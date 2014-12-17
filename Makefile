@@ -16,22 +16,9 @@ clean:
 	rm -v ./bin/*
 
 
-bin/tatanka: src/main.cpp build/cpu.o build/bytecode.o
-	${CXX} ${CXXFLAGS} -o ./bin/tatanka src/main.cpp build/cpu.o build/bytecode.o
+bin/tatanka: src/bytecode.h src/main.cpp build/cpu.o
+	${CXX} ${CXXFLAGS} -o ./bin/tatanka src/main.cpp build/cpu.o
 
 
 build/cpu.o: src/cpu.h src/cpu.cpp
 	${CXX} ${CXXFLAGS} -c -o ./build/cpu.o ./src/cpu.cpp
-
-
-build/bytecode.o: src/bytecode.h src/bytecode.cpp
-	${CXX} ${CXXFLAGS} -c -o ./build/bytecode.o ./src/bytecode.cpp
-
-
-
-
-bin/test: test.cpp
-	${CXX} ${CXXFLAGS} -o ./bin/test test.cpp
-
-try_test: bin/test
-	@./bin/test
