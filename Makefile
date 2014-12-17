@@ -26,3 +26,12 @@ build/cpu.o: src/cpu.h src/cpu.cpp
 
 build/bytecode.o: src/bytecode.h src/bytecode.cpp
 	${CXX} ${CXXFLAGS} -c -o ./build/bytecode.o ./src/bytecode.cpp
+
+
+
+
+bin/test: test.cpp
+	${CXX} ${CXXFLAGS} -o ./bin/test test.cpp
+
+try_test: bin/test
+	@./bin/test
