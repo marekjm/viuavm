@@ -1,0 +1,12 @@
+*.o
+*.so
+*.bin
+
+*~
+
+.*
+!.gitkeep
+!.gitignore
+
+
+bin/
