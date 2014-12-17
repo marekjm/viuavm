@@ -28,16 +28,16 @@ int CPU::run(int cycles) {
         Instruction inst = instructions[addr];
 
         // print out where are we
-        cout << "CPU::run(): instruction at " << hex << addr << ": ";
+        cout << "CPU: instruction at " << hex << addr << ": ";
 
         // switch instructions
         switch ( inst.which ) {
-            case BRANCH:
+            case BRANCH:    // branch to an address
                 cout << "BRANCH " << inst.operands << endl;
                 branch = true;
                 addr = inst.operands;
                 break;
-            case HALT:  // halt the CPU
+            case HALT:      // halt the CPU
                 cout << "HALT" << endl;
                 halt = true;
                 break;
@@ -45,7 +45,11 @@ int CPU::run(int cycles) {
                 cout << "ISTORE " << inst.locals[0] << " " << inst.locals[1] << endl;
                 registers[inst.locals[0]] = (void*)(new int(inst.locals[1]));
                 break;
-            case PRINT_I:
+            case IADD:      // add two integers
+                cout << "IADD " << inst.locals[0] << " " << inst.locals[1] << " " << inst.locals[2] << endl;
+                registers[inst.locals[2]] = (void*)(new int(*(int*)registers[inst.locals[0]] + *(int*)registers[inst.locals[1]]));
+                break;
+            case PRINT_I:   // print an integer
                 cout << "PRINT_I " << inst.locals[0] << endl;
                 cout << *((int*)registers[inst.locals[0]]) << endl;
                 break;
