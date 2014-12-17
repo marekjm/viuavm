@@ -12,6 +12,7 @@ using namespace std;
 int main(int argc, char* argv[]) {
     cout << "tatanka VM, version " << VERSION << endl;
 
+    /*
     vector<Instruction> program_halt;
     program_halt.push_back(Instruction(BRANCH, 3));  // 2
     program_halt.push_back(Instruction(HALT));       // 7
@@ -42,11 +43,26 @@ int main(int argc, char* argv[]) {
     program_iadd.push_back(iadd);
     program_iadd.push_back(print_i);
     program_iadd.push_back(Instruction(HALT));
+    */
+
+    Program program;
+
+    program.push( Instruction(ISTORE, 2).local(0, 1).local(1, 4) )
+           .push( Instruction(ISTORE, 2).local(0, 2).local(1, 8) )
+           .push( Instruction(PRINT_I).local(0, 1) )
+           .push( Instruction(PRINT_I).local(0, 2) )
+           ;
 
     CPU cpu = CPU();
 
-    cpu.load(program_iadd);
-    cpu.run();
+    cpu.setRegisterCount(1024);
+    cpu.load(program.getInstructionVector());
 
-    return 0;
+    int return_code;
+    return_code = cpu.run();
+
+    //cpu.load(program_iadd);
+    //cpu.run();
+
+    return return_code;
 }
