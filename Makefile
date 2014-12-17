@@ -20,5 +20,5 @@ bin/tatanka: src/bytecode.h src/main.cpp build/cpu.o
 	${CXX} ${CXXFLAGS} -o ./bin/tatanka src/main.cpp build/cpu.o
 
 
-build/cpu.o: src/cpu.h src/cpu.cpp
+build/cpu.o: src/bytecode.h src/cpu.h src/cpu.cpp
 	${CXX} ${CXXFLAGS} -c -o ./build/cpu.o ./src/cpu.cpp
