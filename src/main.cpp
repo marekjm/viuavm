@@ -12,57 +12,32 @@ using namespace std;
 int main(int argc, char* argv[]) {
     cout << "tatanka VM, version " << VERSION << endl;
 
-    /*
-    vector<Instruction> program_halt;
-    program_halt.push_back(Instruction(BRANCH, 3));  // 2
-    program_halt.push_back(Instruction(HALT));       // 7
-    program_halt.push_back(Instruction(BRANCH, 1));  // 3
-    program_halt.push_back(Instruction(BRANCH, 2));  // 5
-    program_halt.push_back(Instruction(HALT));       // 7
+    int return_code = 0;
+
+    char program[128];  // bytecode for the program
+
+    program[0] = ISTORE;          // set bytecode for ISTORE
+    ((int*)(program+1))[0] = 1;   // set first operand for ISTORE to int 1 (register 1)
+    ((int*)(program+1))[1] = 1;   // set second operand for ISTORE to int 4 (number 4)
+    program[9] = ISTORE;
+    ((int*)(program+10))[0] = 2;  // set first operand for ISTORE to int 1 (register 1)
+    ((int*)(program+10))[1] = 3;  // set second operand for ISTORE to int 4 (number 4)
+    program[18] = PRINT_I;
+    ((int*)(program+19))[0] = 1;  // print integer in 1. register
+    program[23] = PRINT_I;
+    ((int*)(program+24))[0] = 2;  // print integer in 2. register
+    program[28] = IADD;           // add integer...
+    ((int*)(program+29))[0] = 1;  // ... from register 1
+    ((int*)(program+29))[1] = 2;  // ... to register 2
+    ((int*)(program+29))[2] = 3;  // ... and store the value in register 3
+    program[41] = PRINT_I;
+    ((int*)(program+42))[0] = 3;  // print integer in register 3
+    program[46] = HALT;
 
 
-    vector<Instruction> program_iadd;
-    Instruction istore1 = Instruction(ISTORE, 2);
-    istore1.local(0, 1);
-    istore1.local(1, 4);
+    CPU cpu = CPU(64, program);
 
-    Instruction istore2 = Instruction(ISTORE, 2);
-    istore2.local(0, 2);
-    istore2.local(1, 4);
-
-    Instruction iadd = Instruction(IADD, 3);
-    iadd.local(0, 1);
-    iadd.local(1, 2);
-    iadd.local(2, 3);
-
-    Instruction print_i = Instruction(PRINT_I, 1);
-    print_i.local(0, 3);
-
-    program_iadd.push_back(istore1);
-    program_iadd.push_back(istore2);
-    program_iadd.push_back(iadd);
-    program_iadd.push_back(print_i);
-    program_iadd.push_back(Instruction(HALT));
-    */
-
-    Program program;
-
-    program.push( Instruction(ISTORE, 2).local(0, 1).local(1, 4) )
-           .push( Instruction(ISTORE, 2).local(0, 2).local(1, 8) )
-           .push( Instruction(PRINT_I).local(0, 1) )
-           .push( Instruction(PRINT_I).local(0, 2) )
-           ;
-
-    CPU cpu = CPU();
-
-    cpu.setRegisterCount(1024);
-    cpu.load(program.getInstructionVector());
-
-    int return_code;
-    return_code = cpu.run();
-
-    //cpu.load(program_iadd);
-    //cpu.run();
+    cpu.run2();
 
     return return_code;
 }
