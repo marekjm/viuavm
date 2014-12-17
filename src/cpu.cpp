@@ -5,16 +5,7 @@
 using namespace std;
 
 
-void CPU::setRegisterCount(int n) {
-    for (int i = 0; i < n; ++i) { registers.push_back(0); }
-}
-
-
-void CPU::load(vector<Instruction> ins) {
-    instructions = ins;
-}
-
-
+/*
 void* CPU::getRegister(int index) {
     if (index >= registers.size()) { throw "register index out of bounds"; }
     if (registers[index] == 0) { throw "read from empty register"; }
@@ -88,4 +79,48 @@ int CPU::run(int cycles) {
     cout << endl;
 
     return return_code;
+}
+*/
+
+
+int CPU::run2(int cycles) {
+    if (!bytecode) {
+        throw "null bytecode (maybe not loaded?)";
+    }
+    int return_code = 0;
+
+    int addr = 0;
+    bool halt = false;
+    bool branched;
+
+    while (true) {
+        cout << "CPU: bytecode at 0x" << hex << addr << dec << ": ";
+
+        switch (bytecode[addr]) {
+            case ISTORE:
+                cout << "ISTORE " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << endl;
+                registers[ ((int*)(bytecode+addr+1))[0] ] = (void*)(new int(((int*)(bytecode+addr+1))[1]));
+                addr += 2 * sizeof(int);
+                break;
+            case IADD:
+                cout << "IADD " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
+                registers[ ((int*)(bytecode+addr+1))[2] ] = (void*)(new int( *(int*)registers[((int*)(bytecode+addr+1))[0]] + *(int*)registers[((int*)(bytecode+addr+1))[1]] ));
+                addr += 3 * sizeof(int);
+                break;
+            case PRINT_I:
+                cout << "PRINT_I " << ((int*)(bytecode+addr+1))[0] << endl;
+                cout << *(int*)registers[*((int*)(bytecode+addr+1))] << endl;// (void*)(new int(((int*)(bytecode+addr+1))[1]));
+                addr += sizeof(int);
+                break;
+            case HALT:
+                cout << "HALT" << endl;
+                halt = true;
+                break;
+        }
+
+        if (++addr >= cycles and cycles) break;
+        if (halt) break;
+    }
+
+    return 0;
 }
