@@ -5,7 +5,6 @@ CXXFLAGS=-std=c++11
 .PHONY: clean
 
 all: bin/tatanka
-	@echo "done"
 
 
 run: bin/tatanka
