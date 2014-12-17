@@ -10,11 +10,13 @@ class CPU {
     int instruction_ptr = 0;
 
     std::vector<Instruction> instructions;
-    std::vector<void*> registers = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    std::vector<void*> registers;
 
-    int cycle();
+    void* getRegister(int);
 
     public:
+        void setRegisterCount(int n);
+
         void load(std::vector<Instruction> ins);
         int run(int cycles = 0);
 
