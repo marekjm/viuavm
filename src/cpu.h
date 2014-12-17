@@ -16,8 +16,8 @@ class CPU {
     void* getRegister(int);
 
     public:
+        CPU& load(char*);
         int run(int cycles = 0);
-        int run2(int cycles = 0);
 
         CPU(int r = DEFAULT_REGISTER_SIZE): reg_count(r) {
             /*  Basic constructor.
@@ -27,11 +27,6 @@ class CPU {
             registers = new void*[reg_count];
             for (int i = 0; i < reg_count; ++i) { registers[0] = 0; }
             bytecode = 0;
-        }
-        CPU(int r, char* bytes): CPU(r) {
-            /*  Constructor which allows to feed bytecode to CPU during initialization.
-             */
-            bytecode = bytes;
         }
 
         ~CPU() {

@@ -83,7 +83,12 @@ int CPU::run(int cycles) {
 */
 
 
-int CPU::run2(int cycles) {
+CPU& CPU::load(char* bc) {
+    bytecode = bc;
+    return (*this);
+}
+
+int CPU::run(int cycles) {
     if (!bytecode) {
         throw "null bytecode (maybe not loaded?)";
     }
@@ -94,6 +99,7 @@ int CPU::run2(int cycles) {
     bool branched;
 
     while (true) {
+        branched = false;
         cout << "CPU: bytecode at 0x" << hex << addr << dec << ": ";
 
         switch (bytecode[addr]) {
@@ -107,20 +113,35 @@ int CPU::run2(int cycles) {
                 registers[ ((int*)(bytecode+addr+1))[2] ] = (void*)(new int( *(int*)registers[((int*)(bytecode+addr+1))[0]] + *(int*)registers[((int*)(bytecode+addr+1))[1]] ));
                 addr += 3 * sizeof(int);
                 break;
-            case PRINT_I:
-                cout << "PRINT_I " << ((int*)(bytecode+addr+1))[0] << endl;
-                cout << *(int*)registers[*((int*)(bytecode+addr+1))] << endl;// (void*)(new int(((int*)(bytecode+addr+1))[1]));
+            case IMUL:
+                cout << "IMUL " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
+                registers[ ((int*)(bytecode+addr+1))[2] ] = (void*)(new int( *(int*)registers[((int*)(bytecode+addr+1))[0]] * *(int*)registers[((int*)(bytecode+addr+1))[1]] ));
+                addr += 3 * sizeof(int);
+                break;
+            case IPRINT:
+                cout << "IPRINT " << ((int*)(bytecode+addr+1))[0] << endl;
+                cout << *(int*)registers[*((int*)(bytecode+addr+1))] << endl;
                 addr += sizeof(int);
+                break;
+            case BRANCH:
+                cout << "BRANCH " << *(int*)(bytecode+addr+1) << " (to bytecode " << hex << *(int*)(bytecode+addr+1) << dec << ")" << endl;
+                addr = *(int*)(bytecode+addr+1);
+                branched = true;
                 break;
             case HALT:
                 cout << "HALT" << endl;
                 halt = true;
                 break;
+            default:
+                cout << "unrecognised: aborting (check instruction " << addr << ")" << endl;
+                halt = true;
+                return_code = 2;
         }
 
-        if (++addr >= cycles and cycles) break;
+        if (!branched) ++addr;
+        if (addr >= cycles and cycles) break;
         if (halt) break;
     }
 
-    return 0;
+    return return_code;
 }
