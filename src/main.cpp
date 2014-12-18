@@ -20,10 +20,10 @@ int main(int argc, char* argv[]) {
 
     program[0] = ISTORE;          // set bytecode for ISTORE
     ((int*)(program+1))[0] = 1;   // set first operand for ISTORE to int 1 (register 1)
-    ((int*)(program+1))[1] = 1;   // set second operand for ISTORE to int 4 (number 4)
+    ((int*)(program+1))[1] = 8;   // set second operand for ISTORE to int 4 (number 4)
     program[9] = ISTORE;
     ((int*)(program+10))[0] = 2;  // set first operand for ISTORE to int 1 (register 1)
-    ((int*)(program+10))[1] = 3;  // set second operand for ISTORE to int 4 (number 4)
+    ((int*)(program+10))[1] = 16;  // set second operand for ISTORE to int 4 (number 4)
     program[18] = PRINT;
     ((int*)(program+19))[0] = 1;  // print integer in 1. register
     program[23] = PRINT;
@@ -34,9 +34,9 @@ int main(int argc, char* argv[]) {
     ((int*)(program+29))[2] = 3;  // ... and store the value in register 3
     program[41] = PRINT;
     ((int*)(program+42))[0] = 3;  // print integer in register 3
-    program[46] = IMUL;           // multiply integer...
-    ((int*)(program+47))[0] = 2;  // ... from register 2
-    ((int*)(program+47))[1] = 3;  // ... by register 3
+    program[46] = IDIV;           // divide integer...
+    ((int*)(program+47))[0] = 3;  // ... from register 2
+    ((int*)(program+47))[1] = 1;  // ... by register 3
     ((int*)(program+47))[2] = 4;  // ... and store the value in register 4
     program[59] = PRINT;
     ((int*)(program+60))[0] = 4;  // print integer in register 3

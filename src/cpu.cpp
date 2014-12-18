@@ -115,9 +115,23 @@ int CPU::run(int cycles) {
                                                                           );
                 addr += 3 * sizeof(int);
                 break;
+            case ISUB:
+                cout << "ISUB " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
+                registers[ ((int*)(bytecode+addr+1))[2] ] = new Integer( static_cast<Integer*>( registers[((int*)(bytecode+addr+1))[0]] )->value() -
+                                                                          static_cast<Integer*>( registers[((int*)(bytecode+addr+1))[1]] )->value()
+                                                                          );
+                addr += 3 * sizeof(int);
+                break;
             case IMUL:
                 cout << "IMUL " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
                 registers[ ((int*)(bytecode+addr+1))[2] ] = new Integer( static_cast<Integer*>( registers[((int*)(bytecode+addr+1))[0]] )->value() *
+                                                                          static_cast<Integer*>( registers[((int*)(bytecode+addr+1))[1]] )->value()
+                                                                          );
+                addr += 3 * sizeof(int);
+                break;
+            case IDIV:
+                cout << "IDIV " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
+                registers[ ((int*)(bytecode+addr+1))[2] ] = new Integer( static_cast<Integer*>( registers[((int*)(bytecode+addr+1))[0]] )->value() /
                                                                           static_cast<Integer*>( registers[((int*)(bytecode+addr+1))[1]] )->value()
                                                                           );
                 addr += 3 * sizeof(int);
@@ -128,7 +142,7 @@ int CPU::run(int cycles) {
                 addr += sizeof(int);
                 break;
             case BRANCH:
-                cout << "BRANCH " << *(int*)(bytecode+addr+1) << " (to bytecode " << hex << *(int*)(bytecode+addr+1) << dec << ")" << endl;
+                cout << "BRANCH " << *(int*)(bytecode+addr+1) << " (to bytecode 0x" << hex << *(int*)(bytecode+addr+1) << dec << ")" << endl;
                 addr = *(int*)(bytecode+addr+1);
                 branched = true;
                 break;
@@ -146,9 +160,6 @@ int CPU::run(int cycles) {
         if (addr >= cycles and cycles) break;
         if (halt) break;
     }
-
-    cout << registers[1]->str() << endl;
-    cout << registers[2]->str() << endl;
 
     return return_code;
 }
