@@ -8,13 +8,15 @@
 #include "bytecode.h"
 using namespace std;
 
+#define byte char
+
 
 int main(int argc, char* argv[]) {
     cout << "tatanka VM, version " << VERSION << endl;
 
     int return_code = 0;
 
-    char program[128];  // bytecode for the program
+    byte program[128];  // bytecode for the program
 
     program[0] = ISTORE;          // set bytecode for ISTORE
     ((int*)(program+1))[0] = 1;   // set first operand for ISTORE to int 1 (register 1)
