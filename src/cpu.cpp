@@ -105,22 +105,26 @@ int CPU::run(int cycles) {
         switch (bytecode[addr]) {
             case ISTORE:
                 cout << "ISTORE " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << endl;
-                registers[ ((int*)(bytecode+addr+1))[0] ] = (void*)(new int(((int*)(bytecode+addr+1))[1]));
+                registers[ ((int*)(bytecode+addr+1))[0] ] = new Integer(((int*)(bytecode+addr+1))[1]);
                 addr += 2 * sizeof(int);
                 break;
             case IADD:
                 cout << "IADD " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
-                registers[ ((int*)(bytecode+addr+1))[2] ] = (void*)(new int( *(int*)registers[((int*)(bytecode+addr+1))[0]] + *(int*)registers[((int*)(bytecode+addr+1))[1]] ));
+                registers[ ((int*)(bytecode+addr+1))[2] ] = new Integer( static_cast<Integer*>( registers[((int*)(bytecode+addr+1))[0]] )->value() +
+                                                                          static_cast<Integer*>( registers[((int*)(bytecode+addr+1))[1]] )->value()
+                                                                          );
                 addr += 3 * sizeof(int);
                 break;
             case IMUL:
                 cout << "IMUL " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
-                registers[ ((int*)(bytecode+addr+1))[2] ] = (void*)(new int( *(int*)registers[((int*)(bytecode+addr+1))[0]] * *(int*)registers[((int*)(bytecode+addr+1))[1]] ));
+                registers[ ((int*)(bytecode+addr+1))[2] ] = new Integer( static_cast<Integer*>( registers[((int*)(bytecode+addr+1))[0]] )->value() *
+                                                                          static_cast<Integer*>( registers[((int*)(bytecode+addr+1))[1]] )->value()
+                                                                          );
                 addr += 3 * sizeof(int);
                 break;
-            case IPRINT:
-                cout << "IPRINT " << ((int*)(bytecode+addr+1))[0] << endl;
-                cout << *(int*)registers[*((int*)(bytecode+addr+1))] << endl;
+            case PRINT:
+                cout << "PRINT " << ((int*)(bytecode+addr+1))[0] << endl;
+                cout << (registers[*((int*)(bytecode+addr+1))])->str() << endl;
                 addr += sizeof(int);
                 break;
             case BRANCH:
@@ -142,6 +146,9 @@ int CPU::run(int cycles) {
         if (addr >= cycles and cycles) break;
         if (halt) break;
     }
+
+    cout << registers[1]->str() << endl;
+    cout << registers[2]->str() << endl;
 
     return return_code;
 }

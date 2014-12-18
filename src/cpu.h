@@ -4,13 +4,15 @@
 #pragma once
 
 #include "bytecode.h"
+#include "types/object.h"
+#include "types/integer.h"
 
 const int DEFAULT_REGISTER_SIZE = 64;
 
 
 class CPU {
     char* bytecode;
-    void** registers;
+    Object** registers;
     int reg_count;
 
     void* getRegister(int);
@@ -24,8 +26,8 @@ class CPU {
              *  Creates registers array of requested size and
              *  initializes it with zeroes.
              */
-            registers = new void*[reg_count];
-            for (int i = 0; i < reg_count; ++i) { registers[0] = 0; }
+            registers = new Object*[reg_count];
+            for (int i = 0; i < reg_count; ++i) { registers[i] = 0; }
             bytecode = 0;
         }
 
