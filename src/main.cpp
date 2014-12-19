@@ -8,8 +8,7 @@
 #include "bytecode.h"
 using namespace std;
 
-#define byte char
-
+typedef char byte;
 
 int main(int argc, char* argv[]) {
     cout << "tatanka VM, version " << VERSION << endl;
@@ -48,9 +47,18 @@ int main(int argc, char* argv[]) {
     ((int*)(program+75))[0] = 4;  // print integer in register 3
 
     program[123] = BRANCH;        // another BRANCH, just to show off
-    ((int*)(program+124))[0] = 108;
+    ((int*)(program+124))[0] = 90;
 
-    program[0x6c] = HALT;         // finally, a HALT
+    program[90] = IDEC;
+    ((int*)(program+91))[0] = 4;
+    program[95] = IINC;
+    ((int*)(program+96))[0] = 4;
+    program[100] = IDEC;
+    ((int*)(program+101))[0] = 4;
+    program[105] = PRINT;
+    ((int*)(program+106))[0] = 4;
+
+    program[110] = HALT;         // finally, a HALT instruction
 
 
     /*
