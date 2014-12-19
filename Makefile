@@ -22,3 +22,11 @@ bin/tatanka: src/bytecode.h src/main.cpp build/cpu.o
 
 build/cpu.o: src/bytecode.h src/cpu.h src/cpu.cpp
 	${CXX} ${CXXFLAGS} -c -o ./build/cpu.o ./src/cpu.cpp
+
+
+bin/test: test.cpp
+	${CXX} ${CXXFLAGS} -o ./bin/test test.cpp ./build/object.o
+
+
+try_test: bin/test
+	@./bin/test
