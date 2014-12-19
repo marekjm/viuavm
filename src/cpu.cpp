@@ -102,58 +102,74 @@ int CPU::run(int cycles) {
         branched = false;
         cout << "CPU: bytecode at 0x" << hex << addr << dec << ": ";
 
-        switch (bytecode[addr]) {
-            case ISTORE:
-                cout << "ISTORE " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << endl;
-                registers[ ((int*)(bytecode+addr+1))[0] ] = new Integer(((int*)(bytecode+addr+1))[1]);
-                addr += 2 * sizeof(int);
-                break;
-            case IADD:
-                cout << "IADD " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
-                registers[ ((int*)(bytecode+addr+1))[2] ] = new Integer( static_cast<Integer*>( registers[((int*)(bytecode+addr+1))[0]] )->value() +
-                                                                          static_cast<Integer*>( registers[((int*)(bytecode+addr+1))[1]] )->value()
-                                                                          );
-                addr += 3 * sizeof(int);
-                break;
-            case ISUB:
-                cout << "ISUB " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
-                registers[ ((int*)(bytecode+addr+1))[2] ] = new Integer( static_cast<Integer*>( registers[((int*)(bytecode+addr+1))[0]] )->value() -
-                                                                          static_cast<Integer*>( registers[((int*)(bytecode+addr+1))[1]] )->value()
-                                                                          );
-                addr += 3 * sizeof(int);
-                break;
-            case IMUL:
-                cout << "IMUL " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
-                registers[ ((int*)(bytecode+addr+1))[2] ] = new Integer( static_cast<Integer*>( registers[((int*)(bytecode+addr+1))[0]] )->value() *
-                                                                          static_cast<Integer*>( registers[((int*)(bytecode+addr+1))[1]] )->value()
-                                                                          );
-                addr += 3 * sizeof(int);
-                break;
-            case IDIV:
-                cout << "IDIV " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
-                registers[ ((int*)(bytecode+addr+1))[2] ] = new Integer( static_cast<Integer*>( registers[((int*)(bytecode+addr+1))[0]] )->value() /
-                                                                          static_cast<Integer*>( registers[((int*)(bytecode+addr+1))[1]] )->value()
-                                                                          );
-                addr += 3 * sizeof(int);
-                break;
-            case PRINT:
-                cout << "PRINT " << ((int*)(bytecode+addr+1))[0] << endl;
-                cout << (registers[*((int*)(bytecode+addr+1))])->str() << endl;
-                addr += sizeof(int);
-                break;
-            case BRANCH:
-                cout << "BRANCH " << *(int*)(bytecode+addr+1) << " (to bytecode 0x" << hex << *(int*)(bytecode+addr+1) << dec << ")" << endl;
-                addr = *(int*)(bytecode+addr+1);
-                branched = true;
-                break;
-            case HALT:
-                cout << "HALT" << endl;
-                halt = true;
-                break;
-            default:
-                cout << "unrecognised: aborting (check instruction " << addr << ")" << endl;
-                halt = true;
-                return_code = 2;
+        try {
+            switch (bytecode[addr]) {
+                case ISTORE:
+                    cout << "ISTORE " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << endl;
+                    registers[ ((int*)(bytecode+addr+1))[0] ] = new Integer(((int*)(bytecode+addr+1))[1]);
+                    addr += 2 * sizeof(int);
+                    break;
+                case IADD:
+                    cout << "IADD " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
+                    registers[ ((int*)(bytecode+addr+1))[2] ] = new Integer( static_cast<Integer*>( registers[((int*)(bytecode+addr+1))[0]] )->value() +
+                                                                              static_cast<Integer*>( registers[((int*)(bytecode+addr+1))[1]] )->value()
+                                                                              );
+                    addr += 3 * sizeof(int);
+                    break;
+                case ISUB:
+                    cout << "ISUB " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
+                    registers[ ((int*)(bytecode+addr+1))[2] ] = new Integer( static_cast<Integer*>( registers[((int*)(bytecode+addr+1))[0]] )->value() -
+                                                                              static_cast<Integer*>( registers[((int*)(bytecode+addr+1))[1]] )->value()
+                                                                              );
+                    addr += 3 * sizeof(int);
+                    break;
+                case IMUL:
+                    cout << "IMUL " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
+                    registers[ ((int*)(bytecode+addr+1))[2] ] = new Integer( static_cast<Integer*>( registers[((int*)(bytecode+addr+1))[0]] )->value() *
+                                                                              static_cast<Integer*>( registers[((int*)(bytecode+addr+1))[1]] )->value()
+                                                                              );
+                    addr += 3 * sizeof(int);
+                    break;
+                case IDIV:
+                    cout << "IDIV " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
+                    registers[ ((int*)(bytecode+addr+1))[2] ] = new Integer( static_cast<Integer*>( registers[((int*)(bytecode+addr+1))[0]] )->value() /
+                                                                              static_cast<Integer*>( registers[((int*)(bytecode+addr+1))[1]] )->value()
+                                                                              );
+                    addr += 3 * sizeof(int);
+                    break;
+                case IINC:
+                    cout << "IINC " << ((int*)(bytecode+addr+1))[0] << endl;
+                    (static_cast<Integer*>( registers[ ((int*)(bytecode+addr+1))[0] ] )->value())++;
+                    addr += sizeof(int);
+                    break;
+                case IDEC:
+                    cout << "IDEC " << ((int*)(bytecode+addr+1))[0] << endl;
+                    (static_cast<Integer*>( registers[ ((int*)(bytecode+addr+1))[0] ] )->value())--;
+                    addr += sizeof(int);
+                    break;
+                case PRINT:
+                    cout << "PRINT " << ((int*)(bytecode+addr+1))[0] << endl;
+                    cout << (registers[*((int*)(bytecode+addr+1))])->str() << endl;
+                    addr += sizeof(int);
+                    break;
+                case BRANCH:
+                    cout << "BRANCH " << *(int*)(bytecode+addr+1) << " (to bytecode 0x" << hex << *(int*)(bytecode+addr+1) << dec << ")" << endl;
+                    addr = *(int*)(bytecode+addr+1);
+                    branched = true;
+                    break;
+                case HALT:
+                    cout << "HALT" << endl;
+                    halt = true;
+                    break;
+                default:
+                    ostringstream error;
+                    error << "unrecognised instruction (bytecode value: " << (int)bytecode[addr] << ")";
+                    throw error.str().c_str();
+            }
+        } catch (const char* &e) {
+            return_code = 1;
+            cout << "exception: " << e << endl;
+            break;
         }
 
         if (!branched) ++addr;
