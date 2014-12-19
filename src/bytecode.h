@@ -9,6 +9,8 @@ enum Bytecode {
     ISUB,       // ISUB <register-a> <register-b> <register-result> (a - b)
     IMUL,       // IMUL <register-a> <register-b> <register-result> (a * b)
     IDIV,       // IDIV <register-a> <register-b> <register-result> (a / b)
+    IINC,       // IINC <register-index>    (increment integer at given register)
+    IDEC,       // IDEC <register-index>    (decrement integer at given register)
 
     ILT,        // ILT  <reg-a> <reg-b> <reg-result> (a < b)
     ILTE,       // ILTE <reg-a> <reg-b> <reg-result> (a <= b)
