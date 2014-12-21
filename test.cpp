@@ -2,6 +2,7 @@
 #include <string>
 #include "src/types/object.h"
 #include "src/types/integer.h"
+#include "src/types/boolean.h"
 using namespace std;
 
 
@@ -53,14 +54,12 @@ int main() {
     registers[0] = new Object();
     registers[1] = new Integer(2);
     registers[2] = new UnsignedInteger();
-    registers[3] = new Integer(4);
+    registers[3] = new Boolean();
 
     cout << (*(registers[0])).str() << endl;
     cout << (*(registers[1])).str() << " " << (*static_cast<Integer*>(registers[1])).value() << endl;
     cout << (*(registers[2])).str() << " " << (*static_cast<UnsignedInteger*>(registers[2])).value() << endl;
-
-    registers[4] = new Integer((*static_cast<Integer*>(registers[1])).value() + (*static_cast<Integer*>(registers[3])).value());
-    cout << registers[4]->str() << endl;
+    cout << (*(registers[3])).str() << " " << endl;
 
     return 0;
 }
