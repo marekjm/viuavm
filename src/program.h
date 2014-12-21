@@ -22,12 +22,12 @@ class Program {
     public:
     // instructions interface
     Program& istore     (int, int);
-    Program& iadd       ();
-    Program& isub       ();
-    Program& imul       ();
-    Program& idiv       ();
-    Program& iinc       ();
-    Program& idec       ();
+    Program& iadd       (int, int, int);
+    Program& isub       (int, int, int);
+    Program& imul       (int, int, int);
+    Program& idiv       (int, int, int);
+    Program& iinc       (int);
+    Program& idec       (int);
     Program& ilt        ();
     Program& ilte       ();
     Program& igt        ();
@@ -42,11 +42,7 @@ class Program {
     Program& halt       ();
 
     Program& setAddressPtr(int n = 0);
-
     Program& calculateBranches();
-
-    // byte array manipulation
-    void expand(int n = 0);
 
     // representations
     byte* bytecode();
