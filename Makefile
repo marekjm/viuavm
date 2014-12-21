@@ -44,5 +44,13 @@ sample_ifbranching: bin/sample/ifbranching
 	@./bin/sample/ifbranching
 
 
+bin/sample/looping: src/bytecode.h src/sample/looping.cpp build/cpu.o build/program.o
+	${CXX} ${CXXFLAGS} -o ./bin/sample/looping src/sample/looping.cpp build/cpu.o build/program.o
+
+sample_looping: bin/sample/looping
+	@./bin/sample/looping
+
+
+
 try_test: bin/test
 	@./bin/test
