@@ -18,7 +18,7 @@ class Program {
 
     public:
     // instructions interface
-    Program& istore     ();
+    Program& istore     (int, int);
     Program& iadd       ();
     Program& isub       ();
     Program& imul       ();
@@ -38,6 +38,8 @@ class Program {
     Program& pass       ();
     Program& halt       ();
 
+    Program& setAddressPtr(int n = 0);
+
     // byte array manipulation
     void expand(int n = 0);
 
@@ -49,10 +51,12 @@ class Program {
     int size();
 
 
-    Program(int bts = 64): bytes(bts) {
+    Program(int bts = 2): bytes(bts) {
         program = new byte[bytes];
         for (int i = 0; i < bytes; ++i) { program[i] = PASS; }
-        program[bytes-1] = HALT;
+
+        addr_no = 0;
+        addr_ptr = program+addr_no;
     }
     ~Program() {
         delete[] program;
