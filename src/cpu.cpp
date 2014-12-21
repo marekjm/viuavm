@@ -98,6 +98,9 @@ int CPU::run(int cycles) {
                     break;
                 case BRANCH:
                     cout << "BRANCH 0x" << hex << *(int*)(bytecode+addr+1) << dec << endl;
+                    if ((*(int*)(bytecode+addr+1)) == addr) {
+                        throw "aborting: BRANCH instruction pointing to itself";
+                    }
                     addr = *(int*)(bytecode+addr+1);
                     branched = true;
                     break;
