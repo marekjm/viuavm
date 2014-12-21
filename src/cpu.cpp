@@ -25,6 +25,14 @@ CPU& CPU::load(char* bc) {
     return (*this);
 }
 
+CPU& CPU::bytes(int sz) {
+    /*  Set bytecode size, so the CPU can stop execution even if it doesn't reach HALT instruction but reaches
+     *  bytecode address out of bounds.
+     */
+    bytecode_size = sz;
+    return (*this);
+}
+
 
 Object* CPU::fetchRegister(int i, bool nullok) {
     /*  Return pointer to object at given register.
@@ -46,7 +54,7 @@ Object* CPU::fetchRegister(int i, bool nullok) {
     return optr;
 }
 
-int CPU::run(int cycles) {
+int CPU::run() {
     /*  VM CPU implementation.
      *
      *  A giant switch-in-while which iterates over bytecode and executes encoded instructions.
@@ -116,6 +124,34 @@ int CPU::run(int cycles) {
                                                                              );
                     addr += 3 * sizeof(int);
                     break;
+                case ILTE:
+                    cout << "ILTE " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
+                    registers[ ((int*)(bytecode+addr+1))[2] ] = new Boolean( static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value() <=
+                                                                             static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[1] ) )->value()
+                                                                             );
+                    addr += 3 * sizeof(int);
+                    break;
+                case IGT:
+                    cout << "IGT " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
+                    registers[ ((int*)(bytecode+addr+1))[2] ] = new Boolean( static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value() >
+                                                                             static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[1] ) )->value()
+                                                                             );
+                    addr += 3 * sizeof(int);
+                    break;
+                case IGTE:
+                    cout << "IGTE " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
+                    registers[ ((int*)(bytecode+addr+1))[2] ] = new Boolean( static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value() >=
+                                                                             static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[1] ) )->value()
+                                                                             );
+                    addr += 3 * sizeof(int);
+                    break;
+                case IEQ:
+                    cout << "IEQ " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
+                    registers[ ((int*)(bytecode+addr+1))[2] ] = new Boolean( static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value() ==
+                                                                             static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[1] ) )->value()
+                                                                             );
+                    addr += 3 * sizeof(int);
+                    break;
                 case PRINT:
                     cout << "PRINT " << ((int*)(bytecode+addr+1))[0] << endl;
                     cout << fetchRegister(*((int*)(bytecode+addr+1)))->str() << endl;
@@ -129,6 +165,16 @@ int CPU::run(int cycles) {
                     addr = *(int*)(bytecode+addr+1);
                     branched = true;
                     break;
+                case BRANCHIF:
+                    cout << "BRANCH 0x" << hex << *(int*)(bytecode+addr+1) << dec << endl;
+                    if ((*((int*)(bytecode+addr+1))) == addr or
+                        (*((int*)(bytecode+addr+1)+1)) == addr) {
+                        throw "aborting: BRANCH instruction pointing to itself";
+                    }
+                    addr = *(int*)(bytecode+addr+1);
+                    branched = true;
+                    break;
+
                 case RET:
                     cout << "RET " << *(int*)(bytecode+addr+1) << endl;
                     if (fetchRegister(*((int*)(bytecode+addr+1)))->type() == "Integer") {
@@ -157,8 +203,13 @@ int CPU::run(int cycles) {
         }
 
         if (!branched) ++addr;
-        if (addr >= cycles and cycles) break;
         if (halt) break;
+
+        if (addr >= bytecode_size and bytecode_size) {
+            cout << "CPU: aborting: bytecode address out of bound and no HALT instruction reached" << endl;
+            return_code = 1;
+            break;
+        }
     }
 
     if (return_code == 0 and registers[0]) {

@@ -14,12 +14,14 @@ class CPU {
     char* bytecode;
     Object** registers;
     int reg_count;
+    int bytecode_size;
 
     Object* fetchRegister(int i, bool nullok = false);
 
     public:
         CPU& load(char*);
-        int run(int cycles = 0);
+        CPU& bytes(int);
+        int run();
 
         CPU(int r = DEFAULT_REGISTER_SIZE): reg_count(r) {
             /*  Basic constructor.
@@ -29,6 +31,7 @@ class CPU {
             registers = new Object*[reg_count];
             for (int i = 0; i < reg_count; ++i) { registers[i] = 0; }
             bytecode = 0;
+            bytecode_size = 0;
         }
 
         ~CPU() {
