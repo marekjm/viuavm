@@ -26,6 +26,7 @@ enum Bytecode {
     RET,        // RET <reg-index>
     END,        // END  (end, e.g. function call)
 
+    PASS,       // "do nothing" instruction
     HALT,       // HALT
 };
 

@@ -114,6 +114,9 @@ int CPU::run(int cycles) {
                     cout << "HALT" << endl;
                     halt = true;
                     break;
+                case PASS:
+                    cout << "PASS" << endl;
+                    break;
                 default:
                     ostringstream error;
                     error << "unrecognised instruction (bytecode value: " << (int)bytecode[addr] << ")";
