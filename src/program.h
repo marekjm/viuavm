@@ -2,6 +2,7 @@
 #define TATANKA_PROGRAM_H
 
 #include <string>
+#include <vector>
 #include "bytecode.h"
 
 typedef char byte;
@@ -13,8 +14,10 @@ class Program {
     int addr_no;
     byte* addr_ptr;
 
+    std::vector<int> branches;
 
-    void ensurebytes(int n);
+    void ensurebytes(int);
+    int getInstructionBytecodeOffset(int, int count = -1);
 
     public:
     // instructions interface
@@ -30,15 +33,17 @@ class Program {
     Program& igt        ();
     Program& igte       ();
     Program& ieq        ();
-    Program& print      ();
-    Program& branch     ();
+    Program& branch     (int);
     Program& branchif   ();
     Program& ret        ();
     Program& end        ();
+    Program& print      (int);
     Program& pass       ();
     Program& halt       ();
 
     Program& setAddressPtr(int n = 0);
+
+    Program& calculateBranches();
 
     // byte array manipulation
     void expand(int n = 0);
@@ -49,6 +54,7 @@ class Program {
 
 
     int size();
+    int instructionCount();
 
 
     Program(int bts = 2): bytes(bts) {

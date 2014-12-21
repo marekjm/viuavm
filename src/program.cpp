@@ -34,6 +34,36 @@ int Program::size() {
     return bytes;
 }
 
+int Program::instructionCount() {
+    /*  Returns total number of instructions in the program.
+     *  Should be called only after the program is constructed as it is calculated by
+     *  bytecode analysis.
+     */
+    int counter = 0;
+    for (int i = 0; i < bytes; ++i) {
+        switch (program[i]) {
+            case IADD:
+            case ISUB:
+            case IMUL:
+            case IDIV:
+                i += 3 * sizeof(int);
+                break;
+            case ISTORE:
+                i += 2 * sizeof(int);
+                break;
+            case IINC:
+            case IDEC:
+            case PRINT:
+            case BRANCH:
+            case RET:
+                i += sizeof(int);
+                break;
+        }
+        ++counter;
+    }
+    return counter;
+}
+
 
 void Program::expand(int n) {
     /*  Expands program's byte array with n bytes.
@@ -65,11 +95,63 @@ Program& Program::setAddressPtr(int addr) {
     return (*this);
 }
 
+int Program::getInstructionBytecodeOffset(int instr, int count) {
+    /*  Returns bytecode offset for given instruction index.
+     *  The "count" parameter is there to pass assumed instruction count to
+     *  avoid recalculating it on every call.
+     */
+
+    // check if instruction count was passed, and calculate it if not
+    count = (count >= 0 ? count : instructionCount());
+
+    int offset = 0;
+    for (int i = 0; i < (instr >= 0 ? instr : count+instr); ++i) {
+        /*  The offset is automatically increased by one byte each time the loop is iterated over.
+         *  This means that inside the switch statement, the offset has to be increased just by the
+         *  number of bytes occupied by instruction operands.
+         *
+         *  It is done this way beacaue it is more ellegant than always writing '1 + <some offset>'
+         *  every time, and defaulting to 'offset++'.
+         */
+        switch (program[offset++]) {
+            case IADD:
+            case ISUB:
+            case IMUL:
+            case IDIV:
+                offset += 3 * sizeof(int);
+                break;
+            case ISTORE:
+                offset += 2 * sizeof(int);
+                break;
+            case IINC:
+            case IDEC:
+            case PRINT:
+            case BRANCH:
+            case RET:
+                offset += sizeof(int);
+                break;
+        }
+    }
+    return offset;
+}
+
+Program& Program::calculateBranches() {
+    /*  This function should be called after program is constructed
+     *  to calculate correct bytecode offsets for BRANCH instructions.
+     */
+    int instruction_count = instructionCount();
+    int* ptr;
+    for (int i = 0; i < branches.size(); ++i) {
+        ptr = (int*)(program+branches[i]+1);
+        (*ptr) = getInstructionBytecodeOffset(*ptr, instruction_count);
+    }
+}
+
 
 Program& Program::istore(int regno, int i) {
-    /*  Appends istore instruction to bytecode.
+    /*  Inserts istore instruction to bytecode.
      *
-     *  Parameters:
+     *  :params:
      *
      *  regno:int - register number
      *  i:int     - value to store
@@ -81,6 +163,42 @@ Program& Program::istore(int regno, int i) {
     ((int*)addr_ptr)[0] = regno;
     ((int*)addr_ptr)[1] = i;
     addr_no += 2 * sizeof(int);
+    addr_ptr = program+addr_no;
+
+    return (*this);
+}
+
+Program& Program::branch(int addr) {
+    /*  Inserts branch instruction. Parameter is instruction index.
+     *  Byte offset is calculated automatically.
+     *
+     *  :params:
+     *
+     *  addr:int    - index of the instruction to which to branch
+     */
+    ensurebytes(1 + sizeof(int));
+
+    // save branch instruction index for later evaluation
+    branches.push_back(addr_no);
+
+    program[addr_no++] = BRANCH;
+    addr_ptr++;
+    ((int*)addr_ptr)[0] = addr;
+    addr_no += sizeof(int);
+    addr_ptr = program+addr_no;
+
+    return (*this);
+}
+
+Program& Program::print(int regno) {
+    /*  Inserts print instuction.
+     */
+    ensurebytes(1 + sizeof(int));
+
+    program[addr_no++] = PRINT;
+    addr_ptr++;
+    ((int*)addr_ptr)[0] = regno;
+    addr_no += sizeof(int);
     addr_ptr = program+addr_no;
 
     return (*this);
