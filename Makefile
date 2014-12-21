@@ -25,7 +25,7 @@ build/cpu.o: src/bytecode.h src/cpu.h src/cpu.cpp
 
 
 bin/test: test.cpp
-	${CXX} ${CXXFLAGS} -o ./bin/test test.cpp ./build/object.o
+	${CXX} ${CXXFLAGS} -o ./bin/test test.cpp
 
 
 try_test: bin/test
