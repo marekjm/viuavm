@@ -459,12 +459,14 @@ Program& Program::branch(int addr) {
 }
 
 Program& Program::branchif(int regcondition, int addr_truth, int addr_false) {
-    /*  Inserts branch instruction. Parameter is instruction index.
+    /*  Inserts branchif instruction.
      *  Byte offset is calculated automatically.
      *
      *  :params:
      *
-     *  addr:int    - index of the instruction to which to branch
+     *  regcondition:int    - index of the instruction to which to branch
+     *  addr_truth:int      - instruction index to go if condition is true
+     *  addr_false:int      - instruction index to go if condition is false
      */
     ensurebytes(1 + 3*sizeof(int));
 
