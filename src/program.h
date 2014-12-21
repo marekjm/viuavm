@@ -15,6 +15,7 @@ class Program {
     byte* addr_ptr;
 
     std::vector<int> branches;
+    std::vector<int> ifbranches;
 
     void ensurebytes(int);
     int getInstructionBytecodeOffset(int, int count = -1);
@@ -28,16 +29,16 @@ class Program {
     Program& idiv       (int, int, int);
     Program& iinc       (int);
     Program& idec       (int);
-    Program& ilt        ();
-    Program& ilte       ();
-    Program& igt        ();
-    Program& igte       ();
-    Program& ieq        ();
-    Program& branch     (int);
-    Program& branchif   ();
-    Program& ret        ();
-    Program& end        ();
+    Program& ilt        (int, int, int);
+    Program& ilte       (int, int, int);
+    Program& igt        (int, int, int);
+    Program& igte       (int, int, int);
+    Program& ieq        (int, int, int);
     Program& print      (int);
+    Program& branch     (int);
+    Program& branchif   (int, int, int);
+    Program& ret        (int);
+    Program& end        ();
     Program& pass       ();
     Program& halt       ();
 

@@ -106,6 +106,7 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
             case ISUB:
             case IMUL:
             case IDIV:
+            case BRANCHIF:
                 offset += 3 * sizeof(int);
                 break;
             case ISTORE:
@@ -287,6 +288,130 @@ Program& Program::idec(int regno) {
     return (*this);
 }
 
+Program& Program::ilt(int rega, int regb, int regresult) {
+    /*  Inserts ilt instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  rega:int        - register index of first operand
+     *  regb:int        - register index of second operand
+     *  regresult:int   - register index in which to store the result
+     */
+    ensurebytes(1 + 3*sizeof(int));
+
+    program[addr_no++] = ILT;
+    addr_ptr++;
+    ((int*)addr_ptr)[0] = rega;
+    ((int*)addr_ptr)[1] = regb;
+    ((int*)addr_ptr)[2] = regresult;
+    addr_no += 3 * sizeof(int);
+    addr_ptr = program+addr_no;
+
+    return (*this);
+}
+
+Program& Program::ilte(int rega, int regb, int regresult) {
+    /*  Inserts ilte instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  rega:int        - register index of first operand
+     *  regb:int        - register index of second operand
+     *  regresult:int   - register index in which to store the result
+     */
+    ensurebytes(1 + 3*sizeof(int));
+
+    program[addr_no++] = ILTE;
+    addr_ptr++;
+    ((int*)addr_ptr)[0] = rega;
+    ((int*)addr_ptr)[1] = regb;
+    ((int*)addr_ptr)[2] = regresult;
+    addr_no += 3 * sizeof(int);
+    addr_ptr = program+addr_no;
+
+    return (*this);
+}
+
+Program& Program::igt(int rega, int regb, int regresult) {
+    /*  Inserts igt instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  rega:int        - register index of first operand
+     *  regb:int        - register index of second operand
+     *  regresult:int   - register index in which to store the result
+     */
+    ensurebytes(1 + 3*sizeof(int));
+
+    program[addr_no++] = IGT;
+    addr_ptr++;
+    ((int*)addr_ptr)[0] = rega;
+    ((int*)addr_ptr)[1] = regb;
+    ((int*)addr_ptr)[2] = regresult;
+    addr_no += 3 * sizeof(int);
+    addr_ptr = program+addr_no;
+
+    return (*this);
+}
+
+Program& Program::igte(int rega, int regb, int regresult) {
+    /*  Inserts igte instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  rega:int        - register index of first operand
+     *  regb:int        - register index of second operand
+     *  regresult:int   - register index in which to store the result
+     */
+    ensurebytes(1 + 3*sizeof(int));
+
+    program[addr_no++] = IGTE;
+    addr_ptr++;
+    ((int*)addr_ptr)[0] = rega;
+    ((int*)addr_ptr)[1] = regb;
+    ((int*)addr_ptr)[2] = regresult;
+    addr_no += 3 * sizeof(int);
+    addr_ptr = program+addr_no;
+
+    return (*this);
+}
+
+Program& Program::ieq(int rega, int regb, int regresult) {
+    /*  Inserts ieq instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  rega:int        - register index of first operand
+     *  regb:int        - register index of second operand
+     *  regresult:int   - register index in which to store the result
+     */
+    ensurebytes(1 + 3*sizeof(int));
+
+    program[addr_no++] = IEQ;
+    addr_ptr++;
+    ((int*)addr_ptr)[0] = rega;
+    ((int*)addr_ptr)[1] = regb;
+    ((int*)addr_ptr)[2] = regresult;
+    addr_no += 3 * sizeof(int);
+    addr_ptr = program+addr_no;
+
+    return (*this);
+}
+
+Program& Program::print(int regno) {
+    /*  Inserts print instuction.
+     */
+    ensurebytes(1 + sizeof(int));
+
+    program[addr_no++] = PRINT;
+    addr_ptr++;
+    ((int*)addr_ptr)[0] = regno;
+    addr_no += sizeof(int);
+    addr_ptr = program+addr_no;
+
+    return (*this);
+}
+
 Program& Program::branch(int addr) {
     /*  Inserts branch instruction. Parameter is instruction index.
      *  Byte offset is calculated automatically.
@@ -309,12 +434,43 @@ Program& Program::branch(int addr) {
     return (*this);
 }
 
-Program& Program::print(int regno) {
-    /*  Inserts print instuction.
+Program& Program::branchif(int regcondition, int addr_truth, int addr_false) {
+    /*  Inserts branchif instruction. Parameter is instruction index.
+     *  Byte offset is calculated automatically.
+     *
+     *  :params:
+     *
+     *  regcondition:int    - index of the register to check for truth
+     *  addr_truth:int      - instruction to go to if true
+     *  addr_false:int      - instruction to go to if false
+     */
+    ensurebytes(1 + 3*sizeof(int));
+
+    // save branch instruction index for later evaluation
+    ifbranches.push_back(addr_no);
+
+    program[addr_no++] = BRANCHIF;
+    addr_ptr++;
+    ((int*)addr_ptr)[0] = regcondition;
+    ((int*)addr_ptr)[1] = addr_truth;
+    ((int*)addr_ptr)[2] = addr_false;
+    addr_no += 3*sizeof(int);
+    addr_ptr = program+addr_no;
+
+    return (*this);
+}
+
+Program& Program::ret(int regno) {
+    /*  Inserts ret instruction. Parameter is instruction index.
+     *  Byte offset is calculated automatically.
+     *
+     *  :params:
+     *
+     *  regno:int   - index of the register which will be stored as return value
      */
     ensurebytes(1 + sizeof(int));
 
-    program[addr_no++] = PRINT;
+    program[addr_no++] = RET;
     addr_ptr++;
     ((int*)addr_ptr)[0] = regno;
     addr_no += sizeof(int);

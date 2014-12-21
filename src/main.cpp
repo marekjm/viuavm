@@ -42,37 +42,80 @@ int main(int argc, char* argv[]) {
     boolean_and_branching_test[51] = HALT;
 
 
-    // Or more concisely:
-    Program prog(128);
+    Program boolean_and_conditional_branching(192);
 
-    prog.setAddressPtr(-1);
-    prog.halt();
-    prog.setAddressPtr();
+    boolean_and_conditional_branching.setAddressPtr(-1);
+    boolean_and_conditional_branching.halt();
+    boolean_and_conditional_branching.setAddressPtr();
 
-    prog.istore(1, 8)
+    boolean_and_conditional_branching.istore(1, 4)
+        .istore(2, 4)
+        .print(1)
+        .print(2)
+        .ilt(1, 2, 3)
+        .ilte(1, 2, 4)      // 5
+        .igt(1, 2, 5)
+        .igte(1, 2, 6)
+        .ieq(1, 2, 7)
+        .branchif(4, 15, 10)
+        .print(3)           // 10
+        .print(4)
+        .print(5)
+        .print(6)
+        .print(7)
+        .ret(2)             // 15
+        .branch(-2)
+        ;
+    //boolean_and_conditional_branching.calculateBranches();
+
+
+    // Sample program
+    Program sample(128);
+
+    sample.setAddressPtr(-1);
+    sample.halt();
+    sample.setAddressPtr();
+
+    sample.istore(1, 8)
         .istore(2, 16)
         .print(1)
         .print(2)
         .iadd(1, 2, 3)
         .print(3)       // 5
         .idiv(3, 1, 4)
-        .branch(13)
+        .branch(14)
         .print(4)
         .iinc(4)
-        .idec(4)        // 10
+        .iinc(4)        // 10
+        .idec(4)
         .print(4)
-        .branch(14)
+        .branch(15)
         .branch(8)
         .branch(-1)
         ;
+    sample.calculateBranches();
 
-    prog.calculateBranches();
 
-    cout << "total instructions:  " << prog.instructionCount() << endl;
-    cout << "total bytecode size: " << prog.size() << endl;
 
-    return_code = CPU(64).load(prog.bytecode()).run();
+    // display stats and run the program
+    /*
+    cout << "total instructions:  " << boolean_and_conditional_branching.instructionCount() << endl;
+    cout << "total bytecode size: " << boolean_and_conditional_branching.size() << endl;
 
+    CPU(64).load(boolean_and_conditional_branching.bytecode())
+                         .bytes(boolean_and_conditional_branching.size())
+                         //.run()
+                         ;
+                         */
+
+
+    cout << "total instructions:  " << sample.instructionCount() << endl;
+    cout << "total bytecode size: " << sample.size() << endl;
+
+    CPU(64).load(sample.bytecode())
+                         .bytes(sample.size())
+                         .run()
+                         ;
 
     return return_code;
 }
