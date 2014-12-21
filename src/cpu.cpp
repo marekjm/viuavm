@@ -97,7 +97,7 @@ int CPU::run(int cycles) {
                     addr += sizeof(int);
                     break;
                 case BRANCH:
-                    cout << "BRANCH " << *(int*)(bytecode+addr+1) << " (to bytecode 0x" << hex << *(int*)(bytecode+addr+1) << dec << ")" << endl;
+                    cout << "BRANCH 0x" << hex << *(int*)(bytecode+addr+1) << dec << endl;
                     addr = *(int*)(bytecode+addr+1);
                     branched = true;
                     break;
