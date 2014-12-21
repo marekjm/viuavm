@@ -9,6 +9,18 @@ using namespace std;
 
 
 CPU& CPU::load(char* bc) {
+    /*  Load bytecode into the CPU.
+     *  CPU becomes owner of loaded bytecode - meaning it will consider itself responsible for proper
+     *  destruction of it, so make sure you have a copy of the bytecode.
+     *
+     *  Any previously loaded bytecode is freed.
+     *  To free bytecode without loading anything new it is possible to call .load(0).
+     *
+     *  :params:
+     *
+     *  bc:char*    - pointer to byte array containing bytecode with a program to run
+     */
+    if (bytecode) { delete[] bytecode; }
     bytecode = bc;
     return (*this);
 }
