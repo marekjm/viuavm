@@ -61,6 +61,31 @@ int main(int argc, char* argv[]) {
     program[110] = HALT;         // finally, a HALT instruction
 
 
+    byte boolean_and_branching_test[128];
+    boolean_and_branching_test[0] = ISTORE;
+    ((int*)(boolean_and_branching_test+1))[0] = 1;
+    ((int*)(boolean_and_branching_test+1))[1] = 2;
+    boolean_and_branching_test[9] = ISTORE;
+    ((int*)(boolean_and_branching_test+10))[0] = 2;
+    ((int*)(boolean_and_branching_test+10))[1] = 4;
+    boolean_and_branching_test[18] = PRINT;
+    ((int*)(boolean_and_branching_test+19))[0] = 1;
+    boolean_and_branching_test[23] = PRINT;
+    ((int*)(boolean_and_branching_test+24))[0] = 2;
+    boolean_and_branching_test[28] = ILT;
+    ((int*)(boolean_and_branching_test+29))[0] = 1;
+    ((int*)(boolean_and_branching_test+29))[1] = 2;
+    ((int*)(boolean_and_branching_test+29))[2] = 3;
+
+    boolean_and_branching_test[41] = PRINT;
+    ((int*)(boolean_and_branching_test+42))[0] = 3;
+
+    boolean_and_branching_test[46] = RET;
+    ((int*)(boolean_and_branching_test+47))[0] = 2;
+
+    boolean_and_branching_test[51] = HALT;
+
+
     /*
     CPU cpu = CPU(64);
     cpu.load(program);
@@ -68,7 +93,7 @@ int main(int argc, char* argv[]) {
     */
 
     // Or more concisely:
-    CPU(64).load(program).run();
+    return_code = CPU(64).load(program).run();
 
 
     return return_code;
