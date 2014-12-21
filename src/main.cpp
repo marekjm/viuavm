@@ -6,6 +6,7 @@
 #include "version.h"
 #include "cpu.h"
 #include "bytecode.h"
+#include "program.h"
 using namespace std;
 
 typedef char byte;
@@ -93,7 +94,8 @@ int main(int argc, char* argv[]) {
     */
 
     // Or more concisely:
-    return_code = CPU(64).load(program).run();
+    //return_code = CPU(64).load(program).run();
+    return_code = CPU(64).load(Program().bytecode()).run();
 
 
     return return_code;
