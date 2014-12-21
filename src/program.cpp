@@ -152,12 +152,8 @@ Program& Program::calculateBranches() {
                 (*ptr) = getInstructionBytecodeOffset(*ptr, instruction_count);
                 break;
             case BRANCHIF:
-                cout << *(ptr+1) << ", ";
-                cout << *(ptr+2) << endl;
                 (*(ptr+1)) = getInstructionBytecodeOffset(*(ptr+1), instruction_count);
                 (*(ptr+2)) = getInstructionBytecodeOffset(*(ptr+2), instruction_count);
-                cout << "0x" << hex << *(ptr+1) << ", ";
-                cout << "0x" << *(ptr+2) << dec << endl;
                 break;
         }
     }
