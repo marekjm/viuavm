@@ -46,6 +46,12 @@ int Program::instructionCount() {
             case ISUB:
             case IMUL:
             case IDIV:
+            case ILT:
+            case ILTE:
+            case IGT:
+            case IGTE:
+            case IEQ:
+            case BRANCHIF:
                 i += 3 * sizeof(int);
                 break;
             case ISTORE:
@@ -106,6 +112,11 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
             case ISUB:
             case IMUL:
             case IDIV:
+            case ILT:
+            case ILTE:
+            case IGT:
+            case IGTE:
+            case IEQ:
             case BRANCHIF:
                 offset += 3 * sizeof(int);
                 break;
@@ -133,9 +144,22 @@ Program& Program::calculateBranches() {
      */
     int instruction_count = instructionCount();
     int* ptr;
+    bool conditional = false;
     for (int i = 0; i < branches.size(); ++i) {
         ptr = (int*)(program+branches[i]+1);
-        (*ptr) = getInstructionBytecodeOffset(*ptr, instruction_count);
+        switch (*(program+branches[i])) {
+            case BRANCH:
+                (*ptr) = getInstructionBytecodeOffset(*ptr, instruction_count);
+                break;
+            case BRANCHIF:
+                cout << *(ptr+1) << ", ";
+                cout << *(ptr+2) << endl;
+                (*(ptr+1)) = getInstructionBytecodeOffset(*(ptr+1), instruction_count);
+                (*(ptr+2)) = getInstructionBytecodeOffset(*(ptr+2), instruction_count);
+                cout << "0x" << hex << *(ptr+1) << ", ";
+                cout << "0x" << *(ptr+2) << dec << endl;
+                break;
+        }
     }
 }
 
@@ -435,19 +459,17 @@ Program& Program::branch(int addr) {
 }
 
 Program& Program::branchif(int regcondition, int addr_truth, int addr_false) {
-    /*  Inserts branchif instruction. Parameter is instruction index.
+    /*  Inserts branch instruction. Parameter is instruction index.
      *  Byte offset is calculated automatically.
      *
      *  :params:
      *
-     *  regcondition:int    - index of the register to check for truth
-     *  addr_truth:int      - instruction to go to if true
-     *  addr_false:int      - instruction to go to if false
+     *  addr:int    - index of the instruction to which to branch
      */
     ensurebytes(1 + 3*sizeof(int));
 
     // save branch instruction index for later evaluation
-    ifbranches.push_back(addr_no);
+    branches.push_back(addr_no);
 
     program[addr_no++] = BRANCHIF;
     addr_ptr++;
