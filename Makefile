@@ -2,7 +2,7 @@ CXXFLAGS=-std=c++11
 
 .SUFFIXES: .cpp .h .o
 
-.PHONY: clean run try_test
+.PHONY: clean run try_test sample_ifbranching
 
 all: bin/tatanka
 
@@ -30,6 +30,18 @@ build/program.o: src/bytecode.h src/program.h src/program.cpp
 
 bin/test: test.cpp
 	${CXX} ${CXXFLAGS} -o ./bin/test test.cpp
+
+
+bin/sample/sample: src/bytecode.h src/sample/sample.cpp build/cpu.o build/program.o
+	${CXX} ${CXXFLAGS} -o ./bin/sample/main src/sample/sample.cpp build/cpu.o build/program.o
+	./bin/sample/main
+
+
+bin/sample/ifbranching: src/bytecode.h src/sample/ifbranching.cpp build/cpu.o build/program.o
+	${CXX} ${CXXFLAGS} -o ./bin/sample/ifbranching src/sample/ifbranching.cpp build/cpu.o build/program.o
+
+sample_ifbranching: bin/sample/ifbranching
+	@./bin/sample/ifbranching
 
 
 try_test: bin/test
