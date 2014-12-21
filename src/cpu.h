@@ -15,7 +15,7 @@ class CPU {
     Object** registers;
     int reg_count;
 
-    void* getRegister(int);
+    Object* fetchRegister(int i, bool nullok = false);
 
     public:
         CPU& load(char*);
