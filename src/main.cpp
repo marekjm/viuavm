@@ -42,12 +42,6 @@ int main(int argc, char* argv[]) {
     boolean_and_branching_test[51] = HALT;
 
 
-    /*
-    CPU cpu = CPU(64);
-    cpu.load(program);
-    cpu.run();
-    */
-
     // Or more concisely:
     Program prog(128);
 

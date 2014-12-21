@@ -27,6 +27,15 @@ CPU& CPU::load(char* bc) {
 
 
 Object* CPU::fetchRegister(int i, bool nullok) {
+    /*  Return pointer to object at given register.
+     *  This method safeguards against reaching for out-of-bounds registers and
+     *  reading from an empty register.
+     *
+     *  :params:
+     *
+     *  i:int       - index of a register to fetch
+     *  nullok:bool - disables checking if reading from empty register
+     */
     if (i >= reg_count) {
         throw "register access index out of bounds";
     }
@@ -38,6 +47,10 @@ Object* CPU::fetchRegister(int i, bool nullok) {
 }
 
 int CPU::run(int cycles) {
+    /*  VM CPU implementation.
+     *
+     *  A giant switch-in-while which iterates over bytecode and executes encoded instructions.
+     */
     if (!bytecode) {
         throw "null bytecode (maybe not loaded?)";
     }
