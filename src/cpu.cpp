@@ -8,6 +8,9 @@
 using namespace std;
 
 
+typedef char byte;
+
+
 CPU& CPU::load(char* bc) {
     /*  Load bytecode into the CPU.
      *  CPU becomes owner of loaded bytecode - meaning it will consider itself responsible for proper
@@ -67,6 +70,8 @@ int CPU::run() {
     int addr = 0;
     bool halt = false;
     bool branched;
+    byte* bptr = 0;
+    int* iptr = 0;
 
     while (true) {
         branched = false;
@@ -166,15 +171,19 @@ int CPU::run() {
                     branched = true;
                     break;
                 case BRANCHIF:
-                    cout << "BRANCH 0x" << hex << *(int*)(bytecode+addr+1) << dec << endl;
-                    if ((*((int*)(bytecode+addr+1))) == addr or
-                        (*((int*)(bytecode+addr+1)+1)) == addr) {
-                        throw "aborting: BRANCH instruction pointing to itself";
+                    iptr = (int*)(bytecode+addr+1);
+                    cout << "BRANCHIF " << *iptr << " " << hex
+                         << "0x" << *(iptr+1) << " "
+                         << "0x" << *(iptr+2);
+                    cout << endl;
+                    cout << static_cast<Boolean*>( fetchRegister( *iptr ) )->str() << endl;
+                    if (static_cast<Boolean*>( fetchRegister( *iptr ) )->value()) {
+                        addr = *(iptr+1);
+                    } else {
+                        addr = *(iptr+2);
                     }
-                    addr = *(int*)(bytecode+addr+1);
                     branched = true;
                     break;
-
                 case RET:
                     cout << "RET " << *(int*)(bytecode+addr+1) << endl;
                     if (fetchRegister(*((int*)(bytecode+addr+1)))->type() == "Integer") {
