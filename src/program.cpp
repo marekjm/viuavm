@@ -65,23 +65,11 @@ int Program::instructionCount() {
 }
 
 
-void Program::expand(int n) {
-    /*  Expands program's byte array with n bytes.
-     *  Expanded bytes are filled with PASS instructions to reset the memory location to
-     *  some safe value.
-     */
-    byte* tmp = new byte[bytes+n];
-    for (int i = 0; i < bytes; ++i) { tmp[i] = program[i]; }
-    bytes += n;
-    for (int i = (bytes-n); i < bytes; ++i) { tmp[i] = PASS; }
-    delete[] program;
-    program = tmp;
-}
-
 void Program::ensurebytes(int bts) {
     /*  Ensure program has at least bts bytes after current address.
      */
     if (bytes-addr_no < bts) {
+        throw "not enough bytes";
     }
 }
 
@@ -131,6 +119,9 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
                 offset += sizeof(int);
                 break;
         }
+        if (offset+1 > bytes) {
+            throw "instruction offset out of bounds: check your branches";
+        }
     }
     return offset;
 }
@@ -163,6 +154,134 @@ Program& Program::istore(int regno, int i) {
     ((int*)addr_ptr)[0] = regno;
     ((int*)addr_ptr)[1] = i;
     addr_no += 2 * sizeof(int);
+    addr_ptr = program+addr_no;
+
+    return (*this);
+}
+
+Program& Program::iadd(int rega, int regb, int regresult) {
+    /*  Inserts iadd instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  rega:int        - register index of first operand
+     *  regb:int        - register index of second operand
+     *  regresult:int   - register index in which to store the result
+     */
+    ensurebytes(1 + 3*sizeof(int));
+
+    program[addr_no++] = IADD;
+    addr_ptr++;
+    ((int*)addr_ptr)[0] = rega;
+    ((int*)addr_ptr)[1] = regb;
+    ((int*)addr_ptr)[2] = regresult;
+    addr_no += 3 * sizeof(int);
+    addr_ptr = program+addr_no;
+
+    return (*this);
+}
+
+Program& Program::isub(int rega, int regb, int regresult) {
+    /*  Inserts isub instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  rega:int        - register index of first operand
+     *  regb:int        - register index of second operand
+     *  regresult:int   - register index in which to store the result
+     */
+    ensurebytes(1 + 3*sizeof(int));
+
+    program[addr_no++] = ISUB;
+    addr_ptr++;
+    ((int*)addr_ptr)[0] = rega;
+    ((int*)addr_ptr)[1] = regb;
+    ((int*)addr_ptr)[2] = regresult;
+    addr_no += 3 * sizeof(int);
+    addr_ptr = program+addr_no;
+
+    return (*this);
+}
+
+Program& Program::imul(int rega, int regb, int regresult) {
+    /*  Inserts imul instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  rega:int        - register index of first operand
+     *  regb:int        - register index of second operand
+     *  regresult:int   - register index in which to store the result
+     */
+    ensurebytes(1 + 3*sizeof(int));
+
+    program[addr_no++] = IMUL;
+    addr_ptr++;
+    ((int*)addr_ptr)[0] = rega;
+    ((int*)addr_ptr)[1] = regb;
+    ((int*)addr_ptr)[2] = regresult;
+    addr_no += 3 * sizeof(int);
+    addr_ptr = program+addr_no;
+
+    return (*this);
+}
+
+Program& Program::idiv(int rega, int regb, int regresult) {
+    /*  Inserts idiv instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  rega:int        - register index of first operand
+     *  regb:int        - register index of second operand
+     *  regresult:int   - register index in which to store the result
+     */
+    ensurebytes(1 + 3*sizeof(int));
+
+    program[addr_no++] = IDIV;
+    addr_ptr++;
+    ((int*)addr_ptr)[0] = rega;
+    ((int*)addr_ptr)[1] = regb;
+    ((int*)addr_ptr)[2] = regresult;
+    addr_no += 3 * sizeof(int);
+    addr_ptr = program+addr_no;
+
+    return (*this);
+}
+
+Program& Program::iinc(int regno) {
+    /*  Inserts idiv instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  rega:int        - register index of first operand
+     *  regb:int        - register index of second operand
+     *  regresult:int   - register index in which to store the result
+     */
+    ensurebytes(1 + sizeof(int));
+
+    program[addr_no++] = IINC;
+    addr_ptr++;
+    ((int*)addr_ptr)[0] = regno;
+    addr_no += sizeof(int);
+    addr_ptr = program+addr_no;
+
+    return (*this);
+}
+
+Program& Program::idec(int regno) {
+    /*  Inserts idiv instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  rega:int        - register index of first operand
+     *  regb:int        - register index of second operand
+     *  regresult:int   - register index in which to store the result
+     */
+    ensurebytes(1 + sizeof(int));
+
+    program[addr_no++] = IDEC;
+    addr_ptr++;
+    ((int*)addr_ptr)[0] = regno;
+    addr_no += sizeof(int);
     addr_ptr = program+addr_no;
 
     return (*this);
