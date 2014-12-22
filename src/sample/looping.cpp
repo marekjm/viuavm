@@ -1,8 +1,8 @@
 #include <cstdlib>
+#include <cstdint>
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <sstream>
 #include "../version.h"
 #include "../cpu.h"
 #include "../bytecode.h"
@@ -39,9 +39,18 @@ int main(int argc, char* argv[]) {
     cout << "total instructions:  " << sample.instructionCount() << endl;
     cout << "total bytecode size: " << sample.size() << endl;
 
-    CPU cpu(64);
-    cpu.load(sample.bytecode()).bytes(sample.size());
-    return_code = cpu.run();
+    ofstream out("looping.bin", ios::out | ios::binary);
+
+    byte* bytecode = sample.bytecode();
+    uint16_t bytecode_size = sample.size();
+
+    out.write((const char*)&bytecode_size, 16);
+    out.write(bytecode, sample.size());
+    out.close();
+
+    delete[] bytecode;
+
+    CPU(64).load(sample.bytecode()).bytes(1024).run();
 
     return return_code;
 }
