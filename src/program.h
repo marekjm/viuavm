@@ -34,11 +34,17 @@ class Program {
     Program& igt        (int, int, int);
     Program& igte       (int, int, int);
     Program& ieq        (int, int, int);
+
+    Program& strstore   (int, std::string);
+
     Program& print      (int);
+
     Program& branch     (int);
     Program& branchif   (int, int, int);
+
     Program& ret        (int);
     Program& end        ();
+
     Program& pass       ();
     Program& halt       ();
 
