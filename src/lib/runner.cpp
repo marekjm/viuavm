@@ -4,10 +4,10 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include "version.h"
-#include "cpu.h"
-#include "bytecode.h"
-#include "program.h"
+#include "../version.h"
+#include "../cpu.h"
+#include "../bytecode.h"
+#include "../program.h"
 using namespace std;
 
 

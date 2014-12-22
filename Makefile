@@ -7,17 +7,18 @@ CXXFLAGS=-std=c++11
 all: bin/tatanka
 
 
-run: bin/tatanka
-	./bin/tatanka
+run: bin/lib/runner
+	./bin/lib/runner
 
 
 clean:
 	rm -v ./build/*
-	rm -v ./bin/*
+	rm -v ./bin/lib/*
+	rm -v ./bin/sample/*
 
 
-bin/tatanka: src/bytecode.h src/main.cpp build/cpu.o build/program.o
-	${CXX} ${CXXFLAGS} -o ./bin/tatanka src/main.cpp build/cpu.o build/program.o
+bin/lib/runner: src/bytecode.h src/lib/runner.cpp build/cpu.o build/program.o
+	${CXX} ${CXXFLAGS} -o ./bin/lib/runner src/lib/runner.cpp build/cpu.o build/program.o
 
 
 build/cpu.o: src/bytecode.h src/cpu.h src/cpu.cpp
