@@ -1,12 +1,12 @@
 *.o
 *.so
-*.bin
 
 *~
 
 .*
+
+bin/lib/*
+bin/sample/*
+
 !.gitkeep
 !.gitignore
-
-
-bin/
