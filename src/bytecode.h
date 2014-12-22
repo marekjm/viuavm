@@ -18,6 +18,10 @@ enum Bytecode {
     IGTE,       // IGTE <reg-a> <reg-b> <reg-result> (a >= b)
     IEQ,        // IEQ  <reg-a> <reg-b> <reg-result> (a == b)
 
+    STRSTORE,
+    STRADD,
+    STREQ,
+
     PRINT,      // PRINT <register-index>
 
     BRANCH,     // BRANCH <bytecode-index>
