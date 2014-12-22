@@ -5,6 +5,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <map>
 #include "../version.h"
 #include "../program.h"
 using namespace std;
@@ -13,9 +14,32 @@ using namespace std;
 typedef char byte;
 
 
-bool startswith(string s, string w) {
+bool startswith(const string& s, const string& w) {
     return (s.compare(0, w.length(), w) == 0);
 }
+
+
+const map<string, int> INSTRUCTION_SIZE = {
+    { "istore",     1 + 2*sizeof(int) },
+    { "iadd",       1 + 3*sizeof(int) },
+    { "isub",       1 + 3*sizeof(int) },
+    { "imul",       1 + 3*sizeof(int) },
+    { "idiv",       1 + 3*sizeof(int) },
+    { "iinc",       1 + sizeof(int) },
+    { "idec",       1 + sizeof(int) },
+    { "ilt",        1 + 3*sizeof(int) },
+    { "ilte",       1 + 3*sizeof(int) },
+    { "igt",        1 + 3*sizeof(int) },
+    { "igte",       1 + 3*sizeof(int) },
+    { "ieq",        1 + 3*sizeof(int) },
+    { "print",      1 + sizeof(int) },
+    { "branch",     1 + sizeof(int) },
+    { "branchif",   1 + 3*sizeof(int) },
+    { "ret",        1 + sizeof(int) },
+    { "end",        1 },
+    { "halt",       1 },
+    { "pass",       1 },
+};
 
 
 int main(int argc, char* argv[]) {
@@ -54,49 +78,27 @@ int main(int argc, char* argv[]) {
         while (getline(in, line)) { lines.push_back(line); }
 
         uint16_t bytes = 0;
-        unsigned instructions = 0;
 
+        /*  First, we must decide how much memory (how big byte array) we need to hold the program.
+         *  This is done by iterating over instruction lines and
+         *  increasing bytes size.
+         */
         int inc = 0;
+        istringstream iss;
+        string instr;
         for (int i = 0; i < lines.size(); ++i) {
+            instr = "";
             line = lines[i];
             if (!line.size()) continue;
 
-            //cout << filename << ":" << i+1 << ": '" << line << "' = ";
-
-            if (startswith(line, "istore")) {
-                inc = 1 + 2*sizeof(int);
-            } else if (startswith(line, "iadd")) {
-                inc = 1 + 3*sizeof(int);
-            } else if (startswith(line, "isub")) {
-                inc = 1 + 3*sizeof(int);
-            } else if (startswith(line, "imul")) {
-                inc = 1 + 3*sizeof(int);
-            } else if (startswith(line, "idiv")) {
-                inc = 1 + 3*sizeof(int);
-            } else if (startswith(line, "ilt")) {
-                inc = 1 + 3*sizeof(int);
-            } else if (startswith(line, "ilte")) {
-                inc = 1 + 3*sizeof(int);
-            } else if (startswith(line, "igt")) {
-                inc = 1 + 3*sizeof(int);
-            } else if (startswith(line, "igte")) {
-                inc = 1 + 3*sizeof(int);
-            } else if (startswith(line, "ieq")) {
-                inc = 1 + 3*sizeof(int);
-            } else if (startswith(line, "iinc")) {
-                inc = 1 + sizeof(int);
-            } else if (startswith(line, "idec")) {
-                inc = 1 + sizeof(int);
-            } else if (startswith(line, "print")) {
-                inc = 1 + sizeof(int);
-            } else if (startswith(line, "branchif")) {
-                inc = 1 + 3*sizeof(int);
-            } else if (startswith(line, "branch")) {
-                inc = 1 + sizeof(int);
-            } else if (startswith(line, "pass")) {
-                inc = 1;
-            } else if (startswith(line, "halt")) {
-                inc = 1;
+            iss.str(line);
+            iss >> instr;                       // extract the instruction
+            try {
+                inc = INSTRUCTION_SIZE.at(instr);   // and get its size
+            } catch (const std::out_of_range &e) {
+                cout << "fatal: unrecognised instruction" << endl;
+                cout << filename << ":" << i+1 << ": " << line << endl;
+                exit(1);
             }
 
             if (inc == 0) {
@@ -106,10 +108,7 @@ int main(int argc, char* argv[]) {
                 exit(1);
             }
 
-            //cout << inc << " bytes" << endl;
-
             ilines.push_back(line);
-            instructions++;
             bytes += inc;
             inc = 0;
         }
