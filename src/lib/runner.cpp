@@ -35,23 +35,7 @@ int main(int argc, char* argv[]) {
 
     // run code
     if (argc > 1) {
-        cout << args[1] << endl;
-
-        int runmode = BINARY;
-        if (args[1] == "--bin") {
-            cout << "debug: setting runmode to 'binary'" << endl;
-            runmode = BINARY;
-        } else if (args[1] == "--asm") {
-            cout << "debug: setting runmode to 'asm'" << endl;
-            runmode = ASM;
-        }
-
-        string filename = "";
-        if (argc > 2) {
-            filename = args[2];
-        }
-
-        cout << "message: running in " << (runmode == ASM ? "asm" : "binary") << " mode" << endl;
+        string filename = args[1];
 
         if (!filename.size()) {
             cout << "fatal: no file to run" << endl;
