@@ -4,7 +4,7 @@ CXXFLAGS=-std=c++11
 
 .PHONY: clean run try_test sample_ifbranching
 
-all: bin/lib/asm bin/lib/runner
+all: bin/lib/asm bin/lib/run
 
 
 clean:
@@ -13,8 +13,8 @@ clean:
 	rm -v ./bin/sample/*
 
 
-bin/lib/runner: src/bytecode.h src/lib/runner.cpp build/cpu.o
-	${CXX} ${CXXFLAGS} -o ./bin/lib/runner src/lib/runner.cpp build/cpu.o
+bin/lib/run: src/bytecode.h src/lib/run.cpp build/cpu.o
+	${CXX} ${CXXFLAGS} -o ./bin/lib/run src/lib/run.cpp build/cpu.o
 
 bin/lib/asm: src/bytecode.h src/lib/asm.cpp build/program.o
 	${CXX} ${CXXFLAGS} -o ./bin/lib/asm src/lib/asm.cpp build/program.o
