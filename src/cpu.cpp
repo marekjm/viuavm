@@ -28,7 +28,7 @@ CPU& CPU::load(char* bc) {
     return (*this);
 }
 
-CPU& CPU::bytes(int sz) {
+CPU& CPU::bytes(uint16_t sz) {
     /*  Set bytecode size, so the CPU can stop execution even if it doesn't reach HALT instruction but reaches
      *  bytecode address out of bounds.
      */

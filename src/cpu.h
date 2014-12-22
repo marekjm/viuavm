@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include "bytecode.h"
 #include "types/object.h"
 #include "types/integer.h"
@@ -12,15 +13,16 @@ const int DEFAULT_REGISTER_SIZE = 64;
 
 class CPU {
     char* bytecode;
+    uint16_t bytecode_size;
+
     Object** registers;
     int reg_count;
-    int bytecode_size;
 
     Object* fetchRegister(int i, bool nullok = false);
 
     public:
         CPU& load(char*);
-        CPU& bytes(int);
+        CPU& bytes(uint16_t);
         int run();
 
         CPU(int r = DEFAULT_REGISTER_SIZE): reg_count(r) {
