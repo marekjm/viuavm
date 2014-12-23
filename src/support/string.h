@@ -11,7 +11,12 @@ namespace str {
 
     bool isnum(const std::string& s);
 
+    std::string sub(const std::string& s, int b = 0, int e = -1);
     std::string chunk(const std::string& s);
+
+    std::string lstrip(const std::string& s);
+
+    unsigned lshare(const std::string& s, const std::string& w);
 };
 
 
