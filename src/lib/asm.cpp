@@ -32,7 +32,18 @@ const map<string, int> INSTRUCTION_SIZE = {
     { "igt",        1 + 3*sizeof(int) },
     { "igte",       1 + 3*sizeof(int) },
     { "ieq",        1 + 3*sizeof(int) },
+    { "bstore",     1 + sizeof(int) + sizeof(char) },
+    { "badd",       1 + 3*sizeof(int) },
+    { "bsub",       1 + 3*sizeof(int) },
+    { "binc",       1 + sizeof(int) },
+    { "bdec",       1 + sizeof(int) },
+    { "blt",        1 + 3*sizeof(int) },
+    { "blte",       1 + 3*sizeof(int) },
+    { "bgt",        1 + 3*sizeof(int) },
+    { "bgte",       1 + 3*sizeof(int) },
+    { "beq",        1 + 3*sizeof(int) },
     { "print",      1 + sizeof(int) },
+    { "echo",       1 + sizeof(int) },
     { "branch",     1 + sizeof(int) },
     { "branchif",   1 + 3*sizeof(int) },
     { "ret",        1 + sizeof(int) },
@@ -116,7 +127,7 @@ int main(int argc, char* argv[]) {
         Program program(bytes);
 
         for (int i = 0; i < ilines.size(); ++i) {
-            line = lines[i];
+            line = ilines[i];
 
             string instr;
             istringstream iss(line);
@@ -151,10 +162,19 @@ int main(int argc, char* argv[]) {
                 program.iinc(regno);
             } else if (startswith(line, "idec")) {
                 inc = 1 + sizeof(int);
+            } else if (startswith(line, "bstore")) {
+                int regno;
+                short bt;
+                iss >> instr >> regno >> bt;
+                program.bstore(regno, (char)bt);
             } else if (startswith(line, "print")) {
                 int regno;
                 iss >> instr >> regno;
                 program.print(regno);
+            } else if (startswith(line, "echo")) {
+                int regno;
+                iss >> instr >> regno;
+                program.echo(regno);
             } else if (startswith(line, "branchif")) {
                 int condition, if_true, if_false;
                 iss >> instr >> condition >> if_true >> if_false;
