@@ -35,9 +35,12 @@ class Program {
     Program& igte       (int, int, int);
     Program& ieq        (int, int, int);
 
+    Program& bstore     (int, char);
+
     Program& strstore   (int, std::string);
 
     Program& print      (int);
+    Program& echo       (int);
 
     Program& branch     (int);
     Program& branchif   (int, int, int);

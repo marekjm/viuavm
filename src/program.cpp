@@ -418,12 +418,48 @@ Program& Program::ieq(int rega, int regb, int regresult) {
     return (*this);
 }
 
+Program& Program::bstore(int regno, char b) {
+    /*  Inserts bstore instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  regno:int - register number
+     *  i:int     - value to store
+     */
+    ensurebytes(1 + sizeof(int) + sizeof(char));
+
+    program[addr_no++] = BSTORE;
+    addr_ptr++;
+    ((int*)addr_ptr)[0] = regno;
+    addr_no += sizeof(int);
+    addr_ptr = program+addr_no;
+    addr_ptr[0] = b;
+    addr_no += sizeof(char);
+    addr_ptr = program+addr_no;
+
+    return (*this);
+}
+
 Program& Program::print(int regno) {
     /*  Inserts print instuction.
      */
     ensurebytes(1 + sizeof(int));
 
     program[addr_no++] = PRINT;
+    addr_ptr++;
+    ((int*)addr_ptr)[0] = regno;
+    addr_no += sizeof(int);
+    addr_ptr = program+addr_no;
+
+    return (*this);
+}
+
+Program& Program::echo(int regno) {
+    /*  Inserts echo instuction.
+     */
+    ensurebytes(1 + sizeof(int));
+
+    program[addr_no++] = ECHO;
     addr_ptr++;
     ((int*)addr_ptr)[0] = regno;
     addr_no += sizeof(int);
