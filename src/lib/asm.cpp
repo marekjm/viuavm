@@ -6,17 +6,13 @@
 #include <sstream>
 #include <vector>
 #include <map>
+#include "../support/string.h"
 #include "../version.h"
 #include "../program.h"
 using namespace std;
 
 
 typedef char byte;
-
-
-bool startswith(const string& s, const string& w) {
-    return (s.compare(0, w.length(), w) == 0);
-}
 
 
 const map<string, int> INSTRUCTION_SIZE = {
@@ -132,60 +128,60 @@ int main(int argc, char* argv[]) {
             string instr;
             istringstream iss(line);
 
-            if (startswith(line, "istore")) {
+            if (str::startswith(line, "istore")) {
                 int regno, number;
                 iss >> instr >> regno >> number;
                 program.istore(regno, number);
-            } else if (startswith(line, "iadd")) {
+            } else if (str::startswith(line, "iadd")) {
                 inc = 1 + 3*sizeof(int);
-            } else if (startswith(line, "isub")) {
+            } else if (str::startswith(line, "isub")) {
                 inc = 1 + 3*sizeof(int);
-            } else if (startswith(line, "imul")) {
+            } else if (str::startswith(line, "imul")) {
                 inc = 1 + 3*sizeof(int);
-            } else if (startswith(line, "idiv")) {
+            } else if (str::startswith(line, "idiv")) {
                 inc = 1 + 3*sizeof(int);
-            } else if (startswith(line, "ilt")) {
+            } else if (str::startswith(line, "ilt")) {
                 int rega, regb, regresult;
                 iss >> instr >> rega >> regb >> regresult;
                 program.ilt(rega, regb, regresult);
-            } else if (startswith(line, "ilte")) {
+            } else if (str::startswith(line, "ilte")) {
                 inc = 1 + 3*sizeof(int);
-            } else if (startswith(line, "igt")) {
+            } else if (str::startswith(line, "igt")) {
                 inc = 1 + 3*sizeof(int);
-            } else if (startswith(line, "igte")) {
+            } else if (str::startswith(line, "igte")) {
                 inc = 1 + 3*sizeof(int);
-            } else if (startswith(line, "ieq")) {
+            } else if (str::startswith(line, "ieq")) {
                 inc = 1 + 3*sizeof(int);
-            } else if (startswith(line, "iinc")) {
+            } else if (str::startswith(line, "iinc")) {
                 int regno;
                 iss >> instr >> regno;
                 program.iinc(regno);
-            } else if (startswith(line, "idec")) {
+            } else if (str::startswith(line, "idec")) {
                 inc = 1 + sizeof(int);
-            } else if (startswith(line, "bstore")) {
+            } else if (str::startswith(line, "bstore")) {
                 int regno;
                 short bt;
                 iss >> instr >> regno >> bt;
                 program.bstore(regno, (char)bt);
-            } else if (startswith(line, "print")) {
+            } else if (str::startswith(line, "print")) {
                 int regno;
                 iss >> instr >> regno;
                 program.print(regno);
-            } else if (startswith(line, "echo")) {
+            } else if (str::startswith(line, "echo")) {
                 int regno;
                 iss >> instr >> regno;
                 program.echo(regno);
-            } else if (startswith(line, "branchif")) {
+            } else if (str::startswith(line, "branchif")) {
                 int condition, if_true, if_false;
                 iss >> instr >> condition >> if_true >> if_false;
                 program.branchif(condition, if_true, if_false);
-            } else if (startswith(line, "branch")) {
+            } else if (str::startswith(line, "branch")) {
                 int addr;
                 iss >> instr >> addr;
                 program.branch(addr);
-            } else if (startswith(line, "pass")) {
+            } else if (str::startswith(line, "pass")) {
                 program.pass();
-            } else if (startswith(line, "halt")) {
+            } else if (str::startswith(line, "halt")) {
                 program.halt();
             }
         }
