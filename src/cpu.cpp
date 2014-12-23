@@ -5,6 +5,7 @@
 #include "types/object.h"
 #include "types/integer.h"
 #include "types/boolean.h"
+#include "types/byte.h"
 using namespace std;
 
 
@@ -75,95 +76,106 @@ int CPU::run() {
 
     while (true) {
         branched = false;
-        cout << "CPU: bytecode at 0x" << hex << addr << dec << ": ";
+        if (debug) cout << "CPU: bytecode at 0x" << hex << addr << dec << ": ";
 
         try {
             switch (bytecode[addr]) {
                 case ISTORE:
-                    cout << "ISTORE " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << endl;
+                    if (debug) cout << "ISTORE " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << endl;
                     registers[ ((int*)(bytecode+addr+1))[0] ] = new Integer(((int*)(bytecode+addr+1))[1]);
                     addr += 2 * sizeof(int);
                     break;
                 case IADD:
-                    cout << "IADD " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
+                    if (debug) cout << "IADD " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
                     registers[ ((int*)(bytecode+addr+1))[2] ] = new Integer( static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value() +
                                                                              static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[1] ) )->value()
                                                                              );
                     addr += 3 * sizeof(int);
                     break;
                 case ISUB:
-                    cout << "ISUB " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
+                    if (debug) cout << "ISUB " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
                     registers[ ((int*)(bytecode+addr+1))[2] ] = new Integer( static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value() -
                                                                              static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[1] ) )->value()
                                                                              );
                     addr += 3 * sizeof(int);
                     break;
                 case IMUL:
-                    cout << "IMUL " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
+                    if (debug) cout << "IMUL " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
                     registers[ ((int*)(bytecode+addr+1))[2] ] = new Integer( static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value() *
                                                                              static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[1] ) )->value()
                                                                              );
                     addr += 3 * sizeof(int);
                     break;
                 case IDIV:
-                    cout << "IDIV " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
+                    if (debug) cout << "IDIV " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
                     registers[ ((int*)(bytecode+addr+1))[2] ] = new Integer( static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value() /
                                                                              static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[1] ) )->value()
                                                                              );
                     addr += 3 * sizeof(int);
                     break;
                 case IINC:
-                    cout << "IINC " << ((int*)(bytecode+addr+1))[0] << endl;
+                    if (debug) cout << "IINC " << ((int*)(bytecode+addr+1))[0] << endl;
                     (static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value())++;
                     addr += sizeof(int);
                     break;
                 case IDEC:
-                    cout << "IDEC " << ((int*)(bytecode+addr+1))[0] << endl;
+                    if (debug) cout << "IDEC " << ((int*)(bytecode+addr+1))[0] << endl;
                     (static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value())--;
                     addr += sizeof(int);
                     break;
                 case ILT:
-                    cout << "ILT " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
+                    if (debug) cout << "ILT " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
                     registers[ ((int*)(bytecode+addr+1))[2] ] = new Boolean( static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value() <
                                                                              static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[1] ) )->value()
                                                                              );
                     addr += 3 * sizeof(int);
                     break;
                 case ILTE:
-                    cout << "ILTE " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
+                    if (debug) cout << "ILTE " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
                     registers[ ((int*)(bytecode+addr+1))[2] ] = new Boolean( static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value() <=
                                                                              static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[1] ) )->value()
                                                                              );
                     addr += 3 * sizeof(int);
                     break;
                 case IGT:
-                    cout << "IGT " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
+                    if (debug) cout << "IGT " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
                     registers[ ((int*)(bytecode+addr+1))[2] ] = new Boolean( static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value() >
                                                                              static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[1] ) )->value()
                                                                              );
                     addr += 3 * sizeof(int);
                     break;
                 case IGTE:
-                    cout << "IGTE " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
+                    if (debug) cout << "IGTE " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
                     registers[ ((int*)(bytecode+addr+1))[2] ] = new Boolean( static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value() >=
                                                                              static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[1] ) )->value()
                                                                              );
                     addr += 3 * sizeof(int);
                     break;
                 case IEQ:
-                    cout << "IEQ " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
+                    if (debug) cout << "IEQ " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
                     registers[ ((int*)(bytecode+addr+1))[2] ] = new Boolean( static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value() ==
                                                                              static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[1] ) )->value()
                                                                              );
                     addr += 3 * sizeof(int);
                     break;
+                case BSTORE:
+                    if (debug) cout << "BSTORE " << ((int*)(bytecode+addr+1))[0] << " " <<
+                        (int)(((bytecode+addr+1+sizeof(int)))[0]) << endl;
+                    registers[ ((int*)(bytecode+addr+1))[0] ] = new Byte(*(bytecode+addr+1+sizeof(int)));
+                    addr += sizeof(int) + sizeof(char);
+                    break;
                 case PRINT:
-                    cout << "PRINT " << ((int*)(bytecode+addr+1))[0] << endl;
+                    if (debug) cout << "PRINT " << ((int*)(bytecode+addr+1))[0] << endl;
                     cout << fetchRegister(*((int*)(bytecode+addr+1)))->str() << endl;
                     addr += sizeof(int);
                     break;
+                case ECHO:
+                    if (debug) cout << "ECHO " << ((int*)(bytecode+addr+1))[0] << endl;
+                    cout << fetchRegister(*((int*)(bytecode+addr+1)))->str();
+                    addr += sizeof(int);
+                    break;
                 case BRANCH:
-                    cout << "BRANCH 0x" << hex << *(int*)(bytecode+addr+1) << dec << endl;
+                    if (debug) cout << "BRANCH 0x" << hex << *(int*)(bytecode+addr+1) << dec << endl;
                     if ((*(int*)(bytecode+addr+1)) == addr) {
                         throw "aborting: BRANCH instruction pointing to itself";
                     }
@@ -172,11 +184,11 @@ int CPU::run() {
                     break;
                 case BRANCHIF:
                     iptr = (int*)(bytecode+addr+1);
-                    cout << "BRANCHIF " << *iptr << " " << hex
+                    if (debug) cout << "BRANCHIF " << *iptr << " " << hex
                          << "0x" << *(iptr+1) << " "
                          << "0x" << *(iptr+2);
-                    cout << endl;
-                    cout << static_cast<Boolean*>( fetchRegister( *iptr ) )->str() << endl;
+                    if (debug) cout << endl;
+                    if (debug) cout << static_cast<Boolean*>( fetchRegister( *iptr ) )->str() << endl;
                     if (static_cast<Boolean*>( fetchRegister( *iptr ) )->value()) {
                         addr = *(iptr+1);
                     } else {
@@ -185,7 +197,7 @@ int CPU::run() {
                     branched = true;
                     break;
                 case RET:
-                    cout << "RET " << *(int*)(bytecode+addr+1) << endl;
+                    if (debug) cout << "RET " << *(int*)(bytecode+addr+1) << endl;
                     if (fetchRegister(*((int*)(bytecode+addr+1)))->type() == "Integer") {
                         registers[0] = new Integer( static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value() );
                     } else {
@@ -194,11 +206,11 @@ int CPU::run() {
                     addr += sizeof(int);
                     break;
                 case HALT:
-                    cout << "HALT" << endl;
+                    if (debug) cout << "HALT" << endl;
                     halt = true;
                     break;
                 case PASS:
-                    cout << "PASS" << endl;
+                    if (debug) cout << "PASS" << endl;
                     break;
                 default:
                     ostringstream error;
@@ -207,7 +219,7 @@ int CPU::run() {
             }
         } catch (const char* &e) {
             return_code = 1;
-            cout << "exception: " << e << endl;
+            cout << (debug ? "\n" : "") <<  "exception: " << e << endl;
             break;
         }
 

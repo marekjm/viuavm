@@ -35,6 +35,7 @@ enum Bytecode {
     STREQ,
 
     PRINT,
+    ECHO,
 
     BRANCH,
     BRANCHIF,

@@ -21,19 +21,19 @@ class CPU {
     Object* fetchRegister(int i, bool nullok = false);
 
     public:
+        bool debug;
+
         CPU& load(char*);
         CPU& bytes(uint16_t);
         int run();
 
-        CPU(int r = DEFAULT_REGISTER_SIZE): reg_count(r) {
+        CPU(int r = DEFAULT_REGISTER_SIZE): bytecode(0), bytecode_size(0), registers(0), reg_count(r), debug(false) {
             /*  Basic constructor.
              *  Creates registers array of requested size and
              *  initializes it with zeroes.
              */
             registers = new Object*[reg_count];
             for (int i = 0; i < reg_count; ++i) { registers[i] = 0; }
-            bytecode = 0;
-            bytecode_size = 0;
         }
 
         ~CPU() {
