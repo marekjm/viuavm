@@ -58,9 +58,8 @@ int main(int argc, char* argv[]) {
         in.read(bytecode, bytes);
         in.close();
 
-        CPU cpu(64);
-        cpu.load(bytecode).bytes(bytes);
-        ret_code = cpu.run();
+        // run the bytecode
+        ret_code = CPU().load(bytecode).bytes(bytes).run();
     } else {
         cout << "tatanka VM, version " << VERSION << endl;
     }

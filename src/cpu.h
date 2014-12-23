@@ -8,7 +8,7 @@
 #include "types/object.h"
 #include "types/integer.h"
 
-const int DEFAULT_REGISTER_SIZE = 64;
+const int DEFAULT_REGISTER_SIZE = 256;
 
 
 class CPU {
