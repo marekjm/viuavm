@@ -21,7 +21,7 @@ class Byte : public Object {
             return s.str();
         }
 
-        char& value() { return byte; }
+        char& value() { return byte_; }
 
         Byte(char b = 0): byte_(b) {}
 };
