@@ -21,17 +21,11 @@ enum RunMode {
 
 
 int main(int argc, char* argv[]) {
-    // print hello message
-    cout << "tatanka VM, version " << VERSION << endl;
-
-
     // setup command line arguments vector
     vector<string> args;
     for (int i = 0; i < argc; ++i) { args.push_back(argv[i]); }
 
-
     int ret_code = 0;
-
 
     // run code
     if (argc > 1) {
@@ -47,8 +41,6 @@ int main(int argc, char* argv[]) {
         if (!in) {
             cout << "fatal: file could not be opened" << endl;
             return 1;
-        } else {
-            cout << "debug: reading file: " << argv[1] << endl;
         }
 
         uint16_t bytes;
@@ -62,17 +54,15 @@ int main(int argc, char* argv[]) {
 
         bytes = *((uint16_t*)buffer);
 
-        cout << "debug: program is " << bytes << " bytes" << endl;
-
         byte* bytecode = new byte[bytes];
         in.read(bytecode, bytes);
         in.close();
 
-        cout << "debug: running file: " << filename << endl;
-
         CPU cpu(64);
         cpu.load(bytecode).bytes(bytes);
         ret_code = cpu.run();
+    } else {
+        cout << "tatanka VM, version " << VERSION << endl;
     }
 
     return ret_code;
