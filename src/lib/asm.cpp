@@ -158,12 +158,17 @@ int main(int argc, char* argv[]) {
                 inc = 1 + 3*sizeof(int);
             } else if (str::startswith(line, "ilt")) {
                 line = str::lstrip(str::sub(line, 3));
+
                 string rega, regb, regresult;
+
                 rega = str::chunk(line);
-                line = str::sub(line, rega.size());
+                line = str::lstrip(str::sub(line, rega.size()));
+
                 regb = str::chunk(line);
                 line = str::sub(line, regb.size());
+
                 regresult = str::chunk(line);
+
                 program.ilt(getint_op(rega), getint_op(regb), getint_op(regresult));
             } else if (str::startswith(line, "ilte")) {
                 inc = 1 + 3*sizeof(int);

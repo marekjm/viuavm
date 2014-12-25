@@ -194,14 +194,16 @@ Program& Program::istore(int_op regno, int_op i) {
 
     program[addr_no++] = ISTORE;
     addr_ptr++;
+
     *((bool*)addr_ptr) = regno_ref;
-    boolptr = (bool*)addr_ptr; boolptr++; addr_ptr = (char*)boolptr;
+    pointer::inc<bool, char>(addr_ptr);
     *((int*)addr_ptr)  = regno_num;
-    intptr = (int*)addr_ptr; intptr++; addr_ptr = (char*)intptr;
+    pointer::inc<int, char>(addr_ptr);
+
     *((bool*)addr_ptr) = i_ref;
-    boolptr = (bool*)addr_ptr; boolptr++; addr_ptr = (char*)boolptr;
+    pointer::inc<bool, char>(addr_ptr);
     *((int*)addr_ptr)  = i_num;
-    intptr = (int*)addr_ptr; intptr++; addr_ptr = (char*)intptr;
+    pointer::inc<int, char>(addr_ptr);
 
     addr_no += 2*sizeof(bool) + 2*sizeof(int);
     addr_ptr = program+addr_no;
@@ -374,7 +376,6 @@ Program& Program::ilt(int_op rega, int_op regb, int_op regresult) {
     pointer::inc<bool, char>(addr_ptr);
     *((int*)addr_ptr) = regresult_num;
     pointer::inc<int, char>(addr_ptr);
-
 
     addr_no += 3*sizeof(bool) + 3*sizeof(int);
     addr_ptr = program+addr_no;
