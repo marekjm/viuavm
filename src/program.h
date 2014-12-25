@@ -3,9 +3,13 @@
 
 #include <string>
 #include <vector>
+#include <tuple>
 #include "bytecode.h"
 
 typedef char byte;
+
+typedef std::tuple<bool, int> int_op;
+typedef std::tuple<bool, byte> byte_op;
 
 class Program {
     byte* program;
@@ -22,8 +26,8 @@ class Program {
 
     public:
     // instructions interface
-    Program& istore     (int, int);
-    Program& iadd       (int, int, int);
+    Program& istore     (int_op, int_op);
+    Program& iadd       (int_op, int_op, int_op);
     Program& isub       (int, int, int);
     Program& imul       (int, int, int);
     Program& idiv       (int, int, int);
@@ -37,10 +41,8 @@ class Program {
 
     Program& bstore     (int, char);
 
-    Program& strstore   (int, std::string);
-
-    Program& print      (int);
-    Program& echo       (int);
+    Program& print      (int_op);
+    Program& echo       (int_op);
 
     Program& branch     (int);
     Program& branchif   (int, int, int);

@@ -4,6 +4,18 @@
 #include "program.h"
 using namespace std;
 
+typedef std::tuple<bool, int> int_op;
+typedef std::tuple<bool, byte> byte_op;
+
+
+template<class T, class S> void inc(S*& p) {
+    /*  Increase pointer of type S, as if it were of type T.
+     */
+    T* ptr = (T*)p;
+    ptr++;
+    p = (S*)ptr;
+}
+
 
 byte* Program::bytecode() {
     /*  Returns pointer bo a copy of the bytecode.
@@ -160,7 +172,7 @@ Program& Program::calculateBranches() {
 }
 
 
-Program& Program::istore(int regno, int i) {
+Program& Program::istore(int_op regno, int_op i) {
     /*  Inserts istore instruction to bytecode.
      *
      *  :params:
@@ -168,19 +180,35 @@ Program& Program::istore(int regno, int i) {
      *  regno:int - register number
      *  i:int     - value to store
      */
-    ensurebytes(1 + 2*sizeof(int));
+    ensurebytes(1 + 2*sizeof(bool) + 2*sizeof(int));
+
+    bool regno_ref = false, i_ref = false;
+    int regno_num, i_num;
+
+    bool* boolptr = 0;
+    int* intptr = 0;
+
+    tie(regno_ref, regno_num) = regno;
+    tie(i_ref, i_num) = i;
 
     program[addr_no++] = ISTORE;
     addr_ptr++;
-    ((int*)addr_ptr)[0] = regno;
-    ((int*)addr_ptr)[1] = i;
-    addr_no += 2 * sizeof(int);
+    *((bool*)addr_ptr) = regno_ref;
+    boolptr = (bool*)addr_ptr; boolptr++; addr_ptr = (char*)boolptr;
+    *((int*)addr_ptr)  = regno_num;
+    intptr = (int*)addr_ptr; intptr++; addr_ptr = (char*)intptr;
+    *((bool*)addr_ptr) = i_ref;
+    boolptr = (bool*)addr_ptr; boolptr++; addr_ptr = (char*)boolptr;
+    *((int*)addr_ptr)  = i_num;
+    intptr = (int*)addr_ptr; intptr++; addr_ptr = (char*)intptr;
+
+    addr_no += 2*sizeof(bool) + 2*sizeof(int);
     addr_ptr = program+addr_no;
 
     return (*this);
 }
 
-Program& Program::iadd(int rega, int regb, int regresult) {
+Program& Program::iadd(int_op rega, int_op regb, int_op regresult) {
     /*  Inserts iadd instruction to bytecode.
      *
      *  :params:
@@ -189,8 +217,9 @@ Program& Program::iadd(int rega, int regb, int regresult) {
      *  regb:int        - register index of second operand
      *  regresult:int   - register index in which to store the result
      */
-    ensurebytes(1 + 3*sizeof(int));
+    ensurebytes(1 + 3*sizeof(int) + 3*sizeof(int));
 
+    /*
     program[addr_no++] = IADD;
     addr_ptr++;
     ((int*)addr_ptr)[0] = rega;
@@ -198,6 +227,7 @@ Program& Program::iadd(int rega, int regb, int regresult) {
     ((int*)addr_ptr)[2] = regresult;
     addr_no += 3 * sizeof(int);
     addr_ptr = program+addr_no;
+    */
 
     return (*this);
 }
@@ -440,29 +470,53 @@ Program& Program::bstore(int regno, char b) {
     return (*this);
 }
 
-Program& Program::print(int regno) {
+Program& Program::print(int_op regno) {
     /*  Inserts print instuction.
      */
-    ensurebytes(1 + sizeof(int));
+    ensurebytes(1 + sizeof(bool) + sizeof(int));
+
+    bool regno_ref = false;
+    int regno_num;
+
+    bool* boolptr = 0;
+    int* intptr = 0;
+
+    tie(regno_ref, regno_num) = regno;
 
     program[addr_no++] = PRINT;
     addr_ptr++;
-    ((int*)addr_ptr)[0] = regno;
-    addr_no += sizeof(int);
+    *((bool*)addr_ptr) = regno_ref;
+    boolptr = (bool*)addr_ptr; boolptr++; addr_ptr = (char*)boolptr;
+    *((int*)addr_ptr)  = regno_num;
+    intptr = (int*)addr_ptr; intptr++; addr_ptr = (char*)intptr;
+
+    addr_no += sizeof(bool) + sizeof(int);
     addr_ptr = program+addr_no;
 
     return (*this);
 }
 
-Program& Program::echo(int regno) {
+Program& Program::echo(int_op regno) {
     /*  Inserts echo instuction.
      */
-    ensurebytes(1 + sizeof(int));
+    ensurebytes(1 + sizeof(bool) + sizeof(int));
 
-    program[addr_no++] = ECHO;
+    bool regno_ref = false;
+    int regno_num;
+
+    bool* boolptr = 0;
+    int* intptr = 0;
+
+    tie(regno_ref, regno_num) = regno;
+
+    program[addr_no++] = PRINT;
     addr_ptr++;
-    ((int*)addr_ptr)[0] = regno;
-    addr_no += sizeof(int);
+    *((bool*)addr_ptr) = regno_ref;
+    boolptr = (bool*)addr_ptr; boolptr++; addr_ptr = (char*)boolptr;
+    *((int*)addr_ptr)  = regno_num;
+    intptr = (int*)addr_ptr; intptr++; addr_ptr = (char*)intptr;
+
+    addr_no += sizeof(bool) + sizeof(int);
     addr_ptr = program+addr_no;
 
     return (*this);
