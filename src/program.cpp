@@ -112,44 +112,54 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
     count = (count >= 0 ? count : instructionCount());
 
     int offset = 0;
+    int inc;
     for (int i = 0; i < (instr >= 0 ? instr : count+instr); ++i) {
-        /*  The offset is automatically increased by one byte each time the loop is iterated over.
-         *  This means that inside the switch statement, the offset has to be increased just by the
-         *  number of bytes occupied by instruction operands.
+        /*  This loop iterates over so many instructions as needed to find bytecode offset for requested instruction.
          *
-         *  It is done this way beacaue it is more ellegant than always writing '1 + <some offset>'
-         *  every time, and defaulting to 'offset++'.
+         *  Each time, the offset is increased by `inc` - which is equal to *1 plus size of operands of instructions at current index*.
          */
-        switch (program[offset++]) {
+        inc = 1;
+        switch (program[offset]) {
             case IADD:
+                break;
             case ISUB:
+                break;
             case IMUL:
+                break;
             case IDIV:
+                break;
             case ILT:
+                inc += 3*sizeof(bool) + 3*sizeof(int);
+                break;
             case ILTE:
+                break;
             case IGT:
+                break;
             case IGTE:
+                break;
             case IEQ:
-                offset += 3+sizeof(bool) + 3*sizeof(int);
                 break;
             case BRANCHIF:
-                offset += sizeof(bool) + 3*sizeof(int);
+                inc += sizeof(bool) + 3*sizeof(int);
                 break;
             case ISTORE:
-                offset += 2*sizeof(bool) + 2*sizeof(int);
+                inc += 2*sizeof(bool) + 2*sizeof(int);
                 break;
             case IINC:
+                break;
             case IDEC:
+                break;
             case PRINT:
-                offset += sizeof(bool) + sizeof(int);
+                inc += sizeof(bool) + sizeof(int);
                 break;
             case BRANCH:
-                offset += sizeof(int);
+                inc += sizeof(int);
                 break;
             case RET:
-                offset += sizeof(bool) + sizeof(int);
+                inc += sizeof(bool) + sizeof(int);
                 break;
         }
+        offset += inc;
         if (offset+1 > bytes) {
             throw "instruction offset out of bounds: check your branches";
         }
@@ -168,9 +178,7 @@ Program& Program::calculateBranches() {
         ptr = (int*)(program+branches[i]+1);
         switch (*(program+branches[i])) {
             case BRANCH:
-                cout << "branch: calculated offset: " << (*ptr) << " -> ";
                 (*ptr) = getInstructionBytecodeOffset(*ptr, instruction_count);
-                cout << (*ptr) << " ";
                 break;
             case BRANCHIF:
                 pointer::inc<bool, int>(ptr);
@@ -582,7 +590,7 @@ Program& Program::branchif(int_op regc, int addr_truth, int addr_false) {
      *
      *  :params:
      *
-     *  regcondition:int    - index of the instruction to which to branch
+     *  regc:int    - index of the instruction to which to branch
      *  addr_truth:int      - instruction index to go if condition is true
      *  addr_false:int      - instruction index to go if condition is false
      */
