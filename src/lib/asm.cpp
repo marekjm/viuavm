@@ -136,13 +136,13 @@ int main(int argc, char* argv[]) {
         Program program(bytes);
 
         for (int i = 0; i < ilines.size(); ++i) {
-            line = ilines[i];
+            line = str::lstrip(ilines[i]);
 
             string instr;
             istringstream iss(line);
 
             if (str::startswith(line, "istore")) {
-                line = str::lstrip(str::sub(line, 6));
+                line = str::sub(line, 6);
                 string regno_chnk, number_chnk;
                 regno_chnk = str::chunk(line);
                 line = str::sub(line, regno_chnk.size());
@@ -157,9 +157,14 @@ int main(int argc, char* argv[]) {
             } else if (str::startswith(line, "idiv")) {
                 inc = 1 + 3*sizeof(int);
             } else if (str::startswith(line, "ilt")) {
-                int rega, regb, regresult;
-                iss >> instr >> rega >> regb >> regresult;
-                program.ilt(rega, regb, regresult);
+                line = str::sub(line, 3);
+                string rega, regb, regresult;
+                rega = str::chunk(line);
+                line = str::sub(line, rega.size());
+                regb = str::chunk(line);
+                line = str::sub(line, regb.size());
+                regresult = str::chunk(line);
+                program.ilt(getint_op(rega), getint_op(regb), getint_op(regresult));
             } else if (str::startswith(line, "ilte")) {
                 inc = 1 + 3*sizeof(int);
             } else if (str::startswith(line, "igt")) {
