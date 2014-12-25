@@ -15,34 +15,37 @@ using namespace std;
 typedef char byte;
 
 
+bool DEBUG = true;
+
+
 const map<string, int> INSTRUCTION_SIZE = {
-    { "istore",     1 + 2*sizeof(int) },
-    { "iadd",       1 + 3*sizeof(int) },
-    { "isub",       1 + 3*sizeof(int) },
-    { "imul",       1 + 3*sizeof(int) },
-    { "idiv",       1 + 3*sizeof(int) },
-    { "iinc",       1 + sizeof(int) },
-    { "idec",       1 + sizeof(int) },
-    { "ilt",        1 + 3*sizeof(int) },
-    { "ilte",       1 + 3*sizeof(int) },
-    { "igt",        1 + 3*sizeof(int) },
-    { "igte",       1 + 3*sizeof(int) },
-    { "ieq",        1 + 3*sizeof(int) },
-    { "bstore",     1 + sizeof(int) + sizeof(char) },
-    { "badd",       1 + 3*sizeof(int) },
-    { "bsub",       1 + 3*sizeof(int) },
-    { "binc",       1 + sizeof(int) },
-    { "bdec",       1 + sizeof(int) },
-    { "blt",        1 + 3*sizeof(int) },
-    { "blte",       1 + 3*sizeof(int) },
-    { "bgt",        1 + 3*sizeof(int) },
-    { "bgte",       1 + 3*sizeof(int) },
-    { "beq",        1 + 3*sizeof(int) },
-    { "print",      1 + sizeof(int) },
-    { "echo",       1 + sizeof(int) },
-    { "branch",     1 + sizeof(int) },
-    { "branchif",   1 + 3*sizeof(int) },
-    { "ret",        1 + sizeof(int) },
+    { "istore",     1 + 2*sizeof(bool) + 2*sizeof(int) },
+    { "iadd",       1 + 3*sizeof(bool) + 3*sizeof(int) },
+    { "isub",       1 + 3*sizeof(bool) + 3*sizeof(int) },
+    { "imul",       1 + 3*sizeof(bool) + 3*sizeof(int) },
+    { "idiv",       1 + 3*sizeof(bool) + 3*sizeof(int) },
+    { "iinc",       1 + 1*sizeof(bool) + sizeof(int) },
+    { "idec",       1 + 1*sizeof(bool) + sizeof(int) },
+    { "ilt",        1 + 3*sizeof(bool) + 3*sizeof(int) },
+    { "ilte",       1 + 3*sizeof(bool) + 3*sizeof(int) },
+    { "igt",        1 + 3*sizeof(bool) + 3*sizeof(int) },
+    { "igte",       1 + 3*sizeof(bool) + 3*sizeof(int) },
+    { "ieq",        1 + 3*sizeof(bool) + 3*sizeof(int) },
+    { "bstore",     1 + 2*sizeof(bool) + sizeof(int) + sizeof(char) },
+    { "badd",       1 + 3*sizeof(bool) + 3*sizeof(int) },
+    { "bsub",       1 + 3*sizeof(bool) + 3*sizeof(int) },
+    { "binc",       1 + 1*sizeof(bool) + sizeof(int) },
+    { "bdec",       1 + 1*sizeof(bool) + sizeof(int) },
+    { "blt",        1 + 3*sizeof(bool) + 3*sizeof(int) },
+    { "blte",       1 + 3*sizeof(bool) + 3*sizeof(int) },
+    { "bgt",        1 + 3*sizeof(bool) + 3*sizeof(int) },
+    { "bgte",       1 + 3*sizeof(bool) + 3*sizeof(int) },
+    { "beq",        1 + 3*sizeof(bool) + sizeof(int) },
+    { "print",      1 + 1*sizeof(bool) + sizeof(int) },
+    { "echo",       1 + 1*sizeof(bool) + sizeof(int) },
+    { "branch",     1 + 1*sizeof(bool) + 1*sizeof(int) },
+    { "branchif",   1 + 3*sizeof(bool) + 3*sizeof(int) },
+    { "ret",        1 + 1*sizeof(bool) + sizeof(int) },
     { "end",        1 },
     { "halt",       1 },
     { "pass",       1 },
@@ -120,6 +123,10 @@ int main(int argc, char* argv[]) {
             inc = 0;
         }
 
+        if (DEBUG) {
+            cout << "total required bytes: " << bytes << endl;
+        }
+
         Program program(bytes);
 
         for (int i = 0; i < ilines.size(); ++i) {
@@ -130,7 +137,13 @@ int main(int argc, char* argv[]) {
 
             if (str::startswith(line, "istore")) {
                 int regno, number;
-                iss >> instr >> regno >> number;
+                line = str::lstrip(str::sub(line, 6));
+                string regno_chnk, number_chnk;
+                regno_chnk = str::chunk(line);
+                line = str::sub(line, regno_chnk.size());
+                number_chnk = str::chunk(line);
+                regno = stoi(regno_chnk);
+                number = stoi(number_chnk);
                 program.istore(regno, number);
             } else if (str::startswith(line, "iadd")) {
                 inc = 1 + 3*sizeof(int);
