@@ -29,7 +29,14 @@ int main(int argc, char* argv[]) {
 
     // run code
     if (argc > 1) {
-        string filename = args[1];
+        bool debug = false;
+        string filename;
+        if (args[1] == "--debug") {
+            debug = true;
+            filename = args[2];
+        } else {
+            filename = args[1];
+        }
 
         if (!filename.size()) {
             cout << "fatal: no file to run" << endl;
@@ -59,9 +66,12 @@ int main(int argc, char* argv[]) {
         in.close();
 
         // run the bytecode
-        ret_code = CPU().load(bytecode).bytes(bytes).run();
+        CPU cpu;
+        cpu.debug = debug;
+        ret_code = cpu.load(bytecode).bytes(bytes).run();
     } else {
         cout << "tatanka VM, version " << VERSION << endl;
+        cout << args[0] << " [--debug] <infile>" << endl;
     }
 
     return ret_code;
