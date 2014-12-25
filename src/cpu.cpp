@@ -12,6 +12,15 @@ using namespace std;
 typedef char byte;
 
 
+template<class T, class S> void inc(S*& p) {
+    /*  Increase pointer of type S, as if it were of type T.
+     */
+    T* ptr = (T*)p;
+    ptr++;
+    p = (S*)ptr;
+}
+
+
 CPU& CPU::load(char* bc) {
     /*  Load bytecode into the CPU.
      *  CPU becomes owner of loaded bytecode - meaning it will consider itself responsible for proper
@@ -58,6 +67,76 @@ Object* CPU::fetchRegister(int i, bool nullok) {
     return optr;
 }
 
+
+char* CPU::istore(char* addr) {
+    /*  Run istore instruction.
+     */
+    int reg, num;
+    bool reg_ref = false, num_ref = false;
+
+    reg_ref = *((bool*)addr);
+    inc<bool, char>(addr);
+    reg = *((int*)addr);
+    inc<int, char>(addr);
+
+    num_ref = *((bool*)addr);
+    inc<bool, char>(addr);
+    num = *((int*)addr);
+    inc<int, char>(addr);
+
+    if (debug) {
+        cout << "ISTORE";
+        cout << (reg_ref ? " @" : " ") << reg;
+        cout << (num_ref ? " @" : " ") << num;
+        cout << endl;
+    }
+
+    if (reg_ref) {
+        reg = static_cast<Integer*>(registers[reg])->value();
+    }
+    if (num_ref) {
+        num = static_cast<Integer*>(registers[num])->value();
+    }
+
+    registers[reg] = new Integer(num);
+
+    return addr;
+}
+
+char* CPU::echo(char* addr) {
+    /*  Run echo instruction.
+     */
+    inc<bool, char>(addr);
+    inc<int, char>(addr);
+    return addr;
+}
+
+char* CPU::print(char* addr) {
+    /*  Run print instruction.
+     */
+    bool ref = false;
+    int reg;
+
+    ref = *((bool*)addr);
+    inc<bool, char>(addr);
+
+    reg = *((int*)addr);
+    inc<int, char>(addr);
+
+    if (debug) {
+        cout << "PRINT" << (ref ? " @" : " ") << reg;
+        cout << endl;
+    }
+
+    if (ref) {
+        reg = static_cast<Integer*>(registers[reg])->value();
+    }
+
+    cout << registers[reg]->str() << endl;
+
+    return addr;
+}
+
 int CPU::run() {
     /*  VM CPU implementation.
      *
@@ -74,17 +153,18 @@ int CPU::run() {
     byte* bptr = 0;
     int* iptr = 0;
 
+    byte* instr_ptr = bytecode; // instruction pointer
+
     while (true) {
         branched = false;
-        if (debug) cout << "CPU: bytecode at 0x" << hex << addr << dec << ": ";
+        if (debug) cout << "CPU: bytecode at 0x" << hex << (long)instr_ptr << dec << ": ";
 
         try {
-            switch (bytecode[addr]) {
+            switch (*instr_ptr) {
                 case ISTORE:
-                    if (debug) cout << "ISTORE " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << endl;
-                    registers[ ((int*)(bytecode+addr+1))[0] ] = new Integer(((int*)(bytecode+addr+1))[1]);
-                    addr += 2 * sizeof(int);
+                    instr_ptr = istore(instr_ptr+1);
                     break;
+                    /*
                 case IADD:
                     if (debug) cout << "IADD " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
                     registers[ ((int*)(bytecode+addr+1))[2] ] = new Integer( static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value() +
@@ -164,16 +244,24 @@ int CPU::run() {
                     registers[ ((int*)(bytecode+addr+1))[0] ] = new Byte(*(bytecode+addr+1+sizeof(int)));
                     addr += sizeof(int) + sizeof(char);
                     break;
+                    */
                 case PRINT:
-                    if (debug) cout << "PRINT " << ((int*)(bytecode+addr+1))[0] << endl;
+                    //if (debug) cout << "PRINT " << ((int*)(bytecode+addr+1))[0] << endl;
+                    instr_ptr = print(instr_ptr+1);
+                    /*
                     cout << fetchRegister(*((int*)(bytecode+addr+1)))->str() << endl;
                     addr += sizeof(int);
+                    */
                     break;
                 case ECHO:
+                    instr_ptr = echo(instr_ptr+1);
+                    /*
                     if (debug) cout << "ECHO " << ((int*)(bytecode+addr+1))[0] << endl;
                     cout << fetchRegister(*((int*)(bytecode+addr+1)))->str();
                     addr += sizeof(int);
+                    */
                     break;
+                    /*
                 case BRANCH:
                     if (debug) cout << "BRANCH 0x" << hex << *(int*)(bytecode+addr+1) << dec << endl;
                     if ((*(int*)(bytecode+addr+1)) == addr) {
@@ -205,6 +293,7 @@ int CPU::run() {
                     }
                     addr += sizeof(int);
                     break;
+                    */
                 case HALT:
                     if (debug) cout << "HALT" << endl;
                     halt = true;
@@ -223,7 +312,6 @@ int CPU::run() {
             break;
         }
 
-        if (!branched) ++addr;
         if (halt) break;
 
         if (addr >= bytecode_size and bytecode_size) {

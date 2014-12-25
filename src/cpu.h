@@ -20,6 +20,10 @@ class CPU {
 
     Object* fetchRegister(int i, bool nullok = false);
 
+    char* istore(char*);
+    char* print(char*);
+    char* echo(char*);
+
     public:
         bool debug;
 
