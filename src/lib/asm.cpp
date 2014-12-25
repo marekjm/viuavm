@@ -43,8 +43,8 @@ const map<string, int> INSTRUCTION_SIZE = {
     { "beq",        1 + 3*sizeof(bool) + sizeof(int) },
     { "print",      1 + 1*sizeof(bool) + sizeof(int) },
     { "echo",       1 + 1*sizeof(bool) + sizeof(int) },
-    { "branch",     1 + 1*sizeof(bool) + 1*sizeof(int) },
-    { "branchif",   1 + 3*sizeof(bool) + 3*sizeof(int) },
+    { "branch",     1 + sizeof(int) },
+    { "branchif",   1 + sizeof(bool) + 3*sizeof(int) },
     { "ret",        1 + 1*sizeof(bool) + sizeof(int) },
     { "end",        1 },
     { "halt",       1 },
@@ -102,10 +102,12 @@ int main(int argc, char* argv[]) {
         int inc = 0;
         istringstream iss;
         string instr;
+
+        if (DEBUG) { cout << "calculating: total required bytes: "; }
         for (int i = 0; i < lines.size(); ++i) {
             instr = "";
-            line = lines[i];
-            if (!line.size()) continue;
+            line = str::lstrip(lines[i]);
+            if (!line.size() or line[0] == ';') continue;
 
             iss.str(line);
             iss >> instr;                       // extract the instruction
@@ -128,10 +130,7 @@ int main(int argc, char* argv[]) {
             bytes += inc;
             inc = 0;
         }
-
-        if (DEBUG) {
-            cout << "total required bytes: " << bytes << endl;
-        }
+        if (DEBUG) { cout << bytes << endl; }
 
         Program program(bytes);
 
@@ -202,9 +201,23 @@ int main(int argc, char* argv[]) {
                 //iss >> instr >> regno;
                 //program.echo(regno);
             } else if (str::startswith(line, "branchif")) {
-                int condition, if_true, if_false;
-                iss >> instr >> condition >> if_true >> if_false;
-                program.branchif(condition, if_true, if_false);
+                line = str::lstrip(str::sub(line, 8));
+
+                string regcond, t, f;
+
+                regcond = str::chunk(line);
+                line = str::lstrip(str::sub(line, regcond.size()));
+
+                t = str::chunk(line);
+                line = str::sub(line, t.size());
+
+                f = str::chunk(line);
+
+                int addrt, addrf;
+                addrt = stoi(t);
+                addrf = stoi(f);
+
+                program.branchif(getint_op(regcond), addrt, addrf);
             } else if (str::startswith(line, "branch")) {
                 int addr;
                 iss >> instr >> addr;
@@ -216,7 +229,14 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        program.calculateBranches();
+        if (DEBUG) { cout << "calculating: branches: "; }
+        try {
+            program.calculateBranches();
+        } catch (const char*& e) {
+            cout << "fatal: branch calculation failed: " << e << endl;
+            return 1;
+        }
+        if (DEBUG) { cout << "OK" << endl; }
 
         byte* bytecode = program.bytecode();
 
