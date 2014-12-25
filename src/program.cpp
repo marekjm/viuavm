@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include "support/pointer.h"
 #include "program.h"
 using namespace std;
 
