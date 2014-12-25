@@ -12,7 +12,7 @@ namespace str {
     bool isnum(const std::string& s);
 
     std::string sub(const std::string& s, int b = 0, int e = -1);
-    std::string chunk(const std::string& s);
+    std::string chunk(const std::string& s, bool ignore_leading_ws=true);
 
     std::string lstrip(const std::string& s);
 

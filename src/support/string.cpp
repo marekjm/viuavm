@@ -51,22 +51,24 @@ namespace str {
         part.str("");
 
         if (e < 0) { e = (s.size() + e + 1); }
-        cout << b << ", " << e << ": `";
 
-        for (; b < s.size() and b < e; ++b) { part << s[b]; }
-
-        cout << part.str() << "`" << endl;
+        for (; b < s.size() and b < e; ++b) {
+            part << s[b];
+        }
 
         return part.str();
     }
 
-    string chunk(const string& s) {
+    string chunk(const string& s, bool ignore_leading_ws) {
         /*  Returns part of the string until first whitespace from left side.
          */
         ostringstream chnk;
-        for (int i = 0; i < s.size(); ++i) {
-            if (s[i] == *" " or s[i] == *"\t" or s[i] == *"\v" or s[i] == *"\n") break;
-            chnk << s[i];
+
+        string str = (ignore_leading_ws ? lstrip(s) : s);
+
+        for (int i = 0; i < str.size(); ++i) {
+            if (str[i] == *" " or str[i] == *"\t" or str[i] == *"\v" or str[i] == *"\n") break;
+            chnk << str[i];
         }
         return chnk.str();
     }
