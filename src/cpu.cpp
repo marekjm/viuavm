@@ -95,6 +95,54 @@ char* CPU::istore(char* addr) {
     return addr;
 }
 
+char* CPU::ilt(char* addr) {
+    /*  Run ilt instruction.
+     */
+    bool rega_ref, regb_ref, regr_ref;
+    int rega_num, regb_num, regr_num;
+
+    rega_ref = *((bool*)addr);
+    pointer::inc<bool, char>(addr);
+    rega_num = *((int*)addr);
+    pointer::inc<int, char>(addr);
+
+    regb_ref = *((bool*)addr);
+    pointer::inc<bool, char>(addr);
+    regb_num = *((int*)addr);
+    pointer::inc<int, char>(addr);
+
+    regr_ref = *((bool*)addr);
+    pointer::inc<bool, char>(addr);
+    regr_num = *((int*)addr);
+    pointer::inc<int, char>(addr);
+
+    if (debug) {
+        cout << "ILT";
+        cout << (rega_ref ? " @" : " ") << rega_num << " ";
+        cout << (regb_ref ? " @" : " ") << regb_num << " ";
+        cout << (regr_ref ? " @" : " ") << regr_num << " ";
+        cout << endl;
+    }
+
+    if (rega_ref) {
+        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+    }
+    if (regb_ref) {
+        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+    }
+    if (regr_ref) {
+        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+    }
+
+    rega_num = static_cast<Integer*>(registers[rega_num])->value();
+    regb_num = static_cast<Integer*>(registers[regb_num])->value();
+    regr_num = static_cast<Integer*>(registers[regr_num])->value();
+
+    registers[regr_num] = new Boolean(rega_num < regb_num);
+
+    return addr;
+}
+
 char* CPU::echo(char* addr) {
     /*  Run echo instruction.
      */
@@ -195,13 +243,11 @@ int CPU::run() {
                     (static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value())--;
                     addr += sizeof(int);
                     break;
+                    */
                 case ILT:
-                    if (debug) cout << "ILT " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
-                    registers[ ((int*)(bytecode+addr+1))[2] ] = new Boolean( static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value() <
-                                                                             static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[1] ) )->value()
-                                                                             );
-                    addr += 3 * sizeof(int);
+                    instr_ptr = ilt(instr_ptr+1);
                     break;
+                    /*
                 case ILTE:
                     if (debug) cout << "ILTE " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
                     registers[ ((int*)(bytecode+addr+1))[2] ] = new Boolean( static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value() <=
