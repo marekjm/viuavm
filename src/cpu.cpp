@@ -118,25 +118,27 @@ char* CPU::ilt(char* addr) {
 
     if (debug) {
         cout << "ILT";
-        cout << (rega_ref ? " @" : " ") << rega_num << " ";
-        cout << (regb_ref ? " @" : " ") << regb_num << " ";
-        cout << (regr_ref ? " @" : " ") << regr_num << " ";
+        cout << (rega_ref ? " @" : " ") << rega_num;
+        cout << (regb_ref ? " @" : " ") << regb_num;
+        cout << (regr_ref ? " @" : " ") << regr_num;
         cout << endl;
     }
 
     if (rega_ref) {
+        if (debug) { cout << "resolving reference for a-operand register" << endl; }
         rega_num = static_cast<Integer*>(registers[rega_num])->value();
     }
     if (regb_ref) {
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        if (debug) { cout << "resolving reference for b-operand register" << endl; }
+        regb_num = static_cast<Integer*>(registers[regb_num])->value();
     }
     if (regr_ref) {
+        if (debug) { cout << "resolving reference for result register" << endl; }
         rega_num = static_cast<Integer*>(registers[rega_num])->value();
     }
 
     rega_num = static_cast<Integer*>(registers[rega_num])->value();
     regb_num = static_cast<Integer*>(registers[regb_num])->value();
-    regr_num = static_cast<Integer*>(registers[regr_num])->value();
 
     registers[regr_num] = new Boolean(rega_num < regb_num);
 
