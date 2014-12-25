@@ -6,19 +6,11 @@
 #include "types/integer.h"
 #include "types/boolean.h"
 #include "types/byte.h"
+#include "support/pointer.h"
 using namespace std;
 
 
 typedef char byte;
-
-
-template<class T, class S> void inc(S*& p) {
-    /*  Increase pointer of type S, as if it were of type T.
-     */
-    T* ptr = (T*)p;
-    ptr++;
-    p = (S*)ptr;
-}
 
 
 CPU& CPU::load(char* bc) {
@@ -75,14 +67,14 @@ char* CPU::istore(char* addr) {
     bool reg_ref = false, num_ref = false;
 
     reg_ref = *((bool*)addr);
-    inc<bool, char>(addr);
+    pointer::inc<bool, char>(addr);
     reg = *((int*)addr);
-    inc<int, char>(addr);
+    pointer::inc<int, char>(addr);
 
     num_ref = *((bool*)addr);
-    inc<bool, char>(addr);
+    pointer::inc<bool, char>(addr);
     num = *((int*)addr);
-    inc<int, char>(addr);
+    pointer::inc<int, char>(addr);
 
     if (debug) {
         cout << "ISTORE";
@@ -106,8 +98,8 @@ char* CPU::istore(char* addr) {
 char* CPU::echo(char* addr) {
     /*  Run echo instruction.
      */
-    inc<bool, char>(addr);
-    inc<int, char>(addr);
+    pointer::inc<bool, char>(addr);
+    pointer::inc<int, char>(addr);
     return addr;
 }
 
@@ -118,10 +110,10 @@ char* CPU::print(char* addr) {
     int reg;
 
     ref = *((bool*)addr);
-    inc<bool, char>(addr);
+    pointer::inc<bool, char>(addr);
 
     reg = *((int*)addr);
-    inc<int, char>(addr);
+    pointer::inc<int, char>(addr);
 
     if (debug) {
         cout << "PRINT" << (ref ? " @" : " ") << reg;
