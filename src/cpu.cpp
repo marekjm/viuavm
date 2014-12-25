@@ -125,15 +125,15 @@ char* CPU::ilt(char* addr) {
     }
 
     if (rega_ref) {
-        if (debug) { cout << "resolving reference for a-operand register" << endl; }
+        if (debug) { cout << "resolving reference to a-operand register" << endl; }
         rega_num = static_cast<Integer*>(registers[rega_num])->value();
     }
     if (regb_ref) {
-        if (debug) { cout << "resolving reference for b-operand register" << endl; }
+        if (debug) { cout << "resolving reference to b-operand register" << endl; }
         regb_num = static_cast<Integer*>(registers[regb_num])->value();
     }
     if (regr_ref) {
-        if (debug) { cout << "resolving reference for result register" << endl; }
+        if (debug) { cout << "resolving reference to result register" << endl; }
         rega_num = static_cast<Integer*>(registers[rega_num])->value();
     }
 
@@ -177,6 +177,51 @@ char* CPU::print(char* addr) {
     cout << registers[reg]->str() << endl;
 
     return addr;
+}
+
+char* CPU::branch(char* addr) {
+    /*  Run branch instruction.
+     */
+    if (debug) { cout << "BRANCH 0x" << hex << (long)(bytecode+(*((int*)addr))) << dec << endl; }
+    char* target = bytecode+(*(int*)addr);
+    if (target == addr) {
+        throw "aborting: BRANCH instruction pointing to itself";
+    }
+    return target;
+}
+
+char* CPU::branchif(char* addr) {
+    /*  Run branchif instruction.
+     */
+    bool regcond_ref;
+    int regcond_num;
+
+    regcond_ref = *((bool*)addr);
+    pointer::inc<bool, char>(addr);
+    regcond_num = *((int*)addr);
+    pointer::inc<int, char>(addr);
+
+    int addr_true = *((int*)addr);
+    pointer::inc<int, char>(addr);
+
+    int addr_false = *((int*)addr);
+    pointer::inc<int, char>(addr);
+
+    if (debug) {
+        cout << "BRANCHIF";
+        cout << (regcond_ref ? " @" : " ") << regcond_num;
+        cout << addr_true << " " << addr_false;
+        cout << endl;
+    }
+
+    if (regcond_ref) {
+        if (debug) { cout << "resolving reference to condition register" << endl; }
+        regcond_num = static_cast<Integer*>(registers[regcond_num])->value();
+    }
+
+    bool result = static_cast<Boolean*>(registers[regcond_num])->value();
+
+    return (result ? bytecode+addr_true : bytecode+addr_false);
 }
 
 int CPU::run() {
@@ -286,28 +331,13 @@ int CPU::run() {
                     break;
                     */
                 case PRINT:
-                    //if (debug) cout << "PRINT " << ((int*)(bytecode+addr+1))[0] << endl;
                     instr_ptr = print(instr_ptr+1);
-                    /*
-                    cout << fetchRegister(*((int*)(bytecode+addr+1)))->str() << endl;
-                    addr += sizeof(int);
-                    */
                     break;
                 case ECHO:
                     instr_ptr = echo(instr_ptr+1);
-                    /*
-                    if (debug) cout << "ECHO " << ((int*)(bytecode+addr+1))[0] << endl;
-                    cout << fetchRegister(*((int*)(bytecode+addr+1)))->str();
-                    addr += sizeof(int);
-                    */
                     break;
-                    /*
                 case BRANCH:
-                    if (debug) cout << "BRANCH 0x" << hex << *(int*)(bytecode+addr+1) << dec << endl;
-                    if ((*(int*)(bytecode+addr+1)) == addr) {
-                        throw "aborting: BRANCH instruction pointing to itself";
-                    }
-                    addr = *(int*)(bytecode+addr+1);
+                    instr_ptr = branch(instr_ptr+1);
                     branched = true;
                     break;
                 case BRANCHIF:
@@ -324,6 +354,7 @@ int CPU::run() {
                     }
                     branched = true;
                     break;
+                    /*
                 case RET:
                     if (debug) cout << "RET " << *(int*)(bytecode+addr+1) << endl;
                     if (fetchRegister(*((int*)(bytecode+addr+1)))->type() == "Integer") {
@@ -343,7 +374,8 @@ int CPU::run() {
                     break;
                 default:
                     ostringstream error;
-                    error << "unrecognised instruction (bytecode value: " << (int)bytecode[addr] << ")";
+                    error << "unrecognised instruction (bytecode value: " << // (int)bytecode[addr] << ")";
+                             *((int*)bytecode) << ")";
                     throw error.str().c_str();
             }
         } catch (const char* &e) {

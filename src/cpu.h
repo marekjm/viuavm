@@ -26,6 +26,9 @@ class CPU {
     char* print(char*);
     char* echo(char*);
 
+    char* branchif(char*);
+    char* branch(char*);
+
     public:
         bool debug;
 
