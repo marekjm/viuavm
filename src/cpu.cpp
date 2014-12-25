@@ -196,8 +196,10 @@ char* CPU::branchif(char* addr) {
     bool regcond_ref;
     int regcond_num;
 
+
     regcond_ref = *((bool*)addr);
     pointer::inc<bool, char>(addr);
+
     regcond_num = *((int*)addr);
     pointer::inc<int, char>(addr);
 
@@ -209,10 +211,13 @@ char* CPU::branchif(char* addr) {
 
     if (debug) {
         cout << "BRANCHIF";
-        cout << (regcond_ref ? " @" : " ") << regcond_num;
-        cout << addr_true << " " << addr_false;
+        cout << dec << (regcond_ref ? " @" : " ") << regcond_num << hex;
+        cout << " 0x" << addr_true;
+        cout << " 0x" << addr_false;
+        cout << " (from bytecode start: 0x" << (long)bytecode << ")" << dec;
         cout << endl;
     }
+
 
     if (regcond_ref) {
         if (debug) { cout << "resolving reference to condition register" << endl; }
@@ -221,7 +226,9 @@ char* CPU::branchif(char* addr) {
 
     bool result = static_cast<Boolean*>(registers[regcond_num])->value();
 
-    return (result ? bytecode+addr_true : bytecode+addr_false);
+    addr = bytecode + (result ? addr_true : addr_false);
+
+    return addr;
 }
 
 int CPU::run() {
@@ -341,17 +348,7 @@ int CPU::run() {
                     branched = true;
                     break;
                 case BRANCHIF:
-                    iptr = (int*)(bytecode+addr+1);
-                    if (debug) cout << "BRANCHIF " << *iptr << " " << hex
-                         << "0x" << *(iptr+1) << " "
-                         << "0x" << *(iptr+2);
-                    if (debug) cout << endl;
-                    if (debug) cout << static_cast<Boolean*>( fetchRegister( *iptr ) )->str() << endl;
-                    if (static_cast<Boolean*>( fetchRegister( *iptr ) )->value()) {
-                        addr = *(iptr+1);
-                    } else {
-                        addr = *(iptr+2);
-                    }
+                    instr_ptr = branchif(instr_ptr+1);
                     branched = true;
                     break;
                     /*
