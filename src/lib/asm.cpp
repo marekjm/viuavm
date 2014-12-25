@@ -52,6 +52,12 @@ const map<string, int> INSTRUCTION_SIZE = {
 };
 
 
+int_op getint_op(const string& s) {
+    bool ref = s[0] == '@';
+    return tuple<bool, int>(ref, stoi(ref ? str::sub(s, 1) : s));
+}
+
+
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
     vector<string> args;
@@ -136,15 +142,12 @@ int main(int argc, char* argv[]) {
             istringstream iss(line);
 
             if (str::startswith(line, "istore")) {
-                int regno, number;
                 line = str::lstrip(str::sub(line, 6));
                 string regno_chnk, number_chnk;
                 regno_chnk = str::chunk(line);
                 line = str::sub(line, regno_chnk.size());
                 number_chnk = str::chunk(line);
-                regno = stoi(regno_chnk);
-                number = stoi(number_chnk);
-                program.istore(regno, number);
+                program.istore(getint_op(regno_chnk), getint_op(number_chnk));
             } else if (str::startswith(line, "iadd")) {
                 inc = 1 + 3*sizeof(int);
             } else if (str::startswith(line, "isub")) {
@@ -177,13 +180,17 @@ int main(int argc, char* argv[]) {
                 iss >> instr >> regno >> bt;
                 program.bstore(regno, (char)bt);
             } else if (str::startswith(line, "print")) {
-                int regno;
-                iss >> instr >> regno;
-                program.print(regno);
+                line = str::lstrip(str::sub(line, 6));
+                string regno_chnk;
+                regno_chnk = str::chunk(line);
+                program.print(getint_op(regno_chnk));
+                //int regno;
+                //iss >> instr >> regno;
+                //program.print(regno);
             } else if (str::startswith(line, "echo")) {
-                int regno;
-                iss >> instr >> regno;
-                program.echo(regno);
+                //int regno;
+                //iss >> instr >> regno;
+                //program.echo(regno);
             } else if (str::startswith(line, "branchif")) {
                 int condition, if_true, if_false;
                 iss >> instr >> condition >> if_true >> if_false;
