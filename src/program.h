@@ -45,7 +45,7 @@ class Program {
     Program& echo       (int_op);
 
     Program& branch     (int);
-    Program& branchif   (int, int, int);
+    Program& branchif   (int_op, int, int);
 
     Program& ret        (int);
     Program& end        ();

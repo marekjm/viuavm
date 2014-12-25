@@ -130,18 +130,24 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
             case IGT:
             case IGTE:
             case IEQ:
+                offset += 3+sizeof(bool) + 3*sizeof(int);
+                break;
             case BRANCHIF:
-                offset += 3 * sizeof(int);
+                offset += sizeof(bool) + 3*sizeof(int);
                 break;
             case ISTORE:
-                offset += 2 * sizeof(int);
+                offset += 2*sizeof(bool) + 2*sizeof(int);
                 break;
             case IINC:
             case IDEC:
             case PRINT:
+                offset += sizeof(bool) + sizeof(int);
+                break;
             case BRANCH:
-            case RET:
                 offset += sizeof(int);
+                break;
+            case RET:
+                offset += sizeof(bool) + sizeof(int);
                 break;
         }
         if (offset+1 > bytes) {
@@ -162,9 +168,12 @@ Program& Program::calculateBranches() {
         ptr = (int*)(program+branches[i]+1);
         switch (*(program+branches[i])) {
             case BRANCH:
+                cout << "branch: calculated offset: " << (*ptr) << " -> ";
                 (*ptr) = getInstructionBytecodeOffset(*ptr, instruction_count);
+                cout << (*ptr) << " ";
                 break;
             case BRANCHIF:
+                pointer::inc<bool, int>(ptr);
                 (*(ptr+1)) = getInstructionBytecodeOffset(*(ptr+1), instruction_count);
                 (*(ptr+2)) = getInstructionBytecodeOffset(*(ptr+2), instruction_count);
                 break;
@@ -185,9 +194,6 @@ Program& Program::istore(int_op regno, int_op i) {
 
     bool regno_ref = false, i_ref = false;
     int regno_num, i_num;
-
-    bool* boolptr = 0;
-    int* intptr = 0;
 
     tie(regno_ref, regno_num) = regno;
     tie(i_ref, i_num) = i;
@@ -560,14 +566,17 @@ Program& Program::branch(int addr) {
 
     program[addr_no++] = BRANCH;
     addr_ptr++;
-    ((int*)addr_ptr)[0] = addr;
+
+    *((int*)addr_ptr) = addr;
+    pointer::inc<int, char>(addr_ptr);
+
     addr_no += sizeof(int);
     addr_ptr = program+addr_no;
 
     return (*this);
 }
 
-Program& Program::branchif(int regcondition, int addr_truth, int addr_false) {
+Program& Program::branchif(int_op regc, int addr_truth, int addr_false) {
     /*  Inserts branchif instruction.
      *  Byte offset is calculated automatically.
      *
@@ -577,17 +586,30 @@ Program& Program::branchif(int regcondition, int addr_truth, int addr_false) {
      *  addr_truth:int      - instruction index to go if condition is true
      *  addr_false:int      - instruction index to go if condition is false
      */
-    ensurebytes(1 + 3*sizeof(int));
+    ensurebytes(1 + sizeof(bool) + 3*sizeof(int));
 
     // save branch instruction index for later evaluation
     branches.push_back(addr_no);
 
+    bool regcond_ref;
+    int regcond_num;
+
+    tie(regcond_ref, regcond_num) = regc;
+
     program[addr_no++] = BRANCHIF;
     addr_ptr++;
-    ((int*)addr_ptr)[0] = regcondition;
-    ((int*)addr_ptr)[1] = addr_truth;
-    ((int*)addr_ptr)[2] = addr_false;
-    addr_no += 3*sizeof(int);
+
+    *((bool*)addr_ptr) = regcond_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((int*)addr_ptr) = regcond_num;
+    pointer::inc<int, char>(addr_ptr);
+
+    *((int*)addr_ptr) = addr_truth;
+    pointer::inc<int, char>(addr_ptr);
+    *((int*)addr_ptr) = addr_false;
+    pointer::inc<int, char>(addr_ptr);
+
+    addr_no += sizeof(bool) + 3*sizeof(int);
     addr_ptr = program+addr_no;
 
     return (*this);
