@@ -93,15 +93,6 @@ void Program::ensurebytes(int bts) {
 }
 
 
-Program& Program::setAddressPtr(int addr) {
-    /*  Sets address pointer to given index.
-     *  Supports negative indexes.
-     */
-    addr_no = (addr >= 0 ? addr : bytes+addr);
-    addr_ptr = program + addr_no;
-    return (*this);
-}
-
 int Program::getInstructionBytecodeOffset(int instr, int count) {
     /*  Returns bytecode offset for given instruction index.
      *  The "count" parameter is there to pass assumed instruction count to

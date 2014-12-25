@@ -53,7 +53,6 @@ class Program {
     Program& pass       ();
     Program& halt       ();
 
-    Program& setAddressPtr(int n = 0);
     Program& calculateBranches();
 
     // representations
