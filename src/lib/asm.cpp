@@ -178,9 +178,10 @@ int main(int argc, char* argv[]) {
             } else if (str::startswith(line, "ieq")) {
                 inc = 1 + 3*sizeof(int);
             } else if (str::startswith(line, "iinc")) {
-                int regno;
-                iss >> instr >> regno;
-                program.iinc(regno);
+                line = str::lstrip(str::sub(line, 4));
+                string regno_chnk;
+                regno_chnk = str::chunk(line);
+                program.iinc(getint_op(regno_chnk));
             } else if (str::startswith(line, "idec")) {
                 inc = 1 + sizeof(int);
             } else if (str::startswith(line, "bstore")) {

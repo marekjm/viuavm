@@ -145,6 +145,36 @@ char* CPU::ilt(char* addr) {
     return addr;
 }
 
+char* CPU::iinc(char* addr) {
+    /*  Run iinc instruction.
+     */
+    bool ref = false;
+    int regno;
+
+    ref = *((bool*)addr);
+    pointer::inc<bool, char>(addr);
+
+    regno = *((int*)addr);
+    pointer::inc<int, char>(addr);
+
+    if (debug) {
+        cout << "IINC" << (ref ? " @" : " ") << regno;
+    }
+
+    if (ref) {
+        regno = static_cast<Integer*>(registers[regno])->value();
+    }
+
+    if (debug) {
+        if (ref) { cout << " -> " << regno; }
+        cout << endl;
+    }
+
+    ++(static_cast<Integer*>(registers[regno])->value());
+
+    return addr;
+}
+
 char* CPU::echo(char* addr) {
     /*  Run echo instruction.
      */
@@ -182,7 +212,9 @@ char* CPU::print(char* addr) {
 char* CPU::branch(char* addr) {
     /*  Run branch instruction.
      */
-    if (debug) { cout << "BRANCH 0x" << hex << (long)(bytecode+(*((int*)addr))) << dec << endl; }
+    if (debug) {
+        cout << "BRANCH " << *(int*)addr << endl;
+    }
     char* target = bytecode+(*(int*)addr);
     if (target == addr) {
         throw "aborting: BRANCH instruction pointing to itself";
@@ -211,10 +243,9 @@ char* CPU::branchif(char* addr) {
 
     if (debug) {
         cout << "BRANCHIF";
-        cout << dec << (regcond_ref ? " @" : " ") << regcond_num << hex;
-        cout << " 0x" << addr_true;
-        cout << " 0x" << addr_false;
-        cout << " (from bytecode start: 0x" << (long)bytecode << ")" << dec;
+        cout << dec << (regcond_ref ? " @" : " ") << regcond_num;
+        cout << " " << addr_true  << "::0x" << hex << (long)(bytecode+addr_true) << dec;
+        cout << " " << addr_false << "::0x" << hex << (long)(bytecode+addr_false);
         cout << endl;
     }
 
@@ -243,15 +274,16 @@ int CPU::run() {
 
     int addr = 0;
     bool halt = false;
-    bool branched;
-    byte* bptr = 0;
-    int* iptr = 0;
 
     byte* instr_ptr = bytecode; // instruction pointer
 
     while (true) {
-        branched = false;
-        if (debug) cout << "CPU: bytecode at 0x" << hex << (long)instr_ptr << dec << ": ";
+        if (debug) {
+            cout << "CPU: bytecode ";
+            cout << ((long)instr_ptr - (long)bytecode);
+            cout << " at 0x" << hex << (long)instr_ptr;
+            cout << dec << ": ";
+        }
 
         try {
             switch (*instr_ptr) {
@@ -287,11 +319,11 @@ int CPU::run() {
                                                                              );
                     addr += 3 * sizeof(int);
                     break;
+                    */
                 case IINC:
-                    if (debug) cout << "IINC " << ((int*)(bytecode+addr+1))[0] << endl;
-                    (static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value())++;
-                    addr += sizeof(int);
+                    instr_ptr = iinc(instr_ptr+1);
                     break;
+                    /*
                 case IDEC:
                     if (debug) cout << "IDEC " << ((int*)(bytecode+addr+1))[0] << endl;
                     (static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value())--;
@@ -345,11 +377,9 @@ int CPU::run() {
                     break;
                 case BRANCH:
                     instr_ptr = branch(instr_ptr+1);
-                    branched = true;
                     break;
                 case BRANCHIF:
                     instr_ptr = branchif(instr_ptr+1);
-                    branched = true;
                     break;
                     /*
                 case RET:

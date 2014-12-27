@@ -23,6 +23,8 @@ class CPU {
     char* istore(char*);
     char* ilt(char*);
 
+    char* iinc(char*);
+
     char* print(char*);
     char* echo(char*);
 
