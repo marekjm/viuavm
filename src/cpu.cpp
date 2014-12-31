@@ -280,7 +280,7 @@ int CPU::run() {
     while (true) {
         if (debug) {
             cout << "CPU: bytecode ";
-            cout << ((long)instr_ptr - (long)bytecode);
+            cout << dec << ((long)instr_ptr - (long)bytecode);
             cout << " at 0x" << hex << (long)instr_ptr;
             cout << dec << ": ";
         }
