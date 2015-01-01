@@ -66,6 +66,21 @@ Object* CPU::fetchRegister(int i, bool nullok) {
     return optr;
 }
 
+Object* CPU::fetch(int index) {
+    /*  Return pointer to object at given register.
+     *  This method safeguards against reaching for out-of-bounds registers and
+     *  reading from an empty register.
+     *
+     *  :params:
+     *
+     *  index:int   - index of a register to fetch
+     */
+    if (index >= reg_count) { throw "register access index out of bounds"; }
+    Object* optr = registers[index];
+    if (optr == 0) { throw "read from null register"; }
+    return optr;
+}
+
 
 char* CPU::istore(char* addr) {
     /*  Run istore instruction.
@@ -91,10 +106,10 @@ char* CPU::istore(char* addr) {
     }
 
     if (reg_ref) {
-        reg = static_cast<Integer*>(registers[reg])->value();
+        reg = static_cast<Integer*>(fetch(reg))->value();
     }
     if (num_ref) {
-        num = static_cast<Integer*>(registers[num])->value();
+        num = static_cast<Integer*>(fetch(num))->value();
     }
 
     registers[reg] = new Integer(num);
@@ -144,8 +159,8 @@ char* CPU::ilt(char* addr) {
         rega_num = static_cast<Integer*>(registers[rega_num])->value();
     }
 
-    rega_num = static_cast<Integer*>(registers[rega_num])->value();
-    regb_num = static_cast<Integer*>(registers[regb_num])->value();
+    rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    regb_num = static_cast<Integer*>(fetch(regb_num))->value();
 
     registers[regr_num] = new Boolean(rega_num < regb_num);
 
@@ -169,7 +184,7 @@ char* CPU::iinc(char* addr) {
     }
 
     if (ref) {
-        regno = static_cast<Integer*>(registers[regno])->value();
+        regno = static_cast<Integer*>(fetch(regno))->value();
     }
 
     if (debug) {
@@ -177,7 +192,7 @@ char* CPU::iinc(char* addr) {
         cout << endl;
     }
 
-    ++(static_cast<Integer*>(registers[regno])->value());
+    ++(static_cast<Integer*>(fetch(regno))->value());
 
     return addr;
 }
@@ -208,10 +223,10 @@ char* CPU::print(char* addr) {
     }
 
     if (ref) {
-        reg = static_cast<Integer*>(registers[reg])->value();
+        reg = static_cast<Integer*>(fetch(reg))->value();
     }
 
-    cout << registers[reg]->str() << endl;
+    cout << fetch(reg)->str() << endl;
 
     return addr;
 }
@@ -259,10 +274,10 @@ char* CPU::branchif(char* addr) {
 
     if (regcond_ref) {
         if (debug) { cout << "resolving reference to condition register" << endl; }
-        regcond_num = static_cast<Integer*>(registers[regcond_num])->value();
+        regcond_num = static_cast<Integer*>(fetch(regcond_num))->value();
     }
 
-    bool result = registers[regcond_num]->boolean();
+    bool result = fetch(regcond_num)->boolean();
 
     addr = bytecode + (result ? addr_true : addr_false);
 
@@ -406,11 +421,11 @@ int CPU::run() {
                     break;
                 case PASS:
                     if (debug) cout << "PASS" << endl;
+                    ++instr_ptr;
                     break;
                 default:
                     ostringstream error;
-                    error << "unrecognised instruction (bytecode value: " << // (int)bytecode[addr] << ")";
-                             *((int*)bytecode) << ")";
+                    error << "unrecognised instruction (bytecode value: " << *((int*)bytecode) << ")";
                     throw error.str().c_str();
             }
         } catch (const char* &e) {
@@ -421,8 +436,8 @@ int CPU::run() {
 
         if (halt) break;
 
-        if (addr >= bytecode_size and bytecode_size) {
-            cout << "CPU: aborting: bytecode address out of bound and no HALT instruction reached" << endl;
+        if (instr_ptr >= (bytecode+bytecode_size)) {
+            cout << "CPU: aborting: bytecode address out of bounds" << endl;
             return_code = 1;
             break;
         }
