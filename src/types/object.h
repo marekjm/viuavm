@@ -17,6 +17,9 @@ class Object {
             s << "<'" << type() << "' object at " << this << ">";
             return s.str();
         }
+        virtual bool boolean() const {
+            return false;
+        }
 };
 
 

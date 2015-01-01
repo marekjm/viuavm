@@ -20,6 +20,7 @@ class Integer : public Object {
             s << number;
             return s.str();
         }
+        bool boolean() const { return number != 0; }
 
         int& value() { return number; }
 
@@ -39,6 +40,7 @@ class UnsignedInteger : public Integer {
             s << number;
             return s.str();
         }
+        bool boolean() const { return number != 0; }
 
         unsigned value() { return number; }
 

@@ -262,12 +262,13 @@ char* CPU::branchif(char* addr) {
         regcond_num = static_cast<Integer*>(registers[regcond_num])->value();
     }
 
-    bool result = static_cast<Boolean*>(registers[regcond_num])->value();
+    bool result = registers[regcond_num]->boolean();
 
     addr = bytecode + (result ? addr_true : addr_false);
 
     return addr;
 }
+
 
 int CPU::run() {
     /*  VM CPU implementation.

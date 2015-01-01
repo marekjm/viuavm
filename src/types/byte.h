@@ -20,6 +20,9 @@ class Byte : public Object {
             s << byte_;
             return s.str();
         }
+        bool boolean() const {
+            return _char != 0;
+        }
 
         char& value() { return byte_; }
 
@@ -39,6 +42,7 @@ class UnsignedByte : public Byte {
             s << ubyte_;
             return s.str();
         }
+        bool boolean() const { return ubyte_ != 0; }
 
         unsigned char& value() { return ubyte_; }
 

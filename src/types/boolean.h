@@ -9,19 +9,22 @@
 
 
 class Boolean : public Object {
-    bool boolean;
+    bool b;
 
     public:
         std::string type() const {
             return "Boolean";
         }
         std::string str() const {
-            return ( boolean ? "true" : "false" );
+            return ( b ? "true" : "false" );
+        }
+        bool boolean() const {
+            return b;
         }
 
-        bool& value() { return boolean; }
+        bool& value() { return b; }
 
-        Boolean(bool b = false): boolean(b) {}
+        Boolean(bool v = false): b(v) {}
 };
 
 
