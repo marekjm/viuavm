@@ -46,26 +46,6 @@ CPU& CPU::eoffset(uint16_t o) {
 }
 
 
-Object* CPU::fetchRegister(int i, bool nullok) {
-    /*  Return pointer to object at given register.
-     *  This method safeguards against reaching for out-of-bounds registers and
-     *  reading from an empty register.
-     *
-     *  :params:
-     *
-     *  i:int       - index of a register to fetch
-     *  nullok:bool - disables checking if reading from empty register
-     */
-    if (i >= reg_count) {
-        throw "register access index out of bounds";
-    }
-    Object* optr = registers[i];
-    if (!nullok and optr == 0) {
-        throw "read from null register";
-    }
-    return optr;
-}
-
 Object* CPU::fetch(int index) {
     /*  Return pointer to object at given register.
      *  This method safeguards against reaching for out-of-bounds registers and

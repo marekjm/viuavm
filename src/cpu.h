@@ -19,7 +19,6 @@ class CPU {
     Object** registers;
     int reg_count;
 
-    Object* fetchRegister(int i, bool nullok = false);
     Object* fetch(int);
 
     char* istore(char*);
