@@ -21,7 +21,7 @@ class Byte : public Object {
             return s.str();
         }
         bool boolean() const {
-            return _char != 0;
+            return byte_ != 0;
         }
 
         char& value() { return byte_; }
