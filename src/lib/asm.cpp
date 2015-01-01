@@ -15,7 +15,7 @@ using namespace std;
 typedef char byte;
 
 
-bool DEBUG = true;
+bool DEBUG = false;
 
 
 const map<string, int> INSTRUCTION_SIZE = {
@@ -73,10 +73,34 @@ int main(int argc, char* argv[]) {
 
     // run code
     if (argc > 1) {
-        string filename = args[1];
+        string filename, compilename = "";
+        if (args[1] == "--debug") {
+            DEBUG = true;
+            if (argc > 2) {
+                filename = args[2];
+            } else {
+                cout << "fatal: filename required" << endl;
+                return 1;
+            }
+        } else {
+            filename = args[1];
+        }
+
+        if (DEBUG and argc >= 4) {
+            compilename = args[3];
+        } else if (!DEBUG and argc >= 3) {
+            compilename = args[2];
+        }
+        if (compilename.size() == 0) {
+            compilename = "out.bin";
+        }
+
+        if (DEBUG) {
+            cout << "assembling \"" << filename << "\" to \"" << compilename << "\"" << endl;
+        }
 
         if (!filename.size()) {
-            cout << "fatal: no file to run" << endl;
+            cout << "fatal: no file to assemble" << endl;
             return 1;
         }
 
@@ -94,6 +118,7 @@ int main(int argc, char* argv[]) {
         while (getline(in, line)) { lines.push_back(line); }
 
         uint16_t bytes = 0;
+        uint16_t starting_instruction = 0;  // the bytecode offset to first executable instruction
 
         /*  First, we must decide how much memory (how big byte array) we need to hold the program.
          *  This is done by iterating over instruction lines and
@@ -103,7 +128,7 @@ int main(int argc, char* argv[]) {
         istringstream iss;
         string instr;
 
-        if (DEBUG) { cout << "calculating: total required bytes: "; }
+        if (DEBUG) { cout << "total required bytes: "; }
         for (int i = 0; i < lines.size(); ++i) {
             instr = "";
             line = str::lstrip(lines[i]);
@@ -131,6 +156,8 @@ int main(int argc, char* argv[]) {
             inc = 0;
         }
         if (DEBUG) { cout << bytes << endl; }
+
+        if (DEBUG) { cout << "executable offset: " << starting_instruction << endl; }
 
         Program program(bytes);
 
@@ -230,7 +257,7 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        if (DEBUG) { cout << "calculating: branches: "; }
+        if (DEBUG) { cout << "branches: "; }
         try {
             program.calculateBranches();
         } catch (const char*& e) {
@@ -241,8 +268,9 @@ int main(int argc, char* argv[]) {
 
         byte* bytecode = program.bytecode();
 
-        ofstream out(((args.size() >= 3) ? args[2] : "out.bin"), ios::out | ios::binary);
+        ofstream out(compilename, ios::out | ios::binary);
         out.write((const char*)&bytes, 16);
+        out.write((const char*)&starting_instruction, 16);
         out.write(bytecode, bytes);
         out.close();
 

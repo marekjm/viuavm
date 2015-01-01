@@ -38,6 +38,13 @@ CPU& CPU::bytes(uint16_t sz) {
     return (*this);
 }
 
+CPU& CPU::eoffset(uint16_t o) {
+    /*  Set offset of first executable instruction.
+     */
+    executable_offset = o;
+    return (*this);
+}
+
 
 Object* CPU::fetchRegister(int i, bool nullok) {
     /*  Return pointer to object at given register.
@@ -275,7 +282,7 @@ int CPU::run() {
     int addr = 0;
     bool halt = false;
 
-    byte* instr_ptr = bytecode; // instruction pointer
+    byte* instr_ptr = bytecode+executable_offset; // instruction pointer
 
     while (true) {
         if (debug) {

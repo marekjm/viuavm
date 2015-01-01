@@ -14,6 +14,7 @@ const int DEFAULT_REGISTER_SIZE = 256;
 class CPU {
     char* bytecode;
     uint16_t bytecode_size;
+    uint16_t executable_offset;
 
     Object** registers;
     int reg_count;
@@ -36,9 +37,10 @@ class CPU {
 
         CPU& load(char*);
         CPU& bytes(uint16_t);
+        CPU& eoffset(uint16_t);
         int run();
 
-        CPU(int r = DEFAULT_REGISTER_SIZE): bytecode(0), bytecode_size(0), registers(0), reg_count(r), debug(false) {
+        CPU(int r = DEFAULT_REGISTER_SIZE): bytecode(0), bytecode_size(0), registers(0), reg_count(r), debug(false), executable_offset(0) {
             /*  Basic constructor.
              *  Creates registers array of requested size and
              *  initializes it with zeroes.
