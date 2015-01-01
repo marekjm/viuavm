@@ -8,16 +8,16 @@ all: bin/lib/asm bin/lib/run
 
 
 clean:
-	rm -v ./bin/lib/*
+	rm -v ./bin/vm/*
 	rm -v ./build/support/*.o
 	rm -v ./build/*.o
 
 
-bin/lib/run: src/bytecode.h src/lib/run.cpp build/cpu.o build/support/pointer.o
-	${CXX} ${CXXFLAGS} -o ./bin/lib/run src/lib/run.cpp build/cpu.o build/support/pointer.o
+bin/vm/run: src/bytecode.h src/lib/run.cpp build/cpu.o build/support/pointer.o
+	${CXX} ${CXXFLAGS} -o ./bin/vm/run src/lib/run.cpp build/cpu.o build/support/pointer.o
 
-bin/lib/asm: src/bytecode.h src/lib/asm.cpp build/program.o build/support/string.o
-	${CXX} ${CXXFLAGS} -o ./bin/lib/asm src/lib/asm.cpp build/program.o build/support/string.o
+bin/vm/asm: src/bytecode.h src/lib/asm.cpp build/program.o build/support/string.o
+	${CXX} ${CXXFLAGS} -o ./bin/vm/asm src/lib/asm.cpp build/program.o build/support/string.o
 
 
 build/cpu.o: src/bytecode.h src/cpu.h src/cpu.cpp

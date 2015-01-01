@@ -7,7 +7,7 @@
 
 .*
 
-bin/lib/*
+bin/vm/*
 bin/sample/*
 
 !.gitkeep
