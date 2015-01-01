@@ -28,12 +28,17 @@ int main(int argc, char* argv[]) {
     int ret_code = 0;
 
     // run code
-    if (argc > 1) {
+    if (argc > 1 and args[1] != "--help") {
         bool debug = false;
         string filename;
         if (args[1] == "--debug") {
             debug = true;
-            filename = args[2];
+            if (argc >= 3) {
+                filename = args[2];
+            } else {
+                cout << "fatal: no file to run" << endl;
+                return 1;
+            }
         } else {
             filename = args[1];
         }
@@ -87,7 +92,10 @@ int main(int argc, char* argv[]) {
         ret_code = cpu.load(bytecode).bytes(bytes).eoffset(starting_instruction).run();
     } else {
         cout << "tatanka VM, version " << VERSION << endl;
-        cout << args[0] << " [--debug] <infile>" << endl;
+        if (argc > 1 and args[1] == "--help") {
+            cout << args[0] << " [--debug] <infile>         - to run a program" << endl;
+            cout << args[0] << " [--help]                   - to display this message" << endl;
+        }
     }
 
     return ret_code;
