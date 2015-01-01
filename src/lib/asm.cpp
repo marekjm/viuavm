@@ -58,6 +58,168 @@ int_op getint_op(const string& s) {
 }
 
 
+vector<string> getilines(const vector<string>& lines) {
+    /*  Clears code from empty lines and comments.
+     */
+    vector<string> ilines;
+    string line;
+
+    for (int i = 0; i < lines.size(); ++i) {
+        line = str::lstrip(lines[i]);
+        if (!line.size() or line[0] == ';') continue;
+        ilines.push_back(line);
+    }
+
+    return ilines;
+}
+
+
+uint16_t countBytes(const vector<string>& lines, const string& filename) {
+    /*  First, we must decide how much memory (how big byte array) we need to hold the program.
+     *  This is done by iterating over instruction lines and
+     *  increasing bytes size.
+     */
+    uint16_t bytes = 0;
+    int inc = 0;
+    istringstream iss;
+    string instr, line;
+
+    for (int i = 0; i < lines.size(); ++i) {
+        instr = "";
+        line = str::lstrip(lines[i]);
+
+        iss.str(line);
+        iss >> instr;                       // extract the instruction
+        try {
+            inc = INSTRUCTION_SIZE.at(instr);   // and get its size
+        } catch (const std::out_of_range &e) {
+            cout << "fatal: unrecognised instruction" << endl;
+            cout << filename << ":" << i+1 << ": " << line << endl;
+            exit(1);
+        }
+
+        if (inc == 0) {
+            cout << filename << ":" << i+1 << ": '" << line << "'" << endl;
+            cout << "fail: line is not empty and requires 0 bytes: ";
+            cout << "possibly an unrecognised instruction" << endl;
+            exit(1);
+        }
+
+        bytes += inc;
+        inc = 0;
+    }
+
+    return bytes;
+}
+
+
+void assemble(Program& program, const vector<string>& lines) {
+    /** Assemble the instructions in lines into bytecode, using
+     *  Bytecode Programming API.
+     *
+     *  :params:
+     *
+     *  program     - program object which will be used for assembling
+     *  lines       - lines with instructions
+     */
+    int inc = 0;
+    string line;
+
+    for (int i = 0; i < lines.size(); ++i) {
+        line = lines[i];
+
+        string instr;
+        istringstream iss(line);
+
+        if (str::startswith(line, "istore")) {
+            line = str::lstrip(str::sub(line, 6));
+            string regno_chnk, number_chnk;
+            regno_chnk = str::chunk(line);
+            line = str::sub(line, regno_chnk.size());
+            number_chnk = str::chunk(line);
+            program.istore(getint_op(regno_chnk), getint_op(number_chnk));
+        } else if (str::startswith(line, "iadd")) {
+            inc = 1 + 3*sizeof(int);
+        } else if (str::startswith(line, "isub")) {
+            inc = 1 + 3*sizeof(int);
+        } else if (str::startswith(line, "imul")) {
+            inc = 1 + 3*sizeof(int);
+        } else if (str::startswith(line, "idiv")) {
+            inc = 1 + 3*sizeof(int);
+        } else if (str::startswith(line, "ilt")) {
+            line = str::lstrip(str::sub(line, 3));
+
+            string rega, regb, regresult;
+
+            rega = str::chunk(line);
+            line = str::lstrip(str::sub(line, rega.size()));
+
+            regb = str::chunk(line);
+            line = str::sub(line, regb.size());
+
+            regresult = str::chunk(line);
+
+            program.ilt(getint_op(rega), getint_op(regb), getint_op(regresult));
+        } else if (str::startswith(line, "ilte")) {
+            inc = 1 + 3*sizeof(int);
+        } else if (str::startswith(line, "igt")) {
+            inc = 1 + 3*sizeof(int);
+        } else if (str::startswith(line, "igte")) {
+            inc = 1 + 3*sizeof(int);
+        } else if (str::startswith(line, "ieq")) {
+            inc = 1 + 3*sizeof(int);
+        } else if (str::startswith(line, "iinc")) {
+            line = str::lstrip(str::sub(line, 4));
+            string regno_chnk;
+            regno_chnk = str::chunk(line);
+            program.iinc(getint_op(regno_chnk));
+        } else if (str::startswith(line, "idec")) {
+            inc = 1 + sizeof(int);
+        } else if (str::startswith(line, "bstore")) {
+            int regno;
+            short bt;
+            iss >> instr >> regno >> bt;
+            program.bstore(regno, (char)bt);
+        } else if (str::startswith(line, "print")) {
+            line = str::lstrip(str::sub(line, 6));
+            string regno_chnk;
+            regno_chnk = str::chunk(line);
+            program.print(getint_op(regno_chnk));
+        } else if (str::startswith(line, "echo")) {
+            //int regno;
+            //iss >> instr >> regno;
+            //program.echo(regno);
+        } else if (str::startswith(line, "branchif")) {
+            line = str::lstrip(str::sub(line, 8));
+
+            string regcond, t, f;
+
+            regcond = str::chunk(line);
+            line = str::lstrip(str::sub(line, regcond.size()));
+
+            t = str::chunk(line);
+            line = str::sub(line, t.size());
+
+            f = str::chunk(line);
+
+            int addrt, addrf;
+            addrt = stoi(t);
+            addrf = stoi(f);
+
+            program.branchif(getint_op(regcond), addrt, addrf);
+        } else if (str::startswith(line, "branch")) {
+            int addr;
+            iss >> instr >> addr;
+            program.branch(addr);
+        } else if (str::startswith(line, "pass")) {
+            program.pass();
+        } else if (str::startswith(line, "halt")) {
+            program.halt();
+        }
+    }
+}
+
+
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
     vector<string> args;
@@ -116,146 +278,20 @@ int main(int argc, char* argv[]) {
         string line;
 
         while (getline(in, line)) { lines.push_back(line); }
+        ilines = getilines(lines);
 
         uint16_t bytes = 0;
         uint16_t starting_instruction = 0;  // the bytecode offset to first executable instruction
 
-        /*  First, we must decide how much memory (how big byte array) we need to hold the program.
-         *  This is done by iterating over instruction lines and
-         *  increasing bytes size.
-         */
-        int inc = 0;
-        istringstream iss;
-        string instr;
+        bytes = countBytes(ilines, filename);
 
         if (DEBUG) { cout << "total required bytes: "; }
-        for (int i = 0; i < lines.size(); ++i) {
-            instr = "";
-            line = str::lstrip(lines[i]);
-            if (!line.size() or line[0] == ';') continue;
-
-            iss.str(line);
-            iss >> instr;                       // extract the instruction
-            try {
-                inc = INSTRUCTION_SIZE.at(instr);   // and get its size
-            } catch (const std::out_of_range &e) {
-                cout << "fatal: unrecognised instruction" << endl;
-                cout << filename << ":" << i+1 << ": " << line << endl;
-                exit(1);
-            }
-
-            if (inc == 0) {
-                cout << filename << ":" << i+1 << ": '" << line << "'" << endl;
-                cout << "fail: line is not empty and requires 0 bytes: ";
-                cout << "possibly an unrecognised instruction" << endl;
-                exit(1);
-            }
-
-            ilines.push_back(line);
-            bytes += inc;
-            inc = 0;
-        }
         if (DEBUG) { cout << bytes << endl; }
 
         if (DEBUG) { cout << "executable offset: " << starting_instruction << endl; }
 
         Program program(bytes);
-
-        for (int i = 0; i < ilines.size(); ++i) {
-            line = ilines[i];
-
-            string instr;
-            istringstream iss(line);
-
-            if (str::startswith(line, "istore")) {
-                line = str::lstrip(str::sub(line, 6));
-                string regno_chnk, number_chnk;
-                regno_chnk = str::chunk(line);
-                line = str::sub(line, regno_chnk.size());
-                number_chnk = str::chunk(line);
-                program.istore(getint_op(regno_chnk), getint_op(number_chnk));
-            } else if (str::startswith(line, "iadd")) {
-                inc = 1 + 3*sizeof(int);
-            } else if (str::startswith(line, "isub")) {
-                inc = 1 + 3*sizeof(int);
-            } else if (str::startswith(line, "imul")) {
-                inc = 1 + 3*sizeof(int);
-            } else if (str::startswith(line, "idiv")) {
-                inc = 1 + 3*sizeof(int);
-            } else if (str::startswith(line, "ilt")) {
-                line = str::lstrip(str::sub(line, 3));
-
-                string rega, regb, regresult;
-
-                rega = str::chunk(line);
-                line = str::lstrip(str::sub(line, rega.size()));
-
-                regb = str::chunk(line);
-                line = str::sub(line, regb.size());
-
-                regresult = str::chunk(line);
-
-                program.ilt(getint_op(rega), getint_op(regb), getint_op(regresult));
-            } else if (str::startswith(line, "ilte")) {
-                inc = 1 + 3*sizeof(int);
-            } else if (str::startswith(line, "igt")) {
-                inc = 1 + 3*sizeof(int);
-            } else if (str::startswith(line, "igte")) {
-                inc = 1 + 3*sizeof(int);
-            } else if (str::startswith(line, "ieq")) {
-                inc = 1 + 3*sizeof(int);
-            } else if (str::startswith(line, "iinc")) {
-                line = str::lstrip(str::sub(line, 4));
-                string regno_chnk;
-                regno_chnk = str::chunk(line);
-                program.iinc(getint_op(regno_chnk));
-            } else if (str::startswith(line, "idec")) {
-                inc = 1 + sizeof(int);
-            } else if (str::startswith(line, "bstore")) {
-                int regno;
-                short bt;
-                iss >> instr >> regno >> bt;
-                program.bstore(regno, (char)bt);
-            } else if (str::startswith(line, "print")) {
-                line = str::lstrip(str::sub(line, 6));
-                string regno_chnk;
-                regno_chnk = str::chunk(line);
-                program.print(getint_op(regno_chnk));
-                //int regno;
-                //iss >> instr >> regno;
-                //program.print(regno);
-            } else if (str::startswith(line, "echo")) {
-                //int regno;
-                //iss >> instr >> regno;
-                //program.echo(regno);
-            } else if (str::startswith(line, "branchif")) {
-                line = str::lstrip(str::sub(line, 8));
-
-                string regcond, t, f;
-
-                regcond = str::chunk(line);
-                line = str::lstrip(str::sub(line, regcond.size()));
-
-                t = str::chunk(line);
-                line = str::sub(line, t.size());
-
-                f = str::chunk(line);
-
-                int addrt, addrf;
-                addrt = stoi(t);
-                addrf = stoi(f);
-
-                program.branchif(getint_op(regcond), addrt, addrf);
-            } else if (str::startswith(line, "branch")) {
-                int addr;
-                iss >> instr >> addr;
-                program.branch(addr);
-            } else if (str::startswith(line, "pass")) {
-                program.pass();
-            } else if (str::startswith(line, "halt")) {
-                program.halt();
-            }
-        }
+        assemble(program, ilines);
 
         if (DEBUG) { cout << "branches: "; }
         try {
