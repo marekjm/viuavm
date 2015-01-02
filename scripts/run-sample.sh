@@ -7,6 +7,11 @@ if [[ $1 == "" ]]; then
     exit 1
 fi
 
+if [[ $DEBUG_WUDOO == 1 ]]; then
+    DEBUG_ASM=1
+    DEBUG_CPU=1
+fi
+
 if [[ $DEBUG_ASM == 1 ]]; then
     bin/vm/asm --debug $1 bin/sample/`basename $1.bin`
 else
