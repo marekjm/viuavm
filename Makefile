@@ -16,15 +16,15 @@ clean:
 	rm -v ./build/*.o
 
 
-${VM_RUN}: src/bytecode.h src/lib/run.cpp build/cpu.o build/support/pointer.o
-	${CXX} ${CXXFLAGS} -o ${VM_RUN} src/lib/run.cpp build/cpu.o build/support/pointer.o
+${VM_RUN}: src/bytecode.h src/lib/run.cpp build/cpu/cpu.o build/support/pointer.o
+	${CXX} ${CXXFLAGS} -o ${VM_RUN} src/lib/run.cpp build/cpu/cpu.o build/support/pointer.o
 
 ${VM_ASM}: src/bytecode.h src/lib/asm.cpp build/program.o build/support/string.o
 	${CXX} ${CXXFLAGS} -o ${VM_ASM} src/lib/asm.cpp build/program.o build/support/string.o
 
 
-build/cpu.o: src/bytecode.h src/cpu.h src/cpu.cpp
-	${CXX} ${CXXFLAGS} -c -o ./build/cpu.o ./src/cpu.cpp
+build/cpu/cpu.o: src/bytecode.h src/cpu/cpu.h src/cpu/cpu.cpp
+	${CXX} ${CXXFLAGS} -c -o ./build/cpu/cpu.o ./src/cpu/cpu.cpp
 
 build/program.o: src/bytecode.h src/program.h src/program.cpp
 	${CXX} ${CXXFLAGS} -c -o ./build/program.o ./src/program.cpp
