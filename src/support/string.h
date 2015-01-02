@@ -17,6 +17,8 @@ namespace str {
     std::string lstrip(const std::string& s);
 
     unsigned lshare(const std::string& s, const std::string& w);
+
+    std::string enquote(const std::string&);
 };
 
 
