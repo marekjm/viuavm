@@ -41,6 +41,9 @@ char* CPU::echo(char* addr) {
 char* CPU::print(char* addr) {
     /*  Run print instruction.
      */
+    if (debug) {
+        cout << "PRINT -> ";
+    }
     addr = echo(addr);
     cout << '\n';
     return addr;
