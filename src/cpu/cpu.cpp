@@ -1,12 +1,12 @@
 #include <iostream>
 #include <vector>
-#include "bytecode.h"
+#include "../bytecode.h"
+#include "../types/object.h"
+#include "../types/integer.h"
+#include "../types/boolean.h"
+#include "../types/byte.h"
+#include "../support/pointer.h"
 #include "cpu.h"
-#include "types/object.h"
-#include "types/integer.h"
-#include "types/boolean.h"
-#include "types/byte.h"
-#include "support/pointer.h"
 using namespace std;
 
 

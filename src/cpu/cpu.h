@@ -4,9 +4,9 @@
 #pragma once
 
 #include <cstdint>
-#include "bytecode.h"
-#include "types/object.h"
-#include "types/integer.h"
+#include "../bytecode.h"
+#include "../types/object.h"
+#include "../types/integer.h"
 
 const int DEFAULT_REGISTER_SIZE = 256;
 
