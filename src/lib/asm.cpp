@@ -57,6 +57,11 @@ int_op getint_op(const string& s) {
     return tuple<bool, int>(ref, stoi(ref ? str::sub(s, 1) : s));
 }
 
+byte_op getbyte_op(const string& s) {
+    bool ref = s[0] == '@';
+    return tuple<bool, char>(ref, (char)stoi(ref ? str::sub(s, 1) : s));
+}
+
 
 vector<string> getilines(const vector<string>& lines) {
     /*  Clears code from empty lines and comments.
@@ -176,19 +181,22 @@ void assemble(Program& program, const vector<string>& lines) {
         } else if (str::startswith(line, "idec")) {
             inc = 1 + sizeof(int);
         } else if (str::startswith(line, "bstore")) {
-            int regno;
-            short bt;
-            iss >> instr >> regno >> bt;
-            program.bstore(regno, (char)bt);
+            line = str::lstrip(str::sub(line, 6));
+            string regno_chnk, byte_chnk;
+            regno_chnk = str::chunk(line);
+            line = str::sub(line, regno_chnk.size());
+            byte_chnk = str::chunk(line);
+            program.bstore(getint_op(regno_chnk), getbyte_op(byte_chnk));
         } else if (str::startswith(line, "print")) {
             line = str::lstrip(str::sub(line, 6));
             string regno_chnk;
             regno_chnk = str::chunk(line);
             program.print(getint_op(regno_chnk));
         } else if (str::startswith(line, "echo")) {
-            //int regno;
-            //iss >> instr >> regno;
-            //program.echo(regno);
+            line = str::lstrip(str::sub(line, 4));
+            string regno_chnk;
+            regno_chnk = str::chunk(line);
+            program.echo(getint_op(regno_chnk));
         } else if (str::startswith(line, "branchif")) {
             line = str::lstrip(str::sub(line, 8));
 

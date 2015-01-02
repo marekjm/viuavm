@@ -479,23 +479,38 @@ Program& Program::ieq(int rega, int regb, int regresult) {
     return (*this);
 }
 
-Program& Program::bstore(int regno, char b) {
+Program& Program::bstore(int_op regno, byte_op b) {
     /*  Inserts bstore instruction to bytecode.
      *
      *  :params:
      *
-     *  regno:int - register number
-     *  i:int     - value to store
+     *  regno - register number
+     *  b     - value to store
      */
-    ensurebytes(1 + sizeof(int) + sizeof(char));
+    ensurebytes(1 + 2*sizeof(bool) + sizeof(int) + sizeof(byte));
+
+
+    bool regno_ref = false, b_ref = false;
+    int regno_num;
+    byte bt;
+
+    tie(regno_ref, regno_num) = regno;
+    tie(b_ref, bt) = b;
 
     program[addr_no++] = BSTORE;
     addr_ptr++;
-    ((int*)addr_ptr)[0] = regno;
-    addr_no += sizeof(int);
-    addr_ptr = program+addr_no;
-    addr_ptr[0] = b;
-    addr_no += sizeof(char);
+
+    *((bool*)addr_ptr) = regno_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((int*)addr_ptr)  = regno_num;
+    pointer::inc<int, char>(addr_ptr);
+
+    *((bool*)addr_ptr) = b_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((byte*)addr_ptr)  = bt;
+    ++addr_ptr;
+
+    addr_no += 2*sizeof(bool) + sizeof(int) + sizeof(byte);
     addr_ptr = program+addr_no;
 
     return (*this);
@@ -540,7 +555,7 @@ Program& Program::echo(int_op regno) {
 
     tie(regno_ref, regno_num) = regno;
 
-    program[addr_no++] = PRINT;
+    program[addr_no++] = ECHO;
     addr_ptr++;
     *((bool*)addr_ptr) = regno_ref;
     boolptr = (bool*)addr_ptr; boolptr++; addr_ptr = (char*)boolptr;

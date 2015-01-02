@@ -41,7 +41,7 @@ class Program {
     Program& igte       (int, int, int);
     Program& ieq        (int, int, int);
 
-    Program& bstore     (int, char);
+    Program& bstore     (int_op, byte_op);
 
     Program& print      (int_op);
     Program& echo       (int_op);
