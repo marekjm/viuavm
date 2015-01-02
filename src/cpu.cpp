@@ -250,26 +250,8 @@ char* CPU::echo(char* addr) {
 char* CPU::print(char* addr) {
     /*  Run print instruction.
      */
-    bool ref = false;
-    int reg;
-
-    ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
-
-    reg = *((int*)addr);
-    pointer::inc<int, char>(addr);
-
-    if (debug) {
-        cout << "PRINT" << (ref ? " @" : " ") << reg;
-        cout << endl;
-    }
-
-    if (ref) {
-        reg = static_cast<Integer*>(fetch(reg))->value();
-    }
-
-    cout << fetch(reg)->str() << endl;
-
+    addr = echo(addr);
+    cout << '\n';
     return addr;
 }
 
