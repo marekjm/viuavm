@@ -100,4 +100,21 @@ namespace str {
         }
         return share;
     }
+
+
+    string enquote(const string& s) {
+        /** Enquote the string.
+         */
+        ostringstream encoded;
+        char closing = '"';
+
+        encoded << closing;
+        for (int i = 0; i < s.size(); ++i) {
+            if (s[i] == closing) { encoded << "\\"; }
+            encoded << s[i];
+        }
+        encoded << closing;
+
+        return encoded.str();
+    }
 };
