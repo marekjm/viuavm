@@ -1,0 +1,1 @@
+* in `bstore` instruction it is possible to refer to a byte (with the `@<int>` syntax) - however, its range is limited and allows only to refer to registers between 0 and 127,
