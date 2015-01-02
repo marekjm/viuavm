@@ -26,6 +26,8 @@ class CPU {
 
     char* iinc(char*);
 
+    char* bstore(char*);
+
     char* print(char*);
     char* echo(char*);
 

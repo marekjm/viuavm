@@ -177,11 +177,73 @@ char* CPU::iinc(char* addr) {
     return addr;
 }
 
+char* CPU::bstore(char* addr) {
+    /*  Run bstore instruction.
+     */
+    int reg;
+    bool reg_ref = false, byte_ref = false;
+    byte bt;
+
+    reg_ref = *((bool*)addr);
+    pointer::inc<bool, char>(addr);
+    reg = *((int*)addr);
+    pointer::inc<int, char>(addr);
+
+    byte_ref = *((bool*)addr);
+    pointer::inc<bool, char>(addr);
+    bt = *((byte*)addr);
+    ++addr;
+
+    if (debug) {
+        cout << "BSTORE";
+        cout << (reg_ref ? " @" : " ") << reg;
+        cout << (byte_ref ? " @" : " ");
+        // this range is to display ASCII characters as their printable representations
+        if (bt >= 32 and bt <= 127) {
+            cout << '"' << bt << '"';
+        } else {
+            cout << (int)bt;
+        }
+        cout << endl;
+    }
+
+    if (reg_ref) {
+        reg = static_cast<Integer*>(fetch(reg))->value();
+    }
+    if (byte_ref) {
+        bt = static_cast<Byte*>(fetch((int)bt))->value();
+    }
+
+    registers[reg] = new Byte(bt);
+
+    return addr;
+}
+
 char* CPU::echo(char* addr) {
     /*  Run echo instruction.
      */
+    bool ref = false;
+    int reg;
+
+    ref = *((bool*)addr);
     pointer::inc<bool, char>(addr);
+
+    reg = *((int*)addr);
     pointer::inc<int, char>(addr);
+
+    if (debug) {
+        cout << "ECHO" << (ref ? " @" : " ") << reg;
+        cout << endl;
+    }
+
+    if (ref) {
+        reg = static_cast<Integer*>(fetch(reg))->value();
+    }
+
+    cout << fetch(reg)->str();
+
+    if (debug) { cout << endl; }
+
     return addr;
 }
 
@@ -365,13 +427,10 @@ int CPU::run() {
                                                                              );
                     addr += 3 * sizeof(int);
                     break;
-                case BSTORE:
-                    if (debug) cout << "BSTORE " << ((int*)(bytecode+addr+1))[0] << " " <<
-                        (int)(((bytecode+addr+1+sizeof(int)))[0]) << endl;
-                    registers[ ((int*)(bytecode+addr+1))[0] ] = new Byte(*(bytecode+addr+1+sizeof(int)));
-                    addr += sizeof(int) + sizeof(char);
-                    break;
                     */
+                case BSTORE:
+                    instr_ptr = bstore(instr_ptr+1);
+                    break;
                 case PRINT:
                     instr_ptr = print(instr_ptr+1);
                     break;
