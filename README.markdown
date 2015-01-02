@@ -2,7 +2,7 @@
 
 A simple, bytecode driven, register-based virtual machine.
 
-It is a project to learn how such software is created and
+It is a project I do to learn how such software is created and
 to help me in my computer language implementation studies.
 
 ----
@@ -16,6 +16,21 @@ The internal assembler uses the bpapi.
 
 It is also possible to program directly in bytecode by putting bytes in proper order into an array and
 dumping it to a file, or feeding to Wudoo CPU.
+
+
+----
+
+## Development
+
+Some development-related information.
+
+
+### Wudoo development scripts
+
+In the `scripts/` directory, you can find scripts that are used during development of Wudoo.
+The shell installed in dev environment is ZSH but the scripts should be compatible with BASH as well.
+
+Some of the scripts may be written in Python 3 in the future.
 
 
 ----
