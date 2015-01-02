@@ -29,15 +29,12 @@ byte* Program::bytecode() {
     return tmp;
 }
 
-string Program::assembler() {
-    /*  Returns a string representing the program written in
-     *  Tatanka assembly code.
-     *
-     *  Any unused bytes are written out as PASS instructions
-     *  to preserve addresses.
+
+Program& Program::setdebug(bool d) {
+    /** Sets debugging status.
      */
-    ostringstream out;
-    return out.str();
+    debug = d;
+    return (*this);
 }
 
 
@@ -94,7 +91,7 @@ void Program::ensurebytes(int bts) {
 
 
 int Program::getInstructionBytecodeOffset(int instr, int count) {
-    /*  Returns bytecode offset for given instruction index.
+    /** Returns bytecode offset for given instruction index.
      *  The "count" parameter is there to pass assumed instruction count to
      *  avoid recalculating it on every call.
      */
@@ -110,45 +107,67 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
          *  Each time, the offset is increased by `inc` - which is equal to *1 plus size of operands of instructions at current index*.
          */
         inc = 1;
+        if (debug) { cout << "increasing instruction offset (" << i+1 << '/' << (instr >= 0 ? instr : count+instr) << "): "; }
         switch (program[offset]) {
             case IADD:
+                if (debug) { cout << "iadd"; }
                 break;
             case ISUB:
+                if (debug) { cout << "isub"; }
                 break;
             case IMUL:
+                if (debug) { cout << "imul"; }
                 break;
             case IDIV:
+                if (debug) { cout << "idiv"; }
                 break;
             case ILT:
+                if (debug) { cout << "ilt"; }
                 inc += 3*sizeof(bool) + 3*sizeof(int);
                 break;
             case ILTE:
+                if (debug) { cout << "ilte"; }
                 break;
             case IGT:
+                if (debug) { cout << "igt"; }
                 break;
             case IGTE:
+                if (debug) { cout << "igte"; }
                 break;
             case IEQ:
+                if (debug) { cout << "ieq"; }
                 break;
             case BRANCHIF:
+                if (debug) { cout << "branchif"; }
                 inc += sizeof(bool) + 3*sizeof(int);
                 break;
             case ISTORE:
+                if (debug) { cout << "istore"; }
                 inc += 2*sizeof(bool) + 2*sizeof(int);
                 break;
             case IINC:
+                if (debug) { cout << "iinc"; }
+                inc += sizeof(bool) + sizeof(int);
                 break;
             case IDEC:
+                if (debug) { cout << "idec"; }
                 break;
             case PRINT:
+                if (debug) { cout << "print"; }
                 inc += sizeof(bool) + sizeof(int);
                 break;
             case BRANCH:
+                if (debug) { cout << "branch"; }
                 inc += sizeof(int);
                 break;
             case RET:
+                if (debug) { cout << "ret"; }
                 inc += sizeof(bool) + sizeof(int);
                 break;
+        }
+        if (debug) {
+            cout << ": " << inc;
+            cout << endl;
         }
         offset += inc;
         if (offset+1 > bytes) {

@@ -21,6 +21,8 @@ class Program {
     std::vector<int> branches;
     std::vector<int> ifbranches;
 
+    bool debug;
+
     void ensurebytes(int);
     int getInstructionBytecodeOffset(int, int count = -1);
 
@@ -57,16 +59,17 @@ class Program {
 
     Program& calculateBranches();
 
+
     // representations
     byte* bytecode();
-    std::string assembler();
 
+    Program& setdebug(bool d = true);
 
     int size();
     int instructionCount();
 
 
-    Program(int bts = 2): bytes(bts) {
+    Program(int bts = 2): bytes(bts), debug(false) {
         program = new byte[bytes];
         for (int i = 0; i < bytes; ++i) { program[i] = PASS; }
 

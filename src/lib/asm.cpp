@@ -299,7 +299,7 @@ int main(int argc, char* argv[]) {
         if (DEBUG) { cout << "executable offset: " << starting_instruction << endl; }
 
         Program program(bytes);
-        assemble(program, ilines);
+        assemble(program.setdebug(DEBUG), ilines);
 
         if (DEBUG) { cout << "branches: "; }
         try {
