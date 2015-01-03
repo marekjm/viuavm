@@ -43,8 +43,8 @@ const map<string, int> INSTRUCTION_SIZE = {
     { "beq",        1 + 3*sizeof(bool) + sizeof(int) },
     { "print",      1 + 1*sizeof(bool) + sizeof(int) },
     { "echo",       1 + 1*sizeof(bool) + sizeof(int) },
-    { "branch",     1 + sizeof(int) },
-    { "branchif",   1 + sizeof(bool) + 3*sizeof(int) },
+    { "jump",       1 + sizeof(int) },
+    { "branch",     1 + sizeof(bool) + 3*sizeof(int) },
     { "ret",        1 + 1*sizeof(bool) + sizeof(int) },
     { "end",        1 },
     { "halt",       1 },
@@ -282,7 +282,7 @@ void assemble(Program& program, const vector<string>& lines, bool debug) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
             program.echo(getint_op(regno_chnk));
-        } else if (str::startswith(line, "branchif")) {
+        } else if (str::startswith(line, "branch")) {
             line = str::lstrip(str::sub(line, 8));
 
             string regcond, t, f;
@@ -299,11 +299,11 @@ void assemble(Program& program, const vector<string>& lines, bool debug) {
             addrt = stoi(t);
             addrf = stoi(f);
 
-            program.branchif(getint_op(regcond), addrt, addrf);
-        } else if (str::startswith(line, "branch")) {
+            program.branch(getint_op(regcond), addrt, addrf);
+        } else if (str::startswith(line, "jump")) {
             int addr;
             iss >> instr >> addr;
-            program.branch(addr);
+            program.jump(addr);
         } else if (str::startswith(line, "pass")) {
             program.pass();
         } else if (str::startswith(line, "halt")) {

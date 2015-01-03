@@ -61,7 +61,7 @@ int Program::instructionCount() {
             case IGT:
             case IGTE:
             case IEQ:
-            case BRANCHIF:
+            case BRANCH:
                 i += 3 * sizeof(int);
                 break;
             case ISTORE:
@@ -70,7 +70,7 @@ int Program::instructionCount() {
             case IINC:
             case IDEC:
             case PRINT:
-            case BRANCH:
+            case JUMP:
             case RET:
                 i += sizeof(int);
                 break;
@@ -145,8 +145,8 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
                 if (debug) { cout << "ieq"; }
                 inc += 3*sizeof(bool) + 3*sizeof(int);
                 break;
-            case BRANCHIF:
-                if (debug) { cout << "branchif"; }
+            case BRANCH:
+                if (debug) { cout << "branch"; }
                 inc += sizeof(bool) + 3*sizeof(int);
                 break;
             case ISTORE:
@@ -164,8 +164,8 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
                 if (debug) { cout << "print"; }
                 inc += sizeof(bool) + sizeof(int);
                 break;
-            case BRANCH:
-                if (debug) { cout << "branch"; }
+            case JUMP:
+                if (debug) { cout << "jump"; }
                 inc += sizeof(int);
                 break;
             case RET:
@@ -195,18 +195,18 @@ Program& Program::calculateBranches() {
     for (int i = 0; i < branches.size(); ++i) {
         ptr = (int*)(program+branches[i]+1);
         switch (*(program+branches[i])) {
-            case BRANCH:
+            case JUMP:
                 (*ptr) = getInstructionBytecodeOffset(*ptr, instruction_count);
                 break;
-            case BRANCHIF:
+            case BRANCH:
                 pointer::inc<bool, int>(ptr);
-                if (debug) { cout << "calculating branchif:  true: " << *(ptr+1) << endl; }
+                if (debug) { cout << "calculating branch:  true: " << *(ptr+1) << endl; }
                 (*(ptr+1)) = getInstructionBytecodeOffset(*(ptr+1), instruction_count);
-                if (debug) { cout << "calculated branchif:   true: " << *(ptr+1) << endl; }
+                if (debug) { cout << "calculated branch:   true: " << *(ptr+1) << endl; }
 
-                if (debug) { cout << "calculating branchif: false: " << *(ptr+2) << endl; }
+                if (debug) { cout << "calculating branch: false: " << *(ptr+2) << endl; }
                 (*(ptr+2)) = getInstructionBytecodeOffset(*(ptr+2), instruction_count);
-                if (debug) { cout << "calculated branchif:  false: " << *(ptr+2) << endl; }
+                if (debug) { cout << "calculated branch:  false: " << *(ptr+2) << endl; }
                 break;
         }
     }
@@ -761,8 +761,8 @@ Program& Program::echo(int_op regno) {
     return (*this);
 }
 
-Program& Program::branch(int addr) {
-    /*  Inserts branch instruction. Parameter is instruction index.
+Program& Program::jump(int addr) {
+    /*  Inserts jump instruction. Parameter is instruction index.
      *  Byte offset is calculated automatically.
      *
      *  :params:
@@ -774,7 +774,7 @@ Program& Program::branch(int addr) {
     // save branch instruction index for later evaluation
     branches.push_back(addr_no);
 
-    program[addr_no++] = BRANCH;
+    program[addr_no++] = JUMP;
     addr_ptr++;
 
     *((int*)addr_ptr) = addr;
@@ -786,8 +786,8 @@ Program& Program::branch(int addr) {
     return (*this);
 }
 
-Program& Program::branchif(int_op regc, int addr_truth, int addr_false) {
-    /*  Inserts branchif instruction.
+Program& Program::branch(int_op regc, int addr_truth, int addr_false) {
+    /*  Inserts branch instruction.
      *  Byte offset is calculated automatically.
      *
      *  :params:
@@ -806,7 +806,7 @@ Program& Program::branchif(int_op regc, int addr_truth, int addr_false) {
 
     tie(regcond_ref, regcond_num) = regc;
 
-    program[addr_no++] = BRANCHIF;
+    program[addr_no++] = BRANCH;
     addr_ptr++;
 
     *((bool*)addr_ptr) = regcond_ref;

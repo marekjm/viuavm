@@ -129,11 +129,11 @@ int CPU::run() {
                 case ECHO:
                     instr_ptr = echo(instr_ptr+1);
                     break;
+                case JUMP:
+                    instr_ptr = jump(instr_ptr+1);
+                    break;
                 case BRANCH:
                     instr_ptr = branch(instr_ptr+1);
-                    break;
-                case BRANCHIF:
-                    instr_ptr = branchif(instr_ptr+1);
                     break;
                     /*
                 case RET:

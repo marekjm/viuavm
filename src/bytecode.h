@@ -37,8 +37,8 @@ enum Bytecode {
     PRINT,
     ECHO,
 
+    JUMP,
     BRANCH,
-    BRANCHIF,
 
     RET,
     END,

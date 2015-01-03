@@ -48,8 +48,8 @@ class Program {
     Program& print      (int_op);
     Program& echo       (int_op);
 
-    Program& branch     (int);
-    Program& branchif   (int_op, int, int);
+    Program& jump       (int);
+    Program& branch     (int_op, int, int);
 
     Program& ret        (int);
     Program& end        ();

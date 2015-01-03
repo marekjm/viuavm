@@ -49,21 +49,21 @@ char* CPU::print(char* addr) {
     return addr;
 }
 
-char* CPU::branch(char* addr) {
-    /*  Run branch instruction.
+char* CPU::jump(char* addr) {
+    /*  Run jump instruction.
      */
     if (debug) {
-        cout << "BRANCH " << *(int*)addr << endl;
+        cout << "JUMP " << *(int*)addr << endl;
     }
     char* target = bytecode+(*(int*)addr);
     if (target == addr) {
-        throw "aborting: BRANCH instruction pointing to itself";
+        throw "aborting: JUMP instruction pointing to itself";
     }
     return target;
 }
 
-char* CPU::branchif(char* addr) {
-    /*  Run branchif instruction.
+char* CPU::branch(char* addr) {
+    /*  Run branch instruction.
      */
     bool regcond_ref;
     int regcond_num;
@@ -82,7 +82,7 @@ char* CPU::branchif(char* addr) {
     pointer::inc<int, char>(addr);
 
     if (debug) {
-        cout << "BRANCHIF";
+        cout << "BRANCH";
         cout << dec << (regcond_ref ? " @" : " ") << regcond_num;
         cout << " " << addr_true  << "::0x" << hex << (long)(bytecode+addr_true) << dec;
         cout << " " << addr_false << "::0x" << hex << (long)(bytecode+addr_false);

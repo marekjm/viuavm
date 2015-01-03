@@ -45,7 +45,7 @@ class CPU {
     char* print(char*);
     char* echo(char*);
 
-    char* branchif(char*);
+    char* jump(char*);
     char* branch(char*);
 
     public:
