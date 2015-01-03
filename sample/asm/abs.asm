@@ -13,7 +13,7 @@ ilt 1 2 3
 
 ; if the int is less than zero, multiply it by -1
 ; else, branch directly to print instruction
-branchif 3 4 6
+branch 3 4 6
 istore 4 -1
 imul 1 4 1
 

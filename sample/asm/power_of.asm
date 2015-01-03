@@ -11,20 +11,20 @@ istore 3 0
 
 ; if the power is equal to zero, store 1 in first register and jump to print
 ieq 2 3 4
-branchif 4 5 7
+branch 4 5 7
 istore 6 1
-branch 15
+jump 15
 
 ; now, we multiply in loop
 istore 5 1
 ; in register 6, store the integer that can be found in register 1
 istore 6 @1
 ilt 5 2 4
-branchif 4 11 15
+branch 4 11 15
 imul 1 6 6
 pass
 iinc 5
-branch 9
+jump 9
 
 print 6
 halt
