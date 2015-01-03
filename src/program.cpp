@@ -111,15 +111,19 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
         switch (program[offset]) {
             case IADD:
                 if (debug) { cout << "iadd"; }
+                inc += 3*sizeof(bool) + 3*sizeof(int);
                 break;
             case ISUB:
                 if (debug) { cout << "isub"; }
+                inc += 3*sizeof(bool) + 3*sizeof(int);
                 break;
             case IMUL:
                 if (debug) { cout << "imul"; }
+                inc += 3*sizeof(bool) + 3*sizeof(int);
                 break;
             case IDIV:
                 if (debug) { cout << "idiv"; }
+                inc += 3*sizeof(bool) + 3*sizeof(int);
                 break;
             case ILT:
                 if (debug) { cout << "ilt"; }
@@ -127,15 +131,19 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
                 break;
             case ILTE:
                 if (debug) { cout << "ilte"; }
+                inc += 3*sizeof(bool) + 3*sizeof(int);
                 break;
             case IGT:
                 if (debug) { cout << "igt"; }
+                inc += 3*sizeof(bool) + 3*sizeof(int);
                 break;
             case IGTE:
                 if (debug) { cout << "igte"; }
+                inc += 3*sizeof(bool) + 3*sizeof(int);
                 break;
             case IEQ:
                 if (debug) { cout << "ieq"; }
+                inc += 3*sizeof(bool) + 3*sizeof(int);
                 break;
             case BRANCHIF:
                 if (debug) { cout << "branchif"; }
@@ -192,8 +200,13 @@ Program& Program::calculateBranches() {
                 break;
             case BRANCHIF:
                 pointer::inc<bool, int>(ptr);
+                if (debug) { cout << "calculating branchif:  true: " << *(ptr+1) << endl; }
                 (*(ptr+1)) = getInstructionBytecodeOffset(*(ptr+1), instruction_count);
+                if (debug) { cout << "calculated branchif:   true: " << *(ptr+1) << endl; }
+
+                if (debug) { cout << "calculating branchif: false: " << *(ptr+2) << endl; }
                 (*(ptr+2)) = getInstructionBytecodeOffset(*(ptr+2), instruction_count);
+                if (debug) { cout << "calculated branchif:  false: " << *(ptr+2) << endl; }
                 break;
         }
     }
