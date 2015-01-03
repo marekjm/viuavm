@@ -319,45 +319,85 @@ Program& Program::isub(int_op rega, int_op regb, int_op regr) {
     return (*this);
 }
 
-Program& Program::imul(int rega, int regb, int regresult) {
+Program& Program::imul(int_op rega, int_op regb, int_op regr) {
     /*  Inserts imul instruction to bytecode.
      *
      *  :params:
      *
-     *  rega:int        - register index of first operand
-     *  regb:int        - register index of second operand
-     *  regresult:int   - register index in which to store the result
+     *  rega    - register index of first operand
+     *  regb    - register index of second operand
+     *  regr    - register index in which to store the result
      */
-    ensurebytes(1 + 3*sizeof(int));
+    ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
+
+    bool rega_ref = false, regb_ref = false, regr_ref = false;
+    int rega_num, regb_num, regr_num;
+
+    tie(rega_ref, rega_num) = rega;
+    tie(regb_ref, regb_num) = regb;
+    tie(regr_ref, regr_num) = regr;
 
     program[addr_no++] = IMUL;
     addr_ptr++;
-    ((int*)addr_ptr)[0] = rega;
-    ((int*)addr_ptr)[1] = regb;
-    ((int*)addr_ptr)[2] = regresult;
-    addr_no += 3 * sizeof(int);
+
+    *((bool*)addr_ptr) = rega_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((int*)addr_ptr)  = rega_num;
+    pointer::inc<int, char>(addr_ptr);
+
+    *((bool*)addr_ptr) = regb_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((int*)addr_ptr)  = regb_num;
+    pointer::inc<int, char>(addr_ptr);
+
+    *((bool*)addr_ptr) = regr_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((int*)addr_ptr)  = regr_num;
+    pointer::inc<int, char>(addr_ptr);
+
+    addr_no += 3*sizeof(bool) + 3*sizeof(int);
     addr_ptr = program+addr_no;
 
     return (*this);
 }
 
-Program& Program::idiv(int rega, int regb, int regresult) {
+Program& Program::idiv(int_op rega, int_op regb, int_op regr) {
     /*  Inserts idiv instruction to bytecode.
      *
      *  :params:
      *
-     *  rega:int        - register index of first operand
-     *  regb:int        - register index of second operand
-     *  regresult:int   - register index in which to store the result
+     *  rega    - register index of first operand
+     *  regb    - register index of second operand
+     *  regr    - register index in which to store the result
      */
-    ensurebytes(1 + 3*sizeof(int));
+    ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
+
+    bool rega_ref = false, regb_ref = false, regr_ref = false;
+    int rega_num, regb_num, regr_num;
+
+    tie(rega_ref, rega_num) = rega;
+    tie(regb_ref, regb_num) = regb;
+    tie(regr_ref, regr_num) = regr;
 
     program[addr_no++] = IDIV;
     addr_ptr++;
-    ((int*)addr_ptr)[0] = rega;
-    ((int*)addr_ptr)[1] = regb;
-    ((int*)addr_ptr)[2] = regresult;
-    addr_no += 3 * sizeof(int);
+
+    *((bool*)addr_ptr) = rega_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((int*)addr_ptr)  = rega_num;
+    pointer::inc<int, char>(addr_ptr);
+
+    *((bool*)addr_ptr) = regb_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((int*)addr_ptr)  = regb_num;
+    pointer::inc<int, char>(addr_ptr);
+
+    *((bool*)addr_ptr) = regr_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((int*)addr_ptr)  = regr_num;
+    pointer::inc<int, char>(addr_ptr);
+
+    addr_no += 3*sizeof(bool) + 3*sizeof(int);
     addr_ptr = program+addr_no;
 
     return (*this);

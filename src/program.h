@@ -31,8 +31,8 @@ class Program {
     Program& istore     (int_op, int_op);
     Program& iadd       (int_op, int_op, int_op);
     Program& isub       (int_op, int_op, int_op);
-    Program& imul       (int, int, int);
-    Program& idiv       (int, int, int);
+    Program& imul       (int_op, int_op, int_op);
+    Program& idiv       (int_op, int_op, int_op);
 
     Program& iinc       (int_op);
     Program& idec       (int);
