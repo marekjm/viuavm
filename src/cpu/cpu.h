@@ -30,7 +30,13 @@ class CPU {
     char* isub(char*);
     char* imul(char*);
     char* idiv(char*);
+
     char* ilt(char*);
+    char* ilte(char*);
+    char* igt(char*);
+    char* igte(char*);
+    char* ieq(char*);
+
     char* iinc(char*);
     char* idec(char*);
 

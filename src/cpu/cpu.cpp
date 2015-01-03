@@ -108,36 +108,18 @@ int CPU::run() {
                 case ILT:
                     instr_ptr = ilt(instr_ptr+1);
                     break;
-                    /*
                 case ILTE:
-                    if (debug) cout << "ILTE " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
-                    registers[ ((int*)(bytecode+addr+1))[2] ] = new Boolean( static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value() <=
-                                                                             static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[1] ) )->value()
-                                                                             );
-                    addr += 3 * sizeof(int);
+                    instr_ptr = ilte(instr_ptr+1);
                     break;
                 case IGT:
-                    if (debug) cout << "IGT " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
-                    registers[ ((int*)(bytecode+addr+1))[2] ] = new Boolean( static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value() >
-                                                                             static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[1] ) )->value()
-                                                                             );
-                    addr += 3 * sizeof(int);
+                    instr_ptr = igt(instr_ptr+1);
                     break;
                 case IGTE:
-                    if (debug) cout << "IGTE " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
-                    registers[ ((int*)(bytecode+addr+1))[2] ] = new Boolean( static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value() >=
-                                                                             static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[1] ) )->value()
-                                                                             );
-                    addr += 3 * sizeof(int);
+                    instr_ptr = igte(instr_ptr+1);
                     break;
                 case IEQ:
-                    if (debug) cout << "IEQ " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
-                    registers[ ((int*)(bytecode+addr+1))[2] ] = new Boolean( static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value() ==
-                                                                             static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[1] ) )->value()
-                                                                             );
-                    addr += 3 * sizeof(int);
+                    instr_ptr = ieq(instr_ptr+1);
                     break;
-                    */
                 case BSTORE:
                     instr_ptr = bstore(instr_ptr+1);
                     break;
