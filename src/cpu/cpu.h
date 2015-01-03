@@ -32,6 +32,7 @@ class CPU {
     char* idiv(char*);
     char* ilt(char*);
     char* iinc(char*);
+    char* idec(char*);
 
     char* bstore(char*);
 

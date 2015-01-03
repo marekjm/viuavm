@@ -324,3 +324,33 @@ char* CPU::iinc(char* addr) {
 
     return addr;
 }
+
+char* CPU::idec(char* addr) {
+    /*  Run idec instruction.
+     */
+    bool ref = false;
+    int regno;
+
+    ref = *((bool*)addr);
+    pointer::inc<bool, char>(addr);
+
+    regno = *((int*)addr);
+    pointer::inc<int, char>(addr);
+
+    if (debug) {
+        cout << "IDEC" << (ref ? " @" : " ") << regno;
+    }
+
+    if (ref) {
+        regno = static_cast<Integer*>(fetch(regno))->value();
+    }
+
+    if (debug) {
+        if (ref) { cout << " -> " << regno; }
+        cout << endl;
+    }
+
+    --(static_cast<Integer*>(fetch(regno))->value());
+
+    return addr;
+}

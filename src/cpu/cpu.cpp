@@ -102,13 +102,9 @@ int CPU::run() {
                 case IINC:
                     instr_ptr = iinc(instr_ptr+1);
                     break;
-                    /*
                 case IDEC:
-                    if (debug) cout << "IDEC " << ((int*)(bytecode+addr+1))[0] << endl;
-                    (static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value())--;
-                    addr += sizeof(int);
+                    instr_ptr = idec(instr_ptr+1);
                     break;
-                    */
                 case ILT:
                     instr_ptr = ilt(instr_ptr+1);
                     break;
