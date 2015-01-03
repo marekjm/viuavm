@@ -28,6 +28,8 @@ class CPU {
     char* istore(char*);
     char* iadd(char*);
     char* isub(char*);
+    char* imul(char*);
+    char* idiv(char*);
     char* ilt(char*);
     char* iinc(char*);
 

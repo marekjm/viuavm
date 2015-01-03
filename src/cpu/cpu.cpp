@@ -93,22 +93,12 @@ int CPU::run() {
                 case ISUB:
                     instr_ptr = isub(instr_ptr+1);
                     break;
-                    /*
                 case IMUL:
-                    if (debug) cout << "IMUL " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
-                    registers[ ((int*)(bytecode+addr+1))[2] ] = new Integer( static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value() *
-                                                                             static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[1] ) )->value()
-                                                                             );
-                    addr += 3 * sizeof(int);
+                    instr_ptr = imul(instr_ptr+1);
                     break;
                 case IDIV:
-                    if (debug) cout << "IDIV " << ((int*)(bytecode+addr+1))[0] << " " << ((int*)(bytecode+addr+1))[1] << " " << ((int*)(bytecode+addr+1))[2] << endl;
-                    registers[ ((int*)(bytecode+addr+1))[2] ] = new Integer( static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value() /
-                                                                             static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[1] ) )->value()
-                                                                             );
-                    addr += 3 * sizeof(int);
+                    instr_ptr = idiv(instr_ptr+1);
                     break;
-                    */
                 case IINC:
                     instr_ptr = iinc(instr_ptr+1);
                     break;
