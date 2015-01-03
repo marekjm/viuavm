@@ -26,8 +26,9 @@ class CPU {
     Object* fetch(int);
 
     char* istore(char*);
+    char* iadd(char*);
+    char* isub(char*);
     char* ilt(char*);
-
     char* iinc(char*);
 
     char* bstore(char*);

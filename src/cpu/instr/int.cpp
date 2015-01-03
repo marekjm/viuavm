@@ -45,6 +45,106 @@ char* CPU::istore(char* addr) {
     return addr;
 }
 
+char* CPU::iadd(char* addr) {
+    /*  Run iadd instruction.
+     */
+    bool rega_ref, regb_ref, regr_ref;
+    int rega_num, regb_num, regr_num;
+
+    rega_ref = *((bool*)addr);
+    pointer::inc<bool, char>(addr);
+    rega_num = *((int*)addr);
+    pointer::inc<int, char>(addr);
+
+    regb_ref = *((bool*)addr);
+    pointer::inc<bool, char>(addr);
+    regb_num = *((int*)addr);
+    pointer::inc<int, char>(addr);
+
+    regr_ref = *((bool*)addr);
+    pointer::inc<bool, char>(addr);
+    regr_num = *((int*)addr);
+    pointer::inc<int, char>(addr);
+
+    if (debug) {
+        cout << "IADD";
+        cout << (rega_ref ? " @" : " ") << rega_num;
+        cout << (regb_ref ? " @" : " ") << regb_num;
+        cout << (regr_ref ? " @" : " ") << regr_num;
+        cout << endl;
+    }
+
+    if (rega_ref) {
+        if (debug) { cout << "resolving reference to a-operand register" << endl; }
+        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+    }
+    if (regb_ref) {
+        if (debug) { cout << "resolving reference to b-operand register" << endl; }
+        regb_num = static_cast<Integer*>(registers[regb_num])->value();
+    }
+    if (regr_ref) {
+        if (debug) { cout << "resolving reference to result register" << endl; }
+        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+    }
+
+    rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    regb_num = static_cast<Integer*>(fetch(regb_num))->value();
+
+    registers[regr_num] = new Integer(rega_num + regb_num);
+
+    return addr;
+}
+
+char* CPU::isub(char* addr) {
+    /*  Run isub instruction.
+     */
+    bool rega_ref, regb_ref, regr_ref;
+    int rega_num, regb_num, regr_num;
+
+    rega_ref = *((bool*)addr);
+    pointer::inc<bool, char>(addr);
+    rega_num = *((int*)addr);
+    pointer::inc<int, char>(addr);
+
+    regb_ref = *((bool*)addr);
+    pointer::inc<bool, char>(addr);
+    regb_num = *((int*)addr);
+    pointer::inc<int, char>(addr);
+
+    regr_ref = *((bool*)addr);
+    pointer::inc<bool, char>(addr);
+    regr_num = *((int*)addr);
+    pointer::inc<int, char>(addr);
+
+    if (debug) {
+        cout << "ISUB";
+        cout << (rega_ref ? " @" : " ") << rega_num;
+        cout << (regb_ref ? " @" : " ") << regb_num;
+        cout << (regr_ref ? " @" : " ") << regr_num;
+        cout << endl;
+    }
+
+    if (rega_ref) {
+        if (debug) { cout << "resolving reference to a-operand register" << endl; }
+        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+    }
+    if (regb_ref) {
+        if (debug) { cout << "resolving reference to b-operand register" << endl; }
+        regb_num = static_cast<Integer*>(registers[regb_num])->value();
+    }
+    if (regr_ref) {
+        if (debug) { cout << "resolving reference to result register" << endl; }
+        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+    }
+
+    rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    regb_num = static_cast<Integer*>(fetch(regb_num))->value();
+
+    registers[regr_num] = new Integer(rega_num - regb_num);
+
+    return addr;
+}
+
 char* CPU::ilt(char* addr) {
     /*  Run ilt instruction.
      */
