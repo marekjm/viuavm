@@ -86,7 +86,6 @@ uint16_t countBytes(const vector<string>& lines, const string& filename) {
      */
     uint16_t bytes = 0;
     int inc = 0;
-    istringstream iss;
     string instr, line;
 
     for (int i = 0; i < lines.size(); ++i) {
@@ -94,12 +93,11 @@ uint16_t countBytes(const vector<string>& lines, const string& filename) {
         instr = "";
         line = str::lstrip(lines[i]);
 
-        iss.str(line);
-        iss >> instr;                       // extract the instruction
+        instr = str::chunk(line);
         try {
             inc = INSTRUCTION_SIZE.at(instr);   // and get its size
         } catch (const std::out_of_range &e) {
-            cout << "fatal: unrecognised instruction" << endl;
+            cout << "fatal: unrecognised instruction: `" << instr << '`' << endl;
             cout << filename << ":" << i+1 << ": " << line << endl;
             exit(1);
         }
