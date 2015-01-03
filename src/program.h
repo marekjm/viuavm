@@ -38,10 +38,10 @@ class Program {
     Program& idec       (int_op);
 
     Program& ilt        (int_op, int_op, int_op);
-    Program& ilte       (int, int, int);
-    Program& igt        (int, int, int);
-    Program& igte       (int, int, int);
-    Program& ieq        (int, int, int);
+    Program& ilte       (int_op, int_op, int_op);
+    Program& igt        (int_op, int_op, int_op);
+    Program& igte       (int_op, int_op, int_op);
+    Program& ieq        (int_op, int_op, int_op);
 
     Program& bstore     (int_op, byte_op);
 

@@ -491,7 +491,7 @@ Program& Program::ilt(int_op rega, int_op regb, int_op regresult) {
     return (*this);
 }
 
-Program& Program::ilte(int rega, int regb, int regresult) {
+Program& Program::ilte(int_op rega, int_op regb, int_op regresult) {
     /*  Inserts ilte instruction to bytecode.
      *
      *  :params:
@@ -500,20 +500,40 @@ Program& Program::ilte(int rega, int regb, int regresult) {
      *  regb:int        - register index of second operand
      *  regresult:int   - register index in which to store the result
      */
-    ensurebytes(1 + 3*sizeof(int));
+    ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
+
+    bool rega_ref, regb_ref, regresult_ref;
+    int  rega_num, regb_num, regresult_num;
+
+    tie(rega_ref, rega_num) = rega;
+    tie(regb_ref, regb_num) = regb;
+    tie(regresult_ref, regresult_num) = regresult;
 
     program[addr_no++] = ILTE;
     addr_ptr++;
-    ((int*)addr_ptr)[0] = rega;
-    ((int*)addr_ptr)[1] = regb;
-    ((int*)addr_ptr)[2] = regresult;
-    addr_no += 3 * sizeof(int);
+
+    *((bool*)addr_ptr) = rega_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((int*)addr_ptr) = rega_num;
+    pointer::inc<int, char>(addr_ptr);
+
+    *((bool*)addr_ptr) = regb_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((int*)addr_ptr) = regb_num;
+    pointer::inc<int, char>(addr_ptr);
+
+    *((bool*)addr_ptr) = regresult_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((int*)addr_ptr) = regresult_num;
+    pointer::inc<int, char>(addr_ptr);
+
+    addr_no += 3*sizeof(bool) + 3*sizeof(int);
     addr_ptr = program+addr_no;
 
     return (*this);
 }
 
-Program& Program::igt(int rega, int regb, int regresult) {
+Program& Program::igt(int_op rega, int_op regb, int_op regresult) {
     /*  Inserts igt instruction to bytecode.
      *
      *  :params:
@@ -522,20 +542,40 @@ Program& Program::igt(int rega, int regb, int regresult) {
      *  regb:int        - register index of second operand
      *  regresult:int   - register index in which to store the result
      */
-    ensurebytes(1 + 3*sizeof(int));
+    ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
+
+    bool rega_ref, regb_ref, regresult_ref;
+    int  rega_num, regb_num, regresult_num;
+
+    tie(rega_ref, rega_num) = rega;
+    tie(regb_ref, regb_num) = regb;
+    tie(regresult_ref, regresult_num) = regresult;
 
     program[addr_no++] = IGT;
     addr_ptr++;
-    ((int*)addr_ptr)[0] = rega;
-    ((int*)addr_ptr)[1] = regb;
-    ((int*)addr_ptr)[2] = regresult;
-    addr_no += 3 * sizeof(int);
+
+    *((bool*)addr_ptr) = rega_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((int*)addr_ptr) = rega_num;
+    pointer::inc<int, char>(addr_ptr);
+
+    *((bool*)addr_ptr) = regb_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((int*)addr_ptr) = regb_num;
+    pointer::inc<int, char>(addr_ptr);
+
+    *((bool*)addr_ptr) = regresult_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((int*)addr_ptr) = regresult_num;
+    pointer::inc<int, char>(addr_ptr);
+
+    addr_no += 3*sizeof(bool) + 3*sizeof(int);
     addr_ptr = program+addr_no;
 
     return (*this);
 }
 
-Program& Program::igte(int rega, int regb, int regresult) {
+Program& Program::igte(int_op rega, int_op regb, int_op regresult) {
     /*  Inserts igte instruction to bytecode.
      *
      *  :params:
@@ -544,20 +584,40 @@ Program& Program::igte(int rega, int regb, int regresult) {
      *  regb:int        - register index of second operand
      *  regresult:int   - register index in which to store the result
      */
-    ensurebytes(1 + 3*sizeof(int));
+    ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
+
+    bool rega_ref, regb_ref, regresult_ref;
+    int  rega_num, regb_num, regresult_num;
+
+    tie(rega_ref, rega_num) = rega;
+    tie(regb_ref, regb_num) = regb;
+    tie(regresult_ref, regresult_num) = regresult;
 
     program[addr_no++] = IGTE;
     addr_ptr++;
-    ((int*)addr_ptr)[0] = rega;
-    ((int*)addr_ptr)[1] = regb;
-    ((int*)addr_ptr)[2] = regresult;
-    addr_no += 3 * sizeof(int);
+
+    *((bool*)addr_ptr) = rega_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((int*)addr_ptr) = rega_num;
+    pointer::inc<int, char>(addr_ptr);
+
+    *((bool*)addr_ptr) = regb_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((int*)addr_ptr) = regb_num;
+    pointer::inc<int, char>(addr_ptr);
+
+    *((bool*)addr_ptr) = regresult_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((int*)addr_ptr) = regresult_num;
+    pointer::inc<int, char>(addr_ptr);
+
+    addr_no += 3*sizeof(bool) + 3*sizeof(int);
     addr_ptr = program+addr_no;
 
     return (*this);
 }
 
-Program& Program::ieq(int rega, int regb, int regresult) {
+Program& Program::ieq(int_op rega, int_op regb, int_op regresult) {
     /*  Inserts ieq instruction to bytecode.
      *
      *  :params:
@@ -566,14 +626,34 @@ Program& Program::ieq(int rega, int regb, int regresult) {
      *  regb:int        - register index of second operand
      *  regresult:int   - register index in which to store the result
      */
-    ensurebytes(1 + 3*sizeof(int));
+    ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
+
+    bool rega_ref, regb_ref, regresult_ref;
+    int  rega_num, regb_num, regresult_num;
+
+    tie(rega_ref, rega_num) = rega;
+    tie(regb_ref, regb_num) = regb;
+    tie(regresult_ref, regresult_num) = regresult;
 
     program[addr_no++] = IEQ;
     addr_ptr++;
-    ((int*)addr_ptr)[0] = rega;
-    ((int*)addr_ptr)[1] = regb;
-    ((int*)addr_ptr)[2] = regresult;
-    addr_no += 3 * sizeof(int);
+
+    *((bool*)addr_ptr) = rega_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((int*)addr_ptr) = rega_num;
+    pointer::inc<int, char>(addr_ptr);
+
+    *((bool*)addr_ptr) = regb_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((int*)addr_ptr) = regb_num;
+    pointer::inc<int, char>(addr_ptr);
+
+    *((bool*)addr_ptr) = regresult_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((int*)addr_ptr) = regresult_num;
+    pointer::inc<int, char>(addr_ptr);
+
+    addr_no += 3*sizeof(bool) + 3*sizeof(int);
     addr_ptr = program+addr_no;
 
     return (*this);
