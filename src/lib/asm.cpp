@@ -90,6 +90,7 @@ uint16_t countBytes(const vector<string>& lines, const string& filename) {
     string instr, line;
 
     for (int i = 0; i < lines.size(); ++i) {
+        inc = 0;
         instr = "";
         line = str::lstrip(lines[i]);
 
@@ -103,6 +104,7 @@ uint16_t countBytes(const vector<string>& lines, const string& filename) {
             exit(1);
         }
 
+
         if (inc == 0) {
             cout << filename << ":" << i+1 << ": '" << line << "'" << endl;
             cout << "fail: line is not empty and requires 0 bytes: ";
@@ -111,7 +113,6 @@ uint16_t countBytes(const vector<string>& lines, const string& filename) {
         }
 
         bytes += inc;
-        inc = 0;
     }
 
     return bytes;
@@ -144,9 +145,31 @@ void assemble(Program& program, const vector<string>& lines) {
             number_chnk = str::chunk(line);
             program.istore(getint_op(regno_chnk), getint_op(number_chnk));
         } else if (str::startswith(line, "iadd")) {
-            inc = 1 + 3*sizeof(int);
+            line = str::lstrip(str::sub(line, 4));
+            string rega_chnk, regb_chnk, regr_chnk;
+            // get chunk for first-op register
+            rega_chnk = str::chunk(line);
+            line = str::lstrip(str::sub(line, rega_chnk.size()));
+            // get chunk for second-op register
+            regb_chnk = str::chunk(line);
+            line = str::lstrip(str::sub(line, regb_chnk.size()));
+            // get chunk for result register
+            regr_chnk = str::chunk(line);
+            // feed chunks into Bytecode Programming API
+            program.iadd(getint_op(rega_chnk), getint_op(regb_chnk), getint_op(regr_chnk));
         } else if (str::startswith(line, "isub")) {
-            inc = 1 + 3*sizeof(int);
+            line = str::lstrip(str::sub(line, 4));
+            string rega_chnk, regb_chnk, regr_chnk;
+            // get chunk for first-op register
+            rega_chnk = str::chunk(line);
+            line = str::lstrip(str::sub(line, rega_chnk.size()));
+            // get chunk for second-op register
+            regb_chnk = str::chunk(line);
+            line = str::lstrip(str::sub(line, regb_chnk.size()));
+            // get chunk for result register
+            regr_chnk = str::chunk(line);
+            // feed chunks into Bytecode Programming API
+            program.isub(getint_op(rega_chnk), getint_op(regb_chnk), getint_op(regr_chnk));
         } else if (str::startswith(line, "imul")) {
             inc = 1 + 3*sizeof(int);
         } else if (str::startswith(line, "idiv")) {
@@ -299,7 +322,12 @@ int main(int argc, char* argv[]) {
         if (DEBUG) { cout << "executable offset: " << starting_instruction << endl; }
 
         Program program(bytes);
-        assemble(program.setdebug(DEBUG), ilines);
+        try {
+            assemble(program.setdebug(DEBUG), ilines);
+        } catch (const char*& e) {
+            cout << "fatal: error during assembling: " << e << endl;
+            return 1;
+        }
 
         if (DEBUG) { cout << "branches: "; }
         try {

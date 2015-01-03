@@ -30,7 +30,7 @@ class Program {
     // instructions interface
     Program& istore     (int_op, int_op);
     Program& iadd       (int_op, int_op, int_op);
-    Program& isub       (int, int, int);
+    Program& isub       (int_op, int_op, int_op);
     Program& imul       (int, int, int);
     Program& idiv       (int, int, int);
 
