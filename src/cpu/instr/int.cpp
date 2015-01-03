@@ -167,7 +167,7 @@ char* CPU::imul(char* addr) {
     pointer::inc<int, char>(addr);
 
     if (debug) {
-        cout << "ISUB";
+        cout << "IMUL";
         cout << (rega_ref ? " @" : " ") << rega_num;
         cout << (regb_ref ? " @" : " ") << regb_num;
         cout << (regr_ref ? " @" : " ") << regr_num;
