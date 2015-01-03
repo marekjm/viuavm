@@ -35,7 +35,7 @@ class Program {
     Program& idiv       (int_op, int_op, int_op);
 
     Program& iinc       (int_op);
-    Program& idec       (int);
+    Program& idec       (int_op);
 
     Program& ilt        (int_op, int_op, int_op);
     Program& ilte       (int, int, int);

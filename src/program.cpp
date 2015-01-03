@@ -404,7 +404,7 @@ Program& Program::idiv(int_op rega, int_op regb, int_op regr) {
 }
 
 Program& Program::iinc(int_op regno) {
-    /*  Inserts print instuction.
+    /*  Inserts iinc instuction.
      */
     ensurebytes(1 + sizeof(bool) + sizeof(int));
 
@@ -426,21 +426,24 @@ Program& Program::iinc(int_op regno) {
     return (*this);
 }
 
-Program& Program::idec(int regno) {
-    /*  Inserts idiv instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  rega:int        - register index of first operand
-     *  regb:int        - register index of second operand
-     *  regresult:int   - register index in which to store the result
+Program& Program::idec(int_op regno) {
+    /*  Inserts idec instuction.
      */
-    ensurebytes(1 + sizeof(int));
+    ensurebytes(1 + sizeof(bool) + sizeof(int));
+
+    bool regno_ref = false;
+    int regno_num;
+
+    tie(regno_ref, regno_num) = regno;
 
     program[addr_no++] = IDEC;
     addr_ptr++;
-    ((int*)addr_ptr)[0] = regno;
-    addr_no += sizeof(int);
+    *((bool*)addr_ptr) = regno_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((int*)addr_ptr)  = regno_num;
+    pointer::inc<bool, char>(addr_ptr);
+
+    addr_no += sizeof(bool) + sizeof(int);
     addr_ptr = program+addr_no;
 
     return (*this);

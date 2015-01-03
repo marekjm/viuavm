@@ -224,7 +224,10 @@ void assemble(Program& program, const vector<string>& lines) {
             regno_chnk = str::chunk(line);
             program.iinc(getint_op(regno_chnk));
         } else if (str::startswith(line, "idec")) {
-            inc = 1 + sizeof(int);
+            line = str::lstrip(str::sub(line, 4));
+            string regno_chnk;
+            regno_chnk = str::chunk(line);
+            program.idec(getint_op(regno_chnk));
         } else if (str::startswith(line, "bstore")) {
             line = str::lstrip(str::sub(line, 6));
             string regno_chnk, byte_chnk;
