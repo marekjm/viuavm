@@ -12,6 +12,12 @@ namespace str {
         return (s.compare(0, w.length(), w) == 0);
     }
 
+    bool startswithchunk(const std::string& s, const std::string& w) {
+        /*  Returns true if s stars with chunk w.
+         */
+        return (chunk(s) == w);
+    }
+
 
     bool isnum(const std::string& s) {
         /*  Returns true if s contains only numerical characters.
