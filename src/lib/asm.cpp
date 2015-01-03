@@ -156,7 +156,7 @@ void assemble(Program& program, const vector<string>& lines, bool debug) {
             regb_chnk = str::chunk(operands);
             operands = str::lstrip(str::sub(operands, regb_chnk.size()));
             // get chunk for result register
-            regr_chnk = str::chunk(operands);
+            regr_chnk = (operands.size() ? str::chunk(operands) : rega_chnk);
             // feed chunks into Bytecode Programming API
             program.iadd(getint_op(rega_chnk), getint_op(regb_chnk), getint_op(regr_chnk));
         } else if (str::startswith(line, "isub")) {
@@ -168,7 +168,7 @@ void assemble(Program& program, const vector<string>& lines, bool debug) {
             regb_chnk = str::chunk(operands);
             operands = str::lstrip(str::sub(operands, regb_chnk.size()));
             // get chunk for result register
-            regr_chnk = str::chunk(operands);
+            regr_chnk = (operands.size() ? str::chunk(operands) : rega_chnk);
             // feed chunks into Bytecode Programming API
             program.isub(getint_op(rega_chnk), getint_op(regb_chnk), getint_op(regr_chnk));
         } else if (str::startswith(line, "imul")) {
@@ -180,7 +180,7 @@ void assemble(Program& program, const vector<string>& lines, bool debug) {
             regb_chnk = str::chunk(operands);
             operands = str::lstrip(str::sub(operands, regb_chnk.size()));
             // get chunk for result register
-            regr_chnk = str::chunk(operands);
+            regr_chnk = (operands.size() ? str::chunk(operands) : rega_chnk);
             // feed chunks into Bytecode Programming API
             program.imul(getint_op(rega_chnk), getint_op(regb_chnk), getint_op(regr_chnk));
         } else if (str::startswith(line, "idiv")) {
@@ -192,7 +192,7 @@ void assemble(Program& program, const vector<string>& lines, bool debug) {
             regb_chnk = str::chunk(operands);
             operands = str::lstrip(str::sub(operands, regb_chnk.size()));
             // get chunk for result register
-            regr_chnk = str::chunk(operands);
+            regr_chnk = (operands.size() ? str::chunk(operands) : rega_chnk);
             // feed chunks into Bytecode Programming API
             program.idiv(getint_op(rega_chnk), getint_op(regb_chnk), getint_op(regr_chnk));
         } else if (str::startswithchunk(line, "ilt")) {
