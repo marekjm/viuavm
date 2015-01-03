@@ -119,7 +119,7 @@ uint16_t countBytes(const vector<string>& lines, const string& filename) {
 }
 
 
-void assemble(Program& program, const vector<string>& lines) {
+void assemble(Program& program, const vector<string>& lines, bool debug) {
     /** Assemble the instructions in lines into bytecode, using
      *  Bytecode Programming API.
      *
@@ -135,128 +135,167 @@ void assemble(Program& program, const vector<string>& lines) {
         line = lines[i];
 
         string instr;
+        string operands;
         istringstream iss(line);
 
+        instr = str::chunk(line);
+        operands = str::lstrip(str::sub(line, instr.size()));
+
+        if (debug) { cout << "* assemble: " << instr << endl; }
+
         if (str::startswith(line, "istore")) {
-            line = str::lstrip(str::sub(line, 6));
             string regno_chnk, number_chnk;
-            regno_chnk = str::chunk(line);
-            line = str::sub(line, regno_chnk.size());
-            number_chnk = str::chunk(line);
+            regno_chnk = str::chunk(operands);
+            operands = str::sub(operands, regno_chnk.size());
+            number_chnk = str::chunk(operands);
             program.istore(getint_op(regno_chnk), getint_op(number_chnk));
         } else if (str::startswith(line, "iadd")) {
-            line = str::lstrip(str::sub(line, 4));
             string rega_chnk, regb_chnk, regr_chnk;
             // get chunk for first-op register
-            rega_chnk = str::chunk(line);
-            line = str::lstrip(str::sub(line, rega_chnk.size()));
+            rega_chnk = str::chunk(operands);
+            operands = str::lstrip(str::sub(operands, rega_chnk.size()));
             // get chunk for second-op register
-            regb_chnk = str::chunk(line);
-            line = str::lstrip(str::sub(line, regb_chnk.size()));
+            regb_chnk = str::chunk(operands);
+            operands = str::lstrip(str::sub(operands, regb_chnk.size()));
             // get chunk for result register
-            regr_chnk = str::chunk(line);
+            regr_chnk = str::chunk(operands);
             // feed chunks into Bytecode Programming API
             program.iadd(getint_op(rega_chnk), getint_op(regb_chnk), getint_op(regr_chnk));
         } else if (str::startswith(line, "isub")) {
-            line = str::lstrip(str::sub(line, 4));
             string rega_chnk, regb_chnk, regr_chnk;
             // get chunk for first-op register
-            rega_chnk = str::chunk(line);
-            line = str::lstrip(str::sub(line, rega_chnk.size()));
+            rega_chnk = str::chunk(operands);
+            operands = str::lstrip(str::sub(operands, rega_chnk.size()));
             // get chunk for second-op register
-            regb_chnk = str::chunk(line);
-            line = str::lstrip(str::sub(line, regb_chnk.size()));
+            regb_chnk = str::chunk(operands);
+            operands = str::lstrip(str::sub(operands, regb_chnk.size()));
             // get chunk for result register
-            regr_chnk = str::chunk(line);
+            regr_chnk = str::chunk(operands);
             // feed chunks into Bytecode Programming API
             program.isub(getint_op(rega_chnk), getint_op(regb_chnk), getint_op(regr_chnk));
         } else if (str::startswith(line, "imul")) {
-            line = str::lstrip(str::sub(line, 4));
             string rega_chnk, regb_chnk, regr_chnk;
             // get chunk for first-op register
-            rega_chnk = str::chunk(line);
-            line = str::lstrip(str::sub(line, rega_chnk.size()));
+            rega_chnk = str::chunk(operands);
+            operands = str::lstrip(str::sub(operands, rega_chnk.size()));
             // get chunk for second-op register
-            regb_chnk = str::chunk(line);
-            line = str::lstrip(str::sub(line, regb_chnk.size()));
+            regb_chnk = str::chunk(operands);
+            operands = str::lstrip(str::sub(operands, regb_chnk.size()));
             // get chunk for result register
-            regr_chnk = str::chunk(line);
+            regr_chnk = str::chunk(operands);
             // feed chunks into Bytecode Programming API
             program.imul(getint_op(rega_chnk), getint_op(regb_chnk), getint_op(regr_chnk));
         } else if (str::startswith(line, "idiv")) {
-            line = str::lstrip(str::sub(line, 4));
             string rega_chnk, regb_chnk, regr_chnk;
             // get chunk for first-op register
-            rega_chnk = str::chunk(line);
-            line = str::lstrip(str::sub(line, rega_chnk.size()));
+            rega_chnk = str::chunk(operands);
+            operands = str::lstrip(str::sub(operands, rega_chnk.size()));
             // get chunk for second-op register
-            regb_chnk = str::chunk(line);
-            line = str::lstrip(str::sub(line, regb_chnk.size()));
+            regb_chnk = str::chunk(operands);
+            operands = str::lstrip(str::sub(operands, regb_chnk.size()));
             // get chunk for result register
-            regr_chnk = str::chunk(line);
+            regr_chnk = str::chunk(operands);
             // feed chunks into Bytecode Programming API
             program.idiv(getint_op(rega_chnk), getint_op(regb_chnk), getint_op(regr_chnk));
-        } else if (str::startswith(line, "ilt")) {
-            line = str::lstrip(str::sub(line, 3));
-
+        } else if (str::startswithchunk(line, "ilt")) {
             string rega, regb, regresult;
 
-            rega = str::chunk(line);
-            line = str::lstrip(str::sub(line, rega.size()));
+            rega = str::chunk(operands);
+            operands = str::lstrip(str::sub(operands, rega.size()));
 
-            regb = str::chunk(line);
-            line = str::sub(line, regb.size());
+            regb = str::chunk(operands);
+            operands = str::sub(operands, regb.size());
 
-            regresult = str::chunk(line);
+            regresult = str::chunk(operands);
 
             program.ilt(getint_op(rega), getint_op(regb), getint_op(regresult));
-        } else if (str::startswith(line, "ilte")) {
-            inc = 1 + 3*sizeof(int);
-        } else if (str::startswith(line, "igt")) {
-            inc = 1 + 3*sizeof(int);
+        } else if (str::startswithchunk(line, "ilte")) {
+            string rega, regb, regresult;
+
+            rega = str::chunk(operands);
+            operands = str::lstrip(str::sub(operands, rega.size()));
+
+            regb = str::chunk(operands);
+            operands = str::sub(operands, regb.size());
+
+            regresult = str::chunk(operands);
+
+            program.ilte(getint_op(rega), getint_op(regb), getint_op(regresult));
         } else if (str::startswith(line, "igte")) {
-            inc = 1 + 3*sizeof(int);
+            string rega, regb, regresult;
+
+            rega = str::chunk(operands);
+            operands = str::lstrip(str::sub(operands, rega.size()));
+
+            regb = str::chunk(operands);
+            operands = str::sub(operands, regb.size());
+
+            regresult = str::chunk(operands);
+
+            program.igte(getint_op(rega), getint_op(regb), getint_op(regresult));
+        } else if (str::startswith(line, "igt")) {
+            string rega, regb, regresult;
+
+            rega = str::chunk(operands);
+            operands = str::lstrip(str::sub(operands, rega.size()));
+
+            regb = str::chunk(operands);
+            operands = str::sub(operands, regb.size());
+
+            regresult = str::chunk(operands);
+
+            program.igt(getint_op(rega), getint_op(regb), getint_op(regresult));
         } else if (str::startswith(line, "ieq")) {
-            inc = 1 + 3*sizeof(int);
+            string rega, regb, regresult;
+
+            rega = str::chunk(operands);
+            operands = str::lstrip(str::sub(operands, rega.size()));
+
+            regb = str::chunk(operands);
+            operands = str::sub(operands, regb.size());
+
+            regresult = str::chunk(operands);
+
+            program.ieq(getint_op(rega), getint_op(regb), getint_op(regresult));
         } else if (str::startswith(line, "iinc")) {
             line = str::lstrip(str::sub(line, 4));
             string regno_chnk;
-            regno_chnk = str::chunk(line);
+            regno_chnk = str::chunk(operands);
             program.iinc(getint_op(regno_chnk));
         } else if (str::startswith(line, "idec")) {
             line = str::lstrip(str::sub(line, 4));
             string regno_chnk;
-            regno_chnk = str::chunk(line);
+            regno_chnk = str::chunk(operands);
             program.idec(getint_op(regno_chnk));
         } else if (str::startswith(line, "bstore")) {
             line = str::lstrip(str::sub(line, 6));
             string regno_chnk, byte_chnk;
-            regno_chnk = str::chunk(line);
-            line = str::sub(line, regno_chnk.size());
-            byte_chnk = str::chunk(line);
+            regno_chnk = str::chunk(operands);
+            operands = str::sub(operands, regno_chnk.size());
+            byte_chnk = str::chunk(operands);
             program.bstore(getint_op(regno_chnk), getbyte_op(byte_chnk));
         } else if (str::startswith(line, "print")) {
             line = str::lstrip(str::sub(line, 6));
             string regno_chnk;
-            regno_chnk = str::chunk(line);
+            regno_chnk = str::chunk(operands);
             program.print(getint_op(regno_chnk));
         } else if (str::startswith(line, "echo")) {
             line = str::lstrip(str::sub(line, 4));
             string regno_chnk;
-            regno_chnk = str::chunk(line);
+            regno_chnk = str::chunk(operands);
             program.echo(getint_op(regno_chnk));
         } else if (str::startswith(line, "branchif")) {
             line = str::lstrip(str::sub(line, 8));
 
             string regcond, t, f;
 
-            regcond = str::chunk(line);
-            line = str::lstrip(str::sub(line, regcond.size()));
+            regcond = str::chunk(operands);
+            operands = str::lstrip(str::sub(operands, regcond.size()));
 
-            t = str::chunk(line);
-            line = str::sub(line, t.size());
+            t = str::chunk(operands);
+            operands = str::sub(operands, t.size());
 
-            f = str::chunk(line);
+            f = str::chunk(operands);
 
             int addrt, addrf;
             addrt = stoi(t);
@@ -348,9 +387,12 @@ int main(int argc, char* argv[]) {
 
         Program program(bytes);
         try {
-            assemble(program.setdebug(DEBUG), ilines);
+            assemble(program.setdebug(DEBUG), ilines, DEBUG);
         } catch (const char*& e) {
             cout << "fatal: error during assembling: " << e << endl;
+            return 1;
+        } catch (const std::invalid_argument& e) {
+            cout << "fatal: error during assembling: " << e.what() << endl;
             return 1;
         }
 
