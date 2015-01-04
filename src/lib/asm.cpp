@@ -41,6 +41,9 @@ const map<string, int> INSTRUCTION_SIZE = {
     { "bgt",        1 + 3*sizeof(bool) + 3*sizeof(int) },
     { "bgte",       1 + 3*sizeof(bool) + 3*sizeof(int) },
     { "beq",        1 + 3*sizeof(bool) + sizeof(int) },
+    { "not",        1 + sizeof(bool) + sizeof(int) },
+    { "and",        1 + 3*sizeof(bool) + 3*sizeof(int) },
+    { "or",         1 + 3*sizeof(bool) + 3*sizeof(int) },
     { "print",      1 + 1*sizeof(bool) + sizeof(int) },
     { "echo",       1 + 1*sizeof(bool) + sizeof(int) },
     { "jump",       1 + sizeof(int) },
@@ -130,6 +133,16 @@ void assemble(Program& program, const vector<string>& lines, bool debug) {
     string line;
 
     for (int i = 0; i < lines.size(); ++i) {
+        /*  Inside this loop `i` is the counter.
+         *
+         *  However, apart from being a counter `i` is also an instruction index.
+         *  We leverage the fact that single line encodes single instruction here so
+         *  no magic really happens, just a simple good-to-exploit coincidence.
+         *
+         *  Watch out though - this is only due to the fact that SINGLE LINE ENCODES SINGLE INSTRUCTION and
+         *  if the design of the assembler ever changed (but I can't see why it reasonably would) and
+         *  this function got *unclueaned* lines, `i` would no longer be instruction index counter.
+         */
         line = lines[i];
 
         string instr;
@@ -269,6 +282,34 @@ void assemble(Program& program, const vector<string>& lines, bool debug) {
             operands = str::sub(operands, regno_chnk.size());
             byte_chnk = str::chunk(operands);
             program.bstore(getint_op(regno_chnk), getbyte_op(byte_chnk));
+        } else if (str::startswith(line, "not")) {
+            string regno_chnk;
+            regno_chnk = str::chunk(operands);
+            program.lognot(getint_op(regno_chnk));
+        } else if (str::startswith(line, "and")) {
+            string rega, regb, regresult;
+
+            rega = str::chunk(operands);
+            operands = str::lstrip(str::sub(operands, rega.size()));
+
+            regb = str::chunk(operands);
+            operands = str::sub(operands, regb.size());
+
+            regresult = str::chunk(operands);
+
+            program.logand(getint_op(rega), getint_op(regb), getint_op(regresult));
+        } else if (str::startswith(line, "or")) {
+            string rega, regb, regresult;
+
+            rega = str::chunk(operands);
+            operands = str::lstrip(str::sub(operands, rega.size()));
+
+            regb = str::chunk(operands);
+            operands = str::sub(operands, regb.size());
+
+            regresult = str::chunk(operands);
+
+            program.logor(getint_op(rega), getint_op(regb), getint_op(regresult));
         } else if (str::startswith(line, "print")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);

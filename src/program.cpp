@@ -159,6 +159,19 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
                 break;
             case IDEC:
                 if (debug) { cout << "idec"; }
+                inc += sizeof(bool) + sizeof(int);
+                break;
+            case NOT:
+                if (debug) { cout << "not"; }
+                inc += sizeof(bool) + sizeof(int);
+                break;
+            case AND:
+                if (debug) { cout << "and"; }
+                inc += 3*sizeof(bool) + 3*sizeof(int);
+                break;
+            case OR:
+                if (debug) { cout << "or"; }
+                inc += 3*sizeof(bool) + 3*sizeof(int);
                 break;
             case PRINT:
                 if (debug) { cout << "print"; }
@@ -704,6 +717,113 @@ Program& Program::bstore(int_op regno, byte_op b) {
     ++addr_ptr;
 
     addr_no += 2*sizeof(bool) + sizeof(int) + sizeof(byte);
+    addr_ptr = program+addr_no;
+
+    return (*this);
+}
+
+Program& Program::lognot(int_op reg) {
+    /*  Inserts not instuction.
+     */
+    ensurebytes(1 + sizeof(bool) + sizeof(int));
+
+    bool reg_ref = false;
+    int reg_num;
+
+    tie(reg_ref, reg_num) = reg;
+
+    program[addr_no++] = NOT;
+    addr_ptr++;
+    *((bool*)addr_ptr) = reg_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((int*)addr_ptr)  = reg_num;
+    pointer::inc<bool, char>(addr_ptr);
+
+    addr_no += sizeof(bool) + sizeof(int);
+    addr_ptr = program+addr_no;
+
+    return (*this);
+}
+
+Program& Program::logand(int_op rega, int_op regb, int_op regr) {
+    /*  Inserts and instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  rega:int        - register index of first operand
+     *  regb:int        - register index of second operand
+     *  regr:int   - register index in which to store the result
+     */
+    ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
+
+    bool rega_ref, regb_ref, regr_ref;
+    int  rega_num, regb_num, regr_num;
+
+    tie(rega_ref, rega_num) = rega;
+    tie(regb_ref, regb_num) = regb;
+    tie(regr_ref, regr_num) = regr;
+
+    program[addr_no++] = AND;
+    addr_ptr++;
+
+    *((bool*)addr_ptr) = rega_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((int*)addr_ptr) = rega_num;
+    pointer::inc<int, char>(addr_ptr);
+
+    *((bool*)addr_ptr) = regb_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((int*)addr_ptr) = regb_num;
+    pointer::inc<int, char>(addr_ptr);
+
+    *((bool*)addr_ptr) = regr_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((int*)addr_ptr) = regr_num;
+    pointer::inc<int, char>(addr_ptr);
+
+    addr_no += 3*sizeof(bool) + 3*sizeof(int);
+    addr_ptr = program+addr_no;
+
+    return (*this);
+}
+
+Program& Program::logor(int_op rega, int_op regb, int_op regr) {
+    /*  Inserts or instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  rega:int        - register index of first operand
+     *  regb:int        - register index of second operand
+     *  regr:int   - register index in which to store the result
+     */
+    ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
+
+    bool rega_ref, regb_ref, regr_ref;
+    int  rega_num, regb_num, regr_num;
+
+    tie(rega_ref, rega_num) = rega;
+    tie(regb_ref, regb_num) = regb;
+    tie(regr_ref, regr_num) = regr;
+
+    program[addr_no++] = OR;
+    addr_ptr++;
+
+    *((bool*)addr_ptr) = rega_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((int*)addr_ptr) = rega_num;
+    pointer::inc<int, char>(addr_ptr);
+
+    *((bool*)addr_ptr) = regb_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((int*)addr_ptr) = regb_num;
+    pointer::inc<int, char>(addr_ptr);
+
+    *((bool*)addr_ptr) = regr_ref;
+    pointer::inc<bool, char>(addr_ptr);
+    *((int*)addr_ptr) = regr_num;
+    pointer::inc<int, char>(addr_ptr);
+
+    addr_no += 3*sizeof(bool) + 3*sizeof(int);
     addr_ptr = program+addr_no;
 
     return (*this);
