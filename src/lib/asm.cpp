@@ -256,35 +256,28 @@ void assemble(Program& program, const vector<string>& lines, bool debug) {
 
             program.ieq(getint_op(rega), getint_op(regb), getint_op(regresult));
         } else if (str::startswith(line, "iinc")) {
-            line = str::lstrip(str::sub(line, 4));
             string regno_chnk;
             regno_chnk = str::chunk(operands);
             program.iinc(getint_op(regno_chnk));
         } else if (str::startswith(line, "idec")) {
-            line = str::lstrip(str::sub(line, 4));
             string regno_chnk;
             regno_chnk = str::chunk(operands);
             program.idec(getint_op(regno_chnk));
         } else if (str::startswith(line, "bstore")) {
-            line = str::lstrip(str::sub(line, 6));
             string regno_chnk, byte_chnk;
             regno_chnk = str::chunk(operands);
             operands = str::sub(operands, regno_chnk.size());
             byte_chnk = str::chunk(operands);
             program.bstore(getint_op(regno_chnk), getbyte_op(byte_chnk));
         } else if (str::startswith(line, "print")) {
-            line = str::lstrip(str::sub(line, 6));
             string regno_chnk;
             regno_chnk = str::chunk(operands);
             program.print(getint_op(regno_chnk));
         } else if (str::startswith(line, "echo")) {
-            line = str::lstrip(str::sub(line, 4));
             string regno_chnk;
             regno_chnk = str::chunk(operands);
             program.echo(getint_op(regno_chnk));
         } else if (str::startswith(line, "branch")) {
-            line = str::lstrip(str::sub(line, 8));
-
             string regcond, t, f;
 
             regcond = str::chunk(operands);
