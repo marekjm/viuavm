@@ -3,8 +3,8 @@ CXXFLAGS=-std=c++11
 VM_ASM=bin/vm/asm
 VM_RUN=bin/vm/run
 
-WUDOO_CPU_INSTR_FILES_CPP=src/cpu/instr/general.cpp src/cpu/instr/int.cpp src/cpu/instr/byte.cpp
-WUDOO_CPU_INSTR_FILES_O=build/cpu/instr/general.o build/cpu/instr/int.o build/cpu/instr/byte.o
+WUDOO_CPU_INSTR_FILES_CPP=src/cpu/instr/general.cpp src/cpu/instr/int.cpp src/cpu/instr/byte.cpp src/cpu/instr/bool.cpp
+WUDOO_CPU_INSTR_FILES_O=build/cpu/instr/general.o build/cpu/instr/int.o build/cpu/instr/byte.o build/cpu/instr/bool.o
 
 
 .SUFFIXES: .cpp .h .o
@@ -43,6 +43,9 @@ build/cpu/instr/int.o: src/cpu/instr/int.cpp
 
 build/cpu/instr/byte.o: src/cpu/instr/byte.cpp
 	${CXX} ${CXXFLAGS} -c -o $@ ./src/cpu/instr/byte.cpp
+
+build/cpu/instr/bool.o: src/cpu/instr/bool.cpp
+	${CXX} ${CXXFLAGS} -c -o $@ ./src/cpu/instr/bool.cpp
 
 
 build/program.o: src/program.cpp
