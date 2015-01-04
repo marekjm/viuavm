@@ -40,7 +40,7 @@ char* CPU::istore(char* addr) {
         num = static_cast<Integer*>(fetch(num))->value();
     }
 
-    registers[reg] = new Integer(num);
+    place(reg, new Integer(num));
 
     return addr;
 }
@@ -90,7 +90,7 @@ char* CPU::iadd(char* addr) {
     rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     regb_num = static_cast<Integer*>(fetch(regb_num))->value();
 
-    registers[regr_num] = new Integer(rega_num + regb_num);
+    place(regr_num, new Integer(rega_num + regb_num));
 
     return addr;
 }
@@ -140,7 +140,7 @@ char* CPU::isub(char* addr) {
     rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     regb_num = static_cast<Integer*>(fetch(regb_num))->value();
 
-    registers[regr_num] = new Integer(rega_num - regb_num);
+    place(regr_num, new Integer(rega_num - regb_num));
 
     return addr;
 }
@@ -190,7 +190,7 @@ char* CPU::imul(char* addr) {
     rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     regb_num = static_cast<Integer*>(fetch(regb_num))->value();
 
-    registers[regr_num] = new Integer(rega_num * regb_num);
+    place(regr_num, new Integer(rega_num * regb_num));
 
     return addr;
 }
@@ -240,7 +240,7 @@ char* CPU::idiv(char* addr) {
     rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     regb_num = static_cast<Integer*>(fetch(regb_num))->value();
 
-    registers[regr_num] = new Integer(rega_num / regb_num);
+    place(regr_num, new Integer(rega_num / regb_num));
 
     return addr;
 }
@@ -290,7 +290,7 @@ char* CPU::ilt(char* addr) {
     rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     regb_num = static_cast<Integer*>(fetch(regb_num))->value();
 
-    registers[regr_num] = new Boolean(rega_num < regb_num);
+    place(regr_num, new Boolean(rega_num < regb_num));
 
     return addr;
 }
@@ -340,7 +340,7 @@ char* CPU::ilte(char* addr) {
     rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     regb_num = static_cast<Integer*>(fetch(regb_num))->value();
 
-    registers[regr_num] = new Boolean(rega_num <= regb_num);
+    place(regr_num, new Boolean(rega_num <= regb_num));
 
     return addr;
 }
@@ -390,7 +390,7 @@ char* CPU::igt(char* addr) {
     rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     regb_num = static_cast<Integer*>(fetch(regb_num))->value();
 
-    registers[regr_num] = new Boolean(rega_num > regb_num);
+    place(regr_num, new Boolean(rega_num > regb_num));
 
     return addr;
 }
@@ -440,7 +440,7 @@ char* CPU::igte(char* addr) {
     rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     regb_num = static_cast<Integer*>(fetch(regb_num))->value();
 
-    registers[regr_num] = new Boolean(rega_num >= regb_num);
+    place(regr_num, new Boolean(rega_num >= regb_num));
 
     return addr;
 }
@@ -490,7 +490,7 @@ char* CPU::ieq(char* addr) {
     rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     regb_num = static_cast<Integer*>(fetch(regb_num))->value();
 
-    registers[regr_num] = new Boolean(rega_num == regb_num);
+    place(regr_num, new Boolean(rega_num == regb_num));
 
     return addr;
 }
