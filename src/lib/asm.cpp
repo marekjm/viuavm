@@ -331,7 +331,21 @@ void assemble(Program& program, const vector<string>& lines, bool debug) {
 
             int addrt, addrf;
             addrt = stoi(t);
-            addrf = stoi(f);
+            /*  If f has non-zero size it means that the instruction has been given three operands.
+             *  Otherwise, it is short-form instruction and we should adjust third operand accordingly,
+             *  as the spec (a.k.a. "The Code") says:
+             *
+             *  In case of short-form `branch` instruction:
+             *
+             *      * first operand is index of the register to check,
+             *      * second operand is the address to which to jump if register is true,
+             *      * third operand is assumed to be the *next instruction*, i.e. instruction after the branch instruction,
+             *
+             *  In long (with three operands) form of `branch` instruction:
+             *
+             *      * third operands is the address to which to jump if register is false,
+             */
+            addrf = (f.size() ? stoi(f) : i+1);
 
             program.branch(getint_op(regcond), addrt, addrf);
         } else if (str::startswith(line, "jump")) {
