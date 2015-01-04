@@ -43,6 +43,10 @@ class CPU {
 
     char* bstore(char*);
 
+    char* lognot(char*);
+    char* logand(char*);
+    char* logor(char*);
+
     char* print(char*);
     char* echo(char*);
 

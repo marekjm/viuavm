@@ -137,6 +137,15 @@ int CPU::run() {
                 case BSTORE:
                     instr_ptr = bstore(instr_ptr+1);
                     break;
+                case NOT:
+                    instr_ptr = lognot(instr_ptr+1);
+                    break;
+                case AND:
+                    instr_ptr = logand(instr_ptr+1);
+                    break;
+                case OR:
+                    instr_ptr = logor(instr_ptr+1);
+                    break;
                 case PRINT:
                     instr_ptr = print(instr_ptr+1);
                     break;
