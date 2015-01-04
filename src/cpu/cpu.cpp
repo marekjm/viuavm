@@ -52,10 +52,24 @@ Object* CPU::fetch(int index) {
      *
      *  index:int   - index of a register to fetch
      */
-    if (index >= reg_count) { throw "register access index out of bounds"; }
+    if (index >= reg_count) { throw "register access out of bounds: read"; }
     Object* optr = registers[index];
     if (optr == 0) { throw "read from null register"; }
     return optr;
+}
+
+void CPU::place(int index, Object* obj) {
+    /** Place an object in register with given index.
+     *
+     * Before placing an object in register, a check is preformed if the register is empty.
+     * If not - the `Object` previously stored in it is destroyed.
+     */
+    if (index >= reg_count) { throw "register access out of bounds: write"; }
+    if (registers[index] != 0) {
+        // register is not empty - the object in it must be destroyed to avoid memory leaks
+        delete registers[index];
+    }
+    registers[index] = obj;
 }
 
 

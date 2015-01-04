@@ -24,6 +24,7 @@ class CPU {
     int reg_count;
 
     Object* fetch(int);
+    void place(int, Object*);
 
     char* istore(char*);
     char* iadd(char*);
