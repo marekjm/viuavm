@@ -15,7 +15,7 @@ ilt 1 2 3
 ; else, branch directly to print instruction
 branch 3 4 6
 istore 4 -1
-imul 1 4 1
+imul 1 4
 
 print 1
 
