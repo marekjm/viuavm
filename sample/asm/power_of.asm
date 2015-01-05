@@ -22,7 +22,7 @@ istore 5 1
 istore 6 @1
 .mark: loop
 ilt 5 2 4
-branch 4 12 16
+branch 4 12 final_print
 imul 1 6 6
 pass
 iinc 5
