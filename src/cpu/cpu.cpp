@@ -83,7 +83,6 @@ int CPU::run() {
     }
     int return_code = 0;
 
-    int addr = 0;
     bool halt = false;
 
     byte* instr_ptr = bytecode+executable_offset; // instruction pointer
