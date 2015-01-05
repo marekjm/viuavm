@@ -14,18 +14,20 @@ ieq 2 3 4
 not 4
 branch 4 8
 istore 6 1
-jump 16
+jump final_print
 
 ; now, we multiply in loop
 istore 5 1
 ; in register 6, store the integer that can be found in register 1
 istore 6 @1
+.mark: loop
 ilt 5 2 4
 branch 4 12 16
 imul 1 6 6
 pass
 iinc 5
-jump 10
+jump loop
 
+.mark: final_print
 print 6
 halt
