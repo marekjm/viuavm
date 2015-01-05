@@ -204,8 +204,7 @@ Program& Program::calculateBranches() {
      */
     int instruction_count = instructionCount();
     int* ptr;
-    bool conditional = false;
-    for (int i = 0; i < branches.size(); ++i) {
+    for (unsigned i = 0; i < branches.size(); ++i) {
         ptr = (int*)(program+branches[i]+1);
         switch (*(program+branches[i])) {
             case JUMP:
@@ -223,6 +222,8 @@ Program& Program::calculateBranches() {
                 break;
         }
     }
+
+    return (*this);
 }
 
 
