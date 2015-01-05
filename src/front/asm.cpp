@@ -92,9 +92,17 @@ uint16_t countBytes(const vector<string>& lines, const string& filename) {
     string instr, line;
 
     for (int i = 0; i < lines.size(); ++i) {
-        inc = 0;
-        instr = "";
         line = str::lstrip(lines[i]);
+
+        if (str::startswith(line, ".mark:")) {
+            /*  Markers must be skipped here or they would cause the code below to
+             *  throw exceptions.
+             */
+            continue;
+        }
+
+        instr = "";
+        inc = 0;
 
         instr = str::chunk(line);
         try {
@@ -120,6 +128,30 @@ uint16_t countBytes(const vector<string>& lines, const string& filename) {
 }
 
 
+map<string, int> getmarks(const vector<string>& lines) {
+    /** This function will pass over all instructions and
+     * gather "marks", i.e. `.mark: <name>` directives which may be used by
+     * `jump` and `branch` instructions.
+     *
+     * When referring to a mark in code, you should use: `jump <name>`.
+     */
+    map<string, int> marks;
+    string line, mark;
+    for (int i = 0; i < lines.size(); ++i) {
+        line = lines[i];
+        if (!str::startswith(line, ".mark:")) {
+            continue;
+        }
+
+        line = str::lstrip(str::sub(line, 6));
+        mark = str::chunk(line);
+
+        marks[mark] = i;
+    }
+    return marks;
+}
+
+
 void assemble(Program& program, const vector<string>& lines, bool debug) {
     /** Assemble the instructions in lines into bytecode, using
      *  Bytecode Programming API.
@@ -131,19 +163,27 @@ void assemble(Program& program, const vector<string>& lines, bool debug) {
      */
     int inc = 0;
     string line;
+    int instruction = 0;  // instruction counter
+
+    map<string, int> marks = getmarks(lines);
 
     for (int i = 0; i < lines.size(); ++i) {
-        /*  Inside this loop `i` is the counter.
-         *
-         *  However, apart from being a counter `i` is also an instruction index.
-         *  We leverage the fact that single line encodes single instruction here so
-         *  no magic really happens, just a simple good-to-exploit coincidence.
-         *
-         *  Watch out though - this is only due to the fact that SINGLE LINE ENCODES SINGLE INSTRUCTION and
-         *  if the design of the assembler ever changed (but I can't see why it reasonably would) and
-         *  this function got *unclueaned* lines, `i` would no longer be instruction index counter.
+        /*  This is main assembly loop.
+         *  It iterates over lines with instructions and
+         *  uses Bytecode Programming API to fill a program with instructions and
+         *  from them generate the bytecode.
          */
         line = lines[i];
+
+        if (str::startswith(line, ".mark:")) {
+            /*  Lines beginning with `.mark:` are just markers placed in code and
+             *  are do not produce any bytecode.
+             *  As such, they are discarded by the assembler so we just skip them as fast as we can
+             *  to avoid complicating code that appears later and
+             *  deals with assembling real instructions.
+             */
+            continue;
+        }
 
         string instr;
         string operands;
@@ -349,14 +389,37 @@ void assemble(Program& program, const vector<string>& lines, bool debug) {
 
             program.branch(getint_op(regcond), addrt, addrf);
         } else if (str::startswith(line, "jump")) {
+            /*  Jump instruction can be written in two forms:
+             *
+             *      * `jump <index>`
+             *      * `jump <marker>`
+             *
+             *  Assembler must distinguish between these two forms, and so it does.
+             *  Here, we use a function from string support lib to determine
+             *  if the jump is numeric, and thus an index, or
+             *  a string - in which case we consider it a marker jump.
+             *
+             *  If it is a marker jump, assembler will look the marker in a map and
+             *  if it is not found throw an exception about unrecognised marker being used.
+             */
             int addr;
-            iss >> instr >> addr;
+            if (str::isnum(operands)) {
+                addr = stoi(operands);
+            } else {
+                try {
+                    addr = marks.at(operands);
+                } catch (const std::out_of_range& e) {
+                    throw ("jump to unrecognised marker: " + operands);
+                }
+            }
             program.jump(addr);
         } else if (str::startswith(line, "pass")) {
             program.pass();
         } else if (str::startswith(line, "halt")) {
             program.halt();
         }
+
+        ++instruction;
     }
 }
 
@@ -434,6 +497,9 @@ int main(int argc, char* argv[]) {
         Program program(bytes);
         try {
             assemble(program.setdebug(DEBUG), ilines, DEBUG);
+        } catch (const string& e) {
+            cout << "fatal: error during assembling: " << e << endl;
+            return 1;
         } catch (const char*& e) {
             cout << "fatal: error during assembling: " << e << endl;
             return 1;
