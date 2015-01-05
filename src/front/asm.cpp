@@ -137,18 +137,38 @@ map<string, int> getmarks(const vector<string>& lines) {
      */
     map<string, int> marks;
     string line, mark;
+    int instruction = 0;  // we need separate instruction counter because number of lines is not exactly number of instructions
     for (int i = 0; i < lines.size(); ++i) {
         line = lines[i];
         if (!str::startswith(line, ".mark:")) {
+            ++instruction;
             continue;
         }
 
         line = str::lstrip(str::sub(line, 6));
         mark = str::chunk(line);
 
-        marks[mark] = i;
+        if (DEBUG) { cout << " *  marker: `" << mark << "` -> " << instruction << endl; }
+        marks[mark] = instruction;
     }
     return marks;
+}
+
+
+int resolvejump(string jmp, const map<string, int>& marks) {
+    /*  This function is used to resolve jumps in `jump` and `branch` instructions.
+     */
+    int addr = 0;
+    if (str::isnum(jmp)) {
+        addr = stoi(jmp);
+    } else {
+        try {
+            addr = marks.at(jmp);
+        } catch (const std::out_of_range& e) {
+            throw ("jump to unrecognised marker: " + jmp);
+        }
+    }
+    return addr;
 }
 
 
@@ -165,8 +185,11 @@ void assemble(Program& program, const vector<string>& lines, bool debug) {
     string line;
     int instruction = 0;  // instruction counter
 
+    if (DEBUG) { cout << "gathering markers:" << '\n'; }
     map<string, int> marks = getmarks(lines);
+    if (DEBUG) { cout << endl; }
 
+    if (DEBUG) { cout << "assembling:" << '\n'; }
     for (int i = 0; i < lines.size(); ++i) {
         /*  This is main assembly loop.
          *  It iterates over lines with instructions and
@@ -192,7 +215,7 @@ void assemble(Program& program, const vector<string>& lines, bool debug) {
         instr = str::chunk(line);
         operands = str::lstrip(str::sub(line, instr.size()));
 
-        if (debug) { cout << "* assemble: " << instr << endl; }
+        if (debug) { cout << " *  assemble: " << instr << '\n'; }
 
         if (str::startswith(line, "istore")) {
             string regno_chnk, number_chnk;
@@ -370,7 +393,7 @@ void assemble(Program& program, const vector<string>& lines, bool debug) {
             f = str::chunk(operands);
 
             int addrt, addrf;
-            addrt = stoi(t);
+            addrt = resolvejump(t, marks);
             /*  If f has non-zero size it means that the instruction has been given three operands.
              *  Otherwise, it is short-form instruction and we should adjust third operand accordingly,
              *  as the spec (a.k.a. "The Code") says:
@@ -385,7 +408,7 @@ void assemble(Program& program, const vector<string>& lines, bool debug) {
              *
              *      * third operands is the address to which to jump if register is false,
              */
-            addrf = (f.size() ? stoi(f) : i+1);
+            addrf = (f.size() ? resolvejump(f, marks) : instruction+1);
 
             program.branch(getint_op(regcond), addrt, addrf);
         } else if (str::startswith(line, "jump")) {
@@ -402,17 +425,7 @@ void assemble(Program& program, const vector<string>& lines, bool debug) {
              *  If it is a marker jump, assembler will look the marker in a map and
              *  if it is not found throw an exception about unrecognised marker being used.
              */
-            int addr;
-            if (str::isnum(operands)) {
-                addr = stoi(operands);
-            } else {
-                try {
-                    addr = marks.at(operands);
-                } catch (const std::out_of_range& e) {
-                    throw ("jump to unrecognised marker: " + operands);
-                }
-            }
-            program.jump(addr);
+            program.jump(resolvejump(operands, marks));
         } else if (str::startswith(line, "pass")) {
             program.pass();
         } else if (str::startswith(line, "halt")) {
@@ -421,6 +434,7 @@ void assemble(Program& program, const vector<string>& lines, bool debug) {
 
         ++instruction;
     }
+    if (DEBUG) { cout << endl; }
 }
 
 
