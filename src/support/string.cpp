@@ -125,4 +125,4 @@ namespace str {
 
         return encoded.str();
     }
-};
+}

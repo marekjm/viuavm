@@ -20,7 +20,7 @@ namespace str {
     unsigned lshare(const std::string& s, const std::string& w);
 
     std::string enquote(const std::string&);
-};
+}
 
 
 #endif

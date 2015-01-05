@@ -7,6 +7,6 @@ namespace pointer {
         ptr++;
         p = (S*)ptr;
     }
-};
+}
 
 #endif
