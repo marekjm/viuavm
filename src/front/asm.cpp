@@ -133,7 +133,10 @@ map<string, int> getmarks(const vector<string>& lines) {
      * gather "marks", i.e. `.mark: <name>` directives which may be used by
      * `jump` and `branch` instructions.
      *
-     * When referring to a mark in code, you should use: `jump <name>`.
+     * When referring to a mark in code, you should use: `jump :<name>`.
+     *
+     * The colon before name of the marker is placed here to make it possible to use numeric markers
+     * which would otherwise be treated as instruction indexes.
      */
     map<string, int> marks;
     string line, mark;
@@ -162,6 +165,7 @@ int resolvejump(string jmp, const map<string, int>& marks) {
     if (str::isnum(jmp)) {
         addr = stoi(jmp);
     } else {
+        jmp = str::sub(jmp, 1);
         try {
             addr = marks.at(jmp);
         } catch (const std::out_of_range& e) {
