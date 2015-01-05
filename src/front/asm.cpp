@@ -72,7 +72,7 @@ vector<string> getilines(const vector<string>& lines) {
     vector<string> ilines;
     string line;
 
-    for (int i = 0; i < lines.size(); ++i) {
+    for (unsigned i = 0; i < lines.size(); ++i) {
         line = str::lstrip(lines[i]);
         if (!line.size() or line[0] == ';') continue;
         ilines.push_back(line);
@@ -91,7 +91,7 @@ uint16_t countBytes(const vector<string>& lines, const string& filename) {
     int inc = 0;
     string instr, line;
 
-    for (int i = 0; i < lines.size(); ++i) {
+    for (unsigned i = 0; i < lines.size(); ++i) {
         line = str::lstrip(lines[i]);
 
         if (str::startswith(line, ".mark:")) {
@@ -141,7 +141,7 @@ map<string, int> getmarks(const vector<string>& lines) {
     map<string, int> marks;
     string line, mark;
     int instruction = 0;  // we need separate instruction counter because number of lines is not exactly number of instructions
-    for (int i = 0; i < lines.size(); ++i) {
+    for (unsigned i = 0; i < lines.size(); ++i) {
         line = lines[i];
         if (!str::startswith(line, ".mark:")) {
             ++instruction;
@@ -185,7 +185,6 @@ void assemble(Program& program, const vector<string>& lines, bool debug) {
      *  program     - program object which will be used for assembling
      *  lines       - lines with instructions
      */
-    int inc = 0;
     string line;
     int instruction = 0;  // instruction counter
 
@@ -194,7 +193,7 @@ void assemble(Program& program, const vector<string>& lines, bool debug) {
     if (DEBUG) { cout << endl; }
 
     if (DEBUG) { cout << "assembling:" << '\n'; }
-    for (int i = 0; i < lines.size(); ++i) {
+    for (unsigned i = 0; i < lines.size(); ++i) {
         /*  This is main assembly loop.
          *  It iterates over lines with instructions and
          *  uses Bytecode Programming API to fill a program with instructions and
