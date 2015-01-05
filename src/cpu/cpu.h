@@ -16,16 +16,25 @@ typedef char byte;
 
 
 class CPU {
+    /*  Bytecode pointer is a pointer to program's code.
+     *  Size and executable offset are metadata exported from bytecode dump.
+     */
     char* bytecode;
     uint16_t bytecode_size;
     uint16_t executable_offset;
 
+    /*  Registers and their number stored.
+     */
     Object** registers;
     int reg_count;
 
+    /*  Methods to deal with registers.
+     */
     Object* fetch(int);
     void place(int, Object*);
 
+    /*  Methods implementing CPU instructions.
+     */
     char* istore(char*);
     char* iadd(char*);
     char* isub(char*);
@@ -54,14 +63,22 @@ class CPU {
     char* branch(char*);
 
     public:
+        // debug flag
         bool debug;
 
+        /*  Public API of the CPU provides basic actions:
+         *
+         *      * load bytecode,
+         *      * set its size,
+         *      * tell the CPU where to start execution,
+         *      * kick the CPU so it starts running,
+         */
         CPU& load(char*);
         CPU& bytes(uint16_t);
         CPU& eoffset(uint16_t);
         int run();
 
-        CPU(int r = DEFAULT_REGISTER_SIZE): bytecode(0), bytecode_size(0), registers(0), reg_count(r), debug(false), executable_offset(0) {
+        CPU(int r = DEFAULT_REGISTER_SIZE): bytecode(0), bytecode_size(0), executable_offset(0), registers(0), reg_count(r), debug(false) {
             /*  Basic constructor.
              *  Creates registers array of requested size and
              *  initializes it with zeroes.
