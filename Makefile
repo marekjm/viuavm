@@ -1,4 +1,4 @@
-CXXFLAGS=-std=c++11
+CXXFLAGS=-std=c++11 -Wall -pedantic
 
 VM_ASM=bin/vm/asm
 VM_RUN=bin/vm/run
