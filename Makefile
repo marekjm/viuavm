@@ -25,11 +25,11 @@ clean-support:
 	rm -v ./build/support/*.o
 
 
-${VM_RUN}: src/bytecode.h src/lib/run.cpp build/cpu/cpu.o build/support/pointer.o ${WUDOO_CPU_INSTR_FILES_O}
-	${CXX} ${CXXFLAGS} -o ${VM_RUN} src/lib/run.cpp build/cpu/cpu.o build/support/pointer.o ${WUDOO_CPU_INSTR_FILES_O}
+${VM_RUN}: src/bytecode.h src/front/run.cpp build/cpu/cpu.o build/support/pointer.o ${WUDOO_CPU_INSTR_FILES_O}
+	${CXX} ${CXXFLAGS} -o ${VM_RUN} src/front/run.cpp build/cpu/cpu.o build/support/pointer.o ${WUDOO_CPU_INSTR_FILES_O}
 
-${VM_ASM}: src/bytecode.h src/lib/asm.cpp build/program.o build/support/string.o
-	${CXX} ${CXXFLAGS} -o ${VM_ASM} src/lib/asm.cpp build/program.o build/support/string.o
+${VM_ASM}: src/bytecode.h src/front/asm.cpp build/program.o build/support/string.o
+	${CXX} ${CXXFLAGS} -o ${VM_ASM} src/front/asm.cpp build/program.o build/support/string.o
 
 
 build/cpu/cpu.o: src/bytecode.h src/cpu/cpu.h src/cpu/cpu.cpp
