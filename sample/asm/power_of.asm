@@ -14,7 +14,7 @@ ieq 2 3 4
 not 4
 branch 4 8
 istore 6 1
-jump final_print
+jump :final_print
 
 ; now, we multiply in loop
 istore 5 1
@@ -22,11 +22,11 @@ istore 5 1
 istore 6 @1
 .mark: loop
 ilt 5 2 4
-branch 4 12 final_print
+branch 4 12 :final_print
 imul 1 6 6
 pass
 iinc 5
-jump loop
+jump :loop
 
 .mark: final_print
 print 6
