@@ -8,10 +8,11 @@
 #include "object.h"
 
 
-std::string encode(const std::string&);
-
-
 class String : public Object {
+    /** String type.
+     *
+     *  Designed to hold text.
+     */
     std::string _value;
 
     public:

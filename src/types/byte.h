@@ -9,6 +9,12 @@
 
 
 class Byte : public Object {
+    /** Byte type can be used to hold generic data or
+     *  act as known-from-C char type.
+     *
+     *  The second usage is however discouraged.
+     *  There are String objects to hold letters.
+     */
     char byte_;
 
     public:
@@ -31,6 +37,8 @@ class Byte : public Object {
 
 
 class UnsignedByte : public Byte {
+    /** Unsigned variant of Byte type.
+     */
     unsigned char ubyte_;
 
     public:
