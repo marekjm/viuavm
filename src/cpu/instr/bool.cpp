@@ -83,9 +83,6 @@ char* CPU::logand(char* addr) {
         rega_num = static_cast<Integer*>(registers[rega_num])->value();
     }
 
-    rega_num = static_cast<Integer*>(fetch(rega_num))->value();
-    regb_num = static_cast<Integer*>(fetch(regb_num))->value();
-
     place(regr_num, new Boolean(fetch(rega_num)->boolean() and fetch(regb_num)->boolean()));
 
     return addr;
@@ -132,9 +129,6 @@ char* CPU::logor(char* addr) {
         if (debug) { cout << "resolving reference to result register" << endl; }
         rega_num = static_cast<Integer*>(registers[rega_num])->value();
     }
-
-    rega_num = static_cast<Integer*>(fetch(rega_num))->value();
-    regb_num = static_cast<Integer*>(fetch(regb_num))->value();
 
     place(regr_num, new Boolean(fetch(rega_num)->boolean() or fetch(regb_num)->boolean()));
 
