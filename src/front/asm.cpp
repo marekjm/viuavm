@@ -94,8 +94,8 @@ uint16_t countBytes(const vector<string>& lines, const string& filename) {
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = str::lstrip(lines[i]);
 
-        if (str::startswith(line, ".mark:")) {
-            /*  Markers must be skipped here or they would cause the code below to
+        if (str::startswith(line, ".mark:") or str::startswith(line, ".name:")) {
+            /*  Markers and name instructions must be skipped here or they would cause the code below to
              *  throw exceptions.
              */
             continue;
@@ -143,6 +143,9 @@ map<string, int> getmarks(const vector<string>& lines) {
     int instruction = 0;  // we need separate instruction counter because number of lines is not exactly number of instructions
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = lines[i];
+        if (str::startswith(line, ".name:")) {
+            continue;
+        }
         if (!str::startswith(line, ".mark:")) {
             ++instruction;
             continue;
@@ -155,6 +158,39 @@ map<string, int> getmarks(const vector<string>& lines) {
         marks[mark] = instruction;
     }
     return marks;
+}
+
+map<string, int> getnames(const vector<string>& lines) {
+    /** This function will pass over all instructions and
+     *  gather "names", i.e. `.name: <register> <name>` instructions which may be used by
+     *  as substitutes for register indexes to more easily remember what is stored where.
+     *
+     *  Example name instruction: `.name: 1 base`.
+     *  This allows to access first register with name `base` instead of its index.
+     *
+     *  Example (which also uses marks) name reference could be: `branch if_equals_0 :finish`.
+     */
+    map<string, int> names;
+    string line, reg, name;
+    for (unsigned i = 0; i < lines.size(); ++i) {
+        line = lines[i];
+        if (!str::startswith(line, ".name:")) {
+            continue;
+        }
+
+        line = str::lstrip(str::sub(line, 6));
+        reg = str::chunk(line);
+        line = str::lstrip(str::sub(line, reg.size()));
+        name = str::chunk(line);
+
+        if (DEBUG) { cout << " *  name: `" << name << "` -> " << reg << endl; }
+        try {
+            names[name] = stoi(reg);
+        } catch (const std::invalid_argument& e) {
+            throw "invalid register index in .name instruction";
+        }
+    }
+    return names;
 }
 
 
@@ -175,8 +211,41 @@ int resolvejump(string jmp, const map<string, int>& marks) {
     return addr;
 }
 
+string resolveregister(string reg, const map<string, int>& names) {
+    /*  This function is used to register numbers when a register is accessed, e.g.
+     *  in `istore` instruction or in `branch` in condition operand.
+     *
+     *  This function MUST return string as teh result is further passed to getint_op() function which *expects* string.
+     */
+    ostringstream out;
+    if (str::isnum(reg)) {
+        /*  Basic case - the register is accessed as real index, everything is nice and simple.
+         */
+        out.str(reg);
+    } else if (reg[0] == '@' and str::isnum(str::sub(reg, 1))) {
+        /*  Basic case - the register index is taken from another register, everything is still nice and simple.
+         */
+        out.str(reg);
+    } else {
+        /*  Case is no longer basic - it seems that a register is being accessed by name.
+         *  Names must be checked to see if the one used was declared.
+         */
+        if (reg[0] == '@') {
+            out << '@';
+            reg = str::sub(reg, 1);
+        }
+        try {
+            out << names.at(reg);
+        } catch (const std::out_of_range& e) {
+            // Jinkies! This name was not declared.
+            throw ("undeclared name: " + reg);
+        }
+    }
+    return out.str();
+}
 
-void assemble(Program& program, const vector<string>& lines, bool debug) {
+
+void assemble(Program& program, const vector<string>& lines, const string& filename) {
     /** Assemble the instructions in lines into bytecode, using
      *  Bytecode Programming API.
      *
@@ -192,6 +261,10 @@ void assemble(Program& program, const vector<string>& lines, bool debug) {
     map<string, int> marks = getmarks(lines);
     if (DEBUG) { cout << endl; }
 
+    if (DEBUG) { cout << "gathering names:" << '\n'; }
+    map<string, int> names = getnames(lines);
+    if (DEBUG) { cout << endl; }
+
     if (DEBUG) { cout << "assembling:" << '\n'; }
     for (unsigned i = 0; i < lines.size(); ++i) {
         /*  This is main assembly loop.
@@ -201,13 +274,18 @@ void assemble(Program& program, const vector<string>& lines, bool debug) {
          */
         line = lines[i];
 
-        if (str::startswith(line, ".mark:")) {
+        if (str::startswith(line, ".mark:") or str::startswith(line, ".name:")) {
             /*  Lines beginning with `.mark:` are just markers placed in code and
              *  are do not produce any bytecode.
-             *  As such, they are discarded by the assembler so we just skip them as fast as we can
+             *  Lines beginning with `.name:` are asm instructions that assign human-rememberable names to
+             *  registers.
+             *
+             *  Assembler instructions are discarded by the assembler during the bytecode-generation phase
+             *  so they can be skipped in this step as fast as possible
              *  to avoid complicating code that appears later and
-             *  deals with assembling real instructions.
+             *  deals with assembling CPU instructions.
              */
+            if (DEBUG) { cout << " -  skip asm: " << filename << ':' << i << ":+" << instruction << ": " << line << '\n'; }
             continue;
         }
 
@@ -218,14 +296,14 @@ void assemble(Program& program, const vector<string>& lines, bool debug) {
         instr = str::chunk(line);
         operands = str::lstrip(str::sub(line, instr.size()));
 
-        if (debug) { cout << " *  assemble: " << instr << '\n'; }
+        if (DEBUG) { cout << " *  assemble: " << filename << ':' << i << ":+" << instruction << ": " << instr << '\n'; }
 
         if (str::startswith(line, "istore")) {
             string regno_chnk, number_chnk;
             regno_chnk = str::chunk(operands);
             operands = str::sub(operands, regno_chnk.size());
             number_chnk = str::chunk(operands);
-            program.istore(getint_op(regno_chnk), getint_op(number_chnk));
+            program.istore(getint_op(resolveregister(regno_chnk, names)), getint_op(resolveregister(number_chnk, names)));
         } else if (str::startswith(line, "iadd")) {
             string rega_chnk, regb_chnk, regr_chnk;
             // get chunk for first-op register
@@ -513,7 +591,7 @@ int main(int argc, char* argv[]) {
 
         Program program(bytes);
         try {
-            assemble(program.setdebug(DEBUG), ilines, DEBUG);
+            assemble(program.setdebug(DEBUG), ilines, filename);
         } catch (const string& e) {
             cout << "fatal: error during assembling: " << e << endl;
             return 1;
