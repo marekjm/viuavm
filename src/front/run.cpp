@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include "../version.h"
+#include "../support/string.h"
 #include "../bytecode.h"
 #include "../cpu/cpu.h"
 #include "../program.h"
@@ -12,6 +13,8 @@ using namespace std;
 
 
 typedef char byte;
+
+const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file which cannot be run on CPU without prior compilation";
 
 
 enum RunMode {
@@ -62,6 +65,7 @@ int main(int argc, char* argv[]) {
         in.read(buffer, 16);
         if (!in) {
             cout << "fatal: an error occued during bytecode loading: cannot read size" << endl;
+            if (str::endswith(filename, ".asm")) { cout << NOTE_LOADED_ASM << endl; }
             return 1;
         } else {
             bytes = *((uint16_t*)buffer);
@@ -70,6 +74,7 @@ int main(int argc, char* argv[]) {
         in.read(buffer, 16);
         if (!in) {
             cout << "fatal: an error occued during bytecode loading: cannot read executable offset" << endl;
+            if (str::endswith(filename, ".asm")) { cout << NOTE_LOADED_ASM << endl; }
             return 1;
         } else {
             starting_instruction = *((uint16_t*)buffer);
@@ -80,6 +85,7 @@ int main(int argc, char* argv[]) {
 
         if (!in) {
             cout << "fatal: an error occued during bytecode loading: cannot read instructions" << endl;
+            if (str::endswith(filename, ".asm")) { cout << NOTE_LOADED_ASM << endl; }
             return 1;
         } else {
             starting_instruction = *((uint16_t*)buffer);
