@@ -314,10 +314,11 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             operands = str::lstrip(str::sub(operands, regb_chnk.size()));
             // get chunk for result register
             regr_chnk = (operands.size() ? str::chunk(operands) : rega_chnk);
-            // feed chunks into Bytecode Programming API
+
             rega_chnk = resolveregister(rega_chnk, names);
             regb_chnk = resolveregister(regb_chnk, names);
             regr_chnk = resolveregister(regr_chnk, names);
+            // feed chunks into Bytecode Programming API
             program.iadd(getint_op(rega_chnk), getint_op(regb_chnk), getint_op(regr_chnk));
         } else if (str::startswith(line, "isub")) {
             string rega_chnk, regb_chnk, regr_chnk;
@@ -329,6 +330,10 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             operands = str::lstrip(str::sub(operands, regb_chnk.size()));
             // get chunk for result register
             regr_chnk = (operands.size() ? str::chunk(operands) : rega_chnk);
+
+            rega_chnk = resolveregister(rega_chnk, names);
+            regb_chnk = resolveregister(regb_chnk, names);
+            regr_chnk = resolveregister(regr_chnk, names);
             // feed chunks into Bytecode Programming API
             program.isub(getint_op(rega_chnk), getint_op(regb_chnk), getint_op(regr_chnk));
         } else if (str::startswith(line, "imul")) {
@@ -341,6 +346,10 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             operands = str::lstrip(str::sub(operands, regb_chnk.size()));
             // get chunk for result register
             regr_chnk = (operands.size() ? str::chunk(operands) : rega_chnk);
+
+            rega_chnk = resolveregister(rega_chnk, names);
+            regb_chnk = resolveregister(regb_chnk, names);
+            regr_chnk = resolveregister(regr_chnk, names);
             // feed chunks into Bytecode Programming API
             program.imul(getint_op(rega_chnk), getint_op(regb_chnk), getint_op(regr_chnk));
         } else if (str::startswith(line, "idiv")) {
@@ -353,10 +362,14 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             operands = str::lstrip(str::sub(operands, regb_chnk.size()));
             // get chunk for result register
             regr_chnk = (operands.size() ? str::chunk(operands) : rega_chnk);
+
+            rega_chnk = resolveregister(rega_chnk, names);
+            regb_chnk = resolveregister(regb_chnk, names);
+            regr_chnk = resolveregister(regr_chnk, names);
             // feed chunks into Bytecode Programming API
             program.idiv(getint_op(rega_chnk), getint_op(regb_chnk), getint_op(regr_chnk));
         } else if (str::startswithchunk(line, "ilt")) {
-            string rega, regb, regresult;
+            string rega, regb, regr;
 
             rega = str::chunk(operands);
             operands = str::lstrip(str::sub(operands, rega.size()));
@@ -364,11 +377,14 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             regb = str::chunk(operands);
             operands = str::sub(operands, regb.size());
 
-            regresult = str::chunk(operands);
+            regr = str::chunk(operands);
 
-            program.ilt(getint_op(rega), getint_op(regb), getint_op(regresult));
+            rega = resolveregister(rega, names);
+            regb = resolveregister(regb, names);
+            regr = resolveregister(regr, names);
+            program.ilt(getint_op(rega), getint_op(regb), getint_op(regr));
         } else if (str::startswithchunk(line, "ilte")) {
-            string rega, regb, regresult;
+            string rega, regb, regr;
 
             rega = str::chunk(operands);
             operands = str::lstrip(str::sub(operands, rega.size()));
@@ -376,11 +392,14 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             regb = str::chunk(operands);
             operands = str::sub(operands, regb.size());
 
-            regresult = str::chunk(operands);
+            regr = str::chunk(operands);
 
-            program.ilte(getint_op(rega), getint_op(regb), getint_op(regresult));
+            rega = resolveregister(rega, names);
+            regb = resolveregister(regb, names);
+            regr = resolveregister(regr, names);
+            program.ilte(getint_op(rega), getint_op(regb), getint_op(regr));
         } else if (str::startswith(line, "igte")) {
-            string rega, regb, regresult;
+            string rega, regb, regr;
 
             rega = str::chunk(operands);
             operands = str::lstrip(str::sub(operands, rega.size()));
@@ -388,11 +407,14 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             regb = str::chunk(operands);
             operands = str::sub(operands, regb.size());
 
-            regresult = str::chunk(operands);
+            regr = str::chunk(operands);
 
-            program.igte(getint_op(rega), getint_op(regb), getint_op(regresult));
+            rega = resolveregister(rega, names);
+            regb = resolveregister(regb, names);
+            regr = resolveregister(regr, names);
+            program.igte(getint_op(rega), getint_op(regb), getint_op(regr));
         } else if (str::startswith(line, "igt")) {
-            string rega, regb, regresult;
+            string rega, regb, regr;
 
             rega = str::chunk(operands);
             operands = str::lstrip(str::sub(operands, rega.size()));
@@ -400,11 +422,14 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             regb = str::chunk(operands);
             operands = str::sub(operands, regb.size());
 
-            regresult = str::chunk(operands);
+            regr = str::chunk(operands);
 
-            program.igt(getint_op(rega), getint_op(regb), getint_op(regresult));
+            rega = resolveregister(rega, names);
+            regb = resolveregister(regb, names);
+            regr = resolveregister(regr, names);
+            program.igt(getint_op(rega), getint_op(regb), getint_op(regr));
         } else if (str::startswith(line, "ieq")) {
-            string rega, regb, regresult;
+            string rega, regb, regr;
 
             rega = str::chunk(operands);
             operands = str::lstrip(str::sub(operands, rega.size()));
@@ -412,29 +437,32 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             regb = str::chunk(operands);
             operands = str::sub(operands, regb.size());
 
-            regresult = str::chunk(operands);
+            regr = str::chunk(operands);
 
-            program.ieq(getint_op(rega), getint_op(regb), getint_op(regresult));
+            rega = resolveregister(rega, names);
+            regb = resolveregister(regb, names);
+            regr = resolveregister(regr, names);
+            program.ieq(getint_op(rega), getint_op(regb), getint_op(regr));
         } else if (str::startswith(line, "iinc")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
-            program.iinc(getint_op(regno_chnk));
+            program.iinc(getint_op(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "idec")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
-            program.idec(getint_op(regno_chnk));
+            program.idec(getint_op(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "bstore")) {
             string regno_chnk, byte_chnk;
             regno_chnk = str::chunk(operands);
             operands = str::sub(operands, regno_chnk.size());
             byte_chnk = str::chunk(operands);
-            program.bstore(getint_op(regno_chnk), getbyte_op(byte_chnk));
+            program.bstore(getint_op(resolveregister(regno_chnk, names)), getbyte_op(resolveregister(byte_chnk, names)));
         } else if (str::startswith(line, "not")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
-            program.lognot(getint_op(regno_chnk));
+            program.lognot(getint_op(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "and")) {
-            string rega, regb, regresult;
+            string rega, regb, regr;
 
             rega = str::chunk(operands);
             operands = str::lstrip(str::sub(operands, rega.size()));
@@ -442,11 +470,14 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             regb = str::chunk(operands);
             operands = str::sub(operands, regb.size());
 
-            regresult = str::chunk(operands);
+            regr = str::chunk(operands);
 
-            program.logand(getint_op(rega), getint_op(regb), getint_op(regresult));
+            rega = resolveregister(rega, names);
+            regb = resolveregister(regb, names);
+            regr = resolveregister(regr, names);
+            program.logand(getint_op(rega), getint_op(regb), getint_op(regr));
         } else if (str::startswith(line, "or")) {
-            string rega, regb, regresult;
+            string rega, regb, regr;
 
             rega = str::chunk(operands);
             operands = str::lstrip(str::sub(operands, rega.size()));
@@ -454,17 +485,20 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             regb = str::chunk(operands);
             operands = str::sub(operands, regb.size());
 
-            regresult = str::chunk(operands);
+            regr = str::chunk(operands);
 
-            program.logor(getint_op(rega), getint_op(regb), getint_op(regresult));
+            rega = resolveregister(rega, names);
+            regb = resolveregister(regb, names);
+            regr = resolveregister(regr, names);
+            program.logor(getint_op(rega), getint_op(regb), getint_op(regr));
         } else if (str::startswith(line, "print")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
-            program.print(getint_op(regno_chnk));
+            program.print(getint_op(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "echo")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
-            program.echo(getint_op(regno_chnk));
+            program.echo(getint_op(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "branch")) {
             string regcond, t, f;
 
@@ -494,19 +528,19 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
              */
             addrf = (f.size() ? resolvejump(f, marks) : instruction+1);
 
-            program.branch(getint_op(regcond), addrt, addrf);
+            program.branch(getint_op(resolveregister(regcond, names)), addrt, addrf);
         } else if (str::startswith(line, "jump")) {
             /*  Jump instruction can be written in two forms:
              *
              *      * `jump <index>`
-             *      * `jump <marker>`
+             *      * `jump :<marker>`
              *
              *  Assembler must distinguish between these two forms, and so it does.
              *  Here, we use a function from string support lib to determine
              *  if the jump is numeric, and thus an index, or
              *  a string - in which case we consider it a marker jump.
              *
-             *  If it is a marker jump, assembler will look the marker in a map and
+             *  If it is a marker jump, assembler will look the marker up in a map and
              *  if it is not found throw an exception about unrecognised marker being used.
              */
             program.jump(resolvejump(operands, marks));
