@@ -12,13 +12,19 @@ namespace str {
         return (s.compare(0, w.length(), w) == 0);
     }
 
+    bool startswithchunk(const std::string& s, const std::string& w) {
+        /*  Returns true if s stars with chunk w.
+         */
+        return (chunk(s) == w);
+    }
+
 
     bool isnum(const std::string& s) {
         /*  Returns true if s contains only numerical characters.
-         *  Regex equvallent: `^[0-9]+$`
+         *  Regex equivalent: `^[0-9]+$`
          */
         bool num = false;
-        for (int i = 0; i < s.size(); ++i) {
+        for (unsigned i = 0; i < s.size(); ++i) {
             switch (s[i]) {
                 case '0':
                 case '1':
@@ -50,10 +56,12 @@ namespace str {
         ostringstream part;
         part.str("");
 
-        if (e < 0) { e = (s.size() + e + 1); }
+        unsigned end;
+        if (e < 0) { end = unsigned(s.size() + e + 1); }
+        else { end = unsigned(e); }
 
-        for (; b < s.size() and b < e; ++b) {
-            part << s[b];
+        for (unsigned i = unsigned(b); i < s.size() and i < end; ++i) {
+            part << s[i];
         }
 
         return part.str();
@@ -66,7 +74,7 @@ namespace str {
 
         string str = (ignore_leading_ws ? lstrip(s) : s);
 
-        for (int i = 0; i < str.size(); ++i) {
+        for (unsigned i = 0; i < str.size(); ++i) {
             if (str[i] == *" " or str[i] == *"\t" or str[i] == *"\v" or str[i] == *"\n") break;
             chnk << str[i];
         }
@@ -77,7 +85,7 @@ namespace str {
     string lstrip(const string& s) {
         /*  Removes whitespace from left side of the string.
          */
-        int i = 0;
+        unsigned i = 0;
         while (i < s.size()) {
             if (s[i] == *" " or s[i] == *"\t" or s[i] == *"\v" or s[i] == *"\n") {
                 ++i;
@@ -91,7 +99,7 @@ namespace str {
 
     unsigned lshare(const string& s, const string& w) {
         unsigned share = 0;
-        for (int i = 0; i < s.size() and i < w.size(); ++i) {
+        for (unsigned i = 0; i < s.size() and i < w.size(); ++i) {
             if (s[i] == w[i]) {
                 ++share;
             } else {
@@ -109,7 +117,7 @@ namespace str {
         char closing = '"';
 
         encoded << closing;
-        for (int i = 0; i < s.size(); ++i) {
+        for (unsigned i = 0; i < s.size(); ++i) {
             if (s[i] == closing) { encoded << "\\"; }
             encoded << s[i];
         }
@@ -117,4 +125,4 @@ namespace str {
 
         return encoded.str();
     }
-};
+}

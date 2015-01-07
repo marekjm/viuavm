@@ -9,6 +9,10 @@
 
 
 class Boolean : public Object {
+    /** Boolean object.
+     *
+     *  This type is used to hold true and false values.
+     */
     bool b;
 
     public:

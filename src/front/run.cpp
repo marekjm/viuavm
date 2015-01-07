@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 #include "../version.h"
-#include "../cpu.h"
 #include "../bytecode.h"
+#include "../cpu/cpu.h"
 #include "../program.h"
 using namespace std;
 

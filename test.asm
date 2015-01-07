@@ -20,9 +20,10 @@ istore 2 1
 ; TODO: move this to developer diary as a 2015.01.07 entry
 .name: 1 sixteen
 ilt 2 1 3
-branchif 3 5 4
+branch 3 5 4
 print 3
-branch 6
+jump :foo
+.mark: foo
 istore 4 @1
 istore 5 4
 iinc @5

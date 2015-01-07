@@ -34,11 +34,15 @@ enum Bytecode {
     STRADD,
     STREQ,
 
+    NOT,
+    AND,
+    OR,
+
     PRINT,
     ECHO,
 
+    JUMP,
     BRANCH,
-    BRANCHIF,
 
     RET,
     END,

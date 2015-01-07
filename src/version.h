@@ -3,9 +3,6 @@
 
 #pragma once
 
-#include <string>
-
-const std::string VERSION = "0.0.1";
-
+const char* VERSION = "0.1.0";
 
 #endif

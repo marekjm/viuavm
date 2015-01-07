@@ -1,3 +1,5 @@
+; This script's purpose is to stress register-reference syntax in
+; integer related instructions.
 istore 1 16
 istore 16 1
 

@@ -8,6 +8,7 @@
 
 namespace str {
     bool startswith(const std::string& s, const std::string& w);
+    bool startswithchunk(const std::string& s, const std::string& w);
 
     bool isnum(const std::string& s);
 
@@ -19,7 +20,7 @@ namespace str {
     unsigned lshare(const std::string& s, const std::string& w);
 
     std::string enquote(const std::string&);
-};
+}
 
 
 #endif

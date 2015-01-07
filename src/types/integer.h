@@ -9,6 +9,9 @@
 
 
 class Integer : public Object {
+    /** Basic integer type.
+     *  It is suitable for mathematical operations.
+     */
     int number;
 
     public:
@@ -29,6 +32,8 @@ class Integer : public Object {
 
 
 class UnsignedInteger : public Integer {
+    /** Unsigned variant of Integer type.
+     */
     unsigned number;
 
     public:
