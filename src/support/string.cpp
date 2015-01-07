@@ -24,12 +24,18 @@ namespace str {
         return (s.compare(s.length()-w.length(), s.length(), w) == 0);
     }
 
-    bool isnum(const std::string& s) {
+
+    bool isnum(const std::string& s, bool negatives) {
         /*  Returns true if s contains only numerical characters.
          *  Regex equivalent: `^[0-9]+$`
          */
         bool num = false;
-        for (unsigned i = 0; i < s.size(); ++i) {
+        unsigned start = 0;
+        if (s[0] == '-' and negatives) {
+            // must handle negative numbers
+            start = 1;
+        }
+        for (unsigned i = start; i < s.size(); ++i) {
             switch (s[i]) {
                 case '0':
                 case '1':
