@@ -18,6 +18,11 @@ namespace str {
         return (chunk(s) == w);
     }
 
+    bool endswith(const std::string& s, const std::string& w) {
+        /*  Returns true if s ends with w.
+         */
+        return (s.compare(s.length()-w.length(), s.length(), w) == 0);
+    }
 
     bool isnum(const std::string& s) {
         /*  Returns true if s contains only numerical characters.

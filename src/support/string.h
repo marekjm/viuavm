@@ -9,6 +9,7 @@
 namespace str {
     bool startswith(const std::string& s, const std::string& w);
     bool startswithchunk(const std::string& s, const std::string& w);
+    bool endswith(const std::string& s, const std::string& w);
 
     bool isnum(const std::string& s);
 
