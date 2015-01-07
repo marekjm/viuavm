@@ -315,6 +315,9 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             // get chunk for result register
             regr_chnk = (operands.size() ? str::chunk(operands) : rega_chnk);
             // feed chunks into Bytecode Programming API
+            rega_chnk = resolveregister(rega_chnk, names);
+            regb_chnk = resolveregister(regb_chnk, names);
+            regr_chnk = resolveregister(regr_chnk, names);
             program.iadd(getint_op(rega_chnk), getint_op(regb_chnk), getint_op(regr_chnk));
         } else if (str::startswith(line, "isub")) {
             string rega_chnk, regb_chnk, regr_chnk;
