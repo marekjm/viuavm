@@ -38,6 +38,10 @@ enum Bytecode : unsigned int {
     AND,
     OR,
 
+    MOVE,   // move an object from one register to another
+    ROT,    // rotate two objects between their registers
+    COPY,   // copy an object from one register to another
+
     PRINT,
     ECHO,
 
