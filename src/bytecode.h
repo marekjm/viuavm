@@ -3,7 +3,7 @@
 
 #pragma once
 
-enum Bytecode {
+enum Bytecode : unsigned int {
     ISTORE,
     IADD,
     ISUB,
