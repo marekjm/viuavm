@@ -7,15 +7,16 @@
 .name: 9 d
 
 ; exclamation mark
-bstore 1 33
+.name: 1 _exmark
+bstore _exmark 33
 
 bstore H 72
 bstore e 101
 bstore l 108
 bstore o 111
 
-; space
-bstore 6 32
+.name: 6 _space
+bstore _space 32
 
 bstore W 87
 bstore r 114
@@ -27,7 +28,7 @@ echo l
 echo l
 echo o
 
-echo 6
+echo _space
 
 echo W
 echo o
@@ -35,6 +36,6 @@ echo r
 echo l
 echo d
 
-print exclam
+print _exmark
 
 halt
