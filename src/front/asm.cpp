@@ -6,6 +6,7 @@
 #include <sstream>
 #include <vector>
 #include <map>
+#include "../bytecode/maps.h"
 #include "../support/string.h"
 #include "../version.h"
 #include "../program.h"
@@ -13,43 +14,6 @@ using namespace std;
 
 
 bool DEBUG = false;
-
-
-const map<string, int> INSTRUCTION_SIZE = {
-    { "istore",     1 + 2*sizeof(bool) + 2*sizeof(int) },
-    { "iadd",       1 + 3*sizeof(bool) + 3*sizeof(int) },
-    { "isub",       1 + 3*sizeof(bool) + 3*sizeof(int) },
-    { "imul",       1 + 3*sizeof(bool) + 3*sizeof(int) },
-    { "idiv",       1 + 3*sizeof(bool) + 3*sizeof(int) },
-    { "iinc",       1 + 1*sizeof(bool) + sizeof(int) },
-    { "idec",       1 + 1*sizeof(bool) + sizeof(int) },
-    { "ilt",        1 + 3*sizeof(bool) + 3*sizeof(int) },
-    { "ilte",       1 + 3*sizeof(bool) + 3*sizeof(int) },
-    { "igt",        1 + 3*sizeof(bool) + 3*sizeof(int) },
-    { "igte",       1 + 3*sizeof(bool) + 3*sizeof(int) },
-    { "ieq",        1 + 3*sizeof(bool) + 3*sizeof(int) },
-    { "bstore",     1 + 2*sizeof(bool) + sizeof(int) + sizeof(char) },
-    { "badd",       1 + 3*sizeof(bool) + 3*sizeof(int) },
-    { "bsub",       1 + 3*sizeof(bool) + 3*sizeof(int) },
-    { "binc",       1 + 1*sizeof(bool) + sizeof(int) },
-    { "bdec",       1 + 1*sizeof(bool) + sizeof(int) },
-    { "blt",        1 + 3*sizeof(bool) + 3*sizeof(int) },
-    { "blte",       1 + 3*sizeof(bool) + 3*sizeof(int) },
-    { "bgt",        1 + 3*sizeof(bool) + 3*sizeof(int) },
-    { "bgte",       1 + 3*sizeof(bool) + 3*sizeof(int) },
-    { "beq",        1 + 3*sizeof(bool) + sizeof(int) },
-    { "not",        1 + sizeof(bool) + sizeof(int) },
-    { "and",        1 + 3*sizeof(bool) + 3*sizeof(int) },
-    { "or",         1 + 3*sizeof(bool) + 3*sizeof(int) },
-    { "print",      1 + 1*sizeof(bool) + sizeof(int) },
-    { "echo",       1 + 1*sizeof(bool) + sizeof(int) },
-    { "jump",       1 + sizeof(int) },
-    { "branch",     1 + sizeof(bool) + 3*sizeof(int) },
-    { "ret",        1 + 1*sizeof(bool) + sizeof(int) },
-    { "end",        1 },
-    { "halt",       1 },
-    { "pass",       1 },
-};
 
 
 int_op getint_op(const string& s) {
@@ -103,7 +67,7 @@ uint16_t countBytes(const vector<string>& lines, const string& filename) {
 
         instr = str::chunk(line);
         try {
-            inc = INSTRUCTION_SIZE.at(instr);   // and get its size
+            inc = OP_SIZES.at(instr);
         } catch (const std::out_of_range &e) {
             cout << "fatal: unrecognised instruction: `" << instr << '`' << endl;
             cout << filename << ":" << i+1 << ": " << line << endl;
