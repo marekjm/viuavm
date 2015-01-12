@@ -145,6 +145,9 @@ int CPU::run() {
                 case OR:
                     instr_ptr = logor(instr_ptr+1);
                     break;
+                case COPY:
+                    instr_ptr = copy(instr_ptr+1);
+                    break;
                 case PRINT:
                     instr_ptr = print(instr_ptr+1);
                     break;

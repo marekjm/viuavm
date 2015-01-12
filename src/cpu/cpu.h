@@ -48,9 +48,17 @@ class CPU {
 
     byte* bstore(byte*);
 
+    byte* boolean(byte*);
     byte* lognot(byte*);
     byte* logand(byte*);
     byte* logor(byte*);
+
+    byte* move(byte*);
+    byte* copy(byte*);
+    byte* ref(byte*);
+    byte* swap(byte*);
+    byte* del(byte*);
+    byte* isnull(byte*);
 
     byte* print(byte*);
     byte* echo(byte*);

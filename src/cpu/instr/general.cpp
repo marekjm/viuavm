@@ -48,6 +48,62 @@ byte* CPU::print(byte* addr) {
     return addr;
 }
 
+
+byte* CPU::move(byte* addr) {
+    /** Run move instruction.
+     *  Move an object from one register into another.
+     */
+    return addr;
+}
+byte* CPU::copy(byte* addr) {
+    /** Run move instruction.
+     *  Copy an object from one register into another.
+     */
+    int a, b;
+    bool a_ref = false, b_ref = false;
+
+    a_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    a = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    b_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    b = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    if (debug) {
+        cout << "COPY";
+        cout << (a_ref ? " @" : " ") << a;
+        cout << (b_ref ? " @" : " ") << b;
+        cout << endl;
+    }
+
+    if (a_ref) {
+        a = static_cast<Integer*>(fetch(a))->value();
+    }
+    if (b_ref) {
+        b = static_cast<Integer*>(fetch(b))->value();
+    }
+
+    place(b, fetch(a)->copy());
+
+    return addr;
+}
+byte* CPU::ref(byte* addr) {
+    return addr;
+}
+byte* CPU::swap(byte* addr) {
+    return addr;
+}
+byte* CPU::del(byte* addr) {
+    return addr;
+}
+byte* CPU::isnull(byte* addr) {
+    return addr;
+}
+
+
 byte* CPU::jump(byte* addr) {
     /*  Run jump instruction.
      */
