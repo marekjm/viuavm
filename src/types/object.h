@@ -43,6 +43,10 @@ class Object {
             return false;
         }
 
+        virtual Object* copy() const = 0; /* {
+            return new Object();
+        }*/
+
         // We need to construct and desory our basic object.
         Object() {}
         virtual ~Object() {}

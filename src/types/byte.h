@@ -32,6 +32,10 @@ class Byte : public Object {
 
         char& value() { return byte_; }
 
+        Object* copy() const {
+            return new Byte(byte_);
+        }
+
         Byte(char b = 0): byte_(b) {}
 };
 

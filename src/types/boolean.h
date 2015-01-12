@@ -28,6 +28,10 @@ class Boolean : public Object {
 
         bool& value() { return b; }
 
+        Object* copy() const {
+            return new Boolean(b);
+        }
+
         Boolean(bool v = false): b(v) {}
 };
 

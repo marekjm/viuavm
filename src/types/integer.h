@@ -27,6 +27,10 @@ class Integer : public Object {
 
         int& value() { return number; }
 
+        Object* copy() const {
+            return new Integer(number);
+        }
+
         Integer(int n = 0): number(n) {}
 };
 
