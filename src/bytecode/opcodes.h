@@ -3,9 +3,10 @@
 
 #pragma once
 
+typedef unsigned char byte;
 
-enum OPCODE : unsigned int {
-    NOP,    // do nothing
+enum OPCODE : byte {
+    NOP = 0,    // do nothing
 
     ISTORE,
     IADD,

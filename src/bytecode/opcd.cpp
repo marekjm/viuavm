@@ -2,8 +2,8 @@
 #include <algorithm>
 #include <map>
 #include <string>
-#include "src/bytecode/opcodes.h"
-#include "src/bytecode/maps.h"
+#include "opcodes.h"
+#include "maps.h"
 using namespace std;
 
 int main() {
