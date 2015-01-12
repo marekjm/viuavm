@@ -59,7 +59,7 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "jump",   sizeof(byte) + sizeof(int) },
     { "branch", sizeof(byte) + sizeof(bool) + 3*sizeof(int) },
 
-    { "ret",    sizeof(byte) },
+    { "ret",    sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "end",    sizeof(byte) },
 
     { "pass",   sizeof(byte) },
