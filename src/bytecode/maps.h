@@ -1,9 +1,11 @@
+#ifndef WUDOO_BYTECODE_MAPS_H
+#define WUDOO_BYTECODE_MAPS_H
+
+#pragma once
+
 #include <map>
 #include <string>
 #include "opcodes.h"
-
-
-typedef char byte;
 
 
 const std::map<std::string, unsigned> OP_SIZES = {
@@ -122,3 +124,6 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { PASS,	    "pass" },
     { HALT,	    "halt" },
 };
+
+
+#endif
