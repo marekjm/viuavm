@@ -1,27 +1,40 @@
-bstore 1 33
-bstore 2 72
-bstore 3 101
-bstore 4 108
-bstore 5 111
-bstore 6 32
-bstore 7 87
-bstore 8 114
-bstore 9 100
+.name: 2 H
+.name: 3 e
+.name: 4 l
+.name: 5 o
+.name: 7 W
+.name: 8 r
+.name: 9 d
 
-echo 2
-echo 3
-echo 4
-echo 4
-echo 5
+; exclamation mark
+bstore 1 33
+
+bstore H 72
+bstore e 101
+bstore l 108
+bstore o 111
+
+; space
+bstore 6 32
+
+bstore W 87
+bstore r 114
+bstore d 100
+
+echo H
+echo e
+echo l
+echo l
+echo o
 
 echo 6
 
-echo 7
-echo 5
-echo 8
-echo 4
-echo 9
+echo W
+echo o
+echo r
+echo l
+echo d
 
-print 1
+print exclam
 
 halt
