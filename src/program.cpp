@@ -833,6 +833,42 @@ Program& Program::logor(int_op rega, int_op regb, int_op regr) {
     return (*this);
 }
 
+Program& Program::move(int_op a, int_op b) {
+    /*  Inserts move instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  a - register number (move from...)
+     *  b - register number (move to...)
+     */
+    ensurebytes(1 + 2*sizeof(bool) + 2*sizeof(int));
+
+
+    bool a_ref = false, b_ref = false;
+    int a_num, b_num;
+
+    tie(a_ref, a_num) = a;
+    tie(b_ref, b_num) = b;
+
+    program[addr_no++] = MOVE;
+    addr_ptr++;
+
+    *((bool*)addr_ptr) = a_ref;
+    pointer::inc<bool, byte>(addr_ptr);
+    *((int*)addr_ptr)  = a_num;
+    pointer::inc<int, byte>(addr_ptr);
+
+    *((bool*)addr_ptr) = b_ref;
+    pointer::inc<bool, byte>(addr_ptr);
+    *((int*)addr_ptr)  = b_num;
+    pointer::inc<int, byte>(addr_ptr);
+
+    addr_no += 2*sizeof(bool) + 2*sizeof(int);
+    addr_ptr = program+addr_no;
+
+    return (*this);
+}
+
 Program& Program::copy(int_op a, int_op b) {
     /*  Inserts copy instruction to bytecode.
      *
@@ -841,7 +877,7 @@ Program& Program::copy(int_op a, int_op b) {
      *  a - register number (copy from...)
      *  b - register number (copy to...)
      */
-    ensurebytes(1 + 2*sizeof(bool) + sizeof(int) + sizeof(byte));
+    ensurebytes(1 + 2*sizeof(bool) + 2*sizeof(int));
 
 
     bool a_ref = false, b_ref = false;
@@ -851,6 +887,42 @@ Program& Program::copy(int_op a, int_op b) {
     tie(b_ref, b_num) = b;
 
     program[addr_no++] = COPY;
+    addr_ptr++;
+
+    *((bool*)addr_ptr) = a_ref;
+    pointer::inc<bool, byte>(addr_ptr);
+    *((int*)addr_ptr)  = a_num;
+    pointer::inc<int, byte>(addr_ptr);
+
+    *((bool*)addr_ptr) = b_ref;
+    pointer::inc<bool, byte>(addr_ptr);
+    *((int*)addr_ptr)  = b_num;
+    pointer::inc<int, byte>(addr_ptr);
+
+    addr_no += 2*sizeof(bool) + 2*sizeof(int);
+    addr_ptr = program+addr_no;
+
+    return (*this);
+}
+
+Program& Program::ref(int_op a, int_op b) {
+    /*  Inserts ref instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  a - register number (copy from...)
+     *  b - register number (copy to...)
+     */
+    ensurebytes(1 + 2*sizeof(bool) + 2*sizeof(int));
+
+
+    bool a_ref = false, b_ref = false;
+    int a_num, b_num;
+
+    tie(a_ref, a_num) = a;
+    tie(b_ref, b_num) = b;
+
+    program[addr_no++] = REF;
     addr_ptr++;
 
     *((bool*)addr_ptr) = a_ref;

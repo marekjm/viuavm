@@ -452,12 +452,24 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             regb = resolveregister(regb, names);
             regr = resolveregister(regr, names);
             program.logor(getint_op(rega), getint_op(regb), getint_op(regr));
+        } else if (str::startswith(line, "move")) {
+            string a_chnk, b_chnk;
+            a_chnk = str::chunk(operands);
+            operands = str::sub(operands, a_chnk.size());
+            b_chnk = str::chunk(operands);
+            program.move(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "copy")) {
-            string regno_chnk, num_chnk;
-            regno_chnk = str::chunk(operands);
-            operands = str::sub(operands, regno_chnk.size());
-            num_chnk = str::chunk(operands);
-            program.copy(getint_op(resolveregister(regno_chnk, names)), getint_op(resolveregister(num_chnk, names)));
+            string a_chnk, b_chnk;
+            a_chnk = str::chunk(operands);
+            operands = str::sub(operands, a_chnk.size());
+            b_chnk = str::chunk(operands);
+            program.copy(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
+        } else if (str::startswith(line, "ref")) {
+            string a_chnk, b_chnk;
+            a_chnk = str::chunk(operands);
+            operands = str::sub(operands, a_chnk.size());
+            b_chnk = str::chunk(operands);
+            program.ref(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "print")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
