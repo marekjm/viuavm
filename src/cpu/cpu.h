@@ -4,22 +4,18 @@
 #pragma once
 
 #include <cstdint>
-#include "../bytecode.h"
+#include "../bytecode/bytetypedef.h"
 #include "../types/object.h"
-#include "../types/integer.h"
 
 
 const int DEFAULT_REGISTER_SIZE = 256;
-
-
-typedef char byte;
 
 
 class CPU {
     /*  Bytecode pointer is a pointer to program's code.
      *  Size and executable offset are metadata exported from bytecode dump.
      */
-    char* bytecode;
+    byte* bytecode;
     uint16_t bytecode_size;
     uint16_t executable_offset;
 
@@ -35,32 +31,32 @@ class CPU {
 
     /*  Methods implementing CPU instructions.
      */
-    char* istore(char*);
-    char* iadd(char*);
-    char* isub(char*);
-    char* imul(char*);
-    char* idiv(char*);
+    byte* istore(byte*);
+    byte* iadd(byte*);
+    byte* isub(byte*);
+    byte* imul(byte*);
+    byte* idiv(byte*);
 
-    char* ilt(char*);
-    char* ilte(char*);
-    char* igt(char*);
-    char* igte(char*);
-    char* ieq(char*);
+    byte* ilt(byte*);
+    byte* ilte(byte*);
+    byte* igt(byte*);
+    byte* igte(byte*);
+    byte* ieq(byte*);
 
-    char* iinc(char*);
-    char* idec(char*);
+    byte* iinc(byte*);
+    byte* idec(byte*);
 
-    char* bstore(char*);
+    byte* bstore(byte*);
 
-    char* lognot(char*);
-    char* logand(char*);
-    char* logor(char*);
+    byte* lognot(byte*);
+    byte* logand(byte*);
+    byte* logor(byte*);
 
-    char* print(char*);
-    char* echo(char*);
+    byte* print(byte*);
+    byte* echo(byte*);
 
-    char* jump(char*);
-    char* branch(char*);
+    byte* jump(byte*);
+    byte* branch(byte*);
 
     public:
         // debug flag
@@ -73,7 +69,7 @@ class CPU {
          *      * tell the CPU where to start execution,
          *      * kick the CPU so it starts running,
          */
-        CPU& load(char*);
+        CPU& load(byte*);
         CPU& bytes(uint16_t);
         CPU& eoffset(uint16_t);
         int run();

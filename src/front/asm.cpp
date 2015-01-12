@@ -12,9 +12,6 @@
 using namespace std;
 
 
-typedef char byte;
-
-
 bool DEBUG = false;
 
 
@@ -654,7 +651,7 @@ int main(int argc, char* argv[]) {
         ofstream out(compilename, ios::out | ios::binary);
         out.write((const char*)&bytes, 16);
         out.write((const char*)&starting_instruction, 16);
-        out.write(bytecode, bytes);
+        out.write((const char*)bytecode, bytes);
         out.close();
 
         delete[] bytecode;

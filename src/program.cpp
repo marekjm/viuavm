@@ -1,6 +1,9 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include "bytecode/bytetypedef.h"
+#include "bytecode/opcodes.h"
+#include "bytecode/maps.h"
 #include "support/pointer.h"
 #include "program.h"
 using namespace std;
@@ -247,14 +250,14 @@ Program& Program::istore(int_op regno, int_op i) {
     addr_ptr++;
 
     *((bool*)addr_ptr) = regno_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr)  = regno_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     *((bool*)addr_ptr) = i_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr)  = i_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     addr_no += 2*sizeof(bool) + 2*sizeof(int);
     addr_ptr = program+addr_no;
@@ -284,19 +287,19 @@ Program& Program::iadd(int_op rega, int_op regb, int_op regr) {
     addr_ptr++;
 
     *((bool*)addr_ptr) = rega_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr)  = rega_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     *((bool*)addr_ptr) = regb_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr)  = regb_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     *((bool*)addr_ptr) = regr_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr)  = regr_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     addr_no += 3*sizeof(bool) + 3*sizeof(int);
     addr_ptr = program+addr_no;
@@ -326,19 +329,19 @@ Program& Program::isub(int_op rega, int_op regb, int_op regr) {
     addr_ptr++;
 
     *((bool*)addr_ptr) = rega_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr)  = rega_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     *((bool*)addr_ptr) = regb_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr)  = regb_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     *((bool*)addr_ptr) = regr_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr)  = regr_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     addr_no += 3*sizeof(bool) + 3*sizeof(int);
     addr_ptr = program+addr_no;
@@ -368,19 +371,19 @@ Program& Program::imul(int_op rega, int_op regb, int_op regr) {
     addr_ptr++;
 
     *((bool*)addr_ptr) = rega_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr)  = rega_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     *((bool*)addr_ptr) = regb_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr)  = regb_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     *((bool*)addr_ptr) = regr_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr)  = regr_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     addr_no += 3*sizeof(bool) + 3*sizeof(int);
     addr_ptr = program+addr_no;
@@ -410,19 +413,19 @@ Program& Program::idiv(int_op rega, int_op regb, int_op regr) {
     addr_ptr++;
 
     *((bool*)addr_ptr) = rega_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr)  = rega_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     *((bool*)addr_ptr) = regb_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr)  = regb_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     *((bool*)addr_ptr) = regr_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr)  = regr_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     addr_no += 3*sizeof(bool) + 3*sizeof(int);
     addr_ptr = program+addr_no;
@@ -443,9 +446,9 @@ Program& Program::iinc(int_op regno) {
     program[addr_no++] = IINC;
     addr_ptr++;
     *((bool*)addr_ptr) = regno_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr)  = regno_num;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
 
     addr_no += sizeof(bool) + sizeof(int);
     addr_ptr = program+addr_no;
@@ -466,9 +469,9 @@ Program& Program::idec(int_op regno) {
     program[addr_no++] = IDEC;
     addr_ptr++;
     *((bool*)addr_ptr) = regno_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr)  = regno_num;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
 
     addr_no += sizeof(bool) + sizeof(int);
     addr_ptr = program+addr_no;
@@ -498,19 +501,19 @@ Program& Program::ilt(int_op rega, int_op regb, int_op regresult) {
     addr_ptr++;
 
     *((bool*)addr_ptr) = rega_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr) = rega_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     *((bool*)addr_ptr) = regb_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr) = regb_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     *((bool*)addr_ptr) = regresult_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr) = regresult_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     addr_no += 3*sizeof(bool) + 3*sizeof(int);
     addr_ptr = program+addr_no;
@@ -540,19 +543,19 @@ Program& Program::ilte(int_op rega, int_op regb, int_op regresult) {
     addr_ptr++;
 
     *((bool*)addr_ptr) = rega_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr) = rega_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     *((bool*)addr_ptr) = regb_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr) = regb_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     *((bool*)addr_ptr) = regresult_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr) = regresult_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     addr_no += 3*sizeof(bool) + 3*sizeof(int);
     addr_ptr = program+addr_no;
@@ -582,19 +585,19 @@ Program& Program::igt(int_op rega, int_op regb, int_op regresult) {
     addr_ptr++;
 
     *((bool*)addr_ptr) = rega_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr) = rega_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     *((bool*)addr_ptr) = regb_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr) = regb_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     *((bool*)addr_ptr) = regresult_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr) = regresult_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     addr_no += 3*sizeof(bool) + 3*sizeof(int);
     addr_ptr = program+addr_no;
@@ -624,19 +627,19 @@ Program& Program::igte(int_op rega, int_op regb, int_op regresult) {
     addr_ptr++;
 
     *((bool*)addr_ptr) = rega_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr) = rega_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     *((bool*)addr_ptr) = regb_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr) = regb_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     *((bool*)addr_ptr) = regresult_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr) = regresult_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     addr_no += 3*sizeof(bool) + 3*sizeof(int);
     addr_ptr = program+addr_no;
@@ -666,19 +669,19 @@ Program& Program::ieq(int_op rega, int_op regb, int_op regresult) {
     addr_ptr++;
 
     *((bool*)addr_ptr) = rega_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr) = rega_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     *((bool*)addr_ptr) = regb_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr) = regb_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     *((bool*)addr_ptr) = regresult_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr) = regresult_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     addr_no += 3*sizeof(bool) + 3*sizeof(int);
     addr_ptr = program+addr_no;
@@ -708,12 +711,12 @@ Program& Program::bstore(int_op regno, byte_op b) {
     addr_ptr++;
 
     *((bool*)addr_ptr) = regno_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr)  = regno_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     *((bool*)addr_ptr) = b_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((byte*)addr_ptr)  = bt;
     ++addr_ptr;
 
@@ -736,9 +739,9 @@ Program& Program::lognot(int_op reg) {
     program[addr_no++] = NOT;
     addr_ptr++;
     *((bool*)addr_ptr) = reg_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr)  = reg_num;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
 
     addr_no += sizeof(bool) + sizeof(int);
     addr_ptr = program+addr_no;
@@ -768,19 +771,19 @@ Program& Program::logand(int_op rega, int_op regb, int_op regr) {
     addr_ptr++;
 
     *((bool*)addr_ptr) = rega_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr) = rega_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     *((bool*)addr_ptr) = regb_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr) = regb_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     *((bool*)addr_ptr) = regr_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr) = regr_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     addr_no += 3*sizeof(bool) + 3*sizeof(int);
     addr_ptr = program+addr_no;
@@ -810,19 +813,19 @@ Program& Program::logor(int_op rega, int_op regb, int_op regr) {
     addr_ptr++;
 
     *((bool*)addr_ptr) = rega_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr) = rega_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     *((bool*)addr_ptr) = regb_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr) = regb_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     *((bool*)addr_ptr) = regr_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr) = regr_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     addr_no += 3*sizeof(bool) + 3*sizeof(int);
     addr_ptr = program+addr_no;
@@ -846,9 +849,9 @@ Program& Program::print(int_op regno) {
     program[addr_no++] = PRINT;
     addr_ptr++;
     *((bool*)addr_ptr) = regno_ref;
-    boolptr = (bool*)addr_ptr; boolptr++; addr_ptr = (char*)boolptr;
+    boolptr = (bool*)addr_ptr; boolptr++; addr_ptr = (byte*)boolptr;
     *((int*)addr_ptr)  = regno_num;
-    intptr = (int*)addr_ptr; intptr++; addr_ptr = (char*)intptr;
+    intptr = (int*)addr_ptr; intptr++; addr_ptr = (byte*)intptr;
 
     addr_no += sizeof(bool) + sizeof(int);
     addr_ptr = program+addr_no;
@@ -872,9 +875,9 @@ Program& Program::echo(int_op regno) {
     program[addr_no++] = ECHO;
     addr_ptr++;
     *((bool*)addr_ptr) = regno_ref;
-    boolptr = (bool*)addr_ptr; boolptr++; addr_ptr = (char*)boolptr;
+    boolptr = (bool*)addr_ptr; boolptr++; addr_ptr = (byte*)boolptr;
     *((int*)addr_ptr)  = regno_num;
-    intptr = (int*)addr_ptr; intptr++; addr_ptr = (char*)intptr;
+    intptr = (int*)addr_ptr; intptr++; addr_ptr = (byte*)intptr;
 
     addr_no += sizeof(bool) + sizeof(int);
     addr_ptr = program+addr_no;
@@ -899,7 +902,7 @@ Program& Program::jump(int addr) {
     addr_ptr++;
 
     *((int*)addr_ptr) = addr;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     addr_no += sizeof(int);
     addr_ptr = program+addr_no;
@@ -931,14 +934,14 @@ Program& Program::branch(int_op regc, int addr_truth, int addr_false) {
     addr_ptr++;
 
     *((bool*)addr_ptr) = regcond_ref;
-    pointer::inc<bool, char>(addr_ptr);
+    pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr) = regcond_num;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     *((int*)addr_ptr) = addr_truth;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
     *((int*)addr_ptr) = addr_false;
-    pointer::inc<int, char>(addr_ptr);
+    pointer::inc<int, byte>(addr_ptr);
 
     addr_no += sizeof(bool) + 3*sizeof(int);
     addr_ptr = program+addr_no;

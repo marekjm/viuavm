@@ -1,6 +1,5 @@
 #include <iostream>
-#include <vector>
-#include "../../bytecode.h"
+#include "../../bytecode/bytetypedef.h"
 #include "../../types/object.h"
 #include "../../types/integer.h"
 #include "../../types/boolean.h"
@@ -11,17 +10,17 @@
 using namespace std;
 
 
-char* CPU::lognot(char* addr) {
+byte* CPU::lognot(byte* addr) {
     /*  Run idec instruction.
      */
     bool ref = false;
     int regno;
 
     ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
 
     regno = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     if (debug) {
         cout << "NOT" << (ref ? " @" : " ") << regno;
@@ -41,26 +40,26 @@ char* CPU::lognot(char* addr) {
     return addr;
 }
 
-char* CPU::logand(char* addr) {
+byte* CPU::logand(byte* addr) {
     /*  Run ieq instruction.
      */
     bool rega_ref, regb_ref, regr_ref;
     int rega_num, regb_num, regr_num;
 
     rega_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     rega_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     regb_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     regb_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     regr_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     regr_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     if (debug) {
         cout << "AND";
@@ -88,26 +87,26 @@ char* CPU::logand(char* addr) {
     return addr;
 }
 
-char* CPU::logor(char* addr) {
+byte* CPU::logor(byte* addr) {
     /*  Run ieq instruction.
      */
     bool rega_ref, regb_ref, regr_ref;
     int rega_num, regb_num, regr_num;
 
     rega_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     rega_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     regb_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     regb_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     regr_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     regr_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     if (debug) {
         cout << "OR";

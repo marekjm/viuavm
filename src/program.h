@@ -1,12 +1,10 @@
-#ifndef TATANKA_PROGRAM_H
-#define TATANKA_PROGRAM_H
+#ifndef WUDOO_PROGRAM_H
+#define WUDOO_PROGRAM_H
 
 #include <string>
 #include <vector>
 #include <tuple>
-#include "bytecode.h"
-
-typedef char byte;
+#include "bytecode/bytetypedef.h"
 
 typedef std::tuple<bool, int> int_op;
 typedef std::tuple<bool, byte> byte_op;
@@ -75,7 +73,7 @@ class Program {
 
     Program(int bts = 2): bytes(bts), debug(false) {
         program = new byte[bytes];
-        for (int i = 0; i < bytes; ++i) { program[i] = PASS; }
+        for (int i = 0; i < bytes; ++i) { program[i] = byte(0); }
 
         addr_no = 0;
         addr_ptr = program+addr_no;

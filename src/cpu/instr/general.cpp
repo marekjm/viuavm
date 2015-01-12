@@ -1,6 +1,5 @@
 #include <iostream>
-#include <vector>
-#include "../../bytecode.h"
+#include "../../bytecode/bytetypedef.h"
 #include "../../types/object.h"
 #include "../../types/integer.h"
 #include "../../types/boolean.h"
@@ -10,17 +9,17 @@
 using namespace std;
 
 
-char* CPU::echo(char* addr) {
+byte* CPU::echo(byte* addr) {
     /*  Run echo instruction.
      */
     bool ref = false;
     int reg;
 
     ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
 
     reg = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     if (debug) {
         cout << "ECHO" << (ref ? " @" : " ") << reg;
@@ -38,7 +37,7 @@ char* CPU::echo(char* addr) {
     return addr;
 }
 
-char* CPU::print(char* addr) {
+byte* CPU::print(byte* addr) {
     /*  Run print instruction.
      */
     if (debug) {
@@ -49,20 +48,20 @@ char* CPU::print(char* addr) {
     return addr;
 }
 
-char* CPU::jump(char* addr) {
+byte* CPU::jump(byte* addr) {
     /*  Run jump instruction.
      */
     if (debug) {
         cout << "JUMP " << *(int*)addr << endl;
     }
-    char* target = bytecode+(*(int*)addr);
+    byte* target = bytecode+(*(int*)addr);
     if (target == addr) {
         throw "aborting: JUMP instruction pointing to itself";
     }
     return target;
 }
 
-char* CPU::branch(char* addr) {
+byte* CPU::branch(byte* addr) {
     /*  Run branch instruction.
      */
     bool regcond_ref;
@@ -70,16 +69,16 @@ char* CPU::branch(char* addr) {
 
 
     regcond_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
 
     regcond_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     int addr_true = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     int addr_false = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     if (debug) {
         cout << "BRANCH";

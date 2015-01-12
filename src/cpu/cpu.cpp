@@ -1,15 +1,16 @@
 #include <iostream>
 #include <vector>
+#include "../bytecode/bytetypedef.h"
+#include "../bytecode/opcodes.h"
+#include "../bytecode/maps.h"
 #include "../types/object.h"
 #include "../types/integer.h"
-#include "../types/boolean.h"
-#include "../types/byte.h"
 #include "../support/pointer.h"
 #include "cpu.h"
 using namespace std;
 
 
-CPU& CPU::load(char* bc) {
+CPU& CPU::load(byte* bc) {
     /*  Load bytecode into the CPU.
      *  CPU becomes owner of loaded bytecode - meaning it will consider itself responsible for proper
      *  destruction of it, so make sure you have a copy of the bytecode.

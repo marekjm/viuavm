@@ -6,13 +6,10 @@
 #include <vector>
 #include "../version.h"
 #include "../support/string.h"
-#include "../bytecode.h"
 #include "../cpu/cpu.h"
 #include "../program.h"
 using namespace std;
 
-
-typedef char byte;
 
 const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file which cannot be run on CPU without prior compilation";
 
@@ -81,7 +78,7 @@ int main(int argc, char* argv[]) {
         }
 
         byte* bytecode = new byte[bytes];
-        in.read(bytecode, bytes);
+        in.read((char*)bytecode, bytes);
 
         if (!in) {
             cout << "fatal: an error occued during bytecode loading: cannot read instructions" << endl;

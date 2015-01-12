@@ -1,6 +1,5 @@
 #include <iostream>
-#include <vector>
-#include "../../bytecode.h"
+#include "../../bytecode/bytetypedef.h"
 #include "../../types/object.h"
 #include "../../types/integer.h"
 #include "../../types/boolean.h"
@@ -10,21 +9,21 @@
 using namespace std;
 
 
-char* CPU::istore(char* addr) {
+byte* CPU::istore(byte* addr) {
     /*  Run istore instruction.
      */
     int reg, num;
     bool reg_ref = false, num_ref = false;
 
     reg_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     reg = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     num_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     if (debug) {
         cout << "ISTORE";
@@ -45,26 +44,26 @@ char* CPU::istore(char* addr) {
     return addr;
 }
 
-char* CPU::iadd(char* addr) {
+byte* CPU::iadd(byte* addr) {
     /*  Run iadd instruction.
      */
     bool rega_ref, regb_ref, regr_ref;
     int rega_num, regb_num, regr_num;
 
     rega_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     rega_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     regb_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     regb_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     regr_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     regr_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     if (debug) {
         cout << "IADD";
@@ -95,26 +94,26 @@ char* CPU::iadd(char* addr) {
     return addr;
 }
 
-char* CPU::isub(char* addr) {
+byte* CPU::isub(byte* addr) {
     /*  Run isub instruction.
      */
     bool rega_ref, regb_ref, regr_ref;
     int rega_num, regb_num, regr_num;
 
     rega_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     rega_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     regb_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     regb_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     regr_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     regr_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     if (debug) {
         cout << "ISUB";
@@ -145,26 +144,26 @@ char* CPU::isub(char* addr) {
     return addr;
 }
 
-char* CPU::imul(char* addr) {
+byte* CPU::imul(byte* addr) {
     /*  Run imul instruction.
      */
     bool rega_ref, regb_ref, regr_ref;
     int rega_num, regb_num, regr_num;
 
     rega_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     rega_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     regb_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     regb_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     regr_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     regr_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     if (debug) {
         cout << "IMUL";
@@ -195,26 +194,26 @@ char* CPU::imul(char* addr) {
     return addr;
 }
 
-char* CPU::idiv(char* addr) {
+byte* CPU::idiv(byte* addr) {
     /*  Run idiv instruction.
      */
     bool rega_ref, regb_ref, regr_ref;
     int rega_num, regb_num, regr_num;
 
     rega_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     rega_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     regb_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     regb_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     regr_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     regr_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     if (debug) {
         cout << "ISUB";
@@ -245,26 +244,26 @@ char* CPU::idiv(char* addr) {
     return addr;
 }
 
-char* CPU::ilt(char* addr) {
+byte* CPU::ilt(byte* addr) {
     /*  Run ilt instruction.
      */
     bool rega_ref, regb_ref, regr_ref;
     int rega_num, regb_num, regr_num;
 
     rega_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     rega_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     regb_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     regb_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     regr_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     regr_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     if (debug) {
         cout << "ILT";
@@ -295,26 +294,26 @@ char* CPU::ilt(char* addr) {
     return addr;
 }
 
-char* CPU::ilte(char* addr) {
+byte* CPU::ilte(byte* addr) {
     /*  Run ilte instruction.
      */
     bool rega_ref, regb_ref, regr_ref;
     int rega_num, regb_num, regr_num;
 
     rega_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     rega_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     regb_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     regb_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     regr_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     regr_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     if (debug) {
         cout << "ILTE";
@@ -345,26 +344,26 @@ char* CPU::ilte(char* addr) {
     return addr;
 }
 
-char* CPU::igt(char* addr) {
+byte* CPU::igt(byte* addr) {
     /*  Run igt instruction.
      */
     bool rega_ref, regb_ref, regr_ref;
     int rega_num, regb_num, regr_num;
 
     rega_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     rega_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     regb_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     regb_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     regr_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     regr_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     if (debug) {
         cout << "IGT";
@@ -395,26 +394,26 @@ char* CPU::igt(char* addr) {
     return addr;
 }
 
-char* CPU::igte(char* addr) {
+byte* CPU::igte(byte* addr) {
     /*  Run igte instruction.
      */
     bool rega_ref, regb_ref, regr_ref;
     int rega_num, regb_num, regr_num;
 
     rega_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     rega_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     regb_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     regb_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     regr_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     regr_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     if (debug) {
         cout << "IGTE";
@@ -445,26 +444,26 @@ char* CPU::igte(char* addr) {
     return addr;
 }
 
-char* CPU::ieq(char* addr) {
+byte* CPU::ieq(byte* addr) {
     /*  Run ieq instruction.
      */
     bool rega_ref, regb_ref, regr_ref;
     int rega_num, regb_num, regr_num;
 
     rega_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     rega_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     regb_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     regb_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     regr_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     regr_num = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     if (debug) {
         cout << "IEQ";
@@ -495,17 +494,17 @@ char* CPU::ieq(char* addr) {
     return addr;
 }
 
-char* CPU::iinc(char* addr) {
+byte* CPU::iinc(byte* addr) {
     /*  Run iinc instruction.
      */
     bool ref = false;
     int regno;
 
     ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
 
     regno = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     if (debug) {
         cout << "IINC" << (ref ? " @" : " ") << regno;
@@ -525,17 +524,17 @@ char* CPU::iinc(char* addr) {
     return addr;
 }
 
-char* CPU::idec(char* addr) {
+byte* CPU::idec(byte* addr) {
     /*  Run idec instruction.
      */
     bool ref = false;
     int regno;
 
     ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
 
     regno = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     if (debug) {
         cout << "IDEC" << (ref ? " @" : " ") << regno;

@@ -1,6 +1,5 @@
 #include <iostream>
-#include <vector>
-#include "../../bytecode.h"
+#include "../../bytecode/bytetypedef.h"
 #include "../../types/object.h"
 #include "../../types/integer.h"
 #include "../../types/boolean.h"
@@ -10,7 +9,7 @@
 using namespace std;
 
 
-char* CPU::bstore(char* addr) {
+byte* CPU::bstore(byte* addr) {
     /*  Run bstore instruction.
      */
     int reg;
@@ -18,12 +17,12 @@ char* CPU::bstore(char* addr) {
     byte bt;
 
     reg_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     reg = *((int*)addr);
-    pointer::inc<int, char>(addr);
+    pointer::inc<int, byte>(addr);
 
     byte_ref = *((bool*)addr);
-    pointer::inc<bool, char>(addr);
+    pointer::inc<bool, byte>(addr);
     bt = *((byte*)addr);
     ++addr;
 
@@ -31,7 +30,7 @@ char* CPU::bstore(char* addr) {
         cout << "BSTORE";
         cout << (reg_ref ? " @" : " ") << reg;
         cout << (byte_ref ? " @" : " ");
-        // this range is to display ASCII characters as their printable representations
+        // this range is to display ASCII byteacters as their printable representations
         if (bt >= 32 and bt <= 127) {
             cout << '"' << bt << '"';
         } else {
