@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include "../bytecode.h"
+#include "../bytecode/opcode.h"
 #include "../types/object.h"
 #include "../types/integer.h"
 #include "../types/boolean.h"

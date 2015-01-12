@@ -1,3 +1,8 @@
+
+* define `byte` as `unsigned char`,
+* update all files to use new `byte`,
+* update CPU to use new bytecode definition,
+* update assembler to use `bytecode/maps.h`,
+
 * in `bstore` instruction it is possible to refer to a byte (with the `@<int>` syntax) - however, its range is limited and allows only to refer to registers between 0 and 127,
 * comparison and logical instructions do not support short (two-operand) form,
-* define `byte` as `unsigned char`,
