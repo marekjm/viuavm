@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <map>
 #include <string>
+#include "bytetypedef.h"
 #include "opcodes.h"
 #include "maps.h"
 using namespace std;

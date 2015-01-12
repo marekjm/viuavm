@@ -3,7 +3,7 @@
 
 #pragma once
 
-typedef unsigned char byte;
+#include "bytetypedef.h"
 
 enum OPCODE : byte {
     NOP = 0,    // do nothing
