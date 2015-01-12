@@ -53,6 +53,36 @@ byte* CPU::move(byte* addr) {
     /** Run move instruction.
      *  Move an object from one register into another.
      */
+    int a, b;
+    bool a_ref = false, b_ref = false;
+
+    a_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    a = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    b_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    b = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    if (debug) {
+        cout << "COPY";
+        cout << (a_ref ? " @" : " ") << a;
+        cout << (b_ref ? " @" : " ") << b;
+        cout << endl;
+    }
+
+    if (a_ref) {
+        a = static_cast<Integer*>(fetch(a))->value();
+    }
+    if (b_ref) {
+        b = static_cast<Integer*>(fetch(b))->value();
+    }
+
+    registers[b] = registers[a];    // copy pointer from first-operand register to second-operand register
+    registers[a] = 0;               // zero first-operand register
+
     return addr;
 }
 byte* CPU::copy(byte* addr) {
@@ -91,6 +121,39 @@ byte* CPU::copy(byte* addr) {
     return addr;
 }
 byte* CPU::ref(byte* addr) {
+    /** Run ref instruction.
+     *  Create a reference (implementation detail: copy a pointer) of an object in one register in
+     *  another register.
+     */
+    int a, b;
+    bool a_ref = false, b_ref = false;
+
+    a_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    a = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    b_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    b = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    if (debug) {
+        cout << "COPY";
+        cout << (a_ref ? " @" : " ") << a;
+        cout << (b_ref ? " @" : " ") << b;
+        cout << endl;
+    }
+
+    if (a_ref) {
+        a = static_cast<Integer*>(fetch(a))->value();
+    }
+    if (b_ref) {
+        b = static_cast<Integer*>(fetch(b))->value();
+    }
+
+    registers[b] = registers[a];    // copy pointer
+
     return addr;
 }
 byte* CPU::swap(byte* addr) {

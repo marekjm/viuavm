@@ -145,8 +145,20 @@ int CPU::run() {
                 case OR:
                     instr_ptr = logor(instr_ptr+1);
                     break;
+                case MOVE:
+                    instr_ptr = move(instr_ptr+1);
+                    break;
                 case COPY:
                     instr_ptr = copy(instr_ptr+1);
+                    break;
+                case REF:
+                    instr_ptr = ref(instr_ptr+1);
+                    break;
+                case SWAP:
+                    instr_ptr = swap(instr_ptr+1);
+                    break;
+                case DELETE:
+                    instr_ptr = del(instr_ptr+1);
                     break;
                 case PRINT:
                     instr_ptr = print(instr_ptr+1);
