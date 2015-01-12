@@ -47,6 +47,9 @@ class Program {
     Program& logand     (int_op, int_op, int_op);
     Program& logor      (int_op, int_op, int_op);
 
+    Program& move       (int_op, int_op);
+    Program& copy       (int_op, int_op);
+
     Program& print      (int_op);
     Program& echo       (int_op);
 
