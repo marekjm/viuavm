@@ -12,7 +12,7 @@ WUDOO_CPU_INSTR_FILES_O=build/cpu/instr/general.o build/cpu/instr/int.o build/cp
 .PHONY: all
 
 
-all: ${VM_ASM} ${VM_RUN}
+all: ${VM_ASM} ${VM_RUN} bin/opcodes.bin
 
 
 clean: clean-support
@@ -30,6 +30,10 @@ ${VM_RUN}: src/bytecode.h src/front/run.cpp build/cpu/cpu.o build/support/pointe
 
 ${VM_ASM}: src/bytecode.h src/front/asm.cpp build/program.o build/support/string.o
 	${CXX} ${CXXFLAGS} -o ${VM_ASM} src/front/asm.cpp build/program.o build/support/string.o
+
+
+bin/opcodes.bin: src/bytecode/opcodes.h src/bytecode/maps.h src/bytecode/opcd.cpp
+	${CXX} ${CXXFLAGS} -o bin/opcodes.bin src/bytecode/opcd.cpp
 
 
 build/cpu/cpu.o: src/bytecode.h src/cpu/cpu.h src/cpu/cpu.cpp
