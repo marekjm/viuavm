@@ -338,7 +338,7 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             regb = str::chunk(operands);
             operands = str::sub(operands, regb.size());
 
-            regr = str::chunk(operands);
+            regr = (operands.size() ? str::chunk(operands) : rega);
 
             rega = resolveregister(rega, names);
             regb = resolveregister(regb, names);
@@ -353,7 +353,7 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             regb = str::chunk(operands);
             operands = str::sub(operands, regb.size());
 
-            regr = str::chunk(operands);
+            regr = (operands.size() ? str::chunk(operands) : rega);
 
             rega = resolveregister(rega, names);
             regb = resolveregister(regb, names);
@@ -368,7 +368,7 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             regb = str::chunk(operands);
             operands = str::sub(operands, regb.size());
 
-            regr = str::chunk(operands);
+            regr = (operands.size() ? str::chunk(operands) : rega);
 
             rega = resolveregister(rega, names);
             regb = resolveregister(regb, names);
@@ -383,7 +383,7 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             regb = str::chunk(operands);
             operands = str::sub(operands, regb.size());
 
-            regr = str::chunk(operands);
+            regr = (operands.size() ? str::chunk(operands) : rega);
 
             rega = resolveregister(rega, names);
             regb = resolveregister(regb, names);
@@ -398,7 +398,7 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             regb = str::chunk(operands);
             operands = str::sub(operands, regb.size());
 
-            regr = str::chunk(operands);
+            regr = (operands.size() ? str::chunk(operands) : rega);
 
             rega = resolveregister(rega, names);
             regb = resolveregister(regb, names);
@@ -431,7 +431,7 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             regb = str::chunk(operands);
             operands = str::sub(operands, regb.size());
 
-            regr = str::chunk(operands);
+            regr = (operands.size() ? str::chunk(operands) : rega);
 
             rega = resolveregister(rega, names);
             regb = resolveregister(regb, names);
@@ -446,7 +446,7 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             regb = str::chunk(operands);
             operands = str::sub(operands, regb.size());
 
-            regr = str::chunk(operands);
+            regr = (operands.size() ? str::chunk(operands) : rega);
 
             rega = resolveregister(rega, names);
             regb = resolveregister(regb, names);
