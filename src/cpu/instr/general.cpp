@@ -139,7 +139,7 @@ byte* CPU::ref(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << "COPY";
+        cout << "REF";
         cout << (a_ref ? " @" : " ") << a;
         cout << (b_ref ? " @" : " ") << b;
         cout << endl;
@@ -152,7 +152,7 @@ byte* CPU::ref(byte* addr) {
         b = static_cast<Integer*>(fetch(b))->value();
     }
 
-    registers[b] = registers[a];    // copy pointer
+    registers[a] = registers[b];    // copy pointer
 
     return addr;
 }
