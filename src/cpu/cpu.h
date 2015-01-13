@@ -89,6 +89,7 @@ class CPU {
              *  initializes it with zeroes.
              */
             registers = new Object*[reg_count];
+            references = new bool[reg_count];
             for (int i = 0; i < reg_count; ++i) {
                 registers[i] = 0;
                 references[i] = false;
