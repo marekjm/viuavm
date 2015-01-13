@@ -5,6 +5,7 @@
 #include "../bytecode/maps.h"
 #include "../types/object.h"
 #include "../types/integer.h"
+#include "../types/byte.h"
 #include "../support/pointer.h"
 #include "cpu.h"
 using namespace std;
@@ -58,18 +59,69 @@ Object* CPU::fetch(int index) {
     return optr;
 }
 
+
+template<class T> inline void copyvalue(Object* a, Object* b) {
+    /** This is a short inline, template function to copy value between two `Object` pointers of the same polymorphic type.
+     *  It is used internally by CPU.
+     */
+    static_cast<T>(a)->value() = static_cast<T>(b)->value();
+}
+
+void CPU::updaterefs(Object* before, Object* now) {
+    /** This method updates references to a given address present in registers.
+     *  It swaps old address for the new one in every register that points to the old address and
+     *  is marked as a reference.
+     */
+    for (int i = 0; i < reg_count; ++i) {
+        if (registers[i] == before and references[i]) {
+            if (debug) {
+                cout << "CPU: updating reference address in register " << i << hex << ": 0x" << (unsigned long)before << " -> 0x" << (unsigned long)now << dec << endl;
+            }
+            registers[i] = now;
+        }
+    }
+}
+
+bool CPU::hasrefs(int index) {
+    /** This method checks if object at a given address exists as a reference in another register.
+     */
+    bool has = false;
+    for (int i = 0; i < reg_count; ++i) {
+        if (i == index) continue;
+        if (registers[i] == registers[index]) {
+            has = true;
+            break;
+        }
+    }
+    return has;
+}
+
 void CPU::place(int index, Object* obj) {
     /** Place an object in register with given index.
      *
-     * Before placing an object in register, a check is preformed if the register is empty.
-     * If not - the `Object` previously stored in it is destroyed.
+     *  Before placing an object in register, a check is preformed if the register is empty.
+     *  If not - the `Object` previously stored in it is destroyed.
+     *
      */
     if (index >= reg_count) { throw "register access out of bounds: write"; }
-    if (registers[index] != 0) {
-        // register is not empty - the object in it must be destroyed to avoid memory leaks
+    if (registers[index] != 0 and !references[index]) {
+        // register is not empty and is not a reference - the object in it must be destroyed to avoid memory leaks
         delete registers[index];
     }
-    registers[index] = obj;
+    if (references[index]) {
+        Object* referenced = fetch(index);
+
+        // it is a reference, copy value of the object
+        if (referenced->type() == "Integer") { copyvalue<Integer*>(referenced, obj); }
+        else if (referenced->type() == "Byte") { copyvalue<Byte*>(referenced, obj); }
+
+        // and delete the newly created object to avoid leaks
+        delete obj;
+    } else {
+        Object* old_ref_ptr = (hasrefs(index) ? registers[index] : 0);
+        registers[index] = obj;
+        if (old_ref_ptr) { updaterefs(old_ref_ptr, obj); }
+    }
 }
 
 
