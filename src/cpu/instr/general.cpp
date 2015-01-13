@@ -152,8 +152,8 @@ byte* CPU::ref(byte* addr) {
         b = static_cast<Integer*>(fetch(b))->value();
     }
 
-    registers[a] = registers[b];    // copy pointer
-    references[a] = true;
+    registers[b] = registers[a];    // copy pointer
+    references[b] = true;
 
     return addr;
 }
