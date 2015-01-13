@@ -153,6 +153,7 @@ byte* CPU::ref(byte* addr) {
     }
 
     registers[a] = registers[b];    // copy pointer
+    references[a] = true;
 
     return addr;
 }
