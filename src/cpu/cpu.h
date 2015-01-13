@@ -27,6 +27,8 @@ class CPU {
 
     /*  Methods to deal with registers.
      */
+    void updaterefs(Object* before, Object* now);
+    bool hasrefs(int index);
     Object* fetch(int);
     void place(int, Object*);
 

@@ -5,6 +5,7 @@
 #include "../bytecode/maps.h"
 #include "../types/object.h"
 #include "../types/integer.h"
+#include "../types/byte.h"
 #include "../support/pointer.h"
 #include "cpu.h"
 using namespace std;
@@ -58,6 +59,43 @@ Object* CPU::fetch(int index) {
     return optr;
 }
 
+
+template<class T> inline void copyvalue(Object* a, Object* b) {
+    /** This is a short inline, template function to copy value between two `Object` pointers of the same polymorphic type.
+     *  It is used internally by CPU.
+     */
+    static_cast<T>(a)->value() = static_cast<T>(b)->value();
+}
+
+void CPU::updaterefs(Object* before, Object* now) {
+    /** This method updates references to a given address present in registers.
+     *  It swaps old address for the new one in every register that points to the old address and
+     *  is marked as a reference.
+     */
+    for (int i = 0; i < reg_count; ++i) {
+        if (registers[i] == before and references[i]) {
+            if (debug) {
+                cout << "CPU: updating reference address in register " << i << hex << ": 0x" << (unsigned long)before << " -> 0x" << (unsigned long)now << dec << endl;
+            }
+            registers[i] = now;
+        }
+    }
+}
+
+bool CPU::hasrefs(int index) {
+    /** This method checks if object at a given address exists as a reference in another register.
+     */
+    bool has = false;
+    for (int i = 0; i < reg_count; ++i) {
+        if (i == index) continue;
+        if (registers[i] == registers[index]) {
+            has = true;
+            break;
+        }
+    }
+    return has;
+}
+
 void CPU::place(int index, Object* obj) {
     /** Place an object in register with given index.
      *
@@ -71,12 +109,18 @@ void CPU::place(int index, Object* obj) {
         delete registers[index];
     }
     if (references[index]) {
-        // it is a reference, copy the object
-        *(registers[index]) = *obj;
-        // and delete newly created object to avoid leaks
+        Object* referenced = fetch(index);
+
+        // it is a reference, copy value of the object
+        if (referenced->type() == "Integer") { copyvalue<Integer*>(referenced, obj); }
+        else if (referenced->type() == "Byte") { copyvalue<Byte*>(referenced, obj); }
+
+        // and delete the newly created object to avoid leaks
         delete obj;
     } else {
+        Object* old_ref_ptr = (hasrefs(index) ? registers[index] : 0);
         registers[index] = obj;
+        if (old_ref_ptr) { updaterefs(old_ref_ptr, obj); }
     }
 }
 
