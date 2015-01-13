@@ -1,7 +1,2 @@
-
-* references work only in `iinc` and `idec` instructions,
-  must augment code for arithmetic so it does not always create new objects but reuses old ones where possible or
-  knows that it is a reference and updates all other objects,
-
 * in `bstore` instruction it is possible to refer to a byte (with the `@<int>` syntax) - however, its range is limited and allows only to refer to registers between 0 and 127,
 * comparison and logical instructions do not support short (two-operand) form,
