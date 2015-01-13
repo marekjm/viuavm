@@ -543,7 +543,7 @@ int main(int argc, char* argv[]) {
     int ret_code = 0;
 
     if (argc > 1 and args[1] == "--help") {
-        cout << "tatanka VM assembler, version " << VERSION << endl;
+        cout << "wudoo VM assembler, version " << VERSION << endl;
         cout << args[0] << " <infile> [<outfile>]" << endl;
         return 0;
     }

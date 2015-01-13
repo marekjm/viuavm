@@ -94,7 +94,7 @@ int main(int argc, char* argv[]) {
         cpu.debug = debug;
         ret_code = cpu.load(bytecode).bytes(bytes).eoffset(starting_instruction).run();
     } else {
-        cout << "tatanka VM, version " << VERSION << endl;
+        cout << "wudoo VM, version " << VERSION << endl;
         if (argc > 1 and args[1] == "--help") {
             cout << args[0] << " [--debug] <infile>         - to run a program" << endl;
             cout << args[0] << " [--help]                   - to display this message" << endl;
