@@ -22,6 +22,7 @@ class CPU {
     /*  Registers and their number stored.
      */
     Object** registers;
+    bool* references;
     int reg_count;
 
     /*  Methods to deal with registers.
@@ -82,13 +83,16 @@ class CPU {
         CPU& eoffset(uint16_t);
         int run();
 
-        CPU(int r = DEFAULT_REGISTER_SIZE): bytecode(0), bytecode_size(0), executable_offset(0), registers(0), reg_count(r), debug(false) {
+        CPU(int r = DEFAULT_REGISTER_SIZE): bytecode(0), bytecode_size(0), executable_offset(0), registers(0), references(0), reg_count(r), debug(false) {
             /*  Basic constructor.
              *  Creates registers array of requested size and
              *  initializes it with zeroes.
              */
             registers = new Object*[reg_count];
-            for (int i = 0; i < reg_count; ++i) { registers[i] = 0; }
+            for (int i = 0; i < reg_count; ++i) {
+                registers[i] = 0;
+                references[i] = false;
+            }
         }
 
         ~CPU() {
@@ -99,7 +103,7 @@ class CPU {
              *  after the CPU is finished.
              */
             for (int i = 0; i < reg_count; ++i) {
-                if (registers[i]) {
+                if (registers[i] and !references[i]) {
                     delete registers[i];
                 }
             }

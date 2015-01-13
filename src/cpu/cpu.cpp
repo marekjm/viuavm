@@ -61,15 +61,23 @@ Object* CPU::fetch(int index) {
 void CPU::place(int index, Object* obj) {
     /** Place an object in register with given index.
      *
-     * Before placing an object in register, a check is preformed if the register is empty.
-     * If not - the `Object` previously stored in it is destroyed.
+     *  Before placing an object in register, a check is preformed if the register is empty.
+     *  If not - the `Object` previously stored in it is destroyed.
+     *
      */
     if (index >= reg_count) { throw "register access out of bounds: write"; }
-    if (registers[index] != 0) {
-        // register is not empty - the object in it must be destroyed to avoid memory leaks
+    if (registers[index] != 0 and !references[index]) {
+        // register is not empty and is not a reference - the object in it must be destroyed to avoid memory leaks
         delete registers[index];
     }
-    registers[index] = obj;
+    if (references[index]) {
+        // it is a reference, copy the object
+        *(registers[index]) = *obj;
+        // and delete newly created object to avoid leaks
+        delete obj;
+    } else {
+        registers[index] = obj;
+    }
 }
 
 
