@@ -6,10 +6,12 @@ VM_RUN=bin/vm/run
 WUDOO_CPU_INSTR_FILES_CPP=src/cpu/instr/general.cpp src/cpu/instr/int.cpp src/cpu/instr/byte.cpp src/cpu/instr/bool.cpp
 WUDOO_CPU_INSTR_FILES_O=build/cpu/instr/general.o build/cpu/instr/int.o build/cpu/instr/byte.o build/cpu/instr/bool.o
 
+BIN_PATH=/usr/local/bin
+
 
 .SUFFIXES: .cpp .h .o
 
-.PHONY: all
+.PHONY: all install
 
 
 all: ${VM_ASM} ${VM_RUN} bin/opcodes.bin
@@ -23,6 +25,13 @@ clean: clean-support
 
 clean-support:
 	rm -v ./build/support/*.o
+
+install: ${VM_ASM} ${VM_RUN}
+	mkdir -p ${BIN_PATH}
+	cp ${VM_ASM} ${BIN_PATH}/wudoo-asm
+	chmod 755 ${BIN_PATH}/wudoo-asm
+	cp ${VM_RUN} ${BIN_PATH}/wudoo-run
+	chmod 755 ${BIN_PATH}/wudoo-run
 
 
 ${VM_RUN}: src/bytecode.h src/front/run.cpp build/cpu/cpu.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O}
