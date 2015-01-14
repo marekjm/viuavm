@@ -12,15 +12,6 @@ typedef std::tuple<bool, int> int_op;
 typedef std::tuple<bool, byte> byte_op;
 
 
-template<class T, class S> void inc(S*& p) {
-    /*  Increase pointer of type S, as if it were of type T.
-     */
-    T* ptr = (T*)p;
-    ptr++;
-    p = (S*)ptr;
-}
-
-
 byte* Program::bytecode() {
     /*  Returns pointer bo a copy of the bytecode.
      *  Each call produces new copy.
