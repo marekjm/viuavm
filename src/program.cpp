@@ -221,6 +221,61 @@ Program& Program::calculateBranches() {
 }
 
 
+byte* insertTwoIntegerOpsInstruction(byte* addr_ptr, enum OPCODE instruction, int_op a, int_op b) {
+    /** Insert instruction with two integer operands.
+     */
+    bool a_ref = false, b_ref = false;
+    int a_int, b_int;
+
+    tie(a_ref, a_int) = a;
+    tie(b_ref, b_int) = b;
+
+    *(addr_ptr++) = instruction;
+
+    *((bool*)addr_ptr) = a_ref;
+    pointer::inc<bool, byte>(addr_ptr);
+    *((int*)addr_ptr)  = a_int;
+    pointer::inc<int, byte>(addr_ptr);
+
+    *((bool*)addr_ptr) = b_ref;
+    pointer::inc<bool, byte>(addr_ptr);
+    *((int*)addr_ptr)  = b_int;
+    pointer::inc<int, byte>(addr_ptr);
+
+    return addr_ptr;
+}
+
+byte* insertThreeIntegerOpsInstruction(byte* addr_ptr, enum OPCODE instruction, int_op a, int_op b, int_op c) {
+    /** Insert instruction with two integer operands.
+     */
+    bool a_ref = false, b_ref = false, c_ref = false;
+    int a_int, b_int, c_int;
+
+    tie(a_ref, a_int) = a;
+    tie(b_ref, b_int) = b;
+    tie(c_ref, c_int) = b;
+
+    *(addr_ptr++) = instruction;
+
+    *((bool*)addr_ptr) = a_ref;
+    pointer::inc<bool, byte>(addr_ptr);
+    *((int*)addr_ptr)  = a_int;
+    pointer::inc<int, byte>(addr_ptr);
+
+    *((bool*)addr_ptr) = b_ref;
+    pointer::inc<bool, byte>(addr_ptr);
+    *((int*)addr_ptr)  = b_int;
+    pointer::inc<int, byte>(addr_ptr);
+
+    *((bool*)addr_ptr) = c_ref;
+    pointer::inc<bool, byte>(addr_ptr);
+    *((int*)addr_ptr)  = c_int;
+    pointer::inc<int, byte>(addr_ptr);
+
+    return addr_ptr;
+}
+
+
 Program& Program::istore(int_op regno, int_op i) {
     /*  Inserts istore instruction to bytecode.
      *
@@ -231,27 +286,8 @@ Program& Program::istore(int_op regno, int_op i) {
      */
     ensurebytes(1 + 2*sizeof(bool) + 2*sizeof(int));
 
-    bool regno_ref = false, i_ref = false;
-    int regno_num, i_num;
-
-    tie(regno_ref, regno_num) = regno;
-    tie(i_ref, i_num) = i;
-
-    program[addr_no++] = ISTORE;
-    addr_ptr++;
-
-    *((bool*)addr_ptr) = regno_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr)  = regno_num;
-    pointer::inc<int, byte>(addr_ptr);
-
-    *((bool*)addr_ptr) = i_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr)  = i_num;
-    pointer::inc<int, byte>(addr_ptr);
-
-    addr_no += 2*sizeof(bool) + 2*sizeof(int);
-    addr_ptr = program+addr_no;
+    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, ISTORE, regno, i);
+    addr_no += 1 + 2*sizeof(bool) + 2*sizeof(int);
 
     return (*this);
 }
@@ -267,33 +303,8 @@ Program& Program::iadd(int_op rega, int_op regb, int_op regr) {
      */
     ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
 
-    bool rega_ref = false, regb_ref = false, regr_ref = false;
-    int rega_num, regb_num, regr_num;
-
-    tie(rega_ref, rega_num) = rega;
-    tie(regb_ref, regb_num) = regb;
-    tie(regr_ref, regr_num) = regr;
-
-    program[addr_no++] = IADD;
-    addr_ptr++;
-
-    *((bool*)addr_ptr) = rega_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr)  = rega_num;
-    pointer::inc<int, byte>(addr_ptr);
-
-    *((bool*)addr_ptr) = regb_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr)  = regb_num;
-    pointer::inc<int, byte>(addr_ptr);
-
-    *((bool*)addr_ptr) = regr_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr)  = regr_num;
-    pointer::inc<int, byte>(addr_ptr);
-
-    addr_no += 3*sizeof(bool) + 3*sizeof(int);
-    addr_ptr = program+addr_no;
+    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, IADD, rega, regb, regr);
+    addr_no += 1 + 3*sizeof(bool) + 3*sizeof(int);
 
     return (*this);
 }
