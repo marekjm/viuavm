@@ -253,7 +253,7 @@ byte* insertThreeIntegerOpsInstruction(byte* addr_ptr, enum OPCODE instruction, 
 
     tie(a_ref, a_int) = a;
     tie(b_ref, b_int) = b;
-    tie(c_ref, c_int) = b;
+    tie(c_ref, c_int) = c;
 
     *(addr_ptr++) = instruction;
 

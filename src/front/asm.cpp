@@ -279,6 +279,7 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             rega_chnk = resolveregister(rega_chnk, names);
             regb_chnk = resolveregister(regb_chnk, names);
             regr_chnk = resolveregister(regr_chnk, names);
+
             // feed chunks into Bytecode Programming API
             program.iadd(getint_op(rega_chnk), getint_op(regb_chnk), getint_op(regr_chnk));
         } else if (str::startswith(line, "isub")) {
