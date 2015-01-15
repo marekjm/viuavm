@@ -8,6 +8,7 @@
 #include "program.h"
 using namespace std;
 
+
 typedef std::tuple<bool, int> int_op;
 typedef std::tuple<bool, byte> byte_op;
 
@@ -540,6 +541,7 @@ Program& Program::lognot(int_op reg) {
 
     program[addr_no++] = NOT;
     addr_ptr++;
+
     *((bool*)addr_ptr) = reg_ref;
     pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr)  = reg_num;
@@ -556,39 +558,14 @@ Program& Program::logand(int_op rega, int_op regb, int_op regr) {
      *
      *  :params:
      *
-     *  rega:int        - register index of first operand
-     *  regb:int        - register index of second operand
-     *  regr:int   - register index in which to store the result
+     *  rega   - register index of first operand
+     *  regb   - register index of second operand
+     *  regr   - register index in which to store the result
      */
     ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
 
-    bool rega_ref, regb_ref, regr_ref;
-    int  rega_num, regb_num, regr_num;
-
-    tie(rega_ref, rega_num) = rega;
-    tie(regb_ref, regb_num) = regb;
-    tie(regr_ref, regr_num) = regr;
-
-    program[addr_no++] = AND;
-    addr_ptr++;
-
-    *((bool*)addr_ptr) = rega_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr) = rega_num;
-    pointer::inc<int, byte>(addr_ptr);
-
-    *((bool*)addr_ptr) = regb_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr) = regb_num;
-    pointer::inc<int, byte>(addr_ptr);
-
-    *((bool*)addr_ptr) = regr_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr) = regr_num;
-    pointer::inc<int, byte>(addr_ptr);
-
-    addr_no += 3*sizeof(bool) + 3*sizeof(int);
-    addr_ptr = program+addr_no;
+    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, AND, rega, regb, regr);
+    addr_no += 1 + 3*sizeof(bool) + 3*sizeof(int);
 
     return (*this);
 }
@@ -598,39 +575,14 @@ Program& Program::logor(int_op rega, int_op regb, int_op regr) {
      *
      *  :params:
      *
-     *  rega:int        - register index of first operand
-     *  regb:int        - register index of second operand
-     *  regr:int   - register index in which to store the result
+     *  rega   - register index of first operand
+     *  regb   - register index of second operand
+     *  regr   - register index in which to store the result
      */
     ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
 
-    bool rega_ref, regb_ref, regr_ref;
-    int  rega_num, regb_num, regr_num;
-
-    tie(rega_ref, rega_num) = rega;
-    tie(regb_ref, regb_num) = regb;
-    tie(regr_ref, regr_num) = regr;
-
-    program[addr_no++] = OR;
-    addr_ptr++;
-
-    *((bool*)addr_ptr) = rega_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr) = rega_num;
-    pointer::inc<int, byte>(addr_ptr);
-
-    *((bool*)addr_ptr) = regb_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr) = regb_num;
-    pointer::inc<int, byte>(addr_ptr);
-
-    *((bool*)addr_ptr) = regr_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr) = regr_num;
-    pointer::inc<int, byte>(addr_ptr);
-
-    addr_no += 3*sizeof(bool) + 3*sizeof(int);
-    addr_ptr = program+addr_no;
+    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, OR, rega, regb, regr);
+    addr_no += 1 + 3*sizeof(bool) + 3*sizeof(int);
 
     return (*this);
 }
