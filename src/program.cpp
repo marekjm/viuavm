@@ -320,33 +320,8 @@ Program& Program::isub(int_op rega, int_op regb, int_op regr) {
      */
     ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
 
-    bool rega_ref = false, regb_ref = false, regr_ref = false;
-    int rega_num, regb_num, regr_num;
-
-    tie(rega_ref, rega_num) = rega;
-    tie(regb_ref, regb_num) = regb;
-    tie(regr_ref, regr_num) = regr;
-
-    program[addr_no++] = ISUB;
-    addr_ptr++;
-
-    *((bool*)addr_ptr) = rega_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr)  = rega_num;
-    pointer::inc<int, byte>(addr_ptr);
-
-    *((bool*)addr_ptr) = regb_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr)  = regb_num;
-    pointer::inc<int, byte>(addr_ptr);
-
-    *((bool*)addr_ptr) = regr_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr)  = regr_num;
-    pointer::inc<int, byte>(addr_ptr);
-
-    addr_no += 3*sizeof(bool) + 3*sizeof(int);
-    addr_ptr = program+addr_no;
+    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, ISUB, rega, regb, regr);
+    addr_no += 1 + 3*sizeof(bool) + 3*sizeof(int);
 
     return (*this);
 }
@@ -362,33 +337,8 @@ Program& Program::imul(int_op rega, int_op regb, int_op regr) {
      */
     ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
 
-    bool rega_ref = false, regb_ref = false, regr_ref = false;
-    int rega_num, regb_num, regr_num;
-
-    tie(rega_ref, rega_num) = rega;
-    tie(regb_ref, regb_num) = regb;
-    tie(regr_ref, regr_num) = regr;
-
-    program[addr_no++] = IMUL;
-    addr_ptr++;
-
-    *((bool*)addr_ptr) = rega_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr)  = rega_num;
-    pointer::inc<int, byte>(addr_ptr);
-
-    *((bool*)addr_ptr) = regb_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr)  = regb_num;
-    pointer::inc<int, byte>(addr_ptr);
-
-    *((bool*)addr_ptr) = regr_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr)  = regr_num;
-    pointer::inc<int, byte>(addr_ptr);
-
-    addr_no += 3*sizeof(bool) + 3*sizeof(int);
-    addr_ptr = program+addr_no;
+    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, IMUL, rega, regb, regr);
+    addr_no += 1 + 3*sizeof(bool) + 3*sizeof(int);
 
     return (*this);
 }
@@ -404,33 +354,8 @@ Program& Program::idiv(int_op rega, int_op regb, int_op regr) {
      */
     ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
 
-    bool rega_ref = false, regb_ref = false, regr_ref = false;
-    int rega_num, regb_num, regr_num;
-
-    tie(rega_ref, rega_num) = rega;
-    tie(regb_ref, regb_num) = regb;
-    tie(regr_ref, regr_num) = regr;
-
-    program[addr_no++] = IDIV;
-    addr_ptr++;
-
-    *((bool*)addr_ptr) = rega_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr)  = rega_num;
-    pointer::inc<int, byte>(addr_ptr);
-
-    *((bool*)addr_ptr) = regb_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr)  = regb_num;
-    pointer::inc<int, byte>(addr_ptr);
-
-    *((bool*)addr_ptr) = regr_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr)  = regr_num;
-    pointer::inc<int, byte>(addr_ptr);
-
-    addr_no += 3*sizeof(bool) + 3*sizeof(int);
-    addr_ptr = program+addr_no;
+    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, IDIV, rega, regb, regr);
+    addr_no += 1 + 3*sizeof(bool) + 3*sizeof(int);
 
     return (*this);
 }
