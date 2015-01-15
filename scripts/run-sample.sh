@@ -53,7 +53,7 @@ else
 fi
 
 if [[ $DEBUG_CPU == 1 ]]; then
-    bin/vm/run --debug bin/sample/`basename $1.bin`
+    bin/vm/cpu --debug bin/sample/`basename $1.bin`
 else
-    bin/vm/run bin/sample/`basename $1.bin`
+    bin/vm/cpu bin/sample/`basename $1.bin`
 fi

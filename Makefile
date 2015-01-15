@@ -1,7 +1,7 @@
 CXXFLAGS=-std=c++11 -Wall -pedantic -Wfatal-errors
 
 VM_ASM=bin/vm/asm
-VM_RUN=bin/vm/run
+VM_CPU=bin/vm/cpu
 
 WUDOO_CPU_INSTR_FILES_CPP=src/cpu/instr/general.cpp src/cpu/instr/int.cpp src/cpu/instr/byte.cpp src/cpu/instr/bool.cpp
 WUDOO_CPU_INSTR_FILES_O=build/cpu/instr/general.o build/cpu/instr/int.o build/cpu/instr/byte.o build/cpu/instr/bool.o
@@ -14,7 +14,7 @@ BIN_PATH=/usr/local/bin
 .PHONY: all install
 
 
-all: ${VM_ASM} ${VM_RUN} bin/opcodes.bin
+all: ${VM_ASM} ${VM_CPU} bin/opcodes.bin
 
 
 clean: clean-support
@@ -26,16 +26,16 @@ clean: clean-support
 clean-support:
 	rm -v ./build/support/*.o
 
-install: ${VM_ASM} ${VM_RUN}
+install: ${VM_ASM} ${VM_CPU}
 	mkdir -p ${BIN_PATH}
 	cp ${VM_ASM} ${BIN_PATH}/wudoo-asm
 	chmod 755 ${BIN_PATH}/wudoo-asm
-	cp ${VM_RUN} ${BIN_PATH}/wudoo-run
+	cp ${VM_CPU} ${BIN_PATH}/wudoo-run
 	chmod 755 ${BIN_PATH}/wudoo-run
 
 
-${VM_RUN}: src/bytecode.h src/front/run.cpp build/cpu/cpu.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O}
-	${CXX} ${CXXFLAGS} -o ${VM_RUN} src/front/run.cpp build/cpu/cpu.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O}
+${VM_CPU}: src/bytecode.h src/front/cpu.cpp build/cpu/cpu.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O}
+	${CXX} ${CXXFLAGS} -o ${VM_CPU} src/front/cpu.cpp build/cpu/cpu.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O}
 
 ${VM_ASM}: src/bytecode.h src/front/asm.cpp build/program.o build/support/string.o
 	${CXX} ${CXXFLAGS} -o ${VM_ASM} src/front/asm.cpp build/program.o build/support/string.o
