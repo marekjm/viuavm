@@ -22,8 +22,7 @@ byte* CPU::echo(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << "ECHO" << (ref ? " @" : " ") << reg;
-        cout << endl;
+        cout << (ref ? " @" : " ") << reg << endl;
     }
 
     if (ref) {
@@ -32,17 +31,12 @@ byte* CPU::echo(byte* addr) {
 
     cout << fetch(reg)->str();
 
-    if (debug) { cout << endl; }
-
     return addr;
 }
 
 byte* CPU::print(byte* addr) {
     /*  Run print instruction.
      */
-    if (debug) {
-        cout << "PRINT -> ";
-    }
     addr = echo(addr);
     cout << '\n';
     return addr;
@@ -67,10 +61,8 @@ byte* CPU::move(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << "COPY";
         cout << (a_ref ? " @" : " ") << a;
         cout << (b_ref ? " @" : " ") << b;
-        cout << endl;
     }
 
     if (a_ref) {
@@ -103,10 +95,8 @@ byte* CPU::copy(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << "COPY";
         cout << (a_ref ? " @" : " ") << a;
         cout << (b_ref ? " @" : " ") << b;
-        cout << endl;
     }
 
     if (a_ref) {
@@ -139,10 +129,8 @@ byte* CPU::ref(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << "REF";
         cout << (a_ref ? " @" : " ") << a;
         cout << (b_ref ? " @" : " ") << b;
-        cout << endl;
     }
 
     if (a_ref) {
@@ -172,7 +160,7 @@ byte* CPU::jump(byte* addr) {
     /*  Run jump instruction.
      */
     if (debug) {
-        cout << "JUMP " << *(int*)addr << endl;
+        cout << ' ' << *(int*)addr;
     }
     byte* target = bytecode+(*(int*)addr);
     if (target == addr) {
@@ -201,11 +189,9 @@ byte* CPU::branch(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << "BRANCH";
         cout << dec << (regcond_ref ? " @" : " ") << regcond_num;
         cout << " " << addr_true  << "::0x" << hex << (long)(bytecode+addr_true) << dec;
         cout << " " << addr_false << "::0x" << hex << (long)(bytecode+addr_false);
-        cout << endl;
     }
 
 

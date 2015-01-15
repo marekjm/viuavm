@@ -27,7 +27,6 @@ byte* CPU::bstore(byte* addr) {
     ++addr;
 
     if (debug) {
-        cout << "BSTORE";
         cout << (reg_ref ? " @" : " ") << reg;
         cout << (byte_ref ? " @" : " ");
         // this range is to display ASCII byteacters as their printable representations
@@ -36,7 +35,6 @@ byte* CPU::bstore(byte* addr) {
         } else {
             cout << (int)bt;
         }
-        cout << endl;
     }
 
     if (reg_ref) {

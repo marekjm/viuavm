@@ -23,7 +23,7 @@ byte* CPU::lognot(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << "NOT" << (ref ? " @" : " ") << regno;
+        cout << (ref ? " @" : " ") << regno;
     }
 
     if (ref) {
@@ -32,7 +32,6 @@ byte* CPU::lognot(byte* addr) {
 
     if (debug) {
         if (ref) { cout << " -> " << regno; }
-        cout << endl;
     }
 
     place(regno, new Boolean(not fetch(regno)->boolean()));
@@ -62,11 +61,9 @@ byte* CPU::logand(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << "AND";
         cout << (rega_ref ? " @" : " ") << rega_num;
         cout << (regb_ref ? " @" : " ") << regb_num;
         cout << (regr_ref ? " @" : " ") << regr_num;
-        cout << endl;
     }
 
     if (rega_ref) {
@@ -109,11 +106,9 @@ byte* CPU::logor(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << "OR";
         cout << (rega_ref ? " @" : " ") << rega_num;
         cout << (regb_ref ? " @" : " ") << regb_num;
         cout << (regr_ref ? " @" : " ") << regr_num;
-        cout << endl;
     }
 
     if (rega_ref) {
