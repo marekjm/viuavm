@@ -10,5 +10,7 @@
 bin/vm/*
 bin/sample/*
 
+tests/compiled/*
+
 !.gitkeep
 !.gitignore
