@@ -55,7 +55,11 @@ Object* CPU::fetch(int index) {
      */
     if (index >= reg_count) { throw "register access out of bounds: read"; }
     Object* optr = registers[index];
-    if (optr == 0) { throw "read from null register"; }
+    if (optr == 0) {
+        ostringstream oss;
+        oss << "read from null register: " << index;
+        throw oss.str().c_str();
+    }
     return optr;
 }
 
@@ -148,6 +152,7 @@ int CPU::run() {
         }
 
         try {
+            if (debug) { cout << OP_NAMES.at(OPCODE(*instr_ptr)); }
             switch (*instr_ptr) {
                 case ISTORE:
                     instr_ptr = istore(instr_ptr+1);
@@ -226,7 +231,6 @@ int CPU::run() {
                     break;
                     /*
                 case RET:
-                    if (debug) cout << "RET " << *(int*)(bytecode+addr+1) << endl;
                     if (fetchRegister(*((int*)(bytecode+addr+1)))->type() == "Integer") {
                         registers[0] = new Integer( static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value() );
                     } else {
@@ -236,11 +240,9 @@ int CPU::run() {
                     break;
                     */
                 case HALT:
-                    if (debug) cout << "HALT" << endl;
                     halt = true;
                     break;
                 case PASS:
-                    if (debug) cout << "PASS" << endl;
                     ++instr_ptr;
                     break;
                 default:
@@ -248,6 +250,7 @@ int CPU::run() {
                     error << "unrecognised instruction (bytecode value: " << *((int*)bytecode) << ")";
                     throw error.str().c_str();
             }
+            if (debug) { cout << endl; }
         } catch (const char* &e) {
             return_code = 1;
             cout << (debug ? "\n" : "") <<  "exception: " << e << endl;
