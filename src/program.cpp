@@ -489,11 +489,24 @@ Program& Program::ref(int_op a, int_op b) {
      *
      *  :params:
      *
-     *  a - register number (copy from...)
-     *  b - register number (copy to...)
+     *  a - register number
+     *  b - register number
      */
     ensurebytes(1 + 2*sizeof(bool) + 2*sizeof(int));
     addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, REF, a, b);
+    return (*this);
+}
+
+Program& Program::swap(int_op a, int_op b) {
+    /*  Inserts swap instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  a - register number
+     *  b - register number
+     */
+    ensurebytes(1 + 2*sizeof(bool) + 2*sizeof(int));
+    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, SWAP, a, b);
     return (*this);
 }
 

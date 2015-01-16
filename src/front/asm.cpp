@@ -471,6 +471,12 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             operands = str::sub(operands, a_chnk.size());
             b_chnk = str::chunk(operands);
             program.ref(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
+        } else if (str::startswith(line, "swap")) {
+            string a_chnk, b_chnk;
+            a_chnk = str::chunk(operands);
+            operands = str::sub(operands, a_chnk.size());
+            b_chnk = str::chunk(operands);
+            program.swap(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "print")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
