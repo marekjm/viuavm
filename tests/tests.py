@@ -45,7 +45,7 @@ def assemble(asm, out):
     output, error = p.communicate()
     exit_code = p.wait()
     if exit_code != 0:
-        raise WudooAssemblyError('{0}: {1}'.format(asm, output.decode('utf-8').strip()))
+        raise WudooAssemblerError('{0}: {1}'.format(asm, output.decode('utf-8').strip()))
 
 
 def run(path):
@@ -200,6 +200,15 @@ class RegisterManipulationInstructionsTests(unittest.TestCase):
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('1', output.strip())
+        self.assertEqual(0, excode)
+
+    def testSWAP(self):
+        name = 'swap.asm'
+        assembly_path = os.path.join(RegisterManipulationInstructionsTests.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual([1, 0], [int(i) for i in output.strip().splitlines()])
         self.assertEqual(0, excode)
 
 
