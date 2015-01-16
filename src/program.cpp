@@ -258,18 +258,8 @@ Program& Program::iinc(int_op regno) {
     /*  Inserts iinc instuction.
      */
     ensurebytes(1 + sizeof(bool) + sizeof(int));
-
-    bool regno_ref = false;
-    int regno_num;
-
-    tie(regno_ref, regno_num) = regno;
-
     *(addr_ptr++) = IINC;
-    *((bool*)addr_ptr) = regno_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr)  = regno_num;
-    pointer::inc<int, byte>(addr_ptr);
-
+    addr_ptr = insertIntegerOperand(addr_ptr, regno);
     return (*this);
 }
 
@@ -277,18 +267,8 @@ Program& Program::idec(int_op regno) {
     /*  Inserts idec instuction.
      */
     ensurebytes(1 + sizeof(bool) + sizeof(int));
-
-    bool regno_ref = false;
-    int regno_num;
-
-    tie(regno_ref, regno_num) = regno;
-
     *(addr_ptr++) = IDEC;
-    *((bool*)addr_ptr) = regno_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr)  = regno_num;
-    pointer::inc<int, byte>(addr_ptr);
-
+    addr_ptr = insertIntegerOperand(addr_ptr, regno);
     return (*this);
 }
 
