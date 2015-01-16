@@ -16,7 +16,6 @@ class Program {
     byte* addr_ptr;
 
     std::vector<byte*> branches;
-    std::vector<int> ifbranches;
 
     bool debug;
 
