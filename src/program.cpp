@@ -467,26 +467,7 @@ Program& Program::move(int_op a, int_op b) {
      *  b - register number (move to...)
      */
     ensurebytes(1 + 2*sizeof(bool) + 2*sizeof(int));
-
-
-    bool a_ref = false, b_ref = false;
-    int a_num, b_num;
-
-    tie(a_ref, a_num) = a;
-    tie(b_ref, b_num) = b;
-
-    *(addr_ptr++) = MOVE;
-
-    *((bool*)addr_ptr) = a_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr)  = a_num;
-    pointer::inc<int, byte>(addr_ptr);
-
-    *((bool*)addr_ptr) = b_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr)  = b_num;
-    pointer::inc<int, byte>(addr_ptr);
-
+    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, MOVE, a, b);
     return (*this);
 }
 
@@ -499,26 +480,7 @@ Program& Program::copy(int_op a, int_op b) {
      *  b - register number (copy to...)
      */
     ensurebytes(1 + 2*sizeof(bool) + 2*sizeof(int));
-
-
-    bool a_ref = false, b_ref = false;
-    int a_num, b_num;
-
-    tie(a_ref, a_num) = a;
-    tie(b_ref, b_num) = b;
-
-    *(addr_ptr++) = COPY;
-
-    *((bool*)addr_ptr) = a_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr)  = a_num;
-    pointer::inc<int, byte>(addr_ptr);
-
-    *((bool*)addr_ptr) = b_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr)  = b_num;
-    pointer::inc<int, byte>(addr_ptr);
-
+    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, COPY, a, b);
     return (*this);
 }
 
@@ -531,26 +493,7 @@ Program& Program::ref(int_op a, int_op b) {
      *  b - register number (copy to...)
      */
     ensurebytes(1 + 2*sizeof(bool) + 2*sizeof(int));
-
-
-    bool a_ref = false, b_ref = false;
-    int a_num, b_num;
-
-    tie(a_ref, a_num) = a;
-    tie(b_ref, b_num) = b;
-
-    *(addr_ptr++) = REF;
-
-    *((bool*)addr_ptr) = a_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr)  = a_num;
-    pointer::inc<int, byte>(addr_ptr);
-
-    *((bool*)addr_ptr) = b_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr)  = b_num;
-    pointer::inc<int, byte>(addr_ptr);
-
+    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, REF, a, b);
     return (*this);
 }
 
