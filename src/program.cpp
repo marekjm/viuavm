@@ -79,7 +79,7 @@ int Program::instructionCount() {
 void Program::ensurebytes(int bts) {
     /*  Ensure program has at least bts bytes after current address.
      */
-    if (bytes-addr_no < bts) {
+    if (bytes-((long)addr_ptr-(long)program) < bts) {
         throw "not enough bytes";
     }
 }
@@ -200,8 +200,8 @@ Program& Program::calculateBranches() {
     int instruction_count = instructionCount();
     int* ptr;
     for (unsigned i = 0; i < branches.size(); ++i) {
-        ptr = (int*)(program+branches[i]+1);
-        switch (*(program+branches[i])) {
+        ptr = (int*)(branches[i]+1);
+        switch (*(branches[i])) {
             case JUMP:
                 (*ptr) = getInstructionBytecodeOffset(*ptr, instruction_count);
                 break;
@@ -286,10 +286,7 @@ Program& Program::istore(int_op regno, int_op i) {
      *  i:int     - value to store
      */
     ensurebytes(1 + 2*sizeof(bool) + 2*sizeof(int));
-
     addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, ISTORE, regno, i);
-    addr_no += 1 + 2*sizeof(bool) + 2*sizeof(int);
-
     return (*this);
 }
 
@@ -303,10 +300,7 @@ Program& Program::iadd(int_op rega, int_op regb, int_op regr) {
      *  regr    - register index in which to store the result
      */
     ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
-
     addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, IADD, rega, regb, regr);
-    addr_no += 1 + 3*sizeof(bool) + 3*sizeof(int);
-
     return (*this);
 }
 
@@ -320,10 +314,7 @@ Program& Program::isub(int_op rega, int_op regb, int_op regr) {
      *  regr    - register index in which to store the result
      */
     ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
-
     addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, ISUB, rega, regb, regr);
-    addr_no += 1 + 3*sizeof(bool) + 3*sizeof(int);
-
     return (*this);
 }
 
@@ -337,10 +328,7 @@ Program& Program::imul(int_op rega, int_op regb, int_op regr) {
      *  regr    - register index in which to store the result
      */
     ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
-
     addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, IMUL, rega, regb, regr);
-    addr_no += 1 + 3*sizeof(bool) + 3*sizeof(int);
-
     return (*this);
 }
 
@@ -354,10 +342,7 @@ Program& Program::idiv(int_op rega, int_op regb, int_op regr) {
      *  regr    - register index in which to store the result
      */
     ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
-
     addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, IDIV, rega, regb, regr);
-    addr_no += 1 + 3*sizeof(bool) + 3*sizeof(int);
-
     return (*this);
 }
 
@@ -371,15 +356,11 @@ Program& Program::iinc(int_op regno) {
 
     tie(regno_ref, regno_num) = regno;
 
-    program[addr_no++] = IINC;
-    addr_ptr++;
+    *(addr_ptr++) = IINC;
     *((bool*)addr_ptr) = regno_ref;
     pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr)  = regno_num;
-    pointer::inc<bool, byte>(addr_ptr);
-
-    addr_no += sizeof(bool) + sizeof(int);
-    addr_ptr = program+addr_no;
+    pointer::inc<int, byte>(addr_ptr);
 
     return (*this);
 }
@@ -394,15 +375,11 @@ Program& Program::idec(int_op regno) {
 
     tie(regno_ref, regno_num) = regno;
 
-    program[addr_no++] = IDEC;
-    addr_ptr++;
+    *(addr_ptr++) = IDEC;
     *((bool*)addr_ptr) = regno_ref;
     pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr)  = regno_num;
-    pointer::inc<bool, byte>(addr_ptr);
-
-    addr_no += sizeof(bool) + sizeof(int);
-    addr_ptr = program+addr_no;
+    pointer::inc<int, byte>(addr_ptr);
 
     return (*this);
 }
@@ -417,10 +394,7 @@ Program& Program::ilt(int_op rega, int_op regb, int_op regr) {
      *  regr    - register index in which to store the result
      */
     ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
-
     addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, ILT, rega, regb, regr);
-    addr_no += 1 + 3*sizeof(bool) + 3*sizeof(int);
-
     return (*this);
 }
 
@@ -434,10 +408,7 @@ Program& Program::ilte(int_op rega, int_op regb, int_op regr) {
      *  regr    - register index in which to store the result
      */
     ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
-
     addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, ILTE, rega, regb, regr);
-    addr_no += 1 + 3*sizeof(bool) + 3*sizeof(int);
-
     return (*this);
 }
 
@@ -451,10 +422,7 @@ Program& Program::igt(int_op rega, int_op regb, int_op regr) {
      *  regr    - register index in which to store the result
      */
     ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
-
     addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, IGT, rega, regb, regr);
-    addr_no += 1 + 3*sizeof(bool) + 3*sizeof(int);
-
     return (*this);
 }
 
@@ -468,10 +436,7 @@ Program& Program::igte(int_op rega, int_op regb, int_op regr) {
      *  regr    - register index in which to store the result
      */
     ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
-
     addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, IGTE, rega, regb, regr);
-    addr_no += 1 + 3*sizeof(bool) + 3*sizeof(int);
-
     return (*this);
 }
 
@@ -485,10 +450,7 @@ Program& Program::ieq(int_op rega, int_op regb, int_op regr) {
      *  regr    - register index in which to store the result
      */
     ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
-
     addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, IEQ, rega, regb, regr);
-    addr_no += 1 + 3*sizeof(bool) + 3*sizeof(int);
-
     return (*this);
 }
 
@@ -510,8 +472,7 @@ Program& Program::bstore(int_op regno, byte_op b) {
     tie(regno_ref, regno_num) = regno;
     tie(b_ref, bt) = b;
 
-    program[addr_no++] = BSTORE;
-    addr_ptr++;
+    *(addr_ptr++) = BSTORE;
 
     *((bool*)addr_ptr) = regno_ref;
     pointer::inc<bool, byte>(addr_ptr);
@@ -522,9 +483,6 @@ Program& Program::bstore(int_op regno, byte_op b) {
     pointer::inc<bool, byte>(addr_ptr);
     *((byte*)addr_ptr)  = bt;
     ++addr_ptr;
-
-    addr_no += 2*sizeof(bool) + sizeof(int) + sizeof(byte);
-    addr_ptr = program+addr_no;
 
     return (*this);
 }
@@ -539,16 +497,12 @@ Program& Program::lognot(int_op reg) {
 
     tie(reg_ref, reg_num) = reg;
 
-    program[addr_no++] = NOT;
-    addr_ptr++;
+    *(addr_ptr++) = NOT;
 
     *((bool*)addr_ptr) = reg_ref;
     pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr)  = reg_num;
-    pointer::inc<bool, byte>(addr_ptr);
-
-    addr_no += sizeof(bool) + sizeof(int);
-    addr_ptr = program+addr_no;
+    pointer::inc<int, byte>(addr_ptr);
 
     return (*this);
 }
@@ -563,10 +517,7 @@ Program& Program::logand(int_op rega, int_op regb, int_op regr) {
      *  regr   - register index in which to store the result
      */
     ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
-
     addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, AND, rega, regb, regr);
-    addr_no += 1 + 3*sizeof(bool) + 3*sizeof(int);
-
     return (*this);
 }
 
@@ -580,10 +531,7 @@ Program& Program::logor(int_op rega, int_op regb, int_op regr) {
      *  regr   - register index in which to store the result
      */
     ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
-
     addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, OR, rega, regb, regr);
-    addr_no += 1 + 3*sizeof(bool) + 3*sizeof(int);
-
     return (*this);
 }
 
@@ -604,8 +552,7 @@ Program& Program::move(int_op a, int_op b) {
     tie(a_ref, a_num) = a;
     tie(b_ref, b_num) = b;
 
-    program[addr_no++] = MOVE;
-    addr_ptr++;
+    *(addr_ptr++) = MOVE;
 
     *((bool*)addr_ptr) = a_ref;
     pointer::inc<bool, byte>(addr_ptr);
@@ -616,9 +563,6 @@ Program& Program::move(int_op a, int_op b) {
     pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr)  = b_num;
     pointer::inc<int, byte>(addr_ptr);
-
-    addr_no += 2*sizeof(bool) + 2*sizeof(int);
-    addr_ptr = program+addr_no;
 
     return (*this);
 }
@@ -640,8 +584,7 @@ Program& Program::copy(int_op a, int_op b) {
     tie(a_ref, a_num) = a;
     tie(b_ref, b_num) = b;
 
-    program[addr_no++] = COPY;
-    addr_ptr++;
+    *(addr_ptr++) = COPY;
 
     *((bool*)addr_ptr) = a_ref;
     pointer::inc<bool, byte>(addr_ptr);
@@ -652,9 +595,6 @@ Program& Program::copy(int_op a, int_op b) {
     pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr)  = b_num;
     pointer::inc<int, byte>(addr_ptr);
-
-    addr_no += 2*sizeof(bool) + 2*sizeof(int);
-    addr_ptr = program+addr_no;
 
     return (*this);
 }
@@ -676,8 +616,7 @@ Program& Program::ref(int_op a, int_op b) {
     tie(a_ref, a_num) = a;
     tie(b_ref, b_num) = b;
 
-    program[addr_no++] = REF;
-    addr_ptr++;
+    *(addr_ptr++) = REF;
 
     *((bool*)addr_ptr) = a_ref;
     pointer::inc<bool, byte>(addr_ptr);
@@ -688,9 +627,6 @@ Program& Program::ref(int_op a, int_op b) {
     pointer::inc<bool, byte>(addr_ptr);
     *((int*)addr_ptr)  = b_num;
     pointer::inc<int, byte>(addr_ptr);
-
-    addr_no += 2*sizeof(bool) + 2*sizeof(int);
-    addr_ptr = program+addr_no;
 
     return (*this);
 }
@@ -708,15 +644,12 @@ Program& Program::print(int_op regno) {
 
     tie(regno_ref, regno_num) = regno;
 
-    program[addr_no++] = PRINT;
-    addr_ptr++;
+    *(addr_ptr++) = PRINT;
+
     *((bool*)addr_ptr) = regno_ref;
     boolptr = (bool*)addr_ptr; boolptr++; addr_ptr = (byte*)boolptr;
     *((int*)addr_ptr)  = regno_num;
     intptr = (int*)addr_ptr; intptr++; addr_ptr = (byte*)intptr;
-
-    addr_no += sizeof(bool) + sizeof(int);
-    addr_ptr = program+addr_no;
 
     return (*this);
 }
@@ -734,15 +667,12 @@ Program& Program::echo(int_op regno) {
 
     tie(regno_ref, regno_num) = regno;
 
-    program[addr_no++] = ECHO;
-    addr_ptr++;
+    *(addr_ptr++) = ECHO;
+
     *((bool*)addr_ptr) = regno_ref;
     boolptr = (bool*)addr_ptr; boolptr++; addr_ptr = (byte*)boolptr;
     *((int*)addr_ptr)  = regno_num;
     intptr = (int*)addr_ptr; intptr++; addr_ptr = (byte*)intptr;
-
-    addr_no += sizeof(bool) + sizeof(int);
-    addr_ptr = program+addr_no;
 
     return (*this);
 }
@@ -758,16 +688,12 @@ Program& Program::jump(int addr) {
     ensurebytes(1 + sizeof(int));
 
     // save branch instruction index for later evaluation
-    branches.push_back(addr_no);
+    branches.push_back(addr_ptr);
 
-    program[addr_no++] = JUMP;
-    addr_ptr++;
+    *(addr_ptr++) = JUMP;
 
     *((int*)addr_ptr) = addr;
     pointer::inc<int, byte>(addr_ptr);
-
-    addr_no += sizeof(int);
-    addr_ptr = program+addr_no;
 
     return (*this);
 }
@@ -785,15 +711,14 @@ Program& Program::branch(int_op regc, int addr_truth, int addr_false) {
     ensurebytes(1 + sizeof(bool) + 3*sizeof(int));
 
     // save branch instruction index for later evaluation
-    branches.push_back(addr_no);
+    branches.push_back(addr_ptr);
 
     bool regcond_ref;
     int regcond_num;
 
     tie(regcond_ref, regcond_num) = regc;
 
-    program[addr_no++] = BRANCH;
-    addr_ptr++;
+    *(addr_ptr++) = BRANCH;
 
     *((bool*)addr_ptr) = regcond_ref;
     pointer::inc<bool, byte>(addr_ptr);
@@ -804,9 +729,6 @@ Program& Program::branch(int_op regc, int addr_truth, int addr_false) {
     pointer::inc<int, byte>(addr_ptr);
     *((int*)addr_ptr) = addr_false;
     pointer::inc<int, byte>(addr_ptr);
-
-    addr_no += sizeof(bool) + 3*sizeof(int);
-    addr_ptr = program+addr_no;
 
     return (*this);
 }
@@ -821,11 +743,10 @@ Program& Program::ret(int regno) {
      */
     ensurebytes(1 + sizeof(int));
 
-    program[addr_no++] = RET;
-    addr_ptr++;
-    ((int*)addr_ptr)[0] = regno;
-    addr_no += sizeof(int);
-    addr_ptr = program+addr_no;
+    *(addr_ptr++) = RET;
+
+    *((int*)addr_ptr) = regno;
+    pointer::inc<int, byte>(addr_ptr);
 
     return (*this);
 }
@@ -835,8 +756,7 @@ Program& Program::pass() {
      */
     ensurebytes(1);
 
-    program[addr_no++] = PASS;
-    addr_ptr++;
+    *(addr_ptr++) = PASS;
 
     return (*this);
 }
@@ -846,8 +766,7 @@ Program& Program::halt() {
      */
     ensurebytes(1);
 
-    program[addr_no++] = HALT;
-    addr_ptr++;
+    *(addr_ptr++) = HALT;
 
     return (*this);
 }

@@ -13,10 +13,9 @@ class Program {
     byte* program;
     int bytes;
 
-    int addr_no;
     byte* addr_ptr;
 
-    std::vector<int> branches;
+    std::vector<byte*> branches;
     std::vector<int> ifbranches;
 
     bool debug;
@@ -77,10 +76,11 @@ class Program {
 
     Program(int bts = 2): bytes(bts), debug(false) {
         program = new byte[bytes];
+        /* Filling bytecode with zeroes (which are interpreted by CPU as NOP instructions) is a safe way
+         * to prevent many hiccups.
+         */
         for (int i = 0; i < bytes; ++i) { program[i] = byte(0); }
-
-        addr_no = 0;
-        addr_ptr = program+addr_no;
+        addr_ptr = program;
     }
     ~Program() {
         delete[] program;
