@@ -101,89 +101,12 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
          *
          *  Each time, the offset is increased by `inc` - which is equal to *1 plus size of operands of instructions at current index*.
          */
-        inc = 1;
-        if (debug) { cout << "increasing instruction offset (" << i+1 << '/' << (instr >= 0 ? instr : count+instr) << "): "; }
-        switch (program[offset]) {
-            case IADD:
-                if (debug) { cout << "iadd"; }
-                inc += 3*sizeof(bool) + 3*sizeof(int);
-                break;
-            case ISUB:
-                if (debug) { cout << "isub"; }
-                inc += 3*sizeof(bool) + 3*sizeof(int);
-                break;
-            case IMUL:
-                if (debug) { cout << "imul"; }
-                inc += 3*sizeof(bool) + 3*sizeof(int);
-                break;
-            case IDIV:
-                if (debug) { cout << "idiv"; }
-                inc += 3*sizeof(bool) + 3*sizeof(int);
-                break;
-            case ILT:
-                if (debug) { cout << "ilt"; }
-                inc += 3*sizeof(bool) + 3*sizeof(int);
-                break;
-            case ILTE:
-                if (debug) { cout << "ilte"; }
-                inc += 3*sizeof(bool) + 3*sizeof(int);
-                break;
-            case IGT:
-                if (debug) { cout << "igt"; }
-                inc += 3*sizeof(bool) + 3*sizeof(int);
-                break;
-            case IGTE:
-                if (debug) { cout << "igte"; }
-                inc += 3*sizeof(bool) + 3*sizeof(int);
-                break;
-            case IEQ:
-                if (debug) { cout << "ieq"; }
-                inc += 3*sizeof(bool) + 3*sizeof(int);
-                break;
-            case BRANCH:
-                if (debug) { cout << "branch"; }
-                inc += sizeof(bool) + 3*sizeof(int);
-                break;
-            case ISTORE:
-                if (debug) { cout << "istore"; }
-                inc += 2*sizeof(bool) + 2*sizeof(int);
-                break;
-            case IINC:
-                if (debug) { cout << "iinc"; }
-                inc += sizeof(bool) + sizeof(int);
-                break;
-            case IDEC:
-                if (debug) { cout << "idec"; }
-                inc += sizeof(bool) + sizeof(int);
-                break;
-            case NOT:
-                if (debug) { cout << "not"; }
-                inc += sizeof(bool) + sizeof(int);
-                break;
-            case AND:
-                if (debug) { cout << "and"; }
-                inc += 3*sizeof(bool) + 3*sizeof(int);
-                break;
-            case OR:
-                if (debug) { cout << "or"; }
-                inc += 3*sizeof(bool) + 3*sizeof(int);
-                break;
-            case PRINT:
-                if (debug) { cout << "print"; }
-                inc += sizeof(bool) + sizeof(int);
-                break;
-            case JUMP:
-                if (debug) { cout << "jump"; }
-                inc += sizeof(int);
-                break;
-            case RET:
-                if (debug) { cout << "ret"; }
-                inc += sizeof(bool) + sizeof(int);
-                break;
-        }
+        string opcode_name = OP_NAMES.at(OPCODE(program[offset]));
+        inc = OP_SIZES.at(opcode_name);
         if (debug) {
-            cout << ": " << inc;
-            cout << endl;
+            cout << "increasing instruction offset (" << i+1 << '/';
+            cout << (instr >= 0 ? instr : count+instr) << "): " << opcode_name;
+            cout << ": " << inc << endl;
         }
         offset += inc;
         if (offset+1 > bytes) {

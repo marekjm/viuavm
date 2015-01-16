@@ -26,6 +26,9 @@ clean: clean-support
 clean-support:
 	rm -v ./build/support/*.o
 
+clean-test-compiles:
+	rm -v ./tests/copmiled/*.bin
+
 install: ${VM_ASM} ${VM_CPU}
 	mkdir -p ${BIN_PATH}
 	cp ${VM_ASM} ${BIN_PATH}/wudoo-asm
