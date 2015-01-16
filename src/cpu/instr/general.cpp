@@ -146,6 +146,38 @@ byte* CPU::ref(byte* addr) {
     return addr;
 }
 byte* CPU::swap(byte* addr) {
+    /** Run swap instruction.
+     *  Swaps two objects in registers.
+     */
+    int a, b;
+    bool a_ref = false, b_ref = false;
+
+    a_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    a = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    b_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    b = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    if (debug) {
+        cout << (a_ref ? " @" : " ") << a;
+        cout << (b_ref ? " @" : " ") << b;
+    }
+
+    if (a_ref) {
+        a = static_cast<Integer*>(fetch(a))->value();
+    }
+    if (b_ref) {
+        b = static_cast<Integer*>(fetch(b))->value();
+    }
+
+    Object* tmp = registers[a];
+    registers[a] = registers[b];
+    registers[b] = tmp;
+
     return addr;
 }
 byte* CPU::del(byte* addr) {
