@@ -352,21 +352,13 @@ Program& Program::bstore(int_op regno, byte_op b) {
      */
     ensurebytes(1 + 2*sizeof(bool) + sizeof(int) + sizeof(byte));
 
-
-    bool regno_ref = false, b_ref = false;
-    int regno_num;
+    bool b_ref = false;
     byte bt;
 
-    tie(regno_ref, regno_num) = regno;
     tie(b_ref, bt) = b;
 
     *(addr_ptr++) = BSTORE;
-
-    *((bool*)addr_ptr) = regno_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr)  = regno_num;
-    pointer::inc<int, byte>(addr_ptr);
-
+    addr_ptr = insertIntegerOperand(addr_ptr, regno);
     *((bool*)addr_ptr) = b_ref;
     pointer::inc<bool, byte>(addr_ptr);
     *((byte*)addr_ptr)  = bt;
@@ -379,19 +371,8 @@ Program& Program::lognot(int_op reg) {
     /*  Inserts not instuction.
      */
     ensurebytes(1 + sizeof(bool) + sizeof(int));
-
-    bool reg_ref = false;
-    int reg_num;
-
-    tie(reg_ref, reg_num) = reg;
-
     *(addr_ptr++) = NOT;
-
-    *((bool*)addr_ptr) = reg_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr)  = reg_num;
-    pointer::inc<int, byte>(addr_ptr);
-
+    addr_ptr = insertIntegerOperand(addr_ptr, reg);
     return (*this);
 }
 
@@ -475,49 +456,21 @@ Program& Program::swap(int_op a, int_op b) {
     return (*this);
 }
 
-Program& Program::print(int_op regno) {
+Program& Program::print(int_op reg) {
     /*  Inserts print instuction.
      */
     ensurebytes(1 + sizeof(bool) + sizeof(int));
-
-    bool regno_ref = false;
-    int regno_num;
-
-    bool* boolptr = 0;
-    int* intptr = 0;
-
-    tie(regno_ref, regno_num) = regno;
-
     *(addr_ptr++) = PRINT;
-
-    *((bool*)addr_ptr) = regno_ref;
-    boolptr = (bool*)addr_ptr; boolptr++; addr_ptr = (byte*)boolptr;
-    *((int*)addr_ptr)  = regno_num;
-    intptr = (int*)addr_ptr; intptr++; addr_ptr = (byte*)intptr;
-
+    addr_ptr = insertIntegerOperand(addr_ptr, reg);
     return (*this);
 }
 
-Program& Program::echo(int_op regno) {
+Program& Program::echo(int_op reg) {
     /*  Inserts echo instuction.
      */
     ensurebytes(1 + sizeof(bool) + sizeof(int));
-
-    bool regno_ref = false;
-    int regno_num;
-
-    bool* boolptr = 0;
-    int* intptr = 0;
-
-    tie(regno_ref, regno_num) = regno;
-
     *(addr_ptr++) = ECHO;
-
-    *((bool*)addr_ptr) = regno_ref;
-    boolptr = (bool*)addr_ptr; boolptr++; addr_ptr = (byte*)boolptr;
-    *((int*)addr_ptr)  = regno_num;
-    intptr = (int*)addr_ptr; intptr++; addr_ptr = (byte*)intptr;
-
+    addr_ptr = insertIntegerOperand(addr_ptr, reg);
     return (*this);
 }
 
@@ -557,18 +510,8 @@ Program& Program::branch(int_op regc, int addr_truth, int addr_false) {
     // save branch instruction index for later evaluation
     branches.push_back(addr_ptr);
 
-    bool regcond_ref;
-    int regcond_num;
-
-    tie(regcond_ref, regcond_num) = regc;
-
     *(addr_ptr++) = BRANCH;
-
-    *((bool*)addr_ptr) = regcond_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr) = regcond_num;
-    pointer::inc<int, byte>(addr_ptr);
-
+    addr_ptr = insertIntegerOperand(addr_ptr, regc);
     *((int*)addr_ptr) = addr_truth;
     pointer::inc<int, byte>(addr_ptr);
     *((int*)addr_ptr) = addr_false;
@@ -586,12 +529,9 @@ Program& Program::ret(int regno) {
      *  regno:int   - index of the register which will be stored as return value
      */
     ensurebytes(1 + sizeof(int));
-
     *(addr_ptr++) = RET;
-
     *((int*)addr_ptr) = regno;
     pointer::inc<int, byte>(addr_ptr);
-
     return (*this);
 }
 
@@ -599,9 +539,7 @@ Program& Program::pass() {
     /*  Inserts pass instruction.
      */
     ensurebytes(1);
-
     *(addr_ptr++) = PASS;
-
     return (*this);
 }
 
@@ -609,8 +547,6 @@ Program& Program::halt() {
     /*  Inserts halt instruction.
      */
     ensurebytes(1);
-
     *(addr_ptr++) = HALT;
-
     return (*this);
 }
