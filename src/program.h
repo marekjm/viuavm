@@ -56,7 +56,7 @@ class Program {
     Program& jump       (int);
     Program& branch     (int_op, int, int);
 
-    Program& ret        (int);
+    Program& ret        (int_op);
     Program& end        ();
 
     Program& pass       ();

@@ -520,7 +520,7 @@ Program& Program::branch(int_op regc, int addr_truth, int addr_false) {
     return (*this);
 }
 
-Program& Program::ret(int regno) {
+Program& Program::ret(int_op reg) {
     /*  Inserts ret instruction. Parameter is instruction index.
      *  Byte offset is calculated automatically.
      *
@@ -528,10 +528,9 @@ Program& Program::ret(int regno) {
      *
      *  regno:int   - index of the register which will be stored as return value
      */
-    ensurebytes(1 + sizeof(int));
+    ensurebytes(1 + sizeof(bool) + sizeof(int));
     *(addr_ptr++) = RET;
-    *((int*)addr_ptr) = regno;
-    pointer::inc<int, byte>(addr_ptr);
+    addr_ptr = insertIntegerOperand(addr_ptr, reg);
     return (*this);
 }
 
