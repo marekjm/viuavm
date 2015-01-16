@@ -54,6 +54,8 @@ def run(path):
     p = subprocess.Popen(('./bin/vm/cpu', path), stdout=subprocess.PIPE)
     output, error = p.communicate()
     exit_code = p.wait()
+    if exit_code != 0:
+        raise WudooCPUError('{0}: {1}'.format(path, output.decode('utf-8').strip()))
     return (exit_code, output.decode('utf-8'))
 
 
