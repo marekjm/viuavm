@@ -63,6 +63,8 @@ class CPU {
     byte* del(byte*);
     byte* isnull(byte*);
 
+    byte* ret(byte*);
+
     byte* print(byte*);
     byte* echo(byte*);
 

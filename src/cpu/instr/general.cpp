@@ -188,6 +188,36 @@ byte* CPU::isnull(byte* addr) {
 }
 
 
+byte* CPU::ret(byte* addr) {
+    /*  Run iinc instruction.
+     */
+    bool ref = false;
+    int regno;
+
+    ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+
+    regno = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    if (debug) {
+        cout << (ref ? " @" : " ") << regno;
+    }
+
+    if (ref) {
+        regno = static_cast<Integer*>(fetch(regno))->value();
+    }
+
+    if (debug) {
+        if (ref) { cout << " -> " << regno; }
+    }
+
+    place(0, new Integer(static_cast<Integer*>(fetch(regno))->value()));
+
+    return addr;
+}
+
+
 byte* CPU::jump(byte* addr) {
     /*  Run jump instruction.
      */
