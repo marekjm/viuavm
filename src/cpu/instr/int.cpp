@@ -26,10 +26,8 @@ byte* CPU::istore(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << "ISTORE";
         cout << (reg_ref ? " @" : " ") << reg;
         cout << (num_ref ? " @" : " ") << num;
-        cout << endl;
     }
 
     if (reg_ref) {
@@ -66,11 +64,9 @@ byte* CPU::iadd(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << "IADD";
         cout << (rega_ref ? " @" : " ") << rega_num;
         cout << (regb_ref ? " @" : " ") << regb_num;
         cout << (regr_ref ? " @" : " ") << regr_num;
-        cout << endl;
     }
 
     if (rega_ref) {
@@ -116,11 +112,9 @@ byte* CPU::isub(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << "ISUB";
         cout << (rega_ref ? " @" : " ") << rega_num;
         cout << (regb_ref ? " @" : " ") << regb_num;
         cout << (regr_ref ? " @" : " ") << regr_num;
-        cout << endl;
     }
 
     if (rega_ref) {
@@ -166,11 +160,9 @@ byte* CPU::imul(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << "IMUL";
         cout << (rega_ref ? " @" : " ") << rega_num;
         cout << (regb_ref ? " @" : " ") << regb_num;
         cout << (regr_ref ? " @" : " ") << regr_num;
-        cout << endl;
     }
 
     if (rega_ref) {
@@ -216,11 +208,9 @@ byte* CPU::idiv(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << "ISUB";
         cout << (rega_ref ? " @" : " ") << rega_num;
         cout << (regb_ref ? " @" : " ") << regb_num;
         cout << (regr_ref ? " @" : " ") << regr_num;
-        cout << endl;
     }
 
     if (rega_ref) {
@@ -266,11 +256,9 @@ byte* CPU::ilt(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << "ILT";
         cout << (rega_ref ? " @" : " ") << rega_num;
         cout << (regb_ref ? " @" : " ") << regb_num;
         cout << (regr_ref ? " @" : " ") << regr_num;
-        cout << endl;
     }
 
     if (rega_ref) {
@@ -316,11 +304,9 @@ byte* CPU::ilte(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << "ILTE";
         cout << (rega_ref ? " @" : " ") << rega_num;
         cout << (regb_ref ? " @" : " ") << regb_num;
         cout << (regr_ref ? " @" : " ") << regr_num;
-        cout << endl;
     }
 
     if (rega_ref) {
@@ -366,11 +352,9 @@ byte* CPU::igt(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << "IGT";
         cout << (rega_ref ? " @" : " ") << rega_num;
         cout << (regb_ref ? " @" : " ") << regb_num;
         cout << (regr_ref ? " @" : " ") << regr_num;
-        cout << endl;
     }
 
     if (rega_ref) {
@@ -416,11 +400,9 @@ byte* CPU::igte(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << "IGTE";
         cout << (rega_ref ? " @" : " ") << rega_num;
         cout << (regb_ref ? " @" : " ") << regb_num;
         cout << (regr_ref ? " @" : " ") << regr_num;
-        cout << endl;
     }
 
     if (rega_ref) {
@@ -466,11 +448,9 @@ byte* CPU::ieq(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << "IEQ";
         cout << (rega_ref ? " @" : " ") << rega_num;
         cout << (regb_ref ? " @" : " ") << regb_num;
         cout << (regr_ref ? " @" : " ") << regr_num;
-        cout << endl;
     }
 
     if (rega_ref) {
@@ -507,7 +487,7 @@ byte* CPU::iinc(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << "IINC" << (ref ? " @" : " ") << regno;
+        cout << (ref ? " @" : " ") << regno;
     }
 
     if (ref) {
@@ -516,7 +496,6 @@ byte* CPU::iinc(byte* addr) {
 
     if (debug) {
         if (ref) { cout << " -> " << regno; }
-        cout << endl;
     }
 
     ++(static_cast<Integer*>(fetch(regno))->value());
@@ -537,7 +516,7 @@ byte* CPU::idec(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << "IDEC" << (ref ? " @" : " ") << regno;
+        cout << (ref ? " @" : " ") << regno;
     }
 
     if (ref) {
@@ -546,7 +525,6 @@ byte* CPU::idec(byte* addr) {
 
     if (debug) {
         if (ref) { cout << " -> " << regno; }
-        cout << endl;
     }
 
     --(static_cast<Integer*>(fetch(regno))->value());

@@ -13,11 +13,9 @@ class Program {
     byte* program;
     int bytes;
 
-    int addr_no;
     byte* addr_ptr;
 
-    std::vector<int> branches;
-    std::vector<int> ifbranches;
+    std::vector<byte*> branches;
 
     bool debug;
 
@@ -50,6 +48,7 @@ class Program {
     Program& move       (int_op, int_op);
     Program& copy       (int_op, int_op);
     Program& ref        (int_op, int_op);
+    Program& swap       (int_op, int_op);
 
     Program& print      (int_op);
     Program& echo       (int_op);
@@ -57,7 +56,7 @@ class Program {
     Program& jump       (int);
     Program& branch     (int_op, int, int);
 
-    Program& ret        (int);
+    Program& ret        (int_op);
     Program& end        ();
 
     Program& pass       ();
@@ -77,10 +76,11 @@ class Program {
 
     Program(int bts = 2): bytes(bts), debug(false) {
         program = new byte[bytes];
+        /* Filling bytecode with zeroes (which are interpreted by CPU as NOP instructions) is a safe way
+         * to prevent many hiccups.
+         */
         for (int i = 0; i < bytes; ++i) { program[i] = byte(0); }
-
-        addr_no = 0;
-        addr_ptr = program+addr_no;
+        addr_ptr = program;
     }
     ~Program() {
         delete[] program;

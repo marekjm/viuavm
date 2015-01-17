@@ -11,7 +11,7 @@ BIN_PATH=/usr/local/bin
 
 .SUFFIXES: .cpp .h .o
 
-.PHONY: all install
+.PHONY: all install test
 
 
 all: ${VM_ASM} ${VM_CPU} bin/opcodes.bin
@@ -26,12 +26,19 @@ clean: clean-support
 clean-support:
 	rm -v ./build/support/*.o
 
+clean-test-compiles:
+	rm -v ./tests/compiled/*.bin
+
 install: ${VM_ASM} ${VM_CPU}
 	mkdir -p ${BIN_PATH}
 	cp ${VM_ASM} ${BIN_PATH}/wudoo-asm
 	chmod 755 ${BIN_PATH}/wudoo-asm
 	cp ${VM_CPU} ${BIN_PATH}/wudoo-run
 	chmod 755 ${BIN_PATH}/wudoo-run
+
+
+test: ${VM_CPU} ${VM_ASM}
+	python3 ./tests/tests.py --verbose --catch --failfast
 
 
 ${VM_CPU}: src/bytecode.h src/front/cpu.cpp build/cpu/cpu.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O}

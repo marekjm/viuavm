@@ -279,6 +279,7 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             rega_chnk = resolveregister(rega_chnk, names);
             regb_chnk = resolveregister(regb_chnk, names);
             regr_chnk = resolveregister(regr_chnk, names);
+
             // feed chunks into Bytecode Programming API
             program.iadd(getint_op(rega_chnk), getint_op(regb_chnk), getint_op(regr_chnk));
         } else if (str::startswith(line, "isub")) {
@@ -470,6 +471,16 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             operands = str::sub(operands, a_chnk.size());
             b_chnk = str::chunk(operands);
             program.ref(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
+        } else if (str::startswith(line, "swap")) {
+            string a_chnk, b_chnk;
+            a_chnk = str::chunk(operands);
+            operands = str::sub(operands, a_chnk.size());
+            b_chnk = str::chunk(operands);
+            program.swap(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
+        } else if (str::startswith(line, "ret")) {
+            string regno_chnk;
+            regno_chnk = str::chunk(operands);
+            program.ret(getint_op(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "print")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
