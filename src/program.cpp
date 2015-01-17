@@ -526,7 +526,7 @@ Program& Program::ret(int_op reg) {
      *
      *  :params:
      *
-     *  regno:int   - index of the register which will be stored as return value
+     *  reg - index of the register which will be stored as return value
      */
     ensurebytes(1 + sizeof(bool) + sizeof(int));
     *(addr_ptr++) = RET;
