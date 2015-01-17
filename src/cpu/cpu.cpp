@@ -229,16 +229,9 @@ int CPU::run() {
                 case BRANCH:
                     instr_ptr = branch(instr_ptr+1);
                     break;
-                    /*
                 case RET:
-                    if (fetchRegister(*((int*)(bytecode+addr+1)))->type() == "Integer") {
-                        registers[0] = new Integer( static_cast<Integer*>( fetchRegister( ((int*)(bytecode+addr+1))[0] ) )->value() );
-                    } else {
-                        throw ("invalid return value: must be Integer but was: " + fetchRegister(*((int*)(bytecode+addr+1)))->str());
-                    }
-                    addr += sizeof(int);
+                    instr_ptr = ret(instr_ptr+1);
                     break;
-                    */
                 case HALT:
                     halt = true;
                     break;

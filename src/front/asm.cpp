@@ -389,6 +389,10 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = get2operands(operands);
             program.swap(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
+        } else if (str::startswith(line, "ret")) {
+            string regno_chnk;
+            regno_chnk = str::chunk(operands);
+            program.ret(getint_op(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "print")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);

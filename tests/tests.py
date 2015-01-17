@@ -47,14 +47,13 @@ def assemble(asm, out):
     if exit_code != 0:
         raise WudooAssemblerError('{0}: {1}'.format(asm, output.decode('utf-8').strip()))
 
-
-def run(path):
+def run(path, expected_exit_code=0):
     """Run given file with Wudoo CPU and return its output.
     """
     p = subprocess.Popen(('./bin/vm/cpu', path), stdout=subprocess.PIPE)
     output, error = p.communicate()
     exit_code = p.wait()
-    if exit_code != 0:
+    if exit_code not in (expected_exit_code if type(expected_exit_code) in [list, tuple] else (expected_exit_code,)):
         raise WudooCPUError('{0}: {1}'.format(path, output.decode('utf-8').strip()))
     return (exit_code, output.decode('utf-8'))
 
@@ -210,6 +209,15 @@ class RegisterManipulationInstructionsTests(unittest.TestCase):
         excode, output = run(compiled_path)
         self.assertEqual([1, 0], [int(i) for i in output.strip().splitlines()])
         self.assertEqual(0, excode)
+
+    def testRET(self):
+        name = 'ret.asm'
+        assembly_path = os.path.join(RegisterManipulationInstructionsTests.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path, (4,))
+        self.assertEqual('', output.strip())
+        self.assertEqual(4, excode)
 
 
 class SampleProgramsTests(unittest.TestCase):
