@@ -162,6 +162,15 @@ class IntegerInstructionsTests(unittest.TestCase):
         self.assertEqual('true', output.strip())
         self.assertEqual(0, excode)
 
+    def testCalculatingModulo(self):
+        name = 'modulo.asm'
+        assembly_path = os.path.join(IntegerInstructionsTests.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual('65', output.strip())
+        self.assertEqual(0, excode)
+
 
 class ByteInstructionsTests(unittest.TestCase):
     """Tests for byte instructions.
