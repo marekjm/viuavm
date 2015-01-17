@@ -235,6 +235,48 @@ tuple<string, string, string> get3operands(string s, bool fill_third = true) {
 }
 
 
+/*  This is a mapping of instructions to their assembly functions.
+ *  Used in the assembly() function.
+ *
+ *  It is suitable for all instructions which use three, simple register-index operands.
+ *
+ *  BE WARNED!
+ *  This mapping (and the assemble_three_intop_instruction() function) *seriously* reduce the amount of code repetition
+ *  in the assembler but are kinda black voodoo magic...
+ *
+ *  NOTE TO FUTURE SELF:
+ *  If you feel comfortable with taking pointers of member functions and calling such things - go on.
+ *  Otherwise, it may be better to leave this alone until your have refreshed your memory.
+ *  Here is isocpp.org's FAQ about pointers to members (2015-01-17): https://isocpp.org/wiki/faq/pointers-to-members
+ */
+typedef Program& (Program::*ThreeIntopAssemblerFunction)(int_op, int_op, int_op);
+const map<string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS = {
+    { "iadd", &Program::iadd },
+    { "isub", &Program::isub },
+    { "imul", &Program::imul },
+    { "idiv", &Program::idiv },
+    { "ilt", &Program::ilt },
+    { "ilte", &Program::ilte },
+    { "igt", &Program::igt },
+    { "igte", &Program::igte },
+    { "ieq", &Program::ieq },
+
+    { "and", &Program::logand },
+    { "or", &Program::logor },
+};
+
+void assemble_three_intop_instruction(Program& program, map<string, int>& names, const string& instr, const string& operands) {
+    string rega, regb, regr;
+    tie(rega, regb, regr) = get3operands(operands);
+    rega = resolveregister(rega, names);
+    regb = resolveregister(regb, names);
+    regr = resolveregister(regr, names);
+
+    // feed chunks into Bytecode Programming API
+    (program.*THREE_INTOP_ASM_FUNCTIONS.at(instr))(getint_op(rega), getint_op(regb), getint_op(regr));
+}
+
+
 void assemble(Program& program, const vector<string>& lines, const string& filename) {
     /** Assemble the instructions in lines into bytecode, using
      *  Bytecode Programming API.
@@ -298,64 +340,23 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             tie(regno_chnk, number_chnk) = get2operands(operands);
             program.istore(getint_op(resolveregister(regno_chnk, names)), getint_op(resolveregister(number_chnk, names)));
         } else if (str::startswith(line, "iadd")) {
-            tie(rega, regb, regr) = get3operands(operands);
-            rega = resolveregister(rega, names);
-            regb = resolveregister(regb, names);
-            regr = resolveregister(regr, names);
-
-            // feed chunks into Bytecode Programming API
-            program.iadd(getint_op(rega), getint_op(regb), getint_op(regr));
+            assemble_three_intop_instruction(program, names, "iadd", operands);
         } else if (str::startswith(line, "isub")) {
-            tie(rega, regb, regr) = get3operands(operands);
-            rega = resolveregister(rega, names);
-            regb = resolveregister(regb, names);
-            regr = resolveregister(regr, names);
-            // feed chunks into Bytecode Programming API
-            program.isub(getint_op(rega), getint_op(regb), getint_op(regr));
+            assemble_three_intop_instruction(program, names, "isub", operands);
         } else if (str::startswith(line, "imul")) {
-            tie(rega, regb, regr) = get3operands(operands);
-            rega = resolveregister(rega, names);
-            regb = resolveregister(regb, names);
-            regr = resolveregister(regr, names);
-            // feed chunks into Bytecode Programming API
-            program.imul(getint_op(rega), getint_op(regb), getint_op(regr));
+            assemble_three_intop_instruction(program, names, "imul", operands);
         } else if (str::startswith(line, "idiv")) {
-            tie(rega, regb, regr) = get3operands(operands);
-            rega = resolveregister(rega, names);
-            regb = resolveregister(regb, names);
-            regr = resolveregister(regr, names);
-            // feed chunks into Bytecode Programming API
-            program.idiv(getint_op(rega), getint_op(regb), getint_op(regr));
+            assemble_three_intop_instruction(program, names, "idiv", operands);
         } else if (str::startswithchunk(line, "ilt")) {
-            tie(rega, regb, regr) = get3operands(operands);
-            rega = resolveregister(rega, names);
-            regb = resolveregister(regb, names);
-            regr = resolveregister(regr, names);
-            program.ilt(getint_op(rega), getint_op(regb), getint_op(regr));
+            assemble_three_intop_instruction(program, names, "ilt", operands);
         } else if (str::startswithchunk(line, "ilte")) {
-            tie(rega, regb, regr) = get3operands(operands);
-            rega = resolveregister(rega, names);
-            regb = resolveregister(regb, names);
-            regr = resolveregister(regr, names);
-            program.ilte(getint_op(rega), getint_op(regb), getint_op(regr));
+            assemble_three_intop_instruction(program, names, "ilte", operands);
         } else if (str::startswith(line, "igte")) {
-            tie(rega, regb, regr) = get3operands(operands);
-            rega = resolveregister(rega, names);
-            regb = resolveregister(regb, names);
-            regr = resolveregister(regr, names);
-            program.igte(getint_op(rega), getint_op(regb), getint_op(regr));
+            assemble_three_intop_instruction(program, names, "igte", operands);
         } else if (str::startswith(line, "igt")) {
-            tie(rega, regb, regr) = get3operands(operands);
-            rega = resolveregister(rega, names);
-            regb = resolveregister(regb, names);
-            regr = resolveregister(regr, names);
-            program.igt(getint_op(rega), getint_op(regb), getint_op(regr));
+            assemble_three_intop_instruction(program, names, "igt", operands);
         } else if (str::startswith(line, "ieq")) {
-            tie(rega, regb, regr) = get3operands(operands);
-            rega = resolveregister(rega, names);
-            regb = resolveregister(regb, names);
-            regr = resolveregister(regr, names);
-            program.ieq(getint_op(rega), getint_op(regb), getint_op(regr));
+            assemble_three_intop_instruction(program, names, "ieq", operands);
         } else if (str::startswith(line, "iinc")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
@@ -373,17 +374,9 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             regno_chnk = str::chunk(operands);
             program.lognot(getint_op(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "and")) {
-            tie(rega, regb, regr) = get3operands(operands);
-            rega = resolveregister(rega, names);
-            regb = resolveregister(regb, names);
-            regr = resolveregister(regr, names);
-            program.logand(getint_op(rega), getint_op(regb), getint_op(regr));
+            assemble_three_intop_instruction(program, names, "and", operands);
         } else if (str::startswith(line, "or")) {
-            tie(rega, regb, regr) = get3operands(operands);
-            rega = resolveregister(rega, names);
-            regb = resolveregister(regb, names);
-            regr = resolveregister(regr, names);
-            program.logor(getint_op(rega), getint_op(regb), getint_op(regr));
+            assemble_three_intop_instruction(program, names, "or", operands);
         } else if (str::startswith(line, "move")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = get2operands(operands);
