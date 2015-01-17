@@ -299,7 +299,6 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
 
     if (DEBUG) { cout << "assembling:" << '\n'; }
 
-    string rega, regb, regr;
     for (unsigned i = 0; i < lines.size(); ++i) {
         /*  This is main assembly loop.
          *  It iterates over lines with instructions and
@@ -329,9 +328,6 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
 
         instr = str::chunk(line);
         operands = str::lstrip(str::sub(line, instr.size()));
-        rega = "";
-        regb = "";
-        regr = "";
 
         if (DEBUG) { cout << " *  assemble: " << filename << ':' << i << ":+" << instruction << ": " << instr << '\n'; }
 
@@ -402,10 +398,6 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             regno_chnk = str::chunk(operands);
             program.echo(getint_op(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "branch")) {
-            tie(rega, regb, regr) = get3operands(operands, false);
-
-            int addrt, addrf;
-            addrt = resolvejump(regb, marks);
             /*  If branch is given three operands, it means its full, three-operands form is being used.
              *  Otherwise, it is short, two-operands form instruction and assembler should fill third operand accordingly.
              *
@@ -419,9 +411,14 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
              *
              *      * third operands is the address to which to jump if register is false,
              */
-            addrf = (regr.size() ? resolvejump(regr, marks) : instruction+1);
+            string condition, if_true, if_false;
+            tie(condition, if_true, if_false) = get3operands(operands, false);
 
-            program.branch(getint_op(resolveregister(rega, names)), addrt, addrf);
+            int addrt, addrf;
+            addrt = resolvejump(if_true, marks);
+            addrf = (if_false.size() ? resolvejump(if_false, marks) : instruction+1);
+
+            program.branch(getint_op(resolveregister(condition, names)), addrt, addrf);
         } else if (str::startswith(line, "jump")) {
             /*  Jump instruction can be written in two forms:
              *
