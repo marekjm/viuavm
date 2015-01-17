@@ -74,7 +74,6 @@ uint16_t countBytes(const vector<string>& lines, const string& filename) {
             exit(1);
         }
 
-
         if (inc == 0) {
             cout << filename << ":" << i+1 << ": '" << line << "'" << endl;
             cout << "fail: line is not empty and requires 0 bytes: ";
@@ -206,6 +205,17 @@ string resolveregister(string reg, const map<string, int>& names) {
 }
 
 
+tuple<string, string> get2operands(string s) {
+    /** Returns tuple of two strings - two operands chunked from the `s` string.
+     */
+    string op_a, op_b;
+    op_a = str::chunk(s);
+    s = str::sub(s, op_a.size());
+    op_b = str::chunk(s);
+    return tuple<string, string>(op_a, op_b);
+}
+
+
 void assemble(Program& program, const vector<string>& lines, const string& filename) {
     /** Assemble the instructions in lines into bytecode, using
      *  Bytecode Programming API.
@@ -261,9 +271,7 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
 
         if (str::startswith(line, "istore")) {
             string regno_chnk, number_chnk;
-            regno_chnk = str::chunk(operands);
-            operands = str::sub(operands, regno_chnk.size());
-            number_chnk = str::chunk(operands);
+            tie(regno_chnk, number_chnk) = get2operands(operands);
             program.istore(getint_op(resolveregister(regno_chnk, names)), getint_op(resolveregister(number_chnk, names)));
         } else if (str::startswith(line, "iadd")) {
             string rega_chnk, regb_chnk, regr_chnk;
@@ -415,9 +423,7 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             program.idec(getint_op(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "bstore")) {
             string regno_chnk, byte_chnk;
-            regno_chnk = str::chunk(operands);
-            operands = str::sub(operands, regno_chnk.size());
-            byte_chnk = str::chunk(operands);
+            tie(regno_chnk, byte_chnk) = get2operands(operands);
             program.bstore(getint_op(resolveregister(regno_chnk, names)), getbyte_op(resolveregister(byte_chnk, names)));
         } else if (str::startswith(line, "not")) {
             string regno_chnk;
@@ -455,27 +461,19 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             program.logor(getint_op(rega), getint_op(regb), getint_op(regr));
         } else if (str::startswith(line, "move")) {
             string a_chnk, b_chnk;
-            a_chnk = str::chunk(operands);
-            operands = str::sub(operands, a_chnk.size());
-            b_chnk = str::chunk(operands);
+            tie(a_chnk, b_chnk) = get2operands(operands);
             program.move(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "copy")) {
             string a_chnk, b_chnk;
-            a_chnk = str::chunk(operands);
-            operands = str::sub(operands, a_chnk.size());
-            b_chnk = str::chunk(operands);
+            tie(a_chnk, b_chnk) = get2operands(operands);
             program.copy(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "ref")) {
             string a_chnk, b_chnk;
-            a_chnk = str::chunk(operands);
-            operands = str::sub(operands, a_chnk.size());
-            b_chnk = str::chunk(operands);
+            tie(a_chnk, b_chnk) = get2operands(operands);
             program.ref(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "swap")) {
             string a_chnk, b_chnk;
-            a_chnk = str::chunk(operands);
-            operands = str::sub(operands, a_chnk.size());
-            b_chnk = str::chunk(operands);
+            tie(a_chnk, b_chnk) = get2operands(operands);
             program.swap(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "print")) {
             string regno_chnk;
@@ -555,99 +553,98 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    // run code
-    if (argc > 1) {
-        string filename, compilename = "";
-        if (args[1] == "--debug") {
-            DEBUG = true;
-            if (argc > 2) {
-                filename = args[2];
-            } else {
-                cout << "fatal: filename required" << endl;
-                return 1;
-            }
-        } else {
-            filename = args[1];
-        }
-
-        if (DEBUG and argc >= 4) {
-            compilename = args[3];
-        } else if (!DEBUG and argc >= 3) {
-            compilename = args[2];
-        }
-        if (compilename.size() == 0) {
-            compilename = "out.bin";
-        }
-
-        if (DEBUG) {
-            cout << "assembling \"" << filename << "\" to \"" << compilename << "\"" << endl;
-        }
-
-        if (!filename.size()) {
-            cout << "fatal: no file to assemble" << endl;
-            return 1;
-        }
-
-        ifstream in(filename, ios::in | ios::binary);
-
-        if (!in) {
-            cout << "fatal: file could not be opened" << endl;
-            return 1;
-        }
-
-        vector<string> lines;
-        vector<string> ilines;  // instruction lines
-        string line;
-
-        while (getline(in, line)) { lines.push_back(line); }
-        ilines = getilines(lines);
-
-        uint16_t bytes = 0;
-        uint16_t starting_instruction = 0;  // the bytecode offset to first executable instruction
-
-        bytes = countBytes(ilines, filename);
-
-        if (DEBUG) { cout << "total required bytes: "; }
-        if (DEBUG) { cout << bytes << endl; }
-
-        if (DEBUG) { cout << "executable offset: " << starting_instruction << endl; }
-
-        Program program(bytes);
-        try {
-            assemble(program.setdebug(DEBUG), ilines, filename);
-        } catch (const string& e) {
-            cout << "fatal: error during assembling: " << e << endl;
-            return 1;
-        } catch (const char*& e) {
-            cout << "fatal: error during assembling: " << e << endl;
-            return 1;
-        } catch (const std::invalid_argument& e) {
-            cout << "fatal: error during assembling: " << e.what() << endl;
-            return 1;
-        }
-
-        if (DEBUG) { cout << "branches: "; }
-        try {
-            program.calculateBranches();
-        } catch (const char*& e) {
-            cout << "fatal: branch calculation failed: " << e << endl;
-            return 1;
-        }
-        if (DEBUG) { cout << "OK" << endl; }
-
-        byte* bytecode = program.bytecode();
-
-        ofstream out(compilename, ios::out | ios::binary);
-        out.write((const char*)&bytes, 16);
-        out.write((const char*)&starting_instruction, 16);
-        out.write((const char*)bytecode, bytes);
-        out.close();
-
-        delete[] bytecode;
-    } else {
+    if (argc < 2) {
         cout << "fatal: no input file" << endl;
         return 1;
     }
+
+    string filename, compilename = "";
+    if (args[1] == "--debug") {
+        DEBUG = true;
+        if (argc > 2) {
+            filename = args[2];
+        } else {
+            cout << "fatal: filename required" << endl;
+            return 1;
+        }
+    } else {
+        filename = args[1];
+    }
+
+    if (DEBUG and argc >= 4) {
+        compilename = args[3];
+    } else if (!DEBUG and argc >= 3) {
+        compilename = args[2];
+    }
+    if (compilename.size() == 0) {
+        compilename = "out.bin";
+    }
+
+    if (DEBUG) {
+        cout << "assembling \"" << filename << "\" to \"" << compilename << "\"" << endl;
+    }
+
+    if (!filename.size()) {
+        cout << "fatal: no file to assemble" << endl;
+        return 1;
+    }
+
+    ifstream in(filename, ios::in | ios::binary);
+
+    if (!in) {
+        cout << "fatal: file could not be opened" << endl;
+        return 1;
+    }
+
+    vector<string> lines;
+    vector<string> ilines;  // instruction lines
+    string line;
+
+    while (getline(in, line)) { lines.push_back(line); }
+    ilines = getilines(lines);
+
+    uint16_t bytes = 0;
+    uint16_t starting_instruction = 0;  // the bytecode offset to first executable instruction
+
+    bytes = countBytes(ilines, filename);
+
+    if (DEBUG) { cout << "total required bytes: "; }
+    if (DEBUG) { cout << bytes << endl; }
+
+    if (DEBUG) { cout << "executable offset: " << starting_instruction << endl; }
+
+    Program program(bytes);
+    try {
+        assemble(program.setdebug(DEBUG), ilines, filename);
+    } catch (const string& e) {
+        cout << "fatal: error during assembling: " << e << endl;
+        return 1;
+    } catch (const char*& e) {
+        cout << "fatal: error during assembling: " << e << endl;
+        return 1;
+    } catch (const std::invalid_argument& e) {
+        cout << "fatal: error during assembling: " << e.what() << endl;
+        return 1;
+    }
+
+    if (DEBUG) { cout << "branches: "; }
+    try {
+        program.calculateBranches();
+    } catch (const char*& e) {
+        cout << "fatal: branch calculation failed: " << e << endl;
+        return 1;
+    }
+    if (DEBUG) { cout << "OK" << endl; }
+
+    byte* bytecode = program.bytecode();
+
+    ofstream out(compilename, ios::out | ios::binary);
+    out.write((const char*)&bytes, 16);
+    out.write((const char*)&starting_instruction, 16);
+    out.write((const char*)bytecode, bytes);
+    out.close();
+
+    delete[] bytecode;
 
     return ret_code;
 }
