@@ -76,15 +76,6 @@ int Program::instructionCount() {
 }
 
 
-void Program::ensurebytes(int bts) {
-    /*  Ensure program has at least bts bytes after current address.
-     */
-    if (bytes-((long)addr_ptr-(long)program) < bts) {
-        throw "not enough bytes";
-    }
-}
-
-
 int Program::getInstructionBytecodeOffset(int instr, int count) {
     /** Returns bytecode offset for given instruction index.
      *  The "count" parameter is there to pass assumed instruction count to
@@ -193,7 +184,6 @@ Program& Program::istore(int_op regno, int_op i) {
      *  regno:int - register number
      *  i:int     - value to store
      */
-    ensurebytes(1 + 2*sizeof(bool) + 2*sizeof(int));
     addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, ISTORE, regno, i);
     return (*this);
 }
@@ -207,7 +197,6 @@ Program& Program::iadd(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
     addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, IADD, rega, regb, regr);
     return (*this);
 }
@@ -221,7 +210,6 @@ Program& Program::isub(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
     addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, ISUB, rega, regb, regr);
     return (*this);
 }
@@ -235,7 +223,6 @@ Program& Program::imul(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
     addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, IMUL, rega, regb, regr);
     return (*this);
 }
@@ -249,7 +236,6 @@ Program& Program::idiv(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
     addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, IDIV, rega, regb, regr);
     return (*this);
 }
@@ -257,7 +243,6 @@ Program& Program::idiv(int_op rega, int_op regb, int_op regr) {
 Program& Program::iinc(int_op regno) {
     /*  Inserts iinc instuction.
      */
-    ensurebytes(1 + sizeof(bool) + sizeof(int));
     *(addr_ptr++) = IINC;
     addr_ptr = insertIntegerOperand(addr_ptr, regno);
     return (*this);
@@ -266,7 +251,6 @@ Program& Program::iinc(int_op regno) {
 Program& Program::idec(int_op regno) {
     /*  Inserts idec instuction.
      */
-    ensurebytes(1 + sizeof(bool) + sizeof(int));
     *(addr_ptr++) = IDEC;
     addr_ptr = insertIntegerOperand(addr_ptr, regno);
     return (*this);
@@ -281,7 +265,6 @@ Program& Program::ilt(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
     addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, ILT, rega, regb, regr);
     return (*this);
 }
@@ -295,7 +278,6 @@ Program& Program::ilte(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
     addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, ILTE, rega, regb, regr);
     return (*this);
 }
@@ -309,7 +291,6 @@ Program& Program::igt(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
     addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, IGT, rega, regb, regr);
     return (*this);
 }
@@ -323,7 +304,6 @@ Program& Program::igte(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
     addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, IGTE, rega, regb, regr);
     return (*this);
 }
@@ -337,7 +317,6 @@ Program& Program::ieq(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
     addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, IEQ, rega, regb, regr);
     return (*this);
 }
@@ -350,8 +329,6 @@ Program& Program::bstore(int_op regno, byte_op b) {
      *  regno - register number
      *  b     - value to store
      */
-    ensurebytes(1 + 2*sizeof(bool) + sizeof(int) + sizeof(byte));
-
     bool b_ref = false;
     byte bt;
 
@@ -370,7 +347,6 @@ Program& Program::bstore(int_op regno, byte_op b) {
 Program& Program::lognot(int_op reg) {
     /*  Inserts not instuction.
      */
-    ensurebytes(1 + sizeof(bool) + sizeof(int));
     *(addr_ptr++) = NOT;
     addr_ptr = insertIntegerOperand(addr_ptr, reg);
     return (*this);
@@ -385,7 +361,6 @@ Program& Program::logand(int_op rega, int_op regb, int_op regr) {
      *  regb   - register index of second operand
      *  regr   - register index in which to store the result
      */
-    ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
     addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, AND, rega, regb, regr);
     return (*this);
 }
@@ -399,7 +374,6 @@ Program& Program::logor(int_op rega, int_op regb, int_op regr) {
      *  regb   - register index of second operand
      *  regr   - register index in which to store the result
      */
-    ensurebytes(1 + 3*sizeof(bool) + 3*sizeof(int));
     addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, OR, rega, regb, regr);
     return (*this);
 }
@@ -412,7 +386,6 @@ Program& Program::move(int_op a, int_op b) {
      *  a - register number (move from...)
      *  b - register number (move to...)
      */
-    ensurebytes(1 + 2*sizeof(bool) + 2*sizeof(int));
     addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, MOVE, a, b);
     return (*this);
 }
@@ -425,7 +398,6 @@ Program& Program::copy(int_op a, int_op b) {
      *  a - register number (copy from...)
      *  b - register number (copy to...)
      */
-    ensurebytes(1 + 2*sizeof(bool) + 2*sizeof(int));
     addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, COPY, a, b);
     return (*this);
 }
@@ -438,7 +410,6 @@ Program& Program::ref(int_op a, int_op b) {
      *  a - register number
      *  b - register number
      */
-    ensurebytes(1 + 2*sizeof(bool) + 2*sizeof(int));
     addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, REF, a, b);
     return (*this);
 }
@@ -451,7 +422,6 @@ Program& Program::swap(int_op a, int_op b) {
      *  a - register number
      *  b - register number
      */
-    ensurebytes(1 + 2*sizeof(bool) + 2*sizeof(int));
     addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, SWAP, a, b);
     return (*this);
 }
@@ -459,7 +429,6 @@ Program& Program::swap(int_op a, int_op b) {
 Program& Program::print(int_op reg) {
     /*  Inserts print instuction.
      */
-    ensurebytes(1 + sizeof(bool) + sizeof(int));
     *(addr_ptr++) = PRINT;
     addr_ptr = insertIntegerOperand(addr_ptr, reg);
     return (*this);
@@ -468,7 +437,6 @@ Program& Program::print(int_op reg) {
 Program& Program::echo(int_op reg) {
     /*  Inserts echo instuction.
      */
-    ensurebytes(1 + sizeof(bool) + sizeof(int));
     *(addr_ptr++) = ECHO;
     addr_ptr = insertIntegerOperand(addr_ptr, reg);
     return (*this);
@@ -482,8 +450,6 @@ Program& Program::jump(int addr) {
      *
      *  addr:int    - index of the instruction to which to branch
      */
-    ensurebytes(1 + sizeof(int));
-
     // save branch instruction index for later evaluation
     branches.push_back(addr_ptr);
 
@@ -505,8 +471,6 @@ Program& Program::branch(int_op regc, int addr_truth, int addr_false) {
      *  addr_truth:int      - instruction index to go if condition is true
      *  addr_false:int      - instruction index to go if condition is false
      */
-    ensurebytes(1 + sizeof(bool) + 3*sizeof(int));
-
     // save branch instruction index for later evaluation
     branches.push_back(addr_ptr);
 
@@ -528,7 +492,6 @@ Program& Program::ret(int_op reg) {
      *
      *  reg - index of the register which will be stored as return value
      */
-    ensurebytes(1 + sizeof(bool) + sizeof(int));
     *(addr_ptr++) = RET;
     addr_ptr = insertIntegerOperand(addr_ptr, reg);
     return (*this);
@@ -537,7 +500,6 @@ Program& Program::ret(int_op reg) {
 Program& Program::pass() {
     /*  Inserts pass instruction.
      */
-    ensurebytes(1);
     *(addr_ptr++) = PASS;
     return (*this);
 }
@@ -545,7 +507,6 @@ Program& Program::pass() {
 Program& Program::halt() {
     /*  Inserts halt instruction.
      */
-    ensurebytes(1);
     *(addr_ptr++) = HALT;
     return (*this);
 }

@@ -19,7 +19,6 @@ class Program {
 
     bool debug;
 
-    void ensurebytes(int);
     int getInstructionBytecodeOffset(int, int count = -1);
 
     public:
