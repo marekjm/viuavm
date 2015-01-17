@@ -14,7 +14,7 @@
 #   Environment variables listed below affect this script.
 #   They are intended to be used in such a form:
 #
-#       ENV_VAR=value ./scripts/run-sample.sh <file>
+#       ENV_VAR=value ./scripts/run.sh <file>
 #
 #   and are a primitive form of user interface for this
 #   frontend.
