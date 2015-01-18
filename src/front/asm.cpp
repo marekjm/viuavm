@@ -55,7 +55,7 @@ uint16_t countBytes(const vector<string>& lines, const string& filename) {
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = str::lstrip(lines[i]);
 
-        if (str::startswith(line, ".mark:") or str::startswith(line, ".name:")) {
+        if (str::startswith(line, ".mark:") or str::startswith(line, ".name:") or str::startswith(line, ".def:") or str::startswith(line, ".end")) {
             /*  Markers and name instructions must be skipped here or they would cause the code below to
              *  throw exceptions.
              */
@@ -151,6 +151,35 @@ map<string, int> getnames(const vector<string>& lines) {
         }
     }
     return names;
+}
+
+map<string, Program> getfunctions(const vector<string>& lines) {
+    map<string, Program> functions;
+
+    string line, holdline;
+    for (unsigned i = 0; i < lines.size(); ++i) {
+        holdline = line = lines[i];
+        if (!str::startswith(line, ".def:")) { continue; }
+
+        vector<string> flines;
+        for (int j = i+1; lines[j] != ".end"; ++j, ++i) { flines.push_back(lines[j]); }
+
+        line = str::lstrip(str::sub(line, 5));
+        string name = str::chunk(line);
+        cout << " + defining function: " << name << endl;
+        line = str::lstrip(str::sub(line, name.size()));
+        string ret_sign = str::chunk(line);
+        bool returns;
+        if (ret_sign == "true" or ret_sign == "1") {
+            returns = true;
+        } else if (ret_sign == "false" or ret_sign == "0") {
+            returns = false;
+        } else {
+            throw ("invalid function signature: illegal return declaration: " + holdline);
+        }
+        throw "function definition";
+    }
+    return functions;
 }
 
 
@@ -277,28 +306,14 @@ void assemble_three_intop_instruction(Program& program, map<string, int>& names,
 }
 
 
-void assemble(Program& program, const vector<string>& lines, const string& filename) {
-    /** Assemble the instructions in lines into bytecode, using
-     *  Bytecode Programming API.
+Program& compile(Program& program, const vector<string>& lines, map<string, int>& marks, map<string, int>& names, map<string, Program>& functions) {
+    /** Compile instructions into bytecode using bytecode generation API.
      *
-     *  :params:
-     *
-     *  program     - program object which will be used for assembling
-     *  lines       - lines with instructions
      */
-    string line;
-    int instruction = 0;  // instruction counter
-
-    if (DEBUG) { cout << "gathering markers:" << '\n'; }
-    map<string, int> marks = getmarks(lines);
-    if (DEBUG) { cout << endl; }
-
-    if (DEBUG) { cout << "gathering names:" << '\n'; }
-    map<string, int> names = getnames(lines);
-    if (DEBUG) { cout << endl; }
-
     if (DEBUG) { cout << "assembling:" << '\n'; }
 
+    string line;
+    int instruction = 0;  // instruction counter
     for (unsigned i = 0; i < lines.size(); ++i) {
         /*  This is main assembly loop.
          *  It iterates over lines with instructions and
@@ -318,7 +333,13 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
              *  to avoid complicating code that appears later and
              *  deals with assembling CPU instructions.
              */
-            if (DEBUG) { cout << " -  skip asm: " << filename << ':' << i << ":+" << instruction << ": " << line << '\n'; }
+            if (DEBUG) { cout << " -  skip asm: " << i << ":+" << instruction << ": " << line << '\n'; }
+            continue;
+        }
+
+        if (str::startswith(line, ".def:")) {
+            // just skip function lines
+            while (lines[++i] != ".end");
             continue;
         }
 
@@ -329,7 +350,7 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
         instr = str::chunk(line);
         operands = str::lstrip(str::sub(line, instr.size()));
 
-        if (DEBUG) { cout << " *  assemble: " << filename << ':' << i << ":+" << instruction << ": " << instr << '\n'; }
+        if (DEBUG) { cout << " *  assemble: " << i << ":+" << instruction << ": " << instr << '\n'; }
 
         if (str::startswith(line, "istore")) {
             string regno_chnk, number_chnk;
@@ -442,11 +463,39 @@ void assemble(Program& program, const vector<string>& lines, const string& filen
             program.pass();
         } else if (str::startswith(line, "halt")) {
             program.halt();
+        } else {
+            throw ("unimplemented instruction: " + instr);
         }
 
         ++instruction;
     }
     if (DEBUG) { cout << endl; }
+
+    return program;
+}
+
+
+void assemble(Program& program, const vector<string>& lines) {
+    /** Assemble instructions in lines into a program.
+     *  This function first garthers required information about markers, named registers and functions.
+     *  Then, it passes all gathered data into compilation function.
+     *
+     *  :params:
+     *
+     *  program     - Program object which will be used for assembling
+     *  lines       - lines with instructions
+     */
+    if (DEBUG) { cout << "gathering markers:" << '\n'; }
+    map<string, int> marks = getmarks(lines);
+    if (DEBUG) { cout << endl; }
+
+    if (DEBUG) { cout << "gathering names:" << '\n'; }
+    map<string, int> names = getnames(lines);
+    if (DEBUG) { cout << endl; }
+
+    map<string, Program> functions = getfunctions(lines);
+
+    compile(program, lines, marks, names, functions);
 }
 
 
@@ -525,7 +574,7 @@ int main(int argc, char* argv[]) {
 
     Program program(bytes);
     try {
-        assemble(program.setdebug(DEBUG), ilines, filename);
+        assemble(program.setdebug(DEBUG), ilines);
     } catch (const string& e) {
         cout << "fatal: error during assembling: " << e << endl;
         return 1;
