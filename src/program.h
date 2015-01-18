@@ -81,6 +81,16 @@ class Program {
         for (int i = 0; i < bytes; ++i) { program[i] = byte(0); }
         addr_ptr = program;
     }
+    Program(const Program& other): program(0), bytes(other.bytes), addr_ptr(0), branches({}) {
+        program = new byte[bytes];
+        for (int i = 0; i < bytes; ++i) {
+            program[i] = other.program[i];
+        }
+        addr_ptr = program+long(other.addr_ptr - other.program);
+        for (unsigned i = 0; i < other.branches.size(); ++i) {
+            branches.push_back(program+long(other.branches[i]-other.program));
+        }
+    }
     ~Program() {
         delete[] program;
     }
