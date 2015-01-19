@@ -539,6 +539,13 @@ Program& Program::ret(int_op reg) {
     return (*this);
 }
 
+Program& Program::end() {
+    /*  Inserts end instruction.
+     */
+    *(addr_ptr++) = END;
+    return (*this);
+}
+
 Program& Program::pass() {
     /*  Inserts pass instruction.
      */
