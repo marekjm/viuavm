@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -5,6 +6,7 @@
 #include "bytecode/opcodes.h"
 #include "bytecode/maps.h"
 #include "support/pointer.h"
+#include "support/string.h"
 #include "program.h"
 using namespace std;
 
@@ -73,6 +75,46 @@ int Program::instructionCount() {
         ++counter;
     }
     return counter;
+}
+
+
+uint16_t Program::countBytes(const vector<string>& lines) {
+    /*  First, we must decide how much memory (how big byte array) we need to hold the program.
+     *  This is done by iterating over instruction lines and
+     *  increasing bytes size.
+     */
+    uint16_t bytes = 0;
+    int inc = 0;
+    string instr, line;
+
+    for (unsigned i = 0; i < lines.size(); ++i) {
+        line = str::lstrip(lines[i]);
+
+        if (str::startswith(line, ".mark:") or str::startswith(line, ".name:") or str::startswith(line, ".def:") or str::startswith(line, ".end")) {
+            /*  Markers and name instructions must be skipped here or they would cause the code below to
+             *  throw exceptions.
+             */
+            continue;
+        }
+
+        instr = "";
+        inc = 0;
+
+        instr = str::chunk(line);
+        try {
+            inc = OP_SIZES.at(instr);
+        } catch (const std::out_of_range &e) {
+            throw ("unrecognised instruction: `" + instr + '`');
+        }
+
+        if (inc == 0) {
+            throw ("fail: line is not empty and requires 0 bytes: " + line);
+        }
+
+        bytes += inc;
+    }
+
+    return bytes;
 }
 
 

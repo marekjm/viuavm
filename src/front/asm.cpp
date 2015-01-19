@@ -43,51 +43,6 @@ vector<string> getilines(const vector<string>& lines) {
 }
 
 
-uint16_t countBytes(const vector<string>& lines, const string& filename) {
-    /*  First, we must decide how much memory (how big byte array) we need to hold the program.
-     *  This is done by iterating over instruction lines and
-     *  increasing bytes size.
-     */
-    uint16_t bytes = 0;
-    int inc = 0;
-    string instr, line;
-
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        line = str::lstrip(lines[i]);
-
-        if (str::startswith(line, ".mark:") or str::startswith(line, ".name:") or str::startswith(line, ".def:") or str::startswith(line, ".end")) {
-            /*  Markers and name instructions must be skipped here or they would cause the code below to
-             *  throw exceptions.
-             */
-            continue;
-        }
-
-        instr = "";
-        inc = 0;
-
-        instr = str::chunk(line);
-        try {
-            inc = OP_SIZES.at(instr);
-        } catch (const std::out_of_range &e) {
-            cout << "fatal: unrecognised instruction: `" << instr << '`' << endl;
-            cout << filename << ":" << i+1 << ": " << line << endl;
-            exit(1);
-        }
-
-        if (inc == 0) {
-            cout << filename << ":" << i+1 << ": '" << line << "'" << endl;
-            cout << "fail: line is not empty and requires 0 bytes: ";
-            cout << "possibly an unrecognised instruction" << endl;
-            exit(1);
-        }
-
-        bytes += inc;
-    }
-
-    return bytes;
-}
-
-
 map<string, int> getmarks(const vector<string>& lines) {
     /** This function will pass over all instructions and
      * gather "marks", i.e. `.mark: <name>` directives which may be used by
@@ -565,7 +520,7 @@ int main(int argc, char* argv[]) {
     uint16_t bytes = 0;
     uint16_t starting_instruction = 0;  // the bytecode offset to first executable instruction
 
-    bytes = countBytes(ilines, filename);
+    bytes = Program::countBytes(ilines);
 
     if (DEBUG) { cout << "total required bytes: "; }
     if (DEBUG) { cout << bytes << endl; }
