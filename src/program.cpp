@@ -151,7 +151,7 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
 
 Program& Program::calculateBranches(unsigned offset) {
     /*  This function should be called after program is constructed
-     *  to calculate correct bytecode offsets for BRANCH instructions.
+     *  to calculate correct bytecode offsets for BRANCH and JUMP instructions.
      */
     int instruction_count = instructionCount();
     int* ptr;
@@ -172,6 +172,25 @@ Program& Program::calculateBranches(unsigned offset) {
                 if (debug) { cout << "calculated branch:  false: " << *(ptr+2) << endl; }
                 break;
         }
+    }
+
+    return (*this);
+}
+
+Program& Program::calculateCalls(const vector<string>& function_names, map<string, pair<bool, Program> >& functions) {
+    /*  This function should be called after program is constructed
+     *  to calculate correct bytecode offsets for CALL instructions.
+     */
+    int* ptr;
+    int calculated_offset;
+    for (unsigned i = 0; i < calls.size(); ++i) {
+        calculated_offset = 0;
+        // increase pointer by two bytes to got to instruction address, and step one byte further
+        ptr = (int*)(calls[i]+2);
+        for (unsigned i = 0; i < function_names.size() and i < (unsigned)(*ptr); ++i) {
+            calculated_offset += functions.at(function_names[i]).second.size();
+        }
+        (*ptr) = calculated_offset;
     }
 
     return (*this);
@@ -481,6 +500,26 @@ Program& Program::echo(int_op reg) {
      */
     *(addr_ptr++) = ECHO;
     addr_ptr = insertIntegerOperand(addr_ptr, reg);
+    return (*this);
+}
+
+Program& Program::call(int instruction_index, int_op reg) {
+    /*  Inserts call instruction.
+     *  Byte offset is calculated automatically.
+     *
+     *  :params:
+     *
+     *  instruction_index   - instruction index where to call
+     *  reg                 - index of the register where return value will be stored
+     */
+    // save call instruction index for later evaluation
+    calls.push_back(addr_ptr);
+
+    *(addr_ptr++) = CALL;
+    *((int*)addr_ptr) = instruction_index;
+    pointer::inc<int, byte>(addr_ptr);
+    addr_ptr = insertIntegerOperand(addr_ptr, reg);
+
     return (*this);
 }
 

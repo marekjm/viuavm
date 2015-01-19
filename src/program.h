@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <tuple>
+#include <map>
 #include "bytecode/bytetypedef.h"
 
 typedef std::tuple<bool, int> int_op;
@@ -16,6 +17,7 @@ class Program {
     byte* addr_ptr;
 
     std::vector<byte*> branches;
+    std::vector<byte*> calls;
 
     bool debug;
 
@@ -52,6 +54,7 @@ class Program {
     Program& print      (int_op);
     Program& echo       (int_op);
 
+    Program& call       (int, int_op);
     Program& jump       (int);
     Program& branch     (int_op, int, int);
 
@@ -64,7 +67,7 @@ class Program {
 
     // after-insertion calculations
     Program& calculateBranches(unsigned offset = 0);
-    Program& calculateCalls(unsigned offset = 0);
+    Program& calculateCalls(const std::vector<std::string>&, std::map<std::string, std::pair<bool, Program> >&);
 
 
     // representations
