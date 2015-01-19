@@ -304,7 +304,7 @@ void assemble_three_intop_instruction(Program& program, map<string, int>& names,
 }
 
 
-Program& compile(Program& program, const vector<string>& lines, map<string, int>& marks, map<string, int>& names) {
+Program& compile(Program& program, const vector<string>& lines, map<string, int>& marks, map<string, int>& names, const vector<string>& function_names) {
     /** Compile instructions into bytecode using bytecode generation API.
      *
      */
@@ -420,6 +420,46 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string regno_chnk;
             regno_chnk = str::chunk(operands);
             program.echo(getint_op(resolveregister(regno_chnk, names)));
+        } else if (str::startswith(line, "call")) {
+            /*  Full form of call instruction has two operands: instruction index and register index.
+             *  If call is given only one operand - it means it is the instruction index and returned value is discarded.
+             *  To explicitly state that return value should be discarder, 0 can be supplied as second operand.
+             *
+             *  Note that when writing assembly code, first operand of `call` instruction is function name and
+             *  not an integer.
+             *
+             */
+            string fun_name, reg;
+            tie(fun_name, reg) = get2operands(operands);
+
+            /*  Why is the instruction_index index of the function name in the vector with function names and
+             *  not a real instruction index?
+             *
+             *  Because functions are written into bytecode in the order in which their names appear in this vector.
+             *  This allows to actually insert a *name* index here and later (when all offsets are known) adjust
+             *  instruction indexes accordingly - by obtaining function index and substituting it with summed up
+             *  sizes of previous functions.
+             *
+             *  This makes it possible to declare functions and call them even if they are
+             *  not yet defined (just like in C), and
+             *  to simplify the code - there is one function that inserts the instruction and
+             *  second that adjusts the operand.
+             *  It is the same mechanism as with `jump` and `branch` instructions where their jumps are calculated
+             *  when the size of bytecode is known.
+             */
+            int instruction_index = -1;
+            for (unsigned i = 0; i < function_names.size(); ++i) {
+                if (fun_name == function_names[i]) {
+                    instruction_index = (int)i;
+                    break;
+                }
+            }
+
+            // if second operand is empty, fill it with zero
+            // which means that return value will be discarded
+            if (reg == "") { reg = "0"; }
+
+            program.call(instruction_index, getint_op(resolveregister(reg, names)));
         } else if (str::startswith(line, "branch")) {
             /*  If branch is given three operands, it means its full, three-operands form is being used.
              *  Otherwise, it is short, two-operands form instruction and assembler should fill third operand accordingly.
@@ -475,7 +515,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
 }
 
 
-void assemble(Program& program, const vector<string>& lines) {
+void assemble(Program& program, const vector<string>& lines, const vector<string>& function_names) {
     /** Assemble instructions in lines into a program.
      *  This function first garthers required information about markers, named registers and functions.
      *  Then, it passes all gathered data into compilation function.
@@ -493,7 +533,7 @@ void assemble(Program& program, const vector<string>& lines) {
     map<string, int> names = getnames(lines);
     if (DEBUG) { cout << endl; }
 
-    compile(program, lines, marks, names);
+    compile(program, lines, marks, names, function_names);
 }
 
 
@@ -584,7 +624,7 @@ int main(int argc, char* argv[]) {
 
     Program program(bytes);
     try {
-        assemble(program.setdebug(DEBUG), ilines);
+        assemble(program.setdebug(DEBUG), ilines, function_names);
     } catch (const string& e) {
         cout << "fatal: error during assembling: " << e << endl;
         return 1;
@@ -596,13 +636,14 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    if (DEBUG) { cout << "branches:\n"; }
+    if (DEBUG) { cout << "calculating jumps:\n"; }
     try {
         /*  Here, starting_instruction is used as offset.
          *  This is because all branches and jumps should be adjusted to the amount of bytes
          *  that precede them.
          */
         program.calculateBranches(starting_instruction);
+        program.calculateCalls(function_names, functions);
     } catch (const char*& e) {
         cout << "fatal: branch calculation failed: " << e << endl;
         return 1;
