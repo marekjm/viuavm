@@ -238,6 +238,9 @@ int CPU::run() {
                 case PASS:
                     ++instr_ptr;
                     break;
+                case NOP:
+                    ++instr_ptr;
+                    break;
                 default:
                     ostringstream error;
                     error << "unrecognised instruction (bytecode value: " << *((int*)bytecode) << ")";
