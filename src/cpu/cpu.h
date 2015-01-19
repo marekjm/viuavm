@@ -4,6 +4,7 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
 #include "../bytecode/bytetypedef.h"
 #include "../types/object.h"
 
@@ -12,8 +13,29 @@ const int DEFAULT_REGISTER_SIZE = 256;
 
 
 class Frame {
+    byte* return_address;
+    int arguments_size;
+    Object** arguments;
 
+    public:
+    inline byte* ret_address() { return return_address; }
+
+    Frame(byte* ra, int argsize): return_address(ra), arguments_size(argsize), arguments(new Object*[argsize]) {}
+    Frame(const Frame& that) {
+        return_address = that.return_address;
+        arguments_size = that.arguments_size;
+        for (int i = 0; i < arguments_size; ++i) {
+            arguments[i] = that.arguments[i]->copy();
+        }
+    }
+    ~Frame() {
+        for (int i = 0; i < arguments_size; ++i) {
+            if (arguments[i] != 0) { delete arguments[i]; }
+        }
+        delete[] arguments;
+    }
 };
+
 
 class CPU {
     /*  Bytecode pointer is a pointer to program's code.
@@ -28,6 +50,10 @@ class CPU {
     Object** registers;
     bool* references;
     int reg_count;
+
+    /*  Call stack.
+     */
+    std::vector<Frame> frames;
 
     /*  Methods to deal with registers.
      */
@@ -118,6 +144,7 @@ class CPU {
                 }
             }
             delete[] registers;
+            delete[] references;
             if (bytecode) { delete[] bytecode; }
         }
 };

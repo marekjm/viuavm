@@ -226,6 +226,10 @@ int CPU::run() {
                 case CALL:
                     instr_ptr = call(instr_ptr+1);
                     break;
+                case END:
+                    instr_ptr = frames.back().ret_address();
+                    frames.pop_back();
+                    break;
                 case JUMP:
                     instr_ptr = jump(instr_ptr+1);
                     break;
