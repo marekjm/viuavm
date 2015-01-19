@@ -59,17 +59,29 @@ map<string, int> getmarks(const vector<string>& lines) {
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = lines[i];
         if (str::startswith(line, ".name:")) {
+            // names can be safely skipped as they are not instructions
+            continue;
+        }
+        if (str::startswith(line, ".def:")) {
+            // instructions in functions are counted separately so they are
+            // not included here
+            while (!str::startswith(lines[i], ".end")) { ++i; }
             continue;
         }
         if (!str::startswith(line, ".mark:")) {
+            // if all previous checks were false, then this line must be either .mark: directive or
+            // an instruction
+            // if this check is true - then it is an instruction
             ++instruction;
             continue;
         }
 
+        // get mark name
         line = str::lstrip(str::sub(line, 6));
         mark = str::chunk(line);
 
         if (DEBUG) { cout << " *  marker: `" << mark << "` -> " << instruction << endl; }
+        // create mark for current instruction
         marks[mark] = instruction;
     }
     return marks;
@@ -108,8 +120,36 @@ map<string, int> getnames(const vector<string>& lines) {
     return names;
 }
 
-map<string, Program> getfunctions(const vector<string>& lines) {
-    map<string, Program> functions;
+vector<string> getFunctionNames(const vector<string>& lines) {
+    vector<string> names;
+
+    string line, holdline;
+    for (unsigned i = 0; i < lines.size(); ++i) {
+        holdline = line = lines[i];
+        if (!str::startswith(line, ".def:")) { continue; }
+
+        for (int j = i+1; lines[j] != ".end"; ++j, ++i) {}
+
+        line = str::lstrip(str::sub(line, 5));
+        string name = str::chunk(line);
+        line = str::lstrip(str::sub(line, name.size()));
+        string ret_sign = str::chunk(line);
+        bool returns;
+        if (ret_sign == "true" or ret_sign == "1") {
+            returns = true;
+        } else if (ret_sign == "false" or ret_sign == "0") {
+            returns = false;
+        } else {
+            throw ("invalid function signature: illegal return declaration: " + holdline);
+        }
+
+        names.push_back(name);
+    }
+
+    return names;
+}
+map<string, pair<bool, Program> > getFunctions(const vector<string>& lines) {
+    map<string, pair<bool, Program> > functions;
 
     string line, holdline;
     for (unsigned i = 0; i < lines.size(); ++i) {
@@ -132,8 +172,11 @@ map<string, Program> getfunctions(const vector<string>& lines) {
         } else {
             throw ("invalid function signature: illegal return declaration: " + holdline);
         }
-        throw "function definition";
+
+        Program func(Program::countBytes(flines));
+        functions[name] = pair<bool, Program>(returns, func);
     }
+
     return functions;
 }
 
@@ -261,7 +304,7 @@ void assemble_three_intop_instruction(Program& program, map<string, int>& names,
 }
 
 
-Program& compile(Program& program, const vector<string>& lines, map<string, int>& marks, map<string, int>& names, map<string, Program>& functions) {
+Program& compile(Program& program, const vector<string>& lines, map<string, int>& marks, map<string, int>& names) {
     /** Compile instructions into bytecode using bytecode generation API.
      *
      */
@@ -272,7 +315,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
     for (unsigned i = 0; i < lines.size(); ++i) {
         /*  This is main assembly loop.
          *  It iterates over lines with instructions and
-         *  uses Bytecode Programming API to fill a program with instructions and
+         *  uses bytecode generation API to fill the program with instructions and
          *  from them generate the bytecode.
          */
         line = lines[i];
@@ -288,7 +331,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
              *  to avoid complicating code that appears later and
              *  deals with assembling CPU instructions.
              */
-            if (DEBUG) { cout << " -  skip asm: " << i << ":+" << instruction << ": " << line << '\n'; }
+            if (DEBUG) { cout << " -  skip: +" << instruction+1 << ": " << line << '\n'; }
             continue;
         }
 
@@ -305,7 +348,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         instr = str::chunk(line);
         operands = str::lstrip(str::sub(line, instr.size()));
 
-        if (DEBUG) { cout << " *  assemble: " << i << ":+" << instruction << ": " << instr << '\n'; }
+        if (DEBUG) { cout << " *  assemble: +" << instruction+1 << ": " << instr << '\n'; }
 
         if (str::startswith(line, "istore")) {
             string regno_chnk, number_chnk;
@@ -450,9 +493,7 @@ void assemble(Program& program, const vector<string>& lines) {
     map<string, int> names = getnames(lines);
     if (DEBUG) { cout << endl; }
 
-    map<string, Program> functions = getfunctions(lines);
-
-    compile(program, lines, marks, names, functions);
+    compile(program, lines, marks, names);
 }
 
 
@@ -522,11 +563,23 @@ int main(int argc, char* argv[]) {
     uint16_t bytes = 0;
     uint16_t starting_instruction = 0;  // the bytecode offset to first executable instruction
 
+    vector<string> function_names = getFunctionNames(lines);
+    map<string, pair<bool, Program> > functions;
+    try {
+         functions = getFunctions(ilines);
+    } catch (const string& e) {
+        cout << "fatal: error during function gathering: " << e << endl;
+        return 1;
+    }
+    if (DEBUG) { cout << "functions:\n"; }
+    for (string name : function_names) {
+        if (DEBUG) { cout << " *  " <<  name << ": " << functions.at(name).second.size() << " bytes" << endl; }
+        starting_instruction += functions.at(name).second.size();
+    }
+
     bytes = Program::countBytes(ilines);
 
-    if (DEBUG) { cout << "total required bytes: "; }
-    if (DEBUG) { cout << bytes << endl; }
-
+    if (DEBUG) { cout << "total required bytes: " <<  bytes << endl; }
     if (DEBUG) { cout << "executable offset: " << starting_instruction << endl; }
 
     Program program(bytes);
@@ -543,9 +596,13 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    if (DEBUG) { cout << "branches: "; }
+    if (DEBUG) { cout << "branches:\n"; }
     try {
-        program.calculateBranches();
+        /*  Here, starting_instruction is used as offset.
+         *  This is because all branches and jumps should be adjusted to the amount of bytes
+         *  that precede them.
+         */
+        program.calculateBranches(starting_instruction);
     } catch (const char*& e) {
         cout << "fatal: branch calculation failed: " << e << endl;
         return 1;
@@ -557,6 +614,11 @@ int main(int argc, char* argv[]) {
     ofstream out(compilename, ios::out | ios::binary);
     out.write((const char*)&bytes, 16);
     out.write((const char*)&starting_instruction, 16);
+    for (string name : function_names) {
+        byte* btcd = functions.at(name).second.bytecode();
+        out.write((const char*)btcd, functions.at(name).second.size());
+        delete[] btcd;
+    }
     out.write((const char*)bytecode, bytes);
     out.close();
 
