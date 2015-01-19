@@ -149,7 +149,7 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
     return offset;
 }
 
-Program& Program::calculateBranches() {
+Program& Program::calculateBranches(unsigned offset) {
     /*  This function should be called after program is constructed
      *  to calculate correct bytecode offsets for BRANCH instructions.
      */
@@ -164,11 +164,11 @@ Program& Program::calculateBranches() {
             case BRANCH:
                 pointer::inc<bool, int>(ptr);
                 if (debug) { cout << "calculating branch:  true: " << *(ptr+1) << endl; }
-                (*(ptr+1)) = getInstructionBytecodeOffset(*(ptr+1), instruction_count);
+                (*(ptr+1)) = offset + getInstructionBytecodeOffset(*(ptr+1), instruction_count);
                 if (debug) { cout << "calculated branch:   true: " << *(ptr+1) << endl; }
 
                 if (debug) { cout << "calculating branch: false: " << *(ptr+2) << endl; }
-                (*(ptr+2)) = getInstructionBytecodeOffset(*(ptr+2), instruction_count);
+                (*(ptr+2)) = offset + getInstructionBytecodeOffset(*(ptr+2), instruction_count);
                 if (debug) { cout << "calculated branch:  false: " << *(ptr+2) << endl; }
                 break;
         }

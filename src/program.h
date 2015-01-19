@@ -22,7 +22,7 @@ class Program {
     int getInstructionBytecodeOffset(int, int count = -1);
 
     public:
-    // instructions interface
+    // instruction insertion interface
     Program& istore     (int_op, int_op);
     Program& iadd       (int_op, int_op, int_op);
     Program& isub       (int_op, int_op, int_op);
@@ -61,7 +61,10 @@ class Program {
     Program& pass       ();
     Program& halt       ();
 
-    Program& calculateBranches();
+
+    // after-insertion calculations
+    Program& calculateBranches(unsigned offset = 0);
+    Program& calculateCalls(unsigned offset = 0);
 
 
     // representations
