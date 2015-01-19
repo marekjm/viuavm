@@ -159,7 +159,7 @@ Program& Program::calculateBranches(unsigned offset) {
         ptr = (int*)(branches[i]+1);
         switch (*(branches[i])) {
             case JUMP:
-                (*ptr) = getInstructionBytecodeOffset(*ptr, instruction_count);
+                (*ptr) = offset + getInstructionBytecodeOffset(*ptr, instruction_count);
                 break;
             case BRANCH:
                 pointer::inc<bool, int>(ptr);
