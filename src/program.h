@@ -84,18 +84,35 @@ class Program {
         for (int i = 0; i < bytes; ++i) { program[i] = byte(0); }
         addr_ptr = program;
     }
-    Program(const Program& other): program(0), bytes(other.bytes), addr_ptr(0), branches({}) {
+    Program(const Program& that): program(0), bytes(that.bytes), addr_ptr(0), branches({}) {
         program = new byte[bytes];
         for (int i = 0; i < bytes; ++i) {
-            program[i] = other.program[i];
+            program[i] = that.program[i];
         }
-        addr_ptr = program+long(other.addr_ptr - other.program);
-        for (unsigned i = 0; i < other.branches.size(); ++i) {
-            branches.push_back(program+long(other.branches[i]-other.program));
+        addr_ptr = program+long(that.addr_ptr - that.program);
+        for (unsigned i = 0; i < that.branches.size(); ++i) {
+            branches.push_back(program+long(that.branches[i]-that.program));
         }
     }
     ~Program() {
         delete[] program;
+    }
+
+    Program& operator=(const Program& that) {
+        if (this != &that) {
+            delete[] program;
+            bytes = that.bytes;
+            program = new byte[bytes];
+            for (int i = 0; i < bytes; ++i) {
+                program[i] = that.program[i];
+            }
+            addr_ptr = program+long(that.addr_ptr - that.program);
+            while (branches.size()) { branches.pop_back(); }
+            for (unsigned i = 0; i < that.branches.size(); ++i) {
+                branches.push_back(program+long(that.branches[i]-that.program));
+            }
+        }
+        return (*this);
     }
 };
 
