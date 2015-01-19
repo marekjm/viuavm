@@ -217,6 +217,12 @@ byte* CPU::ret(byte* addr) {
     return addr;
 }
 
+byte* CPU::call(byte* addr) {
+    /*  Run call instruction.
+     */
+    addr += sizeof(bool) + 2*sizeof(int);
+    return addr;
+}
 
 byte* CPU::jump(byte* addr) {
     /*  Run jump instruction.

@@ -11,6 +11,10 @@
 const int DEFAULT_REGISTER_SIZE = 256;
 
 
+class Frame {
+
+};
+
 class CPU {
     /*  Bytecode pointer is a pointer to program's code.
      *  Size and executable offset are metadata exported from bytecode dump.
@@ -68,6 +72,7 @@ class CPU {
     byte* print(byte*);
     byte* echo(byte*);
 
+    byte* call(byte*);
     byte* jump(byte*);
     byte* branch(byte*);
 

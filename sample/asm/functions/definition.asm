@@ -16,4 +16,6 @@ iadd 2 3
 .mark: foo
 print 2
 
+call foo
+
 halt

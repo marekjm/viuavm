@@ -223,6 +223,9 @@ int CPU::run() {
                 case ECHO:
                     instr_ptr = echo(instr_ptr+1);
                     break;
+                case CALL:
+                    instr_ptr = call(instr_ptr+1);
+                    break;
                 case JUMP:
                     instr_ptr = jump(instr_ptr+1);
                     break;
