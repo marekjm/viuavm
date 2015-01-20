@@ -67,7 +67,7 @@ class Program {
 
     // after-insertion calculations
     Program& calculateBranches(unsigned offset = 0);
-    Program& calculateCalls(const std::vector<std::string>&, std::map<std::string, std::pair<bool, Program> >&);
+    Program& calculateCalls(const std::vector<std::string>&, std::map<std::string, std::pair<bool, std::vector<std::string> > >&);
 
 
     // representations

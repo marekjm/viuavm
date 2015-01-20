@@ -177,7 +177,7 @@ Program& Program::calculateBranches(unsigned offset) {
     return (*this);
 }
 
-Program& Program::calculateCalls(const vector<string>& function_names, map<string, pair<bool, Program> >& functions) {
+Program& Program::calculateCalls(const vector<string>& function_names, map<string, pair<bool, vector<string> > >& functions) {
     /*  This function should be called after program is constructed
      *  to calculate correct bytecode offsets for CALL instructions.
      */
