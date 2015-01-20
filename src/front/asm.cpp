@@ -148,8 +148,8 @@ vector<string> getFunctionNames(const vector<string>& lines) {
 
     return names;
 }
-map<string, pair<bool, Program> > getFunctions(const vector<string>& lines) {
-    map<string, pair<bool, Program> > functions;
+map<string, pair<bool, vector<string> > > getFunctions(const vector<string>& lines) {
+    map<string, pair<bool, vector<string> > > functions;
 
     string line, holdline;
     for (unsigned i = 0; i < lines.size(); ++i) {
@@ -173,8 +173,7 @@ map<string, pair<bool, Program> > getFunctions(const vector<string>& lines) {
             throw ("invalid function signature: illegal return declaration: " + holdline);
         }
 
-        Program func(Program::countBytes(flines));
-        functions[name] = pair<bool, Program>(returns, func);
+        functions[name] = pair<bool, vector<string> >(returns, flines);
     }
 
     return functions;
@@ -604,7 +603,7 @@ int main(int argc, char* argv[]) {
     uint16_t starting_instruction = 0;  // the bytecode offset to first executable instruction
 
     vector<string> function_names = getFunctionNames(lines);
-    map<string, pair<bool, Program> > functions;
+    map<string, pair<bool, vector<string> > > functions;
     try {
          functions = getFunctions(ilines);
     } catch (const string& e) {
@@ -613,8 +612,8 @@ int main(int argc, char* argv[]) {
     }
     if (DEBUG) { cout << "functions:\n"; }
     for (string name : function_names) {
-        if (DEBUG) { cout << " *  " <<  name << ": " << functions.at(name).second.size() << " bytes" << endl; }
-        starting_instruction += functions.at(name).second.size();
+        if (DEBUG) { cout << " *  " <<  name << ": " << Program::countBytes(functions.at(name).second) << " bytes" << endl; }
+        starting_instruction += Program::countBytes(functions.at(name).second);
     }
 
     bytes = Program::countBytes(ilines);
@@ -656,8 +655,11 @@ int main(int argc, char* argv[]) {
     out.write((const char*)&bytes, 16);
     out.write((const char*)&starting_instruction, 16);
     for (string name : function_names) {
-        byte* btcd = functions.at(name).second.bytecode();
-        out.write((const char*)btcd, functions.at(name).second.size());
+        Program func(Program::countBytes(functions.at(name).second));
+        assemble(func, functions.at(name).second, function_names);
+        // TODO: FIXME: add call and jump calculations here
+        byte* btcd = func.bytecode();
+        out.write((const char*)btcd, func.size());
         delete[] btcd;
     }
     out.write((const char*)bytecode, bytes);
