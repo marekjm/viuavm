@@ -79,7 +79,7 @@ void CPU::updaterefs(Object* before, Object* now) {
     for (int i = 0; i < reg_count; ++i) {
         if (registers[i] == before and references[i]) {
             if (debug) {
-                cout << "CPU: updating reference address in register " << i << hex << ": 0x" << (unsigned long)before << " -> 0x" << (unsigned long)now << dec << endl;
+                cout << "\nCPU: updating reference address in register " << i << hex << ": 0x" << (unsigned long)before << " -> 0x" << (unsigned long)now << dec << endl;
             }
             registers[i] = now;
         }
