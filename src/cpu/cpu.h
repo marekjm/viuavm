@@ -20,12 +20,18 @@ class Frame {
     public:
     inline byte* ret_address() { return return_address; }
 
-    Frame(byte* ra, int argsize): return_address(ra), arguments_size(argsize), arguments(new Object*[argsize]) {}
+    Frame(byte* ra, int argsize): return_address(ra), arguments_size(argsize), arguments(new Object*[argsize]) {
+        for (int i = 0; i < argsize; ++i) { arguments[i] = 0; }
+    }
     Frame(const Frame& that) {
         return_address = that.return_address;
         arguments_size = that.arguments_size;
         for (int i = 0; i < arguments_size; ++i) {
-            arguments[i] = that.arguments[i]->copy();
+            if (that.arguments[i] != 0) {
+                arguments[i] = that.arguments[i]->copy();
+            } else {
+                arguments[i] = 0;
+            }
         }
     }
     ~Frame() {

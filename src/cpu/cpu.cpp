@@ -227,6 +227,9 @@ int CPU::run() {
                     instr_ptr = call(instr_ptr+1);
                     break;
                 case END:
+                    if (debug) {
+                        cout << " -> return address: " << (long)(frames.back().ret_address() - bytecode);
+                    }
                     instr_ptr = frames.back().ret_address();
                     frames.pop_back();
                     break;
