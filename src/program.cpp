@@ -185,10 +185,10 @@ Program& Program::calculateCalls(const vector<string>& function_names, map<strin
     int calculated_offset;
     for (unsigned i = 0; i < calls.size(); ++i) {
         calculated_offset = 0;
-        // increase pointer by two bytes to got to instruction address, and step one byte further
-        ptr = (int*)(calls[i]+2);
+        // increase pointer by one byte to go to address here function-index is encoded
+        ptr = (int*)(calls[i]+1);
         for (unsigned i = 0; i < function_names.size() and i < (unsigned)(*ptr); ++i) {
-            calculated_offset += functions.at(function_names[i]).second.size();
+            calculated_offset += Program::countBytes(functions.at(function_names[i]).second);
         }
         (*ptr) = calculated_offset;
     }
