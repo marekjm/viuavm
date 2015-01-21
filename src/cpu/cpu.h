@@ -59,7 +59,7 @@ class CPU {
 
     /*  Call stack.
      */
-    std::vector<Frame> frames;
+    std::vector<Frame*> frames;
 
     /*  Methods to deal with registers.
      */

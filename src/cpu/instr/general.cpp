@@ -220,7 +220,9 @@ byte* CPU::ret(byte* addr) {
 byte* CPU::call(byte* addr) {
     /*  Run call instruction.
      */
-    frames.push_back(Frame((addr + sizeof(bool) + 2*sizeof(int)), 0));
+    // save return address for frame
+    byte* return_address = (addr + sizeof(bool) + 2*sizeof(int));
+    frames.push_back(new Frame(return_address, 1));
     addr = bytecode + *(int*)addr;
     return addr;
 }
