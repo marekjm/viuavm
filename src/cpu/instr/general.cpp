@@ -222,6 +222,9 @@ byte* CPU::call(byte* addr) {
      */
     // save return address for frame
     byte* return_address = (addr + sizeof(bool) + 2*sizeof(int));
+    if (debug) {
+        cout << ": setting return address to bytecode " << (long)(return_address-bytecode);
+    }
     frames.push_back(new Frame(return_address, 1));
     addr = bytecode + *(int*)addr;
     return addr;

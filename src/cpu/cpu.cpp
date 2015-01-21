@@ -142,8 +142,10 @@ int CPU::run() {
     bool halt = false;
 
     byte* instr_ptr = bytecode+executable_offset; // instruction pointer
+    byte* previous_instr_ptr;
 
     while (true) {
+        previous_instr_ptr = instr_ptr;
         if (debug) {
             cout << "CPU: bytecode ";
             cout << dec << ((long)instr_ptr - (long)bytecode);
@@ -267,6 +269,19 @@ int CPU::run() {
         if (instr_ptr >= (bytecode+bytecode_size)) {
             cout << "CPU: aborting: bytecode address out of bounds" << endl;
             return_code = 1;
+            break;
+        }
+
+        if (instr_ptr == previous_instr_ptr and OPCODE(*instr_ptr) != END) {
+            cout << "CPU: aborting: instruction pointer did not change, possibly endless loop" << endl;
+            cout << "note: instruction index was " << (long)(instr_ptr-bytecode) << " and the opcode was '" << OP_NAMES.at(OPCODE(*instr_ptr)) << "'" << endl;
+            if (OPCODE(*instr_ptr) == CALL) {
+                cout << "note: this was caused by 'call' opcode immediately calling itself\n"
+                     << "      such situation may have several sources, e.g. empty function definition or\n"
+                     << "      a function which calls itself in its first instruction";
+                cout << endl;
+            }
+            return_code = 2;
             break;
         }
     }
