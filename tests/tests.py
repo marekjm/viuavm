@@ -283,5 +283,42 @@ class SampleProgramsTests(unittest.TestCase):
         self.assertEqual(0, excode)
 
 
+class FunctionTests(unittest.TestCase):
+    """Tests for various sample programs.
+
+    These tests (as well as samples) use several types of instructions and/or
+    assembler directives and as such are more stressing for both assembler and CPU.
+    """
+    PATH = './sample/asm/functions'
+
+    def testBasicFunctionSupport(self):
+        name = 'definition.asm'
+        assembly_path = os.path.join(FunctionTests.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual('42', output.strip())
+        #self.assertEqual([1, 0], [int(i) for i in output.strip().splitlines()])
+        self.assertEqual(0, excode)
+
+    def testNestedFunctionCallSupport(self):
+        name = 'nested_calls.asm'
+        assembly_path = os.path.join(FunctionTests.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual([2015, 1995, 69, 42], [int(i) for i in output.strip().splitlines()])
+        self.assertEqual(0, excode)
+
+    def testRecursiveCallFunctionSupport(self):
+        name = 'recursive.asm'
+        assembly_path = os.path.join(FunctionTests.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual([i for i in range(9, -1, -1)], [int(i) for i in output.strip().splitlines()])
+        self.assertEqual(0, excode)
+
+
 if __name__ == '__main__':
     unittest.main()
