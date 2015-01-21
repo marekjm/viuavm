@@ -655,9 +655,11 @@ int main(int argc, char* argv[]) {
     out.write((const char*)&bytes, 16);
     out.write((const char*)&starting_instruction, 16);
     for (string name : function_names) {
+        if (DEBUG) { cout << "generating bytecode for function: " << name << endl; }
         Program func(Program::countBytes(functions.at(name).second));
         assemble(func, functions.at(name).second, function_names);
-        // TODO: FIXME: add call and jump calculations here
+        func.calculateBranches();
+        func.calculateCalls(function_names, functions);
         byte* btcd = func.bytecode();
         out.write((const char*)btcd, func.size());
         delete[] btcd;
