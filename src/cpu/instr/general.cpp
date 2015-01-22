@@ -217,6 +217,32 @@ byte* CPU::ret(byte* addr) {
     return addr;
 }
 
+byte* CPU::frame(byte* addr) {
+    /**
+     */
+    bool ref = false;
+    int number;
+
+    ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+
+    number = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    if (debug) {
+        cout << (ref ? " @" : " ") << number << endl;
+    }
+
+    if (ref) {
+        number = static_cast<Integer*>(fetch(number))->value();
+    }
+
+    if (frame_new != 0) { throw "requested new frame while last one is unused"; }
+    frame_new = new Frame(0, number);
+
+    return addr;
+}
+
 byte* CPU::call(byte* addr) {
     /*  Run call instruction.
      */
@@ -225,7 +251,7 @@ byte* CPU::call(byte* addr) {
     if (debug) {
         cout << ": setting return address to bytecode " << (long)(return_address-bytecode);
     }
-    frames.push_back(new Frame(return_address, 1));
+    frames.push_back(new Frame(return_address, 0));
     addr = bytecode + *(int*)addr;
     return addr;
 }

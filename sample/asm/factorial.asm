@@ -14,6 +14,7 @@
     istore number 5
     istore 2 1
     istore 3 0
+    frame 1
     call factorial
     print 2
     end

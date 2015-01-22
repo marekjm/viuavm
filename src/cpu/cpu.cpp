@@ -225,6 +225,15 @@ int CPU::run() {
                 case ECHO:
                     instr_ptr = echo(instr_ptr+1);
                     break;
+                case FRAME:
+                    instr_ptr = frame(instr_ptr+1);
+                    break;
+                case PARAM:
+                    instr_ptr += OP_SIZES.at(OP_NAMES.at(OPCODE(*instr_ptr)));
+                    break;
+                case PAREF:
+                    instr_ptr += OP_SIZES.at(OP_NAMES.at(OPCODE(*instr_ptr)));
+                    break;
                 case CALL:
                     instr_ptr = call(instr_ptr+1);
                     break;

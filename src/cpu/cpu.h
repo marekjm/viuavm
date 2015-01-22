@@ -13,11 +13,11 @@ const int DEFAULT_REGISTER_SIZE = 256;
 
 
 class Frame {
+    public:
     byte* return_address;
     int arguments_size;
     Object** arguments;
 
-    public:
     inline byte* ret_address() { return return_address; }
 
     Frame(byte* ra, int argsize): return_address(ra), arguments_size(argsize), arguments(new Object*[argsize]) {
@@ -60,6 +60,7 @@ class CPU {
     /*  Call stack.
      */
     std::vector<Frame*> frames;
+    Frame* frame_new;
 
     /*  Methods to deal with registers.
      */
@@ -104,6 +105,8 @@ class CPU {
     byte* print(byte*);
     byte* echo(byte*);
 
+    byte* frame(byte*);
+
     byte* call(byte*);
     byte* jump(byte*);
     byte* branch(byte*);
@@ -124,7 +127,7 @@ class CPU {
         CPU& eoffset(uint16_t);
         int run();
 
-        CPU(int r = DEFAULT_REGISTER_SIZE): bytecode(0), bytecode_size(0), executable_offset(0), registers(0), references(0), reg_count(r), debug(false) {
+        CPU(int r = DEFAULT_REGISTER_SIZE): bytecode(0), bytecode_size(0), executable_offset(0), registers(0), references(0), reg_count(r), frame_new(0), debug(false) {
             /*  Basic constructor.
              *  Creates registers array of requested size and
              *  initializes it with zeroes.
