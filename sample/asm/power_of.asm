@@ -33,8 +33,7 @@
     .mark: loop
     ilt counter exponent 4
     branch 4 12 :final_print
-    ; TODO: this imul should use short form
-    imul base result result
+    imul result base
     pass
     iinc counter
     jump :loop
