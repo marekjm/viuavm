@@ -7,8 +7,10 @@
 #include <map>
 #include "bytecode/bytetypedef.h"
 
+
 typedef std::tuple<bool, int> int_op;
 typedef std::tuple<bool, byte> byte_op;
+
 
 class Program {
     byte* program;
@@ -53,6 +55,10 @@ class Program {
 
     Program& print      (int_op);
     Program& echo       (int_op);
+
+    Program& frame      (int_op);
+    Program& param      (int_op, int_op);
+    Program& paref      (int_op, int_op);
 
     Program& call       (int, int_op);
     Program& jump       (int);

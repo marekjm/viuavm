@@ -503,6 +503,38 @@ Program& Program::echo(int_op reg) {
     return (*this);
 }
 
+Program& Program::frame(int_op op) {
+    /*  Inserts frame instruction to bytecode.
+     */
+    *(addr_ptr++) = FRAME;
+    addr_ptr = insertIntegerOperand(addr_ptr, op);
+    return (*this);
+}
+
+Program& Program::param(int_op a, int_op b) {
+    /*  Inserts param instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  a - register number
+     *  b - register number
+     */
+    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, PARAM, a, b);
+    return (*this);
+}
+
+Program& Program::paref(int_op a, int_op b) {
+    /*  Inserts paref instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  a - register number
+     *  b - register number
+     */
+    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, PAREF, a, b);
+    return (*this);
+}
+
 Program& Program::call(int instruction_index, int_op reg) {
     /*  Inserts call instruction.
      *  Byte offset is calculated automatically.

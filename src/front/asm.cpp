@@ -451,6 +451,18 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string regno_chnk;
             regno_chnk = str::chunk(operands);
             program.echo(getint_op(resolveregister(regno_chnk, names)));
+        } else if (str::startswith(line, "frame")) {
+            string regno_chnk;
+            regno_chnk = str::chunk(operands);
+            program.frame(getint_op(resolveregister(regno_chnk, names)));
+        } else if (str::startswith(line, "param")) {
+            string a_chnk, b_chnk;
+            tie(a_chnk, b_chnk) = get2operands(operands);
+            program.param(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
+        } else if (str::startswith(line, "paref")) {
+            string a_chnk, b_chnk;
+            tie(a_chnk, b_chnk) = get2operands(operands);
+            program.paref(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "call")) {
             /*  Full form of call instruction has two operands: instruction index and register index.
              *  If call is given only one operand - it means it is the instruction index and returned value is discarded.
@@ -690,9 +702,14 @@ int main(int argc, char* argv[]) {
     for (string name : function_names) {
         if (DEBUG) { cout << "generating bytecode for function (at bytecode " << functions_section_size << "): " << name << endl; }
         Program func(Program::countBytes(functions.at(name).second));
-        assemble(func, functions.at(name).second, function_names);
-        func.calculateBranches();
-        func.calculateCalls(function_names, functions);
+        try {
+            assemble(func, functions.at(name).second, function_names);
+            func.calculateBranches();
+            func.calculateCalls(function_names, functions);
+        } catch (const string& e) {
+            cout << e << endl;
+            exit(1);
+        }
         byte* btcd = func.bytecode();
         out.write((const char*)btcd, func.size());
         functions_section_size += func.size();
