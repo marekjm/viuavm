@@ -13,9 +13,23 @@
 using namespace std;
 
 
+// MISC FLAGS
 bool DEBUG = false;
+bool WARNING_ALL = true;
+bool ERROR_ALL = true;
 
 
+// WARNINGS
+bool WARNING_MISSING_END = false;
+bool WARNING_EMPTY_FUNCTION_BODY = false;
+
+
+// ERRORS
+bool ERROR_MISSING_END = false;
+bool ERROR_EMPTY_FUNCTION_BODY = false;
+
+
+// LOGIC
 int_op getint_op(const string& s) {
     bool ref = s[0] == '@';
     return tuple<bool, int>(ref, stoi(ref ? str::sub(s, 1) : s));
@@ -171,6 +185,24 @@ map<string, pair<bool, vector<string> > > getFunctions(const vector<string>& lin
             returns = false;
         } else {
             throw ("invalid function signature: illegal return declaration: " + holdline);
+        }
+
+
+        if (flines.size() == 0) {
+            if (ERROR_EMPTY_FUNCTION_BODY or ERROR_ALL) {
+                throw ("error: function '" + name + "' is empty");
+            } else if (WARNING_EMPTY_FUNCTION_BODY or WARNING_ALL) {
+                cout << ("warning: function '" + name + "' is empty\n");
+            }
+        }
+        if (flines.back() != "end") {
+            if (ERROR_MISSING_END or ERROR_ALL) {
+                throw ("error: missing 'end' at the end of function '" + name + "'");
+            } else if (WARNING_MISSING_END or WARNING_ALL) {
+                cout << ("warning: missing 'end' at the end of function '" + name + "'\n");
+            } else {
+                flines.push_back("end");
+            }
         }
 
         functions[name] = pair<bool, vector<string> >(returns, flines);
@@ -650,18 +682,20 @@ int main(int argc, char* argv[]) {
     if (DEBUG) { cout << "OK" << endl; }
 
     byte* bytecode = program.bytecode();
+    int functions_section_size = 0;
 
     ofstream out(compilename, ios::out | ios::binary);
     out.write((const char*)&bytes, 16);
     out.write((const char*)&starting_instruction, 16);
     for (string name : function_names) {
-        if (DEBUG) { cout << "generating bytecode for function: " << name << endl; }
+        if (DEBUG) { cout << "generating bytecode for function (at bytecode " << functions_section_size << "): " << name << endl; }
         Program func(Program::countBytes(functions.at(name).second));
         assemble(func, functions.at(name).second, function_names);
         func.calculateBranches();
         func.calculateCalls(function_names, functions);
         byte* btcd = func.bytecode();
         out.write((const char*)btcd, func.size());
+        functions_section_size += func.size();
         delete[] btcd;
     }
     out.write((const char*)bytecode, bytes);
