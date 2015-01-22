@@ -56,6 +56,7 @@ enum OPCODE : byte {
     ECHO,
 
     // Opcodes related to functions.
+    FRAME,  // create new frame (required before param and paref) for future function call
     PARAM,  // copy object from a register to parameter register (pass-by-value),
     PAREF,  // create a reference to an object in a parameter register (pass-by-reference),
     CALL,   // call given function with parameters set in parameter register,
