@@ -25,5 +25,6 @@ istore 2 10
     end
 .end
 
+frame 0
 call main
 halt

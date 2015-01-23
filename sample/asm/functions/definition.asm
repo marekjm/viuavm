@@ -18,6 +18,7 @@ print 2
 
 ; this call should pring 42 to the console
 .mark: foo
+frame 0
 call foo
 
 halt

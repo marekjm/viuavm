@@ -11,5 +11,6 @@
     end
 .end
 
+frame 0
 call main
 halt
