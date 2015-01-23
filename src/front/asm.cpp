@@ -15,18 +15,20 @@ using namespace std;
 
 // MISC FLAGS
 bool DEBUG = false;
-bool WARNING_ALL = true;
-bool ERROR_ALL = true;
+bool WARNING_ALL = false;
+bool ERROR_ALL = false;
 
 
 // WARNINGS
-bool WARNING_MISSING_END = false;
-bool WARNING_EMPTY_FUNCTION_BODY = false;
+bool WARNING_MISSING_END = true;
+bool WARNING_EMPTY_FUNCTION_BODY = true;
+bool WARNING_OPERANDLESS_FRAME = false;
 
 
 // ERRORS
-bool ERROR_MISSING_END = false;
-bool ERROR_EMPTY_FUNCTION_BODY = false;
+bool ERROR_MISSING_END = true;
+bool ERROR_EMPTY_FUNCTION_BODY = true;
+bool ERROR_OPERANDLESS_FRAME = false;
 
 
 // LOGIC
@@ -454,6 +456,12 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         } else if (str::startswith(line, "frame")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
+            if (ERROR_OPERANDLESS_FRAME or ERROR_ALL) {
+                throw "frame instruction without operand";
+            } else if (WARNING_OPERANDLESS_FRAME or WARNING_ALL) {
+                cout << "warning: frame instruction without operand: inserting zero" << endl;
+            }
+            if (regno_chnk.size() == 0) { regno_chnk = "0"; }
             program.frame(getint_op(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "param")) {
             string a_chnk, b_chnk;
