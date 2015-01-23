@@ -4,6 +4,7 @@
     ; if counter is equal to zero
     ieq 1 3 4
     branch 4 :finish
+    frame 0
     call factorial
     .mark: finish
     end
@@ -14,11 +15,12 @@
     istore number 5
     istore 2 1
     istore 3 0
-    frame 1
+    frame 0
     call factorial
     print 2
     end
 .end
 
+frame 0
 call main
 halt
