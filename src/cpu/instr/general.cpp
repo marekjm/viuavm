@@ -251,7 +251,15 @@ byte* CPU::call(byte* addr) {
     if (debug) {
         cout << ": setting return address to bytecode " << (long)(return_address-bytecode);
     }
-    frames.push_back(new Frame(return_address, 0));
+    if (frame_new == 0) {
+        throw "function call without a frame: use `frame 0' if the function takes no parameters";
+    }
+    // adjust return address
+    frame_new->return_address = return_address;
+    // use frame for function call
+    frames.push_back(frame_new);
+    // and free the hook
+    frame_new = 0;
     addr = bytecode + *(int*)addr;
     return addr;
 }
