@@ -53,8 +53,8 @@ Object* CPU::fetch(int index) {
      *
      *  index:int   - index of a register to fetch
      */
-    if (index >= reg_count) { throw "register access out of bounds: read"; }
-    Object* optr = registers[index];
+    if (index >= uregisters_size) { throw "register access out of bounds: read"; }
+    Object* optr = uregisters[index];
     if (optr == 0) {
         ostringstream oss;
         oss << "read from null register: " << index;
@@ -122,7 +122,7 @@ void CPU::place(int index, Object* obj) {
         // and delete the newly created object to avoid leaks
         delete obj;
     } else {
-        Object* old_ref_ptr = (hasrefs(index) ? registers[index] : 0);
+        Object* old_ref_ptr = (hasrefs(index) ? uregisters[index] : 0);
         uregisters[index] = obj;
         if (old_ref_ptr) { updaterefs(old_ref_ptr, obj); }
     }
@@ -238,10 +238,7 @@ int CPU::run() {
                     instr_ptr = call(instr_ptr+1);
                     break;
                 case END:
-                    instr_ptr = frames.back()->ret_address();
-                    if (debug) { cout << " -> return address: " << (long)(instr_ptr - bytecode); }
-                    delete frames.back();
-                    frames.pop_back();
+                    instr_ptr = end(instr_ptr);
                     break;
                 case JUMP:
                     instr_ptr = jump(instr_ptr+1);

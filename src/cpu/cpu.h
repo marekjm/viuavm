@@ -27,6 +27,7 @@ class Frame {
     Frame(byte* ra, int argsize, int regsize = DEFAULT_REGISTER_SIZE): return_address(ra), arguments_size(argsize), arguments(new Object*[argsize]), registers(new Object*[regsize]), references(new bool[regsize]), registers_size(regsize) {
         for (int i = 0; i < argsize; ++i) { arguments[i] = 0; }
         for (int i = 0; i < regsize; ++i) { registers[i] = 0; }
+        for (int i = 0; i < regsize; ++i) { references[i] = 0; }
     }
     Frame(const Frame& that) {
         return_address = that.return_address;
@@ -130,6 +131,8 @@ class CPU {
     byte* frame(byte*);
 
     byte* call(byte*);
+    byte* end(byte*);
+
     byte* jump(byte*);
     byte* branch(byte*);
 
