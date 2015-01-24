@@ -76,12 +76,12 @@ void CPU::updaterefs(Object* before, Object* now) {
      *  It swaps old address for the new one in every register that points to the old address and
      *  is marked as a reference.
      */
-    for (int i = 0; i < reg_count; ++i) {
-        if (registers[i] == before and references[i]) {
+    for (int i = 0; i < uregisters_size; ++i) {
+        if (uregisters[i] == before and ureferences[i]) {
             if (debug) {
                 cout << "\nCPU: updating reference address in register " << i << hex << ": 0x" << (unsigned long)before << " -> 0x" << (unsigned long)now << dec << endl;
             }
-            registers[i] = now;
+            uregisters[i] = now;
         }
     }
 }
@@ -90,9 +90,9 @@ bool CPU::hasrefs(int index) {
     /** This method checks if object at a given address exists as a reference in another register.
      */
     bool has = false;
-    for (int i = 0; i < reg_count; ++i) {
+    for (int i = 0; i < uregisters_size; ++i) {
         if (i == index) continue;
-        if (registers[i] == registers[index]) {
+        if (uregisters[i] == uregisters[index]) {
             has = true;
             break;
         }
@@ -107,12 +107,12 @@ void CPU::place(int index, Object* obj) {
      *  If not - the `Object` previously stored in it is destroyed.
      *
      */
-    if (index >= reg_count) { throw "register access out of bounds: write"; }
-    if (registers[index] != 0 and !references[index]) {
+    if (index >= uregisters_size) { throw "register access out of bounds: write"; }
+    if (uregisters[index] != 0 and !ureferences[index]) {
         // register is not empty and is not a reference - the object in it must be destroyed to avoid memory leaks
-        delete registers[index];
+        delete uregisters[index];
     }
-    if (references[index]) {
+    if (ureferences[index]) {
         Object* referenced = fetch(index);
 
         // it is a reference, copy value of the object
@@ -123,7 +123,7 @@ void CPU::place(int index, Object* obj) {
         delete obj;
     } else {
         Object* old_ref_ptr = (hasrefs(index) ? registers[index] : 0);
-        registers[index] = obj;
+        uregisters[index] = obj;
         if (old_ref_ptr) { updaterefs(old_ref_ptr, obj); }
     }
 }
