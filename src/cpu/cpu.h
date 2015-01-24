@@ -18,9 +18,13 @@ class Frame {
     int arguments_size;
     Object** arguments;
 
+    Object** registers;
+    bool* references;
+    int registers_size;
+
     inline byte* ret_address() { return return_address; }
 
-    Frame(byte* ra, int argsize): return_address(ra), arguments_size(argsize), arguments(new Object*[argsize]) {
+    Frame(byte* ra, int argsize): return_address(ra), arguments_size(argsize), arguments(new Object*[argsize]), registers(0), references(0), registers_size(0) {
         for (int i = 0; i < argsize; ++i) { arguments[i] = 0; }
     }
     Frame(const Frame& that) {
@@ -31,6 +35,14 @@ class Frame {
                 arguments[i] = that.arguments[i]->copy();
             } else {
                 arguments[i] = 0;
+            }
+        }
+        registers_size = that.registers_size;
+        for (int i = 0; i < registers_size; ++i) {
+            if (that.registers[i] != 0) {
+                registers[i] = that.registers[i]->copy();
+            } else {
+                registers[i] = 0;
             }
         }
     }
