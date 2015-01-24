@@ -256,11 +256,34 @@ byte* CPU::call(byte* addr) {
     }
     // adjust return address
     frame_new->return_address = return_address;
+    // adjust register set
+    uregisters = frame_new->registers;
+    ureferences = frame_new->references;
+    uregisters_size = frame_new->registers_size;
+
     // use frame for function call
     frames.push_back(frame_new);
+
     // and free the hook
     frame_new = 0;
+
     addr = bytecode + *(int*)addr;
+    return addr;
+}
+
+byte* CPU::end(byte* addr) {
+    /*  Run end instruction.
+     */
+    if (frames.size() == 0) {
+        throw "no frame on stack: nothing to end";
+    }
+    addr = frames.back()->ret_address();
+    if (debug) { cout << " -> return address: " << (long)(addr - bytecode); }
+    delete frames.back();
+    frames.pop_back();
+    uregisters = registers;
+    ureferences = references;
+    uregisters_size = reg_count;
     return addr;
 }
 
