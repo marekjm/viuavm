@@ -74,6 +74,11 @@ class CPU {
     bool* references;
     int reg_count;
 
+    // Currently used register set
+    Object** uregisters;
+    bool* ureferences;
+    int uregisters_size;
+
     /*  Call stack.
      */
     std::vector<Frame*> frames;
@@ -144,7 +149,8 @@ class CPU {
         CPU& eoffset(uint16_t);
         int run();
 
-        CPU(int r = DEFAULT_REGISTER_SIZE): bytecode(0), bytecode_size(0), executable_offset(0), registers(0), references(0), reg_count(r), frame_new(0), debug(false) {
+        CPU(int r = DEFAULT_REGISTER_SIZE): bytecode(0), bytecode_size(0), executable_offset(0), registers(0), references(0), reg_count(r),
+                                            uregisters(0), ureferences(0), uregisters_size(0), frame_new(0), debug(false) {
             /*  Basic constructor.
              *  Creates registers array of requested size and
              *  initializes it with zeroes.
@@ -155,6 +161,9 @@ class CPU {
                 registers[i] = 0;
                 references[i] = false;
             }
+            uregisters = registers;
+            ureferences = references;
+            uregisters_size = reg_count;
         }
 
         ~CPU() {
