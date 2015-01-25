@@ -52,7 +52,7 @@ bin/opcodes.bin: src/bytecode/opcodes.h src/bytecode/maps.h src/bytecode/opcd.cp
 	${CXX} ${CXXFLAGS} -o bin/opcodes.bin src/bytecode/opcd.cpp
 
 
-build/cpu/cpu.o: src/bytecode.h src/cpu/cpu.h src/cpu/cpu.cpp
+build/cpu/cpu.o: src/bytecode.h src/cpu/frame.h src/cpu/cpu.h src/cpu/cpu.cpp
 	${CXX} ${CXXFLAGS} -c -o $@ ./src/cpu/cpu.cpp
 
 build/cpu/instr/general.o: src/cpu/instr/general.cpp
