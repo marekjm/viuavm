@@ -282,6 +282,18 @@ class SampleProgramsTests(unittest.TestCase):
         self.assertEqual([16, 1, 1, 16], [int(i) for i in output.strip().splitlines()])
         self.assertEqual(0, excode)
 
+    def testCalculatingFactorial(self):
+        """The code that is tested by this unit is not the best implementation of factorial calculation.
+        However, it tests passing parameters by value and by reference;
+        so we got that going for us what is nice.
+        """
+        name = 'factorial.asm'
+        assembly_path = os.path.join(SampleProgramsTests.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual('40320', output.strip())
+        self.assertEqual(0, excode)
 
 class FunctionTests(unittest.TestCase):
     """Tests for various sample programs.
