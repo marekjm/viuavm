@@ -54,7 +54,7 @@ class Frame {
         }
         delete[] arguments;
         for (int i = 0; i < registers_size; ++i) {
-            if (registers[i] != 0) { delete registers[i]; }
+            if (registers[i] != 0 and !references) { delete registers[i]; }
         }
         delete[] registers;
     }

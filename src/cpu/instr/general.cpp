@@ -72,8 +72,8 @@ byte* CPU::move(byte* addr) {
         b = static_cast<Integer*>(fetch(b))->value();
     }
 
-    registers[b] = registers[a];    // copy pointer from first-operand register to second-operand register
-    registers[a] = 0;               // zero first-operand register
+    uregisters[b] = uregisters[a];    // copy pointer from first-operand register to second-operand register
+    uregisters[a] = 0;               // zero first-operand register
 
     return addr;
 }
@@ -140,8 +140,8 @@ byte* CPU::ref(byte* addr) {
         b = static_cast<Integer*>(fetch(b))->value();
     }
 
-    registers[b] = registers[a];    // copy pointer
-    references[b] = true;
+    uregisters[b] = uregisters[a];    // copy pointer
+    ureferences[b] = true;
 
     return addr;
 }
@@ -174,9 +174,9 @@ byte* CPU::swap(byte* addr) {
         b = static_cast<Integer*>(fetch(b))->value();
     }
 
-    Object* tmp = registers[a];
-    registers[a] = registers[b];
-    registers[b] = tmp;
+    Object* tmp = uregisters[a];
+    uregisters[a] = uregisters[b];
+    uregisters[b] = tmp;
 
     return addr;
 }
@@ -281,9 +281,11 @@ byte* CPU::end(byte* addr) {
     if (debug) { cout << " -> return address: " << (long)(addr - bytecode); }
     delete frames.back();
     frames.pop_back();
+
     uregisters = registers;
     ureferences = references;
     uregisters_size = reg_count;
+
     return addr;
 }
 
