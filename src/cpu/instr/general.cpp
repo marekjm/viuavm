@@ -243,6 +243,108 @@ byte* CPU::frame(byte* addr) {
     return addr;
 }
 
+byte* CPU::param(byte* addr) {
+    /** Run param instruction.
+     */
+    int a, b;
+    bool a_ref = false, b_ref = false;
+
+    a_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    a = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    b_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    b = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    if (debug) {
+        cout << (a_ref ? " @" : " ") << a;
+        cout << (b_ref ? " @" : " ") << b;
+    }
+
+    if (a_ref) {
+        a = static_cast<Integer*>(fetch(a))->value();
+    }
+    if (b_ref) {
+        b = static_cast<Integer*>(fetch(b))->value();
+    }
+
+    frame_new->arguments[a] = uregisters[b]->copy();
+
+    return addr;
+}
+
+byte* CPU::paref(byte* addr) {
+    /** Run paref instruction.
+     */
+    int a, b;
+    bool a_ref = false, b_ref = false;
+
+    a_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    a = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    b_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    b = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    if (debug) {
+        cout << (a_ref ? " @" : " ") << a;
+        cout << (b_ref ? " @" : " ") << b;
+    }
+
+    if (a_ref) {
+        a = static_cast<Integer*>(fetch(a))->value();
+    }
+    if (b_ref) {
+        b = static_cast<Integer*>(fetch(b))->value();
+    }
+
+    frame_new->arguments[a] = uregisters[b];
+    frame_new->argreferences[a] = true;
+
+    return addr;
+}
+
+byte* CPU::arg(byte* addr) {
+    /** Run arg instruction.
+     */
+    int a, b;
+    bool a_ref = false, b_ref = false;
+
+    a_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    a = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    b_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    b = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    if (debug) {
+        cout << (a_ref ? " @" : " ") << a;
+        cout << (b_ref ? " @" : " ") << b;
+    }
+
+    if (a_ref) {
+        a = static_cast<Integer*>(fetch(a))->value();
+    }
+    if (b_ref) {
+        b = static_cast<Integer*>(fetch(b))->value();
+    }
+
+    uregisters[b] = frames.back()->arguments[a];    // copy pointer from first-operand register to second-operand register
+    frames.back()->arguments[a] = 0;                // zero the pointer to avoid double free
+    ureferences[b] = frames.back()->argreferences[a];  // set reference status
+
+    return addr;
+}
+
 byte* CPU::call(byte* addr) {
     /*  Run call instruction.
      */

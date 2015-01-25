@@ -81,6 +81,9 @@ class CPU {
     byte* echo(byte*);
 
     byte* frame(byte*);
+    byte* param(byte*);
+    byte* paref(byte*);
+    byte* arg(byte*);
 
     byte* call(byte*);
     byte* end(byte*);

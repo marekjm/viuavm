@@ -229,10 +229,13 @@ int CPU::run() {
                     instr_ptr = frame(instr_ptr+1);
                     break;
                 case PARAM:
-                    instr_ptr += OP_SIZES.at(OP_NAMES.at(OPCODE(*instr_ptr)));
+                    instr_ptr = param(instr_ptr+1);
                     break;
                 case PAREF:
-                    instr_ptr += OP_SIZES.at(OP_NAMES.at(OPCODE(*instr_ptr)));
+                    instr_ptr = paref(instr_ptr+1);
+                    break;
+                case ARG:
+                    instr_ptr = arg(instr_ptr+1);
                     break;
                 case CALL:
                     instr_ptr = call(instr_ptr+1);
