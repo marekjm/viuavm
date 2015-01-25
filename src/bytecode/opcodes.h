@@ -60,8 +60,7 @@ enum OPCODE : byte {
     PARAM,  // copy object from a register to parameter register (pass-by-value),
     PAREF,  // create a reference to an object in a parameter register (pass-by-reference),
     CALL,   // call given function with parameters set in parameter register,
-    ARGMV,  // move an object from argument register to a normal register (in a function call),
-    ARGC,   // store number of passed arguments in a given register (an Unsigned Integer type),
+    ARG,    // move an object from argument register to a normal register (inside a function call),
 
     JUMP,
     BRANCH,

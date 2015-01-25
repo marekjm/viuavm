@@ -56,8 +56,7 @@ const std::map<std::string, unsigned> OP_SIZES = {
     // this is because function call is followed by an instruction index, and
     // a register operand: one int is for index, second and bool for register
     { "call",   sizeof(byte) + sizeof(bool) + 2*sizeof(int) },
-    { "argmv",  sizeof(byte) },
-    { "argc",   sizeof(byte) },
+    { "arg",    sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
 
     { "jump",   sizeof(byte) + sizeof(int) },
     { "branch", sizeof(byte) + sizeof(bool) + 3*sizeof(int) },
@@ -102,31 +101,30 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { AND,	    "and" },
     { OR,	    "or" },
 
-    { MOVE,	    "move" },
-    { COPY,	    "copy" },
-    { REF,	    "ref" },
-    { SWAP,	    "swap" },
-    { DELETE,	"delete" },
-    { ISNULL,	"isnull" },
+    { MOVE,     "move" },
+    { COPY,     "copy" },
+    { REF,      "ref" },
+    { SWAP,     "swap" },
+    { DELETE,   "delete" },
+    { ISNULL,   "isnull" },
 
-    { PRINT,	"print" },
-    { ECHO,	    "echo" },
+    { PRINT,    "print" },
+    { ECHO,     "echo" },
 
     { FRAME,    "frame" },
-    { PARAM,	"param" },
-    { PAREF,	"paref" },
-    { CALL,	    "call" },
-    { ARGMV,	"argmv" },
-    { ARGC,	    "argc" },
+    { PARAM,    "param" },
+    { PAREF,    "paref" },
+    { CALL,     "call" },
+    { ARG,      "arg" },
 
-    { JUMP,	    "jump" },
-    { BRANCH,	"branch" },
+    { JUMP,     "jump" },
+    { BRANCH,   "branch" },
 
-    { RET,	    "ret" },
-    { END,	    "end" },
+    { RET,      "ret" },
+    { END,      "end" },
 
-    { PASS,	    "pass" },
-    { HALT,	    "halt" },
+    { PASS,     "pass" },
+    { HALT,     "halt" },
 };
 
 
