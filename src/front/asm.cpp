@@ -662,13 +662,19 @@ int main(int argc, char* argv[]) {
         cout << "fatal: error during function gathering: " << e << endl;
         return 1;
     }
-    if (DEBUG) { cout << "functions:\n"; }
-    for (string name : function_names) {
-        if (DEBUG) { cout << " *  " <<  name << ": " << Program::countBytes(functions.at(name).second) << " bytes" << endl; }
-        starting_instruction += Program::countBytes(functions.at(name).second);
-    }
 
-    bytes = Program::countBytes(ilines);
+    try {
+        if (DEBUG) { cout << "functions:\n"; }
+        for (string name : function_names) {
+            if (DEBUG) { cout << " *  " <<  name << ": " << Program::countBytes(functions.at(name).second) << " bytes" << endl; }
+            starting_instruction += Program::countBytes(functions.at(name).second);
+        }
+
+        bytes = Program::countBytes(ilines);
+    } catch (const string& e) {
+        cout << "fatal: error furing bytecode size calculations: " << e << endl;
+        return 1;
+    }
 
     if (DEBUG) { cout << "total required bytes: " <<  bytes << endl; }
     if (DEBUG) { cout << "executable offset: " << starting_instruction << endl; }
