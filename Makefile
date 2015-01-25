@@ -41,10 +41,10 @@ test: ${VM_CPU} ${VM_ASM}
 	python3 ./tests/tests.py --verbose --catch --failfast
 
 
-${VM_CPU}: src/bytecode.h src/front/cpu.cpp build/cpu/cpu.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O}
+${VM_CPU}: src/bytecode/opcodes.h src/front/cpu.cpp build/cpu/cpu.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O}
 	${CXX} ${CXXFLAGS} -o ${VM_CPU} src/front/cpu.cpp build/cpu/cpu.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O}
 
-${VM_ASM}: src/bytecode.h src/front/asm.cpp build/program.o build/support/string.o
+${VM_ASM}: src/bytecode/opcodes.h src/front/asm.cpp build/program.o build/support/string.o
 	${CXX} ${CXXFLAGS} -o ${VM_ASM} src/front/asm.cpp build/program.o build/support/string.o
 
 
@@ -52,7 +52,7 @@ bin/opcodes.bin: src/bytecode/opcodes.h src/bytecode/maps.h src/bytecode/opcd.cp
 	${CXX} ${CXXFLAGS} -o bin/opcodes.bin src/bytecode/opcd.cpp
 
 
-build/cpu/cpu.o: src/bytecode.h src/cpu/frame.h src/cpu/cpu.h src/cpu/cpu.cpp
+build/cpu/cpu.o: src/bytecode/opcodes.h src/cpu/frame.h src/cpu/cpu.h src/cpu/cpu.cpp
 	${CXX} ${CXXFLAGS} -c -o $@ ./src/cpu/cpu.cpp
 
 build/cpu/instr/general.o: src/cpu/instr/general.cpp
