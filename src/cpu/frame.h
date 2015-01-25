@@ -11,6 +11,7 @@ class Frame {
     byte* return_address;
     int arguments_size;
     Object** arguments;
+    bool* argreferences;
 
     Object** registers;
     bool* references;
@@ -18,8 +19,9 @@ class Frame {
 
     inline byte* ret_address() { return return_address; }
 
-    Frame(byte* ra, int argsize, int regsize = 64): return_address(ra), arguments_size(argsize), arguments(new Object*[argsize]), registers(new Object*[regsize]), references(new bool[regsize]), registers_size(regsize) {
+    Frame(byte* ra, int argsize, int regsize = 64): return_address(ra), arguments_size(argsize), arguments(new Object*[argsize]), argreferences(new bool[argsize]), registers(new Object*[regsize]), references(new bool[regsize]), registers_size(regsize) {
         for (int i = 0; i < argsize; ++i) { arguments[i] = 0; }
+        for (int i = 0; i < argsize; ++i) { argreferences[i] = false; }
         for (int i = 0; i < regsize; ++i) { registers[i] = 0; }
         for (int i = 0; i < regsize; ++i) { references[i] = false; }
     }
