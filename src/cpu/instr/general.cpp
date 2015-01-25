@@ -282,9 +282,15 @@ byte* CPU::end(byte* addr) {
     delete frames.back();
     frames.pop_back();
 
-    uregisters = registers;
-    ureferences = references;
-    uregisters_size = reg_count;
+    if (frames.size()) {
+        uregisters = frames.back()->registers;
+        ureferences = frames.back()->references;
+        uregisters_size = frames.back()->registers_size;
+    } else {
+        uregisters = registers;
+        ureferences = references;
+        uregisters_size = reg_count;
+    }
 
     return addr;
 }
