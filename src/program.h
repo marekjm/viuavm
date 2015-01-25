@@ -59,6 +59,7 @@ class Program {
     Program& frame      (int_op);
     Program& param      (int_op, int_op);
     Program& paref      (int_op, int_op);
+    Program& arg        (int_op, int_op);
 
     Program& call       (int, int_op);
     Program& jump       (int);

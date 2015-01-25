@@ -535,6 +535,18 @@ Program& Program::paref(int_op a, int_op b) {
     return (*this);
 }
 
+Program& Program::arg(int_op a, int_op b) {
+    /*  Inserts arg instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  a - argument number
+     *  b - register number
+     */
+    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, ARG, a, b);
+    return (*this);
+}
+
 Program& Program::call(int instruction_index, int_op reg) {
     /*  Inserts call instruction.
      *  Byte offset is calculated automatically.
