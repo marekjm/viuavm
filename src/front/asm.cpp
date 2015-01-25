@@ -471,6 +471,10 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = get2operands(operands);
             program.paref(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
+        } else if (str::startswith(line, "arg")) {
+            string a_chnk, b_chnk;
+            tie(a_chnk, b_chnk) = get2operands(operands);
+            program.arg(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "call")) {
             /*  Full form of call instruction has two operands: instruction index and register index.
              *  If call is given only one operand - it means it is the instruction index and returned value is discarded.
