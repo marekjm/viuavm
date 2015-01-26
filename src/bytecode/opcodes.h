@@ -21,6 +21,8 @@ enum OPCODE : byte {
     IGTE,
     IEQ,
 
+    FSTORE,
+
     BSTORE,
     BADD,
     BSUB,

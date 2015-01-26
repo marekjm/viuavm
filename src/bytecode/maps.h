@@ -24,6 +24,8 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "igte",   sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
     { "ieq",    sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
 
+    { "fstore", sizeof(byte) + 2*sizeof(bool) + sizeof(int) + sizeof(float) },
+
     { "bstore", sizeof(byte) + 2*sizeof(bool) + sizeof(int) + sizeof(byte) },
     { "badd",   sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
     { "bsub",   sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
@@ -84,6 +86,8 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { IGT,      "igt" },
     { IGTE,     "igte" },
     { IEQ,      "ieq" },
+
+    { FSTORE,   "fstore" },
 
     { BSTORE,   "bstore" },
     { BADD,     "badd" },
