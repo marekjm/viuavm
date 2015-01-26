@@ -1,19 +1,35 @@
 .def: rec 0
-    arg 0 1
-    istore 2 0
-    idec 1
-    ilt 1 2 3
+    .name: 1 counter
+    .name: 2 zero
+
+    ; unpack arguments
+    arg 0 counter
+    arg 1 zero
+
+    ; decrease counter and check if it's less than zero
+    idec counter
+    ilt counter zero 3
+
     branch 3 :break_rec
-    print 1
-    frame 1
-    param 0 1
+    print counter
+    frame 2
+    param 0 counter
+    paref 1 zero
     call rec
+
     .mark: break_rec
     end
 .end
 
+; setup parameters
 istore 1 10
-frame 1
+istore 2 0
+
+; create frame and pass parameters
+frame 2
 param 0 1
+paref 1 2
+
 call rec
+
 halt

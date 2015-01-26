@@ -381,7 +381,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         instr = str::chunk(line);
         operands = str::lstrip(str::sub(line, instr.size()));
 
-        if (DEBUG) { cout << " *  assemble: +" << instruction+1 << ": " << instr << '\n'; }
+        if (DEBUG) { cout << " *  assemble: +" << instruction+1 << ": " << instr; }
 
         if (str::startswith(line, "istore")) {
             string regno_chnk, number_chnk;
@@ -514,6 +514,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             // which means that return value will be discarded
             if (reg == "") { reg = "0"; }
 
+            if (DEBUG) { cout << ' ' << fun_name << ' ' << reg << endl; }
             program.call(instruction_index, getint_op(resolveregister(reg, names)));
         } else if (str::startswith(line, "branch")) {
             /*  If branch is given three operands, it means its full, three-operands form is being used.
@@ -561,6 +562,8 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         } else {
             throw ("unimplemented instruction: " + instr);
         }
+
+        if (DEBUG) { cout << '\n'; }
 
         ++instruction;
     }

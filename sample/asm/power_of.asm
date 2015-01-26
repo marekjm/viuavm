@@ -1,14 +1,14 @@
 ; purpose of this program is to compute n-th power of a number
 
-.def: main 0
+.def: power_of 1
     .name: 1 base
     .name: 2 exponent
     .name: 3 zero
     .name: 6 result
 
     ; store operands of the power-of operation
-    istore base 4
-    istore exponent 3
+    arg 0 base
+    arg 1 exponent
 
     ; store zero - we need it to compare the exponent to it
     istore zero 0
@@ -20,7 +20,7 @@
     not 4
     branch 4 :algorithm
     istore result 1
-    jump :final_print
+    jump :final
 
     ; now, we multiply in a loop
     .mark: algorithm
@@ -32,15 +32,28 @@
 
     .mark: loop
     ilt counter exponent 4
-    branch 4 12 :final_print
+    branch 4 12 :final
     imul result base
     pass
     iinc counter
     jump :loop
 
-    ; print the result
-    .mark: final_print
-    print result
+    ; final instructions
+    .mark: final
+    ; return result
+    ret result
+    end
+.end
+
+.def: main 0
+    istore 1 4
+    istore 2 3
+
+    frame 2
+    param 0 1
+    param 1 2
+    call power_of 1
+    print 1
     end
 .end
 

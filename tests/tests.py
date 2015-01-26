@@ -295,6 +295,7 @@ class SampleProgramsTests(unittest.TestCase):
         self.assertEqual('40320', output.strip())
         self.assertEqual(0, excode)
 
+
 class FunctionTests(unittest.TestCase):
     """Tests for various sample programs.
 
