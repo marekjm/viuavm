@@ -22,7 +22,10 @@ class Frame {
 
     inline byte* ret_address() { return return_address; }
 
-    Frame(byte* ra, int argsize, int regsize = 64): return_address(ra), arguments_size(argsize), arguments(0), argreferences(0), registers(0), references(0), registers_size(regsize), place_return_value_in(0), resolve_return_value_register(false) {
+    Frame(byte* ra, int argsize, int regsize = 64): return_address(ra),
+                                                    arguments_size(argsize), arguments(0), argreferences(0),
+                                                    registers(0), references(0), registers_size(regsize),
+                                                    place_return_value_in(0), resolve_return_value_register(false) {
         arguments = new Object*[argsize];
         argreferences = new bool[argsize];
         registers = new Object*[regsize];
@@ -34,14 +37,7 @@ class Frame {
     }
     Frame(const Frame& that) {
         return_address = that.return_address;
-        registers_size = that.registers_size;
-        for (int i = 0; i < registers_size; ++i) {
-            if (that.registers[i] != 0) {
-                registers[i] = that.registers[i]->copy();
-            } else {
-                registers[i] = 0;
-            }
-        }
+
         registers_size = that.registers_size;
         for (int i = 0; i < registers_size; ++i) {
             if (that.registers[i] != 0) {
@@ -53,16 +49,28 @@ class Frame {
         for (int i = 0; i < registers_size; ++i) {
             references[i] = that.references[i];
         }
+
+        arguments_size = that.arguments_size;
+        for (int i = 0; i < arguments_size; ++i) {
+            if (that.arguments[i] != 0) {
+                arguments[i] = that.arguments[i]->copy();
+            } else {
+                arguments[i] = 0;
+            }
+        }
+        for (int i = 0; i < arguments_size; ++i) {
+            argreferences[i] = that.argreferences[i];
+        }
     }
     ~Frame() {
         for (int i = 0; i < arguments_size; ++i) {
-            if (arguments[i] != 0) { delete arguments[i]; }
+            if (arguments[i] != 0 and !argreferences[i]) { delete arguments[i]; }
         }
         delete[] arguments;
         delete[] argreferences;
 
         for (int i = 0; i < registers_size; ++i) {
-            if (registers[i] != 0 and !references) { delete registers[i]; }
+            if (registers[i] != 0 and !references[i]) { delete registers[i]; }
         }
         delete[] registers;
         delete[] references;
