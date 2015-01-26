@@ -42,6 +42,11 @@ byte_op getbyte_op(const string& s) {
     return tuple<bool, char>(ref, (char)stoi(ref ? str::sub(s, 1) : s));
 }
 
+float_op getfloat_op(const string& s) {
+    bool ref = s[0] == '@';
+    return tuple<bool, float>(ref, stof(ref ? str::sub(s, 1) : s));
+}
+
 
 vector<string> getilines(const vector<string>& lines) {
     /*  Clears code from empty lines and comments.
@@ -413,6 +418,10 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string regno_chnk;
             regno_chnk = str::chunk(operands);
             program.idec(getint_op(resolveregister(regno_chnk, names)));
+        } else if (str::startswith(line, "fstore")) {
+            string regno_chnk, byte_chnk;
+            tie(regno_chnk, byte_chnk) = get2operands(operands);
+            program.fstore(getint_op(resolveregister(regno_chnk, names)), getfloat_op(resolveregister(byte_chnk, names)));
         } else if (str::startswith(line, "bstore")) {
             string regno_chnk, byte_chnk;
             tie(regno_chnk, byte_chnk) = get2operands(operands);
