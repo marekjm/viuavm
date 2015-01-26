@@ -10,6 +10,7 @@
 
 typedef std::tuple<bool, int> int_op;
 typedef std::tuple<bool, byte> byte_op;
+typedef std::tuple<bool, float> float_op;
 
 
 class Program {
@@ -41,6 +42,8 @@ class Program {
     Program& igt        (int_op, int_op, int_op);
     Program& igte       (int_op, int_op, int_op);
     Program& ieq        (int_op, int_op, int_op);
+
+    Program& fstore     (int_op, float_op);
 
     Program& bstore     (int_op, byte_op);
 
