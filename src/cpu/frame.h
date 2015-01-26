@@ -17,9 +17,16 @@ class Frame {
     bool* references;
     int registers_size;
 
+    int place_return_value_in;
+    bool resolve_return_value_register;
+
     inline byte* ret_address() { return return_address; }
 
-    Frame(byte* ra, int argsize, int regsize = 64): return_address(ra), arguments_size(argsize), arguments(new Object*[argsize]), argreferences(new bool[argsize]), registers(new Object*[regsize]), references(new bool[regsize]), registers_size(regsize) {
+    Frame(byte* ra, int argsize, int regsize = 64): return_address(ra), arguments_size(argsize), arguments(0), argreferences(0), registers(0), references(0), registers_size(regsize), place_return_value_in(0), resolve_return_value_register(false) {
+        arguments = new Object*[argsize];
+        argreferences = new bool[argsize];
+        registers = new Object*[regsize];
+        references = new bool[regsize];
         for (int i = 0; i < argsize; ++i) { arguments[i] = 0; }
         for (int i = 0; i < argsize; ++i) { argreferences[i] = false; }
         for (int i = 0; i < regsize; ++i) { registers[i] = 0; }
@@ -43,16 +50,22 @@ class Frame {
                 registers[i] = 0;
             }
         }
+        for (int i = 0; i < registers_size; ++i) {
+            references[i] = that.references[i];
+        }
     }
     ~Frame() {
         for (int i = 0; i < arguments_size; ++i) {
             if (arguments[i] != 0) { delete arguments[i]; }
         }
         delete[] arguments;
+        delete[] argreferences;
+
         for (int i = 0; i < registers_size; ++i) {
             if (registers[i] != 0 and !references) { delete registers[i]; }
         }
         delete[] registers;
+        delete[] references;
     }
 };
 
