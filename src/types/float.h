@@ -1,5 +1,5 @@
-#ifndef TATANKA_TYPES_INTEGER_H
-#define TATANKA_TYPES_INTEGER_H
+#ifndef TATANKA_TYPES_FLOAT_H
+#define TATANKA_TYPES_FLOAT_H
 
 #pragma once
 
