@@ -61,6 +61,8 @@ class CPU {
     byte* iinc(byte*);
     byte* idec(byte*);
 
+    byte* fstore(byte*);
+
     byte* bstore(byte*);
 
     byte* boolean(byte*);

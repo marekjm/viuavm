@@ -192,6 +192,9 @@ int CPU::run() {
                 case IEQ:
                     instr_ptr = ieq(instr_ptr+1);
                     break;
+                case FSTORE:
+                    instr_ptr = fstore(instr_ptr+1);
+                    break;
                 case BSTORE:
                     instr_ptr = bstore(instr_ptr+1);
                     break;
