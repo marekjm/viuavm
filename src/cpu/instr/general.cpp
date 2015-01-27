@@ -271,6 +271,7 @@ byte* CPU::param(byte* addr) {
         b = static_cast<Integer*>(fetch(b))->value();
     }
 
+    if (a >= frame_new->arguments_size) { throw "parameter register index out of bounds (greater than arguments set size) while adding parameter"; }
     frame_new->arguments[a] = uregisters[b]->copy();
 
     return addr;
@@ -304,6 +305,7 @@ byte* CPU::paref(byte* addr) {
         b = static_cast<Integer*>(fetch(b))->value();
     }
 
+    if (a >= frame_new->arguments_size) { throw "parameter register index out of bounds (greater than arguments set size) while adding parameter"; }
     frame_new->arguments[a] = uregisters[b];
     frame_new->argreferences[a] = true;
 
@@ -350,14 +352,29 @@ byte* CPU::call(byte* addr) {
      */
     // save return address for frame
     byte* return_address = (addr + sizeof(bool) + 2*sizeof(int));
+    byte* call_address = bytecode + *(int*)addr;
+    pointer::inc<int, byte>(addr);
+
     if (debug) {
         cout << ": setting return address to bytecode " << (long)(return_address-bytecode);
     }
     if (frame_new == 0) {
-        throw "function call without a frame: use `frame 0' if the function takes no parameters";
+        throw "function call without a frame: use `frame 0' in source code if the function takes no parameters";
     }
     // adjust return address
     frame_new->return_address = return_address;
+
+    frame_new->resolve_return_value_register = *(bool*)addr;
+    pointer::inc<bool, byte>(addr);
+    frame_new->place_return_value_in = *(int*)addr;
+    if (debug) {
+        if (frame_new->place_return_value_in == 0) {
+            cout << " (return value will be discarded)" << endl;
+        } else {
+            cout << " (return value will be placed in: " << (frame_new->resolve_return_value_register ? "@" : "") << frame_new->place_return_value_in << ')' << endl;
+        }
+    }
+
     // adjust register set
     uregisters = frame_new->registers;
     ureferences = frame_new->references;
@@ -369,8 +386,7 @@ byte* CPU::call(byte* addr) {
     // and free the hook
     frame_new = 0;
 
-    addr = bytecode + *(int*)addr;
-    return addr;
+    return call_address;
 }
 
 byte* CPU::end(byte* addr) {
@@ -381,9 +397,23 @@ byte* CPU::end(byte* addr) {
     }
     addr = frames.back()->ret_address();
     if (debug) { cout << " -> return address: " << (long)(addr - bytecode); }
+
+    Object* returned = 0;
+    int return_value_register = frames.back()->place_return_value_in;
+    bool resolve_return_value_register = frames.back()->resolve_return_value_register;
+    if (return_value_register != 0) {
+        // we check in 0. register because it's reserved for return values
+        if (uregisters[0] == 0) {
+            throw "return value requested by frame but function did not set return register";
+        }
+        returned = uregisters[0]->copy();
+    }
+
+    // delete and remove top frame
     delete frames.back();
     frames.pop_back();
 
+    // adjust registers
     if (frames.size()) {
         uregisters = frames.back()->registers;
         ureferences = frames.back()->references;
@@ -392,6 +422,14 @@ byte* CPU::end(byte* addr) {
         uregisters = registers;
         ureferences = references;
         uregisters_size = reg_count;
+    }
+
+    // place return value
+    if (returned) {
+        if (resolve_return_value_register) {
+            return_value_register = static_cast<Integer*>(fetch(return_value_register))->value();
+        }
+        place(return_value_register, returned);
     }
 
     return addr;

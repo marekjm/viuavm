@@ -295,6 +295,7 @@ class SampleProgramsTests(unittest.TestCase):
         self.assertEqual('40320', output.strip())
         self.assertEqual(0, excode)
 
+
 class FunctionTests(unittest.TestCase):
     """Tests for various sample programs.
 
@@ -331,7 +332,7 @@ class FunctionTests(unittest.TestCase):
         self.assertEqual([i for i in range(9, -1, -1)], [int(i) for i in output.strip().splitlines()])
         self.assertEqual(0, excode)
 
-    def testRecursiveCallFunctionSupport(self):
+    def testLocalRegistersInFunctions(self):
         name = 'local_registers.asm'
         assembly_path = os.path.join(FunctionTests.PATH, name)
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
