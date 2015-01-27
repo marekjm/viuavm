@@ -74,7 +74,6 @@ namespace str {
                 break;
             }
         }
-        //cout << sub(s, 0, dot) << "." << sub(s, dot+1) << endl;
         is = isnum(sub(s, 0, dot), negatives) and isnum(sub(s, dot+1));
         return is;
     }
