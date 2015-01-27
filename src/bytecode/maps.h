@@ -24,7 +24,7 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "igte",   sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
     { "ieq",    sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
 
-    { "fstore", sizeof(byte) + 2*sizeof(bool) + sizeof(int) + sizeof(float) },
+    { "fstore", sizeof(byte) + sizeof(bool) + sizeof(int) + sizeof(float) },
 
     { "bstore", sizeof(byte) + 2*sizeof(bool) + sizeof(int) + sizeof(byte) },
     { "badd",   sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
