@@ -43,7 +43,7 @@ class Program {
     Program& igte       (int_op, int_op, int_op);
     Program& ieq        (int_op, int_op, int_op);
 
-    Program& fstore     (int_op, float_op);
+    Program& fstore     (int_op, float);
 
     Program& bstore     (int_op, byte_op);
 

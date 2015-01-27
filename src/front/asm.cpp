@@ -419,9 +419,10 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             regno_chnk = str::chunk(operands);
             program.idec(getint_op(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "fstore")) {
-            string regno_chnk, byte_chnk;
-            tie(regno_chnk, byte_chnk) = get2operands(operands);
-            program.fstore(getint_op(resolveregister(regno_chnk, names)), getfloat_op(resolveregister(byte_chnk, names)));
+            string regno_chnk, float_chnk;
+            tie(regno_chnk, float_chnk) = get2operands(operands);
+            cout << regno_chnk << " : " << float_chnk << endl;
+            program.fstore(getint_op(resolveregister(regno_chnk, names)), stod(float_chnk));
         } else if (str::startswith(line, "bstore")) {
             string regno_chnk, byte_chnk;
             tie(regno_chnk, byte_chnk) = get2operands(operands);

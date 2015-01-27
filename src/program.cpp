@@ -382,7 +382,7 @@ Program& Program::ieq(int_op rega, int_op regb, int_op regr) {
     return (*this);
 }
 
-Program& Program::fstore(int_op regno, float_op f) {
+Program& Program::fstore(int_op regno, float f) {
     /*  Inserts fstore instruction to bytecode.
      *
      *  :params:
@@ -390,16 +390,9 @@ Program& Program::fstore(int_op regno, float_op f) {
      *  regno - register number
      *  f     - value to store
      */
-    bool f_ref = false;
-    float ft;
-
-    tie(f_ref, ft) = f;
-
     *(addr_ptr++) = FSTORE;
     addr_ptr = insertIntegerOperand(addr_ptr, regno);
-    *((bool*)addr_ptr) = f_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((float*)addr_ptr)  = ft;
+    *((float*)addr_ptr)  = f;
     pointer::inc<float, byte>(addr_ptr);
 
     return (*this);
