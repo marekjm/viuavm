@@ -411,6 +411,110 @@ Program& Program::fadd(int_op rega, int_op regb, int_op regr) {
     return (*this);
 }
 
+Program& Program::fsub(int_op rega, int_op regb, int_op regr) {
+    /*  Inserts fsub instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  rega    - register index of first operand
+     *  regb    - register index of second operand
+     *  regr    - register index in which to store the result
+     */
+    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, FSUB, rega, regb, regr);
+    return (*this);
+}
+
+Program& Program::fmul(int_op rega, int_op regb, int_op regr) {
+    /*  Inserts fmul instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  rega    - register index of first operand
+     *  regb    - register index of second operand
+     *  regr    - register index in which to store the result
+     */
+    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, FMUL, rega, regb, regr);
+    return (*this);
+}
+
+Program& Program::fdiv(int_op rega, int_op regb, int_op regr) {
+    /*  Inserts fdiv instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  rega    - register index of first operand
+     *  regb    - register index of second operand
+     *  regr    - register index in which to store the result
+     */
+    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, FDIV, rega, regb, regr);
+    return (*this);
+}
+
+Program& Program::flt(int_op rega, int_op regb, int_op regr) {
+    /*  Inserts flt instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  rega    - register index of first operand
+     *  regb    - register index of second operand
+     *  regr    - register index in which to store the result
+     */
+    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, FLT, rega, regb, regr);
+    return (*this);
+}
+
+Program& Program::flte(int_op rega, int_op regb, int_op regr) {
+    /*  Inserts flte instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  rega    - register index of first operand
+     *  regb    - register index of second operand
+     *  regr    - register index in which to store the result
+     */
+    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, FLTE, rega, regb, regr);
+    return (*this);
+}
+
+Program& Program::fgt(int_op rega, int_op regb, int_op regr) {
+    /*  Inserts fgt instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  rega    - register index of first operand
+     *  regb    - register index of second operand
+     *  regr    - register index in which to store the resugt
+     */
+    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, FGT, rega, regb, regr);
+    return (*this);
+}
+
+Program& Program::fgte(int_op rega, int_op regb, int_op regr) {
+    /*  Inserts fgte instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  rega    - register index of first operand
+     *  regb    - register index of second operand
+     *  regr    - register index in which to store the resugt
+     */
+    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, FGTE, rega, regb, regr);
+    return (*this);
+}
+
+Program& Program::feq(int_op rega, int_op regb, int_op regr) {
+    /*  Inserts feq instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  rega    - register index of first operand
+     *  regb    - register index of second operand
+     *  regr    - register index in which to store the resugt
+     */
+    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, FEQ, rega, regb, regr);
+    return (*this);
+}
+
 Program& Program::bstore(int_op regno, byte_op b) {
     /*  Inserts bstore instruction to bytecode.
      *

@@ -45,6 +45,15 @@ class Program {
 
     Program& fstore     (int_op, float);
     Program& fadd       (int_op, int_op, int_op);
+    Program& fsub       (int_op, int_op, int_op);
+    Program& fmul       (int_op, int_op, int_op);
+    Program& fdiv       (int_op, int_op, int_op);
+
+    Program& flt        (int_op, int_op, int_op);
+    Program& flte       (int_op, int_op, int_op);
+    Program& fgt        (int_op, int_op, int_op);
+    Program& fgte       (int_op, int_op, int_op);
+    Program& feq        (int_op, int_op, int_op);
 
     Program& bstore     (int_op, byte_op);
 
