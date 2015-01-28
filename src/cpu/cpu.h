@@ -62,6 +62,7 @@ class CPU {
     byte* idec(byte*);
 
     byte* fstore(byte*);
+    byte* fadd(byte*);
 
     byte* bstore(byte*);
 
