@@ -327,7 +327,7 @@ byte* CPU::flte(byte* addr) {
     a = static_cast<Float*>(fetch(rega_num))->value();
     b = static_cast<Float*>(fetch(regb_num))->value();
 
-    place(regr_num, new Float(a <= b));
+    place(regr_num, new Boolean(a <= b));
 
     return addr;
 }
@@ -376,7 +376,7 @@ byte* CPU::fgt(byte* addr) {
     a = static_cast<Float*>(fetch(rega_num))->value();
     b = static_cast<Float*>(fetch(regb_num))->value();
 
-    place(regr_num, new Float(a > b));
+    place(regr_num, new Boolean(a > b));
 
     return addr;
 }
@@ -425,7 +425,7 @@ byte* CPU::fgte(byte* addr) {
     a = static_cast<Float*>(fetch(rega_num))->value();
     b = static_cast<Float*>(fetch(regb_num))->value();
 
-    place(regr_num, new Float(a >= b));
+    place(regr_num, new Boolean(a >= b));
 
     return addr;
 }
@@ -474,7 +474,7 @@ byte* CPU::feq(byte* addr) {
     a = static_cast<Float*>(fetch(rega_num))->value();
     b = static_cast<Float*>(fetch(regb_num))->value();
 
-    place(regr_num, new Float(a == b));
+    place(regr_num, new Boolean(a == b));
 
     return addr;
 }
