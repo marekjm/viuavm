@@ -440,6 +440,22 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             program.fstore(getint_op(resolveregister(regno_chnk, names)), stod(float_chnk));
         } else if (str::startswith(line, "fadd")) {
             assemble_three_intop_instruction(program, names, "fadd", operands);
+        } else if (str::startswith(line, "fsub")) {
+            assemble_three_intop_instruction(program, names, "fsub", operands);
+        } else if (str::startswith(line, "fmul")) {
+            assemble_three_intop_instruction(program, names, "fmul", operands);
+        } else if (str::startswith(line, "fdiv")) {
+            assemble_three_intop_instruction(program, names, "fdiv", operands);
+        } else if (str::startswith(line, "flt")) {
+            assemble_three_intop_instruction(program, names, "flt", operands);
+        } else if (str::startswith(line, "flte")) {
+            assemble_three_intop_instruction(program, names, "flte", operands);
+        } else if (str::startswith(line, "fgt")) {
+            assemble_three_intop_instruction(program, names, "fgt", operands);
+        } else if (str::startswith(line, "fgte")) {
+            assemble_three_intop_instruction(program, names, "fgte", operands);
+        } else if (str::startswith(line, "feq")) {
+            assemble_three_intop_instruction(program, names, "feq", operands);
         } else if (str::startswith(line, "bstore")) {
             string regno_chnk, byte_chnk;
             tie(regno_chnk, byte_chnk) = get2operands(operands);
