@@ -1,5 +1,5 @@
-#ifndef TATANKA_TYPES_BYTE_H
-#define TATANKA_TYPES_BYTE_H
+#ifndef TATANKA_TYPES_STRING_H
+#define TATANKA_TYPES_STRING_H
 
 #pragma once
 
