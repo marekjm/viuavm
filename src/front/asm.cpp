@@ -423,6 +423,8 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             tie(regno_chnk, float_chnk) = get2operands(operands);
             cout << regno_chnk << " : " << float_chnk << endl;
             program.fstore(getint_op(resolveregister(regno_chnk, names)), stod(float_chnk));
+        } else if (str::startswith(line, "fadd")) {
+            assemble_three_intop_instruction(program, names, "fadd", operands);
         } else if (str::startswith(line, "bstore")) {
             string regno_chnk, byte_chnk;
             tie(regno_chnk, byte_chnk) = get2operands(operands);
