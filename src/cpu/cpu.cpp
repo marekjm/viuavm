@@ -198,6 +198,30 @@ int CPU::run() {
                 case FADD:
                     instr_ptr = fadd(instr_ptr+1);
                     break;
+                case FSUB:
+                    instr_ptr = fsub(instr_ptr+1);
+                    break;
+                case FMUL:
+                    instr_ptr = fmul(instr_ptr+1);
+                    break;
+                case FDIV:
+                    instr_ptr = fdiv(instr_ptr+1);
+                    break;
+                case FLT:
+                    instr_ptr = flt(instr_ptr+1);
+                    break;
+                case FLTE:
+                    instr_ptr = flte(instr_ptr+1);
+                    break;
+                case FGT:
+                    instr_ptr = fgt(instr_ptr+1);
+                    break;
+                case FGTE:
+                    instr_ptr = fgte(instr_ptr+1);
+                    break;
+                case FEQ:
+                    instr_ptr = feq(instr_ptr+1);
+                    break;
                 case BSTORE:
                     instr_ptr = bstore(instr_ptr+1);
                     break;
