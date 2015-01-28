@@ -172,6 +172,103 @@ class IntegerInstructionsTests(unittest.TestCase):
         self.assertEqual(0, excode)
 
 
+class FloatInstructionsTests(unittest.TestCase):
+    """Tests for float instructions.
+    """
+    PATH = './sample/asm/float'
+
+    def testFADD(self):
+        name = 'add.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual('0.5', output.strip())
+        self.assertEqual(0, excode)
+
+    def testFSUB(self):
+        name = 'sub.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual('1.015', output.strip())
+        self.assertEqual(0, excode)
+
+    def testFMUL(self):
+        name = 'mul.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual('8.004', output.strip())
+        self.assertEqual(0, excode)
+
+    def testFDIV(self):
+        name = 'div.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual('1.57', output.strip())
+        self.assertEqual(0, excode)
+
+    def testFLT(self):
+        name = 'lt.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual('true', output.strip())
+        self.assertEqual(0, excode)
+
+    @unittest.skip('FIXME: float <= operator seems to work as < operator...')
+    def testFLTE(self):
+        name = 'lte.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual('true', output.strip())
+        self.assertEqual(0, excode)
+
+    def testFGT(self):
+        name = 'gt.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual('true', output.strip())
+        self.assertEqual(0, excode)
+
+    def testFGTE(self):
+        name = 'gte.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual('true', output.strip())
+        self.assertEqual(0, excode)
+
+    def testFEQ(self):
+        name = 'eq.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual('true', output.strip())
+        self.assertEqual(0, excode)
+
+    def testFloatsInCondition(self):
+        name = 'in_condition.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual('true', output.strip())
+        self.assertEqual(0, excode)
+
+
 class ByteInstructionsTests(unittest.TestCase):
     """Tests for byte instructions.
     """
