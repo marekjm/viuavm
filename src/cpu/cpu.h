@@ -63,6 +63,15 @@ class CPU {
 
     byte* fstore(byte*);
     byte* fadd(byte*);
+    byte* fsub(byte*);
+    byte* fmul(byte*);
+    byte* fdiv(byte*);
+
+    byte* flt(byte*);
+    byte* flte(byte*);
+    byte* fgt(byte*);
+    byte* fgte(byte*);
+    byte* feq(byte*);
 
     byte* bstore(byte*);
 
