@@ -1,9 +1,9 @@
 #include <iostream>
 #include "../../bytecode/bytetypedef.h"
 #include "../../types/object.h"
+#include "../../types/boolean.h"
 #include "../../types/integer.h"
 #include "../../types/float.h"
-#include "../../types/byte.h"
 #include "../../support/pointer.h"
 #include "../cpu.h"
 using namespace std;
