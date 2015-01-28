@@ -327,7 +327,6 @@ const map<string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS = {
     { "ieq",  &Program::ieq },
 
     { "fadd", &Program::fadd },
-    /*
     { "fsub", &Program::fsub },
     { "fmul", &Program::fmul },
     { "fdiv", &Program::fdiv },
@@ -336,7 +335,6 @@ const map<string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS = {
     { "fgt",  &Program::fgt },
     { "fgte", &Program::fgte },
     { "feq",  &Program::feq },
-    */
 
     { "and",  &Program::logand },
     { "or",   &Program::logor },
