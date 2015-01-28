@@ -44,6 +44,7 @@ class Program {
     Program& ieq        (int_op, int_op, int_op);
 
     Program& fstore     (int_op, float);
+    Program& fadd       (int_op, int_op, int_op);
 
     Program& bstore     (int_op, byte_op);
 

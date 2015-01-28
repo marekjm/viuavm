@@ -398,6 +398,19 @@ Program& Program::fstore(int_op regno, float f) {
     return (*this);
 }
 
+Program& Program::fadd(int_op rega, int_op regb, int_op regr) {
+    /*  Inserts fadd instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  rega    - register index of first operand
+     *  regb    - register index of second operand
+     *  regr    - register index in which to store the result
+     */
+    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, FADD, rega, regb, regr);
+    return (*this);
+}
+
 Program& Program::bstore(int_op regno, byte_op b) {
     /*  Inserts bstore instruction to bytecode.
      *
