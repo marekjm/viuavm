@@ -12,6 +12,6 @@
     end
 .end
 
-frame 0
+frame 0 17
 call main
 halt

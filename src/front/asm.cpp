@@ -495,15 +495,18 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             regno_chnk = str::chunk(operands);
             program.echo(getint_op(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "frame")) {
-            string regno_chnk;
-            regno_chnk = str::chunk(operands);
-            if (ERROR_OPERANDLESS_FRAME or ERROR_ALL) {
-                throw "frame instruction without operand";
-            } else if (WARNING_OPERANDLESS_FRAME or WARNING_ALL) {
-                cout << "warning: frame instruction without operand: inserting zero" << endl;
+            if (operands.size() == 0) {
+                if (ERROR_OPERANDLESS_FRAME or ERROR_ALL) {
+                    throw "frame instruction without operand";
+                } else if (WARNING_OPERANDLESS_FRAME or WARNING_ALL) {
+                    cout << "warning: frame instruction without operand: inserting zero" << endl;
+                }
             }
-            if (regno_chnk.size() == 0) { regno_chnk = "0"; }
-            program.frame(getint_op(resolveregister(regno_chnk, names)));
+            string a_chnk, b_chnk;
+            tie(a_chnk, b_chnk) = get2operands(operands);
+            if (a_chnk.size() == 0) { a_chnk = "0"; }
+            if (b_chnk.size() == 0) { b_chnk = "16"; }  // default number of local registers
+            program.frame(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "param")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = get2operands(operands);

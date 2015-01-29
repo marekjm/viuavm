@@ -636,11 +636,10 @@ Program& Program::echo(int_op reg) {
     return (*this);
 }
 
-Program& Program::frame(int_op op) {
+Program& Program::frame(int_op a, int_op b) {
     /*  Inserts frame instruction to bytecode.
      */
-    *(addr_ptr++) = FRAME;
-    addr_ptr = insertIntegerOperand(addr_ptr, op);
+    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, FRAME, a, b);
     return (*this);
 }
 

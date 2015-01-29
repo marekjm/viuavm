@@ -218,27 +218,35 @@ byte* CPU::ret(byte* addr) {
 }
 
 byte* CPU::frame(byte* addr) {
-    /**
+    /** Create new frame for function calls.
      */
-    bool ref = false;
-    int number;
+    int arguments, local_registers;
+    bool arguments_ref = false, local_registers_ref = false;
 
-    ref = *((bool*)addr);
+    arguments_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
+    arguments = *((int*)addr);
+    pointer::inc<int, byte>(addr);
 
-    number = *((int*)addr);
+    local_registers_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    local_registers = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << (ref ? " @" : " ") << number << endl;
+        cout << (arguments_ref ? " @" : " ") << arguments;
+        cout << (local_registers_ref ? " @" : " ") << local_registers;
     }
 
-    if (ref) {
-        number = static_cast<Integer*>(fetch(number))->value();
+    if (arguments_ref) {
+        arguments = static_cast<Integer*>(fetch(arguments))->value();
+    }
+    if (local_registers_ref) {
+        local_registers = static_cast<Integer*>(fetch(local_registers))->value();
     }
 
     if (frame_new != 0) { throw "requested new frame while last one is unused"; }
-    frame_new = new Frame(0, number);
+    frame_new = new Frame(0, arguments, local_registers);
 
     return addr;
 }

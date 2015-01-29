@@ -61,7 +61,7 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "print",  sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "echo",   sizeof(byte) + sizeof(bool) + sizeof(int) },
 
-    { "frame",  sizeof(byte) + sizeof(bool) + sizeof(int) },
+    { "frame",  sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
     { "param",  sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
     { "paref",  sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
     // this is because function call is followed by an instruction index, and
