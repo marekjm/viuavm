@@ -295,6 +295,20 @@ class SampleProgramsTests(unittest.TestCase):
         self.assertEqual('40320', output.strip())
         self.assertEqual(0, excode)
 
+    def testFibonacciNumbers(self):
+        """We count Fibonacci numbers from 1 to 16.
+        It takes some time, you know. So, wait for it...
+        """
+        name = 'fibonacci.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        numbers_32 = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946, 17711, 28657, 46368, 75025, 121393, 196418, 317811, 514229, 832040, 1346269, 2178309]
+        numbers_16 = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987]
+        self.assertEqual(numbers_16, [int(i) for i in output.strip().splitlines()])
+        self.assertEqual(0, excode)
+
 
 class FunctionTests(unittest.TestCase):
     """Tests for various sample programs.
