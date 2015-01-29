@@ -48,7 +48,7 @@
     .name: 2 max
     .name: 1 check
 
-    istore counter 16
+    istore counter 1
     ; uncomment "max 32" to count numbers up to 32
     ; but be aware that it takes about a minute to calculate on Intel i5-430M
     istore max 16
