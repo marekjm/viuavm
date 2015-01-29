@@ -356,6 +356,7 @@ byte* CPU::call(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (debug) {
+        cout << ' ' << (long)(call_address-bytecode);
         cout << ": setting return address to bytecode " << (long)(return_address-bytecode);
     }
     if (frame_new == 0) {
@@ -369,9 +370,9 @@ byte* CPU::call(byte* addr) {
     frame_new->place_return_value_in = *(int*)addr;
     if (debug) {
         if (frame_new->place_return_value_in == 0) {
-            cout << " (return value will be discarded)" << endl;
+            cout << " (return value will be discarded)";
         } else {
-            cout << " (return value will be placed in: " << (frame_new->resolve_return_value_register ? "@" : "") << frame_new->place_return_value_in << ')' << endl;
+            cout << " (return value will be placed in: " << (frame_new->resolve_return_value_register ? "@" : "") << frame_new->place_return_value_in << ')';
         }
     }
 
