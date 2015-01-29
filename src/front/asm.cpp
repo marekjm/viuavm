@@ -725,7 +725,7 @@ int main(int argc, char* argv[]) {
         Program func(Program::countBytes(functions.at(name).second));
         try {
             assemble(func, functions.at(name).second, function_names);
-            func.calculateBranches();
+            func.calculateBranches(functions_section_size);
             func.calculateCalls(function_names, functions);
         } catch (const string& e) {
             cout << e << endl;
