@@ -2,11 +2,19 @@
 ; Basically, it justs tests correctness of the .boolean() method override in Integer objects.
 
 .def: main 0
-    istore 1 2
-    branch 1 2 :fin
-    idec 1
+    istore 1 1
+
+    ; generate false
+    istore 2 0
+    istore 3 1
+    ieq 2 3
+
+    ; check
+    branch 1 :ok :fin
+    .mark: ok
+    not 2
     .mark: fin
-    print 1
+    print 2
     end
 .end
 

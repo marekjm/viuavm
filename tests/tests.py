@@ -171,6 +171,15 @@ class IntegerInstructionsTests(unittest.TestCase):
         self.assertEqual('65', output.strip())
         self.assertEqual(0, excode)
 
+    def testIntegersInCondition(self):
+        name = 'in_condition.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual('true', output.strip())
+        self.assertEqual(0, excode)
+
 
 class FloatInstructionsTests(unittest.TestCase):
     """Tests for float instructions.
