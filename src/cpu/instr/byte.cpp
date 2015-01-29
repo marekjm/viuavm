@@ -44,7 +44,7 @@ byte* CPU::bstore(byte* addr) {
         bt = static_cast<Byte*>(fetch((int)bt))->value();
     }
 
-    registers[reg] = new Byte(bt);
+    place(reg, new Byte(bt));
 
     return addr;
 }
