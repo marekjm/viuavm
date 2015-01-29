@@ -444,13 +444,13 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             assemble_three_intop_instruction(program, names, "fmul", operands);
         } else if (str::startswith(line, "fdiv")) {
             assemble_three_intop_instruction(program, names, "fdiv", operands);
-        } else if (str::startswith(line, "flt")) {
+        } else if (str::startswithchunk(line, "flt")) {
             assemble_three_intop_instruction(program, names, "flt", operands);
-        } else if (str::startswith(line, "flte")) {
+        } else if (str::startswithchunk(line, "flte")) {
             assemble_three_intop_instruction(program, names, "flte", operands);
-        } else if (str::startswith(line, "fgt")) {
+        } else if (str::startswithchunk(line, "fgt")) {
             assemble_three_intop_instruction(program, names, "fgt", operands);
-        } else if (str::startswith(line, "fgte")) {
+        } else if (str::startswithchunk(line, "fgte")) {
             assemble_three_intop_instruction(program, names, "fgte", operands);
         } else if (str::startswith(line, "feq")) {
             assemble_three_intop_instruction(program, names, "feq", operands);

@@ -222,7 +222,6 @@ class FloatInstructionsTests(unittest.TestCase):
         self.assertEqual('true', output.strip())
         self.assertEqual(0, excode)
 
-    @unittest.skip('FIXME: float <= operator seems to work as < operator...')
     def testFLTE(self):
         name = 'lte.asm'
         assembly_path = os.path.join(self.PATH, name)
