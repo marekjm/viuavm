@@ -57,6 +57,27 @@ namespace str {
         return num;
     }
 
+    bool isfloat(const std::string& s, bool negatives) {
+        /*  Returns true if s contains only numerical characters.
+         *  Regex equivalent: `^[0-9]+\.[0-9]+$`
+         */
+        bool is = false;
+        unsigned start = 0;
+        if (s[0] == '-' and negatives) {
+            // to handle negative numbers
+            start = 1;
+        }
+        int dot = -1;
+        for (unsigned i = start; i < s.size(); ++i) {
+            if (s[i] == '.') {
+                dot = (int)i;
+                break;
+            }
+        }
+        is = isnum(sub(s, 0, dot), negatives) and isnum(sub(s, dot+1));
+        return is;
+    }
+
 
     string sub(const string& s, int b, int e) {
         /*  Returns substring of s.

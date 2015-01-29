@@ -21,6 +21,17 @@ enum OPCODE : byte {
     IGTE,
     IEQ,
 
+    FSTORE,
+    FADD,
+    FSUB,
+    FMUL,
+    FDIV,
+    FLT,
+    FLTE,
+    FGT,
+    FGTE,
+    FEQ,
+
     BSTORE,
     BADD,
     BSUB,

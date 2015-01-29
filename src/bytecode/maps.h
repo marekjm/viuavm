@@ -24,6 +24,17 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "igte",   sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
     { "ieq",    sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
 
+    { "fstore", sizeof(byte) + sizeof(bool) + sizeof(int) + sizeof(float) },
+    { "fadd",   sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
+    { "fsub",   sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
+    { "fmul",   sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
+    { "fdiv",   sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
+    { "flt",    sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
+    { "flte",   sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
+    { "fgt",    sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
+    { "fgte",   sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
+    { "feq",    sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
+
     { "bstore", sizeof(byte) + 2*sizeof(bool) + sizeof(int) + sizeof(byte) },
     { "badd",   sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
     { "bsub",   sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
@@ -84,6 +95,18 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { IGT,      "igt" },
     { IGTE,     "igte" },
     { IEQ,      "ieq" },
+
+    { FSTORE,   "fstore" },
+    { FADD,     "fadd" },
+    { FSUB,     "fsub" },
+    { FMUL,     "fmul" },
+    { FDIV,     "fdiv" },
+    { FLT,      "flt" },
+    { FLTE,     "flte" },
+    { FGT,      "fgt" },
+    { FGTE,     "fgte" },
+    { FEQ,      "feq" },
+
 
     { BSTORE,   "bstore" },
     { BADD,     "badd" },

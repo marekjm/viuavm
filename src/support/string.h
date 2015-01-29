@@ -12,9 +12,10 @@ namespace str {
     bool endswith(const std::string& s, const std::string& w);
 
     bool isnum(const std::string& s, bool negatives = true);
+    bool isfloat(const std::string& s, bool negatives = true);
 
     std::string sub(const std::string& s, int b = 0, int e = -1);
-    std::string chunk(const std::string& s, bool ignore_leading_ws=true);
+    std::string chunk(const std::string& s, bool ignore_leading_ws = true);
 
     std::string lstrip(const std::string& s);
 
