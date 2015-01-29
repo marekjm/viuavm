@@ -42,6 +42,11 @@ byte_op getbyte_op(const string& s) {
     return tuple<bool, char>(ref, (char)stoi(ref ? str::sub(s, 1) : s));
 }
 
+float_op getfloat_op(const string& s) {
+    bool ref = s[0] == '@';
+    return tuple<bool, float>(ref, stof(ref ? str::sub(s, 1) : s));
+}
+
 
 vector<string> getilines(const vector<string>& lines) {
     /*  Clears code from empty lines and comments.
@@ -315,14 +320,24 @@ const map<string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS = {
     { "isub", &Program::isub },
     { "imul", &Program::imul },
     { "idiv", &Program::idiv },
-    { "ilt", &Program::ilt },
+    { "ilt",  &Program::ilt },
     { "ilte", &Program::ilte },
-    { "igt", &Program::igt },
+    { "igt",  &Program::igt },
     { "igte", &Program::igte },
-    { "ieq", &Program::ieq },
+    { "ieq",  &Program::ieq },
 
-    { "and", &Program::logand },
-    { "or", &Program::logor },
+    { "fadd", &Program::fadd },
+    { "fsub", &Program::fsub },
+    { "fmul", &Program::fmul },
+    { "fdiv", &Program::fdiv },
+    { "flt",  &Program::flt },
+    { "flte", &Program::flte },
+    { "fgt",  &Program::fgt },
+    { "fgte", &Program::fgte },
+    { "feq",  &Program::feq },
+
+    { "and",  &Program::logand },
+    { "or",   &Program::logor },
 };
 
 void assemble_three_intop_instruction(Program& program, map<string, int>& names, const string& instr, const string& operands) {
@@ -333,7 +348,11 @@ void assemble_three_intop_instruction(Program& program, map<string, int>& names,
     regr = resolveregister(regr, names);
 
     // feed chunks into Bytecode Programming API
-    (program.*THREE_INTOP_ASM_FUNCTIONS.at(instr))(getint_op(rega), getint_op(regb), getint_op(regr));
+    try {
+        (program.*THREE_INTOP_ASM_FUNCTIONS.at(instr))(getint_op(rega), getint_op(regb), getint_op(regr));
+    } catch (const std::out_of_range& e) {
+        throw ("instruction is not present in THREE_INTOP_ASM_FUNCTIONS map but it should be: " + instr);
+    }
 }
 
 
@@ -413,6 +432,28 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string regno_chnk;
             regno_chnk = str::chunk(operands);
             program.idec(getint_op(resolveregister(regno_chnk, names)));
+        } else if (str::startswith(line, "fstore")) {
+            string regno_chnk, float_chnk;
+            tie(regno_chnk, float_chnk) = get2operands(operands);
+            program.fstore(getint_op(resolveregister(regno_chnk, names)), stod(float_chnk));
+        } else if (str::startswith(line, "fadd")) {
+            assemble_three_intop_instruction(program, names, "fadd", operands);
+        } else if (str::startswith(line, "fsub")) {
+            assemble_three_intop_instruction(program, names, "fsub", operands);
+        } else if (str::startswith(line, "fmul")) {
+            assemble_three_intop_instruction(program, names, "fmul", operands);
+        } else if (str::startswith(line, "fdiv")) {
+            assemble_three_intop_instruction(program, names, "fdiv", operands);
+        } else if (str::startswithchunk(line, "flt")) {
+            assemble_three_intop_instruction(program, names, "flt", operands);
+        } else if (str::startswithchunk(line, "flte")) {
+            assemble_three_intop_instruction(program, names, "flte", operands);
+        } else if (str::startswithchunk(line, "fgt")) {
+            assemble_three_intop_instruction(program, names, "fgt", operands);
+        } else if (str::startswithchunk(line, "fgte")) {
+            assemble_three_intop_instruction(program, names, "fgte", operands);
+        } else if (str::startswith(line, "feq")) {
+            assemble_three_intop_instruction(program, names, "feq", operands);
         } else if (str::startswith(line, "bstore")) {
             string regno_chnk, byte_chnk;
             tie(regno_chnk, byte_chnk) = get2operands(operands);
@@ -722,13 +763,26 @@ int main(int argc, char* argv[]) {
     out.write((const char*)&starting_instruction, 16);
     for (string name : function_names) {
         if (DEBUG) { cout << "generating bytecode for function (at bytecode " << functions_section_size << "): " << name << endl; }
-        Program func(Program::countBytes(functions.at(name).second));
+        uint16_t fun_bytes = 0;
+        try {
+            fun_bytes = Program::countBytes(functions.at(name).second);
+        } catch (const string& e) {
+            cout << e << endl;
+            exit(1);
+        } catch (const std::out_of_range& e) {
+            cout << e.what() << endl;
+            exit(1);
+        }
+        Program func(fun_bytes);
         try {
             assemble(func, functions.at(name).second, function_names);
             func.calculateBranches(functions_section_size);
             func.calculateCalls(function_names, functions);
         } catch (const string& e) {
-            cout << e << endl;
+            cout << '\n' << e << endl;
+            exit(1);
+        } catch (const std::out_of_range& e) {
+            cout << '\n' << e.what() << endl;
             exit(1);
         }
         byte* btcd = func.bytecode();
