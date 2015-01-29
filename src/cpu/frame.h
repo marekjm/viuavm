@@ -22,7 +22,7 @@ class Frame {
 
     inline byte* ret_address() { return return_address; }
 
-    Frame(byte* ra, int argsize, int regsize = 64): return_address(ra),
+    Frame(byte* ra, int argsize, int regsize = 16): return_address(ra),
                                                     arguments_size(argsize), arguments(0), argreferences(0),
                                                     registers(0), references(0), registers_size(regsize),
                                                     place_return_value_in(0), resolve_return_value_register(false) {
