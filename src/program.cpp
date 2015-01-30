@@ -103,6 +103,12 @@ uint16_t Program::countBytes(const vector<string>& lines) {
         instr = str::chunk(line);
         try {
             inc = OP_SIZES.at(instr);
+            if (instr == "call") {
+                // clear first chunk
+                line = str::lstrip(str::sub(line, instr.size()));
+                // get second chunk (which for call instruction is function name)
+                inc += str::chunk(line).size();
+            }
         } catch (const std::out_of_range &e) {
             throw ("unrecognised instruction: `" + instr + '`');
         }
@@ -136,13 +142,20 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
          */
         string opcode_name = OP_NAMES.at(OPCODE(program[offset]));
         inc = OP_SIZES.at(opcode_name);
-        if (debug) {
+        if (OPCODE(program[offset]) == CALL) {
+            cout << string(program+offset+1) << endl;
+            inc += string(program+offset+1).size();
+        }
+        if (debug or 1) {
             cout << "increasing instruction offset (" << i+1 << '/';
             cout << (instr >= 0 ? instr : count+instr) << "): " << opcode_name;
             cout << ": " << inc << endl;
         }
         offset += inc;
         if (offset+1 > bytes) {
+            cout << "instruction offset out of bounds: check your branches: ";
+            cout << "offset/bytecode size: ";
+            cout << offset << '/' << bytes << endl;
             throw "instruction offset out of bounds: check your branches";
         }
     }

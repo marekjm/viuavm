@@ -29,6 +29,7 @@ clean-support:
 clean-test-compiles:
 	rm -v ./tests/compiled/*.bin
 
+
 install: ${VM_ASM} ${VM_CPU}
 	mkdir -p ${BIN_PATH}
 	cp ${VM_ASM} ${BIN_PATH}/wudoo-asm
@@ -37,7 +38,7 @@ install: ${VM_ASM} ${VM_CPU}
 	chmod 755 ${BIN_PATH}/wudoo-run
 
 
-test: ${VM_CPU} ${VM_ASM}
+test: ${VM_CPU} ${VM_ASM} clean-test-compiles
 	python3 ./tests/tests.py --verbose --catch --failfast
 
 
