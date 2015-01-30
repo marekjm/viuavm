@@ -5,6 +5,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <map>
 #include "../bytecode/bytetypedef.h"
 #include "../types/object.h"
 #include "frame.h"
@@ -36,6 +37,10 @@ class CPU {
      */
     std::vector<Frame*> frames;
     Frame* frame_new;
+
+    /*  Function ID to bytecode address map.
+     */
+    std::map<const char*, int> function_addresses;
 
     /*  Methods to deal with registers.
      */
@@ -117,6 +122,9 @@ class CPU {
         CPU& load(byte*);
         CPU& bytes(uint16_t);
         CPU& eoffset(uint16_t);
+
+        CPU& mapfunction(const char*, int);
+
         int run();
 
         CPU(int r = DEFAULT_REGISTER_SIZE): bytecode(0), bytecode_size(0), executable_offset(0), registers(0), references(0), reg_count(r),

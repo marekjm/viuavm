@@ -43,6 +43,13 @@ CPU& CPU::eoffset(uint16_t o) {
     return (*this);
 }
 
+CPU& CPU::mapfunction(const char* name, int address) {
+    /** Maps function name to bytecode address.
+     */
+    function_addresses[name] = address;
+    return (*this);
+}
+
 
 Object* CPU::fetch(int index) {
     /*  Return pointer to object at given register.
