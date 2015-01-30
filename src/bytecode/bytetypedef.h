@@ -12,6 +12,6 @@
  *
  */
 
-typedef unsigned char byte;
+typedef char byte;
 
 #endif
