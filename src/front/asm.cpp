@@ -528,8 +528,8 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
              *  not an integer.
              *
              */
-            string fun_name, reg;
-            tie(fun_name, reg) = get2operands(operands);
+            string fn_name, reg;
+            tie(fn_name, reg) = get2operands(operands);
 
             /*  Why is the instruction_index index of the function name in the vector with function names and
              *  not a real instruction index?
@@ -546,20 +546,12 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
              *  It is the same mechanism as with `jump` and `branch` instructions where their jumps are calculated
              *  when the size of bytecode is known.
              */
-            int instruction_index = -1;
-            for (unsigned i = 0; i < function_names.size(); ++i) {
-                if (fun_name == function_names[i]) {
-                    instruction_index = (int)i;
-                    break;
-                }
-            }
-
             // if second operand is empty, fill it with zero
             // which means that return value will be discarded
             if (reg == "") { reg = "0"; }
 
-            if (DEBUG) { cout << ' ' << fun_name << ' ' << reg << endl; }
-            program.call(instruction_index, getint_op(resolveregister(reg, names)));
+            if (DEBUG) { cout << ' ' << fn_name << ' ' << reg << endl; }
+            program.call(fn_name, getint_op(resolveregister(reg, names)));
         } else if (str::startswith(line, "branch")) {
             /*  If branch is given three operands, it means its full, three-operands form is being used.
              *  Otherwise, it is short, two-operands form instruction and assembler should fill third operand accordingly.
@@ -761,7 +753,23 @@ int main(int argc, char* argv[]) {
     byte* bytecode = program.bytecode();
     int functions_section_size = 0;
 
+    uint16_t function_ids_section_size = 0;
+    for (string name : function_names) { function_ids_section_size += name.size(); }
+    // we need to insert address (uint16_t) after every function
+    function_ids_section_size += sizeof(uint16_t) * function_names.size();
+    // for null characters after function names
+    functions_section_size += function_names.size();
+
     ofstream out(compilename, ios::out | ios::binary);
+
+    out.write((const char*)&function_ids_section_size, sizeof(uint16_t));
+    uint16_t functions_size_so_far = 0;
+    for (string name : function_names) {
+        out.write((const char*)name.c_str(), name.size());
+        out.put('\0');
+        out.write((const char*)&functions_size_so_far, sizeof(uint16_t));
+        functions_size_so_far += Program::countBytes(functions.at(name).second);
+    }
     out.write((const char*)&bytes, 16);
     out.write((const char*)&starting_instruction, 16);
     for (string name : function_names) {
@@ -778,10 +786,13 @@ int main(int argc, char* argv[]) {
         }
         Program func(fun_bytes);
         try {
-            assemble(func, functions.at(name).second, function_names);
+            assemble(func.setdebug(DEBUG), functions.at(name).second, function_names);
             func.calculateBranches(functions_section_size);
             func.calculateCalls(function_names, functions);
         } catch (const string& e) {
+            cout << '\n' << e << endl;
+            exit(1);
+        } catch (const char*& e) {
             cout << '\n' << e << endl;
             exit(1);
         } catch (const std::out_of_range& e) {
