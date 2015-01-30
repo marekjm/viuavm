@@ -13,7 +13,7 @@ Bytes between 32. and the byte denoted by the second `uint16_t` are function def
 ## Structure
 
 ```
-uint16_t        - how many function IDs are mapped
+uint16_t        - size of the function-name-to-id mapping section,
 
 char*           - function ID encoded as null-terminated string
 byte*           - bytecode address to call for this ID
