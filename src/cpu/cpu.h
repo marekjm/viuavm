@@ -4,6 +4,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 #include <vector>
 #include <map>
 #include "../bytecode/bytetypedef.h"
@@ -40,7 +41,7 @@ class CPU {
 
     /*  Function ID to bytecode address map.
      */
-    std::map<const char*, int> function_addresses;
+    std::map<std::string, unsigned> function_addresses;
 
     /*  Methods to deal with registers.
      */
@@ -123,7 +124,7 @@ class CPU {
         CPU& bytes(uint16_t);
         CPU& eoffset(uint16_t);
 
-        CPU& mapfunction(const char*, int);
+        CPU& mapfunction(const std::string&, unsigned);
 
         int run();
 

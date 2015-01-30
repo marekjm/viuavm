@@ -43,7 +43,7 @@ CPU& CPU::eoffset(uint16_t o) {
     return (*this);
 }
 
-CPU& CPU::mapfunction(const char* name, int address) {
+CPU& CPU::mapfunction(const string& name, unsigned address) {
     /** Maps function name to bytecode address.
      */
     function_addresses[name] = address;
@@ -304,7 +304,11 @@ int CPU::run() {
                     throw error.str().c_str();
             }
             if (debug) { cout << endl; }
-        } catch (const char* &e) {
+        } catch (const char*& e) {
+            return_code = 1;
+            cout << (debug ? "\n" : "") <<  "exception: " << e << endl;
+            break;
+        } catch (const string& e) {
             return_code = 1;
             cout << (debug ? "\n" : "") <<  "exception: " << e << endl;
             break;
