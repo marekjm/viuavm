@@ -74,7 +74,7 @@ class Program {
     Program& paref      (int_op, int_op);
     Program& arg        (int_op, int_op);
 
-    Program& call       (int, int_op);
+    Program& call       (std::string, int_op);
     Program& jump       (int);
     Program& branch     (int_op, int, int);
 

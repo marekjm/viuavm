@@ -692,7 +692,7 @@ Program& Program::arg(int_op a, int_op b) {
     return (*this);
 }
 
-Program& Program::call(int instruction_index, int_op reg) {
+Program& Program::call(string fn_name, int_op reg) {
     /*  Inserts call instruction.
      *  Byte offset is calculated automatically.
      *
@@ -705,8 +705,7 @@ Program& Program::call(int instruction_index, int_op reg) {
     calls.push_back(addr_ptr);
 
     *(addr_ptr++) = CALL;
-    *((int*)addr_ptr) = instruction_index;
-    pointer::inc<int, byte>(addr_ptr);
+    for (unsigned i = 0; i < fn_name.size(); ++i) { *((char*)addr_ptr++) = fn_name[i]; }
     addr_ptr = insertIntegerOperand(addr_ptr, reg);
 
     return (*this);
