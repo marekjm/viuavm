@@ -751,14 +751,13 @@ int main(int argc, char* argv[]) {
     if (DEBUG) { cout << "OK" << endl; }
 
     byte* bytecode = program.bytecode();
-    int functions_section_size = 0;
 
     uint16_t function_ids_section_size = 0;
     for (string name : function_names) { function_ids_section_size += name.size(); }
     // we need to insert address (uint16_t) after every function
     function_ids_section_size += sizeof(uint16_t) * function_names.size();
     // for null characters after function names
-    functions_section_size += function_names.size();
+    function_ids_section_size += function_names.size();
 
     ofstream out(compilename, ios::out | ios::binary);
 
@@ -770,8 +769,11 @@ int main(int argc, char* argv[]) {
         out.write((const char*)&functions_size_so_far, sizeof(uint16_t));
         functions_size_so_far += Program::countBytes(functions.at(name).second);
     }
+
     out.write((const char*)&bytes, 16);
     out.write((const char*)&starting_instruction, 16);
+
+    int functions_section_size = 0;
     for (string name : function_names) {
         if (DEBUG) { cout << "generating bytecode for function (at bytecode " << functions_section_size << "): " << name << endl; }
         uint16_t fun_bytes = 0;
