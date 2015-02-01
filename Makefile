@@ -27,7 +27,7 @@ clean-support:
 	rm -v ./build/support/*.o
 
 clean-test-compiles:
-	rm -v ./tests/compiled/*.bin
+	rm ./tests/compiled/*.bin
 
 
 install: ${VM_ASM} ${VM_CPU}
