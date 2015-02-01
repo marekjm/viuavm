@@ -531,6 +531,20 @@ Program& Program::bstore(int_op regno, byte_op b) {
     return (*this);
 }
 
+Program& Program::itof(int_op a, int_op b) {
+    /*  Inserts itof instruction to bytecode.
+     */
+    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, ITOF, a, b);
+    return (*this);
+}
+
+Program& Program::ftoi(int_op a, int_op b) {
+    /*  Inserts ftoi instruction to bytecode.
+     */
+    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, FTOI, a, b);
+    return (*this);
+}
+
 Program& Program::lognot(int_op reg) {
     /*  Inserts not instuction.
      */
