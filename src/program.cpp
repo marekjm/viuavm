@@ -189,25 +189,6 @@ Program& Program::calculateBranches(unsigned offset) {
     return (*this);
 }
 
-Program& Program::calculateCalls(const vector<string>& function_names, map<string, pair<bool, vector<string> > >& functions) {
-    /*  This function should be called after program is constructed
-     *  to calculate correct bytecode offsets for CALL instructions.
-     */
-    int* ptr;
-    int calculated_offset;
-    for (unsigned i = 0; i < calls.size(); ++i) {
-        calculated_offset = 0;
-        // increase pointer by one byte to go to address here function-index is encoded
-        ptr = (int*)(calls[i]+1);
-        for (unsigned i = 0; i < function_names.size() and i < (unsigned)(*ptr); ++i) {
-            calculated_offset += Program::countBytes(functions.at(function_names[i]).second);
-        }
-        (*ptr) = calculated_offset;
-    }
-
-    return (*this);
-}
-
 
 byte* insertIntegerOperand(byte* addr_ptr, int_op op) {
     /** Insert integer operand into bytecode.
