@@ -47,13 +47,13 @@ if [[ $DEBUG_WUDOO == 1 ]]; then
 fi
 
 if [[ $DEBUG_ASM == 1 ]]; then
-    bin/vm/asm --debug $1 bin/sample/`basename $1.bin`
+    bin/vm/asm --debug $1 bin/run/`basename $1.bin`
 else
-    bin/vm/asm $1 bin/sample/`basename $1.bin`
+    bin/vm/asm $1 bin/run/`basename $1.bin`
 fi
 
 if [[ $DEBUG_CPU == 1 ]]; then
-    bin/vm/cpu --debug bin/sample/`basename $1.bin`
+    bin/vm/cpu --debug bin/run/`basename $1.bin`
 else
-    bin/vm/cpu bin/sample/`basename $1.bin`
+    bin/vm/cpu bin/run/`basename $1.bin`
 fi
