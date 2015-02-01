@@ -107,7 +107,7 @@ uint16_t Program::countBytes(const vector<string>& lines) {
                 // clear first chunk
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (which for call instruction is function name)
-                inc += str::chunk(line).size();
+                inc += str::chunk(line).size() + 1;
             }
         } catch (const std::out_of_range &e) {
             throw ("unrecognised instruction: `" + instr + '`');
@@ -143,10 +143,9 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
         string opcode_name = OP_NAMES.at(OPCODE(program[offset]));
         inc = OP_SIZES.at(opcode_name);
         if (OPCODE(program[offset]) == CALL) {
-            cout << string(program+offset+1) << endl;
             inc += string(program+offset+1).size();
         }
-        if (debug or 1) {
+        if (debug) {
             cout << "increasing instruction offset (" << i+1 << '/';
             cout << (instr >= 0 ? instr : count+instr) << "): " << opcode_name;
             cout << ": " << inc << endl;
@@ -695,17 +694,16 @@ Program& Program::arg(int_op a, int_op b) {
 Program& Program::call(string fn_name, int_op reg) {
     /*  Inserts call instruction.
      *  Byte offset is calculated automatically.
-     *
-     *  :params:
-     *
-     *  instruction_index   - instruction index where to call
-     *  reg                 - index of the register where return value will be stored
      */
-    // save call instruction index for later evaluation
-    calls.push_back(addr_ptr);
-
     *(addr_ptr++) = CALL;
-    for (unsigned i = 0; i < fn_name.size(); ++i) { *((char*)addr_ptr++) = fn_name[i]; }
+    byte* original_addr = addr_ptr;
+    for (unsigned i = 0; i < fn_name.size(); ++i) {
+        *((char*)addr_ptr++) = fn_name[i];
+    }
+    if (debug) {
+        cout << "debug: call to function '" << original_addr << "' at byte " << (long)(original_addr-program);
+        cout << " (id ends at byte " << (long)(addr_ptr-program) << ')' << endl;
+    }
     addr_ptr = insertIntegerOperand(addr_ptr, reg);
 
     return (*this);
