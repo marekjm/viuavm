@@ -156,7 +156,7 @@ vector<string> getFunctionNames(const vector<string>& lines) {
         string name = str::chunk(line);
         line = str::lstrip(str::sub(line, name.size()));
         string ret_sign = str::chunk(line);
-        bool returns;
+        bool returns;   // for now it is unused but is here for the future - when checking is more strict
         if (ret_sign == "true" or ret_sign == "1") {
             returns = true;
         } else if (ret_sign == "false" or ret_sign == "0") {
