@@ -232,6 +232,12 @@ int CPU::run() {
                 case BSTORE:
                     instr_ptr = bstore(instr_ptr+1);
                     break;
+                case ITOF:
+                    instr_ptr = itof(instr_ptr+1);
+                    break;
+                case FTOI:
+                    instr_ptr = ftoi(instr_ptr+1);
+                    break;
                 case NOT:
                     instr_ptr = lognot(instr_ptr+1);
                     break;

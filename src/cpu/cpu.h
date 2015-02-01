@@ -81,6 +81,9 @@ class CPU {
 
     byte* bstore(byte*);
 
+    byte* itof(byte*);
+    byte* ftoi(byte*);
+
     byte* boolean(byte*);
     byte* lognot(byte*);
     byte* logand(byte*);
