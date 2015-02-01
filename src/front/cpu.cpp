@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
         ifstream in(filename, ios::in | ios::binary);
 
         if (!in) {
-            cout << "fatal: file could not be opened" << endl;
+            cout << "fatal: file could not be opened: " << filename << endl;
             return 1;
         }
 
@@ -120,10 +120,7 @@ int main(int argc, char* argv[]) {
         CPU cpu;
         cpu.debug = debug;
         for (auto p : function_address_mapping) {
-            if (debug) {
-                cout << "debug: ";
-                cout << "mapped function '" << p.first << "' to address " << p.second << " in CPU" << endl;
-            }
+            if (debug) { cout << "debug: loader: mapped function '" << p.first << "' to byte " << p.second << endl; }
             cpu.mapfunction(p.first, p.second);
         }
 

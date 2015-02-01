@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <cstdint>
 #include <iostream>
+#include <algorithm>
 #include <fstream>
 #include <string>
 #include <sstream>
@@ -531,6 +532,10 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string fn_name, reg;
             tie(fn_name, reg) = get2operands(operands);
 
+            if (find(function_names.begin(), function_names.end(), fn_name) == function_names.end()) {
+                throw ("call to an undefined function: '" + fn_name + "'");
+            }
+
             /*  Why is the instruction_index index of the function name in the vector with function names and
              *  not a real instruction index?
              *
@@ -743,7 +748,6 @@ int main(int argc, char* argv[]) {
          *  that precede them.
          */
         program.calculateBranches(starting_instruction);
-        program.calculateCalls(function_names, functions);
     } catch (const char*& e) {
         cout << "fatal: branch calculation failed: " << e << endl;
         return 1;
@@ -790,15 +794,14 @@ int main(int argc, char* argv[]) {
         try {
             assemble(func.setdebug(DEBUG), functions.at(name).second, function_names);
             func.calculateBranches(functions_section_size);
-            func.calculateCalls(function_names, functions);
         } catch (const string& e) {
-            cout << '\n' << e << endl;
+            cout << (DEBUG ? "\n" : "") << e << endl;
             exit(1);
         } catch (const char*& e) {
-            cout << '\n' << e << endl;
+            cout << (DEBUG ? "\n" : "") << e << endl;
             exit(1);
         } catch (const std::out_of_range& e) {
-            cout << '\n' << e.what() << endl;
+            cout << (DEBUG ? "\n" : "") << e.what() << endl;
             exit(1);
         }
         byte* btcd = func.bytecode();
