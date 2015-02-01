@@ -15,20 +15,26 @@ during development of the VM.
 
 ----
 
-### Virtual Destructors
+## Development diary
 
-*When*: 2014.01.05
+### Function call scheme. Dynamic and static linking.
 
-When creating polymorphic classes remember to make the destructor virtual!
-This is one freakin' good idea because otherwise you can have memory leaks and
-they are not a good thing to have, in any way.
+*When*: 2015.01.29
 
-Also, destorying polymorphic objects with non-virtual destructors leads to undefined behaviour and
-software behaving in an undefined manner is not something we like (unless it is written to behave in
-an undefined manner).
+Today I had a short, one-hour talk with professor Lukasz Kuszner at Gdansk University of Technology about
+the design and code of the Wudoo.
+I asked him some questions about "how to do implement dynamic/static linking" and "is my function calling scheme any good".
 
-So, lesson for today: use `virtual` on your destructors when tinkering with polymorphism.
-And, as a reminder, compile with `-Wall -pedantic` once in a while to catch errors you missed earlier.
+As it turned out, the latter were not that good or well designed, suffered from severe inflexibility, and had several disadvantages, e.g.
+it preserved no information useful during debugging and made it hard to implement linking without many recalculations in bytecode.
+It was suggested to me that an alternative, id-based scheme would be better.
+
+Professor Kuszner also expressed his doubts whether the function call mechanism where call frames are real objects would be efficient.
+The potential problems he pointed out were related to memory allocation being slow - and if I create a new frame for every function call
+then the whole VM is going to be slowed down by it.
+However, the frame-is-a-real-object approach has its advantages which I am reluctant to give up.
+Parameters and return values have well-defined place to be stored, implementation of local scopes for function calls is hilariously easy and
+the call history can be easily inspected.
 
 
 ----
@@ -106,3 +112,21 @@ Now, to explain each instruction:
 
 The code above would initialise our `Point2D` struct's fields with integer zeroes.
 It is fragile and weak but it is also a first iteration of the idea.
+
+
+----
+
+### Virtual Destructors
+
+*When*: 2014.01.05
+
+When creating polymorphic classes remember to make the destructor virtual!
+This is one freakin' good idea because otherwise you can have memory leaks and
+they are not a good thing to have, in any way.
+
+Also, destorying polymorphic objects with non-virtual destructors leads to undefined behaviour and
+software behaving in an undefined manner is not something we like (unless it is written to behave in
+an undefined manner).
+
+So, lesson for today: use `virtual` on your destructors when tinkering with polymorphism.
+And, as a reminder, compile with `-Wall -pedantic` once in a while to catch errors you missed earlier.
