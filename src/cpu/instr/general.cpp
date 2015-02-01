@@ -352,19 +352,25 @@ byte* CPU::arg(byte* addr) {
     frames.back()->arguments[a] = 0;                // zero the pointer to avoid double free
     ureferences[b] = frames.back()->argreferences[a];  // set reference status
 
+    if (debug and uregisters[b] != 0) {
+        cout << " (= " << (ureferences[b] ? "&" : "") << uregisters[b]->str() << ')';
+    }
+
     return addr;
 }
 
 byte* CPU::call(byte* addr) {
     /*  Run call instruction.
      */
+    string call_name = string(addr);
+    byte* call_address = bytecode+function_addresses.at(call_name);
+    addr += call_name.size();
+
     // save return address for frame
-    byte* return_address = (addr + sizeof(bool) + 2*sizeof(int));
-    byte* call_address = bytecode + *(int*)addr;
-    pointer::inc<int, byte>(addr);
+    byte* return_address = (addr + sizeof(bool) + sizeof(int));
 
     if (debug) {
-        cout << ' ' << (long)(call_address-bytecode);
+        cout << " '" << call_name << "' " << (long)(call_address-bytecode);
         cout << ": setting return address to bytecode " << (long)(return_address-bytecode);
     }
     if (frame_new == 0) {
