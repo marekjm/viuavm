@@ -66,7 +66,7 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "paref",  sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
     // this is because function call is followed by an instruction index, and
     // a register operand: one int is for index, second and bool for register
-    { "call",   sizeof(byte) + sizeof(bool) + 2*sizeof(int) },
+    { "call",   sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "arg",    sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
 
     { "jump",   sizeof(byte) + sizeof(int) },
