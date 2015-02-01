@@ -112,6 +112,8 @@ class CPU {
     public:
         // debug flag
         bool debug;
+        // stepping flag, enables to run CPU in a step-by-step mode
+        bool stepping;
 
         /*  Public API of the CPU provides basic actions:
          *
@@ -129,7 +131,7 @@ class CPU {
         int run();
 
         CPU(int r = DEFAULT_REGISTER_SIZE): bytecode(0), bytecode_size(0), executable_offset(0), registers(0), references(0), reg_count(r),
-                                            uregisters(0), ureferences(0), uregisters_size(0), frame_new(0), debug(false) {
+                                            uregisters(0), ureferences(0), uregisters_size(0), frame_new(0), debug(false), stepping(false) {
             /*  Basic constructor.
              *  Creates registers array of requested size and
              *  initializes it with zeroes.
@@ -143,6 +145,8 @@ class CPU {
             uregisters = registers;
             ureferences = references;
             uregisters_size = reg_count;
+
+            if (stepping) { debug = true; }
         }
 
         ~CPU() {

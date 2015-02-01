@@ -303,7 +303,7 @@ int CPU::run() {
                     error << "unrecognised instruction (bytecode value: " << *((int*)bytecode) << ")";
                     throw error.str().c_str();
             }
-            if (debug) { cout << endl; }
+            if (debug and not stepping) { cout << endl; }
         } catch (const char*& e) {
             return_code = 1;
             cout << (debug ? "\n" : "") <<  "exception: " << e << endl;
@@ -333,6 +333,11 @@ int CPU::run() {
             }
             return_code = 2;
             break;
+        }
+
+        if (stepping) {
+            string ins;
+            getline(cin, ins);
         }
     }
 
