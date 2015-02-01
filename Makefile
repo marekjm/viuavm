@@ -11,10 +11,12 @@ BIN_PATH=/usr/local/bin
 
 .SUFFIXES: .cpp .h .o
 
-.PHONY: all install test
+.PHONY: all remake clean clean-support clean-test-compiles install test
 
 
 all: ${VM_ASM} ${VM_CPU} bin/opcodes.bin
+
+remake: clean all
 
 
 clean: clean-support
