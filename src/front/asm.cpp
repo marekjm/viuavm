@@ -459,6 +459,16 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string regno_chnk, byte_chnk;
             tie(regno_chnk, byte_chnk) = get2operands(operands);
             program.bstore(getint_op(resolveregister(regno_chnk, names)), getbyte_op(resolveregister(byte_chnk, names)));
+        } else if (str::startswith(line, "itof")) {
+            string a_chnk, b_chnk;
+            tie(a_chnk, b_chnk) = get2operands(operands);
+            if (b_chnk.size() == 0) { b_chnk = a_chnk; }
+            program.itof(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
+        } else if (str::startswith(line, "ftoi")) {
+            string a_chnk, b_chnk;
+            tie(a_chnk, b_chnk) = get2operands(operands);
+            if (b_chnk.size() == 0) { b_chnk = a_chnk; }
+            program.ftoi(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "not")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
