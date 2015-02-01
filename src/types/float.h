@@ -21,6 +21,9 @@ class Float : public Object {
         std::string str() const {
             std::ostringstream s;
             s << data;
+            if ((int)data == data) {    // if the two numbers are equal after the mantissa is discarded, then it means that it is .0
+                s << ".0";  // make sure that we always print the mantissa (even if it is .0)
+            }
             return s.str();
         }
         bool boolean() const { return data != 0; }
