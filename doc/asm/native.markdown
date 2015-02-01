@@ -39,3 +39,13 @@ Assign a name to the register.
 ### `.def:` and `.end`
 
 Used to define functions.
+
+
+### `.main:`
+
+**Syntax**: `.main: <function_name>`
+
+Used to set main function name.
+Defaults to `main`.
+
+Assembler will abort translation if no `main` function is defined and `.main:` did not set an alternative.

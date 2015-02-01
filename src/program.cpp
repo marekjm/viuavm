@@ -90,7 +90,7 @@ uint16_t Program::countBytes(const vector<string>& lines) {
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = str::lstrip(lines[i]);
 
-        if (str::startswith(line, ".mark:") or str::startswith(line, ".name:") or str::startswith(line, ".def:") or str::startswith(line, ".end")) {
+        if (str::startswith(line, ".mark:") or str::startswith(line, ".name:") or str::startswith(line, ".def:") or str::startswith(line, ".end") or str::startswith(line, ".main:")) {
             /*  Markers and name instructions must be skipped here or they would cause the code below to
              *  throw exceptions.
              */
