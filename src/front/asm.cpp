@@ -373,7 +373,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
          */
         line = lines[i];
 
-        if (str::startswith(line, ".mark:") or str::startswith(line, ".name:")) {
+        if (str::startswith(line, ".mark:") or str::startswith(line, ".name:") or str::startswith(line, ".main:")) {
             /*  Lines beginning with `.mark:` are just markers placed in code and
              *  are do not produce any bytecode.
              *  Lines beginning with `.name:` are asm instructions that assign human-rememberable names to
@@ -713,6 +713,21 @@ int main(int argc, char* argv[]) {
     uint16_t starting_instruction = 0;  // the bytecode offset to first executable instruction
 
     vector<string> function_names = getFunctionNames(lines);
+    string main_function = "";
+
+    for (string line : ilines) {
+        if (str::startswith(line, ".main:")) {
+            main_function = str::lstrip(str::sub(line, 6));
+            break;
+        }
+    }
+    if (DEBUG) { cout << "debug: main function set to: '" << main_function << "'" << endl; }
+
+    if (find(function_names.begin(), function_names.end(), "main") == function_names.end() and main_function == "") {
+        cout << "error: 'main' function is undefined and no alternative main function has been set" << endl;
+        return 1;
+    }
+
     map<string, pair<bool, vector<string> > > functions;
     try {
          functions = getFunctions(ilines);
