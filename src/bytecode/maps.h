@@ -46,6 +46,9 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "bgte",   sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
     { "beq",    sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
 
+    { "itof",   sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
+    { "ftoi",   sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
+
     { "bool",   sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "not",    sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "and",    sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
@@ -107,7 +110,6 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { FGTE,     "fgte" },
     { FEQ,      "feq" },
 
-
     { BSTORE,   "bstore" },
     { BADD,     "badd" },
     { BSUB,     "bsub" },
@@ -118,6 +120,9 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { BGT,      "bgt" },
     { BGTE,     "bgte" },
     { BEQ,      "beq" },
+
+    { ITOF,     "itof" },
+    { FTOI,     "ftoi" },
 
     { BOOL,	    "bool" },
     { NOT,	    "not" },

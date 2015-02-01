@@ -8,6 +8,7 @@
 enum OPCODE : byte {
     NOP = 0,    // do nothing
 
+    // integer instructions
     ISTORE,
     IADD,
     ISUB,
@@ -21,6 +22,7 @@ enum OPCODE : byte {
     IGTE,
     IEQ,
 
+    // float instructions
     FSTORE,
     FADD,
     FSUB,
@@ -32,6 +34,7 @@ enum OPCODE : byte {
     FGTE,
     FEQ,
 
+    // integer instructions
     BSTORE,
     BADD,
     BSUB,
@@ -43,6 +46,11 @@ enum OPCODE : byte {
     BGTE,
     BEQ,
 
+    // numeric conversion instructions
+    ITOF,   // convert integer to float
+    FTOI,   // convert float to integer
+
+    // string instructions
     STRSTORE,
     STRADD,
     STREQ,
@@ -63,6 +71,7 @@ enum OPCODE : byte {
     ISNULL, // checks if register is null (empty) stores this information as a boolean in
             // another register
 
+    // printing
     PRINT,
     ECHO,
 
