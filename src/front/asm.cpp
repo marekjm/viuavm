@@ -15,20 +15,24 @@ using namespace std;
 
 
 // MISC FLAGS
+bool SHOW_HELP = false;
+bool SHOW_VERSION = false;
+bool LIB = false;
+bool VERBOSE = false;
 bool DEBUG = false;
 bool WARNING_ALL = false;
 bool ERROR_ALL = false;
 
 
 // WARNINGS
-bool WARNING_MISSING_END = true;
-bool WARNING_EMPTY_FUNCTION_BODY = true;
+bool WARNING_MISSING_END = false;
+bool WARNING_EMPTY_FUNCTION_BODY = false;
 bool WARNING_OPERANDLESS_FRAME = false;
 
 
 // ERRORS
-bool ERROR_MISSING_END = true;
-bool ERROR_EMPTY_FUNCTION_BODY = true;
+bool ERROR_MISSING_END = false;
+bool ERROR_EMPTY_FUNCTION_BODY = false;
 bool ERROR_OPERANDLESS_FRAME = false;
 
 
@@ -649,40 +653,71 @@ void assemble(Program& program, const vector<string>& lines, const vector<string
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
     vector<string> args;
-    for (int i = 0; i < argc; ++i) { args.push_back(argv[i]); }
+    string option;
+    for (int i = 1; i < argc; ++i) {
+        option = string(argv[i]);
+        if (option == "--SHOW_HELP") {
+            SHOW_HELP = true;
+            continue;
+        } else if (option == "--version") {
+            SHOW_VERSION = true;
+            continue;
+        } else if (option == "--verbose") {
+            VERBOSE = true;
+            continue;
+        } else if (option == "--debug") {
+            DEBUG = true;
+            continue;
+        } else if (option == "--lib") {
+            LIB = true;
+            continue;
+        } else if (option == "--Wall") {
+            WARNING_ALL = true;
+            continue;
+        } else if (option == "--Eall") {
+            ERROR_ALL = true;
+            continue;
+        } else if (option == "--Wmissing-end") {
+            WARNING_MISSING_END = true;
+            continue;
+        } else if (option == "--Wempty-function") {
+            WARNING_EMPTY_FUNCTION_BODY = true;
+            continue;
+        } else if (option == "--Wopless-frame") {
+            WARNING_OPERANDLESS_FRAME = true;
+            continue;
+        } else if (option == "--Emissing-end") {
+            ERROR_MISSING_END = true;
+            continue;
+        } else if (option == "--Eempty-function") {
+            ERROR_EMPTY_FUNCTION_BODY = true;
+            continue;
+        } else if (option == "--Eopless-frame") {
+            ERROR_OPERANDLESS_FRAME = true;
+            continue;
+        }
+        args.push_back(argv[i]);
+    }
 
     int ret_code = 0;
 
-    if (argc > 1 and args[1] == "--help") {
+    if (SHOW_HELP or SHOW_VERSION) {
         cout << "wudoo VM assembler, version " << VERSION << endl;
-        cout << args[0] << " <infile> [<outfile>]" << endl;
+        if (SHOW_HELP) { cout << argv[0] << " <infile> [<outfile>]" << endl; }
         return 0;
     }
 
-    if (argc < 2) {
+    if (args.size() == 0) {
         cout << "fatal: no input file" << endl;
         return 1;
     }
 
     string filename, compilename = "";
-    if (args[1] == "--debug") {
-        DEBUG = true;
-        if (argc > 2) {
-            filename = args[2];
-        } else {
-            cout << "fatal: filename required" << endl;
-            return 1;
-        }
-    } else {
-        filename = args[1];
-    }
-
-    if (DEBUG and argc >= 4) {
-        compilename = args[3];
-    } else if (!DEBUG and argc >= 3) {
-        compilename = args[2];
-    }
-    if (compilename.size() == 0) {
+    if (args.size() == 2) {
+        filename = args[0];
+        compilename = args[1];
+    } else if (args.size() == 1) {
+        filename = args[0];
         compilename = "out.bin";
     }
 
@@ -723,7 +758,7 @@ int main(int argc, char* argv[]) {
     }
     if (DEBUG) { cout << "debug: main function set to: '" << main_function << "'" << endl; }
 
-    if (find(function_names.begin(), function_names.end(), "main") == function_names.end() and main_function == "") {
+    if (find(function_names.begin(), function_names.end(), "main") == function_names.end() and main_function == "" and not LIB) {
         cout << "error: 'main' function is undefined and no alternative main function has been set" << endl;
         return 1;
     }
