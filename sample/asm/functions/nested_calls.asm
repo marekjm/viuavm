@@ -29,6 +29,13 @@
 .end
 
 
+.def: main 0
+    frame 0
+    call bay
+    end
+.end
+
+
 frame 0
-call bay
+call main
 halt
