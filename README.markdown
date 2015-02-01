@@ -9,10 +9,9 @@ to help myself in my computer language implementation studies.
 
 ## Programming
 
-Wudoo can be programmed in an assembler-like language which must then be compiled into bytecode, or
-via  **Bytecode Generation API** which then generates bytecode.
-
-The internal assembler uses the bytecode generation API.
+Wudoo can be programmed in an assembler-like language which must then be compiled into bytecode.
+Assembler uses **Bytecode Generation API** to generate bytecode after the assembler frontend
+performs initial analysis.
 
 
 ----
