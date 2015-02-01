@@ -292,6 +292,30 @@ class ByteInstructionsTests(unittest.TestCase):
         self.assertEqual(0, excode)
 
 
+class CastingInstructionsTests(unittest.TestCase):
+    """Tests for byte instructions.
+    """
+    PATH = './sample/asm/casts'
+
+    def testITOF(self):
+        name = 'itof.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual('4.0', output.strip())
+        self.assertEqual(0, excode)
+
+    def testFTOI(self):
+        name = 'ftoi.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual('3', output.strip())
+        self.assertEqual(0, excode)
+
+
 class RegisterManipulationInstructionsTests(unittest.TestCase):
     """Tests for register-manipulation instructions.
     """
