@@ -29,6 +29,7 @@ clean-support:
 	rm -v ./build/support/*.o
 
 clean-test-compiles:
+	touch ./tests/compiled/a.bin
 	rm ./tests/compiled/*.bin
 
 
