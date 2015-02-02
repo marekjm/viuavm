@@ -635,17 +635,12 @@ void assemble(Program& program, const vector<string>& lines, const vector<string
      *
      *  :params:
      *
-     *  program     - Program object which will be used for assembling
-     *  lines       - lines with instructions
+     *  program         - Program object which will be used for assembling
+     *  lines           - lines with instructions
+     *  function_names  - list of function names
      */
-    if (DEBUG) { cout << "gathering markers:" << '\n'; }
     map<string, int> marks = getmarks(lines);
-    if (DEBUG) { cout << endl; }
-
-    if (DEBUG) { cout << "gathering names:" << '\n'; }
     map<string, int> names = getnames(lines);
-    if (DEBUG) { cout << endl; }
-
     compile(program, lines, marks, names, function_names);
 }
 
@@ -721,8 +716,8 @@ int main(int argc, char* argv[]) {
         compilename = "out.bin";
     }
 
-    if (DEBUG) {
-        cout << "assembling \"" << filename << "\" to \"" << compilename << "\"" << endl;
+    if (VERBOSE or DEBUG) {
+        cout << "message: assembling \"" << filename << "\" to \"" << compilename << "\"" << endl;
     }
 
     if (!filename.size()) {
@@ -767,25 +762,20 @@ int main(int argc, char* argv[]) {
     try {
          functions = getFunctions(ilines);
     } catch (const string& e) {
-        cout << "fatal: error during function gathering: " << e << endl;
+        cout << "error: function gathering failed: " << e << endl;
         return 1;
     }
 
     try {
-        if (DEBUG) { cout << "functions:\n"; }
-        for (string name : function_names) {
-            if (DEBUG) { cout << " *  " <<  name << ": " << Program::countBytes(functions.at(name).second) << " bytes" << endl; }
-            starting_instruction += Program::countBytes(functions.at(name).second);
-        }
-
+        for (string name : function_names) { starting_instruction += Program::countBytes(functions.at(name).second); }
         bytes = Program::countBytes(ilines);
     } catch (const string& e) {
-        cout << "fatal: error furing bytecode size calculations: " << e << endl;
+        cout << "error: bytecode size calculation failed: " << e << endl;
         return 1;
     }
 
-    if (DEBUG) { cout << "total required bytes: " <<  bytes << endl; }
-    if (DEBUG) { cout << "executable offset: " << starting_instruction << endl; }
+    if (VERBOSE or DEBUG) { cout << "message: total required bytes: " <<  bytes << endl; }
+    if (VERBOSE or DEBUG) { cout << "message: executable offset: " << starting_instruction << endl; }
 
     Program program(bytes);
     try {
@@ -809,10 +799,9 @@ int main(int argc, char* argv[]) {
          */
         program.calculateBranches(starting_instruction);
     } catch (const char*& e) {
-        cout << "fatal: branch calculation failed: " << e << endl;
+        cout << "error: branch calculation failed: " << e << endl;
         return 1;
     }
-    if (DEBUG) { cout << "OK" << endl; }
 
     byte* bytecode = program.bytecode();
 
@@ -839,10 +828,11 @@ int main(int argc, char* argv[]) {
 
     int functions_section_size = 0;
     for (string name : function_names) {
-        if (DEBUG) { cout << "generating bytecode for function (at bytecode " << functions_section_size << "): " << name << endl; }
+        if (VERBOSE or DEBUG) { cout << "message: generating bytecode for function (at bytecode " << functions_section_size << "): " << name; }
         uint16_t fun_bytes = 0;
         try {
             fun_bytes = Program::countBytes(functions.at(name).second);
+            if (VERBOSE or DEBUG) { cout << " (" << fun_bytes << " bytes)" << endl; }
         } catch (const string& e) {
             cout << e << endl;
             exit(1);
@@ -850,6 +840,7 @@ int main(int argc, char* argv[]) {
             cout << e.what() << endl;
             exit(1);
         }
+
         Program func(fun_bytes);
         try {
             assemble(func.setdebug(DEBUG), functions.at(name).second, function_names);
