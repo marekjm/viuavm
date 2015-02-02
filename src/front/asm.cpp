@@ -651,7 +651,7 @@ int main(int argc, char* argv[]) {
     string option;
     for (int i = 1; i < argc; ++i) {
         option = string(argv[i]);
-        if (option == "--SHOW_HELP") {
+        if (option == "--help") {
             SHOW_HELP = true;
             continue;
         } else if (option == "--version") {
