@@ -361,22 +361,12 @@ void assemble_three_intop_instruction(Program& program, map<string, int>& names,
 }
 
 
-Program& compile(Program& program, const vector<string>& lines, map<string, int>& marks, map<string, int>& names, const vector<string>& function_names) {
-    /** Compile instructions into bytecode using bytecode generation API.
-     *
-     */
-    if (DEBUG) { cout << "assembling:" << '\n'; }
+vector<string> filter(const vector<string>& lines) {
+    vector<string> filtered;
 
     string line;
-    int instruction = 0;  // instruction counter
     for (unsigned i = 0; i < lines.size(); ++i) {
-        /*  This is main assembly loop.
-         *  It iterates over lines with instructions and
-         *  uses bytecode generation API to fill the program with instructions and
-         *  from them generate the bytecode.
-         */
         line = lines[i];
-
         if (str::startswith(line, ".mark:") or str::startswith(line, ".name:") or str::startswith(line, ".main:")) {
             /*  Lines beginning with `.mark:` are just markers placed in code and
              *  are do not produce any bytecode.
@@ -388,7 +378,6 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
              *  to avoid complicating code that appears later and
              *  deals with assembling CPU instructions.
              */
-            if (DEBUG) { cout << " -  skip: +" << instruction+1 << ": " << line << '\n'; }
             continue;
         }
 
@@ -397,6 +386,30 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             while (lines[++i] != ".end");
             continue;
         }
+
+        filtered.push_back(line);
+    }
+
+    return filtered;
+}
+
+Program& compile(Program& program, const vector<string>& lines, map<string, int>& marks, map<string, int>& names, const vector<string>& function_names) {
+    /** Compile instructions into bytecode using bytecode generation API.
+     *
+     */
+    if (DEBUG) { cout << "assembling:" << '\n'; }
+
+    vector<string> ilines = filter(lines);
+
+    string line;
+    int instruction = 0;  // instruction counter
+    for (unsigned i = 0; i < ilines.size(); ++i) {
+        /*  This is main assembly loop.
+         *  It iterates over lines with instructions and
+         *  uses bytecode generation API to fill the program with instructions and
+         *  from them generate the bytecode.
+         */
+        line = ilines[i];
 
         string instr;
         string operands;
@@ -751,10 +764,11 @@ int main(int argc, char* argv[]) {
             break;
         }
     }
-    if (DEBUG) { cout << "debug: main function set to: '" << main_function << "'" << endl; }
+    if ((VERBOSE and main_function != "main" and main_function != "") or DEBUG) { cout << "debug (notice): main function set to: '" << main_function << "'" << endl; }
+    if (main_function == "" and not LIB) { main_function = "main"; }
 
-    if (find(function_names.begin(), function_names.end(), "main") == function_names.end() and main_function == "" and not LIB) {
-        cout << "error: 'main' function is undefined and no alternative main function has been set" << endl;
+    if (find(function_names.begin(), function_names.end(), main_function) == function_names.end() and not LIB) {
+        cout << "error: main function is undefined: " << main_function << endl;
         return 1;
     }
 
@@ -766,16 +780,22 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    map<string, uint16_t> function_addresses;
     try {
-        for (string name : function_names) { starting_instruction += Program::countBytes(functions.at(name).second); }
+        for (string name : function_names) {
+            function_addresses[name] = starting_instruction;
+            starting_instruction += Program::countBytes(functions.at(name).second);
+        }
         bytes = Program::countBytes(ilines);
     } catch (const string& e) {
         cout << "error: bytecode size calculation failed: " << e << endl;
         return 1;
     }
 
+    starting_instruction = function_addresses[main_function];
+
     if (VERBOSE or DEBUG) { cout << "message: total required bytes: " <<  bytes << endl; }
-    if (VERBOSE or DEBUG) { cout << "message: executable offset: " << starting_instruction << endl; }
+    if (VERBOSE or DEBUG) { cout << "message: first instruction pointer: " << starting_instruction << endl; }
 
     Program program(bytes);
     try {
