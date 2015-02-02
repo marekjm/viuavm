@@ -1,3 +1,7 @@
+.def: main 0
+    end
+.end
+
 .name: 1 zero
 .name: 2 one
 

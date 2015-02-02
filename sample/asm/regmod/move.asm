@@ -1,3 +1,7 @@
+.def: main 0
+    end
+.end
+
 istore 1 1
 move 1 2
 print 2

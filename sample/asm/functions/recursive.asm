@@ -21,7 +21,7 @@
     end
 .end
 
-.def: __main__ 0
+.def: main 0
     ; setup parameters
     istore 1 10
     istore 2 0
@@ -34,7 +34,3 @@
 
     end
 .end
-
-frame
-call __main__
-halt

@@ -6,6 +6,6 @@
 
 istore 1 69
 frame 0
-call main
+call main 0
 print 1
 halt
