@@ -36,6 +36,10 @@ bool ERROR_EMPTY_FUNCTION_BODY = false;
 bool ERROR_OPERANDLESS_FRAME = false;
 
 
+// Assembly constants
+const string ENTRY_FUNCTION_NAME = "__entry";
+
+
 // LOGIC
 int_op getint_op(const string& s) {
     bool ref = s[0] == '@';
@@ -792,38 +796,23 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    starting_instruction = function_addresses[main_function];
+    if (filter(ilines).size() > 0) {
+        cout << "generating '__entry' function" << endl;
+        function_names.push_back(ENTRY_FUNCTION_NAME);
+        function_addresses[ENTRY_FUNCTION_NAME] = starting_instruction;
+        functions[ENTRY_FUNCTION_NAME] = pair<bool, vector<string> >(false, ilines);
+    }
+
+    starting_instruction = function_addresses[(function_names.size() ? main_function : ENTRY_FUNCTION_NAME)];
 
     if (VERBOSE or DEBUG) { cout << "message: total required bytes: " <<  bytes << endl; }
     if (VERBOSE or DEBUG) { cout << "message: first instruction pointer: " << starting_instruction << endl; }
 
-    Program program(bytes);
-    try {
-        assemble(program.setdebug(DEBUG), ilines, function_names);
-    } catch (const string& e) {
-        cout << "fatal: error during assembling: " << e << endl;
-        return 1;
-    } catch (const char*& e) {
-        cout << "fatal: error during assembling: " << e << endl;
-        return 1;
-    } catch (const std::invalid_argument& e) {
-        cout << "fatal: error during assembling: " << e.what() << endl;
-        return 1;
+    if (function_names.back() == ENTRY_FUNCTION_NAME) {
+        cout << "adjusting starting instruction" << endl;
+        starting_instruction = function_addresses.at(ENTRY_FUNCTION_NAME);
+        cout << "message: first instruction pointer: " << starting_instruction << endl;
     }
-
-    if (DEBUG) { cout << "calculating jumps:\n"; }
-    try {
-        /*  Here, starting_instruction is used as offset.
-         *  This is because all branches and jumps should be adjusted to the amount of bytes
-         *  that precede them.
-         */
-        program.calculateBranches(starting_instruction);
-    } catch (const char*& e) {
-        cout << "error: branch calculation failed: " << e << endl;
-        return 1;
-    }
-
-    byte* bytecode = program.bytecode();
 
     uint16_t function_ids_section_size = 0;
     for (string name : function_names) { function_ids_section_size += name.size(); }
@@ -851,7 +840,7 @@ int main(int argc, char* argv[]) {
         if (VERBOSE or DEBUG) { cout << "message: generating bytecode for function (at bytecode " << functions_section_size << "): " << name; }
         uint16_t fun_bytes = 0;
         try {
-            fun_bytes = Program::countBytes(functions.at(name).second);
+            fun_bytes = Program::countBytes(name == ENTRY_FUNCTION_NAME ? filter(functions.at(name).second) : functions.at(name).second);
             if (VERBOSE or DEBUG) { cout << " (" << fun_bytes << " bytes)" << endl; }
         } catch (const string& e) {
             cout << e << endl;
@@ -880,10 +869,7 @@ int main(int argc, char* argv[]) {
         functions_section_size += func.size();
         delete[] btcd;
     }
-    out.write((const char*)bytecode, bytes);
     out.close();
-
-    delete[] bytecode;
 
     return ret_code;
 }
