@@ -19,7 +19,7 @@ char*           - function ID encoded as null-terminated string
 byte*           - bytecode address to call for this ID
 
 uint16_t        - bytecode size
-uint16_t        - executable offset
+uint16_t        - first executable instruction
 
 byte*           - instructions
 ```
