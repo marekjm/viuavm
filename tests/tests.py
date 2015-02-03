@@ -37,15 +37,17 @@ class WudooCPUError(WudooError):
     pass
 
 
-def assemble(asm, out):
+def assemble(asm, out, opts=(), okcodes=(0,)):
     """Assemble path given as `asm` and put binary in `out`.
     Raises exception if compilation is not successful.
     """
-    p = subprocess.Popen(('./bin/vm/asm', asm, out), stdout=subprocess.PIPE)
+    asmargs = ('./bin/vm/asm',) + opts + (asm, out)
+    p = subprocess.Popen(asmargs, stdout=subprocess.PIPE)
     output, error = p.communicate()
     exit_code = p.wait()
-    if exit_code != 0:
+    if exit_code not in okcodes:
         raise WudooAssemblerError('{0}: {1}'.format(asm, output.decode('utf-8').strip()))
+    return (output, error, exit_code)
 
 def run(path, expected_exit_code=0):
     """Run given file with Wudoo CPU and return its output.
@@ -483,6 +485,7 @@ class FunctionTests(unittest.TestCase):
         excode, output = run(compiled_path)
         self.assertEqual([42, 69], [int(i) for i in output.strip().splitlines()])
         self.assertEqual(0, excode)
+
 
 
 if __name__ == '__main__':
