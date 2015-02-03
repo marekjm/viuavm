@@ -203,17 +203,16 @@ map<string, pair<bool, vector<string> > > getFunctions(const vector<string>& lin
             throw ("invalid function signature: illegal return declaration: " + holdline);
         }
 
-
         if (flines.size() == 0) {
             if (ERROR_EMPTY_FUNCTION_BODY or ERROR_ALL) {
-                throw ("error: function '" + name + "' is empty");
+                throw ("function '" + name + "' is empty");
             } else if (WARNING_EMPTY_FUNCTION_BODY or WARNING_ALL) {
                 cout << ("warning: function '" + name + "' is empty\n");
             }
         }
-        if (flines.back() != "end") {
+        if (flines.size() == 0 or flines.back() != "end") {
             if (ERROR_MISSING_END or ERROR_ALL) {
-                throw ("error: missing 'end' at the end of function '" + name + "'");
+                throw ("missing 'end' at the end of function '" + name + "'");
             } else if (WARNING_MISSING_END or WARNING_ALL) {
                 cout << ("warning: missing 'end' at the end of function '" + name + "'\n");
             } else {
@@ -768,8 +767,8 @@ int main(int argc, char* argv[]) {
             break;
         }
     }
-    if ((VERBOSE and main_function != "main" and main_function != "") or DEBUG) { cout << "debug (notice): main function set to: '" << main_function << "'" << endl; }
     if (main_function == "" and not LIB) { main_function = "main"; }
+    if ((VERBOSE and main_function != "main" and main_function != "") or DEBUG) { cout << "debug (notice): main function set to: '" << main_function << "'" << endl; }
 
     if (find(function_names.begin(), function_names.end(), main_function) == function_names.end() and not LIB) {
         cout << "error: main function is undefined: " << main_function << endl;
