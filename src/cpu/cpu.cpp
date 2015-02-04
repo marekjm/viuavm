@@ -157,6 +157,21 @@ int CPU::run() {
     ureferences = initial_frame->references;
     uregisters_size = initial_frame->registers_size;
     frames.push_back(initial_frame);
+    for (auto fn_addr : function_addresses) {
+        if (fn_addr.first == "__entry") {
+            // do not destroy last frame if it's entry function as it holds global registers
+            destroy_last_frame = false;
+            // delete global registers
+            // FIXME: CPU shoul wait until now with allocating memory for global registers to see
+            // if it's really necessary - unneeded new/delete would be avoided this way
+            delete[] registers;
+            delete[] references;
+            registers = uregisters;
+            references = ureferences;
+            reg_count = uregisters_size;
+            break;
+        }
+    }
 
     while (true) {
         previous_instr_ptr = instr_ptr;
@@ -336,12 +351,11 @@ int CPU::run() {
         }
 
         if (instr_ptr == previous_instr_ptr and OPCODE(*instr_ptr) != END) {
-            cout << "CPU: aborting: instruction pointer did not change, possibly endless loop" << endl;
+            cout << "CPU: aborting: instruction pointer did not change, possibly an endless loop" << endl;
             cout << "note: instruction index was " << (long)(instr_ptr-bytecode) << " and the opcode was '" << OP_NAMES.at(OPCODE(*instr_ptr)) << "'" << endl;
             if (OPCODE(*instr_ptr) == CALL) {
                 cout << "note: this was caused by 'call' opcode immediately calling itself\n"
-                     << "      such situation may have several sources, e.g. empty function definition or\n"
-                     << "      a function which calls itself in its first instruction";
+                     << "      such situation may arise when a function which calls itself in its first instruction";
                 cout << endl;
             }
             return_code = 2;

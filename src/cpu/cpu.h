@@ -43,6 +43,8 @@ class CPU {
      */
     std::map<std::string, unsigned> function_addresses;
 
+    bool destroy_last_frame;
+
     /*  Methods to deal with registers.
      */
     void updaterefs(Object* before, Object* now);
@@ -139,6 +141,7 @@ class CPU {
              *  Creates registers array of requested size and
              *  initializes it with zeroes.
              */
+            destroy_last_frame = true;
             registers = new Object*[reg_count];
             references = new bool[reg_count];
             for (int i = 0; i < reg_count; ++i) {
@@ -159,13 +162,18 @@ class CPU {
              *  Destructor also frees memory at bytecode pointer so make sure you gave CPU a copy of the bytecode if you want to keep it
              *  after the CPU is finished.
              */
-            for (int i = 0; i < reg_count; ++i) {
-                if (registers[i] and !references[i]) {
-                    delete registers[i];
+            if (not destroy_last_frame) {
+                for (int i = 0; i < reg_count; ++i) {
+                    if (registers[i] and !references[i]) {
+                        delete registers[i];
+                    }
                 }
+                delete[] registers;
+                delete[] references;
+            } else {
+                delete frames.back();
+                frames.pop_back();
             }
-            delete[] registers;
-            delete[] references;
             if (bytecode) { delete[] bytecode; }
         }
 };
