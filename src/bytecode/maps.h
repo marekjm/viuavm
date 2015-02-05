@@ -60,7 +60,7 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "swap",   sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
     { "delete", sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "isnull", sizeof(byte) + sizeof(bool) + sizeof(int) },
-    { "ress",   sizeof(byte) + sizeof(bool) + sizeof(int) },
+    { "ress",   sizeof(byte) + sizeof(int) },
     { "tmpri",  sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "tmpro",  sizeof(byte) + sizeof(bool) + sizeof(int) },
 
