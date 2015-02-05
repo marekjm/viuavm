@@ -190,11 +190,29 @@ byte* CPU::isnull(byte* addr) {
 byte* CPU::ress(byte* addr) {
     /*  Run ress instruction.
      */
-    int switch_to = 0;
-    switch_to = *(int*)addr;
+    int to_register_set = 0;
+    to_register_set = *(int*)addr;
     pointer::inc<int, byte>(addr);
 
-    throw "FIXME: ress instruction";
+    if (debug) {
+        cout << ' ' << to_register_set;
+    }
+
+    switch (to_register_set) {
+        case 0:
+            uregisters = registers;
+            ureferences = references;
+            uregisters_size = reg_count;
+            break;
+        case 1:
+            break;
+        case 2:
+            break;
+        default:
+            throw "illegal register set ID in ress instruction";
+    }
+
+    return addr;
 }
 
 
