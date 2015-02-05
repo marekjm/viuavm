@@ -187,6 +187,16 @@ byte* CPU::isnull(byte* addr) {
     return addr;
 }
 
+byte* CPU::ress(byte* addr) {
+    /*  Run ress instruction.
+     */
+    int switch_to = 0;
+    switch_to = *(int*)addr;
+    pointer::inc<int, byte>(addr);
+
+    throw "FIXME: ress instruction";
+}
+
 
 byte* CPU::ret(byte* addr) {
     /*  Run iinc instruction.
