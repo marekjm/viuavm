@@ -15,7 +15,31 @@ during development of the VM.
 
 ----
 
-## Development diary
+## Development diary, VM history
+
+### Three new instructions: `RESS`, `TMPRI` and `TMPRO`
+
+*When*: 2015.02.05
+
+These three instructions mean will be used to:
+
+- switch between register sets (*global*, *local* and *static*),
+- get an object in and out of singular, temporary register to move them between register sets,
+
+All of these things are really awesome.
+For example, they make it possible to implement static members in classes and static variables in functions.
+They also provide the support for sharing variables between functions (inside global scope).
+
+Even with all this switching that would be done, this can actually speed up the VM in some cases.
+For example, functions can be written to operate on global variable - thus removing the need to pass and
+parameters and return values.
+
+Also, memoizing functions and algorithms will be possible to implement (after hashes are implemented, or
+any way to store "multiple" objects inside single register).
+The immediate benefit of this will be the speed-up of Fibonacci test.
+
+
+----
 
 ### Function call scheme. Dynamic and static linking.
 
