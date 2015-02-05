@@ -269,6 +269,9 @@ int CPU::run() {
                 case DELETE:
                     instr_ptr = del(instr_ptr+1);
                     break;
+                case RESS:
+                    instr_ptr = ress(instr_ptr+1);
+                    break;
                 case PRINT:
                     instr_ptr = print(instr_ptr+1);
                     break;

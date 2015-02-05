@@ -96,6 +96,8 @@ class CPU {
     byte* del(byte*);
     byte* isnull(byte*);
 
+    byte* ress(byte*);
+
     byte* ret(byte*);
 
     byte* print(byte*);
