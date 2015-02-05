@@ -513,6 +513,16 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = get2operands(operands);
             program.swap(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
+        } else if (str::startswith(line, "ress")) {
+            vector<string> legal_register_sets = {
+                "global",   // global register set
+                "local",    // local register set for function
+                "static",   // static register set
+            };
+            if (find(legal_register_sets.begin(), legal_register_sets.end(), operands) == legal_register_sets.end()) {
+                throw ("illegal register set name: '" + operands + "'");
+            }
+            program.ress(operands);
         } else if (str::startswith(line, "ret")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
@@ -799,7 +809,9 @@ int main(int argc, char* argv[]) {
         cout << "generating '__entry' function" << endl;
         function_names.push_back(ENTRY_FUNCTION_NAME);
         function_addresses[ENTRY_FUNCTION_NAME] = starting_instruction;
+        ilines.insert(ilines.begin(), "ress global");
         functions[ENTRY_FUNCTION_NAME] = pair<bool, vector<string> >(false, ilines);
+        bytes += OP_SIZES.at("ress");   // ress instruction is added so bytecount must also be increased
     }
 
     starting_instruction = function_addresses[(function_names.size() ? main_function : ENTRY_FUNCTION_NAME)];
