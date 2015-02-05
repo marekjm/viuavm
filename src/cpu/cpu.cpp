@@ -162,7 +162,7 @@ int CPU::run() {
             // do not destroy last frame if it's entry function as it holds global registers
             destroy_last_frame = false;
             // delete global registers
-            // FIXME: CPU shoul wait until now with allocating memory for global registers to see
+            // FIXME: CPU should wait until now with allocating memory for global registers to see
             // if it's really necessary - unneeded new/delete would be avoided this way
             delete[] registers;
             delete[] references;
