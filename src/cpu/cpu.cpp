@@ -152,10 +152,10 @@ int CPU::run() {
     byte* previous_instr_ptr;
 
     // initial frame for entry function call
-    Frame *initial_frame = new Frame(0, 0, 16);
-    uregisters = initial_frame->registers;
-    ureferences = initial_frame->references;
-    uregisters_size = initial_frame->registers_size;
+    Frame *initial_frame = new Frame(0, 0, 0);
+    uregisters = (initial_frame->registers = registers);
+    ureferences = (initial_frame->references = references);
+    uregisters_size = (initial_frame->registers_size = reg_count);
     frames.push_back(initial_frame);
 
     while (true) {
@@ -330,7 +330,7 @@ int CPU::run() {
             break;
         }
 
-        if (halt or frames.size() == 0) break;
+        if (halt or frames.size() == 0) { break; }
 
         if (instr_ptr >= (bytecode+bytecode_size)) {
             cout << "CPU: aborting: bytecode address out of bounds" << endl;
