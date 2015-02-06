@@ -26,10 +26,14 @@ class Frame {
                                                     arguments_size(argsize), arguments(0), argreferences(0),
                                                     registers(0), references(0), registers_size(regsize),
                                                     place_return_value_in(0), resolve_return_value_register(false) {
-        arguments = new Object*[argsize];
-        argreferences = new bool[argsize];
-        registers = new Object*[regsize];
-        references = new bool[regsize];
+        if (argsize > 0) {
+            arguments = new Object*[argsize];
+            argreferences = new bool[argsize];
+        }
+        if (regsize > 0) {
+            registers = new Object*[regsize];
+            references = new bool[regsize];
+        }
         for (int i = 0; i < argsize; ++i) { arguments[i] = 0; }
         for (int i = 0; i < argsize; ++i) { argreferences[i] = false; }
         for (int i = 0; i < regsize; ++i) { registers[i] = 0; }
@@ -66,14 +70,18 @@ class Frame {
         for (int i = 0; i < arguments_size; ++i) {
             if (arguments[i] != 0 and !argreferences[i]) { delete arguments[i]; }
         }
-        delete[] arguments;
-        delete[] argreferences;
+        if (arguments_size) {
+            delete[] arguments;
+            delete[] argreferences;
+        }
 
         for (int i = 0; i < registers_size; ++i) {
             if (registers[i] != 0 and !references[i]) { delete registers[i]; }
         }
-        delete[] registers;
-        delete[] references;
+        if (registers_size) {
+            delete[] registers;
+            delete[] references;
+        }
     }
 };
 

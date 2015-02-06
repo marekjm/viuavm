@@ -60,6 +60,9 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "swap",   sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
     { "delete", sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "isnull", sizeof(byte) + sizeof(bool) + sizeof(int) },
+    { "ress",   sizeof(byte) + sizeof(int) },
+    { "tmpri",  sizeof(byte) + sizeof(bool) + sizeof(int) },
+    { "tmpro",  sizeof(byte) + sizeof(bool) + sizeof(int) },
 
     { "print",  sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "echo",   sizeof(byte) + sizeof(bool) + sizeof(int) },
@@ -135,6 +138,9 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { SWAP,     "swap" },
     { DELETE,   "delete" },
     { ISNULL,   "isnull" },
+    { RESS,     "ress", },
+    { TMPRI,    "tmpri", },
+    { TMPRO,    "tmpro", },
 
     { PRINT,    "print" },
     { ECHO,     "echo" },

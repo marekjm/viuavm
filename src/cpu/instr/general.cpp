@@ -187,6 +187,38 @@ byte* CPU::isnull(byte* addr) {
     return addr;
 }
 
+byte* CPU::ress(byte* addr) {
+    /*  Run ress instruction.
+     */
+    int to_register_set = 0;
+    to_register_set = *(int*)addr;
+    pointer::inc<int, byte>(addr);
+
+    if (debug) {
+        cout << ' ' << to_register_set;
+    }
+
+    switch (to_register_set) {
+        case 0:
+            uregisters = registers;
+            ureferences = references;
+            uregisters_size = reg_count;
+            break;
+        case 1:
+            uregisters = frames.back()->registers;
+            ureferences = frames.back()->references;
+            uregisters_size = frames.back()->registers_size;
+            break;
+        case 2:
+            // TODO: switching to static registers
+            break;
+        default:
+            throw "illegal register set ID in ress instruction";
+    }
+
+    return addr;
+}
+
 
 byte* CPU::ret(byte* addr) {
     /*  Run iinc instruction.
@@ -440,7 +472,7 @@ byte* CPU::end(byte* addr) {
     }
 
     // place return value
-    if (returned) {
+    if (returned and frames.size() > 0) {
         if (resolve_return_value_register) {
             return_value_register = static_cast<Integer*>(fetch(return_value_register))->value();
         }

@@ -98,6 +98,8 @@ class CPU {
     byte* del(byte*);
     byte* isnull(byte*);
 
+    byte* ress(byte*);
+
     byte* ret(byte*);
 
     byte* print(byte*);
@@ -162,7 +164,7 @@ class CPU {
              *  Destructor also frees memory at bytecode pointer so make sure you gave CPU a copy of the bytecode if you want to keep it
              *  after the CPU is finished.
              */
-            if (not destroy_last_frame) {
+            if (uregisters != registers) {
                 for (int i = 0; i < reg_count; ++i) {
                     if (registers[i] and !references[i]) {
                         delete registers[i];
