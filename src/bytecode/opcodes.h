@@ -70,6 +70,11 @@ enum OPCODE : byte {
     DELETE, // delete object from register
     ISNULL, // checks if register is null (empty) stores this information as a boolean in
             // another register
+    RESS,   // REgister Set Switch - switches register context
+    TMPRI,  // temporary register in - move object from current
+            // register set into the temporary register
+    TMPRO,  // temporary register out - move object out of the temporary
+            // to current register set
 
     // printing
     PRINT,

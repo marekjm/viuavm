@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
         } else if (option == "--Eall") {
             ERROR_ALL = true;
             continue;
-        } else if (option == "--stepping") {
+        } else if (option == "--step") {
             STEP_BY_STEP = true;
             continue;
         } else if (option == "--analyze") {

@@ -627,6 +627,25 @@ Program& Program::swap(int_op a, int_op b) {
     return (*this);
 }
 
+Program& Program::ress(string a) {
+    /*  Inserts ress instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  a - register set ID
+     */
+    *(addr_ptr++) = RESS;
+    if (a == "global") {
+        *((int*)addr_ptr) = 0;
+    } else if (a == "local") {
+        *((int*)addr_ptr) = 1;
+    } else if (a == "static") {
+        *((int*)addr_ptr) = 2;
+    }
+    pointer::inc<int, byte>(addr_ptr);
+    return (*this);
+}
+
 Program& Program::print(int_op reg) {
     /*  Inserts print instuction.
      */

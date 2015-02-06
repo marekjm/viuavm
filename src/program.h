@@ -67,6 +67,7 @@ class Program {
     Program& copy       (int_op, int_op);
     Program& ref        (int_op, int_op);
     Program& swap       (int_op, int_op);
+    Program& ress       (std::string);
 
     Program& print      (int_op);
     Program& echo       (int_op);
