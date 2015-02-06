@@ -210,7 +210,7 @@ map<string, pair<bool, vector<string> > > getFunctions(const vector<string>& lin
                 cout << ("warning: function '" + name + "' is empty\n");
             }
         }
-        if (flines.size() == 0 or flines.back() != "end") {
+        if ((flines.size() == 0 or flines.back() != "end") and (name != "main" and flines.back() != "halt")) {
             if (ERROR_MISSING_END or ERROR_ALL) {
                 throw ("missing 'end' at the end of function '" + name + "'");
             } else if (WARNING_MISSING_END or WARNING_ALL) {
