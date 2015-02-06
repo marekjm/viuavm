@@ -520,7 +520,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
                 "static",   // static register set
             };
             if (find(legal_register_sets.begin(), legal_register_sets.end(), operands) == legal_register_sets.end()) {
-                throw ("illegal register set name: '" + operands + "'");
+                throw ("illegal register set name in ress instruction: '" + operands + "'");
             }
             program.ress(operands);
         } else if (str::startswith(line, "ret")) {
