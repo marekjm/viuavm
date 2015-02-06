@@ -472,7 +472,7 @@ byte* CPU::end(byte* addr) {
     }
 
     // place return value
-    if (returned) {
+    if (returned and frames.size() > 0) {
         if (resolve_return_value_register) {
             return_value_register = static_cast<Integer*>(fetch(return_value_register))->value();
         }
