@@ -110,7 +110,6 @@ int main(int argc, char* argv[]) {
     char *buffer_function_ids = new char[function_ids_section_size];
     in.read(buffer_function_ids, function_ids_section_size);
     char *function_ids_map = buffer_function_ids;
-
     map<string, uint16_t> function_address_mapping;
 
     int i = 0;
@@ -128,6 +127,7 @@ int main(int argc, char* argv[]) {
             cout << "debug: function id-to-address mapping: " << fn_name << " @ byte " << fn_address << endl;
         }
     }
+    delete[] buffer_function_ids;
 
     uint16_t bytes;
     uint16_t starting_instruction;
