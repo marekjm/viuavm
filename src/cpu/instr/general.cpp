@@ -205,8 +205,12 @@ byte* CPU::ress(byte* addr) {
             uregisters_size = reg_count;
             break;
         case 1:
+            uregisters = frames.back()->registers;
+            ureferences = frames.back()->references;
+            uregisters_size = frames.back()->registers_size;
             break;
         case 2:
+            // TODO: switching to static registers
             break;
         default:
             throw "illegal register set ID in ress instruction";
