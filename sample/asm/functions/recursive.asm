@@ -32,5 +32,5 @@
     paref 1 2
     call rec__VOID__INT__INT
 
-    end
+    halt
 .end
