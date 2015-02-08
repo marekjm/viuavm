@@ -20,12 +20,17 @@ remake: clean all
 
 
 clean: clean-support
+	touch ./build/cpu/instr/dummy.o
 	rm -v ./build/cpu/instr/*.o
+	touch ./build/cpu/dummy.o
 	rm -v ./build/cpu/*.o
+	touch ./build/dummy.o
 	rm -v ./build/*.o
+	touch ./bin/vm/dummy.o
 	rm -v ./bin/vm/*
 
 clean-support:
+	touch ./build/support/dummy.o
 	rm -v ./build/support/*.o
 
 clean-test-compiles:
