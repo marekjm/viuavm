@@ -408,7 +408,8 @@ byte* CPU::call(byte* addr) {
     if (frame_new == 0) {
         throw "function call without a frame: use `frame 0' in source code if the function takes no parameters";
     }
-    // adjust return address
+    // set function name and return address
+    frame_new->function_name = call_name;
     frame_new->return_address = return_address;
 
     frame_new->resolve_return_value_register = *(bool*)addr;
@@ -443,7 +444,10 @@ byte* CPU::end(byte* addr) {
         throw "no frame on stack: nothing to end";
     }
     addr = frames.back()->ret_address();
-    if (debug) { cout << " -> return address: " << (long)(addr - bytecode); }
+    if (debug) {
+        cout << " -> return address: " << (long)(addr - bytecode);
+        cout << " (from function: " << frames.back()->function_name << ')';
+    }
 
     Object* returned = 0;
     int return_value_register = frames.back()->place_return_value_in;
