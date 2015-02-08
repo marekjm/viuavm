@@ -153,6 +153,7 @@ int CPU::run() {
 
     // initial frame for entry function call
     Frame *initial_frame = new Frame(0, 0, 0);
+    initial_frame->function_name = "__entry";
     uregisters = (initial_frame->registers = registers);
     ureferences = (initial_frame->references = references);
     uregisters_size = (initial_frame->registers_size = reg_count);
