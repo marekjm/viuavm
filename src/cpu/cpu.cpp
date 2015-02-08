@@ -323,24 +323,47 @@ int CPU::run() {
             if (debug and not stepping) { cout << endl; }
         } catch (const char*& e) {
             return_code = 1;
-            cout << (debug ? "\n" : "") <<  "exception: " << e << endl;
+            cout << "CPU: failed operation\n\n";
+            cout << "stack trace: from entry point...\n";
+            for (unsigned i = 1; i < frames.size(); ++i) {
+                cout << "  called function: '" << frames[i]->function_name << "'\n";
+            }
+            cout << "exception in function '" << frames.back()->function_name << "': ";
+            cout << e << endl;
             break;
         } catch (const string& e) {
             return_code = 1;
-            cout << (debug ? "\n" : "") <<  "exception: " << e << endl;
+            cout << "CPU: failed operation\n\n";
+            cout << "stack trace: from entry point...\n";
+            for (unsigned i = 1; i < frames.size(); ++i) {
+                cout << "  called function: '" << frames[i]->function_name << "'\n";
+            }
+            cout << "exception in function '" << frames.back()->function_name << "': ";
+            cout << e << endl;
             break;
         }
 
         if (halt or frames.size() == 0) { break; }
 
         if (instr_ptr >= (bytecode+bytecode_size)) {
-            cout << "CPU: aborting: bytecode address out of bounds" << endl;
+            cout << "CPU: failed operation\n\n";
+            cout << "stack trace: from entry point...\n";
+            for (unsigned i = 1; i < frames.size(); ++i) {
+                cout << "  called function: '" << frames[i]->function_name << "'\n";
+            }
+            cout << "aborting: bytecode address out of bounds" << endl;
             return_code = 1;
             break;
         }
 
         if (instr_ptr == previous_instr_ptr and OPCODE(*instr_ptr) != END) {
-            cout << "CPU: aborting: instruction pointer did not change, possibly endless loop" << endl;
+            cout << "CPU: failed operation\n\n";
+            cout << "stack trace: from entry point...\n";
+            for (unsigned i = 1; i < frames.size(); ++i) {
+                cout << "  called function: '" << frames[i]->function_name << "'\n";
+            }
+            return_code = 1;
+            cout << "aborting: instruction pointer did not change, possibly endless loop" << endl;
             cout << "note: instruction index was " << (long)(instr_ptr-bytecode) << " and the opcode was '" << OP_NAMES.at(OPCODE(*instr_ptr)) << "'" << endl;
             if (OPCODE(*instr_ptr) == CALL) {
                 cout << "note: this was caused by 'call' opcode immediately calling itself\n"
