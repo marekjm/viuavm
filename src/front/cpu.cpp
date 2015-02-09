@@ -65,8 +65,6 @@ int main(int argc, char* argv[]) {
         args.push_back(argv[i]);
     }
 
-    int ret_code = 0;
-
     if (SHOW_HELP or SHOW_VERSION) {
         cout << "wudoo VM virtual machine, version " << VERSION << endl;
         if (SHOW_HELP) {
@@ -165,6 +163,7 @@ int main(int argc, char* argv[]) {
     }
     in.close();
 
+    int ret_code = 0;
     // run the bytecode
     CPU cpu;
     cpu.debug = (DEBUG or STEP_BY_STEP);
@@ -173,6 +172,7 @@ int main(int argc, char* argv[]) {
 
     if (not ANALYZE) {
         ret_code = cpu.load(bytecode).bytes(bytes).eoffset(starting_instruction).run();
+
     }
 
     return ret_code;
