@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <tuple>
 #include "../bytecode/bytetypedef.h"
 #include "../types/object.h"
 #include "frame.h"
@@ -42,6 +43,13 @@ class CPU {
     /*  Function ID to bytecode address map.
      */
     std::map<std::string, unsigned> function_addresses;
+
+    /*  Variables set after CPU executed bytecode.
+     *  They describe exit conditions of the bytecode that just stopped running.
+     */
+    int return_code;                // always set
+    std::string return_exception;   // set if CPU stopped because of an exception
+    std::string return_message;     // message set by exception
 
     /*  Methods to deal with registers.
      */
@@ -135,8 +143,19 @@ class CPU {
 
         int run();
 
-        CPU(int r = DEFAULT_REGISTER_SIZE): bytecode(0), bytecode_size(0), executable_offset(0), registers(0), references(0), reg_count(r),
-                                            uregisters(0), ureferences(0), uregisters_size(0), frame_new(0), debug(false), stepping(false) {
+        inline std::tuple<int, std::string, std::string> exitcondition() {
+            return std::tuple<int, std::string, std::string>(return_code, return_exception, return_message);
+        }
+        inline std::vector<Frame*> trace() { return frames; }
+
+        CPU(int r = DEFAULT_REGISTER_SIZE):
+            bytecode(0), bytecode_size(0), executable_offset(0),
+            registers(0), references(0), reg_count(r),
+            uregisters(0), ureferences(0), uregisters_size(0),
+            frame_new(0),
+            return_code(0), return_exception(""), return_message(""),
+            debug(false), stepping(false)
+        {
             /*  Basic constructor.
              *  Creates registers array of requested size and
              *  initializes it with zeroes.
