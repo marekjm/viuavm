@@ -183,6 +183,8 @@ int main(int argc, char* argv[]) {
             cout << "  called function: '" << trace[i]->function_name << "'\n";
         }
         cout << "exception in function '" << trace.back()->function_name << "': ";
+        if (return_exception.size()) { cout << return_exception << ": "; }
+        cout << return_message << endl;
     }
 
     return ret_code;
