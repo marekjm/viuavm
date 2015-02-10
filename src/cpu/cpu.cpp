@@ -323,36 +323,22 @@ int CPU::run() {
             if (debug and not stepping) { cout << endl; }
         } catch (const char*& e) {
             return_code = 1;
-            cout << "CPU: failed operation\n\n";
-            cout << "stack trace: from entry point...\n";
-            for (unsigned i = 1; i < frames.size(); ++i) {
-                cout << "  called function: '" << frames[i]->function_name << "'\n";
-            }
-            cout << "exception in function '" << frames.back()->function_name << "': ";
-            cout << e << endl;
+            return_exception = string(e);
+            return_message = string(e);
             break;
         } catch (const string& e) {
             return_code = 1;
-            cout << "CPU: failed operation\n\n";
-            cout << "stack trace: from entry point...\n";
-            for (unsigned i = 1; i < frames.size(); ++i) {
-                cout << "  called function: '" << frames[i]->function_name << "'\n";
-            }
-            cout << "exception in function '" << frames.back()->function_name << "': ";
-            cout << e << endl;
+            return_exception = string(e);
+            return_message = string(e);
             break;
         }
 
         if (halt or frames.size() == 0) { break; }
 
         if (instr_ptr >= (bytecode+bytecode_size)) {
-            cout << "CPU: failed operation\n\n";
-            cout << "stack trace: from entry point...\n";
-            for (unsigned i = 1; i < frames.size(); ++i) {
-                cout << "  called function: '" << frames[i]->function_name << "'\n";
-            }
-            cout << "aborting: bytecode address out of bounds" << endl;
             return_code = 1;
+            return_exception = string("CPUException::BytecodeOutOfBounds");
+            return_message = string("bytecode address out of bounds");
             break;
         }
 
