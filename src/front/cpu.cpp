@@ -164,6 +164,7 @@ int main(int argc, char* argv[]) {
     in.close();
 
     int ret_code = 0;
+    string return_exception, return_message;
     // run the bytecode
     CPU cpu;
     cpu.debug = (DEBUG or STEP_BY_STEP);
@@ -171,8 +172,17 @@ int main(int argc, char* argv[]) {
     for (auto p : function_address_mapping) { cpu.mapfunction(p.first, p.second); }
 
     if (not ANALYZE) {
-        ret_code = cpu.load(bytecode).bytes(bytes).eoffset(starting_instruction).run();
+        cpu.load(bytecode).bytes(bytes).eoffset(starting_instruction).run();
+        tie(ret_code, return_exception, return_message) = cpu.exitcondition();
+    }
 
+    if (ret_code != 0) {
+        vector<Frame*> trace = cpu.trace();
+        cout << "stack trace: from entry point...\n";
+        for (unsigned i = 1; i < trace.size(); ++i) {
+            cout << "  called function: '" << trace[i]->function_name << "'\n";
+        }
+        cout << "exception in function '" << trace.back()->function_name << "': ";
     }
 
     return ret_code;
