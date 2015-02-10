@@ -221,7 +221,7 @@ byte* CPU::ress(byte* addr) {
 
 
 byte* CPU::ret(byte* addr) {
-    /*  Run iinc instruction.
+    /*  Run ret instruction.
      */
     bool ref = false;
     int regno;
