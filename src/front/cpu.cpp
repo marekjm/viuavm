@@ -164,7 +164,7 @@ int main(int argc, char* argv[]) {
     in.close();
 
     int ret_code = 0;
-    string return_exception, return_message;
+    string return_exception = "", return_message = "";
     // run the bytecode
     CPU cpu;
     cpu.debug = (DEBUG or STEP_BY_STEP);
@@ -176,7 +176,7 @@ int main(int argc, char* argv[]) {
         tie(ret_code, return_exception, return_message) = cpu.exitcondition();
     }
 
-    if (ret_code != 0) {
+    if (ret_code != 0 and return_exception.size()) {
         vector<Frame*> trace = cpu.trace();
         cout << "stack trace: from entry point...\n";
         for (unsigned i = 1; i < trace.size(); ++i) {
