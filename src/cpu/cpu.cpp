@@ -335,8 +335,8 @@ int CPU::run() {
 
         if (instr_ptr >= (bytecode+bytecode_size)) {
             return_code = 1;
-            return_exception = "";
-            return_message = string("bytecode address out of bounds");
+            return_exception = "InvalidBytecodeAddress";
+            return_message = string("instruction address out of bounds");
             break;
         }
 
@@ -366,7 +366,17 @@ int CPU::run() {
         // if return code if the default one and
         // return register is not unused
         // copy value of return register as return code
-        return_code = static_cast<Integer*>(uregisters[0])->value();
+        try {
+            return_code = static_cast<Integer*>(uregisters[0])->value();
+        } catch (const char*& e) {
+            return_code = 1;
+            return_exception = "ReturnStageException";
+            return_message = string(e);
+        } catch (const string& e) {
+            return_code = 1;
+            return_exception = "ReturnStageException";
+            return_message = string(e);
+        }
     }
 
     return return_code;
