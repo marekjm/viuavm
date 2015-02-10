@@ -144,8 +144,6 @@ int CPU::run() {
     if (!bytecode) {
         throw "null bytecode (maybe not loaded?)";
     }
-    int return_code = 0;
-
     bool halt = false;
 
     byte* instr_ptr = bytecode+executable_offset; // instruction pointer
@@ -323,12 +321,12 @@ int CPU::run() {
             if (debug and not stepping) { cout << endl; }
         } catch (const char*& e) {
             return_code = 1;
-            return_exception = string(e);
+            return_exception = "";
             return_message = string(e);
             break;
         } catch (const string& e) {
             return_code = 1;
-            return_exception = string(e);
+            return_exception =  "";
             return_message = string(e);
             break;
         }
@@ -337,27 +335,24 @@ int CPU::run() {
 
         if (instr_ptr >= (bytecode+bytecode_size)) {
             return_code = 1;
-            return_exception = string("CPUException::BytecodeOutOfBounds");
+            return_exception = "";
             return_message = string("bytecode address out of bounds");
             break;
         }
 
         if (instr_ptr == previous_instr_ptr and OPCODE(*instr_ptr) != END) {
-            cout << "CPU: failed operation\n\n";
-            cout << "stack trace: from entry point...\n";
-            for (unsigned i = 1; i < frames.size(); ++i) {
-                cout << "  called function: '" << frames[i]->function_name << "'\n";
-            }
-            return_code = 1;
-            cout << "aborting: instruction pointer did not change, possibly endless loop" << endl;
-            cout << "note: instruction index was " << (long)(instr_ptr-bytecode) << " and the opcode was '" << OP_NAMES.at(OPCODE(*instr_ptr)) << "'" << endl;
-            if (OPCODE(*instr_ptr) == CALL) {
-                cout << "note: this was caused by 'call' opcode immediately calling itself\n"
-                     << "      such situation may have several sources, e.g. empty function definition or\n"
-                     << "      a function which calls itself in its first instruction";
-                cout << endl;
-            }
             return_code = 2;
+            ostringstream oss;
+            return_exception = "InstructionUnchanged";
+            oss << "instruction pointer did not change, possibly endless loop\n";
+            oss << "note: instruction index was " << (long)(instr_ptr-bytecode) << " and the opcode was '" << OP_NAMES.at(OPCODE(*instr_ptr)) << "'";
+            if (OPCODE(*instr_ptr) == CALL) {
+                oss << '\n';
+                oss << "note: this was caused by 'call' opcode immediately calling itself\n"
+                    << "      such situation may have several sources, e.g. empty function definition or\n"
+                    << "      a function which calls itself in its first instruction";
+            }
+            return_message = oss.str();
             break;
         }
 
