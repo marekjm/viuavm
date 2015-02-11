@@ -805,13 +805,19 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    if (filter(ilines).size() > 0) {    // FIXME: entry function should *always* be generated
-        function_names.push_back(ENTRY_FUNCTION_NAME);
-        function_addresses[ENTRY_FUNCTION_NAME] = starting_instruction;
-        ilines.insert(ilines.begin(), "ress global");
-        functions[ENTRY_FUNCTION_NAME] = pair<bool, vector<string> >(false, ilines);
-        bytes += OP_SIZES.at("ress");   // ress instruction is added so bytecount must also be increased
-    }
+    // generate entry function
+    function_names.push_back(ENTRY_FUNCTION_NAME);
+    function_addresses[ENTRY_FUNCTION_NAME] = starting_instruction;
+    ilines.insert(ilines.begin(), "ress global");
+    ilines.push_back("frame 0");
+    ilines.push_back("call main");
+    ilines.push_back("halt");
+    functions[ENTRY_FUNCTION_NAME] = pair<bool, vector<string> >(false, ilines);
+    // instructions were added so bytecode size must be inreased
+    bytes += OP_SIZES.at("ress");
+    bytes += OP_SIZES.at("frame");
+    bytes += OP_SIZES.at("call");
+    bytes += OP_SIZES.at("halt");
 
     starting_instruction = function_addresses[ENTRY_FUNCTION_NAME];
 
