@@ -428,7 +428,11 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
 
         if (DEBUG) { cout << " *  assemble: +" << instruction+1 << ": " << instr; }
 
-        if (str::startswith(line, "istore")) {
+        if (str::startswith(line, "izero")) {
+            string regno_chnk;
+            regno_chnk = str::chunk(operands);
+            program.izero(getint_op(resolveregister(regno_chnk, names)));
+        } else if (str::startswith(line, "istore")) {
             string regno_chnk, number_chnk;
             tie(regno_chnk, number_chnk) = get2operands(operands);
             program.istore(getint_op(resolveregister(regno_chnk, names)), getint_op(resolveregister(number_chnk, names)));
@@ -800,12 +804,15 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // we should check if main function returns
+    // we should check if main function returns a value
+    // FIXME: this is just a crude check - it does not acctually checks if these instructions set 0 register
+    // this must be better implemented or we will receive "function did not set return register" exceptions at runtime
     string main_second_but_last = *(functions.at(main_function).second.end()-2);
     if (!str::startswith(main_second_but_last, "ret") and // FIXME: ret instruction is deprecated remove all references to it
         !str::startswith(main_second_but_last, "copy") and
         !str::startswith(main_second_but_last, "move") and
-        !str::startswith(main_second_but_last, "swap")
+        !str::startswith(main_second_but_last, "swap") and
+        !str::startswith(main_second_but_last, "izero")
         ) {
         cout << "fatal: main function does not return a value" << endl;
         return 1;

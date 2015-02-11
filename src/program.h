@@ -27,6 +27,7 @@ class Program {
 
     public:
     // instruction insertion interface
+    Program& izero      (int_op);
     Program& istore     (int_op, int_op);
     Program& iadd       (int_op, int_op, int_op);
     Program& isub       (int_op, int_op, int_op);

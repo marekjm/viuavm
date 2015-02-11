@@ -60,6 +60,7 @@ class CPU {
 
     /*  Methods implementing CPU instructions.
      */
+    byte* izero(byte*);
     byte* istore(byte*);
     byte* iadd(byte*);
     byte* isub(byte*);

@@ -169,6 +169,9 @@ int CPU::run() {
         try {
             if (debug) { cout << OP_NAMES.at(OPCODE(*instr_ptr)); }
             switch (*instr_ptr) {
+                case IZERO:
+                    instr_ptr = izero(instr_ptr+1);
+                    break;
                 case ISTORE:
                     instr_ptr = istore(instr_ptr+1);
                     break;

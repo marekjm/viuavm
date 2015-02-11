@@ -9,6 +9,7 @@ enum OPCODE : byte {
     NOP = 0,    // do nothing
 
     // integer instructions
+    IZERO,
     ISTORE,
     IADD,
     ISUB,

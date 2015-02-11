@@ -9,6 +9,30 @@
 using namespace std;
 
 
+byte* CPU::izero(byte* addr) {
+    /*  Run istore instruction.
+     */
+    int reg;
+    bool reg_ref = false;
+
+    reg_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    reg = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    if (debug) {
+        cout << (reg_ref ? " @" : " ") << reg;
+    }
+
+    if (reg_ref) {
+        reg = static_cast<Integer*>(fetch(reg))->value();
+    }
+
+    place(reg, new Integer(0));
+
+    return addr;
+}
+
 byte* CPU::istore(byte* addr) {
     /*  Run istore instruction.
      */

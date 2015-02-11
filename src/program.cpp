@@ -230,6 +230,14 @@ byte* insertThreeIntegerOpsInstruction(byte* addr_ptr, enum OPCODE instruction, 
 }
 
 
+Program& Program::izero(int_op regno) {
+    /*  Inserts izero instuction.
+     */
+    *(addr_ptr++) = IZERO;
+    addr_ptr = insertIntegerOperand(addr_ptr, regno);
+    return (*this);
+}
+
 Program& Program::istore(int_op regno, int_op i) {
     /*  Inserts istore instruction to bytecode.
      *

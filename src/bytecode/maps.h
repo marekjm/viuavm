@@ -11,6 +11,7 @@
 const std::map<std::string, unsigned> OP_SIZES = {
     { "nop",    sizeof(byte) },
 
+    { "izero",  sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "istore", sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
     { "iadd",   sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
     { "isub",   sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
@@ -89,6 +90,7 @@ const std::map<std::string, unsigned> OP_SIZES = {
 const std::map<enum OPCODE, std::string> OP_NAMES = {
     { NOP,	    "nop" },
 
+    { IZERO,    "izero" },
     { ISTORE,   "istore" },
     { IADD,     "iadd" },
     { ISUB,     "isub" },
