@@ -4,7 +4,3 @@
     print 1
     end
 .end
-
-;frame
-;call main
-;halt
