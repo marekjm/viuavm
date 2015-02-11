@@ -15,6 +15,7 @@
     iinc 4
     print @5
     halt
+    izero 0
     end
 .end
 
