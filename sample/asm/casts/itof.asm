@@ -5,6 +5,6 @@
     end
 .end
 
-frame
-call main
-halt
+;frame
+;call main
+;halt
