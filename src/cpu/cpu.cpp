@@ -321,13 +321,13 @@ int CPU::run() {
             if (debug and not stepping) { cout << endl; }
         } catch (const char*& e) {
             return_code = 1;
-            return_exception = "";
             return_message = string(e);
+            return_exception = "RuntimeException";
             break;
         } catch (const string& e) {
             return_code = 1;
-            return_exception =  "";
             return_message = string(e);
+            return_exception =  "RuntimeException";
             break;
         }
 
