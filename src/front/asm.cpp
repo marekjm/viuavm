@@ -806,7 +806,6 @@ int main(int argc, char* argv[]) {
     }
 
     if (filter(ilines).size() > 0) {
-        cout << "generating '__entry' function" << endl;
         function_names.push_back(ENTRY_FUNCTION_NAME);
         function_addresses[ENTRY_FUNCTION_NAME] = starting_instruction;
         ilines.insert(ilines.begin(), "ress global");
@@ -815,15 +814,12 @@ int main(int argc, char* argv[]) {
     }
 
     starting_instruction = function_addresses[(function_names.size() ? main_function : ENTRY_FUNCTION_NAME)];
+    if (function_names.back() == ENTRY_FUNCTION_NAME) {
+        starting_instruction = function_addresses.at(ENTRY_FUNCTION_NAME);
+    }
 
     if (VERBOSE or DEBUG) { cout << "message: total required bytes: " <<  bytes << endl; }
     if (VERBOSE or DEBUG) { cout << "message: first instruction pointer: " << starting_instruction << endl; }
-
-    if (function_names.back() == ENTRY_FUNCTION_NAME) {
-        cout << "adjusting starting instruction" << endl;
-        starting_instruction = function_addresses.at(ENTRY_FUNCTION_NAME);
-        cout << "message: first instruction pointer: " << starting_instruction << endl;
-    }
 
     uint16_t function_ids_section_size = 0;
     for (string name : function_names) { function_ids_section_size += name.size(); }
