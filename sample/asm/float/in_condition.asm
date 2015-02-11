@@ -17,7 +17,3 @@
     print 2
     end
 .end
-
-frame 0
-call main
-halt
