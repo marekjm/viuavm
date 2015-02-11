@@ -3,6 +3,6 @@
 
 #pragma once
 
-const char* VERSION = "0.3.0";
+const char* VERSION = "0.3.1";
 
 #endif
