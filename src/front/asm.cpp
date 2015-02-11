@@ -805,7 +805,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    if (filter(ilines).size() > 0) {
+    if (filter(ilines).size() > 0) {    // FIXME: entry function should *always* be generated
         function_names.push_back(ENTRY_FUNCTION_NAME);
         function_addresses[ENTRY_FUNCTION_NAME] = starting_instruction;
         ilines.insert(ilines.begin(), "ress global");
@@ -813,10 +813,7 @@ int main(int argc, char* argv[]) {
         bytes += OP_SIZES.at("ress");   // ress instruction is added so bytecount must also be increased
     }
 
-    starting_instruction = function_addresses[(function_names.size() ? main_function : ENTRY_FUNCTION_NAME)];
-    if (function_names.back() == ENTRY_FUNCTION_NAME) {
-        starting_instruction = function_addresses.at(ENTRY_FUNCTION_NAME);
-    }
+    starting_instruction = function_addresses[ENTRY_FUNCTION_NAME];
 
     if (VERBOSE or DEBUG) { cout << "message: total required bytes: " <<  bytes << endl; }
     if (VERBOSE or DEBUG) { cout << "message: first instruction pointer: " << starting_instruction << endl; }
