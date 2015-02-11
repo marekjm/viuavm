@@ -773,7 +773,9 @@ int main(int argc, char* argv[]) {
 
     for (string line : ilines) {
         if (str::startswith(line, ".main:")) {
+            cout << "setting main function to: ";
             main_function = str::lstrip(str::sub(line, 6));
+            cout << main_function << endl;
             break;
         }
     }
@@ -810,13 +812,15 @@ int main(int argc, char* argv[]) {
     function_addresses[ENTRY_FUNCTION_NAME] = starting_instruction;
     ilines.insert(ilines.begin(), "ress global");
     ilines.push_back("frame 0");
-    ilines.push_back("call main");
+    // this must not be hardcoded because we have '.main:' assembler instruction
+    ilines.push_back("call " + main_function);
     ilines.push_back("halt");
     functions[ENTRY_FUNCTION_NAME] = pair<bool, vector<string> >(false, ilines);
     // instructions were added so bytecode size must be inreased
     bytes += OP_SIZES.at("ress");
     bytes += OP_SIZES.at("frame");
     bytes += OP_SIZES.at("call");
+    bytes += main_function.size();
     bytes += OP_SIZES.at("halt");
 
     starting_instruction = function_addresses[ENTRY_FUNCTION_NAME];
