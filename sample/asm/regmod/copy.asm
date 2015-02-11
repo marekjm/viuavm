@@ -4,5 +4,6 @@
     istore 1 1
     copy 1 2
     print 2
+    izero 0
     end
 .end

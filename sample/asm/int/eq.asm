@@ -8,5 +8,6 @@
 
     ; should be true
     print 1
+    izero 0
     end
 .end

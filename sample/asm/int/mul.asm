@@ -7,5 +7,6 @@
     imul 1 2 4
     iadd 4 3 3
     print 3
+    izero 0
     end
 .end

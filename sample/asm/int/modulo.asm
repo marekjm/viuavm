@@ -20,5 +20,6 @@
 
     .mark: final
     print result
+    izero 0
     end
 .end

@@ -32,5 +32,6 @@
 .def: main 0
     frame 0
     call bay
+    izero 0
     end
 .end

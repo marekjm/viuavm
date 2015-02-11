@@ -15,5 +15,6 @@
     not 2
     .mark: fin
     print 2
+    izero 0
     end
 .end

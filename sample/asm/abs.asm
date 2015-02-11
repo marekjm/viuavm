@@ -27,6 +27,7 @@
 
     .mark: final_print
     print number
+    izero 0
     end
 .end
 

@@ -6,5 +6,6 @@
     istore 2 1
     igte 1 2
     print 1
+    izero 0
     end
 .end

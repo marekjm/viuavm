@@ -81,6 +81,7 @@
     jump :loop
 
     .mark: break
+    izero 0
     end
 .end
 

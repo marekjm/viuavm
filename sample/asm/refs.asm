@@ -28,6 +28,7 @@
     ; nor 2 (as istore to a direct reference may suggest)
     ; but that it is 16!
     print number
+    izero 0
     end
 .end
 

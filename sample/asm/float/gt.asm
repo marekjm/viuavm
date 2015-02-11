@@ -6,5 +6,6 @@
     fstore 2 3.98
     fgt 1 2
     print 1
+    izero 0
     end
 .end

@@ -15,5 +15,6 @@
     print zero
     print one
 
+    izero 0
     end
 .end

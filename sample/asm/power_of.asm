@@ -54,6 +54,8 @@
     param 1 2
     call power_of 1
     print 1
+
+    izero 0
     end
 .end
 

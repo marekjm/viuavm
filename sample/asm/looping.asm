@@ -17,6 +17,7 @@
     jump :loop
     .mark: final_print
     print 1
+    izero 0
     end
 .end
 

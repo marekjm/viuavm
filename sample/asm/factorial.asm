@@ -44,6 +44,7 @@
 
     ; print result
     print result
+    izero 0
     end
 .end
 

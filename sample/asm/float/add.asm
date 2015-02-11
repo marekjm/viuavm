@@ -10,5 +10,6 @@
     fstore 4 0
     fadd 3 4
     print 3
+    izero 0
     end
 .end

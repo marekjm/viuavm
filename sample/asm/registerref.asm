@@ -9,6 +9,8 @@
     print @1
     print 16
     print @16
+
+    izero 0
     end
 .end
 

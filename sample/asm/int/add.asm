@@ -10,5 +10,6 @@
     istore 4 0
     iadd 3 4
     print 3
+    izero 0
     end
 .end
