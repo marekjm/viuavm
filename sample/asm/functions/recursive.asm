@@ -34,3 +34,9 @@
 
     halt
 .end
+
+; FIXME: this must be removed after __entry function is generated!
+; otherwise main will be called *two* times!
+frame 0
+call main
+halt
