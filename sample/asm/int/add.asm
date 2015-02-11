@@ -12,7 +12,3 @@
     print 3
     end
 .end
-
-frame 0
-call main
-halt
