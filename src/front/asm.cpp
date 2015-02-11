@@ -800,6 +800,17 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    // we should check if main function returns
+    string main_second_but_last = *(functions.at(main_function).second.end()-2);
+    if (!str::startswith(main_second_but_last, "ret") and // FIXME: ret instruction is deprecated remove all references to it
+        !str::startswith(main_second_but_last, "copy") and
+        !str::startswith(main_second_but_last, "move") and
+        !str::startswith(main_second_but_last, "swap")
+        ) {
+        cout << "fatal: main function does not return a value" << endl;
+        return 1;
+    }
+
     map<string, uint16_t> function_addresses;
     try {
         for (string name : function_names) {
@@ -815,10 +826,15 @@ int main(int argc, char* argv[]) {
     // generate entry function
     function_names.push_back(ENTRY_FUNCTION_NAME);
     function_addresses[ENTRY_FUNCTION_NAME] = starting_instruction;
+    // entry function sets global stuff
     ilines.insert(ilines.begin(), "ress global");
+    // append entry function instructions...
     ilines.push_back("frame 0");
     // this must not be hardcoded because we have '.main:' assembler instruction
-    ilines.push_back("call " + main_function);
+    // we also save return value in 1 register since 0 means "drop return value"
+    ilines.push_back("call " + main_function + " 1");
+    // then, register 1 is moved to register 0 so it counts as a return code
+    ilines.push_back("move 1 0");
     ilines.push_back("halt");
     functions[ENTRY_FUNCTION_NAME] = pair<bool, vector<string> >(false, ilines);
     // instructions were added so bytecode size must be inreased
@@ -826,6 +842,7 @@ int main(int argc, char* argv[]) {
     bytes += OP_SIZES.at("frame");
     bytes += OP_SIZES.at("call");
     bytes += main_function.size();
+    bytes += OP_SIZES.at("move");
     bytes += OP_SIZES.at("halt");
 
     starting_instruction = function_addresses[ENTRY_FUNCTION_NAME];
