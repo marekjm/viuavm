@@ -270,8 +270,13 @@ string resolveregister(string reg, const map<string, int>& names) {
         try {
             out << names.at(reg);
         } catch (const std::out_of_range& e) {
-            // Jinkies! This name was not declared.
-            throw ("undeclared name: " + reg);
+            // first, check if the name is non-empty
+            if (reg != "") {
+                // Jinkies! This name was not declared.
+                throw ("undeclared name: " + reg);
+            } else {
+                throw "not enough operands";
+            }
         }
     }
     return out.str();
