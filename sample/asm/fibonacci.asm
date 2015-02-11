@@ -84,8 +84,3 @@
     izero 0
     end
 .end
-
-
-frame
-call main
-halt
