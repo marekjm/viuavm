@@ -69,6 +69,9 @@ class Program {
     Program& ref        (int_op, int_op);
     Program& swap       (int_op, int_op);
     Program& ress       (std::string);
+    Program& free       (int_op);
+    Program& empty      (int_op);
+    Program& isnull     (int_op, int_op);
 
     Program& print      (int_op);
     Program& echo       (int_op);

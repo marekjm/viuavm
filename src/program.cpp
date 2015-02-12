@@ -634,6 +634,34 @@ Program& Program::swap(int_op a, int_op b) {
     return (*this);
 }
 
+Program& Program::free(int_op reg) {
+    /*  Inserts free instuction.
+     */
+    *(addr_ptr++) = FREE;
+    addr_ptr = insertIntegerOperand(addr_ptr, reg);
+    return (*this);
+}
+
+Program& Program::empty(int_op reg) {
+    /*  Inserts empty instuction.
+     */
+    *(addr_ptr++) = EMPTY;
+    addr_ptr = insertIntegerOperand(addr_ptr, reg);
+    return (*this);
+}
+
+Program& Program::isnull(int_op a, int_op b) {
+    /*  Inserts isnull instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  a - register number
+     *  b - register number
+     */
+    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, ISNULL, a, b);
+    return (*this);
+}
+
 Program& Program::ress(string a) {
     /*  Inserts ress instruction to bytecode.
      *
