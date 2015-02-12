@@ -773,19 +773,6 @@ Program& Program::branch(int_op regc, int addr_truth, int addr_false) {
     return (*this);
 }
 
-Program& Program::ret(int_op reg) {
-    /*  Inserts ret instruction. Parameter is instruction index.
-     *  Byte offset is calculated automatically.
-     *
-     *  :params:
-     *
-     *  reg - index of the register which will be stored as return value
-     */
-    *(addr_ptr++) = RET;
-    addr_ptr = insertIntegerOperand(addr_ptr, reg);
-    return (*this);
-}
-
 Program& Program::end() {
     /*  Inserts end instruction.
      */

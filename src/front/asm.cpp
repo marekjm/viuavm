@@ -532,10 +532,6 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
                 throw ("illegal register set name in ress instruction: '" + operands + "'");
             }
             program.ress(operands);
-        } else if (str::startswith(line, "ret")) {
-            string regno_chnk;
-            regno_chnk = str::chunk(operands);
-            program.ret(getint_op(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "print")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
@@ -808,8 +804,7 @@ int main(int argc, char* argv[]) {
     // FIXME: this is just a crude check - it does not acctually checks if these instructions set 0 register
     // this must be better implemented or we will receive "function did not set return register" exceptions at runtime
     string main_second_but_last = *(functions.at(main_function).second.end()-2);
-    if (!str::startswith(main_second_but_last, "ret") and // FIXME: ret instruction is deprecated remove all references to it
-        !str::startswith(main_second_but_last, "copy") and
+    if (!str::startswith(main_second_but_last, "copy") and
         !str::startswith(main_second_but_last, "move") and
         !str::startswith(main_second_but_last, "swap") and
         !str::startswith(main_second_but_last, "izero")
