@@ -68,7 +68,6 @@ int Program::instructionCount() {
             case IDEC:
             case PRINT:
             case JUMP:
-            case RET:
                 i += sizeof(int);
                 break;
         }
