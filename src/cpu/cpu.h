@@ -107,8 +107,6 @@ class CPU {
 
     byte* ress(byte*);
 
-    byte* ret(byte*);
-
     byte* print(byte*);
     byte* echo(byte*);
 

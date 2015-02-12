@@ -304,9 +304,6 @@ int CPU::run() {
                 case BRANCH:
                     instr_ptr = branch(instr_ptr+1);
                     break;
-                case RET:
-                    instr_ptr = ret(instr_ptr+1);
-                    break;
                 case HALT:
                     halt = true;
                     break;
