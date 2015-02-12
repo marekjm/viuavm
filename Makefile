@@ -42,8 +42,8 @@ install: ${VM_ASM} ${VM_CPU}
 	mkdir -p ${BIN_PATH}
 	cp ${VM_ASM} ${BIN_PATH}/wudoo-asm
 	chmod 755 ${BIN_PATH}/wudoo-asm
-	cp ${VM_CPU} ${BIN_PATH}/wudoo-run
-	chmod 755 ${BIN_PATH}/wudoo-run
+	cp ${VM_CPU} ${BIN_PATH}/wudoo-cpu
+	chmod 755 ${BIN_PATH}/wudoo-cpu
 
 
 test: ${VM_CPU} ${VM_ASM} clean-test-compiles
