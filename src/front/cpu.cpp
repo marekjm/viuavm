@@ -68,9 +68,10 @@ int main(int argc, char* argv[]) {
     if (SHOW_HELP or SHOW_VERSION) {
         cout << "wudoo VM virtual machine, version " << VERSION << endl;
         if (SHOW_HELP) {
-            cout << "    --debug <infile>       - to run a program in debug mode (shows debug output)" << endl;
-            cout << "    --stepping <infile>    - to run a program in stepping mode (pauses after each instruction, implies debug mode)" << endl;
-            cout << "    --help                 - to display this message" << endl;
+            cout << "    --analyze          - to display information about loaded bytecode but not run it" << endl;
+            cout << "    --debug <infile>   - to run a program in debug mode (shows debug output)" << endl;
+            cout << "    --help             - to display this message" << endl;
+            cout << "    --step <infile>    - to run a program in stepping mode (pauses after each instruction, implies debug mode for CPU)" << endl;
         }
         return 0;
     }
