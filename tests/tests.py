@@ -477,6 +477,14 @@ class FunctionTests(unittest.TestCase):
         self.assertEqual([42, 69], [int(i) for i in output.strip().splitlines()])
         self.assertEqual(0, excode)
 
+    def testReturningReferences(self):
+        name = 'return_by_reference.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual(42, int(output.strip()))
+        self.assertEqual(0, excode)
 
 
 if __name__ == '__main__':
