@@ -79,7 +79,6 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "jump",   sizeof(byte) + sizeof(int) },
     { "branch", sizeof(byte) + sizeof(bool) + 3*sizeof(int) },
 
-    { "ret",    sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "end",    sizeof(byte) },
 
     { "pass",   sizeof(byte) },
@@ -156,7 +155,6 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { JUMP,     "jump" },
     { BRANCH,   "branch" },
 
-    { RET,      "ret" },
     { END,      "end" },
 
     { PASS,     "pass" },

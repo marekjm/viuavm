@@ -91,7 +91,6 @@ enum OPCODE : byte {
     JUMP,
     BRANCH,
 
-    RET,
     END,
 
     PASS,   // do nothing
