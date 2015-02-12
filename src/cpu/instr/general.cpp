@@ -420,6 +420,7 @@ byte* CPU::end(byte* addr) {
     }
 
     Object* returned = 0;
+    bool returned_is_reference = false;
     int return_value_register = frames.back()->place_return_value_in;
     bool resolve_return_value_register = frames.back()->resolve_return_value_register;
     if (return_value_register != 0) {
@@ -427,7 +428,12 @@ byte* CPU::end(byte* addr) {
         if (uregisters[0] == 0) {
             throw "return value requested by frame but function did not set return register";
         }
-        returned = uregisters[0]->copy();
+        if (ureferences[0]) {
+            returned = uregisters[0];
+            returned_is_reference = true;
+        } else {
+            returned = uregisters[0]->copy();
+        }
     }
 
     // delete and remove top frame
@@ -451,6 +457,7 @@ byte* CPU::end(byte* addr) {
             return_value_register = static_cast<Integer*>(fetch(return_value_register))->value();
         }
         place(return_value_register, returned);
+        ureferences[return_value_register] = returned_is_reference;
     }
 
     return addr;
