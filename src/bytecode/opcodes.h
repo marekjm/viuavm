@@ -68,9 +68,9 @@ enum OPCODE : byte {
     COPY,   // copy an object from one register to another
     REF,    // create a refenrence to a value store in one register in another register
     SWAP,   // rotate two objects between their registers
-    DELETE, // delete object from register
-    ISNULL, // checks if register is null (empty) stores this information as a boolean in
-            // another register
+    FREE,   // delete object from register, freeing the memory (ACHTUNG MINEN!!! will also delete references)
+    EMPTY,  // empty the register (set it to 0 and set its reference status to false, does not delete any objects)
+    ISNULL, // checks if register is null (empty)
     RESS,   // REgister Set Switch - switches register context
     TMPRI,  // temporary register in - move object from current
             // register set into the temporary register
