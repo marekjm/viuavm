@@ -522,6 +522,18 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = get2operands(operands);
             program.swap(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
+        } else if (str::startswith(line, "free")) {
+            string regno_chnk;
+            regno_chnk = str::chunk(operands);
+            program.free(getint_op(resolveregister(regno_chnk, names)));
+        } else if (str::startswith(line, "empty")) {
+            string regno_chnk;
+            regno_chnk = str::chunk(operands);
+            program.empty(getint_op(resolveregister(regno_chnk, names)));
+        } else if (str::startswith(line, "isnull")) {
+            string a_chnk, b_chnk;
+            tie(a_chnk, b_chnk) = get2operands(operands);
+            program.isnull(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "ress")) {
             vector<string> legal_register_sets = {
                 "global",   // global register set
