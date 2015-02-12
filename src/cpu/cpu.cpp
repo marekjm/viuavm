@@ -268,8 +268,14 @@ int CPU::run() {
                 case SWAP:
                     instr_ptr = swap(instr_ptr+1);
                     break;
-                case DELETE:
-                    instr_ptr = del(instr_ptr+1);
+                case FREE:
+                    instr_ptr = free(instr_ptr+1);
+                    break;
+                case EMPTY:
+                    instr_ptr = empty(instr_ptr+1);
+                    break;
+                case ISNULL:
+                    instr_ptr = isnull(instr_ptr+1);
                     break;
                 case RESS:
                     instr_ptr = ress(instr_ptr+1);

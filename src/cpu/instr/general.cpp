@@ -180,7 +180,10 @@ byte* CPU::swap(byte* addr) {
 
     return addr;
 }
-byte* CPU::del(byte* addr) {
+byte* CPU::free(byte* addr) {
+    return addr;
+}
+byte* CPU::empty(byte* addr) {
     return addr;
 }
 byte* CPU::isnull(byte* addr) {

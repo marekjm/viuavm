@@ -102,7 +102,8 @@ class CPU {
     byte* copy(byte*);
     byte* ref(byte*);
     byte* swap(byte*);
-    byte* del(byte*);
+    byte* free(byte*);
+    byte* empty(byte*);
     byte* isnull(byte*);
 
     byte* ress(byte*);
