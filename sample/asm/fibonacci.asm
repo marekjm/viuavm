@@ -15,7 +15,7 @@
     not 4
     branch 4 :not_one_and_not_two
     istore 1 1
-    ret 1
+    move 1 0
     end
 
     .mark: not_one_and_not_two
@@ -35,7 +35,7 @@
     ; add these two calls
     iadd 3 4 5
     ; and return the value
-    ret 5
+    move 5 0
 
     end
 .end

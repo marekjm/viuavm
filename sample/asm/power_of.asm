@@ -41,7 +41,7 @@
     ; final instructions
     .mark: final
     ; return result
-    ret result
+    move result 0
     end
 .end
 
