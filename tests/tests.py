@@ -350,15 +350,6 @@ class RegisterManipulationInstructionsTests(unittest.TestCase):
         self.assertEqual([1, 0], [int(i) for i in output.strip().splitlines()])
         self.assertEqual(0, excode)
 
-    def testRET(self):
-        name = 'ret.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
-        assemble(assembly_path, compiled_path)
-        excode, output = run(compiled_path, (4,))
-        self.assertEqual('', output.strip())
-        self.assertEqual(4, excode)
-
 
 class SampleProgramsTests(unittest.TestCase):
     """Tests for various sample programs.
