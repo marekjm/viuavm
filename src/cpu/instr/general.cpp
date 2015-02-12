@@ -181,12 +181,95 @@ byte* CPU::swap(byte* addr) {
     return addr;
 }
 byte* CPU::free(byte* addr) {
+    /** Run free instruction.
+     */
+    int a;
+    bool a_ref = false;
+
+    a_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    a = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    if (debug) {
+        cout << (a_ref ? " @" : " ") << a;
+    }
+
+    if (a_ref) {
+        a = static_cast<Integer*>(fetch(a))->value();
+    }
+
+    if (uregisters[a]) {
+        // FIXME: if it is a reference register all references should be cleared
+        // to avoid errors and
+        // to make it possible to detect deletion with "isnull" instruction
+        delete uregisters[a];
+        uregisters[a] = 0;
+    }
+    ureferences[a] = false;
+
     return addr;
 }
 byte* CPU::empty(byte* addr) {
+    /** Run empty instruction.
+     */
+    int a;
+    bool a_ref = false;
+
+    a_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    a = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    if (debug) {
+        cout << (a_ref ? " @" : " ") << a;
+    }
+
+    if (a_ref) {
+        a = static_cast<Integer*>(fetch(a))->value();
+    }
+
+    uregisters[a] = 0;
+    ureferences[a] = false;
+
     return addr;
 }
 byte* CPU::isnull(byte* addr) {
+    /** Run isnull instruction.
+     *
+     * Example:
+     *
+     *      isnull A, B
+     *
+     * the above means: "check if A is null and store the information in B".
+     */
+    int a, b;
+    bool a_ref = false, b_ref = false;
+
+    a_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    a = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    b_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    b = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    if (debug) {
+        cout << (a_ref ? " @" : " ") << a;
+        cout << (b_ref ? " @" : " ") << b;
+    }
+
+    if (a_ref) {
+        a = static_cast<Integer*>(fetch(a))->value();
+    }
+    if (b_ref) {
+        b = static_cast<Integer*>(fetch(b))->value();
+    }
+
+    place(b, new Boolean(uregisters[a] == 0));
+
     return addr;
 }
 
