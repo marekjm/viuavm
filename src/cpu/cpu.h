@@ -173,21 +173,9 @@ class CPU {
         }
 
         ~CPU() {
-            /*  Destructor must free all memory allocated for values stored in registers.
-             *  Here we iterate over all registers and delete non-null pointers.
-             *
-             *  Destructor also frees memory at bytecode pointer so make sure you gave CPU a copy of the bytecode if you want to keep it
-             *  after the CPU is finished.
+            /*  Destructor frees memory at bytecode pointer so make sure you passed a copy of the bytecode to the constructor
+             *  if you want to keep it around after the CPU is finished.
              */
-            if (uregisters != registers) {
-                for (int i = 0; i < reg_count; ++i) {
-                    if (registers[i] and !references[i]) {
-                        delete registers[i];
-                    }
-                }
-                delete[] registers;
-                delete[] references;
-            }
             if (bytecode) { delete[] bytecode; }
         }
 };
