@@ -379,5 +379,9 @@ int CPU::run() {
         }
     }
 
+    // delete entry function's frame
+    // otherwise we get huge memory leak
+    delete frames.back();
+
     return return_code;
 }
