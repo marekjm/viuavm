@@ -54,8 +54,6 @@
     tmpri first
     ress global
     tmpro @1
-    print 1
-    print @1
     .mark: is_filled
     empty 1
     empty 2
@@ -74,12 +72,10 @@
     isnull @1 2
     tmpri 2
     branch 2 :nope
-    ;echo @1
     .mark: nope
     ; switch back to local registers
     ress local
     tmpro 0
-    ;print 0
 
     branch 0 :we_must_calculate :fetch_it
 
@@ -127,17 +123,24 @@
     istore number 10
     istore expected 55
 
-    ;istore number 20
-    ;istore expected 6765
+    istore number 20
+    istore expected 6765
 
-    ;istore number 30
-    ;istore expected 832040
+    istore number 30
+    istore expected 832040
 
-    ;istore number 35
-    ;istore expected 9227465
+    istore number 35
+    istore expected 9227465
 
-    ;istore number 40
-    ;istore expected 102334155
+    istore number 40
+    istore expected 102334155
+
+    istore number 45
+    istore expected 1134903170
+
+    ; 50. Fibonacci number is too big for an integer
+    ;istore number 50
+    ;istore expected 12586269025
 
     print number
 
