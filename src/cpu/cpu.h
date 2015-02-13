@@ -35,6 +35,9 @@ class CPU {
     bool* ureferences;
     int uregisters_size;
 
+    // Temporary register
+    Object* tmp;
+
     /*  Call stack.
      */
     std::vector<Frame*> frames;
@@ -107,6 +110,8 @@ class CPU {
     byte* isnull(byte*);
 
     byte* ress(byte*);
+    byte* tmpri(byte*);
+    byte* tmpro(byte*);
 
     byte* print(byte*);
     byte* echo(byte*);
@@ -152,6 +157,7 @@ class CPU {
             bytecode(0), bytecode_size(0), executable_offset(0),
             registers(0), references(0), reg_count(r),
             uregisters(0), ureferences(0), uregisters_size(0),
+            tmp(0),
             frame_new(0),
             return_code(0), return_exception(""), return_message(""),
             debug(false), stepping(false)
@@ -160,7 +166,6 @@ class CPU {
              *  Creates registers array of requested size and
              *  initializes it with zeroes.
              */
-            destroy_last_frame = true;
             registers = new Object*[reg_count];
             references = new bool[reg_count];
             for (int i = 0; i < reg_count; ++i) {

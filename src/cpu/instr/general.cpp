@@ -305,6 +305,55 @@ byte* CPU::ress(byte* addr) {
     return addr;
 }
 
+byte* CPU::tmpri(byte* addr) {
+    /** Run tmpri instruction.
+     */
+    int a;
+    bool a_ref = false;
+
+    a_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    a = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    if (debug) {
+        cout << (a_ref ? " @" : " ") << a;
+    }
+
+    if (a_ref) {
+        a = static_cast<Integer*>(fetch(a))->value();
+    }
+
+    tmp = uregisters[a]->copy();
+
+    return addr;
+}
+byte* CPU::tmpro(byte* addr) {
+    /** Run tmpro instruction.
+     */
+    int a;
+    bool a_ref = false;
+
+    a_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    a = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    if (debug) {
+        cout << (a_ref ? " @" : " ") << a;
+    }
+
+    if (a_ref) {
+        a = static_cast<Integer*>(fetch(a))->value();
+    }
+
+    uregisters[a] = tmp;
+    ureferences[a] = false;
+    tmp = 0;
+
+    return addr;
+}
+
 byte* CPU::frame(byte* addr) {
     /** Create new frame for function calls.
      */
