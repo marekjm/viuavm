@@ -50,6 +50,7 @@
     not 2
     branch 2 :is_filled
     ; here, register is not filled - return value not memorized
+    free 2
     ress local
     tmpri first
     ress global
