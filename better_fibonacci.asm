@@ -55,8 +55,8 @@
     ress global
     tmpro @1
     .mark: is_filled
-    empty 1
-    empty 2
+    free 1
+    free 2
     ress local
 
     ; calculate N-2
