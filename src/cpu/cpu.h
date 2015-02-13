@@ -44,7 +44,6 @@ class CPU {
      */
     std::map<std::string, unsigned> function_addresses;
 
-<<<<<<< HEAD
     /*  Variables set after CPU executed bytecode.
      *  They describe exit conditions of the bytecode that just stopped running.
      */
