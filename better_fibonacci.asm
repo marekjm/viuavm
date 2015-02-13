@@ -122,20 +122,20 @@
     ; set Fibonacci number we want to calculate
     ; and expected value (for test)
 
-    istore number 10
-    istore expected 55
+    ;istore number 10
+    ;istore expected 55
 
-    istore number 20
-    istore expected 6765
+    ;istore number 20
+    ;istore expected 6765
 
-    istore number 30
-    istore expected 832040
+    ;istore number 30
+    ;istore expected 832040
 
-    istore number 35
-    istore expected 9227465
+    ;istore number 35
+    ;istore expected 9227465
 
-    istore number 40
-    istore expected 102334155
+    ;istore number 40
+    ;istore expected 102334155
 
     istore number 45
     istore expected 1134903170
