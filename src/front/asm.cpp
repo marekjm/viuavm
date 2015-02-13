@@ -923,11 +923,11 @@ int main(int argc, char* argv[]) {
 
     int functions_section_size = 0;
     for (string name : function_names) {
-        if (VERBOSE or DEBUG) { cout << "message: generating bytecode for function (at bytecode " << functions_section_size << "): " << name; }
+        if (VERBOSE or DEBUG) { cout << "message: generating bytecode for function: " << name; }
         uint16_t fun_bytes = 0;
         try {
             fun_bytes = Program::countBytes(name == ENTRY_FUNCTION_NAME ? filter(functions.at(name).second) : functions.at(name).second);
-            if (VERBOSE or DEBUG) { cout << " (" << fun_bytes << " bytes)" << endl; }
+            if (VERBOSE or DEBUG) { cout << " (" << fun_bytes << " bytes at bytecode " << functions_section_size << ')' << endl; }
         } catch (const string& e) {
             cout << e << endl;
             exit(1);
