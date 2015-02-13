@@ -72,8 +72,8 @@
     ; set Fibonacci number we want to calculate
     ; and expected value (for test)
 
-    istore number 6
-    istore expected 8
+    istore number 10
+    istore expected 55
 
     ;istore number 20
     ;istore expected 6765
