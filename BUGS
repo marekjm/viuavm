@@ -1,0 +1,3 @@
+* in CPU::run() if an exception is raised while in main loop and `return_exception` is set before `return_message`,
+  `return_message` will be set to `return_message` for some reason...
+* segfault when assembling "unchanged.asm" file
