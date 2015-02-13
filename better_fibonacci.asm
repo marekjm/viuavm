@@ -4,6 +4,8 @@
     .name: 2 two
     .name: 3 number
     .name: 4 result
+    .name: 5 first
+    .name: 6 second
 
     ; FIXME: remove this after debugging
     izero result
@@ -39,7 +41,7 @@
     isub number one one
     frame 1
     param 0 one
-    call fibonacci_memoizing one
+    call fibonacci_memoizing first
 
     tmpri one
     ress global
@@ -47,8 +49,13 @@
     isnull @1 2
     not 2
     branch 2 :is_filled
-    ; example: copy "29" to 29. register
-    copy 1 @1
+    ; here, register is not filled - return value not memorized
+    ress local
+    tmpri first
+    ress global
+    tmpro @1
+    print 1
+    print @1
     .mark: is_filled
     empty 1
     empty 2
@@ -75,14 +82,25 @@
     ;print 0
 
     branch 0 :we_must_calculate :fetch_it
+
     .mark: we_must_calculate
-    .mark: fetch_it
+    ;.mark: fetch_it
     frame 1
     param 0 two
-    call fibonacci_memoizing two
+    call fibonacci_memoizing second
+    jump :add_them
+
+    .mark: fetch_it
+    ress global
+    ; fetch from register 29 if we calculate 29
+    tmpri @1
+    ress local
+    ; drop fetched value to regsiter "two"
+    tmpro second
 
     ; put (N-1) + (N-2) in result register
-    iadd one two result
+    .mark: add_them
+    iadd first second result
     jump :finish
 
     .mark: give_zero
