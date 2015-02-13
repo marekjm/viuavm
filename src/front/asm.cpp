@@ -544,6 +544,14 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
                 throw ("illegal register set name in ress instruction: '" + operands + "'");
             }
             program.ress(operands);
+        } else if (str::startswith(line, "tmpri")) {
+            string regno_chnk;
+            regno_chnk = str::chunk(operands);
+            program.tmpri(getint_op(resolveregister(regno_chnk, names)));
+        } else if (str::startswith(line, "tmpro")) {
+            string regno_chnk;
+            regno_chnk = str::chunk(operands);
+            program.tmpro(getint_op(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "print")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);

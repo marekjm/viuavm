@@ -69,6 +69,8 @@ class Program {
     Program& ref        (int_op, int_op);
     Program& swap       (int_op, int_op);
     Program& ress       (std::string);
+    Program& tmpri      (int_op);
+    Program& tmpri      (int_op);
     Program& free       (int_op);
     Program& empty      (int_op);
     Program& isnull     (int_op, int_op);
