@@ -44,6 +44,7 @@ class CPU {
      */
     std::map<std::string, unsigned> function_addresses;
 
+<<<<<<< HEAD
     /*  Variables set after CPU executed bytecode.
      *  They describe exit conditions of the bytecode that just stopped running.
      */
@@ -160,6 +161,7 @@ class CPU {
              *  Creates registers array of requested size and
              *  initializes it with zeroes.
              */
+            destroy_last_frame = true;
             registers = new Object*[reg_count];
             references = new bool[reg_count];
             for (int i = 0; i < reg_count; ++i) {

@@ -156,6 +156,21 @@ int CPU::run() {
     ureferences = (initial_frame->references = references);
     uregisters_size = (initial_frame->registers_size = reg_count);
     frames.push_back(initial_frame);
+    for (auto fn_addr : function_addresses) {
+        if (fn_addr.first == "__entry") {
+            // do not destroy last frame if it's entry function as it holds global registers
+            destroy_last_frame = false;
+            // delete global registers
+            // FIXME: CPU should wait until now with allocating memory for global registers to see
+            // if it's really necessary - unneeded new/delete would be avoided this way
+            delete[] registers;
+            delete[] references;
+            registers = uregisters;
+            references = ureferences;
+            reg_count = uregisters_size;
+            break;
+        }
+    }
 
     while (true) {
         previous_instr_ptr = instr_ptr;
