@@ -17,9 +17,13 @@ using namespace std;
 // MISC FLAGS
 bool SHOW_HELP = false;
 bool SHOW_VERSION = false;
-bool LIB = false;
+
+bool AS_LIB_STATIC = false;
+bool AS_LIB_DYNAMIC = false;
+
 bool VERBOSE = false;
 bool DEBUG = false;
+
 bool WARNING_ALL = false;
 bool ERROR_ALL = false;
 
@@ -36,7 +40,7 @@ bool ERROR_EMPTY_FUNCTION_BODY = false;
 bool ERROR_OPERANDLESS_FRAME = false;
 
 
-// Assembly constants
+// ASSEMBLY CONSTANTS
 const string ENTRY_FUNCTION_NAME = "__entry";
 
 
@@ -706,8 +710,11 @@ int main(int argc, char* argv[]) {
         } else if (option == "--debug") {
             DEBUG = true;
             continue;
-        } else if (option == "--lib") {
-            LIB = true;
+        } else if (option == "--lib-static") {
+            AS_LIB_STATIC = true;
+            continue;
+        } else if (option == "--lib-dynamic") {
+            AS_LIB_DYNAMIC = true;
             continue;
         } else if (option == "--Wall") {
             WARNING_ALL = true;
@@ -741,7 +748,26 @@ int main(int argc, char* argv[]) {
 
     if (SHOW_HELP or SHOW_VERSION) {
         cout << "wudoo VM assembler, version " << VERSION << endl;
-        if (SHOW_HELP) { cout << argv[0] << " <infile> [<outfile>]" << endl; }
+        if (SHOW_HELP) {
+            cout << "\nUSAGE:\n";
+            cout << "    " << argv[0] << " [option...] <infile> [<outfile>]\n" << endl;
+            cout << "OPTIONS:\n";
+            cout << "    " << "--version            - show version\n"
+                 << "    " << "--help               - display this message\n"
+                 << "    " << "--verbose            - show verbose output\n"
+                 << "    " << "--debug              - show debugging output\n"
+                 << "    " << "--Wall               - warn about everything\n"
+                 << "    " << "--Wmissin-end        - warn about missing 'end' instruction at the end of functions\n"
+                 << "    " << "--Wempty-function    - warn about empty functions\n"
+                 << "    " << "--Wopless-frame      - warn about frames without operands\n"
+                 << "    " << "--Eall               - treat all warnings as errors\n"
+                 << "    " << "--Emissin-end        - treat missing 'end' instruction at the end of function as error\n"
+                 << "    " << "--Eempty-function    - treat empty function as error\n"
+                 << "    " << "--Eopless-frame      - treat frames without operands as errors\n"
+                 << "    " << "--lib-static         - assemble as a static library\n"
+                 << "    " << "--lib-dynamic        - assemble as a dynamic library\n"
+                 ;
+        }
         return 0;
     }
 
@@ -771,7 +797,7 @@ int main(int argc, char* argv[]) {
     ifstream in(filename, ios::in | ios::binary);
 
     if (!in) {
-        cout << "fatal: file could not be opened" << endl;
+        cout << "fatal: file could not be opened: " << filename << endl;
         return 1;
     }
 
@@ -796,10 +822,12 @@ int main(int argc, char* argv[]) {
             break;
         }
     }
-    if (main_function == "" and not LIB) { main_function = "main"; }
+    if (main_function == "" and not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
+        main_function = "main";
+    }
     if ((VERBOSE and main_function != "main" and main_function != "") or DEBUG) { cout << "debug (notice): main function set to: '" << main_function << "'" << endl; }
 
-    if (find(function_names.begin(), function_names.end(), main_function) == function_names.end() and not LIB) {
+    if (find(function_names.begin(), function_names.end(), main_function) == function_names.end() and not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
         cout << "error: main function is undefined: " << main_function << endl;
         return 1;
     }
