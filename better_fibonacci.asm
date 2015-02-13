@@ -91,6 +91,7 @@
     ress global
     ; fetch from register 29 if we calculate 29
     tmpri @1
+    free 1
     ress local
     ; drop fetched value to regsiter "two"
     tmpro second
