@@ -37,16 +37,10 @@
 
     ; calculate N-1
     isub number one one
-
-    ; is N-1 register was null calculate "one",
-    ; otherwise fetch the register
     frame 1
     param 0 one
     call fibonacci_memoizing one
-    jump :now_do_two
 
-
-    .mark: now_do_two
     ; calculate N-2
     isub number two two
     frame 1
@@ -78,11 +72,14 @@
     ; set Fibonacci number we want to calculate
     ; and expected value (for test)
 
+    istore number 6
+    istore expected 8
+
     ;istore number 20
     ;istore expected 6765
 
-    istore number 30
-    istore expected 832040
+    ;istore number 30
+    ;istore expected 832040
 
     ;istore number 35
     ;istore expected 9227465
