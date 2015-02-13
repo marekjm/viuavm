@@ -41,8 +41,42 @@
     param 0 one
     call fibonacci_memoizing one
 
+    tmpri one
+    ress global
+    tmpro 1
+    isnull @1 2
+    not 2
+    branch 2 :is_filled
+    ; example: copy "29" to 29. register
+    copy 1 @1
+    .mark: is_filled
+    empty 1
+    empty 2
+    ress local
+
     ; calculate N-2
     isub number two two
+
+    ; store N-2 in temporary register
+    tmpri two
+    ; switch to global registers
+    ress global
+    ; toss temporary register out, to 1 global register
+    tmpro 1
+    ; check if register N-2 is null (not calculated)
+    isnull @1 2
+    tmpri 2
+    branch 2 :nope
+    ;echo @1
+    .mark: nope
+    ; switch back to local registers
+    ress local
+    tmpro 0
+    ;print 0
+
+    branch 0 :we_must_calculate :fetch_it
+    .mark: we_must_calculate
+    .mark: fetch_it
     frame 1
     param 0 two
     call fibonacci_memoizing two
