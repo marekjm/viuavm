@@ -350,6 +350,33 @@ class RegisterManipulationInstructionsTests(unittest.TestCase):
         self.assertEqual([1, 0], [int(i) for i in output.strip().splitlines()])
         self.assertEqual(0, excode)
 
+    def testISNULL(self):
+        name = 'isnull.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual('true', output.strip())
+        self.assertEqual(0, excode)
+
+    def testFREE(self):
+        name = 'free.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual('true', output.strip())
+        self.assertEqual(0, excode)
+
+    def testEMPTY(self):
+        name = 'empty.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual('true', output.strip())
+        self.assertEqual(0, excode)
+
 
 class SampleProgramsTests(unittest.TestCase):
     """Tests for various sample programs.
