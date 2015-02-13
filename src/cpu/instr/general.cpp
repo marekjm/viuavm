@@ -337,6 +337,9 @@ byte* CPU::tmpri(byte* addr) {
         a = static_cast<Integer*>(fetch(a))->value();
     }
 
+    if (tmp != 0) {
+        cout << "warning: CPU: storing in non-empty temporary register: memory has been leaked" << endl;
+    }
     tmp = uregisters[a]->copy();
 
     return addr;
@@ -360,6 +363,10 @@ byte* CPU::tmpro(byte* addr) {
         a = static_cast<Integer*>(fetch(a))->value();
     }
 
+    if (uregisters[a] != 0) {
+        cerr << "warning: CPU: droping from temporary into non-empty register: possible references loss" << endl;
+        delete uregisters[a];
+    }
     uregisters[a] = tmp;
     ureferences[a] = false;
     tmp = 0;
