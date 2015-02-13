@@ -364,7 +364,9 @@ byte* CPU::tmpro(byte* addr) {
     }
 
     if (uregisters[a] != 0) {
-        cerr << "warning: CPU: droping from temporary into non-empty register: possible references loss" << endl;
+        if (errors) {
+            cerr << "warning: CPU: droping from temporary into non-empty register: possible references loss" << endl;
+        }
         delete uregisters[a];
     }
     uregisters[a] = tmp;
