@@ -281,7 +281,20 @@ byte* CPU::ress(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << ' ' << to_register_set;
+        cout << ' ';
+        switch (to_register_set) {
+            case 0:
+                cout << "global";
+                break;
+            case 1:
+                cout << "local";
+                break;
+            case 2:
+                cout << "static (TODO)";
+                break;
+            default:
+                cout << "ERROR";
+        }
     }
 
     switch (to_register_set) {
