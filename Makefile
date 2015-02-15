@@ -83,8 +83,11 @@ build/cpu/instr/cast.o: src/cpu/instr/cast.cpp
 	${CXX} ${CXXFLAGS} -c -o $@ ./src/cpu/instr/cast.cpp
 
 
-build/program.o: src/program.cpp
+build/program.o: src/program.h src/program.cpp
 	${CXX} ${CXXFLAGS} -c -o $@ ./src/program.cpp
+
+build/memory.o: src/memory.h src/memory.cpp
+	${CXX} ${CXXFLAGS} -c -o $@ ./src/memory.cpp
 
 
 build/support/string.o: src/support/string.cpp
