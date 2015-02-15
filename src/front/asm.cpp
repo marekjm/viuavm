@@ -177,11 +177,13 @@ vector<string> getFunctionNames(const vector<string>& lines, const string& libna
     string line, holdline;
     for (unsigned i = 0; i < lines.size(); ++i) {
         holdline = line = lines[i];
-        if (!str::startswith(line, ".def:")) { continue; }
+        if (!str::startswith(line, ".def:") and !str::startswith(line, ".dec:")) { continue; }
 
-        for (int j = i+1; lines[j] != ".end"; ++j, ++i) {}
+        if (str::startswith(line, ".def:")) {
+            for (int j = i+1; lines[j] != ".end"; ++j, ++i) {}
+        }
 
-        line = str::lstrip(str::sub(line, 5));
+        line = str::lstrip(str::sub(line, str::chunk(line).size()));
         string name = str::chunk(line);
         line = str::lstrip(str::sub(line, name.size()));
         string ret_sign = str::chunk(line);
@@ -816,7 +818,11 @@ int main(int argc, char* argv[]) {
         compilename = args[1];
     } else if (args.size() == 1) {
         filename = args[0];
-        compilename = "out.bin";
+        if (AS_LIB_STATIC or AS_LIB_DYNAMIC) {
+            compilename = (filename + ".wlib");
+        } else {
+            compilename = "out.bin";
+        }
     }
 
     if (VERBOSE or DEBUG) {
@@ -992,12 +998,33 @@ int main(int argc, char* argv[]) {
     /////////////////////////////////////////////////////////
     // GATHER LINKS, GET THEIR SIZES AND ADJUST BYTECODE SIZE
     vector<string> links = getlinks(ilines);
+    map<string, char*> linked_libs;
+
     if ((DEBUG or VERBOSE) and links.size()) {
         cout << "message: linking with:" << endl;
     }
     for (string lnk : links) {
         if (DEBUG or VERBOSE) {
-            cout << " * '" << lnk << '\'' << endl;
+            cout << " * '" << lnk << "\': ";
+        }
+
+        ifstream libin(lnk, ios::in | ios::binary);
+        if (!libin) {
+            cout << "fatal: failed to link static library: '" << lnk << "'" << endl;
+            exit(1);
+        }
+
+        uint16_t lib_size;
+        in.read((char*)(&lib_size), sizeof(uint16_t));
+
+        if (DEBUG or VERBOSE) {
+            cout << lib_size << " bytes" << endl;
+        }
+
+        char* linked_code = new char[lib_size];
+
+        if (DEBUG or VERBOSE) {
+            cout << endl;
         }
     }
 
@@ -1046,6 +1073,14 @@ int main(int argc, char* argv[]) {
         functions_section_size += func.size();
         delete[] btcd;
     }
+
+
+    /////////////////////////////////////
+    // WRITE STATICALLY LINKED LIBARARIES
+    uint16_t bytes_offset = bytes;
+    for (string lnk : links) {
+    }
+
     out.close();
 
     return ret_code;
