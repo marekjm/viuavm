@@ -7,19 +7,18 @@ using namespace std;
 
 // PUBLIC METHODS
 
-unsigned long Memory::request(unsigned sz) {
+void* Memory::request(unsigned sz) {
     /** Request memory block of given size.
      */
-    cout << "  * Memory::request()" << endl;
-    vector<unsigned long> available;
+    vector<void*> available;
     try {
         available = allocated[sz];
     } catch (const char*& e) {
         // just prevent throwing the exception
-        allocated[sz] = vector<unsigned long>();
+        allocated[sz] = vector<void*>();
     }
 
-    unsigned long block = 0;
+    void* block = 0;
     for (auto blk : available) {
         if (not taken[blk]) {
             block = blk;
@@ -30,7 +29,7 @@ unsigned long Memory::request(unsigned sz) {
     if (block == 0) {
         // no available block has been found
         // so a new one must be allocated
-        block = (unsigned long)(new char[sz]);
+        block = (void*)(new char[sz]);
         allocated[sz].push_back(block);
         sizes[block] = sz;
         pointers.push_back(block);
@@ -41,10 +40,9 @@ unsigned long Memory::request(unsigned sz) {
     return block;
 }
 
-void Memory::release(unsigned long block) {
+void Memory::release(void* block) {
     /** Release memeory block at given address.
      */
-    cout << "  * Memory::release()" << endl;
     unsigned sz = sizes[block];
     zero(block, sz);
     taken[block] = false;
@@ -53,12 +51,12 @@ void Memory::release(unsigned long block) {
 unsigned Memory::collect() {
     /** Collect and free unused blocks of memory.
      */
-    cout << "  * Memory::collect()" << endl;
     unsigned freed = 0;
     for (auto block : pointers) {
         if (not taken[block]) {
             delete[] (char**)block;
-            vector<unsigned long> allocated_of_size = allocated[sizes[block]];
+            freed = sizes[block];
+            vector<void*> allocated_of_size = allocated[sizes[block]];
             allocated_of_size.erase(find(allocated_of_size.begin(), allocated_of_size.end(), block));
             sizes.erase(block);
             taken.erase(block);
@@ -79,7 +77,7 @@ unsigned Memory::used() {
 
 // PRIVATE METHODS
 
-void Memory::zero(unsigned long block, unsigned size) {
+void Memory::zero(void* block, unsigned size) {
     /** Clear (fill with zeros) block of memory with given size at
      *  given position.
      */
