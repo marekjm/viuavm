@@ -383,7 +383,7 @@ byte* CPU::frame(byte* addr) {
     }
 
     if (frame_new != 0) { throw "requested new frame while last one is unused"; }
-    frame_new = new Frame(0, arguments, local_registers);
+    frame_new = new ((Frame*)memory.request(sizeof(Frame))) Frame(0, arguments, local_registers);
 
     return addr;
 }
@@ -572,7 +572,8 @@ byte* CPU::end(byte* addr) {
     }
 
     // delete and remove top frame
-    delete frames.back();
+    frames.back()->~Frame();
+    memory.release(frames.back());
     frames.pop_back();
 
     // adjust registers
