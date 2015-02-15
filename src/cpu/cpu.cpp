@@ -392,6 +392,11 @@ int CPU::run() {
     }
 
     // collect memory used by this run
+    // FIXME: why does the first commented line give incorrect value (i.e. "collected X bytes (X bytes still in use)" and X is the same) but
+    //        the second and third give correct one?
+    //cout << "collected " << memory.collect() << " bytes of allocated memory (" << memory.used() << " bytes still in use)" << endl;
+    //cout << "collected " << memory.collect() << " bytes of allocated memory (";
+    //cout << memory.used() << " bytes still in use)" << endl;
     memory.collect();
 
     // delete entry function's frame
