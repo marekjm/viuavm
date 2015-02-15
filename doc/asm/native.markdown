@@ -49,3 +49,10 @@ Used to set main function name.
 Defaults to `main`.
 
 Assembler will abort translation if no `main` function is defined and `.main:` did not set an alternative.
+
+
+### `.link:`
+
+**Syntax**: `.link: <module>`
+
+Used to statically link link modules and libraries.

@@ -92,8 +92,8 @@ map<string, int> getmarks(const vector<string>& lines) {
     int instruction = 0;  // we need separate instruction counter because number of lines is not exactly number of instructions
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = lines[i];
-        if (str::startswith(line, ".name:")) {
-            // names can be safely skipped as they are not instructions
+        if (str::startswith(line, ".name:") or str::startswith(line, ".link:")) {
+            // names and links can be safely skipped as they are not CPU instructions
             continue;
         }
         if (str::startswith(line, ".def:")) {
