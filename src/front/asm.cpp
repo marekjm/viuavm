@@ -20,6 +20,7 @@ bool SHOW_VERSION = false;
 
 bool AS_LIB_STATIC = false;
 bool AS_LIB_DYNAMIC = false;
+string LIB_NAME = "";
 
 bool VERBOSE = false;
 bool DEBUG = false;
@@ -170,7 +171,7 @@ vector<string> getlinks(const vector<string>& lines) {
     return links;
 }
 
-vector<string> getFunctionNames(const vector<string>& lines) {
+vector<string> getFunctionNames(const vector<string>& lines, const string& libname = "") {
     vector<string> names;
 
     string line, holdline;
@@ -193,12 +194,15 @@ vector<string> getFunctionNames(const vector<string>& lines) {
             throw ("invalid function signature: illegal return declaration: " + holdline);
         }
 
+        // library name must be prepended
+        if (libname != "") { name = (libname + "::" + name); }
+
         names.push_back(name);
     }
 
     return names;
 }
-map<string, pair<bool, vector<string> > > getFunctions(const vector<string>& lines) {
+map<string, pair<bool, vector<string> > > getFunctions(const vector<string>& lines, const string& libname = "") {
     map<string, pair<bool, vector<string> > > functions;
 
     string line, holdline;
@@ -239,6 +243,9 @@ map<string, pair<bool, vector<string> > > getFunctions(const vector<string>& lin
                 flines.push_back("end");
             }
         }
+
+        // library name must be prepended
+        if (libname != "") { name = (libname + "::" + name); }
 
         functions[name] = pair<bool, vector<string> >(returns, flines);
     }
@@ -843,9 +850,15 @@ int main(int argc, char* argv[]) {
     uint16_t bytes = 0;
 
 
+    /////////////////////////////////////
+    // SET UP LIBRARY NAME (IF NECESSARY)
+    // FIXME: use base name or define lib name inside code
+    if (AS_LIB_STATIC or AS_LIB_DYNAMIC) { LIB_NAME = filename; }
+
+
     ////////////////////////
     // GATHER FUNCTION NAMES
-    vector<string> function_names = getFunctionNames(lines);
+    vector<string> function_names = getFunctionNames(lines, LIB_NAME);
 
 
     /////////////////////////
@@ -862,7 +875,9 @@ int main(int argc, char* argv[]) {
     if (main_function == "" and not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
         main_function = "main";
     }
-    if ((VERBOSE and main_function != "main" and main_function != "") or DEBUG) { cout << "debug (notice): main function set to: '" << main_function << "'" << endl; }
+    if (((VERBOSE and main_function != "main" and main_function != "") or DEBUG) and not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
+        cout << "debug (notice): main function set to: '" << main_function << "'" << endl;
+    }
 
     if (find(function_names.begin(), function_names.end(), main_function) == function_names.end() and not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
         cout << "error: main function is undefined: " << main_function << endl;
@@ -874,7 +889,7 @@ int main(int argc, char* argv[]) {
     // GATHER FUNCTIONS' CODE LINES
     map<string, pair<bool, vector<string> > > functions;
     try {
-         functions = getFunctions(ilines);
+         functions = getFunctions(ilines, LIB_NAME);
     } catch (const string& e) {
         cout << "error: function gathering failed: " << e << endl;
         return 1;
@@ -885,14 +900,16 @@ int main(int argc, char* argv[]) {
     // CHECK IF MAIN FUNCTION RETURNS A VALUE
     // FIXME: this is just a crude check - it does not acctually checks if these instructions set 0 register
     // this must be better implemented or we will receive "function did not set return register" exceptions at runtime
-    string main_second_but_last = *(functions.at(main_function).second.end()-2);
-    if (!str::startswith(main_second_but_last, "copy") and
-        !str::startswith(main_second_but_last, "move") and
-        !str::startswith(main_second_but_last, "swap") and
-        !str::startswith(main_second_but_last, "izero")
-        ) {
-        cout << "fatal: main function does not return a value" << endl;
-        return 1;
+    if (not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
+        string main_second_but_last = *(functions.at(main_function).second.end()-2);
+        if (!str::startswith(main_second_but_last, "copy") and
+            !str::startswith(main_second_but_last, "move") and
+            !str::startswith(main_second_but_last, "swap") and
+            !str::startswith(main_second_but_last, "izero")
+            ) {
+            cout << "fatal: main function does not return a value" << endl;
+            return 1;
+        }
     }
 
 
@@ -914,29 +931,35 @@ int main(int argc, char* argv[]) {
 
     //////////////////////////
     // GENERATE ENTRY FUNCTION
-    function_names.push_back(ENTRY_FUNCTION_NAME);
-    function_addresses[ENTRY_FUNCTION_NAME] = starting_instruction;
-    // entry function sets global stuff
-    ilines.insert(ilines.begin(), "ress global");
-    // append entry function instructions...
-    ilines.push_back("frame 0");
-    // this must not be hardcoded because we have '.main:' assembler instruction
-    // we also save return value in 1 register since 0 means "drop return value"
-    ilines.push_back("call " + main_function + " 1");
-    // then, register 1 is moved to register 0 so it counts as a return code
-    ilines.push_back("move 1 0");
-    ilines.push_back("halt");
-    functions[ENTRY_FUNCTION_NAME] = pair<bool, vector<string> >(false, ilines);
-    // instructions were added so bytecode size must be inreased
-    bytes += OP_SIZES.at("ress");
-    bytes += OP_SIZES.at("frame");
-    bytes += OP_SIZES.at("call");
-    bytes += main_function.size();
-    bytes += OP_SIZES.at("move");
-    bytes += OP_SIZES.at("halt");
+    if (not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
+        function_names.push_back(ENTRY_FUNCTION_NAME);
+        function_addresses[ENTRY_FUNCTION_NAME] = starting_instruction;
+        // entry function sets global stuff
+        ilines.insert(ilines.begin(), "ress global");
+        // append entry function instructions...
+        ilines.push_back("frame 0");
+        // this must not be hardcoded because we have '.main:' assembler instruction
+        // we also save return value in 1 register since 0 means "drop return value"
+        ilines.push_back("call " + main_function + " 1");
+        // then, register 1 is moved to register 0 so it counts as a return code
+        ilines.push_back("move 1 0");
+        ilines.push_back("halt");
+        functions[ENTRY_FUNCTION_NAME] = pair<bool, vector<string> >(false, ilines);
+        // instructions were added so bytecode size must be inreased
+        bytes += OP_SIZES.at("ress");
+        bytes += OP_SIZES.at("frame");
+        bytes += OP_SIZES.at("call");
+        bytes += main_function.size();
+        bytes += OP_SIZES.at("move");
+        bytes += OP_SIZES.at("halt");
+    }
 
-    if (VERBOSE or DEBUG) { cout << "message: total required bytes: " <<  bytes << endl; }
-    if (VERBOSE or DEBUG) { cout << "message: first instruction pointer: " << starting_instruction << endl; }
+    if (VERBOSE or DEBUG) {
+        cout << "message: total required bytes: " <<  bytes << endl;
+    }
+    if ((VERBOSE or DEBUG) and not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
+        cout << "message: first instruction pointer: " << starting_instruction << endl;
+    }
 
 
     ///////////////////////////////
@@ -982,7 +1005,9 @@ int main(int argc, char* argv[]) {
     ///////////////////////////////////////////
     // WRITE BYTECODE SIZE AND STARTING ADDRESS
     out.write((const char*)&bytes, 16);
-    out.write((const char*)&starting_instruction, 16);
+    if (not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
+        out.write((const char*)&starting_instruction, 16);
+    }
 
 
     //////////////////////////////////////////////
