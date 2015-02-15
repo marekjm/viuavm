@@ -800,6 +800,9 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+
+    ////////////////////////////////
+    // FIND FILENAME AND COMPILENAME
     string filename, compilename = "";
     if (args.size() == 2) {
         filename = args[0];
@@ -818,8 +821,10 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    ifstream in(filename, ios::in | ios::binary);
 
+    ////////////////
+    // READ LINES IN
+    ifstream in(filename, ios::in | ios::binary);
     if (!in) {
         cout << "fatal: file could not be opened: " << filename << endl;
         return 1;
@@ -832,12 +837,20 @@ int main(int argc, char* argv[]) {
     while (getline(in, line)) { lines.push_back(line); }
     ilines = getilines(lines);
 
+
+    //////////////////////////////
+    // SETUP INITIAL BYTECODE SIZE
     uint16_t bytes = 0;
-    uint16_t starting_instruction = 0;  // the bytecode offset to first executable instruction
 
+
+    ////////////////////////
+    // GATHER FUNCTION NAMES
     vector<string> function_names = getFunctionNames(lines);
-    string main_function = "";
 
+
+    /////////////////////////
+    // GET MAIN FUNCTION NAME
+    string main_function = "";
     for (string line : ilines) {
         if (str::startswith(line, ".main:")) {
             cout << "setting main function to: ";
@@ -856,6 +869,9 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+
+    ///////////////////////////////
+    // GATHER FUNCTIONS' CODE LINES
     map<string, pair<bool, vector<string> > > functions;
     try {
          functions = getFunctions(ilines);
@@ -864,7 +880,9 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // we should check if main function returns a value
+
+    /////////////////////////////////////////
+    // CHECK IF MAIN FUNCTION RETURNS A VALUE
     // FIXME: this is just a crude check - it does not acctually checks if these instructions set 0 register
     // this must be better implemented or we will receive "function did not set return register" exceptions at runtime
     string main_second_but_last = *(functions.at(main_function).second.end()-2);
@@ -877,6 +895,10 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+
+    //////////////////////////////////////////////////////////
+    // MAP FUNCTIONS TO ADDRESSES AND SET STARTING INSTRUCTION
+    uint16_t starting_instruction = 0;  // the bytecode offset to first executable instruction
     map<string, uint16_t> function_addresses;
     try {
         for (string name : function_names) {
@@ -889,7 +911,9 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // generate entry function
+
+    //////////////////////////
+    // GENERATE ENTRY FUNCTION
     function_names.push_back(ENTRY_FUNCTION_NAME);
     function_addresses[ENTRY_FUNCTION_NAME] = starting_instruction;
     // entry function sets global stuff
@@ -911,11 +935,12 @@ int main(int argc, char* argv[]) {
     bytes += OP_SIZES.at("move");
     bytes += OP_SIZES.at("halt");
 
-    starting_instruction = function_addresses[ENTRY_FUNCTION_NAME];
-
     if (VERBOSE or DEBUG) { cout << "message: total required bytes: " <<  bytes << endl; }
     if (VERBOSE or DEBUG) { cout << "message: first instruction pointer: " << starting_instruction << endl; }
 
+
+    ///////////////////////////////
+    // PREPARE FUNCTION IDS SECTION
     uint16_t function_ids_section_size = 0;
     for (string name : function_names) { function_ids_section_size += name.size(); }
     // we need to insert address (uint16_t) after every function
@@ -923,8 +948,14 @@ int main(int argc, char* argv[]) {
     // for null characters after function names
     function_ids_section_size += function_names.size();
 
+
+    ////////////////////////////////////////
+    // CREATE OFSTREAM TO WRITE BYTECODE OUT
     ofstream out(compilename, ios::out | ios::binary);
 
+
+    /////////////////////////////////
+    // WRITE OUT FUNCTION IDS SECTION
     out.write((const char*)&function_ids_section_size, sizeof(uint16_t));
     uint16_t functions_size_so_far = 0;
     for (string name : function_names) {
@@ -934,19 +965,28 @@ int main(int argc, char* argv[]) {
         functions_size_so_far += Program::countBytes(functions.at(name).second);
     }
 
+
+    /////////////////////////////////////////////////////////
+    // GATHER LINKS, GET THEIR SIZES AND ADJUST BYTECODE SIZE
     vector<string> links = getlinks(ilines);
     if ((DEBUG or VERBOSE) and links.size()) {
         cout << "message: linking with:" << endl;
     }
     for (string lnk : links) {
-        if (DBEUG or VERBOSE) {
+        if (DEBUG or VERBOSE) {
             cout << " * '" << lnk << '\'' << endl;
         }
     }
 
+
+    ///////////////////////////////////////////
+    // WRITE BYTECODE SIZE AND STARTING ADDRESS
     out.write((const char*)&bytes, 16);
     out.write((const char*)&starting_instruction, 16);
 
+
+    //////////////////////////////////////////////
+    // GENERATE AND WRITE FUNCTIONS TO COMPILEFILE
     int functions_section_size = 0;
     for (string name : function_names) {
         if (VERBOSE or DEBUG) { cout << "message: generating bytecode for function: " << name; }
