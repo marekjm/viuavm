@@ -154,6 +154,22 @@ map<string, int> getnames(const vector<string>& lines) {
     return names;
 }
 
+vector<string> getlinks(const vector<string>& lines) {
+    /** This function will pass over all instructions and
+     * gather .link: assembler instructions.
+     */
+    vector<string> links;
+    string line;
+    for (unsigned i = 0; i < lines.size(); ++i) {
+        line = lines[i];
+        if (str::startswith(line, ".link:")) {
+            line = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
+            links.push_back(line);
+        }
+    }
+    return links;
+}
+
 vector<string> getFunctionNames(const vector<string>& lines) {
     vector<string> names;
 
@@ -379,7 +395,7 @@ vector<string> filter(const vector<string>& lines) {
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = lines[i];
-        if (str::startswith(line, ".mark:") or str::startswith(line, ".name:") or str::startswith(line, ".main:")) {
+        if (str::startswith(line, ".mark:") or str::startswith(line, ".name:") or str::startswith(line, ".main:") or str::startswith(line, ".link:")) {
             /*  Lines beginning with `.mark:` are just markers placed in code and
              *  are do not produce any bytecode.
              *  Lines beginning with `.name:` are asm instructions that assign human-rememberable names to
@@ -916,6 +932,16 @@ int main(int argc, char* argv[]) {
         out.put('\0');
         out.write((const char*)&functions_size_so_far, sizeof(uint16_t));
         functions_size_so_far += Program::countBytes(functions.at(name).second);
+    }
+
+    vector<string> links = getlinks(ilines);
+    if ((DEBUG or VERBOSE) and links.size()) {
+        cout << "message: linking with:" << endl;
+    }
+    for (string lnk : links) {
+        if (DBEUG or VERBOSE) {
+            cout << " * '" << lnk << '\'' << endl;
+        }
     }
 
     out.write((const char*)&bytes, 16);
