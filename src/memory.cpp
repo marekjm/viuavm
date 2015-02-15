@@ -1,4 +1,3 @@
-#include <iostream>
 #include <algorithm>
 #include <vector>
 #include "memory.h"
@@ -52,15 +51,20 @@ unsigned Memory::collect() {
     /** Collect and free unused blocks of memory.
      */
     unsigned freed = 0;
-    for (auto block : pointers) {
+    vector<void*>::iterator it = pointers.begin();
+    void* block;
+    while (it != pointers.end()) {
+        block = *it;
         if (not taken[block]) {
-            delete[] (char**)block;
-            freed = sizes[block];
+            freed += sizes[block];
             vector<void*> allocated_of_size = allocated[sizes[block]];
             allocated_of_size.erase(find(allocated_of_size.begin(), allocated_of_size.end(), block));
             sizes.erase(block);
             taken.erase(block);
             pointers.erase(find(pointers.begin(), pointers.end(), block));
+            delete[] (char**)block;
+        } else {
+            it++;
         }
     }
     return freed;
