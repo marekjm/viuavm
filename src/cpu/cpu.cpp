@@ -391,6 +391,9 @@ int CPU::run() {
         }
     }
 
+    // collect memory used by this run
+    memory.collect();
+
     // delete entry function's frame
     // otherwise we get huge memory leak
     delete frames.back();

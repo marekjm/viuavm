@@ -10,6 +10,7 @@
 #include <tuple>
 #include "../bytecode/bytetypedef.h"
 #include "../types/object.h"
+#include "../memory.h"
 #include "frame.h"
 
 
@@ -53,6 +54,8 @@ class CPU {
     int return_code;                // always set
     std::string return_exception;   // set if CPU stopped because of an exception
     std::string return_message;     // message set by exception
+
+    Memory memory;
 
     /*  Methods to deal with registers.
      */
