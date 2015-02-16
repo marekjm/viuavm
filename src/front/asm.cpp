@@ -20,7 +20,6 @@ bool SHOW_VERSION = false;
 
 bool AS_LIB_STATIC = false;
 bool AS_LIB_DYNAMIC = false;
-string LIB_NAME = "";
 
 bool VERBOSE = false;
 bool DEBUG = false;
@@ -171,7 +170,7 @@ vector<string> getlinks(const vector<string>& lines) {
     return links;
 }
 
-vector<string> getFunctionNames(const vector<string>& lines, const string& libname = "") {
+vector<string> getFunctionNames(const vector<string>& lines) {
     vector<string> names;
 
     string line, holdline;
@@ -196,15 +195,12 @@ vector<string> getFunctionNames(const vector<string>& lines, const string& libna
             throw ("invalid function signature: illegal return declaration: " + holdline);
         }
 
-        // library name must be prepended
-        if (libname != "") { name = (libname + "::" + name); }
-
         names.push_back(name);
     }
 
     return names;
 }
-map<string, pair<bool, vector<string> > > getFunctions(const vector<string>& lines, const string& libname = "") {
+map<string, pair<bool, vector<string> > > getFunctions(const vector<string>& lines) {
     map<string, pair<bool, vector<string> > > functions;
 
     string line, holdline;
@@ -245,9 +241,6 @@ map<string, pair<bool, vector<string> > > getFunctions(const vector<string>& lin
                 flines.push_back("end");
             }
         }
-
-        // library name must be prepended
-        if (libname != "") { name = (libname + "::" + name); }
 
         functions[name] = pair<bool, vector<string> >(returns, flines);
     }
@@ -856,15 +849,9 @@ int main(int argc, char* argv[]) {
     uint16_t bytes = 0;
 
 
-    /////////////////////////////////////
-    // SET UP LIBRARY NAME (IF NECESSARY)
-    // FIXME: use base name or define lib name inside code
-    if (AS_LIB_STATIC or AS_LIB_DYNAMIC) { LIB_NAME = filename; }
-
-
     ////////////////////////
     // GATHER FUNCTION NAMES
-    vector<string> function_names = getFunctionNames(lines, LIB_NAME);
+    vector<string> function_names = getFunctionNames(lines);
 
 
     /////////////////////////
@@ -895,7 +882,7 @@ int main(int argc, char* argv[]) {
     // GATHER FUNCTIONS' CODE LINES
     map<string, pair<bool, vector<string> > > functions;
     try {
-         functions = getFunctions(ilines, LIB_NAME);
+         functions = getFunctions(ilines);
     } catch (const string& e) {
         cout << "error: function gathering failed: " << e << endl;
         return 1;

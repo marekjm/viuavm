@@ -46,11 +46,6 @@ Used to define functions.
 Declare a function.
 
 
-### `.dex:`
-
-Declare a function and do not mangle its name.
-
-
 ### `.main:`
 
 **Syntax**: `.main: <function_name>`
