@@ -113,7 +113,6 @@ int main(int argc, char* argv[]) {
 
 
     uint16_t bytes;
-
     in.read(buffer, 16);
     if (!in) {
         cout << "fatal: an error occued during bytecode loading: cannot read size" << endl;

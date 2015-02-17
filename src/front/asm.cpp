@@ -975,9 +975,14 @@ int main(int argc, char* argv[]) {
     out.write((const char*)&function_ids_section_size, sizeof(uint16_t));
     uint16_t functions_size_so_far = 0;
     for (string name : function_names) {
+        // function name...
         out.write((const char*)name.c_str(), name.size());
+        // ...requires terminating null character
         out.put('\0');
+        // mapped address must after name
         out.write((const char*)&functions_size_so_far, sizeof(uint16_t));
+        // functions size must be incremented by the actual size of function's bytecode size
+        // to give correct offset for next function
         functions_size_so_far += Program::countBytes(functions.at(name).second);
     }
 
