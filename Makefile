@@ -14,7 +14,7 @@ BIN_PATH=/usr/local/bin
 .PHONY: all remake clean clean-support clean-test-compiles install test
 
 
-all: ${VM_ASM} ${VM_CPU} bin/opcodes.bin
+all: ${VM_ASM} ${VM_CPU} bin/vm/analyze bin/opcodes.bin
 
 remake: clean all
 
@@ -55,6 +55,9 @@ ${VM_CPU}: src/bytecode/opcodes.h src/front/cpu.cpp build/cpu/cpu.o build/suppor
 
 ${VM_ASM}: src/bytecode/opcodes.h src/front/asm.cpp build/program.o build/support/string.o
 	${CXX} ${CXXFLAGS} -o ${VM_ASM} src/front/asm.cpp build/program.o build/support/string.o
+
+bin/vm/analyze: src/bytecode/opcodes.h src/front/analyze.cpp build/program.o build/support/string.o
+	${CXX} ${CXXFLAGS} -o bin/vm/analyze src/front/analyze.cpp build/program.o build/support/string.o
 
 
 bin/opcodes.bin: src/bytecode/opcodes.h src/bytecode/maps.h src/bytecode/opcd.cpp
