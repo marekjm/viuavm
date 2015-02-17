@@ -87,7 +87,6 @@ int main(int argc, char* argv[]) {
     char buffer[16];
     in.read(buffer, sizeof(uint16_t));
     function_ids_section_size = *((uint16_t*)buffer);
-    cout << "function mapping section: " << function_ids_section_size << " bytes" << endl;
 
     /*  The code below extracts function id-to-address mapping.
      */
@@ -99,6 +98,7 @@ int main(int argc, char* argv[]) {
     int i = 0;
     string fn_name;
     uint16_t fn_address;
+    cout << "function id-to-address mapping (" << function_ids_section_size << " bytes):\n";
     while (i < function_ids_section_size) {
         fn_name = string(function_ids_map);
         i += fn_name.size() + 1;  // one for null character
@@ -107,13 +107,12 @@ int main(int argc, char* argv[]) {
         function_ids_map = buffer_function_ids+i;
         function_address_mapping[fn_name] = fn_address;
 
-        cout << "function id-to-address mapping: " << fn_name << " @ byte " << fn_address << endl;
+        cout << "  * '" << fn_name << "' at byte " << fn_address << endl;
     }
     delete[] buffer_function_ids;
 
 
     uint16_t bytes;
-    uint16_t starting_instruction;
 
     in.read(buffer, 16);
     if (!in) {
@@ -124,16 +123,6 @@ int main(int argc, char* argv[]) {
         bytes = *((uint16_t*)buffer);
     }
     cout << "bytecode size: " << bytes << " bytes" << endl;
-
-    in.read(buffer, 16);
-    if (!in) {
-        cout << "fatal: an error occued during bytecode loading: cannot read executable offset" << endl;
-        if (str::endswith(filename, ".asm")) { cout << NOTE_LOADED_ASM << endl; }
-        return 1;
-    } else {
-        starting_instruction = *((uint16_t*)buffer);
-    }
-    cout << "first executable instruction at byte " << starting_instruction << endl;
 
     byte* bytecode = new byte[bytes];
     in.read((char*)bytecode, bytes);

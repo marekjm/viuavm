@@ -150,8 +150,9 @@ int main(int argc, char* argv[]) {
         if (str::endswith(filename, ".asm")) { cout << NOTE_LOADED_ASM << endl; }
         return 1;
     } else {
-        starting_instruction = *((uint16_t*)buffer);
+        //starting_instruction = *((uint16_t*)buffer);
     }
+    starting_instruction = function_address_mapping["__entry"];
     if (VERBOSE or DEBUG) { cout << "message: first executable instruction at byte " << starting_instruction << endl; }
 
     byte* bytecode = new byte[bytes];
