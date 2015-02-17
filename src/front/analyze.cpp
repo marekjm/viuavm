@@ -107,7 +107,7 @@ int main(int argc, char* argv[]) {
         function_ids_map = buffer_function_ids+i;
         function_address_mapping[fn_name] = fn_address;
 
-        cout << "  * '" << fn_name << "' at byte " << fn_address << endl;
+        cout << "  * '" << fn_name << "' entry point at byte: " << fn_address << " (mapping byte after this: " << i << ')' << endl;
     }
     delete[] buffer_function_ids;
 
