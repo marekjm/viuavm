@@ -1037,12 +1037,9 @@ int main(int argc, char* argv[]) {
     }
 
 
-    ///////////////////////////////////////////
-    // WRITE BYTECODE SIZE AND STARTING ADDRESS
+    //////////////////////
+    // WRITE BYTECODE SIZE
     out.write((const char*)&bytes, 16);
-    if (not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
-        out.write((const char*)&starting_instruction, 16);
-    }
 
 
     //////////////////////////////////////////////

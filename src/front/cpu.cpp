@@ -132,7 +132,6 @@ int main(int argc, char* argv[]) {
 
 
     uint16_t bytes;
-    uint16_t starting_instruction;
 
     in.read(buffer, 16);
     if (!in) {
@@ -144,15 +143,7 @@ int main(int argc, char* argv[]) {
     }
     if (VERBOSE or DEBUG) { cout << "message: bytecode size: " << bytes << " bytes" << endl; }
 
-    in.read(buffer, 16);
-    if (!in) {
-        cout << "fatal: an error occued during bytecode loading: cannot read executable offset" << endl;
-        if (str::endswith(filename, ".asm")) { cout << NOTE_LOADED_ASM << endl; }
-        return 1;
-    } else {
-        //starting_instruction = *((uint16_t*)buffer);
-    }
-    starting_instruction = function_address_mapping["__entry"];
+    uint16_t starting_instruction = function_address_mapping["__entry"];
     if (VERBOSE or DEBUG) { cout << "message: first executable instruction at byte " << starting_instruction << endl; }
 
     byte* bytecode = new byte[bytes];
