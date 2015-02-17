@@ -987,12 +987,9 @@ int main(int argc, char* argv[]) {
     vector<string> links = getlinks(ilines);
     map<string, char*> linked_libs;
 
-    if ((DEBUG or VERBOSE) and links.size()) {
-        cout << "message: linking with:" << endl;
-    }
     for (string lnk : links) {
         if (DEBUG or VERBOSE) {
-            cout << " * '" << lnk << "\': ";
+            cout << "message: linking with: '" << lnk << "\'" << endl;
         }
 
         ifstream libin(lnk, ios::in | ios::binary);
@@ -1001,18 +998,42 @@ int main(int argc, char* argv[]) {
             exit(1);
         }
 
-        uint16_t lib_size;
-        in.read((char*)(&lib_size), sizeof(uint16_t));
+        uint16_t lib_functions_section_size;
+        char buffer[16];
 
-        if (DEBUG or VERBOSE) {
-            cout << lib_size << " bytes" << endl;
+        in.read(buffer, sizeof(uint16_t));
+        lib_functions_section_size = *((uint16_t*)buffer);
+
+        cout << "function_ids_section_size: " << function_ids_section_size << endl;
+
+        map<string, uint16_t> lib_function_address_mapping;
+        char *lib_buffer_function_ids = new char[lib_functions_section_size];
+        in.read(lib_buffer_function_ids, function_ids_section_size);
+        char *lib_function_ids_map = lib_buffer_function_ids;
+
+        int i = 0;
+        string lib_fn_name;
+        uint16_t lib_fn_address;
+        while (i < lib_functions_section_size) {
+            lib_fn_name = string(lib_function_ids_map);
+            i += lib_fn_name.size() + 1;  // one for null character
+            lib_fn_address = *((uint16_t*)(lib_buffer_function_ids+i));
+            i += sizeof(uint16_t);
+            lib_function_ids_map = lib_buffer_function_ids+i;
+            lib_function_address_mapping[lib_fn_name] = lib_fn_address;
+
+            if (VERBOSE or DEBUG) {
+                cout << "message: linker: function id-to-address mapping: " << lib_fn_name;
+                cout << " @ byte " << lib_fn_address << '+' << bytes << endl;
+            }
         }
+        delete[] lib_buffer_function_ids;
+
+        uint16_t lib_size;
+        in.read(buffer, 16);
+        lib_size = *((uint16_t*)buffer);
 
         char* linked_code = new char[lib_size];
-
-        if (DEBUG or VERBOSE) {
-            cout << endl;
-        }
     }
 
 
