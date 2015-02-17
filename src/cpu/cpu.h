@@ -54,6 +54,8 @@ class CPU {
     std::string return_exception;   // set if CPU stopped because of an exception
     std::string return_message;     // message set by exception
 
+    unsigned instruction_counter;
+
     /*  Methods to deal with registers.
      */
     void updaterefs(Object* before, Object* now);
@@ -147,6 +149,7 @@ class CPU {
         CPU& mapfunction(const std::string&, unsigned);
 
         int run();
+        inline unsigned counter() { return instruction_counter; }
 
         inline std::tuple<int, std::string, std::string> exitcondition() {
             return std::tuple<int, std::string, std::string>(return_code, return_exception, return_message);
@@ -161,6 +164,8 @@ class CPU {
             frame_new(0),
             return_code(0), return_exception(""), return_message(""),
             debug(false), stepping(false)
+            instruction_counter(0),
+            debug(false), errors(false), stepping(false)
         {
             /*  Basic constructor.
              *  Creates registers array of requested size and
