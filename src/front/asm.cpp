@@ -990,7 +990,7 @@ int main(int argc, char* argv[]) {
     /////////////////////////////////////////////////////////
     // GATHER LINKS, GET THEIR SIZES AND ADJUST BYTECODE SIZE
     vector<string> links = getlinks(ilines);
-    map<string, char*> linked_libs;
+    map<string, char*> linked_libs_bytecode;
 
     for (string lnk : links) {
         if (DEBUG or VERBOSE) {
@@ -1003,42 +1003,36 @@ int main(int argc, char* argv[]) {
             exit(1);
         }
 
-        uint16_t lib_functions_section_size;
+        // FIXME: urgent!!!
+        uint16_t function_ids_section_size = 0;
         char buffer[16];
-
         in.read(buffer, sizeof(uint16_t));
-        lib_functions_section_size = *((uint16_t*)buffer);
+        function_ids_section_size = *((uint16_t*)buffer);
 
-        cout << "function_ids_section_size: " << function_ids_section_size << endl;
-
-        map<string, uint16_t> lib_function_address_mapping;
-        char *lib_buffer_function_ids = new char[lib_functions_section_size];
-        in.read(lib_buffer_function_ids, function_ids_section_size);
-        char *lib_function_ids_map = lib_buffer_function_ids;
+        /*  The code below extracts function id-to-address mapping.
+         */
+        map<string, uint16_t> function_address_mapping;
+        char *buffer_function_ids = new char[function_ids_section_size];
+        in.read(buffer_function_ids, function_ids_section_size);
+        char *function_ids_map = buffer_function_ids;
 
         int i = 0;
-        string lib_fn_name;
-        uint16_t lib_fn_address;
-        while (i < lib_functions_section_size) {
-            lib_fn_name = string(lib_function_ids_map);
-            i += lib_fn_name.size() + 1;  // one for null character
-            lib_fn_address = *((uint16_t*)(lib_buffer_function_ids+i));
+        string fn_name;
+        uint16_t fn_address;
+        cout << "function id-to-address mapping (" << function_ids_section_size << " bytes):\n";
+        while (i < function_ids_section_size) {
+            fn_name = string(function_ids_map);
+            i += fn_name.size() + 1;  // one for null character
+            fn_address = *((uint16_t*)(buffer_function_ids+i));
             i += sizeof(uint16_t);
-            lib_function_ids_map = lib_buffer_function_ids+i;
-            lib_function_address_mapping[lib_fn_name] = lib_fn_address;
+            function_ids_map = buffer_function_ids+i;
+            function_address_mapping[fn_name] = fn_address;
 
-            if (VERBOSE or DEBUG) {
-                cout << "message: linker: function id-to-address mapping: " << lib_fn_name;
-                cout << " @ byte " << lib_fn_address << '+' << bytes << endl;
-            }
+            cout << "  * '" << fn_name << "' entry point at byte: " << fn_address << " (mapping byte after this: " << i << ')' << endl;
         }
-        delete[] lib_buffer_function_ids;
+        delete[] buffer_function_ids;
 
-        uint16_t lib_size;
-        in.read(buffer, 16);
-        lib_size = *((uint16_t*)buffer);
-
-        char* linked_code = new char[lib_size];
+        //char* linked_code = new char[lib_size];
     }
 
 
