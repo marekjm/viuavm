@@ -1015,6 +1015,7 @@ int main(int argc, char* argv[]) {
         libin.read(linked_code, lib_size);
 
         linked_libs_bytecode.push_back( tuple<uint16_t, char*>(lib_size, linked_code) );
+        bytes += lib_size;
     }
 
 
@@ -1119,7 +1120,7 @@ int main(int argc, char* argv[]) {
     // WRITE STATICALLY LINKED LIBARARIES
     // FIXME: implement this after we are able to load static libs
     uint16_t bytes_offset = bytes;
-    for (string lnk : links) {
+    for (string lnk : linked_libs_bytecode) {
     }
 
     out.close();
