@@ -281,7 +281,20 @@ byte* CPU::ress(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << ' ' << to_register_set;
+        cout << ' ';
+        switch (to_register_set) {
+            case 0:
+                cout << "global";
+                break;
+            case 1:
+                cout << "local";
+                break;
+            case 2:
+                cout << "static (TODO)";
+                break;
+            default:
+                cout << "ERROR";
+        }
     }
 
     switch (to_register_set) {
@@ -324,6 +337,9 @@ byte* CPU::tmpri(byte* addr) {
         a = static_cast<Integer*>(fetch(a))->value();
     }
 
+    if (tmp != 0) {
+        cout << "warning: CPU: storing in non-empty temporary register: memory has been leaked" << endl;
+    }
     tmp = uregisters[a]->copy();
 
     return addr;
@@ -347,6 +363,12 @@ byte* CPU::tmpro(byte* addr) {
         a = static_cast<Integer*>(fetch(a))->value();
     }
 
+    if (uregisters[a] != 0) {
+        if (errors) {
+            cerr << "warning: CPU: droping from temporary into non-empty register: possible references loss" << endl;
+        }
+        delete uregisters[a];
+    }
     uregisters[a] = tmp;
     ureferences[a] = false;
     tmp = 0;

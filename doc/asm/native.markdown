@@ -41,6 +41,11 @@ Assign a name to the register.
 Used to define functions.
 
 
+### `.dec:`
+
+Declare a function.
+
+
 ### `.main:`
 
 **Syntax**: `.main: <function_name>`
@@ -49,3 +54,10 @@ Used to set main function name.
 Defaults to `main`.
 
 Assembler will abort translation if no `main` function is defined and `.main:` did not set an alternative.
+
+
+### `.link:`
+
+**Syntax**: `.link: <module>`
+
+Used to statically link link modules and libraries.

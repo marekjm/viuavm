@@ -18,9 +18,6 @@ const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file whi
 bool SHOW_HELP = false;
 bool SHOW_VERSION = false;
 bool VERBOSE = false;
-bool DEBUG = false;
-bool STEP_BY_STEP = false;
-bool ANALYZE = false;
 
 
 // WARNING FLAGS
@@ -46,32 +43,20 @@ int main(int argc, char* argv[]) {
         } else if (option == "--verbose") {
             VERBOSE = true;
             continue;
-        } else if (option == "--debug") {
-            DEBUG = true;
-            continue;
         } else if (option == "--Wall") {
             WARNING_ALL = true;
             continue;
         } else if (option == "--Eall") {
             ERROR_ALL = true;
             continue;
-        } else if (option == "--step") {
-            STEP_BY_STEP = true;
-            continue;
-        } else if (option == "--analyze") {
-            ANALYZE = true;
-            continue;
         }
         args.push_back(argv[i]);
     }
 
     if (SHOW_HELP or SHOW_VERSION) {
-        cout << "wudoo VM virtual machine, version " << VERSION << endl;
+        cout << "wudoo VM bytecode analyzer, version " << VERSION << endl;
         if (SHOW_HELP) {
-            cout << "    --analyze          - to display information about loaded bytecode but not run it" << endl;
-            cout << "    --debug <infile>   - to run a program in debug mode (shows debug output)" << endl;
             cout << "    --help             - to display this message" << endl;
-            cout << "    --step <infile>    - to run a program in stepping mode (pauses after each instruction, implies debug mode for CPU)" << endl;
         }
         return 0;
     }
@@ -89,9 +74,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    if (VERBOSE or DEBUG) {
-        cout << "message: running \"" << filename << "\"" << endl;
-    }
+    cout << "analyzing: \"" << filename << "\"" << endl;
 
     ifstream in(filename, ios::in | ios::binary);
 
@@ -104,7 +87,6 @@ int main(int argc, char* argv[]) {
     char buffer[16];
     in.read(buffer, sizeof(uint16_t));
     function_ids_section_size = *((uint16_t*)buffer);
-    if (VERBOSE or DEBUG) { cout << "message: function mapping section: " << function_ids_section_size << " bytes" << endl; }
 
     /*  The code below extracts function id-to-address mapping.
      */
@@ -116,6 +98,7 @@ int main(int argc, char* argv[]) {
     int i = 0;
     string fn_name;
     uint16_t fn_address;
+    cout << "function id-to-address mapping (" << function_ids_section_size << " bytes):\n";
     while (i < function_ids_section_size) {
         fn_name = string(function_ids_map);
         i += fn_name.size() + 1;  // one for null character
@@ -124,15 +107,12 @@ int main(int argc, char* argv[]) {
         function_ids_map = buffer_function_ids+i;
         function_address_mapping[fn_name] = fn_address;
 
-        if (DEBUG) {
-            cout << "debug: function id-to-address mapping: " << fn_name << " @ byte " << fn_address << endl;
-        }
+        cout << "  * '" << fn_name << "' entry point at byte: " << fn_address << " (mapping byte after this: " << i << ')' << endl;
     }
     delete[] buffer_function_ids;
 
 
     uint16_t bytes;
-
     in.read(buffer, 16);
     if (!in) {
         cout << "fatal: an error occued during bytecode loading: cannot read size" << endl;
@@ -141,10 +121,7 @@ int main(int argc, char* argv[]) {
     } else {
         bytes = *((uint16_t*)buffer);
     }
-    if (VERBOSE or DEBUG) { cout << "message: bytecode size: " << bytes << " bytes" << endl; }
-
-    uint16_t starting_instruction = function_address_mapping["__entry"];
-    if (VERBOSE or DEBUG) { cout << "message: first executable instruction at byte " << starting_instruction << endl; }
+    cout << "bytecode size: " << bytes << " bytes" << endl;
 
     byte* bytecode = new byte[bytes];
     in.read((char*)bytecode, bytes);
@@ -156,33 +133,5 @@ int main(int argc, char* argv[]) {
     }
     in.close();
 
-    int ret_code = 0;
-    string return_exception = "", return_message = "";
-    // run the bytecode
-    CPU cpu;
-    cpu.debug = (DEBUG or STEP_BY_STEP);
-    cpu.stepping = STEP_BY_STEP;
-    for (auto p : function_address_mapping) { cpu.mapfunction(p.first, p.second); }
-
-    if (not ANALYZE) {
-        cpu.load(bytecode).bytes(bytes).eoffset(starting_instruction).run();
-        tie(ret_code, return_exception, return_message) = cpu.exitcondition();
-
-        if (VERBOSE or DEBUG) {
-            cout << "message: finished: " << cpu.counter() << " instructions executed" << endl;
-        }
-    }
-
-    if (ret_code != 0 and return_exception.size()) {
-        vector<Frame*> trace = cpu.trace();
-        cout << "stack trace: from entry point...\n";
-        for (unsigned i = 1; i < trace.size(); ++i) {
-            cout << "  called function: '" << trace[i]->function_name << "'\n";
-        }
-        cout << "exception in function '" << trace.back()->function_name << "': ";
-        if (return_exception.size()) { cout << return_exception << ": "; }
-        cout << return_message << endl;
-    }
-
-    return ret_code;
+    return 0;
 }

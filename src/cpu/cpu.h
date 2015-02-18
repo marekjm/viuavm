@@ -130,8 +130,8 @@ class CPU {
     byte* branch(byte*);
 
     public:
-        // debug flag
-        bool debug;
+        // debug and error reporting flags
+        bool debug, errors;
         // stepping flag, enables to run CPU in a step-by-step mode
         bool stepping;
 
@@ -163,7 +163,6 @@ class CPU {
             tmp(0),
             frame_new(0),
             return_code(0), return_exception(""), return_message(""),
-            debug(false), stepping(false),
             instruction_counter(0),
             debug(false), errors(false), stepping(false)
         {

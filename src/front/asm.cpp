@@ -17,9 +17,13 @@ using namespace std;
 // MISC FLAGS
 bool SHOW_HELP = false;
 bool SHOW_VERSION = false;
-bool LIB = false;
+
+bool AS_LIB_STATIC = false;
+bool AS_LIB_DYNAMIC = false;
+
 bool VERBOSE = false;
 bool DEBUG = false;
+
 bool WARNING_ALL = false;
 bool ERROR_ALL = false;
 
@@ -36,7 +40,7 @@ bool ERROR_EMPTY_FUNCTION_BODY = false;
 bool ERROR_OPERANDLESS_FRAME = false;
 
 
-// Assembly constants
+// ASSEMBLY CONSTANTS
 const string ENTRY_FUNCTION_NAME = "__entry";
 
 
@@ -88,8 +92,8 @@ map<string, int> getmarks(const vector<string>& lines) {
     int instruction = 0;  // we need separate instruction counter because number of lines is not exactly number of instructions
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = lines[i];
-        if (str::startswith(line, ".name:")) {
-            // names can be safely skipped as they are not instructions
+        if (str::startswith(line, ".name:") or str::startswith(line, ".link:")) {
+            // names and links can be safely skipped as they are not CPU instructions
             continue;
         }
         if (str::startswith(line, ".def:")) {
@@ -150,17 +154,35 @@ map<string, int> getnames(const vector<string>& lines) {
     return names;
 }
 
+vector<string> getlinks(const vector<string>& lines) {
+    /** This function will pass over all instructions and
+     * gather .link: assembler instructions.
+     */
+    vector<string> links;
+    string line;
+    for (unsigned i = 0; i < lines.size(); ++i) {
+        line = lines[i];
+        if (str::startswith(line, ".link:")) {
+            line = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
+            links.push_back(line);
+        }
+    }
+    return links;
+}
+
 vector<string> getFunctionNames(const vector<string>& lines) {
     vector<string> names;
 
     string line, holdline;
     for (unsigned i = 0; i < lines.size(); ++i) {
         holdline = line = lines[i];
-        if (!str::startswith(line, ".def:")) { continue; }
+        if (!str::startswith(line, ".def:") and !str::startswith(line, ".dec:")) { continue; }
 
-        for (int j = i+1; lines[j] != ".end"; ++j, ++i) {}
+        if (str::startswith(line, ".def:")) {
+            for (int j = i+1; lines[j] != ".end"; ++j, ++i) {}
+        }
 
-        line = str::lstrip(str::sub(line, 5));
+        line = str::lstrip(str::sub(line, str::chunk(line).size()));
         string name = str::chunk(line);
         line = str::lstrip(str::sub(line, name.size()));
         string ret_sign = str::chunk(line);
@@ -375,7 +397,7 @@ vector<string> filter(const vector<string>& lines) {
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = lines[i];
-        if (str::startswith(line, ".mark:") or str::startswith(line, ".name:") or str::startswith(line, ".main:")) {
+        if (str::startswith(line, ".mark:") or str::startswith(line, ".name:") or str::startswith(line, ".main:") or str::startswith(line, ".link:")) {
             /*  Lines beginning with `.mark:` are just markers placed in code and
              *  are do not produce any bytecode.
              *  Lines beginning with `.name:` are asm instructions that assign human-rememberable names to
@@ -714,8 +736,11 @@ int main(int argc, char* argv[]) {
         } else if (option == "--debug") {
             DEBUG = true;
             continue;
-        } else if (option == "--lib") {
-            LIB = true;
+        } else if (option == "--lib-static") {
+            AS_LIB_STATIC = true;
+            continue;
+        } else if (option == "--lib-dynamic") {
+            AS_LIB_DYNAMIC = true;
             continue;
         } else if (option == "--Wall") {
             WARNING_ALL = true;
@@ -749,7 +774,26 @@ int main(int argc, char* argv[]) {
 
     if (SHOW_HELP or SHOW_VERSION) {
         cout << "wudoo VM assembler, version " << VERSION << endl;
-        if (SHOW_HELP) { cout << argv[0] << " <infile> [<outfile>]" << endl; }
+        if (SHOW_HELP) {
+            cout << "\nUSAGE:\n";
+            cout << "    " << argv[0] << " [option...] <infile> [<outfile>]\n" << endl;
+            cout << "OPTIONS:\n";
+            cout << "    " << "--version            - show version\n"
+                 << "    " << "--help               - display this message\n"
+                 << "    " << "--verbose            - show verbose output\n"
+                 << "    " << "--debug              - show debugging output\n"
+                 << "    " << "--Wall               - warn about everything\n"
+                 << "    " << "--Wmissin-end        - warn about missing 'end' instruction at the end of functions\n"
+                 << "    " << "--Wempty-function    - warn about empty functions\n"
+                 << "    " << "--Wopless-frame      - warn about frames without operands\n"
+                 << "    " << "--Eall               - treat all warnings as errors\n"
+                 << "    " << "--Emissin-end        - treat missing 'end' instruction at the end of function as error\n"
+                 << "    " << "--Eempty-function    - treat empty function as error\n"
+                 << "    " << "--Eopless-frame      - treat frames without operands as errors\n"
+                 << "    " << "--lib-static         - assemble as a static library\n"
+                 << "    " << "--lib-dynamic        - assemble as a dynamic library\n"
+                 ;
+        }
         return 0;
     }
 
@@ -758,13 +802,20 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+
+    ////////////////////////////////
+    // FIND FILENAME AND COMPILENAME
     string filename, compilename = "";
     if (args.size() == 2) {
         filename = args[0];
         compilename = args[1];
     } else if (args.size() == 1) {
         filename = args[0];
-        compilename = "out.bin";
+        if (AS_LIB_STATIC or AS_LIB_DYNAMIC) {
+            compilename = (filename + ".wlib");
+        } else {
+            compilename = "out.bin";
+        }
     }
 
     if (VERBOSE or DEBUG) {
@@ -776,10 +827,12 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    ifstream in(filename, ios::in | ios::binary);
 
+    ////////////////
+    // READ LINES IN
+    ifstream in(filename, ios::in | ios::binary);
     if (!in) {
-        cout << "fatal: file could not be opened" << endl;
+        cout << "fatal: file could not be opened: " << filename << endl;
         return 1;
     }
 
@@ -790,12 +843,20 @@ int main(int argc, char* argv[]) {
     while (getline(in, line)) { lines.push_back(line); }
     ilines = getilines(lines);
 
+
+    //////////////////////////////
+    // SETUP INITIAL BYTECODE SIZE
     uint16_t bytes = 0;
-    uint16_t starting_instruction = 0;  // the bytecode offset to first executable instruction
 
+
+    ////////////////////////
+    // GATHER FUNCTION NAMES
     vector<string> function_names = getFunctionNames(lines);
-    string main_function = "";
 
+
+    /////////////////////////
+    // GET MAIN FUNCTION NAME
+    string main_function = "";
     for (string line : ilines) {
         if (str::startswith(line, ".main:")) {
             cout << "setting main function to: ";
@@ -804,14 +865,21 @@ int main(int argc, char* argv[]) {
             break;
         }
     }
-    if (main_function == "" and not LIB) { main_function = "main"; }
-    if ((VERBOSE and main_function != "main" and main_function != "") or DEBUG) { cout << "debug (notice): main function set to: '" << main_function << "'" << endl; }
+    if (main_function == "" and not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
+        main_function = "main";
+    }
+    if (((VERBOSE and main_function != "main" and main_function != "") or DEBUG) and not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
+        cout << "debug (notice): main function set to: '" << main_function << "'" << endl;
+    }
 
-    if (find(function_names.begin(), function_names.end(), main_function) == function_names.end() and not LIB) {
+    if (find(function_names.begin(), function_names.end(), main_function) == function_names.end() and not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
         cout << "error: main function is undefined: " << main_function << endl;
         return 1;
     }
 
+
+    ///////////////////////////////
+    // GATHER FUNCTIONS' CODE LINES
     map<string, pair<bool, vector<string> > > functions;
     try {
          functions = getFunctions(ilines);
@@ -820,19 +888,27 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // we should check if main function returns a value
+
+    /////////////////////////////////////////
+    // CHECK IF MAIN FUNCTION RETURNS A VALUE
     // FIXME: this is just a crude check - it does not acctually checks if these instructions set 0 register
     // this must be better implemented or we will receive "function did not set return register" exceptions at runtime
-    string main_second_but_last = *(functions.at(main_function).second.end()-2);
-    if (!str::startswith(main_second_but_last, "copy") and
-        !str::startswith(main_second_but_last, "move") and
-        !str::startswith(main_second_but_last, "swap") and
-        !str::startswith(main_second_but_last, "izero")
-        ) {
-        cout << "fatal: main function does not return a value" << endl;
-        return 1;
+    if (not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
+        string main_second_but_last = *(functions.at(main_function).second.end()-2);
+        if (!str::startswith(main_second_but_last, "copy") and
+            !str::startswith(main_second_but_last, "move") and
+            !str::startswith(main_second_but_last, "swap") and
+            !str::startswith(main_second_but_last, "izero")
+            ) {
+            cout << "fatal: main function does not return a value" << endl;
+            return 1;
+        }
     }
 
+
+    //////////////////////////////////////////////////////////
+    // MAP FUNCTIONS TO ADDRESSES AND SET STARTING INSTRUCTION
+    uint16_t starting_instruction = 0;  // the bytecode offset to first executable instruction
     map<string, uint16_t> function_addresses;
     try {
         for (string name : function_names) {
@@ -845,61 +921,176 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // generate entry function
-    function_names.push_back(ENTRY_FUNCTION_NAME);
-    function_addresses[ENTRY_FUNCTION_NAME] = starting_instruction;
-    // entry function sets global stuff
-    ilines.insert(ilines.begin(), "ress global");
-    // append entry function instructions...
-    ilines.push_back("frame 0");
-    // this must not be hardcoded because we have '.main:' assembler instruction
-    // we also save return value in 1 register since 0 means "drop return value"
-    ilines.push_back("call " + main_function + " 1");
-    // then, register 1 is moved to register 0 so it counts as a return code
-    ilines.push_back("move 1 0");
-    ilines.push_back("halt");
-    functions[ENTRY_FUNCTION_NAME] = pair<bool, vector<string> >(false, ilines);
-    // instructions were added so bytecode size must be inreased
-    bytes += OP_SIZES.at("ress");
-    bytes += OP_SIZES.at("frame");
-    bytes += OP_SIZES.at("call");
-    bytes += main_function.size();
-    bytes += OP_SIZES.at("move");
-    bytes += OP_SIZES.at("halt");
 
-    starting_instruction = function_addresses[ENTRY_FUNCTION_NAME];
+    //////////////////////////
+    // GENERATE ENTRY FUNCTION
+    if (not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
+        function_names.push_back(ENTRY_FUNCTION_NAME);
+        function_addresses[ENTRY_FUNCTION_NAME] = starting_instruction;
+        // entry function sets global stuff
+        ilines.insert(ilines.begin(), "ress global");
+        // append entry function instructions...
+        ilines.push_back("frame 0");
+        // this must not be hardcoded because we have '.main:' assembler instruction
+        // we also save return value in 1 register since 0 means "drop return value"
+        ilines.push_back("call " + main_function + " 1");
+        // then, register 1 is moved to register 0 so it counts as a return code
+        ilines.push_back("move 1 0");
+        ilines.push_back("halt");
+        functions[ENTRY_FUNCTION_NAME] = pair<bool, vector<string> >(false, ilines);
+        // instructions were added so bytecode size must be inreased
+        bytes += OP_SIZES.at("ress");
+        bytes += OP_SIZES.at("frame");
+        bytes += OP_SIZES.at("call");
+        bytes += main_function.size();
+        bytes += OP_SIZES.at("move");
+        bytes += OP_SIZES.at("halt");
+    }
 
-    if (VERBOSE or DEBUG) { cout << "message: total required bytes: " <<  bytes << endl; }
-    if (VERBOSE or DEBUG) { cout << "message: first instruction pointer: " << starting_instruction << endl; }
+    if (VERBOSE or DEBUG) {
+        cout << "message: total required bytes: " <<  bytes << endl;
+    }
+    if ((VERBOSE or DEBUG) and not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
+        cout << "message: first instruction pointer: " << starting_instruction << endl;
+    }
 
+
+    /////////////////////////////////////////////////////////
+    // GATHER LINKS, GET THEIR SIZES AND ADJUST BYTECODE SIZE
+    vector<string> links = getlinks(ilines);
+    vector<tuple<uint16_t, char*> > linked_libs_bytecode;
+    uint16_t current_link_offset = bytes;
+
+    vector<string> linked_function_names;
+
+    for (string lnk : links) {
+        ifstream libin(lnk, ios::in | ios::binary);
+        if (!libin) {
+            cout << "fatal: failed to link static library: '" << lnk << "'" << endl;
+            exit(1);
+        }
+
+        if (DEBUG or VERBOSE) {
+            cout << "message [loader]: linking with: '" << lnk << "\'" << endl;
+        }
+
+        // FIXME: urgent!!!
+        uint16_t lib_function_ids_section_size = 0;
+        char lib_buffer[16];
+        libin.read(lib_buffer, sizeof(uint16_t));
+        lib_function_ids_section_size = *((uint16_t*)lib_buffer);
+
+        if (DEBUG or VERBOSE) {
+            cout << "message [loader]: function mapping section size: " << lib_function_ids_section_size << " bytes" << endl;
+        }
+
+        char *lib_buffer_function_ids = new char[lib_function_ids_section_size];
+        libin.read(lib_buffer_function_ids, lib_function_ids_section_size);
+        char *lib_function_ids_map = lib_buffer_function_ids;
+
+        int i = 0;
+        string lib_fn_name;
+        uint16_t lib_fn_address;
+        while (i < lib_function_ids_section_size) {
+            lib_fn_name = string(lib_function_ids_map);
+            i += lib_fn_name.size() + 1;  // one for null character
+            lib_fn_address = *((uint16_t*)(lib_buffer_function_ids+i));
+            i += sizeof(uint16_t);
+            lib_function_ids_map = lib_buffer_function_ids+i;
+            function_addresses[lib_fn_name] = lib_fn_address+current_link_offset;
+            linked_function_names.push_back(lib_fn_name);
+
+            cout << "  * '" << lib_fn_name << "' entry point at byte: " << lib_fn_address << '+' << current_link_offset << endl;
+        }
+        delete[] lib_buffer_function_ids;
+
+
+        uint16_t lib_size = 0;
+        // FIXME: error check
+        libin.read(lib_buffer, 16);
+        lib_size = *(uint16_t*)lib_buffer;
+
+        char* linked_code = new char[lib_size];
+        // FIXME: error echeck
+        libin.read(linked_code, lib_size);
+
+        linked_libs_bytecode.push_back( tuple<uint16_t, char*>(lib_size, linked_code) );
+        bytes += lib_size;
+    }
+
+    if ((VERBOSE or DEBUG) and linked_function_names.size() != 0) {
+        cout << "message: total required bytes after linking: " << bytes << " bytes" << endl;
+    }
+
+
+    ////////////////////////////////////////
+    // CREATE OFSTREAM TO WRITE BYTECODE OUT
+    ofstream out(compilename, ios::out | ios::binary);
+
+
+    ///////////////////////////////
+    // PREPARE FUNCTION IDS SECTION
     uint16_t function_ids_section_size = 0;
     for (string name : function_names) { function_ids_section_size += name.size(); }
     // we need to insert address (uint16_t) after every function
     function_ids_section_size += sizeof(uint16_t) * function_names.size();
     // for null characters after function names
     function_ids_section_size += function_names.size();
+    for (string name : linked_function_names) { function_ids_section_size += name.size(); }
+    // we need to insert address (uint16_t) after every function
+    function_ids_section_size += sizeof(uint16_t) * linked_function_names.size();
+    // for null characters after function names
+    function_ids_section_size += linked_function_names.size();
 
-    ofstream out(compilename, ios::out | ios::binary);
 
+    /////////////////////////////////
+    // WRITE OUT FUNCTION IDS SECTION
     out.write((const char*)&function_ids_section_size, sizeof(uint16_t));
     uint16_t functions_size_so_far = 0;
     for (string name : function_names) {
+        // function name...
         out.write((const char*)name.c_str(), name.size());
+        // ...requires terminating null character
         out.put('\0');
+        // mapped address must come after name
         out.write((const char*)&functions_size_so_far, sizeof(uint16_t));
+        // functions size must be incremented by the actual size of function's bytecode size
+        // to give correct offset for next function
         functions_size_so_far += Program::countBytes(functions.at(name).second);
     }
+    for (string name : linked_function_names) {
+        // function name...
+        out.write((const char*)name.c_str(), name.size());
+        // ...requires terminating null character
+        out.put('\0');
+        // mapped address must come after name
+        uint16_t address = function_addresses[name];
+        out.write((const char*)&address, sizeof(uint16_t));
+    }
 
+
+    //////////////////////////////////////////////////////////////
+    // EXTEND FUNCTION NAMES VECTOR WITH NAMES OF LINKED FUNCTIONS
+    for (string name : linked_function_names) { function_names.push_back(name); }
+
+
+    //////////////////////
+    // WRITE BYTECODE SIZE
     out.write((const char*)&bytes, 16);
-    out.write((const char*)&starting_instruction, 16);
 
+
+    //////////////////////////////////////////////
+    // GENERATE AND WRITE FUNCTIONS TO COMPILEFILE
     int functions_section_size = 0;
     for (string name : function_names) {
-        if (VERBOSE or DEBUG) { cout << "message: generating bytecode for function (at bytecode " << functions_section_size << "): " << name; }
+        // do not generate bytecode for functions that were linked
+        if (find(linked_function_names.begin(), linked_function_names.end(), name) != linked_function_names.end()) { continue; }
+
+        if (VERBOSE or DEBUG) { cout << "message: generating bytecode for function: " << name; }
         uint16_t fun_bytes = 0;
         try {
             fun_bytes = Program::countBytes(name == ENTRY_FUNCTION_NAME ? filter(functions.at(name).second) : functions.at(name).second);
-            if (VERBOSE or DEBUG) { cout << " (" << fun_bytes << " bytes)" << endl; }
+            if (VERBOSE or DEBUG) { cout << " (" << fun_bytes << " bytes at bytecode " << functions_section_size << ')' << endl; }
         } catch (const string& e) {
             cout << e << endl;
             exit(1);
@@ -927,6 +1118,19 @@ int main(int argc, char* argv[]) {
         functions_section_size += func.size();
         delete[] btcd;
     }
+
+
+    /////////////////////////////////////
+    // WRITE STATICALLY LINKED LIBARARIES
+    // FIXME: implement this after we are able to load static libs
+    uint16_t bytes_offset = bytes;
+    for (tuple<uint16_t, char*> lnk : linked_libs_bytecode) {
+        const char* linked_bytecode;
+        uint16_t linked_size;
+        tie(linked_size, linked_bytecode) = lnk;
+        out.write(linked_bytecode, linked_size);
+    }
+
     out.close();
 
     return ret_code;
