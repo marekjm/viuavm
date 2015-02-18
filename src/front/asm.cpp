@@ -958,7 +958,7 @@ int main(int argc, char* argv[]) {
     /////////////////////////////////////////////////////////
     // GATHER LINKS, GET THEIR SIZES AND ADJUST BYTECODE SIZE
     vector<string> links = getlinks(ilines);
-    map<string, char*> linked_libs_bytecode;
+    vector<tuple<uint16_t, char*> > linked_libs_bytecode;
     uint16_t current_link_offset = bytes;
 
     vector<string> linked_function_names;
@@ -1004,7 +1004,17 @@ int main(int argc, char* argv[]) {
         }
         delete[] lib_buffer_function_ids;
 
-        //char* linked_code = new char[lib_size];
+
+        uint16_t lib_size = 0;
+        // FIXME: error check
+        libin.read(lib_buffer, 16);
+        lib_size = *(uint16_t*)lib_buffer;
+
+        char* linked_code = new char[lib_size];
+        // FIXME: error echeck
+        libin.read(linked_code, lib_size);
+
+        linked_libs_bytecode.push_back( tuple<uint16_t, char*>(lib_size, linked_code) );
     }
 
 
