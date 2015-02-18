@@ -159,6 +159,8 @@ int CPU::run() {
 
     while (true) {
         previous_instr_ptr = instr_ptr;
+        ++instruction_counter;
+
         if (debug) {
             cout << "CPU: bytecode ";
             cout << dec << ((long)instr_ptr - (long)bytecode);

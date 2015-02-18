@@ -167,6 +167,10 @@ int main(int argc, char* argv[]) {
     if (not ANALYZE) {
         cpu.load(bytecode).bytes(bytes).eoffset(starting_instruction).run();
         tie(ret_code, return_exception, return_message) = cpu.exitcondition();
+
+        if (VERBOSE or DEBUG) {
+            cout << "message: finished: " << cpu.counter() << " instructions executed" << endl;
+        }
     }
 
     if (ret_code != 0 and return_exception.size()) {
