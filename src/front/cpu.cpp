@@ -170,7 +170,7 @@ int main(int argc, char* argv[]) {
     if (ret_code != 0 and return_exception.size()) {
         vector<Frame*> trace = cpu.trace();
         cout << "stack trace: from entry point...\n";
-        for (unsigned i = 1; i < trace.size(); ++i) {
+        for (unsigned i = 1; i < trace.size()-1; ++i) {
             cout << "  called function: '" << trace[i]->function_name << "'\n";
         }
         cout << "exception in function '" << trace.back()->function_name << "': ";

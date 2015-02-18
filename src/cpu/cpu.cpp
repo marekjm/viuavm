@@ -395,7 +395,10 @@ int CPU::run() {
 
     // delete entry function's frame
     // otherwise we get huge memory leak
-    delete frames.back();
+    // do not delete if execution was halted because of exception
+    if (return_exception == "") {
+        delete frames.back();
+    }
 
     return return_code;
 }
