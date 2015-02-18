@@ -955,38 +955,6 @@ int main(int argc, char* argv[]) {
     }
 
 
-    ///////////////////////////////
-    // PREPARE FUNCTION IDS SECTION
-    uint16_t function_ids_section_size = 0;
-    for (string name : function_names) { function_ids_section_size += name.size(); }
-    // we need to insert address (uint16_t) after every function
-    function_ids_section_size += sizeof(uint16_t) * function_names.size();
-    // for null characters after function names
-    function_ids_section_size += function_names.size();
-
-
-    ////////////////////////////////////////
-    // CREATE OFSTREAM TO WRITE BYTECODE OUT
-    ofstream out(compilename, ios::out | ios::binary);
-
-
-    /////////////////////////////////
-    // WRITE OUT FUNCTION IDS SECTION
-    out.write((const char*)&function_ids_section_size, sizeof(uint16_t));
-    uint16_t functions_size_so_far = 0;
-    for (string name : function_names) {
-        // function name...
-        out.write((const char*)name.c_str(), name.size());
-        // ...requires terminating null character
-        out.put('\0');
-        // mapped address must after name
-        out.write((const char*)&functions_size_so_far, sizeof(uint16_t));
-        // functions size must be incremented by the actual size of function's bytecode size
-        // to give correct offset for next function
-        functions_size_so_far += Program::countBytes(functions.at(name).second);
-    }
-
-
     /////////////////////////////////////////////////////////
     // GATHER LINKS, GET THEIR SIZES AND ADJUST BYTECODE SIZE
     vector<string> links = getlinks(ilines);
@@ -1029,8 +997,7 @@ int main(int argc, char* argv[]) {
             lib_fn_address = *((uint16_t*)(lib_buffer_function_ids+i));
             i += sizeof(uint16_t);
             lib_function_ids_map = lib_buffer_function_ids+i;
-            //function_address_mapping[fn_name] = fn_address;
-            function_names.push_back(lib_fn_name);
+            function_addresses[lib_fn_name] = lib_fn_address+current_link_offset;
             linked_function_names.push_back(lib_fn_name);
 
             cout << "  * '" << lib_fn_name << "' entry point at byte: " << lib_fn_address << '+' << current_link_offset << endl;
@@ -1039,6 +1006,57 @@ int main(int argc, char* argv[]) {
 
         //char* linked_code = new char[lib_size];
     }
+
+
+    ////////////////////////////////////////
+    // CREATE OFSTREAM TO WRITE BYTECODE OUT
+    ofstream out(compilename, ios::out | ios::binary);
+
+
+    ///////////////////////////////
+    // PREPARE FUNCTION IDS SECTION
+    uint16_t function_ids_section_size = 0;
+    for (string name : function_names) { function_ids_section_size += name.size(); }
+    // we need to insert address (uint16_t) after every function
+    function_ids_section_size += sizeof(uint16_t) * function_names.size();
+    // for null characters after function names
+    function_ids_section_size += function_names.size();
+    for (string name : linked_function_names) { function_ids_section_size += name.size(); }
+    // we need to insert address (uint16_t) after every function
+    function_ids_section_size += sizeof(uint16_t) * linked_function_names.size();
+    // for null characters after function names
+    function_ids_section_size += linked_function_names.size();
+
+
+    /////////////////////////////////
+    // WRITE OUT FUNCTION IDS SECTION
+    out.write((const char*)&function_ids_section_size, sizeof(uint16_t));
+    uint16_t functions_size_so_far = 0;
+    for (string name : function_names) {
+        // function name...
+        out.write((const char*)name.c_str(), name.size());
+        // ...requires terminating null character
+        out.put('\0');
+        // mapped address must come after name
+        out.write((const char*)&functions_size_so_far, sizeof(uint16_t));
+        // functions size must be incremented by the actual size of function's bytecode size
+        // to give correct offset for next function
+        functions_size_so_far += Program::countBytes(functions.at(name).second);
+    }
+    for (string name : linked_function_names) {
+        // function name...
+        out.write((const char*)name.c_str(), name.size());
+        // ...requires terminating null character
+        out.put('\0');
+        // mapped address must come after name
+        uint16_t address = function_addresses[name];
+        out.write((const char*)&address, sizeof(uint16_t));
+    }
+
+
+    //////////////////////////////////////////////////////////////
+    // EXTEND FUNCTION NAMES VECTOR WITH NAMES OF LINKED FUNCTIONS
+    for (string name : linked_function_names) { function_names.push_back(name); }
 
 
     //////////////////////
