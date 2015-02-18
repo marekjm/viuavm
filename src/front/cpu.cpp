@@ -20,7 +20,6 @@ bool SHOW_VERSION = false;
 bool VERBOSE = false;
 bool DEBUG = false;
 bool STEP_BY_STEP = false;
-bool ANALYZE = false;
 
 
 // WARNING FLAGS
@@ -57,9 +56,6 @@ int main(int argc, char* argv[]) {
             continue;
         } else if (option == "--step") {
             STEP_BY_STEP = true;
-            continue;
-        } else if (option == "--analyze") {
-            ANALYZE = true;
             continue;
         }
         args.push_back(argv[i]);
@@ -164,13 +160,11 @@ int main(int argc, char* argv[]) {
     cpu.stepping = STEP_BY_STEP;
     for (auto p : function_address_mapping) { cpu.mapfunction(p.first, p.second); }
 
-    if (not ANALYZE) {
-        cpu.load(bytecode).bytes(bytes).eoffset(starting_instruction).run();
-        tie(ret_code, return_exception, return_message) = cpu.exitcondition();
+    cpu.load(bytecode).bytes(bytes).eoffset(starting_instruction).run();
+    tie(ret_code, return_exception, return_message) = cpu.exitcondition();
 
-        if (VERBOSE or DEBUG) {
-            cout << "message: finished: " << cpu.counter() << " instructions executed" << endl;
-        }
+    if (VERBOSE or DEBUG) {
+        cout << "message: finished: " << cpu.counter() << " instructions executed" << endl;
     }
 
     if (ret_code != 0 and return_exception.size()) {
