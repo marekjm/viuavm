@@ -1018,6 +1018,10 @@ int main(int argc, char* argv[]) {
         bytes += lib_size;
     }
 
+    if ((VERBOSE or DEBUG) and linked_function_names.size() != 0) {
+        cout << "message: total required bytes after linking: " << bytes << " bytes" << endl;
+    }
+
 
     ////////////////////////////////////////
     // CREATE OFSTREAM TO WRITE BYTECODE OUT
@@ -1120,7 +1124,11 @@ int main(int argc, char* argv[]) {
     // WRITE STATICALLY LINKED LIBARARIES
     // FIXME: implement this after we are able to load static libs
     uint16_t bytes_offset = bytes;
-    for (string lnk : linked_libs_bytecode) {
+    for (tuple<uint16_t, char*> lnk : linked_libs_bytecode) {
+        const char* linked_bytecode;
+        uint16_t linked_size;
+        tie(linked_size, linked_bytecode) = lnk;
+        out.write(linked_bytecode, linked_size);
     }
 
     out.close();
