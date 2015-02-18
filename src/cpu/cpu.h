@@ -163,7 +163,7 @@ class CPU {
             tmp(0),
             frame_new(0),
             return_code(0), return_exception(""), return_message(""),
-            debug(false), stepping(false)
+            debug(false), stepping(false),
             instruction_counter(0),
             debug(false), errors(false), stepping(false)
         {
