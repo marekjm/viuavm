@@ -176,11 +176,16 @@ int main(int argc, char* argv[]) {
         cout << "exception in function '" << trace.back()->function_name << "': ";
         cout << return_exception << ": " << return_message << endl;
 
-        cout << "call frame details:\n";
+        cout << "frame details:\n";
 
         Frame* last = trace.back();
         if (last->registers_size) {
-            cout << "  non-empty registers (out of " << last->registers_size << "):" << endl;
+            unsigned non_empty = 0;
+            for (int r = 0; r < last->registers_size; ++r) {
+                if (last->registers[r] != 0) { ++non_empty; }
+            }
+            cout << "  non-empty registers: " << non_empty << '/' << last->registers_size;
+            cout << (non_empty ? ":\n" : "\n");
             for (int r = 0; r < last->registers_size; ++r) {
                 if (last->registers[r] == 0) { continue; }
                 cout << "    registers[" << i << "]: ";
