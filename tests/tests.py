@@ -512,5 +512,28 @@ class FunctionTests(unittest.TestCase):
         self.assertEqual(0, excode)
 
 
+class ErrorTests(unittest.TestCase):
+    """Tests for error-checking and reporting functionality.
+    """
+    PATH = './sample/asm/errors'
+
+    def testStackTracePrinting(self):
+        name = 'stacktrace.asm'
+        lines = [
+            'stack trace: from entry point...',
+            "  called function: 'main'",
+            "  called function: 'baz'",
+            "  called function: 'bar'",
+            "exception in function 'foo': RuntimeException: read from null register: 1",
+        ]
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path, 1)
+        self.assertEqual(lines, output.strip().splitlines())
+        self.assertEqual(1, excode)
+
+
+
 if __name__ == '__main__':
     unittest.main()
