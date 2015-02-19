@@ -524,6 +524,7 @@ class ErrorTests(unittest.TestCase):
             "  called function: 'main'",
             "  called function: 'baz'",
             "  called function: 'bar'",
+            "  called function: 'foo'",
             "exception in function 'foo': RuntimeException: read from null register: 1",
         ]
         assembly_path = os.path.join(self.PATH, name)
