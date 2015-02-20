@@ -53,8 +53,10 @@ enum OPCODE : byte {
 
     // string instructions
     STRSTORE,
-    STRADD,
+    STRSIZE,
     STREQ,
+    STRADD,
+    STRSUB,
 
     // booleans
     BOOL,   // store Boolean false object in given register (empty) or

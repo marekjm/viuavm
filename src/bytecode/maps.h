@@ -50,6 +50,12 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "itof",   sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
     { "ftoi",   sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
 
+    { "strstore", sizeof(byte) + sizeof(bool) + sizeof(int) },
+    { "strsize", sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
+    { "streq",  sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
+    { "stradd", sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
+    { "strsub", sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
+
     { "bool",   sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "not",    sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "and",    sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
@@ -128,6 +134,12 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
 
     { ITOF,     "itof" },
     { FTOI,     "ftoi" },
+
+    { STRSTORE, "strstore" },
+    { STRSIZE,  "strsize" },
+    { STREQ,    "streq" },
+    { STRADD,   "stradd" },
+    { STRSUB,   "strsub" },
 
     { BOOL,	    "bool" },
     { NOT,	    "not" },
