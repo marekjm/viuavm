@@ -176,23 +176,34 @@ int main(int argc, char* argv[]) {
         cout << "exception in function '" << trace.back()->function_name << "': ";
         cout << return_exception << ": " << return_message << endl;
 
+        cout << "frame details:\n";
+
         Frame* last = trace.back();
         if (last->registers_size) {
-            cout << "    non-empty registers (out of " << last->registers_size << "):" << endl;
+            unsigned non_empty = 0;
+            for (int r = 0; r < last->registers_size; ++r) {
+                if (last->registers[r] != 0) { ++non_empty; }
+            }
+            cout << "  non-empty registers: " << non_empty << '/' << last->registers_size;
+            cout << (non_empty ? ":\n" : "\n");
             for (int r = 0; r < last->registers_size; ++r) {
                 if (last->registers[r] == 0) { continue; }
-                cout << "      registers[" << i << "]: ";
+                cout << "    registers[" << i << "]: ";
                 cout << '<' << last->registers[r]->type() << "> " << last->registers[r]->str() << endl;
             }
+        } else {
+            cout << "  no registers were allocated for this frame" << endl;
         }
 
         if (last->arguments_size) {
             cout << "    non-empty arguments (out of " << last->arguments_size << "):" << endl;
             for (int r = 0; r < last->arguments_size; ++r) {
                 if (last->arguments[r] == 0) { continue; }
-                cout << "      arguments[" << i << "]: ";
+                cout << "    arguments[" << i << "]: ";
                 cout << '<' << last->arguments[r]->type() << "> " << last->arguments[r]->str() << endl;
             }
+        } else {
+            cout << "  no arguments were passed to this frame" << endl;
         }
     }
 
