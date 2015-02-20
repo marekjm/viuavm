@@ -188,7 +188,7 @@ int main(int argc, char* argv[]) {
             cout << (non_empty ? ":\n" : "\n");
             for (int r = 0; r < last->registers_size; ++r) {
                 if (last->registers[r] == 0) { continue; }
-                cout << "    registers[" << i << "]: ";
+                cout << "    registers[" << r << "]: ";
                 cout << '<' << last->registers[r]->type() << "> " << last->registers[r]->str() << endl;
             }
         } else {
