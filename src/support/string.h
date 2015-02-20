@@ -17,6 +17,8 @@ namespace str {
     std::string sub(const std::string& s, int b = 0, int e = -1);
     std::string chunk(const std::string& s, bool ignore_leading_ws = true);
 
+    std::string extract(const std::string& s);
+
     std::string lstrip(const std::string& s);
 
     unsigned lshare(const std::string& s, const std::string& w);
