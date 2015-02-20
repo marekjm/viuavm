@@ -38,12 +38,14 @@ clean-test-compiles:
 	rm ./tests/compiled/*.bin
 
 
-install: ${VM_ASM} ${VM_CPU}
+install: ${VM_ASM} ${VM_CPU} ./bin/vm/analyze
 	mkdir -p ${BIN_PATH}
 	cp ${VM_ASM} ${BIN_PATH}/wudoo-asm
 	chmod 755 ${BIN_PATH}/wudoo-asm
 	cp ${VM_CPU} ${BIN_PATH}/wudoo-cpu
 	chmod 755 ${BIN_PATH}/wudoo-cpu
+	cp ./bin/vm/analyze ${BIN_PATH}/wudoo-analyze
+	chmod 755 ${BIN_PATH}/wudoo-analyze
 
 
 test: ${VM_CPU} ${VM_ASM} clean-test-compiles
