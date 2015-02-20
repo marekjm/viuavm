@@ -851,7 +851,13 @@ int main(int argc, char* argv[]) {
 
     ////////////////////////
     // GATHER FUNCTION NAMES
-    vector<string> function_names = getFunctionNames(lines);
+    vector<string> function_names;
+    try {
+        function_names = getFunctionNames(lines);
+    } catch (const string& e) {
+        cout << "fatal: " << e << endl;
+        return 1;
+    }
 
 
     /////////////////////////
@@ -872,11 +878,6 @@ int main(int argc, char* argv[]) {
         cout << "debug (notice): main function set to: '" << main_function << "'" << endl;
     }
 
-    if (find(function_names.begin(), function_names.end(), main_function) == function_names.end() and not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
-        cout << "error: main function is undefined: " << main_function << endl;
-        return 1;
-    }
-
 
     ///////////////////////////////
     // GATHER FUNCTIONS' CODE LINES
@@ -893,7 +894,8 @@ int main(int argc, char* argv[]) {
     // CHECK IF MAIN FUNCTION RETURNS A VALUE
     // FIXME: this is just a crude check - it does not acctually checks if these instructions set 0 register
     // this must be better implemented or we will receive "function did not set return register" exceptions at runtime
-    if (not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
+    bool main_is_defined = (find(function_names.begin(), function_names.end(), main_function) != function_names.end());
+    if (not (AS_LIB_STATIC or AS_LIB_DYNAMIC) and main_is_defined) {
         string main_second_but_last = *(functions.at(main_function).second.end()-2);
         if (!str::startswith(main_second_but_last, "copy") and
             !str::startswith(main_second_but_last, "move") and
@@ -903,6 +905,9 @@ int main(int argc, char* argv[]) {
             cout << "fatal: main function does not return a value" << endl;
             return 1;
         }
+    }
+    if (not main_is_defined and (DEBUG or VERBOSE)) {
+        cout << "notice: main function (" << main_function << ") is not defined, deferring main function check to post-link phase" << endl;
     }
 
 
@@ -1072,6 +1077,16 @@ int main(int argc, char* argv[]) {
     //////////////////////////////////////////////////////////////
     // EXTEND FUNCTION NAMES VECTOR WITH NAMES OF LINKED FUNCTIONS
     for (string name : linked_function_names) { function_names.push_back(name); }
+
+
+    ///////////////////////////////////////////////
+    // CHECK IF THE FUNCTION SET AS MAIN IS DEFINED
+    // AS ALL THE FUNCTIONS (LOCAL OR LINKED) ARE
+    // NOW AVAILABLE
+    if (find(function_names.begin(), function_names.end(), main_function) == function_names.end() and not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
+        cout << "error: main function is undefined: " << main_function << endl;
+        return 1;
+    }
 
 
     //////////////////////
