@@ -4,7 +4,6 @@
 #pragma once
 
 #include <string>
-#include <sstream>
 #include "object.h"
 
 
@@ -13,24 +12,27 @@ class String : public Object {
      *
      *  Designed to hold text.
      */
-    std::string _value;
+    std::string svalue;
 
     public:
         std::string type() const {
             return "String";
         }
         std::string str() const {
-            std::ostringstream s;
-            s << _value;
-            return s.str();
+            return svalue;
         }
         bool boolean() const {
-            return _value.size() != 0;
+            return svalue.size() != 0;
         }
 
-        std::string& value() { return _value; }
+        Object* copy() const {
+            return new String(svalue);
+        }
 
-        String(std::string s = ""): _value(s) {}
+        std::string& value() { return svalue; }
+
+        String(std::string s = ""): svalue(s) {}
+
 };
 
 
