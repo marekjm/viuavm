@@ -60,6 +60,8 @@ class Program {
     Program& itof       (int_op, int_op);
     Program& ftoi       (int_op, int_op);
 
+    Program& strstore   (int_op, std::string);
+
     Program& lognot     (int_op);
     Program& logand     (int_op, int_op, int_op);
     Program& logor      (int_op, int_op, int_op);

@@ -107,6 +107,12 @@ uint16_t Program::countBytes(const vector<string>& lines) {
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (which for call instruction is function name)
                 inc += str::chunk(line).size() + 1;
+            } else if (instr == "strstore") {
+                // clear first chunk
+                line = str::lstrip(str::sub(line, instr.size()));
+                line = str::lstrip(str::sub(line, str::chunk(line).size()));
+                // get second chunk (which is a string)
+                inc += (str::extract(line).size() - 2 + 1); // +1: null-terminator
             }
         } catch (const std::out_of_range &e) {
             throw ("unrecognised instruction: `" + instr + '`');
@@ -142,6 +148,9 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
         string opcode_name = OP_NAMES.at(OPCODE(program[offset]));
         inc = OP_SIZES.at(opcode_name);
         if (OPCODE(program[offset]) == CALL) {
+            inc += string(program+offset+1).size();
+        }
+        if (OPCODE(program[offset]) == STRSTORE) {
             inc += string(program+offset+1).size();
         }
         if (debug) {
@@ -549,6 +558,24 @@ Program& Program::ftoi(int_op a, int_op b) {
     /*  Inserts ftoi instruction to bytecode.
      */
     addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, FTOI, a, b);
+    return (*this);
+}
+
+Program& Program::strstore(int_op reg, string s) {
+    /*  Inserts call instruction.
+     *  Byte offset is calculated automatically.
+     */
+    *(addr_ptr++) = STRSTORE;
+    addr_ptr = insertIntegerOperand(addr_ptr, reg);
+
+    if (debug or 1) {
+        cout << "debug: string store `" << s << '`' << endl;
+    }
+
+    for (unsigned i = 1; i < s.size()-1; ++i) {
+        *((char*)addr_ptr++) = s[i];
+    }
+    *((char*)addr_ptr++) = char(0);
     return (*this);
 }
 
