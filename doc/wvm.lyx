@@ -83,6 +83,10 @@ LatexCommand tableofcontents
 \end_inset
 
 
+\begin_inset Newpage newpage
+\end_inset
+
+
 \end_layout
 
 \begin_layout Part
@@ -197,6 +201,10 @@ name "sec:Architecture"
 
 \begin_layout Standard
 This section talks about VM's architecture.
+\begin_inset Newpage newpage
+\end_inset
+
+
 \end_layout
 
 \begin_layout Part
@@ -323,6 +331,10 @@ Dynamic libraries
 
 \begin_layout Standard
 This section discusses bytecode format specific to dynamic libraries.
+\begin_inset Newpage newpage
+\end_inset
+
+
 \end_layout
 
 \begin_layout Part
