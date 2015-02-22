@@ -814,7 +814,7 @@ int main(int argc, char* argv[]) {
         if (AS_LIB_STATIC or AS_LIB_DYNAMIC) {
             compilename = (filename + ".wlib");
         } else {
-            compilename = "out.bin";
+            compilename = "a.out";
         }
     }
 
