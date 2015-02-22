@@ -524,10 +524,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string reg_chnk, str_chnk;
             reg_chnk = str::chunk(operands);
             operands = str::lstrip(str::sub(operands, reg_chnk.size()));
-            cout << "reg_chnk: " << reg_chnk << endl;
             str_chnk = str::extract(operands);
-            cout << "str_chnk: " << str_chnk << endl;
-            cout << "str_chnk (modified): `" << str_chnk << '`' << endl;
             program.strstore(getint_op(resolveregister(reg_chnk, names)), str_chnk);
         } else if (str::startswith(line, "not")) {
             string regno_chnk;

@@ -562,15 +562,10 @@ Program& Program::ftoi(int_op a, int_op b) {
 }
 
 Program& Program::strstore(int_op reg, string s) {
-    /*  Inserts call instruction.
-     *  Byte offset is calculated automatically.
+    /*  Inserts strstore instruction.
      */
     *(addr_ptr++) = STRSTORE;
     addr_ptr = insertIntegerOperand(addr_ptr, reg);
-
-    if (debug or 1) {
-        cout << "debug: string store `" << s << '`' << endl;
-    }
 
     for (unsigned i = 1; i < s.size()-1; ++i) {
         *((char*)addr_ptr++) = s[i];
