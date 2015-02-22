@@ -1,0 +1,362 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Wudoo Virtual Machine
+\end_layout
+
+\begin_layout Author
+by Marek Marecki
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Part
+Overview
+\end_layout
+
+\begin_layout Section
+Overview
+\end_layout
+
+\begin_layout Standard
+This section features a brief overview of the Wudoo VM; its history, development
+ goals, influences and various other bits and pieces of information more
+ or less related to the development of the idea and resulting code of the
+ virtual machine.
+ It is contains more prose and casual writing than technicalities.
+ More technical discussion begins with Section
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "sec:Architecture"
+
+\end_inset
+
+.
+ VM architecture is discussed in Part
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "part:Virtual-Machine"
+
+\end_inset
+
+.
+ People who want to dive straight into code can start at Part
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "part:Programming"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+History
+\end_layout
+
+\begin_layout Standard
+Wudoo VM is a project that has been started during the Christmas break of
+ 2014, when I was still a student of Gdansk University of Technology.
+ It was meant to be my reasearch project, and to help me understand how
+ languages can be implemented and what really happends when I 
+\begin_inset Quotes eld
+\end_inset
+
+run
+\begin_inset Quotes erd
+\end_inset
+
+ the programs I wrote.
+\end_layout
+
+\begin_layout Standard
+As to why it has been started at all - I had taken interest in computer
+ language design and implementation; lexers, parsers, virtual machines -
+ the whole stack.
+ The natural way for me was to take a book about the topic, start reading
+ it, halfway through begin to implement things described and by the end
+ of the book have a working prototype of a software.
+ The book that gave me the confidence required to tackle the task of implementin
+g a VM was 
+\begin_inset Quotes eld
+\end_inset
+
+Language Implementation Patterns
+\begin_inset Quotes erd
+\end_inset
+
+ by Terence Parr.
+\end_layout
+
+\begin_layout Standard
+Apart from the above, I thought it would be just 
+\begin_inset Quotes eld
+\end_inset
+
+cool
+\begin_inset Quotes erd
+\end_inset
+
+ to have my own programming language.
+\end_layout
+
+\begin_layout Standard
+As of February 2015, Wudoo VM can be programmed in simple assembly-lookalike
+ language and cannot do much compared to mainstream languages.
+ Add, subtract, multiply and divide two integers or floats, print a string
+ to the screen, call a function (recursively or not).
+ It supports separate compilation to some extent (by supporting static linking).
+ But this is already a huge success for me.
+\end_layout
+
+\begin_layout Section
+Architecture
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Architecture"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This section talks about VM's architecture.
+\end_layout
+
+\begin_layout Part
+Virtual Machine
+\begin_inset CommandInset label
+LatexCommand label
+name "part:Virtual-Machine"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Register sets
+\end_layout
+
+\begin_layout Standard
+Wudoo is a register-based virtual machine.
+ It comes with several register sets, and each serves different purpose.
+\end_layout
+
+\begin_layout Subsection
+Global
+\end_layout
+
+\begin_layout Standard
+Global register set can be used to hold global variables.
+ It can be accessed from all functions.
+ Initial values in this register set's registers are set by 
+\family typewriter
+__entry
+\family default
+ function.
+\end_layout
+
+\begin_layout Subsection
+Local
+\end_layout
+
+\begin_layout Standard
+Local regster sets are uniqe to functions and cannot be accessed from outside
+ of them.
+ To be even more accurate - new local registers are created each time a
+ function is called and live inside a call frame.
+\end_layout
+
+\begin_layout Subsection
+Static
+\end_layout
+
+\begin_layout Standard
+Static registers are unique to functions and cannot be accessed from outside
+ of them.
+ The difference between local registers is that they are created only the
+ first time a function is called and are independent of call frames.
+\end_layout
+
+\begin_layout Subsection
+Temporary
+\end_layout
+
+\begin_layout Standard
+Temporary register set has only one register.
+ It is used to move values between different register sets.
+ In the future release, the number of registers in the temporary register
+ set may be increased to allow performing simple operations inside it.
+\end_layout
+
+\begin_layout Section
+Type system
+\end_layout
+
+\begin_layout Standard
+This section talks about type system of Wudoo VM.
+\end_layout
+
+\begin_layout Section
+Functions
+\end_layout
+
+\begin_layout Standard
+Functions in Wudoo VM.
+\end_layout
+
+\begin_layout Section
+Bytecode
+\end_layout
+
+\begin_layout Standard
+This section talks about the bytecode used by Wudoo VM.
+\end_layout
+
+\begin_layout Subsection
+Executable
+\end_layout
+
+\begin_layout Standard
+This subsection discusses bytecode format used for executable files.
+\end_layout
+
+\begin_layout Subsection
+Linkable
+\end_layout
+
+\begin_layout Standard
+This section discusses bytecode format used for libraries, both static and
+ dynamic.
+ It also talks about differences between the two types of libraries, and
+ between them and executable bytecode files.
+\end_layout
+
+\begin_layout Subsubsection
+Static libraries
+\end_layout
+
+\begin_layout Standard
+This section discusses bytecode format specific to static libraries.
+\end_layout
+
+\begin_layout Subsubsection
+Dynamic libraries
+\end_layout
+
+\begin_layout Standard
+This section discusses bytecode format specific to dynamic libraries.
+\end_layout
+
+\begin_layout Part
+Programming
+\begin_inset CommandInset label
+LatexCommand label
+name "part:Programming"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This part talks about Wudoo VM programming.
+\end_layout
+
+\begin_layout Section
+Instruction set
+\end_layout
+
+\begin_layout Standard
+This section contains description of the VM's CPU instruction set.
+ Each instruction is explained and its syntax is shown so readers can treat
+ this section also as a reference for VM's assembly language.
+\end_layout
+
+\begin_layout Section
+Examples
+\end_layout
+
+\begin_layout Standard
+Sample programs that can be run on Wudoo VM.
+\end_layout
+
+\end_body
+\end_document
