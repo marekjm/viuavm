@@ -47,7 +47,7 @@ class Object {
             return new Object();
         }*/
 
-        // We need to construct and desory our basic object.
+        // We need to construct and destroy our basic object.
         Object() {}
         virtual ~Object() {}
 };

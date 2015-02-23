@@ -3,8 +3,8 @@ CXXFLAGS=-std=c++11 -Wall -pedantic -Wfatal-errors
 VM_ASM=bin/vm/asm
 VM_CPU=bin/vm/cpu
 
-WUDOO_CPU_INSTR_FILES_CPP=src/cpu/instr/general.cpp src/cpu/instr/int.cpp src/cpu/instr/float.cpp src/cpu/instr/byte.cpp src/cpu/instr/bool.cpp src/cpu/instr/cast.cpp
-WUDOO_CPU_INSTR_FILES_O=build/cpu/instr/general.o build/cpu/instr/int.o build/cpu/instr/float.o build/cpu/instr/byte.o build/cpu/instr/bool.o build/cpu/instr/cast.o
+WUDOO_CPU_INSTR_FILES_CPP=src/cpu/instr/general.cpp src/cpu/instr/int.cpp src/cpu/instr/float.cpp src/cpu/instr/byte.cpp src/cpu/instr/str.cpp src/cpu/instr/bool.cpp src/cpu/instr/cast.cpp
+WUDOO_CPU_INSTR_FILES_O=build/cpu/instr/general.o build/cpu/instr/int.o build/cpu/instr/float.o build/cpu/instr/byte.o build/cpu/instr/str.o build/cpu/instr/bool.o build/cpu/instr/cast.o
 
 BIN_PATH=/usr/local/bin
 
@@ -78,6 +78,9 @@ build/cpu/instr/float.o: src/cpu/instr/float.cpp
 
 build/cpu/instr/byte.o: src/cpu/instr/byte.cpp
 	${CXX} ${CXXFLAGS} -c -o $@ ./src/cpu/instr/byte.cpp
+
+build/cpu/instr/str.o: src/cpu/instr/str.cpp
+	${CXX} ${CXXFLAGS} -c -o $@ ./src/cpu/instr/str.cpp
 
 build/cpu/instr/bool.o: src/cpu/instr/bool.cpp
 	${CXX} ${CXXFLAGS} -c -o $@ ./src/cpu/instr/bool.cpp

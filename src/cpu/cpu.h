@@ -98,6 +98,8 @@ class CPU {
     byte* itof(byte*);
     byte* ftoi(byte*);
 
+    byte* strstore(byte*);
+
     byte* boolean(byte*);
     byte* lognot(byte*);
     byte* logand(byte*);

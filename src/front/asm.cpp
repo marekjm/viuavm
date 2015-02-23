@@ -520,6 +520,12 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             tie(a_chnk, b_chnk) = get2operands(operands);
             if (b_chnk.size() == 0) { b_chnk = a_chnk; }
             program.ftoi(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
+        } else if (str::startswith(line, "strstore")) {
+            string reg_chnk, str_chnk;
+            reg_chnk = str::chunk(operands);
+            operands = str::lstrip(str::sub(operands, reg_chnk.size()));
+            str_chnk = str::extract(operands);
+            program.strstore(getint_op(resolveregister(reg_chnk, names)), str_chnk);
         } else if (str::startswith(line, "not")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
@@ -1116,8 +1122,12 @@ int main(int argc, char* argv[]) {
 
         Program func(fun_bytes);
         try {
+            //cout << "assembling: '" << name << "': bytecode generation..." << endl;
             assemble(func.setdebug(DEBUG), functions.at(name).second, function_names);
+            //cout << "assembling: '" << name << "': bytecode generation: done" << endl;
+            //cout << "assembling: '" << name << "': branch calculation..." << endl;
             func.calculateBranches(functions_section_size);
+            //cout << "assembling: '" << name << "': branch calculation: done" << endl;
         } catch (const string& e) {
             cout << (DEBUG ? "\n" : "") << e << endl;
             exit(1);
@@ -1128,10 +1138,16 @@ int main(int argc, char* argv[]) {
             cout << (DEBUG ? "\n" : "") << e.what() << endl;
             exit(1);
         }
+        //cout << "assembling: '" << name << "': extracting bytecode..." << endl;
         byte* btcd = func.bytecode();
+        //cout << "assembling: '" << name << "': extracting bytecode: done" << endl;
+        //cout << "assembling: '" << name << "': writing to file..." << endl;
         out.write((const char*)btcd, func.size());
         functions_section_size += func.size();
+        //cout << "assembling: '" << name << "': writing to file: done" << endl;
+        //cout << "assembling: '" << name << "': freeing memory..." << endl;
         delete[] btcd;
+        //cout << "assembling: '" << name << "': freeing memory: done" << endl;
     }
 
 

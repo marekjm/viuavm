@@ -249,6 +249,9 @@ int CPU::run() {
                 case FTOI:
                     instr_ptr = ftoi(instr_ptr+1);
                     break;
+                case STRSTORE:
+                    instr_ptr = strstore(instr_ptr+1);
+                    break;
                 case NOT:
                     instr_ptr = lognot(instr_ptr+1);
                     break;

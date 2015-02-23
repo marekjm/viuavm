@@ -114,6 +114,29 @@ namespace str {
     }
 
 
+    string extract(const string& s) {
+        /*  Extracts *enquoted chunk*.
+         *  It is particularly useful if you have a string encoded in another string.
+         *
+         *  Consider this string: `"Hello 'Beautiful' World!" some other (42) things;`.
+         *  str::extract(<that string>) will return `"Hello 'Beautiful' World!"`.
+         */
+        ostringstream chnk;
+
+        char quote = s[0];
+        int backs = 0;
+
+        for (unsigned i = 0; i < s.size(); ++i) {
+            chnk << s[i];
+            if (s[i] == quote and i > 0 and (backs % 2 == 0)) { break; }
+            if (s[i] == '\\') { ++backs; }
+            if (s[i] == quote) { backs = 0; }
+        }
+
+        return chnk.str();
+    }
+
+
     string lstrip(const string& s) {
         /*  Removes whitespace from left side of the string.
          */
