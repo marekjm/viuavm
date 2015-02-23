@@ -213,7 +213,6 @@ map<string, pair<bool, vector<string> > > getFunctions(const vector<string>& lin
 
         line = str::lstrip(str::sub(line, 5));
         string name = str::chunk(line);
-        if (DEBUG) { cout << " + defining function: " << name << endl; }
         line = str::lstrip(str::sub(line, name.size()));
         string ret_sign = str::chunk(line);
         bool returns;
