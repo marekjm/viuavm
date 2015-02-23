@@ -1011,7 +1011,9 @@ int main(int argc, char* argv[]) {
             function_addresses[lib_fn_name] = lib_fn_address+current_link_offset;
             linked_function_names.push_back(lib_fn_name);
 
-            cout << "  * '" << lib_fn_name << "' entry point at byte: " << lib_fn_address << '+' << current_link_offset << endl;
+            if (DEBUG) {
+                cout << "  \"" << lib_fn_name << "\": entry point at byte: " << lib_fn_address << '+' << current_link_offset << endl;
+            }
         }
         delete[] lib_buffer_function_ids;
 
