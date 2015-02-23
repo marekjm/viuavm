@@ -783,7 +783,6 @@ Program& Program::call(string fn_name, int_op reg) {
      *  Byte offset is calculated automatically.
      */
     *(addr_ptr++) = CALL;
-    byte* original_addr = addr_ptr;
     for (unsigned i = 0; i < fn_name.size(); ++i) {
         *((char*)addr_ptr++) = fn_name[i];
     }
