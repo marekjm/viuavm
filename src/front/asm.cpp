@@ -912,7 +912,7 @@ int main(int argc, char* argv[]) {
             return 1;
         }
     }
-    if (not main_is_defined and (DEBUG or VERBOSE)) {
+    if (not main_is_defined and (DEBUG or VERBOSE) and not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
         cout << "notice: main function (" << main_function << ") is not defined, deferring main function check to post-link phase" << endl;
     }
 
