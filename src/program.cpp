@@ -787,12 +787,7 @@ Program& Program::call(string fn_name, int_op reg) {
     for (unsigned i = 0; i < fn_name.size(); ++i) {
         *((char*)addr_ptr++) = fn_name[i];
     }
-    if (debug) {
-        cout << "debug: call to function '" << original_addr << "' at byte " << (long)(original_addr-program);
-        cout << " (id ends at byte " << (long)(addr_ptr-program) << ')' << endl;
-    }
     addr_ptr = insertIntegerOperand(addr_ptr, reg);
-
     return (*this);
 }
 
