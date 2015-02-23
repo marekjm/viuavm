@@ -959,7 +959,7 @@ int main(int argc, char* argv[]) {
     /////////////////////////////////////////////////////////
     // GATHER LINKS, GET THEIR SIZES AND ADJUST BYTECODE SIZE
     vector<string> links = getlinks(ilines);
-    vector<tuple<uint16_t, char*> > linked_libs_bytecode;
+    vector<tuple<string, uint16_t, char*> > linked_libs_bytecode;
     uint16_t current_link_offset = bytes;
 
     vector<string> linked_function_names;
@@ -1017,7 +1017,7 @@ int main(int argc, char* argv[]) {
         // FIXME: error echeck
         libin.read(linked_code, lib_size);
 
-        linked_libs_bytecode.push_back( tuple<uint16_t, char*>(lib_size, linked_code) );
+        linked_libs_bytecode.push_back( tuple<string, uint16_t, char*>(lnk, lib_size, linked_code) );
         bytes += lib_size;
     }
 
@@ -1158,11 +1158,16 @@ int main(int argc, char* argv[]) {
     /////////////////////////////////////
     // WRITE STATICALLY LINKED LIBARARIES
     // FIXME: implement this after we are able to load static libs
-    uint16_t bytes_offset = bytes;
-    for (tuple<uint16_t, char*> lnk : linked_libs_bytecode) {
+    uint16_t bytes_offset = (bytes-(bytes-current_link_offset));
+    for (tuple<string, uint16_t, char*> lnk : linked_libs_bytecode) {
+        string lib_name;
         const char* linked_bytecode;
         uint16_t linked_size;
-        tie(linked_size, linked_bytecode) = lnk;
+        tie(lib_name, linked_size, linked_bytecode) = lnk;
+
+        if (VERBOSE or DEBUG) {
+            cout << "[linker] message: linked module \"" << lib_name <<  "\" written at offset " << bytes_offset << endl;
+        }
         out.write(linked_bytecode, linked_size);
     }
 
