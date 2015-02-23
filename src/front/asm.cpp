@@ -958,13 +958,6 @@ int main(int argc, char* argv[]) {
         bytes += OP_SIZES.at("halt");
     }
 
-    if (VERBOSE or DEBUG) {
-        cout << "message: total required bytes: " <<  bytes << endl;
-    }
-    if ((VERBOSE or DEBUG) and not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
-        cout << "message: first instruction pointer: " << starting_instruction << endl;
-    }
-
 
     /////////////////////////////////////////////////////////
     // GATHER LINKS, GET THEIR SIZES AND ADJUST BYTECODE SIZE
@@ -982,7 +975,7 @@ int main(int argc, char* argv[]) {
         }
 
         if (DEBUG or VERBOSE) {
-            cout << "message [loader]: linking with: '" << lnk << "\'" << endl;
+            cout << "[loader] message: linking with: '" << lnk << "\'" << endl;
         }
 
         // FIXME: urgent!!!
@@ -992,7 +985,7 @@ int main(int argc, char* argv[]) {
         lib_function_ids_section_size = *((uint16_t*)lib_buffer);
 
         if (DEBUG or VERBOSE) {
-            cout << "message [loader]: function mapping section size: " << lib_function_ids_section_size << " bytes" << endl;
+            cout << "[loader] message: function mapping section size: " << lib_function_ids_section_size << " bytes" << endl;
         }
 
         char *lib_buffer_function_ids = new char[lib_function_ids_section_size];
@@ -1012,7 +1005,7 @@ int main(int argc, char* argv[]) {
             linked_function_names.push_back(lib_fn_name);
 
             if (DEBUG) {
-                cout << "  \"" << lib_fn_name << "\": entry point at byte: " << lib_fn_address << '+' << current_link_offset << endl;
+                cout << "  \"" << lib_fn_name << "\": entry point at byte: " << current_link_offset << '+' << lib_fn_address << endl;
             }
         }
         delete[] lib_buffer_function_ids;
@@ -1032,7 +1025,15 @@ int main(int argc, char* argv[]) {
     }
 
     if ((VERBOSE or DEBUG) and linked_function_names.size() != 0) {
-        cout << "message: total required bytes after linking: " << bytes << " bytes" << endl;
+        cout << "message: total required bytes: " << bytes << " bytes" << endl;
+    }
+    if (DEBUG) {
+        cout << "debug: required bytes: " << (bytes-(bytes-current_link_offset)) << " local" << endl;
+        cout << "debug: required bytes: " << (bytes-current_link_offset) << " linked" << endl;
+    }
+
+    if ((VERBOSE or DEBUG) and not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
+        cout << "message: first instruction pointer: " << starting_instruction << endl;
     }
 
 
