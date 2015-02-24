@@ -1083,7 +1083,7 @@ int main(int argc, char* argv[]) {
 
     ////////////////////
     // CREATE JUMP TABLE
-    vector<unsigned> jump_table;  // this code does not compile ON PURPOSE, it is a FIXME marker
+    vector<unsigned> jump_table;
 
 
     /////////////////////////////////////////////////////////
