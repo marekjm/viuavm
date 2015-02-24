@@ -340,7 +340,7 @@ tuple<string, string, string> get3operands(string s, bool fill_third = true) {
  *  It is suitable for all instructions which use three, simple register-index operands.
  *
  *  BE WARNED!
- *  This mapping (and the assemble_three_intop_instruction() function) *seriously* reduce the amount of code repetition
+ *  This mapping (and the assemble_three_intop_instruction() function) *greatly* reduce the amount of code repetition
  *  in the assembler but are kinda black voodoo magic...
  *
  *  NOTE TO FUTURE SELF:
