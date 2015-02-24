@@ -1139,7 +1139,6 @@ int main(int argc, char* argv[]) {
             }
             jump_table.push_back(jmp+functions_section_size);
         }
-        if (func.jumps() // FIXME
 
         functions_section_size += func.size();
     }
@@ -1149,11 +1148,14 @@ int main(int argc, char* argv[]) {
     // IF ASSEMBLING A LIBRARY
     // WRITE OUT JUMP TABLE
     if (AS_LIB_STATIC or AS_LIB_DYNAMIC) {
-        // FIXME: functions must be compiled before this step or
-        // otherwise we are not able to obtain jump table as it is
-        // not yet known to the compiler
         if (DEBUG) {
             cout << "debug: jump table has " << jump_table.size() << " entries" << endl;
+        }
+        unsigned total_jumps = jump_table.size();
+        out.write((const char*)&total_jumps, sizeof(unsigned));
+
+        for (unsigned jmp : jump_table) {
+            out.write((const char*)&jmp, sizeof(unsigned));
         }
     }
 
