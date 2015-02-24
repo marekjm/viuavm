@@ -1134,8 +1134,12 @@ int main(int argc, char* argv[]) {
 
         // extend jump table with jumps from current function
         for (unsigned jmp : func.jumps()) {
+            if (DEBUG) {
+                cout << "[asm] debug: pushed to jump table: " << jmp << '+' << functions_section_size << endl;
+            }
             jump_table.push_back(jmp+functions_section_size);
         }
+        if (func.jumps() // FIXME
 
         functions_section_size += func.size();
     }
