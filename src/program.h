@@ -100,6 +100,7 @@ class Program {
 
     // representations
     byte* bytecode();
+    std::vector<unsigned> jumps();
 
     Program& setdebug(bool d = true);
 

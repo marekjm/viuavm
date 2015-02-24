@@ -197,6 +197,14 @@ Program& Program::calculateBranches(unsigned offset) {
     return (*this);
 }
 
+vector<unsigned> Program::jumps() {
+    /** Returns vector if bytecode points which contain jumps.
+     */
+    vector<unsigned> jmps;
+    // FIXME: this should return vector of uint indexes in bytecode
+    return jmps;
+}
+
 
 byte* insertIntegerOperand(byte* addr_ptr, int_op op) {
     /** Insert integer operand into bytecode.
