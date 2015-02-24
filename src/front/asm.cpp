@@ -1194,7 +1194,7 @@ int main(int argc, char* argv[]) {
 
 
     /////////////////////////////////////
-    // WRITE STATICALLY LINKED LIBARARIES
+    // WRITE STATICALLY LINKED LIBRARIES
     // FIXME: implement this after we are able to load static libs
     uint16_t bytes_offset = (bytes-(bytes-current_link_offset));
     for (tuple<string, uint16_t, char*> lnk : linked_libs_bytecode) {
