@@ -201,13 +201,7 @@ vector<unsigned> Program::jumps() {
     /** Returns vector if bytecode points which contain jumps.
      */
     vector<unsigned> jmps;
-
-    for (byte* jmp : branches) {
-        // FIXME: this "cout" should be removed in final version
-        cout << "jump at byte: " << (unsigned)(jmp-program) << endl;
-        jmps.push_back( (unsigned)(jmp-program) );
-    }
-
+    for (byte* jmp : branches) { jmps.push_back( (unsigned)(jmp-program) ); }
     return jmps;
 }
 
