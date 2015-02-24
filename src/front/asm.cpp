@@ -1054,8 +1054,9 @@ int main(int argc, char* argv[]) {
     function_ids_section_size += linked_function_names.size();
 
 
-    /////////////////////////////////
+    /////////////////////////////////////////////
     // WRITE OUT FUNCTION IDS SECTION
+    // THIS ALSO INCLUDES IDS OF LINKED FUNCTIONS
     out.write((const char*)&function_ids_section_size, sizeof(uint16_t));
     uint16_t functions_size_so_far = 0;
     for (string name : function_names) {
@@ -1077,6 +1078,20 @@ int main(int argc, char* argv[]) {
         // mapped address must come after name
         uint16_t address = function_addresses[name];
         out.write((const char*)&address, sizeof(uint16_t));
+    }
+
+
+    //////////////////////////
+    // IF ASSEMBLING A LIBRARY
+    // WRITE OUT JUMP TABLE
+    if (AS_LIB_STATIC or AS_LIB_DYNAMIC) {
+        // FIXME: functions must be compiled before this step or
+        // otherwise we are not able to obtain jump table as it is
+        // not yet known to the compiler
+        vector<unsigned> jump_table = program.jumps();  // this code does not compile ON PURPOSE, it is a FIXME marker
+        if (DEBUG) {
+            cout << "debug: jump table has " << jump_table.size() << " entries" << endl;
+        }
     }
 
 
