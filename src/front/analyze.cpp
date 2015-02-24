@@ -18,6 +18,7 @@ const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file whi
 bool SHOW_HELP = false;
 bool SHOW_VERSION = false;
 bool VERBOSE = false;
+bool IS_LIBRARY = false;
 
 
 // WARNING FLAGS
@@ -49,6 +50,9 @@ int main(int argc, char* argv[]) {
         } else if (option == "--Eall") {
             ERROR_ALL = true;
             continue;
+        } else if (option == "--lib") {
+            IS_LIBRARY = true;
+            continue;
         }
         args.push_back(argv[i]);
     }
@@ -56,7 +60,10 @@ int main(int argc, char* argv[]) {
     if (SHOW_HELP or SHOW_VERSION) {
         cout << "wudoo VM bytecode analyzer, version " << VERSION << endl;
         if (SHOW_HELP) {
-            cout << "    --help             - to display this message" << endl;
+            cout << "    --help             - display this message" << endl;
+            cout << "    --version          - show version number" << endl;
+            cout << "    --verbose          - use verbose output" << endl;
+            cout << "    --lib              - analyzed bytecode is a library" << endl;
         }
         return 0;
     }
@@ -81,6 +88,20 @@ int main(int argc, char* argv[]) {
     if (!in) {
         cout << "fatal: file could not be opened: " << filename << endl;
         return 1;
+    }
+
+    if (IS_LIBRARY) {
+        unsigned total_jumps;
+        in.read((char*)&total_jumps, sizeof(unsigned));
+        cout << "entries in jump table: " << total_jumps << endl;
+
+        vector<unsigned> jumps;
+        unsigned jmp;
+        for (unsigned i = 0; i < total_jumps; ++i) {
+            in.read((char*)&jmp, sizeof(unsigned));
+            jumps.push_back(jmp);
+            cout << "  jump at byte: " << jmp << endl;
+        }
     }
 
     uint16_t function_ids_section_size = 0;
