@@ -1039,48 +1039,6 @@ int main(int argc, char* argv[]) {
     ofstream out(compilename, ios::out | ios::binary);
 
 
-    ///////////////////////////////
-    // PREPARE FUNCTION IDS SECTION
-    uint16_t function_ids_section_size = 0;
-    for (string name : function_names) { function_ids_section_size += name.size(); }
-    // we need to insert address (uint16_t) after every function
-    function_ids_section_size += sizeof(uint16_t) * function_names.size();
-    // for null characters after function names
-    function_ids_section_size += function_names.size();
-    for (string name : linked_function_names) { function_ids_section_size += name.size(); }
-    // we need to insert address (uint16_t) after every function
-    function_ids_section_size += sizeof(uint16_t) * linked_function_names.size();
-    // for null characters after function names
-    function_ids_section_size += linked_function_names.size();
-
-
-    /////////////////////////////////////////////
-    // WRITE OUT FUNCTION IDS SECTION
-    // THIS ALSO INCLUDES IDS OF LINKED FUNCTIONS
-    out.write((const char*)&function_ids_section_size, sizeof(uint16_t));
-    uint16_t functions_size_so_far = 0;
-    for (string name : function_names) {
-        // function name...
-        out.write((const char*)name.c_str(), name.size());
-        // ...requires terminating null character
-        out.put('\0');
-        // mapped address must come after name
-        out.write((const char*)&functions_size_so_far, sizeof(uint16_t));
-        // functions size must be incremented by the actual size of function's bytecode size
-        // to give correct offset for next function
-        functions_size_so_far += Program::countBytes(functions.at(name).second);
-    }
-    for (string name : linked_function_names) {
-        // function name...
-        out.write((const char*)name.c_str(), name.size());
-        // ...requires terminating null character
-        out.put('\0');
-        // mapped address must come after name
-        uint16_t address = function_addresses[name];
-        out.write((const char*)&address, sizeof(uint16_t));
-    }
-
-
     ////////////////////
     // CREATE JUMP TABLE
     vector<unsigned> jump_table;
@@ -1172,6 +1130,48 @@ int main(int argc, char* argv[]) {
     if (find(function_names.begin(), function_names.end(), main_function) == function_names.end() and not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
         cout << "error: main function is undefined: " << main_function << endl;
         return 1;
+    }
+
+
+    ///////////////////////////////
+    // PREPARE FUNCTION IDS SECTION
+    uint16_t function_ids_section_size = 0;
+    for (string name : function_names) { function_ids_section_size += name.size(); }
+    // we need to insert address (uint16_t) after every function
+    function_ids_section_size += sizeof(uint16_t) * function_names.size();
+    // for null characters after function names
+    function_ids_section_size += function_names.size();
+    for (string name : linked_function_names) { function_ids_section_size += name.size(); }
+    // we need to insert address (uint16_t) after every function
+    function_ids_section_size += sizeof(uint16_t) * linked_function_names.size();
+    // for null characters after function names
+    function_ids_section_size += linked_function_names.size();
+
+
+    /////////////////////////////////////////////
+    // WRITE OUT FUNCTION IDS SECTION
+    // THIS ALSO INCLUDES IDS OF LINKED FUNCTIONS
+    out.write((const char*)&function_ids_section_size, sizeof(uint16_t));
+    uint16_t functions_size_so_far = 0;
+    for (string name : function_names) {
+        // function name...
+        out.write((const char*)name.c_str(), name.size());
+        // ...requires terminating null character
+        out.put('\0');
+        // mapped address must come after name
+        out.write((const char*)&functions_size_so_far, sizeof(uint16_t));
+        // functions size must be incremented by the actual size of function's bytecode size
+        // to give correct offset for next function
+        functions_size_so_far += Program::countBytes(functions.at(name).second);
+    }
+    for (string name : linked_function_names) {
+        // function name...
+        out.write((const char*)name.c_str(), name.size());
+        // ...requires terminating null character
+        out.put('\0');
+        // mapped address must come after name
+        uint16_t address = function_addresses[name];
+        out.write((const char*)&address, sizeof(uint16_t));
     }
 
 
