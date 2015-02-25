@@ -1196,7 +1196,9 @@ int main(int argc, char* argv[]) {
         out.write((const char*)&functions_size_so_far, sizeof(uint16_t));
         // functions size must be incremented by the actual size of function's bytecode size
         // to give correct offset for next function
-        functions_size_so_far += Program::countBytes(functions.at(name).second);
+        try {
+            functions_size_so_far += Program::countBytes(functions.at(name).second);
+        } catch ( // FIXME,BUGFIX
     }
     for (string name : linked_function_names) {
         // function name...
