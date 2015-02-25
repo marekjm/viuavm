@@ -38,6 +38,9 @@ class CPU {
     // Temporary register
     Object* tmp;
 
+    // Static registers
+    std::map<std::string, std::tuple<Object**, bool*, int> > static_registers;
+
     /*  Call stack.
      */
     std::vector<Frame*> frames;
@@ -163,6 +166,7 @@ class CPU {
             registers(0), references(0), reg_count(r),
             uregisters(0), ureferences(0), uregisters_size(0),
             tmp(0),
+            static_registers({}),
             frame_new(0),
             return_code(0), return_exception(""), return_message(""),
             instruction_counter(0),
