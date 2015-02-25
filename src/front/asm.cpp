@@ -1239,7 +1239,7 @@ int main(int argc, char* argv[]) {
     uint16_t bytes_offset = (bytes-(bytes-current_link_offset));
     for (tuple<string, uint16_t, char*> lnk : linked_libs_bytecode) {
         string lib_name;
-        const char* linked_bytecode;
+        byte* linked_bytecode;
         uint16_t linked_size;
         tie(lib_name, linked_size, linked_bytecode) = lnk;
 
@@ -1256,8 +1256,9 @@ int main(int argc, char* argv[]) {
         }
         for (unsigned jmp : linked_jumptable) {
             if (DEBUG) {
-                cout << "[linker] adjusting jump: " << jmp << " -> " << (jmp+bytes_offset);
+                cout << "[linker] adjusting jump: " << jmp << " -> " << (jmp+bytes_offset) << endl;
             }
+            linked_bytecode[jmp] = (jmp+bytes_offset);
         }
 
         out.write(linked_bytecode, linked_size);
