@@ -899,7 +899,13 @@ int main(int argc, char* argv[]) {
     // this must be better implemented or we will receive "function did not set return register" exceptions at runtime
     bool main_is_defined = (find(function_names.begin(), function_names.end(), main_function) != function_names.end());
     if (not (AS_LIB_STATIC or AS_LIB_DYNAMIC) and main_is_defined) {
-        string main_second_but_last = *(functions.at(main_function).second.end()-2);
+        string main_second_but_last;
+        try {
+            main_second_but_last = *(functions.at(main_function).second.end()-2);
+        } catch (const std::out_of_range& e) {
+            cout << "[asm] fatal: could not find main function (during return value check)" << endl;
+            exit(1);
+        }
         if (!str::startswith(main_second_but_last, "copy") and
             !str::startswith(main_second_but_last, "move") and
             !str::startswith(main_second_but_last, "swap") and
@@ -1231,7 +1237,14 @@ int main(int argc, char* argv[]) {
             cout << "[linker] message: linked module \"" << lib_name <<  "\" written at offset " << bytes_offset << endl;
         }
 
-        for (unsigned jmp : linked_libs_jumptables[lib_name]) {
+        vector<unsigned> linked_jumptable;
+        try {
+            linked_jumptable = linked_libs_jumptables[lib_name];
+        } catch (const std::out_of_range& e) {
+            cout << "[linker] fatal: could not find jumptable for '" << lib_name << "' (maybe not loaded?)" << endl;
+            exit(1);
+        }
+        for (unsigned jmp : linked_jumptable) {
             if (DEBUG) {
                 cout << "[linker] adjusting jump: " << jmp << " -> " << (jmp+bytes_offset);
             }
