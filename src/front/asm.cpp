@@ -927,7 +927,11 @@ int main(int argc, char* argv[]) {
     try {
         for (string name : function_names) {
             function_addresses[name] = starting_instruction;
-            starting_instruction += Program::countBytes(functions.at(name).second);
+            try {
+                starting_instruction += Program::countBytes(functions.at(name).second);
+            } catch (const std::out_of_range& e) {
+                throw ("could not find function '" + name + "'");
+            }
         }
         bytes = Program::countBytes(ilines);
     } catch (const string& e) {
