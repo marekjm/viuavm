@@ -1188,6 +1188,7 @@ int main(int argc, char* argv[]) {
     out.write((const char*)&function_ids_section_size, sizeof(uint16_t));
     uint16_t functions_size_so_far = 0;
     for (string name : function_names) {
+        if (find(linked_function_names.begin(), linked_function_names.end(), name) != linked_function_names.end()) { continue; }
         // function name...
         out.write((const char*)name.c_str(), name.size());
         // ...requires terminating null character
