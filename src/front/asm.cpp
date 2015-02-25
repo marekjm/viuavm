@@ -960,9 +960,9 @@ int main(int argc, char* argv[]) {
     // GATHER LINKS, GET THEIR SIZES AND ADJUST BYTECODE SIZE
     vector<string> links = getlinks(ilines);
     vector<tuple<string, uint16_t, char*> > linked_libs_bytecode;
-    uint16_t current_link_offset = bytes;
-
     vector<string> linked_function_names;
+    map<string, vector<unsigned> > linked_libs_jumptables;
+    uint16_t current_link_offset = bytes;
 
     for (string lnk : links) {
         ifstream libin(lnk, ios::in | ios::binary);
@@ -974,6 +974,24 @@ int main(int argc, char* argv[]) {
         if (DEBUG or VERBOSE) {
             cout << "[loader] message: linking with: '" << lnk << "\'" << endl;
         }
+
+        unsigned lib_total_jumps;
+        libin.read((char*)&lib_total_jumps, sizeof(unsigned));
+        if (DEBUG) {
+            cout << "[loader] entries in jump table: " << lib_total_jumps << endl;
+        }
+
+        vector<unsigned> lib_jumps;
+        unsigned lib_jmp;
+        for (unsigned i = 0; i < lib_total_jumps; ++i) {
+            libin.read((char*)&lib_jmp, sizeof(unsigned));
+            lib_jumps.push_back(lib_jmp);
+            if (DEBUG) {
+                cout << "  jump at byte: " << lib_jmp << endl;
+            }
+        }
+
+        linked_libs_jumptables[lnk] = lib_jumps;
 
         // FIXME: urgent!!!
         uint16_t lib_function_ids_section_size = 0;
@@ -1193,7 +1211,7 @@ int main(int argc, char* argv[]) {
     }
 
 
-    /////////////////////////////////////
+    ////////////////////////////////////
     // WRITE STATICALLY LINKED LIBRARIES
     // FIXME: implement this after we are able to load static libs
     uint16_t bytes_offset = (bytes-(bytes-current_link_offset));
@@ -1206,6 +1224,13 @@ int main(int argc, char* argv[]) {
         if (VERBOSE or DEBUG) {
             cout << "[linker] message: linked module \"" << lib_name <<  "\" written at offset " << bytes_offset << endl;
         }
+
+        for (unsigned jmp : linked_libs_jumptables[lib_name]) {
+            if (DEBUG) {
+                cout << "[linker] adjusting jump: " << jmp << " -> " << (jmp+bytes_offset);
+            }
+        }
+
         out.write(linked_bytecode, linked_size);
     }
 
