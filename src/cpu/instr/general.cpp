@@ -311,6 +311,8 @@ byte* CPU::ress(byte* addr) {
         case 2:
             // TODO: switching to static registers
             break;
+        case 3:
+            // TODO: switching to temporary registers
         default:
             throw "illegal register set ID in ress instruction";
     }
