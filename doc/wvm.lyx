@@ -136,6 +136,33 @@ Compilation and dependencies
 \begin_layout Standard
 To compile Wudoo VM one need a C++11 capable compiler.
  Development is done on Linux machine with GCC 4.9.2.
+ C++11 Standard Library is the only dependency of the VM.
+ To compile the code, following command should be used:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+make -j 8
+\end_layout
+
+\begin_layout Plain Layout
+
+make test
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+First command is used to compile assembler, CPU and bytecode analyzer.
+ Second command is optional and can be used to verify if VM works correctly.
 \end_layout
 
 \begin_layout Subsection
@@ -195,9 +222,13 @@ As of February 2015, Wudoo VM can be programmed in simple assembly-lookalike
  to the screen, call a function (recursively or not).
  It supports separate compilation to some extent (by supporting static linking).
  But this is already a huge success for me.
+\begin_inset Newpage newpage
+\end_inset
+
+
 \end_layout
 
-\begin_layout Section
+\begin_layout Part
 Architecture
 \begin_inset CommandInset label
 LatexCommand label
@@ -210,6 +241,19 @@ name "sec:Architecture"
 
 \begin_layout Standard
 This section talks about VM's architecture.
+\end_layout
+
+\begin_layout Section
+Instruction set
+\end_layout
+
+\begin_layout Standard
+This section contains description of the VM's CPU instruction set.
+ Each instruction is explained and its syntax is shown so readers can treat
+ this section also as a reference for VM's assembly language.
+\end_layout
+
+\begin_layout Standard
 \begin_inset Newpage newpage
 \end_inset
 
@@ -358,17 +402,81 @@ name "part:Programming"
 \end_layout
 
 \begin_layout Standard
-This part talks about Wudoo VM programming.
+This part describes how to write programs and run them on Wudoo VM.
+ The language used in this part is custom assembly language created for
+ the VM (it is also a target to which higher-level languages can be compiled).
 \end_layout
 
 \begin_layout Section
-Instruction set
+Structure
 \end_layout
 
 \begin_layout Standard
-This section contains description of the VM's CPU instruction set.
- Each instruction is explained and its syntax is shown so readers can treat
- this section also as a reference for VM's assembly language.
+Every Wudoo VM program is a composed from a set of functions.
+ In fact, each assembled file must contain at least one function.
+\end_layout
+
+\begin_layout Standard
+If any instruction is found outside of a function it is gathered, and later
+ all such instructions are insterted into an  
+\family typewriter
+__entry
+\family default
+ function that is the entry point of every program - CPU of the VM calls
+ 
+\family typewriter
+__entry
+\family default
+ function when told to start running.
+ Programmer-written main function is then called by the 
+\family typewriter
+__entry
+\family default
+ function after every out-of-function instruction is executed in order in
+ which they were gathered.
+\end_layout
+
+\begin_layout Standard
+The only constraints placed on the main functions are:
+\end_layout
+
+\begin_layout Itemize
+main function must be defined,
+\end_layout
+
+\begin_layout Itemize
+main function must return a value,
+\end_layout
+
+\begin_layout Standard
+If these conditions are not met assembler rejects the code.
+ Name of the main function is irrelevant as long as it is set with 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+.main:
+\family default
+
+\begin_inset Quotes eld
+\end_inset
+
+ assembler directive and points to a defined function (constraint #1) which
+ returns a value (constraint #2).
+ Name of the main function defaults to 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+main
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Section
