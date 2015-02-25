@@ -18,8 +18,8 @@ using namespace std;
 bool SHOW_HELP = false;
 bool SHOW_VERSION = false;
 
-bool AS_LIB_STATIC = false;
-bool AS_LIB_DYNAMIC = false;
+// are we assembling a library?
+bool AS_LIB = false;
 
 bool VERBOSE = false;
 bool DEBUG = false;
@@ -732,11 +732,8 @@ int main(int argc, char* argv[]) {
         } else if (option == "--debug") {
             DEBUG = true;
             continue;
-        } else if (option == "--lib-static") {
-            AS_LIB_STATIC = true;
-            continue;
-        } else if (option == "--lib-dynamic") {
-            AS_LIB_DYNAMIC = true;
+        } else if (option == "--lib") {
+            AS_LIB = true;
             continue;
         } else if (option == "--Wall") {
             WARNING_ALL = true;
@@ -807,7 +804,7 @@ int main(int argc, char* argv[]) {
         compilename = args[1];
     } else if (args.size() == 1) {
         filename = args[0];
-        if (AS_LIB_STATIC or AS_LIB_DYNAMIC) {
+        if (AS_LIB) {
             compilename = (filename + ".wlib");
         } else {
             compilename = "a.out";
@@ -867,10 +864,10 @@ int main(int argc, char* argv[]) {
             break;
         }
     }
-    if (main_function == "" and not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
+    if (main_function == "" and not AS_LIB) {
         main_function = "main";
     }
-    if (((VERBOSE and main_function != "main" and main_function != "") or DEBUG) and not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
+    if (((VERBOSE and main_function != "main" and main_function != "") or DEBUG) and not AS_LIB) {
         cout << "debug (notice): main function set to: '" << main_function << "'" << endl;
     }
 
@@ -891,7 +888,7 @@ int main(int argc, char* argv[]) {
     // FIXME: this is just a crude check - it does not acctually checks if these instructions set 0 register
     // this must be better implemented or we will receive "function did not set return register" exceptions at runtime
     bool main_is_defined = (find(function_names.begin(), function_names.end(), main_function) != function_names.end());
-    if (not (AS_LIB_STATIC or AS_LIB_DYNAMIC) and main_is_defined) {
+    if (not AS_LIB and main_is_defined) {
         string main_second_but_last;
         try {
             main_second_but_last = *(functions.at(main_function).second.end()-2);
@@ -908,7 +905,7 @@ int main(int argc, char* argv[]) {
             return 1;
         }
     }
-    if (not main_is_defined and (DEBUG or VERBOSE) and not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
+    if (not main_is_defined and (DEBUG or VERBOSE) and not AS_LIB) {
         cout << "notice: main function (" << main_function << ") is not defined, deferring main function check to post-link phase" << endl;
     }
 
@@ -935,7 +932,7 @@ int main(int argc, char* argv[]) {
 
     //////////////////////////
     // GENERATE ENTRY FUNCTION
-    if (not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
+    if (not AS_LIB) {
         function_names.push_back(ENTRY_FUNCTION_NAME);
         function_addresses[ENTRY_FUNCTION_NAME] = starting_instruction;
         // entry function sets global stuff
@@ -1061,7 +1058,7 @@ int main(int argc, char* argv[]) {
 
     ///////////////////////////
     // REPORT FIRST INSTRUCTION
-    if ((VERBOSE or DEBUG) and not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
+    if ((VERBOSE or DEBUG) and not AS_LIB) {
         cout << "message: first instruction pointer: " << starting_instruction << endl;
     }
 
@@ -1137,7 +1134,7 @@ int main(int argc, char* argv[]) {
     //////////////////////////
     // IF ASSEMBLING A LIBRARY
     // WRITE OUT JUMP TABLE
-    if (AS_LIB_STATIC or AS_LIB_DYNAMIC) {
+    if (AS_LIB) {
         if (DEBUG) {
             cout << "debug: jump table has " << jump_table.size() << " entries" << endl;
         }
@@ -1158,7 +1155,7 @@ int main(int argc, char* argv[]) {
     // CHECK IF THE FUNCTION SET AS MAIN IS DEFINED
     // AS ALL THE FUNCTIONS (LOCAL OR LINKED) ARE
     // NOW AVAILABLE
-    if (find(function_names.begin(), function_names.end(), main_function) == function_names.end() and not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
+    if (find(function_names.begin(), function_names.end(), main_function) == function_names.end() and not AS_LIB) {
         cout << "error: main function is undefined: " << main_function << endl;
         return 1;
     }
