@@ -1147,6 +1147,10 @@ int main(int argc, char* argv[]) {
         for (unsigned jmp : jump_table) {
             out.write((const char*)&jmp, sizeof(unsigned));
         }
+    } else {
+        if (DEBUG) {
+            cout << "debug: skipping jump table write (not a library)" << endl;
+        }
     }
 
 
