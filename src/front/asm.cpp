@@ -1198,7 +1198,10 @@ int main(int argc, char* argv[]) {
         // to give correct offset for next function
         try {
             functions_size_so_far += Program::countBytes(functions.at(name).second);
-        } catch ( // FIXME,BUGFIX
+        } catch (const std::out_of_range& e) {
+            cout << "fatal: could not find function '" << name << "' during bytecode write" << endl;
+            exit(1);
+        }
     }
     for (string name : linked_function_names) {
         // function name...
