@@ -1122,7 +1122,7 @@ int main(int argc, char* argv[]) {
             cout << (DEBUG ? "\n" : "") << e << endl;
             exit(1);
         } catch (const std::out_of_range& e) {
-            cout << (DEBUG ? "\n" : "") << e.what() << endl;
+            cout << (DEBUG ? "\n" : "") << "[asm] fatal: could not assemble function '" << name << "' (" << e.what() << ')' << endl;
             exit(1);
         }
 
