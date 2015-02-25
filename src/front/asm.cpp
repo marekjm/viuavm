@@ -445,8 +445,6 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         instr = str::chunk(line);
         operands = str::lstrip(str::sub(line, instr.size()));
 
-        if (DEBUG) { cout << "  " << instruction+1 << ": " << instr; }
-
         if (str::startswith(line, "izero")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
@@ -645,7 +643,6 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             // which means that return value will be discarded
             if (reg == "") { reg = "0"; }
 
-            if (DEBUG) { cout << ' ' << fn_name << ' ' << reg; }
             program.call(fn_name, getint_op(resolveregister(reg, names)));
         } else if (str::startswith(line, "branch")) {
             /*  If branch is given three operands, it means its full, three-operands form is being used.
@@ -693,12 +690,8 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         } else {
             throw ("unimplemented instruction: " + instr);
         }
-
-        if (DEBUG) { cout << '\n'; }
-
         ++instruction;
     }
-    if (DEBUG) { cout << endl; }
 
     return program;
 }
