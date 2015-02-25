@@ -295,6 +295,21 @@ class ByteInstructionsTests(unittest.TestCase):
         self.assertEqual(0, excode)
 
 
+class StringInstructionsTests(unittest.TestCase):
+    """Tests for string instructions.
+    """
+    PATH = './sample/asm/string'
+
+    def testHelloWorld(self):
+        name = 'hello_world.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual('Hello World!', output.strip())
+        self.assertEqual(0, excode)
+
+
 class CastingInstructionsTests(unittest.TestCase):
     """Tests for byte instructions.
     """
