@@ -153,11 +153,6 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
         if (OPCODE(program[offset]) == STRSTORE) {
             inc += string(program+offset+1).size();
         }
-        if (debug) {
-            cout << "increasing instruction offset (" << i+1 << '/';
-            cout << (instr >= 0 ? instr : count+instr) << "): " << opcode_name;
-            cout << ": " << inc << endl;
-        }
         offset += inc;
         if (offset+1 > bytes) {
             cout << "instruction offset out of bounds: check your branches: ";
@@ -183,13 +178,9 @@ Program& Program::calculateBranches(unsigned offset) {
                 break;
             case BRANCH:
                 pointer::inc<bool, int>(ptr);
-                if (debug) { cout << "calculating branch:  true: " << *(ptr+1) << endl; }
                 (*(ptr+1)) = offset + getInstructionBytecodeOffset(*(ptr+1), instruction_count);
-                if (debug) { cout << "calculated branch:   true: " << *(ptr+1) << endl; }
 
-                if (debug) { cout << "calculating branch: false: " << *(ptr+2) << endl; }
                 (*(ptr+2)) = offset + getInstructionBytecodeOffset(*(ptr+2), instruction_count);
-                if (debug) { cout << "calculated branch:  false: " << *(ptr+2) << endl; }
                 break;
         }
     }
