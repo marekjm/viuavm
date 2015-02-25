@@ -130,6 +130,15 @@ reference "part:Programming"
 \end_layout
 
 \begin_layout Subsection
+Compilation and dependencies
+\end_layout
+
+\begin_layout Standard
+To compile Wudoo VM one need a C++11 capable compiler.
+ Development is done on Linux machine with GCC 4.9.2.
+\end_layout
+
+\begin_layout Subsection
 History
 \end_layout
 
