@@ -164,6 +164,10 @@ int main(int argc, char* argv[]) {
     tie(ret_code, return_exception, return_message) = cpu.exitcondition();
 
     if (VERBOSE or DEBUG) {
+        if (STEP_BY_STEP) {
+            // we need extra newline to separate VM CPU output from CPU frontend output
+            cout << '\n';
+        }
         cout << "message: finished: " << cpu.counter() << " instructions executed" << endl;
     }
 
