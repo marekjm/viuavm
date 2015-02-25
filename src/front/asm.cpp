@@ -1039,6 +1039,14 @@ int main(int argc, char* argv[]) {
         bytes += lib_size;
     }
 
+
+    //////////////////////////////////////////////////////////////
+    // EXTEND FUNCTION NAMES VECTOR WITH NAMES OF LINKED FUNCTIONS
+    for (string name : linked_function_names) { function_names.push_back(name); }
+
+
+    /////////////////////////////
+    // REPORT TOTAL BYTECODE SIZE
     if ((VERBOSE or DEBUG) and linked_function_names.size() != 0) {
         cout << "message: total required bytes: " << bytes << " bytes" << endl;
     }
@@ -1047,6 +1055,9 @@ int main(int argc, char* argv[]) {
         cout << "debug: required bytes: " << (bytes-current_link_offset) << " linked" << endl;
     }
 
+
+    ///////////////////////////
+    // REPORT FIRST INSTRUCTION
     if ((VERBOSE or DEBUG) and not (AS_LIB_STATIC or AS_LIB_DYNAMIC)) {
         cout << "message: first instruction pointer: " << starting_instruction << endl;
     }
@@ -1134,11 +1145,6 @@ int main(int argc, char* argv[]) {
             out.write((const char*)&jmp, sizeof(unsigned));
         }
     }
-
-
-    //////////////////////////////////////////////////////////////
-    // EXTEND FUNCTION NAMES VECTOR WITH NAMES OF LINKED FUNCTIONS
-    for (string name : linked_function_names) { function_names.push_back(name); }
 
 
     ///////////////////////////////////////////////
