@@ -1168,11 +1168,6 @@ int main(int argc, char* argv[]) {
     function_ids_section_size += sizeof(uint16_t) * function_names.size();
     // for null characters after function names
     function_ids_section_size += function_names.size();
-    for (string name : linked_function_names) { function_ids_section_size += name.size(); }
-    // we need to insert address (uint16_t) after every function
-    function_ids_section_size += sizeof(uint16_t) * linked_function_names.size();
-    // for null characters after function names
-    function_ids_section_size += linked_function_names.size();
 
 
     /////////////////////////////////////////////
