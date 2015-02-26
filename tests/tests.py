@@ -527,6 +527,15 @@ class FunctionTests(unittest.TestCase):
         self.assertEqual(42, int(output.strip()))
         self.assertEqual(0, excode)
 
+    def testStaticRegisters(self):
+        name = 'static_registers.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [int(i) for i in output.strip().splitlines()])
+        self.assertEqual(0, excode)
+
 
 class ErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.
