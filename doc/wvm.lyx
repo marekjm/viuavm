@@ -252,6 +252,46 @@ This section contains description of the VM's CPU instruction set.
  this section also as a reference for VM's assembly language.
 \end_layout
 
+\begin_layout Subsection
+Integers
+\end_layout
+
+\begin_layout Subsection
+Floats
+\end_layout
+
+\begin_layout Subsection
+Casts
+\end_layout
+
+\begin_layout Subsection
+Booleans
+\end_layout
+
+\begin_layout Subsection
+Strings
+\end_layout
+
+\begin_layout Subsection
+Control flow
+\end_layout
+
+\begin_layout Subsection
+Functions
+\end_layout
+
+\begin_layout Subsection
+Operations on registers
+\end_layout
+
+\begin_layout Subsection
+IO
+\end_layout
+
+\begin_layout Subsection
+Other instructions
+\end_layout
+
 \begin_layout Standard
 \begin_inset Newpage newpage
 \end_inset
@@ -363,26 +403,11 @@ Linkable
 \end_layout
 
 \begin_layout Standard
-This section discusses bytecode format used for libraries, both static and
- dynamic.
- It also talks about differences between the two types of libraries, and
- between them and executable bytecode files.
-\end_layout
-
-\begin_layout Subsubsection
-Static libraries
-\end_layout
-
-\begin_layout Standard
-This section discusses bytecode format specific to static libraries.
-\end_layout
-
-\begin_layout Subsubsection
-Dynamic libraries
-\end_layout
-
-\begin_layout Standard
-This section discusses bytecode format specific to dynamic libraries.
+This section discusses bytecode format used for libraries.
+ In Wudoo VM there is no difference between a static and dynamic libraries.
+ In fact, a library can be linked statically or dynamically without any
+ changes.
+ The only difference is between linkable and executable bytecode.
 \begin_inset Newpage newpage
 \end_inset
 
