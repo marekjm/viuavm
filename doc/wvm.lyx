@@ -450,7 +450,10 @@ main function must return a value,
 
 \begin_layout Standard
 If these conditions are not met assembler rejects the code.
- Name of the main function is irrelevant as long as it is set with 
+\end_layout
+
+\begin_layout Standard
+Name of the main function is irrelevant as long as it is set with 
 \begin_inset Quotes eld
 \end_inset
 
@@ -477,6 +480,16 @@ main
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Subsection
+Assembler directives
+\end_layout
+
+\begin_layout Standard
+When programming in Wudoo VM assembly language, one not only uses instructions
+ from the CPU instruction set but also directives of the assembler.
+ These include things like markers, register names and functions.
 \end_layout
 
 \begin_layout Section
