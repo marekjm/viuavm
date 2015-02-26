@@ -290,10 +290,13 @@ byte* CPU::ress(byte* addr) {
                 cout << "local";
                 break;
             case 2:
-                cout << "static (TODO)";
+                cout << "static (WIP)";
+                break;
+            case 3:
+                cout << "temp (TODO)";
                 break;
             default:
-                cout << "ERROR";
+                cout << "illegal";
         }
     }
 
@@ -309,7 +312,8 @@ byte* CPU::ress(byte* addr) {
             uregisters_size = frames.back()->registers_size;
             break;
         case 2:
-            // TODO: switching to static registers
+            ensureStaticRegisters(frames.back()->function_name);
+            tie(uregisters, ureferences, uregisters_size) = static_registers.at(frames.back()->function_name);
             break;
         case 3:
             // TODO: switching to temporary registers
