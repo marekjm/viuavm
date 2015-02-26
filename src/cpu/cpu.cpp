@@ -135,6 +135,28 @@ void CPU::place(int index, Object* obj) {
     }
 }
 
+void CPU::ensureStaticRegisters(string function_name) {
+    /** Makes sure that static register set for requested function is initialized.
+     */
+    try {
+        static_registers.at(function_name);
+    } catch (const std::out_of_range& e) {
+        // 1) initialise all register set variables
+        int s_registers_size = 16;  // FIXME: size of static register should be customisable
+        Object** s_registers = new Object*[s_registers_size];
+        bool* s_references = new bool[s_registers_size];
+
+        // 2) zero registers and refrences
+        for (int i = 0; i < s_registers_size; ++i) {
+            s_registers[i] = 0;
+            s_references[i] = false;
+        }
+
+        // 3) assign initialised register set to a function name
+        static_registers[function_name] = tuple<Object**, bool*, int>(s_registers, s_references, s_registers_size);
+    }
+}
+
 
 int CPU::run() {
     /*  VM CPU implementation.

@@ -65,6 +65,7 @@ class CPU {
     bool hasrefs(int index);
     Object* fetch(int);
     void place(int, Object*);
+    void ensureStaticRegisters(std::string);
 
     /*  Methods implementing CPU instructions.
      */
