@@ -513,7 +513,7 @@ byte* CPU::arg(byte* addr) {
         b = static_cast<Integer*>(fetch(b))->value();
     }
 
-    uregisters[b] = frames.back()->arguments[a];    // copy pointer from first-operand register to second-operand register
+    uregisters[b] = frames.back()->arguments[a];    // move pointer from first-operand register to second-operand register
     frames.back()->arguments[a] = 0;                // zero the pointer to avoid double free
     ureferences[b] = frames.back()->argreferences[a];  // set reference status
 
