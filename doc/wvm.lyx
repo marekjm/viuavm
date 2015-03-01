@@ -221,7 +221,6 @@ As of February 2015, Wudoo VM can be programmed in simple assembly-lookalike
  Add, subtract, multiply and divide two integers or floats, print a string
  to the screen, call a function (recursively or not).
  It supports separate compilation to some extent (by supporting static linking).
- But this is already a huge success for me.
 \begin_inset Newpage newpage
 \end_inset
 
@@ -251,6 +250,46 @@ Instruction set
 This section contains description of the VM's CPU instruction set.
  Each instruction is explained and its syntax is shown so readers can treat
  this section also as a reference for VM's assembly language.
+\end_layout
+
+\begin_layout Subsection
+Integers
+\end_layout
+
+\begin_layout Subsection
+Floats
+\end_layout
+
+\begin_layout Subsection
+Casts
+\end_layout
+
+\begin_layout Subsection
+Booleans
+\end_layout
+
+\begin_layout Subsection
+Strings
+\end_layout
+
+\begin_layout Subsection
+Control flow
+\end_layout
+
+\begin_layout Subsection
+Functions
+\end_layout
+
+\begin_layout Subsection
+Operations on registers
+\end_layout
+
+\begin_layout Subsection
+IO
+\end_layout
+
+\begin_layout Subsection
+Other instructions
 \end_layout
 
 \begin_layout Standard
@@ -364,26 +403,11 @@ Linkable
 \end_layout
 
 \begin_layout Standard
-This section discusses bytecode format used for libraries, both static and
- dynamic.
- It also talks about differences between the two types of libraries, and
- between them and executable bytecode files.
-\end_layout
-
-\begin_layout Subsubsection
-Static libraries
-\end_layout
-
-\begin_layout Standard
-This section discusses bytecode format specific to static libraries.
-\end_layout
-
-\begin_layout Subsubsection
-Dynamic libraries
-\end_layout
-
-\begin_layout Standard
-This section discusses bytecode format specific to dynamic libraries.
+This section discusses bytecode format used for libraries.
+ In Wudoo VM there is no difference between a static and dynamic libraries.
+ In fact, a library can be linked statically or dynamically without any
+ changes.
+ The only difference is between linkable and executable bytecode.
 \begin_inset Newpage newpage
 \end_inset
 
@@ -438,6 +462,13 @@ __entry
 
 \begin_layout Standard
 The only constraints placed on the main functions are:
+\begin_inset CommandInset label
+LatexCommand label
+name "Main-function-constraints"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Itemize
@@ -450,7 +481,10 @@ main function must return a value,
 
 \begin_layout Standard
 If these conditions are not met assembler rejects the code.
- Name of the main function is irrelevant as long as it is set with 
+\end_layout
+
+\begin_layout Standard
+Name of the main function is irrelevant as long as it is set with 
 \begin_inset Quotes eld
 \end_inset
 
@@ -477,6 +511,441 @@ main
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Section
+Assembler directives
+\end_layout
+
+\begin_layout Standard
+When programming in Wudoo VM assembly language, one not only uses instructions
+ from the CPU instruction set but also directives of the assembler.
+ These include things like markers, register names and functions.
+\end_layout
+
+\begin_layout Subsection
+Defining functions
+\end_layout
+
+\begin_layout Standard
+Functions are composed from CPU instructions wrapped in 
+\family typewriter
+.def
+\family default
+ and 
+\family typewriter
+.end
+\family default
+ directives.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+.def: <function>
+\end_layout
+
+\begin_layout Plain Layout
+
+    <instruction>+
+\end_layout
+
+\begin_layout Plain Layout
+
+    end
+\end_layout
+
+\begin_layout Plain Layout
+
+.end
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Every function should end with with the 
+\family typewriter
+end
+\family default
+ instruction.
+ This is not a hard requirement, and can probably be used in a similar fashion
+ to 
+\family typewriter
+case
+\family default
+'s inside 
+\family typewriter
+switch
+\family default
+ that do end with 
+\family typewriter
+break
+\family default
+ because if the finishing end is omitted control will just flow into the
+ function that is defined next (as it would to the next case inside a switch).
+\end_layout
+
+\begin_layout Subsection
+Markers
+\end_layout
+
+\begin_layout Standard
+Markers are designed as means to ease jumping to different places in code.
+ They can be used in 
+\family typewriter
+jump
+\family default
+ and 
+\family typewriter
+branch
+\family default
+ instructions, as shown below (assembler checks for markers in places where
+ an instruction index is expected).
+ To set a marker 
+\family typewriter
+.mark:
+\family default
+ directive is used.
+\end_layout
+
+\begin_layout Standard
+Markers are especially useful when imlementing loops.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+.def: main 1
+\end_layout
+
+\begin_layout Plain Layout
+
+	istore 1 42
+\end_layout
+
+\begin_layout Plain Layout
+
+	jump :not_so_fast
+\end_layout
+
+\begin_layout Plain Layout
+
+	istore 1 69
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+	.mark: no_so_fast
+\end_layout
+
+\begin_layout Plain Layout
+
+	print 1
+\end_layout
+
+\begin_layout Plain Layout
+
+	izero 0
+\end_layout
+
+\begin_layout Plain Layout
+
+	end
+\end_layout
+
+\begin_layout Plain Layout
+
+.end
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The syntax for setting a marker is:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+.mark: <marker_id>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Names (named registers)
+\end_layout
+
+\begin_layout Standard
+Names can be assigned to registers to make programming in Wudoo VM's assembly
+ language easier.
+ Compare this code:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+.def: main 1
+\end_layout
+
+\begin_layout Plain Layout
+
+	arg 0 1
+\end_layout
+
+\begin_layout Plain Layout
+
+	; some code...
+\end_layout
+
+\begin_layout Plain Layout
+
+	move 1 0
+\end_layout
+
+\begin_layout Plain Layout
+
+	end
+\end_layout
+
+\begin_layout Plain Layout
+
+.end
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+to this:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+.def: main 1
+\end_layout
+
+\begin_layout Plain Layout
+
+	arg 0 1
+\end_layout
+
+\begin_layout Plain Layout
+
+	.name: 7 exit_code
+\end_layout
+
+\begin_layout Plain Layout
+
+	; some code...
+\end_layout
+
+\begin_layout Plain Layout
+
+	move exit_code 0
+\end_layout
+
+\begin_layout Plain Layout
+
+	end
+\end_layout
+
+\begin_layout Plain Layout
+
+.end
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The second example should be more self-explanatory than the first one.
+ In the former listing it is unclear what is being returned (we can only
+ guess it is 
+\family typewriter
+exit_code
+\family default
+) while in the latter on we immediately know what's going on.
+\end_layout
+
+\begin_layout Standard
+The syntax for naming registers is:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+.name: <register_number> <name>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Alternative main function
+\end_layout
+
+\begin_layout Standard
+Alternative main function may be set using .main: directive.
+ Code in the following listing will not produce an error because the assembler
+ knows that main function name is changed.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+.def: nondefault_main_function 1
+\end_layout
+
+\begin_layout Plain Layout
+
+	istore 1 42
+\end_layout
+
+\begin_layout Plain Layout
+
+	print 1
+\end_layout
+
+\begin_layout Plain Layout
+
+	izero 0
+\end_layout
+
+\begin_layout Plain Layout
+
+	end
+\end_layout
+
+\begin_layout Plain Layout
+
+.end
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+.main: nondefault_main_function
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Alternative main function must still meet all constraints mentioned in Section
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "Main-function-constraints"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Static linking
+\end_layout
+
+\begin_layout Standard
+Static linking is done during assembling, in linking phase.
+ To indicate that a library should be linked 
+\family typewriter
+.link:
+\family default
+ directive is used.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+.link: main.wlib
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The very short snippet above can actually assemble without a single warning,
+ provided function named 
+\family typewriter
+main
+\family default
+ is defined in the 
+\family typewriter
+main.wlib
+\family default
+ library.
+\end_layout
+
+\begin_layout Standard
+No special steps must be performed on the command line to assemble program
+ that links external libraries.
+ However, special steps are required when assembling a library - 
+\family typewriter
+--lib
+\family default
+ option must be passed to the assembler.
+ This will ensure no error is thrown if no main function is found, and generate
+ jump table (which is not present in the executable form of the bytecode).
 \end_layout
 
 \begin_layout Section
