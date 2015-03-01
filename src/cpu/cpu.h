@@ -201,11 +201,8 @@ class CPU {
                 bool* static_references_to_free;
                 int static_registers_size_to_free;
                 std::tie(static_registers_to_free, static_references_to_free, static_registers_size_to_free) = sr.second;
-                std::cout << "freeing static registers of: '" << sr.first << "'" << std::endl;
                 for (int i = 0; i < static_registers_size_to_free; ++i) {
-                    if (static_registers_to_free[i]) {
-                        delete static_registers_to_free[i];
-                    }
+                    if (static_registers_to_free[i]) { delete static_registers_to_free[i]; }
                 }
                 delete[] static_references_to_free;
                 delete[] static_registers_to_free;
