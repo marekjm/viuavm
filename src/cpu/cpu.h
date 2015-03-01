@@ -8,6 +8,7 @@
 #include <vector>
 #include <map>
 #include <tuple>
+#include <algorithm>
 #include "../bytecode/bytetypedef.h"
 #include "../types/object.h"
 #include "frame.h"
@@ -195,6 +196,21 @@ class CPU {
              *  if you want to keep it around after the CPU is finished.
              */
             if (bytecode) { delete[] bytecode; }
+            for (std::pair<std::string, std::tuple<Object**, bool*, int> > sr : static_registers) {
+                Object** static_registers_to_free;
+                bool* static_references_to_free;
+                int static_registers_size_to_free;
+                std::tie(static_registers_to_free, static_references_to_free, static_registers_size_to_free) = sr.second;
+                std::cout << "freeing static registers of: '" << sr.first << "'" << std::endl;
+                for (int i = 0; i < static_registers_size_to_free; ++i) {
+                    if (static_registers_to_free[i]) {
+                        delete static_registers_to_free[i];
+                    }
+                }
+                delete[] static_references_to_free;
+                delete[] static_registers_to_free;
+                static_registers.erase(sr.first);
+            }
         }
 };
 
