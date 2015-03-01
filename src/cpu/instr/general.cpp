@@ -446,6 +446,7 @@ byte* CPU::param(byte* addr) {
 
     if (a >= frame_new->arguments_size) { throw "parameter register index out of bounds (greater than arguments set size) while adding parameter"; }
     frame_new->arguments[a] = fetch(b)->copy();
+    frame_new->references[a] = false;
 
     return addr;
 }
