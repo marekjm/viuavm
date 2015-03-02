@@ -206,6 +206,8 @@ class CPU {
                 }
                 delete[] static_references_to_free;
                 delete[] static_registers_to_free;
+
+                // this causes valgrind to SCREAM with errors...
                 static_registers.erase(sr.first);
             }
         }
