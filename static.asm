@@ -2,8 +2,6 @@
     ; switch to static register set
     ress static
 
-    arg 0 3
-
     ; check if 1 register is null
     isnull 1 2
     ; invert the check (check if register 1 is *not null*)
@@ -13,12 +11,19 @@
     ; otherwise continue execution
     branch 2 :increase
 
-    ; these two instructions are executed only when 1 register was null
+    ; these instructions are executed only when 1 register was null
     istore 1 0
+    arg 0 3
     jump :report
 
     .mark: increase
     iinc 1
+
+    tmpri 1
+    ress local
+    tmpro 1
+
+    arg 0 3
 
     ; integer at 1 is less than N
     ilt 1 3 4
