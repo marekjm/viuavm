@@ -8,6 +8,7 @@
 #include <vector>
 #include <map>
 #include <tuple>
+#include <algorithm>
 #include "../bytecode/bytetypedef.h"
 #include "../types/object.h"
 #include "frame.h"
@@ -38,6 +39,9 @@ class CPU {
     // Temporary register
     Object* tmp;
 
+    // Static registers
+    std::map<std::string, std::tuple<Object**, bool*, int> > static_registers;
+
     /*  Call stack.
      */
     std::vector<Frame*> frames;
@@ -62,6 +66,7 @@ class CPU {
     bool hasrefs(int index);
     Object* fetch(int);
     void place(int, Object*);
+    void ensureStaticRegisters(std::string);
 
     /*  Methods implementing CPU instructions.
      */
@@ -163,6 +168,7 @@ class CPU {
             registers(0), references(0), reg_count(r),
             uregisters(0), ureferences(0), uregisters_size(0),
             tmp(0),
+            static_registers({}),
             frame_new(0),
             return_code(0), return_exception(""), return_message(""),
             instruction_counter(0),
@@ -190,6 +196,20 @@ class CPU {
              *  if you want to keep it around after the CPU is finished.
              */
             if (bytecode) { delete[] bytecode; }
+            for (std::pair<std::string, std::tuple<Object**, bool*, int> > sr : static_registers) {
+                Object** static_registers_to_free;
+                bool* static_references_to_free;
+                int static_registers_size_to_free;
+                std::tie(static_registers_to_free, static_references_to_free, static_registers_size_to_free) = sr.second;
+                for (int i = 0; i < static_registers_size_to_free; ++i) {
+                    if (static_registers_to_free[i]) { delete static_registers_to_free[i]; }
+                }
+                delete[] static_references_to_free;
+                delete[] static_registers_to_free;
+
+                // this causes valgrind to SCREAM with errors...
+                static_registers.erase(sr.first);
+            }
         }
 };
 

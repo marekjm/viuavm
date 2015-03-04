@@ -562,6 +562,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
                 "global",   // global register set
                 "local",    // local register set for function
                 "static",   // static register set
+                "temp",     // temporary register set
             };
             if (find(legal_register_sets.begin(), legal_register_sets.end(), operands) == legal_register_sets.end()) {
                 throw ("illegal register set name in ress instruction: '" + operands + "'");

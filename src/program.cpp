@@ -697,6 +697,8 @@ Program& Program::ress(string a) {
         *((int*)addr_ptr) = 1;
     } else if (a == "static") {
         *((int*)addr_ptr) = 2;
+    } else if (a == "temp") {
+        *((int*)addr_ptr) = 3;
     }
     pointer::inc<int, byte>(addr_ptr);
     return (*this);

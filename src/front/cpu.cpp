@@ -168,7 +168,7 @@ int main(int argc, char* argv[]) {
             // we need extra newline to separate VM CPU output from CPU frontend output
             cout << '\n';
         }
-        cout << "message: finished: " << cpu.counter() << " instructions executed" << endl;
+        cout << "message: execution " << (return_exception.size() == 0 ? "finished" : "broken") << ": " << cpu.counter() << " instructions executed" << endl;
     }
 
     if (ret_code != 0 and return_exception.size()) {

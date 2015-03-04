@@ -290,10 +290,13 @@ byte* CPU::ress(byte* addr) {
                 cout << "local";
                 break;
             case 2:
-                cout << "static (TODO)";
+                cout << "static (WIP)";
+                break;
+            case 3:
+                cout << "temp (TODO)";
                 break;
             default:
-                cout << "ERROR";
+                cout << "illegal";
         }
     }
 
@@ -309,8 +312,11 @@ byte* CPU::ress(byte* addr) {
             uregisters_size = frames.back()->registers_size;
             break;
         case 2:
-            // TODO: switching to static registers
+            ensureStaticRegisters(frames.back()->function_name);
+            tie(uregisters, ureferences, uregisters_size) = static_registers.at(frames.back()->function_name);
             break;
+        case 3:
+            // TODO: switching to temporary registers
         default:
             throw "illegal register set ID in ress instruction";
     }
@@ -439,7 +445,8 @@ byte* CPU::param(byte* addr) {
     }
 
     if (a >= frame_new->arguments_size) { throw "parameter register index out of bounds (greater than arguments set size) while adding parameter"; }
-    frame_new->arguments[a] = uregisters[b]->copy();
+    frame_new->arguments[a] = fetch(b)->copy();
+    frame_new->references[a] = false;
 
     return addr;
 }
@@ -507,7 +514,12 @@ byte* CPU::arg(byte* addr) {
         b = static_cast<Integer*>(fetch(b))->value();
     }
 
-    uregisters[b] = frames.back()->arguments[a];    // copy pointer from first-operand register to second-operand register
+    if (a >= frames.back()->arguments_size) {
+        ostringstream oss;
+        oss << "invalid read: read from argument register out of bounds: " << a;
+        throw oss.str().c_str();
+    }
+    uregisters[b] = frames.back()->arguments[a];    // move pointer from first-operand register to second-operand register
     frames.back()->arguments[a] = 0;                // zero the pointer to avoid double free
     ureferences[b] = frames.back()->argreferences[a];  // set reference status
 
