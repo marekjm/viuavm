@@ -41,7 +41,7 @@
 .end
 
 .def: main 1
-    istore 1 3
+    istore 1 10
     frame 1
     param 0 1
     call counter 0
