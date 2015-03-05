@@ -32,12 +32,14 @@ bool ERROR_ALL = false;
 bool WARNING_MISSING_END = false;
 bool WARNING_EMPTY_FUNCTION_BODY = false;
 bool WARNING_OPERANDLESS_FRAME = false;
+bool WARNING_GLOBALS_IN_LIB = false;
 
 
 // ERRORS
 bool ERROR_MISSING_END = false;
 bool ERROR_EMPTY_FUNCTION_BODY = false;
 bool ERROR_OPERANDLESS_FRAME = false;
+bool ERROR_GLOBALS_IN_LIB = false;
 
 
 // ASSEMBLY CONSTANTS
@@ -567,6 +569,13 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             if (find(legal_register_sets.begin(), legal_register_sets.end(), operands) == legal_register_sets.end()) {
                 throw ("illegal register set name in ress instruction: '" + operands + "'");
             }
+            if (operands == "global" and AS_LIB) {
+                if (ERROR_GLOBALS_IN_LIB or ERROR_ALL) {
+                    throw "global registers used in library function";
+                } else if (WARNING_GLOBALS_IN_LIB or WARNING_ALL) {
+                    cout << "warning: global registers used in library function" << endl;
+                }
+            }
             program.ress(operands);
         } else if (str::startswith(line, "tmpri")) {
             string regno_chnk;
@@ -751,6 +760,9 @@ int main(int argc, char* argv[]) {
         } else if (option == "--Wopless-frame") {
             WARNING_OPERANDLESS_FRAME = true;
             continue;
+        } else if (option == "--Wglobals-in-lib") {
+            WARNING_GLOBALS_IN_LIB = true;
+            continue;
         } else if (option == "--Emissing-end") {
             ERROR_MISSING_END = true;
             continue;
@@ -759,6 +771,9 @@ int main(int argc, char* argv[]) {
             continue;
         } else if (option == "--Eopless-frame") {
             ERROR_OPERANDLESS_FRAME = true;
+            continue;
+        } else if (option == "--Eglobals-in-lib") {
+            ERROR_GLOBALS_IN_LIB = true;
             continue;
         }
         args.push_back(argv[i]);
@@ -1095,7 +1110,7 @@ int main(int argc, char* argv[]) {
                 cout << " (" << fun_bytes << " bytes at byte " << functions_section_size << ')' << endl;
             }
         } catch (const string& e) {
-            cout << e << endl;
+            cout << "fatal: error during function size count (pre-assembling): " << e << endl;
             exit(1);
         } catch (const std::out_of_range& e) {
             cout << e.what() << endl;
@@ -1107,10 +1122,10 @@ int main(int argc, char* argv[]) {
             assemble(func.setdebug(DEBUG), functions.at(name).second, function_names);
             func.calculateBranches(functions_section_size);
         } catch (const string& e) {
-            cout << (DEBUG ? "\n" : "") << e << endl;
+            cout << (DEBUG ? "\n" : "") << "fatal: error during assembling: " << e << endl;
             exit(1);
         } catch (const char*& e) {
-            cout << (DEBUG ? "\n" : "") << e << endl;
+            cout << (DEBUG ? "\n" : "") << "fatal: error during assembling: " << e << endl;
             exit(1);
         } catch (const std::out_of_range& e) {
             cout << (DEBUG ? "\n" : "") << "[asm] fatal: could not assemble function '" << name << "' (" << e.what() << ')' << endl;
