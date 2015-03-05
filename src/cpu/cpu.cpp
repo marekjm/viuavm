@@ -163,6 +163,26 @@ byte* CPU::begin() {
     return (instruction_pointer = bytecode+executable_offset);
 }
 
+CPU& CPU::iframe(Frame* frm) {
+    /** Set initial frame.
+     */
+    Frame *initial_frame;
+    if (frm == 0) {
+        initial_frame = new Frame(0, 0, 0);
+        initial_frame->registers = registers;
+        initial_frame->references = references;
+        initial_frame->registers_size = reg_count;
+        initial_frame->function_name = "__entry";
+    } else {
+        initial_frame = frm;
+    }
+    uregisters = initial_frame->registers;
+    ureferences = initial_frame->references;
+    uregisters_size = initial_frame->registers_size;
+    frames.push_back(initial_frame);
+    return (*this);
+}
+
 byte* CPU::tick() {
     /** Perform a *tick*, i.e. run a single CPU instruction.
      */
@@ -397,14 +417,7 @@ int CPU::run() {
         throw "null bytecode (maybe not loaded?)";
     }
 
-    // initial frame for entry function call
-    Frame *initial_frame = new Frame(0, 0, 0);
-    initial_frame->function_name = "__entry";
-    uregisters = (initial_frame->registers = registers);
-    ureferences = (initial_frame->references = references);
-    uregisters_size = (initial_frame->registers_size = reg_count);
-    frames.push_back(initial_frame);
-
+    iframe();
     begin(); // set the instruction pointer
     while (tick()) {}
 

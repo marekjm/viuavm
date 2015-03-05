@@ -157,6 +157,9 @@ class CPU {
         CPU& mapfunction(const std::string&, unsigned);
 
         byte* begin();
+        inline byte* end() { return 0; }
+
+        CPU& iframe(Frame* frm = 0);
         byte* tick();
 
         int run();
