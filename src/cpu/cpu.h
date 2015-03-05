@@ -59,6 +59,7 @@ class CPU {
     std::string return_message;     // message set by exception
 
     unsigned instruction_counter;
+    byte* instruction_pointer;
 
     /*  Methods to deal with registers.
      */
@@ -155,6 +156,9 @@ class CPU {
 
         CPU& mapfunction(const std::string&, unsigned);
 
+        byte* begin();
+        byte* tick();
+
         int run();
         inline unsigned counter() { return instruction_counter; }
 
@@ -171,7 +175,7 @@ class CPU {
             static_registers({}),
             frame_new(0),
             return_code(0), return_exception(""), return_message(""),
-            instruction_counter(0),
+            instruction_counter(0), instruction_pointer(0),
             debug(false), errors(false), stepping(false)
         {
             /*  Basic constructor.
