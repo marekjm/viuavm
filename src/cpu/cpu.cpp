@@ -157,19 +157,245 @@ void CPU::ensureStaticRegisters(string function_name) {
     }
 }
 
+byte* CPU::begin() {
+    /** Set instruction pointer to the execution beginning position.
+     */
+    return (instruction_pointer = bytecode+executable_offset);
+}
+
+byte* CPU::tick() {
+    /** Perform a *tick*, i.e. run a single CPU instruction.
+     */
+    bool halt = false;
+    byte* previous_instruction_pointer = instruction_pointer;
+    ++instruction_counter;
+
+    if (debug) {
+        cout << "CPU: bytecode ";
+        cout << dec << ((long)instruction_pointer - (long)bytecode);
+        cout << " at 0x" << hex << (long)instruction_pointer;
+        cout << dec << ": ";
+    }
+
+    try {
+        if (debug) { cout << OP_NAMES.at(OPCODE(*instruction_pointer)); }
+        switch (*instruction_pointer) {
+            case IZERO:
+                instruction_pointer = izero(instruction_pointer+1);
+                break;
+            case ISTORE:
+                instruction_pointer = istore(instruction_pointer+1);
+                break;
+            case IADD:
+                instruction_pointer = iadd(instruction_pointer+1);
+                break;
+            case ISUB:
+                instruction_pointer = isub(instruction_pointer+1);
+                break;
+            case IMUL:
+                instruction_pointer = imul(instruction_pointer+1);
+                break;
+            case IDIV:
+                instruction_pointer = idiv(instruction_pointer+1);
+                break;
+            case IINC:
+                instruction_pointer = iinc(instruction_pointer+1);
+                break;
+            case IDEC:
+                instruction_pointer = idec(instruction_pointer+1);
+                break;
+            case ILT:
+                instruction_pointer = ilt(instruction_pointer+1);
+                break;
+            case ILTE:
+                instruction_pointer = ilte(instruction_pointer+1);
+                break;
+            case IGT:
+                instruction_pointer = igt(instruction_pointer+1);
+                break;
+            case IGTE:
+                instruction_pointer = igte(instruction_pointer+1);
+                break;
+            case IEQ:
+                instruction_pointer = ieq(instruction_pointer+1);
+                break;
+            case FSTORE:
+                instruction_pointer = fstore(instruction_pointer+1);
+                break;
+            case FADD:
+                instruction_pointer = fadd(instruction_pointer+1);
+                break;
+            case FSUB:
+                instruction_pointer = fsub(instruction_pointer+1);
+                break;
+            case FMUL:
+                instruction_pointer = fmul(instruction_pointer+1);
+                break;
+            case FDIV:
+                instruction_pointer = fdiv(instruction_pointer+1);
+                break;
+            case FLT:
+                instruction_pointer = flt(instruction_pointer+1);
+                break;
+            case FLTE:
+                instruction_pointer = flte(instruction_pointer+1);
+                break;
+            case FGT:
+                instruction_pointer = fgt(instruction_pointer+1);
+                break;
+            case FGTE:
+                instruction_pointer = fgte(instruction_pointer+1);
+                break;
+            case FEQ:
+                instruction_pointer = feq(instruction_pointer+1);
+                break;
+            case BSTORE:
+                instruction_pointer = bstore(instruction_pointer+1);
+                break;
+            case ITOF:
+                instruction_pointer = itof(instruction_pointer+1);
+                break;
+            case FTOI:
+                instruction_pointer = ftoi(instruction_pointer+1);
+                break;
+            case STRSTORE:
+                instruction_pointer = strstore(instruction_pointer+1);
+                break;
+            case NOT:
+                instruction_pointer = lognot(instruction_pointer+1);
+                break;
+            case AND:
+                instruction_pointer = logand(instruction_pointer+1);
+                break;
+            case OR:
+                instruction_pointer = logor(instruction_pointer+1);
+                break;
+            case MOVE:
+                instruction_pointer = move(instruction_pointer+1);
+                break;
+            case COPY:
+                instruction_pointer = copy(instruction_pointer+1);
+                break;
+            case REF:
+                instruction_pointer = ref(instruction_pointer+1);
+                break;
+            case SWAP:
+                instruction_pointer = swap(instruction_pointer+1);
+                break;
+            case FREE:
+                instruction_pointer = free(instruction_pointer+1);
+                break;
+            case EMPTY:
+                instruction_pointer = empty(instruction_pointer+1);
+                break;
+            case ISNULL:
+                instruction_pointer = isnull(instruction_pointer+1);
+                break;
+            case RESS:
+                instruction_pointer = ress(instruction_pointer+1);
+                break;
+            case TMPRI:
+                instruction_pointer = tmpri(instruction_pointer+1);
+                break;
+            case TMPRO:
+                instruction_pointer = tmpro(instruction_pointer+1);
+                break;
+            case PRINT:
+                instruction_pointer = print(instruction_pointer+1);
+                break;
+            case ECHO:
+                instruction_pointer = echo(instruction_pointer+1);
+                break;
+            case FRAME:
+                instruction_pointer = frame(instruction_pointer+1);
+                break;
+            case PARAM:
+                instruction_pointer = param(instruction_pointer+1);
+                break;
+            case PAREF:
+                instruction_pointer = paref(instruction_pointer+1);
+                break;
+            case ARG:
+                instruction_pointer = arg(instruction_pointer+1);
+                break;
+            case CALL:
+                instruction_pointer = call(instruction_pointer+1);
+                break;
+            case END:
+                instruction_pointer = end(instruction_pointer);
+                break;
+            case JUMP:
+                instruction_pointer = jump(instruction_pointer+1);
+                break;
+            case BRANCH:
+                instruction_pointer = branch(instruction_pointer+1);
+                break;
+            case HALT:
+                halt = true;
+                break;
+            case PASS:
+                ++instruction_pointer;
+                break;
+            case NOP:
+                ++instruction_pointer;
+                break;
+            default:
+                ostringstream error;
+                error << "unrecognised instruction (bytecode value: " << *((int*)bytecode) << ")";
+                throw error.str().c_str();
+        }
+        if (debug and not stepping) { cout << endl; }
+    } catch (const char*& e) {
+        return_code = 1;
+        return_message = string(e);
+        return_exception = "RuntimeException";
+        return 0;
+    } catch (const string& e) {
+        return_code = 1;
+        return_message = string(e);
+        return_exception =  "RuntimeException";
+        return 0;
+    }
+
+    if (halt or frames.size() == 0) { return 0; }
+
+    if (instruction_pointer >= (bytecode+bytecode_size)) {
+        return_code = 1;
+        return_exception = "InvalidBytecodeAddress";
+        return_message = string("instruction address out of bounds");
+        return 0;
+    }
+
+    if (instruction_pointer == previous_instruction_pointer and OPCODE(*instruction_pointer) != END) {
+        return_code = 2;
+        ostringstream oss;
+        return_exception = "InstructionUnchanged";
+        oss << "instruction pointer did not change, possibly endless loop\n";
+        oss << "note: instruction index was " << (long)(instruction_pointer-bytecode) << " and the opcode was '" << OP_NAMES.at(OPCODE(*instruction_pointer)) << "'";
+        if (OPCODE(*instruction_pointer) == CALL) {
+            oss << '\n';
+            oss << "note: this was caused by 'call' opcode immediately calling itself\n"
+                << "      such situation may have several sources, e.g. empty function definition or\n"
+                << "      a function which calls itself in its first instruction";
+        }
+        return_message = oss.str();
+        return 0;
+    }
+
+    if (stepping) {
+        string ins;
+        getline(cin, ins);
+    }
+
+    return instruction_pointer;
+}
 
 int CPU::run() {
     /*  VM CPU implementation.
-     *
-     *  A giant switch-in-while which iterates over bytecode and executes encoded instructions.
      */
     if (!bytecode) {
         throw "null bytecode (maybe not loaded?)";
     }
-    bool halt = false;
-
-    byte* instr_ptr = bytecode+executable_offset; // instruction pointer
-    byte* previous_instr_ptr;
 
     // initial frame for entry function call
     Frame *initial_frame = new Frame(0, 0, 0);
@@ -179,227 +405,8 @@ int CPU::run() {
     uregisters_size = (initial_frame->registers_size = reg_count);
     frames.push_back(initial_frame);
 
-    while (true) {
-        previous_instr_ptr = instr_ptr;
-        ++instruction_counter;
-
-        if (debug) {
-            cout << "CPU: bytecode ";
-            cout << dec << ((long)instr_ptr - (long)bytecode);
-            cout << " at 0x" << hex << (long)instr_ptr;
-            cout << dec << ": ";
-        }
-
-        try {
-            if (debug) { cout << OP_NAMES.at(OPCODE(*instr_ptr)); }
-            switch (*instr_ptr) {
-                case IZERO:
-                    instr_ptr = izero(instr_ptr+1);
-                    break;
-                case ISTORE:
-                    instr_ptr = istore(instr_ptr+1);
-                    break;
-                case IADD:
-                    instr_ptr = iadd(instr_ptr+1);
-                    break;
-                case ISUB:
-                    instr_ptr = isub(instr_ptr+1);
-                    break;
-                case IMUL:
-                    instr_ptr = imul(instr_ptr+1);
-                    break;
-                case IDIV:
-                    instr_ptr = idiv(instr_ptr+1);
-                    break;
-                case IINC:
-                    instr_ptr = iinc(instr_ptr+1);
-                    break;
-                case IDEC:
-                    instr_ptr = idec(instr_ptr+1);
-                    break;
-                case ILT:
-                    instr_ptr = ilt(instr_ptr+1);
-                    break;
-                case ILTE:
-                    instr_ptr = ilte(instr_ptr+1);
-                    break;
-                case IGT:
-                    instr_ptr = igt(instr_ptr+1);
-                    break;
-                case IGTE:
-                    instr_ptr = igte(instr_ptr+1);
-                    break;
-                case IEQ:
-                    instr_ptr = ieq(instr_ptr+1);
-                    break;
-                case FSTORE:
-                    instr_ptr = fstore(instr_ptr+1);
-                    break;
-                case FADD:
-                    instr_ptr = fadd(instr_ptr+1);
-                    break;
-                case FSUB:
-                    instr_ptr = fsub(instr_ptr+1);
-                    break;
-                case FMUL:
-                    instr_ptr = fmul(instr_ptr+1);
-                    break;
-                case FDIV:
-                    instr_ptr = fdiv(instr_ptr+1);
-                    break;
-                case FLT:
-                    instr_ptr = flt(instr_ptr+1);
-                    break;
-                case FLTE:
-                    instr_ptr = flte(instr_ptr+1);
-                    break;
-                case FGT:
-                    instr_ptr = fgt(instr_ptr+1);
-                    break;
-                case FGTE:
-                    instr_ptr = fgte(instr_ptr+1);
-                    break;
-                case FEQ:
-                    instr_ptr = feq(instr_ptr+1);
-                    break;
-                case BSTORE:
-                    instr_ptr = bstore(instr_ptr+1);
-                    break;
-                case ITOF:
-                    instr_ptr = itof(instr_ptr+1);
-                    break;
-                case FTOI:
-                    instr_ptr = ftoi(instr_ptr+1);
-                    break;
-                case STRSTORE:
-                    instr_ptr = strstore(instr_ptr+1);
-                    break;
-                case NOT:
-                    instr_ptr = lognot(instr_ptr+1);
-                    break;
-                case AND:
-                    instr_ptr = logand(instr_ptr+1);
-                    break;
-                case OR:
-                    instr_ptr = logor(instr_ptr+1);
-                    break;
-                case MOVE:
-                    instr_ptr = move(instr_ptr+1);
-                    break;
-                case COPY:
-                    instr_ptr = copy(instr_ptr+1);
-                    break;
-                case REF:
-                    instr_ptr = ref(instr_ptr+1);
-                    break;
-                case SWAP:
-                    instr_ptr = swap(instr_ptr+1);
-                    break;
-                case FREE:
-                    instr_ptr = free(instr_ptr+1);
-                    break;
-                case EMPTY:
-                    instr_ptr = empty(instr_ptr+1);
-                    break;
-                case ISNULL:
-                    instr_ptr = isnull(instr_ptr+1);
-                    break;
-                case RESS:
-                    instr_ptr = ress(instr_ptr+1);
-                    break;
-                case TMPRI:
-                    instr_ptr = tmpri(instr_ptr+1);
-                    break;
-                case TMPRO:
-                    instr_ptr = tmpro(instr_ptr+1);
-                    break;
-                case PRINT:
-                    instr_ptr = print(instr_ptr+1);
-                    break;
-                case ECHO:
-                    instr_ptr = echo(instr_ptr+1);
-                    break;
-                case FRAME:
-                    instr_ptr = frame(instr_ptr+1);
-                    break;
-                case PARAM:
-                    instr_ptr = param(instr_ptr+1);
-                    break;
-                case PAREF:
-                    instr_ptr = paref(instr_ptr+1);
-                    break;
-                case ARG:
-                    instr_ptr = arg(instr_ptr+1);
-                    break;
-                case CALL:
-                    instr_ptr = call(instr_ptr+1);
-                    break;
-                case END:
-                    instr_ptr = end(instr_ptr);
-                    break;
-                case JUMP:
-                    instr_ptr = jump(instr_ptr+1);
-                    break;
-                case BRANCH:
-                    instr_ptr = branch(instr_ptr+1);
-                    break;
-                case HALT:
-                    halt = true;
-                    break;
-                case PASS:
-                    ++instr_ptr;
-                    break;
-                case NOP:
-                    ++instr_ptr;
-                    break;
-                default:
-                    ostringstream error;
-                    error << "unrecognised instruction (bytecode value: " << *((int*)bytecode) << ")";
-                    throw error.str().c_str();
-            }
-            if (debug and not stepping) { cout << endl; }
-        } catch (const char*& e) {
-            return_code = 1;
-            return_message = string(e);
-            return_exception = "RuntimeException";
-            break;
-        } catch (const string& e) {
-            return_code = 1;
-            return_message = string(e);
-            return_exception =  "RuntimeException";
-            break;
-        }
-
-        if (halt or frames.size() == 0) { break; }
-
-        if (instr_ptr >= (bytecode+bytecode_size)) {
-            return_code = 1;
-            return_exception = "InvalidBytecodeAddress";
-            return_message = string("instruction address out of bounds");
-            break;
-        }
-
-        if (instr_ptr == previous_instr_ptr and OPCODE(*instr_ptr) != END) {
-            return_code = 2;
-            ostringstream oss;
-            return_exception = "InstructionUnchanged";
-            oss << "instruction pointer did not change, possibly endless loop\n";
-            oss << "note: instruction index was " << (long)(instr_ptr-bytecode) << " and the opcode was '" << OP_NAMES.at(OPCODE(*instr_ptr)) << "'";
-            if (OPCODE(*instr_ptr) == CALL) {
-                oss << '\n';
-                oss << "note: this was caused by 'call' opcode immediately calling itself\n"
-                    << "      such situation may have several sources, e.g. empty function definition or\n"
-                    << "      a function which calls itself in its first instruction";
-            }
-            return_message = oss.str();
-            break;
-        }
-
-        if (stepping) {
-            string ins;
-            getline(cin, ins);
-        }
-    }
+    begin(); // set the instruction pointer
+    while (tick()) {}
 
     if (return_code == 0 and uregisters[0]) {
         // if return code if the default one and
