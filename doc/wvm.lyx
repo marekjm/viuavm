@@ -292,24 +292,6 @@ IO
 Other instructions
 \end_layout
 
-\begin_layout Standard
-\begin_inset Newpage newpage
-\end_inset
-
-
-\end_layout
-
-\begin_layout Part
-Virtual Machine
-\begin_inset CommandInset label
-LatexCommand label
-name "part:Virtual-Machine"
-
-\end_inset
-
-
-\end_layout
-
 \begin_layout Section
 Register sets
 \end_layout
@@ -374,12 +356,38 @@ Type system
 This section talks about type system of Wudoo VM.
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Part
+Virtual Machine
+\begin_inset CommandInset label
+LatexCommand label
+name "part:Virtual-Machine"
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 Functions
 \end_layout
 
 \begin_layout Standard
 Functions in Wudoo VM.
+\end_layout
+
+\begin_layout Subsection
+Closures
+\end_layout
+
+\begin_layout Standard
+This subsection discusses closure implementation in Wudoo VM.
 \end_layout
 
 \begin_layout Section
@@ -768,7 +776,7 @@ status open
 
 \begin_layout Plain Layout
 
-	.name: 7 exit_code
+	.name: 7 eax
 \end_layout
 
 \begin_layout Plain Layout
@@ -778,7 +786,7 @@ status open
 
 \begin_layout Plain Layout
 
-	move exit_code 0
+	move eax 0
 \end_layout
 
 \begin_layout Plain Layout
@@ -953,7 +961,8 @@ Examples
 \end_layout
 
 \begin_layout Standard
-Sample programs that can be run on Wudoo VM.
+Sample programs that run on Wudoo VM can be found in sample/ directory in
+ source code repository of the VM: https://github.com/marekjm/wudoovm .
 \end_layout
 
 \end_body
