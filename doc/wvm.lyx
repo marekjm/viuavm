@@ -375,6 +375,48 @@ name "part:Virtual-Machine"
 \end_layout
 
 \begin_layout Section
+Instruction operands
+\end_layout
+
+\begin_layout Standard
+Instructions operate on registers and usually operands are just register
+ indexes, this is the simplest case.
+\end_layout
+
+\begin_layout Subsection
+Values
+\end_layout
+
+\begin_layout Standard
+Registers that contain a value are overwritten when another value is put
+ in them.
+\end_layout
+
+\begin_layout Subsection
+References
+\end_layout
+
+\begin_layout Standard
+Registers that contain a reference are not overwritten; instead, they adjust
+ the value of the object they reference.
+ The change appears in every register that holds a reference to changed
+ object.
+\end_layout
+
+\begin_layout Subsection
+At-register operator
+\end_layout
+
+\begin_layout Standard
+If an operand is just an index it can be preceded by @ character to indicate
+ that it is an at-register index.
+ This means that CPU should not take an object from register with this index
+ but rather 1) look into register with given index, 2) use the object it
+ finds as integer and take a value from it, 3) use obtained value as an
+ index for final operand.
+\end_layout
+
+\begin_layout Section
 Functions
 \end_layout
 
