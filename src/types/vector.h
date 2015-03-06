@@ -5,7 +5,7 @@
 
 #include <string>
 #include <vector>
-#include <stringstream>
+#include <sstream>
 #include "object.h"
 
 
@@ -37,8 +37,13 @@ class Vector : public Object {
 
         std::vector<Object*>& value() { return internal_object; }
 
-        Vector(): {}
-        Vector(const std::vector<Object*>& v): {
+        Object* insert(int, Object*);
+        Object* push(Object*);
+        Object* pop(int);
+        int len();
+
+        Vector() {}
+        Vector(const std::vector<Object*>& v) {
             for (unsigned i = 0; i < v.size(); ++i) {
                 internal_object.push_back(v[i]->copy());
             }
