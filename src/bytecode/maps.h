@@ -56,6 +56,13 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "stradd", sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
     { "strsub", sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
 
+    { "vec", sizeof((byte) + sizeof(bool) + sizeof(int) },          // vec      <register>
+    { "vinsert", sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },   // vinsert  <vector> <src register> <dest index>?
+    { "vpush", sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },     // vpush    <vector> <src register>
+    { "vpop", sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },      // vpop     <vector> <result register>? <position>?
+    { "vat", sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },       // vat      <vector> <result register>  <position>?
+    { "vlen", sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },      // vlen     <vector> <result register>
+
     { "bool",   sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "not",    sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "and",    sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
@@ -140,6 +147,13 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { STREQ,    "streq" },
     { STRADD,   "stradd" },
     { STRSUB,   "strsub" },
+
+    { VEC,      "vec" },
+    { VINSERT,  "vinsert" },
+    { VPUSH,    "vpush" },
+    { VPOP,     "vpop" },
+    { VAT,      "vat" },
+    { VLEN,     "vlen" },
 
     { BOOL,	    "bool" },
     { NOT,	    "not" },

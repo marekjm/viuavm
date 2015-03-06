@@ -58,6 +58,13 @@ enum OPCODE : byte {
     STRADD,
     STRSUB,
 
+    VEC,
+    VINSERT,
+    VPUSH,
+    VPOP,
+    VAT,
+    VLEN,
+
     // booleans
     BOOL,   // store Boolean false object in given register (empty) or
             // convert an object to Boolean value

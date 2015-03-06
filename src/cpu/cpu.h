@@ -106,6 +106,13 @@ class CPU {
 
     byte* strstore(byte*);
 
+    byte* vec(byte*);
+    byte* vinsert(byte*);
+    byte* vpush(byte*);
+    byte* vpop(byte*);
+    byte* vat(byte*);
+    byte* vlen(byte*);
+
     byte* boolean(byte*);
     byte* lognot(byte*);
     byte* logand(byte*);
