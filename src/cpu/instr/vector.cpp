@@ -2,8 +2,7 @@
 #include "../../bytecode/bytetypedef.h"
 #include "../../types/object.h"
 #include "../../types/integer.h"
-#include "../../types/float.h"
-#include "../../types/byte.h"
+#include "../../types/vector.h"
 #include "../../support/pointer.h"
 #include "../cpu.h"
 using namespace std;
@@ -12,20 +11,20 @@ using namespace std;
 byte* CPU::vec(byte* addr) {
     /*  Run vec instruction.
      */
-    bool reg_num;
+    bool reg_ref;
     int reg_num;
 
-    reg_num = *((bool*)addr);
+    reg_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
     reg_num = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << (reg_num ? " @" : " ") << reg_num;
+        cout << (reg_ref ? " @" : " ") << reg_num;
     }
 
-    if (reg_num) {
-        if (debug) { cout << "resolving numerence to operand register" << endl; }
+    if (reg_ref) {
+        if (debug) { cout << "resolving reference to operand register" << endl; }
         reg_num = static_cast<Integer*>(registers[reg_num])->value();
     }
 
@@ -40,28 +39,28 @@ byte* CPU::vinsert(byte* addr) {
      *  Vector always inserts a copy of the object in a register.
      *  FIXME: make it possible to insert references.
      */
-    bool regvec_num, regval_num, regpos_num;
+    bool regvec_ref, regval_ref, regpos_ref;
     int regvec_num, regval_num, regpos_num;
 
-    regvec_num = *((bool*)addr);
+    regvec_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
     regvec_num = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regval_num = *((bool*)addr);
+    regval_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
     regval_num = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regpos_num = *((bool*)addr);
+    regpos_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
     regpos_num = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << (regvec_num ? " @" : " ") << regvec_num;
-        cout << (regval_num ? " @" : " ") << regval_num;
-        cout << (regpos_num ? " @" : " ") << regval_num;
+        cout << (regvec_ref ? " @" : " ") << regvec_num;
+        cout << (regval_ref ? " @" : " ") << regval_num;
+        cout << (regpos_ref ? " @" : " ") << regval_num;
     }
 
     if (regvec_ref) {
@@ -77,7 +76,7 @@ byte* CPU::vinsert(byte* addr) {
         regpos_num = static_cast<Integer*>(registers[regpos_num])->value();
     }
 
-    fetch(regvec_num)->insert(regpos_num, fetch(regval_num)->copy());
+    static_cast<Vector*>(fetch(regvec_num))->insert(regpos_num, fetch(regval_num)->copy());
 
     return addr;
 }
@@ -88,22 +87,22 @@ byte* CPU::vpush(byte* addr) {
      *  Vector always pushes a copy of the object in a register.
      *  FIXME: make it possible to push references.
      */
-    bool regvec_num, regval_num;
+    bool regvec_ref, regval_ref;
     int regvec_num, regval_num;
 
-    regvec_num = *((bool*)addr);
+    regvec_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
     regvec_num = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regval_num = *((bool*)addr);
+    regval_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
     regval_num = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << (regvec_num ? " @" : " ") << regvec_num;
-        cout << (regval_num ? " @" : " ") << regval_num;
+        cout << (regvec_ref ? " @" : " ") << regvec_num;
+        cout << (regval_ref ? " @" : " ") << regval_num;
     }
 
     if (regvec_ref) {
@@ -115,7 +114,7 @@ byte* CPU::vpush(byte* addr) {
         regval_num = static_cast<Integer*>(registers[regval_num])->value();
     }
 
-    fetch(regvec_num)->push(fetch(regval_num)->copy());
+    static_cast<Vector*>(fetch(regvec_num))->push(fetch(regval_num)->copy());
 
     return addr;
 }
@@ -126,48 +125,48 @@ byte* CPU::vpop(byte* addr) {
      *  Vector always pops a copy of the object in a register.
      *  FIXME: make it possible to pop references.
      */
-    bool regvec_num, regdst_num, regpos_num;
+    bool regvec_ref, regdst_ref, regpos_ref;
     int regvec_num, regdst_num, regpos_num;
 
-    regvec_num = *((bool*)addr);
+    regvec_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
     regvec_num = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regdst_num = *((bool*)addr);
+    regdst_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
     regdst_num = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regpos_num = *((bool*)addr);
+    regpos_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
     regpos_num = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << (regvec_num ? " @" : " ") << regvec_num;
-        cout << (regdst_num ? " @" : " ") << regdst_num;
-        cout << (regpos_num ? " @" : " ") << regdst_num;
+        cout << (regvec_ref ? " @" : " ") << regvec_num;
+        cout << (regdst_ref ? " @" : " ") << regdst_num;
+        cout << (regpos_ref ? " @" : " ") << regdst_num;
     }
 
     if (regvec_ref) {
         if (debug) { cout << "resolving numerence to 1-operand register" << endl; }
-        regvec_num = static_cast<Integer*>(registers[regvec_num])->dstue();
+        regvec_num = static_cast<Integer*>(registers[regvec_num])->value();
     }
     if (regdst_ref) {
         if (debug) { cout << "resolving numerence to 2-operand register" << endl; }
-        regdst_num = static_cast<Integer*>(registers[regdst_num])->dstue();
+        regdst_num = static_cast<Integer*>(registers[regdst_num])->value();
     }
     if (regpos_ref) {
         if (debug) { cout << "resolving numerence to 3-operand register" << endl; }
-        regpos_num = static_cast<Integer*>(registers[regpos_num])->dstue();
+        regpos_num = static_cast<Integer*>(registers[regpos_num])->value();
     }
 
     /*  1) fetch vector,
      *  2) pop value at given index,
      *  3) put it in a register,
      */
-    Object* ptr = fetch(regvec_num)->pop(regpos_num);
+    Object* ptr = static_cast<Vector*>(fetch(regvec_num))->pop(regpos_num);
     if (regdst_num) { place(regdst_num, ptr); }
 
     return addr;
@@ -176,22 +175,22 @@ byte* CPU::vpop(byte* addr) {
 byte* CPU::vlen(byte* addr) {
     /*  Run vlen instruction.
      */
-    bool regvec_num, regval_num;
+    bool regvec_ref, regval_ref;
     int regvec_num, regval_num;
 
-    regvec_num = *((bool*)addr);
+    regvec_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
     regvec_num = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regval_num = *((bool*)addr);
+    regval_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
     regval_num = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
     if (debug) {
-        cout << (regvec_num ? " @" : " ") << regvec_num;
-        cout << (regval_num ? " @" : " ") << regval_num;
+        cout << (regvec_ref ? " @" : " ") << regvec_num;
+        cout << (regval_ref ? " @" : " ") << regval_num;
     }
 
     if (regvec_ref) {
@@ -203,7 +202,7 @@ byte* CPU::vlen(byte* addr) {
         regval_num = static_cast<Integer*>(registers[regval_num])->value();
     }
 
-    place(regval_num, new Integer(fetch(regvec_num)->len()));
+    place(regval_num, new Integer(static_cast<Vector*>(fetch(regvec_num))->len()));
 
     return addr;
 }
