@@ -66,6 +66,10 @@ bin/opcodes.bin: src/bytecode/opcodes.h src/bytecode/maps.h src/bytecode/opcd.cp
 	${CXX} ${CXXFLAGS} -o bin/opcodes.bin src/bytecode/opcd.cpp
 
 
+build/types/vector.o: src/types/vector.h src/types/vector.cpp
+	${CXX} ${CXXFLAGS} -c -o $@ ./src/types/vector.cpp
+
+
 build/cpu/cpu.o: src/bytecode/opcodes.h src/cpu/frame.h src/cpu/cpu.h src/cpu/cpu.cpp
 	${CXX} ${CXXFLAGS} -c -o $@ ./src/cpu/cpu.cpp
 

@@ -13,10 +13,13 @@
 
 .*
 
+build/*
+
 bin/vm/*
 bin/run/*
 
 tests/compiled/*
+
 
 !.gitkeep
 !.gitignore
