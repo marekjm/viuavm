@@ -172,6 +172,59 @@ byte* CPU::vpop(byte* addr) {
     return addr;
 }
 
+byte* CPU::vat(byte* addr) {
+    /*  Run vat instruction.
+     *
+     *  Vector always returns a copy of the object in a register.
+     *  FIXME: make it possible to pop references.
+     */
+    bool regvec_ref, regdst_ref, regpos_ref;
+    int regvec_num, regdst_num, regpos_num;
+
+    regvec_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    regvec_num = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    regdst_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    regdst_num = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    regpos_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    regpos_num = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    if (debug) {
+        cout << (regvec_ref ? " @" : " ") << regvec_num;
+        cout << (regdst_ref ? " @" : " ") << regdst_num;
+        cout << (regpos_ref ? " @" : " ") << regdst_num;
+    }
+
+    if (regvec_ref) {
+        if (debug) { cout << "resolving numerence to 1-operand register" << endl; }
+        regvec_num = static_cast<Integer*>(registers[regvec_num])->value();
+    }
+    if (regdst_ref) {
+        if (debug) { cout << "resolving numerence to 2-operand register" << endl; }
+        regdst_num = static_cast<Integer*>(registers[regdst_num])->value();
+    }
+    if (regpos_ref) {
+        if (debug) { cout << "resolving numerence to 3-operand register" << endl; }
+        regpos_num = static_cast<Integer*>(registers[regpos_num])->value();
+    }
+
+    /*  1) fetch vector,
+     *  2) pop value at given index,
+     *  3) put it in a register,
+     */
+    Object* ptr = static_cast<Vector*>(fetch(regvec_num))->at(regpos_num);
+    if (regdst_num) { place(regdst_num, ptr); }
+
+    return addr;
+}
+
 byte* CPU::vlen(byte* addr) {
     /*  Run vlen instruction.
      */
