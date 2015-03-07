@@ -163,11 +163,12 @@ int main(int argc, char* argv[]) {
     cpu.load(bytecode).bytes(bytes).eoffset(starting_instruction).run();
     tie(ret_code, return_exception, return_message) = cpu.exitcondition();
 
+    if (VERBOSE or DEBUG or STEP_BY_STEP) {
+        // we need extra newline to separate VM CPU output from CPU frontend output
+        cout << '\n';
+    }
+
     if (VERBOSE or DEBUG) {
-        if (STEP_BY_STEP) {
-            // we need extra newline to separate VM CPU output from CPU frontend output
-            cout << '\n';
-        }
         cout << "message: execution " << (return_exception.size() == 0 ? "finished" : "broken") << ": " << cpu.counter() << " instructions executed" << endl;
     }
 
