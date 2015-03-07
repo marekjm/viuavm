@@ -17,8 +17,10 @@ Object* Vector::push(Object* object) {
 }
 
 Object* Vector::pop(int index) {
-    // FIXME: implement
-    return this;
+    // FIXME: allow popping from arbitrary indexes
+    Object* ptr = internal_object.back();
+    internal_object.pop_back();
+    return ptr;
 }
 
 Object* Vector::at(int index) {
