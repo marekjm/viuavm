@@ -12,13 +12,17 @@ Object* Vector::insert(int pos, Object* object) {
 }
 
 Object* Vector::push(Object* object) {
-    // FIXME: implement
+    internal_object.push_back(object);
     return this;
 }
 
 Object* Vector::pop(int index) {
     // FIXME: implement
     return this;
+}
+
+Object* Vector::at(int index) {
+    return internal_object[index];
 }
 
 int Vector::len() {

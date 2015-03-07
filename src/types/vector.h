@@ -40,6 +40,7 @@ class Vector : public Object {
         Object* insert(int, Object*);
         Object* push(Object*);
         Object* pop(int);
+        Object* at(int);
         int len();
 
         Vector() {}
