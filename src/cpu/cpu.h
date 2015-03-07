@@ -9,12 +9,19 @@
 #include <map>
 #include <tuple>
 #include <algorithm>
+#include <stdexcept>
 #include "../bytecode/bytetypedef.h"
 #include "../types/object.h"
 #include "frame.h"
 
 
 const int DEFAULT_REGISTER_SIZE = 256;
+
+
+class HaltException : public std::runtime_error {
+    public:
+        HaltException(): std::runtime_error("execution halted") {}
+};
 
 
 class CPU {
