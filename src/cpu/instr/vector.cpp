@@ -146,7 +146,7 @@ byte* CPU::vpop(byte* addr) {
     if (debug) {
         cout << (regvec_ref ? " @" : " ") << regvec_num;
         cout << (regdst_ref ? " @" : " ") << regdst_num;
-        cout << (regpos_ref ? " @" : " ") << regdst_num;
+        cout << (regpos_ref ? " @" : " ") << regpos_num;
     }
 
     if (regvec_ref) {
@@ -199,7 +199,7 @@ byte* CPU::vat(byte* addr) {
     if (debug) {
         cout << (regvec_ref ? " @" : " ") << regvec_num;
         cout << (regdst_ref ? " @" : " ") << regdst_num;
-        cout << (regpos_ref ? " @" : " ") << regdst_num;
+        cout << (regpos_ref ? " @" : " ") << regpos_num;
     }
 
     if (regvec_ref) {
