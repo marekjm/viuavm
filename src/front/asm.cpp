@@ -372,10 +372,6 @@ const map<string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS = {
     { "fgte", &Program::fgte },
     { "feq",  &Program::feq },
 
-    { "vinsert", &Program::vinsert },
-    { "vpop", &Program::vpop },
-    { "vat", &Program::vat },
-
     { "and",  &Program::logand },
     { "or",   &Program::logor },
 };
@@ -532,17 +528,24 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             regno_chnk = str::chunk(operands);
             program.vec(getint_op(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "vinsert")) {
-            // FIXME: default parameters
-            assemble_three_intop_instruction(program, names, "vinsert", operands);
+            string vec, src, pos;
+            tie(vec, src, pos) = get3operands(operands, false);
+            if (pos == "") { pos = "-1"; }
+            program.insert(getint_op(srcolveregister(vec, names)), getint_op(srcolveregister(src, names)), getint_op(srcolveregister(pos, names)));
         } else if (str::startswith(line, "vpush")) {
             string regno_chnk, number_chnk;
             tie(regno_chnk, number_chnk) = get2operands(operands);
             program.vpush(getint_op(resolveregister(regno_chnk, names)), getint_op(resolveregister(number_chnk, names)));
         } else if (str::startswith(line, "vpop")) {
-            // FIXME: default parameters
-            assemble_three_intop_instruction(program, names, "vpop", operands);
+            string vec, dst, pos;
+            tie(vec, dst, pos) = get3operands(operands, false);
+            if (pos == "") { pos = "-1"; }
+            program.vpop(getint_op(dstolveregister(vec, names)), getint_op(dstolveregister(dst, names)), getint_op(dstolveregister(pos, names)));
         } else if (str::startswith(line, "vat")) {
-            assemble_three_intop_instruction(program, names, "vat", operands);
+            string vec, dst, pos;
+            tie(vec, dst, pos) = get3operands(operands, false);
+            if (pos == "") { pos = "-1"; }
+            program.vpop(getint_op(resolveregister(vec, names)), getint_op(resolveregister(dst, names)), getint_op(resolveregister(pos, names)));
         } else if (str::startswith(line, "vlen")) {
             string regno_chnk, number_chnk;
             tie(regno_chnk, number_chnk) = get2operands(operands);
