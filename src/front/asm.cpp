@@ -531,7 +531,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string vec, src, pos;
             tie(vec, src, pos) = get3operands(operands, false);
             if (pos == "") { pos = "-1"; }
-            program.insert(getint_op(srcolveregister(vec, names)), getint_op(srcolveregister(src, names)), getint_op(srcolveregister(pos, names)));
+            program.vinsert(getint_op(resolveregister(vec, names)), getint_op(resolveregister(src, names)), getint_op(resolveregister(pos, names)));
         } else if (str::startswith(line, "vpush")) {
             string regno_chnk, number_chnk;
             tie(regno_chnk, number_chnk) = get2operands(operands);
@@ -540,7 +540,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string vec, dst, pos;
             tie(vec, dst, pos) = get3operands(operands, false);
             if (pos == "") { pos = "-1"; }
-            program.vpop(getint_op(dstolveregister(vec, names)), getint_op(dstolveregister(dst, names)), getint_op(dstolveregister(pos, names)));
+            program.vpop(getint_op(resolveregister(vec, names)), getint_op(resolveregister(dst, names)), getint_op(resolveregister(pos, names)));
         } else if (str::startswith(line, "vat")) {
             string vec, dst, pos;
             tie(vec, dst, pos) = get3operands(operands, false);
