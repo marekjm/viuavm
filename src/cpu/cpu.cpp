@@ -281,6 +281,24 @@ byte* CPU::tick() {
             case STRSTORE:
                 instruction_pointer = strstore(instruction_pointer+1);
                 break;
+            case VEC:
+                instruction_pointer = vec(instruction_pointer+1);
+                break;
+            case VINSERT:
+                instruction_pointer = vinsert(instruction_pointer+1);
+                break;
+            case VPUSH:
+                instruction_pointer = vpush(instruction_pointer+1);
+                break;
+            case VPOP:
+                instruction_pointer = vpop(instruction_pointer+1);
+                break;
+            case VAT:
+                instruction_pointer = vat(instruction_pointer+1);
+                break;
+            case VLEN:
+                instruction_pointer = vlen(instruction_pointer+1);
+                break;
             case NOT:
                 instruction_pointer = lognot(instruction_pointer+1);
                 break;
