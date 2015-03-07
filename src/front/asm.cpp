@@ -372,6 +372,10 @@ const map<string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS = {
     { "fgte", &Program::fgte },
     { "feq",  &Program::feq },
 
+    { "vinsert", &Program::vinsert },
+    { "vpop", &Program::vpop },
+    { "vat", &Program::vat },
+
     { "and",  &Program::logand },
     { "or",   &Program::logor },
 };
@@ -523,6 +527,26 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             operands = str::lstrip(str::sub(operands, reg_chnk.size()));
             str_chnk = str::extract(operands);
             program.strstore(getint_op(resolveregister(reg_chnk, names)), str_chnk);
+        } else if (str::startswith(line, "vec")) {
+            string regno_chnk;
+            regno_chnk = str::chunk(operands);
+            program.vec(getint_op(resolveregister(regno_chnk, names)));
+        } else if (str::startswith(line, "vinsert")) {
+            // FIXME: default parameters
+            assemble_three_intop_instruction(program, names, "vinsert", operands);
+        } else if (str::startswith(line, "vpush")) {
+            string regno_chnk, number_chnk;
+            tie(regno_chnk, number_chnk) = get2operands(operands);
+            program.vpush(getint_op(resolveregister(regno_chnk, names)), getint_op(resolveregister(number_chnk, names)));
+        } else if (str::startswith(line, "vpop")) {
+            // FIXME: default parameters
+            assemble_three_intop_instruction(program, names, "vpop", operands);
+        } else if (str::startswith(line, "vat")) {
+            assemble_three_intop_instruction(program, names, "vat", operands);
+        } else if (str::startswith(line, "vlen")) {
+            string regno_chnk, number_chnk;
+            tie(regno_chnk, number_chnk) = get2operands(operands);
+            program.vlen(getint_op(resolveregister(regno_chnk, names)), getint_op(resolveregister(number_chnk, names)));
         } else if (str::startswith(line, "not")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
