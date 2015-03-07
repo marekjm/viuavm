@@ -573,6 +573,49 @@ Program& Program::strstore(int_op reg, string s) {
     return (*this);
 }
 
+Program& Program::vec(int_op index) {
+    /** Inserts vec instruction.
+     */
+    *(addr_ptr++) = VEC;
+    addr_ptr = insertIntegerOperand(addr_ptr, index);
+    return (*this);
+}
+
+Program& Program::vinsert(int_op vec, int_op src, int_op dst) {
+    /** Inserts vinsert instruction.
+     */
+    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, VINSERT, vec, src, dst);
+    return (*this);
+}
+
+Program& Program::vpush(int_op vec, int_op src) {
+    /** Inserts vpush instruction.
+     */
+    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, VPUSH, vec, src);
+    return (*this);
+}
+
+Program& Program::vpop(int_op vec, int_op dst, int_op pos) {
+    /** Inserts vpop instruction.
+     */
+    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, VPOP, vec, dst, pos);
+    return (*this);
+}
+
+Program& Program::vat(int_op vec, int_op dst, int_op at) {
+    /** Inserts vat instruction.
+     */
+    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, VAT, vec, dst, at);
+    return (*this);
+}
+
+Program& Program::vlen(int_op vec, int_op reg) {
+    /** Inserts vlen instruction.
+     */
+    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, VLEN, vec, reg);
+    return (*this);
+}
+
 Program& Program::lognot(int_op reg) {
     /*  Inserts not instuction.
      */

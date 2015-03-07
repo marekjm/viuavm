@@ -62,6 +62,13 @@ class Program {
 
     Program& strstore   (int_op, std::string);
 
+    Program& vec        (int_op);
+    Program& vinsert    (int_op, int_op, int_op);
+    Program& vpush      (int_op, int_op);
+    Program& vpop       (int_op, int_op, int_op);
+    Program& vat        (int_op, int_op, int_op);
+    Program& vlen       (int_op, int_op);
+
     Program& lognot     (int_op);
     Program& logand     (int_op, int_op, int_op);
     Program& logor      (int_op, int_op, int_op);
