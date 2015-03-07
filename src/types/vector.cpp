@@ -24,6 +24,7 @@ Object* Vector::pop(int index) {
 }
 
 Object* Vector::at(int index) {
+    if (index < 0) { index = (internal_object.size()+index); }
     return internal_object[index];
 }
 
