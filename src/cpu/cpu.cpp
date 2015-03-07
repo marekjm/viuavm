@@ -183,6 +183,199 @@ CPU& CPU::iframe(Frame* frm) {
     return (*this);
 }
 
+
+byte* CPU::dispatch(byte* addr) {
+    /** Dispatches instruction at a pointer to its handler.
+     */
+    if (debug) { cout << OP_NAMES.at(OPCODE(*addr)); }
+    switch (*addr) {
+        case IZERO:
+            addr = izero(addr+1);
+            break;
+        case ISTORE:
+            addr = istore(addr+1);
+            break;
+        case IADD:
+            addr = iadd(addr+1);
+            break;
+        case ISUB:
+            addr = isub(addr+1);
+            break;
+        case IMUL:
+            addr = imul(addr+1);
+            break;
+        case IDIV:
+            addr = idiv(addr+1);
+            break;
+        case IINC:
+            addr = iinc(addr+1);
+            break;
+        case IDEC:
+            addr = idec(addr+1);
+            break;
+        case ILT:
+            addr = ilt(addr+1);
+            break;
+        case ILTE:
+            addr = ilte(addr+1);
+            break;
+        case IGT:
+            addr = igt(addr+1);
+            break;
+        case IGTE:
+            addr = igte(addr+1);
+            break;
+        case IEQ:
+            addr = ieq(addr+1);
+            break;
+        case FSTORE:
+            addr = fstore(addr+1);
+            break;
+        case FADD:
+            addr = fadd(addr+1);
+            break;
+        case FSUB:
+            addr = fsub(addr+1);
+            break;
+        case FMUL:
+            addr = fmul(addr+1);
+            break;
+        case FDIV:
+            addr = fdiv(addr+1);
+            break;
+        case FLT:
+            addr = flt(addr+1);
+            break;
+        case FLTE:
+            addr = flte(addr+1);
+            break;
+        case FGT:
+            addr = fgt(addr+1);
+            break;
+        case FGTE:
+            addr = fgte(addr+1);
+            break;
+        case FEQ:
+            addr = feq(addr+1);
+            break;
+        case BSTORE:
+            addr = bstore(addr+1);
+            break;
+        case ITOF:
+            addr = itof(addr+1);
+            break;
+        case FTOI:
+            addr = ftoi(addr+1);
+            break;
+        case STRSTORE:
+            addr = strstore(addr+1);
+            break;
+        case VEC:
+            addr = vec(addr+1);
+            break;
+        case VINSERT:
+            addr = vinsert(addr+1);
+            break;
+        case VPUSH:
+            addr = vpush(addr+1);
+            break;
+        case VPOP:
+            addr = vpop(addr+1);
+            break;
+        case VAT:
+            addr = vat(addr+1);
+            break;
+        case VLEN:
+            addr = vlen(addr+1);
+            break;
+        case NOT:
+            addr = lognot(addr+1);
+            break;
+        case AND:
+            addr = logand(addr+1);
+            break;
+        case OR:
+            addr = logor(addr+1);
+            break;
+        case MOVE:
+            addr = move(addr+1);
+            break;
+        case COPY:
+            addr = copy(addr+1);
+            break;
+        case REF:
+            addr = ref(addr+1);
+            break;
+        case SWAP:
+            addr = swap(addr+1);
+            break;
+        case FREE:
+            addr = free(addr+1);
+            break;
+        case EMPTY:
+            addr = empty(addr+1);
+            break;
+        case ISNULL:
+            addr = isnull(addr+1);
+            break;
+        case RESS:
+            addr = ress(addr+1);
+            break;
+        case TMPRI:
+            addr = tmpri(addr+1);
+            break;
+        case TMPRO:
+            addr = tmpro(addr+1);
+            break;
+        case PRINT:
+            addr = print(addr+1);
+            break;
+        case ECHO:
+            addr = echo(addr+1);
+            break;
+        case FRAME:
+            addr = frame(addr+1);
+            break;
+        case PARAM:
+            addr = param(addr+1);
+            break;
+        case PAREF:
+            addr = paref(addr+1);
+            break;
+        case ARG:
+            addr = arg(addr+1);
+            break;
+        case CALL:
+            addr = call(addr+1);
+            break;
+        case END:
+            addr = end(addr);
+            break;
+        case JUMP:
+            addr = jump(addr+1);
+            break;
+        case BRANCH:
+            addr = branch(addr+1);
+            break;
+        case HALT:
+            throw HaltException();
+            break;
+        case PASS:
+            ++addr;
+            break;
+        case NOP:
+            ++addr;
+            break;
+        default:
+            ostringstream error;
+            error << "unrecognised instruction (bytecode value: " << *((int*)bytecode) << ")";
+            throw error.str().c_str();
+    }
+    if (debug and not stepping) { cout << endl; }
+    return addr;
+}
+
+
 byte* CPU::tick() {
     /** Perform a *tick*, i.e. run a single CPU instruction.
      */
@@ -198,191 +391,7 @@ byte* CPU::tick() {
     }
 
     try {
-        if (debug) { cout << OP_NAMES.at(OPCODE(*instruction_pointer)); }
-        switch (*instruction_pointer) {
-            case IZERO:
-                instruction_pointer = izero(instruction_pointer+1);
-                break;
-            case ISTORE:
-                instruction_pointer = istore(instruction_pointer+1);
-                break;
-            case IADD:
-                instruction_pointer = iadd(instruction_pointer+1);
-                break;
-            case ISUB:
-                instruction_pointer = isub(instruction_pointer+1);
-                break;
-            case IMUL:
-                instruction_pointer = imul(instruction_pointer+1);
-                break;
-            case IDIV:
-                instruction_pointer = idiv(instruction_pointer+1);
-                break;
-            case IINC:
-                instruction_pointer = iinc(instruction_pointer+1);
-                break;
-            case IDEC:
-                instruction_pointer = idec(instruction_pointer+1);
-                break;
-            case ILT:
-                instruction_pointer = ilt(instruction_pointer+1);
-                break;
-            case ILTE:
-                instruction_pointer = ilte(instruction_pointer+1);
-                break;
-            case IGT:
-                instruction_pointer = igt(instruction_pointer+1);
-                break;
-            case IGTE:
-                instruction_pointer = igte(instruction_pointer+1);
-                break;
-            case IEQ:
-                instruction_pointer = ieq(instruction_pointer+1);
-                break;
-            case FSTORE:
-                instruction_pointer = fstore(instruction_pointer+1);
-                break;
-            case FADD:
-                instruction_pointer = fadd(instruction_pointer+1);
-                break;
-            case FSUB:
-                instruction_pointer = fsub(instruction_pointer+1);
-                break;
-            case FMUL:
-                instruction_pointer = fmul(instruction_pointer+1);
-                break;
-            case FDIV:
-                instruction_pointer = fdiv(instruction_pointer+1);
-                break;
-            case FLT:
-                instruction_pointer = flt(instruction_pointer+1);
-                break;
-            case FLTE:
-                instruction_pointer = flte(instruction_pointer+1);
-                break;
-            case FGT:
-                instruction_pointer = fgt(instruction_pointer+1);
-                break;
-            case FGTE:
-                instruction_pointer = fgte(instruction_pointer+1);
-                break;
-            case FEQ:
-                instruction_pointer = feq(instruction_pointer+1);
-                break;
-            case BSTORE:
-                instruction_pointer = bstore(instruction_pointer+1);
-                break;
-            case ITOF:
-                instruction_pointer = itof(instruction_pointer+1);
-                break;
-            case FTOI:
-                instruction_pointer = ftoi(instruction_pointer+1);
-                break;
-            case STRSTORE:
-                instruction_pointer = strstore(instruction_pointer+1);
-                break;
-            case VEC:
-                instruction_pointer = vec(instruction_pointer+1);
-                break;
-            case VINSERT:
-                instruction_pointer = vinsert(instruction_pointer+1);
-                break;
-            case VPUSH:
-                instruction_pointer = vpush(instruction_pointer+1);
-                break;
-            case VPOP:
-                instruction_pointer = vpop(instruction_pointer+1);
-                break;
-            case VAT:
-                instruction_pointer = vat(instruction_pointer+1);
-                break;
-            case VLEN:
-                instruction_pointer = vlen(instruction_pointer+1);
-                break;
-            case NOT:
-                instruction_pointer = lognot(instruction_pointer+1);
-                break;
-            case AND:
-                instruction_pointer = logand(instruction_pointer+1);
-                break;
-            case OR:
-                instruction_pointer = logor(instruction_pointer+1);
-                break;
-            case MOVE:
-                instruction_pointer = move(instruction_pointer+1);
-                break;
-            case COPY:
-                instruction_pointer = copy(instruction_pointer+1);
-                break;
-            case REF:
-                instruction_pointer = ref(instruction_pointer+1);
-                break;
-            case SWAP:
-                instruction_pointer = swap(instruction_pointer+1);
-                break;
-            case FREE:
-                instruction_pointer = free(instruction_pointer+1);
-                break;
-            case EMPTY:
-                instruction_pointer = empty(instruction_pointer+1);
-                break;
-            case ISNULL:
-                instruction_pointer = isnull(instruction_pointer+1);
-                break;
-            case RESS:
-                instruction_pointer = ress(instruction_pointer+1);
-                break;
-            case TMPRI:
-                instruction_pointer = tmpri(instruction_pointer+1);
-                break;
-            case TMPRO:
-                instruction_pointer = tmpro(instruction_pointer+1);
-                break;
-            case PRINT:
-                instruction_pointer = print(instruction_pointer+1);
-                break;
-            case ECHO:
-                instruction_pointer = echo(instruction_pointer+1);
-                break;
-            case FRAME:
-                instruction_pointer = frame(instruction_pointer+1);
-                break;
-            case PARAM:
-                instruction_pointer = param(instruction_pointer+1);
-                break;
-            case PAREF:
-                instruction_pointer = paref(instruction_pointer+1);
-                break;
-            case ARG:
-                instruction_pointer = arg(instruction_pointer+1);
-                break;
-            case CALL:
-                instruction_pointer = call(instruction_pointer+1);
-                break;
-            case END:
-                instruction_pointer = end(instruction_pointer);
-                break;
-            case JUMP:
-                instruction_pointer = jump(instruction_pointer+1);
-                break;
-            case BRANCH:
-                instruction_pointer = branch(instruction_pointer+1);
-                break;
-            case HALT:
-                halt = true;
-                break;
-            case PASS:
-                ++instruction_pointer;
-                break;
-            case NOP:
-                ++instruction_pointer;
-                break;
-            default:
-                ostringstream error;
-                error << "unrecognised instruction (bytecode value: " << *((int*)bytecode) << ")";
-                throw error.str().c_str();
-        }
-        if (debug and not stepping) { cout << endl; }
+        instruction_pointer = dispatch(instruction_pointer);
     } catch (const char*& e) {
         return_code = 1;
         return_message = string(e);
@@ -393,6 +402,8 @@ byte* CPU::tick() {
         return_message = string(e);
         return_exception =  "RuntimeException";
         return 0;
+    } catch (const HaltException& e) {
+        halt = true;
     }
 
     if (halt or frames.size() == 0) { return 0; }

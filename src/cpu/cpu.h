@@ -174,6 +174,8 @@ class CPU {
         inline byte* end() { return 0; }
 
         CPU& iframe(Frame* frm = 0);
+
+        byte* dispatch(byte*);
         byte* tick();
 
         int run();
