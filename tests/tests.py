@@ -310,6 +310,61 @@ class StringInstructionsTests(unittest.TestCase):
         self.assertEqual(0, excode)
 
 
+class VectorInstructionsTests(unittest.TestCase):
+    """Tests for vector-related instructions.
+
+    VEC instruction does not get its own test, but is used in every other vector test
+    so it gets pretty good coverage.
+    """
+    PATH = './sample/asm/vector'
+
+    def testVLEN(self):
+        name = 'vlen.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual('8', output.strip())
+        self.assertEqual(0, excode)
+
+    @unittest.skip('TODO')
+    def testVINSERT(self):
+        name = 'vinsert.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual(['0', '2', '1'], output.strip().splitlines())
+        self.assertEqual(0, excode)
+
+    def testVPUSH(self):
+        name = 'vpush.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual(['0', '1', 'Hello World!'], output.strip().splitlines())
+        self.assertEqual(0, excode)
+
+    def testVPOP(self):
+        name = 'vpop.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual(['0', '1', '0', 'Hello World!'], output.strip().splitlines())
+        self.assertEqual(0, excode)
+
+    def testVAT(self):
+        name = 'vat.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual(['0', '1', '1', 'Hello World!'], output.strip().splitlines())
+        self.assertEqual(0, excode)
+
+
 class CastingInstructionsTests(unittest.TestCase):
     """Tests for byte instructions.
     """
