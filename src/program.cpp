@@ -145,14 +145,30 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
          *
          *  Each time, the offset is increased by `inc` - which is equal to *1 plus size of operands of instructions at current index*.
          */
-        string opcode_name = OP_NAMES.at(OPCODE(program[offset]));
-        inc = OP_SIZES.at(opcode_name);
+        string opcode_name;
+        try {
+            opcode_name = OP_NAMES.at(OPCODE(program[offset]));
+        } catch (const std::out_of_range& e) {
+            ostringstream oss;
+            oss << "instruction not found in OP_NAMES: " << OPCODE(program[offset]);
+            throw oss.str();
+        }
+
+
+        try {
+            inc = OP_SIZES.at(opcode_name);
+        } catch (const std::out_of_range& e) {
+            throw ("instruction " + opcode_name + " not found in OP_SIZES");
+        }
+
         if (OPCODE(program[offset]) == CALL) {
             inc += string(program+offset+1).size();
         }
         if (OPCODE(program[offset]) == STRSTORE) {
-            inc += string(program+offset+1).size();
+            string s(program+offset);
+            inc += s.size();
         }
+
         offset += inc;
         if (offset+1 > bytes) {
             cout << "instruction offset out of bounds: check your branches: ";
