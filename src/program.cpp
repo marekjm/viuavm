@@ -161,12 +161,27 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
             throw ("instruction " + opcode_name + " not found in OP_SIZES");
         }
 
+        if (debug) {
+            cout << "[asm] debug: offsetting: " << opcode_name << ": +" << inc;
+        }
+
         if (OPCODE(program[offset]) == CALL) {
-            inc += string(program+offset+1).size();
+            string s(program+offset+1);
+            if (debug) {
+                cout << '+' << s.size() << " (function at byte " << offset+1 << ": `" << s << "`)";
+            }
+            inc += s.size();
         }
         if (OPCODE(program[offset]) == STRSTORE) {
-            string s(program+offset);
-            inc += s.size();
+            string s(program+offset+inc);
+            if (debug) {
+                cout << '+' << s.size()+1 << " (string at byte " << offset+inc << ": `" << s << "`)";
+            }
+            inc += s.size()+1;
+        }
+
+        if (debug) {
+            cout << " bytes" << endl;
         }
 
         offset += inc;
