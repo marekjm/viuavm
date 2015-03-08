@@ -333,7 +333,7 @@ class VectorInstructionsTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
-        self.assertEqual(['Hurr', 'durr', 'Ima', 'sheep!'], output.strip().splitlines())
+        self.assertEqual(['Hurr', 'durr', 'Im\'a', 'sheep!'], output.strip().splitlines())
         self.assertEqual(0, excode)
 
     def testVPUSH(self):
