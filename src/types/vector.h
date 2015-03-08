@@ -5,7 +5,6 @@
 
 #include <string>
 #include <vector>
-#include <sstream>
 #include "object.h"
 
 
@@ -18,15 +17,7 @@ class Vector : public Object {
         std::string type() const {
             return "Vector";
         }
-        std::string str() const {
-            std::ostringstream oss;
-            oss << "[";
-            for (unsigned i = 0; i < internal_object.size(); ++i) {
-                oss << internal_object[i]->str() << (i < internal_object.size()-1 ? ", " : "");
-            }
-            oss << "]";
-            return oss.str();
-        }
+        std::string str() const;
         bool boolean() const {
             return internal_object.size() != 0;
         }
