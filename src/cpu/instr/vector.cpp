@@ -60,19 +60,19 @@ byte* CPU::vinsert(byte* addr) {
     if (debug) {
         cout << (regvec_ref ? " @" : " ") << regvec_num;
         cout << (regval_ref ? " @" : " ") << regval_num;
-        cout << (regpos_ref ? " @" : " ") << regval_num;
+        cout << (regpos_ref ? " @" : " ") << regpos_num;
     }
 
     if (regvec_ref) {
-        if (debug) { cout << "resolving numerence to 1-operand register" << endl; }
+        if (debug) { cout << "resolving reference to 1-operand register" << endl; }
         regvec_num = static_cast<Integer*>(uregisters[regvec_num])->value();
     }
     if (regval_ref) {
-        if (debug) { cout << "resolving numerence to 2-operand register" << endl; }
+        if (debug) { cout << "resolving reference to 2-operand register" << endl; }
         regval_num = static_cast<Integer*>(uregisters[regval_num])->value();
     }
     if (regpos_ref) {
-        if (debug) { cout << "resolving numerence to 3-operand register" << endl; }
+        if (debug) { cout << "resolving reference to 3-operand register" << endl; }
         regpos_num = static_cast<Integer*>(uregisters[regpos_num])->value();
     }
 
@@ -106,11 +106,11 @@ byte* CPU::vpush(byte* addr) {
     }
 
     if (regvec_ref) {
-        if (debug) { cout << "resolving numerence to 1-operand register" << endl; }
+        if (debug) { cout << "resolving reference to 1-operand register" << endl; }
         regvec_num = static_cast<Integer*>(uregisters[regvec_num])->value();
     }
     if (regval_ref) {
-        if (debug) { cout << "resolving numerence to 2-operand register" << endl; }
+        if (debug) { cout << "resolving reference to 2-operand register" << endl; }
         regval_num = static_cast<Integer*>(uregisters[regval_num])->value();
     }
 
@@ -150,15 +150,15 @@ byte* CPU::vpop(byte* addr) {
     }
 
     if (regvec_ref) {
-        if (debug) { cout << "resolving numerence to 1-operand register" << endl; }
+        if (debug) { cout << "resolving reference to 1-operand register" << endl; }
         regvec_num = static_cast<Integer*>(uregisters[regvec_num])->value();
     }
     if (regdst_ref) {
-        if (debug) { cout << "resolving numerence to 2-operand register" << endl; }
+        if (debug) { cout << "resolving reference to 2-operand register" << endl; }
         regdst_num = static_cast<Integer*>(uregisters[regdst_num])->value();
     }
     if (regpos_ref) {
-        if (debug) { cout << "resolving numerence to 3-operand register" << endl; }
+        if (debug) { cout << "resolving reference to 3-operand register" << endl; }
         regpos_num = static_cast<Integer*>(uregisters[regpos_num])->value();
     }
 
@@ -203,15 +203,15 @@ byte* CPU::vat(byte* addr) {
     }
 
     if (regvec_ref) {
-        if (debug) { cout << "\nresolving numerence to 1-operand register" << endl; }
+        if (debug) { cout << "\nresolving reference to 1-operand register" << endl; }
         regvec_num = static_cast<Integer*>(fetch(regvec_num))->value();
     }
     if (regdst_ref) {
-        if (debug) { cout << "\nresolving numerence to 2-operand register" << endl; }
+        if (debug) { cout << "\nresolving reference to 2-operand register" << endl; }
         regdst_num = static_cast<Integer*>(uregisters[regdst_num])->value();
     }
     if (regpos_ref) {
-        if (debug) { cout << "\nresolving numerence to 3-operand register" << endl; }
+        if (debug) { cout << "\nresolving reference to 3-operand register" << endl; }
         regpos_num = static_cast<Integer*>(uregisters[regpos_num])->value();
     }
 
@@ -247,11 +247,11 @@ byte* CPU::vlen(byte* addr) {
     }
 
     if (regvec_ref) {
-        if (debug) { cout << "resolving numerence to 1-operand register" << endl; }
+        if (debug) { cout << "resolving reference to 1-operand register" << endl; }
         regvec_num = static_cast<Integer*>(uregisters[regvec_num])->value();
     }
     if (regval_ref) {
-        if (debug) { cout << "resolving numerence to 2-operand register" << endl; }
+        if (debug) { cout << "resolving reference to 2-operand register" << endl; }
         regval_num = static_cast<Integer*>(uregisters[regval_num])->value();
     }
 
