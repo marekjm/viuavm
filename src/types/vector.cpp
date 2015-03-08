@@ -9,7 +9,7 @@ using namespace std;
 
 Object* Vector::insert(int index, Object* object) {
     if (index < 0) { index = (internal_object.size()+index); }
-    if ((index < 0) or (index >= (int)internal_object.size())) {
+    if ((index < 0) or (index >= (int)internal_object.size() and internal_object.size() != 0)) {
         throw std::out_of_range("vector index out of range");
     }
     vector<Object*>::iterator it = (internal_object.begin()+index);
