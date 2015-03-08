@@ -220,7 +220,10 @@ byte* CPU::vat(byte* addr) {
      *  3) put it in a register,
      */
     Object* ptr = static_cast<Vector*>(fetch(regvec_num))->at(regpos_num);
-    if (regdst_num) { place(regdst_num, ptr); }
+    if (regdst_num) {
+        place(regdst_num, ptr);
+        ureferences[regdst_num] = true;
+    }
 
     return addr;
 }
