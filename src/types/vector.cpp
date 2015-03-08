@@ -31,6 +31,9 @@ Object* Vector::pop(int index) {
 
 Object* Vector::at(int index) {
     if (index < 0) { index = (internal_object.size()+index); }
+    if ((index < 0) or (index >= (int)internal_object.size())) {
+        throw std::out_of_range("vector index out of range");
+    }
     return internal_object[index];
 }
 
