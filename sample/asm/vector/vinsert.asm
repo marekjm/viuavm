@@ -1,28 +1,43 @@
 .def: main 1
-    strstore 1 "sample vector program"
-    print 1
+    .name: 2 hurr
+    .name: 3 durr
+    .name: 4 ima
+    .name: 5 sheep
 
-    vec 2
+    ;strstore hurr "Hurr"
+    ;strstore durr "durr"
+    ;strstore ima "Ima"
+    ;strstore sheep "sheep"
 
-    vlen 2 3
-    print 3
+    istore hurr 1
+    istore durr 2
+    istore ima 3
+    istore sheep 4
 
-    vpush 2 1
+    vec 1
 
-    vlen 2 3
-    print 3
+    vpush 1 sheep
+    vpush 1 sheep
+    vpush 1 sheep
+    vpush 1 sheep
 
-    vpop 2 4
-    print 4
 
-    vlen 2 3
-    print 3
+    .name: 6 len
+    .name: 7 counter
 
-    vpush 2 4
-    vat 2 5
-    vlen 2 3
-    print 3
-    print 5
+    istore counter 0
+    vlen 1 len
+
+    .mark: loop
+    ilt counter len 8
+    branch 8 :inside :break
+    .mark: inside
+    vat 1 9 @counter
+    print 9
+    iinc counter
+    jump :loop
+
+    .mark: break
 
     izero 0
     end
