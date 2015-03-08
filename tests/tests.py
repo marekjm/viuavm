@@ -327,14 +327,13 @@ class VectorInstructionsTests(unittest.TestCase):
         self.assertEqual('8', output.strip())
         self.assertEqual(0, excode)
 
-    @unittest.skip('TODO')
     def testVINSERT(self):
         name = 'vinsert.asm'
         assembly_path = os.path.join(self.PATH, name)
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
-        self.assertEqual(['0', '2', '1'], output.strip().splitlines())
+        self.assertEqual(['Hurr', 'durr', 'Ima', 'sheep!'], output.strip().splitlines())
         self.assertEqual(0, excode)
 
     def testVPUSH(self):
