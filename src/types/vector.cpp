@@ -34,6 +34,7 @@ Object* Vector::at(int index) {
     if ((index < 0) or (index >= (int)internal_object.size())) {
         throw std::out_of_range("vector index out of range");
     }
+    // FIXME: returned value is a reference, but docs say it's a copy
     return internal_object[index];
 }
 
