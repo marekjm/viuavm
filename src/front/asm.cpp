@@ -539,6 +539,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         } else if (str::startswith(line, "vpop")) {
             string vec, dst, pos;
             tie(vec, dst, pos) = get3operands(operands, false);
+            if (dst == "") { dst = "0"; }
             if (pos == "") { pos = "-1"; }
             program.vpop(getint_op(resolveregister(vec, names)), getint_op(resolveregister(dst, names)), getint_op(resolveregister(pos, names)));
         } else if (str::startswith(line, "vat")) {
