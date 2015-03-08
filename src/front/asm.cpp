@@ -530,7 +530,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         } else if (str::startswith(line, "vinsert")) {
             string vec, src, pos;
             tie(vec, src, pos) = get3operands(operands, false);
-            if (pos == "") { pos = "-1"; }
+            if (pos == "") { pos = "0"; }
             program.vinsert(getint_op(resolveregister(vec, names)), getint_op(resolveregister(src, names)), getint_op(resolveregister(pos, names)));
         } else if (str::startswith(line, "vpush")) {
             string regno_chnk, number_chnk;
