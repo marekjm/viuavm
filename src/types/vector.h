@@ -49,6 +49,12 @@ class Vector : public Object {
                 internal_object.push_back(v[i]->copy());
             }
         }
+        ~Vector() {
+            while (internal_object.size()) {
+                delete internal_object.back();
+                internal_object.pop_back();
+            }
+        }
 };
 
 
