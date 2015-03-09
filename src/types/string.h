@@ -5,6 +5,7 @@
 
 #include <string>
 #include "object.h"
+#include "../support/string.h"
 
 
 class String : public Object {
@@ -21,6 +22,9 @@ class String : public Object {
         std::string str() const {
             return svalue;
         }
+        std::string repr() const {
+            return str::enquote(svalue);
+        }
         bool boolean() const {
             return svalue.size() != 0;
         }
@@ -32,7 +36,6 @@ class String : public Object {
         std::string& value() { return svalue; }
 
         String(std::string s = ""): svalue(s) {}
-
 };
 
 
