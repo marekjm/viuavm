@@ -195,7 +195,6 @@ CPU& CPU::iframe(Frame* frm) {
 byte* CPU::dispatch(byte* addr) {
     /** Dispatches instruction at a pointer to its handler.
      */
-    if (debug) { cout << OP_NAMES.at(OPCODE(*addr)); }
     switch (*addr) {
         case IZERO:
             addr = izero(addr+1);
@@ -379,7 +378,6 @@ byte* CPU::dispatch(byte* addr) {
             error << "unrecognised instruction (bytecode value: " << *((int*)bytecode) << ")";
             throw error.str().c_str();
     }
-    if (debug and not stepping) { cout << endl; }
     return addr;
 }
 
@@ -399,7 +397,9 @@ byte* CPU::tick() {
     }
 
     try {
+        if (debug) { cout << OP_NAMES.at(OPCODE(*addr)); }
         instruction_pointer = dispatch(instruction_pointer);
+        if (debug and not stepping) { cout << endl; }
     } catch (const char*& e) {
         return_code = 1;
         return_message = string(e);
