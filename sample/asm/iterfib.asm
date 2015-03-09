@@ -38,11 +38,15 @@
 .end
 
 .def: main 1
-    istore 1 6
+    .name: 2 result
+    .name: 3 expected
+    istore expected 1134903170
+
+    istore 1 45
 
     frame 1
     param 0 1
-    call iterfib 2
+    call iterfib result
 
     print 2
 
