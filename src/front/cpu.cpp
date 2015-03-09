@@ -160,6 +160,13 @@ int main(int argc, char* argv[]) {
     cpu.stepping = STEP_BY_STEP;
     for (auto p : function_address_mapping) { cpu.mapfunction(p.first, p.second); }
 
+    vector<string> cmdline_args;
+    for (int i = 1; i < argc; ++i) {
+        cmdline_args.push_back(argv[i]);
+    }
+
+    cpu.commandline_arguments = cmdline_args;
+
     cpu.load(bytecode).bytes(bytes).eoffset(starting_instruction).run();
     tie(ret_code, return_exception, return_message) = cpu.exitcondition();
 
