@@ -6,6 +6,8 @@
 #include "../types/object.h"
 #include "../types/integer.h"
 #include "../types/byte.h"
+#include "../types/string.h"
+#include "../types/vector.h"
 #include "../support/pointer.h"
 #include "cpu.h"
 using namespace std;
@@ -169,6 +171,11 @@ CPU& CPU::iframe(Frame* frm) {
     Frame *initial_frame;
     if (frm == 0) {
         initial_frame = new Frame(0, 0, 0);
+        Vector* cmdline = new Vector();
+        for (unsigned i = 0; i < commandline_arguments.size(); ++i) {
+            cmdline->push(new String(commandline_arguments[i]));
+        }
+        registers[1] = cmdline;
         initial_frame->registers = registers;
         initial_frame->references = references;
         initial_frame->registers_size = reg_count;
@@ -180,6 +187,7 @@ CPU& CPU::iframe(Frame* frm) {
     ureferences = initial_frame->references;
     uregisters_size = initial_frame->registers_size;
     frames.push_back(initial_frame);
+
     return (*this);
 }
 

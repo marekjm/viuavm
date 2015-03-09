@@ -157,6 +157,8 @@ class CPU {
         // stepping flag, enables to run CPU in a step-by-step mode
         bool stepping;
 
+        std::vector<std::string> commandline_arguments;
+
         /*  Public API of the CPU provides basic actions:
          *
          *      * load bytecode,
