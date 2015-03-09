@@ -982,7 +982,8 @@ int main(int argc, char* argv[]) {
         // entry function sets global stuff
         ilines.insert(ilines.begin(), "ress global");
         // append entry function instructions...
-        ilines.push_back("frame 0");
+        ilines.push_back("frame 1");
+        ilines.push_back("paref 0 1");
         // this must not be hardcoded because we have '.main:' assembler instruction
         // we also save return value in 1 register since 0 means "drop return value"
         ilines.push_back("call " + main_function + " 1");
@@ -993,6 +994,7 @@ int main(int argc, char* argv[]) {
         // instructions were added so bytecode size must be inreased
         bytes += OP_SIZES.at("ress");
         bytes += OP_SIZES.at("frame");
+        bytes += OP_SIZES.at("paref");
         bytes += OP_SIZES.at("call");
         bytes += main_function.size();
         bytes += OP_SIZES.at("move");
