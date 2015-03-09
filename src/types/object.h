@@ -34,6 +34,12 @@ class Object {
             s << "<'" << type() << "' object at " << this << ">";
             return s.str();
         }
+        virtual std::string repr() const {
+            /** This is akin to Python's repr.
+             *  String returned by this method can be used to represent the value in source code.
+             */
+            return str();
+        }
         virtual bool boolean() const {
             /*  Boolean defaults to false.
              *  This is because in if, loops etc. we will NOT execute code depending on unknown state.
