@@ -47,7 +47,7 @@ string Vector::str() const {
     ostringstream oss;
     oss << "[";
     for (unsigned i = 0; i < internal_object.size(); ++i) {
-        oss << internal_object[i]->str() << (i < internal_object.size()-1 ? ", " : "");
+        oss << internal_object[i]->repr() << (i < internal_object.size()-1 ? ", " : "");
     }
     oss << "]";
     return oss.str();
