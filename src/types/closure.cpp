@@ -7,7 +7,7 @@
 using namespace std;
 
 
-string Closure::str() {
+string Closure::str() const {
     ostringstream oss;
     oss << "Closure: " << function_name;
     return oss.str();
