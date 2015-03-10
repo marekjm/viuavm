@@ -44,3 +44,28 @@ byte* CPU::closure(byte* addr) {
 
     return addr;
 }
+
+byte* CPU::clframe(byte* addr) {
+    /** Create new closure call frame.
+     */
+    int arguments;
+    bool arguments_ref = false;
+
+    arguments_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    arguments = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    if (debug) {
+        cout << (arguments_ref ? " @" : " ") << arguments;
+    }
+
+    if (arguments_ref) {
+        arguments = static_cast<Integer*>(fetch(arguments))->value();
+    }
+
+    if (frame_new != 0) { throw "requested new frame while last one is unused"; }
+    frame_new = new ClosureFrame(0, arguments);
+
+    return addr;
+}
