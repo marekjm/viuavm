@@ -90,6 +90,10 @@ enum OPCODE : byte {
     PRINT,
     ECHO,
 
+    CLOSURE,
+    CLFRAME,
+    CLCALL,
+
     // Opcodes related to functions.
     FRAME,  // create new frame (required before param and paref) for future function call
     PARAM,  // copy object from a register to parameter register (pass-by-value),

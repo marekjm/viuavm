@@ -140,6 +140,8 @@ class CPU {
     byte* print(byte*);
     byte* echo(byte*);
 
+    byte* closure(byte*);
+
     byte* frame(byte*);
     byte* param(byte*);
     byte* paref(byte*);

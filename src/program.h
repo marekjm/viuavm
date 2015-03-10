@@ -87,6 +87,8 @@ class Program {
     Program& print      (int_op);
     Program& echo       (int_op);
 
+    Program& closure    (int_op);
+
     Program& frame      (int_op, int_op);
     Program& param      (int_op, int_op);
     Program& paref      (int_op, int_op);

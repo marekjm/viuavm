@@ -82,6 +82,10 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "print",  sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "echo",   sizeof(byte) + sizeof(bool) + sizeof(int) },
 
+    { "closure",sizeof(byte) + sizeof(bool) + sizeof(int) },
+    { "clframe",sizeof(byte) + sizeof(bool) + sizeof(int) },
+    { "clcall", sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
+
     { "frame",  sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
     { "param",  sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
     { "paref",  sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
@@ -173,6 +177,10 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
 
     { PRINT,    "print" },
     { ECHO,     "echo" },
+
+    { CLOSURE,  "closure" },
+    { CLFRAME,  "clframe" },
+    { CLCALL,   "clcall" },
 
     { FRAME,    "frame" },
     { PARAM,    "param" },

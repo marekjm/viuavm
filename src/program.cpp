@@ -810,6 +810,14 @@ Program& Program::echo(int_op reg) {
     return (*this);
 }
 
+Program& Program::closure(int_op reg) {
+    /*  Inserts echo instuction.
+     */
+    *(addr_ptr++) = CLOSURE;
+    addr_ptr = insertIntegerOperand(addr_ptr, reg);
+    return (*this);
+}
+
 Program& Program::frame(int_op a, int_op b) {
     /*  Inserts frame instruction to bytecode.
      */
