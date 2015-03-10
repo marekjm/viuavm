@@ -38,7 +38,7 @@ class Closure : public Object {
 
         std::vector<Object*>& value() { return this; }
 
-        Closure(): registers(0), references(0), registers_size(0) {}
+        Closure(const std::string& fn): function_name(fn), registers(0), references(0), registers_size(0) {}
 };
 
 
