@@ -6,6 +6,7 @@
 #include <string>
 #include "../bytecode/bytetypedef.h"
 #include "object.h"
+#include "string.h"
 
 
 class Closure : public Object {
@@ -31,12 +32,21 @@ class Closure : public Object {
         }
 
         Object* copy() const {
-            return new Closure();
+            Closure* clsr = new Closure(function_name);
+            // FIXME: we should copy the registers instead of just pointing to them
+            // FIXME: for the above one, copy ctor would be nice
+            clsr->registers = registers;
+            clsr->references = references;
+            clsr->registers_size = registers_size;
+            return clsr;
         }
 
-        std::vector<Object*>& value() { return this; }
+        Object* value() { return new String(function_name); }
 
-        Closure(const std::string& fn): function_name(fn), registers(0), references(0), registers_size(0) {}
+        Closue(): registers(0), references(0), registers_size(0), function_name("") {}
+        Closure(const std::string& fn): registers(0), references(0), registers_size(0), function_name(fn) {}
+        // FIXME: implement real dtor
+        ~Closure() {};
 };
 
 
