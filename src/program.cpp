@@ -810,10 +810,13 @@ Program& Program::echo(int_op reg) {
     return (*this);
 }
 
-Program& Program::closure(int_op reg) {
-    /*  Inserts echo instuction.
+Program& Program::closure(string fn, int_op reg) {
+    /*  Inserts closure instuction.
      */
     *(addr_ptr++) = CLOSURE;
+    for (unsigned i = 0; i < fn.size(); ++i) {
+        *((char*)addr_ptr++) = fn[i];
+    }
     addr_ptr = insertIntegerOperand(addr_ptr, reg);
     return (*this);
 }
