@@ -818,6 +818,21 @@ Program& Program::closure(int_op reg) {
     return (*this);
 }
 
+Program& Program::clframe(int_op a, int_op b) {
+    /*  Inserts clframe instruction to bytecode.
+     */
+    *(addr_ptr++) = CLFRAME;
+    addr_ptr = insertIntegerOperand(addr_ptr, reg);
+    return (*this);
+}
+
+Program& Program::clcall(int_op clsr, int_op ret) {
+    /*  Inserts clcall instruction to bytecode.
+     */
+    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, CLCALL, clsr, ret);
+    return (*this);
+}
+
 Program& Program::frame(int_op a, int_op b) {
     /*  Inserts frame instruction to bytecode.
      */
