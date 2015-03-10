@@ -12,7 +12,6 @@ byte* CPU::closure(byte* addr) {
     /*  Call a closure.
      */
     string call_name = string(addr);
-    byte* call_address = bytecode+function_addresses.at(call_name);
     addr += call_name.size();
 
     int reg;
@@ -36,9 +35,9 @@ byte* CPU::closure(byte* addr) {
     }
 
     Closure* clsr = new Closure(call_name);
-    clsr.registers = uregisters;
-    clsr.references = ureferences;
-    clsr.registers_size = uregisters_size;
+    clsr->registers = uregisters;
+    clsr->references = ureferences;
+    clsr->registers_size = uregisters_size;
 
     for (int i = 0; i < uregisters_size; ++i) { ureferences[i] = true; }
 
@@ -85,21 +84,22 @@ byte* CPU::clcall(byte* addr) {
         closure_reg = static_cast<Integer*>(fetch(closure_reg))->value();
     }
 
-    Closure* clsr = fetch(closure_reg);
+    // FIXME: there should be a check it this is *really* a closure object
+    Closure* clsr = static_cast<Closure*>(fetch(closure_reg));
     byte* call_address = bytecode+function_addresses.at(clsr->function_name);
 
     // save return address for frame
     byte* return_address = (addr + sizeof(bool) + sizeof(int));
 
     if (debug) {
-        cout << " '" << call_name << "' " << (long)(call_address-bytecode);
+        cout << " '" << clsr->function_name << "' " << (long)(call_address-bytecode);
         cout << ": setting return address to bytecode " << (long)(return_address-bytecode);
     }
     if (frame_new == 0) {
         throw "closure call without a frame: use `clframe 0' in source code if the closure takes no parameters";
     }
     // set function name and return address
-    frame_new->function_name = call_name;
+    frame_new->function_name = clsr->function_name;
     frame_new->return_address = return_address;
 
     frame_new->resolve_return_value_register = *(bool*)addr;
