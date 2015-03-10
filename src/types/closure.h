@@ -22,8 +22,6 @@ class Closure : public Object {
 
         std::string function_name;
 
-        inline byte* ret_address() { return return_address; }
-
         std::string type() const {
             return "Closure";
         }
