@@ -49,9 +49,7 @@ class Object {
             return false;
         }
 
-        virtual Object* copy() const = 0; /* {
-            return new Object();
-        }*/
+        virtual Object* copy() const = 0;
 
         // We need to construct and destroy our basic object.
         Object() {}
