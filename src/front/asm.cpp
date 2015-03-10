@@ -668,13 +668,26 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             tie(a_chnk, b_chnk) = get2operands(operands);
             program.arg(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "call")) {
-            /*  Full form of call instruction has two operands: instruction index and register index.
+            /** Full form of call instruction has two operands: function name and return value register index.
              *  If call is given only one operand - it means it is the instruction index and returned value is discarded.
              *  To explicitly state that return value should be discarder, 0 can be supplied as second operand.
+             */
+            /** Why is the function supplied as a *string* and not direct instruction pointer?
+             *  That would be faster - c'mon couldn't assembler just calculate offsets and insert them?
              *
-             *  Note that when writing assembly code, first operand of `call` instruction is function name and
-             *  not an integer.
+             *  Nope.
              *
+             *  It would be faster if calls were just precalculated jumps.
+             *  However, by them being strings we get plenty of plexibility, good-quality stack traces, and
+             *  a place to put plenty of debugging info.
+             *  All that at a cost of just one map lookup; the overhead is minimal and gains are big.
+             *  What's not to love?
+             *
+             *  Of course, you, my dear reader, are free to take this code (it's GPL after all!) and
+             *  modify it to suit your particular needs - in that case that would be calculating call jumps
+             *  at compile time and exchanging CALL instructions with JUMP instructions.
+             *
+             *  Good luck with debugging your code, then.
              */
             string fn_name, reg;
             tie(fn_name, reg) = get2operands(operands);
@@ -683,21 +696,6 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
                 throw ("call to an undefined function: '" + fn_name + "'");
             }
 
-            /*  Why is the instruction_index index of the function name in the vector with function names and
-             *  not a real instruction index?
-             *
-             *  Because functions are written into bytecode in the order in which their names appear in this vector.
-             *  This allows to actually insert a *name* index here and later (when all offsets are known) adjust
-             *  instruction indexes accordingly - by obtaining function index and substituting it with summed up
-             *  sizes of previous functions.
-             *
-             *  This makes it possible to declare functions and call them even if they are
-             *  not yet defined (just like in C), and
-             *  to simplify the code - there is one function that inserts the instruction and
-             *  second that adjusts the operand.
-             *  It is the same mechanism as with `jump` and `branch` instructions where their jumps are calculated
-             *  when the size of bytecode is known.
-             */
             // if second operand is empty, fill it with zero
             // which means that return value will be discarded
             if (reg == "") { reg = "0"; }
