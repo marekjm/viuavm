@@ -23,6 +23,8 @@ class Vector : public Object {
         }
 
         Object* copy() const {
+            // FIXME: we should return a *copy*, you know?
+            //        Not an empty object...
             return new Vector();
         }
 
