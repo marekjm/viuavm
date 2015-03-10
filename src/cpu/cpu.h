@@ -141,6 +141,8 @@ class CPU {
     byte* echo(byte*);
 
     byte* closure(byte*);
+    byte* clframe(byte*);
+    byte* clcall(byte*);
 
     byte* frame(byte*);
     byte* param(byte*);

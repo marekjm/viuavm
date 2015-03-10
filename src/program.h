@@ -88,6 +88,8 @@ class Program {
     Program& echo       (int_op);
 
     Program& closure    (int_op);
+    Program& clframe    (int_op);
+    Program& clcall     (int_op, int_op);
 
     Program& frame      (int_op, int_op);
     Program& param      (int_op, int_op);
