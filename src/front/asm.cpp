@@ -621,6 +621,27 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string regno_chnk;
             regno_chnk = str::chunk(operands);
             program.echo(getint_op(resolveregister(regno_chnk, names)));
+        } else if (str::startswith(line, "closure")) {
+            string fn_name, reg;
+            tie(fn_name, reg) = get2operands(operands);
+
+            if (find(function_names.begin(), function_names.end(), fn_name) == function_names.end()) {
+                throw ("closure from an undefined function: '" + fn_name + "'");
+            }
+
+            // if second operand is empty, fill it with zero
+            // which means that return value will be discarded
+            if (reg == "") { reg = "0"; }
+
+            program.closure(fn_name, getint_op(resolveregister(reg, names)));
+        } else if (str::startswith(line, "clframe")) {
+            string regno_chnk;
+            regno_chnk = str::chunk(operands);
+            program.clframe(getint_op(resolveregister(regno_chnk, names)));
+        } else if (str::startswith(line, "clcall")) {
+            string a_chnk, b_chnk;
+            tie(a_chnk, b_chnk) = get2operands(operands);
+            program.clcall(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "frame")) {
             if (operands.size() == 0) {
                 if (ERROR_OPERANDLESS_FRAME or ERROR_ALL) {
