@@ -102,10 +102,10 @@ uint16_t Program::countBytes(const vector<string>& lines) {
         instr = str::chunk(line);
         try {
             inc = OP_SIZES.at(instr);
-            if (instr == "call") {
+            if ((instr == "call") or (instr == "closure")) {
                 // clear first chunk
                 line = str::lstrip(str::sub(line, instr.size()));
-                // get second chunk (which for call instruction is function name)
+                // get second chunk (which for call and closure instructions is function name)
                 inc += str::chunk(line).size() + 1;
             } else if (instr == "strstore") {
                 // clear first chunk
@@ -165,7 +165,7 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
             cout << "[asm] debug: offsetting: " << opcode_name << ": +" << inc;
         }
 
-        if (OPCODE(program[offset]) == CALL) {
+        if ((OPCODE(program[offset]) == CALL) or (OPCODE(program[offset]) == CLOSURE)) {
             string s(program+offset+1);
             if (debug) {
                 cout << '+' << s.size() << " (function at byte " << offset+1 << ": `" << s << "`)";
