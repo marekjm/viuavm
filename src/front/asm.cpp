@@ -211,7 +211,12 @@ map<string, pair<bool, vector<string> > > getFunctions(const vector<string>& lin
         if (!str::startswith(line, ".def:")) { continue; }
 
         vector<string> flines;
-        for (int j = i+1; lines[j] != ".end"; ++j, ++i) { flines.push_back(lines[j]); }
+        for (int j = i+1; lines[j] != ".end"; ++j, ++i) {
+            if (str::startswith(lines[j], ".def")) {
+                throw ("another function opened before assembler reached .end after '" + str::chunk(str::sub(holdline, str::chunk(holdline).size())) + "' function");
+            }
+            flines.push_back(lines[j]);
+        }
 
         line = str::lstrip(str::sub(line, 5));
         string name = str::chunk(line);
