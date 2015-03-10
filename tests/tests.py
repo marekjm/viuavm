@@ -45,6 +45,7 @@ def assemble(asm, out=None, opts=(), okcodes=(0,)):
     if out is not None: asmargs += (out,)
     p = subprocess.Popen(asmargs, stdout=subprocess.PIPE)
     output, error = p.communicate()
+    output = output.decode('utf-8')
     exit_code = p.wait()
     if exit_code not in okcodes:
         raise WudooAssemblerError('{0}: {1}'.format(asm, output.decode('utf-8').strip()))
@@ -623,6 +624,15 @@ class ErrorTests(unittest.TestCase):
         excode, output = run(compiled_path, 1)
         self.assertEqual(lines, output.strip().splitlines())
         self.assertEqual(1, excode)
+
+    def testNoEndBetweenDefs(self):
+        name = 'no_end_between_defs.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,))
+        self.assertEqual("error: function gathering failed: another function opened before assembler reached .end after 'foo' function", output.strip())
+        self.assertEqual(1, exit_code)
+
 
 
 if __name__ == '__main__':
