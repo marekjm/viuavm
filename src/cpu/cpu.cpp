@@ -340,6 +340,15 @@ byte* CPU::dispatch(byte* addr) {
         case ECHO:
             addr = echo(addr+1);
             break;
+        case CLOSURE:
+            addr = closure(addr+1);
+            break;
+        case CLFRAME:
+            addr = clframe(addr+1);
+            break;
+        case CLCALL:
+            addr = clcall(addr+1);
+            break;
         case FRAME:
             addr = frame(addr+1);
             break;
