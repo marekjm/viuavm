@@ -818,7 +818,7 @@ Program& Program::closure(int_op reg) {
     return (*this);
 }
 
-Program& Program::clframe(int_op a, int_op b) {
+Program& Program::clframe(int_op reg) {
     /*  Inserts clframe instruction to bytecode.
      */
     *(addr_ptr++) = CLFRAME;
