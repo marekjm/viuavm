@@ -34,7 +34,8 @@ byte* CPU::closure(byte* addr) {
         throw "creating closures from nonlocal registers is forbidden, go rethink your behaviour";
     }
 
-    Closure* clsr = new Closure(call_name);
+    Closure* clsr = new Closure();
+    clsr->function_name = call_name;
     clsr->registers = uregisters;
     clsr->references = ureferences;
     clsr->registers_size = uregisters_size;
