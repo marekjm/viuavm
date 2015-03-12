@@ -265,6 +265,13 @@ int main(int argc, char* argv[]) {
             string key = str::chunk(command);
             string value = str::lstrip(str::sub(str::lstrip(command), key.size()));
             cout << key << " = '" << value << "'" << endl;
+            if (key == "step" or key == "stepping") {
+                if (value == "0" or value == "false") {
+                    cpu.stepping = false;
+                } else {
+                    cpu.stepping = true;
+                }
+            }
         } else if (command == "help") {
             cout << HELP << endl;
         } else if (command == "quit") {

@@ -397,7 +397,7 @@ byte* CPU::tick() {
     }
 
     try {
-        if (debug) { cout << OP_NAMES.at(OPCODE(*addr)); }
+        if (debug) { cout << OP_NAMES.at(OPCODE(*instruction_pointer)); }
         instruction_pointer = dispatch(instruction_pointer);
         if (debug and not stepping) { cout << endl; }
     } catch (const char*& e) {
