@@ -17,9 +17,6 @@ const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file whi
 // MISC FLAGS
 bool SHOW_HELP = false;
 bool SHOW_VERSION = false;
-bool VERBOSE = false;
-bool DEBUG = false;
-bool STEP_BY_STEP = false;
 
 
 // WARNING FLAGS
@@ -42,20 +39,11 @@ int main(int argc, char* argv[]) {
         } else if (option == "--version") {
             SHOW_VERSION = true;
             continue;
-        } else if (option == "--verbose") {
-            VERBOSE = true;
-            continue;
-        } else if (option == "--debug") {
-            DEBUG = true;
-            continue;
         } else if (option == "--Wall") {
             WARNING_ALL = true;
             continue;
         } else if (option == "--Eall") {
             ERROR_ALL = true;
-            continue;
-        } else if (option == "--step") {
-            STEP_BY_STEP = true;
             continue;
         }
         args.push_back(argv[i]);
@@ -85,10 +73,6 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    if (VERBOSE or DEBUG) {
-        cout << "message: running \"" << filename << "\"" << endl;
-    }
-
     ifstream in(filename, ios::in | ios::binary);
 
     if (!in) {
@@ -100,7 +84,6 @@ int main(int argc, char* argv[]) {
     char buffer[16];
     in.read(buffer, sizeof(uint16_t));
     function_ids_section_size = *((uint16_t*)buffer);
-    if (VERBOSE or DEBUG) { cout << "message: function mapping section: " << function_ids_section_size << " bytes" << endl; }
 
     /*  The code below extracts function id-to-address mapping.
      */
@@ -119,10 +102,6 @@ int main(int argc, char* argv[]) {
         i += sizeof(uint16_t);
         function_ids_map = buffer_function_ids+i;
         function_address_mapping[fn_name] = fn_address;
-
-        if (DEBUG) {
-            cout << "debug: function id-to-address mapping: " << fn_name << " @ byte " << fn_address << endl;
-        }
     }
     delete[] buffer_function_ids;
 
@@ -137,10 +116,8 @@ int main(int argc, char* argv[]) {
     } else {
         bytes = *((uint16_t*)buffer);
     }
-    if (VERBOSE or DEBUG) { cout << "message: bytecode size: " << bytes << " bytes" << endl; }
 
     uint16_t starting_instruction = function_address_mapping["__entry"];
-    if (VERBOSE or DEBUG) { cout << "message: first executable instruction at byte " << starting_instruction << endl; }
 
     byte* bytecode = new byte[bytes];
     in.read((char*)bytecode, bytes);
@@ -156,8 +133,6 @@ int main(int argc, char* argv[]) {
     string return_exception = "", return_message = "";
     // run the bytecode
     CPU cpu;
-    cpu.debug = (DEBUG or STEP_BY_STEP);
-    cpu.stepping = STEP_BY_STEP;
     for (auto p : function_address_mapping) { cpu.mapfunction(p.first, p.second); }
 
     vector<string> cmdline_args;
@@ -169,15 +144,6 @@ int main(int argc, char* argv[]) {
 
     cpu.load(bytecode).bytes(bytes).eoffset(starting_instruction).run();
     tie(ret_code, return_exception, return_message) = cpu.exitcondition();
-
-    if (VERBOSE or DEBUG or STEP_BY_STEP) {
-        // we need extra newline to separate VM CPU output from CPU frontend output
-        cout << '\n';
-    }
-
-    if (VERBOSE or DEBUG) {
-        cout << "message: execution " << (return_exception.size() == 0 ? "finished" : "broken") << ": " << cpu.counter() << " instructions executed" << endl;
-    }
 
     if (ret_code != 0 and return_exception.size()) {
         vector<Frame*> trace = cpu.trace();

@@ -374,7 +374,12 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
 
         while (not paused and not finished and (ticks_left == -1 or (ticks_left > 0))) {
             if (ticks_left > 0) { --ticks_left; }
-            if (cpu.tick() == 0) { finished = true; ticks_left = 0; cout << '\n'; break; }
+            if (cpu.tick() == 0) {
+                finished = true;
+                ticks_left = 0;
+                cout << "\nmessage: execution finished: " << cpu.counter() << " instructions executed" << endl;
+                break;
+            }
             if (find(breakpoints_byte.begin(), breakpoints_byte.end(), cpu.instruction_pointer) != breakpoints_byte.end()) {
                 cout << "info: execution halted by byte breakpoint: " << cpu.instruction_pointer << endl;
                 paused = true;
