@@ -19,14 +19,6 @@ bool SHOW_HELP = false;
 bool SHOW_VERSION = false;
 
 
-// WARNING FLAGS
-bool WARNING_ALL = false;
-
-
-// ERROR FLAGS
-bool ERROR_ALL = false;
-
-
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
     vector<string> args;
@@ -39,12 +31,6 @@ int main(int argc, char* argv[]) {
         } else if (option == "--version") {
             SHOW_VERSION = true;
             continue;
-        } else if (option == "--Wall") {
-            WARNING_ALL = true;
-            continue;
-        } else if (option == "--Eall") {
-            ERROR_ALL = true;
-            continue;
         }
         args.push_back(argv[i]);
     }
@@ -52,10 +38,8 @@ int main(int argc, char* argv[]) {
     if (SHOW_HELP or SHOW_VERSION) {
         cout << "wudoo VM virtual machine, version " << VERSION << endl;
         if (SHOW_HELP) {
-            cout << "    --analyze          - to display information about loaded bytecode but not run it" << endl;
-            cout << "    --debug <infile>   - to run a program in debug mode (shows debug output)" << endl;
-            cout << "    --help             - to display this message" << endl;
-            cout << "    --step <infile>    - to run a program in stepping mode (pauses after each instruction, implies debug mode for CPU)" << endl;
+            cout << "    --help             - display this message" << endl;
+            cout << "    --version          - display version" << endl;
         }
         return 0;
     }
