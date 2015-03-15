@@ -223,6 +223,17 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
                 continue;
             }
             ticks_left = (operands.size() ? stoi(operands[0]) : 1);
+        } else if (command == "cpu.jump") {
+            if (operands.size() != 1) {
+                cout << "error: invalid operand size, expected 1 operand" << endl;
+                continue;
+            }
+            if (not str::isnum(operands[0])) {
+                cout << "error: invalid operand, expected integer" << endl;
+                continue;
+            }
+
+            cpu.instruction_pointer = (cpu.bytecode+stoi(operands[0]));
         } else if (command == "register.show") {
             if (not operands.size()) {
                 cout << "error: invalid operand size, expected at least 1 operand" << endl;
