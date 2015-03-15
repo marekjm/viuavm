@@ -56,7 +56,6 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
     vector<string> chunks;
 
     bool initialised = false;
-    bool started = false;
     bool paused = false;
 
     int ticks_left = 0;
@@ -164,10 +163,6 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
             }
             ticks_left = -1;
         } else if (command == "cpu.resume") {
-            if (not started) {
-                cout << "error: CPU has not been started, cannot resume" << endl;
-                continue;
-            }
             if (not paused) {
                 cout << "error: execution has not been paused, cannot resume" << endl;
                 continue;
@@ -190,7 +185,6 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
                 cout << "error: invalid operand, expected integer" << endl;
                 continue;
             }
-            started = true;
             ticks_left = (operands.size() ? stoi(operands[0]) : 1);
         } else if (command == "register.show") {
             if (not operands.size()) {
@@ -225,7 +219,7 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
             cout << "unknown command: `" << command << "`" << endl;
         }
 
-        if (not started) { continue; }
+        if (not initialised) { continue; }
 
         while (not paused and (ticks_left == -1 or (ticks_left > 0))) {
             if (ticks_left > 0) { --ticks_left; }
