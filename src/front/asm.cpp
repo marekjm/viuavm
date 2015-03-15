@@ -1020,7 +1020,7 @@ int main(int argc, char* argv[]) {
         bytes += OP_SIZES.at("frame");
         bytes += OP_SIZES.at("paref");
         bytes += OP_SIZES.at("call");
-        bytes += main_function.size();
+        bytes += main_function.size()+1;
         bytes += OP_SIZES.at("move");
         bytes += OP_SIZES.at("halt");
     }
