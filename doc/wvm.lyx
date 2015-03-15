@@ -263,6 +263,11 @@ This section contains description of the VM's CPU instruction set.
 Integers
 \end_layout
 
+\begin_layout Standard
+These instructions are used to perform common operations in integers (like
+ addition or multiplication, or comparison).
+\end_layout
+
 \begin_layout Subsubsection
 izero
 \end_layout
@@ -319,6 +324,11 @@ ieq
 Floats
 \end_layout
 
+\begin_layout Standard
+These instructions are similat to their integer counterparts.
+ Float subset lacks increment and decrement instructions, though.
+\end_layout
+
 \begin_layout Subsubsection
 fstore
 \end_layout
@@ -363,6 +373,10 @@ feq
 Casts
 \end_layout
 
+\begin_layout Standard
+These instructions are used to provide type conversion inside VM.
+\end_layout
+
 \begin_layout Subsubsection
 itof
 \end_layout
@@ -373,6 +387,10 @@ ftoi
 
 \begin_layout Subsection
 Booleans
+\end_layout
+
+\begin_layout Standard
+Common boolean operations.
 \end_layout
 
 \begin_layout Subsubsection
@@ -391,12 +409,20 @@ or
 Strings
 \end_layout
 
+\begin_layout Standard
+Instructions implementing string support in Wudoo VM.
+\end_layout
+
 \begin_layout Subsubsection
 strstore
 \end_layout
 
 \begin_layout Subsection
 Vectors
+\end_layout
+
+\begin_layout Standard
+Instructions used to perform operations on basic Wudoo sequences - vectors.
 \end_layout
 
 \begin_layout Subsubsection
@@ -427,6 +453,10 @@ vlen
 Control flow
 \end_layout
 
+\begin_layout Standard
+Basic control flow capabilities.
+\end_layout
+
 \begin_layout Subsubsection
 jump
 \end_layout
@@ -437,6 +467,10 @@ branch
 
 \begin_layout Subsection
 Functions
+\end_layout
+
+\begin_layout Standard
+Function instructions.
 \end_layout
 
 \begin_layout Subsubsection
@@ -467,6 +501,12 @@ end
 Closures
 \end_layout
 
+\begin_layout Standard
+Closure instructions.
+ Closures are first-class objects inside Wudoo VM.
+ Their semantics differ slightly from those of casual functions.
+\end_layout
+
 \begin_layout Subsubsection
 closure
 \end_layout
@@ -481,6 +521,11 @@ clcall
 
 \begin_layout Subsection
 Operations on registers
+\end_layout
+
+\begin_layout Standard
+Instructions used to perform type-agnostic operations on registers.
+ These include: copying, moving, swapping etc.
 \end_layout
 
 \begin_layout Subsubsection
@@ -525,6 +570,10 @@ tmpro
 
 \begin_layout Subsection
 Other instructions
+\end_layout
+
+\begin_layout Standard
+Various instructions that do not fit into any other category.
 \end_layout
 
 \begin_layout Subsubsection
@@ -685,6 +734,13 @@ Closures
 
 \begin_layout Standard
 This subsection discusses closure implementation in Wudoo VM.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
 \end_layout
 
 \begin_layout Part
