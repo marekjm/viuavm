@@ -244,6 +244,13 @@ This section talks about VM's architecture.
 
 \begin_layout Section
 Instruction set
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Instruction-set"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -256,40 +263,288 @@ This section contains description of the VM's CPU instruction set.
 Integers
 \end_layout
 
+\begin_layout Subsubsection
+izero
+\end_layout
+
+\begin_layout Subsubsection
+istore
+\end_layout
+
+\begin_layout Subsubsection
+iadd
+\end_layout
+
+\begin_layout Subsubsection
+isub
+\end_layout
+
+\begin_layout Subsubsection
+imul
+\end_layout
+
+\begin_layout Subsubsection
+idiv
+\end_layout
+
+\begin_layout Subsubsection
+iinc
+\end_layout
+
+\begin_layout Subsubsection
+idec
+\end_layout
+
+\begin_layout Subsubsection
+ilt
+\end_layout
+
+\begin_layout Subsubsection
+ilte
+\end_layout
+
+\begin_layout Subsubsection
+igt
+\end_layout
+
+\begin_layout Subsubsection
+igte
+\end_layout
+
+\begin_layout Subsubsection
+ieq
+\end_layout
+
 \begin_layout Subsection
 Floats
+\end_layout
+
+\begin_layout Subsubsection
+fstore
+\end_layout
+
+\begin_layout Subsubsection
+fadd
+\end_layout
+
+\begin_layout Subsubsection
+fsub
+\end_layout
+
+\begin_layout Subsubsection
+fmul
+\end_layout
+
+\begin_layout Subsubsection
+fdiv
+\end_layout
+
+\begin_layout Subsubsection
+flt
+\end_layout
+
+\begin_layout Subsubsection
+flte
+\end_layout
+
+\begin_layout Subsubsection
+fgt
+\end_layout
+
+\begin_layout Subsubsection
+fgte
+\end_layout
+
+\begin_layout Subsubsection
+feq
 \end_layout
 
 \begin_layout Subsection
 Casts
 \end_layout
 
+\begin_layout Subsubsection
+itof
+\end_layout
+
+\begin_layout Subsubsection
+ftoi
+\end_layout
+
 \begin_layout Subsection
 Booleans
+\end_layout
+
+\begin_layout Subsubsection
+not
+\end_layout
+
+\begin_layout Subsubsection
+and
+\end_layout
+
+\begin_layout Subsubsection
+or
 \end_layout
 
 \begin_layout Subsection
 Strings
 \end_layout
 
+\begin_layout Subsubsection
+strstore
+\end_layout
+
+\begin_layout Subsection
+Vectors
+\end_layout
+
+\begin_layout Subsubsection
+vec
+\end_layout
+
+\begin_layout Subsubsection
+vinsert
+\end_layout
+
+\begin_layout Subsubsection
+vpush
+\end_layout
+
+\begin_layout Subsubsection
+vpop
+\end_layout
+
+\begin_layout Subsubsection
+vat
+\end_layout
+
+\begin_layout Subsubsection
+vlen
+\end_layout
+
 \begin_layout Subsection
 Control flow
+\end_layout
+
+\begin_layout Subsubsection
+jump
+\end_layout
+
+\begin_layout Subsubsection
+branch
 \end_layout
 
 \begin_layout Subsection
 Functions
 \end_layout
 
+\begin_layout Subsubsection
+frame
+\end_layout
+
+\begin_layout Subsubsection
+param
+\end_layout
+
+\begin_layout Subsubsection
+paref
+\end_layout
+
+\begin_layout Subsubsection
+call
+\end_layout
+
+\begin_layout Subsubsection
+arg
+\end_layout
+
+\begin_layout Subsubsection
+end
+\end_layout
+
+\begin_layout Subsection
+Closures
+\end_layout
+
+\begin_layout Subsubsection
+closure
+\end_layout
+
+\begin_layout Subsubsection
+clframe
+\end_layout
+
+\begin_layout Subsubsection
+clcall
+\end_layout
+
 \begin_layout Subsection
 Operations on registers
 \end_layout
 
-\begin_layout Subsection
-IO
+\begin_layout Subsubsection
+move
+\end_layout
+
+\begin_layout Subsubsection
+copy
+\end_layout
+
+\begin_layout Subsubsection
+ref
+\end_layout
+
+\begin_layout Subsubsection
+swap
+\end_layout
+
+\begin_layout Subsubsection
+free
+\end_layout
+
+\begin_layout Subsubsection
+empty
+\end_layout
+
+\begin_layout Subsubsection
+isnull
+\end_layout
+
+\begin_layout Subsubsection
+ress
+\end_layout
+
+\begin_layout Subsubsection
+tmpri
+\end_layout
+
+\begin_layout Subsubsection
+tmpro
 \end_layout
 
 \begin_layout Subsection
 Other instructions
+\end_layout
+
+\begin_layout Subsubsection
+echo
+\end_layout
+
+\begin_layout Subsubsection
+print
+\end_layout
+
+\begin_layout Subsubsection
+nop
+\end_layout
+
+\begin_layout Subsubsection
+pass
+\end_layout
+
+\begin_layout Subsubsection
+halt
 \end_layout
 
 \begin_layout Section
@@ -432,7 +687,7 @@ Closures
 This subsection discusses closure implementation in Wudoo VM.
 \end_layout
 
-\begin_layout Section
+\begin_layout Part
 Bytecode
 \end_layout
 
@@ -440,15 +695,102 @@ Bytecode
 This section talks about the bytecode used by Wudoo VM.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Executable
 \end_layout
 
 \begin_layout Standard
 This subsection discusses bytecode format used for executable files.
+ Each subsection discusses a coresponding section of the bytecode format,
+ all sections appear in text in the exact same order as they appear in bytecode.
 \end_layout
 
 \begin_layout Subsection
+Function mapping
+\end_layout
+
+\begin_layout Standard
+Function mapping begins with 
+\family typewriter
+uint16_t
+\family default
+ encoding size of the section.
+ Following N bytes contain paired function names (encoded as null-terminated
+ strings, thus variable length) and locations of their entry points (encoded
+ as 
+\family typewriter
+uint16_t
+\family default
+ integers).
+\end_layout
+
+\begin_layout Standard
+Format can be written as such:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<section size:uint16_t>
+\end_layout
+
+\begin_layout Plain Layout
+
+(<name:null-terminated-string><entry_point:uint16_t>)+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+There is a 
+\family typewriter
++
+\family default
+ rather than 
+\family typewriter
+*
+\family default
+ after name/entry-point pair because there are always at least two functions
+ mapped: 
+\family typewriter
+__entry
+\family default
+ and 
+\family typewriter
+main
+\family default
+.
+\end_layout
+
+\begin_layout Subsection
+Executable bytecode size
+\end_layout
+
+\begin_layout Standard
+Last name/entry-point pair from function mapping section is followed size
+ of the executable bytecode encoded as 
+\family typewriter
+uint16_t
+\family default
+.
+\end_layout
+
+\begin_layout Subsection
+Executable bytes
+\end_layout
+
+\begin_layout Standard
+Size is followed by N bytes containing encoded opcodes with program logic.
+\end_layout
+
+\begin_layout Section
 Linkable
 \end_layout
 
@@ -457,7 +799,78 @@ This section discusses bytecode format used for libraries.
  In Wudoo VM there is no difference between a static and dynamic libraries.
  In fact, a library can be linked statically or dynamically without any
  changes.
- The only difference is between linkable and executable bytecode.
+ The only difference is between linkable and executable bytecode formats.
+\end_layout
+
+\begin_layout Subsection
+Jump table
+\end_layout
+
+\begin_layout Standard
+Linkable bytecode format begins with encoded jump table.
+ This is because jumps must be recalculated before linking and providing
+ jump table is faster than manually scanning bytecode for 
+\family typewriter
+JUMP
+\family default
+ and 
+\family typewriter
+BRANCH
+\family default
+ instructions.
+\end_layout
+
+\begin_layout Standard
+This section begins with an 
+\family typewriter
+unsigned
+\family default
+ encoding total number of entries in the jump table.
+ It is followed by N 
+\family typewriter
+unsigned
+\family default
+ integers encoding positions of 
+\family typewriter
+JUMP
+\family default
+ and 
+\family typewriter
+BRANCH
+\family default
+ instructions in linked bytecode.
+\end_layout
+
+\begin_layout Subsection
+Function mapping
+\end_layout
+
+\begin_layout Standard
+Function mapping has the same structure as in executable bytecode format.
+\end_layout
+
+\begin_layout Subsection
+Executable bytecode size
+\end_layout
+
+\begin_layout Standard
+Last name/entry-point pair from function mapping section is followed size
+ of the executable bytecode encoded as 
+\family typewriter
+uint16_t
+\family default
+.
+\end_layout
+
+\begin_layout Subsection
+Executable bytes
+\end_layout
+
+\begin_layout Standard
+Size is followed by N bytes containing encoded opcodes with library logic.
+\end_layout
+
+\begin_layout Standard
 \begin_inset Newpage newpage
 \end_inset
 
