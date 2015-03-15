@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 #include <string>
 #include <sstream>
 #include "string.h"
@@ -99,6 +100,7 @@ namespace str {
         return part.str();
     }
 
+
     string chunk(const string& s, bool ignore_leading_ws) {
         /*  Returns part of the string until first whitespace from left side.
          */
@@ -111,6 +113,20 @@ namespace str {
             chnk << str[i];
         }
         return chnk.str();
+    }
+
+    vector<string> chunks(const string& s) {
+        /*  Returns chunks of string.
+         */
+        vector<string> chnks;
+        string tmp(lstrip(s));
+        string chnk;
+        while (tmp.size()) {
+            chnk = chunk(tmp);
+            tmp = lstrip(sub(tmp, chnk.size()));
+            chnks.push_back(chnk);
+        }
+        return chnks;
     }
 
 
