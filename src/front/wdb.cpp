@@ -325,6 +325,29 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
                 cout << indent << stack[j]->function_name << endl;
                 indent += " ";
             }
+        } else if (command == "loader.funmap.show") {
+            if (operands.size() == 0) {
+                for (pair<string, unsigned> mapping : cpu.function_addresses) {
+                    cout << "  '" << mapping.first << "': " << mapping.second << endl;
+                }
+            } else {
+                unsigned addr;
+                bool exists = false;
+                for (string fun : operands) {
+                    try {
+                        addr = cpu.function_addresses.at(fun);
+                        exists = true;
+                    } catch (const std::out_of_range& e) {
+                        exists = false;
+                    }
+                    cout << "  '" << fun << "': ";
+                    if (not exists) {
+                        cout << "not found" << endl;
+                    } else {
+                        cout << addr << endl;
+                    }
+                }
+            }
         } else if (command == "quit") {
             break;
         } else {
