@@ -14,6 +14,7 @@ using namespace std;
 
 
 const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file which cannot be run on CPU without prior compilation";
+const char* RC_FILENAME = "/.wudoo.db.rc";
 
 
 // MISC FLAGS
@@ -44,11 +45,11 @@ string join(const string& s, const vector<string>& parts) {
     return oss.str();
 }
 
-void debuggerMainLoop(CPU& cpu) {
+void debuggerMainLoop(CPU& cpu, deque<string> init) {
     vector<byte*> breakpoints_byte;
     vector<string> breakpoints_opcode;
 
-    deque<string> command_feed;
+    deque<string> command_feed = init;
     string line(""), partline(""), lastline("");
     string command("");
     vector<string> operands;
@@ -331,7 +332,20 @@ int main(int argc, char* argv[]) {
     cpu.commandline_arguments = cmdline_args;
     cpu.load(bytecode).bytes(bytes).eoffset(starting_instruction);
 
-    debuggerMainLoop(cpu);
+    string homedir(getenv("HOME"));
+    ifstream local_rc_file(homedir + RC_FILENAME);
+    ifstream global_rc_file("/etc/wudoovm/dbrc");
+
+    deque<string> init_commands;
+    string line;
+    if (global_rc_file) {
+        while (getline(global_rc_file, line)) { init_commands.push_back(line); }
+    }
+    if (local_rc_file) {
+        while (getline(local_rc_file, line)) { init_commands.push_back(line); }
+    }
+
+    debuggerMainLoop(cpu, init_commands);
 
     return ret_code;
 }
