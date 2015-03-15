@@ -235,6 +235,13 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
                     cout << " [empty]" << endl;
                 }
             }
+        } else if (command == "st.show") {
+            vector<Frame*> stack = cpu.trace();
+            string indent("");
+            for (unsigned j = 1; j < stack.size(); ++j) {
+                cout << indent << stack[j]->function_name << endl;
+                indent += " ";
+            }
         } else if (command == "quit") {
             break;
         } else {
