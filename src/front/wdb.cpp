@@ -103,13 +103,6 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
         command = str::chunk(line);
         operands = str::chunks(str::sub(line, command.size()));
 
-        cout << "command:  `" << command << "`" << endl;
-        cout << "operands: ";
-        if (operands.size()) {
-            cout << "`" << join("`, `", operands) << "`";
-        }
-        cout << endl;
-
         if (command == "") {
             // do nothing...
         } else if (command == "conf.set") {
