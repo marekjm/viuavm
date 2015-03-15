@@ -55,6 +55,8 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
     vector<string> operands;
     vector<string> chunks;
 
+    bool conf_resume_at_0_ticks_once = false;
+
     bool initialised = false;
     bool paused = false;
 
@@ -125,6 +127,16 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
                 } else {
                     cout << "error: invalid operand, expected 'true' of 'false'" << endl;
                 }
+            } else if (operands[0] == "cpu.resume-ticks") {
+                if (operands.size() == 1 or (operands.size() > 1 and operands[1] == "true")) {
+                    conf_resume_at_0_ticks_once = true;
+                } else if (operands.size() > 1 and operands[1] == "false") {
+                    conf_resume_at_0_ticks_once = false;
+                } else {
+                    cout << "error: invalid operand, expected 'true' of 'false'" << endl;
+                }
+            } else {
+                cout << "error: invalid setting" << endl;
             }
         } else if (command == "conf.get") {
         } else if (command == "conf.load") {
@@ -168,6 +180,13 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
                 continue;
             }
             paused = false;
+            if (ticks_left == 0) {
+                if (conf_resume_at_0_ticks_once) {
+                    ticks_left = 1;
+                } else {
+                    cout << "info: resumed, but ticks counter reached 0" << endl;
+                }
+            }
         } else if (command == "cpu.tick") {
             if (not initialised) {
                 cout << "error: CPU is not initialised, use `cpu.init` command before `" << command << "`" << endl;
