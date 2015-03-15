@@ -826,19 +826,32 @@ This section begins with an
 unsigned
 \family default
  encoding total number of entries in the jump table.
- It is followed by N 
+ It is followed by N pairs of 
 \family typewriter
 unsigned
 \family default
- integers encoding positions of 
-\family typewriter
-JUMP
-\family default
- and 
-\family typewriter
-BRANCH
-\family default
- instructions in linked bytecode.
+ integers encoding positions of jumps in linked bytecode and their targets.
+ The schema may look like this:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<jumptable size:unsigned>
+\end_layout
+
+\begin_layout Plain Layout
+
+(<jump position:unsigned><jump target:unsigned>)*
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
