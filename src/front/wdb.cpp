@@ -366,6 +366,7 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
 
         if (not initialised) { continue; }
 
+        string op_name;
         while (not paused and not finished and (ticks_left == -1 or (ticks_left > 0))) {
             if (ticks_left > 0) { --ticks_left; }
             printInstruction(cpu.instruction_pointer);
@@ -379,8 +380,19 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
                 cout << "info: execution halted by byte breakpoint: " << cpu.instruction_pointer << endl;
                 paused = true;
             }
-            if (find(breakpoints_opcode.begin(), breakpoints_opcode.end(), OP_NAMES.at(OPCODE(*cpu.instruction_pointer))) != breakpoints_opcode.end()) {
-                cout << "info: execution halted by opcode breakpoint: " << OP_NAMES.at(OPCODE(*cpu.instruction_pointer)) << endl;
+
+            try {
+                op_name = OP_NAMES.at(OPCODE(*cpu.instruction_pointer));
+            } catch (const std::out_of_range& e) {
+                cout << "fatal: unknown instruction at byte " << (cpu.instruction_pointer-cpu.bytecode) << endl;
+                autoresumes = 0;
+                ticks_left = 0;
+                paused = true;
+                break;
+            }
+
+            if (find(breakpoints_opcode.begin(), breakpoints_opcode.end(), op_name) != breakpoints_opcode.end()) {
+                cout << "info: execution halted by opcode breakpoint: " << op_name << endl;
                 paused = true;
             }
 
