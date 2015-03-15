@@ -56,8 +56,8 @@ test: ${VM_CPU} ${VM_ASM} clean-test-compiles
 ${VM_CPU}: src/bytecode/opcodes.h src/front/cpu.cpp build/cpu/cpu.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o
 	${CXX} ${CXXFLAGS} -o ${VM_CPU} src/front/cpu.cpp build/cpu/cpu.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o
 
-${VM_WDB}: src/bytecode/opcodes.h src/front/wdb.cpp build/cpu/debugger.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O} build/types/vector.o
-	${CXX} ${CXXFLAGS} -o ${VM_WDB} src/front/wdb.cpp build/cpu/debugger.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O} build/types/vector.o
+${VM_WDB}: src/bytecode/opcodes.h src/front/wdb.cpp build/cpu/debugger.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o
+	${CXX} ${CXXFLAGS} -o ${VM_WDB} src/front/wdb.cpp build/cpu/debugger.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o
 
 ${VM_ASM}: src/bytecode/opcodes.h src/front/asm.cpp build/program.o build/support/string.o
 	${CXX} ${CXXFLAGS} -o ${VM_ASM} src/front/asm.cpp build/program.o build/support/string.o
