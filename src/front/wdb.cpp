@@ -69,6 +69,13 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
             cout << ">>> ";
             getline(cin, line);
             line = str::lstrip(line);
+
+            // handle ^D
+            if (cin.eof()) {
+                cin.clear(); // EOF must be cleared
+                cout << "^D" << endl;
+                continue;
+            }
         }
 
         if (line == string("{")) {
