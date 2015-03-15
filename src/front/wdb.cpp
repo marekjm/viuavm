@@ -234,6 +234,11 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
             }
 
             cpu.instruction_pointer = (cpu.bytecode+stoi(operands[0]));
+        } else if (command == "cpu.unpause") {
+            paused = false;
+            ticks_left = 0;
+        } else if (command == "cpu.unfinish") {
+            finished = false;
         } else if (command == "register.show") {
             if (not operands.size()) {
                 cout << "error: invalid operand size, expected at least 1 operand" << endl;
@@ -369,7 +374,7 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
 
         while (not paused and not finished and (ticks_left == -1 or (ticks_left > 0))) {
             if (ticks_left > 0) { --ticks_left; }
-            if (cpu.tick() == 0) { finished = true; cout << '\n'; break; }
+            if (cpu.tick() == 0) { finished = true; ticks_left = 0; cout << '\n'; break; }
             if (find(breakpoints_byte.begin(), breakpoints_byte.end(), cpu.instruction_pointer) != breakpoints_byte.end()) {
                 cout << "info: execution halted by byte breakpoint: " << cpu.instruction_pointer << endl;
                 paused = true;
