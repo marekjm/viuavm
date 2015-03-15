@@ -36,7 +36,7 @@ class CPU {
      */
     Object** registers;
     bool* references;
-    int reg_count;
+    int reg_count;  // FIXME: change name to `registers_size`
 
     // Currently used register set
     Object** uregisters;
