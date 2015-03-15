@@ -155,7 +155,7 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
             initialised = true;
         } else if (command == "cpu.run") {
             if (not initialised) {
-                cout << "error: CPU is not initialised, use `cpu.init` command before `" << command "`" << endl;
+                cout << "error: CPU is not initialised, use `cpu.init` command before `" << command << "`" << endl;
                 continue;
             }
             if (paused) {
@@ -175,7 +175,7 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
             paused = false;
         } else if (command == "cpu.tick") {
             if (not initialised) {
-                cout << "error: CPU is not initialised, use `cpu.init` command before `" << command "`" << endl;
+                cout << "error: CPU is not initialised, use `cpu.init` command before `" << command << "`" << endl;
                 continue;
             }
             if (paused) {
