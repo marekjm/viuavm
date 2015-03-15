@@ -80,8 +80,8 @@ build/types/closure.o: src/types/closure.h src/types/closure.cpp
 build/cpu/cpu.o: src/bytecode/opcodes.h src/cpu/frame.h src/cpu/cpu.h src/cpu/cpu.cpp
 	${CXX} ${CXXFLAGS} -c -o $@ ./src/cpu/cpu.cpp
 
-build/cpu/debugger.o: src/bytecode/opcodes.h src/cpu/frame.h src/cpu/debugger.h src/cpu/debugger.cpp
-	${CXX} ${CXXFLAGS} -c -o $@ ./src/cpu/debugger.cpp
+build/cpu/debugger.o: src/bytecode/opcodes.h src/cpu/frame.h src/cpu/debugger.h src/cpu/cpu.cpp
+	${CXX} ${CXXFLAGS} -c -o $@ ./src/cpu/cpu.cpp
 
 build/cpu/instr/general.o: src/cpu/instr/general.cpp
 	${CXX} ${CXXFLAGS} -c -o $@ ./src/cpu/instr/general.cpp
