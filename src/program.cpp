@@ -204,6 +204,7 @@ Program& Program::calculateBranches(unsigned offset) {
     for (unsigned i = 0; i < branches.size(); ++i) {
         ptr = (int*)(branches[i]);
         (*ptr) = offset + getInstructionBytecodeOffset(*ptr, instruction_count);
+        branches_calculated.push_back((unsigned)(*ptr));
     }
 
     return (*this);
@@ -217,6 +218,11 @@ vector<unsigned> Program::jumps() {
     return jmps;
 }
 
+vector<unsigned> Program::jumpsCalculated() {
+    /** Returns vector if bytecode points which contain jumps.
+     */
+    return branches_calculated;
+}
 
 byte* insertIntegerOperand(byte* addr_ptr, int_op op) {
     /** Insert integer operand into bytecode.
