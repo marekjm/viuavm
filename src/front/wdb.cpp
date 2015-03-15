@@ -34,6 +34,12 @@ string join(const string& s, const vector<string>& parts) {
     return oss.str();
 }
 
+void printInstruction(byte* addr) {
+    string opcode_name = OP_NAMES.at(OPCODE(*addr));
+    cout << opcode_name;
+    cout << endl;
+}
+
 void debuggerMainLoop(CPU& cpu, deque<string> init) {
     vector<byte*> breakpoints_byte;
     vector<string> breakpoints_opcode;
@@ -362,6 +368,7 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
 
         while (not paused and not finished and (ticks_left == -1 or (ticks_left > 0))) {
             if (ticks_left > 0) { --ticks_left; }
+            printInstruction(cpu.instruction_pointer);
             if (cpu.tick() == 0) {
                 finished = true;
                 ticks_left = 0;
