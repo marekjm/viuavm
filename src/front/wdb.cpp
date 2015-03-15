@@ -235,6 +235,74 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
                     cout << " [empty]" << endl;
                 }
             }
+        } else if (command == "register.global.show") {
+            if (not operands.size()) {
+                cout << "error: invalid operand size, expected at least 1 operand" << endl;
+                continue;
+            }
+
+            int index;
+            for (unsigned j = 0; j < operands.size(); ++j) {
+                if (not str::isnum(operands[j])) {
+                    cout << "error: invalid operand, expected integer" << endl;
+                    continue;
+                }
+                index = stoi(operands[j]);
+                if (index >= cpu.reg_count) {
+                    cout << "warn: register out of range: " << index << endl;
+                    continue;
+                }
+                cout << "-- " << index << " --";
+                if (cpu.registers[index]) {
+                    cout << '\n';
+                    cout << "  reference:   " << (cpu.references[index] ? "true" : "false") << '\n';
+                    cout << "  object type: " << cpu.registers[index]->type() << '\n';
+                    cout << "  value:       " << cpu.registers[index]->repr() << endl;
+                } else {
+                    cout << " [empty]" << endl;
+                }
+            }
+        } else if (command == "register.static.show") {
+            if (not operands.size()) {
+                cout << "error: invalid operand size, expected at least 1 operand" << endl;
+                continue;
+            }
+
+            string fun_name = cpu.trace().back()->function_name;
+
+            Object** registers = 0;
+            bool* references;
+            int registers_size;
+            try {
+                tie(registers, references, registers_size) = cpu.static_registers.at(fun_name);
+            } catch (const std::out_of_range& e) {
+                // OK, now we know that our function does not have static registers
+                cout << "error: current function does not have static registers allocated" << endl;
+            }
+
+            if (not registers) { continue; }
+
+            int index;
+            for (unsigned j = 0; j < operands.size(); ++j) {
+                if (not str::isnum(operands[j])) {
+                    cout << "error: invalid operand, expected integer" << endl;
+                    continue;
+                }
+                index = stoi(operands[j]);
+                if (index >= registers_size) {
+                    cout << "warn: register out of range: " << index << endl;
+                    continue;
+                }
+                cout << "-- " << index << " --";
+                if (registers[index]) {
+                    cout << '\n';
+                    cout << "  reference:   " << (references[index] ? "true" : "false") << '\n';
+                    cout << "  object type: " << registers[index]->type() << '\n';
+                    cout << "  value:       " << registers[index]->repr() << endl;
+                } else {
+                    cout << " [empty]" << endl;
+                }
+            }
         } else if (command == "st.show") {
             vector<Frame*> stack = cpu.trace();
             string indent("");
