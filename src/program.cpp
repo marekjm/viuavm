@@ -202,18 +202,8 @@ Program& Program::calculateBranches(unsigned offset) {
     int instruction_count = instructionCount();
     int* ptr;
     for (unsigned i = 0; i < branches.size(); ++i) {
-        ptr = (int*)(branches[i]+1);
-        switch (*(branches[i])) {
-            case JUMP:
-                (*ptr) = offset + getInstructionBytecodeOffset(*ptr, instruction_count);
-                break;
-            case BRANCH:
-                pointer::inc<bool, int>(ptr);
-                (*(ptr+1)) = offset + getInstructionBytecodeOffset(*(ptr+1), instruction_count);
-
-                (*(ptr+2)) = offset + getInstructionBytecodeOffset(*(ptr+2), instruction_count);
-                break;
-        }
+        ptr = (int*)(branches[i]);
+        (*ptr) = offset + getInstructionBytecodeOffset(*ptr, instruction_count);
     }
 
     return (*this);
@@ -899,10 +889,10 @@ Program& Program::jump(int addr) {
      *
      *  addr:int    - index of the instruction to which to branch
      */
-    // save branch instruction index for later evaluation
-    branches.push_back(addr_ptr);
-
     *(addr_ptr++) = JUMP;
+
+    // save jump position
+    branches.push_back(addr_ptr);
 
     *((int*)addr_ptr) = addr;
     pointer::inc<int, byte>(addr_ptr);
@@ -920,13 +910,17 @@ Program& Program::branch(int_op regc, int addr_truth, int addr_false) {
      *  addr_truth:int      - instruction index to go if condition is true
      *  addr_false:int      - instruction index to go if condition is false
      */
-    // save branch instruction index for later evaluation
-    branches.push_back(addr_ptr);
 
     *(addr_ptr++) = BRANCH;
     addr_ptr = insertIntegerOperand(addr_ptr, regc);
+
+    // save jump position
+    branches.push_back(addr_ptr);
     *((int*)addr_ptr) = addr_truth;
     pointer::inc<int, byte>(addr_ptr);
+
+    // save jump position
+    branches.push_back(addr_ptr);
     *((int*)addr_ptr) = addr_false;
     pointer::inc<int, byte>(addr_ptr);
 
