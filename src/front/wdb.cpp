@@ -55,7 +55,7 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
     vector<string> operands;
     vector<string> chunks;
 
-    bool prepared = false;
+    bool initialised = false;
     bool started = false;
     bool paused = false;
 
@@ -149,13 +149,13 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
             for (unsigned j = 0; j < operands.size(); ++j) {
                 breakpoints_opcode.push_back(operands[j]);
             }
-        } else if (command == "cpu.prepare") {
+        } else if (command == "cpu.init") {
             cpu.iframe();
             cpu.begin();
-            prepared = true;
+            initialised = true;
         } else if (command == "cpu.run") {
-            if (not prepared) {
-                cout << "error: CPU is not prepared, use `cpu.prepare` command" << endl;
+            if (not initialised) {
+                cout << "error: CPU is not initialised, use `cpu.init` command" << endl;
                 continue;
             }
             if (paused) {
@@ -175,8 +175,8 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
             }
             paused = false;
         } else if (command == "cpu.tick") {
-            if (not prepared) {
-                cout << "error: CPU is not prepared, use `cpu.prepare` command" << endl;
+            if (not initialised) {
+                cout << "error: CPU is not initialised, use `cpu.init` command" << endl;
                 continue;
             }
             if (paused) {
