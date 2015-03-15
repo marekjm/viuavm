@@ -86,6 +86,9 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
             command_feed.pop_front();
         }
 
+        if (line == "") { continue; }
+        if (line[0] == "#") { continue; }
+
         if (line == ".") {
             line = lastline;
         }
