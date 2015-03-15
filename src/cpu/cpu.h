@@ -158,8 +158,6 @@ class CPU {
     public:
         // debug and error reporting flags
         bool debug, errors;
-        // stepping flag, enables to run CPU in a step-by-step mode
-        bool stepping;
 
         std::vector<std::string> commandline_arguments;
 
@@ -201,7 +199,7 @@ class CPU {
             frame_new(0),
             return_code(0), return_exception(""), return_message(""),
             instruction_counter(0), instruction_pointer(0),
-            debug(false), errors(false), stepping(false)
+            debug(false), errors(false)
         {
             /*  Basic constructor.
              *  Creates registers array of requested size and
@@ -216,8 +214,6 @@ class CPU {
             uregisters = registers;
             ureferences = references;
             uregisters_size = reg_count;
-
-            if (stepping) { debug = true; }
         }
 
         ~CPU() {

@@ -399,7 +399,7 @@ byte* CPU::tick() {
     try {
         if (debug) { cout << OP_NAMES.at(OPCODE(*instruction_pointer)); }
         instruction_pointer = dispatch(instruction_pointer);
-        if (debug and not stepping) { cout << endl; }
+        if (debug) { cout << endl; }
     } catch (const char*& e) {
         return_code = 1;
         return_message = string(e);
@@ -437,11 +437,6 @@ byte* CPU::tick() {
         }
         return_message = oss.str();
         return 0;
-    }
-
-    if (stepping) {
-        string ins;
-        getline(cin, ins);
     }
 
     return instruction_pointer;

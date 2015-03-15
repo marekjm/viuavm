@@ -116,11 +116,11 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
                 continue;
             }
 
-            if (operands[0] == "cpu.stepping") {
+            if (operands[0] == "cpu.resume-ticks") {
                 if (operands.size() == 1 or (operands.size() > 1 and operands[1] == "true")) {
-                    cpu.stepping = true;
+                    conf_resume_at_0_ticks_once = true;
                 } else if (operands.size() > 1 and operands[1] == "false") {
-                    cpu.stepping = false;
+                    conf_resume_at_0_ticks_once = false;
                 } else {
                     cout << "error: invalid operand, expected 'true' of 'false'" << endl;
                 }
@@ -129,14 +129,6 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
                     cpu.debug = true;
                 } else if (operands.size() > 1 and operands[1] == "false") {
                     cpu.debug = false;
-                } else {
-                    cout << "error: invalid operand, expected 'true' of 'false'" << endl;
-                }
-            } else if (operands[0] == "cpu.resume-ticks") {
-                if (operands.size() == 1 or (operands.size() > 1 and operands[1] == "true")) {
-                    conf_resume_at_0_ticks_once = true;
-                } else if (operands.size() > 1 and operands[1] == "false") {
-                    conf_resume_at_0_ticks_once = false;
                 } else {
                     cout << "error: invalid operand, expected 'true' of 'false'" << endl;
                 }
@@ -525,7 +517,6 @@ int main(int argc, char* argv[]) {
     // run the bytecode
     CPU cpu;
     cpu.debug = true;
-    cpu.stepping = true;
     for (auto p : function_address_mapping) { cpu.mapfunction(p.first, p.second); }
 
     vector<string> cmdline_args;
