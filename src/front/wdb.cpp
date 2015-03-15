@@ -87,7 +87,7 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
         }
 
         if (line == "") { continue; }
-        if (line[0] == "#") { continue; }
+        if (line[0] == '#') { continue; }
 
         if (line == ".") {
             line = lastline;
