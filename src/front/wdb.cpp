@@ -173,6 +173,7 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
                 cout << "error: invalid operand, expected integer" << endl;
                 continue;
             }
+            started = true;
             ticks_left = (operands.size() ? stoi(operands[0]) : 1);
         } else if (command == "quit") {
             break;
@@ -183,7 +184,7 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
         if (not started) { continue; }
 
         while (ticks_left == -1 or ((ticks_left--) > 0)) {
-            cpu.tick();
+            if (cpu.tick() == 0) { break; }
             if (find(breakpoints_byte.begin(), breakpoints_byte.end(), cpu.instruction_pointer) != breakpoints_byte.end()) {
                 cout << "info: execution halted by byte breakpoint: " << cpu.instruction_pointer << endl;
                 paused = true;
