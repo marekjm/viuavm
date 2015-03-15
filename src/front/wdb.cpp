@@ -59,8 +59,10 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
 
     bool initialised = false;
     bool paused = false;
+    bool finished = false;
 
     int ticks_left = 0;
+    int autoresumes = 0;
 
     while (true) {
         if (not command_feed.size()) {
@@ -182,6 +184,15 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
                 cout << "error: execution has not been paused, cannot resume" << endl;
                 continue;
             }
+            if (operands.size() == 1) {
+                if (not str::isnum(operands[0])) {
+                    cout << "error: invalid operand, expected integer" << endl;
+                    continue;
+                }
+                autoresumes = stoi(operands[0]);
+            } else {
+                autoresumes = 0;
+            }
             paused = false;
             if (ticks_left == 0) {
                 if (conf_resume_at_0_ticks_once) {
@@ -193,6 +204,10 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
         } else if (command == "cpu.tick") {
             if (not initialised) {
                 cout << "error: CPU is not initialised, use `cpu.init` command before `" << command << "`" << endl;
+                continue;
+            }
+            if (finished) {
+                cout << "error: CPU has finished execution of loaded program" << endl;
                 continue;
             }
             if (paused) {
@@ -318,9 +333,9 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
 
         if (not initialised) { continue; }
 
-        while (not paused and (ticks_left == -1 or (ticks_left > 0))) {
+        while (not paused and not finished and (ticks_left == -1 or (ticks_left > 0))) {
             if (ticks_left > 0) { --ticks_left; }
-            if (cpu.tick() == 0) { break; }
+            if (cpu.tick() == 0) { finished = true; cout << '\n'; break; }
             if (find(breakpoints_byte.begin(), breakpoints_byte.end(), cpu.instruction_pointer) != breakpoints_byte.end()) {
                 cout << "info: execution halted by byte breakpoint: " << cpu.instruction_pointer << endl;
                 paused = true;
@@ -329,7 +344,16 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
                 cout << "info: execution halted by opcode breakpoint: " << OP_NAMES.at(OPCODE(*cpu.instruction_pointer)) << endl;
                 paused = true;
             }
+
+            if (paused) {
+                // if there are no autoresumes, keep paused status
+                // otherwise, set paused status to false
+                paused = (not (autoresumes-- > 0));
+            }
         }
+
+        // do not let autoresumes slide to next execution
+        autoresumes = 0;
     }
 }
 
