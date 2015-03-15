@@ -4,7 +4,9 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <deque>
 #include "../version.h"
+#include "../bytecode/maps.h"
 #include "../support/string.h"
 #include "../cpu/debugger.h"
 #include "../program.h"
@@ -28,6 +30,171 @@ bool WARNING_ALL = false;
 
 // ERROR FLAGS
 bool ERROR_ALL = false;
+
+
+string join(const string& s, const vector<string>& parts) {
+    ostringstream oss;
+    unsigned limit = parts.size();
+    for (unsigned i = 0; i < limit; ++i) {
+        oss << parts[i];
+        if (i < (limit-1)) {
+            oss << s;
+        }
+    }
+    return oss.str();
+}
+
+void debuggerMainLoop(CPU& cpu) {
+    vector<byte*> breakpoints_byte;
+    vector<string> breakpoints_opcode;
+
+    deque<string> command_feed;
+    string line(""), partline(""), lastline("");
+    string command("");
+    vector<string> operands;
+    vector<string> chunks;
+
+    bool started = false;
+
+    int ticks_left = 0;
+    bool paused = false;
+
+    while (true) {
+        if (not command_feed.size()) {
+            cout << ">>> ";
+            getline(cin, line);
+            line = str::lstrip(line);
+        }
+
+        if (line == string("{")) {
+            while (true) {
+                cout << "...  ";
+                getline(cin, partline);
+                if (partline == string("}")) {
+                    break;
+                }
+                command_feed.push_back(partline);
+            }
+            partline = "";
+        }
+
+        if (command_feed.size()) {
+            line = command_feed.front();
+            command_feed.pop_front();
+        }
+
+        if (line == ".") {
+            line = lastline;
+        }
+        if (line != "") {
+            lastline = line;
+        }
+
+        command = str::chunk(line);
+        operands = str::chunks(str::sub(line, command.size()));
+
+        cout << "command:  `" << command << "`" << endl;
+        cout << "operands: ";
+        if (operands.size()) {
+            cout << "`" << join("`, `", operands) << "`";
+        }
+        cout << endl;
+
+        if (command == "") {
+            // do nothing...
+        } else if (command == "conf.set") {
+            if (not operands.size()) {
+                cout << "error: missing operands: <key> [value]" << endl;
+                continue;
+            }
+
+            if (operands[0] == "cpu.stepping") {
+                if (operands.size() == 1 or (operands.size() > 1 and operands[1] == "true")) {
+                    cpu.stepping = true;
+                } else if (operands.size() > 1 and operands[1] == "false") {
+                    cpu.stepping = false;
+                } else {
+                    cout << "error: invalid operand, expected 'true' of 'false'" << endl;
+                }
+            } else if (operands[0] == "cpu.debug") {
+                if (operands.size() == 1 or (operands.size() > 1 and operands[1] == "true")) {
+                    cpu.debug = true;
+                } else if (operands.size() > 1 and operands[1] == "false") {
+                    cpu.debug = false;
+                } else {
+                    cout << "error: invalid operand, expected 'true' of 'false'" << endl;
+                }
+            }
+        } else if (command == "conf.get") {
+        } else if (command == "conf.load") {
+            cout << "FIXME/TODO" << endl;
+        } else if (command == "conf.load.default") {
+            cout << "FIXME/TODO" << endl;
+        } else if (command == "conf.dump") {
+            cout << "FIXME/TODO" << endl;
+        } else if (command == "breakpoint.set.at") {
+            if (not operands.size()) {
+                cout << "warn: requires integer operand(s)" << endl;
+            }
+            for (unsigned j = 0; j < operands.size(); ++j) {
+                if (str::isnum(operands[j])) {
+                    breakpoints_byte.push_back(cpu.bytecode+stoi(operands[j]));
+                } else {
+                    cout << "warn: invalid operand, expected integer: " << operands[j] << endl;
+                }
+            }
+        } else if (command == "breakpoint.set.on") {
+            for (unsigned j = 0; j < operands.size(); ++j) {
+                breakpoints_opcode.push_back(operands[j]);
+            }
+        } else if (command == "cpu.prepare") {
+            cpu.iframe();
+            cpu.begin();
+        } else if (command == "cpu.run") {
+            if (started) {
+                cout << "error: program has already been started, use `resume` command instead" << endl;
+                continue;
+            }
+            started = true;
+            ticks_left = -1;
+        } else if (command == "cpu.resume") {
+            if (not paused) {
+                cout << "error: execution has not been paused, cannot resume" << endl;
+                continue;
+            }
+            paused = false;
+        } else if (command == "cpu.tick") {
+            if (operands.size() > 1) {
+                cout << "error: invalid operand size, expected 0 or 1 operand but got " << operands.size() << endl;
+                continue;
+            }
+            if (operands.size() == 1 and not str::isnum(operands[0])) {
+                cout << "error: invalid operand, expected integer" << endl;
+                continue;
+            }
+            ticks_left = (operands.size() ? stoi(operands[0]) : 1);
+        } else if (command == "quit") {
+            break;
+        } else {
+            cout << "unknown command: `" << command << "`" << endl;
+        }
+
+        if (not started) { continue; }
+
+        while (ticks_left == -1 or ((ticks_left--) > 0)) {
+            cpu.tick();
+            if (find(breakpoints_byte.begin(), breakpoints_byte.end(), cpu.instruction_pointer) != breakpoints_byte.end()) {
+                cout << "info: execution halted by byte breakpoint: " << cpu.instruction_pointer << endl;
+                paused = true;
+            }
+            if (find(breakpoints_opcode.begin(), breakpoints_opcode.end(), OP_NAMES.at(OPCODE(*cpu.instruction_pointer))) != breakpoints_opcode.end()) {
+                cout << "info: execution halted by opcode breakpoint: " << OP_NAMES.at(OPCODE(*cpu.instruction_pointer)) << endl;
+                paused = true;
+            }
+            if (paused) { break; }
+        }
+    }
+}
 
 
 int main(int argc, char* argv[]) {
@@ -162,127 +329,9 @@ int main(int argc, char* argv[]) {
     }
 
     cpu.commandline_arguments = cmdline_args;
-
     cpu.load(bytecode).bytes(bytes).eoffset(starting_instruction);
 
-    string HELP(
-        "SYNTAX:\n"
-        "\n"
-        "  Commands are written as follows: `:<command>[operand]`.\n"
-        "  If operand is enclosed in <triangular> braces it is mandatory.\n"
-        "  If operand is enclosed in [square] braces it is optional.\n"
-        "\n"
-        "  Commands cannot be chained, i.e. `:t18s` does not mean \"execute 18 instructions and"
-        "  print stack trace\" - it is an error.\n"
-        "\n"
-        "COMMANDS:\n"
-        "\n"
-        "  help                 - display help\n"
-        "  quit                 - quit debugger\n"
-        "  conf <key> <value>   - set configuration variable (for the run)\n"
-        "  :i                   - create initial frame\n"
-        "  :b                   - set instruction counter to 0 and go to the beginning of the bytecode\n"
-        "  :p                   - prepare CPU to run (alias for :i<CR>:b)\n"
-        "  :t[n]                - execute [n] instructions\n"
-        "  :s                   - print stack trace\n"
-        "  :f                   - print last frame on stack trace\n"
-        "  :u                   - print current registers\n"
-        "  :j<n>                - jump to <n> bytecode\n"
-        "  .                    - repeat last command\n"
-    );
-
-    string command(""), lastcommand("");
-    while (true) {
-        cout << ">>> ";
-        getline(cin, command);
-
-        command = str::lstrip(command);
-
-        if (command == ".") {
-            command = lastcommand;
-        }
-
-        if (command == "") {
-            // do nothing
-            continue;
-        } else if (str::startswith(command, ":i")) {
-            cpu.iframe();
-        } else if (str::startswith(command, ":b")) {
-            cpu.instruction_counter = 0;
-            cpu.begin();
-        } else if (str::startswith(command, ":p")) {
-            cpu.iframe();
-            cpu.begin();
-        } else if (str::startswith(command, ":t")) {
-            int n = 1;
-            if (str::isnum(str::chunk(str::sub(command, 2)))) {
-                n = stoi(str::chunk(str::sub(command, 2)));
-            }
-            while ((n--) > 0) {
-                if (cpu.tick() == 0) {
-                    break;
-                }
-            }
-        } else if (str::startswith(command, ":s")) {
-            vector<Frame*> trace = cpu.trace();
-            for (unsigned i = 1; i < trace.size(); ++i) {
-                cout << "  " << trace[i]->function_name << "\n";
-            }
-        } else if (str::startswith(command, ":f")) {
-            Frame* frame = cpu.trace().back();
-
-            for (int r = 0; r < frame->registers_size; ++r) {
-                if (frame->registers[r] == 0) { continue; }
-                cout << "    registers[" << r << "]: ";
-                cout << '<' << frame->registers[r]->type() << "> " << frame->registers[r]->str() << endl;
-            }
-            cout << endl;
-
-            for (int r = 0; r < frame->arguments_size; ++r) {
-                if (frame->arguments[r] == 0) { continue; }
-                cout << "    arguments[" << r << "]: ";
-                cout << '<' << frame->arguments[r]->type() << "> " << frame->arguments[r]->str() << endl;
-            }
-        } else if (str::startswith(command, ":u")) {
-            for (int r = 0; r < cpu.uregisters_size; ++r) {
-                if (cpu.uregisters[r] == 0) { continue; }
-                cout << "    uregisters[" << r << "]: ";
-                cout << '<' << cpu.uregisters[r]->type() << "> " << cpu.uregisters[r]->str() << endl;
-            }
-        } else if (str::startswith(command, ":j")) {
-            int n = 1;
-            if (str::isnum(str::chunk(str::sub(command, 2)))) {
-                n = stoi(str::chunk(str::sub(command, 2)));
-            } else {
-                cout << "invalid syntax" << endl;
-                continue;
-            }
-            cpu.instruction_pointer = (cpu.bytecode+n);
-        } else if (str::startswith(command, ":c")) {
-            cout << cpu.counter() << endl;
-        } else if (str::startswith(command, "conf")) {
-            command = str::sub(command, 4);
-            string key = str::chunk(command);
-            string value = str::lstrip(str::sub(str::lstrip(command), key.size()));
-            cout << key << " = '" << value << "'" << endl;
-            if (key == "step" or key == "stepping") {
-                if (value == "0" or value == "false") {
-                    cpu.stepping = false;
-                } else {
-                    cpu.stepping = true;
-                }
-            }
-        } else if (command == "help") {
-            cout << HELP << endl;
-        } else if (command == "quit") {
-            break;
-        } else {
-            cout << "unknown command: " << command << endl;
-            continue;
-        }
-
-        lastcommand = command;
-    }
+    debuggerMainLoop(cpu);
 
     return ret_code;
 }
