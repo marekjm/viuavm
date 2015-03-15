@@ -20,17 +20,6 @@ const char* RC_FILENAME = "/.wudoo.db.rc";
 // MISC FLAGS
 bool SHOW_HELP = false;
 bool SHOW_VERSION = false;
-bool VERBOSE = false;
-bool DEBUG = false;
-bool STEP_BY_STEP = false;
-
-
-// WARNING FLAGS
-bool WARNING_ALL = false;
-
-
-// ERROR FLAGS
-bool ERROR_ALL = false;
 
 
 string join(const string& s, const vector<string>& parts) {
@@ -413,21 +402,6 @@ int main(int argc, char* argv[]) {
         } else if (option == "--version") {
             SHOW_VERSION = true;
             continue;
-        } else if (option == "--verbose") {
-            VERBOSE = true;
-            continue;
-        } else if (option == "--debug") {
-            DEBUG = true;
-            continue;
-        } else if (option == "--Wall") {
-            WARNING_ALL = true;
-            continue;
-        } else if (option == "--Eall") {
-            ERROR_ALL = true;
-            continue;
-        } else if (option == "--step") {
-            STEP_BY_STEP = true;
-            continue;
         }
         args.push_back(argv[i]);
     }
@@ -469,7 +443,7 @@ int main(int argc, char* argv[]) {
     char buffer[16];
     in.read(buffer, sizeof(uint16_t));
     function_ids_section_size = *((uint16_t*)buffer);
-    if (VERBOSE or DEBUG) { cout << "message: function mapping section: " << function_ids_section_size << " bytes" << endl; }
+    cout << "message: function mapping section: " << function_ids_section_size << " bytes" << endl;
 
     /*  The code below extracts function id-to-address mapping.
      */
