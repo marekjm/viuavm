@@ -135,7 +135,7 @@ int main(int argc, char* argv[]) {
         for (unsigned i = 1; i < trace.size(); ++i) {
             cout << "  called function: '" << trace[i]->function_name << "'\n";
         }
-        cout << "exception in function '" << trace.back()->function_name << "': ";
+        cout << "exception after " << cpu.counter() << " ticks: ";
         cout << return_exception << ": " << return_message << endl;
 
         cout << "frame details:\n";
