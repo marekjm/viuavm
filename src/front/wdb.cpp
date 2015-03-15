@@ -155,14 +155,13 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
             initialised = true;
         } else if (command == "cpu.run") {
             if (not initialised) {
-                cout << "error: CPU is not initialised, use `cpu.init` command" << endl;
+                cout << "error: CPU is not initialised, use `cpu.init` command before `" << command "`" << endl;
                 continue;
             }
             if (paused) {
-                cout << "warn: CPU is paused, use `cpu.resume` command" << endl;
+                cout << "warn: CPU is paused, use `cpu.resume` command instead of `" << command << "`" << endl;
                 continue;
             }
-            started = true;
             ticks_left = -1;
         } else if (command == "cpu.resume") {
             if (not started) {
@@ -176,11 +175,11 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
             paused = false;
         } else if (command == "cpu.tick") {
             if (not initialised) {
-                cout << "error: CPU is not initialised, use `cpu.init` command" << endl;
+                cout << "error: CPU is not initialised, use `cpu.init` command before `" << command "`" << endl;
                 continue;
             }
             if (paused) {
-                cout << "warn: CPU is paused, use `cpu.resume` command" << endl;
+                cout << "warn: CPU is paused, use `cpu.resume` command instead of `" << command << "`" << endl;
                 continue;
             }
             if (operands.size() > 1) {
