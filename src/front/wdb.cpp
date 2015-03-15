@@ -55,10 +55,11 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
     vector<string> operands;
     vector<string> chunks;
 
+    bool prepared = false;
     bool started = false;
+    bool paused = false;
 
     int ticks_left = 0;
-    bool paused = false;
 
     while (true) {
         if (not command_feed.size()) {
@@ -151,20 +152,37 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
         } else if (command == "cpu.prepare") {
             cpu.iframe();
             cpu.begin();
+            prepared = true;
         } else if (command == "cpu.run") {
-            if (started) {
-                cout << "error: program has already been started, use `resume` command instead" << endl;
+            if (not prepared) {
+                cout << "error: CPU is not prepared, use `cpu.prepare` command" << endl;
+                continue;
+            }
+            if (paused) {
+                cout << "warn: CPU is paused, use `cpu.resume` command" << endl;
                 continue;
             }
             started = true;
             ticks_left = -1;
         } else if (command == "cpu.resume") {
+            if (not started) {
+                cout << "error: CPU has not been started, cannot resume" << endl;
+                continue;
+            }
             if (not paused) {
                 cout << "error: execution has not been paused, cannot resume" << endl;
                 continue;
             }
             paused = false;
         } else if (command == "cpu.tick") {
+            if (not prepared) {
+                cout << "error: CPU is not prepared, use `cpu.prepare` command" << endl;
+                continue;
+            }
+            if (paused) {
+                cout << "warn: CPU is paused, use `cpu.resume` command" << endl;
+                continue;
+            }
             if (operands.size() > 1) {
                 cout << "error: invalid operand size, expected 0 or 1 operand but got " << operands.size() << endl;
                 continue;
@@ -175,6 +193,33 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
             }
             started = true;
             ticks_left = (operands.size() ? stoi(operands[0]) : 1);
+        } else if (command == "register.show") {
+            if (not operands.size()) {
+                cout << "error: invalid operand size, expected at least 1 operand" << endl;
+                continue;
+            }
+
+            int index;
+            for (unsigned j = 0; j < operands.size(); ++j) {
+                if (not str::isnum(operands[j])) {
+                    cout << "error: invalid operand, expected integer" << endl;
+                    continue;
+                }
+                index = stoi(operands[j]);
+                if (index >= cpu.uregisters_size) {
+                    cout << "warn: register out of range: " << index << endl;
+                    continue;
+                }
+                cout << "-- " << index << " --";
+                if (cpu.uregisters[index]) {
+                    cout << '\n';
+                    cout << "  reference:   " << (cpu.ureferences[index] ? "true" : "false") << '\n';
+                    cout << "  object type: " << cpu.uregisters[index]->type() << '\n';
+                    cout << "  value:       " << cpu.uregisters[index]->repr() << endl;
+                } else {
+                    cout << " [empty]" << endl;
+                }
+            }
         } else if (command == "quit") {
             break;
         } else {
@@ -183,7 +228,8 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
 
         if (not started) { continue; }
 
-        while (ticks_left == -1 or ((ticks_left--) > 0)) {
+        while (not paused and (ticks_left == -1 or (ticks_left > 0))) {
+            if (ticks_left > 0) { --ticks_left; }
             if (cpu.tick() == 0) { break; }
             if (find(breakpoints_byte.begin(), breakpoints_byte.end(), cpu.instruction_pointer) != breakpoints_byte.end()) {
                 cout << "info: execution halted by byte breakpoint: " << cpu.instruction_pointer << endl;
@@ -193,7 +239,6 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
                 cout << "info: execution halted by opcode breakpoint: " << OP_NAMES.at(OPCODE(*cpu.instruction_pointer)) << endl;
                 paused = true;
             }
-            if (paused) { break; }
         }
     }
 }
