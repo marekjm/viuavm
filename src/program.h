@@ -20,6 +20,7 @@ class Program {
     byte* addr_ptr;
 
     std::vector<byte*> branches;
+    std::vector<unsigned> branches_calculated;
 
     bool debug;
 
@@ -108,19 +109,17 @@ class Program {
 
     // after-insertion calculations
     Program& calculateBranches(unsigned offset = 0);
-
-    // representations
-    byte* bytecode();
     std::vector<unsigned> jumps();
+    std::vector<unsigned> jumpsCalculated();
+
+    byte* bytecode();
 
     Program& setdebug(bool d = true);
 
     int size();
     int instructionCount();
 
-
     static uint16_t countBytes(const std::vector<std::string>&);
-
 
     Program(int bts = 2): bytes(bts), debug(false) {
         program = new byte[bytes];
