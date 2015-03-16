@@ -1334,7 +1334,7 @@ int main(int argc, char* argv[]) {
             if (DEBUG) {
                 cout << "[linker] adjusting jump: at position " << jmp << ", " << jmp_target << '+' << bytes_offset << " -> " << (jmp_target+bytes_offset) << endl;
             }
-            linked_bytecode[jmp] = (jmp_target+bytes_offset);
+            *((int*)(linked_bytecode+jmp)) += bytes_offset;
         }
 
         out.write(linked_bytecode, linked_size);
