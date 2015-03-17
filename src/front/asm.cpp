@@ -1031,7 +1031,7 @@ int main(int argc, char* argv[]) {
     vector<string> links = getlinks(ilines);
     vector<tuple<string, uint16_t, char*> > linked_libs_bytecode;
     vector<string> linked_function_names;
-    map<string, tuple<vector<unsigned>, vector<unsigned> > > linked_libs_jumptables;
+    map<string, vector<unsigned> > linked_libs_jumptables;
     uint16_t current_link_offset = bytes;
 
     for (string lnk : links) {
@@ -1052,20 +1052,16 @@ int main(int argc, char* argv[]) {
         }
 
         vector<unsigned> lib_jumps;
-        vector<unsigned> lib_jumps_targets;
         unsigned lib_jmp;
-        unsigned lib_jmp_target;
         for (unsigned i = 0; i < lib_total_jumps; ++i) {
             libin.read((char*)&lib_jmp, sizeof(unsigned));
-            //libin.read((char*)&lib_jmp_target, sizeof(unsigned));
             lib_jumps.push_back(lib_jmp);
-            lib_jumps_targets.push_back(lib_jmp);
             if (DEBUG) {
                 cout << "  jump at byte: " << lib_jmp << endl;// ", target: " << lib_jmp_target << endl;
             }
         }
 
-        linked_libs_jumptables[lnk] = tuple<vector<unsigned>, vector<unsigned> >(lib_jumps, lib_jumps_targets);
+        linked_libs_jumptables[lnk] = lib_jumps;
 
         // FIXME: urgent!!!
         uint16_t lib_function_ids_section_size = 0;
@@ -1145,7 +1141,6 @@ int main(int argc, char* argv[]) {
     ////////////////////
     // CREATE JUMP TABLE
     vector<unsigned> jump_table;
-    vector<unsigned> jump_table_calculated;
 
 
     /////////////////////////////////////////////////////////
@@ -1195,7 +1190,6 @@ int main(int argc, char* argv[]) {
         functions_bytecode[name] = tuple<int, byte*>(func.size(), func.bytecode());
 
         vector<unsigned> jumps = func.jumps();
-        vector<unsigned> jumps_calculated = func.jumpsCalculated();
         // extend jump table with jumps from current function
         for (unsigned i = 0; i < jumps.size(); ++i) {
             unsigned jmp = jumps[i];
@@ -1203,7 +1197,6 @@ int main(int argc, char* argv[]) {
                 cout << "[asm] debug: pushed to jump table: " << jmp << '+' << functions_section_size << endl;
             }
             jump_table.push_back(jmp+functions_section_size);
-            jump_table_calculated.push_back(jumps_calculated[i]);
         }
 
         functions_section_size += func.size();
@@ -1223,9 +1216,7 @@ int main(int argc, char* argv[]) {
         unsigned jmp, jmp_target;
         for (unsigned i = 0; i < total_jumps; ++i) {
             jmp = jump_table[i];
-            jmp_target = jump_table_calculated[i];
             out.write((const char*)&jmp, sizeof(unsigned));
-            //out.write((const char*)&jmp_target, sizeof(unsigned));
         }
     } else {
         if (DEBUG) {
@@ -1319,9 +1310,9 @@ int main(int argc, char* argv[]) {
             cout << "[linker] message: linked module \"" << lib_name <<  "\" written at offset " << bytes_offset << endl;
         }
 
-        vector<unsigned> linked_jumptable, linked_jumptable_targets;
+        vector<unsigned> linked_jumptable;
         try {
-            tie(linked_jumptable, linked_jumptable_targets) = linked_libs_jumptables[lib_name];
+            linked_jumptable = linked_libs_jumptables[lib_name];
         } catch (const std::out_of_range& e) {
             cout << "[linker] fatal: could not find jumptable for '" << lib_name << "' (maybe not loaded?)" << endl;
             exit(1);
