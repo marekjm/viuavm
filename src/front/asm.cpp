@@ -1057,11 +1057,11 @@ int main(int argc, char* argv[]) {
         unsigned lib_jmp_target;
         for (unsigned i = 0; i < lib_total_jumps; ++i) {
             libin.read((char*)&lib_jmp, sizeof(unsigned));
-            libin.read((char*)&lib_jmp_target, sizeof(unsigned));
+            //libin.read((char*)&lib_jmp_target, sizeof(unsigned));
             lib_jumps.push_back(lib_jmp);
-            lib_jumps_targets.push_back(lib_jmp_target);
+            lib_jumps_targets.push_back(lib_jmp);
             if (DEBUG) {
-                cout << "  jump at byte: " << lib_jmp << ", target: " << lib_jmp_target << endl;
+                cout << "  jump at byte: " << lib_jmp << endl;// ", target: " << lib_jmp_target << endl;
             }
         }
 
@@ -1225,7 +1225,7 @@ int main(int argc, char* argv[]) {
             jmp = jump_table[i];
             jmp_target = jump_table_calculated[i];
             out.write((const char*)&jmp, sizeof(unsigned));
-            out.write((const char*)&jmp_target, sizeof(unsigned));
+            //out.write((const char*)&jmp_target, sizeof(unsigned));
         }
     } else {
         if (DEBUG) {
@@ -1330,7 +1330,7 @@ int main(int argc, char* argv[]) {
         unsigned jmp, jmp_target;
         for (unsigned i = 0; i < linked_jumptable.size(); ++i) {
             jmp = linked_jumptable[i];
-            jmp_target = linked_jumptable_targets[i];
+            jmp_target = *((unsigned*)(linked_bytecode+jmp));
             if (DEBUG) {
                 cout << "[linker] adjusting jump: at position " << jmp << ", " << jmp_target << '+' << bytes_offset << " -> " << (jmp_target+bytes_offset) << endl;
             }
