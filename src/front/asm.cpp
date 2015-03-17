@@ -1213,7 +1213,7 @@ int main(int argc, char* argv[]) {
         unsigned total_jumps = jump_table.size();
         out.write((const char*)&total_jumps, sizeof(unsigned));
 
-        unsigned jmp, jmp_target;
+        unsigned jmp;
         for (unsigned i = 0; i < total_jumps; ++i) {
             jmp = jump_table[i];
             out.write((const char*)&jmp, sizeof(unsigned));
