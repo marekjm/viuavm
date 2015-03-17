@@ -882,11 +882,12 @@ This section begins with an
 unsigned
 \family default
  encoding total number of entries in the jump table.
- It is followed by N pairs of 
+ It is followed by N 
 \family typewriter
 unsigned
 \family default
- integers encoding positions of jumps in linked bytecode and their targets.
+ integers encoding positions of jumps in linked bytecode.
+ During linking they must be adjusted by increasing their targets by total size of bytecode that precedes them.
  The schema may look like this:
 \end_layout
 
@@ -902,7 +903,7 @@ status open
 
 \begin_layout Plain Layout
 
-(<jump position:unsigned><jump target:unsigned>)*
+<jump position:unsigned>*
 \end_layout
 
 \end_inset
