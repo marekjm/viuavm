@@ -604,6 +604,25 @@ class FunctionTests(unittest.TestCase):
         self.assertEqual(0, excode)
 
 
+class StaticLinkingTests(unittest.TestCase):
+    """Tests for static linking functionality.
+    """
+    PATH = './sample/asm/linking/static'
+
+    def testBasicLinking(self):
+        lib_name = 'print_N.asm'
+        assembly_lib_path = os.path.join(self.PATH, lib_name)
+        compiled_lib_path = os.path.join(COMPILED_SAMPLES_PATH, (lib_name + '.wlib'))
+        assemble(assembly_lib_path, compiled_lib_path, opts=('--lib',))
+        bin_name = 'links.asm'
+        assembly_bin_path = os.path.join(self.PATH, bin_name)
+        compiled_bin_path = os.path.join(COMPILED_SAMPLES_PATH, (bin_name + '.bin'))
+        assemble(assembly_bin_path, compiled_bin_path, links=(compiled_lib_path,))
+        excode, output = run(compiled_bin_path)
+        self.assertEqual('42', output.strip())
+        self.assertEqual(0, excode)
+
+
 class ErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.
     """
