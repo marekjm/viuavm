@@ -42,13 +42,13 @@ def assemble(asm, out=None, opts=(), okcodes=(0,)):
     Raises exception if compilation is not successful.
     """
     asmargs = ('./bin/vm/asm',) + opts + (asm,)
-    if out is not None: asmargs += (out,)
+    if out is not None: asmargs += ('--out', out,)
     p = subprocess.Popen(asmargs, stdout=subprocess.PIPE)
     output, error = p.communicate()
     output = output.decode('utf-8')
     exit_code = p.wait()
     if exit_code not in okcodes:
-        raise WudooAssemblerError('{0}: {1}'.format(asm, output.decode('utf-8').strip()))
+        raise WudooAssemblerError('{0}: {1}'.format(asm, output.strip()))
     return (output, error, exit_code)
 
 def run(path, expected_exit_code=0):
