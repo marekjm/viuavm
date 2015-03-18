@@ -37,12 +37,14 @@ class WudooCPUError(WudooError):
     pass
 
 
-def assemble(asm, out=None, opts=(), okcodes=(0,)):
+def assemble(asm, out=None, links=(), opts=(), okcodes=(0,)):
     """Assemble path given as `asm` and put binary in `out`.
     Raises exception if compilation is not successful.
     """
-    asmargs = ('./bin/vm/asm',) + opts + (asm,)
+    asmargs = ('./bin/vm/asm',) + opts
     if out is not None: asmargs += ('--out', out,)
+    asmargs += (asm,)
+    asmargs += links
     p = subprocess.Popen(asmargs, stdout=subprocess.PIPE)
     output, error = p.communicate()
     output = output.decode('utf-8')
