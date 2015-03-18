@@ -780,6 +780,9 @@ int main(int argc, char* argv[]) {
     // setup command line arguments vector
     vector<string> args;
     string option;
+
+    string filename(""), compilename("");
+
     for (int i = 1; i < argc; ++i) {
         option = string(argv[i]);
         if (option == "--help") {
@@ -826,6 +829,14 @@ int main(int argc, char* argv[]) {
             continue;
         } else if (option == "--Eglobals-in-lib") {
             ERROR_GLOBALS_IN_LIB = true;
+            continue;
+        } else if (option == "--out" or option == "-o") {
+            if (i < argc-1) {
+                compilename = string(argv[++i]);
+            } else {
+                cout << "error: option '" << argv[i] << "' requires an argument: filename" << endl;
+                exit(1);
+            }
             continue;
         }
         args.push_back(argv[i]);
