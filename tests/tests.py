@@ -609,7 +609,7 @@ class StaticLinkingTests(unittest.TestCase):
     """
     PATH = './sample/asm/linking/static'
 
-    def testBasicLinking(self):
+    def testLinkingBasic(self):
         lib_name = 'print_N.asm'
         assembly_lib_path = os.path.join(self.PATH, lib_name)
         compiled_lib_path = os.path.join(COMPILED_SAMPLES_PATH, (lib_name + '.wlib'))
@@ -622,7 +622,7 @@ class StaticLinkingTests(unittest.TestCase):
         self.assertEqual('42', output.strip())
         self.assertEqual(0, excode)
 
-    def testMainFunctionLinking(self):
+    def testLinkingMainFunction(self):
         lib_name = 'main_main.asm'
         assembly_lib_path = os.path.join(self.PATH, lib_name)
         compiled_lib_path = os.path.join(COMPILED_SAMPLES_PATH, (lib_name + '.wlib'))
