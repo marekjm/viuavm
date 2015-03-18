@@ -877,12 +877,8 @@ int main(int argc, char* argv[]) {
 
     ////////////////////////////////
     // FIND FILENAME AND COMPILENAME
-    string filename, compilename = "";
-    if (args.size() == 2) {
-        filename = args[0];
-        compilename = args[1];
-    } else if (args.size() == 1) {
-        filename = args[0];
+    filename = args[0];
+    if (compilename == "") {
         if (AS_LIB) {
             compilename = (filename + ".wlib");
         } else {
