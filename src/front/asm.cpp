@@ -890,6 +890,14 @@ int main(int argc, char* argv[]) {
         cout << "message: assembling \"" << filename << "\" to \"" << compilename << "\"" << endl;
     }
 
+
+    //////////////////////////////////////////
+    // GATHER LINKS OBTAINED FROM COMMAND LINE
+    vector<string> commandline_given_links;
+    for (unsigned i = 1; i < args.size(); ++i) {
+        commandline_given_links.push_back(args[i]);
+    }
+
     if (!filename.size()) {
         cout << "fatal: no file to assemble" << endl;
         return 1;
@@ -1040,6 +1048,12 @@ int main(int argc, char* argv[]) {
     vector<string> linked_function_names;
     map<string, vector<unsigned> > linked_libs_jumptables;
     uint16_t current_link_offset = bytes;
+
+    for (string lnk : commandline_given_links) {
+        if (find(links.begin(), links.end(), lnk) == links.end()) {
+            links.push_back(lnk);
+        }
+    }
 
     for (string lnk : links) {
         ifstream libin(lnk, ios::in | ios::binary);
