@@ -201,9 +201,16 @@ Program& Program::calculateBranches(unsigned offset) {
      */
     int instruction_count = instructionCount();
     int* ptr;
+
     for (unsigned i = 0; i < branches.size(); ++i) {
         ptr = (int*)(branches[i]);
         (*ptr) = offset + getInstructionBytecodeOffset(*ptr, instruction_count);
+        branches_calculated.push_back((unsigned)(*ptr));
+    }
+
+    for (unsigned i = 0; i < branches_absolute.size(); ++i) {
+        ptr = (int*)(branches_absolute[i]);
+        (*ptr) = getInstructionBytecodeOffset(*ptr, instruction_count);
         branches_calculated.push_back((unsigned)(*ptr));
     }
 
@@ -215,6 +222,14 @@ vector<unsigned> Program::jumps() {
      */
     vector<unsigned> jmps;
     for (byte* jmp : branches) { jmps.push_back( (unsigned)(jmp-program) ); }
+    return jmps;
+}
+
+vector<unsigned> Program::jumpsAbsolute() {
+    /** Returns vector if bytecode points which contain absolute jumps.
+     */
+    vector<unsigned> jmps;
+    for (byte* jmp : branches_absolute) { jmps.push_back( (unsigned)(jmp-program) ); }
     return jmps;
 }
 
@@ -894,7 +909,7 @@ Program& Program::call(string fn_name, int_op reg) {
     return (*this);
 }
 
-Program& Program::jump(int addr) {
+Program& Program::jump(int addr, bool local) {
     /*  Inserts jump instruction. Parameter is instruction index.
      *  Byte offset is calculated automatically.
      *
@@ -905,7 +920,11 @@ Program& Program::jump(int addr) {
     *(addr_ptr++) = JUMP;
 
     // save jump position
-    branches.push_back(addr_ptr);
+    if (local) {
+        branches.push_back(addr_ptr);
+    } else {
+        branches_absolute.push_back(addr_ptr);
+    }
 
     *((int*)addr_ptr) = addr;
     pointer::inc<int, byte>(addr_ptr);
@@ -913,7 +932,7 @@ Program& Program::jump(int addr) {
     return (*this);
 }
 
-Program& Program::branch(int_op regc, int addr_truth, int addr_false) {
+Program& Program::branch(int_op regc, int addr_truth, bool local_truth, int addr_false, bool local_false) {
     /*  Inserts branch instruction.
      *  Byte offset is calculated automatically.
      *
@@ -928,12 +947,12 @@ Program& Program::branch(int_op regc, int addr_truth, int addr_false) {
     addr_ptr = insertIntegerOperand(addr_ptr, regc);
 
     // save jump position
-    branches.push_back(addr_ptr);
+    (local_truth ? branches : branches_absolute).push_back(addr_ptr);
     *((int*)addr_ptr) = addr_truth;
     pointer::inc<int, byte>(addr_ptr);
 
     // save jump position
-    branches.push_back(addr_ptr);
+    (local_false ? branches : branches_absolute).push_back(addr_ptr);
     *((int*)addr_ptr) = addr_false;
     pointer::inc<int, byte>(addr_ptr);
 

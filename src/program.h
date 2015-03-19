@@ -20,6 +20,7 @@ class Program {
     byte* addr_ptr;
 
     std::vector<byte*> branches;
+    std::vector<byte*> branches_absolute;
     std::vector<unsigned> branches_calculated;
 
     bool debug;
@@ -100,8 +101,8 @@ class Program {
     Program& arg        (int_op, int_op);
 
     Program& call       (std::string, int_op);
-    Program& jump       (int);
-    Program& branch     (int_op, int, int);
+    Program& jump       (int, bool);
+    Program& branch     (int_op, int, bool, int, bool);
 
     Program& end        ();
     Program& halt       ();
@@ -110,6 +111,7 @@ class Program {
     // after-insertion calculations
     Program& calculateBranches(unsigned offset = 0);
     std::vector<unsigned> jumps();
+    std::vector<unsigned> jumpsAbsolute();
     std::vector<unsigned> jumpsCalculated();
 
     byte* bytecode();
