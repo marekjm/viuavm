@@ -105,8 +105,6 @@ enum OPCODE : byte {
     BRANCH,
 
     END,
-
-    PASS,   // do nothing
     HALT,
 };
 

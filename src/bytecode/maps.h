@@ -98,8 +98,6 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "branch", sizeof(byte) + sizeof(bool) + 3*sizeof(int) },
 
     { "end",    sizeof(byte) },
-
-    { "pass",   sizeof(byte) },
     { "halt",   sizeof(byte) },
 };
 
@@ -192,8 +190,6 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { BRANCH,   "branch" },
 
     { END,      "end" },
-
-    { PASS,     "pass" },
     { HALT,     "halt" },
 };
 
