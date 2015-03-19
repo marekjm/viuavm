@@ -745,8 +745,6 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             program.jump(resolvejump(operands, marks));
         } else if (str::startswith(line, "end")) {
             program.end();
-        } else if (str::startswith(line, "pass")) {
-            program.pass();
         } else if (str::startswith(line, "halt")) {
             program.halt();
         } else {
