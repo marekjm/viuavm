@@ -1435,7 +1435,7 @@ Static linking is done during assembling, in linking phase.
 \family typewriter
 .link:
 \family default
- directive is used.
+ directive (in asm source code) is used.
 \end_layout
 
 \begin_layout Standard
@@ -1454,8 +1454,28 @@ status open
 \end_layout
 
 \begin_layout Standard
-The very short snippet above can actually assemble without a single warning,
- provided function named 
+Alternatively, a list of libraries to link can be supplied to assembler
+ frontend on the command line.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+./bin/vm/asm -o main.out main.asm lib1.wlib lib2.wlib libN.wlib...
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The very short snippet shown in the first listing can actually assemble
+ without a single warning, provided function named 
 \family typewriter
 main
 \family default
@@ -1467,8 +1487,9 @@ main.wlib
 \end_layout
 
 \begin_layout Standard
-No special steps must be performed on the command line to assemble program
- that links external libraries.
+No special steps have to be performed on the command line to assemble program
+ that links external libraries, provided that correct paths are embedded
+ in source code.
  However, special steps are required when assembling a library - 
 \family typewriter
 --lib
