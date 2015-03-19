@@ -102,8 +102,6 @@ class Program {
     Program& branch     (int_op, int, int);
 
     Program& end        ();
-
-    Program& pass       ();
     Program& halt       ();
 
 

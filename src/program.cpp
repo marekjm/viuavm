@@ -940,13 +940,6 @@ Program& Program::end() {
     return (*this);
 }
 
-Program& Program::pass() {
-    /*  Inserts pass instruction.
-     */
-    *(addr_ptr++) = PASS;
-    return (*this);
-}
-
 Program& Program::halt() {
     /*  Inserts halt instruction.
      */
