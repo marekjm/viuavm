@@ -901,7 +901,7 @@ Program& Program::call(string fn_name, int_op reg) {
     return (*this);
 }
 
-Program& Program::jump(int addr, bool local) {
+Program& Program::jump(int addr, bool is_absolute) {
     /*  Inserts jump instruction. Parameter is instruction index.
      *  Byte offset is calculated automatically.
      *
@@ -912,11 +912,7 @@ Program& Program::jump(int addr, bool local) {
     *(addr_ptr++) = JUMP;
 
     // save jump position
-    if (local) {
-        branches.push_back(addr_ptr);
-    } else {
-        branches_absolute.push_back(addr_ptr);
-    }
+    (is_absolute ? branches_absolute : branches).push_back(addr_ptr);
 
     *((int*)addr_ptr) = addr;
     pointer::inc<int, byte>(addr_ptr);
@@ -924,7 +920,7 @@ Program& Program::jump(int addr, bool local) {
     return (*this);
 }
 
-Program& Program::branch(int_op regc, int addr_truth, bool local_truth, int addr_false, bool local_false) {
+Program& Program::branch(int_op regc, int addr_truth, bool absolute_truth, int addr_false, bool absolute_false) {
     /*  Inserts branch instruction.
      *  Byte offset is calculated automatically.
      *
@@ -939,12 +935,12 @@ Program& Program::branch(int_op regc, int addr_truth, bool local_truth, int addr
     addr_ptr = insertIntegerOperand(addr_ptr, regc);
 
     // save jump position
-    (local_truth ? branches : branches_absolute).push_back(addr_ptr);
+    (absolute_truth ? branches_absolute : branches).push_back(addr_ptr);
     *((int*)addr_ptr) = addr_truth;
     pointer::inc<int, byte>(addr_ptr);
 
     // save jump position
-    (local_false ? branches : branches_absolute).push_back(addr_ptr);
+    (absolute_false ? branches_absolute : branches).push_back(addr_ptr);
     *((int*)addr_ptr) = addr_false;
     pointer::inc<int, byte>(addr_ptr);
 
