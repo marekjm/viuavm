@@ -21,7 +21,6 @@ class Program {
 
     std::vector<byte*> branches;
     std::vector<byte*> branches_absolute;
-    std::vector<unsigned> branches_calculated;
 
     bool debug;
 
@@ -112,7 +111,6 @@ class Program {
     Program& calculateBranches(unsigned offset = 0);
     std::vector<unsigned> jumps();
     std::vector<unsigned> jumpsAbsolute();
-    std::vector<unsigned> jumpsCalculated();
 
     byte* bytecode();
 
