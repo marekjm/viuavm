@@ -649,6 +649,21 @@ class StaticLinkingTests(unittest.TestCase):
         self.assertEqual(0, excode)
 
 
+class JumpingTests(unittest.TestCase):
+    """
+    """
+    PATH = './sample/asm/absolute_jumping'
+
+    def testAbsoluteJump(self):
+        name = 'absolute_jump.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual('Hello World!', output.strip())
+        self.assertEqual(0, excode)
+
+
 class ErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.
     """
