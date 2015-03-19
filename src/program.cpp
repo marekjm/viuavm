@@ -264,6 +264,13 @@ byte* insertThreeIntegerOpsInstruction(byte* addr_ptr, enum OPCODE instruction, 
 }
 
 
+Program& Program::nop() {
+    /*  Inserts nop instuction.
+     */
+    *(addr_ptr++) = NOP;
+    return (*this);
+}
+
 Program& Program::izero(int_op regno) {
     /*  Inserts izero instuction.
      */
