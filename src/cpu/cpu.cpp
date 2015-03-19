@@ -376,9 +376,6 @@ byte* CPU::dispatch(byte* addr) {
         case HALT:
             throw HaltException();
             break;
-        case PASS:
-            ++addr;
-            break;
         case NOP:
             ++addr;
             break;
