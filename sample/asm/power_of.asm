@@ -34,7 +34,7 @@
     ilt counter exponent 4
     branch 4 12 :final
     imul result base
-    pass
+    nop
     iinc counter
     jump :loop
 
