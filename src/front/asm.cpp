@@ -259,12 +259,12 @@ tuple<int, bool> resolvejump(string jmp, const map<string, int>& marks) {
     /*  This function is used to resolve jumps in `jump` and `branch` instructions.
      */
     int addr = 0;
-    bool local = true;
+    bool absolute = false;
     if (str::isnum(jmp)) {
         addr = stoi(jmp);
     } else if (jmp[0] == ':' and str::isnum(str::sub(jmp, 1))) {
         addr = stoi(str::sub(jmp, 1));
-        local = false;
+        absolute = true;
     } else if (jmp[0] == ':') {
         jmp = str::sub(jmp, 1);
         try {
@@ -273,7 +273,7 @@ tuple<int, bool> resolvejump(string jmp, const map<string, int>& marks) {
             throw ("jump to unrecognised marker: " + jmp);
         }
     }
-    return tuple<int, bool>(addr, local);
+    return tuple<int, bool>(addr, absolute);
 }
 
 string resolveregister(string reg, const map<string, int>& names) {
@@ -730,16 +730,16 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             tie(condition, if_true, if_false) = get3operands(operands, false);
 
             int addrt_target, addrf_target;
-            bool addrt_is_local, addrf_is_local;
-            tie(addrt_target, addrt_is_local) = resolvejump(if_true, marks);
+            bool addrt_is_absolute, addrf_is_absolute;
+            tie(addrt_target, addrt_is_absolute) = resolvejump(if_true, marks);
             if (if_false != "") {
-                tie(addrf_target, addrf_is_local) = resolvejump(if_false, marks);
+                tie(addrf_target, addrf_is_absolute) = resolvejump(if_false, marks);
             } else {
-                addrf_is_local = true;
+                addrf_is_absolute = false;
                 addrf_target = instruction+1;
             }
 
-            program.branch(getint_op(resolveregister(condition, names)), addrt_target, addrt_is_local, addrf_target, addrf_is_local);
+            program.branch(getint_op(resolveregister(condition, names)), addrt_target, addrt_is_absolute, addrf_target, addrf_is_absolute);
         } else if (str::startswith(line, "jump")) {
             /*  Jump instruction can be written in two forms:
              *
@@ -755,9 +755,9 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
              *  if it is not found throw an exception about unrecognised marker being used.
              */
             int jump_target;
-            bool is_local;
-            tie(jump_target, is_local) = resolvejump(operands, marks);
-            program.jump(jump_target, is_local);
+            bool is_absolute;
+            tie(jump_target, is_absolute) = resolvejump(operands, marks);
+            program.jump(jump_target, is_absolute);
         } else if (str::startswith(line, "end")) {
             program.end();
         } else if (str::startswith(line, "halt")) {
