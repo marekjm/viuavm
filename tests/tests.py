@@ -660,7 +660,16 @@ class JumpingTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
-        self.assertEqual('Hello World!', output.strip())
+        self.assertEqual("Hey babe, I'm absolute.", output.strip())
+        self.assertEqual(0, excode)
+
+    def testAbsoluteBranch(self):
+        name = 'absolute_branch.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual("Hey babe, I'm absolute.", output.strip())
         self.assertEqual(0, excode)
 
 
