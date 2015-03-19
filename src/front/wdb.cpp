@@ -55,6 +55,7 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
     bool initialised = false;
     bool paused = false;
     bool finished = false;
+    bool exception_raised = false;
 
     int ticks_left = 0;
     int autoresumes = 0;
@@ -360,15 +361,24 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
         if (not initialised) { continue; }
 
         string op_name;
-        while (not paused and not finished and (ticks_left == -1 or (ticks_left > 0))) {
+        while (not paused and not finished and not exception_raised and (ticks_left == -1 or (ticks_left > 0))) {
             if (ticks_left > 0) { --ticks_left; }
             printInstruction(cpu.instruction_pointer);
             if (cpu.tick() == 0) {
-                finished = true;
+                finished = (cpu.return_exception == "" ? true : false);
                 ticks_left = 0;
-                cout << "\nmessage: execution finished: " << cpu.counter() << " instructions executed" << endl;
+                cout << "\nmessage: execution " << (cpu.return_exception == "" ? "finished" : "broken") << ": " << cpu.counter() << " instructions executed" << endl;
+            }
+
+            if (finished) {
                 break;
             }
+
+            if (cpu.return_exception != "") {
+                cout << cpu.return_exception << ": " << cpu.return_message << endl;
+                exception_raised = true;
+            }
+
             if (find(breakpoints_byte.begin(), breakpoints_byte.end(), cpu.instruction_pointer) != breakpoints_byte.end()) {
                 cout << "info: execution halted by byte breakpoint: " << cpu.instruction_pointer << endl;
                 paused = true;
