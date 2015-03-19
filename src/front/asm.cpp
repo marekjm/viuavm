@@ -452,7 +452,9 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         instr = str::chunk(line);
         operands = str::lstrip(str::sub(line, instr.size()));
 
-        if (str::startswith(line, "izero")) {
+        if (line == "nop") {
+            program.nop();
+        } else if (str::startswith(line, "izero")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
             program.izero(getint_op(resolveregister(regno_chnk, names)));
