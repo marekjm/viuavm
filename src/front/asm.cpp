@@ -1184,6 +1184,9 @@ int main(int argc, char* argv[]) {
     // THIS MUST BE GENERATED HERE TO OBTAIN FILL JUMP TABLE
     map<string, tuple<int, byte*> > functions_bytecode;
     int functions_section_size = 0;
+
+    vector<tuple<int, int> > jump_positions;
+
     for (string name : function_names) {
         // do not generate bytecode for functions that were linked
         if (find(linked_function_names.begin(), linked_function_names.end(), name) != linked_function_names.end()) { continue; }
@@ -1208,7 +1211,7 @@ int main(int argc, char* argv[]) {
         Program func(fun_bytes);
         try {
             assemble(func.setdebug(DEBUG), functions.at(name).second, function_names);
-            func.calculateBranches(functions_section_size);
+            //func.calculateBranches(functions_section_size);
         } catch (const string& e) {
             cout << (DEBUG ? "\n" : "") << "fatal: error during assembling: " << e << endl;
             exit(1);
@@ -1231,6 +1234,15 @@ int main(int argc, char* argv[]) {
                 cout << "[asm] debug: pushed to jump table: " << jmp << '+' << functions_section_size << endl;
             }
             jump_table.push_back(jmp+functions_section_size);
+            jump_positions.push_back(tuple<int, int>(jmp+functions_section_size, functions_section_size));
+        }
+
+        vector<unsigned> jumps_absolute = func.jumpsAbsolute();
+        for (unsigned i = 0; i < jumps_absolute.size(); ++i) {
+            if (DEBUG) {
+                cout << "[asm] debug: pushed to jump table: " << jumps_absolute[i] << "+0 (absolute jump)" << endl;
+            }
+            jump_positions.push_back(tuple<int, int>(jumps_absolute[i], 0));
         }
 
         functions_section_size += func.size();
@@ -1316,18 +1328,33 @@ int main(int argc, char* argv[]) {
     // WRITE BYTECODE SIZE
     out.write((const char*)&bytes, 16);
 
+    byte* program_bytecode = new byte[bytes];
+    int program_bytecode_used = 0;
 
     ////////////////////////////////////////////
     // WRITE BYTECODE OF LOCAL FUNCTIONS TO FILE
     for (string name : function_names) {
-        int fun_size;
-        byte* fun_bytecode;
+        int fun_size = 0;
+        byte* fun_bytecode = 0;
         tie(fun_size, fun_bytecode) = functions_bytecode[name];
-        out.write((const char*)fun_bytecode, fun_size);
+        //out.write((const char*)fun_bytecode, fun_size);
+
+        for (int i = 0; i < fun_size; ++i) {
+            program_bytecode[program_bytecode_used+i] = fun_bytecode[i];
+            if ((int)fun_bytecode[i] == 0) {
+                cout << "warning: NOP opcode at byte " << i << " (ignore if it really is a NOP)" << endl;
+            }
+        }
+        program_bytecode_used += fun_size;
 
         // delete the bytecode pointer to avoid memory leak in assembler
-        delete[] fun_bytecode;
+        //delete[] fun_bytecode;
     }
+
+    Program calculator(bytes);
+    cout << "calculating branches..." << endl;
+    calculator.fill(program_bytecode).calculateJumps(jump_positions);
+    out.write((const char*)program_bytecode, bytes);
 
 
     ////////////////////////////////////
