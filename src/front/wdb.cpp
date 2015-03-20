@@ -55,7 +55,9 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
     bool initialised = false;
     bool paused = false;
     bool finished = false;
+
     bool exception_raised = false;
+    string exception_type, exception_message;
 
     int ticks_left = 0;
     int autoresumes = 0;
@@ -365,8 +367,16 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
         string op_name;
         while (not paused and not finished and not exception_raised and (ticks_left == -1 or (ticks_left > 0))) {
             if (ticks_left > 0) { --ticks_left; }
-            printInstruction(cpu.instruction_pointer);
-            if (cpu.tick() == 0) {
+
+            try {
+                printInstruction(cpu.instruction_pointer);
+            } catch (const std::out_of_range& e) {
+                exception_type = "RuntimeException";
+                exception_message = "unrecognised instruction";
+                exception_raised = true;
+            }
+
+            if (not exception_raised and not finished and cpu.tick() == 0) {
                 finished = (cpu.return_exception == "" ? true : false);
                 ticks_left = 0;
                 cout << "\nmessage: execution " << (cpu.return_exception == "" ? "finished" : "broken") << ": " << cpu.counter() << " instructions executed" << endl;
@@ -377,8 +387,14 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
             }
 
             if (cpu.return_exception != "") {
-                cout << cpu.return_exception << ": " << cpu.return_message << endl;
+                exception_type = cpu.return_exception;
+                exception_message = cpu.return_message;
                 exception_raised = true;
+            }
+
+            if (exception_raised) {
+                cout << exception_type << ": " << exception_message << endl;
+                break;
             }
 
             if (find(breakpoints_byte.begin(), breakpoints_byte.end(), cpu.instruction_pointer) != breakpoints_byte.end()) {
