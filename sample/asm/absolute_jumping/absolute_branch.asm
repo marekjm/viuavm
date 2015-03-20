@@ -1,6 +1,8 @@
 .def: hey_im_absolute 0
     strstore 1 "Hey babe, I'm absolute."
     print 1
+    nop
+    nop
     izero 0
     end
 .end
