@@ -212,12 +212,34 @@ Program& Program::calculateBranches(unsigned offset) {
 
     for (unsigned i = 0; i < branches.size(); ++i) {
         ptr = (int*)(branches[i]);
+        cout << "[brch] calculating jump at " << (int)(branches[i]-program) << ", " << hex << (long)branches[i] << dec << " (target: " << *ptr << ") with offset " << offset << " = ";
         (*ptr) = offset + getInstructionBytecodeOffset(*ptr, instruction_count);
+        cout << *ptr << endl;
     }
 
     for (unsigned i = 0; i < branches_absolute.size(); ++i) {
         ptr = (int*)(branches_absolute[i]);
+        cout << "[brch] calculating jump at " << (int)(branches_absolute[i]-program) << ", " << hex << (long)branches_absolute[i] << dec << " (target: " << *ptr << ") with offset " << 0 << " = ";
         (*ptr) = getInstructionBytecodeOffset(*ptr, instruction_count);
+        cout << *ptr << endl;
+    }
+
+    return (*this);
+}
+
+Program& Program::calculateJumps(vector<tuple<int, int> > jump_positions) {
+    /** Calculate jump targets in given bytecode.
+     */
+    int instruction_count = instructionCount();
+    int* ptr;
+
+    int position, offset;
+    for (tuple<int, int> jmp : jump_positions) {
+        tie(position, offset) = jmp;
+        ptr = (int*)(program+position);
+        cout << "[jump] calculating jump at " << position << ", " << hex << (long)(program+position) << dec << " (target: " << *ptr << ") with offset " << offset << " = ";
+        (*ptr) = offset + getInstructionBytecodeOffset(*ptr, instruction_count);
+        cout << *ptr << endl;
     }
 
     return (*this);
