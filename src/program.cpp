@@ -26,6 +26,14 @@ byte* Program::bytecode() {
     return tmp;
 }
 
+Program& Program::fill(byte* code) {
+    /** Fill program with bytecode.
+     */
+    delete[] program;
+    program = code;
+    return (*this);
+}
+
 
 Program& Program::setdebug(bool d) {
     /** Sets debugging status.
