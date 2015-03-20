@@ -227,6 +227,8 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
             ticks_left = 0;
         } else if (command == "cpu.unfinish") {
             finished = false;
+        } else if (command == "cpu.counter") {
+            cout << cpu.counter() << endl;
         } else if (command == "register.show") {
             if (not operands.size()) {
                 cout << "error: invalid operand size, expected at least 1 operand" << endl;
