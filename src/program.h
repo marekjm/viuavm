@@ -109,10 +109,12 @@ class Program {
 
     // after-insertion calculations
     Program& calculateBranches(unsigned offset = 0);
+    Program& calculateJumps(std::vector<std::tuple<int, int> >);
     std::vector<unsigned> jumps();
     std::vector<unsigned> jumpsAbsolute();
 
     byte* bytecode();
+    Program& fill(byte*);
 
     Program& setdebug(bool d = true);
 
