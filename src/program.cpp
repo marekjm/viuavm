@@ -36,6 +36,7 @@ Program& Program::fill(byte* code) {
      */
     delete[] program;
     program = code;
+    addr_ptr = program;
     return (*this);
 }
 
