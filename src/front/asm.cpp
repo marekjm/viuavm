@@ -23,6 +23,7 @@ bool AS_LIB = false;
 
 bool VERBOSE = false;
 bool DEBUG = false;
+bool SCREAM = false;
 
 bool WARNING_ALL = false;
 bool ERROR_ALL = false;
@@ -456,6 +457,10 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         instr = str::chunk(line);
         operands = str::lstrip(str::sub(line, instr.size()));
 
+        if (DEBUG and SCREAM) {
+            cout << "[asm] compiling line: `" << line << "`" << endl;
+        }
+
         if (line == "nop") {
             program.nop();
         } else if (str::startswith(line, "izero")) {
@@ -810,6 +815,9 @@ int main(int argc, char* argv[]) {
         } else if (option == "--debug") {
             DEBUG = true;
             continue;
+        } else if (option == "--scream") {
+            SCREAM = true;
+            continue;
         } else if (option == "--lib") {
             AS_LIB = true;
             continue;
@@ -867,6 +875,7 @@ int main(int argc, char* argv[]) {
                  << "    " << "--help               - display this message\n"
                  << "    " << "--verbose            - show verbose output\n"
                  << "    " << "--debug              - show debugging output\n"
+                 << "    " << "--scream             - show so much debugging output it becomes noisy\n"
                  << "    " << "--Wall               - warn about everything\n"
                  << "    " << "--Wmissin-end        - warn about missing 'end' instruction at the end of functions\n"
                  << "    " << "--Wempty-function    - warn about empty functions\n"
@@ -1334,6 +1343,9 @@ int main(int argc, char* argv[]) {
     ////////////////////////////////////////////
     // WRITE BYTECODE OF LOCAL FUNCTIONS TO FILE
     for (string name : function_names) {
+        if (DEBUG) {
+            cout << "[asm] pushing bytecode of local function '" << name << "' to final byte array" << endl;
+        }
         int fun_size = 0;
         byte* fun_bytecode = 0;
         tie(fun_size, fun_bytecode) = functions_bytecode[name];
