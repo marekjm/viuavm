@@ -22,7 +22,12 @@ byte* Program::bytecode() {
      *  Calling code is responsible for dectruction of the allocated memory.
      */
     byte* tmp = new byte[bytes];
-    for (int i = 0; i < bytes; ++i) { tmp[i] = program[i]; }
+    for (int i = 0; i < bytes; ++i) {
+        if (int(program[i]) == 0) {
+            cout << "warning: bytecode generator: NOP instruction at byte " << i << endl;
+        }
+        tmp[i] = program[i];
+    }
     return tmp;
 }
 
