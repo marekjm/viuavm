@@ -1351,6 +1351,9 @@ int main(int argc, char* argv[]) {
     ////////////////////////////////////////////
     // WRITE BYTECODE OF LOCAL FUNCTIONS TO FILE
     for (string name : function_names) {
+        // linked functions are to be inserted later
+        if (find(linked_function_names.begin(), linked_function_names.end(), name) != linked_function_names.end()) { continue; }
+
         if (DEBUG) {
             cout << "[asm] pushing bytecode of local function '" << name << "' to final byte array" << endl;
         }
