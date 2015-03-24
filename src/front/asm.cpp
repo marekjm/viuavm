@@ -1239,7 +1239,7 @@ int main(int argc, char* argv[]) {
         byte* btcode = func.bytecode();
         for (int i = 0; i < func.size(); ++i) {
             if ((int)btcode[i] == 0) {
-                cout << "warning: NOP opcode at byte " << i << " (ignore if it really is a NOP)" << endl;
+                cout << "warning: NOP opcode at byte " << i << endl;
             }
         }
 
@@ -1361,9 +1361,6 @@ int main(int argc, char* argv[]) {
 
         for (int i = 0; i < fun_size; ++i) {
             program_bytecode[program_bytecode_used+i] = fun_bytecode[i];
-            if ((int)fun_bytecode[i] == 0) {
-                cout << "warning: NOP opcode at byte " << i << " (ignore if it really is a NOP)" << endl;
-            }
         }
         program_bytecode_used += fun_size;
 
