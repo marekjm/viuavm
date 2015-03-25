@@ -263,11 +263,14 @@ tuple<int, bool> resolvejump(string jmp, const map<string, int>& marks) {
     bool absolute = false;
     if (str::isnum(jmp)) {
         addr = stoi(jmp);
-    } else if (jmp[0] == ':' and str::isnum(str::sub(jmp, 1))) {
+    } else if (jmp[0] == '.' and str::isnum(str::sub(jmp, 1))) {
         addr = stoi(str::sub(jmp, 1));
         absolute = true;
-    } else if (jmp[0] == ':') {
-        jmp = str::sub(jmp, 1);
+    } else if (jmp[0] == '.') {
+        // FIXME
+        cout << "FIXME: global marker jumps (jumps to functions) are not implemented yet" << endl;
+        exit(1);
+    } else {
         try {
             addr = marks.at(jmp);
         } catch (const std::out_of_range& e) {
