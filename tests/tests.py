@@ -654,7 +654,6 @@ class JumpingTests(unittest.TestCase):
     """
     PATH = './sample/asm/absolute_jumping'
 
-    @unittest.skip('new jump calculation does not pass this test')
     def testAbsoluteJump(self):
         name = 'absolute_jump.asm'
         assembly_path = os.path.join(self.PATH, name)
