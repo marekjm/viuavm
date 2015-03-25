@@ -461,6 +461,67 @@ Basic control flow capabilities.
 jump
 \end_layout
 
+\begin_layout Paragraph
+Size
+\end_layout
+
+\begin_layout Standard
+5 bytes
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+jump 42        ; relative (local) jump
+\end_layout
+
+\begin_layout Plain Layout
+
+jump foo	   ; relative jump to marker
+\end_layout
+
+\begin_layout Plain Layout
+
+jump .42       ; absolute jump
+\end_layout
+
+\begin_layout Plain Layout
+
+jump .foo      ; absolute jump to function (functions act as "global" markers)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Behaviour
+\end_layout
+
+\begin_layout Standard
+This instruction is an unconditional jump to a specified byte inside currently
+ loaded program.
+\end_layout
+
+\begin_layout Paragraph
+Description
+\end_layout
+
+\begin_layout Standard
+When writing ASM code, jumps can be resolved as absolute or relative (relative
+ to current function's first instruction) instruction index.
+ This index is then translated by bytecode generator into byte address.
+\end_layout
+
 \begin_layout Subsubsection
 branch
 \end_layout
