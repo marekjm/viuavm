@@ -609,7 +609,6 @@ class StaticLinkingTests(unittest.TestCase):
     """
     PATH = './sample/asm/linking/static'
 
-    @unittest.skip('new jump calculation broke linking')
     def testLinkingBasic(self):
         lib_name = 'print_N.asm'
         assembly_lib_path = os.path.join(self.PATH, lib_name)
@@ -623,7 +622,6 @@ class StaticLinkingTests(unittest.TestCase):
         self.assertEqual('42', output.strip())
         self.assertEqual(0, excode)
 
-    @unittest.skip('new jump calculation broke linking')
     def testLinkingMainFunction(self):
         lib_name = 'main_main.asm'
         assembly_lib_path = os.path.join(self.PATH, lib_name)
@@ -637,7 +635,6 @@ class StaticLinkingTests(unittest.TestCase):
         self.assertEqual('Hello World!', output.strip())
         self.assertEqual(0, excode)
 
-    @unittest.skip('new jump calculation broke linking')
     def testLinkingCodeWithBranchesAndJumps(self):
         lib_name = 'jumplib.asm'
         assembly_lib_path = os.path.join(self.PATH, lib_name)
