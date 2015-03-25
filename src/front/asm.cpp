@@ -1370,9 +1370,11 @@ int main(int argc, char* argv[]) {
             program_bytecode[program_bytecode_used+i] = fun_bytecode[i];
         }
         program_bytecode_used += fun_size;
+    }
 
-        // delete the bytecode pointer to avoid memory leak in assembler
-        //delete[] fun_bytecode;
+    // free memory allocated for bytecode of local functions
+    for (pair<string, tuple<int, byte*>> fun : functions_bytecode) {
+        delete[] get<1>(fun.second);
     }
 
     Program calculator(bytes);
