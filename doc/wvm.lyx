@@ -480,27 +480,51 @@ status open
 
 \begin_layout Plain Layout
 
-jump 42        ; relative (local) jump
+(1) jump 42
 \end_layout
 
 \begin_layout Plain Layout
 
-jump foo	   ; relative jump to marker
+(2) jump foo
 \end_layout
 
 \begin_layout Plain Layout
 
-jump .42       ; absolute jump
+(3) jump .42
 \end_layout
 
 \begin_layout Plain Layout
 
-jump .foo      ; absolute jump to function (functions act as "global" markers)
+(4) jump .foo
 \end_layout
 
 \end_inset
 
 
+\end_layout
+
+\begin_layout Enumerate
+relative jump to instruction
+\end_layout
+
+\begin_layout Enumerate
+relative jump to marker
+\end_layout
+
+\begin_layout Enumerate
+absolute jump to instruction
+\end_layout
+
+\begin_layout Enumerate
+absolute jump to function (functions act as global 
+\begin_inset Quotes eld
+\end_inset
+
+markers
+\begin_inset Quotes erd
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Paragraph
