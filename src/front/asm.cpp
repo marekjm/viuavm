@@ -1384,9 +1384,8 @@ int main(int argc, char* argv[]) {
     }
 
     Program calculator(bytes);
-    cout << "calculating branches..." << endl;
+    cout << "[post-asm] calculating branches..." << endl;
     calculator.fill(program_bytecode).calculateJumps(jump_positions);
-    out.write((const char*)program_bytecode, bytes);
 
 
     ////////////////////////////////////
@@ -1421,9 +1420,14 @@ int main(int argc, char* argv[]) {
             *((int*)(linked_bytecode+jmp)) += bytes_offset;
         }
 
-        out.write(linked_bytecode, linked_size);
+        //out.write(linked_bytecode, linked_size);
+        for (int i = 0; i < linked_size; ++i) {
+            program_bytecode[program_bytecode_used+i] = linked_bytecode[i];
+        }
+        program_bytecode_used += linked_size;
     }
 
+    out.write((const char*)program_bytecode, bytes);
     out.close();
 
     return ret_code;
