@@ -240,7 +240,9 @@ Program& Program::calculateJumps(vector<tuple<int, int> > jump_positions) {
     for (tuple<int, int> jmp : jump_positions) {
         tie(position, offset) = jmp;
         ptr = (int*)(program+position);
-        cout << "[jump] calculating jump at " << position << ", " << hex << (long)(program+position) << dec << " (target: " << *ptr << ") with offset " << offset << " = ";
+        if (debug) {
+            cout << "[bcgen:jump] calculating jump at " << position << ", " << hex << (long)(program+position) << dec << " (target: " << *ptr << ") with offset " << offset << " = ";
+        }
         (*ptr) = offset + getInstructionBytecodeOffset(*ptr, instruction_count);
         cout << *ptr << endl;
     }

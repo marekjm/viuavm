@@ -1311,12 +1311,18 @@ int main(int argc, char* argv[]) {
     out.write((const char*)&function_ids_section_size, sizeof(uint16_t));
     uint16_t functions_size_so_far = 0;
     for (string name : function_names) {
-        cout << "[wrt] writing function '" << name << "' to call address table";
+        if (DEBUG) {
+            cout << "[asm:write] writing function '" << name << "' to call address table";
+        }
         if (find(linked_function_names.begin(), linked_function_names.end(), name) != linked_function_names.end()) {
-            cout << ": delayed" << endl;
+            if (DEBUG) {
+                cout << ": delayed" << endl;
+            }
             continue;
         }
-        cout << endl;
+        if (DEBUG) {
+            cout << endl;
+        }
 
         // function name...
         out.write((const char*)name.c_str(), name.size());
@@ -1378,7 +1384,9 @@ int main(int argc, char* argv[]) {
     }
 
     Program calculator(bytes);
-    cout << "[post-asm] calculating branches..." << endl;
+    if (DEBUG) {
+        cout << "[asm:post] calculating branches..." << endl;
+    }
     calculator.fill(program_bytecode).calculateJumps(jump_positions);
 
 
