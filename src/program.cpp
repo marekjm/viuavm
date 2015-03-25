@@ -244,7 +244,9 @@ Program& Program::calculateJumps(vector<tuple<int, int> > jump_positions) {
             cout << "[bcgen:jump] calculating jump at " << position << ", " << hex << (long)(program+position) << dec << " (target: " << *ptr << ") with offset " << offset << " = ";
         }
         (*ptr) = offset + getInstructionBytecodeOffset(*ptr, instruction_count);
-        cout << *ptr << endl;
+        if (debug) {
+            cout << *ptr << endl;
+        }
     }
 
     return (*this);
