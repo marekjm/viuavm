@@ -21,7 +21,7 @@
     ; the negation of boolean is just to use short form of branch
     ; instruction - this construction starts emerging as a pattern...
     not is_negative
-    branch is_negative :final_print
+    branch is_negative final_print
     istore 4 -1
     imul 1 4
 

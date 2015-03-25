@@ -21,7 +21,7 @@
     ; just return 0
     izero 0
     ieq 0 number
-    branch 0 :give_zero
+    branch 0 give_zero
 
     ; check if we can skip calculations and
     ; just return 1
@@ -29,7 +29,7 @@
     ieq two number
     or one two
     ; if number is one or two give_one as the result
-    branch one :give_one
+    branch one give_one
 
     istore one 1
     istore two 2
@@ -48,7 +48,7 @@
     tmpro 1
     isnull @1 2
     not 2
-    branch 2 :is_filled
+    branch 2 is_filled
     ; here, register is not filled - return value not memorized
     free 2
     ress local
@@ -72,20 +72,20 @@
     ; check if register N-2 is null (not calculated)
     isnull @1 2
     tmpri 2
-    branch 2 :nope
+    branch 2 nope
     .mark: nope
     ; switch back to local registers
     ress local
     tmpro 0
 
-    branch 0 :we_must_calculate :fetch_it
+    branch 0 we_must_calculate fetch_it
 
     .mark: we_must_calculate
     ;.mark: fetch_it
     frame 1
     param 0 two
     call fibonacci_memoizing second
-    jump :add_them
+    jump add_them
 
     .mark: fetch_it
     ress global
@@ -99,11 +99,11 @@
     ; put (N-1) + (N-2) in result register
     .mark: add_them
     iadd first second result
-    jump :finish
+    jump finish
 
     .mark: give_zero
     izero result
-    jump :finish
+    jump finish
 
     .mark: give_one
     istore result 1

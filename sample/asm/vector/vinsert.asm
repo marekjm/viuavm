@@ -28,7 +28,7 @@
 
     .mark: loop
     ilt counter len 8
-    branch 8 :inside :break
+    branch 8 inside break
     .mark: inside
     vat 1 9 @counter
     print 9
@@ -36,7 +36,7 @@
     ; VATed registers are references!
     empty 9
     iinc counter
-    jump :loop
+    jump loop
 
     .mark: break
 

@@ -18,9 +18,9 @@
 
     ; invert so we can use short form of branch instruction
     not 4
-    branch 4 :algorithm
+    branch 4 algorithm
     istore result 1
-    jump :final
+    jump final
 
     ; now, we multiply in a loop
     .mark: algorithm
@@ -32,11 +32,11 @@
 
     .mark: loop
     ilt counter exponent 4
-    branch 4 12 :final
+    branch 4 12 final
     imul result base
     nop
     iinc counter
-    jump :loop
+    jump loop
 
     ; final instructions
     .mark: final

@@ -4,7 +4,7 @@
     ress static
     isnull vector 2
     not 2
-    branch 2 :logic
+    branch 2 logic
     vec vector
     istore 2 1
     vpush 1 2
@@ -20,14 +20,14 @@
     vlen vector length
     ilt length number 5
     not 5
-    branch 5 :finished
+    branch 5 finished
     vat vector 6 -1
     vat vector 7 -2
     iadd 6 7 8
     vpush vector 8
     empty 6
     empty 7
-    jump :loop
+    jump loop
 
     .mark: finished
 

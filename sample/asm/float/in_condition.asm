@@ -10,7 +10,7 @@
     ieq 2 3
 
     ; check
-    branch 1 :ok :fin
+    branch 1 ok fin
     .mark: ok
     not 2
     .mark: fin

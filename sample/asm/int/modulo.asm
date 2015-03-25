@@ -10,7 +10,7 @@
 
     ; if number is less than modulo, jump straight to result printing
     ilt number modulo 4
-    branch 4 :final
+    branch 4 final
 
     ; otherwise we must perform some calculations
     idiv number modulo

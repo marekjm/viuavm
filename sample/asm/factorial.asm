@@ -14,7 +14,7 @@
     ; if counter is equal to zero
     ; finish "factorial" calls
     ieq 1 3 4
-    branch 4 :finish
+    branch 4 finish
     ; this frame must be the same as in "main"
     frame 2
     param 0 number

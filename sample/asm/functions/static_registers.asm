@@ -9,12 +9,12 @@
 
     ; if register 1 is *not null* jump to :increase marker
     ; otherwise continue execution
-    branch 2 :increase
+    branch 2 increase
 
     ; these instructions are executed only when 1 register was null
     istore 1 0
     arg 0 3
-    jump :report
+    jump report
 
     .mark: increase
     iinc 1
@@ -29,7 +29,7 @@
     ilt 1 3 4
     ; integer at 1 is *at least* N
     not 4
-    branch 4 :finish
+    branch 4 finish
     .mark: report
     print 1
     frame 1

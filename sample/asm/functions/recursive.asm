@@ -10,7 +10,7 @@
     idec counter
     ilt counter zero 3
 
-    branch 3 :break_rec
+    branch 3 break_rec
     print counter
     frame 2
     param 0 counter
