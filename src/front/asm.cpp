@@ -1353,8 +1353,8 @@ int main(int argc, char* argv[]) {
     byte* program_bytecode = new byte[bytes];
     int program_bytecode_used = 0;
 
-    ////////////////////////////////////////////
-    // WRITE BYTECODE OF LOCAL FUNCTIONS TO FILE
+    ///////////////////////////////////////////////////////
+    // WRITE BYTECODE OF LOCAL FUNCTIONS TO BYTECODE BUFFER
     for (string name : function_names) {
         // linked functions are to be inserted later
         if (find(linked_function_names.begin(), linked_function_names.end(), name) != linked_function_names.end()) { continue; }
@@ -1365,7 +1365,6 @@ int main(int argc, char* argv[]) {
         int fun_size = 0;
         byte* fun_bytecode = 0;
         tie(fun_size, fun_bytecode) = functions_bytecode[name];
-        //out.write((const char*)fun_bytecode, fun_size);
 
         for (int i = 0; i < fun_size; ++i) {
             program_bytecode[program_bytecode_used+i] = fun_bytecode[i];
