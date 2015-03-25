@@ -1038,6 +1038,9 @@ int main(int argc, char* argv[]) {
     //////////////////////////
     // GENERATE ENTRY FUNCTION
     if (not AS_LIB) {
+        if (DEBUG) {
+            cout << "generating __entry function" << endl;
+        }
         function_names.push_back(ENTRY_FUNCTION_NAME);
         function_addresses[ENTRY_FUNCTION_NAME] = starting_instruction;
         // entry function sets global stuff
@@ -1315,7 +1318,11 @@ int main(int argc, char* argv[]) {
     out.write((const char*)&function_ids_section_size, sizeof(uint16_t));
     uint16_t functions_size_so_far = 0;
     for (string name : function_names) {
-        if (find(linked_function_names.begin(), linked_function_names.end(), name) != linked_function_names.end()) { continue; }
+        cout << "[wrt] writing function '" << name << '" to call address table";
+        if (find(linked_function_names.begin(), linked_function_names.end(), name) != linked_function_names.end()) {
+            cout << "skipping..." << endl;
+            continue;
+        }
         // function name...
         out.write((const char*)name.c_str(), name.size());
         // ...requires terminating null character
@@ -1327,7 +1334,7 @@ int main(int argc, char* argv[]) {
         try {
             functions_size_so_far += Program::countBytes(functions.at(name).second);
         } catch (const std::out_of_range& e) {
-            cout << "fatal: could not find function '" << name << "' during bytecode write" << endl;
+            cout << "fatal: could not find function '" << name << "' during call address table write" << endl;
             exit(1);
         }
     }
