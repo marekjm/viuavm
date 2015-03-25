@@ -1340,6 +1340,8 @@ int main(int argc, char* argv[]) {
             exit(1);
         }
     }
+    // FIXME: iteration over linked functions to put them to the call address table
+    //        should be done in the loop above (for local functions)
     for (string name : linked_function_names) {
         // function name...
         out.write((const char*)name.c_str(), name.size());
