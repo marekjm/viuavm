@@ -1320,9 +1320,11 @@ int main(int argc, char* argv[]) {
     for (string name : function_names) {
         cout << "[wrt] writing function '" << name << "' to call address table";
         if (find(linked_function_names.begin(), linked_function_names.end(), name) != linked_function_names.end()) {
-            cout << "skipping..." << endl;
+            cout << ": delayed" << endl;
             continue;
         }
+        cout << endl;
+
         // function name...
         out.write((const char*)name.c_str(), name.size());
         // ...requires terminating null character
