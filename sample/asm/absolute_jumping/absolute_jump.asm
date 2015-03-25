@@ -1,7 +1,6 @@
 .def: hey_im_absolute 0
     strstore 1 "Hey babe, I'm absolute."
-    ; FIXME: uncomment next line when absolute forward-jumps are implemented
-    ;jump :5
+    jump :7
     print 1
     izero 0
     end
