@@ -1256,7 +1256,7 @@ int main(int argc, char* argv[]) {
             if (DEBUG) {
                 cout << "[asm] debug: pushed to jump table: " << jumps_absolute[i] << "+0 (absolute jump)" << endl;
             }
-            jump_positions.push_back(tuple<int, int>(jumps_absolute[i], 0));
+            jump_positions.push_back(tuple<int, int>(jumps_absolute[i]+functions_section_size, 0));
         }
 
         functions_section_size += func.size();
