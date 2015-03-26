@@ -519,9 +519,13 @@ byte* CPU::arg(byte* addr) {
         oss << "invalid read: read from argument register out of bounds: " << a;
         throw oss.str().c_str();
     }
-    uregisters[b] = frames.back()->arguments[a];    // move pointer from first-operand register to second-operand register
-    frames.back()->arguments[a] = 0;                // zero the pointer to avoid double free
+
     ureferences[b] = frames.back()->argreferences[a];  // set reference status
+    if (ureferences[b]) {
+        uregisters[b] = frames.back()->arguments[a];
+    } else {
+        uregisters[b] = frames.back()->arguments[a]->copy();
+    }
 
     if (debug and uregisters[b] != 0) {
         cout << " (= " << (ureferences[b] ? "&" : "") << uregisters[b]->str() << ')';
