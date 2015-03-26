@@ -34,9 +34,10 @@ string join(const string& s, const vector<string>& parts) {
     return oss.str();
 }
 
-void printInstruction(byte* addr) {
-    string opcode_name = OP_NAMES.at(OPCODE(*addr));
-    cout << opcode_name;
+
+void printInstruction(const CPU& cpu) {
+    string opcode_name = OP_NAMES.at(OPCODE(*cpu.instruction_pointer));
+    cout << "bytecode " << (cpu.instruction_pointer-cpu.bytecode) << " at 0x" << hex << long(cpu.instruction_pointer) << dec << ": " << opcode_name << ' ';
     cout << endl;
 }
 
@@ -342,7 +343,7 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
             if (ticks_left > 0) { --ticks_left; }
 
             try {
-                printInstruction(cpu.instruction_pointer);
+                printInstruction(cpu);
             } catch (const std::out_of_range& e) {
                 exception_type = "RuntimeException";
                 exception_message = "unrecognised instruction";
