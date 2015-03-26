@@ -38,6 +38,7 @@ string join(const string& s, const vector<string>& parts) {
 
 byte* printIntegerOperand(byte* iptr) {
     cout << ((*(bool*)iptr) ? "@" : "");
+
     pointer::inc<bool, byte>(iptr);
     cout << *(int*)iptr;
     pointer::inc<int, byte>(iptr);
@@ -46,13 +47,13 @@ byte* printIntegerOperand(byte* iptr) {
 
 void printInstruction(const CPU& cpu) {
     byte* iptr = cpu.instruction_pointer;
-    string opcode_name = OP_NAMES.at(OPCODE(*iptr));
-    cout << "bytecode " << (iptr-cpu.bytecode) << " at 0x" << hex << long(iptr) << dec << ": " << opcode_name << ' ';
+    string opcode = OP_NAMES.at(OPCODE(*iptr));
+    cout << "bytecode " << (iptr-cpu.bytecode) << " at 0x" << hex << long(iptr) << dec << ": " << opcode << ' ';
 
     ++iptr;
-    if (opcode_name == "nop") {
+    if (opcode == "nop") {
         // do nothing...
-    } else if (opcode_name == "ress") {
+    } else if (opcode == "ress") {
         int to_register_set = *(int*)iptr;
         switch (to_register_set) {
             case 0:
@@ -70,7 +71,7 @@ void printInstruction(const CPU& cpu) {
             default:
                 cout << "illegal";
         }
-    } else if (opcode_name == "frame") {
+    } else if (opcode == "frame" or opcode == "paref" or opcode == "istore" or opcode == "arg") {
         iptr = printIntegerOperand(iptr);
         cout << ' ';
         iptr = printIntegerOperand(iptr);

@@ -407,11 +407,6 @@ byte* CPU::param(byte* addr) {
     b = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (debug) {
-        cout << (a_ref ? " @" : " ") << a;
-        cout << (b_ref ? " @" : " ") << b;
-    }
-
     if (a_ref) {
         a = static_cast<Integer*>(fetch(a))->value();
     }
@@ -441,11 +436,6 @@ byte* CPU::paref(byte* addr) {
     pointer::inc<bool, byte>(addr);
     b = *((int*)addr);
     pointer::inc<int, byte>(addr);
-
-    if (debug) {
-        cout << (a_ref ? " @" : " ") << a;
-        cout << (b_ref ? " @" : " ") << b;
-    }
 
     if (a_ref) {
         a = static_cast<Integer*>(fetch(a))->value();
@@ -477,11 +467,6 @@ byte* CPU::arg(byte* addr) {
     b = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (debug) {
-        cout << (a_ref ? " @" : " ") << a;
-        cout << (b_ref ? " @" : " ") << b;
-    }
-
     if (a_ref) {
         a = static_cast<Integer*>(fetch(a))->value();
     }
@@ -500,10 +485,6 @@ byte* CPU::arg(byte* addr) {
         uregisters[b] = frames.back()->arguments[a];
     } else {
         uregisters[b] = frames.back()->arguments[a]->copy();
-    }
-
-    if (debug and uregisters[b] != 0) {
-        cout << " (= " << (ureferences[b] ? "&" : "") << uregisters[b]->str() << ')';
     }
 
     return addr;
