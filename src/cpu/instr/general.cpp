@@ -378,11 +378,6 @@ byte* CPU::frame(byte* addr) {
     local_registers = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (debug) {
-        cout << (arguments_ref ? " @" : " ") << arguments;
-        cout << (local_registers_ref ? " @" : " ") << local_registers;
-    }
-
     if (arguments_ref) {
         arguments = static_cast<Integer*>(fetch(arguments))->value();
     }

@@ -8,6 +8,7 @@
 #include "../version.h"
 #include "../bytecode/maps.h"
 #include "../support/string.h"
+#include "../support/pointer.h"
 #include "../cpu/debugger.h"
 #include "../program.h"
 using namespace std;
@@ -35,12 +36,24 @@ string join(const string& s, const vector<string>& parts) {
 }
 
 
-void printInstruction(const CPU& cpu) {
-    string opcode_name = OP_NAMES.at(OPCODE(*cpu.instruction_pointer));
-    cout << "bytecode " << (cpu.instruction_pointer-cpu.bytecode) << " at 0x" << hex << long(cpu.instruction_pointer) << dec << ": " << opcode_name << ' ';
+byte* printIntegerOperand(byte* iptr) {
+    cout << ((*(bool*)iptr) ? "@" : "");
+    pointer::inc<bool, byte>(iptr);
+    cout << *(int*)iptr;
+    pointer::inc<int, byte>(iptr);
+    return iptr;
+}
 
-    if (opcode_name == "ress") {
-        int to_register_set = *(int*)(cpu.instruction_pointer+1);
+void printInstruction(const CPU& cpu) {
+    byte* iptr = cpu.instruction_pointer;
+    string opcode_name = OP_NAMES.at(OPCODE(*iptr));
+    cout << "bytecode " << (iptr-cpu.bytecode) << " at 0x" << hex << long(iptr) << dec << ": " << opcode_name << ' ';
+
+    ++iptr;
+    if (opcode_name == "nop") {
+        // do nothing...
+    } else if (opcode_name == "ress") {
+        int to_register_set = *(int*)iptr;
         switch (to_register_set) {
             case 0:
                 cout << "global";
@@ -57,6 +70,10 @@ void printInstruction(const CPU& cpu) {
             default:
                 cout << "illegal";
         }
+    } else if (opcode_name == "frame") {
+        iptr = printIntegerOperand(iptr);
+        cout << ' ';
+        iptr = printIntegerOperand(iptr);
     }
 
     cout << endl;
