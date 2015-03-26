@@ -40,7 +40,44 @@ void printInstruction(byte* addr) {
     cout << endl;
 }
 
+void printRegisters(const vector<string>& indexes, int register_set_size, Object** registers, bool* references) {
+    /** Print selected registers.
+     *
+     *  This function handles pretty printing of register contents.
+     *  While printed, indexes are bound-checked.
+     */
+    int index;
+    for (unsigned j = 0; j < indexes.size(); ++j) {
+        if (not str::isnum(indexes[j])) {
+            cout << "error: invalid operand, expected integer" << endl;
+            continue;
+        }
+        index = stoi(indexes[j]);
+        if (index >= register_set_size) {
+            cout << "warn: register out of range: " << index << endl;
+            continue;
+        }
+        cout << "-- " << index << " --";
+        if (registers[index]) {
+            cout << '\n';
+            cout << "  reference:   " << (references[index] ? "true" : "false") << '\n';
+            cout << "  object type: " << registers[index]->type() << '\n';
+            cout << "  value:       " << registers[index]->repr() << '\n';
+            cout << "  pointer:     " << hex << registers[index] << dec << endl;
+        } else {
+            cout << " [empty]" << endl;
+        }
+    }
+}
+
+
 void debuggerMainLoop(CPU& cpu, deque<string> init) {
+    /** This function implements main REPL of the debugger.
+     *
+     *  Wudoo debugger is kind of interactive beast.
+     *  You can enter commands into it and get results from them.
+     *  The shell is very primitive (no scripting) and only accepts a few commands.
+     */
     vector<byte*> breakpoints_byte;
     vector<string> breakpoints_opcode;
 
@@ -236,55 +273,14 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
                 cout << "error: invalid operand size, expected at least 1 operand" << endl;
                 continue;
             }
-
-            int index;
-            for (unsigned j = 0; j < operands.size(); ++j) {
-                if (not str::isnum(operands[j])) {
-                    cout << "error: invalid operand, expected integer" << endl;
-                    continue;
-                }
-                index = stoi(operands[j]);
-                if (index >= cpu.uregisters_size) {
-                    cout << "warn: register out of range: " << index << endl;
-                    continue;
-                }
-                cout << "-- " << index << " --";
-                if (cpu.uregisters[index]) {
-                    cout << '\n';
-                    cout << "  reference:   " << (cpu.ureferences[index] ? "true" : "false") << '\n';
-                    cout << "  object type: " << cpu.uregisters[index]->type() << '\n';
-                    cout << "  value:       " << cpu.uregisters[index]->repr() << endl;
-                } else {
-                    cout << " [empty]" << endl;
-                }
-            }
+            printRegisters(operands, cpu.uregisters_size, cpu.uregisters, cpu.ureferences);
         } else if (command == "register.global.show") {
             if (not operands.size()) {
                 cout << "error: invalid operand size, expected at least 1 operand" << endl;
                 continue;
             }
 
-            int index;
-            for (unsigned j = 0; j < operands.size(); ++j) {
-                if (not str::isnum(operands[j])) {
-                    cout << "error: invalid operand, expected integer" << endl;
-                    continue;
-                }
-                index = stoi(operands[j]);
-                if (index >= cpu.reg_count) {
-                    cout << "warn: register out of range: " << index << endl;
-                    continue;
-                }
-                cout << "-- " << index << " --";
-                if (cpu.registers[index]) {
-                    cout << '\n';
-                    cout << "  reference:   " << (cpu.references[index] ? "true" : "false") << '\n';
-                    cout << "  object type: " << cpu.registers[index]->type() << '\n';
-                    cout << "  value:       " << cpu.registers[index]->repr() << endl;
-                } else {
-                    cout << " [empty]" << endl;
-                }
-            }
+            printRegisters(operands, cpu.reg_count, cpu.registers, cpu.references);
         } else if (command == "register.static.show") {
             if (not operands.size()) {
                 cout << "error: invalid operand size, expected at least 1 operand" << endl;
@@ -298,33 +294,10 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
             int registers_size;
             try {
                 tie(registers, references, registers_size) = cpu.static_registers.at(fun_name);
+                printRegisters(operands, registers_size, registers, references);
             } catch (const std::out_of_range& e) {
                 // OK, now we know that our function does not have static registers
                 cout << "error: current function does not have static registers allocated" << endl;
-            }
-
-            if (not registers) { continue; }
-
-            int index;
-            for (unsigned j = 0; j < operands.size(); ++j) {
-                if (not str::isnum(operands[j])) {
-                    cout << "error: invalid operand, expected integer" << endl;
-                    continue;
-                }
-                index = stoi(operands[j]);
-                if (index >= registers_size) {
-                    cout << "warn: register out of range: " << index << endl;
-                    continue;
-                }
-                cout << "-- " << index << " --";
-                if (registers[index]) {
-                    cout << '\n';
-                    cout << "  reference:   " << (references[index] ? "true" : "false") << '\n';
-                    cout << "  object type: " << registers[index]->type() << '\n';
-                    cout << "  value:       " << registers[index]->repr() << endl;
-                } else {
-                    cout << " [empty]" << endl;
-                }
             }
         } else if (command == "st.show") {
             vector<Frame*> stack = cpu.trace();
