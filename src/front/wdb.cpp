@@ -38,6 +38,27 @@ string join(const string& s, const vector<string>& parts) {
 void printInstruction(const CPU& cpu) {
     string opcode_name = OP_NAMES.at(OPCODE(*cpu.instruction_pointer));
     cout << "bytecode " << (cpu.instruction_pointer-cpu.bytecode) << " at 0x" << hex << long(cpu.instruction_pointer) << dec << ": " << opcode_name << ' ';
+
+    if (opcode_name == "ress") {
+        int to_register_set = *(int*)(cpu.instruction_pointer+1);
+        switch (to_register_set) {
+            case 0:
+                cout << "global";
+                break;
+            case 1:
+                cout << "local";
+                break;
+            case 2:
+                cout << "static (WIP)";
+                break;
+            case 3:
+                cout << "temp (TODO)";
+                break;
+            default:
+                cout << "illegal";
+        }
+    }
+
     cout << endl;
 }
 
