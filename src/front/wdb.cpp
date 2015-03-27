@@ -120,6 +120,20 @@ typedef void(*PRINTER)(byte*, const CPU&);
 map<string, PRINTER> opcode_printers = {
     { "izero", &print1IntegerOperandInstruction },
     { "istore", &print2IntegerOperandInstruction },
+    { "iadd", &print3IntegerOperandInstruction },
+    { "isub", &print3IntegerOperandInstruction },
+    { "imul", &print3IntegerOperandInstruction },
+    { "idiv", &print3IntegerOperandInstruction },
+    { "iinc", &print1IntegerOperandInstruction },
+    { "idec", &print1IntegerOperandInstruction },
+    { "ilt", &print3IntegerOperandInstruction },
+    { "ilte", &print3IntegerOperandInstruction },
+    { "igt", &print3IntegerOperandInstruction },
+    { "igte", &print3IntegerOperandInstruction },
+    { "ieq", &print3IntegerOperandInstruction },
+
+    { "itof", &print2IntegerOperandInstruction },
+    { "ftoi", &print2IntegerOperandInstruction },
 
     { "echo", &print1IntegerOperandInstruction },
     { "print", &print1IntegerOperandInstruction },
