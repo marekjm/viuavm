@@ -45,81 +45,122 @@ byte* printIntegerOperand(byte* iptr) {
     return iptr;
 }
 
+void print1IntegerOperandInstruction(byte* iptr, const CPU& cpu) {
+    printIntegerOperand(iptr);
+}
+
+void print2IntegerOperandInstruction(byte* iptr, const CPU& cpu) {
+    iptr = printIntegerOperand(iptr);
+    cout << ' ';
+    iptr = printIntegerOperand(iptr);
+}
+
+void print3IntegerOperandInstruction(byte* iptr, const CPU& cpu) {
+    iptr = printIntegerOperand(iptr);
+    cout << ' ';
+    iptr = printIntegerOperand(iptr);
+    cout << ' ';
+    iptr = printIntegerOperand(iptr);
+}
+
+void printRESS(byte* iptr, const CPU& cpu) {
+    int to_register_set = *(int*)iptr;
+    switch (to_register_set) {
+        case 0:
+            cout << "global";
+            break;
+        case 1:
+            cout << "local";
+            break;
+        case 2:
+            cout << "static (WIP)";
+            break;
+        case 3:
+            cout << "temp (TODO)";
+            break;
+        default:
+            cout << "illegal";
+    }
+}
+
+void printJUMP(byte* iptr, const CPU& cpu) {
+    cout << *(int*)iptr;
+    pointer::inc<int, byte>(iptr);
+}
+
+void printBRANCH(byte* iptr, const CPU& cpu) {
+    iptr = printIntegerOperand(iptr);
+    cout << ' ';
+    cout << *(int*)iptr;
+    pointer::inc<int, byte>(iptr);
+    cout << ' ';
+    cout << *(int*)iptr;
+    pointer::inc<int, byte>(iptr);
+}
+
+void printCALL(byte* iptr, const CPU& cpu) {
+    string call_name = string(iptr);
+    iptr += call_name.size();
+
+    bool is_ref = *(bool*)iptr;
+    pointer::inc<bool, byte>(iptr);
+    bool return_value_register_num = *(int*)iptr;
+    pointer::inc<int, byte>(iptr);
+
+    cout << call_name << "; return address: " << (iptr-cpu.bytecode);
+    if (return_value_register_num == 0) {
+        cout << " (return value will be discarded)";
+    } else {
+        cout << " (return value will be placed in: ";
+        cout << (is_ref ? "@" : "") << return_value_register_num << ')';
+    }
+}
+
+typedef void(*PRINTER)(byte*, const CPU&);
+map<string, PRINTER> opcode_printers = {
+    { "izero", &print1IntegerOperandInstruction },
+    { "istore", &print2IntegerOperandInstruction },
+
+    { "echo", &print1IntegerOperandInstruction },
+    { "print", &print1IntegerOperandInstruction },
+
+    { "frame", &print2IntegerOperandInstruction },
+    { "param", &print2IntegerOperandInstruction },
+    { "paref", &print2IntegerOperandInstruction },
+    { "arg", &print2IntegerOperandInstruction },
+
+    { "move", &print2IntegerOperandInstruction },
+    { "copy", &print2IntegerOperandInstruction },
+    { "ref", &print2IntegerOperandInstruction },
+    { "swap", &print2IntegerOperandInstruction },
+    { "isnull", &print2IntegerOperandInstruction },
+    { "ress", &printRESS },
+    { "empty", &print1IntegerOperandInstruction },
+    { "free", &print1IntegerOperandInstruction },
+
+    { "tmpri", &print1IntegerOperandInstruction },
+    { "tmpro", &print1IntegerOperandInstruction },
+
+    { "and", &print3IntegerOperandInstruction },
+    { "or", &print3IntegerOperandInstruction },
+    { "not", &print1IntegerOperandInstruction },
+
+    { "jump", &printJUMP },
+    { "branch", &printBRANCH },
+    { "call", &printCALL },
+};
+
+
 void printInstruction(const CPU& cpu) {
     byte* iptr = cpu.instruction_pointer;
     string opcode = OP_NAMES.at(OPCODE(*iptr));
     cout << "bytecode " << (iptr-cpu.bytecode) << " at 0x" << hex << long(iptr) << dec << ": " << opcode << ' ';
 
     ++iptr;
-    if (opcode == "nop") {
-        // do nothing...
-    } else if (opcode == "ress") {
-        int to_register_set = *(int*)iptr;
-        switch (to_register_set) {
-            case 0:
-                cout << "global";
-                break;
-            case 1:
-                cout << "local";
-                break;
-            case 2:
-                cout << "static (WIP)";
-                break;
-            case 3:
-                cout << "temp (TODO)";
-                break;
-            default:
-                cout << "illegal";
-        }
-    } else if (opcode == "echo" or opcode == "print" or
-               opcode == "empty" or opcode == "free" or
-               opcode == "tmpri" or opcode == "tmpro" or
-               opcode == "not"
-              )
-    {
-        iptr = printIntegerOperand(iptr);
-    } else if (opcode == "frame" or opcode == "param" or opcode == "paref" or opcode == "arg" or
-               opcode == "move" or opcode == "copy" or opcode == "ref" or opcode == "swap" or
-               opcode == "isnull" or
-               opcode == "istore"
-              )
-    {
-        iptr = printIntegerOperand(iptr);
-        cout << ' ';
-        iptr = printIntegerOperand(iptr);
-    } else if (opcode == "and" or opcode == "or") {
-        iptr = printIntegerOperand(iptr);
-        cout << ' ';
-        iptr = printIntegerOperand(iptr);
-        cout << ' ';
-        iptr = printIntegerOperand(iptr);
-    } else if (opcode == "jump") {
-        cout << *(int*)iptr;
-        pointer::inc<int, byte>(iptr);
-    } else if (opcode == "branch") {
-        iptr = printIntegerOperand(iptr);
-        cout << ' ';
-        cout << *(int*)iptr;
-        pointer::inc<int, byte>(iptr);
-        cout << ' ';
-        cout << *(int*)iptr;
-        pointer::inc<int, byte>(iptr);
-    } else if (opcode == "call") {
-        string call_name = string(iptr);
-        iptr += call_name.size();
-
-        bool is_ref = *(bool*)iptr;
-        pointer::inc<bool, byte>(iptr);
-        bool return_value_register_num = *(int*)iptr;
-        pointer::inc<int, byte>(iptr);
-
-        cout << call_name << "; return address: " << (iptr-cpu.bytecode);
-        if (return_value_register_num == 0) {
-            cout << " (return value will be discarded)";
-        } else {
-            cout << " (return value will be placed in: ";
-            cout << (is_ref ? "@" : "") << return_value_register_num << ')';
-        }
+    try {
+        (*opcode_printers.at(opcode))(iptr, cpu);
+    } catch (const std::out_of_range& e) {
+        cout << "<this opcode does not have a printer function>";
     }
 
     cout << endl;
