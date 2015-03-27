@@ -1,4 +1,3 @@
-#include <iostream>
 #include "../../bytecode/bytetypedef.h"
 #include "../../types/object.h"
 #include "../../types/integer.h"
@@ -25,17 +24,10 @@ byte* CPU::itof(byte* addr) {
     regb_num = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (debug) {
-        cout << (rega_ref ? " @" : " ") << rega_num;
-        cout << (regb_ref ? " @" : " ") << regb_num;
-    }
-
     if (rega_ref) {
-        if (debug) { cout << "resolving reference to a-operand register" << endl; }
         rega_num = static_cast<Integer*>(registers[rega_num])->value();
     }
     if (regb_ref) {
-        if (debug) { cout << "resolving reference to b-operand register" << endl; }
         regb_num = static_cast<Integer*>(registers[regb_num])->value();
     }
 
@@ -60,17 +52,10 @@ byte* CPU::ftoi(byte* addr) {
     regb_num = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (debug) {
-        cout << (rega_ref ? " @" : " ") << rega_num;
-        cout << (regb_ref ? " @" : " ") << regb_num;
-    }
-
     if (rega_ref) {
-        if (debug) { cout << "resolving reference to a-operand register" << endl; }
         rega_num = static_cast<Integer*>(registers[rega_num])->value();
     }
     if (regb_ref) {
-        if (debug) { cout << "resolving reference to b-operand register" << endl; }
         regb_num = static_cast<Integer*>(registers[regb_num])->value();
     }
 
