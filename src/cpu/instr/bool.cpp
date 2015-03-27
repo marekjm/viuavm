@@ -22,16 +22,8 @@ byte* CPU::lognot(byte* addr) {
     regno = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (debug) {
-        cout << (ref ? " @" : " ") << regno;
-    }
-
     if (ref) {
         regno = static_cast<Integer*>(fetch(regno))->value();
-    }
-
-    if (debug) {
-        if (ref) { cout << " -> " << regno; }
     }
 
     place(regno, new Boolean(not fetch(regno)->boolean()));
@@ -60,22 +52,13 @@ byte* CPU::logand(byte* addr) {
     regr_num = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (debug) {
-        cout << (rega_ref ? " @" : " ") << rega_num;
-        cout << (regb_ref ? " @" : " ") << regb_num;
-        cout << (regr_ref ? " @" : " ") << regr_num;
-    }
-
     if (rega_ref) {
-        if (debug) { cout << "resolving reference to a-operand register" << endl; }
         rega_num = static_cast<Integer*>(registers[rega_num])->value();
     }
     if (regb_ref) {
-        if (debug) { cout << "resolving reference to b-operand register" << endl; }
         regb_num = static_cast<Integer*>(registers[regb_num])->value();
     }
     if (regr_ref) {
-        if (debug) { cout << "resolving reference to result register" << endl; }
         rega_num = static_cast<Integer*>(registers[rega_num])->value();
     }
 
@@ -105,22 +88,13 @@ byte* CPU::logor(byte* addr) {
     regr_num = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (debug) {
-        cout << (rega_ref ? " @" : " ") << rega_num;
-        cout << (regb_ref ? " @" : " ") << regb_num;
-        cout << (regr_ref ? " @" : " ") << regr_num;
-    }
-
     if (rega_ref) {
-        if (debug) { cout << "resolving reference to a-operand register" << endl; }
         rega_num = static_cast<Integer*>(registers[rega_num])->value();
     }
     if (regb_ref) {
-        if (debug) { cout << "resolving reference to b-operand register" << endl; }
         regb_num = static_cast<Integer*>(registers[regb_num])->value();
     }
     if (regr_ref) {
-        if (debug) { cout << "resolving reference to result register" << endl; }
         rega_num = static_cast<Integer*>(registers[rega_num])->value();
     }
 
