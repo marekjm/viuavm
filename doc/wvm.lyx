@@ -1195,16 +1195,24 @@ end
 \family typewriter
 case
 \family default
-'s inside 
+ inside 
 \family typewriter
 switch
 \family default
- that do end with 
+ that do not end with 
 \family typewriter
 break
 \family default
- because if the finishing end is omitted control will just flow into the
- function that is defined next (as it would to the next case inside a switch).
+; because if the finishing end is omitted control will just flow into the
+ function that is defined next (as it would to the next 
+\family typewriter
+case
+\family default
+ inside a 
+\family typewriter
+switch
+\family default
+).
 \end_layout
 
 \begin_layout Subsection
@@ -1388,12 +1396,17 @@ status open
 
 \begin_layout Plain Layout
 
+    .name: 0 exit_code
+\end_layout
+
+\begin_layout Plain Layout
+
 	; some code...
 \end_layout
 
 \begin_layout Plain Layout
 
-	move eax 0
+	move eax exit_code
 \end_layout
 
 \begin_layout Plain Layout
@@ -1510,6 +1523,10 @@ reference "Main-function-constraints"
 .
 \end_layout
 
+\begin_layout Section
+Linking
+\end_layout
+
 \begin_layout Subsection
 Static linking
 \end_layout
@@ -1575,7 +1592,8 @@ main.wlib
 No special steps have to be performed on the command line to assemble program
  that links external libraries, provided that correct paths are embedded
  in source code.
- However, special steps are required when assembling a library - 
+ However, special steps are required when assembling a library, i.e.
+ 
 \family typewriter
 --lib
 \family default
@@ -1584,13 +1602,338 @@ No special steps have to be performed on the command line to assemble program
  jump table (which is not present in the executable form of the bytecode).
 \end_layout
 
-\begin_layout Section
-Examples
+\begin_layout Subsection
+Dynamic linking
 \end_layout
 
 \begin_layout Standard
-Sample programs that run on Wudoo VM can be found in sample/ directory in
- source code repository of the VM: https://github.com/marekjm/wudoovm .
+Dynamic linking is a feature planned for later versions of Wudoo VM.
+\end_layout
+
+\begin_layout Part
+Debugging
+\end_layout
+
+\begin_layout Standard
+Sources of Wudoo VM include basic debugger that allows programmers to run
+ compiled programs in a controlled environment and inspect their state mid-fligh
+t.
+ This section explains debugger commands.
+\end_layout
+
+\begin_layout Standard
+Debugger has its .rc script which can contain arbitrary commands and is placed
+ in 
+\begin_inset Quotes eld
+\end_inset
+
+~/.wudoo.db.rc
+\begin_inset Quotes erd
+\end_inset
+
+ for local commands, and 
+\begin_inset Quotes eld
+\end_inset
+
+/etc/wudoovm/dbrc
+\begin_inset Quotes erd
+\end_inset
+
+ for system-wide commands.
+\end_layout
+
+\begin_layout Standard
+Debugging can also be aided by 
+\family typewriter
+--Wall
+\family default
+ and 
+\family typewriter
+--Eall
+\family default
+ compiler flags, which issue either a warning or error upon encountered
+ mistakes.
+ Be informed that some behaviours which are valid can still issue a warning
+ or an error, e.g.
+ functions not ending with 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+end
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ instruction (it may be either a mistake, or a decision - for example when
+ a programmer decides they want execution to 
+\begin_inset Quotes eld
+\end_inset
+
+fall
+\begin_inset Quotes erd
+\end_inset
+
+ to the next function).
+ Another useful assembler flags are 
+\family typewriter
+--verbose
+\family default
+ and 
+\family typewriter
+--debug
+\family default
+, each causing certain messages to be displayed while compiling the code.
+\end_layout
+
+\begin_layout Section
+Debugger commands
+\end_layout
+
+\begin_layout Subsection
+CPU commands
+\end_layout
+
+\begin_layout Subsubsection
+cpu.init
+\end_layout
+
+\begin_layout Standard
+This command initializes the CPU (initialization includes setting up instruction
+ pointer, and creating first frame on the call stack).
+ It must be run before any other command.
+\end_layout
+
+\begin_layout Subsubsection
+cpu.run
+\end_layout
+
+\begin_layout Standard
+This command launches loaded program.
+ The CPU will run instructions until a breakpoint is encountered or the
+ end of execution is reached.
+\end_layout
+
+\begin_layout Subsubsection
+cpu.tick
+\end_layout
+
+\begin_layout Standard
+This command accepts zero or one integer operand, which defaults to 1.
+ It instructs the CPU to perform N cycles.
+ If a breakpoint is encountered execution is paused; if end of execution
+ is reached CPU halts.
+\end_layout
+
+\begin_layout Subsubsection
+cpu.resume
+\end_layout
+
+\begin_layout Standard
+This command is used to resume execution after a encountering a breakpoint.
+ It will continue execution for as many ticks as were specified by previous
+ 
+\family typewriter
+cpu.run
+\family default
+ or 
+\family typewriter
+cpu.tick
+\family default
+ commands.
+\end_layout
+
+\begin_layout Subsubsection
+cpu.unpause
+\end_layout
+
+\begin_layout Standard
+This command is used to clear 
+\begin_inset Quotes eld
+\end_inset
+
+paused
+\begin_inset Quotes erd
+\end_inset
+
+ state of the CPU, thus allowing further execution.
+ It does not immediately resume execution, though.
+\end_layout
+
+\begin_layout Subsubsection
+cpu.jump
+\end_layout
+
+\begin_layout Standard
+This instruction allows jumping to arbitrary addresses.
+\end_layout
+
+\begin_layout Subsubsection
+cpu.unfinish
+\end_layout
+
+\begin_layout Standard
+This command clears 
+\begin_inset Quotes eld
+\end_inset
+
+finished
+\begin_inset Quotes erd
+\end_inset
+
+ state of the CPU and allows to continue running after end of execution
+ is reached.
+\end_layout
+
+\begin_layout Subsubsection
+cpu.counter
+\end_layout
+
+\begin_layout Standard
+This command shows how many instructions have been executed so far.
+\end_layout
+
+\begin_layout Subsection
+Breakpoint commands
+\end_layout
+
+\begin_layout Subsubsection
+breakpoint.set.at
+\end_layout
+
+\begin_layout Standard
+This command sets breakpoint at specified byte address or addresses.
+ It accepts zero or more integer operands, each specifying an instruction
+ index at which execution is to be paused.
+\end_layout
+
+\begin_layout Subsubsection
+breakpoint.set.on
+\end_layout
+
+\begin_layout Standard
+This command sets breakpoint on specified opcodes.
+ It accepts zero or more string operands, each being a valid opcode name
+ and specifying opcode upon which execution is to be paused.
+\end_layout
+
+\begin_layout Subsection
+Register inspection commands
+\end_layout
+
+\begin_layout Subsubsection
+register.show
+\end_layout
+
+\begin_layout Standard
+This command is used to show information about the register set being currently
+ used by CPU, typically it is the 
+\begin_inset Quotes eld
+\end_inset
+
+local
+\begin_inset Quotes erd
+\end_inset
+
+ register set.
+ The command accepts zero or more integer operands, each specifying register
+ index to be printed.
+ The indexes are checked to not exceed register set size.
+ For empty registers, appropriate message is issued.
+\end_layout
+
+\begin_layout Subsubsection
+register.global.show
+\end_layout
+
+\begin_layout Standard
+This command is used to show information about global registers.
+ It accepts the same operands as 
+\family typewriter
+register.show
+\family default
+ command.
+\end_layout
+
+\begin_layout Subsubsection
+register.static.show
+\end_layout
+
+\begin_layout Standard
+This command is used to show information about static registers.
+ It accepts the same operands as 
+\family typewriter
+register.show
+\family default
+ command.
+ If no static register have been allocated for current function, this command
+ will issue appropriate error message.
+\end_layout
+
+\begin_layout Subsection
+Various commands
+\end_layout
+
+\begin_layout Subsubsection
+st.show
+\end_layout
+
+\begin_layout Standard
+This command can be used to print simple representation of stack trace.
+\end_layout
+
+\begin_layout Subsubsection
+loader.funmap.show
+\end_layout
+
+\begin_layout Standard
+This command displays function call address map.
+\end_layout
+
+\begin_layout Subsubsection
+quit
+\end_layout
+
+\begin_layout Standard
+This command quits the debugger.
+\end_layout
+
+\begin_layout Subsubsection
+conf.set
+\end_layout
+
+\begin_layout Standard
+This command sets a configuration variable for a session.
+ The syntax is as follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+conf.set <key> (true|false)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Available keys are: 
+\family typewriter
+cpu.resume-ticks
+\family default
+ and 
+\family typewriter
+cpu.debug
+\family default
+.
 \end_layout
 
 \end_body
