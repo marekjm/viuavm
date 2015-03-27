@@ -21,10 +21,6 @@ byte* CPU::echo(byte* addr) {
     reg = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (debug) {
-        cout << (ref ? " @" : " ") << reg << endl;
-    }
-
     if (ref) {
         reg = static_cast<Integer*>(fetch(reg))->value();
     }
@@ -60,11 +56,6 @@ byte* CPU::move(byte* addr) {
     b = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (debug) {
-        cout << (a_ref ? " @" : " ") << a;
-        cout << (b_ref ? " @" : " ") << b;
-    }
-
     if (a_ref) {
         a = static_cast<Integer*>(fetch(a))->value();
     }
@@ -93,11 +84,6 @@ byte* CPU::copy(byte* addr) {
     pointer::inc<bool, byte>(addr);
     b = *((int*)addr);
     pointer::inc<int, byte>(addr);
-
-    if (debug) {
-        cout << (a_ref ? " @" : " ") << a;
-        cout << (b_ref ? " @" : " ") << b;
-    }
 
     if (a_ref) {
         a = static_cast<Integer*>(fetch(a))->value();
@@ -128,11 +114,6 @@ byte* CPU::ref(byte* addr) {
     b = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (debug) {
-        cout << (a_ref ? " @" : " ") << a;
-        cout << (b_ref ? " @" : " ") << b;
-    }
-
     if (a_ref) {
         a = static_cast<Integer*>(fetch(a))->value();
     }
@@ -162,11 +143,6 @@ byte* CPU::swap(byte* addr) {
     b = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (debug) {
-        cout << (a_ref ? " @" : " ") << a;
-        cout << (b_ref ? " @" : " ") << b;
-    }
-
     if (a_ref) {
         a = static_cast<Integer*>(fetch(a))->value();
     }
@@ -190,10 +166,6 @@ byte* CPU::free(byte* addr) {
     pointer::inc<bool, byte>(addr);
     a = *((int*)addr);
     pointer::inc<int, byte>(addr);
-
-    if (debug) {
-        cout << (a_ref ? " @" : " ") << a;
-    }
 
     if (a_ref) {
         a = static_cast<Integer*>(fetch(a))->value();
@@ -220,10 +192,6 @@ byte* CPU::empty(byte* addr) {
     pointer::inc<bool, byte>(addr);
     a = *((int*)addr);
     pointer::inc<int, byte>(addr);
-
-    if (debug) {
-        cout << (a_ref ? " @" : " ") << a;
-    }
 
     if (a_ref) {
         a = static_cast<Integer*>(fetch(a))->value();
@@ -255,11 +223,6 @@ byte* CPU::isnull(byte* addr) {
     pointer::inc<bool, byte>(addr);
     b = *((int*)addr);
     pointer::inc<int, byte>(addr);
-
-    if (debug) {
-        cout << (a_ref ? " @" : " ") << a;
-        cout << (b_ref ? " @" : " ") << b;
-    }
 
     if (a_ref) {
         a = static_cast<Integer*>(fetch(a))->value();
@@ -315,10 +278,6 @@ byte* CPU::tmpri(byte* addr) {
     a = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (debug) {
-        cout << (a_ref ? " @" : " ") << a;
-    }
-
     if (a_ref) {
         a = static_cast<Integer*>(fetch(a))->value();
     }
@@ -340,10 +299,6 @@ byte* CPU::tmpro(byte* addr) {
     pointer::inc<bool, byte>(addr);
     a = *((int*)addr);
     pointer::inc<int, byte>(addr);
-
-    if (debug) {
-        cout << (a_ref ? " @" : " ") << a;
-    }
 
     if (a_ref) {
         a = static_cast<Integer*>(fetch(a))->value();
@@ -500,10 +455,6 @@ byte* CPU::call(byte* addr) {
     // save return address for frame
     byte* return_address = (addr + sizeof(bool) + sizeof(int));
 
-    if (debug) {
-        cout << " '" << call_name << "' " << (long)(call_address-bytecode);
-        cout << ": setting return address to bytecode " << (long)(return_address-bytecode);
-    }
     if (frame_new == 0) {
         throw "function call without a frame: use `frame 0' in source code if the function takes no parameters";
     }
@@ -514,13 +465,6 @@ byte* CPU::call(byte* addr) {
     frame_new->resolve_return_value_register = *(bool*)addr;
     pointer::inc<bool, byte>(addr);
     frame_new->place_return_value_in = *(int*)addr;
-    if (debug) {
-        if (frame_new->place_return_value_in == 0) {
-            cout << " (return value will be discarded)";
-        } else {
-            cout << " (return value will be placed in: " << (frame_new->resolve_return_value_register ? "@" : "") << frame_new->place_return_value_in << ')';
-        }
-    }
 
     // adjust register set
     uregisters = frame_new->registers;
@@ -543,10 +487,6 @@ byte* CPU::end(byte* addr) {
         throw "no frame on stack: nothing to end";
     }
     addr = frames.back()->ret_address();
-    if (debug) {
-        cout << " -> return address: " << (long)(addr - bytecode);
-        cout << " (from function: " << frames.back()->function_name << ')';
-    }
 
     Object* returned = 0;
     bool returned_is_reference = false;
@@ -595,9 +535,6 @@ byte* CPU::end(byte* addr) {
 byte* CPU::jump(byte* addr) {
     /*  Run jump instruction.
      */
-    if (debug) {
-        cout << ' ' << *(int*)addr;
-    }
     byte* target = bytecode+(*(int*)addr);
     if (target == addr) {
         throw "aborting: JUMP instruction pointing to itself";
@@ -624,15 +561,8 @@ byte* CPU::branch(byte* addr) {
     int addr_false = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (debug) {
-        cout << dec << (regcond_ref ? " @" : " ") << regcond_num;
-        cout << " " << addr_true  << "::0x" << hex << (long)(bytecode+addr_true) << dec;
-        cout << " " << addr_false << "::0x" << hex << (long)(bytecode+addr_false);
-    }
-
 
     if (regcond_ref) {
-        if (debug) { cout << "resolving reference to condition register" << endl; }
         regcond_num = static_cast<Integer*>(fetch(regcond_num))->value();
     }
 
