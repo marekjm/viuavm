@@ -71,10 +71,55 @@ void printInstruction(const CPU& cpu) {
             default:
                 cout << "illegal";
         }
-    } else if (opcode == "frame" or opcode == "paref" or opcode == "istore" or opcode == "arg") {
+    } else if (opcode == "echo" or opcode == "print" or
+               opcode == "empty" or opcode == "free" or
+               opcode == "tmpri" or opcode == "tmpro" or
+               opcode == "not"
+              )
+    {
+        iptr = printIntegerOperand(iptr);
+    } else if (opcode == "frame" or opcode == "param" or opcode == "paref" or opcode == "arg" or
+               opcode == "move" or opcode == "copy" or opcode == "ref" or opcode == "swap" or
+               opcode == "isnull" or
+               opcode == "istore"
+              )
+    {
         iptr = printIntegerOperand(iptr);
         cout << ' ';
         iptr = printIntegerOperand(iptr);
+    } else if (opcode == "and" or opcode == "or") {
+        iptr = printIntegerOperand(iptr);
+        cout << ' ';
+        iptr = printIntegerOperand(iptr);
+        cout << ' ';
+        iptr = printIntegerOperand(iptr);
+    } else if (opcode == "jump") {
+        cout << *(int*)iptr;
+        pointer::inc<int, byte>(iptr);
+    } else if (opcode == "branch") {
+        iptr = printIntegerOperand(iptr);
+        cout << ' ';
+        cout << *(int*)iptr;
+        pointer::inc<int, byte>(iptr);
+        cout << ' ';
+        cout << *(int*)iptr;
+        pointer::inc<int, byte>(iptr);
+    } else if (opcode == "call") {
+        string call_name = string(iptr);
+        iptr += call_name.size();
+
+        bool is_ref = *(bool*)iptr;
+        pointer::inc<bool, byte>(iptr);
+        bool return_value_register_num = *(int*)iptr;
+        pointer::inc<int, byte>(iptr);
+
+        cout << call_name << "; return address: " << (iptr-cpu.bytecode);
+        if (return_value_register_num == 0) {
+            cout << " (return value will be discarded)";
+        } else {
+            cout << " (return value will be placed in: ";
+            cout << (is_ref ? "@" : "") << return_value_register_num << ')';
+        }
     }
 
     cout << endl;
