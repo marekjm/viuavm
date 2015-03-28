@@ -907,79 +907,23 @@ int main(int argc, char* argv[]) {
     }
 
 
-    ////////////////////////
-    // VERIFY FUNCTION CALLS
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        line = str::lstrip(lines[i]);
-        if (not str::startswith(line, "call")) {
-            continue;
-        }
+    string report;
 
-        string function = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
-        bool is_undefined = (find(function_names.begin(), function_names.end(), function) == function_names.end());
-
-        if (is_undefined) {
-            cout << "fatal: call to undefined function '" << function << "' at line " << i << " in " << filename << endl;
-            exit(1);
-        }
+    if ((report = assembler::verify::functionCalls(lines, function_names)).size()) {
+        cout << report << endl;
+        exit(1);
     }
-
-    ///////////////////////////
-    // VERIFY CLOSURE CREATIONS
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        line = str::lstrip(lines[i]);
-        if (not str::startswith(line, "closure")) {
-            continue;
-        }
-
-        line = str::lstrip(str::sub(line, str::chunk(line).size()));
-        string function = str::chunk(line);
-        bool is_undefined = (find(function_names.begin(), function_names.end(), function) == function_names.end());
-
-        if (is_undefined) {
-            cout << "fatal: closure from undefined function '" << function << "' at line " << i << " in " << filename << endl;
-            exit(1);
-        }
-
-        // second chunk of closure instruction, must be an integer
-        line = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
-        if (line.size() == 0) {
-            cout << "fatal: second operand missing from closure instruction at line " << i << " in " << filename << endl;
-            exit(1);
-        } else if (not str::isnum(line)) {
-            cout << "fatal: second operand is not an integer in closure instruction at line " << i << " in " << filename << endl;
-            exit(1);
-        }
+    if ((report = assembler::verify::closureCreations(lines, function_names)).size()) {
+        cout << report << endl;
+        exit(1);
     }
-
-    ///////////////////////////
-    // VERIFY RESS INSTRUCTIONS
-    vector<string> legal_register_sets = {
-        "global",   // global register set
-        "local",    // local register set for function
-        "static",   // static register set
-        "temp",     // temporary register set
-    };
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        line = str::lstrip(lines[i]);
-        if (not str::startswith(line, "ress")) {
-            continue;
-        }
-
-        string registerset_name = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
-
-        if (find(legal_register_sets.begin(), legal_register_sets.end(), registerset_name) == legal_register_sets.end()) {
-            cout << "fatal: illegal register set name in ress instruction: '" << registerset_name << "' at line " << i << " in " << filename;
-            exit(1);
-        }
-        if (registerset_name == "global" and AS_LIB) {
-            if (ERROR_GLOBALS_IN_LIB or ERROR_ALL) {
-                cout << "fatal: global registers used in library function at line " << i << " in " << filename;
-                exit(1);
-            } else if (WARNING_GLOBALS_IN_LIB or WARNING_ALL) {
-                cout << "warning: global registers used in library function at line " << i << " in " << filename;
-            }
-        }
+    if ((report = assembler::verify::ressInstructions(lines, AS_LIB)).size()) {
+        cout << report << endl;
+        exit(1);
+    }
+    if ((report = assembler::verify::functionBodiesAreNonempty(lines, functions)).size()) {
+        cout << report << endl;
+        exit(1);
     }
 
     ////////////////////////////
@@ -1006,14 +950,6 @@ int main(int argc, char* argv[]) {
     // VERIFY FUNCTION BODIES
     for (auto function : functions) {
         vector<string> flines = function.second.second;
-        if (flines.size() == 0) {
-            if (ERROR_EMPTY_FUNCTION_BODY or ERROR_ALL) {
-                cout << "fatal: function '" + function.first + "' is empty" << endl;
-                exit(1);
-            } else if (WARNING_EMPTY_FUNCTION_BODY or WARNING_ALL) {
-                cout << "warning: function '" << function.first << "' is empty" << endl;
-            }
-        }
         if ((flines.size() == 0 or flines.back() != "end") and (function.first != "main" and flines.back() != "halt")) {
             if (ERROR_MISSING_END or ERROR_ALL) {
                 cout << "fatal: missing 'end' at the end of function '" << function.first << "'" << endl;
