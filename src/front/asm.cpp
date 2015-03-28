@@ -1164,7 +1164,6 @@ int main(int argc, char* argv[]) {
             *((int*)(linked_bytecode+jmp)) += bytes_offset;
         }
 
-        //out.write(linked_bytecode, linked_size);
         for (int i = 0; i < linked_size; ++i) {
             program_bytecode[program_bytecode_used+i] = linked_bytecode[i];
         }
