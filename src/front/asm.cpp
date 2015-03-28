@@ -664,8 +664,8 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
              *
              *  Nope.
              *
-             *  It would be faster if calls were just precalculated jumps.
-             *  However, by them being strings we get plenty of plexibility, good-quality stack traces, and
+             *  Yes, it *would* be faster if calls were just precalculated jumps.
+             *  However, by them being strings we get plenty of flexibility, good-quality stack traces, and
              *  a place to put plenty of debugging info.
              *  All that at a cost of just one map lookup; the overhead is minimal and gains are big.
              *  What's not to love?
