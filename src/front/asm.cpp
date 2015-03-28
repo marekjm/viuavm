@@ -1032,7 +1032,7 @@ int main(int argc, char* argv[]) {
     // AS ALL THE FUNCTIONS (LOCAL OR LINKED) ARE
     // NOW AVAILABLE
     if (find(function_names.begin(), function_names.end(), main_function) == function_names.end() and not AS_LIB) {
-        cout << "error: main function is undefined: " << main_function << endl;
+        cout << "[asm:pre] fatal: main function is undefined: " << main_function << endl;
         return 1;
     }
 
