@@ -11,6 +11,7 @@
 #include "../support/string.h"
 #include "../version.h"
 #include "../program.h"
+#include "../assembler/assembler.h"
 using namespace std;
 
 
@@ -45,23 +46,6 @@ bool ERROR_GLOBALS_IN_LIB = false;
 
 // ASSEMBLY CONSTANTS
 const string ENTRY_FUNCTION_NAME = "__entry";
-
-
-// LOGIC
-int_op getint_op(const string& s) {
-    bool ref = s[0] == '@';
-    return tuple<bool, int>(ref, stoi(ref ? str::sub(s, 1) : s));
-}
-
-byte_op getbyte_op(const string& s) {
-    bool ref = s[0] == '@';
-    return tuple<bool, char>(ref, (char)stoi(ref ? str::sub(s, 1) : s));
-}
-
-float_op getfloat_op(const string& s) {
-    bool ref = s[0] == '@';
-    return tuple<bool, float>(ref, stof(ref ? str::sub(s, 1) : s));
-}
 
 
 vector<string> getilines(const vector<string>& lines) {
@@ -284,7 +268,7 @@ string resolveregister(string reg, const map<string, int>& names) {
     /*  This function is used to register numbers when a register is accessed, e.g.
      *  in `istore` instruction or in `branch` in condition operand.
      *
-     *  This function MUST return string as teh result is further passed to getint_op() function which *expects* string.
+     *  This function MUST return string as teh result is further passed to assembler::operands::getint() function which *expects* string.
      */
     ostringstream out;
     if (str::isnum(reg)) {
@@ -398,7 +382,7 @@ void assemble_three_intop_instruction(Program& program, map<string, int>& names,
 
     // feed chunks into Bytecode Programming API
     try {
-        (program.*THREE_INTOP_ASM_FUNCTIONS.at(instr))(getint_op(rega), getint_op(regb), getint_op(regr));
+        (program.*THREE_INTOP_ASM_FUNCTIONS.at(instr))(assembler::operands::getint(rega), assembler::operands::getint(regb), assembler::operands::getint(regr));
     } catch (const std::out_of_range& e) {
         throw ("instruction is not present in THREE_INTOP_ASM_FUNCTIONS map but it should be: " + instr);
     }
@@ -469,11 +453,11 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         } else if (str::startswith(line, "izero")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
-            program.izero(getint_op(resolveregister(regno_chnk, names)));
+            program.izero(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "istore")) {
             string regno_chnk, number_chnk;
             tie(regno_chnk, number_chnk) = get2operands(operands);
-            program.istore(getint_op(resolveregister(regno_chnk, names)), getint_op(resolveregister(number_chnk, names)));
+            program.istore(assembler::operands::getint(resolveregister(regno_chnk, names)), assembler::operands::getint(resolveregister(number_chnk, names)));
         } else if (str::startswith(line, "iadd")) {
             assemble_three_intop_instruction(program, names, "iadd", operands);
         } else if (str::startswith(line, "isub")) {
@@ -495,15 +479,15 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         } else if (str::startswith(line, "iinc")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
-            program.iinc(getint_op(resolveregister(regno_chnk, names)));
+            program.iinc(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "idec")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
-            program.idec(getint_op(resolveregister(regno_chnk, names)));
+            program.idec(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "fstore")) {
             string regno_chnk, float_chnk;
             tie(regno_chnk, float_chnk) = get2operands(operands);
-            program.fstore(getint_op(resolveregister(regno_chnk, names)), stod(float_chnk));
+            program.fstore(assembler::operands::getint(resolveregister(regno_chnk, names)), stod(float_chnk));
         } else if (str::startswith(line, "fadd")) {
             assemble_three_intop_instruction(program, names, "fadd", operands);
         } else if (str::startswith(line, "fsub")) {
@@ -525,55 +509,55 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         } else if (str::startswith(line, "bstore")) {
             string regno_chnk, byte_chnk;
             tie(regno_chnk, byte_chnk) = get2operands(operands);
-            program.bstore(getint_op(resolveregister(regno_chnk, names)), getbyte_op(resolveregister(byte_chnk, names)));
+            program.bstore(assembler::operands::getint(resolveregister(regno_chnk, names)), assembler::operands::getbyte(resolveregister(byte_chnk, names)));
         } else if (str::startswith(line, "itof")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = get2operands(operands);
             if (b_chnk.size() == 0) { b_chnk = a_chnk; }
-            program.itof(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
+            program.itof(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "ftoi")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = get2operands(operands);
             if (b_chnk.size() == 0) { b_chnk = a_chnk; }
-            program.ftoi(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
+            program.ftoi(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "strstore")) {
             string reg_chnk, str_chnk;
             reg_chnk = str::chunk(operands);
             operands = str::lstrip(str::sub(operands, reg_chnk.size()));
             str_chnk = str::extract(operands);
-            program.strstore(getint_op(resolveregister(reg_chnk, names)), str_chnk);
+            program.strstore(assembler::operands::getint(resolveregister(reg_chnk, names)), str_chnk);
         } else if (str::startswith(line, "vec")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
-            program.vec(getint_op(resolveregister(regno_chnk, names)));
+            program.vec(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "vinsert")) {
             string vec, src, pos;
             tie(vec, src, pos) = get3operands(operands, false);
             if (pos == "") { pos = "0"; }
-            program.vinsert(getint_op(resolveregister(vec, names)), getint_op(resolveregister(src, names)), getint_op(resolveregister(pos, names)));
+            program.vinsert(assembler::operands::getint(resolveregister(vec, names)), assembler::operands::getint(resolveregister(src, names)), assembler::operands::getint(resolveregister(pos, names)));
         } else if (str::startswith(line, "vpush")) {
             string regno_chnk, number_chnk;
             tie(regno_chnk, number_chnk) = get2operands(operands);
-            program.vpush(getint_op(resolveregister(regno_chnk, names)), getint_op(resolveregister(number_chnk, names)));
+            program.vpush(assembler::operands::getint(resolveregister(regno_chnk, names)), assembler::operands::getint(resolveregister(number_chnk, names)));
         } else if (str::startswith(line, "vpop")) {
             string vec, dst, pos;
             tie(vec, dst, pos) = get3operands(operands, false);
             if (dst == "") { dst = "0"; }
             if (pos == "") { pos = "-1"; }
-            program.vpop(getint_op(resolveregister(vec, names)), getint_op(resolveregister(dst, names)), getint_op(resolveregister(pos, names)));
+            program.vpop(assembler::operands::getint(resolveregister(vec, names)), assembler::operands::getint(resolveregister(dst, names)), assembler::operands::getint(resolveregister(pos, names)));
         } else if (str::startswith(line, "vat")) {
             string vec, dst, pos;
             tie(vec, dst, pos) = get3operands(operands, false);
             if (pos == "") { pos = "-1"; }
-            program.vat(getint_op(resolveregister(vec, names)), getint_op(resolveregister(dst, names)), getint_op(resolveregister(pos, names)));
+            program.vat(assembler::operands::getint(resolveregister(vec, names)), assembler::operands::getint(resolveregister(dst, names)), assembler::operands::getint(resolveregister(pos, names)));
         } else if (str::startswith(line, "vlen")) {
             string regno_chnk, number_chnk;
             tie(regno_chnk, number_chnk) = get2operands(operands);
-            program.vlen(getint_op(resolveregister(regno_chnk, names)), getint_op(resolveregister(number_chnk, names)));
+            program.vlen(assembler::operands::getint(resolveregister(regno_chnk, names)), assembler::operands::getint(resolveregister(number_chnk, names)));
         } else if (str::startswith(line, "not")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
-            program.lognot(getint_op(resolveregister(regno_chnk, names)));
+            program.lognot(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "and")) {
             assemble_three_intop_instruction(program, names, "and", operands);
         } else if (str::startswith(line, "or")) {
@@ -581,79 +565,79 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         } else if (str::startswith(line, "move")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = get2operands(operands);
-            program.move(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
+            program.move(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "copy")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = get2operands(operands);
-            program.copy(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
+            program.copy(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "ref")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = get2operands(operands);
-            program.ref(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
+            program.ref(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "swap")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = get2operands(operands);
-            program.swap(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
+            program.swap(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "free")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
-            program.free(getint_op(resolveregister(regno_chnk, names)));
+            program.free(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "empty")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
-            program.empty(getint_op(resolveregister(regno_chnk, names)));
+            program.empty(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "isnull")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = get2operands(operands);
-            program.isnull(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
+            program.isnull(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "ress")) {
             program.ress(operands);
         } else if (str::startswith(line, "tmpri")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
-            program.tmpri(getint_op(resolveregister(regno_chnk, names)));
+            program.tmpri(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "tmpro")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
-            program.tmpro(getint_op(resolveregister(regno_chnk, names)));
+            program.tmpro(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "print")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
-            program.print(getint_op(resolveregister(regno_chnk, names)));
+            program.print(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "echo")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
-            program.echo(getint_op(resolveregister(regno_chnk, names)));
+            program.echo(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "closure")) {
             string fn_name, reg;
             tie(fn_name, reg) = get2operands(operands);
-            program.closure(fn_name, getint_op(resolveregister(reg, names)));
+            program.closure(fn_name, assembler::operands::getint(resolveregister(reg, names)));
         } else if (str::startswith(line, "clframe")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
-            program.clframe(getint_op(resolveregister(regno_chnk, names)));
+            program.clframe(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "clcall")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = get2operands(operands);
-            program.clcall(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
+            program.clcall(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "frame")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = get2operands(operands);
             if (a_chnk.size() == 0) { a_chnk = "0"; }
             if (b_chnk.size() == 0) { b_chnk = "16"; }  // default number of local registers
-            program.frame(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
+            program.frame(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "param")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = get2operands(operands);
-            program.param(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
+            program.param(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "paref")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = get2operands(operands);
-            program.paref(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
+            program.paref(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "arg")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = get2operands(operands);
-            program.arg(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
+            program.arg(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "call")) {
             /** Full form of call instruction has two operands: function name and return value register index.
              *  If call is given only one operand - it means it is the instruction index and returned value is discarded.
@@ -683,7 +667,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             // which means that return value will be discarded
             if (reg == "") { reg = "0"; }
 
-            program.call(fn_name, getint_op(resolveregister(reg, names)));
+            program.call(fn_name, assembler::operands::getint(resolveregister(reg, names)));
         } else if (str::startswith(line, "branch")) {
             /*  If branch is given three operands, it means its full, three-operands form is being used.
              *  Otherwise, it is short, two-operands form instruction and assembler should fill third operand accordingly.
@@ -711,7 +695,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
                 addrf_target = instruction+1;
             }
 
-            program.branch(getint_op(resolveregister(condition, names)), addrt_target, addrt_is_absolute, addrf_target, addrf_is_absolute);
+            program.branch(assembler::operands::getint(resolveregister(condition, names)), addrt_target, addrt_is_absolute, addrf_target, addrf_is_absolute);
         } else if (str::startswith(line, "jump")) {
             /*  Jump instruction can be written in two forms:
              *
