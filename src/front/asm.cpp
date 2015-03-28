@@ -1239,7 +1239,6 @@ int main(int argc, char* argv[]) {
         Program func(fun_bytes);
         try {
             assemble(func.setdebug(DEBUG), functions.at(name).second);
-            //func.calculateBranches(functions_section_size);
         } catch (const string& e) {
             cout << (DEBUG ? "\n" : "") << "fatal: error during assembling: " << e << endl;
             exit(1);
