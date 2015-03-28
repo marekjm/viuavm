@@ -627,11 +627,6 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         } else if (str::startswith(line, "closure")) {
             string fn_name, reg;
             tie(fn_name, reg) = get2operands(operands);
-
-            // if second operand is empty, fill it with zero
-            // which means that return value will be discarded
-            if (reg == "") { reg = "0"; }
-
             program.closure(fn_name, getint_op(resolveregister(reg, names)));
         } else if (str::startswith(line, "clframe")) {
             string regno_chnk;
@@ -1157,11 +1152,11 @@ int main(int argc, char* argv[]) {
     }
 
 
-    //////////////////////////////////////////////
-    // VERIFY FUNCTION CALLS AND CLOSURE CREATIONS
+    ////////////////////////
+    // VERIFY FUNCTION CALLS
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = str::lstrip(lines[i]);
-        if (not str::startswith(line, "call") and not str::startswith(line, "closure")) {
+        if (not str::startswith(line, "call")) {
             continue;
         }
 
@@ -1169,15 +1164,38 @@ int main(int argc, char* argv[]) {
         bool is_undefined = (find(function_names.begin(), function_names.end(), function) == function_names.end());
 
         if (is_undefined) {
-            if (str::startswith(line, "call")) {
-                cout << "fatal: call to undefined function '" << function << "' at line " << i << " in " << filename << endl;
-            } else {
-                cout << "fatal: closure from undefined function '" << function << "' at line " << i << " in " << filename << endl;
-            }
+            cout << "fatal: call to undefined function '" << function << "' at line " << i << " in " << filename << endl;
             exit(1);
         }
     }
 
+    ///////////////////////////
+    // VERIFY CLOSURE CREATIONS
+    for (unsigned i = 0; i < lines.size(); ++i) {
+        line = str::lstrip(lines[i]);
+        if (not str::startswith(line, "closure")) {
+            continue;
+        }
+
+        line = str::lstrip(str::sub(line, str::chunk(line).size()));
+        string function = str::chunk(line);
+        bool is_undefined = (find(function_names.begin(), function_names.end(), function) == function_names.end());
+
+        if (is_undefined) {
+            cout << "fatal: closure from undefined function '" << function << "' at line " << i << " in " << filename << endl;
+            exit(1);
+        }
+
+        // second chunk of closure instruction, must be an integer
+        line = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
+        if (line.size() == 0) {
+            cout << "fatal: second operand missing from closure instruction at line " << i << " in " << filename << endl;
+            exit(1);
+        } else if (not str::isnum(line)) {
+            cout << "fatal: second operand is not an integer in closure instruction at line " << i << " in " << filename << endl;
+            exit(1);
+        }
+    }
 
     ///////////////////////////
     // VERIFY RESS INSTRUCTIONS
