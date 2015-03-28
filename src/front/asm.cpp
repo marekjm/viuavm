@@ -1002,6 +1002,31 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    /////////////////////////
+    // VERIFY FUNCTION BODIES
+    for (auto function : functions) {
+        vector<string> flines = function.second.second;
+        if (flines.size() == 0) {
+            if (ERROR_EMPTY_FUNCTION_BODY or ERROR_ALL) {
+                cout << "fatal: function '" + function.first + "' is empty" << endl;
+                exit(1);
+            } else if (WARNING_EMPTY_FUNCTION_BODY or WARNING_ALL) {
+                cout << "warning: function '" << function.first << "' is empty" << endl;
+            }
+        }
+        if ((flines.size() == 0 or flines.back() != "end") and (function.first != "main" and flines.back() != "halt")) {
+            if (ERROR_MISSING_END or ERROR_ALL) {
+                cout << "fatal: missing 'end' at the end of function '" << function.first << "'" << endl;
+                exit(1);
+            } else if (WARNING_MISSING_END or WARNING_ALL) {
+                cout << "warning: missing 'end' at the end of function '" << function.first << "'" << endl;
+            } else {
+                // FIXME: autoappend end on-demand
+                flines.push_back("end");
+            }
+        }
+    }
+
 
     ////////////////////////////////////////
     // CREATE OFSTREAM TO WRITE BYTECODE OUT
