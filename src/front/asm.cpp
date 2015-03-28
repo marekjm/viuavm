@@ -628,6 +628,11 @@ int main(int argc, char* argv[]) {
     ////////////////////////////////
     // FIND FILENAME AND COMPILENAME
     filename = args[0];
+    if (!filename.size()) {
+        cout << "fatal: no file to assemble" << endl;
+        return 1;
+    }
+
     if (compilename == "") {
         if (AS_LIB) {
             compilename = (filename + ".wlib");
@@ -646,11 +651,6 @@ int main(int argc, char* argv[]) {
     vector<string> commandline_given_links;
     for (unsigned i = 1; i < args.size(); ++i) {
         commandline_given_links.push_back(args[i]);
-    }
-
-    if (!filename.size()) {
-        cout << "fatal: no file to assemble" << endl;
-        return 1;
     }
 
 
