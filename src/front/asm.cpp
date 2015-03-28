@@ -437,7 +437,7 @@ vector<string> filter(const vector<string>& lines) {
     return filtered;
 }
 
-Program& compile(Program& program, const vector<string>& lines, map<string, int>& marks, map<string, int>& names, const vector<string>& function_names) {
+Program& compile(Program& program, const vector<string>& lines, map<string, int>& marks, map<string, int>& names) {
     /** Compile instructions into bytecode using bytecode generation API.
      *
      */
@@ -644,10 +644,6 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string fn_name, reg;
             tie(fn_name, reg) = get2operands(operands);
 
-            if (find(function_names.begin(), function_names.end(), fn_name) == function_names.end()) {
-                throw ("closure from an undefined function: '" + fn_name + "'");
-            }
-
             // if second operand is empty, fill it with zero
             // which means that return value will be discarded
             if (reg == "") { reg = "0"; }
@@ -710,10 +706,6 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
              */
             string fn_name, reg;
             tie(fn_name, reg) = get2operands(operands);
-
-            if (find(function_names.begin(), function_names.end(), fn_name) == function_names.end()) {
-                throw ("call to an undefined function: '" + fn_name + "'");
-            }
 
             // if second operand is empty, fill it with zero
             // which means that return value will be discarded
@@ -780,7 +772,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
 }
 
 
-void assemble(Program& program, const vector<string>& lines, const vector<string>& function_names) {
+void assemble(Program& program, const vector<string>& lines) {
     /** Assemble instructions in lines into a program.
      *  This function first garthers required information about markers, named registers and functions.
      *  Then, it passes all gathered data into compilation function.
@@ -789,11 +781,10 @@ void assemble(Program& program, const vector<string>& lines, const vector<string
      *
      *  program         - Program object which will be used for assembling
      *  lines           - lines with instructions
-     *  function_names  - list of function names
      */
     map<string, int> marks = getmarks(lines);
     map<string, int> names = getnames(lines);
-    compile(program, lines, marks, names, function_names);
+    compile(program, lines, marks, names);
 }
 
 
@@ -1182,6 +1173,28 @@ int main(int argc, char* argv[]) {
     }
 
 
+    //////////////////////////////////////////////
+    // VERIFY FUNCTION CALLS AND CLOSURE CREATIONS
+    for (unsigned i = 0; i < lines.size(); ++i) {
+        line = str::lstrip(lines[i]);
+        if (not str::startswith(line, "call") and not str::startswith(line, "closure")) {
+            continue;
+        }
+
+        string function = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
+        bool is_undefined = (find(function_names.begin(), function_names.end(), function) == function_names.end());
+
+        if (is_undefined) {
+            if (str::startswith(line, "call")) {
+                cout << "fatal: call to undefined function '" << function << "' at line " << i << " in " << filename << endl;
+            } else {
+                cout << "fatal: closure from undefined function '" << function << "' at line " << i << " in " << filename << endl;
+            }
+            exit(1);
+        }
+    }
+
+
     ////////////////////////////////////////
     // CREATE OFSTREAM TO WRITE BYTECODE OUT
     ofstream out(compilename, ios::out | ios::binary);
@@ -1225,7 +1238,7 @@ int main(int argc, char* argv[]) {
 
         Program func(fun_bytes);
         try {
-            assemble(func.setdebug(DEBUG), functions.at(name).second, function_names);
+            assemble(func.setdebug(DEBUG), functions.at(name).second);
             //func.calculateBranches(functions_section_size);
         } catch (const string& e) {
             cout << (DEBUG ? "\n" : "") << "fatal: error during assembling: " << e << endl;
