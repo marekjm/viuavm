@@ -637,13 +637,6 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             tie(a_chnk, b_chnk) = get2operands(operands);
             program.clcall(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "frame")) {
-            if (operands.size() == 0) {
-                if (ERROR_OPERANDLESS_FRAME or ERROR_ALL) {
-                    throw "frame instruction without operand";
-                } else if (WARNING_OPERANDLESS_FRAME or WARNING_ALL) {
-                    cout << "warning: frame instruction without operand: inserting zero" << endl;
-                }
-            }
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = get2operands(operands);
             if (a_chnk.size() == 0) { a_chnk = "0"; }
@@ -1227,6 +1220,25 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    ////////////////////////////
+    // VERIFY FRAME INSTRUCTIONS
+    for (unsigned i = 0; i < lines.size(); ++i) {
+        line = str::lstrip(lines[i]);
+        if (not str::startswith(line, "frame")) {
+            continue;
+        }
+
+        line = str::lstrip(str::sub(line, str::chunk(line).size()));
+
+        if (line.size() == 0) {
+            if (ERROR_OPERANDLESS_FRAME or ERROR_ALL) {
+                cout << "fatal: frame instruction without operands at line " << i << " in " << filename;
+                exit(1);
+            } else if (WARNING_OPERANDLESS_FRAME or WARNING_ALL) {
+                cout << "warning: frame instruction without operands at line " << i << " in " << filename;
+            }
+        }
+    }
 
 
     ////////////////////////////////////////
