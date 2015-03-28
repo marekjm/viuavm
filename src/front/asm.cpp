@@ -607,22 +607,6 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             tie(a_chnk, b_chnk) = get2operands(operands);
             program.isnull(getint_op(resolveregister(a_chnk, names)), getint_op(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "ress")) {
-            vector<string> legal_register_sets = {
-                "global",   // global register set
-                "local",    // local register set for function
-                "static",   // static register set
-                "temp",     // temporary register set
-            };
-            if (find(legal_register_sets.begin(), legal_register_sets.end(), operands) == legal_register_sets.end()) {
-                throw ("illegal register set name in ress instruction: '" + operands + "'");
-            }
-            if (operands == "global" and AS_LIB) {
-                if (ERROR_GLOBALS_IN_LIB or ERROR_ALL) {
-                    throw "global registers used in library function";
-                } else if (WARNING_GLOBALS_IN_LIB or WARNING_ALL) {
-                    cout << "warning: global registers used in library function" << endl;
-                }
-            }
             program.ress(operands);
         } else if (str::startswith(line, "tmpri")) {
             string regno_chnk;
@@ -1193,6 +1177,38 @@ int main(int argc, char* argv[]) {
             exit(1);
         }
     }
+
+
+    ///////////////////////////
+    // VERIFY RESS INSTRUCTIONS
+    vector<string> legal_register_sets = {
+        "global",   // global register set
+        "local",    // local register set for function
+        "static",   // static register set
+        "temp",     // temporary register set
+    };
+    for (unsigned i = 0; i < lines.size(); ++i) {
+        line = str::lstrip(lines[i]);
+        if (not str::startswith(line, "ress")) {
+            continue;
+        }
+
+        string registerset_name = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
+
+        if (find(legal_register_sets.begin(), legal_register_sets.end(), registerset_name) == legal_register_sets.end()) {
+            cout << "fatal: illegal register set name in ress instruction: '" << registerset_name << "' at line " << i << " in " << filename;
+            exit(1);
+        }
+        if (registerset_name == "global" and AS_LIB) {
+            if (ERROR_GLOBALS_IN_LIB or ERROR_ALL) {
+                cout << "fatal: global registers used in library function at line " << i << " in " << filename;
+                exit(1);
+            } else if (WARNING_GLOBALS_IN_LIB or WARNING_ALL) {
+                cout << "warning: global registers used in library function at line " << i << " in " << filename;
+            }
+        }
+    }
+
 
 
     ////////////////////////////////////////
