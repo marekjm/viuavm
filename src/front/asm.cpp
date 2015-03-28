@@ -10,6 +10,7 @@
 #include "../bytecode/maps.h"
 #include "../support/string.h"
 #include "../version.h"
+#include "../loader.h"
 #include "../program.h"
 #include "../assembler/assembler.h"
 using namespace std;
@@ -809,78 +810,35 @@ int main(int argc, char* argv[]) {
     }
 
     for (string lnk : links) {
-        ifstream libin(lnk, ios::in | ios::binary);
-        if (!libin) {
-            cout << "fatal: failed to link static library: '" << lnk << "'" << endl;
-            exit(1);
-        }
-
         if (DEBUG or VERBOSE) {
             cout << "[loader] message: linking with: '" << lnk << "\'" << endl;
         }
 
-        unsigned lib_total_jumps;
-        libin.read((char*)&lib_total_jumps, sizeof(unsigned));
-        if (DEBUG) {
-            cout << "[loader] entries in jump table: " << lib_total_jumps << endl;
-        }
+        Loader loader(lnk);
+        loader.load();
 
-        vector<unsigned> lib_jumps;
-        unsigned lib_jmp;
-        for (unsigned i = 0; i < lib_total_jumps; ++i) {
-            libin.read((char*)&lib_jmp, sizeof(unsigned));
-            lib_jumps.push_back(lib_jmp);
-            if (DEBUG) {
-                cout << "  jump at byte: " << lib_jmp << endl;// ", target: " << lib_jmp_target << endl;
+        vector<unsigned> lib_jumps = loader.getJumps();
+        if (DEBUG) {
+            cout << "[loader] entries in jump table: " << lib_jumps.size() << endl;
+            for (unsigned i = 0; i < lib_jumps.size(); ++i) {
+                cout << "  jump at byte: " << lib_jumps[i] << endl;
             }
         }
 
         linked_libs_jumptables[lnk] = lib_jumps;
 
-        // FIXME: urgent!!!
-        uint16_t lib_function_ids_section_size = 0;
-        char lib_buffer[16];
-        libin.read(lib_buffer, sizeof(uint16_t));
-        lib_function_ids_section_size = *((uint16_t*)lib_buffer);
-
-        if (DEBUG or VERBOSE) {
-            cout << "[loader] message: function mapping section size: " << lib_function_ids_section_size << " bytes" << endl;
-        }
-
-        char *lib_buffer_function_ids = new char[lib_function_ids_section_size];
-        libin.read(lib_buffer_function_ids, lib_function_ids_section_size);
-        char *lib_function_ids_map = lib_buffer_function_ids;
-
-        int i = 0;
-        string lib_fn_name;
-        uint16_t lib_fn_address;
-        while (i < lib_function_ids_section_size) {
-            lib_fn_name = string(lib_function_ids_map);
-            i += lib_fn_name.size() + 1;  // one for null character
-            lib_fn_address = *((uint16_t*)(lib_buffer_function_ids+i));
-            i += sizeof(uint16_t);
-            lib_function_ids_map = lib_buffer_function_ids+i;
-            function_addresses[lib_fn_name] = lib_fn_address+current_link_offset;
-            linked_function_names.push_back(lib_fn_name);
-
+        map<string, uint16_t> fn_addresses = loader.getFunctionAddresses();
+        vector<string> fn_names = loader.getFunctions();
+        for (string fn : fn_names) {
+            function_addresses[fn] = fn_addresses.at(fn) + current_link_offset;
+            linked_function_names.push_back(fn);
             if (DEBUG) {
-                cout << "  \"" << lib_fn_name << "\": entry point at byte: " << current_link_offset << '+' << lib_fn_address << endl;
+                cout << "  \"" << fn << "\": entry point at byte: " << current_link_offset << '+' << fn_addresses.at(fn) << endl;
             }
         }
-        delete[] lib_buffer_function_ids;
 
-
-        uint16_t lib_size = 0;
-        // FIXME: error check
-        libin.read(lib_buffer, 16);
-        lib_size = *(uint16_t*)lib_buffer;
-
-        char* linked_code = new char[lib_size];
-        // FIXME: error echeck
-        libin.read(linked_code, lib_size);
-
-        linked_libs_bytecode.push_back( tuple<string, uint16_t, char*>(lnk, lib_size, linked_code) );
-        bytes += lib_size;
+        linked_libs_bytecode.push_back( tuple<string, uint16_t, char*>(lnk, loader.getBytecodeSize(), loader.getBytecode()) );
+        bytes += loader.getBytecodeSize();
     }
 
 
