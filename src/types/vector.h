@@ -23,9 +23,11 @@ class Vector : public Object {
         }
 
         Object* copy() const {
-            // FIXME: we should return a *copy*, you know?
-            //        Not an empty object...
-            return new Vector();
+            Vector* vec = new Vector();
+            for (unsigned i = 0; i < internal_object.size(); ++i) {
+                vec->push(internal_object[i]->copy());
+            }
+            return vec;
         }
 
         std::vector<Object*>& value() { return internal_object; }
