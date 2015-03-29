@@ -1,4 +1,5 @@
 .def: print_args_closure 0
+    print 1
     end
 .end
 
@@ -19,8 +20,9 @@
 
     ; create frame for our closure and
     ; call it
+    closure print_args_closure 3
     clframe 0
-    ;clcall 2 0
+    clcall 3 0
 
     izero 0
     end
