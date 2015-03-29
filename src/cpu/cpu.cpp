@@ -274,6 +274,12 @@ byte* CPU::dispatch(byte* addr) {
         case FTOI:
             addr = ftoi(addr+1);
             break;
+        case STOI:
+            addr = stoi(addr+1);
+            break;
+        case STOF:
+            addr = stof(addr+1);
+            break;
         case STRSTORE:
             addr = strstore(addr+1);
             break;

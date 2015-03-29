@@ -110,6 +110,8 @@ class CPU {
 
     byte* itof(byte*);
     byte* ftoi(byte*);
+    byte* stoi(byte*);
+    byte* stof(byte*);
 
     byte* strstore(byte*);
 

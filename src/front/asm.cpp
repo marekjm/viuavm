@@ -299,6 +299,16 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             tie(a_chnk, b_chnk) = assembler::operands::get2(operands);
             if (b_chnk.size() == 0) { b_chnk = a_chnk; }
             program.ftoi(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
+        } else if (str::startswith(line, "stoi")) {
+            string a_chnk, b_chnk;
+            tie(a_chnk, b_chnk) = assembler::operands::get2(operands);
+            if (b_chnk.size() == 0) { b_chnk = a_chnk; }
+            program.stoi(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
+        } else if (str::startswith(line, "stof")) {
+            string a_chnk, b_chnk;
+            tie(a_chnk, b_chnk) = assembler::operands::get2(operands);
+            if (b_chnk.size() == 0) { b_chnk = a_chnk; }
+            program.stof(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "strstore")) {
             string reg_chnk, str_chnk;
             reg_chnk = str::chunk(operands);

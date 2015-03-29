@@ -638,6 +638,20 @@ Program& Program::ftoi(int_op a, int_op b) {
     return (*this);
 }
 
+Program& Program::stoi(int_op a, int_op b) {
+    /*  Inserts stoi instruction to bytecode.
+     */
+    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, STOI, a, b);
+    return (*this);
+}
+
+Program& Program::stof(int_op a, int_op b) {
+    /*  Inserts stof instruction to bytecode.
+     */
+    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, STOF, a, b);
+    return (*this);
+}
+
 Program& Program::strstore(int_op reg, string s) {
     /*  Inserts strstore instruction.
      */

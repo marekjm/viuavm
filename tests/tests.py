@@ -390,6 +390,15 @@ class CastingInstructionsTests(unittest.TestCase):
         self.assertEqual('3', output.strip())
         self.assertEqual(0, excode)
 
+    def testSTOI(self):
+        name = 'stoi.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual('69', output.strip())
+        self.assertEqual(0, excode)
+
 
 class RegisterManipulationInstructionsTests(unittest.TestCase):
     """Tests for register-manipulation instructions.

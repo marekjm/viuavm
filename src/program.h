@@ -62,6 +62,8 @@ class Program {
 
     Program& itof       (int_op, int_op);
     Program& ftoi       (int_op, int_op);
+    Program& stoi       (int_op, int_op);
+    Program& stof       (int_op, int_op);
 
     Program& strstore   (int_op, std::string);
 
