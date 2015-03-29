@@ -49,6 +49,8 @@ const std::map<std::string, unsigned> OP_SIZES = {
 
     { "itof",   sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
     { "ftoi",   sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
+    { "stoi",   sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
+    { "stof",   sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
 
     { "strstore", sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "strsize", sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
@@ -143,6 +145,8 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
 
     { ITOF,     "itof" },
     { FTOI,     "ftoi" },
+    { STOI,     "stoi" },
+    { STOF,     "stof" },
 
     { STRSTORE, "strstore" },
     { STRSIZE,  "strsize" },

@@ -50,6 +50,8 @@ enum OPCODE : byte {
     // numeric conversion instructions
     ITOF,   // convert integer to float
     FTOI,   // convert float to integer
+    STOI,   // convert string to integer
+    STOF,   // convert string to float
 
     // string instructions
     STRSTORE,
