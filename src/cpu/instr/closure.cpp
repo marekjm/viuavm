@@ -37,24 +37,19 @@ byte* CPU::closure(byte* addr) {
 
     Closure* clsr = new Closure();
     clsr->function_name = call_name;
-    clsr->registers = uregisters;
-    clsr->references = ureferences;
     clsr->registers_size = uregisters_size;
+    clsr->registers = new Object*[uregisters_size];
+    clsr->references = new bool[uregisters_size];
 
     place(reg, clsr);
 
     for (int i = 0; i < uregisters_size; ++i) {
+        clsr->registers[i] = uregisters[i];
+
         // we must not mark empty registers as references or
         // segfaults will follow as CPU will try to update objects they are referring to, and
         // that's obviously no good
         if (uregisters[i] == 0) { continue; }
-
-        // we must not mark the register in which the closure resides as a reference
-        // doing so would introduce memory leak by creating a sitution where CPU cannot free the memory
-        // allocated for objects (as they are marked as references) and
-        // cannot free memory of the closure because it is *also* marked as a reference
-        // if the closure is not marked as a reference it will eventually be freed - along with objects it is holding
-        if (i == reg) { continue; }
 
         ureferences[i] = true;
     }
