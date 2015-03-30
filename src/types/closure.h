@@ -30,13 +30,6 @@ class Closure : public Object {
 
         Object* copy() const;
 
-        /*
-        Closure(const std::string& fn):
-            arguments(0), argreferences(0), arguments_size(0),
-            registers(0), references(0), registers_size(0),
-            function_name(fn) {
-        }
-        */
         // FIXME: implement real dtor
         Closure();
         ~Closure();

@@ -12,6 +12,13 @@ Closure::Closure():
 }
 
 Closure::~Closure() {
+    for (int i = 0; i < registers_size; ++i) {
+        if (registers[i] != 0 and !references[i]) { delete registers[i]; }
+    }
+    if (registers_size) {
+        delete[] registers;
+        delete[] references;
+    }
 }
 
 
