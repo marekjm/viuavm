@@ -44,7 +44,10 @@ byte* CPU::closure(byte* addr) {
     place(reg, clsr);
 
     for (int i = 0; i < uregisters_size; ++i) {
-        clsr->registers[i] = uregisters[i];
+        if (i != reg) {
+            // do not copy the closure into its own environment
+            clsr->registers[i] = uregisters[i];
+        }
 
         // we must not mark empty registers as references or
         // segfaults will follow as CPU will try to update objects they are referring to, and
