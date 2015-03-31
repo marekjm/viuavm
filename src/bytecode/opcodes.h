@@ -56,9 +56,10 @@ enum OPCODE : byte {
     // string instructions
     STRSTORE,
     STRSIZE,
-    STREQ,
     STRADD,
     STRSUB,
+    STRJOIN,
+    STREQ,
 
     VEC,
     VINSERT,
