@@ -211,6 +211,38 @@ void printRegisters(const vector<string>& indexes, int register_set_size, Object
 }
 
 
+struct State {
+    // breakpoints
+    vector<byte*> breakpoints_byte;
+    vector<string> breakpoints_opcode;
+    vector<string> breakpoints_function;
+
+    // watchpoints (FIXME)
+    // ...
+
+    // init/pause/finish/quit
+    bool initialised = false;
+    bool paused = false;
+    bool finished = false;
+    bool quit = false;
+
+    // exception state
+    bool exception_raised = false;
+    string exception_type, exception_message;
+
+    // tick control
+    int ticks_left = 0;
+    int autoresumes = 0;
+
+    State():
+        breakpoints_byte({}), breakpoints_opcode({}), breakpoints_function({}),
+        initialised(false), paused(false), finished(false), quit(false),
+        exception_raised(false), exception_type(""), exception_message(""),
+        ticks_left(0), autoresumes(0)
+    {}
+};
+
+
 tuple<bool, string> if_breakpoint_byte(CPU& cpu, vector<byte*>& breakpoints_byte) {
     bool pause = false;
     ostringstream reason;
@@ -255,37 +287,207 @@ tuple<bool, string> if_breakpoint_function(CPU& cpu, vector<string>& breakpoints
     return tuple<bool, string>(pause, reason.str());
 }
 
+bool command_dispatch(const string& command, vector<string>& operands, CPU& cpu, State& state) {
+    /** Command dispatching logic.
+     *
+     * This function will modify state of the debugger according to received command and
+     * its operands.
+     * Basic verification of both command and operands is performed.
+     *
+     * Returns true on success, false otherwise.
+     * If false is returned, current iteration of debuggers's REPL should be skipped.
+     */
 
-struct State {
-    // breakpoints
-    vector<byte*> breakpoints_byte;
-    vector<string> breakpoints_opcode;
-    vector<string> breakpoints_function;
+    if (command == "") {
+        // do nothing...
+    } else if (command == "conf.set") {
+        if (not operands.size()) {
+            cout << "error: missing operands: <key> [value]" << endl;
+            return false;
+        }
 
-    // watchpoints (FIXME)
-    // ...
+        if (operands[0] == "cpu.debug") {
+            if (operands.size() == 1 or (operands.size() > 1 and operands[1] == "true")) {
+                cpu.debug = true;
+            } else if (operands.size() > 1 and operands[1] == "false") {
+                cpu.debug = false;
+            } else {
+                cout << "error: invalid operand, expected 'true' of 'false'" << endl;
+                return false;
+            }
+        } else {
+            cout << "error: invalid setting" << endl;
+            return false;
+        }
+    } else if (command == "conf.get") {
+    } else if (command == "conf.load") {
+        cout << "FIXME/TODO" << endl;
+    } else if (command == "conf.load.default") {
+        cout << "FIXME/TODO" << endl;
+    } else if (command == "conf.dump") {
+        cout << "FIXME/TODO" << endl;
+    } else if (command == "breakpoint.set.at") {
+        if (not operands.size()) {
+            cout << "warn: requires integer operand(s)" << endl;
+            return false;
+        }
+        for (unsigned j = 0; j < operands.size(); ++j) {
+            if (str::isnum(operands[j])) {
+                state.breakpoints_byte.push_back(cpu.bytecode+stoi(operands[j]));
+            } else {
+                cout << "warn: invalid operand, expected integer: " << operands[j] << endl;
+            }
+        }
+    } else if (command == "breakpoint.set.on" or command == "breakpoint.set.on.opcode") {
+        for (unsigned j = 0; j < operands.size(); ++j) {
+            state.breakpoints_opcode.push_back(operands[j]);
+        }
+    } else if (command == "breakpoint.set.on.function") {
+        for (unsigned j = 0; j < operands.size(); ++j) {
+            state.breakpoints_function.push_back(operands[j]);
+        }
+    } else if (command == "cpu.init") {
+        cpu.iframe();
+        cpu.begin();
+        state.initialised = true;
+    } else if (command == "cpu.run") {
+        if (not state.initialised) {
+            cout << "error: CPU is not initialised, use `cpu.init` command before `" << command << "`" << endl;
+            return false;
+        }
+        if (state.paused) {
+            cout << "warn: CPU is paused, use `cpu.resume` command instead of `" << command << "`" << endl;
+            return false;
+        }
+        state.ticks_left = -1;
+    } else if (command == "cpu.resume") {
+        if (not state.paused) {
+            cout << "error: execution has not been paused, cannot resume" << endl;
+            return false;
+        }
+        if (operands.size() == 1) {
+            if (not str::isnum(operands[0])) {
+                cout << "error: invalid operand, expected integer" << endl;
+                return false;
+            }
+            state.autoresumes = stoi(operands[0]);
+        } else {
+            state.autoresumes = 0;
+        }
+        state.paused = false;
+        if (state.ticks_left == 0) {
+            cout << "info: resumed, but ticks counter has already reached 0" << endl;
+        }
+    } else if (command == "cpu.tick") {
+        if (not state.initialised) {
+            cout << "error: CPU is not initialised, use `cpu.init` command before `" << command << "`" << endl;
+            return false;
+        }
+        if (state.finished) {
+            cout << "error: CPU has finished execution of loaded program" << endl;
+            return false;
+        }
+        if (state.paused) {
+            cout << "warn: CPU is paused, use `cpu.resume` command instead of `" << command << "`" << endl;
+            return false;
+        }
+        if (operands.size() > 1) {
+            cout << "error: invalid operand size, expected 0 or 1 operand but got " << operands.size() << endl;
+            return false;
+        }
+        if (operands.size() == 1 and not str::isnum(operands[0])) {
+            cout << "error: invalid operand, expected integer" << endl;
+            return false;
+        }
+        state.ticks_left = (operands.size() ? stoi(operands[0]) : 1);
+    } else if (command == "cpu.jump") {
+        if (operands.size() != 1) {
+            cout << "error: invalid operand size, expected 1 operand" << endl;
+            return false;
+        }
+        if (not str::isnum(operands[0])) {
+            cout << "error: invalid operand, expected integer" << endl;
+            return false;
+        }
 
-    // init/pause/finish
-    bool initialised = false;
-    bool paused = false;
-    bool finished = false;
+        cpu.instruction_pointer = (cpu.bytecode+stoi(operands[0]));
+    } else if (command == "cpu.unpause") {
+        state.paused = false;
+        state.ticks_left = 0;
+    } else if (command == "cpu.unfinish") {
+        state.finished = false;
+    } else if (command == "cpu.counter") {
+        cout << cpu.counter() << endl;
+    } else if (command == "register.show") {
+        if (not operands.size()) {
+            cout << "error: invalid operand size, expected at least 1 operand" << endl;
+            return false;
+        }
+        printRegisters(operands, cpu.uregisters_size, cpu.uregisters, cpu.ureferences);
+    } else if (command == "register.global.show") {
+        if (not operands.size()) {
+            cout << "error: invalid operand size, expected at least 1 operand" << endl;
+            return false;
+        }
 
-    // exception state
-    bool exception_raised = false;
-    string exception_type, exception_message;
+        printRegisters(operands, cpu.reg_count, cpu.registers, cpu.references);
+    } else if (command == "register.static.show") {
+        if (not operands.size()) {
+            cout << "error: invalid operand size, expected at least 1 operand" << endl;
+            return false;
+        }
 
-    // tick control
-    int ticks_left = 0;
-    int autoresumes = 0;
+        string fun_name = cpu.trace().back()->function_name;
 
+        Object** registers = 0;
+        bool* references;
+        int registers_size;
+        try {
+            tie(registers, references, registers_size) = cpu.static_registers.at(fun_name);
+            printRegisters(operands, registers_size, registers, references);
+        } catch (const std::out_of_range& e) {
+            // OK, now we know that our function does not have static registers
+            cout << "error: current function does not have static registers allocated" << endl;
+        }
+    } else if (command == "st.show") {
+        vector<Frame*> stack = cpu.trace();
+        string indent("");
+        for (unsigned j = 1; j < stack.size(); ++j) {
+            cout << indent << stack[j]->function_name << endl;
+            indent += " ";
+        }
+    } else if (command == "loader.funmap.show") {
+        if (operands.size() == 0) {
+            for (pair<string, unsigned> mapping : cpu.function_addresses) {
+                cout << "  '" << mapping.first << "': " << mapping.second << endl;
+            }
+        } else {
+            unsigned addr;
+            bool exists = false;
+            for (string fun : operands) {
+                try {
+                    addr = cpu.function_addresses.at(fun);
+                    exists = true;
+                } catch (const std::out_of_range& e) {
+                    exists = false;
+                }
+                cout << "  '" << fun << "': ";
+                if (not exists) {
+                    cout << "not found" << endl;
+                } else {
+                    cout << addr << endl;
+                }
+            }
+        }
+    } else if (command == "quit") {
+        state.quit = true;
+    } else {
+        cout << "unknown command: `" << command << "`" << endl;
+    }
 
-    State():
-        breakpoints_byte({}), breakpoints_opcode({}), breakpoints_function({}),
-        initialised(false), paused(false), finished(false),
-        exception_raised(false), exception_type(""), exception_message(""),
-        ticks_left(0), autoresumes(0)
-    {}
-};
+    // everything OK
+    return true;
+}
 
 void debuggerMainLoop(CPU& cpu, deque<string> init) {
     /** This function implements main REPL of the debugger.
@@ -301,8 +503,6 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
     string command("");
     vector<string> operands;
     vector<string> chunks;
-
-    bool conf_resume_at_0_ticks_once = false;
 
     while (true) {
         if (not command_feed.size()) {
@@ -348,202 +548,11 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
         command = str::chunk(line);
         operands = str::chunks(str::sub(line, command.size()));
 
-        if (command == "") {
-            // do nothing...
-        } else if (command == "conf.set") {
-            if (not operands.size()) {
-                cout << "error: missing operands: <key> [value]" << endl;
-                continue;
-            }
-
-            if (operands[0] == "cpu.resume-ticks") {
-                if (operands.size() == 1 or (operands.size() > 1 and operands[1] == "true")) {
-                    conf_resume_at_0_ticks_once = true;
-                } else if (operands.size() > 1 and operands[1] == "false") {
-                    conf_resume_at_0_ticks_once = false;
-                } else {
-                    cout << "error: invalid operand, expected 'true' of 'false'" << endl;
-                }
-            } else if (operands[0] == "cpu.debug") {
-                if (operands.size() == 1 or (operands.size() > 1 and operands[1] == "true")) {
-                    cpu.debug = true;
-                } else if (operands.size() > 1 and operands[1] == "false") {
-                    cpu.debug = false;
-                } else {
-                    cout << "error: invalid operand, expected 'true' of 'false'" << endl;
-                }
-            } else {
-                cout << "error: invalid setting" << endl;
-            }
-        } else if (command == "conf.get") {
-        } else if (command == "conf.load") {
-            cout << "FIXME/TODO" << endl;
-        } else if (command == "conf.load.default") {
-            cout << "FIXME/TODO" << endl;
-        } else if (command == "conf.dump") {
-            cout << "FIXME/TODO" << endl;
-        } else if (command == "breakpoint.set.at") {
-            if (not operands.size()) {
-                cout << "warn: requires integer operand(s)" << endl;
-            }
-            for (unsigned j = 0; j < operands.size(); ++j) {
-                if (str::isnum(operands[j])) {
-                    state.breakpoints_byte.push_back(cpu.bytecode+stoi(operands[j]));
-                } else {
-                    cout << "warn: invalid operand, expected integer: " << operands[j] << endl;
-                }
-            }
-        } else if (command == "breakpoint.set.on" or command == "breakpoint.set.on.opcode") {
-            for (unsigned j = 0; j < operands.size(); ++j) {
-                state.breakpoints_opcode.push_back(operands[j]);
-            }
-        } else if (command == "breakpoint.set.on.function") {
-            for (unsigned j = 0; j < operands.size(); ++j) {
-                state.breakpoints_function.push_back(operands[j]);
-            }
-        } else if (command == "cpu.init") {
-            cpu.iframe();
-            cpu.begin();
-            state.initialised = true;
-        } else if (command == "cpu.run") {
-            if (not state.initialised) {
-                cout << "error: CPU is not initialised, use `cpu.init` command before `" << command << "`" << endl;
-                continue;
-            }
-            if (state.paused) {
-                cout << "warn: CPU is paused, use `cpu.resume` command instead of `" << command << "`" << endl;
-                continue;
-            }
-            state.ticks_left = -1;
-        } else if (command == "cpu.resume") {
-            if (not state.paused) {
-                cout << "error: execution has not been paused, cannot resume" << endl;
-                continue;
-            }
-            if (operands.size() == 1) {
-                if (not str::isnum(operands[0])) {
-                    cout << "error: invalid operand, expected integer" << endl;
-                    continue;
-                }
-                state.autoresumes = stoi(operands[0]);
-            } else {
-                state.autoresumes = 0;
-            }
-            state.paused = false;
-            if (state.ticks_left == 0) {
-                if (conf_resume_at_0_ticks_once) {
-                    state.ticks_left = 1;
-                } else {
-                    cout << "info: resumed, but ticks counter reached 0" << endl;
-                }
-            }
-        } else if (command == "cpu.tick") {
-            if (not state.initialised) {
-                cout << "error: CPU is not initialised, use `cpu.init` command before `" << command << "`" << endl;
-                continue;
-            }
-            if (state.finished) {
-                cout << "error: CPU has finished execution of loaded program" << endl;
-                continue;
-            }
-            if (state.paused) {
-                cout << "warn: CPU is paused, use `cpu.resume` command instead of `" << command << "`" << endl;
-                continue;
-            }
-            if (operands.size() > 1) {
-                cout << "error: invalid operand size, expected 0 or 1 operand but got " << operands.size() << endl;
-                continue;
-            }
-            if (operands.size() == 1 and not str::isnum(operands[0])) {
-                cout << "error: invalid operand, expected integer" << endl;
-                continue;
-            }
-            state.ticks_left = (operands.size() ? stoi(operands[0]) : 1);
-        } else if (command == "cpu.jump") {
-            if (operands.size() != 1) {
-                cout << "error: invalid operand size, expected 1 operand" << endl;
-                continue;
-            }
-            if (not str::isnum(operands[0])) {
-                cout << "error: invalid operand, expected integer" << endl;
-                continue;
-            }
-
-            cpu.instruction_pointer = (cpu.bytecode+stoi(operands[0]));
-        } else if (command == "cpu.unpause") {
-            state.paused = false;
-            state.ticks_left = 0;
-        } else if (command == "cpu.unfinish") {
-            state.finished = false;
-        } else if (command == "cpu.counter") {
-            cout << cpu.counter() << endl;
-        } else if (command == "register.show") {
-            if (not operands.size()) {
-                cout << "error: invalid operand size, expected at least 1 operand" << endl;
-                continue;
-            }
-            printRegisters(operands, cpu.uregisters_size, cpu.uregisters, cpu.ureferences);
-        } else if (command == "register.global.show") {
-            if (not operands.size()) {
-                cout << "error: invalid operand size, expected at least 1 operand" << endl;
-                continue;
-            }
-
-            printRegisters(operands, cpu.reg_count, cpu.registers, cpu.references);
-        } else if (command == "register.static.show") {
-            if (not operands.size()) {
-                cout << "error: invalid operand size, expected at least 1 operand" << endl;
-                continue;
-            }
-
-            string fun_name = cpu.trace().back()->function_name;
-
-            Object** registers = 0;
-            bool* references;
-            int registers_size;
-            try {
-                tie(registers, references, registers_size) = cpu.static_registers.at(fun_name);
-                printRegisters(operands, registers_size, registers, references);
-            } catch (const std::out_of_range& e) {
-                // OK, now we know that our function does not have static registers
-                cout << "error: current function does not have static registers allocated" << endl;
-            }
-        } else if (command == "st.show") {
-            vector<Frame*> stack = cpu.trace();
-            string indent("");
-            for (unsigned j = 1; j < stack.size(); ++j) {
-                cout << indent << stack[j]->function_name << endl;
-                indent += " ";
-            }
-        } else if (command == "loader.funmap.show") {
-            if (operands.size() == 0) {
-                for (pair<string, unsigned> mapping : cpu.function_addresses) {
-                    cout << "  '" << mapping.first << "': " << mapping.second << endl;
-                }
-            } else {
-                unsigned addr;
-                bool exists = false;
-                for (string fun : operands) {
-                    try {
-                        addr = cpu.function_addresses.at(fun);
-                        exists = true;
-                    } catch (const std::out_of_range& e) {
-                        exists = false;
-                    }
-                    cout << "  '" << fun << "': ";
-                    if (not exists) {
-                        cout << "not found" << endl;
-                    } else {
-                        cout << addr << endl;
-                    }
-                }
-            }
-        } else if (command == "quit") {
-            break;
-        } else {
-            cout << "unknown command: `" << command << "`" << endl;
+        if (not command_dispatch(command, operands, cpu, state)) {
+            continue;
         }
 
+        if (state.quit) { break; }
         if (not state.initialised) { continue; }
 
         string op_name;
