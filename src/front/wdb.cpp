@@ -287,15 +287,11 @@ tuple<bool, string> if_breakpoint_function(CPU& cpu, vector<string>& breakpoints
     return tuple<bool, string>(pause, reason.str());
 }
 
-bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State& state) {
-    /** Command dispatching logic.
+bool command_verify(string& command, vector<string>& operands, const CPU& cpu, const State& state) {
+    /** Basic command verification.
      *
-     * This function will modify state of the debugger according to received command and
-     * its operands.
-     * Basic verification of both command and operands is performed.
-     *
-     * Returns true on success, false otherwise.
-     * If false is returned, current iteration of debuggers's REPL should be skipped.
+     *  This function check only for the most obvious errors and
+     *  syntax violations.
      */
     bool verified = true;
 
@@ -423,7 +419,20 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
         verified = false;
     }
 
-    if (not verified) { return false; }
+    return verified;
+}
+
+bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State& state) {
+    /** Command dispatching logic.
+     *
+     *  This function will modify state of the debugger according to received command and
+     *  its operands.
+     *  Basic verification of both command and operands is performed.
+     *
+     *  Returns true on success, false otherwise.
+     *  If false is returned, current iteration of debuggers's REPL should be skipped.
+     */
+    if (not command_verify(command, operands, cpu, state)) { return false; }
 
     if (command == "") {
         // do nothing...
