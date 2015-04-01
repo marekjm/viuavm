@@ -287,7 +287,7 @@ tuple<bool, string> if_breakpoint_function(CPU& cpu, vector<string>& breakpoints
     return tuple<bool, string>(pause, reason.str());
 }
 
-bool command_dispatch(const string& command, vector<string>& operands, CPU& cpu, State& state) {
+bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State& state) {
     /** Command dispatching logic.
      *
      * This function will modify state of the debugger according to received command and
@@ -330,6 +330,7 @@ bool command_dispatch(const string& command, vector<string>& operands, CPU& cpu,
             verified = false;
         }
     } else if (command == "breakpoint.set.on" or command == "breakpoint.set.on.opcode") {
+        command = "breakpoint.set.on.opcode";
     } else if (command == "breakpoint.set.on.function") {
     } else if (command == "cpu.init") {
     } else if (command == "cpu.run") {
@@ -407,8 +408,10 @@ bool command_dispatch(const string& command, vector<string>& operands, CPU& cpu,
             cout << "error: invalid operand size, expected at least 1 operand" << endl;
             verified = false;
         }
-    } else if (command == "st.show") {
-    } else if (command == "loader.function.map.show") {
+    } else if (command == "trace" or command == "trace.show") {
+        command = "trace.show";
+    } else if (command == "loader.function.map" or command == "loader.function.map.show") {
+        command = "loader.function.map.show";
         if (operands.size() == 0) {
             for (pair<string, unsigned> mapping : cpu.function_addresses) {
                 operands.push_back(mapping.first);
@@ -443,7 +446,7 @@ bool command_dispatch(const string& command, vector<string>& operands, CPU& cpu,
                 cout << "warn: invalid operand, expected integer: " << operands[j] << endl;
             }
         }
-    } else if (command == "breakpoint.set.on" or command == "breakpoint.set.on.opcode") {
+    } else if (command == "breakpoint.set.on.opcode") {
         for (unsigned j = 0; j < operands.size(); ++j) {
             state.breakpoints_opcode.push_back(operands[j]);
         }
@@ -491,7 +494,7 @@ bool command_dispatch(const string& command, vector<string>& operands, CPU& cpu,
             // OK, now we know that our function does not have static registers
             cout << "error: current function does not have static registers allocated" << endl;
         }
-    } else if (command == "st.show") {
+    } else if (command == "trace.show") {
         vector<Frame*> stack = cpu.trace();
         string indent("");
         for (unsigned j = 1; j < stack.size(); ++j) {
