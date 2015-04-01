@@ -256,6 +256,37 @@ tuple<bool, string> if_breakpoint_function(CPU& cpu, vector<string>& breakpoints
 }
 
 
+struct State {
+    // breakpoints
+    vector<byte*> breakpoints_byte;
+    vector<string> breakpoints_opcode;
+    vector<string> breakpoints_function;
+
+    // watchpoints (FIXME)
+    // ...
+
+    // init/pause/finish
+    bool initialised = false;
+    bool paused = false;
+    bool finished = false;
+
+    // exception state
+    bool exception_raised = false;
+    string exception_type, exception_message;
+
+    // tick control
+    int ticks_left = 0;
+    int autoresumes = 0;
+
+
+    State():
+        breakpoints_byte({}), breakpoints_opcode({}), breakpoints_function({}),
+        initialised(false), paused(false), finished(false),
+        exception_raised(false), exception_type(""), exception_message(""),
+        ticks_left(0), autoresumes(0)
+    {}
+};
+
 void debuggerMainLoop(CPU& cpu, deque<string> init) {
     /** This function implements main REPL of the debugger.
      *
@@ -263,9 +294,7 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
      *  You can enter commands into it and get results from them.
      *  The shell is very primitive (no scripting) and only accepts a few commands.
      */
-    vector<byte*> breakpoints_byte;
-    vector<string> breakpoints_opcode;
-    vector<string> breakpoints_function;
+    State state;
 
     deque<string> command_feed = init;
     string line(""), partline(""), lastline("");
@@ -274,16 +303,6 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
     vector<string> chunks;
 
     bool conf_resume_at_0_ticks_once = false;
-
-    bool initialised = false;
-    bool paused = false;
-    bool finished = false;
-
-    bool exception_raised = false;
-    string exception_type, exception_message;
-
-    int ticks_left = 0;
-    int autoresumes = 0;
 
     while (true) {
         if (not command_feed.size()) {
@@ -369,35 +388,35 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
             }
             for (unsigned j = 0; j < operands.size(); ++j) {
                 if (str::isnum(operands[j])) {
-                    breakpoints_byte.push_back(cpu.bytecode+stoi(operands[j]));
+                    state.breakpoints_byte.push_back(cpu.bytecode+stoi(operands[j]));
                 } else {
                     cout << "warn: invalid operand, expected integer: " << operands[j] << endl;
                 }
             }
         } else if (command == "breakpoint.set.on" or command == "breakpoint.set.on.opcode") {
             for (unsigned j = 0; j < operands.size(); ++j) {
-                breakpoints_opcode.push_back(operands[j]);
+                state.breakpoints_opcode.push_back(operands[j]);
             }
         } else if (command == "breakpoint.set.on.function") {
             for (unsigned j = 0; j < operands.size(); ++j) {
-                breakpoints_function.push_back(operands[j]);
+                state.breakpoints_function.push_back(operands[j]);
             }
         } else if (command == "cpu.init") {
             cpu.iframe();
             cpu.begin();
-            initialised = true;
+            state.initialised = true;
         } else if (command == "cpu.run") {
-            if (not initialised) {
+            if (not state.initialised) {
                 cout << "error: CPU is not initialised, use `cpu.init` command before `" << command << "`" << endl;
                 continue;
             }
-            if (paused) {
+            if (state.paused) {
                 cout << "warn: CPU is paused, use `cpu.resume` command instead of `" << command << "`" << endl;
                 continue;
             }
-            ticks_left = -1;
+            state.ticks_left = -1;
         } else if (command == "cpu.resume") {
-            if (not paused) {
+            if (not state.paused) {
                 cout << "error: execution has not been paused, cannot resume" << endl;
                 continue;
             }
@@ -406,28 +425,28 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
                     cout << "error: invalid operand, expected integer" << endl;
                     continue;
                 }
-                autoresumes = stoi(operands[0]);
+                state.autoresumes = stoi(operands[0]);
             } else {
-                autoresumes = 0;
+                state.autoresumes = 0;
             }
-            paused = false;
-            if (ticks_left == 0) {
+            state.paused = false;
+            if (state.ticks_left == 0) {
                 if (conf_resume_at_0_ticks_once) {
-                    ticks_left = 1;
+                    state.ticks_left = 1;
                 } else {
                     cout << "info: resumed, but ticks counter reached 0" << endl;
                 }
             }
         } else if (command == "cpu.tick") {
-            if (not initialised) {
+            if (not state.initialised) {
                 cout << "error: CPU is not initialised, use `cpu.init` command before `" << command << "`" << endl;
                 continue;
             }
-            if (finished) {
+            if (state.finished) {
                 cout << "error: CPU has finished execution of loaded program" << endl;
                 continue;
             }
-            if (paused) {
+            if (state.paused) {
                 cout << "warn: CPU is paused, use `cpu.resume` command instead of `" << command << "`" << endl;
                 continue;
             }
@@ -439,7 +458,7 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
                 cout << "error: invalid operand, expected integer" << endl;
                 continue;
             }
-            ticks_left = (operands.size() ? stoi(operands[0]) : 1);
+            state.ticks_left = (operands.size() ? stoi(operands[0]) : 1);
         } else if (command == "cpu.jump") {
             if (operands.size() != 1) {
                 cout << "error: invalid operand size, expected 1 operand" << endl;
@@ -452,10 +471,10 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
 
             cpu.instruction_pointer = (cpu.bytecode+stoi(operands[0]));
         } else if (command == "cpu.unpause") {
-            paused = false;
-            ticks_left = 0;
+            state.paused = false;
+            state.ticks_left = 0;
         } else if (command == "cpu.unfinish") {
-            finished = false;
+            state.finished = false;
         } else if (command == "cpu.counter") {
             cout << cpu.counter() << endl;
         } else if (command == "register.show") {
@@ -525,52 +544,52 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
             cout << "unknown command: `" << command << "`" << endl;
         }
 
-        if (not initialised) { continue; }
+        if (not state.initialised) { continue; }
 
         string op_name;
-        while (not paused and not finished and not exception_raised and (ticks_left == -1 or (ticks_left > 0))) {
-            if (ticks_left > 0) { --ticks_left; }
+        while (not state.paused and not state.finished and not state.exception_raised and (state.ticks_left == -1 or (state.ticks_left > 0))) {
+            if (state.ticks_left > 0) { --state.ticks_left; }
 
             try {
                 printInstruction(cpu);
             } catch (const std::out_of_range& e) {
-                exception_type = "RuntimeException";
-                exception_message = "unrecognised instruction";
-                exception_raised = true;
+                state.exception_type = "RuntimeException";
+                state.exception_message = "unrecognised instruction";
+                state.exception_raised = true;
             }
 
-            if (not exception_raised and not finished and cpu.tick() == 0) {
-                finished = (cpu.return_exception == "" ? true : false);
-                ticks_left = 0;
+            if (not state.exception_raised and not state.finished and cpu.tick() == 0) {
+                state.finished = (cpu.return_exception == "" ? true : false);
+                state.ticks_left = 0;
                 cout << "\nmessage: execution " << (cpu.return_exception == "" ? "finished" : "broken") << ": " << cpu.counter() << " instructions executed" << endl;
             }
 
-            if (finished) {
+            if (state.finished) {
                 break;
             }
 
             if (cpu.return_exception != "") {
-                exception_type = cpu.return_exception;
-                exception_message = cpu.return_message;
-                exception_raised = true;
+                state.exception_type = cpu.return_exception;
+                state.exception_message = cpu.return_message;
+                state.exception_raised = true;
             }
 
-            if (exception_raised) {
-                cout << exception_type << ": " << exception_message << endl;
+            if (state.exception_raised) {
+                cout << state.exception_type << ": " << state.exception_message << endl;
                 break;
             }
 
             string pause_reason = "";
 
-            tie(paused, pause_reason) = if_breakpoint_byte(cpu, breakpoints_byte);
-            if (not paused) {
-                tie(paused, pause_reason) = if_breakpoint_opcode(cpu, breakpoints_opcode);
+            tie(state.paused, pause_reason) = if_breakpoint_byte(cpu, state.breakpoints_byte);
+            if (not state.paused) {
+                tie(state.paused, pause_reason) = if_breakpoint_opcode(cpu, state.breakpoints_opcode);
             }
-            if (not paused) {
-                tie(paused, pause_reason) = if_breakpoint_function(cpu, breakpoints_function);
+            if (not state.paused) {
+                tie(state.paused, pause_reason) = if_breakpoint_function(cpu, state.breakpoints_function);
             }
 
-            if (paused) {
+            if (state.paused) {
                 cout << pause_reason << endl;
             }
 
@@ -579,21 +598,21 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
                 op_name = OP_NAMES.at(OPCODE(*cpu.instruction_pointer));
             } catch (const std::out_of_range& e) {
                 cout << "fatal: unknown instruction at byte " << (cpu.instruction_pointer-cpu.bytecode) << endl;
-                autoresumes = 0;
-                ticks_left = 0;
-                paused = true;
+                state.autoresumes = 0;
+                state.ticks_left = 0;
+                state.paused = true;
                 break;
             }
 
-            if (paused) {
+            if (state.paused) {
                 // if there are no autoresumes, keep paused status
                 // otherwise, set paused status to false
-                paused = (not (autoresumes-- > 0));
+                state.paused = (not (state.autoresumes-- > 0));
             }
         }
 
         // do not let autoresumes slide to next execution
-        autoresumes = 0;
+        state.autoresumes = 0;
     }
 }
 
