@@ -211,6 +211,51 @@ void printRegisters(const vector<string>& indexes, int register_set_size, Object
 }
 
 
+tuple<bool, string> if_breakpoint_byte(CPU& cpu, vector<byte*>& breakpoints_byte) {
+    bool pause = false;
+    ostringstream reason;
+    reason.str("");
+
+    if (find(breakpoints_byte.begin(), breakpoints_byte.end(), cpu.instruction_pointer) != breakpoints_byte.end()) {
+        reason << "info: execution paused by byte breakpoint: " << cpu.instruction_pointer;
+        pause = true;
+    }
+
+    return tuple<bool, string>(pause, reason.str());
+}
+tuple<bool, string> if_breakpoint_opcode(CPU& cpu, vector<string>& breakpoints_opcode) {
+    bool pause = false;
+    ostringstream reason;
+    reason.str("");
+
+    string op_name = OP_NAMES.at(OPCODE(*cpu.instruction_pointer));
+
+    if (find(breakpoints_opcode.begin(), breakpoints_opcode.end(), op_name) != breakpoints_opcode.end()) {
+        reason << "info: execution halted by opcode breakpoint: " << op_name;
+        pause = true;
+    }
+
+    return tuple<bool, string>(pause, reason.str());
+}
+tuple<bool, string> if_breakpoint_function(CPU& cpu, vector<string>& breakpoints_function) {
+    bool pause = false;
+    ostringstream reason;
+    reason.str("");
+
+    string op_name = OP_NAMES.at(OPCODE(*cpu.instruction_pointer));
+
+    if (op_name == "call") {
+        string function_name = string(cpu.instruction_pointer+1);
+        if (find(breakpoints_function.begin(), breakpoints_function.end(), function_name) != breakpoints_function.end()) {
+            reason << "info: execution halted by function breakpoint: " << function_name;
+            pause = true;
+        }
+    }
+
+    return tuple<bool, string>(pause, reason.str());
+}
+
+
 void debuggerMainLoop(CPU& cpu, deque<string> init) {
     /** This function implements main REPL of the debugger.
      *
@@ -220,6 +265,7 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
      */
     vector<byte*> breakpoints_byte;
     vector<string> breakpoints_opcode;
+    vector<string> breakpoints_function;
 
     deque<string> command_feed = init;
     string line(""), partline(""), lastline("");
@@ -328,9 +374,13 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
                     cout << "warn: invalid operand, expected integer: " << operands[j] << endl;
                 }
             }
-        } else if (command == "breakpoint.set.on") {
+        } else if (command == "breakpoint.set.on" or command == "breakpoint.set.on.opcode") {
             for (unsigned j = 0; j < operands.size(); ++j) {
                 breakpoints_opcode.push_back(operands[j]);
+            }
+        } else if (command == "breakpoint.set.on.function") {
+            for (unsigned j = 0; j < operands.size(); ++j) {
+                breakpoints_function.push_back(operands[j]);
             }
         } else if (command == "cpu.init") {
             cpu.iframe();
@@ -510,10 +560,20 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
                 break;
             }
 
-            if (find(breakpoints_byte.begin(), breakpoints_byte.end(), cpu.instruction_pointer) != breakpoints_byte.end()) {
-                cout << "info: execution halted by byte breakpoint: " << cpu.instruction_pointer << endl;
-                paused = true;
+            string pause_reason = "";
+
+            tie(paused, pause_reason) = if_breakpoint_byte(cpu, breakpoints_byte);
+            if (not paused) {
+                tie(paused, pause_reason) = if_breakpoint_opcode(cpu, breakpoints_opcode);
             }
+            if (not paused) {
+                tie(paused, pause_reason) = if_breakpoint_function(cpu, breakpoints_function);
+            }
+
+            if (paused) {
+                cout << pause_reason << endl;
+            }
+
 
             try {
                 op_name = OP_NAMES.at(OPCODE(*cpu.instruction_pointer));
@@ -523,11 +583,6 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
                 ticks_left = 0;
                 paused = true;
                 break;
-            }
-
-            if (find(breakpoints_opcode.begin(), breakpoints_opcode.end(), op_name) != breakpoints_opcode.end()) {
-                cout << "info: execution halted by opcode breakpoint: " << op_name << endl;
-                paused = true;
             }
 
             if (paused) {
