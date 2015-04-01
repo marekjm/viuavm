@@ -23,19 +23,6 @@ bool SHOW_HELP = false;
 bool SHOW_VERSION = false;
 
 
-string join(const string& s, const vector<string>& parts) {
-    ostringstream oss;
-    unsigned limit = parts.size();
-    for (unsigned i = 0; i < limit; ++i) {
-        oss << parts[i];
-        if (i < (limit-1)) {
-            oss << s;
-        }
-    }
-    return oss.str();
-}
-
-
 byte* printIntegerOperand(byte* iptr) {
     cout << ((*(bool*)iptr) ? "@" : "");
 
