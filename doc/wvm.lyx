@@ -1810,13 +1810,22 @@ This command sets breakpoint at specified byte address or addresses.
 \end_layout
 
 \begin_layout Subsubsection
-breakpoint.set.on
+breakpoint.set.on[.opcode]
 \end_layout
 
 \begin_layout Standard
 This command sets breakpoint on specified opcodes.
  It accepts zero or more string operands, each being a valid opcode name
  and specifying opcode upon which execution is to be paused.
+\end_layout
+
+\begin_layout Subsubsection
+breakpoint.set.on.function
+\end_layout
+
+\begin_layout Standard
+This command sets breakpoint on calls to function.
+ It accepts zero or more string operands, each being a valid function name.
 \end_layout
 
 \begin_layout Subsection
@@ -1877,7 +1886,7 @@ Various commands
 \end_layout
 
 \begin_layout Subsubsection
-st.show
+trace[.show]
 \end_layout
 
 \begin_layout Standard
@@ -1885,7 +1894,7 @@ This command can be used to print simple representation of stack trace.
 \end_layout
 
 \begin_layout Subsubsection
-loader.funmap.show
+loader.function.map[.show]
 \end_layout
 
 \begin_layout Standard
@@ -1926,10 +1935,6 @@ conf.set <key> (true|false)
 
 \begin_layout Standard
 Available keys are: 
-\family typewriter
-cpu.resume-ticks
-\family default
- and 
 \family typewriter
 cpu.debug
 \family default
