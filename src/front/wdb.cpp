@@ -279,7 +279,9 @@ tuple<bool, string> if_breakpoint_function(CPU& cpu, vector<string>& breakpoints
     return tuple<bool, string>(pause, reason.str());
 }
 
-tuple<bool, string> if_watchpoint_local_register_write(const CPU& cpu, const State& state) {
+tuple<bool, string> if_watchpoint_local_register_write(CPU& cpu, const State& state) {
+    /** Determine whether the instruction at instruction pointer should trigger a watchpoint.
+     */
     bool writing_instruction = true;
     OPCODE opcode = OPCODE(*cpu.instruction_pointer);
     if (opcode == NOP or
@@ -301,28 +303,101 @@ tuple<bool, string> if_watchpoint_local_register_write(const CPU& cpu, const Sta
        ) {
         writing_instruction = false;
     }
-    int register_index = -1;
+    int register_index[2] = {-1, -1};
+    int writes_to = 0;
+    byte* register_index_ptr = (cpu.instruction_pointer+1);
 
     if (opcode == IZERO or
         opcode == ISTORE or
+        opcode == IINC or
+        opcode == IDEC or
         opcode == FSTORE or
         opcode == BSTORE or
         opcode == STRSTORE or
         opcode == VEC or
+        opcode == VINSERT or
+        opcode == VPUSH or
         opcode == BOOL or
         opcode == NOT or
         opcode == FREE or
         opcode == EMPTY or
         opcode == TMPRO
        ) {
-        register_index = *(int*)(cpu.instruction_pointer+1);
+        register_index[0] = *(int*)(register_index_ptr+1);
+        writes_to = 1;
+    } else if (opcode == ITOF or
+               opcode == FTOI or
+               opcode == STOI or
+               opcode == STOF or
+               opcode == STRSIZE or
+               opcode == VLEN or
+               opcode == MOVE or
+               opcode == COPY or
+               opcode == REF or
+               opcode == ISNULL or
+               opcode == ARG
+            ) {
+        register_index[0] = *((int*)(register_index_ptr+2)+1);
+        writes_to = 1;
+    } else if (opcode == IADD or
+               opcode == ISUB or
+               opcode == IMUL or
+               opcode == IDIV or
+               opcode == ILT or
+               opcode == ILTE or
+               opcode == IGT or
+               opcode == IGTE or
+               opcode == IEQ or
+               opcode == FADD or
+               opcode == FSUB or
+               opcode == FMUL or
+               opcode == FDIV or
+               opcode == FLT or
+               opcode == FLTE or
+               opcode == FGT or
+               opcode == FGTE or
+               opcode == FEQ or
+               opcode == BADD or
+               opcode == BSUB or
+               opcode == BLT or
+               opcode == BLTE or
+               opcode == BGT or
+               opcode == BGTE or
+               opcode == BEQ or
+               opcode == STRADD or
+               opcode == STRJOIN or
+               opcode == VAT or
+               opcode == AND or
+               opcode == OR
+               ) {
+        register_index[0] = *((int*)(register_index_ptr+3)+2);
+        writes_to = 1;
+    } else if (opcode == STRSUB) {
+        register_index[0] = *((int*)(register_index_ptr+4)+3);
+        writes_to = 1;
+    } else if (opcode == VPOP or opcode == SWAP) {
+        register_index[0] = *((int*)(++register_index_ptr)++);
+        register_index[1] = *((int*)(++register_index_ptr)++);
+        writes_to = 2;
     }
+
+    bool pause = false;
+    ostringstream reason;
+    reason.str("");
 
     if (writing_instruction) {
-        auto search = state.watch_register_local_write.find(cpu.trace().back()-function_name);
+        auto search = state.watch_register_local_write.find(cpu.trace().back()->function_name);
+        if (search != state.watch_register_local_write.end()) {
+            for (int i = 0; i < writes_to; ++i) {
+                if (find(search->second.begin(), search->second.end(), register_index[i]) != search->second.end()) {
+                    pause = true;
+                    reason << "info: execution halted by local register write watchpoint: " << register_index[i];
+                }
+            }
+        }
     }
 
-    return tuple<bool, string>(false, "");
+    return tuple<bool, string>(pause, reason.str());
 }
 
 
@@ -703,6 +778,9 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
             }
             if (not state.paused) {
                 tie(state.paused, pause_reason) = if_breakpoint_function(cpu, state.breakpoints_function);
+            }
+            if (not state.paused) {
+                tie(state.paused, pause_reason) = if_watchpoint_local_register_write(cpu, state);
             }
 
             if (state.paused) {
