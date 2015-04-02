@@ -531,6 +531,8 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
             cout << "error: invalid operand size, expected at least 1 operand" << endl;
             verified = false;
         }
+    } else if (command == "print.ahead") {
+        // OK
     } else if (command == "trace" or command == "trace.show") {
         command = "trace.show";
     } else if (command == "loader.function.map" or command == "loader.function.map.show") {
@@ -638,6 +640,8 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
             // OK, now we know that our function does not have static registers
             cout << "error: current function does not have static registers allocated" << endl;
         }
+    } else if (command == "print.ahead") {
+        printInstruction(cpu);
     } else if (command == "trace.show") {
         vector<Frame*> stack = cpu.trace();
         string indent("");
