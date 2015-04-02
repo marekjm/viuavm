@@ -60,7 +60,7 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "stradd",   sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
     // strsub <source> <begin> <end> <dest>?
     { "strsub",   sizeof(byte) + 4*sizeof(bool) + 4*sizeof(int) },
-    // strsub <source> <vector> <dest>?
+    // strjoin <source> <vector> <dest>?
     { "strjoin",  sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
     // streq <str-a> <str-b> <dest>
     { "streq",    sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
@@ -98,8 +98,6 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "frame",  sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
     { "param",  sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
     { "paref",  sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
-    // this is because function call is followed by an instruction index, and
-    // a register operand: one int is for index, second and bool for register
     { "call",   sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "arg",    sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
 
