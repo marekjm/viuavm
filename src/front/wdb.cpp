@@ -205,7 +205,12 @@ struct State {
     vector<string> breakpoints_function;
 
     // watchpoints (FIXME)
-    // ...
+    map<string, vector<int> > watch_register_local_write;
+    map<string, vector<int> > watch_register_local_read;
+    map<string, vector<int> > watch_register_static_write;
+    map<string, vector<int> > watch_register_static_read;
+    vector<int> watch_register_global_write;
+    vector<int> watch_register_global_read;
 
     // init/pause/finish/quit
     bool initialised = false;
@@ -274,6 +279,53 @@ tuple<bool, string> if_breakpoint_function(CPU& cpu, vector<string>& breakpoints
     return tuple<bool, string>(pause, reason.str());
 }
 
+tuple<bool, string> if_watchpoint_local_register_write(const CPU& cpu, const State& state) {
+    bool writing_instruction = true;
+    OPCODE opcode = OPCODE(*cpu.instruction_pointer);
+    if (opcode == NOP or
+        opcode == NOP or
+        opcode == RESS or
+        opcode == TMPRI or
+        opcode == PRINT or
+        opcode == ECHO or
+        opcode == CLFRAME or
+        opcode == CLCALL or
+        opcode == FRAME or
+        opcode == PARAM or
+        opcode == PAREF or
+        opcode == CALL or
+        opcode == JUMP or
+        opcode == BRANCH or
+        opcode == END or
+        opcode == HALT
+       ) {
+        writing_instruction = false;
+    }
+    int register_index = -1;
+
+    if (opcode == IZERO or
+        opcode == ISTORE or
+        opcode == FSTORE or
+        opcode == BSTORE or
+        opcode == STRSTORE or
+        opcode == VEC or
+        opcode == BOOL or
+        opcode == NOT or
+        opcode == FREE or
+        opcode == EMPTY or
+        opcode == TMPRO
+       ) {
+        register_index = *(int*)(cpu.instruction_pointer+1);
+    }
+
+    if (writing_instruction) {
+        auto search = state.watch_register_local_write.find(cpu.trace().back()-function_name);
+    }
+
+    return tuple<bool, string>(false, "");
+}
+
+
 bool command_verify(string& command, vector<string>& operands, const CPU& cpu, const State& state) {
     /** Basic command verification.
      *
@@ -315,6 +367,19 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
     } else if (command == "breakpoint.set.on" or command == "breakpoint.set.on.opcode") {
         command = "breakpoint.set.on.opcode";
     } else if (command == "breakpoint.set.on.function") {
+    } else if (command == "watch.register.local.write") {
+        if (operands.size() == 0) {
+            cout << "error: invalid syntax, expected: <function-name> <register-index>..." << endl;
+            verified = false;
+        } else if (operands.size() == 1 and not str::isnum(operands[0])) {
+            cout << "error: expected at least one integer operand" << endl;
+            verified = false;
+        }
+
+        if (operands.size() > 0 and str::isnum(operands[0])) {
+            // if operands start with numerical value, assume current function
+            operands.insert(operands.begin(), ".");
+        }
     } else if (command == "cpu.init") {
     } else if (command == "cpu.run") {
         if (not state.initialised) {
@@ -449,6 +514,14 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
     } else if (command == "breakpoint.set.on.function") {
         for (unsigned j = 0; j < operands.size(); ++j) {
             state.breakpoints_function.push_back(operands[j]);
+        }
+    } else if (command == "watch.register.local.write") {
+        string function_name = (operands[0] == "." ? cpu.trace().back()->function_name : operands[0]);
+        if (not state.watch_register_local_write.count(function_name)) {
+            state.watch_register_local_write[function_name] = vector<int>({});
+        }
+        for (unsigned i = 1; i < operands.size(); ++i) {
+            state.watch_register_local_write[function_name].push_back(stoi(operands[i]));
         }
     } else if (command == "cpu.init") {
         cpu.iframe();
