@@ -5,6 +5,8 @@
 
 #include <string>
 #include "object.h"
+#include "vector.h"
+#include "integer.h"
 #include "../support/string.h"
 
 
@@ -34,6 +36,11 @@ class String : public Object {
         }
 
         std::string& value() { return svalue; }
+
+        Integer* size();
+        String* sub(int b = 0, int e = -1);
+        String* add(String*);
+        String* join(Vector*);
 
         String(std::string s = ""): svalue(s) {}
 };

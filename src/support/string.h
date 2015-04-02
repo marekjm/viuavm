@@ -20,6 +20,8 @@ namespace str {
     std::string chunk(const std::string& s, bool ignore_leading_ws = true);
     std::vector<std::string> chunks(const std::string& s);
 
+    std::string join(const std::string& s, const std::vector<std::string>& v);
+
     std::string extract(const std::string& s);
 
     std::string lstrip(const std::string& s);

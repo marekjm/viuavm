@@ -130,6 +130,21 @@ namespace str {
     }
 
 
+    string join(const string& s, const vector<string>& parts) {
+        /** Join elements of vector with given string.
+         */
+        ostringstream oss;
+        unsigned limit = parts.size();
+        for (unsigned i = 0; i < limit; ++i) {
+            oss << parts[i];
+            if (i < (limit-1)) {
+                oss << s;
+            }
+        }
+        return oss.str();
+    }
+
+
     string extract(const string& s) {
         /*  Extracts *enquoted chunk*.
          *  It is particularly useful if you have a string encoded in another string.
