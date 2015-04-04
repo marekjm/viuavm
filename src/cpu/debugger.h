@@ -12,6 +12,7 @@
 #include <stdexcept>
 #include "../bytecode/bytetypedef.h"
 #include "../types/object.h"
+#include "registerset.h"
 #include "frame.h"
 
 
@@ -37,7 +38,8 @@ class CPU {
      */
     Object** registers;
     bool* references;
-    int reg_count;
+    int reg_count;  // FIXME: change name to `registers_size`
+    RegisterSet* regset;
 
     // Currently used register set
     Object** uregisters;
@@ -143,6 +145,10 @@ class CPU {
     byte* print(byte*);
     byte* echo(byte*);
 
+    byte* closure(byte*);
+    byte* clframe(byte*);
+    byte* clcall(byte*);
+
     byte* frame(byte*);
     byte* param(byte*);
     byte* paref(byte*);
@@ -191,6 +197,7 @@ class CPU {
     CPU(int r = DEFAULT_REGISTER_SIZE):
         bytecode(0), bytecode_size(0), executable_offset(0),
         registers(0), references(0), reg_count(r),
+        regset(0),
         uregisters(0), ureferences(0), uregisters_size(0),
         tmp(0),
         static_registers({}),
@@ -203,6 +210,7 @@ class CPU {
          *  Creates registers array of requested size and
          *  initializes it with zeroes.
          */
+        regset = new RegisterSet(reg_count);
         registers = new Object*[reg_count];
         references = new bool[reg_count];
         for (int i = 0; i < reg_count; ++i) {
@@ -235,5 +243,6 @@ class CPU {
         }
     }
 };
+
 
 #endif
