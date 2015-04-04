@@ -673,13 +673,12 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
         state.quit = true;
     }
 
-
     // everything OK
     return true;
 }
 
 
-void completion(const char*buf, linenoiseCompletions* lc) {
+void completion(const char* buf, linenoiseCompletions* lc) {
     vector<string> completions = {
         "cpu.",
         "cpu.init",
