@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <cstdint>
+#include <cstring>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -676,6 +677,67 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
     return true;
 }
 
+
+void completion(const char*buf, linenoiseCompletions* lc) {
+    vector<string> completions = {
+        "cpu.",
+        "cpu.init",
+        "cpu.run",
+        "cpu.tick",
+        "cpu.jump",
+        "cpu.unpause",
+        "cpu.resume",
+        "cpu.unfinish",
+        "cpu.counter",
+        "breakpoint.",
+        "breakpoint.set.",
+        "breakpoint.set.at",
+        "breakpoint.set.on",
+        "breakpoint.set.on.",
+        "breakpoint.set.on.opcode",
+        "breakpoint.set.on.function",
+        "watch.",
+        "watch.register.",
+        "watch.register.local.",
+        "watch.register.local.write",
+        "watch.register.local.read",
+        "watch.register.global.",
+        "watch.register.global.write",
+        "watch.register.global.read",
+        "watch.register.static.",
+        "watch.register.static.write",
+        "watch.register.static.read",
+        "register.",
+        "register.show",
+        "register.global.",
+        "register.global.show",
+        "register.static.",
+        "register.static.show",
+        "print.ahead",
+        "trace",
+        "trace.",
+        "trace.show",
+        "quit",
+    };
+
+    unsigned len = strlen(buf);
+    for (unsigned i = 0; i < completions.size(); ++i) {
+        bool matching = true;
+        unsigned j = 0;
+        while (j < len and matching) {
+            if (completions[i].size() < j) {
+                matching = false;
+                break;
+            }
+            matching = (completions[i][j] == buf[j]);
+            ++j;
+        }
+        if (matching) {
+            linenoiseAddCompletion(lc, completions[i].c_str());
+        }
+    }
+}
+
 void debuggerMainLoop(CPU& cpu, deque<string> init) {
     /** This function implements main REPL of the debugger.
      *
@@ -691,9 +753,15 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
     vector<string> operands;
     vector<string> chunks;
 
+
+    /* Set the completion callback. This will be called every time the
+     * user uses the <tab> key. */
+    linenoiseSetCompletionCallback(completion);
+
     char* cline;
     while ((cline = linenoise(">>> ")) != NULL) {
         line = string(cline);
+        free(cline);
 
         if (line == "") { continue; }
         if (line[0] == '#') { continue; }
