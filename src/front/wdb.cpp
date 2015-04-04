@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <deque>
+#include "../../lib/linenoise/linenoise.h"
 #include "../version.h"
 #include "../bytecode/maps.h"
 #include "../support/string.h"
@@ -690,36 +691,9 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
     vector<string> operands;
     vector<string> chunks;
 
-    while (true) {
-        if (not command_feed.size()) {
-            cout << ">>> ";
-            getline(cin, line);
-            line = str::lstrip(line);
-
-            // handle ^D
-            if (cin.eof()) {
-                cin.clear(); // EOF must be cleared
-                cout << "^D" << endl;
-                continue;
-            }
-        }
-
-        if (line == string("{")) {
-            while (true) {
-                cout << "...  ";
-                getline(cin, partline);
-                if (partline == string("}")) {
-                    break;
-                }
-                command_feed.push_back(partline);
-            }
-            partline = "";
-        }
-
-        if (command_feed.size()) {
-            line = command_feed.front();
-            command_feed.pop_front();
-        }
+    char* cline;
+    while ((cline = linenoise(">>> ")) != NULL) {
+        line = string(cline);
 
         if (line == "") { continue; }
         if (line[0] == '#') { continue; }
