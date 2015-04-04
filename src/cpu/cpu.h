@@ -197,6 +197,7 @@ class CPU {
         CPU(int r = DEFAULT_REGISTER_SIZE):
             bytecode(0), bytecode_size(0), executable_offset(0),
             registers(0), references(0), reg_count(r),
+            regset(0),
             uregisters(0), ureferences(0), uregisters_size(0),
             tmp(0),
             static_registers({}),
@@ -240,7 +241,6 @@ class CPU {
                 // this causes valgrind to SCREAM with errors...
                 static_registers.erase(sr.first);
             }
-            delete[] regset;
         }
 };
 
