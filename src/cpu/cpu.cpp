@@ -62,14 +62,7 @@ Object* CPU::fetch(int index) {
      *
      *  index:int   - index of a register to fetch
      */
-    if (index >= uregisters_size) { throw "register access out of bounds: read"; }
-    Object* optr = uregisters[index];
-    if (optr == 0) {
-        ostringstream oss;
-        oss << "read from null register: " << index;
-        throw oss.str().c_str();
-    }
-    return optr;
+    return regset->get(unsigned(index));
 }
 
 
@@ -116,25 +109,7 @@ void CPU::place(int index, Object* obj) {
      *  If not - the `Object` previously stored in it is destroyed.
      *
      */
-    if (index >= uregisters_size) { throw "register access out of bounds: write"; }
-    if (uregisters[index] != 0 and !ureferences[index]) {
-        // register is not empty and is not a reference - the object in it must be destroyed to avoid memory leaks
-        delete uregisters[index];
-    }
-    if (ureferences[index]) {
-        Object* referenced = fetch(index);
-
-        // it is a reference, copy value of the object
-        if (referenced->type() == "Integer") { copyvalue<Integer*>(referenced, obj); }
-        else if (referenced->type() == "Byte") { copyvalue<Byte*>(referenced, obj); }
-
-        // and delete the newly created object to avoid leaks
-        delete obj;
-    } else {
-        Object* old_ref_ptr = (hasrefs(index) ? uregisters[index] : 0);
-        uregisters[index] = obj;
-        if (old_ref_ptr) { updaterefs(old_ref_ptr, obj); }
-    }
+    regset->set(unsigned(index), obj);
 }
 
 void CPU::ensureStaticRegisters(string function_name) {
