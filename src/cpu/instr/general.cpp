@@ -6,6 +6,7 @@
 #include "../../types/byte.h"
 #include "../../support/pointer.h"
 #include "../cpu.h"
+#include "../registerset.h"
 using namespace std;
 
 
@@ -496,14 +497,14 @@ byte* CPU::end(byte* addr) {
     bool resolve_return_value_register = frames.back()->resolve_return_value_register;
     if (return_value_register != 0) {
         // we check in 0. register because it's reserved for return values
-        if (uregisters[0] == 0) {
+        if (regset->at(0) == 0) {
             throw "return value requested by frame but function did not set return register";
         }
-        if (ureferences[0]) {
-            returned = uregisters[0];
+        if (regset->isenabled(0, REFERENCE)) {
+            returned = regset->get(0);
             returned_is_reference = true;
         } else {
-            returned = uregisters[0]->copy();
+            returned = regset->get(0)->copy();
         }
     }
 
