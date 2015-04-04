@@ -440,12 +440,12 @@ int CPU::run() {
     begin(); // set the instruction pointer
     while (tick()) {}
 
-    if (return_code == 0 and uregisters[0]) {
+    if (return_code == 0 and regset->at(0)) {
         // if return code if the default one and
         // return register is not unused
         // copy value of return register as return code
         try {
-            return_code = static_cast<Integer*>(uregisters[0])->value();
+            return_code = static_cast<Integer*>(regset->get(0))->value();
         } catch (const char*& e) {
             return_code = 1;
             return_exception = "ReturnStageException";
