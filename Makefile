@@ -1,4 +1,4 @@
-CXXFLAGS=-std=c++11 -Wall -pedantic -Wfatal-errors
+CXXFLAGS=-std=c++11 -Wall -pedantic -Wfatal-errors -g
 
 VM_ASM=bin/vm/asm
 VM_CPU=bin/vm/cpu
