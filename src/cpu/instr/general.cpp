@@ -64,10 +64,12 @@ byte* CPU::move(byte* addr) {
         b = static_cast<Integer*>(fetch(b))->value();
     }
 
-    uregisters[b] = uregisters[a];   // copy pointer from first-operand register to second-operand register
-    uregisters[a] = 0;               // zero first-operand register
-    ureferences[b] = ureferences[a]; // copy reference status
-    ureferences[a] = false;          // reset reference status of source register
+    regset->move(a, b);
+
+    /* uregisters[b] = uregisters[a];   // copy pointer from first-operand register to second-operand register */
+    /* uregisters[a] = 0;               // zero first-operand register */
+    /* ureferences[b] = ureferences[a]; // copy reference status */
+    /* ureferences[a] = false;          // reset reference status of source register */
 
     return addr;
 }
@@ -153,9 +155,10 @@ byte* CPU::swap(byte* addr) {
         b = static_cast<Integer*>(fetch(b))->value();
     }
 
-    Object* tmp = uregisters[a];
-    uregisters[a] = uregisters[b];
-    uregisters[b] = tmp;
+    regset->swap(a, b);
+    /* Object* tmp = uregisters[a]; */
+    /* uregisters[a] = uregisters[b]; */
+    /* uregisters[b] = tmp; */
 
     return addr;
 }
