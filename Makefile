@@ -55,11 +55,11 @@ test: ${VM_CPU} ${VM_ASM} clean-test-compiles
 	python3 ./tests/tests.py --verbose --catch --failfast
 
 
-${VM_CPU}: src/bytecode/opcodes.h src/front/cpu.cpp build/cpu/cpu.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o build/types/string.o
-	${CXX} ${CXXFLAGS} -o ${VM_CPU} src/front/cpu.cpp build/cpu/cpu.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o build/types/string.o
+${VM_CPU}: src/bytecode/opcodes.h src/front/cpu.cpp build/cpu/cpu.o build/cpu/registserset.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o build/types/string.o
+	${CXX} ${CXXFLAGS} -o ${VM_CPU} src/front/cpu.cpp build/cpu/cpu.o build/cpu/registserset.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o build/types/string.o
 
-${VM_WDB}: src/bytecode/opcodes.h src/front/wdb.cpp build/lib/linenoise.o build/cpu/debugger.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o build/types/string.o
-	${CXX} ${CXXFLAGS} -o ${VM_WDB} src/front/wdb.cpp build/lib/linenoise.o build/cpu/debugger.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o build/types/string.o
+${VM_WDB}: src/bytecode/opcodes.h src/front/wdb.cpp build/lib/linenoise.o build/cpu/debugger.o build/cpu/registserset.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o build/types/string.o
+	${CXX} ${CXXFLAGS} -o ${VM_WDB} src/front/wdb.cpp build/lib/linenoise.o build/cpu/debugger.o build/cpu/registserset.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o build/types/string.o
 
 ${VM_ASM}: src/bytecode/opcodes.h src/front/asm.cpp build/program.o build/assembler/operands.o build/assembler/ce.o build/assembler/verify.o build/loader.o build/support/string.o
 	${CXX} ${CXXFLAGS} -o ${VM_ASM} src/front/asm.cpp build/program.o build/assembler/operands.o build/assembler/ce.o build/assembler/verify.o build/loader.o build/support/string.o
@@ -87,6 +87,10 @@ build/cpu/cpu.o: src/bytecode/opcodes.h src/cpu/frame.h src/cpu/cpu.h src/cpu/cp
 
 build/cpu/debugger.o: src/bytecode/opcodes.h src/cpu/frame.h src/cpu/debugger.h src/cpu/cpu.cpp
 	${CXX} ${CXXFLAGS} -c -o $@ ./src/cpu/cpu.cpp
+
+build/cpu/registserset.o: src/cpu/registerset.h src/cpu/registerset.cpp
+	${CXX} ${CXXFLAGS} -c -o $@ ./src/cpu/registerset.cpp
+
 
 build/cpu/instr/general.o: src/cpu/instr/general.cpp
 	${CXX} ${CXXFLAGS} -c -o $@ ./src/cpu/instr/general.cpp
