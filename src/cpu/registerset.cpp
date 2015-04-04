@@ -40,7 +40,6 @@ Object* RegisterSet::set(unsigned index, Object* object) {
         registers[index] = object;
         //if (old_ref_ptr) { updaterefs(old_ref_ptr, object); }
     }
-    registers[index] = object;
 
     return object;
 }
