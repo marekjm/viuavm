@@ -1,3 +1,4 @@
+#include <iostream>
 #include <string>
 #include <sstream>
 #include "../types/object.h"
@@ -105,14 +106,8 @@ void RegisterSet::clear(unsigned index) {
     /** Clear masks for given register.
      *
      *  Performs bounds checking.
-     *  Throws exception when accessing empty register.
      */
     if (index >= registerset_size) { throw "register access out of bounds: mask_clear"; }
-    if (registers[index] == 0) {
-        ostringstream oss;
-        oss << "read from null register: " << index;
-        throw oss.str().c_str();
-    }
     masks[index] = 0;
 }
 
@@ -121,13 +116,8 @@ bool RegisterSet::isenabled(unsigned index, mask_t filter) {
      *  Returns false otherwise.
      *
      *  Performs bounds checking.
-     *  Throws exception when accessing empty register.
      */
     if (index >= registerset_size) { throw "register access out of bounds: mask_isenabled"; }
-    if (registers[index] == 0) {
-        ostringstream oss;
-        oss << "read from null register: " << index;
-        throw oss.str().c_str();
-    }
+    // FIXME: should throw when accessing empty register, but that breaks set()
     return (masks[index] & filter);
 }
