@@ -139,3 +139,7 @@ build/support/string.o: src/support/string.cpp
 
 build/support/pointer.o: src/support/pointer.cpp
 	${CXX} ${CXXFLAGS} -c -o $@ ./src/support/pointer.cpp
+
+
+build/lib/linenoise.o: lib/linenoise/linenoise.h lib/linenoise/linenoise.c
+	${CXX} ${CXXFLAGS} -c -o $@ lib/linenoise/linenoise.c
