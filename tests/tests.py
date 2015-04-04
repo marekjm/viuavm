@@ -60,7 +60,7 @@ def run(path, expected_exit_code=0):
     output, error = p.communicate()
     exit_code = p.wait()
     if exit_code not in (expected_exit_code if type(expected_exit_code) in [list, tuple] else (expected_exit_code,)):
-        raise WudooCPUError('{0}: {1}'.format(path, output.decode('utf-8').strip()))
+        raise WudooCPUError('{0} [{1}]: {2}'.format(path, exit_code, output.decode('utf-8').strip()))
     return (exit_code, output.decode('utf-8'))
 
 
