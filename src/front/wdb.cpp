@@ -18,6 +18,7 @@ using namespace std;
 
 const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file which cannot be run on CPU without prior compilation";
 const char* RC_FILENAME = "/.wudoo.db.rc";
+const char* DEBUGGER_COMMAND_HISTORY = "/.wudoodb_history";
 
 
 // MISC FLAGS
@@ -758,9 +759,14 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
      * user uses the <tab> key. */
     linenoiseSetCompletionCallback(completion);
 
+    string home = getenv("HOME");
+    string history = (home + DEBUGGER_COMMAND_HISTORY);
+    linenoiseHistoryLoad(history.c_str());
+
     char* cline;
     while ((cline = linenoise(">>> ")) != NULL) {
         line = string(cline);
+        linenoiseHistoryAdd(cline);
         free(cline);
 
         if (line == "") { continue; }
@@ -854,6 +860,8 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
         // do not let autoresumes slide to next execution
         state.autoresumes = 0;
     }
+
+    linenoiseHistorySave(history.c_str());
 }
 
 
