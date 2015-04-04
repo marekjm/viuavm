@@ -12,6 +12,7 @@
 #include <stdexcept>
 #include "../bytecode/bytetypedef.h"
 #include "../types/object.h"
+#include "registerset.h"
 #include "frame.h"
 
 
@@ -37,6 +38,7 @@ class CPU {
     Object** registers;
     bool* references;
     int reg_count;  // FIXME: change name to `registers_size`
+    RegisterSet* regset;
 
     // Currently used register set
     Object** uregisters;
@@ -207,6 +209,7 @@ class CPU {
              *  Creates registers array of requested size and
              *  initializes it with zeroes.
              */
+            regset = new RegisterSet(reg_count);
             registers = new Object*[reg_count];
             references = new bool[reg_count];
             for (int i = 0; i < reg_count; ++i) {
@@ -237,6 +240,7 @@ class CPU {
                 // this causes valgrind to SCREAM with errors...
                 static_registers.erase(sr.first);
             }
+            delete[] regset;
         }
 };
 
