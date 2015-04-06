@@ -71,6 +71,28 @@ Object* RegisterSet::at(unsigned index) {
 }
 
 
+void RegisterSet::move(unsigned src, unsigned dst) {
+    /** Move an object from src register to dst register.
+     */
+    registers[dst] = registers[src];    // copy pointer from first-operand register to second-operand register
+    registers[src] = 0;                 // zero first-operand register
+    masks[dst] = masks[src];            // copy mask
+    masks[src] = 0;                     // reset mask of source register
+}
+
+void RegisterSet::swap(unsigned src, unsigned dst) {
+    /** Move an object from src register to dst register.
+     */
+    Object* tmp = registers[src];
+    registers[src] = registers[dst];
+    registers[dst] = tmp;
+
+    mask_t tmp_mask = masks[src];
+    masks[src] = masks[dst];
+    masks[dst] = tmp_mask;
+}
+
+
 void RegisterSet::enable(unsigned index, mask_t filter) {
     /** Enable masks specified by filter for register at given index.
      *

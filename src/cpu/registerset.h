@@ -24,6 +24,10 @@ class RegisterSet {
         Object* get(unsigned);
         Object* at(unsigned);
 
+        // register modifications
+        void move(unsigned, unsigned);
+        void swap(unsigned, unsigned);
+
         // mask inspection and manipulation
         void enable(unsigned, mask_t);
         void disable(unsigned, mask_t);
