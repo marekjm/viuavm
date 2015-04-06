@@ -170,30 +170,32 @@ void printInstruction(const CPU& cpu) {
     cout << endl;
 }
 
-void printRegisters(const vector<string>& indexes, int register_set_size, Object** registers, bool* references) {
+void printRegisters(const vector<string>& indexes, RegisterSet* regset) {
     /** Print selected registers.
      *
      *  This function handles pretty printing of register contents.
      *  While printed, indexes are bound-checked.
      */
-    int index;
+    unsigned index;
     for (unsigned j = 0; j < indexes.size(); ++j) {
         if (not str::isnum(indexes[j])) {
             cout << "error: invalid operand, expected integer" << endl;
             continue;
         }
         index = stoi(indexes[j]);
-        if (index >= register_set_size) {
-            cout << "warn: register out of range: " << index << endl;
+        if (index >= regset->size()) {
+            cout << "warn: register index out of range: " << index << endl;
             continue;
         }
         cout << "-- " << index << " --";
-        if (registers[index]) {
+        Object* object = regset->at(index);
+        if (object) {
             cout << '\n';
-            cout << "  reference:   " << (references[index] ? "true" : "false") << '\n';
-            cout << "  object type: " << registers[index]->type() << '\n';
-            cout << "  value:       " << registers[index]->repr() << '\n';
-            cout << "  pointer:     " << hex << registers[index] << dec << endl;
+            cout << "  reference:     " << (regset->isenabled(index, REFERENCE) ? "true" : "false") << '\n';
+            cout << "  copy-on-write: " << (regset->isenabled(index, COPY_ON_WRITE) ? "true" : "false") << '\n';
+            cout << "  object type:   " << object->type() << '\n';
+            cout << "  value:         " << object->repr() << '\n';
+            cout << "  pointer:       " << hex << object << dec << endl;
         } else {
             cout << " [empty]" << endl;
         }
@@ -627,9 +629,9 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
     } else if (command == "cpu.counter") {
         cout << cpu.counter() << endl;
     } else if (command == "register.show") {
-        printRegisters(operands, cpu.uregisters_size, cpu.uregisters, cpu.ureferences);
+        printRegisters(operands, cpu.regset);
     } else if (command == "register.global.show") {
-        printRegisters(operands, cpu.reg_count, cpu.registers, cpu.references);
+        printRegisters(operands, cpu.regset);
     } else if (command == "register.static.show") {
         string fun_name = cpu.trace().back()->function_name;
 
@@ -638,7 +640,7 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
         int registers_size;
         try {
             tie(registers, references, registers_size) = cpu.static_registers.at(fun_name);
-            printRegisters(operands, registers_size, registers, references);
+            //printRegisters(operands, registers_size, registers, references);
         } catch (const std::out_of_range& e) {
             // OK, now we know that our function does not have static registers
             cout << "error: current function does not have static registers allocated" << endl;
