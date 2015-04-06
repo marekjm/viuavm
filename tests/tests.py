@@ -415,7 +415,6 @@ class RegisterManipulationInstructionsTests(unittest.TestCase):
         self.assertEqual('1', output.strip())
         self.assertEqual(0, excode)
 
-    @unittest.skip('broken by RegisteSet')
     def testMOVE(self):
         name = 'move.asm'
         assembly_path = os.path.join(self.PATH, name)
@@ -425,7 +424,6 @@ class RegisterManipulationInstructionsTests(unittest.TestCase):
         self.assertEqual('1', output.strip())
         self.assertEqual(0, excode)
 
-    @unittest.skip('broken by RegisteSet')
     def testSWAP(self):
         name = 'swap.asm'
         assembly_path = os.path.join(self.PATH, name)
