@@ -141,17 +141,17 @@ int main(int argc, char* argv[]) {
         cout << "frame details:\n";
 
         Frame* last = trace.back();
-        if (last->registers_size) {
+        if (last->regset->size()) {
             unsigned non_empty = 0;
-            for (int r = 0; r < last->registers_size; ++r) {
-                if (last->registers[r] != 0) { ++non_empty; }
+            for (unsigned r = 0; r < last->regset->size(); ++r) {
+                if (last->regset->at(r) != 0) { ++non_empty; }
             }
-            cout << "  non-empty registers: " << non_empty << '/' << last->registers_size;
+            cout << "  non-empty registers: " << non_empty << '/' << last->regset->size();
             cout << (non_empty ? ":\n" : "\n");
-            for (int r = 0; r < last->registers_size; ++r) {
-                if (last->registers[r] == 0) { continue; }
+            for (unsigned r = 0; r < last->regset->size(); ++r) {
+                if (last->regset->at(r) == 0) { continue; }
                 cout << "    registers[" << r << "]: ";
-                cout << '<' << last->registers[r]->type() << "> " << last->registers[r]->str() << endl;
+                cout << '<' << last->regset->get(r)->type() << "> " << last->regset->get(r)->str() << endl;
             }
         } else {
             cout << "  no registers were allocated for this frame" << endl;

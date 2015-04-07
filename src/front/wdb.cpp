@@ -191,8 +191,8 @@ void printRegisters(const vector<string>& indexes, RegisterSet* regset) {
         Object* object = regset->at(index);
         if (object) {
             cout << '\n';
-            cout << "  reference:     " << (regset->isenabled(index, REFERENCE) ? "true" : "false") << '\n';
-            cout << "  copy-on-write: " << (regset->isenabled(index, COPY_ON_WRITE) ? "true" : "false") << '\n';
+            cout << "  reference:     " << (regset->isflagged(index, REFERENCE) ? "true" : "false") << '\n';
+            cout << "  copy-on-write: " << (regset->isflagged(index, COPY_ON_WRITE) ? "true" : "false") << '\n';
             cout << "  object type:   " << object->type() << '\n';
             cout << "  value:         " << object->repr() << '\n';
             cout << "  pointer:       " << hex << object << dec << endl;
@@ -635,11 +635,9 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
     } else if (command == "register.static.show") {
         string fun_name = cpu.trace().back()->function_name;
 
-        Object** registers = 0;
-        bool* references;
-        int registers_size;
+        RegisterSet* rs;
         try {
-            tie(registers, references, registers_size) = cpu.static_registers.at(fun_name);
+            rs = cpu.static_registers.at(fun_name);
             //printRegisters(operands, registers_size, registers, references);
         } catch (const std::out_of_range& e) {
             // OK, now we know that our function does not have static registers
