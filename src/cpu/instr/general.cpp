@@ -167,14 +167,7 @@ byte* CPU::free(byte* addr) {
         a = static_cast<Integer*>(fetch(a))->value();
     }
 
-    if (uregisters[a]) {
-        // FIXME: if it is a reference register all references should be cleared
-        // to avoid errors and
-        // to make it possible to detect deletion with "isnull" instruction
-        delete uregisters[a];
-        uregisters[a] = 0;
-    }
-    ureferences[a] = false;
+    regset->free(a);
 
     return addr;
 }
@@ -193,8 +186,7 @@ byte* CPU::empty(byte* addr) {
         a = static_cast<Integer*>(fetch(a))->value();
     }
 
-    uregisters[a] = 0;
-    ureferences[a] = false;
+    regset->empty(a);
 
     return addr;
 }
@@ -227,7 +219,7 @@ byte* CPU::isnull(byte* addr) {
         b = static_cast<Integer*>(fetch(b))->value();
     }
 
-    place(b, new Boolean(uregisters[a] == 0));
+    place(b, new Boolean(regset->at(a) == 0));
 
     return addr;
 }
