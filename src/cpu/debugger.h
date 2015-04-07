@@ -40,6 +40,7 @@ class CPU {
     bool* references;
     int reg_count;  // FIXME: change name to `registers_size`
     RegisterSet* regset;
+    RegisterSet* uregset;
 
     // Currently used register set
     Object** uregisters;
@@ -50,7 +51,7 @@ class CPU {
     Object* tmp;
 
     // Static registers
-    std::map<std::string, std::tuple<Object**, bool*, int> > static_registers;
+    std::map<std::string, RegisterSet*> static_registers;
 
     /*  Call stack.
      */
@@ -197,7 +198,7 @@ class CPU {
     CPU(int r = DEFAULT_REGISTER_SIZE):
         bytecode(0), bytecode_size(0), executable_offset(0),
         registers(0), references(0), reg_count(r),
-        regset(0),
+        regset(0), uregset(0),
         uregisters(0), ureferences(0), uregisters_size(0),
         tmp(0),
         static_registers({}),
@@ -227,16 +228,8 @@ class CPU {
          *  if you want to keep it around after the CPU is finished.
          */
         if (bytecode) { delete[] bytecode; }
-        for (std::pair<std::string, std::tuple<Object**, bool*, int> > sr : static_registers) {
-            Object** static_registers_to_free;
-            bool* static_references_to_free;
-            int static_registers_size_to_free;
-            std::tie(static_registers_to_free, static_references_to_free, static_registers_size_to_free) = sr.second;
-            for (int i = 0; i < static_registers_size_to_free; ++i) {
-                if (static_registers_to_free[i]) { delete static_registers_to_free[i]; }
-            }
-            delete[] static_references_to_free;
-            delete[] static_registers_to_free;
+        for (std::pair<std::string, RegisterSet*> sr : static_registers) {
+            delete sr.second;
 
             // this causes valgrind to SCREAM with errors...
             static_registers.erase(sr.first);
