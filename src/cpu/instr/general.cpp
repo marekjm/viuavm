@@ -233,18 +233,14 @@ byte* CPU::ress(byte* addr) {
 
     switch (to_register_set) {
         case 0:
-            uregisters = registers;
-            ureferences = references;
-            uregisters_size = reg_count;
+            uregset = regset;
             break;
         case 1:
-            uregisters = frames.back()->registers;
-            ureferences = frames.back()->references;
-            uregisters_size = frames.back()->registers_size;
+            uregset = frames.back()->regset;
             break;
         case 2:
             ensureStaticRegisters(frames.back()->function_name);
-            tie(uregisters, ureferences, uregisters_size) = static_registers.at(frames.back()->function_name);
+            uregset = static_registers.at(frames.back()->function_name);
             break;
         case 3:
             // TODO: switching to temporary registers
@@ -273,7 +269,7 @@ byte* CPU::tmpri(byte* addr) {
     if (tmp != 0) {
         cout << "warning: CPU: storing in non-empty temporary register: memory has been leaked" << endl;
     }
-    tmp = uregisters[a]->copy();
+    tmp = uregset->get(a)->copy();
 
     return addr;
 }
@@ -296,10 +292,9 @@ byte* CPU::tmpro(byte* addr) {
         if (errors) {
             cerr << "warning: CPU: droping from temporary into non-empty register: possible references loss" << endl;
         }
-        delete uregisters[a];
+        uregset->free(a);
     }
-    uregisters[a] = tmp;
-    ureferences[a] = false;
+    uregset->set(a, tmp);
     tmp = 0;
 
     return addr;
@@ -358,8 +353,8 @@ byte* CPU::param(byte* addr) {
     }
 
     if (a >= frame_new->arguments_size) { throw "parameter register index out of bounds (greater than arguments set size) while adding parameter"; }
-    frame_new->arguments[a] = fetch(b)->copy();
-    frame_new->references[a] = false;
+    frame_new->args->set(a, fetch(b)->copy());
+    frame_new->args->clear(a);
 
     return addr;
 }
@@ -388,8 +383,8 @@ byte* CPU::paref(byte* addr) {
     }
 
     if (a >= frame_new->arguments_size) { throw "parameter register index out of bounds (greater than arguments set size) while adding parameter"; }
-    frame_new->arguments[a] = uregisters[b];
-    frame_new->argreferences[a] = true;
+    frame_new->args->set(a, fetch(b));
+    frame_new->args->flag(a, REFERENCE);
 
     return addr;
 }
@@ -455,9 +450,7 @@ byte* CPU::call(byte* addr) {
     frame_new->place_return_value_in = *(int*)addr;
 
     // adjust register set
-    uregisters = frame_new->registers;
-    ureferences = frame_new->references;
-    uregisters_size = frame_new->registers_size;
+    uregset = frame_new->regset;
 
     // use frame for function call
     frames.push_back(frame_new);
@@ -485,7 +478,7 @@ byte* CPU::end(byte* addr) {
         if (regset->at(0) == 0) {
             throw "return value requested by frame but function did not set return register";
         }
-        if (regset->isenabled(0, REFERENCE)) {
+        if (regset->isflagged(0, REFERENCE)) {
             returned = regset->get(0);
             returned_is_reference = true;
         } else {
@@ -499,13 +492,9 @@ byte* CPU::end(byte* addr) {
 
     // adjust registers
     if (frames.size()) {
-        uregisters = frames.back()->registers;
-        ureferences = frames.back()->references;
-        uregisters_size = frames.back()->registers_size;
+        uregset = frames.back()->regset;
     } else {
-        uregisters = registers;
-        ureferences = references;
-        uregisters_size = reg_count;
+        uregset = regset;
     }
 
     // place return value
@@ -514,7 +503,8 @@ byte* CPU::end(byte* addr) {
             return_value_register = static_cast<Integer*>(fetch(return_value_register))->value();
         }
         place(return_value_register, returned);
-        ureferences[return_value_register] = returned_is_reference;
+        // FIXME: set correct flags!!!
+        //ureferences[return_value_register] = returned_is_reference;
     }
 
     return addr;
