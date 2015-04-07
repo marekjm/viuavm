@@ -7,18 +7,12 @@ using namespace std;
 
 Closure::Closure():
     arguments(0), argreferences(0), arguments_size(0),
-    registers(0), references(0), registers_size(0),
+    regset(0),
     function_name("") {
 }
 
 Closure::~Closure() {
-    for (int i = 0; i < registers_size; ++i) {
-        if (registers[i] != 0 and !references[i]) { delete registers[i]; }
-    }
-    if (registers_size) {
-        delete[] registers;
-        delete[] references;
-    }
+    delete regset;
 }
 
 
@@ -45,8 +39,6 @@ Object* Closure::copy() const {
     clsr->function_name = function_name;
     // FIXME: we should copy the registers instead of just pointing to them
     // FIXME: for the above one, copy ctor would be nice
-    clsr->registers = registers;
-    clsr->references = references;
-    clsr->registers_size = registers_size;
+    clsr->regset = regset;
     return clsr;
 }

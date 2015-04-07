@@ -5,6 +5,7 @@
 
 #include <string>
 #include "../bytecode/bytetypedef.h"
+#include "../cpu/registerset.h"
 #include "object.h"
 
 
@@ -16,9 +17,7 @@ class Closure : public Object {
         bool* argreferences;
         int arguments_size;
 
-        Object** registers;
-        bool* references;
-        int registers_size;
+        RegisterSet* regset;
 
         std::string function_name;
 
