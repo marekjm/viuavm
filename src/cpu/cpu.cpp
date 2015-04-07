@@ -62,7 +62,7 @@ Object* CPU::fetch(int index) {
      *
      *  index:int   - index of a register to fetch
      */
-    return regset->get(unsigned(index));
+    return uregset->get(unsigned(index));
 }
 
 
@@ -109,7 +109,7 @@ void CPU::place(int index, Object* obj) {
      *  If not - the `Object` previously stored in it is destroyed.
      *
      */
-    regset->set(unsigned(index), obj);
+    uregset->set(unsigned(index), obj);
 }
 
 void CPU::ensureStaticRegisters(string function_name) {
@@ -118,19 +118,8 @@ void CPU::ensureStaticRegisters(string function_name) {
     try {
         static_registers.at(function_name);
     } catch (const std::out_of_range& e) {
-        // 1) initialise all register set variables
-        int s_registers_size = 16;  // FIXME: size of static register should be customisable
-        Object** s_registers = new Object*[s_registers_size];
-        bool* s_references = new bool[s_registers_size];
-
-        // 2) zero registers and refrences
-        for (int i = 0; i < s_registers_size; ++i) {
-            s_registers[i] = 0;
-            s_references[i] = false;
-        }
-
-        // 3) assign initialised register set to a function name
-        static_registers[function_name] = tuple<Object**, bool*, int>(s_registers, s_references, s_registers_size);
+        // FIXME: amount of static registers should be customizable
+        static_registers[function_name] = new RegisterSet(16);
     }
 }
 
@@ -151,16 +140,12 @@ CPU& CPU::iframe(Frame* frm) {
             cmdline->push(new String(commandline_arguments[i]));
         }
         registers[1] = cmdline;
-        initial_frame->registers = registers;
-        initial_frame->references = references;
-        initial_frame->registers_size = reg_count;
+        initial_frame->regset = regset;
         initial_frame->function_name = "__entry";
     } else {
         initial_frame = frm;
     }
-    uregisters = initial_frame->registers;
-    ureferences = initial_frame->references;
-    uregisters_size = initial_frame->registers_size;
+    uregset = regset;
     frames.push_back(initial_frame);
 
     return (*this);
