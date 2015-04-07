@@ -27,6 +27,8 @@ class RegisterSet {
         // register modifications
         void move(unsigned, unsigned);
         void swap(unsigned, unsigned);
+        void empty(unsigned);
+        void free(unsigned);
 
         // mask inspection and manipulation
         void enable(unsigned, mask_t);

@@ -73,7 +73,12 @@ Object* RegisterSet::at(unsigned index) {
 
 void RegisterSet::move(unsigned src, unsigned dst) {
     /** Move an object from src register to dst register.
+     *
+     *  Performs bound checking.
+     *  Both source and destination can be empty.
      */
+    if (src >= registerset_size) { throw "register access out of bounds: move source"; }
+    if (dst >= registerset_size) { throw "register access out of bounds: move destination"; }
     registers[dst] = registers[src];    // copy pointer from first-operand register to second-operand register
     registers[src] = 0;                 // zero first-operand register
     masks[dst] = masks[src];            // copy mask
@@ -81,8 +86,13 @@ void RegisterSet::move(unsigned src, unsigned dst) {
 }
 
 void RegisterSet::swap(unsigned src, unsigned dst) {
-    /** Move an object from src register to dst register.
+    /** Swap objects in src and dst registers.
+     *
+     *  Performs bound checking.
+     *  Both source and destination can be empty.
      */
+    if (src >= registerset_size) { throw "register access out of bounds: swap source"; }
+    if (dst >= registerset_size) { throw "register access out of bounds: swap destination"; }
     Object* tmp = registers[src];
     registers[src] = registers[dst];
     registers[dst] = tmp;
@@ -90,6 +100,29 @@ void RegisterSet::swap(unsigned src, unsigned dst) {
     mask_t tmp_mask = masks[src];
     masks[src] = masks[dst];
     masks[dst] = tmp_mask;
+}
+
+void RegisterSet::empty(unsigned here) {
+    /** Empty a register.
+     *
+     *  Performs bound checking.
+     *  Does not throw if the register is empty.
+     */
+    if (here >= registerset_size) { throw "register access out of bounds: empty"; }
+    registers[here] = 0;
+    masks[here] = 0;
+}
+
+void RegisterSet::free(unsigned here) {
+    /** Free an object inside a register.
+     *
+     *  Performs bound checking.
+     *  Throws if the register is empty.
+     */
+    if (here >= registerset_size) { throw "register access out of bounds: free"; }
+    if (registers[here] == 0) { throw "invalid free: trying to free a null pointer"; }
+    delete registers[here];
+    empty(here);
 }
 
 
