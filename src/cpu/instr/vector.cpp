@@ -4,6 +4,7 @@
 #include "../../types/integer.h"
 #include "../../types/vector.h"
 #include "../../support/pointer.h"
+#include "../registerset.h"
 #include "../cpu.h"
 using namespace std;
 
@@ -208,11 +209,11 @@ byte* CPU::vat(byte* addr) {
     }
     if (regdst_ref) {
         if (debug) { cout << "\nresolving reference to 2-operand register" << endl; }
-        regdst_num = static_cast<Integer*>(uregisters[regdst_num])->value();
+        regdst_num = static_cast<Integer*>(fetch(regdst_num))->value();
     }
     if (regpos_ref) {
         if (debug) { cout << "\nresolving reference to 3-operand register" << endl; }
-        regpos_num = static_cast<Integer*>(uregisters[regpos_num])->value();
+        regpos_num = static_cast<Integer*>(fetch(regpos_num))->value();
     }
 
     /*  1) fetch vector,
@@ -222,7 +223,7 @@ byte* CPU::vat(byte* addr) {
     Object* ptr = static_cast<Vector*>(fetch(regvec_num))->at(regpos_num);
     if (regdst_num) {
         place(regdst_num, ptr);
-        ureferences[regdst_num] = true;
+        regset->enable(regdst_num, REFERENCE);
     }
 
     return addr;

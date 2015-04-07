@@ -330,7 +330,6 @@ class VectorInstructionsTests(unittest.TestCase):
         self.assertEqual('8', output.strip())
         self.assertEqual(0, excode)
 
-    @unittest.skip('broken by RegisteSet')
     def testVINSERT(self):
         name = 'vinsert.asm'
         assembly_path = os.path.join(self.PATH, name)
