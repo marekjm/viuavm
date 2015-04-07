@@ -31,10 +31,12 @@ class RegisterSet {
         void free(unsigned);
 
         // mask inspection and manipulation
-        void enable(unsigned, mask_t);
-        void disable(unsigned, mask_t);
+        void flag(unsigned, mask_t);
+        void unflag(unsigned, mask_t);
         void clear(unsigned);
-        bool isenabled(unsigned, mask_t);
+        bool isflagged(unsigned, mask_t);
+        void setmask(unsigned, mask_t);
+        mask_t getmask(unsigned);
 
         inline unsigned size() { return registerset_size; }
 
@@ -48,6 +50,9 @@ class RegisterSet {
                 masks[i] = 0;
             }
         }
+        RegisterSet(RegisterSet*&) {
+            // FIXME: copy ctor is A MUST
+        }
         ~RegisterSet() {
             /** Proper destructor for register sets.
              */
@@ -58,7 +63,7 @@ class RegisterSet {
                 }
                 // do not delete if register is a reference or should be kept in memory even
                 // after going out of scope
-                if (isenabled(i, (KEEP | REFERENCE))) {
+                if (isflagged(i, (KEEP | REFERENCE))) {
                     continue;
                 }
                 delete[] registers[i];

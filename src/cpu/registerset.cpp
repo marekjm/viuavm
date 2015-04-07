@@ -22,11 +22,11 @@ Object* RegisterSet::set(unsigned index, Object* object) {
      */
     if (index >= registerset_size) { throw "register access out of bounds: write"; }
 
-    if (registers[index] != 0 and !isenabled(index, REFERENCE)) {
+    if (registers[index] != 0 and !isflagged(index, REFERENCE)) {
         // register is not empty and is not a reference - the object in it must be destroyed to avoid memory leaks
         delete registers[index];
     }
-    if (isenabled(index, REFERENCE)) {
+    if (isflagged(index, REFERENCE)) {
         Object* referenced = get(index);
 
         // it is a reference, copy value of the object
@@ -126,7 +126,7 @@ void RegisterSet::free(unsigned here) {
 }
 
 
-void RegisterSet::enable(unsigned index, mask_t filter) {
+void RegisterSet::flag(unsigned index, mask_t filter) {
     /** Enable masks specified by filter for register at given index.
      *
      *  Performs bounds checking.
@@ -141,7 +141,7 @@ void RegisterSet::enable(unsigned index, mask_t filter) {
     masks[index] = (masks[index] | filter);
 }
 
-void RegisterSet::disable(unsigned index, mask_t filter) {
+void RegisterSet::unflag(unsigned index, mask_t filter) {
     /** Disable masks specified by filter for register at given index.
      *
      *  Performs bounds checking.
@@ -165,7 +165,7 @@ void RegisterSet::clear(unsigned index) {
     masks[index] = 0;
 }
 
-bool RegisterSet::isenabled(unsigned index, mask_t filter) {
+bool RegisterSet::isflagged(unsigned index, mask_t filter) {
     /** Returns true if given filter is enabled for register specified by given index.
      *  Returns false otherwise.
      *
@@ -174,4 +174,34 @@ bool RegisterSet::isenabled(unsigned index, mask_t filter) {
     if (index >= registerset_size) { throw "register access out of bounds: mask_isenabled"; }
     // FIXME: should throw when accessing empty register, but that breaks set()
     return (masks[index] & filter);
+}
+
+void RegisterSet::setmask(unsigned index, mask_t mask) {
+    /** Set mask for a register.
+     *
+     *  Performs bounds checking.
+     *  Throws exception when accessing empty register.
+     */
+    if (index >= registerset_size) { throw "register access out of bounds: mask_disable"; }
+    if (registers[index] == 0) {
+        ostringstream oss;
+        oss << "read from null register: " << index;
+        throw oss.str().c_str();
+    }
+    masks[index] = mask;
+}
+
+mask_t RegisterSet::getmask(unsigned index) {
+    /** Get mask of a register.
+     *
+     *  Performs bounds checking.
+     *  Throws exception when accessing empty register.
+     */
+    if (index >= registerset_size) { throw "register access out of bounds: mask_disable"; }
+    if (registers[index] == 0) {
+        ostringstream oss;
+        oss << "read from null register: " << index;
+        throw oss.str().c_str();
+    }
+    return masks[index];
 }
