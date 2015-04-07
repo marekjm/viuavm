@@ -4,6 +4,7 @@
 #include "../../types/integer.h"
 #include "../../types/closure.h"
 #include "../../support/pointer.h"
+#include "../registerset.h"
 #include "../cpu.h"
 using namespace std;
 
@@ -31,30 +32,28 @@ byte* CPU::closure(byte* addr) {
         cout << " for function '" << call_name << "' in register " << reg;
     }
 
-    if (uregisters != frames.back()->registers) {
+    if (uregset != frames.back()->regset) {
         throw "creating closures from nonlocal registers is forbidden, go rethink your behaviour";
     }
 
     Closure* clsr = new Closure();
     clsr->function_name = call_name;
-    clsr->registers_size = uregisters_size;
-    clsr->registers = new Object*[uregisters_size];
-    clsr->references = new bool[uregisters_size];
+    clsr->regset = new RegisterSet(uregset);
 
     place(reg, clsr);
 
-    for (int i = 0; i < uregisters_size; ++i) {
-        if (i != reg) {
+    for (unsigned i = 0; i < uregset->size(); ++i) {
+        if (i != unsigned(reg)) {
             // do not copy the closure into its own environment
-            clsr->registers[i] = uregisters[i];
+            clsr->regset->set(i, uregset->get(i));
         }
 
         // we must not mark empty registers as references or
         // segfaults will follow as CPU will try to update objects they are referring to, and
         // that's obviously no good
-        if (uregisters[i] == 0) { continue; }
+        if (uregset->at(i) == 0) { continue; }
 
-        ureferences[i] = true;
+        uregset->flag(i, KEEP);
     }
 
     return addr;
@@ -130,9 +129,7 @@ byte* CPU::clcall(byte* addr) {
     }
 
     // adjust register set
-    uregisters = clsr->registers;
-    ureferences = clsr->references;
-    uregisters_size = clsr->registers_size;
+    uregset = clsr->regset;
 
     // use frame for function call
     frames.push_back(frame_new);
