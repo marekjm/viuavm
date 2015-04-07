@@ -5,7 +5,7 @@
 
 #include <string>
 #include "../bytecode/bytetypedef.h"
-
+#include "registerset.h"
 
 class Frame {
     public:
@@ -14,9 +14,8 @@ class Frame {
         Object** arguments;
         bool* argreferences;
 
-        Object** registers;
-        bool* references;
-        int registers_size;
+        RegisterSet* args;
+        RegisterSet* regset;
 
         int place_return_value_in;
         bool resolve_return_value_register;
@@ -28,36 +27,21 @@ class Frame {
         Frame(byte* ra, int argsize, int regsize = 16):
             return_address(ra),
             arguments_size(argsize), arguments(0), argreferences(0),
-            registers(0), references(0), registers_size(regsize),
+            args(0), regset(0),
             place_return_value_in(0), resolve_return_value_register(false)
         {
             if (argsize > 0) {
                 arguments = new Object*[argsize];
                 argreferences = new bool[argsize];
             }
-            if (regsize > 0) {
-                registers = new Object*[regsize];
-                references = new bool[regsize];
-            }
             for (int i = 0; i < argsize; ++i) { arguments[i] = 0; }
             for (int i = 0; i < argsize; ++i) { argreferences[i] = false; }
-            for (int i = 0; i < regsize; ++i) { registers[i] = 0; }
-            for (int i = 0; i < regsize; ++i) { references[i] = false; }
+            regset = new RegisterSet(regsize);
         }
         Frame(const Frame& that) {
             return_address = that.return_address;
 
-            registers_size = that.registers_size;
-            for (int i = 0; i < registers_size; ++i) {
-                if (that.registers[i] != 0) {
-                    registers[i] = that.registers[i]->copy();
-                } else {
-                    registers[i] = 0;
-                }
-            }
-            for (int i = 0; i < registers_size; ++i) {
-                references[i] = that.references[i];
-            }
+            // FIXME: copy the registers maybe?
 
             arguments_size = that.arguments_size;
             for (int i = 0; i < arguments_size; ++i) {
@@ -80,13 +64,7 @@ class Frame {
                 delete[] argreferences;
             }
 
-            for (int i = 0; i < registers_size; ++i) {
-                if (registers[i] != 0 and !references[i]) { delete registers[i]; }
-            }
-            if (registers_size) {
-                delete[] registers;
-                delete[] references;
-            }
+            delete regset;
         }
 };
 
