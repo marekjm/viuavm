@@ -53,7 +53,7 @@ CPU& CPU::mapfunction(const string& name, unsigned address) {
 }
 
 
-Object* CPU::fetch(int index) {
+Object* CPU::fetch(unsigned index) {
     /*  Return pointer to object at given register.
      *  This method safeguards against reaching for out-of-bounds registers and
      *  reading from an empty register.
@@ -62,7 +62,7 @@ Object* CPU::fetch(int index) {
      *
      *  index:int   - index of a register to fetch
      */
-    return uregset->get(unsigned(index));
+    return uregset->get(index);
 }
 
 
@@ -78,23 +78,24 @@ void CPU::updaterefs(Object* before, Object* now) {
      *  It swaps old address for the new one in every register that points to the old address and
      *  is marked as a reference.
      */
-    for (int i = 0; i < uregisters_size; ++i) {
-        if (uregisters[i] == before and ureferences[i]) {
+    for (unsigned i = 0; i < uregset->size(); ++i) {
+        if (uregset->at(i) == before and uregset->isflagged(i, REFERENCE)) {
             if (debug) {
                 cout << "\nCPU: updating reference address in register " << i << hex << ": 0x" << (unsigned long)before << " -> 0x" << (unsigned long)now << dec << endl;
             }
-            uregisters[i] = now;
+            uregset->set(i, now);
         }
     }
 }
 
-bool CPU::hasrefs(int index) {
+bool CPU::hasrefs(unsigned index) {
     /** This method checks if object at a given address exists as a reference in another register.
      */
     bool has = false;
-    for (int i = 0; i < uregisters_size; ++i) {
+    // FIXME: this should check for references in every register set; gonna be slow, isn't it?
+    for (unsigned i = 0; i < uregset->size(); ++i) {
         if (i == index) continue;
-        if (uregisters[i] == uregisters[index]) {
+        if (uregset->at(i) == uregset->at(index)) {
             has = true;
             break;
         }
@@ -102,14 +103,16 @@ bool CPU::hasrefs(int index) {
     return has;
 }
 
-void CPU::place(int index, Object* obj) {
+void CPU::place(unsigned index, Object* obj) {
     /** Place an object in register with given index.
      *
      *  Before placing an object in register, a check is preformed if the register is empty.
      *  If not - the `Object` previously stored in it is destroyed.
      *
      */
-    uregset->set(unsigned(index), obj);
+    Object* old_ref_ptr = (hasrefs(index) ? uregset->at(index) : 0);
+    uregset->set(index, obj);
+    if (old_ref_ptr) { updaterefs(old_ref_ptr, obj); }
 }
 
 void CPU::ensureStaticRegisters(string function_name) {
@@ -139,7 +142,7 @@ CPU& CPU::iframe(Frame* frm) {
         for (unsigned i = 0; i < commandline_arguments.size(); ++i) {
             cmdline->push(new String(commandline_arguments[i]));
         }
-        registers[1] = cmdline;
+        regset->set(1, cmdline);
         initial_frame->regset = regset;
         initial_frame->function_name = "__entry";
     } else {
