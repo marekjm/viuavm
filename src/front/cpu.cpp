@@ -157,12 +157,12 @@ int main(int argc, char* argv[]) {
             cout << "  no registers were allocated for this frame" << endl;
         }
 
-        if (last->arguments_size) {
-            cout << "    non-empty arguments (out of " << last->arguments_size << "):" << endl;
-            for (int r = 0; r < last->arguments_size; ++r) {
-                if (last->arguments[r] == 0) { continue; }
+        if (last->args->size()) {
+            cout << "    non-empty arguments (out of " << last->args->size() << "):" << endl;
+            for (unsigned r = 0; r < last->args->size(); ++r) {
+                if (last->args->at(r) == 0) { continue; }
                 cout << "    arguments[" << i << "]: ";
-                cout << '<' << last->arguments[r]->type() << "> " << last->arguments[r]->str() << endl;
+                cout << '<' << last->args->get(r)->type() << "> " << last->args->get(r)->str() << endl;
             }
         } else {
             cout << "  no arguments were passed to this frame" << endl;
