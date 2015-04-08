@@ -36,9 +36,7 @@ Object* RegisterSet::set(unsigned index, Object* object) {
         // and delete the newly created object to avoid leaks
         delete object;
     } else {
-        //Object* old_ref_ptr = (hasrefs(index) ? registers[index] : 0);
         registers[index] = object;
-        //if (old_ref_ptr) { updaterefs(old_ref_ptr, object); }
     }
 
     return object;
