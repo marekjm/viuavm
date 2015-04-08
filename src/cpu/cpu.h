@@ -16,7 +16,7 @@
 #include "frame.h"
 
 
-const int DEFAULT_REGISTER_SIZE = 256;
+const unsigned DEFAULT_REGISTER_SIZE = 256;
 
 
 class HaltException : public std::runtime_error {
@@ -33,18 +33,10 @@ class CPU {
     uint16_t bytecode_size;
     uint16_t executable_offset;
 
-    /*  Registers and their number stored.
-     */
-    Object** registers;
-    bool* references;
-    int reg_count;  // FIXME: change name to `registers_size`
+    // Global register set
     RegisterSet* regset;
-    RegisterSet* uregset;
-
     // Currently used register set
-    Object** uregisters;
-    bool* ureferences;
-    int uregisters_size;
+    RegisterSet* uregset;
 
     // Temporary register
     Object* tmp;
@@ -74,9 +66,9 @@ class CPU {
     /*  Methods to deal with registers.
      */
     void updaterefs(Object* before, Object* now);
-    bool hasrefs(int index);
-    Object* fetch(int);
-    void place(int, Object*);
+    bool hasrefs(unsigned);
+    Object* fetch(unsigned);
+    void place(unsigned, Object*);
     void ensureStaticRegisters(std::string);
 
     /*  Methods implementing CPU instructions.
@@ -195,11 +187,9 @@ class CPU {
         }
         inline std::vector<Frame*> trace() { return frames; }
 
-        CPU(int r = DEFAULT_REGISTER_SIZE):
+        CPU(unsigned r = DEFAULT_REGISTER_SIZE):
             bytecode(0), bytecode_size(0), executable_offset(0),
-            registers(0), references(0), reg_count(r),
             regset(0), uregset(0),
-            uregisters(0), ureferences(0), uregisters_size(0),
             tmp(0),
             static_registers({}),
             frame_new(0),
@@ -211,16 +201,8 @@ class CPU {
              *  Creates registers array of requested size and
              *  initializes it with zeroes.
              */
-            regset = new RegisterSet(reg_count);
-            registers = new Object*[reg_count];
-            references = new bool[reg_count];
-            for (int i = 0; i < reg_count; ++i) {
-                registers[i] = 0;
-                references[i] = false;
-            }
-            uregisters = registers;
-            ureferences = references;
-            uregisters_size = reg_count;
+            regset = new RegisterSet(r);
+            uregset = regset;
         }
 
         ~CPU() {
