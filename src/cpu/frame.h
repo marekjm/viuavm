@@ -10,10 +10,6 @@
 class Frame {
     public:
         byte* return_address;
-        int arguments_size;
-        Object** arguments;
-        bool* argreferences;
-
         RegisterSet* args;
         RegisterSet* regset;
 
@@ -26,44 +22,20 @@ class Frame {
 
         Frame(byte* ra, int argsize, int regsize = 16):
             return_address(ra),
-            arguments_size(argsize), arguments(0), argreferences(0),
             args(0), regset(0),
             place_return_value_in(0), resolve_return_value_register(false)
         {
-            if (argsize > 0) {
-                arguments = new Object*[argsize];
-                argreferences = new bool[argsize];
-            }
-            for (int i = 0; i < argsize; ++i) { arguments[i] = 0; }
-            for (int i = 0; i < argsize; ++i) { argreferences[i] = false; }
+            args = new RegisterSet(argsize);
             regset = new RegisterSet(regsize);
         }
         Frame(const Frame& that) {
             return_address = that.return_address;
 
             // FIXME: copy the registers maybe?
-
-            arguments_size = that.arguments_size;
-            for (int i = 0; i < arguments_size; ++i) {
-                if (that.arguments[i] != 0) {
-                    arguments[i] = that.arguments[i]->copy();
-                } else {
-                    arguments[i] = 0;
-                }
-            }
-            for (int i = 0; i < arguments_size; ++i) {
-                argreferences[i] = that.argreferences[i];
-            }
+            // FIXME: oh, and the arguments too, while you're at it!
         }
         ~Frame() {
-            for (int i = 0; i < arguments_size; ++i) {
-                if (arguments[i] != 0 and !argreferences[i]) { delete arguments[i]; }
-            }
-            if (arguments_size) {
-                delete[] arguments;
-                delete[] argreferences;
-            }
-
+            delete args;
             delete regset;
         }
 };
