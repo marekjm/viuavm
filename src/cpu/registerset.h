@@ -51,22 +51,20 @@ class RegisterSet {
             }
         }
         RegisterSet(RegisterSet*&) {
-            // FIXME: copy ctor is A MUST
+            throw "NotImplemented";
         }
         ~RegisterSet() {
             /** Proper destructor for register sets.
              */
             for (unsigned i = 0; i < registerset_size; ++i) {
                 // do not delete if register is empty
-                if (registers[i] == 0) {
-                    continue;
-                }
+                if (registers[i] == 0) { continue; }
+
                 // do not delete if register is a reference or should be kept in memory even
                 // after going out of scope
-                if (isflagged(i, (KEEP | REFERENCE))) {
-                    continue;
-                }
-                delete[] registers[i];
+                if (isflagged(i, (KEEP | REFERENCE))) { continue; }
+
+                delete registers[i];
             }
             delete[] registers;
             delete[] masks;
