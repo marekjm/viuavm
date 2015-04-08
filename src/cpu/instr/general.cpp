@@ -120,8 +120,8 @@ byte* CPU::ref(byte* addr) {
         b = static_cast<Integer*>(fetch(b))->value();
     }
 
-    uregisters[b] = uregisters[a];    // copy pointer
-    ureferences[b] = true;
+    uregset->set(b, uregset->get(a));
+    uregset->flag(b, REFERENCE);
 
     return addr;
 }
@@ -288,9 +288,9 @@ byte* CPU::tmpro(byte* addr) {
         a = static_cast<Integer*>(fetch(a))->value();
     }
 
-    if (uregisters[a] != 0) {
+    if (uregset->at(a) != 0) {
         if (errors) {
-            cerr << "warning: CPU: droping from temporary into non-empty register: possible references loss" << endl;
+            cerr << "warning: CPU: droping from temporary into non-empty register: possible references loss and register corruption" << endl;
         }
         uregset->free(a);
     }
@@ -352,7 +352,7 @@ byte* CPU::param(byte* addr) {
         b = static_cast<Integer*>(fetch(b))->value();
     }
 
-    if (a >= frame_new->arguments_size) { throw "parameter register index out of bounds (greater than arguments set size) while adding parameter"; }
+    if (unsigned(a) >= frame_new->args->size()) { throw "parameter register index out of bounds (greater than arguments set size) while adding parameter"; }
     frame_new->args->set(a, fetch(b)->copy());
     frame_new->args->clear(a);
 
@@ -382,7 +382,7 @@ byte* CPU::paref(byte* addr) {
         b = static_cast<Integer*>(fetch(b))->value();
     }
 
-    if (a >= frame_new->arguments_size) { throw "parameter register index out of bounds (greater than arguments set size) while adding parameter"; }
+    if (unsigned(a) >= frame_new->args->size()) { throw "parameter register index out of bounds (greater than arguments set size) while adding parameter"; }
     frame_new->args->set(a, fetch(b));
     frame_new->args->flag(a, REFERENCE);
 
@@ -412,17 +412,17 @@ byte* CPU::arg(byte* addr) {
         b = static_cast<Integer*>(fetch(b))->value();
     }
 
-    if (a >= frames.back()->arguments_size) {
+    if (unsigned(a) >= frames.back()->args->size()) {
         ostringstream oss;
         oss << "invalid read: read from argument register out of bounds: " << a;
         throw oss.str().c_str();
     }
 
-    ureferences[b] = frames.back()->argreferences[a];  // set reference status
-    if (ureferences[b]) {
-        uregisters[b] = frames.back()->arguments[a];
+    uregset->setmask(b, frames.back()->args->getmask(a));  // set reference status
+    if (uregset->isflagged(b, REFERENCE)) {
+        uregset->set(b, frames.back()->args->get(a));
     } else {
-        uregisters[b] = frames.back()->arguments[a]->copy();
+        uregset->set(b, frames.back()->args->get(a)->copy());
     }
 
     return addr;
@@ -503,8 +503,9 @@ byte* CPU::end(byte* addr) {
             return_value_register = static_cast<Integer*>(fetch(return_value_register))->value();
         }
         place(return_value_register, returned);
-        // FIXME: set correct flags!!!
-        //ureferences[return_value_register] = returned_is_reference;
+        if (returned_is_reference) {
+            uregset->flag(return_value_register, REFERENCE);
+        }
     }
 
     return addr;
