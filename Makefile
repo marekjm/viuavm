@@ -21,6 +21,8 @@ remake: clean all
 
 
 clean: clean-support
+	touch ./build/lib/dummy.o
+	rm -v ./build/lib/*.o
 	touch ./build/cpu/instr/dummy.o
 	rm -v ./build/cpu/instr/*.o
 	touch ./build/cpu/dummy.o
