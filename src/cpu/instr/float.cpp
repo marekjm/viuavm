@@ -67,15 +67,15 @@ byte* CPU::fadd(byte* addr) {
 
     if (rega_ref) {
         if (debug) { cout << "resolving reference to a-operand register" << endl; }
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
     if (regb_ref) {
-        if (debug) { cout << "resolving reference to b-operand register" << endl; }
-        regb_num = static_cast<Integer*>(registers[regb_num])->value();
+        if (debug) { cout << "resolving reference to b-)perand register" << endl; }
+        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
     }
     if (regr_ref) {
-        if (debug) { cout << "resolving reference to result register" << endl; }
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        if (debug) { cout << "resolving reference to re)ult register" << endl; }
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
 
     float a, b;
@@ -116,15 +116,15 @@ byte* CPU::fsub(byte* addr) {
 
     if (rega_ref) {
         if (debug) { cout << "resolving reference to a-operand register" << endl; }
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
     if (regb_ref) {
         if (debug) { cout << "resolving reference to b-operand register" << endl; }
-        regb_num = static_cast<Integer*>(registers[regb_num])->value();
+        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
     }
     if (regr_ref) {
         if (debug) { cout << "resolving reference to result register" << endl; }
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
 
     float a, b;
@@ -165,15 +165,15 @@ byte* CPU::fmul(byte* addr) {
 
     if (rega_ref) {
         if (debug) { cout << "resolving reference to a-operand register" << endl; }
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
     if (regb_ref) {
         if (debug) { cout << "resolving reference to b-operand register" << endl; }
-        regb_num = static_cast<Integer*>(registers[regb_num])->value();
+        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
     }
     if (regr_ref) {
         if (debug) { cout << "resolving reference to result register" << endl; }
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
 
     float a, b;
@@ -214,15 +214,15 @@ byte* CPU::fdiv(byte* addr) {
 
     if (rega_ref) {
         if (debug) { cout << "resolving reference to a-operand register" << endl; }
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
     if (regb_ref) {
         if (debug) { cout << "resolving reference to b-operand register" << endl; }
-        regb_num = static_cast<Integer*>(registers[regb_num])->value();
+        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
     }
     if (regr_ref) {
         if (debug) { cout << "resolving reference to result register" << endl; }
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
 
     float a, b;
@@ -263,15 +263,15 @@ byte* CPU::flt(byte* addr) {
 
     if (rega_ref) {
         if (debug) { cout << "resolving reference to a-operand register" << endl; }
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
     if (regb_ref) {
         if (debug) { cout << "resolving reference to b-operand register" << endl; }
-        regb_num = static_cast<Integer*>(registers[regb_num])->value();
+        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
     }
     if (regr_ref) {
         if (debug) { cout << "resolving reference to result register" << endl; }
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
 
     float a, b;
@@ -312,15 +312,15 @@ byte* CPU::flte(byte* addr) {
 
     if (rega_ref) {
         if (debug) { cout << "resolving reference to a-operand register" << endl; }
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
     if (regb_ref) {
         if (debug) { cout << "resolving reference to b-operand register" << endl; }
-        regb_num = static_cast<Integer*>(registers[regb_num])->value();
+        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
     }
     if (regr_ref) {
         if (debug) { cout << "resolving reference to result register" << endl; }
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
 
     float a, b;
@@ -361,15 +361,15 @@ byte* CPU::fgt(byte* addr) {
 
     if (rega_ref) {
         if (debug) { cout << "resolving reference to a-operand register" << endl; }
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
     if (regb_ref) {
         if (debug) { cout << "resolving reference to b-operand register" << endl; }
-        regb_num = static_cast<Integer*>(registers[regb_num])->value();
+        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
     }
     if (regr_ref) {
         if (debug) { cout << "resolving reference to result register" << endl; }
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
 
     float a, b;
@@ -410,15 +410,15 @@ byte* CPU::fgte(byte* addr) {
 
     if (rega_ref) {
         if (debug) { cout << "resolving reference to a-operand register" << endl; }
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
     if (regb_ref) {
         if (debug) { cout << "resolving reference to b-operand register" << endl; }
-        regb_num = static_cast<Integer*>(registers[regb_num])->value();
+        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
     }
     if (regr_ref) {
         if (debug) { cout << "resolving reference to result register" << endl; }
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
 
     float a, b;
@@ -459,15 +459,15 @@ byte* CPU::feq(byte* addr) {
 
     if (rega_ref) {
         if (debug) { cout << "resolving reference to a-operand register" << endl; }
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
     if (regb_ref) {
         if (debug) { cout << "resolving reference to b-operand register" << endl; }
-        regb_num = static_cast<Integer*>(registers[regb_num])->value();
+        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
     }
     if (regr_ref) {
         if (debug) { cout << "resolving reference to result register" << endl; }
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
 
     float a, b;

@@ -27,10 +27,10 @@ byte* CPU::itof(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (rega_ref) {
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
     if (regb_ref) {
-        regb_num = static_cast<Integer*>(registers[regb_num])->value();
+        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
     }
 
     place(regb_num, new Float(static_cast<Integer*>(fetch(rega_num))->value()));
@@ -55,10 +55,10 @@ byte* CPU::ftoi(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (rega_ref) {
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
     if (regb_ref) {
-        regb_num = static_cast<Integer*>(registers[regb_num])->value();
+        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
     }
 
     place(regb_num, new Integer(static_cast<Float*>(fetch(rega_num))->value()));
@@ -83,10 +83,10 @@ byte* CPU::stoi(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (rega_ref) {
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
     if (regb_ref) {
-        regb_num = static_cast<Integer*>(registers[regb_num])->value();
+        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
     }
 
     place(regb_num, new Integer(std::stoi(static_cast<String*>(fetch(rega_num))->value())));
@@ -111,10 +111,10 @@ byte* CPU::stof(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (rega_ref) {
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
     if (regb_ref) {
-        regb_num = static_cast<Integer*>(registers[regb_num])->value();
+        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
     }
 
     place(regb_num, new Float(std::stod(static_cast<String*>(fetch(rega_num))->value())));

@@ -26,7 +26,7 @@ byte* CPU::vec(byte* addr) {
 
     if (reg_ref) {
         if (debug) { cout << "resolving reference to operand register" << endl; }
-        reg_num = static_cast<Integer*>(uregisters[reg_num])->value();
+        reg_num = static_cast<Integer*>(fetch(reg_num))->value();
     }
 
     place(reg_num, new Vector());
@@ -66,15 +66,15 @@ byte* CPU::vinsert(byte* addr) {
 
     if (regvec_ref) {
         if (debug) { cout << "resolving reference to 1-operand register" << endl; }
-        regvec_num = static_cast<Integer*>(uregisters[regvec_num])->value();
+        regvec_num = static_cast<Integer*>(fetch(regvec_num))->value();
     }
     if (regval_ref) {
         if (debug) { cout << "resolving reference to 2-operand register" << endl; }
-        regval_num = static_cast<Integer*>(uregisters[regval_num])->value();
+        regval_num = static_cast<Integer*>(fetch(regval_num))->value();
     }
     if (regpos_ref) {
         if (debug) { cout << "resolving reference to 3-operand register" << endl; }
-        regpos_num = static_cast<Integer*>(uregisters[regpos_num])->value();
+        regpos_num = static_cast<Integer*>(fetch(regpos_num))->value();
     }
 
     static_cast<Vector*>(fetch(regvec_num))->insert(regpos_num, fetch(regval_num)->copy());
@@ -108,11 +108,11 @@ byte* CPU::vpush(byte* addr) {
 
     if (regvec_ref) {
         if (debug) { cout << "resolving reference to 1-operand register" << endl; }
-        regvec_num = static_cast<Integer*>(uregisters[regvec_num])->value();
+        regvec_num = static_cast<Integer*>(fetch(regvec_num))->value();
     }
     if (regval_ref) {
         if (debug) { cout << "resolving reference to 2-operand register" << endl; }
-        regval_num = static_cast<Integer*>(uregisters[regval_num])->value();
+        regval_num = static_cast<Integer*>(fetch(regval_num))->value();
     }
 
     static_cast<Vector*>(fetch(regvec_num))->push(fetch(regval_num)->copy());
@@ -152,15 +152,15 @@ byte* CPU::vpop(byte* addr) {
 
     if (regvec_ref) {
         if (debug) { cout << "resolving reference to 1-operand register" << endl; }
-        regvec_num = static_cast<Integer*>(uregisters[regvec_num])->value();
+        regvec_num = static_cast<Integer*>(fetch(regvec_num))->value();
     }
     if (regdst_ref) {
         if (debug) { cout << "resolving reference to 2-operand register" << endl; }
-        regdst_num = static_cast<Integer*>(uregisters[regdst_num])->value();
+        regdst_num = static_cast<Integer*>(fetch(regdst_num))->value();
     }
     if (regpos_ref) {
         if (debug) { cout << "resolving reference to 3-operand register" << endl; }
-        regpos_num = static_cast<Integer*>(uregisters[regpos_num])->value();
+        regpos_num = static_cast<Integer*>(fetch(regpos_num))->value();
     }
 
     /*  1) fetch vector,
@@ -252,11 +252,11 @@ byte* CPU::vlen(byte* addr) {
 
     if (regvec_ref) {
         if (debug) { cout << "resolving reference to 1-operand register" << endl; }
-        regvec_num = static_cast<Integer*>(uregisters[regvec_num])->value();
+        regvec_num = static_cast<Integer*>(fetch(regvec_num))->value();
     }
     if (regval_ref) {
         if (debug) { cout << "resolving reference to 2-operand register" << endl; }
-        regval_num = static_cast<Integer*>(uregisters[regval_num])->value();
+        regval_num = static_cast<Integer*>(fetch(regval_num))->value();
     }
 
     place(regval_num, new Integer(static_cast<Vector*>(fetch(regvec_num))->len()));

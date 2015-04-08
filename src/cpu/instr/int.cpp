@@ -78,13 +78,13 @@ byte* CPU::iadd(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (rega_ref) {
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
     if (regb_ref) {
-        regb_num = static_cast<Integer*>(registers[regb_num])->value();
+        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
     }
     if (regr_ref) {
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
 
     rega_num = static_cast<Integer*>(fetch(rega_num))->value();
@@ -117,13 +117,13 @@ byte* CPU::isub(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (rega_ref) {
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
     if (regb_ref) {
-        regb_num = static_cast<Integer*>(registers[regb_num])->value();
+        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
     }
     if (regr_ref) {
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
 
     rega_num = static_cast<Integer*>(fetch(rega_num))->value();
@@ -156,13 +156,13 @@ byte* CPU::imul(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (rega_ref) {
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
     if (regb_ref) {
-        regb_num = static_cast<Integer*>(registers[regb_num])->value();
+        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
     }
     if (regr_ref) {
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
 
     rega_num = static_cast<Integer*>(fetch(rega_num))->value();
@@ -195,13 +195,13 @@ byte* CPU::idiv(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (rega_ref) {
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
     if (regb_ref) {
-        regb_num = static_cast<Integer*>(registers[regb_num])->value();
+        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
     }
     if (regr_ref) {
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
 
     rega_num = static_cast<Integer*>(fetch(rega_num))->value();
@@ -234,13 +234,13 @@ byte* CPU::ilt(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (rega_ref) {
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
     if (regb_ref) {
-        regb_num = static_cast<Integer*>(registers[regb_num])->value();
+        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
     }
     if (regr_ref) {
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
 
     rega_num = static_cast<Integer*>(fetch(rega_num))->value();
@@ -273,13 +273,13 @@ byte* CPU::ilte(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (rega_ref) {
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
     if (regb_ref) {
-        regb_num = static_cast<Integer*>(registers[regb_num])->value();
+        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
     }
     if (regr_ref) {
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
 
     rega_num = static_cast<Integer*>(fetch(rega_num))->value();
@@ -312,13 +312,13 @@ byte* CPU::igt(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (rega_ref) {
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
     if (regb_ref) {
-        regb_num = static_cast<Integer*>(registers[regb_num])->value();
+        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
     }
     if (regr_ref) {
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
 
     rega_num = static_cast<Integer*>(fetch(rega_num))->value();
@@ -351,13 +351,13 @@ byte* CPU::igte(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (rega_ref) {
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
     if (regb_ref) {
-        regb_num = static_cast<Integer*>(registers[regb_num])->value();
+        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
     }
     if (regr_ref) {
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
 
     rega_num = static_cast<Integer*>(fetch(rega_num))->value();
@@ -390,13 +390,13 @@ byte* CPU::ieq(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (rega_ref) {
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
     if (regb_ref) {
-        regb_num = static_cast<Integer*>(registers[regb_num])->value();
+        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
     }
     if (regr_ref) {
-        rega_num = static_cast<Integer*>(registers[rega_num])->value();
+        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
     }
 
     rega_num = static_cast<Integer*>(fetch(rega_num))->value();
