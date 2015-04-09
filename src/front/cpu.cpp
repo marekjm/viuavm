@@ -161,7 +161,7 @@ int main(int argc, char* argv[]) {
             cout << "    non-empty arguments (out of " << last->args->size() << "):" << endl;
             for (unsigned r = 0; r < last->args->size(); ++r) {
                 if (last->args->at(r) == 0) { continue; }
-                cout << "    arguments[" << i << "]: ";
+                cout << "    arguments[" << r << "]: ";
                 cout << '<' << last->args->get(r)->type() << "> " << last->args->get(r)->str() << endl;
             }
         } else {
