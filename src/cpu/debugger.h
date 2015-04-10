@@ -1,5 +1,5 @@
-#ifndef TATANKA_CPU_H
-#define TATANKA_CPU_H
+#ifndef WUDOO_CPU_H
+#define WUDOO_CPU_H
 
 #pragma once
 
@@ -16,7 +16,7 @@
 #include "frame.h"
 
 
-const int DEFAULT_REGISTER_SIZE = 256;
+const unsigned DEFAULT_REGISTER_SIZE = 256;
 
 
 class HaltException : public std::runtime_error {
@@ -34,18 +34,10 @@ class CPU {
     uint16_t bytecode_size;
     uint16_t executable_offset;
 
-    /*  Registers and their number stored.
-     */
-    Object** registers;
-    bool* references;
-    int reg_count;  // FIXME: change name to `registers_size`
+    // Global register set
     RegisterSet* regset;
-    RegisterSet* uregset;
-
     // Currently used register set
-    Object** uregisters;
-    bool* ureferences;
-    int uregisters_size;
+    RegisterSet* uregset;
 
     // Temporary register
     Object* tmp;
@@ -75,9 +67,9 @@ class CPU {
     /*  Methods to deal with registers.
      */
     void updaterefs(Object* before, Object* now);
-    bool hasrefs(int index);
-    Object* fetch(int);
-    void place(int, Object*);
+    bool hasrefs(unsigned);
+    Object* fetch(unsigned);
+    void place(unsigned, Object*);
     void ensureStaticRegisters(std::string);
 
     /*  Methods implementing CPU instructions.
@@ -161,81 +153,70 @@ class CPU {
     byte* jump(byte*);
     byte* branch(byte*);
 
-    // debug and error reporting flags
-    bool debug, errors;
+        // debug and error reporting flags
+        bool debug, errors;
 
-    std::vector<std::string> commandline_arguments;
+        std::vector<std::string> commandline_arguments;
 
-    /*  Public API of the CPU provides basic actions:
-     *
-     *      * load bytecode,
-     *      * set its size,
-     *      * tell the CPU where to start execution,
-     *      * kick the CPU so it starts running,
-     */
-    CPU& load(byte*);
-    CPU& bytes(uint16_t);
-    CPU& eoffset(uint16_t);
-
-    CPU& mapfunction(const std::string&, unsigned);
-
-    byte* begin();
-    inline byte* end() { return 0; }
-
-    CPU& iframe(Frame* frm = 0);
-
-    byte* dispatch(byte*);
-    byte* tick();
-
-    int run();
-    inline unsigned counter() { return instruction_counter; }
-
-    inline std::tuple<int, std::string, std::string> exitcondition() {
-        return std::tuple<int, std::string, std::string>(return_code, return_exception, return_message);
-    }
-    inline std::vector<Frame*> trace() { return frames; }
-
-    CPU(int r = DEFAULT_REGISTER_SIZE):
-        bytecode(0), bytecode_size(0), executable_offset(0),
-        registers(0), references(0), reg_count(r),
-        regset(0), uregset(0),
-        uregisters(0), ureferences(0), uregisters_size(0),
-        tmp(0),
-        static_registers({}),
-        frame_new(0),
-        return_code(0), return_exception(""), return_message(""),
-        instruction_counter(0), instruction_pointer(0),
-        debug(false), errors(false)
-    {
-        /*  Basic constructor.
-         *  Creates registers array of requested size and
-         *  initializes it with zeroes.
+        /*  Public API of the CPU provides basic actions:
+         *
+         *      * load bytecode,
+         *      * set its size,
+         *      * tell the CPU where to start execution,
+         *      * kick the CPU so it starts running,
          */
-        regset = new RegisterSet(reg_count);
-        registers = new Object*[reg_count];
-        references = new bool[reg_count];
-        for (int i = 0; i < reg_count; ++i) {
-            registers[i] = 0;
-            references[i] = false;
-        }
-        uregisters = registers;
-        ureferences = references;
-        uregisters_size = reg_count;
-    }
+        CPU& load(byte*);
+        CPU& bytes(uint16_t);
+        CPU& eoffset(uint16_t);
 
-    ~CPU() {
-        /*  Destructor frees memory at bytecode pointer so make sure you passed a copy of the bytecode to the constructor
-         *  if you want to keep it around after the CPU is finished.
-         */
-        if (bytecode) { delete[] bytecode; }
-        for (std::pair<std::string, RegisterSet*> sr : static_registers) {
-            delete sr.second;
+        CPU& mapfunction(const std::string&, unsigned);
 
-            // this causes valgrind to SCREAM with errors...
-            static_registers.erase(sr.first);
+        byte* begin();
+        inline byte* end() { return 0; }
+
+        CPU& iframe(Frame* frm = 0);
+
+        byte* dispatch(byte*);
+        byte* tick();
+
+        int run();
+        inline unsigned counter() { return instruction_counter; }
+
+        inline std::tuple<int, std::string, std::string> exitcondition() {
+            return std::tuple<int, std::string, std::string>(return_code, return_exception, return_message);
         }
-    }
+        inline std::vector<Frame*> trace() { return frames; }
+
+        CPU(unsigned r = DEFAULT_REGISTER_SIZE):
+            bytecode(0), bytecode_size(0), executable_offset(0),
+            regset(0), uregset(0),
+            tmp(0),
+            static_registers({}),
+            frame_new(0),
+            return_code(0), return_exception(""), return_message(""),
+            instruction_counter(0), instruction_pointer(0),
+            debug(false), errors(false)
+        {
+            /*  Basic constructor.
+             *  Creates registers array of requested size and
+             *  initializes it with zeroes.
+             */
+            regset = new RegisterSet(r);
+            uregset = regset;
+        }
+
+        ~CPU() {
+            /*  Destructor frees memory at bytecode pointer so make sure you passed a copy of the bytecode to the constructor
+             *  if you want to keep it around after the CPU is finished.
+             */
+            if (bytecode) { delete[] bytecode; }
+            for (std::pair<std::string, RegisterSet*> sr : static_registers) {
+                delete sr.second;
+
+                // this causes valgrind to SCREAM with errors...
+                static_registers.erase(sr.first);
+            }
+        }
 };
-
 
 #endif
