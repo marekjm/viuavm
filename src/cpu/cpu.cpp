@@ -81,6 +81,7 @@ void CPU::updaterefs(Object* before, Object* now) {
      *  it is replaced in the origin register (i.e. the register that holds the original pointer to
      *  the object - the one from which all references had been derived).
      */
+    // FIXME: this function should update references in all registersets
     for (unsigned i = 0; i < uregset->size(); ++i) {
         if (uregset->at(i) == before) {
             if (debug) {
