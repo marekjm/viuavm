@@ -75,15 +75,21 @@ template<class T> inline void copyvalue(Object* a, Object* b) {
 
 void CPU::updaterefs(Object* before, Object* now) {
     /** This method updates references to a given address present in registers.
-     *  It swaps old address for the new one in every register that points to the old address and
-     *  is marked as a reference.
+     *  It swaps old address for the new one in every register that points to the old address.
+     *
+     *  There is no need to delete old object in this function, as it will be deleted as soon as
+     *  it is replaced in the origin register (i.e. the register that holds the original pointer to
+     *  the object - the one from which all references had been derived).
      */
     for (unsigned i = 0; i < uregset->size(); ++i) {
-        if (uregset->at(i) == before and uregset->isflagged(i, REFERENCE)) {
+        if (uregset->at(i) == before) {
             if (debug) {
                 cout << "\nCPU: updating reference address in register " << i << hex << ": 0x" << (unsigned long)before << " -> 0x" << (unsigned long)now << dec << endl;
             }
+            mask_t had_mask = uregset->getmask(i);
+            uregset->empty(i);
             uregset->set(i, now);
+            uregset->setmask(i, had_mask);
         }
     }
 }
