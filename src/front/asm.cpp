@@ -702,7 +702,9 @@ int main(int argc, char* argv[]) {
     string main_function = "";
     for (string line : ilines) {
         if (str::startswith(line, ".main:")) {
-            cout << "setting main function to: ";
+            if (DEBUG) {
+                cout << "setting main function to: ";
+            }
             main_function = str::lstrip(str::sub(line, 6));
             cout << main_function << endl;
             break;
