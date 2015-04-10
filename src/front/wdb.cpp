@@ -526,6 +526,11 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
             cout << "error: invalid operand size, expected at least 1 operand" << endl;
             verified = false;
         }
+    } else if (command == "register.local.show") {
+        if (not operands.size()) {
+            cout << "error: invalid operand size, expected at least 1 operand" << endl;
+            verified = false;
+        }
     } else if (command == "register.global.show") {
         if (not operands.size()) {
             cout << "error: invalid operand size, expected at least 1 operand" << endl;
@@ -629,7 +634,9 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
     } else if (command == "cpu.counter") {
         cout << cpu.counter() << endl;
     } else if (command == "register.show") {
-        printRegisters(operands, cpu.regset);
+        printRegisters(operands, cpu.uregset);
+    } else if (command == "register.local.show") {
+        printRegisters(operands, cpu.trace().back()->regset);
     } else if (command == "register.global.show") {
         printRegisters(operands, cpu.regset);
     } else if (command == "register.static.show") {
@@ -709,6 +716,8 @@ void completion(const char* buf, linenoiseCompletions* lc) {
         "watch.register.static.read",
         "register.",
         "register.show",
+        "register.local.",
+        "register.local.show",
         "register.global.",
         "register.global.show",
         "register.static.",
