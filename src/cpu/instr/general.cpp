@@ -475,14 +475,14 @@ byte* CPU::end(byte* addr) {
     bool resolve_return_value_register = frames.back()->resolve_return_value_register;
     if (return_value_register != 0) {
         // we check in 0. register because it's reserved for return values
-        if (regset->at(0) == 0) {
+        if (uregset->at(0) == 0) {
             throw "return value requested by frame but function did not set return register";
         }
-        if (regset->isflagged(0, REFERENCE)) {
-            returned = regset->get(0);
+        if (uregset->isflagged(0, REFERENCE)) {
+            returned = uregset->get(0);
             returned_is_reference = true;
         } else {
-            returned = regset->get(0)->copy();
+            returned = uregset->get(0)->copy();
         }
     }
 
