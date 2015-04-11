@@ -64,7 +64,7 @@ byte* CPU::move(byte* addr) {
         b = static_cast<Integer*>(fetch(b))->value();
     }
 
-    regset->move(a, b);
+    uregset->move(a, b);
     return addr;
 }
 byte* CPU::copy(byte* addr) {
