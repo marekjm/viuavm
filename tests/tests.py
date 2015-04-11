@@ -589,7 +589,6 @@ class FunctionTests(unittest.TestCase):
         self.assertEqual([i for i in range(9, -1, -1)], [int(i) for i in output.strip().splitlines()])
         self.assertEqual(0, excode)
 
-    @unittest.skip('broken by RegisteSet')
     def testLocalRegistersInFunctions(self):
         name = 'local_registers.asm'
         assembly_path = os.path.join(self.PATH, name)
@@ -609,7 +608,6 @@ class FunctionTests(unittest.TestCase):
         self.assertEqual(42, int(output.strip()))
         self.assertEqual(0, excode)
 
-    @unittest.skip('broken by RegisteSet')
     def testStaticRegisters(self):
         name = 'static_registers.asm'
         assembly_path = os.path.join(self.PATH, name)
