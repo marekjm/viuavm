@@ -167,7 +167,7 @@ byte* CPU::free(byte* addr) {
         a = static_cast<Integer*>(fetch(a))->value();
     }
 
-    regset->free(a);
+    uregset->free(a);
 
     return addr;
 }
