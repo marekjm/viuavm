@@ -149,7 +149,7 @@ byte* CPU::swap(byte* addr) {
         b = static_cast<Integer*>(fetch(b))->value();
     }
 
-    regset->swap(a, b);
+    uregset->swap(a, b);
     return addr;
 }
 byte* CPU::free(byte* addr) {
