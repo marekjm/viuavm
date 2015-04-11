@@ -223,7 +223,7 @@ byte* CPU::vat(byte* addr) {
     Object* ptr = static_cast<Vector*>(fetch(regvec_num))->at(regpos_num);
     if (regdst_num) {
         place(regdst_num, ptr);
-        regset->flag(regdst_num, REFERENCE);
+        uregset->flag(regdst_num, REFERENCE);
     }
 
     return addr;
