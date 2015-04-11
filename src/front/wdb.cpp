@@ -444,8 +444,7 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
             cout << "warn: requires integer operand(s)" << endl;
             verified = false;
         }
-    } else if (command == "breakpoint.set.on" or command == "breakpoint.set.on.opcode") {
-        command = "breakpoint.set.on.opcode";
+    } else if (command == "breakpoint.set.on.opcode") {
     } else if (command == "breakpoint.set.on.function") {
     } else if (command == "watch.register.local.write") {
         if (operands.size() == 0) {
@@ -542,7 +541,8 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
             verified = false;
         }
     } else if (command == "print.ahead") {
-        // OK
+    } else if (command == "arguments") {
+    } else if (command == "arguments.show") {
     } else if (command == "trace" or command == "trace.show") {
         command = "trace.show";
     } else if (command == "loader.function.map" or command == "loader.function.map.show") {
@@ -650,6 +650,8 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
             // OK, now we know that our function does not have static registers
             cout << "error: current function does not have static registers allocated" << endl;
         }
+    } else if (command == "register.global.show") {
+        printRegisters(operands, cpu.trace().back()->args);
     } else if (command == "print.ahead") {
         printInstruction(cpu);
     } else if (command == "trace.show") {
@@ -699,7 +701,6 @@ void completion(const char* buf, linenoiseCompletions* lc) {
         "breakpoint.",
         "breakpoint.set.",
         "breakpoint.set.at",
-        "breakpoint.set.on",
         "breakpoint.set.on.",
         "breakpoint.set.on.opcode",
         "breakpoint.set.on.function",
@@ -722,9 +723,10 @@ void completion(const char* buf, linenoiseCompletions* lc) {
         "register.global.show",
         "register.static.",
         "register.static.show",
+        "arguments",
+        "arguments.show",
         "print.ahead",
         "trace",
-        "trace.",
         "trace.show",
         "quit",
     };
