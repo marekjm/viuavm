@@ -495,7 +495,6 @@ class SampleProgramsTests(unittest.TestCase):
         self.assertEqual([i for i in range(0, 11)], [int(i) for i in output.strip().splitlines()])
         self.assertEqual(0, excode)
 
-    @unittest.skip('broken by RegisteSet')
     def testReferences(self):
         name = 'refs.asm'
         assembly_path = os.path.join(self.PATH, name)
