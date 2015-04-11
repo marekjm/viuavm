@@ -186,7 +186,7 @@ byte* CPU::empty(byte* addr) {
         a = static_cast<Integer*>(fetch(a))->value();
     }
 
-    regset->empty(a);
+    uregset->empty(a);
 
     return addr;
 }
