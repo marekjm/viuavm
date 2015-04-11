@@ -468,7 +468,6 @@ class SampleProgramsTests(unittest.TestCase):
     """
     PATH = './sample/asm'
 
-    @unittest.skip('broken by RegisteSet')
     def testCalculatingIntegerPowerOf(self):
         name = 'power_of.asm'
         assembly_path = os.path.join(self.PATH, name)
@@ -540,7 +539,6 @@ class SampleProgramsTests(unittest.TestCase):
         self.assertEqual(int(output.strip()), 1134903170)
         self.assertEqual(0, excode)
 
-    @unittest.skip('broken by RegisteSet')
     def testIterativeFibonacciNumbers(self):
         """45. Fibonacci number calculated iteratively.
         """
