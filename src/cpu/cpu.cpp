@@ -85,7 +85,7 @@ void CPU::updaterefs(Object* before, Object* now) {
     for (unsigned i = 0; i < uregset->size(); ++i) {
         if (uregset->at(i) == before) {
             if (debug) {
-                cout << "\nCPU: updating reference address in register " << i << hex << ": 0x" << (unsigned long)before << " -> 0x" << (unsigned long)now << dec << endl;
+                cout << "\nCPU: updating reference address in register " << i << hex << ": " << before << " -> " << now << dec << endl;
             }
             mask_t had_mask = uregset->getmask(i);
             uregset->empty(i);
