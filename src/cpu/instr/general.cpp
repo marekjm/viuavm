@@ -418,12 +418,12 @@ byte* CPU::arg(byte* addr) {
         throw oss.str().c_str();
     }
 
-    uregset->setmask(b, frames.back()->args->getmask(a));  // set reference status
-    if (uregset->isflagged(b, REFERENCE)) {
+    if (frames.back()->args->isflagged(a, REFERENCE)) {
         uregset->set(b, frames.back()->args->get(a));
     } else {
         uregset->set(b, frames.back()->args->get(a)->copy());
     }
+    uregset->setmask(b, frames.back()->args->getmask(a));  // set correct mask
 
     return addr;
 }
