@@ -191,11 +191,11 @@ void printRegisters(const vector<string>& indexes, RegisterSet* regset) {
         Object* object = regset->at(index);
         if (object) {
             cout << '\n';
+            cout << "  pointer:       " << hex << object << dec << endl;
             cout << "  reference:     " << (regset->isflagged(index, REFERENCE) ? "true" : "false") << '\n';
             cout << "  copy-on-write: " << (regset->isflagged(index, COPY_ON_WRITE) ? "true" : "false") << '\n';
             cout << "  object type:   " << object->type() << '\n';
             cout << "  value:         " << object->repr() << '\n';
-            cout << "  pointer:       " << hex << object << dec << endl;
         } else {
             cout << " [empty]" << endl;
         }
