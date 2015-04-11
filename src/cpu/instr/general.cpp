@@ -219,7 +219,7 @@ byte* CPU::isnull(byte* addr) {
         b = static_cast<Integer*>(fetch(b))->value();
     }
 
-    place(b, new Boolean(regset->at(a) == 0));
+    place(b, new Boolean(uregset->at(a) == 0));
 
     return addr;
 }
