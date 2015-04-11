@@ -119,7 +119,12 @@ void CPU::place(unsigned index, Object* obj) {
      */
     Object* old_ref_ptr = (hasrefs(index) ? uregset->at(index) : 0);
     uregset->set(index, obj);
-    if (old_ref_ptr) { updaterefs(old_ref_ptr, obj); }
+
+    // update references *if, and only if* the register being set has references and
+    // is *not marked a reference* itself, i.e. is the origin register
+    if (old_ref_ptr and not uregset->isflagged(index, REFERENCE)) {
+        updaterefs(old_ref_ptr, obj);
+    }
 }
 
 void CPU::ensureStaticRegisters(string function_name) {
