@@ -8,11 +8,11 @@
 using namespace std;
 
 
-template<class T> inline void copyvalue(Object* a, Object* b) {
+template<class T> inline void copyvalue(Object* dst, Object* src) {
     /** This is a short inline, template function to copy value between two `Object` pointers of the same polymorphic type.
      *  It is used internally by CPU.
      */
-    static_cast<T>(a)->value() = static_cast<T>(b)->value();
+    static_cast<T>(dst)->value() = static_cast<T>(src)->value();
 }
 
 Object* RegisterSet::set(unsigned index, Object* object) {
