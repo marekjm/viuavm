@@ -52,7 +52,7 @@ Object* RegisterSet::get(unsigned index) {
     Object* optr = registers[index];
     if (optr == 0) {
         ostringstream oss;
-        oss << "read from null register: " << index;
+        oss << "(get) read from null register: " << index;
         throw oss.str().c_str();
     }
     return optr;
@@ -133,7 +133,7 @@ void RegisterSet::flag(unsigned index, mask_t filter) {
     if (index >= registerset_size) { throw "register access out of bounds: mask_enable"; }
     if (registers[index] == 0) {
         ostringstream oss;
-        oss << "read from null register: " << index;
+        oss << "(flag) flagging null register: " << index;
         throw oss.str().c_str();
     }
     masks[index] = (masks[index] | filter);
@@ -148,7 +148,7 @@ void RegisterSet::unflag(unsigned index, mask_t filter) {
     if (index >= registerset_size) { throw "register access out of bounds: mask_disable"; }
     if (registers[index] == 0) {
         ostringstream oss;
-        oss << "read from null register: " << index;
+        oss << "(unflag) unflagging null register: " << index;
         throw oss.str().c_str();
     }
     masks[index] = (masks[index] ^ filter);
@@ -183,7 +183,7 @@ void RegisterSet::setmask(unsigned index, mask_t mask) {
     if (index >= registerset_size) { throw "register access out of bounds: mask_disable"; }
     if (registers[index] == 0) {
         ostringstream oss;
-        oss << "read from null register: " << index;
+        oss << "(setmask) setting mask for null register: " << index;
         throw oss.str().c_str();
     }
     masks[index] = mask;
@@ -198,7 +198,7 @@ mask_t RegisterSet::getmask(unsigned index) {
     if (index >= registerset_size) { throw "register access out of bounds: mask_disable"; }
     if (registers[index] == 0) {
         ostringstream oss;
-        oss << "read from null register: " << index;
+        oss << "(getmask) getting mask of null register: " << index;
         throw oss.str().c_str();
     }
     return masks[index];
