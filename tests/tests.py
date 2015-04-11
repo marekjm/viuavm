@@ -595,7 +595,6 @@ class FunctionTests(unittest.TestCase):
         self.assertEqual([42, 69], [int(i) for i in output.strip().splitlines()])
         self.assertEqual(0, excode)
 
-    @unittest.skip('broken by RegisteSet')
     def testReturningReferences(self):
         name = 'return_by_reference.asm'
         assembly_path = os.path.join(self.PATH, name)
