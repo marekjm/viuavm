@@ -541,7 +541,6 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
             verified = false;
         }
     } else if (command == "print.ahead") {
-    } else if (command == "arguments") {
     } else if (command == "arguments.show") {
     } else if (command == "trace" or command == "trace.show") {
         command = "trace.show";
@@ -650,7 +649,7 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
             // OK, now we know that our function does not have static registers
             cout << "error: current function does not have static registers allocated" << endl;
         }
-    } else if (command == "register.global.show") {
+    } else if (command == "arguments.show") {
         printRegisters(operands, cpu.trace().back()->args);
     } else if (command == "print.ahead") {
         printInstruction(cpu);
@@ -723,7 +722,6 @@ void completion(const char* buf, linenoiseCompletions* lc) {
         "register.global.show",
         "register.static.",
         "register.static.show",
-        "arguments",
         "arguments.show",
         "print.ahead",
         "trace",
