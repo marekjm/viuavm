@@ -590,6 +590,7 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
             }
         }
     } else if (command == "quit") {
+    } else if (command == "help") {
     } else {
         cout << "unknown command: `" << command << "`" << endl;
         verified = false;
@@ -726,6 +727,12 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
             } else {
                 cout << addr << endl;
             }
+        }
+    } else if (command == "help") {
+        cout << "Wudoo debugger commands:" << endl;
+        for (string c : DEBUGGER_COMMANDS) {
+            if (c[c.size()-1] == '.') { continue; }
+            cout << c << endl;
         }
     } else if (command == "quit") {
         state.quit = true;
