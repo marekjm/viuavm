@@ -176,13 +176,23 @@ void printRegisters(const vector<string>& indexes, RegisterSet* regset) {
      *  This function handles pretty printing of register contents.
      *  While printed, indexes are bound-checked.
      */
-    unsigned index;
-    for (unsigned j = 0; j < indexes.size(); ++j) {
-        if (not str::isnum(indexes[j])) {
+    vector<unsigned> to_display = {};
+    for (unsigned i = 0; i < indexes.size(); ++i) {
+        if (not str::isnum(indexes[i])) {
             cout << "error: invalid operand, expected integer" << endl;
             continue;
         }
-        index = stoi(indexes[j]);
+        to_display.push_back(stoi(indexes[i]));
+    }
+    if (indexes.size() == 0) {
+        for (unsigned i = 0; i < regset->size(); ++i) {
+            to_display.push_back(i);
+        }
+    }
+
+    unsigned index;
+    for (unsigned i = 0; i < to_display.size(); ++i) {
+        index = to_display[i];
         if (index >= regset->size()) {
             cout << "warn: register index out of range: " << index << endl;
             continue;
@@ -521,25 +531,9 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
         }
     } else if (command == "cpu.counter") {
     } else if (command == "register.show") {
-        if (not operands.size()) {
-            cout << "error: invalid operand size, expected at least 1 operand" << endl;
-            verified = false;
-        }
     } else if (command == "register.local.show") {
-        if (not operands.size()) {
-            cout << "error: invalid operand size, expected at least 1 operand" << endl;
-            verified = false;
-        }
     } else if (command == "register.global.show") {
-        if (not operands.size()) {
-            cout << "error: invalid operand size, expected at least 1 operand" << endl;
-            verified = false;
-        }
     } else if (command == "register.static.show") {
-        if (not operands.size()) {
-            cout << "error: invalid operand size, expected at least 1 operand" << endl;
-            verified = false;
-        }
     } else if (command == "print.ahead") {
     } else if (command == "arguments.show") {
     } else if (command == "trace" or command == "trace.show") {
