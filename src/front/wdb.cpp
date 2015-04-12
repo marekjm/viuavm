@@ -21,6 +21,50 @@ const char* RC_FILENAME = "/.wudoo.db.rc";
 const char* DEBUGGER_COMMAND_HISTORY = "/.wudoodb_history";
 
 
+const vector<string> DEBUGGER_COMMANDS = {
+    "cpu.",
+    "cpu.init",
+    "cpu.run",
+    "cpu.tick",
+    "cpu.jump",
+    "cpu.unpause",
+    "cpu.resume",
+    "cpu.unfinish",
+    "cpu.counter",
+    "breakpoint.",
+    "breakpoint.set.",
+    "breakpoint.set.at",
+    "breakpoint.set.on.",
+    "breakpoint.set.on.opcode",
+    "breakpoint.set.on.function",
+    "watch.",
+    "watch.register.",
+    "watch.register.local.",
+    "watch.register.local.write",
+    "watch.register.local.read",
+    "watch.register.global.",
+    "watch.register.global.write",
+    "watch.register.global.read",
+    "watch.register.static.",
+    "watch.register.static.write",
+    "watch.register.static.read",
+    "register.",
+    "register.show",
+    "register.local.",
+    "register.local.show",
+    "register.global.",
+    "register.global.show",
+    "register.static.",
+    "register.static.show",
+    "arguments.show",
+    "print.ahead",
+    "trace",
+    "trace.show",
+    "help",
+    "quit",
+};
+
+
 // MISC FLAGS
 bool SHOW_HELP = false;
 bool SHOW_VERSION = false;
@@ -693,62 +737,25 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
 
 
 void completion(const char* buf, linenoiseCompletions* lc) {
-    vector<string> completions = {
-        "cpu.",
-        "cpu.init",
-        "cpu.run",
-        "cpu.tick",
-        "cpu.jump",
-        "cpu.unpause",
-        "cpu.resume",
-        "cpu.unfinish",
-        "cpu.counter",
-        "breakpoint.",
-        "breakpoint.set.",
-        "breakpoint.set.at",
-        "breakpoint.set.on.",
-        "breakpoint.set.on.opcode",
-        "breakpoint.set.on.function",
-        "watch.",
-        "watch.register.",
-        "watch.register.local.",
-        "watch.register.local.write",
-        "watch.register.local.read",
-        "watch.register.global.",
-        "watch.register.global.write",
-        "watch.register.global.read",
-        "watch.register.static.",
-        "watch.register.static.write",
-        "watch.register.static.read",
-        "register.",
-        "register.show",
-        "register.local.",
-        "register.local.show",
-        "register.global.",
-        "register.global.show",
-        "register.static.",
-        "register.static.show",
-        "arguments.show",
-        "print.ahead",
-        "trace",
-        "trace.show",
-        "quit",
-    };
-
+    /** Completion callback for linenoise.
+     *
+     *  This function is a proxy between linenoise completion mechanism and
+     *  dynamically built vector of all available completions.
+     */
     unsigned len = strlen(buf);
-    for (unsigned i = 0; i < completions.size(); ++i) {
+    for (unsigned i = 0; i < DEBUGGER_COMMANDS.size(); ++i) {
         bool matching = true;
         unsigned j = 0;
         while (j < len and matching) {
-            if (completions[i].size() < j) {
+            if (DEBUGGER_COMMANDS[i].size() < j) {
                 matching = false;
                 break;
             }
-            matching = (completions[i][j] == buf[j]);
+            matching = (DEBUGGER_COMMANDS[i][j] == buf[j]);
             ++j;
         }
         if (matching) {
-            linenoiseAddCompletion(lc, completions[i].c_str());
+            linenoiseAddCompletion(lc, DEBUGGER_COMMANDS[i].c_str());
         }
     }
 }
