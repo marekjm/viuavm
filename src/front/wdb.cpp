@@ -657,7 +657,19 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
         vector<Frame*> stack = cpu.trace();
         string indent("");
         for (unsigned j = 1; j < stack.size(); ++j) {
-            cout << indent << stack[j]->function_name << endl;
+            cout << indent << stack[j]->function_name;
+            cout << '/' << stack[j]->args->size();
+            cout << '(';
+            for (unsigned k = 0; k < stack[j]->args->size(); ++k) {
+                Object* optr = stack[j]->args->at(k);
+                if (optr == 0) { continue; }
+                cout << optr->repr();
+                if (k < (stack[j]->args->size()-1)) {
+                    cout << ", ";
+                }
+            }
+            cout << ')';
+            cout << endl;
             indent += " ";
         }
     } else if (command == "loader.function.map.show") {
