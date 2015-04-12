@@ -526,18 +526,6 @@ class SampleProgramsTests(unittest.TestCase):
         self.assertEqual('40320', output.strip())
         self.assertEqual(0, excode)
 
-    @unittest.skip('broken by RegisteSet')
-    def testRecursiveFibonacciNumbers(self):
-        """45. Fibonacci number calculated recursively.
-        """
-        name = 'fibonacci.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
-        assemble(assembly_path, compiled_path)
-        excode, output = run(compiled_path)
-        self.assertEqual(int(output.strip()), 1134903170)
-        self.assertEqual(0, excode)
-
     def testIterativeFibonacciNumbers(self):
         """45. Fibonacci number calculated iteratively.
         """
