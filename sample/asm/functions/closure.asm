@@ -1,5 +1,5 @@
 .def: foo 0
-    ; one is bound from main
+    ; one is bound from 'returns_closure' function
     print 1
     end
 .end
@@ -12,14 +12,15 @@
 .end
 
 .def: main 0
+    .name: 1 bar
     ; call function that returns the closure
     frame 0
-    call returns_closure 1
+    call returns_closure bar
 
     ; create frame for our closure and
     ; call it
     clframe 0
-    clcall 1 0
+    clcall bar 0
 
     izero 0
     end
