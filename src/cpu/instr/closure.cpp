@@ -38,23 +38,25 @@ byte* CPU::closure(byte* addr) {
 
     Closure* clsr = new Closure();
     clsr->function_name = call_name;
-    clsr->regset = new RegisterSet(uregset);
-
-    place(reg, clsr);
+    clsr->regset = new RegisterSet(uregset->size());
 
     for (unsigned i = 0; i < uregset->size(); ++i) {
-        if (i != unsigned(reg)) {
-            // do not copy the closure into its own environment
-            clsr->regset->set(i, uregset->get(i));
-        }
-
         // we must not mark empty registers as references or
         // segfaults will follow as CPU will try to update objects they are referring to, and
         // that's obviously no good
+        // also, we shouldn't copy them
         if (uregset->at(i) == 0) { continue; }
+
+        // do not copy the closure into its own environment
+        if (i != unsigned(reg)) {
+            clsr->regset->set(i, uregset->get(i));
+            clsr->regset->unflag(i, KEEP);
+        }
 
         uregset->flag(i, KEEP);
     }
+
+    place(reg, clsr);
 
     return addr;
 }
