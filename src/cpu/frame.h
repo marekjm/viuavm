@@ -25,8 +25,8 @@ class Frame {
             args(0), regset(0),
             place_return_value_in(0), resolve_return_value_register(false)
         {
-            if (argsize > 0) { args = new RegisterSet(argsize); }
-            if (regsize > 0) { regset = new RegisterSet(regsize); }
+            args = new RegisterSet(argsize);
+            regset = new RegisterSet(regsize);
         }
         Frame(const Frame& that) {
             return_address = that.return_address;
