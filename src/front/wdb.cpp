@@ -681,10 +681,8 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
     } else if (command == "register.static.show") {
         string fun_name = cpu.trace().back()->function_name;
 
-        RegisterSet* rs;
         try {
-            rs = cpu.static_registers.at(fun_name);
-            //printRegisters(operands, registers_size, registers, references);
+            printRegisters(operands, cpu.static_registers.at(fun_name));
         } catch (const std::out_of_range& e) {
             // OK, now we know that our function does not have static registers
             cout << "error: current function does not have static registers allocated" << endl;
