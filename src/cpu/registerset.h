@@ -43,11 +43,13 @@ class RegisterSet {
         RegisterSet(unsigned sz): registerset_size(sz), registers(0), masks(0) {
             /** Create register set with specified size.
              */
-            registers = new Object*[sz];
-            masks = new mask_t[sz];
-            for (unsigned i = 0; i < sz; ++i) {
-                registers[i] = 0;
-                masks[i] = 0;
+            if (sz > 0) {
+                registers = new Object*[sz];
+                masks = new mask_t[sz];
+                for (unsigned i = 0; i < sz; ++i) {
+                    registers[i] = 0;
+                    masks[i] = 0;
+                }
             }
         }
         RegisterSet(RegisterSet*&) {
@@ -66,8 +68,8 @@ class RegisterSet {
 
                 delete registers[i];
             }
-            delete[] registers;
-            delete[] masks;
+            if (registers != 0) { delete[] registers; }
+            if (masks != 0) { delete[] masks; }
         }
 };
 
