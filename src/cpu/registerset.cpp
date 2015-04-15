@@ -203,3 +203,33 @@ mask_t RegisterSet::getmask(unsigned index) {
     }
     return masks[index];
 }
+
+
+RegisterSet::RegisterSet(unsigned sz): registerset_size(sz), registers(0), masks(0) {
+    /** Create register set with specified size.
+     */
+    if (sz > 0) {
+        registers = new Object*[sz];
+        masks = new mask_t[sz];
+        for (unsigned i = 0; i < sz; ++i) {
+            registers[i] = 0;
+            masks[i] = 0;
+        }
+    }
+}
+RegisterSet::~RegisterSet() {
+    /** Proper destructor for register sets.
+     */
+    for (unsigned i = 0; i < registerset_size; ++i) {
+        // do not delete if register is empty
+        if (registers[i] == 0) { continue; }
+
+        // do not delete if register is a reference or should be kept in memory even
+        // after going out of scope
+        if (isflagged(i, (KEEP | REFERENCE))) { continue; }
+
+        delete registers[i];
+    }
+    if (registers != 0) { delete[] registers; }
+    if (masks != 0) { delete[] masks; }
+}
