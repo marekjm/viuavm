@@ -154,8 +154,25 @@ void CPU::pushFrame() {
     /** Pushes new frame to be the current (top-most) one.
      */
     uregset = frame_new->regset;
+    // FIXME: remove this print
+    //cout << "\npushing new frame on stack: " << hex << frame_new << dec << " (for function: " << frame_new->function_name << ')' << endl;
     frames.push_back(frame_new);
     frame_new = 0;
+}
+
+void CPU::dropFrame() {
+    /** Drops top-most frame from call stack.
+     */
+    // FIXME: remove this print
+    //cout << "\ndeleting top frame: " << hex << frames.back() << dec << " (for function: " << frames.back()->function_name << ')' << endl;
+    delete frames.back();
+    frames.pop_back();
+
+    if (frames.size()) {
+        uregset = frames.back()->regset;
+    } else {
+        uregset = regset;
+    }
 }
 
 

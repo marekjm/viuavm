@@ -477,16 +477,7 @@ byte* CPU::end(byte* addr) {
         }
     }
 
-    // delete and remove top frame
-    delete frames.back();
-    frames.pop_back();
-
-    // adjust registers
-    if (frames.size()) {
-        uregset = frames.back()->regset;
-    } else {
-        uregset = regset;
-    }
+    dropFrame();
 
     // place return value
     if (returned and frames.size() > 0) {
