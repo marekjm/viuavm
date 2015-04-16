@@ -72,6 +72,12 @@ class CPU {
     void place(unsigned, Object*);
     void ensureStaticRegisters(std::string);
 
+    /*  Methods dealing with stack and frame manipulation.
+     */
+    Frame* requestNewFrame(int arguments_size = 0, int registers_size = 0);
+    void pushFrame();
+    void dropFrame();
+
     /*  Methods implementing CPU instructions.
      */
     byte* izero(byte*);
