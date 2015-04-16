@@ -11,7 +11,8 @@
 #include "../bytecode/maps.h"
 #include "../support/string.h"
 #include "../support/pointer.h"
-#include "../cpu/debugger.h"
+#define AS_DEBUG_HEADER 1
+#include "../cpu/cpu.h"
 #include "../program.h"
 using namespace std;
 

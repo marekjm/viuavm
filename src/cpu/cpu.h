@@ -26,6 +26,9 @@ class HaltException : public std::runtime_error {
 
 
 class CPU {
+#ifdef AS_DEBUG_HEADER
+    public:
+#endif
     /*  Bytecode pointer is a pointer to program's code.
      *  Size and executable offset are metadata exported from bytecode dump.
      */
