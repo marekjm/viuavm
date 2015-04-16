@@ -138,6 +138,19 @@ void CPU::ensureStaticRegisters(string function_name) {
     }
 }
 
+
+Frame* CPU::requestNewFrame(int arguments_size, int registers_size) {
+    /** Request new frame to be prepared.
+     *
+     *  Creates new frame if the new-frame hook is empty.
+     *  Throws an exception otherwise.
+     *  Returns pointer to the newly created frame.
+     */
+    if (frame_new != 0) { throw "requested new frame while last one is unused"; }
+    return (frame_new = new Frame(0, arguments_size, registers_size));
+}
+
+
 byte* CPU::begin() {
     /** Set instruction pointer to the execution beginning position.
      */
