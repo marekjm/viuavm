@@ -447,14 +447,7 @@ byte* CPU::call(byte* addr) {
     pointer::inc<bool, byte>(addr);
     frame_new->place_return_value_in = *(int*)addr;
 
-    // adjust register set
-    uregset = frame_new->regset;
-
-    // use frame for function call
-    frames.push_back(frame_new);
-
-    // and free the hook
-    frame_new = 0;
+    pushFrame();
 
     return call_address;
 }

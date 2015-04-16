@@ -150,6 +150,14 @@ Frame* CPU::requestNewFrame(int arguments_size, int registers_size) {
     return (frame_new = new Frame(0, arguments_size, registers_size));
 }
 
+void CPU::pushFrame() {
+    /** Pushes new frame to be the current (top-most) one.
+     */
+    uregset = frame_new->regset;
+    frames.push_back(frame_new);
+    frame_new = 0;
+}
+
 
 byte* CPU::begin() {
     /** Set instruction pointer to the execution beginning position.
