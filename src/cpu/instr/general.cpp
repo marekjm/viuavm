@@ -323,9 +323,7 @@ byte* CPU::frame(byte* addr) {
         local_registers = static_cast<Integer*>(fetch(local_registers))->value();
     }
 
-    if (frame_new != 0) { throw "requested new frame while last one is unused"; }
-    frame_new = new Frame(0, arguments, local_registers);
-
+    requestNewFrame(arguments, local_registers);
     return addr;
 }
 
