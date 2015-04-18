@@ -156,6 +156,11 @@ void CPU::pushFrame() {
     uregset = frame_new->regset;
     // FIXME: remove this print
     //cout << "\npushing new frame on stack: " << hex << frame_new << dec << " (for function: " << frame_new->function_name << ')' << endl;
+    if (find(frames.begin(), frames.end(), frame_new) != frames.end()) {
+        ostringstream oss;
+        oss << "stack corruption: frame " << hex << frame_new << dec << " for function " << frame_new->function_name << '/' << frame_new->args->size() << " pushed more than once";
+        throw oss.str();
+    }
     frames.push_back(frame_new);
     frame_new = 0;
 }
