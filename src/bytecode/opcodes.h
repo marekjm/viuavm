@@ -93,6 +93,7 @@ enum OPCODE : byte {
     PRINT,
     ECHO,
 
+    CLBIND,
     CLOSURE,
     CLFRAME,
     CLCALL,
