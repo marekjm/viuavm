@@ -1,6 +1,6 @@
 .def: foo 0
     ; one is bound from 'returns_closure' function
-    print 1
+    ;print 1
     end
 .end
 

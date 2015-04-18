@@ -38,6 +38,8 @@ byte* CPU::closure(byte* addr) {
 
     Closure* clsr = new Closure();
     clsr->function_name = call_name;
+    cout << '\n';
+    cout << "closure registerset size: " << uregset->size() << endl;
     clsr->regset = new RegisterSet(uregset->size());
 
     for (unsigned i = 0; i < uregset->size(); ++i) {
@@ -49,8 +51,10 @@ byte* CPU::closure(byte* addr) {
 
         // do not copy the closure into its own environment
         if (i != unsigned(reg)) {
+            cout << "binding: " << uregset->get(i)->type() << " at " << hex << uregset->get(i) << dec << endl;
             clsr->regset->set(i, uregset->get(i));
             clsr->regset->unflag(i, KEEP);
+            clsr->regset->flag(i, REFERENCE);
         }
 
         uregset->flag(i, KEEP);
@@ -133,6 +137,8 @@ byte* CPU::clcall(byte* addr) {
     // adjust register set
     uregset = clsr->regset;
 
+    // FIXME: remove this print
+    //cout << "\npushing new frame on stack: " << hex << frame_new << dec << " (for function: " << frame_new->function_name << ')' << endl;
     // use frame for function call
     frames.push_back(frame_new);
 
