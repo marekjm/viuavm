@@ -397,6 +397,10 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string regno_chnk;
             regno_chnk = str::chunk(operands);
             program.echo(assembler::operands::getint(resolveregister(regno_chnk, names)));
+        } else if (str::startswith(line, "clbind")) {
+            string regno_chnk;
+            regno_chnk = str::chunk(operands);
+            program.clbind(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "closure")) {
             string fn_name, reg;
             tie(fn_name, reg) = assembler::operands::get2(operands);
