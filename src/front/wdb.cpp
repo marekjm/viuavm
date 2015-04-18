@@ -250,6 +250,8 @@ void printRegisters(const vector<string>& indexes, RegisterSet* regset) {
             cout << "  reference:     " << (regset->isflagged(index, REFERENCE) ? "true" : "false") << '\n';
             cout << "  copy-on-write: " << (regset->isflagged(index, COPY_ON_WRITE) ? "true" : "false") << '\n';
             cout << "  keep:          " << (regset->isflagged(index, KEEP) ? "true" : "false") << '\n';
+            cout << "  to-be bound:   " << (regset->isflagged(index, BIND) ? "true" : "false") << '\n';
+            cout << "  bound:         " << (regset->isflagged(index, BOUND) ? "true" : "false") << '\n';
             cout << "  object type:   " << object->type() << '\n';
             cout << "  value:         " << object->repr() << '\n';
         } else {
