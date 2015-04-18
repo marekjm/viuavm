@@ -92,6 +92,7 @@ class Program {
     Program& print      (int_op);
     Program& echo       (int_op);
 
+    Program& clbind     (int_op);
     Program& closure    (std::string, int_op);
     Program& clframe    (int_op);
     Program& clcall     (int_op, int_op);

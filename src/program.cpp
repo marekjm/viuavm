@@ -871,6 +871,14 @@ Program& Program::echo(int_op reg) {
     return (*this);
 }
 
+Program& Program::clbind(int_op reg) {
+    /*  Inserts clbing instuction.
+     */
+    *(addr_ptr++) = CLBIND;
+    addr_ptr = insertIntegerOperand(addr_ptr, reg);
+    return (*this);
+}
+
 Program& Program::closure(string fn, int_op reg) {
     /*  Inserts closure instuction.
      */
