@@ -364,6 +364,9 @@ byte* CPU::dispatch(byte* addr) {
         case ECHO:
             addr = echo(addr+1);
             break;
+        case CLBIND:
+            addr = clbind(addr+1);
+            break;
         case CLOSURE:
             addr = closure(addr+1);
             break;
