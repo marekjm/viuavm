@@ -589,7 +589,11 @@ Closures
 \begin_layout Standard
 Closure instructions.
  Closures are first-class objects inside Wudoo VM.
- Their semantics differ slightly from those of casual functions.
+ Their semantics differ slightly from those of ordinary functions.
+\end_layout
+
+\begin_layout Subsubsection
+clbind
 \end_layout
 
 \begin_layout Subsubsection
