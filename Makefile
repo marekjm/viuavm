@@ -1,3 +1,4 @@
+CXX=g++
 CXXFLAGS=-std=c++11 -Wall -pedantic -Wfatal-errors -g
 
 VM_ASM=bin/vm/asm
