@@ -539,10 +539,7 @@ class SampleProgramsTests(unittest.TestCase):
 
 
 class FunctionTests(unittest.TestCase):
-    """Tests for various sample programs.
-
-    These tests (as well as samples) use several types of instructions and/or
-    assembler directives and as such are more stressing for both assembler and CPU.
+    """Tests for function related parts of the VM.
     """
     PATH = './sample/asm/functions'
 
