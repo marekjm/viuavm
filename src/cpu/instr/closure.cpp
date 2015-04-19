@@ -74,15 +74,12 @@ byte* CPU::closure(byte* addr) {
         // also, we shouldn't copy them
         if (uregset->at(i) == 0) { continue; }
 
-        // do not copy the closure into its own environment
-        if (i != unsigned(reg)) {
-            cout << "binding: " << uregset->get(i)->type() << " at " << hex << uregset->get(i) << dec << endl;
+        if (uregset->isflagged(i, BIND)) {
+            uregset->unflag(i, BIND);
             clsr->regset->set(i, uregset->get(i));
-            clsr->regset->unflag(i, KEEP);
             clsr->regset->flag(i, REFERENCE);
+            uregset->flag(i, BOUND);
         }
-
-        uregset->flag(i, KEEP);
     }
 
     place(reg, clsr);
