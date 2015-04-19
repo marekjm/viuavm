@@ -156,16 +156,9 @@ byte* CPU::clcall(byte* addr) {
         }
     }
 
+    pushFrame();
     // adjust register set
     uregset = clsr->regset;
-
-    // FIXME: remove this print
-    //cout << "\npushing new frame on stack: " << hex << frame_new << dec << " (for function: " << frame_new->function_name << ')' << endl;
-    // use frame for function call
-    frames.push_back(frame_new);
-
-    // and free the hook
-    frame_new = 0;
 
     return call_address;
 }
