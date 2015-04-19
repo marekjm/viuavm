@@ -205,6 +205,21 @@ mask_t RegisterSet::getmask(unsigned index) {
 }
 
 
+RegisterSet* RegisterSet::copy() {
+    RegisterSet* rscopy = new RegisterSet(size());
+    for (unsigned i = 0; i < size(); ++i) {
+        if (at(i) == 0) { continue; }
+
+        if (isflagged(i, (REFERENCE | BOUND))) {
+            rscopy->set(i, at(i));
+        } else {
+            rscopy->set(i, at(i)->copy());
+        }
+        rscopy->setmask(i, getmask(i));
+    }
+    return rscopy;
+}
+
 RegisterSet::RegisterSet(unsigned sz): registerset_size(sz), registers(0), masks(0) {
     /** Create register set with specified size.
      */
@@ -226,8 +241,10 @@ RegisterSet::~RegisterSet() {
 
         // do not delete if register is a reference or should be kept in memory even
         // after going out of scope
-        if (isflagged(i, (KEEP | REFERENCE))) { continue; }
+        if (isflagged(i, (KEEP | REFERENCE | BOUND))) { continue; }
 
+        // FIXME: remove this print
+        //cout << "deleting: " << registers[i]->type() << " at " << hex << registers[i] << dec << endl;
         delete registers[i];
     }
     if (registers != 0) { delete[] registers; }

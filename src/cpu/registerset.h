@@ -42,6 +42,8 @@ class RegisterSet {
 
         inline unsigned size() { return registerset_size; }
 
+        RegisterSet* copy();
+
         RegisterSet(unsigned sz);
         ~RegisterSet();
 };
