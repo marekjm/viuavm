@@ -37,8 +37,7 @@ bool Closure::boolean() const {
 Object* Closure::copy() const {
     Closure* clsr = new Closure();
     clsr->function_name = function_name;
-    // FIXME: we should copy the registers instead of just pointing to them
     // FIXME: for the above one, copy ctor would be nice
-    clsr->regset = regset;
+    clsr->regset = regset->copy();
     return clsr;
 }
