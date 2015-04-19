@@ -148,13 +148,6 @@ byte* CPU::clcall(byte* addr) {
     frame_new->resolve_return_value_register = *(bool*)addr;
     pointer::inc<bool, byte>(addr);
     frame_new->place_return_value_in = *(int*)addr;
-    if (debug) {
-        if (frame_new->place_return_value_in == 0) {
-            cout << " (return value will be discarded)";
-        } else {
-            cout << " (return value will be placed in: " << (frame_new->resolve_return_value_register ? "@" : "") << frame_new->place_return_value_in << ')';
-        }
-    }
 
     pushFrame();
     // adjust register set
