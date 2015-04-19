@@ -1,11 +1,13 @@
 .def: foo 0
     ; one is bound from 'returns_closure' function
-    ;print 1
+    print 1
     end
 .end
 
 .def: returns_closure 1
     istore 1 42
+
+    clbind 1
     closure foo 2
     move 2 0
     end
