@@ -9,6 +9,31 @@
 using namespace std;
 
 
+byte* CPU::clbind(byte* addr) {
+    /** Mark a register to be bound by next closure.
+     *
+     *  After next closure instruction, the BIND mask is removed and
+     *  BOUND mask is inserted to hint the CPU that this register
+     *  contains an object bound outside of its immediate scope.
+     *  Objects are not freed from registers marked as BOUND.
+     */
+    int a;
+    bool ref = false;
+
+    ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    a = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    if (ref) {
+        a = static_cast<Integer*>(fetch(a))->value();
+    }
+
+    uregset->flag(a, BIND);
+
+    return addr;
+}
+
 byte* CPU::closure(byte* addr) {
     /*  Call a closure.
      */
@@ -61,31 +86,6 @@ byte* CPU::closure(byte* addr) {
     }
 
     place(reg, clsr);
-
-    return addr;
-}
-
-byte* CPU::clbind(byte* addr) {
-    /** Mark a register to be bound by next closure.
-     *
-     *  After next closure instruction, the BIND mask is removed and
-     *  BOUND mask is inserted to hint the CPU that this register
-     *  contains an object bound outside of its immediate scope.
-     *  Objects are not freed from registers marked as BOUND.
-     */
-    int a;
-    bool ref = false;
-
-    ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    a = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
-    if (ref) {
-        a = static_cast<Integer*>(fetch(a))->value();
-    }
-
-    uregset->flag(a, BIND);
 
     return addr;
 }
