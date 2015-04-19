@@ -599,6 +599,30 @@ class FunctionTests(unittest.TestCase):
         self.assertEqual(0, excode)
 
 
+class ClosureTests(unittest.TestCase):
+    """Tests for closures.
+    """
+    PATH = './sample/asm/functions/closures'
+
+    def testSimpleClosure(self):
+        name = 'simple.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual('42', output.strip())
+        self.assertEqual(0, excode)
+
+    def testVariableSharingBetweenTwoClosures(self):
+        name = 'shared_variables.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual([42, 69], [int(i) for i in output.strip().splitlines()])
+        self.assertEqual(0, excode)
+
+
 class StaticLinkingTests(unittest.TestCase):
     """Tests for static linking functionality.
     """
