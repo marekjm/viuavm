@@ -697,7 +697,7 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
     } else if (command == "trace.show") {
         vector<Frame*> stack = cpu.trace();
         string indent("");
-        for (unsigned j = 1; j < stack.size(); ++j) {
+        for (unsigned j = 0; j < stack.size(); ++j) {
             cout << indent << stack[j]->function_name;
             cout << '/' << stack[j]->args->size();
             cout << '(';
@@ -709,8 +709,7 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
                     cout << ", ";
                 }
             }
-            cout << ')';
-            cout << endl;
+            cout << "): frame at " << hex << stack[j] << dec << endl;
             indent += " ";
         }
     } else if (command == "loader.function.map.show") {
