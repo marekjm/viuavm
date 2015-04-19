@@ -11,6 +11,8 @@
 #include "../bytecode/maps.h"
 #include "../support/string.h"
 #include "../support/pointer.h"
+#include "../types/integer.h"
+#include "../types/closure.h"
 #define AS_DEBUG_HEADER 1
 #include "../cpu/cpu.h"
 #include "../program.h"
@@ -151,6 +153,45 @@ void printCALL(byte* iptr, const CPU& cpu) {
     }
 }
 
+void printCLOSURE(byte* iptr, const CPU& cpu) {
+    string fun_name = string(iptr);
+    iptr += fun_name.size();
+
+    bool is_ref = *(bool*)iptr;
+    pointer::inc<bool, byte>(iptr);
+    bool register_num = *(int*)iptr;
+    pointer::inc<int, byte>(iptr);
+
+    cout << fun_name << ' ';
+    cout << (is_ref ? "@" : "") << register_num;
+}
+
+void printCLCALL(byte* iptr, const CPU& cpu) {
+    int closure_reg;
+    bool closure_reg_ref;
+
+    closure_reg_ref = *((bool*)iptr);
+    pointer::inc<bool, byte>(iptr);
+    closure_reg = *((int*)iptr);
+    pointer::inc<int, byte>(iptr);
+
+    cout << (closure_reg_ref ? "@" : "") << closure_reg;
+
+    if (closure_reg_ref) {
+        closure_reg = static_cast<Integer*>(cpu.fetch(closure_reg))->value();
+    }
+
+    Closure* clsr = static_cast<Closure*>(cpu.fetch(closure_reg));
+    cout << " (" << clsr->function_name << ") ";
+
+    bool resolve_return_value_register = *(bool*)iptr;
+    pointer::inc<bool, byte>(iptr);
+    int place_return_value_in = *(int*)iptr;
+
+    cout << (resolve_return_value_register ? "@" : "") << place_return_value_in;
+    cout << endl;
+}
+
 typedef void(*PRINTER)(byte*, const CPU&);
 map<string, PRINTER> opcode_printers = {
     { "izero", &print1IntegerOperandInstruction },
@@ -186,6 +227,10 @@ map<string, PRINTER> opcode_printers = {
     { "ress", &printRESS },
     { "empty", &print1IntegerOperandInstruction },
     { "free", &print1IntegerOperandInstruction },
+
+    { "clbind", &print1IntegerOperandInstruction },
+    { "closure", &printCLOSURE },
+    { "clcall", &printCLCALL },
 
     { "tmpri", &print1IntegerOperandInstruction },
     { "tmpro", &print1IntegerOperandInstruction },
