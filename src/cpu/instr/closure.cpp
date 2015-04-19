@@ -49,12 +49,7 @@ byte* CPU::closure(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     if (reg_ref) {
-        cout << "here?" << endl;
         reg = static_cast<Integer*>(fetch(reg))->value();
-    }
-
-    if (debug) {
-        cout << " for function '" << call_name << "' in register " << reg;
     }
 
     if (uregset != frames.back()->regset) {
@@ -63,8 +58,6 @@ byte* CPU::closure(byte* addr) {
 
     Closure* clsr = new Closure();
     clsr->function_name = call_name;
-    cout << '\n';
-    cout << "closure registerset size: " << uregset->size() << endl;
     clsr->regset = new RegisterSet(uregset->size());
 
     for (unsigned i = 0; i < uregset->size(); ++i) {
@@ -134,10 +127,6 @@ byte* CPU::clcall(byte* addr) {
     // save return address for frame
     byte* return_address = (addr + sizeof(bool) + sizeof(int));
 
-    if (debug) {
-        cout << " '" << clsr->function_name << "' " << (long)(call_address-bytecode);
-        cout << ": setting return address to bytecode " << (long)(return_address-bytecode);
-    }
     if (frame_new == 0) {
         throw "closure call without a frame: use `clframe 0' in source code if the closure takes no parameters";
     }
