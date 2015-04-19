@@ -70,7 +70,7 @@ class CPU {
      */
     void updaterefs(Object* before, Object* now);
     bool hasrefs(unsigned);
-    Object* fetch(unsigned);
+    Object* fetch(unsigned) const;
     void place(unsigned, Object*);
     void ensureStaticRegisters(std::string);
 

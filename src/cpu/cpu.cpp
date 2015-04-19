@@ -53,7 +53,7 @@ CPU& CPU::mapfunction(const string& name, unsigned address) {
 }
 
 
-Object* CPU::fetch(unsigned index) {
+Object* CPU::fetch(unsigned index) const {
     /*  Return pointer to object at given register.
      *  This method safeguards against reaching for out-of-bounds registers and
      *  reading from an empty register.
