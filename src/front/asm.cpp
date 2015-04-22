@@ -507,6 +507,19 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             bool is_absolute;
             tie(jump_target, is_absolute) = resolvejump(operands, marks);
             program.jump(jump_target, is_absolute);
+        } else if (str::startswith(line, "excall")) {
+            /** Full form of excall instruction has two operands: external function name and return value register index.
+             *  If call is given only one operand - it means it is the instruction index and returned value is discarded.
+             *  To explicitly state that return value should be discarded, 0 can be supplied as second operand.
+             */
+            string fn_name, reg;
+            tie(fn_name, reg) = assembler::operands::get2(operands);
+
+            // if second operand is empty, fill it with zero
+            // which means that return value will be discarded
+            if (reg == "") { reg = "0"; }
+
+            program.excall(fn_name, assembler::operands::getint(resolveregister(reg, names)));
         } else if (str::startswith(line, "end")) {
             program.end();
         } else if (str::startswith(line, "halt")) {
