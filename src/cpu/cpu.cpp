@@ -400,6 +400,9 @@ byte* CPU::dispatch(byte* addr) {
         case BRANCH:
             addr = branch(addr+1);
             break;
+        case EXCALL:
+            addr = excall(addr+1);
+            break;
         case HALT:
             throw HaltException();
             break;

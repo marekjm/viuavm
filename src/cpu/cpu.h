@@ -171,6 +171,9 @@ class CPU {
     byte* jump(byte*);
     byte* branch(byte*);
 
+    byte* exlink(byte*);
+    byte* excall(byte*);
+
     public:
         // debug and error reporting flags
         bool debug, errors;
