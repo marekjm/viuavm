@@ -25,6 +25,10 @@ class HaltException : public std::runtime_error {
 };
 
 
+// external functions must have following signature
+typedef Object*(externalFunction)(Frame*, RegisterSet*, RegisterSet*);
+
+
 class CPU {
 #ifdef AS_DEBUG_HEADER
     public:
