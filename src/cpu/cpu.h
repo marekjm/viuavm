@@ -70,6 +70,11 @@ class CPU {
     unsigned instruction_counter;
     byte* instruction_pointer;
 
+    /*  This is the interface between programs compiled to VM bytecode and
+     *  external libraries written in C/C++.
+     */
+    std::map<std::string, externalFunction*> external_functions;
+
     /*  Methods to deal with registers.
      */
     void updaterefs(Object* before, Object* now);
@@ -184,6 +189,9 @@ class CPU {
         CPU& eoffset(uint16_t);
 
         CPU& mapfunction(const std::string&, unsigned);
+
+        CPU& registerExternalFunction(std::string, externalFunction*);
+        CPU& removeExternalFunction(std::string);
 
         byte* begin();
         inline byte* end() { return 0; }
