@@ -536,7 +536,7 @@ byte* CPU::excall(byte* addr) {
      * FIXME: should external functions always have static registers allocated?
      */
     Object* returned = 0;
-    returned = (*external_functions.at(call_name))(frames.end(), 0, regset);
+    returned = (*external_functions.at(call_name))(*(frames.end()), 0, regset);
 
     bool returned_is_reference = false;
     int return_value_register = frames.back()->place_return_value_in;
