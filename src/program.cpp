@@ -113,7 +113,7 @@ uint16_t Program::countBytes(const vector<string>& lines) {
         instr = str::chunk(line);
         try {
             inc = OP_SIZES.at(instr);
-            if ((instr == "call") or (instr == "closure")) {
+            if ((instr == "call") or (instr == "closure") or (instr == "excall")) {
                 // clear first chunk
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (which for call and closure instructions is function name)
@@ -176,7 +176,7 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
             cout << "[asm] debug: offsetting: " << opcode_name << ": +" << inc;
         }
 
-        if ((OPCODE(program[offset]) == CALL) or (OPCODE(program[offset]) == CLOSURE)) {
+        if ((OPCODE(program[offset]) == CALL) or (OPCODE(program[offset]) == CLOSURE) or (OPCODE(program[offset]) == EXCALL)) {
             string s(program+offset+1);
             if (debug) {
                 cout << '+' << s.size() << " (function at byte " << offset+1 << ": `" << s << "`)";
@@ -1003,6 +1003,18 @@ Program& Program::branch(int_op regc, int addr_truth, bool absolute_truth, int a
     *((int*)addr_ptr) = addr_false;
     pointer::inc<int, byte>(addr_ptr);
 
+    return (*this);
+}
+
+Program& Program::excall(string fn_name, int_op reg) {
+    /*  Inserts excall instruction.
+     *  Byte offset is calculated automatically.
+     */
+    *(addr_ptr++) = EXCALL;
+    for (unsigned i = 0; i < fn_name.size(); ++i) {
+        *((char*)addr_ptr++) = fn_name[i];
+    }
+    addr_ptr = insertIntegerOperand(addr_ptr, reg);
     return (*this);
 }
 
