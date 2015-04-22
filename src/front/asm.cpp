@@ -434,7 +434,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         } else if (str::startswith(line, "call")) {
             /** Full form of call instruction has two operands: function name and return value register index.
              *  If call is given only one operand - it means it is the instruction index and returned value is discarded.
-             *  To explicitly state that return value should be discarder, 0 can be supplied as second operand.
+             *  To explicitly state that return value should be discarderd 0 can be supplied as second operand.
              */
             /** Why is the function supplied as a *string* and not direct instruction pointer?
              *  That would be faster - c'mon couldn't assembler just calculate offsets and insert them?
