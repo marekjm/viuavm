@@ -108,6 +108,10 @@ enum OPCODE : byte {
     JUMP,
     BRANCH,
 
+    // Opcodes dealing with external C/C++ modules
+    EXLINK, // link external (written in C/C++) library
+    EXCALL, // call external function
+
     END,
     HALT,
 };
