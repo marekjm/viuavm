@@ -940,6 +940,13 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
 }
 
 
+/** Just a sample external function.
+ */
+Object* sample_external_function(Frame* frame, RegisterSet* static_registers, RegisterSet* global_registers) {
+    frame->regset->set(0, new Integer(42));
+    return frame->regset->at(0);
+}
+
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
     vector<string> args;
@@ -1072,6 +1079,8 @@ int main(int argc, char* argv[]) {
     CPU cpu;
     cpu.debug = true;
     for (auto p : function_address_mapping) { cpu.mapfunction(p.first, p.second); }
+
+    cpu.registerExternalFunction("sample_external_function", &sample_external_function);
 
     vector<string> cmdline_args;
     for (int i = 1; i < argc; ++i) {

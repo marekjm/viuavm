@@ -508,7 +508,6 @@ byte* CPU::excall(byte* addr) {
     /** Run excall instruction.
      */
     string call_name = string(addr);
-    byte* call_address = bytecode+function_addresses.at(call_name);
     addr += call_name.size();
 
     // save return address for frame
@@ -538,6 +537,7 @@ byte* CPU::excall(byte* addr) {
     Object* returned = 0;
     returned = (*external_functions.at(call_name))(*(frames.end()), 0, regset);
 
+    // FIXME: woohoo! segfault!
     bool returned_is_reference = false;
     int return_value_register = frames.back()->place_return_value_in;
     bool resolve_return_value_register = frames.back()->resolve_return_value_register;

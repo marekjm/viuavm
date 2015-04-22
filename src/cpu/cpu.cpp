@@ -52,6 +52,13 @@ CPU& CPU::mapfunction(const string& name, unsigned address) {
     return (*this);
 }
 
+CPU& CPU::registerExternalFunction(const string& name, externalFunction* function_ptr) {
+    /** Registers external function in CPU.
+     */
+    external_functions[name] = function_ptr;
+    return (*this);
+}
+
 
 Object* CPU::fetch(unsigned index) const {
     /*  Return pointer to object at given register.

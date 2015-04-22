@@ -193,7 +193,7 @@ class CPU {
 
         CPU& mapfunction(const std::string&, unsigned);
 
-        CPU& registerExternalFunction(std::string, externalFunction*);
+        CPU& registerExternalFunction(const std::string&, externalFunction*);
         CPU& removeExternalFunction(std::string);
 
         byte* begin();
