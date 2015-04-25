@@ -2048,153 +2048,25 @@ C
 ' every function exported from C++ modules.
 \end_layout
 
-\begin_layout Subsection
-Example
-\begin_inset CommandInset label
-LatexCommand label
-name "sub:Example"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
-#include <iostream>
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-Object* print_hello_word(Frame* frame, RegisterSet* static_registers, RegisterSe
-t* global_registers) {
-\end_layout
-
-\begin_layout Plain Layout
-
-    std::cout << "Hello World!" << std::endl;
-\end_layout
-
-\begin_layout Plain Layout
-
-    return 0;
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-const char* function_names[] = {
-\end_layout
-
-\begin_layout Plain Layout
-
-    "print_hello_world",
-\end_layout
-
-\begin_layout Plain Layout
-
-    NULL,
-\end_layout
-
-\begin_layout Plain Layout
-
-};
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-const ExternalFunction* function_pointers[] = {
-\end_layout
-
-\begin_layout Plain Layout
-
-    &print_hello_world,
-\end_layout
-
-\begin_layout Plain Layout
-
-    NULL,
-\end_layout
-
-\begin_layout Plain Layout
-
-};
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-const char** exports_names() {
-\end_layout
-
-\begin_layout Plain Layout
-
-    return function_names;
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-ExternalFunction** exports_pointers() {
-\end_layout
-
-\begin_layout Plain Layout
-
-    return function_pointers;
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The listing found above is a fully functional Wudoo VM module.
-\end_layout
-
-\begin_layout Standard
-
-\end_layout
-
 \begin_layout Section
 Using external modules
+\end_layout
+
+\begin_layout Standard
+Example code showing interfacing with C++ can be found in source code repository
+, in 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+./sample/asm/external
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ directory.
 \end_layout
 
 \begin_layout Subsection
@@ -2251,71 +2123,6 @@ excall
 call
 \family default
  used for native functions.
-\end_layout
-
-\begin_layout Subsection
-Example
-\end_layout
-
-\begin_layout Standard
-Below is an example program written in Wudoo VM asm, which uses sample module
- from 
-\begin_inset CommandInset ref
-LatexCommand vref
-reference "sub:Example"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
-.def: main 1
-\end_layout
-
-\begin_layout Plain Layout
-
-    eximport "hello_world_module"
-\end_layout
-
-\begin_layout Plain Layout
-
-    frame 0
-\end_layout
-
-\begin_layout Plain Layout
-
-    excall hello_world_module.print_hello_world 0
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-    izero 0
-\end_layout
-
-\begin_layout Plain Layout
-
-    end
-\end_layout
-
-\begin_layout Plain Layout
-
-.end
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \end_body
