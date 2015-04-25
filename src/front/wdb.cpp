@@ -943,8 +943,14 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
 /** Just a sample external function.
  */
 Object* sample_external_function(Frame* frame, RegisterSet* static_registers, RegisterSet* global_registers) {
-    frame->regset->set(0, new Integer(42));
-    return frame->regset->at(0);
+    cout << "got: frame at " << hex << frame << dec << endl;
+    cout << "got: arguments at " << hex << frame->args << dec << " (" << (frame->args != 0 ? frame->args->size() : 0) << ')' << endl;
+    cout << "got: local registers at " << hex << frame->regset << dec << " (" << (frame->regset != 0 ? frame->regset->size() : 0) << ')' << endl;
+    cout << "got: static registers at " << hex << static_registers << dec << " (" << (static_registers != 0 ? static_registers->size() : 0) << ')' << endl;
+    cout << "got: global registers at " << hex << global_registers << dec << " (" << (global_registers != 0 ? global_registers->size() : 0) << ')' << endl;
+
+    cout << frame->args->get(0)->str() << endl;
+    return 0;
 }
 
 int main(int argc, char* argv[]) {
@@ -1080,7 +1086,11 @@ int main(int argc, char* argv[]) {
     cpu.debug = true;
     for (auto p : function_address_mapping) { cpu.mapfunction(p.first, p.second); }
 
+
+    // Register external functions...
     cpu.registerExternalFunction("sample_external_function", &sample_external_function);
+    // ...and stop here.
+
 
     vector<string> cmdline_args;
     for (int i = 1; i < argc; ++i) {
