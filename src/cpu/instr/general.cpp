@@ -524,6 +524,8 @@ byte* CPU::excall(byte* addr) {
     pointer::inc<bool, byte>(addr);
     frame_new->place_return_value_in = *(int*)addr;
 
+    Frame* frame = frame_new;
+
     pushFrame();
 
     if (external_functions.count(call_name) == 0) {
@@ -535,7 +537,8 @@ byte* CPU::excall(byte* addr) {
      * FIXME: should external functions always have static registers allocated?
      */
     Object* returned = 0;
-    returned = (*external_functions.at(call_name))(*(frames.end()), 0, regset);
+    externalFunction* callback = external_functions.at(call_name);
+    (*callback)(frame, 0, regset);
 
     // FIXME: woohoo! segfault!
     bool returned_is_reference = false;
