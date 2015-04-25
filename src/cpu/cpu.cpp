@@ -9,6 +9,7 @@
 #include "../types/string.h"
 #include "../types/vector.h"
 #include "../support/pointer.h"
+#include "../exmodule.h"
 #include "cpu.h"
 using namespace std;
 
@@ -52,7 +53,7 @@ CPU& CPU::mapfunction(const string& name, unsigned address) {
     return (*this);
 }
 
-CPU& CPU::registerExternalFunction(const string& name, externalFunction* function_ptr) {
+CPU& CPU::registerExternalFunction(const string& name, ExternalFunction* function_ptr) {
     /** Registers external function in CPU.
      */
     external_functions[name] = function_ptr;

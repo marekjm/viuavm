@@ -14,6 +14,7 @@
 #include "../types/object.h"
 #include "registerset.h"
 #include "frame.h"
+#include "../exmodule.h"
 
 
 const unsigned DEFAULT_REGISTER_SIZE = 256;
@@ -23,10 +24,6 @@ class HaltException : public std::runtime_error {
     public:
         HaltException(): std::runtime_error("execution halted") {}
 };
-
-
-// external functions must have following signature
-typedef Object*(externalFunction)(Frame*, RegisterSet*, RegisterSet*);
 
 
 class CPU {
@@ -73,7 +70,7 @@ class CPU {
     /*  This is the interface between programs compiled to VM bytecode and
      *  external libraries written in C/C++.
      */
-    std::map<std::string, externalFunction*> external_functions;
+    std::map<std::string, ExternalFunction*> external_functions;
 
     /*  Methods to deal with registers.
      */
@@ -193,7 +190,7 @@ class CPU {
 
         CPU& mapfunction(const std::string&, unsigned);
 
-        CPU& registerExternalFunction(const std::string&, externalFunction*);
+        CPU& registerExternalFunction(const std::string&, ExternalFunction*);
         CPU& removeExternalFunction(std::string);
 
         byte* begin();
