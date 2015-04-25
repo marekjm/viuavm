@@ -168,7 +168,7 @@ class CPU {
     byte* jump(byte*);
     byte* branch(byte*);
 
-    byte* exlink(byte*);
+    byte* eximport(byte*);
     byte* excall(byte*);
 
     public:

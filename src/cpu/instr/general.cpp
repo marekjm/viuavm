@@ -1,3 +1,4 @@
+#include <dlfcn.h>
 #include <iostream>
 #include "../../bytecode/bytetypedef.h"
 #include "../../types/object.h"
@@ -5,6 +6,7 @@
 #include "../../types/boolean.h"
 #include "../../types/byte.h"
 #include "../../support/pointer.h"
+#include "../../exmodule.h"
 #include "../cpu.h"
 #include "../registerset.h"
 using namespace std;
@@ -503,7 +505,45 @@ byte* CPU::jump(byte* addr) {
     return target;
 }
 
+byte* CPU::eximport(byte* addr) {
+    /** Run excall instruction.
+     */
+    string module = string(addr);
+    addr += module.size();
 
+    string path = ("./" + module + ".so");
+
+    void* handle = dlopen(path.c_str(), RTLD_LAZY);
+
+    if (handle == 0) {
+        throw ("failed to link library: " + module + " (" + path + ')');
+    }
+
+    ExportedFunctionNamesReport* exports_names;
+    ExportedFunctionPointersReport* exports_pointers;
+
+    exports_names = (ExportedFunctionNamesReport*)dlsym(handle, "exports_names");
+    exports_pointers = (ExportedFunctionPointersReport*)dlsym(handle, "exports_pointers");
+
+    if (exports_names == 0) {
+        throw ("failed to extract function names from module: " + module);
+    }
+    if (exports_names == 0) {
+        throw ("failed to extract function pointers from module: " + module);
+    }
+
+    const char** functions = (*exports_names)();
+    ExternalFunction** function_pointers = (*exports_pointers)();
+
+    unsigned i = 0;
+    while (functions[i] != NULL) {
+        string namespaced_name = (module + '.' + functions[i]);
+        registerExternalFunction(namespaced_name, function_pointers[i]);
+        ++i;
+    }
+
+    return addr;
+}
 byte* CPU::excall(byte* addr) {
     /** Run excall instruction.
      */
@@ -536,7 +576,7 @@ byte* CPU::excall(byte* addr) {
      *        0 if function does not have static registers registered
      * FIXME: should external functions always have static registers allocated?
      */
-    externalFunction* callback = external_functions.at(call_name);
+    ExternalFunction* callback = external_functions.at(call_name);
     (*callback)(frame, 0, regset);
 
     // FIXME: woohoo! segfault!
