@@ -109,8 +109,8 @@ enum OPCODE : byte {
     BRANCH,
 
     // Opcodes dealing with external C/C++ modules
-    EXLINK, // link external (written in C/C++) library
-    EXCALL, // call external function
+    EXIMPORT,   // import external library
+    EXCALL,     // call external function
 
     END,
     HALT,

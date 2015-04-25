@@ -105,7 +105,7 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "jump",   sizeof(byte) + sizeof(int) },
     { "branch", sizeof(byte) + sizeof(bool) + 3*sizeof(int) },
 
-    { "exlink", sizeof(byte) },
+    { "eximport", sizeof(byte) },
     { "excall", sizeof(byte) + sizeof(bool) + sizeof(int) },
 
     { "end",    sizeof(byte) },
@@ -203,7 +203,7 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { JUMP,     "jump" },
     { BRANCH,   "branch" },
 
-    { EXLINK,   "exlink" },
+    { EXIMPORT, "eximport" },
     { EXCALL,   "excall" },
 
     { END,      "end" },
