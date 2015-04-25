@@ -106,6 +106,7 @@ class Program {
     Program& jump       (int, bool);
     Program& branch     (int_op, int, bool, int, bool);
 
+    Program& eximport   (std::string);
     Program& excall     (std::string, int_op);
 
     Program& end        ();

@@ -118,6 +118,11 @@ uint16_t Program::countBytes(const vector<string>& lines) {
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (which for call and closure instructions is function name)
                 inc += str::chunk(line).size() + 1;
+            } else if (instr == "eximport") {
+                // clear first chunk
+                line = str::lstrip(str::sub(line, instr.size()));
+                // get second chunk (which is a string)
+                inc += (str::extract(line).size() - 2 + 1); // +1: null-terminator
             } else if (instr == "strstore") {
                 // clear first chunk
                 line = str::lstrip(str::sub(line, instr.size()));
@@ -176,10 +181,10 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
             cout << "[asm] debug: offsetting: " << opcode_name << ": +" << inc;
         }
 
-        if ((OPCODE(program[offset]) == CALL) or (OPCODE(program[offset]) == CLOSURE) or (OPCODE(program[offset]) == EXCALL)) {
+        if ((OPCODE(program[offset]) == CALL) or (OPCODE(program[offset]) == CLOSURE) or (OPCODE(program[offset]) == EXIMPORT) or (OPCODE(program[offset]) == EXCALL)) {
             string s(program+offset+1);
             if (debug) {
-                cout << '+' << s.size() << " (function at byte " << offset+1 << ": `" << s << "`)";
+                cout << '+' << s.size() << " (function/module name at byte " << offset+1 << ": `" << s << "`)";
             }
             inc += s.size();
         }
@@ -1003,6 +1008,17 @@ Program& Program::branch(int_op regc, int addr_truth, bool absolute_truth, int a
     *((int*)addr_ptr) = addr_false;
     pointer::inc<int, byte>(addr_ptr);
 
+    return (*this);
+}
+
+Program& Program::eximport(string module_name) {
+    /*  Inserts eximport instruction.
+     */
+    *(addr_ptr++) = EXIMPORT;
+    for (unsigned i = 1; i < module_name.size()-1; ++i) {
+        *((char*)addr_ptr++) = module_name[i];
+    }
+    *((char*)addr_ptr++) = char(0);
     return (*this);
 }
 
