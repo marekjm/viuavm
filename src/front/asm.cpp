@@ -507,6 +507,10 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             bool is_absolute;
             tie(jump_target, is_absolute) = resolvejump(operands, marks);
             program.jump(jump_target, is_absolute);
+        } else if (str::startswith(line, "eximport")) {
+            string str_chnk;
+            str_chnk = str::extract(operands);
+            program.eximport(str_chnk);
         } else if (str::startswith(line, "excall")) {
             /** Full form of excall instruction has two operands: external function name and return value register index.
              *  If call is given only one operand - it means it is the instruction index and returned value is discarded.
