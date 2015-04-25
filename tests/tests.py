@@ -724,6 +724,21 @@ class ErrorTests(unittest.TestCase):
         self.assertEqual(1, exit_code)
 
 
+class ExternalModulesTests(unittest.TestCase):
+    """Tests for C/C++ module importing, and calling external functions.
+    """
+    PATH = './sample/asm/external'
+
+    def testHelloWorldExample(self):
+        name = 'hello_world.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        os.system('g++ -std=c++11 -fPIC -shared -o World.so ./sample/asm/external/World.cpp')
+        output, error, exit_code = assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual("Hello World!", output.strip())
+        self.assertEqual(0, exit_code)
+
 
 if __name__ == '__main__':
     unittest.main()
