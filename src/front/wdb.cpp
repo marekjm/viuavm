@@ -950,6 +950,10 @@ Object* sample_external_function(Frame* frame, RegisterSet* static_registers, Re
     cout << "got: global registers at " << hex << global_registers << dec << " (" << (global_registers != 0 ? global_registers->size() : 0) << ')' << endl;
 
     cout << frame->args->get(0)->str() << endl;
+
+    // Set return value
+    frame->regset->set(0, new Integer(42));
+
     return 0;
 }
 
