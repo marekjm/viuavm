@@ -16,7 +16,7 @@ BIN_PATH=/usr/local/bin
 .PHONY: all remake clean clean-support clean-test-compiles install test
 
 
-all: ${VM_ASM} ${VM_CPU} ${VM_WDB} bin/vm/analyze bin/opcodes.bin
+all: ${VM_ASM} ${VM_CPU} ${VM_WDB} bin/opcodes.bin
 
 remake: clean all
 
@@ -42,7 +42,7 @@ clean-test-compiles:
 	rm ./tests/compiled/*.bin
 
 
-install: ${VM_ASM} ${VM_CPU} ${VM_WDB} ./bin/vm/analyze
+install: ${VM_ASM} ${VM_CPU} ${VM_WDB}
 	mkdir -p ${BIN_PATH}
 	cp ${VM_ASM} ${BIN_PATH}/wudoo-asm
 	chmod 755 ${BIN_PATH}/wudoo-asm
@@ -50,8 +50,6 @@ install: ${VM_ASM} ${VM_CPU} ${VM_WDB} ./bin/vm/analyze
 	chmod 755 ${BIN_PATH}/wudoo-cpu
 	cp ${VM_WDB} ${BIN_PATH}/wudoo-wdb
 	chmod 755 ${BIN_PATH}/wudoo-wdb
-	cp ./bin/vm/analyze ${BIN_PATH}/wudoo-analyze
-	chmod 755 ${BIN_PATH}/wudoo-analyze
 
 
 test: ${VM_CPU} ${VM_ASM} clean-test-compiles
@@ -66,9 +64,6 @@ ${VM_WDB}: src/bytecode/opcodes.h src/front/wdb.cpp build/lib/linenoise.o build/
 
 ${VM_ASM}: src/bytecode/opcodes.h src/front/asm.cpp build/program.o build/programinstructions.o build/assembler/operands.o build/assembler/ce.o build/assembler/verify.o build/loader.o build/support/string.o
 	${CXX} ${CXXFLAGS} -o ${VM_ASM} src/front/asm.cpp build/program.o build/programinstructions.o build/assembler/operands.o build/assembler/ce.o build/assembler/verify.o build/loader.o build/support/string.o
-
-bin/vm/analyze: src/bytecode/opcodes.h src/front/analyze.cpp build/program.o build/support/string.o
-	${CXX} ${CXXFLAGS} -o bin/vm/analyze src/front/analyze.cpp build/program.o build/support/string.o
 
 
 bin/opcodes.bin: src/bytecode/opcodes.h src/bytecode/maps.h src/bytecode/opcd.cpp
