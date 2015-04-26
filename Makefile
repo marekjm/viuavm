@@ -64,8 +64,8 @@ ${VM_CPU}: src/bytecode/opcodes.h src/front/cpu.cpp build/cpu/cpu.o build/cpu/re
 ${VM_WDB}: src/bytecode/opcodes.h src/front/wdb.cpp build/lib/linenoise.o build/cpu/cpu.o build/cpu/registserset.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o build/types/string.o
 	${CXX} ${CXXFLAGS} -ldl -o ${VM_WDB} src/front/wdb.cpp build/lib/linenoise.o build/cpu/cpu.o build/cpu/registserset.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o build/types/string.o
 
-${VM_ASM}: src/bytecode/opcodes.h src/front/asm.cpp build/program.o build/assembler/operands.o build/assembler/ce.o build/assembler/verify.o build/loader.o build/support/string.o
-	${CXX} ${CXXFLAGS} -o ${VM_ASM} src/front/asm.cpp build/program.o build/assembler/operands.o build/assembler/ce.o build/assembler/verify.o build/loader.o build/support/string.o
+${VM_ASM}: src/bytecode/opcodes.h src/front/asm.cpp build/program.o build/programinstructions.o build/assembler/operands.o build/assembler/ce.o build/assembler/verify.o build/loader.o build/support/string.o
+	${CXX} ${CXXFLAGS} -o ${VM_ASM} src/front/asm.cpp build/program.o build/programinstructions.o build/assembler/operands.o build/assembler/ce.o build/assembler/verify.o build/loader.o build/support/string.o
 
 bin/vm/analyze: src/bytecode/opcodes.h src/front/analyze.cpp build/program.o build/support/string.o
 	${CXX} ${CXXFLAGS} -o bin/vm/analyze src/front/analyze.cpp build/program.o build/support/string.o
@@ -122,6 +122,9 @@ build/cpu/instr/vector.o: src/cpu/instr/vector.cpp
 
 build/program.o: src/program.cpp
 	${CXX} ${CXXFLAGS} -c -o $@ ./src/program.cpp
+
+build/programinstructions.o: src/programinstructions.cpp
+	${CXX} ${CXXFLAGS} -c -o $@ ./src/programinstructions.cpp
 
 
 build/assembler/operands.o: src/assembler/operands.cpp
