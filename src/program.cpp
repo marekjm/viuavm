@@ -11,10 +11,6 @@
 using namespace std;
 
 
-typedef std::tuple<bool, int> int_op;
-typedef std::tuple<bool, byte> byte_op;
-
-
 byte* Program::bytecode() {
     /*  Returns pointer to a copy of the bytecode.
      *  Each call produces new copy.
