@@ -63,6 +63,8 @@ const vector<string> DEBUGGER_COMMANDS = {
     "print.ahead",
     "trace",
     "trace.show",
+    "loader.function.map",
+    "loader.function.map.show",
     "help",
     "quit",
 };
@@ -771,7 +773,7 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
             if (not exists) {
                 cout << "not found" << endl;
             } else {
-                cout << addr << endl;
+                cout << "entry point at byte " << addr << endl;
             }
         }
     } else if (command == "help") {
