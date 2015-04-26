@@ -16,10 +16,10 @@ typedef std::tuple<bool, byte> byte_op;
 
 
 byte* Program::bytecode() {
-    /*  Returns pointer bo a copy of the bytecode.
+    /*  Returns pointer to a copy of the bytecode.
      *  Each call produces new copy.
      *
-     *  Calling code is responsible for dectruction of the allocated memory.
+     *  Calling code is responsible for proper destruction of the allocated memory.
      */
     byte* tmp = new byte[bytes];
     for (int i = 0; i < bytes; ++i) {
