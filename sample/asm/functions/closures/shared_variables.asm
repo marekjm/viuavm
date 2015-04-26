@@ -26,10 +26,10 @@
     clbind 2
     closure closure_b 4
 
-    ; push the closures to vector...
+    ; push closures to vector...
     vpush 1 3
     vpush 1 4
-    
+
     ; ...and return the vector
     ; vectors can be used to return multiple values as
     ; they can hold any Object-derived type
