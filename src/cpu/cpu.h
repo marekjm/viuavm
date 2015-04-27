@@ -14,7 +14,7 @@
 #include "../types/object.h"
 #include "registerset.h"
 #include "frame.h"
-#include "../exmodule.h"
+#include "../include/module.h"
 
 
 const unsigned DEFAULT_REGISTER_SIZE = 256;

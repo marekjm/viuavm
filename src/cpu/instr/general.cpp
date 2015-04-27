@@ -6,7 +6,7 @@
 #include "../../types/boolean.h"
 #include "../../types/byte.h"
 #include "../../support/pointer.h"
-#include "../../exmodule.h"
+#include "../../include/module.h"
 #include "../cpu.h"
 #include "../registerset.h"
 using namespace std;

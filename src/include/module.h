@@ -4,9 +4,9 @@
 #pragma once
 
 #include <vector>
-#include "cpu/frame.h"
-#include "cpu/registerset.h"
-#include "types/object.h"
+#include "../cpu/frame.h"
+#include "../cpu/registerset.h"
+#include "../types/object.h"
 
 
 const std::vector<const char*> WUDOOPATH = {

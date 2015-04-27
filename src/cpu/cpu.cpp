@@ -9,7 +9,7 @@
 #include "../types/string.h"
 #include "../types/vector.h"
 #include "../support/pointer.h"
-#include "../exmodule.h"
+#include "../include/module.h"
 #include "cpu.h"
 using namespace std;
 
