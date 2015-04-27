@@ -1945,5 +1945,185 @@ cpu.debug
 .
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Part
+Interfacing with C/C++ modules
+\end_layout
+
+\begin_layout Standard
+This part describes mechanism implemented in Wudoo VM to support interfacing
+ with libraries written in C/C++, and how modules must be written.
+\end_layout
+
+\begin_layout Section
+Module interface
+\end_layout
+
+\begin_layout Standard
+Linked modules can be libraries written specifically for Wudoo VM to speed
+ up programs running on it, or wrappers for existing libraries.
+\end_layout
+
+\begin_layout Standard
+In both cases, module must provide two functions - 
+\family typewriter
+exports_names
+\family default
+ and 
+\family typewriter
+exports_pointers
+\family default
+ which return a 
+\family typewriter
+NULL
+\family default
+-terminated arrays.
+\end_layout
+
+\begin_layout Standard
+If any of these two functions cannot be found in the .so of the module it
+ is considered invalid.
+\end_layout
+
+\begin_layout Subsection
+The 
+\family typewriter
+exports_names
+\family default
+ function
+\end_layout
+
+\begin_layout Standard
+This function must return a NULL-terminated array of 
+\family typewriter
+const char
+\family default
+ pointers.
+ It defines modules' interface, i.e.
+ names of the functions that Wudoo VM will see.
+ Good practice is that the actual functions be named the same as their exported
+ names but this is not required.
+\end_layout
+
+\begin_layout Subsection
+The 
+\family typewriter
+exports_pointers
+\family default
+ function
+\end_layout
+
+\begin_layout Standard
+This function must return a NULL-terminated array of pointers to functions
+ taking 
+\family typewriter
+(Frame*, RegisterSet*, RegisterSet*)
+\family default
+ as their parameters and returning 
+\family typewriter
+void
+\family default
+.
+ Convenience 
+\family typewriter
+typedef
+\family default
+ is provided.
+ Wudoo VM will use pointers returned by this function to locate exported
+ functions.
+ This is to avoid having to 'extern 
+\begin_inset Quotes eld
+\end_inset
+
+C
+\begin_inset Quotes erd
+\end_inset
+
+' every function exported from C++ modules.
+\end_layout
+
+\begin_layout Section
+Using external modules
+\end_layout
+
+\begin_layout Standard
+Example code showing interfacing with C++ can be found in source code repository
+, in 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+./sample/asm/external
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ directory.
+\end_layout
+
+\begin_layout Subsection
+Importing modules or functions
+\end_layout
+
+\begin_layout Standard
+The instruction that is used to link external modules is named 
+\family typewriter
+eximport
+\family default
+.
+ It accepts a single string containing name of the module to be imported
+ as its only operand.
+ Imported functions are namespaced, i.e.
+ their names are prefixed with 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+<module name>
+\family default
+.
+\begin_inset Quotes erd
+\end_inset
+
+ string.
+ Wudoo will search for modules in a set of predefined paths, which is defined
+ in a header file.
+\end_layout
+
+\begin_layout Standard
+Individual functions can be imported with 
+\family typewriter
+eximportf
+\family default
+ instruction which takes two strings as its operands, first is module name
+ and second is function name.
+\end_layout
+
+\begin_layout Subsection
+Calling functions
+\end_layout
+
+\begin_layout Standard
+Calling external functions is done in the same manner as native Wudoo VM
+ functions with small change: instruction used to call the function is 
+\family typewriter
+excall
+\family default
+ instead of 
+\family typewriter
+call
+\family default
+ used for native functions.
+\end_layout
+
 \end_body
 \end_document

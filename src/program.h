@@ -8,20 +8,35 @@
 #include "bytecode/bytetypedef.h"
 
 
+/** typedefs for various types of operands
+ *  that Wudoo asm instructions may use.
+ */
 typedef std::tuple<bool, int> int_op;
 typedef std::tuple<bool, byte> byte_op;
 typedef std::tuple<bool, float> float_op;
 
 
 class Program {
+    // byte array containing bytecode
     byte* program;
+    // size of the bytecode
     int bytes;
 
+    /** Current address inside bytecode array.
+     *  Used during bytecode generation.
+     *  Methods implementing generation of specific bytecodes always
+     *  append bytes to this pointer.
+     */
     byte* addr_ptr;
 
+    /** Branches inside bytecode must be stored for later recalculation.
+     *  Absolute and local branches must be distinguished between as
+     *  they are calculated a bit differently.
+     */
     std::vector<byte*> branches;
     std::vector<byte*> branches_absolute;
 
+    // simple, whether to print debugging information or not
     bool debug;
 
     int getInstructionBytecodeOffset(int, int count = -1);
@@ -106,11 +121,17 @@ class Program {
     Program& jump       (int, bool);
     Program& branch     (int_op, int, bool, int, bool);
 
+    Program& eximport   (std::string);
+    Program& excall     (std::string, int_op);
+
     Program& end        ();
     Program& halt       ();
 
 
-    // after-insertion calculations
+    /** Functions driving after-insertion calculations.
+     *  These must be called after the bytecode is already generated as they must know
+     *  size of the program.
+     */
     Program& calculateBranches(unsigned offset = 0);
     Program& calculateJumps(std::vector<std::tuple<int, int> >);
     std::vector<unsigned> jumps();

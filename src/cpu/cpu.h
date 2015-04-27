@@ -14,6 +14,7 @@
 #include "../types/object.h"
 #include "registerset.h"
 #include "frame.h"
+#include "../include/module.h"
 
 
 const unsigned DEFAULT_REGISTER_SIZE = 256;
@@ -65,6 +66,11 @@ class CPU {
 
     unsigned instruction_counter;
     byte* instruction_pointer;
+
+    /*  This is the interface between programs compiled to VM bytecode and
+     *  external libraries written in C/C++.
+     */
+    std::map<std::string, ExternalFunction*> external_functions;
 
     /*  Methods to deal with registers.
      */
@@ -162,6 +168,9 @@ class CPU {
     byte* jump(byte*);
     byte* branch(byte*);
 
+    byte* eximport(byte*);
+    byte* excall(byte*);
+
     public:
         // debug and error reporting flags
         bool debug, errors;
@@ -180,6 +189,9 @@ class CPU {
         CPU& eoffset(uint16_t);
 
         CPU& mapfunction(const std::string&, unsigned);
+
+        CPU& registerExternalFunction(const std::string&, ExternalFunction*);
+        CPU& removeExternalFunction(std::string);
 
         byte* begin();
         inline byte* end() { return 0; }

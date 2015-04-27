@@ -9,6 +9,7 @@
 #include "../types/string.h"
 #include "../types/vector.h"
 #include "../support/pointer.h"
+#include "../include/module.h"
 #include "cpu.h"
 using namespace std;
 
@@ -49,6 +50,13 @@ CPU& CPU::mapfunction(const string& name, unsigned address) {
     /** Maps function name to bytecode address.
      */
     function_addresses[name] = address;
+    return (*this);
+}
+
+CPU& CPU::registerExternalFunction(const string& name, ExternalFunction* function_ptr) {
+    /** Registers external function in CPU.
+     */
+    external_functions[name] = function_ptr;
     return (*this);
 }
 
@@ -400,6 +408,12 @@ byte* CPU::dispatch(byte* addr) {
         case BRANCH:
             addr = branch(addr+1);
             break;
+        case EXIMPORT:
+            addr = eximport(addr+1);
+            break;
+        case EXCALL:
+            addr = excall(addr+1);
+            break;
         case HALT:
             throw HaltException();
             break;
@@ -408,7 +422,7 @@ byte* CPU::dispatch(byte* addr) {
             break;
         default:
             ostringstream error;
-            error << "unrecognised instruction (bytecode value: " << *((byte*)bytecode) << ")";
+            error << "unrecognised instruction (bytecode value: " << int(*((byte*)bytecode)) << ")";
             throw error.str().c_str();
     }
     return addr;
