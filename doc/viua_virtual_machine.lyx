@@ -69,7 +69,7 @@
 \begin_body
 
 \begin_layout Title
-Wudoo Virtual Machine
+Viua Virtual Machine
 \end_layout
 
 \begin_layout Author
@@ -98,7 +98,7 @@ Overview
 \end_layout
 
 \begin_layout Standard
-This section features a brief overview of the Wudoo VM; its history, development
+This section features a brief overview of the Viua VM; its history, development
  goals, influences and various other bits and pieces of information more
  or less related to the development of the idea and resulting code of the
  virtual machine.
@@ -134,7 +134,7 @@ Compilation and dependencies
 \end_layout
 
 \begin_layout Standard
-To compile Wudoo VM one need a C++11 capable compiler.
+To compile Viua VM one need a C++11 capable compiler.
  Development is done on Linux machine with GCC 4.9.2.
  C++11 Standard Library is the only dependency of the VM.
  To compile the code, following command should be used:
@@ -170,7 +170,7 @@ History
 \end_layout
 
 \begin_layout Standard
-Wudoo VM is a project that has been started during the Christmas break of
+Viua VM is a project that has been started during the Christmas break of
  2014, when I was still a student of Gdansk University of Technology.
  It was meant to be my reasearch project, and to help me understand how
  languages can be implemented and what really happends when I 
@@ -216,7 +216,7 @@ cool
 \end_layout
 
 \begin_layout Standard
-As of February 2015, Wudoo VM can be programmed in simple assembly-lookalike
+As of February 2015, Viua VM can be programmed in simple assembly-lookalike
  language and cannot do much compared to mainstream languages.
  Add, subtract, multiply and divide two integers or floats, print a string
  to the screen, call a function (recursively or not).
@@ -410,7 +410,7 @@ Strings
 \end_layout
 
 \begin_layout Standard
-Instructions implementing string support in Wudoo VM.
+Instructions implementing string support in Viua VM.
 \end_layout
 
 \begin_layout Subsubsection
@@ -422,7 +422,7 @@ Vectors
 \end_layout
 
 \begin_layout Standard
-Instructions used to perform operations on basic Wudoo sequences - vectors.
+Instructions used to perform operations on basic Viua sequences - vectors.
 \end_layout
 
 \begin_layout Subsubsection
@@ -588,7 +588,7 @@ Closures
 
 \begin_layout Standard
 Closure instructions.
- Closures are first-class objects inside Wudoo VM.
+ Closures are first-class objects inside Viua VM.
  Their semantics differ slightly from those of ordinary functions.
 \end_layout
 
@@ -686,7 +686,7 @@ Register sets
 \end_layout
 
 \begin_layout Standard
-Wudoo is a register-based virtual machine.
+Viua is a register-based virtual machine.
  It comes with several register sets, and each serves different purpose.
 \end_layout
 
@@ -742,7 +742,7 @@ Type system
 \end_layout
 
 \begin_layout Standard
-This section talks about type system of Wudoo VM.
+This section talks about type system of Viua VM.
 \end_layout
 
 \begin_layout Standard
@@ -810,7 +810,7 @@ Functions
 \end_layout
 
 \begin_layout Standard
-Functions in Wudoo VM.
+Functions in Viua VM.
 \end_layout
 
 \begin_layout Subsection
@@ -818,7 +818,7 @@ Closures
 \end_layout
 
 \begin_layout Standard
-This subsection discusses closure implementation in Wudoo VM.
+This subsection discusses closure implementation in Viua VM.
 \end_layout
 
 \begin_layout Standard
@@ -833,7 +833,7 @@ Bytecode
 \end_layout
 
 \begin_layout Standard
-This section talks about the bytecode used by Wudoo VM.
+This section talks about the bytecode used by Viua VM.
 \end_layout
 
 \begin_layout Section
@@ -937,7 +937,7 @@ Linkable
 
 \begin_layout Standard
 This section discusses bytecode format used for libraries.
- In Wudoo VM there is no difference between a static and dynamic libraries.
+ In Viua VM there is no difference between a static and dynamic libraries.
  In fact, a library can be linked statically or dynamically without any
  changes.
  The only difference is between linkable and executable bytecode formats.
@@ -1045,7 +1045,7 @@ name "part:Programming"
 \end_layout
 
 \begin_layout Standard
-This part describes how to write programs and run them on Wudoo VM.
+This part describes how to write programs and run them on Viua VM.
  The language used in this part is custom assembly language created for
  the VM (it is also a target to which higher-level languages can be compiled).
 \end_layout
@@ -1055,7 +1055,7 @@ Structure
 \end_layout
 
 \begin_layout Standard
-Every Wudoo VM program is a composed from a set of functions.
+Every Viua VM program is a composed from a set of functions.
  In fact, each assembled file must contain at least one function.
 \end_layout
 
@@ -1137,7 +1137,7 @@ Assembler directives
 \end_layout
 
 \begin_layout Standard
-When programming in Wudoo VM assembly language, one not only uses instructions
+When programming in Viua VM assembly language, one not only uses instructions
  from the CPU instruction set but also directives of the assembler.
  These include things like markers, register names and functions.
 \end_layout
@@ -1329,7 +1329,7 @@ Names (named registers)
 \end_layout
 
 \begin_layout Standard
-Names can be assigned to registers to make programming in Wudoo VM's assembly
+Names can be assigned to registers to make programming in Viua VM's assembly
  language easier.
  Compare this code:
 \end_layout
@@ -1611,7 +1611,7 @@ Dynamic linking
 \end_layout
 
 \begin_layout Standard
-Dynamic linking is a feature planned for later versions of Wudoo VM.
+Dynamic linking is a feature planned for later versions of Viua VM.
 \end_layout
 
 \begin_layout Part
@@ -1619,7 +1619,7 @@ Debugging
 \end_layout
 
 \begin_layout Standard
-Sources of Wudoo VM include basic debugger that allows programmers to run
+Sources of Viua VM include basic debugger that allows programmers to run
  compiled programs in a controlled environment and inspect their state mid-fligh
 t.
  This section explains debugger commands.
@@ -1957,7 +1957,7 @@ Interfacing with C/C++ modules
 \end_layout
 
 \begin_layout Standard
-This part describes mechanism implemented in Wudoo VM to support interfacing
+This part describes mechanism implemented in Viua VM to support interfacing
  with libraries written in C/C++, and how modules must be written.
 \end_layout
 
@@ -1966,7 +1966,7 @@ Module interface
 \end_layout
 
 \begin_layout Standard
-Linked modules can be libraries written specifically for Wudoo VM to speed
+Linked modules can be libraries written specifically for Viua VM to speed
  up programs running on it, or wrappers for existing libraries.
 \end_layout
 
@@ -2006,7 +2006,7 @@ const char
 \family default
  pointers.
  It defines modules' interface, i.e.
- names of the functions that Wudoo VM will see.
+ names of the functions that Viua VM will see.
  Good practice is that the actual functions be named the same as their exported
  names but this is not required.
 \end_layout
@@ -2035,7 +2035,7 @@ void
 typedef
 \family default
  is provided.
- Wudoo VM will use pointers returned by this function to locate exported
+ Viua VM will use pointers returned by this function to locate exported
  functions.
  This is to avoid having to 'extern 
 \begin_inset Quotes eld
@@ -2095,7 +2095,7 @@ eximport
 \end_inset
 
  string.
- Wudoo will search for modules in a set of predefined paths, which is defined
+ Viua will search for modules in a set of predefined paths, which is defined
  in a header file.
 \end_layout
 
@@ -2113,7 +2113,7 @@ Calling functions
 \end_layout
 
 \begin_layout Standard
-Calling external functions is done in the same manner as native Wudoo VM
+Calling external functions is done in the same manner as native Viua VM
  functions with small change: instruction used to call the function is 
 \family typewriter
 excall
