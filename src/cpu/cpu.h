@@ -1,5 +1,5 @@
-#ifndef WUDOOVM_CPU_H
-#define WUDOOVM_CPU_H
+#ifndef VIUA_CPU_H
+#define VIUA_CPU_H
 
 #pragma once
 

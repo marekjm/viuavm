@@ -1,5 +1,5 @@
-#ifndef WUDOOVM_TYPES_BOOLEAN_H
-#define WUDOOVM_TYPES_BOOLEAN_H
+#ifndef VIUA_TYPES_BOOLEAN_H
+#define VIUA_TYPES_BOOLEAN_H
 
 #pragma once
 

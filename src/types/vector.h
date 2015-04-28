@@ -1,5 +1,5 @@
-#ifndef WUDOO_TYPE_VECTOR_H
-#define WUDOO_TYPE_VECTOR_H
+#ifndef VIUA_TYPE_VECTOR_H
+#define VIUA_TYPE_VECTOR_H
 
 #pragma once
 

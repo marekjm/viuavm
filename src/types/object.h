@@ -1,5 +1,5 @@
-#ifndef WUDOOVM_TYPES_OBJECT_H
-#define WUDOOVM_TYPES_OBJECT_H
+#ifndef VIUA_TYPES_OBJECT_H
+#define VIUA_TYPES_OBJECT_H
 
 #pragma once
 

@@ -5,8 +5,8 @@ VM_ASM=bin/vm/asm
 VM_CPU=bin/vm/cpu
 VM_WDB=bin/vm/wdb
 
-WUDOO_CPU_INSTR_FILES_CPP=src/cpu/instr/general.cpp src/cpu/instr/closure.cpp src/cpu/instr/int.cpp src/cpu/instr/float.cpp src/cpu/instr/byte.cpp src/cpu/instr/str.cpp src/cpu/instr/bool.cpp src/cpu/instr/cast.cpp src/cpu/instr/vector.cpp
-WUDOO_CPU_INSTR_FILES_O=build/cpu/instr/general.o build/cpu/instr/closure.o build/cpu/instr/int.o build/cpu/instr/float.o build/cpu/instr/byte.o build/cpu/instr/str.o build/cpu/instr/bool.o build/cpu/instr/cast.o build/cpu/instr/vector.o
+VIUA_CPU_INSTR_FILES_CPP=src/cpu/instr/general.cpp src/cpu/instr/closure.cpp src/cpu/instr/int.cpp src/cpu/instr/float.cpp src/cpu/instr/byte.cpp src/cpu/instr/str.cpp src/cpu/instr/bool.cpp src/cpu/instr/cast.cpp src/cpu/instr/vector.cpp
+VIUA_CPU_INSTR_FILES_O=build/cpu/instr/general.o build/cpu/instr/closure.o build/cpu/instr/int.o build/cpu/instr/float.o build/cpu/instr/byte.o build/cpu/instr/str.o build/cpu/instr/bool.o build/cpu/instr/cast.o build/cpu/instr/vector.o
 
 BIN_PATH=/usr/local/bin
 
@@ -56,11 +56,11 @@ test: ${VM_CPU} ${VM_ASM} clean-test-compiles
 	python3 ./tests/tests.py --verbose --catch --failfast
 
 
-${VM_CPU}: src/bytecode/opcodes.h src/front/cpu.cpp build/cpu/cpu.o build/cpu/registserset.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o build/types/string.o
-	${CXX} ${CXXFLAGS} -ldl -o ${VM_CPU} src/front/cpu.cpp build/cpu/cpu.o build/cpu/registserset.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o build/types/string.o
+${VM_CPU}: src/bytecode/opcodes.h src/front/cpu.cpp build/cpu/cpu.o build/cpu/registserset.o build/support/pointer.o build/support/string.o ${VIUA_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o build/types/string.o
+	${CXX} ${CXXFLAGS} -ldl -o ${VM_CPU} src/front/cpu.cpp build/cpu/cpu.o build/cpu/registserset.o build/support/pointer.o build/support/string.o ${VIUA_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o build/types/string.o
 
-${VM_WDB}: src/bytecode/opcodes.h src/front/wdb.cpp build/lib/linenoise.o build/cpu/cpu.o build/cpu/registserset.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o build/types/string.o
-	${CXX} ${CXXFLAGS} -ldl -o ${VM_WDB} src/front/wdb.cpp build/lib/linenoise.o build/cpu/cpu.o build/cpu/registserset.o build/support/pointer.o build/support/string.o ${WUDOO_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o build/types/string.o
+${VM_WDB}: src/bytecode/opcodes.h src/front/wdb.cpp build/lib/linenoise.o build/cpu/cpu.o build/cpu/registserset.o build/support/pointer.o build/support/string.o ${VIUA_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o build/types/string.o
+	${CXX} ${CXXFLAGS} -ldl -o ${VM_WDB} src/front/wdb.cpp build/lib/linenoise.o build/cpu/cpu.o build/cpu/registserset.o build/support/pointer.o build/support/string.o ${VIUA_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o build/types/string.o
 
 ${VM_ASM}: src/bytecode/opcodes.h src/front/asm.cpp build/program.o build/programinstructions.o build/assembler/operands.o build/assembler/ce.o build/assembler/verify.o build/loader.o build/support/string.o
 	${CXX} ${CXXFLAGS} -o ${VM_ASM} src/front/asm.cpp build/program.o build/programinstructions.o build/assembler/operands.o build/assembler/ce.o build/assembler/verify.o build/loader.o build/support/string.o

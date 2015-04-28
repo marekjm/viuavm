@@ -25,7 +25,7 @@
 #       DEBUG_CPU       - if passed as 1, the script will pass
 #                         the --debug flag to CPU
 #
-#       DEBUG_WUDOO     - if passed as 1, both assembler and
+#       DEBUG_VIUA     - if passed as 1, both assembler and
 #                         the CPU will receive --debug flag
 #
 #
@@ -39,8 +39,8 @@ if [[ $1 == "" ]]; then
     exit 1
 fi
 
-if [[ $DEBUG_WUDOO == 1 ]]; then
-    # DEBUG_WUDOO just sets the other to up
+if [[ $DEBUG_VIUA == 1 ]]; then
+    # DEBUG_VIUA just sets the other to up
     # in a correct way
     DEBUG_ASM=1
     DEBUG_CPU=1

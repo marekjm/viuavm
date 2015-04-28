@@ -1,5 +1,5 @@
-#ifndef WUDOO_TYPE_CLOSURE_H
-#define WUDOO_TYPE_CLOSURE_H
+#ifndef VIUA_TYPE_CLOSURE_H
+#define VIUA_TYPE_CLOSURE_H
 
 #pragma once
 

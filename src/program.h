@@ -1,5 +1,5 @@
-#ifndef WUDOO_PROGRAM_H
-#define WUDOO_PROGRAM_H
+#ifndef VIUA_PROGRAM_H
+#define VIUA_PROGRAM_H
 
 #include <string>
 #include <vector>

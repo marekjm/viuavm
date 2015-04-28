@@ -1,5 +1,5 @@
-#ifndef WUDOO_CPU_FRAME_H
-#define WUDOO_CPU_FRAME_H
+#ifndef VIUA_CPU_FRAME_H
+#define VIUA_CPU_FRAME_H
 
 #pragma once
 

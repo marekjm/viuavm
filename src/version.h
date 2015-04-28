@@ -1,5 +1,5 @@
-#ifndef WUDOOVM_VERSION_H
-#define WUDOOVM_VERSION_H
+#ifndef VIUA_VERSION_H
+#define VIUA_VERSION_H
 
 #pragma once
 

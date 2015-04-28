@@ -1,5 +1,5 @@
-#ifndef WUDOO_EXMODULE_H
-#define WUDOO_EXMODULE_H
+#ifndef VIUA_EXMODULE_H
+#define VIUA_EXMODULE_H
 
 #pragma once
 
@@ -9,7 +9,7 @@
 #include "../types/object.h"
 
 
-const std::vector<const char*> WUDOOPATH = {
+const std::vector<const char*> VIUAPATH = {
     ".wudoo/lib",
     ".local/lib/wudoo",
     "/usr/local/lib/wudoo",

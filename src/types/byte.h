@@ -1,5 +1,5 @@
-#ifndef WUDOOVM_TYPES_BYTE_H
-#define WUDOOVM_TYPES_BYTE_H
+#ifndef VIUA_TYPES_BYTE_H
+#define VIUA_TYPES_BYTE_H
 
 #pragma once
 

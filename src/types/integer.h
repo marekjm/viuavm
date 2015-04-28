@@ -1,5 +1,5 @@
-#ifndef WUDOOVM_TYPES_INTEGER_H
-#define WUDOOVM_TYPES_INTEGER_H
+#ifndef VIUA_TYPES_INTEGER_H
+#define VIUA_TYPES_INTEGER_H
 
 #pragma once
 

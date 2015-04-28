@@ -1,5 +1,5 @@
-#ifndef WUDOO_BYTECODE_MAPS_H
-#define WUDOO_BYTECODE_MAPS_H
+#ifndef VIUA_BYTECODE_MAPS_H
+#define VIUA_BYTECODE_MAPS_H
 
 #pragma once
 

@@ -1,5 +1,5 @@
-#ifndef WUDOOVM_TYPES_FLOAT_H
-#define WUDOOVM_TYPES_FLOAT_H
+#ifndef VIUA_TYPES_FLOAT_H
+#define VIUA_TYPES_FLOAT_H
 
 #pragma once
 

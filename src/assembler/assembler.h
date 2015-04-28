@@ -1,5 +1,5 @@
-#ifndef WUDOO_ASSEMBLER_H
-#define WUDOO_ASSEMBLER_H
+#ifndef VIUA_ASSEMBLER_H
+#define VIUA_ASSEMBLER_H
 
 #pragma once
 
