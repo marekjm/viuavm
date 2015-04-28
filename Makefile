@@ -22,6 +22,9 @@ all: ${VM_ASM} ${VM_CPU} ${VM_WDB} bin/opcodes.bin
 
 remake: clean all
 
+doc/viua_virtual_machine.pdf: doc/viua_virtual_machine.lyx
+	lyx --export-to pdf doc/viua_virtual_machine.pdf --force-overwrite main doc/viua_virtual_machine.lyx
+
 
 clean: clean-support
 	touch ./build/lib/dummy.o
