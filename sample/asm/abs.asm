@@ -1,5 +1,5 @@
-; this is the first program written for Wudoo VM that combines
-; instructions to carry out an action that is not hard coded as
+; this is the first program written for Viua VM that combines
+; instructions to carry out an action that is not hardcoded as
 ; a standalone isntruction
 ;
 ; the purpose of this program is to find an absolute value of an integer
