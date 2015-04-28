@@ -2,7 +2,7 @@
 #include "../../../src/types/object.h"
 #include "../../../src/cpu/frame.h"
 #include "../../../src/cpu/registerset.h"
-#include "../../../src/exmodule.h"
+#include "../../../src/include/module.h"
 using namespace std;
 
 
