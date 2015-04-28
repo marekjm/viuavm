@@ -68,82 +68,82 @@ ${VM_ASM}: src/front/asm.cpp build/program.o build/programinstructions.o build/a
 	${CXX} ${CXXFLAGS} -o ${VM_ASM} $^
 
 
-bin/opcodes.bin: src/bytecode/opcodes.h src/bytecode/maps.h src/bytecode/opcd.cpp
-	${CXX} ${CXXFLAGS} -o bin/opcodes.bin src/bytecode/opcd.cpp
+bin/opcodes.bin: src/bytecode/opcd.cpp src/bytecode/opcodes.h src/bytecode/maps.h
+	${CXX} ${CXXFLAGS} -o $@ $<
 
 
-build/types/vector.o: src/types/vector.h src/types/vector.cpp
-	${CXX} ${CXXFLAGS} -c -o $@ ./src/types/vector.cpp
+build/types/vector.o: src/types/vector.cpp src/types/vector.h
+	${CXX} ${CXXFLAGS} -c -o $@ $<
 
-build/types/closure.o: src/types/closure.h src/types/closure.cpp
-	${CXX} ${CXXFLAGS} -c -o $@ ./src/types/closure.cpp
+build/types/closure.o: src/types/closure.cpp src/types/closure.h
+	${CXX} ${CXXFLAGS} -c -o $@ $<
 
-build/types/string.o: src/types/string.h src/types/string.cpp
-	${CXX} ${CXXFLAGS} -c -o $@ ./src/types/string.cpp
+build/types/string.o: src/types/string.cpp src/types/string.h
+	${CXX} ${CXXFLAGS} -c -o $@ $<
 
 
-build/cpu/cpu.o: src/bytecode/opcodes.h src/cpu/frame.h src/cpu/cpu.h src/cpu/cpu.cpp
-	${CXX} ${CXXFLAGS} -c -o $@ ./src/cpu/cpu.cpp
+build/cpu/cpu.o: src/cpu/cpu.cpp src/cpu/cpu.h src/bytecode/opcodes.h src/cpu/frame.h
+	${CXX} ${CXXFLAGS} -c -o $@ $<
 
-build/cpu/registserset.o: src/cpu/registerset.h src/cpu/registerset.cpp
-	${CXX} ${CXXFLAGS} -c -o $@ ./src/cpu/registerset.cpp
+build/cpu/registserset.o: src/cpu/registerset.cpp src/cpu/registerset.h
+	${CXX} ${CXXFLAGS} -c -o $@ $<
 
 
 build/cpu/instr/general.o: src/cpu/instr/general.cpp
-	${CXX} ${CXXFLAGS} -c -o $@ ./src/cpu/instr/general.cpp
+	${CXX} ${CXXFLAGS} -c -o $@ $<
 
 build/cpu/instr/closure.o: src/cpu/instr/closure.cpp
-	${CXX} ${CXXFLAGS} -c -o $@ ./src/cpu/instr/closure.cpp
+	${CXX} ${CXXFLAGS} -c -o $@ $<
 
 build/cpu/instr/int.o: src/cpu/instr/int.cpp
-	${CXX} ${CXXFLAGS} -c -o $@ ./src/cpu/instr/int.cpp
+	${CXX} ${CXXFLAGS} -c -o $@ $<
 
 build/cpu/instr/float.o: src/cpu/instr/float.cpp
-	${CXX} ${CXXFLAGS} -c -o $@ ./src/cpu/instr/float.cpp
+	${CXX} ${CXXFLAGS} -c -o $@ $<
 
 build/cpu/instr/byte.o: src/cpu/instr/byte.cpp
-	${CXX} ${CXXFLAGS} -c -o $@ ./src/cpu/instr/byte.cpp
+	${CXX} ${CXXFLAGS} -c -o $@ $<
 
 build/cpu/instr/str.o: src/cpu/instr/str.cpp
-	${CXX} ${CXXFLAGS} -c -o $@ ./src/cpu/instr/str.cpp
+	${CXX} ${CXXFLAGS} -c -o $@ $<
 
 build/cpu/instr/bool.o: src/cpu/instr/bool.cpp
-	${CXX} ${CXXFLAGS} -c -o $@ ./src/cpu/instr/bool.cpp
+	${CXX} ${CXXFLAGS} -c -o $@ $<
 
 build/cpu/instr/cast.o: src/cpu/instr/cast.cpp
-	${CXX} ${CXXFLAGS} -c -o $@ ./src/cpu/instr/cast.cpp
+	${CXX} ${CXXFLAGS} -c -o $@ $<
 
 build/cpu/instr/vector.o: src/cpu/instr/vector.cpp
-	${CXX} ${CXXFLAGS} -c -o $@ ./src/cpu/instr/vector.cpp
+	${CXX} ${CXXFLAGS} -c -o $@ $<
 
 
 build/program.o: src/program.cpp
-	${CXX} ${CXXFLAGS} -c -o $@ ./src/program.cpp
+	${CXX} ${CXXFLAGS} -c -o $@ $<
 
 build/programinstructions.o: src/programinstructions.cpp
-	${CXX} ${CXXFLAGS} -c -o $@ ./src/programinstructions.cpp
+	${CXX} ${CXXFLAGS} -c -o $@ $<
 
 
 build/assembler/operands.o: src/assembler/operands.cpp
-	${CXX} ${CXXFLAGS} -c -o $@ ./src/assembler/operands.cpp
+	${CXX} ${CXXFLAGS} -c -o $@ $<
 
 build/assembler/ce.o: src/assembler/codeextract.cpp
-	${CXX} ${CXXFLAGS} -c -o $@ ./src/assembler/codeextract.cpp
+	${CXX} ${CXXFLAGS} -c -o $@ $<
 
 build/assembler/verify.o: src/assembler/verify.cpp
-	${CXX} ${CXXFLAGS} -c -o $@ ./src/assembler/verify.cpp
+	${CXX} ${CXXFLAGS} -c -o $@ $<
 
 
 build/loader.o: src/loader.cpp
-	${CXX} ${CXXFLAGS} -c -o $@ ./src/loader.cpp
+	${CXX} ${CXXFLAGS} -c -o $@ $<
 
 
 build/support/string.o: src/support/string.cpp
-	${CXX} ${CXXFLAGS} -c -o $@ ./src/support/string.cpp
+	${CXX} ${CXXFLAGS} -c -o $@ $<
 
 build/support/pointer.o: src/support/pointer.cpp
-	${CXX} ${CXXFLAGS} -c -o $@ ./src/support/pointer.cpp
+	${CXX} ${CXXFLAGS} -c -o $@ $<
 
 
-build/lib/linenoise.o: lib/linenoise/linenoise.h lib/linenoise/linenoise.c
-	${CXX} ${CXXFLAGS} -c -o $@ lib/linenoise/linenoise.c
+build/lib/linenoise.o: lib/linenoise/linenoise.c lib/linenoise/linenoise.h
+	${CXX} ${CXXFLAGS} -c -o $@ $<
