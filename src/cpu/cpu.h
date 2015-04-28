@@ -1,5 +1,5 @@
-#ifndef TATANKA_CPU_H
-#define TATANKA_CPU_H
+#ifndef WUDOOVM_CPU_H
+#define WUDOOVM_CPU_H
 
 #pragma once
 

@@ -1,5 +1,5 @@
-#ifndef TATANKA_TYPES_STRING_H
-#define TATANKA_TYPES_STRING_H
+#ifndef WUDOOVM_TYPES_STRING_H
+#define WUDOOVM_TYPES_STRING_H
 
 #pragma once
 

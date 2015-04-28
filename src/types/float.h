@@ -1,5 +1,5 @@
-#ifndef TATANKA_TYPES_FLOAT_H
-#define TATANKA_TYPES_FLOAT_H
+#ifndef WUDOOVM_TYPES_FLOAT_H
+#define WUDOOVM_TYPES_FLOAT_H
 
 #pragma once
 

@@ -1,5 +1,5 @@
-#ifndef TATANKA_TYPES_OBJECT_H
-#define TATANKA_TYPES_OBJECT_H
+#ifndef WUDOOVM_TYPES_OBJECT_H
+#define WUDOOVM_TYPES_OBJECT_H
 
 #pragma once
 

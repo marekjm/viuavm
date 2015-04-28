@@ -1,5 +1,5 @@
-#ifndef TATANKA_VERSION_H
-#define TATANKA_VERSION_H
+#ifndef WUDOOVM_VERSION_H
+#define WUDOOVM_VERSION_H
 
 #pragma once
 
