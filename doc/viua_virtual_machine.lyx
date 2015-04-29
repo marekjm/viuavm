@@ -2165,15 +2165,6 @@ eximport
  in a header file.
 \end_layout
 
-\begin_layout Standard
-Individual functions can be imported with 
-\family typewriter
-eximportf
-\family default
- instruction which takes two strings as its operands, first is module name
- and second is function name.
-\end_layout
-
 \begin_layout Subsection
 Calling functions
 \end_layout
