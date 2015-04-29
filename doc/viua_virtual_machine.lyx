@@ -228,18 +228,14 @@ As of February 2015, Viua VM can be programmed in simple assembly-lookalike
 \end_layout
 
 \begin_layout Part
-Architecture
+Virtual Machine
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:Architecture"
+name "part:Virtual-Machine"
 
 \end_inset
 
 
-\end_layout
-
-\begin_layout Standard
-This section talks about VM's architecture.
 \end_layout
 
 \begin_layout Section
@@ -682,7 +678,44 @@ halt
 \end_layout
 
 \begin_layout Section
+Standard Library
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Standard-Library"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This section describes standard library that Viua VM provides.
+\end_layout
+
+\begin_layout Part
+Architecture
+\begin_inset CommandInset label
+LatexCommand label
+name "part:Architecture"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This part describes archtecture of the VM.
+\end_layout
+
+\begin_layout Section
 Register sets
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Register-sets"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -739,28 +772,17 @@ Temporary register set has only one register.
 
 \begin_layout Section
 Type system
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Type-system"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 This section talks about type system of Viua VM.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Newpage newpage
-\end_inset
-
-
-\end_layout
-
-\begin_layout Part
-Virtual Machine
-\begin_inset CommandInset label
-LatexCommand label
-name "part:Virtual-Machine"
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Section
@@ -806,19 +828,63 @@ If an operand is just an index it can be preceded by @ character to indicate
 \end_layout
 
 \begin_layout Section
-Functions
+Callables
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Callables"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-Functions in Viua VM.
+Callble objects in Viua VM.
+\end_layout
+
+\begin_layout Subsection
+Functions
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Functions"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Thsi subsection discusses functions as first-class objects in Viua VM.
 \end_layout
 
 \begin_layout Subsection
 Closures
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Closures"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 This subsection discusses closure implementation in Viua VM.
+\end_layout
+
+\begin_layout Subsection
+Coroutines
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Coroutines"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This subsection discusses coroutine implementation in Viua VM.
 \end_layout
 
 \begin_layout Standard
