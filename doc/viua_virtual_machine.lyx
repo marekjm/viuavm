@@ -654,6 +654,18 @@ tmpro
 \end_layout
 
 \begin_layout Subsection
+Interfacing with C++ modules
+\end_layout
+
+\begin_layout Subsubsection
+eximport
+\end_layout
+
+\begin_layout Subsubsection
+excall
+\end_layout
+
+\begin_layout Subsection
 Other instructions
 \end_layout
 
