@@ -743,8 +743,9 @@ class ExternalModulesTests(unittest.TestCase):
         name = 'sqrt.asm'
         assembly_path = os.path.join(self.PATH, name)
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
-        os.system('g++ -std=c++11 -fPIC -c -o regset.o ./src/cpu/registerset.cpp')
-        os.system('g++ -std=c++11 -fPIC -shared -o math.so ./sample/asm/external/math.cpp regset.o')
+        os.system('g++ -std=c++11 -fPIC -c -o registerset.o ./src/cpu/registerset.cpp')
+        os.system('g++ -std=c++11 -fPIC -c -o exception.o ./src/types/exception.cpp')
+        os.system('g++ -std=c++11 -fPIC -shared -o math.so ./sample/asm/external/math.cpp registerset.o exception.o')
         output, error, exit_code = assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual(1.73, round(float(output.strip()), 2))
