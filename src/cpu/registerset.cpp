@@ -4,6 +4,7 @@
 #include "../types/object.h"
 #include "../types/integer.h"
 #include "../types/byte.h"
+#include "../types/exception.h"
 #include "registerset.h"
 using namespace std;
 
@@ -20,7 +21,7 @@ Object* RegisterSet::set(unsigned index, Object* object) {
      *
      *  Performs bounds checking.
      */
-    if (index >= registerset_size) { throw "register access out of bounds: write"; }
+    if (index >= registerset_size) { throw Exception("register access out of bounds: write"); }
 
     if (registers[index] != 0 and !isflagged(index, REFERENCE)) {
         // register is not empty and is not a reference - the object in it must be destroyed to avoid memory leaks
@@ -48,12 +49,12 @@ Object* RegisterSet::get(unsigned index) {
      *  Performs bounds checking.
      *  Throws exception when accessing empty register.
      */
-    if (index >= registerset_size) { throw "register access out of bounds: read"; }
+    if (index >= registerset_size) { throw Exception("register access out of bounds: read"); }
     Object* optr = registers[index];
     if (optr == 0) {
         ostringstream oss;
         oss << "(get) read from null register: " << index;
-        throw oss.str().c_str();
+        throw Exception(oss.str());
     }
     return optr;
 }
@@ -64,7 +65,7 @@ Object* RegisterSet::at(unsigned index) {
      *  Performs bounds checking.
      *  Returns 0 when accessing empty register.
      */
-    if (index >= registerset_size) { throw "register access out of bounds: read"; }
+    if (index >= registerset_size) { throw Exception("register access out of bounds: read"); }
     return registers[index];
 }
 
@@ -75,8 +76,8 @@ void RegisterSet::move(unsigned src, unsigned dst) {
      *  Performs bound checking.
      *  Both source and destination can be empty.
      */
-    if (src >= registerset_size) { throw "register access out of bounds: move source"; }
-    if (dst >= registerset_size) { throw "register access out of bounds: move destination"; }
+    if (src >= registerset_size) { throw Exception("register access out of bounds: move source"); }
+    if (dst >= registerset_size) { throw Exception("register access out of bounds: move destination"); }
     registers[dst] = registers[src];    // copy pointer from first-operand register to second-operand register
     registers[src] = 0;                 // zero first-operand register
     masks[dst] = masks[src];            // copy mask
@@ -89,8 +90,8 @@ void RegisterSet::swap(unsigned src, unsigned dst) {
      *  Performs bound checking.
      *  Both source and destination can be empty.
      */
-    if (src >= registerset_size) { throw "register access out of bounds: swap source"; }
-    if (dst >= registerset_size) { throw "register access out of bounds: swap destination"; }
+    if (src >= registerset_size) { throw Exception("register access out of bounds: swap source"); }
+    if (dst >= registerset_size) { throw Exception("register access out of bounds: swap destination"); }
     Object* tmp = registers[src];
     registers[src] = registers[dst];
     registers[dst] = tmp;
@@ -106,7 +107,7 @@ void RegisterSet::empty(unsigned here) {
      *  Performs bound checking.
      *  Does not throw if the register is empty.
      */
-    if (here >= registerset_size) { throw "register access out of bounds: empty"; }
+    if (here >= registerset_size) { throw Exception("register access out of bounds: empty"); }
     registers[here] = 0;
     masks[here] = 0;
 }
@@ -117,8 +118,8 @@ void RegisterSet::free(unsigned here) {
      *  Performs bound checking.
      *  Throws if the register is empty.
      */
-    if (here >= registerset_size) { throw "register access out of bounds: free"; }
-    if (registers[here] == 0) { throw "invalid free: trying to free a null pointer"; }
+    if (here >= registerset_size) { throw Exception("register access out of bounds: free"); }
+    if (registers[here] == 0) { throw Exception("invalid free: trying to free a null pointer"); }
     delete registers[here];
     empty(here);
 }
@@ -130,11 +131,11 @@ void RegisterSet::flag(unsigned index, mask_t filter) {
      *  Performs bounds checking.
      *  Throws exception when accessing empty register.
      */
-    if (index >= registerset_size) { throw "register access out of bounds: mask_enable"; }
+    if (index >= registerset_size) { throw Exception("register access out of bounds: mask_enable"); }
     if (registers[index] == 0) {
         ostringstream oss;
         oss << "(flag) flagging null register: " << index;
-        throw oss.str().c_str();
+        throw Exception(oss.str());
     }
     masks[index] = (masks[index] | filter);
 }
@@ -145,11 +146,11 @@ void RegisterSet::unflag(unsigned index, mask_t filter) {
      *  Performs bounds checking.
      *  Throws exception when accessing empty register.
      */
-    if (index >= registerset_size) { throw "register access out of bounds: mask_disable"; }
+    if (index >= registerset_size) { throw Exception("register access out of bounds: mask_disable"); }
     if (registers[index] == 0) {
         ostringstream oss;
         oss << "(unflag) unflagging null register: " << index;
-        throw oss.str().c_str();
+        throw Exception(oss.str());
     }
     masks[index] = (masks[index] ^ filter);
 }
@@ -159,7 +160,7 @@ void RegisterSet::clear(unsigned index) {
      *
      *  Performs bounds checking.
      */
-    if (index >= registerset_size) { throw "register access out of bounds: mask_clear"; }
+    if (index >= registerset_size) { throw Exception("register access out of bounds: mask_clear"); }
     masks[index] = 0;
 }
 
@@ -169,7 +170,7 @@ bool RegisterSet::isflagged(unsigned index, mask_t filter) {
      *
      *  Performs bounds checking.
      */
-    if (index >= registerset_size) { throw "register access out of bounds: mask_isenabled"; }
+    if (index >= registerset_size) { throw Exception("register access out of bounds: mask_isenabled"); }
     // FIXME: should throw when accessing empty register, but that breaks set()
     return (masks[index] & filter);
 }
@@ -180,11 +181,11 @@ void RegisterSet::setmask(unsigned index, mask_t mask) {
      *  Performs bounds checking.
      *  Throws exception when accessing empty register.
      */
-    if (index >= registerset_size) { throw "register access out of bounds: mask_disable"; }
+    if (index >= registerset_size) { throw Exception("register access out of bounds: mask_disable"); }
     if (registers[index] == 0) {
         ostringstream oss;
         oss << "(setmask) setting mask for null register: " << index;
-        throw oss.str().c_str();
+        throw Exception(oss.str());
     }
     masks[index] = mask;
 }
@@ -195,11 +196,11 @@ mask_t RegisterSet::getmask(unsigned index) {
      *  Performs bounds checking.
      *  Throws exception when accessing empty register.
      */
-    if (index >= registerset_size) { throw "register access out of bounds: mask_disable"; }
+    if (index >= registerset_size) { throw Exception("register access out of bounds: mask_disable"); }
     if (registers[index] == 0) {
         ostringstream oss;
         oss << "(getmask) getting mask of null register: " << index;
-        throw oss.str().c_str();
+        throw Exception(oss.str());
     }
     return masks[index];
 }
