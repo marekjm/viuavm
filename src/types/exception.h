@@ -13,8 +13,8 @@ class Exception : public Object {
      *
      *  Designed to hold text.
      */
-    std::string cause;
-
+    protected:
+        std::string cause;
     public:
         std::string type() const {
             return "Exception";
@@ -33,7 +33,7 @@ class Exception : public Object {
             return new Exception(cause);
         }
 
-        virtual std::string what();
+        virtual std::string what() const;
 
         Exception(std::string s = ""): cause(s) {}
 };

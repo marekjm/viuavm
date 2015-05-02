@@ -3,7 +3,7 @@
 using namespace std;
 
 
-string Exception::what() {
+string Exception::what() const {
     /** Stay compatible with standatd exceptions and
      *  provide what() method.
      */
