@@ -84,6 +84,9 @@ build/types/closure.o: src/types/closure.cpp src/types/closure.h
 build/types/string.o: src/types/string.cpp src/types/string.h
 	${CXX} ${CXXFLAGS} -c -o $@ $<
 
+build/types/exception.o: src/types/exception.cpp src/types/exception.h
+	${CXX} ${CXXFLAGS} -c -o $@ $<
+
 
 build/cpu/cpu.o: src/cpu/cpu.cpp src/cpu/cpu.h src/bytecode/opcodes.h src/cpu/frame.h
 	${CXX} ${CXXFLAGS} -c -o $@ $<
