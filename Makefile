@@ -61,10 +61,10 @@ test: ${VM_CPU} ${VM_ASM} clean-test-compiles
 	python3 ./tests/tests.py --verbose --catch --failfast
 
 
-${VM_CPU}: src/front/cpu.cpp build/cpu/cpu.o build/cpu/registserset.o build/support/pointer.o build/support/string.o ${VIUA_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o build/types/string.o
+${VM_CPU}: src/front/cpu.cpp build/cpu/cpu.o build/cpu/registserset.o build/support/pointer.o build/support/string.o ${VIUA_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o build/types/string.o build/types/exception.o
 	${CXX} ${CXXFLAGS} -ldl -o ${VM_CPU} $^
 
-${VM_WDB}: src/front/wdb.cpp build/lib/linenoise.o build/cpu/cpu.o build/cpu/registserset.o build/support/pointer.o build/support/string.o ${VIUA_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o build/types/string.o
+${VM_WDB}: src/front/wdb.cpp build/lib/linenoise.o build/cpu/cpu.o build/cpu/registserset.o build/support/pointer.o build/support/string.o ${VIUA_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o build/types/string.o build/types/exception.o
 	${CXX} ${CXXFLAGS} -ldl -o ${VM_WDB} $^
 
 ${VM_ASM}: src/front/asm.cpp build/program.o build/programinstructions.o build/assembler/operands.o build/assembler/ce.o build/assembler/verify.o build/loader.o build/support/string.o
