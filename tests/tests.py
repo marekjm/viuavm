@@ -692,7 +692,7 @@ class JumpingTests(unittest.TestCase):
         self.assertEqual(0, excode)
 
 
-class ErrorTests(unittest.TestCase):
+class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.
     """
     PATH = './sample/asm/errors'
