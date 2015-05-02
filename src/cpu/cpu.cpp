@@ -8,6 +8,7 @@
 #include "../types/byte.h"
 #include "../types/string.h"
 #include "../types/vector.h"
+#include "../types/exception.h"
 #include "../support/pointer.h"
 #include "../include/module.h"
 #include "cpu.h"
@@ -447,15 +448,10 @@ byte* CPU::tick() {
         if (debug) { cout << OP_NAMES.at(OPCODE(*instruction_pointer)); }
         instruction_pointer = dispatch(instruction_pointer);
         if (debug) { cout << endl; }
-    } catch (const char*& e) {
+    } catch (const Exception& e) {
         return_code = 1;
-        return_message = string(e);
-        return_exception = "RuntimeException";
-        return 0;
-    } catch (const string& e) {
-        return_code = 1;
-        return_message = string(e);
-        return_exception =  "RuntimeException";
+        return_message = e.what();
+        return_exception = e.type();
         return 0;
     } catch (const HaltException& e) {
         halt = true;
@@ -506,14 +502,10 @@ int CPU::run() {
         // copy value of return register as return code
         try {
             return_code = static_cast<Integer*>(regset->get(0))->value();
-        } catch (const char*& e) {
+        } catch (const Exception& e) {
             return_code = 1;
-            return_exception = "ReturnStageException";
-            return_message = string(e);
-        } catch (const string& e) {
-            return_code = 1;
-            return_exception = "ReturnStageException";
-            return_message = string(e);
+            return_exception = e.type();
+            return_message = e.what();
         }
     }
 
