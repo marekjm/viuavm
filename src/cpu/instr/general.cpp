@@ -248,7 +248,7 @@ byte* CPU::ress(byte* addr) {
         case 3:
             // TODO: switching to temporary registers
         default:
-            throw Exception("illegal register set ID in ress instruction");
+            throw new Exception("illegal register set ID in ress instruction");
     }
 
     return addr;
@@ -353,7 +353,7 @@ byte* CPU::param(byte* addr) {
         b = static_cast<Integer*>(fetch(b))->value();
     }
 
-    if (unsigned(a) >= frame_new->args->size()) { throw Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter"); }
+    if (unsigned(a) >= frame_new->args->size()) { throw new Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter"); }
     frame_new->args->set(a, fetch(b)->copy());
     frame_new->args->clear(a);
 
@@ -383,7 +383,7 @@ byte* CPU::paref(byte* addr) {
         b = static_cast<Integer*>(fetch(b))->value();
     }
 
-    if (unsigned(a) >= frame_new->args->size()) { throw Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter"); }
+    if (unsigned(a) >= frame_new->args->size()) { throw new Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter"); }
     frame_new->args->set(a, fetch(b));
     frame_new->args->flag(a, REFERENCE);
 
@@ -416,7 +416,7 @@ byte* CPU::arg(byte* addr) {
     if (unsigned(a) >= frames.back()->args->size()) {
         ostringstream oss;
         oss << "invalid read: read from argument register out of bounds: " << a;
-        throw Exception(oss.str());
+        throw new Exception(oss.str());
     }
 
     if (frames.back()->args->isflagged(a, REFERENCE)) {
@@ -440,7 +440,7 @@ byte* CPU::call(byte* addr) {
     byte* return_address = (addr + sizeof(bool) + sizeof(int));
 
     if (frame_new == 0) {
-        throw Exception("function call without a frame: use `frame 0' in source code if the function takes no parameters");
+        throw new Exception("function call without a frame: use `frame 0' in source code if the function takes no parameters");
     }
     // set function name and return address
     frame_new->function_name = call_name;
@@ -459,7 +459,7 @@ byte* CPU::end(byte* addr) {
     /*  Run end instruction.
      */
     if (frames.size() == 0) {
-        throw Exception("no frame on stack: nothing to end");
+        throw new Exception("no frame on stack: nothing to end");
     }
     addr = frames.back()->ret_address();
 
@@ -470,7 +470,7 @@ byte* CPU::end(byte* addr) {
     if (return_value_register != 0) {
         // we check in 0. register because it's reserved for return values
         if (uregset->at(0) == 0) {
-            throw Exception("return value requested by frame but function did not set return register");
+            throw new Exception("return value requested by frame but function did not set return register");
         }
         if (uregset->isflagged(0, REFERENCE)) {
             returned = uregset->get(0);
@@ -501,7 +501,7 @@ byte* CPU::jump(byte* addr) {
      */
     byte* target = bytecode+(*(int*)addr);
     if (target == addr) {
-        throw Exception("aborting: JUMP instruction pointing to itself");
+        throw new Exception("aborting: JUMP instruction pointing to itself");
     }
     return target;
 }
@@ -528,7 +528,7 @@ byte* CPU::eximport(byte* addr) {
     }
 
     if (handle == 0) {
-        throw Exception("failed to link library: " + module + " (" + path + ')');
+        throw new Exception("failed to link library: " + module + " (" + path + ')');
     }
 
     ExportedFunctionNamesReport* exports_names;
@@ -538,10 +538,10 @@ byte* CPU::eximport(byte* addr) {
     exports_pointers = (ExportedFunctionPointersReport*)dlsym(handle, "exports_pointers");
 
     if (exports_names == 0) {
-        throw Exception("failed to extract function names from module: " + module);
+        throw new Exception("failed to extract function names from module: " + module);
     }
     if (exports_names == 0) {
-        throw Exception("failed to extract function pointers from module: " + module);
+        throw new Exception("failed to extract function pointers from module: " + module);
     }
 
     const char** functions = (*exports_names)();
@@ -566,7 +566,7 @@ byte* CPU::excall(byte* addr) {
     byte* return_address = (addr + sizeof(bool) + sizeof(int));
 
     if (frame_new == 0) {
-        throw Exception("external function call without a frame: use `frame 0' in source code if the function takes no parameters");
+        throw new Exception("external function call without a frame: use `frame 0' in source code if the function takes no parameters");
     }
     // set function name and return address
     frame_new->function_name = call_name;
@@ -581,7 +581,7 @@ byte* CPU::excall(byte* addr) {
     pushFrame();
 
     if (external_functions.count(call_name) == 0) {
-        throw Exception("call to unregistered external function: " + call_name);
+        throw new Exception("call to unregistered external function: " + call_name);
     }
 
     /* FIXME: second parameter should be a pointer to static registers or
@@ -599,7 +599,7 @@ byte* CPU::excall(byte* addr) {
     if (return_value_register != 0) {
         // we check in 0. register because it's reserved for return values
         if (uregset->at(0) == 0) {
-            throw Exception("return value requested by frame but external function did not set return register");
+            throw new Exception("return value requested by frame but external function did not set return register");
         }
         if (uregset->isflagged(0, REFERENCE)) {
             returned = uregset->get(0);

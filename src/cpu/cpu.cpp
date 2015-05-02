@@ -448,10 +448,10 @@ byte* CPU::tick() {
         if (debug) { cout << OP_NAMES.at(OPCODE(*instruction_pointer)); }
         instruction_pointer = dispatch(instruction_pointer);
         if (debug) { cout << endl; }
-    } catch (const Exception& e) {
+    } catch (const Exception* e) {
         return_code = 1;
-        return_message = e.what();
-        return_exception = e.type();
+        return_message = e->what();
+        return_exception = e->type();
         return 0;
     } catch (const HaltException& e) {
         halt = true;
@@ -502,10 +502,10 @@ int CPU::run() {
         // copy value of return register as return code
         try {
             return_code = static_cast<Integer*>(regset->get(0))->value();
-        } catch (const Exception& e) {
+        } catch (const Exception* e) {
             return_code = 1;
-            return_exception = e.type();
-            return_message = e.what();
+            return_exception = e->type();
+            return_message = e->what();
         }
     }
 

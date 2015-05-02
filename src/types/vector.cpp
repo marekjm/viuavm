@@ -10,7 +10,7 @@ using namespace std;
 Object* Vector::insert(int index, Object* object) {
     if (index < 0) { index = (internal_object.size()+index); }
     if ((index < 0) or (index >= (int)internal_object.size() and internal_object.size() != 0)) {
-        throw OutOfRangeException("vector index out of range");
+        throw new OutOfRangeException("vector index out of range");
     }
     vector<Object*>::iterator it = (internal_object.begin()+index);
     internal_object.insert(it, object);
@@ -32,7 +32,7 @@ Object* Vector::pop(int index) {
 Object* Vector::at(int index) {
     if (index < 0) { index = (internal_object.size()+index); }
     if ((index < 0) or (index >= (int)internal_object.size())) {
-        throw OutOfRangeException("vector index out of range");
+        throw new OutOfRangeException("vector index out of range");
     }
     // FIXME: returned value is a reference, but docs say it's a copy
     return internal_object[index];

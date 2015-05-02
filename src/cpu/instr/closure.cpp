@@ -54,7 +54,7 @@ byte* CPU::closure(byte* addr) {
     }
 
     if (uregset != frames.back()->regset) {
-        throw Exception("creating closures from nonlocal registers is forbidden, go rethink your behaviour");
+        throw new Exception("creating closures from nonlocal registers is forbidden, go rethink your behaviour");
     }
 
     Closure* clsr = new Closure();
@@ -100,7 +100,7 @@ byte* CPU::clframe(byte* addr) {
         arguments = static_cast<Integer*>(fetch(arguments))->value();
     }
 
-    if (frame_new != 0) { throw Exception("requested new frame while last one is unused"); }
+    if (frame_new != 0) { throw new Exception("requested new frame while last one is unused"); }
     frame_new = new Frame(0, arguments, 0);
 
     return addr;
@@ -129,7 +129,7 @@ byte* CPU::clcall(byte* addr) {
     byte* return_address = (addr + sizeof(bool) + sizeof(int));
 
     if (frame_new == 0) {
-        throw Exception("closure call without a frame: use `clframe 0' in source code if the closure takes no parameters");
+        throw new Exception("closure call without a frame: use `clframe 0' in source code if the closure takes no parameters");
     }
     // set function name and return address
     frame_new->function_name = clsr->function_name;
