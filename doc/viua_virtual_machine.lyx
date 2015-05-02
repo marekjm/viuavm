@@ -989,6 +989,42 @@ main
 \end_layout
 
 \begin_layout Subsection
+Block mapping
+\end_layout
+
+\begin_layout Standard
+Block mapping begins with 
+\family typewriter
+uint16_t
+\family default
+ encoding size of the section.
+ A block is a piece of code that is executed when throw-catch mechanism
+ is in use, i.e.
+ VM 
+\begin_inset Quotes eld
+\end_inset
+
+tries
+\begin_inset Quotes erd
+\end_inset
+
+ to execute a block, and if an exception is thrown, it executes the block
+ that should 
+\begin_inset Quotes eld
+\end_inset
+
+catch
+\begin_inset Quotes erd
+\end_inset
+
+ it the exception.
+\end_layout
+
+\begin_layout Standard
+The format is exactly the same as for function mapping.
+\end_layout
+
+\begin_layout Subsection
 Executable bytecode size
 \end_layout
 
@@ -1081,6 +1117,14 @@ Function mapping
 
 \begin_layout Standard
 Function mapping has the same structure as in executable bytecode format.
+\end_layout
+
+\begin_layout Subsection
+Block mapping
+\end_layout
+
+\begin_layout Standard
+Block mapping has the same structure as in executable bytecode format.
 \end_layout
 
 \begin_layout Subsection
