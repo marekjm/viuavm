@@ -169,6 +169,10 @@ void assemble_three_intop_instruction(Program& program, map<string, int>& names,
 
 
 vector<string> filter(const vector<string>& lines) {
+    /** Return lines for current function.
+     *
+     *  Filters out all non-local (i.e. outside the scope of current function) and non-opcode lines.
+     */
     vector<string> filtered;
 
     string line;
@@ -188,8 +192,8 @@ vector<string> filter(const vector<string>& lines) {
             continue;
         }
 
-        if (str::startswith(line, ".def:")) {
-            // just skip function lines
+        if (str::startswith(line, ".def:") or str::startswith(line, ".block:")) {
+            // just skip function and block lines
             while (lines[++i] != ".end");
             continue;
         }
