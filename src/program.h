@@ -137,7 +137,7 @@ class Program {
      *  These must be called after the bytecode is already generated as they must know
      *  size of the program.
      */
-    Program& xcalculateBranches(unsigned offset = 0);
+    Program& calculateBranches(unsigned offset = 0); // FIXME: is unused, scheduled for removal
     Program& calculateJumps(std::vector<std::tuple<int, int> >);
     std::vector<unsigned> jumps();
     std::vector<unsigned> jumpsAbsolute();

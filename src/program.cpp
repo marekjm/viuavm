@@ -215,7 +215,8 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
     return offset;
 }
 
-Program& Program::xcalculateBranches(unsigned offset) {
+// FIXME: is unused, scheduled for removal
+Program& Program::calculateBranches(unsigned offset) {
     /*  This function should be called after program is constructed
      *  to calculate correct bytecode offsets for BRANCH and JUMP instructions.
      */
