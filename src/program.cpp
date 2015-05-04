@@ -215,7 +215,7 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
     return offset;
 }
 
-Program& Program::calculateBranches(unsigned offset) {
+Program& Program::xcalculateBranches(unsigned offset) {
     /*  This function should be called after program is constructed
      *  to calculate correct bytecode offsets for BRANCH and JUMP instructions.
      */

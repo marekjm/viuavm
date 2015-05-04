@@ -121,6 +121,7 @@ class Program {
     Program& jump       (int, bool);
     Program& branch     (int_op, int, bool, int, bool);
 
+    Program& vmthrow    (int_op);
     Program& vmcatch    (std::string, std::string);
     Program& vmtry      (std::string);
     Program& leave      ();
@@ -136,7 +137,7 @@ class Program {
      *  These must be called after the bytecode is already generated as they must know
      *  size of the program.
      */
-    Program& calculateBranches(unsigned offset = 0);
+    Program& xcalculateBranches(unsigned offset = 0);
     Program& calculateJumps(std::vector<std::tuple<int, int> >);
     std::vector<unsigned> jumps();
     std::vector<unsigned> jumpsAbsolute();

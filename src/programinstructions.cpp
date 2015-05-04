@@ -743,6 +743,13 @@ Program& Program::branch(int_op regc, int addr_truth, bool absolute_truth, int a
     return (*this);
 }
 
+Program& Program::leave() {
+    /*  Inserts leave instruction.
+     */
+    *(addr_ptr++) = LEAVE;
+    return (*this);
+}
+
 Program& Program::eximport(string module_name) {
     /*  Inserts eximport instruction.
      */
