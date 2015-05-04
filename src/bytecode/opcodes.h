@@ -108,6 +108,12 @@ enum OPCODE : byte {
     JUMP,
     BRANCH,
 
+    THROW,  // throw an object
+    CATCH,  // register a catcher block for given type
+    TRY,    // try executing a block, if an exception is thrown and no catcher claims it, it is propagated up
+            // TRY insructions do not require any CATCH to precede them
+    LEAVE,  // leave a block and resume execution after block-entering instruction
+
     // Opcodes dealing with external C/C++ modules
     EXIMPORT,   // import external library
     EXCALL,     // call external function

@@ -105,6 +105,13 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "jump",   sizeof(byte) + sizeof(int) },
     { "branch", sizeof(byte) + sizeof(bool) + 3*sizeof(int) },
 
+    { "throw",  sizeof(byte) + sizeof(int) + sizeof(bool) },
+    // variable length
+    { "catch",  sizeof(byte) }, // catch "<type>" <block>
+    // variable length
+    { "try",    sizeof(byte) }, // try <block>
+    { "leave",  sizeof(byte) },
+
     { "eximport", sizeof(byte) },
     { "excall", sizeof(byte) + sizeof(bool) + sizeof(int) },
 
@@ -205,6 +212,11 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
 
     { EXIMPORT, "eximport" },
     { EXCALL,   "excall" },
+
+    { THROW,    "throw" },
+    { CATCH,    "catch" },
+    { TRY,      "try" },
+    { LEAVE,    "leave" },
 
     { END,      "end" },
     { HALT,     "halt" },
