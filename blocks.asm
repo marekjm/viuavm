@@ -1,5 +1,6 @@
 .block: handle_integer
-    fly 2
+    ;fly 2
+    istore 2 42
     strstore 3 "thrown Object: "
     echo 3
     print 2
@@ -13,8 +14,8 @@
 .end
 
 .def: main 1
-    catch "Integer" handle_integer
-    try main_block
+    ;catch "Integer" handle_integer
+    ;try main_block
     ; leave instructions lead here
 
     izero 0
