@@ -103,7 +103,7 @@ uint16_t Program::countBytes(const vector<string>& lines) {
         line = str::lstrip(lines[i]);
 
         if (line[0] == '.') {
-            /*  Assembler instructions must be skipped here or they would cause the code below to
+            /*  Assembler annotations must be skipped here or they would cause the code below to
              *  throw exceptions.
              */
             continue;
