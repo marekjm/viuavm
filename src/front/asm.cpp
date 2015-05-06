@@ -727,6 +727,17 @@ int main(int argc, char* argv[]) {
     }
 
 
+    /////////////////////
+    // GATHER BLOCK NAMES
+    vector<string> block_names;
+    try {
+        block_names = assembler::ce::getBlockNames(lines);
+    } catch (const string& e) {
+        cout << "fatal: " << e << endl;
+        return 1;
+    }
+
+
     /////////////////////////
     // GET MAIN FUNCTION NAME
     string main_function = "";
@@ -755,6 +766,17 @@ int main(int argc, char* argv[]) {
          functions = assembler::ce::getFunctions(ilines);
     } catch (const string& e) {
         cout << "error: function gathering failed: " << e << endl;
+        return 1;
+    }
+
+
+    ///////////////////////////////
+    // GATHER BLOCK CODE LINES
+    map<string, vector<string> > blocks;
+    try {
+         blocks = assembler::ce::getBlocks(ilines);
+    } catch (const string& e) {
+        cout << "error: block gathering failed: " << e << endl;
         return 1;
     }
 
