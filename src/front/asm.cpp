@@ -990,6 +990,17 @@ int main(int argc, char* argv[]) {
     }
 
 
+    //////////////////////
+    // VERIFY BLOCK BODIES
+    for (auto block : blocks) {
+        vector<string> flines = block.second;
+        if (flines.size() == 0 or flines.back() != "leave") {
+            cout << "fatal: missing 'leave' at the end of block '" << block.first << "'" << endl;
+            exit(1);
+        }
+    }
+
+
     ////////////////////////////////////////
     // CREATE OFSTREAM TO WRITE BYTECODE OUT
     ofstream out(compilename, ios::out | ios::binary);
