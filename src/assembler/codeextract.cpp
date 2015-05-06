@@ -178,3 +178,50 @@ map<string, pair<bool, vector<string> > > assembler::ce::getFunctions(const vect
 
     return functions;
 }
+
+vector<string> assembler::ce::getBlockNames(const vector<string>& lines) {
+    vector<string> names;
+
+    string line, holdline;
+    for (unsigned i = 0; i < lines.size(); ++i) {
+        holdline = line = lines[i];
+        if (not str::startswith(line, ".block:")) { continue; }
+
+        if (str::startswith(line, ".block:")) {
+            for (int j = i+1; lines[j] != ".end"; ++j, ++i) {}
+        }
+
+        line = str::lstrip(str::sub(line, str::chunk(line).size()));
+        string name = str::chunk(line);
+        line = str::lstrip(str::sub(line, name.size()));
+        string ret_sign = str::chunk(line);
+
+        names.push_back(name);
+    }
+
+    return names;
+}
+map<string, vector<string> > assembler::ce::getBlocks(const vector<string>& lines) {
+    map<string, vector<string> > blocks;
+
+    string line, holdline;
+    for (unsigned i = 0; i < lines.size(); ++i) {
+        holdline = line = lines[i];
+        if (!str::startswith(line, ".block:")) { continue; }
+
+        vector<string> flines;
+        for (int j = i+1; lines[j] != ".end"; ++j, ++i) {
+            if (str::startswith(lines[j], ".def")) {
+                throw ("another block opened before assembler reached .end after '" + str::chunk(str::sub(holdline, str::chunk(holdline).size())) + "' block");
+            }
+            flines.push_back(lines[j]);
+        }
+
+        line = str::lstrip(str::sub(line, 5));
+        string name = str::chunk(line);
+
+        blocks[name] = flines;
+    }
+
+    return blocks;
+}

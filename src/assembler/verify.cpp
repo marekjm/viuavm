@@ -29,6 +29,25 @@ string assembler::verify::functionCalls(const vector<string>& lines, const vecto
     return report.str();
 }
 
+string assembler::verify::blockTries(const vector<string>& lines, const vector<string>& block_names) {
+    ostringstream report("");
+    string line;
+    for (unsigned i = 0; i < lines.size(); ++i) {
+        line = str::lstrip(lines[i]);
+        if (not str::startswith(line, "try")) {
+            continue;
+        }
+
+        string block = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
+        bool is_undefined = (find(block_names.begin(), block_names.end(), block) == block_names.end());
+
+        if (is_undefined) {
+            report << "fatal: try of undefined block '" << block << "' at line " << i;
+        }
+    }
+    return report.str();
+}
+
 string assembler::verify::closureCreations(const vector<string>& lines, const vector<string>& function_names) {
     ostringstream report("");
     string line;
