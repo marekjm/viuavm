@@ -211,13 +211,13 @@ map<string, vector<string> > assembler::ce::getBlocks(const vector<string>& line
 
         vector<string> flines;
         for (int j = i+1; lines[j] != ".end"; ++j, ++i) {
-            if (str::startswith(lines[j], ".def")) {
+            if (str::startswith(lines[j], ".block")) {
                 throw ("another block opened before assembler reached .end after '" + str::chunk(str::sub(holdline, str::chunk(holdline).size())) + "' block");
             }
             flines.push_back(lines[j]);
         }
 
-        line = str::lstrip(str::sub(line, 5));
+        line = str::lstrip(str::sub(line, 7));  // 7 is the size if ".block:" string
         string name = str::chunk(line);
 
         blocks[name] = flines;
