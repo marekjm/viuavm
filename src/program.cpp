@@ -115,7 +115,7 @@ uint16_t Program::countBytes(const vector<string>& lines) {
         instr = str::chunk(line);
         try {
             inc = OP_SIZES.at(instr);
-            if ((instr == "call") or (instr == "closure") or (instr == "excall")) {
+            if ((instr == "call") or (instr == "closure") or (instr == "excall") or (instr == "try")) {
                 // clear first chunk
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (which for call and closure instructions is function name)
@@ -185,7 +185,8 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
             cout << "[asm] debug: offsetting: " << opcode_name << ": +" << inc;
         }
 
-        if ((OPCODE(program[offset]) == CALL) or (OPCODE(program[offset]) == CLOSURE) or (OPCODE(program[offset]) == EXIMPORT) or (OPCODE(program[offset]) == EXCALL)) {
+        OPCODE opcode = OPCODE(program[offset]);
+        if ((opcode == CALL) or (opcode == CLOSURE) or (opcode == EXIMPORT) or (opcode == EXCALL) or (opcode == TRY)) {
             string s(program+offset+1);
             if (debug) {
                 cout << '+' << s.size() << " (function/module name at byte " << offset+1 << ": `" << s << "`)";

@@ -743,6 +743,17 @@ Program& Program::branch(int_op regc, int addr_truth, bool absolute_truth, int a
     return (*this);
 }
 
+Program& Program::vmtry(string block_name) {
+    /*  Inserts try instruction.
+     *  Byte offset is calculated automatically.
+     */
+    *(addr_ptr++) = TRY;
+    for (unsigned i = 0; i < block_name.size(); ++i) {
+        *((char*)addr_ptr++) = block_name[i];
+    }
+    return (*this);
+}
+
 Program& Program::leave() {
     /*  Inserts leave instruction.
      */
