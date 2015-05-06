@@ -947,6 +947,10 @@ int main(int argc, char* argv[]) {
         cout << report << endl;
         exit(1);
     }
+    if ((report = assembler::verify::blockTries(lines, block_names)).size()) {
+        cout << report << endl;
+        exit(1);
+    }
 
     ////////////////////////////
     // VERIFY FRAME INSTRUCTIONS
