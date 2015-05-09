@@ -22,6 +22,7 @@ class Loader {
 
     public:
     Loader& load();
+    Loader& executable();
 
     uint16_t getBytecodeSize();
     byte* getBytecode();
