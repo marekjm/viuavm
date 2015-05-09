@@ -47,8 +47,8 @@ Loader& Loader::load() {
 
     in.read((char*)&size, 16);
 
-    bytecode = new char[size];
-    in.read(bytecode, size);
+    bytecode = new byte[size];
+    in.read((char*)bytecode, size);
 
     return (*this);
 }
