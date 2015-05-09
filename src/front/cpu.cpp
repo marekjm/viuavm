@@ -67,8 +67,6 @@ int main(int argc, char* argv[]) {
     uint16_t bytes = loader.getBytecodeSize();
     byte* bytecode = loader.getBytecode();
 
-    int ret_code = 0;
-    string return_exception = "", return_message = "";
     // run the bytecode
     CPU cpu;
     for (auto p : function_address_mapping) { cpu.mapfunction(p.first, p.second); }
@@ -81,6 +79,9 @@ int main(int argc, char* argv[]) {
     cpu.commandline_arguments = cmdline_args;
 
     cpu.load(bytecode).bytes(bytes).eoffset(starting_instruction).run();
+
+    int ret_code = 0;
+    string return_exception = "", return_message = "";
     tie(ret_code, return_exception, return_message) = cpu.exitcondition();
 
     if (ret_code != 0 and return_exception.size()) {
