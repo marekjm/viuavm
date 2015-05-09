@@ -20,6 +20,8 @@ class Loader {
     std::map<std::string, uint16_t> function_addresses;
     std::vector<std::string> functions;
 
+    std::map<std::string, uint16_t> loadmap(char*, const uint16_t&);
+
     public:
     Loader& load();
     Loader& executable();

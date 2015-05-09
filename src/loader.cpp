@@ -9,6 +9,26 @@
 using namespace std;
 
 
+map<string, uint16_t> Loader::loadmap(char* bytedump, const uint16_t& bytedump_size) {
+    map<string, uint16_t> mapping;
+
+    char *lib_function_ids_map = bytedump;
+
+    int i = 0;
+    string lib_fn_name;
+    uint16_t lib_fn_address;
+    while (i < bytedump_size) {
+        lib_fn_name = string(lib_function_ids_map);
+        i += lib_fn_name.size() + 1;  // one for null character
+        lib_fn_address = *((uint16_t*)(bytedump+i));
+        i += sizeof(uint16_t);
+        lib_function_ids_map = bytedump+i;
+        mapping[lib_fn_name] = lib_fn_address;
+    }
+
+    return mapping;
+}
+
 Loader& Loader::load() {
     ifstream in(path, ios::in | ios::binary);
     if (!in) {
@@ -64,19 +84,10 @@ Loader& Loader::executable() {
 
     char *lib_buffer_function_ids = new char[lib_function_ids_section_size];
     in.read(lib_buffer_function_ids, lib_function_ids_section_size);
-    char *lib_function_ids_map = lib_buffer_function_ids;
 
-    int i = 0;
-    string lib_fn_name;
-    uint16_t lib_fn_address;
-    while (i < lib_function_ids_section_size) {
-        lib_fn_name = string(lib_function_ids_map);
-        i += lib_fn_name.size() + 1;  // one for null character
-        lib_fn_address = *((uint16_t*)(lib_buffer_function_ids+i));
-        i += sizeof(uint16_t);
-        lib_function_ids_map = lib_buffer_function_ids+i;
-        functions.push_back(lib_fn_name);
-        function_addresses[lib_fn_name] = lib_fn_address;
+    for (pair<string, uint16_t> p : loadmap(lib_buffer_function_ids, lib_function_ids_section_size)) {
+        functions.push_back(p.first);
+        function_addresses[p.first] = p.second;
     }
     delete[] lib_buffer_function_ids;
 
