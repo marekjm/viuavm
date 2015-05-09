@@ -13,6 +13,7 @@
 #include "../support/pointer.h"
 #include "../types/integer.h"
 #include "../types/closure.h"
+#include "../loader.h"
 #define AS_DEBUG_HEADER 1
 #include "../cpu/cpu.h"
 #include "../program.h"
@@ -1007,70 +1008,19 @@ int main(int argc, char* argv[]) {
 
     cout << "message: running \"" << filename << "\"" << endl;
 
-    ifstream in(filename, ios::in | ios::binary);
+    Loader loader(filename);
+    loader.executable();
 
-    if (!in) {
-        cout << "fatal: file could not be opened: " << filename << endl;
-        return 1;
-    }
-
-    uint16_t function_ids_section_size = 0;
-    char buffer[16];
-    in.read(buffer, sizeof(uint16_t));
-    function_ids_section_size = *((uint16_t*)buffer);
-    cout << "message: function mapping section: " << function_ids_section_size << " bytes" << endl;
-
-    /*  The code below extracts function id-to-address mapping.
-     */
-    map<string, uint16_t> function_address_mapping;
-    char *buffer_function_ids = new char[function_ids_section_size];
-    in.read(buffer_function_ids, function_ids_section_size);
-    char *function_ids_map = buffer_function_ids;
-
-    int i = 0;
-    string fn_name;
-    uint16_t fn_address;
-    while (i < function_ids_section_size) {
-        fn_name = string(function_ids_map);
-        i += fn_name.size() + 1;  // one for null character
-        fn_address = *((uint16_t*)(buffer_function_ids+i));
-        i += sizeof(uint16_t);
-        function_ids_map = buffer_function_ids+i;
-        function_address_mapping[fn_name] = fn_address;
-
-        cout << "debug: function id-to-address mapping: " << fn_name << " @ byte " << fn_address << endl;
-    }
-    delete[] buffer_function_ids;
-
-
-    uint16_t bytes;
-
-    in.read(buffer, 16);
-    if (!in) {
-        cout << "fatal: an error occued during bytecode loading: cannot read size" << endl;
-        if (str::endswith(filename, ".asm")) { cout << NOTE_LOADED_ASM << endl; }
-        return 1;
-    } else {
-        bytes = *((uint16_t*)buffer);
-    }
-    cout << "message: bytecode size: " << bytes << " bytes" << endl;
-
+    map<string, uint16_t> function_address_mapping = loader.getFunctionAddresses();
     uint16_t starting_instruction = function_address_mapping["__entry"];
-    cout << "message: first executable instruction at byte " << starting_instruction << endl;
 
-    byte* bytecode = new byte[bytes];
-    in.read((char*)bytecode, bytes);
+    uint16_t bytes = loader.getBytecodeSize();
+    byte* bytecode = loader.getBytecode();
 
-    if (!in) {
-        cout << "fatal: an error occued during bytecode loading: cannot read instructions" << endl;
-        if (str::endswith(filename, ".asm")) { cout << NOTE_LOADED_ASM << endl; }
-        return 1;
-    }
-    in.close();
+    cout << "bytecode size: " << bytes << endl;
 
     int ret_code = 0;
     string return_exception = "", return_message = "";
-    // run the bytecode
     CPU cpu;
     cpu.debug = true;
     for (auto p : function_address_mapping) { cpu.mapfunction(p.first, p.second); }
