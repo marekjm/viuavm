@@ -1019,8 +1019,6 @@ int main(int argc, char* argv[]) {
 
     cout << "bytecode size: " << bytes << endl;
 
-    int ret_code = 0;
-    string return_exception = "", return_message = "";
     CPU cpu;
     cpu.debug = true;
     for (auto p : function_address_mapping) { cpu.mapfunction(p.first, p.second); }
@@ -1048,5 +1046,5 @@ int main(int argc, char* argv[]) {
 
     debuggerMainLoop(cpu, init_commands);
 
-    return ret_code;
+    return 0;
 }
