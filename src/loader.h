@@ -5,6 +5,7 @@
 
 
 #include <cstdint>
+#include <fstream>
 #include <string>
 #include <vector>
 #include <map>
@@ -21,6 +22,8 @@ class Loader {
     std::vector<std::string> functions;
 
     std::map<std::string, uint16_t> loadmap(char*, const uint16_t&);
+
+    void loadFunctionsMap(std::ifstream&);
 
     public:
     Loader& load();

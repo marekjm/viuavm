@@ -29,6 +29,20 @@ map<string, uint16_t> Loader::loadmap(char* bytedump, const uint16_t& bytedump_s
     return mapping;
 }
 
+void Loader::loadFunctionsMap(ifstream& in) {
+    uint16_t lib_function_ids_section_size = 0;
+    in.read((char*)&lib_function_ids_section_size, sizeof(uint16_t));
+
+    char *lib_buffer_function_ids = new char[lib_function_ids_section_size];
+    in.read(lib_buffer_function_ids, lib_function_ids_section_size);
+
+    for (pair<string, uint16_t> p : loadmap(lib_buffer_function_ids, lib_function_ids_section_size)) {
+        functions.push_back(p.first);
+        function_addresses[p.first] = p.second;
+    }
+    delete[] lib_buffer_function_ids;
+}
+
 Loader& Loader::load() {
     ifstream in(path, ios::in | ios::binary);
     if (!in) {
@@ -44,17 +58,7 @@ Loader& Loader::load() {
         jumps.push_back(lib_jmp);
     }
 
-    uint16_t lib_function_ids_section_size = 0;
-    in.read((char*)&lib_function_ids_section_size, sizeof(uint16_t));
-
-    char *lib_buffer_function_ids = new char[lib_function_ids_section_size];
-    in.read(lib_buffer_function_ids, lib_function_ids_section_size);
-
-    for (pair<string, uint16_t> p : loadmap(lib_buffer_function_ids, lib_function_ids_section_size)) {
-        functions.push_back(p.first);
-        function_addresses[p.first] = p.second;
-    }
-    delete[] lib_buffer_function_ids;
+    loadFunctionsMap(in);
 
     in.read((char*)&size, 16);
 
@@ -70,17 +74,7 @@ Loader& Loader::executable() {
         throw ("fatal: failed to link " + path);
     }
 
-    uint16_t lib_function_ids_section_size = 0;
-    in.read((char*)&lib_function_ids_section_size, sizeof(uint16_t));
-
-    char *lib_buffer_function_ids = new char[lib_function_ids_section_size];
-    in.read(lib_buffer_function_ids, lib_function_ids_section_size);
-
-    for (pair<string, uint16_t> p : loadmap(lib_buffer_function_ids, lib_function_ids_section_size)) {
-        functions.push_back(p.first);
-        function_addresses[p.first] = p.second;
-    }
-    delete[] lib_buffer_function_ids;
+    loadFunctionsMap(in);
 
     in.read((char*)&size, 16);
 
