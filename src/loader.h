@@ -40,6 +40,8 @@ class Loader {
 
     std::map<std::string, uint16_t> getFunctionAddresses();
     std::vector<std::string> getFunctions();
+    std::map<std::string, uint16_t> getBlockAddresses();
+    std::vector<std::string> getBlocks();
 
     std::map<std::string, uint16_t> getBlockAddresses();
     std::vector<std::string> getBlocks();

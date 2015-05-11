@@ -63,6 +63,7 @@ Loader& Loader::load() {
         throw ("fatal: failed to link " + path);
     }
 
+    // load jump table
     unsigned lib_total_jumps;
     in.read((char*)&lib_total_jumps, sizeof(unsigned));
 
@@ -90,6 +91,7 @@ Loader& Loader::executable() {
 
     loadFunctionsMap(in);
 
+    // load executable bytecode
     in.read((char*)&size, 16);
 
     bytecode = new byte[size];
