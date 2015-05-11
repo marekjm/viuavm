@@ -506,6 +506,24 @@ byte* CPU::jump(byte* addr) {
     return target;
 }
 
+byte* CPU::vmtry(byte* addr) {
+    /*  Run try instruction.
+     */
+    string block_name = string(addr);
+    byte* block_address = bytecode+block_addresses.at(block_name);
+    return block_address;
+}
+
+byte* CPU::leave(byte* addr) {
+    /*  Run leave instruction.
+     */
+    // FIXME
+    //if (block_return_addresses.size() == 0) {
+    //    throw Exception("bad leave: no block has been entered");
+    //}
+    return addr;
+}
+
 byte* CPU::eximport(byte* addr) {
     /** Run excall instruction.
      */
@@ -624,7 +642,6 @@ byte* CPU::excall(byte* addr) {
 
     return return_address;
 }
-
 
 byte* CPU::branch(byte* addr) {
     /*  Run branch instruction.
