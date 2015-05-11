@@ -73,6 +73,7 @@ Loader& Loader::load() {
         jumps.push_back(lib_jmp);
     }
 
+    loadBlocksMap(in);
     loadFunctionsMap(in);
 
     in.read((char*)&size, 16);
@@ -89,6 +90,7 @@ Loader& Loader::executable() {
         throw ("fatal: failed to link " + path);
     }
 
+    loadBlocksMap(in);
     loadFunctionsMap(in);
 
     // load executable bytecode

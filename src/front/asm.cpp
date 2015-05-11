@@ -1116,6 +1116,14 @@ int main(int argc, char* argv[]) {
     }
 
 
+    //////////////////////////////////////////
+    // WRITE OUT BLOCK IDS SECTION
+    // THIS ALSO INCLUDES IDS OF LINKED BLOCKS
+    uint16_t block_ids_section_size = 0;
+    // FIXME: this is just to ensure loader can read the size and contents
+    out.write((const char*)&block_ids_section_size, sizeof(uint16_t));
+
+
     ///////////////////////////////
     // PREPARE FUNCTION IDS SECTION
     uint16_t function_ids_section_size = 0;
