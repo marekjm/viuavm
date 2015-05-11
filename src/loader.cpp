@@ -43,6 +43,20 @@ void Loader::loadFunctionsMap(ifstream& in) {
     delete[] lib_buffer_function_ids;
 }
 
+void Loader::loadBlocksMap(ifstream& in) {
+    uint16_t lib_block_ids_section_size = 0;
+    in.read((char*)&lib_block_ids_section_size, sizeof(uint16_t));
+
+    char *lib_buffer_block_ids = new char[lib_block_ids_section_size];
+    in.read(lib_buffer_block_ids, lib_block_ids_section_size);
+
+    for (pair<string, uint16_t> p : loadmap(lib_buffer_block_ids, lib_block_ids_section_size)) {
+        blocks.push_back(p.first);
+        block_addresses[p.first] = p.second;
+    }
+    delete[] lib_buffer_block_ids;
+}
+
 Loader& Loader::load() {
     ifstream in(path, ios::in | ios::binary);
     if (!in) {
@@ -98,9 +112,17 @@ byte* Loader::getBytecode() {
 vector<unsigned> Loader::getJumps() {
     return jumps;
 }
+
 map<string, uint16_t> Loader::getFunctionAddresses() {
     return function_addresses;
 }
 vector<string> Loader::getFunctions() {
     return functions;
+}
+
+map<string, uint16_t> Loader::getBlockAddresses() {
+    return block_addresses;
+}
+vector<string> Loader::getBlocks() {
+    return blocks;
 }
