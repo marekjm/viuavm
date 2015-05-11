@@ -53,9 +53,10 @@ class CPU {
     std::vector<Frame*> frames;
     Frame* frame_new;
 
-    /*  Function ID to bytecode address map.
+    /*  Function and block names mapped to bytecode addresses.
      */
     std::map<std::string, unsigned> function_addresses;
+    std::map<std::string, unsigned> block_addresses;
 
     /*  Variables set after CPU executed bytecode.
      *  They describe exit conditions of the bytecode that just stopped running.
@@ -167,6 +168,9 @@ class CPU {
 
     byte* jump(byte*);
     byte* branch(byte*);
+
+    byte* vmtry(byte*);
+    byte* leave(byte*);
 
     byte* eximport(byte*);
     byte* excall(byte*);

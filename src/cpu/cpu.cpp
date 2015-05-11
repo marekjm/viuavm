@@ -409,6 +409,12 @@ byte* CPU::dispatch(byte* addr) {
         case BRANCH:
             addr = branch(addr+1);
             break;
+        case TRY:
+            addr = vmtry(addr+1);
+            break;
+        case LEAVE:
+            addr = leave(addr+1);
+            break;
         case EXIMPORT:
             addr = eximport(addr+1);
             break;
