@@ -1212,7 +1212,7 @@ int main(int argc, char* argv[]) {
     uint16_t blocks_size_so_far = 0;
     for (string name : block_names) {
         if (DEBUG) {
-            cout << "[asm:write] writing block '" << name << "' to call address table";
+            cout << "[asm:write] writing block '" << name << "' to block address table";
         }
         if (find(linked_block_names.begin(), linked_block_names.end(), name) != linked_block_names.end()) {
             if (DEBUG) {
@@ -1235,7 +1235,7 @@ int main(int argc, char* argv[]) {
         try {
             blocks_size_so_far += Program::countBytes(blocks.at(name));
         } catch (const std::out_of_range& e) {
-            cout << "fatal: could not find block '" << name << "' during call address table write" << endl;
+            cout << "fatal: could not find block '" << name << "' during address table write" << endl;
             exit(1);
         }
     }
@@ -1258,7 +1258,7 @@ int main(int argc, char* argv[]) {
     uint16_t functions_size_so_far = 0;
     for (string name : function_names) {
         if (DEBUG) {
-            cout << "[asm:write] writing function '" << name << "' to call address table";
+            cout << "[asm:write] writing function '" << name << "' to function address table";
         }
         if (find(linked_function_names.begin(), linked_function_names.end(), name) != linked_function_names.end()) {
             if (DEBUG) {
@@ -1281,11 +1281,11 @@ int main(int argc, char* argv[]) {
         try {
             functions_size_so_far += Program::countBytes(functions.at(name).second);
         } catch (const std::out_of_range& e) {
-            cout << "fatal: could not find function '" << name << "' during call address table write" << endl;
+            cout << "fatal: could not find function '" << name << "' during address table write" << endl;
             exit(1);
         }
     }
-    // FIXME: iteration over linked functions to put them to the call address table
+    // FIXME: iteration over linked functions to put them to the address table
     //        should be done in the loop above (for local functions)
     for (string name : linked_function_names) {
         // function name...
