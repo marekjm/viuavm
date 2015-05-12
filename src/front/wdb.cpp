@@ -66,6 +66,8 @@ const vector<string> DEBUGGER_COMMANDS = {
     "trace.show",
     "loader.function.map",
     "loader.function.map.show",
+    "loader.block.map",
+    "loader.block.map.show",
     "help",
     "quit",
 };
@@ -641,6 +643,13 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
                 operands.push_back(mapping.first);
             }
         }
+    } else if (command == "loader.block.map" or command == "loader.block.map.show") {
+        command = "loader.block.map.show";
+        if (operands.size() == 0) {
+            for (pair<string, unsigned> mapping : cpu.block_addresses) {
+                operands.push_back(mapping.first);
+            }
+        }
     } else if (command == "quit") {
     } else if (command == "help") {
     } else {
@@ -766,6 +775,23 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
         for (string fun : operands) {
             try {
                 addr = cpu.function_addresses.at(fun);
+                exists = true;
+            } catch (const std::out_of_range& e) {
+                exists = false;
+            }
+            cout << "  '" << fun << "': ";
+            if (not exists) {
+                cout << "not found" << endl;
+            } else {
+                cout << "entry point at byte " << addr << endl;
+            }
+        }
+    } else if (command == "loader.block.map.show") {
+        unsigned addr;
+        bool exists = false;
+        for (string fun : operands) {
+            try {
+                addr = cpu.block_addresses.at(fun);
                 exists = true;
             } catch (const std::out_of_range& e) {
                 exists = false;
