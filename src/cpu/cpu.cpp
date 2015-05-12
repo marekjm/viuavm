@@ -54,6 +54,13 @@ CPU& CPU::mapfunction(const string& name, unsigned address) {
     return (*this);
 }
 
+CPU& CPU::mapblock(const string& name, unsigned address) {
+    /** Maps block name to bytecode address.
+     */
+    block_addresses[name] = address;
+    return (*this);
+}
+
 CPU& CPU::registerExternalFunction(const string& name, ExternalFunction* function_ptr) {
     /** Registers external function in CPU.
      */

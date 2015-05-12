@@ -193,6 +193,7 @@ class CPU {
         CPU& eoffset(uint16_t);
 
         CPU& mapfunction(const std::string&, unsigned);
+        CPU& mapblock(const std::string&, unsigned);
 
         CPU& registerExternalFunction(const std::string&, ExternalFunction*);
         CPU& removeExternalFunction(std::string);
