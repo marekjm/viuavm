@@ -1255,7 +1255,10 @@ int main(int argc, char* argv[]) {
     // WRITE OUT FUNCTION IDS SECTION
     // THIS ALSO INCLUDES IDS OF LINKED FUNCTIONS
     out.write((const char*)&function_ids_section_size, sizeof(uint16_t));
-    uint16_t functions_size_so_far = 0;
+    uint16_t functions_size_so_far = blocks_size_so_far;
+    if (DEBUG) {
+        cout << "[asm:write] function addresses are offset by " << functions_size_so_far << " bytes (size of the block address table)" << endl;
+    }
     for (string name : function_names) {
         if (DEBUG) {
             cout << "[asm:write] writing function '" << name << "' to function address table";
