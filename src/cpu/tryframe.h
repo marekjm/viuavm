@@ -4,8 +4,10 @@
 #pragma once
 
 #include <string>
+#include <map>
 #include "../bytecode/bytetypedef.h"
 #include "frame.h"
+#include "catcher.h"
 
 class TryFrame {
     public:
@@ -13,6 +15,8 @@ class TryFrame {
         Frame* associated_frame;
 
         std::string block_name;
+
+        std::map<std::string, Catcher*> catchers;
 
         inline byte* ret_address() { return return_address; }
 
