@@ -14,6 +14,7 @@
 #include "../types/object.h"
 #include "registerset.h"
 #include "frame.h"
+#include "tryframe.h"
 #include "../include/module.h"
 
 
@@ -53,6 +54,11 @@ class CPU {
     std::vector<Frame*> frames;
     Frame* frame_new;
 
+    /*  Block stack.
+     */
+    std::vector<TryFrame*> tryframes;
+    TryFrame* try_frame_new;
+
     /*  Function and block names mapped to bytecode addresses.
      */
     std::map<std::string, unsigned> function_addresses;
@@ -84,6 +90,7 @@ class CPU {
     /*  Methods dealing with stack and frame manipulation.
      */
     Frame* requestNewFrame(int arguments_size = 0, int registers_size = 0);
+    TryFrame* requestNewTryFrame();
     void pushFrame();
     void dropFrame();
 
@@ -220,6 +227,7 @@ class CPU {
             tmp(0),
             static_registers({}),
             frame_new(0),
+            try_frame_new(0),
             return_code(0), return_exception(""), return_message(""),
             instruction_counter(0), instruction_pointer(0),
             debug(false), errors(false)
