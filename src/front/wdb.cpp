@@ -1048,6 +1048,7 @@ int main(int argc, char* argv[]) {
     CPU cpu;
     cpu.debug = true;
     for (auto p : function_address_mapping) { cpu.mapfunction(p.first, p.second); }
+    for (auto p : loader.getBlockAddresses()) { cpu.mapblock(p.first, p.second); }
 
     vector<string> cmdline_args;
     for (int i = 1; i < argc; ++i) {
