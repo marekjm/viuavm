@@ -67,7 +67,6 @@ int main(int argc, char* argv[]) {
     uint16_t bytes = loader.getBytecodeSize();
     byte* bytecode = loader.getBytecode();
 
-    // run the bytecode
     CPU cpu;
     for (auto p : function_address_mapping) { cpu.mapfunction(p.first, p.second); }
     for (auto p : loader.getBlockAddresses()) { cpu.mapblock(p.first, p.second); }
