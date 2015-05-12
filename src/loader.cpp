@@ -77,7 +77,6 @@ Loader& Loader::load() {
     loadFunctionsMap(in);
 
     in.read((char*)&size, 16);
-
     bytecode = new byte[size];
     in.read((char*)bytecode, size);
 
@@ -95,7 +94,6 @@ Loader& Loader::executable() {
 
     // load executable bytecode
     in.read((char*)&size, 16);
-
     bytecode = new byte[size];
     in.read((char*)bytecode, size);
 
