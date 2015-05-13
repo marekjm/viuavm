@@ -758,6 +758,7 @@ Program& Program::vmtry(string block_name) {
     for (unsigned i = 0; i < block_name.size(); ++i) {
         *((char*)addr_ptr++) = block_name[i];
     }
+    *(addr_ptr++) = '\0';
     return (*this);
 }
 
