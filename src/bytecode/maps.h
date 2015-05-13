@@ -81,7 +81,7 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "copy",   sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
     { "ref",    sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
     { "swap",   sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
-    { "free", sizeof(byte) + sizeof(bool) + sizeof(int) },
+    { "free",   sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "empty",  sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "isnull", sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
     { "ress",   sizeof(byte) + sizeof(int) },
