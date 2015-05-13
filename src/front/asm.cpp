@@ -511,6 +511,8 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             bool is_absolute;
             tie(jump_target, is_absolute) = resolvejump(operands, marks);
             program.jump(jump_target, is_absolute);
+        } else if (str::startswith(line, "tryframe")) {
+            program.tryframe();
         } else if (str::startswith(line, "try")) {
             string block_name = str::chunk(operands);
             program.vmtry(block_name);
