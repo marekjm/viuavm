@@ -64,6 +64,7 @@ const vector<string> DEBUGGER_COMMANDS = {
     "print.ahead",
     "trace",
     "trace.show",
+    "loader.",
     "loader.function.map",
     "loader.function.map.show",
     "loader.block.map",
