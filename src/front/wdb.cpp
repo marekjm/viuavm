@@ -63,7 +63,10 @@ const vector<string> DEBUGGER_COMMANDS = {
     "arguments.show",
     "print.ahead",
     "trace",
-    "trace.show",
+    "stack.",
+    "stack.trace",
+    "stack.trace.show",
+    "stack.frame.show",
     "loader.",
     "loader.function.map",
     "loader.function.map.show",
@@ -637,8 +640,9 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
     } else if (command == "register.static.show") {
     } else if (command == "print.ahead") {
     } else if (command == "arguments.show") {
-    } else if (command == "trace" or command == "trace.show") {
-        command = "trace.show";
+    } else if (command == "trace" or command == "stack.trace" or command == "stack.trace.show") {
+        command = "stack.trace.show";
+    } else if (command == "stack.frame.show") {
     } else if (command == "loader.function.map" or command == "loader.function.map.show") {
         command = "loader.function.map.show";
         if (operands.size() == 0) {
