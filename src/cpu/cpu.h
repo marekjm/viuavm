@@ -176,6 +176,7 @@ class CPU {
     byte* jump(byte*);
     byte* branch(byte*);
 
+    byte* tryframe(byte*);
     byte* vmtry(byte*);
     byte* leave(byte*);
 
