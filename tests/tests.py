@@ -692,6 +692,21 @@ class JumpingTests(unittest.TestCase):
         self.assertEqual(0, excode)
 
 
+class TryCatchBlockTests(unittest.TestCase):
+    """
+    """
+    PATH = './sample/asm/blocks'
+
+    def testBasicNoThrowNoCatchBlock(self):
+        name = 'basic.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual("42", output.strip())
+        self.assertEqual(0, excode)
+
+
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.
     """
