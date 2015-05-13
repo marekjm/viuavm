@@ -20,7 +20,7 @@ class TryFrame {
 
         inline byte* ret_address() { return return_address; }
 
-        TryFrame(byte* ra, Frame* af): return_address(ra), associated_frame(af) {}
+        TryFrame(): return_address(0), associated_frame(0) {}
 };
 
 
