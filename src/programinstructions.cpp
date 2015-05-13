@@ -743,6 +743,13 @@ Program& Program::branch(int_op regc, int addr_truth, bool absolute_truth, int a
     return (*this);
 }
 
+Program& Program::tryframe() {
+    /*  Inserts tryframe instruction.
+     */
+    *(addr_ptr++) = TRYFRAME;
+    return (*this);
+}
+
 Program& Program::vmtry(string block_name) {
     /*  Inserts try instruction.
      *  Byte offset is calculated automatically.

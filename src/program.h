@@ -123,6 +123,7 @@ class Program {
 
     Program& vmthrow    (int_op);
     Program& vmcatch    (std::string, std::string);
+    Program& tryframe   ();
     Program& vmtry      (std::string);
     Program& leave      ();
 
