@@ -34,7 +34,7 @@ string assembler::verify::blockTries(const vector<string>& lines, const vector<s
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = str::lstrip(lines[i]);
-        if (not str::startswith(line, "try")) {
+        if (not str::startswithchunk(line, "try")) {
             continue;
         }
 
