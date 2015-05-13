@@ -782,6 +782,13 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
             cout << ": frame at " << hex << stack[j] << dec << endl;
             indent += " ";
         }
+    } else if (command == "stack.frame.show") {
+        Frame* top = cpu.trace().back();
+        cout << "frame: " << stringifyFunctionInvocation(top) << '\n';
+        cout << "  * number on stack: " << cpu.trace().size() << endl;
+        cout << "  * return address:  " << top->ret_address() << endl;
+        cout << "  * return value:    " << top->place_return_value_in << endl;
+        cout << "  * resolve return:  " << (top->resolve_return_value_register ? "yes" : "no") << endl;
     } else if (command == "loader.function.map.show") {
         unsigned addr;
         bool exists = false;
