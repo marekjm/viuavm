@@ -526,6 +526,9 @@ byte* CPU::vmtry(byte* addr) {
     try_frame_new->associated_frame = frames.back();
     try_frame_new->block_name = block_name;
 
+    tryframes.push_back(try_frame_new);
+    try_frame_new = 0;
+
     return block_address;
 }
 
