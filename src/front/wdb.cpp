@@ -248,6 +248,8 @@ map<string, PRINTER> opcode_printers = {
     { "jump", &printJUMP },
     { "branch", &printBRANCH },
     { "call", &printCALL },
+
+    { "excall", &printCALL },
 };
 
 
