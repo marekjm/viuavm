@@ -39,7 +39,7 @@ byte* CPU::closure(byte* addr) {
     /*  Call a closure.
      */
     string call_name = string(addr);
-    addr += call_name.size();
+    addr += (call_name.size()+1);
 
     int reg;
     bool reg_ref;

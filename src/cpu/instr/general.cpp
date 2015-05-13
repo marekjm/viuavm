@@ -434,7 +434,7 @@ byte* CPU::call(byte* addr) {
      */
     string call_name = string(addr);
     byte* call_address = bytecode+function_addresses.at(call_name);
-    addr += call_name.size();
+    addr += (call_name.size()+1);
 
     // save return address for frame
     byte* return_address = (addr + sizeof(bool) + sizeof(int));
@@ -598,7 +598,7 @@ byte* CPU::excall(byte* addr) {
     /** Run excall instruction.
      */
     string call_name = string(addr);
-    addr += call_name.size();
+    addr += (call_name.size()+1);
 
     // save return address for frame
     byte* return_address = (addr + sizeof(bool) + sizeof(int));

@@ -623,6 +623,7 @@ Program& Program::closure(string fn, int_op reg) {
     for (unsigned i = 0; i < fn.size(); ++i) {
         *((char*)addr_ptr++) = fn[i];
     }
+    *(addr_ptr++) = '\0';
     addr_ptr = insertIntegerOperand(addr_ptr, reg);
     return (*this);
 }
@@ -693,6 +694,7 @@ Program& Program::call(string fn_name, int_op reg) {
     for (unsigned i = 0; i < fn_name.size(); ++i) {
         *((char*)addr_ptr++) = fn_name[i];
     }
+    *(addr_ptr++) = '\0';
     addr_ptr = insertIntegerOperand(addr_ptr, reg);
     return (*this);
 }
@@ -788,6 +790,7 @@ Program& Program::excall(string fn_name, int_op reg) {
     for (unsigned i = 0; i < fn_name.size(); ++i) {
         *((char*)addr_ptr++) = fn_name[i];
     }
+    *(addr_ptr++) = '\0';
     addr_ptr = insertIntegerOperand(addr_ptr, reg);
     return (*this);
 }
