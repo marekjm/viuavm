@@ -667,6 +667,21 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
     return verified;
 }
 
+string stringifyFunctionInvocation(const Frame* frame) {
+    ostringstream oss;
+    oss << frame->function_name << '/' << frame->args->size();
+    oss << '(';
+    for (unsigned i = 0; i < frame->args->size(); ++i) {
+        Object* optr = frame->args->at(i);
+        if (optr == 0) { continue; }
+        oss << optr->repr();
+        if (i < (frame->args->size()-1)) {
+            oss << ", ";
+        }
+    }
+    oss << ')';
+    return oss.str();
+}
 bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State& state) {
     /** Command dispatching logic.
      *
@@ -758,22 +773,13 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
         printRegisters(operands, cpu.trace().back()->args);
     } else if (command == "print.ahead") {
         printInstruction(cpu);
-    } else if (command == "trace.show") {
+    } else if (command == "stack.trace.show") {
         vector<Frame*> stack = cpu.trace();
         string indent("");
         for (unsigned j = 0; j < stack.size(); ++j) {
-            cout << indent << stack[j]->function_name;
-            cout << '/' << stack[j]->args->size();
-            cout << '(';
-            for (unsigned k = 0; k < stack[j]->args->size(); ++k) {
-                Object* optr = stack[j]->args->at(k);
-                if (optr == 0) { continue; }
-                cout << optr->repr();
-                if (k < (stack[j]->args->size()-1)) {
-                    cout << ", ";
-                }
-            }
-            cout << "): frame at " << hex << stack[j] << dec << endl;
+            cout << indent;
+            cout << stringifyFunctionInvocation(stack[j]);
+            cout << ": frame at " << hex << stack[j] << dec << endl;
             indent += " ";
         }
     } else if (command == "loader.function.map.show") {
