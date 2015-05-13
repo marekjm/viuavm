@@ -506,21 +506,38 @@ byte* CPU::jump(byte* addr) {
     return target;
 }
 
+byte* CPU::tryframe(byte* addr) {
+    /** Create new special frame for try blocks.
+     */
+    if (try_frame_new != 0) {
+        throw "new block frame requested while last one is unused";
+    }
+    try_frame_new = new TryFrame();
+    return addr;
+}
+
 byte* CPU::vmtry(byte* addr) {
     /*  Run try instruction.
      */
     string block_name = string(addr);
     byte* block_address = bytecode+block_addresses.at(block_name);
+
+    try_frame_new->return_address = (addr+block_name.size());
+    try_frame_new->associated_frame = frames.back();
+    try_frame_new->block_name = block_name;
+
     return block_address;
 }
 
 byte* CPU::leave(byte* addr) {
     /*  Run leave instruction.
      */
-    // FIXME
-    //if (block_return_addresses.size() == 0) {
-    //    throw Exception("bad leave: no block has been entered");
-    //}
+    if (tryframes.size() == 0) {
+        throw Exception("bad leave: no block has been entered");
+    }
+    addr = tryframes.back()->return_address;
+    delete tryframes.back();
+    tryframes.pop_back();
     return addr;
 }
 
