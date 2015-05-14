@@ -15,7 +15,7 @@
 
 .def: main 1
     tryframe
-    ;catch "Integer" handle_integer
+    catch "Integer" handle_integer
     try main_block
     ; leave instructions lead here
     print 1
