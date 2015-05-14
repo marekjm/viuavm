@@ -546,6 +546,38 @@ byte* CPU::vmtry(byte* addr) {
     return block_address;
 }
 
+byte* CPU::vmthrow(byte* addr) {
+    /** Run throw instruction.
+     */
+    int a;
+    bool a_ref = false;
+
+    a_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    a = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    if (a_ref) {
+        a = static_cast<Integer*>(fetch(a))->value();
+    }
+
+    if (unsigned(a) >= uregset->size()) {
+        ostringstream oss;
+        oss << "invalid read: register out of bounds: " << a;
+        throw new Exception(oss.str());
+    }
+    if (uregset->at(a) == 0) {
+        ostringstream oss;
+        oss << "invalid throw: register " << a << " is empty";
+        throw new Exception(oss.str());
+    }
+
+    uregset->setmask(a, KEEP);  // set correct mask
+    thrown = uregset->get(a);
+
+    return addr;
+}
+
 byte* CPU::leave(byte* addr) {
     /*  Run leave instruction.
      */
