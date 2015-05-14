@@ -64,6 +64,11 @@ class CPU {
     std::map<std::string, unsigned> function_addresses;
     std::map<std::string, unsigned> block_addresses;
 
+    /*  Slot for thrown objects (typically exceptions).
+     *  Can be set by user code and the CPU.
+     */
+    Object* thrown;
+
     /*  Variables set after CPU executed bytecode.
      *  They describe exit conditions of the bytecode that just stopped running.
      */
@@ -229,6 +234,7 @@ class CPU {
             static_registers({}),
             frame_new(0),
             try_frame_new(0),
+            thrown(0),
             return_code(0), return_exception(""), return_message(""),
             instruction_counter(0), instruction_pointer(0),
             debug(false), errors(false)
