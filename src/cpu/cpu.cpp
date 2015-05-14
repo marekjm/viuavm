@@ -425,6 +425,9 @@ byte* CPU::dispatch(byte* addr) {
         case TRY:
             addr = vmtry(addr+1);
             break;
+        case THROW:
+            addr = vmthrow(addr+1);
+            break;
         case LEAVE:
             addr = leave(addr+1);
             break;
