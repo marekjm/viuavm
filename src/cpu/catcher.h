@@ -8,10 +8,11 @@
 
 class Catcher {
     public:
-        byte* block_address;
         std::string caught_type;
+        std::string catcher_name;
+        byte* block_address;
 
-        Catcher(byte* ba, const std::string& ct): block_address(ba), caught_type(ct) {}
+        Catcher(const std::string& ct, const std::string& cn, byte* ba): caught_type(ct), catcher_name(cn), block_address(ba) {}
 };
 
 
