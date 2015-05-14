@@ -516,6 +516,20 @@ byte* CPU::tryframe(byte* addr) {
     return addr;
 }
 
+byte* CPU::vmcatch(byte* addr) {
+    /** Run catch instruction.
+     */
+    string type_name = string(addr);
+    addr += (type_name.size()+1);
+
+    string catcher_block_name = string(addr);
+    addr += (catcher_block_name.size()+1);
+
+    try_frame_new->catchers[type_name] = new Catcher(type_name, catcher_block_name, (bytecode+block_addresses.at(catcher_block_name)));
+
+    return addr;
+}
+
 byte* CPU::vmtry(byte* addr) {
     /*  Run try instruction.
      */

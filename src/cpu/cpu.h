@@ -182,6 +182,7 @@ class CPU {
     byte* branch(byte*);
 
     byte* tryframe(byte*);
+    byte* vmcatch(byte*);
     byte* vmtry(byte*);
     byte* leave(byte*);
 
