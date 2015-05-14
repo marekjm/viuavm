@@ -9,7 +9,7 @@
 
 .block: main_block
     istore 1 42
-    ;throw 1
+    throw 1
     leave
 .end
 
