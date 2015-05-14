@@ -784,6 +784,14 @@ Program& Program::vmtry(string block_name) {
     return (*this);
 }
 
+Program& Program::vmthrow(int_op regno) {
+    /*  Inserts throw instuction.
+     */
+    *(addr_ptr++) = THROW;
+    addr_ptr = insertIntegerOperand(addr_ptr, regno);
+    return (*this);
+}
+
 Program& Program::leave() {
     /*  Inserts leave instruction.
      */

@@ -125,6 +125,7 @@ class Program {
     Program& vmcatch    (std::string, std::string);
     Program& tryframe   ();
     Program& vmtry      (std::string);
+    Program& vmthrow    (int_op);
     Program& leave      ();
 
     Program& eximport   (std::string);
