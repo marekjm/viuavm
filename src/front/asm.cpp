@@ -513,6 +513,12 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             program.jump(jump_target, is_absolute);
         } else if (str::startswith(line, "tryframe")) {
             program.tryframe();
+        } else if (str::startswith(line, "catch")) {
+            string type_chnk, catcher_chnk;
+            type_chnk = str::extract(operands);
+            operands = str::lstrip(str::sub(operands, type_chnk.size()));
+            catcher_chnk = str::chunk(operands);
+            program.vmcatch(type_chnk, catcher_chnk);
         } else if (str::startswith(line, "try")) {
             string block_name = str::chunk(operands);
             program.vmtry(block_name);
