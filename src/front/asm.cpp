@@ -522,6 +522,10 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         } else if (str::startswith(line, "try")) {
             string block_name = str::chunk(operands);
             program.vmtry(block_name);
+        } else if (str::startswith(line, "throw")) {
+            string regno_chnk;
+            regno_chnk = str::chunk(operands);
+            program.vmthrow(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "leave")) {
             program.leave();
         } else if (str::startswith(line, "eximport")) {
