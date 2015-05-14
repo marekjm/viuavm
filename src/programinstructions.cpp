@@ -753,7 +753,7 @@ Program& Program::tryframe() {
 }
 
 Program& Program::vmcatch(string type_name, string block_name) {
-    /*  Inserts vmcatch instruction.
+    /*  Inserts catch instruction.
      */
     *(addr_ptr++) = CATCH;
 
