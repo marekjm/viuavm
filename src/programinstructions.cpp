@@ -752,6 +752,26 @@ Program& Program::tryframe() {
     return (*this);
 }
 
+Program& Program::vmcatch(string type_name, string block_name) {
+    /*  Inserts vmcatch instruction.
+     */
+    *(addr_ptr++) = CATCH;
+
+    // the type
+    for (unsigned i = 1; i < type_name.size()-1; ++i) {
+        *((char*)addr_ptr++) = type_name[i];
+    }
+    *((char*)addr_ptr++) = '\0';
+
+    // catcher block name
+    for (unsigned i = 0; i < block_name.size(); ++i) {
+        *((char*)addr_ptr++) = block_name[i];
+    }
+    *((char*)addr_ptr++) = '\0';
+
+    return (*this);
+}
+
 Program& Program::vmtry(string block_name) {
     /*  Inserts try instruction.
      *  Byte offset is calculated automatically.

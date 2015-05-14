@@ -130,7 +130,7 @@ uint16_t Program::countBytes(const vector<string>& lines) {
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (the type as a string)
                 inc += (str::extract(line).size() - 2 + 1); // +1: null-terminator, -2: quotes
-                line = str::lstrip(str::sub(line, str::extract(line).size().size()));
+                line = str::lstrip(str::sub(line, str::extract(line).size()));
                 // get third chunk (which is a block name)
                 inc += str::chunk(line).size() + 1;
             } else if (instr == "strstore") {
