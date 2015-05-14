@@ -21,6 +21,11 @@ class TryFrame {
         inline byte* ret_address() { return return_address; }
 
         TryFrame(): return_address(0), associated_frame(0) {}
+        ~TryFrame() {
+            for (auto p : catchers) {
+                delete p.second;
+            }
+        }
 };
 
 
