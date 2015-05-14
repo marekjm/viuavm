@@ -121,7 +121,6 @@ class Program {
     Program& jump       (int, bool);
     Program& branch     (int_op, int, bool, int, bool);
 
-    Program& vmthrow    (int_op);
     Program& vmcatch    (std::string, std::string);
     Program& tryframe   ();
     Program& vmtry      (std::string);
