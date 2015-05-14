@@ -129,7 +129,7 @@ uint16_t Program::countBytes(const vector<string>& lines) {
                 // clear first chunk
                 line = str::lstrip(str::sub(line, instr.size()));
                 line = str::lstrip(str::sub(line, str::chunk(line).size()));
-                // get second chunk (which is a string)
+                // get third chunk (which is a string)
                 inc += (str::extract(line).size() - 2 + 1); // +1: null-terminator
             }
         } catch (const std::out_of_range &e) {
