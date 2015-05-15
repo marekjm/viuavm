@@ -68,6 +68,7 @@ class CPU {
      *  Can be set by user code and the CPU.
      */
     Object* thrown;
+    Object* caught;
 
     /*  Variables set after CPU executed bytecode.
      *  They describe exit conditions of the bytecode that just stopped running.
@@ -236,7 +237,7 @@ class CPU {
             static_registers({}),
             frame_new(0),
             try_frame_new(0),
-            thrown(0),
+            thrown(0), caught(0),
             return_code(0), return_exception(""), return_message(""),
             instruction_counter(0), instruction_pointer(0),
             debug(false), errors(false)
