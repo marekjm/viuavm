@@ -9,6 +9,7 @@
 #include "../loader.h"
 #include "../cpu/cpu.h"
 #include "../program.h"
+#include "../printutils.h"
 using namespace std;
 
 
@@ -92,14 +93,16 @@ int main(int argc, char* argv[]) {
     tie(ret_code, return_exception, return_message) = cpu.exitcondition();
 
     if (ret_code != 0 and return_exception.size()) {
-        vector<Frame*> trace = cpu.trace();
-        cout << "stack trace: from entry point...\n";
-        for (unsigned i = 1; i < trace.size(); ++i) {
-            cout << "  called function: '" << trace[i]->function_name << "'\n";
-        }
-        cout << "exception after " << cpu.counter() << " ticks: ";
-        cout << return_exception << ": " << return_message << endl;
+        cout << "exception after " << cpu.counter() << " ticks" << endl;
+        cout << "uncaught object: " << return_exception << " = " << return_message << endl;
+        cout << "\n";
 
+        vector<Frame*> trace = cpu.trace();
+        cout << "stack trace: from entry point, most recent call last...\n";
+        for (unsigned i = 1; i < trace.size(); ++i) {
+            cout << "  " << stringifyFunctionInvocation(trace[i]) << "\n";
+        }
+        cout << "\n";
         cout << "frame details:\n";
 
         Frame* last = trace.back();
@@ -120,7 +123,7 @@ int main(int argc, char* argv[]) {
         }
 
         if (last->args->size()) {
-            cout << "    non-empty arguments (out of " << last->args->size() << "):" << endl;
+            cout << "  non-empty arguments (out of " << last->args->size() << "):" << endl;
             for (unsigned r = 0; r < last->args->size(); ++r) {
                 if (last->args->at(r) == 0) { continue; }
                 cout << "    arguments[" << r << "]: ";
