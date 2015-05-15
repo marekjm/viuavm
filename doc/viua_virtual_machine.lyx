@@ -103,10 +103,10 @@ This section features a brief overview of the Viua VM; its history, development
  or less related to the development of the idea and resulting code of the
  virtual machine.
  It is contains more prose and casual writing than technicalities.
- More technical discussion begins with Section
+ More technical discussion begins in Part 
 \begin_inset CommandInset ref
-LatexCommand vref
-reference "sec:Architecture"
+LatexCommand ref
+reference "part:Architecture"
 
 \end_inset
 
@@ -134,7 +134,7 @@ Compilation and dependencies
 \end_layout
 
 \begin_layout Standard
-To compile Viua VM one need a C++11 capable compiler.
+To compile Viua VM one needs a C++11 capable compiler.
  Development is done on Linux machine with GCC 4.9.2.
  C++11 Standard Library is the only dependency of the VM.
  To compile the code, following command should be used:
@@ -147,7 +147,7 @@ status open
 
 \begin_layout Plain Layout
 
-make -j 8
+make -j <number of cores>
 \end_layout
 
 \begin_layout Plain Layout
@@ -165,6 +165,28 @@ First command is used to compile assembler, CPU and bytecode analyzer.
  Second command is optional and can be used to verify if VM works correctly.
 \end_layout
 
+\begin_layout Standard
+Shortcut compilation script exists in main directory; it will clean the
+ build and recompile the code with maximal number of threads the machine
+ it is run on supports (i.e.
+ the number of cores the CPU has).
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+./compile
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 History
 \end_layout
@@ -172,8 +194,8 @@ History
 \begin_layout Standard
 Viua VM is a project that has been started during the Christmas break of
  2014, when I was still a student of Gdansk University of Technology.
- It was meant to be my reasearch project, and to help me understand how
- languages can be implemented and what really happends when I 
+ It was meant to be my research project, and to help me understand how languages
+ can be implemented and what really happends when I 
 \begin_inset Quotes eld
 \end_inset
 
@@ -216,11 +238,24 @@ cool
 \end_layout
 
 \begin_layout Standard
-As of February 2015, Viua VM can be programmed in simple assembly-lookalike
+As of February 2015, Viua VM could be programmed in simple assembly-lookalike
  language and cannot do much compared to mainstream languages.
  Add, subtract, multiply and divide two integers or floats, print a string
  to the screen, call a function (recursively or not).
  It supports separate compilation to some extent (by supporting static linking).
+\end_layout
+
+\begin_layout Standard
+In April 2015, API for external modules written in C++ has been defined
+ which allowed the machine to communicate with the outside world.
+\end_layout
+
+\begin_layout Standard
+In May 2015, Viua gained the ability to throw and catch objects (among them
+ exceptions).
+ This confirmed that errors will be handled in the VM via exception catching
+ mechanism.
+ 
 \begin_inset Newpage newpage
 \end_inset
 
@@ -662,7 +697,7 @@ tryframe
 \end_layout
 
 \begin_layout Standard
-Creates a frame for trying a Used to rblock.
+Creates a frame for trying a block.
  Takes no operands.
 \end_layout
 
@@ -1822,7 +1857,7 @@ Debugger has its .rc script which can contain arbitrary commands and is placed
 \begin_inset Quotes eld
 \end_inset
 
-~/.wudoo.db.rc
+~/.viuavm.db.rc
 \begin_inset Quotes erd
 \end_inset
 
@@ -1830,7 +1865,7 @@ Debugger has its .rc script which can contain arbitrary commands and is placed
 \begin_inset Quotes eld
 \end_inset
 
-/etc/wudoovm/dbrc
+/etc/viuavm/dbrc
 \begin_inset Quotes erd
 \end_inset
 
@@ -1874,11 +1909,15 @@ fall
  to the next function).
  Another useful assembler flags are 
 \family typewriter
---verbose
+--verbose,
+\family default
+ 
+\family typewriter
+--debug
 \family default
  and 
 \family typewriter
---debug
+--scream
 \family default
 , each causing certain messages to be displayed while compiling the code.
 \end_layout
