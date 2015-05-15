@@ -654,6 +654,75 @@ tmpro
 \end_layout
 
 \begin_layout Subsection
+Exceptions
+\end_layout
+
+\begin_layout Subsubsection
+tryframe
+\end_layout
+
+\begin_layout Standard
+Creates a frame for trying a Used to rblock.
+ Takes no operands.
+\end_layout
+
+\begin_layout Subsubsection
+catch
+\end_layout
+
+\begin_layout Standard
+Registers catcher block for a type.
+ Takes two operands: a type to catch and a block name to handle it.
+ Type must be given as a double-quoted string.
+\end_layout
+
+\begin_layout Subsubsection*
+Syntax
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+catch "Integer" handle_integer
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+try
+\end_layout
+
+\begin_layout Standard
+Tries to execute a block.
+ Takes one operand: block name.
+\end_layout
+
+\begin_layout Subsubsection
+throw
+\end_layout
+
+\begin_layout Standard
+Throws an object.
+ Takes one operand: register index specifying which object should be thrown.
+\end_layout
+
+\begin_layout Subsubsection
+pull
+\end_layout
+
+\begin_layout Standard
+Pulls caught object into a register.
+ Takes one operand: register index into which the object shall be pulled.
+\end_layout
+
+\begin_layout Subsection
 Interfacing with C++ modules
 \end_layout
 
