@@ -17,6 +17,7 @@
 #define AS_DEBUG_HEADER 1
 #include "../cpu/cpu.h"
 #include "../program.h"
+#include "../printutils.h"
 using namespace std;
 
 
@@ -673,22 +674,6 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
     }
 
     return verified;
-}
-
-string stringifyFunctionInvocation(const Frame* frame) {
-    ostringstream oss;
-    oss << frame->function_name << '/' << frame->args->size();
-    oss << '(';
-    for (unsigned i = 0; i < frame->args->size(); ++i) {
-        Object* optr = frame->args->at(i);
-        if (optr == 0) { continue; }
-        oss << optr->repr();
-        if (i < (frame->args->size()-1)) {
-            oss << ", ";
-        }
-    }
-    oss << ')';
-    return oss.str();
 }
 bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State& state) {
     /** Command dispatching logic.
