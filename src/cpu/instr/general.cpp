@@ -545,7 +545,7 @@ byte* CPU::pull(byte* addr) {
         a = static_cast<Integer*>(fetch(a))->value();
     }
 
-    if (uregset->at(a) == 0) {
+    if (caught == 0) {
         throw new Exception("no caught object to pull");
     }
     uregset->set(a, caught);
