@@ -49,12 +49,12 @@ clean-test-compiles:
 
 install: ${VM_ASM} ${VM_CPU} ${VM_WDB}
 	mkdir -p ${BIN_PATH}
-	cp ${VM_ASM} ${BIN_PATH}/wudoo-asm
-	chmod 755 ${BIN_PATH}/wudoo-asm
-	cp ${VM_CPU} ${BIN_PATH}/wudoo-cpu
-	chmod 755 ${BIN_PATH}/wudoo-cpu
-	cp ${VM_WDB} ${BIN_PATH}/wudoo-wdb
-	chmod 755 ${BIN_PATH}/wudoo-wdb
+	cp ${VM_ASM} ${BIN_PATH}/viua-asm
+	chmod 755 ${BIN_PATH}/viua-asm
+	cp ${VM_CPU} ${BIN_PATH}/viua-cpu
+	chmod 755 ${BIN_PATH}/viua-cpu
+	cp ${VM_WDB} ${BIN_PATH}/viua-db
+	chmod 755 ${BIN_PATH}/viua-db
 
 
 test: ${VM_CPU} ${VM_ASM} clean-test-compiles
