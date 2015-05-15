@@ -1,0 +1,5 @@
+#!/usr/bin/sh
+
+set -e
+
+make clean && make -j 4
