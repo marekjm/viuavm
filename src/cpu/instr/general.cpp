@@ -530,6 +530,30 @@ byte* CPU::vmcatch(byte* addr) {
     return addr;
 }
 
+byte* CPU::pull(byte* addr) {
+    /** Run pull instruction.
+     */
+    int a;
+    bool a_ref = false;
+
+    a_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    a = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    if (a_ref) {
+        a = static_cast<Integer*>(fetch(a))->value();
+    }
+
+    if (uregset->at(a) == 0) {
+        throw new Exception("no caught object to pull");
+    }
+    uregset->set(a, caught);
+    caught = 0;
+
+    return addr;
+}
+
 byte* CPU::vmtry(byte* addr) {
     /*  Run try instruction.
      */

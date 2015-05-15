@@ -422,6 +422,9 @@ byte* CPU::dispatch(byte* addr) {
         case CATCH:
             addr = vmcatch(addr+1);
             break;
+        case PULL:
+            addr = pull(addr+1);
+            break;
         case TRY:
             addr = vmtry(addr+1);
             break;
