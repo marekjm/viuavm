@@ -519,6 +519,10 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             operands = str::lstrip(str::sub(operands, type_chnk.size()));
             catcher_chnk = str::chunk(operands);
             program.vmcatch(type_chnk, catcher_chnk);
+        } else if (str::startswith(line, "pull")) {
+            string regno_chnk;
+            regno_chnk = str::chunk(operands);
+            program.pull(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "try")) {
             string block_name = str::chunk(operands);
             program.vmtry(block_name);
