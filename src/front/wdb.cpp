@@ -21,8 +21,8 @@ using namespace std;
 
 
 const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file which cannot be run on CPU without prior compilation";
-const char* RC_FILENAME = "/.wudoo.db.rc";
-const char* DEBUGGER_COMMAND_HISTORY = "/.wudoodb_history";
+const char* RC_FILENAME = "/.viuavm.db.rc";
+const char* DEBUGGER_COMMAND_HISTORY = "/.viuavmdb_history";
 
 
 const vector<string> DEBUGGER_COMMANDS = {
@@ -824,7 +824,7 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
             }
         }
     } else if (command == "help") {
-        cout << "Wudoo debugger commands:" << endl;
+        cout << "Viua debugger commands:" << endl;
         for (string c : DEBUGGER_COMMANDS) {
             if (c[c.size()-1] == '.') { continue; }
             cout << c << endl;
@@ -865,7 +865,7 @@ void completion(const char* buf, linenoiseCompletions* lc) {
 void debuggerMainLoop(CPU& cpu, deque<string> init) {
     /** This function implements main REPL of the debugger.
      *
-     *  Wudoo debugger is kind of interactive beast.
+     *  Viua debugger is kind of interactive beast.
      *  You can enter commands into it and get results from them.
      *  The shell is very primitive (no scripting) and only accepts a few commands.
      */
@@ -1006,7 +1006,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (SHOW_HELP or SHOW_VERSION) {
-        cout << "wudoo VM virtual machine debugger, version " << VERSION << endl;
+        cout << "Viua VM virtual machine debugger, version " << VERSION << endl;
         if (SHOW_HELP) {
             cout << "    --help             - to display this message" << endl;
             cout << "    --version          - show version and quit" << endl;
@@ -1080,7 +1080,7 @@ int main(int argc, char* argv[]) {
 
     string homedir(getenv("HOME"));
     ifstream local_rc_file(homedir + RC_FILENAME);
-    ifstream global_rc_file("/etc/wudoovm/dbrc");
+    ifstream global_rc_file("/etc/viuavm/dbrc");
 
     deque<string> init_commands;
     string line;

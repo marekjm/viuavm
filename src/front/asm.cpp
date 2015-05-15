@@ -647,7 +647,7 @@ int main(int argc, char* argv[]) {
     int ret_code = 0;
 
     if (SHOW_HELP or SHOW_VERSION) {
-        cout << "wudoo VM assembler, version " << VERSION << endl;
+        cout << "Viua VM assembler, version " << VERSION << endl;
         if (SHOW_HELP) {
             cout << "\nUSAGE:\n";
             cout << "    " << argv[0] << " [option...] <infile> [<outfile>]\n" << endl;

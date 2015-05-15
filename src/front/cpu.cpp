@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (SHOW_HELP or SHOW_VERSION) {
-        cout << "wudoo VM virtual machine, version " << VERSION << endl;
+        cout << "Viua VM virtual machine, version " << VERSION << endl;
         if (SHOW_HELP) {
             cout << "    --help             - display this message" << endl;
             cout << "    --version          - display version" << endl;
