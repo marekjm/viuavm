@@ -1907,8 +1907,8 @@ cpu.run
 
 \begin_layout Standard
 This command launches loaded program.
- The CPU will run instructions until a breakpoint is encountered or the
- end of execution is reached.
+ The CPU will run instructions until a breakpoint or a watchpoint is encountered
+, or the end of execution is reached.
 \end_layout
 
 \begin_layout Subsubsection
@@ -1918,8 +1918,8 @@ cpu.tick
 \begin_layout Standard
 This command accepts zero or one integer operand, which defaults to 1.
  It instructs the CPU to perform N cycles.
- If a breakpoint is encountered execution is paused; if end of execution
- is reached CPU halts.
+ If a breakpoint or a watchpoint is encountered execution is paused; if
+ end of execution is reached CPU halts.
 \end_layout
 
 \begin_layout Subsubsection
@@ -1927,7 +1927,8 @@ cpu.resume
 \end_layout
 
 \begin_layout Standard
-This command is used to resume execution after a encountering a breakpoint.
+This command is used to resume execution after a encountering a breakpoint
+ or a watchpoint.
  It will continue execution for as many ticks as were specified by previous
  
 \family typewriter
@@ -1954,7 +1955,7 @@ paused
 \end_inset
 
  state of the CPU, thus allowing further execution.
- It does not immediately resume execution, though.
+ It does not immediately resume execution.
 \end_layout
 
 \begin_layout Subsubsection
@@ -1962,7 +1963,7 @@ cpu.jump
 \end_layout
 
 \begin_layout Standard
-This instruction allows jumping to arbitrary addresses.
+This instruction allows jumping to arbitrary bytes inside bytecode.
 \end_layout
 
 \begin_layout Subsubsection
@@ -1979,7 +1980,12 @@ finished
 \end_inset
 
  state of the CPU and allows to continue running after end of execution
- is reached.
+ is reached (i.e.
+ replaying parts of a program after jumping to them with 
+\family typewriter
+cpu.jump
+\family default
+ command).
 \end_layout
 
 \begin_layout Subsubsection
@@ -1991,7 +1997,7 @@ This command shows how many instructions have been executed so far.
 \end_layout
 
 \begin_layout Subsection
-Breakpoint commands
+Breakpoints
 \end_layout
 
 \begin_layout Subsubsection
@@ -2005,7 +2011,7 @@ This command sets breakpoint at specified byte address or addresses.
 \end_layout
 
 \begin_layout Subsubsection
-breakpoint.set.on[.opcode]
+breakpoint.set.on.opcode
 \end_layout
 
 \begin_layout Standard
@@ -2021,6 +2027,37 @@ breakpoint.set.on.function
 \begin_layout Standard
 This command sets breakpoint on calls to function.
  It accepts zero or more string operands, each being a valid function name.
+\end_layout
+
+\begin_layout Subsection
+Watchpoints
+\end_layout
+
+\begin_layout Standard
+Watchpoints pause execution based on a specific condition.
+ They require certain checks to be performed (some quite demanding) and
+ as such add much more overhead than simple breakpoints.
+\end_layout
+
+\begin_layout Standard
+Execution is always paused before the instruction that would modify a register
+ is executed.
+\end_layout
+
+\begin_layout Subsubsection
+watch.register.(local,global,static).read
+\end_layout
+
+\begin_layout Standard
+Watch local, global or static register for reads.
+\end_layout
+
+\begin_layout Subsubsection
+watch.register.(local,global,static).read
+\end_layout
+
+\begin_layout Standard
+Watch local, global or static register for writes.
 \end_layout
 
 \begin_layout Subsection
@@ -2046,6 +2083,19 @@ local
  index to be printed.
  The indexes are checked to not exceed register set size.
  For empty registers, appropriate message is issued.
+\end_layout
+
+\begin_layout Subsubsection
+register.local.show
+\end_layout
+
+\begin_layout Standard
+This command is used to show information about local registers.
+ It accepts the same operands as 
+\family typewriter
+register.show
+\family default
+ command.
 \end_layout
 
 \begin_layout Subsubsection
@@ -2077,15 +2127,37 @@ register.show
 \end_layout
 
 \begin_layout Subsection
-Various commands
+Call stack commands
 \end_layout
 
 \begin_layout Subsubsection
-trace[.show]
+arguments.show
 \end_layout
 
 \begin_layout Standard
-This command can be used to print simple representation of stack trace.
+Show arguments of the current frame.
+\end_layout
+
+\begin_layout Subsubsection
+trace, stack.trace, stack.trace.show
+\end_layout
+
+\begin_layout Standard
+Print simple representation of the stack trace.
+ Indentation is used to show nesting level.
+ This command prints name of the function, its arity, and parameters.
+\end_layout
+
+\begin_layout Subsubsection
+stack.frame.show
+\end_layout
+
+\begin_layout Standard
+Show more detailed information about top-most call stack frame.
+\end_layout
+
+\begin_layout Subsection
+Loader commands
 \end_layout
 
 \begin_layout Subsubsection
@@ -2093,7 +2165,27 @@ loader.function.map[.show]
 \end_layout
 
 \begin_layout Standard
-This command displays function call address map.
+Display map of function addresses.
+\end_layout
+
+\begin_layout Subsubsection
+loader.block.map[.show]
+\end_layout
+
+\begin_layout Standard
+Display map of block addresses.
+\end_layout
+
+\begin_layout Subsection
+Various commands
+\end_layout
+
+\begin_layout Subsubsection
+print.ahead
+\end_layout
+
+\begin_layout Standard
+Show instruction that will be executed next.
 \end_layout
 
 \begin_layout Subsubsection
@@ -2101,7 +2193,7 @@ quit
 \end_layout
 
 \begin_layout Standard
-This command quits the debugger.
+Quit the debugger.
 \end_layout
 
 \begin_layout Subsubsection
@@ -2109,7 +2201,7 @@ conf.set
 \end_layout
 
 \begin_layout Standard
-This command sets a configuration variable for a session.
+Set a configuration variable for a session.
  The syntax is as follows:
 \end_layout
 
@@ -2134,6 +2226,14 @@ Available keys are:
 cpu.debug
 \family default
 .
+\end_layout
+
+\begin_layout Subsubsection
+help
+\end_layout
+
+\begin_layout Standard
+List all debugger commands available.
 \end_layout
 
 \begin_layout Standard
