@@ -110,6 +110,7 @@ enum OPCODE : byte {
 
     THROW,      // throw an object
     CATCH,      // register a catcher block for given type
+    PULL,       // pull caught object into a register (it becomes local object for current frame)
     TRYFRAME,   // create a frame for try block
     TRY,        // try executing a block, if an exception is thrown and no catcher claims it, it is propagated up
                 // TRY insructions do not require any CATCH to precede them
