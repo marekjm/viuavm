@@ -772,6 +772,14 @@ Program& Program::vmcatch(string type_name, string block_name) {
     return (*this);
 }
 
+Program& Program::pull(int_op regno) {
+    /*  Inserts throw instuction.
+     */
+    *(addr_ptr++) = PULL;
+    addr_ptr = insertIntegerOperand(addr_ptr, regno);
+    return (*this);
+}
+
 Program& Program::vmtry(string block_name) {
     /*  Inserts try instruction.
      *  Byte offset is calculated automatically.
