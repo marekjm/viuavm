@@ -451,7 +451,6 @@ byte* CPU::dispatch(byte* addr) {
     return addr;
 }
 
-
 byte* CPU::tick() {
     /** Perform a *tick*, i.e. run a single CPU instruction.
      */
@@ -522,6 +521,18 @@ byte* CPU::tick() {
         //        otherwise, finish execution with unhandled exception
         //
         //        REMINDER: catching Object catches everything! (not actually implemented, marked as a TODO)
+        TryFrame* tframe;
+        for (unsigned i = tryframes.size(); i > 0; --i) {
+            tframe = tryframes[(i-1)];
+            if (tframe->catchers.count(thrown->type())) {
+                instruction_pointer = tframe->catchers.at(thrown->type())->block_address;
+
+                caught = thrown;
+                thrown = 0;
+
+                break;
+            }
+        }
     }
 
     return instruction_pointer;
