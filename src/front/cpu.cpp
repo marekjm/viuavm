@@ -46,6 +46,7 @@ int main(int argc, char* argv[]) {
     if (SHOW_HELP) {
         cout << "    --help             - display this message" << endl;
         cout << "    --version          - display version" << endl;
+        cout << "    --verbose          - show verbose output" << endl;
     }
     if (SHOW_HELP or SHOW_VERSION) {
         return 0;

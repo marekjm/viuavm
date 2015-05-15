@@ -1018,30 +1018,10 @@ int main(int argc, char* argv[]) {
         cout << "    --help             - to display this message" << endl;
         cout << "    --version          - show version and quit" << endl;
         cout << "    --verbose          - show verbose output" << endl;
-        cout << "\n\nDebugger statements:\n";
-        cout << "  cpu.init                     - initialise the CPU (must be run before starting CPU)\n"
-             << "  cpu.tick [n]                 - perform [n] CPU ticks, [n] is optional, [n] can be -1 to run to the end of code\n"
-             << "  cpu.resume                   - resume execution after breakpoint\n"
-             << "  cpu.unpause                  - unpause CPU after breakpoint (does not resume execution)\n"
-             << "  cpu.jump <byte>              - set instruction pointer to <byte>\n"
-             << "  breakpoint.set.at <byte>     - set breakpoint at <byte>\n"
-             << "  breakpoint.set.on <opcode>+  - set breakpoint on <opcode> (accepts space-separated multiple operands)\n"
-             << "  st.show                      - show stack trace\n"
-             << "  register.show <n>...         - show register n from current register set (accepts space-separated multiple operands)\n"
-             << "  register.local.show <n>...   - show local register n (accepts space-separated multiple operands)\n"
-             << "  register.static.show <n>...  - show static register n (accepts space-separated multiple operands)\n"
-             << "  register.global.show <n>...  - show global register n (accepts space-separated multiple operands)\n"
-             << "  .                            - reuse last statement (last statement in bulk, it does not support blocks)\n"
-             ;
-        cout << "\nMultiple statements can be given at once and executed in bulk like this:\n\n";
-        cout << "  >>> {\n"
-             << "  ...  cpu.init\n"
-             << "  ...  breakpoint.set.on jump end halt\n"
-             << "  ...  cpu.tick -1\n"
-             << "  ...  }\n"
-             ;
         cout << "\n";
-        cout << "Use ^D to abort entering a statement. Use ^C to quit the debugger.";
+        cout << "When inside debugger, use 'help' to list debugger statements (you can also discover them by pressing Tab repeatedly).";
+        cout << "\n";
+        cout << "Use ^C to abort entering a statement. Use ^D or 'quit' to quit the debugger.";
         cout << endl;
     }
     if (SHOW_HELP or SHOW_VERSION) {
