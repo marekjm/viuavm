@@ -202,6 +202,11 @@ void printCLCALL(byte* iptr, const CPU& cpu) {
     cout << endl;
 }
 
+void printLEAVE(byte* iptr, const CPU& cpu) {
+    byte* address = cpu.tryframes.back()->ret_address();
+    cout << "(leaving to 0x" << hex << (unsigned long)address << dec << ", bytecode " << (address-cpu.bytecode) <<  ')' << endl;
+}
+
 typedef void(*PRINTER)(byte*, const CPU&);
 map<string, PRINTER> opcode_printers = {
     { "izero", &print1IntegerOperandInstruction },
@@ -252,6 +257,8 @@ map<string, PRINTER> opcode_printers = {
     { "jump", &printJUMP },
     { "branch", &printBRANCH },
     { "call", &printCALL },
+
+    { "leave", &printLEAVE },
 
     { "excall", &printCALL },
 };
