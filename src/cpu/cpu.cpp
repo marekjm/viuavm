@@ -507,23 +507,7 @@ byte* CPU::tick() {
     }
 
     if (thrown != 0) {
-        // FIXME: thrown objects should be handled here
-        //
-        //        1) if a catcher block is registered:
-        //          * new block frame should be created for it,
-        //          * return address for it should be copied
-        //            from a top-most frame on the block-stack,
-        //          * this new frame should be pushed on block-stack,
-        //          * control should be transferred to selected block,
-        //
-        //        2) otherwise, look for registered catcher in a block-frame one level up on the stack and
-        //        repeat the procedure from step 1,
-        //
-        //        3) if the object has been handled (i.e. a block catching its type has been found),
-        //        continue execution,
-        //        otherwise, finish execution with unhandled exception
-        //
-        //        REMINDER: catching Object catches everything! (not actually implemented, marked as a TODO)
+        // FIXME: catching Object catches everything! (not actually implemented, marked as a TODO)
         TryFrame* tframe;
         for (unsigned i = tryframes.size(); i > 0; --i) {
             tframe = tryframes[(i-1)];
@@ -535,6 +519,12 @@ byte* CPU::tick() {
 
                 break;
             }
+        }
+        if (thrown != 0) {
+            return_code = 1;
+            return_exception = thrown->type();
+            return_message = thrown->repr();
+            return 0;
         }
     }
 
