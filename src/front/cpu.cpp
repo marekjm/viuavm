@@ -18,6 +18,7 @@ const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file whi
 // MISC FLAGS
 bool SHOW_HELP = false;
 bool SHOW_VERSION = false;
+bool VERBOSE = false;
 
 
 int main(int argc, char* argv[]) {
@@ -36,12 +37,17 @@ int main(int argc, char* argv[]) {
         args.push_back(argv[i]);
     }
 
+    if (SHOW_HELP or (SHOW_VERSION and VERBOSE)) {
+        cout << "Viua VM virtual machine, version ";
+    }
     if (SHOW_HELP or SHOW_VERSION) {
-        cout << "Viua VM virtual machine, version " << VERSION << endl;
-        if (SHOW_HELP) {
-            cout << "    --help             - display this message" << endl;
-            cout << "    --version          - display version" << endl;
-        }
+        cout << VERSION << endl;
+    }
+    if (SHOW_HELP) {
+        cout << "    --help             - display this message" << endl;
+        cout << "    --version          - display version" << endl;
+    }
+    if (SHOW_HELP or SHOW_VERSION) {
         return 0;
     }
 

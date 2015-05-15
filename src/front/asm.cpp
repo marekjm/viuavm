@@ -646,29 +646,34 @@ int main(int argc, char* argv[]) {
 
     int ret_code = 0;
 
+    if (SHOW_HELP or (SHOW_VERSION and VERBOSE)) {
+        cout << "Viua VM assembler, version ";
+    }
     if (SHOW_HELP or SHOW_VERSION) {
-        cout << "Viua VM assembler, version " << VERSION << endl;
-        if (SHOW_HELP) {
-            cout << "\nUSAGE:\n";
-            cout << "    " << argv[0] << " [option...] <infile> [<outfile>]\n" << endl;
-            cout << "OPTIONS:\n";
-            cout << "    " << "--version            - show version\n"
-                 << "    " << "--help               - display this message\n"
-                 << "    " << "--verbose            - show verbose output\n"
-                 << "    " << "--debug              - show debugging output\n"
-                 << "    " << "--scream             - show so much debugging output it becomes noisy\n"
-                 << "    " << "--Wall               - warn about everything\n"
-                 << "    " << "--Wmissin-end        - warn about missing 'end' instruction at the end of functions\n"
-                 << "    " << "--Wempty-function    - warn about empty functions\n"
-                 << "    " << "--Wopless-frame      - warn about frames without operands\n"
-                 << "    " << "--Eall               - treat all warnings as errors\n"
-                 << "    " << "--Emissin-end        - treat missing 'end' instruction at the end of function as error\n"
-                 << "    " << "--Eempty-function    - treat empty function as error\n"
-                 << "    " << "--Eopless-frame      - treat frames without operands as errors\n"
-                 << "    " << "--lib-static         - assemble as a static library\n"
-                 << "    " << "--lib-dynamic        - assemble as a dynamic library\n"
-                 ;
-        }
+        cout << VERSION << endl;
+    }
+    if (SHOW_HELP) {
+        cout << "\nUSAGE:\n";
+        cout << "    " << argv[0] << " [option...] <infile> [<outfile>]\n" << endl;
+        cout << "OPTIONS:\n";
+        cout << "    " << "--version            - show version\n"
+             << "    " << "--help               - display this message\n"
+             << "    " << "--verbose            - show verbose output\n"
+             << "    " << "--debug              - show debugging output\n"
+             << "    " << "--scream             - show so much debugging output it becomes noisy\n"
+             << "    " << "--Wall               - warn about everything\n"
+             << "    " << "--Wmissin-end        - warn about missing 'end' instruction at the end of functions\n"
+             << "    " << "--Wempty-function    - warn about empty functions\n"
+             << "    " << "--Wopless-frame      - warn about frames without operands\n"
+             << "    " << "--Eall               - treat all warnings as errors\n"
+             << "    " << "--Emissin-end        - treat missing 'end' instruction at the end of function as error\n"
+             << "    " << "--Eempty-function    - treat empty function as error\n"
+             << "    " << "--Eopless-frame      - treat frames without operands as errors\n"
+             << "    " << "--lib-static         - assemble as a static library\n"
+             << "    " << "--lib-dynamic        - assemble as a dynamic library\n"
+             ;
+    }
+    if (SHOW_HELP or SHOW_VERSION) {
         return 0;
     }
 
