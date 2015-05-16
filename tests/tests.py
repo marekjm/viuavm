@@ -693,7 +693,7 @@ class JumpingTests(unittest.TestCase):
 
 
 class TryCatchBlockTests(unittest.TestCase):
-    """
+    """Tests for user code thrown exceptions.
     """
     PATH = './sample/asm/blocks'
 
@@ -713,6 +713,21 @@ class TryCatchBlockTests(unittest.TestCase):
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual("42", output.strip())
+        self.assertEqual(0, excode)
+
+
+class CatchingMachineThrownExceptionTests(unittest.TestCase):
+    """Tests for catching machine-thrown exceptions.
+    """
+    PATH = './sample/asm/exceptions'
+
+    def testCatchingMachineThrownException(self):
+        name = 'nullregister_access.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual("exception encountered: (get) read from null register: 1", output.strip())
         self.assertEqual(0, excode)
 
 
