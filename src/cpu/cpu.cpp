@@ -456,6 +456,9 @@ byte* CPU::dispatch(byte* addr) {
 
 byte* CPU::tick() {
     /** Perform a *tick*, i.e. run a single CPU instruction.
+     *
+     *  Returns pointer to next instruction upon correct execution.
+     *  Returns null pointer upon error.
      */
     bool halt = false;
     byte* previous_instruction_pointer = instruction_pointer;
@@ -487,6 +490,8 @@ byte* CPU::tick() {
 
     if (halt or frames.size() == 0) { return 0; }
 
+    /*  Machine should halt execution if the instruction pointer exceeds bytecode size.
+     */
     if (instruction_pointer >= (bytecode+bytecode_size)) {
         return_code = 1;
         return_exception = "InvalidBytecodeAddress";
@@ -494,7 +499,15 @@ byte* CPU::tick() {
         return 0;
     }
 
-    if (instruction_pointer == previous_instruction_pointer and OPCODE(*instruction_pointer) != END) {
+    /*  Machine should halt execution if previous instruction pointer is the same as current one as
+     *  it means that the execution flow is corrupted.
+     *
+     *  However, execution *should not* be halted if:
+     *      - the offending opcode is END (as this may indicate exiting recursive function),
+     *      - an object has been thrown, as the instruction pointer will be adjusted by
+     *        catchers or execution will be halted on unhandled types,
+     */
+    if (instruction_pointer == previous_instruction_pointer and OPCODE(*instruction_pointer) != END and thrown == 0) {
         return_code = 2;
         ostringstream oss;
         return_exception = "InstructionUnchanged";
