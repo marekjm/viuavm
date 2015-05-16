@@ -524,12 +524,12 @@ byte* CPU::tick() {
                 break;
             }
         }
-        if (thrown != 0) {
-            return_code = 1;
-            return_exception = thrown->type();
-            return_message = thrown->repr();
-            return 0;
-        }
+    }
+    if (thrown != 0) {
+        return_code = 1;
+        return_exception = thrown->type();
+        return_message = thrown->repr();
+        return 0;
     }
 
     return instruction_pointer;
