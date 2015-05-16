@@ -472,11 +472,15 @@ byte* CPU::tick() {
         if (debug) { cout << OP_NAMES.at(OPCODE(*instruction_pointer)); }
         instruction_pointer = dispatch(instruction_pointer);
         if (debug) { cout << endl; }
-    } catch (const Exception* e) {
-        return_code = 1;
-        return_message = e->what();
-        return_exception = e->type();
-        return 0;
+    } catch (Exception* e) {
+        /* All machine-thrown exceptions are passed back to user code.
+         * This is much easier than checking for erroneous conditions and
+         * terminating functions conditionally, instead - machine just throws Exception objects which
+         * are then caught here.
+         *
+         * If user code cannot deal with them (i.e. did not register a catcher block) they will terminate execution later.
+         */
+        thrown = e;
     } catch (const HaltException& e) {
         halt = true;
     }
