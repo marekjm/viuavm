@@ -1,6 +1,6 @@
 #include <string>
 #include "../../bytecode/bytetypedef.h"
-#include "../../types/object.h"
+#include "../../types/type.h"
 #include "../../types/integer.h"
 #include "../../types/float.h"
 #include "../../types/byte.h"

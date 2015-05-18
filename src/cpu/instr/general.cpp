@@ -1,7 +1,7 @@
 #include <dlfcn.h>
 #include <iostream>
 #include "../../bytecode/bytetypedef.h"
-#include "../../types/object.h"
+#include "../../types/type.h"
 #include "../../types/integer.h"
 #include "../../types/boolean.h"
 #include "../../types/byte.h"
@@ -463,7 +463,7 @@ byte* CPU::end(byte* addr) {
     }
     addr = frames.back()->ret_address();
 
-    Object* returned = 0;
+    Type* returned = 0;
     bool returned_is_reference = false;
     int return_value_register = frames.back()->place_return_value_in;
     bool resolve_return_value_register = frames.back()->resolve_return_value_register;
@@ -700,7 +700,7 @@ byte* CPU::excall(byte* addr) {
     (*callback)(frame, 0, regset);
 
     // FIXME: woohoo! segfault!
-    Object* returned = 0;
+    Type* returned = 0;
     bool returned_is_reference = false;
     int return_value_register = frames.back()->place_return_value_in;
     bool resolve_return_value_register = frames.back()->resolve_return_value_register;

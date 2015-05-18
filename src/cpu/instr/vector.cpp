@@ -1,6 +1,6 @@
 #include <iostream>
 #include "../../bytecode/bytetypedef.h"
-#include "../../types/object.h"
+#include "../../types/type.h"
 #include "../../types/integer.h"
 #include "../../types/vector.h"
 #include "../../support/pointer.h"
@@ -167,7 +167,7 @@ byte* CPU::vpop(byte* addr) {
      *  2) pop value at given index,
      *  3) put it in a register,
      */
-    Object* ptr = static_cast<Vector*>(fetch(regvec_num))->pop(regpos_num);
+    Type* ptr = static_cast<Vector*>(fetch(regvec_num))->pop(regpos_num);
     if (regdst_num) { place(regdst_num, ptr); }
 
     return addr;
@@ -220,7 +220,7 @@ byte* CPU::vat(byte* addr) {
      *  2) pop value at given index,
      *  3) put it in a register,
      */
-    Object* ptr = static_cast<Vector*>(fetch(regvec_num))->at(regpos_num);
+    Type* ptr = static_cast<Vector*>(fetch(regvec_num))->at(regpos_num);
     if (regdst_num) {
         place(regdst_num, ptr);
         uregset->flag(regdst_num, REFERENCE);
