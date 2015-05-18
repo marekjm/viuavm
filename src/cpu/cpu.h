@@ -11,7 +11,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include "../bytecode/bytetypedef.h"
-#include "../types/object.h"
+#include "../types/type.h"
 #include "registerset.h"
 #include "frame.h"
 #include "tryframe.h"
@@ -44,7 +44,7 @@ class CPU {
     RegisterSet* uregset;
 
     // Temporary register
-    Object* tmp;
+    Type* tmp;
 
     // Static registers
     std::map<std::string, RegisterSet*> static_registers;
@@ -67,8 +67,8 @@ class CPU {
     /*  Slot for thrown objects (typically exceptions).
      *  Can be set by user code and the CPU.
      */
-    Object* thrown;
-    Object* caught;
+    Type* thrown;
+    Type* caught;
 
     /*  Variables set after CPU executed bytecode.
      *  They describe exit conditions of the bytecode that just stopped running.
@@ -87,10 +87,10 @@ class CPU {
 
     /*  Methods to deal with registers.
      */
-    void updaterefs(Object* before, Object* now);
+    void updaterefs(Type* before, Type* now);
     bool hasrefs(unsigned);
-    Object* fetch(unsigned) const;
-    void place(unsigned, Object*);
+    Type* fetch(unsigned) const;
+    void place(unsigned, Type*);
     void ensureStaticRegisters(std::string);
 
     /*  Methods dealing with stack and frame manipulation.
