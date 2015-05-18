@@ -308,7 +308,7 @@ void printRegisters(const vector<string>& indexes, RegisterSet* regset) {
             continue;
         }
         cout << "-- " << index << " --";
-        Object* object = regset->at(index);
+        Type* object = regset->at(index);
         if (object) {
             cout << '\n';
             cout << "  pointer:       " << hex << object << dec << endl;
