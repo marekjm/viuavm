@@ -6,7 +6,7 @@
 #include <vector>
 #include "../cpu/frame.h"
 #include "../cpu/registerset.h"
-#include "../types/object.h"
+#include "../types/type.h"
 
 
 const std::vector<const char*> VIUAPATH = {
@@ -17,7 +17,7 @@ const std::vector<const char*> VIUAPATH = {
 
 
 // External functions must have this signature
-typedef Object* (ExternalFunction)(Frame*, RegisterSet*, RegisterSet*);
+typedef Type* (ExternalFunction)(Frame*, RegisterSet*, RegisterSet*);
 
 /** External modules must export two functions:
  *
