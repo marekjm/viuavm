@@ -5,10 +5,10 @@
 
 #include <string>
 #include <sstream>
-#include "object.h"
+#include "type.h"
 
 
-class Byte : public Object {
+class Byte : public Type {
     /** Byte type can be used to hold generic data or
      *  act as known-from-C char type.
      *
@@ -32,7 +32,7 @@ class Byte : public Object {
 
         char& value() { return byte_; }
 
-        Object* copy() const {
+        Type* copy() const {
             return new Byte(byte_);
         }
 

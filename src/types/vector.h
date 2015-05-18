@@ -5,13 +5,13 @@
 
 #include <string>
 #include <vector>
-#include "object.h"
+#include "type.h"
 
 
-class Vector : public Object {
+class Vector : public Type {
     /** Vector type.
      */
-    std::vector<Object*> internal_object;
+    std::vector<Type*> internal_object;
 
     public:
         std::string type() const {
@@ -22,7 +22,7 @@ class Vector : public Object {
             return internal_object.size() != 0;
         }
 
-        Object* copy() const {
+        Type* copy() const {
             Vector* vec = new Vector();
             for (unsigned i = 0; i < internal_object.size(); ++i) {
                 vec->push(internal_object[i]->copy());
@@ -30,16 +30,16 @@ class Vector : public Object {
             return vec;
         }
 
-        std::vector<Object*>& value() { return internal_object; }
+        std::vector<Type*>& value() { return internal_object; }
 
-        Object* insert(int, Object*);
-        Object* push(Object*);
-        Object* pop(int);
-        Object* at(int);
+        Type* insert(int, Type*);
+        Type* push(Type*);
+        Type* pop(int);
+        Type* at(int);
         int len();
 
         Vector() {}
-        Vector(const std::vector<Object*>& v) {
+        Vector(const std::vector<Type*>& v) {
             for (unsigned i = 0; i < v.size(); ++i) {
                 internal_object.push_back(v[i]->copy());
             }

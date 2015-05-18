@@ -5,10 +5,10 @@
 
 #include <string>
 #include <sstream>
-#include "object.h"
+#include "type.h"
 
 
-class Boolean : public Object {
+class Boolean : public Type {
     /** Boolean object.
      *
      *  This type is used to hold true and false values.
@@ -28,7 +28,7 @@ class Boolean : public Object {
 
         bool& value() { return b; }
 
-        Object* copy() const {
+        Type* copy() const {
             return new Boolean(b);
         }
 

@@ -5,10 +5,10 @@
 
 #include <string>
 #include <sstream>
-#include "object.h"
+#include "type.h"
 
 
-class Float : public Object {
+class Float : public Type {
     /** Basic integer type.
      *  It is suitable for mathematical operations.
      */
@@ -30,7 +30,7 @@ class Float : public Object {
 
         float& value() { return data; }
 
-        Object* copy() const {
+        Type* copy() const {
             return new Float(data);
         }
 

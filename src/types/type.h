@@ -12,7 +12,7 @@ class Type {
      *  Viua uses an object-based hierarchy to allow easier storage in registers and
      *  to take advantage of C++ polymorphism.
      *
-     *  Instead of void* Viua holds Object* so when registers are delete'ed proper destructor
+     *  Instead of void* Viua holds Type* so when registers are delete'ed proper destructor
      *  is always called.
      */
     public:

@@ -4,11 +4,11 @@
 #pragma once
 
 #include <string>
-#include "object.h"
+#include "type.h"
 #include "../support/string.h"
 
 
-class Exception : public Object {
+class Exception : public Type {
     /** String type.
      *
      *  Designed to hold text.
@@ -29,7 +29,7 @@ class Exception : public Object {
             return true;
         }
 
-        Object* copy() const {
+        Type* copy() const {
             return new Exception(cause);
         }
 

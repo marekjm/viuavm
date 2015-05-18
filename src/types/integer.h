@@ -5,10 +5,10 @@
 
 #include <string>
 #include <sstream>
-#include "object.h"
+#include "type.h"
 
 
-class Integer : public Object {
+class Integer : public Type {
     /** Basic integer type.
      *  It is suitable for mathematical operations.
      */
@@ -27,7 +27,7 @@ class Integer : public Object {
 
         int& value() { return number; }
 
-        Object* copy() const {
+        Type* copy() const {
             return new Integer(number);
         }
 

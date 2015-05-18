@@ -4,13 +4,13 @@
 #pragma once
 
 #include <string>
-#include "object.h"
+#include "type.h"
 #include "vector.h"
 #include "integer.h"
 #include "../support/string.h"
 
 
-class String : public Object {
+class String : public Type {
     /** String type.
      *
      *  Designed to hold text.
@@ -31,7 +31,7 @@ class String : public Object {
             return svalue.size() != 0;
         }
 
-        Object* copy() const {
+        Type* copy() const {
             return new String(svalue);
         }
 

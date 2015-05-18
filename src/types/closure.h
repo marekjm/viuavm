@@ -6,14 +6,14 @@
 #include <string>
 #include "../bytecode/bytetypedef.h"
 #include "../cpu/registerset.h"
-#include "object.h"
+#include "type.h"
 
 
-class Closure : public Object {
+class Closure : public Type {
     /** Vector type.
      */
     public:
-        Object** arguments;
+        Type** arguments;
         bool* argreferences;
         int arguments_size;
 
@@ -27,7 +27,7 @@ class Closure : public Object {
 
         bool boolean() const;
 
-        Object* copy() const;
+        Type* copy() const;
 
         // FIXME: implement real dtor
         Closure();
