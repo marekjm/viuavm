@@ -588,28 +588,28 @@ int main(int argc, char* argv[]) {
 
     for (int i = 1; i < argc; ++i) {
         option = string(argv[i]);
-        if (option == "--help") {
+        if (option == "--help" or option == "-h") {
             SHOW_HELP = true;
             continue;
-        } else if (option == "--version") {
+        } else if (option == "--version" or option == "-V") {
             SHOW_VERSION = true;
             continue;
-        } else if (option == "--verbose") {
+        } else if (option == "--verbose" or option == "-v") {
             VERBOSE = true;
             continue;
-        } else if (option == "--debug") {
+        } else if (option == "--debug" or option == "-d") {
             DEBUG = true;
             continue;
         } else if (option == "--scream") {
             SCREAM = true;
             continue;
-        } else if (option == "--lib") {
+        } else if (option == "--lib" or option == "-c") {
             AS_LIB = true;
             continue;
-        } else if (option == "--Wall") {
+        } else if (option == "--Wall" or option == "-W") {
             WARNING_ALL = true;
             continue;
-        } else if (option == "--Eall") {
+        } else if (option == "--Eall" or option == "-E") {
             ERROR_ALL = true;
             continue;
         } else if (option == "--Wmissing-end") {
@@ -660,21 +660,20 @@ int main(int argc, char* argv[]) {
         cout << "\nUSAGE:\n";
         cout << "    " << argv[0] << " [option...] <infile> [<outfile>]\n" << endl;
         cout << "OPTIONS:\n";
-        cout << "    " << "--version            - show version\n"
-             << "    " << "--help               - display this message\n"
-             << "    " << "--verbose            - show verbose output\n"
-             << "    " << "--debug              - show debugging output\n"
-             << "    " << "--scream             - show so much debugging output it becomes noisy\n"
-             << "    " << "--Wall               - warn about everything\n"
-             << "    " << "--Wmissin-end        - warn about missing 'end' instruction at the end of functions\n"
-             << "    " << "--Wempty-function    - warn about empty functions\n"
-             << "    " << "--Wopless-frame      - warn about frames without operands\n"
-             << "    " << "--Eall               - treat all warnings as errors\n"
-             << "    " << "--Emissin-end        - treat missing 'end' instruction at the end of function as error\n"
-             << "    " << "--Eempty-function    - treat empty function as error\n"
-             << "    " << "--Eopless-frame      - treat frames without operands as errors\n"
-             << "    " << "--lib-static         - assemble as a static library\n"
-             << "    " << "--lib-dynamic        - assemble as a dynamic library\n"
+        cout << "    " << "-V, --version            - show version\n"
+             << "    " << "-h, --help               - display this message\n"
+             << "    " << "-v, --verbose            - show verbose output\n"
+             << "    " << "-d, --debug              - show debugging output\n"
+             << "    " << "    --scream             - show so much debugging output it becomes noisy\n"
+             << "    " << "-W, --Wall               - warn about everything\n"
+             << "    " << "    --Wmissin-end        - warn about missing 'end' instruction at the end of functions\n"
+             << "    " << "    --Wempty-function    - warn about empty functions\n"
+             << "    " << "    --Wopless-frame      - warn about frames without operands\n"
+             << "    " << "-E, --Eall               - treat all warnings as errors\n"
+             << "    " << "    --Emissing-end       - treat missing 'end' instruction at the end of function as error\n"
+             << "    " << "    --Eempty-function    - treat empty function as error\n"
+             << "    " << "    --Eopless-frame      - treat frames without operands as errors\n"
+             << "    " << "-c, --lib                - assemble as a library\n"
              ;
     }
     if (SHOW_HELP or SHOW_VERSION) {
