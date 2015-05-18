@@ -1,6 +1,6 @@
 #include <sstream>
 #include <string>
-#include "types/object.h"
+#include "types/type.h"
 #include "cpu/frame.h"
 using namespace std;
 
