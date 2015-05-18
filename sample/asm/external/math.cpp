@@ -1,6 +1,6 @@
 #include <cmath>
 #include <iostream>
-#include "../../../src/types/object.h"
+#include "../../../src/types/type.h"
 #include "../../../src/types/float.h"
 #include "../../../src/cpu/frame.h"
 #include "../../../src/cpu/registerset.h"
@@ -8,7 +8,7 @@
 using namespace std;
 
 
-Object* math_sqrt(Frame* frame, RegisterSet*, RegisterSet*) {
+Type* math_sqrt(Frame* frame, RegisterSet*, RegisterSet*) {
     Float* flt = dynamic_cast<Float*>(frame->args->get(0));
     float square_root = sqrt(flt->value());
     frame->regset->set(0, new Float(square_root));

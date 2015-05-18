@@ -1,12 +1,12 @@
 #include <iostream>
-#include "../../../src/types/object.h"
+#include "../../../src/types/type.h"
 #include "../../../src/cpu/frame.h"
 #include "../../../src/cpu/registerset.h"
 #include "../../../src/include/module.h"
 using namespace std;
 
 
-Object* hello(Frame*, RegisterSet*, RegisterSet*) {
+Type* hello(Frame*, RegisterSet*, RegisterSet*) {
     cout << "Hello World!" << endl;
     return 0;
 }
