@@ -3,7 +3,7 @@
 #include "../bytecode/bytetypedef.h"
 #include "../bytecode/opcodes.h"
 #include "../bytecode/maps.h"
-#include "../types/object.h"
+#include "../types/type.h"
 #include "../types/integer.h"
 #include "../types/byte.h"
 #include "../types/string.h"
@@ -69,7 +69,7 @@ CPU& CPU::registerExternalFunction(const string& name, ExternalFunction* functio
 }
 
 
-Object* CPU::fetch(unsigned index) const {
+Type* CPU::fetch(unsigned index) const {
     /*  Return pointer to object at given register.
      *  This method safeguards against reaching for out-of-bounds registers and
      *  reading from an empty register.
@@ -82,14 +82,14 @@ Object* CPU::fetch(unsigned index) const {
 }
 
 
-template<class T> inline void copyvalue(Object* a, Object* b) {
-    /** This is a short inline, template function to copy value between two `Object` pointers of the same polymorphic type.
+template<class T> inline void copyvalue(Type* a, Type* b) {
+    /** This is a short inline, template function to copy value between two `Type` pointers of the same polymorphic type.
      *  It is used internally by CPU.
      */
     static_cast<T>(a)->value() = static_cast<T>(b)->value();
 }
 
-void CPU::updaterefs(Object* before, Object* now) {
+void CPU::updaterefs(Type* before, Type* now) {
     /** This method updates references to a given address present in registers.
      *  It swaps old address for the new one in every register that points to the old address.
      *
@@ -126,14 +126,14 @@ bool CPU::hasrefs(unsigned index) {
     return has;
 }
 
-void CPU::place(unsigned index, Object* obj) {
+void CPU::place(unsigned index, Type* obj) {
     /** Place an object in register with given index.
      *
      *  Before placing an object in register, a check is preformed if the register is empty.
-     *  If not - the `Object` previously stored in it is destroyed.
+     *  If not - the `Type` previously stored in it is destroyed.
      *
      */
-    Object* old_ref_ptr = (hasrefs(index) ? uregset->at(index) : 0);
+    Type* old_ref_ptr = (hasrefs(index) ? uregset->at(index) : 0);
     uregset->set(index, obj);
 
     // update references *if, and only if* the register being set has references and
@@ -524,7 +524,7 @@ byte* CPU::tick() {
     }
 
     if (thrown != 0) {
-        // FIXME: catching Object catches everything! (not actually implemented, marked as a TODO)
+        // FIXME: catching Type catches everything! (not actually implemented, marked as a TODO)
         TryFrame* tframe;
         for (unsigned i = tryframes.size(); i > 0; --i) {
             tframe = tryframes[(i-1)];
