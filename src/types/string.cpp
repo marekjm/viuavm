@@ -3,7 +3,7 @@
 #include <sstream>
 #include <stdexcept>
 #include "../support/string.h"
-#include "object.h"
+#include "type.h"
 #include "vector.h"
 #include "string.h"
 using namespace std;

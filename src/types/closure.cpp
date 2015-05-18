@@ -1,6 +1,6 @@
 #include <string>
 #include <sstream>
-#include "object.h"
+#include "type.h"
 #include "closure.h"
 using namespace std;
 
@@ -34,7 +34,7 @@ bool Closure::boolean() const {
     return true;
 }
 
-Object* Closure::copy() const {
+Type* Closure::copy() const {
     Closure* clsr = new Closure();
     clsr->function_name = function_name;
     // FIXME: for the above one, copy ctor would be nice
