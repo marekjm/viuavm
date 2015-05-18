@@ -32,7 +32,7 @@
 
     ; ...and return the vector
     ; vectors can be used to return multiple values as
-    ; they can hold any Object-derived type
+    ; they can hold any Type-derived type
     move 1 0
     end
 .end
