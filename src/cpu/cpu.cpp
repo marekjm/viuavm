@@ -214,6 +214,9 @@ CPU& CPU::iframe(Frame* frm) {
             cmdline->push(new String(commandline_arguments[i]));
         }
         regset->set(1, cmdline);
+        // FIXME: this shoud be fixed in a different way
+        //        why even allocate the memory when it is never used?
+        delete initial_frame->regset;
         initial_frame->regset = regset;
         initial_frame->function_name = "__entry";
     } else {
