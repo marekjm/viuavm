@@ -1,5 +1,5 @@
-#ifndef VIUA_TYPES_OBJECT_H
-#define VIUA_TYPES_OBJECT_H
+#ifndef VIUA_TYPES_TYPE_H
+#define VIUA_TYPES_TYPE_H
 
 #pragma once
 
@@ -7,24 +7,24 @@
 #include <sstream>
 
 
-class Object {
+class Type {
     /** Base class for all derived types.
-     *  Wudoo uses an Object-based Hierarchy to allow easier storage in registers and
+     *  Viua uses an object-based hierarchy to allow easier storage in registers and
      *  to take advantage of C++ polymorphism.
      *
-     *  Instead of void* Wudoo holds Object* so when registers are delete'ed proper destructor
+     *  Instead of void* Viua holds Object* so when registers are delete'ed proper destructor
      *  is always called.
      */
     public:
-        /** Interface of an Object.
+        /** Basic interface of a Type.
          *
-         *  Derived objects are expected to override this methods, but incase they do not
-         *  here are provided safe defaults.
+         *  Derived objects are expected to override this methods, but in case they do not
+         *  Type provides safe defaults.
          */
         virtual std::string type() const {
-            /*  Basic type is just `Object`.
+            /*  Basic type is just `Type`.
              */
-            return "Object";
+            return "Type";
         }
         virtual std::string str() const {
             /*  By default, Wudoo provides string output a la Python.
@@ -49,11 +49,11 @@ class Object {
             return false;
         }
 
-        virtual Object* copy() const = 0;
+        virtual Type* copy() const = 0;
 
         // We need to construct and destroy our basic object.
-        Object() {}
-        virtual ~Object() {}
+        Type() {}
+        virtual ~Type() {}
 };
 
 
