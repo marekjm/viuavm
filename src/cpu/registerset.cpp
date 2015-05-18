@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include "../types/object.h"
+#include "../types/type.h"
 #include "../types/integer.h"
 #include "../types/byte.h"
 #include "../types/exception.h"
@@ -9,14 +9,14 @@
 using namespace std;
 
 
-template<class T> inline void copyvalue(Object* dst, Object* src) {
-    /** This is a short inline, template function to copy value between two `Object` pointers of the same polymorphic type.
+template<class T> inline void copyvalue(Type* dst, Type* src) {
+    /** This is a short inline, template function to copy value between two `Type` pointers of the same polymorphic type.
      *  It is used internally by CPU.
      */
     static_cast<T>(dst)->value() = static_cast<T>(src)->value();
 }
 
-Object* RegisterSet::set(unsigned index, Object* object) {
+Type* RegisterSet::set(unsigned index, Type* object) {
     /** Put object inside register specified by give index.
      *
      *  Performs bounds checking.
@@ -28,7 +28,7 @@ Object* RegisterSet::set(unsigned index, Object* object) {
         delete registers[index];
     }
     if (isflagged(index, REFERENCE)) {
-        Object* referenced = get(index);
+        Type* referenced = get(index);
 
         // it is a reference, copy value of the object
         if (referenced->type() == "Integer") { copyvalue<Integer*>(referenced, object); }
@@ -43,14 +43,14 @@ Object* RegisterSet::set(unsigned index, Object* object) {
     return object;
 }
 
-Object* RegisterSet::get(unsigned index) {
+Type* RegisterSet::get(unsigned index) {
     /** Fetch object from register specified by given index.
      *
      *  Performs bounds checking.
      *  Throws exception when accessing empty register.
      */
     if (index >= registerset_size) { throw new Exception("register access out of bounds: read"); }
-    Object* optr = registers[index];
+    Type* optr = registers[index];
     if (optr == 0) {
         ostringstream oss;
         oss << "(get) read from null register: " << index;
@@ -59,7 +59,7 @@ Object* RegisterSet::get(unsigned index) {
     return optr;
 }
 
-Object* RegisterSet::at(unsigned index) {
+Type* RegisterSet::at(unsigned index) {
     /** Fetch object from register specified by given index.
      *
      *  Performs bounds checking.
@@ -92,7 +92,7 @@ void RegisterSet::swap(unsigned src, unsigned dst) {
      */
     if (src >= registerset_size) { throw new Exception("register access out of bounds: swap source"); }
     if (dst >= registerset_size) { throw new Exception("register access out of bounds: swap destination"); }
-    Object* tmp = registers[src];
+    Type* tmp = registers[src];
     registers[src] = registers[dst];
     registers[dst] = tmp;
 
@@ -225,7 +225,7 @@ RegisterSet::RegisterSet(unsigned sz): registerset_size(sz), registers(0), masks
     /** Create register set with specified size.
      */
     if (sz > 0) {
-        registers = new Object*[sz];
+        registers = new Type*[sz];
         masks = new mask_t[sz];
         for (unsigned i = 0; i < sz; ++i) {
             registers[i] = 0;

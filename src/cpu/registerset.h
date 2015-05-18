@@ -17,14 +17,14 @@ enum REGISTER_MASKS: mask_t {
 
 class RegisterSet {
     unsigned registerset_size;
-    Object** registers;
+    Type** registers;
     mask_t*  masks;
 
     public:
         // basic access to registers
-        Object* set(unsigned, Object*);
-        Object* get(unsigned);
-        Object* at(unsigned);
+        Type* set(unsigned, Type*);
+        Type* get(unsigned);
+        Type* at(unsigned);
 
         // register modifications
         void move(unsigned, unsigned);
