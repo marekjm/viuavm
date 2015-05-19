@@ -218,7 +218,7 @@ class CPU {
         byte* begin();
         inline byte* end() { return 0; }
 
-        CPU& iframe(Frame* frm = 0);
+        CPU& iframe(Frame* frm = 0, unsigned r = DEFAULT_REGISTER_SIZE);
 
         byte* dispatch(byte*);
         byte* tick();
@@ -231,7 +231,7 @@ class CPU {
         }
         inline std::vector<Frame*> trace() { return frames; }
 
-        CPU(unsigned r = DEFAULT_REGISTER_SIZE):
+        CPU():
             bytecode(0), bytecode_size(0), executable_offset(0),
             regset(0), uregset(0),
             tmp(0),
@@ -242,12 +242,7 @@ class CPU {
             return_code(0), return_exception(""), return_message(""),
             instruction_counter(0), instruction_pointer(0),
             debug(false), errors(false)
-        {
-            /*  Basic constructor.
-             *  Creates register set of requested size.
-             */
-            regset = new RegisterSet(r);
-        }
+        {}
 
         ~CPU() {
             /*  Destructor frees memory at bytecode pointer so make sure you passed a copy of the bytecode to the constructor

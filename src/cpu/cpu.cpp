@@ -203,20 +203,16 @@ byte* CPU::begin() {
     return (instruction_pointer = bytecode+executable_offset);
 }
 
-CPU& CPU::iframe(Frame* frm) {
+CPU& CPU::iframe(Frame* frm, unsigned r) {
     /** Set initial frame.
      */
     Frame *initial_frame;
     if (frm == 0) {
-        initial_frame = new Frame(0, 0, 0);
+        initial_frame = new Frame(0, 0, r);
         initial_frame->function_name = "__entry";
 
-        /*  Overwrite __entry function's registers with
-         *  global register set address.
-         *  They should be the same thing.
-         */
-        delete initial_frame->regset;
-        initial_frame->regset = regset;
+        // set global registers to be the same as __entry function's local registers
+        regset = initial_frame->regset;
 
         Vector* cmdline = new Vector();
         for (unsigned i = 0; i < commandline_arguments.size(); ++i) {
