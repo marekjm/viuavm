@@ -209,20 +209,33 @@ CPU& CPU::iframe(Frame* frm) {
     Frame *initial_frame;
     if (frm == 0) {
         initial_frame = new Frame(0, 0, 0);
+        initial_frame->function_name = "__entry";
+
+        /*  Overwrite __entry function's registers with
+         *  global register set address.
+         *  They should be the same thing.
+         */
+        delete initial_frame->regset;
+        initial_frame->regset = regset;
+
         Vector* cmdline = new Vector();
         for (unsigned i = 0; i < commandline_arguments.size(); ++i) {
             cmdline->push(new String(commandline_arguments[i]));
         }
         regset->set(1, cmdline);
-        // FIXME: this shoud be fixed in a different way
-        //        why even allocate the memory when it is never used?
-        delete initial_frame->regset;
-        initial_frame->regset = regset;
-        initial_frame->function_name = "__entry";
     } else {
         initial_frame = frm;
+
+        /*  If a frame was supplied to us to be the initial one,
+         *  set global registers to the locals of supplied frame.
+         */
+        delete regset;
+        regset = initial_frame->regset;
     }
+
+    // set currently used register set to the global one
     uregset = regset;
+
     frames.push_back(initial_frame);
 
     return (*this);

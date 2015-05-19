@@ -244,11 +244,9 @@ class CPU {
             debug(false), errors(false)
         {
             /*  Basic constructor.
-             *  Creates registers array of requested size and
-             *  initializes it with zeroes.
+             *  Creates register set of requested size.
              */
             regset = new RegisterSet(r);
-            uregset = regset;
         }
 
         ~CPU() {
