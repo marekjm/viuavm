@@ -5,10 +5,11 @@
 
 #include <string>
 #include <sstream>
+#include "casts/integer.h"
 #include "type.h"
 
 
-class Boolean : public Type {
+class Boolean : public IntegerCast {
     /** Boolean object.
      *
      *  This type is used to hold true and false values.
@@ -27,6 +28,8 @@ class Boolean : public Type {
         }
 
         bool& value() { return b; }
+
+        int as_integer() const { return int(b); }
 
         Type* copy() const {
             return new Boolean(b);
