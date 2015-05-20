@@ -28,7 +28,10 @@ class Integer : public IntegerCast {
 
         int& value() { return number; }
 
+        // IntegerCast methods
         int as_integer() const { return number; }
+        int increment() { return (++number); }
+        int decrement() { return (--number); }
 
         Type* copy() const {
             return new Integer(number);

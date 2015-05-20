@@ -29,7 +29,11 @@ class Boolean : public IntegerCast {
 
         bool& value() { return b; }
 
+        // IntegerCast methods
         int as_integer() const { return int(b); }
+        int increment() { return (b = true); }
+        int decrement() { return (b = false); }
+
 
         Type* copy() const {
             return new Boolean(b);
