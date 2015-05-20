@@ -5,10 +5,11 @@
 
 #include <string>
 #include <sstream>
+#include "casts/integer.h"
 #include "type.h"
 
 
-class Integer : public Type {
+class Integer : public IntegerCast {
     /** Basic integer type.
      *  It is suitable for mathematical operations.
      */
@@ -26,6 +27,8 @@ class Integer : public Type {
         bool boolean() const { return number != 0; }
 
         int& value() { return number; }
+
+        int as_integer() const { return number; }
 
         Type* copy() const {
             return new Integer(number);
