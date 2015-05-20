@@ -186,6 +186,15 @@ class IntegerInstructionsTests(unittest.TestCase):
         self.assertEqual('true', output.strip())
         self.assertEqual(0, excode)
 
+    def testBooleanAsInteger(self):
+        name = 'boolean_as_int.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual('70', output.strip())
+        self.assertEqual(0, excode)
+
 
 class FloatInstructionsTests(unittest.TestCase):
     """Tests for float instructions.
