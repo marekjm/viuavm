@@ -424,7 +424,7 @@ byte* CPU::iinc(byte* addr) {
         regno = static_cast<Integer*>(fetch(regno))->value();
     }
 
-    ++(static_cast<Integer*>(fetch(regno))->value());
+    static_cast<IntegerCast*>(fetch(regno))->increment();
 
     return addr;
 }
@@ -444,7 +444,8 @@ byte* CPU::idec(byte* addr) {
     if (ref) {
         regno = static_cast<Integer*>(fetch(regno))->value();
     }
-    --(static_cast<Integer*>(fetch(regno))->value());
+
+    static_cast<IntegerCast*>(fetch(regno))->decrement();
 
     return addr;
 }
