@@ -5,6 +5,7 @@
 
 #include <string>
 #include <sstream>
+#include <vector>
 
 
 class Type {
@@ -48,6 +49,9 @@ class Type {
              */
             return false;
         }
+
+        std::vector<std::string> bases() const;
+        std::vector<std::string> inheritancechain() const;
 
         virtual Type* copy() const = 0;
 
