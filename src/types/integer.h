@@ -5,11 +5,10 @@
 
 #include <string>
 #include <sstream>
-#include "casts/integer.h"
 #include "type.h"
 
 
-class Integer : public IntegerCast {
+class Integer : public Type {
     /** Basic integer type.
      *  It is suitable for mathematical operations.
      */
@@ -28,10 +27,9 @@ class Integer : public IntegerCast {
 
         int& value() { return number; }
 
-        // IntegerCast methods
-        int as_integer() const { return number; }
-        int increment() { return (++number); }
-        int decrement() { return (--number); }
+        virtual int as_integer() const { return number; }
+        virtual int increment() { return (++number); }
+        virtual int decrement() { return (--number); }
 
         Type* copy() const {
             return new Integer(number);
