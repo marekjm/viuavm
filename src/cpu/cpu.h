@@ -189,6 +189,8 @@ class CPU {
     byte* vmthrow(byte*);
     byte* leave(byte*);
 
+    byte* vmtypeof(byte*);
+
     byte* eximport(byte*);
     byte* excall(byte*);
 
