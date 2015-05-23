@@ -215,9 +215,6 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { JUMP,     "jump" },
     { BRANCH,   "branch" },
 
-    { EXIMPORT, "eximport" },
-    { EXCALL,   "excall" },
-
     { THROW,    "throw" },
     { CATCH,    "catch" },
     { PULL,     "pull" },
@@ -227,6 +224,9 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
 
     { CLASSOF,  "classof" },
     { TYPEOF,   "typeof" },
+
+    { EXIMPORT, "eximport" },
+    { EXCALL,   "excall" },
 
     { END,      "end" },
     { HALT,     "halt" },
