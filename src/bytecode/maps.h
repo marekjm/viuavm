@@ -114,6 +114,9 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "try",    sizeof(byte) }, // try <block>
     { "leave",  sizeof(byte) },
 
+    { "classof",sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
+    { "typeof", sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
+
     { "eximport", sizeof(byte) },
     { "excall", sizeof(byte) + sizeof(bool) + sizeof(int) },
 
@@ -221,6 +224,9 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { TRYFRAME, "tryframe" },
     { TRY,      "try" },
     { LEAVE,    "leave" },
+
+    { CLASSOF,  "classof" },
+    { TYPEOF,   "typeof" },
 
     { END,      "end" },
     { HALT,     "halt" },

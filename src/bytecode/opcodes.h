@@ -116,6 +116,9 @@ enum OPCODE : byte {
                 // TRY insructions do not require any CATCH to precede them
     LEAVE,      // leave a block and resume execution after block-entering instruction
 
+    CLASSOF,    // returns factory function spawning new instances of class of object in a given register
+    TYPEOF,     // returns string representation of type of an object in a given register
+
     // Opcodes dealing with external C/C++ modules
     EXIMPORT,   // import external library
     EXCALL,     // call external function
