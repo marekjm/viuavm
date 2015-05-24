@@ -26,7 +26,7 @@ doc/viua_virtual_machine.pdf: doc/viua_virtual_machine.lyx
 	lyx --export-to pdf doc/viua_virtual_machine.pdf --force-overwrite main doc/viua_virtual_machine.lyx
 
 
-clean: clean-support
+clean: clean-support clean-stdlib
 	touch ./build/lib/dummy.o
 	rm -v ./build/lib/*.o
 	touch ./build/cpu/instr/dummy.o
@@ -37,6 +37,12 @@ clean: clean-support
 	rm -v ./build/*.o
 	touch ./bin/vm/dummy.o
 	rm -v ./bin/vm/*
+
+clean-stdlib:
+	touch ./build/stdlib/dummy.o
+	rm -v ./build/stdlib/*.o
+	touch ./build/stdlib/lib/dummy.so
+	rm -v ./build/stdlib/lib/*.so
 
 clean-support:
 	touch ./build/support/dummy.o
