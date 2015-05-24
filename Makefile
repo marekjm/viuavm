@@ -90,7 +90,7 @@ build/stdlib/registerset.o: src/cpu/registerset.cpp src/types/exception.h
 	${CXX} ${CXXFLAGS} -fPIC -shared -o $@ src/cpu/registerset.cpp
 
 build/stdlib/lib/typesystem.so: src/stdlib/typesystem.cpp build/stdlib/exception.o build/stdlib/registerset.o
-	${CXX} ${CXXFLAGS} -fPIC -shared -o $@ $<
+	${CXX} ${CXXFLAGS} -fPIC -shared -o $@ build/stdlib/exception.o build/stdlib/registerset.o
 
 
 build/types/vector.o: src/types/vector.cpp src/types/vector.h
