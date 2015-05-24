@@ -636,7 +636,7 @@ byte* CPU::eximport(byte* addr) {
     }
 
     if (handle == 0) {
-        throw new Exception("failed to link library: " + module + " (" + path + ')');
+        throw new Exception("failed to link library: " + module);
     }
 
     ExportedFunctionNamesReport* exports_names;
