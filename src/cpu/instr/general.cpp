@@ -639,8 +639,8 @@ byte* CPU::eximport(byte* addr) {
         throw new Exception("failed to link library: " + module);
     }
 
-    ExportedFunctionNamesReport* exports_names;
-    ExportedFunctionPointersReport* exports_pointers;
+    ExportedFunctionNamesReport* exports_names = 0;
+    ExportedFunctionPointersReport* exports_pointers = 0;
 
     exports_names = (ExportedFunctionNamesReport*)dlsym(handle, "exports_names");
     exports_pointers = (ExportedFunctionPointersReport*)dlsym(handle, "exports_pointers");
