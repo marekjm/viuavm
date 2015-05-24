@@ -5,7 +5,6 @@
 #include "../../types/integer.h"
 #include "../../types/boolean.h"
 #include "../../types/byte.h"
-#include "../../types/string.h"
 #include "../../support/pointer.h"
 #include "../../include/module.h"
 #include "../../exceptions.h"
@@ -612,34 +611,6 @@ byte* CPU::leave(byte* addr) {
     addr = tryframes.back()->return_address;
     delete tryframes.back();
     tryframes.pop_back();
-    return addr;
-}
-
-byte* CPU::vmtypeof(byte* addr) {
-    /** Run typeof instruction.
-     */
-    int a, b;
-    bool a_ref = false, b_ref = false;
-
-    a_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    a = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
-    b_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    b = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
-    if (a_ref) {
-        a = static_cast<Integer*>(fetch(a))->value();
-    }
-    if (b_ref) {
-        b = static_cast<Integer*>(fetch(b))->value();
-    }
-
-    place(a, new String(fetch(b)->type()));
-
     return addr;
 }
 
