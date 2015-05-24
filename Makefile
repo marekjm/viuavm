@@ -15,10 +15,10 @@ LIB_PATH=${PREFIX}/lib/viua
 
 .SUFFIXES: .cpp .h .o
 
-.PHONY: all remake clean clean-support clean-test-compiles install test
+.PHONY: all remake clean clean-support clean-test-compiles install test stdlib
 
 
-all: ${VM_ASM} ${VM_CPU} ${VM_WDB} bin/opcodes.bin
+all: ${VM_ASM} ${VM_CPU} ${VM_WDB} stdlib bin/opcodes.bin
 
 remake: clean all
 
@@ -73,6 +73,18 @@ ${VM_ASM}: src/front/asm.cpp build/program.o build/programinstructions.o build/a
 
 bin/opcodes.bin: src/bytecode/opcd.cpp src/bytecode/opcodes.h src/bytecode/maps.h
 	${CXX} ${CXXFLAGS} -o $@ $<
+
+
+stdlib: build/stdlib/lib/typesystem.so
+
+build/stdlib/exception.o: src/types/exception.cpp src/types/exception.h
+	${CXX} ${CXXFLAGS} -fPIC -shared -o $@ src/types/exception.cpp
+
+build/stdlib/registerset.o: src/cpu/registerset.cpp src/types/exception.h
+	${CXX} ${CXXFLAGS} -fPIC -shared -o $@ src/cpu/registerset.cpp
+
+build/stdlib/lib/typesystem.so: src/stdlib/typesystem.cpp build/stdlib/exception.o build/stdlib/registerset.o
+	${CXX} ${CXXFLAGS} -fPIC -shared -o $@ $<
 
 
 build/types/vector.o: src/types/vector.cpp src/types/vector.h
