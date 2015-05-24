@@ -498,6 +498,8 @@ byte* CPU::tick() {
         thrown = e;
     } catch (const HaltException& e) {
         halt = true;
+    } catch (const char* e) {
+        thrown = new Exception(e);
     }
 
     if (halt or frames.size() == 0) { return 0; }
