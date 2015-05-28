@@ -1,6 +1,6 @@
 CXX=g++
 CXXFLAGS=-std=c++11 -Wall -pedantic -Wfatal-errors -g
-CXXOPTIMIZATIONFLAGS=-O2
+CXXOPTIMIZATIONFLAGS=
 
 VM_ASM=bin/vm/asm
 VM_CPU=bin/vm/cpu
