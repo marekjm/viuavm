@@ -82,16 +82,22 @@ bin/opcodes.bin: src/bytecode/opcd.cpp src/bytecode/opcodes.h src/bytecode/maps.
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -o $@ $<
 
 
+# compile all standard library shared modules
 stdlib: build/stdlib/lib/typesystem.so
 
+# compile prerequisites for all further modules
 build/stdlib/exception.o: src/types/exception.cpp src/types/exception.h
-	${CXX} ${CXXFLAGS} -fPIC -shared -o $@ src/types/exception.cpp
+	${CXX} ${CXXFLAGS} -fPIC -c -o $@ src/types/exception.cpp
 
 build/stdlib/registerset.o: src/cpu/registerset.cpp src/types/exception.h
-	${CXX} ${CXXFLAGS} -fPIC -shared -o $@ src/cpu/registerset.cpp
+	${CXX} ${CXXFLAGS} -fPIC -c -o $@ src/cpu/registerset.cpp
 
-build/stdlib/lib/typesystem.so: src/stdlib/typesystem.cpp build/stdlib/exception.o build/stdlib/registerset.o
-	${CXX} ${CXXFLAGS} -fPIC -shared -o $@ build/stdlib/exception.o build/stdlib/registerset.o
+
+build/stdlib/lib/typesystem.o: src/stdlib/typesystem.cpp
+	${CXX} ${CXXFLAGS} -fPIC -c -o ./build/stdlib/lib/typesystem.o src/stdlib/typesystem.cpp
+
+build/stdlib/lib/typesystem.so: build/stdlib/lib/typesystem.o build/stdlib/exception.o build/stdlib/registerset.o
+	${CXX} ${CXXFLAGS} -shared -Wl,-soname,$(notdir $@) -o $@ $< -lc
 
 
 build/types/vector.o: src/types/vector.cpp src/types/vector.h
