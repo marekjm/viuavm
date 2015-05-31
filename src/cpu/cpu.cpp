@@ -537,9 +537,25 @@ byte* CPU::tick() {
         return 0;
     }
 
+    TryFrame* tframe;
+    // WARNING!
+    // This is a temporary hack for more fine-grained exception handling
+    if (thrown != 0 and thrown->type() == "Exception") {
+        string exception_detailed_type = static_cast<Exception*>(thrown)->etype();
+        for (unsigned i = tryframes.size(); i > 0; --i) {
+            tframe = tryframes[(i-1)];
+            if (tframe->catchers.count(exception_detailed_type)) {
+                instruction_pointer = tframe->catchers.at(exception_detailed_type)->block_address;
+
+                caught = thrown;
+                thrown = 0;
+
+                break;
+            }
+        }
+    }
+
     if (thrown != 0) {
-        // FIXME: catching Type catches everything! (not actually implemented, marked as a TODO)
-        TryFrame* tframe;
         for (unsigned i = tryframes.size(); i > 0; --i) {
             tframe = tryframes[(i-1)];
             if (tframe->catchers.count(thrown->type())) {
