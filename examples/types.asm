@@ -1,5 +1,12 @@
 .block: handle_Exception
-    strstore 2 "Exception occured: cannot obtain real type of object, assuming: Object"
+    strstore 2 "cannot obtain real type of object, assuming: Object"
+    print 2
+    strstore 2 "Object"
+    leave
+.end
+
+.block: handle_LinkException
+    strstore 2 "failed to link 'typesystem' module, assuming object type is 'Object'"
     print 2
     strstore 2 "Object"
     leave
@@ -19,6 +26,7 @@
     arg 0 1
 
     tryframe
+    catch "LinkException" handle_LinkException
     catch "Exception" handle_Exception
     try get_typeof
 
@@ -30,9 +38,9 @@
     istore 1 42
     print 1
 
-    ; tryframe
-    ; catch "Exception" handle_Exception
-    ; try get_typeof
+    ;tryframe
+    ;catch "Exception" handle_Exception
+    ;try get_typeof
 
     ; print typeof
     frame 1
