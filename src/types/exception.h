@@ -15,6 +15,7 @@ class Exception : public Type {
      */
     protected:
         std::string cause;
+        std::string detailed_type;
     public:
         std::string type() const {
             return "Exception";
@@ -23,7 +24,7 @@ class Exception : public Type {
             return cause;
         }
         std::string repr() const {
-            return (type() + ": " + str::enquote(cause));
+            return (etype() + ": " + str::enquote(cause));
         }
         bool boolean() const {
             return true;
@@ -34,8 +35,10 @@ class Exception : public Type {
         }
 
         virtual std::string what() const;
+        virtual std::string etype() const;
 
-        Exception(std::string s = ""): cause(s) {}
+        Exception(std::string s = ""): cause(s), detailed_type("Exception") {}
+        Exception(std::string ts, std::string cs): cause(cs), detailed_type(ts) {}
 };
 
 
