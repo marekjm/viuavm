@@ -54,7 +54,7 @@ clean-test-compiles:
 	rm ./tests/compiled/*.bin
 
 
-install: ${VM_ASM} ${VM_CPU} ${VM_WDB}
+install: ${VM_ASM} ${VM_CPU} ${VM_WDB} stdlib
 	mkdir -p ${BIN_PATH}
 	cp ${VM_ASM} ${BIN_PATH}/viua-asm
 	chmod 755 ${BIN_PATH}/viua-asm
@@ -62,6 +62,8 @@ install: ${VM_ASM} ${VM_CPU} ${VM_WDB}
 	chmod 755 ${BIN_PATH}/viua-cpu
 	cp ${VM_WDB} ${BIN_PATH}/viua-db
 	chmod 755 ${BIN_PATH}/viua-db
+	mkdir -p ${LIB_PATH}
+	cp -v ./build/stdlib/lib/*.so ${LIB_PATH}/
 
 
 test: ${VM_CPU} ${VM_ASM} clean-test-compiles
