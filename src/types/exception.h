@@ -9,9 +9,10 @@
 
 
 class Exception : public Type {
-    /** String type.
+    /** Exception type.
      *
-     *  Designed to hold text.
+     *  Thrown when irrecoverable conditions are encountered
+     *  during program execution.
      */
     protected:
         std::string cause;
