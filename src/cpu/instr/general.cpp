@@ -623,13 +623,14 @@ byte* CPU::eximport(byte* addr) {
     string path = ("./" + module + ".so");
     void* handle = dlopen(path.c_str(), RTLD_LAZY);
 
+    ostringstream oss;
     for (unsigned i = 0; (i < VIUAPATH.size()) and (handle == 0); ++i) {
-        ostringstream oss;
+        oss.str("");
         oss << VIUAPATH[i] << '/' << module << ".so";
         path = oss.str();
-        if (path[0] == '.') {
+        if (path[0] == '~') {
             oss.str("");
-            oss << getenv("HOME") << '/' << path;
+            oss << getenv("HOME") << path.substr(1);
             path = oss.str();
         }
         handle = dlopen(path.c_str(), RTLD_LAZY);
