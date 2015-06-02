@@ -1,5 +1,8 @@
+#include <string>
+#include <vector>
 #include "../types/type.h"
 #include "../types/string.h"
+#include "../types/vector.h"
 #include "../types/exception.h"
 #include "../cpu/frame.h"
 #include "../cpu/registerset.h"
@@ -15,13 +18,49 @@ Type* typeof(Frame* frame, RegisterSet*, RegisterSet*) {
     return 0;
 }
 
+Type* inheritanceChain(Frame* frame, RegisterSet*, RegisterSet*) {
+    if (frame->args->at(0) == 0) {
+        throw new Exception("expected object as parameter 0");
+    }
+
+    vector<string> ic = frame->args->at(0)->inheritancechain();
+    Vector* icv = new Vector();
+
+    for (unsigned i = 0; i < ic.size(); ++i) {
+        icv->push(new String(ic[i]));
+    }
+
+    frame->regset->set(0, icv);
+    return 0;
+}
+
+Type* bases(Frame* frame, RegisterSet*, RegisterSet*) {
+    if (frame->args->at(0) == 0) {
+        throw new Exception("expected object as parameter 0");
+    }
+
+    vector<string> ic = frame->args->at(0)->bases();
+    Vector* icv = new Vector();
+
+    for (unsigned i = 0; i < ic.size(); ++i) {
+        icv->push(new String(ic[i]));
+    }
+
+    frame->regset->set(0, icv);
+    return 0;
+}
+
 
 const char* function_names[] = {
     "typeof",
+    "inheritanceChain",
+    "bases",
     NULL,
 };
 const ExternalFunction* function_pointers[] = {
     &typeof,
+    &inheritanceChain,
+    &bases,
     NULL,
 };
 
