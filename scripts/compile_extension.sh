@@ -37,6 +37,8 @@ if [[ $2 != "" ]]; then
 fi
 
 g++ -std=c++11 -fPIC -c -o exception.o src/types/exception.cpp
+g++ -std=c++11 -fPIC -c -o vector.o src/types/vector.cpp
 g++ -std=c++11 -fPIC -c -o registerset.o src/cpu/registerset.cpp
+g++ -std=c++11 -fPIC -c -o support_string.o src/support/string.cpp
 g++ -std=c++11 -fPIC -c -o $ONAME $1
-g++ -std=c++11 -fPIC -shared -o $SONAME $ONAME exception.o registerset.o
+g++ -std=c++11 -fPIC -shared -o $SONAME $ONAME exception.o vector.o registerset.o support_string.o
