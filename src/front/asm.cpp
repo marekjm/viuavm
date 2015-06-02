@@ -1027,8 +1027,13 @@ int main(int argc, char* argv[]) {
     // VERIFY BLOCK BODIES
     for (auto block : blocks) {
         vector<string> flines = block.second;
-        if (flines.size() == 0 or flines.back() != "leave") {
-            cout << "fatal: missing 'leave' at the end of block '" << block.first << "'" << endl;
+        if (flines.size() == 0) {
+            cout << "fatal: block '" << block.first << "' has empty body" << endl;
+            exit(1);
+        }
+        string last_line = flines.back();
+        if (not (last_line == "leave" or last_line == "end" or last_line == "halt")) {
+            cout << "fatal: missing returning instruction ('leave', 'end' or 'halt') at the end of block '" << block.first << "'" << endl;
             exit(1);
         }
     }
