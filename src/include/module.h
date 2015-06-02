@@ -10,7 +10,7 @@
 
 
 const std::vector<const char*> VIUAPATH = {
-    ".local/lib/viua",
+    "~/.local/lib/viua",
     "/usr/local/lib/viua",
     "/usr/lib/viua",
 };
