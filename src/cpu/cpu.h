@@ -81,7 +81,7 @@ class CPU {
     byte* instruction_pointer;
 
     /*  This is the interface between programs compiled to VM bytecode and
-     *  external libraries written in C/C++.
+     *  extension libraries written in C++.
      */
     std::map<std::string, ExternalFunction*> external_functions;
 
