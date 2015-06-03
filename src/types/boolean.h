@@ -33,6 +33,13 @@ class Boolean : public Integer {
         int increment() { return (b = true); }
         int decrement() { return (b = false); }
 
+        virtual std::vector<std::string> bases() const {
+            return std::vector<std::string>{"Integer"};
+        }
+        virtual std::vector<std::string> inheritancechain() const {
+            return std::vector<std::string>{"Integer", "Type"};
+        }
+
         Type* copy() const {
             return new Boolean(b);
         }
