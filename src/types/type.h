@@ -50,10 +50,10 @@ class Type {
             return false;
         }
 
-        std::vector<std::string> bases() const {
+        virtual std::vector<std::string> bases() const {
             return std::vector<std::string>{"Type"};
         }
-        std::vector<std::string> inheritancechain() const {
+        virtual std::vector<std::string> inheritancechain() const {
             return std::vector<std::string>{"Type"};
         }
 
