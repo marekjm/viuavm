@@ -19,7 +19,7 @@ LIB_PATH=${PREFIX}/lib/viua
 .PHONY: all remake clean clean-support clean-test-compiles install test stdlib
 
 
-all: ${VM_ASM} ${VM_CPU} ${VM_WDB} stdlib bin/opcodes.bin
+all: ${VM_ASM} ${VM_CPU} ${VM_WDB} bin/opcodes.bin
 
 remake: clean all
 
