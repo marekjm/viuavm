@@ -38,7 +38,7 @@
 .end
 
 .def: main 1
-    istore 1 42
+    isnull 1 1
     print 1
 
     ; placeholder, for now it is not possible to use strings from registers
