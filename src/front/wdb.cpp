@@ -18,6 +18,7 @@
 #include "../cpu/cpu.h"
 #include "../program.h"
 #include "../printutils.h"
+#include "../include/module.h"
 using namespace std;
 
 
@@ -73,6 +74,8 @@ const vector<string> DEBUGGER_COMMANDS = {
     "loader.function.map.show",
     "loader.block.map",
     "loader.block.map.show",
+    "loader.extern.function.map",
+    "loader.extern.function.map.show",
     "help",
     "quit",
 };
@@ -666,6 +669,13 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
                 operands.push_back(mapping.first);
             }
         }
+    } else if (command == "loader.extern.function.map" or command == "loader.extern.function.map.show") {
+        command = "loader.extern.function.map.show";
+        if (operands.size() == 0) {
+            for (pair<string, ExternalFunction*> mapping : cpu.external_functions) {
+                operands.push_back(mapping.first);
+            }
+        }
     } else if (command == "quit") {
     } else if (command == "help") {
     } else {
@@ -814,6 +824,20 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
                 cout << "not found" << endl;
             } else {
                 cout << "entry point at byte " << addr << endl;
+            }
+        }
+    } else if (command == "loader.function.map.show") {
+        bool exists = false;
+        for (string fun : operands) {
+            try {
+                cpu.external_functions.at(fun);
+                exists = true;
+            } catch (const std::out_of_range& e) {
+                exists = false;
+            }
+            cout << "  '" << fun << "'";
+            if (not exists) {
+                cout << " (not found)" << endl;
             }
         }
     } else if (command == "help") {

@@ -212,15 +212,15 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { JUMP,     "jump" },
     { BRANCH,   "branch" },
 
-    { EXIMPORT, "eximport" },
-    { EXCALL,   "excall" },
-
     { THROW,    "throw" },
     { CATCH,    "catch" },
     { PULL,     "pull" },
     { TRYFRAME, "tryframe" },
     { TRY,      "try" },
     { LEAVE,    "leave" },
+
+    { EXIMPORT, "eximport" },
+    { EXCALL,   "excall" },
 
     { END,      "end" },
     { HALT,     "halt" },

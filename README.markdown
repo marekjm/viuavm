@@ -1,41 +1,71 @@
-# Wudoo VM
+# Viua VM
 
 A simple, bytecode driven, register-based virtual machine.
 
-I develop Wudoo VM to learn how such software is created and
+I develop Viua VM to learn how such software is created and
 to help myself in my computer language implementation studies.
 
 ----
 
-## Programming
+## Programming in Viua
 
-Wudoo can be programmed in an assembler-like language which must then be compiled into bytecode.
+Viua can be programmed in an assembler-like language which must then be compiled into bytecode.
 Assembler uses **Bytecode Generation API** to generate bytecode after the assembler frontend
 performs initial analysis.
+
+Typical code-n-debug cycle is shown below (assuming current working directory
+is the local clone of Viua repository):
+
+```
+nvim ./some_file.asm
+./bin/vm/asm -o some_file.out ./some_file.asm
+./bin/vm/cpu some_file.out
+./bin/vm/wdb some_file.out
+```
 
 
 ----
 
-## Development
+# Development
 
 Some development-related information.
+Required tools:
+
+* `g++`: GNU Compiler Collection's C++ compiler version 4.9 and above (mandatory),
+* `python`: Python programming language 3.x for test suite (optional),
+* `valgrind`: for memory leak testing (optional),
 
 
-### Wudoo development scripts
+## Compilation
 
-In the `scripts/` directory, you can find scripts that are used during development of Wudoo.
-The shell installed in dev environment is ZSH but the scripts should be compatible with BASH as well.
+Use `g++` to compile Viua VM. The code can also be compiled with `clang++`, but will not run correctly.
+Output from `clang++` will crash during the tests.
+
+Before compiling, Git submodule for `linenoise` library must be initialised.
+
+Compilation is simple and can be executed by typing `make` in the shell.
+Full, clean compilation can also be performed by the `recompile` script located in main directory of the
+repository.
+The script will run `make clean` production, detect number of cores the machine compilation is done on has, and
+run `make` with `-j` option adjusted to take advantage of multithreaded `make`-ing.
 
 
 ## Testing
 
-There is a simple test suite (written in Python 3) located in `tests/` directory.
+There is a simple test suite located in `tests/` directory.
 It can be invoked by `make test` command.
+Python 3 must be installed on the machine to run the tests.
 
 Code used for unit tests can be found in `sample/` directory.
 
 
-## Git Workflow
+### Viua development scripts
+
+In the `scripts/` directory, you can find scripts that are used during development of Viua.
+The shell installed in dev environment is ZSH but the scripts should be compatible with BASH as well.
+
+
+## Git workflow
 
 Each feature and fix is developed in a separate branch.
 Bugs which are discovered during development of a certain feature of bug fixing,
@@ -46,20 +76,16 @@ This is also true for small features.
 
 - `master`: master branch - contains stable, working version of VM code,
 - `devel`: development branch - all fixes and features are first merged here,
-- `feature/issue/<number>/<title>`: for features and enhancements,
-- `fix/issue/<number>/<title>`: for bugixes,
-- `vm/bytecode`: special branch related to general bytecode development outside of issue system,
-- `vm/assembler`: branch used for various small fixes and developments related to VM's assembler,
-- `vm/cpu`: branch used for various small fixes and developments related to CPU code,
+- `issue/<number>/<slug>`: for issues,
 
 
 Explained with arrows:
 
 ```
-fix/* ←----→ devel ←----→ feature/*
-               |
-               ↓
-             master
+issue/* ←----→ devel
+                 |
+                 ↓
+              master
 ```
 
 

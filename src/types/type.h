@@ -5,6 +5,7 @@
 
 #include <string>
 #include <sstream>
+#include <vector>
 
 
 class Type {
@@ -47,6 +48,13 @@ class Type {
              *  the default is to NOT carry any actions.
              */
             return false;
+        }
+
+        std::vector<std::string> bases() const {
+            return std::vector<std::string>{"Type"};
+        }
+        std::vector<std::string> inheritancechain() const {
+            return std::vector<std::string>{"Type"};
         }
 
         virtual Type* copy() const = 0;

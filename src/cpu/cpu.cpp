@@ -498,6 +498,8 @@ byte* CPU::tick() {
         thrown = e;
     } catch (const HaltException& e) {
         halt = true;
+    } catch (const char* e) {
+        thrown = new Exception(e);
     }
 
     if (halt or frames.size() == 0) { return 0; }
@@ -535,9 +537,25 @@ byte* CPU::tick() {
         return 0;
     }
 
+    TryFrame* tframe;
+    // WARNING!
+    // This is a temporary hack for more fine-grained exception handling
+    if (thrown != 0 and thrown->type() == "Exception") {
+        string exception_detailed_type = static_cast<Exception*>(thrown)->etype();
+        for (unsigned i = tryframes.size(); i > 0; --i) {
+            tframe = tryframes[(i-1)];
+            if (tframe->catchers.count(exception_detailed_type)) {
+                instruction_pointer = tframe->catchers.at(exception_detailed_type)->block_address;
+
+                caught = thrown;
+                thrown = 0;
+
+                break;
+            }
+        }
+    }
+
     if (thrown != 0) {
-        // FIXME: catching Type catches everything! (not actually implemented, marked as a TODO)
-        TryFrame* tframe;
         for (unsigned i = tryframes.size(); i > 0; --i) {
             tframe = tryframes[(i-1)];
             if (tframe->catchers.count(thrown->type())) {
@@ -547,6 +565,23 @@ byte* CPU::tick() {
                 thrown = 0;
 
                 break;
+            }
+        }
+    }
+    if (thrown != 0) {
+        // FIXME: catching Type catches everything! (not actually implemented, marked as a TODO)
+        vector<string> ic = thrown->inheritancechain();
+        for (unsigned i = tryframes.size(); i > 0; --i) {
+            tframe = tryframes[(i-1)];
+            for (unsigned j = 0; j < ic.size(); ++j) {
+                if (tframe->catchers.count(ic[j])) {
+                    instruction_pointer = tframe->catchers.at(ic[j])->block_address;
+
+                    caught = thrown;
+                    thrown = 0;
+
+                    break;
+                }
             }
         }
     }
