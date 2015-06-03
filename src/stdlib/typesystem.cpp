@@ -39,7 +39,8 @@ Type* bases(Frame* frame, RegisterSet*, RegisterSet*) {
         throw new Exception("expected object as parameter 0");
     }
 
-    vector<string> ic = frame->args->at(0)->bases();
+    Type* object = frame->args->at(0);
+    vector<string> ic = object->bases();
     Vector* icv = new Vector();
 
     for (unsigned i = 0; i < ic.size(); ++i) {
