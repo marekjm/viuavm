@@ -28,30 +28,21 @@ doc/viua_virtual_machine.pdf: doc/viua_virtual_machine.lyx
 
 
 clean: clean-support clean-stdlib
-	touch ./build/lib/dummy.o
-	rm -v ./build/lib/*.o
-	touch ./build/cpu/instr/dummy.o
-	rm -v ./build/cpu/instr/*.o
-	touch ./build/cpu/dummy.o
-	rm -v ./build/cpu/*.o
-	touch ./build/dummy.o
-	rm -v ./build/*.o
-	touch ./bin/vm/dummy.o
-	rm -v ./bin/vm/*
+	rm -f ./build/lib/*.o
+	rm -f ./build/cpu/instr/*.o
+	rm -f ./build/cpu/*.o
+	rm -f ./build/*.o
+	rm -f ./bin/vm/*
 
 clean-stdlib:
-	touch ./build/stdlib/dummy.o
-	rm -v ./build/stdlib/*.o
-	touch ./build/stdlib/lib/dummy.so
-	rm -v ./build/stdlib/lib/*.so
+	rm -f ./build/stdlib/*.o
+	rm -f ./build/stdlib/lib/*.so
 
 clean-support:
-	touch ./build/support/dummy.o
-	rm -v ./build/support/*.o
+	rm -f ./build/support/*.o
 
 clean-test-compiles:
-	touch ./tests/compiled/a.bin
-	rm ./tests/compiled/*.bin
+	rm -f ./tests/compiled/*.bin
 
 
 install: ${VM_ASM} ${VM_CPU} ${VM_WDB} stdlib
