@@ -643,6 +643,25 @@ Program& Program::clcall(int_op clsr, int_op ret) {
     return (*this);
 }
 
+Program& Program::function(string fn, int_op reg) {
+    /*  Inserts function instuction.
+     */
+    *(addr_ptr++) = FUNCTION;
+    for (unsigned i = 0; i < fn.size(); ++i) {
+        *((char*)addr_ptr++) = fn[i];
+    }
+    *(addr_ptr++) = '\0';
+    addr_ptr = insertIntegerOperand(addr_ptr, reg);
+    return (*this);
+}
+
+Program& Program::fcall(int_op clsr, int_op ret) {
+    /*  Inserts fcall instruction to bytecode.
+     */
+    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, FCALL, clsr, ret);
+    return (*this);
+}
+
 Program& Program::frame(int_op a, int_op b) {
     /*  Inserts frame instruction to bytecode.
      */

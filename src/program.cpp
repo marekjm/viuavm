@@ -115,10 +115,10 @@ uint16_t Program::countBytes(const vector<string>& lines) {
         instr = str::chunk(line);
         try {
             inc = OP_SIZES.at(instr);
-            if ((instr == "call") or (instr == "closure") or (instr == "excall") or (instr == "try")) {
+            if ((instr == "call") or (instr == "closure") or (instr == "function") or (instr == "excall") or (instr == "try")) {
                 // clear first chunk
                 line = str::lstrip(str::sub(line, instr.size()));
-                // get second chunk (which for call and closure instructions is function name)
+                // get second chunk (which for call, closure and function instructions is function name)
                 inc += str::chunk(line).size() + 1;
             } else if (instr == "eximport") {
                 // clear first chunk
@@ -194,7 +194,7 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
         }
 
         OPCODE opcode = OPCODE(program[offset]);
-        if ((opcode == CALL) or (opcode == CLOSURE) or (opcode == EXIMPORT) or (opcode == EXCALL) or (opcode == TRY)) {
+        if ((opcode == CALL) or (opcode == CLOSURE) or (opcode == FUNCTION) or (opcode == EXIMPORT) or (opcode == EXCALL) or (opcode == TRY)) {
             string s(program+offset+1);
             if (debug) {
                 cout << '+' << s.size() << " (function/module name at byte " << offset+1 << ": `" << s << "`)";
