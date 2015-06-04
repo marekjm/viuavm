@@ -422,6 +422,14 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = assembler::operands::get2(operands);
             program.clcall(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
+        } else if (str::startswith(line, "function")) {
+            string fn_name, reg;
+            tie(fn_name, reg) = assembler::operands::get2(operands);
+            program.function(fn_name, assembler::operands::getint(resolveregister(reg, names)));
+        } else if (str::startswith(line, "fcall")) {
+            string a_chnk, b_chnk;
+            tie(a_chnk, b_chnk) = assembler::operands::get2(operands);
+            program.fcall(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "frame")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = assembler::operands::get2(operands);
