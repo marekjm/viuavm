@@ -104,6 +104,9 @@ build/types/vector.o: src/types/vector.cpp src/types/vector.h
 build/types/closure.o: src/types/closure.cpp src/types/closure.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
+build/types/function.o: src/types/function.cpp src/types/function.h
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+
 build/types/string.o: src/types/string.cpp src/types/string.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
