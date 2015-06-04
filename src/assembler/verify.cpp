@@ -48,31 +48,33 @@ string assembler::verify::blockTries(const vector<string>& lines, const vector<s
     return report.str();
 }
 
-string assembler::verify::closureCreations(const vector<string>& lines, const vector<string>& function_names) {
+string assembler::verify::callableCreations(const vector<string>& lines, const vector<string>& function_names) {
     ostringstream report("");
     string line;
+    string callable_type;
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = str::lstrip(lines[i]);
-        if (not str::startswith(line, "closure")) {
+        if (not str::startswith(line, "closure") and not str::startswith(line, "function")) {
             continue;
         }
 
-        line = str::lstrip(str::sub(line, str::chunk(line).size()));
+        callable_type = str::chunk(line);
+        line = str::lstrip(str::sub(line, callable_type.size()));
         string function = str::chunk(line);
         bool is_undefined = (find(function_names.begin(), function_names.end(), function) == function_names.end());
 
         if (is_undefined) {
-            report << "fatal: closure from undefined function '" << function << "' at line " << i;
+            report << "fatal: " << callable_type << " from undefined function '" << function << "' at line " << i;
             break;
         }
 
         // second chunk of closure instruction, must be an integer
         line = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
         if (line.size() == 0) {
-            report << "fatal: second operand missing from closure instruction at line " << i;
+            report << "fatal: second operand missing from " << callable_type << " instruction at line " << i;
             break;
         } else if (not str::isnum(line)) {
-            report << "fatal: second operand is not an integer in closure instruction at line " << i;
+            report << "fatal: second operand is not an integer in " << callable_type << " instruction at line " << i;
             break;
         }
     }
