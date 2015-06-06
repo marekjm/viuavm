@@ -10,7 +10,7 @@
 
 
 class Closure : public Type {
-    /** Vector type.
+    /** Closure type.
      */
     public:
         RegisterSet* regset;
