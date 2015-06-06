@@ -404,6 +404,12 @@ byte* CPU::dispatch(byte* addr) {
         case CLCALL:
             addr = clcall(addr+1);
             break;
+        case FUNCTION:
+            addr = function(addr+1);
+            break;
+        case FCALL:
+            addr = fcall(addr+1);
+            break;
         case FRAME:
             addr = frame(addr+1);
             break;
