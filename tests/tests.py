@@ -1065,6 +1065,16 @@ class HigherOrderFunctionTests(unittest.TestCase):
         self.assertEqual('25', output.strip())
         self.assertEqual(0, excode)
 
+    @unittest.skip('not yet implemented')
+    def testInvoke(self):
+        name = 'invoke.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual(['Hello World!', '42'], output.splitlines())
+        self.assertEqual(0, excode)
+
 
 class ClosureTests(unittest.TestCase):
     """Tests for closures.
