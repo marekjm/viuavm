@@ -6,10 +6,10 @@
 #include <string>
 #include "../bytecode/bytetypedef.h"
 #include "../cpu/registerset.h"
-#include "type.h"
+#include "function.h"
 
 
-class Closure : public Type {
+class Closure : public Function {
     /** Closure type.
      */
     public:
