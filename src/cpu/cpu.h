@@ -171,6 +171,9 @@ class CPU {
     byte* clframe(byte*);
     byte* clcall(byte*);
 
+    byte* function(byte*);
+    byte* fcall(byte*);
+
     byte* frame(byte*);
     byte* param(byte*);
     byte* paref(byte*);
