@@ -5,9 +5,7 @@
 using namespace std;
 
 
-Function::Function():
-    arguments(0), argreferences(0), arguments_size(0),
-    function_name("") {
+Function::Function(): function_name("") {
 }
 
 Function::~Function() {

@@ -1,14 +1,11 @@
 #include <string>
 #include <sstream>
-#include "type.h"
 #include "closure.h"
+#include "type.h"
 using namespace std;
 
 
-Closure::Closure():
-    arguments(0), argreferences(0), arguments_size(0),
-    regset(0),
-    function_name("") {
+Closure::Closure(): regset(0), function_name("") {
 }
 
 Closure::~Closure() {

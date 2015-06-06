@@ -13,10 +13,6 @@ class Function : public Type {
     /** Type representing a function.
      */
     public:
-        Type** arguments;
-        bool* argreferences;
-        int arguments_size;
-
         std::string function_name;
 
         std::string type() const;

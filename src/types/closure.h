@@ -13,10 +13,6 @@ class Closure : public Type {
     /** Vector type.
      */
     public:
-        Type** arguments;
-        bool* argreferences;
-        int arguments_size;
-
         RegisterSet* regset;
 
         std::string function_name;
