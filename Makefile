@@ -59,7 +59,7 @@ test: ${VM_CPU} ${VM_ASM} clean-test-compiles
 	python3 ./tests/tests.py --verbose --catch --failfast
 
 
-bin/vm/cpu: src/front/cpu.cpp build/cpu/cpu.o build/cpu/registserset.o build/loader.o build/printutils.o build/support/pointer.o build/support/string.o ${VIUA_CPU_INSTR_FILES_O} build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o
+bin/vm/cpu: src/front/cpu.cpp build/cpu/cpu.o build/cpu/dispatch.o build/cpu/registserset.o build/loader.o build/printutils.o build/support/pointer.o build/support/string.o ${VIUA_CPU_INSTR_FILES_O} build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -ldl -o $@ $^
 
 bin/vm/vdb: src/front/wdb.cpp build/lib/linenoise.o build/cpu/cpu.o build/cpu/registserset.o build/loader.o build/printutils.o build/support/pointer.o build/support/string.o ${VIUA_CPU_INSTR_FILES_O} build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o
@@ -72,10 +72,24 @@ bin/vm/dis: src/front/dis.cpp build/loader.o build/cg/disassembler/disassembler.
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -o $@ $^
 
 
+# OBJECTS COMMON FOR DEBUGGER AND CPU
+# CPU COMPILATION
+build/cpu/dispatch.o: src/cpu/dispatch.cpp
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+
+build/cpu/cpu.o: src/cpu/cpu.cpp src/cpu/cpu.h src/bytecode/opcodes.h src/cpu/frame.h
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+
+build/cpu/registserset.o: src/cpu/registerset.cpp src/cpu/registerset.h
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+
+
+# opcode lister program
 bin/opcodes.bin: src/bytecode/opcd.cpp src/bytecode/opcodes.h src/bytecode/maps.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -o $@ $<
 
 
+# CODE GENERATION
 build/cg/disassembler/disassembler.o: src/cg/disassembler/disassembler.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
@@ -98,6 +112,7 @@ build/stdlib/lib/typesystem.so: build/stdlib/lib/typesystem.o build/stdlib/excep
 	${CXX} ${CXXFLAGS} -shared -Wl,-soname,$(notdir $@) -o $@ $< -lc
 
 
+# TYPE MODULES
 build/types/vector.o: src/types/vector.cpp src/types/vector.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
@@ -114,13 +129,7 @@ build/types/exception.o: src/types/exception.cpp src/types/exception.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
 
-build/cpu/cpu.o: src/cpu/cpu.cpp src/cpu/cpu.h src/bytecode/opcodes.h src/cpu/frame.h
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
-
-build/cpu/registserset.o: src/cpu/registerset.cpp src/cpu/registerset.h
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
-
-
+# CPU INSTRUCTIONS
 build/cpu/instr/general.o: src/cpu/instr/general.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
