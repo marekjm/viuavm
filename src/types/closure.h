@@ -17,17 +17,17 @@ class Closure : public Type {
 
         std::string function_name;
 
-        std::string type() const;
-        std::string str() const;
-        std::string repr() const;
+        virtual std::string type() const;
+        virtual std::string str() const;
+        virtual std::string repr() const;
 
-        bool boolean() const;
+        virtual bool boolean() const;
 
-        Type* copy() const;
+        virtual Type* copy() const;
 
         // FIXME: implement real dtor
         Closure();
-        ~Closure();
+        virtual ~Closure();
 };
 
 
