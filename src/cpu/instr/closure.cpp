@@ -2,6 +2,7 @@
 #include "../../bytecode/bytetypedef.h"
 #include "../../types/type.h"
 #include "../../types/integer.h"
+#include "../../types/function.h"
 #include "../../types/closure.h"
 #include "../../support/pointer.h"
 #include "../../exceptions.h"
@@ -142,6 +143,75 @@ byte* CPU::clcall(byte* addr) {
     pushFrame();
     // adjust register set
     uregset = clsr->regset;
+
+    return call_address;
+}
+
+
+byte* CPU::function(byte* addr) {
+    /** Create function object in a register.
+     *
+     *  Such objects can be used to call functions, and
+     *  are can be used to pass functions as parameters and
+     *  return them from other functions.
+     */
+    string call_name = string(addr);
+    addr += (call_name.size()+1);
+
+    int reg;
+    bool reg_ref;
+
+    reg_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    reg = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    if (reg_ref) {
+        reg = static_cast<Integer*>(fetch(reg))->value();
+    }
+
+    Function* fn = new Function();
+    fn->function_name = call_name;
+
+    place(reg, fn);
+
+    return addr;
+}
+
+byte* CPU::fcall(byte* addr) {
+    /*  Call a function object.
+     */
+    int fn_reg;
+    bool fn_reg_ref;
+
+    fn_reg_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    fn_reg = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    if (fn_reg_ref) {
+        fn_reg = static_cast<Integer*>(fetch(fn_reg))->value();
+    }
+
+    // FIXME: there should be a check it this is *really* a function object
+    Function* fn = static_cast<Function*>(fetch(fn_reg));
+    byte* call_address = bytecode+function_addresses.at(fn->function_name);
+
+    // save return address for frame
+    byte* return_address = (addr + sizeof(bool) + sizeof(int));
+
+    if (frame_new == 0) {
+        throw new Exception("fn call without a frame: use `clframe 0' in source code if the fn takes no parameters");
+    }
+    // set function name and return address
+    frame_new->function_name = fn->function_name;
+    frame_new->return_address = return_address;
+
+    frame_new->resolve_return_value_register = *(bool*)addr;
+    pointer::inc<bool, byte>(addr);
+    frame_new->place_return_value_in = *(int*)addr;
+
+    pushFrame();
 
     return call_address;
 }
