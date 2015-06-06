@@ -1051,6 +1051,21 @@ class FunctionTests(unittest.TestCase):
         self.assertEqual(excode, dis_excode)
 
 
+class HigherOrderFunctionTests(unittest.TestCase):
+    """Tests for higher-order function support.
+    """
+    PATH = './sample/asm/functions/higher_order'
+
+    def testApply(self):
+        name = 'apply.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual('25', output.strip())
+        self.assertEqual(0, excode)
+
+
 class ClosureTests(unittest.TestCase):
     """Tests for closures.
     """
