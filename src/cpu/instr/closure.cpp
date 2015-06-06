@@ -36,7 +36,7 @@ byte* CPU::clbind(byte* addr) {
 }
 
 byte* CPU::closure(byte* addr) {
-    /*  Call a closure.
+    /** Create a closure from a function.
      */
     string call_name = string(addr);
     addr += (call_name.size()+1);
