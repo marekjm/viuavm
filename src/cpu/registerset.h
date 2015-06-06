@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "../types/type.h"
 
 typedef unsigned char mask_t;
 
