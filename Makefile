@@ -15,7 +15,7 @@ LIB_PATH=${PREFIX}/lib/viua
 .PHONY: all remake clean clean-support clean-test-compiles install test stdlib
 
 
-all: bin/vm/asm bin/vm/cpu bin/vm/vdb bin/opcodes.bin
+all: bin/vm/asm bin/vm/cpu bin/vm/vdb bin/vm/dis bin/opcodes.bin
 
 remake: clean all
 
@@ -64,6 +64,9 @@ bin/vm/vdb: src/front/wdb.cpp build/lib/linenoise.o build/cpu/cpu.o build/cpu/re
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -ldl -o $@ $^
 
 bin/vm/asm: src/front/asm.cpp build/program.o build/programinstructions.o build/assembler/operands.o build/assembler/ce.o build/assembler/verify.o build/loader.o build/support/string.o
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -o $@ $^
+
+bin/vm/dis: src/front/dis.cpp build/loader.o build/support/pointer.o build/support/string.o
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -o $@ $^
 
 
