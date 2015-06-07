@@ -2,10 +2,6 @@ CXX=g++
 CXXFLAGS=-std=c++11 -Wall -pedantic -Wfatal-errors -g
 CXXOPTIMIZATIONFLAGS=
 
-VM_ASM=bin/vm/asm
-VM_CPU=bin/vm/cpu
-VM_WDB=bin/vm/wdb
-
 VIUA_CPU_INSTR_FILES_CPP=src/cpu/instr/general.cpp src/cpu/instr/closure.cpp src/cpu/instr/int.cpp src/cpu/instr/float.cpp src/cpu/instr/byte.cpp src/cpu/instr/str.cpp src/cpu/instr/bool.cpp src/cpu/instr/cast.cpp src/cpu/instr/vector.cpp
 VIUA_CPU_INSTR_FILES_O=build/cpu/instr/general.o build/cpu/instr/closure.o build/cpu/instr/int.o build/cpu/instr/float.o build/cpu/instr/byte.o build/cpu/instr/str.o build/cpu/instr/bool.o build/cpu/instr/cast.o build/cpu/instr/vector.o
 
@@ -19,7 +15,7 @@ LIB_PATH=${PREFIX}/lib/viua
 .PHONY: all remake clean clean-support clean-test-compiles install test stdlib
 
 
-all: ${VM_ASM} ${VM_CPU} ${VM_WDB} bin/opcodes.bin
+all: bin/vm/asm bin/vm/cpu bin/vm/vdb bin/opcodes.bin
 
 remake: clean all
 
@@ -45,7 +41,7 @@ clean-test-compiles:
 	rm -f ./tests/compiled/*.bin
 
 
-install: ${VM_ASM} ${VM_CPU} ${VM_WDB} stdlib
+install: bin/vm/asm bin/vm/cpu bin/vm/vdb stdlib
 	mkdir -p ${BIN_PATH}
 	cp ${VM_ASM} ${BIN_PATH}/viua-asm
 	chmod 755 ${BIN_PATH}/viua-asm
@@ -61,14 +57,14 @@ test: ${VM_CPU} ${VM_ASM} clean-test-compiles
 	python3 ./tests/tests.py --verbose --catch --failfast
 
 
-${VM_CPU}: src/front/cpu.cpp build/cpu/cpu.o build/cpu/registserset.o build/loader.o build/printutils.o build/support/pointer.o build/support/string.o ${VIUA_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o build/types/string.o build/types/exception.o
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -ldl -o ${VM_CPU} $^
+bin/vm/cpu: src/front/cpu.cpp build/cpu/cpu.o build/cpu/registserset.o build/loader.o build/printutils.o build/support/pointer.o build/support/string.o ${VIUA_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o build/types/string.o build/types/exception.o
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -ldl -o $@ $^
 
-${VM_WDB}: src/front/wdb.cpp build/lib/linenoise.o build/cpu/cpu.o build/cpu/registserset.o build/loader.o build/printutils.o build/support/pointer.o build/support/string.o ${VIUA_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o build/types/string.o build/types/exception.o
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -ldl -o ${VM_WDB} $^
+bin/vm/vdb: src/front/wdb.cpp build/lib/linenoise.o build/cpu/cpu.o build/cpu/registserset.o build/loader.o build/printutils.o build/support/pointer.o build/support/string.o ${VIUA_CPU_INSTR_FILES_O} build/types/vector.o build/types/closure.o build/types/string.o build/types/exception.o
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -ldl -o $@ $^
 
-${VM_ASM}: src/front/asm.cpp build/program.o build/programinstructions.o build/assembler/operands.o build/assembler/ce.o build/assembler/verify.o build/loader.o build/support/string.o
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -o ${VM_ASM} $^
+bin/vm/asm: src/front/asm.cpp build/program.o build/programinstructions.o build/assembler/operands.o build/assembler/ce.o build/assembler/verify.o build/loader.o build/support/string.o
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -o $@ $^
 
 
 bin/opcodes.bin: src/bytecode/opcd.cpp src/bytecode/opcodes.h src/bytecode/maps.h
