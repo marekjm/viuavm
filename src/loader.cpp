@@ -1,6 +1,7 @@
 #include <cstdint>
 #include <iostream>
 #include <fstream>
+#include <tuple>
 #include <string>
 #include <vector>
 #include <map>
@@ -9,7 +10,9 @@
 using namespace std;
 
 
-map<string, uint16_t> Loader::loadmap(char* bytedump, const uint16_t& bytedump_size) {
+
+IdToAddressMapping Loader::loadmap(char* bytedump, const uint16_t& bytedump_size) {
+    vector<string> order;
     map<string, uint16_t> mapping;
 
     char *lib_function_ids_map = bytedump;
@@ -24,9 +27,10 @@ map<string, uint16_t> Loader::loadmap(char* bytedump, const uint16_t& bytedump_s
         i += sizeof(uint16_t);
         lib_function_ids_map = bytedump+i;
         mapping[lib_fn_name] = lib_fn_address;
+        order.push_back(lib_fn_name);
     }
 
-    return mapping;
+    return IdToAddressMapping(order, mapping);
 }
 
 void Loader::loadFunctionsMap(ifstream& in) {
@@ -36,9 +40,14 @@ void Loader::loadFunctionsMap(ifstream& in) {
     char *lib_buffer_function_ids = new char[lib_function_ids_section_size];
     in.read(lib_buffer_function_ids, lib_function_ids_section_size);
 
-    for (pair<string, uint16_t> p : loadmap(lib_buffer_function_ids, lib_function_ids_section_size)) {
-        functions.push_back(p.first);
-        function_addresses[p.first] = p.second;
+    vector<string> order;
+    map<string, uint16_t> mapping;
+
+    tie(order, mapping) = loadmap(lib_buffer_function_ids, lib_function_ids_section_size);
+
+    for (string p : order) {
+        functions.push_back(p);
+        function_addresses[p] = mapping[p];
     }
     delete[] lib_buffer_function_ids;
 }
@@ -50,9 +59,14 @@ void Loader::loadBlocksMap(ifstream& in) {
     char *lib_buffer_block_ids = new char[lib_block_ids_section_size];
     in.read(lib_buffer_block_ids, lib_block_ids_section_size);
 
-    for (pair<string, uint16_t> p : loadmap(lib_buffer_block_ids, lib_block_ids_section_size)) {
-        blocks.push_back(p.first);
-        block_addresses[p.first] = p.second;
+    vector<string> order;
+    map<string, uint16_t> mapping;
+
+    tie(order, mapping) = loadmap(lib_buffer_block_ids, lib_block_ids_section_size);
+
+    for (string p : order) {
+        blocks.push_back(p);
+        block_addresses[p] = mapping[p];
     }
     delete[] lib_buffer_block_ids;
 }

@@ -6,10 +6,13 @@
 
 #include <cstdint>
 #include <fstream>
+#include <tuple>
 #include <string>
 #include <vector>
 #include <map>
 #include "bytecode/bytetypedef.h"
+
+typedef std::tuple<std::vector<std::string>, std::map<std::string, uint16_t> > IdToAddressMapping;
 
 class Loader {
     std::string path;
@@ -24,7 +27,7 @@ class Loader {
     std::map<std::string, uint16_t> block_addresses;
     std::vector<std::string> blocks;
 
-    std::map<std::string, uint16_t> loadmap(char*, const uint16_t&);
+    IdToAddressMapping loadmap(char*, const uint16_t&);
 
     void loadFunctionsMap(std::ifstream&);
     void loadBlocksMap(std::ifstream&);
