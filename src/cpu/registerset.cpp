@@ -17,7 +17,7 @@ template<class T> inline void copyvalue(Type* dst, Type* src) {
 }
 
 Type* RegisterSet::set(unsigned index, Type* object) {
-    /** Put object inside register specified by give index.
+    /** Put object inside register specified by given index.
      *
      *  Performs bounds checking.
      */
