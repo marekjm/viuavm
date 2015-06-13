@@ -113,7 +113,7 @@ enum OPCODE : byte {
     PULL,       // pull caught object into a register (it becomes local object for current frame)
     TRYFRAME,   // create a frame for try block
     TRY,        // try executing a block, if an exception is thrown and no catcher claims it, it is propagated up
-                // TRY insructions do not require any CATCH to precede them
+                // TRY instructions do not require any CATCH to precede them
     LEAVE,      // leave a block and resume execution after block-entering instruction
 
     // Opcodes dealing with external C/C++ modules
