@@ -153,9 +153,35 @@ int main(int argc, char* argv[]) {
 
         oss << ".def: " << name << " 1" << '\n';
 
-        for (unsigned j = 0; j < fn_size; ++j) {
-            oss << "    ";
-            oss << "nop\n";
+        OPCODE op;
+        string opname;
+        bool disasm_terminated = false;
+        for (unsigned j = 0; j < fn_size;) {
+            try {
+                op = OPCODE(*(bytecode+function_address_mapping[name]+j));
+                opname = OP_NAMES.at(op);
+                oss << "    ";
+                oss << opname;
+                if (in(OP_VARIABLE_LENGTH, op)) {
+                    ++j; // skip byte containing the opcode
+                    j += string((bytecode+function_address_mapping[name]+j)).size();
+                    ++j; // for null character terminating the C-style string not included in std::string
+                    j += (OP_SIZES.at(opname)-1); // -1 because OP_SIZES include one instruction-storing byte
+                } else {
+                    j += OP_SIZES.at(opname);
+                }
+                oss << '\n';
+            } catch (const out_of_range& e) {
+                oss << "\n---- ERROR ----\n\n";
+                oss << "disassembly terminated after throwing an instance of std::out_of_range\n";
+                oss << "what(): " << e.what() << '\n';
+                disasm_terminated = true;
+                break;
+            }
+        }
+        if (disasm_terminated) {
+            disassembled_lines.push_back(oss.str());
+            break;
         }
 
         oss << ".end" << '\n';
