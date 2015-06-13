@@ -6,6 +6,7 @@
 #include <sstream>
 #include <vector>
 #include "../version.h"
+#include "../bytecode/opcodes.h"
 #include "../bytecode/maps.h"
 #include "../support/string.h"
 #include "../support/pointer.h"
