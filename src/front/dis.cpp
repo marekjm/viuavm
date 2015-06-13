@@ -5,6 +5,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <algorithm>
 #include "../version.h"
 #include "../bytecode/opcodes.h"
 #include "../bytecode/maps.h"
@@ -30,6 +31,13 @@ string printIntegerOperand(byte* iptr) {
     cout << *(int*)iptr;
     pointer::inc<int, byte>(iptr);
     return iptr;
+}
+
+template<typename T> bool in(std::vector<T> v, T item) {
+    return (find(v.begin(), v.end(), item) != v.end());
+}
+template<typename K, typename V> bool in(std::map<K, V> m, K key) {
+    return (m.count() == 1);
 }
 
 int main(int argc, char* argv[]) {
