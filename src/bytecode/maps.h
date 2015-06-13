@@ -4,6 +4,7 @@
 #pragma once
 
 #include <map>
+#include <vector>
 #include <string>
 #include "opcodes.h"
 
@@ -224,6 +225,17 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
 
     { END,      "end" },
     { HALT,     "halt" },
+};
+
+
+const std::vector<enum OPCODE> OP_VARIABLE_LENGTH = {
+    STRSTORE,
+    CLOSURE,
+    CALL,
+    CATCH,
+    TRY,
+    EXIMPORT,
+    EXCALL,
 };
 
 
