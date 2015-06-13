@@ -92,32 +92,20 @@ int main(int argc, char* argv[]) {
 
     map<string, uint16_t> function_address_mapping = loader.getFunctionAddresses();
     vector<string> functions = loader.getFunctions();
+    map<string, unsigned> function_sizes;
 
     map<string, uint16_t> block_address_mapping = loader.getBlockAddresses();
     vector<string> blocks = loader.getBlocks();
+
 
     vector<string> disassembled_lines;
 
     ostringstream oss;
 
-    oss << "; bytecode size: " << bytes << '\n';
-    oss << ";\n";
-    oss << "; functions:\n";
-    for (unsigned i = 0; i < functions.size(); ++i) {
-        oss << ";   " << functions[i] << " at byte " << function_address_mapping[functions[i]] << '\n';
-    }
-    oss << "\n\n";
-
-    disassembled_lines.push_back(oss.str());
-
     string name;
     unsigned fn_size;
     for (unsigned i = 0; i < functions.size(); ++i) {
         name = functions[i];
-        if ((name == "__entry") and not DISASSEMBLE_ENTRY) {
-            continue;
-        }
-        oss.str("");
 
         if (i < (functions.size()-1)) {
             long unsigned a = function_address_mapping[name];
@@ -129,8 +117,39 @@ int main(int argc, char* argv[]) {
             fn_size = (b-a);
         }
 
-        oss << "; function size: " << fn_size << '\n';
+        function_sizes[name] = fn_size;
+    }
+
+    if (INCLUDE_INFO) {
+        oss << "; bytecode size: " << bytes << '\n';
+        oss << ";\n";
+        oss << "; functions:\n";
+        for (unsigned i = 0; i < functions.size(); ++i) {
+            name = functions[i];
+            oss << ";   " << name << " -> " << function_sizes[name] << " bytes at byte " << function_address_mapping[functions[i]] << '\n';
+        }
+        oss << "\n\n";
+
+        disassembled_lines.push_back(oss.str());
+    }
+
+    for (unsigned i = 0; i < functions.size(); ++i) {
+        name = functions[i];
+        fn_size = function_sizes[name];
+
+        if ((name == "__entry") and not DISASSEMBLE_ENTRY) {
+            continue;
+        }
+
+        oss.str("");
+
         oss << ".def: " << name << " 1" << '\n';
+
+        for (unsigned j = 0; j < fn_size; ++j) {
+            oss << "    ";
+            oss << "nop\n";
+        }
+
         oss << ".end" << '\n';
 
         if (i < (functions.size()-1)) {
