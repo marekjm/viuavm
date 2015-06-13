@@ -19,7 +19,8 @@ bool SHOW_HELP = false;
 bool SHOW_VERSION = false;
 bool VERBOSE = false;
 
-bool DISASSEMBLE_ENTRY = true;
+bool DISASSEMBLE_ENTRY = false;
+bool INCLUDE_INFO = false;
 
 
 string printIntegerOperand(byte* iptr) {
@@ -39,14 +40,17 @@ int main(int argc, char* argv[]) {
         option = string(argv[i]);
         if (option == "--help") {
             SHOW_HELP = true;
-            continue;
         } else if (option == "--version") {
             SHOW_VERSION = true;
-            continue;
         } else if (option == "--verbose") {
             VERBOSE = true;
+        } else if ((option == "--with-entry") or (option == "-e")) {
+            DISASSEMBLE_ENTRY = true;
+        } else if ((option == "--info") or (option == "-i")) {
+            INCLUDE_INFO = true;
+        } else {
+            args.push_back(argv[i]);
         }
-        args.push_back(argv[i]);
     }
 
     if (SHOW_HELP or (SHOW_VERSION and VERBOSE)) {
@@ -59,6 +63,8 @@ int main(int argc, char* argv[]) {
         cout << "    --help             - to display this message" << endl;
         cout << "    --version          - show version and quit" << endl;
         cout << "    --verbose          - show verbose output" << endl;
+        cout << "    --with-entry       - disassemble entry function" << endl;
+        cout << "    --info             - include info about disassembled file in output" << endl;
         cout << endl;
     }
     if (SHOW_HELP or SHOW_VERSION) {
