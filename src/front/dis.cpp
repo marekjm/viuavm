@@ -2,10 +2,11 @@
 #include <cstdint>
 #include <cstring>
 #include <iostream>
-#include <string>
 #include <sstream>
-#include <vector>
 #include <algorithm>
+#include <vector>
+#include <tuple>
+#include <string>
 #include "../version.h"
 #include "../bytecode/opcodes.h"
 #include "../bytecode/maps.h"
@@ -33,11 +34,35 @@ string printIntegerOperand(byte* iptr) {
     return iptr;
 }
 
+
+// Helper functions for checking if a container contains an item.
 template<typename T> bool in(std::vector<T> v, T item) {
     return (find(v.begin(), v.end(), item) != v.end());
 }
 template<typename K, typename V> bool in(std::map<K, V> m, K key) {
     return (m.count() == 1);
+}
+
+
+// Helper functions for disassembler
+tuple<string, unsigned> disline(byte* ptr) {
+    byte* bptr = ptr;
+
+    OPCODE op = OPCODE(*bptr);
+    string opname = OP_NAMES.at(op);
+
+    ++bptr; // instruction byte is not needed anymore
+
+    ostringstream oss;
+    oss << opname;
+    if (in(OP_VARIABLE_LENGTH, op)) {
+        bptr += string(bptr).size();
+        ++bptr; // for null character terminating the C-style string not included in std::string
+        bptr += (OP_SIZES.at(opname)-1); // -1 because OP_SIZES add one for instruction-storing byte
+    } else {
+        bptr += (OP_SIZES.at(opname)-1); // -1 because OP_SIZES add one for instruction-storing byte
+    }
+    return tuple<string, unsigned>(oss.str(), (bptr-ptr));
 }
 
 int main(int argc, char* argv[]) {
@@ -158,19 +183,11 @@ int main(int argc, char* argv[]) {
         bool disasm_terminated = false;
         for (unsigned j = 0; j < fn_size;) {
             try {
-                op = OPCODE(*(bytecode+function_address_mapping[name]+j));
-                opname = OP_NAMES.at(op);
-                oss << "    ";
-                oss << opname;
-                if (in(OP_VARIABLE_LENGTH, op)) {
-                    ++j; // skip byte containing the opcode
-                    j += string((bytecode+function_address_mapping[name]+j)).size();
-                    ++j; // for null character terminating the C-style string not included in std::string
-                    j += (OP_SIZES.at(opname)-1); // -1 because OP_SIZES include one instruction-storing byte
-                } else {
-                    j += OP_SIZES.at(opname);
-                }
-                oss << '\n';
+                string instruction;
+                unsigned size;
+                tie(instruction, size) = disline((bytecode+function_address_mapping[name]+j));
+                oss << "    " << instruction << '\n';
+                j += size;
             } catch (const out_of_range& e) {
                 oss << "\n---- ERROR ----\n\n";
                 oss << "disassembly terminated after throwing an instance of std::out_of_range\n";
