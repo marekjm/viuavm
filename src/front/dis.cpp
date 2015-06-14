@@ -178,7 +178,6 @@ int main(int argc, char* argv[]) {
 
         oss << ".def: " << name << " 1" << '\n';
 
-        OPCODE op;
         string opname;
         bool disasm_terminated = false;
         for (unsigned j = 0; j < fn_size;) {
