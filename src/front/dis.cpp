@@ -69,6 +69,7 @@ tuple<string, unsigned> disline(byte* ptr) {
         case IZERO:
         case PRINT:
         case ECHO:
+        case NOT:
             ++ptr;
 
             oss << " ";
