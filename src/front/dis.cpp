@@ -80,6 +80,10 @@ tuple<string, unsigned> disline(byte* ptr) {
 
             break;
         case ISTORE:
+        case ITOF:
+        case FTOI:
+        case STOI:
+        case STOF:
             ++ptr;
 
             oss << " ";
