@@ -62,7 +62,74 @@ tuple<string, unsigned> disline(byte* ptr) {
     } else {
         bptr += (OP_SIZES.at(opname)-1); // -1 because OP_SIZES add one for instruction-storing byte
     }
-    return tuple<string, unsigned>(oss.str(), (bptr-ptr));
+
+    unsigned increase = (bptr-ptr);
+
+    switch (op) {
+        case IZERO:
+        case PRINT:
+        case ECHO:
+            ++ptr;
+
+            oss << " ";
+            oss << (*((bool*)ptr) ? "@" : "");
+            pointer::inc<bool, byte>(ptr);
+            oss << *(int*)ptr;
+            pointer::inc<int, byte>(ptr);
+
+            break;
+        case ISTORE:
+            ++ptr;
+
+            oss << " ";
+            oss << (*((bool*)ptr) ? "@" : "");
+            pointer::inc<bool, byte>(ptr);
+            oss << *(int*)ptr;
+            pointer::inc<int, byte>(ptr);
+
+            oss << " ";
+            oss << (*((bool*)ptr) ? "@" : "");
+            pointer::inc<bool, byte>(ptr);
+            oss << *(int*)ptr;
+            pointer::inc<int, byte>(ptr);
+
+            break;
+        case IADD:
+        case ISUB:
+        case IMUL:
+        case IDIV:
+        case IINC:
+        case IDEC:
+        case ILT:
+        case ILTE:
+        case IGT:
+        case IGTE:
+        case IEQ:
+            ++ptr;
+
+            oss << " ";
+            oss << (*((bool*)ptr) ? "@" : "");
+            pointer::inc<bool, byte>(ptr);
+            oss << *(int*)ptr;
+            pointer::inc<int, byte>(ptr);
+
+            oss << " ";
+            oss << (*((bool*)ptr) ? "@" : "");
+            pointer::inc<bool, byte>(ptr);
+            oss << *(int*)ptr;
+            pointer::inc<int, byte>(ptr);
+
+            oss << " ";
+            oss << (*((bool*)ptr) ? "@" : "");
+            pointer::inc<bool, byte>(ptr);
+            oss << *(int*)ptr;
+            pointer::inc<int, byte>(ptr);
+
+            break;
+        default:
+            oss << "";
+    }
+    return tuple<string, unsigned>(oss.str(), increase);
 }
 
 int main(int argc, char* argv[]) {
