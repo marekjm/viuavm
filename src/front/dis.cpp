@@ -149,6 +149,18 @@ tuple<string, unsigned> disline(byte* ptr) {
             oss << dec;
 
             break;
+        case FSTORE:
+            ++ptr;
+
+            oss << " ";
+            oss << (*((bool*)ptr) ? "@" : "");
+            pointer::inc<bool, byte>(ptr);
+            oss << *(int*)ptr;
+            pointer::inc<int, byte>(ptr);
+
+            oss << " ";
+            oss << *(float*)ptr;
+            break;
         default:
             oss << "";
     }
