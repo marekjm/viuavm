@@ -106,6 +106,15 @@ tuple<string, unsigned> disline(byte* ptr) {
         case IGT:
         case IGTE:
         case IEQ:
+        case FADD:
+        case FSUB:
+        case FMUL:
+        case FDIV:
+        case FLT:
+        case FLTE:
+        case FGT:
+        case FGTE:
+        case FEQ:
             ++ptr;
 
             oss << " ";
