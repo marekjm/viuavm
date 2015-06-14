@@ -35,7 +35,7 @@ enum OPCODE : byte {
     FGTE,
     FEQ,
 
-    // integer instructions
+    // byte instructions
     BSTORE,
     BADD,
     BSUB,
