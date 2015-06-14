@@ -127,6 +127,28 @@ tuple<string, unsigned> disline(byte* ptr) {
             pointer::inc<int, byte>(ptr);
 
             break;
+        case BRANCH:
+            ++ptr;
+
+            oss << " ";
+            oss << (*((bool*)ptr) ? "@" : "");
+            pointer::inc<bool, byte>(ptr);
+            oss << *(int*)ptr;
+            pointer::inc<int, byte>(ptr);
+
+            oss << " 0x";
+            oss << hex;
+            oss << *(int*)ptr;
+            pointer::inc<int, byte>(ptr);
+
+            oss << " 0x";
+            oss << hex;
+            oss << *(int*)ptr;
+            pointer::inc<int, byte>(ptr);
+
+            oss << dec;
+
+            break;
         default:
             oss << "";
     }
