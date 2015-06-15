@@ -36,6 +36,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
 
     unsigned increase = (bptr-ptr);
 
+    ++ptr;
     switch (op) {
         case IZERO:
         case IINC:
@@ -45,8 +46,6 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case PRINT:
         case ECHO:
         case NOT:
-            ++ptr;
-
             oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
             pointer::inc<int, byte>(ptr);
@@ -57,8 +56,6 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case FTOI:
         case STOI:
         case STOF:
-            ++ptr;
-
             oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
             pointer::inc<int, byte>(ptr);
@@ -93,8 +90,6 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case BGT:
         case BGTE:
         case BEQ:
-            ++ptr;
-
             oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
             pointer::inc<int, byte>(ptr);
@@ -109,8 +104,6 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
 
             break;
         case BRANCH:
-            ++ptr;
-
             oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
             pointer::inc<int, byte>(ptr);
@@ -129,8 +122,6 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
 
             break;
         case FSTORE:
-            ++ptr;
-
             oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
             pointer::inc<int, byte>(ptr);
@@ -139,8 +130,6 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
             oss << *(float*)ptr;
             break;
         case BSTORE:
-            ++ptr;
-
             oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
             pointer::inc<int, byte>(ptr);
