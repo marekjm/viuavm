@@ -38,6 +38,9 @@ int main(int argc, char* argv[]) {
     // setup command line arguments vector
     vector<string> args;
     string option;
+
+    string filename = "";
+    string disasmname = "";
     for (int i = 1; i < argc; ++i) {
         option = string(argv[i]);
         if (option == "--help") {
@@ -50,6 +53,14 @@ int main(int argc, char* argv[]) {
             DISASSEMBLE_ENTRY = true;
         } else if ((option == "--info") or (option == "-i")) {
             INCLUDE_INFO = true;
+        } else if (option == "--out" or option == "-o") {
+            if (i < argc-1) {
+                disasmname = string(argv[++i]);
+            } else {
+                cout << "error: option '" << argv[i] << "' requires an argument: filename" << endl;
+                exit(1);
+            }
+            continue;
         } else {
             args.push_back(argv[i]);
         }
@@ -65,8 +76,10 @@ int main(int argc, char* argv[]) {
         cout << "    --help             - to display this message" << endl;
         cout << "    --version          - show version and quit" << endl;
         cout << "    --verbose          - show verbose output" << endl;
-        cout << "    --with-entry       - disassemble entry function" << endl;
-        cout << "    --info             - include info about disassembled file in output" << endl;
+        cout << "-o, --out              - specify output file" << endl;
+        cout << "                         without this option prints to standard output" << endl;
+        cout << "-e, --with-entry       - disassemble entry function" << endl;
+        cout << "-i, --info             - include info about disassembled file in output" << endl;
         cout << endl;
     }
     if (SHOW_HELP or SHOW_VERSION) {
@@ -78,7 +91,6 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    string filename = "";
     filename = args[0];
 
     if (!filename.size()) {
@@ -239,8 +251,17 @@ int main(int argc, char* argv[]) {
         disassembled_lines.push_back(oss.str());
     }
 
+    ostringstream assembly_code;
     for (unsigned i = 0; i < disassembled_lines.size(); ++i) {
-        cout << disassembled_lines[i];
+        assembly_code << disassembled_lines[i];
+    }
+
+    if (disasmname.size()) {
+        ofstream out(disasmname);
+        out << assembly_code.str();
+        out.close();
+    } else {
+        cout << assembly_code.str();
     }
 
     return 0;
