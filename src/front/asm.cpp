@@ -49,16 +49,21 @@ bool ERROR_GLOBALS_IN_LIB = false;
 const string ENTRY_FUNCTION_NAME = "__entry";
 
 
-tuple<int, bool> resolvejump(string jmp, const map<string, int>& marks) {
+tuple<int, enum JUMPTYPE> resolvejump(string jmp, const map<string, int>& marks) {
     /*  This function is used to resolve jumps in `jump` and `branch` instructions.
      */
     int addr = 0;
-    bool absolute = false;
+    enum JUMPTYPE jump_type = JMP_RELATIVE;
     if (str::isnum(jmp)) {
         addr = stoi(jmp);
     } else if (jmp[0] == '.' and str::isnum(str::sub(jmp, 1))) {
         addr = stoi(str::sub(jmp, 1));
-        absolute = true;
+        jump_type = JMP_ABSOLUTE;
+    } else if (jmp.substr(0, 2) == "0x") {
+        stringstream ss;
+        ss << hex << jmp;
+        ss >> addr;
+        jump_type = JMP_TO_BYTE;
     } else if (jmp[0] == '.') {
         // FIXME
         cout << "FIXME: global marker jumps (jumps to functions) are not implemented yet" << endl;
@@ -70,7 +75,7 @@ tuple<int, bool> resolvejump(string jmp, const map<string, int>& marks) {
             throw ("jump to unrecognised marker: " + jmp);
         }
     }
-    return tuple<int, bool>(addr, absolute);
+    return tuple<int, enum JUMPTYPE>(addr, jump_type);
 }
 
 string resolveregister(string reg, const map<string, int>& names) {
@@ -483,16 +488,16 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             tie(condition, if_true, if_false) = assembler::operands::get3(operands, false);
 
             int addrt_target, addrf_target;
-            bool addrt_is_absolute, addrf_is_absolute;
-            tie(addrt_target, addrt_is_absolute) = resolvejump(if_true, marks);
+            enum JUMPTYPE addrt_jump_type, addrf_jump_type;
+            tie(addrt_target, addrt_jump_type) = resolvejump(if_true, marks);
             if (if_false != "") {
-                tie(addrf_target, addrf_is_absolute) = resolvejump(if_false, marks);
+                tie(addrf_target, addrf_jump_type) = resolvejump(if_false, marks);
             } else {
-                addrf_is_absolute = false;
+                addrf_jump_type = JMP_RELATIVE;
                 addrf_target = instruction+1;
             }
 
-            program.branch(assembler::operands::getint(resolveregister(condition, names)), addrt_target, addrt_is_absolute, addrf_target, addrf_is_absolute);
+            program.branch(assembler::operands::getint(resolveregister(condition, names)), addrt_target, addrt_jump_type, addrf_target, addrf_jump_type);
         } else if (str::startswith(line, "jump")) {
             /*  Jump instruction can be written in two forms:
              *
@@ -508,9 +513,9 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
              *  if it is not found throw an exception about unrecognised marker being used.
              */
             int jump_target;
-            bool is_absolute;
-            tie(jump_target, is_absolute) = resolvejump(operands, marks);
-            program.jump(jump_target, is_absolute);
+            enum JUMPTYPE jump_type;
+            tie(jump_target, jump_type) = resolvejump(operands, marks);
+            program.jump(jump_target, jump_type);
         } else if (str::startswith(line, "tryframe")) {
             program.tryframe();
         } else if (str::startswith(line, "catch")) {
