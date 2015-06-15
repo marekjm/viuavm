@@ -16,6 +16,13 @@ typedef std::tuple<bool, byte> byte_op;
 typedef std::tuple<bool, float> float_op;
 
 
+enum JUMPTYPE {
+    JMP_RELATIVE = 0,
+    JMP_ABSOLUTE,
+    JMP_TO_BYTE,
+};
+
+
 class Program {
     // byte array containing bytecode
     byte* program;
