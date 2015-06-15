@@ -39,6 +39,8 @@ clean-support:
 
 clean-test-compiles:
 	rm -f ./tests/compiled/*.bin
+	rm -f ./tests/compiled/*.asm
+	rm -f ./tests/compiled/*.wlib
 
 
 install: bin/vm/asm bin/vm/cpu bin/vm/vdb stdlib
