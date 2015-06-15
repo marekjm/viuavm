@@ -38,6 +38,10 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
 
     switch (op) {
         case IZERO:
+        case IINC:
+        case IDEC:
+        case BINC:
+        case BDEC:
         case PRINT:
         case ECHO:
         case NOT:
@@ -68,8 +72,6 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case ISUB:
         case IMUL:
         case IDIV:
-        case IINC:
-        case IDEC:
         case ILT:
         case ILTE:
         case IGT:
@@ -86,8 +88,6 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case FEQ:
         case BADD:
         case BSUB:
-        case BINC:
-        case BDEC:
         case BLT:
         case BLTE:
         case BGT:
