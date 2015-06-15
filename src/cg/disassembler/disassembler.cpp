@@ -56,6 +56,10 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case FTOI:
         case STOI:
         case STOF:
+        case FRAME:
+        case ARG:
+        case PARAM:
+        case PAREF:
             oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
             pointer::inc<int, byte>(ptr);
