@@ -699,7 +699,7 @@ Program& Program::call(string fn_name, int_op reg) {
     return (*this);
 }
 
-Program& Program::jump(int addr, bool is_absolute) {
+Program& Program::jump(int addr, enum JUMPTYPE is_absolute) {
     /*  Inserts jump instruction. Parameter is instruction index.
      *  Byte offset is calculated automatically.
      *
@@ -709,16 +709,17 @@ Program& Program::jump(int addr, bool is_absolute) {
      */
     *(addr_ptr++) = JUMP;
 
-    // save jump position
-    (is_absolute ? branches_absolute : branches).push_back(addr_ptr);
-
+    // save jump position if jump is not to byte
+    if (is_absolute != JMP_TO_BYTE) {
+        (is_absolute == JMP_ABSOLUTE ? branches_absolute : branches).push_back(addr_ptr);
+    }
     *((int*)addr_ptr) = addr;
     pointer::inc<int, byte>(addr_ptr);
 
     return (*this);
 }
 
-Program& Program::branch(int_op regc, int addr_truth, bool absolute_truth, int addr_false, bool absolute_false) {
+Program& Program::branch(int_op regc, int addr_truth, enum JUMPTYPE absolute_truth, int addr_false, enum JUMPTYPE absolute_false) {
     /*  Inserts branch instruction.
      *  Byte offset is calculated automatically.
      *
@@ -732,13 +733,17 @@ Program& Program::branch(int_op regc, int addr_truth, bool absolute_truth, int a
     *(addr_ptr++) = BRANCH;
     addr_ptr = insertIntegerOperand(addr_ptr, regc);
 
-    // save jump position
-    (absolute_truth ? branches_absolute : branches).push_back(addr_ptr);
+    // save jump position if jump is not to byte
+    if (absolute_truth != JMP_TO_BYTE) {
+        (absolute_truth == JMP_ABSOLUTE ? branches_absolute : branches).push_back(addr_ptr);
+    }
     *((int*)addr_ptr) = addr_truth;
     pointer::inc<int, byte>(addr_ptr);
 
-    // save jump position
-    (absolute_false ? branches_absolute : branches).push_back(addr_ptr);
+    // save jump position if jump is not to byte
+    if (absolute_false != JMP_TO_BYTE) {
+        (absolute_truth == JMP_ABSOLUTE ? branches_absolute : branches).push_back(addr_ptr);
+    }
     *((int*)addr_ptr) = addr_false;
     pointer::inc<int, byte>(addr_ptr);
 

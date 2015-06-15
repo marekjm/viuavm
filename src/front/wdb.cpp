@@ -896,8 +896,9 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
 
     /* Set the completion callback. This will be called every time the
      * user uses the <tab> key. */
+    char word_separators[] = {'.'};
     linenoiseSetCompletionCallback(completion);
-    linenoiseSetWordSeparators(1, ".");
+    linenoiseSetWordSeparators(1, word_separators);
 
     string home = getenv("HOME");
     string history = (home + DEBUGGER_COMMAND_HISTORY);

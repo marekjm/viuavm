@@ -1,0 +1,7 @@
+#!/usr/bin/sh
+
+set -e
+
+# The command below will compile the code with as many threads as your CPU has cores.
+# Behold the great power of pipes and subshells!
+make -j $(dc -e "$(cat /proc/cpuinfo | grep 'processor' | tail -n 1 | grep -Po '[0-9]+') 1 + p")

@@ -16,6 +16,13 @@ typedef std::tuple<bool, byte> byte_op;
 typedef std::tuple<bool, float> float_op;
 
 
+enum JUMPTYPE {
+    JMP_RELATIVE = 0,
+    JMP_ABSOLUTE,
+    JMP_TO_BYTE,
+};
+
+
 class Program {
     // byte array containing bytecode
     byte* program;
@@ -118,8 +125,8 @@ class Program {
     Program& arg        (int_op, int_op);
 
     Program& call       (std::string, int_op);
-    Program& jump       (int, bool);
-    Program& branch     (int_op, int, bool, int, bool);
+    Program& jump       (int, enum JUMPTYPE);
+    Program& branch     (int_op, int, enum JUMPTYPE, int, enum JUMPTYPE);
 
     Program& tryframe   ();
     Program& vmcatch    (std::string, std::string);
