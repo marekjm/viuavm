@@ -41,7 +41,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         oss << " " << str::enquote(s);
         bptr += s.size();
         ++bptr; // for null character terminating the C-style string not included in std::string
-    } else if (op == CALL) {
+    } else if ((op == CALL) or (op == CLOSURE)) {
         oss << " ";
         string fn_name = string(bptr);
         oss << fn_name;
@@ -71,6 +71,8 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case TMPRI:
         case TMPRO:
         case VEC:
+        case CLBIND:
+        case CLFRAME:
             oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
             pointer::inc<int, byte>(ptr);
@@ -92,6 +94,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case ISNULL:
         case VPUSH:
         case VLEN:
+        case CLCALL:
             oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
             pointer::inc<int, byte>(ptr);
