@@ -98,14 +98,16 @@ int main(int argc, char* argv[]) {
 
     map<string, uint16_t> block_address_mapping = loader.getBlockAddresses();
     vector<string> blocks = loader.getBlocks();
+    map<string, unsigned> block_sizes;
 
 
     vector<string> disassembled_lines;
-
     ostringstream oss;
+
 
     string name;
     unsigned fn_size;
+
     for (unsigned i = 0; i < functions.size(); ++i) {
         name = functions[i];
 
@@ -122,6 +124,22 @@ int main(int argc, char* argv[]) {
         function_sizes[name] = fn_size;
     }
 
+    for (unsigned i = 0; i < blocks.size(); ++i) {
+        name = blocks[i];
+
+        if (i < (blocks.size()-1)) {
+            long unsigned a = block_address_mapping[name];
+            long unsigned b = block_address_mapping[blocks[i+1]];
+            fn_size = (b-a);
+        } else {
+            long unsigned a = block_address_mapping[name];
+            long unsigned b = function_address_mapping[functions[0]];
+            fn_size = (b-a);
+        }
+
+        block_sizes[name] = fn_size;
+    }
+
     if (INCLUDE_INFO) {
         oss << "; bytecode size: " << bytes << '\n';
         oss << ";\n";
@@ -133,6 +151,49 @@ int main(int argc, char* argv[]) {
         oss << "\n\n";
 
         disassembled_lines.push_back(oss.str());
+    }
+
+    for (unsigned i = 0; i < blocks.size(); ++i) {
+        name = blocks[i];
+        fn_size = block_sizes[name];
+
+        oss.str("");
+
+        oss << ".block: " << name << '\n';
+
+        string opname;
+        bool disasm_terminated = false;
+        for (unsigned j = 0; j < fn_size;) {
+            try {
+                string instruction;
+                unsigned size;
+                tie(instruction, size) = disassembler::instruction((bytecode+block_address_mapping[name]+j));
+                oss << "    " << instruction << '\n';
+                j += size;
+            } catch (const out_of_range& e) {
+                oss << "\n---- ERROR ----\n\n";
+                oss << "disassembly terminated after throwing an instance of std::out_of_range\n";
+                oss << "what(): " << e.what() << '\n';
+                disasm_terminated = true;
+                break;
+            }
+        }
+        if (disasm_terminated) {
+            disassembled_lines.push_back(oss.str());
+            break;
+        }
+
+        oss << ".end" << '\n';
+
+        if (i < (blocks.size()-1)) {
+            oss << '\n';
+        }
+
+        disassembled_lines.push_back(oss.str());
+    }
+
+    if (blocks.size()) {
+        disassembled_lines.push_back("\n");
     }
 
     for (unsigned i = 0; i < functions.size(); ++i) {
