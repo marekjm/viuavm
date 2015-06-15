@@ -51,11 +51,25 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         oss << " " << intop(bptr);
         pointer::inc<bool, byte>(bptr);
         pointer::inc<int, byte>(bptr);
-    } else if (op == EXIMPORT) {
+    } else if ((op == EXIMPORT) or (op == TRY)) {
         oss << " ";
-        string import_name = string(bptr);
-        oss << str::enquote(import_name);
-        bptr += import_name.size();
+        string s = string(bptr);
+        oss << (op == EXIMPORT ? str::enquote(s) : s);
+        bptr += s.size();
+        ++bptr; // for null character terminating the C-style string not included in std::string
+    } else if (op == CATCH) {
+        string s;
+
+        oss << " ";
+        s = string(bptr);
+        oss << s;
+        bptr += s.size();
+        ++bptr; // for null character terminating the C-style string not included in std::string
+
+        oss << " ";
+        s = string(bptr);
+        oss << s;
+        bptr += s.size();
         ++bptr; // for null character terminating the C-style string not included in std::string
     }
 
