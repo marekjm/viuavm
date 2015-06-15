@@ -6,6 +6,16 @@
 using namespace std;
 
 
+string disassembler::intop(byte* ptr) {
+    ostringstream oss;
+
+    oss << ((*(bool*)ptr) ? "@" : "");
+    pointer::inc<bool, byte>(ptr);
+    oss << *(int*)ptr;
+
+    return oss.str();
+}
+
 tuple<string, unsigned> disassembler::instruction(byte* ptr) {
     byte* bptr = ptr;
 
@@ -33,10 +43,8 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case NOT:
             ++ptr;
 
-            oss << " ";
-            oss << (*((bool*)ptr) ? "@" : "");
+            oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
-            oss << *(int*)ptr;
             pointer::inc<int, byte>(ptr);
 
             break;
@@ -47,16 +55,12 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case STOF:
             ++ptr;
 
-            oss << " ";
-            oss << (*((bool*)ptr) ? "@" : "");
+            oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
-            oss << *(int*)ptr;
             pointer::inc<int, byte>(ptr);
 
-            oss << " ";
-            oss << (*((bool*)ptr) ? "@" : "");
+            oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
-            oss << *(int*)ptr;
             pointer::inc<int, byte>(ptr);
 
             break;
@@ -82,32 +86,24 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case FEQ:
             ++ptr;
 
-            oss << " ";
-            oss << (*((bool*)ptr) ? "@" : "");
+            oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
-            oss << *(int*)ptr;
             pointer::inc<int, byte>(ptr);
 
-            oss << " ";
-            oss << (*((bool*)ptr) ? "@" : "");
+            oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
-            oss << *(int*)ptr;
             pointer::inc<int, byte>(ptr);
 
-            oss << " ";
-            oss << (*((bool*)ptr) ? "@" : "");
+            oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
-            oss << *(int*)ptr;
             pointer::inc<int, byte>(ptr);
 
             break;
         case BRANCH:
             ++ptr;
 
-            oss << " ";
-            oss << (*((bool*)ptr) ? "@" : "");
+            oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
-            oss << *(int*)ptr;
             pointer::inc<int, byte>(ptr);
 
             oss << " 0x";
@@ -126,10 +122,8 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case FSTORE:
             ++ptr;
 
-            oss << " ";
-            oss << (*((bool*)ptr) ? "@" : "");
+            oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
-            oss << *(int*)ptr;
             pointer::inc<int, byte>(ptr);
 
             oss << " ";
