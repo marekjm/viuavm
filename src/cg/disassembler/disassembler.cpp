@@ -62,7 +62,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
 
         oss << " ";
         s = string(bptr);
-        oss << s;
+        oss << str::enquote(s);
         bptr += s.size();
         ++bptr; // for null character terminating the C-style string not included in std::string
 
