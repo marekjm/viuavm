@@ -236,7 +236,20 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
             break;
         case RESS:
             oss << " ";
-            oss << int(*(byte*)ptr);
+            switch(int(*(byte*)ptr)) {
+                case 0:
+                    oss << "global";
+                    break;
+                case 1:
+                    oss << "local";
+                    break;
+                case 2:
+                    oss << "static";
+                    break;
+                case 3:
+                    oss << "temp";
+                    break;
+            }
             break;
         default:
             oss << "";
