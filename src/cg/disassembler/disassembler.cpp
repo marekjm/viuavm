@@ -41,7 +41,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         oss << " " << str::enquote(s);
         bptr += s.size();
         ++bptr; // for null character terminating the C-style string not included in std::string
-    } else if ((op == CALL) or (op == CLOSURE)) {
+    } else if ((op == CALL) or (op == CLOSURE) or (op == EXCALL)) {
         oss << " ";
         string fn_name = string(bptr);
         oss << fn_name;
@@ -51,6 +51,12 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         oss << " " << intop(bptr);
         pointer::inc<bool, byte>(bptr);
         pointer::inc<int, byte>(bptr);
+    } else if (op == EXIMPORT) {
+        oss << " ";
+        string import_name = string(bptr);
+        oss << str::enquote(import_name);
+        bptr += import_name.size();
+        ++bptr; // for null character terminating the C-style string not included in std::string
     }
 
     unsigned increase = (bptr-ptr);
