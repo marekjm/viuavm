@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""This is initial unit Tests suite for Wudoo virtual machine.
+"""This is initial unit Tests suite for Viua virtual machine.
 It uses sample asm code (samples can also be compiled and run directly).
 
 Each unit passes if:
@@ -21,23 +21,23 @@ import unittest
 COMPILED_SAMPLES_PATH = './tests/compiled'
 
 
-class WudooError(Exception):
-    """Generic Wudoo exception.
+class ViuaError(Exception):
+    """Generic Viua exception.
     """
     pass
 
-class WudooAssemblerError(WudooError):
-    """Base class for exceptions related to Wudoo assembler.
+class ViuaAssemblerError(ViuaError):
+    """Base class for exceptions related to Viua assembler.
     """
     pass
 
-class WudooDisassemblerError(WudooError):
-    """Base class for exceptions related to Wudoo assembler.
+class ViuaDisassemblerError(ViuaError):
+    """Base class for exceptions related to Viua assembler.
     """
     pass
 
-class WudooCPUError(WudooError):
-    """Base class for exceptions related to Wudoo CPU.
+class ViuaCPUError(ViuaError):
+    """Base class for exceptions related to Viua CPU.
     """
     pass
 
@@ -55,7 +55,7 @@ def assemble(asm, out=None, links=(), opts=(), okcodes=(0,)):
     output = output.decode('utf-8')
     exit_code = p.wait()
     if exit_code not in okcodes:
-        raise WudooAssemblerError('{0}: {1}'.format(asm, output.strip()))
+        raise ViuaAssemblerError('{0}: {1}'.format(asm, output.strip()))
     return (output, error, exit_code)
 
 def disassemble(path, out=None):
@@ -70,17 +70,17 @@ def disassemble(path, out=None):
     output = output.decode('utf-8')
     exit_code = p.wait()
     if exit_code != 0:
-        raise WudooDisassemblerError('{0}: {1}'.format(' '.join(asmargs), output.strip()))
+        raise ViuaDisassemblerError('{0}: {1}'.format(' '.join(asmargs), output.strip()))
     return (output, error, exit_code)
 
 def run(path, expected_exit_code=0):
-    """Run given file with Wudoo CPU and return its output.
+    """Run given file with Viua CPU and return its output.
     """
     p = subprocess.Popen(('./bin/vm/cpu', path), stdout=subprocess.PIPE)
     output, error = p.communicate()
     exit_code = p.wait()
     if exit_code not in (expected_exit_code if type(expected_exit_code) in [list, tuple] else (expected_exit_code,)):
-        raise WudooCPUError('{0} [{1}]: {2}'.format(path, exit_code, output.decode('utf-8').strip()))
+        raise ViuaCPUError('{0} [{1}]: {2}'.format(path, exit_code, output.decode('utf-8').strip()))
     return (exit_code, output.decode('utf-8'))
 
 
