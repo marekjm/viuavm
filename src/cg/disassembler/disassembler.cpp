@@ -1,6 +1,7 @@
 #include <sstream>
 #include "../../bytecode/opcodes.h"
 #include "../../bytecode/maps.h"
+#include "../../support/string.h"
 #include "../../support/pointer.h"
 #include "disassembler.h"
 using namespace std;
@@ -27,11 +28,29 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
     ostringstream oss;
     oss << opname;
     if (in(OP_VARIABLE_LENGTH, op)) {
-        bptr += string(bptr).size();
+    }
+
+    if (not in(OP_VARIABLE_LENGTH, op)) {
+        bptr += (OP_SIZES.at(opname)-1); // -1 because OP_SIZES add one for instruction-storing byte
+    } else if (op == STRSTORE) {
+        oss << " " << intop(bptr);
+        pointer::inc<bool, byte>(bptr);
+        pointer::inc<int, byte>(bptr);
+
+        string s = string(bptr);
+        oss << " " << str::enquote(s);
+        bptr += s.size();
         ++bptr; // for null character terminating the C-style string not included in std::string
-        bptr += (OP_SIZES.at(opname)-1); // -1 because OP_SIZES add one for instruction-storing byte
-    } else {
-        bptr += (OP_SIZES.at(opname)-1); // -1 because OP_SIZES add one for instruction-storing byte
+    } else if (op == CALL) {
+        oss << " ";
+        string fn_name = string(bptr);
+        oss << fn_name;
+        bptr += fn_name.size();
+        ++bptr; // for null character terminating the C-style string not included in std::string
+
+        oss << " " << intop(bptr);
+        pointer::inc<bool, byte>(bptr);
+        pointer::inc<int, byte>(bptr);
     }
 
     unsigned increase = (bptr-ptr);
