@@ -3,13 +3,13 @@
 #include <cstring>
 #include <iostream>
 #include <sstream>
-#include <algorithm>
 #include <vector>
 #include <tuple>
 #include <string>
 #include "../version.h"
 #include "../bytecode/opcodes.h"
 #include "../bytecode/maps.h"
+#include "../cg/disassembler/disassembler.h"
 #include "../support/string.h"
 #include "../support/pointer.h"
 #include "../loader.h"
@@ -32,152 +32,6 @@ string printIntegerOperand(byte* iptr) {
     cout << *(int*)iptr;
     pointer::inc<int, byte>(iptr);
     return iptr;
-}
-
-
-// Helper functions for checking if a container contains an item.
-template<typename T> bool in(std::vector<T> v, T item) {
-    return (find(v.begin(), v.end(), item) != v.end());
-}
-template<typename K, typename V> bool in(std::map<K, V> m, K key) {
-    return (m.count() == 1);
-}
-
-
-// Helper functions for disassembler
-tuple<string, unsigned> disline(byte* ptr) {
-    byte* bptr = ptr;
-
-    OPCODE op = OPCODE(*bptr);
-    string opname = OP_NAMES.at(op);
-
-    ++bptr; // instruction byte is not needed anymore
-
-    ostringstream oss;
-    oss << opname;
-    if (in(OP_VARIABLE_LENGTH, op)) {
-        bptr += string(bptr).size();
-        ++bptr; // for null character terminating the C-style string not included in std::string
-        bptr += (OP_SIZES.at(opname)-1); // -1 because OP_SIZES add one for instruction-storing byte
-    } else {
-        bptr += (OP_SIZES.at(opname)-1); // -1 because OP_SIZES add one for instruction-storing byte
-    }
-
-    unsigned increase = (bptr-ptr);
-
-    switch (op) {
-        case IZERO:
-        case PRINT:
-        case ECHO:
-        case NOT:
-            ++ptr;
-
-            oss << " ";
-            oss << (*((bool*)ptr) ? "@" : "");
-            pointer::inc<bool, byte>(ptr);
-            oss << *(int*)ptr;
-            pointer::inc<int, byte>(ptr);
-
-            break;
-        case ISTORE:
-        case ITOF:
-        case FTOI:
-        case STOI:
-        case STOF:
-            ++ptr;
-
-            oss << " ";
-            oss << (*((bool*)ptr) ? "@" : "");
-            pointer::inc<bool, byte>(ptr);
-            oss << *(int*)ptr;
-            pointer::inc<int, byte>(ptr);
-
-            oss << " ";
-            oss << (*((bool*)ptr) ? "@" : "");
-            pointer::inc<bool, byte>(ptr);
-            oss << *(int*)ptr;
-            pointer::inc<int, byte>(ptr);
-
-            break;
-        case IADD:
-        case ISUB:
-        case IMUL:
-        case IDIV:
-        case IINC:
-        case IDEC:
-        case ILT:
-        case ILTE:
-        case IGT:
-        case IGTE:
-        case IEQ:
-        case FADD:
-        case FSUB:
-        case FMUL:
-        case FDIV:
-        case FLT:
-        case FLTE:
-        case FGT:
-        case FGTE:
-        case FEQ:
-            ++ptr;
-
-            oss << " ";
-            oss << (*((bool*)ptr) ? "@" : "");
-            pointer::inc<bool, byte>(ptr);
-            oss << *(int*)ptr;
-            pointer::inc<int, byte>(ptr);
-
-            oss << " ";
-            oss << (*((bool*)ptr) ? "@" : "");
-            pointer::inc<bool, byte>(ptr);
-            oss << *(int*)ptr;
-            pointer::inc<int, byte>(ptr);
-
-            oss << " ";
-            oss << (*((bool*)ptr) ? "@" : "");
-            pointer::inc<bool, byte>(ptr);
-            oss << *(int*)ptr;
-            pointer::inc<int, byte>(ptr);
-
-            break;
-        case BRANCH:
-            ++ptr;
-
-            oss << " ";
-            oss << (*((bool*)ptr) ? "@" : "");
-            pointer::inc<bool, byte>(ptr);
-            oss << *(int*)ptr;
-            pointer::inc<int, byte>(ptr);
-
-            oss << " 0x";
-            oss << hex;
-            oss << *(int*)ptr;
-            pointer::inc<int, byte>(ptr);
-
-            oss << " 0x";
-            oss << hex;
-            oss << *(int*)ptr;
-            pointer::inc<int, byte>(ptr);
-
-            oss << dec;
-
-            break;
-        case FSTORE:
-            ++ptr;
-
-            oss << " ";
-            oss << (*((bool*)ptr) ? "@" : "");
-            pointer::inc<bool, byte>(ptr);
-            oss << *(int*)ptr;
-            pointer::inc<int, byte>(ptr);
-
-            oss << " ";
-            oss << *(float*)ptr;
-            break;
-        default:
-            oss << "";
-    }
-    return tuple<string, unsigned>(oss.str(), increase);
 }
 
 int main(int argc, char* argv[]) {
@@ -299,7 +153,7 @@ int main(int argc, char* argv[]) {
             try {
                 string instruction;
                 unsigned size;
-                tie(instruction, size) = disline((bytecode+function_address_mapping[name]+j));
+                tie(instruction, size) = disassembler::instruction((bytecode+function_address_mapping[name]+j));
                 oss << "    " << instruction << '\n';
                 j += size;
             } catch (const out_of_range& e) {

@@ -1,3 +1,4 @@
+#include <sstream>
 #include "../../bytecode/opcodes.h"
 #include "../../bytecode/maps.h"
 #include "../../support/pointer.h"
