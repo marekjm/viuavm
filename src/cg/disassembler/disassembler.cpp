@@ -51,6 +51,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case EMPTY:
         case TMPRI:
         case TMPRO:
+        case VEC:
             oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
             pointer::inc<int, byte>(ptr);
@@ -70,6 +71,8 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case REF:
         case SWAP:
         case ISNULL:
+        case VPUSH:
+        case VLEN:
             oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
             pointer::inc<int, byte>(ptr);
@@ -106,6 +109,9 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case BEQ:
         case AND:
         case OR:
+        case VINSERT:
+        case VPOP:
+        case VAT:
             oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
             pointer::inc<int, byte>(ptr);
