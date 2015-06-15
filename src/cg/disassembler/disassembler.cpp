@@ -119,6 +119,14 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
             pointer::inc<int, byte>(ptr);
 
             break;
+        case JUMP:
+            oss << " 0x";
+            oss << hex;
+            oss << *(int*)ptr;
+
+            oss << dec;
+
+            break;
         case BRANCH:
             oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
