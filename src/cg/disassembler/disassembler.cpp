@@ -45,6 +45,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case BDEC:
         case PRINT:
         case ECHO:
+        case BOOL:
         case NOT:
             oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
@@ -94,6 +95,8 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case BGT:
         case BGTE:
         case BEQ:
+        case AND:
+        case OR:
             oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
             pointer::inc<int, byte>(ptr);
