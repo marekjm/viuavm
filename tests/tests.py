@@ -72,7 +72,7 @@ class IntegerInstructionsTests(unittest.TestCase):
     def testIADD(self):
         name = 'add.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('1', output.strip())
@@ -81,7 +81,7 @@ class IntegerInstructionsTests(unittest.TestCase):
     def testISUB(self):
         name = 'sub.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('1', output.strip())
@@ -90,7 +90,7 @@ class IntegerInstructionsTests(unittest.TestCase):
     def testIMUL(self):
         name = 'mul.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('1', output.strip())
@@ -99,7 +99,7 @@ class IntegerInstructionsTests(unittest.TestCase):
     def testIDIV(self):
         name = 'div.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('1', output.strip())
@@ -108,7 +108,7 @@ class IntegerInstructionsTests(unittest.TestCase):
     def testIDEC(self):
         name = 'dec.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('1', output.strip())
@@ -117,7 +117,7 @@ class IntegerInstructionsTests(unittest.TestCase):
     def testIINC(self):
         name = 'inc.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('1', output.strip())
@@ -126,7 +126,7 @@ class IntegerInstructionsTests(unittest.TestCase):
     def testILT(self):
         name = 'lt.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('true', output.strip())
@@ -135,7 +135,7 @@ class IntegerInstructionsTests(unittest.TestCase):
     def testILTE(self):
         name = 'lte.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('true', output.strip())
@@ -144,7 +144,7 @@ class IntegerInstructionsTests(unittest.TestCase):
     def testIGT(self):
         name = 'gt.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('true', output.strip())
@@ -153,7 +153,7 @@ class IntegerInstructionsTests(unittest.TestCase):
     def testIGTE(self):
         name = 'gte.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('true', output.strip())
@@ -162,7 +162,7 @@ class IntegerInstructionsTests(unittest.TestCase):
     def testIEQ(self):
         name = 'eq.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('true', output.strip())
@@ -171,7 +171,7 @@ class IntegerInstructionsTests(unittest.TestCase):
     def testCalculatingModulo(self):
         name = 'modulo.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('65', output.strip())
@@ -180,7 +180,7 @@ class IntegerInstructionsTests(unittest.TestCase):
     def testIntegersInCondition(self):
         name = 'in_condition.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('true', output.strip())
@@ -189,7 +189,7 @@ class IntegerInstructionsTests(unittest.TestCase):
     def testBooleanAsInteger(self):
         name = 'boolean_as_int.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('70', output.strip())
@@ -204,7 +204,7 @@ class FloatInstructionsTests(unittest.TestCase):
     def testFADD(self):
         name = 'add.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('0.5', output.strip())
@@ -213,7 +213,7 @@ class FloatInstructionsTests(unittest.TestCase):
     def testFSUB(self):
         name = 'sub.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('1.015', output.strip())
@@ -222,7 +222,7 @@ class FloatInstructionsTests(unittest.TestCase):
     def testFMUL(self):
         name = 'mul.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('8.004', output.strip())
@@ -231,7 +231,7 @@ class FloatInstructionsTests(unittest.TestCase):
     def testFDIV(self):
         name = 'div.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('1.57', output.strip())
@@ -240,7 +240,7 @@ class FloatInstructionsTests(unittest.TestCase):
     def testFLT(self):
         name = 'lt.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('true', output.strip())
@@ -249,7 +249,7 @@ class FloatInstructionsTests(unittest.TestCase):
     def testFLTE(self):
         name = 'lte.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('true', output.strip())
@@ -258,7 +258,7 @@ class FloatInstructionsTests(unittest.TestCase):
     def testFGT(self):
         name = 'gt.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('true', output.strip())
@@ -267,7 +267,7 @@ class FloatInstructionsTests(unittest.TestCase):
     def testFGTE(self):
         name = 'gte.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('true', output.strip())
@@ -276,7 +276,7 @@ class FloatInstructionsTests(unittest.TestCase):
     def testFEQ(self):
         name = 'eq.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('true', output.strip())
@@ -285,7 +285,7 @@ class FloatInstructionsTests(unittest.TestCase):
     def testFloatsInCondition(self):
         name = 'in_condition.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('true', output.strip())
@@ -300,7 +300,7 @@ class ByteInstructionsTests(unittest.TestCase):
     def testHelloWorld(self):
         name = 'helloworld.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('Hello World!', output.strip())
@@ -315,7 +315,7 @@ class StringInstructionsTests(unittest.TestCase):
     def testHelloWorld(self):
         name = 'hello_world.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('Hello World!', output.strip())
@@ -333,7 +333,7 @@ class VectorInstructionsTests(unittest.TestCase):
     def testVLEN(self):
         name = 'vlen.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('8', output.strip())
@@ -342,7 +342,7 @@ class VectorInstructionsTests(unittest.TestCase):
     def testVINSERT(self):
         name = 'vinsert.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual(['Hurr', 'durr', 'Im\'a', 'sheep!'], output.strip().splitlines())
@@ -351,7 +351,7 @@ class VectorInstructionsTests(unittest.TestCase):
     def testVPUSH(self):
         name = 'vpush.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual(['0', '1', 'Hello World!'], output.strip().splitlines())
@@ -360,7 +360,7 @@ class VectorInstructionsTests(unittest.TestCase):
     def testVPOP(self):
         name = 'vpop.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual(['0', '1', '0', 'Hello World!'], output.strip().splitlines())
@@ -369,7 +369,7 @@ class VectorInstructionsTests(unittest.TestCase):
     def testVAT(self):
         name = 'vat.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual(['0', '1', '1', 'Hello World!'], output.strip().splitlines())
@@ -384,7 +384,7 @@ class CastingInstructionsTests(unittest.TestCase):
     def testITOF(self):
         name = 'itof.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('4.0', output.strip())
@@ -393,7 +393,7 @@ class CastingInstructionsTests(unittest.TestCase):
     def testFTOI(self):
         name = 'ftoi.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('3', output.strip())
@@ -402,7 +402,7 @@ class CastingInstructionsTests(unittest.TestCase):
     def testSTOI(self):
         name = 'stoi.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('69', output.strip())
@@ -417,7 +417,7 @@ class RegisterManipulationInstructionsTests(unittest.TestCase):
     def testCOPY(self):
         name = 'copy.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('1', output.strip())
@@ -426,7 +426,7 @@ class RegisterManipulationInstructionsTests(unittest.TestCase):
     def testMOVE(self):
         name = 'move.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('1', output.strip())
@@ -435,7 +435,7 @@ class RegisterManipulationInstructionsTests(unittest.TestCase):
     def testSWAP(self):
         name = 'swap.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual([1, 0], [int(i) for i in output.strip().splitlines()])
@@ -444,7 +444,7 @@ class RegisterManipulationInstructionsTests(unittest.TestCase):
     def testISNULL(self):
         name = 'isnull.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('true', output.strip())
@@ -453,7 +453,7 @@ class RegisterManipulationInstructionsTests(unittest.TestCase):
     def testFREE(self):
         name = 'free.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('true', output.strip())
@@ -462,7 +462,7 @@ class RegisterManipulationInstructionsTests(unittest.TestCase):
     def testEMPTY(self):
         name = 'empty.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('true', output.strip())
@@ -480,7 +480,7 @@ class SampleProgramsTests(unittest.TestCase):
     def testCalculatingIntegerPowerOf(self):
         name = 'power_of.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('64', output.strip())
@@ -489,7 +489,7 @@ class SampleProgramsTests(unittest.TestCase):
     def testCalculatingAbsoluteValueOfAnInteger(self):
         name = 'abs.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('17', output.strip())
@@ -498,7 +498,7 @@ class SampleProgramsTests(unittest.TestCase):
     def testLooping(self):
         name = 'looping.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual([i for i in range(0, 11)], [int(i) for i in output.strip().splitlines()])
@@ -507,7 +507,7 @@ class SampleProgramsTests(unittest.TestCase):
     def testReferences(self):
         name = 'refs.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual([2, 16], [int(i) for i in output.strip().splitlines()])
@@ -516,7 +516,7 @@ class SampleProgramsTests(unittest.TestCase):
     def testRegisterReferencesInIntegerOperands(self):
         name = 'registerref.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual([16, 1, 1, 16], [int(i) for i in output.strip().splitlines()])
@@ -529,7 +529,7 @@ class SampleProgramsTests(unittest.TestCase):
         """
         name = 'factorial.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('40320', output.strip())
@@ -540,7 +540,7 @@ class SampleProgramsTests(unittest.TestCase):
         """
         name = 'iterfib.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual(int(output.strip()), 1134903170)
@@ -555,7 +555,7 @@ class FunctionTests(unittest.TestCase):
     def testBasicFunctionSupport(self):
         name = 'definition.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('42', output.strip())
@@ -565,7 +565,7 @@ class FunctionTests(unittest.TestCase):
     def testNestedFunctionCallSupport(self):
         name = 'nested_calls.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual([2015, 1995, 69, 42], [int(i) for i in output.strip().splitlines()])
@@ -574,7 +574,7 @@ class FunctionTests(unittest.TestCase):
     def testRecursiveCallFunctionSupport(self):
         name = 'recursive.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual([i for i in range(9, -1, -1)], [int(i) for i in output.strip().splitlines()])
@@ -583,7 +583,7 @@ class FunctionTests(unittest.TestCase):
     def testLocalRegistersInFunctions(self):
         name = 'local_registers.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual([42, 69], [int(i) for i in output.strip().splitlines()])
@@ -592,7 +592,7 @@ class FunctionTests(unittest.TestCase):
     def testReturningReferences(self):
         name = 'return_by_reference.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual(42, int(output.strip()))
@@ -601,7 +601,7 @@ class FunctionTests(unittest.TestCase):
     def testStaticRegisters(self):
         name = 'static_registers.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [int(i) for i in output.strip().splitlines()])
@@ -616,7 +616,7 @@ class ClosureTests(unittest.TestCase):
     def testSimpleClosure(self):
         name = 'simple.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual('42', output.strip())
@@ -625,7 +625,7 @@ class ClosureTests(unittest.TestCase):
     def testVariableSharingBetweenTwoClosures(self):
         name = 'shared_variables.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual([42, 69], [int(i) for i in output.strip().splitlines()])
@@ -685,7 +685,7 @@ class JumpingTests(unittest.TestCase):
     def testAbsoluteJump(self):
         name = 'absolute_jump.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual("Hey babe, I'm absolute.", output.strip())
@@ -694,7 +694,7 @@ class JumpingTests(unittest.TestCase):
     def testAbsoluteBranch(self):
         name = 'absolute_branch.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual("Hey babe, I'm absolute.", output.strip())
@@ -709,7 +709,7 @@ class TryCatchBlockTests(unittest.TestCase):
     def testBasicNoThrowNoCatchBlock(self):
         name = 'basic.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual("42", output.strip())
@@ -718,7 +718,7 @@ class TryCatchBlockTests(unittest.TestCase):
     def testCatchingBuiltinType(self):
         name = 'catching_builtin_type.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual("42", output.strip())
@@ -733,7 +733,7 @@ class CatchingMachineThrownExceptionTests(unittest.TestCase):
     def testCatchingMachineThrownException(self):
         name = 'nullregister_access.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual("exception encountered: (get) read from null register: 1", output.strip())
@@ -757,7 +757,7 @@ class AssemblerErrorTests(unittest.TestCase):
             "exception in function 'foo': RuntimeException: read from null register: 1",
         ]
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path, 1)
         self.assertEqual(lines, output.strip().splitlines())
@@ -766,7 +766,7 @@ class AssemblerErrorTests(unittest.TestCase):
     def testNoEndBetweenDefs(self):
         name = 'no_end_between_defs.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,))
         self.assertEqual("error: function gathering failed: another function opened before assembler reached .end after 'foo' function", output.strip())
         self.assertEqual(1, exit_code)
@@ -780,7 +780,7 @@ class ExternalModulesTests(unittest.TestCase):
     def testHelloWorldExample(self):
         name = 'hello_world.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         os.system('g++ -std=c++11 -fPIC -shared -o World.so ./sample/asm/external/World.cpp')
         output, error, exit_code = assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
@@ -790,7 +790,7 @@ class ExternalModulesTests(unittest.TestCase):
     def testReturningAValue(self):
         name = 'sqrt.asm'
         assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         os.system('g++ -std=c++11 -fPIC -c -o registerset.o ./src/cpu/registerset.cpp')
         os.system('g++ -std=c++11 -fPIC -c -o exception.o ./src/types/exception.cpp')
         os.system('g++ -std=c++11 -fPIC -shared -o math.so ./sample/asm/external/math.cpp registerset.o exception.o')
