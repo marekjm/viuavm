@@ -45,12 +45,14 @@ clean-test-compiles:
 
 install: bin/vm/asm bin/vm/cpu bin/vm/vdb stdlib
 	mkdir -p ${BIN_PATH}
-	cp ${VM_ASM} ${BIN_PATH}/viua-asm
+	cp ./bin/vm/asm ${BIN_PATH}/viua-asm
 	chmod 755 ${BIN_PATH}/viua-asm
-	cp ${VM_CPU} ${BIN_PATH}/viua-cpu
+	cp ./bin/vm/cpu ${BIN_PATH}/viua-cpu
 	chmod 755 ${BIN_PATH}/viua-cpu
-	cp ${VM_WDB} ${BIN_PATH}/viua-db
+	cp ./bin/vm/vdb ${BIN_PATH}/viua-db
 	chmod 755 ${BIN_PATH}/viua-db
+	cp ./bin/vm/dis ${BIN_PATH}/viua-dis
+	chmod 755 ${BIN_PATH}/viua-dis
 	mkdir -p ${LIB_PATH}
 	cp -v ./build/stdlib/lib/*.so ${LIB_PATH}/
 
