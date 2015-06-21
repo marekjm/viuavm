@@ -625,11 +625,21 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
             verified = false;
         }
     } else if (command == "cpu.jump") {
-        if (operands.size() != 1) {
+        if (operands.size() == 1) {
+            if (not (str::isnum(operands[0]) or str::startswith(operands[0], "0x"))) {
+                cout << "error: invalid operand, expected decimal or hexadecimal integer" << endl;
+                verified = false;
+            }
+        } else if (operands.size() == 2) {
+            if (operands[0] == "sizeof" and not OP_SIZES.count(operands[1])) {
+                cout << "error: invalid second operand, expected lowercase opcode name" << endl;
+                verified = false;
+            } else if (operands[0] != "sizeof") {
+                cout << "error: invalid first operand, expected 'sizeof' subcommand" << endl;
+                verified = false;
+            }
+        } else {
             cout << "error: invalid operand size, expected 1 operand" << endl;
-            verified = false;
-        } else if (not str::isnum(operands[0])) {
-            cout << "error: invalid operand, expected integer" << endl;
             verified = false;
         }
     } else if (command == "cpu.unpause") {
@@ -749,7 +759,13 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
     } else if (command == "cpu.tick") {
         state.ticks_left = (operands.size() ? stoi(operands[0]) : 1);
     } else if (command == "cpu.jump") {
-        cpu.instruction_pointer = (cpu.bytecode+stoi(operands[0]));
+        if (operands[0] == "sizeof") {
+            cpu.instruction_pointer += OP_SIZES.at(operands[1]);
+        } else if (str::startswith(operands[0], "0x")) {
+            cpu.instruction_pointer = (cpu.bytecode+stoul(operands[0], nullptr, 16));
+        } else {
+            cpu.instruction_pointer = (cpu.bytecode+stoul(operands[0]));
+        }
     } else if (command == "cpu.unpause") {
         state.paused = false;
         state.ticks_left = 0;
