@@ -21,7 +21,14 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
     byte* bptr = ptr;
 
     OPCODE op = OPCODE(*bptr);
-    string opname = OP_NAMES.at(op);
+    string opname;
+    try {
+        opname = OP_NAMES.at(op);
+    } catch (const std::out_of_range& e) {
+        ostringstream emsg;
+        emsg << "could not find name for opcode: " << op;
+        throw emsg.str();
+    }
 
     ++bptr; // instruction byte is not needed anymore
 
