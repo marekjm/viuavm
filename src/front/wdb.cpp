@@ -934,15 +934,17 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
         while (not state.paused and not state.finished and not state.exception_raised and (state.ticks_left == -1 or (state.ticks_left > 0))) {
             if (state.ticks_left > 0) { --state.ticks_left; }
 
+            OPCODE printed = NOP;
             try {
-                printInstruction(cpu);
+                printed = printInstruction(cpu);
             } catch (const std::out_of_range& e) {
                 state.exception_type = "RuntimeException";
                 state.exception_message = "unrecognised instruction";
                 state.exception_raised = true;
             }
 
-            if (not state.exception_raised and not state.finished and cpu.tick() == 0) {
+            byte* ticked = cpu.tick();
+            if (not state.exception_raised and not state.finished and ticked == 0) {
                 state.finished = (cpu.return_exception == "" ? true : false);
                 state.ticks_left = 0;
                 cout << "\nmessage: execution " << (cpu.return_exception == "" ? "finished" : "broken") << ": " << cpu.counter() << " instructions executed" << endl;
@@ -950,6 +952,9 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
 
             if (state.finished) {
                 break;
+            }
+            if (printed == ECHO) {
+                cout << endl;
             }
 
             if (cpu.return_exception != "") {
