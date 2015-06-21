@@ -49,7 +49,11 @@ Type* RegisterSet::get(unsigned index) {
      *  Performs bounds checking.
      *  Throws exception when accessing empty register.
      */
-    if (index >= registerset_size) { throw new Exception("register access out of bounds: read"); }
+    if (index >= registerset_size) {
+        ostringstream emsg;
+        emsg << "register access out of bounds: read from " << index;
+        throw new Exception(emsg.str());
+    }
     Type* optr = registers[index];
     if (optr == 0) {
         ostringstream oss;
@@ -65,7 +69,11 @@ Type* RegisterSet::at(unsigned index) {
      *  Performs bounds checking.
      *  Returns 0 when accessing empty register.
      */
-    if (index >= registerset_size) { throw new Exception("register access out of bounds: read"); }
+    if (index >= registerset_size) {
+        ostringstream emsg;
+        emsg << "register access out of bounds: read from " << index;
+        throw new Exception(emsg.str());
+    }
     return registers[index];
 }
 
