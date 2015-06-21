@@ -741,12 +741,6 @@ Program& Program::jump(int addr, enum JUMPTYPE is_absolute) {
 Program& Program::branch(int_op regc, int addr_truth, enum JUMPTYPE absolute_truth, int addr_false, enum JUMPTYPE absolute_false) {
     /*  Inserts branch instruction.
      *  Byte offset is calculated automatically.
-     *
-     *  :params:
-     *
-     *  regc:int    - index of the instruction to which to branch
-     *  addr_truth:int      - instruction index to go if condition is true
-     *  addr_false:int      - instruction index to go if condition is false
      */
 
     *(addr_ptr++) = BRANCH;

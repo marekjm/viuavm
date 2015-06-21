@@ -505,6 +505,26 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
                 addrf_target = instruction+1;
             }
 
+            if (DEBUG) {
+                if (addrt_jump_type == JMP_TO_BYTE) {
+                    cout << line << " => truth jump to byte";
+                } else if (addrt_jump_type == JMP_ABSOLUTE) {
+                    cout << line << " => truth absolute jump";
+                } else {
+                    cout << line << " => truth relative jump";
+                }
+                cout << ": " << addrt_target << endl;
+
+                if (addrf_jump_type == JMP_TO_BYTE) {
+                    cout << line << " => false jump to byte";
+                } else if (addrf_jump_type == JMP_ABSOLUTE) {
+                    cout << line << " => false absolute jump";
+                } else {
+                    cout << line << " => false relative jump";
+                }
+                cout << ": " << addrf_target << endl;
+            }
+
             program.branch(assembler::operands::getint(resolveregister(condition, names)), addrt_target, addrt_jump_type, addrf_target, addrf_jump_type);
         } else if (str::startswith(line, "jump")) {
             /*  Jump instruction can be written in two forms:
@@ -523,6 +543,18 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             int jump_target;
             enum JUMPTYPE jump_type;
             tie(jump_target, jump_type) = resolvejump(operands, marks);
+
+            if (DEBUG) {
+                if (jump_type == JMP_TO_BYTE) {
+                    cout << line << " => false jump to byte";
+                } else if (jump_type == JMP_ABSOLUTE) {
+                    cout << line << " => false absolute jump";
+                } else {
+                    cout << line << " => false relative jump";
+                }
+                cout << ": " << jump_target << endl;
+            }
+
             program.jump(jump_target, jump_type);
         } else if (str::startswith(line, "tryframe")) {
             program.tryframe();
