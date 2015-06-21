@@ -201,7 +201,7 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
             }
             inc += s.size();
         }
-        if (OPCODE(program[offset]) == STRSTORE) {
+        if (opcode == STRSTORE) {
             string s(program+offset+inc);
             if (debug) {
                 cout << '+' << s.size()+1 << " (string at byte " << offset+inc << ": `" << s << "`)";
