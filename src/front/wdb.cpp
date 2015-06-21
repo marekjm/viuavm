@@ -626,8 +626,10 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
         }
     } else if (command == "cpu.jump") {
         if (operands.size() == 1) {
-            if (not (str::isnum(operands[0]) or str::startswith(operands[0], "0x"))) {
-                cout << "error: invalid operand, expected decimal or hexadecimal integer" << endl;
+            if (not (str::isnum(operands[0]) or str::startswith(operands[0], "0x") or operands[0][0] == '+')) {
+                cout << "error: invalid operand, expected:" << endl;
+                cout << "  * decimal integer (optionally preceded by plus), or" << endl;
+                cout << "  * hexadecimal integer" << endl;
                 verified = false;
             }
         } else if (operands.size() == 2) {
@@ -761,6 +763,15 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
     } else if (command == "cpu.jump") {
         if (operands[0] == "sizeof") {
             cpu.instruction_pointer += OP_SIZES.at(operands[1]);
+        } else if (operands[0][0] == '+') {
+            unsigned long j = stoul(str::sub(operands[0], 1));
+            while (j > 0) {
+                string instruction;
+                unsigned size;
+                tie(instruction, size) = disassembler::instruction(cpu.instruction_pointer);
+                cpu.instruction_pointer += size;
+                --j;
+            }
         } else if (str::startswith(operands[0], "0x")) {
             cpu.instruction_pointer = (cpu.bytecode+stoul(operands[0], nullptr, 16));
         } else {
