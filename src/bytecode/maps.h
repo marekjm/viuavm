@@ -237,6 +237,7 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
 const std::vector<enum OPCODE> OP_VARIABLE_LENGTH = {
     STRSTORE,
     CLOSURE,
+    FUNCTION,
     CALL,
     CATCH,
     TRY,
