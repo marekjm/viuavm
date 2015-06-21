@@ -248,17 +248,8 @@ byte* CPU::tick() {
     byte* previous_instruction_pointer = instruction_pointer;
     ++instruction_counter;
 
-    if (debug) {
-        cout << "CPU: bytecode ";
-        cout << dec << ((long)instruction_pointer - (long)bytecode);
-        cout << " at 0x" << hex << (long)instruction_pointer;
-        cout << dec << ": ";
-    }
-
     try {
-        if (debug) { cout << OP_NAMES.at(OPCODE(*instruction_pointer)); }
         instruction_pointer = dispatch(instruction_pointer);
-        if (debug) { cout << endl; }
     } catch (Exception* e) {
         /* All machine-thrown exceptions are passed back to user code.
          * This is much easier than checking for erroneous conditions and
