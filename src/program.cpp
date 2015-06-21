@@ -199,7 +199,7 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
             if (debug) {
                 cout << '+' << s.size() << " (function/module name at byte " << offset+1 << ": `" << s << "`)";
             }
-            inc += s.size();
+            inc += s.size()+1;
         }
         if (opcode == STRSTORE) {
             string s(program+offset+inc);
