@@ -41,7 +41,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         oss << " " << str::enquote(s);
         bptr += s.size();
         ++bptr; // for null character terminating the C-style string not included in std::string
-    } else if ((op == CALL) or (op == CLOSURE) or (op == EXCALL)) {
+    } else if ((op == CALL) or (op == CLOSURE) or (op == EXCALL) or (op == FUNCTION)) {
         oss << " ";
         string fn_name = string(bptr);
         oss << fn_name;
