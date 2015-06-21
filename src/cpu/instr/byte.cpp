@@ -26,17 +26,6 @@ byte* CPU::bstore(byte* addr) {
     bt = *((byte*)addr);
     ++addr;
 
-    if (debug) {
-        cout << (reg_ref ? " @" : " ") << reg;
-        cout << (byte_ref ? " @" : " ");
-        // this range is to display ASCII byteacters as their printable representations
-        if (bt >= 32 and bt <= 127) {
-            cout << '"' << bt << '"';
-        } else {
-            cout << (int)bt;
-        }
-    }
-
     if (reg_ref) {
         reg = static_cast<Integer*>(fetch(reg))->value();
     }

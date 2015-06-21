@@ -22,16 +22,8 @@ byte* CPU::strstore(byte* addr) {
     reg = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (debug) {
-        cout << (reg_ref ? " @" : " ") << reg;
-    }
-
     string svalue = string(addr);
     addr += svalue.size()+1;
-
-    if (debug) {
-        cout << ' ' << str::enquote(svalue) << endl;
-    }
 
     if (reg_ref) {
         reg = static_cast<Integer*>(fetch(reg))->value();

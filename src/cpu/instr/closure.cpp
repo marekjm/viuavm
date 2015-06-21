@@ -93,10 +93,6 @@ byte* CPU::clframe(byte* addr) {
     arguments = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (debug) {
-        cout << (arguments_ref ? " @" : " ") << arguments;
-    }
-
     if (arguments_ref) {
         arguments = static_cast<Integer*>(fetch(arguments))->value();
     }

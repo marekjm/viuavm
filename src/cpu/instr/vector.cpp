@@ -20,12 +20,7 @@ byte* CPU::vec(byte* addr) {
     reg_num = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (debug) {
-        cout << (reg_ref ? " @" : " ") << reg_num;
-    }
-
     if (reg_ref) {
-        if (debug) { cout << "resolving reference to operand register" << endl; }
         reg_num = static_cast<Integer*>(fetch(reg_num))->value();
     }
 
@@ -58,22 +53,13 @@ byte* CPU::vinsert(byte* addr) {
     regpos_num = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (debug) {
-        cout << (regvec_ref ? " @" : " ") << regvec_num;
-        cout << (regval_ref ? " @" : " ") << regval_num;
-        cout << (regpos_ref ? " @" : " ") << regpos_num;
-    }
-
     if (regvec_ref) {
-        if (debug) { cout << "resolving reference to 1-operand register" << endl; }
         regvec_num = static_cast<Integer*>(fetch(regvec_num))->value();
     }
     if (regval_ref) {
-        if (debug) { cout << "resolving reference to 2-operand register" << endl; }
         regval_num = static_cast<Integer*>(fetch(regval_num))->value();
     }
     if (regpos_ref) {
-        if (debug) { cout << "resolving reference to 3-operand register" << endl; }
         regpos_num = static_cast<Integer*>(fetch(regpos_num))->value();
     }
 
@@ -101,17 +87,10 @@ byte* CPU::vpush(byte* addr) {
     regval_num = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (debug) {
-        cout << (regvec_ref ? " @" : " ") << regvec_num;
-        cout << (regval_ref ? " @" : " ") << regval_num;
-    }
-
     if (regvec_ref) {
-        if (debug) { cout << "resolving reference to 1-operand register" << endl; }
         regvec_num = static_cast<Integer*>(fetch(regvec_num))->value();
     }
     if (regval_ref) {
-        if (debug) { cout << "resolving reference to 2-operand register" << endl; }
         regval_num = static_cast<Integer*>(fetch(regval_num))->value();
     }
 
@@ -144,22 +123,13 @@ byte* CPU::vpop(byte* addr) {
     regpos_num = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (debug) {
-        cout << (regvec_ref ? " @" : " ") << regvec_num;
-        cout << (regdst_ref ? " @" : " ") << regdst_num;
-        cout << (regpos_ref ? " @" : " ") << regpos_num;
-    }
-
     if (regvec_ref) {
-        if (debug) { cout << "resolving reference to 1-operand register" << endl; }
         regvec_num = static_cast<Integer*>(fetch(regvec_num))->value();
     }
     if (regdst_ref) {
-        if (debug) { cout << "resolving reference to 2-operand register" << endl; }
         regdst_num = static_cast<Integer*>(fetch(regdst_num))->value();
     }
     if (regpos_ref) {
-        if (debug) { cout << "resolving reference to 3-operand register" << endl; }
         regpos_num = static_cast<Integer*>(fetch(regpos_num))->value();
     }
 
@@ -197,22 +167,13 @@ byte* CPU::vat(byte* addr) {
     regpos_num = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (debug) {
-        cout << (regvec_ref ? " @" : " ") << regvec_num;
-        cout << (regdst_ref ? " @" : " ") << regdst_num;
-        cout << (regpos_ref ? " @" : " ") << regpos_num;
-    }
-
     if (regvec_ref) {
-        if (debug) { cout << "\nresolving reference to 1-operand register" << endl; }
         regvec_num = static_cast<Integer*>(fetch(regvec_num))->value();
     }
     if (regdst_ref) {
-        if (debug) { cout << "\nresolving reference to 2-operand register" << endl; }
         regdst_num = static_cast<Integer*>(fetch(regdst_num))->value();
     }
     if (regpos_ref) {
-        if (debug) { cout << "\nresolving reference to 3-operand register" << endl; }
         regpos_num = static_cast<Integer*>(fetch(regpos_num))->value();
     }
 
@@ -245,17 +206,10 @@ byte* CPU::vlen(byte* addr) {
     regval_num = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (debug) {
-        cout << (regvec_ref ? " @" : " ") << regvec_num;
-        cout << (regval_ref ? " @" : " ") << regval_num;
-    }
-
     if (regvec_ref) {
-        if (debug) { cout << "resolving reference to 1-operand register" << endl; }
         regvec_num = static_cast<Integer*>(fetch(regvec_num))->value();
     }
     if (regval_ref) {
-        if (debug) { cout << "resolving reference to 2-operand register" << endl; }
         regval_num = static_cast<Integer*>(fetch(regval_num))->value();
     }
 
