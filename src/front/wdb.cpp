@@ -17,6 +17,7 @@
 #define AS_DEBUG_HEADER 1
 #include "../cpu/cpu.h"
 #include "../program.h"
+#include "../cg/disassembler/disassembler.h"
 #include "../printutils.h"
 #include "../include/module.h"
 using namespace std;
@@ -268,19 +269,18 @@ map<string, PRINTER> opcode_printers = {
 };
 
 
-void printInstruction(const CPU& cpu) {
+OPCODE printInstruction(const CPU& cpu) {
     byte* iptr = cpu.instruction_pointer;
-    string opcode = OP_NAMES.at(OPCODE(*iptr));
-    cout << "bytecode " << (iptr-cpu.bytecode) << " at 0x" << hex << long(iptr) << dec << ": " << opcode << ' ';
 
-    ++iptr;
-    try {
-        (*opcode_printers.at(opcode))(iptr, cpu);
-    } catch (const std::out_of_range& e) {
-        cout << "<this opcode does not have a printer function>";
-    }
+    string instruction;
+    unsigned size;
+    tie(instruction, size) = disassembler::instruction(iptr);
 
-    cout << endl;
+    cout << "byte " << (iptr-cpu.bytecode) << hex << " (0x" << (iptr-cpu.bytecode) << ") ";
+    cout << "at 0x" << long(iptr) << dec << ": ";
+    cout << instruction << endl;
+
+    return OPCODE(*iptr);
 }
 
 void printRegisters(const vector<string>& indexes, RegisterSet* regset) {
