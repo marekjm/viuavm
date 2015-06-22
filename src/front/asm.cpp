@@ -1128,6 +1128,7 @@ int main(int argc, char* argv[]) {
         }
 
         Program func(fun_bytes);
+        func.setdebug(DEBUG);
         try {
             assemble(func.setdebug(DEBUG), blocks.at(name));
         } catch (const string& e) {
@@ -1193,6 +1194,7 @@ int main(int argc, char* argv[]) {
         }
 
         Program func(fun_bytes);
+        func.setdebug(DEBUG);
         try {
             assemble(func.setdebug(DEBUG), functions.at(name).second);
         } catch (const string& e) {
@@ -1423,6 +1425,7 @@ int main(int argc, char* argv[]) {
     }
 
     Program calculator(bytes);
+    calculator.setdebug(DEBUG);
     if (DEBUG) {
         cout << "[asm:post] calculating branches..." << endl;
     }
