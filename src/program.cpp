@@ -255,15 +255,17 @@ Program& Program::calculateJumps(vector<tuple<int, int> > jump_positions) {
     int instruction_count = instructionCount();
     int* ptr;
 
-    int position, offset;
+    int position, offset, adjustment;
     for (tuple<int, int> jmp : jump_positions) {
         tie(position, offset) = jmp;
         ptr = (int*)(program+position);
         if (debug) {
-            cout << "[bcgen:jump] calculating jump at " << position << ", " << hex << (long)(program+position) << dec << " (target: " << *ptr << ") with offset " << offset << " = ";
+            cout << "[bcgen:jump] calculating jump at " << position << " (target: " << *ptr << ") with offset " << offset << endl;
         }
-        (*ptr) = offset + getInstructionBytecodeOffset(*ptr, instruction_count);
+        adjustment = getInstructionBytecodeOffset(*ptr, instruction_count);
+        (*ptr) = offset + adjustment;
         if (debug) {
+            cout << "[bcgen:jump] calculated jump at " << position << " (total: " << adjustment << ") with offset " << offset << " = ";
             cout << *ptr << endl;
         }
     }
