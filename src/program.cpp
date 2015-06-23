@@ -41,6 +41,13 @@ Program& Program::setdebug(bool d) {
     return (*this);
 }
 
+Program& Program::setscream(bool d) {
+    /** Sets screaming status.
+     */
+    scream = d;
+    return (*this);
+}
+
 
 int Program::size() {
     /*  Returns program size in bytes.
@@ -189,27 +196,27 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
             throw ("instruction " + opcode_name + " not found in OP_SIZES");
         }
 
-        if (debug) {
+        if (scream) {
             cout << "[asm] debug: offsetting: " << opcode_name << ": +" << inc;
         }
 
         OPCODE opcode = OPCODE(program[offset]);
         if ((opcode == CALL) or (opcode == CLOSURE) or (opcode == FUNCTION) or (opcode == EXIMPORT) or (opcode == EXCALL) or (opcode == TRY)) {
             string s(program+offset+1);
-            if (debug) {
+            if (scream) {
                 cout << '+' << s.size() << " (function/module name at byte " << offset+1 << ": `" << s << "`)";
             }
             inc += s.size()+1;
         }
         if (opcode == STRSTORE) {
             string s(program+offset+inc);
-            if (debug) {
+            if (scream) {
                 cout << '+' << s.size()+1 << " (string at byte " << offset+inc << ": `" << s << "`)";
             }
             inc += s.size()+1;
         }
 
-        if (debug) {
+        if (scream) {
             cout << " bytes" << endl;
         }
 

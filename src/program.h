@@ -45,6 +45,7 @@ class Program {
 
     // simple, whether to print debugging information or not
     bool debug;
+    bool scream;
 
     int getInstructionBytecodeOffset(int, int count = -1);
 
@@ -158,13 +159,14 @@ class Program {
     Program& fill(byte*);
 
     Program& setdebug(bool d = true);
+    Program& setscream(bool d = true);
 
     int size();
     int instructionCount();
 
     static uint16_t countBytes(const std::vector<std::string>&);
 
-    Program(int bts = 2): bytes(bts), debug(false) {
+    Program(int bts = 2): bytes(bts), debug(false), scream(false) {
         program = new byte[bytes];
         /* Filling bytecode with zeroes (which are interpreted by CPU as NOP instructions) is a safe way
          * to prevent many hiccups.

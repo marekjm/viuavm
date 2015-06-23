@@ -1128,9 +1128,9 @@ int main(int argc, char* argv[]) {
         }
 
         Program func(fun_bytes);
-        func.setdebug(DEBUG);
+        func.setdebug(DEBUG).setscream(SCREAM);
         try {
-            assemble(func.setdebug(DEBUG), blocks.at(name));
+            assemble(func, blocks.at(name));
         } catch (const string& e) {
             cout << (DEBUG ? "\n" : "") << "fatal: error during assembling: " << e << endl;
             exit(1);
@@ -1194,9 +1194,9 @@ int main(int argc, char* argv[]) {
         }
 
         Program func(fun_bytes);
-        func.setdebug(DEBUG);
+        func.setdebug(DEBUG).setscream(SCREAM);
         try {
-            assemble(func.setdebug(DEBUG), functions.at(name).second);
+            assemble(func, functions.at(name).second);
         } catch (const string& e) {
             cout << (DEBUG ? "\n" : "") << "fatal: error during assembling: " << e << endl;
             exit(1);
@@ -1425,7 +1425,7 @@ int main(int argc, char* argv[]) {
     }
 
     Program calculator(bytes);
-    calculator.setdebug(DEBUG);
+    calculator.setdebug(DEBUG).setscream(SCREAM);
     if (DEBUG) {
         cout << "[asm:post] calculating branches..." << endl;
     }
