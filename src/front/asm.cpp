@@ -1441,7 +1441,7 @@ int main(int argc, char* argv[]) {
     Program calculator(bytes);
     calculator.setdebug(DEBUG).setscream(SCREAM);
     if (DEBUG) {
-        cout << "[asm:post] calculating branches..." << endl;
+        cout << "[asm:post] calculating absolute jumps..." << endl;
     }
     calculator.fill(program_bytecode).calculateJumps(jump_positions);
 
