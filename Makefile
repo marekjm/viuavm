@@ -12,7 +12,7 @@ LIB_PATH=${PREFIX}/lib/viua
 
 .SUFFIXES: .cpp .h .o
 
-.PHONY: all remake clean clean-support clean-test-compiles install test stdlib
+.PHONY: all remake clean clean-support clean-test-compiles install test
 
 
 all: bin/vm/asm bin/vm/cpu bin/vm/vdb bin/vm/dis bin/opcodes.bin
@@ -23,16 +23,12 @@ doc/viua_virtual_machine.pdf: doc/viua_virtual_machine.lyx
 	lyx --export-to pdf doc/viua_virtual_machine.pdf --force-overwrite main doc/viua_virtual_machine.lyx
 
 
-clean: clean-support clean-stdlib
+clean: clean-support
 	rm -f ./build/lib/*.o
 	rm -f ./build/cpu/instr/*.o
 	rm -f ./build/cpu/*.o
 	rm -f ./build/*.o
 	rm -f ./bin/vm/*
-
-clean-stdlib:
-	rm -f ./build/stdlib/*.o
-	rm -f ./build/stdlib/lib/*.so
 
 clean-support:
 	rm -f ./build/support/*.o
@@ -90,6 +86,11 @@ build/cpu/registserset.o: src/cpu/registerset.cpp src/cpu/registerset.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
 
+# Standard library
+stdlib:
+	echo "OK"
+
+
 # opcode lister program
 bin/opcodes.bin: src/bytecode/opcd.cpp src/bytecode/opcodes.h src/bytecode/maps.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -o $@ $<
@@ -98,24 +99,6 @@ bin/opcodes.bin: src/bytecode/opcd.cpp src/bytecode/opcodes.h src/bytecode/maps.
 # CODE GENERATION
 build/cg/disassembler/disassembler.o: src/cg/disassembler/disassembler.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
-
-
-# compile all standard library shared modules
-stdlib: build/stdlib/lib/typesystem.so
-
-# compile prerequisites for all further modules
-build/stdlib/exception.o: src/types/exception.cpp src/types/exception.h
-	${CXX} ${CXXFLAGS} -fPIC -c -o $@ src/types/exception.cpp
-
-build/stdlib/registerset.o: src/cpu/registerset.cpp src/types/exception.h
-	${CXX} ${CXXFLAGS} -fPIC -c -o $@ src/cpu/registerset.cpp
-
-
-build/stdlib/lib/typesystem.o: src/stdlib/typesystem.cpp
-	${CXX} ${CXXFLAGS} -fPIC -c -o ./build/stdlib/lib/typesystem.o src/stdlib/typesystem.cpp
-
-build/stdlib/lib/typesystem.so: build/stdlib/lib/typesystem.o build/stdlib/exception.o build/stdlib/registerset.o
-	${CXX} ${CXXFLAGS} -shared -Wl,-soname,$(notdir $@) -o $@ $< -lc
 
 
 # TYPE MODULES
