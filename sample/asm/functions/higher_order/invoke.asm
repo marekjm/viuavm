@@ -1,31 +1,6 @@
-.def: sum 1
-    ; sum integers in a vector
-    izero 0
-
-    arg 0 1
-
-    izero 2
-    vlen 1 3
-
-    .mark: begin_loop
-    igte 2 3 4
-
-    branch 4 end_loop
-
-    vat 1 4 @2
-    iadd 0 4 0
-    empty 4
-
-    iinc 2
-    jump begin_loop
-
-    .mark: end_loop
-
-    end
-.end
-
 .def: sum4 1
-    ; this function will sum its 4 parameters
+    ; this function takes four integers as parameters and
+    ; adds them, and returns the sum
     arg 0 1
     arg 1 2
     arg 2 3
@@ -40,58 +15,60 @@
 
 .def: invoke 1
     ; this function takes two parameters:
-    ;   1)  a function
-    ;   2)  a vector containing parameters for function passed as first parameter
+    ;    1) a function object
+    ;    2) a vector of parameters for function given as first parameter
     ;
-    ; it then unpacks the params in vector and
-    ; calls given function with them as params
-    .name: 0 func
-    .name: 1 params
+    ; it then creates a frame with required number of parameter slots (as
+    ; specified by length of the vector), and calls given function with this
+    ; frame
+    arg 0 1
+    arg 1 2
 
-    arg 0 func
-    arg 1 params
+    ; take length of the vector
+    .name: 4 vector_length
+    vlen 2 vector_length
+    frame @vector_length
 
-    vlen 1 2
-    frame @2
+    ; zero loop counter
+    .name: 3 loop_counter
+    izero loop_counter
+    .mark: while_begin
 
-    strstore 8 "index: "
-    strstore 9 "continue: "
-    strstore 10 "object: "
+    ; simple condition:
+    ; while (loop_counter < vector_length) {
+    .name: 5 loop_condition
+    igte loop_counter vector_length loop_condition
+    branch loop_condition while_end while_body
 
-    izero 3
-    .mark: begin_loop
-    igte 3 2 4
+    .mark: while_body
 
-    ;echo 9
-    print 4
-    branch 4 end_loop
+    ; store item located inside parameter vector at index denoted by loop_counter in
+    ; a register
+    .name: 7 slot
+    vat 2 slot @loop_counter
 
-    ;vat params 4 @3
-    ;echo 3
-    ;print 3
-    ;echo 10
-    ;print 4
-    ;param @3 4
-    ;empty 4
+    ; add parameter
+    param @loop_counter slot
 
-    ;iinc 3
-    ;jump begin_loop
+    ; clear parameter slot
+    empty slot
 
-    .mark: end_loop
+    ; loop_counter++
+    iinc loop_counter
 
-    ;call sum 1
+    jump while_begin
 
-    ; these NOP instructions are here as a padding
-    ; probably there is a bug in the assembler or bytecode generator as
-    ; without them, the "izero 1" seems to not be executed
-    nop
-    nop
-    izero 1
-    move 1 0
+    .mark: while_end
+
+    ; finally, after the frame is ready
+    ; call the function
+    fcall 1 8
+    move 8 0
     end
 .end
 
 .def: main 1
+    ; create the vector
     vec 1
 
     istore 2 20
@@ -106,13 +83,7 @@
     istore 5 -2
     vpush 1 5
 
-    print 1
-
-    frame 1
-    paref 0 1
-    call sum 6
-    print 6
-
+    ; call sum/4() function
     frame 4
     param 0 2
     param 1 3
@@ -121,12 +92,19 @@
     call sum4 6
     print 6
 
-    function sum 7
-    frame 2 16
-    param 0 7
-    param 1 1
-    call invoke 6
-    print 6
+    function sum4 7
+
+    istore 9 2
+    frame @9
+
+    izero 9
+    param @9 7
+    iinc 9
+    param @9 1
+
+    call invoke 8
+
+    print 8
 
     izero 0
     end
