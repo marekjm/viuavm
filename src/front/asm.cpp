@@ -1227,14 +1227,14 @@ int main(int argc, char* argv[]) {
         for (unsigned i = 0; i < jumps.size(); ++i) {
             unsigned jmp = jumps[i];
             if (DEBUG) {
-                cout << "[asm] debug: pushed to jump table: " << jmp << '+' << functions_section_size << endl;
+                cout << "[asm] debug: pushed relative jump to jump table: " << jmp << '+' << functions_section_size << endl;
             }
             jump_table.push_back(jmp+functions_section_size);
         }
 
         for (unsigned i = 0; i < jumps_absolute.size(); ++i) {
             if (DEBUG) {
-                cout << "[asm] debug: pushed to jump table: " << jumps_absolute[i] << "+0 (absolute jump)" << endl;
+                cout << "[asm] debug: pushed absolute jump to jump table: " << jumps_absolute[i] << "+0" << endl;
             }
             jump_positions.push_back(tuple<int, int>(jumps_absolute[i]+functions_section_size, 0));
         }
