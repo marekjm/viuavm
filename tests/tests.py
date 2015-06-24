@@ -12,6 +12,7 @@ Each unit passes if:
 Returning correct may mean raising an exception in some cases.
 """
 
+import json
 import os
 import subprocess
 import sys
@@ -1072,6 +1073,15 @@ class HigherOrderFunctionTests(unittest.TestCase):
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual(['42', '42'], output.splitlines())
+        self.assertEqual(0, excode)
+
+    def testMap(self):
+        name = 'map.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual([[1, 2, 3, 4, 5], [1, 4, 9, 16, 25]], [json.loads(i) for i in output.splitlines()])
         self.assertEqual(0, excode)
 
 
