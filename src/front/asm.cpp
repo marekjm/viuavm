@@ -719,7 +719,7 @@ int generate(const string& filename, string& compilename, const vector<string>& 
     // GATHER BLOCK CODE LINES
     map<string, vector<string> > blocks;
     try {
-         blocks = assembler::ce::getBlocks(ilines);
+         blocks = assembler::ce::getInvokables("block", ilines);
     } catch (const string& e) {
         cout << "error: block gathering failed: " << e << endl;
         return 1;
