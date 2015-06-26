@@ -12,7 +12,7 @@
 #include "../version.h"
 #include "../loader.h"
 #include "../program.h"
-#include "../assembler/assembler.h"
+#include "../cg/assembler/assembler.h"
 using namespace std;
 
 

@@ -4,8 +4,8 @@
 #include <tuple>
 #include <map>
 #include <algorithm>
-#include "../support/string.h"
-#include "../program.h"
+#include "../../support/string.h"
+#include "../../program.h"
 #include "assembler.h"
 using namespace std;
 

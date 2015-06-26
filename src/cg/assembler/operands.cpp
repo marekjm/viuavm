@@ -1,7 +1,7 @@
 #include <string>
 #include <tuple>
-#include "../support/string.h"
-#include "../program.h"
+#include "../../support/string.h"
+#include "../../program.h"
 #include "assembler.h"
 using namespace std;
 
