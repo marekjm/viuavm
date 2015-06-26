@@ -1,1 +1,7 @@
-return-type? := undefined function identifier "(" (var | const)? := var name ("=" expr)? ")" "{" statement* "}" ";"
+function-proto-parameter := (var | const)? => var name ("=" expr)? ;
+
+sequence<TOKEN> := TOKEN ("," TOKEN)* ","? ;
+
+function := "function" return-type? => "undefined" "(" sequence@<function-proto-parameter> ")" "{" statement* "}" ;
+
+function-definition := "function" return-type? => "undefined" identifier "(" sequence@<function-proto-parameter> ")" "{" statement* "}" ";" ;
