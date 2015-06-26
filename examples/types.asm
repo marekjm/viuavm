@@ -1,4 +1,4 @@
-.def: typeof 1
+.def: typeof
     arg 0 1
     frame 1
     param 0 1
@@ -7,7 +7,7 @@
     end
 .end
 
-.def: inheritanceChain 1
+.def: inheritanceChain
     arg 0 1
     frame 1
     param 0 1
@@ -16,7 +16,7 @@
     end
 .end
 
-.def: bases 1
+.def: bases
     arg 0 1
     frame 1
     param 0 1
@@ -37,7 +37,7 @@
     leave
 .end
 
-.def: main 1
+.def: main
     isnull 1 1
     print 1
 

@@ -1,4 +1,4 @@
-.def: set_x 0
+.def: set_x
     ; this is the setter method
 
     ; store 0th argument in 2nd register
@@ -12,7 +12,7 @@
     end
 .end
 
-.def: get_x 1
+.def: get_x
     ; this is the getter method
 
     ; simply copy value from 1st register into 0th register
@@ -26,7 +26,7 @@
 .end
 
 
-.def: object 1
+.def: object
     ; this function acts as a constructor for the closure-based object
     ; 2nd register is intentionally left unused
     ; because the "set_x" closure uses it to store the argument it gets
@@ -58,7 +58,7 @@
 .end
 
 
-.def: main 1
+.def: main
     ; store Integer 42 in 1st register and
     ; print it
     istore 1 42
