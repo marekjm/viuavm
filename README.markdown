@@ -32,14 +32,12 @@ Some development-related information.
 Required tools:
 
 * `g++`: GNU Compiler Collection's C++ compiler version 4.9 and above (mandatory),
+* `clang++`: clang C++ compiler version 3.6.1 and above (if not using GCC),
 * `python`: Python programming language 3.x for test suite (optional),
 * `valgrind`: for memory leak testing (optional),
 
 
 ## Compilation
-
-Use `g++` to compile Viua VM. The code can also be compiled with `clang++`, but will not run correctly.
-Output from `clang++` will crash during the tests.
 
 Before compiling, Git submodule for `linenoise` library must be initialised.
 
