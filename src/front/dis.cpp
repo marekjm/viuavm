@@ -25,15 +25,6 @@ bool DISASSEMBLE_ENTRY = false;
 bool INCLUDE_INFO = false;
 
 
-string printIntegerOperand(byte* iptr) {
-    cout << ((*(bool*)iptr) ? "@" : "");
-
-    pointer::inc<bool, byte>(iptr);
-    cout << *(int*)iptr;
-    pointer::inc<int, byte>(iptr);
-    return iptr;
-}
-
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
     vector<string> args;
