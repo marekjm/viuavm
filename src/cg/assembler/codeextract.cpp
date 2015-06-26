@@ -128,24 +128,14 @@ vector<string> assembler::ce::getFunctionNames(const vector<string>& lines) {
 
         line = str::lstrip(str::sub(line, str::chunk(line).size()));
         string name = str::chunk(line);
-        line = str::lstrip(str::sub(line, name.size()));
-        string ret_sign = str::chunk(line);
-        bool returns;   // for now it is unused but is here for the future - when checking is more strict
-        if (ret_sign == "true" or ret_sign == "1") {
-            returns = true;
-        } else if (ret_sign == "false" or ret_sign == "0") {
-            returns = false;
-        } else {
-            throw ("invalid function signature: illegal return declaration: " + holdline);
-        }
 
         names.push_back(name);
     }
 
     return names;
 }
-map<string, pair<bool, vector<string> > > assembler::ce::getFunctions(const vector<string>& lines) {
-    map<string, pair<bool, vector<string> > > functions;
+map<string, vector<string> > assembler::ce::getFunctions(const vector<string>& lines) {
+    map<string, vector<string> > functions;
 
     string line, holdline;
     for (unsigned i = 0; i < lines.size(); ++i) {
@@ -163,17 +153,8 @@ map<string, pair<bool, vector<string> > > assembler::ce::getFunctions(const vect
         line = str::lstrip(str::sub(line, 5));
         string name = str::chunk(line);
         line = str::lstrip(str::sub(line, name.size()));
-        string ret_sign = str::chunk(line);
-        bool returns;
-        if (ret_sign == "true" or ret_sign == "1") {
-            returns = true;
-        } else if (ret_sign == "false" or ret_sign == "0") {
-            returns = false;
-        } else {
-            throw ("invalid function signature: illegal return declaration: " + holdline);
-        }
 
-        functions[name] = pair<bool, vector<string> >(returns, flines);
+        functions[name] = vector<string>(flines);
     }
 
     return functions;

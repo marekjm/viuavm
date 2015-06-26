@@ -636,12 +636,12 @@ map<string, uint16_t> mapBlockAddresses(uint16_t& starting_instruction, const ve
     }
     return addresses;
 }
-map<string, uint16_t> mapFunctionAddresses(uint16_t& starting_instruction, const vector<string>& names, const map<string, pair<bool, vector<string> > >& sources) {
+map<string, uint16_t> mapFunctionAddresses(uint16_t& starting_instruction, const vector<string>& names, const map<string, vector<string> >& sources) {
     map<string, uint16_t> addresses;
     for (string name : names) {
         addresses[name] = starting_instruction;
         try {
-            starting_instruction += Program::countBytes(sources.at(name).second);
+            starting_instruction += Program::countBytes(sources.at(name));
         } catch (const std::out_of_range& e) {
             throw ("could not find function '" + name + "'");
         }
@@ -717,7 +717,7 @@ int generate(const string& filename, string& compilename, const vector<string>& 
 
     ///////////////////////////////
     // GATHER FUNCTIONS' CODE LINES
-    map<string, pair<bool, vector<string> > > functions;
+    map<string, vector<string> > functions;
     try {
          functions = assembler::ce::getFunctions(ilines);
     } catch (const string& e) {
@@ -745,7 +745,7 @@ int generate(const string& filename, string& compilename, const vector<string>& 
     if (not AS_LIB and main_is_defined) {
         string main_second_but_last;
         try {
-            main_second_but_last = *(functions.at(main_function).second.end()-2);
+            main_second_but_last = *(functions.at(main_function).end()-2);
         } catch (const std::out_of_range& e) {
             cout << "[asm] fatal: could not find main function (during return value check)" << endl;
             exit(1);
@@ -800,7 +800,7 @@ int generate(const string& filename, string& compilename, const vector<string>& 
         // then, register 1 is moved to register 0 so it counts as a return code
         ilines.push_back("move 1 0");
         ilines.push_back("halt");
-        functions[ENTRY_FUNCTION_NAME] = pair<bool, vector<string> >(false, ilines);
+        functions[ENTRY_FUNCTION_NAME] = ilines;
         // instructions were added so bytecode size must be inreased
         bytes += OP_SIZES.at("ress");
         bytes += OP_SIZES.at("frame");
@@ -929,7 +929,7 @@ int generate(const string& filename, string& compilename, const vector<string>& 
     /////////////////////////
     // VERIFY FUNCTION BODIES
     for (auto function : functions) {
-        vector<string> flines = function.second.second;
+        vector<string> flines = function.second;
         if ((flines.size() == 0 or flines.back() != "end") and (function.first != "main" and flines.back() != "halt")) {
             if (ERROR_MISSING_END or ERROR_ALL) {
                 cout << "fatal: missing 'end' at the end of function '" << function.first << "'" << endl;
@@ -1064,7 +1064,7 @@ int generate(const string& filename, string& compilename, const vector<string>& 
         }
         uint16_t fun_bytes = 0;
         try {
-            fun_bytes = Program::countBytes(name == ENTRY_FUNCTION_NAME ? filter(functions.at(name).second) : functions.at(name).second);
+            fun_bytes = Program::countBytes(name == ENTRY_FUNCTION_NAME ? filter(functions.at(name)) : functions.at(name));
             if (VERBOSE or DEBUG) {
                 cout << " (" << fun_bytes << " bytes at byte " << functions_section_size << ')' << endl;
             }
@@ -1079,7 +1079,7 @@ int generate(const string& filename, string& compilename, const vector<string>& 
         Program func(fun_bytes);
         func.setdebug(DEBUG).setscream(SCREAM);
         try {
-            assemble(func, functions.at(name).second);
+            assemble(func, functions.at(name));
         } catch (const string& e) {
             cout << (DEBUG ? "\n" : "") << "fatal: error during assembling: " << e << endl;
             exit(1);
@@ -1244,7 +1244,7 @@ int generate(const string& filename, string& compilename, const vector<string>& 
         // functions size must be incremented by the actual size of function's bytecode size
         // to give correct offset for next function
         try {
-            functions_size_so_far += Program::countBytes(functions.at(name).second);
+            functions_size_so_far += Program::countBytes(functions.at(name));
         } catch (const std::out_of_range& e) {
             cout << "fatal: could not find function '" << name << "' during address table write" << endl;
             exit(1);

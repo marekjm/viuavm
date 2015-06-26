@@ -115,11 +115,11 @@ string assembler::verify::ressInstructions(const vector<string>& lines, bool as_
     return report.str();
 }
 
-string assembler::verify::functionBodiesAreNonempty(const vector<string>& lines, map<string, pair<bool, vector<string> > >& functions) {
+string assembler::verify::functionBodiesAreNonempty(const vector<string>& lines, map<string, vector<string> >& functions) {
     ostringstream report("");
     string line;
     for (auto function : functions) {
-        vector<string> flines = function.second.second;
+        vector<string> flines = function.second;
         if (flines.size() == 0) {
             report << "fatal: function '" + function.first + "' is empty" << endl;
             break;

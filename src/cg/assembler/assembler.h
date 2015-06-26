@@ -26,7 +26,7 @@ namespace assembler {
         std::map<std::string, int> getnames(const std::vector<std::string>& lines);
         std::vector<std::string> getlinks(const std::vector<std::string>& lines);
         std::vector<std::string> getFunctionNames(const std::vector<std::string>& lines);
-        std::map<std::string, std::pair<bool, std::vector<std::string> > > getFunctions(const std::vector<std::string>& lines);
+        std::map<std::string, std::vector<std::string> > getFunctions(const std::vector<std::string>& lines);
         std::vector<std::string> getBlockNames(const std::vector<std::string>& lines);
         std::map<std::string, std::vector<std::string> > getBlocks(const std::vector<std::string>& lines);
     }
@@ -35,7 +35,7 @@ namespace assembler {
         std::string functionCalls(const std::vector<std::string>& lines, const std::vector<std::string>& function_names);
         std::string callableCreations(const std::vector<std::string>& lines, const std::vector<std::string>& function_names);
         std::string ressInstructions(const std::vector<std::string>& lines, bool as_lib);
-        std::string functionBodiesAreNonempty(const std::vector<std::string>& lines, std::map<std::string, std::pair<bool, std::vector<std::string> > >& functions);
+        std::string functionBodiesAreNonempty(const std::vector<std::string>& lines, std::map<std::string, std::vector<std::string> >& functions);
         std::string blockTries(const std::vector<std::string>& lines, const std::vector<std::string>& block_names);
         std::string blockBodiesEndWithLeave(const std::vector<std::string>& lines, std::map<std::string, std::pair<bool, std::vector<std::string> > >& blocks);
     }
