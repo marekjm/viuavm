@@ -36,7 +36,7 @@ Markers can be used in `jump` and `branch` CPU instructions.
 Assign a name to the register.
 
 
-### `.def:` and `.end`
+### `.function:` and `.end`
 
 Used to define functions.
 

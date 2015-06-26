@@ -12,7 +12,7 @@
 ;   ../bin/vm/cpu a.out
 ;
 
-.def: main
+.function: main
     eximport "io"
 
     strstore 1 "Path to read: "
