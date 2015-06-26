@@ -624,7 +624,7 @@ void assemble(Program& program, const vector<string>& lines) {
 }
 
 
-map<string, uint16_t> mapBlockAddresses(uint16_t& starting_instruction, const vector<string>& names, const map<string, vector<string> >& sources) {
+map<string, uint16_t> mapInvokableAddresses(uint16_t& starting_instruction, const vector<string>& names, const map<string, vector<string> >& sources) {
     map<string, uint16_t> addresses;
     for (string name : names) {
         addresses[name] = starting_instruction;
@@ -636,18 +636,7 @@ map<string, uint16_t> mapBlockAddresses(uint16_t& starting_instruction, const ve
     }
     return addresses;
 }
-map<string, uint16_t> mapFunctionAddresses(uint16_t& starting_instruction, const vector<string>& names, const map<string, vector<string> >& sources) {
-    map<string, uint16_t> addresses;
-    for (string name : names) {
-        addresses[name] = starting_instruction;
-        try {
-            starting_instruction += Program::countBytes(sources.at(name));
-        } catch (const std::out_of_range& e) {
-            throw ("could not find function '" + name + "'");
-        }
-    }
-    return addresses;
-}
+
 
 
 int generate(const string& filename, string& compilename, const vector<string>& commandline_given_links) {
@@ -772,8 +761,8 @@ int generate(const string& filename, string& compilename, const vector<string>& 
     map<string, uint16_t> function_addresses;
     map<string, uint16_t> block_addresses;
     try {
-        block_addresses = mapBlockAddresses(starting_instruction, block_names, blocks);
-        function_addresses = mapFunctionAddresses(starting_instruction, function_names, functions);
+        block_addresses = mapInvokableAddresses(starting_instruction, block_names, blocks);
+        function_addresses = mapInvokableAddresses(starting_instruction, function_names, functions);
         bytes = Program::countBytes(ilines);
     } catch (const string& e) {
         cout << "error: bytecode size calculation failed: " << e << endl;
