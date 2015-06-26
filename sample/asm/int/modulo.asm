@@ -1,4 +1,4 @@
-.def: main
+.function: main
     .name: 1 number
     .name: 2 modulo
     .name: 3 result

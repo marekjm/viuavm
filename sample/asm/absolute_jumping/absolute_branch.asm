@@ -1,4 +1,4 @@
-.def: hey_im_absolute
+.function: hey_im_absolute
     strstore 1 "Hey babe, I'm absolute."
     print 1
     nop
@@ -7,7 +7,7 @@
     end
 .end
 
-.def: main
+.function: main
     strstore 1 "I'm relative..."
     istore 1 1
     branch 1 .0

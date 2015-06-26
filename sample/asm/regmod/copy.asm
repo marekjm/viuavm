@@ -1,6 +1,6 @@
 ; This script checks if the copy instruction works correctly.
 ; The instruction should copy the value of one register into another.
-.def: main
+.function: main
     istore 1 1
     copy 1 2
     print 2

@@ -1,4 +1,4 @@
-.def: main
+.function: main
     istore 1 42
     ; empty the register
     empty 1

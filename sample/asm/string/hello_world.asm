@@ -1,4 +1,4 @@
-.def: main
+.function: main
     strstore 1 "Hello World!"
     print 1
     izero 0

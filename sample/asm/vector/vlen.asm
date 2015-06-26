@@ -1,4 +1,4 @@
-.def: main
+.function: main
     istore 1 0
 
     vec 2

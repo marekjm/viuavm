@@ -1,4 +1,4 @@
-.def: main
+.function: main
     eximport "World"
 
     frame 0

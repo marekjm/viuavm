@@ -1,22 +1,22 @@
-.def: foo
+.function: foo
     print 1
     end
 .end
 
-.def: bar
+.function: bar
     frame 0
     call foo
     end
 .end
 
-.def: baz
+.function: baz
     istore 1 42
     frame 0
     call bar
     end
 .end
 
-.def: main
+.function: main
     frame 0
     call baz 0
     izero 0

@@ -1,4 +1,4 @@
-.def: main
+.function: main
     fstore 1 3.0
 
     eximport "math"

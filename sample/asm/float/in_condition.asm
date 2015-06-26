@@ -1,7 +1,7 @@
 ; This script tests whether floats can be freely used as conditions for branch instruction.
 ; Basically, it justs tests correctness of the .boolean() method override in Integer objects.
 
-.def: main
+.function: main
     fstore 1 0.0001
 
     ; generate false

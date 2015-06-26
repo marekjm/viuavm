@@ -1,4 +1,4 @@
-.def: main
+.function: main
     arg 0 1
 
     .name: 2 len

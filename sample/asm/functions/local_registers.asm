@@ -1,10 +1,10 @@
-.def: set_69
+.function: set_69
     ress global
     istore 1 69
     end
 .end
 
-.def: main
+.function: main
     istore 1 42
     frame 0
     call set_69

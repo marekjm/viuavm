@@ -1,4 +1,4 @@
-.def: main
+.function: main
     istore 1 42
     frame 1
     param 0 1

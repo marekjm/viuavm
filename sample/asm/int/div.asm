@@ -1,6 +1,6 @@
 ; Test support for integer division.
 
-.def: main
+.function: main
     istore 1 4
     istore 2 4
     idiv 1 2 3

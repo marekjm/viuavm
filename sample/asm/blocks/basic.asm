@@ -3,7 +3,7 @@
     leave
 .end
 
-.def: main
+.function: main
     tryframe
     try main_block
     ; leave instructions lead here

@@ -1,4 +1,4 @@
-.def: main
+.function: main
     .name: 2 hurr
     .name: 3 durr
     .name: 4 ima

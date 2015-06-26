@@ -1,10 +1,10 @@
-.def: foo
+.function: foo
     istore 1 42
     print 1
     end
 .end
 
-.def: bar
+.function: bar
     istore 1 69
     print 1
     frame 0
@@ -12,7 +12,7 @@
     end
 .end
 
-.def: baz
+.function: baz
     istore 1 1995
     print 1
     frame 0
@@ -20,7 +20,7 @@
     end
 .end
 
-.def: bay
+.function: bay
     istore 1 2015
     print 1
     frame 0
@@ -29,7 +29,7 @@
 .end
 
 
-.def: main
+.function: main
     frame 0
     call bay
     izero 0

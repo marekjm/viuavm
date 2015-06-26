@@ -1,4 +1,4 @@
-.def: check
+.function: check
     arg 0 1
 
     istore 2 2
@@ -19,7 +19,7 @@
     end
 .end
 
-.def: filter
+.function: filter
     arg 0 1
     arg 1 2
 
@@ -55,7 +55,7 @@
     end
 .end
 
-.def: main
+.function: main
     ; applies function square/1(int) to 5 and
     ; prints the result
     vec 1

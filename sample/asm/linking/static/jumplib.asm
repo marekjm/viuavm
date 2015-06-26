@@ -1,4 +1,4 @@
-.def: jumprint
+.function: jumprint
     ; FIXME: jump instructions are calculated incorrectly
     arg 0 1
     print 1

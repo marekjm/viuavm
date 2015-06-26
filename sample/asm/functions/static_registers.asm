@@ -1,4 +1,4 @@
-.def: counter
+.function: counter
     ; switch to static register set
     ress static
 
@@ -40,7 +40,7 @@
     end
 .end
 
-.def: main
+.function: main
     istore 1 10
     frame 1
     param 0 1

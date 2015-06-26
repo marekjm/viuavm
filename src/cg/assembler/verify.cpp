@@ -93,7 +93,7 @@ string assembler::verify::ressInstructions(const vector<string>& lines, bool as_
     string function;
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = str::lstrip(lines[i]);
-        if (str::startswith(line, ".def:")) {
+        if (str::startswith(line, ".function:")) {
             function = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
             continue;
         }

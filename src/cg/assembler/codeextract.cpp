@@ -42,7 +42,7 @@ map<string, int> assembler::ce::getmarks(const vector<string>& lines) {
             // names and links can be safely skipped as they are not CPU instructions
             continue;
         }
-        if (str::startswith(line, ".def:")) {
+        if (str::startswith(line, ".function:")) {
             // instructions in functions are counted separately so they are
             // not included here
             while (!str::startswith(lines[i], ".end")) { ++i; }
@@ -120,9 +120,9 @@ vector<string> assembler::ce::getFunctionNames(const vector<string>& lines) {
     string line, holdline;
     for (unsigned i = 0; i < lines.size(); ++i) {
         holdline = line = lines[i];
-        if (!str::startswith(line, ".def:") and !str::startswith(line, ".dec:")) { continue; }
+        if (!str::startswith(line, ".function:") and !str::startswith(line, ".dec:")) { continue; }
 
-        if (str::startswith(line, ".def:")) {
+        if (str::startswith(line, ".function:")) {
             for (int j = i+1; lines[j] != ".end"; ++j, ++i) {}
         }
 
@@ -161,7 +161,7 @@ map<string, vector<string> > assembler::ce::getInvokables(const string& type, co
 
     string opening;
     if (type == "function") {
-        opening = ".def:";
+        opening = ".function:";
     } else if (type == "block") {
         opening = ".block:";
     }

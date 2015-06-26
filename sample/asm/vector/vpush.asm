@@ -1,4 +1,4 @@
-.def: main
+.function: main
     strstore 1 "Hello World!"
 
     vec 2

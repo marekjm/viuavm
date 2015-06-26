@@ -197,7 +197,7 @@ vector<string> filter(const vector<string>& lines) {
             continue;
         }
 
-        if (str::startswith(line, ".def:") or str::startswith(line, ".block:")) {
+        if (str::startswith(line, ".function:") or str::startswith(line, ".block:")) {
             // just skip function and block lines
             while (lines[++i] != ".end");
             continue;

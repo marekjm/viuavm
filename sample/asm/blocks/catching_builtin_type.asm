@@ -11,7 +11,7 @@
     leave
 .end
 
-.def: main
+.function: main
     tryframe
     catch "Integer" handle_integer
     try main_block

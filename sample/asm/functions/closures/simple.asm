@@ -1,10 +1,10 @@
-.def: foo
+.function: foo
     ; one is bound from 'returns_closure' function
     print 1
     end
 .end
 
-.def: returns_closure
+.function: returns_closure
     istore 1 42
 
     clbind 1
@@ -13,7 +13,7 @@
     end
 .end
 
-.def: main
+.function: main
     .name: 1 bar
     ; call function that returns the closure
     frame 0

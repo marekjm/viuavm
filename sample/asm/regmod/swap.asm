@@ -1,4 +1,4 @@
-.def: main
+.function: main
     .name: 1 zero
     .name: 2 one
 
