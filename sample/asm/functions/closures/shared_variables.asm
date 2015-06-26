@@ -1,10 +1,10 @@
-.def: closure_a 0
+.def: closure_a
     ; it has to be 2, because 2 register has been bound
     print 2
     end
 .end
 
-.def: closure_b 0
+.def: closure_b
     arg 0 1
 
     ; overwrite bound value with whatever we got
@@ -12,7 +12,7 @@
     end
 .end
 
-.def: returns_closures 1
+.def: returns_closures
     ; create a vector to store closures
     vec 1
 
@@ -37,7 +37,7 @@
     end
 .end
 
-.def: main 1
+.def: main
     frame 0
     call returns_closures 1
 

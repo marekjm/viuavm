@@ -1,4 +1,4 @@
-.def: main 1
+.def: main
     strstore 1 "42"
 
     istore 2 27

@@ -1,4 +1,4 @@
-.def: main 0
+.def: main
     istore 1 4
     itof 1
     print 1

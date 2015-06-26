@@ -1,9 +1,9 @@
-.def: by_reference 1
+.def: by_reference
     arg 0 0
     end
 .end
 
-.def: main 0
+.def: main
     ; store a number in register
     istore 1 69
 

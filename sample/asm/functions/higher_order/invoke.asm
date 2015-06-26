@@ -1,4 +1,4 @@
-.def: sum4 1
+.def: sum4
     ; this function takes four integers as parameters and
     ; adds them, and returns the sum
     arg 0 1
@@ -13,7 +13,7 @@
     end
 .end
 
-.def: invoke 1
+.def: invoke
     ; this function takes two parameters:
     ;    1) a function object
     ;    2) a vector of parameters for function given as first parameter
@@ -67,7 +67,7 @@
     end
 .end
 
-.def: main 1
+.def: main
     ; create the vector
     vec 1
 

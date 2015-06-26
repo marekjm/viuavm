@@ -1,4 +1,4 @@
-.def: main 0
+.def: main
     .name: 1 number
     .name: 3 indirect_ref
 

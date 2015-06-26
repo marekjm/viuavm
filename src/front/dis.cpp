@@ -214,7 +214,7 @@ int main(int argc, char* argv[]) {
 
         oss.str("");
 
-        oss << ".def: " << name << " 1" << '\n';
+        oss << ".def: " << name << '\n';
 
         string opname;
         bool disasm_terminated = false;

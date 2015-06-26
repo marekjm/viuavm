@@ -1,6 +1,6 @@
 ; This script tests float subtraction.
 
-.def: main 0
+.def: main
     fstore 1 3.098
     fstore 2 2.083
     fsub 1 2 3

@@ -1,4 +1,4 @@
-.def: main 1
+.def: main
     ress global
     print 1
     izero 0

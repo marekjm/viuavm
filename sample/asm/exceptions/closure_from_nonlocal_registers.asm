@@ -1,9 +1,9 @@
-.def: foo 0
+.def: foo
     print 1
     end
 .end
 
-.def: main 1
+.def: main
     ress global
     istore 1 42
     clbind 1

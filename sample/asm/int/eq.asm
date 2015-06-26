@@ -1,7 +1,7 @@
 ; This script tests support for integer equality checking.
 ; Its expected output is "true".
 
-.def: main 0
+.def: main
     istore 1 1
     istore 2 1
     ieq 1 2

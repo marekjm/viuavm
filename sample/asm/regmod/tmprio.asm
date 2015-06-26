@@ -1,4 +1,4 @@
-.def: main 1
+.def: main
     ress global
     tmpri 1
     ress local

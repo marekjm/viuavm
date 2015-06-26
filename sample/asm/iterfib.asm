@@ -1,4 +1,4 @@
-.def: iterfib 1
+.def: iterfib
     .name: 1 vector
 
     ress static
@@ -37,7 +37,7 @@
     end
 .end
 
-.def: main 1
+.def: main
     .name: 2 result
     .name: 3 expected
     istore expected 1134903170

@@ -1,12 +1,12 @@
 ; purpose of this program is to compute n-th power of a number
 
-.def: dummy 1
+.def: dummy
     ; this function is here to stress jump calculation
     izero 0
     end
 .end
 
-.def: power_of 1
+.def: power_of
     .name: 1 base
     .name: 2 exponent
     .name: 3 zero
@@ -51,7 +51,7 @@
     end
 .end
 
-.def: main 0
+.def: main
     istore 1 4
     istore 2 3
 

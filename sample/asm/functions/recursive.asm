@@ -1,4 +1,4 @@
-.def: rec__VOID__INT__INT 0
+.def: rec__VOID__INT__INT
     .name: 1 counter
     .name: 2 zero
 
@@ -21,7 +21,7 @@
     end
 .end
 
-.def: main 0
+.def: main
     ; setup parameters
     istore 1 10
     istore 2 0

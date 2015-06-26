@@ -1,4 +1,4 @@
-.def: main 1
+.def: main
     arg 0 1
 
     .name: 2 len

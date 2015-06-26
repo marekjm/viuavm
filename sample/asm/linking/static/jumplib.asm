@@ -1,4 +1,4 @@
-.def: jumprint 0
+.def: jumprint
     ; FIXME: jump instructions are calculated incorrectly
     arg 0 1
     print 1

@@ -1,7 +1,7 @@
 ; This script is just a simple loop.
 ; It displays numbers from 0 to 10.
 
-.def: main 0
+.def: main
     istore 1 0
     istore 2 10
 

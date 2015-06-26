@@ -1,4 +1,4 @@
-.def: main 1
+.def: main
     strstore 1 "sample vector program"
     print 1
     vec 2

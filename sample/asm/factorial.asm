@@ -1,4 +1,4 @@
-.def: factorial 0
+.def: factorial
     .name: 1 number
     .name: 2 result
     arg 0 number
@@ -25,7 +25,7 @@
     end
 .end
 
-.def: main 0
+.def: main
     .name: 1 number
     .name: 2 result
     ; store the number of which we want to calculate the factorial

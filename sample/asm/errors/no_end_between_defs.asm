@@ -1,9 +1,9 @@
-.def: foo 0
+.def: foo
     end
 ; below should be .end and not .def
 .def
 
-.def: main 0
+.def: main
     izero 0
     end
 .end

@@ -1,4 +1,4 @@
-.def: main 0
+.def: main
     fstore 1 3.14159
     ftoi 1
     print 1

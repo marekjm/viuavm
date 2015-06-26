@@ -1,4 +1,4 @@
-.def: square 1
+.def: square
     ; this function takes single integer as its argument,
     ; squares it and returns the result
     arg 0 1
@@ -6,7 +6,7 @@
     end
 .end
 
-.def: apply 1
+.def: apply
     ; this function applies another function on a single parameter
     ;
     ; this function is type agnostic
@@ -28,7 +28,7 @@
     end
 .end
 
-.def: map 1
+.def: map
     arg 0 1
     arg 1 2
 
@@ -60,7 +60,7 @@
     end
 .end
 
-.def: main 1
+.def: main
     ; applies function square/1(int) to 5 and
     ; prints the result
     vec 1

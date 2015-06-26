@@ -1,4 +1,4 @@
-.def: main 1
+.def: main
     frame 0
     call print_N::print_42
     izero 0

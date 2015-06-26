@@ -1,7 +1,7 @@
 ; This script tests support for float less-than checking.
 ; Its expected output is "true".
 
-.def: main 0
+.def: main
     fstore 1 1.00098
     fstore 2 1.00099
     flt 1 2 3

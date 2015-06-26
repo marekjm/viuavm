@@ -1,7 +1,7 @@
 ; This script tests support for float equality checking.
 ; Its expected output is "true".
 
-.def: main 0
+.def: main
     fstore 1 0.69
     fstore 2 0.69
     feq 1 2

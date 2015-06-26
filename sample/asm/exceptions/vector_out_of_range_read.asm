@@ -1,4 +1,4 @@
-.def: main 1
+.def: main
     vec 1
     vat 1 2 4
 

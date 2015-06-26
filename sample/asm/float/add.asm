@@ -3,7 +3,7 @@
 ; The nagative-numbers thingy is just nice-to-have and not the
 ; true porpose of this script, though.
 
-.def: main 0
+.def: main
     fstore 1 4.0
     fstore 2 -3.5
     fadd 1 2 3

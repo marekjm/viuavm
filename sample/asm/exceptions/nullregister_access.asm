@@ -11,7 +11,7 @@
     leave
 .end
 
-.def: main 1
+.def: main
     tryframe
     catch "Exception" exception_handler
     try print_block

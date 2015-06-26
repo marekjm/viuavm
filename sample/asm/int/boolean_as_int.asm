@@ -1,4 +1,4 @@
-.def: main 1
+.def: main
     istore 1 42
     istore 2 69
 
