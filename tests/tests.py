@@ -1084,6 +1084,15 @@ class HigherOrderFunctionTests(unittest.TestCase):
         self.assertEqual([[1, 2, 3, 4, 5], [1, 4, 9, 16, 25]], [json.loads(i) for i in output.splitlines()])
         self.assertEqual(0, excode)
 
+    def testFilter(self):
+        name = 'filter.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, (name + '.bin'))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        self.assertEqual([[1, 2, 3, 4, 5], [2, 4]], [json.loads(i) for i in output.splitlines()])
+        self.assertEqual(0, excode)
+
 
 class ClosureTests(unittest.TestCase):
     """Tests for closures.
