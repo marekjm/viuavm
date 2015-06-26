@@ -1500,7 +1500,7 @@ status open
 
 \begin_layout Plain Layout
 
-.def: <function>
+.function: <function>
 \end_layout
 
 \begin_layout Plain Layout
@@ -1588,7 +1588,7 @@ status open
 
 \begin_layout Plain Layout
 
-.def: main
+.function: main
 \end_layout
 
 \begin_layout Plain Layout
@@ -1676,7 +1676,7 @@ status open
 
 \begin_layout Plain Layout
 
-.def: main
+.function: main
 \end_layout
 
 \begin_layout Plain Layout
@@ -1720,7 +1720,7 @@ status open
 
 \begin_layout Plain Layout
 
-.def: main
+.function: main
 \end_layout
 
 \begin_layout Plain Layout
@@ -1809,7 +1809,7 @@ status open
 
 \begin_layout Plain Layout
 
-.def: nondefault_main_function
+.function: nondefault_main_function
 \end_layout
 
 \begin_layout Plain Layout
