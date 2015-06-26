@@ -708,7 +708,7 @@ int generate(const string& filename, string& compilename, const vector<string>& 
     // GATHER FUNCTIONS' CODE LINES
     map<string, vector<string> > functions;
     try {
-         functions = assembler::ce::getFunctions(ilines);
+         functions = assembler::ce::getInvokables("function", ilines);
     } catch (const string& e) {
         cout << "error: function gathering failed: " << e << endl;
         return 1;

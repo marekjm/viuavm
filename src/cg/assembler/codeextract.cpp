@@ -134,18 +134,25 @@ vector<string> assembler::ce::getFunctionNames(const vector<string>& lines) {
 
     return names;
 }
-map<string, vector<string> > assembler::ce::getFunctions(const vector<string>& lines) {
-    map<string, vector<string> > functions;
+map<string, vector<string> > assembler::ce::getInvokables(const string& type, const vector<string>& lines) {
+    map<string, vector<string> > invokables;
+
+    string opening;
+    if (type == "function") {
+        opening = ".def:";
+    } else if (type == "block") {
+        opening = ".block:";
+    }
 
     string line, holdline;
     for (unsigned i = 0; i < lines.size(); ++i) {
         holdline = line = lines[i];
-        if (!str::startswith(line, ".def:")) { continue; }
+        if (!str::startswith(line, opening)) { continue; }
 
         vector<string> flines;
         for (int j = i+1; lines[j] != ".end"; ++j, ++i) {
-            if (str::startswith(lines[j], ".def")) {
-                throw ("another function opened before assembler reached .end after '" + str::chunk(str::sub(holdline, str::chunk(holdline).size())) + "' function");
+            if (str::startswith(lines[j], opening)) {
+                throw ("another " + type + " opened before assembler reached .end after '" + str::chunk(str::sub(holdline, str::chunk(holdline).size())) + "' " + type);
             }
             flines.push_back(lines[j]);
         }
@@ -154,10 +161,10 @@ map<string, vector<string> > assembler::ce::getFunctions(const vector<string>& l
         string name = str::chunk(line);
         line = str::lstrip(str::sub(line, name.size()));
 
-        functions[name] = vector<string>(flines);
+        invokables[name] = flines;
     }
 
-    return functions;
+    return invokables;
 }
 
 vector<string> assembler::ce::getBlockNames(const vector<string>& lines) {
