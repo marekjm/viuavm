@@ -643,7 +643,7 @@ map<string, uint16_t> mapFunctionAddresses(uint16_t& starting_instruction, const
         try {
             starting_instruction += Program::countBytes(sources.at(name).second);
         } catch (const std::out_of_range& e) {
-            throw ("could not find block '" + name + "'");
+            throw ("could not find function '" + name + "'");
         }
     }
     return addresses;
