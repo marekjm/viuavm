@@ -857,6 +857,31 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
 }
 
 
+bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE) {
+    if (SHOW_HELP or (SHOW_VERSION and VERBOSE)) {
+        cout << "Viua VM debugger, version ";
+    }
+    if (SHOW_HELP or SHOW_VERSION) {
+        cout << VERSION << endl;
+    }
+    if (SHOW_HELP) {
+        cout << "\nUSAGE:\n";
+        cout << "    " << program << " [option...] <executable> [<operands>...]\n" << endl;
+        cout << "OPTIONS:\n";
+        cout << "    " << "-V, --version            - show version\n"
+             << "    " << "-h, --help               - display this message\n"
+             << "    " << "-v, --verbose            - show verbose output\n"
+             ;
+        cout << "\n";
+        cout << "When inside debugger, use 'help' to list debugger statements (you can also discover them by pressing Tab repeatedly).";
+        cout << "\n";
+        cout << "Use ^C to abort entering a statement. Use ^D or 'quit' to quit the debugger.";
+        cout << endl;
+    }
+
+    return (SHOW_HELP or SHOW_VERSION);
+}
+
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
     vector<string> args;
@@ -875,25 +900,7 @@ int main(int argc, char* argv[]) {
         args.push_back(argv[i]);
     }
 
-    if (SHOW_HELP or (SHOW_VERSION and VERBOSE)) {
-        cout << "Viua VM virtual machine debugger, version ";
-    }
-    if (SHOW_HELP or SHOW_VERSION) {
-        cout << VERSION << endl;
-    }
-    if (SHOW_HELP) {
-        cout << "    --help             - to display this message" << endl;
-        cout << "    --version          - show version and quit" << endl;
-        cout << "    --verbose          - show verbose output" << endl;
-        cout << "\n";
-        cout << "When inside debugger, use 'help' to list debugger statements (you can also discover them by pressing Tab repeatedly).";
-        cout << "\n";
-        cout << "Use ^C to abort entering a statement. Use ^D or 'quit' to quit the debugger.";
-        cout << endl;
-    }
-    if (SHOW_HELP or SHOW_VERSION) {
-        return 0;
-    }
+    if (usage(argv[0], SHOW_HELP, SHOW_VERSION, VERBOSE)) { return 0; }
 
     if (args.size() == 0) {
         cout << "fatal: no input file" << endl;

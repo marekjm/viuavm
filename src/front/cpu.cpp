@@ -22,6 +22,26 @@ bool SHOW_VERSION = false;
 bool VERBOSE = false;
 
 
+bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE) {
+    if (SHOW_HELP or (SHOW_VERSION and VERBOSE)) {
+        cout << "Viua VM CPU, version ";
+    }
+    if (SHOW_HELP or SHOW_VERSION) {
+        cout << VERSION << endl;
+    }
+    if (SHOW_HELP) {
+        cout << "\nUSAGE:\n";
+        cout << "    " << program << " [option...] <executable>\n" << endl;
+        cout << "OPTIONS:\n";
+        cout << "    " << "-V, --version            - show version\n"
+             << "    " << "-h, --help               - display this message\n"
+             << "    " << "-v, --verbose            - show verbose output\n"
+             ;
+    }
+
+    return (SHOW_HELP or SHOW_VERSION);
+}
+
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
     vector<string> args;
@@ -34,24 +54,14 @@ int main(int argc, char* argv[]) {
         } else if (option == "--version") {
             SHOW_VERSION = true;
             continue;
+        } else if (option == "--verbose") {
+            VERBOSE = true;
+            continue;
         }
         args.push_back(argv[i]);
     }
 
-    if (SHOW_HELP or (SHOW_VERSION and VERBOSE)) {
-        cout << "Viua VM virtual machine, version ";
-    }
-    if (SHOW_HELP or SHOW_VERSION) {
-        cout << VERSION << endl;
-    }
-    if (SHOW_HELP) {
-        cout << "    --help             - display this message" << endl;
-        cout << "    --version          - display version" << endl;
-        cout << "    --verbose          - show verbose output" << endl;
-    }
-    if (SHOW_HELP or SHOW_VERSION) {
-        return 0;
-    }
+    if (usage(argv[0], SHOW_HELP, SHOW_VERSION, VERBOSE)) { return 0; }
 
     if (args.size() == 0) {
         cout << "fatal: no input file" << endl;

@@ -25,6 +25,29 @@ bool DISASSEMBLE_ENTRY = false;
 bool INCLUDE_INFO = false;
 
 
+bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE) {
+    if (SHOW_HELP or (SHOW_VERSION and VERBOSE)) {
+        cout << "Viua VM disassembler, version ";
+    }
+    if (SHOW_HELP or SHOW_VERSION) {
+        cout << VERSION << endl;
+    }
+    if (SHOW_HELP) {
+        cout << "\nUSAGE:\n";
+        cout << "    " << program << " [option...] [-o <outfile>] <infile>\n" << endl;
+        cout << "OPTIONS:\n";
+        cout << "    " << "-V, --version            - show version\n"
+             << "    " << "-h, --help               - display this message\n"
+             << "    " << "-v, --verbose            - show verbose output\n"
+             << "    " << "-o, --out                - output to given path (by default prints to cout)\n"
+             << "    " << "-i, --info               - include information about executable in output\n"
+             << "    " << "-e, --with-entry         - include __entry function in disassembly\n"
+             ;
+    }
+
+    return (SHOW_HELP or SHOW_VERSION);
+}
+
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
     vector<string> args;
@@ -57,25 +80,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if (SHOW_HELP or (SHOW_VERSION and VERBOSE)) {
-        cout << "Viua VM disassembler, version ";
-    }
-    if (SHOW_HELP or SHOW_VERSION) {
-        cout << VERSION << endl;
-    }
-    if (SHOW_HELP) {
-        cout << "    --help             - to display this message" << endl;
-        cout << "    --version          - show version and quit" << endl;
-        cout << "    --verbose          - show verbose output" << endl;
-        cout << "-o, --out              - specify output file" << endl;
-        cout << "                         without this option prints to standard output" << endl;
-        cout << "-e, --with-entry       - disassemble entry function" << endl;
-        cout << "-i, --info             - include info about disassembled file in output" << endl;
-        cout << endl;
-    }
-    if (SHOW_HELP or SHOW_VERSION) {
-        return 0;
-    }
+    if (usage(argv[0], SHOW_HELP, SHOW_VERSION, VERBOSE)) { return 0; }
 
     if (args.size() == 0) {
         cout << "fatal: no input file" << endl;

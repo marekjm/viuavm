@@ -624,6 +624,37 @@ void assemble(Program& program, const vector<string>& lines) {
 }
 
 
+bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE) {
+    if (SHOW_HELP or (SHOW_VERSION and VERBOSE)) {
+        cout << "Viua VM assembler, version ";
+    }
+    if (SHOW_HELP or SHOW_VERSION) {
+        cout << VERSION << endl;
+    }
+    if (SHOW_HELP) {
+        cout << "\nUSAGE:\n";
+        cout << "    " << program << " [option...] [-o <outfile>] <infile> [<linked-file>...]\n" << endl;
+        cout << "OPTIONS:\n";
+        cout << "    " << "-V, --version            - show version\n"
+             << "    " << "-h, --help               - display this message\n"
+             << "    " << "-v, --verbose            - show verbose output\n"
+             << "    " << "-d, --debug              - show debugging output\n"
+             << "    " << "    --scream             - show so much debugging output it becomes noisy\n"
+             << "    " << "-W, --Wall               - warn about everything\n"
+             << "    " << "    --Wmissin-end        - warn about missing 'end' instruction at the end of functions\n"
+             << "    " << "    --Wempty-function    - warn about empty functions\n"
+             << "    " << "    --Wopless-frame      - warn about frames without operands\n"
+             << "    " << "-E, --Eall               - treat all warnings as errors\n"
+             << "    " << "    --Emissing-end       - treat missing 'end' instruction at the end of function as error\n"
+             << "    " << "    --Eempty-function    - treat empty function as error\n"
+             << "    " << "    --Eopless-frame      - treat frames without operands as errors\n"
+             << "    " << "-c, --lib                - assemble as a library\n"
+             ;
+    }
+
+    return (SHOW_HELP or SHOW_VERSION);
+}
+
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
     vector<string> args;
@@ -693,37 +724,9 @@ int main(int argc, char* argv[]) {
         args.push_back(argv[i]);
     }
 
-    int ret_code = 0;
+    if (usage(argv[0], SHOW_HELP, SHOW_VERSION, VERBOSE)) { return 0; }
 
-    if (SHOW_HELP or (SHOW_VERSION and VERBOSE)) {
-        cout << "Viua VM assembler, version ";
-    }
-    if (SHOW_HELP or SHOW_VERSION) {
-        cout << VERSION << endl;
-    }
-    if (SHOW_HELP) {
-        cout << "\nUSAGE:\n";
-        cout << "    " << argv[0] << " [option...] <infile> [<outfile>]\n" << endl;
-        cout << "OPTIONS:\n";
-        cout << "    " << "-V, --version            - show version\n"
-             << "    " << "-h, --help               - display this message\n"
-             << "    " << "-v, --verbose            - show verbose output\n"
-             << "    " << "-d, --debug              - show debugging output\n"
-             << "    " << "    --scream             - show so much debugging output it becomes noisy\n"
-             << "    " << "-W, --Wall               - warn about everything\n"
-             << "    " << "    --Wmissin-end        - warn about missing 'end' instruction at the end of functions\n"
-             << "    " << "    --Wempty-function    - warn about empty functions\n"
-             << "    " << "    --Wopless-frame      - warn about frames without operands\n"
-             << "    " << "-E, --Eall               - treat all warnings as errors\n"
-             << "    " << "    --Emissing-end       - treat missing 'end' instruction at the end of function as error\n"
-             << "    " << "    --Eempty-function    - treat empty function as error\n"
-             << "    " << "    --Eopless-frame      - treat frames without operands as errors\n"
-             << "    " << "-c, --lib                - assemble as a library\n"
-             ;
-    }
-    if (SHOW_HELP or SHOW_VERSION) {
-        return 0;
-    }
+    int ret_code = 0;
 
     if (args.size() == 0) {
         cout << "fatal: no input file" << endl;
