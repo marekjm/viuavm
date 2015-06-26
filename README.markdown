@@ -66,7 +66,7 @@ The shell installed in dev environment is ZSH but the scripts should be compatib
 ## Git workflow
 
 Each feature and fix is developed in a separate branch.
-Bugs which are discovered during development of a certain feature of bug fixing,
+Bugs which are discovered during development of a certain feature,
 may be fixed in the same branch as their parent issue.
 This is also true for small features.
 
