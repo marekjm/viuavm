@@ -39,6 +39,9 @@ namespace assembler {
         std::string functionBodiesAreNonempty(const std::vector<std::string>& lines, std::map<std::string, std::vector<std::string> >& functions);
         std::string blockTries(const std::vector<std::string>& lines, const std::vector<std::string>& block_names);
         std::string blockBodiesEndWithLeave(const std::vector<std::string>& lines, std::map<std::string, std::pair<bool, std::vector<std::string> > >& blocks);
+
+        std::string directives(const std::vector<std::string>& lines);
+        std::string instructions(const std::vector<std::string>& lines);
     }
 }
 

@@ -874,6 +874,11 @@ int generate(const string& filename, string& compilename, const vector<string>& 
 
     string report;
 
+    if ((report = assembler::verify::directives(lines)).size()) {
+        cout << report << endl;
+        exit(1);
+    }
+
     if ((report = assembler::verify::functionCalls(lines, function_names)).size()) {
         cout << report << endl;
         exit(1);
