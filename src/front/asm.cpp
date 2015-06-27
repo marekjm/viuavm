@@ -789,13 +789,9 @@ int generate(const string& filename, string& compilename, const vector<string>& 
                 exit(1);
             } else if (WARNING_MISSING_END or WARNING_ALL) {
                 cout << "warning: missing 'end' at the end of function '" << function.first << "'" << endl;
-            } else {
-                // FIXME: autoappend end on-demand
-                flines.push_back("end");
             }
         }
     }
-
 
     //////////////////////
     // VERIFY BLOCK BODIES
@@ -811,7 +807,6 @@ int generate(const string& filename, string& compilename, const vector<string>& 
             exit(1);
         }
     }
-
 
 
     /////////////////////////////////////////
