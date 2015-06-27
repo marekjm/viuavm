@@ -27,6 +27,9 @@ clean: clean-support
 	rm -f ./build/lib/*.o
 	rm -f ./build/cpu/instr/*.o
 	rm -f ./build/cpu/*.o
+	rm -f ./build/cg/assembler/*.o
+	rm -f ./build/cg/disassembler/*.o
+	rm -f ./build/cg/bytecode/*.o
 	rm -f ./build/*.o
 	rm -f ./bin/vm/*
 
