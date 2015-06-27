@@ -279,7 +279,6 @@ tuple<bool, string> if_watchpoint_local_register_write(CPU& cpu, const State& st
                opcode == FTOI or
                opcode == STOI or
                opcode == STOF or
-               opcode == STRSIZE or
                opcode == VLEN or
                opcode == MOVE or
                opcode == COPY or
@@ -314,16 +313,11 @@ tuple<bool, string> if_watchpoint_local_register_write(CPU& cpu, const State& st
                opcode == BGT or
                opcode == BGTE or
                opcode == BEQ or
-               opcode == STRADD or
-               opcode == STRJOIN or
                opcode == VAT or
                opcode == AND or
                opcode == OR
                ) {
         register_index[0] = *((int*)(register_index_ptr+3)+2);
-        writes_to = 1;
-    } else if (opcode == STRSUB) {
-        register_index[0] = *((int*)(register_index_ptr+4)+3);
         writes_to = 1;
     } else if (opcode == VPOP or opcode == SWAP) {
         register_index[0] = *((int*)(++register_index_ptr)++);
