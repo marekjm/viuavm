@@ -260,7 +260,9 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
             }
             break;
         default:
-            throw ("unhandled opcode: " + OP_NAMES.at(op));
+            // if opcode was not covered here, it means it must have been a variable-length opcode
+            oss << "";
     }
+
     return tuple<string, unsigned>(oss.str(), increase);
 }
