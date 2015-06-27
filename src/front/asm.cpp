@@ -737,14 +737,6 @@ int generate(const string& filename, string& compilename, const vector<string>& 
         cout << report << endl;
         exit(1);
     }
-    if ((report = assembler::verify::functionCalls(lines, function_names)).size()) {
-        cout << report << endl;
-        exit(1);
-    }
-    if ((report = assembler::verify::callableCreations(lines, function_names)).size()) {
-        cout << report << endl;
-        exit(1);
-    }
     if ((report = assembler::verify::ressInstructions(lines, AS_LIB)).size()) {
         cout << report << endl;
         exit(1);
@@ -935,6 +927,19 @@ int generate(const string& filename, string& compilename, const vector<string>& 
     //////////////////////////////////////////////////////////////
     // EXTEND FUNCTION NAMES VECTOR WITH NAMES OF LINKED FUNCTIONS
     for (string name : linked_function_names) { function_names.push_back(name); }
+
+
+    /////////////////////////////////////////////////////////////////////////
+    // AFTER HAVING OBTAINED LINKED NAMES, IT IS POSSIBLE TO VERIFY CALLS AND
+    // CALLABLE (FUNCTIONS, CLOSURES, ETC.) CREATIONS
+    if ((report = assembler::verify::functionCalls(lines, function_names)).size()) {
+        cout << report << endl;
+        exit(1);
+    }
+    if ((report = assembler::verify::callableCreations(lines, function_names)).size()) {
+        cout << report << endl;
+        exit(1);
+    }
 
 
     /////////////////////////////
