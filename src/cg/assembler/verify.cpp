@@ -139,7 +139,7 @@ string assembler::verify::directives(const vector<string>& lines) {
         }
 
         string token = str::chunk(line);
-        if (not (token == ".function:" or token == ".block:" or token == ".end" or token == ".name:" or token == ".mark:")) {
+        if (not (token == ".function:" or token == ".block:" or token == ".end" or token == ".name:" or token == ".mark:" or token == ".main:")) {
             report << "fatal: unrecognised assembler directive on line " << (i+1) << ": `" << token << '`';
             break;
         }
