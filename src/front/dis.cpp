@@ -184,6 +184,12 @@ int main(int argc, char* argv[]) {
                 oss << "what(): " << e.what() << '\n';
                 disasm_terminated = true;
                 break;
+            } catch (const string& e) {
+                oss << "\n---- ERROR ----\n\n";
+                oss << "disassembly terminated after throwing an instance of std::out_of_range\n";
+                oss << "what(): " << e << '\n';
+                disasm_terminated = true;
+                break;
             }
         }
         if (disasm_terminated) {
@@ -229,6 +235,12 @@ int main(int argc, char* argv[]) {
                 oss << "\n---- ERROR ----\n\n";
                 oss << "disassembly terminated after throwing an instance of std::out_of_range\n";
                 oss << "what(): " << e.what() << '\n';
+                disasm_terminated = true;
+                break;
+            } catch (const string& e) {
+                oss << "\n---- ERROR ----\n\n";
+                oss << "disassembly terminated after throwing an instance of std::out_of_range\n";
+                oss << "what(): " << e << '\n';
                 disasm_terminated = true;
                 break;
             }
