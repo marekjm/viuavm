@@ -726,6 +726,94 @@ int generate(const string& filename, string& compilename, const vector<string>& 
     }
 
 
+    ///////////////////////////////////////////
+    // INITIAL VERIFICATION OF CODE CORRECTNESS
+    string report;
+    if ((report = assembler::verify::directives(lines)).size()) {
+        cout << report << endl;
+        exit(1);
+    }
+    if ((report = assembler::verify::instructions(lines)).size()) {
+        cout << report << endl;
+        exit(1);
+    }
+    if ((report = assembler::verify::functionCalls(lines, function_names)).size()) {
+        cout << report << endl;
+        exit(1);
+    }
+    if ((report = assembler::verify::callableCreations(lines, function_names)).size()) {
+        cout << report << endl;
+        exit(1);
+    }
+    if ((report = assembler::verify::ressInstructions(lines, AS_LIB)).size()) {
+        cout << report << endl;
+        exit(1);
+    }
+    if ((report = assembler::verify::functionBodiesAreNonempty(lines, functions)).size()) {
+        cout << report << endl;
+        exit(1);
+    }
+    if ((report = assembler::verify::blockTries(lines, block_names)).size()) {
+        cout << report << endl;
+        exit(1);
+    }
+
+
+    ////////////////////////////
+    // VERIFY FRAME INSTRUCTIONS
+    for (unsigned i = 0; i < lines.size(); ++i) {
+        line = str::lstrip(lines[i]);
+        if (not str::startswith(line, "frame")) {
+            continue;
+        }
+
+        line = str::lstrip(str::sub(line, str::chunk(line).size()));
+
+        if (line.size() == 0) {
+            if (ERROR_OPERANDLESS_FRAME or ERROR_ALL) {
+                cout << "fatal: frame instruction without operands at line " << i << " in " << filename;
+                exit(1);
+            } else if (WARNING_OPERANDLESS_FRAME or WARNING_ALL) {
+                cout << "warning: frame instruction without operands at line " << i << " in " << filename;
+            }
+        }
+    }
+
+    /////////////////////////
+    // VERIFY FUNCTION BODIES
+    for (auto function : functions) {
+        vector<string> flines = function.second;
+        if ((flines.size() == 0 or flines.back() != "end") and (function.first != "main" and flines.back() != "halt")) {
+            if (ERROR_MISSING_END or ERROR_ALL) {
+                cout << "fatal: missing 'end' at the end of function '" << function.first << "'" << endl;
+                exit(1);
+            } else if (WARNING_MISSING_END or WARNING_ALL) {
+                cout << "warning: missing 'end' at the end of function '" << function.first << "'" << endl;
+            } else {
+                // FIXME: autoappend end on-demand
+                flines.push_back("end");
+            }
+        }
+    }
+
+
+    //////////////////////
+    // VERIFY BLOCK BODIES
+    for (auto block : blocks) {
+        vector<string> flines = block.second;
+        if (flines.size() == 0) {
+            cout << "fatal: block '" << block.first << "' has empty body" << endl;
+            exit(1);
+        }
+        string last_line = flines.back();
+        if (not (last_line == "leave" or last_line == "end" or last_line == "halt")) {
+            cout << "fatal: missing returning instruction ('leave', 'end' or 'halt') at the end of block '" << block.first << "'" << endl;
+            exit(1);
+        }
+    }
+
+
+
     /////////////////////////////////////////
     // CHECK IF MAIN FUNCTION RETURNS A VALUE
     // FIXME: this is just a crude check - it does not acctually checks if these instructions set 0 register
@@ -869,88 +957,6 @@ int generate(const string& filename, string& compilename, const vector<string>& 
     // REPORT FIRST INSTRUCTION
     if ((VERBOSE or DEBUG) and not AS_LIB) {
         cout << "message: first instruction pointer: " << starting_instruction << endl;
-    }
-
-
-    string report;
-
-    if ((report = assembler::verify::directives(lines)).size()) {
-        cout << report << endl;
-        exit(1);
-    }
-
-    if ((report = assembler::verify::functionCalls(lines, function_names)).size()) {
-        cout << report << endl;
-        exit(1);
-    }
-    if ((report = assembler::verify::callableCreations(lines, function_names)).size()) {
-        cout << report << endl;
-        exit(1);
-    }
-    if ((report = assembler::verify::ressInstructions(lines, AS_LIB)).size()) {
-        cout << report << endl;
-        exit(1);
-    }
-    if ((report = assembler::verify::functionBodiesAreNonempty(lines, functions)).size()) {
-        cout << report << endl;
-        exit(1);
-    }
-    if ((report = assembler::verify::blockTries(lines, block_names)).size()) {
-        cout << report << endl;
-        exit(1);
-    }
-
-    ////////////////////////////
-    // VERIFY FRAME INSTRUCTIONS
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        line = str::lstrip(lines[i]);
-        if (not str::startswith(line, "frame")) {
-            continue;
-        }
-
-        line = str::lstrip(str::sub(line, str::chunk(line).size()));
-
-        if (line.size() == 0) {
-            if (ERROR_OPERANDLESS_FRAME or ERROR_ALL) {
-                cout << "fatal: frame instruction without operands at line " << i << " in " << filename;
-                exit(1);
-            } else if (WARNING_OPERANDLESS_FRAME or WARNING_ALL) {
-                cout << "warning: frame instruction without operands at line " << i << " in " << filename;
-            }
-        }
-    }
-
-    /////////////////////////
-    // VERIFY FUNCTION BODIES
-    for (auto function : functions) {
-        vector<string> flines = function.second;
-        if ((flines.size() == 0 or flines.back() != "end") and (function.first != "main" and flines.back() != "halt")) {
-            if (ERROR_MISSING_END or ERROR_ALL) {
-                cout << "fatal: missing 'end' at the end of function '" << function.first << "'" << endl;
-                exit(1);
-            } else if (WARNING_MISSING_END or WARNING_ALL) {
-                cout << "warning: missing 'end' at the end of function '" << function.first << "'" << endl;
-            } else {
-                // FIXME: autoappend end on-demand
-                flines.push_back("end");
-            }
-        }
-    }
-
-
-    //////////////////////
-    // VERIFY BLOCK BODIES
-    for (auto block : blocks) {
-        vector<string> flines = block.second;
-        if (flines.size() == 0) {
-            cout << "fatal: block '" << block.first << "' has empty body" << endl;
-            exit(1);
-        }
-        string last_line = flines.back();
-        if (not (last_line == "leave" or last_line == "end" or last_line == "halt")) {
-            cout << "fatal: missing returning instruction ('leave', 'end' or 'halt') at the end of block '" << block.first << "'" << endl;
-            exit(1);
-        }
     }
 
 
