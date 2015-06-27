@@ -260,7 +260,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
             }
             break;
         default:
-            oss << "";
+            throw ("unhandled opcode: " + OP_NAMES.at(op));
     }
     return tuple<string, unsigned>(oss.str(), increase);
 }
