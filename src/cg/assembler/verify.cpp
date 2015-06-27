@@ -24,7 +24,7 @@ string assembler::verify::functionCalls(const vector<string>& lines, const vecto
         bool is_undefined = (find(function_names.begin(), function_names.end(), function) == function_names.end());
 
         if (is_undefined) {
-            report << "fatal: call to undefined function '" << function << "' at line " << i;
+            report << "fatal: call to undefined function '" << function << "' at line " << (i+1);
         }
     }
     return report.str();
@@ -43,7 +43,7 @@ string assembler::verify::blockTries(const vector<string>& lines, const vector<s
         bool is_undefined = (find(block_names.begin(), block_names.end(), block) == block_names.end());
 
         if (is_undefined) {
-            report << "fatal: try of undefined block '" << block << "' at line " << i;
+            report << "fatal: try of undefined block '" << block << "' at line " << (i+1);
         }
     }
     return report.str();
@@ -65,7 +65,7 @@ string assembler::verify::callableCreations(const vector<string>& lines, const v
         bool is_undefined = (find(function_names.begin(), function_names.end(), function) == function_names.end());
 
         if (is_undefined) {
-            report << "fatal: " << callable_type << " from undefined function '" << function << "' at line " << i;
+            report << "fatal: " << callable_type << " from undefined function '" << function << "' at line " << (i+1);
             break;
         }
 
@@ -105,11 +105,11 @@ string assembler::verify::ressInstructions(const vector<string>& lines, bool as_
         string registerset_name = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
 
         if (find(legal_register_sets.begin(), legal_register_sets.end(), registerset_name) == legal_register_sets.end()) {
-            report << "fatal: illegal register set name in ress instruction: '" << registerset_name << "' at line " << i;
+            report << "fatal: illegal register set name in ress instruction: '" << registerset_name << "' at line " << (i+1);
             break;
         }
         if (registerset_name == "global" and as_lib and function != "main") {
-            report << "fatal: global registers used in library function at line " << i;
+            report << "fatal: global registers used in library function at line " << (i+1);
             break;
         }
     }
