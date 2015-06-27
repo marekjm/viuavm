@@ -4,6 +4,7 @@
 #include <tuple>
 #include <map>
 #include <algorithm>
+#include "../../bytecode/maps.h"
 #include "../../support/string.h"
 #include "../../program.h"
 #include "assembler.h"
@@ -140,6 +141,23 @@ string assembler::verify::directives(const vector<string>& lines) {
         string token = str::chunk(line);
         if (not (token == ".function:" or token == ".block:" or token == ".end" or token == ".name:" or token == ".mark:")) {
             report << "fatal: unrecognised assembler directive on line " << (i+1) << ": `" << token << '`';
+            break;
+        }
+    }
+    return report.str();
+}
+string assembler::verify::instructions(const vector<string>& lines) {
+    ostringstream report("");
+    string line;
+    for (unsigned i = 0; i < lines.size(); ++i) {
+        line = str::lstrip(lines[i]);
+        if (line.size() == 0 or line[0] == '.' or line[0] == ';') {
+            continue;
+        }
+
+        string token = str::chunk(line);
+        if (OP_SIZES.count(token) == 0) {
+            report << "fatal: unrecognised instruction on line " << (i+1) << ": `" << token << '`';
             break;
         }
     }
