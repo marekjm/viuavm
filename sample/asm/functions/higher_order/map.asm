@@ -29,33 +29,51 @@
 .end
 
 .function: map
+    ; this function takes two arguments:
+    ;   * a function,
+    ;   * a vector,
+    ; then, it maps (i.e. calls) the given function on every element of given vector
+    ; and returns a vector containing modified values.
+    ; returned vector is a newly created one - this function does not modify vectors in place.
     arg 0 1
     arg 1 2
 
+    ; new vector to store mapped values
     vec 3
 
+    ; set initial counter value and
+    ; loop termination variable
     izero 4
     vlen 2 5
 
+    ; while (...) {
     .mark: loop_begin
     igte 4 5 6
     branch 6 loop_end loop_body
 
     .mark: loop_body
 
+    ; call supplied function on current element
     frame 1
     vat 2 7 @4
     param 0 7
     fcall 1 8
 
+    ; push result to new vector
     vpush 3 8
+
+    ; empty the register, as vat instruction creates references
     empty 7
 
+    ; increase loop counter and go back to the beginning
+    ;     ++i;
+    ; }
     iinc 4
     jump loop_begin
 
     .mark: loop_end
 
+    ; move vector with mapped values to the return register
     move 3 0
     end
 .end
