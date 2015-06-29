@@ -240,8 +240,6 @@ tuple<bool, string> if_watchpoint_local_register_write(CPU& cpu, const State& st
         opcode == TMPRI or
         opcode == PRINT or
         opcode == ECHO or
-        opcode == CLFRAME or
-        opcode == CLCALL or
         opcode == FRAME or
         opcode == PARAM or
         opcode == PAREF or
