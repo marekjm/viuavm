@@ -91,8 +91,6 @@ enum OPCODE : byte {
 
     CLBIND,
     CLOSURE,
-    CLFRAME,
-    CLCALL,
 
     FUNCTION,
     FCALL,
