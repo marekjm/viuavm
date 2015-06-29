@@ -631,14 +631,6 @@ clbind
 closure
 \end_layout
 
-\begin_layout Subsubsection
-clframe
-\end_layout
-
-\begin_layout Subsubsection
-clcall
-\end_layout
-
 \begin_layout Subsection
 Operations on registers
 \end_layout
