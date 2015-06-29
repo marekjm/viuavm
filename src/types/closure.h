@@ -25,6 +25,8 @@ class Closure : public Function {
 
         virtual Type* copy() const;
 
+        virtual std::string name() const;
+
         // FIXME: implement real dtor
         Closure();
         virtual ~Closure();

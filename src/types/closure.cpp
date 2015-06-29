@@ -38,3 +38,8 @@ Type* Closure::copy() const {
     clsr->regset = regset->copy();
     return clsr;
 }
+
+
+string Closure::name() const {
+    return function_name;
+}

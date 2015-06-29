@@ -23,6 +23,8 @@ class Function : public Type {
 
         virtual Type* copy() const;
 
+        virtual std::string name() const;
+
         // FIXME: implement real dtor
         Function();
         virtual ~Function();

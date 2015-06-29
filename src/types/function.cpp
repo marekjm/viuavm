@@ -35,3 +35,8 @@ Type* Function::copy() const {
     fn->function_name = function_name;
     return fn;
 }
+
+
+string Function::name() const {
+    return function_name;
+}
