@@ -120,7 +120,7 @@ byte* CPU::clcall(byte* addr) {
 
     // FIXME: there should be a check it this is *really* a closure object
     Closure* clsr = static_cast<Closure*>(fetch(closure_reg));
-    byte* call_address = bytecode+function_addresses.at(clsr->function_name);
+    byte* call_address = bytecode+function_addresses.at(clsr->name());
 
     // save return address for frame
     byte* return_address = (addr + sizeof(bool) + sizeof(int));
@@ -191,13 +191,13 @@ byte* CPU::fcall(byte* addr) {
 
     // FIXME: there should be a check it this is *really* a function object
     Function* fn = static_cast<Function*>(fetch(fn_reg));
-    byte* call_address = bytecode+function_addresses.at(fn->function_name);
+    byte* call_address = bytecode+function_addresses.at(fn->name());
 
     // save return address for frame
     byte* return_address = (addr + sizeof(bool) + sizeof(int));
 
     if (frame_new == 0) {
-        throw new Exception("fn call without a frame: use `clframe 0' in source code if the fn takes no parameters");
+        throw new Exception("fcall without a frame: use `clframe 0' in source code if the function takes no parameters");
     }
     // set function name and return address
     frame_new->function_name = fn->function_name;
@@ -208,6 +208,10 @@ byte* CPU::fcall(byte* addr) {
     frame_new->place_return_value_in = *(int*)addr;
 
     pushFrame();
+
+    if (fn->type() == "Closure") {
+        uregset = dynamic_cast<Closure*>(fn)->regset;
+    }
 
     return call_address;
 }
