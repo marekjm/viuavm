@@ -41,19 +41,19 @@
     frame 0
     call returns_closures 1
 
-    clframe 0
+    frame 0 0
     vat 1 2 0
     fcall 2 0
 
     istore 4 69
 
-    clframe 1
+    frame 1 0
     param 0 4
 
     vat 1 3 1
     fcall 3 0
 
-    clframe 0
+    frame 0 0
     fcall 2 0
 
     izero 0

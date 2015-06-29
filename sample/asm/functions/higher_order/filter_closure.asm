@@ -57,7 +57,7 @@
 
     ; call filtering function to determine whether current element
     ; is a valid value
-    clframe 1
+    frame 1 0
     vat 2 7 @4
     param 0 7
     fcall 1 8
