@@ -117,8 +117,6 @@ class Program {
 
     Program& clbind     (int_op);
     Program& closure    (std::string, int_op);
-    Program& clframe    (int_op);
-    Program& clcall     (int_op, int_op);
 
     Program& function   (std::string, int_op);
     Program& fcall      (int_op, int_op);
