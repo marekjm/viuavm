@@ -22,7 +22,7 @@
     ; create frame for our closure and
     ; call it
     clframe 0
-    clcall bar 0
+    fcall bar 0
 
     izero 0
     end

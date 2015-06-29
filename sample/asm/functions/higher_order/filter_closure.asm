@@ -60,7 +60,7 @@
     clframe 1
     vat 2 7 @4
     param 0 7
-    clcall 1 8
+    fcall 1 8
 
     ; if the result from filtering function was "true" - the element should be pushed onto result vector
     ; it it was "false" - skip to next iteration

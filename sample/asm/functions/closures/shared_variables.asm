@@ -43,7 +43,7 @@
 
     clframe 0
     vat 1 2 0
-    clcall 2 0
+    fcall 2 0
 
     istore 4 69
 
@@ -51,10 +51,10 @@
     param 0 4
 
     vat 1 3 1
-    clcall 3 0
+    fcall 3 0
 
     clframe 0
-    clcall 2 0
+    fcall 2 0
 
     izero 0
     end
