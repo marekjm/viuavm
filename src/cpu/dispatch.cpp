@@ -165,12 +165,6 @@ byte* CPU::dispatch(byte* addr) {
         case CLOSURE:
             addr = closure(addr+1);
             break;
-        case CLFRAME:
-            addr = clframe(addr+1);
-            break;
-        case CLCALL:
-            addr = clcall(addr+1);
-            break;
         case FUNCTION:
             addr = function(addr+1);
             break;

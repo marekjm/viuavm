@@ -82,68 +82,6 @@ byte* CPU::closure(byte* addr) {
     return addr;
 }
 
-byte* CPU::clframe(byte* addr) {
-    /** Create new closure call frame.
-     */
-    int arguments;
-    bool arguments_ref = false;
-
-    arguments_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    arguments = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
-    if (arguments_ref) {
-        arguments = static_cast<Integer*>(fetch(arguments))->value();
-    }
-
-    if (frame_new != 0) { throw new Exception("requested new frame while last one is unused"); }
-    frame_new = new Frame(0, arguments, 0);
-
-    return addr;
-}
-
-byte* CPU::clcall(byte* addr) {
-    /*  Call a closure.
-     */
-    int closure_reg;
-    bool closure_reg_ref;
-
-    closure_reg_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    closure_reg = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
-    if (closure_reg_ref) {
-        closure_reg = static_cast<Integer*>(fetch(closure_reg))->value();
-    }
-
-    // FIXME: there should be a check it this is *really* a closure object
-    Closure* clsr = static_cast<Closure*>(fetch(closure_reg));
-    byte* call_address = bytecode+function_addresses.at(clsr->name());
-
-    // save return address for frame
-    byte* return_address = (addr + sizeof(bool) + sizeof(int));
-
-    if (frame_new == 0) {
-        throw new Exception("closure call without a frame: use `clframe 0' in source code if the closure takes no parameters");
-    }
-    // set function name and return address
-    frame_new->function_name = clsr->function_name;
-    frame_new->return_address = return_address;
-
-    frame_new->resolve_return_value_register = *(bool*)addr;
-    pointer::inc<bool, byte>(addr);
-    frame_new->place_return_value_in = *(int*)addr;
-
-    pushFrame();
-    // adjust register set
-    uregset = clsr->regset;
-
-    return call_address;
-}
-
-
 byte* CPU::function(byte* addr) {
     /** Create function object in a register.
      *

@@ -168,8 +168,6 @@ class CPU {
 
     byte* clbind(byte*);
     byte* closure(byte*);
-    byte* clframe(byte*);
-    byte* clcall(byte*);
 
     byte* function(byte*);
     byte* fcall(byte*);
