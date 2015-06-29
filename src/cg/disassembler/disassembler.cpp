@@ -99,7 +99,6 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case TMPRO:
         case VEC:
         case CLBIND:
-        case CLFRAME:
         case THROW:
         case PULL:
             oss << " " << intop(ptr);
@@ -123,7 +122,6 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case ISNULL:
         case VPUSH:
         case VLEN:
-        case CLCALL:
         case FCALL:
             oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
