@@ -52,23 +52,13 @@ Type* bases(Frame* frame, RegisterSet*, RegisterSet*) {
 }
 
 
-const char* function_names[] = {
-    "typeof",
-    "inheritanceChain",
-    "bases",
-    NULL,
-};
-const ExternalFunction* function_pointers[] = {
-    &typeof,
-    &inheritanceChain,
-    &bases,
-    NULL,
+const ExternalFunctionSpec functions[] = {
+    { "typeof", &typeof },
+    { "inheritanceChain", &inheritanceChain },
+    { "bases", &bases },
+    { NULL, NULL },
 };
 
-
-extern "C" const char** exports_names() {
-    return function_names;
-}
-extern "C" const ExternalFunction** exports_pointers() {
-    return function_pointers;
+extern "C" const ExternalFunctionSpec* exports() {
+    return functions;
 }

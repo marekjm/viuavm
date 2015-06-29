@@ -35,23 +35,13 @@ Type* string_stringify(Frame* frame, RegisterSet*, RegisterSet*) {
 }
 
 
-const char* function_names[] = {
-    "string",
-    "repr",
-    "stringify",
-    NULL,
-};
-const ExternalFunction* function_pointers[] = {
-    &string_string,
-    &string_repr,
-    &string_stringify,
-    NULL,
+const ExternalFunctionSpec functions[] = {
+    { "string", &string_string },
+    { "repr", &string_repr },
+    { "stringify", &string_stringify },
+    { NULL, NULL },
 };
 
-
-extern "C" const char** exports_names() {
-    return function_names;
-}
-extern "C" const ExternalFunction** exports_pointers() {
-    return function_pointers;
+extern "C" const ExternalFunctionSpec* exports() {
+    return functions;
 }
