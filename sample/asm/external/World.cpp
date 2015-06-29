@@ -12,19 +12,11 @@ Type* hello(Frame*, RegisterSet*, RegisterSet*) {
 }
 
 
-const char* function_names[] = {
-    "print_hello",
-    NULL,
-};
-const ExternalFunction* function_pointers[] = {
-    &hello,
-    NULL,
+const ExternalFunctionSpec functions[] = {
+    { "print_hello", &hello },
+    { NULL, NULL },
 };
 
-
-extern "C" const char** exports_names() {
-    return function_names;
-}
-extern "C" const ExternalFunction** exports_pointers() {
-    return function_pointers;
+extern "C" const ExternalFunctionSpec* exports() {
+    return functions;
 }

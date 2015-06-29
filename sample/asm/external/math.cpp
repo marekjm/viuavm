@@ -16,19 +16,11 @@ Type* math_sqrt(Frame* frame, RegisterSet*, RegisterSet*) {
 }
 
 
-const char* function_names[] = {
-    "sqrt",
-    NULL,
-};
-const ExternalFunction* function_pointers[] = {
-    &math_sqrt,
-    NULL,
+const ExternalFunctionSpec functions[] = {
+    { "sqrt", &math_sqrt },
+    { NULL, NULL },
 };
 
-
-extern "C" const char** exports_names() {
-    return function_names;
-}
-extern "C" const ExternalFunction** exports_pointers() {
-    return function_pointers;
+extern "C" const ExternalFunctionSpec* exports() {
+    return functions;
 }

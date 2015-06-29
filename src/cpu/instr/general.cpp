@@ -640,26 +640,17 @@ byte* CPU::eximport(byte* addr) {
         throw new Exception("LinkException", ("failed to link library: " + module));
     }
 
-    ExportedFunctionNamesReport* exports_names = 0;
-    ExportedFunctionPointersReport* exports_pointers = 0;
-
-    exports_names = (ExportedFunctionNamesReport*)dlsym(handle, "exports_names");
-    exports_pointers = (ExportedFunctionPointersReport*)dlsym(handle, "exports_pointers");
-
-    if (exports_names == 0) {
-        throw new Exception("failed to extract function names from module: " + module);
-    }
-    if (exports_names == 0) {
-        throw new Exception("failed to extract function pointers from module: " + module);
+    ExternalFunctionSpec* (*exports)() = 0;
+    if ((exports = (ExternalFunctionSpec*(*)())dlsym(handle, "exports")) == 0) {
+        throw new Exception("failed to extract interface from module: " + module);
     }
 
-    const char** functions = (*exports_names)();
-    ExternalFunction** function_pointers = (*exports_pointers)();
+    ExternalFunctionSpec* exported = (*exports)();
 
     unsigned i = 0;
-    while (functions[i] != NULL) {
-        string namespaced_name = (module + '.' + functions[i]);
-        registerExternalFunction(namespaced_name, function_pointers[i]);
+    while (exported[i].name != NULL) {
+        string namespaced_name = (module + '.' + exported[i].name);
+        registerExternalFunction(namespaced_name, exported[i].fpointer);
         ++i;
     }
 
