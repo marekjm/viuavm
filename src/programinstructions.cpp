@@ -52,7 +52,7 @@ Program& Program::isub(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, ISUB, rega, regb, regr);
+    addr_ptr = cg::bytecode::isub(addr_ptr, rega, regb, regr);
     return (*this);
 }
 
@@ -65,7 +65,7 @@ Program& Program::imul(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, IMUL, rega, regb, regr);
+    addr_ptr = cg::bytecode::imul(addr_ptr, rega, regb, regr);
     return (*this);
 }
 
@@ -78,23 +78,21 @@ Program& Program::idiv(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, IDIV, rega, regb, regr);
+    addr_ptr = cg::bytecode::idiv(addr_ptr, rega, regb, regr);
     return (*this);
 }
 
 Program& Program::iinc(int_op regno) {
     /*  Inserts iinc instuction.
      */
-    *(addr_ptr++) = IINC;
-    addr_ptr = insertIntegerOperand(addr_ptr, regno);
+    addr_ptr = cg::bytecode::iinc(addr_ptr, regno);
     return (*this);
 }
 
 Program& Program::idec(int_op regno) {
     /*  Inserts idec instuction.
      */
-    *(addr_ptr++) = IDEC;
-    addr_ptr = insertIntegerOperand(addr_ptr, regno);
+    addr_ptr = cg::bytecode::idec(addr_ptr, regno);
     return (*this);
 }
 
@@ -107,7 +105,7 @@ Program& Program::ilt(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, ILT, rega, regb, regr);
+    addr_ptr = cg::bytecode::ilt(addr_ptr, rega, regb, regr);
     return (*this);
 }
 
@@ -120,7 +118,7 @@ Program& Program::ilte(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, ILTE, rega, regb, regr);
+    addr_ptr = cg::bytecode::ilte(addr_ptr, rega, regb, regr);
     return (*this);
 }
 
@@ -133,7 +131,7 @@ Program& Program::igt(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, IGT, rega, regb, regr);
+    addr_ptr = cg::bytecode::igt(addr_ptr, rega, regb, regr);
     return (*this);
 }
 
@@ -146,7 +144,7 @@ Program& Program::igte(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, IGTE, rega, regb, regr);
+    addr_ptr = cg::bytecode::igte(addr_ptr, rega, regb, regr);
     return (*this);
 }
 
@@ -159,7 +157,7 @@ Program& Program::ieq(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, IEQ, rega, regb, regr);
+    addr_ptr = cg::bytecode::ieq(addr_ptr, rega, regb, regr);
     return (*this);
 }
 
