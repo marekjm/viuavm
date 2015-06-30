@@ -171,6 +171,10 @@ build/cg/assembler/verify.o: src/cg/assembler/verify.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
 
+build/cg/bytecode/instructions.o: src/cg/bytecode/instructions.cpp
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+
+
 build/loader.o: src/loader.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
