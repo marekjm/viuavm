@@ -4,59 +4,17 @@
 using namespace std;
 
 
-byte* insertIntegerOperand(byte* addr_ptr, int_op op) {
-    /** Insert integer operand into bytecode.
-     *
-     *  When using integer operand, it usually is a plain number - which translates to a regsiter index.
-     *  However, when preceded by `@` integer operand will not be interpreted directly, but instead CPU
-     *  will look into a register the integer points to, fetch an integer from this register and
-     *  use the fetched register as the operand.
-     */
-    bool ref;
-    int num;
-
-    tie(ref, num) = op;
-
-    *((bool*)addr_ptr) = ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((int*)addr_ptr)  = num;
-    pointer::inc<int, byte>(addr_ptr);
-
-    return addr_ptr;
-}
-
-byte* insertTwoIntegerOpsInstruction(byte* addr_ptr, enum OPCODE instruction, int_op a, int_op b) {
-    /** Insert instruction with two integer operands.
-     */
-    *(addr_ptr++) = instruction;
-    addr_ptr = insertIntegerOperand(addr_ptr, a);
-    addr_ptr = insertIntegerOperand(addr_ptr, b);
-    return addr_ptr;
-}
-
-byte* insertThreeIntegerOpsInstruction(byte* addr_ptr, enum OPCODE instruction, int_op a, int_op b, int_op c) {
-    /** Insert instruction with two integer operands.
-     */
-    *(addr_ptr++) = instruction;
-    addr_ptr = insertIntegerOperand(addr_ptr, a);
-    addr_ptr = insertIntegerOperand(addr_ptr, b);
-    addr_ptr = insertIntegerOperand(addr_ptr, c);
-    return addr_ptr;
-}
-
-
 Program& Program::nop() {
     /*  Inserts nop instuction.
      */
-    *(addr_ptr++) = NOP;
+    addr_ptr = cg::bytecode::nop(addr_ptr);
     return (*this);
 }
 
 Program& Program::izero(int_op regno) {
     /*  Inserts izero instuction.
      */
-    *(addr_ptr++) = IZERO;
-    addr_ptr = insertIntegerOperand(addr_ptr, regno);
+    addr_ptr = cg::bytecode::izero(addr_ptr, regno);
     return (*this);
 }
 
@@ -68,7 +26,7 @@ Program& Program::istore(int_op regno, int_op i) {
      *  regno:int - register number
      *  i:int     - value to store
      */
-    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, ISTORE, regno, i);
+    addr_ptr = cg::bytecode::istore(addr_ptr, regno, i);
     return (*this);
 }
 
@@ -81,7 +39,7 @@ Program& Program::iadd(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, IADD, rega, regb, regr);
+    addr_ptr = cg::bytecode::iadd(addr_ptr, rega, regb, regr);
     return (*this);
 }
 

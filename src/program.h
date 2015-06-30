@@ -6,21 +6,7 @@
 #include <tuple>
 #include <map>
 #include "bytecode/bytetypedef.h"
-
-
-/** typedefs for various types of operands
- *  that Wudoo asm instructions may use.
- */
-typedef std::tuple<bool, int> int_op;
-typedef std::tuple<bool, byte> byte_op;
-typedef std::tuple<bool, float> float_op;
-
-
-enum JUMPTYPE {
-    JMP_RELATIVE = 0,
-    JMP_ABSOLUTE,
-    JMP_TO_BYTE,
-};
+#include "cg/bytecode/instructions.h"
 
 
 class Program {
