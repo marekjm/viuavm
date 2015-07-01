@@ -612,15 +612,12 @@ Program& Program::jump(int addr, enum JUMPTYPE is_absolute) {
      *
      *  addr:int    - index of the instruction to which to branch
      */
-    *(addr_ptr++) = JUMP;
-
     // save jump position if jump is not to byte
     if (is_absolute != JMP_TO_BYTE) {
         (is_absolute == JMP_ABSOLUTE ? branches_absolute : branches).push_back(addr_ptr);
     }
-    *((int*)addr_ptr) = addr;
-    pointer::inc<int, byte>(addr_ptr);
 
+    addr_ptr = cg::bytecode::jump(addr_ptr, addr, is_absolute);
     return (*this);
 }
 
