@@ -9,6 +9,13 @@
 #include "cg/bytecode/instructions.h"
 
 
+enum JUMPTYPE {
+    JMP_RELATIVE = 0,
+    JMP_ABSOLUTE,
+    JMP_TO_BYTE,
+};
+
+
 class Program {
     // byte array containing bytecode
     byte* program;
