@@ -690,7 +690,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* call(byte* addr_ptr, string fn_name, int_op reg) {
+        byte* call(byte* addr_ptr, const string& fn_name, int_op reg) {
             /*  Inserts call instruction.
              *  Byte offset is calculated automatically.
              */

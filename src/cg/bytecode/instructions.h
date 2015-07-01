@@ -100,7 +100,7 @@ namespace cg {
         byte* param(byte* addr_ptr, int_op a, int_op b);
         byte* paref(byte* addr_ptr, int_op a, int_op b);
         byte* arg(byte* addr_ptr, int_op a, int_op b);
-        byte* call(byte* addr_ptr, std::string fn_name, int_op reg);
+        byte* call(byte* addr_ptr, const std::string& fn_name, int_op reg);
 
         byte* jump(byte* addr_ptr, int addr, enum JUMPTYPE is_absolute);
         byte* branch(byte* addr_ptr, int_op regc, int addr_truth, enum JUMPTYPE absolute_truth, int addr_false, enum JUMPTYPE absolute_false);

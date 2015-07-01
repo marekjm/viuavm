@@ -561,7 +561,7 @@ Program& Program::fcall(int_op clsr, int_op ret) {
 Program& Program::frame(int_op a, int_op b) {
     /*  Inserts frame instruction to bytecode.
      */
-    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, FRAME, a, b);
+    addr_ptr = cg::bytecode::frame(addr_ptr, a, b);
     return (*this);
 }
 
@@ -573,7 +573,7 @@ Program& Program::param(int_op a, int_op b) {
      *  a - register number
      *  b - register number
      */
-    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, PARAM, a, b);
+    addr_ptr = cg::bytecode::param(addr_ptr, a, b);
     return (*this);
 }
 
@@ -585,7 +585,7 @@ Program& Program::paref(int_op a, int_op b) {
      *  a - register number
      *  b - register number
      */
-    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, PAREF, a, b);
+    addr_ptr = cg::bytecode::paref(addr_ptr, a, b);
     return (*this);
 }
 
@@ -597,7 +597,7 @@ Program& Program::arg(int_op a, int_op b) {
      *  a - argument number
      *  b - register number
      */
-    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, ARG, a, b);
+    addr_ptr = cg::bytecode::arg(addr_ptr, a, b);
     return (*this);
 }
 
@@ -605,12 +605,7 @@ Program& Program::call(string fn_name, int_op reg) {
     /*  Inserts call instruction.
      *  Byte offset is calculated automatically.
      */
-    *(addr_ptr++) = CALL;
-    for (unsigned i = 0; i < fn_name.size(); ++i) {
-        *((char*)addr_ptr++) = fn_name[i];
-    }
-    *(addr_ptr++) = '\0';
-    addr_ptr = insertIntegerOperand(addr_ptr, reg);
+    addr_ptr = cg::bytecode::call(addr_ptr, fn_name, reg);
     return (*this);
 }
 
