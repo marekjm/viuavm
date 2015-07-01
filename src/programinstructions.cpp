@@ -382,8 +382,7 @@ Program& Program::vlen(int_op vec, int_op reg) {
 Program& Program::lognot(int_op reg) {
     /*  Inserts not instuction.
      */
-    *(addr_ptr++) = NOT;
-    addr_ptr = insertIntegerOperand(addr_ptr, reg);
+    addr_ptr = cg::bytecode::lognot(addr_ptr, reg);
     return (*this);
 }
 
@@ -396,7 +395,7 @@ Program& Program::logand(int_op rega, int_op regb, int_op regr) {
      *  regb   - register index of second operand
      *  regr   - register index in which to store the result
      */
-    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, AND, rega, regb, regr);
+    addr_ptr = cg::bytecode::logand(addr_ptr, rega, regb, regr);
     return (*this);
 }
 
@@ -409,7 +408,7 @@ Program& Program::logor(int_op rega, int_op regb, int_op regr) {
      *  regb   - register index of second operand
      *  regr   - register index in which to store the result
      */
-    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, OR, rega, regb, regr);
+    addr_ptr = cg::bytecode::logor(addr_ptr, rega, regb, regr);
     return (*this);
 }
 
