@@ -1,5 +1,7 @@
 # Viua VM
 
+[![Build Status](https://travis-ci.org/marekjm/wudoovm.svg)](https://travis-ci.org/marekjm/wudoovm)
+
 A simple, bytecode driven, register-based virtual machine.
 
 I develop Viua VM to learn how such software is created and
