@@ -625,24 +625,23 @@ Program& Program::branch(int_op regc, int addr_truth, enum JUMPTYPE absolute_tru
     /*  Inserts branch instruction.
      *  Byte offset is calculated automatically.
      */
+    byte* jump_position_in_bytecode = addr_ptr;
 
-    *(addr_ptr++) = BRANCH;
-    addr_ptr = insertIntegerOperand(addr_ptr, regc);
-
+    jump_position_in_bytecode += sizeof(byte); // for opcode
+    jump_position_in_bytecode += sizeof(bool); // for at-register flag
+    jump_position_in_bytecode += sizeof(int);  // for integer with register index
     // save jump position if jump is not to byte
     if (absolute_truth != JMP_TO_BYTE) {
-        (absolute_truth == JMP_ABSOLUTE ? branches_absolute : branches).push_back(addr_ptr);
+        (absolute_truth == JMP_ABSOLUTE ? branches_absolute : branches).push_back(jump_position_in_bytecode);
     }
-    *((int*)addr_ptr) = addr_truth;
-    pointer::inc<int, byte>(addr_ptr);
 
+    jump_position_in_bytecode += sizeof(int);  // for integer with jump address
     // save jump position if jump is not to byte
     if (absolute_false != JMP_TO_BYTE) {
-        (absolute_truth == JMP_ABSOLUTE ? branches_absolute : branches).push_back(addr_ptr);
+        (absolute_truth == JMP_ABSOLUTE ? branches_absolute : branches).push_back(jump_position_in_bytecode);
     }
-    *((int*)addr_ptr) = addr_false;
-    pointer::inc<int, byte>(addr_ptr);
 
+    addr_ptr = cg::bytecode::branch(addr_ptr, regc, addr_truth, absolute_truth, addr_false, absolute_false);
     return (*this);
 }
 
