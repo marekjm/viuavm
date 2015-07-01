@@ -92,8 +92,8 @@ namespace cg {
         byte* echo(byte* addr_ptr, int_op reg);
 
         byte* clbind(byte* addr_ptr, int_op reg);
-        byte* closure(byte* addr_ptr, std::string fn, int_op reg);
-        byte* function(byte* addr_ptr, std::string fn, int_op reg);
+        byte* closure(byte* addr_ptr, const std::string& fn, int_op reg);
+        byte* function(byte* addr_ptr, const std::string& fn, int_op reg);
         byte* fcall(byte* addr_ptr, int_op clsr, int_op ret);
 
         byte* frame(byte* addr_ptr, int_op a, int_op b);

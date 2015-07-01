@@ -543,39 +543,28 @@ Program& Program::echo(int_op reg) {
 Program& Program::clbind(int_op reg) {
     /*  Inserts clbing instuction.
      */
-    *(addr_ptr++) = CLBIND;
-    addr_ptr = insertIntegerOperand(addr_ptr, reg);
+    addr_ptr = cg::bytecode::clbind(addr_ptr, reg);
     return (*this);
 }
 
 Program& Program::closure(string fn, int_op reg) {
     /*  Inserts closure instuction.
      */
-    *(addr_ptr++) = CLOSURE;
-    for (unsigned i = 0; i < fn.size(); ++i) {
-        *((char*)addr_ptr++) = fn[i];
-    }
-    *(addr_ptr++) = '\0';
-    addr_ptr = insertIntegerOperand(addr_ptr, reg);
+    addr_ptr = cg::bytecode::closure(addr_ptr, fn, reg);
     return (*this);
 }
 
 Program& Program::function(string fn, int_op reg) {
     /*  Inserts function instuction.
      */
-    *(addr_ptr++) = FUNCTION;
-    for (unsigned i = 0; i < fn.size(); ++i) {
-        *((char*)addr_ptr++) = fn[i];
-    }
-    *(addr_ptr++) = '\0';
-    addr_ptr = insertIntegerOperand(addr_ptr, reg);
+    addr_ptr = cg::bytecode::function(addr_ptr, fn, reg);
     return (*this);
 }
 
 Program& Program::fcall(int_op clsr, int_op ret) {
     /*  Inserts fcall instruction to bytecode.
      */
-    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, FCALL, clsr, ret);
+    addr_ptr = cg::bytecode::fcall(addr_ptr, clsr, ret);
     return (*this);
 }
 

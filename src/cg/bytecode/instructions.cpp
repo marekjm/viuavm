@@ -616,7 +616,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* closure(byte* addr_ptr, string fn, int_op reg) {
+        byte* closure(byte* addr_ptr, const string& fn, int_op reg) {
             /*  Inserts closure instuction.
              */
             *(addr_ptr++) = CLOSURE;
@@ -628,7 +628,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* function(byte* addr_ptr, string fn, int_op reg) {
+        byte* function(byte* addr_ptr, const string& fn, int_op reg) {
             /*  Inserts function instuction.
              */
             *(addr_ptr++) = FUNCTION;
