@@ -25,3 +25,4 @@ tmp/*
 
 !.gitkeep
 !.gitignore
+!.travis.yml
