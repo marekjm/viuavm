@@ -8,4 +8,4 @@ before_install:
     - sudo apt-get update
 
 install:
-    - sudo apt-get install openssl openssl-dev
+    - sudo apt-get install openssl
