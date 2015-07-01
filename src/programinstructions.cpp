@@ -494,17 +494,7 @@ Program& Program::ress(string a) {
      *
      *  a - register set ID
      */
-    *(addr_ptr++) = RESS;
-    if (a == "global") {
-        *((int*)addr_ptr) = 0;
-    } else if (a == "local") {
-        *((int*)addr_ptr) = 1;
-    } else if (a == "static") {
-        *((int*)addr_ptr) = 2;
-    } else if (a == "temp") {
-        *((int*)addr_ptr) = 3;
-    }
-    pointer::inc<int, byte>(addr_ptr);
+    addr_ptr = cg::bytecode::ress(addr_ptr, a);
     return (*this);
 }
 
