@@ -2,7 +2,7 @@
 using namespace std;
 
 
-byte* insertIntegerOperand(byte* addr_ptr, int_op op) {
+static byte* insertIntegerOperand(byte* addr_ptr, int_op op) {
     /** Insert integer operand into bytecode.
      *
      *  When using integer operand, it usually is a plain number - which translates to a regsiter index.
@@ -23,7 +23,7 @@ byte* insertIntegerOperand(byte* addr_ptr, int_op op) {
     return addr_ptr;
 }
 
-byte* insertTwoIntegerOpsInstruction(byte* addr_ptr, enum OPCODE instruction, int_op a, int_op b) {
+static byte* insertTwoIntegerOpsInstruction(byte* addr_ptr, enum OPCODE instruction, int_op a, int_op b) {
     /** Insert instruction with two integer operands.
      */
     *(addr_ptr++) = instruction;
@@ -32,7 +32,7 @@ byte* insertTwoIntegerOpsInstruction(byte* addr_ptr, enum OPCODE instruction, in
     return addr_ptr;
 }
 
-byte* insertThreeIntegerOpsInstruction(byte* addr_ptr, enum OPCODE instruction, int_op a, int_op b, int_op c) {
+static byte* insertThreeIntegerOpsInstruction(byte* addr_ptr, enum OPCODE instruction, int_op a, int_op b, int_op c) {
     /** Insert instruction with two integer operands.
      */
     *(addr_ptr++) = instruction;

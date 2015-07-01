@@ -22,12 +22,6 @@ enum JUMPTYPE {
     JMP_TO_BYTE,
 };
 
-
-byte* insertIntegerOperand(byte* addr_ptr, int_op op);
-byte* insertTwoIntegerOpsInstruction(byte* addr_ptr, enum OPCODE instruction, int_op a, int_op b);
-byte* insertThreeIntegerOpsInstruction(byte* addr_ptr, enum OPCODE instruction, int_op a, int_op b, int_op c);
-
-
 namespace cg {
     namespace bytecode {
         byte* nop(byte* addr_ptr);
