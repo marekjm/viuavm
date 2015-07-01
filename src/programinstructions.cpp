@@ -617,7 +617,7 @@ Program& Program::jump(int addr, enum JUMPTYPE is_absolute) {
         (is_absolute == JMP_ABSOLUTE ? branches_absolute : branches).push_back((addr_ptr+1));
     }
 
-    addr_ptr = cg::bytecode::jump(addr_ptr, addr, is_absolute);
+    addr_ptr = cg::bytecode::jump(addr_ptr, addr);
     return (*this);
 }
 

@@ -703,7 +703,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* jump(byte* addr_ptr, int addr, enum JUMPTYPE is_absolute) {
+        byte* jump(byte* addr_ptr, int addr) {
             /*  Inserts jump instruction. Parameter is instruction index.
              *  Byte offset is calculated automatically.
              *
