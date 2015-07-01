@@ -719,11 +719,10 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* branch(byte* addr_ptr, int_op regc, int addr_truth, enum JUMPTYPE absolute_truth, int addr_false, enum JUMPTYPE absolute_false) {
+        byte* branch(byte* addr_ptr, int_op regc, int addr_truth, int addr_false) {
             /*  Inserts branch instruction.
              *  Byte offset is calculated automatically.
              */
-
             *(addr_ptr++) = BRANCH;
             addr_ptr = insertIntegerOperand(addr_ptr, regc);
 

@@ -103,7 +103,7 @@ namespace cg {
         byte* call(byte* addr_ptr, const std::string& fn_name, int_op reg);
 
         byte* jump(byte* addr_ptr, int addr, enum JUMPTYPE is_absolute);
-        byte* branch(byte* addr_ptr, int_op regc, int addr_truth, enum JUMPTYPE absolute_truth, int addr_false, enum JUMPTYPE absolute_false);
+        byte* branch(byte* addr_ptr, int_op regc, int addr_truth, int addr_false);
 
         byte* tryframe(byte* addr_ptr);
         byte* vmcatch(byte* addr_ptr, const std::string& type_name, const std::string& block_name);

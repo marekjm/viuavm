@@ -641,7 +641,7 @@ Program& Program::branch(int_op regc, int addr_truth, enum JUMPTYPE absolute_tru
         (absolute_truth == JMP_ABSOLUTE ? branches_absolute : branches).push_back(jump_position_in_bytecode);
     }
 
-    addr_ptr = cg::bytecode::branch(addr_ptr, regc, addr_truth, absolute_truth, addr_false, absolute_false);
+    addr_ptr = cg::bytecode::branch(addr_ptr, regc, addr_truth, addr_false);
     return (*this);
 }
 
