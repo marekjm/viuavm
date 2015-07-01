@@ -724,13 +724,13 @@ Program& Program::excall(string fn_name, int_op reg) {
 Program& Program::end() {
     /*  Inserts end instruction.
      */
-    *(addr_ptr++) = END;
+    addr_ptr = cg::bytecode::end(addr_ptr);
     return (*this);
 }
 
 Program& Program::halt() {
     /*  Inserts halt instruction.
      */
-    *(addr_ptr++) = HALT;
+    addr_ptr = cg::bytecode::halt(addr_ptr);
     return (*this);
 }
