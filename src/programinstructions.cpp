@@ -657,35 +657,21 @@ Program& Program::branch(int_op regc, int addr_truth, enum JUMPTYPE absolute_tru
 Program& Program::tryframe() {
     /*  Inserts tryframe instruction.
      */
-    *(addr_ptr++) = TRYFRAME;
+    addr_ptr = cg::bytecode::tryframe(addr_ptr);
     return (*this);
 }
 
 Program& Program::vmcatch(string type_name, string block_name) {
     /*  Inserts catch instruction.
      */
-    *(addr_ptr++) = CATCH;
-
-    // the type
-    for (unsigned i = 1; i < type_name.size()-1; ++i) {
-        *((char*)addr_ptr++) = type_name[i];
-    }
-    *((char*)addr_ptr++) = '\0';
-
-    // catcher block name
-    for (unsigned i = 0; i < block_name.size(); ++i) {
-        *((char*)addr_ptr++) = block_name[i];
-    }
-    *((char*)addr_ptr++) = '\0';
-
+    addr_ptr = cg::bytecode::vmcatch(addr_ptr, type_name, block_name);
     return (*this);
 }
 
 Program& Program::pull(int_op regno) {
     /*  Inserts throw instuction.
      */
-    *(addr_ptr++) = PULL;
-    addr_ptr = insertIntegerOperand(addr_ptr, regno);
+    addr_ptr = cg::bytecode::pull(addr_ptr, regno);
     return (*this);
 }
 
@@ -693,26 +679,21 @@ Program& Program::vmtry(string block_name) {
     /*  Inserts try instruction.
      *  Byte offset is calculated automatically.
      */
-    *(addr_ptr++) = TRY;
-    for (unsigned i = 0; i < block_name.size(); ++i) {
-        *((char*)addr_ptr++) = block_name[i];
-    }
-    *(addr_ptr++) = '\0';
+    addr_ptr = cg::bytecode::vmtry(addr_ptr, block_name);
     return (*this);
 }
 
 Program& Program::vmthrow(int_op regno) {
     /*  Inserts throw instuction.
      */
-    *(addr_ptr++) = THROW;
-    addr_ptr = insertIntegerOperand(addr_ptr, regno);
+    addr_ptr = cg::bytecode::vmthrow(addr_ptr, regno);
     return (*this);
 }
 
 Program& Program::leave() {
     /*  Inserts leave instruction.
      */
-    *(addr_ptr++) = LEAVE;
+    addr_ptr = cg::bytecode::leave(addr_ptr);
     return (*this);
 }
 

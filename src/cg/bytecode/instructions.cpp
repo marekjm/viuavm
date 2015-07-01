@@ -743,7 +743,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* vmcatch(byte* addr_ptr, string type_name, string block_name) {
+        byte* vmcatch(byte* addr_ptr, const string& type_name, const string& block_name) {
             /*  Inserts catch instruction.
              */
             *(addr_ptr++) = CATCH;
@@ -771,7 +771,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* vmtry(byte* addr_ptr, string block_name) {
+        byte* vmtry(byte* addr_ptr, const string& block_name) {
             /*  Inserts try instruction.
              *  Byte offset is calculated automatically.
              */
