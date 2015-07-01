@@ -340,43 +340,42 @@ Program& Program::strstore(int_op reg, string s) {
 Program& Program::vec(int_op index) {
     /** Inserts vec instruction.
      */
-    *(addr_ptr++) = VEC;
-    addr_ptr = insertIntegerOperand(addr_ptr, index);
+    addr_ptr = cg::bytecode::vec(addr_ptr, index);
     return (*this);
 }
 
 Program& Program::vinsert(int_op vec, int_op src, int_op dst) {
     /** Inserts vinsert instruction.
      */
-    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, VINSERT, vec, src, dst);
+    addr_ptr = cg::bytecode::vinsert(addr_ptr, vec, src, dst);
     return (*this);
 }
 
 Program& Program::vpush(int_op vec, int_op src) {
     /** Inserts vpush instruction.
      */
-    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, VPUSH, vec, src);
+    addr_ptr = cg::bytecode::vpush(addr_ptr, vec, src);
     return (*this);
 }
 
 Program& Program::vpop(int_op vec, int_op dst, int_op pos) {
     /** Inserts vpop instruction.
      */
-    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, VPOP, vec, dst, pos);
+    addr_ptr = cg::bytecode::vpop(addr_ptr, vec, dst, pos);
     return (*this);
 }
 
 Program& Program::vat(int_op vec, int_op dst, int_op at) {
     /** Inserts vat instruction.
      */
-    addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, VAT, vec, dst, at);
+    addr_ptr = cg::bytecode::vat(addr_ptr, vec, dst, at);
     return (*this);
 }
 
 Program& Program::vlen(int_op vec, int_op reg) {
     /** Inserts vlen instruction.
      */
-    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, VLEN, vec, reg);
+    addr_ptr = cg::bytecode::vlen(addr_ptr, vec, reg);
     return (*this);
 }
 
