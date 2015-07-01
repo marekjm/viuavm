@@ -555,7 +555,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* ress(byte* addr_ptr, string a) {
+        byte* ress(byte* addr_ptr, const string& a) {
             /*  Inserts ress instruction to bytecode.
              *
              *  :params:

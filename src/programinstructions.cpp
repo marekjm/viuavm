@@ -421,7 +421,7 @@ Program& Program::move(int_op a, int_op b) {
      *  a - register number (move from...)
      *  b - register number (move to...)
      */
-    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, MOVE, a, b);
+    addr_ptr = cg::bytecode::move(addr_ptr, a, b);
     return (*this);
 }
 
@@ -433,7 +433,7 @@ Program& Program::copy(int_op a, int_op b) {
      *  a - register number (copy from...)
      *  b - register number (copy to...)
      */
-    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, COPY, a, b);
+    addr_ptr = cg::bytecode::copy(addr_ptr, a, b);
     return (*this);
 }
 
@@ -445,7 +445,7 @@ Program& Program::ref(int_op a, int_op b) {
      *  a - register number
      *  b - register number
      */
-    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, REF, a, b);
+    addr_ptr = cg::bytecode::ref(addr_ptr, a, b);
     return (*this);
 }
 
@@ -457,23 +457,21 @@ Program& Program::swap(int_op a, int_op b) {
      *  a - register number
      *  b - register number
      */
-    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, SWAP, a, b);
+    addr_ptr = cg::bytecode::swap(addr_ptr, a, b);
     return (*this);
 }
 
 Program& Program::free(int_op reg) {
     /*  Inserts free instuction.
      */
-    *(addr_ptr++) = FREE;
-    addr_ptr = insertIntegerOperand(addr_ptr, reg);
+    addr_ptr = cg::bytecode::free(addr_ptr, reg);
     return (*this);
 }
 
 Program& Program::empty(int_op reg) {
     /*  Inserts empty instuction.
      */
-    *(addr_ptr++) = EMPTY;
-    addr_ptr = insertIntegerOperand(addr_ptr, reg);
+    addr_ptr = cg::bytecode::empty(addr_ptr, reg);
     return (*this);
 }
 
@@ -485,7 +483,7 @@ Program& Program::isnull(int_op a, int_op b) {
      *  a - register number
      *  b - register number
      */
-    addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, ISNULL, a, b);
+    addr_ptr = cg::bytecode::isnull(addr_ptr, a, b);
     return (*this);
 }
 
