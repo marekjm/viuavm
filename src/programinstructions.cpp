@@ -500,32 +500,28 @@ Program& Program::ress(string a) {
 Program& Program::tmpri(int_op reg) {
     /*  Inserts tmpri instuction.
      */
-    *(addr_ptr++) = TMPRI;
-    addr_ptr = insertIntegerOperand(addr_ptr, reg);
+    addr_ptr = cg::bytecode::tmpri(addr_ptr, reg);
     return (*this);
 }
 
 Program& Program::tmpro(int_op reg) {
     /*  Inserts tmpro instuction.
      */
-    *(addr_ptr++) = TMPRO;
-    addr_ptr = insertIntegerOperand(addr_ptr, reg);
+    addr_ptr = cg::bytecode::tmpro(addr_ptr, reg);
     return (*this);
 }
 
 Program& Program::print(int_op reg) {
     /*  Inserts print instuction.
      */
-    *(addr_ptr++) = PRINT;
-    addr_ptr = insertIntegerOperand(addr_ptr, reg);
+    addr_ptr = cg::bytecode::print(addr_ptr, reg);
     return (*this);
 }
 
 Program& Program::echo(int_op reg) {
     /*  Inserts echo instuction.
      */
-    *(addr_ptr++) = ECHO;
-    addr_ptr = insertIntegerOperand(addr_ptr, reg);
+    addr_ptr = cg::bytecode::echo(addr_ptr, reg);
     return (*this);
 }
 
