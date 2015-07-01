@@ -614,7 +614,7 @@ Program& Program::jump(int addr, enum JUMPTYPE is_absolute) {
      */
     // save jump position if jump is not to byte
     if (is_absolute != JMP_TO_BYTE) {
-        (is_absolute == JMP_ABSOLUTE ? branches_absolute : branches).push_back(addr_ptr);
+        (is_absolute == JMP_ABSOLUTE ? branches_absolute : branches).push_back((addr_ptr+1));
     }
 
     addr_ptr = cg::bytecode::jump(addr_ptr, addr, is_absolute);
