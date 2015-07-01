@@ -798,7 +798,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* eximport(byte* addr_ptr, string module_name) {
+        byte* eximport(byte* addr_ptr, const string& module_name) {
             /*  Inserts eximport instruction.
              */
             *(addr_ptr++) = EXIMPORT;
@@ -809,7 +809,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* excall(byte* addr_ptr, string fn_name, int_op reg) {
+        byte* excall(byte* addr_ptr, const string& fn_name, int_op reg) {
             /*  Inserts excall instruction.
              *  Byte offset is calculated automatically.
              */

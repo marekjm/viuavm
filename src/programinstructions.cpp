@@ -700,11 +700,7 @@ Program& Program::leave() {
 Program& Program::eximport(string module_name) {
     /*  Inserts eximport instruction.
      */
-    *(addr_ptr++) = EXIMPORT;
-    for (unsigned i = 1; i < module_name.size()-1; ++i) {
-        *((char*)addr_ptr++) = module_name[i];
-    }
-    *((char*)addr_ptr++) = char(0);
+    addr_ptr = cg::bytecode::eximport(addr_ptr, module_name);
     return (*this);
 }
 
@@ -712,12 +708,7 @@ Program& Program::excall(string fn_name, int_op reg) {
     /*  Inserts excall instruction.
      *  Byte offset is calculated automatically.
      */
-    *(addr_ptr++) = EXCALL;
-    for (unsigned i = 0; i < fn_name.size(); ++i) {
-        *((char*)addr_ptr++) = fn_name[i];
-    }
-    *(addr_ptr++) = '\0';
-    addr_ptr = insertIntegerOperand(addr_ptr, reg);
+    addr_ptr = cg::bytecode::excall(addr_ptr, fn_name, reg);
     return (*this);
 }
 

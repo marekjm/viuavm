@@ -112,8 +112,8 @@ namespace cg {
         byte* vmthrow(byte* addr_ptr, int_op regno);
         byte* leave(byte* addr_ptr);
 
-        byte* eximport(byte* addr_ptr, std::string module_name);
-        byte* excall(byte* addr_ptr, std::string fn_name, int_op reg);
+        byte* eximport(byte* addr_ptr, const std::string& module_name);
+        byte* excall(byte* addr_ptr, const std::string& fn_name, int_op reg);
 
         byte* end(byte* addr_ptr);
         byte* halt(byte* addr_ptr);
