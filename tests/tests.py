@@ -1332,7 +1332,7 @@ class ExternalModulesTests(unittest.TestCase):
         name = 'hello_world.asm'
         assembly_path = os.path.join(self.PATH, name)
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        os.system('g++ -std=c++11 -fPIC -shared -o World.so ./sample/asm/external/World.cpp')
+        os.system('{0} -std=c++11 -fPIC -shared -o World.so ./sample/asm/external/World.cpp'.format((os.getenv('CXX') or 'g++')))
         output, error, exit_code = assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual("Hello World!", output.strip())
@@ -1350,9 +1350,9 @@ class ExternalModulesTests(unittest.TestCase):
         name = 'sqrt.asm'
         assembly_path = os.path.join(self.PATH, name)
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        os.system('g++ -std=c++11 -fPIC -c -o registerset.o ./src/cpu/registerset.cpp')
-        os.system('g++ -std=c++11 -fPIC -c -o exception.o ./src/types/exception.cpp')
-        os.system('g++ -std=c++11 -fPIC -shared -o math.so ./sample/asm/external/math.cpp registerset.o exception.o')
+        os.system('{0} -std=c++11 -fPIC -c -o registerset.o ./src/cpu/registerset.cpp'.format((os.getenv('CXX') or 'g++')))
+        os.system('{0} -std=c++11 -fPIC -c -o exception.o ./src/types/exception.cpp'.format((os.getenv('CXX') or 'g++')))
+        os.system('{0} -std=c++11 -fPIC -shared -o math.so ./sample/asm/external/math.cpp registerset.o exception.o'.format((os.getenv('CXX') or 'g++')))
         output, error, exit_code = assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         self.assertEqual(1.73, round(float(output.strip()), 2))
