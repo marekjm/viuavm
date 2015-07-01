@@ -298,18 +298,7 @@ Program& Program::bstore(int_op regno, byte_op b) {
      *  regno - register number
      *  b     - value to store
      */
-    bool b_ref = false;
-    byte bt;
-
-    tie(b_ref, bt) = b;
-
-    *(addr_ptr++) = BSTORE;
-    addr_ptr = insertIntegerOperand(addr_ptr, regno);
-    *((bool*)addr_ptr) = b_ref;
-    pointer::inc<bool, byte>(addr_ptr);
-    *((byte*)addr_ptr)  = bt;
-    ++addr_ptr;
-
+    addr_ptr = cg::bytecode::bstore(addr_ptr, regno, b);
     return (*this);
 }
 
