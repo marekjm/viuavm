@@ -13,27 +13,27 @@ using namespace std;
 byte* CPU::itof(byte* addr) {
     /*  Run itof instruction.
      */
-    bool rega_ref, regb_ref;
-    int rega_num, regb_num;
+    bool first_operand_ref, destination_register_ref;
+    int first_operand_index, destination_register_index;
 
-    rega_ref = *((bool*)addr);
+    destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    rega_num = *((int*)addr);
+    destination_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regb_ref = *((bool*)addr);
+    first_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    regb_num = *((int*)addr);
+    first_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (rega_ref) {
-        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    if (first_operand_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
-    if (regb_ref) {
-        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
+    if (destination_register_ref) {
+        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
     }
 
-    place(regb_num, new Float(static_cast<Integer*>(fetch(rega_num))->value()));
+    place(destination_register_index, new Float(static_cast<Integer*>(fetch(first_operand_index))->value()));
 
     return addr;
 }
@@ -41,27 +41,27 @@ byte* CPU::itof(byte* addr) {
 byte* CPU::ftoi(byte* addr) {
     /*  Run ftoi instruction.
      */
-    bool rega_ref, regb_ref;
-    int rega_num, regb_num;
+    bool first_operand_ref, destination_register_ref;
+    int first_operand_index, destination_register_index;
 
-    rega_ref = *((bool*)addr);
+    destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    rega_num = *((int*)addr);
+    destination_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regb_ref = *((bool*)addr);
+    first_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    regb_num = *((int*)addr);
+    first_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (rega_ref) {
-        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    if (first_operand_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
-    if (regb_ref) {
-        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
+    if (destination_register_ref) {
+        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
     }
 
-    place(regb_num, new Integer(static_cast<Float*>(fetch(rega_num))->value()));
+    place(destination_register_index, new Integer(static_cast<Float*>(fetch(first_operand_index))->value()));
 
     return addr;
 }
@@ -69,27 +69,27 @@ byte* CPU::ftoi(byte* addr) {
 byte* CPU::stoi(byte* addr) {
     /*  Run stoi instruction.
      */
-    bool rega_ref, regb_ref;
-    int rega_num, regb_num;
+    bool first_operand_ref, destination_register_ref;
+    int first_operand_index, destination_register_index;
 
-    rega_ref = *((bool*)addr);
+    destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    rega_num = *((int*)addr);
+    destination_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regb_ref = *((bool*)addr);
+    first_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    regb_num = *((int*)addr);
+    first_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (rega_ref) {
-        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    if (first_operand_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
-    if (regb_ref) {
-        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
+    if (destination_register_ref) {
+        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
     }
 
-    place(regb_num, new Integer(std::stoi(static_cast<String*>(fetch(rega_num))->value())));
+    place(destination_register_index, new Integer(std::stoi(static_cast<String*>(fetch(first_operand_index))->value())));
 
     return addr;
 }
@@ -97,27 +97,27 @@ byte* CPU::stoi(byte* addr) {
 byte* CPU::stof(byte* addr) {
     /*  Run stof instruction.
      */
-    bool rega_ref, regb_ref;
-    int rega_num, regb_num;
+    bool first_operand_ref, destination_register_ref;
+    int first_operand_index, destination_register_index;
 
-    rega_ref = *((bool*)addr);
+    destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    rega_num = *((int*)addr);
+    destination_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regb_ref = *((bool*)addr);
+    first_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    regb_num = *((int*)addr);
+    first_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (rega_ref) {
-        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    if (first_operand_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
-    if (regb_ref) {
-        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
+    if (destination_register_ref) {
+        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
     }
 
-    place(regb_num, new Float(std::stod(static_cast<String*>(fetch(rega_num))->value())));
+    place(destination_register_index, new Float(std::stod(static_cast<String*>(fetch(first_operand_index))->value())));
 
     return addr;
 }
