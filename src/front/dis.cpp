@@ -23,6 +23,7 @@ bool VERBOSE = false;
 
 bool DISASSEMBLE_ENTRY = false;
 bool INCLUDE_INFO = false;
+bool LINE_BY_LINE = false;
 
 
 bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE) {
@@ -42,6 +43,7 @@ bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE)
              << "    " << "-o, --out                - output to given path (by default prints to cout)\n"
              << "    " << "-i, --info               - include information about executable in output\n"
              << "    " << "-e, --with-entry         - include __entry function in disassembly\n"
+             << "    " << "-L, --line-by-line       - display output line by line\n"
              ;
     }
 
@@ -52,6 +54,9 @@ int main(int argc, char* argv[]) {
     // setup command line arguments vector
     vector<string> args;
     string option;
+
+    // for getline()
+    string dummy;
 
     string filename = "";
     string disasmname = "";
@@ -67,6 +72,8 @@ int main(int argc, char* argv[]) {
             DISASSEMBLE_ENTRY = true;
         } else if ((option == "--info") or (option == "-i")) {
             INCLUDE_INFO = true;
+        } else if ((option == "--line-by-line") or (option == "-L")) {
+            LINE_BY_LINE = true;
         } else if (option == "--out" or option == "-o") {
             if (i < argc-1) {
                 disasmname = string(argv[++i]);
@@ -169,11 +176,16 @@ int main(int argc, char* argv[]) {
 
         oss << ".block: " << name << '\n';
 
+        if (LINE_BY_LINE) {
+            cout << oss.str();
+            getline(cin, dummy);
+        }
+
         string opname;
         bool disasm_terminated = false;
         for (unsigned j = 0; j < fn_size;) {
+            string instruction;
             try {
-                string instruction;
                 unsigned size;
                 tie(instruction, size) = disassembler::instruction((bytecode+block_address_mapping[name]+j));
                 oss << "    " << instruction << '\n';
@@ -191,6 +203,11 @@ int main(int argc, char* argv[]) {
                 disasm_terminated = true;
                 break;
             }
+
+            if (LINE_BY_LINE) {
+                cout << "    " << instruction;
+                getline(cin, dummy);
+            }
         }
         if (disasm_terminated) {
             disassembled_lines.push_back(oss.str());
@@ -198,6 +215,10 @@ int main(int argc, char* argv[]) {
         }
 
         oss << ".end" << '\n';
+        if (LINE_BY_LINE) {
+            cout << ".end" << endl;
+            getline(cin, dummy);
+        }
 
         if (i < (blocks.size()-1)) {
             oss << '\n';
@@ -221,12 +242,16 @@ int main(int argc, char* argv[]) {
         oss.str("");
 
         oss << ".function: " << name << '\n';
+        if (LINE_BY_LINE) {
+            cout << ".function: " << name;
+            getline(cin, dummy);
+        }
 
         string opname;
         bool disasm_terminated = false;
         for (unsigned j = 0; j < fn_size;) {
+            string instruction;
             try {
-                string instruction;
                 unsigned size;
                 tie(instruction, size) = disassembler::instruction((bytecode+function_address_mapping[name]+j));
                 oss << "    " << instruction << '\n';
@@ -244,6 +269,11 @@ int main(int argc, char* argv[]) {
                 disasm_terminated = true;
                 break;
             }
+
+            if (LINE_BY_LINE) {
+                cout << "    " << instruction;
+                getline(cin, dummy);
+            }
         }
         if (disasm_terminated) {
             disassembled_lines.push_back(oss.str());
@@ -251,6 +281,11 @@ int main(int argc, char* argv[]) {
         }
 
         oss << ".end" << '\n';
+
+        if (LINE_BY_LINE) {
+            cout << ".end" << endl;
+            getline(cin, dummy);
+        }
 
         if (i < (functions.size()-1)) {
             oss << '\n';
@@ -264,6 +299,11 @@ int main(int argc, char* argv[]) {
         assembly_code << disassembled_lines[i];
     }
 
+
+    // do not print full dump if line-by-line
+    if (LINE_BY_LINE) {
+        return 0;
+    }
     if (disasmname.size()) {
         ofstream out(disasmname);
         out << assembly_code.str();
