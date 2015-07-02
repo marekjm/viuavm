@@ -3,7 +3,7 @@
 
     istore 2 27
 
-    stoi 1 3
+    stoi 3 1
     iadd 2 3 3
 
     print 3
