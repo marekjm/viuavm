@@ -18,93 +18,93 @@ typedef std::tuple<bool, float> float_op;
 
 namespace cg {
     namespace bytecode {
-        byte* nop(byte* addr_ptr);
+        byte* nop(byte*);
 
-        byte* izero(byte* addr_ptr, int_op regno);
-        byte* istore(byte* addr_ptr, int_op regno, int_op i);
-        byte* iadd(byte* addr_ptr, int_op rega, int_op regb, int_op regr);
-        byte* isub(byte* addr_ptr, int_op rega, int_op regb, int_op regr);
-        byte* imul(byte* addr_ptr, int_op rega, int_op regb, int_op regr);
-        byte* idiv(byte* addr_ptr, int_op rega, int_op regb, int_op regr);
-        byte* iinc(byte* addr_ptr, int_op regno);
-        byte* idec(byte* addr_ptr, int_op regno);
-        byte* ilt(byte* addr_ptr, int_op rega, int_op regb, int_op regr);
-        byte* ilte(byte* addr_ptr, int_op rega, int_op regb, int_op regr);
-        byte* igt(byte* addr_ptr, int_op rega, int_op regb, int_op regr);
-        byte* igte(byte* addr_ptr, int_op rega, int_op regb, int_op regr);
-        byte* ieq(byte* addr_ptr, int_op rega, int_op regb, int_op regr);
+        byte* izero(byte*, int_op);
+        byte* istore(byte*, int_op, int_op);
+        byte* iadd(byte*, int_op, int_op, int_op);
+        byte* isub(byte*, int_op, int_op, int_op);
+        byte* imul(byte*, int_op, int_op, int_op);
+        byte* idiv(byte*, int_op, int_op, int_op);
+        byte* iinc(byte*, int_op);
+        byte* idec(byte*, int_op);
+        byte* ilt(byte*, int_op, int_op, int_op);
+        byte* ilte(byte*, int_op, int_op, int_op);
+        byte* igt(byte*, int_op, int_op, int_op);
+        byte* igte(byte*, int_op, int_op, int_op);
+        byte* ieq(byte*, int_op, int_op, int_op);
 
-        byte* fstore(byte* addr_ptr, int_op regno, float f);
-        byte* fadd(byte* addr_ptr, int_op rega, int_op regb, int_op regr);
-        byte* fsub(byte* addr_ptr, int_op rega, int_op regb, int_op regr);
-        byte* fmul(byte* addr_ptr, int_op rega, int_op regb, int_op regr);
-        byte* fdiv(byte* addr_ptr, int_op rega, int_op regb, int_op regr);
-        byte* flt(byte* addr_ptr, int_op rega, int_op regb, int_op regr);
-        byte* flte(byte* addr_ptr, int_op rega, int_op regb, int_op regr);
-        byte* fgt(byte* addr_ptr, int_op rega, int_op regb, int_op regr);
-        byte* fgte(byte* addr_ptr, int_op rega, int_op regb, int_op regr);
-        byte* feq(byte* addr_ptr, int_op rega, int_op regb, int_op regr);
+        byte* fstore(byte*, int_op, float);
+        byte* fadd(byte*, int_op, int_op, int_op);
+        byte* fsub(byte*, int_op, int_op, int_op);
+        byte* fmul(byte*, int_op, int_op, int_op);
+        byte* fdiv(byte*, int_op, int_op, int_op);
+        byte* flt(byte*, int_op, int_op, int_op);
+        byte* flte(byte*, int_op, int_op, int_op);
+        byte* fgt(byte*, int_op, int_op, int_op);
+        byte* fgte(byte*, int_op, int_op, int_op);
+        byte* feq(byte*, int_op, int_op, int_op);
 
-        byte* bstore(byte* addr_ptr, int_op regno, byte_op b);
+        byte* bstore(byte*, int_op, byte_op);
 
-        byte* itof(byte* addr_ptr, int_op a, int_op b);
-        byte* ftoi(byte* addr_ptr, int_op a, int_op b);
-        byte* stoi(byte* addr_ptr, int_op a, int_op b);
-        byte* stof(byte* addr_ptr, int_op a, int_op b);
+        byte* itof(byte*, int_op, int_op);
+        byte* ftoi(byte*, int_op, int_op);
+        byte* stoi(byte*, int_op, int_op);
+        byte* stof(byte*, int_op, int_op);
 
-        byte* strstore(byte* addr_ptr, int_op reg, std::string s);
+        byte* strstore(byte*, int_op, std::string);
 
-        byte* vec(byte* addr_ptr, int_op index);
-        byte* vinsert(byte* addr_ptr, int_op vec, int_op src, int_op dst);
-        byte* vpush(byte* addr_ptr, int_op vec, int_op src);
-        byte* vpop(byte* addr_ptr, int_op vec, int_op dst, int_op pos);
-        byte* vat(byte* addr_ptr, int_op vec, int_op dst, int_op at);
-        byte* vlen(byte* addr_ptr, int_op vec, int_op reg);
+        byte* vec(byte*, int_op);
+        byte* vinsert(byte*, int_op, int_op, int_op);
+        byte* vpush(byte*, int_op, int_op);
+        byte* vpop(byte*, int_op, int_op, int_op);
+        byte* vat(byte*, int_op, int_op, int_op);
+        byte* vlen(byte*, int_op, int_op);
 
         byte* lognot(byte*, int_op);
         byte* logand(byte*, int_op, int_op, int_op);
         byte* logor(byte*, int_op, int_op, int_op);
 
-        byte* move(byte* addr_ptr, int_op a, int_op b);
-        byte* copy(byte* addr_ptr, int_op a, int_op b);
-        byte* ref(byte* addr_ptr, int_op a, int_op b);
-        byte* swap(byte* addr_ptr, int_op a, int_op b);
-        byte* free(byte* addr_ptr, int_op reg);
-        byte* empty(byte* addr_ptr, int_op reg);
-        byte* isnull(byte* addr_ptr, int_op a, int_op b);
-        byte* ress(byte* addr_ptr, const std::string& a);
-        byte* tmpri(byte* addr_ptr, int_op reg);
-        byte* tmpro(byte* addr_ptr, int_op reg);
+        byte* move(byte*, int_op, int_op);
+        byte* copy(byte*, int_op, int_op);
+        byte* ref(byte*, int_op, int_op);
+        byte* swap(byte*, int_op, int_op);
+        byte* free(byte*, int_op);
+        byte* empty(byte*, int_op);
+        byte* isnull(byte*, int_op, int_op);
+        byte* ress(byte*, const std::string&);
+        byte* tmpri(byte*, int_op);
+        byte* tmpro(byte*, int_op);
 
-        byte* print(byte* addr_ptr, int_op reg);
-        byte* echo(byte* addr_ptr, int_op reg);
+        byte* print(byte*, int_op);
+        byte* echo(byte*, int_op);
 
-        byte* clbind(byte* addr_ptr, int_op reg);
-        byte* closure(byte* addr_ptr, const std::string& fn, int_op reg);
-        byte* function(byte* addr_ptr, const std::string& fn, int_op reg);
-        byte* fcall(byte* addr_ptr, int_op clsr, int_op ret);
+        byte* clbind(byte*, int_op);
+        byte* closure(byte*, const std::string&, int_op);
+        byte* function(byte*, const std::string&, int_op);
+        byte* fcall(byte*, int_op, int_op);
 
-        byte* frame(byte* addr_ptr, int_op a, int_op b);
-        byte* param(byte* addr_ptr, int_op a, int_op b);
-        byte* paref(byte* addr_ptr, int_op a, int_op b);
-        byte* arg(byte* addr_ptr, int_op a, int_op b);
-        byte* call(byte* addr_ptr, const std::string& fn_name, int_op reg);
+        byte* frame(byte*, int_op, int_op);
+        byte* param(byte*, int_op, int_op);
+        byte* paref(byte*, int_op, int_op);
+        byte* arg(byte*, int_op, int_op);
+        byte* call(byte*, const std::string&, int_op);
 
-        byte* jump(byte* addr_ptr, int addr);
-        byte* branch(byte* addr_ptr, int_op regc, int addr_truth, int addr_false);
+        byte* jump(byte*, int);
+        byte* branch(byte*, int_op, int, int);
 
-        byte* tryframe(byte* addr_ptr);
-        byte* vmcatch(byte* addr_ptr, const std::string& type_name, const std::string& block_name);
-        byte* pull(byte* addr_ptr, int_op regno);
-        byte* vmtry(byte* addr_ptr, const std::string& block_name);
-        byte* vmthrow(byte* addr_ptr, int_op regno);
-        byte* leave(byte* addr_ptr);
+        byte* tryframe(byte*);
+        byte* vmcatch(byte*, const std::string&, const std::string&);
+        byte* pull(byte*, int_op);
+        byte* vmtry(byte*, const std::string&);
+        byte* vmthrow(byte*, int_op);
+        byte* leave(byte*);
 
-        byte* eximport(byte* addr_ptr, const std::string& module_name);
-        byte* excall(byte* addr_ptr, const std::string& fn_name, int_op reg);
+        byte* eximport(byte*, const std::string&);
+        byte* excall(byte*, const std::string&, int_op);
 
-        byte* end(byte* addr_ptr);
-        byte* halt(byte* addr_ptr);
+        byte* end(byte*);
+        byte* halt(byte*);
     }
 }
 
