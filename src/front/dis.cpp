@@ -24,6 +24,7 @@ bool VERBOSE = false;
 bool DISASSEMBLE_ENTRY = false;
 bool INCLUDE_INFO = false;
 bool LINE_BY_LINE = false;
+string SELECTED_FUNCTION = "";
 
 
 bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE) {
@@ -44,6 +45,7 @@ bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE)
              << "    " << "-i, --info               - include information about executable in output\n"
              << "    " << "-e, --with-entry         - include __entry function in disassembly\n"
              << "    " << "-L, --line-by-line       - display output line by line\n"
+             << "    " << "-F, --function <name>    - disassemble only selected function\n"
              ;
     }
 
@@ -74,6 +76,14 @@ int main(int argc, char* argv[]) {
             INCLUDE_INFO = true;
         } else if ((option == "--line-by-line") or (option == "-L")) {
             LINE_BY_LINE = true;
+        } else if (option == "--function" or option == "-F") {
+            if (i < argc-1) {
+                SELECTED_FUNCTION = string(argv[++i]);
+            } else {
+                cout << "error: option '" << argv[i] << "' requires an argument: function name" << endl;
+                exit(1);
+            }
+            continue;
         } else if (option == "--out" or option == "-o") {
             if (i < argc-1) {
                 disasmname = string(argv[++i]);
@@ -224,10 +234,12 @@ int main(int argc, char* argv[]) {
             oss << '\n';
         }
 
-        disassembled_lines.push_back(oss.str());
+        if (not SELECTED_FUNCTION.size()) {
+            disassembled_lines.push_back(oss.str());
+        }
     }
 
-    if (blocks.size()) {
+    if (blocks.size() and not SELECTED_FUNCTION.size()) {
         disassembled_lines.push_back("\n");
     }
 
@@ -291,7 +303,9 @@ int main(int argc, char* argv[]) {
             oss << '\n';
         }
 
-        disassembled_lines.push_back(oss.str());
+        if ((not SELECTED_FUNCTION.size()) or (SELECTED_FUNCTION == name)) {
+            disassembled_lines.push_back(oss.str());
+        }
     }
 
     ostringstream assembly_code;
