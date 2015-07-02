@@ -12,28 +12,28 @@ using namespace std;
 byte* CPU::bstore(byte* addr) {
     /*  Run bstore instruction.
      */
-    int reg;
-    bool reg_ref = false, byte_ref = false;
-    byte bt;
+    int destination_register;
+    bool destination_register_ref = false, operand_ref = false;
+    byte operand;
 
-    reg_ref = *((bool*)addr);
+    destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    reg = *((int*)addr);
+    destination_register = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    byte_ref = *((bool*)addr);
+    operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    bt = *((byte*)addr);
+    operand = *((byte*)addr);
     ++addr;
 
-    if (reg_ref) {
-        reg = static_cast<Integer*>(fetch(reg))->value();
+    if (destination_register_ref) {
+        destination_register = static_cast<Integer*>(fetch(destination_register))->value();
     }
-    if (byte_ref) {
-        bt = static_cast<Byte*>(fetch((int)bt))->value();
+    if (operand_ref) {
+        operand = static_cast<Byte*>(fetch((int)operand))->value();
     }
 
-    place(reg, new Byte(bt));
+    place(destination_register, new Byte(operand));
 
     return addr;
 }
