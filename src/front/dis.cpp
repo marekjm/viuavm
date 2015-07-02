@@ -125,50 +125,67 @@ int main(int argc, char* argv[]) {
     vector<string> blocks = loader.getBlocks();
     map<string, unsigned> block_sizes;
 
+    map<string, uint16_t> element_address_mapping;
+    vector<string> elements;
+    map<string, unsigned> element_sizes;
+    map<string, string> element_types;
 
     vector<string> disassembled_lines;
     ostringstream oss;
 
 
     string name;
-    unsigned fn_size;
-
-    for (unsigned i = 0; i < functions.size(); ++i) {
-        name = functions[i];
-
-        if (i < (functions.size()-1)) {
-            long unsigned a = function_address_mapping[name];
-            long unsigned b = function_address_mapping[functions[i+1]];
-            fn_size = (b-a);
-        } else {
-            long unsigned a = (long unsigned)(bytecode+function_address_mapping[name]);
-            long unsigned b = (long unsigned)(bytecode+bytes);
-            fn_size = (b-a);
-        }
-
-        function_sizes[name] = fn_size;
-    }
+    unsigned el_size;
 
     for (unsigned i = 0; i < blocks.size(); ++i) {
         name = blocks[i];
+        el_size = 0;
 
         if (i < (blocks.size()-1)) {
             long unsigned a = block_address_mapping[name];
             long unsigned b = block_address_mapping[blocks[i+1]];
-            fn_size = (b-a);
+            el_size = (b-a);
         } else {
             long unsigned a = block_address_mapping[name];
             long unsigned b = function_address_mapping[functions[0]];
-            fn_size = (b-a);
+            el_size = (b-a);
         }
 
-        block_sizes[name] = fn_size;
+        block_sizes[name] = el_size;
+
+        element_sizes[name] = el_size;
+        element_types[name] = "block";
+        element_address_mapping[name] = block_address_mapping[name];
+        elements.push_back(name);
+    }
+
+    for (unsigned i = 0; i < functions.size(); ++i) {
+        name = functions[i];
+        el_size = 0;
+
+        if (i < (functions.size()-1)) {
+            long unsigned a = function_address_mapping[name];
+            long unsigned b = function_address_mapping[functions[i+1]];
+            el_size = (b-a);
+        } else {
+            long unsigned a = (long unsigned)(bytecode+function_address_mapping[name]);
+            long unsigned b = (long unsigned)(bytecode+bytes);
+            el_size = (b-a);
+        }
+
+        function_sizes[name] = el_size;
+
+        element_sizes[name] = el_size;
+        element_types[name] = "function";
+        element_address_mapping[name] = function_address_mapping[name];
+        elements.push_back(name);
     }
 
     if (INCLUDE_INFO) {
         oss << "; bytecode size: " << bytes << '\n';
         oss << ";\n";
         oss << "; functions:\n";
+        string name;
         for (unsigned i = 0; i < functions.size(); ++i) {
             name = functions[i];
             oss << ";   " << name << " -> " << function_sizes[name] << " bytes at byte " << function_address_mapping[functions[i]] << '\n';
@@ -178,74 +195,9 @@ int main(int argc, char* argv[]) {
         disassembled_lines.push_back(oss.str());
     }
 
-    for (unsigned i = 0; i < blocks.size(); ++i) {
-        name = blocks[i];
-        fn_size = block_sizes[name];
-
-        oss.str("");
-
-        oss << ".block: " << name << '\n';
-
-        if (LINE_BY_LINE) {
-            cout << oss.str();
-            getline(cin, dummy);
-        }
-
-        string opname;
-        bool disasm_terminated = false;
-        for (unsigned j = 0; j < fn_size;) {
-            string instruction;
-            try {
-                unsigned size;
-                tie(instruction, size) = disassembler::instruction((bytecode+block_address_mapping[name]+j));
-                oss << "    " << instruction << '\n';
-                j += size;
-            } catch (const out_of_range& e) {
-                oss << "\n---- ERROR ----\n\n";
-                oss << "disassembly terminated after throwing an instance of std::out_of_range\n";
-                oss << "what(): " << e.what() << '\n';
-                disasm_terminated = true;
-                break;
-            } catch (const string& e) {
-                oss << "\n---- ERROR ----\n\n";
-                oss << "disassembly terminated after throwing an instance of std::out_of_range\n";
-                oss << "what(): " << e << '\n';
-                disasm_terminated = true;
-                break;
-            }
-
-            if (LINE_BY_LINE) {
-                cout << "    " << instruction;
-                getline(cin, dummy);
-            }
-        }
-        if (disasm_terminated) {
-            disassembled_lines.push_back(oss.str());
-            break;
-        }
-
-        oss << ".end" << '\n';
-        if (LINE_BY_LINE) {
-            cout << ".end" << endl;
-            getline(cin, dummy);
-        }
-
-        if (i < (blocks.size()-1)) {
-            oss << '\n';
-        }
-
-        if (not SELECTED_FUNCTION.size()) {
-            disassembled_lines.push_back(oss.str());
-        }
-    }
-
-    if (blocks.size() and not SELECTED_FUNCTION.size()) {
-        disassembled_lines.push_back("\n");
-    }
-
-    for (unsigned i = 0; i < functions.size(); ++i) {
-        name = functions[i];
-        fn_size = function_sizes[name];
+    for (unsigned i = 0; i < elements.size(); ++i) {
+        name = elements[i];
+        el_size = element_sizes[name];
 
         if ((name == "__entry") and not DISASSEMBLE_ENTRY) {
             continue;
@@ -253,19 +205,19 @@ int main(int argc, char* argv[]) {
 
         oss.str("");
 
-        oss << ".function: " << name << '\n';
+        oss << '.' << element_types[name] << ": " << name << '\n';
         if (LINE_BY_LINE) {
-            cout << ".function: " << name;
+            oss << '.' << element_types[name] << ": " << name;
             getline(cin, dummy);
         }
 
         string opname;
         bool disasm_terminated = false;
-        for (unsigned j = 0; j < fn_size;) {
+        for (unsigned j = 0; j < el_size;) {
             string instruction;
             try {
                 unsigned size;
-                tie(instruction, size) = disassembler::instruction((bytecode+function_address_mapping[name]+j));
+                tie(instruction, size) = disassembler::instruction((bytecode+element_address_mapping[name]+j));
                 oss << "    " << instruction << '\n';
                 j += size;
             } catch (const out_of_range& e) {
@@ -299,7 +251,7 @@ int main(int argc, char* argv[]) {
             getline(cin, dummy);
         }
 
-        if (i < (functions.size()-1)) {
+        if (i < (elements.size()-1-(!DISASSEMBLE_ENTRY))) {
             oss << '\n';
         }
 
