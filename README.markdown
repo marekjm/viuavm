@@ -22,7 +22,7 @@ is the local clone of Viua repository):
 nvim ./some_file.asm
 ./bin/vm/asm -o some_file.out ./some_file.asm
 ./bin/vm/cpu some_file.out
-./bin/vm/wdb some_file.out
+./bin/vm/vdb some_file.out
 ```
 
 
