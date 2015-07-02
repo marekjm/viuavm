@@ -37,6 +37,11 @@ byte* CPU::logand(byte* addr) {
     bool first_operand_ref, second_operand_ref, destination_register_ref;
     int first_operand_index, second_operand_index, destination_register_index;
 
+    destination_register_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    destination_register_index = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
     first_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
     first_operand_index = *((int*)addr);
@@ -47,19 +52,14 @@ byte* CPU::logand(byte* addr) {
     second_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    destination_register_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    destination_register_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
+    if (destination_register_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
+    }
     if (first_operand_ref) {
         first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
     if (second_operand_ref) {
         second_operand_index = static_cast<Integer*>(fetch(second_operand_index))->value();
-    }
-    if (destination_register_ref) {
-        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
 
     place(destination_register_index, new Boolean(fetch(first_operand_index)->boolean() and fetch(second_operand_index)->boolean()));
@@ -73,6 +73,11 @@ byte* CPU::logor(byte* addr) {
     bool first_operand_ref, second_operand_ref, destination_register_ref;
     int first_operand_index, second_operand_index, destination_register_index;
 
+    destination_register_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    destination_register_index = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
     first_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
     first_operand_index = *((int*)addr);
@@ -83,19 +88,14 @@ byte* CPU::logor(byte* addr) {
     second_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    destination_register_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    destination_register_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
+    if (destination_register_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
+    }
     if (first_operand_ref) {
         first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
     if (second_operand_ref) {
         second_operand_index = static_cast<Integer*>(fetch(second_operand_index))->value();
-    }
-    if (destination_register_ref) {
-        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
 
     place(destination_register_index, new Boolean(fetch(first_operand_index)->boolean() or fetch(second_operand_index)->boolean()));

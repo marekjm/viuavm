@@ -61,9 +61,9 @@ namespace cg {
         byte* vat(byte* addr_ptr, int_op vec, int_op dst, int_op at);
         byte* vlen(byte* addr_ptr, int_op vec, int_op reg);
 
-        byte* lognot(byte* addr_ptr, int_op reg);
-        byte* logand(byte* addr_ptr, int_op rega, int_op regb, int_op regr);
-        byte* logor(byte* addr_ptr, int_op rega, int_op regb, int_op regr);
+        byte* lognot(byte*, int_op);
+        byte* logand(byte*, int_op, int_op, int_op);
+        byte* logor(byte*, int_op, int_op, int_op);
 
         byte* move(byte* addr_ptr, int_op a, int_op b);
         byte* copy(byte* addr_ptr, int_op a, int_op b);
