@@ -10,5 +10,5 @@ before_install:
 install:
     - sudo apt-get install openssl
     - sudo apt-get install python3
-    - if [ "$CXX" = "g++" ]; then sudo apt-get install gcc-4.8 g++-4.8; fi
-    - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+    - if [ "$CXX" = "g++" ]; then sudo apt-get install gcc-5 g++-5; fi
+    - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
