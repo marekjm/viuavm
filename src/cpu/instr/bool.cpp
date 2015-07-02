@@ -34,35 +34,35 @@ byte* CPU::lognot(byte* addr) {
 byte* CPU::logand(byte* addr) {
     /*  Run ieq instruction.
      */
-    bool rega_ref, regb_ref, regr_ref;
-    int rega_num, regb_num, regr_num;
+    bool first_operand_ref, second_operand_ref, destination_register_ref;
+    int first_operand_index, second_operand_index, destination_register_index;
 
-    rega_ref = *((bool*)addr);
+    destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    rega_num = *((int*)addr);
+    destination_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regb_ref = *((bool*)addr);
+    first_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    regb_num = *((int*)addr);
+    first_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regr_ref = *((bool*)addr);
+    second_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    regr_num = *((int*)addr);
+    second_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (rega_ref) {
-        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    if (destination_register_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
-    if (regb_ref) {
-        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
+    if (first_operand_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
-    if (regr_ref) {
-        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    if (second_operand_ref) {
+        second_operand_index = static_cast<Integer*>(fetch(second_operand_index))->value();
     }
 
-    place(regr_num, new Boolean(fetch(rega_num)->boolean() and fetch(regb_num)->boolean()));
+    place(destination_register_index, new Boolean(fetch(first_operand_index)->boolean() and fetch(second_operand_index)->boolean()));
 
     return addr;
 }
@@ -70,35 +70,35 @@ byte* CPU::logand(byte* addr) {
 byte* CPU::logor(byte* addr) {
     /*  Run ieq instruction.
      */
-    bool rega_ref, regb_ref, regr_ref;
-    int rega_num, regb_num, regr_num;
+    bool first_operand_ref, second_operand_ref, destination_register_ref;
+    int first_operand_index, second_operand_index, destination_register_index;
 
-    rega_ref = *((bool*)addr);
+    destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    rega_num = *((int*)addr);
+    destination_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regb_ref = *((bool*)addr);
+    first_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    regb_num = *((int*)addr);
+    first_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regr_ref = *((bool*)addr);
+    second_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    regr_num = *((int*)addr);
+    second_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (rega_ref) {
-        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    if (destination_register_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
-    if (regb_ref) {
-        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
+    if (first_operand_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
-    if (regr_ref) {
-        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    if (second_operand_ref) {
+        second_operand_index = static_cast<Integer*>(fetch(second_operand_index))->value();
     }
 
-    place(regr_num, new Boolean(fetch(rega_num)->boolean() or fetch(regb_num)->boolean()));
+    place(destination_register_index, new Boolean(fetch(first_operand_index)->boolean() or fetch(second_operand_index)->boolean()));
 
     return addr;
 }

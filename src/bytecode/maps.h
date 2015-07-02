@@ -53,17 +53,15 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "stoi",   sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
     { "stof",   sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
 
-    // strstore <register> "string"
     { "strstore",sizeof(byte) + sizeof(bool) + sizeof(int) },
-    // streq <str-a> <str-b> <dest>
     { "streq",  sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
 
-    { "vec",    sizeof(byte) + sizeof(bool) + sizeof(int) },        // vec      <register>
-    { "vinsert",sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },    // vinsert  <vector> <src register> <dest index>?
-    { "vpush",  sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },    // vpush    <vector> <src register>
-    { "vpop",   sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },    // vpop     <vector> <result register>? <position>?
-    { "vat",    sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },    // vat      <vector> <result register>  <position>?
-    { "vlen",   sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },    // vlen     <vector> <result register>
+    { "vec",    sizeof(byte) + sizeof(bool) + sizeof(int) },
+    { "vinsert",sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
+    { "vpush",  sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
+    { "vpop",   sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
+    { "vat",    sizeof(byte) + 3*sizeof(bool) + 3*sizeof(int) },
+    { "vlen",   sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
 
     { "bool",   sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "not",    sizeof(byte) + sizeof(bool) + sizeof(int) },
@@ -100,12 +98,10 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "branch", sizeof(byte) + sizeof(bool) + 3*sizeof(int) },
 
     { "throw",  sizeof(byte) + sizeof(int) + sizeof(bool) },
-    // variable length
     { "catch",  sizeof(byte) }, // catch "<type>" <block>
     { "pull",   sizeof(byte) + sizeof(bool) + sizeof(int) }, // pull <register>
-    // variable length
     { "tryframe", sizeof(byte) },
-    { "try",    sizeof(byte) }, // try <block>
+    { "try",    sizeof(byte) },
     { "leave",  sizeof(byte) },
 
     { "eximport", sizeof(byte) },

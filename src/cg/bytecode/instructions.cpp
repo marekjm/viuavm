@@ -453,29 +453,29 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* logand(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
+        byte* logand(byte* addr_ptr, int_op regr, int_op rega, int_op regb) {
             /*  Inserts and instruction to bytecode.
              *
              *  :params:
              *
+             *  regr   - register index in which to store the result
              *  rega   - register index of first operand
              *  regb   - register index of second operand
-             *  regr   - register index in which to store the result
              */
-            addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, AND, rega, regb, regr);
+            addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, AND, regr, rega, regb);
             return addr_ptr;
         }
 
-        byte* logor(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
+        byte* logor(byte* addr_ptr, int_op regr, int_op rega, int_op regb) {
             /*  Inserts or instruction to bytecode.
              *
              *  :params:
              *
+             *  regr   - register index in which to store the result
              *  rega   - register index of first operand
              *  regb   - register index of second operand
-             *  regr   - register index in which to store the result
              */
-            addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, OR, rega, regb, regr);
+            addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, OR, regr, rega, regb);
             return addr_ptr;
         }
 
