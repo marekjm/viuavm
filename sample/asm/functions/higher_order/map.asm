@@ -55,7 +55,7 @@
 
     ; call supplied function on current element
     frame 1
-    vat 2 7 @4
+    vat 7 2 @4
     param 0 7
     fcall 1 8
 
