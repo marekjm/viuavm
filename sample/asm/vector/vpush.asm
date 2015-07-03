@@ -11,7 +11,7 @@
     vlen 2 3
     print 3
 
-    vpop 2 4
+    vpop 4 2
     print 4
 
     izero 0
