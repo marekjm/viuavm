@@ -6,7 +6,7 @@
     istore number 0
 
     ; create a reference to register "number" in register 2
-    ref number 2
+    ref 2 number
 
     ; store 2 in register 2 and print number
     ; number will now be 2
@@ -15,7 +15,7 @@
 
     ; create reference to register 2 in register "indirect_ref"
     ; registers 1, 2 and 3 all now point to the same object
-    ref 2 indirect_ref
+    ref indirect_ref 2
 
     ; store
     istore indirect_ref 4

@@ -11,4 +11,4 @@
 ; these instructions are just to prove that offsets work correctly
 istore 1 0
 iinc 1
-ref 1 2
+ref 2 1
