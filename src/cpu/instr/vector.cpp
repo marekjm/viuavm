@@ -74,27 +74,27 @@ byte* CPU::vpush(byte* addr) {
      *  Vector always pushes a copy of the object in a register.
      *  FIXME: make it possible to push references.
      */
-    bool vector_operand_ref, destination_register_ref;
-    int vector_operand_index, destination_register_index;
+    bool vector_operand_ref, object_operand_ref;
+    int vector_operand_index, object_operand_index;
 
     vector_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
     vector_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    destination_register_ref = *((bool*)addr);
+    object_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    destination_register_index = *((int*)addr);
+    object_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
     if (vector_operand_ref) {
         vector_operand_index = static_cast<Integer*>(fetch(vector_operand_index))->value();
     }
-    if (destination_register_ref) {
-        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
+    if (object_operand_ref) {
+        object_operand_index = static_cast<Integer*>(fetch(object_operand_index))->value();
     }
 
-    static_cast<Vector*>(fetch(vector_operand_index))->push(fetch(destination_register_index)->copy());
+    static_cast<Vector*>(fetch(vector_operand_index))->push(fetch(object_operand_index)->copy());
 
     return addr;
 }
