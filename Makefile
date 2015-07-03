@@ -1,8 +1,8 @@
 CXXFLAGS=-std=c++11 -Wall -pedantic -Wfatal-errors -g
 CXXOPTIMIZATIONFLAGS=
 
-VIUA_CPU_INSTR_FILES_CPP=src/cpu/instr/general.cpp src/cpu/instr/registers.cpp src/cpu/instr/calls.cpp src/cpu/instr/closure.cpp src/cpu/instr/int.cpp src/cpu/instr/float.cpp src/cpu/instr/byte.cpp src/cpu/instr/str.cpp src/cpu/instr/bool.cpp src/cpu/instr/cast.cpp src/cpu/instr/vector.cpp
-VIUA_CPU_INSTR_FILES_O=build/cpu/instr/general.o build/cpu/instr/registers.o build/cpu/instr/calls.o build/cpu/instr/closure.o build/cpu/instr/int.o build/cpu/instr/float.o build/cpu/instr/byte.o build/cpu/instr/str.o build/cpu/instr/bool.o build/cpu/instr/cast.o build/cpu/instr/vector.o
+VIUA_CPU_INSTR_FILES_CPP=src/cpu/instr/general.cpp src/cpu/instr/registers.cpp src/cpu/instr/calls.cpp src/cpu/instr/linking.cpp src/cpu/instr/closure.cpp src/cpu/instr/int.cpp src/cpu/instr/float.cpp src/cpu/instr/byte.cpp src/cpu/instr/str.cpp src/cpu/instr/bool.cpp src/cpu/instr/cast.cpp src/cpu/instr/vector.cpp
+VIUA_CPU_INSTR_FILES_O=build/cpu/instr/general.o build/cpu/instr/registers.o build/cpu/instr/calls.o build/cpu/instr/linking.o build/cpu/instr/closure.o build/cpu/instr/int.o build/cpu/instr/float.o build/cpu/instr/byte.o build/cpu/instr/str.o build/cpu/instr/bool.o build/cpu/instr/cast.o build/cpu/instr/vector.o
 
 PREFIX=~/.local
 BIN_PATH=${PREFIX}/bin
@@ -128,6 +128,9 @@ build/cpu/instr/registers.o: src/cpu/instr/registers.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
 build/cpu/instr/calls.o: src/cpu/instr/calls.cpp
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+
+build/cpu/instr/linking.o: src/cpu/instr/linking.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
 build/cpu/instr/closure.o: src/cpu/instr/closure.cpp
