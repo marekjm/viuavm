@@ -1,15 +1,8 @@
-#include <dlfcn.h>
 #include <iostream>
-#include "../../bytecode/bytetypedef.h"
-#include "../../types/type.h"
-#include "../../types/integer.h"
 #include "../../types/boolean.h"
-#include "../../types/byte.h"
 #include "../../support/pointer.h"
-#include "../../include/module.h"
 #include "../../exceptions.h"
 #include "../cpu.h"
-#include "../registerset.h"
 using namespace std;
 
 
