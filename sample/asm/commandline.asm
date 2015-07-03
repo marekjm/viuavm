@@ -4,7 +4,7 @@
     .name: 2 len
     .name: 3 counter
 
-    vlen 1 len
+    vlen len 1
     istore counter 0
 
     .mark: loop

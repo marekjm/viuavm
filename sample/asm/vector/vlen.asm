@@ -12,7 +12,7 @@
     vpush 2 1
     vpush 2 1
 
-    vlen 2 3
+    vlen 3 2
     print 3
 
     izero 0

@@ -17,7 +17,7 @@
     arg 0 number
 
     .mark: loop
-    vlen vector length
+    vlen length vector
     ilt 5 length number
     not 5
     branch 5 finished

@@ -24,7 +24,7 @@
     .name: 7 counter
 
     istore counter 0
-    vlen 1 len
+    vlen len 1
 
     .mark: loop
     ilt 8 counter len

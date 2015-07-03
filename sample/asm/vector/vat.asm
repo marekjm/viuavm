@@ -3,17 +3,17 @@
 
     vec 2
 
-    vlen 2 3
+    vlen 3 2
     print 3
 
     vpush 2 1
 
-    vlen 2 3
+    vlen 3 2
     print 3
 
     vat 4 2 -1
 
-    vlen 2 3
+    vlen 3 2
     print 3
 
     print 4

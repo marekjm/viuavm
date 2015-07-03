@@ -26,7 +26,7 @@
 
     ; take length of the vector
     .name: 4 vector_length
-    vlen 2 vector_length
+    vlen vector_length 2
     frame @vector_length
 
     ; zero loop counter

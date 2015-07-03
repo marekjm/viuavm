@@ -46,7 +46,7 @@
     ; initial loop counter and
     ; loop termination variable
     izero 4
-    vlen 2 5
+    vlen 5 2
 
     ; while (...) {
     .mark: loop_begin

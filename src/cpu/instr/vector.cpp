@@ -194,14 +194,14 @@ byte* CPU::vlen(byte* addr) {
     bool vector_operand_ref, destination_register_ref;
     int vector_operand_index, destination_register_index;
 
-    vector_operand_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    vector_operand_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
     destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
     destination_register_index = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    vector_operand_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    vector_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
     if (vector_operand_ref) {
