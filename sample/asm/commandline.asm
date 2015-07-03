@@ -11,7 +11,7 @@
     ilt 4 counter len
     branch 4 inside break
     .mark: inside
-    vat 1 5 @counter
+    vat 5 1 @counter
     print 5
     empty 5
     iinc counter

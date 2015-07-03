@@ -42,7 +42,7 @@
     call returns_closures 1
 
     frame 0 0
-    vat 1 2 0
+    vat 2 1 0
     fcall 2 0
 
     istore 4 69
@@ -50,7 +50,7 @@
     frame 1 0
     param 0 4
 
-    vat 1 3 1
+    vat 3 1 1
     fcall 3 0
 
     frame 0 0

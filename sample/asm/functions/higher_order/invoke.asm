@@ -45,7 +45,7 @@
     ; store item located inside parameter vector at index denoted by loop_counter in
     ; a register
     .name: 7 slot
-    vat 2 slot @loop_counter
+    vat slot 2 @loop_counter
 
     ; add parameter
     param @loop_counter slot

@@ -21,8 +21,8 @@
     ilt 5 length number
     not 5
     branch 5 finished
-    vat vector 6 -1
-    vat vector 7 -2
+    vat 6 vector -1
+    vat 7 vector -2
     iadd 8 6 7
     vpush vector 8
     empty 6
@@ -31,7 +31,7 @@
 
     .mark: finished
 
-    vat vector 9 -1
+    vat 9 vector -1
     copy 9 0
     empty 9
     end

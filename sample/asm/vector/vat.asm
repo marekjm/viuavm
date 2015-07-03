@@ -11,7 +11,7 @@
     vlen 2 3
     print 3
 
-    vat 2 4
+    vat 4 2 -1
 
     vlen 2 3
     print 3

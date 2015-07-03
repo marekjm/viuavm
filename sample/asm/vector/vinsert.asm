@@ -30,7 +30,7 @@
     ilt 8 counter len
     branch 8 inside break
     .mark: inside
-    vat 1 9 @counter
+    vat 9 1 @counter
     print 9
     ; empty must be done or second print would fail with a segfault!
     ; VATed registers are references!

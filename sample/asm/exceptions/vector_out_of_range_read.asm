@@ -1,6 +1,6 @@
 .function: main
     vec 1
-    vat 1 2 4
+    vat 2 1 4
 
     izero 0
     end
