@@ -3,6 +3,6 @@
 .name: 3 result
 istore a 2
 istore b 1
-isub a b result
+isub result a b
 print 3
 halt

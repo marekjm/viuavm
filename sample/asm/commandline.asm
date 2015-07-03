@@ -8,7 +8,7 @@
     istore counter 0
 
     .mark: loop
-    ilt counter len 4
+    ilt 4 counter len
     branch 4 inside break
     .mark: inside
     vat 1 5 @counter

@@ -8,7 +8,7 @@
 
     ; decrease counter and check if it's less than zero
     idec counter
-    ilt counter zero 3
+    ilt 3 counter zero
 
     branch 3 break_rec
     print counter

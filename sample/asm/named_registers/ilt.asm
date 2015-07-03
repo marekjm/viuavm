@@ -5,7 +5,7 @@
 istore 1 0
 istore 2 1
 
-ilt a b result
+ilt result a b
 print 3
 
 halt

@@ -2,9 +2,9 @@
     istore 1 42
     istore 2 69
 
-    ilt 1 2 3
+    ilt 3 1 2
 
-    iadd 2 3 4
+    iadd 4 2 3
     print 4
 
     izero 0

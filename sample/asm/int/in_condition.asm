@@ -7,7 +7,7 @@
     ; generate false
     istore 2 0
     istore 3 1
-    ieq 2 3
+    ieq 2 2 3
 
     ; check
     branch 1 ok fin

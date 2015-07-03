@@ -9,13 +9,13 @@
     istore result @number
 
     ; if number is less than modulo, jump straight to result printing
-    ilt number modulo 4
+    ilt 4 number modulo
     branch 4 final
 
     ; otherwise we must perform some calculations
-    idiv number modulo
-    imul number modulo
-    isub result number
+    idiv number number modulo
+    imul number number modulo
+    isub result result number
 
 
     .mark: final

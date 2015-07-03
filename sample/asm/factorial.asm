@@ -7,13 +7,13 @@
     ; multiply "result" (reference) by "number" (copy)
     ; and store the resulting integer in "result"
     ; calculation is available outside of the local scope
-    imul 2 1
+    imul 2 2 1
     idec 1
 
     istore 3 0
     ; if counter is equal to zero
     ; finish "factorial" calls
-    ieq 1 3 4
+    ieq 4 1 3
     branch 4 finish
     ; this frame must be the same as in "main"
     frame 2

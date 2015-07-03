@@ -27,7 +27,7 @@
     vlen 1 len
 
     .mark: loop
-    ilt counter len 8
+    ilt 8 counter len
     branch 8 inside break
     .mark: inside
     vat 1 9 @counter

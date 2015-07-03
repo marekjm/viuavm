@@ -6,7 +6,7 @@
     arg 2 3
     arg 3 4
 
-    iadd 1 2 0
+    iadd 0 1 2
     iadd 0 3 0
     iadd 0 4 0
 
@@ -37,7 +37,7 @@
     ; simple condition:
     ; while (loop_counter < vector_length) {
     .name: 5 loop_condition
-    igte loop_counter vector_length loop_condition
+    igte loop_condition loop_counter vector_length
     branch loop_condition while_end while_body
 
     .mark: while_body

@@ -2,7 +2,7 @@
     ; this function takes single integer as its argument,
     ; squares it and returns the result
     arg 0 1
-    imul 1 1 0
+    imul 0 1 1
     end
 .end
 
@@ -48,7 +48,7 @@
 
     ; while (...) {
     .mark: loop_begin
-    igte 4 5 6
+    igte 6 4 5
     branch 6 loop_end loop_body
 
     .mark: loop_body

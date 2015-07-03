@@ -1,4 +1,4 @@
-; This script tests support for iinc instruction, i.e. i++.
+; This script tests support for iinc i++. instruction, i.e.
 
 .function: main
     istore 1 0

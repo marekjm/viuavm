@@ -3,11 +3,11 @@
     arg 0 1
 
     .mark: loop_begin
-    ilt 1 bound_variable 3
+    ilt 3 1 bound_variable
     branch 3 loop_end loop_body
 
     .mark: loop_body
-    isub 1 bound_variable
+    isub 1 1 bound_variable
     jump loop_begin
 
     .mark: loop_end
@@ -50,7 +50,7 @@
 
     ; while (...) {
     .mark: loop_begin
-    igte 4 5 6
+    igte 6 4 5
     branch 6 loop_end loop_body
 
     .mark: loop_body

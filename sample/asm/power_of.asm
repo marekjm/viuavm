@@ -20,7 +20,7 @@
     istore zero 0
 
     ; if the exponent is equal to zero, store 1 in first register and jump to print
-    ieq exponent zero 4
+    ieq 4 exponent zero
 
     ; invert so we can use short form of branch instruction
     not 4
@@ -37,9 +37,9 @@
     istore result @base
 
     .mark: loop
-    ilt counter exponent 4
+    ilt 4 counter exponent
     branch 4 12 final
-    imul result base
+    imul result result base
     nop
     iinc counter
     jump loop

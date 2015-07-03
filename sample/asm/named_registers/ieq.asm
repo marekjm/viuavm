@@ -4,7 +4,7 @@
 
 istore 1 1
 
-ieq a a result
+ieq result a a
 print 3
 
 halt

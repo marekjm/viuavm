@@ -6,9 +6,9 @@
 .function: main
     istore 1 4
     istore 2 -3
-    iadd 1 2 3
+    iadd 3 1 2
     istore 4 0
-    iadd 3 4
+    iadd 3 3 4
     print 3
     izero 0
     end

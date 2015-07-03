@@ -18,12 +18,12 @@
 
     .mark: loop
     vlen vector length
-    ilt length number 5
+    ilt 5 length number
     not 5
     branch 5 finished
     vat vector 6 -1
     vat vector 7 -2
-    iadd 6 7 8
+    iadd 8 6 7
     vpush vector 8
     empty 6
     empty 7

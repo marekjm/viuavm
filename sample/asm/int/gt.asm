@@ -4,7 +4,7 @@
 .function: main
     istore 1 4
     istore 2 1
-    igt 1 2
+    igt 1 1 2
     print 1
     izero 0
     end

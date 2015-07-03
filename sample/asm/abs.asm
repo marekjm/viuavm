@@ -14,7 +14,7 @@
 
     ; compare the int to zero
     istore zero 0
-    ilt number zero is_negative
+    ilt is_negative number zero
 
     ; if the int is less than zero, multiply it by -1
     ; else, branch directly to print instruction

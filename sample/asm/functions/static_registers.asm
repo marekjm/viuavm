@@ -26,7 +26,7 @@
     arg 0 3
 
     ; integer at 1 is less than N
-    ilt 1 3 4
+    ilt 4 1 3
     ; integer at 1 is *at least* N
     not 4
     branch 4 finish
