@@ -182,10 +182,8 @@ byte* CPU::vat(byte* addr) {
      *  3) put it in a register,
      */
     Type* ptr = static_cast<Vector*>(fetch(vector_operand_index))->at(position_operand_index);
-    if (destination_register_index) {
-        place(destination_register_index, ptr);
-        uregset->flag(destination_register_index, REFERENCE);
-    }
+    place(destination_register_index, ptr);
+    uregset->flag(destination_register_index, REFERENCE);
 
     return addr;
 }
