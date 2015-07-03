@@ -4,7 +4,7 @@
 .function: main
     fstore 1 1.098
     fstore 2 1.099
-    flte 1 2 3
+    flte 3 1 2
     print 3
     izero 0
     end

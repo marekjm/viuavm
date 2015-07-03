@@ -12,23 +12,23 @@ using namespace std;
 byte* CPU::fstore(byte* addr) {
     /*  Run istore instruction.
      */
-    int reg;
+    int destination_register_index;
     float value;
-    bool ref = false;
+    bool destination_register_ref = false;
 
-    ref = *((bool*)addr);
+    destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    reg = *((int*)addr);
+    destination_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
     value = *((float*)addr);
     pointer::inc<float, byte>(addr);
 
-    if (ref) {
-        reg = static_cast<Integer*>(fetch(reg))->value();
+    if (destination_register_ref) {
+        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
     }
 
-    place(reg, new Float(value));
+    place(destination_register_index, new Float(value));
 
     return addr;
 }
@@ -36,39 +36,39 @@ byte* CPU::fstore(byte* addr) {
 byte* CPU::fadd(byte* addr) {
     /*  Run fadd instruction.
      */
-    bool rega_ref, regb_ref, regr_ref;
-    int rega_num, regb_num, regr_num;
+    bool first_operand_ref, second_operand_ref, destination_register_ref;
+    int first_operand_index, second_operand_index, destination_register_index;
 
-    rega_ref = *((bool*)addr);
+    destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    rega_num = *((int*)addr);
+    destination_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regb_ref = *((bool*)addr);
+    first_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    regb_num = *((int*)addr);
+    first_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regr_ref = *((bool*)addr);
+    second_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    regr_num = *((int*)addr);
+    second_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (rega_ref) {
-        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    if (first_operand_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
-    if (regb_ref) {
-        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
+    if (second_operand_ref) {
+        second_operand_index = static_cast<Integer*>(fetch(second_operand_index))->value();
     }
-    if (regr_ref) {
-        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    if (destination_register_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
 
     float a, b;
-    a = static_cast<Float*>(fetch(rega_num))->value();
-    b = static_cast<Float*>(fetch(regb_num))->value();
+    a = static_cast<Float*>(fetch(first_operand_index))->value();
+    b = static_cast<Float*>(fetch(second_operand_index))->value();
 
-    place(regr_num, new Float(a + b));
+    place(destination_register_index, new Float(a + b));
 
     return addr;
 }
@@ -76,39 +76,39 @@ byte* CPU::fadd(byte* addr) {
 byte* CPU::fsub(byte* addr) {
     /*  Run fsub instruction.
      */
-    bool rega_ref, regb_ref, regr_ref;
-    int rega_num, regb_num, regr_num;
+    bool first_operand_ref, second_operand_ref, destination_register_ref;
+    int first_operand_index, second_operand_index, destination_register_index;
 
-    rega_ref = *((bool*)addr);
+    destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    rega_num = *((int*)addr);
+    destination_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regb_ref = *((bool*)addr);
+    first_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    regb_num = *((int*)addr);
+    first_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regr_ref = *((bool*)addr);
+    second_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    regr_num = *((int*)addr);
+    second_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (rega_ref) {
-        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    if (first_operand_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
-    if (regb_ref) {
-        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
+    if (second_operand_ref) {
+        second_operand_index = static_cast<Integer*>(fetch(second_operand_index))->value();
     }
-    if (regr_ref) {
-        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    if (destination_register_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
 
     float a, b;
-    a = static_cast<Float*>(fetch(rega_num))->value();
-    b = static_cast<Float*>(fetch(regb_num))->value();
+    a = static_cast<Float*>(fetch(first_operand_index))->value();
+    b = static_cast<Float*>(fetch(second_operand_index))->value();
 
-    place(regr_num, new Float(a - b));
+    place(destination_register_index, new Float(a - b));
 
     return addr;
 }
@@ -116,39 +116,39 @@ byte* CPU::fsub(byte* addr) {
 byte* CPU::fmul(byte* addr) {
     /*  Run fmul instruction.
      */
-    bool rega_ref, regb_ref, regr_ref;
-    int rega_num, regb_num, regr_num;
+    bool first_operand_ref, second_operand_ref, destination_register_ref;
+    int first_operand_index, second_operand_index, destination_register_index;
 
-    rega_ref = *((bool*)addr);
+    destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    rega_num = *((int*)addr);
+    destination_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regb_ref = *((bool*)addr);
+    first_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    regb_num = *((int*)addr);
+    first_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regr_ref = *((bool*)addr);
+    second_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    regr_num = *((int*)addr);
+    second_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (rega_ref) {
-        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    if (first_operand_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
-    if (regb_ref) {
-        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
+    if (second_operand_ref) {
+        second_operand_index = static_cast<Integer*>(fetch(second_operand_index))->value();
     }
-    if (regr_ref) {
-        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    if (destination_register_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
 
     float a, b;
-    a = static_cast<Float*>(fetch(rega_num))->value();
-    b = static_cast<Float*>(fetch(regb_num))->value();
+    a = static_cast<Float*>(fetch(first_operand_index))->value();
+    b = static_cast<Float*>(fetch(second_operand_index))->value();
 
-    place(regr_num, new Float(a * b));
+    place(destination_register_index, new Float(a * b));
 
     return addr;
 }
@@ -156,39 +156,39 @@ byte* CPU::fmul(byte* addr) {
 byte* CPU::fdiv(byte* addr) {
     /*  Run fdiv instruction.
      */
-    bool rega_ref, regb_ref, regr_ref;
-    int rega_num, regb_num, regr_num;
+    bool first_operand_ref, second_operand_ref, destination_register_ref;
+    int first_operand_index, second_operand_index, destination_register_index;
 
-    rega_ref = *((bool*)addr);
+    destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    rega_num = *((int*)addr);
+    destination_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regb_ref = *((bool*)addr);
+    first_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    regb_num = *((int*)addr);
+    first_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regr_ref = *((bool*)addr);
+    second_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    regr_num = *((int*)addr);
+    second_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (rega_ref) {
-        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    if (first_operand_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
-    if (regb_ref) {
-        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
+    if (second_operand_ref) {
+        second_operand_index = static_cast<Integer*>(fetch(second_operand_index))->value();
     }
-    if (regr_ref) {
-        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    if (destination_register_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
 
     float a, b;
-    a = static_cast<Float*>(fetch(rega_num))->value();
-    b = static_cast<Float*>(fetch(regb_num))->value();
+    a = static_cast<Float*>(fetch(first_operand_index))->value();
+    b = static_cast<Float*>(fetch(second_operand_index))->value();
 
-    place(regr_num, new Float(a / b));
+    place(destination_register_index, new Float(a / b));
 
     return addr;
 }
@@ -196,39 +196,39 @@ byte* CPU::fdiv(byte* addr) {
 byte* CPU::flt(byte* addr) {
     /*  Run flt instruction.
      */
-    bool rega_ref, regb_ref, regr_ref;
-    int rega_num, regb_num, regr_num;
+    bool first_operand_ref, second_operand_ref, destination_register_ref;
+    int first_operand_index, second_operand_index, destination_register_index;
 
-    rega_ref = *((bool*)addr);
+    destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    rega_num = *((int*)addr);
+    destination_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regb_ref = *((bool*)addr);
+    first_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    regb_num = *((int*)addr);
+    first_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regr_ref = *((bool*)addr);
+    second_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    regr_num = *((int*)addr);
+    second_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (rega_ref) {
-        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    if (first_operand_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
-    if (regb_ref) {
-        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
+    if (second_operand_ref) {
+        second_operand_index = static_cast<Integer*>(fetch(second_operand_index))->value();
     }
-    if (regr_ref) {
-        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    if (destination_register_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
 
     float a, b;
-    a = static_cast<Float*>(fetch(rega_num))->value();
-    b = static_cast<Float*>(fetch(regb_num))->value();
+    a = static_cast<Float*>(fetch(first_operand_index))->value();
+    b = static_cast<Float*>(fetch(second_operand_index))->value();
 
-    place(regr_num, new Boolean(a < b));
+    place(destination_register_index, new Boolean(a < b));
 
     return addr;
 }
@@ -236,39 +236,39 @@ byte* CPU::flt(byte* addr) {
 byte* CPU::flte(byte* addr) {
     /*  Run flte instruction.
      */
-    bool rega_ref, regb_ref, regr_ref;
-    int rega_num, regb_num, regr_num;
+    bool first_operand_ref, second_operand_ref, destination_register_ref;
+    int first_operand_index, second_operand_index, destination_register_index;
 
-    rega_ref = *((bool*)addr);
+    destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    rega_num = *((int*)addr);
+    destination_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regb_ref = *((bool*)addr);
+    first_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    regb_num = *((int*)addr);
+    first_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regr_ref = *((bool*)addr);
+    second_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    regr_num = *((int*)addr);
+    second_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (rega_ref) {
-        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    if (first_operand_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
-    if (regb_ref) {
-        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
+    if (second_operand_ref) {
+        second_operand_index = static_cast<Integer*>(fetch(second_operand_index))->value();
     }
-    if (regr_ref) {
-        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    if (destination_register_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
 
     float a, b;
-    a = static_cast<Float*>(fetch(rega_num))->value();
-    b = static_cast<Float*>(fetch(regb_num))->value();
+    a = static_cast<Float*>(fetch(first_operand_index))->value();
+    b = static_cast<Float*>(fetch(second_operand_index))->value();
 
-    place(regr_num, new Boolean(a <= b));
+    place(destination_register_index, new Boolean(a <= b));
 
     return addr;
 }
@@ -276,39 +276,39 @@ byte* CPU::flte(byte* addr) {
 byte* CPU::fgt(byte* addr) {
     /*  Run fgt instruction.
      */
-    bool rega_ref, regb_ref, regr_ref;
-    int rega_num, regb_num, regr_num;
+    bool first_operand_ref, second_operand_ref, destination_register_ref;
+    int first_operand_index, second_operand_index, destination_register_index;
 
-    rega_ref = *((bool*)addr);
+    destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    rega_num = *((int*)addr);
+    destination_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regb_ref = *((bool*)addr);
+    first_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    regb_num = *((int*)addr);
+    first_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regr_ref = *((bool*)addr);
+    second_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    regr_num = *((int*)addr);
+    second_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (rega_ref) {
-        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    if (first_operand_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
-    if (regb_ref) {
-        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
+    if (second_operand_ref) {
+        second_operand_index = static_cast<Integer*>(fetch(second_operand_index))->value();
     }
-    if (regr_ref) {
-        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    if (destination_register_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
 
     float a, b;
-    a = static_cast<Float*>(fetch(rega_num))->value();
-    b = static_cast<Float*>(fetch(regb_num))->value();
+    a = static_cast<Float*>(fetch(first_operand_index))->value();
+    b = static_cast<Float*>(fetch(second_operand_index))->value();
 
-    place(regr_num, new Boolean(a > b));
+    place(destination_register_index, new Boolean(a > b));
 
     return addr;
 }
@@ -316,39 +316,39 @@ byte* CPU::fgt(byte* addr) {
 byte* CPU::fgte(byte* addr) {
     /*  Run fgte instruction.
      */
-    bool rega_ref, regb_ref, regr_ref;
-    int rega_num, regb_num, regr_num;
+    bool first_operand_ref, second_operand_ref, destination_register_ref;
+    int first_operand_index, second_operand_index, destination_register_index;
 
-    rega_ref = *((bool*)addr);
+    destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    rega_num = *((int*)addr);
+    destination_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regb_ref = *((bool*)addr);
+    first_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    regb_num = *((int*)addr);
+    first_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regr_ref = *((bool*)addr);
+    second_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    regr_num = *((int*)addr);
+    second_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (rega_ref) {
-        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    if (first_operand_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
-    if (regb_ref) {
-        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
+    if (second_operand_ref) {
+        second_operand_index = static_cast<Integer*>(fetch(second_operand_index))->value();
     }
-    if (regr_ref) {
-        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    if (destination_register_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
 
     float a, b;
-    a = static_cast<Float*>(fetch(rega_num))->value();
-    b = static_cast<Float*>(fetch(regb_num))->value();
+    a = static_cast<Float*>(fetch(first_operand_index))->value();
+    b = static_cast<Float*>(fetch(second_operand_index))->value();
 
-    place(regr_num, new Boolean(a >= b));
+    place(destination_register_index, new Boolean(a >= b));
 
     return addr;
 }
@@ -356,39 +356,39 @@ byte* CPU::fgte(byte* addr) {
 byte* CPU::feq(byte* addr) {
     /*  Run feq instruction.
      */
-    bool rega_ref, regb_ref, regr_ref;
-    int rega_num, regb_num, regr_num;
+    bool first_operand_ref, second_operand_ref, destination_register_ref;
+    int first_operand_index, second_operand_index, destination_register_index;
 
-    rega_ref = *((bool*)addr);
+    destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    rega_num = *((int*)addr);
+    destination_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regb_ref = *((bool*)addr);
+    first_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    regb_num = *((int*)addr);
+    first_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    regr_ref = *((bool*)addr);
+    second_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    regr_num = *((int*)addr);
+    second_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (rega_ref) {
-        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    if (first_operand_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
-    if (regb_ref) {
-        regb_num = static_cast<Integer*>(fetch(regb_num))->value();
+    if (second_operand_ref) {
+        second_operand_index = static_cast<Integer*>(fetch(second_operand_index))->value();
     }
-    if (regr_ref) {
-        rega_num = static_cast<Integer*>(fetch(rega_num))->value();
+    if (destination_register_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
 
     float a, b;
-    a = static_cast<Float*>(fetch(rega_num))->value();
-    b = static_cast<Float*>(fetch(regb_num))->value();
+    a = static_cast<Float*>(fetch(first_operand_index))->value();
+    b = static_cast<Float*>(fetch(second_operand_index))->value();
 
-    place(regr_num, new Boolean(a == b));
+    place(destination_register_index, new Boolean(a == b));
 
     return addr;
 }

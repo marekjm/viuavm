@@ -6,9 +6,9 @@
 .function: main
     fstore 1 4.0
     fstore 2 -3.5
-    fadd 1 2 3
+    fadd 3 1 2
     fstore 4 0
-    fadd 3 4
+    fadd 3 3 4
     print 3
     izero 0
     end

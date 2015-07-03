@@ -4,7 +4,7 @@
 .function: main
     fstore 1 0.69
     fstore 2 0.69
-    feq 1 2
+    feq 1 1 2
 
     ; should be true
     print 1
