@@ -47,84 +47,84 @@ byte* CPU::move(byte* addr) {
     /** Run move instruction.
      *  Move an object from one register into another.
      */
-    int a, b;
-    bool a_ref = false, b_ref = false;
+    int object_operand_index, destination_register_index;
+    bool object_operand_ref = false, destination_register_ref = false;
 
-    a_ref = *((bool*)addr);
+    object_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    a = *((int*)addr);
+    object_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    b_ref = *((bool*)addr);
+    destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    b = *((int*)addr);
+    destination_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (a_ref) {
-        a = static_cast<Integer*>(fetch(a))->value();
+    if (object_operand_ref) {
+        object_operand_index = static_cast<Integer*>(fetch(object_operand_index))->value();
     }
-    if (b_ref) {
-        b = static_cast<Integer*>(fetch(b))->value();
+    if (destination_register_ref) {
+        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
     }
 
-    uregset->move(a, b);
+    uregset->move(object_operand_index, destination_register_index);
     return addr;
 }
 byte* CPU::copy(byte* addr) {
     /** Run move instruction.
      *  Copy an object from one register into another.
      */
-    int a, b;
-    bool a_ref = false, b_ref = false;
+    int object_operand_index, destination_register_index;
+    bool object_operand_ref = false, destination_register_ref = false;
 
-    a_ref = *((bool*)addr);
+    object_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    a = *((int*)addr);
+    object_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    b_ref = *((bool*)addr);
+    destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    b = *((int*)addr);
+    destination_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (a_ref) {
-        a = static_cast<Integer*>(fetch(a))->value();
+    if (object_operand_ref) {
+        object_operand_index = static_cast<Integer*>(fetch(object_operand_index))->value();
     }
-    if (b_ref) {
-        b = static_cast<Integer*>(fetch(b))->value();
+    if (destination_register_ref) {
+        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
     }
 
-    place(b, fetch(a)->copy());
+    place(destination_register_index, fetch(object_operand_index)->copy());
 
     return addr;
 }
 byte* CPU::ref(byte* addr) {
     /** Run ref instruction.
-     *  Create a reference (implementation detail: copy a pointer) of an object in one register in
+     *  Create object_operand_index reference (implementation detail: copy object_operand_index pointer) of an object in one register in
      *  another register.
      */
-    int a, b;
-    bool a_ref = false, b_ref = false;
+    int object_operand_index, destination_register_index;
+    bool object_operand_ref = false, destination_register_ref = false;
 
-    a_ref = *((bool*)addr);
+    object_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    a = *((int*)addr);
+    object_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    b_ref = *((bool*)addr);
+    destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    b = *((int*)addr);
+    destination_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (a_ref) {
-        a = static_cast<Integer*>(fetch(a))->value();
+    if (object_operand_ref) {
+        object_operand_index = static_cast<Integer*>(fetch(object_operand_index))->value();
     }
-    if (b_ref) {
-        b = static_cast<Integer*>(fetch(b))->value();
+    if (destination_register_ref) {
+        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
     }
 
-    uregset->set(b, uregset->get(a));
-    uregset->flag(b, REFERENCE);
+    uregset->set(destination_register_index, uregset->get(object_operand_index));
+    uregset->flag(destination_register_index, REFERENCE);
 
     return addr;
 }
@@ -132,64 +132,64 @@ byte* CPU::swap(byte* addr) {
     /** Run swap instruction.
      *  Swaps two objects in registers.
      */
-    int a, b;
-    bool a_ref = false, b_ref = false;
+    int first_operand_index, second_operand_index;
+    bool first_operand_ref = false, second_operand_ref = false;
 
-    a_ref = *((bool*)addr);
+    first_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    a = *((int*)addr);
+    first_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    b_ref = *((bool*)addr);
+    second_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    b = *((int*)addr);
+    second_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (a_ref) {
-        a = static_cast<Integer*>(fetch(a))->value();
+    if (first_operand_ref) {
+        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
     }
-    if (b_ref) {
-        b = static_cast<Integer*>(fetch(b))->value();
+    if (second_operand_ref) {
+        second_operand_index = static_cast<Integer*>(fetch(second_operand_index))->value();
     }
 
-    uregset->swap(a, b);
+    uregset->swap(first_operand_index, second_operand_index);
     return addr;
 }
 byte* CPU::free(byte* addr) {
     /** Run free instruction.
      */
-    int a;
-    bool a_ref = false;
+    int target_register_index;
+    bool target_register_ref = false;
 
-    a_ref = *((bool*)addr);
+    target_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    a = *((int*)addr);
+    target_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (a_ref) {
-        a = static_cast<Integer*>(fetch(a))->value();
+    if (target_register_ref) {
+        target_register_index = static_cast<Integer*>(fetch(target_register_index))->value();
     }
 
-    uregset->free(a);
+    uregset->free(target_register_index);
 
     return addr;
 }
 byte* CPU::empty(byte* addr) {
     /** Run empty instruction.
      */
-    int a;
-    bool a_ref = false;
+    int target_register_index;
+    bool target_register_ref = false;
 
-    a_ref = *((bool*)addr);
+    target_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    a = *((int*)addr);
+    target_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (a_ref) {
-        a = static_cast<Integer*>(fetch(a))->value();
+    if (target_register_ref) {
+        target_register_index = static_cast<Integer*>(fetch(target_register_index))->value();
     }
 
-    uregset->empty(a);
+    uregset->empty(target_register_index);
 
     return addr;
 }
@@ -198,31 +198,31 @@ byte* CPU::isnull(byte* addr) {
      *
      * Example:
      *
-     *      isnull A, B
+     *      isnull checked_register_index, B
      *
-     * the above means: "check if A is null and store the information in B".
+     * the above means: "check if checked_register_index is null and store the information in B".
      */
-    int a, b;
-    bool a_ref = false, b_ref = false;
+    int checked_register_index, destination_register_index;
+    bool checked_register_ref = false, destination_register_ref = false;
 
-    a_ref = *((bool*)addr);
+    checked_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    a = *((int*)addr);
+    checked_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    b_ref = *((bool*)addr);
+    destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    b = *((int*)addr);
+    destination_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (a_ref) {
-        a = static_cast<Integer*>(fetch(a))->value();
+    if (checked_register_ref) {
+        checked_register_index = static_cast<Integer*>(fetch(checked_register_index))->value();
     }
-    if (b_ref) {
-        b = static_cast<Integer*>(fetch(b))->value();
+    if (destination_register_ref) {
+        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
     }
 
-    place(b, new Boolean(uregset->at(a) == 0));
+    place(destination_register_index, new Boolean(uregset->at(checked_register_index) == 0));
 
     return addr;
 }
@@ -257,47 +257,47 @@ byte* CPU::ress(byte* addr) {
 byte* CPU::tmpri(byte* addr) {
     /** Run tmpri instruction.
      */
-    int a;
-    bool a_ref = false;
+    int object_operand_index;
+    bool object_operand_ref = false;
 
-    a_ref = *((bool*)addr);
+    object_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    a = *((int*)addr);
+    object_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (a_ref) {
-        a = static_cast<Integer*>(fetch(a))->value();
+    if (object_operand_ref) {
+        object_operand_index = static_cast<Integer*>(fetch(object_operand_index))->value();
     }
 
     if (tmp != 0) {
         cout << "warning: CPU: storing in non-empty temporary register: memory has been leaked" << endl;
     }
-    tmp = uregset->get(a)->copy();
+    tmp = uregset->get(object_operand_index)->copy();
 
     return addr;
 }
 byte* CPU::tmpro(byte* addr) {
     /** Run tmpro instruction.
      */
-    int a;
-    bool a_ref = false;
+    int destination_register_index;
+    bool destination_register_ref = false;
 
-    a_ref = *((bool*)addr);
+    destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    a = *((int*)addr);
+    destination_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (a_ref) {
-        a = static_cast<Integer*>(fetch(a))->value();
+    if (destination_register_ref) {
+        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
     }
 
-    if (uregset->at(a) != 0) {
+    if (uregset->at(destination_register_index) != 0) {
         if (errors) {
             cerr << "warning: CPU: droping from temporary into non-empty register: possible references loss and register corruption" << endl;
         }
-        uregset->free(a);
+        uregset->free(destination_register_index);
     }
-    uregset->set(a, tmp);
+    uregset->set(destination_register_index, tmp);
     tmp = 0;
 
     return addr;
@@ -333,29 +333,29 @@ byte* CPU::frame(byte* addr) {
 byte* CPU::param(byte* addr) {
     /** Run param instruction.
      */
-    int a, b;
-    bool a_ref = false, b_ref = false;
+    int parameter_no_operand_index, object_operand_index;
+    bool parameter_no_operand_ref = false, object_operand_ref = false;
 
-    a_ref = *((bool*)addr);
+    parameter_no_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    a = *((int*)addr);
+    parameter_no_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    b_ref = *((bool*)addr);
+    object_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    b = *((int*)addr);
+    object_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (a_ref) {
-        a = static_cast<Integer*>(fetch(a))->value();
+    if (parameter_no_operand_ref) {
+        parameter_no_operand_index = static_cast<Integer*>(fetch(parameter_no_operand_index))->value();
     }
-    if (b_ref) {
-        b = static_cast<Integer*>(fetch(b))->value();
+    if (object_operand_ref) {
+        object_operand_index = static_cast<Integer*>(fetch(object_operand_index))->value();
     }
 
-    if (unsigned(a) >= frame_new->args->size()) { throw new Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter"); }
-    frame_new->args->set(a, fetch(b)->copy());
-    frame_new->args->clear(a);
+    if (unsigned(parameter_no_operand_index) >= frame_new->args->size()) { throw new Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter"); }
+    frame_new->args->set(parameter_no_operand_index, fetch(object_operand_index)->copy());
+    frame_new->args->clear(parameter_no_operand_index);
 
     return addr;
 }
@@ -363,29 +363,29 @@ byte* CPU::param(byte* addr) {
 byte* CPU::paref(byte* addr) {
     /** Run paref instruction.
      */
-    int a, b;
-    bool a_ref = false, b_ref = false;
+    int parameter_no_operand_index, object_operand_index;
+    bool parameter_no_operand_ref = false, object_operand_ref = false;
 
-    a_ref = *((bool*)addr);
+    parameter_no_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    a = *((int*)addr);
+    parameter_no_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    b_ref = *((bool*)addr);
+    object_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    b = *((int*)addr);
+    object_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (a_ref) {
-        a = static_cast<Integer*>(fetch(a))->value();
+    if (parameter_no_operand_ref) {
+        parameter_no_operand_index = static_cast<Integer*>(fetch(parameter_no_operand_index))->value();
     }
-    if (b_ref) {
-        b = static_cast<Integer*>(fetch(b))->value();
+    if (object_operand_ref) {
+        object_operand_index = static_cast<Integer*>(fetch(object_operand_index))->value();
     }
 
-    if (unsigned(a) >= frame_new->args->size()) { throw new Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter"); }
-    frame_new->args->set(a, fetch(b));
-    frame_new->args->flag(a, REFERENCE);
+    if (unsigned(parameter_no_operand_index) >= frame_new->args->size()) { throw new Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter"); }
+    frame_new->args->set(parameter_no_operand_index, fetch(object_operand_index));
+    frame_new->args->flag(parameter_no_operand_index, REFERENCE);
 
     return addr;
 }
@@ -393,38 +393,38 @@ byte* CPU::paref(byte* addr) {
 byte* CPU::arg(byte* addr) {
     /** Run arg instruction.
      */
-    int a, b;
-    bool a_ref = false, b_ref = false;
+    int parameter_no_operand_index, destination_register_index;
+    bool parameter_no_operand_ref = false, destination_register_ref = false;
 
-    a_ref = *((bool*)addr);
+    parameter_no_operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    a = *((int*)addr);
+    parameter_no_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    b_ref = *((bool*)addr);
+    destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    b = *((int*)addr);
+    destination_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (a_ref) {
-        a = static_cast<Integer*>(fetch(a))->value();
+    if (parameter_no_operand_ref) {
+        parameter_no_operand_index = static_cast<Integer*>(fetch(parameter_no_operand_index))->value();
     }
-    if (b_ref) {
-        b = static_cast<Integer*>(fetch(b))->value();
+    if (destination_register_ref) {
+        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
     }
 
-    if (unsigned(a) >= frames.back()->args->size()) {
+    if (unsigned(parameter_no_operand_index) >= frames.back()->args->size()) {
         ostringstream oss;
-        oss << "invalid read: read from argument register out of bounds: " << a;
+        oss << "invalid read: read from argument register out of bounds: " << parameter_no_operand_index;
         throw new Exception(oss.str());
     }
 
-    if (frames.back()->args->isflagged(a, REFERENCE)) {
-        uregset->set(b, frames.back()->args->get(a));
+    if (frames.back()->args->isflagged(parameter_no_operand_index, REFERENCE)) {
+        uregset->set(destination_register_index, frames.back()->args->get(parameter_no_operand_index));
     } else {
-        uregset->set(b, frames.back()->args->get(a)->copy());
+        uregset->set(destination_register_index, frames.back()->args->get(parameter_no_operand_index)->copy());
     }
-    uregset->setmask(b, frames.back()->args->getmask(a));  // set correct mask
+    uregset->setmask(destination_register_index, frames.back()->args->getmask(parameter_no_operand_index));  // set correct mask
 
     return addr;
 }
@@ -440,7 +440,7 @@ byte* CPU::call(byte* addr) {
     byte* return_address = (addr + sizeof(bool) + sizeof(int));
 
     if (frame_new == 0) {
-        throw new Exception("function call without a frame: use `frame 0' in source code if the function takes no parameters");
+        throw new Exception("function call without first_operand_index frame: use `frame 0' in source code if the function takes no parameters");
     }
     // set function name and return address
     frame_new->function_name = call_name;
@@ -533,22 +533,22 @@ byte* CPU::vmcatch(byte* addr) {
 byte* CPU::pull(byte* addr) {
     /** Run pull instruction.
      */
-    int a;
-    bool a_ref = false;
+    int destination_register_index;
+    bool destination_register_ref = false;
 
-    a_ref = *((bool*)addr);
+    destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    a = *((int*)addr);
+    destination_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (a_ref) {
-        a = static_cast<Integer*>(fetch(a))->value();
+    if (destination_register_ref) {
+        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
     }
 
     if (caught == 0) {
         throw new Exception("no caught object to pull");
     }
-    uregset->set(a, caught);
+    uregset->set(destination_register_index, caught);
     caught = 0;
 
     return addr;
@@ -573,31 +573,31 @@ byte* CPU::vmtry(byte* addr) {
 byte* CPU::vmthrow(byte* addr) {
     /** Run throw instruction.
      */
-    int a;
-    bool a_ref = false;
+    int source_register_index;
+    bool source_register_ref = false;
 
-    a_ref = *((bool*)addr);
+    source_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    a = *((int*)addr);
+    source_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (a_ref) {
-        a = static_cast<Integer*>(fetch(a))->value();
+    if (source_register_ref) {
+        source_register_index = static_cast<Integer*>(fetch(source_register_index))->value();
     }
 
-    if (unsigned(a) >= uregset->size()) {
+    if (unsigned(source_register_index) >= uregset->size()) {
         ostringstream oss;
-        oss << "invalid read: register out of bounds: " << a;
+        oss << "invalid read: register out of bounds: " <<source_register_index;
         throw new Exception(oss.str());
     }
-    if (uregset->at(a) == 0) {
+    if (uregset->at(source_register_index) == 0) {
         ostringstream oss;
-        oss << "invalid throw: register " << a << " is empty";
+        oss << "invalid throw: register " << source_register_index << " is empty";
         throw new Exception(oss.str());
     }
 
-    uregset->setmask(a, KEEP);  // set correct mask
-    thrown = uregset->get(a);
+    uregset->setmask(source_register_index, KEEP);  // set correct mask
+    thrown = uregset->get(source_register_index);
 
     return addr;
 }
@@ -728,14 +728,13 @@ byte* CPU::excall(byte* addr) {
 byte* CPU::branch(byte* addr) {
     /*  Run branch instruction.
      */
-    bool regcond_ref;
-    int regcond_num;
+    bool condition_object_ref;
+    int condition_object_index;
 
-
-    regcond_ref = *((bool*)addr);
+    condition_object_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
 
-    regcond_num = *((int*)addr);
+    condition_object_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
     int addr_true = *((int*)addr);
@@ -744,12 +743,11 @@ byte* CPU::branch(byte* addr) {
     int addr_false = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-
-    if (regcond_ref) {
-        regcond_num = static_cast<Integer*>(fetch(regcond_num))->value();
+    if (condition_object_ref) {
+        condition_object_index = static_cast<Integer*>(fetch(condition_object_index))->value();
     }
 
-    bool result = fetch(regcond_num)->boolean();
+    bool result = fetch(condition_object_index)->boolean();
 
     addr = bytecode + (result ? addr_true : addr_false);
 
