@@ -17,19 +17,19 @@ byte* CPU::echo(byte* addr) {
     /*  Run echo instruction.
      */
     bool ref = false;
-    int reg;
+    int operand_index;
 
     ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
 
-    reg = *((int*)addr);
+    operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
     if (ref) {
-        reg = static_cast<Integer*>(fetch(reg))->value();
+        operand_index = static_cast<Integer*>(fetch(operand_index))->value();
     }
 
-    cout << fetch(reg)->str();
+    cout << fetch(operand_index)->str();
 
     return addr;
 }
