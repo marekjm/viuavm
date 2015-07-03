@@ -3,7 +3,7 @@
     ress static
 
     ; check if 1 register is null
-    isnull 1 2
+    isnull 2 1
     ; invert the check (check if register 1 is *not null*)
     not 2
 

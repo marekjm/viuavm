@@ -168,14 +168,14 @@ byte* CPU::isnull(byte* addr) {
     int checked_register_index, destination_register_index;
     bool checked_register_ref = false, destination_register_ref = false;
 
-    checked_register_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    checked_register_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
     destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
     destination_register_index = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    checked_register_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    checked_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
     if (checked_register_ref) {

@@ -2,7 +2,7 @@
     .name: 1 vector
 
     ress static
-    isnull vector 2
+    isnull 2 vector
     not 2
     branch 2 logic
     vec vector
