@@ -2,7 +2,7 @@
 ; The instruction should copy the value of one register into another.
 .function: main
     istore 1 1
-    copy 1 2
+    copy 2 1
     print 2
     izero 0
     end

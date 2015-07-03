@@ -32,7 +32,7 @@
     .mark: finished
 
     vat 9 vector -1
-    copy 9 0
+    copy 0 9
     empty 9
     end
 .end
