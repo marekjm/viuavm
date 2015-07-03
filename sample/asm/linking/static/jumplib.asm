@@ -1,6 +1,6 @@
 .function: jumprint
     ; FIXME: jump instructions are calculated incorrectly
-    arg 0 1
+    arg 1 0
     print 1
 
     istore 2 42

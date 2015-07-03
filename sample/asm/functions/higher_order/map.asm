@@ -1,7 +1,7 @@
 .function: square
     ; this function takes single integer as its argument,
     ; squares it and returns the result
-    arg 0 1
+    arg 1 0
     imul 0 1 1
     end
 .end
@@ -15,8 +15,8 @@
     .name: 2 parameter
 
     ; extract the parameters
-    arg 0 func
-    arg 1 parameter
+    arg func 0
+    arg parameter 1
 
     ; apply the function to the parameter...
     frame 1
@@ -35,8 +35,8 @@
     ; then, it maps (i.e. calls) the given function on every element of given vector
     ; and returns a vector containing modified values.
     ; returned vector is a newly created one - this function does not modify vectors in place.
-    arg 0 1
-    arg 1 2
+    arg 1 0
+    arg 2 1
 
     ; new vector to store mapped values
     vec 3

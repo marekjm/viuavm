@@ -1,8 +1,8 @@
 .function: factorial
     .name: 1 number
     .name: 2 result
-    arg 0 number
-    arg 1 result
+    arg number 0
+    arg result 1
 
     ; multiply "result" (reference) by "number" (copy)
     ; and store the resulting integer in "result"

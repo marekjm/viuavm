@@ -1,7 +1,7 @@
 .function: square
     ; this function takes single integer as its argument,
     ; squares it and returns the result
-    arg 0 1
+    arg 1 0
     imul 0 1 1
     end
 .end
@@ -15,8 +15,8 @@
     .name: 2 parameter
 
     ; extract the parameters
-    arg 0 func
-    arg 1 parameter
+    arg func 0
+    arg parameter 1
 
     ; apply the function to the parameter...
     frame 1

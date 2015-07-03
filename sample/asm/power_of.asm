@@ -13,8 +13,8 @@
     .name: 6 result
 
     ; store operands of the power-of operation
-    arg 0 base
-    arg 1 exponent
+    arg base 0
+    arg exponent 1
 
     ; store zero - we need it to compare the exponent to it
     istore zero 0

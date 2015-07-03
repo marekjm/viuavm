@@ -3,8 +3,8 @@
     .name: 2 zero
 
     ; unpack arguments
-    arg 0 counter
-    arg 1 zero
+    arg counter 0
+    arg zero 1
 
     ; decrease counter and check if it's less than zero
     idec counter

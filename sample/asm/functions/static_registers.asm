@@ -13,7 +13,7 @@
 
     ; these instructions are executed only when 1 register was null
     istore 1 0
-    arg 0 3
+    arg 3 0
     jump report
 
     .mark: increase
@@ -23,7 +23,7 @@
     ress local
     tmpro 1
 
-    arg 0 3
+    arg 3 0
 
     ; integer at 1 is less than N
     ilt 4 1 3

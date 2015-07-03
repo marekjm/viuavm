@@ -1,6 +1,6 @@
 .function: is_divisible_by
     .name: 2 bound_variable
-    arg 0 1
+    arg 1 0
 
     .mark: loop_begin
     ilt 3 1 bound_variable
@@ -25,7 +25,7 @@
 .end
 
 .function: is_divisible_by_2
-    arg 0 2
+    arg 2 0
     clbind 2
     closure is_divisible_by 1
     move 0 1
@@ -37,8 +37,8 @@
     ; it takes two arguments:
     ;   * a filtering function,
     ;   * a vector with values to be filtered,
-    arg 0 1
-    arg 1 2
+    arg 1 0
+    arg 2 1
 
     ; vector for filtered values
     vec 3

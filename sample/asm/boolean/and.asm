@@ -1,5 +1,5 @@
 .function: boolean
-    arg 0 1
+    arg 1 0
     not 1
     not 1
     move 0 1

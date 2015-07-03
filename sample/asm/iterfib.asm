@@ -14,7 +14,7 @@
 
     .name: 3 number
     .name: 4 length
-    arg 0 number
+    arg number 0
 
     .mark: loop
     vlen length vector

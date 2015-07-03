@@ -5,7 +5,7 @@
 .end
 
 .function: closure_b
-    arg 0 1
+    arg 1 0
 
     ; overwrite bound value with whatever we got
     istore 2 @1

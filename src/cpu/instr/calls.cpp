@@ -98,14 +98,14 @@ byte* CPU::arg(byte* addr) {
     int parameter_no_operand_index, destination_register_index;
     bool parameter_no_operand_ref = false, destination_register_ref = false;
 
-    parameter_no_operand_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    parameter_no_operand_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
     destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
     destination_register_index = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    parameter_no_operand_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    parameter_no_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
     if (parameter_no_operand_ref) {

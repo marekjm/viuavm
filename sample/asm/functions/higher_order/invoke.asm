@@ -1,10 +1,10 @@
 .function: sum4
     ; this function takes four integers as parameters and
     ; adds them, and returns the sum
-    arg 0 1
-    arg 1 2
-    arg 2 3
-    arg 3 4
+    arg 1 0
+    arg 2 1
+    arg 3 2
+    arg 4 3
 
     iadd 0 1 2
     iadd 0 3 0
@@ -21,8 +21,8 @@
     ; it then creates a frame with required number of parameter slots (as
     ; specified by length of the vector), and calls given function with this
     ; frame
-    arg 0 1
-    arg 1 2
+    arg 1 0
+    arg 2 1
 
     ; take length of the vector
     .name: 4 vector_length

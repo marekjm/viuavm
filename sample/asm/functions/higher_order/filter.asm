@@ -1,5 +1,5 @@
 .function: is_divisible_by_2
-    arg 0 1
+    arg 1 0
 
     istore 2 2
 
@@ -27,8 +27,8 @@
     ; it takes two arguments:
     ;   * a filtering function,
     ;   * a vector with values to be filtered,
-    arg 0 1
-    arg 1 2
+    arg 1 0
+    arg 2 1
 
     ; vector for filtered values
     vec 3

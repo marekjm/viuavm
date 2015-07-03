@@ -1,5 +1,5 @@
 .function: main
-    arg 0 1
+    arg 1 0
 
     .name: 2 len
     .name: 3 counter
