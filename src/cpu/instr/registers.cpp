@@ -13,14 +13,14 @@ byte* CPU::move(byte* addr) {
     int object_operand_index, destination_register_index;
     bool object_operand_ref = false, destination_register_ref = false;
 
-    object_operand_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    object_operand_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
     destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
     destination_register_index = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    object_operand_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    object_operand_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
     if (object_operand_ref) {

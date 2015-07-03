@@ -9,7 +9,7 @@
 
     clbind 1
     closure foo 2
-    move 2 0
+    move 0 2
     end
 .end
 

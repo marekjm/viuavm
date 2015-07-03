@@ -24,7 +24,7 @@
     fcall func 3
 
     ; ...and return the result
-    move 3 0
+    move 0 3
     end
 .end
 

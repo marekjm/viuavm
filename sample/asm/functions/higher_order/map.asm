@@ -24,7 +24,7 @@
     fcall func 3
 
     ; ...and return the result
-    move 3 0
+    move 0 3
     end
 .end
 
@@ -74,7 +74,7 @@
     .mark: loop_end
 
     ; move vector with mapped values to the return register
-    move 3 0
+    move 0 3
     end
 .end
 

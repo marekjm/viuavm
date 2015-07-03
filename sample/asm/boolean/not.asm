@@ -2,7 +2,7 @@
     arg 0 1
     not 1
     not 1
-    move 1 0
+    move 0 1
     end
 .end
 

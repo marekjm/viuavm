@@ -63,7 +63,7 @@
     ; finally, after the frame is ready
     ; call the function
     fcall 1 8
-    move 8 0
+    move 0 8
     end
 .end
 

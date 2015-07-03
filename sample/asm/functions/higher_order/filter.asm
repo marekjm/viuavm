@@ -13,7 +13,7 @@
 
     .mark: loop_end
 
-    move 1 0
+    move 0 1
 
     ; make zero "true" and
     ; non-zero values "false"
@@ -72,7 +72,7 @@
     .mark: loop_end
 
     ; move result vector into return register
-    move 3 0
+    move 0 3
     end
 .end
 
