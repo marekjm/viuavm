@@ -2429,16 +2429,90 @@ Various instructions that do not fit into any other category.
 echo
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+echo <target register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Print stringified contents of target register to standard output.
+ Does not put trailing newline.
+\end_layout
+
 \begin_layout Subsubsection
 print
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+print <target register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Print stringified contents of target register to standard output.
+ Prints trailing newline.
 \end_layout
 
 \begin_layout Subsubsection
 nop
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+nop
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Do nothing.
+\end_layout
+
 \begin_layout Subsubsection
 halt
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+halt
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Unconditionally halt execution of the machine.
 \end_layout
 
 \begin_layout Standard
