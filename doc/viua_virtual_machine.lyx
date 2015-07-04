@@ -288,10 +288,110 @@ name "sec:Instruction-set"
 This section contains description of the VM's CPU instruction set.
  Each instruction is explained and its syntax is shown so readers can treat
  this section also as a reference for VM's assembly language.
+ Opcodes are divided into several groups described under different sections.
+ Integer instructions are described
+\begin_inset CommandInset ref
+LatexCommand vpageref
+reference "sub:Integers"
+
+\end_inset
+
+, floating point instructions
+\begin_inset CommandInset ref
+LatexCommand vpageref
+reference "sub:Floats"
+
+\end_inset
+
+, instructions for conversion between builtin types
+\begin_inset CommandInset ref
+LatexCommand vpageref
+reference "sub:Casts"
+
+\end_inset
+
+, Boolean instructions
+\begin_inset CommandInset ref
+LatexCommand vpageref
+reference "sub:Booleans"
+
+\end_inset
+
+, string (text) instructions
+\begin_inset CommandInset ref
+LatexCommand vpageref
+reference "sub:Strings"
+
+\end_inset
+
+, vector (data type) instructions
+\begin_inset CommandInset ref
+LatexCommand vpageref
+reference "sub:Vectors"
+
+\end_inset
+
+, control flow
+\begin_inset CommandInset ref
+LatexCommand vpageref
+reference "sub:Control-flow"
+
+\end_inset
+
+, function calling
+\begin_inset CommandInset ref
+LatexCommand vpageref
+reference "sub:Function-calls"
+
+\end_inset
+
+, closures and functional instructions
+\begin_inset CommandInset ref
+LatexCommand vpageref
+reference "sub:Closures-and-functional"
+
+\end_inset
+
+, operations on registers
+\begin_inset CommandInset ref
+LatexCommand vpageref
+reference "sub:Operations-on-registers"
+
+\end_inset
+
+, exception handling
+\begin_inset CommandInset ref
+LatexCommand vpageref
+reference "sub:Exceptions"
+
+\end_inset
+
+, interfacing with C++ code
+\begin_inset CommandInset ref
+LatexCommand vpageref
+reference "sub:Interfacing-with-C++"
+
+\end_inset
+
+ and other instructions
+\begin_inset CommandInset ref
+LatexCommand vpageref
+reference "sub:Other-instructions"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
 Integers
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Integers"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -353,6 +453,13 @@ ieq
 
 \begin_layout Subsection
 Floats
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Floats"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -402,6 +509,13 @@ feq
 
 \begin_layout Subsection
 Casts
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Casts"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -418,6 +532,13 @@ ftoi
 
 \begin_layout Subsection
 Booleans
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Booleans"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -438,6 +559,13 @@ or
 
 \begin_layout Subsection
 Strings
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Strings"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -450,6 +578,13 @@ strstore
 
 \begin_layout Subsection
 Vectors
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Vectors"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -482,6 +617,13 @@ vlen
 
 \begin_layout Subsection
 Control flow
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Control-flow"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -582,7 +724,14 @@ branch
 \end_layout
 
 \begin_layout Subsection
-Functions
+Function calls
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Function-calls"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -614,7 +763,14 @@ end
 \end_layout
 
 \begin_layout Subsection
-Closures
+Closures and functional
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Closures-and-functional"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -631,8 +787,23 @@ clbind
 closure
 \end_layout
 
+\begin_layout Subsubsection
+function
+\end_layout
+
+\begin_layout Subsubsection
+fcall
+\end_layout
+
 \begin_layout Subsection
 Operations on registers
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Operations-on-registers"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -682,6 +853,13 @@ tmpro
 
 \begin_layout Subsection
 Exceptions
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Exceptions"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection
@@ -751,6 +929,13 @@ Pulls caught object into a register.
 
 \begin_layout Subsection
 Interfacing with C++ modules
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Interfacing-with-C++"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection
@@ -763,6 +948,13 @@ excall
 
 \begin_layout Subsection
 Other instructions
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Other-instructions"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
