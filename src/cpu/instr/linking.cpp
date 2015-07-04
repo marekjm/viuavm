@@ -1,4 +1,5 @@
 #include <dlfcn.h>
+#include <iostream>
 #include "../../types/integer.h"
 #include "../../support/pointer.h"
 #include "../../include/module.h"
@@ -8,7 +9,7 @@ using namespace std;
 
 
 byte* CPU::eximport(byte* addr) {
-    /** Run excall instruction.
+    /** Run eximport instruction.
      */
     string module = string(addr);
     addr += module.size();
@@ -121,4 +122,28 @@ byte* CPU::excall(byte* addr) {
     }
 
     return return_address;
+}
+
+byte* CPU::link(byte* addr) {
+    /** Run link instruction.
+     */
+    string module = string(addr);
+    addr += module.size();
+
+    string path = module;
+
+    ostringstream oss;
+    for (unsigned i = 0; i < VIUAPATH.size(); ++i) {
+        oss.str("");
+        oss << VIUAPATH[i] << '/' << module << ".vlib";
+        path = oss.str();
+        if (path[0] == '~') {
+            oss.str("");
+            oss << getenv("HOME") << path.substr(1);
+            path = oss.str();
+        }
+        cout << path << endl;
+    }
+
+    return addr;
 }

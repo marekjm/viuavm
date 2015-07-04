@@ -219,6 +219,9 @@ byte* CPU::dispatch(byte* addr) {
         case EXCALL:
             addr = excall(addr+1);
             break;
+        case LINK:
+            addr = link(addr+1);
+            break;
         case HALT:
             throw HaltException();
             break;

@@ -193,6 +193,8 @@ class CPU {
     byte* eximport(byte*);
     byte* excall(byte*);
 
+    byte* link(byte*);
+
     public:
         // debug and error reporting flags
         bool debug, errors;
