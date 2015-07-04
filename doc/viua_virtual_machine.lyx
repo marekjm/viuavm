@@ -2204,65 +2204,120 @@ name "sub:Exceptions"
 tryframe
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
 \begin_layout Standard
-Creates a frame for trying a block.
- Takes no operands.
+
+\family typewriter
+tryframe
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Create a frame for trying a block.
 \end_layout
 
 \begin_layout Subsubsection
 catch
 \end_layout
 
-\begin_layout Standard
-Registers catcher block for a type.
- Takes two operands: a type to catch and a block name to handle it.
- Type must be given as a double-quoted string.
-\end_layout
-
-\begin_layout Subsubsection*
+\begin_layout Paragraph
 Syntax
 \end_layout
 
 \begin_layout Standard
-\begin_inset listings
-inline false
-status open
 
-\begin_layout Plain Layout
-
-catch "Integer" handle_integer
+\family typewriter
+catch <type> <handler block>
 \end_layout
 
-\end_inset
+\begin_layout Paragraph
+Semantics
+\end_layout
 
-
+\begin_layout Standard
+Registers handler block for a type.
+ Instruction fails if no 
+\family typewriter
+tryframe
+\family default
+ is available.
 \end_layout
 
 \begin_layout Subsubsection
 try
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+try <block>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
 \begin_layout Standard
 Tries to execute a block.
- Takes one operand: block name.
+ Instruction fails if no 
+\family typewriter
+tryframe
+\family default
+ is available.
 \end_layout
 
 \begin_layout Subsubsection
 throw
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
 \begin_layout Standard
-Throws an object.
- Takes one operand: register index specifying which object should be thrown.
+
+\family typewriter
+throw <source register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Throw object found in given register.
 \end_layout
 
 \begin_layout Subsubsection
 pull
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
 \begin_layout Standard
-Pulls caught object into a register.
- Takes one operand: register index into which the object shall be pulled.
+
+\family typewriter
+pull <target register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Put caught object in target register.
 \end_layout
 
 \begin_layout Standard
