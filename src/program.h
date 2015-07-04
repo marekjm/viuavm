@@ -109,9 +109,9 @@ class Program {
     Program& echo       (int_op);
 
     Program& clbind     (int_op);
-    Program& closure    (std::string, int_op);
+    Program& closure    (int_op, const std::string&);
 
-    Program& function   (std::string, int_op);
+    Program& function   (int_op, const std::string&);
     Program& fcall      (int_op, int_op);
 
     Program& frame      (int_op, int_op);

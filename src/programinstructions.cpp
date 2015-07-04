@@ -532,17 +532,17 @@ Program& Program::clbind(int_op reg) {
     return (*this);
 }
 
-Program& Program::closure(string fn, int_op reg) {
+Program& Program::closure(int_op reg, const string& fn) {
     /*  Inserts closure instuction.
      */
-    addr_ptr = cg::bytecode::closure(addr_ptr, fn, reg);
+    addr_ptr = cg::bytecode::closure(addr_ptr, reg, fn);
     return (*this);
 }
 
-Program& Program::function(string fn, int_op reg) {
+Program& Program::function(int_op reg, const string& fn) {
     /*  Inserts function instuction.
      */
-    addr_ptr = cg::bytecode::function(addr_ptr, fn, reg);
+    addr_ptr = cg::bytecode::function(addr_ptr, reg, fn);
     return (*this);
 }
 

@@ -413,11 +413,11 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         } else if (str::startswith(line, "closure")) {
             string fn_name, reg;
             tie(fn_name, reg) = assembler::operands::get2(operands);
-            program.closure(fn_name, assembler::operands::getint(resolveregister(reg, names)));
+            program.closure(assembler::operands::getint(resolveregister(reg, names)), fn_name);
         } else if (str::startswith(line, "function")) {
             string fn_name, reg;
             tie(fn_name, reg) = assembler::operands::get2(operands);
-            program.function(fn_name, assembler::operands::getint(resolveregister(reg, names)));
+            program.function(assembler::operands::getint(resolveregister(reg, names)), fn_name);
         } else if (str::startswith(line, "fcall")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = assembler::operands::get2(operands);
