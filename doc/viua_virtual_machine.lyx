@@ -714,40 +714,229 @@ These instructions are similat to their integer counterparts.
 fstore
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+fstore <target register> <float operand>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Store a floating point number object in given target register.
+\end_layout
+
 \begin_layout Subsubsection
 fadd
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+fadd <destination register> <1st operand register> <2nd operand register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Add float found in second operand to float found in the first one, and store
+ float result in destination register.
 \end_layout
 
 \begin_layout Subsubsection
 fsub
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+fsub <destination register> <1st operand register> <2nd operand register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Subtract float found in second operand from float found in the first one,
+ and store float result in destination register.
+\end_layout
+
 \begin_layout Subsubsection
 fmul
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+fmul <destination register> <1st operand register> <2nd operand register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Multiply float found in first operand by float found in the second one,
+ and store float result in destination register.
 \end_layout
 
 \begin_layout Subsubsection
 fdiv
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+fdiv <destination register> <1st operand register> <2nd operand register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Divide float found in first operand by float found in the second one, and
+ store float result in destination register.
+\end_layout
+
 \begin_layout Subsubsection
 flt
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+flt <destination register> <1st operand register> <2nd operand register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Check if float found in first operand is lesser than float found in the
+ second one, and store boolean result in destination register.
 \end_layout
 
 \begin_layout Subsubsection
 flte
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+flte <destination register> <1st operand register> <2nd operand register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Check if float found in first operand is lesser than or equal to float found
+ in the second one, and store boolean result in destination register.
+\end_layout
+
 \begin_layout Subsubsection
 fgt
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+fgt <destination register> <1st operand register> <2nd operand register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Check if float found in first operand is greater than float found in the
+ second one, and store boolean result in destination register.
 \end_layout
 
 \begin_layout Subsubsection
 fgte
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+fgte <destination register> <1st operand register> <2nd operand register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Check if float found in first operand is greater than or equal to float
+ found in the second one, and store boolean result in destination register.
+\end_layout
+
 \begin_layout Subsubsection
 feq
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+feq <destination register> <1st operand register> <2nd operand register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Check if float found in first operand is equal to float found in the second
+ one, and store boolean result in destination register.
 \end_layout
 
 \begin_layout Subsection
