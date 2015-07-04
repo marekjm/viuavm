@@ -1068,12 +1068,74 @@ Common boolean operations.
 not
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+not <target register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Invert boolean value of object found in target register.
+ Object is converted to Boolean type if needed.
+ If a unchanged form of the object is required to remain available, 
+\family typewriter
+not
+\family default
+ should be used on a copy of the object.
+\end_layout
+
 \begin_layout Subsubsection
 and
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+and <target register> <1st operand register> <2nd operand register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Store result of logical conjunction of Boolean values of operand objects
+ in target register.
+\end_layout
+
 \begin_layout Subsubsection
 or
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+or <target register> <1st operand register> <2nd operand register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Store result of logical disjunction of Boolean values of operand objects
+ in target register.
 \end_layout
 
 \begin_layout Subsection
