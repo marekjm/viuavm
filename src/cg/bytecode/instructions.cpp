@@ -825,7 +825,7 @@ namespace cg {
             /*  Inserts eximport instruction.
              */
             *(addr_ptr++) = LINK;
-            for (unsigned i = 1; i < module_name.size()-1; ++i) {
+            for (unsigned i = 0; i < module_name.size(); ++i) {
                 *((char*)addr_ptr++) = module_name[i];
             }
             *((char*)addr_ptr++) = char(0);
