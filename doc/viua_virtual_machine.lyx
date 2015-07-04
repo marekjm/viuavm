@@ -2512,7 +2512,7 @@ Semantics
 \end_layout
 
 \begin_layout Standard
-Unconditionally halt execution of the machine.
+Unconditionally halt execution of the program and exit the machine.
 \end_layout
 
 \begin_layout Standard
