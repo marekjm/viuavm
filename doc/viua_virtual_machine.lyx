@@ -69,11 +69,11 @@
 \begin_body
 
 \begin_layout Title
-Viua Virtual Machine
+Viua Virtual Machine 0.4.6
 \end_layout
 
 \begin_layout Author
-by Marek Marecki
+Marek Marecki
 \end_layout
 
 \begin_layout Standard
@@ -127,6 +127,14 @@ reference "part:Programming"
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Subsection
+License
+\end_layout
+
+\begin_layout Standard
+Machine's code is released under GNU GPL version 3 license.
 \end_layout
 
 \begin_layout Subsection
