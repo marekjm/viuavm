@@ -21,7 +21,7 @@
     ; apply the function to the parameter...
     frame 1
     param 0 parameter
-    fcall func 3
+    fcall 3 func
 
     ; ...and return the result
     move 0 3

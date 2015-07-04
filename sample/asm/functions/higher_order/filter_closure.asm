@@ -60,7 +60,7 @@
     frame 1 0
     vat 7 2 @4
     param 0 7
-    fcall 1 8
+    fcall 8 1
 
     ; if the result from filtering function was "true" - the element should be pushed onto result vector
     ; it it was "false" - skip to next iteration

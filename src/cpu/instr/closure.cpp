@@ -118,14 +118,14 @@ byte* CPU::fcall(byte* addr) {
     int fn_reg, return_value_reg;
     bool fn_reg_ref, return_value_ref;
 
-    fn_reg_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    fn_reg = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
     return_value_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
     return_value_reg = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    fn_reg_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    fn_reg = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
     if (fn_reg_ref) {

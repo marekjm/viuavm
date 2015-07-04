@@ -43,7 +43,7 @@
 
     frame 0 0
     vat 2 1 0
-    fcall 2 0
+    fcall 0 2
 
     istore 4 69
 
@@ -51,10 +51,10 @@
     param 0 4
 
     vat 3 1 1
-    fcall 3 0
+    fcall 0 3
 
     frame 0 0
-    fcall 2 0
+    fcall 0 2
 
     izero 0
     end

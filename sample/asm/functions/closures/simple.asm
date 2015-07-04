@@ -22,7 +22,7 @@
     ; create frame for our closure and
     ; call it
     frame 0 0
-    fcall bar 0
+    fcall 0 bar
 
     izero 0
     end
