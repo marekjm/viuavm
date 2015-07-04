@@ -1202,24 +1202,143 @@ Instructions used to perform operations on basic Viua sequences - vectors.
 vec
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+vec <target register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Store empty vector in target register.
+\end_layout
+
 \begin_layout Subsubsection
 vinsert
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+vinsert <target register> <object operand register> <position operand>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Insert a copy of object from object operand register into vector, at specified
+ position, found in target register.
+ Default position is 0.
+ At-register reference can be used to load position value from a register.
 \end_layout
 
 \begin_layout Subsubsection
 vpush
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+vpush <target register> <object operand register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Push a copy of object from object operand register to vector found in target
+ register.
+\end_layout
+
 \begin_layout Subsubsection
 vpop
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+vpop <target register> <vector operand register> <position operand>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Pop an object at specified position from vector register and store it in
+ target register.
+ Default position is -1.
+ At-register reference can be used to load position value from a register.
 \end_layout
 
 \begin_layout Subsubsection
 vat
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+vat <target register> <vector operand register> <position operand>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Create a reference in target register, to an object at specified position
+ inside vector register.
+ Default position is -1.
+ At-register reference can be used to load position value from a register.
+\end_layout
+
 \begin_layout Subsubsection
 vlen
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+vlen <target register> <vector operand register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Store length of given vector target register inside target register.
+ Result is an integer.
 \end_layout
 
 \begin_layout Subsection
