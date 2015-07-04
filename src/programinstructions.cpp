@@ -703,6 +703,13 @@ Program& Program::excall(int_op reg, const string& fn_name) {
     return (*this);
 }
 
+Program& Program::link(string module_name) {
+    /*  Inserts link instruction.
+     */
+    addr_ptr = cg::bytecode::link(addr_ptr, module_name);
+    return (*this);
+}
+
 Program& Program::end() {
     /*  Inserts end instruction.
      */

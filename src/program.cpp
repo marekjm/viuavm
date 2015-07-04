@@ -148,6 +148,11 @@ uint16_t Program::countBytes(const vector<string>& lines) {
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (which is a string)
                 inc += (str::extract(line).size() - 2 + 1); // +1: null-terminator, -2: quotes around module name
+            } else if (instr == "link") {
+                // clear first chunk
+                line = str::lstrip(str::sub(line, instr.size()));
+                // get second chunk (which is a module name)
+                inc += (str::extract(line).size() + 1); // +1: null-terminator
             } else if (instr == "catch") {
                 // clear first chunk (the opcode)
                 line = str::lstrip(str::sub(line, instr.size()));
@@ -217,7 +222,7 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
         }
 
         OPCODE opcode = OPCODE(program[offset]);
-        if ((opcode == EXIMPORT) or (opcode == TRY)) {
+        if ((opcode == EXIMPORT) or (opcode == TRY) or (opcode == LINK)) {
             string s(program+offset+1);
             if (scream) {
                 cout << '+' << s.size() << " (function/module name at byte " << offset+1 << ": `" << s << "`)";
