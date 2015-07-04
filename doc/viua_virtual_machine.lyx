@@ -1157,6 +1157,32 @@ Instructions implementing string support in Viua VM.
 strstore
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+strstore <target register> <string>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Store string object in target register.
+\end_layout
+
+\begin_layout Subparagraph
+Implementation detail
+\end_layout
+
+\begin_layout Standard
+Strings are stored as null-terminated character sequences in bytecode.
+\end_layout
+
 \begin_layout Subsection
 Vectors
 \begin_inset CommandInset label
