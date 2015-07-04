@@ -1520,24 +1520,181 @@ Function instructions.
 frame
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+frame <parameters number operand> <local registers number operand>
+\end_layout
+
+\begin_layout Paragraph
+Assembler syntax
+\end_layout
+
+\begin_layout Subparagraph
+Frame with default number of local registers
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+frame <parameters number operand>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Create a frame for next function call with specified number of parameter
+ slots and local registers.
+ Instruction will fail if an unused frame is already present.
+\end_layout
+
 \begin_layout Subsubsection
 param
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+param <param index> <object operand register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Put a copy of an object from operand register to parameter slot with given
+ index.
+ Instruction will fail if no unused frame is present, or if parameter index
+ is greater than available number of slots.
 \end_layout
 
 \begin_layout Subsubsection
 paref
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+paref <param index> <object operand register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Put a reference to an object from operand register to parameter slot with
+ given index.
+ Instruction will fail if no unused frame is present, or if parameter index
+ is greater than available number of slots.
+ This instruction is used for pass-by-reference implementation.
+\end_layout
+
 \begin_layout Subsubsection
 call
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+call <target register> <function name>
+\end_layout
+
+\begin_layout Paragraph
+Assembler syntax
+\end_layout
+
+\begin_layout Subparagraph
+Call that discards returned value
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+call <function name>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Call specified function and put its return value in target register.
+ Return value is discarded if return register is set to 0.
+ Instruction will fail if no unused frame can be found.
+ Instruction will fail if function does not return a value but caller requests
+ one (set target register to non-zero value).
 \end_layout
 
 \begin_layout Subsubsection
 arg
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+arg <target register> <param index>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Put a copy of object found in specified parameter index into target register,
+ or create a reference to an object found in specified parameter index in
+ target register (if pass-by-reference has been used for this parameter).
+\end_layout
+
 \begin_layout Subsubsection
 end
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+end
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Finish execution of current frame and return control to caller function.
+ If the function should return a value, this value must be put into register
+ 0 (return register) before 
+\family typewriter
+end
+\family default
+ instruction is reached.
 \end_layout
 
 \begin_layout Standard
