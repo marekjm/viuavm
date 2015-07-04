@@ -961,8 +961,92 @@ These instructions are used to provide type conversion inside VM.
 itof
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+itof <destination register> <source register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Convert integer found in second operand to float, and store result in destinatio
+n register.
+\end_layout
+
 \begin_layout Subsubsection
 ftoi
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+ftoi <destination register> <source register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Convert float found in second operand to integer, and store result in destinatio
+n register.
+\end_layout
+
+\begin_layout Subsubsection
+stoi
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+stoi <destination register> <source register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Convert string found in second operand to integer, and store result in destinati
+on register.
+\end_layout
+
+\begin_layout Subsubsection
+stof
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+stof <destination register> <source register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Convert string found in second operand to float, and store result in destination
+ register.
 \end_layout
 
 \begin_layout Subsection
