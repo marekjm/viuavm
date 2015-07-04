@@ -11,7 +11,7 @@
     ; pass it by reference to the function
     paref 0 1
     ; store return value in another register (it is a reference!)
-    call by_reference 2
+    call 2 by_reference
     ; assign different value to it
     istore 2 42
     ; check if return-by-reference is working (should print 42)

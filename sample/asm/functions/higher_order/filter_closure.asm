@@ -27,7 +27,7 @@
 .function: is_divisible_by_2
     arg 2 0
     clbind 2
-    closure is_divisible_by 1
+    closure 1 is_divisible_by
     move 0 1
     end
 .end
@@ -60,7 +60,7 @@
     frame 1 0
     vat 7 2 @4
     param 0 7
-    fcall 1 8
+    fcall 8 1
 
     ; if the result from filtering function was "true" - the element should be pushed onto result vector
     ; it it was "false" - skip to next iteration
@@ -105,12 +105,12 @@
     istore 5 2
     frame 1
     param 0 5
-    call is_divisible_by_2 3
+    call 3 is_divisible_by_2
 
     frame 2
     param 0 3
     paref 1 1
-    call filter_closure 4
+    call 4 filter_closure
 
     print 4
 

@@ -80,15 +80,15 @@ namespace cg {
         byte* echo(byte*, int_op);
 
         byte* clbind(byte*, int_op);
-        byte* closure(byte*, const std::string&, int_op);
-        byte* function(byte*, const std::string&, int_op);
+        byte* closure(byte*, int_op, const std::string&);
+        byte* function(byte*, int_op, const std::string&);
         byte* fcall(byte*, int_op, int_op);
 
         byte* frame(byte*, int_op, int_op);
         byte* param(byte*, int_op, int_op);
         byte* paref(byte*, int_op, int_op);
         byte* arg(byte*, int_op, int_op);
-        byte* call(byte*, const std::string&, int_op);
+        byte* call(byte*, int_op, const std::string&);
 
         byte* jump(byte*, int);
         byte* branch(byte*, int_op, int, int);
@@ -101,7 +101,7 @@ namespace cg {
         byte* leave(byte*);
 
         byte* eximport(byte*, const std::string&);
-        byte* excall(byte*, const std::string&, int_op);
+        byte* excall(byte*, int_op, const std::string&);
 
         byte* end(byte*);
         byte* halt(byte*);

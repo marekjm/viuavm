@@ -62,7 +62,7 @@
 
     ; finally, after the frame is ready
     ; call the function
-    fcall 1 8
+    fcall 8 1
     move 0 8
     end
 .end
@@ -89,10 +89,10 @@
     param 1 3
     param 2 4
     param 3 5
-    call sum4 6
+    call 6 sum4
     print 6
 
-    function sum4 7
+    function 7 sum4
 
     istore 9 2
     frame @9
@@ -102,7 +102,7 @@
     iinc 9
     param @9 1
 
-    call invoke 8
+    call 8 invoke
 
     print 8
 

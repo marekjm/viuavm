@@ -412,12 +412,12 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             program.clbind(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "closure")) {
             string fn_name, reg;
-            tie(fn_name, reg) = assembler::operands::get2(operands);
-            program.closure(fn_name, assembler::operands::getint(resolveregister(reg, names)));
+            tie(reg, fn_name) = assembler::operands::get2(operands);
+            program.closure(assembler::operands::getint(resolveregister(reg, names)), fn_name);
         } else if (str::startswith(line, "function")) {
             string fn_name, reg;
-            tie(fn_name, reg) = assembler::operands::get2(operands);
-            program.function(fn_name, assembler::operands::getint(resolveregister(reg, names)));
+            tie(reg, fn_name) = assembler::operands::get2(operands);
+            program.function(assembler::operands::getint(resolveregister(reg, names)), fn_name);
         } else if (str::startswith(line, "fcall")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = assembler::operands::get2(operands);
@@ -463,13 +463,16 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
              *  Good luck with debugging your code, then.
              */
             string fn_name, reg;
-            tie(fn_name, reg) = assembler::operands::get2(operands);
+            tie(reg, fn_name) = assembler::operands::get2(operands);
 
             // if second operand is empty, fill it with zero
             // which means that return value will be discarded
-            if (reg == "") { reg = "0"; }
+            if (fn_name == "") {
+                fn_name = reg;
+                reg = "0";
+            }
 
-            program.call(fn_name, assembler::operands::getint(resolveregister(reg, names)));
+            program.call(assembler::operands::getint(resolveregister(reg, names)), fn_name);
         } else if (str::startswith(line, "branch")) {
             /*  If branch is given three operands, it means its full, three-operands form is being used.
              *  Otherwise, it is short, two-operands form instruction and assembler should fill third operand accordingly.
@@ -579,13 +582,16 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
              *  To explicitly state that return value should be discarded, 0 can be supplied as second operand.
              */
             string fn_name, reg;
-            tie(fn_name, reg) = assembler::operands::get2(operands);
+            tie(reg, fn_name) = assembler::operands::get2(operands);
 
             // if second operand is empty, fill it with zero
             // which means that return value will be discarded
-            if (reg == "") { reg = "0"; }
+            if (fn_name == "") {
+                fn_name = reg;
+                reg = "0";
+            }
 
-            program.excall(fn_name, assembler::operands::getint(resolveregister(reg, names)));
+            program.excall(assembler::operands::getint(resolveregister(reg, names)), fn_name);
         } else if (str::startswith(line, "end")) {
             program.end();
         } else if (str::startswith(line, "halt")) {
@@ -852,7 +858,7 @@ int generate(const string& filename, string& compilename, const vector<string>& 
         ilines.push_back("paref 0 1");
         // this must not be hardcoded because we have '.main:' assembler instruction
         // we also save return value in 1 register since 0 means "drop return value"
-        ilines.push_back("call " + main_function + " 1");
+        ilines.push_back("call 1 " + main_function);
         // then, register 1 is moved to register 0 so it counts as a return code
         ilines.push_back("move 1 0");
         ilines.push_back("halt");

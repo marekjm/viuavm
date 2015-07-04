@@ -2,7 +2,7 @@
     eximport "World"
 
     frame 0
-    excall World.print_hello 0
+    excall 0 World.print_hello
 
     izero 0
     end

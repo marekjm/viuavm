@@ -11,7 +11,7 @@
 
     frame 1
     param 0 1
-    call boolean 1
+    call 1 boolean
 
     print 1
     not 1

@@ -8,7 +8,7 @@
     istore 1 42
 
     clbind 1
-    closure foo 2
+    closure 2 foo
     move 0 2
     end
 .end
@@ -17,12 +17,12 @@
     .name: 1 bar
     ; call function that returns the closure
     frame 0
-    call returns_closure bar
+    call bar returns_closure
 
     ; create frame for our closure and
     ; call it
     frame 0 0
-    fcall bar 0
+    fcall 0 bar
 
     izero 0
     end

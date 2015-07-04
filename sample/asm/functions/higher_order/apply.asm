@@ -21,7 +21,7 @@
     ; apply the function to the parameter...
     frame 1
     param 0 parameter
-    fcall func 3
+    fcall 3 func
 
     ; ...and return the result
     move 0 3
@@ -32,12 +32,12 @@
     ; applies function square/1(int) to 5 and
     ; prints the result
     istore 1 5
-    function square 2
+    function 2 square
 
     frame 2
     param 0 2
     paref 1 1
-    call apply 3
+    call 3 apply
 
     print 3
 

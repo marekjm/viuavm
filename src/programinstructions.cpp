@@ -532,17 +532,17 @@ Program& Program::clbind(int_op reg) {
     return (*this);
 }
 
-Program& Program::closure(string fn, int_op reg) {
+Program& Program::closure(int_op reg, const string& fn) {
     /*  Inserts closure instuction.
      */
-    addr_ptr = cg::bytecode::closure(addr_ptr, fn, reg);
+    addr_ptr = cg::bytecode::closure(addr_ptr, reg, fn);
     return (*this);
 }
 
-Program& Program::function(string fn, int_op reg) {
+Program& Program::function(int_op reg, const string& fn) {
     /*  Inserts function instuction.
      */
-    addr_ptr = cg::bytecode::function(addr_ptr, fn, reg);
+    addr_ptr = cg::bytecode::function(addr_ptr, reg, fn);
     return (*this);
 }
 
@@ -596,11 +596,11 @@ Program& Program::arg(int_op a, int_op b) {
     return (*this);
 }
 
-Program& Program::call(string fn_name, int_op reg) {
+Program& Program::call(int_op reg, const string& fn_name) {
     /*  Inserts call instruction.
      *  Byte offset is calculated automatically.
      */
-    addr_ptr = cg::bytecode::call(addr_ptr, fn_name, reg);
+    addr_ptr = cg::bytecode::call(addr_ptr, reg, fn_name);
     return (*this);
 }
 
@@ -695,11 +695,11 @@ Program& Program::eximport(string module_name) {
     return (*this);
 }
 
-Program& Program::excall(string fn_name, int_op reg) {
+Program& Program::excall(int_op reg, const string& fn_name) {
     /*  Inserts excall instruction.
      *  Byte offset is calculated automatically.
      */
-    addr_ptr = cg::bytecode::excall(addr_ptr, fn_name, reg);
+    addr_ptr = cg::bytecode::excall(addr_ptr, reg, fn_name);
     return (*this);
 }
 

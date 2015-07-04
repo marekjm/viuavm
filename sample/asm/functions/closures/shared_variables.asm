@@ -22,9 +22,9 @@
     ; create two closures binding the same variable
     ; presto, we have two functions that are share some state
     clbind 2
-    closure closure_a 3
+    closure 3 closure_a
     clbind 2
-    closure closure_b 4
+    closure 4 closure_b
 
     ; push closures to vector...
     vpush 1 3
@@ -39,11 +39,11 @@
 
 .function: main
     frame 0
-    call returns_closures 1
+    call 1 returns_closures
 
     frame 0 0
     vat 2 1 0
-    fcall 2 0
+    fcall 0 2
 
     istore 4 69
 
@@ -51,10 +51,10 @@
     param 0 4
 
     vat 3 1 1
-    fcall 3 0
+    fcall 0 3
 
     frame 0 0
-    fcall 2 0
+    fcall 0 2
 
     izero 0
     end

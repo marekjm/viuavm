@@ -616,27 +616,27 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* closure(byte* addr_ptr, const string& fn, int_op reg) {
+        byte* closure(byte* addr_ptr, int_op reg, const string& fn) {
             /*  Inserts closure instuction.
              */
             *(addr_ptr++) = CLOSURE;
+            addr_ptr = insertIntegerOperand(addr_ptr, reg);
             for (unsigned i = 0; i < fn.size(); ++i) {
                 *((char*)addr_ptr++) = fn[i];
             }
             *(addr_ptr++) = '\0';
-            addr_ptr = insertIntegerOperand(addr_ptr, reg);
             return addr_ptr;
         }
 
-        byte* function(byte* addr_ptr, const string& fn, int_op reg) {
+        byte* function(byte* addr_ptr, int_op reg, const string& fn) {
             /*  Inserts function instuction.
              */
             *(addr_ptr++) = FUNCTION;
+            addr_ptr = insertIntegerOperand(addr_ptr, reg);
             for (unsigned i = 0; i < fn.size(); ++i) {
                 *((char*)addr_ptr++) = fn[i];
             }
             *(addr_ptr++) = '\0';
-            addr_ptr = insertIntegerOperand(addr_ptr, reg);
             return addr_ptr;
         }
 
@@ -690,16 +690,16 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* call(byte* addr_ptr, const string& fn_name, int_op reg) {
+        byte* call(byte* addr_ptr, int_op reg, const string& fn_name) {
             /*  Inserts call instruction.
              *  Byte offset is calculated automatically.
              */
             *(addr_ptr++) = CALL;
+            addr_ptr = insertIntegerOperand(addr_ptr, reg);
             for (unsigned i = 0; i < fn_name.size(); ++i) {
                 *((char*)addr_ptr++) = fn_name[i];
             }
             *(addr_ptr++) = '\0';
-            addr_ptr = insertIntegerOperand(addr_ptr, reg);
             return addr_ptr;
         }
 
@@ -808,16 +808,16 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* excall(byte* addr_ptr, const string& fn_name, int_op reg) {
+        byte* excall(byte* addr_ptr, int_op reg, const string& fn_name) {
             /*  Inserts excall instruction.
              *  Byte offset is calculated automatically.
              */
             *(addr_ptr++) = EXCALL;
+            addr_ptr = insertIntegerOperand(addr_ptr, reg);
             for (unsigned i = 0; i < fn_name.size(); ++i) {
                 *((char*)addr_ptr++) = fn_name[i];
             }
             *(addr_ptr++) = '\0';
-            addr_ptr = insertIntegerOperand(addr_ptr, reg);
             return addr_ptr;
         }
 

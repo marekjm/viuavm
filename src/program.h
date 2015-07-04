@@ -109,9 +109,9 @@ class Program {
     Program& echo       (int_op);
 
     Program& clbind     (int_op);
-    Program& closure    (std::string, int_op);
+    Program& closure    (int_op, const std::string&);
 
-    Program& function   (std::string, int_op);
+    Program& function   (int_op, const std::string&);
     Program& fcall      (int_op, int_op);
 
     Program& frame      (int_op, int_op);
@@ -119,7 +119,7 @@ class Program {
     Program& paref      (int_op, int_op);
     Program& arg        (int_op, int_op);
 
-    Program& call       (std::string, int_op);
+    Program& call       (int_op, const std::string&);
     Program& jump       (int, enum JUMPTYPE);
     Program& branch     (int_op, int, enum JUMPTYPE, int, enum JUMPTYPE);
 
@@ -131,7 +131,7 @@ class Program {
     Program& leave      ();
 
     Program& eximport   (std::string);
-    Program& excall     (std::string, int_op);
+    Program& excall     (int_op, const std::string&);
 
     Program& end        ();
     Program& halt       ();

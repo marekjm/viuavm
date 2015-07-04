@@ -18,7 +18,7 @@
 
 .function: main
     frame 0
-    call baz 0
+    call 0 baz
     izero 0
     end
 .end

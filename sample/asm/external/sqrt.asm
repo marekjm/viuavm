@@ -4,7 +4,7 @@
     eximport "math"
     frame 1
     param 0 1
-    excall math.sqrt 2
+    excall 2 math.sqrt
 
     print 2
 

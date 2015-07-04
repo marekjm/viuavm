@@ -21,7 +21,7 @@
     ; apply the function to the parameter...
     frame 1
     param 0 parameter
-    fcall func 3
+    fcall 3 func
 
     ; ...and return the result
     move 0 3
@@ -57,7 +57,7 @@
     frame 1
     vat 7 2 @4
     param 0 7
-    fcall 1 8
+    fcall 8 1
 
     ; push result to new vector
     vpush 3 8
@@ -96,12 +96,12 @@
 
     print 1
 
-    function square 3
+    function 3 square
 
     frame 2
     param 0 3
     paref 1 1
-    call map 4
+    call 4 map
 
     print 4
 

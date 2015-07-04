@@ -50,7 +50,7 @@
     frame 1
     vat 7 2 @4
     param 0 7
-    fcall 1 8
+    fcall 8 1
 
     ; if the result from filtering function was "true" - the element should be pushed onto result vector
     ; it it was "false" - skip to next iteration
@@ -92,12 +92,12 @@
 
     print 1
 
-    function is_divisible_by_2 3
+    function 3 is_divisible_by_2
 
     frame 2
     param 0 3
     paref 1 1
-    call filter 4
+    call 4 filter
 
     print 4
 

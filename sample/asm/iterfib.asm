@@ -46,7 +46,7 @@
 
     frame 1
     param 0 1
-    call iterfib result
+    call result iterfib
 
     print 2
 
