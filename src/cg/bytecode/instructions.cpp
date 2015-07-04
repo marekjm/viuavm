@@ -821,6 +821,17 @@ namespace cg {
             return addr_ptr;
         }
 
+        byte* link(byte* addr_ptr, const string& module_name) {
+            /*  Inserts eximport instruction.
+             */
+            *(addr_ptr++) = LINK;
+            for (unsigned i = 1; i < module_name.size()-1; ++i) {
+                *((char*)addr_ptr++) = module_name[i];
+            }
+            *((char*)addr_ptr++) = char(0);
+            return addr_ptr;
+        }
+
         byte* end(byte* addr_ptr) {
             /*  Inserts end instruction.
              */
