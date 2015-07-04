@@ -61,6 +61,10 @@ string assembler::verify::callableCreations(const vector<string>& lines, const v
 
         callable_type = str::chunk(line);
         line = str::lstrip(str::sub(line, callable_type.size()));
+
+        string register_index = str::chunk(line);
+        line = str::lstrip(str::sub(line, register_index.size()));
+
         string function = str::chunk(line);
         bool is_undefined = (find(function_names.begin(), function_names.end(), function) == function_names.end());
 
@@ -70,12 +74,8 @@ string assembler::verify::callableCreations(const vector<string>& lines, const v
         }
 
         // second chunk of closure instruction, must be an integer
-        line = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
-        if (line.size() == 0) {
-            report << "fatal: second operand missing from " << callable_type << " instruction at line " << i;
-            break;
-        } else if (not str::isnum(line)) {
-            report << "fatal: second operand is not an integer in " << callable_type << " instruction at line " << i;
+        if (not str::isnum(register_index)) {
+            report << "fatal: first operand (register index) is not an integer in " << callable_type << " instruction at line " << (i+1);
             break;
         }
     }

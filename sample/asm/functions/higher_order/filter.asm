@@ -92,7 +92,7 @@
 
     print 1
 
-    function is_divisible_by_2 3
+    function 3 is_divisible_by_2
 
     frame 2
     param 0 3

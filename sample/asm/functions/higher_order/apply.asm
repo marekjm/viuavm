@@ -32,7 +32,7 @@
     ; applies function square/1(int) to 5 and
     ; prints the result
     istore 1 5
-    function square 2
+    function 2 square
 
     frame 2
     param 0 2

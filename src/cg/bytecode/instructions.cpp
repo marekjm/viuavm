@@ -620,11 +620,11 @@ namespace cg {
             /*  Inserts closure instuction.
              */
             *(addr_ptr++) = CLOSURE;
+            addr_ptr = insertIntegerOperand(addr_ptr, reg);
             for (unsigned i = 0; i < fn.size(); ++i) {
                 *((char*)addr_ptr++) = fn[i];
             }
             *(addr_ptr++) = '\0';
-            addr_ptr = insertIntegerOperand(addr_ptr, reg);
             return addr_ptr;
         }
 
@@ -632,11 +632,11 @@ namespace cg {
             /*  Inserts function instuction.
              */
             *(addr_ptr++) = FUNCTION;
+            addr_ptr = insertIntegerOperand(addr_ptr, reg);
             for (unsigned i = 0; i < fn.size(); ++i) {
                 *((char*)addr_ptr++) = fn[i];
             }
             *(addr_ptr++) = '\0';
-            addr_ptr = insertIntegerOperand(addr_ptr, reg);
             return addr_ptr;
         }
 

@@ -39,9 +39,6 @@ byte* CPU::clbind(byte* addr) {
 byte* CPU::closure(byte* addr) {
     /** Create a closure from a function.
      */
-    string call_name = string(addr);
-    addr += (call_name.size()+1);
-
     int reg;
     bool reg_ref;
 
@@ -49,6 +46,9 @@ byte* CPU::closure(byte* addr) {
     pointer::inc<bool, byte>(addr);
     reg = *((int*)addr);
     pointer::inc<int, byte>(addr);
+
+    string call_name = string(addr);
+    addr += (call_name.size()+1);
 
     if (reg_ref) {
         reg = static_cast<Integer*>(fetch(reg))->value();
@@ -89,9 +89,6 @@ byte* CPU::function(byte* addr) {
      *  are can be used to pass functions as parameters and
      *  return them from other functions.
      */
-    string call_name = string(addr);
-    addr += (call_name.size()+1);
-
     int reg;
     bool reg_ref;
 
@@ -99,6 +96,9 @@ byte* CPU::function(byte* addr) {
     pointer::inc<bool, byte>(addr);
     reg = *((int*)addr);
     pointer::inc<int, byte>(addr);
+
+    string call_name = string(addr);
+    addr += (call_name.size()+1);
 
     if (reg_ref) {
         reg = static_cast<Integer*>(fetch(reg))->value();

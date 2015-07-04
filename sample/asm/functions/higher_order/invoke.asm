@@ -92,7 +92,7 @@
     call sum4 6
     print 6
 
-    function sum4 7
+    function 7 sum4
 
     istore 9 2
     frame @9

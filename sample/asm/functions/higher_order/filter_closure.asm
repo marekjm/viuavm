@@ -27,7 +27,7 @@
 .function: is_divisible_by_2
     arg 2 0
     clbind 2
-    closure is_divisible_by 1
+    closure 1 is_divisible_by
     move 0 1
     end
 .end

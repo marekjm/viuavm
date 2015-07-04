@@ -96,7 +96,7 @@
 
     print 1
 
-    function square 3
+    function 3 square
 
     frame 2
     param 0 3

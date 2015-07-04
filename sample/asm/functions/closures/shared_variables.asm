@@ -22,9 +22,9 @@
     ; create two closures binding the same variable
     ; presto, we have two functions that are share some state
     clbind 2
-    closure closure_a 3
+    closure 3 closure_a
     clbind 2
-    closure closure_b 4
+    closure 4 closure_b
 
     ; push closures to vector...
     vpush 1 3

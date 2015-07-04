@@ -8,7 +8,7 @@
     istore 1 42
 
     clbind 1
-    closure foo 2
+    closure 2 foo
     move 0 2
     end
 .end
