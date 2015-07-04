@@ -1854,40 +1854,332 @@ Instructions used to perform type-agnostic operations on registers.
 move
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+move <target register> <source register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Move object from source to target register.
+ Source register is then set to point to 0.
+ All flags are cleared for source register.
+\end_layout
+
 \begin_layout Subsubsection
 copy
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+copy <target register> <source register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Copy object from source to target register.
 \end_layout
 
 \begin_layout Subsubsection
 ref
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+ref <target register> <source register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Create a reference to object from source register in target register.
+ This instruction causes target register to become flagged as a 
+\begin_inset Quotes eld
+\end_inset
+
+reference holding register
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Subsubsection
 swap
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+swap <first operand register> <second operand register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Swap objects in first and second operand registers.
+ Flags are also swapped.
 \end_layout
 
 \begin_layout Subsubsection
 free
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+free <target register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Delete an object found in target register.
+ All flags are cleared for target register.
+ Instruction will fail if register is empty.
+\end_layout
+
+\begin_layout Subparagraph
+Implementation detail
+\end_layout
+
+\begin_layout Standard
+Instruction can cause crashes if deleted object is referenced elsewhere.
+\end_layout
+
 \begin_layout Subsubsection
 empty
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+empty <target register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Make target register point to 0.
+ All flags are cleared for target register.
+\end_layout
+
+\begin_layout Subparagraph
+Implementation detail
+\end_layout
+
+\begin_layout Standard
+Instruction can lead to memory leaks if the register holds the only pointer
+ to an object, or if only remaining pointers to an object are marked as
+ references - as machine does not automaticallty delete references.
 \end_layout
 
 \begin_layout Subsubsection
 isnull
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+isnull <target register> <source register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Check if source register is empty.
+ Stores boolean result in target register.
+\end_layout
+
 \begin_layout Subsubsection
 ress
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+ress <register set id>
+\end_layout
+
+\begin_layout Paragraph
+Assembler syntax
+\end_layout
+
+\begin_layout Subparagraph
+Switching to global register set
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+ress global
+\end_layout
+
+\begin_layout Subparagraph
+Switching to local register set
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+ress local
+\end_layout
+
+\begin_layout Subparagraph
+Switching to static register set
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+ress static
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Switch current register set used.
+\end_layout
+
+\begin_layout Subparagraph
+Implementation detail
+\end_layout
+
+\begin_layout Standard
+Static register set is allocated for a function first time it requests one.
+ Currently there is no way to specify which functions are and which are
+ not allowed to request a switch to static register set.
 \end_layout
 
 \begin_layout Subsubsection
 tmpri
 \end_layout
 
+\begin_layout Standard
+This instruction and its 
+\family typewriter
+tmpro
+\family default
+ counterpart can be used to transfer values between different register sets.
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+tmpri <source register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Put a copy of object from source register in temporary register.
+\end_layout
+
+\begin_layout Subparagraph
+Implementation detail
+\end_layout
+
+\begin_layout Standard
+Instruction must be used with caution - it will cause memory leak if temporary
+ register is overwritten.
+\end_layout
+
 \begin_layout Subsubsection
 tmpro
+\end_layout
+
+\begin_layout Standard
+This instruction and its 
+\family typewriter
+tmpro
+\family default
+ counterpart can be used to transfer values between different register sets.
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+tmpro <target register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Move object from temporary register to target register.
+\end_layout
+
+\begin_layout Subparagraph
+Implementation detail
+\end_layout
+
+\begin_layout Standard
+Instruction must be used with caution - it may cause crashes and memory
+ leaks if target register is overwritten.
 \end_layout
 
 \begin_layout Standard
