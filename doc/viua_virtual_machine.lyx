@@ -1725,16 +1725,106 @@ Closure instructions.
 clbind
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+clbind <target register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Mark given register with 
+\begin_inset Quotes eld
+\end_inset
+
+to be bound
+\begin_inset Quotes erd
+\end_inset
+
+ flag.
+ This flag is needed for closure instruction to know which objects should
+ be bound by it.
+ This flag will be reset by nex closure instruction.
+\end_layout
+
 \begin_layout Subsubsection
 closure
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+closure <target register> <function name>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Create a closure from given function and store it in target register.
 \end_layout
 
 \begin_layout Subsubsection
 function
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+function <target register> <function name>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Create a function object from given function and store it in target register.
+\end_layout
+
 \begin_layout Subsubsection
 fcall
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+fcall <target register> <callable object register index>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Call object found in specified register.
+ This instruction will fail if the object is neither a function object nor
+ a closure.
+ Apart from this fact, this and 
+\family typewriter
+call
+\family default
+ instruction's semantics are the same.
 \end_layout
 
 \begin_layout Standard
