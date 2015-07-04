@@ -582,13 +582,16 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
              *  To explicitly state that return value should be discarded, 0 can be supplied as second operand.
              */
             string fn_name, reg;
-            tie(fn_name, reg) = assembler::operands::get2(operands);
+            tie(reg, fn_name) = assembler::operands::get2(operands);
 
             // if second operand is empty, fill it with zero
             // which means that return value will be discarded
-            if (reg == "") { reg = "0"; }
+            if (fn_name == "") {
+                fn_name = reg;
+                reg = "0";
+            }
 
-            program.excall(fn_name, assembler::operands::getint(resolveregister(reg, names)));
+            program.excall(assembler::operands::getint(resolveregister(reg, names)), fn_name);
         } else if (str::startswith(line, "end")) {
             program.end();
         } else if (str::startswith(line, "halt")) {

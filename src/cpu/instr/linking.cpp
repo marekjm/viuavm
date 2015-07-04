@@ -52,11 +52,17 @@ byte* CPU::eximport(byte* addr) {
 byte* CPU::excall(byte* addr) {
     /** Run excall instruction.
      */
+    bool return_register_ref = *(bool*)addr;
+    pointer::inc<bool, byte>(addr);
+
+    int return_register_index = *(int*)addr;
+    pointer::inc<int, byte>(addr);
+
     string call_name = string(addr);
     addr += (call_name.size()+1);
 
     // save return address for frame
-    byte* return_address = (addr + sizeof(bool) + sizeof(int));
+    byte* return_address = addr;
 
     if (frame_new == 0) {
         throw new Exception("external function call without a frame: use `frame 0' in source code if the function takes no parameters");
@@ -65,9 +71,8 @@ byte* CPU::excall(byte* addr) {
     frame_new->function_name = call_name;
     frame_new->return_address = return_address;
 
-    frame_new->resolve_return_value_register = *(bool*)addr;
-    pointer::inc<bool, byte>(addr);
-    frame_new->place_return_value_in = *(int*)addr;
+    frame_new->resolve_return_value_register = return_register_ref;
+    frame_new->place_return_value_in = return_register_index;
 
     Frame* frame = frame_new;
 

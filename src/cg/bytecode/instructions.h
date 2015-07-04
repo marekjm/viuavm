@@ -101,7 +101,7 @@ namespace cg {
         byte* leave(byte*);
 
         byte* eximport(byte*, const std::string&);
-        byte* excall(byte*, const std::string&, int_op);
+        byte* excall(byte*, int_op, const std::string&);
 
         byte* end(byte*);
         byte* halt(byte*);

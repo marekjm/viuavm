@@ -695,11 +695,11 @@ Program& Program::eximport(string module_name) {
     return (*this);
 }
 
-Program& Program::excall(string fn_name, int_op reg) {
+Program& Program::excall(int_op reg, const string& fn_name) {
     /*  Inserts excall instruction.
      *  Byte offset is calculated automatically.
      */
-    addr_ptr = cg::bytecode::excall(addr_ptr, fn_name, reg);
+    addr_ptr = cg::bytecode::excall(addr_ptr, reg, fn_name);
     return (*this);
 }
 
