@@ -135,7 +135,8 @@ Compilation and dependencies
 
 \begin_layout Standard
 To compile Viua VM one needs a C++11 capable compiler.
- Development is done on Linux machine with GCC 4.9.2.
+ Development is done on Linux machine with GCC 5.1.0.
+ From version 0.4.6 machine should also be compilable by clang++ 3.6.1 and above.
  C++11 Standard Library is the only dependency of the VM.
  To compile the code, following command should be used:
 \end_layout
@@ -161,30 +162,25 @@ make test
 \end_layout
 
 \begin_layout Standard
-First command is used to compile assembler, CPU and bytecode analyzer.
+First command is used to compile assembler, CPU, debugger and disassemler.
  Second command is optional and can be used to verify if VM works correctly.
 \end_layout
 
 \begin_layout Standard
-Shortcut compilation script exists in main directory; it will clean the
- build and recompile the code with maximal number of threads the machine
- it is run on supports (i.e.
- the number of cores the CPU has).
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
-./compile
-\end_layout
-
-\end_inset
-
-
+Shortcut compilation scripts exist in 
+\family typewriter
+./scripts
+\family default
+ directory; 
+\family typewriter
+./scripts/compile
+\family default
+ will compile changed pieces with maximal number of threads the machine
+ it is run on supports, and 
+\family typewriter
+./scripts/recompile
+\family default
+ will recompile whole project.
 \end_layout
 
 \begin_layout Subsection
