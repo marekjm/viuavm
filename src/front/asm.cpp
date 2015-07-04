@@ -592,6 +592,10 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             }
 
             program.excall(assembler::operands::getint(resolveregister(reg, names)), fn_name);
+        } else if (str::startswith(line, "link")) {
+            string str_chnk;
+            str_chnk = str::chunk(operands);
+            program.link(str_chnk);
         } else if (str::startswith(line, "end")) {
             program.end();
         } else if (str::startswith(line, "halt")) {
