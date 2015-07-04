@@ -251,7 +251,14 @@ In May 2015, Viua gained the ability to throw and catch objects (among them
  exceptions).
  This confirmed that errors will be handled in the VM via exception catching
  mechanism.
- 
+\end_layout
+
+\begin_layout Standard
+In June 2015 machine implemented first-class functions and closures which
+ enabled it to support some form of functional programming.
+\end_layout
+
+\begin_layout Standard
 \begin_inset Newpage newpage
 \end_inset
 
