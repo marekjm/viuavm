@@ -117,6 +117,8 @@ enum OPCODE : byte {
     EXIMPORT,   // import external library
     EXCALL,     // call external function
 
+    LINK,
+
     END,
     HALT,
 };

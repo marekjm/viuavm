@@ -107,6 +107,8 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "eximport", sizeof(byte) },
     { "excall", sizeof(byte) + sizeof(bool) + sizeof(int) },
 
+    { "link",   sizeof(byte) },
+
     { "end",    sizeof(byte) },
     { "halt",   sizeof(byte) },
 };
@@ -210,6 +212,8 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { EXIMPORT, "eximport" },
     { EXCALL,   "excall" },
 
+    { LINK,     "link" },
+
     { END,      "end" },
     { HALT,     "halt" },
 };
@@ -224,6 +228,7 @@ const std::vector<enum OPCODE> OP_VARIABLE_LENGTH = {
     TRY,
     EXIMPORT,
     EXCALL,
+    LINK,
 };
 
 
