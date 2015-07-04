@@ -13,6 +13,7 @@ string disassembler::intop(byte* ptr) {
     oss << ((*(bool*)ptr) ? "@" : "");
     pointer::inc<bool, byte>(ptr);
     oss << *(int*)ptr;
+    pointer::inc<int, byte>(ptr);
 
     return oss.str();
 }
