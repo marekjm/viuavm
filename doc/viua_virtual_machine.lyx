@@ -395,60 +395,303 @@ name "sub:Integers"
 \end_layout
 
 \begin_layout Standard
-These instructions are used to perform common operations in integers (like
- addition or multiplication, or comparison).
+These instructions are used to perform common operations on integers (like
+ addition, multiplication, or comparison).
 \end_layout
 
 \begin_layout Subsubsection
 izero
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+izero <register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Store integer 0 in given register.
+\end_layout
+
 \begin_layout Subsubsection
 istore
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+istore <register> <integer operand>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Store integer in given register.
 \end_layout
 
 \begin_layout Subsubsection
 iadd
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+iadd <destination register> <1st operand register> <2nd operand register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Add integer found in second operand to integer found in the first one, and
+ store integer result in destination register.
+\end_layout
+
 \begin_layout Subsubsection
 isub
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+isub <destination register> <1st operand register> <2nd operand register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Subtract integer found in second operand from integer found in the first
+ one, and store integer result in destination register.
 \end_layout
 
 \begin_layout Subsubsection
 imul
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+imul <destination register> <1st operand register> <2nd operand register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Multiply integer found in first operand by integer found in the second one,
+ and store integer result in destination register.
+\end_layout
+
 \begin_layout Subsubsection
 idiv
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+idiv <destination register> <1st operand register> <2nd operand register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Divide integer found in first operand by integer found in the second one,
+ and store integer result in destination register.
 \end_layout
 
 \begin_layout Subsubsection
 iinc
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+iinc <target register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Increment integer found in target register.
+\end_layout
+
 \begin_layout Subsubsection
 idec
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+idec <target register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Decrement integer found in target register.
 \end_layout
 
 \begin_layout Subsubsection
 ilt
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+ilt <destination register> <1st operand register> <2nd operand register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Check if integer found in first operand is lesser than integer found in
+ the second one, and store boolean result in destination register.
+\end_layout
+
 \begin_layout Subsubsection
 ilte
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+ilte <destination register> <1st operand register> <2nd operand register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Check if integer found in first operand is lesser than or equal to integer
+ found in the second one, and store boolean result in destination register.
 \end_layout
 
 \begin_layout Subsubsection
 igt
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+igt <destination register> <1st operand register> <2nd operand register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Check if integer found in first operand is greater than integer found in
+ the second one, and store boolean result in destination register.
+\end_layout
+
 \begin_layout Subsubsection
 igte
 \end_layout
 
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+igte <destination register> <1st operand register> <2nd operand register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Check if integer found in first operand is greater than or equal to integer
+ found in the second one, and store boolean result in destination register.
+\end_layout
+
 \begin_layout Subsubsection
 ieq
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+ieq <destination register> <1st operand register> <2nd operand register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Check if integer found in first operand is equal to integer found in the
+ second one, and store boolean result in destination register.
 \end_layout
 
 \begin_layout Subsection
