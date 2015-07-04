@@ -2358,7 +2358,7 @@ Semantics
 
 \begin_layout Standard
 Import an external C++ module.
- Instructions fails if a module cannot be found, or does not provide valid
+ Instruction fails if a module cannot be found, or does not provide valid
  interface.
 \end_layout
 
