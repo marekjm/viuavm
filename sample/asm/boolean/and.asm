@@ -12,11 +12,11 @@
 
     frame 1
     param 0 1
-    call boolean 1
+    call 1 boolean
 
     frame 1
     param 0 2
-    call boolean 2
+    call 2 boolean
 
     and 3 1 2
 

@@ -122,11 +122,20 @@ uint16_t Program::countBytes(const vector<string>& lines) {
         instr = str::chunk(line);
         try {
             inc = OP_SIZES.at(instr);
-            if ((instr == "call") or (instr == "excall") or (instr == "try")) {
+            if ((instr == "excall") or (instr == "try")) {
                 // clear first chunk
                 line = str::lstrip(str::sub(line, instr.size()));
-                // get second chunk (function name)
+                // get second chunk (function or block name)
                 inc += str::chunk(line).size() + 1;
+            } else if (instr == "call") {
+                // clear first chunk (opcode mnemonic)
+                line = str::lstrip(str::sub(line, instr.size()));
+                // get second chunk (optional register index)
+                string first_op = str::chunk(line);
+                line = str::lstrip(str::sub(line, first_op.size()));
+                // get third chunk (function name if register index was given, empty otherwise)
+                string second_op = str::chunk(line);
+                inc += (second_op.size() ? second_op : first_op).size() + 1;
             } else if ((instr == "closure") or (instr == "function")) {
                 // clear first chunk (opcode mnemonic)
                 line = str::lstrip(str::sub(line, instr.size()));
@@ -208,14 +217,14 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
         }
 
         OPCODE opcode = OPCODE(program[offset]);
-        if ((opcode == CALL) or (opcode == EXIMPORT) or (opcode == EXCALL) or (opcode == TRY)) {
+        if ((opcode == EXIMPORT) or (opcode == EXCALL) or (opcode == TRY)) {
             string s(program+offset+1);
             if (scream) {
                 cout << '+' << s.size() << " (function/module name at byte " << offset+1 << ": `" << s << "`)";
             }
             inc += s.size()+1;
         }
-        if ((opcode == CLOSURE) or (opcode == FUNCTION)) {
+        if ((opcode == CALL) or (opcode == CLOSURE) or (opcode == FUNCTION)) {
             string s(program+offset+sizeof(bool)+sizeof(int)+1);
             if (scream) {
                 cout << '+' << s.size() << " (function/module name at byte " << offset+1 << ": `" << s << "`)";

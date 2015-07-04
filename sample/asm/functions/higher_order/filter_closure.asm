@@ -105,12 +105,12 @@
     istore 5 2
     frame 1
     param 0 5
-    call is_divisible_by_2 3
+    call 3 is_divisible_by_2
 
     frame 2
     param 0 3
     paref 1 1
-    call filter_closure 4
+    call 4 filter_closure
 
     print 4
 

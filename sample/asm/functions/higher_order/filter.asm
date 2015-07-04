@@ -97,7 +97,7 @@
     frame 2
     param 0 3
     paref 1 1
-    call filter 4
+    call 4 filter
 
     print 4
 

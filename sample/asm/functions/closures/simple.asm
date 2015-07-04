@@ -17,7 +17,7 @@
     .name: 1 bar
     ; call function that returns the closure
     frame 0
-    call returns_closure bar
+    call bar returns_closure
 
     ; create frame for our closure and
     ; call it

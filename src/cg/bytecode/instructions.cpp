@@ -690,16 +690,16 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* call(byte* addr_ptr, const string& fn_name, int_op reg) {
+        byte* call(byte* addr_ptr, int_op reg, const string& fn_name) {
             /*  Inserts call instruction.
              *  Byte offset is calculated automatically.
              */
             *(addr_ptr++) = CALL;
+            addr_ptr = insertIntegerOperand(addr_ptr, reg);
             for (unsigned i = 0; i < fn_name.size(); ++i) {
                 *((char*)addr_ptr++) = fn_name[i];
             }
             *(addr_ptr++) = '\0';
-            addr_ptr = insertIntegerOperand(addr_ptr, reg);
             return addr_ptr;
         }
 

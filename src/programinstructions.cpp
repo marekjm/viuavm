@@ -596,11 +596,11 @@ Program& Program::arg(int_op a, int_op b) {
     return (*this);
 }
 
-Program& Program::call(string fn_name, int_op reg) {
+Program& Program::call(int_op reg, const string& fn_name) {
     /*  Inserts call instruction.
      *  Byte offset is calculated automatically.
      */
-    addr_ptr = cg::bytecode::call(addr_ptr, fn_name, reg);
+    addr_ptr = cg::bytecode::call(addr_ptr, reg, fn_name);
     return (*this);
 }
 

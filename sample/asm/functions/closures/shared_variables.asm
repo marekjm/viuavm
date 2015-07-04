@@ -39,7 +39,7 @@
 
 .function: main
     frame 0
-    call returns_closures 1
+    call 1 returns_closures
 
     frame 0 0
     vat 2 1 0

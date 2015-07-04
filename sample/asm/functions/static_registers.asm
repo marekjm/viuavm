@@ -34,7 +34,7 @@
     print 1
     frame 1
     param 0 3
-    call counter 0
+    call 0 counter
 
     .mark: finish
     end
@@ -44,7 +44,7 @@
     istore 1 10
     frame 1
     param 0 1
-    call counter 0
+    call 0 counter
 
     izero 0
     end

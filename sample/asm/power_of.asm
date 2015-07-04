@@ -58,7 +58,7 @@
     frame 2
     param 0 1
     param 1 2
-    call power_of 1
+    call 1 power_of
     print 1
 
     izero 0

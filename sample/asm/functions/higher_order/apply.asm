@@ -37,7 +37,7 @@
     frame 2
     param 0 2
     paref 1 1
-    call apply 3
+    call 3 apply
 
     print 3
 

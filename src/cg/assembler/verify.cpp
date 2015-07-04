@@ -20,11 +20,18 @@ string assembler::verify::functionCalls(const vector<string>& lines, const vecto
             continue;
         }
 
-        string function = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
-        bool is_undefined = (find(function_names.begin(), function_names.end(), function) == function_names.end());
+        line = str::lstrip(line.substr(4));
+        string return_register = str::chunk(line);
+        line = str::lstrip(line.substr(return_register.size()));
+        string function = str::chunk(line);
+
+        // return register is optional to give
+        // if it is not given - second operand is empty, and function name must be taken from first operand
+        bool is_undefined = (find(function_names.begin(), function_names.end(), (function.size() ? function : return_register)) == function_names.end());
 
         if (is_undefined) {
             report << "fatal: call to undefined function '" << function << "' at line " << (i+1);
+            break;
         }
     }
     return report.str();

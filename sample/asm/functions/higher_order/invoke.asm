@@ -89,7 +89,7 @@
     param 1 3
     param 2 4
     param 3 5
-    call sum4 6
+    call 6 sum4
     print 6
 
     function 7 sum4
@@ -102,7 +102,7 @@
     iinc 9
     param @9 1
 
-    call invoke 8
+    call 8 invoke
 
     print 8
 
