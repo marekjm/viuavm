@@ -115,12 +115,17 @@ byte* CPU::function(byte* addr) {
 byte* CPU::fcall(byte* addr) {
     /*  Call a function object.
      */
-    int fn_reg;
-    bool fn_reg_ref;
+    int fn_reg, return_value_reg;
+    bool fn_reg_ref, return_value_ref;
 
     fn_reg_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
     fn_reg = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    return_value_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    return_value_reg = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
     if (fn_reg_ref) {
@@ -132,7 +137,7 @@ byte* CPU::fcall(byte* addr) {
     byte* call_address = bytecode+function_addresses.at(fn->name());
 
     // save return address for frame
-    byte* return_address = (addr + sizeof(bool) + sizeof(int));
+    byte* return_address = addr;
 
     if (frame_new == 0) {
         throw new Exception("fcall without a frame: use `clframe 0' in source code if the function takes no parameters");
@@ -141,9 +146,8 @@ byte* CPU::fcall(byte* addr) {
     frame_new->function_name = fn->function_name;
     frame_new->return_address = return_address;
 
-    frame_new->resolve_return_value_register = *(bool*)addr;
-    pointer::inc<bool, byte>(addr);
-    frame_new->place_return_value_in = *(int*)addr;
+    frame_new->resolve_return_value_register = return_value_ref;
+    frame_new->place_return_value_in = return_value_reg;
 
     pushFrame();
 
