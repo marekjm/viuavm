@@ -267,9 +267,13 @@ byte* CPU::tick() {
 
     if (halt or frames.size() == 0) { return 0; }
 
-    /*  Machine should halt execution if the instruction pointer exceeds bytecode size.
+    /*  Machine should halt execution if the instruction pointer exceeds bytecode size and
+     *  top frame is for local function.
+     *  For dynamically linked functions address will not be in bytecode size range.
      */
-    if (instruction_pointer >= (bytecode+bytecode_size)) {
+    Frame* top_frame = (frames.size() ? frames[frames.size()-1] : 0);
+    bool is_current_function_dynamic = linked_functions.count(top_frame != 0 ? top_frame->function_name : "");
+    if (instruction_pointer >= (bytecode+bytecode_size) and not is_current_function_dynamic) {
         return_code = 1;
         return_exception = "InvalidBytecodeAddress";
         return_message = string("instruction address out of bounds");
