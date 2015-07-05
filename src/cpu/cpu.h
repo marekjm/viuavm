@@ -263,7 +263,7 @@ class CPU {
                 static_registers.erase(sr.first);
             }
             for (std::pair<std::string, std::pair<unsigned, byte*> > lm : linked_modules) {
-                delete lm.second.second;
+                delete[] lm.second.second;
 
                 // this causes valgrind to SCREAM with errors...
                 linked_modules.erase(lm.first);
