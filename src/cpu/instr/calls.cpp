@@ -141,12 +141,18 @@ byte* CPU::call(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     string call_name = string(addr);
+    bool function_found = (function_addresses.count(call_name) or linked_functions.count(call_name));
 
-    if (function_addresses.count(call_name) == 0) {
+    if (not function_found) {
         throw new Exception("call to undefined function: " + call_name);
     }
 
-    byte* call_address = bytecode+function_addresses.at(call_name);
+    byte* call_address = 0;
+    if (function_addresses.count(call_name)) {
+        call_address = bytecode+function_addresses.at(call_name);
+    } else {
+        call_address = linked_functions.at(call_name);
+    }
     addr += (call_name.size()+1);
 
     // save return address for frame
