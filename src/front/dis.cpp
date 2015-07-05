@@ -119,7 +119,7 @@ int main(int argc, char* argv[]) {
 
     map<string, uint16_t> function_address_mapping = loader.getFunctionAddresses();
     vector<string> functions = loader.getFunctions();
-    map<string, unsigned> function_sizes;
+    map<string, unsigned> function_sizes = loader.getFunctionSizes();
 
     map<string, uint16_t> block_address_mapping = loader.getBlockAddresses();
     vector<string> blocks = loader.getBlocks();
@@ -161,21 +161,7 @@ int main(int argc, char* argv[]) {
 
     for (unsigned i = 0; i < functions.size(); ++i) {
         name = functions[i];
-        el_size = 0;
-
-        if (i < (functions.size()-1)) {
-            long unsigned a = function_address_mapping[name];
-            long unsigned b = function_address_mapping[functions[i+1]];
-            el_size = (b-a);
-        } else {
-            long unsigned a = (long unsigned)(bytecode+function_address_mapping[name]);
-            long unsigned b = (long unsigned)(bytecode+bytes);
-            el_size = (b-a);
-        }
-
-        function_sizes[name] = el_size;
-
-        element_sizes[name] = el_size;
+        element_sizes[name] = function_sizes[name];
         element_types[name] = "function";
         element_address_mapping[name] = function_address_mapping[name];
         elements.push_back(name);
