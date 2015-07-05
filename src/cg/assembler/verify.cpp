@@ -26,11 +26,15 @@ string assembler::verify::functionCallsAreDefined(const vector<string>& lines, c
         line = str::lstrip(line.substr(return_register.size()));
         string function = str::chunk(line);
 
-        string& check_function = (function.size() ? function : return_register);
-
         // return register is optional to give
         // if it is not given - second operand is empty, and function name must be taken from first operand
+        string& check_function = (function.size() ? function : return_register);
+
         bool is_undefined = (find(function_names.begin(), function_names.end(), check_function) == function_names.end());
+        // if function is undefined, check if we got a signature for it
+        if (is_undefined) {
+            is_undefined = (find(function_signatures.begin(), function_signatures.end(), check_function) == function_signatures.end());
+        }
 
         if (is_undefined) {
             report << "fatal: call to undefined function '" << check_function << "' at line " << (i+1);
