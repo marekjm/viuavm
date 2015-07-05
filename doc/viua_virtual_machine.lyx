@@ -3290,6 +3290,97 @@ switch
 ).
 \end_layout
 
+\begin_layout Subsubsection
+Function signatures
+\end_layout
+
+\begin_layout Standard
+Assembler does not compile code that contains calls to, or instantiates
+ (as closure or a function object) undefined functions.
+ This is problematic when dynamic linking of Viua code is used.
+ Dynamically linked Viua modules export functions which can be called with
+ ordinary 
+\family typewriter
+CALL
+\family default
+ instructions or instantiated with 
+\family typewriter
+CLOSURE
+\family default
+ or 
+\family typewriter
+FUNCTION
+\family default
+ instructions and assembler ensures that these instructions reference functions
+ defined in current compilation unit or in units statically linked to it.
+\end_layout
+
+\begin_layout Standard
+Dynamically linked functions, by definition, are not present in currently
+ compiled unit or in any units statically linked to it, so assembler sees
+ them as undefined and aborts compilation.
+ This compile-time check is necessary to prevent exception throwing and
+ crashes at runtime.
+ To allow functions from a dynamically linked unit to be used with code
+ currently being compiled 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+.signature:
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ directive is used.
+ After assembler sees such code:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+.signature: dynamically_linked::function
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+it will trust the programmer that 
+\family typewriter
+dynamically_linked::function
+\family default
+ will be available at runtime before it will be called.
+ If the function will be called before it is available an exception will
+ be thrown instead of program being crashed to allow graceful recovery and,
+ in case it is not caught, stack trace pinpointing location of the problem.
+\end_layout
+
+\begin_layout Subparagraph*
+Warning
+\end_layout
+
+\begin_layout Standard
+This directive should not be abused; it is not designed to keep the assembler
+ quiet when it detects problems but to provide it with information.
+ If the information is provided to mislead the assembler it will generate
+ code that will eventually throw an exception about a call to undefined
+ function.
+ Using 
+\family typewriter
+.signature:
+\family default
+ to silence warnings about undefined function is very strongly discouraged.
+\end_layout
+
 \begin_layout Subsection
 Markers
 \end_layout
