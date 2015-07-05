@@ -31,8 +31,10 @@ class Loader {
     IdToAddressMapping loadmap(char*, const uint16_t&);
     void calculateFunctionSizes();
 
+    void loadJumpTable(std::ifstream&);
     void loadFunctionsMap(std::ifstream&);
     void loadBlocksMap(std::ifstream&);
+    void loadBytecode(std::ifstream&);
 
     public:
     Loader& load();

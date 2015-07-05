@@ -32,7 +32,6 @@ IdToAddressMapping Loader::loadmap(char* bytedump, const uint16_t& bytedump_size
 
     return IdToAddressMapping(order, mapping);
 }
-
 void Loader::calculateFunctionSizes() {
     string name;
     unsigned el_size;
@@ -54,6 +53,18 @@ void Loader::calculateFunctionSizes() {
         function_sizes[name] = el_size;
     }
 }
+
+void Loader::loadJumpTable(ifstream& in) {
+    // load jump table
+    unsigned lib_total_jumps;
+    in.read((char*)&lib_total_jumps, sizeof(unsigned));
+
+    unsigned lib_jmp;
+    for (unsigned i = 0; i < lib_total_jumps; ++i) {
+        in.read((char*)&lib_jmp, sizeof(unsigned));
+        jumps.push_back(lib_jmp);
+    }
+}
 void Loader::loadFunctionsMap(ifstream& in) {
     uint16_t lib_function_ids_section_size = 0;
     in.read((char*)&lib_function_ids_section_size, sizeof(uint16_t));
@@ -72,7 +83,6 @@ void Loader::loadFunctionsMap(ifstream& in) {
     }
     delete[] lib_buffer_function_ids;
 }
-
 void Loader::loadBlocksMap(ifstream& in) {
     uint16_t lib_block_ids_section_size = 0;
     in.read((char*)&lib_block_ids_section_size, sizeof(uint16_t));
@@ -91,6 +101,11 @@ void Loader::loadBlocksMap(ifstream& in) {
     }
     delete[] lib_buffer_block_ids;
 }
+void Loader::loadBytecode(ifstream& in) {
+    in.read((char*)&size, 16);
+    bytecode = new byte[size];
+    in.read((char*)bytecode, size);
+}
 
 Loader& Loader::load() {
     ifstream in(path, ios::in | ios::binary);
@@ -98,23 +113,12 @@ Loader& Loader::load() {
         throw ("fatal: failed to link " + path);
     }
 
-    // load jump table
-    unsigned lib_total_jumps;
-    in.read((char*)&lib_total_jumps, sizeof(unsigned));
-
-    unsigned lib_jmp;
-    for (unsigned i = 0; i < lib_total_jumps; ++i) {
-        in.read((char*)&lib_jmp, sizeof(unsigned));
-        jumps.push_back(lib_jmp);
-    }
+    // jump table must be loaded if loading a library
+    loadJumpTable(in);
 
     loadBlocksMap(in);
     loadFunctionsMap(in);
-
-    in.read((char*)&size, 16);
-    bytecode = new byte[size];
-    in.read((char*)bytecode, size);
-
+    loadBytecode(in);
     calculateFunctionSizes();
 
     return (*this);
@@ -128,12 +132,7 @@ Loader& Loader::executable() {
 
     loadBlocksMap(in);
     loadFunctionsMap(in);
-
-    // load executable bytecode
-    in.read((char*)&size, 16);
-    bytecode = new byte[size];
-    in.read((char*)bytecode, size);
-
+    loadBytecode(in);
     calculateFunctionSizes();
 
     return (*this);
