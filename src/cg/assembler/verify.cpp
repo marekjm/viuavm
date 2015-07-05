@@ -32,6 +32,10 @@ string assembler::verify::functionCallsAreDefined(const vector<string>& lines, c
 
         // check if function is defined
         bool is_undefined = (find(function_names.begin(), function_names.end(), check_function) == function_names.end());
+        // if function is undefined, check if we got a signature for it
+        if (is_undefined) {
+            is_undefined = (find(function_signatures.begin(), function_signatures.end(), check_function) == function_signatures.end());
+        }
 
         // if function is undefined, check if we got a signature for it
         if (is_undefined) {
