@@ -33,6 +33,30 @@ IdToAddressMapping Loader::loadmap(char* bytedump, const uint16_t& bytedump_size
     return IdToAddressMapping(order, mapping);
 }
 
+void Loader::calculateFunctionSizes() {
+    string name;
+    unsigned el_size;
+
+    for (unsigned i = 0; i < functions.size(); ++i) {
+        name = functions[i];
+        el_size = 0;
+
+        cout << name << " -> ";
+        if (i < (functions.size()-1)) {
+            long unsigned a = (unsigned long)(bytecode+function_addresses[name]);
+            long unsigned b = (unsigned long)(bytecode+function_addresses[functions[i+1]]);
+            el_size = (b-a);
+            cout << "end(" << b << ") - start(" << a << ") = " << el_size << endl;
+        } else {
+            long unsigned a = (long unsigned)(bytecode+function_addresses[name]);
+            long unsigned b = (long unsigned)(bytecode+size);
+            el_size = (b-a);
+            cout << "end(" << b << ") - start(" << a << ") = " << el_size << endl;
+        }
+
+        function_sizes[name] = el_size;
+    }
+}
 void Loader::loadFunctionsMap(ifstream& in) {
     uint16_t lib_function_ids_section_size = 0;
     in.read((char*)&lib_function_ids_section_size, sizeof(uint16_t));
@@ -50,6 +74,8 @@ void Loader::loadFunctionsMap(ifstream& in) {
         function_addresses[p] = mapping[p];
     }
     delete[] lib_buffer_function_ids;
+
+    calculateFunctionSizes();
 }
 
 void Loader::loadBlocksMap(ifstream& in) {
@@ -131,6 +157,9 @@ vector<unsigned> Loader::getJumps() {
 
 map<string, uint16_t> Loader::getFunctionAddresses() {
     return function_addresses;
+}
+map<string, unsigned> Loader::getFunctionSizes() {
+    return function_sizes;
 }
 vector<string> Loader::getFunctions() {
     return functions;

@@ -23,11 +23,13 @@ class Loader {
     std::vector<unsigned> jumps;
 
     std::map<std::string, uint16_t> function_addresses;
+    std::map<std::string, unsigned> function_sizes;
     std::vector<std::string> functions;
     std::map<std::string, uint16_t> block_addresses;
     std::vector<std::string> blocks;
 
     IdToAddressMapping loadmap(char*, const uint16_t&);
+    void calculateFunctionSizes();
 
     void loadFunctionsMap(std::ifstream&);
     void loadBlocksMap(std::ifstream&);
@@ -42,6 +44,7 @@ class Loader {
     std::vector<unsigned> getJumps();
 
     std::map<std::string, uint16_t> getFunctionAddresses();
+    std::map<std::string, unsigned> getFunctionSizes();
     std::vector<std::string> getFunctions();
 
     std::map<std::string, uint16_t> getBlockAddresses();
