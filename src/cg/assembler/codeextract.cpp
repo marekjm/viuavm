@@ -120,16 +120,27 @@ vector<string> assembler::ce::getFunctionNames(const vector<string>& lines) {
     string line, holdline;
     for (unsigned i = 0; i < lines.size(); ++i) {
         holdline = line = lines[i];
-        if (!str::startswith(line, ".function:") and !str::startswith(line, ".dec:")) { continue; }
+        if (!str::startswith(line, ".function:")) { continue; }
 
         if (str::startswith(line, ".function:")) {
             for (int j = i+1; lines[j] != ".end"; ++j, ++i) {}
         }
 
         line = str::lstrip(str::sub(line, str::chunk(line).size()));
-        string name = str::chunk(line);
+        names.push_back(str::chunk(line));
+    }
 
-        names.push_back(name);
+    return names;
+}
+vector<string> assembler::ce::getSignatures(const vector<string>& lines) {
+    vector<string> names;
+
+    string line, holdline;
+    for (unsigned i = 0; i < lines.size(); ++i) {
+        holdline = line = lines[i];
+        if (!str::startswith(line, ".signature:")) { continue; }
+        line = str::lstrip(str::sub(line, str::chunk(line).size()));
+        names.push_back(str::chunk(line));
     }
 
     return names;

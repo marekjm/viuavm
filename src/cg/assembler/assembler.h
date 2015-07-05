@@ -28,14 +28,15 @@ namespace assembler {
         std::vector<std::string> getlinks(const std::vector<std::string>& lines);
 
         std::vector<std::string> getFunctionNames(const std::vector<std::string>& lines);
+        std::vector<std::string> getSignatures(const std::vector<std::string>& lines);
         std::vector<std::string> getBlockNames(const std::vector<std::string>& lines);
         std::map<std::string, std::vector<std::string> > getInvokables(const std::string& type, const std::vector<std::string>& lines);
     }
 
     namespace verify {
-        std::string functionCallsAreDefined(const std::vector<std::string>& lines, const std::vector<std::string>& function_names);
+        std::string functionCallsAreDefined(const std::vector<std::string>& lines, const std::vector<std::string>& function_names, const std::vector<std::string>& function_signatures);
         std::string frameBalance(const std::vector<std::string>& lines);
-        std::string callableCreations(const std::vector<std::string>& lines, const std::vector<std::string>& function_names);
+        std::string callableCreations(const std::vector<std::string>& lines, const std::vector<std::string>& function_names, const std::vector<std::string>& function_signatures);
         std::string ressInstructions(const std::vector<std::string>& lines, bool as_lib);
         std::string functionBodiesAreNonempty(const std::vector<std::string>& lines, std::map<std::string, std::vector<std::string> >& functions);
         std::string blockTries(const std::vector<std::string>& lines, const std::vector<std::string>& block_names);

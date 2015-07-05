@@ -12,7 +12,7 @@
 using namespace std;
 
 
-string assembler::verify::functionCallsAreDefined(const vector<string>& lines, const vector<string>& function_names) {
+string assembler::verify::functionCallsAreDefined(const vector<string>& lines, const vector<string>& function_names, const vector<string>& function_signatures) {
     ostringstream report("");
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
@@ -26,11 +26,17 @@ string assembler::verify::functionCallsAreDefined(const vector<string>& lines, c
         line = str::lstrip(line.substr(return_register.size()));
         string function = str::chunk(line);
 
-        string& check_function = (function.size() ? function : return_register);
-
         // return register is optional to give
         // if it is not given - second operand is empty, and function name must be taken from first operand
+        string& check_function = (function.size() ? function : return_register);
+
+        // check if function is defined
         bool is_undefined = (find(function_names.begin(), function_names.end(), check_function) == function_names.end());
+
+        // if function is undefined, check if we got a signature for it
+        if (is_undefined) {
+            is_undefined = (find(function_signatures.begin(), function_signatures.end(), check_function) == function_signatures.end());
+        }
 
         if (is_undefined) {
             report << "fatal: call to undefined function '" << check_function << "' at line " << (i+1);
@@ -99,7 +105,7 @@ string assembler::verify::blockTries(const vector<string>& lines, const vector<s
     return report.str();
 }
 
-string assembler::verify::callableCreations(const vector<string>& lines, const vector<string>& function_names) {
+string assembler::verify::callableCreations(const vector<string>& lines, const vector<string>& function_names, const vector<string>& function_signatures) {
     ostringstream report("");
     string line;
     string callable_type;
@@ -117,6 +123,10 @@ string assembler::verify::callableCreations(const vector<string>& lines, const v
 
         string function = str::chunk(line);
         bool is_undefined = (find(function_names.begin(), function_names.end(), function) == function_names.end());
+        // if function is undefined, check if we got a signature for it
+        if (is_undefined) {
+            is_undefined = (find(function_signatures.begin(), function_signatures.end(), function) == function_signatures.end());
+        }
 
         if (is_undefined) {
             report << "fatal: " << callable_type << " from undefined function '" << function << "' at line " << (i+1);
@@ -189,7 +199,7 @@ string assembler::verify::directives(const vector<string>& lines) {
         }
 
         string token = str::chunk(line);
-        if (not (token == ".function:" or token == ".block:" or token == ".end" or token == ".name:" or token == ".mark:" or token == ".main:")) {
+        if (not (token == ".function:" or token == ".signature:" or token == ".block:" or token == ".end" or token == ".name:" or token == ".mark:" or token == ".main:")) {
             report << "fatal: unrecognised assembler directive on line " << (i+1) << ": `" << token << '`';
             break;
         }
