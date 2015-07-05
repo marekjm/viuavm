@@ -2826,7 +2826,7 @@ Object sharing
 \begin_layout Standard
 If an object is bound to more than one closure, pointer to this object stays
  the same in all binding closures.
- It must be noted that binding object to multiple closures leads to memory
+ It must be noted that binding objects to multiple closures leads to memory
  leaks.
  Due to the naive way machine tracks objects lifetimes it will not be able
  to determine when it can destroy a bound object because all pointers to
