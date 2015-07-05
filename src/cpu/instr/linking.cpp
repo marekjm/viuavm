@@ -1,9 +1,12 @@
 #include <dlfcn.h>
+#include <sys/stat.h>
+#include <stdlib.h>
 #include <iostream>
 #include "../../types/integer.h"
 #include "../../support/pointer.h"
 #include "../../include/module.h"
 #include "../../exceptions.h"
+#include "../../loader.h"
 #include "../cpu.h"
 using namespace std;
 
@@ -124,6 +127,19 @@ byte* CPU::excall(byte* addr) {
     return return_address;
 }
 
+
+bool isfile(const string& path) {
+    struct stat sf;
+
+    // not a file if stat returned error
+    if (stat(path.c_str(), &sf) == -1) return false;
+    // not a file if S_ISREG() macro returned false
+    if (not S_ISREG(sf.st_mode)) return false;
+
+    // file otherwise
+    return true;
+}
+
 byte* CPU::link(byte* addr) {
     /** Run link instruction.
      */
@@ -131,6 +147,7 @@ byte* CPU::link(byte* addr) {
     addr += module.size();
 
     string path = module;
+    bool found = false;
 
     ostringstream oss;
     for (unsigned i = 0; i < VIUAPATH.size(); ++i) {
@@ -142,7 +159,24 @@ byte* CPU::link(byte* addr) {
             oss << getenv("HOME") << path.substr(1);
             path = oss.str();
         }
-        cout << path << endl;
+
+        if ((found = isfile(path))) break;
+    }
+
+    if (found) {
+        Loader loader(path);
+        loader.load();
+
+        vector<string> fn_names = loader.getFunctions();
+        map<string, uint16_t> fn_addrs = loader.getFunctionAddresses();
+        byte* lnk_btcd = loader.getBytecode();
+
+        linked_modules[module] = pair<unsigned, byte*>(unsigned(loader.getBytecodeSize()), lnk_btcd);
+
+        for (unsigned i = 0; i < fn_names.size(); ++i) {
+            string fn_linkname = (module + "::" + fn_names[i]);
+            linked_functions[fn_linkname] = (lnk_btcd+fn_addrs[fn_names[i]]);
+        }
     }
 
     return addr;
