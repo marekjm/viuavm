@@ -141,6 +141,11 @@ byte* CPU::call(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     string call_name = string(addr);
+
+    if (function_addresses.count(call_name) == 0) {
+        throw new Exception("call to undefined function: " + call_name);
+    }
+
     byte* call_address = bytecode+function_addresses.at(call_name);
     addr += (call_name.size()+1);
 
