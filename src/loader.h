@@ -50,7 +50,7 @@ class Loader {
     std::map<std::string, uint16_t> getBlockAddresses();
     std::vector<std::string> getBlocks();
 
-    Loader(std::string pth): path(pth), bytecode(0) {}
+    Loader(std::string pth): path(pth), size(0), bytecode(0) {}
     ~Loader() {
         delete[] bytecode;
     }
