@@ -183,7 +183,7 @@ vector<string> filter(const vector<string>& lines) {
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = lines[i];
-        if (str::startswith(line, ".mark:") or str::startswith(line, ".name:") or str::startswith(line, ".main:") or str::startswith(line, ".link:")) {
+        if (str::startswith(line, ".mark:") or str::startswith(line, ".name:") or str::startswith(line, ".main:") or str::startswith(line, ".link:") or str::startswith(line, ".signature:")) {
             /*  Lines beginning with `.mark:` are just markers placed in code and
              *  are do not produce any bytecode.
              *  Lines beginning with `.name:` are asm instructions that assign human-rememberable names to
@@ -663,11 +663,23 @@ int generate(const string& filename, string& compilename, const vector<string>& 
     uint16_t bytes = 0;
 
 
-    ////////////////////////
-    // GATHER FUNCTION NAMES
+    ///////////////////////////////////////////
+    // GATHER FUNCTION NAMES AND SIGNATURES
+    //
+    // SIGNATURES ARE USED WITH DYNAMIC LINKING
+    // AS ASSEMBLER WOULD COMPLAIN ABOUT
+    // CALLS TO UNDEFINED FUNCTIONS
     vector<string> function_names;
     try {
         function_names = assembler::ce::getFunctionNames(lines);
+    } catch (const string& e) {
+        cout << "fatal: " << e << endl;
+        return 1;
+    }
+
+    vector<string> function_signatures;
+    try {
+        function_signatures = assembler::ce::getSignatures(lines);
     } catch (const string& e) {
         cout << "fatal: " << e << endl;
         return 1;
@@ -934,7 +946,7 @@ int generate(const string& filename, string& compilename, const vector<string>& 
     /////////////////////////////////////////////////////////////////////////
     // AFTER HAVING OBTAINED LINKED NAMES, IT IS POSSIBLE TO VERIFY CALLS AND
     // CALLABLE (FUNCTIONS, CLOSURES, ETC.) CREATIONS
-    if ((report = assembler::verify::functionCallsAreDefined(lines, function_names)).size()) {
+    if ((report = assembler::verify::functionCallsAreDefined(lines, function_names, function_signatures)).size()) {
         cout << report << endl;
         exit(1);
     }
@@ -942,7 +954,7 @@ int generate(const string& filename, string& compilename, const vector<string>& 
         cout << report << endl;
         exit(1);
     }
-    if ((report = assembler::verify::callableCreations(lines, function_names)).size()) {
+    if ((report = assembler::verify::callableCreations(lines, function_names, function_signatures)).size()) {
         cout << report << endl;
         exit(1);
     }

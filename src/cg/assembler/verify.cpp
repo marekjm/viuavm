@@ -12,7 +12,7 @@
 using namespace std;
 
 
-string assembler::verify::functionCallsAreDefined(const vector<string>& lines, const vector<string>& function_names) {
+string assembler::verify::functionCallsAreDefined(const vector<string>& lines, const vector<string>& function_names, const vector<string>& function_signatures) {
     ostringstream report("");
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
@@ -80,6 +80,46 @@ string assembler::verify::frameBalance(const vector<string>& lines) {
     return report.str();
 }
 
+string assembler::verify::frameBalance(const vector<string>& lines) {
+    ostringstream report("");
+    string line;
+    string instruction;
+
+    int balance = 0;
+    int previous_frame_spawnline = 0;
+    for (unsigned i = 0; i < lines.size(); ++i) {
+        line = lines[i];
+        if (line.size() == 0) { continue; }
+
+        line = str::lstrip(line);
+        instruction = str::chunk(line);
+        if (not (instruction == "call" or instruction == "excall" or instruction == "fcall" or instruction == "frame")) {
+            continue;
+        }
+
+        if (instruction == "call" or instruction == "excall" or instruction == "fcall") {
+            --balance;
+        }
+        if (instruction == "frame") {
+            ++balance;
+        }
+
+        if (balance < 0) {
+            report << "fatal: call with '" << instruction << "' without a frame at line " << (i+1);
+            break;
+        }
+        if (balance > 1) {
+            report << "fatal: excess frame spawned at line " << (i+1) << " (unused frame spawned at line " << (previous_frame_spawnline+1) << ')';
+            break;
+        }
+
+        if (instruction == "frame") {
+            previous_frame_spawnline = i;
+        }
+    }
+    return report.str();
+}
+
 string assembler::verify::blockTries(const vector<string>& lines, const vector<string>& block_names) {
     ostringstream report("");
     string line;
@@ -99,7 +139,7 @@ string assembler::verify::blockTries(const vector<string>& lines, const vector<s
     return report.str();
 }
 
-string assembler::verify::callableCreations(const vector<string>& lines, const vector<string>& function_names) {
+string assembler::verify::callableCreations(const vector<string>& lines, const vector<string>& function_names, const vector<string>& function_signatures) {
     ostringstream report("");
     string line;
     string callable_type;
@@ -117,6 +157,10 @@ string assembler::verify::callableCreations(const vector<string>& lines, const v
 
         string function = str::chunk(line);
         bool is_undefined = (find(function_names.begin(), function_names.end(), function) == function_names.end());
+        // if function is undefined, check if we got a signature for it
+        if (is_undefined) {
+            is_undefined = (find(function_signatures.begin(), function_signatures.end(), function) == function_signatures.end());
+        }
 
         if (is_undefined) {
             report << "fatal: " << callable_type << " from undefined function '" << function << "' at line " << (i+1);
@@ -189,7 +233,7 @@ string assembler::verify::directives(const vector<string>& lines) {
         }
 
         string token = str::chunk(line);
-        if (not (token == ".function:" or token == ".block:" or token == ".end" or token == ".name:" or token == ".mark:" or token == ".main:")) {
+        if (not (token == ".function:" or token == ".signature:" or token == ".block:" or token == ".end" or token == ".name:" or token == ".mark:" or token == ".main:")) {
             report << "fatal: unrecognised assembler directive on line " << (i+1) << ": `" << token << '`';
             break;
         }
