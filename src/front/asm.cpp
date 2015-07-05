@@ -934,7 +934,11 @@ int generate(const string& filename, string& compilename, const vector<string>& 
     /////////////////////////////////////////////////////////////////////////
     // AFTER HAVING OBTAINED LINKED NAMES, IT IS POSSIBLE TO VERIFY CALLS AND
     // CALLABLE (FUNCTIONS, CLOSURES, ETC.) CREATIONS
-    if ((report = assembler::verify::functionCalls(lines, function_names)).size()) {
+    if ((report = assembler::verify::functionCallsAreDefined(lines, function_names)).size()) {
+        cout << report << endl;
+        exit(1);
+    }
+    if ((report = assembler::verify::frameBalance(lines)).size()) {
         cout << report << endl;
         exit(1);
     }
