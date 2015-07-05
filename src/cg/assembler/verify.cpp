@@ -80,46 +80,6 @@ string assembler::verify::frameBalance(const vector<string>& lines) {
     return report.str();
 }
 
-string assembler::verify::frameBalance(const vector<string>& lines) {
-    ostringstream report("");
-    string line;
-    string instruction;
-
-    int balance = 0;
-    int previous_frame_spawnline = 0;
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        line = lines[i];
-        if (line.size() == 0) { continue; }
-
-        line = str::lstrip(line);
-        instruction = str::chunk(line);
-        if (not (instruction == "call" or instruction == "excall" or instruction == "fcall" or instruction == "frame")) {
-            continue;
-        }
-
-        if (instruction == "call" or instruction == "excall" or instruction == "fcall") {
-            --balance;
-        }
-        if (instruction == "frame") {
-            ++balance;
-        }
-
-        if (balance < 0) {
-            report << "fatal: call with '" << instruction << "' without a frame at line " << (i+1);
-            break;
-        }
-        if (balance > 1) {
-            report << "fatal: excess frame spawned at line " << (i+1) << " (unused frame spawned at line " << (previous_frame_spawnline+1) << ')';
-            break;
-        }
-
-        if (instruction == "frame") {
-            previous_frame_spawnline = i;
-        }
-    }
-    return report.str();
-}
-
 string assembler::verify::blockTries(const vector<string>& lines, const vector<string>& block_names) {
     ostringstream report("");
     string line;
