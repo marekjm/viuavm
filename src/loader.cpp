@@ -41,17 +41,14 @@ void Loader::calculateFunctionSizes() {
         name = functions[i];
         el_size = 0;
 
-        cout << name << " -> ";
         if (i < (functions.size()-1)) {
             long unsigned a = (unsigned long)(bytecode+function_addresses[name]);
             long unsigned b = (unsigned long)(bytecode+function_addresses[functions[i+1]]);
             el_size = (b-a);
-            cout << "end(" << b << ") - start(" << a << ") = " << el_size << endl;
         } else {
             long unsigned a = (long unsigned)(bytecode+function_addresses[name]);
             long unsigned b = (long unsigned)(bytecode+size);
             el_size = (b-a);
-            cout << "end(" << b << ") - start(" << a << ") = " << el_size << endl;
         }
 
         function_sizes[name] = el_size;
