@@ -8,6 +8,7 @@
 #include <vector>
 #include <map>
 #include <tuple>
+#include <utility>
 #include <algorithm>
 #include <stdexcept>
 #include "../bytecode/bytetypedef.h"
@@ -65,6 +66,7 @@ class CPU {
     std::map<std::string, unsigned> block_addresses;
 
     std::map<std::string, byte*> linked_functions;
+    std::map<std::string, std::pair<unsigned, byte*> > linked_modules;
 
     /*  Slot for thrown objects (typically exceptions).
      *  Can be set by user code and the CPU.
@@ -259,6 +261,12 @@ class CPU {
 
                 // this causes valgrind to SCREAM with errors...
                 static_registers.erase(sr.first);
+            }
+            for (std::pair<std::string, std::pair<unsigned, byte*> > lm : linked_modules) {
+                delete lm.second.second;
+
+                // this causes valgrind to SCREAM with errors...
+                linked_modules.erase(lm.first);
             }
         }
 };
