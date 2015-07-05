@@ -42,12 +42,12 @@ void Loader::calculateFunctionSizes() {
         el_size = 0;
 
         if (i < (functions.size()-1)) {
-            long unsigned a = (unsigned long)(bytecode+function_addresses[name]);
-            long unsigned b = (unsigned long)(bytecode+function_addresses[functions[i+1]]);
+            long unsigned a = (unsigned long)(function_addresses[name]);
+            long unsigned b = (unsigned long)(function_addresses[functions[i+1]]);
             el_size = (b-a);
         } else {
-            long unsigned a = (long unsigned)(bytecode+function_addresses[name]);
-            long unsigned b = (long unsigned)(bytecode+size);
+            long unsigned a = (long unsigned)(function_addresses[name]);
+            long unsigned b = (long unsigned)size;
             el_size = (b-a);
         }
 
@@ -71,8 +71,6 @@ void Loader::loadFunctionsMap(ifstream& in) {
         function_addresses[p] = mapping[p];
     }
     delete[] lib_buffer_function_ids;
-
-    calculateFunctionSizes();
 }
 
 void Loader::loadBlocksMap(ifstream& in) {
@@ -117,6 +115,8 @@ Loader& Loader::load() {
     bytecode = new byte[size];
     in.read((char*)bytecode, size);
 
+    calculateFunctionSizes();
+
     return (*this);
 }
 
@@ -133,6 +133,8 @@ Loader& Loader::executable() {
     in.read((char*)&size, 16);
     bytecode = new byte[size];
     in.read((char*)bytecode, size);
+
+    calculateFunctionSizes();
 
     return (*this);
 }
