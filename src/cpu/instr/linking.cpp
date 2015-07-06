@@ -177,6 +177,8 @@ byte* CPU::link(byte* addr) {
             string fn_linkname = (module + "::" + fn_names[i]);
             linked_functions[fn_linkname] = (lnk_btcd+fn_addrs[fn_names[i]]);
         }
+    } else {
+        throw new Exception("failed to link: " + module);
     }
 
     return addr;
