@@ -150,8 +150,10 @@ byte* CPU::call(byte* addr) {
     byte* call_address = 0;
     if (function_addresses.count(call_name)) {
         call_address = bytecode+function_addresses.at(call_name);
+        jump_base = bytecode;
     } else {
-        call_address = linked_functions.at(call_name);
+        call_address = linked_functions.at(call_name).second;
+        jump_base = linked_modules.at(linked_functions.at(call_name).first).second;
     }
     addr += (call_name.size()+1);
 

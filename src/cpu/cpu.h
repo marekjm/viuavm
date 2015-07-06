@@ -62,10 +62,11 @@ class CPU {
 
     /*  Function and block names mapped to bytecode addresses.
      */
+    byte* jump_base;
     std::map<std::string, unsigned> function_addresses;
     std::map<std::string, unsigned> block_addresses;
 
-    std::map<std::string, byte*> linked_functions;
+    std::map<std::string, std::pair<std::string, byte*>> linked_functions;
     std::map<std::string, std::pair<unsigned, byte*> > linked_modules;
 
     /*  Slot for thrown objects (typically exceptions).
@@ -245,6 +246,7 @@ class CPU {
             static_registers({}),
             frame_new(0),
             try_frame_new(0),
+            jump_base(0),
             thrown(0), caught(0),
             return_code(0), return_exception(""), return_message(""),
             instruction_counter(0), instruction_pointer(0),

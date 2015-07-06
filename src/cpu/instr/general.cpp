@@ -39,7 +39,7 @@ byte* CPU::print(byte* addr) {
 byte* CPU::jump(byte* addr) {
     /*  Run jump instruction.
      */
-    byte* target = bytecode+(*(int*)addr);
+    byte* target = jump_base+(*(int*)addr);
     if (target == addr) {
         throw new Exception("aborting: JUMP instruction pointing to itself");
     }
@@ -70,7 +70,7 @@ byte* CPU::branch(byte* addr) {
 
     bool result = fetch(condition_object_index)->boolean();
 
-    addr = bytecode + (result ? addr_true : addr_false);
+    addr = jump_base + (result ? addr_true : addr_false);
 
     return addr;
 }

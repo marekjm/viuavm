@@ -29,6 +29,7 @@ CPU& CPU::load(byte* bc) {
      */
     if (bytecode) { delete[] bytecode; }
     bytecode = bc;
+    jump_base = bytecode;
     return (*this);
 }
 
