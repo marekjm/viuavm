@@ -213,5 +213,13 @@ byte* CPU::end(byte* addr) {
         }
     }
 
+    if (frames.size() > 0) {
+        if (function_addresses.count(frames.back()->function_name)) {
+            jump_base = bytecode;
+        } else {
+            jump_base = linked_modules.at(linked_functions.at(frames.back()->function_name).first).second;
+        }
+    }
+
     return addr;
 }
