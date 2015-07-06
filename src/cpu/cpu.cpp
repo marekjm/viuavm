@@ -272,7 +272,7 @@ byte* CPU::tick() {
      *  top frame is for local function.
      *  For dynamically linked functions address will not be in bytecode size range.
      */
-    Frame* top_frame = (frames.size() ? frames[frames.size()-1] : 0);
+    Frame* top_frame = (frames.size() ? frames.back() : 0);
     bool is_current_function_dynamic = linked_functions.count(top_frame != 0 ? top_frame->function_name : "");
     if (instruction_pointer >= (bytecode+bytecode_size) and not is_current_function_dynamic) {
         return_code = 1;
