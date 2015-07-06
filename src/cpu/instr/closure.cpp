@@ -136,6 +136,11 @@ byte* CPU::fcall(byte* addr) {
     Function* fn = static_cast<Function*>(fetch(fn_reg));
 
     string call_name = fn->name();
+    bool function_found = (function_addresses.count(call_name) or linked_functions.count(call_name));
+
+    if (not function_found) {
+        throw new Exception("fcall to undefined function: " + call_name);
+    }
 
     byte* call_address = 0;
     if (function_addresses.count(call_name)) {
