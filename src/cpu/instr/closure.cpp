@@ -153,7 +153,7 @@ byte* CPU::fcall(byte* addr) {
         throw new Exception("fcall without a frame: use `frame 0' in source code if the function takes no parameters");
     }
     // set function name and return address
-    frame_new->function_name = fn->function_name;
+    frame_new->function_name = call_name;
     frame_new->return_address = return_address;
 
     frame_new->resolve_return_value_register = return_value_ref;
