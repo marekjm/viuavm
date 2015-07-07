@@ -4,7 +4,7 @@
 #pragma once
 
 const char* VERSION = "0.4.6";
-const char* MICRO = "163";
-const char* COMMIT = "337e9355fff90f6ba56f3f8f12df2cc9405ccfa2";
+const char* MICRO = "167";
+const char* COMMIT = "280c12dbdf4a57fd95f67942a6cb962ca6132a16";
 
 #endif

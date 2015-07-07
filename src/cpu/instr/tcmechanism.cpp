@@ -132,7 +132,7 @@ byte* CPU::leave(byte* addr) {
     /*  Run leave instruction.
      */
     if (tryframes.size() == 0) {
-        throw Exception("bad leave: no block has been entered");
+        throw new Exception("bad leave: no block has been entered");
     }
     addr = tryframes.back()->return_address;
     delete tryframes.back();
