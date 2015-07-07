@@ -854,7 +854,7 @@ bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE)
         cout << "Viua VM debugger, version ";
     }
     if (SHOW_HELP or SHOW_VERSION) {
-        cout << VERSION << endl;
+        cout << VERSION << '.' << MICRO << ' ' << COMMIT << endl;
     }
     if (SHOW_HELP) {
         cout << "\nUSAGE:\n";
