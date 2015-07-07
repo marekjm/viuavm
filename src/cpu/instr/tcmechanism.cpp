@@ -24,7 +24,21 @@ byte* CPU::vmcatch(byte* addr) {
     string catcher_block_name = string(addr);
     addr += (catcher_block_name.size()+1);
 
-    try_frame_new->catchers[type_name] = new Catcher(type_name, catcher_block_name, (bytecode+block_addresses.at(catcher_block_name)));
+    bool block_found = (block_addresses.count(catcher_block_name) or linked_blocks.count(catcher_block_name));
+    if (not block_found) {
+        throw new Exception("registering undefined handler block: " + catcher_block_name);
+    }
+
+    byte* block_address = 0;
+    if (block_addresses.count(catcher_block_name)) {
+        block_address = bytecode+block_addresses.at(catcher_block_name);
+        jump_base = bytecode;
+    } else {
+        block_address = linked_blocks.at(catcher_block_name).second;
+        jump_base = linked_modules.at(linked_blocks.at(catcher_block_name).first).second;
+    }
+
+    try_frame_new->catchers[type_name] = new Catcher(type_name, catcher_block_name, block_address);
 
     return addr;
 }
@@ -57,7 +71,20 @@ byte* CPU::vmtry(byte* addr) {
     /*  Run try instruction.
      */
     string block_name = string(addr);
-    byte* block_address = bytecode+block_addresses.at(block_name);
+
+    bool block_found = (block_addresses.count(block_name) or linked_blocks.count(block_name));
+    if (not block_found) {
+        throw new Exception("try of undefined block: " + block_name);
+    }
+
+    byte* block_address = 0;
+    if (block_addresses.count(block_name)) {
+        block_address = bytecode+block_addresses.at(block_name);
+        jump_base = bytecode;
+    } else {
+        block_address = linked_blocks.at(block_name).second;
+        jump_base = linked_modules.at(linked_blocks.at(block_name).first).second;
+    }
 
     try_frame_new->return_address = (addr+block_name.size());
     try_frame_new->associated_frame = frames.back();
@@ -110,5 +137,13 @@ byte* CPU::leave(byte* addr) {
     addr = tryframes.back()->return_address;
     delete tryframes.back();
     tryframes.pop_back();
+
+    if (frames.size() > 0) {
+        if (function_addresses.count(frames.back()->function_name)) {
+            jump_base = bytecode;
+        } else {
+            jump_base = linked_modules.at(linked_functions.at(frames.back()->function_name).first).second;
+        }
+    }
     return addr;
 }
