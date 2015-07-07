@@ -67,6 +67,7 @@ class CPU {
     std::map<std::string, unsigned> block_addresses;
 
     std::map<std::string, std::pair<std::string, byte*>> linked_functions;
+    std::map<std::string, std::pair<std::string, byte*>> linked_blocks;
     std::map<std::string, std::pair<unsigned, byte*> > linked_modules;
 
     /*  Slot for thrown objects (typically exceptions).
