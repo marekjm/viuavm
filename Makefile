@@ -56,7 +56,7 @@ libinstall: stdlib
 	mkdir -p ${LIB_PATH}
 	cp ./build/stdlib/lib/*.so ${LIB_PATH}/
 
-install: bininstall libinstall
+install: bininstall
 
 
 test: ${VM_CPU} ${VM_ASM} clean-test-compiles
