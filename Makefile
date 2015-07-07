@@ -11,7 +11,7 @@ LIB_PATH=${PREFIX}/lib/viua
 
 .SUFFIXES: .cpp .h .o
 
-.PHONY: all remake clean clean-support clean-test-compiles install test
+.PHONY: all remake clean clean-support clean-test-compiles install test version
 
 
 all: bin/vm/asm bin/vm/cpu bin/vm/vdb bin/vm/dis bin/opcodes.bin
@@ -61,6 +61,9 @@ install: bininstall libinstall
 
 test: ${VM_CPU} ${VM_ASM} clean-test-compiles
 	python3 ./tests/tests.py --verbose --catch --failfast
+
+version: src/version.h
+	./scripts/update_commit_info.sh
 
 
 bin/vm/cpu: src/front/cpu.cpp build/cpu/cpu.o build/cpu/dispatch.o build/cpu/registserset.o build/loader.o build/printutils.o build/support/pointer.o build/support/string.o ${VIUA_CPU_INSTR_FILES_O} build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o
