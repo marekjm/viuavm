@@ -329,11 +329,23 @@ byte* CPU::tick() {
             if (tframe->catchers.count(thrown->type())) {
                 instruction_pointer = tframe->catchers.at(thrown->type())->block_address;
 
+                unsigned distance = 0;
+                for (unsigned j = (frames.size()-1); j >= 0; --j) {
+                    if (frames[j] == tframe->associated_frame) {
+                        break;
+                    }
+                    ++distance;
+                }
+                for (unsigned j = 0; j < distance; ++j) {
+                    dropFrame();
+                }
+
                 caught = thrown;
                 thrown = 0;
 
                 break;
             }
+            cout << "not found" << endl;
         }
     }
     if (thrown != 0) {
