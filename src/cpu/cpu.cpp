@@ -345,7 +345,6 @@ byte* CPU::tick() {
 
                 break;
             }
-            cout << "not found" << endl;
         }
     }
     if (thrown != 0) {
