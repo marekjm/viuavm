@@ -876,7 +876,7 @@ int generate(const string& filename, string& compilename, const vector<string>& 
         // we also save return value in 1 register since 0 means "drop return value"
         ilines.push_back("call 1 " + main_function);
         // then, register 1 is moved to register 0 so it counts as a return code
-        ilines.push_back("move 1 0");
+        ilines.push_back("move 0 1");
         ilines.push_back("halt");
         functions[ENTRY_FUNCTION_NAME] = ilines;
         // instructions were added so bytecode size must be inreased
