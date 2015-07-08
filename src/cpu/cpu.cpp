@@ -337,23 +337,6 @@ byte* CPU::tick() {
         }
     }
     if (thrown != 0) {
-        // FIXME: catching Type catches everything! (not actually implemented, marked as a TODO)
-        vector<string> ic = thrown->inheritancechain();
-        for (unsigned i = tryframes.size(); i > 0; --i) {
-            tframe = tryframes[(i-1)];
-            for (unsigned j = 0; j < ic.size(); ++j) {
-                if (tframe->catchers.count(ic[j])) {
-                    instruction_pointer = tframe->catchers.at(ic[j])->block_address;
-
-                    caught = thrown;
-                    thrown = 0;
-
-                    break;
-                }
-            }
-        }
-    }
-    if (thrown != 0) {
         return_code = 1;
         return_exception = thrown->type();
         return_message = thrown->repr();
