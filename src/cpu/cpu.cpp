@@ -185,8 +185,6 @@ void CPU::pushFrame() {
 void CPU::dropFrame() {
     /** Drops top-most frame from call stack.
      */
-    // FIXME: remove this print
-    //cout << "\ndeleting top frame: " << hex << frames.back() << dec << " (for function: " << frames.back()->function_name << ')' << endl;
     delete frames.back();
     frames.pop_back();
 
