@@ -338,6 +338,11 @@ byte* CPU::tick() {
                     dropFrame();
                 }
 
+                while (tryframes.back() != tframe) {
+                    delete tryframes.back();
+                    tryframes.pop_back();
+                }
+
                 caught = thrown;
                 thrown = 0;
 
