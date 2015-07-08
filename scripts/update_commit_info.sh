@@ -13,7 +13,6 @@ fi
 
 HEAD_UPDATED_VERSION=`git show HEAD | grep -P '^---' | cut -d' ' -f2 | sed 's:a/::' | grep $FILE`
 
-echo $COMMITS_SINCE
 if [[ $HEAD_UPDATED_VERSION == "" ]]; then
     sed -i "s/COMMIT = \".*\"/COMMIT = \"`git rev-parse HEAD`\"/" $FILE
     sed -i "s/MICRO = \".*\"/MICRO = \"$COMMITS_SINCE\"/" $FILE
