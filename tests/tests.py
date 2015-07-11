@@ -102,6 +102,15 @@ def runTest(self, name, expected_output, expected_exit_code = 0, output_processi
         self.assertEqual(got_output, (dis_output.strip() if output_processing_function is None else output_processing_function(dis_output)))
         self.assertEqual(excode, dis_excode)
 
+def runTestNoDisassemblyRerun(self, name, expected_output, expected_exit_code = 0, output_processing_function = None):
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        got_output = (output.strip() if output_processing_function is None else output_processing_function(output))
+        self.assertEqual(expected_output, got_output)
+        self.assertEqual(expected_exit_code, excode)
+
 def runTestSplitlines(self, name, expected_output, expected_exit_code = 0):
     runTest(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: o.strip().splitlines())
 
@@ -400,6 +409,10 @@ class FunctionTests(unittest.TestCase):
 
     def testObtainingNumberOfParameters(self):
         runTestReturnsIntegers(self, 'argc.asm', [1, 2, 0])
+
+    def testObtainingVectorWithPassedParameters(self):
+        assemble('./src/stdlib/viua/misc.asm', './misc.vlib', opts=('-c',))
+        runTestNoDisassemblyRerun(self, 'parameters_vector.asm', '[0, 1, 2, 3]')
 
     def testReturningReferences(self):
         runTest(self, 'return_by_reference.asm', 42, 0, lambda o: int(o.strip()))
