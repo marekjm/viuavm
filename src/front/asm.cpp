@@ -436,10 +436,14 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = assembler::operands::get2(operands);
             program.paref(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
-        } else if (str::startswith(line, "arg")) {
+        } else if (str::startswithchunk(line, "arg")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = assembler::operands::get2(operands);
             program.arg(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
+        } else if (str::startswith(line, "argc")) {
+            string regno_chnk;
+            regno_chnk = str::chunk(operands);
+            program.argc(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "call")) {
             /** Full form of call instruction has two operands: function name and return value register index.
              *  If call is given only one operand - it means it is the instruction index and returned value is discarded.
