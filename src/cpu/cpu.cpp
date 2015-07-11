@@ -271,8 +271,10 @@ byte* CPU::tick() {
      *  For dynamically linked functions address will not be in bytecode size range.
      */
     Frame* top_frame = (frames.size() ? frames.back() : 0);
+    TryFrame* top_tryframe = (tryframes.size() ? tryframes.back() : 0);
     bool is_current_function_dynamic = linked_functions.count(top_frame != 0 ? top_frame->function_name : "");
-    if (instruction_pointer >= (bytecode+bytecode_size) and not is_current_function_dynamic) {
+    bool is_current_block_dynamic = linked_blocks.count(top_tryframe != 0 ? top_tryframe->block_name : "");
+    if (instruction_pointer >= (bytecode+bytecode_size) and not (is_current_function_dynamic or is_current_block_dynamic)) {
         return_code = 1;
         return_exception = "InvalidBytecodeAddress";
         return_message = string("instruction address out of bounds");
