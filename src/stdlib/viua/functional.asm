@@ -1,4 +1,4 @@
-.function: foreach
+.function: functional::foreach
     ; this function takes two mandatory parameters:
     ;
     ;       * a closure, or a function object to call on every element of second
