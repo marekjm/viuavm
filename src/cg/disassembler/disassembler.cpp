@@ -100,6 +100,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case TMPRO:
         case VEC:
         case CLBIND:
+        case ARGC:
         case THROW:
         case PULL:
             oss << " " << intop(ptr);
