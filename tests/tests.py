@@ -398,6 +398,9 @@ class FunctionTests(unittest.TestCase):
     def testLocalRegistersInFunctions(self):
         runTestReturnsIntegers(self, 'local_registers.asm', [42, 69])
 
+    def testObtainingNumberOfParameters(self):
+        runTestReturnsIntegers(self, 'argc.asm', [1, 2, 0])
+
     def testReturningReferences(self):
         runTest(self, 'return_by_reference.asm', 42, 0, lambda o: int(o.strip()))
 
