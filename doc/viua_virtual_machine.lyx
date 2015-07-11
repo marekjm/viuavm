@@ -1754,6 +1754,29 @@ Put a copy of object found in specified parameter index into target register,
 \end_layout
 
 \begin_layout Subsubsection
+argc
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+argc <target register>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Store an integer indicating how many parameters the function has been called
+ with.
+\end_layout
+
+\begin_layout Subsubsection
 end
 \end_layout
 
