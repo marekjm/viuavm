@@ -165,6 +165,20 @@ vector<string> assembler::ce::getBlockNames(const vector<string>& lines) {
 
     return names;
 }
+vector<string> assembler::ce::getBlockSignatures(const vector<string>& lines) {
+    vector<string> names;
+
+    string line, holdline;
+    for (unsigned i = 0; i < lines.size(); ++i) {
+        holdline = line = lines[i];
+        if (!str::startswith(line, ".bsignature:")) { continue; }
+        line = str::lstrip(str::sub(line, str::chunk(line).size()));
+        names.push_back(str::chunk(line));
+    }
+
+    return names;
+}
+
 map<string, vector<string> > assembler::ce::getInvokables(const string& type, const vector<string>& lines) {
     map<string, vector<string> > invokables;
 

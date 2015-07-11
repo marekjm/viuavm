@@ -30,6 +30,7 @@ namespace assembler {
         std::vector<std::string> getFunctionNames(const std::vector<std::string>& lines);
         std::vector<std::string> getSignatures(const std::vector<std::string>& lines);
         std::vector<std::string> getBlockNames(const std::vector<std::string>& lines);
+        std::vector<std::string> getBlockSignatures(const std::vector<std::string>& lines);
         std::map<std::string, std::vector<std::string> > getInvokables(const std::string& type, const std::vector<std::string>& lines);
     }
 
@@ -39,7 +40,7 @@ namespace assembler {
         std::string callableCreations(const std::vector<std::string>& lines, const std::vector<std::string>& function_names, const std::vector<std::string>& function_signatures);
         std::string ressInstructions(const std::vector<std::string>& lines, bool as_lib);
         std::string functionBodiesAreNonempty(const std::vector<std::string>& lines, std::map<std::string, std::vector<std::string> >& functions);
-        std::string blockTries(const std::vector<std::string>& lines, const std::vector<std::string>& block_names);
+        std::string blockTries(const std::vector<std::string>& lines, const std::vector<std::string>& block_names, const std::vector<std::string>& block_signatures);
         std::string blockBodiesEndWithLeave(const std::vector<std::string>& lines, std::map<std::string, std::pair<bool, std::vector<std::string> > >& blocks);
 
         std::string directives(const std::vector<std::string>& lines);

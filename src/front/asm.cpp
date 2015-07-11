@@ -183,7 +183,7 @@ vector<string> filter(const vector<string>& lines) {
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = lines[i];
-        if (str::startswith(line, ".mark:") or str::startswith(line, ".name:") or str::startswith(line, ".main:") or str::startswith(line, ".link:") or str::startswith(line, ".signature:")) {
+        if (str::startswith(line, ".mark:") or str::startswith(line, ".name:") or str::startswith(line, ".main:") or str::startswith(line, ".link:") or str::startswith(line, ".signature:") or str::startswith(line, ".bsignature:")) {
             /*  Lines beginning with `.mark:` are just markers placed in code and
              *  are do not produce any bytecode.
              *  Lines beginning with `.name:` are asm instructions that assign human-rememberable names to
@@ -700,6 +700,14 @@ int generate(const string& filename, string& compilename, const vector<string>& 
         return 1;
     }
 
+    vector<string> block_signatures;
+    try {
+        block_signatures = assembler::ce::getBlockSignatures(lines);
+    } catch (const string& e) {
+        cout << "fatal: " << e << endl;
+        return 1;
+    }
+
 
     /////////////////////////
     // GET MAIN FUNCTION NAME
@@ -763,7 +771,7 @@ int generate(const string& filename, string& compilename, const vector<string>& 
         cout << report << endl;
         exit(1);
     }
-    if ((report = assembler::verify::blockTries(lines, block_names)).size()) {
+    if ((report = assembler::verify::blockTries(lines, block_names, block_signatures)).size()) {
         cout << report << endl;
         exit(1);
     }
