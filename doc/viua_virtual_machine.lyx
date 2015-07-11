@@ -3467,7 +3467,7 @@ Defining functions
 \begin_layout Standard
 Functions are composed from CPU instructions wrapped in 
 \family typewriter
-.def
+.function:
 \family default
  and 
 \family typewriter
