@@ -596,6 +596,17 @@ Program& Program::arg(int_op a, int_op b) {
     return (*this);
 }
 
+Program& Program::argc(int_op a) {
+    /*  Inserts argc instruction to bytecode.
+     *
+     *  :params:
+     *
+     *  a - target register
+     */
+    addr_ptr = cg::bytecode::argc(addr_ptr, a);
+    return (*this);
+}
+
 Program& Program::call(int_op reg, const string& fn_name) {
     /*  Inserts call instruction.
      *  Byte offset is calculated automatically.

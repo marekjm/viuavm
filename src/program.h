@@ -118,6 +118,7 @@ class Program {
     Program& param      (int_op, int_op);
     Program& paref      (int_op, int_op);
     Program& arg        (int_op, int_op);
+    Program& argc       (int_op);
 
     Program& call       (int_op, const std::string&);
     Program& jump       (int, enum JUMPTYPE);
