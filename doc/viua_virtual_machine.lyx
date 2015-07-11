@@ -114,8 +114,52 @@ newpage
 \end_layout
 
 \begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 \begin_inset CommandInset toc
 LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+mbox{}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+thispagestyle{empty}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+newpage
+\end_layout
 
 \end_inset
 
@@ -2563,121 +2607,6 @@ Unconditionally halt execution of the program and exit the machine.
 \end_layout
 
 \begin_layout Section
-Standard Library
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:Standard-Library"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This section describes standard library that Viua VM provides.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Newpage newpage
-\end_inset
-
-
-\end_layout
-
-\begin_layout Part
-Architecture
-\begin_inset CommandInset label
-LatexCommand label
-name "part:Architecture"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This part describes archtecture of the VM.
-\end_layout
-
-\begin_layout Section
-Register sets
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:Register-sets"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Viua is a register-based virtual machine.
- It comes with several register sets, and each serves different purpose.
-\end_layout
-
-\begin_layout Subsection
-Global
-\end_layout
-
-\begin_layout Standard
-Global register set can be used to hold global variables.
- It can be accessed from all functions.
- Initial values in this register set's registers are set by 
-\family typewriter
-__entry
-\family default
- function.
-\end_layout
-
-\begin_layout Subsection
-Local
-\end_layout
-
-\begin_layout Standard
-Local regster sets are uniqe to functions and cannot be accessed from outside
- of them.
- They are created each time a function is called, live inside a call frame
- and are destoyed when the frame is popped from the call stack.
-\end_layout
-
-\begin_layout Subsection
-Static
-\end_layout
-
-\begin_layout Standard
-Static registers are unique to functions and cannot be accessed from outside
- of them.
- The difference between local registers is that they are created only the
- first time a function is called and are independent of call frames.
-\end_layout
-
-\begin_layout Subsection
-Temporary
-\end_layout
-
-\begin_layout Standard
-Temporary register set has only one register.
- It is used to move values between different register sets.
- In the future release, the number of registers in the temporary register
- set may be increased to allow performing simple operations inside it.
-\end_layout
-
-\begin_layout Section
-Type system
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:Type-system"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This section talks about type system of Viua VM.
-\end_layout
-
-\begin_layout Section
 Instruction operands
 \end_layout
 
@@ -2788,6 +2717,261 @@ istore 1 @42
 \end_inset
 
  will store in first register whatever integer was stored in register 42.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Part
+Architecture
+\begin_inset CommandInset label
+LatexCommand label
+name "part:Architecture"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This part describes archtecture of the VM.
+\end_layout
+
+\begin_layout Section
+Program excution
+\end_layout
+
+\begin_layout Subsection
+Entry point
+\end_layout
+
+\begin_layout Standard
+This subsection explains how does the execution start.
+\end_layout
+
+\begin_layout Subsubsection
+Hardcoded entry function
+\end_layout
+
+\begin_layout Standard
+Describe entry function hardcoded inside the machine, which is also the
+ first function to be executed when a program is run on Viua.
+\end_layout
+
+\begin_layout Subsubsection
+User supplied main function
+\end_layout
+
+\begin_layout Standard
+Describe the main function a user should supply.
+\end_layout
+
+\begin_layout Subsection
+Calling conventions
+\end_layout
+
+\begin_layout Standard
+This subsection explains calling conventions in Viua.
+\end_layout
+
+\begin_layout Subsubsection
+Call frames
+\end_layout
+
+\begin_layout Standard
+Describe layout of a single call frame.
+\end_layout
+
+\begin_layout Subsubsection
+Passing parameters
+\end_layout
+
+\begin_layout Standard
+How does the parameters get passed to functions.
+ Explain pass-by-value and pass-by-reference.
+\end_layout
+
+\begin_layout Subsubsection
+Call address resolution
+\end_layout
+
+\begin_layout Standard
+How does the machine determine the location to which execution pointer should
+ be set when calling a function?
+\end_layout
+
+\begin_layout Subsubsection
+Returning from calls
+\end_layout
+
+\begin_layout Standard
+What happens when a function returns?
+\end_layout
+
+\begin_layout Subsection
+Call stack
+\end_layout
+
+\begin_layout Standard
+This subsection explains call stack in Viua.
+\end_layout
+
+\begin_layout Subsubsection
+Not a stack
+\end_layout
+
+\begin_layout Standard
+Call stack in Viua is not really a stack, but a vector.
+ Implementation detail.
+\end_layout
+
+\begin_layout Subsection
+Exception handling
+\end_layout
+
+\begin_layout Standard
+This subsection explains in detail how exceptions are handled inside Viua.
+\end_layout
+
+\begin_layout Subsubsection
+Creating tryframes
+\end_layout
+
+\begin_layout Subsubsection
+Registering catching blocks
+\end_layout
+
+\begin_layout Subsubsection
+Trying blocks
+\end_layout
+
+\begin_layout Subsubsection
+Leaving blocks
+\end_layout
+
+\begin_layout Subsubsection
+Block stack
+\end_layout
+
+\begin_layout Standard
+Try-frames are placed on a stack separate from ordinary call-frame stack,
+ but are closely tied to their respective frames.
+\end_layout
+
+\begin_layout Section
+Register sets
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Register-sets"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+A register set
+\end_layout
+
+\begin_layout Standard
+Register set is a collection of registers.
+\end_layout
+
+\begin_layout Subsection
+A register
+\end_layout
+
+\begin_layout Standard
+A register is a pointer holding a pointer to an object.
+ In Viua, a 
+\begin_inset Quotes eld
+\end_inset
+
+register
+\begin_inset Quotes erd
+\end_inset
+
+ is a piece of memory, with some associated flags, inside a register set
+ that holds a pointer to an object.
+\end_layout
+
+\begin_layout Subsubsection
+Register flags
+\end_layout
+
+\begin_layout Subsection
+Available register sets
+\end_layout
+
+\begin_layout Standard
+Viua is a register-based virtual machine.
+ It comes with several register sets, and each serves different purpose.
+\end_layout
+
+\begin_layout Subsubsection
+Global
+\end_layout
+
+\begin_layout Standard
+Global register set can be used to hold global variables.
+ It can be accessed from all functions.
+ Initial values in this register set's registers are set by 
+\family typewriter
+__entry
+\family default
+ function.
+\end_layout
+
+\begin_layout Subsubsection
+Local
+\end_layout
+
+\begin_layout Standard
+Local regster sets are uniqe to functions and cannot be accessed from outside
+ of them.
+ They are created each time a function is called, live inside a call frame
+ and are destoyed when the frame is popped from the call stack.
+\end_layout
+
+\begin_layout Subsubsection
+Static
+\end_layout
+
+\begin_layout Standard
+Static registers are unique to functions and cannot be accessed from outside
+ of them.
+ The difference between local registers is that they are created only the
+ first time a function is called and are independent of call frames.
+\end_layout
+
+\begin_layout Subsubsection
+Temporary
+\end_layout
+
+\begin_layout Standard
+Temporary register set has only one register.
+ It is used to move values between different register sets.
+ In the future release, the number of registers in the temporary register
+ set may be increased to allow performing simple operations inside it.
+\end_layout
+
+\begin_layout Section
+Type system
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Type-system"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This section talks about type system of Viua VM.
 \end_layout
 
 \begin_layout Section
@@ -3814,6 +3998,48 @@ Dynamic linking
 
 \begin_layout Standard
 Dynamic linking is a feature planned for later versions of Viua VM.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Part
+Standard Library
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Standard-Library"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+C++ modules
+\end_layout
+
+\begin_layout Subsection
+Typesystem
+\end_layout
+
+\begin_layout Subsection
+String
+\end_layout
+
+\begin_layout Section
+Viua modules
+\end_layout
+
+\begin_layout Subsection
+Functional
+\end_layout
+
+\begin_layout Subsection
+Misc
 \end_layout
 
 \begin_layout Standard

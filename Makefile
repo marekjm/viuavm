@@ -62,8 +62,12 @@ install: bininstall
 test: ${VM_CPU} ${VM_ASM} clean-test-compiles
 	python3 ./tests/tests.py --verbose --catch --failfast
 
-version: src/version.h
+version:
 	./scripts/update_commit_info.sh
+	touch src/front/asm.cpp
+	touch src/front/dis.cpp
+	touch src/front/cpu.cpp
+	touch src/front/wdb.cpp
 
 
 bin/vm/cpu: src/front/cpu.cpp build/cpu/cpu.o build/cpu/dispatch.o build/cpu/registserset.o build/loader.o build/printutils.o build/support/pointer.o build/support/string.o ${VIUA_CPU_INSTR_FILES_O} build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o
