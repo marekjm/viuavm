@@ -173,7 +173,7 @@ byte* CPU::link(byte* addr) {
         vector<string> fn_names = loader.getFunctions();
         map<string, uint16_t> fn_addrs = loader.getFunctionAddresses();
         for (unsigned i = 0; i < fn_names.size(); ++i) {
-            string fn_linkname = (module + "::" + fn_names[i]);
+            string fn_linkname = fn_names[i];
             linked_functions[fn_linkname] = pair<string, byte*>(module, (lnk_btcd+fn_addrs[fn_names[i]]));
         }
 
