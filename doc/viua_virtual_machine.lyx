@@ -3629,6 +3629,116 @@ This directive should not be abused; it is not designed to keep the assembler
 \end_layout
 
 \begin_layout Subsection
+Defining blocks
+\end_layout
+
+\begin_layout Standard
+Blocks are composed from CPU instructions wrapped in 
+\family typewriter
+.block:
+\family default
+ and 
+\family typewriter
+.end
+\family default
+ directives.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+.block: <block>
+\end_layout
+
+\begin_layout Plain Layout
+
+    <instruction>+
+\end_layout
+
+\begin_layout Plain Layout
+
+    leave
+\end_layout
+
+\begin_layout Plain Layout
+
+.end
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Every block should end with with the 
+\family typewriter
+leave
+\family default
+ instruction.
+ This is a hard requirement and blocks without finishing 
+\family typewriter
+leave
+\family default
+ will cause assembler to abort compilation.
+\end_layout
+
+\begin_layout Subsubsection
+Block signatures
+\end_layout
+
+\begin_layout Standard
+Assembler does not compile code that contains tries of undefined blocks.
+ As with functions, this is problematic when dynamic linking of Viua code
+ is used.
+ Adopted solution is the same as for functions; by providing a 
+\begin_inset Quotes eld
+\end_inset
+
+block signature
+\begin_inset Quotes erd
+\end_inset
+
+ programmers can inform the assembler that block with a given name will
+ be available at runtime:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+.bsignature: dynamically_linked::block
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subparagraph*
+Warning
+\end_layout
+
+\begin_layout Standard
+This directive should not be abused; it is not designed to keep the assembler
+ quiet when it detects problems but to provide it with information.
+ If the information is provided to mislead the assembler it will generate
+ code that will eventually crash.
+ Using 
+\family typewriter
+.bsignature:
+\family default
+ to silence warnings about undefined blocks is very strongly discouraged.
+\end_layout
+
+\begin_layout Subsection
 Markers
 \end_layout
 
