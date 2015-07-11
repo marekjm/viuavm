@@ -159,8 +159,6 @@ vector<string> assembler::ce::getBlockNames(const vector<string>& lines) {
 
         line = str::lstrip(str::sub(line, str::chunk(line).size()));
         string name = str::chunk(line);
-        line = str::lstrip(str::sub(line, name.size()));
-        string ret_sign = str::chunk(line);
 
         names.push_back(name);
     }
