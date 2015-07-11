@@ -1,4 +1,4 @@
-.function: boolean
+.function: misc::boolean
     ; this function returns boolean value of its parameter
     arg 0 0
     not 0

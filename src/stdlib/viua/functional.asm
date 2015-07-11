@@ -160,7 +160,7 @@
     end
 .end
 
-.function: apply
+.function: functional::apply
     ; this function applies another function on a single parameter
     ;
     ; this function is type agnostic
@@ -182,7 +182,7 @@
     end
 .end
 
-.function: invoke
+.function: functional::invoke
     ; this function takes two parameters:
     ;    1) a function object
     ;    2) a vector of parameters for function given as first parameter
