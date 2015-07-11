@@ -131,6 +131,26 @@ byte* CPU::arg(byte* addr) {
     return addr;
 }
 
+byte* CPU::argc(byte* addr) {
+    /** Run arg instruction.
+     */
+    int destination_register_index;
+    bool destination_register_ref = false;
+
+    destination_register_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    destination_register_index = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    if (destination_register_ref) {
+        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
+    }
+
+    uregset->set(destination_register_index, new Integer(frames.back()->args->size()));
+
+    return addr;
+}
+
 byte* CPU::call(byte* addr) {
     /*  Run call instruction.
      */

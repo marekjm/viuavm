@@ -182,6 +182,7 @@ class CPU {
     byte* param(byte*);
     byte* paref(byte*);
     byte* arg(byte*);
+    byte* argc(byte*);
 
     byte* call(byte*);
     byte* end(byte*);

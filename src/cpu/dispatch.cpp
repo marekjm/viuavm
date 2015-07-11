@@ -183,6 +183,9 @@ byte* CPU::dispatch(byte* addr) {
         case ARG:
             addr = arg(addr+1);
             break;
+        case ARGC:
+            addr = argc(addr+1);
+            break;
         case CALL:
             addr = call(addr+1);
             break;
