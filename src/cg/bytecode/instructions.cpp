@@ -690,6 +690,18 @@ namespace cg {
             return addr_ptr;
         }
 
+        byte* argc(byte* addr_ptr, int_op a) {
+            /*  Inserts argc instruction to bytecode.
+             *
+             *  :params:
+             *
+             *  a - target register
+             */
+            *(addr_ptr++) = ARGC;
+            addr_ptr = insertIntegerOperand(addr_ptr, a);
+            return addr_ptr;
+        }
+
         byte* call(byte* addr_ptr, int_op reg, const string& fn_name) {
             /*  Inserts call instruction.
              *  Byte offset is calculated automatically.

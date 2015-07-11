@@ -88,6 +88,7 @@ namespace cg {
         byte* param(byte*, int_op, int_op);
         byte* paref(byte*, int_op, int_op);
         byte* arg(byte*, int_op, int_op);
+        byte* argc(byte*, int_op);
         byte* call(byte*, int_op, const std::string&);
 
         byte* jump(byte*, int);
