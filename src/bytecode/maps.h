@@ -93,6 +93,7 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "paref",  sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
     { "call",   sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "arg",    sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
+    { "argc",   sizeof(byte) + sizeof(bool) + sizeof(int) },
 
     { "jump",   sizeof(byte) + sizeof(int) },
     { "branch", sizeof(byte) + sizeof(bool) + 3*sizeof(int) },
@@ -198,6 +199,7 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { PAREF,    "paref" },
     { CALL,     "call" },
     { ARG,      "arg" },
+    { ARGC,     "argc" },
 
     { JUMP,     "jump" },
     { BRANCH,   "branch" },
