@@ -13,7 +13,7 @@
 #include <stdexcept>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/types/type.h>
-#include <viua/registerset.h>
+#include <viua/cpu/registerset.h>
 #include <viua/cpu/frame.h>
 #include <viua/cpu/tryframe.h>
 #include <viua/include/module.h>
