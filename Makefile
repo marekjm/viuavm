@@ -103,10 +103,10 @@ bin/vm/dis: src/front/dis.cpp build/loader.o build/cg/disassembler/disassembler.
 build/cpu/dispatch.o: src/cpu/dispatch.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/cpu/cpu.o: src/cpu/cpu.cpp src/cpu/cpu.h src/bytecode/opcodes.h src/cpu/frame.h
+build/cpu/cpu.o: src/cpu/cpu.cpp src/include/viua/cpu/cpu.h src/include/viua/bytecode/opcodes.h src/include/viua/cpu/frame.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/cpu/registserset.o: src/cpu/registerset.cpp src/cpu/registerset.h
+build/cpu/registserset.o: src/cpu/registerset.cpp src/include/viua/cpu/registerset.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
 

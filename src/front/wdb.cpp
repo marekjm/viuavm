@@ -7,19 +7,19 @@
 #include <vector>
 #include <deque>
 #include "../../lib/linenoise/linenoise.h"
-#include "../version.h"
-#include "../bytecode/maps.h"
-#include "../support/string.h"
-#include "../support/pointer.h"
-#include "../types/integer.h"
-#include "../types/closure.h"
-#include "../loader.h"
+#include <viua/version.h>
+#include <viua/bytecode/maps.h>
+#include <viua/support/string.h>
+#include <viua/support/pointer.h>
+#include <viua/types/integer.h>
+#include <viua/types/closure.h>
+#include <viua/loader.h>
 #define AS_DEBUG_HEADER 1
-#include "../cpu/cpu.h"
-#include "../program.h"
-#include "../cg/disassembler/disassembler.h"
-#include "../printutils.h"
-#include "../include/module.h"
+#include <viua/cpu/cpu.h>
+#include <viua/program.h>
+#include <viua/cg/disassembler/disassembler.h>
+#include <viua/printutils.h>
+#include <viua/include/module.h>
 using namespace std;
 
 

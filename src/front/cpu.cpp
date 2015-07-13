@@ -4,12 +4,12 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include "../version.h"
-#include "../support/string.h"
-#include "../loader.h"
-#include "../cpu/cpu.h"
-#include "../program.h"
-#include "../printutils.h"
+#include <viua/version.h>
+#include <viua/support/string.h>
+#include <viua/loader.h>
+#include <viua/cpu/cpu.h>
+#include <viua/program.h>
+#include <viua/printutils.h>
 using namespace std;
 
 

@@ -6,13 +6,13 @@
 #include <vector>
 #include <tuple>
 #include <string>
-#include "../version.h"
-#include "../bytecode/opcodes.h"
-#include "../bytecode/maps.h"
-#include "../cg/disassembler/disassembler.h"
-#include "../support/string.h"
-#include "../support/pointer.h"
-#include "../loader.h"
+#include <viua/version.h>
+#include <viua/bytecode/opcodes.h>
+#include <viua/bytecode/maps.h>
+#include <viua/cg/disassembler/disassembler.h>
+#include <viua/support/string.h>
+#include <viua/support/pointer.h>
+#include <viua/loader.h>
 using namespace std;
 
 

@@ -7,12 +7,12 @@
 #include <sstream>
 #include <vector>
 #include <map>
-#include "../bytecode/maps.h"
-#include "../support/string.h"
-#include "../version.h"
-#include "../loader.h"
-#include "../program.h"
-#include "../cg/assembler/assembler.h"
+#include <viua/bytecode/maps.h>
+#include <viua/support/string.h>
+#include <viua/version.h>
+#include <viua/loader.h>
+#include <viua/program.h>
+#include <viua/cg/assembler/assembler.h>
 using namespace std;
 
 

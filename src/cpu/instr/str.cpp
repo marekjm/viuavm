@@ -1,13 +1,13 @@
 #include <iostream>
-#include "../../bytecode/bytetypedef.h"
-#include "../../types/type.h"
-#include "../../types/integer.h"
-#include "../../types/boolean.h"
-#include "../../types/byte.h"
-#include "../../types/string.h"
-#include "../../support/pointer.h"
-#include "../../support/string.h"
-#include "../cpu.h"
+#include <viua/bytecode/bytetypedef.h>
+#include <viua/types/type.h>
+#include <viua/types/integer.h>
+#include <viua/types/boolean.h>
+#include <viua/types/byte.h>
+#include <viua/types/string.h>
+#include <viua/support/pointer.h>
+#include <viua/support/string.h>
+#include <viua/cpu/cpu.h>
 using namespace std;
 
 

@@ -1,7 +1,7 @@
-#include "../../types/integer.h"
-#include "../../support/pointer.h"
-#include "../../exceptions.h"
-#include "../cpu.h"
+#include <viua/types/integer.h>
+#include <viua/support/pointer.h>
+#include <viua/exceptions.h>
+#include <viua/cpu/cpu.h>
 using namespace std;
 
 

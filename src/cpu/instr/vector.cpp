@@ -1,11 +1,11 @@
 #include <iostream>
-#include "../../bytecode/bytetypedef.h"
-#include "../../types/type.h"
-#include "../../types/integer.h"
-#include "../../types/vector.h"
-#include "../../support/pointer.h"
-#include "../registerset.h"
-#include "../cpu.h"
+#include <viua/bytecode/bytetypedef.h>
+#include <viua/types/type.h>
+#include <viua/types/integer.h>
+#include <viua/types/vector.h>
+#include <viua/support/pointer.h>
+#include <viua/cpu/registerset.h>
+#include <viua/cpu/cpu.h>
 using namespace std;
 
 
