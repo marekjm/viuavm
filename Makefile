@@ -7,6 +7,7 @@ VIUA_CPU_INSTR_FILES_O=build/cpu/instr/general.o build/cpu/instr/registers.o bui
 PREFIX=~/.local
 BIN_PATH=${PREFIX}/bin
 LIB_PATH=${PREFIX}/lib/viua
+H_PATH=/usr/include/viua
 
 
 .SUFFIXES: .cpp .h .o
@@ -57,6 +58,12 @@ libinstall: stdlib
 	cp ./build/stdlib/lib/*.so ${LIB_PATH}/
 
 install: bininstall
+	mkdir -p ${H_PATH}
+	cp -R ./src/include/*.h ${H_PATH}/
+	mkdir -p ${H_PATH}/types
+	cp -R ./src/types/*.h ${H_PATH}/types/
+	cp -R ./src/cpu/frame.h ${H_PATH}/
+	cp -R ./src/cpu/registerset.h ${H_PATH}/
 
 
 test: ${VM_CPU} ${VM_ASM} clean-test-compiles
