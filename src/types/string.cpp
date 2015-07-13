@@ -2,10 +2,10 @@
 #include <vector>
 #include <sstream>
 #include <stdexcept>
-#include "../support/string.h"
-#include "type.h"
-#include "vector.h"
-#include "string.h"
+#include <viua/support/string.h>
+#include <viua/types/type.h>
+#include <viua/types/vector.h>
+#include <viua/types/string.h>
 using namespace std;
 
 

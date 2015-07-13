@@ -1,7 +1,7 @@
 #include <string>
 #include <sstream>
-#include "closure.h"
-#include "type.h"
+#include <viua/types/closure.h>
+#include <viua/types/type.h>
 using namespace std;
 
 

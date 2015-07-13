@@ -1,5 +1,5 @@
 #include <string>
-#include "exception.h"
+#include <viua/types/exception.h>
 using namespace std;
 
 

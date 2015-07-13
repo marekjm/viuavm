@@ -1,7 +1,7 @@
 #include <string>
 #include <sstream>
-#include "type.h"
-#include "function.h"
+#include <viua/types/type.h>
+#include <viua/types/function.h>
 using namespace std;
 
 

@@ -1,9 +1,9 @@
 #include <string>
 #include <vector>
 #include <sstream>
-#include "type.h"
-#include "vector.h"
-#include "../exceptions.h"
+#include <viua/types/type.h>
+#include <viua/types/vector.h>
+#include <viua/exceptions.h>
 using namespace std;
 
 
