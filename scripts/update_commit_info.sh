@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-FILE=src/version.h
+FILE=src/include/viua/version.h
 COMMITS_SINCE=`git describe HEAD | cut -d'-' -f2`
 SAVED_MICRO=`grep -P 'MICRO' $FILE | grep -Po '\d+'`
 
