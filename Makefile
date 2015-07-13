@@ -54,16 +54,21 @@ bininstall: bin/vm/asm bin/vm/cpu bin/vm/vdb bin/vm/dis
 	chmod 755 ${BIN_PATH}/viua-dis
 
 libinstall: stdlib
-	mkdir -p ${LIB_PATH}
-	cp ./build/stdlib/lib/*.so ${LIB_PATH}/
+	mkdir -p ${LIB_PATH}/std/extern
+	mkdir -p ${LIB_PATH}/std/native
+	mkdir -p ${LIB_PATH}/core
+	cp ./build/stdlib/lib/*.so ${LIB_PATH}/std/extern
 
 install: bininstall
 	mkdir -p ${H_PATH}
 	cp -R ./src/include/*.h ${H_PATH}/
+	mkdir -p ${H_PATH}/support
+	cp -R ./src/support/*.h ${H_PATH}/support/
 	mkdir -p ${H_PATH}/types
 	cp -R ./src/types/*.h ${H_PATH}/types/
 	cp -R ./src/cpu/frame.h ${H_PATH}/
 	cp -R ./src/cpu/registerset.h ${H_PATH}/
+
 
 
 test: ${VM_CPU} ${VM_ASM} clean-test-compiles
