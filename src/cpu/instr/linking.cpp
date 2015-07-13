@@ -2,12 +2,12 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <iostream>
-#include "../../types/integer.h"
-#include "../../support/pointer.h"
-#include "../../include/module.h"
-#include "../../exceptions.h"
-#include "../../loader.h"
-#include "../cpu.h"
+#include <viua/types/integer.h>
+#include <viua/support/pointer.h>
+#include <viua/include/module.h>
+#include <viua/exceptions.h>
+#include <viua/loader.h>
+#include <viua/cpu/cpu.h>
 using namespace std;
 
 
