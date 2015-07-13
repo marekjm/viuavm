@@ -13,7 +13,7 @@ Type* hello(Frame*, RegisterSet*, RegisterSet*) {
 
 
 const ExternalFunctionSpec functions[] = {
-    { "print_hello", &hello },
+    { "World::print_hello", &hello },
     { NULL, NULL },
 };
 

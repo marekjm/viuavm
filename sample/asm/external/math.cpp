@@ -17,7 +17,7 @@ Type* math_sqrt(Frame* frame, RegisterSet*, RegisterSet*) {
 
 
 const ExternalFunctionSpec functions[] = {
-    { "sqrt", &math_sqrt },
+    { "math::sqrt", &math_sqrt },
     { NULL, NULL },
 };
 
