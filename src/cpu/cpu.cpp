@@ -1,17 +1,17 @@
 #include <iostream>
 #include <vector>
-#include "../bytecode/bytetypedef.h"
-#include "../bytecode/opcodes.h"
-#include "../bytecode/maps.h"
-#include "../types/type.h"
-#include "../types/integer.h"
-#include "../types/byte.h"
-#include "../types/string.h"
-#include "../types/vector.h"
-#include "../types/exception.h"
-#include "../support/pointer.h"
-#include "../include/module.h"
-#include "cpu.h"
+#include <viua/bytecode/bytetypedef.h>
+#include <viua/bytecode/opcodes.h>
+#include <viua/bytecode/maps.h>
+#include <viua/types/type.h>
+#include <viua/types/integer.h>
+#include <viua/types/byte.h>
+#include <viua/types/string.h>
+#include <viua/types/vector.h>
+#include <viua/types/exception.h>
+#include <viua/support/pointer.h>
+#include <viua/include/module.h>
+#include <viua/cpu/cpu.h>
 using namespace std;
 
 

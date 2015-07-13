@@ -1,4 +1,4 @@
-#include "pointer.h"
+#include <viua/support/pointer.h>
 
 
 namespace pointer {

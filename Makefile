@@ -1,4 +1,4 @@
-CXXFLAGS=-std=c++11 -Wall -pedantic -Wfatal-errors -g
+CXXFLAGS=-std=c++11 -Wall -pedantic -Wfatal-errors -g -I./src/include
 CXXOPTIMIZATIONFLAGS=
 
 VIUA_CPU_INSTR_FILES_CPP=src/cpu/instr/general.cpp src/cpu/instr/registers.cpp src/cpu/instr/calls.cpp src/cpu/instr/linking.cpp src/cpu/instr/tcmechanism.cpp src/cpu/instr/closure.cpp src/cpu/instr/int.cpp src/cpu/instr/float.cpp src/cpu/instr/byte.cpp src/cpu/instr/str.cpp src/cpu/instr/bool.cpp src/cpu/instr/cast.cpp src/cpu/instr/vector.cpp
@@ -66,8 +66,11 @@ install: bininstall
 	cp -R ./src/support/*.h ${H_PATH}/support/
 	mkdir -p ${H_PATH}/types
 	cp -R ./src/types/*.h ${H_PATH}/types/
-	cp -R ./src/cpu/frame.h ${H_PATH}/
-	cp -R ./src/cpu/registerset.h ${H_PATH}/
+	mkdir -p ${H_PATH}/cpu
+	cp -R ./src/cpu/frame.h ${H_PATH}/cpu/frame.h
+	cp -R ./src/cpu/registerset.h ${H_PATH}/cpu/registserset.h
+	mkdir -p ${H_PATH}/bytecode
+	cp -R ./src/bytecode/*.h ${H_PATH}/bytecode/
 
 
 

@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
-#include "string.h"
+#include <viua/types/string.h>
 using namespace std;
 
 
