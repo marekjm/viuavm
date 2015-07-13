@@ -53,9 +53,9 @@ Type* bases(Frame* frame, RegisterSet*, RegisterSet*) {
 
 
 const ExternalFunctionSpec functions[] = {
-    { "typeof", &typeof },
-    { "inheritanceChain", &inheritanceChain },
-    { "bases", &bases },
+    { "typesystem::typeof", &typeof },
+    { "typesystem::inheritanceChain", &inheritanceChain },
+    { "typesystem::bases", &bases },
     { NULL, NULL },
 };
 

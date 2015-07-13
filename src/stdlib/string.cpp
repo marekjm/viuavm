@@ -36,9 +36,9 @@ Type* string_stringify(Frame* frame, RegisterSet*, RegisterSet*) {
 
 
 const ExternalFunctionSpec functions[] = {
-    { "string", &string_string },
-    { "repr", &string_repr },
-    { "stringify", &string_stringify },
+    { "string::string", &string_string },
+    { "string::repr", &string_repr },
+    { "string::stringify", &string_stringify },
     { NULL, NULL },
 };
 

@@ -46,8 +46,7 @@ byte* CPU::eximport(byte* addr) {
 
     unsigned i = 0;
     while (exported[i].name != NULL) {
-        string namespaced_name = (module + '.' + exported[i].name);
-        registerExternalFunction(namespaced_name, exported[i].fpointer);
+        registerExternalFunction(exported[i].name, exported[i].fpointer);
         ++i;
     }
 

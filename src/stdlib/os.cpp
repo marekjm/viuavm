@@ -20,7 +20,7 @@ Type* os_system(Frame* frame, RegisterSet*, RegisterSet*) {
 
 
 const ExternalFunctionSpec functions[] = {
-    { "system", &os_system },
+    { "os::system", &os_system },
     { NULL, NULL },
 };
 
