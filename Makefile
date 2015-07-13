@@ -61,17 +61,7 @@ libinstall: stdlib
 
 install: bininstall
 	mkdir -p ${H_PATH}
-	cp -R ./src/include/*.h ${H_PATH}/
-	mkdir -p ${H_PATH}/support
-	cp -R ./src/support/*.h ${H_PATH}/support/
-	mkdir -p ${H_PATH}/types
-	cp -R ./src/types/*.h ${H_PATH}/types/
-	mkdir -p ${H_PATH}/cpu
-	cp -R ./src/cpu/frame.h ${H_PATH}/cpu/frame.h
-	cp -R ./src/cpu/registerset.h ${H_PATH}/cpu/registserset.h
-	mkdir -p ${H_PATH}/bytecode
-	cp -R ./src/bytecode/*.h ${H_PATH}/bytecode/
-
+	cp -R ./src/include/viua/. ${H_PATH}/
 
 
 test: ${VM_CPU} ${VM_ASM} clean-test-compiles
