@@ -1,11 +1,11 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include "../types/type.h"
-#include "../types/integer.h"
-#include "../types/byte.h"
-#include "../types/exception.h"
-#include "registerset.h"
+#include <viua/types/type.h>
+#include <viua/types/integer.h>
+#include <viua/types/byte.h>
+#include <viua/types/exception.h>
+#include <viua/cpu/registerset.h>
 using namespace std;
 
 

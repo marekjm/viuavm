@@ -1,7 +1,7 @@
 #include <sstream>
-#include "../bytecode/bytetypedef.h"
-#include "../bytecode/opcodes.h"
-#include "cpu.h"
+#include <viua/bytecode/bytetypedef.h>
+#include <viua/bytecode/opcodes.h>
+#include <viua/cpu/cpu.h>
 using namespace std;
 
 
