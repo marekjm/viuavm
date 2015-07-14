@@ -4,7 +4,7 @@
 #pragma once
 
 #include <string>
-#include "../bytecode/bytetypedef.h"
+#include <viua/bytecode/bytetypedef.h>
 
 class Catcher {
     public:
