@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "bytecode/bytetypedef.h"
-#include "loader.h"
+#include <viua/bytecode/bytetypedef.h>
+#include <viua/loader.h>
 using namespace std;
 
 
