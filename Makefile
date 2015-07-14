@@ -121,19 +121,19 @@ build/cg/disassembler/disassembler.o: src/cg/disassembler/disassembler.cpp
 
 
 # TYPE MODULES
-build/types/vector.o: src/types/vector.cpp src/types/vector.h
+build/types/vector.o: src/types/vector.cpp src/include/viua/types/vector.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/types/closure.o: src/types/closure.cpp src/types/closure.h
+build/types/closure.o: src/types/closure.cpp src/include/viua/types/closure.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/types/function.o: src/types/function.cpp src/types/function.h
+build/types/function.o: src/types/function.cpp src/include/viua/types/function.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/types/string.o: src/types/string.cpp src/types/string.h
+build/types/string.o: src/types/string.cpp src/include/viua/types/string.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/types/exception.o: src/types/exception.cpp src/types/exception.h
+build/types/exception.o: src/types/exception.cpp src/include/viua/types/exception.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
 
