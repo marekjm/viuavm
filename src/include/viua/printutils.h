@@ -4,7 +4,7 @@
 #pragma once
 
 #include <string>
-#include "cpu/frame.h"
+#include <viua/cpu/frame.h>
 
 std::string stringifyFunctionInvocation(const Frame*);
 

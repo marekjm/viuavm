@@ -1,8 +1,8 @@
 #include <iostream>
-#include "../../../src/types/type.h"
-#include "../../../src/cpu/frame.h"
-#include "../../../src/cpu/registerset.h"
-#include "../../../src/include/module.h"
+#include <viua/types/type.h>
+#include <viua/cpu/frame.h>
+#include <viua/cpu/registerset.h>
+#include <viua/include/module.h>
 using namespace std;
 
 

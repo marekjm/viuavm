@@ -1,7 +1,7 @@
 #include <sstream>
 #include <string>
-#include "types/type.h"
-#include "cpu/frame.h"
+#include <viua/types/type.h>
+#include <viua/printutils.h>
 using namespace std;
 
 string stringifyFunctionInvocation(const Frame* frame) {
