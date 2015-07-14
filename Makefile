@@ -1,4 +1,4 @@
-CXXFLAGS=-std=c++11 -Wall -pedantic -Wfatal-errors -g -I./src/include
+CXXFLAGS=-std=c++11 -Wall -pedantic -Wfatal-errors -g -I./include
 CXXOPTIMIZATIONFLAGS=
 
 VIUA_CPU_INSTR_FILES_CPP=src/cpu/instr/general.cpp src/cpu/instr/registers.cpp src/cpu/instr/calls.cpp src/cpu/instr/linking.cpp src/cpu/instr/tcmechanism.cpp src/cpu/instr/closure.cpp src/cpu/instr/int.cpp src/cpu/instr/float.cpp src/cpu/instr/byte.cpp src/cpu/instr/str.cpp src/cpu/instr/bool.cpp src/cpu/instr/cast.cpp src/cpu/instr/vector.cpp
@@ -61,7 +61,7 @@ libinstall: stdlib
 
 install: bininstall
 	mkdir -p ${H_PATH}
-	cp -R ./src/include/viua/. ${H_PATH}/
+	cp -R ./include/viua/. ${H_PATH}/
 
 uninstall:
 	rm -rf ${H_PATH}
@@ -98,10 +98,10 @@ bin/vm/dis: src/front/dis.cpp build/loader.o build/cg/disassembler/disassembler.
 build/cpu/dispatch.o: src/cpu/dispatch.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/cpu/cpu.o: src/cpu/cpu.cpp src/include/viua/cpu/cpu.h src/include/viua/bytecode/opcodes.h src/include/viua/cpu/frame.h
+build/cpu/cpu.o: src/cpu/cpu.cpp include/viua/cpu/cpu.h include/viua/bytecode/opcodes.h include/viua/cpu/frame.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/cpu/registserset.o: src/cpu/registerset.cpp src/include/viua/cpu/registerset.h
+build/cpu/registserset.o: src/cpu/registerset.cpp include/viua/cpu/registerset.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
 
@@ -111,7 +111,7 @@ stdlib:
 
 
 # opcode lister program
-bin/opcodes.bin: src/bytecode/opcd.cpp src/include/viua/bytecode/opcodes.h src/include/viua/bytecode/maps.h
+bin/opcodes.bin: src/bytecode/opcd.cpp include/viua/bytecode/opcodes.h include/viua/bytecode/maps.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -o $@ $<
 
 
@@ -121,19 +121,19 @@ build/cg/disassembler/disassembler.o: src/cg/disassembler/disassembler.cpp
 
 
 # TYPE MODULES
-build/types/vector.o: src/types/vector.cpp src/include/viua/types/vector.h
+build/types/vector.o: src/types/vector.cpp include/viua/types/vector.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/types/closure.o: src/types/closure.cpp src/include/viua/types/closure.h
+build/types/closure.o: src/types/closure.cpp include/viua/types/closure.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/types/function.o: src/types/function.cpp src/include/viua/types/function.h
+build/types/function.o: src/types/function.cpp include/viua/types/function.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/types/string.o: src/types/string.cpp src/include/viua/types/string.h
+build/types/string.o: src/types/string.cpp include/viua/types/string.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/types/exception.o: src/types/exception.cpp src/include/viua/types/exception.h
+build/types/exception.o: src/types/exception.cpp include/viua/types/exception.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
 
