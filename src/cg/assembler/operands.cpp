@@ -1,8 +1,8 @@
 #include <string>
 #include <tuple>
-#include "../../support/string.h"
-#include "../../program.h"
-#include "assembler.h"
+#include <viua/support/string.h>
+#include <viua/cg/assembler/assembler.h>
+#include <viua/program.h>
 using namespace std;
 
 

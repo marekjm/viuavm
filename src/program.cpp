@@ -1,10 +1,10 @@
 #include <cstdint>
 #include <iostream>
 #include <sstream>
-#include "bytecode/opcodes.h"
-#include "bytecode/maps.h"
-#include "support/string.h"
-#include "program.h"
+#include <viua/support/string.h>
+#include <viua/bytecode/opcodes.h>
+#include <viua/bytecode/maps.h>
+#include <viua/program.h>
 using namespace std;
 
 

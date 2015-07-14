@@ -5,10 +5,10 @@
 #include <tuple>
 #include <map>
 #include <algorithm>
-#include "../../bytecode/maps.h"
-#include "../../support/string.h"
-#include "../../program.h"
-#include "assembler.h"
+#include <viua/support/string.h>
+#include <viua/bytecode/maps.h>
+#include <viua/cg/assembler/assembler.h>
+#include <viua/program.h>
 using namespace std;
 
 

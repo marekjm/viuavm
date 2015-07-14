@@ -1,6 +1,6 @@
-#include "bytecode/opcodes.h"
-#include "support/pointer.h"
-#include "program.h"
+#include <viua/bytecode/opcodes.h>
+#include <viua/support/pointer.h>
+#include <viua/program.h>
 using namespace std;
 
 

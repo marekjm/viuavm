@@ -5,8 +5,8 @@
 #include <vector>
 #include <tuple>
 #include <map>
-#include "bytecode/bytetypedef.h"
-#include "cg/bytecode/instructions.h"
+#include <viua/bytecode/bytetypedef.h>
+#include <viua/cg/bytecode/instructions.h>
 
 
 enum JUMPTYPE {
