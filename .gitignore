@@ -15,8 +15,8 @@
 
 build/assembler/*
 
-bin/vm/*
-bin/run/*
+build/bin/vm/*
+build/bin/run/*
 
 tests/compiled/*
 
