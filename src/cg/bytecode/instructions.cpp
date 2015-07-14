@@ -1,4 +1,4 @@
-#include "instructions.h"
+#include <viua/cg/bytecode/instructions.h>
 using namespace std;
 
 

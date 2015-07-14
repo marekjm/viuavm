@@ -1,9 +1,9 @@
 #include <sstream>
-#include "../../bytecode/opcodes.h"
-#include "../../bytecode/maps.h"
-#include "../../support/string.h"
-#include "../../support/pointer.h"
-#include "disassembler.h"
+#include <viua/bytecode/opcodes.h>
+#include <viua/bytecode/maps.h>
+#include <viua/support/string.h>
+#include <viua/support/pointer.h>
+#include <viua/cg/disassembler/disassembler.h>
 using namespace std;
 
 
