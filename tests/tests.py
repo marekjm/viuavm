@@ -47,7 +47,7 @@ def assemble(asm, out=None, links=(), opts=(), okcodes=(0,)):
     """Assemble path given as `asm` and put binary in `out`.
     Raises exception if compilation is not successful.
     """
-    asmargs = ('./bin/vm/asm',) + opts
+    asmargs = ('./build/bin/vm/asm',) + opts
     if out is not None: asmargs += ('--out', out,)
     asmargs += (asm,)
     asmargs += links
@@ -63,7 +63,7 @@ def disassemble(path, out=None):
     """Disassemle path given as `path` and put resulting assembly code in `out`.
     Raises exception if disassembly is not successful.
     """
-    asmargs = ('./bin/vm/dis',)
+    asmargs = ('./build/bin/vm/dis',)
     if out is not None: asmargs += ('--out', out,)
     asmargs += (path,)
     p = subprocess.Popen(asmargs, stdout=subprocess.PIPE)
@@ -77,7 +77,7 @@ def disassemble(path, out=None):
 def run(path, expected_exit_code=0):
     """Run given file with Viua CPU and return its output.
     """
-    p = subprocess.Popen(('./bin/vm/cpu', path), stdout=subprocess.PIPE)
+    p = subprocess.Popen(('./build/bin/vm/cpu', path), stdout=subprocess.PIPE)
     output, error = p.communicate()
     exit_code = p.wait()
     if exit_code not in (expected_exit_code if type(expected_exit_code) in [list, tuple] else (expected_exit_code,)):

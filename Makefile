@@ -15,7 +15,7 @@ H_PATH=/usr/include/viua
 .PHONY: all remake clean clean-support clean-test-compiles install test version
 
 
-all: bin/vm/asm bin/vm/cpu bin/vm/vdb bin/vm/dis bin/opcodes.bin
+all: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/vdb build/bin/vm/dis build/bin/opcodes.bin
 
 remake: clean all
 
@@ -42,15 +42,15 @@ clean-test-compiles:
 	rm -f ./tests/compiled/*.wlib
 
 
-bininstall: bin/vm/asm bin/vm/cpu bin/vm/vdb bin/vm/dis
+bininstall: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/vdb build/bin/vm/dis
 	mkdir -p ${BIN_PATH}
-	cp ./bin/vm/asm ${BIN_PATH}/viua-asm
+	cp ./build/bin/vm/asm ${BIN_PATH}/viua-asm
 	chmod 755 ${BIN_PATH}/viua-asm
-	cp ./bin/vm/cpu ${BIN_PATH}/viua-cpu
+	cp ./build/bin/vm/cpu ${BIN_PATH}/viua-cpu
 	chmod 755 ${BIN_PATH}/viua-cpu
-	cp ./bin/vm/vdb ${BIN_PATH}/viua-db
+	cp ./build/bin/vm/vdb ${BIN_PATH}/viua-db
 	chmod 755 ${BIN_PATH}/viua-db
-	cp ./bin/vm/dis ${BIN_PATH}/viua-dis
+	cp ./build/bin/vm/dis ${BIN_PATH}/viua-dis
 	chmod 755 ${BIN_PATH}/viua-dis
 
 libinstall: stdlib
@@ -80,16 +80,16 @@ version:
 	touch src/front/wdb.cpp
 
 
-bin/vm/cpu: src/front/cpu.cpp build/cpu/cpu.o build/cpu/dispatch.o build/cpu/registserset.o build/loader.o build/printutils.o build/support/pointer.o build/support/string.o ${VIUA_CPU_INSTR_FILES_O} build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o
+build/bin/vm/cpu: src/front/cpu.cpp build/cpu/cpu.o build/cpu/dispatch.o build/cpu/registserset.o build/loader.o build/printutils.o build/support/pointer.o build/support/string.o ${VIUA_CPU_INSTR_FILES_O} build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -o $@ $^ -ldl
 
-bin/vm/vdb: src/front/wdb.cpp build/lib/linenoise.o build/cpu/cpu.o build/cpu/dispatch.o build/cpu/registserset.o build/loader.o build/cg/disassembler/disassembler.o build/printutils.o build/support/pointer.o build/support/string.o ${VIUA_CPU_INSTR_FILES_O} build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o
+build/bin/vm/vdb: src/front/wdb.cpp build/lib/linenoise.o build/cpu/cpu.o build/cpu/dispatch.o build/cpu/registserset.o build/loader.o build/cg/disassembler/disassembler.o build/printutils.o build/support/pointer.o build/support/string.o ${VIUA_CPU_INSTR_FILES_O} build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -o $@ $^ -ldl
 
-bin/vm/asm: src/front/asm.cpp build/program.o build/programinstructions.o build/cg/assembler/operands.o build/cg/assembler/ce.o build/cg/assembler/verify.o build/cg/bytecode/instructions.o build/loader.o build/support/string.o
+build/bin/vm/asm: src/front/asm.cpp build/program.o build/programinstructions.o build/cg/assembler/operands.o build/cg/assembler/ce.o build/cg/assembler/verify.o build/cg/bytecode/instructions.o build/loader.o build/support/string.o
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -o $@ $^
 
-bin/vm/dis: src/front/dis.cpp build/loader.o build/cg/disassembler/disassembler.o build/support/pointer.o build/support/string.o
+build/bin/vm/dis: src/front/dis.cpp build/loader.o build/cg/disassembler/disassembler.o build/support/pointer.o build/support/string.o
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -o $@ $^
 
 
@@ -111,7 +111,7 @@ stdlib:
 
 
 # opcode lister program
-bin/opcodes.bin: src/bytecode/opcd.cpp include/viua/bytecode/opcodes.h include/viua/bytecode/maps.h
+build/bin/opcodes.bin: src/bytecode/opcd.cpp include/viua/bytecode/opcodes.h include/viua/bytecode/maps.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -o $@ $<
 
 
