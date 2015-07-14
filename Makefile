@@ -111,7 +111,7 @@ stdlib:
 
 
 # opcode lister program
-bin/opcodes.bin: src/bytecode/opcd.cpp src/bytecode/opcodes.h src/bytecode/maps.h
+bin/opcodes.bin: src/bytecode/opcd.cpp src/include/viua/bytecode/opcodes.h src/include/viua/bytecode/maps.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -o $@ $<
 
 

@@ -2,9 +2,9 @@
 #include <algorithm>
 #include <map>
 #include <string>
-#include "bytetypedef.h"
-#include "opcodes.h"
-#include "maps.h"
+#include <viua/bytecode/bytetypedef.h>
+#include <viua/bytecode/opcodes.h>
+#include <viua/bytecode/maps.h>
 using namespace std;
 
 
