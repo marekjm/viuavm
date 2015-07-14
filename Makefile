@@ -63,6 +63,11 @@ install: bininstall
 	mkdir -p ${H_PATH}
 	cp -R ./src/include/viua/. ${H_PATH}/
 
+uninstall:
+	rm -rf ${H_PATH}
+	rm -rf ${LIB_PATH}
+	rm -rf ${BIN_PATH}/viua-*
+
 
 test: ${VM_CPU} ${VM_ASM} clean-test-compiles
 	python3 ./tests/tests.py --verbose --catch --failfast
