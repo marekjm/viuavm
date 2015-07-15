@@ -189,28 +189,27 @@ This section features a brief overview of the Viua VM; its history, development
  It is contains more prose and casual writing than technicalities.
  More technical discussion begins in Part 
 \begin_inset CommandInset ref
-LatexCommand ref
-reference "part:Architecture"
-
-\end_inset
-
-.
- VM architecture is discussed in Part
-\begin_inset CommandInset ref
 LatexCommand vref
 reference "part:Virtual-Machine"
 
 \end_inset
 
 .
- People who want to dive straight into code can start at Part
+ People who want to dive straight into code can start at Part 
 \begin_inset CommandInset ref
 LatexCommand vref
 reference "part:Programming"
 
 \end_inset
 
-.
+ to get the big picture and then go to 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "sec:Instruction-set"
+
+\end_inset
+
+ to become familiar with the instruction set.
 \end_layout
 
 \begin_layout Subsection
@@ -348,6 +347,11 @@ In May 2015, Viua gained the ability to throw and catch objects (among them
 \begin_layout Standard
 In June 2015 machine implemented first-class functions and closures which
  enabled it to support some form of functional programming.
+\end_layout
+
+\begin_layout Standard
+In July 2015 dynamic linking has been implemented, release 0.5.0 has been
+ announced and machine entered alpha stage of development.
 \end_layout
 
 \begin_layout Standard
