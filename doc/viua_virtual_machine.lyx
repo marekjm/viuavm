@@ -69,7 +69,7 @@
 \begin_body
 
 \begin_layout Title
-Viua Virtual Machine 0.4.6
+Viua Virtual Machine 0.5.0
 \end_layout
 
 \begin_layout Author
@@ -2435,6 +2435,56 @@ Put caught object in target register.
 \end_layout
 
 \begin_layout Subsection
+Dynamic linking
+\end_layout
+
+\begin_layout Subsubsection
+link
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:link"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+link <module>
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Dynamically link a module.
+ Instruction fails if a module cannot be found, or cannot be loaded (e.g.
+ when it has been incorrectly compiled).
+ Brief description of dynamic linking can be found 
+\begin_inset CommandInset ref
+LatexCommand vpageref
+reference "sub:Dynamic-linking"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
 Interfacing with C++ modules
 \begin_inset CommandInset label
 LatexCommand label
@@ -2793,6 +2843,13 @@ User supplied main function
 Describe the main function a user should supply.
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 Calling conventions
 \end_layout
@@ -2835,6 +2892,13 @@ Returning from calls
 What happens when a function returns?
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 Call stack
 \end_layout
@@ -2850,6 +2914,13 @@ Not a stack
 \begin_layout Standard
 Call stack in Viua is not really a stack, but a vector.
  Implementation detail.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
@@ -2883,6 +2954,13 @@ Block stack
 \begin_layout Standard
 Try-frames are placed on a stack separate from ordinary call-frame stack,
  but are closely tied to their respective frames.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -2982,6 +3060,13 @@ Temporary register set has only one register.
  set may be increased to allow performing simple operations inside it.
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 Type system
 \begin_inset CommandInset label
@@ -2995,6 +3080,13 @@ name "sec:Type-system"
 
 \begin_layout Standard
 This section talks about type system of Viua VM.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -3025,6 +3117,13 @@ name "sub:Functions"
 
 \begin_layout Standard
 Function objects are currently not implemented.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
@@ -3078,6 +3177,13 @@ If an object is bound to more than one closure, pointer to this object stays
  Due to the naive way machine tracks objects lifetimes it will not be able
  to determine when it can destroy a bound object because all pointers to
  it are either REFERENCEs or in BOUND registers.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
@@ -3239,6 +3345,13 @@ Executable bytes
 
 \begin_layout Standard
 Size is followed by N bytes containing encoded opcodes with program logic.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -3450,6 +3563,13 @@ main
 .
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 Assembler directives
 \end_layout
@@ -3539,6 +3659,13 @@ switch
 
 \begin_layout Subsubsection
 Function signatures
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Function-signatures"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -3628,6 +3755,13 @@ This directive should not be abused; it is not designed to keep the assembler
  to silence warnings about undefined function is very strongly discouraged.
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 Defining blocks
 \end_layout
@@ -3689,6 +3823,13 @@ leave
 
 \begin_layout Subsubsection
 Block signatures
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Block-signatures"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -3736,6 +3877,13 @@ This directive should not be abused; it is not designed to keep the assembler
 .bsignature:
 \family default
  to silence warnings about undefined blocks is very strongly discouraged.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
@@ -3838,6 +3986,13 @@ status open
 .mark: <marker_id>
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
 \end_inset
 
 
@@ -3976,6 +4131,13 @@ status open
 
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 Alternative main function
 \end_layout
@@ -4046,6 +4208,13 @@ reference "Main-function-constraints"
 .
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 Linking
 \end_layout
@@ -4070,7 +4239,7 @@ status open
 
 \begin_layout Plain Layout
 
-.link: main.wlib
+.link: main.vlib
 \end_layout
 
 \end_inset
@@ -4090,7 +4259,7 @@ status open
 
 \begin_layout Plain Layout
 
-./bin/vm/asm -o main.out main.asm lib1.wlib lib2.wlib libN.wlib...
+./bin/vm/asm -o main.out main.asm lib1.vlib lib2.vlib libN.vlib...
 \end_layout
 
 \end_inset
@@ -4125,12 +4294,108 @@ No special steps have to be performed on the command line to assemble program
  jump table (which is not present in the executable form of the bytecode).
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 Dynamic linking
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Dynamic-linking"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-Dynamic linking is a feature planned for later versions of Viua VM.
+Dynamic linking is performed during runtime.
+ The fact that the assembler checks if called functions are defined can
+ prove problematic at first.
+ To inform the assembler that a function (or a block) will be available
+ at runtime, but is not available during compilation and static linking
+ stages for current unit, use 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+.signature:
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ (see 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "sub:Function-signatures"
+
+\end_inset
+
+) and 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+.bsignature:
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ (
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "sub:Block-signatures"
+
+\end_inset
+
+) assembler directives for functions and blocks respectively.
+\end_layout
+
+\begin_layout Standard
+The actual linking operation is performed during program execution.
+ When the machine encounters 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+LINK
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ (described 
+\begin_inset CommandInset ref
+LatexCommand vpageref
+reference "sub:link"
+
+\end_inset
+
+) opcode it loads the library associated with it and makes functions it
+ defines available to the program.
+ Calls to undefined functions (which may happen if a library has not been
+ linked before a call is issued to one of its functions) result in an exception
+ being thrown.
+ The exception is catchable from user code.
+\end_layout
+
+\begin_layout Subparagraph
+Implementation detail
+\end_layout
+
+\begin_layout Standard
+Currently, machine does not check if the module has been already linked.
+ The side-effect of this is possiblity of reloading a module during program
+ execution (similar to Erlang's upgrade).
 \end_layout
 
 \begin_layout Standard
@@ -4377,6 +4642,13 @@ cpu.counter
 This command shows how many instructions have been executed so far.
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 Breakpoints
 \end_layout
@@ -4410,6 +4682,13 @@ This command sets breakpoint on calls to function.
  It accepts zero or more string operands, each being a valid function name.
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 Watchpoints
 \end_layout
@@ -4439,6 +4718,13 @@ watch.register.(local,global,static).read
 
 \begin_layout Standard
 Watch local, global or static register for writes.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
@@ -4507,8 +4793,15 @@ register.show
  will issue appropriate error message.
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
-Call stack commands
+Call stack inspection commands
 \end_layout
 
 \begin_layout Subsubsection
@@ -4537,6 +4830,13 @@ stack.frame.show
 Show more detailed information about top-most call stack frame.
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 Loader commands
 \end_layout
@@ -4555,6 +4855,13 @@ loader.block.map[.show]
 
 \begin_layout Standard
 Display map of block addresses.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
@@ -4630,7 +4937,7 @@ Interfacing with C/C++ modules
 
 \begin_layout Standard
 This part describes mechanism implemented in Viua VM to support interfacing
- with libraries written in C/C++, and how modules must be written.
+ with libraries written in C/C++, and how external modules must be written.
 \end_layout
 
 \begin_layout Section
@@ -4640,84 +4947,138 @@ Module interface
 \begin_layout Standard
 Linked modules can be libraries written specifically for Viua VM to speed
  up programs running on it, or wrappers for existing libraries.
-\end_layout
-
-\begin_layout Standard
-In both cases, module must provide two functions - 
+ In both cases, module must provide and introduction function - 
 \family typewriter
-exports_names
+exports
 \family default
- and 
-\family typewriter
-exports_pointers
-\family default
- which return a 
+ which returns a 
 \family typewriter
 NULL
 \family default
--terminated arrays.
-\end_layout
-
-\begin_layout Standard
-If any of these two functions cannot be found in the .so of the module it
- is considered invalid.
+-terminated array of name/function pointer pairs.
+ If any of this function cannot be found in the 
+\family typewriter
+.so
+\family default
+ file of the module it is considered invalid.
 \end_layout
 
 \begin_layout Subsection
 The 
 \family typewriter
-exports_names
+exports
 \family default
  function
 \end_layout
 
 \begin_layout Standard
-This function must return a NULL-terminated array of 
-\family typewriter
-const char
-\family default
- pointers.
+This function must return a NULL-terminated array of name/function pointer
+ pairs.
  It defines modules' interface, i.e.
  names of the functions that Viua VM will see.
  Good practice is that the actual functions be named the same as their exported
  names but this is not required.
-\end_layout
-
-\begin_layout Subsection
-The 
+ Definition of the 
 \family typewriter
-exports_pointers
+struct
 \family default
- function
+ that describes single element of this array is show below:
 \end_layout
 
 \begin_layout Standard
-This function must return a NULL-terminated array of pointers to functions
- taking 
-\family typewriter
-(Frame*, RegisterSet*, RegisterSet*)
-\family default
- as their parameters and returning 
-\family typewriter
-void
-\family default
-.
- Convenience 
-\family typewriter
-typedef
-\family default
- is provided.
- Viua VM will use pointers returned by this function to locate exported
- functions.
- This is to avoid having to 'extern 
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+typedef Type* (ExternalFunction)(Frame*, RegisterSet*, RegisterSet*);
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+struct ExternalFunctionSpec {
+\end_layout
+
+\begin_layout Plain Layout
+
+    const char* name;
+\end_layout
+
+\begin_layout Plain Layout
+
+    ExternalFunction* fpointer;
+\end_layout
+
+\begin_layout Plain Layout
+
+};
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Header file that contains this definition can be included with 
 \begin_inset Quotes eld
 \end_inset
 
-C
+
+\family typewriter
+#include <viua/include/module.h>
+\family default
+
 \begin_inset Quotes erd
 \end_inset
 
-' every function exported from C++ modules.
+.
+\end_layout
+
+\begin_layout Subsection
+Compilation of external modules
+\end_layout
+
+\begin_layout Standard
+Simple helper script 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+compile_extension.sh
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ for compilation of external modules is shipped as a part of standard distributi
+on and is located in 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+./scripts/
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ directory.
+ For more compex libraires it acts only as a template.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -4753,22 +5114,12 @@ eximport
 .
  It accepts a single string containing name of the module to be imported
  as its only operand.
- Imported functions are namespaced, i.e.
- their names are prefixed with 
-\begin_inset Quotes eld
-\end_inset
-
-
-\family typewriter
-<module name>
-\family default
-.
-\begin_inset Quotes erd
-\end_inset
-
- string.
  Viua will search for modules in a set of predefined paths, which is defined
- in a header file.
+ in 
+\family typewriter
+<viua/include/module.h>
+\family default
+ header file.
 \end_layout
 
 \begin_layout Subsection
