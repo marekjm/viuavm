@@ -3,8 +3,8 @@
 
 #pragma once
 
-const char* VERSION = "0.4.6";
-const char* MICRO = "247";
+const char* VERSION = "0.5.0";
+const char* MICRO = "0";
 
 // commit pointed by the hash below is HEAD~1
 // while the MICRO variable shows actual number of commits added since last release,
