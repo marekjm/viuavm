@@ -13,6 +13,7 @@
 #include <stdexcept>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/types/type.h>
+#include <viua/types/prototype.h>
 #include <viua/cpu/registerset.h>
 #include <viua/cpu/frame.h>
 #include <viua/cpu/tryframe.h>
@@ -50,6 +51,9 @@ class CPU {
 
     // Static registers
     std::map<std::string, RegisterSet*> static_registers;
+
+    // Map of the typesystem currently existing inside the VM.
+    std::map<std::string, Prototype> typesystem;
 
     /*  Call stack.
      */
