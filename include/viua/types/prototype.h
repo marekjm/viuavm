@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <map>
 #include <viua/types/type.h>
 
 
@@ -11,6 +12,12 @@ class Prototype: public Type {
      *
      *  This type is used internally inside the VM.
      */
+
+    std::string type_name;
+    std::vector<std::string> ancestors;
+    std::map<std::string, std::string> methods;
+    std::vector<std::string> attributes;
+
     public:
         virtual std::string type() const {
             return "Prototype";
@@ -27,6 +34,17 @@ class Prototype: public Type {
             return true;
         }
 
+
+        // attach a function as a method to the prototype
+        Prototype* attach(const std::string&, const std::string&);
+
+        // add an attribute to the prototype
+        Prototype* add(const std::string&);
+
+        // push a type to the inheritance chain of the prototype
+        Prototype* derive(const std::string&);
+
+
         virtual std::vector<std::string> bases() const {
             return std::vector<std::string>{"Type"};
         }
@@ -35,11 +53,10 @@ class Prototype: public Type {
         }
 
         virtual Type* copy() const {
-            return new Prototype();
+            return new Prototype(type_name);
         }
 
-        // We need to construct and destroy our basic object.
-        Prototype() {}
+        Prototype(const std::string& tn) {}
         virtual ~Prototype() {}
 };
 
