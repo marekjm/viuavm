@@ -69,10 +69,10 @@ uninstall:
 	rm -rf ${BIN_PATH}/viua-*
 
 devellibs:
-	${CXX} -std=c++11 -fPIC -c -o ./build/platform/exception.o src/types/exception.cpp
-	${CXX} -std=c++11 -fPIC -c -o ./build/platform/vector.o src/types/vector.cpp
-	${CXX} -std=c++11 -fPIC -c -o ./build/platform/registerset.o src/cpu/registerset.cpp
-	${CXX} -std=c++11 -fPIC -c -o ./build/platform/support_string.o src/support/string.cpp
+	${CXX} -std=c++11 -fPIC -c -I./include -o ./build/platform/exception.o src/types/exception.cpp
+	${CXX} -std=c++11 -fPIC -c -I./include -o ./build/platform/vector.o src/types/vector.cpp
+	${CXX} -std=c++11 -fPIC -c -I./include -o ./build/platform/registerset.o src/cpu/registerset.cpp
+	${CXX} -std=c++11 -fPIC -c -I./include -o ./build/platform/support_string.o src/support/string.cpp
 
 installdevel: devellibs
 	mkdir -p ${LIB_PATH}/platform
