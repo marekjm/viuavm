@@ -4,7 +4,7 @@ CXXOPTIMIZATIONFLAGS=
 VIUA_CPU_INSTR_FILES_CPP=src/cpu/instr/general.cpp src/cpu/instr/registers.cpp src/cpu/instr/calls.cpp src/cpu/instr/linking.cpp src/cpu/instr/tcmechanism.cpp src/cpu/instr/closure.cpp src/cpu/instr/int.cpp src/cpu/instr/float.cpp src/cpu/instr/byte.cpp src/cpu/instr/str.cpp src/cpu/instr/bool.cpp src/cpu/instr/cast.cpp src/cpu/instr/vector.cpp
 VIUA_CPU_INSTR_FILES_O=build/cpu/instr/general.o build/cpu/instr/registers.o build/cpu/instr/calls.o build/cpu/instr/linking.o build/cpu/instr/tcmechanism.o build/cpu/instr/closure.o build/cpu/instr/int.o build/cpu/instr/float.o build/cpu/instr/byte.o build/cpu/instr/str.o build/cpu/instr/bool.o build/cpu/instr/cast.o build/cpu/instr/vector.o
 
-PREFIX=~/.local
+PREFIX=/usr
 BIN_PATH=${PREFIX}/bin
 LIB_PATH=${PREFIX}/lib/viua
 H_PATH=/usr/include/viua
@@ -12,10 +12,10 @@ H_PATH=/usr/include/viua
 
 .SUFFIXES: .cpp .h .o
 
-.PHONY: all remake clean clean-support clean-test-compiles install test version
+.PHONY: all remake clean clean-support clean-test-compiles install test version devellibs
 
 
-all: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/vdb build/bin/vm/dis build/bin/opcodes.bin
+all: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/vdb build/bin/vm/dis build/bin/opcodes.bin devellibs
 
 remake: clean all
 
@@ -59,7 +59,7 @@ libinstall: stdlib
 	mkdir -p ${LIB_PATH}/core
 	cp ./build/stdlib/lib/*.so ${LIB_PATH}/std/extern
 
-install: bininstall
+install: bininstall installdevel
 	mkdir -p ${H_PATH}
 	cp -R ./include/viua/. ${H_PATH}/
 
@@ -67,6 +67,16 @@ uninstall:
 	rm -rf ${H_PATH}
 	rm -rf ${LIB_PATH}
 	rm -rf ${BIN_PATH}/viua-*
+
+devellibs:
+	${CXX} -std=c++11 -fPIC -c -o ./build/platform/exception.o src/types/exception.cpp
+	${CXX} -std=c++11 -fPIC -c -o ./build/platform/vector.o src/types/vector.cpp
+	${CXX} -std=c++11 -fPIC -c -o ./build/platform/registerset.o src/cpu/registerset.cpp
+	${CXX} -std=c++11 -fPIC -c -o ./build/platform/support_string.o src/support/string.cpp
+
+installdevel: devellibs
+	mkdir -p ${LIB_PATH}/platform
+	cp ./build/platform/*.o ${LIB_PATH}/platform
 
 
 test: ${VM_CPU} ${VM_ASM} clean-test-compiles
