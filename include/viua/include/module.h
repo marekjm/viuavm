@@ -12,8 +12,14 @@
 const std::vector<const char*> VIUAPATH = {
     ".",
     "~/.local/lib/viua",
+    "~/.local/lib/viua/core",
+    "~/.local/lib/viua/site",
     "/usr/local/lib/viua",
+    "/usr/local/lib/viua/core",
+    "/usr/local/lib/viua/site",
     "/usr/lib/viua",
+    "/usr/lib/viua/core",
+    "/usr/lib/viua/site",
 };
 
 
