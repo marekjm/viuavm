@@ -330,7 +330,7 @@ byte* CPU::tick() {
                 instruction_pointer = tframe->catchers.at(thrown->type())->block_address;
 
                 unsigned distance = 0;
-                for (unsigned j = (frames.size()-1); j >= 0; --j) {
+                for (int j = (frames.size()-1); j >= 0; --j) {
                     if (frames[j] == tframe->associated_frame) {
                         break;
                     }
