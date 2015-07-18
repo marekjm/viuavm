@@ -354,6 +354,57 @@ In July 2015 dynamic linking has been implemented, release 0.5.0 has been
  announced and machine entered alpha stage of development.
 \end_layout
 
+\begin_layout Section
+Comparison with state of the art
+\end_layout
+
+\begin_layout Standard
+This section discusses the differences between Viua and other popular virtual
+ machines and bytecode-driven interpreters that can be considered 
+\begin_inset Quotes eld
+\end_inset
+
+the current state of the art
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Here, 
+\begin_inset Quotes eld
+\end_inset
+
+state of the art
+\begin_inset Quotes erd
+\end_inset
+
+ means what is currently in use, not what is currently the bleeding edge
+ of the technology.
+ Viua started as a research project, but aims to be a production-ready VM
+ instead of pure academic experiment.
+\end_layout
+
+\begin_layout Standard
+Each subsection will briefly compare Viua with another VM; Viua's advantages
+ and disadvantages over the other solution will be discussed (and how they
+ can be addressed), preferred use cases, and possibly other aspects.
+\end_layout
+
+\begin_layout Subsection
+Java
+\end_layout
+
+\begin_layout Subsection
+Lua
+\end_layout
+
+\begin_layout Subsection
+Perl
+\end_layout
+
+\begin_layout Subsection
+Python 3
+\end_layout
+
 \begin_layout Standard
 \begin_inset Newpage newpage
 \end_inset
