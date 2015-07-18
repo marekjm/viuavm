@@ -420,6 +420,13 @@ class FunctionTests(unittest.TestCase):
     def testStaticRegisters(self):
         runTestReturnsIntegers(self, 'static_registers.asm', [i for i in range(0, 10)])
 
+    def testNeverendingFunction(self):
+        runTestSplitlines(self, 'neverending.asm', ['42', '48'])
+
+    @unittest.skip('this test hangs the VM until it runs out of memory')
+    def testNeverendingFunction0(self):
+        runTest(self, 'neverending0.asm', '42')
+
 
 class HigherOrderFunctionTests(unittest.TestCase):
     """Tests for higher-order function support.
