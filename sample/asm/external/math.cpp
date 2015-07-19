@@ -13,7 +13,7 @@ Type* math_sqrt(Frame* frame, RegisterSet*, RegisterSet*) {
     if (frame->args->at(0) == 0) {
         throw new Exception("expected float as first argument");
     }
-    Float* flt = dynamic_cast<Float*>(frame->args->get(0));
+    Float* flt = static_cast<Float*>(frame->args->get(0));
 
     if (flt == 0) {
         throw new Exception("failed to convert first argument to correct type: Float");
