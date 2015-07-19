@@ -13,12 +13,11 @@ Type* math_sqrt(Frame* frame, RegisterSet*, RegisterSet*) {
     if (frame->args->at(0) == 0) {
         throw new Exception("expected float as first argument");
     }
-    Float* flt = static_cast<Float*>(frame->args->get(0));
-
-    if (flt == 0) {
-        throw new Exception("failed to convert first argument to correct type: Float");
+    if (frame->args->at(0)->type() != "Float") {
+        throw new Exception("invalid type of parameter 0: expected Float");
     }
 
+    Float* flt = static_cast<Float*>(frame->args->get(0));
     float square_root = sqrt(flt->value());
     frame->regset->set(0, new Float(square_root));
     return 0;
