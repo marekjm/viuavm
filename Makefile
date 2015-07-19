@@ -10,7 +10,7 @@ BIN_PATH=${PREFIX}/bin
 LIB_PATH=${PREFIX}/lib/viua
 H_PATH=/usr/include/viua
 
-LIBDL=-ldl
+LIBDL ?= -ldl
 
 .SUFFIXES: .cpp .h .o
 
