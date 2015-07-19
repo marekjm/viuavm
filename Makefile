@@ -10,7 +10,7 @@ BIN_PATH=${PREFIX}/bin
 LIB_PATH=${PREFIX}/lib/viua
 H_PATH=/usr/include/viua
 
-LIBDL=-ldl
+LIBDL ?= -ldl
 
 .SUFFIXES: .cpp .h .o
 
@@ -27,15 +27,19 @@ remake: clean all
 ############################################################
 # CLEANING
 clean: clean-support clean-test-compiles
+	rm -f ./build/bin/vm/*
+	rm -f ./build/bin/opcodes.bin
 	rm -f ./build/lib/*.o
 	rm -f ./build/cpu/instr/*.o
 	rm -f ./build/cpu/*.o
 	rm -f ./build/cg/assembler/*.o
 	rm -f ./build/cg/disassembler/*.o
 	rm -f ./build/cg/bytecode/*.o
-	rm -f ./build/*.o
 	rm -f ./build/bin/vm/*
+	rm -f ./build/platform/*.o
 	rm -f ./build/test/*
+	rm -f ./build/types/*.o
+	rm -f ./build/*.o
 
 clean-support:
 	rm -f ./build/support/*.o
@@ -44,6 +48,7 @@ clean-test-compiles:
 	rm -f ./tests/compiled/*.bin
 	rm -f ./tests/compiled/*.asm
 	rm -f ./tests/compiled/*.wlib
+	rm -f ./misc.vlib
 
 
 ############################################################
@@ -114,7 +119,7 @@ build/test/math.o:  sample/asm/external/math.cpp
 build/test/math.so: build/test/math.o build/platform/registerset.o build/platform/exception.o
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -fPIC -shared -o build/test/math.so build/test/math.o ./build/platform/registerset.o ./build/platform/exception.o
 
-compile-test: math.so build/test/build/test/World.so
+compile-test: build/test/math.so build/test/World.so
 
 test: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/dis build/test/math.so build/test/World.so
 	python3 ./tests/tests.py --verbose --catch --failfast
@@ -132,16 +137,28 @@ version:
 
 ############################################################
 # VIRTUAL MACHINE CODE
-build/bin/vm/cpu: src/front/cpu.cpp build/cpu/cpu.o build/cpu/dispatch.o build/cpu/registserset.o build/loader.o build/printutils.o build/support/pointer.o build/support/string.o ${VIUA_CPU_INSTR_FILES_O} build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o
+build/asm.o: src/front/asm.cpp
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $^
+
+build/cpu.o: src/front/cpu.cpp
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $^
+
+build/dis.o: src/front/dis.cpp
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $^
+
+build/wdb.o: src/front/wdb.cpp
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $^
+
+build/bin/vm/cpu: build/cpu.o build/cpu/cpu.o build/cpu/dispatch.o build/cpu/registserset.o build/loader.o build/printutils.o build/support/pointer.o build/support/string.o ${VIUA_CPU_INSTR_FILES_O} build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -o $@ $^ $(LIBDL)
 
-build/bin/vm/vdb: src/front/wdb.cpp build/lib/linenoise.o build/cpu/cpu.o build/cpu/dispatch.o build/cpu/registserset.o build/loader.o build/cg/disassembler/disassembler.o build/printutils.o build/support/pointer.o build/support/string.o ${VIUA_CPU_INSTR_FILES_O} build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o
+build/bin/vm/vdb: build/wdb.o build/lib/linenoise.o build/cpu/cpu.o build/cpu/dispatch.o build/cpu/registserset.o build/loader.o build/cg/disassembler/disassembler.o build/printutils.o build/support/pointer.o build/support/string.o ${VIUA_CPU_INSTR_FILES_O} build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -o $@ $^ $(LIBDL)
 
-build/bin/vm/asm: src/front/asm.cpp build/program.o build/programinstructions.o build/cg/assembler/operands.o build/cg/assembler/ce.o build/cg/assembler/verify.o build/cg/bytecode/instructions.o build/loader.o build/support/string.o
+build/bin/vm/asm: build/asm.o build/program.o build/programinstructions.o build/cg/assembler/operands.o build/cg/assembler/ce.o build/cg/assembler/verify.o build/cg/bytecode/instructions.o build/loader.o build/support/string.o
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -o $@ $^
 
-build/bin/vm/dis: src/front/dis.cpp build/loader.o build/cg/disassembler/disassembler.o build/support/pointer.o build/support/string.o
+build/bin/vm/dis: build/dis.o build/loader.o build/cg/disassembler/disassembler.o build/support/pointer.o build/support/string.o
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -o $@ $^
 
 
