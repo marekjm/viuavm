@@ -170,6 +170,12 @@ Frame* CPU::requestNewFrame(int arguments_size, int registers_size) {
 void CPU::pushFrame() {
     /** Pushes new frame to be the current (top-most) one.
      */
+    if (frames.size() > MAX_STACK_SIZE) {
+        ostringstream oss;
+        oss << "stack size (" << MAX_STACK_SIZE << ") exceeded with call to '" << frame_new->function_name << '/' << frame_new->args->size() << '\'';
+        throw new Exception(oss.str());
+    }
+
     uregset = frame_new->regset;
     // FIXME: remove this print
     //cout << "\npushing new frame on stack: " << hex << frame_new << dec << " (for function: " << frame_new->function_name << ')' << endl;
