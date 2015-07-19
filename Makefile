@@ -94,7 +94,7 @@ uninstall:
 # TESTING
 test: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/dis devellibs
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -fPIC -shared -o World.so ./sample/asm/external/World.cpp
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -fPIC -shared -o math.so ./sample/asm/external/math.cpp ./build/platform/registerset.o ./build/platform/exception.o
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -fPIC -shared -o math.so ./sample/asm/external/math.cpp ./build/platform/registerset.o ./build/platform/exception.o ./build/platform/support_string.o
 	python3 ./tests/tests.py --verbose --catch --failfast
 
 
