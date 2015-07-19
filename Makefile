@@ -35,7 +35,7 @@ clean: clean-support clean-test-compiles
 	rm -f ./build/cg/bytecode/*.o
 	rm -f ./build/*.o
 	rm -f ./bin/vm/*
-	rm -f math.o World.o math.so World.so
+	rm -f ./build/test/*
 
 clean-support:
 	rm -f ./build/support/*.o
@@ -102,21 +102,21 @@ uninstall:
 ############################################################
 # TESTING
 
-World.o: sample/asm/external/World.cpp
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -fPIC -o World.o ./sample/asm/external/World.cpp
+build/test/World.o: sample/asm/external/World.cpp
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -fPIC -o build/test/World.o ./sample/asm/external/World.cpp
 
-World.so: World.o
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -fPIC -shared -o World.so World.o
+build/test/World.so: build/test/World.o
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -fPIC -shared -o build/test/World.so build/test/World.o
 
-math.o:  sample/asm/external/math.cpp
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -fPIC -o math.o ./sample/asm/external/math.cpp
+build/test/math.o:  sample/asm/external/math.cpp
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -fPIC -o build/test/math.o ./sample/asm/external/math.cpp
 
-math.so: math.o build/platform/registerset.o build/platform/exception.o
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -fPIC -shared -o math.so math.o ./build/platform/registerset.o ./build/platform/exception.o
+build/test/math.so: build/test/math.o build/platform/registerset.o build/platform/exception.o
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -fPIC -shared -o build/test/math.so build/test/math.o ./build/platform/registerset.o ./build/platform/exception.o
 
-compile-test: math.so World.so
+compile-test: math.so build/test/build/test/World.so
 
-test: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/dis math.so World.so
+test: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/dis build/test/math.so build/test/World.so
 	python3 ./tests/tests.py --verbose --catch --failfast
 
 
