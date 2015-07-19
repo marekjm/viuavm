@@ -119,7 +119,7 @@ build/test/math.o:  sample/asm/external/math.cpp
 build/test/math.so: build/test/math.o build/platform/registerset.o build/platform/exception.o
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -fPIC -shared -o build/test/math.so build/test/math.o ./build/platform/registerset.o ./build/platform/exception.o
 
-compile-test: math.so build/test/build/test/World.so
+compile-test: build/test/math.so build/test/World.so
 
 test: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/dis build/test/math.so build/test/World.so
 	python3 ./tests/tests.py --verbose --catch --failfast
