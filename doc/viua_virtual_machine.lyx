@@ -3700,8 +3700,12 @@ switch
 \family typewriter
 break
 \family default
-; because if the finishing end is omitted control will just flow into the
- function that is defined next (as it would to the next 
+; because if the finishing 
+\family typewriter
+end
+\family default
+ is omitted control will just flow into the function that is defined next
+ (as it would to the next 
 \family typewriter
 case
 \family default
@@ -3710,6 +3714,132 @@ case
 switch
 \family default
 ).
+ This 
+\begin_inset Quotes eld
+\end_inset
+
+fallthrough
+\begin_inset Quotes erd
+\end_inset
+
+ behaviour is possible because Viua's bytecode is dense, i.e.
+ there is no special separation space between functions.
+\end_layout
+
+\begin_layout Subparagraph
+Warning
+\end_layout
+
+\begin_layout Standard
+Despite being useful at times, the fallthrough behaviour can also be a source
+ of problems.
+ Consider following code:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+.function: one
+\end_layout
+
+\begin_layout Plain Layout
+
+    istore 1 42
+\end_layout
+
+\begin_layout Plain Layout
+
+    print 1
+\end_layout
+
+\begin_layout Plain Layout
+
+    izero 0
+\end_layout
+
+\begin_layout Plain Layout
+
+    ; no end here
+\end_layout
+
+\begin_layout Plain Layout
+
+.end
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+.function: main
+\end_layout
+
+\begin_layout Plain Layout
+
+    frame 0 2
+\end_layout
+
+\begin_layout Plain Layout
+
+    call one
+\end_layout
+
+\begin_layout Plain Layout
+
+    izero 0
+\end_layout
+
+\begin_layout Plain Layout
+
+    end
+\end_layout
+
+\begin_layout Plain Layout
+
+.end
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In this case, falling from 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+one
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ to 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+main
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ creates an infinite loop.
+ As of version 0.5.0 machine is not able to defend itself from such code (it
+ only offers a limited form of instruction-level protection from infinite
+ loops - one that protects it from stopping on single instruction forever
+ and is intended to protect from jumps to themselves).
 \end_layout
 
 \begin_layout Subsubsection
