@@ -103,16 +103,17 @@ int main(int argc, char* argv[]) {
     tie(ret_code, return_exception, return_message) = cpu.exitcondition();
 
     if (ret_code != 0 and return_exception.size()) {
-        cout << "exception after " << cpu.counter() << " ticks" << endl;
-        cout << "uncaught object: " << return_exception << " = " << return_message << endl;
-        cout << "\n";
-
         vector<Frame*> trace = cpu.trace();
         cout << "stack trace: from entry point, most recent call last...\n";
         for (unsigned i = 1; i < trace.size(); ++i) {
             cout << "  " << stringifyFunctionInvocation(trace[i]) << "\n";
         }
         cout << "\n";
+
+        cout << "exception after " << cpu.counter() << " ticks" << endl;
+        cout << "uncaught object: " << return_exception << " = " << return_message << endl;
+        cout << "\n";
+
         cout << "frame details:\n";
 
         Frame* last = trace.back();
