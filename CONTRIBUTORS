@@ -1,0 +1,18 @@
+# Contributors to Viua VM
+
+This file lists contributors to Viua virtual machine.
+Names are listed in alphabetical order.
+
+----
+
+
+Marcin Cieślak:
+    Exposed and fixed bugs in memory management that led to semi-random segmentation faults.
+    Exposed problems with infinite loop protection mechanisms inside the VM.
+    Improved quality of machine's test suite.
+
+
+Marek Marecki (from 2014-12-01):
+    Original author and maintainer.
+    Main designer.
+
