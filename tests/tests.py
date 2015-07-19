@@ -117,6 +117,15 @@ def runTestSplitlines(self, name, expected_output, expected_exit_code = 0):
 def runTestReturnsIntegers(self, name, expected_output, expected_exit_code = 0):
     runTest(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: [int(i) for i in o.strip().splitlines()])
 
+def runTestThrowsException(self, name, expected_output):
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path, 1)
+        got_exception = [line for line in output.strip().splitlines() if line.startswith('uncaught object:')][0]
+        self.assertEqual(1, excode)
+        self.assertEqual(got_exception, expected_output)
+
 
 class IntegerInstructionsTests(unittest.TestCase):
     """Tests for integer instructions.
@@ -423,9 +432,8 @@ class FunctionTests(unittest.TestCase):
     def testNeverendingFunction(self):
         runTestSplitlines(self, 'neverending.asm', ['42', '48'])
 
-    @unittest.skip('this test hangs the VM until it runs out of memory')
     def testNeverendingFunction0(self):
-        runTest(self, 'neverending0.asm', '42')
+        runTestThrowsException(self, 'neverending0.asm', 'uncaught object: Exception = Exception: "stack size (8192) exceeded with call to \'one/0\'"')
 
 
 class HigherOrderFunctionTests(unittest.TestCase):
