@@ -27,15 +27,19 @@ remake: clean all
 ############################################################
 # CLEANING
 clean: clean-support clean-test-compiles
+	rm -f ./build/bin/vm/*
+	rm -f ./build/bin/opcodes.bin
 	rm -f ./build/lib/*.o
 	rm -f ./build/cpu/instr/*.o
 	rm -f ./build/cpu/*.o
 	rm -f ./build/cg/assembler/*.o
 	rm -f ./build/cg/disassembler/*.o
 	rm -f ./build/cg/bytecode/*.o
-	rm -f ./build/*.o
 	rm -f ./build/bin/vm/*
+	rm -f ./build/platform/*.o
 	rm -f ./build/test/*
+	rm -f ./build/types/*.o
+	rm -f ./build/*.o
 
 clean-support:
 	rm -f ./build/support/*.o
@@ -44,6 +48,7 @@ clean-test-compiles:
 	rm -f ./tests/compiled/*.bin
 	rm -f ./tests/compiled/*.asm
 	rm -f ./tests/compiled/*.wlib
+	rm -f ./misc.vlib
 
 
 ############################################################
