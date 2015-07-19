@@ -20,6 +20,7 @@
 
 
 const unsigned DEFAULT_REGISTER_SIZE = 256;
+const unsigned MAX_STACK_SIZE = 8192;
 
 
 class HaltException : public std::runtime_error {
@@ -267,7 +268,7 @@ class CPU {
                 RegisterSet* rset = sr->second;
 
                 ++sr;
-                
+
                 static_registers.erase(rkey);
                 delete rset;
             }
