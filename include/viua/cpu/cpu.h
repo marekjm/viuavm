@@ -260,17 +260,26 @@ class CPU {
              *  if you want to keep it around after the CPU is finished.
              */
             if (bytecode) { delete[] bytecode; }
-            for (std::pair<std::string, RegisterSet*> sr : static_registers) {
-                delete sr.second;
 
-                // this causes valgrind to SCREAM with errors...
-                static_registers.erase(sr.first);
+            std::map<std::string, RegisterSet*>::iterator sr = static_registers.begin();
+            while (sr != static_registers.end()) {
+                std::string  rkey = sr->first;
+                RegisterSet* rset = sr->second;
+
+                ++sr;
+                
+                static_registers.erase(rkey);
+                delete rset;
             }
-            for (std::pair<std::string, std::pair<unsigned, byte*> > lm : linked_modules) {
-                delete[] lm.second.second;
+            std::map<std::string, std::pair<unsigned, byte*> >::iterator lm = linked_modules.begin();
+            while (lm != linked_modules.end()) {
+                std::string lkey = lm->first;
+                byte *ptr = lm->second.second;
 
-                // this causes valgrind to SCREAM with errors...
-                linked_modules.erase(lm.first);
+                ++lm;
+
+                linked_modules.erase(lkey);
+                delete[] ptr;
             }
         }
 };
