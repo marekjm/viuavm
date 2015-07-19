@@ -34,7 +34,7 @@ clean: clean-support clean-test-compiles
 	rm -f ./build/cg/disassembler/*.o
 	rm -f ./build/cg/bytecode/*.o
 	rm -f ./build/*.o
-	rm -f ./bin/vm/*
+	rm -f ./build/bin/vm/*
 	rm -f ./build/test/*
 
 clean-support:
