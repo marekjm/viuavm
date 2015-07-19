@@ -17,14 +17,15 @@ LIBDL=-ldl
 .PHONY: all remake clean clean-support clean-test-compiles install test version devellibs
 
 
+############################################################
+# BASICS
 all: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/vdb build/bin/vm/dis build/bin/opcodes.bin devellibs
 
 remake: clean all
 
-doc/viua_virtual_machine.pdf: doc/viua_virtual_machine.lyx
-	lyx --export-to pdf doc/viua_virtual_machine.pdf --force-overwrite main doc/viua_virtual_machine.lyx
 
-
+############################################################
+# CLEANING
 clean: clean-support
 	rm -f ./build/lib/*.o
 	rm -f ./build/cpu/instr/*.o
@@ -44,6 +45,14 @@ clean-test-compiles:
 	rm -f ./tests/compiled/*.wlib
 
 
+############################################################
+# DOCUMENTATION
+doc/viua_virtual_machine.pdf: doc/viua_virtual_machine.lyx
+	lyx --export-to pdf doc/viua_virtual_machine.pdf --force-overwrite main doc/viua_virtual_machine.lyx
+
+
+############################################################
+# INSTALLATION AND UNINSTALLATION
 bininstall: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/vdb build/bin/vm/dis
 	mkdir -p ${BIN_PATH}
 	cp ./build/bin/vm/asm ${BIN_PATH}/viua-asm
@@ -61,15 +70,6 @@ libinstall: stdlib
 	mkdir -p ${LIB_PATH}/core
 	cp ./build/stdlib/lib/*.so ${LIB_PATH}/std/extern
 
-install: bininstall installdevel
-	mkdir -p ${H_PATH}
-	cp -R ./include/viua/. ${H_PATH}/
-
-uninstall:
-	rm -rf ${H_PATH}
-	rm -rf ${LIB_PATH}
-	rm -rf ${BIN_PATH}/viua-*
-
 devellibs:
 	${CXX} -std=c++11 -fPIC -c -I./include -o ./build/platform/exception.o src/types/exception.cpp
 	${CXX} -std=c++11 -fPIC -c -I./include -o ./build/platform/vector.o src/types/vector.cpp
@@ -80,10 +80,24 @@ installdevel: devellibs
 	mkdir -p ${LIB_PATH}/platform
 	cp ./build/platform/*.o ${LIB_PATH}/platform
 
+install: bininstall installdevel
+	mkdir -p ${H_PATH}
+	cp -R ./include/viua/. ${H_PATH}/
 
+uninstall:
+	rm -rf ${H_PATH}
+	rm -rf ${LIB_PATH}
+	rm -rf ${BIN_PATH}/viua-*
+
+
+############################################################
+# TESTING
 test: ${VM_CPU} ${VM_ASM} clean-test-compiles
 	python3 ./tests/tests.py --verbose --catch --failfast
 
+
+############################################################
+# VERSION UPDATE
 version:
 	./scripts/update_commit_info.sh
 	touch src/front/asm.cpp
@@ -92,6 +106,8 @@ version:
 	touch src/front/wdb.cpp
 
 
+############################################################
+# VIRTUAL MACHINE CODE
 build/bin/vm/cpu: src/front/cpu.cpp build/cpu/cpu.o build/cpu/dispatch.o build/cpu/registserset.o build/loader.o build/printutils.o build/support/pointer.o build/support/string.o ${VIUA_CPU_INSTR_FILES_O} build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -o $@ $^ $(LIBDL)
 
@@ -105,8 +121,8 @@ build/bin/vm/dis: src/front/dis.cpp build/loader.o build/cg/disassembler/disasse
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -o $@ $^
 
 
-# OBJECTS COMMON FOR DEBUGGER AND CPU
-# CPU COMPILATION
+############################################################
+# OBJECTS COMMON FOR DEBUGGER AND CPU COMPILATION
 build/cpu/dispatch.o: src/cpu/dispatch.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
@@ -117,21 +133,25 @@ build/cpu/registserset.o: src/cpu/registerset.cpp include/viua/cpu/registerset.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
 
-# Standard library
+############################################################
+# STANDARD LIBRARY
 stdlib:
 	echo "OK"
 
 
-# opcode lister program
+############################################################
+# OPCODE LISTER PROGRAM
 build/bin/opcodes.bin: src/bytecode/opcd.cpp include/viua/bytecode/opcodes.h include/viua/bytecode/maps.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -o $@ $<
 
 
+############################################################
 # CODE GENERATION
 build/cg/disassembler/disassembler.o: src/cg/disassembler/disassembler.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
 
+############################################################
 # TYPE MODULES
 build/types/vector.o: src/types/vector.cpp include/viua/types/vector.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
@@ -149,6 +169,7 @@ build/types/exception.o: src/types/exception.cpp include/viua/types/exception.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
 
+############################################################
 # CPU INSTRUCTIONS
 build/cpu/instr/general.o: src/cpu/instr/general.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
@@ -190,14 +211,24 @@ build/cpu/instr/vector.o: src/cpu/instr/vector.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
 
+############################################################
+# UTILITY MODULES
+build/printutils.o: src/printutils.cpp
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+
+build/support/string.o: src/support/string.cpp
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+
+build/support/pointer.o: src/support/pointer.cpp
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+
+
+############################################################
+# CODE AND BYTECODE GENERATION
 build/program.o: src/program.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
 build/programinstructions.o: src/programinstructions.cpp
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
-
-
-build/printutils.o: src/printutils.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
 
@@ -215,16 +246,13 @@ build/cg/bytecode/instructions.o: src/cg/bytecode/instructions.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
 
+############################################################
+# MISC MODULES
 build/loader.o: src/loader.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
 
-build/support/string.o: src/support/string.cpp
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
-
-build/support/pointer.o: src/support/pointer.cpp
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
-
-
+############################################################
+# DEPENDENCY LIBRARIES
 build/lib/linenoise.o: lib/linenoise/linenoise.c lib/linenoise/linenoise.h
 	${CC} ${CFLAGS} ${COPTIMIZATIONFLAGS} -c -o $@ $<
