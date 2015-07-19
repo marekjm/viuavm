@@ -1,5 +1,5 @@
 .function: main
-    eximport "World"
+    eximport "build/test/World"
 
     frame 0
     excall 0 World::print_hello

@@ -14,7 +14,7 @@ LIBDL=-ldl
 
 .SUFFIXES: .cpp .h .o
 
-.PHONY: all remake clean clean-support clean-test-compiles install test version devellibs
+.PHONY: all remake clean clean-support clean-test-compiles install compile-test test version devellibs
 
 
 ############################################################
@@ -26,7 +26,7 @@ remake: clean all
 
 ############################################################
 # CLEANING
-clean: clean-support
+clean: clean-support clean-test-compiles
 	rm -f ./build/lib/*.o
 	rm -f ./build/cpu/instr/*.o
 	rm -f ./build/cpu/*.o
@@ -34,7 +34,8 @@ clean: clean-support
 	rm -f ./build/cg/disassembler/*.o
 	rm -f ./build/cg/bytecode/*.o
 	rm -f ./build/*.o
-	rm -f ./bin/vm/*
+	rm -f ./build/bin/vm/*
+	rm -f ./build/test/*
 
 clean-support:
 	rm -f ./build/support/*.o
@@ -70,10 +71,18 @@ libinstall: stdlib
 	mkdir -p ${LIB_PATH}/core
 	cp ./build/stdlib/lib/*.so ${LIB_PATH}/std/extern
 
-devellibs:
+devellibs: build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o
+
+build/platform/exception.o: src/types/exception.cpp
 	${CXX} -std=c++11 -fPIC -c -I./include -o ./build/platform/exception.o src/types/exception.cpp
+
+build/platform/vector.o: src/types/vector.cpp
 	${CXX} -std=c++11 -fPIC -c -I./include -o ./build/platform/vector.o src/types/vector.cpp
+
+build/platform/registerset.o: src/cpu/registerset.cpp
 	${CXX} -std=c++11 -fPIC -c -I./include -o ./build/platform/registerset.o src/cpu/registerset.cpp
+
+build/platform/support_string.o: src/support/string.cpp
 	${CXX} -std=c++11 -fPIC -c -I./include -o ./build/platform/support_string.o src/support/string.cpp
 
 installdevel: devellibs
@@ -92,9 +101,21 @@ uninstall:
 
 ############################################################
 # TESTING
-test: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/dis devellibs
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -fPIC -shared -o World.so ./sample/asm/external/World.cpp
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -fPIC -shared -o math.so ./sample/asm/external/math.cpp ./build/platform/registerset.o ./build/platform/exception.o ./build/platform/support_string.o
+build/test/World.o: sample/asm/external/World.cpp
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -fPIC -o build/test/World.o ./sample/asm/external/World.cpp
+
+build/test/World.so: build/test/World.o
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -fPIC -shared -o build/test/World.so build/test/World.o
+
+build/test/math.o:  sample/asm/external/math.cpp
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -fPIC -o build/test/math.o ./sample/asm/external/math.cpp
+
+build/test/math.so: build/test/math.o build/platform/registerset.o build/platform/exception.o
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -fPIC -shared -o build/test/math.so build/test/math.o ./build/platform/registerset.o ./build/platform/exception.o
+
+compile-test: math.so build/test/build/test/World.so
+
+test: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/dis build/test/math.so build/test/World.so
 	python3 ./tests/tests.py --verbose --catch --failfast
 
 
