@@ -420,6 +420,13 @@ class FunctionTests(unittest.TestCase):
     def testStaticRegisters(self):
         runTestReturnsIntegers(self, 'static_registers.asm', [i for i in range(0, 10)])
 
+    def testNeverendingFunction(self):
+        runTestSplitlines(self, 'neverending.asm', ['42', '48'])
+
+    @unittest.skip('this test hangs the VM until it runs out of memory')
+    def testNeverendingFunction0(self):
+        runTest(self, 'neverending0.asm', '42')
+
 
 class HigherOrderFunctionTests(unittest.TestCase):
     """Tests for higher-order function support.
@@ -530,6 +537,9 @@ class CatchingMachineThrownExceptionTests(unittest.TestCase):
 
     def testCatchingMachineThrownException(self):
         runTest(self, 'nullregister_access.asm', "exception encountered: (get) read from null register: 1")
+
+    def testCatcherState(self):
+        runTestSplitlines(self, 'restore_catcher_state.asm', ['42','100','42','100'])
 
 
 class AssemblerErrorTests(unittest.TestCase):
