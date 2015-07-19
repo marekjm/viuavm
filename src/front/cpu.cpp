@@ -48,13 +48,13 @@ int main(int argc, char* argv[]) {
     string option;
     for (int i = 1; i < argc; ++i) {
         option = string(argv[i]);
-        if (option == "--help") {
+        if (option == "--help" or option == "-h") {
             SHOW_HELP = true;
             continue;
-        } else if (option == "--version") {
+        } else if (option == "--version" or option == "-V") {
             SHOW_VERSION = true;
             continue;
-        } else if (option == "--verbose") {
+        } else if (option == "--verbose" or option == "-v") {
             VERBOSE = true;
             continue;
         }

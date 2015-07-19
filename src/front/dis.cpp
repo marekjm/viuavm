@@ -64,11 +64,11 @@ int main(int argc, char* argv[]) {
     string disasmname = "";
     for (int i = 1; i < argc; ++i) {
         option = string(argv[i]);
-        if (option == "--help") {
+        if (option == "--help" or option == "-h") {
             SHOW_HELP = true;
-        } else if (option == "--version") {
+        } else if (option == "--version" or option == "-V") {
             SHOW_VERSION = true;
-        } else if (option == "--verbose") {
+        } else if (option == "--verbose" or option == "-v") {
             VERBOSE = true;
         } else if ((option == "--with-entry") or (option == "-e")) {
             DISASSEMBLE_ENTRY = true;
