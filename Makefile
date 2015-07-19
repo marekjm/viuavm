@@ -92,7 +92,9 @@ uninstall:
 
 ############################################################
 # TESTING
-test: ${VM_CPU} ${VM_ASM} clean-test-compiles
+test: ${VM_CPU} ${VM_ASM} devellibs
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -fPIC -shared -o World.so ./sample/asm/external/World.cpp
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -fPIC -shared -o math.so ./sample/asm/external/math.cpp ./build/platform/registerset.o ./build/platform/exception.o
 	python3 ./tests/tests.py --verbose --catch --failfast
 
 

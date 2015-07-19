@@ -580,13 +580,9 @@ class ExternalModulesTests(unittest.TestCase):
     PATH = './sample/asm/external'
 
     def testHelloWorldExample(self):
-        os.system('{0} -std=c++11 -I./include -fPIC -shared -o World.so ./sample/asm/external/World.cpp'.format((os.getenv('CXX') or 'g++')))
         runTest(self, 'hello_world.asm', "Hello World!")
 
     def testReturningAValue(self):
-        os.system('{0} -std=c++11 -I./include -fPIC -c -o registerset.o ./src/cpu/registerset.cpp'.format((os.getenv('CXX') or 'g++')))
-        os.system('{0} -std=c++11 -I./include -fPIC -c -o exception.o ./src/types/exception.cpp'.format((os.getenv('CXX') or 'g++')))
-        os.system('{0} -std=c++11 -I./include -fPIC -shared -o math.so ./sample/asm/external/math.cpp registerset.o exception.o'.format((os.getenv('CXX') or 'g++')))
         runTest(self, 'sqrt.asm', 1.73, 0, lambda o: round(float(o.strip()), 2))
 
 
