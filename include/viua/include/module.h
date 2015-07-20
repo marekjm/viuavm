@@ -4,9 +4,9 @@
 #pragma once
 
 #include <vector>
-#include "../cpu/frame.h"
-#include "../cpu/registerset.h"
-#include "../types/type.h"
+#include <viua/cpu/frame.h>
+#include <viua/cpu/registerset.h>
+#include <viua/types/type.h>
 
 
 const std::vector<const char*> VIUAPATH = {
