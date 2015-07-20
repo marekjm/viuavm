@@ -116,7 +116,6 @@ enum OPCODE : byte {
 
     // Opcodes dealing with external C/C++ modules
     EXIMPORT,   // import external library
-    EXCALL,     // call external function
 
     LINK,
 
