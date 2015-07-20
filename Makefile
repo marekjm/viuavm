@@ -221,7 +221,7 @@ build/cpu/instr/registers.o: src/cpu/instr/registers.cpp
 build/cpu/instr/calls.o: src/cpu/instr/calls.cpp build/cpu/cpu.o
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/cpu/instr/linking.o: src/cpu/instr/linking.cpp
+build/cpu/instr/linking.o: src/cpu/instr/linking.cpp build/cpu/cpu.o
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
 build/cpu/instr/tcmechanism.o: src/cpu/instr/tcmechanism.cpp
