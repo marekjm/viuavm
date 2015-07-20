@@ -204,8 +204,6 @@ class CPU {
     byte* leave(byte*);
 
     byte* eximport(byte*);
-    byte* excall(byte*);
-
     byte* link(byte*);
 
     public:
