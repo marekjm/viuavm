@@ -161,13 +161,16 @@ byte* CPU::call(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     string call_name = string(addr);
-    bool function_found = (function_addresses.count(call_name) or linked_functions.count(call_name));
 
-    if (not function_found) {
+    bool is_native = (function_addresses.count(call_name) or linked_functions.count(call_name));
+    bool is_foreign = external_functions.count(call_name);
+
+    if (not (is_native or is_foreign)) {
         throw new Exception("call to undefined function: " + call_name);
     }
 
-    return callNative(addr, call_name, return_register_ref, return_register_index);
+    auto caller = (is_native ? &CPU::callNative : &CPU::callForeign);
+    return (this->*caller)(addr, call_name, return_register_ref, return_register_index);
 }
 
 byte* CPU::end(byte* addr) {
