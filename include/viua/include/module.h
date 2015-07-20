@@ -20,6 +20,9 @@ const std::vector<const char*> VIUAPATH = {
     "/usr/lib/viua",
     "/usr/lib/viua/core",
     "/usr/lib/viua/site",
+    "" /* this path may cause confusing exception about "failing to extract the interface" from a library if
+        * name of Viua lib is the same as one of the system libs, and Viua version has not been found
+        */
 };
 
 

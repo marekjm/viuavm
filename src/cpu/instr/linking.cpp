@@ -17,8 +17,8 @@ byte* CPU::eximport(byte* addr) {
     string module = string(addr);
     addr += module.size();
 
-    string path = (module + ".so");
-    void* handle = dlopen(path.c_str(), RTLD_LAZY);
+    string path;
+    void* handle = 0;
 
     ostringstream oss;
     for (unsigned i = 0; (i < VIUAPATH.size()) and (handle == 0); ++i) {
