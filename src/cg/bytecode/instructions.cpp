@@ -820,19 +820,6 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* excall(byte* addr_ptr, int_op reg, const string& fn_name) {
-            /*  Inserts excall instruction.
-             *  Byte offset is calculated automatically.
-             */
-            *(addr_ptr++) = EXCALL;
-            addr_ptr = insertIntegerOperand(addr_ptr, reg);
-            for (unsigned i = 0; i < fn_name.size(); ++i) {
-                *((char*)addr_ptr++) = fn_name[i];
-            }
-            *(addr_ptr++) = '\0';
-            return addr_ptr;
-        }
-
         byte* link(byte* addr_ptr, const string& module_name) {
             /*  Inserts eximport instruction.
              */
