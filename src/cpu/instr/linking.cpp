@@ -1,6 +1,6 @@
 #include <dlfcn.h>
 #include <sys/stat.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <iostream>
 #include <viua/types/integer.h>
 #include <viua/support/pointer.h>
@@ -11,19 +11,47 @@
 using namespace std;
 
 
-byte* CPU::eximport(byte* addr) {
-    /** Run eximport instruction.
-     */
-    string module = string(addr);
-    addr += module.size();
+vector<string> getpaths(const string& var) {
+    const char* VAR = getenv(var.c_str());
+    vector<string> paths;
+
+    if (VAR == 0) {
+        // return empty vector as environment does not
+        // set requested variable
+        return paths;
+    }
+
+    string PATH = string(VAR);
 
     string path;
-    void* handle = 0;
+    unsigned i = 0;
+    while (i < PATH.size()) {
+        if (PATH[i] == ':') {
+            if (path.size()) {
+                paths.push_back(path);
+                path = "";
+                ++i;
+            }
+        }
+        path += PATH[i];
+        ++i;
+    }
+    if (path.size()) {
+        paths.push_back(path);
+    }
 
+    return paths;
+}
+
+void* gethandle(const string& module, const vector<string>& paths) {
+    void *handle = 0;
+
+    string path;
     ostringstream oss;
-    for (unsigned i = 0; (i < VIUAPATH.size()) and (handle == 0); ++i) {
+
+    for (unsigned i = 0; (i < paths.size()) and (handle == 0); ++i) {
         oss.str("");
-        oss << VIUAPATH[i] << '/' << module << ".so";
+        oss << paths[i] << '/' << module << ".so";
         path = oss.str();
         if (path[0] == '~') {
             oss.str("");
@@ -32,6 +60,20 @@ byte* CPU::eximport(byte* addr) {
         }
         handle = dlopen(path.c_str(), RTLD_LAZY);
     }
+
+    return handle;
+}
+
+byte* CPU::eximport(byte* addr) {
+    /** Run eximport instruction.
+     */
+    string module = string(addr);
+    addr += module.size();
+
+    void* handle = 0;
+    handle = gethandle(module, getpaths("VIUAPATH"));
+    if (handle == 0) { handle = gethandle(module, VIUAPATH); }
+    if (handle == 0) { handle = gethandle(module, getpaths("VIUAAFTERPATH")); }
 
     if (handle == 0) {
         throw new Exception("LinkException", ("failed to link library: " + module));

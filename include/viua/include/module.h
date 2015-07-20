@@ -3,13 +3,14 @@
 
 #pragma once
 
+#include <string>
 #include <vector>
 #include <viua/cpu/frame.h>
 #include <viua/cpu/registerset.h>
 #include <viua/types/type.h>
 
 
-const std::vector<const char*> VIUAPATH = {
+const std::vector<std::string> VIUAPATH = {
     ".",
     "~/.local/lib/viua",
     "~/.local/lib/viua/core",
