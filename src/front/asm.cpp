@@ -580,22 +580,6 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string str_chnk;
             str_chnk = str::extract(operands);
             program.eximport(str_chnk);
-        } else if (str::startswith(line, "excall")) {
-            /** Full form of excall instruction has two operands: external function name and return value register index.
-             *  If call is given only one operand - it means it is the instruction index and returned value is discarded.
-             *  To explicitly state that return value should be discarded, 0 can be supplied as second operand.
-             */
-            string fn_name, reg;
-            tie(reg, fn_name) = assembler::operands::get2(operands);
-
-            // if second operand is empty, fill it with zero
-            // which means that return value will be discarded
-            if (fn_name == "") {
-                fn_name = reg;
-                reg = "0";
-            }
-
-            program.excall(assembler::operands::getint(resolveregister(reg, names)), fn_name);
         } else if (str::startswith(line, "link")) {
             string str_chnk;
             str_chnk = str::chunk(operands);
