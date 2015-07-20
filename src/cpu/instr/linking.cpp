@@ -17,7 +17,7 @@ byte* CPU::eximport(byte* addr) {
     string module = string(addr);
     addr += module.size();
 
-    string path = ("./" + module + ".so");
+    string path = (module + ".so");
     void* handle = dlopen(path.c_str(), RTLD_LAZY);
 
     ostringstream oss;
