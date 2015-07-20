@@ -43,6 +43,40 @@ vector<string> getpaths(const string& var) {
     return paths;
 }
 
+bool isfile(const string& path) {
+    struct stat sf;
+
+    // not a file if stat returned error
+    if (stat(path.c_str(), &sf) == -1) return false;
+    // not a file if S_ISREG() macro returned false
+    if (not S_ISREG(sf.st_mode)) return false;
+
+    // file otherwise
+    return true;
+}
+
+
+string getmodpath(const string& module, const vector<string>& paths) {
+    string path = "";
+    bool found = false;
+
+    ostringstream oss;
+    for (unsigned i = 0; i < paths.size(); ++i) {
+        oss.str("");
+        oss << paths[i] << '/' << module << ".vlib";
+        path = oss.str();
+        if (path[0] == '~') {
+            oss.str("");
+            oss << getenv("HOME") << path.substr(1);
+            path = oss.str();
+        }
+
+        if ((found = isfile(path))) break;
+    }
+
+    return (found ? path : "");
+}
+
 void* gethandle(const string& module, const vector<string>& paths) {
     void *handle = 0;
 
@@ -63,6 +97,7 @@ void* gethandle(const string& module, const vector<string>& paths) {
 
     return handle;
 }
+
 
 byte* CPU::eximport(byte* addr) {
     /** Run eximport instruction.
@@ -168,19 +203,6 @@ byte* CPU::excall(byte* addr) {
     return return_address;
 }
 
-
-bool isfile(const string& path) {
-    struct stat sf;
-
-    // not a file if stat returned error
-    if (stat(path.c_str(), &sf) == -1) return false;
-    // not a file if S_ISREG() macro returned false
-    if (not S_ISREG(sf.st_mode)) return false;
-
-    // file otherwise
-    return true;
-}
-
 byte* CPU::link(byte* addr) {
     /** Run link instruction.
      */
@@ -188,23 +210,11 @@ byte* CPU::link(byte* addr) {
     addr += module.size();
 
     string path = module;
-    bool found = false;
+    path = getmodpath(module, getpaths("VIUAPATH"));
+    if (path.size() == 0) { path = getmodpath(module, VIUAPATH); }
+    if (path.size() == 0) { path = getmodpath(module, getpaths("VIUAAFTERPATH")); }
 
-    ostringstream oss;
-    for (unsigned i = 0; i < VIUAPATH.size(); ++i) {
-        oss.str("");
-        oss << VIUAPATH[i] << '/' << module << ".vlib";
-        path = oss.str();
-        if (path[0] == '~') {
-            oss.str("");
-            oss << getenv("HOME") << path.substr(1);
-            path = oss.str();
-        }
-
-        if ((found = isfile(path))) break;
-    }
-
-    if (found) {
+    if (path.size()) {
         Loader loader(path);
         loader.load();
 
