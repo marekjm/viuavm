@@ -132,8 +132,6 @@ class Program {
     Program& leave      ();
 
     Program& eximport   (std::string);
-    Program& excall     (int_op, const std::string&);
-
     Program& link       (std::string);
 
     Program& end        ();

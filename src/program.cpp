@@ -127,7 +127,7 @@ uint16_t Program::countBytes(const vector<string>& lines) {
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (function or block name)
                 inc += str::chunk(line).size() + 1;
-            } else if ((instr == "call") or (instr == "excall")) {
+            } else if (instr == "call") {
                 // clear first chunk (opcode mnemonic)
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (optional register index)
@@ -229,7 +229,7 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
             }
             inc += s.size()+1;
         }
-        if ((opcode == CALL) or (opcode == EXCALL) or (opcode == CLOSURE) or (opcode == FUNCTION)) {
+        if ((opcode == CALL) or (opcode == CLOSURE) or (opcode == FUNCTION)) {
             string s(program+offset+sizeof(bool)+sizeof(int)+1);
             if (scream) {
                 cout << '+' << s.size() << " (function/module name at byte " << offset+1 << ": `" << s << "`)";
