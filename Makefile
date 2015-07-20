@@ -14,12 +14,12 @@ LIBDL ?= -ldl
 
 .SUFFIXES: .cpp .h .o
 
-.PHONY: all remake clean clean-support clean-test-compiles install compile-test test version devellibs
+.PHONY: all remake clean clean-support clean-test-compiles install compile-test test version platform
 
 
 ############################################################
 # BASICS
-all: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/vdb build/bin/vm/dis build/bin/opcodes.bin devellibs
+all: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/vdb build/bin/vm/dis build/bin/opcodes.bin platform
 
 remake: clean all
 
@@ -76,7 +76,7 @@ libinstall: stdlib
 	mkdir -p ${LIB_PATH}/core
 	cp ./build/stdlib/lib/*.so ${LIB_PATH}/std/extern
 
-devellibs: build/platform/exception.o build/platform/string.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o
+platform: build/platform/exception.o build/platform/string.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o
 
 build/platform/exception.o: src/types/exception.cpp
 	${CXX} -std=c++11 -fPIC -c -I./include -o ./build/platform/exception.o src/types/exception.cpp
@@ -93,7 +93,7 @@ build/platform/registerset.o: src/cpu/registerset.cpp
 build/platform/support_string.o: src/support/string.cpp
 	${CXX} -std=c++11 -fPIC -c -I./include -o ./build/platform/support_string.o src/support/string.cpp
 
-installdevel: devellibs
+installdevel: platform
 	mkdir -p ${LIB_PATH}/platform
 	cp ./build/platform/*.o ${LIB_PATH}/platform
 
