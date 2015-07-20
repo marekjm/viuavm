@@ -11,6 +11,18 @@
 using namespace std;
 
 
+bool isfile(const string& path) {
+    struct stat sf;
+
+    // not a file if stat returned error
+    if (stat(path.c_str(), &sf) == -1) return false;
+    // not a file if S_ISREG() macro returned false
+    if (not S_ISREG(sf.st_mode)) return false;
+
+    // file otherwise
+    return true;
+}
+
 byte* CPU::eximport(byte* addr) {
     /** Run eximport instruction.
      */
@@ -51,32 +63,6 @@ byte* CPU::eximport(byte* addr) {
     }
 
     return addr;
-}
-byte* CPU::excall(byte* addr) {
-    /** Run excall instruction.
-     */
-    bool return_register_ref = *(bool*)addr;
-    pointer::inc<bool, byte>(addr);
-
-    int return_register_index = *(int*)addr;
-    pointer::inc<int, byte>(addr);
-
-    string call_name = string(addr);
-
-    return callForeign(addr, call_name, return_register_ref, return_register_index);
-}
-
-
-bool isfile(const string& path) {
-    struct stat sf;
-
-    // not a file if stat returned error
-    if (stat(path.c_str(), &sf) == -1) return false;
-    // not a file if S_ISREG() macro returned false
-    if (not S_ISREG(sf.st_mode)) return false;
-
-    // file otherwise
-    return true;
 }
 
 byte* CPU::link(byte* addr) {
