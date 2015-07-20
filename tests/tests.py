@@ -588,10 +588,10 @@ class ExternalModulesTests(unittest.TestCase):
     PATH = './sample/asm/external'
 
     def testHelloWorldExample(self):
-        runTest(self, 'hello_world.asm', "Hello World!")
+        runTestNoDisassemblyRerun(self, 'hello_world.asm', "Hello World!")
 
     def testReturningAValue(self):
-        runTest(self, 'sqrt.asm', 1.73, 0, lambda o: round(float(o.strip()), 2))
+        runTestNoDisassemblyRerun(self, 'sqrt.asm', 1.73, 0, lambda o: round(float(o.strip()), 2))
 
 
 if __name__ == '__main__':
