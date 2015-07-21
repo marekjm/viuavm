@@ -11,6 +11,7 @@
 #include <viua/bytecode/maps.h>
 #include <viua/support/string.h>
 #include <viua/support/pointer.h>
+#include <viua/support/env.h>
 #include <viua/types/integer.h>
 #include <viua/types/closure.h>
 #include <viua/loader.h>
@@ -908,6 +909,10 @@ int main(int argc, char* argv[]) {
 
     if (!filename.size()) {
         cout << "fatal: no file to run" << endl;
+        return 1;
+    }
+    if (!support::env::isfile(filename)) {
+        cout << "fatal: could not open file: " << filename << endl;
         return 1;
     }
 

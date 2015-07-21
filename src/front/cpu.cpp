@@ -6,6 +6,7 @@
 #include <vector>
 #include <viua/version.h>
 #include <viua/support/string.h>
+#include <viua/support/env.h>
 #include <viua/types/exception.h>
 #include <viua/loader.h>
 #include <viua/cpu/cpu.h>
@@ -74,6 +75,10 @@ int main(int argc, char* argv[]) {
 
     if (!filename.size()) {
         cout << "fatal: no file to run" << endl;
+        return 1;
+    }
+    if (!support::env::isfile(filename)) {
+        cout << "fatal: could not open file: " << filename << endl;
         return 1;
     }
 

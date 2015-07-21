@@ -9,6 +9,7 @@
 #include <map>
 #include <viua/bytecode/maps.h>
 #include <viua/support/string.h>
+#include <viua/support/env.h>
 #include <viua/version.h>
 #include <viua/loader.h>
 #include <viua/program.h>
@@ -1493,6 +1494,10 @@ int main(int argc, char* argv[]) {
     filename = args[0];
     if (!filename.size()) {
         cout << "fatal: no file to assemble" << endl;
+        return 1;
+    }
+    if (!support::env::isfile(filename)) {
+        cout << "fatal: could not open file: " << filename << endl;
         return 1;
     }
 
