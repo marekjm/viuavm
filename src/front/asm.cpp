@@ -50,12 +50,12 @@ bool ERROR_GLOBALS_IN_LIB = false;
 const string ENTRY_FUNCTION_NAME = "__entry";
 
 
-tuple<int, enum JUMPTYPE> resolvejump(string jmp, const map<string, int>& marks) {
+tuple<int, enum JUMPTYPE> resolvejump(string jmp, const map<string, int>& marks, int instruction_index = -1) {
     /*  This function is used to resolve jumps in `jump` and `branch` instructions.
      */
     int addr = 0;
     enum JUMPTYPE jump_type = JMP_RELATIVE;
-    if (str::isnum(jmp)) {
+    if (str::isnum(jmp, false)) {
         addr = stoi(jmp);
     } else if (jmp[0] == '.' and str::isnum(str::sub(jmp, 1))) {
         addr = stoi(str::sub(jmp, 1));
@@ -65,6 +65,13 @@ tuple<int, enum JUMPTYPE> resolvejump(string jmp, const map<string, int>& marks)
         ss << hex << jmp;
         ss >> addr;
         jump_type = JMP_TO_BYTE;
+    } else if (jmp[0] == '-') {
+        if (instruction_index < 0) { throw ("invalid use of relative jump: " + jmp); }
+        addr = (instruction_index + stoi(jmp));
+        if (addr < 0) { throw "use of relative jump results in a jump to negative index"; }
+    } else if (jmp[0] == '+') {
+        if (instruction_index < 0) { throw ("invalid use of relative jump: " + jmp); }
+        addr = (instruction_index + stoi(jmp.substr(1)));
     } else if (jmp[0] == '.') {
         // FIXME
         cout << "FIXME: global marker jumps (jumps to functions) are not implemented yet" << endl;
@@ -542,7 +549,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
              */
             int jump_target;
             enum JUMPTYPE jump_type;
-            tie(jump_target, jump_type) = resolvejump(operands, marks);
+            tie(jump_target, jump_type) = resolvejump(operands, marks, i);
 
             if (DEBUG) {
                 if (jump_type == JMP_TO_BYTE) {
