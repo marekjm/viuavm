@@ -1581,6 +1581,22 @@ jump <index>
 \end_layout
 
 \begin_layout Subparagraph
+Jump relative to current instruction index
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+jump +<index>
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+jump -<index>
+\end_layout
+
+\begin_layout Subparagraph
 Jump relative to beginning of executable bytecode (absolute jump)
 \end_layout
 
@@ -1628,6 +1644,16 @@ Automatic jump to next instruction if condition is false
 
 \family typewriter
 branch <condition operand register> <jump if true>
+\end_layout
+
+\begin_layout Subparagraph
+Branch with jumps relative to current instruction index
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+branch <condition> +/-<jump if true> +/-<jump if false>
 \end_layout
 
 \begin_layout Paragraph
