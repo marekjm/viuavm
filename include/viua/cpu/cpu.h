@@ -112,6 +112,9 @@ class CPU {
     // call foreign (i.e. from a C++ extension) function
     byte* callForeign(byte*, const std::string&, const bool&, const int&);
 
+    void loadNativeLibrary(const std::string&);
+    void loadForeignLibrary(const std::string&);
+
     /*  Methods implementing CPU instructions.
      */
     byte* izero(byte*);
