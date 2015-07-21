@@ -52,6 +52,22 @@ CPU& CPU::eoffset(uint16_t o) {
     return (*this);
 }
 
+CPU& CPU::preload() {
+    /** This method preloads dynamic libraries specified by environment.
+     */
+    vector<string> preload_native = support::env::getpaths("VIUAPRELINK");
+    for (unsigned i = 0; i < preload_native.size(); ++i) {
+        loadNativeLibrary(preload_native[i]);
+    }
+
+    vector<string> preload_foreign = support::env::getpaths("VIUAPREIMPORT");
+    for (unsigned i = 0; i < preload_foreign.size(); ++i) {
+        loadForeignLibrary(preload_foreign[i]);
+    }
+
+    return (*this);
+}
+
 CPU& CPU::mapfunction(const string& name, unsigned address) {
     /** Maps function name to bytecode address.
      */

@@ -225,6 +225,7 @@ class CPU {
         CPU& load(byte*);
         CPU& bytes(uint16_t);
         CPU& eoffset(uint16_t);
+        CPU& preload();
 
         CPU& mapfunction(const std::string&, unsigned);
         CPU& mapblock(const std::string&, unsigned);
