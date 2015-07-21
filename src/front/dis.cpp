@@ -112,7 +112,13 @@ int main(int argc, char* argv[]) {
     }
 
     Loader loader(filename);
-    loader.executable();
+
+    try {
+        loader.executable();
+    } catch (const string& e) {
+        cout << e << endl;
+        return 1;
+    }
 
     uint16_t bytes = loader.getBytecodeSize();
     byte* bytecode = loader.getBytecode();
