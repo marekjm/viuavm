@@ -1,3 +1,4 @@
+#include <sstream>
 #include <viua/support/env.h>
 using namespace std;
 
@@ -45,6 +46,29 @@ namespace support {
 
             // file otherwise
             return true;
+        }
+
+        namespace viua {
+            string getmodpath(const string& module, const vector<string>& paths) {
+                string path = "";
+                bool found = false;
+
+                ostringstream oss;
+                for (unsigned i = 0; i < paths.size(); ++i) {
+                    oss.str("");
+                    oss << paths[i] << '/' << module << ".vlib";
+                    path = oss.str();
+                    if (path[0] == '~') {
+                        oss.str("");
+                        oss << getenv("HOME") << path.substr(1);
+                        path = oss.str();
+                    }
+
+                    if ((found = support::env::isfile(path))) break;
+                }
+
+                return (found ? path : "");
+            }
         }
     }
 }

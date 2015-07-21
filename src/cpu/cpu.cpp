@@ -300,27 +300,6 @@ byte* CPU::callForeign(byte* addr, const string& call_name, const bool& return_r
 
 
 
-string getmodpath(const string& module, const vector<string>& paths) {
-    string path = "";
-    bool found = false;
-
-    ostringstream oss;
-    for (unsigned i = 0; i < paths.size(); ++i) {
-        oss.str("");
-        oss << paths[i] << '/' << module << ".vlib";
-        path = oss.str();
-        if (path[0] == '~') {
-            oss.str("");
-            oss << getenv("HOME") << path.substr(1);
-            path = oss.str();
-        }
-
-        if ((found = support::env::isfile(path))) break;
-    }
-
-    return (found ? path : "");
-}
-
 void* gethandle(const string& module, const vector<string>& paths) {
     void *handle = 0;
 
@@ -344,9 +323,9 @@ void* gethandle(const string& module, const vector<string>& paths) {
 
 void CPU::loadNativeLibrary(const string& module) {
     string path = module;
-    path = getmodpath(module, support::env::getpaths("VIUAPATH"));
-    if (path.size() == 0) { path = getmodpath(module, VIUAPATH); }
-    if (path.size() == 0) { path = getmodpath(module, support::env::getpaths("VIUAAFTERPATH")); }
+    path = support::env::viua::getmodpath(module, support::env::getpaths("VIUAPATH"));
+    if (path.size() == 0) { path = support::env::viua::getmodpath(module, VIUAPATH); }
+    if (path.size() == 0) { path = support::env::viua::getmodpath(module, support::env::getpaths("VIUAAFTERPATH")); }
 
     if (path.size()) {
         Loader loader(path);
