@@ -1,5 +1,4 @@
 #include <dlfcn.h>
-#include <sys/stat.h>
 #include <cstdlib>
 #include <iostream>
 #include <vector>
@@ -13,6 +12,7 @@
 #include <viua/types/vector.h>
 #include <viua/types/exception.h>
 #include <viua/support/pointer.h>
+#include <viua/support/env.h>
 #include <viua/loader.h>
 #include <viua/include/module.h>
 #include <viua/cpu/cpu.h>
@@ -300,50 +300,6 @@ byte* CPU::callForeign(byte* addr, const string& call_name, const bool& return_r
 
 
 
-vector<string> getpaths(const string& var) {
-    const char* VAR = getenv(var.c_str());
-    vector<string> paths;
-
-    if (VAR == 0) {
-        // return empty vector as environment does not
-        // set requested variable
-        return paths;
-    }
-
-    string PATH = string(VAR);
-
-    string path;
-    unsigned i = 0;
-    while (i < PATH.size()) {
-        if (PATH[i] == ':') {
-            if (path.size()) {
-                paths.push_back(path);
-                path = "";
-                ++i;
-            }
-        }
-        path += PATH[i];
-        ++i;
-    }
-    if (path.size()) {
-        paths.push_back(path);
-    }
-
-    return paths;
-}
-
-bool isfile(const string& path) {
-    struct stat sf;
-
-    // not a file if stat returned error
-    if (stat(path.c_str(), &sf) == -1) return false;
-    // not a file if S_ISREG() macro returned false
-    if (not S_ISREG(sf.st_mode)) return false;
-
-    // file otherwise
-    return true;
-}
-
 string getmodpath(const string& module, const vector<string>& paths) {
     string path = "";
     bool found = false;
@@ -359,7 +315,7 @@ string getmodpath(const string& module, const vector<string>& paths) {
             path = oss.str();
         }
 
-        if ((found = isfile(path))) break;
+        if ((found = support::env::isfile(path))) break;
     }
 
     return (found ? path : "");
@@ -388,9 +344,9 @@ void* gethandle(const string& module, const vector<string>& paths) {
 
 void CPU::loadNativeLibrary(const string& module) {
     string path = module;
-    path = getmodpath(module, getpaths("VIUAPATH"));
+    path = getmodpath(module, support::env::getpaths("VIUAPATH"));
     if (path.size() == 0) { path = getmodpath(module, VIUAPATH); }
-    if (path.size() == 0) { path = getmodpath(module, getpaths("VIUAAFTERPATH")); }
+    if (path.size() == 0) { path = getmodpath(module, support::env::getpaths("VIUAAFTERPATH")); }
 
     if (path.size()) {
         Loader loader(path);
@@ -418,9 +374,9 @@ void CPU::loadNativeLibrary(const string& module) {
 }
 void CPU::loadForeignLibrary(const string& module) {
     void* handle = 0;
-    handle = gethandle(module, getpaths("VIUAPATH"));
+    handle = gethandle(module, support::env::getpaths("VIUAPATH"));
     if (handle == 0) { handle = gethandle(module, VIUAPATH); }
-    if (handle == 0) { handle = gethandle(module, getpaths("VIUAAFTERPATH")); }
+    if (handle == 0) { handle = gethandle(module, support::env::getpaths("VIUAAFTERPATH")); }
 
     if (handle == 0) {
         throw new Exception("LinkException", ("failed to link library: " + module));
