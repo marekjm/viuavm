@@ -528,6 +528,9 @@ class JumpingTests(unittest.TestCase):
     def testRelativeJump(self):
         runTest(self, 'relative_jumps.asm', "Hello World")
 
+    def testRelativeBranch(self):
+        runTest(self, 'relative_branch.asm', "Hello World")
+
 
 class TryCatchBlockTests(unittest.TestCase):
     """Tests for user code thrown exceptions.
