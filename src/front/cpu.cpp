@@ -6,6 +6,7 @@
 #include <vector>
 #include <viua/version.h>
 #include <viua/support/string.h>
+#include <viua/types/exception.h>
 #include <viua/loader.h>
 #include <viua/cpu/cpu.h>
 #include <viua/program.h>
@@ -96,7 +97,17 @@ int main(int argc, char* argv[]) {
 
     cpu.commandline_arguments = cmdline_args;
 
-    cpu.load(bytecode).bytes(bytes).eoffset(starting_instruction).run();
+    cpu.load(bytecode).bytes(bytes).eoffset(starting_instruction);
+
+    try {
+        // try preloading dynamic libraries specified by environment
+        cpu.preload();
+    } catch (const Exception* e) {
+        cout << "fatal: preload: " << e->what() << endl;
+        return 1;
+    }
+
+    cpu.run();
 
     int ret_code = 0;
     string return_exception = "", return_message = "";
