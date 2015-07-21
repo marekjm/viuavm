@@ -266,6 +266,9 @@ build/support/string.o: src/support/string.cpp
 build/support/pointer.o: src/support/pointer.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
+build/support/env.o: src/support/env.cpp
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+
 
 ############################################################
 # CODE AND BYTECODE GENERATION
