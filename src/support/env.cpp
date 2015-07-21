@@ -49,14 +49,14 @@ namespace support {
         }
 
         namespace viua {
-            string getmodpath(const string& module, const vector<string>& paths) {
+            string getmodpath(const string& module, const string& extension, const vector<string>& paths) {
                 string path = "";
                 bool found = false;
 
                 ostringstream oss;
                 for (unsigned i = 0; i < paths.size(); ++i) {
                     oss.str("");
-                    oss << paths[i] << '/' << module << ".vlib";
+                    oss << paths[i] << '/' << module << '.' << extension;
                     path = oss.str();
                     if (path[0] == '~') {
                         oss.str("");

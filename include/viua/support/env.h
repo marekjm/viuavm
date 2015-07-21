@@ -15,7 +15,7 @@ namespace support {
         bool isfile(const std::string&);
 
         namespace viua {
-            std::string getmodpath(const std::string&, const std::vector<std::string>&);
+            std::string getmodpath(const std::string&, const std::string&, const std::vector<std::string>&);
         }
     }
 }

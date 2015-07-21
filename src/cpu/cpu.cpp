@@ -191,7 +191,6 @@ void CPU::pushFrame() {
     frames.push_back(frame_new);
     frame_new = 0;
 }
-
 void CPU::dropFrame() {
     /** Drops top-most frame from call stack.
      */
@@ -204,6 +203,7 @@ void CPU::dropFrame() {
         uregset = regset;
     }
 }
+
 
 byte* CPU::callNative(byte* addr, const string& call_name, const bool& return_ref, const int& return_index) {
     byte* call_address = 0;
@@ -299,33 +299,11 @@ byte* CPU::callForeign(byte* addr, const string& call_name, const bool& return_r
 }
 
 
-
-void* gethandle(const string& module, const vector<string>& paths) {
-    void *handle = 0;
-
-    string path;
-    ostringstream oss;
-
-    for (unsigned i = 0; (i < paths.size()) and (handle == 0); ++i) {
-        oss.str("");
-        oss << paths[i] << '/' << module << ".so";
-        path = oss.str();
-        if (path[0] == '~') {
-            oss.str("");
-            oss << getenv("HOME") << path.substr(1);
-            path = oss.str();
-        }
-        handle = dlopen(path.c_str(), RTLD_LAZY);
-    }
-
-    return handle;
-}
-
 void CPU::loadNativeLibrary(const string& module) {
     string path = module;
-    path = support::env::viua::getmodpath(module, support::env::getpaths("VIUAPATH"));
-    if (path.size() == 0) { path = support::env::viua::getmodpath(module, VIUAPATH); }
-    if (path.size() == 0) { path = support::env::viua::getmodpath(module, support::env::getpaths("VIUAAFTERPATH")); }
+    path = support::env::viua::getmodpath(module, "vlib", support::env::getpaths("VIUAPATH"));
+    if (path.size() == 0) { path = support::env::viua::getmodpath(module, "vlib", VIUAPATH); }
+    if (path.size() == 0) { path = support::env::viua::getmodpath(module, "vlib", support::env::getpaths("VIUAAFTERPATH")); }
 
     if (path.size()) {
         Loader loader(path);
@@ -352,13 +330,19 @@ void CPU::loadNativeLibrary(const string& module) {
     }
 }
 void CPU::loadForeignLibrary(const string& module) {
-    void* handle = 0;
-    handle = gethandle(module, support::env::getpaths("VIUAPATH"));
-    if (handle == 0) { handle = gethandle(module, VIUAPATH); }
-    if (handle == 0) { handle = gethandle(module, support::env::getpaths("VIUAAFTERPATH")); }
+    string path = "";
+    path = support::env::viua::getmodpath(module, "so", support::env::getpaths("VIUAPATH"));
+    if (path.size() == 0) { path = support::env::viua::getmodpath(module, "so", VIUAPATH); }
+    if (path.size() == 0) { path = support::env::viua::getmodpath(module, "so", support::env::getpaths("VIUAAFTERPATH")); }
+
+    if (path.size() == 0) {
+        throw new Exception("LinkException", ("failed to link library: " + module));
+    }
+
+    void* handle = dlopen(path.c_str(), RTLD_LAZY);
 
     if (handle == 0) {
-        throw new Exception("LinkException", ("failed to link library: " + module));
+        throw new Exception("LinkException", ("failed to open handle: " + module));
     }
 
     ExternalFunctionSpec* (*exports)() = 0;
