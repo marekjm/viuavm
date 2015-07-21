@@ -812,7 +812,7 @@ namespace cg {
         byte* import(byte* addr_ptr, const string& module_name) {
             /*  Inserts eximport instruction.
              */
-            *(addr_ptr++) = EXIMPORT;
+            *(addr_ptr++) = IMPORT;
             for (unsigned i = 1; i < module_name.size()-1; ++i) {
                 *((char*)addr_ptr++) = module_name[i];
             }

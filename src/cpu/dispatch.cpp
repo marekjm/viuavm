@@ -216,7 +216,7 @@ byte* CPU::dispatch(byte* addr) {
         case LEAVE:
             addr = leave(addr+1);
             break;
-        case EXIMPORT:
+        case IMPORT:
             addr = import(addr+1);
             break;
         case LINK:

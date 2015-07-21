@@ -209,7 +209,7 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { TRY,      "try" },
     { LEAVE,    "leave" },
 
-    { EXIMPORT, "import" },
+    { IMPORT,   "import" },
     { LINK,     "link" },
 
     { END,      "end" },
@@ -224,7 +224,7 @@ const std::vector<enum OPCODE> OP_VARIABLE_LENGTH = {
     CALL,
     CATCH,
     TRY,
-    EXIMPORT,
+    IMPORT,
     LINK,
 };
 
