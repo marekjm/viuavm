@@ -576,7 +576,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             program.vmthrow(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "leave")) {
             program.leave();
-        } else if (str::startswith(line, "eximport")) {
+        } else if (str::startswith(line, "import")) {
             string str_chnk;
             str_chnk = str::extract(operands);
             program.eximport(str_chnk);

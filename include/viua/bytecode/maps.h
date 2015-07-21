@@ -105,7 +105,7 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "try",    sizeof(byte) },
     { "leave",  sizeof(byte) },
 
-    { "eximport", sizeof(byte) },
+    { "import", sizeof(byte) },
     { "link",   sizeof(byte) },
 
     { "end",    sizeof(byte) },
@@ -209,7 +209,7 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { TRY,      "try" },
     { LEAVE,    "leave" },
 
-    { EXIMPORT, "eximport" },
+    { EXIMPORT, "import" },
     { LINK,     "link" },
 
     { END,      "end" },
