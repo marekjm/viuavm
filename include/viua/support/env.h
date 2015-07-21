@@ -11,6 +11,7 @@
 namespace support {
     namespace env {
         std::vector<std::string> getpaths(const std::string&);
+        std::string getvar(const std::string&);
 
         bool isfile(const std::string&);
 

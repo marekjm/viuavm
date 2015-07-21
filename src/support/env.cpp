@@ -4,17 +4,13 @@ using namespace std;
 
 namespace support {
     namespace env {
-        vector<string> getpaths(const string& var) {
+        string getvar(const string& var) {
             const char* VAR = getenv(var.c_str());
+            return (VAR == 0 ? string("") : string(VAR));
+        }
+        vector<string> getpaths(const string& var) {
+            string PATH = getvar(var);
             vector<string> paths;
-
-            if (VAR == 0) {
-                // return empty vector as environment does not
-                // set requested variable
-                return paths;
-            }
-
-            string PATH = string(VAR);
 
             string path;
             unsigned i = 0;
