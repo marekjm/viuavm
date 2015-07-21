@@ -504,9 +504,9 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
 
             int addrt_target, addrf_target;
             enum JUMPTYPE addrt_jump_type, addrf_jump_type;
-            tie(addrt_target, addrt_jump_type) = resolvejump(if_true, marks);
+            tie(addrt_target, addrt_jump_type) = resolvejump(if_true, marks, i);
             if (if_false != "") {
-                tie(addrf_target, addrf_jump_type) = resolvejump(if_false, marks);
+                tie(addrf_target, addrf_jump_type) = resolvejump(if_false, marks, i);
             } else {
                 addrf_jump_type = JMP_RELATIVE;
                 addrf_target = instruction+1;
