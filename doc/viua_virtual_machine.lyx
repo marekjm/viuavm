@@ -354,6 +354,13 @@ In July 2015 dynamic linking has been implemented, release 0.5.0 has been
  announced and machine entered alpha stage of development.
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 Comparison with state of the art
 \end_layout
@@ -2689,7 +2696,7 @@ Unconditionally halt execution of the program and exit the machine.
 \end_layout
 
 \begin_layout Standard
-\begin_inset Newpage pagebreak
+\begin_inset Newpage newpage
 \end_inset
 
 
@@ -2813,21 +2820,6 @@ istore 1 @42
 \end_inset
 
 
-\end_layout
-
-\begin_layout Part
-Architecture
-\begin_inset CommandInset label
-LatexCommand label
-name "part:Architecture"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This part describes archtecture of the VM.
 \end_layout
 
 \begin_layout Section
@@ -3215,6 +3207,111 @@ name "sub:Coroutines"
 
 \begin_layout Standard
 Coroutines are a planned but currently not implemented feature.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Environment variables
+\end_layout
+
+\begin_layout Standard
+Viua VM uses several environment variables to adjust its behaviour.
+\end_layout
+
+\begin_layout Subsection
+
+\family typewriter
+VIUAPATH
+\end_layout
+
+\begin_layout Standard
+This environment variable is a colon-separated list of paths that should
+ be searched for dynamically linked libraries (both native and foreign)
+ before any hardcoded path is searched.
+\end_layout
+
+\begin_layout Subparagraph
+Example
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+VIUAPATH=./build:/home/joe/lib/viua
+\end_layout
+
+\begin_layout Subsection
+
+\family typewriter
+VIUAAFTERPATH
+\end_layout
+
+\begin_layout Standard
+This environment variable is a colon-separated list of paths that should
+ be searched for dynamically linked libraries (both native and foreign)
+ after all hardcoded paths have neen searched.
+\end_layout
+
+\begin_layout Subparagraph
+Example
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+VIUAAFTERPATH=./build:/home/joe/lib/viua
+\end_layout
+
+\begin_layout Subsection
+
+\family typewriter
+VIUAPRELINK
+\end_layout
+
+\begin_layout Standard
+This environment variable is a colon-separated list of native dynamic libraries
+ that should be loaded into memory before 
+\family typewriter
+
+\begin_inset Quotes eld
+\end_inset
+
+main
+\begin_inset Quotes erd
+\end_inset
+
+
+\family default
+ function is entered.
+\end_layout
+
+\begin_layout Subsection
+
+\family typewriter
+VIUAPREIMPORT
+\end_layout
+
+\begin_layout Standard
+This environment variable is a colon-separated list of foreign dynamic libraries
+ that should be loaded into memory before 
+\family typewriter
+
+\begin_inset Quotes eld
+\end_inset
+
+main
+\begin_inset Quotes erd
+\end_inset
+
+
+\family default
+ function is entered.
 \end_layout
 
 \begin_layout Standard
