@@ -131,7 +131,7 @@ class Program {
     Program& vmthrow    (int_op);
     Program& leave      ();
 
-    Program& eximport   (std::string);
+    Program& import   (std::string);
     Program& link       (std::string);
 
     Program& end        ();

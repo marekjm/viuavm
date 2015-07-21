@@ -203,7 +203,7 @@ class CPU {
     byte* vmthrow(byte*);
     byte* leave(byte*);
 
-    byte* eximport(byte*);
+    byte* import(byte*);
     byte* link(byte*);
 
     public:

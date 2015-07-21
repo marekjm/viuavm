@@ -809,7 +809,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* eximport(byte* addr_ptr, const string& module_name) {
+        byte* import(byte* addr_ptr, const string& module_name) {
             /*  Inserts eximport instruction.
              */
             *(addr_ptr++) = EXIMPORT;

@@ -579,7 +579,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         } else if (str::startswith(line, "import")) {
             string str_chnk;
             str_chnk = str::extract(operands);
-            program.eximport(str_chnk);
+            program.import(str_chnk);
         } else if (str::startswith(line, "link")) {
             string str_chnk;
             str_chnk = str::chunk(operands);

@@ -99,8 +99,8 @@ void* gethandle(const string& module, const vector<string>& paths) {
 }
 
 
-byte* CPU::eximport(byte* addr) {
-    /** Run eximport instruction.
+byte* CPU::import(byte* addr) {
+    /** Run import instruction.
      */
     string module = string(addr);
     addr += module.size();

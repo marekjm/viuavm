@@ -101,7 +101,7 @@ namespace cg {
         byte* vmthrow(byte*, int_op);
         byte* leave(byte*);
 
-        byte* eximport(byte*, const std::string&);
+        byte* import(byte*, const std::string&);
         byte* link(byte*, const std::string&);
 
         byte* end(byte*);
