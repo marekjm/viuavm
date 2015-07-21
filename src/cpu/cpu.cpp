@@ -365,6 +365,27 @@ string getmodpath(const string& module, const vector<string>& paths) {
     return (found ? path : "");
 }
 
+void* gethandle(const string& module, const vector<string>& paths) {
+    void *handle = 0;
+
+    string path;
+    ostringstream oss;
+
+    for (unsigned i = 0; (i < paths.size()) and (handle == 0); ++i) {
+        oss.str("");
+        oss << paths[i] << '/' << module << ".so";
+        path = oss.str();
+        if (path[0] == '~') {
+            oss.str("");
+            oss << getenv("HOME") << path.substr(1);
+            path = oss.str();
+        }
+        handle = dlopen(path.c_str(), RTLD_LAZY);
+    }
+
+    return handle;
+}
+
 void CPU::loadNativeLibrary(const string& module) {
     string path = module;
     path = getmodpath(module, getpaths("VIUAPATH"));
@@ -393,6 +414,29 @@ void CPU::loadNativeLibrary(const string& module) {
         }
     } else {
         throw new Exception("failed to link: " + module);
+    }
+}
+void CPU::loadForeignLibrary(const string& module) {
+    void* handle = 0;
+    handle = gethandle(module, getpaths("VIUAPATH"));
+    if (handle == 0) { handle = gethandle(module, VIUAPATH); }
+    if (handle == 0) { handle = gethandle(module, getpaths("VIUAAFTERPATH")); }
+
+    if (handle == 0) {
+        throw new Exception("LinkException", ("failed to link library: " + module));
+    }
+
+    ExternalFunctionSpec* (*exports)() = 0;
+    if ((exports = (ExternalFunctionSpec*(*)())dlsym(handle, "exports")) == 0) {
+        throw new Exception("failed to extract interface from module: " + module);
+    }
+
+    ExternalFunctionSpec* exported = (*exports)();
+
+    unsigned i = 0;
+    while (exported[i].name != NULL) {
+        registerExternalFunction(exported[i].name, exported[i].fpointer);
+        ++i;
     }
 }
 
