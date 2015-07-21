@@ -31,6 +31,7 @@ const char* DEBUGGER_COMMAND_HISTORY = "/.viuavmdb_history";
 const vector<string> DEBUGGER_COMMANDS = {
     "cpu.",
     "cpu.init",
+    "cpu.preload",
     "cpu.run",
     "cpu.tick",
     "cpu.jump",
@@ -397,6 +398,7 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
             operands.insert(operands.begin(), ".");
         }
     } else if (command == "cpu.init") {
+    } else if (command == "cpu.preload") {
     } else if (command == "cpu.run") {
         if (not state.initialised) {
             cout << "error: CPU is not initialised, use `cpu.init` command before `" << command << "`" << endl;
@@ -561,6 +563,8 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
         cpu.iframe();
         cpu.begin();
         state.initialised = true;
+    } else if (command == "cpu.preload") {
+        cpu.preload();
     } else if (command == "cpu.run") {
         state.ticks_left = -1;
     } else if (command == "cpu.resume") {
