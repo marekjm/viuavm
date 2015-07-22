@@ -210,6 +210,15 @@ class CPU {
     byte* vmthrow(byte*);
     byte* leave(byte*);
 
+    byte* vmclass(byte*);
+    byte* prototype(byte*);
+    byte* derive(byte*);
+    byte* attach(byte*);
+    byte* vmregister(byte*);
+
+    byte* vmnew(byte*);
+    byte* msg(byte*);
+
     byte* import(byte*);
     byte* link(byte*);
 
