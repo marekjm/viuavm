@@ -108,14 +108,14 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "import", sizeof(byte) },
     { "link",   sizeof(byte) },
 
-    { "class",  sizeof(byte) + sizeof(bool) + sizeof(int) },
-    { "prototype",sizeof(byte) + sizeof(bool) + sizeof(int) },
-    { "derive", sizeof(byte) + sizeof(bool) + sizeof(int) },
-    { "attach", sizeof(byte) + sizeof(bool) + sizeof(int) },
-    { "register",sizeof(byte) + sizeof(bool) + sizeof(int) },
+    { "class",  sizeof(byte) + sizeof(bool) + sizeof(int) },        // class 1 Foo
+    { "prototype",sizeof(byte) + sizeof(bool) + sizeof(int) },      // prototype 1 Foo
+    { "derive", sizeof(byte) + sizeof(bool) + sizeof(int) },        // derive 1 Bar
+    { "attach", sizeof(byte) + sizeof(bool) + sizeof(int) },        // attach 1 function method
+    { "register",sizeof(byte) + sizeof(bool) + sizeof(int) },       // register 1
 
-    { "new",    sizeof(byte) + sizeof(bool) + sizeof(int) },
-    { "msg",    sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
+    { "new",    sizeof(byte) + sizeof(bool) + sizeof(int) },        // new 1 Foo
+    { "msg",    sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },    // msg 2 1 method
 
     { "end",    sizeof(byte) },
     { "halt",   sizeof(byte) },
