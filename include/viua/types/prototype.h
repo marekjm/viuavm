@@ -19,21 +19,8 @@ class Prototype: public Type {
     std::vector<std::string> attributes;
 
     public:
-        virtual std::string type() const {
-            return "Prototype";
-        }
-        virtual std::string str() const {
-            std::ostringstream s;
-            s << "<'" << type() << "' object at " << this << ">";
-            return s.str();
-        }
-        virtual std::string repr() const {
-            return str();
-        }
-        virtual bool boolean() const {
-            return true;
-        }
-
+        virtual std::string type() const;
+        virtual bool boolean() const;
 
         // attach a function as a method to the prototype
         Prototype* attach(const std::string&, const std::string&);
@@ -52,9 +39,7 @@ class Prototype: public Type {
             return std::vector<std::string>{"Type"};
         }
 
-        virtual Type* copy() const {
-            return new Prototype(type_name);
-        }
+        virtual Type* copy() const;
 
         Prototype(const std::string& tn) {}
         virtual ~Prototype() {}
