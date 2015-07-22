@@ -53,7 +53,7 @@ class CPU {
     std::map<std::string, RegisterSet*> static_registers;
 
     // Map of the typesystem currently existing inside the VM.
-    std::map<std::string, Prototype> typesystem;
+    std::map<std::string, Prototype*> typesystem;
 
     /*  Call stack.
      */
