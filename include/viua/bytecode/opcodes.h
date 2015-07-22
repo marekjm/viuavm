@@ -116,8 +116,16 @@ enum OPCODE : byte {
 
     // Opcodes dealing with external C/C++ modules
     IMPORT,     // import external library
-
     LINK,
+
+    CLASS,      // create a prototype for new class
+    PROTOTYPE,  // create a prototype from existing class
+    DERIVE,     // derive a prototype from an existing class
+    ATTACH,     // attach a method to the prototype
+    REGISTER,   // register a prototype in VM's typesystem
+
+    NEW,        // construct new instance of a class in a register
+    MSG,        // send a message to an object (used for dynamic dispatch, for static use plan "CALL")
 
     END,
     HALT,

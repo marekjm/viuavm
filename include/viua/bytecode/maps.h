@@ -108,6 +108,15 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "import", sizeof(byte) },
     { "link",   sizeof(byte) },
 
+    { "class",  sizeof(byte) + sizeof(bool) + sizeof(int) },
+    { "prototype",sizeof(byte) + sizeof(bool) + sizeof(int) },
+    { "derive", sizeof(byte) + sizeof(bool) + sizeof(int) },
+    { "attach", sizeof(byte) + sizeof(bool) + sizeof(int) },
+    { "register",sizeof(byte) + sizeof(bool) + sizeof(int) },
+
+    { "new",    sizeof(byte) + sizeof(bool) + sizeof(int) },
+    { "msg",    sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
+
     { "end",    sizeof(byte) },
     { "halt",   sizeof(byte) },
 };
@@ -212,6 +221,15 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { IMPORT,   "import" },
     { LINK,     "link" },
 
+    { CLASS,    "class" },
+    { PROTOTYPE,"prototype" },
+    { DERIVE,   "derive" },
+    { ATTACH,   "attach" },
+    { REGISTER, "register" },
+
+    { NEW,      "new" },
+    { MSG,      "msg" },
+
     { END,      "end" },
     { HALT,     "halt" },
 };
@@ -226,6 +244,12 @@ const std::vector<enum OPCODE> OP_VARIABLE_LENGTH = {
     TRY,
     IMPORT,
     LINK,
+    CLASS,
+    PROTOTYPE,
+    DERIVE,
+    ATTACH,
+    NEW,
+    MSG,
 };
 
 
