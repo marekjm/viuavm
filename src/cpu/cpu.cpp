@@ -1,3 +1,5 @@
+#include <dlfcn.h>
+#include <cstdlib>
 #include <iostream>
 #include <vector>
 #include <viua/bytecode/bytetypedef.h>
@@ -10,6 +12,8 @@
 #include <viua/types/vector.h>
 #include <viua/types/exception.h>
 #include <viua/support/pointer.h>
+#include <viua/support/env.h>
+#include <viua/loader.h>
 #include <viua/include/module.h>
 #include <viua/cpu/cpu.h>
 using namespace std;
@@ -45,6 +49,22 @@ CPU& CPU::eoffset(uint16_t o) {
     /*  Set offset of first executable instruction.
      */
     executable_offset = o;
+    return (*this);
+}
+
+CPU& CPU::preload() {
+    /** This method preloads dynamic libraries specified by environment.
+     */
+    vector<string> preload_native = support::env::getpaths("VIUAPRELINK");
+    for (unsigned i = 0; i < preload_native.size(); ++i) {
+        loadNativeLibrary(preload_native[i]);
+    }
+
+    vector<string> preload_foreign = support::env::getpaths("VIUAPREIMPORT");
+    for (unsigned i = 0; i < preload_foreign.size(); ++i) {
+        loadForeignLibrary(preload_foreign[i]);
+    }
+
     return (*this);
 }
 
@@ -187,7 +207,6 @@ void CPU::pushFrame() {
     frames.push_back(frame_new);
     frame_new = 0;
 }
-
 void CPU::dropFrame() {
     /** Drops top-most frame from call stack.
      */
@@ -198,6 +217,161 @@ void CPU::dropFrame() {
         uregset = frames.back()->regset;
     } else {
         uregset = regset;
+    }
+}
+
+
+byte* CPU::callNative(byte* addr, const string& call_name, const bool& return_ref, const int& return_index) {
+    byte* call_address = 0;
+    if (function_addresses.count(call_name)) {
+        call_address = bytecode+function_addresses.at(call_name);
+        jump_base = bytecode;
+    } else {
+        call_address = linked_functions.at(call_name).second;
+        jump_base = linked_modules.at(linked_functions.at(call_name).first).second;
+    }
+    addr += (call_name.size()+1);
+
+    // save return address for frame
+    byte* return_address = addr;
+
+    if (frame_new == 0) {
+        throw new Exception("function call without first_operand_index frame: use `frame 0' in source code if the function takes no parameters");
+    }
+    // set function name and return address
+    frame_new->function_name = call_name;
+    frame_new->return_address = return_address;
+
+    frame_new->resolve_return_value_register = return_ref;
+    frame_new->place_return_value_in = return_index;
+
+    pushFrame();
+
+    return call_address;
+}
+byte* CPU::callForeign(byte* addr, const string& call_name, const bool& return_ref, const int& return_index) {
+    addr += (call_name.size()+1);
+
+    // save return address for frame
+    byte* return_address = addr;
+
+    if (frame_new == 0) {
+        throw new Exception("external function call without a frame: use `frame 0' in source code if the function takes no parameters");
+    }
+    // set function name and return address
+    frame_new->function_name = call_name;
+    frame_new->return_address = return_address;
+
+    frame_new->resolve_return_value_register = return_ref;
+    frame_new->place_return_value_in = return_index;
+
+    Frame* frame = frame_new;
+
+    pushFrame();
+
+    if (external_functions.count(call_name) == 0) {
+        throw new Exception("call to unregistered external function: " + call_name);
+    }
+
+    /* FIXME: second parameter should be a pointer to static registers or
+     *        0 if function does not have static registers registered
+     * FIXME: should external functions always have static registers allocated?
+     */
+    ExternalFunction* callback = external_functions.at(call_name);
+    (*callback)(frame, 0, regset);
+
+    // FIXME: woohoo! segfault!
+    Type* returned = 0;
+    bool returned_is_reference = false;
+    int return_value_register = frames.back()->place_return_value_in;
+    bool resolve_return_value_register = frames.back()->resolve_return_value_register;
+    if (return_value_register != 0) {
+        // we check in 0. register because it's reserved for return values
+        if (uregset->at(0) == 0) {
+            throw new Exception("return value requested by frame but external function did not set return register");
+        }
+        if (uregset->isflagged(0, REFERENCE)) {
+            returned = uregset->get(0);
+            returned_is_reference = true;
+        } else {
+            returned = uregset->get(0)->copy();
+        }
+    }
+
+    dropFrame();
+
+    // place return value
+    if (returned and frames.size() > 0) {
+        if (resolve_return_value_register) {
+            return_value_register = static_cast<Integer*>(fetch(return_value_register))->value();
+        }
+        place(return_value_register, returned);
+        if (returned_is_reference) {
+            uregset->flag(return_value_register, REFERENCE);
+        }
+    }
+
+    return return_address;
+}
+
+
+void CPU::loadNativeLibrary(const string& module) {
+    string path = module;
+    path = support::env::viua::getmodpath(module, "vlib", support::env::getpaths("VIUAPATH"));
+    if (path.size() == 0) { path = support::env::viua::getmodpath(module, "vlib", VIUAPATH); }
+    if (path.size() == 0) { path = support::env::viua::getmodpath(module, "vlib", support::env::getpaths("VIUAAFTERPATH")); }
+
+    if (path.size()) {
+        Loader loader(path);
+        loader.load();
+
+        byte* lnk_btcd = loader.getBytecode();
+        linked_modules[module] = pair<unsigned, byte*>(unsigned(loader.getBytecodeSize()), lnk_btcd);
+
+        vector<string> fn_names = loader.getFunctions();
+        map<string, uint16_t> fn_addrs = loader.getFunctionAddresses();
+        for (unsigned i = 0; i < fn_names.size(); ++i) {
+            string fn_linkname = fn_names[i];
+            linked_functions[fn_linkname] = pair<string, byte*>(module, (lnk_btcd+fn_addrs[fn_names[i]]));
+        }
+
+        vector<string> bl_names = loader.getBlocks();
+        map<string, uint16_t> bl_addrs = loader.getBlockAddresses();
+        for (unsigned i = 0; i < bl_names.size(); ++i) {
+            string bl_linkname = bl_names[i];
+            linked_blocks[bl_linkname] = pair<string, byte*>(module, (lnk_btcd+bl_addrs[bl_linkname]));
+        }
+    } else {
+        throw new Exception("failed to link: " + module);
+    }
+}
+void CPU::loadForeignLibrary(const string& module) {
+    string path = "";
+    path = support::env::viua::getmodpath(module, "so", support::env::getpaths("VIUAPATH"));
+    if (path.size() == 0) { path = support::env::viua::getmodpath(module, "so", VIUAPATH); }
+    if (path.size() == 0) { path = support::env::viua::getmodpath(module, "so", support::env::getpaths("VIUAAFTERPATH")); }
+
+    if (path.size() == 0) {
+        throw new Exception("LinkException", ("failed to link library: " + module));
+    }
+
+    void* handle = dlopen(path.c_str(), RTLD_LAZY);
+
+    if (handle == 0) {
+        throw new Exception("LinkException", ("failed to open handle: " + module));
+    }
+
+    ExternalFunctionSpec* (*exports)() = 0;
+    if ((exports = (ExternalFunctionSpec*(*)())dlsym(handle, "exports")) == 0) {
+        throw new Exception("failed to extract interface from module: " + module);
+    }
+
+    ExternalFunctionSpec* exported = (*exports)();
+
+    unsigned i = 0;
+    while (exported[i].name != NULL) {
+        registerExternalFunction(exported[i].name, exported[i].fpointer);
+        ++i;
     }
 }
 

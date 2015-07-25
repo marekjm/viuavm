@@ -6,6 +6,8 @@
 #include <vector>
 #include <viua/version.h>
 #include <viua/support/string.h>
+#include <viua/support/env.h>
+#include <viua/types/exception.h>
 #include <viua/loader.h>
 #include <viua/cpu/cpu.h>
 #include <viua/program.h>
@@ -48,13 +50,13 @@ int main(int argc, char* argv[]) {
     string option;
     for (int i = 1; i < argc; ++i) {
         option = string(argv[i]);
-        if (option == "--help") {
+        if (option == "--help" or option == "-h") {
             SHOW_HELP = true;
             continue;
-        } else if (option == "--version") {
+        } else if (option == "--version" or option == "-V") {
             SHOW_VERSION = true;
             continue;
-        } else if (option == "--verbose") {
+        } else if (option == "--verbose" or option == "-v") {
             VERBOSE = true;
             continue;
         }
@@ -73,6 +75,10 @@ int main(int argc, char* argv[]) {
 
     if (!filename.size()) {
         cout << "fatal: no file to run" << endl;
+        return 1;
+    }
+    if (!support::env::isfile(filename)) {
+        cout << "fatal: could not open file: " << filename << endl;
         return 1;
     }
 
@@ -96,7 +102,17 @@ int main(int argc, char* argv[]) {
 
     cpu.commandline_arguments = cmdline_args;
 
-    cpu.load(bytecode).bytes(bytes).eoffset(starting_instruction).run();
+    cpu.load(bytecode).bytes(bytes).eoffset(starting_instruction);
+
+    try {
+        // try preloading dynamic libraries specified by environment
+        cpu.preload();
+    } catch (const Exception* e) {
+        cout << "fatal: preload: " << e->what() << endl;
+        return 1;
+    }
+
+    cpu.run();
 
     int ret_code = 0;
     string return_exception = "", return_message = "";

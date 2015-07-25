@@ -11,6 +11,7 @@
 #include <viua/bytecode/maps.h>
 #include <viua/support/string.h>
 #include <viua/support/pointer.h>
+#include <viua/support/env.h>
 #include <viua/types/integer.h>
 #include <viua/types/closure.h>
 #include <viua/loader.h>
@@ -31,6 +32,7 @@ const char* DEBUGGER_COMMAND_HISTORY = "/.viuavmdb_history";
 const vector<string> DEBUGGER_COMMANDS = {
     "cpu.",
     "cpu.init",
+    "cpu.preload",
     "cpu.run",
     "cpu.tick",
     "cpu.jump",
@@ -397,6 +399,7 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
             operands.insert(operands.begin(), ".");
         }
     } else if (command == "cpu.init") {
+    } else if (command == "cpu.preload") {
     } else if (command == "cpu.run") {
         if (not state.initialised) {
             cout << "error: CPU is not initialised, use `cpu.init` command before `" << command << "`" << endl;
@@ -561,6 +564,8 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
         cpu.iframe();
         cpu.begin();
         state.initialised = true;
+    } else if (command == "cpu.preload") {
+        cpu.preload();
     } else if (command == "cpu.run") {
         state.ticks_left = -1;
     } else if (command == "cpu.resume") {
@@ -880,13 +885,13 @@ int main(int argc, char* argv[]) {
     string option;
     for (int i = 1; i < argc; ++i) {
         option = string(argv[i]);
-        if (option == "--help") {
+        if (option == "--help" or option == "-h") {
             SHOW_HELP = true;
             continue;
-        } else if (option == "--version") {
+        } else if (option == "--version" or option == "-V") {
             SHOW_VERSION = true;
             continue;
-        } else if (option == "--verbose") {
+        } else if (option == "--verbose" or option == "-v") {
             VERBOSE = true;
         }
         args.push_back(argv[i]);
@@ -904,6 +909,10 @@ int main(int argc, char* argv[]) {
 
     if (!filename.size()) {
         cout << "fatal: no file to run" << endl;
+        return 1;
+    }
+    if (!support::env::isfile(filename)) {
+        cout << "fatal: could not open file: " << filename << endl;
         return 1;
     }
 

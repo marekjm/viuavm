@@ -809,27 +809,14 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* eximport(byte* addr_ptr, const string& module_name) {
+        byte* import(byte* addr_ptr, const string& module_name) {
             /*  Inserts eximport instruction.
              */
-            *(addr_ptr++) = EXIMPORT;
+            *(addr_ptr++) = IMPORT;
             for (unsigned i = 1; i < module_name.size()-1; ++i) {
                 *((char*)addr_ptr++) = module_name[i];
             }
             *((char*)addr_ptr++) = char(0);
-            return addr_ptr;
-        }
-
-        byte* excall(byte* addr_ptr, int_op reg, const string& fn_name) {
-            /*  Inserts excall instruction.
-             *  Byte offset is calculated automatically.
-             */
-            *(addr_ptr++) = EXCALL;
-            addr_ptr = insertIntegerOperand(addr_ptr, reg);
-            for (unsigned i = 0; i < fn_name.size(); ++i) {
-                *((char*)addr_ptr++) = fn_name[i];
-            }
-            *(addr_ptr++) = '\0';
             return addr_ptr;
         }
 

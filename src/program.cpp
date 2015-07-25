@@ -127,7 +127,7 @@ uint16_t Program::countBytes(const vector<string>& lines) {
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (function or block name)
                 inc += str::chunk(line).size() + 1;
-            } else if ((instr == "call") or (instr == "excall")) {
+            } else if (instr == "call") {
                 // clear first chunk (opcode mnemonic)
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (optional register index)
@@ -143,7 +143,7 @@ uint16_t Program::countBytes(const vector<string>& lines) {
                 line = str::lstrip(str::sub(line, str::chunk(line).size()));
                 // get third chunk (function name)
                 inc += str::chunk(line).size() + 1;
-            } else if (instr == "eximport") {
+            } else if (instr == "import") {
                 // clear first chunk
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (which is a string)
@@ -222,14 +222,14 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
         }
 
         OPCODE opcode = OPCODE(program[offset]);
-        if ((opcode == EXIMPORT) or (opcode == TRY) or (opcode == LINK)) {
+        if ((opcode == IMPORT) or (opcode == TRY) or (opcode == LINK)) {
             string s(program+offset+1);
             if (scream) {
                 cout << '+' << s.size() << " (function/module name at byte " << offset+1 << ": `" << s << "`)";
             }
             inc += s.size()+1;
         }
-        if ((opcode == CALL) or (opcode == EXCALL) or (opcode == CLOSURE) or (opcode == FUNCTION)) {
+        if ((opcode == CALL) or (opcode == CLOSURE) or (opcode == FUNCTION)) {
             string s(program+offset+sizeof(bool)+sizeof(int)+1);
             if (scream) {
                 cout << '+' << s.size() << " (function/module name at byte " << offset+1 << ": `" << s << "`)";

@@ -12,6 +12,7 @@
 #include <viua/cg/disassembler/disassembler.h>
 #include <viua/support/string.h>
 #include <viua/support/pointer.h>
+#include <viua/support/env.h>
 #include <viua/loader.h>
 using namespace std;
 
@@ -64,11 +65,11 @@ int main(int argc, char* argv[]) {
     string disasmname = "";
     for (int i = 1; i < argc; ++i) {
         option = string(argv[i]);
-        if (option == "--help") {
+        if (option == "--help" or option == "-h") {
             SHOW_HELP = true;
-        } else if (option == "--version") {
+        } else if (option == "--version" or option == "-V") {
             SHOW_VERSION = true;
-        } else if (option == "--verbose") {
+        } else if (option == "--verbose" or option == "-v") {
             VERBOSE = true;
         } else if ((option == "--with-entry") or (option == "-e")) {
             DISASSEMBLE_ENTRY = true;
@@ -110,9 +111,19 @@ int main(int argc, char* argv[]) {
         cout << "fatal: no file to run" << endl;
         return 1;
     }
+    if (!support::env::isfile(filename)) {
+        cout << "fatal: could not open file: " << filename << endl;
+        return 1;
+    }
 
     Loader loader(filename);
-    loader.executable();
+
+    try {
+        loader.executable();
+    } catch (const string& e) {
+        cout << e << endl;
+        return 1;
+    }
 
     uint16_t bytes = loader.getBytecodeSize();
     byte* bytecode = loader.getBytecode();

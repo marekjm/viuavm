@@ -100,12 +100,20 @@ class CPU {
     void place(unsigned, Type*);
     void ensureStaticRegisters(std::string);
 
-    /*  Methods dealing with stack and frame manipulation.
+    /*  Methods dealing with stack and frame manipulation, and
+     *  function calls.
      */
     Frame* requestNewFrame(int arguments_size = 0, int registers_size = 0);
     TryFrame* requestNewTryFrame();
     void pushFrame();
     void dropFrame();
+    // call native (i.e. written in Viua) function
+    byte* callNative(byte*, const std::string&, const bool&, const int&);
+    // call foreign (i.e. from a C++ extension) function
+    byte* callForeign(byte*, const std::string&, const bool&, const int&);
+
+    void loadNativeLibrary(const std::string&);
+    void loadForeignLibrary(const std::string&);
 
     /*  Methods implementing CPU instructions.
      */
@@ -198,9 +206,7 @@ class CPU {
     byte* vmthrow(byte*);
     byte* leave(byte*);
 
-    byte* eximport(byte*);
-    byte* excall(byte*);
-
+    byte* import(byte*);
     byte* link(byte*);
 
     public:
@@ -219,6 +225,7 @@ class CPU {
         CPU& load(byte*);
         CPU& bytes(uint16_t);
         CPU& eoffset(uint16_t);
+        CPU& preload();
 
         CPU& mapfunction(const std::string&, unsigned);
         CPU& mapblock(const std::string&, unsigned);

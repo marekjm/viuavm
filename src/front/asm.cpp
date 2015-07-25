@@ -9,6 +9,7 @@
 #include <map>
 #include <viua/bytecode/maps.h>
 #include <viua/support/string.h>
+#include <viua/support/env.h>
 #include <viua/version.h>
 #include <viua/loader.h>
 #include <viua/program.h>
@@ -49,12 +50,12 @@ bool ERROR_GLOBALS_IN_LIB = false;
 const string ENTRY_FUNCTION_NAME = "__entry";
 
 
-tuple<int, enum JUMPTYPE> resolvejump(string jmp, const map<string, int>& marks) {
+tuple<int, enum JUMPTYPE> resolvejump(string jmp, const map<string, int>& marks, int instruction_index = -1) {
     /*  This function is used to resolve jumps in `jump` and `branch` instructions.
      */
     int addr = 0;
     enum JUMPTYPE jump_type = JMP_RELATIVE;
-    if (str::isnum(jmp)) {
+    if (str::isnum(jmp, false)) {
         addr = stoi(jmp);
     } else if (jmp[0] == '.' and str::isnum(str::sub(jmp, 1))) {
         addr = stoi(str::sub(jmp, 1));
@@ -64,6 +65,13 @@ tuple<int, enum JUMPTYPE> resolvejump(string jmp, const map<string, int>& marks)
         ss << hex << jmp;
         ss >> addr;
         jump_type = JMP_TO_BYTE;
+    } else if (jmp[0] == '-') {
+        if (instruction_index < 0) { throw ("invalid use of relative jump: " + jmp); }
+        addr = (instruction_index + stoi(jmp));
+        if (addr < 0) { throw "use of relative jump results in a jump to negative index"; }
+    } else if (jmp[0] == '+') {
+        if (instruction_index < 0) { throw ("invalid use of relative jump: " + jmp); }
+        addr = (instruction_index + stoi(jmp.substr(1)));
     } else if (jmp[0] == '.') {
         // FIXME
         cout << "FIXME: global marker jumps (jumps to functions) are not implemented yet" << endl;
@@ -496,9 +504,9 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
 
             int addrt_target, addrf_target;
             enum JUMPTYPE addrt_jump_type, addrf_jump_type;
-            tie(addrt_target, addrt_jump_type) = resolvejump(if_true, marks);
+            tie(addrt_target, addrt_jump_type) = resolvejump(if_true, marks, i);
             if (if_false != "") {
-                tie(addrf_target, addrf_jump_type) = resolvejump(if_false, marks);
+                tie(addrf_target, addrf_jump_type) = resolvejump(if_false, marks, i);
             } else {
                 addrf_jump_type = JMP_RELATIVE;
                 addrf_target = instruction+1;
@@ -541,7 +549,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
              */
             int jump_target;
             enum JUMPTYPE jump_type;
-            tie(jump_target, jump_type) = resolvejump(operands, marks);
+            tie(jump_target, jump_type) = resolvejump(operands, marks, i);
 
             if (DEBUG) {
                 if (jump_type == JMP_TO_BYTE) {
@@ -576,26 +584,10 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             program.vmthrow(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "leave")) {
             program.leave();
-        } else if (str::startswith(line, "eximport")) {
+        } else if (str::startswith(line, "import")) {
             string str_chnk;
             str_chnk = str::extract(operands);
-            program.eximport(str_chnk);
-        } else if (str::startswith(line, "excall")) {
-            /** Full form of excall instruction has two operands: external function name and return value register index.
-             *  If call is given only one operand - it means it is the instruction index and returned value is discarded.
-             *  To explicitly state that return value should be discarded, 0 can be supplied as second operand.
-             */
-            string fn_name, reg;
-            tie(reg, fn_name) = assembler::operands::get2(operands);
-
-            // if second operand is empty, fill it with zero
-            // which means that return value will be discarded
-            if (fn_name == "") {
-                fn_name = reg;
-                reg = "0";
-            }
-
-            program.excall(assembler::operands::getint(resolveregister(reg, names)), fn_name);
+            program.import(str_chnk);
         } else if (str::startswith(line, "link")) {
             string str_chnk;
             str_chnk = str::chunk(operands);
@@ -1509,6 +1501,10 @@ int main(int argc, char* argv[]) {
     filename = args[0];
     if (!filename.size()) {
         cout << "fatal: no file to assemble" << endl;
+        return 1;
+    }
+    if (!support::env::isfile(filename)) {
+        cout << "fatal: could not open file: " << filename << endl;
         return 1;
     }
 

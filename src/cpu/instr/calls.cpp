@@ -161,38 +161,16 @@ byte* CPU::call(byte* addr) {
     pointer::inc<int, byte>(addr);
 
     string call_name = string(addr);
-    bool function_found = (function_addresses.count(call_name) or linked_functions.count(call_name));
 
-    if (not function_found) {
+    bool is_native = (function_addresses.count(call_name) or linked_functions.count(call_name));
+    bool is_foreign = external_functions.count(call_name);
+
+    if (not (is_native or is_foreign)) {
         throw new Exception("call to undefined function: " + call_name);
     }
 
-    byte* call_address = 0;
-    if (function_addresses.count(call_name)) {
-        call_address = bytecode+function_addresses.at(call_name);
-        jump_base = bytecode;
-    } else {
-        call_address = linked_functions.at(call_name).second;
-        jump_base = linked_modules.at(linked_functions.at(call_name).first).second;
-    }
-    addr += (call_name.size()+1);
-
-    // save return address for frame
-    byte* return_address = addr;
-
-    if (frame_new == 0) {
-        throw new Exception("function call without first_operand_index frame: use `frame 0' in source code if the function takes no parameters");
-    }
-    // set function name and return address
-    frame_new->function_name = call_name;
-    frame_new->return_address = return_address;
-
-    frame_new->resolve_return_value_register = return_register_ref;
-    frame_new->place_return_value_in = return_register_index;
-
-    pushFrame();
-
-    return call_address;
+    auto caller = (is_native ? &CPU::callNative : &CPU::callForeign);
+    return (this->*caller)(addr, call_name, return_register_ref, return_register_index);
 }
 
 byte* CPU::end(byte* addr) {

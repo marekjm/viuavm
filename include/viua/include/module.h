@@ -3,13 +3,14 @@
 
 #pragma once
 
+#include <string>
 #include <vector>
-#include "../cpu/frame.h"
-#include "../cpu/registerset.h"
-#include "../types/type.h"
+#include <viua/cpu/frame.h>
+#include <viua/cpu/registerset.h>
+#include <viua/types/type.h>
 
 
-const std::vector<const char*> VIUAPATH = {
+const std::vector<std::string> VIUAPATH = {
     ".",
     "~/.local/lib/viua",
     "~/.local/lib/viua/core",
@@ -20,6 +21,9 @@ const std::vector<const char*> VIUAPATH = {
     "/usr/lib/viua",
     "/usr/lib/viua/core",
     "/usr/lib/viua/site",
+    "" /* this path may cause confusing exception about "failing to extract the interface" from a library if
+        * name of Viua lib is the same as one of the system libs, and Viua version has not been found
+        */
 };
 
 

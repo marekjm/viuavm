@@ -699,18 +699,10 @@ Program& Program::leave() {
     return (*this);
 }
 
-Program& Program::eximport(string module_name) {
-    /*  Inserts eximport instruction.
+Program& Program::import(string module_name) {
+    /*  Inserts import instruction.
      */
-    addr_ptr = cg::bytecode::eximport(addr_ptr, module_name);
-    return (*this);
-}
-
-Program& Program::excall(int_op reg, const string& fn_name) {
-    /*  Inserts excall instruction.
-     *  Byte offset is calculated automatically.
-     */
-    addr_ptr = cg::bytecode::excall(addr_ptr, reg, fn_name);
+    addr_ptr = cg::bytecode::import(addr_ptr, module_name);
     return (*this);
 }
 

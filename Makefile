@@ -11,16 +11,16 @@ BIN_PATH=${PREFIX}/bin
 LIB_PATH=${PREFIX}/lib/viua
 H_PATH=/usr/include/viua
 
-LIBDL=-ldl
+LIBDL ?= -ldl
 
 .SUFFIXES: .cpp .h .o
 
-.PHONY: all remake clean clean-support clean-test-compiles install compile-test test version devellibs
+.PHONY: all remake clean clean-support clean-test-compiles install compile-test test version platform
 
 
 ############################################################
 # BASICS
-all: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/vdb build/bin/vm/dis build/bin/opcodes.bin devellibs
+all: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/vdb build/bin/vm/dis build/bin/opcodes.bin platform
 
 remake: clean all
 
@@ -28,15 +28,19 @@ remake: clean all
 ############################################################
 # CLEANING
 clean: clean-support clean-test-compiles
+	rm -f ./build/bin/vm/*
+	rm -f ./build/bin/opcodes.bin
 	rm -f ./build/lib/*.o
 	rm -f ./build/cpu/instr/*.o
 	rm -f ./build/cpu/*.o
 	rm -f ./build/cg/assembler/*.o
 	rm -f ./build/cg/disassembler/*.o
 	rm -f ./build/cg/bytecode/*.o
-	rm -f ./build/*.o
 	rm -f ./build/bin/vm/*
+	rm -f ./build/platform/*.o
 	rm -f ./build/test/*
+	rm -f ./build/types/*.o
+	rm -f ./build/*.o
 
 clean-support:
 	rm -f ./build/support/*.o
@@ -45,6 +49,7 @@ clean-test-compiles:
 	rm -f ./tests/compiled/*.bin
 	rm -f ./tests/compiled/*.asm
 	rm -f ./tests/compiled/*.wlib
+	rm -f ./misc.vlib
 
 
 ############################################################
@@ -72,10 +77,13 @@ libinstall: stdlib
 	mkdir -p ${LIB_PATH}/core
 	cp ./build/stdlib/lib/*.so ${LIB_PATH}/std/extern
 
-devellibs: build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o
+platform: build/platform/exception.o build/platform/string.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o
 
 build/platform/exception.o: src/types/exception.cpp
 	${CXX} -std=c++11 -fPIC -c -I./include -o ./build/platform/exception.o src/types/exception.cpp
+
+build/platform/string.o: src/types/string.cpp
+	${CXX} -std=c++11 -fPIC -c -I./include -o ./build/platform/string.o src/types/string.cpp
 
 build/platform/vector.o: src/types/vector.cpp
 	${CXX} -std=c++11 -fPIC -c -I./include -o ./build/platform/vector.o src/types/vector.cpp
@@ -86,7 +94,7 @@ build/platform/registerset.o: src/cpu/registerset.cpp
 build/platform/support_string.o: src/support/string.cpp
 	${CXX} -std=c++11 -fPIC -c -I./include -o ./build/platform/support_string.o src/support/string.cpp
 
-installdevel: devellibs
+installdevel: platform
 	mkdir -p ${LIB_PATH}/platform
 	cp ./build/platform/*.o ${LIB_PATH}/platform
 
@@ -114,7 +122,7 @@ build/test/math.o:  sample/asm/external/math.cpp
 build/test/math.so: build/test/math.o build/platform/registerset.o build/platform/exception.o
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -fPIC -shared -o build/test/math.so build/test/math.o ./build/platform/registerset.o ./build/platform/exception.o
 
-compile-test: math.so build/test/build/test/World.so
+compile-test: build/test/math.so build/test/World.so
 
 test: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/dis build/test/math.so build/test/World.so
 	python3 ./tests/tests.py --verbose --catch --failfast
@@ -213,10 +221,10 @@ build/cpu/instr/general.o: src/cpu/instr/general.cpp
 build/cpu/instr/registers.o: src/cpu/instr/registers.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/cpu/instr/calls.o: src/cpu/instr/calls.cpp
+build/cpu/instr/calls.o: src/cpu/instr/calls.cpp build/cpu/cpu.o
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/cpu/instr/linking.o: src/cpu/instr/linking.cpp
+build/cpu/instr/linking.o: src/cpu/instr/linking.cpp build/cpu/cpu.o
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
 build/cpu/instr/tcmechanism.o: src/cpu/instr/tcmechanism.cpp
@@ -256,6 +264,9 @@ build/support/string.o: src/support/string.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
 build/support/pointer.o: src/support/pointer.cpp
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+
+build/support/env.o: src/support/env.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
 

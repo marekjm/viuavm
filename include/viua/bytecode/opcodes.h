@@ -115,8 +115,7 @@ enum OPCODE : byte {
     LEAVE,      // leave a block and resume execution after block-entering instruction
 
     // Opcodes dealing with external C/C++ modules
-    EXIMPORT,   // import external library
-    EXCALL,     // call external function
+    IMPORT,     // import external library
 
     LINK,
 
