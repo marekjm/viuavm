@@ -152,8 +152,11 @@ namespace str {
          *  Consider this string: `"Hello 'Beautiful' World!" some other (42) things;`.
          *  str::extract(<that string>) will return `"Hello 'Beautiful' World!"`.
          */
-        ostringstream chnk;
+        if (s.size() == 0) {
+            return string("");
+        }
 
+        ostringstream chnk;
         char quote = s[0];
         int backs = 0;
 
