@@ -7,10 +7,7 @@
     arg zero 1
 
     ; decrease counter and check if it's less than zero
-    idec counter
-    ilt 3 counter zero
-
-    branch 3 break_rec
+    branch (ilt 3 (idec counter) zero) break_rec
     print counter
 
     frame ^[(param 0 counter) (paref 1 zero)]
