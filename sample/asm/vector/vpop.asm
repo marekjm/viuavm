@@ -1,20 +1,11 @@
 .function: main
-    strstore 1 "Hello World!"
+    print (vlen 3 (vec 2))
 
-    vec 2
-
-    vlen 3 2
-    print 3
-
-    vpush 2 1
-
-    vlen 3 2
-    print 3
+    vpush 2 (strstore 1 "Hello World!")
+    print (vlen 3 2)
 
     vpop 4 2
-
-    vlen 3 2
-    print 3
+    print (vlen 3 2)
 
     print 4
 
