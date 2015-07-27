@@ -13,20 +13,8 @@
 
 .function: main
     izero 1
-    frame 4
 
-    param @1 1
-    iinc 1
-
-    param @1 1
-    iinc 1
-
-    param @1 1
-    iinc 1
-
-    param @1 1
-    iinc 1
-
+    frame ^[(param @1 ^(iinc 1)) (param @1 ^(iinc 1)) (param @1 ^(iinc 1)) (param @1 ^(iinc 1))]
     call foo
 
     izero 0
