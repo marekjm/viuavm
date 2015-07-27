@@ -1,37 +1,30 @@
 .function: foo
-    istore 1 42
-    print 1
+    print (istore 1 42)
     end
 .end
 
 .function: bar
-    istore 1 69
-    print 1
-    frame 0
-    call foo
+    print (istore 1 69)
+    call (frame 0) foo
     end
 .end
 
 .function: baz
-    istore 1 1995
-    print 1
-    frame 0
-    call bar
+    print (istore 1 1995)
+    call (frame 0) bar
     end
 .end
 
 .function: bay
-    istore 1 2015
-    print 1
-    frame 0
-    call baz
+    print (istore 1 2015)
+    call (frame 0) baz
     end
 .end
 
 
 .function: main
-    frame 0
-    call bay
+    call (frame 0) bay
+
     izero 0
     end
 .end
