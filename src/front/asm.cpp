@@ -873,7 +873,7 @@ int generate(const string& filename, string& compilename, const vector<string>& 
     // CALLS TO UNDEFINED FUNCTIONS
     vector<string> function_names;
     try {
-        function_names = assembler::ce::getFunctionNames(lines);
+        function_names = assembler::ce::getFunctionNames(expanded_lines);
     } catch (const string& e) {
         cout << "fatal: " << e << endl;
         return 1;
@@ -881,7 +881,7 @@ int generate(const string& filename, string& compilename, const vector<string>& 
 
     vector<string> function_signatures;
     try {
-        function_signatures = assembler::ce::getSignatures(lines);
+        function_signatures = assembler::ce::getSignatures(expanded_lines);
     } catch (const string& e) {
         cout << "fatal: " << e << endl;
         return 1;
@@ -892,7 +892,7 @@ int generate(const string& filename, string& compilename, const vector<string>& 
     // GATHER BLOCK NAMES
     vector<string> block_names;
     try {
-        block_names = assembler::ce::getBlockNames(lines);
+        block_names = assembler::ce::getBlockNames(expanded_lines);
     } catch (const string& e) {
         cout << "fatal: " << e << endl;
         return 1;
@@ -900,7 +900,7 @@ int generate(const string& filename, string& compilename, const vector<string>& 
 
     vector<string> block_signatures;
     try {
-        block_signatures = assembler::ce::getBlockSignatures(lines);
+        block_signatures = assembler::ce::getBlockSignatures(expanded_lines);
     } catch (const string& e) {
         cout << "fatal: " << e << endl;
         return 1;
@@ -953,23 +953,23 @@ int generate(const string& filename, string& compilename, const vector<string>& 
     ///////////////////////////////////////////
     // INITIAL VERIFICATION OF CODE CORRECTNESS
     string report;
-    if ((report = assembler::verify::directives(lines)).size()) {
+    if ((report = assembler::verify::directives(expanded_lines)).size()) {
         cout << report << endl;
         exit(1);
     }
-    if ((report = assembler::verify::instructions(lines)).size()) {
+    if ((report = assembler::verify::instructions(expanded_lines)).size()) {
         cout << report << endl;
         exit(1);
     }
-    if ((report = assembler::verify::ressInstructions(lines, AS_LIB)).size()) {
+    if ((report = assembler::verify::ressInstructions(expanded_lines, AS_LIB)).size()) {
         cout << report << endl;
         exit(1);
     }
-    if ((report = assembler::verify::functionBodiesAreNonempty(lines, functions)).size()) {
+    if ((report = assembler::verify::functionBodiesAreNonempty(expanded_lines, functions)).size()) {
         cout << report << endl;
         exit(1);
     }
-    if ((report = assembler::verify::blockTries(lines, block_names, block_signatures)).size()) {
+    if ((report = assembler::verify::blockTries(expanded_lines, block_names, block_signatures)).size()) {
         cout << report << endl;
         exit(1);
     }
@@ -977,8 +977,8 @@ int generate(const string& filename, string& compilename, const vector<string>& 
 
     ////////////////////////////
     // VERIFY FRAME INSTRUCTIONS
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        line = str::lstrip(lines[i]);
+    for (unsigned i = 0; i < expanded_lines.size(); ++i) {
+        line = str::lstrip(expanded_lines[i]);
         if (not str::startswith(line, "frame")) {
             continue;
         }
@@ -1156,15 +1156,15 @@ int generate(const string& filename, string& compilename, const vector<string>& 
     /////////////////////////////////////////////////////////////////////////
     // AFTER HAVING OBTAINED LINKED NAMES, IT IS POSSIBLE TO VERIFY CALLS AND
     // CALLABLE (FUNCTIONS, CLOSURES, ETC.) CREATIONS
-    if ((report = assembler::verify::functionCallsAreDefined(lines, function_names, function_signatures)).size()) {
+    if ((report = assembler::verify::functionCallsAreDefined(expanded_lines, function_names, function_signatures)).size()) {
         cout << report << endl;
         exit(1);
     }
-    if ((report = assembler::verify::frameBalance(lines)).size()) {
+    if ((report = assembler::verify::frameBalance(expanded_lines)).size()) {
         cout << report << endl;
         exit(1);
     }
-    if ((report = assembler::verify::callableCreations(lines, function_names, function_signatures)).size()) {
+    if ((report = assembler::verify::callableCreations(expanded_lines, function_names, function_signatures)).size()) {
         cout << report << endl;
         exit(1);
     }
