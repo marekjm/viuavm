@@ -688,6 +688,12 @@ vector<string> tokenize(const string& s) {
             tokens.push_back((s[i] == '{' ? "{" : "}"));
             continue;
         }
+        if (s[i] == '"' or s[i] == '\'') {
+            string ss = str::extract(s.substr(i));
+            i += ss.size();
+            tokens.push_back(ss);
+            continue;
+        }
         token << s[i];
     }
     if (token.str().size()) {
