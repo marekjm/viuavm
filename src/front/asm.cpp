@@ -693,7 +693,7 @@ vector<string> tokenize(const string& s) {
         }
         if (s[i] == '"' or s[i] == '\'') {
             string ss = str::extract(s.substr(i));
-            i += ss.size();
+            i += (ss.size()-1);
             tokens.push_back(ss);
             continue;
         }
