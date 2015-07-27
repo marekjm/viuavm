@@ -636,20 +636,6 @@ map<string, uint16_t> mapInvokableAddresses(uint16_t& starting_instruction, cons
 }
 
 
-string lstrip(const string& s) {
-    ostringstream stripped;
-    unsigned start = 0;
-    for (; start < s.size(); ++start) {
-        if (not (s[start] == ' ' or s[start] == '\t')) {
-            break;
-        }
-    }
-    for (unsigned i = start; i < s.size(); ++i) {
-        stripped << s[i];
-    }
-    return stripped.str();
-}
-
 bool contains(const string&s, const char c) {
     bool it_does = false;
     for (unsigned i = 0; i < s.size(); ++i) {
@@ -826,7 +812,7 @@ vector<string> precompile(const vector<string>& lines) {
     vector<string> stripped_lines;
 
     for (unsigned i = 0; i < lines.size(); ++i) {
-        stripped_lines.push_back(lstrip(lines[i]));
+        stripped_lines.push_back(str::lstrip(lines[i]));
     }
 
     vector<string> asm_lines;

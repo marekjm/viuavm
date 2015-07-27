@@ -173,11 +173,10 @@ namespace str {
          */
         unsigned i = 0;
         while (i < s.size()) {
-            if (s[i] == *" " or s[i] == *"\t" or s[i] == *"\v" or s[i] == *"\n") {
-                ++i;
-            } else {
+            if (not (s[i] == ' ' or s[i] == '\t' or s[i] == '\v' or s[i] == '\n')) {
                 break;
-            }
+            };
+            ++i;
         }
         return sub(s, i);
     }
