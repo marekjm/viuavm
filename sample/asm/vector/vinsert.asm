@@ -27,11 +27,8 @@
     vlen len 1
 
     .mark: loop
-    ilt 8 counter len
-    branch 8 inside break
-    .mark: inside
-    vat 9 1 @counter
-    print 9
+    branch (ilt 8 counter len) +1 break
+    print (vat 9 1 @counter)
     ; empty must be done or second print would fail with a segfault!
     ; VATed registers are references!
     empty 9
