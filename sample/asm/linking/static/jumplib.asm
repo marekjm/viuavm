@@ -1,5 +1,4 @@
 .function: jumprint
-    ; FIXME: jump instructions are calculated incorrectly
     arg 1 0
     print 1
 
