@@ -635,10 +635,6 @@ map<string, uint16_t> mapInvokableAddresses(uint16_t& starting_instruction, cons
     return addresses;
 }
 
-string prepend(const string& base, const string& with) {
-    return (with + base);
-}
-
 unsigned extend(vector<string>& base, const vector<string>& v) {
     unsigned i = 0;
     for (; i < v.size(); ++i) {
@@ -823,7 +819,7 @@ vector<string> precompile(const vector<string>& lines) {
             vector<vector<string>> decoded_lines = decode_line(stripped_lines[i]);
             unsigned indent = (lines[i].size() - stripped_lines[i].size());
             for (unsigned i = 0; i < decoded_lines.size(); ++i) {
-                asm_lines.push_back(prepend(str::join<char>(decoded_lines[i], ' '), str::strmul<char>(' ', indent)));
+                asm_lines.push_back(str::join<char>(decoded_lines[i], ' ') + str::strmul<char>(' ', indent));
             }
         }
     }
