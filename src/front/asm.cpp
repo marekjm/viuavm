@@ -24,6 +24,9 @@ bool SHOW_VERSION = false;
 // are we assembling a library?
 bool AS_LIB = false;
 
+// are we just expanding the source to simple form?
+bool EXPAND_ONLY = false;
+
 bool VERBOSE = false;
 bool DEBUG = false;
 bool SCREAM = false;
@@ -847,6 +850,13 @@ int generate(const string& filename, string& compilename, const vector<string>& 
     while (getline(in, line)) { lines.push_back(line); }
 
     vector<string> expanded_lines = precompile(lines);
+    if (EXPAND_ONLY) {
+        for (unsigned i = 0; i < expanded_lines.size(); ++i) {
+            cout << expanded_lines[i] << endl;
+        }
+        return 0;
+    }
+
     vector<string> ilines = assembler::ce::getilines(expanded_lines);   // instruction lines
 
 
@@ -1610,6 +1620,8 @@ bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE)
              << "    " << "    --Eempty-function    - treat empty function as error\n"
              << "    " << "    --Eopless-frame      - treat frames without operands as errors\n"
              << "    " << "-c, --lib                - assemble as a library\n"
+             << "    " << "    --expand             - only expand the source code to simple form (one instruction per line)\n"
+             << "    " << "                           with this option, assembler prints expanded source to standard output\n"
              ;
     }
 
@@ -1680,6 +1692,9 @@ int main(int argc, char* argv[]) {
                 cout << "error: option '" << argv[i] << "' requires an argument: filename" << endl;
                 exit(1);
             }
+            continue;
+        } else if (option == "--expand") {
+            EXPAND_ONLY = true;
             continue;
         }
         args.push_back(argv[i]);
