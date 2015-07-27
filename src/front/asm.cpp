@@ -674,22 +674,6 @@ unsigned extend(vector<string>& base, const vector<string>& v) {
 }
 
 
-string stringify(const vector<string>& sv) {
-    ostringstream oss;
-    oss << '[';
-    for (unsigned i = 0; i < sv.size(); ++i) {
-        oss << '`' << sv[i] << "`, ";
-    }
-    oss << ']';
-    return oss.str();
-}
-string stringify(unsigned n) {
-    ostringstream oss;
-    oss << n << endl;
-    return oss.str();
-}
-
-
 vector<string> tokenize(const string& s) {
     vector<string> tokens;
     ostringstream token;
@@ -797,7 +781,7 @@ vector<vector<string>> decode_line_tokens(const vector<string>& tokens) {
             for (unsigned j = 0; j < sublines.size(); ++j) {
                 decoded_lines.push_back(sublines[j]);
             }
-            main_line.push_back(stringify(len));
+            main_line.push_back(str::stringify(len));
             ++i;
             continue;
         }

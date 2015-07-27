@@ -48,6 +48,10 @@ namespace str {
     unsigned lshare(const std::string& s, const std::string& w);
 
     std::string enquote(const std::string&);
+
+
+    std::string stringify(const std::vector<std::string>&);
+    std::string stringify(unsigned);
 }
 
 

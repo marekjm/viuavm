@@ -211,4 +211,24 @@ namespace str {
 
         return encoded.str();
     }
+
+
+    string stringify(const vector<string>& sv) {
+        ostringstream oss;
+        oss << '[';
+        unsigned sz = sv.size();
+        for (unsigned i = 0; i < sz; ++i) {
+            oss << enquote(sv[i]);
+            if (i < (sz-1)) {
+                oss << ", ";
+            }
+        }
+        oss << ']';
+        return oss.str();
+    }
+    string stringify(unsigned n) {
+        ostringstream oss;
+        oss << n << endl;
+        return oss.str();
+    }
 }
