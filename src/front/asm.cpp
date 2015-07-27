@@ -636,6 +636,278 @@ map<string, uint16_t> mapInvokableAddresses(uint16_t& starting_instruction, cons
 }
 
 
+string lstrip(const string& s) {
+    ostringstream stripped;
+    unsigned start = 0;
+    for (; start < s.size(); ++start) {
+        if (not (s[start] == ' ' or s[start] == '\t')) {
+            break;
+        }
+    }
+    for (unsigned i = start; i < s.size(); ++i) {
+        stripped << s[i];
+    }
+    return stripped.str();
+}
+
+bool startswith(const string&s, const string& base) {
+    bool it_does = true;
+    for (unsigned i = 0; i < base.size(); ++i) {
+        if (i >= s.size()) {
+            it_does = false;
+            break;
+        }
+        if (s[i] != base[i]) {
+            it_does = false;
+            break;
+        }
+    }
+    return it_does;
+}
+
+bool contains(const string&s, const char c) {
+    bool it_does = false;
+    for (unsigned i = 0; i < s.size(); ++i) {
+        if (s[i] == c) {
+            it_does = true;
+            break;
+        }
+    }
+    return it_does;
+}
+
+template<typename T> string join(const vector<string>& seq, const T& delim) {
+    unsigned sz = seq.size();
+    ostringstream oss;
+    for (unsigned i = 0; i < sz; ++i) {
+        oss << seq[i];
+        if (i < (sz-1)) {
+            oss << delim;
+        }
+    }
+    return oss.str();
+}
+
+template<typename T> string strmul(const T& s, unsigned times) {
+    ostringstream oss;
+    for (unsigned i = 0; i < times; ++i) {
+        oss << s;
+    }
+    return oss.str();
+}
+
+string prepend(const string& base, const string& with) {
+    return (with + base);
+}
+
+
+unsigned extend(vector<string>& base, const vector<string>& v) {
+    unsigned i = 0;
+    for (; i < v.size(); ++i) {
+        base.push_back(v[i]);
+    }
+    return i;
+}
+
+
+string stringify(const vector<string>& sv) {
+    ostringstream oss;
+    oss << '[';
+    for (unsigned i = 0; i < sv.size(); ++i) {
+        oss << '`' << sv[i] << "`, ";
+    }
+    oss << ']';
+    return oss.str();
+}
+string stringify(unsigned n) {
+    ostringstream oss;
+    oss << n << endl;
+    return oss.str();
+}
+
+
+vector<string> tokenize(const string& s) {
+    vector<string> tokens;
+    ostringstream token;
+    token.str("");
+    for (unsigned i = 0; i < s.size(); ++i) {
+        if (s[i] == ' ' and token.str().size()) {
+            tokens.push_back(token.str());
+            token.str("");
+            continue;
+        }
+        if (s[i] == ' ') {
+            continue;
+        }
+        if (s[i] == '^') {
+            if (token.str().size()) {
+                tokens.push_back(token.str());
+                token.str("");
+            }
+            tokens.push_back("^");
+        }
+        if (s[i] == '(' or s[i] == ')') {
+            if (token.str().size()) {
+                tokens.push_back(token.str());
+                token.str("");
+            }
+            tokens.push_back((s[i] == '(' ? "(" : ")"));
+            continue;
+        }
+        if (s[i] == '[' or s[i] == ']') {
+            if (token.str().size()) {
+                tokens.push_back(token.str());
+                token.str("");
+            }
+            tokens.push_back((s[i] == '[' ? "[" : "]"));
+            continue;
+        }
+        if (s[i] == '{' or s[i] == '}') {
+            if (token.str().size()) {
+                tokens.push_back(token.str());
+                token.str("");
+            }
+            tokens.push_back((s[i] == '{' ? "{" : "}"));
+            continue;
+        }
+        token << s[i];
+    }
+    if (token.str().size()) {
+        tokens.push_back(token.str());
+    }
+    return tokens;
+}
+
+vector<vector<string>> decode_line_tokens(const vector<string>& tokens) {
+    vector<vector<string>> decoded_lines;
+    vector<string> main_line;
+
+    unsigned i = 0;
+    bool invert = false;
+    while (i < tokens.size()) {
+        if (tokens[i] == "^") {
+            invert = true;
+            ++i;
+            continue;
+        }
+        if (tokens[i] == "(") {
+            vector<string> subtokens;
+            ++i;
+            int balance = 1;
+            while (i < tokens.size()) {
+                if (tokens[i] == "(") { ++balance; }
+                if (tokens[i] == ")") { --balance; }
+                if (balance == 0) { break; }
+                subtokens.push_back(tokens[i]);
+                ++i;
+            }
+            vector<vector<string>> sublines = decode_line_tokens(subtokens);
+            for (unsigned j = 0; j < sublines.size(); ++j) {
+                decoded_lines.push_back(sublines[j]);
+            }
+            main_line.push_back(sublines[sublines.size()-1][1]);
+            ++i;
+            continue;
+        }
+        if (tokens[i] == "[") {
+            vector<string> subtokens;
+            ++i;
+            int balance = 1;
+            int toplevel_subexpr_balance = 0;
+            unsigned len = 0;
+            while (i < tokens.size()) {
+                if (tokens[i] == "[") { ++balance; }
+                if (tokens[i] == "]") { --balance; }
+                if (tokens[i] == "(") {
+                    if ((++toplevel_subexpr_balance) == 1) { ++len; }
+                }
+                if (tokens[i] == ")") {
+                    --toplevel_subexpr_balance;
+                }
+                if (balance == 0) { break; }
+                subtokens.push_back(tokens[i]);
+                ++i;
+            }
+            vector<vector<string>> sublines = decode_line_tokens(subtokens);
+            sublines.pop_back();
+            for (unsigned j = 0; j < sublines.size(); ++j) {
+                decoded_lines.push_back(sublines[j]);
+            }
+            main_line.push_back(stringify(len));
+            ++i;
+            continue;
+        }
+        if (tokens[i] == "{") {
+            vector<string> subtokens;
+            ++i;
+            int balance = 1;
+            while (i < tokens.size()) {
+                if (tokens[i] == "{") { ++balance; }
+                if (tokens[i] == "}") { --balance; }
+                if (balance == 0) { break; }
+                subtokens.push_back(tokens[i]);
+                ++i;
+            }
+            vector<vector<string>> sublines = decode_line_tokens(subtokens);
+            sublines.pop_back();
+            for (unsigned j = 0; j < sublines.size(); ++j) {
+                decoded_lines.push_back(sublines[j]);
+                main_line.push_back(sublines[j][1]);
+            }
+            ++i;
+            continue;
+        }
+        main_line.push_back(tokens[i]);
+        ++i;
+    }
+
+    if (invert) {
+        decoded_lines.insert(decoded_lines.begin(), main_line);
+    } else {
+        decoded_lines.push_back(main_line);
+    }
+
+    return decoded_lines;
+}
+vector<vector<string>> decode_line(const string& s) {
+    return decode_line_tokens(tokenize(s));
+}
+
+
+vector<string> precompile(const vector<string>& lines) {
+    vector<string> stripped_lines;
+
+    for (unsigned i = 0; i < lines.size(); ++i) {
+        stripped_lines.push_back(lstrip(lines[i]));
+    }
+
+    vector<string> asm_lines;
+    for (unsigned i = 0; i < stripped_lines.size(); ++i) {
+        if (stripped_lines[i] == "") {
+            asm_lines.push_back(lines[i]);
+        } else if (startswith(stripped_lines[i], ".signature")) {
+            asm_lines.push_back(lines[i]);
+        } else if (startswith(stripped_lines[i], ".bsignature")) {
+            asm_lines.push_back(lines[i]);
+        } else if (startswith(stripped_lines[i], ".function")) {
+            asm_lines.push_back(lines[i]);
+        } else if (startswith(stripped_lines[i], ".end")) {
+            asm_lines.push_back(lines[i]);
+        } else if (stripped_lines[i][0] == ';') {
+            asm_lines.push_back(lines[i]);
+        } else if (not contains(stripped_lines[i], '(')) {
+            asm_lines.push_back(lines[i]);
+        } else {
+            vector<vector<string>> decoded_lines = decode_line(stripped_lines[i]);
+            unsigned indent = (lines[i].size() - stripped_lines[i].size());
+            for (unsigned i = 0; i < decoded_lines.size(); ++i) {
+                asm_lines.push_back(prepend(join<char>(decoded_lines[i], ' '), strmul<char>(' ', indent)));
+            }
+        }
+    }
+
+    return asm_lines;
+}
 
 int generate(const string& filename, string& compilename, const vector<string>& commandline_given_links) {
     ////////////////
@@ -647,11 +919,11 @@ int generate(const string& filename, string& compilename, const vector<string>& 
     }
 
     vector<string> lines;
-    vector<string> ilines;  // instruction lines
     string line;
-
     while (getline(in, line)) { lines.push_back(line); }
-    ilines = assembler::ce::getilines(lines);
+
+    vector<string> expanded_lines = precompile(lines);
+    vector<string> ilines = assembler::ce::getilines(expanded_lines);   // instruction lines
 
 
     //////////////////////////////

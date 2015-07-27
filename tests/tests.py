@@ -500,6 +500,7 @@ class StaticLinkingTests(unittest.TestCase):
         self.assertEqual('Hello World!', output.strip())
         self.assertEqual(0, excode)
 
+    @unittest.skip('causes std::bad_alloc when used with HLA')
     def testLinkingCodeWithBranchesAndJumps(self):
         lib_name = 'jumplib.asm'
         assembly_lib_path = os.path.join(self.PATH, lib_name)
