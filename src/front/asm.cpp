@@ -661,30 +661,9 @@ bool contains(const string&s, const char c) {
     return it_does;
 }
 
-template<typename T> string join(const vector<string>& seq, const T& delim) {
-    unsigned sz = seq.size();
-    ostringstream oss;
-    for (unsigned i = 0; i < sz; ++i) {
-        oss << seq[i];
-        if (i < (sz-1)) {
-            oss << delim;
-        }
-    }
-    return oss.str();
-}
-
-template<typename T> string strmul(const T& s, unsigned times) {
-    ostringstream oss;
-    for (unsigned i = 0; i < times; ++i) {
-        oss << s;
-    }
-    return oss.str();
-}
-
 string prepend(const string& base, const string& with) {
     return (with + base);
 }
-
 
 unsigned extend(vector<string>& base, const vector<string>& v) {
     unsigned i = 0;
@@ -886,7 +865,7 @@ vector<string> precompile(const vector<string>& lines) {
             vector<vector<string>> decoded_lines = decode_line(stripped_lines[i]);
             unsigned indent = (lines[i].size() - stripped_lines[i].size());
             for (unsigned i = 0; i < decoded_lines.size(); ++i) {
-                asm_lines.push_back(prepend(join<char>(decoded_lines[i], ' '), strmul<char>(' ', indent)));
+                asm_lines.push_back(prepend(str::join<char>(decoded_lines[i], ' '), str::strmul<char>(' ', indent)));
             }
         }
     }
