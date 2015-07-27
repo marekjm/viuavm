@@ -1,15 +1,7 @@
 .function: sum4
     ; this function takes four integers as parameters and
     ; adds them, and returns the sum
-    arg 1 0
-    arg 2 1
-    arg 3 2
-    arg 4 3
-
-    iadd 0 1 2
-    iadd 0 3 0
-    iadd 0 4 0
-
+    iadd 0 (arg 4 3) (iadd 0 (arg 3 2) (iadd 0 (arg 1 0) (arg 2 1)))
     end
 .end
 
@@ -69,42 +61,18 @@
 
 .function: main
     ; create the vector
-    vec 1
-
-    istore 2 20
-    vpush 1 2
-
-    istore 3 16
-    vpush 1 3
-
-    istore 4 8
-    vpush 1 4
-
-    istore 5 -2
-    vpush 1 5
+    vpush (vec 1) (istore 2 20)
+    vpush 1 (istore 3 16)
+    vpush 1 (istore 4 8)
+    vpush 1 (istore 5 -2)
 
     ; call sum/4() function
-    frame 4
-    param 0 2
-    param 1 3
-    param 2 4
-    param 3 5
-    call 6 sum4
-    print 6
+    frame ^[(param 0 2) (param 1 3) (param 2 4) (param 3 5)]
+    print (call 6 sum4)
 
-    function 7 sum4
-
-    istore 9 2
-    frame @9
-
-    izero 9
-    param @9 7
-    iinc 9
-    param @9 1
-
-    call 8 invoke
-
-    print 8
+    ; call sum/4 function via invoke/2 function
+    frame ^[(param 0 (function 7 sum4)) (param 1 1)]
+    print (call 8 invoke)
 
     izero 0
     end
