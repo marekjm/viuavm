@@ -635,18 +635,6 @@ map<string, uint16_t> mapInvokableAddresses(uint16_t& starting_instruction, cons
     return addresses;
 }
 
-
-bool contains(const string&s, const char c) {
-    bool it_does = false;
-    for (unsigned i = 0; i < s.size(); ++i) {
-        if (s[i] == c) {
-            it_does = true;
-            break;
-        }
-    }
-    return it_does;
-}
-
 string prepend(const string& base, const string& with) {
     return (with + base);
 }
@@ -829,7 +817,7 @@ vector<string> precompile(const vector<string>& lines) {
             asm_lines.push_back(lines[i]);
         } else if (stripped_lines[i][0] == ';') {
             asm_lines.push_back(lines[i]);
-        } else if (not contains(stripped_lines[i], '(')) {
+        } else if (not str::contains(stripped_lines[i], '(')) {
             asm_lines.push_back(lines[i]);
         } else {
             vector<vector<string>> decoded_lines = decode_line(stripped_lines[i]);

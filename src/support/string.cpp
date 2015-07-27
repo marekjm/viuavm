@@ -193,6 +193,16 @@ namespace str {
         }
         return share;
     }
+    bool contains(const string&s, const char c) {
+        bool it_does = false;
+        for (unsigned i = 0; i < s.size(); ++i) {
+            if (s[i] == c) {
+                it_does = true;
+                break;
+            }
+        }
+        return it_does;
+    }
 
 
     string enquote(const string& s) {
