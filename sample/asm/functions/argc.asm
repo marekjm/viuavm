@@ -1,12 +1,10 @@
 .function: print_number_of_params
-    argc 1
-    print 1
+    print (argc 1)
     end
 .end
 
 .function: main
-    argc 1
-    print 1
+    print (argc 1)
 
     izero 2
 
