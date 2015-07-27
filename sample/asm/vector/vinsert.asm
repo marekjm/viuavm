@@ -1,18 +1,5 @@
 .function: main
-    .name: 2 hurr
-    .name: 3 durr
-    .name: 4 ima
-    .name: 5 sheep
-
-    strstore durr "durr"
-    strstore ima "Im'a"
-
-    vec 1
-
-    vinsert 1 (strstore sheep "sheep!")
-    vinsert 1 (strstore hurr "Hurr")
-    vinsert 1 durr 1
-    vinsert 1 ima 2
+    vinsert (vinsert (vinsert (vinsert (vec 1) (strstore 5 "sheep!")) (strstore 2 "Hurr")) (strstore 3 "durr") 1) (strstore 4 "Im'a") 2
 
     ; this works OK
     ; this instruction is here for debugging - uncomment it to see the vector
