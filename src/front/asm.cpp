@@ -650,21 +650,6 @@ string lstrip(const string& s) {
     return stripped.str();
 }
 
-bool startswith(const string&s, const string& base) {
-    bool it_does = true;
-    for (unsigned i = 0; i < base.size(); ++i) {
-        if (i >= s.size()) {
-            it_does = false;
-            break;
-        }
-        if (s[i] != base[i]) {
-            it_does = false;
-            break;
-        }
-    }
-    return it_does;
-}
-
 bool contains(const string&s, const char c) {
     bool it_does = false;
     for (unsigned i = 0; i < s.size(); ++i) {
@@ -885,13 +870,13 @@ vector<string> precompile(const vector<string>& lines) {
     for (unsigned i = 0; i < stripped_lines.size(); ++i) {
         if (stripped_lines[i] == "") {
             asm_lines.push_back(lines[i]);
-        } else if (startswith(stripped_lines[i], ".signature")) {
+        } else if (str::startswith(stripped_lines[i], ".signature")) {
             asm_lines.push_back(lines[i]);
-        } else if (startswith(stripped_lines[i], ".bsignature")) {
+        } else if (str::startswith(stripped_lines[i], ".bsignature")) {
             asm_lines.push_back(lines[i]);
-        } else if (startswith(stripped_lines[i], ".function")) {
+        } else if (str::startswith(stripped_lines[i], ".function")) {
             asm_lines.push_back(lines[i]);
-        } else if (startswith(stripped_lines[i], ".end")) {
+        } else if (str::startswith(stripped_lines[i], ".end")) {
             asm_lines.push_back(lines[i]);
         } else if (stripped_lines[i][0] == ';') {
             asm_lines.push_back(lines[i]);
