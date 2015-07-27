@@ -825,7 +825,7 @@ vector<string> precompile(const vector<string>& lines) {
             vector<vector<string>> decoded_lines = decode_line(stripped_lines[i]);
             unsigned indent = (lines[i].size() - stripped_lines[i].size());
             for (unsigned i = 0; i < decoded_lines.size(); ++i) {
-                asm_lines.push_back(str::join<char>(decoded_lines[i], ' ') + str::strmul<char>(' ', indent));
+                asm_lines.push_back(str::strmul<char>(' ', indent) + str::join<char>(decoded_lines[i], ' '));
             }
         }
     }
