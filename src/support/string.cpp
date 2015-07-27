@@ -163,6 +163,10 @@ namespace str {
         for (unsigned i = 0; i < s.size(); ++i) {
             chnk << s[i];
             if (s[i] == quote and i > 0 and (backs % 2 == 0)) { break; }
+            if (s[i] == quote and i > 0 and (backs % 2 != 0)) {
+                backs = 0;
+                break;
+            }
             if (s[i] == '\\') { ++backs; }
             if (s[i] == quote) { backs = 0; }
         }
