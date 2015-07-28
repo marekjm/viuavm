@@ -28,19 +28,15 @@
 
     ; simple condition:
     ; while (loop_counter < vector_length) {
-    .name: 5 loop_condition
-    igte loop_condition loop_counter vector_length
-    branch loop_condition while_end while_body
+    branch (igte 5 loop_counter vector_length) while_end while_body
 
     .mark: while_body
 
-    ; store item located inside parameter vector at index denoted by loop_counter in
-    ; a register
     .name: 7 slot
-    vat slot 2 @loop_counter
-
-    ; add parameter
-    param @loop_counter slot
+    ; store item located inside parameter vector at index denoted by loop_counter in
+    ; a register and
+    ; pass it as a parameter
+    param @loop_counter (vat slot 2 @loop_counter)
 
     ; clear parameter slot
     empty slot
@@ -54,8 +50,7 @@
 
     ; finally, after the frame is ready
     ; call the function
-    fcall 8 1
-    move 0 8
+    move 0 (fcall 8 1)
     end
 .end
 
