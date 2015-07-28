@@ -1,5 +1,4 @@
 .function: main
-    istore 1 4
-    ret 1
+    ret (istore 1 4)
     end
 .end
