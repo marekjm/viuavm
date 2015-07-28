@@ -42,19 +42,12 @@
 
     ; while (...) {
     .mark: loop_begin
-    igte 6 4 5
-    branch 6 loop_end loop_body
+    branch (igte 6 4 5) loop_end
 
-    .mark: loop_body
-
-    ; call supplied function on current element
-    frame 1
-    vat 7 2 @4
-    param 0 7
-    fcall 8 1
-
-    ; push result to new vector
-    vpush 3 8
+    ; call supplied function on current element...
+    frame ^[(param 0 (vat 7 2 @4))]
+    ; ...and push result to new vector
+    vpush 3 (fcall 8 1)
 
     ; empty the register, as vat instruction creates references
     empty 7
@@ -75,29 +68,17 @@
 .function: main
     ; applies function square/1(int) to 5 and
     ; prints the result
-    vec 1
 
-    istore 2 1
-    vpush 1 2
-    istore 2 2
-    vpush 1 2
-    istore 2 3
-    vpush 1 2
-    istore 2 4
-    vpush 1 2
-    istore 2 5
-    vpush 1 2
+    vpush (vec 1) (istore 2 1)
+    vpush 1 (istore 2 2)
+    vpush 1 (istore 2 3)
+    vpush 1 (istore 2 4)
+    vpush 1 (istore 2 5)
 
     print 1
 
-    function 3 square
-
-    frame 2
-    param 0 3
-    paref 1 1
-    call 4 map
-
-    print 4
+    frame ^[(param 0 (function 3 square)) (paref 1 1)]
+    print (call 4 map)
 
     izero 0
     end
