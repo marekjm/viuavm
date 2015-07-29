@@ -225,6 +225,9 @@ byte* CPU::dispatch(byte* addr) {
         case CLASS:
             addr = vmclass(addr+1);
             break;
+        case REGISTER:
+            addr = vmregister(addr+1);
+            break;
         case HALT:
             throw HaltException();
             break;
