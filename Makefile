@@ -41,6 +41,8 @@ clean: clean-support clean-test-compiles
 	rm -f ./build/test/*
 	rm -f ./build/types/*.o
 	rm -f ./build/*.o
+	rm -f ./build/stdlib/lib/*.o
+	rm -f ./build/stdlib/lib/*.so
 
 clean-support:
 	rm -f ./build/support/*.o
