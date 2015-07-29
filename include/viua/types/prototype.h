@@ -43,7 +43,7 @@ class Prototype: public Type {
 
         virtual Type* copy() const;
 
-        Prototype(const std::string& tn) {}
+        Prototype(const std::string& tn): type_name(tn) {}
         virtual ~Prototype() {}
 };
 
