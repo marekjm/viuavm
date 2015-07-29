@@ -831,6 +831,18 @@ namespace cg {
             return addr_ptr;
         }
 
+        byte* vmclass(byte* addr_ptr, int_op reg, const string& class_name) {
+            /*  Inserts class instuction.
+             */
+            *(addr_ptr++) = CLASS;
+            addr_ptr = insertIntegerOperand(addr_ptr, reg);
+            for (unsigned i = 0; i < class_name.size(); ++i) {
+                *((char*)addr_ptr++) = class_name[i];
+            }
+            *(addr_ptr++) = '\0';
+            return addr_ptr;
+        }
+
         byte* end(byte* addr_ptr) {
             /*  Inserts end instruction.
              */
