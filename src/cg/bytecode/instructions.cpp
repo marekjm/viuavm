@@ -843,6 +843,14 @@ namespace cg {
             return addr_ptr;
         }
 
+        byte* vmregister(byte* addr_ptr, int_op regno) {
+            /*  Inserts register instuction.
+             */
+            *(addr_ptr++) = REGISTER;
+            addr_ptr = insertIntegerOperand(addr_ptr, regno);
+            return addr_ptr;
+        }
+
         byte* end(byte* addr_ptr) {
             /*  Inserts end instruction.
              */

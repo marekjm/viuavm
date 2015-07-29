@@ -713,6 +713,20 @@ Program& Program::link(string module_name) {
     return (*this);
 }
 
+Program& Program::vmclass(int_op reg, const string& class_name) {
+    /*  Inserts class instuction.
+     */
+    addr_ptr = cg::bytecode::vmclass(addr_ptr, reg, class_name);
+    return (*this);
+}
+
+Program& Program::vmregister(int_op reg) {
+    /*  Inserts register instuction.
+     */
+    addr_ptr = cg::bytecode::vmregister(addr_ptr, reg);
+    return (*this);
+}
+
 Program& Program::end() {
     /*  Inserts end instruction.
      */

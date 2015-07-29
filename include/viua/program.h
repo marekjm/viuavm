@@ -131,8 +131,11 @@ class Program {
     Program& vmthrow    (int_op);
     Program& leave      ();
 
-    Program& import   (std::string);
+    Program& import     (std::string);
     Program& link       (std::string);
+
+    Program& vmclass    (int_op, const std::string&);
+    Program& vmregister (int_op);
 
     Program& end        ();
     Program& halt       ();
