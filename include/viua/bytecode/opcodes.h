@@ -85,7 +85,6 @@ enum OPCODE : byte {
     TMPRO,  // temporary register out - move object out of the temporary
             // to current register set
 
-    // printing
     PRINT,
     ECHO,
 
@@ -114,9 +113,8 @@ enum OPCODE : byte {
                 // TRY instructions do not require any CATCH to precede them
     LEAVE,      // leave a block and resume execution after block-entering instruction
 
-    // Opcodes dealing with external C/C++ modules
-    IMPORT,     // import external library
-    LINK,
+    IMPORT,     // dynamically link foreign library
+    LINK,       // dynamically link native library
 
     CLASS,      // create a prototype for new class
     PROTOTYPE,  // create a prototype from existing class
