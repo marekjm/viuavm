@@ -22,6 +22,8 @@ class Prototype: public Type {
         virtual std::string type() const;
         virtual bool boolean() const;
 
+        std::string getTypeName() const;
+
         // attach a function as a method to the prototype
         Prototype* attach(const std::string&, const std::string&);
 

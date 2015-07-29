@@ -15,3 +15,8 @@ Type* Prototype::copy() const {
     Prototype* cp = new Prototype(type_name);
     return cp;
 }
+
+
+string Prototype::getTypeName() const {
+    return type_name;
+}
