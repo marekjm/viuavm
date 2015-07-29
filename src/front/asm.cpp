@@ -595,6 +595,14 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string str_chnk;
             str_chnk = str::chunk(operands);
             program.link(str_chnk);
+        } else if (str::startswith(line, "class")) {
+            string class_name, reg;
+            tie(reg, class_name) = assembler::operands::get2(operands);
+            program.vmclass(assembler::operands::getint(resolveregister(reg, names)), class_name);
+        } else if (str::startswith(line, "register")) {
+            string regno_chnk;
+            regno_chnk = str::chunk(operands);
+            program.vmregister(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "end")) {
             program.end();
         } else if (str::startswith(line, "halt")) {
