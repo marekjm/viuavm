@@ -1,13 +1,11 @@
 .function: one
-    istore 1 42
-    print 1
+    print (istore 1 42)
     izero 0
     ; no end here
 .end
 
 .function: main
-    frame 0 2
-    call one
+    call (frame 0 2) one
     izero 0
     end
 .end

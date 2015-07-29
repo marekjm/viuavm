@@ -1,19 +1,16 @@
 .function: main
-    arg 1 0
-
     .name: 2 len
     .name: 3 counter
 
-    vlen len 1
+    vlen len (arg 1 0)
     istore counter 0
 
     .mark: loop
-    ilt 4 counter len
-    branch 4 inside break
-    .mark: inside
-    vat 5 1 @counter
-    print 5
+    branch (ilt 4 counter len) +1 break
+
+    print (vat 5 1 @counter)
     empty 5
+
     iinc counter
     jump loop
 

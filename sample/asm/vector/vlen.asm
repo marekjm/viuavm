@@ -1,19 +1,8 @@
 .function: main
     istore 1 0
 
-    vec 2
-
-    vpush 2 1
-    vpush 2 1
-    vpush 2 1
-    vpush 2 1
-    vpush 2 1
-    vpush 2 1
-    vpush 2 1
-    vpush 2 1
-
-    vlen 3 2
-    print 3
+    vpush (vpush (vpush (vpush (vpush (vpush (vpush (vpush (vec 2) 1) 1) 1) 1) 1) 1) 1) 1
+    print (vlen 3 2)
 
     izero 0
     end

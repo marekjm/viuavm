@@ -3,8 +3,7 @@
     arg 1 0
 
     .mark: loop_begin
-    ilt 3 1 bound_variable
-    branch 3 loop_end loop_body
+    branch (ilt 3 1 bound_variable) loop_end loop_body
 
     .mark: loop_body
     isub 1 1 bound_variable
@@ -12,23 +11,15 @@
 
     .mark: loop_end
 
-    move 0 1
-
     ; make zero "true" and
     ; non-zero values "false"
-    not 0
-
-    end
-    izero 0
-    not 0
+    not (move 0 1)
     end
 .end
 
 .function: is_divisible_by_2
-    arg 2 0
-    clbind 2
-    closure 1 is_divisible_by
-    move 0 1
+    clbind (arg 2 0)
+    move 0 (closure 1 is_divisible_by)
     end
 .end
 
@@ -50,16 +41,11 @@
 
     ; while (...) {
     .mark: loop_begin
-    igte 6 4 5
-    branch 6 loop_end loop_body
-
-    .mark: loop_body
+    branch (igte 6 4 5) loop_end
 
     ; call filtering function to determine whether current element
     ; is a valid value
-    frame 1 0
-    vat 7 2 @4
-    param 0 7
+    frame ^[(param 0 (vat 7 2 @4))] 0
     fcall 8 1
 
     ; if the result from filtering function was "true" - the element should be pushed onto result vector
@@ -87,32 +73,19 @@
 .end
 
 .function: main
-    vec 1
-
-    istore 2 1
-    vpush 1 2
-    istore 2 2
-    vpush 1 2
-    istore 2 3
-    vpush 1 2
-    istore 2 4
-    vpush 1 2
-    istore 2 5
-    vpush 1 2
+    vpush (vec 1) (istore 2 1)
+    vpush 1 (istore 2 2)
+    vpush 1 (istore 2 3)
+    vpush 1 (istore 2 4)
+    vpush 1 (istore 2 5)
 
     print 1
 
-    istore 5 2
-    frame 1
-    param 0 5
+    frame ^[(param 0 (istore 5 2))]
     call 3 is_divisible_by_2
 
-    frame 2
-    param 0 3
-    paref 1 1
-    call 4 filter_closure
-
-    print 4
+    frame ^[(param 0 3) (paref 1 1)]
+    print (call 4 filter_closure)
 
     izero 0
     end

@@ -1,21 +1,12 @@
 .function: jumprint
-    ; FIXME: jump instructions are calculated incorrectly
-    arg 1 0
-    print 1
-
-    istore 2 42
-    ilt 2 2 1
-    branch 2 lesser greater_or_equal
-
-    .mark: greater_or_equal
+    branch (ilt 2 (istore 2 42) (arg 1 0)) lesser
     strstore 3 ":-)"
-    jump finish
+    jump +2
 
     .mark: lesser
     strstore 3 ":-("
-    jump finish
 
-    .mark: finish
+    print 1
     print 3
     end
 .end

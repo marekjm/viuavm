@@ -17,13 +17,7 @@ Type* math_sqrt(Frame* frame, RegisterSet*, RegisterSet*) {
         throw new Exception("invalid type of parameter 0: expected Float");
     }
 
-    Type* prm = frame->args->at(0);
-    Float* flt = 0;
-    if ((flt = dynamic_cast<Float*>(prm)) == 0) {
-        throw new Exception("failed dynamic_cast<Float*>(" + prm->repr() + ")");
-    }
-
-    float square_root = sqrt(flt->value());
+    float square_root = sqrt(static_cast<Float*>(frame->args->at(0))->value());
     frame->regset->set(0, new Float(square_root));
     return 0;
 }

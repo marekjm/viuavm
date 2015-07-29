@@ -12,18 +12,12 @@
     ; store the int, of which we want to get an absolute value
     istore number -17
 
-    ; compare the int to zero
-    istore zero 0
-    ilt is_negative number zero
-
     ; if the int is less than zero, multiply it by -1
     ; else, branch directly to print instruction
     ; the negation of boolean is just to use short form of branch
     ; instruction - this construction starts emerging as a pattern...
-    not is_negative
-    branch is_negative final_print
-    istore 4 -1
-    imul 1 4
+    branch (not (ilt is_negative number (istore zero 0))) final_print
+    imul 1 (istore 4 -1)
 
     .mark: final_print
     print number

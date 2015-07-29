@@ -24,6 +24,9 @@ bool SHOW_VERSION = false;
 // are we assembling a library?
 bool AS_LIB = false;
 
+// are we just expanding the source to simple form?
+bool EXPAND_ONLY = false;
+
 bool VERBOSE = false;
 bool DEBUG = false;
 bool SCREAM = false;
@@ -635,7 +638,183 @@ map<string, uint16_t> mapInvokableAddresses(uint16_t& starting_instruction, cons
     return addresses;
 }
 
+unsigned extend(vector<string>& base, const vector<string>& v) {
+    unsigned i = 0;
+    for (; i < v.size(); ++i) {
+        base.push_back(v[i]);
+    }
+    return i;
+}
 
+
+vector<string> tokenize(const string& s) {
+    vector<string> tokens;
+    ostringstream token;
+    token.str("");
+    for (unsigned i = 0; i < s.size(); ++i) {
+        if (s[i] == ' ' and token.str().size()) {
+            tokens.push_back(token.str());
+            token.str("");
+            continue;
+        }
+        if (s[i] == ' ') {
+            continue;
+        }
+        if (s[i] == '^') {
+            if (token.str().size()) {
+                tokens.push_back(token.str());
+                token.str("");
+            }
+            tokens.push_back("^");
+        }
+        if (s[i] == '(' or s[i] == ')') {
+            if (token.str().size()) {
+                tokens.push_back(token.str());
+                token.str("");
+            }
+            tokens.push_back((s[i] == '(' ? "(" : ")"));
+            continue;
+        }
+        if (s[i] == '[' or s[i] == ']') {
+            if (token.str().size()) {
+                tokens.push_back(token.str());
+                token.str("");
+            }
+            tokens.push_back((s[i] == '[' ? "[" : "]"));
+            continue;
+        }
+        if (s[i] == '{' or s[i] == '}') {
+            if (token.str().size()) {
+                tokens.push_back(token.str());
+                token.str("");
+            }
+            tokens.push_back((s[i] == '{' ? "{" : "}"));
+            continue;
+        }
+        if (s[i] == '"' or s[i] == '\'') {
+            string ss = str::extract(s.substr(i));
+            i += (ss.size()-1);
+            tokens.push_back(ss);
+            continue;
+        }
+        token << s[i];
+    }
+    if (token.str().size()) {
+        tokens.push_back(token.str());
+    }
+    return tokens;
+}
+
+vector<vector<string>> decode_line_tokens(const vector<string>& tokens) {
+    vector<vector<string>> decoded_lines;
+    vector<string> main_line;
+
+    unsigned i = 0;
+    bool invert = false;
+    while (i < tokens.size()) {
+        if (tokens[i] == "^") {
+            invert = true;
+            ++i;
+            continue;
+        }
+        if (tokens[i] == "(") {
+            vector<string> subtokens;
+            ++i;
+            int balance = 1;
+            while (i < tokens.size()) {
+                if (tokens[i] == "(") { ++balance; }
+                if (tokens[i] == ")") { --balance; }
+                if (balance == 0) { break; }
+                subtokens.push_back(tokens[i]);
+                ++i;
+            }
+            vector<vector<string>> sublines = decode_line_tokens(subtokens);
+            for (unsigned j = 0; j < sublines.size(); ++j) {
+                decoded_lines.push_back(sublines[j]);
+            }
+            main_line.push_back(sublines[sublines.size()-1][1]);
+            ++i;
+            continue;
+        }
+        if (tokens[i] == "[") {
+            vector<string> subtokens;
+            ++i;
+            int balance = 1;
+            int toplevel_subexpr_balance = 0;
+            unsigned len = 0;
+            while (i < tokens.size()) {
+                if (tokens[i] == "[") { ++balance; }
+                if (tokens[i] == "]") { --balance; }
+                if (tokens[i] == "(") {
+                    if ((++toplevel_subexpr_balance) == 1) { ++len; }
+                }
+                if (tokens[i] == ")") {
+                    --toplevel_subexpr_balance;
+                }
+                if (balance == 0) { break; }
+                subtokens.push_back(tokens[i]);
+                ++i;
+            }
+            vector<vector<string>> sublines = decode_line_tokens(subtokens);
+            sublines.pop_back();
+            for (unsigned j = 0; j < sublines.size(); ++j) {
+                decoded_lines.push_back(sublines[j]);
+            }
+            main_line.push_back(str::stringify(len));
+            ++i;
+            continue;
+        }
+        main_line.push_back(tokens[i]);
+        ++i;
+    }
+
+    if (invert) {
+        decoded_lines.insert(decoded_lines.begin(), main_line);
+    } else {
+        decoded_lines.push_back(main_line);
+    }
+
+    return decoded_lines;
+}
+vector<vector<string>> decode_line(const string& s) {
+    return decode_line_tokens(tokenize(s));
+}
+
+
+vector<string> precompile(const vector<string>& lines) {
+    vector<string> stripped_lines;
+
+    for (unsigned i = 0; i < lines.size(); ++i) {
+        stripped_lines.push_back(str::lstrip(lines[i]));
+    }
+
+    vector<string> asm_lines;
+    for (unsigned i = 0; i < stripped_lines.size(); ++i) {
+        if (stripped_lines[i] == "") {
+            asm_lines.push_back(lines[i]);
+        } else if (str::startswith(stripped_lines[i], ".signature")) {
+            asm_lines.push_back(lines[i]);
+        } else if (str::startswith(stripped_lines[i], ".bsignature")) {
+            asm_lines.push_back(lines[i]);
+        } else if (str::startswith(stripped_lines[i], ".function")) {
+            asm_lines.push_back(lines[i]);
+        } else if (str::startswith(stripped_lines[i], ".end")) {
+            asm_lines.push_back(lines[i]);
+        } else if (stripped_lines[i][0] == ';') {
+            asm_lines.push_back(lines[i]);
+        } else if (not str::contains(stripped_lines[i], '(')) {
+            asm_lines.push_back(lines[i]);
+        } else {
+            vector<vector<string>> decoded_lines = decode_line(stripped_lines[i]);
+            unsigned indent = (lines[i].size() - stripped_lines[i].size());
+            for (unsigned i = 0; i < decoded_lines.size(); ++i) {
+                asm_lines.push_back(str::strmul<char>(' ', indent) + str::join<char>(decoded_lines[i], ' '));
+            }
+        }
+    }
+
+    return asm_lines;
+}
 
 int generate(const string& filename, string& compilename, const vector<string>& commandline_given_links) {
     ////////////////
@@ -647,11 +826,18 @@ int generate(const string& filename, string& compilename, const vector<string>& 
     }
 
     vector<string> lines;
-    vector<string> ilines;  // instruction lines
     string line;
-
     while (getline(in, line)) { lines.push_back(line); }
-    ilines = assembler::ce::getilines(lines);
+
+    vector<string> expanded_lines = precompile(lines);
+    if (EXPAND_ONLY) {
+        for (unsigned i = 0; i < expanded_lines.size(); ++i) {
+            cout << expanded_lines[i] << endl;
+        }
+        return 0;
+    }
+
+    vector<string> ilines = assembler::ce::getilines(expanded_lines);   // instruction lines
 
 
     //////////////////////////////
@@ -667,7 +853,7 @@ int generate(const string& filename, string& compilename, const vector<string>& 
     // CALLS TO UNDEFINED FUNCTIONS
     vector<string> function_names;
     try {
-        function_names = assembler::ce::getFunctionNames(lines);
+        function_names = assembler::ce::getFunctionNames(expanded_lines);
     } catch (const string& e) {
         cout << "fatal: " << e << endl;
         return 1;
@@ -675,7 +861,7 @@ int generate(const string& filename, string& compilename, const vector<string>& 
 
     vector<string> function_signatures;
     try {
-        function_signatures = assembler::ce::getSignatures(lines);
+        function_signatures = assembler::ce::getSignatures(expanded_lines);
     } catch (const string& e) {
         cout << "fatal: " << e << endl;
         return 1;
@@ -686,7 +872,7 @@ int generate(const string& filename, string& compilename, const vector<string>& 
     // GATHER BLOCK NAMES
     vector<string> block_names;
     try {
-        block_names = assembler::ce::getBlockNames(lines);
+        block_names = assembler::ce::getBlockNames(expanded_lines);
     } catch (const string& e) {
         cout << "fatal: " << e << endl;
         return 1;
@@ -694,7 +880,7 @@ int generate(const string& filename, string& compilename, const vector<string>& 
 
     vector<string> block_signatures;
     try {
-        block_signatures = assembler::ce::getBlockSignatures(lines);
+        block_signatures = assembler::ce::getBlockSignatures(expanded_lines);
     } catch (const string& e) {
         cout << "fatal: " << e << endl;
         return 1;
@@ -747,23 +933,23 @@ int generate(const string& filename, string& compilename, const vector<string>& 
     ///////////////////////////////////////////
     // INITIAL VERIFICATION OF CODE CORRECTNESS
     string report;
-    if ((report = assembler::verify::directives(lines)).size()) {
+    if ((report = assembler::verify::directives(expanded_lines)).size()) {
         cout << report << endl;
         exit(1);
     }
-    if ((report = assembler::verify::instructions(lines)).size()) {
+    if ((report = assembler::verify::instructions(expanded_lines)).size()) {
         cout << report << endl;
         exit(1);
     }
-    if ((report = assembler::verify::ressInstructions(lines, AS_LIB)).size()) {
+    if ((report = assembler::verify::ressInstructions(expanded_lines, AS_LIB)).size()) {
         cout << report << endl;
         exit(1);
     }
-    if ((report = assembler::verify::functionBodiesAreNonempty(lines, functions)).size()) {
+    if ((report = assembler::verify::functionBodiesAreNonempty(expanded_lines, functions)).size()) {
         cout << report << endl;
         exit(1);
     }
-    if ((report = assembler::verify::blockTries(lines, block_names, block_signatures)).size()) {
+    if ((report = assembler::verify::blockTries(expanded_lines, block_names, block_signatures)).size()) {
         cout << report << endl;
         exit(1);
     }
@@ -771,8 +957,8 @@ int generate(const string& filename, string& compilename, const vector<string>& 
 
     ////////////////////////////
     // VERIFY FRAME INSTRUCTIONS
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        line = str::lstrip(lines[i]);
+    for (unsigned i = 0; i < expanded_lines.size(); ++i) {
+        line = str::lstrip(expanded_lines[i]);
         if (not str::startswith(line, "frame")) {
             continue;
         }
@@ -950,15 +1136,15 @@ int generate(const string& filename, string& compilename, const vector<string>& 
     /////////////////////////////////////////////////////////////////////////
     // AFTER HAVING OBTAINED LINKED NAMES, IT IS POSSIBLE TO VERIFY CALLS AND
     // CALLABLE (FUNCTIONS, CLOSURES, ETC.) CREATIONS
-    if ((report = assembler::verify::functionCallsAreDefined(lines, function_names, function_signatures)).size()) {
+    if ((report = assembler::verify::functionCallsAreDefined(expanded_lines, function_names, function_signatures)).size()) {
         cout << report << endl;
         exit(1);
     }
-    if ((report = assembler::verify::frameBalance(lines)).size()) {
+    if ((report = assembler::verify::frameBalance(expanded_lines)).size()) {
         cout << report << endl;
         exit(1);
     }
-    if ((report = assembler::verify::callableCreations(lines, function_names, function_signatures)).size()) {
+    if ((report = assembler::verify::callableCreations(expanded_lines, function_names, function_signatures)).size()) {
         cout << report << endl;
         exit(1);
     }
@@ -1414,6 +1600,8 @@ bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE)
              << "    " << "    --Eempty-function    - treat empty function as error\n"
              << "    " << "    --Eopless-frame      - treat frames without operands as errors\n"
              << "    " << "-c, --lib                - assemble as a library\n"
+             << "    " << "    --expand             - only expand the source code to simple form (one instruction per line)\n"
+             << "    " << "                           with this option, assembler prints expanded source to standard output\n"
              ;
     }
 
@@ -1484,6 +1672,9 @@ int main(int argc, char* argv[]) {
                 cout << "error: option '" << argv[i] << "' requires an argument: filename" << endl;
                 exit(1);
             }
+            continue;
+        } else if (option == "--expand") {
+            EXPAND_ONLY = true;
             continue;
         }
         args.push_back(argv[i]);

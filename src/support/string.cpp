@@ -152,14 +152,21 @@ namespace str {
          *  Consider this string: `"Hello 'Beautiful' World!" some other (42) things;`.
          *  str::extract(<that string>) will return `"Hello 'Beautiful' World!"`.
          */
-        ostringstream chnk;
+        if (s.size() == 0) {
+            return string("");
+        }
 
+        ostringstream chnk;
         char quote = s[0];
         int backs = 0;
 
         for (unsigned i = 0; i < s.size(); ++i) {
             chnk << s[i];
             if (s[i] == quote and i > 0 and (backs % 2 == 0)) { break; }
+            if (s[i] == quote and i > 0 and (backs % 2 != 0)) {
+                backs = 0;
+                break;
+            }
             if (s[i] == '\\') { ++backs; }
             if (s[i] == quote) { backs = 0; }
         }
@@ -173,11 +180,10 @@ namespace str {
          */
         unsigned i = 0;
         while (i < s.size()) {
-            if (s[i] == *" " or s[i] == *"\t" or s[i] == *"\v" or s[i] == *"\n") {
-                ++i;
-            } else {
+            if (not (s[i] == ' ' or s[i] == '\t' or s[i] == '\v' or s[i] == '\n')) {
                 break;
-            }
+            };
+            ++i;
         }
         return sub(s, i);
     }
@@ -193,6 +199,16 @@ namespace str {
             }
         }
         return share;
+    }
+    bool contains(const string&s, const char c) {
+        bool it_does = false;
+        for (unsigned i = 0; i < s.size(); ++i) {
+            if (s[i] == c) {
+                it_does = true;
+                break;
+            }
+        }
+        return it_does;
     }
 
 
@@ -210,5 +226,25 @@ namespace str {
         encoded << closing;
 
         return encoded.str();
+    }
+
+
+    string stringify(const vector<string>& sv) {
+        ostringstream oss;
+        oss << '[';
+        unsigned sz = sv.size();
+        for (unsigned i = 0; i < sz; ++i) {
+            oss << enquote(sv[i]);
+            if (i < (sz-1)) {
+                oss << ", ";
+            }
+        }
+        oss << ']';
+        return oss.str();
+    }
+    string stringify(unsigned n) {
+        ostringstream oss;
+        oss << n << endl;
+        return oss.str();
     }
 }

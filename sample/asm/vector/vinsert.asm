@@ -1,20 +1,5 @@
 .function: main
-    .name: 2 hurr
-    .name: 3 durr
-    .name: 4 ima
-    .name: 5 sheep
-
-    strstore hurr "Hurr"
-    strstore durr "durr"
-    strstore ima "Im'a"
-    strstore sheep "sheep!"
-
-    vec 1
-
-    vinsert 1 sheep
-    vinsert 1 hurr
-    vinsert 1 durr 1
-    vinsert 1 ima 2
+    vinsert (vinsert (vinsert (vinsert (vec 1) (strstore 5 "sheep!")) (strstore 2 "Hurr")) (strstore 3 "durr") 1) (strstore 4 "Im'a") 2
 
     ; this works OK
     ; this instruction is here for debugging - uncomment it to see the vector
@@ -27,11 +12,8 @@
     vlen len 1
 
     .mark: loop
-    ilt 8 counter len
-    branch 8 inside break
-    .mark: inside
-    vat 9 1 @counter
-    print 9
+    branch (ilt 8 counter len) +1 break
+    print (vat 9 1 @counter)
     ; empty must be done or second print would fail with a segfault!
     ; VATed registers are references!
     empty 9

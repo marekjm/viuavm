@@ -7,14 +7,10 @@
     arg zero 1
 
     ; decrease counter and check if it's less than zero
-    idec counter
-    ilt 3 counter zero
-
-    branch 3 break_rec
+    branch (ilt 3 (idec counter) zero) break_rec
     print counter
-    frame 2
-    param 0 counter
-    paref 1 zero
+
+    frame ^[(param 0 counter) (paref 1 zero)]
     call rec__VOID__INT__INT
 
     .mark: break_rec
@@ -22,14 +18,8 @@
 .end
 
 .function: main
-    ; setup parameters
-    istore 1 10
-    istore 2 0
-
-    ; create frame and pass parameters
-    frame 2
-    param 0 1
-    paref 1 2
+    ; create frame and set initial parameters
+    frame ^[(param 0 (istore 1 10)) (paref 1 (istore 2 0))]
     call rec__VOID__INT__INT
 
     izero 0
