@@ -561,24 +561,6 @@ class AssemblerErrorTests(unittest.TestCase):
     """
     PATH = './sample/asm/errors'
 
-    @unittest.skip('due to changes in report formatting')
-    def testStackTracePrinting(self):
-        name = 'stacktrace.asm'
-        lines = [
-            'stack trace: from entry point...',
-            "  called function: 'main'",
-            "  called function: 'baz'",
-            "  called function: 'bar'",
-            "  called function: 'foo'",
-            "exception in function 'foo': RuntimeException: read from null register: 1",
-        ]
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        assemble(assembly_path, compiled_path)
-        excode, output = run(compiled_path, 1)
-        self.assertEqual(lines, output.strip().splitlines())
-        self.assertEqual(1, excode)
-
     def testNoEndBetweenDefs(self):
         name = 'no_end_between_defs.asm'
         assembly_path = os.path.join(self.PATH, name)
