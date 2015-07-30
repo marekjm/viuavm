@@ -23,6 +23,7 @@ class Prototype: public Type {
         virtual bool boolean() const;
 
         std::string getTypeName() const;
+        std::vector<std::string> getAncestors() const;
 
         // attach a function as a method to the prototype
         Prototype* attach(const std::string&, const std::string&);

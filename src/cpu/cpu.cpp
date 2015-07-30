@@ -376,6 +376,13 @@ void CPU::loadForeignLibrary(const string& module) {
 }
 
 
+vector<string> CPU::inheritanceChainOf(const string& type_name) {
+    /** This methods returns full inheritance chain of a type.
+     */
+    vector<string> ichain = typesystem.at(type_name)->getAncestors();
+    return ichain;
+}
+
 byte* CPU::begin() {
     /** Set instruction pointer to the execution beginning position.
      */
@@ -506,8 +513,22 @@ byte* CPU::tick() {
     if (thrown != 0) {
         for (unsigned i = tryframes.size(); i > 0; --i) {
             tframe = tryframes[(i-1)];
-            if (tframe->catchers.count(thrown->type())) {
-                instruction_pointer = tframe->catchers.at(thrown->type())->block_address;
+            string handler_found_for_type = thrown->type();
+            bool handler_found = tframe->catchers.count(handler_found_for_type);
+
+            if ((not handler_found) and typesystem.count(handler_found_for_type)) {
+                vector<string> types_to_check = inheritanceChainOf(handler_found_for_type);
+                for (unsigned j = 0; j < types_to_check.size(); ++j) {
+                    if (tframe->catchers.count(types_to_check[j])) {
+                        handler_found = true;
+                        handler_found_for_type = types_to_check[j];
+                        break;
+                    }
+                }
+            }
+
+            if (handler_found) {
+                instruction_pointer = tframe->catchers.at(handler_found_for_type)->block_address;
 
                 unsigned distance = 0;
                 for (int j = (frames.size()-1); j >= 0; --j) {

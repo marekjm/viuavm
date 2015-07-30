@@ -116,8 +116,14 @@ class CPU {
     // call foreign (i.e. from a C++ extension) function
     byte* callForeign(byte*, const std::string&, const bool&, const int&);
 
+    /*  Methods dealing with dynamic library loading.
+     */
     void loadNativeLibrary(const std::string&);
     void loadForeignLibrary(const std::string&);
+
+    /*  Methods dealing with typesystem related tasks.
+     */
+    std::vector<std::string> inheritanceChainOf(const std::string&);
 
     /*  Methods implementing CPU instructions.
      */
