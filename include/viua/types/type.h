@@ -28,7 +28,7 @@ class Type {
             return "Type";
         }
         virtual std::string str() const {
-            /*  By default, Wudoo provides string output a la Python.
+            /*  By default, Viua provides string output a la Python.
              *  This means - type of the object and its location in memory.
              */
             std::ostringstream s;
