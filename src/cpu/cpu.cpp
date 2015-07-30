@@ -12,6 +12,7 @@
 #include <viua/types/vector.h>
 #include <viua/types/exception.h>
 #include <viua/support/pointer.h>
+#include <viua/support/string.h>
 #include <viua/support/env.h>
 #include <viua/loader.h>
 #include <viua/include/module.h>
@@ -376,10 +377,25 @@ void CPU::loadForeignLibrary(const string& module) {
 }
 
 
-vector<string> CPU::inheritanceChainOf(const string& type_name) {
+vector<string> CPU::inheritanceChainOf(const string& type_name, const unordered_set<string>& already_in) {
     /** This methods returns full inheritance chain of a type.
      */
     vector<string> ichain = typesystem.at(type_name)->getAncestors();
+    unordered_set<string> already_pushed;
+    for (unsigned i = 0; i < ichain.size(); ++i) {
+        if (already_pushed.count(ichain[i]) or already_in.count(ichain[i])) {
+            continue;
+        }
+        vector<string> sub_ichain = inheritanceChainOf(ichain[i], already_pushed);
+        for (unsigned j = 0; j < sub_ichain.size(); ++j) {
+            if (already_pushed.count(sub_ichain[j]) or already_in.count(sub_ichain[j])) {
+                continue;
+            }
+            already_pushed.insert(sub_ichain[j]);
+            ichain.push_back(sub_ichain[j]);
+        }
+    }
+
     return ichain;
 }
 

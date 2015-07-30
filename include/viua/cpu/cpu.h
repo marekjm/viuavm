@@ -8,6 +8,7 @@
 #include <vector>
 #include <map>
 #include <tuple>
+#include <unordered_set>
 #include <utility>
 #include <algorithm>
 #include <stdexcept>
@@ -123,7 +124,7 @@ class CPU {
 
     /*  Methods dealing with typesystem related tasks.
      */
-    std::vector<std::string> inheritanceChainOf(const std::string&);
+    std::vector<std::string> inheritanceChainOf(const std::string&, const std::unordered_set<std::string>& = {});
 
     /*  Methods implementing CPU instructions.
      */
