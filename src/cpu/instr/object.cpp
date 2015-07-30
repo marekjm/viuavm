@@ -27,6 +27,10 @@ byte* CPU::vmnew(byte* addr) {
         reg = static_cast<Integer*>(fetch(reg))->value();
     }
 
+    if (typesystem.count(class_name) == 0) {
+        throw new Exception("cannot create new instance of unregistered type: " + class_name);
+    }
+
     place(reg, new Object(class_name));
 
     return addr;

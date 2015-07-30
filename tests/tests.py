@@ -562,7 +562,10 @@ class PrototypeSystemTests(unittest.TestCase):
     PATH = './sample/asm/prototype'
 
     def testSimplePrototypeRegistrationAndInstantation(self):
-        runTest(self, 'simple.asm', ["<'Prototype' object at", "<'Prototype' object at"], 0, lambda o: [' '.join(i.split()[:-1]) for i in o.splitlines()])
+        runTest(self, 'simple.asm', ["<'Prototype' object at", "<'Custom' object at"], 0, lambda o: [' '.join(i.split()[:-1]) for i in o.splitlines()])
+
+    def testExceptionThrownOnUnknownTypeInstantation(self):
+        runTest(self, 'unregistered_type_instantation.asm', "cannot create new instance of unregistered type: Nonexistent")
 
 
 class AssemblerErrorTests(unittest.TestCase):
