@@ -76,6 +76,7 @@ byte* CPU::vmregister(byte* addr) {
 
     Prototype* new_proto = static_cast<Prototype*>(fetch(reg));
     typesystem[new_proto->getTypeName()] = new_proto;
+    uregset->empty(reg);
 
     return addr;
 }

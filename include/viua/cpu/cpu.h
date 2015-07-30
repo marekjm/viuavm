@@ -298,6 +298,7 @@ class CPU {
                 static_registers.erase(rkey);
                 delete rset;
             }
+
             std::map<std::string, std::pair<unsigned, byte*> >::iterator lm = linked_modules.begin();
             while (lm != linked_modules.end()) {
                 std::string lkey = lm->first;
@@ -307,6 +308,17 @@ class CPU {
 
                 linked_modules.erase(lkey);
                 delete[] ptr;
+            }
+
+            std::map<std::string, Prototype*>::iterator pr = typesystem.begin();
+            while (pr != typesystem.end()) {
+                std::string proto_name = pr->first;
+                Prototype* proto_ptr = pr->second;
+
+                ++pr;
+
+                typesystem.erase(proto_name);
+                delete proto_ptr;
             }
         }
 };
