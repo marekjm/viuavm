@@ -567,6 +567,9 @@ class PrototypeSystemTests(unittest.TestCase):
     def testExceptionThrownOnUnknownTypeInstantation(self):
         runTest(self, 'unregistered_type_instantation.asm', "cannot create new instance of unregistered type: Nonexistent")
 
+    def testCatchingDerivedTypesWithBaseClassHandlers(self):
+        runTest(self, 'derived_class_catching.asm', "<'Derived' object at", 0, lambda o: ' '.join(o.split()[:-1]))
+
 
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.
