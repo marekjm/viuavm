@@ -32,6 +32,33 @@ byte* CPU::vmclass(byte* addr) {
     return addr;
 }
 
+byte* CPU::vmderive(byte* addr) {
+    /** Push an ancestor class to prototype's inheritance chain.
+     */
+    int reg;
+    bool reg_ref;
+
+    reg_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    reg = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    string class_name = string(addr);
+    addr += (class_name.size()+1);
+
+    if (reg_ref) {
+        reg = static_cast<Integer*>(fetch(reg))->value();
+    }
+
+    if (typesystem.count(class_name) == 0) {
+        throw new Exception("cannot derive from unregistered type: " + class_name);
+    }
+
+    static_cast<Prototype*>(fetch(reg))->derive(class_name);
+
+    return addr;
+}
+
 byte* CPU::vmregister(byte* addr) {
     /** Register a prototype in the typesystem.
      */

@@ -20,3 +20,8 @@ Type* Prototype::copy() const {
 string Prototype::getTypeName() const {
     return type_name;
 }
+
+Prototype* Prototype::derive(const string& base_class_name) {
+    ancestors.push_back(base_class_name);
+    return this;
+}
