@@ -556,6 +556,15 @@ class CatchingMachineThrownExceptionTests(unittest.TestCase):
         runTestSplitlines(self, 'restore_catcher_state.asm', ['42','100','42','100'])
 
 
+class PrototypeSystemTests(unittest.TestCase):
+    """Tests for prototype system inside the machine.
+    """
+    PATH = './sample/asm/prototype'
+
+    def testSimplePrototypeRegistrationAndInstantation(self):
+        runTest(self, 'simple.asm', ["<'Prototype' object at", "<'Prototype' object at"], 0, lambda o: [' '.join(i.split()[:-1]) for i in o.splitlines()])
+
+
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.
     """
