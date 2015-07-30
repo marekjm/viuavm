@@ -720,6 +720,13 @@ Program& Program::vmclass(int_op reg, const string& class_name) {
     return (*this);
 }
 
+Program& Program::vmderive(int_op reg, const string& base_class_name) {
+    /*  Inserts derive instuction.
+     */
+    addr_ptr = cg::bytecode::vmderive(addr_ptr, reg, base_class_name);
+    return (*this);
+}
+
 Program& Program::vmregister(int_op reg) {
     /*  Inserts register instuction.
      */

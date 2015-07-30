@@ -105,6 +105,7 @@ namespace cg {
         byte* link(byte*, const std::string&);
 
         byte* vmclass(byte*, int_op, const std::string&);
+        byte* vmderive(byte*, int_op, const std::string&);
         byte* vmregister(byte*, int_op);
         byte* vmnew(byte*, int_op, const std::string&);
 

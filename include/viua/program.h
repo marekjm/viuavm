@@ -135,6 +135,7 @@ class Program {
     Program& link       (std::string);
 
     Program& vmclass    (int_op, const std::string&);
+    Program& vmderive   (int_op, const std::string&);
     Program& vmregister (int_op);
     Program& vmnew      (int_op, const std::string&);
 

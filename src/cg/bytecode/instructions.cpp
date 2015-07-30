@@ -843,6 +843,18 @@ namespace cg {
             return addr_ptr;
         }
 
+        byte* vmderive(byte* addr_ptr, int_op reg, const string& base_class_name) {
+            /*  Inserts derive instuction.
+             */
+            *(addr_ptr++) = DERIVE;
+            addr_ptr = insertIntegerOperand(addr_ptr, reg);
+            for (unsigned i = 0; i < base_class_name.size(); ++i) {
+                *((char*)addr_ptr++) = base_class_name[i];
+            }
+            *(addr_ptr++) = '\0';
+            return addr_ptr;
+        }
+
         byte* vmregister(byte* addr_ptr, int_op regno) {
             /*  Inserts register instuction.
              */
