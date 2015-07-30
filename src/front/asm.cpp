@@ -599,6 +599,10 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string class_name, reg;
             tie(reg, class_name) = assembler::operands::get2(operands);
             program.vmclass(assembler::operands::getint(resolveregister(reg, names)), class_name);
+        } else if (str::startswith(line, "derive")) {
+            string base_class_name, reg;
+            tie(reg, base_class_name) = assembler::operands::get2(operands);
+            program.vmderive(assembler::operands::getint(resolveregister(reg, names)), base_class_name);
         } else if (str::startswith(line, "register")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
