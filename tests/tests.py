@@ -573,6 +573,9 @@ class PrototypeSystemTests(unittest.TestCase):
     def testCatchingDeeplyDerivedTypesWithBaseClassHandlers(self):
         runTest(self, 'deeply_derived_class_catching.asm', "<'DeeplyDerived' object at", 0, lambda o: ' '.join(o.split()[:-1]))
 
+    def testCatchingObjectsUsingMultipleInheritanceWithNoSharedBases(self):
+        runTest(self, 'multiple_inheritance_with_no_shared_base_classes.asm', "<'Combined' object at", 0, lambda o: ' '.join(o.split()[:-1]))
+
 
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.
