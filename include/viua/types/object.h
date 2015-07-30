@@ -29,8 +29,8 @@ class Object: public Type {
 
         virtual Type* copy() const;
 
-        Object(const std::string& tn): type_name(tn) {}
-        virtual ~Object() {}
+        Object(const std::string& tn);
+        virtual ~Object();
 };
 
 

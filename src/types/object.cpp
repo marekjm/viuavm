@@ -17,3 +17,7 @@ Type* Object::copy() const {
     Object* cp = new Object(type_name);
     return cp;
 }
+
+
+Object::Object(const std::string& tn): type_name(tn) {}
+Object::~Object() {}
