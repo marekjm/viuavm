@@ -570,6 +570,9 @@ class PrototypeSystemTests(unittest.TestCase):
     def testCatchingDerivedTypesWithBaseClassHandlers(self):
         runTest(self, 'derived_class_catching.asm', "<'Derived' object at", 0, lambda o: ' '.join(o.split()[:-1]))
 
+    def testCatchingDeeplyDerivedTypesWithBaseClassHandlers(self):
+        runTest(self, 'deeply_derived_class_catching.asm', "<'DeeplyDerived' object at", 0, lambda o: ' '.join(o.split()[:-1]))
+
 
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.

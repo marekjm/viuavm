@@ -1,8 +1,9 @@
 .function: main
-    print (register (class 1 Custom))
+    class 1 Custom
+    print ^(register 1)
 
-    new 2 Custom
-    print 2
+    new 1 Custom
+    print 1
 
     izero 0
     end
