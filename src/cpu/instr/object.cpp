@@ -9,3 +9,25 @@
 using namespace std;
 
 
+byte* CPU::vmnew(byte* addr) {
+    /** Create new instance of specified class.
+     */
+    int reg;
+    bool reg_ref;
+
+    reg_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    reg = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    string class_name = string(addr);
+    addr += (class_name.size()+1);
+
+    if (reg_ref) {
+        reg = static_cast<Integer*>(fetch(reg))->value();
+    }
+
+    place(reg, new Object(class_name));
+
+    return addr;
+}

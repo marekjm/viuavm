@@ -228,6 +228,9 @@ byte* CPU::dispatch(byte* addr) {
         case REGISTER:
             addr = vmregister(addr+1);
             break;
+        case NEW:
+            addr = vmnew(addr+1);
+            break;
         case HALT:
             throw HaltException();
             break;
