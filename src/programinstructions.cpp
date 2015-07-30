@@ -727,6 +727,13 @@ Program& Program::vmregister(int_op reg) {
     return (*this);
 }
 
+Program& Program::vmnew(int_op reg, const string& class_name) {
+    /*  Inserts new instuction.
+     */
+    addr_ptr = cg::bytecode::vmnew(addr_ptr, reg, class_name);
+    return (*this);
+}
+
 Program& Program::end() {
     /*  Inserts end instruction.
      */
