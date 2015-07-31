@@ -28,3 +28,8 @@ Prototype* Prototype::derive(const string& base_class_name) {
     ancestors.push_back(base_class_name);
     return this;
 }
+
+Prototype* Prototype::attach(const string& function_name, const string& method_name) {
+    methods[method_name] = function_name;
+    return this;
+}

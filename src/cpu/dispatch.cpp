@@ -228,6 +228,9 @@ byte* CPU::dispatch(byte* addr) {
         case DERIVE:
             addr = vmderive(addr+1);
             break;
+        case ATTACH:
+            addr = vmattach(addr+1);
+            break;
         case REGISTER:
             addr = vmregister(addr+1);
             break;

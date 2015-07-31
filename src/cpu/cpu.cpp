@@ -396,6 +396,8 @@ vector<string> CPU::inheritanceChainOf(const string& type_name, const unordered_
         }
     }
 
+    cout << "inheritance chain of: '" << type_name << "': " << str::stringify(ichain) << endl;
+
     return ichain;
 }
 

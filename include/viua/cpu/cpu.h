@@ -220,7 +220,7 @@ class CPU {
     byte* vmclass(byte*);
     byte* prototype(byte*);
     byte* vmderive(byte*);
-    byte* attach(byte*);
+    byte* vmattach(byte*);
     byte* vmregister(byte*);
 
     byte* vmnew(byte*);

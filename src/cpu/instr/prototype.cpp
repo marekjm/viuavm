@@ -59,6 +59,38 @@ byte* CPU::vmderive(byte* addr) {
     return addr;
 }
 
+byte* CPU::vmattach(byte* addr) {
+    /** Attach a function to a prototype as a method.
+     */
+    int reg;
+    bool reg_ref;
+
+    reg_ref = *((bool*)addr);
+    pointer::inc<bool, byte>(addr);
+    reg = *((int*)addr);
+    pointer::inc<int, byte>(addr);
+
+    string function_name = string(addr);
+    addr += (function_name.size()+1);
+
+    string method_name = string(addr);
+    addr += (method_name.size()+1);
+
+    if (reg_ref) {
+        reg = static_cast<Integer*>(fetch(reg))->value();
+    }
+
+    Prototype* proto = static_cast<Prototype*>(fetch(reg));
+
+    if (not (function_addresses.count(function_name) or linked_functions.count(function_name) or external_functions.count(function_name))) {
+        throw new Exception("cannot attach undefined function '" + function_name + "' as a method '" + method_name + "' of prototype '" + proto->getTypeName() + "'");
+    }
+
+    proto->attach(function_name, method_name);
+
+    return addr;
+}
+
 byte* CPU::vmregister(byte* addr) {
     /** Register a prototype in the typesystem.
      */
