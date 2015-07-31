@@ -136,6 +136,7 @@ class Program {
 
     Program& vmclass    (int_op, const std::string&);
     Program& vmderive   (int_op, const std::string&);
+    Program& vmattach   (int_op, const std::string&, const std::string&);
     Program& vmregister (int_op);
     Program& vmnew      (int_op, const std::string&);
 

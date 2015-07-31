@@ -855,6 +855,22 @@ namespace cg {
             return addr_ptr;
         }
 
+        byte* vmattach(byte* addr_ptr, int_op reg, const string& function_name, const string& method_name) {
+            /*  Inserts derive instuction.
+             */
+            *(addr_ptr++) = ATTACH;
+            addr_ptr = insertIntegerOperand(addr_ptr, reg);
+            for (unsigned i = 0; i < function_name.size(); ++i) {
+                *((char*)addr_ptr++) = function_name[i];
+            }
+            *(addr_ptr++) = '\0';
+            for (unsigned i = 0; i < method_name.size(); ++i) {
+                *((char*)addr_ptr++) = method_name[i];
+            }
+            *(addr_ptr++) = '\0';
+            return addr_ptr;
+        }
+
         byte* vmregister(byte* addr_ptr, int_op regno) {
             /*  Inserts register instuction.
              */

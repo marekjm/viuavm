@@ -603,6 +603,10 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string base_class_name, reg;
             tie(reg, base_class_name) = assembler::operands::get2(operands);
             program.vmderive(assembler::operands::getint(resolveregister(reg, names)), base_class_name);
+        } else if (str::startswith(line, "attach")) {
+            string function_name, method_name, reg;
+            tie(reg, function_name, method_name) = assembler::operands::get3(operands);
+            program.vmattach(assembler::operands::getint(resolveregister(reg, names)), function_name, method_name);
         } else if (str::startswith(line, "register")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);

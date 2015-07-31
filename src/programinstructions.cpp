@@ -727,6 +727,13 @@ Program& Program::vmderive(int_op reg, const string& base_class_name) {
     return (*this);
 }
 
+Program& Program::vmattach(int_op reg, const string& function_name, const string& method_name) {
+    /*  Inserts attach instuction.
+     */
+    addr_ptr = cg::bytecode::vmattach(addr_ptr, reg, function_name, method_name);
+    return (*this);
+}
+
 Program& Program::vmregister(int_op reg) {
     /*  Inserts register instuction.
      */
