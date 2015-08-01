@@ -1,6 +1,6 @@
 # Viua VM
 
-[![Build Status](https://travis-ci.org/marekjm/wudoovm.svg)](https://travis-ci.org/marekjm/wudoovm)
+[![Build Status](https://travis-ci.org/marekjm/viuavm.svg)](https://travis-ci.org/marekjm/viuavm)
 
 A simple, bytecode driven, register-based virtual machine.
 
