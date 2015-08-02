@@ -57,11 +57,11 @@ string assembler::verify::frameBalance(const vector<string>& lines) {
 
         line = str::lstrip(line);
         instruction = str::chunk(line);
-        if (not (instruction == "call" or instruction == "excall" or instruction == "fcall" or instruction == "frame")) {
+        if (not (instruction == "call" or instruction == "excall" or instruction == "fcall" or instruction == "frame" or instruction == "msg")) {
             continue;
         }
 
-        if (instruction == "call" or instruction == "excall" or instruction == "fcall") {
+        if (instruction == "call" or instruction == "excall" or instruction == "fcall" or instruction == "msg") {
             --balance;
         }
         if (instruction == "frame") {
