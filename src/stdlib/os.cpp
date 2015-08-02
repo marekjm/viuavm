@@ -1,10 +1,10 @@
 #include <cstdlib>
 #include <string>
-#include "../types/integer.h"
-#include "../types/exception.h"
-#include "../cpu/frame.h"
-#include "../cpu/registerset.h"
-#include "../include/module.h"
+#include <viua/types/integer.h>
+#include <viua/types/exception.h>
+#include <viua/cpu/frame.h>
+#include <viua/cpu/registerset.h>
+#include <viua/include/module.h>
 using namespace std;
 
 

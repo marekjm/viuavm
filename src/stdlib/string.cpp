@@ -1,12 +1,13 @@
 #include <string>
 #include <vector>
-#include "../types/type.h"
-#include "../types/string.h"
-#include "../types/vector.h"
-#include "../types/exception.h"
-#include "../cpu/frame.h"
-#include "../cpu/registerset.h"
-#include "../include/module.h"
+
+#include <viua/types/type.h>
+#include <viua/types/string.h>
+#include <viua/types/vector.h>
+#include <viua/types/exception.h>
+#include <viua/cpu/frame.h>
+#include <viua/cpu/registerset.h>
+#include <viua/include/module.h>
 using namespace std;
 
 
