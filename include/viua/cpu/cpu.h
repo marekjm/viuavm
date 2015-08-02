@@ -224,7 +224,7 @@ class CPU {
     byte* vmregister(byte*);
 
     byte* vmnew(byte*);
-    byte* msg(byte*);
+    byte* vmmsg(byte*);
 
     byte* import(byte*);
     byte* link(byte*);
