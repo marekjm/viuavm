@@ -237,6 +237,9 @@ byte* CPU::dispatch(byte* addr) {
         case NEW:
             addr = vmnew(addr+1);
             break;
+        case MSG:
+            addr = vmmsg(addr+1);
+            break;
         case HALT:
             throw HaltException();
             break;
