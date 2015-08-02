@@ -578,7 +578,6 @@ class PrototypeSystemTests(unittest.TestCase):
     def testCatchingObjectsUsingMultipleInheritanceWithNoSharedBases(self):
         runTest(self, 'multiple_inheritance_with_no_shared_base_classes.asm', "<'Combined' object at", 0, lambda o: ' '.join(o.split()[:-1]))
 
-    @unittest.skip('requires typesystem standard library module to be available')
     def testDynamicDispatch(self):
         runTestSplitlinesNoDisassemblyRerun(self, 'dynamic_method_dispatch.asm',
             [

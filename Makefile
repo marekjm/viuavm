@@ -125,8 +125,8 @@ build/test/math.so: build/test/math.o build/platform/registerset.o build/platfor
 
 compile-test: build/test/math.so build/test/World.so
 
-test: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/dis build/test/math.so build/test/World.so
-	python3 ./tests/tests.py --verbose --catch --failfast
+test: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/dis build/test/math.so build/test/World.so build/stdlib/typesystem.so
+	VIUAPATH=./build/stdlib python3 ./tests/tests.py --verbose --catch --failfast
 
 
 ############################################################
