@@ -114,6 +114,8 @@ def runTestNoDisassemblyRerun(self, name, expected_output, expected_exit_code = 
 def runTestSplitlines(self, name, expected_output, expected_exit_code = 0):
     runTest(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: o.strip().splitlines())
 
+def runTestSplitlinesNoDisassemblyRerun(self, name, expected_output, expected_exit_code = 0):
+    runTestNoDisassemblyRerun(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: o.strip().splitlines())
 def runTestReturnsIntegers(self, name, expected_output, expected_exit_code = 0):
     runTest(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: [int(i) for i in o.strip().splitlines()])
 
@@ -576,6 +578,18 @@ class PrototypeSystemTests(unittest.TestCase):
     def testCatchingObjectsUsingMultipleInheritanceWithNoSharedBases(self):
         runTest(self, 'multiple_inheritance_with_no_shared_base_classes.asm', "<'Combined' object at", 0, lambda o: ' '.join(o.split()[:-1]))
 
+    @unittest.skip('requires typesystem standard library module to be available')
+    def testDynamicDispatch(self):
+        runTestSplitlinesNoDisassemblyRerun(self, 'dynamic_method_dispatch.asm',
+            [
+                'Good day from Derived',
+                'Hello from Derived',
+                '',
+                'Good day from MoreDerived',
+                'Hello from MoreDerived',
+                'Hi from MoreDerived',
+            ]
+        )
 
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.
