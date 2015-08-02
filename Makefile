@@ -183,6 +183,12 @@ build/cpu/registserset.o: src/cpu/registerset.cpp include/viua/cpu/registerset.h
 stdlib:
 	echo "OK"
 
+build/stdlib/typesystem.o: src/stdlib/typesystem.cpp
+	${CXX} -std=c++11 -fPIC -c -o $@ $<
+
+build/stdlib/typesystem.so: build/stdlib/typesystem.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o
+	${CXX} -std=c++11 -fPIC -shared -o $@ $^
+
 
 ############################################################
 # OPCODE LISTER PROGRAM
