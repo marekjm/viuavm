@@ -41,8 +41,8 @@ clean: clean-support clean-test-compiles
 	rm -f ./build/test/*
 	rm -f ./build/types/*.o
 	rm -f ./build/*.o
-	rm -f ./build/stdlib/lib/*.o
-	rm -f ./build/stdlib/lib/*.so
+	rm -f ./build/stdlib/*.o
+	rm -f ./build/stdlib/*.so
 
 clean-support:
 	rm -f ./build/support/*.o
@@ -74,10 +74,9 @@ bininstall: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/vdb build/bin/vm/dis
 	chmod 755 ${BIN_PATH}/viua-dis
 
 libinstall: stdlib
-	mkdir -p ${LIB_PATH}/std/extern
-	mkdir -p ${LIB_PATH}/std/native
 	mkdir -p ${LIB_PATH}/core
-	cp ./build/stdlib/lib/*.so ${LIB_PATH}/std/extern
+	mkdir -p ${LIB_PATH}/site
+	cp ./build/stdlib/*.so ${LIB_PATH}/core
 
 platform: build/platform/exception.o build/platform/string.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o
 
