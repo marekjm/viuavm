@@ -891,6 +891,19 @@ namespace cg {
             return addr_ptr;
         }
 
+        byte* vmmsg(byte* addr_ptr, int_op reg, int_op object, const string& method_name) {
+            /*  Inserts msg instuction.
+             */
+            *(addr_ptr++) = MSG;
+            addr_ptr = insertIntegerOperand(addr_ptr, reg);
+            addr_ptr = insertIntegerOperand(addr_ptr, object);
+            for (unsigned i = 0; i < method_name.size(); ++i) {
+                *((char*)addr_ptr++) = method_name[i];
+            }
+            *(addr_ptr++) = '\0';
+            return addr_ptr;
+        }
+
         byte* end(byte* addr_ptr) {
             /*  Inserts end instruction.
              */
