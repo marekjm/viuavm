@@ -386,26 +386,30 @@ void CPU::loadForeignLibrary(const string& module) {
 }
 
 
-vector<string> CPU::inheritanceChainOf(const string& type_name, const unordered_set<string>& already_in) {
+vector<string> CPU::inheritanceChainOf(const string& type_name) {
     /** This methods returns full inheritance chain of a type.
      */
     vector<string> ichain = typesystem.at(type_name)->getAncestors();
-    unordered_set<string> already_pushed;
     for (unsigned i = 0; i < ichain.size(); ++i) {
-        if (already_pushed.count(ichain[i]) or already_in.count(ichain[i])) {
-            continue;
-        }
-        vector<string> sub_ichain = inheritanceChainOf(ichain[i], already_pushed);
+        vector<string> sub_ichain = inheritanceChainOf(ichain[i]);
         for (unsigned j = 0; j < sub_ichain.size(); ++j) {
-            if (already_pushed.count(sub_ichain[j]) or already_in.count(sub_ichain[j])) {
-                continue;
-            }
-            already_pushed.insert(sub_ichain[j]);
             ichain.push_back(sub_ichain[j]);
         }
     }
 
-    /* cout << "inheritance chain of: '" << type_name << "': " << str::stringify(ichain) << endl; */
+    vector<string> linearised_inheritance_chain;
+    unordered_set<string> pushed;
+
+    string element;
+    for (unsigned i = 0; i < ichain.size(); ++i) {
+        element = ichain[i];
+        if (pushed.count(element)) {
+            linearised_inheritance_chain.erase(remove(linearised_inheritance_chain.begin(), linearised_inheritance_chain.end(), element), linearised_inheritance_chain.end());
+        } else {
+            pushed.insert(element);
+        }
+        linearised_inheritance_chain.push_back(element);
+    }
 
     return ichain;
 }
