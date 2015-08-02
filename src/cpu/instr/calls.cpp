@@ -170,7 +170,7 @@ byte* CPU::call(byte* addr) {
     }
 
     auto caller = (is_native ? &CPU::callNative : &CPU::callForeign);
-    return (this->*caller)(addr, call_name, return_register_ref, return_register_index);
+    return (this->*caller)(addr, call_name, return_register_ref, return_register_index, "");
 }
 
 byte* CPU::end(byte* addr) {

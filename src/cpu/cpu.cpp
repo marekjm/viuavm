@@ -222,7 +222,7 @@ void CPU::dropFrame() {
 }
 
 
-byte* CPU::callNative(byte* addr, const string& call_name, const bool& return_ref, const int& return_index) {
+byte* CPU::callNative(byte* addr, const string& call_name, const bool& return_ref, const int& return_index, const string& real_call_name) {
     byte* call_address = 0;
     if (function_addresses.count(call_name)) {
         call_address = bytecode+function_addresses.at(call_name);
@@ -231,7 +231,12 @@ byte* CPU::callNative(byte* addr, const string& call_name, const bool& return_re
         call_address = linked_functions.at(call_name).second;
         jump_base = linked_modules.at(linked_functions.at(call_name).first).second;
     }
-    addr += (call_name.size()+1);
+    if (real_call_name.size()) {
+        addr += (real_call_name.size()+1);
+    } else {
+        addr += (call_name.size()+1);
+    }
+
 
     // save return address for frame
     byte* return_address = addr;
@@ -250,8 +255,12 @@ byte* CPU::callNative(byte* addr, const string& call_name, const bool& return_re
 
     return call_address;
 }
-byte* CPU::callForeign(byte* addr, const string& call_name, const bool& return_ref, const int& return_index) {
-    addr += (call_name.size()+1);
+byte* CPU::callForeign(byte* addr, const string& call_name, const bool& return_ref, const int& return_index, const string& real_call_name) {
+    if (real_call_name.size()) {
+        addr += (real_call_name.size()+1);
+    } else {
+        addr += (call_name.size()+1);
+    }
 
     // save return address for frame
     byte* return_address = addr;
