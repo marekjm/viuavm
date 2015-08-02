@@ -27,6 +27,8 @@ class Prototype: public Type {
 
         // attach a function as a method to the prototype
         Prototype* attach(const std::string&, const std::string&);
+        bool accepts(const std::string&) const;
+        std::string resolvesTo(const std::string&) const;
 
         // add an attribute to the prototype
         Prototype* add(const std::string&);

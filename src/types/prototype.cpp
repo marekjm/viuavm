@@ -33,3 +33,11 @@ Prototype* Prototype::attach(const string& function_name, const string& method_n
     methods[method_name] = function_name;
     return this;
 }
+
+bool Prototype::accepts(const string& method_name) const {
+    return methods.count(method_name);
+}
+
+string Prototype::resolvesTo(const string& method_name) const {
+    return methods.at(method_name);
+}
