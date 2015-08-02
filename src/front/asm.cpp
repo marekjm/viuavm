@@ -615,6 +615,10 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string class_name, reg;
             tie(reg, class_name) = assembler::operands::get2(operands);
             program.vmnew(assembler::operands::getint(resolveregister(reg, names)), class_name);
+        } else if (str::startswith(line, "msg")) {
+            string reg, obj, mtd;
+            tie(reg, obj, mtd) = assembler::operands::get3(operands);
+            program.vmmsg(assembler::operands::getint(resolveregister(reg, names)), assembler::operands::getint(resolveregister(obj, names)), mtd);
         } else if (str::startswith(line, "end")) {
             program.end();
         } else if (str::startswith(line, "halt")) {
