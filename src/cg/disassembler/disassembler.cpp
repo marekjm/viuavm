@@ -93,6 +93,22 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         oss << s;
         bptr += s.size();
         ++bptr; // for null character terminating the C-style string not included in std::string
+    } else if (op == ATTACH) {
+        oss << " " << intop(bptr);
+        pointer::inc<bool, byte>(bptr);
+        pointer::inc<int, byte>(bptr);
+
+        oss << " ";
+        string fn_name = string(bptr);
+        oss << fn_name;
+        bptr += fn_name.size();
+        ++bptr; // for null character terminating the C-style string not included in std::string
+
+        oss << " ";
+        string md_name = string(bptr);
+        oss << md_name;
+        bptr += md_name.size();
+        ++bptr; // for null character terminating the C-style string not included in std::string
     }
 
     unsigned increase = (bptr-ptr);
