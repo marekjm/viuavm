@@ -76,6 +76,9 @@ byte* CPU::vmmsg(byte* addr) {
             break;
         }
     }
+    if (function_name.size() == 0) {
+        throw new Exception("class '" + obj->type() + "' does not accept method '" + method_name + "'");
+    }
 
     bool is_native = (function_addresses.count(function_name) or linked_functions.count(function_name));
     bool is_foreign = external_functions.count(function_name);
