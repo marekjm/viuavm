@@ -139,6 +139,7 @@ class Program {
     Program& vmattach   (int_op, const std::string&, const std::string&);
     Program& vmregister (int_op);
     Program& vmnew      (int_op, const std::string&);
+    Program& vmmsg      (int_op, int_op, const std::string&);
 
     Program& end        ();
     Program& halt       ();

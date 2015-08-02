@@ -748,6 +748,13 @@ Program& Program::vmnew(int_op reg, const string& class_name) {
     return (*this);
 }
 
+Program& Program::vmmsg(int_op reg, int_op object, const string& method_name) {
+    /*  Inserts msg instuction.
+     */
+    addr_ptr = cg::bytecode::vmmsg(addr_ptr, reg, object, method_name);
+    return (*this);
+}
+
 Program& Program::end() {
     /*  Inserts end instruction.
      */
