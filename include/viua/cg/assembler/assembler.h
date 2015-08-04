@@ -8,6 +8,7 @@
 #include <vector>
 #include <tuple>
 #include <map>
+#include <unordered_set>
 #include "../../program.h"
 
 namespace assembler {
@@ -32,6 +33,7 @@ namespace assembler {
         std::vector<std::string> getBlockNames(const std::vector<std::string>& lines);
         std::vector<std::string> getBlockSignatures(const std::vector<std::string>& lines);
         std::map<std::string, std::vector<std::string> > getInvokables(const std::string& type, const std::vector<std::string>& lines);
+        std::unordered_set<std::string> getTypeNames(const std::vector<std::string>&);
     }
 
     namespace verify {
