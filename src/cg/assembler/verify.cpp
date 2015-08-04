@@ -201,7 +201,7 @@ string assembler::verify::directives(const vector<string>& lines) {
         }
 
         string token = str::chunk(line);
-        if (not (token == ".function:" or token == ".signature:" or token == ".bsignature:" or token == ".block:" or token == ".end" or token == ".name:" or token == ".mark:" or token == ".main:")) {
+        if (not (token == ".function:" or token == ".signature:" or token == ".bsignature:" or token == ".block:" or token == ".end" or token == ".name:" or token == ".mark:" or token == ".main:" or token == ".type:" or token == ".class:")) {
             report << "fatal: unrecognised assembler directive on line " << (i+1) << ": `" << token << '`';
             break;
         }
