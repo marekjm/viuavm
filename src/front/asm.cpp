@@ -7,6 +7,7 @@
 #include <sstream>
 #include <vector>
 #include <map>
+#include <unordered_set>
 #include <viua/bytecode/maps.h>
 #include <viua/support/string.h>
 #include <viua/support/env.h>
@@ -876,6 +877,11 @@ int generate(const string& filename, string& compilename, const vector<string>& 
     //////////////////////////////
     // SETUP INITIAL BYTECODE SIZE
     uint16_t bytes = 0;
+
+
+    //////////////////////////////////////////
+    // GATHER TYPE NAMES AND CLASS DEFINITIONS
+    unordered_set<string> type_names = assembler::ce::getTypeNames(ilines);
 
 
     ///////////////////////////////////////////
