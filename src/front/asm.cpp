@@ -194,13 +194,17 @@ vector<string> filter(const vector<string>& lines) {
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = lines[i];
-        if (str::startswith(line, ".mark:") or str::startswith(line, ".name:") or str::startswith(line, ".main:") or str::startswith(line, ".link:") or str::startswith(line, ".signature:") or str::startswith(line, ".bsignature:")) {
+        if (str::startswith(line, ".mark:") or str::startswith(line, ".name:") or str::startswith(line, ".main:") or str::startswith(line, ".link:") or str::startswith(line, ".signature:") or str::startswith(line, ".bsignature:") or str::startswith(line, ".type:")) {
             /*  Lines beginning with `.mark:` are just markers placed in code and
              *  are do not produce any bytecode.
-             *  Lines beginning with `.name:` are asm instructions that assign human-rememberable names to
+             *  Lines beginning with `.name:` are asm directives that assign human-rememberable names to
              *  registers.
+             *  Lines beginning with `.signature:` and `.bsignature:` covey information about functions and
+             *  blocks that will be available at runtime but may not be available during compilation.
+             *  Lines beginning with `.type:` inform the assembler that definition of this type will be
+             *  supplied later (either by `.class:` block, or by dynamically defining the type during runtime).
              *
-             *  Assembler instructions are discarded by the assembler during the bytecode-generation phase
+             *  Assembler directives are discarded by the assembler during the bytecode-generation phase
              *  so they can be skipped in this step as fast as possible
              *  to avoid complicating code that appears later and
              *  deals with assembling CPU instructions.
@@ -209,7 +213,12 @@ vector<string> filter(const vector<string>& lines) {
         }
 
         if (str::startswith(line, ".function:") or str::startswith(line, ".block:")) {
-            // just skip function and block lines
+            // skip function and block definition blocks
+            while (lines[++i] != ".end");
+            continue;
+        }
+        if (str::startswith(line, ".class:")) {
+            // skip class definition lines
             while (lines[++i] != ".end");
             continue;
         }
