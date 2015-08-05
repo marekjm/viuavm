@@ -287,6 +287,32 @@ class StringInstructionsTests(unittest.TestCase):
     def testHelloWorld(self):
         runTest(self, 'hello_world.asm', 'Hello World!', 0)
 
+class StringInstructionsEscapeSequencesTests(unittest.TestCase):
+    """Tests for escape sequence decoding.
+    """
+    PATH = './sample/asm/string/escape_sequences'
+
+    def testNewline(self):
+        runTest(self, 'newline.asm', 'Hello\nWorld!', 0)
+
+    def testTab(self):
+        runTest(self, 'tab.asm', 'Hello\tWorld!', 0)
+
+    def testVerticalTab(self):
+        runTest(self, 'vertical_tab.asm', 'Hello\vWorld!', 0)
+
+    def testBell(self):
+        runTest(self, 'bell.asm', 'Hello \aWorld!', 0)
+
+    def testBackspace(self):
+        runTest(self, 'backspace.asm', 'Hello  \bWorld!', 0)
+
+    def testFormFeed(self):
+        runTest(self, 'form_feed.asm', 'Hello \fWorld!', 0)
+
+    def testCarriageReturn(self):
+        runTest(self, 'carriage_return.asm', 'Hello \rWorld!', 0)
+
 
 class VectorInstructionsTests(unittest.TestCase):
     """Tests for vector-related instructions.
