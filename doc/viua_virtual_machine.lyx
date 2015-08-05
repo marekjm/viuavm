@@ -3113,7 +3113,193 @@ name "sec:Type-system"
 \end_layout
 
 \begin_layout Standard
-This section talks about type system of Viua VM.
+This section describes the type system implemented inside Viua virtual machine.
+ First, a high level overview of the system is presented to give the reader
+ a broad view; then, in each following section, various aspects of the system
+ are discussed in more detail - the type hierarchy used by machine and its
+ parts exposed to user code, inheritance, object construction and destruction,
+ method overloading and dispatch, etc.
+\end_layout
+
+\begin_layout Subsection
+Overview
+\end_layout
+
+\begin_layout Standard
+Type system implemented in Viua is expressed by two ideas: a prototype,
+ and an object.
+\end_layout
+
+\begin_layout Subsubsection
+Prototype
+\end_layout
+
+\begin_layout Standard
+Prototype is a description of a class (the 
+\begin_inset Quotes eld
+\end_inset
+
+type
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+class
+\begin_inset Quotes erd
+\end_inset
+
+ are considered synonymous), i.e.
+ what methods it exposes, and the list of classes it inherits from.
+ Inheritance linearizations (and, thus, method resolution order chains)
+ can be from the typesystem map built from prototypes.
+\end_layout
+
+\begin_layout Standard
+Prototypes can be defined using instructions provided by Viua CPU instruction
+ set, or using 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+.class:
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ blocks in source code (in which case the compiler must turn the class-block
+ definition into instruction-sequence definition).
+ Regardless of the method with which they are defined, all prototypes are
+ constructed and registered in machine's typesystem at runtime (but it is
+ possible for the compiler to check code for type correctness during compilation
+ as class information is present in the source code).
+ However, prototypes defined using 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+.class:
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ blocks are guaranteed to be available before 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+main
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ function is entered which may be desirable.
+ No guarantee is provided that class-block defined prototypes will be available
+ at the time libraries specified by 
+\begin_inset Quotes eld
+\end_inset
+
+VIUAPRELINK
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+VIUAPREIMPORT
+\begin_inset Quotes erd
+\end_inset
+
+ are being loaded into the machine.
+\end_layout
+
+\begin_layout Standard
+Existing prototypes can be modified (and new ones can be defined) at runtime
+ using instructions provided by Viua CPU.
+ This, along with reloading of the libraries, provides a robust system for
+ creating long-running processes that require minium downtime (similar to
+ what Erlang provides).
+\end_layout
+
+\begin_layout Standard
+Prototypes do not own their methods as they are being 
+\begin_inset Quotes eld
+\end_inset
+
+composed
+\begin_inset Quotes erd
+\end_inset
+
+ from existing components - a class is created empty, then it may be derived
+ from another, already existing, class, and finally have some methods attached.
+ The concept of 
+\begin_inset Quotes eld
+\end_inset
+
+attaching
+\begin_inset Quotes erd
+\end_inset
+
+ a method is the key one - on the lowest level, method names attached to
+ a class are mapped to names of ordinary functions and are resolved when
+ the 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+msg
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ instruction is called to issue a method call on an object.
+ The only thing special about functions that are attached to prototypes
+ as methods is the fact that they must take an object of correct type as
+ their first parameter.
+ This way of composing prototypes, where methods are ordinary functions
+ attached with changed name to the prototype, enables the compiler to generate
+ faster code by using static dispatch and simply calling the function without
+ going through the indirection of resolving a method name.
+ This is essentially the same technique that can be used for C++: virtual
+ methods are called after resolving vtable-stored member-function pointers,
+ and non-virtual methods are called using static dispatch; it provides flexibili
+ty where polymorphic behaviour is needed, and zero-overhead (when compared
+ to simple function call) performance in critical parts of the program.
+\end_layout
+
+\begin_layout Subsubsection
+Object
+\end_layout
+
+\begin_layout Standard
+An object is a structure with assigned type (it is possible to define 
+\begin_inset Quotes eld
+\end_inset
+
+typeless
+\begin_inset Quotes erd
+\end_inset
+
+ objects whose type will be just 
+\begin_inset Quotes eld
+\end_inset
+
+Object
+\begin_inset Quotes erd
+\end_inset
+
+ but they do not provide much functionality) and named data fields.
 \end_layout
 
 \begin_layout Standard
