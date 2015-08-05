@@ -146,29 +146,40 @@ namespace str {
 
 
     string extract(const string& s) {
-        /*  Extracts *enquoted chunk*.
+        /** Extracts *enquoted chunk*.
+         *
          *  It is particularly useful if you have a string encoded in another string.
          *
-         *  Consider this string: `"Hello 'Beautiful' World!" some other (42) things;`.
-         *  str::extract(<that string>) will return `"Hello 'Beautiful' World!"`.
+         *  This function will return `"Hello 'Beautiful' World!"` when fed `"Hello 'Beautiful' World!" some other (42) things;`, and
+         *  will return `'Hello "Beautiful" World!'` when fed `'Hello "Beautiful" World!' some other (42) things;`.
+         *  Starting quote character is irrelevant.
+         *
+         *  In fact, this function will treat *the first character* of the string it is fed as a delimiter for
+         *  string extraction - whatever that may be (e.g. the backtick character) so you can get creative.
+         *  One character that is not recommended for use as a delimiter is the backslash as it is treated specially (as
+         *  the escape character) by this function.
          */
         if (s.size() == 0) {
             return string("");
         }
 
         ostringstream chnk;
-        char quote = s[0];
-        int backs = 0;
+        char quote;
+        chnk << (quote = s[0]);
 
-        for (unsigned i = 0; i < s.size(); ++i) {
+        int backs = 0;
+        for (unsigned i = 1; i < s.size(); ++i) {
             chnk << s[i];
-            if (s[i] == quote and i > 0 and (backs % 2 == 0)) { break; }
-            if (s[i] == quote and i > 0 and (backs % 2 != 0)) {
-                backs = 0;
+            if (s[i] == quote and (backs == 0)) {
                 break;
             }
-            if (s[i] == '\\') { ++backs; }
-            if (s[i] == quote) { backs = 0; }
+            if (s[i] == quote and (backs != 0)) {
+                backs = 0;
+                continue;
+            }
+            if (s[i] == '\\') {
+                ++backs;
+            }
         }
 
         return chnk.str();
