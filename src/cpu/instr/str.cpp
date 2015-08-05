@@ -29,7 +29,7 @@ byte* CPU::strstore(byte* addr) {
         reg = static_cast<Integer*>(fetch(reg))->value();
     }
 
-    place(reg, new String(svalue));
+    place(reg, new String(str::strdecode(svalue)));
 
     return addr;
 }

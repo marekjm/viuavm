@@ -228,6 +228,71 @@ namespace str {
         return encoded.str();
     }
 
+    string strdecode(const string& s) {
+        /** Decode escape sequences in strings.
+         *
+         *  This function recognizes escape sequences as listed on:
+         *  http://en.cppreference.com/w/cpp/language/escape
+         *  The function does not recognize sequences for:
+         *      - arbitrary octal numbers (escape: \nnn),
+         *      - arbitrary hexadecimal numbers (escape: \xnn),
+         *      - short arbitrary Unicode values (escape: \unnnn),
+         *      - long arbitrary Unicode values (escape: \Unnnnnnnn),
+         *
+         *  If a character that does not encode an escape sequence is
+         *  preceded by a backslash (\\) the function consumes the backslash and
+         *  leaves only the character preceded by it in the outpur string.
+         *
+         */
+        ostringstream decoded;
+        char c;
+        for (unsigned i = 0; i < s.size(); ++i) {
+            c = s[i];
+            if (c == '\\' and i < (s.size()-1)) {
+                ++i;
+                switch (s[i]) {
+                    case '\'':
+                        c = '\'';
+                        break;
+                    case '"':
+                        c = '"';
+                        break;
+                    case '?':
+                        c = '?';
+                        break;
+                    case '\\':
+                        c = '\\';
+                        break;
+                    case 'a':
+                        c = '\a';
+                        break;
+                    case 'b':
+                        c = '\b';
+                        break;
+                    case 'f':
+                        c = '\f';
+                        break;
+                    case 'n':
+                        c = '\n';
+                        break;
+                    case 'r':
+                        c = '\r';
+                        break;
+                    case 't':
+                        c = '\t';
+                        break;
+                    case 'v':
+                        c = '\v';
+                        break;
+                    default:
+                        c = s[i];
+                }
+            }
+            decoded << c;
+        }
+        return decoded.str();
+    }
+
 
     string stringify(const vector<string>& sv) {
         ostringstream oss;
