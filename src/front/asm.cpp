@@ -1571,7 +1571,6 @@ int generate(const string& filename, string& compilename, const vector<string>& 
 
     ////////////////////////////////////
     // WRITE STATICALLY LINKED LIBRARIES
-    // FIXME: implement this after we are able to load static libs
     uint16_t bytes_offset = current_link_offset;
     for (tuple<string, uint16_t, char*> lnk : linked_libs_bytecode) {
         string lib_name;
