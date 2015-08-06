@@ -815,7 +815,7 @@ vector<vector<string>> decode_line(const string& s) {
 }
 
 
-vector<string> precompile(const vector<string>& lines) {
+vector<string> expandSource(const vector<string>& lines) {
     vector<string> stripped_lines;
 
     for (unsigned i = 0; i < lines.size(); ++i) {
@@ -863,7 +863,7 @@ int generate(const string& filename, string& compilename, const vector<string>& 
     string line;
     while (getline(in, line)) { lines.push_back(line); }
 
-    vector<string> expanded_lines = precompile(lines);
+    vector<string> expanded_lines = expandSource(lines);
     if (EXPAND_ONLY) {
         for (unsigned i = 0; i < expanded_lines.size(); ++i) {
             cout << expanded_lines[i] << endl;
