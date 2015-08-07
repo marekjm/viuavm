@@ -52,12 +52,12 @@ bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE)
              << "    " << "    --scream             - show so much debugging output it becomes noisy\n"
              << "    " << "-W, --Wall               - warn about everything\n"
              << "    " << "    --Wmissin-end        - warn about missing 'end' instruction at the end of functions\n"
-             << "    " << "-E, --Eall               - treat all warnings as errors\n"
+             << "    " << "    --Eall               - treat all warnings as errors\n"
              << "    " << "    --Emissing-end       - treat missing 'end' instruction at the end of function as error\n"
              << "    " << "-c, --lib                - assemble as a library\n"
-             << "    " << "    --expand             - only expand the source code to simple form (one instruction per line)\n"
+             << "    " << "-E, --expand             - only expand the source code to simple form (one instruction per line)\n"
              << "    " << "                           with this option, assembler prints expanded source to standard output\n"
-             << "    " << "    --verify             - verify source code correctness without actually compiling it\n"
+             << "    " << "-C, --verify             - verify source code correctness without actually compiling it\n"
              << "    " << "                         - verify source code correctness without actually compiling it\n"
              << "    " << "                           this option turns assembler into source level debugger and static code analyzer hybrid\n"
              ;
@@ -96,7 +96,7 @@ int main(int argc, char* argv[]) {
         } else if (option == "--Wall" or option == "-W") {
             WARNING_ALL = true;
             continue;
-        } else if (option == "--Eall" or option == "-E") {
+        } else if (option == "--Eall") {
             ERROR_ALL = true;
             continue;
         } else if (option == "--Wmissing-end") {
@@ -113,10 +113,10 @@ int main(int argc, char* argv[]) {
                 exit(1);
             }
             continue;
-        } else if (option == "--expand") {
+        } else if (option == "--expand" or option == "-E") {
             EXPAND_ONLY = true;
             continue;
-        } else if (option == "--verify") {
+        } else if (option == "--verify" or option == "-C") {
             EARLY_VERIFICATION_ONLY = true;
             continue;
         }
