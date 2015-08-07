@@ -955,27 +955,6 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
     }
 
 
-    ////////////////////////////
-    // VERIFY FRAME INSTRUCTIONS
-    string line;
-    for (unsigned i = 0; i < expanded_lines.size(); ++i) {
-        line = str::lstrip(expanded_lines[i]);
-        if (not str::startswith(line, "frame")) {
-            continue;
-        }
-
-        line = str::lstrip(str::sub(line, str::chunk(line).size()));
-
-        if (line.size() == 0) {
-            if (ERROR_OPERANDLESS_FRAME or ERROR_ALL) {
-                cout << "fatal: frame instruction without operands at line " << i << " in " << filename;
-                exit(1);
-            } else if (WARNING_OPERANDLESS_FRAME or WARNING_ALL) {
-                cout << "warning: frame instruction without operands at line " << i << " in " << filename;
-            }
-        }
-    }
-
     /////////////////////////
     // VERIFY FUNCTION BODIES
     for (auto function : functions) {

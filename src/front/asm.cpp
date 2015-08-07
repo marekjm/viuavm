@@ -242,6 +242,25 @@ int main(int argc, char* argv[]) {
         cout << report << endl;
         return 1;
     }
+    ////////////////////////////
+    // VERIFY FRAME INSTRUCTIONS
+    for (unsigned i = 0; i < expanded_lines.size(); ++i) {
+        line = str::lstrip(expanded_lines[i]);
+        if (not str::startswith(line, "frame")) {
+            continue;
+        }
+
+        line = str::lstrip(str::sub(line, str::chunk(line).size()));
+
+        if (line.size() == 0) {
+            if (ERROR_OPERANDLESS_FRAME or ERROR_ALL) {
+                cout << "fatal: frame instruction without operands at line " << i << " in " << filename;
+                return 1;
+            } else if (WARNING_OPERANDLESS_FRAME or WARNING_ALL) {
+                cout << "warning: frame instruction without operands at line " << i << " in " << filename;
+            }
+        }
+    }
 
     if (EARLY_VERIFICATION_ONLY) {
         return 0;
