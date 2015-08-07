@@ -1,18 +1,8 @@
-#include <cstdlib>
-#include <cstdint>
 #include <iostream>
-#include <algorithm>
 #include <fstream>
-#include <string>
-#include <sstream>
-#include <vector>
-#include <map>
-#include <viua/bytecode/maps.h>
 #include <viua/support/string.h>
 #include <viua/support/env.h>
 #include <viua/version.h>
-#include <viua/loader.h>
-#include <viua/program.h>
 #include <viua/cg/assembler/assembler.h>
 #include <viua/front/asm.h>
 using namespace std;
