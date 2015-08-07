@@ -920,9 +920,9 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
 
     ///////////////////////////////
     // GATHER FUNCTIONS' CODE LINES
-    map<string, vector<string> > functions;
+    map<string, vector<string> > function_bodies;
     try {
-         functions = assembler::ce::getInvokables("function", ilines);
+         function_bodies = assembler::ce::getInvokables("function", ilines);
     } catch (const string& e) {
         cout << "error: function gathering failed: " << e << endl;
         return 1;
@@ -943,7 +943,7 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
     ///////////////////////////////////////////
     // INITIAL VERIFICATION OF CODE CORRECTNESS
     string report;
-    if ((report = assembler::verify::functionBodiesAreNonempty(expanded_lines, functions)).size()) {
+    if ((report = assembler::verify::functionBodiesAreNonempty(expanded_lines, function_bodies)).size()) {
         cout << report << endl;
         exit(1);
     }
@@ -954,7 +954,7 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
 
     /////////////////////////
     // VERIFY FUNCTION BODIES
-    for (auto function : functions) {
+    for (auto function : function_bodies) {
         vector<string> flines = function.second;
         if ((flines.size() == 0 or flines.back() != "end") and (function.first != "main" and flines.back() != "halt")) {
             if (ERROR_MISSING_END or ERROR_ALL) {
@@ -990,7 +990,7 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
     if (not AS_LIB and main_is_defined) {
         string main_second_but_last;
         try {
-            main_second_but_last = *(functions.at(main_function).end()-2);
+            main_second_but_last = *(function_bodies.at(main_function).end()-2);
         } catch (const std::out_of_range& e) {
             cout << "[asm] fatal: could not find main function (during return value check)" << endl;
             exit(1);
@@ -1018,7 +1018,7 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
     map<string, uint16_t> block_addresses;
     try {
         block_addresses = mapInvokableAddresses(starting_instruction, block_names, blocks);
-        function_addresses = mapInvokableAddresses(starting_instruction, function_names, functions);
+        function_addresses = mapInvokableAddresses(starting_instruction, function_names, function_bodies);
         bytes = Program::countBytes(ilines);
     } catch (const string& e) {
         cout << "error: bytecode size calculation failed: " << e << endl;
@@ -1045,7 +1045,7 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
         // then, register 1 is moved to register 0 so it counts as a return code
         ilines.push_back("move 0 1");
         ilines.push_back("halt");
-        functions[ENTRY_FUNCTION_NAME] = ilines;
+        function_bodies[ENTRY_FUNCTION_NAME] = ilines;
         // instructions were added so bytecode size must be inreased
         bytes += OP_SIZES.at("ress");
         bytes += OP_SIZES.at("frame");
@@ -1249,7 +1249,7 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
         }
         uint16_t fun_bytes = 0;
         try {
-            fun_bytes = Program::countBytes(name == ENTRY_FUNCTION_NAME ? filter(functions.at(name)) : functions.at(name));
+            fun_bytes = Program::countBytes(name == ENTRY_FUNCTION_NAME ? filter(function_bodies.at(name)) : function_bodies.at(name));
             if (VERBOSE or DEBUG) {
                 cout << " (" << fun_bytes << " bytes at byte " << functions_section_size << ')' << endl;
             }
@@ -1264,7 +1264,7 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
         Program func(fun_bytes);
         func.setdebug(DEBUG).setscream(SCREAM);
         try {
-            assemble(func, functions.at(name));
+            assemble(func, function_bodies.at(name));
         } catch (const string& e) {
             cout << (DEBUG ? "\n" : "") << "fatal: error during assembling: " << e << endl;
             exit(1);
@@ -1429,7 +1429,7 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
         // functions size must be incremented by the actual size of function's bytecode size
         // to give correct offset for next function
         try {
-            functions_size_so_far += Program::countBytes(functions.at(name));
+            functions_size_so_far += Program::countBytes(function_bodies.at(name));
         } catch (const std::out_of_range& e) {
             cout << "fatal: could not find function '" << name << "' during address table write" << endl;
             exit(1);
