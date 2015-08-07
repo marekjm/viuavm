@@ -853,67 +853,6 @@ struct invocables_t {
     map<string, vector<string>> bodies;
 };
 
-int gatherFunctions(invocables_t* invocables, const vector<string>& expanded_lines, const vector<string>& ilines) {
-    ///////////////////////////////////////////
-    // GATHER FUNCTION NAMES AND SIGNATURES
-    //
-    // SIGNATURES ARE USED WITH DYNAMIC LINKING
-    // AS ASSEMBLER WOULD COMPLAIN ABOUT
-    // CALLS TO UNDEFINED FUNCTIONS
-    try {
-        invocables->names = assembler::ce::getFunctionNames(expanded_lines);
-    } catch (const string& e) {
-        cout << "fatal: " << e << endl;
-        return 1;
-    }
-
-    try {
-        invocables->signatures = assembler::ce::getSignatures(expanded_lines);
-    } catch (const string& e) {
-        cout << "fatal: " << e << endl;
-        return 1;
-    }
-
-    ///////////////////////////////
-    // GATHER FUNCTIONS' CODE LINES
-    try {
-         invocables->bodies = assembler::ce::getInvokables("function", ilines);
-    } catch (const string& e) {
-        cout << "error: function gathering failed: " << e << endl;
-        return 1;
-    }
-
-    return 0;
-}
-
-int gatherBlocks(invocables_t* invocables, const vector<string>& expanded_lines, const vector<string>& ilines) {
-    /////////////////////
-    // GATHER BLOCK NAMES
-    try {
-        invocables->names = assembler::ce::getBlockNames(expanded_lines);
-    } catch (const string& e) {
-        cout << "fatal: " << e << endl;
-        return 1;
-    }
-    try {
-        invocables->signatures = assembler::ce::getBlockSignatures(expanded_lines);
-    } catch (const string& e) {
-        cout << "fatal: " << e << endl;
-        return 1;
-    }
-
-    ///////////////////////////////
-    // GATHER BLOCK CODE LINES
-    try {
-         invocables->bodies = assembler::ce::getInvokables("block", ilines);
-    } catch (const string& e) {
-        cout << "error: block gathering failed: " << e << endl;
-        return 1;
-    }
-
-    return 0;
-}
-
 int generate(const vector<string>& expanded_lines, vector<string>& ilines, invocables_t& functions, invocables_t& blocks, string& filename, string& compilename, const vector<string>& commandline_given_links) {
     //////////////////////////////
     // SETUP INITIAL BYTECODE SIZE
