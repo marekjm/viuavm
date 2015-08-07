@@ -712,36 +712,6 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, invoc
     }
 
 
-    /////////////////////////
-    // VERIFY FUNCTION BODIES
-    for (auto function : functions.bodies) {
-        vector<string> flines = function.second;
-        if ((flines.size() == 0 or flines.back() != "end") and (function.first != "main" and flines.back() != "halt")) {
-            if (ERROR_MISSING_END or ERROR_ALL) {
-                cout << "fatal: missing 'end' at the end of function '" << function.first << "'" << endl;
-                exit(1);
-            } else if (WARNING_MISSING_END or WARNING_ALL) {
-                cout << "warning: missing 'end' at the end of function '" << function.first << "'" << endl;
-            }
-        }
-    }
-
-    //////////////////////
-    // VERIFY BLOCK BODIES
-    for (auto block : blocks.bodies) {
-        vector<string> flines = block.second;
-        if (flines.size() == 0) {
-            cout << "fatal: block '" << block.first << "' has empty body" << endl;
-            exit(1);
-        }
-        string last_line = flines.back();
-        if (not (last_line == "leave" or last_line == "end" or last_line == "halt")) {
-            cout << "fatal: missing returning instruction ('leave', 'end' or 'halt') at the end of block '" << block.first << "'" << endl;
-            exit(1);
-        }
-    }
-
-
     /////////////////////////////////////////
     // CHECK IF MAIN FUNCTION RETURNS A VALUE
     // FIXME: this is just a crude check - it does not acctually checks if these instructions set 0 register

@@ -237,6 +237,36 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    /////////////////////////
+    // VERIFY FUNCTION BODIES
+    for (auto function : functions.bodies) {
+        vector<string> flines = function.second;
+        if ((flines.size() == 0 or flines.back() != "end") and (function.first != "main" and flines.back() != "halt")) {
+            if (ERROR_MISSING_END or ERROR_ALL) {
+                cout << "fatal: missing 'end' at the end of function '" << function.first << "'" << endl;
+                exit(1);
+            } else if (WARNING_MISSING_END or WARNING_ALL) {
+                cout << "warning: missing 'end' at the end of function '" << function.first << "'" << endl;
+            }
+        }
+    }
+
+    //////////////////////
+    // VERIFY BLOCK BODIES
+    for (auto block : blocks.bodies) {
+        vector<string> flines = block.second;
+        if (flines.size() == 0) {
+            cout << "fatal: block '" << block.first << "' has empty body" << endl;
+            exit(1);
+        }
+        string last_line = flines.back();
+        if (not (last_line == "leave" or last_line == "end" or last_line == "halt")) {
+            cout << "fatal: missing returning instruction ('leave', 'end' or 'halt') at the end of block '" << block.first << "'" << endl;
+            exit(1);
+        }
+    }
+
+
     if (EARLY_VERIFICATION_ONLY) {
         return 0;
     }
