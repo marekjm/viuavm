@@ -849,29 +849,8 @@ vector<string> expandSource(const vector<string>& lines) {
     return asm_lines;
 }
 
-int generate(const string& filename, string& compilename, const vector<string>& commandline_given_links) {
-    ////////////////
-    // READ LINES IN
-    ifstream in(filename, ios::in | ios::binary);
-    if (!in) {
-        cout << "fatal: file could not be opened: " << filename << endl;
-        return 1;
-    }
-
-    vector<string> lines;
-    string line;
-    while (getline(in, line)) { lines.push_back(line); }
-
-    vector<string> expanded_lines = expandSource(lines);
-    if (EXPAND_ONLY) {
-        for (unsigned i = 0; i < expanded_lines.size(); ++i) {
-            cout << expanded_lines[i] << endl;
-        }
-        return 0;
-    }
-
+int generate(const vector<string>& expanded_lines, string& filename, string& compilename, const vector<string>& commandline_given_links) {
     vector<string> ilines = assembler::ce::getilines(expanded_lines);   // instruction lines
-
 
     //////////////////////////////
     // SETUP INITIAL BYTECODE SIZE
@@ -990,6 +969,7 @@ int generate(const string& filename, string& compilename, const vector<string>& 
 
     ////////////////////////////
     // VERIFY FRAME INSTRUCTIONS
+    string line;
     for (unsigned i = 0; i < expanded_lines.size(); ++i) {
         line = str::lstrip(expanded_lines[i]);
         if (not str::startswith(line, "frame")) {

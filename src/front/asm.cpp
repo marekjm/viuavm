@@ -49,8 +49,8 @@ bool ERROR_OPERANDLESS_FRAME = false;
 bool ERROR_GLOBALS_IN_LIB = false;
 
 
-extern vector<string> expandSource(const vector<string>& lines);
-extern int generate(const string& filename, string& compilename, const vector<string>& commandline_given_links);
+extern vector<string> expandSource(const vector<string>&);
+extern int generate(const vector<string>&, string&, string&, const vector<string>&);
 
 
 bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE) {
@@ -197,7 +197,28 @@ int main(int argc, char* argv[]) {
         commandline_given_links.push_back(args[i]);
     }
 
-    int ret_code = generate(filename, compilename, commandline_given_links);
+
+    ////////////////
+    // READ LINES IN
+    ifstream in(filename, ios::in | ios::binary);
+    if (!in) {
+        cout << "fatal: file could not be opened: " << filename << endl;
+        return 1;
+    }
+
+    vector<string> lines;
+    string line;
+    while (getline(in, line)) { lines.push_back(line); }
+
+    vector<string> expanded_lines = expandSource(lines);
+    if (EXPAND_ONLY) {
+        for (unsigned i = 0; i < expanded_lines.size(); ++i) {
+            cout << expanded_lines[i] << endl;
+        }
+        return 0;
+    }
+
+    int ret_code = generate(expanded_lines, filename, compilename, commandline_given_links);
 
     return ret_code;
 }
