@@ -49,35 +49,6 @@ bool ERROR_OPERANDLESS_FRAME = false;
 bool ERROR_GLOBALS_IN_LIB = false;
 
 
-// ASSEMBLY CONSTANTS
-/* const string ENTRY_FUNCTION_NAME = "__entry"; */
-
-
-extern tuple<int, enum JUMPTYPE> resolvejump(string jmp, const map<string, int>& marks, int instruction_index = -1);
-
-extern string resolveregister(string reg, const map<string, int>& names);
-
-
-extern void assemble_three_intop_instruction(Program& program, map<string, int>& names, const string& instr, const string& operands);
-
-extern vector<string> filter(const vector<string>& lines);
-
-extern Program& compile(Program& program, const vector<string>& lines, map<string, int>& marks, map<string, int>& names);
-
-
-extern void assemble(Program& program, const vector<string>& lines);
-
-
-extern map<string, uint16_t> mapInvokableAddresses(uint16_t& starting_instruction, const vector<string>& names, const map<string, vector<string> >& sources);
-
-extern unsigned extend(vector<string>& base, const vector<string>& v);
-
-
-extern vector<string> tokenize(const string& s);
-
-extern vector<vector<string>> decode_line_tokens(const vector<string>& tokens);
-extern vector<vector<string>> decode_line(const string& s);
-
 extern vector<string> expandSource(const vector<string>& lines);
 extern int generate(const string& filename, string& compilename, const vector<string>& commandline_given_links);
 
