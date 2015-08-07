@@ -1176,8 +1176,8 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, invoc
     byte* program_bytecode = new byte[bytes];
     int program_bytecode_used = 0;
 
-    ///////////////////////////////////////////////////////
-    // WRITE BYTECODE OF LOCAL blocks.bodies TO BYTECODE BUFFER
+    ////////////////////////////////////////////////////
+    // WRITE BYTECODE OF LOCAL BLOCKS TO BYTECODE BUFFER
     for (string name : blocks.names) {
         // linked blocks.bodies are to be inserted later
         if (find(linked_block_names.begin(), linked_block_names.end(), name) != linked_block_names.end()) { continue; }
