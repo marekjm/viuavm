@@ -14,6 +14,7 @@
 #include <viua/loader.h>
 #include <viua/program.h>
 #include <viua/cg/assembler/assembler.h>
+#include <viua/front/asm.h>
 using namespace std;
 
 
@@ -48,12 +49,6 @@ bool ERROR_MISSING_END = false;
 bool ERROR_EMPTY_FUNCTION_BODY = false;
 bool ERROR_GLOBALS_IN_LIB = false;
 
-
-struct invocables_t {
-    vector<string> names;
-    vector<string> signatures;
-    map<string, vector<string>> bodies;
-};
 
 extern vector<string> expandSource(const vector<string>&);
 extern int gatherFunctions(invocables_t*, const vector<string>&, const vector<string>&);

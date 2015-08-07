@@ -14,6 +14,7 @@
 #include <viua/loader.h>
 #include <viua/program.h>
 #include <viua/cg/assembler/assembler.h>
+#include <viua/front/asm.h>
 using namespace std;
 
 
@@ -708,12 +709,6 @@ vector<string> expandSource(const vector<string>& lines) {
 
     return asm_lines;
 }
-
-struct invocables_t {
-    vector<string> names;
-    vector<string> signatures;
-    map<string, vector<string>> bodies;
-};
 
 int generate(const vector<string>& expanded_lines, vector<string>& ilines, invocables_t& functions, invocables_t& blocks, string& filename, string& compilename, const vector<string>& commandline_given_links) {
     //////////////////////////////

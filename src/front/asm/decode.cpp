@@ -14,6 +14,7 @@
 #include <viua/loader.h>
 #include <viua/program.h>
 #include <viua/cg/assembler/assembler.h>
+#include <viua/front/asm.h>
 using namespace std;
 
 

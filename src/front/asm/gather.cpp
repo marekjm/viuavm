@@ -14,13 +14,8 @@
 #include <viua/loader.h>
 #include <viua/program.h>
 #include <viua/cg/assembler/assembler.h>
+#include <viua/front/asm.h>
 using namespace std;
-
-struct invocables_t {
-    vector<string> names;
-    vector<string> signatures;
-    map<string, vector<string>> bodies;
-};
 
 int gatherFunctions(invocables_t* invocables, const vector<string>& expanded_lines, const vector<string>& ilines) {
     ///////////////////////////////////////////
