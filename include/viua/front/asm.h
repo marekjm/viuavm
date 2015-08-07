@@ -22,8 +22,15 @@ struct compilationflags_t {
     bool scream;
 };
 
+struct srcline_t {
+    std::string line;
+    unsigned expanded_from;
 
-std::vector<std::string> expandSource(const std::vector<std::string>&);
+    srcline_t(const std::string& l, unsigned ef): line(l), expanded_from(ef) {}
+};
+
+
+std::vector<std::string> expandSource(const std::vector<std::string>&, std::map<unsigned, unsigned>&);
 
 std::vector<std::string> tokenize(const std::string&);
 std::vector<std::vector<std::string>> decode_line_tokens(const std::vector<std::string>&);

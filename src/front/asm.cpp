@@ -177,7 +177,8 @@ int main(int argc, char* argv[]) {
     string line;
     while (getline(in, line)) { lines.push_back(line); }
 
-    vector<string> expanded_lines = expandSource(lines);
+    map<unsigned, unsigned> expanded_lines_to_source_lines;
+    vector<string> expanded_lines = expandSource(lines, expanded_lines_to_source_lines);
     if (EXPAND_ONLY) {
         for (unsigned i = 0; i < expanded_lines.size(); ++i) {
             cout << expanded_lines[i] << endl;
@@ -199,15 +200,15 @@ int main(int argc, char* argv[]) {
     ///////////////////////////////////////////
     // INITIAL VERIFICATION OF CODE CORRECTNESS
     string report;
-    if ((report = assembler::verify::directives(expanded_lines)).size()) {
+    if ((report = assembler::verify::directives(expanded_lines, expanded_lines_to_source_lines)).size()) {
         cout << report << endl;
         return 1;
     }
-    if ((report = assembler::verify::instructions(expanded_lines)).size()) {
+    if ((report = assembler::verify::instructions(expanded_lines, expanded_lines_to_source_lines)).size()) {
         cout << report << endl;
         return 1;
     }
-    if ((report = assembler::verify::ressInstructions(expanded_lines, AS_LIB)).size()) {
+    if ((report = assembler::verify::ressInstructions(expanded_lines, expanded_lines_to_source_lines, AS_LIB)).size()) {
         cout << report << endl;
         return 1;
     }
@@ -215,7 +216,7 @@ int main(int argc, char* argv[]) {
         cout << report << endl;
         return 1;
     }
-    if ((report = assembler::verify::blockTries(expanded_lines, blocks.names, blocks.signatures)).size()) {
+    if ((report = assembler::verify::blockTries(expanded_lines, expanded_lines_to_source_lines, blocks.names, blocks.signatures)).size()) {
         cout << report << endl;
         return 1;
     }

@@ -640,7 +640,7 @@ map<string, uint16_t> mapInvokableAddresses(uint16_t& starting_instruction, cons
     return addresses;
 }
 
-vector<string> expandSource(const vector<string>& lines) {
+vector<string> expandSource(const vector<string>& lines, map<unsigned, unsigned>& expanded_lines_to_source_lines) {
     vector<string> stripped_lines;
 
     for (unsigned i = 0; i < lines.size(); ++i) {
@@ -650,23 +650,31 @@ vector<string> expandSource(const vector<string>& lines) {
     vector<string> asm_lines;
     for (unsigned i = 0; i < stripped_lines.size(); ++i) {
         if (stripped_lines[i] == "") {
+            expanded_lines_to_source_lines[asm_lines.size()] = i;
             asm_lines.push_back(lines[i]);
         } else if (str::startswith(stripped_lines[i], ".signature")) {
+            expanded_lines_to_source_lines[asm_lines.size()] = i;
             asm_lines.push_back(lines[i]);
         } else if (str::startswith(stripped_lines[i], ".bsignature")) {
+            expanded_lines_to_source_lines[asm_lines.size()] = i;
             asm_lines.push_back(lines[i]);
         } else if (str::startswith(stripped_lines[i], ".function")) {
+            expanded_lines_to_source_lines[asm_lines.size()] = i;
             asm_lines.push_back(lines[i]);
         } else if (str::startswith(stripped_lines[i], ".end")) {
+            expanded_lines_to_source_lines[asm_lines.size()] = i;
             asm_lines.push_back(lines[i]);
         } else if (stripped_lines[i][0] == ';') {
+            expanded_lines_to_source_lines[asm_lines.size()] = i;
             asm_lines.push_back(lines[i]);
         } else if (not str::contains(stripped_lines[i], '(')) {
+            expanded_lines_to_source_lines[asm_lines.size()] = i;
             asm_lines.push_back(lines[i]);
         } else {
             vector<vector<string>> decoded_lines = decode_line(stripped_lines[i]);
             unsigned indent = (lines[i].size() - stripped_lines[i].size());
             for (unsigned j = 0; j < decoded_lines.size(); ++j) {
+                expanded_lines_to_source_lines[asm_lines.size()] = i;
                 asm_lines.push_back(str::strmul<char>(' ', indent) + str::join<char>(decoded_lines[j], ' '));
             }
         }
