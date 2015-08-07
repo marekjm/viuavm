@@ -49,8 +49,16 @@ bool ERROR_EMPTY_FUNCTION_BODY = false;
 bool ERROR_GLOBALS_IN_LIB = false;
 
 
+struct invocables_t {
+    vector<string> names;
+    vector<string> signatures;
+    map<string, vector<string>> bodies;
+};
+
 extern vector<string> expandSource(const vector<string>&);
-extern int generate(const vector<string>&, string&, string&, const vector<string>&);
+extern int gatherFunctions(invocables_t*, const vector<string>&, const vector<string>&);
+extern int gatherBlocks(invocables_t*, const vector<string>&, const vector<string>&);
+extern int generate(const vector<string>&, vector<string>&, invocables_t&, invocables_t&, string&, string&, const vector<string>&);
 
 
 bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE) {
@@ -219,6 +227,16 @@ int main(int argc, char* argv[]) {
     }
 
 
+    vector<string> ilines = assembler::ce::getilines(expanded_lines);
+    invocables_t functions;
+    if (gatherFunctions(&functions, expanded_lines, ilines)) {
+        return 1;
+    }
+    invocables_t blocks;
+    if (gatherBlocks(&blocks, expanded_lines, ilines)) {
+        return 1;
+    }
+
     ///////////////////////////////////////////
     // INITIAL VERIFICATION OF CODE CORRECTNESS
     string report;
@@ -254,7 +272,7 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    int ret_code = generate(expanded_lines, filename, compilename, commandline_given_links);
+    int ret_code = generate(expanded_lines, ilines, functions, blocks, filename, compilename, commandline_given_links);
 
     return ret_code;
 }

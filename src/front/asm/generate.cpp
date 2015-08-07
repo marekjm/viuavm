@@ -914,23 +914,11 @@ int gatherBlocks(invocables_t* invocables, const vector<string>& expanded_lines,
     return 0;
 }
 
-int generate(const vector<string>& expanded_lines, string& filename, string& compilename, const vector<string>& commandline_given_links) {
-    vector<string> ilines = assembler::ce::getilines(expanded_lines);   // instruction lines
-
+int generate(const vector<string>& expanded_lines, vector<string>& ilines, invocables_t& functions, invocables_t& blocks, string& filename, string& compilename, const vector<string>& commandline_given_links) {
     //////////////////////////////
     // SETUP INITIAL BYTECODE SIZE
     uint16_t bytes = 0;
 
-
-    invocables_t functions;
-    if (gatherFunctions(&functions, expanded_lines, ilines)) {
-        return 1;
-    }
-
-    invocables_t blocks;
-    if (gatherBlocks(&blocks, expanded_lines, ilines)) {
-        return 1;
-    }
 
     /////////////////////////
     // GET MAIN FUNCTION NAME
