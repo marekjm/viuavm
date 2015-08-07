@@ -847,6 +847,73 @@ vector<string> expandSource(const vector<string>& lines) {
     return asm_lines;
 }
 
+struct invocables_t {
+    vector<string> names;
+    vector<string> signatures;
+    map<string, vector<string>> bodies;
+};
+
+int gatherFunctions(invocables_t* invocables, const vector<string>& expanded_lines, const vector<string>& ilines) {
+    ///////////////////////////////////////////
+    // GATHER FUNCTION NAMES AND SIGNATURES
+    //
+    // SIGNATURES ARE USED WITH DYNAMIC LINKING
+    // AS ASSEMBLER WOULD COMPLAIN ABOUT
+    // CALLS TO UNDEFINED FUNCTIONS
+    try {
+        invocables->names = assembler::ce::getFunctionNames(expanded_lines);
+    } catch (const string& e) {
+        cout << "fatal: " << e << endl;
+        return 1;
+    }
+
+    try {
+        invocables->signatures = assembler::ce::getSignatures(expanded_lines);
+    } catch (const string& e) {
+        cout << "fatal: " << e << endl;
+        return 1;
+    }
+
+    ///////////////////////////////
+    // GATHER FUNCTIONS' CODE LINES
+    try {
+         invocables->bodies = assembler::ce::getInvokables("function", ilines);
+    } catch (const string& e) {
+        cout << "error: function gathering failed: " << e << endl;
+        return 1;
+    }
+
+    return 0;
+}
+
+int gatherBlocks(invocables_t* invocables, const vector<string>& expanded_lines, const vector<string>& ilines) {
+    /////////////////////
+    // GATHER BLOCK NAMES
+    try {
+        invocables->names = assembler::ce::getBlockNames(expanded_lines);
+    } catch (const string& e) {
+        cout << "fatal: " << e << endl;
+        return 1;
+    }
+    try {
+        invocables->signatures = assembler::ce::getBlockSignatures(expanded_lines);
+    } catch (const string& e) {
+        cout << "fatal: " << e << endl;
+        return 1;
+    }
+
+    ///////////////////////////////
+    // GATHER BLOCK CODE LINES
+    try {
+         invocables->bodies = assembler::ce::getInvokables("block", ilines);
+    } catch (const string& e) {
+        cout << "error: block gathering failed: " << e << endl;
+        return 1;
+    }
+
+    return 0;
+}
+
 int generate(const vector<string>& expanded_lines, string& filename, string& compilename, const vector<string>& commandline_given_links) {
     vector<string> ilines = assembler::ce::getilines(expanded_lines);   // instruction lines
 
@@ -855,28 +922,10 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
     uint16_t bytes = 0;
 
 
-    ///////////////////////////////////////////
-    // GATHER FUNCTION NAMES AND SIGNATURES
-    //
-    // SIGNATURES ARE USED WITH DYNAMIC LINKING
-    // AS ASSEMBLER WOULD COMPLAIN ABOUT
-    // CALLS TO UNDEFINED FUNCTIONS
-    vector<string> function_names;
-    try {
-        function_names = assembler::ce::getFunctionNames(expanded_lines);
-    } catch (const string& e) {
-        cout << "fatal: " << e << endl;
+    invocables_t functions;
+    if (gatherFunctions(&functions, expanded_lines, ilines)) {
         return 1;
     }
-
-    vector<string> function_signatures;
-    try {
-        function_signatures = assembler::ce::getSignatures(expanded_lines);
-    } catch (const string& e) {
-        cout << "fatal: " << e << endl;
-        return 1;
-    }
-
 
     /////////////////////
     // GATHER BLOCK NAMES
@@ -919,17 +968,6 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
 
 
     ///////////////////////////////
-    // GATHER FUNCTIONS' CODE LINES
-    map<string, vector<string> > function_bodies;
-    try {
-         function_bodies = assembler::ce::getInvokables("function", ilines);
-    } catch (const string& e) {
-        cout << "error: function gathering failed: " << e << endl;
-        return 1;
-    }
-
-
-    ///////////////////////////////
     // GATHER BLOCK CODE LINES
     map<string, vector<string> > blocks;
     try {
@@ -943,7 +981,7 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
     ///////////////////////////////////////////
     // INITIAL VERIFICATION OF CODE CORRECTNESS
     string report;
-    if ((report = assembler::verify::functionBodiesAreNonempty(expanded_lines, function_bodies)).size()) {
+    if ((report = assembler::verify::functionBodiesAreNonempty(expanded_lines, functions.bodies)).size()) {
         cout << report << endl;
         exit(1);
     }
@@ -954,7 +992,7 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
 
     /////////////////////////
     // VERIFY FUNCTION BODIES
-    for (auto function : function_bodies) {
+    for (auto function : functions.bodies) {
         vector<string> flines = function.second;
         if ((flines.size() == 0 or flines.back() != "end") and (function.first != "main" and flines.back() != "halt")) {
             if (ERROR_MISSING_END or ERROR_ALL) {
@@ -986,11 +1024,11 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
     // CHECK IF MAIN FUNCTION RETURNS A VALUE
     // FIXME: this is just a crude check - it does not acctually checks if these instructions set 0 register
     // this must be better implemented or we will receive "function did not set return register" exceptions at runtime
-    bool main_is_defined = (find(function_names.begin(), function_names.end(), main_function) != function_names.end());
+    bool main_is_defined = (find(functions.names.begin(), functions.names.end(), main_function) != functions.names.end());
     if (not AS_LIB and main_is_defined) {
         string main_second_but_last;
         try {
-            main_second_but_last = *(function_bodies.at(main_function).end()-2);
+            main_second_but_last = *(functions.bodies.at(main_function).end()-2);
         } catch (const std::out_of_range& e) {
             cout << "[asm] fatal: could not find main function (during return value check)" << endl;
             exit(1);
@@ -1018,7 +1056,7 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
     map<string, uint16_t> block_addresses;
     try {
         block_addresses = mapInvokableAddresses(starting_instruction, block_names, blocks);
-        function_addresses = mapInvokableAddresses(starting_instruction, function_names, function_bodies);
+        function_addresses = mapInvokableAddresses(starting_instruction, functions.names, functions.bodies);
         bytes = Program::countBytes(ilines);
     } catch (const string& e) {
         cout << "error: bytecode size calculation failed: " << e << endl;
@@ -1032,7 +1070,7 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
         if (DEBUG) {
             cout << "generating __entry function" << endl;
         }
-        function_names.push_back(ENTRY_FUNCTION_NAME);
+        functions.names.push_back(ENTRY_FUNCTION_NAME);
         function_addresses[ENTRY_FUNCTION_NAME] = starting_instruction;
         // entry function sets global stuff
         ilines.insert(ilines.begin(), "ress global");
@@ -1045,7 +1083,7 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
         // then, register 1 is moved to register 0 so it counts as a return code
         ilines.push_back("move 0 1");
         ilines.push_back("halt");
-        function_bodies[ENTRY_FUNCTION_NAME] = ilines;
+        functions.bodies[ENTRY_FUNCTION_NAME] = ilines;
         // instructions were added so bytecode size must be inreased
         bytes += OP_SIZES.at("ress");
         bytes += OP_SIZES.at("frame");
@@ -1107,13 +1145,13 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
 
     //////////////////////////////////////////////////////////////
     // EXTEND FUNCTION NAMES VECTOR WITH NAMES OF LINKED FUNCTIONS
-    for (string name : linked_function_names) { function_names.push_back(name); }
+    for (string name : linked_function_names) { functions.names.push_back(name); }
 
 
     /////////////////////////////////////////////////////////////////////////
     // AFTER HAVING OBTAINED LINKED NAMES, IT IS POSSIBLE TO VERIFY CALLS AND
     // CALLABLE (FUNCTIONS, CLOSURES, ETC.) CREATIONS
-    if ((report = assembler::verify::functionCallsAreDefined(expanded_lines, function_names, function_signatures)).size()) {
+    if ((report = assembler::verify::functionCallsAreDefined(expanded_lines, functions.names, functions.signatures)).size()) {
         cout << report << endl;
         exit(1);
     }
@@ -1121,7 +1159,7 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
         cout << report << endl;
         exit(1);
     }
-    if ((report = assembler::verify::callableCreations(expanded_lines, function_names, function_signatures)).size()) {
+    if ((report = assembler::verify::callableCreations(expanded_lines, functions.names, functions.signatures)).size()) {
         cout << report << endl;
         exit(1);
     }
@@ -1240,7 +1278,7 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
     // functions section size, must be offset by the size of block section
     functions_section_size = blocks_section_size;
 
-    for (string name : function_names) {
+    for (string name : functions.names) {
         // do not generate bytecode for functions that were linked
         if (find(linked_function_names.begin(), linked_function_names.end(), name) != linked_function_names.end()) { continue; }
 
@@ -1249,7 +1287,7 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
         }
         uint16_t fun_bytes = 0;
         try {
-            fun_bytes = Program::countBytes(name == ENTRY_FUNCTION_NAME ? filter(function_bodies.at(name)) : function_bodies.at(name));
+            fun_bytes = Program::countBytes(name == ENTRY_FUNCTION_NAME ? filter(functions.bodies.at(name)) : functions.bodies.at(name));
             if (VERBOSE or DEBUG) {
                 cout << " (" << fun_bytes << " bytes at byte " << functions_section_size << ')' << endl;
             }
@@ -1264,7 +1302,7 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
         Program func(fun_bytes);
         func.setdebug(DEBUG).setscream(SCREAM);
         try {
-            assemble(func, function_bodies.at(name));
+            assemble(func, functions.bodies.at(name));
         } catch (const string& e) {
             cout << (DEBUG ? "\n" : "") << "fatal: error during assembling: " << e << endl;
             exit(1);
@@ -1337,7 +1375,7 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
     // CHECK IF THE FUNCTION SET AS MAIN IS DEFINED
     // AS ALL THE FUNCTIONS (LOCAL OR LINKED) ARE
     // NOW AVAILABLE
-    if (find(function_names.begin(), function_names.end(), main_function) == function_names.end() and not AS_LIB) {
+    if (find(functions.names.begin(), functions.names.end(), main_function) == functions.names.end() and not AS_LIB) {
         cout << "[asm:pre] fatal: main function is undefined: " << main_function << endl;
         return 1;
     }
@@ -1391,11 +1429,11 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
     ///////////////////////////////
     // PREPARE FUNCTION IDS SECTION
     uint16_t function_ids_section_size = 0;
-    for (string name : function_names) { function_ids_section_size += name.size(); }
+    for (string name : functions.names) { function_ids_section_size += name.size(); }
     // we need to insert address (uint16_t) after every function
-    function_ids_section_size += sizeof(uint16_t) * function_names.size();
+    function_ids_section_size += sizeof(uint16_t) * functions.names.size();
     // for null characters after function names
-    function_ids_section_size += function_names.size();
+    function_ids_section_size += functions.names.size();
 
 
     /////////////////////////////////////////////
@@ -1406,7 +1444,7 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
     if (DEBUG) {
         cout << "[asm:write] function addresses are offset by " << functions_size_so_far << " bytes (size of the block address table)" << endl;
     }
-    for (string name : function_names) {
+    for (string name : functions.names) {
         if (DEBUG) {
             cout << "[asm:write] writing function '" << name << "' to function address table";
         }
@@ -1429,7 +1467,7 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
         // functions size must be incremented by the actual size of function's bytecode size
         // to give correct offset for next function
         try {
-            functions_size_so_far += Program::countBytes(function_bodies.at(name));
+            functions_size_so_far += Program::countBytes(functions.bodies.at(name));
         } catch (const std::out_of_range& e) {
             cout << "fatal: could not find function '" << name << "' during address table write" << endl;
             exit(1);
@@ -1477,7 +1515,7 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
 
     ///////////////////////////////////////////////////////
     // WRITE BYTECODE OF LOCAL FUNCTIONS TO BYTECODE BUFFER
-    for (string name : function_names) {
+    for (string name : functions.names) {
         // linked functions are to be inserted later
         if (find(linked_function_names.begin(), linked_function_names.end(), name) != linked_function_names.end()) { continue; }
 
