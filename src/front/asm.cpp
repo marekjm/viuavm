@@ -260,7 +260,13 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    int ret_code = generate(expanded_lines, ilines, functions, blocks, filename, compilename, commandline_given_links);
+    compilationflags_t flags;
+    flags.as_lib = AS_LIB;
+    flags.verbose = VERBOSE;
+    flags.debug = DEBUG;
+    flags.scream = SCREAM;
+
+    int ret_code = generate(expanded_lines, ilines, functions, blocks, filename, compilename, commandline_given_links, flags);
 
     return ret_code;
 }

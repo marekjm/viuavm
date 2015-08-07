@@ -13,16 +13,6 @@
 using namespace std;
 
 
-// MISC FLAGS
-extern bool SHOW_HELP;
-extern bool SHOW_VERSION;
-
-// are we assembling a library?
-extern bool AS_LIB;
-
-// are we just expanding the source to simple form?
-extern bool EXPAND_ONLY;
-
 extern bool VERBOSE;
 extern bool DEBUG;
 extern bool SCREAM;
@@ -33,14 +23,9 @@ extern bool ERROR_ALL;
 
 // WARNINGS
 extern bool WARNING_MISSING_END;
-extern bool WARNING_EMPTY_FUNCTION_BODY;
-extern bool WARNING_GLOBALS_IN_LIB;
-
 
 // ERRORS
 extern bool ERROR_MISSING_END;
-extern bool ERROR_EMPTY_FUNCTION_BODY;
-extern bool ERROR_GLOBALS_IN_LIB;
 
 
 // ASSEMBLY CONSTANTS
@@ -700,7 +685,7 @@ vector<string> expandSource(const vector<string>& lines) {
     return asm_lines;
 }
 
-int generate(const vector<string>& expanded_lines, vector<string>& ilines, invocables_t& functions, invocables_t& blocks, string& filename, string& compilename, const vector<string>& commandline_given_links) {
+int generate(const vector<string>& expanded_lines, vector<string>& ilines, invocables_t& functions, invocables_t& blocks, string& filename, string& compilename, const vector<string>& commandline_given_links, const compilationflags_t& flags) {
     //////////////////////////////
     // SETUP INITIAL BYTECODE SIZE
     uint16_t bytes = 0;
@@ -719,10 +704,10 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, invoc
             break;
         }
     }
-    if (main_function == "" and not AS_LIB) {
+    if (main_function == "" and not flags.as_lib) {
         main_function = "main";
     }
-    if (((VERBOSE and main_function != "main" and main_function != "") or DEBUG) and not AS_LIB) {
+    if (((VERBOSE and main_function != "main" and main_function != "") or DEBUG) and not flags.as_lib) {
         cout << "debug (notice): main function set to: '" << main_function << "'" << endl;
     }
 
@@ -762,7 +747,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, invoc
     // FIXME: this is just a crude check - it does not acctually checks if these instructions set 0 register
     // this must be better implemented or we will receive "function did not set return register" exceptions at runtime
     bool main_is_defined = (find(functions.names.begin(), functions.names.end(), main_function) != functions.names.end());
-    if (not AS_LIB and main_is_defined) {
+    if (not flags.as_lib and main_is_defined) {
         string main_second_but_last;
         try {
             main_second_but_last = *(functions.bodies.at(main_function).end()-2);
@@ -779,7 +764,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, invoc
             return 1;
         }
     }
-    if (not main_is_defined and (DEBUG or VERBOSE) and not AS_LIB) {
+    if (not main_is_defined and (DEBUG or VERBOSE) and not flags.as_lib) {
         cout << "notice: main function (" << main_function << ") is not defined, deferring main function check to post-link phase" << endl;
     }
 
@@ -803,7 +788,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, invoc
 
     //////////////////////////
     // GENERATE ENTRY FUNCTION
-    if (not AS_LIB) {
+    if (not flags.as_lib) {
         if (DEBUG) {
             cout << "generating __entry function" << endl;
         }
@@ -916,7 +901,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, invoc
 
     ///////////////////////////
     // REPORT FIRST INSTRUCTION
-    if ((VERBOSE or DEBUG) and not AS_LIB) {
+    if ((VERBOSE or DEBUG) and not flags.as_lib) {
         cout << "message: first instruction pointer: " << starting_instruction << endl;
     }
 
@@ -1090,7 +1075,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, invoc
     //////////////////////////
     // IF ASSEMBLING A LIBRARY
     // WRITE OUT JUMP TABLE
-    if (AS_LIB) {
+    if (flags.as_lib) {
         if (DEBUG) {
             cout << "debug: jump table has " << jump_table.size() << " entries" << endl;
         }
@@ -1113,7 +1098,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, invoc
     // CHECK IF THE FUNCTION SET AS MAIN IS DEFINED
     // AS ALL THE FUNCTIONS (LOCAL OR LINKED) ARE
     // NOW AVAILABLE
-    if (find(functions.names.begin(), functions.names.end(), main_function) == functions.names.end() and not AS_LIB) {
+    if (find(functions.names.begin(), functions.names.end(), main_function) == functions.names.end() and not flags.as_lib) {
         cout << "[asm:pre] fatal: main function is undefined: " << main_function << endl;
         return 1;
     }
