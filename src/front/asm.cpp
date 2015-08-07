@@ -276,7 +276,13 @@ int main(int argc, char* argv[]) {
     flags.debug = DEBUG;
     flags.scream = SCREAM;
 
-    int ret_code = generate(expanded_lines, ilines, functions, blocks, filename, compilename, commandline_given_links, flags);
+    int ret_code = 0;
+    try {
+        ret_code = generate(expanded_lines, ilines, functions, blocks, filename, compilename, commandline_given_links, flags);
+    } catch (const string& e) {
+        ret_code = 1;
+        cout << "fatal: exception occured during assembling: " << e << endl;
+    }
 
     return ret_code;
 }
