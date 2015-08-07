@@ -27,7 +27,6 @@ bool SCREAM = false;
 bool WARNING_ALL = false;
 bool ERROR_ALL = false;
 
-
 // WARNINGS
 bool WARNING_MISSING_END = false;
 

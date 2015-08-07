@@ -17,16 +17,6 @@ extern bool VERBOSE;
 extern bool DEBUG;
 extern bool SCREAM;
 
-extern bool WARNING_ALL;
-extern bool ERROR_ALL;
-
-
-// WARNINGS
-extern bool WARNING_MISSING_END;
-
-// ERRORS
-extern bool ERROR_MISSING_END;
-
 
 // ASSEMBLY CONSTANTS
 const string ENTRY_FUNCTION_NAME = "__entry";
