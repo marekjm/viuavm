@@ -50,12 +50,6 @@ bool ERROR_EMPTY_FUNCTION_BODY = false;
 bool ERROR_GLOBALS_IN_LIB = false;
 
 
-extern vector<string> expandSource(const vector<string>&);
-extern int gatherFunctions(invocables_t*, const vector<string>&, const vector<string>&);
-extern int gatherBlocks(invocables_t*, const vector<string>&, const vector<string>&);
-extern int generate(const vector<string>&, vector<string>&, invocables_t&, invocables_t&, string&, string&, const vector<string>&);
-
-
 bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE) {
     if (SHOW_HELP or (SHOW_VERSION and VERBOSE)) {
         cout << "Viua VM assembler, version ";

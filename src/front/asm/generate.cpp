@@ -670,11 +670,6 @@ map<string, uint16_t> mapInvokableAddresses(uint16_t& starting_instruction, cons
     return addresses;
 }
 
-extern vector<string> tokenize(const string&);
-extern vector<vector<string>> decode_line_tokens(const vector<string>&);
-extern vector<vector<string>> decode_line(const string&);
-
-
 vector<string> expandSource(const vector<string>& lines) {
     vector<string> stripped_lines;
 

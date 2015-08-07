@@ -141,17 +141,17 @@ version:
 
 ############################################################
 # VIRTUAL MACHINE CODE
-build/asm/decode.o: src/front/asm/decode.cpp
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $^
+build/asm/decode.o: src/front/asm/decode.cpp include/viua/front/asm.h
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/asm/gather.o: src/front/asm/gather.cpp
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $^
+build/asm/gather.o: src/front/asm/gather.cpp include/viua/front/asm.h
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/asm/generate.o: src/front/asm/generate.cpp
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $^
+build/asm/generate.o: src/front/asm/generate.cpp include/viua/front/asm.h
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/asm.o: src/front/asm.cpp
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $^
+build/asm.o: src/front/asm.cpp include/viua/front/asm.h
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
 build/cpu.o: src/front/cpu.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $^

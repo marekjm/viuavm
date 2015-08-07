@@ -17,6 +17,7 @@
 #include <viua/front/asm.h>
 using namespace std;
 
+
 int gatherFunctions(invocables_t* invocables, const vector<string>& expanded_lines, const vector<string>& ilines) {
     ///////////////////////////////////////////
     // GATHER FUNCTION NAMES AND SIGNATURES
