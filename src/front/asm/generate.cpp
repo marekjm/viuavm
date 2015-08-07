@@ -941,18 +941,6 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, invoc
     }
 
 
-    ///////////////////////////////////////////
-    // INITIAL VERIFICATION OF CODE CORRECTNESS
-    string report;
-    if ((report = assembler::verify::functionBodiesAreNonempty(expanded_lines, functions.bodies)).size()) {
-        cout << report << endl;
-        exit(1);
-    }
-    if ((report = assembler::verify::blockTries(expanded_lines, blocks.names, blocks.signatures)).size()) {
-        cout << report << endl;
-        exit(1);
-    }
-
     /////////////////////////
     // VERIFY FUNCTION BODIES
     for (auto function : functions.bodies) {
@@ -1114,6 +1102,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, invoc
     /////////////////////////////////////////////////////////////////////////
     // AFTER HAVING OBTAINED LINKED NAMES, IT IS POSSIBLE TO VERIFY CALLS AND
     // CALLABLE (FUNCTIONS, CLOSURES, ETC.) CREATIONS
+    string report;
     if ((report = assembler::verify::functionCallsAreDefined(expanded_lines, functions.names, functions.signatures)).size()) {
         cout << report << endl;
         exit(1);

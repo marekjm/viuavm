@@ -252,6 +252,15 @@ int main(int argc, char* argv[]) {
         cout << report << endl;
         return 1;
     }
+    if ((report = assembler::verify::functionBodiesAreNonempty(expanded_lines, functions.bodies)).size()) {
+        cout << report << endl;
+        return 1;
+    }
+    if ((report = assembler::verify::blockTries(expanded_lines, blocks.names, blocks.signatures)).size()) {
+        cout << report << endl;
+        return 1;
+    }
+
     ////////////////////////////
     // VERIFY FRAME INSTRUCTIONS
     for (unsigned i = 0; i < expanded_lines.size(); ++i) {
