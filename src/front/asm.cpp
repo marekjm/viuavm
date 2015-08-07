@@ -40,14 +40,12 @@ bool ERROR_ALL = false;
 // WARNINGS
 bool WARNING_MISSING_END = false;
 bool WARNING_EMPTY_FUNCTION_BODY = false;
-bool WARNING_OPERANDLESS_FRAME = false;
 bool WARNING_GLOBALS_IN_LIB = false;
 
 
 // ERRORS
 bool ERROR_MISSING_END = false;
 bool ERROR_EMPTY_FUNCTION_BODY = false;
-bool ERROR_OPERANDLESS_FRAME = false;
 bool ERROR_GLOBALS_IN_LIB = false;
 
 
@@ -130,9 +128,6 @@ int main(int argc, char* argv[]) {
         } else if (option == "--Wempty-function") {
             WARNING_EMPTY_FUNCTION_BODY = true;
             continue;
-        } else if (option == "--Wopless-frame") {
-            WARNING_OPERANDLESS_FRAME = true;
-            continue;
         } else if (option == "--Wglobals-in-lib") {
             WARNING_GLOBALS_IN_LIB = true;
             continue;
@@ -141,9 +136,6 @@ int main(int argc, char* argv[]) {
             continue;
         } else if (option == "--Eempty-function") {
             ERROR_EMPTY_FUNCTION_BODY = true;
-            continue;
-        } else if (option == "--Eopless-frame") {
-            ERROR_OPERANDLESS_FRAME = true;
             continue;
         } else if (option == "--Eglobals-in-lib") {
             ERROR_GLOBALS_IN_LIB = true;
@@ -253,12 +245,8 @@ int main(int argc, char* argv[]) {
         line = str::lstrip(str::sub(line, str::chunk(line).size()));
 
         if (line.size() == 0) {
-            if (ERROR_OPERANDLESS_FRAME or ERROR_ALL) {
-                cout << "fatal: frame instruction without operands at line " << i << " in " << filename;
-                return 1;
-            } else if (WARNING_OPERANDLESS_FRAME or WARNING_ALL) {
-                cout << "warning: frame instruction without operands at line " << i << " in " << filename;
-            }
+            cout << "fatal: frame instruction without operands at line " << i << " in " << filename;
+            return 1;
         }
     }
 

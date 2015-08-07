@@ -38,14 +38,12 @@ extern bool ERROR_ALL;
 // WARNINGS
 extern bool WARNING_MISSING_END;
 extern bool WARNING_EMPTY_FUNCTION_BODY;
-extern bool WARNING_OPERANDLESS_FRAME;
 extern bool WARNING_GLOBALS_IN_LIB;
 
 
 // ERRORS
 extern bool ERROR_MISSING_END;
 extern bool ERROR_EMPTY_FUNCTION_BODY;
-extern bool ERROR_OPERANDLESS_FRAME;
 extern bool ERROR_GLOBALS_IN_LIB;
 
 
@@ -953,7 +951,6 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
         cout << report << endl;
         exit(1);
     }
-
 
     /////////////////////////
     // VERIFY FUNCTION BODIES
