@@ -927,24 +927,10 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
         return 1;
     }
 
-    /////////////////////
-    // GATHER BLOCK NAMES
-    vector<string> block_names;
-    try {
-        block_names = assembler::ce::getBlockNames(expanded_lines);
-    } catch (const string& e) {
-        cout << "fatal: " << e << endl;
+    invocables_t blocks;
+    if (gatherBlocks(&blocks, expanded_lines, ilines)) {
         return 1;
     }
-
-    vector<string> block_signatures;
-    try {
-        block_signatures = assembler::ce::getBlockSignatures(expanded_lines);
-    } catch (const string& e) {
-        cout << "fatal: " << e << endl;
-        return 1;
-    }
-
 
     /////////////////////////
     // GET MAIN FUNCTION NAME
@@ -967,17 +953,6 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
     }
 
 
-    ///////////////////////////////
-    // GATHER BLOCK CODE LINES
-    map<string, vector<string> > blocks;
-    try {
-         blocks = assembler::ce::getInvokables("block", ilines);
-    } catch (const string& e) {
-        cout << "error: block gathering failed: " << e << endl;
-        return 1;
-    }
-
-
     ///////////////////////////////////////////
     // INITIAL VERIFICATION OF CODE CORRECTNESS
     string report;
@@ -985,7 +960,7 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
         cout << report << endl;
         exit(1);
     }
-    if ((report = assembler::verify::blockTries(expanded_lines, block_names, block_signatures)).size()) {
+    if ((report = assembler::verify::blockTries(expanded_lines, blocks.names, blocks.signatures)).size()) {
         cout << report << endl;
         exit(1);
     }
@@ -1006,7 +981,7 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
 
     //////////////////////
     // VERIFY BLOCK BODIES
-    for (auto block : blocks) {
+    for (auto block : blocks.bodies) {
         vector<string> flines = block.second;
         if (flines.size() == 0) {
             cout << "fatal: block '" << block.first << "' has empty body" << endl;
@@ -1049,13 +1024,13 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
 
     /////////////////////////////////
     // MAP FUNCTIONS TO ADDRESSES AND
-    // MAP BLOCKS TO ADDRESSES AND
+    // MAP blocks.bodies TO ADDRESSES AND
     // SET STARTING INSTRUCTION
     uint16_t starting_instruction = 0;  // the bytecode offset to first executable instruction
     map<string, uint16_t> function_addresses;
     map<string, uint16_t> block_addresses;
     try {
-        block_addresses = mapInvokableAddresses(starting_instruction, block_names, blocks);
+        block_addresses = mapInvokableAddresses(starting_instruction, blocks.names, blocks.bodies);
         function_addresses = mapInvokableAddresses(starting_instruction, functions.names, functions.bodies);
         bytes = Program::countBytes(ilines);
     } catch (const string& e) {
@@ -1194,19 +1169,19 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
 
 
     /////////////////////////////////////////////////////////
-    // GENERATE BYTECODE OF LOCAL FUNCTIONS AND BLOCKS
+    // GENERATE BYTECODE OF LOCAL FUNCTIONS AND blocks.bodies
     //
     // BYTECODE IS GENERATED HERE BUT NOT YET WRITTEN TO FILE
     // THIS MUST BE GENERATED HERE TO OBTAIN FILL JUMP TABLE
     map<string, tuple<int, byte*> > functions_bytecode;
-    map<string, tuple<int, byte*> > blocks_bytecode;
+    map<string, tuple<int, byte*> > block_bodies_bytecode;
     int functions_section_size = 0;
-    int blocks_section_size = 0;
+    int block_bodies_section_size = 0;
 
     vector<tuple<int, int> > jump_positions;
 
-    for (string name : block_names) {
-        // do not generate bytecode for blocks that were linked
+    for (string name : blocks.names) {
+        // do not generate bytecode for blocks.bodies that were linked
         if (find(linked_block_names.begin(), linked_block_names.end(), name) != linked_block_names.end()) { continue; }
 
         if (VERBOSE or DEBUG) {
@@ -1214,9 +1189,9 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
         }
         uint16_t fun_bytes = 0;
         try {
-            fun_bytes = Program::countBytes(blocks.at(name));
+            fun_bytes = Program::countBytes(blocks.bodies.at(name));
             if (VERBOSE or DEBUG) {
-                cout << " (" << fun_bytes << " bytes at byte " << blocks_section_size << ')' << endl;
+                cout << " (" << fun_bytes << " bytes at byte " << block_bodies_section_size << ')' << endl;
             }
         } catch (const string& e) {
             cout << "fatal: error during block size count (pre-assembling): " << e << endl;
@@ -1229,7 +1204,7 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
         Program func(fun_bytes);
         func.setdebug(DEBUG).setscream(SCREAM);
         try {
-            assemble(func, blocks.at(name));
+            assemble(func, blocks.bodies.at(name));
         } catch (const string& e) {
             cout << (DEBUG ? "\n" : "") << "fatal: error during assembling: " << e << endl;
             exit(1);
@@ -1247,36 +1222,36 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
         vector<tuple<int, int> > local_jumps;
         for (unsigned i = 0; i < jumps.size(); ++i) {
             unsigned jmp = jumps[i];
-            local_jumps.push_back(tuple<int, int>(jmp, blocks_section_size));
+            local_jumps.push_back(tuple<int, int>(jmp, block_bodies_section_size));
         }
         func.calculateJumps(local_jumps);
 
         byte* btcode = func.bytecode();
 
         // store generated bytecode fragment for future use (we must not yet write it to the file to conform to bytecode format)
-        blocks_bytecode[name] = tuple<int, byte*>(func.size(), btcode);
+        block_bodies_bytecode[name] = tuple<int, byte*>(func.size(), btcode);
 
         // extend jump table with jumps from current block
         for (unsigned i = 0; i < jumps.size(); ++i) {
             unsigned jmp = jumps[i];
             if (DEBUG) {
-                cout << "[asm] debug: pushed relative jump to jump table: " << jmp << '+' << blocks_section_size << endl;
+                cout << "[asm] debug: pushed relative jump to jump table: " << jmp << '+' << block_bodies_section_size << endl;
             }
-            jump_table.push_back(jmp+blocks_section_size);
+            jump_table.push_back(jmp+block_bodies_section_size);
         }
 
         for (unsigned i = 0; i < jumps_absolute.size(); ++i) {
             if (DEBUG) {
                 cout << "[asm] debug: pushed absolute jump to jump table: " << jumps_absolute[i] << "+0" << endl;
             }
-            jump_positions.push_back(tuple<int, int>(jumps_absolute[i]+blocks_section_size, 0));
+            jump_positions.push_back(tuple<int, int>(jumps_absolute[i]+block_bodies_section_size, 0));
         }
 
-        blocks_section_size += func.size();
+        block_bodies_section_size += func.size();
     }
 
     // functions section size, must be offset by the size of block section
-    functions_section_size = blocks_section_size;
+    functions_section_size = block_bodies_section_size;
 
     for (string name : functions.names) {
         // do not generate bytecode for functions that were linked
@@ -1384,18 +1359,18 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
     ////////////////////////////
     // PREPARE BLOCK IDS SECTION
     uint16_t block_ids_section_size = 0;
-    for (string name : block_names) { block_ids_section_size += name.size(); }
+    for (string name : blocks.names) { block_ids_section_size += name.size(); }
     // we need to insert address (uint16_t) after every block
-    block_ids_section_size += sizeof(uint16_t) * block_names.size();
+    block_ids_section_size += sizeof(uint16_t) * blocks.names.size();
     // for null characters after block names
-    block_ids_section_size += block_names.size();
+    block_ids_section_size += blocks.names.size();
 
     /////////////////////////////////////////////
     // WRITE OUT BLOCK IDS SECTION
-    // THIS ALSO INCLUDES IDS OF LINKED BLOCKS
+    // THIS ALSO INCLUDES IDS OF LINKED blocks.bodies
     out.write((const char*)&block_ids_section_size, sizeof(uint16_t));
-    uint16_t blocks_size_so_far = 0;
-    for (string name : block_names) {
+    uint16_t block_bodies_size_so_far = 0;
+    for (string name : blocks.names) {
         if (DEBUG) {
             cout << "[asm:write] writing block '" << name << "' to block address table";
         }
@@ -1414,11 +1389,11 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
         // ...requires terminating null character
         out.put('\0');
         // mapped address must come after name
-        out.write((const char*)&blocks_size_so_far, sizeof(uint16_t));
-        // blocks size must be incremented by the actual size of block's bytecode size
+        out.write((const char*)&block_bodies_size_so_far, sizeof(uint16_t));
+        // blocks.bodies size must be incremented by the actual size of block's bytecode size
         // to give correct offset for next block
         try {
-            blocks_size_so_far += Program::countBytes(blocks.at(name));
+            block_bodies_size_so_far += Program::countBytes(blocks.bodies.at(name));
         } catch (const std::out_of_range& e) {
             cout << "fatal: could not find block '" << name << "' during address table write" << endl;
             exit(1);
@@ -1440,7 +1415,7 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
     // WRITE OUT FUNCTION IDS SECTION
     // THIS ALSO INCLUDES IDS OF LINKED FUNCTIONS
     out.write((const char*)&function_ids_section_size, sizeof(uint16_t));
-    uint16_t functions_size_so_far = blocks_size_so_far;
+    uint16_t functions_size_so_far = block_bodies_size_so_far;
     if (DEBUG) {
         cout << "[asm:write] function addresses are offset by " << functions_size_so_far << " bytes (size of the block address table)" << endl;
     }
@@ -1494,9 +1469,9 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
     int program_bytecode_used = 0;
 
     ///////////////////////////////////////////////////////
-    // WRITE BYTECODE OF LOCAL BLOCKS TO BYTECODE BUFFER
-    for (string name : block_names) {
-        // linked blocks are to be inserted later
+    // WRITE BYTECODE OF LOCAL blocks.bodies TO BYTECODE BUFFER
+    for (string name : blocks.names) {
+        // linked blocks.bodies are to be inserted later
         if (find(linked_block_names.begin(), linked_block_names.end(), name) != linked_block_names.end()) { continue; }
 
         if (DEBUG) {
@@ -1504,7 +1479,7 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
         }
         int fun_size = 0;
         byte* fun_bytecode = 0;
-        tie(fun_size, fun_bytecode) = blocks_bytecode[name];
+        tie(fun_size, fun_bytecode) = block_bodies_bytecode[name];
 
         for (int i = 0; i < fun_size; ++i) {
             program_bytecode[program_bytecode_used+i] = fun_bytecode[i];
