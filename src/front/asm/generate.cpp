@@ -945,18 +945,6 @@ int generate(const vector<string>& expanded_lines, string& filename, string& com
     ///////////////////////////////////////////
     // INITIAL VERIFICATION OF CODE CORRECTNESS
     string report;
-    if ((report = assembler::verify::directives(expanded_lines)).size()) {
-        cout << report << endl;
-        exit(1);
-    }
-    if ((report = assembler::verify::instructions(expanded_lines)).size()) {
-        cout << report << endl;
-        exit(1);
-    }
-    if ((report = assembler::verify::ressInstructions(expanded_lines, AS_LIB)).size()) {
-        cout << report << endl;
-        exit(1);
-    }
     if ((report = assembler::verify::functionBodiesAreNonempty(expanded_lines, functions)).size()) {
         cout << report << endl;
         exit(1);

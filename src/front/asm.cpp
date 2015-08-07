@@ -26,6 +26,8 @@ bool AS_LIB = false;
 
 // are we just expanding the source to simple form?
 bool EXPAND_ONLY = false;
+// are we only verifying source code correctness?
+bool EARLY_VERIFICATION_ONLY = false;
 
 bool VERBOSE = false;
 bool DEBUG = false;
@@ -80,6 +82,9 @@ bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE)
              << "    " << "-c, --lib                - assemble as a library\n"
              << "    " << "    --expand             - only expand the source code to simple form (one instruction per line)\n"
              << "    " << "                           with this option, assembler prints expanded source to standard output\n"
+             << "    " << "    --verify             - verify source code correctness without actually compiling it\n"
+             << "    " << "                         - verify source code correctness without actually compiling it\n"
+             << "    " << "                           this option turns assembler into source level debugger and static code analyzer hybrid\n"
              ;
     }
 
@@ -154,6 +159,9 @@ int main(int argc, char* argv[]) {
         } else if (option == "--expand") {
             EXPAND_ONLY = true;
             continue;
+        } else if (option == "--verify") {
+            EARLY_VERIFICATION_ONLY = true;
+            continue;
         }
         args.push_back(argv[i]);
     }
@@ -215,6 +223,27 @@ int main(int argc, char* argv[]) {
         for (unsigned i = 0; i < expanded_lines.size(); ++i) {
             cout << expanded_lines[i] << endl;
         }
+        return 0;
+    }
+
+
+    ///////////////////////////////////////////
+    // INITIAL VERIFICATION OF CODE CORRECTNESS
+    string report;
+    if ((report = assembler::verify::directives(expanded_lines)).size()) {
+        cout << report << endl;
+        return 1;
+    }
+    if ((report = assembler::verify::instructions(expanded_lines)).size()) {
+        cout << report << endl;
+        return 1;
+    }
+    if ((report = assembler::verify::ressInstructions(expanded_lines, AS_LIB)).size()) {
+        cout << report << endl;
+        return 1;
+    }
+
+    if (EARLY_VERIFICATION_ONLY) {
         return 0;
     }
 
