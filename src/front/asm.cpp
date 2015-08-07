@@ -30,14 +30,9 @@ bool ERROR_ALL = false;
 
 // WARNINGS
 bool WARNING_MISSING_END = false;
-bool WARNING_EMPTY_FUNCTION_BODY = false;
-bool WARNING_GLOBALS_IN_LIB = false;
-
 
 // ERRORS
 bool ERROR_MISSING_END = false;
-bool ERROR_EMPTY_FUNCTION_BODY = false;
-bool ERROR_GLOBALS_IN_LIB = false;
 
 
 bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE) {
@@ -58,11 +53,9 @@ bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE)
              << "    " << "    --scream             - show so much debugging output it becomes noisy\n"
              << "    " << "-W, --Wall               - warn about everything\n"
              << "    " << "    --Wmissin-end        - warn about missing 'end' instruction at the end of functions\n"
-             << "    " << "    --Wempty-function    - warn about empty functions\n"
              << "    " << "    --Wopless-frame      - warn about frames without operands\n"
              << "    " << "-E, --Eall               - treat all warnings as errors\n"
              << "    " << "    --Emissing-end       - treat missing 'end' instruction at the end of function as error\n"
-             << "    " << "    --Eempty-function    - treat empty function as error\n"
              << "    " << "    --Eopless-frame      - treat frames without operands as errors\n"
              << "    " << "-c, --lib                - assemble as a library\n"
              << "    " << "    --expand             - only expand the source code to simple form (one instruction per line)\n"
@@ -112,20 +105,8 @@ int main(int argc, char* argv[]) {
         } else if (option == "--Wmissing-end") {
             WARNING_MISSING_END = true;
             continue;
-        } else if (option == "--Wempty-function") {
-            WARNING_EMPTY_FUNCTION_BODY = true;
-            continue;
-        } else if (option == "--Wglobals-in-lib") {
-            WARNING_GLOBALS_IN_LIB = true;
-            continue;
         } else if (option == "--Emissing-end") {
             ERROR_MISSING_END = true;
-            continue;
-        } else if (option == "--Eempty-function") {
-            ERROR_EMPTY_FUNCTION_BODY = true;
-            continue;
-        } else if (option == "--Eglobals-in-lib") {
-            ERROR_GLOBALS_IN_LIB = true;
             continue;
         } else if (option == "--out" or option == "-o") {
             if (i < argc-1) {
