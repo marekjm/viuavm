@@ -2,14 +2,9 @@
 
 ##############################################################
 #
-#   This file is a compile-and-run frontend for Wudoo VM.
+#   This file is a compile-and-run frontend for Viua VM.
 #   It first calls an assembler on given file and then
 #   runs the output inside the CPU.
-#
-#   The bin/vm/run binary name is a bit misleading as it
-#   is not a "runner" for code but a frontend which is
-#   just loading bytecode into the CPU and kicks it
-#   so it starts running the bytecode.
 #
 #   Environment variables listed below affect this script.
 #   They are intended to be used in such a form:
@@ -33,6 +28,9 @@
 
 set -e
 
+VIUA_ASM=./build/bin/vm/asm
+VIUA_CPU=./build/bin/vm/cpu
+
 if [[ $1 == "" ]]; then
     # must pass a filename to run
     echo "fatal: no file to run"
@@ -47,13 +45,13 @@ if [[ $DEBUG_VIUA == 1 ]]; then
 fi
 
 if [[ $DEBUG_ASM == 1 ]]; then
-    bin/vm/asm --debug $1 bin/run/`basename $1.bin`
+    $VIUA_ASM --debug -o `basename $1.bin` $1
 else
-    bin/vm/asm $1 bin/run/`basename $1.bin`
+    $VIUA_ASM -o `basename $1.bin` $1 
 fi
 
 if [[ $DEBUG_CPU == 1 ]]; then
-    bin/vm/cpu --debug bin/run/`basename $1.bin`
+    $VIUA_CPU --debug `basename $1.bin`
 else
-    bin/vm/cpu bin/run/`basename $1.bin`
+    $VIUA_CPU `basename $1.bin`
 fi
