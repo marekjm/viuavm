@@ -112,6 +112,13 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    Prototype* proto_object = new Prototype("Object");
+    proto_object->attach("Object::set", "set");
+    proto_object->attach("Object::get", "get");
+    cpu.registerForeignPrototype("Object", proto_object);
+    cpu.registerForeignMethod("Object::set", &Object::set);
+    cpu.registerForeignMethod("Object::get", &Object::get);
+
     cpu.run();
 
     int ret_code = 0;
