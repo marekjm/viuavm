@@ -97,6 +97,10 @@ class CPU {
      */
     std::map<std::string, ExternalFunction*> foreign_functions;
 
+    /** This is the mapping Viua uses to dispatch methods on pure-C++ classes.
+     */
+    std::map<std::string, ForeignMethod> foreign_methods;
+
     /*  Methods to deal with registers.
      */
     void updaterefs(Type* before, Type* now);

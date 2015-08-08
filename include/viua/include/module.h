@@ -7,7 +7,7 @@
 #include <vector>
 #include <viua/cpu/frame.h>
 #include <viua/cpu/registerset.h>
-#include <viua/types/type.h>
+#include <viua/types/object.h>
 
 
 const std::vector<std::string> VIUAPATH = {
@@ -34,6 +34,14 @@ const std::vector<std::string> VIUAPATH = {
 
 // External functions must have this signature
 typedef Type* (ExternalFunction)(Frame*, RegisterSet*, RegisterSet*);
+
+/** Custom types for Viua VM can be written in C++ and loaded into the typesystem with minimal amount of bookkeeping.
+ *  The only thing Viua needs to use a pure-C++ class is a string-name-to-member-function-pointer mapping as
+ *  the machine must be able to somehow dispatch the methods.
+ *  One downside this approach has is that all method calls are performed via the vtable which may not be the most
+ *  efficient way.
+ */
+typedef Object* (Object::*ForeignMethod)(Frame*, RegisterSet*, RegisterSet*);
 
 // Specification of single external function
 // The "exports()" function returns an array of such structures.
