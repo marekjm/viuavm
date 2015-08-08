@@ -4,6 +4,8 @@
 #pragma once
 
 #include <map>
+#include <viua/cpu/frame.h>
+#include <viua/registerset.h>
 #include <viua/types/type.h>
 
 
@@ -26,6 +28,9 @@ class Object: public Type {
         virtual std::vector<std::string> inheritancechain() const {
             return std::vector<std::string>{"Type"};
         }
+
+        virtual Object* set(Frame*, RegisterSet*, RegisterSet*);
+        virtual Object* get(Frame*, RegisterSet*, RegisterSet*);
 
         virtual Type* copy() const;
 

@@ -1,3 +1,4 @@
+#include <iostream>
 #include <string>
 #include <sstream>
 #include <viua/types/object.h>
@@ -16,6 +17,15 @@ bool Object::boolean() const {
 Type* Object::copy() const {
     Object* cp = new Object(type_name);
     return cp;
+}
+
+Object* Object::set(Frame*, RegisterSet*, RegisterSet*) {
+    cout << "Object::set()" << endl;
+    return 0;
+}
+Object* Object::get(Frame*, RegisterSet*, RegisterSet*) {
+    cout << "Object::get()" << endl;
+    return 0;
 }
 
 
