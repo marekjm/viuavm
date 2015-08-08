@@ -337,6 +337,73 @@ byte* CPU::callForeign(byte* addr, const string& call_name, const bool& return_r
 
     return return_address;
 }
+byte* CPU::callForeignMethod(byte* addr, Object* object, const string& call_name, const bool& return_ref, const int& return_index, const string& real_call_name) {
+    if (real_call_name.size()) {
+        addr += (real_call_name.size()+1);
+    } else {
+        addr += (call_name.size()+1);
+    }
+
+    // save return address for frame
+    byte* return_address = addr;
+
+    if (frame_new == 0) {
+        throw new Exception("foreign method call without a frame");
+    }
+    // set function name and return address
+    frame_new->function_name = call_name;
+    frame_new->return_address = return_address;
+
+    frame_new->resolve_return_value_register = return_ref;
+    frame_new->place_return_value_in = return_index;
+
+    Frame* frame = frame_new;
+
+    pushFrame();
+
+    if (foreign_methods.count(call_name) == 0) {
+        throw new Exception("call to unregistered foreign method: " + call_name);
+    }
+
+    try {
+        (object->*(foreign_methods.at(call_name)))(frame, 0, 0);
+    } catch (const std::out_of_range& e) {
+        throw new Exception(e.what());
+    }
+
+    // FIXME: woohoo! segfault!
+    Type* returned = 0;
+    bool returned_is_reference = false;
+    int return_value_register = frames.back()->place_return_value_in;
+    bool resolve_return_value_register = frames.back()->resolve_return_value_register;
+    if (return_value_register != 0) {
+        // we check in 0. register because it's reserved for return values
+        if (uregset->at(0) == 0) {
+            throw new Exception("return value requested by frame but foreign method did not set return register");
+        }
+        if (uregset->isflagged(0, REFERENCE)) {
+            returned = uregset->get(0);
+            returned_is_reference = true;
+        } else {
+            returned = uregset->get(0)->copy();
+        }
+    }
+
+    dropFrame();
+
+    // place return value
+    if (returned and frames.size() > 0) {
+        if (resolve_return_value_register) {
+            return_value_register = static_cast<Integer*>(fetch(return_value_register))->value();
+        }
+        place(return_value_register, returned);
+        if (returned_is_reference) {
+            uregset->flag(return_value_register, REFERENCE);
+        }
+    }
+
+    return return_address;
+}
 
 
 void CPU::loadNativeLibrary(const string& module) {
