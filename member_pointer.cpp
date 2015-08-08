@@ -22,16 +22,20 @@ class Derived: public Middle {
         virtual void hello() {
             cout << "hello world! (from Derived)" << endl;
         }
+
+        virtual void hi() {
+            cout << "Hi! (from Derived)" << endl;
+        }
 };
 
 
-typedef void (Base::*HELLO)();
+typedef void (Base::*MEMBER_FUNCTION)();
 
 
 int main() {
     Base* bptr = new Derived();
 
-    HELLO bhello = &Base::hello;
+    MEMBER_FUNCTION bhello = static_cast<MEMBER_FUNCTION>(&Derived::hi);
 
     (bptr->*bhello)();
 
