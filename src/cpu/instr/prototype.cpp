@@ -82,7 +82,7 @@ byte* CPU::vmattach(byte* addr) {
 
     Prototype* proto = static_cast<Prototype*>(fetch(reg));
 
-    if (not (function_addresses.count(function_name) or linked_functions.count(function_name) or external_functions.count(function_name))) {
+    if (not (function_addresses.count(function_name) or linked_functions.count(function_name) or foreign_functions.count(function_name))) {
         throw new Exception("cannot attach undefined function '" + function_name + "' as a method '" + method_name + "' of prototype '" + proto->getTypeName() + "'");
     }
 

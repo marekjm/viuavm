@@ -86,7 +86,7 @@ CPU& CPU::mapblock(const string& name, unsigned address) {
 CPU& CPU::registerExternalFunction(const string& name, ExternalFunction* function_ptr) {
     /** Registers external function in CPU.
      */
-    external_functions[name] = function_ptr;
+    foreign_functions[name] = function_ptr;
     return (*this);
 }
 
@@ -279,7 +279,7 @@ byte* CPU::callForeign(byte* addr, const string& call_name, const bool& return_r
 
     pushFrame();
 
-    if (external_functions.count(call_name) == 0) {
+    if (foreign_functions.count(call_name) == 0) {
         throw new Exception("call to unregistered external function: " + call_name);
     }
 
@@ -287,7 +287,7 @@ byte* CPU::callForeign(byte* addr, const string& call_name, const bool& return_r
      *        0 if function does not have static registers registered
      * FIXME: should external functions always have static registers allocated?
      */
-    ExternalFunction* callback = external_functions.at(call_name);
+    ExternalFunction* callback = foreign_functions.at(call_name);
     (*callback)(frame, 0, regset);
 
     // FIXME: woohoo! segfault!

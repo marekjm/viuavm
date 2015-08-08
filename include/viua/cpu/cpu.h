@@ -95,7 +95,7 @@ class CPU {
     /*  This is the interface between programs compiled to VM bytecode and
      *  extension libraries written in C++.
      */
-    std::map<std::string, ExternalFunction*> external_functions;
+    std::map<std::string, ExternalFunction*> foreign_functions;
 
     /*  Methods to deal with registers.
      */

@@ -498,7 +498,7 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
     } else if (command == "loader.extern.function.map" or command == "loader.extern.function.map.show") {
         command = "loader.extern.function.map.show";
         if (operands.size() == 0) {
-            for (pair<string, ExternalFunction*> mapping : cpu.external_functions) {
+            for (pair<string, ExternalFunction*> mapping : cpu.foreign_functions) {
                 operands.push_back(mapping.first);
             }
         }
@@ -673,7 +673,7 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
         bool exists = false;
         for (string fun : operands) {
             try {
-                cpu.external_functions.at(fun);
+                cpu.foreign_functions.at(fun);
                 exists = true;
             } catch (const std::out_of_range& e) {
                 exists = false;

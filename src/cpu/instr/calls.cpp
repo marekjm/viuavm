@@ -163,7 +163,7 @@ byte* CPU::call(byte* addr) {
     string call_name = string(addr);
 
     bool is_native = (function_addresses.count(call_name) or linked_functions.count(call_name));
-    bool is_foreign = external_functions.count(call_name);
+    bool is_foreign = foreign_functions.count(call_name);
 
     if (not (is_native or is_foreign)) {
         throw new Exception("call to undefined function: " + call_name);
