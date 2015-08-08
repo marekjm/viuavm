@@ -12,7 +12,7 @@
 using namespace std;
 
 
-string assembler::verify::functionCallsAreDefined(const vector<string>& lines, const vector<string>& function_names, const vector<string>& function_signatures) {
+string assembler::verify::functionCallsAreDefined(const vector<string>& lines, const map<unsigned, unsigned>& expanded_lines_to_source_lines, const vector<string>& function_names, const vector<string>& function_signatures) {
     ostringstream report("");
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
@@ -37,14 +37,14 @@ string assembler::verify::functionCallsAreDefined(const vector<string>& lines, c
         }
 
         if (is_undefined) {
-            report << "fatal: call to undefined function '" << check_function << "' at line " << (i+1);
+            report << "fatal: call to undefined function '" << check_function << "' at line " << (expanded_lines_to_source_lines.at(i)+1);
             break;
         }
     }
     return report.str();
 }
 
-string assembler::verify::frameBalance(const vector<string>& lines) {
+string assembler::verify::frameBalance(const vector<string>& lines, const map<unsigned, unsigned>& expanded_lines_to_source_lines) {
     ostringstream report("");
     string line;
     string instruction;
@@ -69,11 +69,15 @@ string assembler::verify::frameBalance(const vector<string>& lines) {
         }
 
         if (balance < 0) {
-            report << "fatal: call with '" << instruction << "' without a frame at line " << (i+1);
+            report << "fatal: call with '" << instruction << "' without a frame at line ";
+            report << (expanded_lines_to_source_lines.at(i)+1);
             break;
         }
         if (balance > 1) {
-            report << "fatal: excess frame spawned at line " << (i+1) << " (unused frame spawned at line " << (previous_frame_spawnline+1) << ')';
+            report << "fatal: excess frame spawned at line ";
+            report << (expanded_lines_to_source_lines.at(i)+1);
+            report << " (unused frame spawned at line ";
+            report << (expanded_lines_to_source_lines.at(previous_frame_spawnline)+1) << ')';
             break;
         }
 
@@ -84,7 +88,7 @@ string assembler::verify::frameBalance(const vector<string>& lines) {
     return report.str();
 }
 
-string assembler::verify::blockTries(const vector<string>& lines, const vector<string>& block_names, const vector<string>& block_signatures) {
+string assembler::verify::blockTries(const vector<string>& lines, const map<unsigned, unsigned>& expanded_lines_to_source_lines, const vector<string>& block_names, const vector<string>& block_signatures) {
     ostringstream report("");
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
@@ -101,13 +105,13 @@ string assembler::verify::blockTries(const vector<string>& lines, const vector<s
         }
 
         if (is_undefined) {
-            report << "fatal: try of undefined block '" << block << "' at line " << (i+1);
+            report << "fatal: try of undefined block '" << block << "' at line " << (expanded_lines_to_source_lines.at(i)+1);
         }
     }
     return report.str();
 }
 
-string assembler::verify::callableCreations(const vector<string>& lines, const vector<string>& function_names, const vector<string>& function_signatures) {
+string assembler::verify::callableCreations(const vector<string>& lines, const map<unsigned, unsigned>& expanded_lines_to_source_lines, const vector<string>& function_names, const vector<string>& function_signatures) {
     ostringstream report("");
     string line;
     string callable_type;
@@ -131,20 +135,15 @@ string assembler::verify::callableCreations(const vector<string>& lines, const v
         }
 
         if (is_undefined) {
-            report << "fatal: " << callable_type << " from undefined function '" << function << "' at line " << (i+1);
-            break;
-        }
-
-        // second chunk of closure instruction, must be an integer
-        if (not str::isnum(register_index)) {
-            report << "fatal: first operand (register index) is not an integer in " << callable_type << " instruction at line " << (i+1);
+            report << "fatal: " << callable_type << " from undefined function '" << function << "' at line ";
+            report << (expanded_lines_to_source_lines.at(i)+1);
             break;
         }
     }
     return report.str();
 }
 
-string assembler::verify::ressInstructions(const vector<string>& lines, bool as_lib) {
+string assembler::verify::ressInstructions(const vector<string>& lines, const map<unsigned, unsigned>& expanded_lines_to_source_lines, bool as_lib) {
     ostringstream report("");
     vector<string> legal_register_sets = {
         "global",   // global register set
@@ -167,11 +166,11 @@ string assembler::verify::ressInstructions(const vector<string>& lines, bool as_
         string registerset_name = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
 
         if (find(legal_register_sets.begin(), legal_register_sets.end(), registerset_name) == legal_register_sets.end()) {
-            report << "fatal: illegal register set name in ress instruction: '" << registerset_name << "' at line " << (i+1);
+            report << "fatal: illegal register set name in ress instruction: '" << registerset_name << "' at line " << (expanded_lines_to_source_lines.at(i)+1);
             break;
         }
         if (registerset_name == "global" and as_lib and function != "main") {
-            report << "fatal: global registers used in library function at line " << (i+1);
+            report << "fatal: global registers used in library function at line " << (expanded_lines_to_source_lines.at(i)+1);
             break;
         }
     }
@@ -191,7 +190,7 @@ string assembler::verify::functionBodiesAreNonempty(const vector<string>& lines,
     return report.str();
 }
 
-string assembler::verify::directives(const vector<string>& lines) {
+string assembler::verify::directives(const vector<string>& lines, const map<unsigned, unsigned>& expanded_lines_to_source_lines) {
     ostringstream report("");
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
@@ -202,13 +201,15 @@ string assembler::verify::directives(const vector<string>& lines) {
 
         string token = str::chunk(line);
         if (not (token == ".function:" or token == ".signature:" or token == ".bsignature:" or token == ".block:" or token == ".end" or token == ".name:" or token == ".mark:" or token == ".main:" or token == ".type:" or token == ".class:")) {
-            report << "fatal: unrecognised assembler directive on line " << (i+1) << ": `" << token << '`';
+            report << "fatal: unrecognised assembler directive on line ";
+            report << (expanded_lines_to_source_lines.at(i)+1);
+            report << ": `" << token << '`';
             break;
         }
     }
     return report.str();
 }
-string assembler::verify::instructions(const vector<string>& lines) {
+string assembler::verify::instructions(const vector<string>& lines, const map<unsigned, unsigned>& expanded_lines_to_source_lines) {
     ostringstream report("");
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
@@ -219,7 +220,9 @@ string assembler::verify::instructions(const vector<string>& lines) {
 
         string token = str::chunk(line);
         if (OP_SIZES.count(token) == 0) {
-            report << "fatal: unrecognised instruction on line " << (i+1) << ": `" << token << '`';
+            report << "fatal: unrecognised instruction on line ";
+            report << (expanded_lines_to_source_lines.at(i)+1);
+            report << ": `" << token << '`';
             break;
         }
     }

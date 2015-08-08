@@ -110,7 +110,7 @@ void Loader::loadBytecode(ifstream& in) {
 Loader& Loader::load() {
     ifstream in(path, ios::in | ios::binary);
     if (!in) {
-        throw ("fatal: failed to open file: " + path);
+        throw ("failed to open file: " + path);
     }
 
     // jump table must be loaded if loading a library

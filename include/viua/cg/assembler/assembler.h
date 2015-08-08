@@ -37,16 +37,16 @@ namespace assembler {
     }
 
     namespace verify {
-        std::string functionCallsAreDefined(const std::vector<std::string>& lines, const std::vector<std::string>& function_names, const std::vector<std::string>& function_signatures);
-        std::string frameBalance(const std::vector<std::string>& lines);
-        std::string callableCreations(const std::vector<std::string>& lines, const std::vector<std::string>& function_names, const std::vector<std::string>& function_signatures);
-        std::string ressInstructions(const std::vector<std::string>& lines, bool as_lib);
+        std::string functionCallsAreDefined(const std::vector<std::string>& lines, const std::map<unsigned, unsigned>&, const std::vector<std::string>& function_names, const std::vector<std::string>& function_signatures);
+        std::string frameBalance(const std::vector<std::string>& lines, const std::map<unsigned, unsigned>&);
+        std::string callableCreations(const std::vector<std::string>& lines, const std::map<unsigned, unsigned>&, const std::vector<std::string>& function_names, const std::vector<std::string>& function_signatures);
+        std::string ressInstructions(const std::vector<std::string>& lines, const std::map<unsigned, unsigned>&, bool as_lib);
         std::string functionBodiesAreNonempty(const std::vector<std::string>& lines, std::map<std::string, std::vector<std::string> >& functions);
-        std::string blockTries(const std::vector<std::string>& lines, const std::vector<std::string>& block_names, const std::vector<std::string>& block_signatures);
+        std::string blockTries(const std::vector<std::string>& lines, const std::map<unsigned, unsigned>&, const std::vector<std::string>& block_names, const std::vector<std::string>& block_signatures);
         std::string blockBodiesEndWithLeave(const std::vector<std::string>& lines, std::map<std::string, std::pair<bool, std::vector<std::string> > >& blocks);
 
-        std::string directives(const std::vector<std::string>& lines);
-        std::string instructions(const std::vector<std::string>& lines);
+        std::string directives(const std::vector<std::string>& lines, const std::map<unsigned, unsigned>&);
+        std::string instructions(const std::vector<std::string>& lines, const std::map<unsigned, unsigned>&);
     }
 }
 
