@@ -82,9 +82,14 @@ byte* CPU::vmmsg(byte* addr) {
 
     bool is_native = (function_addresses.count(function_name) or linked_functions.count(function_name));
     bool is_foreign = foreign_functions.count(function_name);
+    bool is_foreign_method = foreign_methods.count(function_name);
 
-    if (not (is_native or is_foreign)) {
+    if (not (is_native or is_foreign or is_foreign_method)) {
         throw new Exception("method '" + method_name + "' resolves to undefined function '" + function_name + "' on class '" + obj->type() + "'");
+    }
+
+    if (is_foreign_method) {
+        return callForeignMethod(addr, obj, function_name, return_register_ref, return_register_index, method_name);
     }
 
     auto caller = (is_native ? &CPU::callNative : &CPU::callForeign);
