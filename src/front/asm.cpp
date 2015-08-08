@@ -218,7 +218,7 @@ int main(int argc, char* argv[]) {
         cout << report << endl;
         return 1;
     }
-    if ((report = assembler::verify::frameBalance(expanded_lines)).size()) {
+    if ((report = assembler::verify::frameBalance(expanded_lines, expanded_lines_to_source_lines)).size()) {
         cout << report << endl;
         exit(1);
     }

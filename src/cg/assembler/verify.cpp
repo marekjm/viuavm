@@ -12,7 +12,7 @@
 using namespace std;
 
 
-string assembler::verify::functionCallsAreDefined(const vector<string>& lines, const std::map<unsigned, unsigned>& expanded_lines_to_source_lines, const vector<string>& function_names, const vector<string>& function_signatures) {
+string assembler::verify::functionCallsAreDefined(const vector<string>& lines, const map<unsigned, unsigned>& expanded_lines_to_source_lines, const vector<string>& function_names, const vector<string>& function_signatures) {
     ostringstream report("");
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
@@ -44,7 +44,7 @@ string assembler::verify::functionCallsAreDefined(const vector<string>& lines, c
     return report.str();
 }
 
-string assembler::verify::frameBalance(const vector<string>& lines) {
+string assembler::verify::frameBalance(const vector<string>& lines, const map<unsigned, unsigned>& expanded_lines_to_source_lines) {
     ostringstream report("");
     string line;
     string instruction;
@@ -69,11 +69,15 @@ string assembler::verify::frameBalance(const vector<string>& lines) {
         }
 
         if (balance < 0) {
-            report << "fatal: call with '" << instruction << "' without a frame at line " << (i+1);
+            report << "fatal: call with '" << instruction << "' without a frame at line ";
+            report << (expanded_lines_to_source_lines.at(i)+1);
             break;
         }
         if (balance > 1) {
-            report << "fatal: excess frame spawned at line " << (i+1) << " (unused frame spawned at line " << (previous_frame_spawnline+1) << ')';
+            report << "fatal: excess frame spawned at line ";
+            report << (expanded_lines_to_source_lines.at(i)+1);
+            report << " (unused frame spawned at line ";
+            report << (expanded_lines_to_source_lines.at(previous_frame_spawnline)+1) << ')';
             break;
         }
 
