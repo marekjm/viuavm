@@ -120,6 +120,8 @@ class CPU {
     byte* callNative(byte*, const std::string&, const bool&, const int&, const std::string&);
     // call foreign (i.e. from a C++ extension) function
     byte* callForeign(byte*, const std::string&, const bool&, const int&, const std::string&);
+    // call foreign method (i.e. method of a pure-C++ class loaded into machine's typesystem)
+    byte* callForeignMethod(byte*, Object*, const std::string&, const bool&, const int&, const std::string&);
 
     /*  Methods dealing with dynamic library loading.
      */
@@ -256,6 +258,10 @@ class CPU {
 
         CPU& registerExternalFunction(const std::string&, ExternalFunction*);
         CPU& removeExternalFunction(std::string);
+
+        /// These two methods are used to inject pure-C++ classes into machine's typesystem.
+        CPU& registerForeignPrototype(const std::string&, Prototype*);
+        CPU& registerForeignMethod(const std::string&, ForeignMethod);
 
         byte* begin();
         inline byte* end() { return 0; }
