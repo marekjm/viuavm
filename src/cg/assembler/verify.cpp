@@ -12,7 +12,7 @@
 using namespace std;
 
 
-string assembler::verify::functionCallsAreDefined(const vector<string>& lines, const vector<string>& function_names, const vector<string>& function_signatures) {
+string assembler::verify::functionCallsAreDefined(const vector<string>& lines, const std::map<unsigned, unsigned>& expanded_lines_to_source_lines, const vector<string>& function_names, const vector<string>& function_signatures) {
     ostringstream report("");
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
@@ -37,7 +37,7 @@ string assembler::verify::functionCallsAreDefined(const vector<string>& lines, c
         }
 
         if (is_undefined) {
-            report << "fatal: call to undefined function '" << check_function << "' at line " << (i+1);
+            report << "fatal: call to undefined function '" << check_function << "' at line " << (expanded_lines_to_source_lines.at(i)+1);
             break;
         }
     }

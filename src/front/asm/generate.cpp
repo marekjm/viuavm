@@ -683,7 +683,7 @@ vector<string> expandSource(const vector<string>& lines, map<unsigned, unsigned>
     return asm_lines;
 }
 
-int generate(const vector<string>& expanded_lines, vector<string>& ilines, invocables_t& functions, invocables_t& blocks, string& filename, string& compilename, const vector<string>& commandline_given_links, const compilationflags_t& flags) {
+int generate(const vector<string>& expanded_lines, const map<unsigned, unsigned>& expanded_lines_to_source_lines, vector<string>& ilines, invocables_t& functions, invocables_t& blocks, string& filename, string& compilename, const vector<string>& commandline_given_links, const compilationflags_t& flags) {
     //////////////////////////////
     // SETUP INITIAL BYTECODE SIZE
     uint16_t bytes = 0;
@@ -842,7 +842,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, invoc
     // AFTER HAVING OBTAINED LINKED NAMES, IT IS POSSIBLE TO VERIFY CALLS AND
     // CALLABLE (FUNCTIONS, CLOSURES, ETC.) CREATIONS
     string report;
-    if ((report = assembler::verify::functionCallsAreDefined(expanded_lines, functions.names, functions.signatures)).size()) {
+    if ((report = assembler::verify::functionCallsAreDefined(expanded_lines, expanded_lines_to_source_lines, functions.names, functions.signatures)).size()) {
         cout << report << endl;
         exit(1);
     }
