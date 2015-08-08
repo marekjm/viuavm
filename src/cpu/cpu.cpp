@@ -90,6 +90,20 @@ CPU& CPU::registerExternalFunction(const string& name, ExternalFunction* functio
     return (*this);
 }
 
+CPU& CPU::registerForeignPrototype(const string& name, Prototype* proto) {
+    /** Registers foreign prototype in CPU.
+     */
+    typesystem[name] = proto;
+    return (*this);
+}
+
+CPU& CPU::registerForeignMethod(const string& name, ForeignMethod method) {
+    /** Registers foreign prototype in CPU.
+     */
+    foreign_methods[name] = method;
+    return (*this);
+}
+
 
 Type* CPU::fetch(unsigned index) const {
     /*  Return pointer to object at given register.
