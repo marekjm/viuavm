@@ -111,7 +111,7 @@ string assembler::verify::blockTries(const vector<string>& lines, const map<unsi
     return report.str();
 }
 
-string assembler::verify::callableCreations(const vector<string>& lines, const vector<string>& function_names, const vector<string>& function_signatures) {
+string assembler::verify::callableCreations(const vector<string>& lines, const map<unsigned, unsigned>& expanded_lines_to_source_lines, const vector<string>& function_names, const vector<string>& function_signatures) {
     ostringstream report("");
     string line;
     string callable_type;
@@ -135,13 +135,8 @@ string assembler::verify::callableCreations(const vector<string>& lines, const v
         }
 
         if (is_undefined) {
-            report << "fatal: " << callable_type << " from undefined function '" << function << "' at line " << (i+1);
-            break;
-        }
-
-        // second chunk of closure instruction, must be an integer
-        if (not str::isnum(register_index)) {
-            report << "fatal: first operand (register index) is not an integer in " << callable_type << " instruction at line " << (i+1);
+            report << "fatal: " << callable_type << " from undefined function '" << function << "' at line ";
+            report << (expanded_lines_to_source_lines.at(i)+1);
             break;
         }
     }

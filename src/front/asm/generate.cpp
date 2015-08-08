@@ -846,7 +846,7 @@ int generate(const vector<string>& expanded_lines, const map<unsigned, unsigned>
         cout << report << endl;
         exit(1);
     }
-    if ((report = assembler::verify::callableCreations(expanded_lines, functions.names, functions.signatures)).size()) {
+    if ((report = assembler::verify::callableCreations(expanded_lines, expanded_lines_to_source_lines, functions.names, functions.signatures)).size()) {
         cout << report << endl;
         exit(1);
     }
