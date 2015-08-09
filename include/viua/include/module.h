@@ -41,7 +41,7 @@ typedef Type* (ExternalFunction)(Frame*, RegisterSet*, RegisterSet*);
  *  One downside this approach has is that all method calls are performed via the vtable which may not be the most
  *  efficient way.
  */
-typedef Object* (Object::*ForeignMethod)(Frame*, RegisterSet*, RegisterSet*);
+typedef Type* (Type::*ForeignMethod)(Frame*, RegisterSet*, RegisterSet*);
 
 // Specification of single external function
 // The "exports()" function returns an array of such structures.

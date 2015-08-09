@@ -116,8 +116,8 @@ int main(int argc, char* argv[]) {
     proto_object->attach("Object::set", "set");
     proto_object->attach("Object::get", "get");
     cpu.registerForeignPrototype("Object", proto_object);
-    cpu.registerForeignMethod("Object::set", &Object::set);
-    cpu.registerForeignMethod("Object::get", &Object::get);
+    cpu.registerForeignMethod("Object::set", static_cast<ForeignMethod>(&Object::set));
+    cpu.registerForeignMethod("Object::get", static_cast<ForeignMethod>(&Object::get));
 
     cpu.run();
 

@@ -19,11 +19,11 @@ Type* Object::copy() const {
     return cp;
 }
 
-Object* Object::set(Frame*, RegisterSet*, RegisterSet*) {
+Type* Object::set(Frame*, RegisterSet*, RegisterSet*) {
     cout << "Object::set()" << endl;
     return 0;
 }
-Object* Object::get(Frame*, RegisterSet*, RegisterSet*) {
+Type* Object::get(Frame*, RegisterSet*, RegisterSet*) {
     cout << "Object::get()" << endl;
     return 0;
 }

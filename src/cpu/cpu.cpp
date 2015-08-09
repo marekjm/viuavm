@@ -337,7 +337,7 @@ byte* CPU::callForeign(byte* addr, const string& call_name, const bool& return_r
 
     return return_address;
 }
-byte* CPU::callForeignMethod(byte* addr, Object* object, const string& call_name, const bool& return_ref, const int& return_index, const string& real_call_name) {
+byte* CPU::callForeignMethod(byte* addr, Type* object, const string& call_name, const bool& return_ref, const int& return_index, const string& real_call_name) {
     if (real_call_name.size()) {
         addr += (real_call_name.size()+1);
     } else {

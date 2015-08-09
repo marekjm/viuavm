@@ -29,8 +29,8 @@ class Object: public Type {
             return std::vector<std::string>{"Type"};
         }
 
-        virtual Object* set(Frame*, RegisterSet*, RegisterSet*);
-        virtual Object* get(Frame*, RegisterSet*, RegisterSet*);
+        virtual Type* set(Frame*, RegisterSet*, RegisterSet*);
+        virtual Type* get(Frame*, RegisterSet*, RegisterSet*);
 
         virtual Type* copy() const;
 
