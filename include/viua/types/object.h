@@ -5,7 +5,7 @@
 
 #include <map>
 #include <viua/cpu/frame.h>
-#include <viua/registerset.h>
+#include <viua/cpu/registerset.h>
 #include <viua/types/type.h>
 
 
