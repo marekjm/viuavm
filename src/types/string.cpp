@@ -6,6 +6,7 @@
 #include <viua/types/type.h>
 #include <viua/types/vector.h>
 #include <viua/types/string.h>
+#include <viua/exceptions.h>
 using namespace std;
 
 
@@ -40,4 +41,12 @@ String* String::join(Vector* v) {
         }
     }
     return new String(s);
+}
+
+String* String::stringify(Frame* frame, RegisterSet*, RegisterSet*) {
+    if (frame->args->size() == 0) {
+        throw new Exception("expected 1 parameter but got 0");
+    }
+    frame->regset->set(0, new String(frame->args->at(0)->str()));
+    return 0;
 }

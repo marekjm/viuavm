@@ -8,6 +8,8 @@
 #include "vector.h"
 #include "integer.h"
 #include "../support/string.h"
+#include <viua/cpu/frame.h>
+#include <viua/cpu/registerset.h>
 
 
 class String : public Type {
@@ -41,6 +43,8 @@ class String : public Type {
         String* sub(int b = 0, int e = -1);
         String* add(String*);
         String* join(Vector*);
+
+        String* stringify(Frame*, RegisterSet*, RegisterSet*);
 
         String(std::string s = ""): svalue(s) {}
 };
