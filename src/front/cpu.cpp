@@ -8,6 +8,7 @@
 #include <viua/support/string.h>
 #include <viua/support/env.h>
 #include <viua/types/exception.h>
+#include <viua/types/string.h>
 #include <viua/loader.h>
 #include <viua/cpu/cpu.h>
 #include <viua/program.h>
@@ -118,6 +119,11 @@ int main(int argc, char* argv[]) {
     cpu.registerForeignPrototype("Object", proto_object);
     cpu.registerForeignMethod("Object::set", static_cast<ForeignMethod>(&Object::set));
     cpu.registerForeignMethod("Object::get", static_cast<ForeignMethod>(&Object::get));
+
+    Prototype* proto_string = new Prototype("String");
+    proto_string->attach("String::stringify", "stringify");
+    cpu.registerForeignPrototype("String", proto_string);
+    cpu.registerForeignMethod("String::stringify", static_cast<ForeignMethod>(&String::stringify));
 
     cpu.run();
 
