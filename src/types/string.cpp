@@ -43,7 +43,7 @@ String* String::join(Vector* v) {
     return new String(s);
 }
 
-String* String::stringify(Frame* frame, RegisterSet*, RegisterSet*) {
+Type* String::stringify(Frame* frame, RegisterSet*, RegisterSet*) {
     if (frame->args->size() == 0) {
         throw new Exception("expected 1 parameter but got 0");
     }
