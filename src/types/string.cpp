@@ -43,10 +43,19 @@ String* String::join(Vector* v) {
     return new String(s);
 }
 
+// foreign methods
 Type* String::stringify(Frame* frame, RegisterSet*, RegisterSet*) {
     if (frame->args->size() == 0) {
         throw new Exception("expected 1 parameter but got 0");
     }
     frame->regset->set(0, new String(frame->args->at(0)->str()));
+    return 0;
+}
+
+Type* String::represent(Frame* frame, RegisterSet*, RegisterSet*) {
+    if (frame->args->size() == 0) {
+        throw new Exception("expected 1 parameter but got 0");
+    }
+    frame->regset->set(0, new String(frame->args->at(0)->repr()));
     return 0;
 }
