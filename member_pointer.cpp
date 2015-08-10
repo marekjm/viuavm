@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <functional>
 using namespace std;
 
 
@@ -31,14 +32,15 @@ class Derived: public Middle {
 
 typedef void (Base::*MEMBER_FUNCTION)();
 
-
 int main() {
     /** Simple case - call a member function of derived class through a base class pointer.
      *  Thanks to the dynamic dispatch we got it covered for us.
      */
     Base* base_derived_ptr = new Derived();
     MEMBER_FUNCTION hi = static_cast<MEMBER_FUNCTION>(&Derived::hi);
+    function<void(Base*)> hi_fn = static_cast<MEMBER_FUNCTION>(&Derived::hi);
     (base_derived_ptr->*hi)();
+    hi_fn(base_derived_ptr);
 
     /** Slightly more advanced case - call a member function down the inheritance hierarchy.
      *  Again, thanks to the dynamic dispatch we got it covered for us.
