@@ -57,7 +57,7 @@ string assembler::verify::frameBalance(const vector<string>& lines, const map<un
 
         line = str::lstrip(line);
         instruction = str::chunk(line);
-        if (not (instruction == "call" or instruction == "excall" or instruction == "fcall" or instruction == "frame" or instruction == "msg")) {
+        if (not (instruction == "call" or instruction == "excall" or instruction == "fcall" or instruction == "frame" or instruction == "msg" or instruction == "end")) {
             continue;
         }
 
@@ -78,6 +78,10 @@ string assembler::verify::frameBalance(const vector<string>& lines, const map<un
             report << (expanded_lines_to_source_lines.at(i)+1);
             report << " (unused frame spawned at line ";
             report << (expanded_lines_to_source_lines.at(previous_frame_spawnline)+1) << ')';
+            break;
+        }
+        if (instruction == "end" and balance > 0) {
+            report << "fatal: leftover frame at line " << (expanded_lines_to_source_lines.at(i)+1) << " (spawned at line " << (expanded_lines_to_source_lines.at(previous_frame_spawnline)+1) << ')';
             break;
         }
 
