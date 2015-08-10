@@ -195,7 +195,7 @@ stdlib:
 build/stdlib/typesystem.o: src/stdlib/typesystem.cpp
 	${CXX} -std=c++11 -fPIC -c -I./include -o $@ $<
 
-build/stdlib/typesystem.so: build/stdlib/typesystem.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o
+build/stdlib/typesystem.so: build/stdlib/typesystem.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o
 	${CXX} -std=c++11 -fPIC -shared -o $@ $^
 
 
