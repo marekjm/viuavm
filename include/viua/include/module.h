@@ -5,6 +5,7 @@
 
 #include <string>
 #include <vector>
+#include <functional>
 #include <viua/cpu/frame.h>
 #include <viua/cpu/registerset.h>
 #include <viua/types/object.h>
@@ -41,7 +42,8 @@ typedef Type* (ExternalFunction)(Frame*, RegisterSet*, RegisterSet*);
  *  One downside this approach has is that all method calls are performed via the vtable which may not be the most
  *  efficient way.
  */
-typedef Type* (Type::*ForeignMethod)(Frame*, RegisterSet*, RegisterSet*);
+typedef Type* (Type::*ForeignMethodMemberPointer)(Frame*, RegisterSet*, RegisterSet*);
+typedef std::function<Type*(Type*, Frame*, RegisterSet*, RegisterSet*)> ForeignMethod;
 
 // Specification of single external function
 // The "exports()" function returns an array of such structures.

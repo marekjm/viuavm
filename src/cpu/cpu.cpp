@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <vector>
+#include <functional>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/opcodes.h>
 #include <viua/bytecode/maps.h>
@@ -366,7 +367,8 @@ byte* CPU::callForeignMethod(byte* addr, Type* object, const string& call_name, 
     }
 
     try {
-        (object->*(foreign_methods.at(call_name)))(frame, 0, 0);
+        // FIXME: supply static and global registers to foreign functions
+        foreign_methods.at(call_name)(object, frame, 0, 0);
     } catch (const std::out_of_range& e) {
         throw new Exception(e.what());
     }

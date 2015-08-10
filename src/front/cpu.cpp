@@ -117,13 +117,13 @@ int main(int argc, char* argv[]) {
     proto_object->attach("Object::set", "set");
     proto_object->attach("Object::get", "get");
     cpu.registerForeignPrototype("Object", proto_object);
-    cpu.registerForeignMethod("Object::set", static_cast<ForeignMethod>(&Object::set));
-    cpu.registerForeignMethod("Object::get", static_cast<ForeignMethod>(&Object::get));
+    cpu.registerForeignMethod("Object::set", static_cast<ForeignMethodMemberPointer>(&Object::set));
+    cpu.registerForeignMethod("Object::get", static_cast<ForeignMethodMemberPointer>(&Object::get));
 
     Prototype* proto_string = new Prototype("String");
     proto_string->attach("String::stringify", "stringify");
     cpu.registerForeignPrototype("String", proto_string);
-    cpu.registerForeignMethod("String::stringify", static_cast<ForeignMethod>(&String::stringify));
+    cpu.registerForeignMethod("String::stringify", static_cast<ForeignMethodMemberPointer>(&String::stringify));
 
     cpu.run();
 
