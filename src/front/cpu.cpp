@@ -122,8 +122,10 @@ int main(int argc, char* argv[]) {
 
     Prototype* proto_string = new Prototype("String");
     proto_string->attach("String::stringify", "stringify");
+    proto_string->attach("String::represent", "represent");
     cpu.registerForeignPrototype("String", proto_string);
     cpu.registerForeignMethod("String::stringify", static_cast<ForeignMethodMemberPointer>(&String::stringify));
+    cpu.registerForeignMethod("String::represent", static_cast<ForeignMethodMemberPointer>(&String::represent));
 
     cpu.run();
 
