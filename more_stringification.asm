@@ -11,6 +11,7 @@
     frame ^[(paref 0 (arg 2 0))]
     msg 1 1 represent
     move 0 1
+    frame
     end
 .end
 
