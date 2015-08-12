@@ -8,6 +8,7 @@
 #include <viua/support/env.h>
 #include <viua/loader.h>
 #include <viua/program.h>
+#include <viua/cg/tokenizer.h>
 #include <viua/cg/assembler/assembler.h>
 #include <viua/front/asm.h>
 using namespace std;
@@ -220,6 +221,8 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
 
         instr = str::chunk(line);
         operands = str::lstrip(str::sub(line, instr.size()));
+
+        vector<string> tokens = tokenize(operands);
 
         if (DEBUG and SCREAM) {
             cout << "[asm] compiling line: `" << line << "`" << endl;

@@ -32,7 +32,6 @@ struct srcline_t {
 
 std::vector<std::string> expandSource(const std::vector<std::string>&, std::map<unsigned, unsigned>&);
 
-std::vector<std::string> tokenize(const std::string&);
 std::vector<std::vector<std::string>> decode_line_tokens(const std::vector<std::string>&);
 std::vector<std::vector<std::string>> decode_line(const std::string&);
 
