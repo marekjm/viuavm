@@ -1,12 +1,8 @@
-.function: stringify
-    strstore 1 ""
-    frame ^[(paref 0 (arg 2 0))]
-    msg 1 1 stringify
-    move 0 1
-    end
-.end
+.signature: viua::core::string::stringify
 
 .function: main
+    link string
+
     ; store an object...
     new 1 Object
     ; ...and print it, why not?
@@ -18,7 +14,7 @@
     ;
     ; let's do this!
     frame ^[(paref 0 1)]
-    call 2 stringify
+    call 2 viua::core::string::stringify
 
     ; the output will be *identical* to the first print instruction
     ; it would be different if we passed the Object by value

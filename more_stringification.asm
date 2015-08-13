@@ -1,28 +1,18 @@
-.function: std::string::stringify
-    strstore 1 ""
-    frame ^[(paref 0 (arg 2 0))]
-    msg 1 1 stringify
-    move 0 1
-    end
-.end
-
-.function: std::string::represent
-    strstore 1 ""
-    frame ^[(paref 0 (arg 2 0))]
-    msg 1 1 represent
-    move 0 1
-    frame
-    end
-.end
+.signature: viua::core::string::stringify
+.signature: viua::core::string::represent
 
 .function: main
+    ; this program requires "string" module from standard runtime library
+    ; it needs functions from "viua::core::string" namespace
+    link string
+
     strstore 1 "Hello World!"
 
     frame ^[(paref 0 1)]
-    call 1 std::string::stringify
+    call 1 viua::core::string::stringify
 
     frame ^[(paref 0 1)]
-    call 2 std::string::represent
+    call 2 viua::core::string::represent
 
     print 1
     print 2
