@@ -19,12 +19,45 @@ Type* Object::copy() const {
     return cp;
 }
 
-Type* Object::set(Frame*, RegisterSet*, RegisterSet*) {
-    cout << "Object::set()" << endl;
+Type* Object::set(Frame* frame, RegisterSet*, RegisterSet*) {
+    if (frame->args->size() != 3) {
+        ostringstream oss;
+        oss << "invalid number of arguments: expected 3 but got " << frame->args->size();
+        throw new Exception(oss.str());
+    }
+    if (frame->args->at(1)->type() != "String") {
+        throw new Exception("invalid type of first parameter: expected 'String' but got '" + frame->args->at(1)->type() + "'");
+    }
+
+    string name = frame->args->at(1)->str();
+
+    // prevent memory leaks during key overwriting
+    if (attributes.count(name)) {
+        delete attributes.at(name);
+        attributes.erase(name);
+    }
+
+    attributes[name] = frame->args->at(2)->copy();
+
     return 0;
 }
-Type* Object::get(Frame*, RegisterSet*, RegisterSet*) {
-    cout << "Object::get()" << endl;
+Type* Object::get(Frame* frame, RegisterSet*, RegisterSet*) {
+    if (frame->args->size() != 2) {
+        ostringstream oss;
+        oss << "invalid number of arguments: expected 2 but got " << frame->args->size();
+        throw new Exception(oss.str());
+    }
+    if (frame->args->at(1)->type() != "String") {
+        throw new Exception("invalid type of first parameter: expected 'String' but got '" + frame->args->at(1)->type() + "'");
+    }
+
+    string name = frame->args->at(1)->str();
+    if (attributes.count(name) == 0) {
+        throw new Exception("failed attribute lookup: '" + name + "'");
+    }
+
+    frame->regset->set(0, attributes[name]->copy());
+
     return 0;
 }
 
