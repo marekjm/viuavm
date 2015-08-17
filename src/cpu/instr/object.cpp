@@ -43,29 +43,25 @@ byte* CPU::vmmsg(byte* addr) {
      *  To call a method using static dispatch (where a correct function is resolved during compilation) use
      *  "call" instruction.
      */
-    int return_register_index, object_operand_index;
-    bool return_register_ref = false, object_operand_ref = false;
+    int return_register_index;
+    bool return_register_ref = false;
 
     return_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
     return_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    object_operand_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    object_operand_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
     if (return_register_ref) {
         return_register_index = static_cast<Integer*>(fetch(return_register_index))->value();
-    }
-    if (object_operand_ref) {
-        object_operand_index = static_cast<Integer*>(fetch(object_operand_index))->value();
     }
 
     string method_name = string(addr);
 
-    Object* obj = static_cast<Object*>(fetch(object_operand_index));
+    // dynamic cast to ensure that the type has been derived from Object at runtime
+    Object* obj = dynamic_cast<Object*>(frame_new->args->at(0));
+    if (obj == 0) {
+        throw new Exception("invalid 'this' argument");
+    }
     vector<string> mro = inheritanceChainOf(obj->type());
     mro.insert(mro.begin(), obj->type());
 

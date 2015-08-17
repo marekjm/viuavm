@@ -127,7 +127,7 @@ uint16_t Program::countBytes(const vector<string>& lines) {
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (function or block name)
                 inc += str::chunk(line).size() + 1;
-            } else if (instr == "call") {
+            } else if ((instr == "call") or (instr == "msg")) {
                 // clear first chunk (opcode mnemonic)
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (optional register index)
@@ -152,15 +152,6 @@ uint16_t Program::countBytes(const vector<string>& lines) {
                 inc += str::chunk(line).size() + 1;
                 line = str::lstrip(str::sub(line, str::chunk(line).size()));
                 // get fourth chunk (method name)
-                inc += str::chunk(line).size() + 1;
-            } else if (instr == "msg") {
-                // clear first chunk (opcode mnemonic)
-                line = str::lstrip(str::sub(line, instr.size()));
-                // clear second chunk (return register index)
-                line = str::lstrip(str::sub(line, str::chunk(line).size()));
-                // clear third chunk (object register index)
-                line = str::lstrip(str::sub(line, str::chunk(line).size()));
-                // get fourth chunk (message name)
                 inc += str::chunk(line).size() + 1;
             } else if (instr == "import") {
                 // clear first chunk
@@ -249,7 +240,7 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
             inc += s.size()+1;
         }
         if ((opcode == CALL) or (opcode == CLOSURE) or (opcode == FUNCTION) or
-            (opcode == CLASS) or (opcode == PROTOTYPE) or (opcode == DERIVE) or (opcode == NEW)) {
+            (opcode == CLASS) or (opcode == PROTOTYPE) or (opcode == DERIVE) or (opcode == NEW) or (opcode == MSG)) {
             string s(program+offset+sizeof(bool)+sizeof(int)+1);
             if (scream) {
                 cout << '+' << s.size() << " (function/module/class name at byte " << offset+1 << ": `" << s << "`)";
@@ -260,10 +251,6 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
             string f(program+offset+sizeof(bool)+sizeof(int)+1);
             inc += f.size()+1;
             string m(program+offset+sizeof(bool)+sizeof(int)+1+f.size()+1);
-            inc += m.size()+1;
-        }
-        if (opcode == MSG) {
-            string m(program + offset + (2*sizeof(bool)) + (2*sizeof(int)) + 1);
             inc += m.size()+1;
         }
         if (opcode == STRSTORE) {

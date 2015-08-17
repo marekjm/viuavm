@@ -42,10 +42,10 @@
     new 1 Derived
 
     frame ^[(param 0 1)]
-    msg 0 1 good_day
+    msg 0 good_day
 
     frame ^[(param 0 1)]
-    msg 0 1 hello
+    msg 0 hello
 
     ; print an empty line
     print (strstore 3 "")
@@ -55,13 +55,13 @@
     new 2 MoreDerived
 
     frame ^[(param 0 2)]
-    msg 0 2 good_day
+    msg 0 good_day
 
     frame ^[(param 0 2)]
-    msg 0 2 hello
+    msg 0 hello
 
     frame ^[(param 0 2)]
-    msg 0 2 hi
+    msg 0 hi
 
     izero 0
     end

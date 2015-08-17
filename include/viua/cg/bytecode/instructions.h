@@ -109,7 +109,7 @@ namespace cg {
         byte* vmattach(byte*, int_op, const std::string&, const std::string&);
         byte* vmregister(byte*, int_op);
         byte* vmnew(byte*, int_op, const std::string&);
-        byte* vmmsg(byte*, int_op, int_op, const std::string&);
+        byte* vmmsg(byte*, int_op, const std::string&);
 
         byte* end(byte*);
         byte* halt(byte*);
