@@ -57,11 +57,7 @@ byte* CPU::vmmsg(byte* addr) {
 
     string method_name = string(addr);
 
-    // dynamic cast to ensure that the type has been derived from Object at runtime
-    Object* obj = dynamic_cast<Object*>(frame_new->args->at(0));
-    if (obj == 0) {
-        throw new Exception("invalid 'this' argument");
-    }
+    Type* obj = frame_new->args->at(0);
     vector<string> mro = inheritanceChainOf(obj->type());
     mro.insert(mro.begin(), obj->type());
 
