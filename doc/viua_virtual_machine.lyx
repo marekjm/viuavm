@@ -3299,7 +3299,8 @@ Object
 \begin_inset Quotes erd
 \end_inset
 
- but they do not provide much functionality) and named data fields.
+ but they do not provide much functionality apart from setting and retrieving
+ values) and named data fields.
 \end_layout
 
 \begin_layout Standard
