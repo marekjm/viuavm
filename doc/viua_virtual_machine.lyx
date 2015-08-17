@@ -1674,7 +1674,7 @@ Conditional jump to a specified index (byte) inside currently loaded program.
 \end_layout
 
 \begin_layout Subsection
-Function calls
+Function and method calls
 \begin_inset CommandInset label
 LatexCommand label
 name "sub:Function-calls"
@@ -1685,7 +1685,174 @@ name "sub:Function-calls"
 \end_layout
 
 \begin_layout Standard
-Function instructions.
+This subsection discusses instruction used for calling functions and methods.
+ Ordinary function calls can also be used for static dispatch of methods
+ to increase runtime performance when correct function to call can be resolved
+ at compile time.
+\end_layout
+
+\begin_layout Standard
+Calling a function means creating a frame for the call and issuing a 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+call
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ instruction to existing function.
+ No other runtime constraints are placed on function calls.
+ One compile time constraint is that 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+end
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+halt
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+leave
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ are not allowed to be placed between 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+frame
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+call
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ instructions to avoid possibility of creating leftover frames that would
+ break the program later during execution.
+\end_layout
+
+\begin_layout Standard
+There is no unnecessary runtime overhead (apart from instruction decoding)
+ for call instructions, the control is immediately transferred to specified
+ point in bytecode.
+\end_layout
+
+\begin_layout Standard
+Calling a method on (or sending a message to) an object means creating a
+ frame and issuing a 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+msg
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ instruction with name of the message to be dispatched.
+ One runtime constraint is that the frame for 
+\begin_inset Quotes eld
+\end_inset
+
+msg
+\begin_inset Quotes erd
+\end_inset
+
+ instruction must be passed at least one parameter - the 
+\begin_inset Quotes eld
+\end_inset
+
+this
+\begin_inset Quotes erd
+\end_inset
+
+ object (however, as of Viua 0.5.0.325, commit 
+\family typewriter
+97ceba0
+\family default
+, passing it by reference is not enforced) the message should operate on.
+ Compile time constraints are the same as for function calls.
+\end_layout
+
+\begin_layout Standard
+There is runtime overhead involved in dispatching messages to objects related
+ to method handler resolution - methods are mapped to functions and this
+ indirection must be resolved before the message is dispatched.
+ Also, several checks must be performed to ensure safety, i.e.
+ the machine has to determine wheter the object accepts the message or not,
+ and is the handler function defined.
+ Only after passing this verification, is the message dispatched.
+\end_layout
+
+\begin_layout Standard
+Due to the fact that 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+msg
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ involves overhead incurred by runtime checks needed by dynamic dispatch,
+ using the 
+\begin_inset Quotes eld
+\end_inset
+
+call
+\begin_inset Quotes erd
+\end_inset
+
+ instruction resulting in static dispatch of methods is preffered when possible.
+ It should be noted that static dispatch is not available for foreign methods
+ of foreign prototypes because of limitations of the technique used for
+ C++ class mapping.
+ Methods handled with ordinary functions - both foreign and native - can
+ be dispatched statically on foreign types, though.
 \end_layout
 
 \begin_layout Subsubsection
@@ -1817,6 +1984,105 @@ Call specified function (native or foreign) and put its return value in
  Instruction will fail if function does not return a value but caller requests
  one (set target register to non-zero value).
  Instruction can fail if a function cannot be found.
+\end_layout
+
+\begin_layout Subsubsection
+msg
+\end_layout
+
+\begin_layout Paragraph
+Syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+msg <target register> <method name>
+\end_layout
+
+\begin_layout Paragraph
+Assembler syntax
+\end_layout
+
+\begin_layout Standard
+Assembly language syntax is the same for 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+call
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+msg
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ instructions.
+ However, 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+msg
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ instruction required to have an object passed as first parameter.
+\end_layout
+
+\begin_layout Subparagraph
+Sample method call
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+new 1 Object
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+frame ^[(paref 0 1)]
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+msg 0 method
+\end_layout
+
+\begin_layout Paragraph
+Semantics
+\end_layout
+
+\begin_layout Standard
+Calls a method on an object, resulting in dynamic dispatch of handler function.
+ First parameter passed is the object that will be operated on.
+ Instruction will fail when no unused frame can be found.
+ Instruction will fail if method does not return a value but caller requested
+ one.
+ Instruction will fail if object's type does not accept specified method.
+ Instruction will fail if handler function is undefined.
 \end_layout
 
 \begin_layout Subsubsection
