@@ -29,10 +29,6 @@ const std::vector<std::string> VIUAPATH = {
 
 
 
-/** External modules must export the "exports()" function.
- *  Should a module fail to provide this function, it is deemed invalid and is rejected by the VM.
- */
-
 // External functions must have this signature
 typedef Type* (ExternalFunction)(Frame*, RegisterSet*, RegisterSet*);
 
@@ -45,8 +41,12 @@ typedef Type* (ExternalFunction)(Frame*, RegisterSet*, RegisterSet*);
 typedef Type* (Type::*ForeignMethodMemberPointer)(Frame*, RegisterSet*, RegisterSet*);
 typedef std::function<Type*(Type*, Frame*, RegisterSet*, RegisterSet*)> ForeignMethod;
 
-// Specification of single external function
-// The "exports()" function returns an array of such structures.
+
+/** External modules must export the "exports()" function.
+ *  Should a module fail to provide this function, it is deemed invalid and is rejected by the VM.
+ *
+ *  The "exports()" function returns an array of below structures.
+ */
 struct ExternalFunctionSpec {
     const char* name;
     ExternalFunction* fpointer;
