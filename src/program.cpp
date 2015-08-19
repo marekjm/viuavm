@@ -162,7 +162,7 @@ uint16_t Program::countBytes(const vector<string>& lines) {
                 // clear first chunk
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (which is a module name)
-                inc += (str::extract(line).size() + 1); // +1: null-terminator
+                inc += (str::chunk(line).size() + 1); // +1: null-terminator
             } else if (instr == "catch") {
                 // clear first chunk (the opcode)
                 line = str::lstrip(str::sub(line, instr.size()));
