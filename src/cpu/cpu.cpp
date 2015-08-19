@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <functional>
+#include <regex>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/opcodes.h>
 #include <viua/bytecode/maps.h>
@@ -407,12 +408,14 @@ byte* CPU::callForeignMethod(byte* addr, Type* object, const string& call_name, 
     return return_address;
 }
 
-
 void CPU::loadNativeLibrary(const string& module) {
-    string path = module;
-    path = support::env::viua::getmodpath(module, "vlib", support::env::getpaths("VIUAPATH"));
-    if (path.size() == 0) { path = support::env::viua::getmodpath(module, "vlib", VIUAPATH); }
-    if (path.size() == 0) { path = support::env::viua::getmodpath(module, "vlib", support::env::getpaths("VIUAAFTERPATH")); }
+    regex double_colon("::");
+    ostringstream oss;
+    oss << regex_replace(module, double_colon, "/");
+    string try_path = oss.str();
+    string path = support::env::viua::getmodpath(try_path, "vlib", support::env::getpaths("VIUAPATH"));
+    if (path.size() == 0) { path = support::env::viua::getmodpath(try_path, "vlib", VIUAPATH); }
+    if (path.size() == 0) { path = support::env::viua::getmodpath(try_path, "vlib", support::env::getpaths("VIUAAFTERPATH")); }
 
     if (path.size()) {
         Loader loader(path);
