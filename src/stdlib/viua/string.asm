@@ -6,24 +6,22 @@
 ;
 ; Signatures
 ;
-.signature: viua::core::string::stringify
-.signature: viua::core::string::represent
+.signature: std::string::stringify
+.signature: std::string::represent
 
 ;
 ; Code
 ;
-.function: viua::core::string::stringify
-    strstore 1 ""
-    frame ^[(paref 0 (arg 2 0))]
-    msg 1 1 stringify
-    move 0 1
+.function: std::string::stringify
+    frame ^[(paref 0 (strstore 1 "")) (paref 1 (arg 2 0))]
+    msg 3 stringify
+    move 0 3
     end
 .end
 
-.function: viua::core::string::represent
-    strstore 1 ""
-    frame ^[(paref 0 (arg 2 0))]
-    msg 1 1 represent
-    move 0 1
+.function: std::string::represent
+    frame ^[(paref 0 (strstore 1 "")) (paref 1 (arg 2 0))]
+    msg 3 represent
+    move 0 3
     end
 .end
