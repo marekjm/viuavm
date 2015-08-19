@@ -45,17 +45,17 @@ String* String::join(Vector* v) {
 
 // foreign methods
 Type* String::stringify(Frame* frame, RegisterSet*, RegisterSet*) {
-    if (frame->args->size() == 0) {
-        throw new Exception("expected 1 parameter but got 0");
+    if (frame->args->size() < 2) {
+        throw new Exception("expected 2 parameters");
     }
-    frame->regset->set(0, new String(frame->args->at(0)->str()));
+    frame->regset->set(0, new String(frame->args->at(1)->str()));
     return 0;
 }
 
 Type* String::represent(Frame* frame, RegisterSet*, RegisterSet*) {
-    if (frame->args->size() == 0) {
-        throw new Exception("expected 1 parameter but got 0");
+    if (frame->args->size() < 2) {
+        throw new Exception("expected 2 parameters");
     }
-    frame->regset->set(0, new String(frame->args->at(0)->repr()));
+    frame->regset->set(0, new String(frame->args->at(1)->repr()));
     return 0;
 }
