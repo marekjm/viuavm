@@ -14,13 +14,10 @@
 const std::vector<std::string> VIUAPATH = {
     ".",
     "~/.local/lib/viua",
-    "~/.local/lib/viua/core",
     "~/.local/lib/viua/site",
     "/usr/local/lib/viua",
-    "/usr/local/lib/viua/core",
     "/usr/local/lib/viua/site",
     "/usr/lib/viua",
-    "/usr/lib/viua/core",
     "/usr/lib/viua/site",
     "" /* this path may cause confusing exception about "failing to extract the interface" from a library if
         * name of Viua lib is the same as one of the system libs, and Viua version has not been found

@@ -74,10 +74,26 @@ bininstall: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/vdb build/bin/vm/dis
 	chmod 755 ${BIN_PATH}/viua-dis
 
 libinstall: stdlib
-	mkdir -p ${LIB_PATH}/core
+	mkdir -p ${LIB_PATH}/std
 	mkdir -p ${LIB_PATH}/site
-	cp ./build/stdlib/*.so ${LIB_PATH}/core
+	cp ./build/stdlib/*.so ${LIB_PATH}/std
 
+installdevel: platform
+	mkdir -p ${LIB_PATH}/platform
+	cp ./build/platform/*.o ${LIB_PATH}/platform
+
+install: bininstall installdevel
+	mkdir -p ${H_PATH}
+	cp -R ./include/viua/. ${H_PATH}/
+
+uninstall:
+	rm -rf ${H_PATH}
+	rm -rf ${LIB_PATH}
+	rm -rf ${BIN_PATH}/viua-*
+
+
+############################################################
+# PLATFORM OBJECT FILES
 platform: build/platform/exception.o build/platform/string.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o
 
 build/platform/exception.o: src/types/exception.cpp
@@ -94,19 +110,6 @@ build/platform/registerset.o: src/cpu/registerset.cpp
 
 build/platform/support_string.o: src/support/string.cpp
 	${CXX} -std=c++11 -fPIC -c -I./include -o ./build/platform/support_string.o src/support/string.cpp
-
-installdevel: platform
-	mkdir -p ${LIB_PATH}/platform
-	cp ./build/platform/*.o ${LIB_PATH}/platform
-
-install: bininstall installdevel
-	mkdir -p ${H_PATH}
-	cp -R ./include/viua/. ${H_PATH}/
-
-uninstall:
-	rm -rf ${H_PATH}
-	rm -rf ${LIB_PATH}
-	rm -rf ${BIN_PATH}/viua-*
 
 
 ############################################################
