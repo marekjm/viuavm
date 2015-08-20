@@ -14,14 +14,14 @@
 ;
 .function: std::string::stringify
     frame ^[(paref 0 (strstore 1 "")) (paref 1 (arg 2 0))]
-    msg 3 stringify
-    move 0 3
+    msg 0 stringify
+    move 0 1
     end
 .end
 
 .function: std::string::represent
     frame ^[(paref 0 (strstore 1 "")) (paref 1 (arg 2 0))]
-    msg 3 represent
-    move 0 3
+    msg 0 represent
+    move 0 1
     end
 .end
