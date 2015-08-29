@@ -32,6 +32,7 @@ bool WARNING_MISSING_END = false;
 
 // ERRORS
 bool ERROR_MISSING_END = false;
+bool ERROR_HALT_IS_LAST = false;
 
 
 bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE) {
@@ -54,6 +55,7 @@ bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE)
              << "    " << "    --Wmissin-end        - warn about missing 'end' instruction at the end of functions\n"
              << "    " << "    --Eall               - treat all warnings as errors\n"
              << "    " << "    --Emissing-end       - treat missing 'end' instruction at the end of function as error\n"
+             << "    " << "    --Ehalt-is-last      - treat 'halt' being used as last instruction of 'main' function as error\n"
              << "    " << "-c, --lib                - assemble as a library\n"
              << "    " << "-E, --expand             - only expand the source code to simple form (one instruction per line)\n"
              << "    " << "                           with this option, assembler prints expanded source to standard output\n"
@@ -104,6 +106,12 @@ int main(int argc, char* argv[]) {
             continue;
         } else if (option == "--Emissing-end") {
             ERROR_MISSING_END = true;
+            continue;
+        } else if (option == "--Emissing-end") {
+            ERROR_MISSING_END = true;
+            continue;
+        } else if (option == "--Ehalt-is-last") {
+            ERROR_HALT_IS_LAST = true;
             continue;
         } else if (option == "--out" or option == "-o") {
             if (i < argc-1) {
@@ -220,6 +228,12 @@ int main(int argc, char* argv[]) {
     if ((report = assembler::verify::frameBalance(expanded_lines, expanded_lines_to_source_lines)).size()) {
         cout << report << endl;
         exit(1);
+    }
+    if ((not AS_LIB) and (ERROR_HALT_IS_LAST or ERROR_ALL) and functions.bodies.count("main")) {
+        if ((report = assembler::verify::mainFunctionDoesNotEndWithHalt(functions.bodies)).size()) {
+            cout << report << endl;
+            exit(1);
+        }
     }
 
     ////////////////////////////
