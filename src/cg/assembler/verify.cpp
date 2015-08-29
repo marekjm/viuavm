@@ -194,6 +194,24 @@ string assembler::verify::functionBodiesAreNonempty(const vector<string>& lines,
     return report.str();
 }
 
+string assembler::verify::mainFunctionDoesNotEndWithHalt(map<string, vector<string> >& functions) {
+    ostringstream report("");
+    string line;
+    if (functions.count("main") == 0) {
+        report << "error: cannot verify undefined 'main' function" << endl;
+        return report.str();
+    }
+    vector<string> flines = functions.at("main");
+    if (flines.size() == 0) {
+        report << "error: cannot verify empty 'main' function" << endl;
+        return report.str();
+    }
+    if (str::chunk(str::lstrip(flines.back())) == "halt") {
+        report << "error: using 'halt' instead of 'end' as last instruction in main function leads to memory leaks" << endl;
+    }
+    return report.str();
+}
+
 string assembler::verify::directives(const vector<string>& lines, const map<unsigned, unsigned>& expanded_lines_to_source_lines) {
     ostringstream report("");
     string line;
