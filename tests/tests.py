@@ -686,7 +686,6 @@ class PrototypeSystemTests(unittest.TestCase):
                 'Hello from MoreDerived',
                 'Hi from MoreDerived',
             ],
-            check_memory_leaks=False
         )
 
 
