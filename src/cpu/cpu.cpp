@@ -516,14 +516,11 @@ CPU& CPU::iframe(Frame* frm, unsigned r) {
         initial_frame = new Frame(0, 0, r);
         initial_frame->function_name = "__entry";
 
-        // set global registers to be the same as __entry function's local registers
-        regset = initial_frame->regset;
-
         Vector* cmdline = new Vector();
         for (unsigned i = 0; i < commandline_arguments.size(); ++i) {
             cmdline->push(new String(commandline_arguments[i]));
         }
-        regset->set(1, cmdline);
+        initial_frame->regset->set(1, cmdline);
     } else {
         initial_frame = frm;
 
@@ -531,8 +528,10 @@ CPU& CPU::iframe(Frame* frm, unsigned r) {
          *  set global registers to the locals of supplied frame.
          */
         delete regset;
-        regset = initial_frame->regset;
     }
+
+    // set global registers to be the same as __entry function's local registers
+    regset = initial_frame->regset;
 
     // set currently used register set to the global one
     uregset = regset;
