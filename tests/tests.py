@@ -689,6 +689,7 @@ class PrototypeSystemTests(unittest.TestCase):
             check_memory_leaks=False
         )
 
+
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.
     """
@@ -701,6 +702,14 @@ class AssemblerErrorTests(unittest.TestCase):
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,))
         self.assertEqual("error: function gathering failed: another function opened before assembler reached .end after 'foo' function", output.strip())
         self.assertEqual(1, exit_code)
+
+    def testHaltAsLastInstruction(self):
+        name = 'halt_as_last_instruction.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, opts=('--Ehalt-is-last',), okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("error: using 'halt' instead of 'end' as last instruction in main function leads to memory leaks", output.strip())
 
 
 class ExternalModulesTests(unittest.TestCase):
