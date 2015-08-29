@@ -1,17 +1,17 @@
 .function: set_69
     ress global
-    istore 1 69
+    istore 2 69
     end
 .end
 
 .function: main
-    istore 1 42
+    istore 2 42
 
     call (frame 0) set_69
-    print 1
+    print 2
 
     ress global
-    print 1
+    print 2
 
     izero 0
     end
