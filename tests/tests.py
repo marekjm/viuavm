@@ -446,7 +446,7 @@ class RegisterManipulationInstructionsTests(unittest.TestCase):
         runTest(self, 'free.asm', 'true')
 
     def testEMPTY(self):
-        runTest(self, 'empty.asm', 'true', output_processing_function=None, check_memory_leaks=False)
+        runTest(self, 'empty.asm', 'true')
 
 
 class SampleProgramsTests(unittest.TestCase):
