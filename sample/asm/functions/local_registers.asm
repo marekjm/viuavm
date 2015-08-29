@@ -13,6 +13,7 @@
     ress global
     print 2
 
+    ress local
     izero 0
     end
 .end
