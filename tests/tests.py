@@ -111,11 +111,19 @@ def runTestNoDisassemblyRerun(self, name, expected_output, expected_exit_code = 
         self.assertEqual(expected_output, got_output)
         self.assertEqual(expected_exit_code, excode)
 
+def runTestCustomAssertsNoDisassemblyRerun(self, name, assertions_callback):
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        assemble(assembly_path, compiled_path)
+        excode, output = run(compiled_path)
+        assertions_callback(self, excode, output)
+
 def runTestSplitlines(self, name, expected_output, expected_exit_code = 0):
     runTest(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: o.strip().splitlines())
 
 def runTestSplitlinesNoDisassemblyRerun(self, name, expected_output, expected_exit_code = 0):
     runTestNoDisassemblyRerun(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: o.strip().splitlines())
+
 def runTestReturnsIntegers(self, name, expected_output, expected_exit_code = 0):
     runTest(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: [int(i) for i in o.strip().splitlines()])
 
@@ -640,6 +648,17 @@ class ExternalModulesTests(unittest.TestCase):
 
     def testReturningAValue(self):
         runTestNoDisassemblyRerun(self, 'sqrt.asm', 1.73, 0, lambda o: round(float(o.strip()), 2))
+
+
+def twoSameLines(self, excode, output):
+    lines = output.splitlines()
+    self.assertEqual(lines[0], lines[1])
+
+class StandardRuntimeLibraryModuleString(unittest.TestCase):
+    PATH = './sample/standard_library/string'
+
+    def testStringifyFunction(self):
+        runTestCustomAssertsNoDisassemblyRerun(self, 'stringify.asm', twoSameLines)
 
 
 if __name__ == '__main__':
