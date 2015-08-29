@@ -721,7 +721,7 @@ class ExternalModulesTests(unittest.TestCase):
         runTestNoDisassemblyRerun(self, 'hello_world.asm', "Hello World!")
 
     def testReturningAValue(self):
-        runTestNoDisassemblyRerun(self, 'sqrt.asm', 1.73, 0, lambda o: round(float(o.strip()), 2), check_memory_leaks=False)
+        runTestNoDisassemblyRerun(self, 'sqrt.asm', 1.73, 0, lambda o: round(float(o.strip()), 2))
 
 
 def twoSameLines(self, excode, output):
