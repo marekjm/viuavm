@@ -296,55 +296,13 @@ class BooleanInstructionsTests(unittest.TestCase):
     PATH = './sample/asm/boolean'
 
     def testNOT(self):
-        name = 'not.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        assemble(assembly_path, compiled_path)
-        excode, output = run(compiled_path)
-        self.assertEqual(['false', 'true'], output.strip().splitlines())
-        self.assertEqual(0, excode)
-
-        disasm_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.dis.asm'.format(self.PATH[2:].replace('/', '_'), name))
-        compiled_disasm_path = '{0}.bin'.format(disasm_path)
-        disassemble(compiled_path, disasm_path)
-        assemble(disasm_path, compiled_disasm_path)
-        dis_excode, dis_output = run(compiled_disasm_path)
-        self.assertEqual(output.strip(), dis_output.strip())
-        self.assertEqual(excode, dis_excode)
+        runTestSplitlines(self, 'not.asm', ['false', 'true'])
 
     def testAND(self):
-        name = 'and.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        assemble(assembly_path, compiled_path)
-        excode, output = run(compiled_path)
-        self.assertEqual(['false', 'true', 'false'], output.strip().splitlines())
-        self.assertEqual(0, excode)
-
-        disasm_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.dis.asm'.format(self.PATH[2:].replace('/', '_'), name))
-        compiled_disasm_path = '{0}.bin'.format(disasm_path)
-        disassemble(compiled_path, disasm_path)
-        assemble(disasm_path, compiled_disasm_path)
-        dis_excode, dis_output = run(compiled_disasm_path)
-        self.assertEqual(output.strip(), dis_output.strip())
-        self.assertEqual(excode, dis_excode)
+        runTestSplitlines(self, 'and.asm', ['false', 'true', 'false'])
 
     def testOR(self):
-        name = 'or.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        assemble(assembly_path, compiled_path)
-        excode, output = run(compiled_path)
-        self.assertEqual(['false', 'true', 'true'], output.strip().splitlines())
-        self.assertEqual(0, excode)
-
-        disasm_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.dis.asm'.format(self.PATH[2:].replace('/', '_'), name))
-        compiled_disasm_path = '{0}.bin'.format(disasm_path)
-        disassemble(compiled_path, disasm_path)
-        assemble(disasm_path, compiled_disasm_path)
-        dis_excode, dis_output = run(compiled_disasm_path)
-        self.assertEqual(output.strip(), dis_output.strip())
-        self.assertEqual(excode, dis_excode)
+        runTestSplitlines(self, 'or.asm', ['false', 'true', 'true'])
 
 
 class FloatInstructionsTests(unittest.TestCase):
