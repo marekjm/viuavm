@@ -85,6 +85,8 @@ def run(path, expected_exit_code=0):
         raise ViuaCPUError('{0} [{1}]: {2}'.format(path, exit_code, output.decode('utf-8').strip()))
     return (exit_code, output.decode('utf-8'))
 
+MEMORY_LEAK_CHECKS_SKIPPED = 0
+MEMORY_LEAK_CHECKS_RUN = 0
 valgrind_regex_heap_summary_in_use_at_exit = re.compile('in use at exit: (\d+(?:,\d+)?) bytes in (\d+) blocks')
 valgrind_regex_heap_summary_total_heap_usage = re.compile('total heap usage: (\d+) allocs, (\d+) frees, (\d+(?:,\d+)?) bytes allocated')
 valgrind_regex_leak_summary_definitely_lost = re.compile('definitely lost: (\d+(?:,\d+)?) bytes in (\d+) blocks')
@@ -176,7 +178,15 @@ def valgrindCheck(self, path):
     return 0
 
 
-def runTest(self, name, expected_output, expected_exit_code = 0, output_processing_function = None):
+def runMemoryLeakCheck(self, compiled_path, skip_memory_leak_check):
+    global MEMORY_LEAK_CHECKS_RUN, MEMORY_LEAK_CHECKS_SKIPPED
+    if not skip_memory_leak_check:
+        MEMORY_LEAK_CHECKS_RUN += 1
+        valgrindCheck(self, compiled_path)
+    else:
+        MEMORY_LEAK_CHECKS_SKIPPED += 1
+
+def runTest(self, name, expected_output, expected_exit_code = 0, output_processing_function = None, skip_memory_leak_check = False):
         assembly_path = os.path.join(self.PATH, name)
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
@@ -185,7 +195,7 @@ def runTest(self, name, expected_output, expected_exit_code = 0, output_processi
         self.assertEqual(expected_output, got_output)
         self.assertEqual(expected_exit_code, excode)
 
-        valgrindCheck(self, compiled_path)
+        runMemoryLeakCheck(self, compiled_path, skip_memory_leak_check)
 
         disasm_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.dis.asm'.format(self.PATH[2:].replace('/', '_'), name))
         compiled_disasm_path = '{0}.bin'.format(disasm_path)
@@ -195,7 +205,7 @@ def runTest(self, name, expected_output, expected_exit_code = 0, output_processi
         self.assertEqual(got_output, (dis_output.strip() if output_processing_function is None else output_processing_function(dis_output)))
         self.assertEqual(excode, dis_excode)
 
-def runTestNoDisassemblyRerun(self, name, expected_output, expected_exit_code = 0, output_processing_function = None):
+def runTestNoDisassemblyRerun(self, name, expected_output, expected_exit_code = 0, output_processing_function = None, skip_memory_leak_check=False):
         assembly_path = os.path.join(self.PATH, name)
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
@@ -203,15 +213,15 @@ def runTestNoDisassemblyRerun(self, name, expected_output, expected_exit_code = 
         got_output = (output.strip() if output_processing_function is None else output_processing_function(output))
         self.assertEqual(expected_output, got_output)
         self.assertEqual(expected_exit_code, excode)
-        valgrindCheck(self, compiled_path)
+        runMemoryLeakCheck(self, compiled_path, skip_memory_leak_check)
 
-def runTestCustomAssertsNoDisassemblyRerun(self, name, assertions_callback):
+def runTestCustomAssertsNoDisassemblyRerun(self, name, assertions_callback, skip_memory_leak_check = False):
         assembly_path = os.path.join(self.PATH, name)
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         assertions_callback(self, excode, output)
-        valgrindCheck(self, compiled_path)
+        runMemoryLeakCheck(self, compiled_path, skip_memory_leak_check)
 
 def runTestSplitlines(self, name, expected_output, expected_exit_code = 0):
     runTest(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: o.strip().splitlines())
@@ -769,4 +779,5 @@ class StandardRuntimeLibraryModuleString(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(exit=False)
+    print('{0} memory leak check{2} ({1} check{3} skipped)'.format(MEMORY_LEAK_CHECKS_RUN, MEMORY_LEAK_CHECKS_SKIPPED, ('' if MEMORY_LEAK_CHECKS_RUN == 1 else 's'), ('' if MEMORY_LEAK_CHECKS_SKIPPED == 1 else 's')))
