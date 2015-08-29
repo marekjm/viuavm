@@ -706,7 +706,7 @@ int CPU::run() {
         }
     }
 
-    // delete entry function's frame
+    // delete __entry function's frame
     // otherwise we get huge memory leak
     // do not delete if execution was halted because of exception
     if (return_exception == "") {
