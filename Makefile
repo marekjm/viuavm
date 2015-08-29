@@ -192,8 +192,10 @@ build/cpu/registserset.o: src/cpu/registerset.cpp include/viua/cpu/registerset.h
 
 ############################################################
 # STANDARD LIBRARY
-stdlib:
-	echo "OK"
+stdlib: build/stdlib/std/string.vlib build/stdlib/typesystem.so
+
+build/stdlib/std/string.vlib: src/stdlib/viua/string.asm
+	./build/bin/vm/asm --lib -o $@ $<
 
 build/stdlib/typesystem.o: src/stdlib/typesystem.cpp
 	${CXX} -std=c++11 -fPIC -c -I./include -o $@ $<
