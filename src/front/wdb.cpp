@@ -343,6 +343,115 @@ tuple<bool, string> if_watchpoint_local_register_write(CPU& cpu, const State& st
 
     return tuple<bool, string>(pause, reason.str());
 }
+tuple<bool, string> if_watchpoint_global_register_write(CPU& cpu, const State& state) {
+    /** Determine whether the instruction at instruction pointer should trigger a watchpoint.
+     */
+    bool writing_instruction = true;
+    OPCODE opcode = OPCODE(*cpu.instruction_pointer);
+    if (opcode == NOP or
+        opcode == NOP or
+        opcode == RESS or
+        opcode == TMPRI or
+        opcode == PRINT or
+        opcode == ECHO or
+        opcode == FRAME or
+        opcode == PARAM or
+        opcode == PAREF or
+        opcode == CALL or
+        opcode == JUMP or
+        opcode == BRANCH or
+        opcode == END or
+        opcode == HALT
+       ) {
+        writing_instruction = false;
+    }
+    int register_index[2] = {-1, -1};
+    int writes_to = 0;
+    byte* register_index_ptr = (cpu.instruction_pointer+1);
+
+    if (opcode == IZERO or
+        opcode == ISTORE or
+        opcode == IINC or
+        opcode == IDEC or
+        opcode == FSTORE or
+        opcode == BSTORE or
+        opcode == STRSTORE or
+        opcode == VEC or
+        opcode == VINSERT or
+        opcode == VPUSH or
+        opcode == BOOL or
+        opcode == NOT or
+        opcode == FREE or
+        opcode == EMPTY or
+        opcode == TMPRO
+       ) {
+        register_index[0] = *(int*)(register_index_ptr+1);
+        writes_to = 1;
+    } else if (opcode == ITOF or
+               opcode == FTOI or
+               opcode == STOI or
+               opcode == STOF or
+               opcode == VLEN or
+               opcode == MOVE or
+               opcode == COPY or
+               opcode == REF or
+               opcode == ISNULL or
+               opcode == ARG
+            ) {
+        register_index[0] = *((int*)(register_index_ptr+2)+1);
+        writes_to = 1;
+    } else if (opcode == IADD or
+               opcode == ISUB or
+               opcode == IMUL or
+               opcode == IDIV or
+               opcode == ILT or
+               opcode == ILTE or
+               opcode == IGT or
+               opcode == IGTE or
+               opcode == IEQ or
+               opcode == FADD or
+               opcode == FSUB or
+               opcode == FMUL or
+               opcode == FDIV or
+               opcode == FLT or
+               opcode == FLTE or
+               opcode == FGT or
+               opcode == FGTE or
+               opcode == FEQ or
+               opcode == BADD or
+               opcode == BSUB or
+               opcode == BLT or
+               opcode == BLTE or
+               opcode == BGT or
+               opcode == BGTE or
+               opcode == BEQ or
+               opcode == VAT or
+               opcode == AND or
+               opcode == OR
+               ) {
+        register_index[0] = *((int*)(register_index_ptr+3)+2);
+        writes_to = 1;
+    } else if (opcode == VPOP or opcode == SWAP) {
+        register_index[0] = *((int*)(++register_index_ptr)++);
+        register_index[1] = *((int*)(++register_index_ptr)++);
+        writes_to = 2;
+    }
+
+    bool pause = false;
+    ostringstream reason;
+    reason.str("");
+
+    if (writing_instruction) {
+        for (int i = 0; i < writes_to; ++i) {
+            if (find(state.watch_register_global_write.begin(), state.watch_register_global_write.end(), register_index[i]) != state.watch_register_global_write.end()) {
+                pause = true;
+                reason << "info: execution halted by global register write watchpoint: " << register_index[i];
+            }
+        }
+    }
+
+    return tuple<bool, string>(pause, reason.str());
+}
 
 
 bool command_verify(string& command, vector<string>& operands, const CPU& cpu, const State& state) {
@@ -397,6 +506,14 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
         if (operands.size() > 0 and str::isnum(operands[0])) {
             // if operands start with numerical value, assume current function
             operands.insert(operands.begin(), ".");
+        }
+    } else if (command == "watch.register.global.write") {
+        if (operands.size() == 0) {
+            cout << "error: invalid syntax, expected: <register-index>..." << endl;
+            verified = false;
+        } else if (operands.size() == 1 and not str::isnum(operands[0])) {
+            cout << "error: expected at least one integer operand" << endl;
+            verified = false;
         }
     } else if (command == "cpu.init") {
     } else if (command == "cpu.preload") {
@@ -559,6 +676,10 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
         }
         for (unsigned i = 1; i < operands.size(); ++i) {
             state.watch_register_local_write[function_name].push_back(stoi(operands[i]));
+        }
+    } else if (command == "watch.register.global.write") {
+        for (unsigned i = 1; i < operands.size(); ++i) {
+            state.watch_register_global_write.push_back(stoi(operands[i]));
         }
     } else if (command == "cpu.init") {
         cpu.iframe();
