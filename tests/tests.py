@@ -660,6 +660,9 @@ class StandardRuntimeLibraryModuleString(unittest.TestCase):
     def testStringifyFunction(self):
         runTestCustomAssertsNoDisassemblyRerun(self, 'stringify.asm', twoSameLines)
 
+    def testRepresentFunction(self):
+        runTestCustomAssertsNoDisassemblyRerun(self, 'represent.asm', twoSameLines)
+
 
 if __name__ == '__main__':
     unittest.main()

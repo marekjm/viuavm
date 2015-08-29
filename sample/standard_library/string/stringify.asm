@@ -13,7 +13,7 @@
     frame ^[(paref 0 1)]
     call 2 std::string::stringify
 
-    ; this should print the exactly same lines
+    ; this should print two, exactly same lines
     print 1
     print 2
 
