@@ -178,15 +178,16 @@ def valgrindCheck(self, path):
     return 0
 
 
-def runMemoryLeakCheck(self, compiled_path, skip_memory_leak_check):
+def runMemoryLeakCheck(self, compiled_path, check_memory_leaks):
     global MEMORY_LEAK_CHECKS_RUN, MEMORY_LEAK_CHECKS_SKIPPED
-    if not skip_memory_leak_check:
+    if check_memory_leaks:
         MEMORY_LEAK_CHECKS_RUN += 1
         valgrindCheck(self, compiled_path)
     else:
+        print('skipped memory leak check for: {0}'.format(compiled_path))
         MEMORY_LEAK_CHECKS_SKIPPED += 1
 
-def runTest(self, name, expected_output, expected_exit_code = 0, output_processing_function = None, skip_memory_leak_check = False):
+def runTest(self, name, expected_output, expected_exit_code = 0, output_processing_function = None, check_memory_leaks = True):
         assembly_path = os.path.join(self.PATH, name)
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
@@ -195,7 +196,7 @@ def runTest(self, name, expected_output, expected_exit_code = 0, output_processi
         self.assertEqual(expected_output, got_output)
         self.assertEqual(expected_exit_code, excode)
 
-        runMemoryLeakCheck(self, compiled_path, skip_memory_leak_check)
+        runMemoryLeakCheck(self, compiled_path, check_memory_leaks)
 
         disasm_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.dis.asm'.format(self.PATH[2:].replace('/', '_'), name))
         compiled_disasm_path = '{0}.bin'.format(disasm_path)
@@ -205,7 +206,7 @@ def runTest(self, name, expected_output, expected_exit_code = 0, output_processi
         self.assertEqual(got_output, (dis_output.strip() if output_processing_function is None else output_processing_function(dis_output)))
         self.assertEqual(excode, dis_excode)
 
-def runTestNoDisassemblyRerun(self, name, expected_output, expected_exit_code = 0, output_processing_function = None, skip_memory_leak_check=False):
+def runTestNoDisassemblyRerun(self, name, expected_output, expected_exit_code = 0, output_processing_function = None, check_memory_leaks = True):
         assembly_path = os.path.join(self.PATH, name)
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
@@ -213,24 +214,24 @@ def runTestNoDisassemblyRerun(self, name, expected_output, expected_exit_code = 
         got_output = (output.strip() if output_processing_function is None else output_processing_function(output))
         self.assertEqual(expected_output, got_output)
         self.assertEqual(expected_exit_code, excode)
-        runMemoryLeakCheck(self, compiled_path, skip_memory_leak_check)
+        runMemoryLeakCheck(self, compiled_path, check_memory_leaks)
 
-def runTestCustomAssertsNoDisassemblyRerun(self, name, assertions_callback, skip_memory_leak_check = False):
+def runTestCustomAssertsNoDisassemblyRerun(self, name, assertions_callback, check_memory_leaks = True):
         assembly_path = os.path.join(self.PATH, name)
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         assemble(assembly_path, compiled_path)
         excode, output = run(compiled_path)
         assertions_callback(self, excode, output)
-        runMemoryLeakCheck(self, compiled_path, skip_memory_leak_check)
+        runMemoryLeakCheck(self, compiled_path, check_memory_leaks)
 
 def runTestSplitlines(self, name, expected_output, expected_exit_code = 0):
     runTest(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: o.strip().splitlines())
 
-def runTestSplitlinesNoDisassemblyRerun(self, name, expected_output, expected_exit_code = 0):
-    runTestNoDisassemblyRerun(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: o.strip().splitlines())
+def runTestSplitlinesNoDisassemblyRerun(self, name, expected_output, expected_exit_code = 0, check_memory_leaks = True):
+    runTestNoDisassemblyRerun(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: o.strip().splitlines(), check_memory_leaks=check_memory_leaks)
 
-def runTestReturnsIntegers(self, name, expected_output, expected_exit_code = 0):
-    runTest(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: [int(i) for i in o.strip().splitlines()])
+def runTestReturnsIntegers(self, name, expected_output, expected_exit_code = 0, check_memory_leaks=True):
+    runTest(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: [int(i) for i in o.strip().splitlines()], check_memory_leaks=check_memory_leaks)
 
 def runTestThrowsException(self, name, expected_output):
         assembly_path = os.path.join(self.PATH, name)
@@ -346,9 +347,8 @@ class ByteInstructionsTests(unittest.TestCase):
     """
     PATH = './sample/asm/byte'
 
-    @unittest.skip('memory leak due to undebugged reason')
     def testHelloWorld(self):
-        runTest(self, 'helloworld.asm', 'Hello World!', 0)
+        runTest(self, 'helloworld.asm', 'Hello World!', 0, output_processing_function=None, check_memory_leaks=False)
 
 
 class StringInstructionsTests(unittest.TestCase):
@@ -445,9 +445,8 @@ class RegisterManipulationInstructionsTests(unittest.TestCase):
     def testFREE(self):
         runTest(self, 'free.asm', 'true')
 
-    @unittest.skip('memory leak due to "empty" instruction being issued on an object not referenced elsewhere')
     def testEMPTY(self):
-        runTest(self, 'empty.asm', 'true')
+        runTest(self, 'empty.asm', 'true', output_processing_function=None, check_memory_leaks=False)
 
 
 class SampleProgramsTests(unittest.TestCase):
@@ -514,9 +513,8 @@ class FunctionTests(unittest.TestCase):
     def testRecursiveCallFunctionSupport(self):
         runTestReturnsIntegers(self, 'recursive.asm', [i for i in range(9, -1, -1)])
 
-    @unittest.skip('memory leak due to undebugged reason')
     def testLocalRegistersInFunctions(self):
-        runTestReturnsIntegers(self, 'local_registers.asm', [42, 69])
+        runTestReturnsIntegers(self, 'local_registers.asm', [42, 69], check_memory_leaks=False)
 
     def testObtainingNumberOfParameters(self):
         runTestReturnsIntegers(self, 'argc.asm', [1, 2, 0])
@@ -555,9 +553,8 @@ class HigherOrderFunctionTests(unittest.TestCase):
     def testFilter(self):
         runTest(self, 'filter.asm', [[1, 2, 3, 4, 5], [2, 4]], 0, lambda o: [json.loads(i) for i in o.splitlines()])
 
-    @unittest.skip('memory leak due to buggy implementation of references (possibly)')
     def testFilterByClosure(self):
-        runTest(self, 'filter_closure.asm', [[1, 2, 3, 4, 5], [2, 4]], 0, lambda o: [json.loads(i) for i in o.splitlines()])
+        runTest(self, 'filter_closure.asm', [[1, 2, 3, 4, 5], [2, 4]], 0, lambda o: [json.loads(i) for i in o.splitlines()], check_memory_leaks=False)
 
 
 class ClosureTests(unittest.TestCase):
@@ -565,13 +562,11 @@ class ClosureTests(unittest.TestCase):
     """
     PATH = './sample/asm/functions/closures'
 
-    @unittest.skip('memory leak due to buggy implementation of references')
     def testSimpleClosure(self):
-        runTest(self, 'simple.asm', '42')
+        runTest(self, 'simple.asm', '42', output_processing_function=None, check_memory_leaks=False)
 
-    @unittest.skip('memory leak due to buggy implementation of references')
     def testVariableSharingBetweenTwoClosures(self):
-        runTestReturnsIntegers(self, 'shared_variables.asm', [42, 69])
+        runTestReturnsIntegers(self, 'shared_variables.asm', [42, 69], check_memory_leaks=False)
 
 
 class StaticLinkingTests(unittest.TestCase):
@@ -681,7 +676,6 @@ class PrototypeSystemTests(unittest.TestCase):
     def testCatchingObjectsUsingMultipleInheritanceWithNoSharedBases(self):
         runTest(self, 'multiple_inheritance_with_no_shared_base_classes.asm', "<'Combined' object at", 0, lambda o: ' '.join(o.split()[:-1]))
 
-    @unittest.skip('memory leak due to undebugged reason')
     def testDynamicDispatch(self):
         runTestSplitlinesNoDisassemblyRerun(self, 'dynamic_method_dispatch.asm',
             [
@@ -691,7 +685,8 @@ class PrototypeSystemTests(unittest.TestCase):
                 'Good day from MoreDerived',
                 'Hello from MoreDerived',
                 'Hi from MoreDerived',
-            ]
+            ],
+            check_memory_leaks=False
         )
 
 class AssemblerErrorTests(unittest.TestCase):
@@ -713,13 +708,11 @@ class ExternalModulesTests(unittest.TestCase):
     """
     PATH = './sample/asm/external'
 
-    @unittest.skip('memory leak due to undebugged reason')
     def testHelloWorldExample(self):
-        runTestNoDisassemblyRerun(self, 'hello_world.asm', "Hello World!")
+        runTestNoDisassemblyRerun(self, 'hello_world.asm', "Hello World!", output_processing_function=None, check_memory_leaks=False)
 
-    @unittest.skip('memory leak due to undebugged reason')
     def testReturningAValue(self):
-        runTestNoDisassemblyRerun(self, 'sqrt.asm', 1.73, 0, lambda o: round(float(o.strip()), 2))
+        runTestNoDisassemblyRerun(self, 'sqrt.asm', 1.73, 0, lambda o: round(float(o.strip()), 2), check_memory_leaks=False)
 
 
 def twoSameLines(self, excode, output):
