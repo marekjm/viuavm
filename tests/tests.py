@@ -16,6 +16,7 @@ import json
 import os
 import subprocess
 import sys
+import re
 import unittest
 
 
@@ -77,12 +78,102 @@ def disassemble(path, out=None):
 def run(path, expected_exit_code=0):
     """Run given file with Viua CPU and return its output.
     """
-    p = subprocess.Popen(('./build/bin/vm/cpu', path), stdout=subprocess.PIPE)
+    p = subprocess.Popen(('./build/bin/vm/cpu', path), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, error = p.communicate()
     exit_code = p.wait()
     if exit_code not in (expected_exit_code if type(expected_exit_code) in [list, tuple] else (expected_exit_code,)):
         raise ViuaCPUError('{0} [{1}]: {2}'.format(path, exit_code, output.decode('utf-8').strip()))
     return (exit_code, output.decode('utf-8'))
+
+valgrind_regex_heap_summary_in_use_at_exit = re.compile('in use at exit: (\d+(?:,\d+)?) bytes in (\d+) blocks')
+valgrind_regex_heap_summary_total_heap_usage = re.compile('total heap usage: (\d+) allocs, (\d+) frees, (\d+(?:,\d+)?) bytes allocated')
+valgrind_regex_leak_summary_definitely_lost = re.compile('definitely lost: (\d+(?:,\d+)?) bytes in (\d+) blocks')
+valgrind_regex_leak_summary_indirectly_lost = re.compile('indirectly lost: (\d+(?:,\d+)?) bytes in (\d+) blocks')
+valgrind_regex_leak_summary_possibly_lost = re.compile('possibly lost: (\d+(?:,\d+)?) bytes in (\d+) blocks')
+valgrind_regex_leak_summary_still_reachable = re.compile('still reachable: (\d+(?:,\d+)?) bytes in (\d+) blocks')
+valgrind_regex_leak_summary_suppressed = re.compile('suppressed: (\d+(?:,\d+)?) bytes in (\d+) blocks')
+def valgrindBytesInBlocks(line, regex):
+    matched = regex.search(line)
+    return {'bytes': int(matched.group(1).replace(',', '')), 'blocks': int(matched.group(2))}
+
+def valgrindSummary(text):
+    output_lines = text.splitlines()
+    valprefix = output_lines[0].split(' ')[0]
+    interesting_lines = [line[len(valprefix):].strip() for line in output_lines[output_lines.index('{0} HEAP SUMMARY:'.format(valprefix)):]]
+
+    in_use_at_exit = valgrindBytesInBlocks(interesting_lines[1], valgrind_regex_heap_summary_in_use_at_exit)
+    # print(interesting_lines[1], in_use_at_exit)
+
+    total_heap_usage_matched = valgrind_regex_heap_summary_total_heap_usage.search(interesting_lines[2])
+    total_heap_usage = {
+        'allocs': int(total_heap_usage_matched.group(1)),
+        'frees': int(total_heap_usage_matched.group(2)),
+        'bytes': int(total_heap_usage_matched.group(3).replace(',', '')),
+    }
+    # print(interesting_lines[2], total_heap_usage)
+
+    definitely_lost = valgrindBytesInBlocks(interesting_lines[5], valgrind_regex_leak_summary_definitely_lost)
+    # print(interesting_lines[5], definitely_lost)
+
+    indirectly_lost = valgrindBytesInBlocks(interesting_lines[6], valgrind_regex_leak_summary_indirectly_lost)
+    # print(interesting_lines[6], indirectly_lost)
+
+    possibly_lost = valgrindBytesInBlocks(interesting_lines[7], valgrind_regex_leak_summary_possibly_lost)
+    # print(interesting_lines[7], possibly_lost)
+
+    still_reachable = valgrindBytesInBlocks(interesting_lines[8], valgrind_regex_leak_summary_still_reachable)
+    # print(interesting_lines[8], still_reachable)
+
+    suppressed = valgrindBytesInBlocks(interesting_lines[9], valgrind_regex_leak_summary_suppressed)
+    # print(interesting_lines[9], suppressed)
+
+    summary = {'heap': {}, 'leak': {}}
+
+    summary['heap']['in_use_at_exit'] = in_use_at_exit
+    summary['heap']['total_heap_usage'] = total_heap_usage
+
+    summary['leak']['definitely_lost'] = definitely_lost
+    summary['leak']['indirectly_lost'] = indirectly_lost
+    summary['leak']['possibly_lost'] = possibly_lost
+    summary['leak']['still_reachable'] = still_reachable
+    summary['leak']['suppressed'] = suppressed
+    return summary
+
+def valgrindCheck(self, path):
+    """Run compiled code under Valgrind to check for memory leaks.
+    """
+    p = subprocess.Popen(('valgrind', './build/bin/vm/cpu', path), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output, error = p.communicate()
+    exit_code = p.wait()
+
+    error = error.decode('utf-8')
+    summary = valgrindSummary(error)
+
+    memory_was_leaked = False
+    allocation_balance = (summary['heap']['total_heap_usage']['allocs'] - summary['heap']['total_heap_usage']['frees'])
+    # 1 must be allowed to deal with GCC 5.1 bug that causes 72,704 bytes to remain reachable
+    # sources:
+    #   https://stackoverflow.com/questions/30393229/new-libstdc-of-gcc5-1-may-allocate-large-heap-memory
+    #   https://gcc.gnu.org/bugzilla/show_bug.cgi?id=64535
+    if not (allocation_balance == 0 or allocation_balance == 1): memory_was_leaked = True
+    if summary['leak']['definitely_lost']['bytes']: memory_was_leaked = True
+    if summary['leak']['indirectly_lost']['bytes']: memory_was_leaked = True
+    if summary['leak']['possibly_lost']['bytes']: memory_was_leaked = True
+    # same as above, we have to allow 72704 bytes to leak
+    if summary['leak']['still_reachable']['bytes'] not in (0, 72704): memory_was_leaked = True
+    if summary['leak']['suppressed']['bytes']: memory_was_leaked = True
+
+    if memory_was_leaked:
+        print(error)
+
+    total_leak_bytes  = summary['leak']['definitely_lost']['bytes']
+    total_leak_bytes += summary['leak']['indirectly_lost']['bytes']
+    total_leak_bytes += summary['leak']['possibly_lost']['bytes']
+    total_leak_bytes += summary['leak']['still_reachable']['bytes']
+    total_leak_bytes += summary['leak']['suppressed']['bytes']
+    self.assertIn(total_leak_bytes, (0, 72704))
+
+    return 0
 
 
 def runTest(self, name, expected_output, expected_exit_code = 0, output_processing_function = None):
