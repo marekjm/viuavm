@@ -348,7 +348,7 @@ class ByteInstructionsTests(unittest.TestCase):
     PATH = './sample/asm/byte'
 
     def testHelloWorld(self):
-        runTest(self, 'helloworld.asm', 'Hello World!', 0, output_processing_function=None, check_memory_leaks=False)
+        runTest(self, 'helloworld.asm', 'Hello World!', 0)
 
 
 class StringInstructionsTests(unittest.TestCase):
@@ -718,7 +718,7 @@ class ExternalModulesTests(unittest.TestCase):
     PATH = './sample/asm/external'
 
     def testHelloWorldExample(self):
-        runTestNoDisassemblyRerun(self, 'hello_world.asm', "Hello World!", output_processing_function=None, check_memory_leaks=False)
+        runTestNoDisassemblyRerun(self, 'hello_world.asm', "Hello World!")
 
     def testReturningAValue(self):
         runTestNoDisassemblyRerun(self, 'sqrt.asm', 1.73, 0, lambda o: round(float(o.strip()), 2), check_memory_leaks=False)
