@@ -514,7 +514,7 @@ class FunctionTests(unittest.TestCase):
         runTestReturnsIntegers(self, 'recursive.asm', [i for i in range(9, -1, -1)])
 
     def testLocalRegistersInFunctions(self):
-        runTestReturnsIntegers(self, 'local_registers.asm', [42, 69], check_memory_leaks=False)
+        runTestReturnsIntegers(self, 'local_registers.asm', [42, 69])
 
     def testObtainingNumberOfParameters(self):
         runTestReturnsIntegers(self, 'argc.asm', [1, 2, 0])
