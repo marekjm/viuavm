@@ -469,6 +469,8 @@ void CPU::loadForeignLibrary(const string& module) {
         registerExternalFunction(exported[i].name, exported[i].fpointer);
         ++i;
     }
+
+    cxx_dynamic_lib_handles.push_back(handle);
 }
 
 

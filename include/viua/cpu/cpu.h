@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <dlfcn.h>
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -125,6 +126,7 @@ class CPU {
 
     /*  Methods dealing with dynamic library loading.
      */
+    std::vector<void*> cxx_dynamic_lib_handles;
     void loadNativeLibrary(const std::string&);
     void loadForeignLibrary(const std::string&);
 
@@ -330,6 +332,10 @@ class CPU {
 
                 typesystem.erase(proto_name);
                 delete proto_ptr;
+            }
+
+            for (unsigned i = 0; i < cxx_dynamic_lib_handles.size(); ++i) {
+                dlclose(cxx_dynamic_lib_handles[i]);
             }
         }
 };
