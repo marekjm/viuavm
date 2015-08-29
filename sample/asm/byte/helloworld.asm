@@ -40,5 +40,5 @@
     print _exmark
 
     izero 0
-    halt
+    end
 .end
