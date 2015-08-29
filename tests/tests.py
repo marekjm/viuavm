@@ -378,7 +378,7 @@ class ByteInstructionsTests(unittest.TestCase):
     """
     PATH = './sample/asm/byte'
 
-    @unittest.skip('')
+    @unittest.skip('memory leak due to undebugged reason')
     def testHelloWorld(self):
         runTest(self, 'helloworld.asm', 'Hello World!', 0)
 
