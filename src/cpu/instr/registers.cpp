@@ -34,7 +34,7 @@ byte* CPU::move(byte* addr) {
     return addr;
 }
 byte* CPU::copy(byte* addr) {
-    /** Run move instruction.
+    /** Run copy instruction.
      *  Copy an object from one register into another.
      */
     int object_operand_index, destination_register_index;
