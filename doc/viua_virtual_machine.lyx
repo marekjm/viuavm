@@ -3123,16 +3123,192 @@ Entry point
 \end_layout
 
 \begin_layout Standard
-This subsection explains how does the execution start.
-\end_layout
+From programmer's point of view, main entry point of a Viua program is the
+ 
+\begin_inset Quotes eld
+\end_inset
 
-\begin_layout Subsubsection
-Hardcoded entry function
+
+\family typewriter
+main/1
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ function.
+ However, several things necessary for programs' execution environment setup
+ happen before main is called.
+ These 
+\begin_inset Quotes eld
+\end_inset
+
+things
+\begin_inset Quotes erd
+\end_inset
+
+ are defined inside 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+__entry
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ function which is the real entry point the machine looks for when it starts
+ running a program.
 \end_layout
 
 \begin_layout Standard
-Describe entry function hardcoded inside the machine, which is also the
- first function to be executed when a program is run on Viua.
+Main function is wholly defined by the user - the only things that are forced
+ are the parameter list, which is a single vector with operands given to
+ the program on the command line, and the fact that main must return an
+ integer.
+ Apart from these two restrictions, main may contain any combination of
+ valid instructions.
+\end_layout
+
+\begin_layout Standard
+Entry function, in turn, is almost entirely machine-generated; programmers
+ have only very limited freedom in how they operate in and modify the pre-main
+ environment, and have to be extremenly careful not to disrupt the surroudings
+ of the main-call.
+ In particular, local registers 0 and 1 of 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+__entry
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ function must not be modified.
+ Global registers, however, can be freely utilised even in pre-main environment
+ as the global register set is initialised before the execution of entry
+ function.
+\end_layout
+
+\begin_layout Subsubsection
+Hardcoded entry (
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+__entry
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+) function
+\end_layout
+
+\begin_layout Standard
+Before main function of the loaded program is called, a special function
+ is run.
+ Contents of this function are not listed in this document, but can be inspected
+ by looking at the source code, as they should be largely irrelevant to
+ the work of typical Viua programmer (in a simillar fashion, the contents
+ of 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+_startup
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ routine are - in typical situations - of little relevance to the typical
+ C or C++ programmer).
+\end_layout
+
+\begin_layout Standard
+The role of the 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+__entry
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ function is to call main function of the program loaded into the machine
+ after basic execution environment has been set up.
+ The entry function is exactly alike all other functions running inside
+ the Viua.
+ The single most important aspect that makes the function special, is that
+ it is the very first function that the CPU starts executing and therefore
+ most vulnerable - no catchers can be registered, and debugging output from
+ the program crashed inside 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+__entry
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ function is usually confusing.
+ However, even if discouraged - it is possible to add instructions to the
+ entry function (e.g.
+ to register catchers above main function).
+ It is important to remember that instructions can only be added to entry
+ function, machine-generated instructions that call main function will remain
+ unchanged and will be executed after all additional instructions have been
+ executed.
+\end_layout
+
+\begin_layout Subparagraph*
+Implementation note
+\end_layout
+
+\begin_layout Standard
+There is no guarantee that altering behaviour of 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+__entry
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ function will be allowed in final version of the machine so users should
+ not rely on it.
+ It is much better to add, e.g.
+ error-handling code to the main function and call yet another function
+ to really start the program than inject instructions into 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+__entry
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsubsection
@@ -3140,7 +3316,79 @@ User supplied main function
 \end_layout
 
 \begin_layout Standard
-Describe the main function a user should supply.
+The shortest possible code that will satisfy both compiletime and runtime
+ constraints placed on the main function is presented below:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+.function: main (1)
+\end_layout
+
+\begin_layout Plain Layout
+
+	izero 0     (2)
+\end_layout
+
+\begin_layout Plain Layout
+
+	end         (3)
+\end_layout
+
+\begin_layout Plain Layout
+
+.end            (4)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+First line starts a function definition, main function must be named 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+main
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Second line stores 0 in the zeroeth register - main function must return
+ an integer, and zeroeth register is used to take return values from.
+ Third line tells the machine to finish execution of current frame (
+\begin_inset Quotes eld
+\end_inset
+
+end the frame
+\begin_inset Quotes erd
+\end_inset
+
+) and return from it.
+ Fourth line closes function definition.
+\end_layout
+
+\begin_layout Subparagraph*
+Compatibility note
+\end_layout
+
+\begin_layout Standard
+Integere returned from main function should be equal to or greater than
+ 0, but less than 256.
+ This requirement is not strictly enforced, but will guarantee that the
+ outer environment the machine runs in will not be confused by strange return
+ codes.
+ See: http://www.tldp.org/LDP/abs/html/exitcodes.html
 \end_layout
 
 \begin_layout Standard
