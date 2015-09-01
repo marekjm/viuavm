@@ -513,7 +513,7 @@ CPU& CPU::iframe(Frame* frm, unsigned r) {
      */
     Frame *initial_frame;
     if (frm == 0) {
-        initial_frame = new Frame(0, 0, r);
+        initial_frame = new Frame(0, 0, 2);
         initial_frame->function_name = "__entry";
 
         Vector* cmdline = new Vector();
@@ -530,11 +530,11 @@ CPU& CPU::iframe(Frame* frm, unsigned r) {
         delete regset;
     }
 
-    // set global registers to be the same as __entry function's local registers
-    regset = initial_frame->regset;
+    // set global registers
+    regset = new RegisterSet(r);
 
-    // set currently used register set to the global one
-    uregset = regset;
+    // set currently used register set
+    uregset = initial_frame->regset;
 
     frames.push_back(initial_frame);
 
@@ -705,11 +705,13 @@ int CPU::run() {
         }
     }
 
-    // delete __entry function's frame
+    // delete __entry function's frame and
+    // global registers
     // otherwise we get huge memory leak
     // do not delete if execution was halted because of exception
     if (return_exception == "") {
         delete frames.back();
+        delete regset;
     }
 
     return return_code;
