@@ -566,7 +566,6 @@ class ClosureTests(unittest.TestCase):
     def testSimpleClosure(self):
         runTest(self, 'simple.asm', '42', output_processing_function=None)
 
-    @unittest.skip('broken by new, non-leaking implementation of references')
     def testVariableSharingBetweenTwoClosures(self):
         runTestReturnsIntegers(self, 'shared_variables.asm', [42, 69])
 
