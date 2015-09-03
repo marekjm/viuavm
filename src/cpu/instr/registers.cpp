@@ -163,6 +163,10 @@ byte* CPU::empty(byte* addr) {
         target_register_index = static_cast<Integer*>(fetch(target_register_index))->value();
     }
 
+    Type* object = uregset->get(target_register_index);
+    if (Reference* rf = dynamic_cast<Reference*>(object)) {
+        delete rf;
+    }
     uregset->empty(target_register_index);
 
     return addr;
