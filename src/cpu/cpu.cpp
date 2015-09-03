@@ -372,6 +372,11 @@ byte* CPU::callForeignMethod(byte* addr, Type* object, const string& call_name, 
         throw new Exception("call to unregistered foreign method: " + call_name);
     }
 
+    Reference* rf = nullptr;
+    if ((rf = dynamic_cast<Reference*>(object))) {
+        object = rf->pointsTo();
+    }
+
     try {
         // FIXME: supply static and global registers to foreign functions
         foreign_methods.at(call_name)(object, frame, 0, 0);
