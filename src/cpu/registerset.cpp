@@ -5,6 +5,7 @@
 #include <viua/types/integer.h>
 #include <viua/types/byte.h>
 #include <viua/types/exception.h>
+#include <viua/types/reference.h>
 #include <viua/cpu/registerset.h>
 using namespace std;
 
@@ -23,20 +24,12 @@ Type* RegisterSet::set(unsigned index, Type* object) {
      */
     if (index >= registerset_size) { throw new Exception("register access out of bounds: write"); }
 
-    if (registers[index] != 0 and !isflagged(index, REFERENCE)) {
-        // register is not empty and is not a reference - the object in it must be destroyed to avoid memory leaks
-        delete registers[index];
-    }
-    if (isflagged(index, REFERENCE)) {
-        Type* referenced = get(index);
-
-        // it is a reference, copy value of the object
-        if (referenced->type() == "Integer") { copyvalue<Integer*>(referenced, object); }
-        else if (referenced->type() == "Byte") { copyvalue<Byte*>(referenced, object); }
-
-        // and delete the newly created object to avoid leaks
-        delete object;
+    if (registers[index] == 0) {
+        registers[index] = object;
+    } else if (dynamic_cast<Reference*>(registers[index])) {
+        static_cast<Reference*>(registers[index])->rebind(object);
     } else {
+        delete registers[index];
         registers[index] = object;
     }
 
