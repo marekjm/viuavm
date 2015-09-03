@@ -14,6 +14,7 @@
 #include <viua/support/env.h>
 #include <viua/types/integer.h>
 #include <viua/types/closure.h>
+#include <viua/types/string.h>
 #include <viua/loader.h>
 #define AS_DEBUG_HEADER 1
 #include <viua/cpu/cpu.h>
@@ -1062,6 +1063,21 @@ int main(int argc, char* argv[]) {
 
     cpu.commandline_arguments = cmdline_args;
     cpu.load(bytecode).bytes(bytes).eoffset(starting_instruction);
+
+
+    Prototype* proto_object = new Prototype("Object");
+    proto_object->attach("Object::set", "set");
+    proto_object->attach("Object::get", "get");
+    cpu.registerForeignPrototype("Object", proto_object);
+    cpu.registerForeignMethod("Object::set", static_cast<ForeignMethodMemberPointer>(&Object::set));
+    cpu.registerForeignMethod("Object::get", static_cast<ForeignMethodMemberPointer>(&Object::get));
+
+    Prototype* proto_string = new Prototype("String");
+    proto_string->attach("String::stringify", "stringify");
+    proto_string->attach("String::represent", "represent");
+    cpu.registerForeignPrototype("String", proto_string);
+    cpu.registerForeignMethod("String::stringify", static_cast<ForeignMethodMemberPointer>(&String::stringify));
+    cpu.registerForeignMethod("String::represent", static_cast<ForeignMethodMemberPointer>(&String::represent));
 
     string homedir(getenv("HOME"));
     ifstream local_rc_file(homedir + RC_FILENAME);
