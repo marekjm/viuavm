@@ -765,11 +765,11 @@ int generate(const vector<string>& expanded_lines, const map<unsigned, unsigned>
         }
         functions.names.push_back(ENTRY_FUNCTION_NAME);
         function_addresses[ENTRY_FUNCTION_NAME] = starting_instruction;
-        // entry function sets global stuff
-        ilines.insert(ilines.begin(), "ress global");
+        // entry function sets global stuff (FIXME: not really)
+        ilines.insert(ilines.begin(), "ress local");
         // append entry function instructions...
         ilines.push_back("frame 1");
-        ilines.push_back("paref 0 1");
+        ilines.push_back("param 0 1");
         // this must not be hardcoded because we have '.main:' assembler instruction
         // we also save return value in 1 register since 0 means "drop return value"
         ilines.push_back("call 1 " + main_function);
@@ -780,7 +780,7 @@ int generate(const vector<string>& expanded_lines, const map<unsigned, unsigned>
         // instructions were added so bytecode size must be inreased
         bytes += OP_SIZES.at("ress");
         bytes += OP_SIZES.at("frame");
-        bytes += OP_SIZES.at("paref");
+        bytes += OP_SIZES.at("param");
         bytes += OP_SIZES.at("call");
         bytes += main_function.size()+1;
         bytes += OP_SIZES.at("move");
