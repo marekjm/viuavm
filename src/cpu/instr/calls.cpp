@@ -1,4 +1,5 @@
 #include <viua/types/boolean.h>
+#include <viua/types/reference.h>
 #include <viua/support/pointer.h>
 #include <viua/exceptions.h>
 #include <viua/cpu/cpu.h>
@@ -85,9 +86,24 @@ byte* CPU::paref(byte* addr) {
         object_operand_index = static_cast<Integer*>(fetch(object_operand_index))->value();
     }
 
-    if (unsigned(parameter_no_operand_index) >= frame_new->args->size()) { throw new Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter"); }
-    frame_new->args->set(parameter_no_operand_index, fetch(object_operand_index));
-    frame_new->args->flag(parameter_no_operand_index, REFERENCE);
+    if (unsigned(parameter_no_operand_index) >= frame_new->args->size()) {
+        throw new Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
+    }
+
+    Type* object = uregset->at(object_operand_index);
+    Reference* rf = nullptr;
+    if (dynamic_cast<Reference*>(object)) {
+        //cout << "thou shalt not reference references!" << endl;
+        rf = static_cast<Reference*>(object)->copy();
+        frame_new->args->set(parameter_no_operand_index, rf);
+    } else {
+        rf = new Reference(object);
+        uregset->empty(object_operand_index);
+        uregset->set(object_operand_index, rf);
+        frame_new->args->set(parameter_no_operand_index, rf->copy());
+    }
+    /* frame_new->args->set(parameter_no_operand_index, fetch(object_operand_index)); */
+    /* frame_new->args->flag(parameter_no_operand_index, REFERENCE); */
 
     return addr;
 }
