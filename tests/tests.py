@@ -512,7 +512,6 @@ class FunctionTests(unittest.TestCase):
     def testNestedFunctionCallSupport(self):
         runTestReturnsIntegers(self, 'nested_calls.asm', [2015, 1995, 69, 42])
 
-    @unittest.skip('broken by new, non-leaking references')
     def testRecursiveCallFunctionSupport(self):
         runTestReturnsIntegers(self, 'recursive.asm', [i for i in range(9, -1, -1)])
 
