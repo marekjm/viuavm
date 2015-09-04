@@ -1,6 +1,5 @@
 .function: main
-    ress global
-    print 1
+    print (strstore 1 "Hello World!")
     izero 0
     end
 .end

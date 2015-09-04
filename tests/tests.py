@@ -597,7 +597,7 @@ class StaticLinkingTests(unittest.TestCase):
     def testLinkingMainFunction(self):
         lib_name = 'main_main.asm'
         assembly_lib_path = os.path.join(self.PATH, lib_name)
-        compiled_lib_path = os.path.join(COMPILED_SAMPLES_PATH, (lib_name + '.wlib'))
+        compiled_lib_path = os.path.join(COMPILED_SAMPLES_PATH, (lib_name + '.vlib'))
         assemble(assembly_lib_path, compiled_lib_path, opts=('--lib',))
         bin_name = 'main_link.asm'
         assembly_bin_path = os.path.join(self.PATH, bin_name)
