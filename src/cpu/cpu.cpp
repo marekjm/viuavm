@@ -13,6 +13,7 @@
 #include <viua/types/string.h>
 #include <viua/types/vector.h>
 #include <viua/types/exception.h>
+#include <viua/types/reference.h>
 #include <viua/support/pointer.h>
 #include <viua/support/string.h>
 #include <viua/support/env.h>
@@ -116,7 +117,11 @@ Type* CPU::fetch(unsigned index) const {
      *
      *  index:int   - index of a register to fetch
      */
-    return uregset->get(index);
+    Type* object = uregset->get(index);
+    if (dynamic_cast<Reference*>(object)) {
+        object = static_cast<Reference*>(object)->pointsTo();
+    }
+    return object;
 }
 
 
@@ -365,6 +370,11 @@ byte* CPU::callForeignMethod(byte* addr, Type* object, const string& call_name, 
 
     if (foreign_methods.count(call_name) == 0) {
         throw new Exception("call to unregistered foreign method: " + call_name);
+    }
+
+    Reference* rf = nullptr;
+    if ((rf = dynamic_cast<Reference*>(object))) {
+        object = rf->pointsTo();
     }
 
     try {

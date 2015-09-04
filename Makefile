@@ -94,7 +94,7 @@ uninstall:
 
 ############################################################
 # PLATFORM OBJECT FILES
-platform: build/platform/exception.o build/platform/string.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o
+platform: build/platform/exception.o build/platform/string.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/reference.o
 
 build/platform/exception.o: src/types/exception.cpp
 	${CXX} -std=c++11 -fPIC -c -I./include -o ./build/platform/exception.o src/types/exception.cpp
@@ -104,6 +104,9 @@ build/platform/string.o: src/types/string.cpp
 
 build/platform/vector.o: src/types/vector.cpp
 	${CXX} -std=c++11 -fPIC -c -I./include -o ./build/platform/vector.o src/types/vector.cpp
+
+build/platform/reference.o: src/types/reference.cpp
+	${CXX} -std=c++11 -fPIC -c -I./include -o ./build/platform/reference.o src/types/reference.cpp
 
 build/platform/registerset.o: src/cpu/registerset.cpp
 	${CXX} -std=c++11 -fPIC -c -I./include -o ./build/platform/registerset.o src/cpu/registerset.cpp
@@ -194,7 +197,7 @@ build/cpu/registserset.o: src/cpu/registerset.cpp include/viua/cpu/registerset.h
 # STANDARD LIBRARY
 stdlib: build/stdlib/std/string.vlib build/stdlib/typesystem.so
 
-build/stdlib/std/string.vlib: src/stdlib/viua/string.asm
+build/stdlib/std/string.vlib: src/stdlib/viua/string.asm build/platform/reference.o
 	./build/bin/vm/asm --lib -o $@ $<
 
 build/stdlib/typesystem.o: src/stdlib/typesystem.cpp

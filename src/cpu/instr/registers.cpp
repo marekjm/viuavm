@@ -1,5 +1,6 @@
 #include <iostream>
 #include <viua/types/boolean.h>
+#include <viua/types/reference.h>
 #include <viua/support/pointer.h>
 #include <viua/exceptions.h>
 #include <viua/cpu/cpu.h>
@@ -86,8 +87,18 @@ byte* CPU::ref(byte* addr) {
         destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
     }
 
-    uregset->set(destination_register_index, uregset->get(object_operand_index));
-    uregset->flag(destination_register_index, REFERENCE);
+    Type* object = uregset->at(object_operand_index);
+    Reference* rf = nullptr;
+    if (dynamic_cast<Reference*>(object)) {
+        //cout << "thou shalt not reference references!" << endl;
+        rf = static_cast<Reference*>(object)->copy();
+        uregset->set(destination_register_index, rf);
+    } else {
+        rf = new Reference(object);
+        uregset->empty(object_operand_index);
+        uregset->set(object_operand_index, rf);
+        uregset->set(destination_register_index, rf->copy());
+    }
 
     return addr;
 }
@@ -152,6 +163,10 @@ byte* CPU::empty(byte* addr) {
         target_register_index = static_cast<Integer*>(fetch(target_register_index))->value();
     }
 
+    Type* object = uregset->get(target_register_index);
+    if (Reference* rf = dynamic_cast<Reference*>(object)) {
+        delete rf;
+    }
     uregset->empty(target_register_index);
 
     return addr;

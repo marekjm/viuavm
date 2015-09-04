@@ -4,6 +4,7 @@
 #include <viua/types/integer.h>
 #include <viua/types/function.h>
 #include <viua/types/closure.h>
+#include <viua/types/reference.h>
 #include <viua/support/pointer.h>
 #include <viua/exceptions.h>
 #include <viua/cpu/registerset.h>
@@ -71,9 +72,22 @@ byte* CPU::closure(byte* addr) {
 
         if (uregset->isflagged(i, BIND)) {
             uregset->unflag(i, BIND);
-            clsr->regset->set(i, uregset->get(i));
-            clsr->regset->flag(i, REFERENCE);
-            uregset->flag(i, BOUND);
+
+            Type* object = uregset->at(i);
+            Reference* rf = nullptr;
+            if (dynamic_cast<Reference*>(object)) {
+                //cout << "thou shalt not reference references!" << endl;
+                rf = static_cast<Reference*>(object)->copy();
+                clsr->regset->set(i, rf);
+            } else {
+                rf = new Reference(object);
+                uregset->empty(i);
+                uregset->set(i, rf);
+                clsr->regset->set(i, rf->copy());
+            }
+            /* clsr->regset->set(i, uregset->get(i)); */
+            /* clsr->regset->flag(i, REFERENCE); */
+            /* uregset->flag(i, BOUND); */
         }
     }
 

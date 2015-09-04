@@ -13,7 +13,8 @@
 
     ; make zero "true" and
     ; non-zero values "false"
-    not (move 0 1)
+    ; FIXME: find out why `not (move 0 1)` causes memory leak
+    not (copy 0 1)
     end
 .end
 
