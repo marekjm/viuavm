@@ -188,41 +188,41 @@ def runMemoryLeakCheck(self, compiled_path, check_memory_leaks):
         MEMORY_LEAK_CHECKS_SKIPPED += 1
 
 def runTest(self, name, expected_output, expected_exit_code = 0, output_processing_function = None, check_memory_leaks = True):
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        assemble(assembly_path, compiled_path)
-        excode, output = run(compiled_path)
-        got_output = (output.strip() if output_processing_function is None else output_processing_function(output))
-        self.assertEqual(expected_output, got_output)
-        self.assertEqual(expected_exit_code, excode)
+    assembly_path = os.path.join(self.PATH, name)
+    compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+    assemble(assembly_path, compiled_path)
+    excode, output = run(compiled_path)
+    got_output = (output.strip() if output_processing_function is None else output_processing_function(output))
+    self.assertEqual(expected_output, got_output)
+    self.assertEqual(expected_exit_code, excode)
 
-        runMemoryLeakCheck(self, compiled_path, check_memory_leaks)
+    runMemoryLeakCheck(self, compiled_path, check_memory_leaks)
 
-        disasm_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.dis.asm'.format(self.PATH[2:].replace('/', '_'), name))
-        compiled_disasm_path = '{0}.bin'.format(disasm_path)
-        disassemble(compiled_path, disasm_path)
-        assemble(disasm_path, compiled_disasm_path)
-        dis_excode, dis_output = run(compiled_disasm_path)
-        self.assertEqual(got_output, (dis_output.strip() if output_processing_function is None else output_processing_function(dis_output)))
-        self.assertEqual(excode, dis_excode)
+    disasm_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.dis.asm'.format(self.PATH[2:].replace('/', '_'), name))
+    compiled_disasm_path = '{0}.bin'.format(disasm_path)
+    disassemble(compiled_path, disasm_path)
+    assemble(disasm_path, compiled_disasm_path)
+    dis_excode, dis_output = run(compiled_disasm_path)
+    self.assertEqual(got_output, (dis_output.strip() if output_processing_function is None else output_processing_function(dis_output)))
+    self.assertEqual(excode, dis_excode)
 
 def runTestNoDisassemblyRerun(self, name, expected_output, expected_exit_code = 0, output_processing_function = None, check_memory_leaks = True):
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        assemble(assembly_path, compiled_path)
-        excode, output = run(compiled_path)
-        got_output = (output.strip() if output_processing_function is None else output_processing_function(output))
-        self.assertEqual(expected_output, got_output)
-        self.assertEqual(expected_exit_code, excode)
-        runMemoryLeakCheck(self, compiled_path, check_memory_leaks)
+    assembly_path = os.path.join(self.PATH, name)
+    compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+    assemble(assembly_path, compiled_path)
+    excode, output = run(compiled_path)
+    got_output = (output.strip() if output_processing_function is None else output_processing_function(output))
+    self.assertEqual(expected_output, got_output)
+    self.assertEqual(expected_exit_code, excode)
+    runMemoryLeakCheck(self, compiled_path, check_memory_leaks)
 
 def runTestCustomAssertsNoDisassemblyRerun(self, name, assertions_callback, check_memory_leaks = True):
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        assemble(assembly_path, compiled_path)
-        excode, output = run(compiled_path)
-        assertions_callback(self, excode, output)
-        runMemoryLeakCheck(self, compiled_path, check_memory_leaks)
+    assembly_path = os.path.join(self.PATH, name)
+    compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+    assemble(assembly_path, compiled_path)
+    excode, output = run(compiled_path)
+    assertions_callback(self, excode, output)
+    runMemoryLeakCheck(self, compiled_path, check_memory_leaks)
 
 def runTestSplitlines(self, name, expected_output, expected_exit_code = 0):
     runTest(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: o.strip().splitlines())
@@ -234,13 +234,13 @@ def runTestReturnsIntegers(self, name, expected_output, expected_exit_code = 0, 
     runTest(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: [int(i) for i in o.strip().splitlines()], check_memory_leaks=check_memory_leaks)
 
 def runTestThrowsException(self, name, expected_output):
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        assemble(assembly_path, compiled_path)
-        excode, output = run(compiled_path, 1)
-        got_exception = [line for line in output.strip().splitlines() if line.startswith('uncaught object:')][0]
-        self.assertEqual(1, excode)
-        self.assertEqual(got_exception, expected_output)
+    assembly_path = os.path.join(self.PATH, name)
+    compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+    assemble(assembly_path, compiled_path)
+    excode, output = run(compiled_path, 1)
+    got_exception = [line for line in output.strip().splitlines() if line.startswith('uncaught object:')][0]
+    self.assertEqual(1, excode)
+    self.assertEqual(got_exception, expected_output)
 
 
 class IntegerInstructionsTests(unittest.TestCase):
