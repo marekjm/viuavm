@@ -473,7 +473,6 @@ class SampleProgramsTests(unittest.TestCase):
     def testRegisterReferencesInIntegerOperands(self):
         runTestReturnsIntegers(self, 'registerref.asm', [16, 1, 1, 16])
 
-    @unittest.skip('broken by new, non-leaking references')
     def testCalculatingFactorial(self):
         """The code that is tested by this unit is not the best implementation of factorial calculation.
         However, it tests passing parameters by value and by reference;
