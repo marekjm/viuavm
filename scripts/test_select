@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+
+set -e
+
+if [[ $1 == "" ]]; then
+    echo "no test case selected"
+    exit 1
+fi
+
+VIUAPATH=./build/stdlib python3 ./tests/tests.py --verbose --catch --failfast $1
