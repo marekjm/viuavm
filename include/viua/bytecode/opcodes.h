@@ -74,12 +74,12 @@ enum OPCODE : byte {
     // register manipulation
     MOVE,   // move an object from one register to another
     COPY,   // copy an object from one register to another
-    REF,    // create a refenrence to a value store in one register in another register
-    SWAP,   // rotate two objects between their registers
-    FREE,   // delete object from register, freeing the memory (ACHTUNG MINEN!!! will also delete references)
-    EMPTY,  // empty the register (set it to 0 and set its reference status to false, does not delete any objects)
+    REF,    // create a refenrence to an object
+    SWAP,   // swap two objects between registers
+    FREE,   // delete an object from a register, freeing the memory
+    EMPTY,  // empty the register and set its flags to 0
     ISNULL, // checks if register is null (empty)
-    RESS,   // REgister Set Switch - switches register context
+    RESS,   // REgister Set Switch - switches register set
     TMPRI,  // temporary register in - move object from current
             // register set into the temporary register
     TMPRO,  // temporary register out - move object out of the temporary
