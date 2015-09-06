@@ -9,7 +9,7 @@ VIUA_CPU_INSTR_FILES_O=build/cpu/instr/general.o build/cpu/instr/registers.o bui
 PREFIX=/usr
 BIN_PATH=${PREFIX}/bin
 LIB_PATH=${PREFIX}/lib/viua
-H_PATH=/usr/include/viua
+H_PATH=${PREFIX}/include/viua
 
 LIBDL ?= -ldl
 
