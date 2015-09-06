@@ -2995,21 +2995,76 @@ Unconditionally halt execution of the program and exit the machine.
 \end_layout
 
 \begin_layout Section
-Instruction operands
+Instruction operands and register contents
 \end_layout
 
 \begin_layout Standard
-Instructions operate on registers and usually operands are just register
- indexes, this is the simplest case.
+On the lowest level, programs written in Viua VM language are sequences
+ of simple instructions operating on a set of registers.
+ Each instruction is given zero or more operands to specify which registers
+ should the operands be fetched from.
+ During the fetch operation, VM must distinguish between several possible
+ content types each register can store and react accordingly to the operand
+ request.
 \end_layout
 
 \begin_layout Subsection
-Values
+Simple objects
 \end_layout
 
 \begin_layout Standard
-Registers that contain a value are overwritten when another value is put
- in them.
+Registers can store simple objects, e.g.
+ strings, integers, floats, bytes, functions etc.
+ Whenever a 
+\begin_inset Quotes eld
+\end_inset
+
+read
+\begin_inset Quotes erd
+\end_inset
+
+ operation is performed the object is simply returned to the instruction
+ for use.
+ Whenever a 
+\begin_inset Quotes eld
+\end_inset
+
+write
+\begin_inset Quotes erd
+\end_inset
+
+ operation is performed on the object currently being stored in a register
+ is deleted, and new value is put into the register.
+ Simple objects have predictable lifetimes; after they are spawned as a
+ result of an instruction, they live until: (1) their register is overwritten,
+ or (2) their frame is popped from the call stack, or (3) they are explicitly
+ deleted with 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+free
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ instruction.
+ Machine can be made to leak memory by using 
+\begin_inset Quotes eld
+\end_inset
+
+
+\family typewriter
+empty
+\family default
+
+\begin_inset Quotes erd
+\end_inset
+
+ instruction on registers containing simple objects as it will empty the
+ register without looking at its contents.
 \end_layout
 
 \begin_layout Subsection
@@ -3017,10 +3072,95 @@ References
 \end_layout
 
 \begin_layout Standard
-Registers that contain a reference are not overwritten; instead, they adjust
- the value of the object they reference.
- The change appears in every register that holds a reference to changed
- object.
+Registers can store a reference to a simple object.
+ From machine's point of view, a reference is a simple object itself which
+ means that a reference lives at most as long as its frame.
+ From programmer's point of view a reference is also a simple object, although
+ with slightly modified semantics.
+ When used in program's code references are transparent, meaning all typical
+ operations that can be performed on an object of type T can be performed
+ on a reference to type T without dereferencing the reference (the dereference
+ happens automatically whenever machine detects an instruction fetches a
+ reference).
+\end_layout
+
+\begin_layout Standard
+References are useful, but heavyweight.
+ When a reference to an object A is created, two things happen: (1) new
+ reference object is spawned pointing to the object being referenced, (2)
+ the original object is also wrapped in a reference to prevent it from being
+ automatically freed upon scope exit.
+ While references are managed by the usual out-of-scope deletion mechanism,
+ the objects 
+\begin_inset Quotes eld
+\end_inset
+
+being referenced
+\begin_inset Quotes erd
+\end_inset
+
+ are not, and are instead managed by reference counting and will only be
+ deleted after their reference count reaches zero.
+\end_layout
+
+\begin_layout Standard
+All references originating from object A will always point to the same object,
+ even if it is no longer A.
+ Although such behaviour may look broken, it is not if it is taken into
+ account that, on the lowest level where references are handled, different
+ 
+\begin_inset Quotes eld
+\end_inset
+
+values
+\begin_inset Quotes erd
+\end_inset
+
+ are also different 
+\begin_inset Quotes eld
+\end_inset
+
+objects
+\begin_inset Quotes erd
+\end_inset
+
+; code compiled from higher level languages will still work as expected.
+ Consider following example: (1) an integer with value 42 is stored in register
+ R, (2) reference to the object stored in register R is created in register
+ S - both registers now store references to the same object, (3) an integer
+ 128 is stored in register S - both regsiters now store a reference to an
+ object that represents an integer 128.
+ Even if the references no longer point to the original integer object their
+ behaviour is correct.
+\end_layout
+
+\begin_layout Standard
+References are automatically created by the machine when objects are bound
+ in closures, or when a pass-by-reference is used in function call.
+ In the latter case, though, a pass-by-pointer may be more appropriate to
+ avoid the overhead of reference counting.
+\end_layout
+
+\begin_layout Subsection
+Pointers
+\end_layout
+
+\begin_layout Standard
+Viua pointers are slightly different than pointers known from C or C++.
+ Pointers spawned by VM instruction set can point only to initialized simple
+ objects, and not to null registers or references.
+ Pointers are of limited use and are only meant as a way of providing pass-by-po
+inter as a lightweight alternative to pass-by-reference.
+ In contrast with references, use of pointers is not transparent; they must
+ be 
+\begin_inset Quotes eld
+\end_inset
+
+depointered
+\begin_inset Quotes erd
+\end_inset
+
+ to obtain the object they point to.
 \end_layout
 
 \begin_layout Subsection
