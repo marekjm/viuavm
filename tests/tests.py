@@ -742,4 +742,7 @@ class StandardRuntimeLibraryModuleString(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main(exit=False)
-    print('{0} memory leak check{2} ({1} check{3} skipped)'.format(MEMORY_LEAK_CHECKS_RUN, MEMORY_LEAK_CHECKS_SKIPPED, ('' if MEMORY_LEAK_CHECKS_RUN == 1 else 's'), ('' if MEMORY_LEAK_CHECKS_SKIPPED == 1 else 's')))
+    if MEMORY_LEAK_CHECKS_ENABLE:
+        print('{0} memory leak check{2} ({1} check{3} skipped)'.format(MEMORY_LEAK_CHECKS_RUN, MEMORY_LEAK_CHECKS_SKIPPED, ('' if MEMORY_LEAK_CHECKS_RUN == 1 else 's'), ('' if MEMORY_LEAK_CHECKS_SKIPPED == 1 else 's')))
+    else:
+        print('memory leak checks disabled for this run')
