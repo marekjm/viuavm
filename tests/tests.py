@@ -87,6 +87,7 @@ def run(path, expected_exit_code=0):
 
 MEMORY_LEAK_CHECKS_SKIPPED = 0
 MEMORY_LEAK_CHECKS_RUN = 0
+MEMORY_LEAK_CHECKS_ENABLE = False
 valgrind_regex_heap_summary_in_use_at_exit = re.compile('in use at exit: (\d+(?:,\d+)?) bytes in (\d+) blocks')
 valgrind_regex_heap_summary_total_heap_usage = re.compile('total heap usage: (\d+) allocs, (\d+) frees, (\d+(?:,\d+)?) bytes allocated')
 valgrind_regex_leak_summary_definitely_lost = re.compile('definitely lost: (\d+(?:,\d+)?) bytes in (\d+) blocks')
@@ -180,7 +181,7 @@ def valgrindCheck(self, path):
 
 def runMemoryLeakCheck(self, compiled_path, check_memory_leaks):
     global MEMORY_LEAK_CHECKS_RUN, MEMORY_LEAK_CHECKS_SKIPPED
-    if check_memory_leaks:
+    if check_memory_leaks and MEMORY_LEAK_CHECKS_ENABLE:
         MEMORY_LEAK_CHECKS_RUN += 1
         valgrindCheck(self, compiled_path)
     else:
