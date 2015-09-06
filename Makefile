@@ -77,6 +77,7 @@ libinstall: stdlib
 	mkdir -p ${LIB_PATH}/std
 	mkdir -p ${LIB_PATH}/site
 	cp ./build/stdlib/*.so ${LIB_PATH}/std
+	cp ./build/stdlib/std/*.vlib ${LIB_PATH}/std
 
 installdevel: platform
 	mkdir -p ${LIB_PATH}/platform
