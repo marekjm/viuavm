@@ -20,7 +20,7 @@ LIBDL ?= -ldl
 
 ############################################################
 # BASICS
-all: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/vdb build/bin/vm/dis build/bin/opcodes.bin platform
+all: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/vdb build/bin/vm/dis build/bin/opcodes.bin platform stdlib
 
 remake: clean all
 
@@ -198,7 +198,7 @@ build/cpu/registserset.o: src/cpu/registerset.cpp include/viua/cpu/registerset.h
 # STANDARD LIBRARY
 stdlib: build/stdlib/std/string.vlib build/stdlib/typesystem.so
 
-build/stdlib/std/string.vlib: src/stdlib/viua/string.asm build/platform/reference.o
+build/stdlib/std/string.vlib: src/stdlib/viua/string.asm
 	./build/bin/vm/asm --lib -o $@ $<
 
 build/stdlib/typesystem.o: src/stdlib/typesystem.cpp
