@@ -1,4 +1,4 @@
-CXXFLAGS=-std=c++11 -Wall -pedantic -Wfatal-errors -g -I./include
+CXXFLAGS=-std=c++11 -Wall -Wextra -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Winline -pedantic -Wfatal-errors -g -I./include
 CXXOPTIMIZATIONFLAGS=
 COPTIMIZATIONFLAGS=
 DYNAMIC_SYMS=-Wl,--dynamic-list-cpp-typeinfo
