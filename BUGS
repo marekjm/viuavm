@@ -1,8 +1,2 @@
-* in CPU::run() if an exception is raised while in main loop and `return_exception` is set before `return_message`,
-  `return_message` will be set to `return_message` for some reason...
-* segfault when assembling "unchanged.asm" file
-* stack trace details should inform hat there are no non-empty registers,
 * linking a function two times shall be detected (this would create dead code),
 * linking into bigger libs should be allowed,
-* linking main should be allowed,
-* functions should be checked only after all libs are linked,
