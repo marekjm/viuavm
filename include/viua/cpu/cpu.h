@@ -266,9 +266,9 @@ class CPU {
         CPU& registerForeignMethod(const std::string&, ForeignMethod);
 
         byte* begin();
-        inline byte* end() { return 0; }
+        inline byte* end() { return nullptr; }
 
-        CPU& iframe(Frame* frm = 0, unsigned r = DEFAULT_REGISTER_SIZE);
+        CPU& iframe(Frame* frm = nullptr, unsigned r = DEFAULT_REGISTER_SIZE);
 
         byte* dispatch(byte*);
         byte* tick();
@@ -282,16 +282,16 @@ class CPU {
         inline std::vector<Frame*> trace() { return frames; }
 
         CPU():
-            bytecode(0), bytecode_size(0), executable_offset(0),
-            regset(0), uregset(0),
-            tmp(0),
+            bytecode(nullptr), bytecode_size(0), executable_offset(0),
+            regset(nullptr), uregset(nullptr),
+            tmp(nullptr),
             static_registers({}),
-            frame_new(0),
-            try_frame_new(0),
-            jump_base(0),
-            thrown(0), caught(0),
+            frame_new(nullptr),
+            try_frame_new(nullptr),
+            jump_base(nullptr),
+            thrown(nullptr), caught(nullptr),
             return_code(0), return_exception(""), return_message(""),
-            instruction_counter(0), instruction_pointer(0),
+            instruction_counter(0), instruction_pointer(nullptr),
             debug(false), errors(false)
         {}
 

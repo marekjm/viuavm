@@ -10,7 +10,7 @@ string stringifyFunctionInvocation(const Frame* frame) {
     oss << '(';
     for (unsigned i = 0; i < frame->args->size(); ++i) {
         Type* optr = frame->args->at(i);
-        if (optr == 0) { continue; }
+        if (optr == nullptr) { continue; }
         oss << optr->repr();
         if (i < (frame->args->size()-1)) {
             oss << ", ";

@@ -200,7 +200,7 @@ byte* CPU::isnull(byte* addr) {
         destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
     }
 
-    place(destination_register_index, new Boolean(uregset->at(checked_register_index) == 0));
+    place(destination_register_index, new Boolean(uregset->at(checked_register_index) == nullptr));
 
     return addr;
 }
@@ -247,7 +247,7 @@ byte* CPU::tmpri(byte* addr) {
         object_operand_index = static_cast<Integer*>(fetch(object_operand_index))->value();
     }
 
-    if (tmp != 0) {
+    if (tmp != nullptr) {
         cout << "warning: CPU: storing in non-empty temporary register: memory has been leaked" << endl;
     }
     tmp = uregset->get(object_operand_index)->copy();
@@ -269,14 +269,14 @@ byte* CPU::tmpro(byte* addr) {
         destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
     }
 
-    if (uregset->at(destination_register_index) != 0) {
+    if (uregset->at(destination_register_index) != nullptr) {
         if (errors) {
             cerr << "warning: CPU: droping from temporary into non-empty register: possible references loss and register corruption" << endl;
         }
         uregset->free(destination_register_index);
     }
     uregset->set(destination_register_index, tmp);
-    tmp = 0;
+    tmp = nullptr;
 
     return addr;
 }

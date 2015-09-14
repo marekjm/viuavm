@@ -49,7 +49,7 @@ Type* String::stringify(Frame* frame, RegisterSet*, RegisterSet*) {
         throw new Exception("expected 2 parameters");
     }
     svalue = frame->args->at(1)->str();
-    return 0;
+    return nullptr;
 }
 
 Type* String::represent(Frame* frame, RegisterSet*, RegisterSet*) {
@@ -57,5 +57,5 @@ Type* String::represent(Frame* frame, RegisterSet*, RegisterSet*) {
         throw new Exception("expected 2 parameters");
     }
     svalue = frame->args->at(1)->repr();
-    return 0;
+    return nullptr;
 }

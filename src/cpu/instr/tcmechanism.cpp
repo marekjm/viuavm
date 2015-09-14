@@ -8,7 +8,7 @@ using namespace std;
 byte* CPU::tryframe(byte* addr) {
     /** Create new special frame for try blocks.
      */
-    if (try_frame_new != 0) {
+    if (try_frame_new != nullptr) {
         throw "new block frame requested while last one is unused";
     }
     try_frame_new = new TryFrame();
@@ -29,7 +29,7 @@ byte* CPU::vmcatch(byte* addr) {
         throw new Exception("registering undefined handler block: " + catcher_block_name);
     }
 
-    byte* block_address = 0;
+    byte* block_address = nullptr;
     if (block_addresses.count(catcher_block_name)) {
         block_address = bytecode+block_addresses.at(catcher_block_name);
         jump_base = bytecode;
@@ -58,11 +58,11 @@ byte* CPU::pull(byte* addr) {
         destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
     }
 
-    if (caught == 0) {
+    if (caught == nullptr) {
         throw new Exception("no caught object to pull");
     }
     uregset->set(destination_register_index, caught);
-    caught = 0;
+    caught = nullptr;
 
     return addr;
 }
@@ -77,7 +77,7 @@ byte* CPU::vmtry(byte* addr) {
         throw new Exception("try of undefined block: " + block_name);
     }
 
-    byte* block_address = 0;
+    byte* block_address = nullptr;
     if (block_addresses.count(block_name)) {
         block_address = bytecode+block_addresses.at(block_name);
         jump_base = bytecode;
@@ -91,7 +91,7 @@ byte* CPU::vmtry(byte* addr) {
     try_frame_new->block_name = block_name;
 
     tryframes.push_back(try_frame_new);
-    try_frame_new = 0;
+    try_frame_new = nullptr;
 
     return block_address;
 }
@@ -116,7 +116,7 @@ byte* CPU::vmthrow(byte* addr) {
         oss << "invalid read: register out of bounds: " <<source_register_index;
         throw new Exception(oss.str());
     }
-    if (uregset->at(source_register_index) == 0) {
+    if (uregset->at(source_register_index) == nullptr) {
         ostringstream oss;
         oss << "invalid throw: register " << source_register_index << " is empty";
         throw new Exception(oss.str());

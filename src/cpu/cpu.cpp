@@ -176,7 +176,7 @@ void CPU::place(unsigned index, Type* obj) {
      *  If not - the `Type` previously stored in it is destroyed.
      *
      */
-    Type* old_ref_ptr = (hasrefs(index) ? uregset->at(index) : 0);
+    Type* old_ref_ptr = (hasrefs(index) ? uregset->at(index) : nullptr);
     uregset->set(index, obj);
 
     // update references *if, and only if* the register being set has references and
@@ -205,8 +205,8 @@ Frame* CPU::requestNewFrame(int arguments_size, int registers_size) {
      *  Throws an exception otherwise.
      *  Returns pointer to the newly created frame.
      */
-    if (frame_new != 0) { throw "requested new frame while last one is unused"; }
-    return (frame_new = new Frame(0, arguments_size, registers_size));
+    if (frame_new != nullptr) { throw "requested new frame while last one is unused"; }
+    return (frame_new = new Frame(nullptr, arguments_size, registers_size));
 }
 
 void CPU::pushFrame() {
@@ -227,7 +227,7 @@ void CPU::pushFrame() {
         throw oss.str();
     }
     frames.push_back(frame_new);
-    frame_new = 0;
+    frame_new = nullptr;
 }
 void CPU::dropFrame() {
     /** Drops top-most frame from call stack.
@@ -244,7 +244,7 @@ void CPU::dropFrame() {
 
 
 byte* CPU::callNative(byte* addr, const string& call_name, const bool& return_ref, const int& return_index, const string& real_call_name) {
-    byte* call_address = 0;
+    byte* call_address = nullptr;
     if (function_addresses.count(call_name)) {
         call_address = bytecode+function_addresses.at(call_name);
         jump_base = bytecode;
@@ -262,7 +262,7 @@ byte* CPU::callNative(byte* addr, const string& call_name, const bool& return_re
     // save return address for frame
     byte* return_address = addr;
 
-    if (frame_new == 0) {
+    if (frame_new == nullptr) {
         throw new Exception("function call without first_operand_index frame: use `frame 0' in source code if the function takes no parameters");
     }
     // set function name and return address
@@ -286,7 +286,7 @@ byte* CPU::callForeign(byte* addr, const string& call_name, const bool& return_r
     // save return address for frame
     byte* return_address = addr;
 
-    if (frame_new == 0) {
+    if (frame_new == nullptr) {
         throw new Exception("external function call without a frame: use `frame 0' in source code if the function takes no parameters");
     }
     // set function name and return address
@@ -309,16 +309,16 @@ byte* CPU::callForeign(byte* addr, const string& call_name, const bool& return_r
      * FIXME: should external functions always have static registers allocated?
      */
     ExternalFunction* callback = foreign_functions.at(call_name);
-    (*callback)(frame, 0, regset);
+    (*callback)(frame, nullptr, regset);
 
     // FIXME: woohoo! segfault!
-    Type* returned = 0;
+    Type* returned = nullptr;
     bool returned_is_reference = false;
     int return_value_register = frames.back()->place_return_value_in;
     bool resolve_return_value_register = frames.back()->resolve_return_value_register;
     if (return_value_register != 0) {
         // we check in 0. register because it's reserved for return values
-        if (uregset->at(0) == 0) {
+        if (uregset->at(0) == nullptr) {
             throw new Exception("return value requested by frame but external function did not set return register");
         }
         if (uregset->isflagged(0, REFERENCE)) {
@@ -354,7 +354,7 @@ byte* CPU::callForeignMethod(byte* addr, Type* object, const string& call_name, 
     // save return address for frame
     byte* return_address = addr;
 
-    if (frame_new == 0) {
+    if (frame_new == nullptr) {
         throw new Exception("foreign method call without a frame");
     }
     // set function name and return address
@@ -379,19 +379,19 @@ byte* CPU::callForeignMethod(byte* addr, Type* object, const string& call_name, 
 
     try {
         // FIXME: supply static and global registers to foreign functions
-        foreign_methods.at(call_name)(object, frame, 0, 0);
+        foreign_methods.at(call_name)(object, frame, nullptr, nullptr);
     } catch (const std::out_of_range& e) {
         throw new Exception(e.what());
     }
 
     // FIXME: woohoo! segfault!
-    Type* returned = 0;
+    Type* returned = nullptr;
     bool returned_is_reference = false;
     int return_value_register = frames.back()->place_return_value_in;
     bool resolve_return_value_register = frames.back()->resolve_return_value_register;
     if (return_value_register != 0) {
         // we check in 0. register because it's reserved for return values
-        if (uregset->at(0) == 0) {
+        if (uregset->at(0) == nullptr) {
             throw new Exception("return value requested by frame but foreign method did not set return register");
         }
         if (uregset->isflagged(0, REFERENCE)) {
@@ -463,12 +463,12 @@ void CPU::loadForeignLibrary(const string& module) {
 
     void* handle = dlopen(path.c_str(), RTLD_LAZY);
 
-    if (handle == 0) {
+    if (handle == nullptr) {
         throw new Exception("LinkException", ("failed to open handle: " + module));
     }
 
-    ExternalFunctionSpec* (*exports)() = 0;
-    if ((exports = (ExternalFunctionSpec*(*)())dlsym(handle, "exports")) == 0) {
+    ExternalFunctionSpec* (*exports)() = nullptr;
+    if ((exports = (ExternalFunctionSpec*(*)())dlsym(handle, "exports")) == nullptr) {
         throw new Exception("failed to extract interface from module: " + module);
     }
 
@@ -522,8 +522,8 @@ CPU& CPU::iframe(Frame* frm, unsigned r) {
     /** Set initial frame.
      */
     Frame *initial_frame;
-    if (frm == 0) {
-        initial_frame = new Frame(0, 0, 2);
+    if (frm == nullptr) {
+        initial_frame = new Frame(nullptr, 0, 2);
         initial_frame->function_name = "__entry";
 
         Vector* cmdline = new Vector();
@@ -579,21 +579,21 @@ byte* CPU::tick() {
         thrown = new Exception(e);
     }
 
-    if (halt or frames.size() == 0) { return 0; }
+    if (halt or frames.size() == 0) { return nullptr; }
 
     /*  Machine should halt execution if the instruction pointer exceeds bytecode size and
      *  top frame is for local function.
      *  For dynamically linked functions address will not be in bytecode size range.
      */
-    Frame* top_frame = (frames.size() ? frames.back() : 0);
-    TryFrame* top_tryframe = (tryframes.size() ? tryframes.back() : 0);
-    bool is_current_function_dynamic = linked_functions.count(top_frame != 0 ? top_frame->function_name : "");
-    bool is_current_block_dynamic = linked_blocks.count(top_tryframe != 0 ? top_tryframe->block_name : "");
+    Frame* top_frame = (frames.size() ? frames.back() : nullptr);
+    TryFrame* top_tryframe = (tryframes.size() ? tryframes.back() : nullptr);
+    bool is_current_function_dynamic = linked_functions.count(top_frame != nullptr ? top_frame->function_name : "");
+    bool is_current_block_dynamic = linked_blocks.count(top_tryframe != nullptr ? top_tryframe->block_name : "");
     if (instruction_pointer >= (bytecode+bytecode_size) and not (is_current_function_dynamic or is_current_block_dynamic)) {
         return_code = 1;
         return_exception = "InvalidBytecodeAddress";
         return_message = string("instruction address out of bounds");
-        return 0;
+        return nullptr;
     }
 
     /*  Machine should halt execution if previous instruction pointer is the same as current one as
@@ -604,7 +604,7 @@ byte* CPU::tick() {
      *      - an object has been thrown, as the instruction pointer will be adjusted by
      *        catchers or execution will be halted on unhandled types,
      */
-    if (instruction_pointer == previous_instruction_pointer and OPCODE(*instruction_pointer) != END and thrown == 0) {
+    if (instruction_pointer == previous_instruction_pointer and OPCODE(*instruction_pointer) != END and thrown == nullptr) {
         return_code = 2;
         ostringstream oss;
         return_exception = "InstructionUnchanged";
@@ -617,13 +617,13 @@ byte* CPU::tick() {
                 << "      a function which calls itself in its first instruction";
         }
         return_message = oss.str();
-        return 0;
+        return nullptr;
     }
 
     TryFrame* tframe;
     // WARNING!
     // This is a temporary hack for more fine-grained exception handling
-    if (thrown != 0 and thrown->type() == "Exception") {
+    if (thrown != nullptr and thrown->type() == "Exception") {
         string exception_detailed_type = static_cast<Exception*>(thrown)->etype();
         for (unsigned i = tryframes.size(); i > 0; --i) {
             tframe = tryframes[(i-1)];
@@ -631,14 +631,14 @@ byte* CPU::tick() {
                 instruction_pointer = tframe->catchers.at(exception_detailed_type)->block_address;
 
                 caught = thrown;
-                thrown = 0;
+                thrown = nullptr;
 
                 break;
             }
         }
     }
 
-    if (thrown != 0) {
+    if (thrown != nullptr) {
         for (unsigned i = tryframes.size(); i > 0; --i) {
             tframe = tryframes[(i-1)];
             string handler_found_for_type = thrown->type();
@@ -675,17 +675,17 @@ byte* CPU::tick() {
                 }
 
                 caught = thrown;
-                thrown = 0;
+                thrown = nullptr;
 
                 break;
             }
         }
     }
-    if (thrown != 0) {
+    if (thrown != nullptr) {
         return_code = 1;
         return_exception = thrown->type();
         return_message = thrown->repr();
-        return 0;
+        return nullptr;
     }
 
     return instruction_pointer;

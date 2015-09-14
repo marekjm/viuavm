@@ -24,7 +24,7 @@ Type* RegisterSet::set(unsigned index, Type* object) {
      */
     if (index >= registerset_size) { throw new Exception("register access out of bounds: write"); }
 
-    if (registers[index] == 0) {
+    if (registers[index] == nullptr) {
         registers[index] = object;
     } else if (dynamic_cast<Reference*>(registers[index])) {
         static_cast<Reference*>(registers[index])->rebind(object);
@@ -48,7 +48,7 @@ Type* RegisterSet::get(unsigned index) {
         throw new Exception(emsg.str());
     }
     Type* optr = registers[index];
-    if (optr == 0) {
+    if (optr == nullptr) {
         ostringstream oss;
         oss << "(get) read from null register: " << index;
         throw new Exception(oss.str());
@@ -80,7 +80,7 @@ void RegisterSet::move(unsigned src, unsigned dst) {
     if (src >= registerset_size) { throw new Exception("register access out of bounds: move source"); }
     if (dst >= registerset_size) { throw new Exception("register access out of bounds: move destination"); }
     registers[dst] = registers[src];    // copy pointer from first-operand register to second-operand register
-    registers[src] = 0;                 // zero first-operand register
+    registers[src] = nullptr;           // zero first-operand register
     masks[dst] = masks[src];            // copy mask
     masks[src] = 0;                     // reset mask of source register
 }
@@ -109,7 +109,7 @@ void RegisterSet::empty(unsigned here) {
      *  Does not throw if the register is empty.
      */
     if (here >= registerset_size) { throw new Exception("register access out of bounds: empty"); }
-    registers[here] = 0;
+    registers[here] = nullptr;
     masks[here] = 0;
 }
 
@@ -120,7 +120,7 @@ void RegisterSet::free(unsigned here) {
      *  Throws if the register is empty.
      */
     if (here >= registerset_size) { throw new Exception("register access out of bounds: free"); }
-    if (registers[here] == 0) { throw new Exception("invalid free: trying to free a null pointer"); }
+    if (registers[here] == nullptr) { throw new Exception("invalid free: trying to free a null pointer"); }
     delete registers[here];
     empty(here);
 }
@@ -133,7 +133,7 @@ void RegisterSet::flag(unsigned index, mask_t filter) {
      *  Throws exception when accessing empty register.
      */
     if (index >= registerset_size) { throw new Exception("register access out of bounds: mask_enable"); }
-    if (registers[index] == 0) {
+    if (registers[index] == nullptr) {
         ostringstream oss;
         oss << "(flag) flagging null register: " << index;
         throw new Exception(oss.str());
@@ -148,7 +148,7 @@ void RegisterSet::unflag(unsigned index, mask_t filter) {
      *  Throws exception when accessing empty register.
      */
     if (index >= registerset_size) { throw new Exception("register access out of bounds: mask_disable"); }
-    if (registers[index] == 0) {
+    if (registers[index] == nullptr) {
         ostringstream oss;
         oss << "(unflag) unflagging null register: " << index;
         throw new Exception(oss.str());
@@ -183,7 +183,7 @@ void RegisterSet::setmask(unsigned index, mask_t mask) {
      *  Throws exception when accessing empty register.
      */
     if (index >= registerset_size) { throw new Exception("register access out of bounds: mask_disable"); }
-    if (registers[index] == 0) {
+    if (registers[index] == nullptr) {
         ostringstream oss;
         oss << "(setmask) setting mask for null register: " << index;
         throw new Exception(oss.str());
@@ -198,7 +198,7 @@ mask_t RegisterSet::getmask(unsigned index) {
      *  Throws exception when accessing empty register.
      */
     if (index >= registerset_size) { throw new Exception("register access out of bounds: mask_disable"); }
-    if (registers[index] == 0) {
+    if (registers[index] == nullptr) {
         ostringstream oss;
         oss << "(getmask) getting mask of null register: " << index;
         throw new Exception(oss.str());
@@ -210,7 +210,7 @@ mask_t RegisterSet::getmask(unsigned index) {
 RegisterSet* RegisterSet::copy() {
     RegisterSet* rscopy = new RegisterSet(size());
     for (unsigned i = 0; i < size(); ++i) {
-        if (at(i) == 0) { continue; }
+        if (at(i) == nullptr) { continue; }
 
         if (isflagged(i, (REFERENCE | BOUND))) {
             rscopy->set(i, at(i));
@@ -222,14 +222,14 @@ RegisterSet* RegisterSet::copy() {
     return rscopy;
 }
 
-RegisterSet::RegisterSet(unsigned sz): registerset_size(sz), registers(0), masks(0) {
+RegisterSet::RegisterSet(unsigned sz): registerset_size(sz), registers(nullptr), masks(0) {
     /** Create register set with specified size.
      */
     if (sz > 0) {
         registers = new Type*[sz];
         masks = new mask_t[sz];
         for (unsigned i = 0; i < sz; ++i) {
-            registers[i] = 0;
+            registers[i] = nullptr;
             masks[i] = 0;
         }
     }
@@ -239,7 +239,7 @@ RegisterSet::~RegisterSet() {
      */
     for (unsigned i = 0; i < registerset_size; ++i) {
         // do not delete if register is empty
-        if (registers[i] == 0) { continue; }
+        if (registers[i] == nullptr) { continue; }
 
         // do not delete if register is a reference or should be kept in memory even
         // after going out of scope
@@ -249,6 +249,6 @@ RegisterSet::~RegisterSet() {
         //cout << "deleting: " << registers[i]->type() << " at " << hex << registers[i] << dec << endl;
         delete registers[i];
     }
-    if (registers != 0) { delete[] registers; }
-    if (masks != 0) { delete[] masks; }
+    if (registers != nullptr) { delete[] registers; }
+    if (masks != nullptr) { delete[] masks; }
 }

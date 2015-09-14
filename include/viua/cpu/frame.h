@@ -22,7 +22,7 @@ class Frame {
 
         Frame(byte* ra, int argsize, int regsize = 16):
             return_address(ra),
-            args(0), regset(0),
+            args(nullptr), regset(nullptr),
             place_return_value_in(0), resolve_return_value_register(false)
         {
             args = new RegisterSet(argsize);

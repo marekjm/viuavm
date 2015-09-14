@@ -39,7 +39,7 @@ Type* Object::set(Frame* frame, RegisterSet*, RegisterSet*) {
 
     attributes[name] = frame->args->at(2)->copy();
 
-    return 0;
+    return nullptr;
 }
 Type* Object::get(Frame* frame, RegisterSet*, RegisterSet*) {
     if (frame->args->size() != 2) {
@@ -58,7 +58,7 @@ Type* Object::get(Frame* frame, RegisterSet*, RegisterSet*) {
 
     frame->regset->set(0, attributes[name]->copy());
 
-    return 0;
+    return nullptr;
 }
 
 

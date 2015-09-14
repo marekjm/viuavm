@@ -151,12 +151,12 @@ int main(int argc, char* argv[]) {
         if (last->regset->size()) {
             unsigned non_empty = 0;
             for (unsigned r = 0; r < last->regset->size(); ++r) {
-                if (last->regset->at(r) != 0) { ++non_empty; }
+                if (last->regset->at(r) != nullptr) { ++non_empty; }
             }
             cout << "  non-empty registers: " << non_empty << '/' << last->regset->size();
             cout << (non_empty ? ":\n" : "\n");
             for (unsigned r = 0; r < last->regset->size(); ++r) {
-                if (last->regset->at(r) == 0) { continue; }
+                if (last->regset->at(r) == nullptr) { continue; }
                 cout << "    registers[" << r << "]: ";
                 cout << '<' << last->regset->get(r)->type() << "> " << last->regset->get(r)->str() << endl;
             }
@@ -167,7 +167,7 @@ int main(int argc, char* argv[]) {
         if (last->args->size()) {
             cout << "  non-empty arguments (out of " << last->args->size() << "):" << endl;
             for (unsigned r = 0; r < last->args->size(); ++r) {
-                if (last->args->at(r) == 0) { continue; }
+                if (last->args->at(r) == nullptr) { continue; }
                 cout << "    arguments[" << r << "]: ";
                 cout << '<' << last->args->get(r)->type() << "> " << last->args->get(r)->str() << endl;
             }

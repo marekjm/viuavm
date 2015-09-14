@@ -68,7 +68,7 @@ byte* CPU::closure(byte* addr) {
         // segfaults will follow as CPU will try to update objects they are referring to, and
         // that's obviously no good
         // also, we shouldn't copy them
-        if (uregset->at(i) == 0) { continue; }
+        if (uregset->at(i) == nullptr) { continue; }
 
         if (uregset->isflagged(i, BIND)) {
             uregset->unflag(i, BIND);
@@ -156,7 +156,7 @@ byte* CPU::fcall(byte* addr) {
         throw new Exception("fcall to undefined function: " + call_name);
     }
 
-    byte* call_address = 0;
+    byte* call_address = nullptr;
     if (function_addresses.count(call_name)) {
         call_address = bytecode+function_addresses.at(call_name);
         jump_base = bytecode;
@@ -168,7 +168,7 @@ byte* CPU::fcall(byte* addr) {
     // save return address for frame
     byte* return_address = addr;
 
-    if (frame_new == 0) {
+    if (frame_new == nullptr) {
         throw new Exception("fcall without a frame: use `frame 0' in source code if the function takes no parameters");
     }
     // set function name and return address

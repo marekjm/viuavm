@@ -6,7 +6,7 @@ namespace support {
     namespace env {
         string getvar(const string& var) {
             const char* VAR = getenv(var.c_str());
-            return (VAR == 0 ? string("") : string(VAR));
+            return (VAR == nullptr ? string("") : string(VAR));
         }
         vector<string> getpaths(const string& var) {
             string PATH = getvar(var);

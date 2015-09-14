@@ -5,7 +5,7 @@
 using namespace std;
 
 
-Closure::Closure(): regset(0), function_name("") {
+Closure::Closure(): regset(nullptr), function_name("") {
 }
 
 Closure::~Closure() {

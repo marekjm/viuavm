@@ -197,13 +197,13 @@ byte* CPU::end(byte* addr) {
     }
     addr = frames.back()->ret_address();
 
-    Type* returned = 0;
+    Type* returned = nullptr;
     bool returned_is_reference = false;
     int return_value_register = frames.back()->place_return_value_in;
     bool resolve_return_value_register = frames.back()->resolve_return_value_register;
     if (return_value_register != 0) {
         // we check in 0. register because it's reserved for return values
-        if (uregset->at(0) == 0) {
+        if (uregset->at(0) == nullptr) {
             throw new Exception("return value requested by frame but function did not set return register");
         }
         if (uregset->isflagged(0, REFERENCE)) {
