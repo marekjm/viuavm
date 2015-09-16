@@ -625,7 +625,7 @@ byte* CPU::tick() {
     // This is a temporary hack for more fine-grained exception handling
     if (thrown != nullptr and thrown->type() == "Exception") {
         string exception_detailed_type = static_cast<Exception*>(thrown)->etype();
-        for (unsigned i = tryframes.size(); i > 0; --i) {
+        for (long unsigned i = tryframes.size(); i > 0; --i) {
             tframe = tryframes[(i-1)];
             if (tframe->catchers.count(exception_detailed_type)) {
                 instruction_pointer = tframe->catchers.at(exception_detailed_type)->block_address;
@@ -639,7 +639,7 @@ byte* CPU::tick() {
     }
 
     if (thrown != nullptr) {
-        for (unsigned i = tryframes.size(); i > 0; --i) {
+        for (long unsigned i = tryframes.size(); i > 0; --i) {
             tframe = tryframes[(i-1)];
             string handler_found_for_type = thrown->type();
             bool handler_found = tframe->catchers.count(handler_found_for_type);
@@ -659,7 +659,7 @@ byte* CPU::tick() {
                 instruction_pointer = tframe->catchers.at(handler_found_for_type)->block_address;
 
                 unsigned distance = 0;
-                for (int j = (frames.size()-1); j >= 0; --j) {
+                for (long unsigned j = (frames.size()-1); j > 1; --j) {
                     if (frames[j] == tframe->associated_frame) {
                         break;
                     }

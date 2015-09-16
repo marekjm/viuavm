@@ -825,7 +825,7 @@ void completion(const char* buf, linenoiseCompletions* lc) {
      *  This function is a proxy between linenoise completion mechanism and
      *  dynamically built vector of all available completions.
      */
-    unsigned len = strlen(buf);
+    long unsigned len = strlen(buf);
     for (unsigned i = 0; i < DEBUGGER_COMMANDS.size(); ++i) {
         bool matching = true;
         unsigned j = 0;

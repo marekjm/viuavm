@@ -62,7 +62,7 @@ int Program::instructionCount() {
      *  performing bytecode analysis.
      */
     int counter = 0;
-    for (int i = 0; i < bytes; ++i) {
+    for (long i = 0; i < bytes; ++i) {
         switch (program[i]) {
             case IADD:
             case ISUB:
@@ -103,7 +103,7 @@ uint16_t Program::countBytes(const vector<string>& lines) {
      *  Passed lines must be sanitized, i.e. the comments and blanks must be removed.
      */
     uint16_t bytes = 0;
-    int inc = 0;
+    long unsigned inc = 0;
     string instr, line;
 
     for (unsigned i = 0; i < lines.size(); ++i) {
@@ -193,7 +193,7 @@ uint16_t Program::countBytes(const vector<string>& lines) {
 }
 
 
-int Program::getInstructionBytecodeOffset(int instr, int count) {
+long Program::getInstructionBytecodeOffset(int instr, int count) {
     /** Returns bytecode offset for given instruction index.
      *
      *  The "count" parameter is there to pass assumed instruction count to
@@ -204,8 +204,8 @@ int Program::getInstructionBytecodeOffset(int instr, int count) {
     // check if instruction count was passed, and calculate it if not
     count = (count >= 0 ? count : instructionCount());
 
-    int offset = 0;
-    int inc;
+    long offset = 0;
+    long unsigned inc;
     for (int i = 0; i < (instr >= 0 ? instr : count+instr); ++i) {
         /*  This loop iterates over so many instructions as needed to find bytecode offset for requested instruction.
          *
@@ -287,14 +287,16 @@ Program& Program::calculateBranches(unsigned offset) {
     for (unsigned i = 0; i < branches.size(); ++i) {
         ptr = (int*)(branches[i]);
         cout << "[brch] calculating jump at " << (int)(branches[i]-program) << ", " << hex << (long)branches[i] << dec << " (target: " << *ptr << ") with offset " << offset << " = ";
-        (*ptr) = offset + getInstructionBytecodeOffset(*ptr, instruction_count);
+        // FIXME: branches should be able to hold bigger values
+        (*ptr) = int(offset + getInstructionBytecodeOffset(*ptr, instruction_count));
         cout << *ptr << endl;
     }
 
     for (unsigned i = 0; i < branches_absolute.size(); ++i) {
         ptr = (int*)(branches_absolute[i]);
         cout << "[brch] calculating jump at " << (int)(branches_absolute[i]-program) << ", " << hex << (long)branches_absolute[i] << dec << " (target: " << *ptr << ") with offset " << 0 << " = ";
-        (*ptr) = getInstructionBytecodeOffset(*ptr, instruction_count);
+        // FIXME: branches should be able to hold bigger values
+        (*ptr) = int(getInstructionBytecodeOffset(*ptr, instruction_count));
         cout << *ptr << endl;
     }
 
@@ -314,7 +316,8 @@ Program& Program::calculateJumps(vector<tuple<int, int> > jump_positions) {
         if (debug) {
             cout << "[bcgen:jump] calculating jump at " << position << " (target: " << *ptr << ") with offset " << offset << endl;
         }
-        adjustment = getInstructionBytecodeOffset(*ptr, instruction_count);
+        // FIXME: branches should be able to hold bigger values
+        adjustment = int(getInstructionBytecodeOffset(*ptr, instruction_count));
         (*ptr) = offset + adjustment;
         if (debug) {
             cout << "[bcgen:jump] calculated jump at " << position << " (total: " << adjustment << ") with offset " << offset << " = ";

@@ -9,7 +9,7 @@ using namespace std;
 
 
 int main() {
-    unsigned max_mnemonic_length = 0;
+    long unsigned max_mnemonic_length = 0;
     for (pair<const OPCODE, string> i : OP_NAMES) {
         max_mnemonic_length = ((max_mnemonic_length >= i.second.size()) ? max_mnemonic_length : i.second.size());
     }
@@ -24,7 +24,7 @@ int main() {
 
     for (pair<const OPCODE, string> i : OP_NAMES) {
         cout << i.second;
-        for (unsigned j = i.second.size(); j < (max_mnemonic_length); ++j) {
+        for (long unsigned j = i.second.size(); j < (max_mnemonic_length); ++j) {
             cout << ' ';
         }
         cout << "  ";

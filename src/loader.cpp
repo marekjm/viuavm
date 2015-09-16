@@ -17,7 +17,7 @@ IdToAddressMapping Loader::loadmap(char* bytedump, const uint16_t& bytedump_size
 
     char *lib_function_ids_map = bytedump;
 
-    int i = 0;
+    long unsigned i = 0;
     string lib_fn_name;
     uint16_t lib_fn_address;
     while (i < bytedump_size) {
@@ -34,7 +34,7 @@ IdToAddressMapping Loader::loadmap(char* bytedump, const uint16_t& bytedump_size
 }
 void Loader::calculateFunctionSizes() {
     string name;
-    unsigned el_size;
+    long unsigned el_size;
 
     for (unsigned i = 0; i < functions.size(); ++i) {
         name = functions[i];
@@ -50,6 +50,7 @@ void Loader::calculateFunctionSizes() {
             el_size = (b-a);
         }
 
+        // FIXME: function sizes should use bigger type
         function_sizes[name] = el_size;
     }
 }
