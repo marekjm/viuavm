@@ -97,7 +97,10 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         ++bptr; // for null character terminating the C-style string not included in std::string
     }
 
-    unsigned increase = (bptr-ptr);
+    long increase = (bptr-ptr);
+    if (increase < 0) {
+        throw ("bytecode pointer increase less than zero: near " + OP_NAMES.at(op) + " instruction");
+    }
 
     ++ptr;
     switch (op) {
@@ -260,5 +263,6 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
             oss << "";
     }
 
-    return tuple<string, unsigned>(oss.str(), increase);
+    // cast increase to unsigned as at this point it is safe to assume that it is greater than zero
+    return tuple<string, unsigned>(oss.str(), unsigned(increase));
 }
