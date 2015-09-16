@@ -248,7 +248,7 @@ byte* CPU::dispatch(byte* addr) {
             break;
         default:
             ostringstream error;
-            error << "unrecognised instruction (bytecode value: " << int(*((byte*)bytecode)) << ")";
+            error << "unrecognised instruction (bytecode value: " << int(*bytecode) << ")";
             throw error.str().c_str();
     }
     return addr;

@@ -23,7 +23,7 @@ byte* CPU::bstore(byte* addr) {
 
     operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    operand = *((byte*)addr);
+    operand = *addr;
     ++addr;
 
     if (destination_register_ref) {

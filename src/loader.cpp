@@ -104,7 +104,7 @@ void Loader::loadBlocksMap(ifstream& in) {
 void Loader::loadBytecode(ifstream& in) {
     in.read((char*)&size, 16);
     bytecode = new byte[size];
-    in.read((char*)bytecode, size);
+    in.read(bytecode, size);
 }
 
 Loader& Loader::load() {

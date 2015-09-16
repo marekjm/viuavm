@@ -909,7 +909,7 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
             }
 
             byte* ticked = cpu.tick();
-            if (not state.exception_raised and not state.finished and ticked == 0) {
+            if (not state.exception_raised and not state.finished and ticked == nullptr) {
                 state.finished = (cpu.return_exception == "" ? true : false);
                 state.ticks_left = 0;
                 cout << "\nmessage: execution " << (cpu.return_exception == "" ? "finished" : "broken") << ": " << cpu.counter() << " instructions executed" << endl;

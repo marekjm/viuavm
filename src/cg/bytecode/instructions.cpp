@@ -355,7 +355,7 @@ namespace cg {
             addr_ptr = insertIntegerOperand(addr_ptr, regno);
             *((bool*)addr_ptr) = b_ref;
             pointer::inc<bool, byte>(addr_ptr);
-            *((byte*)addr_ptr)  = bt;
+            *(addr_ptr) = bt;
             ++addr_ptr;
 
             return addr_ptr;
@@ -396,9 +396,9 @@ namespace cg {
             addr_ptr = insertIntegerOperand(addr_ptr, reg);
 
             for (unsigned i = 1; i < s.size()-1; ++i) {
-                *((char*)addr_ptr++) = s[i];
+                *(addr_ptr++) = s[i];
             }
-            *((char*)addr_ptr++) = char(0);
+            *(addr_ptr++) = char(0);
             return addr_ptr;
         }
 
@@ -622,7 +622,7 @@ namespace cg {
             *(addr_ptr++) = CLOSURE;
             addr_ptr = insertIntegerOperand(addr_ptr, reg);
             for (unsigned i = 0; i < fn.size(); ++i) {
-                *((char*)addr_ptr++) = fn[i];
+                *(addr_ptr++) = fn[i];
             }
             *(addr_ptr++) = '\0';
             return addr_ptr;
@@ -634,7 +634,7 @@ namespace cg {
             *(addr_ptr++) = FUNCTION;
             addr_ptr = insertIntegerOperand(addr_ptr, reg);
             for (unsigned i = 0; i < fn.size(); ++i) {
-                *((char*)addr_ptr++) = fn[i];
+                *(addr_ptr++) = fn[i];
             }
             *(addr_ptr++) = '\0';
             return addr_ptr;
@@ -709,7 +709,7 @@ namespace cg {
             *(addr_ptr++) = CALL;
             addr_ptr = insertIntegerOperand(addr_ptr, reg);
             for (unsigned i = 0; i < fn_name.size(); ++i) {
-                *((char*)addr_ptr++) = fn_name[i];
+                *(addr_ptr++) = fn_name[i];
             }
             *(addr_ptr++) = '\0';
             return addr_ptr;
@@ -761,15 +761,15 @@ namespace cg {
 
             // the type
             for (unsigned i = 1; i < type_name.size()-1; ++i) {
-                *((char*)addr_ptr++) = type_name[i];
+                *(addr_ptr++) = type_name[i];
             }
-            *((char*)addr_ptr++) = '\0';
+            *(addr_ptr++) = '\0';
 
             // catcher block name
             for (unsigned i = 0; i < block_name.size(); ++i) {
-                *((char*)addr_ptr++) = block_name[i];
+                *(addr_ptr++) = block_name[i];
             }
-            *((char*)addr_ptr++) = '\0';
+            *(addr_ptr++) = '\0';
 
             return addr_ptr;
         }
@@ -788,7 +788,7 @@ namespace cg {
              */
             *(addr_ptr++) = TRY;
             for (unsigned i = 0; i < block_name.size(); ++i) {
-                *((char*)addr_ptr++) = block_name[i];
+                *(addr_ptr++) = block_name[i];
             }
             *(addr_ptr++) = '\0';
             return addr_ptr;
@@ -814,9 +814,9 @@ namespace cg {
              */
             *(addr_ptr++) = IMPORT;
             for (unsigned i = 1; i < module_name.size()-1; ++i) {
-                *((char*)addr_ptr++) = module_name[i];
+                *(addr_ptr++) = module_name[i];
             }
-            *((char*)addr_ptr++) = char(0);
+            *(addr_ptr++) = char(0);
             return addr_ptr;
         }
 
@@ -825,9 +825,9 @@ namespace cg {
              */
             *(addr_ptr++) = LINK;
             for (unsigned i = 0; i < module_name.size(); ++i) {
-                *((char*)addr_ptr++) = module_name[i];
+                *(addr_ptr++) = module_name[i];
             }
-            *((char*)addr_ptr++) = char(0);
+            *(addr_ptr++) = char(0);
             return addr_ptr;
         }
 
@@ -837,7 +837,7 @@ namespace cg {
             *(addr_ptr++) = CLASS;
             addr_ptr = insertIntegerOperand(addr_ptr, reg);
             for (unsigned i = 0; i < class_name.size(); ++i) {
-                *((char*)addr_ptr++) = class_name[i];
+                *(addr_ptr++) = class_name[i];
             }
             *(addr_ptr++) = '\0';
             return addr_ptr;
@@ -849,7 +849,7 @@ namespace cg {
             *(addr_ptr++) = DERIVE;
             addr_ptr = insertIntegerOperand(addr_ptr, reg);
             for (unsigned i = 0; i < base_class_name.size(); ++i) {
-                *((char*)addr_ptr++) = base_class_name[i];
+                *(addr_ptr++) = base_class_name[i];
             }
             *(addr_ptr++) = '\0';
             return addr_ptr;
@@ -861,11 +861,11 @@ namespace cg {
             *(addr_ptr++) = ATTACH;
             addr_ptr = insertIntegerOperand(addr_ptr, reg);
             for (unsigned i = 0; i < function_name.size(); ++i) {
-                *((char*)addr_ptr++) = function_name[i];
+                *(addr_ptr++) = function_name[i];
             }
             *(addr_ptr++) = '\0';
             for (unsigned i = 0; i < method_name.size(); ++i) {
-                *((char*)addr_ptr++) = method_name[i];
+                *(addr_ptr++) = method_name[i];
             }
             *(addr_ptr++) = '\0';
             return addr_ptr;
@@ -885,7 +885,7 @@ namespace cg {
             *(addr_ptr++) = NEW;
             addr_ptr = insertIntegerOperand(addr_ptr, reg);
             for (unsigned i = 0; i < class_name.size(); ++i) {
-                *((char*)addr_ptr++) = class_name[i];
+                *(addr_ptr++) = class_name[i];
             }
             *(addr_ptr++) = '\0';
             return addr_ptr;
@@ -897,7 +897,7 @@ namespace cg {
             *(addr_ptr++) = MSG;
             addr_ptr = insertIntegerOperand(addr_ptr, reg);
             for (unsigned i = 0; i < method_name.size(); ++i) {
-                *((char*)addr_ptr++) = method_name[i];
+                *(addr_ptr++) = method_name[i];
             }
             *(addr_ptr++) = '\0';
             return addr_ptr;

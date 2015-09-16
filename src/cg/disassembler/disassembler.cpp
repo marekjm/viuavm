@@ -236,11 +236,11 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
 
             oss << " ";
             pointer::inc<bool, byte>(ptr);
-            oss << int(*(byte*)ptr);
+            oss << int(*ptr);
             break;
         case RESS:
             oss << " ";
-            switch(int(*(byte*)ptr)) {
+            switch(int(*ptr)) {
                 case 0:
                     oss << "global";
                     break;
