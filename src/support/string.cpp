@@ -80,7 +80,7 @@ namespace str {
     }
 
 
-    string sub(const string& s, int b, int e) {
+    string sub(const string& s, long unsigned b, long int e) {
         /*  Returns substring of s.
          *  If only s is passed, returns copy of s.
          */
@@ -134,8 +134,8 @@ namespace str {
         /** Join elements of vector with given string.
          */
         ostringstream oss;
-        unsigned limit = parts.size();
-        for (unsigned i = 0; i < limit; ++i) {
+        long unsigned limit = parts.size();
+        for (long unsigned i = 0; i < limit; ++i) {
             oss << parts[i];
             if (i < (limit-1)) {
                 oss << s;
@@ -308,8 +308,8 @@ namespace str {
     string stringify(const vector<string>& sv) {
         ostringstream oss;
         oss << '[';
-        unsigned sz = sv.size();
-        for (unsigned i = 0; i < sz; ++i) {
+        long unsigned sz = sv.size();
+        for (long unsigned i = 0; i < sz; ++i) {
             oss << enquote(sv[i]);
             if (i < (sz-1)) {
                 oss << ", ";

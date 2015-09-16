@@ -30,7 +30,7 @@ tuple<int, enum JUMPTYPE> resolvejump(string jmp, const map<string, int>& marks,
     enum JUMPTYPE jump_type = JMP_RELATIVE;
     if (str::isnum(jmp, false)) {
         addr = stoi(jmp);
-    } else if (jmp[0] == '.' and str::isnum(str::sub(jmp, 1))) {
+    } else if (jmp[0] == '.' and str::isnum(str::sub(jmp, 1LU))) {
         addr = stoi(str::sub(jmp, 1));
         jump_type = JMP_ABSOLUTE;
     } else if (jmp.substr(0, 2) == "0x") {
@@ -1100,7 +1100,7 @@ int generate(const vector<string>& expanded_lines, const map<unsigned, unsigned>
         }
 
         // block name...
-        out.write((const char*)name.c_str(), name.size());
+        out.write(name.c_str(), name.size());
         // ...requires terminating null character
         out.put('\0');
         // mapped address must come after name
@@ -1149,7 +1149,7 @@ int generate(const vector<string>& expanded_lines, const map<unsigned, unsigned>
         }
 
         // function name...
-        out.write((const char*)name.c_str(), name.size());
+        out.write(name.c_str(), name.size());
         // ...requires terminating null character
         out.put('\0');
         // mapped address must come after name
@@ -1167,7 +1167,7 @@ int generate(const vector<string>& expanded_lines, const map<unsigned, unsigned>
     //        should be done in the loop above (for local functions)
     for (string name : linked_function_names) {
         // function name...
-        out.write((const char*)name.c_str(), name.size());
+        out.write(name.c_str(), name.size());
         // ...requires terminating null character
         out.put('\0');
         // mapped address must come after name
@@ -1193,7 +1193,7 @@ int generate(const vector<string>& expanded_lines, const map<unsigned, unsigned>
             cout << "[asm] pushing bytecode of local block '" << name << "' to final byte array" << endl;
         }
         int fun_size = 0;
-        byte* fun_bytecode = 0;
+        byte* fun_bytecode = nullptr;
         tie(fun_size, fun_bytecode) = block_bodies_bytecode[name];
 
         for (int i = 0; i < fun_size; ++i) {
@@ -1213,7 +1213,7 @@ int generate(const vector<string>& expanded_lines, const map<unsigned, unsigned>
             cout << "[asm] pushing bytecode of local function '" << name << "' to final byte array" << endl;
         }
         int fun_size = 0;
-        byte* fun_bytecode = 0;
+        byte* fun_bytecode = nullptr;
         tie(fun_size, fun_bytecode) = functions_bytecode[name];
 
         for (int i = 0; i < fun_size; ++i) {

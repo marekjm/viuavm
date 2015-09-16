@@ -16,7 +16,7 @@ namespace str {
     bool isnum(const std::string& s, bool negatives = true);
     bool isfloat(const std::string& s, bool negatives = true);
 
-    std::string sub(const std::string& s, int b = 0, int e = -1);
+    std::string sub(const std::string& s, long unsigned b = 0, long int e = -1);
 
     std::string extract(const std::string& s);
     std::string chunk(const std::string& s, bool ignore_leading_ws = true);
