@@ -8,13 +8,13 @@ using namespace std;
 
 Type* hello(Frame*, RegisterSet*, RegisterSet*) {
     cout << "Hello World!" << endl;
-    return 0;
+    return nullptr;
 }
 
 
 const ExternalFunctionSpec functions[] = {
     { "World::print_hello", &hello },
-    { NULL, NULL },
+    { nullptr, nullptr },
 };
 
 extern "C" const ExternalFunctionSpec* exports() {

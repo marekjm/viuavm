@@ -10,7 +10,7 @@ using namespace std;
 
 
 Type* math_sqrt(Frame* frame, RegisterSet*, RegisterSet*) {
-    if (frame->args->at(0) == 0) {
+    if (frame->args->at(0) == nullptr) {
         throw new Exception("expected float as first argument");
     }
     if (frame->args->at(0)->type() != "Float") {
@@ -19,13 +19,13 @@ Type* math_sqrt(Frame* frame, RegisterSet*, RegisterSet*) {
 
     float square_root = sqrt(static_cast<Float*>(frame->args->at(0))->value());
     frame->regset->set(0, new Float(square_root));
-    return 0;
+    return nullptr;
 }
 
 
 const ExternalFunctionSpec functions[] = {
     { "math::sqrt", &math_sqrt },
-    { NULL, NULL },
+    { nullptr, nullptr },
 };
 
 extern "C" const ExternalFunctionSpec* exports() {
