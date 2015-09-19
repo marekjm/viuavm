@@ -207,6 +207,17 @@ mask_t RegisterSet::getmask(unsigned index) {
 }
 
 
+void RegisterSet::drop() {
+    /** Drop register set contents.
+     *
+     *  This function makes the register set drop all objects it holds by
+     *  emptying all its available registers.
+     *  No objects will be deleted, so use this function carefully.
+     */
+    for (unsigned i = 0; i < size(); ++i) { empty(i); }
+}
+
+
 RegisterSet* RegisterSet::copy() {
     RegisterSet* rscopy = new RegisterSet(size());
     for (unsigned i = 0; i < size(); ++i) {

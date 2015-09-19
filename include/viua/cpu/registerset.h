@@ -41,6 +41,7 @@ class RegisterSet {
         void setmask(unsigned, mask_t);
         mask_t getmask(unsigned);
 
+        void drop();
         inline unsigned size() { return registerset_size; }
 
         RegisterSet* copy();
