@@ -57,7 +57,7 @@ byte* CPU::param(byte* addr) {
     }
 
     if (unsigned(parameter_no_operand_index) >= frame_new->args->size()) { throw new Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter"); }
-    frame_new->args->set(parameter_no_operand_index, fetch(object_operand_index)->copy());
+    frame_new->args->set(parameter_no_operand_index, fetch(object_operand_index));
     frame_new->args->clear(parameter_no_operand_index);
 
     return addr;
@@ -91,19 +91,13 @@ byte* CPU::paref(byte* addr) {
     }
 
     Type* object = uregset->at(object_operand_index);
-    Reference* rf = nullptr;
-    if (dynamic_cast<Reference*>(object)) {
-        //cout << "thou shalt not reference references!" << endl;
-        rf = static_cast<Reference*>(object)->copy();
-        frame_new->args->set(parameter_no_operand_index, rf);
-    } else {
+    Reference* rf = dynamic_cast<Reference*>(object);
+    if (rf == nullptr) {
         rf = new Reference(object);
         uregset->empty(object_operand_index);
         uregset->set(object_operand_index, rf);
-        frame_new->args->set(parameter_no_operand_index, rf->copy());
     }
-    /* frame_new->args->set(parameter_no_operand_index, fetch(object_operand_index)); */
-    /* frame_new->args->flag(parameter_no_operand_index, REFERENCE); */
+    frame_new->args->set(parameter_no_operand_index, rf);
 
     return addr;
 }

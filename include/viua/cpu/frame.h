@@ -35,6 +35,10 @@ class Frame {
             // FIXME: oh, and the arguments too, while you're at it!
         }
         ~Frame() {
+            // drop all pointers in arguments registers set
+            // to precent double deallocation
+            args->drop();
+
             delete args;
             delete regset;
         }
