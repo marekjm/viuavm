@@ -67,7 +67,7 @@ byte* CPU::pull(byte* addr) {
     return addr;
 }
 
-byte* CPU::vmtry(byte* addr) {
+byte* CPU::vmenter(byte* addr) {
     /*  Run try instruction.
      */
     string block_name = string(addr);

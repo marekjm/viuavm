@@ -208,7 +208,7 @@ byte* CPU::dispatch(byte* addr) {
             addr = pull(addr+1);
             break;
         case ENTER:
-            addr = vmtry(addr+1);
+            addr = vmenter(addr+1);
             break;
         case THROW:
             addr = vmthrow(addr+1);

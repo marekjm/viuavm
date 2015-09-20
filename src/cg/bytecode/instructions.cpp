@@ -782,7 +782,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* vmtry(byte* addr_ptr, const string& block_name) {
+        byte* vmenter(byte* addr_ptr, const string& block_name) {
             /*  Inserts try instruction.
              *  Byte offset is calculated automatically.
              */

@@ -97,7 +97,7 @@ namespace cg {
         byte* tryframe(byte*);
         byte* vmcatch(byte*, const std::string&, const std::string&);
         byte* pull(byte*, int_op);
-        byte* vmtry(byte*, const std::string&);
+        byte* vmenter(byte*, const std::string&);
         byte* vmthrow(byte*, int_op);
         byte* leave(byte*);
 

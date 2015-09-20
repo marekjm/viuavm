@@ -677,11 +677,11 @@ Program& Program::pull(int_op regno) {
     return (*this);
 }
 
-Program& Program::vmtry(string block_name) {
+Program& Program::vmenter(string block_name) {
     /*  Inserts try instruction.
      *  Byte offset is calculated automatically.
      */
-    addr_ptr = cg::bytecode::vmtry(addr_ptr, block_name);
+    addr_ptr = cg::bytecode::vmenter(addr_ptr, block_name);
     return (*this);
 }
 

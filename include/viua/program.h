@@ -127,7 +127,7 @@ class Program {
     Program& tryframe   ();
     Program& vmcatch    (std::string, std::string);
     Program& pull       (int_op);
-    Program& vmtry      (std::string);
+    Program& vmenter    (std::string);
     Program& vmthrow    (int_op);
     Program& leave      ();
 
