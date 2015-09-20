@@ -783,7 +783,7 @@ namespace cg {
         }
 
         byte* vmenter(byte* addr_ptr, const string& block_name) {
-            /*  Inserts try instruction.
+            /*  Inserts enter instruction.
              *  Byte offset is calculated automatically.
              */
             *(addr_ptr++) = ENTER;
