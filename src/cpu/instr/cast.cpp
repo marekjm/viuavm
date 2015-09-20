@@ -96,6 +96,8 @@ byte* CPU::stoi(byte* addr) {
         result_integer = std::stoi(supplied_string);
     } catch (const std::out_of_range& e) {
         throw new Exception("out of range: " + supplied_string);
+    } catch (const std::invalid_argument& e) {
+        throw new Exception("invalid argument: " + supplied_string);
     }
     place(destination_register_index, new Integer(result_integer));
 
