@@ -26,7 +26,7 @@
     izero 0
 
     .mark: take_a_guess
-    strstore 2 "Guess the number: "
+    strstore 2 "guess the number: "
     echo 2
 
     frame 0
