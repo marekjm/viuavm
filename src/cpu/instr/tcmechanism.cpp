@@ -68,13 +68,13 @@ byte* CPU::pull(byte* addr) {
 }
 
 byte* CPU::vmenter(byte* addr) {
-    /*  Run try instruction.
+    /*  Run enter instruction.
      */
     string block_name = string(addr);
 
     bool block_found = (block_addresses.count(block_name) or linked_blocks.count(block_name));
     if (not block_found) {
-        throw new Exception("try of undefined block: " + block_name);
+        throw new Exception("cannot enter undefined block: " + block_name);
     }
 
     byte* block_address = nullptr;
