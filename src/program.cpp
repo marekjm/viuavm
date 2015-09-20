@@ -260,6 +260,15 @@ long Program::getInstructionBytecodeOffset(int instr, int count) {
             }
             inc += s.size()+1;
         }
+        if (opcode == CATCH) {
+            string exception_name(program+offset+1);
+            inc += exception_name.size()+1;
+            string catch_block_name(program+offset+1+exception_name.size()+1);
+            inc += catch_block_name.size()+1;
+            if (scream) {
+                cout << '+' << exception_name.size() << " (typename at byte " << offset+1 << ": `" << exception_name << "`)" << endl;
+            }
+        }
 
         if (scream) {
             cout << " bytes" << endl;
