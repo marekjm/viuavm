@@ -1,13 +1,46 @@
 .signature: std::random::randint
+.signature: std::io::getline
 
 .function: main
-    ; FIXME: implement this chapter of "The Rust Book": https://doc.rust-lang.org/book/guessing-game.html
+    ; implements this chapter of "The Rust Book": https://doc.rust-lang.org/book/guessing-game.html
     import "random"
+    import "io"
 
-    ; random integer between 0 and 100
-    frame ^[(param 0 (istore 2 0)) (param 1 (istore 2 100))]
-    print (call 1 std::random::randint)
+    ; random integer between 1 and 100
+    frame ^[(param 0 (istore 2 1)) (param 1 (istore 2 101))]
+    call 1 std::random::randint
 
+    ; enter zero to abort the game
+    izero 0
+
+    .mark: take_a_guess
+    strstore 2 "Guess the number: "
+    echo 2
+
+    frame 0
+    call 3 std::io::getline
+    stoi 3 3
+
+    branch (ieq 4 3 0) abort
+    branch (ieq 4 3 1) correct
+
+    branch (ilt 4 3 1) +1 +3
+    strstore 4 "guess: your number is less than the target"
+    jump incorrect
+    strstore 4 "guess: your number is greater than the target"
+    .mark: incorrect
+    print 4
+    jump take_a_guess
+
+    .mark: correct
+    print (strstore 2 "guess: correct")
+    jump exit
+
+    .mark: abort
+    echo (strstore 2 "game aborted: target number was ")
+    print 1
+
+    .mark: exit
     izero 0
     end
 .end
