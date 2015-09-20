@@ -232,7 +232,7 @@ long Program::getInstructionBytecodeOffset(int instr, int count) {
         }
 
         OPCODE opcode = OPCODE(program[offset]);
-        if ((opcode == IMPORT) or (opcode == TRY) or (opcode == LINK)) {
+        if ((opcode == IMPORT) or (opcode == ENTER) or (opcode == LINK)) {
             string s(program+offset+1);
             if (scream) {
                 cout << '+' << s.size() << " (function/module name at byte " << offset+1 << ": `" << s << "`)";

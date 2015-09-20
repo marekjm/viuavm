@@ -215,7 +215,7 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { CATCH,    "catch" },
     { PULL,     "pull" },
     { TRYFRAME, "tryframe" },
-    { TRY,      "try" },
+    { ENTER,    "try" },
     { LEAVE,    "leave" },
 
     { IMPORT,   "import" },
@@ -241,7 +241,7 @@ const std::vector<enum OPCODE> OP_VARIABLE_LENGTH = {
     FUNCTION,
     CALL,
     CATCH,
-    TRY,
+    ENTER,
     IMPORT,
     LINK,
     CLASS,

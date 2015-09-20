@@ -786,7 +786,7 @@ namespace cg {
             /*  Inserts try instruction.
              *  Byte offset is calculated automatically.
              */
-            *(addr_ptr++) = TRY;
+            *(addr_ptr++) = ENTER;
             for (unsigned i = 0; i < block_name.size(); ++i) {
                 *(addr_ptr++) = block_name[i];
             }
