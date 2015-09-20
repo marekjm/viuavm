@@ -1,6 +1,18 @@
 .signature: std::random::randint
 .signature: std::io::getline
 
+.block: check_the_number
+    stoi 3 3
+    leave
+.end
+
+.block: failed_to_convert
+    echo (strstore 10 "guess: exception: ")
+    print (pull 9)
+    istore 3 -1
+    leave
+.end
+
 .function: main
     ; implements this chapter of "The Rust Book": https://doc.rust-lang.org/book/guessing-game.html
     import "random"
@@ -19,7 +31,10 @@
 
     frame 0
     call 3 std::io::getline
-    stoi 3 3
+
+    tryframe
+    catch "Exception" failed_to_convert
+    try check_the_number
 
     branch (ieq 4 3 0) abort
     branch (ieq 4 3 1) correct
