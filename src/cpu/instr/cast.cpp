@@ -5,6 +5,7 @@
 #include <viua/types/float.h>
 #include <viua/types/byte.h>
 #include <viua/types/string.h>
+#include <viua/types/exception.h>
 #include <viua/support/pointer.h>
 #include <viua/cpu/cpu.h>
 using namespace std;
@@ -69,27 +70,34 @@ byte* CPU::ftoi(byte* addr) {
 byte* CPU::stoi(byte* addr) {
     /*  Run stoi instruction.
      */
-    bool casted_object_ref, destination_register_ref;
-    int casted_object_index, destination_register_index;
+    bool cast_object_ref, destination_register_ref;
+    int cast_object_index, destination_register_index;
 
     destination_register_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
     destination_register_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    casted_object_ref = *((bool*)addr);
+    cast_object_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
-    casted_object_index = *((int*)addr);
+    cast_object_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    if (casted_object_ref) {
-        casted_object_index = static_cast<Integer*>(fetch(casted_object_index))->value();
+    if (cast_object_ref) {
+        cast_object_index = static_cast<Integer*>(fetch(cast_object_index))->value();
     }
     if (destination_register_ref) {
         destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
     }
 
-    place(destination_register_index, new Integer(std::stoi(static_cast<String*>(fetch(casted_object_index))->value())));
+    int result_integer = 0;
+    string supplied_string = static_cast<String*>(fetch(cast_object_index))->value();
+    try {
+        result_integer = std::stoi(supplied_string);
+    } catch (const std::out_of_range& e) {
+        throw new Exception("out of range: " + supplied_string);
+    }
+    place(destination_register_index, new Integer(result_integer));
 
     return addr;
 }
