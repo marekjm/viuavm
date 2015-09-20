@@ -196,7 +196,7 @@ build/cpu/registserset.o: src/cpu/registerset.cpp include/viua/cpu/registerset.h
 
 ############################################################
 # STANDARD LIBRARY
-stdlib: build/stdlib/std/string.vlib build/stdlib/typesystem.so
+stdlib: build/stdlib/std/string.vlib build/stdlib/typesystem.so build/stdlib/random.so
 
 build/stdlib/std/string.vlib: src/stdlib/viua/string.asm
 	./build/bin/vm/asm --lib -o $@ $<
@@ -204,9 +204,14 @@ build/stdlib/std/string.vlib: src/stdlib/viua/string.asm
 build/stdlib/typesystem.o: src/stdlib/typesystem.cpp
 	${CXX} -std=c++11 -fPIC -c -I./include -o $@ $<
 
+build/stdlib/random.o: src/stdlib/random.cpp
+	${CXX} -std=c++11 -fPIC -c -I./include -o $@ $<
+
 build/stdlib/typesystem.so: build/stdlib/typesystem.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o
 	${CXX} -std=c++11 -fPIC -shared -o $@ $^
 
+build/stdlib/random.so: build/stdlib/random.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o
+	${CXX} -std=c++11 -fPIC -shared -o $@ $^
 
 ############################################################
 # OPCODE LISTER PROGRAM
