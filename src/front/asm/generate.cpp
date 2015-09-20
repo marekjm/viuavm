@@ -559,7 +559,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string regno_chnk;
             regno_chnk = str::chunk(operands);
             program.pull(assembler::operands::getint(resolveregister(regno_chnk, names)));
-        } else if (str::startswith(line, "try")) {
+        } else if (str::startswith(line, "enter")) {
             string block_name = str::chunk(operands);
             program.vmenter(block_name);
         } else if (str::startswith(line, "throw")) {

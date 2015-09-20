@@ -102,7 +102,7 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "catch",  sizeof(byte) }, // catch "<type>" <block>
     { "pull",   sizeof(byte) + sizeof(bool) + sizeof(int) }, // pull <register>
     { "tryframe", sizeof(byte) },
-    { "try",    sizeof(byte) },
+    { "enter",  sizeof(byte) },
     { "leave",  sizeof(byte) },
 
     { "import", sizeof(byte) },
@@ -215,7 +215,7 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { CATCH,    "catch" },
     { PULL,     "pull" },
     { TRYFRAME, "tryframe" },
-    { ENTER,    "try" },
+    { ENTER,    "enter" },
     { LEAVE,    "leave" },
 
     { IMPORT,   "import" },

@@ -97,7 +97,7 @@ string assembler::verify::blockTries(const vector<string>& lines, const map<unsi
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = str::lstrip(lines[i]);
-        if (not str::startswithchunk(line, "try")) {
+        if (not str::startswithchunk(line, "enter")) {
             continue;
         }
 
@@ -109,7 +109,7 @@ string assembler::verify::blockTries(const vector<string>& lines, const map<unsi
         }
 
         if (is_undefined) {
-            report << "fatal: try of undefined block '" << block << "' at line " << (expanded_lines_to_source_lines.at(i)+1);
+            report << "fatal: cannot enter undefined block '" << block << "' at line " << (expanded_lines_to_source_lines.at(i)+1);
         }
     }
     return report.str();
