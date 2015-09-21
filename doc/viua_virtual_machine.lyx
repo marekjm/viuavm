@@ -2664,7 +2664,7 @@ name "sub:Exceptions"
 \end_layout
 
 \begin_layout Subsubsection
-tryframe
+try
 \end_layout
 
 \begin_layout Paragraph
@@ -2674,7 +2674,7 @@ Syntax
 \begin_layout Standard
 
 \family typewriter
-tryframe
+try
 \end_layout
 
 \begin_layout Paragraph
@@ -2707,13 +2707,13 @@ Semantics
 Registers handler block for a type.
  Instruction fails if no 
 \family typewriter
-tryframe
+TryFrame
 \family default
  is available.
 \end_layout
 
 \begin_layout Subsubsection
-try
+enter
 \end_layout
 
 \begin_layout Paragraph
@@ -2723,7 +2723,7 @@ Syntax
 \begin_layout Standard
 
 \family typewriter
-try <block>
+enter <block>
 \end_layout
 
 \begin_layout Paragraph
@@ -2731,10 +2731,10 @@ Semantics
 \end_layout
 
 \begin_layout Standard
-Tries to execute a block.
+Enters a block to try to execute it.
  Instruction fails if no 
 \family typewriter
-tryframe
+TryFrame
 \family default
  is available.
 \end_layout
@@ -3620,7 +3620,7 @@ This subsection explains in detail how exceptions are handled inside Viua.
 \end_layout
 
 \begin_layout Subsubsection
-Creating tryframes
+Creating try frames
 \end_layout
 
 \begin_layout Subsubsection
