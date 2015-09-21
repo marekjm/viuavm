@@ -108,10 +108,10 @@ enum OPCODE : byte {
     THROW,      // throw an object
     CATCH,      // register a catcher block for given type
     PULL,       // pull caught object into a register (it becomes local object for current frame)
-    TRYFRAME,   // create a frame for try block
-    ENTER,      // try executing a block, if an exception is thrown and no catcher claims it, it is propagated up
+    TRY,        // create a frame for try block
+    ENTER,      // enter a block, if an exception is thrown and no catcher claims it, it is propagated up
                 // ENTER instructions do not require any CATCH to precede them
-    LEAVE,      // leave a block and resume execution after block-entering instruction
+    LEAVE,      // leave a block and resume execution after last enter instruction
 
     IMPORT,     // dynamically link foreign library
     LINK,       // dynamically link native library

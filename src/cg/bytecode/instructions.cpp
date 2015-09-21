@@ -750,7 +750,7 @@ namespace cg {
         byte* tryframe(byte* addr_ptr) {
             /*  Inserts tryframe instruction.
              */
-            *(addr_ptr++) = TRYFRAME;
+            *(addr_ptr++) = TRY;
             return addr_ptr;
         }
 

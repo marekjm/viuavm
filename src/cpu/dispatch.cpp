@@ -198,7 +198,7 @@ byte* CPU::dispatch(byte* addr) {
         case BRANCH:
             addr = branch(addr+1);
             break;
-        case TRYFRAME:
+        case TRY:
             addr = tryframe(addr+1);
             break;
         case CATCH:

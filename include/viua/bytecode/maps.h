@@ -214,7 +214,7 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { THROW,    "throw" },
     { CATCH,    "catch" },
     { PULL,     "pull" },
-    { TRYFRAME, "tryframe" },
+    { TRY,      "tryframe" },
     { ENTER,    "enter" },
     { LEAVE,    "leave" },
 
