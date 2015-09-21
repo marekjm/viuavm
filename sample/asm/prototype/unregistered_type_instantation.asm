@@ -11,7 +11,7 @@
 .function: main
     tryframe
     catch "Exception" handler
-    try unregistered_type_instantation
+    enter unregistered_type_instantation
 
     izero 0
     end

@@ -14,7 +14,7 @@
 .function: main
     tryframe
     catch "Exception" exception_handler
-    try print_block
+    enter print_block
 
     izero 0
     end

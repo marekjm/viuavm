@@ -5,7 +5,7 @@
 
 .function: main
     tryframe
-    try main_block
+    enter main_block
     ; leave instructions lead here
     print 1
 

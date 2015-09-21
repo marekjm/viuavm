@@ -23,7 +23,7 @@
 .function: main
     tryframe
     catch "Integer" catch_integer
-    try foo_block
+    enter foo_block
 
     izero 0
     end

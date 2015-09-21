@@ -34,7 +34,7 @@
 
     tryframe
     catch "Exception" failed_to_convert
-    try check_the_number
+    enter check_the_number
 
     branch (ieq 4 3 0) abort
     branch (ieq 4 3 1) correct

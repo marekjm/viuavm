@@ -22,7 +22,7 @@
 
     tryframe
     catch "Base" handler
-    try throws_derived
+    enter throws_derived
 
     izero 0
     end

@@ -53,28 +53,28 @@
 .block: first
     tryframe
     catch "String" catcher
-    try second
+    enter second
     leave
 .end
 
 .block: second
     tryframe
     catch "Vector" catcher
-    try third
+    enter third
     leave
 .end
 
 .block: third
     tryframe
     catch "Float" catcher
-    try fourth
+    enter fourth
     leave
 .end
 
 .block: fourth
     tryframe
     catch "Boolean" catcher
-    try this_throws
+    enter this_throws
     leave
 .end
 
@@ -87,11 +87,11 @@
 .function: main
     tryframe
     catch "Integer" catcher
-    try first
+    enter first
 
     tryframe
     catch "Integer" catcher
-    try this_throws
+    enter this_throws
 
     izero 0
     end

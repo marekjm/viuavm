@@ -14,7 +14,7 @@
 .function: main
     tryframe
     catch "Integer" handle_integer
-    try main_block
+    enter main_block
     ; leave instructions lead here
 
     izero 0
@@ -23,6 +23,6 @@
 
 
 ; catch "<type>" <block>    - registers a catcher <block> for given <type>
-; try <block>               - tries executing given block after registered catchers have been registered
+; enter <block>             - tries executing given block after registered catchers have been registered
 ; leave                     - leaves active block (if any) and resumes execution on instruction after the one that caused
 ;                             the block to be entered

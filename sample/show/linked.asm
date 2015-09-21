@@ -58,14 +58,14 @@
 
 .function: with_block
     tryframe
-    try this_warns
+    enter this_warns
     end
 .end
 
 .function: catches_own_exception
     tryframe
     catch "Integer" this_catches
-    try this_throws
+    enter this_throws
     end
 .end
 

@@ -71,11 +71,11 @@
 
     ;tryframe
     ;catch "Integer" local_catcher
-    ;try local_thrower
+    ;enter local_thrower
 
     tryframe
     catch "Integer" local_catcher
-    try local_block
+    enter local_block
 
     strstore 10 "It's OK now."
     print 10

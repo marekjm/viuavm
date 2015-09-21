@@ -5,7 +5,7 @@
 
     ; FIXME: tryframe will not be needed when ENTER instruction is implemented
     tryframe
-    try misc::argsvector
+    enter misc::argsvector
 
     print 1
     end
