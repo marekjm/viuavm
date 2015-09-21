@@ -20,7 +20,7 @@
 .function: main
     call (frame 0) typesystem_setup
 
-    tryframe
+    try
     catch "Base" handler
     enter throws_derived
 

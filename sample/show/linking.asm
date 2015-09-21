@@ -69,11 +69,11 @@
     frame 0
     call 0 linked::catches_own_exception
 
-    ;tryframe
+    ;try
     ;catch "Integer" local_catcher
     ;enter local_thrower
 
-    tryframe
+    try
     catch "Integer" local_catcher
     enter local_block
 

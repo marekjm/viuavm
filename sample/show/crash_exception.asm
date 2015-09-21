@@ -21,7 +21,7 @@
 .end
 
 .function: main
-    tryframe
+    try
     catch "Integer" catch_integer
     enter foo_block
 

@@ -9,7 +9,7 @@
 .end
 
 .function: main
-    tryframe
+    try
     catch "Exception" handler
     enter unregistered_type_instantation
 

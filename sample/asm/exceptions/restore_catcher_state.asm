@@ -38,7 +38,7 @@
 
 .function: main
     istore 4 50
-    tryframe
+    try
     catch "Integer" handle_integer
     enter main_block
     ; leave instructions lead here

@@ -32,7 +32,7 @@
     frame 0
     call 3 std::io::getline
 
-    tryframe
+    try
     catch "Exception" failed_to_convert
     enter check_the_number
 

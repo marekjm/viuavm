@@ -12,7 +12,7 @@
 .end
 
 .function: main
-    tryframe
+    try
     catch "Exception" exception_handler
     enter print_block
 

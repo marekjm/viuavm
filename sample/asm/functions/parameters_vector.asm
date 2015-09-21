@@ -3,8 +3,8 @@
 .function: foo
     link misc
 
-    ; FIXME: tryframe will not be needed when ENTER instruction is implemented
-    tryframe
+    ; FIXME: try will not be needed when ENTER instruction is implemented
+    try
     enter misc::argsvector
 
     print 1

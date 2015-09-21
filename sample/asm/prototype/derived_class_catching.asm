@@ -13,7 +13,7 @@
 
     register (derive (class 1 Derived) Base)
 
-    tryframe
+    try
     catch "Base" handler
     enter throws_derived
 
