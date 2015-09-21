@@ -547,7 +547,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             }
 
             program.jump(jump_target, jump_type);
-        } else if (str::startswith(line, "tryframe")) {
+        } else if (str::startswith(line, "try")) {
             program.vmtry();
         } else if (str::startswith(line, "catch")) {
             string type_chnk, catcher_chnk;
