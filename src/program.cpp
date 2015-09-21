@@ -92,6 +92,22 @@ int Program::instructionCount() {
 }
 
 
+OPCODE instructionToOpcode(const string& s) {
+    OPCODE op = NOP;
+    bool found = false;
+    for (auto it : OP_NAMES) {
+        if (it.second == s) {
+            found = true;
+            op = it.first;
+            break;
+        }
+    }
+    if (not found) {
+        throw std::out_of_range("invalid instruction name: " + s);
+    }
+    return op;
+}
+
 uint16_t Program::countBytes(const vector<string>& lines) {
     /** Counts bytecode size required for a program.
      *
@@ -121,13 +137,14 @@ uint16_t Program::countBytes(const vector<string>& lines) {
 
         instr = str::chunk(line);
         try {
+            OPCODE op = instructionToOpcode(instr);
             inc = OP_SIZES.at(instr);
-            if (instr == "enter") {
+            if (op == ENTER) {
                 // clear first chunk
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (function or block name)
                 inc += str::chunk(line).size() + 1;
-            } else if ((instr == "call") or (instr == "msg")) {
+            } else if ((op == CALL) or (op == MSG)) {
                 // clear first chunk (opcode mnemonic)
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (optional register index)
@@ -136,14 +153,14 @@ uint16_t Program::countBytes(const vector<string>& lines) {
                 // get third chunk (function name if register index was given, empty otherwise)
                 string second_op = str::chunk(line);
                 inc += (second_op.size() ? second_op : first_op).size() + 1;
-            } else if ((instr == "closure") or (instr == "function") or (instr == "class") or (instr == "prototype") or (instr == "derive") or (instr == "new")) {
+            } else if ((op == CLOSURE) or (op == FUNCTION) or (op == CLASS) or (op == PROTOTYPE) or (op == DERIVE) or (op == NEW)) {
                 // clear first chunk (opcode mnemonic)
                 line = str::lstrip(str::sub(line, instr.size()));
                 // clear second chunk (register index)
                 line = str::lstrip(str::sub(line, str::chunk(line).size()));
                 // get third chunk (name)
                 inc += str::chunk(line).size() + 1;
-            } else if (instr == "attach") {
+            } else if (op == ATTACH) {
                 // clear first chunk (opcode mnemonic)
                 line = str::lstrip(str::sub(line, instr.size()));
                 // clear second chunk (register index)
@@ -153,17 +170,17 @@ uint16_t Program::countBytes(const vector<string>& lines) {
                 line = str::lstrip(str::sub(line, str::chunk(line).size()));
                 // get fourth chunk (method name)
                 inc += str::chunk(line).size() + 1;
-            } else if (instr == "import") {
+            } else if (op == IMPORT) {
                 // clear first chunk
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (which is a string)
                 inc += (str::extract(line).size() - 2 + 1); // +1: null-terminator, -2: quotes around module name
-            } else if (instr == "link") {
+            } else if (op == LINK) {
                 // clear first chunk
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (which is a module name)
                 inc += (str::chunk(line).size() + 1); // +1: null-terminator
-            } else if (instr == "catch") {
+            } else if (op == CATCH) {
                 // clear first chunk (the opcode)
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (the type as a string)
@@ -171,7 +188,7 @@ uint16_t Program::countBytes(const vector<string>& lines) {
                 line = str::lstrip(str::sub(line, str::extract(line).size()));
                 // get third chunk (which is a block name)
                 inc += str::chunk(line).size() + 1;
-            } else if (instr == "strstore") {
+            } else if (op == STRSTORE) {
                 // clear first chunk
                 line = str::lstrip(str::sub(line, instr.size()));
                 line = str::lstrip(str::sub(line, str::chunk(line).size()));
