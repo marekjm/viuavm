@@ -747,8 +747,8 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* tryframe(byte* addr_ptr) {
-            /*  Inserts tryframe instruction.
+        byte* vmtry(byte* addr_ptr) {
+            /*  Inserts try instruction.
              */
             *(addr_ptr++) = TRY;
             return addr_ptr;

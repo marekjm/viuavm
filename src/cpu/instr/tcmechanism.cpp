@@ -5,7 +5,7 @@
 using namespace std;
 
 
-byte* CPU::tryframe(byte* addr) {
+byte* CPU::vmtry(byte* addr) {
     /** Create new special frame for try blocks.
      */
     if (try_frame_new != nullptr) {

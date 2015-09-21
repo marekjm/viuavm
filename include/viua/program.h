@@ -124,7 +124,7 @@ class Program {
     Program& jump       (int, enum JUMPTYPE);
     Program& branch     (int_op, int, enum JUMPTYPE, int, enum JUMPTYPE);
 
-    Program& tryframe   ();
+    Program& vmtry      ();
     Program& vmcatch    (std::string, std::string);
     Program& pull       (int_op);
     Program& vmenter    (std::string);

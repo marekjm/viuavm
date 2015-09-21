@@ -548,7 +548,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
 
             program.jump(jump_target, jump_type);
         } else if (str::startswith(line, "tryframe")) {
-            program.tryframe();
+            program.vmtry();
         } else if (str::startswith(line, "catch")) {
             string type_chnk, catcher_chnk;
             type_chnk = str::extract(operands);

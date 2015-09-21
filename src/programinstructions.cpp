@@ -656,10 +656,10 @@ Program& Program::branch(int_op regc, int addr_truth, enum JUMPTYPE absolute_tru
     return (*this);
 }
 
-Program& Program::tryframe() {
-    /*  Inserts tryframe instruction.
+Program& Program::vmtry() {
+    /*  Inserts try instruction.
      */
-    addr_ptr = cg::bytecode::tryframe(addr_ptr);
+    addr_ptr = cg::bytecode::vmtry(addr_ptr);
     return (*this);
 }
 
