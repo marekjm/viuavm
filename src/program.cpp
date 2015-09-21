@@ -122,7 +122,7 @@ uint16_t Program::countBytes(const vector<string>& lines) {
         instr = str::chunk(line);
         try {
             inc = OP_SIZES.at(instr);
-            if (instr == "try") {
+            if (instr == "enter") {
                 // clear first chunk
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (function or block name)
