@@ -170,12 +170,12 @@ class Program {
         /* Filling bytecode with zeroes (which are interpreted by CPU as NOP instructions) is a safe way
          * to prevent many hiccups.
          */
-        for (int i = 0; i < bytes; ++i) { program[i] = byte(0); }
+        for (uint64_t i = 0; i < bytes; ++i) { program[i] = byte(0); }
         addr_ptr = program;
     }
     Program(const Program& that): program(nullptr), bytes(that.bytes), addr_ptr(nullptr), branches({}) {
         program = new byte[bytes];
-        for (int i = 0; i < bytes; ++i) {
+        for (uint64_t i = 0; i < bytes; ++i) {
             program[i] = that.program[i];
         }
         addr_ptr = program+(that.addr_ptr - that.program);
@@ -192,7 +192,7 @@ class Program {
             delete[] program;
             bytes = that.bytes;
             program = new byte[bytes];
-            for (int i = 0; i < bytes; ++i) {
+            for (uint64_t i = 0; i < bytes; ++i) {
                 program[i] = that.program[i];
             }
             addr_ptr = program+(that.addr_ptr - that.program);
