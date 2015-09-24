@@ -27,7 +27,7 @@ const std::vector<std::string> VIUAPATH = {
 
 
 // External functions must have this signature
-typedef Type* (ExternalFunction)(Frame*, RegisterSet*, RegisterSet*);
+typedef void (ExternalFunction)(Frame*, RegisterSet*, RegisterSet*);
 
 /** Custom types for Viua VM can be written in C++ and loaded into the typesystem with minimal amount of bookkeeping.
  *  The only thing Viua needs to use a pure-C++ class is a string-name-to-member-function-pointer mapping as
@@ -35,8 +35,8 @@ typedef Type* (ExternalFunction)(Frame*, RegisterSet*, RegisterSet*);
  *  One downside this approach has is that all method calls are performed via the vtable which may not be the most
  *  efficient way.
  */
-typedef Type* (Type::*ForeignMethodMemberPointer)(Frame*, RegisterSet*, RegisterSet*);
-typedef std::function<Type*(Type*, Frame*, RegisterSet*, RegisterSet*)> ForeignMethod;
+typedef void (Type::*ForeignMethodMemberPointer)(Frame*, RegisterSet*, RegisterSet*);
+typedef std::function<void(Type*, Frame*, RegisterSet*, RegisterSet*)> ForeignMethod;
 
 
 /** External modules must export the "exports()" function.

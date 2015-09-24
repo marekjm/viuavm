@@ -44,18 +44,16 @@ String* String::join(Vector* v) {
 }
 
 // foreign methods
-Type* String::stringify(Frame* frame, RegisterSet*, RegisterSet*) {
+void String::stringify(Frame* frame, RegisterSet*, RegisterSet*) {
     if (frame->args->size() < 2) {
         throw new Exception("expected 2 parameters");
     }
     svalue = frame->args->at(1)->str();
-    return nullptr;
 }
 
-Type* String::represent(Frame* frame, RegisterSet*, RegisterSet*) {
+void String::represent(Frame* frame, RegisterSet*, RegisterSet*) {
     if (frame->args->size() < 2) {
         throw new Exception("expected 2 parameters");
     }
     svalue = frame->args->at(1)->repr();
-    return nullptr;
 }

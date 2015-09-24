@@ -9,11 +9,10 @@
 using namespace std;
 
 
-Type* io_getline(Frame* frame, RegisterSet*, RegisterSet*) {
+void io_getline(Frame* frame, RegisterSet*, RegisterSet*) {
     string line;
     getline(cin, line);
     frame->regset->set(0, new String(line));
-    return 0;
 }
 
 const ExternalFunctionSpec functions[] = {

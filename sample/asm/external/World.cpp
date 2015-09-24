@@ -6,9 +6,8 @@
 using namespace std;
 
 
-Type* hello(Frame*, RegisterSet*, RegisterSet*) {
+void hello(Frame*, RegisterSet*, RegisterSet*) {
     cout << "Hello World!" << endl;
-    return nullptr;
 }
 
 

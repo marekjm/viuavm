@@ -19,7 +19,7 @@ Type* Object::copy() const {
     return cp;
 }
 
-Type* Object::set(Frame* frame, RegisterSet*, RegisterSet*) {
+void Object::set(Frame* frame, RegisterSet*, RegisterSet*) {
     if (frame->args->size() != 3) {
         ostringstream oss;
         oss << "invalid number of arguments: expected 3 but got " << frame->args->size();
@@ -38,10 +38,8 @@ Type* Object::set(Frame* frame, RegisterSet*, RegisterSet*) {
     }
 
     attributes[name] = frame->args->at(2)->copy();
-
-    return nullptr;
 }
-Type* Object::get(Frame* frame, RegisterSet*, RegisterSet*) {
+void Object::get(Frame* frame, RegisterSet*, RegisterSet*) {
     if (frame->args->size() != 2) {
         ostringstream oss;
         oss << "invalid number of arguments: expected 2 but got " << frame->args->size();
@@ -57,8 +55,6 @@ Type* Object::get(Frame* frame, RegisterSet*, RegisterSet*) {
     }
 
     frame->regset->set(0, attributes[name]->copy());
-
-    return nullptr;
 }
 
 

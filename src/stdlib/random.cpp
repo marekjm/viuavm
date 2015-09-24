@@ -27,7 +27,7 @@ float getrandom() {
     return rfloat;
 }
 
-Type* random_drandom(Frame* frame, RegisterSet*, RegisterSet*) {
+void random_drandom(Frame* frame, RegisterSet*, RegisterSet*) {
     /** Return random integer.
      *
      *  Bytes are read from /dev/random random number device.
@@ -40,10 +40,9 @@ Type* random_drandom(Frame* frame, RegisterSet*, RegisterSet*) {
     int rint = 0;
     in.read((char*)&rint, sizeof(int));
     frame->regset->set(0, new Integer(rint));
-    return 0;
 }
 
-Type* random_durandom(Frame* frame, RegisterSet*, RegisterSet*) {
+void random_durandom(Frame* frame, RegisterSet*, RegisterSet*) {
     /** Return random integer.
      *
      *  Bytes are read from /dev/urandom random number device.
@@ -58,17 +57,15 @@ Type* random_durandom(Frame* frame, RegisterSet*, RegisterSet*) {
     int rint = 0;
     in.read((char*)&rint, sizeof(int));
     frame->regset->set(0, new Integer(rint));
-    return 0;
 }
 
-Type* random_random(Frame* frame, RegisterSet*, RegisterSet*) {
+void random_random(Frame* frame, RegisterSet*, RegisterSet*) {
     /** Return random float from range between 0.0 and 1.0.
      */
     frame->regset->set(0, new Float(getrandom()));
-    return 0;
 }
 
-Type* random_randint(Frame* frame, RegisterSet*, RegisterSet*) {
+void random_randint(Frame* frame, RegisterSet*, RegisterSet*) {
     /** Return random integer from selected range.
      *
      *  Requires two parameters: lower and upper bound.
@@ -78,7 +75,6 @@ Type* random_randint(Frame* frame, RegisterSet*, RegisterSet*) {
     int upper_bound = static_cast<Integer*>(frame->args->at(1))->value();
     int modifer = ((upper_bound - lower_bound) * getrandom());
     frame->regset->set(0, new Integer(lower_bound + modifer));
-    return 0;
 }
 
 const ExternalFunctionSpec functions[] = {

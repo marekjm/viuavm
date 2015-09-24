@@ -44,8 +44,8 @@ class String : public Type {
         String* add(String*);
         String* join(Vector*);
 
-        virtual Type* stringify(Frame*, RegisterSet*, RegisterSet*);
-        virtual Type* represent(Frame*, RegisterSet*, RegisterSet*);
+        virtual void stringify(Frame*, RegisterSet*, RegisterSet*);
+        virtual void represent(Frame*, RegisterSet*, RegisterSet*);
 
         String(std::string s = ""): svalue(s) {}
 };
