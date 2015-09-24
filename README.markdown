@@ -12,17 +12,14 @@ to help myself in my computer language implementation studies.
 ## Programming in Viua
 
 Viua can be programmed in an assembler-like language which must then be compiled into bytecode.
-Assembler uses **Bytecode Generation API** to generate bytecode after the assembler frontend
-performs initial analysis.
-
 Typical code-n-debug cycle is shown below (assuming current working directory
 is the local clone of Viua repository):
 
 ```
-nvim ./some_file.asm
-./bin/vm/asm -o some_file.out ./some_file.asm
-./bin/vm/cpu some_file.out
-./bin/vm/vdb some_file.out
+vi some_file.asm
+./build/bin/vm/asm -o some_file.out some_file.asm
+./build/bin/vm/cpu some_file.out
+./build/bin/vm/vdb some_file.out
 ```
 
 
@@ -34,9 +31,9 @@ Some development-related information.
 Required tools:
 
 * `g++`: GNU Compiler Collection's C++ compiler version 4.9 and above (mandatory),
-* `clang++`: clang C++ compiler version 3.6.1 and above (if not using GCC),
+* `clang++`: clang C++ compiler version 3.6.1 and above (if not using GCC, clang builds are **not** guaranteed to work),
 * `python`: Python programming language 3.x for test suite (optional),
-* `valgrind`: for memory leak testing (optional),
+* `valgrind`: for memory leak testing (optional; by default enabled, disabling required setting `MEMORY_LEAK_CHECKS_ENABLE` variable in `tests/tests.py` to `False`),
 
 
 ## Compilation
@@ -44,10 +41,12 @@ Required tools:
 Before compiling, Git submodule for `linenoise` library must be initialised.
 
 Compilation is simple and can be executed by typing `make` in the shell.
-Full, clean compilation can also be performed by the `recompile` script located in main directory of the
-repository.
+Full, clean compilation can also be performed by the `./scripts/recompile` script.
 The script will run `make clean` production, detect number of cores the machine compilation is done on has, and
 run `make` with `-j` option adjusted to take advantage of multithreaded `make`-ing.
+
+Incremental recompilation can be performed with either `make` or `./scripts/compile` (the latter will detect the number of
+cores available and adjust `-j` option in Make).
 
 
 ## Testing
