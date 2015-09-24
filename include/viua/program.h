@@ -40,7 +40,7 @@ class Program {
     bool debug;
     bool scream;
 
-    long getInstructionBytecodeOffset(int, int count = -1);
+    uint64_t getInstructionBytecodeOffset(int, int count = -1);
 
     public:
     // instruction insertion interface

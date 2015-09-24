@@ -210,7 +210,7 @@ uint64_t Program::countBytes(const vector<string>& lines) {
 }
 
 
-long Program::getInstructionBytecodeOffset(int instr, int count) {
+uint64_t Program::getInstructionBytecodeOffset(int instr, int count) {
     /** Returns bytecode offset for given instruction index.
      *
      *  The "count" parameter is there to pass assumed instruction count to
@@ -221,7 +221,7 @@ long Program::getInstructionBytecodeOffset(int instr, int count) {
     // check if instruction count was passed, and calculate it if not
     count = (count >= 0 ? count : instructionCount());
 
-    long offset = 0;
+    uint64_t offset = 0;
     long unsigned inc;
     for (int i = 0; i < (instr >= 0 ? instr : count+instr); ++i) {
         /*  This loop iterates over so many instructions as needed to find bytecode offset for requested instruction.
