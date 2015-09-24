@@ -41,12 +41,12 @@ void Loader::calculateFunctionSizes() {
         el_size = 0;
 
         if (i < (functions.size()-1)) {
-            long unsigned a = (unsigned long)(function_addresses[name]);
-            long unsigned b = (unsigned long)(function_addresses[functions[i+1]]);
+            uint64_t a = function_addresses[name];
+            uint64_t b = function_addresses[functions[i+1]];
             el_size = (b-a);
         } else {
-            long unsigned a = (long unsigned)(function_addresses[name]);
-            long unsigned b = size;
+            uint64_t a = function_addresses[name];
+            uint64_t b = size;
             el_size = (b-a);
         }
 
