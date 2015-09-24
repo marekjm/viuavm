@@ -23,7 +23,7 @@ class Loader {
     std::vector<unsigned> jumps;
 
     std::map<std::string, uint64_t> function_addresses;
-    std::map<std::string, unsigned> function_sizes;
+    std::map<std::string, uint64_t> function_sizes;
     std::vector<std::string> functions;
     std::map<std::string, uint64_t> block_addresses;
     std::vector<std::string> blocks;
@@ -46,7 +46,7 @@ class Loader {
     std::vector<unsigned> getJumps();
 
     std::map<std::string, uint64_t> getFunctionAddresses();
-    std::map<std::string, unsigned> getFunctionSizes();
+    std::map<std::string, uint64_t> getFunctionSizes();
     std::vector<std::string> getFunctions();
 
     std::map<std::string, uint64_t> getBlockAddresses();

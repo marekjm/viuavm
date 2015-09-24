@@ -157,7 +157,7 @@ vector<unsigned> Loader::getJumps() {
 map<string, uint64_t> Loader::getFunctionAddresses() {
     return function_addresses;
 }
-map<string, unsigned> Loader::getFunctionSizes() {
+map<string, uint64_t> Loader::getFunctionSizes() {
     return function_sizes;
 }
 vector<string> Loader::getFunctions() {

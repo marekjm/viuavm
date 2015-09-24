@@ -130,7 +130,7 @@ int main(int argc, char* argv[]) {
 
     map<string, uint64_t> function_address_mapping = loader.getFunctionAddresses();
     vector<string> functions = loader.getFunctions();
-    map<string, unsigned> function_sizes = loader.getFunctionSizes();
+    map<string, uint64_t> function_sizes = loader.getFunctionSizes();
 
     map<string, uint64_t> block_address_mapping = loader.getBlockAddresses();
     vector<string> blocks = loader.getBlocks();
