@@ -136,7 +136,7 @@ int main(int argc, char* argv[]) {
     vector<string> blocks = loader.getBlocks();
     map<string, uint64_t> block_sizes;
 
-    map<string, uint16_t> element_address_mapping;
+    map<string, uint64_t> element_address_mapping;
     vector<string> elements;
     map<string, uint64_t> element_sizes;
     map<string, string> element_types;
