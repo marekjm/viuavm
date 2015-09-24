@@ -821,7 +821,7 @@ int generate(const vector<string>& expanded_lines, const map<unsigned, unsigned>
 
         linked_libs_jumptables[lnk] = lib_jumps;
 
-        map<string, uint16_t> fn_addresses = loader.getFunctionAddresses();
+        map<string, uint64_t> fn_addresses = loader.getFunctionAddresses();
         vector<string> fn_names = loader.getFunctions();
         for (string fn : fn_names) {
             function_addresses[fn] = fn_addresses.at(fn) + current_link_offset;
