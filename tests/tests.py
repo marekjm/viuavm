@@ -739,11 +739,9 @@ def partiallyAppliedSameLines(n):
 class StandardRuntimeLibraryModuleString(unittest.TestCase):
     PATH = './sample/standard_library/string'
 
-    @unittest.skip('broken by move to uint64_t for bytecode sizes')
     def testStringifyFunction(self):
         runTestCustomAssertsNoDisassemblyRerun(self, 'stringify.asm', partiallyAppliedSameLines(2))
 
-    @unittest.skip('broken by move to uint64_t for bytecode sizes')
     def testRepresentFunction(self):
         runTestCustomAssertsNoDisassemblyRerun(self, 'represent.asm', partiallyAppliedSameLines(2))
 

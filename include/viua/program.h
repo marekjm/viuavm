@@ -20,7 +20,7 @@ class Program {
     // byte array containing bytecode
     byte* program;
     // size of the bytecode
-    int bytes;
+    uint64_t bytes;
 
     /** Current address inside bytecode array.
      *  Used during bytecode generation.
@@ -160,12 +160,12 @@ class Program {
     Program& setdebug(bool d = true);
     Program& setscream(bool d = true);
 
-    int size();
+    uint64_t size();
     int instructionCount();
 
     static uint16_t countBytes(const std::vector<std::string>&);
 
-    Program(int bts = 2): bytes(bts), debug(false), scream(false) {
+    Program(uint64_t bts = 2): bytes(bts), debug(false), scream(false) {
         program = new byte[bytes];
         /* Filling bytecode with zeroes (which are interpreted by CPU as NOP instructions) is a safe way
          * to prevent many hiccups.

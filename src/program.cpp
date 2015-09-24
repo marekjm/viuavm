@@ -49,7 +49,7 @@ Program& Program::setscream(bool d) {
 }
 
 
-int Program::size() {
+uint64_t Program::size() {
     /*  Returns program size in bytes.
      */
     return bytes;
@@ -118,7 +118,7 @@ uint16_t Program::countBytes(const vector<string>& lines) {
      *
      *  Passed lines must be sanitized, i.e. the comments and blanks must be removed.
      */
-    uint16_t bytes = 0;
+    uint64_t bytes = 0;
     long unsigned inc = 0;
     string instr, line;
 
