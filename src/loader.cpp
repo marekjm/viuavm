@@ -103,7 +103,7 @@ void Loader::loadBlocksMap(ifstream& in) {
     delete[] lib_buffer_block_ids;
 }
 void Loader::loadBytecode(ifstream& in) {
-    in.read((char*)&size, 16);
+    in.read((char*)&size, sizeof(uint64_t));
     bytecode = new byte[size];
     in.read(bytecode, size);
 }
@@ -139,7 +139,7 @@ Loader& Loader::executable() {
     return (*this);
 }
 
-uint16_t Loader::getBytecodeSize() {
+uint64_t Loader::getBytecodeSize() {
     return size;
 }
 byte* Loader::getBytecode() {

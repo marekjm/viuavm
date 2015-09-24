@@ -40,8 +40,8 @@ class CPU {
      *  Size and executable offset are metadata exported from bytecode dump.
      */
     byte* bytecode;
-    uint16_t bytecode_size;
-    uint16_t executable_offset;
+    uint64_t bytecode_size;
+    uint64_t executable_offset;
 
     // Global register set
     RegisterSet* regset;
@@ -251,8 +251,8 @@ class CPU {
          *      * kick the CPU so it starts running,
          */
         CPU& load(byte*);
-        CPU& bytes(uint16_t);
-        CPU& eoffset(uint16_t);
+        CPU& bytes(uint64_t);
+        CPU& eoffset(uint64_t);
         CPU& preload();
 
         CPU& mapfunction(const std::string&, unsigned);

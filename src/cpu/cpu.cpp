@@ -41,7 +41,7 @@ CPU& CPU::load(byte* bc) {
     return (*this);
 }
 
-CPU& CPU::bytes(uint16_t sz) {
+CPU& CPU::bytes(uint64_t sz) {
     /*  Set bytecode size, so the CPU can stop execution even if it doesn't reach HALT instruction but reaches
      *  bytecode address out of bounds.
      */
@@ -49,7 +49,7 @@ CPU& CPU::bytes(uint16_t sz) {
     return (*this);
 }
 
-CPU& CPU::eoffset(uint16_t o) {
+CPU& CPU::eoffset(uint64_t o) {
     /*  Set offset of first executable instruction.
      */
     executable_offset = o;

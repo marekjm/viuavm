@@ -689,7 +689,7 @@ vector<string> expandSource(const vector<string>& lines, map<unsigned, unsigned>
 int generate(const vector<string>& expanded_lines, const map<unsigned, unsigned>& expanded_lines_to_source_lines, vector<string>& ilines, invocables_t& functions, invocables_t& blocks, string& filename, string& compilename, const vector<string>& commandline_given_links, const compilationflags_t& flags) {
     //////////////////////////////
     // SETUP INITIAL BYTECODE SIZE
-    uint16_t bytes = 0;
+    uint64_t bytes = 0;
 
 
     /////////////////////////
@@ -795,7 +795,7 @@ int generate(const vector<string>& expanded_lines, const map<unsigned, unsigned>
     vector<string> linked_function_names;
     vector<string> linked_block_names;
     map<string, vector<unsigned> > linked_libs_jumptables;
-    uint16_t current_link_offset = bytes;
+    uint64_t current_link_offset = bytes;
 
     for (string lnk : commandline_given_links) {
         if (find(links.begin(), links.end(), lnk) == links.end()) {
@@ -1178,7 +1178,7 @@ int generate(const vector<string>& expanded_lines, const map<unsigned, unsigned>
 
     //////////////////////
     // WRITE BYTECODE SIZE
-    out.write((const char*)&bytes, 16);
+    out.write((const char*)&bytes, sizeof(uint64_t));
 
     byte* program_bytecode = new byte[bytes];
     int program_bytecode_used = 0;
@@ -1237,7 +1237,7 @@ int generate(const vector<string>& expanded_lines, const map<unsigned, unsigned>
 
     ////////////////////////////////////
     // WRITE STATICALLY LINKED LIBRARIES
-    uint16_t bytes_offset = current_link_offset;
+    uint64_t bytes_offset = current_link_offset;
     for (tuple<string, uint16_t, char*> lnk : linked_libs_bytecode) {
         string lib_name;
         byte* linked_bytecode;

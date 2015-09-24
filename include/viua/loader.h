@@ -17,7 +17,7 @@ typedef std::tuple<std::vector<std::string>, std::map<std::string, uint16_t> > I
 class Loader {
     std::string path;
 
-    uint16_t size;
+    uint64_t size;
     byte* bytecode;
 
     std::vector<unsigned> jumps;
@@ -40,7 +40,7 @@ class Loader {
     Loader& load();
     Loader& executable();
 
-    uint16_t getBytecodeSize();
+    uint64_t getBytecodeSize();
     byte* getBytecode();
 
     std::vector<unsigned> getJumps();
