@@ -128,11 +128,11 @@ int main(int argc, char* argv[]) {
     uint64_t bytes = loader.getBytecodeSize();
     byte* bytecode = loader.getBytecode();
 
-    map<string, uint16_t> function_address_mapping = loader.getFunctionAddresses();
+    map<string, uint64_t> function_address_mapping = loader.getFunctionAddresses();
     vector<string> functions = loader.getFunctions();
     map<string, unsigned> function_sizes = loader.getFunctionSizes();
 
-    map<string, uint16_t> block_address_mapping = loader.getBlockAddresses();
+    map<string, uint64_t> block_address_mapping = loader.getBlockAddresses();
     vector<string> blocks = loader.getBlocks();
     map<string, uint64_t> block_sizes;
 

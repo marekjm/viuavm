@@ -1051,7 +1051,7 @@ int main(int argc, char* argv[]) {
     CPU cpu;
     cpu.debug = true;
 
-    map<string, uint16_t> function_address_mapping = loader.getFunctionAddresses();
+    map<string, uint64_t> function_address_mapping = loader.getFunctionAddresses();
     uint16_t starting_instruction = function_address_mapping["__entry"];
     for (auto p : function_address_mapping) { cpu.mapfunction(p.first, p.second); }
     for (auto p : loader.getBlockAddresses()) { cpu.mapblock(p.first, p.second); }

@@ -154,7 +154,7 @@ vector<unsigned> Loader::getJumps() {
     return jumps;
 }
 
-map<string, uint16_t> Loader::getFunctionAddresses() {
+map<string, uint64_t> Loader::getFunctionAddresses() {
     return function_addresses;
 }
 map<string, unsigned> Loader::getFunctionSizes() {
@@ -164,7 +164,7 @@ vector<string> Loader::getFunctions() {
     return functions;
 }
 
-map<string, uint16_t> Loader::getBlockAddresses() {
+map<string, uint64_t> Loader::getBlockAddresses() {
     return block_addresses;
 }
 vector<string> Loader::getBlocks() {

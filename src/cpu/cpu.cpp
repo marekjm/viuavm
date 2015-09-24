@@ -435,14 +435,14 @@ void CPU::loadNativeLibrary(const string& module) {
         linked_modules[module] = pair<unsigned, byte*>(unsigned(loader.getBytecodeSize()), lnk_btcd);
 
         vector<string> fn_names = loader.getFunctions();
-        map<string, uint16_t> fn_addrs = loader.getFunctionAddresses();
+        map<string, uint64_t> fn_addrs = loader.getFunctionAddresses();
         for (unsigned i = 0; i < fn_names.size(); ++i) {
             string fn_linkname = fn_names[i];
             linked_functions[fn_linkname] = pair<string, byte*>(module, (lnk_btcd+fn_addrs[fn_names[i]]));
         }
 
         vector<string> bl_names = loader.getBlocks();
-        map<string, uint16_t> bl_addrs = loader.getBlockAddresses();
+        map<string, uint64_t> bl_addrs = loader.getBlockAddresses();
         for (unsigned i = 0; i < bl_names.size(); ++i) {
             string bl_linkname = bl_names[i];
             linked_blocks[bl_linkname] = pair<string, byte*>(module, (lnk_btcd+bl_addrs[bl_linkname]));
