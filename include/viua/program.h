@@ -163,7 +163,7 @@ class Program {
     uint64_t size();
     int instructionCount();
 
-    static uint16_t countBytes(const std::vector<std::string>&);
+    static uint64_t countBytes(const std::vector<std::string>&);
 
     Program(uint64_t bts = 2): bytes(bts), debug(false), scream(false) {
         program = new byte[bytes];

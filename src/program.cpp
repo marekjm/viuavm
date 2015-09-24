@@ -108,7 +108,7 @@ OPCODE instructionToOpcode(const string& s) {
     return op;
 }
 
-uint16_t Program::countBytes(const vector<string>& lines) {
+uint64_t Program::countBytes(const vector<string>& lines) {
     /** Counts bytecode size required for a program.
      *
      *  Knowing how many instructions are in a program, and
