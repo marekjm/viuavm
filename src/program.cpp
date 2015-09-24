@@ -15,7 +15,7 @@ byte* Program::bytecode() {
      *  Calling code is responsible for proper destruction of the allocated memory.
      */
     byte* tmp = new byte[bytes];
-    for (int i = 0; i < bytes; ++i) {
+    for (decltype(bytes) i = 0; i < bytes; ++i) {
         tmp[i] = program[i];
     }
     return tmp;
@@ -62,7 +62,7 @@ int Program::instructionCount() {
      *  performing bytecode analysis.
      */
     int counter = 0;
-    for (long i = 0; i < bytes; ++i) {
+    for (decltype(bytes) i = 0; i < bytes; ++i) {
         switch (program[i]) {
             case IADD:
             case ISUB:
