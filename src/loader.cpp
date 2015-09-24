@@ -46,7 +46,7 @@ void Loader::calculateFunctionSizes() {
             el_size = (b-a);
         } else {
             long unsigned a = (long unsigned)(function_addresses[name]);
-            long unsigned b = (long unsigned)size;
+            long unsigned b = size;
             el_size = (b-a);
         }
 
