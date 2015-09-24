@@ -134,11 +134,11 @@ int main(int argc, char* argv[]) {
 
     map<string, uint16_t> block_address_mapping = loader.getBlockAddresses();
     vector<string> blocks = loader.getBlocks();
-    map<string, unsigned> block_sizes;
+    map<string, uint64_t> block_sizes;
 
     map<string, uint16_t> element_address_mapping;
     vector<string> elements;
-    map<string, unsigned> element_sizes;
+    map<string, uint64_t> element_sizes;
     map<string, string> element_types;
 
     vector<string> disassembled_lines;
