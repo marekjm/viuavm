@@ -72,14 +72,14 @@ CPU& CPU::preload() {
     return (*this);
 }
 
-CPU& CPU::mapfunction(const string& name, unsigned address) {
+CPU& CPU::mapfunction(const string& name, uint64_t address) {
     /** Maps function name to bytecode address.
      */
     function_addresses[name] = address;
     return (*this);
 }
 
-CPU& CPU::mapblock(const string& name, unsigned address) {
+CPU& CPU::mapblock(const string& name, uint64_t address) {
     /** Maps block name to bytecode address.
      */
     block_addresses[name] = address;

@@ -70,8 +70,8 @@ class CPU {
     /*  Function and block names mapped to bytecode addresses.
      */
     byte* jump_base;
-    std::map<std::string, unsigned> function_addresses;
-    std::map<std::string, unsigned> block_addresses;
+    std::map<std::string, uint64_t> function_addresses;
+    std::map<std::string, uint64_t> block_addresses;
 
     std::map<std::string, std::pair<std::string, byte*>> linked_functions;
     std::map<std::string, std::pair<std::string, byte*>> linked_blocks;
@@ -255,8 +255,8 @@ class CPU {
         CPU& eoffset(uint64_t);
         CPU& preload();
 
-        CPU& mapfunction(const std::string&, unsigned);
-        CPU& mapblock(const std::string&, unsigned);
+        CPU& mapfunction(const std::string&, uint64_t);
+        CPU& mapblock(const std::string&, uint64_t);
 
         CPU& registerExternalFunction(const std::string&, ExternalFunction*);
         CPU& removeExternalFunction(std::string);
