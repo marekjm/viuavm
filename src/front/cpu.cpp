@@ -86,7 +86,7 @@ int main(int argc, char* argv[]) {
     Loader loader(filename);
     loader.executable();
 
-    uint16_t bytes = loader.getBytecodeSize();
+    uint64_t bytes = loader.getBytecodeSize();
     byte* bytecode = loader.getBytecode();
 
     CPU cpu;

@@ -125,7 +125,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    uint16_t bytes = loader.getBytecodeSize();
+    uint64_t bytes = loader.getBytecodeSize();
     byte* bytecode = loader.getBytecode();
 
     map<string, uint16_t> function_address_mapping = loader.getFunctionAddresses();
