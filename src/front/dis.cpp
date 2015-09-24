@@ -146,7 +146,7 @@ int main(int argc, char* argv[]) {
 
 
     string name;
-    unsigned el_size;
+    uint64_t el_size;
 
     for (unsigned i = 0; i < blocks.size(); ++i) {
         name = blocks[i];
