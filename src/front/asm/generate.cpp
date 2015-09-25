@@ -267,7 +267,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         } else if (str::startswith(line, "fstore")) {
             string regno_chnk, float_chnk;
             tie(regno_chnk, float_chnk) = assembler::operands::get2(operands);
-            program.fstore(assembler::operands::getint(resolveregister(regno_chnk, names)), stod(float_chnk));
+            program.fstore(assembler::operands::getint(resolveregister(regno_chnk, names)), static_cast<float>(stod(float_chnk)));
         } else if (str::startswith(line, "fadd")) {
             assemble_three_intop_instruction(program, names, "fadd", operands);
         } else if (str::startswith(line, "fsub")) {
