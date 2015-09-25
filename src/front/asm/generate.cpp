@@ -630,8 +630,8 @@ void assemble(Program& program, const vector<string>& lines) {
 }
 
 
-map<string, uint16_t> mapInvokableAddresses(uint16_t& starting_instruction, const vector<string>& names, const map<string, vector<string> >& sources) {
-    map<string, uint16_t> addresses;
+map<string, uint64_t> mapInvokableAddresses(uint64_t& starting_instruction, const vector<string>& names, const map<string, vector<string> >& sources) {
+    map<string, uint64_t> addresses;
     for (string name : names) {
         addresses[name] = starting_instruction;
         try {
@@ -744,9 +744,9 @@ int generate(const vector<string>& expanded_lines, const map<unsigned, unsigned>
     // MAP FUNCTIONS TO ADDRESSES AND
     // MAP blocks.bodies TO ADDRESSES AND
     // SET STARTING INSTRUCTION
-    uint16_t starting_instruction = 0;  // the bytecode offset to first executable instruction
-    map<string, uint16_t> function_addresses;
-    map<string, uint16_t> block_addresses;
+    uint64_t starting_instruction = 0;  // the bytecode offset to first executable instruction
+    map<string, uint64_t> function_addresses;
+    map<string, uint64_t> block_addresses;
     try {
         block_addresses = mapInvokableAddresses(starting_instruction, blocks.names, blocks.bodies);
         function_addresses = mapInvokableAddresses(starting_instruction, functions.names, functions.bodies);
