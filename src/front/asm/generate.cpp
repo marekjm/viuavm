@@ -643,7 +643,7 @@ map<string, uint64_t> mapInvocableAddresses(uint64_t& starting_instruction, cons
     return addresses;
 }
 
-vector<string> expandSource(const vector<string>& lines, map<unsigned, unsigned>& expanded_lines_to_source_lines) {
+vector<string> expandSource(const vector<string>& lines, map<long unsigned, long unsigned>& expanded_lines_to_source_lines) {
     vector<string> stripped_lines;
 
     for (unsigned i = 0; i < lines.size(); ++i) {
@@ -686,7 +686,7 @@ vector<string> expandSource(const vector<string>& lines, map<unsigned, unsigned>
     return asm_lines;
 }
 
-int generate(const vector<string>& expanded_lines, const map<unsigned, unsigned>& expanded_lines_to_source_lines, vector<string>& ilines, invocables_t& functions, invocables_t& blocks, string& filename, string& compilename, const vector<string>& commandline_given_links, const compilationflags_t& flags) {
+int generate(const vector<string>& expanded_lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, vector<string>& ilines, invocables_t& functions, invocables_t& blocks, string& filename, string& compilename, const vector<string>& commandline_given_links, const compilationflags_t& flags) {
     //////////////////////////////
     // SETUP INITIAL BYTECODE SIZE
     uint64_t bytes = 0;

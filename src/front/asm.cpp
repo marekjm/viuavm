@@ -183,7 +183,7 @@ int main(int argc, char* argv[]) {
     string line;
     while (getline(in, line)) { lines.push_back(line); }
 
-    map<unsigned, unsigned> expanded_lines_to_source_lines;
+    map<long unsigned, long unsigned> expanded_lines_to_source_lines;
     vector<string> expanded_lines = expandSource(lines, expanded_lines_to_source_lines);
     if (EXPAND_ONLY) {
         for (unsigned i = 0; i < expanded_lines.size(); ++i) {
