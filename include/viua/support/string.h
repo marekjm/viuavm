@@ -24,7 +24,7 @@ namespace str {
 
     std::string join(const std::string& s, const std::vector<std::string>& v);
     template<typename T> std::string join(const std::vector<std::string>& seq, const T& delim) {
-        unsigned sz = seq.size();
+        auto sz = seq.size();
         std::ostringstream oss;
         for (unsigned i = 0; i < sz; ++i) {
             oss << seq[i];

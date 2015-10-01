@@ -50,7 +50,7 @@ string assembler::verify::frameBalance(const vector<string>& lines, const map<lo
     string instruction;
 
     int balance = 0;
-    int previous_frame_spawnline = 0;
+    long unsigned previous_frame_spawnline = 0;
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = lines[i];
         if (line.size() == 0) { continue; }
