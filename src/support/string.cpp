@@ -71,11 +71,11 @@ namespace str {
         int dot = -1;
         for (unsigned i = start; i < s.size(); ++i) {
             if (s[i] == '.') {
-                dot = (int)i;
+                dot = static_cast<int>(i);
                 break;
             }
         }
-        is = isnum(sub(s, 0, dot), negatives) and isnum(sub(s, dot+1));
+        is = isnum(sub(s, 0, dot), negatives) and isnum(sub(s, (static_cast<unsigned>(dot)+1)));
         return is;
     }
 
@@ -89,11 +89,11 @@ namespace str {
         ostringstream part;
         part.str("");
 
-        unsigned end;
-        if (e < 0) { end = unsigned(s.size() + e + 1); }
-        else { end = unsigned(e); }
+        long unsigned end;
+        if (e < 0) { end = (s.size() + e + 1); }
+        else { end = static_cast<long unsigned>(e); }
 
-        for (unsigned i = unsigned(b); i < s.size() and i < end; ++i) {
+        for (long unsigned i = b; i < s.size() and i < end; ++i) {
             part << s[i];
         }
 

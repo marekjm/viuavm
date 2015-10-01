@@ -6,6 +6,7 @@
 #include "../types/type.h"
 
 typedef unsigned char mask_t;
+typedef long unsigned registerset_size_type;
 
 enum REGISTER_MASKS: mask_t {
     REFERENCE       = (1 << 0),
@@ -17,7 +18,7 @@ enum REGISTER_MASKS: mask_t {
 
 
 class RegisterSet {
-    unsigned registerset_size;
+    registerset_size_type registerset_size;
     Type** registers;
     mask_t*  masks;
 
@@ -42,11 +43,11 @@ class RegisterSet {
         mask_t getmask(unsigned);
 
         void drop();
-        inline unsigned size() { return registerset_size; }
+        inline registerset_size_type size() { return registerset_size; }
 
         RegisterSet* copy();
 
-        RegisterSet(unsigned sz);
+        RegisterSet(registerset_size_type sz);
         ~RegisterSet();
 };
 
