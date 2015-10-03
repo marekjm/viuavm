@@ -121,8 +121,8 @@ class Program {
     Program& argc       (int_op);
 
     Program& call       (int_op, const std::string&);
-    Program& jump       (int, enum JUMPTYPE);
-    Program& branch     (int_op, int, enum JUMPTYPE, int, enum JUMPTYPE);
+    Program& jump       (uint64_t, enum JUMPTYPE);
+    Program& branch     (int_op, uint64_t, enum JUMPTYPE, uint64_t, enum JUMPTYPE);
 
     Program& vmtry      ();
     Program& vmcatch    (std::string, std::string);
@@ -151,8 +151,8 @@ class Program {
      */
     Program& calculateBranches(unsigned offset = 0); // FIXME: is unused, scheduled for removal
     Program& calculateJumps(std::vector<std::tuple<int, int> >);
-    std::vector<unsigned> jumps();
-    std::vector<unsigned> jumpsAbsolute();
+    std::vector<uint64_t> jumps();
+    std::vector<uint64_t> jumpsAbsolute();
 
     byte* bytecode();
     Program& fill(byte*);

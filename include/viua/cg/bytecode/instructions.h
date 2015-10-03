@@ -91,8 +91,8 @@ namespace cg {
         byte* argc(byte*, int_op);
         byte* call(byte*, int_op, const std::string&);
 
-        byte* jump(byte*, int);
-        byte* branch(byte*, int_op, int, int);
+        byte* jump(byte*, uint64_t);
+        byte* branch(byte*, int_op, uint64_t, uint64_t);
 
         byte* vmtry(byte*);
         byte* vmcatch(byte*, const std::string&, const std::string&);

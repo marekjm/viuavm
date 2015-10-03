@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <map>
 #include <vector>
 #include <string>
@@ -95,8 +96,8 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "arg",    sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
     { "argc",   sizeof(byte) + sizeof(bool) + sizeof(int) },
 
-    { "jump",   sizeof(byte) + sizeof(int) },
-    { "branch", sizeof(byte) + sizeof(bool) + 3*sizeof(int) },
+    { "jump",   sizeof(byte) + sizeof(uint64_t) },
+    { "branch", sizeof(byte) + sizeof(bool)+sizeof(int) + 2*sizeof(uint64_t) },
 
     { "throw",  sizeof(byte) + sizeof(int) + sizeof(bool) },
     { "catch",  sizeof(byte) }, // catch "<type>" <block>

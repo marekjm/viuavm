@@ -201,7 +201,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case JUMP:
             oss << " 0x";
             oss << hex;
-            oss << *(int*)ptr;
+            oss << *reinterpret_cast<uint64_t*>(ptr);
 
             oss << dec;
 
@@ -213,13 +213,13 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
 
             oss << " 0x";
             oss << hex;
-            oss << *(int*)ptr;
-            pointer::inc<int, byte>(ptr);
+            oss << *reinterpret_cast<uint64_t*>(ptr);
+            pointer::inc<uint64_t, byte>(ptr);
 
             oss << " 0x";
             oss << hex;
-            oss << *(int*)ptr;
-            pointer::inc<int, byte>(ptr);
+            oss << *reinterpret_cast<uint64_t*>(ptr);
+            pointer::inc<uint64_t, byte>(ptr);
 
             oss << dec;
 

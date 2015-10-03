@@ -715,7 +715,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* jump(byte* addr_ptr, int addr) {
+        byte* jump(byte* addr_ptr, uint64_t addr) {
             /*  Inserts jump instruction. Parameter is instruction index.
              *  Byte offset is calculated automatically.
              *
@@ -725,24 +725,27 @@ namespace cg {
              */
             *(addr_ptr++) = JUMP;
 
-            *((int*)addr_ptr) = addr;
-            pointer::inc<int, byte>(addr_ptr);
+            // we *know* that this location in the byte array points to uint64_t so
+            // the reinterpret_cast<> is justified
+            *(reinterpret_cast<uint64_t*>(addr_ptr)) = addr;
+            pointer::inc<uint64_t, byte>(addr_ptr);
 
             return addr_ptr;
         }
 
-        byte* branch(byte* addr_ptr, int_op regc, int addr_truth, int addr_false) {
+        byte* branch(byte* addr_ptr, int_op regc, uint64_t addr_truth, uint64_t addr_false) {
             /*  Inserts branch instruction.
              *  Byte offset is calculated automatically.
              */
             *(addr_ptr++) = BRANCH;
             addr_ptr = insertIntegerOperand(addr_ptr, regc);
 
-            *((int*)addr_ptr) = addr_truth;
-            pointer::inc<int, byte>(addr_ptr);
-
-            *((int*)addr_ptr) = addr_false;
-            pointer::inc<int, byte>(addr_ptr);
+            // we *know* that following locations in the byte array point to uint64_t so
+            // the reinterpret_cast<> is justified
+            *(reinterpret_cast<uint64_t*>(addr_ptr)) = addr_truth;
+            pointer::inc<uint64_t, byte>(addr_ptr);
+            *(reinterpret_cast<uint64_t*>(addr_ptr)) = addr_false;
+            pointer::inc<uint64_t, byte>(addr_ptr);
 
             return addr_ptr;
         }

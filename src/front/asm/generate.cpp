@@ -902,7 +902,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         if (VERBOSE or DEBUG) {
             cout << "[asm] message: generating bytecode for block \"" << name << '"';
         }
-        uint16_t fun_bytes = 0;
+        uint64_t fun_bytes = 0;
         try {
             fun_bytes = Program::countBytes(blocks.bodies.at(name));
             if (VERBOSE or DEBUG) {
@@ -931,8 +931,8 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
             exit(1);
         }
 
-        vector<unsigned> jumps = func.jumps();
-        vector<unsigned> jumps_absolute = func.jumpsAbsolute();
+        vector<uint64_t> jumps = func.jumps();
+        vector<uint64_t> jumps_absolute = func.jumpsAbsolute();
 
         vector<tuple<int, int> > local_jumps;
         for (unsigned i = 0; i < jumps.size(); ++i) {
@@ -1004,8 +1004,8 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
             exit(1);
         }
 
-        vector<unsigned> jumps = func.jumps();
-        vector<unsigned> jumps_absolute = func.jumpsAbsolute();
+        vector<uint64_t> jumps = func.jumps();
+        vector<uint64_t> jumps_absolute = func.jumpsAbsolute();
 
         vector<tuple<int, int> > local_jumps;
         for (unsigned i = 0; i < jumps.size(); ++i) {

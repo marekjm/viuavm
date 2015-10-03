@@ -74,7 +74,8 @@ int Program::instructionCount() {
             case IGTE:
             case IEQ:
             case BRANCH:
-                i += 3 * sizeof(int);
+                i += sizeof(int);
+                i += 2*sizeof(uint64_t);
                 break;
             case ISTORE:
                 i += 2 * sizeof(int);
@@ -83,7 +84,7 @@ int Program::instructionCount() {
             case IDEC:
             case PRINT:
             case JUMP:
-                i += sizeof(int);
+                i += sizeof(uint64_t);
                 break;
         }
         ++counter;
@@ -308,21 +309,25 @@ Program& Program::calculateBranches(unsigned offset) {
      *  to calculate correct bytecode offsets for BRANCH and JUMP instructions.
      */
     int instruction_count = instructionCount();
-    int* ptr;
+    uint64_t* ptr;
 
     for (unsigned i = 0; i < branches.size(); ++i) {
-        ptr = (int*)(branches[i]);
+        // usually beware of the reinterpret_cast<>'s but here we *know* what we're doing
+        // we *know* that this location points to uint64_t even if it is stored inside the byte array
+        ptr = reinterpret_cast<uint64_t*>(branches[i]);
         cout << "[brch] calculating jump at " << (int)(branches[i]-program) << ", " << hex << (long)branches[i] << dec << " (target: " << *ptr << ") with offset " << offset << " = ";
         // FIXME: branches should be able to hold bigger values
-        (*ptr) = int(offset + getInstructionBytecodeOffset(*ptr, instruction_count));
+        (*ptr) = (offset + getInstructionBytecodeOffset(*ptr, instruction_count));
         cout << *ptr << endl;
     }
 
     for (unsigned i = 0; i < branches_absolute.size(); ++i) {
-        ptr = (int*)(branches_absolute[i]);
+        // usually beware of the reinterpret_cast<>'s but here we *know* what we're doing
+        // we *know* that this location points to uint64_t even if it is stored inside the byte array
+        ptr = reinterpret_cast<uint64_t*>(branches_absolute[i]);
         cout << "[brch] calculating jump at " << (int)(branches_absolute[i]-program) << ", " << hex << (long)branches_absolute[i] << dec << " (target: " << *ptr << ") with offset " << 0 << " = ";
         // FIXME: branches should be able to hold bigger values
-        (*ptr) = int(getInstructionBytecodeOffset(*ptr, instruction_count));
+        (*ptr) = getInstructionBytecodeOffset(*ptr, instruction_count);
         cout << *ptr << endl;
     }
 
@@ -333,18 +338,22 @@ Program& Program::calculateJumps(vector<tuple<int, int> > jump_positions) {
     /** Calculate jump targets in given bytecode.
      */
     int instruction_count = instructionCount();
-    int* ptr;
+    uint64_t* ptr;
 
-    int position, offset, adjustment;
+    int position, offset;
+    uint64_t adjustment;
     for (tuple<int, int> jmp : jump_positions) {
         tie(position, offset) = jmp;
-        ptr = (int*)(program+position);
+
+        // usually beware of the reinterpret_cast<>'s but here we *know* what we're doing
+        // we *know* that this location points to uint64_t even if it is stored inside the byte array
+        ptr = reinterpret_cast<uint64_t*>(program+position);
         if (debug) {
             cout << "[bcgen:jump] calculating jump at " << position << " (target: " << *ptr << ") with offset " << offset << endl;
         }
         // FIXME: branches should be able to hold bigger values
-        adjustment = int(getInstructionBytecodeOffset(*ptr, instruction_count));
-        (*ptr) = offset + adjustment;
+        adjustment = static_cast<uint64_t>(getInstructionBytecodeOffset(*ptr, instruction_count));
+        (*ptr) = (offset + adjustment);
         if (debug) {
             cout << "[bcgen:jump] calculated jump at " << position << " (total: " << adjustment << ") with offset " << offset << " = ";
             cout << *ptr << endl;
@@ -354,18 +363,18 @@ Program& Program::calculateJumps(vector<tuple<int, int> > jump_positions) {
     return (*this);
 }
 
-vector<unsigned> Program::jumps() {
+vector<uint64_t> Program::jumps() {
     /** Returns vector if bytecode points which contain jumps.
      */
-    vector<unsigned> jmps;
-    for (byte* jmp : branches) { jmps.push_back( (unsigned)(jmp-program) ); }
+    vector<uint64_t> jmps;
+    for (byte* jmp : branches) { jmps.push_back( static_cast<uint64_t>(jmp-program) ); }
     return jmps;
 }
 
-vector<unsigned> Program::jumpsAbsolute() {
+vector<uint64_t> Program::jumpsAbsolute() {
     /** Returns vector if bytecode points which contain absolute jumps.
      */
-    vector<unsigned> jmps;
-    for (byte* jmp : branches_absolute) { jmps.push_back( (unsigned)(jmp-program) ); }
+    vector<uint64_t> jmps;
+    for (byte* jmp : branches_absolute) { jmps.push_back( static_cast<uint64_t>(jmp-program) ); }
     return jmps;
 }
