@@ -888,12 +888,12 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     //
     // BYTECODE IS GENERATED HERE BUT NOT YET WRITTEN TO FILE
     // THIS MUST BE GENERATED HERE TO OBTAIN FILL JUMP TABLE
-    map<string, tuple<int, byte*> > functions_bytecode;
+    map<string, tuple<uint64_t, byte*> > functions_bytecode;
     map<string, tuple<uint64_t, byte*> > block_bodies_bytecode;
     uint64_t functions_section_size = 0;
     uint64_t block_bodies_section_size = 0;
 
-    vector<tuple<int, int> > jump_positions;
+    vector<tuple<uint64_t, uint64_t> > jump_positions;
 
     for (string name : blocks.names) {
         // do not generate bytecode for blocks.bodies that were linked
@@ -934,7 +934,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         vector<uint64_t> jumps = func.jumps();
         vector<uint64_t> jumps_absolute = func.jumpsAbsolute();
 
-        vector<tuple<int, int> > local_jumps;
+        vector<tuple<uint64_t, uint64_t> > local_jumps;
         for (unsigned i = 0; i < jumps.size(); ++i) {
             uint64_t jmp = jumps[i];
             local_jumps.push_back(tuple<int, int>(jmp, block_bodies_section_size));
@@ -975,7 +975,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         if (VERBOSE or DEBUG) {
             cout << "[asm] message: generating bytecode for function \"" << name << '"';
         }
-        uint16_t fun_bytes = 0;
+        uint64_t fun_bytes = 0;
         try {
             fun_bytes = Program::countBytes(name == ENTRY_FUNCTION_NAME ? filter(functions.bodies.at(name)) : functions.bodies.at(name));
             if (VERBOSE or DEBUG) {
@@ -1007,9 +1007,9 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         vector<uint64_t> jumps = func.jumps();
         vector<uint64_t> jumps_absolute = func.jumpsAbsolute();
 
-        vector<tuple<int, int> > local_jumps;
+        vector<tuple<uint64_t, uint64_t> > local_jumps;
         for (unsigned i = 0; i < jumps.size(); ++i) {
-            unsigned jmp = jumps[i];
+            uint64_t jmp = jumps[i];
             local_jumps.push_back(tuple<int, int>(jmp, functions_section_size));
         }
         func.calculateJumps(local_jumps);

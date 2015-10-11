@@ -333,15 +333,15 @@ Program& Program::calculateBranches(unsigned offset) {
     return (*this);
 }
 
-Program& Program::calculateJumps(vector<tuple<int, int> > jump_positions) {
+Program& Program::calculateJumps(vector<tuple<uint64_t, uint64_t> > jump_positions) {
     /** Calculate jump targets in given bytecode.
      */
-    int instruction_count = instructionCount();
+    uint64_t instruction_count = instructionCount();
     uint64_t* ptr;
 
     int position, offset;
     uint64_t adjustment;
-    for (tuple<int, int> jmp : jump_positions) {
+    for (auto jmp : jump_positions) {
         tie(position, offset) = jmp;
 
         // usually beware of the reinterpret_cast<>'s but here we *know* what we're doing
