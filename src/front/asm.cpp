@@ -298,6 +298,9 @@ int main(int argc, char* argv[]) {
     } catch (const string& e) {
         ret_code = 1;
         cout << "fatal: exception occured during assembling: " << e << endl;
+    } catch (const char* e) {
+        ret_code = 1;
+        cout << "fatal: exception occured during assembling: " << e << endl;
     }
 
     return ret_code;
