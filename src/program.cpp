@@ -350,8 +350,7 @@ Program& Program::calculateJumps(vector<tuple<int, int> > jump_positions) {
         if (debug) {
             cout << "[bcgen:jump] calculating jump at " << position << " (target: " << *ptr << ") with offset " << offset << endl;
         }
-        // FIXME: branches should be able to hold bigger values
-        adjustment = static_cast<uint64_t>(getInstructionBytecodeOffset(*ptr, instruction_count));
+        adjustment = getInstructionBytecodeOffset(*ptr, instruction_count);
         (*ptr) = (offset + adjustment);
         if (debug) {
             cout << "[bcgen:jump] calculated jump at " << position << " (total: " << adjustment << ") with offset " << offset << " = ";
