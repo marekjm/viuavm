@@ -35,9 +35,9 @@ namespace str {
         return oss.str();
     }
 
-    template<typename T> std::string strmul(const T& s, unsigned times) {
+    template<typename T> std::string strmul(const T& s, long unsigned times) {
         std::ostringstream oss;
-        for (unsigned i = 0; i < times; ++i) {
+        for (long unsigned i = 0; i < times; ++i) {
             oss << s;
         }
         return oss.str();
