@@ -1279,7 +1279,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         program_bytecode_used += linked_size;
     }
 
-    out.write((const char*)program_bytecode, bytes);
+    out.write(program_bytecode, bytes);
     out.close();
 
     return 0;
