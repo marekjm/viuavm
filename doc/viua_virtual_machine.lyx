@@ -5040,7 +5040,7 @@ status open
 
 \begin_layout Plain Layout
 
-	jump :not_so_fast
+	jump not_so_fast
 \end_layout
 
 \begin_layout Plain Layout
