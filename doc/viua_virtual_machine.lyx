@@ -186,7 +186,7 @@ This section features a brief overview of the Viua VM; its history, development
  goals, influences and various other bits and pieces of information more
  or less related to the development of the idea and resulting code of the
  virtual machine.
- It is contains more prose and casual writing than technicalities.
+ It contains more prose and casual writing than technicalities.
  More technical discussion begins in Part 
 \begin_inset CommandInset ref
 LatexCommand vref
@@ -3209,7 +3209,7 @@ izero 1
 \begin_inset Quotes erd
 \end_inset
 
- will store 0 in first regitser, but 
+ will store 0 in first register, but 
 \begin_inset Quotes eld
 \end_inset
 
@@ -4033,7 +4033,7 @@ A closure can be created from any defined function written in machine's
 \begin_layout Standard
 Before a closure is created, machine scans current register set for registers
  marked with BIND flag.
- Any such mared register is then inserted into the local registerset of
+ Any such marked register is then inserted into the local register set of
  a closure - where it has REFERENCE flag set - and flag in current registerset
  is changed from BIND to BOUND.
  It is allowed to create closures that bind no objects - such empty closures
@@ -5054,7 +5054,7 @@ status open
 
 \begin_layout Plain Layout
 
-	.mark: no_so_fast
+	.mark: not_so_fast
 \end_layout
 
 \begin_layout Plain Layout
@@ -5385,7 +5385,7 @@ main
 \family default
  is defined in the 
 \family typewriter
-main.wlib
+main.vlib
 \family default
  library.
 \end_layout
