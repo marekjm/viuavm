@@ -1021,7 +1021,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
 
         // extend jump table with jumps from current function
         for (unsigned i = 0; i < jumps.size(); ++i) {
-            unsigned jmp = jumps[i];
+            uint64_t jmp = jumps[i];
             if (DEBUG) {
                 cout << "[asm] debug: pushed relative jump to jump table: " << jmp << '+' << functions_section_size << endl;
             }
@@ -1046,10 +1046,10 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         if (DEBUG) {
             cout << "debug: jump table has " << jump_table.size() << " entries" << endl;
         }
-        unsigned total_jumps = jump_table.size();
+        uint64_t total_jumps = jump_table.size();
         out.write((const char*)&total_jumps, sizeof(unsigned));
 
-        unsigned jmp;
+        uint64_t jmp;
         for (unsigned i = 0; i < total_jumps; ++i) {
             jmp = jump_table[i];
             out.write((const char*)&jmp, sizeof(unsigned));
