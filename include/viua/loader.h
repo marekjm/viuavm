@@ -20,7 +20,7 @@ class Loader {
     uint64_t size;
     byte* bytecode;
 
-    std::vector<unsigned> jumps;
+    std::vector<uint64_t> jumps;
 
     std::map<std::string, uint64_t> function_addresses;
     std::map<std::string, uint64_t> function_sizes;
@@ -43,7 +43,7 @@ class Loader {
     uint64_t getBytecodeSize();
     byte* getBytecode();
 
-    std::vector<unsigned> getJumps();
+    std::vector<uint64_t> getJumps();
 
     std::map<std::string, uint64_t> getFunctionAddresses();
     std::map<std::string, uint64_t> getFunctionSizes();

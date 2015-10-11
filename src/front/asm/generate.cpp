@@ -799,7 +799,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     vector<tuple<string, uint64_t, char*> > linked_libs_bytecode;
     vector<string> linked_function_names;
     vector<string> linked_block_names;
-    map<string, vector<unsigned> > linked_libs_jumptables;
+    map<string, vector<uint64_t> > linked_libs_jumptables;
     uint64_t current_link_offset = bytes;
 
     for (string lnk : commandline_given_links) {
@@ -816,7 +816,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         Loader loader(lnk);
         loader.load();
 
-        vector<unsigned> lib_jumps = loader.getJumps();
+        vector<uint64_t> lib_jumps = loader.getJumps();
         if (DEBUG) {
             cout << "[loader] entries in jump table: " << lib_jumps.size() << endl;
             for (unsigned i = 0; i < lib_jumps.size(); ++i) {
@@ -1254,7 +1254,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
             cout << "[linker] message: linked module \"" << lib_name <<  "\" written at offset " << bytes_offset << endl;
         }
 
-        vector<unsigned> linked_jumptable;
+        vector<uint64_t> linked_jumptable;
         try {
             linked_jumptable = linked_libs_jumptables[lib_name];
         } catch (const std::out_of_range& e) {

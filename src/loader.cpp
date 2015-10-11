@@ -158,7 +158,7 @@ byte* Loader::getBytecode() {
     return copy;
 }
 
-vector<unsigned> Loader::getJumps() {
+vector<uint64_t> Loader::getJumps() {
     return jumps;
 }
 
