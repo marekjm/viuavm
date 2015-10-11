@@ -211,7 +211,7 @@ uint64_t Program::countBytes(const vector<string>& lines) {
 }
 
 
-uint64_t Program::getInstructionBytecodeOffset(int instr, int count) {
+uint64_t Program::getInstructionBytecodeOffset(uint64_t instr, uint64_t count) {
     /** Returns bytecode offset for given instruction index.
      *
      *  The "count" parameter is there to pass assumed instruction count to
@@ -220,11 +220,11 @@ uint64_t Program::getInstructionBytecodeOffset(int instr, int count) {
      */
 
     // check if instruction count was passed, and calculate it if not
-    count = (count >= 0 ? count : instructionCount());
+    count = (count > 0 ? count : instructionCount());
 
     uint64_t offset = 0;
-    long unsigned inc;
-    for (int i = 0; i < (instr >= 0 ? instr : count+instr); ++i) {
+    uint64_t inc;
+    for (uint64_t i = 0; i < instr; ++i) {
         /*  This loop iterates over so many instructions as needed to find bytecode offset for requested instruction.
          *
          *  Each time, the offset is increased by `inc` - which is equal to *1 plus size of operands of instructions at current index*.
@@ -237,7 +237,6 @@ uint64_t Program::getInstructionBytecodeOffset(int instr, int count) {
             oss << "instruction not found in OP_NAMES: " << OPCODE(program[offset]);
             throw oss.str();
         }
-
 
         try {
             inc = OP_SIZES.at(opcode_name);
