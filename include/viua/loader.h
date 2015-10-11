@@ -28,7 +28,7 @@ class Loader {
     std::map<std::string, uint64_t> block_addresses;
     std::vector<std::string> blocks;
 
-    IdToAddressMapping loadmap(char*, const uint16_t&);
+    IdToAddressMapping loadmap(char*, const uint64_t&);
     void calculateFunctionSizes();
 
     void loadJumpTable(std::ifstream&);

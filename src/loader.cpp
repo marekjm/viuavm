@@ -11,14 +11,16 @@ using namespace std;
 
 
 
-IdToAddressMapping Loader::loadmap(char* bytedump, const uint16_t& bytedump_size) {
+IdToAddressMapping Loader::loadmap(char* bytedump, const uint64_t& bytedump_size) {
     vector<string> order;
+    // FIXME: uint16_t -> uint64_t
     map<string, uint16_t> mapping;
 
     char *lib_function_ids_map = bytedump;
 
     long unsigned i = 0;
     string lib_fn_name;
+    // FIXME: uint16_t -> uint64_t
     uint16_t lib_fn_address;
     while (i < bytedump_size) {
         lib_fn_name = string(lib_function_ids_map);
@@ -67,13 +69,16 @@ void Loader::loadJumpTable(ifstream& in) {
     }
 }
 void Loader::loadFunctionsMap(ifstream& in) {
+    // FIXME: uint16_t -> uint64_t
     uint16_t lib_function_ids_section_size = 0;
+    // FIXME: uint16_t -> uint64_t
     in.read((char*)&lib_function_ids_section_size, sizeof(uint16_t));
 
     char *lib_buffer_function_ids = new char[lib_function_ids_section_size];
     in.read(lib_buffer_function_ids, lib_function_ids_section_size);
 
     vector<string> order;
+    // FIXME: uint16_t -> uint64_t
     map<string, uint16_t> mapping;
 
     tie(order, mapping) = loadmap(lib_buffer_function_ids, lib_function_ids_section_size);
@@ -85,13 +90,16 @@ void Loader::loadFunctionsMap(ifstream& in) {
     delete[] lib_buffer_function_ids;
 }
 void Loader::loadBlocksMap(ifstream& in) {
+    // FIXME: uint16_t -> uint64_t
     uint16_t lib_block_ids_section_size = 0;
+    // FIXME: uint16_t -> uint64_t
     in.read((char*)&lib_block_ids_section_size, sizeof(uint16_t));
 
     char *lib_buffer_block_ids = new char[lib_block_ids_section_size];
     in.read(lib_buffer_block_ids, lib_block_ids_section_size);
 
     vector<string> order;
+    // FIXME: uint16_t -> uint64_t
     map<string, uint16_t> mapping;
 
     tie(order, mapping) = loadmap(lib_buffer_block_ids, lib_block_ids_section_size);
