@@ -675,8 +675,8 @@ vector<string> expandSource(const vector<string>& lines, map<long unsigned, long
             asm_lines.push_back(lines[i]);
         } else {
             vector<vector<string>> decoded_lines = decode_line(stripped_lines[i]);
-            unsigned indent = (lines[i].size() - stripped_lines[i].size());
-            for (unsigned j = 0; j < decoded_lines.size(); ++j) {
+            auto indent = (lines[i].size() - stripped_lines[i].size());
+            for (decltype(decoded_lines)::size_type j = 0; j < decoded_lines.size(); ++j) {
                 expanded_lines_to_source_lines[asm_lines.size()] = i;
                 asm_lines.push_back(str::strmul<char>(' ', indent) + str::join<char>(decoded_lines[j], ' '));
             }
