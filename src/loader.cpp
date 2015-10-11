@@ -64,7 +64,7 @@ void Loader::loadJumpTable(ifstream& in) {
     in.read((char*)&lib_total_jumps, sizeof(decltype(lib_total_jumps)));
 
     // FIXME: unsigned -> uint64_t
-    unsigned lib_jmp;
+    uint64_t lib_jmp;
     for (unsigned i = 0; i < lib_total_jumps; ++i) {
         in.read((char*)&lib_jmp, sizeof(decltype(lib_jmp)));
         jumps.push_back(lib_jmp);
