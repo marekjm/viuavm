@@ -1060,10 +1060,6 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
             jmp = jump_table[i];
             bwrite(out, jmp);
         }
-    } else {
-        if (DEBUG) {
-            cout << "debug: skipping jump table write (not a library)" << endl;
-        }
     }
 
 
