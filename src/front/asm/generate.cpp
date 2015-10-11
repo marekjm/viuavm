@@ -1050,10 +1050,11 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         unsigned total_jumps = jump_table.size();
         out.write((const char*)&total_jumps, sizeof(decltype(total_jumps)));
 
-        uint64_t jmp;
+        // FIXME: unsigned -> uint64_t
+        unsigned jmp;
         for (unsigned i = 0; i < total_jumps; ++i) {
             jmp = jump_table[i];
-            out.write((const char*)&jmp, sizeof(unsigned));
+            out.write((const char*)&jmp, sizeof(decltype(jmp)));
         }
     } else {
         if (DEBUG) {
