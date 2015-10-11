@@ -1265,7 +1265,8 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         unsigned jmp, jmp_target;
         for (unsigned i = 0; i < linked_jumptable.size(); ++i) {
             jmp = linked_jumptable[i];
-            jmp_target = *((unsigned*)(linked_bytecode+jmp));
+            // we know what we're doing here
+            jmp_target = *reinterpret_cast<unsigned*>(linked_bytecode+jmp);
             if (DEBUG) {
                 cout << "[linker] adjusting jump: at position " << jmp << ", " << jmp_target << '+' << bytes_offset << " -> " << (jmp_target+bytes_offset) << endl;
             }
