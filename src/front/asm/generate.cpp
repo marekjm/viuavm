@@ -23,6 +23,11 @@ extern bool SCREAM;
 const string ENTRY_FUNCTION_NAME = "__entry";
 
 
+template<class T> void bwrite(ofstream& out, const T& object) {
+    out.write(reinterpret_cast<const char*>(&object), sizeof(T));
+}
+
+
 tuple<int, enum JUMPTYPE> resolvejump(string jmp, const map<string, int>& marks, int instruction_index = -1) {
     /*  This function is used to resolve jumps in `jump` and `branch` instructions.
      */
@@ -1048,13 +1053,13 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         }
         // FIXME: unsigned -> uint64_t
         unsigned total_jumps = jump_table.size();
-        out.write((const char*)&total_jumps, sizeof(decltype(total_jumps)));
+        bwrite(out, total_jumps);
 
         // FIXME: unsigned -> uint64_t
         uint64_t jmp;
         for (unsigned i = 0; i < total_jumps; ++i) {
             jmp = jump_table[i];
-            out.write((const char*)&jmp, sizeof(decltype(jmp)));
+            bwrite(out, jmp);
         }
     } else {
         if (DEBUG) {
@@ -1085,7 +1090,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     /////////////////////////////////////////////
     // WRITE OUT BLOCK IDS SECTION
     // THIS ALSO INCLUDES IDS OF LINKED blocks.bodies
-    out.write((const char*)&block_ids_section_size, sizeof(decltype(block_ids_section_size)));
+    bwrite(out, block_ids_section_size);
     uint16_t block_bodies_size_so_far = 0;
     for (string name : blocks.names) {
         if (DEBUG) {
@@ -1106,7 +1111,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         // ...requires terminating null character
         out.put('\0');
         // mapped address must come after name
-        out.write((const char*)&block_bodies_size_so_far, sizeof(uint16_t));
+        bwrite(out, block_bodies_size_so_far);
         // blocks.bodies size must be incremented by the actual size of block's bytecode size
         // to give correct offset for next block
         try {
@@ -1131,7 +1136,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     /////////////////////////////////////////////
     // WRITE OUT FUNCTION IDS SECTION
     // THIS ALSO INCLUDES IDS OF LINKED FUNCTIONS
-    out.write((const char*)&function_ids_section_size, sizeof(decltype(function_ids_section_size)));
+    bwrite(out, function_ids_section_size);
     uint16_t functions_size_so_far = block_bodies_size_so_far;
     if (DEBUG) {
         cout << "[asm:write] function addresses are offset by " << functions_size_so_far << " bytes (size of the block address table)" << endl;
@@ -1155,7 +1160,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         // ...requires terminating null character
         out.put('\0');
         // mapped address must come after name
-        out.write((const char*)&functions_size_so_far, sizeof(uint16_t));
+        bwrite(out, functions_size_so_far);
         // functions size must be incremented by the actual size of function's bytecode size
         // to give correct offset for next function
         try {
@@ -1174,13 +1179,13 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         out.put('\0');
         // mapped address must come after name
         uint16_t address = function_addresses[name];
-        out.write((const char*)&address, sizeof(uint16_t));
+        bwrite(out, address);
     }
 
 
     //////////////////////
     // WRITE BYTECODE SIZE
-    out.write((const char*)&bytes, sizeof(uint64_t));
+    bwrite(out, bytes);
 
     byte* program_bytecode = new byte[bytes];
     int program_bytecode_used = 0;
