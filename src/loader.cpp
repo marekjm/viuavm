@@ -59,12 +59,14 @@ void Loader::calculateFunctionSizes() {
 
 void Loader::loadJumpTable(ifstream& in) {
     // load jump table
+    // FIXME: unsigned -> uint64_t
     unsigned lib_total_jumps;
-    in.read((char*)&lib_total_jumps, sizeof(unsigned));
+    in.read((char*)&lib_total_jumps, sizeof(decltype(lib_total_jumps)));
 
+    // FIXME: unsigned -> uint64_t
     unsigned lib_jmp;
     for (unsigned i = 0; i < lib_total_jumps; ++i) {
-        in.read((char*)&lib_jmp, sizeof(unsigned));
+        in.read((char*)&lib_jmp, sizeof(decltype(lib_jmp)));
         jumps.push_back(lib_jmp);
     }
 }

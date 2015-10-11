@@ -1046,8 +1046,9 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         if (DEBUG) {
             cout << "debug: jump table has " << jump_table.size() << " entries" << endl;
         }
-        uint64_t total_jumps = jump_table.size();
-        out.write((const char*)&total_jumps, sizeof(unsigned));
+        // FIXME: unsigned -> uint64_t
+        unsigned total_jumps = jump_table.size();
+        out.write((const char*)&total_jumps, sizeof(decltype(total_jumps)));
 
         uint64_t jmp;
         for (unsigned i = 0; i < total_jumps; ++i) {
