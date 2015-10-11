@@ -1083,7 +1083,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     /////////////////////////////////////////////
     // WRITE OUT BLOCK IDS SECTION
     // THIS ALSO INCLUDES IDS OF LINKED blocks.bodies
-    out.write((const char*)&block_ids_section_size, sizeof(uint16_t));
+    out.write((const char*)&block_ids_section_size, sizeof(decltype(block_ids_section_size)));
     uint16_t block_bodies_size_so_far = 0;
     for (string name : blocks.names) {
         if (DEBUG) {
@@ -1129,7 +1129,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     /////////////////////////////////////////////
     // WRITE OUT FUNCTION IDS SECTION
     // THIS ALSO INCLUDES IDS OF LINKED FUNCTIONS
-    out.write((const char*)&function_ids_section_size, sizeof(uint16_t));
+    out.write((const char*)&function_ids_section_size, sizeof(decltype(function_ids_section_size)));
     uint16_t functions_size_so_far = block_bodies_size_so_far;
     if (DEBUG) {
         cout << "[asm:write] function addresses are offset by " << functions_size_so_far << " bytes (size of the block address table)" << endl;
