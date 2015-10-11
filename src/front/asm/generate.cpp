@@ -1187,7 +1187,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     bwrite(out, bytes);
 
     byte* program_bytecode = new byte[bytes];
-    int program_bytecode_used = 0;
+    uint64_t program_bytecode_used = 0;
 
     ////////////////////////////////////////////////////
     // WRITE BYTECODE OF LOCAL BLOCKS TO BYTECODE BUFFER
