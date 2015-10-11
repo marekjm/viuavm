@@ -1244,10 +1244,10 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     ////////////////////////////////////
     // WRITE STATICALLY LINKED LIBRARIES
     uint64_t bytes_offset = current_link_offset;
-    for (tuple<string, uint16_t, char*> lnk : linked_libs_bytecode) {
+    for (tuple<string, uint64_t, char*> lnk : linked_libs_bytecode) {
         string lib_name;
         byte* linked_bytecode;
-        uint16_t linked_size;
+        uint64_t linked_size;
         tie(lib_name, linked_size, linked_bytecode) = lnk;
 
         if (VERBOSE or DEBUG) {
