@@ -694,7 +694,7 @@ vector<string> expandSource(const vector<string>& lines, map<long unsigned, long
 uint64_t writeCodeBlocksSection(ofstream& out, const invocables_t& blocks, const vector<string>& linked_block_names, uint64_t block_bodies_size_so_far = 0) {
     uint64_t block_ids_section_size = 0;
     for (string name : blocks.names) { block_ids_section_size += name.size(); }
-    // we need to insert address (uint16_t) after every block
+    // we need to insert address after every block
     block_ids_section_size += sizeof(uint16_t) * blocks.names.size();
     // for null characters after block names
     block_ids_section_size += blocks.names.size();
