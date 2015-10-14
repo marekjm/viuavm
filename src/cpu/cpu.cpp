@@ -432,7 +432,7 @@ void CPU::loadNativeLibrary(const string& module) {
         loader.load();
 
         byte* lnk_btcd = loader.getBytecode();
-        linked_modules[module] = pair<unsigned, byte*>(unsigned(loader.getBytecodeSize()), lnk_btcd);
+        linked_modules[module] = pair<unsigned, byte*>(static_cast<unsigned>(loader.getBytecodeSize()), lnk_btcd);
 
         vector<string> fn_names = loader.getFunctions();
         map<string, uint64_t> fn_addrs = loader.getFunctionAddresses();
