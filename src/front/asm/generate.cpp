@@ -1123,9 +1123,6 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     // WRITE BLOCK AND FUNCTION ENTRY POINT ADDRESSES TO BYTECODE
     uint64_t functions_size_so_far = writeCodeBlocksSection(out, blocks, linked_block_names);
     functions_size_so_far = writeCodeBlocksSection(out, functions, linked_function_names, functions_size_so_far);
-
-    // FIXME: iteration over linked functions to put them to the address table
-    //        should be done in the loop above (for local functions)
     for (string name : linked_function_names) {
         // function name...
         out.write(name.c_str(), name.size());
