@@ -12,7 +12,7 @@
 using namespace std;
 
 
-string assembler::verify::functionCallsAreDefined(const vector<string>& lines, const map<unsigned, unsigned>& expanded_lines_to_source_lines, const vector<string>& function_names, const vector<string>& function_signatures) {
+string assembler::verify::functionCallsAreDefined(const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, const vector<string>& function_names, const vector<string>& function_signatures) {
     ostringstream report("");
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
@@ -44,13 +44,13 @@ string assembler::verify::functionCallsAreDefined(const vector<string>& lines, c
     return report.str();
 }
 
-string assembler::verify::frameBalance(const vector<string>& lines, const map<unsigned, unsigned>& expanded_lines_to_source_lines) {
+string assembler::verify::frameBalance(const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines) {
     ostringstream report("");
     string line;
     string instruction;
 
     int balance = 0;
-    int previous_frame_spawnline = 0;
+    long unsigned previous_frame_spawnline = 0;
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = lines[i];
         if (line.size() == 0) { continue; }
@@ -92,7 +92,7 @@ string assembler::verify::frameBalance(const vector<string>& lines, const map<un
     return report.str();
 }
 
-string assembler::verify::blockTries(const vector<string>& lines, const map<unsigned, unsigned>& expanded_lines_to_source_lines, const vector<string>& block_names, const vector<string>& block_signatures) {
+string assembler::verify::blockTries(const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, const vector<string>& block_names, const vector<string>& block_signatures) {
     ostringstream report("");
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
@@ -115,7 +115,7 @@ string assembler::verify::blockTries(const vector<string>& lines, const map<unsi
     return report.str();
 }
 
-string assembler::verify::callableCreations(const vector<string>& lines, const map<unsigned, unsigned>& expanded_lines_to_source_lines, const vector<string>& function_names, const vector<string>& function_signatures) {
+string assembler::verify::callableCreations(const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, const vector<string>& function_names, const vector<string>& function_signatures) {
     ostringstream report("");
     string line;
     string callable_type;
@@ -147,7 +147,7 @@ string assembler::verify::callableCreations(const vector<string>& lines, const m
     return report.str();
 }
 
-string assembler::verify::ressInstructions(const vector<string>& lines, const map<unsigned, unsigned>& expanded_lines_to_source_lines, bool as_lib) {
+string assembler::verify::ressInstructions(const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, bool as_lib) {
     ostringstream report("");
     vector<string> legal_register_sets = {
         "global",   // global register set
@@ -212,7 +212,7 @@ string assembler::verify::mainFunctionDoesNotEndWithHalt(map<string, vector<stri
     return report.str();
 }
 
-string assembler::verify::directives(const vector<string>& lines, const map<unsigned, unsigned>& expanded_lines_to_source_lines) {
+string assembler::verify::directives(const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines) {
     ostringstream report("");
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
@@ -231,7 +231,7 @@ string assembler::verify::directives(const vector<string>& lines, const map<unsi
     }
     return report.str();
 }
-string assembler::verify::instructions(const vector<string>& lines, const map<unsigned, unsigned>& expanded_lines_to_source_lines) {
+string assembler::verify::instructions(const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines) {
     ostringstream report("");
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {

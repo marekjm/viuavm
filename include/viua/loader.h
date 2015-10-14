@@ -12,23 +12,23 @@
 #include <map>
 #include <viua/bytecode/bytetypedef.h>
 
-typedef std::tuple<std::vector<std::string>, std::map<std::string, uint16_t> > IdToAddressMapping;
+typedef std::tuple<std::vector<std::string>, std::map<std::string, uint64_t> > IdToAddressMapping;
 
 class Loader {
     std::string path;
 
-    uint16_t size;
+    uint64_t size;
     byte* bytecode;
 
-    std::vector<unsigned> jumps;
+    std::vector<uint64_t> jumps;
 
-    std::map<std::string, uint16_t> function_addresses;
-    std::map<std::string, unsigned> function_sizes;
+    std::map<std::string, uint64_t> function_addresses;
+    std::map<std::string, uint64_t> function_sizes;
     std::vector<std::string> functions;
-    std::map<std::string, uint16_t> block_addresses;
+    std::map<std::string, uint64_t> block_addresses;
     std::vector<std::string> blocks;
 
-    IdToAddressMapping loadmap(char*, const uint16_t&);
+    IdToAddressMapping loadmap(char*, const uint64_t&);
     void calculateFunctionSizes();
 
     void loadJumpTable(std::ifstream&);
@@ -40,16 +40,16 @@ class Loader {
     Loader& load();
     Loader& executable();
 
-    uint16_t getBytecodeSize();
+    uint64_t getBytecodeSize();
     byte* getBytecode();
 
-    std::vector<unsigned> getJumps();
+    std::vector<uint64_t> getJumps();
 
-    std::map<std::string, uint16_t> getFunctionAddresses();
-    std::map<std::string, unsigned> getFunctionSizes();
+    std::map<std::string, uint64_t> getFunctionAddresses();
+    std::map<std::string, uint64_t> getFunctionSizes();
     std::vector<std::string> getFunctions();
 
-    std::map<std::string, uint16_t> getBlockAddresses();
+    std::map<std::string, uint64_t> getBlockAddresses();
     std::vector<std::string> getBlocks();
 
     Loader(std::string pth): path(pth), size(0), bytecode(nullptr) {}

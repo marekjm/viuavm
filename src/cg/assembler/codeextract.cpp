@@ -123,7 +123,7 @@ vector<string> assembler::ce::getFunctionNames(const vector<string>& lines) {
         if (!str::startswith(line, ".function:")) { continue; }
 
         if (str::startswith(line, ".function:")) {
-            for (int j = i+1; lines[j] != ".end"; ++j, ++i) {}
+            for (unsigned j = i+1; lines[j] != ".end"; ++j, ++i) {}
         }
 
         line = str::lstrip(str::sub(line, str::chunk(line).size()));
@@ -154,7 +154,7 @@ vector<string> assembler::ce::getBlockNames(const vector<string>& lines) {
         if (not str::startswith(line, ".block:")) { continue; }
 
         if (str::startswith(line, ".block:")) {
-            for (int j = i+1; lines[j] != ".end"; ++j, ++i) {}
+            for (unsigned j = i+1; lines[j] != ".end"; ++j, ++i) {}
         }
 
         line = str::lstrip(str::sub(line, str::chunk(line).size()));
@@ -195,7 +195,7 @@ map<string, vector<string> > assembler::ce::getInvokables(const string& type, co
         if (!str::startswith(line, opening)) { continue; }
 
         vector<string> flines;
-        for (int j = i+1; lines[j] != ".end"; ++j, ++i) {
+        for (unsigned j = i+1; lines[j] != ".end"; ++j, ++i) {
             if (str::startswith(lines[j], opening)) {
                 throw ("another " + type + " opened before assembler reached .end after '" + str::chunk(str::sub(holdline, str::chunk(holdline).size())) + "' " + type);
             }

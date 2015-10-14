@@ -27,7 +27,7 @@ remake: clean all
 
 ############################################################
 # CLEANING
-clean: clean-support clean-test-compiles
+clean: clean-support clean-test-compiles clean-stdlib
 	rm -f ./build/bin/vm/*
 	rm -f ./build/bin/opcodes.bin
 	rm -f ./build/lib/*.o
@@ -41,8 +41,6 @@ clean: clean-support clean-test-compiles
 	rm -f ./build/test/*
 	rm -f ./build/types/*.o
 	rm -f ./build/*.o
-	rm -f ./build/stdlib/*.o
-	rm -f ./build/stdlib/*.so
 
 clean-support:
 	rm -f ./build/support/*.o
@@ -52,6 +50,11 @@ clean-test-compiles:
 	rm -f ./tests/compiled/*.asm
 	rm -f ./tests/compiled/*.wlib
 	rm -f ./misc.vlib
+
+clean-stdlib:
+	rm -f ./build/stdlib/*.o
+	rm -f ./build/stdlib/*.so
+	rm -f ./build/stdlib/std/*
 
 
 ############################################################
@@ -196,7 +199,8 @@ build/cpu/registserset.o: src/cpu/registerset.cpp include/viua/cpu/registerset.h
 
 ############################################################
 # STANDARD LIBRARY
-stdlib: build/stdlib/std/string.vlib build/stdlib/typesystem.so build/stdlib/io.so build/stdlib/random.so
+stdlib: build/bin/vm/asm
+	${MAKE} build/stdlib/std/string.vlib build/stdlib/typesystem.so build/stdlib/io.so build/stdlib/random.so
 
 build/stdlib/std/string.vlib: src/stdlib/viua/string.asm
 	./build/bin/vm/asm --lib -o $@ $<

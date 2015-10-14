@@ -125,20 +125,20 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    uint16_t bytes = loader.getBytecodeSize();
+    uint64_t bytes = loader.getBytecodeSize();
     byte* bytecode = loader.getBytecode();
 
-    map<string, uint16_t> function_address_mapping = loader.getFunctionAddresses();
+    map<string, uint64_t> function_address_mapping = loader.getFunctionAddresses();
     vector<string> functions = loader.getFunctions();
-    map<string, unsigned> function_sizes = loader.getFunctionSizes();
+    map<string, uint64_t> function_sizes = loader.getFunctionSizes();
 
-    map<string, uint16_t> block_address_mapping = loader.getBlockAddresses();
+    map<string, uint64_t> block_address_mapping = loader.getBlockAddresses();
     vector<string> blocks = loader.getBlocks();
-    map<string, unsigned> block_sizes;
+    map<string, uint64_t> block_sizes;
 
-    map<string, uint16_t> element_address_mapping;
+    map<string, uint64_t> element_address_mapping;
     vector<string> elements;
-    map<string, unsigned> element_sizes;
+    map<string, uint64_t> element_sizes;
     map<string, string> element_types;
 
     vector<string> disassembled_lines;
@@ -146,7 +146,7 @@ int main(int argc, char* argv[]) {
 
 
     string name;
-    unsigned el_size;
+    uint64_t el_size;
 
     for (unsigned i = 0; i < blocks.size(); ++i) {
         name = blocks[i];

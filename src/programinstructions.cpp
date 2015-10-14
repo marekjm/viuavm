@@ -615,7 +615,7 @@ Program& Program::call(int_op reg, const string& fn_name) {
     return (*this);
 }
 
-Program& Program::jump(int addr, enum JUMPTYPE is_absolute) {
+Program& Program::jump(uint64_t addr, enum JUMPTYPE is_absolute) {
     /*  Inserts jump instruction. Parameter is instruction index.
      *  Byte offset is calculated automatically.
      *
@@ -632,7 +632,7 @@ Program& Program::jump(int addr, enum JUMPTYPE is_absolute) {
     return (*this);
 }
 
-Program& Program::branch(int_op regc, int addr_truth, enum JUMPTYPE absolute_truth, int addr_false, enum JUMPTYPE absolute_false) {
+Program& Program::branch(int_op regc, uint64_t addr_truth, enum JUMPTYPE absolute_truth, uint64_t addr_false, enum JUMPTYPE absolute_false) {
     /*  Inserts branch instruction.
      *  Byte offset is calculated automatically.
      */
@@ -646,7 +646,7 @@ Program& Program::branch(int_op regc, int addr_truth, enum JUMPTYPE absolute_tru
         (absolute_truth == JMP_ABSOLUTE ? branches_absolute : branches).push_back(jump_position_in_bytecode);
     }
 
-    jump_position_in_bytecode += sizeof(int);  // for integer with jump address
+    jump_position_in_bytecode += sizeof(uint64_t);  // for integer with jump address
     // save jump position if jump is not to byte
     if (absolute_false != JMP_TO_BYTE) {
         (absolute_truth == JMP_ABSOLUTE ? branches_absolute : branches).push_back(jump_position_in_bytecode);

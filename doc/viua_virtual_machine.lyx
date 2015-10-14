@@ -4213,14 +4213,14 @@ Function mapping
 \begin_layout Standard
 Function mapping begins with 
 \family typewriter
-uint16_t
+uint64_t
 \family default
  encoding size of the section.
  Following N bytes contain paired function names (encoded as null-terminated
  strings, thus variable length) and locations of their entry points (encoded
  as 
 \family typewriter
-uint16_t
+uint64_t
 \family default
  integers).
 \end_layout
@@ -4236,12 +4236,12 @@ status open
 
 \begin_layout Plain Layout
 
-<section size:uint16_t>
+<section size:uint64_t>
 \end_layout
 
 \begin_layout Plain Layout
 
-(<name:null-terminated-string><entry_point:uint16_t>)+
+(<name:null-terminated-string><entry_point:uint64_t>)+
 \end_layout
 
 \end_inset
@@ -4277,7 +4277,7 @@ Block mapping
 \begin_layout Standard
 Block mapping begins with 
 \family typewriter
-uint16_t
+uint64_t
 \family default
  encoding size of the section.
  A block is a piece of code that is executed when throw-catch mechanism
@@ -4314,7 +4314,7 @@ Executable bytecode size
 Last name/entry-point pair from function mapping section is followed size
  of the executable bytecode encoded as 
 \family typewriter
-uint16_t
+uint64_t
 \family default
 .
 \end_layout
@@ -4424,7 +4424,7 @@ Executable bytecode size
 Last name/entry-point pair from function mapping section is followed size
  of the executable bytecode encoded as 
 \family typewriter
-uint16_t
+uint64_t
 \family default
 .
 \end_layout

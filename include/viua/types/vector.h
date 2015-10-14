@@ -32,10 +32,10 @@ class Vector : public Type {
 
         std::vector<Type*>& value() { return internal_object; }
 
-        Type* insert(int, Type*);
+        Type* insert(long int, Type*);
         Type* push(Type*);
-        Type* pop(int);
-        Type* at(int);
+        Type* pop(long int);
+        Type* at(long int);
         int len();
 
         Vector() {}

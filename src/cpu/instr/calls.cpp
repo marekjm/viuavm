@@ -156,7 +156,7 @@ byte* CPU::argc(byte* addr) {
         destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
     }
 
-    uregset->set(destination_register_index, new Integer(frames.back()->args->size()));
+    uregset->set(destination_register_index, new Integer(static_cast<int>(frames.back()->args->size())));
 
     return addr;
 }

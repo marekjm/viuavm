@@ -86,13 +86,13 @@ int main(int argc, char* argv[]) {
     Loader loader(filename);
     loader.executable();
 
-    uint16_t bytes = loader.getBytecodeSize();
+    uint64_t bytes = loader.getBytecodeSize();
     byte* bytecode = loader.getBytecode();
 
     CPU cpu;
 
-    map<string, uint16_t> function_address_mapping = loader.getFunctionAddresses();
-    uint16_t starting_instruction = function_address_mapping["__entry"];
+    map<string, uint64_t> function_address_mapping = loader.getFunctionAddresses();
+    uint64_t starting_instruction = function_address_mapping["__entry"];
     for (auto p : function_address_mapping) { cpu.mapfunction(p.first, p.second); }
     for (auto p : loader.getBlockAddresses()) { cpu.mapblock(p.first, p.second); }
 

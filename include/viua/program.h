@@ -20,7 +20,7 @@ class Program {
     // byte array containing bytecode
     byte* program;
     // size of the bytecode
-    int bytes;
+    uint64_t bytes;
 
     /** Current address inside bytecode array.
      *  Used during bytecode generation.
@@ -40,7 +40,7 @@ class Program {
     bool debug;
     bool scream;
 
-    long getInstructionBytecodeOffset(int, int count = -1);
+    uint64_t getInstructionBytecodeOffset(uint64_t, uint64_t count = 0);
 
     public:
     // instruction insertion interface
@@ -121,8 +121,8 @@ class Program {
     Program& argc       (int_op);
 
     Program& call       (int_op, const std::string&);
-    Program& jump       (int, enum JUMPTYPE);
-    Program& branch     (int_op, int, enum JUMPTYPE, int, enum JUMPTYPE);
+    Program& jump       (uint64_t, enum JUMPTYPE);
+    Program& branch     (int_op, uint64_t, enum JUMPTYPE, uint64_t, enum JUMPTYPE);
 
     Program& vmtry      ();
     Program& vmcatch    (std::string, std::string);
@@ -150,9 +150,9 @@ class Program {
      *  size of the program.
      */
     Program& calculateBranches(unsigned offset = 0); // FIXME: is unused, scheduled for removal
-    Program& calculateJumps(std::vector<std::tuple<int, int> >);
-    std::vector<unsigned> jumps();
-    std::vector<unsigned> jumpsAbsolute();
+    Program& calculateJumps(std::vector<std::tuple<uint64_t, uint64_t> >);
+    std::vector<uint64_t> jumps();
+    std::vector<uint64_t> jumpsAbsolute();
 
     byte* bytecode();
     Program& fill(byte*);
@@ -160,22 +160,22 @@ class Program {
     Program& setdebug(bool d = true);
     Program& setscream(bool d = true);
 
-    int size();
+    uint64_t size();
     int instructionCount();
 
-    static uint16_t countBytes(const std::vector<std::string>&);
+    static uint64_t countBytes(const std::vector<std::string>&);
 
-    Program(int bts = 2): bytes(bts), debug(false), scream(false) {
+    Program(uint64_t bts = 2): bytes(bts), debug(false), scream(false) {
         program = new byte[bytes];
         /* Filling bytecode with zeroes (which are interpreted by CPU as NOP instructions) is a safe way
          * to prevent many hiccups.
          */
-        for (int i = 0; i < bytes; ++i) { program[i] = byte(0); }
+        for (decltype(bytes) i = 0; i < bytes; ++i) { program[i] = byte(0); }
         addr_ptr = program;
     }
     Program(const Program& that): program(nullptr), bytes(that.bytes), addr_ptr(nullptr), branches({}) {
         program = new byte[bytes];
-        for (int i = 0; i < bytes; ++i) {
+        for (decltype(bytes) i = 0; i < bytes; ++i) {
             program[i] = that.program[i];
         }
         addr_ptr = program+(that.addr_ptr - that.program);
@@ -192,7 +192,7 @@ class Program {
             delete[] program;
             bytes = that.bytes;
             program = new byte[bytes];
-            for (int i = 0; i < bytes; ++i) {
+            for (decltype(bytes) i = 0; i < bytes; ++i) {
                 program[i] = that.program[i];
             }
             addr_ptr = program+(that.addr_ptr - that.program);

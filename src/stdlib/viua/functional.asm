@@ -6,14 +6,14 @@
 ;
 ; When linking dynamically, following signatures can be used:
 ;
-;       .signature: functional::filter
-;       .signature: functional::foreach
-;       .signature: functional::map
-;       .signature: functional::apply
-;       .signature: functional::invoke
+;       .signature: std::functional::filter
+;       .signature: std::functional::foreach
+;       .signature: std::functional::map
+;       .signature: std::functional::apply
+;       .signature: std::functional::invoke
 ;
 
-.function: functional::filter
+.function: std::functional::filter
     ; classic filter() function
     ; it takes two arguments:
     ;   * a filtering function,
@@ -67,7 +67,7 @@
     end
 .end
 
-.function: functional::foreach
+.function: std::functional::foreach
     ; this function takes two mandatory parameters:
     ;
     ;       * a closure, or a function object to call,
@@ -110,7 +110,7 @@
     end
 .end
 
-.function: functional::map
+.function: std::functional::map
     ; this function takes two arguments:
     ;   * a function,
     ;   * a vector,
@@ -160,7 +160,7 @@
     end
 .end
 
-.function: functional::apply
+.function: std::functional::apply
     ; this function applies another function on a single parameter
     ;
     ; this function is type agnostic
@@ -182,7 +182,7 @@
     end
 .end
 
-.function: functional::invoke
+.function: std::functional::invoke
     ; this function takes two parameters:
     ;    1) a function object
     ;    2) a vector of parameters for function given as first parameter

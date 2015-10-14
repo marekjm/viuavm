@@ -24,7 +24,7 @@ namespace str {
 
     std::string join(const std::string& s, const std::vector<std::string>& v);
     template<typename T> std::string join(const std::vector<std::string>& seq, const T& delim) {
-        unsigned sz = seq.size();
+        auto sz = seq.size();
         std::ostringstream oss;
         for (unsigned i = 0; i < sz; ++i) {
             oss << seq[i];
@@ -35,9 +35,9 @@ namespace str {
         return oss.str();
     }
 
-    template<typename T> std::string strmul(const T& s, unsigned times) {
+    template<typename T> std::string strmul(const T& s, long unsigned times) {
         std::ostringstream oss;
-        for (unsigned i = 0; i < times; ++i) {
+        for (long unsigned i = 0; i < times; ++i) {
             oss << s;
         }
         return oss.str();

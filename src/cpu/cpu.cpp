@@ -41,7 +41,7 @@ CPU& CPU::load(byte* bc) {
     return (*this);
 }
 
-CPU& CPU::bytes(uint16_t sz) {
+CPU& CPU::bytes(uint64_t sz) {
     /*  Set bytecode size, so the CPU can stop execution even if it doesn't reach HALT instruction but reaches
      *  bytecode address out of bounds.
      */
@@ -49,7 +49,7 @@ CPU& CPU::bytes(uint16_t sz) {
     return (*this);
 }
 
-CPU& CPU::eoffset(uint16_t o) {
+CPU& CPU::eoffset(uint64_t o) {
     /*  Set offset of first executable instruction.
      */
     executable_offset = o;
@@ -72,14 +72,14 @@ CPU& CPU::preload() {
     return (*this);
 }
 
-CPU& CPU::mapfunction(const string& name, unsigned address) {
+CPU& CPU::mapfunction(const string& name, uint64_t address) {
     /** Maps function name to bytecode address.
      */
     function_addresses[name] = address;
     return (*this);
 }
 
-CPU& CPU::mapblock(const string& name, unsigned address) {
+CPU& CPU::mapblock(const string& name, uint64_t address) {
     /** Maps block name to bytecode address.
      */
     block_addresses[name] = address;
@@ -432,17 +432,17 @@ void CPU::loadNativeLibrary(const string& module) {
         loader.load();
 
         byte* lnk_btcd = loader.getBytecode();
-        linked_modules[module] = pair<unsigned, byte*>(unsigned(loader.getBytecodeSize()), lnk_btcd);
+        linked_modules[module] = pair<unsigned, byte*>(static_cast<unsigned>(loader.getBytecodeSize()), lnk_btcd);
 
         vector<string> fn_names = loader.getFunctions();
-        map<string, uint16_t> fn_addrs = loader.getFunctionAddresses();
+        map<string, uint64_t> fn_addrs = loader.getFunctionAddresses();
         for (unsigned i = 0; i < fn_names.size(); ++i) {
             string fn_linkname = fn_names[i];
             linked_functions[fn_linkname] = pair<string, byte*>(module, (lnk_btcd+fn_addrs[fn_names[i]]));
         }
 
         vector<string> bl_names = loader.getBlocks();
-        map<string, uint16_t> bl_addrs = loader.getBlockAddresses();
+        map<string, uint64_t> bl_addrs = loader.getBlockAddresses();
         for (unsigned i = 0; i < bl_names.size(); ++i) {
             string bl_linkname = bl_names[i];
             linked_blocks[bl_linkname] = pair<string, byte*>(module, (lnk_btcd+bl_addrs[bl_linkname]));

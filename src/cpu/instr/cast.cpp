@@ -34,7 +34,8 @@ byte* CPU::itof(byte* addr) {
         destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
     }
 
-    place(destination_register_index, new Float(static_cast<Integer*>(fetch(casted_object_index))->value()));
+    int convert_from = static_cast<Integer*>(fetch(casted_object_index))->value();
+    place(destination_register_index, new Float(static_cast<float>(convert_from)));
 
     return addr;
 }
@@ -62,7 +63,8 @@ byte* CPU::ftoi(byte* addr) {
         destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
     }
 
-    place(destination_register_index, new Integer(static_cast<Float*>(fetch(casted_object_index))->value()));
+    float convert_from = static_cast<Float*>(fetch(casted_object_index))->value();
+    place(destination_register_index, new Integer(static_cast<int>(convert_from)));
 
     return addr;
 }
@@ -127,7 +129,8 @@ byte* CPU::stof(byte* addr) {
         destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
     }
 
-    place(destination_register_index, new Float(std::stod(static_cast<String*>(fetch(casted_object_index))->value())));
+    double convert_from = std::stod(static_cast<String*>(fetch(casted_object_index))->value());
+    place(destination_register_index, new Float(static_cast<float>(convert_from)));
 
     return addr;
 }

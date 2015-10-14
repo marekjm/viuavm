@@ -233,7 +233,7 @@ RegisterSet* RegisterSet::copy() {
     return rscopy;
 }
 
-RegisterSet::RegisterSet(unsigned sz): registerset_size(sz), registers(nullptr), masks(nullptr) {
+RegisterSet::RegisterSet(registerset_size_type sz): registerset_size(sz), registers(nullptr), masks(nullptr) {
     /** Create register set with specified size.
      */
     if (sz > 0) {

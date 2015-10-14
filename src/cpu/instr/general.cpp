@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <iostream>
 #include <viua/types/boolean.h>
 #include <viua/support/pointer.h>
@@ -39,7 +40,8 @@ byte* CPU::print(byte* addr) {
 byte* CPU::jump(byte* addr) {
     /*  Run jump instruction.
      */
-    byte* target = jump_base+(*(int*)addr);
+    uint64_t* offset = reinterpret_cast<uint64_t*>(addr);
+    byte* target = (jump_base+(*offset));
     if (target == addr) {
         throw new Exception("aborting: JUMP instruction pointing to itself");
     }
@@ -58,11 +60,11 @@ byte* CPU::branch(byte* addr) {
     condition_object_index = *((int*)addr);
     pointer::inc<int, byte>(addr);
 
-    int addr_true = *((int*)addr);
-    pointer::inc<int, byte>(addr);
+    uint64_t addr_true = *(reinterpret_cast<uint64_t*>(addr));
+    pointer::inc<uint64_t, byte>(addr);
 
-    int addr_false = *((int*)addr);
-    pointer::inc<int, byte>(addr);
+    uint64_t addr_false = *(reinterpret_cast<uint64_t*>(addr));
+    pointer::inc<uint64_t, byte>(addr);
 
     if (condition_object_ref) {
         condition_object_index = static_cast<Integer*>(fetch(condition_object_index))->value();

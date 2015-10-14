@@ -758,7 +758,7 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
         cout << "  * return value:    " << top->place_return_value_in << endl;
         cout << "  * resolve return:  " << (top->resolve_return_value_register ? "yes" : "no") << endl;
     } else if (command == "loader.function.map.show") {
-        unsigned addr;
+        uint64_t addr;
         bool exists = false;
         for (string fun : operands) {
             try {
@@ -775,7 +775,7 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
             }
         }
     } else if (command == "loader.block.map.show") {
-        unsigned addr;
+        uint64_t addr;
         bool exists = false;
         for (string fun : operands) {
             try {
@@ -1043,7 +1043,7 @@ int main(int argc, char* argv[]) {
     Loader loader(filename);
     loader.executable();
 
-    uint16_t bytes = loader.getBytecodeSize();
+    uint64_t bytes = loader.getBytecodeSize();
     byte* bytecode = loader.getBytecode();
 
     cout << "bytecode size: " << bytes << endl;
@@ -1051,8 +1051,8 @@ int main(int argc, char* argv[]) {
     CPU cpu;
     cpu.debug = true;
 
-    map<string, uint16_t> function_address_mapping = loader.getFunctionAddresses();
-    uint16_t starting_instruction = function_address_mapping["__entry"];
+    map<string, uint64_t> function_address_mapping = loader.getFunctionAddresses();
+    uint64_t starting_instruction = function_address_mapping["__entry"];
     for (auto p : function_address_mapping) { cpu.mapfunction(p.first, p.second); }
     for (auto p : loader.getBlockAddresses()) { cpu.mapblock(p.first, p.second); }
 

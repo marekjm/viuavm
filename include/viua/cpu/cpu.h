@@ -40,8 +40,8 @@ class CPU {
      *  Size and executable offset are metadata exported from bytecode dump.
      */
     byte* bytecode;
-    uint16_t bytecode_size;
-    uint16_t executable_offset;
+    uint64_t bytecode_size;
+    uint64_t executable_offset;
 
     // Global register set
     RegisterSet* regset;
@@ -70,8 +70,8 @@ class CPU {
     /*  Function and block names mapped to bytecode addresses.
      */
     byte* jump_base;
-    std::map<std::string, unsigned> function_addresses;
-    std::map<std::string, unsigned> block_addresses;
+    std::map<std::string, uint64_t> function_addresses;
+    std::map<std::string, uint64_t> block_addresses;
 
     std::map<std::string, std::pair<std::string, byte*>> linked_functions;
     std::map<std::string, std::pair<std::string, byte*>> linked_blocks;
@@ -90,6 +90,7 @@ class CPU {
     std::string return_exception;   // set if CPU stopped because of an exception
     std::string return_message;     // message set by exception
 
+    // FIXME: change unsigned to uint64_t
     unsigned instruction_counter;
     byte* instruction_pointer;
 
@@ -251,12 +252,12 @@ class CPU {
          *      * kick the CPU so it starts running,
          */
         CPU& load(byte*);
-        CPU& bytes(uint16_t);
-        CPU& eoffset(uint16_t);
+        CPU& bytes(uint64_t);
+        CPU& eoffset(uint64_t);
         CPU& preload();
 
-        CPU& mapfunction(const std::string&, unsigned);
-        CPU& mapblock(const std::string&, unsigned);
+        CPU& mapfunction(const std::string&, uint64_t);
+        CPU& mapblock(const std::string&, uint64_t);
 
         CPU& registerExternalFunction(const std::string&, ExternalFunction*);
         CPU& removeExternalFunction(std::string);
