@@ -691,6 +691,52 @@ vector<string> expandSource(const vector<string>& lines, map<long unsigned, long
     return asm_lines;
 }
 
+uint64_t writeCodeBlocksSection(ofstream& out, const invocables_t& blocks, const vector<string>& linked_block_names, uint64_t block_bodies_size_so_far = 0) {
+    uint64_t block_ids_section_size = 0;
+    for (string name : blocks.names) { block_ids_section_size += name.size(); }
+    // we need to insert address (uint16_t) after every block
+    block_ids_section_size += sizeof(uint16_t) * blocks.names.size();
+    // for null characters after block names
+    block_ids_section_size += blocks.names.size();
+
+    /////////////////////////////////////////////
+    // WRITE OUT BLOCK IDS SECTION
+    // THIS ALSO INCLUDES IDS OF LINKED blocks.bodies
+    bwrite(out, block_ids_section_size);
+    for (string name : blocks.names) {
+        if (DEBUG) {
+            cout << "[asm:write] writing block '" << name << "' to block address table";
+        }
+        if (find(linked_block_names.begin(), linked_block_names.end(), name) != linked_block_names.end()) {
+            if (DEBUG) {
+                cout << ": delayed" << endl;
+            }
+            continue;
+        }
+        if (DEBUG) {
+            cout << endl;
+        }
+
+        // block name...
+        out.write(name.c_str(), name.size());
+        // ...requires terminating null character
+        out.put('\0');
+        // mapped address must come after name
+        // FIXME: use uncasted uint64_t
+        bwrite(out, static_cast<uint16_t>(block_bodies_size_so_far));
+        // blocks.bodies size must be incremented by the actual size of block's bytecode size
+        // to give correct offset for next block
+        try {
+            block_bodies_size_so_far += Program::countBytes(blocks.bodies.at(name));
+        } catch (const std::out_of_range& e) {
+            cout << "fatal: could not find block '" << name << "' during address table write" << endl;
+            exit(1);
+        }
+    }
+
+    return block_bodies_size_so_far;
+}
+
 int generate(const vector<string>& expanded_lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, vector<string>& ilines, invocables_t& functions, invocables_t& blocks, string& filename, string& compilename, const vector<string>& commandline_given_links, const compilationflags_t& flags) {
     //////////////////////////////
     // SETUP INITIAL BYTECODE SIZE
@@ -1073,100 +1119,11 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     }
 
 
-    ////////////////////////////
-    // PREPARE BLOCK IDS SECTION
-    uint64_t block_ids_section_size = 0;
-    for (string name : blocks.names) { block_ids_section_size += name.size(); }
-    // we need to insert address (uint16_t) after every block
-    block_ids_section_size += sizeof(uint16_t) * blocks.names.size();
-    // for null characters after block names
-    block_ids_section_size += blocks.names.size();
+    /////////////////////////////////////////////////////////////
+    // WRITE BLOCK AND FUNCTION ENTRY POINT ADDRESSES TO BYTECODE
+    uint64_t functions_size_so_far = writeCodeBlocksSection(out, blocks, linked_block_names);
+    functions_size_so_far = writeCodeBlocksSection(out, functions, linked_function_names, functions_size_so_far);
 
-    /////////////////////////////////////////////
-    // WRITE OUT BLOCK IDS SECTION
-    // THIS ALSO INCLUDES IDS OF LINKED blocks.bodies
-    bwrite(out, block_ids_section_size);
-    uint64_t block_bodies_size_so_far = 0;
-    for (string name : blocks.names) {
-        if (DEBUG) {
-            cout << "[asm:write] writing block '" << name << "' to block address table";
-        }
-        if (find(linked_block_names.begin(), linked_block_names.end(), name) != linked_block_names.end()) {
-            if (DEBUG) {
-                cout << ": delayed" << endl;
-            }
-            continue;
-        }
-        if (DEBUG) {
-            cout << endl;
-        }
-
-        // block name...
-        out.write(name.c_str(), name.size());
-        // ...requires terminating null character
-        out.put('\0');
-        // mapped address must come after name
-        // FIXME: use uncasted uint64_t
-        bwrite(out, static_cast<uint16_t>(block_bodies_size_so_far));
-        // blocks.bodies size must be incremented by the actual size of block's bytecode size
-        // to give correct offset for next block
-        try {
-            block_bodies_size_so_far += Program::countBytes(blocks.bodies.at(name));
-        } catch (const std::out_of_range& e) {
-            cout << "fatal: could not find block '" << name << "' during address table write" << endl;
-            exit(1);
-        }
-    }
-
-
-    ///////////////////////////////
-    // PREPARE FUNCTION IDS SECTION
-    uint64_t function_ids_section_size = 0;
-    for (string name : functions.names) { function_ids_section_size += name.size(); }
-    // we need to insert address (uint16_t) after every function
-    function_ids_section_size += sizeof(uint16_t) * functions.names.size();
-    // for null characters after function names
-    function_ids_section_size += functions.names.size();
-
-
-    /////////////////////////////////////////////
-    // WRITE OUT FUNCTION IDS SECTION
-    // THIS ALSO INCLUDES IDS OF LINKED FUNCTIONS
-    bwrite(out, function_ids_section_size);
-    uint64_t functions_size_so_far = block_bodies_size_so_far;
-    if (DEBUG) {
-        cout << "[asm:write] function addresses are offset by " << functions_size_so_far << " bytes (size of the block address table)" << endl;
-    }
-    for (string name : functions.names) {
-        if (DEBUG) {
-            cout << "[asm:write] writing function '" << name << "' to function address table";
-        }
-        if (find(linked_function_names.begin(), linked_function_names.end(), name) != linked_function_names.end()) {
-            if (DEBUG) {
-                cout << ": delayed" << endl;
-            }
-            continue;
-        }
-        if (DEBUG) {
-            cout << endl;
-        }
-
-        // function name...
-        out.write(name.c_str(), name.size());
-        // ...requires terminating null character
-        out.put('\0');
-        // mapped address must come after name
-        // FIXME: use uncasted uint64_t
-        bwrite(out, static_cast<uint16_t>(functions_size_so_far));
-        // functions size must be incremented by the actual size of function's bytecode size
-        // to give correct offset for next function
-        try {
-            functions_size_so_far += Program::countBytes(functions.bodies.at(name));
-        } catch (const std::out_of_range& e) {
-            cout << "fatal: could not find function '" << name << "' during address table write" << endl;
-            exit(1);
-        }
-    }
     // FIXME: iteration over linked functions to put them to the address table
     //        should be done in the loop above (for local functions)
     for (string name : linked_function_names) {
