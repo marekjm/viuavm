@@ -145,7 +145,7 @@ uint64_t Loader::getBytecodeSize() {
 }
 byte* Loader::getBytecode() {
     byte* copy = new byte[size];
-    for (unsigned i = 0; i < size; ++i) {
+    for (uint64_t i = 0; i < size; ++i) {
         copy[i] = bytecode[i];
     }
     return copy;
