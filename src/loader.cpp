@@ -25,8 +25,8 @@ IdToAddressMapping Loader::loadmap(char* bytedump, const uint64_t& bytedump_size
     while (i < bytedump_size) {
         lib_fn_name = string(lib_function_ids_map);
         i += lib_fn_name.size() + 1;  // one for null character
-        lib_fn_address = *((uint16_t*)(bytedump+i));
-        i += sizeof(uint16_t);
+        lib_fn_address = *reinterpret_cast<decltype(lib_fn_address)*>(bytedump+i);
+        i += sizeof(decltype(lib_fn_address));
         lib_function_ids_map = bytedump+i;
         mapping[lib_fn_name] = lib_fn_address;
         order.push_back(lib_fn_name);
