@@ -43,6 +43,7 @@ clean: clean-support clean-test-compiles
 	rm -f ./build/*.o
 	rm -f ./build/stdlib/*.o
 	rm -f ./build/stdlib/*.so
+	rm -f ./build/stdlib/std/*
 
 clean-support:
 	rm -f ./build/support/*.o
@@ -196,7 +197,8 @@ build/cpu/registserset.o: src/cpu/registerset.cpp include/viua/cpu/registerset.h
 
 ############################################################
 # STANDARD LIBRARY
-stdlib: build/stdlib/std/string.vlib build/stdlib/typesystem.so build/stdlib/io.so build/stdlib/random.so
+stdlib: build/bin/vm/asm
+	${MAKE} build/stdlib/std/string.vlib build/stdlib/typesystem.so build/stdlib/io.so build/stdlib/random.so
 
 build/stdlib/std/string.vlib: src/stdlib/viua/string.asm
 	./build/bin/vm/asm --lib -o $@ $<
