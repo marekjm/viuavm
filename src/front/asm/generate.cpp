@@ -1075,7 +1075,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
 
     ////////////////////////////
     // PREPARE BLOCK IDS SECTION
-    uint16_t block_ids_section_size = 0;
+    uint64_t block_ids_section_size = 0;
     for (string name : blocks.names) { block_ids_section_size += name.size(); }
     // we need to insert address (uint16_t) after every block
     block_ids_section_size += sizeof(uint16_t) * blocks.names.size();
@@ -1121,7 +1121,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
 
     ///////////////////////////////
     // PREPARE FUNCTION IDS SECTION
-    uint16_t function_ids_section_size = 0;
+    uint64_t function_ids_section_size = 0;
     for (string name : functions.names) { function_ids_section_size += name.size(); }
     // we need to insert address (uint16_t) after every function
     function_ids_section_size += sizeof(uint16_t) * functions.names.size();

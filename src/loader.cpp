@@ -70,8 +70,7 @@ void Loader::loadJumpTable(ifstream& in) {
     }
 }
 void Loader::loadFunctionsMap(ifstream& in) {
-    // FIXME: uint16_t -> uint64_t
-    uint16_t lib_function_ids_section_size = 0;
+    uint64_t lib_function_ids_section_size = 0;
     in.read((char*)&lib_function_ids_section_size, sizeof(decltype(lib_function_ids_section_size)));
 
     char *lib_buffer_function_ids = new char[lib_function_ids_section_size];
@@ -90,9 +89,7 @@ void Loader::loadFunctionsMap(ifstream& in) {
     delete[] lib_buffer_function_ids;
 }
 void Loader::loadBlocksMap(ifstream& in) {
-    // FIXME: uint16_t -> uint64_t
-    uint16_t lib_block_ids_section_size = 0;
-    // FIXME: uint16_t -> uint64_t
+    uint64_t lib_block_ids_section_size = 0;
     in.read((char*)&lib_block_ids_section_size, sizeof(decltype(lib_block_ids_section_size)));
 
     char *lib_buffer_block_ids = new char[lib_block_ids_section_size];
