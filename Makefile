@@ -27,7 +27,7 @@ remake: clean all
 
 ############################################################
 # CLEANING
-clean: clean-support clean-test-compiles
+clean: clean-support clean-test-compiles clean-stdlib
 	rm -f ./build/bin/vm/*
 	rm -f ./build/bin/opcodes.bin
 	rm -f ./build/lib/*.o
@@ -41,9 +41,6 @@ clean: clean-support clean-test-compiles
 	rm -f ./build/test/*
 	rm -f ./build/types/*.o
 	rm -f ./build/*.o
-	rm -f ./build/stdlib/*.o
-	rm -f ./build/stdlib/*.so
-	rm -f ./build/stdlib/std/*
 
 clean-support:
 	rm -f ./build/support/*.o
@@ -53,6 +50,11 @@ clean-test-compiles:
 	rm -f ./tests/compiled/*.asm
 	rm -f ./tests/compiled/*.wlib
 	rm -f ./misc.vlib
+
+clean-stdlib:
+	rm -f ./build/stdlib/*.o
+	rm -f ./build/stdlib/*.so
+	rm -f ./build/stdlib/std/*
 
 
 ############################################################
