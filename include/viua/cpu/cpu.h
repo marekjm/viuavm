@@ -90,6 +90,7 @@ class CPU {
     std::string return_exception;   // set if CPU stopped because of an exception
     std::string return_message;     // message set by exception
 
+    // FIXME: change unsigned to uint64_t
     unsigned instruction_counter;
     byte* instruction_pointer;
 
