@@ -1086,7 +1086,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     // WRITE OUT BLOCK IDS SECTION
     // THIS ALSO INCLUDES IDS OF LINKED blocks.bodies
     bwrite(out, block_ids_section_size);
-    uint16_t block_bodies_size_so_far = 0;
+    uint64_t block_bodies_size_so_far = 0;
     for (string name : blocks.names) {
         if (DEBUG) {
             cout << "[asm:write] writing block '" << name << "' to block address table";
@@ -1106,7 +1106,8 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         // ...requires terminating null character
         out.put('\0');
         // mapped address must come after name
-        bwrite(out, block_bodies_size_so_far);
+        // FIXME: use uncasted uint64_t
+        bwrite(out, static_cast<uint16_t>(block_bodies_size_so_far));
         // blocks.bodies size must be incremented by the actual size of block's bytecode size
         // to give correct offset for next block
         try {
@@ -1132,7 +1133,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     // WRITE OUT FUNCTION IDS SECTION
     // THIS ALSO INCLUDES IDS OF LINKED FUNCTIONS
     bwrite(out, function_ids_section_size);
-    uint16_t functions_size_so_far = block_bodies_size_so_far;
+    uint64_t functions_size_so_far = block_bodies_size_so_far;
     if (DEBUG) {
         cout << "[asm:write] function addresses are offset by " << functions_size_so_far << " bytes (size of the block address table)" << endl;
     }
@@ -1155,7 +1156,8 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         // ...requires terminating null character
         out.put('\0');
         // mapped address must come after name
-        bwrite(out, functions_size_so_far);
+        // FIXME: use uncasted uint64_t
+        bwrite(out, static_cast<uint16_t>(functions_size_so_far));
         // functions size must be incremented by the actual size of function's bytecode size
         // to give correct offset for next function
         try {
