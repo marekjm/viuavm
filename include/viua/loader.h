@@ -12,7 +12,7 @@
 #include <map>
 #include <viua/bytecode/bytetypedef.h>
 
-typedef std::tuple<std::vector<std::string>, std::map<std::string, uint16_t> > IdToAddressMapping;
+typedef std::tuple<std::vector<std::string>, std::map<std::string, uint64_t> > IdToAddressMapping;
 
 class Loader {
     std::string path;

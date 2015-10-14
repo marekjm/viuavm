@@ -13,15 +13,13 @@ using namespace std;
 
 IdToAddressMapping Loader::loadmap(char* bytedump, const uint64_t& bytedump_size) {
     vector<string> order;
-    // FIXME: uint16_t -> uint64_t
-    map<string, uint16_t> mapping;
+    map<string, uint64_t> mapping;
 
     char *lib_function_ids_map = bytedump;
 
     long unsigned i = 0;
     string lib_fn_name;
-    // FIXME: uint16_t -> uint64_t
-    uint16_t lib_fn_address;
+    uint64_t lib_fn_address;
     while (i < bytedump_size) {
         lib_fn_name = string(lib_function_ids_map);
         i += lib_fn_name.size() + 1;  // one for null character
@@ -77,8 +75,7 @@ void Loader::loadFunctionsMap(ifstream& in) {
     in.read(lib_buffer_function_ids, lib_function_ids_section_size);
 
     vector<string> order;
-    // FIXME: uint16_t -> uint64_t
-    map<string, uint16_t> mapping;
+    map<string, uint64_t> mapping;
 
     tie(order, mapping) = loadmap(lib_buffer_function_ids, lib_function_ids_section_size);
 
@@ -96,8 +93,7 @@ void Loader::loadBlocksMap(ifstream& in) {
     in.read(lib_buffer_block_ids, lib_block_ids_section_size);
 
     vector<string> order;
-    // FIXME: uint16_t -> uint64_t
-    map<string, uint16_t> mapping;
+    map<string, uint64_t> mapping;
 
     tie(order, mapping) = loadmap(lib_buffer_block_ids, lib_block_ids_section_size);
 

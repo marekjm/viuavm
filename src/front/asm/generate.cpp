@@ -695,7 +695,7 @@ uint64_t writeCodeBlocksSection(ofstream& out, const invocables_t& blocks, const
     uint64_t block_ids_section_size = 0;
     for (string name : blocks.names) { block_ids_section_size += name.size(); }
     // we need to insert address after every block
-    block_ids_section_size += sizeof(uint16_t) * blocks.names.size();
+    block_ids_section_size += sizeof(uint64_t) * blocks.names.size();
     // for null characters after block names
     block_ids_section_size += blocks.names.size();
 
@@ -723,7 +723,7 @@ uint64_t writeCodeBlocksSection(ofstream& out, const invocables_t& blocks, const
         out.put('\0');
         // mapped address must come after name
         // FIXME: use uncasted uint64_t
-        bwrite(out, static_cast<uint16_t>(block_bodies_size_so_far));
+        bwrite(out, block_bodies_size_so_far);
         // blocks.bodies size must be incremented by the actual size of block's bytecode size
         // to give correct offset for next block
         try {
@@ -1129,7 +1129,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         // ...requires terminating null character
         out.put('\0');
         // mapped address must come after name
-        uint16_t address = function_addresses[name];
+        uint64_t address = function_addresses[name];
         bwrite(out, address);
     }
 
