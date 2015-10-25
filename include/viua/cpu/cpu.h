@@ -13,17 +13,7 @@
 #include <utility>
 #include <algorithm>
 #include <stdexcept>
-#include <viua/bytecode/bytetypedef.h>
-#include <viua/types/type.h>
-#include <viua/types/prototype.h>
-#include <viua/cpu/registerset.h>
-#include <viua/cpu/frame.h>
-#include <viua/cpu/tryframe.h>
-#include <viua/include/module.h>
-
-
-const unsigned DEFAULT_REGISTER_SIZE = 256;
-const unsigned MAX_STACK_SIZE = 8192;
+#include <viua/thread.h>
 
 
 class HaltException : public std::runtime_error {

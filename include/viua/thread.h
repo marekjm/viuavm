@@ -3,10 +3,22 @@
 
 #pragma once
 
-#include <viua/cpu/cpu.h>
+#include <viua/bytecode/bytetypedef.h>
+#include <viua/types/type.h>
+#include <viua/types/prototype.h>
+#include <viua/cpu/registerset.h>
+#include <viua/cpu/frame.h>
+#include <viua/cpu/tryframe.h>
+#include <viua/include/module.h>
+
+class CPU;
+
+const unsigned DEFAULT_REGISTER_SIZE = 256;
+const unsigned MAX_STACK_SIZE = 8192;
+
 
 class Thread {
-    CPU& cpu;
+    CPU *cpu;
 
     // Currently used register set
     RegisterSet* uregset;
@@ -163,7 +175,6 @@ class Thread {
     byte* link(byte*);
 
     public:
-
         CPU& iframe(Frame* frm = nullptr, unsigned r = DEFAULT_REGISTER_SIZE);
 
         byte* dispatch(byte*);
@@ -177,7 +188,7 @@ class Thread {
         }
         inline std::vector<Frame*> trace() { return frames; }
 
-        Thread(CPU& _cpu): cpu(_cpu) {
+        Thread(CPU *_cpu): cpu(_cpu) {
         }
 };
 
