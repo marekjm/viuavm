@@ -1224,7 +1224,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
             *reinterpret_cast<uint64_t*>(linked_bytecode+jmp) += bytes_offset;
         }
 
-        for (int i = 0; i < linked_size; ++i) {
+        for (decltype(linked_size) i = 0; i < linked_size; ++i) {
             program_bytecode[program_bytecode_used+i] = linked_bytecode[i];
         }
         program_bytecode_used += linked_size;
