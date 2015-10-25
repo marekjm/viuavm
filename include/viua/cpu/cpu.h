@@ -266,6 +266,8 @@ class CPU {
         byte* dispatch(byte*);
         byte* tick();
 
+        void cycle();
+
         int run();
         inline decltype(instruction_counter) counter() { return instruction_counter; }
 
