@@ -33,6 +33,9 @@ class CPU {
     uint64_t bytecode_size;
     uint64_t executable_offset;
 
+    // vector of all threads machine is executing
+    std::vector<Thread> threads;
+
     // Global register set
     RegisterSet* regset;
     // Currently used register set
