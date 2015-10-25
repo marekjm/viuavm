@@ -1,0 +1,185 @@
+#ifndef VIUA_THREAD_H
+#define VIUA_THREAD_H
+
+#pragma once
+
+#include <viua/cpu/cpu.h>
+
+class Thread {
+    CPU& cpu;
+
+    // Currently used register set
+    RegisterSet* uregset;
+    // Temporary register
+    Type* tmp;
+    // Static registers
+    std::map<std::string, RegisterSet*> static_registers;
+
+
+    // Call stack
+    std::vector<Frame*> frames;
+    Frame* frame_new;
+
+    // Block stack
+    std::vector<TryFrame*> tryframes;
+    TryFrame* try_frame_new;
+
+    /*  Slot for thrown objects (typically exceptions).
+     *  Can be set by user code and the CPU.
+     */
+    Type* thrown;
+    Type* caught;
+
+    /*  Variables set after CPU executed bytecode.
+     *  They describe exit conditions of the bytecode that just stopped running.
+     */
+    int return_code;                // always set
+    std::string return_exception;   // set if CPU stopped because of an exception
+    std::string return_message;     // message set by exception
+
+    // FIXME: change unsigned to uint64_t
+    unsigned instruction_counter;
+    byte* instruction_pointer;
+
+    Type* fetch(unsigned) const;
+    void place(unsigned, Type*);
+    void ensureStaticRegisters(std::string);
+
+    /*  Methods dealing with stack and frame manipulation, and
+     *  function calls.
+     */
+    Frame* requestNewFrame(int arguments_size = 0, int registers_size = 0);
+    TryFrame* requestNewTryFrame();
+    void pushFrame();
+    void dropFrame();
+    // call native (i.e. written in Viua) function
+    byte* callNative(byte*, const std::string&, const bool&, const int&, const std::string&);
+    // call foreign (i.e. from a C++ extension) function
+    byte* callForeign(byte*, const std::string&, const bool&, const int&, const std::string&);
+    // call foreign method (i.e. method of a pure-C++ class loaded into machine's typesystem)
+    byte* callForeignMethod(byte*, Type*, const std::string&, const bool&, const int&, const std::string&);
+
+    /*  Methods implementing CPU instructions.
+     */
+    byte* izero(byte*);
+    byte* istore(byte*);
+    byte* iadd(byte*);
+    byte* isub(byte*);
+    byte* imul(byte*);
+    byte* idiv(byte*);
+
+    byte* ilt(byte*);
+    byte* ilte(byte*);
+    byte* igt(byte*);
+    byte* igte(byte*);
+    byte* ieq(byte*);
+
+    byte* iinc(byte*);
+    byte* idec(byte*);
+
+    byte* fstore(byte*);
+    byte* fadd(byte*);
+    byte* fsub(byte*);
+    byte* fmul(byte*);
+    byte* fdiv(byte*);
+
+    byte* flt(byte*);
+    byte* flte(byte*);
+    byte* fgt(byte*);
+    byte* fgte(byte*);
+    byte* feq(byte*);
+
+    byte* bstore(byte*);
+
+    byte* itof(byte*);
+    byte* ftoi(byte*);
+    byte* stoi(byte*);
+    byte* stof(byte*);
+
+    byte* strstore(byte*);
+
+    byte* vec(byte*);
+    byte* vinsert(byte*);
+    byte* vpush(byte*);
+    byte* vpop(byte*);
+    byte* vat(byte*);
+    byte* vlen(byte*);
+
+    byte* boolean(byte*);
+    byte* lognot(byte*);
+    byte* logand(byte*);
+    byte* logor(byte*);
+
+    byte* move(byte*);
+    byte* copy(byte*);
+    byte* ref(byte*);
+    byte* swap(byte*);
+    byte* free(byte*);
+    byte* empty(byte*);
+    byte* isnull(byte*);
+
+    byte* ress(byte*);
+    byte* tmpri(byte*);
+    byte* tmpro(byte*);
+
+    byte* print(byte*);
+    byte* echo(byte*);
+
+    byte* clbind(byte*);
+    byte* closure(byte*);
+
+    byte* function(byte*);
+    byte* fcall(byte*);
+
+    byte* frame(byte*);
+    byte* param(byte*);
+    byte* paref(byte*);
+    byte* arg(byte*);
+    byte* argc(byte*);
+
+    byte* call(byte*);
+    byte* end(byte*);
+
+    byte* jump(byte*);
+    byte* branch(byte*);
+
+    byte* vmtry(byte*);
+    byte* vmcatch(byte*);
+    byte* pull(byte*);
+    byte* vmenter(byte*);
+    byte* vmthrow(byte*);
+    byte* leave(byte*);
+
+    byte* vmclass(byte*);
+    byte* prototype(byte*);
+    byte* vmderive(byte*);
+    byte* vmattach(byte*);
+    byte* vmregister(byte*);
+
+    byte* vmnew(byte*);
+    byte* vmmsg(byte*);
+
+    byte* import(byte*);
+    byte* link(byte*);
+
+    public:
+
+        CPU& iframe(Frame* frm = nullptr, unsigned r = DEFAULT_REGISTER_SIZE);
+
+        byte* dispatch(byte*);
+        byte* tick();
+
+        int run();
+        inline unsigned counter() { return instruction_counter; }
+
+        inline std::tuple<int, std::string, std::string> exitcondition() {
+            return std::tuple<int, std::string, std::string>(return_code, return_exception, return_message);
+        }
+        inline std::vector<Frame*> trace() { return frames; }
+
+        Thread(CPU& _cpu): cpu(_cpu) {
+        }
+};
+
+
+#endif
