@@ -80,8 +80,7 @@ class CPU {
     std::string return_exception;   // set if CPU stopped because of an exception
     std::string return_message;     // message set by exception
 
-    // FIXME: change unsigned to uint64_t
-    unsigned instruction_counter;
+    uint64_t instruction_counter;
     byte* instruction_pointer;
 
     /*  This is the interface between programs compiled to VM bytecode and
@@ -265,7 +264,7 @@ class CPU {
         byte* tick();
 
         int run();
-        inline unsigned counter() { return instruction_counter; }
+        inline decltype(instruction_counter) counter() { return instruction_counter; }
 
         inline std::tuple<int, std::string, std::string> exitcondition() {
             return std::tuple<int, std::string, std::string>(return_code, return_exception, return_message);
