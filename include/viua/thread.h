@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <string>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/types/type.h>
 #include <viua/types/prototype.h>
@@ -21,6 +22,7 @@ class CPU;
 
 class Thread {
     CPU *cpu;
+    const std::string entry_function;
 
     bool debug;
 
@@ -197,7 +199,9 @@ class Thread {
         }
         inline std::vector<Frame*> trace() { return frames; }
 
-        Thread(CPU *_cpu): cpu(_cpu), debug(false) {
+        Thread(Frame* frm, CPU *_cpu): cpu(_cpu), entry_function(frm->function_name), debug(false) {
+            uregset = frm->regset;
+            frames.push_back(frm);
         }
 };
 

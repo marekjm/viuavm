@@ -548,6 +548,8 @@ CPU& CPU::iframe(Frame* frm, unsigned r) {
 
     frames.push_back(initial_frame);
 
+    threads.push_back(Thread(initial_frame, this));
+
     return (*this);
 }
 
