@@ -23,6 +23,7 @@ class HaltException : public std::runtime_error {
 
 
 class CPU {
+    friend Thread;
 #ifdef AS_DEBUG_HEADER
     public:
 #endif

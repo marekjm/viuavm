@@ -265,6 +265,11 @@ build/types/reference.o: src/types/reference.cpp include/viua/types/reference.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
 ############################################################
+# CPU AND THREADING MODULES
+build/thread.o: src/thread.cpp include/viua/thread.h
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+
+############################################################
 # CPU INSTRUCTIONS
 build/cpu/instr/general.o: src/cpu/instr/general.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<

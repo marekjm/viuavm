@@ -11,16 +11,21 @@
 #include <viua/cpu/tryframe.h>
 #include <viua/include/module.h>
 
-class CPU;
 
 const unsigned DEFAULT_REGISTER_SIZE = 256;
 const unsigned MAX_STACK_SIZE = 8192;
 
 
+class CPU;
+
+
 class Thread {
     CPU *cpu;
 
+    bool debug;
+
     // Currently used register set
+    RegisterSet* regset;
     RegisterSet* uregset;
     // Temporary register
     Type* tmp;
@@ -29,6 +34,7 @@ class Thread {
 
 
     // Call stack
+    byte* jump_base;
     std::vector<Frame*> frames;
     Frame* frame_new;
 
@@ -55,6 +61,8 @@ class Thread {
 
     Type* fetch(unsigned) const;
     void place(unsigned, Type*);
+    void updaterefs(Type*, Type*);
+    bool hasrefs(unsigned);
     void ensureStaticRegisters(std::string);
 
     /*  Methods dealing with stack and frame manipulation, and
@@ -180,6 +188,7 @@ class Thread {
         byte* dispatch(byte*);
         byte* tick();
 
+        byte* begin();
         int run();
         inline unsigned counter() { return instruction_counter; }
 
@@ -188,7 +197,7 @@ class Thread {
         }
         inline std::vector<Frame*> trace() { return frames; }
 
-        Thread(CPU *_cpu): cpu(_cpu) {
+        Thread(CPU *_cpu): cpu(_cpu), debug(false) {
         }
 };
 
