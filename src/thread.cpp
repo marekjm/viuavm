@@ -444,6 +444,10 @@ byte* Thread::tick() {
     return instruction_pointer;
 }
 
+void Thread::iframe(Frame* frm, unsigned r) {
+    // FIXME: remove this placeholder function
+}
+
 int Thread::run() {
     /*  VM CPU implementation.
      */

@@ -17,6 +17,12 @@ const unsigned DEFAULT_REGISTER_SIZE = 256;
 const unsigned MAX_STACK_SIZE = 8192;
 
 
+class HaltException : public std::runtime_error {
+    public:
+        HaltException(): std::runtime_error("execution halted") {}
+};
+
+
 class CPU;
 
 
@@ -185,7 +191,7 @@ class Thread {
     byte* link(byte*);
 
     public:
-        CPU& iframe(Frame* frm = nullptr, unsigned r = DEFAULT_REGISTER_SIZE);
+        void iframe(Frame* frm = nullptr, unsigned r = DEFAULT_REGISTER_SIZE);
 
         byte* dispatch(byte*);
         byte* tick();

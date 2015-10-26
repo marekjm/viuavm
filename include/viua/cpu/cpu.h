@@ -16,12 +16,6 @@
 #include <viua/thread.h>
 
 
-class HaltException : public std::runtime_error {
-    public:
-        HaltException(): std::runtime_error("execution halted") {}
-};
-
-
 class CPU {
     friend Thread;
 #ifdef AS_DEBUG_HEADER

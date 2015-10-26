@@ -2,6 +2,7 @@
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/opcodes.h>
 #include <viua/thread.h>
+#include <viua/cpu/cpu.h>
 using namespace std;
 
 
@@ -248,7 +249,7 @@ byte* Thread::dispatch(byte* addr) {
             break;
         default:
             ostringstream error;
-            error << "unrecognised instruction (bytecode value: " << int(*bytecode) << ")";
+            error << "unrecognised instruction (bytecode value: " << int(*cpu->bytecode) << ")";
             throw error.str().c_str();
     }
     return addr;
