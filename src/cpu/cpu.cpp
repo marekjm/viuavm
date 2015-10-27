@@ -540,13 +540,13 @@ CPU& CPU::iframe(Frame* frm, unsigned r) {
         delete regset;
     }
 
-    // set global registers
-    regset = new RegisterSet(r);
+    /* // set global registers */
+    /* regset = new RegisterSet(r); */
 
-    // set currently used register set
-    uregset = initial_frame->regset;
+    /* // set currently used register set */
+    /* uregset = initial_frame->regset; */
 
-    frames.push_back(initial_frame);
+    /* frames.push_back(initial_frame); */
 
     threads.push_back(Thread(initial_frame, this));
 
@@ -555,142 +555,7 @@ CPU& CPU::iframe(Frame* frm, unsigned r) {
 
 
 byte* CPU::tick() {
-    /** Perform a *tick*, i.e. run a single CPU instruction.
-     *
-     *  Returns pointer to next instruction upon correct execution.
-     *  Returns null pointer upon error.
-     */
-    bool halt = false;
-    byte* previous_instruction_pointer = instruction_pointer;
-    ++instruction_counter;
-
-    try {
-        instruction_pointer = dispatch(instruction_pointer);
-    } catch (Exception* e) {
-        /* All machine-thrown exceptions are passed back to user code.
-         * This is much easier than checking for erroneous conditions and
-         * terminating functions conditionally, instead - machine just throws Exception objects which
-         * are then caught here.
-         *
-         * If user code cannot deal with them (i.e. did not register a catcher block) they will terminate execution later.
-         */
-        thrown = e;
-    } catch (const HaltException& e) {
-        halt = true;
-    } catch (const char* e) {
-        thrown = new Exception(e);
-    }
-
-    if (halt or frames.size() == 0) { return nullptr; }
-
-    /*  Machine should halt execution if the instruction pointer exceeds bytecode size and
-     *  top frame is for local function.
-     *  For dynamically linked functions address will not be in bytecode size range.
-     */
-    Frame* top_frame = (frames.size() ? frames.back() : nullptr);
-    TryFrame* top_tryframe = (tryframes.size() ? tryframes.back() : nullptr);
-    bool is_current_function_dynamic = linked_functions.count(top_frame != nullptr ? top_frame->function_name : "");
-    bool is_current_block_dynamic = linked_blocks.count(top_tryframe != nullptr ? top_tryframe->block_name : "");
-    if (instruction_pointer >= (bytecode+bytecode_size) and not (is_current_function_dynamic or is_current_block_dynamic)) {
-        return_code = 1;
-        return_exception = "InvalidBytecodeAddress";
-        return_message = string("instruction address out of bounds");
-        return nullptr;
-    }
-
-    /*  Machine should halt execution if previous instruction pointer is the same as current one as
-     *  it means that the execution flow is corrupted.
-     *
-     *  However, execution *should not* be halted if:
-     *      - the offending opcode is END (as this may indicate exiting recursive function),
-     *      - an object has been thrown, as the instruction pointer will be adjusted by
-     *        catchers or execution will be halted on unhandled types,
-     */
-    if (instruction_pointer == previous_instruction_pointer and OPCODE(*instruction_pointer) != END and thrown == nullptr) {
-        return_code = 2;
-        ostringstream oss;
-        return_exception = "InstructionUnchanged";
-        oss << "instruction pointer did not change, possibly endless loop\n";
-        oss << "note: instruction index was " << (instruction_pointer-bytecode) << " and the opcode was '" << OP_NAMES.at(OPCODE(*instruction_pointer)) << "'";
-        if (OPCODE(*instruction_pointer) == CALL) {
-            oss << '\n';
-            oss << "note: this was caused by 'call' opcode immediately calling itself\n"
-                << "      such situation may have several sources, e.g. empty function definition or\n"
-                << "      a function which calls itself in its first instruction";
-        }
-        return_message = oss.str();
-        return nullptr;
-    }
-
-    TryFrame* tframe;
-    // WARNING!
-    // This is a temporary hack for more fine-grained exception handling
-    if (thrown != nullptr and thrown->type() == "Exception") {
-        string exception_detailed_type = static_cast<Exception*>(thrown)->etype();
-        for (long unsigned i = tryframes.size(); i > 0; --i) {
-            tframe = tryframes[(i-1)];
-            if (tframe->catchers.count(exception_detailed_type)) {
-                instruction_pointer = tframe->catchers.at(exception_detailed_type)->block_address;
-
-                caught = thrown;
-                thrown = nullptr;
-
-                break;
-            }
-        }
-    }
-
-    if (thrown != nullptr) {
-        for (long unsigned i = tryframes.size(); i > 0; --i) {
-            tframe = tryframes[(i-1)];
-            string handler_found_for_type = thrown->type();
-            bool handler_found = tframe->catchers.count(handler_found_for_type);
-
-            if ((not handler_found) and typesystem.count(handler_found_for_type)) {
-                vector<string> types_to_check = inheritanceChainOf(handler_found_for_type);
-                for (unsigned j = 0; j < types_to_check.size(); ++j) {
-                    if (tframe->catchers.count(types_to_check[j])) {
-                        handler_found = true;
-                        handler_found_for_type = types_to_check[j];
-                        break;
-                    }
-                }
-            }
-
-            if (handler_found) {
-                instruction_pointer = tframe->catchers.at(handler_found_for_type)->block_address;
-
-                unsigned distance = 0;
-                for (long unsigned j = (frames.size()-1); j > 1; --j) {
-                    if (frames[j] == tframe->associated_frame) {
-                        break;
-                    }
-                    ++distance;
-                }
-                for (unsigned j = 0; j < distance; ++j) {
-                    dropFrame();
-                }
-
-                while (tryframes.back() != tframe) {
-                    delete tryframes.back();
-                    tryframes.pop_back();
-                }
-
-                caught = thrown;
-                thrown = nullptr;
-
-                break;
-            }
-        }
-    }
-    if (thrown != nullptr) {
-        return_code = 1;
-        return_exception = thrown->type();
-        return_message = thrown->repr();
-        return nullptr;
-    }
-
-    return instruction_pointer;
+    return threads[0].tick();
 }
 
 int CPU::run() {
@@ -701,7 +566,9 @@ int CPU::run() {
     }
 
     iframe();
-    begin(); // set the instruction pointer
+    threads[0].begin();
+    //begin(); // set the instruction pointer
+    /*
     while (tick()) {}
 
     if (return_code == 0 and regset->at(0)) {
@@ -725,6 +592,7 @@ int CPU::run() {
         delete frames.back();
         delete regset;
     }
+    */
 
     return return_code;
 }
