@@ -92,7 +92,7 @@ bool VERBOSE = false;
 
 
 OPCODE printInstruction(const CPU& cpu) {
-    byte* iptr = cpu.instruction_pointer;
+    byte* iptr = cpu.threads[0].instruction_pointer;
 
     string instruction;
     unsigned size;
@@ -193,8 +193,8 @@ tuple<bool, string> if_breakpoint_byte(CPU& cpu, vector<byte*>& breakpoints_byte
     ostringstream reason;
     reason.str("");
 
-    if (find(breakpoints_byte.begin(), breakpoints_byte.end(), cpu.instruction_pointer) != breakpoints_byte.end()) {
-        reason << "info: execution paused by byte breakpoint: " << cpu.instruction_pointer;
+    if (find(breakpoints_byte.begin(), breakpoints_byte.end(), cpu.threads[0].instruction_pointer) != breakpoints_byte.end()) {
+        reason << "info: execution paused by byte breakpoint: " << cpu.threads[0].instruction_pointer;
         pause = true;
     }
 
@@ -205,7 +205,7 @@ tuple<bool, string> if_breakpoint_opcode(CPU& cpu, vector<string>& breakpoints_o
     ostringstream reason;
     reason.str("");
 
-    string op_name = OP_NAMES.at(OPCODE(*cpu.instruction_pointer));
+    string op_name = OP_NAMES.at(OPCODE(*cpu.threads[0].instruction_pointer));
 
     if (find(breakpoints_opcode.begin(), breakpoints_opcode.end(), op_name) != breakpoints_opcode.end()) {
         reason << "info: execution halted by opcode breakpoint: " << op_name;
@@ -219,10 +219,10 @@ tuple<bool, string> if_breakpoint_function(CPU& cpu, vector<string>& breakpoints
     ostringstream reason;
     reason.str("");
 
-    string op_name = OP_NAMES.at(OPCODE(*cpu.instruction_pointer));
+    string op_name = OP_NAMES.at(OPCODE(*cpu.threads[0].instruction_pointer));
 
     if (op_name == "call" or op_name == "excall") {
-        string function_name = string(cpu.instruction_pointer+1+sizeof(bool)+sizeof(int));
+        string function_name = string(cpu.threads[0].instruction_pointer+1+sizeof(bool)+sizeof(int));
         if (find(breakpoints_function.begin(), breakpoints_function.end(), function_name) != breakpoints_function.end()) {
             reason << "info: execution halted by function breakpoint: " << function_name;
             pause = true;
@@ -236,7 +236,7 @@ tuple<bool, string> if_watchpoint_local_register_write(CPU& cpu, const State& st
     /** Determine whether the instruction at instruction pointer should trigger a watchpoint.
      */
     bool writing_instruction = true;
-    OPCODE opcode = OPCODE(*cpu.instruction_pointer);
+    OPCODE opcode = OPCODE(*cpu.threads[0].instruction_pointer);
     if (opcode == NOP or
         opcode == NOP or
         opcode == RESS or
@@ -256,7 +256,7 @@ tuple<bool, string> if_watchpoint_local_register_write(CPU& cpu, const State& st
     }
     int register_index[2] = {-1, -1};
     int writes_to = 0;
-    byte* register_index_ptr = (cpu.instruction_pointer+1);
+    byte* register_index_ptr = (cpu.threads[0].instruction_pointer+1);
 
     if (opcode == IZERO or
         opcode == ISTORE or
@@ -331,7 +331,7 @@ tuple<bool, string> if_watchpoint_local_register_write(CPU& cpu, const State& st
     reason.str("");
 
     if (writing_instruction) {
-        auto search = state.watch_register_local_write.find(cpu.trace().back()->function_name);
+        auto search = state.watch_register_local_write.find(cpu.threads[0].trace().back()->function_name);
         if (search != state.watch_register_local_write.end()) {
             for (int i = 0; i < writes_to; ++i) {
                 if (find(search->second.begin(), search->second.end(), register_index[i]) != search->second.end()) {
@@ -348,7 +348,7 @@ tuple<bool, string> if_watchpoint_global_register_write(CPU& cpu, const State& s
     /** Determine whether the instruction at instruction pointer should trigger a watchpoint.
      */
     bool writing_instruction = true;
-    OPCODE opcode = OPCODE(*cpu.instruction_pointer);
+    OPCODE opcode = OPCODE(*cpu.threads[0].instruction_pointer);
     if (opcode == NOP or
         opcode == NOP or
         opcode == RESS or
@@ -368,7 +368,7 @@ tuple<bool, string> if_watchpoint_global_register_write(CPU& cpu, const State& s
     }
     int register_index[2] = {-1, -1};
     int writes_to = 0;
-    byte* register_index_ptr = (cpu.instruction_pointer+1);
+    byte* register_index_ptr = (cpu.threads[0].instruction_pointer+1);
 
     if (opcode == IZERO or
         opcode == ISTORE or
@@ -684,7 +684,7 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
         }
     } else if (command == "cpu.init") {
         cpu.iframe();
-        cpu.begin();
+        cpu.threads[0].begin();
         state.initialised = true;
     } else if (command == "cpu.preload") {
         cpu.preload();
@@ -700,20 +700,20 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
         state.ticks_left = (operands.size() ? stoi(operands[0]) : 1);
     } else if (command == "cpu.jump") {
         if (operands[0] == "sizeof") {
-            cpu.instruction_pointer += OP_SIZES.at(operands[1]);
+            cpu.threads[0].instruction_pointer += OP_SIZES.at(operands[1]);
         } else if (operands[0][0] == '+') {
             unsigned long j = stoul(str::sub(operands[0], 1));
             while (j > 0) {
                 string instruction;
                 unsigned size;
-                tie(instruction, size) = disassembler::instruction(cpu.instruction_pointer);
-                cpu.instruction_pointer += size;
+                tie(instruction, size) = disassembler::instruction(cpu.threads[0].instruction_pointer);
+                cpu.threads[0].instruction_pointer += size;
                 --j;
             }
         } else if (str::startswith(operands[0], "0x")) {
-            cpu.instruction_pointer = (cpu.bytecode+stoul(operands[0], nullptr, 16));
+            cpu.threads[0].instruction_pointer = (cpu.bytecode+stoul(operands[0], nullptr, 16));
         } else {
-            cpu.instruction_pointer = (cpu.bytecode+stoul(operands[0]));
+            cpu.threads[0].instruction_pointer = (cpu.bytecode+stoul(operands[0]));
         }
     } else if (command == "cpu.unpause") {
         state.paused = false;
@@ -952,9 +952,9 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
 
 
             try {
-                op_name = OP_NAMES.at(OPCODE(*cpu.instruction_pointer));
+                op_name = OP_NAMES.at(OPCODE(*cpu.threads[0].instruction_pointer));
             } catch (const std::out_of_range& e) {
-                cout << "fatal: unknown instruction at byte " << (cpu.instruction_pointer-cpu.bytecode) << endl;
+                cout << "fatal: unknown instruction at byte " << (cpu.threads[0].instruction_pointer-cpu.bytecode) << endl;
                 state.autoresumes = 0;
                 state.ticks_left = 0;
                 state.paused = true;
