@@ -492,39 +492,3 @@ void Thread::iframe(Frame* frm, unsigned r) {
 byte* Thread::begin() {
     return (instruction_pointer = (cpu->bytecode + cpu->function_addresses.at(frames[0]->function_name)));
 }
-
-int Thread::run() {
-    /*  VM CPU implementation.
-     */
-    if (!cpu->bytecode) {
-        throw "null bytecode (maybe not loaded?)";
-    }
-
-    iframe();
-    instruction_pointer = cpu->bytecode+cpu->executable_offset;
-    while (tick()) {}
-
-    if (return_code == 0 and regset->at(0)) {
-        // if return code if the default one and
-        // return register is not unused
-        // copy value of return register as return code
-        try {
-            return_code = static_cast<Integer*>(regset->get(0))->value();
-        } catch (const Exception* e) {
-            return_code = 1;
-            return_exception = e->type();
-            return_message = e->what();
-        }
-    }
-
-    // delete __entry function's frame and
-    // global registers
-    // otherwise we get huge memory leak
-    // do not delete if execution was halted because of exception
-    if (return_exception == "") {
-        delete frames.back();
-        delete regset;
-    }
-
-    return return_code;
-}

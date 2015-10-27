@@ -202,7 +202,6 @@ class Thread {
         inline Type* getActiveException() { return thrown; }
 
         byte* begin();
-        int run();
         inline unsigned counter() { return instruction_counter; }
 
         inline std::tuple<int, std::string, std::string> exitcondition() {
