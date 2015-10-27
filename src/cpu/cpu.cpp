@@ -571,10 +571,9 @@ int CPU::run() {
 
     iframe();
     threads[0].begin();
-    //begin(); // set the instruction pointer
     while (tick()) {
-        string s;
-        getline(cin, s);
+        /* string s; */
+        /* getline(cin, s); */
     }
 
     if (threads[0].terminated()) {
