@@ -49,13 +49,6 @@ CPU& CPU::bytes(uint64_t sz) {
     return (*this);
 }
 
-CPU& CPU::eoffset(uint64_t o) {
-    /*  Set offset of first executable instruction.
-     */
-    executable_offset = o;
-    return (*this);
-}
-
 CPU& CPU::preload() {
     /** This method preloads dynamic libraries specified by environment.
      */

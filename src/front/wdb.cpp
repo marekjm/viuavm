@@ -1062,7 +1062,7 @@ int main(int argc, char* argv[]) {
     }
 
     cpu.commandline_arguments = cmdline_args;
-    cpu.load(bytecode).bytes(bytes).eoffset(starting_instruction);
+    cpu.load(bytecode).bytes(bytes);
 
 
     Prototype* proto_object = new Prototype("Object");

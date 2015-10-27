@@ -137,7 +137,6 @@ class CPU {
          */
         CPU& load(byte*);
         CPU& bytes(uint64_t);
-        CPU& eoffset(uint64_t);
         CPU& preload();
 
         CPU& mapfunction(const std::string&, uint64_t);
