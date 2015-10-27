@@ -27,6 +27,9 @@ class CPU;
 
 
 class Thread {
+#ifdef AS_DEBUG_HEADER
+    public:
+#endif
     CPU *cpu;
     const std::string entry_function;
 
