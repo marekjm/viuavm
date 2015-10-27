@@ -55,6 +55,7 @@ class Thread {
      */
     Type* thrown;
     Type* caught;
+    bool has_unhandled_exception;
 
     /*  Variables set after CPU executed bytecode.
      *  They describe exit conditions of the bytecode that just stopped running.
@@ -197,6 +198,9 @@ class Thread {
         byte* xtick();
         byte* tick();
 
+        inline bool terminated() { return has_unhandled_exception; }
+        inline Type* getActiveException() { return thrown; }
+
         byte* begin();
         int run();
         inline unsigned counter() { return instruction_counter; }
@@ -206,7 +210,7 @@ class Thread {
         }
         inline std::vector<Frame*> trace() { return frames; }
 
-        Thread(Frame* frm, CPU *_cpu): cpu(_cpu), entry_function(frm->function_name), debug(false) {
+        Thread(Frame* frm, CPU *_cpu): cpu(_cpu), entry_function(frm->function_name), debug(false), has_unhandled_exception(false) {
             uregset = frm->regset;
             frames.push_back(frm);
         }

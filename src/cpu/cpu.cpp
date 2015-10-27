@@ -555,7 +555,11 @@ CPU& CPU::iframe(Frame* frm, unsigned r) {
 
 
 byte* CPU::tick() {
-    return threads[0].tick();
+    byte* ip = threads[0].tick();  // returns instruction pointer
+    if (threads[0].terminated()) {
+        return nullptr;
+    }
+    return ip;
 }
 
 int CPU::run() {
@@ -568,8 +572,17 @@ int CPU::run() {
     iframe();
     threads[0].begin();
     //begin(); // set the instruction pointer
+    while (tick()) {
+        string s;
+        getline(cin, s);
+    }
+
+    if (threads[0].terminated()) {
+        cout << "thread '0:" << hex << &(threads[0]) << dec << "' has terminated" << endl;
+        Type* ex = threads[0].getActiveException();
+        cout << ex << endl;
+    }
     /*
-    while (tick()) {}
 
     if (return_code == 0 and regset->at(0)) {
         // if return code if the default one and

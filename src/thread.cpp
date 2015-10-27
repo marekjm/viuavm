@@ -445,6 +445,43 @@ byte* Thread::xtick() {
 }
 
 byte* Thread::tick() {
+    bool halt = false;
+
+    byte* previous_instruction_pointer = instruction_pointer;
+    ++instruction_counter;
+
+    try {
+        cout << "pre:  " << reinterpret_cast<long unsigned>(instruction_pointer) << " " << OP_NAMES.at(OPCODE(*instruction_pointer)) << endl;
+        instruction_pointer = dispatch(instruction_pointer);
+        cout << "post: " << reinterpret_cast<long unsigned>(instruction_pointer) << " " << OP_NAMES.at(OPCODE(*instruction_pointer)) << endl;
+    } catch (Exception* e) {
+        /* All machine-thrown exceptions are passed back to user code.
+         * This is much easier than checking for erroneous conditions and
+         * terminating functions conditionally, instead - machine just throws Exception objects which
+         * are then caught here.
+         *
+         * If user code cannot deal with them (i.e. did not register a catcher block) they will terminate execution later.
+         */
+        cout << "event 0" << endl;
+        thrown = e;
+    } catch (const HaltException& e) {
+        cout << "event 1" << endl;
+        halt = true;
+    } catch (const char* e) {
+        cout << "event 2 " << e << endl;
+        thrown = new Exception(e);
+    }
+
+    if (halt or frames.size() == 0) {
+        cout << "halted" << endl;
+        return nullptr;
+    }
+
+    if (thrown != nullptr) {
+        has_unhandled_exception = true;
+        return nullptr;
+    }
+
     return instruction_pointer;
 }
 
