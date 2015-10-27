@@ -671,7 +671,7 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
             state.breakpoints_function.push_back(operands[j]);
         }
     } else if (command == "watch.register.local.write") {
-        string function_name = (operands[0] == "." ? cpu.trace().back()->function_name : operands[0]);
+        string function_name = (operands[0] == "." ? cpu.threads[0].trace().back()->function_name : operands[0]);
         if (not state.watch_register_local_write.count(function_name)) {
             state.watch_register_local_write[function_name] = vector<int>({});
         }
@@ -729,7 +729,7 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
     } else if (command == "register.global.show") {
         printRegisters(operands, cpu.regset);
     } else if (command == "register.static.show") {
-        string fun_name = cpu.trace().back()->function_name;
+        string fun_name = cpu.threads[0].trace().back()->function_name;
 
         try {
             printRegisters(operands, cpu.threads[0].static_registers.at(fun_name));
@@ -738,11 +738,11 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
             cout << "error: current function does not have static registers allocated" << endl;
         }
     } else if (command == "arguments.show") {
-        printRegisters(operands, cpu.trace().back()->args);
+        printRegisters(operands, cpu.threads[0].trace().back()->args);
     } else if (command == "print.ahead") {
         printInstruction(cpu);
     } else if (command == "stack.trace.show") {
-        vector<Frame*> stack = cpu.trace();
+        vector<Frame*> stack = cpu.threads[0].trace();
         string indent("");
         for (unsigned j = 0; j < stack.size(); ++j) {
             cout << indent;
@@ -751,9 +751,9 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
             indent += " ";
         }
     } else if (command == "stack.frame.show") {
-        Frame* top = cpu.trace().back();
+        Frame* top = cpu.threads[0].trace().back();
         cout << "frame: " << stringifyFunctionInvocation(top) << '\n';
-        cout << "  * index on stack: " << cpu.trace().size() << endl;
+        cout << "  * index on stack: " << cpu.threads[0].trace().size() << endl;
         cout << "  * return address:  " << top->ret_address() << endl;
         cout << "  * return value:    " << top->place_return_value_in << endl;
         cout << "  * resolve return:  " << (top->resolve_return_value_register ? "yes" : "no") << endl;
