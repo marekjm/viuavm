@@ -3,8 +3,8 @@ CXXOPTIMIZATIONFLAGS=
 COPTIMIZATIONFLAGS=
 DYNAMIC_SYMS=-Wl,--dynamic-list-cpp-typeinfo
 
-VIUA_CPU_INSTR_FILES_CPP=src/cpu/instr/general.cpp src/cpu/instr/registers.cpp src/cpu/instr/calls.cpp src/cpu/instr/linking.cpp src/cpu/instr/tcmechanism.cpp src/cpu/instr/closure.cpp src/cpu/instr/int.cpp src/cpu/instr/float.cpp src/cpu/instr/byte.cpp src/cpu/instr/str.cpp src/cpu/instr/bool.cpp src/cpu/instr/cast.cpp src/cpu/instr/vector.cpp src/cpu/instr/prototype.cpp src/cpu/instr/object.cpp
-VIUA_CPU_INSTR_FILES_O=build/cpu/instr/general.o build/cpu/instr/registers.o build/cpu/instr/calls.o build/cpu/instr/linking.o build/cpu/instr/tcmechanism.o build/cpu/instr/closure.o build/cpu/instr/int.o build/cpu/instr/float.o build/cpu/instr/byte.o build/cpu/instr/str.o build/cpu/instr/bool.o build/cpu/instr/cast.o build/cpu/instr/vector.o build/cpu/instr/prototype.o build/cpu/instr/object.o
+# VIUA_CPU_INSTR_FILES_CPP=src/cpu/instr/general.cpp src/cpu/instr/registers.cpp src/cpu/instr/calls.cpp src/cpu/instr/linking.cpp src/cpu/instr/tcmechanism.cpp src/cpu/instr/closure.cpp src/cpu/instr/int.cpp src/cpu/instr/float.cpp src/cpu/instr/byte.cpp src/cpu/instr/str.cpp src/cpu/instr/bool.cpp src/cpu/instr/cast.cpp src/cpu/instr/vector.cpp src/cpu/instr/prototype.cpp src/cpu/instr/object.cpp
+# VIUA_CPU_INSTR_FILES_O=build/cpu/instr/general.o build/cpu/instr/registers.o build/cpu/instr/calls.o build/cpu/instr/linking.o build/cpu/instr/tcmechanism.o build/cpu/instr/closure.o build/cpu/instr/int.o build/cpu/instr/float.o build/cpu/instr/byte.o build/cpu/instr/str.o build/cpu/instr/bool.o build/cpu/instr/cast.o build/cpu/instr/vector.o build/cpu/instr/prototype.o build/cpu/instr/object.o
 
 VIUA_THREAD_INSTR_FILES_O=build/thread/instr/general.o build/thread/instr/registers.o build/thread/instr/calls.o build/thread/instr/linking.o build/thread/instr/tcmechanism.o build/thread/instr/closure.o build/thread/instr/int.o build/thread/instr/float.o build/thread/instr/byte.o build/thread/instr/str.o build/thread/instr/bool.o build/thread/instr/cast.o build/thread/instr/vector.o build/thread/instr/prototype.o build/thread/instr/object.o
 
@@ -321,50 +321,50 @@ build/thread/instr/object.o: src/thread/instr/object.cpp
 
 ############################################################
 # CPU INSTRUCTIONS
-build/cpu/instr/general.o: src/cpu/instr/general.cpp
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+# build/cpu/instr/general.o: src/cpu/instr/general.cpp
+# 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/cpu/instr/registers.o: src/cpu/instr/registers.cpp
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+# build/cpu/instr/registers.o: src/cpu/instr/registers.cpp
+# 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/cpu/instr/calls.o: src/cpu/instr/calls.cpp build/cpu/cpu.o
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+# build/cpu/instr/calls.o: src/cpu/instr/calls.cpp build/cpu/cpu.o
+# 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/cpu/instr/linking.o: src/cpu/instr/linking.cpp build/cpu/cpu.o
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+# build/cpu/instr/linking.o: src/cpu/instr/linking.cpp build/cpu/cpu.o
+# 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/cpu/instr/tcmechanism.o: src/cpu/instr/tcmechanism.cpp
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+# build/cpu/instr/tcmechanism.o: src/cpu/instr/tcmechanism.cpp
+# 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/cpu/instr/closure.o: src/cpu/instr/closure.cpp
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+# build/cpu/instr/closure.o: src/cpu/instr/closure.cpp
+# 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/cpu/instr/int.o: src/cpu/instr/int.cpp
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+# build/cpu/instr/int.o: src/cpu/instr/int.cpp
+# 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/cpu/instr/float.o: src/cpu/instr/float.cpp
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+# build/cpu/instr/float.o: src/cpu/instr/float.cpp
+# 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/cpu/instr/byte.o: src/cpu/instr/byte.cpp
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+# build/cpu/instr/byte.o: src/cpu/instr/byte.cpp
+# 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/cpu/instr/str.o: src/cpu/instr/str.cpp
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+# build/cpu/instr/str.o: src/cpu/instr/str.cpp
+# 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/cpu/instr/bool.o: src/cpu/instr/bool.cpp
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+# build/cpu/instr/bool.o: src/cpu/instr/bool.cpp
+# 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/cpu/instr/cast.o: src/cpu/instr/cast.cpp
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+# build/cpu/instr/cast.o: src/cpu/instr/cast.cpp
+# 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/cpu/instr/vector.o: src/cpu/instr/vector.cpp
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+# build/cpu/instr/vector.o: src/cpu/instr/vector.cpp
+# 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/cpu/instr/prototype.o: src/cpu/instr/prototype.cpp
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+# build/cpu/instr/prototype.o: src/cpu/instr/prototype.cpp
+# 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
-build/cpu/instr/object.o: src/cpu/instr/object.cpp
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+# build/cpu/instr/object.o: src/cpu/instr/object.cpp
+# 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
 
 ############################################################
