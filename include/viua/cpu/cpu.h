@@ -258,7 +258,6 @@ class CPU {
 
         CPU& iframe(Frame* frm = nullptr, unsigned r = DEFAULT_REGISTER_SIZE);
 
-        byte* dispatch(byte*);
         byte* tick();
 
         void cycle();
