@@ -723,16 +723,16 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
     } else if (command == "cpu.counter") {
         cout << cpu.counter() << endl;
     } else if (command == "register.show") {
-        printRegisters(operands, cpu.uregset);
+        printRegisters(operands, cpu.threads[0].uregset);
     } else if (command == "register.local.show") {
-        printRegisters(operands, cpu.trace().back()->regset);
+        printRegisters(operands, cpu.threads[0].trace().back()->regset);
     } else if (command == "register.global.show") {
         printRegisters(operands, cpu.regset);
     } else if (command == "register.static.show") {
         string fun_name = cpu.trace().back()->function_name;
 
         try {
-            printRegisters(operands, cpu.static_registers.at(fun_name));
+            printRegisters(operands, cpu.threads[0].static_registers.at(fun_name));
         } catch (const std::out_of_range& e) {
             // OK, now we know that our function does not have static registers
             cout << "error: current function does not have static registers allocated" << endl;
