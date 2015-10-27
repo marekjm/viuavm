@@ -305,7 +305,7 @@ byte* Thread::callForeignMethod(byte* addr, Type* object, const string& call_nam
     return return_address;
 }
 
-byte* Thread::tick() {
+byte* Thread::xtick() {
     /** Perform a *tick*, i.e. run a single CPU instruction.
      *
      *  Returns pointer to next instruction upon correct execution.
@@ -444,8 +444,16 @@ byte* Thread::tick() {
     return instruction_pointer;
 }
 
+byte* Thread::tick() {
+    return instruction_pointer;
+}
+
 void Thread::iframe(Frame* frm, unsigned r) {
     // FIXME: remove this placeholder function
+}
+
+byte* Thread::begin() {
+    return (instruction_pointer = (cpu->bytecode + cpu->function_addresses.at(frames[0]->function_name)));
 }
 
 int Thread::run() {
