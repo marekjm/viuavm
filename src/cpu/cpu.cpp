@@ -533,8 +533,8 @@ CPU& CPU::iframe(Frame* frm, unsigned r) {
         delete regset;
     }
 
-    /* // set global registers */
-    /* regset = new RegisterSet(r); */
+    // set global registers
+    regset = new RegisterSet(r);
 
     /* // set currently used register set */
     /* uregset = initial_frame->regset; */
