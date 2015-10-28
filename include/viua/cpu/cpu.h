@@ -29,7 +29,7 @@ class CPU {
     uint64_t executable_offset;
 
     // vector of all threads machine is executing
-    std::vector<Thread> threads;
+    std::vector<Thread*> threads;
 
     // Global register set
     RegisterSet* regset;
@@ -167,7 +167,7 @@ class CPU {
         inline std::tuple<int, std::string, std::string> exitcondition() {
             return std::tuple<int, std::string, std::string>(return_code, return_exception, return_message);
         }
-        inline std::vector<Frame*> trace() { return threads[0].trace(); }
+        inline std::vector<Frame*> trace() { return threads[0]->trace(); }
 
         inline bool terminated() { return (terminating_exception != nullptr); }
         inline Type* terminatedBy() { return terminating_exception; }

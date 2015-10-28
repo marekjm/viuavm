@@ -541,15 +541,15 @@ CPU& CPU::iframe(Frame* frm, unsigned r) {
 
     /* frames.push_back(initial_frame); */
 
-    threads.push_back(Thread(initial_frame, this));
+    threads.push_back(new Thread(initial_frame, this));
 
     return (*this);
 }
 
 
 byte* CPU::tick() {
-    byte* ip = threads[0].tick();  // returns instruction pointer
-    if (threads[0].terminated()) {
+    byte* ip = threads[0]->tick();  // returns instruction pointer
+    if (threads[0]->terminated()) {
         return nullptr;
     }
     return ip;
@@ -563,15 +563,15 @@ int CPU::run() {
     }
 
     iframe();
-    threads[0].begin();
+    threads[0]->begin();
     while (tick()) {
         /* string s; */
         /* getline(cin, s); */
     }
 
-    if (threads[0].terminated()) {
-        cout << "thread '0:" << hex << &(threads[0]) << dec << "' has terminated" << endl;
-        Type* e = threads[0].getActiveException();
+    if (threads[0]->terminated()) {
+        cout << "thread '0:" << hex << threads[0] << dec << "' has terminated" << endl;
+        Type* e = threads[0]->getActiveException();
         cout << e << endl;
 
         return_code = 1;
