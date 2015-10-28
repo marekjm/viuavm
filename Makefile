@@ -69,8 +69,8 @@ bininstall: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/vdb build/bin/vm/dis
 	mkdir -p ${BIN_PATH}
 	cp ./build/bin/vm/asm ${BIN_PATH}/viua-asm
 	chmod 755 ${BIN_PATH}/viua-asm
-	cp ./build/bin/vm/cpu ${BIN_PATH}/viua-cpu
-	chmod 755 ${BIN_PATH}/viua-cpu
+	cp ./build/bin/vm/cpu ${BIN_PATH}/viua-vm
+	chmod 755 ${BIN_PATH}/viua-vm
 	cp ./build/bin/vm/vdb ${BIN_PATH}/viua-db
 	chmod 755 ${BIN_PATH}/viua-db
 	cp ./build/bin/vm/dis ${BIN_PATH}/viua-dis
