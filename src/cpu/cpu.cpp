@@ -571,8 +571,11 @@ int CPU::run() {
 
     if (threads[0].terminated()) {
         cout << "thread '0:" << hex << &(threads[0]) << dec << "' has terminated" << endl;
-        Type* ex = threads[0].getActiveException();
-        cout << ex << endl;
+        Type* e = threads[0].getActiveException();
+        cout << e << endl;
+
+        return_code = 1;
+        terminating_exception = e;
     }
     /*
 
