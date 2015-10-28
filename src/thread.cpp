@@ -560,3 +560,10 @@ void Thread::iframe(Frame* frm, unsigned r) {
 byte* Thread::begin() {
     return (instruction_pointer = (cpu->bytecode + cpu->function_addresses.at(frames[0]->function_name)));
 }
+
+Thread::~Thread() {
+    while (frames.size()) {
+        delete frames.back();
+        frames.pop_back();
+    }
+}

@@ -577,8 +577,8 @@ int CPU::run() {
         return_code = 1;
         terminating_exception = e;
     }
-    /*
 
+    /*
     if (return_code == 0 and regset->at(0)) {
         // if return code if the default one and
         // return register is not unused
@@ -591,16 +591,18 @@ int CPU::run() {
             return_message = e->what();
         }
     }
+    */
 
-    // delete __entry function's frame and
-    // global registers
+    // delete threads and global registers
     // otherwise we get huge memory leak
     // do not delete if execution was halted because of exception
-    if (return_exception == "") {
-        delete frames.back();
+    if (not terminated()) {
+        while (threads.size()) {
+            delete threads.back();
+            threads.pop_back();
+        }
         delete regset;
     }
-    */
 
     return return_code;
 }

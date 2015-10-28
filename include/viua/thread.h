@@ -216,6 +216,7 @@ class Thread {
             uregset = frm->regset;
             frames.push_back(frm);
         }
+        ~Thread();
 };
 
 
