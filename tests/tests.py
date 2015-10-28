@@ -537,7 +537,7 @@ class FunctionTests(unittest.TestCase):
         runTestSplitlines(self, 'neverending.asm', ['42', '48'])
 
     def testNeverendingFunction0(self):
-        runTestThrowsException(self, 'neverending0.asm', 'uncaught object: Exception = Exception: "stack size (8192) exceeded with call to \'one/0\'"')
+        runTestThrowsException(self, 'neverending0.asm', 'uncaught object: Exception = stack size (8192) exceeded with call to \'one/0\'')
 
 
 class HigherOrderFunctionTests(unittest.TestCase):
