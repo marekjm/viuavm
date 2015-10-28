@@ -133,7 +133,7 @@ int main(int argc, char* argv[]) {
     string return_exception = "", return_message = "";
     tie(ret_code, return_exception, return_message) = cpu.exitcondition();
 
-    if (ret_code != 0 and return_exception.size()) {
+    if (cpu.terminated()) {
         vector<Frame*> trace = cpu.trace();
         cout << "stack trace: from entry point, most recent call last...\n";
         for (unsigned i = 1; i < trace.size(); ++i) {
@@ -141,8 +141,12 @@ int main(int argc, char* argv[]) {
         }
         cout << "\n";
 
+        Type* thrown_object = cpu.terminatedBy();
+        Exception* ex = dynamic_cast<Exception*>(thrown_object);
+        string ex_type = thrown_object->type();
+
         cout << "exception after " << cpu.counter() << " ticks" << endl;
-        cout << "uncaught object: " << return_exception << " = " << return_message << endl;
+        cout << "uncaught object: " << ex_type << " = " << (ex ? ex->what() : thrown_object->str()) << endl;
         cout << "\n";
 
         cout << "frame details:\n";
