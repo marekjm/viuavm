@@ -214,7 +214,7 @@ byte* Thread::ress(byte* addr) {
 
     switch (to_register_set) {
         case 0:
-            uregset = regset;
+            uregset = cpu->regset;
             break;
         case 1:
             uregset = frames.back()->regset;
