@@ -98,6 +98,9 @@ class CPU {
     void place(unsigned, Type*);
     void ensureStaticRegisters(std::string);
 
+    // Final exception for stacktracing
+    Type* terminating_exception;
+
     /*  Methods dealing with stack and frame manipulation, and
      *  function calls.
      */
@@ -164,7 +167,10 @@ class CPU {
         inline std::tuple<int, std::string, std::string> exitcondition() {
             return std::tuple<int, std::string, std::string>(return_code, return_exception, return_message);
         }
-        inline std::vector<Frame*> trace() { return frames; }
+        inline std::vector<Frame*> trace() { return threads[0].trace(); }
+
+        inline bool terminated() { return (terminating_exception != nullptr); }
+        inline Type* terminatedBy() { return terminating_exception; }
 
         CPU():
             bytecode(nullptr), bytecode_size(0), executable_offset(0),
@@ -177,7 +183,8 @@ class CPU {
             thrown(nullptr), caught(nullptr),
             return_code(0), return_exception(""), return_message(""),
             instruction_counter(0), instruction_pointer(nullptr),
-            debug(false), errors(false)
+            debug(false), errors(false),
+            terminating_exception(nullptr)
         {}
 
         ~CPU() {
