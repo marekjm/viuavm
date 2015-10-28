@@ -247,10 +247,11 @@ byte* Thread::tmpri(byte* addr) {
         object_operand_index = static_cast<Integer*>(fetch(object_operand_index))->value();
     }
 
-    if (tmp != nullptr) {
+    // FIXME: mutex (VERY IMPORTANT!!!)
+    if (cpu->tmp != nullptr) {
         cout << "warning: CPU: storing in non-empty temporary register: memory has been leaked" << endl;
     }
-    tmp = uregset->get(object_operand_index)->copy();
+    cpu->tmp = uregset->get(object_operand_index)->copy();
 
     return addr;
 }
@@ -275,8 +276,9 @@ byte* Thread::tmpro(byte* addr) {
         }
         uregset->free(destination_register_index);
     }
-    uregset->set(destination_register_index, tmp);
-    tmp = nullptr;
+    // FIXME: mutex (VERY IMPORTANT!!!)
+    uregset->set(destination_register_index, cpu->tmp);
+    cpu->tmp = nullptr;
 
     return addr;
 }
