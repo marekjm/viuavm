@@ -90,7 +90,7 @@ MEMORY_LEAK_CHECKS_SKIPPED = 0
 MEMORY_LEAK_CHECKS_RUN = 0
 MEMORY_LEAK_CHECKS_ENABLE = 0
 valgrind_regex_heap_summary_in_use_at_exit = re.compile('in use at exit: (\d+(?:,\d+)?) bytes in (\d+) blocks')
-valgrind_regex_heap_summary_total_heap_usage = re.compile('total heap usage: (\d+) allocs, (\d+) frees, (\d+(?:,\d+)?) bytes allocated')
+valgrind_regex_heap_summary_total_heap_usage = re.compile('total heap usage: (\d+(?:,\d+)?) allocs, (\d+(?:,\d+)) frees, (\d+(?:,\d+)?) bytes allocated')
 valgrind_regex_leak_summary_definitely_lost = re.compile('definitely lost: (\d+(?:,\d+)?) bytes in (\d+) blocks')
 valgrind_regex_leak_summary_indirectly_lost = re.compile('indirectly lost: (\d+(?:,\d+)?) bytes in (\d+) blocks')
 valgrind_regex_leak_summary_possibly_lost = re.compile('possibly lost: (\d+(?:,\d+)?) bytes in (\d+) blocks')
@@ -110,8 +110,8 @@ def valgrindSummary(text):
 
     total_heap_usage_matched = valgrind_regex_heap_summary_total_heap_usage.search(interesting_lines[2])
     total_heap_usage = {
-        'allocs': int(total_heap_usage_matched.group(1)),
-        'frees': int(total_heap_usage_matched.group(2)),
+        'allocs': int(total_heap_usage_matched.group(1).replace(',', '')),
+        'frees': int(total_heap_usage_matched.group(2).replace(',', '')),
         'bytes': int(total_heap_usage_matched.group(3).replace(',', '')),
     }
     # print(interesting_lines[2], total_heap_usage)
