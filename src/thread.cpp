@@ -566,4 +566,13 @@ Thread::~Thread() {
         delete frames.back();
         frames.pop_back();
     }
+
+    decltype(static_registers)::iterator sr = static_registers.begin();
+    while (sr != static_registers.end()) {
+        auto rkey = sr->first;
+        auto rset = sr->second;
+        ++sr;
+        static_registers.erase(rkey);
+        delete rset;
+    }
 }
