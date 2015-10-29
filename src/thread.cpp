@@ -553,10 +553,6 @@ byte* Thread::tick() {
     return instruction_pointer;
 }
 
-void Thread::iframe(Frame* frm, unsigned r) {
-    // FIXME: remove this placeholder function
-}
-
 byte* Thread::begin() {
     return (instruction_pointer = (cpu->bytecode + cpu->function_addresses.at(frames[0]->function_name)));
 }

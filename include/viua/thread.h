@@ -195,8 +195,6 @@ class Thread {
     byte* link(byte*);
 
     public:
-        void iframe(Frame* frm = nullptr, unsigned r = DEFAULT_REGISTER_SIZE);
-
         byte* dispatch(byte*);
         byte* xtick();
         byte* tick();
