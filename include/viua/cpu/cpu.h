@@ -174,17 +174,15 @@ class CPU {
 
         CPU():
             bytecode(nullptr), bytecode_size(0), executable_offset(0),
-            regset(nullptr), uregset(nullptr),
-            tmp(nullptr),
+            regset(nullptr), uregset(nullptr), tmp(nullptr),
             static_registers({}),
-            frame_new(nullptr),
-            try_frame_new(nullptr),
+            frame_new(nullptr), try_frame_new(nullptr),
             jump_base(nullptr),
             thrown(nullptr), caught(nullptr),
             return_code(0), return_exception(""), return_message(""),
             instruction_counter(0), instruction_pointer(nullptr),
-            debug(false), errors(false),
-            terminating_exception(nullptr)
+            terminating_exception(nullptr),
+            debug(false), errors(false)
         {}
 
         ~CPU() {

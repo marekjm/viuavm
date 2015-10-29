@@ -212,7 +212,16 @@ class Thread {
         }
         inline std::vector<Frame*> trace() { return frames; }
 
-        Thread(Frame* frm, CPU *_cpu): cpu(_cpu), entry_function(frm->function_name), debug(false), has_unhandled_exception(false), frame_new(nullptr), try_frame_new(nullptr), thrown(nullptr), caught(nullptr) {
+        Thread(Frame* frm, CPU *_cpu): cpu(_cpu), entry_function(frm->function_name),
+            debug(false),
+            regset(nullptr), uregset(nullptr), tmp(nullptr),
+            jump_base(nullptr),
+            frame_new(nullptr), try_frame_new(nullptr),
+            thrown(nullptr), caught(nullptr), has_unhandled_exception(false),
+            return_code(0),
+            instruction_counter(0),
+            instruction_pointer(nullptr)
+        {
             uregset = frm->regset;
             frames.push_back(frm);
         }
