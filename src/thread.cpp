@@ -447,7 +447,6 @@ byte* Thread::xtick() {
 byte* Thread::tick() {
     bool halt = false;
 
-    byte* previous_instruction_pointer = instruction_pointer;
     ++instruction_counter;
 
     try {
