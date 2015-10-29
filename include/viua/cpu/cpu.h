@@ -33,27 +33,9 @@ class CPU {
 
     // Global register set
     RegisterSet* regset;
-    // Currently used register set
-    RegisterSet* uregset;
-
-    // Temporary register
-    Type* tmp;
-
-    // Static registers
-    std::map<std::string, RegisterSet*> static_registers;
 
     // Map of the typesystem currently existing inside the VM.
     std::map<std::string, Prototype*> typesystem;
-
-    /*  Call stack.
-     */
-    std::vector<Frame*> frames;
-    Frame* frame_new;
-
-    /*  Block stack.
-     */
-    std::vector<TryFrame*> tryframes;
-    TryFrame* try_frame_new;
 
     /*  Function and block names mapped to bytecode addresses.
      */
@@ -64,12 +46,6 @@ class CPU {
     std::map<std::string, std::pair<std::string, byte*>> linked_functions;
     std::map<std::string, std::pair<std::string, byte*>> linked_blocks;
     std::map<std::string, std::pair<unsigned, byte*> > linked_modules;
-
-    /*  Slot for thrown objects (typically exceptions).
-     *  Can be set by user code and the CPU.
-     */
-    Type* thrown;
-    Type* caught;
 
     /*  Variables set after CPU executed bytecode.
      *  They describe exit conditions of the bytecode that just stopped running.
@@ -90,30 +66,8 @@ class CPU {
      */
     std::map<std::string, ForeignMethod> foreign_methods;
 
-    /*  Methods to deal with registers.
-     */
-    void updaterefs(Type* before, Type* now);
-    bool hasrefs(unsigned);
-    Type* fetch(unsigned) const;
-    void place(unsigned, Type*);
-    void ensureStaticRegisters(std::string);
-
     // Final exception for stacktracing
     Type* terminating_exception;
-
-    /*  Methods dealing with stack and frame manipulation, and
-     *  function calls.
-     */
-    Frame* requestNewFrame(int arguments_size = 0, int registers_size = 0);
-    TryFrame* requestNewTryFrame();
-    void pushFrame();
-    void dropFrame();
-    // call native (i.e. written in Viua) function
-    byte* callNative(byte*, const std::string&, const bool&, const int&, const std::string&);
-    // call foreign (i.e. from a C++ extension) function
-    byte* callForeign(byte*, const std::string&, const bool&, const int&, const std::string&);
-    // call foreign method (i.e. method of a pure-C++ class loaded into machine's typesystem)
-    byte* callForeignMethod(byte*, Type*, const std::string&, const bool&, const int&, const std::string&);
 
     /*  Methods dealing with dynamic library loading.
      */
@@ -174,11 +128,8 @@ class CPU {
 
         CPU():
             bytecode(nullptr), bytecode_size(0), executable_offset(0),
-            regset(nullptr), uregset(nullptr), tmp(nullptr),
-            static_registers({}),
-            frame_new(nullptr), try_frame_new(nullptr),
+            regset(nullptr),
             jump_base(nullptr),
-            thrown(nullptr), caught(nullptr),
             return_code(0), return_exception(""), return_message(""),
             instruction_counter(0), instruction_pointer(nullptr),
             terminating_exception(nullptr),
@@ -190,17 +141,6 @@ class CPU {
              *  if you want to keep it around after the CPU is finished.
              */
             if (bytecode) { delete[] bytecode; }
-
-            std::map<std::string, RegisterSet*>::iterator sr = static_registers.begin();
-            while (sr != static_registers.end()) {
-                std::string  rkey = sr->first;
-                RegisterSet* rset = sr->second;
-
-                ++sr;
-
-                static_registers.erase(rkey);
-                delete rset;
-            }
 
             std::map<std::string, std::pair<unsigned, byte*> >::iterator lm = linked_modules.begin();
             while (lm != linked_modules.end()) {
