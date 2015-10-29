@@ -1052,7 +1052,6 @@ int main(int argc, char* argv[]) {
     cpu.debug = true;
 
     map<string, uint64_t> function_address_mapping = loader.getFunctionAddresses();
-    uint64_t starting_instruction = function_address_mapping["__entry"];
     for (auto p : function_address_mapping) { cpu.mapfunction(p.first, p.second); }
     for (auto p : loader.getBlockAddresses()) { cpu.mapblock(p.first, p.second); }
 
