@@ -101,14 +101,6 @@ CPU& CPU::registerForeignMethod(const string& name, ForeignMethod method) {
 }
 
 
-template<class T> inline void copyvalue(Type* a, Type* b) {
-    /** This is a short inline, template function to copy value between two `Type` pointers of the same polymorphic type.
-     *  It is used internally by CPU.
-     */
-    static_cast<T>(a)->value() = static_cast<T>(b)->value();
-}
-
-
 void CPU::loadNativeLibrary(const string& module) {
     regex double_colon("::");
     ostringstream oss;
