@@ -31,6 +31,7 @@ class Thread {
     public:
 #endif
     CPU *cpu;
+    const std::string entry_function;
 
     bool debug;
 
@@ -209,7 +210,7 @@ class Thread {
         }
         inline std::vector<Frame*> trace() { return frames; }
 
-        Thread(Frame* frm, CPU *_cpu): cpu(_cpu),
+        Thread(Frame* frm, CPU *_cpu): cpu(_cpu), entry_function(frm->function_name),
             debug(false),
             regset(nullptr), uregset(nullptr), tmp(nullptr),
             jump_base(nullptr),
