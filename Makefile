@@ -31,8 +31,9 @@ clean: clean-support clean-test-compiles clean-stdlib
 	rm -f ./build/bin/vm/*
 	rm -f ./build/bin/opcodes.bin
 	rm -f ./build/lib/*.o
-	rm -f ./build/cpu/instr/*.o
 	rm -f ./build/cpu/*.o
+	rm -f ./build/thread/instr/*.o
+	rm -f ./build/thread/*.o
 	rm -f ./build/cg/assembler/*.o
 	rm -f ./build/cg/disassembler/*.o
 	rm -f ./build/cg/bytecode/*.o
