@@ -222,18 +222,6 @@ void CPU::pushFrame() {
     frames.push_back(frame_new);
     frame_new = nullptr;
 }
-void CPU::dropFrame() {
-    /** Drops top-most frame from call stack.
-     */
-    delete frames.back();
-    frames.pop_back();
-
-    if (frames.size()) {
-        uregset = frames.back()->regset;
-    } else {
-        uregset = regset;
-    }
-}
 
 
 void CPU::loadNativeLibrary(const string& module) {
