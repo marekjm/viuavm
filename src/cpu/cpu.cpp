@@ -179,17 +179,6 @@ void CPU::place(unsigned index, Type* obj) {
     }
 }
 
-void CPU::ensureStaticRegisters(string function_name) {
-    /** Makes sure that static register set for requested function is initialized.
-     */
-    try {
-        static_registers.at(function_name);
-    } catch (const std::out_of_range& e) {
-        // FIXME: amount of static registers should be customizable
-        static_registers[function_name] = new RegisterSet(16);
-    }
-}
-
 
 void CPU::loadNativeLibrary(const string& module) {
     regex double_colon("::");

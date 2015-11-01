@@ -96,7 +96,6 @@ class CPU {
     bool hasrefs(unsigned);
     Type* fetch(unsigned) const;
     void place(unsigned, Type*);
-    void ensureStaticRegisters(std::string);
 
     // Final exception for stacktracing
     Type* terminating_exception;
