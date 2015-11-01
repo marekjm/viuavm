@@ -106,7 +106,6 @@ class CPU {
      */
     Frame* requestNewFrame(int arguments_size = 0, int registers_size = 0);
     TryFrame* requestNewTryFrame();
-    void pushFrame();
 
     /*  Methods dealing with dynamic library loading.
      */
