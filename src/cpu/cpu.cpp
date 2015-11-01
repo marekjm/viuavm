@@ -101,44 +101,6 @@ CPU& CPU::registerForeignMethod(const string& name, ForeignMethod method) {
 }
 
 
-void CPU::updaterefs(Type* before, Type* now) {
-    /** This method updates references to a given address present in registers.
-     *  It swaps old address for the new one in every register that points to the old address.
-     *
-     *  There is no need to delete old object in this function, as it will be deleted as soon as
-     *  it is replaced in the origin register (i.e. the register that holds the original pointer to
-     *  the object - the one from which all references had been derived).
-     */
-    // FIXME: this function should update references in all registersets
-    for (unsigned i = 0; i < uregset->size(); ++i) {
-        if (uregset->at(i) == before) {
-            if (debug) {
-                cout << "\nCPU: updating reference address in register " << i << hex << ": " << before << " -> " << now << dec << endl;
-            }
-            mask_t had_mask = uregset->getmask(i);
-            uregset->empty(i);
-            uregset->set(i, now);
-            uregset->setmask(i, had_mask);
-        }
-    }
-}
-
-bool CPU::hasrefs(unsigned index) {
-    /** This method checks if object at a given address exists as a reference in another register.
-     */
-    bool has = false;
-    // FIXME: this should check for references in every register set; gonna be slow, isn't it?
-    for (unsigned i = 0; i < uregset->size(); ++i) {
-        if (i == index) continue;
-        if (uregset->at(i) == uregset->at(index)) {
-            has = true;
-            break;
-        }
-    }
-    return has;
-}
-
-
 void CPU::loadNativeLibrary(const string& module) {
     regex double_colon("::");
     ostringstream oss;

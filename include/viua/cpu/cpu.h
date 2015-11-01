@@ -90,11 +90,6 @@ class CPU {
      */
     std::map<std::string, ForeignMethod> foreign_methods;
 
-    /*  Methods to deal with registers.
-     */
-    void updaterefs(Type* before, Type* now);
-    bool hasrefs(unsigned);
-
     // Final exception for stacktracing
     Type* terminating_exception;
 
