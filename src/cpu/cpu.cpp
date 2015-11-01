@@ -226,11 +226,6 @@ CPU& CPU::iframe(Frame* frm, unsigned r) {
     // set global registers
     regset = new RegisterSet(r);
 
-    /* // set currently used register set */
-    /* uregset = initial_frame->regset; */
-
-    /* frames.push_back(initial_frame); */
-
     threads.push_back(new Thread(initial_frame, this));
 
     return (*this);
