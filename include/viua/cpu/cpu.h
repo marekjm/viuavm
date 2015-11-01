@@ -115,8 +115,6 @@ class CPU {
         CPU& registerForeignPrototype(const std::string&, Prototype*);
         CPU& registerForeignMethod(const std::string&, ForeignMethod);
 
-        inline byte* end() { return nullptr; }
-
         CPU& iframe(Frame* frm = nullptr, unsigned r = DEFAULT_REGISTER_SIZE);
 
         byte* tick();
