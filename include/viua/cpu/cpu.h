@@ -108,12 +108,6 @@ class CPU {
     TryFrame* requestNewTryFrame();
     void pushFrame();
     void dropFrame();
-    // call native (i.e. written in Viua) function
-    byte* callNative(byte*, const std::string&, const bool&, const int&, const std::string&);
-    // call foreign (i.e. from a C++ extension) function
-    byte* callForeign(byte*, const std::string&, const bool&, const int&, const std::string&);
-    // call foreign method (i.e. method of a pure-C++ class loaded into machine's typesystem)
-    byte* callForeignMethod(byte*, Type*, const std::string&, const bool&, const int&, const std::string&);
 
     /*  Methods dealing with dynamic library loading.
      */
