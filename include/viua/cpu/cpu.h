@@ -45,16 +45,6 @@ class CPU {
     // Map of the typesystem currently existing inside the VM.
     std::map<std::string, Prototype*> typesystem;
 
-    /*  Call stack.
-     */
-    std::vector<Frame*> frames;
-    Frame* frame_new;
-
-    /*  Block stack.
-     */
-    std::vector<TryFrame*> tryframes;
-    TryFrame* try_frame_new;
-
     /*  Function and block names mapped to bytecode addresses.
      */
     byte* jump_base;
@@ -154,7 +144,6 @@ class CPU {
             bytecode(nullptr), bytecode_size(0), executable_offset(0),
             regset(nullptr), uregset(nullptr), tmp(nullptr),
             static_registers({}),
-            frame_new(nullptr), try_frame_new(nullptr),
             jump_base(nullptr),
             thrown(nullptr), caught(nullptr),
             return_code(0), return_exception(""), return_message(""),
