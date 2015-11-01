@@ -115,7 +115,6 @@ class CPU {
         CPU& registerForeignPrototype(const std::string&, Prototype*);
         CPU& registerForeignMethod(const std::string&, ForeignMethod);
 
-        byte* begin();
         inline byte* end() { return nullptr; }
 
         CPU& iframe(Frame* frm = nullptr, unsigned r = DEFAULT_REGISTER_SIZE);
@@ -142,7 +141,7 @@ class CPU {
             jump_base(nullptr),
             thrown(nullptr), caught(nullptr),
             return_code(0), return_exception(""), return_message(""),
-            instruction_counter(0), instruction_pointer(nullptr),
+            instruction_counter(0),
             terminating_exception(nullptr),
             debug(false), errors(false)
         {}

@@ -195,12 +195,6 @@ vector<string> CPU::inheritanceChainOf(const string& type_name) {
     return ichain;
 }
 
-byte* CPU::begin() {
-    /** Set instruction pointer to the execution beginning position.
-     */
-    return (instruction_pointer = bytecode+executable_offset);
-}
-
 CPU& CPU::iframe(Frame* frm, unsigned r) {
     /** Set initial frame.
      */
