@@ -236,40 +236,6 @@ void CPU::dropFrame() {
 }
 
 
-byte* CPU::callNative(byte* addr, const string& call_name, const bool& return_ref, const int& return_index, const string& real_call_name) {
-    byte* call_address = nullptr;
-    if (function_addresses.count(call_name)) {
-        call_address = bytecode+function_addresses.at(call_name);
-        jump_base = bytecode;
-    } else {
-        call_address = linked_functions.at(call_name).second;
-        jump_base = linked_modules.at(linked_functions.at(call_name).first).second;
-    }
-    if (real_call_name.size()) {
-        addr += (real_call_name.size()+1);
-    } else {
-        addr += (call_name.size()+1);
-    }
-
-
-    // save return address for frame
-    byte* return_address = addr;
-
-    if (frame_new == nullptr) {
-        throw new Exception("function call without first_operand_index frame: use `frame 0' in source code if the function takes no parameters");
-    }
-    // set function name and return address
-    frame_new->function_name = call_name;
-    frame_new->return_address = return_address;
-
-    frame_new->resolve_return_value_register = return_ref;
-    frame_new->place_return_value_in = return_index;
-
-    pushFrame();
-
-    return call_address;
-}
-
 void CPU::loadNativeLibrary(const string& module) {
     regex double_colon("::");
     ostringstream oss;
