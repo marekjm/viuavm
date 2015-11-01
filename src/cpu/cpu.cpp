@@ -101,23 +101,6 @@ CPU& CPU::registerForeignMethod(const string& name, ForeignMethod method) {
 }
 
 
-Type* CPU::fetch(unsigned index) const {
-    /*  Return pointer to object at given register.
-     *  This method safeguards against reaching for out-of-bounds registers and
-     *  reading from an empty register.
-     *
-     *  :params:
-     *
-     *  index:int   - index of a register to fetch
-     */
-    Type* object = uregset->get(index);
-    if (dynamic_cast<Reference*>(object)) {
-        object = static_cast<Reference*>(object)->pointsTo();
-    }
-    return object;
-}
-
-
 template<class T> inline void copyvalue(Type* a, Type* b) {
     /** This is a short inline, template function to copy value between two `Type` pointers of the same polymorphic type.
      *  It is used internally by CPU.
