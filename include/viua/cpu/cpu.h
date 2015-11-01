@@ -33,8 +33,6 @@ class CPU {
 
     // Global register set
     RegisterSet* regset;
-    // Currently used register set
-    RegisterSet* uregset;
 
     // Temporary register
     Type* tmp;
@@ -142,7 +140,8 @@ class CPU {
 
         CPU():
             bytecode(nullptr), bytecode_size(0), executable_offset(0),
-            regset(nullptr), uregset(nullptr), tmp(nullptr),
+            regset(nullptr),
+            tmp(nullptr),
             static_registers({}),
             jump_base(nullptr),
             thrown(nullptr), caught(nullptr),
