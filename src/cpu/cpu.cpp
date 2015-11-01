@@ -162,23 +162,6 @@ bool CPU::hasrefs(unsigned index) {
     return has;
 }
 
-void CPU::place(unsigned index, Type* obj) {
-    /** Place an object in register with given index.
-     *
-     *  Before placing an object in register, a check is preformed if the register is empty.
-     *  If not - the `Type` previously stored in it is destroyed.
-     *
-     */
-    Type* old_ref_ptr = (hasrefs(index) ? uregset->at(index) : nullptr);
-    uregset->set(index, obj);
-
-    // update references *if, and only if* the register being set has references and
-    // is *not marked a reference* itself, i.e. is the origin register
-    if (old_ref_ptr and not uregset->isflagged(index, REFERENCE)) {
-        updaterefs(old_ref_ptr, obj);
-    }
-}
-
 
 void CPU::loadNativeLibrary(const string& module) {
     regex double_colon("::");

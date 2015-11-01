@@ -95,7 +95,6 @@ class CPU {
     void updaterefs(Type* before, Type* now);
     bool hasrefs(unsigned);
     Type* fetch(unsigned) const;
-    void place(unsigned, Type*);
 
     // Final exception for stacktracing
     Type* terminating_exception;
