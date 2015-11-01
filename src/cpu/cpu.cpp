@@ -191,17 +191,6 @@ void CPU::ensureStaticRegisters(string function_name) {
 }
 
 
-Frame* CPU::requestNewFrame(int arguments_size, int registers_size) {
-    /** Request new frame to be prepared.
-     *
-     *  Creates new frame if the new-frame hook is empty.
-     *  Throws an exception otherwise.
-     *  Returns pointer to the newly created frame.
-     */
-    if (frame_new != nullptr) { throw "requested new frame while last one is unused"; }
-    return (frame_new = new Frame(nullptr, arguments_size, registers_size));
-}
-
 void CPU::loadNativeLibrary(const string& module) {
     regex double_colon("::");
     ostringstream oss;
