@@ -37,9 +37,6 @@ class CPU {
     // Temporary register
     Type* tmp;
 
-    // Static registers
-    std::map<std::string, RegisterSet*> static_registers;
-
     // Map of the typesystem currently existing inside the VM.
     std::map<std::string, Prototype*> typesystem;
 
@@ -142,7 +139,6 @@ class CPU {
             bytecode(nullptr), bytecode_size(0), executable_offset(0),
             regset(nullptr),
             tmp(nullptr),
-            static_registers({}),
             jump_base(nullptr),
             thrown(nullptr), caught(nullptr),
             return_code(0), return_exception(""), return_message(""),
@@ -156,17 +152,6 @@ class CPU {
              *  if you want to keep it around after the CPU is finished.
              */
             if (bytecode) { delete[] bytecode; }
-
-            std::map<std::string, RegisterSet*>::iterator sr = static_registers.begin();
-            while (sr != static_registers.end()) {
-                std::string  rkey = sr->first;
-                RegisterSet* rset = sr->second;
-
-                ++sr;
-
-                static_registers.erase(rkey);
-                delete rset;
-            }
 
             std::map<std::string, std::pair<unsigned, byte*> >::iterator lm = linked_modules.begin();
             while (lm != linked_modules.end()) {
