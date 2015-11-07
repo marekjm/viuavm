@@ -474,6 +474,9 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             }
 
             program.call(assembler::operands::getint(resolveregister(reg, names)), fn_name);
+        } else if (str::startswith(line, "thread")) {
+            string fn_name = str::chunk(operands);
+            program.opthread(fn_name);
         } else if (str::startswith(line, "branch")) {
             /*  If branch is given three operands, it means its full, three-operands form is being used.
              *  Otherwise, it is short, two-operands form instruction and assembler should fill third operand accordingly.
