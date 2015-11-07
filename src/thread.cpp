@@ -475,8 +475,7 @@ byte* Thread::tick() {
     }
 
     if (halt or frames.size() == 0) {
-        // FIXME: remove the print
-        //cout << "halted" << endl;
+        finished = true;
         return nullptr;
     }
 
