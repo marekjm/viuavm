@@ -190,6 +190,9 @@ byte* Thread::dispatch(byte* addr) {
         case CALL:
             addr = call(addr+1);
             break;
+        case THREAD:
+            addr = opthread(addr+1);
+            break;
         case END:
             addr = end(addr);
             break;
