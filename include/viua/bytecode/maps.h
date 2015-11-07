@@ -93,6 +93,7 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "param",  sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
     { "paref",  sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
     { "call",   sizeof(byte) + sizeof(bool) + sizeof(int) },
+    { "thread", sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "arg",    sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
     { "argc",   sizeof(byte) + sizeof(bool) + sizeof(int) },
 
@@ -206,6 +207,7 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { PARAM,    "param" },
     { PAREF,    "paref" },
     { CALL,     "call" },
+    { THREAD,   "thread" },
     { ARG,      "arg" },
     { ARGC,     "argc" },
 
@@ -241,6 +243,7 @@ const std::vector<enum OPCODE> OP_VARIABLE_LENGTH = {
     CLOSURE,
     FUNCTION,
     CALL,
+    THREAD,
     CATCH,
     ENTER,
     IMPORT,
