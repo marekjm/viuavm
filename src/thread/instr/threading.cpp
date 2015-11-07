@@ -18,6 +18,9 @@ byte* Thread::opthread(byte* addr) {
         throw new Exception("call to undefined function: " + call_name);
     }
 
-    auto caller = (is_native ? &Thread::callNative : &Thread::callForeign);
-    return (this->*caller)(addr, call_name, false, 0, "");
+    frame_new->function_name = call_name;
+    cpu->spawn(frame_new);
+    frame_new = nullptr;
+
+    return (addr+call_name.size()+1);
 }
