@@ -91,6 +91,8 @@ class Thread {
     // call foreign method (i.e. method of a pure-C++ class loaded into machine's typesystem)
     byte* callForeignMethod(byte*, Type*, const std::string&, const bool&, const int&, const std::string&);
 
+    bool finished;
+
     /*  Methods implementing CPU instructions.
      */
     byte* izero(byte*);
@@ -200,6 +202,7 @@ class Thread {
         byte* xtick();
         byte* tick();
 
+        inline bool stopped() { return (finished or has_unhandled_exception); }
         inline bool terminated() { return has_unhandled_exception; }
         inline Type* getActiveException() { return thrown; }
 
@@ -219,7 +222,8 @@ class Thread {
             thrown(nullptr), caught(nullptr), has_unhandled_exception(false),
             return_code(0),
             instruction_counter(0),
-            instruction_pointer(nullptr)
+            instruction_pointer(nullptr),
+            finished(false)
         {
             uregset = frm->regset;
             frames.push_back(frm);
