@@ -140,7 +140,7 @@ uint64_t Program::countBytes(const vector<string>& lines) {
         try {
             OPCODE op = instructionToOpcode(instr);
             inc = OP_SIZES.at(instr);
-            if (op == ENTER) {
+            if ((op == ENTER) or (op == THREAD)) {
                 // clear first chunk
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (function or block name)
@@ -249,7 +249,7 @@ uint64_t Program::getInstructionBytecodeOffset(uint64_t instr, uint64_t count) {
         }
 
         OPCODE opcode = OPCODE(program[offset]);
-        if ((opcode == IMPORT) or (opcode == ENTER) or (opcode == LINK)) {
+        if ((opcode == IMPORT) or (opcode == ENTER) or (opcode == THREAD) or (opcode == LINK)) {
             string s(program+offset+1);
             if (scream) {
                 cout << '+' << s.size() << " (function/module name at byte " << offset+1 << ": `" << s << "`)";

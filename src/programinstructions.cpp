@@ -615,6 +615,14 @@ Program& Program::call(int_op reg, const string& fn_name) {
     return (*this);
 }
 
+Program& Program::opthread(const string& fn_name) {
+    /*  Inserts thread instruction.
+     *  Byte offset is calculated automatically.
+     */
+    addr_ptr = cg::bytecode::opthread(addr_ptr, fn_name);
+    return (*this);
+}
+
 Program& Program::jump(uint64_t addr, enum JUMPTYPE is_absolute) {
     /*  Inserts jump instruction. Parameter is instruction index.
      *  Byte offset is calculated automatically.
