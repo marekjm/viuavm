@@ -797,6 +797,15 @@ namespace cg {
             return addr_ptr;
         }
 
+        byte* opthread(byte* addr_ptr, const string& fn_name) {
+            *(addr_ptr++) = THREAD;
+            for (unsigned i = 0; i < fn_name.size(); ++i) {
+                *(addr_ptr++) = fn_name[i];
+            }
+            *(addr_ptr++) = '\0';
+            return addr_ptr;
+        }
+
         byte* vmthrow(byte* addr_ptr, int_op regno) {
             /*  Inserts throw instuction.
              */
