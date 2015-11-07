@@ -3,7 +3,7 @@ CXXOPTIMIZATIONFLAGS=
 COPTIMIZATIONFLAGS=
 DYNAMIC_SYMS=-Wl,--dynamic-list-cpp-typeinfo
 
-VIUA_THREAD_INSTR_FILES_O=build/thread/instr/general.o build/thread/instr/registers.o build/thread/instr/calls.o build/thread/instr/linking.o build/thread/instr/tcmechanism.o build/thread/instr/closure.o build/thread/instr/int.o build/thread/instr/float.o build/thread/instr/byte.o build/thread/instr/str.o build/thread/instr/bool.o build/thread/instr/cast.o build/thread/instr/vector.o build/thread/instr/prototype.o build/thread/instr/object.o
+VIUA_THREAD_INSTR_FILES_O=build/thread/instr/general.o build/thread/instr/registers.o build/thread/instr/calls.o build/thread/instr/threading.o build/thread/instr/linking.o build/thread/instr/tcmechanism.o build/thread/instr/closure.o build/thread/instr/int.o build/thread/instr/float.o build/thread/instr/byte.o build/thread/instr/str.o build/thread/instr/bool.o build/thread/instr/cast.o build/thread/instr/vector.o build/thread/instr/prototype.o build/thread/instr/object.o
 
 
 PREFIX=/usr
@@ -284,6 +284,9 @@ build/thread/instr/registers.o: src/thread/instr/registers.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
 build/thread/instr/calls.o: src/thread/instr/calls.cpp build/thread.o
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+
+build/thread/instr/threading.o: src/thread/instr/threading.cpp build/thread.o
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
 build/thread/instr/linking.o: src/thread/instr/linking.cpp build/thread.o
