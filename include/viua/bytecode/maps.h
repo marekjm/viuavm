@@ -93,7 +93,7 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "param",  sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
     { "paref",  sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
     { "call",   sizeof(byte) + sizeof(bool) + sizeof(int) },
-    { "thread", sizeof(byte) + sizeof(bool) + sizeof(int) },
+    { "thread", sizeof(byte) },
     { "arg",    sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
     { "argc",   sizeof(byte) + sizeof(bool) + sizeof(int) },
 
