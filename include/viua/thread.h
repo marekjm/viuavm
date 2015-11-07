@@ -170,6 +170,7 @@ class Thread {
     byte* argc(byte*);
 
     byte* call(byte*);
+    byte* opthread(byte*);
     byte* end(byte*);
 
     byte* jump(byte*);

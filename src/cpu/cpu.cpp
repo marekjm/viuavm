@@ -167,6 +167,11 @@ void CPU::loadForeignLibrary(const string& module) {
 }
 
 
+void CPU::spawn(Frame* frm) {
+    unique_lock<std::mutex> lck{threads_mtx};
+    threads.push_back(new Thread(frm, this));
+}
+
 vector<string> CPU::inheritanceChainOf(const string& type_name) {
     /** This methods returns full inheritance chain of a type.
      */

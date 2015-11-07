@@ -13,6 +13,7 @@
 #include <utility>
 #include <algorithm>
 #include <stdexcept>
+#include <mutex>
 #include <viua/thread.h>
 
 
@@ -30,6 +31,7 @@ class CPU {
 
     // vector of all threads machine is executing
     std::vector<Thread*> threads;
+    std::mutex threads_mtx;
 
     // Global register set
     RegisterSet* regset;
@@ -116,6 +118,8 @@ class CPU {
         CPU& registerForeignMethod(const std::string&, ForeignMethod);
 
         CPU& iframe(Frame* frm = nullptr, unsigned r = DEFAULT_REGISTER_SIZE);
+
+        void spawn(Frame*);
 
         byte* tick();
 
