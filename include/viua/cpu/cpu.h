@@ -121,9 +121,8 @@ class CPU {
 
         void spawn(Frame*);
 
-        byte* tick();
-
-        void cycle();
+        byte* tick(decltype(threads)::size_type thread_index = 0);
+        bool burst();
 
         int run();
         inline decltype(instruction_counter) counter() { return instruction_counter; }

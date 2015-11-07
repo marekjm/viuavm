@@ -233,12 +233,25 @@ CPU& CPU::iframe(Frame* frm, unsigned r) {
 }
 
 
-byte* CPU::tick() {
-    byte* ip = threads[0]->tick();  // returns instruction pointer
-    if (threads[0]->terminated()) {
+byte* CPU::tick(decltype(threads)::size_type index) {
+    byte* ip = threads[index]->tick();  // returns instruction pointer
+    if (threads[index]->terminated()) {
         return nullptr;
     }
     return ip;
+}
+
+bool CPU::burst() {
+    bool ticked = false;
+    for (decltype(threads)::size_type i = 0; i < threads.size(); ++i) {
+        auto th = threads[i];
+        if (th->stopped()) {
+            continue;
+        }
+        ticked = true;
+        th->tick();
+    }
+    return ticked;
 }
 
 int CPU::run() {
@@ -250,10 +263,8 @@ int CPU::run() {
 
     iframe();
     threads[0]->begin();
-    while (tick()) {
-        /* string s; */
-        /* getline(cin, s); */
-    }
+    while (burst());
+    /* while (tick(0)) {} */
 
     if (threads[0]->terminated()) {
         cout << "thread '0:" << hex << threads[0] << dec << "' has terminated" << endl;
