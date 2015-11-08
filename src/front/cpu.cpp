@@ -126,7 +126,12 @@ int main(int argc, char* argv[]) {
     cpu.registerForeignMethod("String::stringify", static_cast<ForeignMethodMemberPointer>(&String::stringify));
     cpu.registerForeignMethod("String::represent", static_cast<ForeignMethodMemberPointer>(&String::represent));
 
-    cpu.run();
+    try {
+        cpu.run();
+    } catch (const Exception* e) {
+        cout << "fatal: " << e->what() << endl;
+        return 1;
+    }
 
     int ret_code = 0;
     string return_exception = "", return_message = "";
