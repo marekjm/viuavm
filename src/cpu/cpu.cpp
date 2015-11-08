@@ -242,8 +242,24 @@ byte* CPU::tick(decltype(threads)::size_type index) {
 }
 
 bool CPU::burst() {
+    if (not threads.size()) {
+        // make CPU stop if there are no threads to run
+        return false;
+    }
+
     bool ticked = false;
-    for (decltype(threads)::size_type i = 0; i < threads.size(); ++i) {
+    if (not threads[0]->stopped()) {
+        ticked = true;
+        threads[0]->tick();
+    }
+    if (threads[0]->trace().size() == 1 and threads.size() > 1) {
+        for (decltype(threads)::size_type i = 1; i < threads.size(); ++i) {
+            if (not threads[i]->stopped()) {
+                throw new Exception("aborting execution: main/1 orphaned threads, stack corrupted");
+            }
+        }
+    }
+    for (decltype(threads)::size_type i = 1; i < threads.size(); ++i) {
         auto th = threads[i];
         if (th->stopped()) {
             continue;
