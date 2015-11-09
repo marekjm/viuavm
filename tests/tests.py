@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""This is initial unit Tests suite for Viua virtual machine.
+"""This is initial unit tests suite for Viua virtual machine.
 It uses sample asm code (samples can also be compiled and run directly).
 
 Each unit passes if:
@@ -8,8 +8,11 @@ Each unit passes if:
     * the sample compiles,
     * compiled code runs,
     * compiled code returns correct output,
+    * compiled code does not leak memory,
 
 Returning correct may mean raising an exception in some cases.
+Acceptable memory leak is at most 0 bytes.
+Memory leak tests may be disabled for some runs as they are slow.
 """
 
 import functools
