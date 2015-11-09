@@ -1,5 +1,5 @@
-#ifndef VIUA_TYPES_STRING_H
-#define VIUA_TYPES_STRING_H
+#ifndef VIUA_TYPES_THREAD_H
+#define VIUA_TYPES_THREAD_H
 
 #pragma once
 
