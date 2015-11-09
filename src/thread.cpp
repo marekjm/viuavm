@@ -461,16 +461,10 @@ byte* Thread::tick() {
          *
          * If user code cannot deal with them (i.e. did not register a catcher block) they will terminate execution later.
          */
-        // FIXME: remove the print
-        //cout << "event 0" << endl;
         thrown = e;
     } catch (const HaltException& e) {
-        // FIXME: remove the print
-        //cout << "event 1" << endl;
         halt = true;
     } catch (const char* e) {
-        // FIXME: remove the print
-        //cout << "event 2 " << e << endl;
         thrown = new Exception(e);
     }
 
