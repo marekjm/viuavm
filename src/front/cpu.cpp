@@ -9,6 +9,7 @@
 #include <viua/support/env.h>
 #include <viua/types/exception.h>
 #include <viua/types/string.h>
+#include <viua/types/thread.h>
 #include <viua/loader.h>
 #include <viua/cpu/cpu.h>
 #include <viua/program.h>
@@ -125,6 +126,11 @@ int main(int argc, char* argv[]) {
     cpu.registerForeignPrototype("String", proto_string);
     cpu.registerForeignMethod("String::stringify", static_cast<ForeignMethodMemberPointer>(&String::stringify));
     cpu.registerForeignMethod("String::represent", static_cast<ForeignMethodMemberPointer>(&String::represent));
+
+    Prototype* proto_thread = new Prototype("ThreadType");
+    proto_thread->attach("ThreadType::joinable", "joinable");
+    cpu.registerForeignPrototype("ThreadType", proto_thread);
+    cpu.registerForeignMethod("ThreadType::joinable", static_cast<ForeignMethodMemberPointer>(&ThreadType::joinable));
 
     try {
         cpu.run();
