@@ -268,6 +268,9 @@ build/types/object.o: src/types/object.cpp include/viua/types/object.h
 build/types/reference.o: src/types/reference.cpp include/viua/types/reference.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
+build/types/thread.o: src/types/thread.cpp include/viua/types/thread.h
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+
 
 ############################################################
 # CPU AND THREADING MODULES
