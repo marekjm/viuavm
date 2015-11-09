@@ -26,19 +26,6 @@ ThreadType* ThreadType::copy() const {
     return new ThreadType(thrd);
 }
 
-
 void ThreadType::joinable(Frame* frame, RegisterSet*, RegisterSet*) {
     frame->regset->set(0, new Boolean(thrd->joinable()));
-}
-
-void ThreadType::join(Frame* frame, RegisterSet*, RegisterSet*) {
-    if (frame->args->size() < 1) {
-        throw new Exception("undefined this");
-    }
-}
-
-void ThreadType::detach(Frame* frame, RegisterSet*, RegisterSet*) {
-    if (frame->args->size() < 1) {
-        throw new Exception("undefined this");
-    }
 }
