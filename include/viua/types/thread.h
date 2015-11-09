@@ -32,6 +32,11 @@ class ThreadType : public Type {
 
         virtual void joinable(Frame*, RegisterSet*, RegisterSet*);
 
+        bool joinable();
+        void join();
+        void detach();
+        bool stopped();
+
         ThreadType(Thread* t): thrd(t) {}
 };
 

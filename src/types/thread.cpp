@@ -1,3 +1,4 @@
+#include <iostream>
 #include <string>
 #include <viua/types/boolean.h>
 #include <viua/types/thread.h>
@@ -24,6 +25,30 @@ bool ThreadType::boolean() const {
 
 ThreadType* ThreadType::copy() const {
     return new ThreadType(thrd);
+}
+
+bool ThreadType::joinable() {
+    return thrd->joinable();
+}
+
+void ThreadType::join() {
+    if (thrd->joinable()) {
+        thrd->join();
+    } else {
+        throw new Exception("thread cannot be joined");
+    }
+}
+
+void ThreadType::detach() {
+    if (thrd->joinable()) {
+        thrd->detach();
+    } else {
+        throw new Exception("thread cannot be detached");
+    }
+}
+
+bool ThreadType::stopped() {
+    return thrd->stopped();
 }
 
 void ThreadType::joinable(Frame* frame, RegisterSet*, RegisterSet*) {
