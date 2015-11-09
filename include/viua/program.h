@@ -121,7 +121,7 @@ class Program {
     Program& argc       (int_op);
 
     Program& call       (int_op, const std::string&);
-    Program& opthread   (const std::string&);
+    Program& opthread   (int_op, const std::string&);
     Program& jump       (uint64_t, enum JUMPTYPE);
     Program& branch     (int_op, uint64_t, enum JUMPTYPE, uint64_t, enum JUMPTYPE);
 

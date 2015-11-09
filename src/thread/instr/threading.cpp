@@ -10,6 +10,12 @@ using namespace std;
 byte* Thread::opthread(byte* addr) {
     /*  Run thread instruction.
      */
+    bool return_register_ref = *(bool*)addr;
+    pointer::inc<bool, byte>(addr);
+
+    int return_register_index = *(int*)addr;
+    pointer::inc<int, byte>(addr);
+
     string call_name = string(addr);
 
     bool is_native = (cpu->function_addresses.count(call_name) or cpu->linked_functions.count(call_name));

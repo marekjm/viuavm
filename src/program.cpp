@@ -140,12 +140,12 @@ uint64_t Program::countBytes(const vector<string>& lines) {
         try {
             OPCODE op = instructionToOpcode(instr);
             inc = OP_SIZES.at(instr);
-            if ((op == ENTER) or (op == THREAD)) {
+            if ((op == ENTER)) {
                 // clear first chunk
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (function or block name)
                 inc += str::chunk(line).size() + 1;
-            } else if ((op == CALL) or (op == MSG)) {
+            } else if ((op == CALL) or (op == MSG) or (op == THREAD)) {
                 // clear first chunk (opcode mnemonic)
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (optional register index)
@@ -249,14 +249,14 @@ uint64_t Program::getInstructionBytecodeOffset(uint64_t instr, uint64_t count) {
         }
 
         OPCODE opcode = OPCODE(program[offset]);
-        if ((opcode == IMPORT) or (opcode == ENTER) or (opcode == THREAD) or (opcode == LINK)) {
+        if ((opcode == IMPORT) or (opcode == ENTER) or (opcode == LINK)) {
             string s(program+offset+1);
             if (scream) {
                 cout << '+' << s.size() << " (function/module name at byte " << offset+1 << ": `" << s << "`)";
             }
             inc += s.size()+1;
         }
-        if ((opcode == CALL) or (opcode == CLOSURE) or (opcode == FUNCTION) or
+        if ((opcode == CALL) or (opcode == THREAD) or (opcode == CLOSURE) or (opcode == FUNCTION) or
             (opcode == CLASS) or (opcode == PROTOTYPE) or (opcode == DERIVE) or (opcode == NEW) or (opcode == MSG)) {
             string s(program+offset+sizeof(bool)+sizeof(int)+1);
             if (scream) {

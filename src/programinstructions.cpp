@@ -615,11 +615,8 @@ Program& Program::call(int_op reg, const string& fn_name) {
     return (*this);
 }
 
-Program& Program::opthread(const string& fn_name) {
-    /*  Inserts thread instruction.
-     *  Byte offset is calculated automatically.
-     */
-    addr_ptr = cg::bytecode::opthread(addr_ptr, fn_name);
+Program& Program::opthread(int_op ref, const string& fn_name) {
+    addr_ptr = cg::bytecode::opthread(addr_ptr, ref, fn_name);
     return (*this);
 }
 

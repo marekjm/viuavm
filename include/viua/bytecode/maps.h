@@ -95,7 +95,7 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "call",   sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "arg",    sizeof(byte) + 2*sizeof(bool) + 2*sizeof(int) },
     { "argc",   sizeof(byte) + sizeof(bool) + sizeof(int) },
-    { "thread", sizeof(byte) },
+    { "thread", sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "thjoin", sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "thdetach", sizeof(byte) + sizeof(bool) + sizeof(int) },
 

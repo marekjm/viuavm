@@ -715,6 +715,16 @@ namespace cg {
             return addr_ptr;
         }
 
+        byte* opthread(byte* addr_ptr, int_op reg, const string& fn_name) {
+            *(addr_ptr++) = THREAD;
+            addr_ptr = insertIntegerOperand(addr_ptr, reg);
+            for (unsigned i = 0; i < fn_name.size(); ++i) {
+                *(addr_ptr++) = fn_name[i];
+            }
+            *(addr_ptr++) = '\0';
+            return addr_ptr;
+        }
+
         byte* jump(byte* addr_ptr, uint64_t addr) {
             /*  Inserts jump instruction. Parameter is instruction index.
              *  Byte offset is calculated automatically.
@@ -792,15 +802,6 @@ namespace cg {
             *(addr_ptr++) = ENTER;
             for (unsigned i = 0; i < block_name.size(); ++i) {
                 *(addr_ptr++) = block_name[i];
-            }
-            *(addr_ptr++) = '\0';
-            return addr_ptr;
-        }
-
-        byte* opthread(byte* addr_ptr, const string& fn_name) {
-            *(addr_ptr++) = THREAD;
-            for (unsigned i = 0; i < fn_name.size(); ++i) {
-                *(addr_ptr++) = fn_name[i];
             }
             *(addr_ptr++) = '\0';
             return addr_ptr;
