@@ -14,10 +14,10 @@
 .end
 
 .function: main
-    frame ^[(param 0 (strstore 1 "Hello concurrent World! (1)"))]
+    frame ^[(param 0 (strstore 1 "Hello multithreaded World! (1)"))]
     thread print_lazy
 
-    frame ^[(param 0 (strstore 2 "Hello concurrent World! (2)"))]
+    frame ^[(param 0 (strstore 2 "Hello multithreaded World! (2)"))]
     thread print_eager
 
     ; this no-ops here are required for now
