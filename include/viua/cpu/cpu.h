@@ -119,7 +119,7 @@ class CPU {
 
         CPU& iframe(Frame* frm = nullptr, unsigned r = DEFAULT_REGISTER_SIZE);
 
-        void spawn(Frame*);
+        Thread* spawn(Frame*);
 
         byte* tick(decltype(threads)::size_type thread_index = 0);
         bool burst();
