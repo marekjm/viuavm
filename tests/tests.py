@@ -730,6 +730,13 @@ class ExternalModulesTests(unittest.TestCase):
         runTestNoDisassemblyRerun(self, 'sqrt.asm', 1.73, 0, lambda o: round(float(o.strip()), 2))
 
 
+class MultithreadingTests(unittest.TestCase):
+    PATH = './sample/asm/threading'
+
+    def testHelloWorldExample(self):
+        runTestSplitlines(self, 'hello_world.asm', ['Hello multithreaded World! (2)', 'Hello multithreaded World! (1)'], 0)
+
+
 def sameLines(self, excode, output, no_of_lines):
     lines = output.splitlines()
     self.assertTrue(len(lines) == no_of_lines)
