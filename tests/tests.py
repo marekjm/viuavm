@@ -197,7 +197,7 @@ def runTest(self, name, expected_output, expected_exit_code = 0, output_processi
     assembly_path = os.path.join(self.PATH, name)
     compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
     assemble(assembly_path, compiled_path)
-    excode, output = run(compiled_path)
+    excode, output = run(compiled_path, expected_exit_code)
     got_output = (output.strip() if output_processing_function is None else output_processing_function(output))
     self.assertEqual(expected_output, got_output)
     self.assertEqual(expected_exit_code, excode)
@@ -208,7 +208,7 @@ def runTest(self, name, expected_output, expected_exit_code = 0, output_processi
     compiled_disasm_path = '{0}.bin'.format(disasm_path)
     disassemble(compiled_path, disasm_path)
     assemble(disasm_path, compiled_disasm_path)
-    dis_excode, dis_output = run(compiled_disasm_path)
+    dis_excode, dis_output = run(compiled_disasm_path, expected_exit_code)
     self.assertEqual(got_output, (dis_output.strip() if output_processing_function is None else output_processing_function(dis_output)))
     self.assertEqual(excode, dis_excode)
 
