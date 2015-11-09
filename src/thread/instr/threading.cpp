@@ -1,5 +1,6 @@
 #include <viua/types/boolean.h>
 #include <viua/types/reference.h>
+#include <viua/types/thread.h>
 #include <viua/support/pointer.h>
 #include <viua/exceptions.h>
 #include <viua/cpu/cpu.h>
@@ -19,7 +20,9 @@ byte* Thread::opthread(byte* addr) {
     }
 
     frame_new->function_name = call_name;
-    cpu->spawn(frame_new);
+    Thread* vm_thread = cpu->spawn(frame_new);
+    ThreadType* thrd = new ThreadType(vm_thread);
+    delete thrd;
     frame_new = nullptr;
 
     return (addr+call_name.size()+1);
