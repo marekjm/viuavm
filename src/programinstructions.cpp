@@ -620,6 +620,16 @@ Program& Program::opthread(int_op ref, const string& fn_name) {
     return (*this);
 }
 
+Program& Program::opthjoin(int_op ref) {
+    addr_ptr = cg::bytecode::opthjoin(addr_ptr, ref);
+    return (*this);
+}
+
+Program& Program::opthdetach(int_op ref) {
+    addr_ptr = cg::bytecode::opthdetach(addr_ptr, ref);
+    return (*this);
+}
+
 Program& Program::jump(uint64_t addr, enum JUMPTYPE is_absolute) {
     /*  Inserts jump instruction. Parameter is instruction index.
      *  Byte offset is calculated automatically.
