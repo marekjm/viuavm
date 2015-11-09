@@ -478,6 +478,14 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string fn_name, reg;
             tie(reg, fn_name) = assembler::operands::get2(operands);
             program.opthread(assembler::operands::getint(resolveregister(reg, names)), fn_name);
+        } else if (str::startswith(line, "thjoin")) {
+            string regno_chnk;
+            regno_chnk = str::chunk(operands);
+            program.opthjoin(assembler::operands::getint(resolveregister(regno_chnk, names)));
+        } else if (str::startswith(line, "thdetach")) {
+            string regno_chnk;
+            regno_chnk = str::chunk(operands);
+            program.opthdetach(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "branch")) {
             /*  If branch is given three operands, it means its full, three-operands form is being used.
              *  Otherwise, it is short, two-operands form instruction and assembler should fill third operand accordingly.
