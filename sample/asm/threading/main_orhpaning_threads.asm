@@ -15,10 +15,10 @@
 
 .function: main
     frame ^[(param 0 (strstore 1 "Hello multithreaded World! (1)"))]
-    thread 1 print_lazy
+    thread 3 print_lazy
 
     frame ^[(param 0 (strstore 2 "Hello multithreaded World! (2)"))]
-    thread 2 print_eager
+    thread 4 print_eager
 
     izero 0
     end
