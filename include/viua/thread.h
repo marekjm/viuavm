@@ -92,6 +92,7 @@ class Thread {
     byte* callForeignMethod(byte*, Type*, const std::string&, const bool&, const int&, const std::string&);
 
     bool finished;
+    bool is_joinable;
 
     /*  Methods implementing CPU instructions.
      */
@@ -202,8 +203,31 @@ class Thread {
         byte* xtick();
         byte* tick();
 
-        inline bool stopped() { return (finished or has_unhandled_exception); }
-        inline bool terminated() { return has_unhandled_exception; }
+        inline bool joinable() const { return is_joinable; }
+        inline void join() {
+            /** Join a thread with calling thread.
+             *
+             *  This function causes calling thread to be blocked until
+             *  this thread has stopped.
+             */
+            is_joinable = false;
+        }
+        inline void detach() {
+            /** Detach a thread.
+             *
+             *  This function causes the thread to become unjoinable, but
+             *  allows it to run in the background.
+             *
+             *  Keep in mind that while detached threads cannot be joined,
+             *  they can receive messages.
+             *  Also, they will run even after the main/1 function has exited.
+             */
+            is_joinable = false;
+        }
+
+        inline bool stopped() const { return (finished or has_unhandled_exception); }
+
+        inline bool terminated() const { return has_unhandled_exception; }
         inline Type* getActiveException() { return thrown; }
 
         byte* begin();
@@ -223,7 +247,7 @@ class Thread {
             return_code(0),
             instruction_counter(0),
             instruction_pointer(nullptr),
-            finished(false)
+            finished(false), is_joinable(true)
         {
             uregset = frm->regset;
             frames.push_back(frm);
