@@ -110,6 +110,8 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case BINC:
         case BDEC:
         case PRINT:
+        case THJOIN:
+        case THDETACH:
         case ECHO:
         case BOOL:
         case NOT:
