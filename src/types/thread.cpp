@@ -54,3 +54,7 @@ bool ThreadType::stopped() {
 void ThreadType::joinable(Frame* frame, RegisterSet*, RegisterSet*) {
     frame->regset->set(0, new Boolean(thrd->joinable()));
 }
+
+void ThreadType::detach(Frame* frame, RegisterSet*, RegisterSet*) {
+    thrd->detach();
+}

@@ -31,6 +31,7 @@ class ThreadType : public Type {
         ThreadType* copy() const;
 
         virtual void joinable(Frame*, RegisterSet*, RegisterSet*);
+        virtual void detach(Frame*, RegisterSet*, RegisterSet*);
 
         bool joinable();
         void join();
