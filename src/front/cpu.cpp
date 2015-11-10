@@ -127,10 +127,12 @@ int main(int argc, char* argv[]) {
     cpu.registerForeignMethod("String::stringify", static_cast<ForeignMethodMemberPointer>(&String::stringify));
     cpu.registerForeignMethod("String::represent", static_cast<ForeignMethodMemberPointer>(&String::represent));
 
-    Prototype* proto_thread = new Prototype("ThreadType");
-    proto_thread->attach("ThreadType::joinable", "joinable");
-    cpu.registerForeignPrototype("ThreadType", proto_thread);
-    cpu.registerForeignMethod("ThreadType::joinable", static_cast<ForeignMethodMemberPointer>(&ThreadType::joinable));
+    Prototype* proto_thread = new Prototype("Thread");
+    proto_thread->attach("Thread::joinable", "joinable");
+    proto_thread->attach("Thread::detach", "detach");
+    cpu.registerForeignPrototype("Thread", proto_thread);
+    cpu.registerForeignMethod("Thread::joinable", static_cast<ForeignMethodMemberPointer>(&ThreadType::joinable));
+    cpu.registerForeignMethod("Thread::detach", static_cast<ForeignMethodMemberPointer>(&ThreadType::detach));
 
     try {
         cpu.run();
