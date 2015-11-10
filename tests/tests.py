@@ -738,6 +738,9 @@ class MultithreadingTests(unittest.TestCase):
     def testHelloWorldExample(self):
         runTestSplitlines(self, 'hello_world.asm', ['Hello multithreaded World! (2)', 'Hello multithreaded World! (1)'], 0)
 
+    def testJoiningThread(self):
+        runTestSplitlines(self, 'joining_a_thread.asm', ['Hello multithreaded World! (1)', 'Hello multithreaded World! (2)'], 0)
+
     def testStackCorruptedOnMainOrphaningThreads(self):
         MEMORY_LEAK_CHECKS_SKIP_LIST.append(self)
         runTestSplitlines(self, 'main_orhpaning_threads.asm', ['Hello multithreaded World! (2)', 'fatal: aborting execution: main/1 orphaned threads, stack corrupted'], 1)
