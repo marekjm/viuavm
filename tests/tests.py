@@ -741,6 +741,21 @@ class MultithreadingTests(unittest.TestCase):
     def testJoiningThread(self):
         runTestSplitlines(self, 'joining_a_thread.asm', ['Hello multithreaded World! (1)', 'Hello multithreaded World! (2)'], 0)
 
+    def testDetachingThread(self):
+        runTestSplitlines(
+            self,
+            'detaching_a_thread.asm',
+            [
+                'Hello World! (from long-running detached thread) 0',
+                'false',
+                'Hello World! (from long-running detached thread) main/1 exited',
+                '1',
+                'Hello World! (from long-running detached thread) 2',
+                'Hello World! (from long-running detached thread) 3',
+            ],
+            0
+        )
+
     def testStackCorruptedOnMainOrphaningThreads(self):
         # this will of course generate leaks, but we are not interested in them since
         # after process termination operating system will automatically reclaim memory
