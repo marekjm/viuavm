@@ -20,12 +20,9 @@
     frame ^[(param 0 (strstore 2 "Hello multithreaded World! (2)"))]
     thread 4 print_eager
 
-    ; this no-ops here are required for now
-    ; main/1 must run longer than any child threads or
-    ; the CPU will raise exception about main/1 orphaning threads
-    nop
-    nop
-    nop
+    ; join threads
+    thjoin 3
+    thjoin 4
 
     izero 0
     end
