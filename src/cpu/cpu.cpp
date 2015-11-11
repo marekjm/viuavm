@@ -268,6 +268,32 @@ bool CPU::burst() {
         ticked = true;
         th->tick();
     }
+
+    decltype(threads) running_threads{threads[0]};
+    decltype(threads) dead_threads;
+    for (decltype(threads)::size_type i = 1; i < threads.size(); ++i) {
+        auto th = threads[i];
+        cout << "thread " << th << " is ";
+        if (th->stopped() and (not th->joinable())) {
+            cout << "dead";
+            dead_threads.push_back(th);
+        } else {
+            cout << "running";
+            running_threads.push_back(th);
+        }
+        cout << endl;
+    }
+    for (decltype(dead_threads)::size_type i = 0; i < dead_threads.size(); ++i) {
+        cout << "deleting dead thread: " << dead_threads[i] << endl;
+        delete dead_threads[i];
+    }
+
+    if (dead_threads.size()) {
+        threads.erase(threads.begin(), threads.end());
+        for (decltype(running_threads)::size_type i = 0; i < running_threads.size(); ++i) {
+            threads.push_back(running_threads[i]);
+        }
+    }
     return ticked;
 }
 
