@@ -273,20 +273,26 @@ bool CPU::burst() {
     decltype(threads) dead_threads;
     for (decltype(threads)::size_type i = 1; i < threads.size(); ++i) {
         auto th = threads[i];
-        cout << "thread " << th << " is ";
+        /* cout << "thread " << th << " (" << i << ") is "; */
         if (th->stopped() and (not th->joinable())) {
-            cout << "dead";
+            /* cout << "dead"; */
             dead_threads.push_back(th);
         } else {
-            cout << "running";
+            /* cout << "running"; */
             running_threads.push_back(th);
         }
-        cout << endl;
+        /* cout << endl; */
     }
     for (decltype(dead_threads)::size_type i = 0; i < dead_threads.size(); ++i) {
-        cout << "deleting dead thread: " << dead_threads[i] << endl;
+        /* cout << "deleting dead thread: " << dead_threads[i] << endl; */
         delete dead_threads[i];
     }
+
+    highest_number_of_scheduled_threads = (highest_number_of_scheduled_threads > threads.size() ? highest_number_of_scheduled_threads : threads.size());
+    highest_number_of_running_threads = (highest_number_of_running_threads > running_threads.size() ? highest_number_of_running_threads : running_threads.size());
+
+    cout << "PSTC " << dec << highest_number_of_scheduled_threads << " (current: " << threads.size() << ')' << endl;
+    cout << "PRTC " << dec << highest_number_of_running_threads << " (current: " << running_threads.size() << ')' << endl;
 
     if (dead_threads.size()) {
         threads.erase(threads.begin(), threads.end());
@@ -343,6 +349,10 @@ int CPU::run() {
         }
         delete regset;
     }
+
+    cout << dec;
+    cout << "highest_number_of_scheduled_threads = " << highest_number_of_scheduled_threads << endl;
+    cout << "highest_number_of_running_threads = " << highest_number_of_running_threads << endl;
 
     return return_code;
 }
