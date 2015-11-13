@@ -90,9 +90,6 @@ class CPU {
      */
     std::vector<std::string> inheritanceChainOf(const std::string&);
 
-    long long unsigned highest_number_of_scheduled_threads;
-    long long unsigned highest_number_of_running_threads;
-
     public:
         // debug and error reporting flags
         bool debug, errors;
@@ -147,9 +144,7 @@ class CPU {
             return_code(0), return_exception(""), return_message(""),
             instruction_counter(0),
             terminating_exception(nullptr),
-            debug(false), errors(false),
-            highest_number_of_scheduled_threads(0),
-            highest_number_of_running_threads(0)
+            debug(false), errors(false)
         {}
 
         ~CPU() {
