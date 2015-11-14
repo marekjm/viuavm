@@ -62,3 +62,20 @@ void ThreadType::detach(Frame* frame, RegisterSet*, RegisterSet*) {
 void ThreadType::getPriority(Frame* frame, RegisterSet*, RegisterSet*) {
     frame->regset->set(0, new Integer(thrd->priority()));
 }
+
+void ThreadType::setPriority(Frame* frame, RegisterSet*, RegisterSet*) {
+    if (frame->args->at(0) == nullptr) {
+        throw new Exception("expected Thread as first parameter but got nothing");
+    }
+    if (frame->args->at(1) == nullptr) {
+        throw new Exception("expected Integer as first parameter but got nothing");
+    }
+    if (frame->args->at(0)->type() != "Thread") {
+        throw new Exception("expected Thread as first parameter but got " + frame->args->at(0)->type());
+    }
+    if (frame->args->at(1)->type() != "Integer") {
+        throw new Exception("expected Integer as first parameter but got " + frame->args->at(0)->type());
+    }
+
+    thrd->priority(static_cast<Integer*>(frame->args->at(1))->value());
+}
