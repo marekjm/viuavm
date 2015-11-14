@@ -731,6 +731,12 @@ namespace cg {
             return addr_ptr;
         }
 
+        byte* opthreceive(byte* addr_ptr, int_op reg) {
+            *(addr_ptr++) = THRECEIVE;
+            addr_ptr = insertIntegerOperand(addr_ptr, reg);
+            return addr_ptr;
+        }
+
         byte* opthdetach(byte* addr_ptr, int_op reg) {
             *(addr_ptr++) = THDETACH;
             addr_ptr = insertIntegerOperand(addr_ptr, reg);
