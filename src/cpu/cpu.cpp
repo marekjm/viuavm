@@ -228,7 +228,9 @@ CPU& CPU::iframe(Frame* frm, unsigned r) {
     // set global registers
     regset = new RegisterSet(r);
 
-    threads.push_back(new Thread(initial_frame, this, jump_base));
+    Thread* t = new Thread(initial_frame, this, jump_base);
+    t->priority(16);
+    threads.push_back(t);
 
     return (*this);
 }
