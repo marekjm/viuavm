@@ -279,18 +279,13 @@ bool CPU::burst() {
     decltype(threads) dead_threads;
     for (decltype(threads)::size_type i = 1; i < threads.size(); ++i) {
         auto th = threads[i];
-        /* cout << "thread " << th << " (" << i << ") is "; */
         if (th->stopped() and (not th->joinable())) {
-            /* cout << "dead"; */
             dead_threads.push_back(th);
         } else {
-            /* cout << "running"; */
             running_threads.push_back(th);
         }
-        /* cout << endl; */
     }
     for (decltype(dead_threads)::size_type i = 0; i < dead_threads.size(); ++i) {
-        /* cout << "deleting dead thread: " << dead_threads[i] << endl; */
         delete dead_threads[i];
     }
 
