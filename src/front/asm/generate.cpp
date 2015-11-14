@@ -482,6 +482,10 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string regno_chnk;
             regno_chnk = str::chunk(operands);
             program.opthjoin(assembler::operands::getint(resolveregister(regno_chnk, names)));
+        } else if (str::startswith(line, "threceive")) {
+            string regno_chnk;
+            regno_chnk = str::chunk(operands);
+            program.opthreceive(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "thdetach")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
