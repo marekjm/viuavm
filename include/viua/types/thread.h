@@ -33,6 +33,8 @@ class ThreadType : public Type {
         virtual void joinable(Frame*, RegisterSet*, RegisterSet*);
         virtual void detach(Frame*, RegisterSet*, RegisterSet*);
 
+        virtual void getPriority(Frame*, RegisterSet*, RegisterSet*);
+
         bool joinable();
         void join();
         void detach();

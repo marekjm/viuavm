@@ -130,9 +130,11 @@ int main(int argc, char* argv[]) {
     Prototype* proto_thread = new Prototype("Thread");
     proto_thread->attach("Thread::joinable", "joinable");
     proto_thread->attach("Thread::detach", "detach");
+    proto_thread->attach("Thread::getPriority", "getPriority");
     cpu.registerForeignPrototype("Thread", proto_thread);
     cpu.registerForeignMethod("Thread::joinable", static_cast<ForeignMethodMemberPointer>(&ThreadType::joinable));
     cpu.registerForeignMethod("Thread::detach", static_cast<ForeignMethodMemberPointer>(&ThreadType::detach));
+    cpu.registerForeignMethod("Thread::getPriority", static_cast<ForeignMethodMemberPointer>(&ThreadType::getPriority));
 
     try {
         cpu.run();

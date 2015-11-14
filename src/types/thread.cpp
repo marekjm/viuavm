@@ -58,3 +58,7 @@ void ThreadType::joinable(Frame* frame, RegisterSet*, RegisterSet*) {
 void ThreadType::detach(Frame* frame, RegisterSet*, RegisterSet*) {
     thrd->detach();
 }
+
+void ThreadType::getPriority(Frame* frame, RegisterSet*, RegisterSet*) {
+    frame->regset->set(0, new Integer(thrd->priority()));
+}
