@@ -772,6 +772,9 @@ class MultithreadingTests(unittest.TestCase):
             'Hello sequential World!',
         ])
 
+    def testMessagePassing(self):
+        runTest(self, 'message_passing.asm', 'Hello message passing World!')
+
 
 def sameLines(self, excode, output, no_of_lines):
     lines = output.splitlines()
