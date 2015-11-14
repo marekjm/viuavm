@@ -93,6 +93,7 @@ class Thread {
 
     bool finished;
     bool is_joinable;
+    unsigned thread_priority;
 
     /*  Methods implementing CPU instructions.
      */
@@ -227,6 +228,9 @@ class Thread {
             is_joinable = false;
         }
 
+        decltype(thread_priority) priority() const { return thread_priority; }
+        void priority(decltype(thread_priority) p) { thread_priority = p; }
+
         inline bool stopped() const { return (finished or has_unhandled_exception); }
 
         inline bool terminated() const { return has_unhandled_exception; }
@@ -249,7 +253,8 @@ class Thread {
             return_code(0),
             instruction_counter(0),
             instruction_pointer(nullptr),
-            finished(false), is_joinable(true)
+            finished(false), is_joinable(true),
+            thread_priority(1)
         {
             uregset = frm->regset;
             frames.push_back(frm);
