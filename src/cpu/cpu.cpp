@@ -307,7 +307,6 @@ int CPU::run() {
     iframe();
     threads[0]->begin();
     while (burst());
-    /* while (tick(0)) {} */
 
     if (threads[0]->terminated()) {
         cout << "thread '0:" << hex << threads[0] << dec << "' has terminated" << endl;
