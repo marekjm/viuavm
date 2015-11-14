@@ -271,6 +271,9 @@ bool CPU::burst() {
         auto th = threads[i];
 
         if (th->stopped()) {
+            // stopped but still joinable
+            // we don't have to deal with "stopped and unjoinable" case here
+            // because it is handled later (after ticking code)
             continue;
         }
 
@@ -284,6 +287,10 @@ bool CPU::burst() {
             }
             th->tick();
         }
+
+        // if the thread stopped and is not joinable declare it dead and
+        // schedule for removal thus shortening the vector of running threads and
+        // speeding up execution
         if (th->stopped() and (not th->joinable())) {
             dead_threads.push_back(th);
         } else {
@@ -295,6 +302,7 @@ bool CPU::burst() {
         delete dead_threads[i];
     }
 
+    // if there were any dead threads we must rebuild the scheduled threads vector
     if (dead_threads.size()) {
         threads.erase(threads.begin(), threads.end());
         for (decltype(running_threads)::size_type i = 0; i < running_threads.size(); ++i) {
