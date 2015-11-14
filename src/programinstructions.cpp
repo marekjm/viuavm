@@ -625,6 +625,11 @@ Program& Program::opthjoin(int_op ref) {
     return (*this);
 }
 
+Program& Program::opthreceive(int_op ref) {
+    addr_ptr = cg::bytecode::opthreceive(addr_ptr, ref);
+    return (*this);
+}
+
 Program& Program::opthdetach(int_op ref) {
     addr_ptr = cg::bytecode::opthdetach(addr_ptr, ref);
     return (*this);
