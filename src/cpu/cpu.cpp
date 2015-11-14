@@ -253,7 +253,9 @@ bool CPU::burst() {
     bool ticked = false;
     if (not threads[0]->stopped()) {
         ticked = true;
-        threads[0]->tick();
+        for (unsigned i = 0; i < threads[0]->priority(); ++i) {
+            threads[0]->tick();
+        }
     }
     if (threads[0]->trace().size() == 1 and threads.size() > 1) {
         for (decltype(threads)::size_type i = 1; i < threads.size(); ++i) {
@@ -268,7 +270,9 @@ bool CPU::burst() {
             continue;
         }
         ticked = true;
-        th->tick();
+        for (unsigned i = 0; i < th->priority(); ++i) {
+            th->tick();
+        }
     }
 
     decltype(threads) running_threads{threads[0]};
