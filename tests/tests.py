@@ -765,6 +765,13 @@ class MultithreadingTests(unittest.TestCase):
     def testGettingPriorityOfAThread(self):
         runTest(self, 'get_priority.asm', '1')
 
+    def testSettingPriorityOfAThread(self):
+        runTestSplitlines(self, 'set_priority.asm', [
+            '40',
+            'Hello concurrent World!',
+            'Hello sequential World!',
+        ])
+
 
 def sameLines(self, excode, output, no_of_lines):
     lines = output.splitlines()
