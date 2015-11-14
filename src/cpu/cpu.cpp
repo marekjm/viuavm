@@ -264,6 +264,9 @@ bool CPU::burst() {
             }
         }
     }
+
+    decltype(threads) running_threads{threads[0]};
+    decltype(threads) dead_threads;
     for (decltype(threads)::size_type i = 1; i < threads.size(); ++i) {
         auto th = threads[i];
         if (th->stopped()) {
@@ -273,18 +276,13 @@ bool CPU::burst() {
         for (unsigned i = 0; i < th->priority(); ++i) {
             th->tick();
         }
-    }
-
-    decltype(threads) running_threads{threads[0]};
-    decltype(threads) dead_threads;
-    for (decltype(threads)::size_type i = 1; i < threads.size(); ++i) {
-        auto th = threads[i];
         if (th->stopped() and (not th->joinable())) {
             dead_threads.push_back(th);
         } else {
             running_threads.push_back(th);
         }
     }
+
     for (decltype(dead_threads)::size_type i = 0; i < dead_threads.size(); ++i) {
         delete dead_threads[i];
     }
