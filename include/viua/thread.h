@@ -180,6 +180,7 @@ class Thread {
     byte* opthread(byte*);
     byte* opthjoin(byte*);
     byte* opthdetach(byte*);
+    byte* opthreceive(byte*);
     byte* end(byte*);
 
     byte* jump(byte*);

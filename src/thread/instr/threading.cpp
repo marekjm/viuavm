@@ -86,3 +86,29 @@ byte* Thread::opthdetach(byte* addr) {
 
     return addr;
 }
+byte* Thread::opthreceive(byte* addr) {
+    /** Receive a message.
+     *
+     *  This opcode blocks execution of current thread
+     *  until a message arrives.
+     */
+    byte* return_addr = (addr-1);
+
+    bool return_register_ref = *(bool*)addr;
+    pointer::inc<bool, byte>(addr);
+
+    int return_register_index = *(int*)addr;
+    pointer::inc<int, byte>(addr);
+
+    if (return_register_ref) {
+        return_register_index = static_cast<Integer*>(fetch(return_register_index))->value();
+    }
+
+    if (message_queue.size()) {
+        place(return_register_index, message_queue.front());
+        message_queue.pop();
+        return_addr = addr;
+    }
+
+    return return_addr;
+}
