@@ -107,8 +107,6 @@ void Thread::pushFrame() {
     }
 
     uregset = frame_new->regset;
-    // FIXME: remove this print
-    //cout << "\npushing new frame on stack: " << hex << frame_new << dec << " (for function: " << frame_new->function_name << ')' << endl;
     if (find(frames.begin(), frames.end(), frame_new) != frames.end()) {
         ostringstream oss;
         oss << "stack corruption: frame " << hex << frame_new << dec << " for function " << frame_new->function_name << '/' << frame_new->args->size() << " pushed more than once";
@@ -450,9 +448,7 @@ byte* Thread::tick() {
     ++instruction_counter;
 
     try {
-        /* cout << "pre:  " << reinterpret_cast<long unsigned>(instruction_pointer) << " " << OP_NAMES.at(OPCODE(*instruction_pointer)) << endl; */
         instruction_pointer = dispatch(instruction_pointer);
-        /* cout << "post: " << reinterpret_cast<long unsigned>(instruction_pointer) << " " << OP_NAMES.at(OPCODE(*instruction_pointer)) << endl; */
     } catch (Exception* e) {
         /* All machine-thrown exceptions are passed back to user code.
          * This is much easier than checking for erroneous conditions and
@@ -536,8 +532,6 @@ byte* Thread::tick() {
     }
 
     if (thrown != nullptr) {
-        // FIXME: remove the print
-        //cout << "unhandled exception" << endl;
         has_unhandled_exception = true;
         return nullptr;
     }
