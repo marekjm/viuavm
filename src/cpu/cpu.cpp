@@ -269,11 +269,19 @@ bool CPU::burst() {
     decltype(threads) dead_threads;
     for (decltype(threads)::size_type i = 1; i < threads.size(); ++i) {
         auto th = threads[i];
+
         if (th->stopped()) {
             continue;
         }
+
         ticked = true;
         for (unsigned i = 0; i < th->priority(); ++i) {
+            if (th->stopped()) {
+                // remember to break if the thread stopped
+                // otherwise the CPU will try to tick the thread and
+                // it will crash (will try to execute instructions from 0x0 pointer)
+                break;
+            }
             th->tick();
         }
         if (th->stopped() and (not th->joinable())) {
