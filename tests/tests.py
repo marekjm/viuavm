@@ -746,10 +746,10 @@ class MultithreadingTests(unittest.TestCase):
             self,
             'detaching_a_thread.asm',
             [
-                'Hello World! (from long-running detached thread) 0',
                 'false',
-                'Hello World! (from long-running detached thread) main/1 exited',
-                '1',
+                'main/1 exited',
+                'Hello World! (from long-running detached thread) 0',
+                'Hello World! (from long-running detached thread) 1',
                 'Hello World! (from long-running detached thread) 2',
                 'Hello World! (from long-running detached thread) 3',
             ],
