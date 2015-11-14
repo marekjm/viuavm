@@ -79,3 +79,17 @@ void ThreadType::setPriority(Frame* frame, RegisterSet*, RegisterSet*) {
 
     thrd->priority(static_cast<Integer*>(frame->args->at(1))->value());
 }
+
+void ThreadType::pass(Frame* frame, RegisterSet*, RegisterSet*) {
+    if (frame->args->at(0) == nullptr) {
+        throw new Exception("expected Thread as first parameter but got nothing");
+    }
+    if (frame->args->at(1) == nullptr) {
+        throw new Exception("expected object as second parameter but got nothing");
+    }
+    if (frame->args->at(0)->type() != "Thread") {
+        throw new Exception("expected Thread as first parameter but got " + frame->args->at(0)->type());
+    }
+
+    thrd->pass(frame->args->at(1)->copy());
+}
