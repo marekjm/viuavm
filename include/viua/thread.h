@@ -4,6 +4,7 @@
 #pragma once
 
 #include <string>
+#include <queue>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/types/type.h>
 #include <viua/types/prototype.h>
@@ -70,6 +71,8 @@ class Thread {
     // FIXME: change unsigned to uint64_t
     unsigned instruction_counter;
     byte* instruction_pointer;
+
+    std::queue<Type*> message_queue;
 
     Type* fetch(unsigned) const;
     void place(unsigned, Type*);
@@ -227,6 +230,8 @@ class Thread {
              */
             is_joinable = false;
         }
+
+        void pass(Type* message);
 
         decltype(thread_priority) priority() const { return thread_priority; }
         void priority(decltype(thread_priority) p) { thread_priority = p; }

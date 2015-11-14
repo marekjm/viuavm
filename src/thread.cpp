@@ -539,6 +539,10 @@ byte* Thread::tick() {
     return instruction_pointer;
 }
 
+void Thread::pass(Type* message) {
+    message_queue.push(message);
+}
+
 byte* Thread::begin() {
     if (cpu->function_addresses.count(frames[0]->function_name) == 0) {
         throw new Exception("thread from undefined function: " + frames[0]->function_name);
