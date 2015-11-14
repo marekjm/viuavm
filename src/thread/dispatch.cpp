@@ -199,6 +199,9 @@ byte* Thread::dispatch(byte* addr) {
         case THDETACH:
             addr = opthdetach(addr+1);
             break;
+        case THRECEIVE:
+            addr = opthreceive(addr+1);
+            break;
         case END:
             addr = end(addr);
             break;
