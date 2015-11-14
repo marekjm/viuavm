@@ -104,6 +104,7 @@ enum OPCODE : byte {
     THREAD, // spawn a thread (call a function and run it in a different thread)
     THJOIN, // join a thread
     THDETACH, // detach a thread
+    THRECEIVE, // receive passed message, block until one arrives
 
     JUMP,
     BRANCH,
