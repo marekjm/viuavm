@@ -42,6 +42,8 @@ class ThreadType : public Type {
         void join();
         void detach();
         bool stopped();
+        bool terminated();
+        void transferActiveExceptionTo(Type*&);
 
         ThreadType(Thread* t): thrd(t) {}
 };

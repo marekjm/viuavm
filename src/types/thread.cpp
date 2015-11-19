@@ -51,6 +51,15 @@ bool ThreadType::stopped() {
     return thrd->stopped();
 }
 
+bool ThreadType::terminated() {
+    return thrd->terminated();
+}
+
+void ThreadType::transferActiveExceptionTo(Type*& exception_register) {
+    return thrd->transferActiveExceptionTo(exception_register);
+}
+
+
 void ThreadType::joinable(Frame* frame, RegisterSet*, RegisterSet*) {
     frame->regset->set(0, new Boolean(thrd->joinable()));
 }
