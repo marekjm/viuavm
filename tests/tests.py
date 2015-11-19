@@ -775,6 +775,9 @@ class MultithreadingTests(unittest.TestCase):
     def testMessagePassing(self):
         runTest(self, 'message_passing.asm', 'Hello message passing World!')
 
+    def testTransferringExceptionsOnJoin(self):
+        runTest(self, 'transferring_exceptions.asm', 'exception transferred from thread Thread: Hello exception transferring World!')
+
 
 def sameLines(self, excode, output, no_of_lines):
     lines = output.splitlines()
