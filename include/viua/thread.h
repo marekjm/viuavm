@@ -241,6 +241,10 @@ class Thread {
 
         inline bool terminated() const { return has_unhandled_exception; }
         inline Type* getActiveException() { return thrown; }
+        inline void transferActiveExceptionTo(Type*& exception_register) {
+            exception_register = thrown;
+            thrown = nullptr;
+        }
 
         byte* begin();
         inline unsigned counter() { return instruction_counter; }
