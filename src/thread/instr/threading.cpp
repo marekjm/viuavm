@@ -58,6 +58,9 @@ byte* Thread::opthjoin(byte* addr) {
         if (thrd->stopped()) {
             thrd->join();
             return_addr = addr;
+            if (thrd->terminated()) {
+                thrd->transferActiveExceptionTo(thrown);
+            }
         }
     } else {
         throw new Exception("invalid type: expected Thread");
