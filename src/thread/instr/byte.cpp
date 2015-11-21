@@ -16,10 +16,7 @@ byte* Thread::bstore(byte* addr) {
     bool destination_register_ref = false, operand_ref = false;
     byte operand;
 
-    destination_register_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    destination_register = *((int*)addr);
-    pointer::inc<int, byte>(addr);
+    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register);
 
     operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
