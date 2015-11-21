@@ -49,10 +49,7 @@ byte* Thread::pull(byte* addr) {
     int destination_register_index;
     bool destination_register_ref = false;
 
-    destination_register_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    destination_register_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
+    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
 
     if (destination_register_ref) {
         destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
@@ -102,10 +99,7 @@ byte* Thread::vmthrow(byte* addr) {
     int source_register_index;
     bool source_register_ref = false;
 
-    source_register_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    source_register_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
+    viua::cpu::util::extractIntegerOperand(addr, source_register_ref, source_register_index);
 
     if (source_register_ref) {
         source_register_index = static_cast<Integer*>(fetch(source_register_index))->value();
