@@ -13,11 +13,7 @@ byte* Thread::echo(byte* addr) {
     bool ref = false;
     int operand_index;
 
-    ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-
-    operand_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
+    viua::cpu::util::extractIntegerOperand(addr, ref, operand_index);
 
     if (ref) {
         operand_index = static_cast<Integer*>(fetch(operand_index))->value();
