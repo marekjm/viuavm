@@ -179,7 +179,6 @@ class Thread {
     byte* call(byte*);
     byte* opthread(byte*);
     byte* opthjoin(byte*);
-    byte* opthdetach(byte*);
     byte* opthreceive(byte*);
     byte* end(byte*);
 

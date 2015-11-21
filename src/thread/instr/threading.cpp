@@ -61,25 +61,6 @@ byte* Thread::opthjoin(byte* addr) {
 
     return return_addr;
 }
-byte* Thread::opthdetach(byte* addr) {
-    /** Detach a thread.
-     */
-    bool thrd_register_ref;
-    int thrd_register_index;
-    viua::cpu::util::extractIntegerOperand(addr, thrd_register_ref, thrd_register_index);
-
-    if (thrd_register_ref) {
-        thrd_register_index = static_cast<Integer*>(fetch(thrd_register_index))->value();
-    }
-
-    if (ThreadType* thrd = dynamic_cast<ThreadType*>(fetch(thrd_register_index))) {
-        thrd->detach();
-    } else {
-        throw new Exception("invalid type: expected Thread");
-    }
-
-    return addr;
-}
 byte* Thread::opthreceive(byte* addr) {
     /** Receive a message.
      *
