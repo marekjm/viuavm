@@ -4,6 +4,7 @@
 #pragma once
 
 #include <viua/bytecode/bytetypedef.h>
+#include <viua/support/pointer.h>
 
 namespace viua {
     namespace cpu {

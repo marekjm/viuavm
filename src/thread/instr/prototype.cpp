@@ -2,7 +2,7 @@
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/types/integer.h>
 #include <viua/types/prototype.h>
-#include <viua/support/pointer.h>
+#include <viua/cpu/opex.h>
 #include <viua/exceptions.h>
 #include <viua/cpu/registerset.h>
 #include <viua/cpu/cpu.h>

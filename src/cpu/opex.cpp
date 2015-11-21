@@ -1,4 +1,3 @@
-#include <viua/support/pointer.h>
 #include <viua/cpu/opex.h>
 
 

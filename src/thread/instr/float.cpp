@@ -4,7 +4,7 @@
 #include <viua/types/boolean.h>
 #include <viua/types/integer.h>
 #include <viua/types/float.h>
-#include <viua/support/pointer.h>
+#include <viua/cpu/opex.h>
 #include <viua/cpu/cpu.h>
 using namespace std;
 

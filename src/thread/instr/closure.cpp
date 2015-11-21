@@ -5,7 +5,7 @@
 #include <viua/types/function.h>
 #include <viua/types/closure.h>
 #include <viua/types/reference.h>
-#include <viua/support/pointer.h>
+#include <viua/cpu/opex.h>
 #include <viua/exceptions.h>
 #include <viua/cpu/registerset.h>
 #include <viua/cpu/cpu.h>

@@ -1,7 +1,7 @@
 #include <cstdint>
 #include <iostream>
 #include <viua/types/boolean.h>
-#include <viua/support/pointer.h>
+#include <viua/cpu/opex.h>
 #include <viua/exceptions.h>
 #include <viua/cpu/cpu.h>
 using namespace std;

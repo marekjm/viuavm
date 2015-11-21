@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <viua/types/integer.h>
-#include <viua/support/pointer.h>
+#include <viua/cpu/opex.h>
 #include <viua/exceptions.h>
 #include <viua/cpu/cpu.h>
 using namespace std;
