@@ -50,17 +50,11 @@ byte* Thread::branch(byte* addr) {
     bool condition_object_ref;
     int condition_object_index;
 
-    condition_object_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
+    viua::cpu::util::extractIntegerOperand(addr, condition_object_ref, condition_object_index);
 
-    condition_object_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
-    uint64_t addr_true = *(reinterpret_cast<uint64_t*>(addr));
-    pointer::inc<uint64_t, byte>(addr);
-
-    uint64_t addr_false = *(reinterpret_cast<uint64_t*>(addr));
-    pointer::inc<uint64_t, byte>(addr);
+    uint64_t addr_true, addr_false;
+    viua::cpu::util::extractOperand<decltype(addr_true)>(addr, addr_true);
+    viua::cpu::util::extractOperand<decltype(addr_false)>(addr, addr_false);
 
     if (condition_object_ref) {
         condition_object_index = static_cast<Integer*>(fetch(condition_object_index))->value();
