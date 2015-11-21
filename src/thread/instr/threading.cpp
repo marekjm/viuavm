@@ -10,11 +10,9 @@ using namespace std;
 byte* Thread::opthread(byte* addr) {
     /*  Run thread instruction.
      */
-    bool return_register_ref = *(bool*)addr;
-    pointer::inc<bool, byte>(addr);
-
-    int return_register_index = *(int*)addr;
-    pointer::inc<int, byte>(addr);
+    bool return_register_ref;
+    int return_register_index;
+    viua::cpu::util::extractIntegerOperand(addr, return_register_ref, return_register_index);
 
     string call_name = string(addr);
 
@@ -44,11 +42,9 @@ byte* Thread::opthjoin(byte* addr) {
      */
     byte* return_addr = (addr-1);
 
-    bool thrd_register_ref = *(bool*)addr;
-    pointer::inc<bool, byte>(addr);
-
-    int thrd_register_index = *(int*)addr;
-    pointer::inc<int, byte>(addr);
+    bool thrd_register_ref;
+    int thrd_register_index;
+    viua::cpu::util::extractIntegerOperand(addr, thrd_register_ref, thrd_register_index);
 
     if (thrd_register_ref) {
         thrd_register_index = static_cast<Integer*>(fetch(thrd_register_index))->value();
@@ -68,11 +64,9 @@ byte* Thread::opthjoin(byte* addr) {
 byte* Thread::opthdetach(byte* addr) {
     /** Detach a thread.
      */
-    bool thrd_register_ref = *(bool*)addr;
-    pointer::inc<bool, byte>(addr);
-
-    int thrd_register_index = *(int*)addr;
-    pointer::inc<int, byte>(addr);
+    bool thrd_register_ref;
+    int thrd_register_index;
+    viua::cpu::util::extractIntegerOperand(addr, thrd_register_ref, thrd_register_index);
 
     if (thrd_register_ref) {
         thrd_register_index = static_cast<Integer*>(fetch(thrd_register_index))->value();
@@ -94,11 +88,9 @@ byte* Thread::opthreceive(byte* addr) {
      */
     byte* return_addr = (addr-1);
 
-    bool return_register_ref = *(bool*)addr;
-    pointer::inc<bool, byte>(addr);
-
-    int return_register_index = *(int*)addr;
-    pointer::inc<int, byte>(addr);
+    bool return_register_ref;
+    int return_register_index;
+    viua::cpu::util::extractIntegerOperand(addr, return_register_ref, return_register_index);
 
     if (return_register_ref) {
         return_register_index = static_cast<Integer*>(fetch(return_register_index))->value();
