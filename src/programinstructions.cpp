@@ -630,11 +630,6 @@ Program& Program::opthreceive(int_op ref) {
     return (*this);
 }
 
-Program& Program::opthdetach(int_op ref) {
-    addr_ptr = cg::bytecode::opthdetach(addr_ptr, ref);
-    return (*this);
-}
-
 Program& Program::jump(uint64_t addr, enum JUMPTYPE is_absolute) {
     /*  Inserts jump instruction. Parameter is instruction index.
      *  Byte offset is calculated automatically.

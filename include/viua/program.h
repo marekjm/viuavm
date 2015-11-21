@@ -123,7 +123,6 @@ class Program {
     Program& call       (int_op, const std::string&);
     Program& opthread   (int_op, const std::string&);
     Program& opthjoin   (int_op);
-    Program& opthdetach (int_op);
     Program& opthreceive(int_op);
     Program& jump       (uint64_t, enum JUMPTYPE);
     Program& branch     (int_op, uint64_t, enum JUMPTYPE, uint64_t, enum JUMPTYPE);
