@@ -15,10 +15,7 @@ byte* Thread::vmclass(byte* addr) {
     int reg;
     bool reg_ref;
 
-    reg_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    reg = *((int*)addr);
-    pointer::inc<int, byte>(addr);
+    viua::cpu::util::extractIntegerOperand(addr, reg_ref, reg);
 
     string class_name = string(addr);
     addr += (class_name.size()+1);
@@ -38,10 +35,7 @@ byte* Thread::vmderive(byte* addr) {
     int reg;
     bool reg_ref;
 
-    reg_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    reg = *((int*)addr);
-    pointer::inc<int, byte>(addr);
+    viua::cpu::util::extractIntegerOperand(addr, reg_ref, reg);
 
     string class_name = string(addr);
     addr += (class_name.size()+1);
@@ -65,10 +59,7 @@ byte* Thread::vmattach(byte* addr) {
     int reg;
     bool reg_ref;
 
-    reg_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    reg = *((int*)addr);
-    pointer::inc<int, byte>(addr);
+    viua::cpu::util::extractIntegerOperand(addr, reg_ref, reg);
 
     string function_name = string(addr);
     addr += (function_name.size()+1);
@@ -97,10 +88,7 @@ byte* Thread::vmregister(byte* addr) {
     int reg;
     bool reg_ref;
 
-    reg_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    reg = *((int*)addr);
-    pointer::inc<int, byte>(addr);
+    viua::cpu::util::extractIntegerOperand(addr, reg_ref, reg);
 
     if (reg_ref) {
         reg = static_cast<Integer*>(fetch(reg))->value();
