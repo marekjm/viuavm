@@ -17,10 +17,7 @@ byte* Thread::strstore(byte* addr) {
     int reg;
     bool reg_ref = false;
 
-    reg_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    reg = *((int*)addr);
-    pointer::inc<int, byte>(addr);
+    viua::cpu::util::extractIntegerOperand(addr, reg_ref, reg);
 
     string svalue = string(addr);
     addr += svalue.size()+1;
