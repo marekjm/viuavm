@@ -10,24 +10,10 @@
  */
 
 void viua::cpu::util::extractIntegerOperand(byte*& instruction_stream, bool& boolean, int& integer) {
-    bool ex_bool = false;
-    int ex_int = 0;
-
-    ex_bool = *(reinterpret_cast<bool*>(instruction_stream));
-    pointer::inc<bool, byte>(instruction_stream);
-
-    ex_int = *(reinterpret_cast<int*>(instruction_stream));
-    pointer::inc<int, byte>(instruction_stream);
-
-    boolean = ex_bool;
-    integer = ex_int;
+    extractOperand<bool>(instruction_stream, boolean);
+    extractOperand<int>(instruction_stream, integer);
 }
 
 void viua::cpu::util::extractFloatingPointOperand(byte*& instruction_stream, float& fp) {
-    float ex_float = 0.0;
-
-    ex_float = *(reinterpret_cast<float*>(instruction_stream));
-    pointer::inc<float, byte>(instruction_stream);
-
-    fp = ex_float;
+    extractOperand<float>(instruction_stream, fp);
 }
