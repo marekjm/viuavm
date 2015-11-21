@@ -23,10 +23,7 @@ byte* Thread::clbind(byte* addr) {
     int a;
     bool ref = false;
 
-    ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    a = *((int*)addr);
-    pointer::inc<int, byte>(addr);
+    viua::cpu::util::extractIntegerOperand(addr, ref, a);
 
     if (ref) {
         a = static_cast<Integer*>(fetch(a))->value();
@@ -43,10 +40,7 @@ byte* Thread::closure(byte* addr) {
     int reg;
     bool reg_ref;
 
-    reg_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    reg = *((int*)addr);
-    pointer::inc<int, byte>(addr);
+    viua::cpu::util::extractIntegerOperand(addr, reg_ref, reg);
 
     string call_name = string(addr);
     addr += (call_name.size()+1);
@@ -106,10 +100,7 @@ byte* Thread::function(byte* addr) {
     int reg;
     bool reg_ref;
 
-    reg_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    reg = *((int*)addr);
-    pointer::inc<int, byte>(addr);
+    viua::cpu::util::extractIntegerOperand(addr, reg_ref, reg);
 
     string call_name = string(addr);
     addr += (call_name.size()+1);
@@ -132,15 +123,8 @@ byte* Thread::fcall(byte* addr) {
     int fn_reg, return_value_reg;
     bool fn_reg_ref, return_value_ref;
 
-    return_value_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    return_value_reg = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
-    fn_reg_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    fn_reg = *((int*)addr);
-    pointer::inc<int, byte>(addr);
+    viua::cpu::util::extractIntegerOperand(addr, return_value_ref, return_value_reg);
+    viua::cpu::util::extractIntegerOperand(addr, fn_reg_ref, fn_reg);
 
     if (fn_reg_ref) {
         fn_reg = static_cast<Integer*>(fetch(fn_reg))->value();
