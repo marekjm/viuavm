@@ -16,13 +16,8 @@ byte* Thread::fstore(byte* addr) {
     float value;
     bool destination_register_ref = false;
 
-    destination_register_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    destination_register_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
-    value = *((float*)addr);
-    pointer::inc<float, byte>(addr);
+    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
+    viua::cpu::util::extractFloatingPointOperand(addr, value);
 
     if (destination_register_ref) {
         destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
@@ -39,20 +34,9 @@ byte* Thread::fadd(byte* addr) {
     bool first_operand_ref, second_operand_ref, destination_register_ref;
     int first_operand_index, second_operand_index, destination_register_index;
 
-    destination_register_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    destination_register_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
-    first_operand_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    first_operand_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
-    second_operand_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    second_operand_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
+    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
+    viua::cpu::util::extractIntegerOperand(addr, first_operand_ref, first_operand_index);
+    viua::cpu::util::extractIntegerOperand(addr, second_operand_ref, second_operand_index);
 
     if (first_operand_ref) {
         first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
@@ -79,20 +63,9 @@ byte* Thread::fsub(byte* addr) {
     bool first_operand_ref, second_operand_ref, destination_register_ref;
     int first_operand_index, second_operand_index, destination_register_index;
 
-    destination_register_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    destination_register_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
-    first_operand_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    first_operand_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
-    second_operand_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    second_operand_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
+    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
+    viua::cpu::util::extractIntegerOperand(addr, first_operand_ref, first_operand_index);
+    viua::cpu::util::extractIntegerOperand(addr, second_operand_ref, second_operand_index);
 
     if (first_operand_ref) {
         first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
@@ -119,20 +92,9 @@ byte* Thread::fmul(byte* addr) {
     bool first_operand_ref, second_operand_ref, destination_register_ref;
     int first_operand_index, second_operand_index, destination_register_index;
 
-    destination_register_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    destination_register_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
-    first_operand_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    first_operand_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
-    second_operand_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    second_operand_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
+    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
+    viua::cpu::util::extractIntegerOperand(addr, first_operand_ref, first_operand_index);
+    viua::cpu::util::extractIntegerOperand(addr, second_operand_ref, second_operand_index);
 
     if (first_operand_ref) {
         first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
@@ -159,20 +121,9 @@ byte* Thread::fdiv(byte* addr) {
     bool first_operand_ref, second_operand_ref, destination_register_ref;
     int first_operand_index, second_operand_index, destination_register_index;
 
-    destination_register_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    destination_register_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
-    first_operand_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    first_operand_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
-    second_operand_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    second_operand_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
+    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
+    viua::cpu::util::extractIntegerOperand(addr, first_operand_ref, first_operand_index);
+    viua::cpu::util::extractIntegerOperand(addr, second_operand_ref, second_operand_index);
 
     if (first_operand_ref) {
         first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
@@ -199,20 +150,9 @@ byte* Thread::flt(byte* addr) {
     bool first_operand_ref, second_operand_ref, destination_register_ref;
     int first_operand_index, second_operand_index, destination_register_index;
 
-    destination_register_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    destination_register_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
-    first_operand_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    first_operand_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
-    second_operand_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    second_operand_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
+    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
+    viua::cpu::util::extractIntegerOperand(addr, first_operand_ref, first_operand_index);
+    viua::cpu::util::extractIntegerOperand(addr, second_operand_ref, second_operand_index);
 
     if (first_operand_ref) {
         first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
@@ -239,20 +179,9 @@ byte* Thread::flte(byte* addr) {
     bool first_operand_ref, second_operand_ref, destination_register_ref;
     int first_operand_index, second_operand_index, destination_register_index;
 
-    destination_register_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    destination_register_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
-    first_operand_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    first_operand_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
-    second_operand_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    second_operand_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
+    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
+    viua::cpu::util::extractIntegerOperand(addr, first_operand_ref, first_operand_index);
+    viua::cpu::util::extractIntegerOperand(addr, second_operand_ref, second_operand_index);
 
     if (first_operand_ref) {
         first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
@@ -279,20 +208,9 @@ byte* Thread::fgt(byte* addr) {
     bool first_operand_ref, second_operand_ref, destination_register_ref;
     int first_operand_index, second_operand_index, destination_register_index;
 
-    destination_register_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    destination_register_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
-    first_operand_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    first_operand_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
-    second_operand_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    second_operand_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
+    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
+    viua::cpu::util::extractIntegerOperand(addr, first_operand_ref, first_operand_index);
+    viua::cpu::util::extractIntegerOperand(addr, second_operand_ref, second_operand_index);
 
     if (first_operand_ref) {
         first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
@@ -319,20 +237,9 @@ byte* Thread::fgte(byte* addr) {
     bool first_operand_ref, second_operand_ref, destination_register_ref;
     int first_operand_index, second_operand_index, destination_register_index;
 
-    destination_register_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    destination_register_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
-    first_operand_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    first_operand_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
-    second_operand_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    second_operand_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
+    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
+    viua::cpu::util::extractIntegerOperand(addr, first_operand_ref, first_operand_index);
+    viua::cpu::util::extractIntegerOperand(addr, second_operand_ref, second_operand_index);
 
     if (first_operand_ref) {
         first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
@@ -359,20 +266,9 @@ byte* Thread::feq(byte* addr) {
     bool first_operand_ref, second_operand_ref, destination_register_ref;
     int first_operand_index, second_operand_index, destination_register_index;
 
-    destination_register_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    destination_register_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
-    first_operand_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    first_operand_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
-
-    second_operand_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    second_operand_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
+    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
+    viua::cpu::util::extractIntegerOperand(addr, first_operand_ref, first_operand_index);
+    viua::cpu::util::extractIntegerOperand(addr, second_operand_ref, second_operand_index);
 
     if (first_operand_ref) {
         first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
