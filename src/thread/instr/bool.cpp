@@ -6,7 +6,6 @@
 #include <viua/types/byte.h>
 #include <viua/types/boolean.h>
 #include <viua/cpu/opex.h>
-#include <viua/cpu/opex.h>
 #include <viua/cpu/cpu.h>
 using namespace std;
 
