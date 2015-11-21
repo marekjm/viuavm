@@ -15,10 +15,7 @@ byte* Thread::vmnew(byte* addr) {
     int reg;
     bool reg_ref;
 
-    reg_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    reg = *((int*)addr);
-    pointer::inc<int, byte>(addr);
+    viua::cpu::util::extractIntegerOperand(addr, reg_ref, reg);
 
     string class_name = string(addr);
     addr += (class_name.size()+1);
@@ -46,10 +43,7 @@ byte* Thread::vmmsg(byte* addr) {
     int return_register_index;
     bool return_register_ref = false;
 
-    return_register_ref = *((bool*)addr);
-    pointer::inc<bool, byte>(addr);
-    return_register_index = *((int*)addr);
-    pointer::inc<int, byte>(addr);
+    viua::cpu::util::extractIntegerOperand(addr, return_register_ref, return_register_index);
 
     if (return_register_ref) {
         return_register_index = static_cast<Integer*>(fetch(return_register_index))->value();
