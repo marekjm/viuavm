@@ -97,7 +97,6 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "argc",   sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "thread", sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "thjoin", sizeof(byte) + sizeof(bool) + sizeof(int) },
-    { "thdetach", sizeof(byte) + sizeof(bool) + sizeof(int) },
     { "threceive", sizeof(byte) + sizeof(bool) + sizeof(int) },
 
     { "jump",   sizeof(byte) + sizeof(uint64_t) },
@@ -214,8 +213,7 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { ARGC,     "argc" },
     { THREAD,   "thread" },
     { THJOIN,   "thjoin" },
-    { THDETACH, "thdetach" },
-    { THRECEIVE,   "threceive" },
+    { THRECEIVE,"threceive" },
 
     { JUMP,     "jump" },
     { BRANCH,   "branch" },
