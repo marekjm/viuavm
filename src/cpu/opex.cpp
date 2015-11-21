@@ -22,3 +22,12 @@ void viua::cpu::util::extractIntegerOperand(byte*& instruction_stream, bool& boo
     boolean = ex_bool;
     integer = ex_int;
 }
+
+void viua::cpu::util::extractFloatingPointOperand(byte*& instruction_stream, float& fp) {
+    float ex_float = 0.0;
+
+    ex_float = *(reinterpret_cast<float*>(instruction_stream));
+    pointer::inc<float, byte>(instruction_stream);
+
+    fp = ex_float;
+}

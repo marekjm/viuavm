@@ -10,6 +10,7 @@ namespace viua {
     namespace cpu {
         namespace util {
             void extractIntegerOperand(byte*& instruction_stream, bool& boolean, int& integer);
+            void extractFloatingPointOperand(byte*& instruction_stream, float& fp);
         }
     }
 }
