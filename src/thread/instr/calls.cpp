@@ -24,8 +24,6 @@ byte* Thread::frame(byte* addr) {
 
     requestNewFrame(arguments, local_registers);
 
-    cout << "debug: Thread::frame(...): frame_new = " << hex << frame_new << dec << endl;
-
     return addr;
 }
 
@@ -48,8 +46,6 @@ byte* Thread::param(byte* addr) {
     if (unsigned(parameter_no_operand_index) >= frame_new->args->size()) { throw new Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter"); }
     frame_new->args->set(parameter_no_operand_index, fetch(object_operand_index));
     frame_new->args->clear(parameter_no_operand_index);
-
-    cout << "debug: Thread::param(...): frame_new = " << hex << frame_new << dec << endl;
 
     return addr;
 }
@@ -143,8 +139,6 @@ byte* Thread::call(byte* addr) {
     viua::cpu::util::extractIntegerOperand(addr, return_register_ref, return_register_index);
 
     string call_name = string(addr);
-
-    cout << "debug: Thread::call(`" << call_name << "`): frame_new = " << hex << frame_new << dec << endl;
 
     bool is_native = (cpu->function_addresses.count(call_name) or cpu->linked_functions.count(call_name));
     bool is_foreign = cpu->foreign_functions.count(call_name);

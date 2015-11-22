@@ -230,17 +230,14 @@ byte* Thread::callForeign(byte* addr, const string& call_name, const bool& retur
     return return_address;
 }
 byte* Thread::callForeignMethod(byte* addr, Type* object, const string& call_name, const bool& return_ref, const int& return_index, const string& real_call_name) {
-    cout << "debug: Thread::callForeignMethod(...): addr (pre)  = " << hex << (long long)addr << dec << endl;
     if (real_call_name.size()) {
         addr += (real_call_name.size()+1);
     } else {
         addr += (call_name.size()+1);
     }
-    cout << "debug: Thread::callForeignMethod(...): addr (post) = " << hex << (long long)addr << dec << endl;
 
     // save return address for frame
     byte* return_address = addr;
-    cout << "debug: Thread::callForeignMethod(...): return_address = " << hex << (long long)return_address << dec << endl;
 
     if (frame_new == nullptr) {
         throw new Exception("foreign method call without a frame");
