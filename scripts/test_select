@@ -7,4 +7,4 @@ if [[ $1 == "" ]]; then
     exit 1
 fi
 
-VIUAPATH=./build/stdlib python3 ./tests/tests.py --verbose --catch --failfast $1
+VIUAPATH=./build/stdlib python3 ./tests/tests.py --verbose --catch --failfast $@
