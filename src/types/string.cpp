@@ -57,3 +57,18 @@ void String::represent(Frame* frame, RegisterSet*, RegisterSet*) {
     }
     svalue = frame->args->at(1)->repr();
 }
+
+void String::format(Frame* frame, RegisterSet*, RegisterSet*) {
+}
+
+void String::sub(Frame* frame, RegisterSet*, RegisterSet*) {
+}
+
+void String::concatenate(Frame* frame, RegisterSet*, RegisterSet*) {
+}
+
+void String::join(Frame* frame, RegisterSet*, RegisterSet*) {
+}
+
+void String::size(Frame* frame, RegisterSet*, RegisterSet*) {
+}

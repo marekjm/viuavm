@@ -123,9 +123,19 @@ int main(int argc, char* argv[]) {
     Prototype* proto_string = new Prototype("String");
     proto_string->attach("String::stringify", "stringify");
     proto_string->attach("String::represent", "represent");
+    proto_string->attach("String::format", "format");
+    proto_string->attach("String::sub", "sub");
+    proto_string->attach("String::concatenate", "concatenate");
+    proto_string->attach("String::join", "join");
+    proto_string->attach("String::size", "size");
     cpu.registerForeignPrototype("String", proto_string);
     cpu.registerForeignMethod("String::stringify", static_cast<ForeignMethodMemberPointer>(&String::stringify));
     cpu.registerForeignMethod("String::represent", static_cast<ForeignMethodMemberPointer>(&String::represent));
+    cpu.registerForeignMethod("String::format", static_cast<ForeignMethodMemberPointer>(&String::format));
+    cpu.registerForeignMethod("String::sub", static_cast<ForeignMethodMemberPointer>(&String::sub));
+    cpu.registerForeignMethod("String::concatenate", static_cast<ForeignMethodMemberPointer>(&String::concatenate));
+    cpu.registerForeignMethod("String::join", static_cast<ForeignMethodMemberPointer>(&String::join));
+    cpu.registerForeignMethod("String::size", static_cast<ForeignMethodMemberPointer>(&String::size));
 
     Prototype* proto_thread = new Prototype("Thread");
     proto_thread->attach("Thread::joinable", "joinable");

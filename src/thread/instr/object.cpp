@@ -50,6 +50,11 @@ byte* Thread::vmmsg(byte* addr) {
     }
 
     string method_name = string(addr);
+    cout << "debug: Thread::msg(`" << method_name << "`): frame_new = " << hex << frame_new << dec << endl;
+
+    /* if (frame_new == nullptr) { */
+    /*     throw new Exception("no frame available on stack"); */
+    /* } */
 
     Type* obj = frame_new->args->at(0);
     vector<string> mro = cpu->inheritanceChainOf(obj->type());
@@ -75,7 +80,10 @@ byte* Thread::vmmsg(byte* addr) {
     }
 
     if (is_foreign_method) {
-        return callForeignMethod(addr, obj, function_name, return_register_ref, return_register_index, method_name);
+        cout << "debug 0" << endl;
+        byte* new_exec_ptr = callForeignMethod(addr, obj, function_name, return_register_ref, return_register_index, method_name);
+        cout << "debug: Thread::msg(`" << method_name << "`): new execution pointer = " << hex << new_exec_ptr << dec << endl;
+        return new_exec_ptr;
     }
 
     auto caller = (is_native ? &Thread::callNative : &Thread::callForeign);
