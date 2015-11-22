@@ -798,6 +798,13 @@ class StandardRuntimeLibraryModuleString(unittest.TestCase):
         runTestCustomAssertsNoDisassemblyRerun(self, 'represent.asm', partiallyAppliedSameLines(2))
 
 
+class TypeStringTests(unittest.TestCase):
+    PATH = './sample/types/String'
+
+    def testMessageSize(self):
+        runTest(self, 'size.asm', '12')
+
+
 if __name__ == '__main__':
     if not unittest.main(exit=False).result.wasSuccessful():
         exit(1)
