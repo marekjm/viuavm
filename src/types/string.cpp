@@ -71,4 +71,5 @@ void String::join(Frame* frame, RegisterSet*, RegisterSet*) {
 }
 
 void String::size(Frame* frame, RegisterSet*, RegisterSet*) {
+    frame->regset->set(0, new Integer(svalue.size()));
 }
