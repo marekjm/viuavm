@@ -80,6 +80,4 @@ byte* Thread::vmmsg(byte* addr) {
 
     auto caller = (is_native ? &Thread::callNative : &Thread::callForeign);
     return (this->*caller)(addr, function_name, return_register_ref, return_register_index, method_name);
-
-    return addr;
 }
