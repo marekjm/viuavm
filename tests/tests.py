@@ -807,6 +807,9 @@ class TypeStringTests(unittest.TestCase):
     def testMessageConcatenate(self):
         runTest(self, 'concatenate.asm', ['Hello ', 'World!', 'Hello World!'], 0, lambda o: o.splitlines())
 
+    def testMessageFormat(self):
+        runTest(self, 'format.asm', 'Hello, formatted World!')
+
 
 if __name__ == '__main__':
     if not unittest.main(exit=False).result.wasSuccessful():
