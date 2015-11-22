@@ -804,6 +804,9 @@ class TypeStringTests(unittest.TestCase):
     def testMessageSize(self):
         runTest(self, 'size.asm', '12')
 
+    def testMessageConcatenate(self):
+        runTest(self, 'concatenate.asm', ['Hello ', 'World!', 'Hello World!'], 0, lambda o: o.splitlines())
+
 
 if __name__ == '__main__':
     if not unittest.main(exit=False).result.wasSuccessful():

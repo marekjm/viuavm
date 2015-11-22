@@ -65,6 +65,7 @@ void String::sub(Frame* frame, RegisterSet*, RegisterSet*) {
 }
 
 void String::concatenate(Frame* frame, RegisterSet*, RegisterSet*) {
+    frame->regset->set(0, new String(static_cast<String*>(frame->args->at(0))->value() + static_cast<String*>(frame->args->at(1))->value()));
 }
 
 void String::join(Frame* frame, RegisterSet*, RegisterSet*) {
