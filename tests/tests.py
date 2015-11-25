@@ -820,7 +820,7 @@ class TypeStringTests(unittest.TestCase):
         runTest(self, 'substr.asm', 'Hello, World!\nHello\nWorld!')
 
     def testMessageStartswith(self):
-        runTest(self, 'startswith.asm', 'true')
+        runTest(self, 'startswith.asm', 'true\nfalse')
 
 
 if __name__ == '__main__':
