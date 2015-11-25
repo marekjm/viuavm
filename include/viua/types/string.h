@@ -47,6 +47,8 @@ class String : public Type {
         virtual void stringify(Frame*, RegisterSet*, RegisterSet*);
         virtual void represent(Frame*, RegisterSet*, RegisterSet*);
 
+        virtual void startswith(Frame*, RegisterSet*, RegisterSet*);
+
         virtual void format(Frame*, RegisterSet*, RegisterSet*);
         virtual void substr(Frame*, RegisterSet*, RegisterSet*);
         virtual void concatenate(Frame*, RegisterSet*, RegisterSet*);

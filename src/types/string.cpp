@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <viua/support/string.h>
 #include <viua/types/type.h>
+#include <viua/types/boolean.h>
 #include <viua/types/vector.h>
 #include <viua/types/object.h>
 #include <viua/types/string.h>
@@ -59,6 +60,23 @@ void String::represent(Frame* frame, RegisterSet*, RegisterSet*) {
         throw new Exception("expected 2 parameters");
     }
     svalue = frame->args->at(1)->repr();
+}
+
+void String::startswith(Frame* frame, RegisterSet*, RegisterSet*) {
+    string s = static_cast<String*>(frame->args->at(1))->value();
+    bool starts_with = false;
+
+    if (s.size() <= svalue.size()) {
+        long unsigned i = 0;
+        while (i < s.size()) {
+            if (!(starts_with = (s[i] == svalue[i]))) {
+                break;
+            }
+            ++i;
+        }
+    }
+
+    frame->regset->set(0, new Boolean(starts_with));
 }
 
 void String::format(Frame* frame, RegisterSet*, RegisterSet*) {
