@@ -124,6 +124,7 @@ int main(int argc, char* argv[]) {
     proto_string->attach("String::stringify", "stringify");
     proto_string->attach("String::represent", "represent");
     proto_string->attach("String::startswith", "startswith");
+    proto_string->attach("String::endswith", "endswith");
     proto_string->attach("String::format", "format");
     proto_string->attach("String::substr", "substr");
     proto_string->attach("String::concatenate", "concatenate");
@@ -133,6 +134,7 @@ int main(int argc, char* argv[]) {
     cpu.registerForeignMethod("String::stringify", static_cast<ForeignMethodMemberPointer>(&String::stringify));
     cpu.registerForeignMethod("String::represent", static_cast<ForeignMethodMemberPointer>(&String::represent));
     cpu.registerForeignMethod("String::startswith", static_cast<ForeignMethodMemberPointer>(&String::startswith));
+    cpu.registerForeignMethod("String::endswith", static_cast<ForeignMethodMemberPointer>(&String::endswith));
     cpu.registerForeignMethod("String::format", static_cast<ForeignMethodMemberPointer>(&String::format));
     cpu.registerForeignMethod("String::substr", static_cast<ForeignMethodMemberPointer>(&String::substr));
     cpu.registerForeignMethod("String::concatenate", static_cast<ForeignMethodMemberPointer>(&String::concatenate));
