@@ -59,6 +59,7 @@ void String::represent(Frame* frame, RegisterSet*, RegisterSet*) {
 }
 
 void String::format(Frame* frame, RegisterSet*, RegisterSet*) {
+    frame->regset->set(0, new String());
 }
 
 void String::sub(Frame* frame, RegisterSet*, RegisterSet*) {
