@@ -1,6 +1,8 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <regex>
+#include <algorithm>
 #include <stdexcept>
 #include <viua/support/string.h>
 #include <viua/types/type.h>
