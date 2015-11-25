@@ -65,6 +65,7 @@ void String::format(Frame* frame, RegisterSet*, RegisterSet*) {
     regex key_regex("#\\{(?:(?:0|[1-9][0-9]*)|[a-zA-Z_][a-zA-Z0-9_]*)\\}");
 
     string result = svalue;
+
     if (regex_search(result, key_regex)) {
         vector<string> matches;
         for (sregex_iterator match = sregex_iterator(result.begin(), result.end(), key_regex); match != sregex_iterator(); ++match) {
@@ -92,6 +93,7 @@ void String::format(Frame* frame, RegisterSet*, RegisterSet*) {
         }
 
     }
+
     frame->regset->set(0, new String(result));
 }
 
