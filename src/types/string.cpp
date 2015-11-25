@@ -79,6 +79,25 @@ void String::startswith(Frame* frame, RegisterSet*, RegisterSet*) {
     frame->regset->set(0, new Boolean(starts_with));
 }
 
+void String::endswith(Frame* frame, RegisterSet*, RegisterSet*) {
+    string s = static_cast<String*>(frame->args->at(1))->value();
+    bool ends_with = false;
+
+    if (s.size() <= svalue.size()) {
+        auto i = s.size();
+        auto j = svalue.size();
+        while (i > 0) {
+            if (!(ends_with = (s[i] == svalue[j]))) {
+                break;
+            }
+            --i;
+            --j;
+        }
+    }
+
+    frame->regset->set(0, new Boolean(ends_with));
+}
+
 void String::format(Frame* frame, RegisterSet*, RegisterSet*) {
     regex key_regex("#\\{(?:(?:0|[1-9][0-9]*)|[a-zA-Z_][a-zA-Z0-9_]*)\\}");
 

@@ -48,6 +48,7 @@ class String : public Type {
         virtual void represent(Frame*, RegisterSet*, RegisterSet*);
 
         virtual void startswith(Frame*, RegisterSet*, RegisterSet*);
+        virtual void endswith(Frame*, RegisterSet*, RegisterSet*);
 
         virtual void format(Frame*, RegisterSet*, RegisterSet*);
         virtual void substr(Frame*, RegisterSet*, RegisterSet*);
