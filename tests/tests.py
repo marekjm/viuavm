@@ -817,7 +817,7 @@ class TypeStringTests(unittest.TestCase):
         runTest(self, 'format.asm', 'Hello, formatted World!')
 
     def testMessageSubstr(self):
-        runTest(self, 'substr.asm', 'Hello World!\nHello\nWorld!')
+        runTest(self, 'substr.asm', 'Hello, World!\nHello\nWorld!')
 
 
 if __name__ == '__main__':
