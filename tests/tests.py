@@ -816,6 +816,9 @@ class TypeStringTests(unittest.TestCase):
     def testMessageFormat(self):
         runTest(self, 'format.asm', 'Hello, formatted World!')
 
+    def testMessageSubstr(self):
+        runTest(self, 'substr.asm', 'Hello World!\nHello\nWorld!')
+
 
 if __name__ == '__main__':
     if not unittest.main(exit=False).result.wasSuccessful():
