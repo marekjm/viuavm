@@ -91,13 +91,28 @@ void String::format(Frame* frame, RegisterSet*, RegisterSet*) {
             regex subst(pat);
             result = regex_replace(result, subst, replacement);
         }
-
     }
 
     frame->regset->set(0, new String(result));
 }
 
-void String::sub(Frame* frame, RegisterSet*, RegisterSet*) {
+void String::substr(Frame* frame, RegisterSet*, RegisterSet*) {
+    int begin = 0;
+    int end = -1;
+    if (frame->args->size() > 1) {
+        if (Integer* i = dynamic_cast<Integer*>(frame->args->at(1))) {
+            begin = i->value();
+        }
+    }
+    if (frame->args->size() > 2) {
+        if (Integer* i = dynamic_cast<Integer*>(frame->args->at(2))) {
+            end = i->value();
+        }
+    }
+    if (end < 0) {
+        end = (svalue.size()+end+1);
+    }
+    frame->regset->set(0, new String(svalue.substr(begin, end)));
 }
 
 void String::concatenate(Frame* frame, RegisterSet*, RegisterSet*) {

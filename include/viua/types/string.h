@@ -48,7 +48,7 @@ class String : public Type {
         virtual void represent(Frame*, RegisterSet*, RegisterSet*);
 
         virtual void format(Frame*, RegisterSet*, RegisterSet*);
-        virtual void sub(Frame*, RegisterSet*, RegisterSet*);
+        virtual void substr(Frame*, RegisterSet*, RegisterSet*);
         virtual void concatenate(Frame*, RegisterSet*, RegisterSet*);
         virtual void join(Frame*, RegisterSet*, RegisterSet*);
 
