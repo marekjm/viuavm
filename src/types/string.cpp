@@ -10,6 +10,7 @@
 #include <viua/types/vector.h>
 #include <viua/types/object.h>
 #include <viua/types/string.h>
+#include <viua/assert.h>
 #include <viua/exceptions.h>
 using namespace std;
 
@@ -137,11 +138,13 @@ void String::substr(Frame* frame, RegisterSet*, RegisterSet*) {
     int begin = 0;
     int end = -1;
     if (frame->args->size() > 1) {
+        assert_typeof(frame->args->at(1), "Integer");
         if (Integer* i = dynamic_cast<Integer*>(frame->args->at(1))) {
             begin = i->value();
         }
     }
     if (frame->args->size() > 2) {
+        assert_typeof(frame->args->at(2), "Integer");
         if (Integer* i = dynamic_cast<Integer*>(frame->args->at(2))) {
             end = i->value();
         }
