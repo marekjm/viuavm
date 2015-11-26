@@ -137,6 +137,7 @@ void String::format(Frame* frame, RegisterSet*, RegisterSet*) {
 void String::substr(Frame* frame, RegisterSet*, RegisterSet*) {
     int begin = 0;
     int end = -1;
+    /* assert_arity(frame->args->size(), 2, 3); */
     if (frame->args->size() > 1) {
         assert_typeof(frame->args->at(1), "Integer");
         if (Integer* i = dynamic_cast<Integer*>(frame->args->at(1))) {

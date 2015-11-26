@@ -29,4 +29,26 @@ void assert_typeof(Type* object, const std::string& expected) {
 }
 
 
+template<typename T, typename U> bool any_equal(const T& to_compare, const U& first) {
+    return (to_compare == first);
+}
+template<typename T, typename U, typename... R> bool any_equal(const T& to_compare, const U& first, const R&... rest) {
+    return ((to_compare == first) or any_equal(to_compare, rest...));
+}
+
+using ArityType = size_t;
+
+template<typename Arity> bool assert_arity(const ArityType& actual_arity, const Arity& arity) {
+    if (not (actual_arity == arity)) {
+        throw new Exception("ArityException");
+    }
+}
+template<typename Arity, typename... ArityRest> bool assert_arity(const ArityType& actual_arity, const Arity& arity, const ArityRest&... rest) {
+    if (not (actual_arity == arity) or any_equal(actual_arity, rest...)) {
+        throw new Exception("ArityException");
+    }
+}
+
+
+
 #endif
