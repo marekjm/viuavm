@@ -138,7 +138,7 @@ void String::substr(Frame* frame, RegisterSet*, RegisterSet*) {
     int begin = 0;
     int end = -1;
 
-    assert_arity(frame->args->size(), 2, 3);
+    assert_arity(frame->args->size(), 1u, 2u, 3u);
 
     if (frame->args->size() > 1) {
         assert_typeof(frame->args->at(1), "Integer");
