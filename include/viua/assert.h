@@ -38,12 +38,12 @@ template<typename T, typename U, typename... R> bool any_equal(const T& to_compa
 
 using ArityType = size_t;
 
-template<typename Arity> bool assert_arity(const ArityType& actual_arity, const Arity& arity) {
+template<typename Arity> void assert_arity(const ArityType& actual_arity, const Arity& arity) {
     if (not (actual_arity == arity)) {
         throw new Exception("ArityException");
     }
 }
-template<typename Arity, typename... ArityRest> bool assert_arity(const ArityType& actual_arity, const Arity& arity, const ArityRest&... rest) {
+template<typename Arity, typename... ArityRest> void assert_arity(const ArityType& actual_arity, const Arity& arity, const ArityRest&... rest) {
     if (not (actual_arity == arity) or any_equal(actual_arity, rest...)) {
         throw new Exception("ArityException");
     }
