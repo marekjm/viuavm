@@ -460,6 +460,8 @@ byte* Thread::tick() {
         thrown = e;
     } catch (const HaltException& e) {
         halt = true;
+    } catch (Type* e) {
+        thrown = e;
     } catch (const char* e) {
         thrown = new Exception(e);
     }
