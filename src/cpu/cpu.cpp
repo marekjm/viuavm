@@ -253,7 +253,7 @@ bool CPU::burst() {
     bool ticked = false;
     if (not threads[0]->stopped()) {
         ticked = true;
-        for (unsigned i = 0; i < threads[0]->priority(); ++i) {
+        for (unsigned i = 0; i < threads[0]->priority() and not threads[0]->stopped(); ++i) {
             threads[0]->tick();
         }
     }
