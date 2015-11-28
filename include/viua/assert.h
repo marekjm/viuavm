@@ -29,7 +29,7 @@ void assert_typeof(Type* object, const std::string& expected) {
 }
 
 
-template<typename T, typename U> bool any_equal(const T& to_compare, const U& first) {
+template<typename T, typename U> inline bool any_equal(const T& to_compare, const U& first) {
     return (to_compare == first);
 }
 template<typename T, typename U, typename... R> bool any_equal(const T& to_compare, const U& first, const R&... rest) {
