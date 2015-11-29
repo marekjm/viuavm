@@ -826,6 +826,13 @@ class TypeStringTests(unittest.TestCase):
         runTest(self, 'endswith.asm', 'true\nfalse')
 
 
+class RuntimeAssertionsTests(unittest.TestCase):
+    PATH = './sample/vm_runtime_assertions'
+
+    def testAssertArity(self):
+        runTest(self, 'assert_arity.asm', 'got arity 4, expected one of {1, 2, 3}')
+
+
 if __name__ == '__main__':
     if not unittest.main(exit=False).result.wasSuccessful():
         exit(1)
