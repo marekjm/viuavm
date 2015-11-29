@@ -5,7 +5,7 @@
 
 #include <string>
 #include <viua/types/type.h>
-#include <viua/types/exception.h>
+#include <viua/exceptions.h>
 
 
 namespace viua {
