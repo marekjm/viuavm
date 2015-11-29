@@ -51,5 +51,30 @@ class ArityException: public Exception {
         ~ArityException() {}
 };
 
+class TypeException: public Exception {
+        std::string expected;
+        std::string got;
+    public:
+        std::string type() const override {
+            return "TypeException";
+        }
+
+        std::string str() const override {
+            std::ostringstream oss;
+            oss << "expected " << expected << ", got " << got;
+            return oss.str();
+        }
+
+        Type* copy() const override {
+            return new TypeException(expected, got);
+        }
+
+        std::string what() const override {
+            return str();
+        }
+
+        TypeException(decltype(expected) e, decltype(got) g): expected(e), got(g) {}
+        ~TypeException() {}
+};
 
 #endif
