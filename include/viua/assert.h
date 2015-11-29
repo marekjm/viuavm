@@ -27,7 +27,7 @@ namespace viua {
              *  Example: checking if an object is an Integer.
              */
             if (object->type() != expected) {
-                throw new Exception("expected <" + expected + ">, got <" + object->type() + ">");
+                throw new Exception("expected " + expected + ", got " + object->type());
             }
         }
 
