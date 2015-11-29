@@ -832,6 +832,9 @@ class RuntimeAssertionsTests(unittest.TestCase):
     def testAssertArity(self):
         runTest(self, 'assert_arity.asm', 'got arity 4, expected one of {1, 2, 3}')
 
+    def testAssertTypeof(self):
+        runTest(self, 'assert_typeof.asm', 'expected Integer, got String')
+
 
 if __name__ == '__main__':
     if not unittest.main(exit=False).result.wasSuccessful():
