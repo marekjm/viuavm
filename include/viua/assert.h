@@ -4,6 +4,7 @@
 #pragma once
 
 #include <string>
+#include <viua/cpu/frame.h>
 #include <viua/types/type.h>
 #include <viua/exceptions.h>
 
@@ -40,7 +41,8 @@ namespace viua {
 
         using Arity = size_t;
 
-        template<typename... A> void assert_arity(const Arity& arity, const A&... valid_arities) {
+        template<typename... A> void assert_arity(const Frame* frame, const A&... valid_arities) {
+            Arity arity = frame->args->size();
             if (not any_equal(arity, valid_arities...)) {
                 throw new ArityException(arity, {valid_arities...});
             }
