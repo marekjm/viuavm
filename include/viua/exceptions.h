@@ -4,7 +4,7 @@
 #pragma once
 
 #include <string>
-#include "types/exception.h"
+#include <viua/types/exception.h>
 
 class OutOfRangeException: public Exception {
     protected:
