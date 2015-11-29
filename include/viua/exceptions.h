@@ -6,6 +6,7 @@
 #include <string>
 #include <viua/types/exception.h>
 
+
 class OutOfRangeException: public Exception {
     protected:
         std::string cause;
@@ -13,11 +14,6 @@ class OutOfRangeException: public Exception {
     public:
         std::string type() const { return "OutOfRangeException"; }
         OutOfRangeException(const std::string& s): cause(s) {}
-};
-
-class ReturnStageException: public Exception {
-    public:
-        std::string type() const { return "ReturnStageException"; }
 };
 
 
