@@ -13,6 +13,7 @@
 #include <viua/assert.h>
 #include <viua/exceptions.h>
 using namespace std;
+using namespace viua::assertions;
 
 
 Integer* String::size() {
@@ -138,7 +139,7 @@ void String::substr(Frame* frame, RegisterSet*, RegisterSet*) {
     int begin = 0;
     int end = -1;
 
-    assert_arity(frame->args->size(), 1u, 2u, 3u);
+    assert_arity(frame->args->size(), 1ul, 2ul, 3ul);
 
     if (frame->args->size() > 1) {
         assert_typeof(frame->args->at(1), "Integer");
