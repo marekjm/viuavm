@@ -42,7 +42,7 @@ namespace viua {
 
         template<typename... A> void assert_arity(const Arity& arity, const A&... valid_arities) {
             if (not any_equal(arity, valid_arities...)) {
-                throw new Exception("ArityException");
+                throw new ArityException(arity, {valid_arities...});
             }
         }
     }
