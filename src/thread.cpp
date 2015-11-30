@@ -360,7 +360,7 @@ byte* Thread::xtick() {
         ostringstream oss;
         return_exception = "InstructionUnchanged";
         oss << "instruction pointer did not change, possibly endless loop\n";
-        oss << "note: instruction index was " << (cpu->instruction_pointer-cpu->bytecode) << " and the opcode was '" << OP_NAMES.at(OPCODE(*instruction_pointer)) << "'";
+        oss << "note: instruction index was " << (instruction_pointer-jump_base) << " and the opcode was '" << OP_NAMES.at(OPCODE(*instruction_pointer)) << "'";
         if (OPCODE(*instruction_pointer) == CALL) {
             oss << '\n';
             oss << "note: this was caused by 'call' opcode immediately calling itself\n"

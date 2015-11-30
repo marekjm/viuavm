@@ -66,7 +66,6 @@ class CPU {
     std::string return_message;     // message set by exception
 
     uint64_t instruction_counter;
-    byte* instruction_pointer;
 
     /*  This is the interface between programs compiled to VM bytecode and
      *  extension libraries written in C++.
