@@ -9,7 +9,7 @@
 > A simple register-based virtual machine.
 
 
-### Design goals
+#### Design goals
 
 - predictable execution: it is easier to reason about code when you know exactly how it will behave
 - predictable memory behaviour: in Viua you do not have to guess when the memory will be released, or
@@ -41,7 +41,7 @@ Current limitations include:
 - debugging information encoded in compiled files is limited,
 
 
-### Software state notice
+##### Software state notice
 
 Viua VM is an alpha-stage software.
 Even though great care is taken not to introduce bugs during development, it is inevitable that some will make their way into the codebase.
