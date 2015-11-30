@@ -1,7 +1,7 @@
 # Viua VM
 
 [![Build Status](https://travis-ci.org/marekjm/viuavm.svg)](https://travis-ci.org/marekjm/viuavm)
-[![Coverity Scan Build Status](https://scan.coverity.com/projects/marekjm-viuavm)](https://img.shields.io/coverity/scan/7140.svg)
+[![Coverity Scan Build Status](https://img.shields.io/coverity/scan/7140.svg)](https://scan.coverity.com/projects/marekjm-viuavm)
 
 
 > A simple register-based virtual machine.
