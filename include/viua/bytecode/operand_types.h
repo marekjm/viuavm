@@ -4,7 +4,7 @@
 #pragma once
 
 enum OperandType: unsigned char {
-    OT_REGISTER,
+    OT_REGISTER_INDEX,
     OT_REGISTER_REFERENCE,
     OT_ATOM,
 };

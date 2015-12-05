@@ -19,7 +19,7 @@ static byte* insertIntegerOperand(byte* addr_ptr, int_op op) {
     if (ref) {
         *((OperandType*)addr_ptr) = OT_REGISTER_REFERENCE;
     } else {
-        *((OperandType*)addr_ptr) = OT_REGISTER;
+        *((OperandType*)addr_ptr) = OT_REGISTER_INDEX;
     }
     pointer::inc<OperandType, byte>(addr_ptr);
     *((int*)addr_ptr)  = num;
