@@ -19,3 +19,19 @@ addons:
 
 install:
     - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
+
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "X+v3Omn3qdxcrzGzfSgraqWXlBcFMljv8PKDGcff62eFRdVD/nolr2MX9BQevTuNjr/LYPcqDT3bS80mxOuJl3X7byXm8u8o+9e4/shEhPsfuGw6DV2xHnivvSNg34Tf5c2/xYP+karfN+oObury37F3ddsWQwLLFf0ZjoI9lto=" 
+
+addons:
+  coverity_scan:
+    project:
+      name: "marekjm/viuavm"
+      description: "Viua VM"
+    notification_email: marekjm@ozro.pw
+    build_command_prepend: "./configure"
+    build_command:   "make -j 4"
+    branch_pattern: coverity_scan
