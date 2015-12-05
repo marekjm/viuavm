@@ -4,6 +4,7 @@
 #pragma once
 
 
+#include <memory>
 #include <string>
 #include <tuple>
 #include <viua/bytecode/bytetypedef.h>
@@ -49,7 +50,7 @@ namespace viua {
                 RegisterReference(unsigned i): index(i) {}
         };
 
-        std::tuple<viua::operand::Operand*, byte*> extract(byte* ip);
+        std::unique_ptr<viua::operand::Operand> extract(byte*& ip);
     }
 }
 

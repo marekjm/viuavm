@@ -1,3 +1,4 @@
+#include <memory>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/types/type.h>
 #include <viua/types/integer.h>
@@ -13,16 +14,13 @@ using namespace std;
 byte* Thread::izero(byte* addr) {
     /*  Run istore instruction.
      */
-    viua::operand::Operand* operand = nullptr;
-    tie(operand, addr) = viua::operand::extract(addr);
+    auto operand = viua::operand::extract(addr);
 
-    if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(operand)) {
+    if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(operand.get())) {
         place(ri->get(), new Integer(0));
-    } else if (viua::operand::RegisterReference* rr = dynamic_cast<viua::operand::RegisterReference*>(operand)) {
+    } else if (viua::operand::RegisterReference* rr = dynamic_cast<viua::operand::RegisterReference*>(operand.get())) {
         place(static_cast<Integer*>(fetch(rr->get()))->value(), new Integer(0));
     }
-
-    delete operand;
 
     return addr;
 }
