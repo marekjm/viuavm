@@ -1,3 +1,4 @@
+#include <viua/bytecode/operand_types.h>
 #include <viua/cpu/opex.h>
 
 
@@ -10,7 +11,12 @@
  */
 
 void viua::cpu::util::extractIntegerOperand(byte*& instruction_stream, bool& boolean, int& integer) {
-    extractOperand<bool>(instruction_stream, boolean);
+    bool b = false;
+    if (*reinterpret_cast<OperandType*>(instruction_stream) == OT_REGISTER_REFERENCE) {
+        b = true;
+    }
+    boolean = b;
+    pointer::inc<OperandType, byte>(instruction_stream);
     extractOperand<int>(instruction_stream, integer);
 }
 

@@ -1,4 +1,5 @@
 #include <viua/cg/bytecode/instructions.h>
+#include <viua/bytecode/operand_types.h>
 using namespace std;
 
 
@@ -15,8 +16,12 @@ static byte* insertIntegerOperand(byte* addr_ptr, int_op op) {
 
     tie(ref, num) = op;
 
-    *((bool*)addr_ptr) = ref;
-    pointer::inc<bool, byte>(addr_ptr);
+    if (ref) {
+        *((OperandType*)addr_ptr) = OT_REGISTER_REFERENCE;
+    } else {
+        *((OperandType*)addr_ptr) = OT_REGISTER;
+    }
+    pointer::inc<OperandType, byte>(addr_ptr);
     *((int*)addr_ptr)  = num;
     pointer::inc<int, byte>(addr_ptr);
 
