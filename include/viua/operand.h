@@ -20,6 +20,7 @@ namespace viua {
         class Operand {
             public:
                 virtual Type* resolve(CPU*) = 0;
+                virtual ~Operand() {}
         };
 
         class Atom: public Operand {
