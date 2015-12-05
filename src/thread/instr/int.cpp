@@ -5,6 +5,7 @@
 #include <viua/types/byte.h>
 #include <viua/types/casts/integer.h>
 #include <viua/cpu/opex.h>
+#include <viua/operand.h>
 #include <viua/cpu/cpu.h>
 using namespace std;
 
@@ -12,16 +13,16 @@ using namespace std;
 byte* Thread::izero(byte* addr) {
     /*  Run istore instruction.
      */
-    int destination_register_index;
-    bool destination_register_ref = false;
+    viua::operand::Operand* operand = nullptr;
+    tie(operand, addr) = viua::operand::extract(addr);
 
-    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
-
-    if (destination_register_ref) {
-        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
+    if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(operand)) {
+        place(ri->get(), new Integer(0));
+    } else if (viua::operand::RegisterReference* rr = dynamic_cast<viua::operand::RegisterReference*>(operand)) {
+        place(static_cast<Integer*>(fetch(rr->get()))->value(), new Integer(0));
     }
 
-    place(destination_register_index, new Integer(0));
+    delete operand;
 
     return addr;
 }
