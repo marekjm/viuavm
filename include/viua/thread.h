@@ -209,6 +209,10 @@ class Thread {
         byte* xtick();
         byte* tick();
 
+        Type* obtain(unsigned i) const {
+            return fetch(i);
+        }
+
         inline bool joinable() const { return is_joinable; }
         inline void join() {
             /** Join a thread with calling thread.

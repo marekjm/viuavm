@@ -11,7 +11,7 @@
 
 
 // forward declaration since we need a pointer to CPU
-class CPU;
+class Thread;
 // and a pointer to Type
 class Type;
 
@@ -20,7 +20,7 @@ namespace viua {
     namespace operand {
         class Operand {
             public:
-                virtual Type* resolve(CPU*) = 0;
+                virtual Type* resolve(Thread*) = 0;
                 virtual ~Operand() {}
         };
 
@@ -29,24 +29,28 @@ namespace viua {
             public:
                 inline std::string get() const { return atom; }
 
-                Type* resolve(CPU*) override;
+                Type* resolve(Thread*) override;
 
                 Atom(const std::string& a): atom(a) {}
         };
 
         class RegisterIndex: public Operand {
                 unsigned index;
+            protected:
+                RegisterIndex(): index(0) {}
             public:
-                inline unsigned get() const { return index; }
-                Type* resolve(CPU*) override;
+                virtual unsigned get(Thread*) const;
+                Type* resolve(Thread*) override;
+
                 RegisterIndex(unsigned i): index(i) {}
         };
 
-        class RegisterReference: public Operand {
+        class RegisterReference: public RegisterIndex {
                 unsigned index;
             public:
-                inline unsigned get() const { return index; }
-                Type* resolve(CPU*) override;
+                unsigned get(Thread*) const override;
+                Type* resolve(Thread*) override;
+
                 RegisterReference(unsigned i): index(i) {}
         };
 

@@ -1,27 +1,40 @@
 #include <viua/bytecode/operand_types.h>
+#include <viua/assert.h>
 #include <viua/operand.h>
 #include <viua/types/type.h>
-#include <viua/cpu/cpu.h>
+#include <viua/types/integer.h>
+#include <viua/thread.h>
 #include <viua/exceptions.h>
 using namespace std;
 
 
-Type* viua::operand::Atom::resolve(CPU* cpu) {
+Type* viua::operand::Atom::resolve(Thread* cpu) {
     throw new UnresolvedAtomException(atom);
     // just to satisfy the compiler, after the exception is not thrown unconditionally
     // return real object
     return nullptr;
 }
 
-Type* viua::operand::RegisterIndex::resolve(CPU* cpu) {
+
+Type* viua::operand::RegisterIndex::resolve(Thread* cpu) {
     throw new OutOfRangeException("resolving registers via Operand is not implemented");
     return nullptr;
+}
+unsigned viua::operand::RegisterIndex::get(Thread* cpu) const {
+    return index;
 }
 
-Type* viua::operand::RegisterReference::resolve(CPU* cpu) {
+
+Type* viua::operand::RegisterReference::resolve(Thread* cpu) {
     throw new OutOfRangeException("resolving registers via Operand is not implemented");
     return nullptr;
 }
+unsigned viua::operand::RegisterReference::get(Thread* cpu) const {
+    Type* o = cpu->obtain(index);
+    viua::assertions::assert_typeof(o, "Integer");
+    return static_cast<Integer*>(o)->value();
+}
+
 
 unique_ptr<viua::operand::Operand> viua::operand::extract(byte*& ip) {
     /** Extract operand from given address.

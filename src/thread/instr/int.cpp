@@ -16,11 +16,15 @@ byte* Thread::izero(byte* addr) {
      */
     auto operand = viua::operand::extract(addr);
 
-    if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(operand.get())) {
-        place(ri->get(), new Integer(0));
-    } else if (viua::operand::RegisterReference* rr = dynamic_cast<viua::operand::RegisterReference*>(operand.get())) {
-        place(static_cast<Integer*>(fetch(rr->get()))->value(), new Integer(0));
+    if (viua::operand::RegisterIndex* ri =  dynamic_cast<viua::operand::RegisterIndex*>(operand.get())) {
+        place(ri->get(this), new Integer(0));
     }
+
+    /* if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(operand.get())) { */
+    /*     place(ri->get(), new Integer(0)); */
+    /* } else if (viua::operand::RegisterReference* rr = dynamic_cast<viua::operand::RegisterReference*>(operand.get())) { */
+    /*     place(static_cast<Integer*>(fetch(rr->get()))->value(), new Integer(0)); */
+    /* } */
 
     return addr;
 }
@@ -35,15 +39,15 @@ byte* Thread::istore(byte* addr) {
     int integer = -1;
 
     if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(target.get())) {
-        destination_register = ri->get();
+        destination_register = ri->get(this);
     } else if (viua::operand::RegisterReference* rr = dynamic_cast<viua::operand::RegisterReference*>(target.get())) {
-        destination_register = static_cast<Integer*>(fetch(rr->get()))->value();
+        destination_register = static_cast<Integer*>(fetch(rr->get(this)))->value();
     }
 
     if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(source.get())) {
-        integer = ri->get();
+        integer = ri->get(this);
     } else if (viua::operand::RegisterReference* rr = dynamic_cast<viua::operand::RegisterReference*>(source.get())) {
-        integer = static_cast<Integer*>(fetch(rr->get()))->value();
+        integer = static_cast<Integer*>(fetch(rr->get(this)))->value();
     }
 
     place(destination_register, new Integer(integer));
