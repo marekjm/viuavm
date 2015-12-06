@@ -28,20 +28,25 @@ byte* Thread::izero(byte* addr) {
 byte* Thread::istore(byte* addr) {
     /*  Run istore instruction.
      */
-    int destination_register, operand;
-    bool destination_register_ref = false, operand_ref = false;
+    auto target = viua::operand::extract(addr);
+    auto source = viua::operand::extract(addr);
 
-    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register);
-    viua::cpu::util::extractIntegerOperand(addr, operand_ref, operand);
+    int destination_register = -1;
+    int integer = -1;
 
-    if (destination_register_ref) {
-        destination_register = static_cast<Integer*>(fetch(destination_register))->value();
+    if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(target.get())) {
+        destination_register = ri->get();
+    } else if (viua::operand::RegisterReference* rr = dynamic_cast<viua::operand::RegisterReference*>(target.get())) {
+        destination_register = static_cast<Integer*>(fetch(rr->get()))->value();
     }
-    if (operand_ref) {
-        operand = static_cast<Integer*>(fetch(operand))->value();
+
+    if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(source.get())) {
+        integer = ri->get();
+    } else if (viua::operand::RegisterReference* rr = dynamic_cast<viua::operand::RegisterReference*>(source.get())) {
+        integer = static_cast<Integer*>(fetch(rr->get()))->value();
     }
 
-    place(destination_register, new Integer(operand));
+    place(destination_register, new Integer(integer));
 
     return addr;
 }
