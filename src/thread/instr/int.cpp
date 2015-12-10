@@ -20,12 +20,6 @@ byte* Thread::izero(byte* addr) {
         place(ri->get(this), new Integer(0));
     }
 
-    /* if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(operand.get())) { */
-    /*     place(ri->get(), new Integer(0)); */
-    /* } else if (viua::operand::RegisterReference* rr = dynamic_cast<viua::operand::RegisterReference*>(operand.get())) { */
-    /*     place(static_cast<Integer*>(fetch(rr->get()))->value(), new Integer(0)); */
-    /* } */
-
     return addr;
 }
 
