@@ -261,6 +261,9 @@ class IntegerInstructionsTests(unittest.TestCase):
     def testIADD(self):
         runTest(self, 'add.asm', '1', 0)
 
+    def testIADDWithRReferences(self):
+        runTest(self, 'add_with_rreferences.asm', '0', 0)
+
     def testISUB(self):
         runTest(self, 'sub.asm', '1', 0)
 
