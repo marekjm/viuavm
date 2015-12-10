@@ -5,6 +5,7 @@
 #include <viua/types/boolean.h>
 #include <viua/types/byte.h>
 #include <viua/types/casts/integer.h>
+#include <viua/exceptions.h>
 #include <viua/cpu/opex.h>
 #include <viua/operand.h>
 #include <viua/cpu/cpu.h>
@@ -30,14 +31,14 @@ byte* Thread::istore(byte* addr) {
     auto source = viua::operand::extract(addr);
 
     int destination_register = -1;
-    int integer = -1;
 
     if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(target.get())) {
         destination_register = ri->get(this);
-    } else if (viua::operand::RegisterReference* rr = dynamic_cast<viua::operand::RegisterReference*>(target.get())) {
-        destination_register = static_cast<Integer*>(fetch(rr->get(this)))->value();
+    } else {
+        throw new Exception("invalid operand type");
     }
 
+    int integer = 0;
     if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(source.get())) {
         integer = ri->get(this);
     } else if (viua::operand::RegisterReference* rr = dynamic_cast<viua::operand::RegisterReference*>(source.get())) {
