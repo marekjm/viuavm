@@ -16,18 +16,16 @@ Type* viua::operand::Atom::resolve(Thread* cpu) {
 }
 
 
-Type* viua::operand::RegisterIndex::resolve(Thread* cpu) {
-    throw new OutOfRangeException("resolving registers via Operand is not implemented");
-    return nullptr;
+Type* viua::operand::RegisterIndex::resolve(Thread* t) {
+    return t->obtain(index);
 }
 unsigned viua::operand::RegisterIndex::get(Thread* cpu) const {
     return index;
 }
 
 
-Type* viua::operand::RegisterReference::resolve(Thread* cpu) {
-    throw new OutOfRangeException("resolving registers via Operand is not implemented");
-    return nullptr;
+Type* viua::operand::RegisterReference::resolve(Thread* t) {
+    return t->obtain(static_cast<Integer*>(t->obtain(index))->as_integer());
 }
 unsigned viua::operand::RegisterReference::get(Thread* cpu) const {
     Type* o = cpu->obtain(index);
