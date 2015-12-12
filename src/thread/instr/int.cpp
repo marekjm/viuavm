@@ -231,16 +231,6 @@ byte* Thread::iinc(byte* addr) {
 byte* Thread::idec(byte* addr) {
     /*  Run idec instruction.
      */
-    bool ref = false;
-    int target_register;
-
-    viua::cpu::util::extractIntegerOperand(addr, ref, target_register);
-
-    if (ref) {
-        target_register = static_cast<Integer*>(fetch(target_register))->value();
-    }
-
-    static_cast<IntegerCast*>(fetch(target_register))->decrement();
-
+    static_cast<Integer*>(viua::operand::extract(addr)->resolve(this))->decrement();
     return addr;
 }
