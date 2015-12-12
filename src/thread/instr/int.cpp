@@ -205,27 +205,18 @@ byte* Thread::igte(byte* addr) {
 byte* Thread::ieq(byte* addr) {
     /*  Run ieq instruction.
      */
-    bool first_operand_ref, second_operand_ref, destination_register_ref;
-    int first_operand_index, second_operand_index, destination_register_index;
+    auto target = viua::operand::extract(addr);
+    auto first = viua::operand::extract(addr);
+    auto second = viua::operand::extract(addr);
 
-    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
-    viua::cpu::util::extractIntegerOperand(addr, first_operand_ref, first_operand_index);
-    viua::cpu::util::extractIntegerOperand(addr, second_operand_ref, second_operand_index);
-
-    if (first_operand_ref) {
-        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
-    }
-    if (second_operand_ref) {
-        second_operand_index = static_cast<Integer*>(fetch(second_operand_index))->value();
-    }
-    if (destination_register_ref) {
-        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
+    unsigned target_register_index = 0;
+    if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(target.get())) {
+        target_register_index = ri->get(this);
+    } else {
+        throw new Exception("invalid operand type");
     }
 
-    first_operand_index = static_cast<IntegerCast*>(fetch(first_operand_index))->as_integer();
-    second_operand_index = static_cast<IntegerCast*>(fetch(second_operand_index))->as_integer();
-
-    place(destination_register_index, new Boolean(first_operand_index == second_operand_index));
+    place(target_register_index, new Boolean(static_cast<Integer*>(first->resolve(this))->as_integer() == static_cast<Integer*>(second->resolve(this))->as_integer()));
 
     return addr;
 }
