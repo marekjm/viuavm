@@ -22,17 +22,9 @@ byte* Thread::izero(byte* addr) {
 byte* Thread::istore(byte* addr) {
     /*  Run istore instruction.
      */
-    auto target = viua::operand::extract(addr);
+    unsigned destination_register = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
+
     auto source = viua::operand::extract(addr);
-
-    int destination_register = -1;
-
-    if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(target.get())) {
-        destination_register = ri->get(this);
-    } else {
-        throw new Exception("invalid operand type");
-    }
-
     int integer = 0;
     if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(source.get())) {
         integer = ri->get(this);
