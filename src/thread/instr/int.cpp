@@ -40,14 +40,7 @@ byte* Thread::istore(byte* addr) {
 byte* Thread::iadd(byte* addr) {
     /*  Run iadd instruction.
      */
-    auto target = viua::operand::extract(addr);
-
-    unsigned target_register_index = 0;
-    if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(target.get())) {
-        target_register_index = ri->get(this);
-    } else {
-        throw new Exception("invalid operand type");
-    }
+    unsigned target_register_index = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
 
     auto first = viua::operand::extract(addr);
     auto second = viua::operand::extract(addr);
@@ -59,14 +52,7 @@ byte* Thread::iadd(byte* addr) {
 byte* Thread::isub(byte* addr) {
     /*  Run isub instruction.
      */
-    auto target = viua::operand::extract(addr);
-
-    unsigned target_register_index = 0;
-    if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(target.get())) {
-        target_register_index = ri->get(this);
-    } else {
-        throw new Exception("invalid operand type");
-    }
+    unsigned target_register_index = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
 
     auto first = viua::operand::extract(addr);
     auto second = viua::operand::extract(addr);
@@ -78,14 +64,7 @@ byte* Thread::isub(byte* addr) {
 byte* Thread::imul(byte* addr) {
     /*  Run imul instruction.
      */
-    auto target = viua::operand::extract(addr);
-
-    unsigned target_register_index = 0;
-    if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(target.get())) {
-        target_register_index = ri->get(this);
-    } else {
-        throw new Exception("invalid operand type");
-    }
+    unsigned target_register_index = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
 
     auto first = viua::operand::extract(addr);
     auto second = viua::operand::extract(addr);
@@ -97,14 +76,7 @@ byte* Thread::imul(byte* addr) {
 byte* Thread::idiv(byte* addr) {
     /*  Run idiv instruction.
      */
-    auto target = viua::operand::extract(addr);
-
-    unsigned target_register_index = 0;
-    if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(target.get())) {
-        target_register_index = ri->get(this);
-    } else {
-        throw new Exception("invalid operand type");
-    }
+    unsigned target_register_index = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
 
     auto first = viua::operand::extract(addr);
     auto second = viua::operand::extract(addr);
@@ -116,14 +88,7 @@ byte* Thread::idiv(byte* addr) {
 byte* Thread::ilt(byte* addr) {
     /*  Run ilt instruction.
      */
-    auto target = viua::operand::extract(addr);
-
-    unsigned target_register_index = 0;
-    if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(target.get())) {
-        target_register_index = ri->get(this);
-    } else {
-        throw new Exception("invalid operand type");
-    }
+    unsigned target_register_index = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
 
     auto first = viua::operand::extract(addr);
     auto second = viua::operand::extract(addr);
@@ -135,14 +100,7 @@ byte* Thread::ilt(byte* addr) {
 byte* Thread::ilte(byte* addr) {
     /*  Run ilte instruction.
      */
-    auto target = viua::operand::extract(addr);
-
-    unsigned target_register_index = 0;
-    if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(target.get())) {
-        target_register_index = ri->get(this);
-    } else {
-        throw new Exception("invalid operand type");
-    }
+    unsigned target_register_index = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
 
     auto first = viua::operand::extract(addr);
     auto second = viua::operand::extract(addr);
@@ -154,14 +112,7 @@ byte* Thread::ilte(byte* addr) {
 byte* Thread::igt(byte* addr) {
     /*  Run igt instruction.
      */
-    auto target = viua::operand::extract(addr);
-
-    unsigned target_register_index = 0;
-    if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(target.get())) {
-        target_register_index = ri->get(this);
-    } else {
-        throw new Exception("invalid operand type");
-    }
+    unsigned target_register_index = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
 
     auto first = viua::operand::extract(addr);
     auto second = viua::operand::extract(addr);
@@ -173,14 +124,7 @@ byte* Thread::igt(byte* addr) {
 byte* Thread::igte(byte* addr) {
     /*  Run igte instruction.
      */
-    auto target = viua::operand::extract(addr);
-
-    unsigned target_register_index = 0;
-    if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(target.get())) {
-        target_register_index = ri->get(this);
-    } else {
-        throw new Exception("invalid operand type");
-    }
+    unsigned target_register_index = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
 
     auto first = viua::operand::extract(addr);
     auto second = viua::operand::extract(addr);
@@ -192,14 +136,7 @@ byte* Thread::igte(byte* addr) {
 byte* Thread::ieq(byte* addr) {
     /*  Run ieq instruction.
      */
-    auto target = viua::operand::extract(addr);
-
-    unsigned target_register_index = 0;
-    if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(target.get())) {
-        target_register_index = ri->get(this);
-    } else {
-        throw new Exception("invalid operand type");
-    }
+    unsigned target_register_index = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
 
     auto first = viua::operand::extract(addr);
     auto second = viua::operand::extract(addr);
