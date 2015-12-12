@@ -15,12 +15,7 @@ using namespace std;
 byte* Thread::izero(byte* addr) {
     /*  Run istore instruction.
      */
-    auto operand = viua::operand::extract(addr);
-
-    if (viua::operand::RegisterIndex* ri =  dynamic_cast<viua::operand::RegisterIndex*>(operand.get())) {
-        place(ri->get(this), new Integer(0));
-    }
-
+    place(viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this), new Integer(0));
     return addr;
 }
 
