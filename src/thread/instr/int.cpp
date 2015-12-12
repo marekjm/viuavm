@@ -41,8 +41,8 @@ byte* Thread::istore(byte* addr) {
     int integer = 0;
     if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(source.get())) {
         integer = ri->get(this);
-    } else if (viua::operand::RegisterReference* rr = dynamic_cast<viua::operand::RegisterReference*>(source.get())) {
-        integer = static_cast<Integer*>(fetch(rr->get(this)))->value();
+    } else {
+        throw new Exception("invalid operand type");
     }
 
     place(destination_register, new Integer(integer));
