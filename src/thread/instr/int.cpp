@@ -34,40 +34,65 @@ byte* Thread::istore(byte* addr) {
     return addr;
 }
 
+// ObjectPlacer shall be used only as a type of Thread::place() function when passing it
+// to perform<>() implementation template.
+using ObjectPlacer = void(Thread::*)(unsigned,Type*);
+
+template<class Operator, class ResultType> byte* perform(byte* addr, Thread* t, ObjectPlacer placer) {
+    /** Heavily abstracted binary opcode implementation for Integer-related instructions.
+     *
+     *  First parameter - byte* addr - is the instruction pointer from which operand extraction should begin.
+     *
+     *  Second parameter - Thread* t - is a pointer to current VM thread of execution (passed as `this`).
+     *
+     *  Third parameter - ObjectPlacer - is a member-function pointer to Thread::place.
+     *  Since it is private, we have to cheat the compiler by extracting its pointer while in
+     *  Thread class's scope and passing it here.
+     *  Voila - we can place objects in thread's current register set.
+     */
+    unsigned target_register_index = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), t);
+
+    auto first = viua::operand::extract(addr);
+    auto second = viua::operand::extract(addr);
+    (t->*placer)(target_register_index, new ResultType(Operator()(static_cast<Integer*>(first->resolve(t))->as_integer(), static_cast<Integer*>(second->resolve(t))->as_integer())));
+
+    return addr;
+}
+
 byte* Thread::iadd(byte* addr) {
-    return performBinaryOperation<std::plus<int>, Integer>(addr);
+    return perform<std::plus<int>, Integer>(addr, this, &Thread::place);
 }
 
 byte* Thread::isub(byte* addr) {
-    return performBinaryOperation<std::minus<int>, Integer>(addr);
+    return perform<std::minus<int>, Integer>(addr, this, &Thread::place);
 }
 
 byte* Thread::imul(byte* addr) {
-    return performBinaryOperation<std::multiplies<int>, Integer>(addr);
+    return perform<std::multiplies<int>, Integer>(addr, this, &Thread::place);
 }
 
 byte* Thread::idiv(byte* addr) {
-    return performBinaryOperation<std::divides<int>, Integer>(addr);
+    return perform<std::divides<int>, Integer>(addr, this, &Thread::place);
 }
 
 byte* Thread::ilt(byte* addr) {
-    return performBinaryOperation<std::less<int>, Boolean>(addr);
+    return perform<std::less<int>, Boolean>(addr, this, &Thread::place);
 }
 
 byte* Thread::ilte(byte* addr) {
-    return performBinaryOperation<std::less_equal<int>, Boolean>(addr);
+    return perform<std::less_equal<int>, Boolean>(addr, this, &Thread::place);
 }
 
 byte* Thread::igt(byte* addr) {
-    return performBinaryOperation<std::greater<int>, Boolean>(addr);
+    return perform<std::greater<int>, Boolean>(addr, this, &Thread::place);
 }
 
 byte* Thread::igte(byte* addr) {
-    return performBinaryOperation<std::greater_equal<int>, Boolean>(addr);
+    return perform<std::greater_equal<int>, Boolean>(addr, this, &Thread::place);
 }
 
 byte* Thread::ieq(byte* addr) {
-    return performBinaryOperation<std::equal_to<int>, Boolean>(addr);
+    return perform<std::equal_to<int>, Boolean>(addr, this, &Thread::place);
 }
 
 byte* Thread::iinc(byte* addr) {
