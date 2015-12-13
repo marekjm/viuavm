@@ -100,6 +100,20 @@ class Thread {
 
     /*  Methods implementing CPU instructions.
      */
+    template<class Operator, class ResultType> byte* performBinaryOperation(byte* addr) {
+        /** Heavily abstracted binary opcode implementation for Integer-related instructions.
+         *
+         *  The parameter - byte* addr - is the address from which operand extraction should begin.
+         */
+        unsigned target_register_index = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
+
+        auto first = viua::operand::extract(addr);
+        auto second = viua::operand::extract(addr);
+        place(target_register_index, new ResultType(Operator()(static_cast<Integer*>(first->resolve(this))->as_integer(), static_cast<Integer*>(second->resolve(this))->as_integer())));
+
+        return addr;
+    }
+
     byte* izero(byte*);
     byte* istore(byte*);
     byte* iadd(byte*);
