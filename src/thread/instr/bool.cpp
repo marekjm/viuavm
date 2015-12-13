@@ -6,22 +6,14 @@
 #include <viua/types/byte.h>
 #include <viua/types/boolean.h>
 #include <viua/cpu/opex.h>
+#include <viua/operand.h>
 #include <viua/cpu/cpu.h>
 using namespace std;
 
 
 byte* Thread::lognot(byte* addr) {
-    /*  Run idec instruction.
-     */
-    bool ref = false;
-    int regno;
-
-    viua::cpu::util::extractIntegerOperand(addr, ref, regno);
-
-    if (ref) {
-        regno = static_cast<Integer*>(fetch(regno))->value();
-    }
-
+    auto target = viua::operand::extract(addr);
+    unsigned regno = viua::operand::getRegisterIndexOrException(target.get(), this);
     place(regno, new Boolean(not fetch(regno)->boolean()));
 
     return addr;
