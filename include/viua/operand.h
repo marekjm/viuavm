@@ -54,6 +54,19 @@ namespace viua {
                 RegisterReference(unsigned i): index(i) {}
         };
 
+        class Primitive: public Operand {
+            public:
+                Type* resolve(Thread*) = 0;
+        };
+
+        class Int: public Primitive {
+                int integer;
+            public:
+                Type* resolve(Thread*) override;
+
+                Int(int i): integer(i) {}
+        };
+
         std::unique_ptr<viua::operand::Operand> extract(byte*& ip);
         unsigned getRegisterIndexOrException(Operand*, Thread*);
     }
