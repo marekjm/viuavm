@@ -39,7 +39,7 @@ byte* Thread::istore(byte* addr) {
 }
 
 using ObjectPlacer = void(Thread::*)(unsigned,Type*);
-template<class Operator> byte* perform(byte* addr, Thread* t, ObjectPlacer placer) {
+template<class Operator, class ResultType> byte* perform(byte* addr, Thread* t, ObjectPlacer placer) {
     /** Heavily abstracted binary opcode implementation for Integer-related instructions.
      *
      *  First parameter - byte* addr - is the instruction pointer from which operand extraction should begin.
@@ -55,7 +55,7 @@ template<class Operator> byte* perform(byte* addr, Thread* t, ObjectPlacer place
 
     auto first = viua::operand::extract(addr);
     auto second = viua::operand::extract(addr);
-    (t->*placer)(target_register_index, new Integer(Operator()(static_cast<Integer*>(first->resolve(t))->as_integer(), static_cast<Integer*>(second->resolve(t))->as_integer())));
+    (t->*placer)(target_register_index, new ResultType(Operator()(static_cast<Integer*>(first->resolve(t))->as_integer(), static_cast<Integer*>(second->resolve(t))->as_integer())));
 
     return addr;
 }
@@ -63,103 +63,55 @@ template<class Operator> byte* perform(byte* addr, Thread* t, ObjectPlacer place
 byte* Thread::iadd(byte* addr) {
     /*  Run iadd instruction.
      */
-    return perform<std::plus<int>>(addr, this, &Thread::place);
+    return perform<std::plus<int>, Integer>(addr, this, &Thread::place);
 }
 
 byte* Thread::isub(byte* addr) {
     /*  Run isub instruction.
      */
-    unsigned target_register_index = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
-
-    auto first = viua::operand::extract(addr);
-    auto second = viua::operand::extract(addr);
-    place(target_register_index, new Integer(static_cast<Integer*>(first->resolve(this))->as_integer() - static_cast<Integer*>(second->resolve(this))->as_integer()));
-
-    return addr;
+    return perform<std::minus<int>, Integer>(addr, this, &Thread::place);
 }
 
 byte* Thread::imul(byte* addr) {
     /*  Run imul instruction.
      */
-    unsigned target_register_index = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
-
-    auto first = viua::operand::extract(addr);
-    auto second = viua::operand::extract(addr);
-    place(target_register_index, new Integer(static_cast<Integer*>(first->resolve(this))->as_integer() * static_cast<Integer*>(second->resolve(this))->as_integer()));
-
-    return addr;
+    return perform<std::multiplies<int>, Integer>(addr, this, &Thread::place);
 }
 
 byte* Thread::idiv(byte* addr) {
     /*  Run idiv instruction.
      */
-    unsigned target_register_index = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
-
-    auto first = viua::operand::extract(addr);
-    auto second = viua::operand::extract(addr);
-    place(target_register_index, new Integer(static_cast<Integer*>(first->resolve(this))->as_integer() / static_cast<Integer*>(second->resolve(this))->as_integer()));
-
-    return addr;
+    return perform<std::divides<int>, Integer>(addr, this, &Thread::place);
 }
 
 byte* Thread::ilt(byte* addr) {
     /*  Run ilt instruction.
      */
-    unsigned target_register_index = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
-
-    auto first = viua::operand::extract(addr);
-    auto second = viua::operand::extract(addr);
-    place(target_register_index, new Boolean(static_cast<Integer*>(first->resolve(this))->as_integer() < static_cast<Integer*>(second->resolve(this))->as_integer()));
-
-    return addr;
+    return perform<std::less<int>, Boolean>(addr, this, &Thread::place);
 }
 
 byte* Thread::ilte(byte* addr) {
     /*  Run ilte instruction.
      */
-    unsigned target_register_index = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
-
-    auto first = viua::operand::extract(addr);
-    auto second = viua::operand::extract(addr);
-    place(target_register_index, new Boolean(static_cast<Integer*>(first->resolve(this))->as_integer() <= static_cast<Integer*>(second->resolve(this))->as_integer()));
-
-    return addr;
+    return perform<std::less_equal<int>, Boolean>(addr, this, &Thread::place);
 }
 
 byte* Thread::igt(byte* addr) {
     /*  Run igt instruction.
      */
-    unsigned target_register_index = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
-
-    auto first = viua::operand::extract(addr);
-    auto second = viua::operand::extract(addr);
-    place(target_register_index, new Boolean(static_cast<Integer*>(first->resolve(this))->as_integer() > static_cast<Integer*>(second->resolve(this))->as_integer()));
-
-    return addr;
+    return perform<std::greater<int>, Boolean>(addr, this, &Thread::place);
 }
 
 byte* Thread::igte(byte* addr) {
     /*  Run igte instruction.
      */
-    unsigned target_register_index = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
-
-    auto first = viua::operand::extract(addr);
-    auto second = viua::operand::extract(addr);
-    place(target_register_index, new Boolean(static_cast<Integer*>(first->resolve(this))->as_integer() >= static_cast<Integer*>(second->resolve(this))->as_integer()));
-
-    return addr;
+    return perform<std::greater_equal<int>, Boolean>(addr, this, &Thread::place);
 }
 
 byte* Thread::ieq(byte* addr) {
     /*  Run ieq instruction.
      */
-    unsigned target_register_index = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
-
-    auto first = viua::operand::extract(addr);
-    auto second = viua::operand::extract(addr);
-    place(target_register_index, new Boolean(static_cast<Integer*>(first->resolve(this))->as_integer() == static_cast<Integer*>(second->resolve(this))->as_integer()));
-
-    return addr;
+    return perform<std::equal_to<int>, Boolean>(addr, this, &Thread::place);
 }
 
 byte* Thread::iinc(byte* addr) {
