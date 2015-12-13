@@ -56,239 +56,37 @@ template<class Operator, class ResultType> byte* perform(byte* addr, Thread* t, 
 }
 
 byte* Thread::fadd(byte* addr) {
-    /*  Run fadd instruction.
-     */
     return perform<std::plus<float>, Float>(addr, this, &Thread::place);
 }
 
 byte* Thread::fsub(byte* addr) {
-    /*  Run fsub instruction.
-     */
-    bool first_operand_ref, second_operand_ref, destination_register_ref;
-    int first_operand_index, second_operand_index, destination_register_index;
-
-    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
-    viua::cpu::util::extractIntegerOperand(addr, first_operand_ref, first_operand_index);
-    viua::cpu::util::extractIntegerOperand(addr, second_operand_ref, second_operand_index);
-
-    if (first_operand_ref) {
-        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
-    }
-    if (second_operand_ref) {
-        second_operand_index = static_cast<Integer*>(fetch(second_operand_index))->value();
-    }
-    if (destination_register_ref) {
-        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
-    }
-
-    float a, b;
-    a = static_cast<Float*>(fetch(first_operand_index))->value();
-    b = static_cast<Float*>(fetch(second_operand_index))->value();
-
-    place(destination_register_index, new Float(a - b));
-
-    return addr;
+    return perform<std::minus<float>, Float>(addr, this, &Thread::place);
 }
 
 byte* Thread::fmul(byte* addr) {
-    /*  Run fmul instruction.
-     */
-    bool first_operand_ref, second_operand_ref, destination_register_ref;
-    int first_operand_index, second_operand_index, destination_register_index;
-
-    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
-    viua::cpu::util::extractIntegerOperand(addr, first_operand_ref, first_operand_index);
-    viua::cpu::util::extractIntegerOperand(addr, second_operand_ref, second_operand_index);
-
-    if (first_operand_ref) {
-        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
-    }
-    if (second_operand_ref) {
-        second_operand_index = static_cast<Integer*>(fetch(second_operand_index))->value();
-    }
-    if (destination_register_ref) {
-        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
-    }
-
-    float a, b;
-    a = static_cast<Float*>(fetch(first_operand_index))->value();
-    b = static_cast<Float*>(fetch(second_operand_index))->value();
-
-    place(destination_register_index, new Float(a * b));
-
-    return addr;
+    return perform<std::multiplies<float>, Float>(addr, this, &Thread::place);
 }
 
 byte* Thread::fdiv(byte* addr) {
-    /*  Run fdiv instruction.
-     */
-    bool first_operand_ref, second_operand_ref, destination_register_ref;
-    int first_operand_index, second_operand_index, destination_register_index;
-
-    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
-    viua::cpu::util::extractIntegerOperand(addr, first_operand_ref, first_operand_index);
-    viua::cpu::util::extractIntegerOperand(addr, second_operand_ref, second_operand_index);
-
-    if (first_operand_ref) {
-        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
-    }
-    if (second_operand_ref) {
-        second_operand_index = static_cast<Integer*>(fetch(second_operand_index))->value();
-    }
-    if (destination_register_ref) {
-        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
-    }
-
-    float a, b;
-    a = static_cast<Float*>(fetch(first_operand_index))->value();
-    b = static_cast<Float*>(fetch(second_operand_index))->value();
-
-    place(destination_register_index, new Float(a / b));
-
-    return addr;
+    return perform<std::divides<float>, Float>(addr, this, &Thread::place);
 }
 
 byte* Thread::flt(byte* addr) {
-    /*  Run flt instruction.
-     */
-    bool first_operand_ref, second_operand_ref, destination_register_ref;
-    int first_operand_index, second_operand_index, destination_register_index;
-
-    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
-    viua::cpu::util::extractIntegerOperand(addr, first_operand_ref, first_operand_index);
-    viua::cpu::util::extractIntegerOperand(addr, second_operand_ref, second_operand_index);
-
-    if (first_operand_ref) {
-        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
-    }
-    if (second_operand_ref) {
-        second_operand_index = static_cast<Integer*>(fetch(second_operand_index))->value();
-    }
-    if (destination_register_ref) {
-        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
-    }
-
-    float a, b;
-    a = static_cast<Float*>(fetch(first_operand_index))->value();
-    b = static_cast<Float*>(fetch(second_operand_index))->value();
-
-    place(destination_register_index, new Boolean(a < b));
-
-    return addr;
+    return perform<std::less<float>, Boolean>(addr, this, &Thread::place);
 }
 
 byte* Thread::flte(byte* addr) {
-    /*  Run flte instruction.
-     */
-    bool first_operand_ref, second_operand_ref, destination_register_ref;
-    int first_operand_index, second_operand_index, destination_register_index;
-
-    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
-    viua::cpu::util::extractIntegerOperand(addr, first_operand_ref, first_operand_index);
-    viua::cpu::util::extractIntegerOperand(addr, second_operand_ref, second_operand_index);
-
-    if (first_operand_ref) {
-        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
-    }
-    if (second_operand_ref) {
-        second_operand_index = static_cast<Integer*>(fetch(second_operand_index))->value();
-    }
-    if (destination_register_ref) {
-        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
-    }
-
-    float a, b;
-    a = static_cast<Float*>(fetch(first_operand_index))->value();
-    b = static_cast<Float*>(fetch(second_operand_index))->value();
-
-    place(destination_register_index, new Boolean(a <= b));
-
-    return addr;
+    return perform<std::less_equal<float>, Boolean>(addr, this, &Thread::place);
 }
 
 byte* Thread::fgt(byte* addr) {
-    /*  Run fgt instruction.
-     */
-    bool first_operand_ref, second_operand_ref, destination_register_ref;
-    int first_operand_index, second_operand_index, destination_register_index;
-
-    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
-    viua::cpu::util::extractIntegerOperand(addr, first_operand_ref, first_operand_index);
-    viua::cpu::util::extractIntegerOperand(addr, second_operand_ref, second_operand_index);
-
-    if (first_operand_ref) {
-        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
-    }
-    if (second_operand_ref) {
-        second_operand_index = static_cast<Integer*>(fetch(second_operand_index))->value();
-    }
-    if (destination_register_ref) {
-        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
-    }
-
-    float a, b;
-    a = static_cast<Float*>(fetch(first_operand_index))->value();
-    b = static_cast<Float*>(fetch(second_operand_index))->value();
-
-    place(destination_register_index, new Boolean(a > b));
-
-    return addr;
+    return perform<std::greater<float>, Boolean>(addr, this, &Thread::place);
 }
 
 byte* Thread::fgte(byte* addr) {
-    /*  Run fgte instruction.
-     */
-    bool first_operand_ref, second_operand_ref, destination_register_ref;
-    int first_operand_index, second_operand_index, destination_register_index;
-
-    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
-    viua::cpu::util::extractIntegerOperand(addr, first_operand_ref, first_operand_index);
-    viua::cpu::util::extractIntegerOperand(addr, second_operand_ref, second_operand_index);
-
-    if (first_operand_ref) {
-        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
-    }
-    if (second_operand_ref) {
-        second_operand_index = static_cast<Integer*>(fetch(second_operand_index))->value();
-    }
-    if (destination_register_ref) {
-        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
-    }
-
-    float a, b;
-    a = static_cast<Float*>(fetch(first_operand_index))->value();
-    b = static_cast<Float*>(fetch(second_operand_index))->value();
-
-    place(destination_register_index, new Boolean(a >= b));
-
-    return addr;
+    return perform<std::greater_equal<float>, Boolean>(addr, this, &Thread::place);
 }
 
 byte* Thread::feq(byte* addr) {
-    /*  Run feq instruction.
-     */
-    bool first_operand_ref, second_operand_ref, destination_register_ref;
-    int first_operand_index, second_operand_index, destination_register_index;
-
-    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
-    viua::cpu::util::extractIntegerOperand(addr, first_operand_ref, first_operand_index);
-    viua::cpu::util::extractIntegerOperand(addr, second_operand_ref, second_operand_index);
-
-    if (first_operand_ref) {
-        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
-    }
-    if (second_operand_ref) {
-        second_operand_index = static_cast<Integer*>(fetch(second_operand_index))->value();
-    }
-    if (destination_register_ref) {
-        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
-    }
-
-    float a, b;
-    a = static_cast<Float*>(fetch(first_operand_index))->value();
-    b = static_cast<Float*>(fetch(second_operand_index))->value();
-
-    place(destination_register_index, new Boolean(a == b));
-
-    return addr;
+    return perform<std::equal_to<float>, Boolean>(addr, this, &Thread::place);
 }
