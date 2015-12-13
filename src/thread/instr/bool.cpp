@@ -13,9 +13,7 @@ using namespace std;
 
 byte* Thread::lognot(byte* addr) {
     auto target = viua::operand::extract(addr);
-    unsigned regno = viua::operand::getRegisterIndexOrException(target.get(), this);
-    place(regno, new Boolean(not fetch(regno)->boolean()));
-
+    place(viua::operand::getRegisterIndexOrException(target.get(), this), new Boolean(not target->resolve(this)->boolean()));
     return addr;
 }
 
