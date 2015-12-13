@@ -1,4 +1,5 @@
 #include <memory>
+#include <functional>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/types/type.h>
 #include <viua/types/integer.h>
@@ -37,16 +38,32 @@ byte* Thread::istore(byte* addr) {
     return addr;
 }
 
-byte* Thread::iadd(byte* addr) {
-    /*  Run iadd instruction.
+using ObjectPlacer = void(Thread::*)(unsigned,Type*);
+template<class Operator> byte* perform(byte* addr, Thread* t, ObjectPlacer placer) {
+    /** Heavily abstracted binary opcode implementation for Integer-related instructions.
+     *
+     *  First parameter - byte* addr - is the instruction pointer from which operand extraction should begin.
+     *
+     *  Second parameter - Thread* t - is a pointer to current VM thread of execution (passed as `this`).
+     *
+     *  Third parameter - ObjectPlacer - is a member-function pointer to Thread::place.
+     *  Since it is private, we have to cheat the compiler by extracting its pointer while in
+     *  Thread class's scope and passing it here.
+     *  Voila - we can place objects in thread's current register set.
      */
-    unsigned target_register_index = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
+    unsigned target_register_index = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), t);
 
     auto first = viua::operand::extract(addr);
     auto second = viua::operand::extract(addr);
-    place(target_register_index, new Integer(static_cast<Integer*>(first->resolve(this))->as_integer() + static_cast<Integer*>(second->resolve(this))->as_integer()));
+    (t->*placer)(target_register_index, new Integer(Operator()(static_cast<Integer*>(first->resolve(t))->as_integer(), static_cast<Integer*>(second->resolve(t))->as_integer())));
 
     return addr;
+}
+
+byte* Thread::iadd(byte* addr) {
+    /*  Run iadd instruction.
+     */
+    return perform<std::plus<int>>(addr, this, &Thread::place);
 }
 
 byte* Thread::isub(byte* addr) {
