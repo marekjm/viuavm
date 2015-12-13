@@ -14,15 +14,11 @@ using namespace std;
 
 
 byte* Thread::izero(byte* addr) {
-    /*  Run istore instruction.
-     */
     place(viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this), new Integer(0));
     return addr;
 }
 
 byte* Thread::istore(byte* addr) {
-    /*  Run istore instruction.
-     */
     unsigned destination_register = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
 
     auto source = viua::operand::extract(addr);
@@ -38,7 +34,10 @@ byte* Thread::istore(byte* addr) {
     return addr;
 }
 
+// ObjectPlacer shall be used only as a type of Thread::place() function when passing it
+// to perform<>() implementation template.
 using ObjectPlacer = void(Thread::*)(unsigned,Type*);
+
 template<class Operator, class ResultType> byte* perform(byte* addr, Thread* t, ObjectPlacer placer) {
     /** Heavily abstracted binary opcode implementation for Integer-related instructions.
      *
@@ -61,69 +60,47 @@ template<class Operator, class ResultType> byte* perform(byte* addr, Thread* t, 
 }
 
 byte* Thread::iadd(byte* addr) {
-    /*  Run iadd instruction.
-     */
     return perform<std::plus<int>, Integer>(addr, this, &Thread::place);
 }
 
 byte* Thread::isub(byte* addr) {
-    /*  Run isub instruction.
-     */
     return perform<std::minus<int>, Integer>(addr, this, &Thread::place);
 }
 
 byte* Thread::imul(byte* addr) {
-    /*  Run imul instruction.
-     */
     return perform<std::multiplies<int>, Integer>(addr, this, &Thread::place);
 }
 
 byte* Thread::idiv(byte* addr) {
-    /*  Run idiv instruction.
-     */
     return perform<std::divides<int>, Integer>(addr, this, &Thread::place);
 }
 
 byte* Thread::ilt(byte* addr) {
-    /*  Run ilt instruction.
-     */
     return perform<std::less<int>, Boolean>(addr, this, &Thread::place);
 }
 
 byte* Thread::ilte(byte* addr) {
-    /*  Run ilte instruction.
-     */
     return perform<std::less_equal<int>, Boolean>(addr, this, &Thread::place);
 }
 
 byte* Thread::igt(byte* addr) {
-    /*  Run igt instruction.
-     */
     return perform<std::greater<int>, Boolean>(addr, this, &Thread::place);
 }
 
 byte* Thread::igte(byte* addr) {
-    /*  Run igte instruction.
-     */
     return perform<std::greater_equal<int>, Boolean>(addr, this, &Thread::place);
 }
 
 byte* Thread::ieq(byte* addr) {
-    /*  Run ieq instruction.
-     */
     return perform<std::equal_to<int>, Boolean>(addr, this, &Thread::place);
 }
 
 byte* Thread::iinc(byte* addr) {
-    /*  Run iinc instruction.
-     */
     static_cast<Integer*>(viua::operand::extract(addr)->resolve(this))->increment();
     return addr;
 }
 
 byte* Thread::idec(byte* addr) {
-    /*  Run idec instruction.
-     */
     static_cast<Integer*>(viua::operand::extract(addr)->resolve(this))->decrement();
     return addr;
 }
