@@ -5,29 +5,24 @@
 #include <viua/types/boolean.h>
 #include <viua/types/byte.h>
 #include <viua/cpu/opex.h>
+#include <viua/operand.h>
 #include <viua/cpu/cpu.h>
 using namespace std;
 
 
 byte* Thread::bstore(byte* addr) {
-    /*  Run bstore instruction.
-     */
-    int destination_register;
-    bool destination_register_ref = false, operand_ref = false;
-    byte operand;
+    unsigned destination_register = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
 
-    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register);
+    bool operand_ref = false;
+    byte operand;
 
     operand_ref = *((bool*)addr);
     pointer::inc<bool, byte>(addr);
     operand = *addr;
     ++addr;
 
-    if (destination_register_ref) {
-        destination_register = static_cast<Integer*>(fetch(destination_register))->value();
-    }
     if (operand_ref) {
-        operand = static_cast<Byte*>(fetch((int)operand))->value();
+        operand = static_cast<Byte*>(fetch(static_cast<int>(operand)))->value();
     }
 
     place(destination_register, new Byte(operand));
