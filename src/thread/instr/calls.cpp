@@ -2,6 +2,7 @@
 #include <viua/types/reference.h>
 #include <viua/cpu/opex.h>
 #include <viua/exceptions.h>
+#include <viua/operand.h>
 #include <viua/cpu/cpu.h>
 using namespace std;
 
@@ -10,16 +11,19 @@ byte* Thread::frame(byte* addr) {
     /** Create new frame for function calls.
      */
     int arguments, local_registers;
-    bool arguments_ref = false, local_registers_ref = false;
 
-    viua::cpu::util::extractIntegerOperand(addr, arguments_ref, arguments);
-    viua::cpu::util::extractIntegerOperand(addr, local_registers_ref, local_registers);
-
-    if (arguments_ref) {
-        arguments = static_cast<Integer*>(fetch(arguments))->value();
+    auto arguments_source = viua::operand::extract(addr);
+    if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(arguments_source.get())) {
+        arguments = ri->get(this);
+    } else {
+        throw new Exception("invalid operand type");
     }
-    if (local_registers_ref) {
-        local_registers = static_cast<Integer*>(fetch(local_registers))->value();
+
+    auto local_registers_source = viua::operand::extract(addr);
+    if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(local_registers_source.get())) {
+        local_registers = ri->get(this);
+    } else {
+        throw new Exception("invalid operand type");
     }
 
     requestNewFrame(arguments, local_registers);
