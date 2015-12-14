@@ -7,6 +7,7 @@ enum OperandType: unsigned char {
     OT_REGISTER_INDEX,
     OT_REGISTER_REFERENCE,
     OT_ATOM,
+    OT_PRIMITIVE_BYTE,
     OT_PRIMITIVE_INT,
 };
 
