@@ -34,21 +34,19 @@ byte* Thread::frame(byte* addr) {
 byte* Thread::param(byte* addr) {
     /** Run param instruction.
      */
-    int parameter_no_operand_index, object_operand_index;
-    bool parameter_no_operand_ref = false, object_operand_ref = false;
+    int parameter_no_operand_index;
 
-    viua::cpu::util::extractIntegerOperand(addr, parameter_no_operand_ref, parameter_no_operand_index);
-    viua::cpu::util::extractIntegerOperand(addr, object_operand_ref, object_operand_index);
-
-    if (parameter_no_operand_ref) {
-        parameter_no_operand_index = static_cast<Integer*>(fetch(parameter_no_operand_index))->value();
-    }
-    if (object_operand_ref) {
-        object_operand_index = static_cast<Integer*>(fetch(object_operand_index))->value();
+    auto parameter_no_operand_index_source = viua::operand::extract(addr);
+    if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(parameter_no_operand_index_source.get())) {
+        parameter_no_operand_index = ri->get(this);
+    } else {
+        throw new Exception("invalid operand type");
     }
 
-    if (unsigned(parameter_no_operand_index) >= frame_new->args->size()) { throw new Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter"); }
-    frame_new->args->set(parameter_no_operand_index, fetch(object_operand_index));
+    if (unsigned(parameter_no_operand_index) >= frame_new->args->size()) {
+        throw new Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
+    }
+    frame_new->args->set(parameter_no_operand_index, viua::operand::extract(addr)->resolve(this));
     frame_new->args->clear(parameter_no_operand_index);
 
     return addr;
