@@ -10,21 +10,8 @@ using namespace std;
 byte* Thread::frame(byte* addr) {
     /** Create new frame for function calls.
      */
-    int arguments, local_registers;
-
-    auto arguments_source = viua::operand::extract(addr);
-    if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(arguments_source.get())) {
-        arguments = ri->get(this);
-    } else {
-        throw new Exception("invalid operand type");
-    }
-
-    auto local_registers_source = viua::operand::extract(addr);
-    if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(local_registers_source.get())) {
-        local_registers = ri->get(this);
-    } else {
-        throw new Exception("invalid operand type");
-    }
+    int arguments = viua::operand::getInteger(viua::operand::extract(addr).get(), this);
+    int local_registers = viua::operand::getInteger(viua::operand::extract(addr).get(), this);
 
     requestNewFrame(arguments, local_registers);
 
@@ -34,14 +21,7 @@ byte* Thread::frame(byte* addr) {
 byte* Thread::param(byte* addr) {
     /** Run param instruction.
      */
-    int parameter_no_operand_index;
-
-    auto parameter_no_operand_index_source = viua::operand::extract(addr);
-    if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(parameter_no_operand_index_source.get())) {
-        parameter_no_operand_index = ri->get(this);
-    } else {
-        throw new Exception("invalid operand type");
-    }
+    int parameter_no_operand_index = viua::operand::getInteger(viua::operand::extract(addr).get(), this);
 
     if (unsigned(parameter_no_operand_index) >= frame_new->args->size()) {
         throw new Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
@@ -55,14 +35,7 @@ byte* Thread::param(byte* addr) {
 byte* Thread::paref(byte* addr) {
     /** Run paref instruction.
      */
-    int parameter_no_operand_index;
-
-    auto parameter_no_operand_index_source = viua::operand::extract(addr);
-    if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(parameter_no_operand_index_source.get())) {
-        parameter_no_operand_index = ri->get(this);
-    } else {
-        throw new Exception("invalid operand type");
-    }
+    int parameter_no_operand_index = viua::operand::getInteger(viua::operand::extract(addr).get(), this);
 
     int object_operand_index;
     bool object_operand_ref = false;
