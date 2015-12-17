@@ -40,13 +40,13 @@ byte* Thread::paref(byte* addr) {
     int object_operand_index;
     bool object_operand_ref = false;
 
+    if (unsigned(parameter_no_operand_index) >= frame_new->args->size()) {
+        throw new Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
+    }
+
     viua::cpu::util::extractIntegerOperand(addr, object_operand_ref, object_operand_index);
     if (object_operand_ref) {
         object_operand_index = static_cast<Integer*>(fetch(object_operand_index))->value();
-    }
-
-    if (unsigned(parameter_no_operand_index) >= frame_new->args->size()) {
-        throw new Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
     }
 
     Type* object = uregset->at(object_operand_index);
