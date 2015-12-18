@@ -58,18 +58,8 @@ byte* Thread::paref(byte* addr) {
 byte* Thread::arg(byte* addr) {
     /** Run arg instruction.
      */
-    int parameter_no_operand_index, destination_register_index;
-    bool parameter_no_operand_ref = false, destination_register_ref = false;
-
-    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
-    viua::cpu::util::extractIntegerOperand(addr, parameter_no_operand_ref, parameter_no_operand_index);
-
-    if (parameter_no_operand_ref) {
-        parameter_no_operand_index = static_cast<Integer*>(fetch(parameter_no_operand_index))->value();
-    }
-    if (destination_register_ref) {
-        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
-    }
+    int destination_register_index = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
+    int parameter_no_operand_index = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
 
     if (unsigned(parameter_no_operand_index) >= frames.back()->args->size()) {
         ostringstream oss;
