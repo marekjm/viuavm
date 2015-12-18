@@ -77,12 +77,7 @@ byte* Thread::arg(byte* addr) {
         throw new Exception(oss.str());
     }
 
-    if (frames.back()->args->isflagged(parameter_no_operand_index, REFERENCE)) {
-        uregset->set(destination_register_index, frames.back()->args->get(parameter_no_operand_index));
-    } else {
-        uregset->set(destination_register_index, frames.back()->args->get(parameter_no_operand_index)->copy());
-    }
-    uregset->setmask(destination_register_index, frames.back()->args->getmask(parameter_no_operand_index));  // set correct mask
+    uregset->set(destination_register_index, frames.back()->args->get(parameter_no_operand_index)->copy());
 
     return addr;
 }
