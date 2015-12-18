@@ -13,8 +13,6 @@ using namespace std;
 
 
 byte* Thread::itof(byte* addr) {
-    /*  Run itof instruction.
-     */
     int target = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
     int convert_from = static_cast<Integer*>(viua::operand::extract(addr)->resolve(this))->value();
     place(target, new Float(static_cast<float>(convert_from)));
