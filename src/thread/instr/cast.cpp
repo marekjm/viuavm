@@ -29,23 +29,10 @@ byte* Thread::ftoi(byte* addr) {
 }
 
 byte* Thread::stoi(byte* addr) {
-    /*  Run stoi instruction.
-     */
-    bool cast_object_ref, destination_register_ref;
-    int cast_object_index, destination_register_index;
-
-    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
-    viua::cpu::util::extractIntegerOperand(addr, cast_object_ref, cast_object_index);
-
-    if (cast_object_ref) {
-        cast_object_index = static_cast<Integer*>(fetch(cast_object_index))->value();
-    }
-    if (destination_register_ref) {
-        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
-    }
+    int target = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
 
     int result_integer = 0;
-    string supplied_string = static_cast<String*>(fetch(cast_object_index))->value();
+    string supplied_string = static_cast<String*>(viua::operand::extract(addr)->resolve(this))->value();
     try {
         result_integer = std::stoi(supplied_string);
     } catch (const std::out_of_range& e) {
@@ -53,7 +40,8 @@ byte* Thread::stoi(byte* addr) {
     } catch (const std::invalid_argument& e) {
         throw new Exception("invalid argument: " + supplied_string);
     }
-    place(destination_register_index, new Integer(result_integer));
+
+    place(target, new Integer(result_integer));
 
     return addr;
 }
