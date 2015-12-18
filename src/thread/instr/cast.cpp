@@ -7,6 +7,7 @@
 #include <viua/types/string.h>
 #include <viua/types/exception.h>
 #include <viua/cpu/opex.h>
+#include <viua/operand.h>
 #include <viua/cpu/cpu.h>
 using namespace std;
 
@@ -14,21 +15,9 @@ using namespace std;
 byte* Thread::itof(byte* addr) {
     /*  Run itof instruction.
      */
-    bool casted_object_ref, destination_register_ref;
-    int casted_object_index, destination_register_index;
-
-    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
-    viua::cpu::util::extractIntegerOperand(addr, casted_object_ref, casted_object_index);
-
-    if (casted_object_ref) {
-        casted_object_index = static_cast<Integer*>(fetch(casted_object_index))->value();
-    }
-    if (destination_register_ref) {
-        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
-    }
-
-    int convert_from = static_cast<Integer*>(fetch(casted_object_index))->value();
-    place(destination_register_index, new Float(static_cast<float>(convert_from)));
+    int target = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
+    int convert_from = static_cast<Integer*>(viua::operand::extract(addr)->resolve(this))->value();
+    place(target, new Float(static_cast<float>(convert_from)));
 
     return addr;
 }
