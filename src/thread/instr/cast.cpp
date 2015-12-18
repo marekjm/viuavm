@@ -23,23 +23,9 @@ byte* Thread::itof(byte* addr) {
 }
 
 byte* Thread::ftoi(byte* addr) {
-    /*  Run ftoi instruction.
-     */
-    bool casted_object_ref, destination_register_ref;
-    int casted_object_index, destination_register_index;
-
-    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
-    viua::cpu::util::extractIntegerOperand(addr, casted_object_ref, casted_object_index);
-
-    if (casted_object_ref) {
-        casted_object_index = static_cast<Integer*>(fetch(casted_object_index))->value();
-    }
-    if (destination_register_ref) {
-        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
-    }
-
-    float convert_from = static_cast<Float*>(fetch(casted_object_index))->value();
-    place(destination_register_index, new Integer(static_cast<int>(convert_from)));
+    int target = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
+    float convert_from = static_cast<Float*>(viua::operand::extract(addr)->resolve(this))->value();
+    place(target, new Integer(static_cast<int>(convert_from)));
 
     return addr;
 }
