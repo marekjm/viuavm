@@ -47,23 +47,10 @@ byte* Thread::stoi(byte* addr) {
 }
 
 byte* Thread::stof(byte* addr) {
-    /*  Run stof instruction.
-     */
-    bool casted_object_ref, destination_register_ref;
-    int casted_object_index, destination_register_index;
-
-    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
-    viua::cpu::util::extractIntegerOperand(addr, casted_object_ref, casted_object_index);
-
-    if (casted_object_ref) {
-        casted_object_index = static_cast<Integer*>(fetch(casted_object_index))->value();
-    }
-    if (destination_register_ref) {
-        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
-    }
-
-    double convert_from = std::stod(static_cast<String*>(fetch(casted_object_index))->value());
-    place(destination_register_index, new Float(static_cast<float>(convert_from)));
+    int target = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
+    string supplied_string = static_cast<String*>(viua::operand::extract(addr)->resolve(this))->value();
+    double convert_from = std::stod(supplied_string);
+    place(target, new Float(static_cast<float>(convert_from)));
 
     return addr;
 }
