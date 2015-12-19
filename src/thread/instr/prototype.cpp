@@ -25,23 +25,16 @@ byte* Thread::vmclass(byte* addr) {
 byte* Thread::vmderive(byte* addr) {
     /** Push an ancestor class to prototype's inheritance chain.
      */
-    int reg;
-    bool reg_ref;
-
-    viua::cpu::util::extractIntegerOperand(addr, reg_ref, reg);
+    Type* target = viua::operand::extract(addr)->resolve(this);
 
     string class_name = string(addr);
     addr += (class_name.size()+1);
-
-    if (reg_ref) {
-        reg = static_cast<Integer*>(fetch(reg))->value();
-    }
 
     if (cpu->typesystem.count(class_name) == 0) {
         throw new Exception("cannot derive from unregistered type: " + class_name);
     }
 
-    static_cast<Prototype*>(fetch(reg))->derive(class_name);
+    static_cast<Prototype*>(target)->derive(class_name);
 
     return addr;
 }
