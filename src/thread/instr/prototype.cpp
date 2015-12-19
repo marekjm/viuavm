@@ -5,6 +5,7 @@
 #include <viua/cpu/opex.h>
 #include <viua/exceptions.h>
 #include <viua/cpu/registerset.h>
+#include <viua/operand.h>
 #include <viua/cpu/cpu.h>
 using namespace std;
 
@@ -12,19 +13,11 @@ using namespace std;
 byte* Thread::vmclass(byte* addr) {
     /** Create a class.
      */
-    int reg;
-    bool reg_ref;
-
-    viua::cpu::util::extractIntegerOperand(addr, reg_ref, reg);
-
+    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     string class_name = string(addr);
     addr += (class_name.size()+1);
 
-    if (reg_ref) {
-        reg = static_cast<Integer*>(fetch(reg))->value();
-    }
-
-    place(reg, new Prototype(class_name));
+    place(target, new Prototype(class_name));
 
     return addr;
 }
