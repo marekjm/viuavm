@@ -9,9 +9,6 @@ using namespace std;
 
 
 byte* Thread::move(byte* addr) {
-    /** Run move instruction.
-     *  Move an object from one register into another.
-     */
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     int source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
@@ -20,9 +17,6 @@ byte* Thread::move(byte* addr) {
     return addr;
 }
 byte* Thread::copy(byte* addr) {
-    /** Run copy instruction.
-     *  Copy an object from one register into another.
-     */
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     place(target, viua::operand::extract(addr)->resolve(this)->copy());
