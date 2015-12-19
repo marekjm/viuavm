@@ -58,8 +58,8 @@ byte* Thread::paref(byte* addr) {
 byte* Thread::arg(byte* addr) {
     /** Run arg instruction.
      */
-    int destination_register_index = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
-    int parameter_no_operand_index = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
+    int destination_register_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    int parameter_no_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     if (unsigned(parameter_no_operand_index) >= frames.back()->args->size()) {
         ostringstream oss;
@@ -73,7 +73,7 @@ byte* Thread::arg(byte* addr) {
 }
 
 byte* Thread::argc(byte* addr) {
-    int target = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
+    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     uregset->set(target, new Integer(static_cast<int>(frames.back()->args->size())));
 
     return addr;

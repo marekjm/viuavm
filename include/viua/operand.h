@@ -68,7 +68,7 @@ namespace viua {
         };
 
         std::unique_ptr<viua::operand::Operand> extract(byte*& ip);
-        unsigned getRegisterIndexOrException(Operand*, Thread*);
+        unsigned getRegisterIndex(Operand*, Thread*);
         int getInteger(Operand*, Thread*);
     }
 }

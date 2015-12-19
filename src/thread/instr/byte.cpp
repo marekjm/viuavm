@@ -11,7 +11,7 @@ using namespace std;
 
 
 byte* Thread::bstore(byte* addr) {
-    unsigned destination_register = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
+    unsigned destination_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     bool operand_ref = false;
     byte operand;

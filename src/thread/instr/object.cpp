@@ -13,7 +13,7 @@ using namespace std;
 byte* Thread::vmnew(byte* addr) {
     /** Create new instance of specified class.
      */
-    int target = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
+    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     string class_name = string(addr);
     addr += (class_name.size()+1);

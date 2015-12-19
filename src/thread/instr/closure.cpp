@@ -21,7 +21,7 @@ byte* Thread::clbind(byte* addr) {
      *  contains an object bound outside of its immediate scope.
      *  Objects are not freed from registers marked as BOUND.
      */
-    int target = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
+    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     uregset->flag(target, BIND);
     return addr;
 }
@@ -33,7 +33,7 @@ byte* Thread::closure(byte* addr) {
         throw new Exception("creating closures from nonlocal registers is forbidden, go rethink your behaviour");
     }
 
-    int target = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
+    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     string call_name = string(addr);
     addr += (call_name.size()+1);
@@ -79,7 +79,7 @@ byte* Thread::function(byte* addr) {
      *  are can be used to pass functions as parameters and
      *  return them from other functions.
      */
-    int target = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
+    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     string call_name = string(addr);
     addr += (call_name.size()+1);
@@ -99,7 +99,7 @@ byte* Thread::fcall(byte* addr) {
     bool return_value_ref;
     viua::cpu::util::extractIntegerOperand(addr, return_value_ref, return_value_reg);
 
-    int fn_reg = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
+    int fn_reg = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     // FIXME: there should be a check it this is *really* a function object
     Function* fn = static_cast<Function*>(fetch(fn_reg));

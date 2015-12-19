@@ -65,7 +65,7 @@ unique_ptr<viua::operand::Operand> viua::operand::extract(byte*& ip) {
     return operand;
 }
 
-unsigned viua::operand::getRegisterIndexOrException(viua::operand::Operand* o, Thread* t) {
+unsigned viua::operand::getRegisterIndex(viua::operand::Operand* o, Thread* t) {
     unsigned index = 0;
     if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(o)) {
         index = ri->get(t);

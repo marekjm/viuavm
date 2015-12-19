@@ -14,12 +14,12 @@ using namespace std;
 
 
 byte* Thread::izero(byte* addr) {
-    place(viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this), new Integer(0));
+    place(viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this), new Integer(0));
     return addr;
 }
 
 byte* Thread::istore(byte* addr) {
-    unsigned destination_register = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
+    unsigned destination_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     auto source = viua::operand::extract(addr);
     int integer = 0;
@@ -50,7 +50,7 @@ template<class Operator, class ResultType> byte* perform(byte* addr, Thread* t, 
      *  Thread class's scope and passing it here.
      *  Voila - we can place objects in thread's current register set.
      */
-    unsigned target_register_index = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), t);
+    unsigned target_register_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), t);
 
     auto first = viua::operand::extract(addr);
     auto second = viua::operand::extract(addr);

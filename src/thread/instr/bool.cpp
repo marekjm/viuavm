@@ -14,7 +14,7 @@ using namespace std;
 byte* Thread::lognot(byte* addr) {
     auto target = viua::operand::extract(addr);
 
-    place(viua::operand::getRegisterIndexOrException(target.get(), this), new Boolean(not target->resolve(this)->boolean()));
+    place(viua::operand::getRegisterIndex(target.get(), this), new Boolean(not target->resolve(this)->boolean()));
 
     return addr;
 }
@@ -24,7 +24,7 @@ byte* Thread::logand(byte* addr) {
     auto first = viua::operand::extract(addr);
     auto second = viua::operand::extract(addr);
 
-    place(viua::operand::getRegisterIndexOrException(target.get(), this), new Boolean(first->resolve(this)->boolean() and second->resolve(this)->boolean()));
+    place(viua::operand::getRegisterIndex(target.get(), this), new Boolean(first->resolve(this)->boolean() and second->resolve(this)->boolean()));
 
     return addr;
 }
@@ -34,7 +34,7 @@ byte* Thread::logor(byte* addr) {
     auto first = viua::operand::extract(addr);
     auto second = viua::operand::extract(addr);
 
-    place(viua::operand::getRegisterIndexOrException(target.get(), this), new Boolean(first->resolve(this)->boolean() or second->resolve(this)->boolean()));
+    place(viua::operand::getRegisterIndex(target.get(), this), new Boolean(first->resolve(this)->boolean() or second->resolve(this)->boolean()));
 
     return addr;
 }
