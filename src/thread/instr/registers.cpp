@@ -3,6 +3,7 @@
 #include <viua/types/reference.h>
 #include <viua/cpu/opex.h>
 #include <viua/exceptions.h>
+#include <viua/operand.h>
 #include <viua/cpu/cpu.h>
 using namespace std;
 
@@ -11,20 +12,11 @@ byte* Thread::move(byte* addr) {
     /** Run move instruction.
      *  Move an object from one register into another.
      */
-    int object_operand_index, destination_register_index;
-    bool object_operand_ref = false, destination_register_ref = false;
+    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    int source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
-    viua::cpu::util::extractIntegerOperand(addr, object_operand_ref, object_operand_index);
+    uregset->move(source, target);
 
-    if (object_operand_ref) {
-        object_operand_index = static_cast<Integer*>(fetch(object_operand_index))->value();
-    }
-    if (destination_register_ref) {
-        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
-    }
-
-    uregset->move(object_operand_index, destination_register_index);
     return addr;
 }
 byte* Thread::copy(byte* addr) {
