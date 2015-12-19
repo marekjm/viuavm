@@ -71,19 +71,7 @@ byte* Thread::swap(byte* addr) {
     return addr;
 }
 byte* Thread::free(byte* addr) {
-    /** Run free instruction.
-     */
-    int target_register_index;
-    bool target_register_ref = false;
-
-    viua::cpu::util::extractIntegerOperand(addr, target_register_ref, target_register_index);
-
-    if (target_register_ref) {
-        target_register_index = static_cast<Integer*>(fetch(target_register_index))->value();
-    }
-
-    uregset->free(target_register_index);
-
+    uregset->free(viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this));
     return addr;
 }
 byte* Thread::empty(byte* addr) {
