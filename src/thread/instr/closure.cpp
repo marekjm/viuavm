@@ -8,6 +8,7 @@
 #include <viua/cpu/opex.h>
 #include <viua/exceptions.h>
 #include <viua/cpu/registerset.h>
+#include <viua/operand.h>
 #include <viua/cpu/cpu.h>
 using namespace std;
 
@@ -20,17 +21,8 @@ byte* Thread::clbind(byte* addr) {
      *  contains an object bound outside of its immediate scope.
      *  Objects are not freed from registers marked as BOUND.
      */
-    int a;
-    bool ref = false;
-
-    viua::cpu::util::extractIntegerOperand(addr, ref, a);
-
-    if (ref) {
-        a = static_cast<Integer*>(fetch(a))->value();
-    }
-
-    uregset->flag(a, BIND);
-
+    int target = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
+    uregset->flag(target, BIND);
     return addr;
 }
 
