@@ -23,20 +23,9 @@ byte* Thread::copy(byte* addr) {
     /** Run copy instruction.
      *  Copy an object from one register into another.
      */
-    int object_operand_index, destination_register_index;
-    bool object_operand_ref = false, destination_register_ref = false;
+    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
-    viua::cpu::util::extractIntegerOperand(addr, object_operand_ref, object_operand_index);
-
-    if (object_operand_ref) {
-        object_operand_index = static_cast<Integer*>(fetch(object_operand_index))->value();
-    }
-    if (destination_register_ref) {
-        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
-    }
-
-    place(destination_register_index, fetch(object_operand_index)->copy());
+    place(target, viua::operand::extract(addr)->resolve(this)->copy());
 
     return addr;
 }
