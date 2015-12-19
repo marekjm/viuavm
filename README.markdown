@@ -7,7 +7,28 @@
 ![License](https://img.shields.io/github/license/marekjm/viuavm.svg)
 
 
-> A simple register-based virtual machine.
+> A simple, register-based virtual machine programmable in custom assembly lookalike language and
+> extensible with C++.
+
+#### Hello World in Viua VM
+
+```
+.function: main
+    ; store string "Hello World!" in register 1
+    strstore 1 "Hello World!"
+
+    ; print contents of register 1
+    print 1
+
+    ; set exit code...
+    izero 0
+    ; ...and end the main function
+    end
+.end
+```
+
+
+----
 
 
 #### Design goals
