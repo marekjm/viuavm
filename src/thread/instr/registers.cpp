@@ -63,23 +63,11 @@ byte* Thread::ref(byte* addr) {
     return addr;
 }
 byte* Thread::swap(byte* addr) {
-    /** Run swap instruction.
-     *  Swaps two objects in registers.
-     */
-    int first_operand_index, second_operand_index;
-    bool first_operand_ref = false, second_operand_ref = false;
+    int first = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    int second = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    viua::cpu::util::extractIntegerOperand(addr, first_operand_ref, first_operand_index);
-    viua::cpu::util::extractIntegerOperand(addr, second_operand_ref, second_operand_index);
+    uregset->swap(first, second);
 
-    if (first_operand_ref) {
-        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
-    }
-    if (second_operand_ref) {
-        second_operand_index = static_cast<Integer*>(fetch(second_operand_index))->value();
-    }
-
-    uregset->swap(first_operand_index, second_operand_index);
     return addr;
 }
 byte* Thread::free(byte* addr) {
