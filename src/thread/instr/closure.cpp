@@ -29,17 +29,10 @@ byte* Thread::clbind(byte* addr) {
 byte* Thread::closure(byte* addr) {
     /** Create a closure from a function.
      */
-    int reg;
-    bool reg_ref;
-
-    viua::cpu::util::extractIntegerOperand(addr, reg_ref, reg);
+    int target = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
 
     string call_name = string(addr);
     addr += (call_name.size()+1);
-
-    if (reg_ref) {
-        reg = static_cast<Integer*>(fetch(reg))->value();
-    }
 
     if (uregset != frames.back()->regset) {
         throw new Exception("creating closures from nonlocal registers is forbidden, go rethink your behaviour");
@@ -77,7 +70,7 @@ byte* Thread::closure(byte* addr) {
         }
     }
 
-    place(reg, clsr);
+    place(target, clsr);
 
     return addr;
 }
