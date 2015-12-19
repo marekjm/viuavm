@@ -95,15 +95,11 @@ byte* Thread::function(byte* addr) {
 byte* Thread::fcall(byte* addr) {
     /*  Call a function object.
      */
-    int fn_reg, return_value_reg;
-    bool fn_reg_ref, return_value_ref;
-
+    int return_value_reg;
+    bool return_value_ref;
     viua::cpu::util::extractIntegerOperand(addr, return_value_ref, return_value_reg);
-    viua::cpu::util::extractIntegerOperand(addr, fn_reg_ref, fn_reg);
 
-    if (fn_reg_ref) {
-        fn_reg = static_cast<Integer*>(fetch(fn_reg))->value();
-    }
+    int fn_reg = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
 
     // FIXME: there should be a check it this is *really* a function object
     Function* fn = static_cast<Function*>(fetch(fn_reg));
