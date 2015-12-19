@@ -64,9 +64,6 @@ byte* Thread::closure(byte* addr) {
                 uregset->set(i, rf);
                 clsr->regset->set(i, rf->copy());
             }
-            /* clsr->regset->set(i, uregset->get(i)); */
-            /* clsr->regset->flag(i, REFERENCE); */
-            /* uregset->flag(i, BOUND); */
         }
     }
 
