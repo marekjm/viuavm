@@ -79,22 +79,15 @@ byte* Thread::function(byte* addr) {
      *  are can be used to pass functions as parameters and
      *  return them from other functions.
      */
-    int reg;
-    bool reg_ref;
-
-    viua::cpu::util::extractIntegerOperand(addr, reg_ref, reg);
+    int target = viua::operand::getRegisterIndexOrException(viua::operand::extract(addr).get(), this);
 
     string call_name = string(addr);
     addr += (call_name.size()+1);
 
-    if (reg_ref) {
-        reg = static_cast<Integer*>(fetch(reg))->value();
-    }
-
     Function* fn = new Function();
     fn->function_name = call_name;
 
-    place(reg, fn);
+    place(target, fn);
 
     return addr;
 }
