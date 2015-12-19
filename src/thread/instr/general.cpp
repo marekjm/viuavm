@@ -3,30 +3,17 @@
 #include <viua/types/boolean.h>
 #include <viua/cpu/opex.h>
 #include <viua/exceptions.h>
+#include <viua/operand.h>
 #include <viua/cpu/cpu.h>
 using namespace std;
 
 
 byte* Thread::echo(byte* addr) {
-    /*  Run echo instruction.
-     */
-    bool ref = false;
-    int operand_index;
-
-    viua::cpu::util::extractIntegerOperand(addr, ref, operand_index);
-
-    if (ref) {
-        operand_index = static_cast<Integer*>(fetch(operand_index))->value();
-    }
-
-    cout << fetch(operand_index)->str();
-
+    cout << viua::operand::extract(addr)->resolve(this)->str();
     return addr;
 }
 
 byte* Thread::print(byte* addr) {
-    /*  Run print instruction.
-     */
     addr = echo(addr);
     cout << '\n';
     return addr;
