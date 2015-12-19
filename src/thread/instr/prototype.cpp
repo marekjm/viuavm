@@ -42,10 +42,7 @@ byte* Thread::vmderive(byte* addr) {
 byte* Thread::vmattach(byte* addr) {
     /** Attach a function to a prototype as a method.
      */
-    int reg;
-    bool reg_ref;
-
-    viua::cpu::util::extractIntegerOperand(addr, reg_ref, reg);
+    Type* target = viua::operand::extract(addr)->resolve(this);
 
     string function_name = string(addr);
     addr += (function_name.size()+1);
@@ -53,11 +50,7 @@ byte* Thread::vmattach(byte* addr) {
     string method_name = string(addr);
     addr += (method_name.size()+1);
 
-    if (reg_ref) {
-        reg = static_cast<Integer*>(fetch(reg))->value();
-    }
-
-    Prototype* proto = static_cast<Prototype*>(fetch(reg));
+    Prototype* proto = static_cast<Prototype*>(target);
 
     if (not (cpu->function_addresses.count(function_name) or cpu->linked_functions.count(function_name) or cpu->foreign_functions.count(function_name))) {
         throw new Exception("cannot attach undefined function '" + function_name + "' as a method '" + method_name + "' of prototype '" + proto->getTypeName() + "'");
