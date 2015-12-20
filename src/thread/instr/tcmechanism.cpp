@@ -30,10 +30,8 @@ byte* Thread::vmcatch(byte* addr) {
     byte* block_address = nullptr;
     if (cpu->block_addresses.count(catcher_block_name)) {
         block_address = cpu->bytecode+cpu->block_addresses.at(catcher_block_name);
-        jump_base = cpu->bytecode;
     } else {
         block_address = cpu->linked_blocks.at(catcher_block_name).second;
-        jump_base = cpu->linked_modules.at(cpu->linked_blocks.at(catcher_block_name).first).second;
     }
 
     try_frame_new->catchers[type_name] = new Catcher(type_name, catcher_block_name, block_address);
