@@ -1,6 +1,7 @@
 #include <viua/types/integer.h>
 #include <viua/cpu/opex.h>
 #include <viua/exceptions.h>
+#include <viua/operand.h>
 #include <viua/cpu/cpu.h>
 using namespace std;
 
@@ -18,11 +19,8 @@ byte* Thread::vmtry(byte* addr) {
 byte* Thread::vmcatch(byte* addr) {
     /** Run catch instruction.
      */
-    string type_name = string(addr);
-    addr += (type_name.size()+1);
-
-    string catcher_block_name = string(addr);
-    addr += (catcher_block_name.size()+1);
+    string type_name = viua::operand::extractString(addr);
+    string catcher_block_name = viua::operand::extractString(addr);
 
     bool block_found = (cpu->block_addresses.count(catcher_block_name) or cpu->linked_blocks.count(catcher_block_name));
     if (not block_found) {
