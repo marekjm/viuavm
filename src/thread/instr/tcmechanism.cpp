@@ -44,19 +44,12 @@ byte* Thread::vmcatch(byte* addr) {
 byte* Thread::pull(byte* addr) {
     /** Run pull instruction.
      */
-    int destination_register_index;
-    bool destination_register_ref = false;
-
-    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
-
-    if (destination_register_ref) {
-        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
-    }
+    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     if (caught == nullptr) {
         throw new Exception("no caught object to pull");
     }
-    uregset->set(destination_register_index, caught);
+    uregset->set(target, caught);
     caught = nullptr;
 
     return addr;
