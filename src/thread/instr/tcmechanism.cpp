@@ -85,28 +85,21 @@ byte* Thread::vmenter(byte* addr) {
 byte* Thread::vmthrow(byte* addr) {
     /** Run throw instruction.
      */
-    int source_register_index;
-    bool source_register_ref = false;
+    int source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    viua::cpu::util::extractIntegerOperand(addr, source_register_ref, source_register_index);
-
-    if (source_register_ref) {
-        source_register_index = static_cast<Integer*>(fetch(source_register_index))->value();
-    }
-
-    if (unsigned(source_register_index) >= uregset->size()) {
+    if (unsigned(source) >= uregset->size()) {
         ostringstream oss;
-        oss << "invalid read: register out of bounds: " <<source_register_index;
+        oss << "invalid read: register out of bounds: " << source;
         throw new Exception(oss.str());
     }
-    if (uregset->at(source_register_index) == nullptr) {
+    if (uregset->at(source) == nullptr) {
         ostringstream oss;
-        oss << "invalid throw: register " << source_register_index << " is empty";
+        oss << "invalid throw: register " << source << " is empty";
         throw new Exception(oss.str());
     }
 
-    uregset->setmask(source_register_index, KEEP);  // set correct mask
-    thrown = uregset->get(source_register_index);
+    uregset->setmask(source, KEEP);  // set correct mask
+    thrown = uregset->get(source);
 
     return addr;
 }
