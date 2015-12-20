@@ -98,8 +98,8 @@ byte* Thread::vmthrow(byte* addr) {
         throw new Exception(oss.str());
     }
 
-    uregset->setmask(source, KEEP);  // set correct mask
     thrown = uregset->get(source);
+    uregset->empty(source);
 
     return addr;
 }
