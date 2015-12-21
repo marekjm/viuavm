@@ -38,15 +38,8 @@ byte* Thread::opthjoin(byte* addr) {
      */
     byte* return_addr = (addr-1);
 
-    bool thrd_register_ref;
-    int thrd_register_index;
-    viua::cpu::util::extractIntegerOperand(addr, thrd_register_ref, thrd_register_index);
-
-    if (thrd_register_ref) {
-        thrd_register_index = static_cast<Integer*>(fetch(thrd_register_index))->value();
-    }
-
-    if (ThreadType* thrd = dynamic_cast<ThreadType*>(fetch(thrd_register_index))) {
+    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    if (ThreadType* thrd = dynamic_cast<ThreadType*>(fetch(target))) {
         if (thrd->stopped()) {
             thrd->join();
             return_addr = addr;
