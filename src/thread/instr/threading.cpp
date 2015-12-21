@@ -61,16 +61,10 @@ byte* Thread::opthreceive(byte* addr) {
      */
     byte* return_addr = (addr-1);
 
-    bool return_register_ref;
-    int return_register_index;
-    viua::cpu::util::extractIntegerOperand(addr, return_register_ref, return_register_index);
-
-    if (return_register_ref) {
-        return_register_index = static_cast<Integer*>(fetch(return_register_index))->value();
-    }
+    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     if (message_queue.size()) {
-        place(return_register_index, message_queue.front());
+        place(target, message_queue.front());
         message_queue.pop();
         return_addr = addr;
     }
