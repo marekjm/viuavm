@@ -22,22 +22,9 @@ byte* Thread::vinsert(byte* addr) {
      *  Vector always inserts a copy of the object in a register.
      *  FIXME: make it possible to insert references.
      */
-    bool vector_operand_ref, object_operand_ref, position_operand_ref;
-    int vector_operand_index, object_operand_index, position_operand_index;
-
-    viua::cpu::util::extractIntegerOperand(addr, vector_operand_ref, vector_operand_index);
-    viua::cpu::util::extractIntegerOperand(addr, object_operand_ref, object_operand_index);
-    viua::cpu::util::extractIntegerOperand(addr, position_operand_ref, position_operand_index);
-
-    if (vector_operand_ref) {
-        vector_operand_index = static_cast<Integer*>(fetch(vector_operand_index))->value();
-    }
-    if (object_operand_ref) {
-        object_operand_index = static_cast<Integer*>(fetch(object_operand_index))->value();
-    }
-    if (position_operand_ref) {
-        position_operand_index = static_cast<Integer*>(fetch(position_operand_index))->value();
-    }
+    int vector_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    int object_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    int position_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     static_cast<Vector*>(fetch(vector_operand_index))->insert(position_operand_index, fetch(object_operand_index)->copy());
 
