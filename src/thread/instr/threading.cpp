@@ -34,6 +34,7 @@ byte* Thread::opthjoin(byte* addr) {
     /** Join a thread.
      *
      *  This opcode blocks execution of current thread until
+     *  the thread being joined finishes execution.
      */
     byte* return_addr = (addr-1);
 
