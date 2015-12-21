@@ -247,7 +247,7 @@ int main(int argc, char* argv[]) {
         line = str::lstrip(str::sub(line, str::chunk(line).size()));
 
         if (line.size() == 0) {
-            cout << "fatal: frame instruction without operands at line " << i << " in " << filename;
+            cout << "fatal: frame instruction without operands at line " << i << " in " << filename << endl;
             return 1;
         }
     }
