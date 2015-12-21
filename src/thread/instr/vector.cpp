@@ -89,20 +89,10 @@ byte* Thread::vat(byte* addr) {
 byte* Thread::vlen(byte* addr) {
     /*  Run vlen instruction.
      */
-    bool vector_operand_ref, destination_register_ref;
-    int vector_operand_index, destination_register_index;
+    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    Type* source = viua::operand::extract(addr)->resolve(this);
 
-    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
-    viua::cpu::util::extractIntegerOperand(addr, vector_operand_ref, vector_operand_index);
-
-    if (vector_operand_ref) {
-        vector_operand_index = static_cast<Integer*>(fetch(vector_operand_index))->value();
-    }
-    if (destination_register_ref) {
-        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
-    }
-
-    place(destination_register_index, new Integer(static_cast<Vector*>(fetch(vector_operand_index))->len()));
+    place(target, new Integer(static_cast<Vector*>(source)->len()));
 
     return addr;
 }
