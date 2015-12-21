@@ -51,28 +51,15 @@ byte* Thread::vpop(byte* addr) {
      *  Vector always pops a copy of the object in a register.
      *  FIXME: make it possible to pop references.
      */
-    bool vector_operand_ref, destination_register_ref, position_operand_ref;
-    int vector_operand_index, destination_register_index, position_operand_index;
-
-    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
-    viua::cpu::util::extractIntegerOperand(addr, vector_operand_ref, vector_operand_index);
-    viua::cpu::util::extractIntegerOperand(addr, position_operand_ref, position_operand_index);
-
-    if (vector_operand_ref) {
-        vector_operand_index = static_cast<Integer*>(fetch(vector_operand_index))->value();
-    }
-    if (destination_register_ref) {
-        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
-    }
-    if (position_operand_ref) {
-        position_operand_index = static_cast<Integer*>(fetch(position_operand_index))->value();
-    }
+    int destination_register_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    Type* vector_operand = viua::operand::extract(addr)->resolve(this);
+    int position_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     /*  1) fetch vector,
      *  2) pop value at given index,
      *  3) put it in a register,
      */
-    Type* ptr = static_cast<Vector*>(fetch(vector_operand_index))->pop(position_operand_index);
+    Type* ptr = static_cast<Vector*>(vector_operand)->pop(position_operand_index);
     if (destination_register_index) { place(destination_register_index, ptr); }
 
     return addr;
