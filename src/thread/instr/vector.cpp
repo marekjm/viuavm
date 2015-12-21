@@ -37,20 +37,10 @@ byte* Thread::vpush(byte* addr) {
      *  Vector always pushes a copy of the object in a register.
      *  FIXME: make it possible to push references.
      */
-    bool vector_operand_ref, object_operand_ref;
-    int vector_operand_index, object_operand_index;
+    Type* target = viua::operand::extract(addr)->resolve(this);
+    Type* source = viua::operand::extract(addr)->resolve(this);
 
-    viua::cpu::util::extractIntegerOperand(addr, vector_operand_ref, vector_operand_index);
-    viua::cpu::util::extractIntegerOperand(addr, object_operand_ref, object_operand_index);
-
-    if (vector_operand_ref) {
-        vector_operand_index = static_cast<Integer*>(fetch(vector_operand_index))->value();
-    }
-    if (object_operand_ref) {
-        object_operand_index = static_cast<Integer*>(fetch(object_operand_index))->value();
-    }
-
-    static_cast<Vector*>(fetch(vector_operand_index))->push(fetch(object_operand_index)->copy());
+    static_cast<Vector*>(target)->push(source->copy());
 
     return addr;
 }
