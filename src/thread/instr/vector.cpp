@@ -5,23 +5,13 @@
 #include <viua/types/vector.h>
 #include <viua/cpu/opex.h>
 #include <viua/cpu/registerset.h>
+#include <viua/operand.h>
 #include <viua/cpu/cpu.h>
 using namespace std;
 
 
 byte* Thread::vec(byte* addr) {
-    /*  Run vec instruction.
-     */
-    bool target_register_ref;
-    int target_register_index;
-
-    viua::cpu::util::extractIntegerOperand(addr, target_register_ref, target_register_index);
-
-    if (target_register_ref) {
-        target_register_index = static_cast<Integer*>(fetch(target_register_index))->value();
-    }
-
-    place(target_register_index, new Vector());
+    place(viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this), new Vector());
 
     return addr;
 }
