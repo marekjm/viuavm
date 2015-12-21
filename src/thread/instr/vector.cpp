@@ -22,11 +22,11 @@ byte* Thread::vinsert(byte* addr) {
      *  Vector always inserts a copy of the object in a register.
      *  FIXME: make it possible to insert references.
      */
-    int vector_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    Type* vector_operand = viua::operand::extract(addr)->resolve(this);
     int object_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     int position_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    static_cast<Vector*>(fetch(vector_operand_index))->insert(position_operand_index, fetch(object_operand_index)->copy());
+    static_cast<Vector*>(vector_operand)->insert(position_operand_index, fetch(object_operand_index)->copy());
 
     return addr;
 }
