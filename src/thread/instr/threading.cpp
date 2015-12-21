@@ -3,6 +3,7 @@
 #include <viua/types/thread.h>
 #include <viua/cpu/opex.h>
 #include <viua/exceptions.h>
+#include <viua/operand.h>
 #include <viua/cpu/cpu.h>
 using namespace std;
 
@@ -10,11 +11,9 @@ using namespace std;
 byte* Thread::opthread(byte* addr) {
     /*  Run thread instruction.
      */
-    bool return_register_ref;
-    int return_register_index;
-    viua::cpu::util::extractIntegerOperand(addr, return_register_ref, return_register_index);
+    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    string call_name = string(addr);
+    string call_name = viua::operand::extractString(addr);
 
     bool is_native = (cpu->function_addresses.count(call_name) or cpu->linked_functions.count(call_name));
     bool is_foreign = cpu->foreign_functions.count(call_name);
@@ -23,17 +22,13 @@ byte* Thread::opthread(byte* addr) {
         throw new Exception("call to undefined function: " + call_name);
     }
 
-    if (return_register_ref) {
-        return_register_index = static_cast<Integer*>(fetch(return_register_index))->value();
-    }
-
     frame_new->function_name = call_name;
     Thread* vm_thread = cpu->spawn(frame_new);
     ThreadType* thrd = new ThreadType(vm_thread);
-    place(return_register_index, thrd);
+    place(target, thrd);
     frame_new = nullptr;
 
-    return (addr+call_name.size()+1);
+    return addr;
 }
 byte* Thread::opthjoin(byte* addr) {
     /** Join a thread.
