@@ -457,7 +457,7 @@ class RegisterManipulationInstructionsTests(unittest.TestCase):
         runTest(self, 'isnull.asm', 'true')
 
     def testDELETE(self):
-        runTest(self, 'free.asm', 'true')
+        runTest(self, 'delete.asm', 'true')
 
     def testEMPTY(self):
         runTest(self, 'empty.asm', 'true')
