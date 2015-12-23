@@ -2414,7 +2414,7 @@ Swap objects in first and second operand registers.
 \end_layout
 
 \begin_layout Subsubsection
-free
+delete
 \end_layout
 
 \begin_layout Paragraph
@@ -2424,7 +2424,7 @@ Syntax
 \begin_layout Standard
 
 \family typewriter
-free <target register>
+delete <target register>
 \end_layout
 
 \begin_layout Paragraph
@@ -3044,7 +3044,7 @@ write
 
 
 \family typewriter
-free
+delete
 \family default
 
 \begin_inset Quotes erd
