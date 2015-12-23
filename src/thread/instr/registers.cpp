@@ -64,7 +64,7 @@ byte* Thread::swap(byte* addr) {
 
     return addr;
 }
-byte* Thread::free(byte* addr) {
+byte* Thread::opdelete(byte* addr) {
     uregset->free(viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this));
     return addr;
 }

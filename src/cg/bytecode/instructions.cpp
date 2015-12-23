@@ -532,10 +532,8 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* free(byte* addr_ptr, int_op reg) {
-            /*  Inserts free instuction.
-             */
-            *(addr_ptr++) = FREE;
+        byte* opdelete(byte* addr_ptr, int_op reg) {
+            *(addr_ptr++) = DELETE;
             addr_ptr = insertIntegerOperand(addr_ptr, reg);
             return addr_ptr;
         }

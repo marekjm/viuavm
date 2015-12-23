@@ -153,7 +153,7 @@ class Thread {
     byte* copy(byte*);
     byte* ref(byte*);
     byte* swap(byte*);
-    byte* free(byte*);
+    byte* opdelete(byte*);
     byte* empty(byte*);
     byte* isnull(byte*);
 
