@@ -34,3 +34,5 @@ There are several categories of change:
 - bic: `throw` instruction no longer leaves thrown object in its source register;
   thrown object is put in special *throw-register* and the source register in
   currently used instruction set is made empty
+- bic: `free` instruction was renamed to `delete` to better match the naming convections
+  of the other object-lifespan controlling instructions (i.e. the `new` instruction)
