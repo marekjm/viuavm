@@ -88,6 +88,15 @@ byte* Thread::call(byte* addr) {
 
     string call_name = string(addr);
 
+    // clear PASSED flag
+    // since function calls are blocking, we can be sure that after the function returns
+    // we can safely overwrite all registers
+    for (unsigned i = 0; i < uregset->size(); ++i) {
+        if (uregset->at(i) != nullptr) {
+            uregset->unflag(i, PASSED);
+        }
+    }
+
     bool is_native = (cpu->function_addresses.count(call_name) or cpu->linked_functions.count(call_name));
     bool is_foreign = cpu->foreign_functions.count(call_name);
 
