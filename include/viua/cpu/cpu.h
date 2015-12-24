@@ -125,7 +125,9 @@ class CPU {
         bool burst();
 
         int run();
-        inline decltype(instruction_counter) counter() { return instruction_counter; }
+        inline decltype(instruction_counter) counter() {
+            return threads[current_thread_index]->counter();
+        }
 
         inline std::tuple<int, std::string, std::string> exitcondition() {
             return std::tuple<int, std::string, std::string>(return_code, return_exception, return_message);
