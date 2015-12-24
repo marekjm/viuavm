@@ -36,3 +36,4 @@ There are several categories of change:
   currently used instruction set is made empty
 - bic: `free` instruction was renamed to `delete` to better match the naming convections
   of the other object-lifespan controlling instructions (i.e. the `new` instruction)
+- enhancement: change `Thread::instruction_counter`'s type from `unsigned` to `uint64_t`
