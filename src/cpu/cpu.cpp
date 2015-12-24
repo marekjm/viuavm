@@ -167,9 +167,9 @@ void CPU::loadForeignLibrary(const string& module) {
 }
 
 
-Thread* CPU::spawn(Frame* frm) {
+Thread* CPU::spawn(Frame* frm, Thread* parent_thread) {
     unique_lock<std::mutex> lck{threads_mtx};
-    Thread* thrd = new Thread(frm, this, jump_base);
+    Thread* thrd = new Thread(frm, this, jump_base, parent_thread);
     thrd->begin();
     threads.push_back(thrd);
     return thrd;
@@ -228,7 +228,7 @@ CPU& CPU::iframe(Frame* frm, unsigned r) {
     // set global registers
     regset = new RegisterSet(r);
 
-    Thread* t = new Thread(initial_frame, this, jump_base);
+    Thread* t = new Thread(initial_frame, this, jump_base, nullptr);
     t->priority(16);
     threads.push_back(t);
 

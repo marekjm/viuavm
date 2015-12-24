@@ -32,6 +32,7 @@ class Thread {
     public:
 #endif
     CPU *cpu;
+    Thread* parent_thread;
     const std::string entry_function;
 
     bool debug;
@@ -221,6 +222,7 @@ class Thread {
              *  this thread has stopped.
              */
             is_joinable = false;
+            parent_thread = nullptr;
         }
         inline void detach() {
             /** Detach a thread.
@@ -233,6 +235,7 @@ class Thread {
              *  Also, they will run even after the main/1 function has exited.
              */
             is_joinable = false;
+            parent_thread = nullptr;
         }
 
         void pass(Type* message);
@@ -257,7 +260,7 @@ class Thread {
         }
         inline std::vector<Frame*> trace() { return frames; }
 
-        Thread(Frame* frm, CPU *_cpu, decltype(jump_base) jb): cpu(_cpu), entry_function(frm->function_name),
+        Thread(Frame* frm, CPU *_cpu, decltype(jump_base) jb, Thread* pt): cpu(_cpu), parent_thread(pt), entry_function(frm->function_name),
             debug(false),
             regset(nullptr), uregset(nullptr), tmp(nullptr),
             jump_base(jb),

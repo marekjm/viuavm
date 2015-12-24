@@ -23,7 +23,7 @@ byte* Thread::opthread(byte* addr) {
     }
 
     frame_new->function_name = call_name;
-    Thread* vm_thread = cpu->spawn(frame_new);
+    Thread* vm_thread = cpu->spawn(frame_new, this);
     ThreadType* thrd = new ThreadType(vm_thread);
     place(target, thrd);
     frame_new = nullptr;
