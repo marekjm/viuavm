@@ -37,3 +37,5 @@ There are several categories of change:
 - bic: `free` instruction was renamed to `delete` to better match the naming convections
   of the other object-lifespan controlling instructions (i.e. the `new` instruction)
 - enhancement: change `Thread::instruction_counter`'s type from `unsigned` to `uint64_t`
+- fix: stack traces displayed after uncaught exceptions are generated for the thread that
+  the exception originated from
