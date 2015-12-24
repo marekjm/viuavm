@@ -31,6 +31,7 @@ class CPU {
 
     // vector of all threads machine is executing
     std::vector<Thread*> threads;
+    decltype(threads)::size_type current_thread_index;
     std::mutex threads_mtx;
 
     // Global register set
@@ -136,6 +137,7 @@ class CPU {
 
         CPU():
             bytecode(nullptr), bytecode_size(0), executable_offset(0),
+            current_thread_index(0),
             regset(nullptr),
             tmp(nullptr),
             jump_base(nullptr),

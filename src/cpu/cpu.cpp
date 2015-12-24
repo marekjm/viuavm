@@ -250,6 +250,7 @@ bool CPU::burst() {
         return false;
     }
 
+    current_thread_index = 0;
     bool ticked = false;
     if (not threads[0]->stopped()) {
         ticked = true;
@@ -268,6 +269,7 @@ bool CPU::burst() {
     decltype(threads) running_threads{threads[0]};
     decltype(threads) dead_threads;
     for (decltype(threads)::size_type i = 1; i < threads.size(); ++i) {
+        current_thread_index = i;
         auto th = threads[i];
 
         if (th->stopped()) {
