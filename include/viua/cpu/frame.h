@@ -36,7 +36,7 @@ class Frame {
         }
         ~Frame() {
             // drop all pointers in arguments registers set
-            // to precent double deallocation
+            // to prevent double deallocation
             args->drop();
 
             delete args;
