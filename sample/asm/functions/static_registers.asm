@@ -3,12 +3,20 @@
     ress static
 
     ; if register 1 is *not null* jump to increase marker
-    ; otherwise continue execution
+    ; otherwise continue execution to perform initial set up of static registers
     branch (not (isnull 2 1)) increase
 
     ; these instructions are executed only when 1 register was null
+    ; they first setup static counter variable
     istore 1 0
+
+    ; then, switch to local registers and...
+    ress local
+    ; 1) fake taking counter from static registers (it's zero during first pass anyway)
+    istore 1 0
+    ; 2) fetch the argument
     arg 3 0
+    ; 3) jump straight to report mark
     jump report
 
     .mark: increase
