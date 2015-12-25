@@ -237,6 +237,7 @@ class Thread {
             is_joinable = false;
             parent_thread = nullptr;
         }
+        inline Thread* parent() const { return parent_thread; };
 
         void pass(Type* message);
 
