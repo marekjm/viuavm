@@ -39,3 +39,9 @@ There are several categories of change:
 - enhancement: change `Thread::instruction_counter`'s type from `unsigned` to `uint64_t`
 - fix: stack traces displayed after uncaught exceptions are generated for the thread that
   the exception originated from
+- bic: machine prevents overwriting registers that were passed by value; this is due to the
+  fact that calls employ lazy parameter passing - the value is only copied when requested by
+  the callee so if during the time between putting an object in parameter slot and
+  actually calling the function a register has been overwritten (causing the old object residing
+  in the register to be deleted) called function would try to copy an object that does not
+  exist anymore resulting in segmentation fault,
