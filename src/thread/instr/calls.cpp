@@ -22,11 +22,13 @@ byte* Thread::param(byte* addr) {
     /** Run param instruction.
      */
     int parameter_no_operand_index = viua::operand::getInteger(viua::operand::extract(addr).get(), this);
+    int source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     if (unsigned(parameter_no_operand_index) >= frame_new->args->size()) {
         throw new Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
     }
-    frame_new->args->set(parameter_no_operand_index, viua::operand::extract(addr)->resolve(this));
+    uregset->flag(source, PASSED);
+    frame_new->args->set(parameter_no_operand_index, fetch(source));
     frame_new->args->clear(parameter_no_operand_index);
 
     return addr;
