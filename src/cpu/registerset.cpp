@@ -24,12 +24,6 @@ Type* RegisterSet::set(unsigned index, Type* object) {
      */
     if (index >= registerset_size) { throw new Exception("register access out of bounds: write"); }
 
-    if (registers[index] != nullptr and (masks[index] & PASSED)) {
-        ostringstream oss;
-        oss << "overwriting register with object passed by value: " << index;
-        throw new Exception(oss.str());
-    }
-
     if (registers[index] == nullptr) {
         registers[index] = object;
     } else if (dynamic_cast<Reference*>(registers[index])) {
