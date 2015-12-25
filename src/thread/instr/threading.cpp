@@ -22,6 +22,15 @@ byte* Thread::opthread(byte* addr) {
         throw new Exception("call to undefined function: " + call_name);
     }
 
+    // clear PASSED flag
+    // since function calls are blocking, we can be sure that after the function returns
+    // we can safely overwrite all registers
+    for (unsigned i = 0; i < uregset->size(); ++i) {
+        if (uregset->at(i) != nullptr) {
+            uregset->unflag(i, PASSED);
+        }
+    }
+
     frame_new->function_name = call_name;
     Thread* vm_thread = cpu->spawn(frame_new, this);
     ThreadType* thrd = new ThreadType(vm_thread);
