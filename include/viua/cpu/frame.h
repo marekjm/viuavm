@@ -8,6 +8,7 @@
 #include "registerset.h"
 
 class Frame {
+        bool deallocate_arguments;
     public:
         byte* return_address;
         RegisterSet* args;
@@ -20,7 +21,10 @@ class Frame {
 
         inline byte* ret_address() { return return_address; }
 
+        void captureArguments();
+
         Frame(byte* ra, long unsigned argsize, long unsigned regsize = 16):
+            deallocate_arguments(false),
             return_address(ra),
             args(nullptr), regset(nullptr),
             place_return_value_in(0), resolve_return_value_register(false)
@@ -37,7 +41,9 @@ class Frame {
         ~Frame() {
             // drop all pointers in arguments registers set
             // to prevent double deallocation
-            args->drop();
+            if (not deallocate_arguments) {
+                args->drop();
+            }
 
             delete args;
             delete regset;
