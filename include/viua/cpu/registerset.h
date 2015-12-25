@@ -26,6 +26,7 @@ class RegisterSet {
 
     public:
         // basic access to registers
+        Type* put(unsigned, Type*);
         Type* set(unsigned, Type*);
         Type* get(unsigned);
         Type* at(unsigned);

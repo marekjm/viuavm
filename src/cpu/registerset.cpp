@@ -17,6 +17,12 @@ template<class T> inline void copyvalue(Type* dst, Type* src) {
     static_cast<T>(dst)->value() = static_cast<T>(src)->value();
 }
 
+Type* RegisterSet::put(unsigned index, Type* object) {
+    if (index >= registerset_size) { throw new Exception("register access out of bounds: write"); }
+    registers[index] = object;
+    return object;
+}
+
 Type* RegisterSet::set(unsigned index, Type* object) {
     /** Put object inside register specified by given index.
      *
