@@ -10,7 +10,7 @@ For that you have to reference Git commit log.
 
 ----
 
-### Change catrgories
+### Change categories
 
 There are several categories of change:
 
