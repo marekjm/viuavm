@@ -261,7 +261,17 @@ bool CPU::burst() {
     if (threads[0]->trace().size() == 1 and threads.size() > 1) {
         for (decltype(threads)::size_type i = 1; i < threads.size(); ++i) {
             if ((not threads[i]->stopped()) and threads[i]->joinable() and threads[0] == threads[i]->parent()) {
-                throw new Exception("aborting execution: main/1 orphaned threads, stack corrupted");
+                ostringstream oss;
+                oss << "aborting execution: ";
+                auto trace = threads[0]->trace();
+                if (trace.size() == 0) {
+                    oss << "<unavailable> (empty trace)";
+                } else {
+                    oss << trace[(trace.size() - 1)]->function_name << '/';
+                    oss << trace[(trace.size() - 1)]->args->size();
+                }
+                oss << " orphaned threads, stack corrupted";
+                throw new Exception(oss.str());
             }
         }
     }
