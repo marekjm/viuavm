@@ -39,3 +39,7 @@ There are several categories of change:
 - enhancement: change `Thread::instruction_counter`'s type from `unsigned` to `uint64_t`
 - fix: stack traces displayed after uncaught exceptions are generated for the thread that
   the exception originated from
+- bic: machine reports the function that started a thread as orphaning thread's children,
+  this means that old "main/1 orphaning threads" changes to "__entry/0 orphaning trhreads"
+- misc: if stack is not available "<unavailable> (stack empty)" will be used when
+  machine reports that threads were orphaned,
