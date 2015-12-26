@@ -26,7 +26,7 @@
     thread 4 print_eager
 
     thjoin 4
-    ; do not join the thread to test main/1 node orphaning detection
+    ; do not join the thread to test __entry/0 orphaning detection
     ;thjoin 3
 
     izero 0
