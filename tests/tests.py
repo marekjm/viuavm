@@ -765,12 +765,14 @@ class MultithreadingTests(unittest.TestCase):
             0
         )
 
+    @unittest.skip('better exception is WIP')
     def testStackCorruptedOnMainOrphaningThreads(self):
         # this will of course generate leaks, but we are not interested in them since
         # after process termination operating system will automatically reclaim memory
         MEMORY_LEAK_CHECKS_SKIP_LIST.append(self)
         runTestSplitlines(self, 'main_orphaning_threads.asm', ['Hello multithreaded World! (2)', 'fatal: aborting execution: __entry/0 orphaned threads, stack corrupted'], 1)
 
+    @unittest.skip('better exception is WIP')
     def testStackCorruptedOnNonMainFunctionOrphaningThreads(self):
         # this will of course generate leaks, but we are not interested in them since
         # after process termination operating system will automatically reclaim memory

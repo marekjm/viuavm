@@ -5,6 +5,7 @@
 #include <viua/types/integer.h>
 #include <viua/types/exception.h>
 #include <viua/types/reference.h>
+#include <viua/types/thread.h>
 #include <viua/thread.h>
 #include <viua/cpu/cpu.h>
 using namespace std;
@@ -118,7 +119,17 @@ void Thread::pushFrame() {
 void Thread::dropFrame() {
     /** Drops top-most frame from call stack.
      */
-    delete frames.back();
+    Frame* frame = frames.back();
+
+    for (registerset_size_type i = 0; i < frame->regset->size(); ++i) {
+        if (ThreadType* t = dynamic_cast<ThreadType*>(frame->regset->at(i))) {
+            if (t->joinable()) {
+                throw new Exception("joinable thread in dropped frame");
+            }
+        }
+    }
+
+    delete frame;
     frames.pop_back();
 
     if (frames.size()) {
