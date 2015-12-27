@@ -16,6 +16,14 @@ Type* RegisterSet::put(unsigned index, Type* object) {
     return object;
 }
 
+Type* RegisterSet::pop(unsigned index) {
+    /** Pop an object from the register.
+     */
+    Type* object = at(index);
+    empty(index);
+    return object;
+}
+
 Type* RegisterSet::set(unsigned index, Type* object) {
     /** Put object inside register specified by given index.
      *
