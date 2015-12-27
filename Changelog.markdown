@@ -43,3 +43,5 @@ There are several categories of change:
   this means that old "main/1 orphaning threads" changes to "__entry/0 orphaning trhreads"
 - misc: if stack is not available "<unavailable> (stack empty)" will be used when
   machine reports that threads were orphaned,
+- enhancement: returning objects from functions has "move semantics" - there is no copy
+  operation and the object is just moved to the caller frame,
