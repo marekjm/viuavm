@@ -127,12 +127,7 @@ byte* Thread::end(byte* addr) {
         if (uregset->at(0) == nullptr) {
             throw new Exception("return value requested by frame but function did not set return register");
         }
-        if (uregset->isflagged(0, REFERENCE)) {
-            returned = uregset->get(0);
-            returned_is_reference = true;
-        } else {
-            returned = uregset->get(0)->copy();
-        }
+        returned = uregset->get(0)->copy();
     }
 
     dropFrame();
