@@ -229,6 +229,7 @@ CPU& CPU::iframe(Frame* frm, unsigned r) {
     regset = new RegisterSet(r);
 
     Thread* t = new Thread(initial_frame, this, jump_base, nullptr);
+    t->detach();
     t->priority(16);
     threads.push_back(t);
 
