@@ -17,10 +17,6 @@ class Thread;
 
 
 class ThreadType : public Type {
-    /** String type.
-     *
-     *  Designed to hold text.
-     */
     Thread* thrd;
 
     public:

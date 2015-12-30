@@ -119,7 +119,6 @@ byte* Thread::end(byte* addr) {
     addr = frames.back()->ret_address();
 
     Type* returned = nullptr;
-    bool returned_is_reference = false;
     int return_value_register = frames.back()->place_return_value_in;
     bool resolve_return_value_register = frames.back()->resolve_return_value_register;
     if (return_value_register != 0) {
@@ -127,12 +126,7 @@ byte* Thread::end(byte* addr) {
         if (uregset->at(0) == nullptr) {
             throw new Exception("return value requested by frame but function did not set return register");
         }
-        if (uregset->isflagged(0, REFERENCE)) {
-            returned = uregset->get(0);
-            returned_is_reference = true;
-        } else {
-            returned = uregset->get(0)->copy();
-        }
+        returned = uregset->pop(0);
     }
 
     dropFrame();
@@ -143,9 +137,6 @@ byte* Thread::end(byte* addr) {
             return_value_register = static_cast<Integer*>(fetch(return_value_register))->value();
         }
         place(return_value_register, returned);
-        if (returned_is_reference) {
-            uregset->flag(return_value_register, REFERENCE);
-        }
     }
 
     if (frames.size() > 0) {

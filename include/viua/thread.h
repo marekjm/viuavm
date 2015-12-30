@@ -222,7 +222,6 @@ class Thread {
              *  this thread has stopped.
              */
             is_joinable = false;
-            parent_thread = nullptr;
         }
         inline void detach() {
             /** Detach a thread.
