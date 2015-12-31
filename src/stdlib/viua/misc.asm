@@ -46,21 +46,21 @@
     arg 4 @0
     ; ...insert it at the beginning of the vector
     vinsert 2 4
-    ; free the leftover copy
-    free 4
+    ; delete the leftover copy
+    delete 4
 
     jump loop_begin
 
     .mark: loop_end
 
-    ; free the counter and
+    ; delete the counter and
     ; move params vector to 1st register
-    free 1
+    delete 1
     move 1 2
 
     ; cleanup
-    free 0
-    free 3
+    delete 0
+    delete 3
 
     leave
 .end

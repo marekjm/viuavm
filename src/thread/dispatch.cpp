@@ -136,8 +136,8 @@ byte* Thread::dispatch(byte* addr) {
         case SWAP:
             addr = swap(addr+1);
             break;
-        case FREE:
-            addr = free(addr+1);
+        case DELETE:
+            addr = opdelete(addr+1);
             break;
         case EMPTY:
             addr = empty(addr+1);

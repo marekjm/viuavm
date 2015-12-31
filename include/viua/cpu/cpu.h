@@ -31,6 +31,7 @@ class CPU {
 
     // vector of all threads machine is executing
     std::vector<Thread*> threads;
+    decltype(threads)::size_type current_thread_index;
     std::mutex threads_mtx;
 
     // Global register set
@@ -118,24 +119,27 @@ class CPU {
 
         CPU& iframe(Frame* frm = nullptr, unsigned r = DEFAULT_REGISTER_SIZE);
 
-        Thread* spawn(Frame*);
+        Thread* spawn(Frame*, Thread* parent_thread = nullptr);
 
         byte* tick(decltype(threads)::size_type thread_index = 0);
         bool burst();
 
         int run();
-        inline decltype(instruction_counter) counter() { return instruction_counter; }
+        inline decltype(instruction_counter) counter() {
+            return threads[current_thread_index]->counter();
+        }
 
         inline std::tuple<int, std::string, std::string> exitcondition() {
             return std::tuple<int, std::string, std::string>(return_code, return_exception, return_message);
         }
-        inline std::vector<Frame*> trace() { return threads[0]->trace(); }
+        inline std::vector<Frame*> trace() { return threads[current_thread_index]->trace(); }
 
         inline bool terminated() { return (terminating_exception != nullptr); }
         inline Type* terminatedBy() { return terminating_exception; }
 
         CPU():
             bytecode(nullptr), bytecode_size(0), executable_offset(0),
+            current_thread_index(0),
             regset(nullptr),
             tmp(nullptr),
             jump_base(nullptr),

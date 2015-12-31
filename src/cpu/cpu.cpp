@@ -167,9 +167,9 @@ void CPU::loadForeignLibrary(const string& module) {
 }
 
 
-Thread* CPU::spawn(Frame* frm) {
+Thread* CPU::spawn(Frame* frm, Thread* parent_thread) {
     unique_lock<std::mutex> lck{threads_mtx};
-    Thread* thrd = new Thread(frm, this, jump_base);
+    Thread* thrd = new Thread(frm, this, jump_base, parent_thread);
     thrd->begin();
     threads.push_back(thrd);
     return thrd;
@@ -228,7 +228,8 @@ CPU& CPU::iframe(Frame* frm, unsigned r) {
     // set global registers
     regset = new RegisterSet(r);
 
-    Thread* t = new Thread(initial_frame, this, jump_base);
+    Thread* t = new Thread(initial_frame, this, jump_base, nullptr);
+    t->detach();
     t->priority(16);
     threads.push_back(t);
 
@@ -250,27 +251,17 @@ bool CPU::burst() {
         return false;
     }
 
+    current_thread_index = 0;
     bool ticked = false;
-    if (not threads[0]->stopped()) {
-        ticked = true;
-        for (unsigned i = 0; i < threads[0]->priority() and not threads[0]->stopped(); ++i) {
-            threads[0]->tick();
-        }
-    }
-    if (threads[0]->trace().size() == 1 and threads.size() > 1) {
-        for (decltype(threads)::size_type i = 1; i < threads.size(); ++i) {
-            if ((not threads[i]->stopped()) and threads[i]->joinable()) {
-                throw new Exception("aborting execution: main/1 orphaned threads, stack corrupted");
-            }
-        }
-    }
 
-    decltype(threads) running_threads{threads[0]};
+    decltype(threads) running_threads;
     decltype(threads) dead_threads;
-    for (decltype(threads)::size_type i = 1; i < threads.size(); ++i) {
+    bool abort_because_of_thread_termination = false;
+    for (decltype(threads)::size_type i = 0; i < threads.size(); ++i) {
+        current_thread_index = i;
         auto th = threads[i];
 
-        if (th->stopped()) {
+        if (th->stopped() and th->joinable()) {
             // stopped but still joinable
             // we don't have to deal with "stopped and unjoinable" case here
             // because it is handled later (after ticking code)
@@ -288,6 +279,12 @@ bool CPU::burst() {
             th->tick();
         }
 
+        if (th->terminated() and not th->joinable() and th->parent() == nullptr) {
+            cout << "[thread " << th << "]: terminated by runaway exception, aborting" << endl;
+            abort_because_of_thread_termination = true;
+            break;
+        }
+
         // if the thread stopped and is not joinable declare it dead and
         // schedule for removal thus shortening the vector of running threads and
         // speeding up execution
@@ -296,6 +293,10 @@ bool CPU::burst() {
         } else {
             running_threads.push_back(th);
         }
+    }
+
+    if (abort_because_of_thread_termination) {
+        return false;
     }
 
     for (decltype(dead_threads)::size_type i = 0; i < dead_threads.size(); ++i) {
@@ -323,9 +324,9 @@ int CPU::run() {
     threads[0]->begin();
     while (burst());
 
-    if (threads[0]->terminated()) {
-        cout << "thread '0:" << hex << threads[0] << dec << "' has terminated" << endl;
-        Type* e = threads[0]->getActiveException();
+    if (current_thread_index < threads.size() and threads[current_thread_index]->terminated()) {
+        cout << "thread '0:" << hex << threads[current_thread_index] << dec << "' has terminated" << endl;
+        Type* e = threads[current_thread_index]->getActiveException();
         cout << e << endl;
 
         return_code = 1;

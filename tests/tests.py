@@ -261,6 +261,9 @@ class IntegerInstructionsTests(unittest.TestCase):
     def testIADD(self):
         runTest(self, 'add.asm', '1', 0)
 
+    def testIADDWithRReferences(self):
+        runTest(self, 'add_with_rreferences.asm', '0', 0)
+
     def testISUB(self):
         runTest(self, 'sub.asm', '1', 0)
 
@@ -453,8 +456,8 @@ class RegisterManipulationInstructionsTests(unittest.TestCase):
     def testISNULL(self):
         runTest(self, 'isnull.asm', 'true')
 
-    def testFREE(self):
-        runTest(self, 'free.asm', 'true')
+    def testDELETE(self):
+        runTest(self, 'delete.asm', 'true')
 
     def testEMPTY(self):
         runTest(self, 'empty.asm', 'true')
@@ -765,8 +768,12 @@ class MultithreadingTests(unittest.TestCase):
     def testStackCorruptedOnMainOrphaningThreads(self):
         # this will of course generate leaks, but we are not interested in them since
         # after process termination operating system will automatically reclaim memory
-        MEMORY_LEAK_CHECKS_SKIP_LIST.append(self)
-        runTestSplitlines(self, 'main_orhpaning_threads.asm', ['Hello multithreaded World! (2)', 'fatal: aborting execution: main/1 orphaned threads, stack corrupted'], 1)
+        runTestThrowsException(self, 'main_orphaning_threads.asm', 'uncaught object: Exception = joinable thread in dropped frame')
+
+    def testStackCorruptedOnNonMainFunctionOrphaningThreads(self):
+        # this will of course generate leaks, but we are not interested in them since
+        # after process termination operating system will automatically reclaim memory
+        runTestThrowsException(self, 'non_main_orphaning_threads.asm', 'uncaught object: Exception = joinable thread in dropped frame')
 
     def testGettingPriorityOfAThread(self):
         runTest(self, 'get_priority.asm', '1')

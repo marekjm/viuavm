@@ -77,4 +77,46 @@ class TypeException: public Exception {
         ~TypeException() {}
 };
 
+class UnresolvedAtomException: public Exception {
+        std::string atom;
+    public:
+        std::string type() const override {
+            return "UnresolvedAtomException";
+        }
+
+        std::string str() const override {
+            return ("atom '" + atom + "' could not be resolved");
+        }
+
+        Type* copy() const override {
+            return new UnresolvedAtomException(atom);
+        }
+
+        std::string what() const override {
+            return str();
+        }
+
+        UnresolvedAtomException(decltype(atom) a): atom(a) {}
+        ~UnresolvedAtomException() {}
+};
+
+class OperandTypeException: public Exception {
+    public:
+        std::string type() const override {
+            return "OperandTypeException";
+        }
+
+        std::string str() const override {
+            return "invalid operand type";
+        }
+
+        Type* copy() const override {
+            return new OperandTypeException();
+        }
+
+        std::string what() const override {
+            return str();
+        }
+};
+
 #endif

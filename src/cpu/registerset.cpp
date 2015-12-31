@@ -10,11 +10,18 @@
 using namespace std;
 
 
-template<class T> inline void copyvalue(Type* dst, Type* src) {
-    /** This is a short inline, template function to copy value between two `Type` pointers of the same polymorphic type.
-     *  It is used internally by CPU.
+Type* RegisterSet::put(unsigned index, Type* object) {
+    if (index >= registerset_size) { throw new Exception("register access out of bounds: write"); }
+    registers[index] = object;
+    return object;
+}
+
+Type* RegisterSet::pop(unsigned index) {
+    /** Pop an object from the register.
      */
-    static_cast<T>(dst)->value() = static_cast<T>(src)->value();
+    Type* object = at(index);
+    empty(index);
+    return object;
 }
 
 Type* RegisterSet::set(unsigned index, Type* object) {

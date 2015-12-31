@@ -32,6 +32,7 @@ class Thread {
     public:
 #endif
     CPU *cpu;
+    Thread* parent_thread;
     const std::string entry_function;
 
     bool debug;
@@ -69,7 +70,7 @@ class Thread {
     std::string return_message;     // message set by exception
 
     // FIXME: change unsigned to uint64_t
-    unsigned instruction_counter;
+    uint64_t instruction_counter;
     byte* instruction_pointer;
 
     std::queue<Type*> message_queue;
@@ -153,7 +154,7 @@ class Thread {
     byte* copy(byte*);
     byte* ref(byte*);
     byte* swap(byte*);
-    byte* free(byte*);
+    byte* opdelete(byte*);
     byte* empty(byte*);
     byte* isnull(byte*);
 
@@ -209,6 +210,10 @@ class Thread {
         byte* xtick();
         byte* tick();
 
+        Type* obtain(unsigned i) const {
+            return fetch(i);
+        }
+
         inline bool joinable() const { return is_joinable; }
         inline void join() {
             /** Join a thread with calling thread.
@@ -229,7 +234,9 @@ class Thread {
              *  Also, they will run even after the main/1 function has exited.
              */
             is_joinable = false;
+            parent_thread = nullptr;
         }
+        inline Thread* parent() const { return parent_thread; };
 
         void pass(Type* message);
 
@@ -246,14 +253,14 @@ class Thread {
         }
 
         byte* begin();
-        inline unsigned counter() { return instruction_counter; }
+        inline uint64_t counter() { return instruction_counter; }
 
         inline std::tuple<int, std::string, std::string> exitcondition() {
             return std::tuple<int, std::string, std::string>(return_code, return_exception, return_message);
         }
         inline std::vector<Frame*> trace() { return frames; }
 
-        Thread(Frame* frm, CPU *_cpu, decltype(jump_base) jb): cpu(_cpu), entry_function(frm->function_name),
+        Thread(Frame* frm, CPU *_cpu, decltype(jump_base) jb, Thread* pt): cpu(_cpu), parent_thread(pt), entry_function(frm->function_name),
             debug(false),
             regset(nullptr), uregset(nullptr), tmp(nullptr),
             jump_base(jb),

@@ -460,10 +460,10 @@ Program& Program::swap(int_op a, int_op b) {
     return (*this);
 }
 
-Program& Program::free(int_op reg) {
-    /*  Inserts free instuction.
+Program& Program::opdelete(int_op reg) {
+    /*  Inserts delete instuction.
      */
-    addr_ptr = cg::bytecode::free(addr_ptr, reg);
+    addr_ptr = cg::bytecode::opdelete(addr_ptr, reg);
     return (*this);
 }
 

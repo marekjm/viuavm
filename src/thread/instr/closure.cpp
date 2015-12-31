@@ -8,6 +8,7 @@
 #include <viua/cpu/opex.h>
 #include <viua/exceptions.h>
 #include <viua/cpu/registerset.h>
+#include <viua/operand.h>
 #include <viua/cpu/cpu.h>
 using namespace std;
 
@@ -20,38 +21,22 @@ byte* Thread::clbind(byte* addr) {
      *  contains an object bound outside of its immediate scope.
      *  Objects are not freed from registers marked as BOUND.
      */
-    int a;
-    bool ref = false;
-
-    viua::cpu::util::extractIntegerOperand(addr, ref, a);
-
-    if (ref) {
-        a = static_cast<Integer*>(fetch(a))->value();
-    }
-
-    uregset->flag(a, BIND);
-
+    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    uregset->flag(target, BIND);
     return addr;
 }
 
 byte* Thread::closure(byte* addr) {
     /** Create a closure from a function.
      */
-    int reg;
-    bool reg_ref;
-
-    viua::cpu::util::extractIntegerOperand(addr, reg_ref, reg);
-
-    string call_name = string(addr);
-    addr += (call_name.size()+1);
-
-    if (reg_ref) {
-        reg = static_cast<Integer*>(fetch(reg))->value();
-    }
-
     if (uregset != frames.back()->regset) {
         throw new Exception("creating closures from nonlocal registers is forbidden, go rethink your behaviour");
     }
+
+    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+
+    string call_name = string(addr);
+    addr += (call_name.size()+1);
 
     Closure* clsr = new Closure();
     clsr->function_name = call_name;
@@ -79,13 +64,10 @@ byte* Thread::closure(byte* addr) {
                 uregset->set(i, rf);
                 clsr->regset->set(i, rf->copy());
             }
-            /* clsr->regset->set(i, uregset->get(i)); */
-            /* clsr->regset->flag(i, REFERENCE); */
-            /* uregset->flag(i, BOUND); */
         }
     }
 
-    place(reg, clsr);
+    place(target, clsr);
 
     return addr;
 }
@@ -97,22 +79,15 @@ byte* Thread::function(byte* addr) {
      *  are can be used to pass functions as parameters and
      *  return them from other functions.
      */
-    int reg;
-    bool reg_ref;
-
-    viua::cpu::util::extractIntegerOperand(addr, reg_ref, reg);
+    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     string call_name = string(addr);
     addr += (call_name.size()+1);
 
-    if (reg_ref) {
-        reg = static_cast<Integer*>(fetch(reg))->value();
-    }
-
     Function* fn = new Function();
     fn->function_name = call_name;
 
-    place(reg, fn);
+    place(target, fn);
 
     return addr;
 }
@@ -120,15 +95,11 @@ byte* Thread::function(byte* addr) {
 byte* Thread::fcall(byte* addr) {
     /*  Call a function object.
      */
-    int fn_reg, return_value_reg;
-    bool fn_reg_ref, return_value_ref;
-
+    int return_value_reg;
+    bool return_value_ref;
     viua::cpu::util::extractIntegerOperand(addr, return_value_ref, return_value_reg);
-    viua::cpu::util::extractIntegerOperand(addr, fn_reg_ref, fn_reg);
 
-    if (fn_reg_ref) {
-        fn_reg = static_cast<Integer*>(fetch(fn_reg))->value();
-    }
+    int fn_reg = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     // FIXME: there should be a check it this is *really* a function object
     Function* fn = static_cast<Function*>(fetch(fn_reg));

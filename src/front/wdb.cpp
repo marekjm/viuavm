@@ -270,7 +270,7 @@ tuple<bool, string> if_watchpoint_local_register_write(CPU& cpu, const State& st
         opcode == VPUSH or
         opcode == BOOL or
         opcode == NOT or
-        opcode == FREE or
+        opcode == DELETE or
         opcode == EMPTY or
         opcode == TMPRO
        ) {
@@ -382,7 +382,7 @@ tuple<bool, string> if_watchpoint_global_register_write(CPU& cpu, const State& s
         opcode == VPUSH or
         opcode == BOOL or
         opcode == NOT or
-        opcode == FREE or
+        opcode == DELETE or
         opcode == EMPTY or
         opcode == TMPRO
        ) {

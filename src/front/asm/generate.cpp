@@ -373,10 +373,10 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = assembler::operands::get2(operands);
             program.swap(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
-        } else if (str::startswith(line, "free")) {
+        } else if (str::startswith(line, "delete")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
-            program.free(assembler::operands::getint(resolveregister(regno_chnk, names)));
+            program.opdelete(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "empty")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);

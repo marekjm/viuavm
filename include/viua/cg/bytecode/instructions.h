@@ -69,7 +69,7 @@ namespace cg {
         byte* copy(byte*, int_op, int_op);
         byte* ref(byte*, int_op, int_op);
         byte* swap(byte*, int_op, int_op);
-        byte* free(byte*, int_op);
+        byte* opdelete(byte*, int_op);
         byte* empty(byte*, int_op);
         byte* isnull(byte*, int_op, int_op);
         byte* ress(byte*, const std::string&);

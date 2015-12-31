@@ -3,48 +3,23 @@
 #include <viua/types/reference.h>
 #include <viua/cpu/opex.h>
 #include <viua/exceptions.h>
+#include <viua/operand.h>
 #include <viua/cpu/cpu.h>
 using namespace std;
 
 
 byte* Thread::move(byte* addr) {
-    /** Run move instruction.
-     *  Move an object from one register into another.
-     */
-    int object_operand_index, destination_register_index;
-    bool object_operand_ref = false, destination_register_ref = false;
+    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    int source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
-    viua::cpu::util::extractIntegerOperand(addr, object_operand_ref, object_operand_index);
+    uregset->move(source, target);
 
-    if (object_operand_ref) {
-        object_operand_index = static_cast<Integer*>(fetch(object_operand_index))->value();
-    }
-    if (destination_register_ref) {
-        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
-    }
-
-    uregset->move(object_operand_index, destination_register_index);
     return addr;
 }
 byte* Thread::copy(byte* addr) {
-    /** Run copy instruction.
-     *  Copy an object from one register into another.
-     */
-    int object_operand_index, destination_register_index;
-    bool object_operand_ref = false, destination_register_ref = false;
+    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
-    viua::cpu::util::extractIntegerOperand(addr, object_operand_ref, object_operand_index);
-
-    if (object_operand_ref) {
-        object_operand_index = static_cast<Integer*>(fetch(object_operand_index))->value();
-    }
-    if (destination_register_ref) {
-        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
-    }
-
-    place(destination_register_index, fetch(object_operand_index)->copy());
+    place(target, viua::operand::extract(addr)->resolve(this)->copy());
 
     return addr;
 }
@@ -82,84 +57,35 @@ byte* Thread::ref(byte* addr) {
     return addr;
 }
 byte* Thread::swap(byte* addr) {
-    /** Run swap instruction.
-     *  Swaps two objects in registers.
-     */
-    int first_operand_index, second_operand_index;
-    bool first_operand_ref = false, second_operand_ref = false;
+    int first = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    int second = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    viua::cpu::util::extractIntegerOperand(addr, first_operand_ref, first_operand_index);
-    viua::cpu::util::extractIntegerOperand(addr, second_operand_ref, second_operand_index);
+    uregset->swap(first, second);
 
-    if (first_operand_ref) {
-        first_operand_index = static_cast<Integer*>(fetch(first_operand_index))->value();
-    }
-    if (second_operand_ref) {
-        second_operand_index = static_cast<Integer*>(fetch(second_operand_index))->value();
-    }
-
-    uregset->swap(first_operand_index, second_operand_index);
     return addr;
 }
-byte* Thread::free(byte* addr) {
-    /** Run free instruction.
-     */
-    int target_register_index;
-    bool target_register_ref = false;
-
-    viua::cpu::util::extractIntegerOperand(addr, target_register_ref, target_register_index);
-
-    if (target_register_ref) {
-        target_register_index = static_cast<Integer*>(fetch(target_register_index))->value();
-    }
-
-    uregset->free(target_register_index);
-
+byte* Thread::opdelete(byte* addr) {
+    uregset->free(viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this));
     return addr;
 }
 byte* Thread::empty(byte* addr) {
     /** Run empty instruction.
      */
-    int target_register_index;
-    bool target_register_ref = false;
+    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    viua::cpu::util::extractIntegerOperand(addr, target_register_ref, target_register_index);
-
-    if (target_register_ref) {
-        target_register_index = static_cast<Integer*>(fetch(target_register_index))->value();
-    }
-
-    Type* object = uregset->get(target_register_index);
+    Type* object = uregset->get(target);
     if (Reference* rf = dynamic_cast<Reference*>(object)) {
         delete rf;
     }
-    uregset->empty(target_register_index);
+    uregset->empty(target);
 
     return addr;
 }
 byte* Thread::isnull(byte* addr) {
-    /** Run isnull instruction.
-     *
-     * Example:
-     *
-     *      isnull checked_register_index, B
-     *
-     * the above means: "check if checked_register_index is null and store the information in B".
-     */
-    int checked_register_index, destination_register_index;
-    bool checked_register_ref = false, destination_register_ref = false;
+    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    int source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
-    viua::cpu::util::extractIntegerOperand(addr, checked_register_ref, checked_register_index);
-
-    if (checked_register_ref) {
-        checked_register_index = static_cast<Integer*>(fetch(checked_register_index))->value();
-    }
-    if (destination_register_ref) {
-        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
-    }
-
-    place(destination_register_index, new Boolean(uregset->at(checked_register_index) == nullptr));
+    place(target, new Boolean(uregset->at(source) == nullptr));
 
     return addr;
 }
@@ -191,45 +117,25 @@ byte* Thread::ress(byte* addr) {
 }
 
 byte* Thread::tmpri(byte* addr) {
-    /** Run tmpri instruction.
-     */
-    int object_operand_index;
-    bool object_operand_ref = false;
-
-    viua::cpu::util::extractIntegerOperand(addr, object_operand_ref, object_operand_index);
-
-    if (object_operand_ref) {
-        object_operand_index = static_cast<Integer*>(fetch(object_operand_index))->value();
-    }
-
     // FIXME: mutex (VERY IMPORTANT!!!)
     if (cpu->tmp != nullptr) {
         cout << "warning: CPU: storing in non-empty temporary register: memory has been leaked" << endl;
     }
-    cpu->tmp = uregset->get(object_operand_index)->copy();
+    cpu->tmp = viua::operand::extract(addr)->resolve(this)->copy();
 
     return addr;
 }
 byte* Thread::tmpro(byte* addr) {
-    /** Run tmpro instruction.
-     */
-    int destination_register_index;
-    bool destination_register_ref = false;
+    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
-
-    if (destination_register_ref) {
-        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
-    }
-
-    if (uregset->at(destination_register_index) != nullptr) {
+    if (uregset->at(target) != nullptr) {
         if (cpu->errors) {
             cerr << "warning: CPU: droping from temporary into non-empty register: possible references loss and register corruption" << endl;
         }
-        uregset->free(destination_register_index);
+        uregset->free(target);
     }
     // FIXME: mutex (VERY IMPORTANT!!!)
-    uregset->set(destination_register_index, cpu->tmp);
+    uregset->set(target, cpu->tmp);
     cpu->tmp = nullptr;
 
     return addr;

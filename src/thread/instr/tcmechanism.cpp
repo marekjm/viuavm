@@ -1,6 +1,7 @@
 #include <viua/types/integer.h>
 #include <viua/cpu/opex.h>
 #include <viua/exceptions.h>
+#include <viua/operand.h>
 #include <viua/cpu/cpu.h>
 using namespace std;
 
@@ -18,11 +19,8 @@ byte* Thread::vmtry(byte* addr) {
 byte* Thread::vmcatch(byte* addr) {
     /** Run catch instruction.
      */
-    string type_name = string(addr);
-    addr += (type_name.size()+1);
-
-    string catcher_block_name = string(addr);
-    addr += (catcher_block_name.size()+1);
+    string type_name = viua::operand::extractString(addr);
+    string catcher_block_name = viua::operand::extractString(addr);
 
     bool block_found = (cpu->block_addresses.count(catcher_block_name) or cpu->linked_blocks.count(catcher_block_name));
     if (not block_found) {
@@ -32,10 +30,8 @@ byte* Thread::vmcatch(byte* addr) {
     byte* block_address = nullptr;
     if (cpu->block_addresses.count(catcher_block_name)) {
         block_address = cpu->bytecode+cpu->block_addresses.at(catcher_block_name);
-        jump_base = cpu->bytecode;
     } else {
         block_address = cpu->linked_blocks.at(catcher_block_name).second;
-        jump_base = cpu->linked_modules.at(cpu->linked_blocks.at(catcher_block_name).first).second;
     }
 
     try_frame_new->catchers[type_name] = new Catcher(type_name, catcher_block_name, block_address);
@@ -46,19 +42,12 @@ byte* Thread::vmcatch(byte* addr) {
 byte* Thread::pull(byte* addr) {
     /** Run pull instruction.
      */
-    int destination_register_index;
-    bool destination_register_ref = false;
-
-    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
-
-    if (destination_register_ref) {
-        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
-    }
+    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     if (caught == nullptr) {
         throw new Exception("no caught object to pull");
     }
-    uregset->set(destination_register_index, caught);
+    uregset->set(target, caught);
     caught = nullptr;
 
     return addr;
@@ -96,28 +85,21 @@ byte* Thread::vmenter(byte* addr) {
 byte* Thread::vmthrow(byte* addr) {
     /** Run throw instruction.
      */
-    int source_register_index;
-    bool source_register_ref = false;
+    int source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    viua::cpu::util::extractIntegerOperand(addr, source_register_ref, source_register_index);
-
-    if (source_register_ref) {
-        source_register_index = static_cast<Integer*>(fetch(source_register_index))->value();
-    }
-
-    if (unsigned(source_register_index) >= uregset->size()) {
+    if (unsigned(source) >= uregset->size()) {
         ostringstream oss;
-        oss << "invalid read: register out of bounds: " <<source_register_index;
+        oss << "invalid read: register out of bounds: " << source;
         throw new Exception(oss.str());
     }
-    if (uregset->at(source_register_index) == nullptr) {
+    if (uregset->at(source) == nullptr) {
         ostringstream oss;
-        oss << "invalid throw: register " << source_register_index << " is empty";
+        oss << "invalid throw: register " << source << " is empty";
         throw new Exception(oss.str());
     }
 
-    uregset->setmask(source_register_index, KEEP);  // set correct mask
-    thrown = uregset->get(source_register_index);
+    thrown = uregset->get(source);
+    uregset->empty(source);
 
     return addr;
 }

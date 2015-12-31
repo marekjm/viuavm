@@ -115,7 +115,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case ECHO:
         case BOOL:
         case NOT:
-        case FREE:
+        case DELETE:
         case EMPTY:
         case TMPRI:
         case TMPRO:
