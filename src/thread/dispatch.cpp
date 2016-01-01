@@ -133,6 +133,9 @@ byte* Thread::dispatch(byte* addr) {
         case REF:
             addr = ref(addr+1);
             break;
+        case PTR:
+            addr = opptr(addr+1);
+            break;
         case SWAP:
             addr = swap(addr+1);
             break;
