@@ -68,7 +68,7 @@ class Type {
 
         // We need to construct and destroy our basic object.
         Type() {}
-        virtual ~Type() {}
+        virtual ~Type();
 };
 
 
