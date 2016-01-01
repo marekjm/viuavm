@@ -520,6 +520,11 @@ namespace cg {
             return addr_ptr;
         }
 
+        byte* opptr(byte* addr_ptr, int_op a, int_op b) {
+            addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, PTR, a, b);
+            return addr_ptr;
+        }
+
         byte* swap(byte* addr_ptr, int_op a, int_op b) {
             /*  Inserts swap instruction to bytecode.
              *
