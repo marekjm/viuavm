@@ -448,6 +448,11 @@ Program& Program::ref(int_op a, int_op b) {
     return (*this);
 }
 
+Program& Program::opptr(int_op a, int_op b) {
+    addr_ptr = cg::bytecode::opptr(addr_ptr, a, b);
+    return (*this);
+}
+
 Program& Program::swap(int_op a, int_op b) {
     /*  Inserts swap instruction to bytecode.
      *

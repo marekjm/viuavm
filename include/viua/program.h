@@ -97,6 +97,7 @@ class Program {
     Program& move       (int_op, int_op);
     Program& copy       (int_op, int_op);
     Program& ref        (int_op, int_op);
+    Program& opptr      (int_op, int_op);
     Program& swap       (int_op, int_op);
     Program& ress       (std::string);
     Program& tmpri      (int_op);
