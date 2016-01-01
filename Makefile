@@ -99,10 +99,16 @@ uninstall:
 
 ############################################################
 # PLATFORM OBJECT FILES
-platform: build/platform/exception.o build/platform/string.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/reference.o
+platform: build/platform/exception.o build/platform/string.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/reference.o build/platform/type.o build/platform/pointer.o
 
 build/platform/exception.o: src/types/exception.cpp
 	${CXX} -std=c++11 -fPIC -c -I./include -o ./build/platform/exception.o src/types/exception.cpp
+
+build/platform/type.o: src/types/type.cpp
+	${CXX} -std=c++11 -fPIC -c -I./include -o ./build/platform/type.o src/types/type.cpp
+
+build/platform/pointer.o: src/types/pointer.cpp
+	${CXX} -std=c++11 -fPIC -c -I./include -o ./build/platform/pointer.o src/types/pointer.cpp
 
 build/platform/string.o: src/types/string.cpp
 	${CXX} -std=c++11 -fPIC -c -I./include -o ./build/platform/string.o src/types/string.cpp
@@ -131,8 +137,8 @@ build/test/World.so: build/test/World.o
 build/test/math.o:  sample/asm/external/math.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -fPIC -o build/test/math.o ./sample/asm/external/math.cpp
 
-build/test/math.so: build/test/math.o build/platform/registerset.o build/platform/exception.o
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -fPIC -shared -o build/test/math.so build/test/math.o ./build/platform/registerset.o ./build/platform/exception.o
+build/test/math.so: build/test/math.o build/platform/registerset.o build/platform/exception.o build/platform/type.o build/platform/pointer.o
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -fPIC -shared -o build/test/math.so build/test/math.o ./build/platform/registerset.o ./build/platform/exception.o build/platform/type.o build/platform/pointer.o
 
 compile-test: build/test/math.so build/test/World.so
 
@@ -182,10 +188,10 @@ build/operand.o: src/operand.cpp
 build/assert.o: src/assert.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $^
 
-build/bin/vm/cpu: build/cpu.o build/cpu/cpu.o build/operand.o build/assert.o build/thread.o build/thread/dispatch.o build/cpu/opex.o build/cpu/registserset.o build/cpu/frame.o build/loader.o build/printutils.o build/support/pointer.o build/support/string.o build/support/env.o ${VIUA_THREAD_INSTR_FILES_O} build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o build/types/prototype.o build/types/object.o build/types/reference.o build/types/thread.o
+build/bin/vm/cpu: build/cpu.o build/cpu/cpu.o build/operand.o build/assert.o build/thread.o build/thread/dispatch.o build/cpu/opex.o build/cpu/registserset.o build/cpu/frame.o build/loader.o build/printutils.o build/support/pointer.o build/support/string.o build/support/env.o ${VIUA_THREAD_INSTR_FILES_O} build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o build/types/prototype.o build/types/object.o build/types/reference.o build/types/thread.o build/types/type.o build/types/pointer.o
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} ${DYNAMIC_SYMS} -o $@ $^ $(LIBDL)
 
-build/bin/vm/vdb: build/wdb.o build/lib/linenoise.o build/cpu/cpu.o build/operand.o build/assert.o build/thread.o build/thread/dispatch.o build/cpu/opex.o build/cpu/registserset.o build/cpu/frame.o build/loader.o build/cg/disassembler/disassembler.o build/printutils.o build/support/pointer.o build/support/string.o build/support/env.o ${VIUA_THREAD_INSTR_FILES_O} build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o build/types/prototype.o build/types/object.o build/types/reference.o build/types/thread.o
+build/bin/vm/vdb: build/wdb.o build/lib/linenoise.o build/cpu/cpu.o build/operand.o build/assert.o build/thread.o build/thread/dispatch.o build/cpu/opex.o build/cpu/registserset.o build/cpu/frame.o build/loader.o build/cg/disassembler/disassembler.o build/printutils.o build/support/pointer.o build/support/string.o build/support/env.o ${VIUA_THREAD_INSTR_FILES_O} build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o build/types/prototype.o build/types/object.o build/types/reference.o build/types/thread.o build/types/type.o build/types/pointer.o
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} ${DYNAMIC_SYMS} -o $@ $^ $(LIBDL)
 
 build/bin/vm/asm: build/asm.o build/asm/generate.o build/asm/gather.o build/asm/decode.o build/program.o build/programinstructions.o build/cg/tokenizer/tokenize.o build/cg/assembler/operands.o build/cg/assembler/ce.o build/cg/assembler/verify.o build/cg/bytecode/instructions.o build/loader.o build/support/string.o build/support/env.o
@@ -227,17 +233,18 @@ build/stdlib/random.o: src/stdlib/random.cpp
 build/stdlib/kitchensink.o: src/stdlib/kitchensink.cpp
 	${CXX} -std=c++11 -fPIC -c -I./include -o $@ $<
 
-build/stdlib/typesystem.so: build/stdlib/typesystem.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o
+build/stdlib/typesystem.so: build/stdlib/typesystem.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o build/platform/type.o build/platform/pointer.o
 	${CXX} -std=c++11 -fPIC -shared -o $@ $^
 
-build/stdlib/io.so: build/stdlib/io.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o
+build/stdlib/io.so: build/stdlib/io.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o build/platform/type.o build/platform/pointer.o
 	${CXX} -std=c++11 -fPIC -shared -o $@ $^
 
-build/stdlib/random.so: build/stdlib/random.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o
+build/stdlib/random.so: build/stdlib/random.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o build/platform/type.o build/platform/pointer.o
 	${CXX} -std=c++11 -fPIC -shared -o $@ $^
 
-build/stdlib/kitchensink.so: build/stdlib/kitchensink.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o
+build/stdlib/kitchensink.so: build/stdlib/kitchensink.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o build/platform/type.o build/platform/pointer.o
 	${CXX} -std=c++11 -fPIC -shared -o $@ $^
+
 
 ############################################################
 # OPCODE LISTER PROGRAM
@@ -275,6 +282,12 @@ build/types/prototype.o: src/types/prototype.cpp include/viua/types/prototype.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
 build/types/object.o: src/types/object.cpp include/viua/types/object.h
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+
+build/types/type.o: src/types/type.cpp include/viua/types/type.h
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+
+build/types/pointer.o: src/types/pointer.cpp include/viua/types/pointer.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
 build/types/reference.o: src/types/reference.cpp include/viua/types/reference.h
