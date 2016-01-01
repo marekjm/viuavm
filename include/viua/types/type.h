@@ -8,6 +8,8 @@
 #include <vector>
 
 
+class Pointer;
+
 class Type {
     /** Base class for all derived types.
      *  Viua uses an object-based hierarchy to allow easier storage in registers and
@@ -16,6 +18,9 @@ class Type {
      *  Instead of void* Viua holds Type* so when registers are delete'ed proper destructor
      *  is always called.
      */
+    friend class Pointer;
+    std::vector<Pointer*> pointers;
+
     public:
         /** Basic interface of a Type.
          *
@@ -49,6 +54,8 @@ class Type {
              */
             return false;
         }
+
+        virtual Pointer* pointer();
 
         virtual std::vector<std::string> bases() const {
             return std::vector<std::string>{"Type"};
