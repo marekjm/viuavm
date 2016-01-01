@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <algorithm>
 #include <viua/types/type.h>
 #include <viua/types/pointer.h>
 #include <viua/types/exception.h>

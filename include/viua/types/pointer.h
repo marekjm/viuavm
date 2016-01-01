@@ -4,7 +4,6 @@
 #pragma once
 
 #include <vector>
-#include <algorithm>
 #include <viua/types/type.h>
 
 
