@@ -1,4 +1,5 @@
 #include <iostream>
+#include <viua/types/pointer.h>
 #include <viua/types/boolean.h>
 #include <viua/types/reference.h>
 #include <viua/cpu/opex.h>
@@ -53,6 +54,13 @@ byte* Thread::ref(byte* addr) {
         uregset->set(object_operand_index, rf);
         uregset->set(destination_register_index, rf->copy());
     }
+
+    return addr;
+}
+byte* Thread::opptr(byte* addr) {
+    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+
+    place(target, viua::operand::extract(addr)->resolve(this)->pointer());
 
     return addr;
 }
