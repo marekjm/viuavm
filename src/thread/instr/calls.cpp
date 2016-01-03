@@ -101,9 +101,24 @@ byte* Thread::call(byte* addr) {
 
     bool is_native = (cpu->function_addresses.count(call_name) or cpu->linked_functions.count(call_name));
     bool is_foreign = cpu->foreign_functions.count(call_name);
+    bool is_foreign_method = cpu->foreign_methods.count(call_name);
 
-    if (not (is_native or is_foreign)) {
+    if (not (is_native or is_foreign or is_foreign_method)) {
         throw new Exception("call to undefined function: " + call_name);
+    }
+
+    if (is_foreign_method) {
+        if (frame_new == nullptr) {
+            throw new Exception("cannot call foreign method without a frame");
+        }
+        if (frame_new->args->size() == 0) {
+            throw new Exception("cannot call foreign method using empty frame");
+        }
+        if (frame_new->args->at(0) == nullptr) {
+            throw new Exception("frame must have at least one argument when used to call a foreign method");
+        }
+        Type* obj = frame_new->args->at(0);
+        return callForeignMethod(addr, obj, call_name, return_register_ref, return_register_index, call_name);
     }
 
     auto caller = (is_native ? &Thread::callNative : &Thread::callForeign);
