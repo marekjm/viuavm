@@ -36,6 +36,7 @@ class Pointer: public Type {
 
         Type* copy() const override;
 
+        Pointer();
         Pointer(Type* t);
         virtual ~Pointer();
 };

@@ -72,6 +72,7 @@ void Pointer::expired(Frame* frm, RegisterSet*, RegisterSet*) {
 }
 
 
+Pointer::Pointer(): points_to(nullptr), valid(false) {}
 Pointer::Pointer(Type* t): points_to(t), valid(true) {
     attach();
 }
