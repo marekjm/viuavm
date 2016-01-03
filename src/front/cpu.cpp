@@ -7,6 +7,7 @@
 #include <viua/version.h>
 #include <viua/support/string.h>
 #include <viua/support/env.h>
+#include <viua/types/pointer.h>
 #include <viua/types/exception.h>
 #include <viua/types/string.h>
 #include <viua/types/thread.h>
@@ -153,6 +154,11 @@ int main(int argc, char* argv[]) {
     cpu.registerForeignMethod("Thread::getPriority", static_cast<ForeignMethodMemberPointer>(&ThreadType::getPriority));
     cpu.registerForeignMethod("Thread::setPriority", static_cast<ForeignMethodMemberPointer>(&ThreadType::setPriority));
     cpu.registerForeignMethod("Thread::pass", static_cast<ForeignMethodMemberPointer>(&ThreadType::pass));
+
+    Prototype* proto_pointer = new Prototype("Pointer");
+    proto_pointer->attach("Pointer::expired", "expired");
+    cpu.registerForeignPrototype("Pointer", proto_pointer);
+    cpu.registerForeignMethod("Pointer::expired", static_cast<ForeignMethodMemberPointer>(&Pointer::expired));
 
     try {
         cpu.run();
