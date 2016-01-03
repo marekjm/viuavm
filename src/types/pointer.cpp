@@ -50,6 +50,14 @@ bool Pointer::boolean() const {
     return valid;
 }
 
+string Pointer::str() const {
+    if (valid) {
+        return type();
+    } else {
+        return "ExpiredPointer";
+    }
+}
+
 Type* Pointer::copy() const {
     if (not valid) {
         throw new Exception("expired pointer exception");
