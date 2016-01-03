@@ -369,6 +369,10 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = assembler::operands::get2(operands);
             program.ref(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
+        } else if (str::startswith(line, "ptr")) {
+            string a_chnk, b_chnk;
+            tie(a_chnk, b_chnk) = assembler::operands::get2(operands);
+            program.opptr(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "swap")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = assembler::operands::get2(operands);
