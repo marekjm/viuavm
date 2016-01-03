@@ -46,11 +46,17 @@ byte* Thread::vmmsg(byte* addr) {
     string method_name = string(addr);
 
     Type* obj = frame_new->args->at(0);
+    if (cpu->typesystem.count(obj->type()) == 0) {
+        throw new Exception("unregistered type cannot be used for dynamic dispatch: " + obj->type());
+    }
     vector<string> mro = cpu->inheritanceChainOf(obj->type());
     mro.insert(mro.begin(), obj->type());
 
     string function_name = "";
     for (unsigned i = 0; i < mro.size(); ++i) {
+        if (cpu->typesystem.count(mro[i]) == 0) {
+            throw new Exception("unavailable base type in inheritance hierarchy of " + mro[0] + ": " + mro[i]);
+        }
         if (cpu->typesystem.at(mro[i])->accepts(method_name)) {
             function_name = cpu->typesystem.at(mro[i])->resolvesTo(method_name);
             break;
