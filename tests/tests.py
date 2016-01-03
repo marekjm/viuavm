@@ -833,6 +833,13 @@ class TypeStringTests(unittest.TestCase):
         runTest(self, 'endswith.asm', 'true\nfalse')
 
 
+class TypePointerTests(unittest.TestCase):
+    PATH = './sample/types/Pointer'
+
+    def testCheckingIfIsExpired(self):
+        runTestNoDisassemblyRerun(self, 'check_if_is_expired.asm', 'expired: false\nexpired: true')
+
+
 class RuntimeAssertionsTests(unittest.TestCase):
     PATH = './sample/vm_runtime_assertions'
 
