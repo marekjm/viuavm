@@ -33,6 +33,9 @@ void Pointer::reset(Type* t) {
     attach();
 }
 Type* Pointer::to() {
+    if (not valid) {
+        throw new Exception("expired pointer exception");
+    }
     return points_to;
 }
 
