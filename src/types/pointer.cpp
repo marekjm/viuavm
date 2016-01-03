@@ -61,9 +61,10 @@ string Pointer::str() const {
 
 Type* Pointer::copy() const {
     if (not valid) {
-        throw new Exception("expired pointer exception");
+        return new Pointer();
+    } else {
+        return new Pointer(points_to);
     }
-    return new Pointer(points_to);
 }
 
 
