@@ -3,6 +3,7 @@
 #include <sstream>
 #include <algorithm>
 #include <viua/types/type.h>
+#include <viua/types/boolean.h>
 #include <viua/types/pointer.h>
 #include <viua/types/exception.h>
 using namespace std;
@@ -64,6 +65,12 @@ Type* Pointer::copy() const {
     }
     return new Pointer(points_to);
 }
+
+
+void Pointer::expired(Frame* frm, RegisterSet*, RegisterSet*) {
+    frm->regset->set(0, new Boolean(expired()));
+}
+
 
 Pointer::Pointer(Type* t): points_to(t), valid(true) {
     attach();

@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <viua/types/type.h>
+#include <viua/cpu/frame.h>
 
 
 class Pointer: public Type {
@@ -18,6 +19,10 @@ class Pointer: public Type {
         bool expired();
         void reset(Type* t);
         Type* to();
+
+        virtual void expired(Frame*, RegisterSet*, RegisterSet*);
+
+        std::string str() const override;
 
         std::string type() const override;
         bool boolean() const override;
