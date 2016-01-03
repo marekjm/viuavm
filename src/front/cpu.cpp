@@ -212,7 +212,15 @@ int main(int argc, char* argv[]) {
                 for (unsigned r = 0; r < last->args->size(); ++r) {
                     if (last->args->at(r) == nullptr) { continue; }
                     cout << "    arguments[" << r << "]: ";
-                    cout << '<' << last->args->get(r)->type() << "> " << last->args->get(r)->str() << endl;
+                    if (Pointer* ptr = dynamic_cast<Pointer*>(last->args->get(r))) {
+                        if (ptr->expired()) {
+                            cout << "<ExpiredPointer>" << endl;
+                        } else {
+                            cout << '<' << ptr->type() << '>' << endl;
+                        }
+                    } else {
+                        cout << '<' << last->args->get(r)->type() << "> " << last->args->get(r)->str() << endl;
+                    }
                 }
             } else {
                 cout << "  no arguments were passed to this frame" << endl;
