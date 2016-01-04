@@ -1,6 +1,7 @@
 #include <iostream>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/types/integer.h>
+#include <viua/types/pointer.h>
 #include <viua/types/object.h>
 #include <viua/cpu/opex.h>
 #include <viua/exceptions.h>
@@ -46,6 +47,9 @@ byte* Thread::vmmsg(byte* addr) {
     string method_name = string(addr);
 
     Type* obj = frame_new->args->at(0);
+    if (Pointer* ptr = dynamic_cast<Pointer*>(obj)) {
+        obj = ptr->to();
+    }
     if (cpu->typesystem.count(obj->type()) == 0) {
         throw new Exception("unregistered type cannot be used for dynamic dispatch: " + obj->type());
     }
