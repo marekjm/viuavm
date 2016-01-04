@@ -13,7 +13,9 @@
 ; Code
 ;
 .function: std::string::stringify
-    frame ^[(paref 0 (strstore 1 "")) (paref 1 (arg 2 0))]
+    ptr 2 (strstore 1 "")
+    ptr 4 (arg 3 0)
+    frame ^[(param 0 2) (param 1 4)]
     msg 0 stringify
     move 0 1
     end

@@ -45,3 +45,4 @@ There are several categories of change:
   machine reports that threads were orphaned,
 - enhancement: returning objects from functions has "move semantics" - there is no copy
   operation and the object is just moved to the caller frame,
+- bic: `String::stringify()` foreign method takes pointer to an object as its second argument,
