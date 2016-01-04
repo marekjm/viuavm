@@ -217,12 +217,7 @@ byte* Thread::callForeign(byte* addr, const string& call_name, const bool& retur
         if (uregset->at(0) == nullptr) {
             throw new Exception("return value requested by frame but external function did not set return register");
         }
-        if (uregset->isflagged(0, REFERENCE)) {
-            returned = uregset->get(0);
-            returned_is_reference = true;
-        } else {
-            returned = uregset->pop(0);
-        }
+        returned = uregset->pop(0);
     }
 
     dropFrame();
@@ -290,12 +285,7 @@ byte* Thread::callForeignMethod(byte* addr, Type* object, const string& call_nam
         if (uregset->at(0) == nullptr) {
             throw new Exception("return value requested by frame but foreign method did not set return register");
         }
-        if (uregset->isflagged(0, REFERENCE)) {
-            returned = uregset->get(0);
-            returned_is_reference = true;
-        } else {
-            returned = uregset->pop(0);
-        }
+        returned = uregset->pop(0);
     }
 
     dropFrame();
