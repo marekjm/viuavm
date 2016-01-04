@@ -7,6 +7,7 @@
 #include <viua/version.h>
 #include <viua/support/string.h>
 #include <viua/support/env.h>
+#include <viua/types/pointer.h>
 #include <viua/types/exception.h>
 #include <viua/types/string.h>
 #include <viua/types/thread.h>
@@ -154,6 +155,11 @@ int main(int argc, char* argv[]) {
     cpu.registerForeignMethod("Thread::setPriority", static_cast<ForeignMethodMemberPointer>(&ThreadType::setPriority));
     cpu.registerForeignMethod("Thread::pass", static_cast<ForeignMethodMemberPointer>(&ThreadType::pass));
 
+    Prototype* proto_pointer = new Prototype("Pointer");
+    proto_pointer->attach("Pointer::expired", "expired");
+    cpu.registerForeignPrototype("Pointer", proto_pointer);
+    cpu.registerForeignMethod("Pointer::expired", static_cast<ForeignMethodMemberPointer>(&Pointer::expired));
+
     try {
         cpu.run();
     } catch (const Exception* e) {
@@ -206,7 +212,15 @@ int main(int argc, char* argv[]) {
                 for (unsigned r = 0; r < last->args->size(); ++r) {
                     if (last->args->at(r) == nullptr) { continue; }
                     cout << "    arguments[" << r << "]: ";
-                    cout << '<' << last->args->get(r)->type() << "> " << last->args->get(r)->str() << endl;
+                    if (Pointer* ptr = dynamic_cast<Pointer*>(last->args->get(r))) {
+                        if (ptr->expired()) {
+                            cout << "<ExpiredPointer>" << endl;
+                        } else {
+                            cout << '<' << ptr->type() << '>' << endl;
+                        }
+                    } else {
+                        cout << '<' << last->args->get(r)->type() << "> " << last->args->get(r)->str() << endl;
+                    }
                 }
             } else {
                 cout << "  no arguments were passed to this frame" << endl;

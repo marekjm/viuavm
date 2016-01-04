@@ -8,9 +8,9 @@
     new 1 Object
 
     ; obtain string representation of the object
-    ; note the pass-by-reference used to avoid copying since
+    ; note the pass-by-pointer used to avoid copying since
     ; we want to get string representation of exactly the same object
-    frame ^[(paref 0 1)]
+    frame ^[(param 0 (ptr 3 1))]
     call 2 std::string::represent
 
     ; this should print two, exactly same lines

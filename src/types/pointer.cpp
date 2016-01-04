@@ -3,6 +3,7 @@
 #include <sstream>
 #include <algorithm>
 #include <viua/types/type.h>
+#include <viua/types/boolean.h>
 #include <viua/types/pointer.h>
 #include <viua/types/exception.h>
 using namespace std;
@@ -33,6 +34,9 @@ void Pointer::reset(Type* t) {
     attach();
 }
 Type* Pointer::to() {
+    if (not valid) {
+        throw new Exception("expired pointer exception");
+    }
     return points_to;
 }
 
@@ -47,13 +51,29 @@ bool Pointer::boolean() const {
     return valid;
 }
 
-Type* Pointer::copy() const {
-    if (not valid) {
-        throw new Exception("expired pointer exception");
+string Pointer::str() const {
+    if (valid) {
+        return type();
+    } else {
+        return "ExpiredPointer";
     }
-    return new Pointer(points_to);
 }
 
+Type* Pointer::copy() const {
+    if (not valid) {
+        return new Pointer();
+    } else {
+        return new Pointer(points_to);
+    }
+}
+
+
+void Pointer::expired(Frame* frm, RegisterSet*, RegisterSet*) {
+    frm->regset->set(0, new Boolean(expired()));
+}
+
+
+Pointer::Pointer(): points_to(nullptr), valid(false) {}
 Pointer::Pointer(Type* t): points_to(t), valid(true) {
     attach();
 }

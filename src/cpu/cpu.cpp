@@ -178,6 +178,10 @@ Thread* CPU::spawn(Frame* frm, Thread* parent_thread) {
 vector<string> CPU::inheritanceChainOf(const string& type_name) {
     /** This methods returns full inheritance chain of a type.
      */
+    if (typesystem.count(type_name) == 0) {
+        // FIXME: better exception message
+        throw new Exception("unregistered type: " + type_name);
+    }
     vector<string> ichain = typesystem.at(type_name)->getAncestors();
     for (unsigned i = 0; i < ichain.size(); ++i) {
         vector<string> sub_ichain = inheritanceChainOf(ichain[i]);
