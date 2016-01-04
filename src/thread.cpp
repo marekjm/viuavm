@@ -221,7 +221,7 @@ byte* Thread::callForeign(byte* addr, const string& call_name, const bool& retur
             returned = uregset->get(0);
             returned_is_reference = true;
         } else {
-            returned = uregset->get(0)->copy();
+            returned = uregset->pop(0);
         }
     }
 
@@ -294,7 +294,7 @@ byte* Thread::callForeignMethod(byte* addr, Type* object, const string& call_nam
             returned = uregset->get(0);
             returned_is_reference = true;
         } else {
-            returned = uregset->get(0)->copy();
+            returned = uregset->pop(0);
         }
     }
 
