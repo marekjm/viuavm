@@ -46,3 +46,4 @@ There are several categories of change:
 - enhancement: returning objects from functions has "move semantics" - there is no copy
   operation and the object is just moved to the caller frame,
 - bic: `String::stringify()` foreign method takes pointer to an object as its second argument,
+- bic: `String::represent()` foreign method takes pointer to an object as its second argument,

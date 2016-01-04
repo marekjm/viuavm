@@ -62,7 +62,7 @@ void String::represent(Frame* frame, RegisterSet*, RegisterSet*) {
     if (frame->args->size() < 2) {
         throw new Exception("expected 2 parameters");
     }
-    svalue = frame->args->at(1)->repr();
+    svalue = static_cast<Pointer*>(frame->args->at(1))->to()->str();
 }
 
 void String::startswith(Frame* frame, RegisterSet*, RegisterSet*) {
