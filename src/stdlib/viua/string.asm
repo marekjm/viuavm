@@ -13,18 +13,14 @@
 ; Code
 ;
 .function: std::string::stringify
-    ptr 2 (strstore 1 "")
-    ptr 4 (arg 3 0)
-    frame ^[(param 0 2) (param 1 4)]
+    frame ^[(param 0 (ptr 2 (strstore 1 ""))) (param 1 (ptr 4 (arg 3 0)))]
     msg 0 stringify
     move 0 1
     end
 .end
 
 .function: std::string::represent
-    ptr 2 (strstore 1 "")
-    ptr 4 (arg 3 0)
-    frame ^[(param 0 2) (param 1 4)]
+    frame ^[(param 0 (ptr 2 (strstore 1 ""))) (param 1 (ptr 4 (arg 3 0)))]
     msg 0 represent
     move 0 1
     end
