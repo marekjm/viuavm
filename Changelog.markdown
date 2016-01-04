@@ -47,3 +47,5 @@ There are several categories of change:
   operation and the object is just moved to the caller frame,
 - bic: `String::stringify()` foreign method takes pointer to an object as its second argument,
 - bic: `String::represent()` foreign method takes pointer to an object as its second argument,
+- bic: `std::string::stringify` takes pointer to object to stringify instead of a reference,
+  this makes the objects stay within VM's scope-based memory management system,
