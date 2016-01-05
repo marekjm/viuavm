@@ -690,6 +690,9 @@ class PrototypeSystemTests(unittest.TestCase):
     def testCatchingObjectsUsingMultipleInheritanceWithNoSharedBases(self):
         runTest(self, 'multiple_inheritance_with_no_shared_base_classes.asm', "<'Combined' object at", 0, lambda o: ' '.join(o.split()[:-1]))
 
+    def testCatchingObjectsUsingMultipleInheritanceWithSharedBases(self):
+        runTest(self, 'shared_bases.asm', "<'Combined' object at", 0, lambda o: ' '.join(o.split()[:-1]))
+
     def testDynamicDispatch(self):
         global MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES
         # FIXME: Valgrind freaks out about dlopen() leaks, comment this line if you know what to do about it
