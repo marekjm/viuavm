@@ -86,7 +86,11 @@ byte* Thread::arg(byte* addr) {
         throw new Exception(oss.str());
     }
 
-    uregset->set(destination_register_index, frames.back()->args->get(parameter_no_operand_index)->copy());
+    if (frames.back()->args->isflagged(parameter_no_operand_index, MOVED)) {
+        uregset->set(destination_register_index, frames.back()->args->pop(parameter_no_operand_index));
+    } else {
+        uregset->set(destination_register_index, frames.back()->args->get(parameter_no_operand_index)->copy());
+    }
 
     return addr;
 }
