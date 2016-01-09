@@ -117,6 +117,7 @@ class Program {
 
     Program& frame      (int_op, int_op);
     Program& param      (int_op, int_op);
+    Program& oppamv     (int_op, int_op);
     Program& paref      (int_op, int_op);
     Program& arg        (int_op, int_op);
     Program& argc       (int_op);
