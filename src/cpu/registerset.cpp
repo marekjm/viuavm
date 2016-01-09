@@ -263,8 +263,6 @@ RegisterSet::~RegisterSet() {
         // after going out of scope
         if (isflagged(i, (KEEP | REFERENCE | BOUND))) { continue; }
 
-        // FIXME: remove this print
-        //cout << "deleting: " << registers[i]->type() << " at " << hex << registers[i] << dec << endl;
         delete registers[i];
     }
     if (registers != nullptr) { delete[] registers; }
