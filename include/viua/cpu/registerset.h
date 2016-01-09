@@ -16,6 +16,7 @@ enum REGISTER_MASKS: mask_t {
     BOUND           = (1 << 4), // markes registers bound in closures
     PASSED          = (1 << 5), // marks registers containing objects passed to functions by parameter
                                 // these registers *MUST NOT* be overwritten
+    MOVED           = (1 << 6), // marks registers containing moved parameters
 };
 
 
