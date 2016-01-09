@@ -33,34 +33,39 @@
 
 #### Design goals
 
-- predictable execution: it is easier to reason about code when you know exactly how it will behave
-- predictable memory behaviour: in Viua you do not have to guess when the memory will be released, or
+- **predictable execution**: it is easier to reason about code when you know exactly how it will behave
+- **predictable memory behaviour**: in Viua you do not have to guess when the memory will be released, or
   remember about the possibility of a gargabe collector kicking in and interrupting your program;
   Viua manages memory without a GC in a strictly scope-based manner
-- massive parallelism: parallelism model in Viua supports spawning massive amounts of independent, VM-based threads - and
-  provides means to either detach spawned threads or join them later during execution;
-  inter-thread communication is performed via message-passing
-- fast debugging: error handling is performed with exceptions (even across threads), and unserviced exceptions cause the machine
+- **massive parallelism**: parallelism model in Viua supports spawning massive amounts of independent, VM-based threads and
+  provides means to either detach spawned threads or join them later during execution
+- **safe inter-thread communication** via message-passing (with queueing)
+- **fast debugging**: error handling is performed with exceptions (even across threads), and unserviced exceptions cause the machine
   to generate precise and detailed stack traces;
   running programs are also debuggable with GDB or Viua-specific debugger
 
 
 Some features also supported by the VM:
 
+- separate compilation,
 - static and dynamic linking of Viua-native libraries,
-- polymorhism and multiple inheritance,
-- straightforward ways to use both dynamic and static method dispatching on objects,
+- multiple inheritance,
+- straightforward ways to use both dynamic and static method dispatch on objects,
 - first-class functions,
 - closures,
+- passing function parameters by value, reference, pointer and move (non-copying pass),
+- copy-free function returns,
 
 
 Current limitations include:
 
 - severly limited introspection,
-- no way to express atoms (i.e. all names must be known at compile time, and there is no way to tell the machine "Here, take this atom and return corresponding function/class/etc."),
+- no way to express atoms (i.e. all names must be known at compile time, and there is no way to tell the machine "Here, take this string, convert it to atom and return corresponding function/class/etc."),
 - calling Viua code from C++ is not tested,
 - multithreaded code must be debugged with GDB instead of debugger supplied by the VM,
 - debugging information encoded in compiled files is limited,
+- VM is runs in a single process so I/O and foreign function calls block all threads,
+- speed: Viua is not the fastest VM around,
 
 
 ##### Software state notice
