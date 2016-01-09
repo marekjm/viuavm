@@ -550,6 +550,10 @@ class FunctionTests(unittest.TestCase):
     def testStaticRegisters(self):
         runTestReturnsIntegers(self, 'static_registers.asm', [i for i in range(0, 10)])
 
+    def testCallWithPassByMove(self):
+        # runTest(self, 'pass_by_move.asm', None, custom_assert=partiallyAppliedSameLines(3))
+        runTest(self, 'pass_by_move.asm')
+
     def testNeverendingFunction(self):
         runTestSplitlines(self, 'neverending.asm', ['42', '48'])
 
