@@ -93,6 +93,7 @@ const std::map<std::string, unsigned> OP_SIZES = {
 
     { "frame",  sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
     { "param",  sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
+    { "pamv",   sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
     { "paref",  sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
     { "call",   sizeof(byte) + sizeof(OperandType) + sizeof(int) },
     { "arg",    sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
@@ -210,6 +211,7 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
 
     { FRAME,    "frame" },
     { PARAM,    "param" },
+    { PAMV,     "pamv" },
     { PAREF,    "paref" },
     { CALL,     "call" },
     { ARG,      "arg" },
