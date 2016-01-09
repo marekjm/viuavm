@@ -674,6 +674,18 @@ namespace cg {
             return addr_ptr;
         }
 
+        byte* oppamv(byte* addr_ptr, int_op a, int_op b) {
+            /*  Inserts pamv instruction to bytecode.
+             *
+             *  :params:
+             *
+             *  a - register number
+             *  b - register number
+             */
+            addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, PAMV, a, b);
+            return addr_ptr;
+        }
+
         byte* paref(byte* addr_ptr, int_op a, int_op b) {
             /*  Inserts paref instruction to bytecode.
              *

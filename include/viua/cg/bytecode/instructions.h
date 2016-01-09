@@ -87,6 +87,7 @@ namespace cg {
 
         byte* frame(byte*, int_op, int_op);
         byte* param(byte*, int_op, int_op);
+        byte* oppamv(byte*, int_op, int_op);
         byte* paref(byte*, int_op, int_op);
         byte* arg(byte*, int_op, int_op);
         byte* argc(byte*, int_op);
