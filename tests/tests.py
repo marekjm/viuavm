@@ -197,7 +197,9 @@ def runMemoryLeakCheck(self, compiled_path, check_memory_leaks):
         MEMORY_LEAK_CHECKS_RUN += 1
         valgrindCheck(self, compiled_path)
 
-def runTest(self, name, expected_output, expected_exit_code = 0, output_processing_function = None, check_memory_leaks = True, custom_assert=None):
+def runTest(self, name, expected_output=None, expected_exit_code = 0, output_processing_function = None, check_memory_leaks = True, custom_assert=None):
+    if expected_output is None and custom_assert is None:
+        raise TypeError('`expected_output` and `custom_assert` cannot be both None')
     assembly_path = os.path.join(self.PATH, name)
     compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
     assemble(assembly_path, compiled_path)
