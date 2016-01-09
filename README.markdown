@@ -103,7 +103,7 @@ Some development-related information.
 Required tools:
 
 * `g++`: GNU Compiler Collection's C++ compiler version 4.9 and above (mandatory),
-* `clang++`: clang C++ compiler version 3.6.1 and above (if not using GCC, clang builds are **not** guaranteed to work),
+* `clang++`: clang C++ compiler version 3.6.1 and above,
 * `python`: Python programming language 3.x for test suite (optional),
 * `valgrind`: for memory leak testing (optional; by default enabled, disabling required setting `MEMORY_LEAK_CHECKS_ENABLE` variable in `tests/tests.py` to `False`),
 
