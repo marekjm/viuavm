@@ -181,6 +181,9 @@ byte* Thread::dispatch(byte* addr) {
         case PARAM:
             addr = param(addr+1);
             break;
+        case PAMV:
+            addr = oppamv(addr+1);
+            break;
         case PAREF:
             addr = paref(addr+1);
             break;
