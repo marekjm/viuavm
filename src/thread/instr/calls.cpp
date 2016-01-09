@@ -44,8 +44,9 @@ byte* Thread::oppamv(byte* addr) {
         throw new Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
     }
     // FIXME: memory leak when PAMV'ed objects are not extracted inside function
-    frame_new->args->set(parameter_no_operand_index, regset->pop(source));
+    frame_new->args->set(parameter_no_operand_index, uregset->pop(source));
     frame_new->args->clear(parameter_no_operand_index);
+    frame_new->args->flag(parameter_no_operand_index, MOVED);
 
     return addr;
 }
