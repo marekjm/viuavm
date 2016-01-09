@@ -102,10 +102,17 @@ vi some_file.asm
 Some development-related information.
 Required tools:
 
-* `g++`: GNU Compiler Collection's C++ compiler version 4.9 and above (mandatory),
+* `g++`: GNU Compiler Collection's C++ compiler version 5.0 and above (mandatory; development started with 4.9 so it should also be supported even if
+  compilation is no longer tested with 4.9),
 * `clang++`: clang C++ compiler version 3.6.1 and above,
 * `python`: Python programming language 3.x for test suite (optional),
 * `valgrind`: for memory leak testing (optional; by default enabled, disabling required setting `MEMORY_LEAK_CHECKS_ENABLE` variable in `tests/tests.py` to `False`),
+
+Other C++11 capable compilers may work but testing is only performed for G++ and Clang++.
+
+Testing is only performed on Linux.
+Compilation on BSD should also work but it may be problematic when compiling with Clang++.
+Compilation on other operating systems is not tested.
 
 
 ## Compilation
