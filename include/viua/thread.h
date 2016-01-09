@@ -174,6 +174,7 @@ class Thread {
 
     byte* frame(byte*);
     byte* param(byte*);
+    byte* oppamv(byte*);
     byte* paref(byte*);
     byte* arg(byte*);
     byte* argc(byte*);

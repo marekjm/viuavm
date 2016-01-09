@@ -34,6 +34,22 @@ byte* Thread::param(byte* addr) {
     return addr;
 }
 
+byte* Thread::oppamv(byte* addr) {
+    /** Run pamv instruction.
+     */
+    int parameter_no_operand_index = viua::operand::getInteger(viua::operand::extract(addr).get(), this);
+    int source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+
+    if (unsigned(parameter_no_operand_index) >= frame_new->args->size()) {
+        throw new Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
+    }
+    // FIXME: memory leak when PAMV'ed objects are not extracted inside function
+    frame_new->args->set(parameter_no_operand_index, regset->pop(source));
+    frame_new->args->clear(parameter_no_operand_index);
+
+    return addr;
+}
+
 byte* Thread::paref(byte* addr) {
     /** Run paref instruction.
      */
