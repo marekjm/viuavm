@@ -709,6 +709,15 @@ class PrototypeSystemTests(unittest.TestCase):
         )
         MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES = ()
 
+    def testOverridingMethods(self):
+        runTestSplitlinesNoDisassemblyRerun(self, 'overriding_methods.asm',
+            [
+                'Hello Base World!',
+                'Hello Derived World!',
+                'Hello Base World!',
+            ],
+        )
+
 
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.
