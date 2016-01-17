@@ -97,6 +97,7 @@ class Thread {
 
     bool finished;
     bool is_joinable;
+    bool is_suspended;
     unsigned thread_priority;
 
     /*  Methods implementing CPU instructions.
@@ -238,6 +239,11 @@ class Thread {
             is_joinable = false;
             parent_thread = nullptr;
         }
+
+        inline void suspend() { is_suspended = true; }
+        inline void wakeup() { is_suspended = false; }
+        inline bool suspended() { return is_suspended; }
+
         inline Thread* parent() const { return parent_thread; };
 
         void pass(Type* message);
