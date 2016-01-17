@@ -3,7 +3,7 @@
     jump .7
     print 1
     izero 0
-    end
+    return
 .end
 
 .function: main
@@ -11,5 +11,5 @@
     jump .0
     print 1
     izero 0
-    end
+    return
 .end

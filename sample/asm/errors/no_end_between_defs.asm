@@ -1,9 +1,9 @@
 .function: foo
-    end
+    return
 ; below should be .end and not .function
 .function: bar
 
 .function: main
     izero 0
-    end
+    return
 .end

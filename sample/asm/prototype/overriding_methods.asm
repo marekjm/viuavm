@@ -6,17 +6,17 @@
     register (attach (class 1 Base) Base::saySomething hello)
     register (attach (derive (class 1 Derived) Base) Derived::saySomethingMore hello)
 
-    end
+    return
 .end
 
 .function: Base::saySomething
     print (strstore 1 "Hello Base World!")
-    end
+    return
 .end
 
 .function: Derived::saySomethingMore
     print (strstore 1 "Hello Derived World!")
-    end
+    return
 .end
 
 .function: main
@@ -36,5 +36,5 @@
     call 0 Base::saySomething
 
     izero 0
-    end
+    return
 .end

@@ -1,6 +1,6 @@
 .function: run_in_a_thread
     print (threceive 1)
-    end
+    return
 .end
 
 .function: main
@@ -17,5 +17,5 @@
     msg 0 pass
 
     izero 0
-    end
+    return
 .end

@@ -1,24 +1,24 @@
 .function: foo
     print (istore 1 42)
-    end
+    return
 .end
 
 .function: bar
     print (istore 1 69)
     call (frame 0) foo
-    end
+    return
 .end
 
 .function: baz
     print (istore 1 1995)
     call (frame 0) bar
-    end
+    return
 .end
 
 .function: bay
     print (istore 1 2015)
     call (frame 0) baz
-    end
+    return
 .end
 
 
@@ -26,5 +26,5 @@
     call (frame 0) bay
 
     izero 0
-    end
+    return
 .end

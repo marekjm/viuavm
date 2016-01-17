@@ -42,7 +42,7 @@
     print 1
 
     .mark: quit
-    end
+    return
 .end
 
 .function: bottles
@@ -62,7 +62,7 @@
     print 2
 
     idec 0
-    end
+    return
 .end
 
 .function: report_state_of_the_wall
@@ -89,7 +89,7 @@
 
     print 5
 
-    end
+    return
 .end
 
 .function: main
@@ -107,5 +107,5 @@
     branch 0 again
 
     izero 0
-    end
+    return
 .end

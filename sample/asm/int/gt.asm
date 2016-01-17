@@ -7,5 +7,5 @@
     igt 1 1 2
     print 1
     izero 0
-    end
+    return
 .end

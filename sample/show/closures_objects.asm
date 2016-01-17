@@ -8,8 +8,8 @@
     ; use value found in 2nd register as input
     istore 1 @2
 
-    ; end the function
-    end
+    ; return from the function
+    return
 .end
 
 .function: get_x
@@ -21,8 +21,8 @@
     ; by the simulated closure-based object
     copy 0 1
 
-    ; end the function
-    end
+    ; return from the function
+    return
 .end
 
 
@@ -53,8 +53,8 @@
     vpush 0 3
     vpush 0 4
 
-    ; end the function
-    end
+    ; return from the function
+    return
 .end
 
 
@@ -122,5 +122,5 @@
     print 5
 
     izero 0
-    end
+    return
 .end

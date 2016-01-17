@@ -11,5 +11,5 @@
     print (call 1 std::random::device::urandom)
 
     izero 0
-    end
+    return
 .end

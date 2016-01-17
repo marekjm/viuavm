@@ -6,5 +6,5 @@
     fmul 3 1 2
     print 3
     izero 0
-    end
+    return
 .end

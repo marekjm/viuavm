@@ -16,5 +16,5 @@
     print one
 
     izero 0
-    end
+    return
 .end

@@ -352,11 +352,11 @@ byte* Thread::xtick() {
      *  it means that the execution flow is corrupted.
      *
      *  However, execution *should not* be halted if:
-     *      - the offending opcode is END (as this may indicate exiting recursive function),
+     *      - the offending opcode is RETURN (as this may indicate exiting recursive function),
      *      - an object has been thrown, as the instruction pointer will be adjusted by
      *        catchers or execution will be halted on unhandled types,
      */
-    if (instruction_pointer == previous_instruction_pointer and OPCODE(*instruction_pointer) != END and thrown == nullptr) {
+    if (instruction_pointer == previous_instruction_pointer and OPCODE(*instruction_pointer) != RETURN and thrown == nullptr) {
         return_code = 2;
         ostringstream oss;
         return_exception = "InstructionUnchanged";

@@ -18,7 +18,7 @@
     ; leave instructions lead here
 
     izero 0
-    end
+    return
 .end
 
 

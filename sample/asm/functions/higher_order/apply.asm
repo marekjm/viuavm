@@ -2,7 +2,7 @@
     ; this function takes single integer as its argument,
     ; squares it and returns the result
     imul 0 (arg 1 0) 1
-    end
+    return
 .end
 
 .function: apply
@@ -19,7 +19,7 @@
 
     ; ...and return the result
     move 0 3
-    end
+    return
 .end
 
 .function: main
@@ -32,5 +32,5 @@
     print (call 3 apply)
 
     izero 0
-    end
+    return
 .end

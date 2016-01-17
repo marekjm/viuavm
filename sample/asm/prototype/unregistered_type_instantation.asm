@@ -14,5 +14,5 @@
     enter unregistered_type_instantation
 
     izero 0
-    end
+    return
 .end

@@ -5,7 +5,7 @@
     call 2 Pointer::expired
     echo (strstore 3 "expired: ")
     move 0 (print 2)
-    end
+    return
 .end
 
 .function: main
@@ -21,5 +21,5 @@
     call 0 isExpired
 
     izero 0
-    end
+    return
 .end

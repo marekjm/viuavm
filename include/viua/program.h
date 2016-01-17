@@ -146,7 +146,7 @@ class Program {
     Program& vmnew      (int_op, const std::string&);
     Program& vmmsg      (int_op, const std::string&);
 
-    Program& end        ();
+    Program& opreturn   ();
     Program& halt       ();
 
 

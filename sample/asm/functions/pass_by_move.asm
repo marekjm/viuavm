@@ -1,6 +1,6 @@
 .function: foo
     move 0 (print (arg 1 0))
-    end
+    return
 .end
 
 .function: main
@@ -10,5 +10,5 @@
     print (call 1 foo)
 
     izero 0
-    end
+    return
 .end

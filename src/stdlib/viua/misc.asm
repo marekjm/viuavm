@@ -3,7 +3,7 @@
     arg 0 0
     not 0
     not 0
-    end
+    return
 .end
 
 

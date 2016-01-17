@@ -17,5 +17,5 @@
     .mark: break
 
     izero 0
-    end
+    return
 .end

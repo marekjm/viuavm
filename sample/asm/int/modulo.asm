@@ -21,5 +21,5 @@
     .mark: final
     print result
     izero 0
-    end
+    return
 .end

@@ -1,13 +1,13 @@
 .function: foo
     ; one is bound from 'returns_closure' function
     print 1
-    end
+    return
 .end
 
 .function: returns_closure
     clbind (istore 1 42)
     move 0 (closure 2 foo)
-    end
+    return
 .end
 
 .function: main
@@ -22,7 +22,7 @@
     fcall 0 bar
 
     izero 0
-    end
+    return
 .end
 
 

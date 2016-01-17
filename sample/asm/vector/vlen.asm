@@ -5,5 +5,5 @@
     print (vlen 3 2)
 
     izero 0
-    end
+    return
 .end

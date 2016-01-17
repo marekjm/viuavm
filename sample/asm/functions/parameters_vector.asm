@@ -8,11 +8,11 @@
     enter misc::argsvector
 
     print 1
-    end
+    return
 .end
 
 .function: main
     frame ^[(param 0 (istore 1 0)) (param 1 (istore 2 1)) (param 2 (istore 3 2)) (param 3 (istore 4 3))]
     call ^(izero 0) foo
-    end
+    return
 .end

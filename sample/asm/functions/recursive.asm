@@ -14,7 +14,7 @@
     call rec__VOID__INT__INT
 
     .mark: break_rec
-    end
+    return
 .end
 
 .function: main
@@ -23,5 +23,5 @@
     call rec__VOID__INT__INT
 
     izero 0
-    end
+    return
 .end

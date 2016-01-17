@@ -625,8 +625,8 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string reg, mtd;
             tie(reg, mtd) = assembler::operands::get2(operands);
             program.vmmsg(assembler::operands::getint(resolveregister(reg, names)), mtd);
-        } else if (str::startswith(line, "end")) {
-            program.end();
+        } else if (str::startswith(line, "return")) {
+            program.opreturn();
         } else if (str::startswith(line, "halt")) {
             program.halt();
         } else {

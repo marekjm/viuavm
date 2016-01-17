@@ -16,5 +16,5 @@
     .mark: fin
     print 2
     izero 0
-    end
+    return
 .end

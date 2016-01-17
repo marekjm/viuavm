@@ -10,7 +10,7 @@
     arg 3 0
     istore 4 300
     throw 3
-    end
+    return
 .end
 
 .function: secondary
@@ -21,7 +21,7 @@
     param 0 2
     call tertiary
     istore 4 225
-    end
+    return
 .end
 
 .block: main_block
@@ -45,7 +45,7 @@
     print 2
     print 4
     izero 0
-    end
+    return
 .end
 
 

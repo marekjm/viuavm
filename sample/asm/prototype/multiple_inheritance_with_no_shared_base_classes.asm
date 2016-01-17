@@ -22,7 +22,7 @@
     derive 1 MoreDerivedB
     register 1
 
-    end
+    return
 .end
 
 .function: main
@@ -33,5 +33,5 @@
     enter throws_derived
 
     izero 0
-    end
+    return
 .end

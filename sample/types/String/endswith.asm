@@ -6,5 +6,5 @@
     print (msg 3 endswith)
 
     izero 0
-    end
+    return
 .end

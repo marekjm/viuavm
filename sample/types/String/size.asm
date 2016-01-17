@@ -3,5 +3,5 @@
     print (msg 2 size)
 
     izero 0
-    end
+    return
 .end

@@ -36,11 +36,11 @@
     call 0 counter
 
     .mark: finish
-    end
+    return
 .end
 
 .function: main
     frame ^[(param 0 (istore 1 10))]
     call ^(izero 0) counter
-    end
+    return
 .end

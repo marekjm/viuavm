@@ -3,7 +3,7 @@
     nop
     nop
     nop
-    end
+    return
 .end
 
 .function: main
@@ -16,5 +16,5 @@
     thjoin 1
 
     izero 0
-    end
+    return
 .end

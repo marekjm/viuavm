@@ -205,8 +205,8 @@ byte* Thread::dispatch(byte* addr) {
         case THRECEIVE:
             addr = opthreceive(addr+1);
             break;
-        case END:
-            addr = end(addr);
+        case RETURN:
+            addr = opreturn(addr);
             break;
         case JUMP:
             addr = jump(addr+1);

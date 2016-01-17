@@ -9,5 +9,5 @@
     print 3
 
     izero 0
-    end
+    return
 .end

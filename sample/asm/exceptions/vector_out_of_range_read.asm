@@ -3,5 +3,5 @@
     vat 2 1 4
 
     izero 0
-    end
+    return
 .end

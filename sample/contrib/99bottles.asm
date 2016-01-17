@@ -65,5 +65,5 @@
     branch 0 again
 
     izero 0
-    end
+    return
 .end

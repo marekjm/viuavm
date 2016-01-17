@@ -64,7 +64,7 @@
 
     ; move result vector into return register
     move 0 3
-    end
+    return
 .end
 
 .function: std::functional::foreach
@@ -107,7 +107,7 @@
 
     .mark: loop_end
 
-    end
+    return
 .end
 
 .function: std::functional::map
@@ -157,7 +157,7 @@
 
     ; move vector with mapped values to the return register
     move 0 3
-    end
+    return
 .end
 
 .function: std::functional::apply
@@ -179,7 +179,7 @@
 
     ; ...and return the result
     move 0 3
-    end
+    return
 .end
 
 .function: std::functional::invoke
@@ -233,5 +233,5 @@
     ; call the function
     fcall 8 1
     move 0 8
-    end
+    return
 .end

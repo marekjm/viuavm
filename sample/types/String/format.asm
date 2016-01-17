@@ -5,5 +5,5 @@
     print (msg 3 format)
 
     izero 0
-    end
+    return
 .end

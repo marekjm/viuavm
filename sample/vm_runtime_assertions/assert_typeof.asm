@@ -15,5 +15,5 @@
     enter try_TypeException
 
     izero 0
-    end
+    return
 .end

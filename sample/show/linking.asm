@@ -81,5 +81,5 @@
     print 10
 
     izero 0
-    end
+    return
 .end

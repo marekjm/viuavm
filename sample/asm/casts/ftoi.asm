@@ -3,5 +3,5 @@
     ftoi 2 1
     print 2
     izero 0
-    end
+    return
 .end

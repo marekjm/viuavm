@@ -3,43 +3,43 @@
     throw 1
     ;frame 0
     ;call bar
-    end
+    return
 .end
 
 .function: bar
     frame 0
     call baz
-    end
+    return
 .end
 
 .function: baz
     frame 0
     call bay
-    end
+    return
 .end
 
 .function: bay
     frame 0
     call bax
-    end
+    return
 .end
 
 .function: bax
     frame 0
     call baw
-    end
+    return
 .end
 
 .function: baw
     frame 0
     call bau
-    end
+    return
 .end
 
 .function: bau
     istore 1 69
     throw 1
-    end
+    return
 .end
 
 .block: catcher
@@ -81,7 +81,7 @@
 .block: this_throws
     frame 0
     call foo
-    end
+    return
 .end
 
 .function: main
@@ -94,5 +94,5 @@
     enter this_throws
 
     izero 0
-    end
+    return
 .end

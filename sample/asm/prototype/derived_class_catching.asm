@@ -18,5 +18,5 @@
     enter throws_derived
 
     izero 0
-    end
+    return
 .end

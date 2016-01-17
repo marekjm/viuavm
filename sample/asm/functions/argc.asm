@@ -1,6 +1,6 @@
 .function: print_number_of_params
     print (argc 1)
-    end
+    return
 .end
 
 .function: main
@@ -14,5 +14,5 @@
     call (frame 0) print_number_of_params
 
     izero 0
-    end
+    return
 .end

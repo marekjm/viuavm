@@ -1,7 +1,7 @@
 .function: foo
     istore 1 666
     throw 1
-    end
+    return
 .end
 
 .block: catch_integer
@@ -26,5 +26,5 @@
     enter foo_block
 
     izero 0
-    end
+    return
 .end

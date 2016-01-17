@@ -124,7 +124,7 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "new",    sizeof(byte) + sizeof(OperandType) + sizeof(int) },    // new <target> Foo
     { "msg",    sizeof(byte) + sizeof(OperandType) + sizeof(int) },    // msg <return> method
 
-    { "end",    sizeof(byte) },
+    { "return", sizeof(byte) },
     { "halt",   sizeof(byte) },
 };
 
@@ -242,7 +242,7 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { NEW,      "new" },
     { MSG,      "msg" },
 
-    { END,      "end" },
+    { RETURN,   "return" },
     { HALT,     "halt" },
 };
 

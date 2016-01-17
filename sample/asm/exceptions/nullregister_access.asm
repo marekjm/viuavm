@@ -17,5 +17,5 @@
     enter print_block
 
     izero 0
-    end
+    return
 .end

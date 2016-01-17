@@ -5,7 +5,7 @@
     tmpro 2
     print 2
     izero 0
-    end
+    return
 .end
 
 istore 1 42

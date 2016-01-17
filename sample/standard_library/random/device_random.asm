@@ -10,5 +10,5 @@
     print (call 1 std::random::device::random)
 
     izero 0
-    end
+    return
 .end

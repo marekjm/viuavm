@@ -12,7 +12,7 @@
 .mark: endloop
 
     print (strstore 5 "Hello concurrent World!")
-    end
+    return
 .end
 
 .function: main
@@ -43,5 +43,5 @@
     thjoin 1
 
     izero 0
-    end
+    return
 .end

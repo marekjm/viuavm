@@ -9,5 +9,5 @@
     print (msg 4 substr)
 
     izero 0
-    end
+    return
 .end

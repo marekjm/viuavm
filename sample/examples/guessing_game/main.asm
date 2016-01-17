@@ -57,5 +57,5 @@
 
     .mark: exit
     izero 0
-    end
+    return
 .end

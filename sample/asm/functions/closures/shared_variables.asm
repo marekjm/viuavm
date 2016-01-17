@@ -1,7 +1,7 @@
 .function: closure_a
     ; it has to be 2, because 2 register has been bound
     print 2
-    end
+    return
 .end
 
 .function: closure_b
@@ -9,7 +9,7 @@
 
     ; overwrite bound value with whatever we got
     istore 2 @1
-    end
+    return
 .end
 
 .function: returns_closures
@@ -34,7 +34,7 @@
     ; vectors can be used to return multiple values as
     ; they can hold any Type-derived type
     move 0 1
-    end
+    return
 .end
 
 .function: main
@@ -57,5 +57,5 @@
     fcall 0 2
 
     izero 0
-    end
+    return
 .end

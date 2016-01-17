@@ -2,5 +2,5 @@
     istore 1 42
     print 1
     izero 0
-    end
+    return
 .end

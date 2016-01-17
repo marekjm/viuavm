@@ -249,7 +249,7 @@ tuple<bool, string> if_watchpoint_local_register_write(CPU& cpu, const State& st
         opcode == CALL or
         opcode == JUMP or
         opcode == BRANCH or
-        opcode == END or
+        opcode == RETURN or
         opcode == HALT
        ) {
         writing_instruction = false;
@@ -361,7 +361,7 @@ tuple<bool, string> if_watchpoint_global_register_write(CPU& cpu, const State& s
         opcode == CALL or
         opcode == JUMP or
         opcode == BRANCH or
-        opcode == END or
+        opcode == RETURN or
         opcode == HALT
        ) {
         writing_instruction = false;

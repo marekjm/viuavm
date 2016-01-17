@@ -146,11 +146,9 @@ byte* Thread::call(byte* addr) {
     return (this->*caller)(addr, call_name, return_register_ref, return_register_index, "");
 }
 
-byte* Thread::end(byte* addr) {
-    /*  Run end instruction.
-     */
+byte* Thread::opreturn(byte* addr) {
     if (frames.size() == 0) {
-        throw new Exception("no frame on stack: nothing to end");
+        throw new Exception("no frame on stack: no call to return from");
     }
     addr = frames.back()->ret_address();
 

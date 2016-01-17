@@ -15,13 +15,13 @@
     ; non-zero values "false"
     ; FIXME: find out why `not (move 0 1)` causes memory leak
     not (copy 0 1)
-    end
+    return
 .end
 
 .function: is_divisible_by_2
     clbind (arg 2 0)
     move 0 (closure 1 is_divisible_by)
-    end
+    return
 .end
 
 .function: filter_closure
@@ -70,7 +70,7 @@
 
     ; move result vector into return register
     move 0 3
-    end
+    return
 .end
 
 .function: main
@@ -89,5 +89,5 @@
     print (call 4 filter_closure)
 
     izero 0
-    end
+    return
 .end

@@ -2,7 +2,7 @@
     echo (strstore 1 "Hello from #")
     echo (arg 2 0)
     print (strstore 1 " worker thread!")
-    end
+    return
 .end
 
 .function: thread_spawner
@@ -26,7 +26,7 @@
     jump begin_loop
     .mark: end_loop
 
-    end
+    return
 .end
 
 
@@ -37,7 +37,7 @@
     echo (strstore 4 "number of threads to spawn: ")
     frame 0
     stoi 0 (call 4 std::io::getline)
-    end
+    return
 .end
 
 .function: run_thread_spawner
@@ -47,7 +47,7 @@
     frame ^[(paref 0 2)]
     msg 0 detach
 
-    end
+    return
 .end
 
 .function: main
@@ -61,5 +61,5 @@
     call run_thread_spawner
 
     izero 0
-    end
+    return
 .end

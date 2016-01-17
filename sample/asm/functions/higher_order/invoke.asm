@@ -2,7 +2,7 @@
     ; this function takes four integers as parameters and
     ; adds them, and returns the sum
     iadd 0 (arg 4 3) (iadd 0 (arg 3 2) (iadd 0 (arg 1 0) (arg 2 1)))
-    end
+    return
 .end
 
 .function: invoke
@@ -51,7 +51,7 @@
     ; finally, after the frame is ready
     ; call the function
     move 0 (fcall 8 1)
-    end
+    return
 .end
 
 .function: main
@@ -70,5 +70,5 @@
     print (call 8 invoke)
 
     izero 0
-    end
+    return
 .end

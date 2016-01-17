@@ -5,12 +5,12 @@
     nop
     nop
     print (arg 1 0)
-    end
+    return
 .end
 
 .function: print_eager
     print (arg 1 0)
-    end
+    return
 .end
 
 .function: main
@@ -25,5 +25,5 @@
     thjoin 4
 
     izero 0
-    end
+    return
 .end

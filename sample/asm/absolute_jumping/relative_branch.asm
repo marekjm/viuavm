@@ -11,5 +11,5 @@
     print text_to_print
 
     izero 0
-    end
+    return
 .end

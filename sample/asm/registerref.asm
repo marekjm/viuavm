@@ -10,12 +10,12 @@
     print 16
     print @16
 
-    end
+    return
 .end
 
 .function: main
     frame 0 17
     call foo
     izero 0
-    end
+    return
 .end

@@ -26,5 +26,5 @@
     print number
 
     izero 0
-    end
+    return
 .end

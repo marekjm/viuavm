@@ -68,5 +68,5 @@
     print (call 6 std::random::randint)
 
     izero 0
-    end
+    return
 .end

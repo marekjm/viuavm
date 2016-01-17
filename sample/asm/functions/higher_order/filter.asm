@@ -13,7 +13,7 @@
     .mark: loop_end
     not (move 0 1)
 
-    end
+    return
 .end
 
 .function: filter
@@ -61,7 +61,7 @@
 
     ; move result vector into return register
     move 0 3
-    end
+    return
 .end
 
 .function: main
@@ -77,5 +77,5 @@
     print (call 4 filter)
 
     izero 0
-    end
+    return
 .end

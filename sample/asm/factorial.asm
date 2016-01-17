@@ -17,7 +17,7 @@
     call factorial
 
     .mark: finish
-    end
+    return
 .end
 
 .function: main
@@ -38,5 +38,5 @@
     ; print result
     print result
     izero 0
-    end
+    return
 .end

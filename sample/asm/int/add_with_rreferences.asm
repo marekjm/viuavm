@@ -6,5 +6,5 @@
     print (iadd 4 1 @3)
 
     izero 0
-    end
+    return
 .end

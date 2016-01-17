@@ -12,7 +12,7 @@
     .mark: nearly_end
 
     move 0 1
-    end
+    return
 .end
 
 .function: with_branch
@@ -29,12 +29,12 @@
     .mark: nearly_end
 
     move 0 1
-    end
+    return
 .end
 
 .function: dis_a_closure
     print 3
-    end
+    return
 .end
 
 
@@ -59,18 +59,18 @@
 .function: with_block
     try
     enter this_warns
-    end
+    return
 .end
 
 .function: catches_own_exception
     try
     catch "Integer" this_catches
     enter this_throws
-    end
+    return
 .end
 
 .function: needs_catching
     istore 1 666
     throw 1
-    end
+    return
 .end

@@ -8,5 +8,5 @@
     iadd 3 4 3
     print 3
     izero 0
-    end
+    return
 .end

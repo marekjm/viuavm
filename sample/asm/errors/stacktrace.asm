@@ -1,24 +1,24 @@
 .function: foo
     print 1
-    end
+    return
 .end
 
 .function: bar
     frame 0
     call foo
-    end
+    return
 .end
 
 .function: baz
     istore 1 42
     frame 0
     call bar
-    end
+    return
 .end
 
 .function: main
     frame 0
     call 0 baz
     izero 0
-    end
+    return
 .end

@@ -116,7 +116,7 @@ namespace cg {
         byte* vmnew(byte*, int_op, const std::string&);
         byte* vmmsg(byte*, int_op, const std::string&);
 
-        byte* end(byte*);
+        byte* opreturn(byte*);
         byte* halt(byte*);
     }
 }

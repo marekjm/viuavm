@@ -3,7 +3,7 @@
 .function: dummy
     ; this function is here to stress jump calculation
     izero 0
-    end
+    return
 .end
 
 .function: power_of
@@ -40,7 +40,7 @@
     .mark: final
     ; return result
     move 0 result
-    end
+    return
 .end
 
 .function: main
@@ -48,5 +48,5 @@
     print (call 1 power_of)
 
     izero 0
-    end
+    return
 .end

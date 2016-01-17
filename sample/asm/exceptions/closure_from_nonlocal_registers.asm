@@ -1,6 +1,6 @@
 .function: foo
     print 1
-    end
+    return
 .end
 
 .function: main
@@ -10,5 +10,5 @@
     closure 2 foo
 
     izero 0
-    end
+    return
 .end

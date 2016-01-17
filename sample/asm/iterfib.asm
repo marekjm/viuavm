@@ -22,7 +22,7 @@
     .mark: finished
     copy 0 (vat 9 vector -1)
     empty 9
-    end
+    return
 .end
 
 .function: main
@@ -34,5 +34,5 @@
     print (call result iterfib)
 
     izero 0
-    end
+    return
 .end

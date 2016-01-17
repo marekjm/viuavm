@@ -1,7 +1,7 @@
 .function: run_in_a_thread
     ; will cause a memory leak on detached threads
     throw (threceive 1)
-    end
+    return
 .end
 
 .block: try_thread_exception
@@ -35,5 +35,5 @@
     enter try_thread_exception
 
     izero 0
-    end
+    return
 .end

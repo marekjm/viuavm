@@ -7,28 +7,28 @@
     register (attach (derive (class 1 Derived) Base) fn_derived hello)
     register (attach (derive (class 1 MoreDerived) Derived) fn_more_derived hi)
 
-    end
+    return
 .end
 
 .function: fn_base
     echo (strstore 1 "Good day from ")
     frame ^[(param 0 (arg 2 0))]
     print (call 3 typesystem::typeof)
-    end
+    return
 .end
 
 .function: fn_derived
     echo (strstore 1 "Hello from ")
     frame ^[(param 0 (arg 2 0))]
     print (call 3 typesystem::typeof)
-    end
+    return
 .end
 
 .function: fn_more_derived
     echo (strstore 1 "Hi from ")
     frame ^[(param 0 (arg 2 0))]
     print (call 3 typesystem::typeof)
-    end
+    return
 .end
 
 .function: main
@@ -64,5 +64,5 @@
     msg 0 hi
 
     izero 0
-    end
+    return
 .end

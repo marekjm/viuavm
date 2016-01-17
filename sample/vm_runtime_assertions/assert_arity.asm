@@ -15,5 +15,5 @@
     enter try_ArityException
 
     izero 0
-    end
+    return
 .end

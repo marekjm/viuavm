@@ -8,5 +8,5 @@
 
     print 1
     print 3
-    end
+    return
 .end

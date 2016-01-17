@@ -7,5 +7,5 @@
     call 0 World::print_hello
 
     izero 0
-    end
+    return
 .end

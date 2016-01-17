@@ -4,5 +4,5 @@
     param 0 1
     call 0 jumprint
     izero 0
-    end
+    return
 .end

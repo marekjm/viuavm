@@ -1,7 +1,7 @@
 .function: set_69
     ress global
     istore 2 69
-    end
+    return
 .end
 
 .function: main
@@ -15,5 +15,5 @@
 
     ress local
     izero 0
-    end
+    return
 .end

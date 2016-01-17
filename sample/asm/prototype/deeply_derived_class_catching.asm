@@ -14,7 +14,7 @@
     register (derive (class 1 MoreDerived) Derived)
     register (derive (class 1 EvenMoreDerived) MoreDerived)
     register (derive (class 1 DeeplyDerived) EvenMoreDerived)
-    end
+    return
 .end
 
 .function: main
@@ -25,5 +25,5 @@
     enter throws_derived
 
     izero 0
-    end
+    return
 .end

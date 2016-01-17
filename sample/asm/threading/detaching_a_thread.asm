@@ -11,7 +11,7 @@
     iinc counter
     jump loop
 .mark: after_loop
-    end
+    return
 .end
 
 .function: main
@@ -33,5 +33,5 @@
     print (strstore 3 "main/1 exited")
 
     izero 0
-    end
+    return
 .end

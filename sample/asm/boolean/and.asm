@@ -3,7 +3,7 @@
     not 1
     not 1
     move 0 1
-    end
+    return
 .end
 
 .function: main 1
@@ -25,5 +25,5 @@
     print 3
 
     izero 0
-    end
+    return
 .end

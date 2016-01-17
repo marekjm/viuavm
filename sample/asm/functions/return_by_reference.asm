@@ -1,6 +1,6 @@
 .function: by_reference
     arg 0 0
-    end
+    return
 .end
 
 .function: main
@@ -20,5 +20,5 @@
     print 1
 
     izero 0
-    end
+    return
 .end

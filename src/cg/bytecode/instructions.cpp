@@ -948,10 +948,8 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* end(byte* addr_ptr) {
-            /*  Inserts end instruction.
-             */
-            *(addr_ptr++) = END;
+        byte* opreturn(byte* addr_ptr) {
+            *(addr_ptr++) = RETURN;
             return addr_ptr;
         }
 

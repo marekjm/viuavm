@@ -10,12 +10,12 @@
     nop
     nop
     print (arg 1 0)
-    end
+    return
 .end
 
 .function: print_eager
     print (arg 1 0)
-    end
+    return
 .end
 
 .function: thread_spawner
@@ -29,7 +29,7 @@
     ; do not join the thread to test main/1 node orphaning detection
     ;thjoin 3
 
-    end
+    return
 .end
 
 .function: main
@@ -37,5 +37,5 @@
     call thread_spawner
 
     izero 0
-    end
+    return
 .end
