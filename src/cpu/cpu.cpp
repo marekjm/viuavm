@@ -271,13 +271,21 @@ bool CPU::burst() {
             // because it is handled later (after ticking code)
             continue;
         }
+        if (th->suspended()) {
+            // do not execute suspended threads
+            continue;
+        }
 
         ticked = true;
-        for (unsigned i = 0; i < th->priority(); ++i) {
+        for (unsigned j = 0; j < th->priority(); ++j) {
             if (th->stopped()) {
                 // remember to break if the thread stopped
                 // otherwise the CPU will try to tick the thread and
                 // it will crash (will try to execute instructions from 0x0 pointer)
+                break;
+            }
+            if (th->suspended()) {
+                // do not execute suspended threads
                 break;
             }
             th->tick();
