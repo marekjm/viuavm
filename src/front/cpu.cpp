@@ -145,12 +145,18 @@ int main(int argc, char* argv[]) {
     Prototype* proto_thread = new Prototype("Thread");
     proto_thread->attach("Thread::joinable", "joinable");
     proto_thread->attach("Thread::detach", "detach");
+    proto_thread->attach("Thread::suspend", "suspend");
+    proto_thread->attach("Thread::wakeup", "wakeup");
+    proto_thread->attach("Thread::suspended", "suspended");
     proto_thread->attach("Thread::getPriority", "getPriority");
     proto_thread->attach("Thread::setPriority", "setPriority");
     proto_thread->attach("Thread::pass", "pass");
     cpu.registerForeignPrototype("Thread", proto_thread);
     cpu.registerForeignMethod("Thread::joinable", static_cast<ForeignMethodMemberPointer>(&ThreadType::joinable));
     cpu.registerForeignMethod("Thread::detach", static_cast<ForeignMethodMemberPointer>(&ThreadType::detach));
+    cpu.registerForeignMethod("Thread::suspend", static_cast<ForeignMethodMemberPointer>(&ThreadType::suspend));
+    cpu.registerForeignMethod("Thread::wakeup", static_cast<ForeignMethodMemberPointer>(&ThreadType::wakeup));
+    cpu.registerForeignMethod("Thread::suspended", static_cast<ForeignMethodMemberPointer>(&ThreadType::suspended));
     cpu.registerForeignMethod("Thread::getPriority", static_cast<ForeignMethodMemberPointer>(&ThreadType::getPriority));
     cpu.registerForeignMethod("Thread::setPriority", static_cast<ForeignMethodMemberPointer>(&ThreadType::setPriority));
     cpu.registerForeignMethod("Thread::pass", static_cast<ForeignMethodMemberPointer>(&ThreadType::pass));
