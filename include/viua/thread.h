@@ -278,6 +278,7 @@ class Thread {
             instruction_counter(0),
             instruction_pointer(nullptr),
             finished(false), is_joinable(true),
+            is_suspended(false),
             thread_priority(1)
         {
             uregset = frm->regset;
