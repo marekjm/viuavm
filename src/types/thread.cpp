@@ -68,6 +68,18 @@ void ThreadType::detach(Frame* frame, RegisterSet*, RegisterSet*) {
     thrd->detach();
 }
 
+
+void ThreadType::suspend(Frame*, RegisterSet*, RegisterSet*) {
+    thrd->suspend();
+}
+void ThreadType::wakeup(Frame*, RegisterSet*, RegisterSet*) {
+    thrd->wakeup();
+}
+void ThreadType::suspended(Frame* frame, RegisterSet*, RegisterSet*) {
+    frame->regset->set(0, new Boolean(thrd->suspended()));
+}
+
+
 void ThreadType::getPriority(Frame* frame, RegisterSet*, RegisterSet*) {
     frame->regset->set(0, new Integer(thrd->priority()));
 }

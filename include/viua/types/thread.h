@@ -29,6 +29,10 @@ class ThreadType : public Type {
         virtual void joinable(Frame*, RegisterSet*, RegisterSet*);
         virtual void detach(Frame*, RegisterSet*, RegisterSet*);
 
+        virtual void suspend(Frame*, RegisterSet*, RegisterSet*);
+        virtual void wakeup(Frame*, RegisterSet*, RegisterSet*);
+        virtual void suspended(Frame*, RegisterSet*, RegisterSet*);
+
         virtual void getPriority(Frame*, RegisterSet*, RegisterSet*);
         virtual void setPriority(Frame*, RegisterSet*, RegisterSet*);
 
