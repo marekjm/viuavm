@@ -813,6 +813,14 @@ class MultithreadingTests(unittest.TestCase):
     def testTransferringExceptionsOnJoin(self):
         runTest(self, 'transferring_exceptions.asm', 'exception transferred from thread Thread: Hello exception transferring World!')
 
+    def testSuspendAndWakeup(self):
+        runTestSplitlines(self, 'short_suspend_and_wakeup.asm', [
+            'suspending thread 0',
+            'hi, I am thread 1',
+            'waking up thread 0',
+            'hi, I am thread 0',
+        ])
+
 
 def sameLines(self, excode, output, no_of_lines):
     lines = output.splitlines()
