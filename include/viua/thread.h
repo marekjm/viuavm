@@ -273,6 +273,12 @@ class Thread {
             exception_register = thrown;
             thrown = nullptr;
         }
+        inline void raiseException(Type* exception) {
+            thrown = exception;
+        }
+        inline void popFrame() {
+            dropFrame();
+        }
 
         byte* begin();
         inline uint64_t counter() { return instruction_counter; }
