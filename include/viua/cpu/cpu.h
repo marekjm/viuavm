@@ -138,6 +138,8 @@ class CPU {
         CPU& registerExternalFunction(const std::string&, ExternalFunction*);
         CPU& removeExternalFunction(std::string);
 
+        void scheduleForeignCall(ExternalCallRequest*);
+
         /// These two methods are used to inject pure-C++ classes into machine's typesystem.
         CPU& registerForeignPrototype(const std::string&, Prototype*);
         CPU& registerForeignMethod(const std::string&, ForeignMethod);
