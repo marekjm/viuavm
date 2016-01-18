@@ -218,6 +218,9 @@ class Thread {
         Type* obtain(unsigned i) const {
             return fetch(i);
         }
+        void put(unsigned i, Type* o) {
+            place(i, o);
+        }
 
         inline bool joinable() const { return is_joinable; }
         inline void join() {
