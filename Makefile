@@ -189,10 +189,10 @@ build/assert.o: src/assert.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $^
 
 build/bin/vm/cpu: build/cpu.o build/cpu/cpu.o build/operand.o build/assert.o build/thread.o build/thread/dispatch.o build/cpu/opex.o build/cpu/registserset.o build/cpu/frame.o build/loader.o build/printutils.o build/support/pointer.o build/support/string.o build/support/env.o ${VIUA_THREAD_INSTR_FILES_O} build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o build/types/prototype.o build/types/object.o build/types/reference.o build/types/thread.o build/types/type.o build/types/pointer.o
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} ${DYNAMIC_SYMS} -o $@ $^ $(LIBDL)
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} ${DYNAMIC_SYMS} -o $@ $^ $(LIBDL) -lpthread
 
 build/bin/vm/vdb: build/wdb.o build/lib/linenoise.o build/cpu/cpu.o build/operand.o build/assert.o build/thread.o build/thread/dispatch.o build/cpu/opex.o build/cpu/registserset.o build/cpu/frame.o build/loader.o build/cg/disassembler/disassembler.o build/printutils.o build/support/pointer.o build/support/string.o build/support/env.o ${VIUA_THREAD_INSTR_FILES_O} build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o build/types/prototype.o build/types/object.o build/types/reference.o build/types/thread.o build/types/type.o build/types/pointer.o
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} ${DYNAMIC_SYMS} -o $@ $^ $(LIBDL)
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} ${DYNAMIC_SYMS} -o $@ $^ $(LIBDL) -lpthread
 
 build/bin/vm/asm: build/asm.o build/asm/generate.o build/asm/gather.o build/asm/decode.o build/program.o build/programinstructions.o build/cg/tokenizer/tokenize.o build/cg/assembler/operands.o build/cg/assembler/ce.o build/cg/assembler/verify.o build/cg/bytecode/instructions.o build/loader.o build/support/string.o build/support/env.o
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} ${DYNAMIC_SYMS} -o $@ $^
@@ -204,7 +204,7 @@ build/bin/vm/dis: build/dis.o build/loader.o build/cg/disassembler/disassembler.
 ############################################################
 # OBJECTS COMMON FOR DEBUGGER AND CPU COMPILATION
 build/cpu/cpu.o: src/cpu/cpu.cpp include/viua/cpu/cpu.h include/viua/bytecode/opcodes.h include/viua/cpu/frame.h
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $< -lpthread
 
 build/cpu/registserset.o: src/cpu/registerset.cpp include/viua/cpu/registerset.h
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
@@ -300,7 +300,7 @@ build/types/thread.o: src/types/thread.cpp include/viua/types/thread.h
 ############################################################
 # CPU AND THREADING MODULES
 build/thread.o: src/thread.cpp
-	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $< -lpthread
 
 build/thread/dispatch.o: src/thread/dispatch.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
