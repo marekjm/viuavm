@@ -4,6 +4,7 @@
 #include <vector>
 #include <functional>
 #include <regex>
+#include <thread>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/opcodes.h>
 #include <viua/bytecode/maps.h>
@@ -21,6 +22,65 @@
 #include <viua/include/module.h>
 #include <viua/cpu/cpu.h>
 using namespace std;
+
+
+void external_call_worker(queue<ExternalCallRequest*>& fc_queue, mutex& fc_mtx, condition_variable& fc_cv) {
+    while (true) {
+        unique_lock<mutex> lck{fc_mtx};
+
+        // don't wait if there are active jobs
+        if (fc_queue.size() == 0) {
+            fc_cv.wait(lck);
+        }
+
+        ExternalCallRequest *ecr = fc_queue.front();
+        fc_queue.pop();
+
+        // unlock as soon as we're done with the queue
+        lck.unlock();
+
+        if (ecr == nullptr) {
+            break;
+        }
+
+        (ecr->function)(ecr->frame, nullptr, nullptr);
+        // FIXME: woohoo! segfault!
+        Type* returned = nullptr;
+        Frame* frame = ecr->frame;
+        int return_value_register = frame->place_return_value_in;
+        bool resolve_return_value_register = frame->resolve_return_value_register;
+        if (return_value_register != 0) {
+            // we check in 0. register because it's reserved for return values
+            if (frame->regset->at(0) == nullptr) {
+                ecr->issuer->raiseException(new Exception("return value requested by frame but external function did not set return register"));
+            }
+            returned = frame->regset->pop(0);
+        }
+
+        ecr->issuer->popFrame();
+
+        // place return value
+        if (returned and ecr->issuer->trace().size() > 0) {
+            if (resolve_return_value_register) {
+                return_value_register = static_cast<Integer*>(ecr->issuer->obtain(return_value_register))->value();
+            }
+            ecr->issuer->put(return_value_register, returned);
+        }
+
+        ecr->issuer->wakeup();
+
+        delete ecr;
+    }
+
+    cout << "worker returned" << endl;
+}
+
+
+void CPU::scheduleForeignCall(ExternalCallRequest* ecr) {
+    unique_lock<mutex> lck{external_calls_mtx};
+    external_calls_queue.push(ecr);
+    external_calls_cv.notify_one();
+}
 
 
 CPU& CPU::load(byte* bc) {
@@ -271,12 +331,17 @@ bool CPU::burst() {
             // because it is handled later (after ticking code)
             continue;
         }
+
+        // suspended threads count as ticking
+        ticked = true;
+
         if (th->suspended()) {
             // do not execute suspended threads
+            // but also do not mark them as dead
+            running_threads.push_back(th);
             continue;
         }
 
-        ticked = true;
         for (unsigned j = 0; j < th->priority(); ++j) {
             if (th->stopped()) {
                 // remember to break if the thread stopped
@@ -334,7 +399,16 @@ int CPU::run() {
 
     iframe();
     threads[0]->begin();
+
+    thread worker {external_call_worker,
+                   std::ref(external_calls_queue),
+                   std::ref(external_calls_mtx),
+                   std::ref(external_calls_cv)
+    };
+
     while (burst());
+
+    cout << "finished bursting with thread vector of size " << threads.size() << endl;
 
     if (current_thread_index < threads.size() and threads[current_thread_index]->terminated()) {
         cout << "thread '0:" << hex << threads[current_thread_index] << dec << "' has terminated" << endl;
@@ -370,6 +444,10 @@ int CPU::run() {
         }
         delete regset;
     }
+
+    external_calls_queue.push(nullptr);
+    external_calls_cv.notify_one();
+    worker.join();
 
     return return_code;
 }
