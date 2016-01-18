@@ -200,34 +200,9 @@ byte* Thread::callForeign(byte* addr, const string& call_name, const bool& retur
         throw new Exception("call to unregistered external function: " + call_name);
     }
 
-    /* FIXME: second parameter should be a pointer to static registers or
-     *        0 if function does not have static registers registered
-     * FIXME: should external functions always have static registers allocated?
-     */
-    ExternalFunction* callback = cpu->foreign_functions.at(call_name);
-    (*callback)(frame, nullptr, regset);
+    cpu->scheduleForeignCall(new ExternalCallRequest(this, call_name, cpu->foreign_functions.at(call_name), frame));
 
-    // FIXME: woohoo! segfault!
-    Type* returned = nullptr;
-    int return_value_register = frames.back()->place_return_value_in;
-    bool resolve_return_value_register = frames.back()->resolve_return_value_register;
-    if (return_value_register != 0) {
-        // we check in 0. register because it's reserved for return values
-        if (uregset->at(0) == nullptr) {
-            throw new Exception("return value requested by frame but external function did not set return register");
-        }
-        returned = uregset->pop(0);
-    }
-
-    dropFrame();
-
-    // place return value
-    if (returned and frames.size() > 0) {
-        if (resolve_return_value_register) {
-            return_value_register = static_cast<Integer*>(fetch(return_value_register))->value();
-        }
-        place(return_value_register, returned);
-    }
+    suspend();
 
     return return_address;
 }
