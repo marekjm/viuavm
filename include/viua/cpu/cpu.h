@@ -14,7 +14,27 @@
 #include <algorithm>
 #include <stdexcept>
 #include <mutex>
+#include <condition_variable>
+#include <viua/include/module.h>
 #include <viua/thread.h>
+
+
+struct ExternalCallRequest {
+    std::string function_name;
+    ExternalFunction *function;
+    Frame *frame;
+    Thread *issuer;
+
+    ExternalCallRequest(Thread *i, const std::string& fname, ExternalFunction *fn, Frame *frm):
+        function_name(fname),
+        function(fn),
+        frame(frm),
+        issuer(i)
+    {}
+};
+
+
+void external_call_worker(std::queue<ExternalCallRequest*>& external_calls_queue, std::mutex& external_calls_mtx, std::condition_variable& external_calls_cv);
 
 
 class CPU {
