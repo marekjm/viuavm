@@ -5,6 +5,7 @@
 
 #include <string>
 #include <queue>
+#include <mutex>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/types/type.h>
 #include <viua/types/prototype.h>
@@ -99,6 +100,7 @@ class Thread {
     bool is_joinable;
     bool is_suspended;
     unsigned thread_priority;
+    std::mutex thread_mtx;
 
     /*  Methods implementing CPU instructions.
      */
@@ -240,9 +242,18 @@ class Thread {
             parent_thread = nullptr;
         }
 
-        inline void suspend() { is_suspended = true; }
-        inline void wakeup() { is_suspended = false; }
-        inline bool suspended() { return is_suspended; }
+        inline void suspend() {
+            std::unique_lock<std::mutex> lck;
+            is_suspended = true;
+        }
+        inline void wakeup() {
+            std::unique_lock<std::mutex> lck;
+            is_suspended = false;
+        }
+        inline bool suspended() {
+            std::unique_lock<std::mutex> lck;
+            return is_suspended;
+        }
 
         inline Thread* parent() const { return parent_thread; };
 
