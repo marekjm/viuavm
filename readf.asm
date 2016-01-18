@@ -1,8 +1,8 @@
-.signature: std::io::readtext
+.signature: std::io::getline
 
 .function: run_in_a_thread
     .name: 1 counter
-    istore counter 140
+    istore counter 1400000
     strstore 2 "iterations left: "
 
     .mark: loop_begin
@@ -26,10 +26,9 @@
     frame ^[(param 0 (ptr 2 1))]
     msg 0 detach
 
-    frame ^[(param 0 (strstore 3 "./big_file.txt"))]
-    call 4 std::io::readtext
+    frame 0
+    print (call 4 std::io::getline)
 
-    ;print 4
     print (strstore 5 "main/1 returning")
 
     izero 0
