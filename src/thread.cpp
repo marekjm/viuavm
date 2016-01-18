@@ -209,7 +209,6 @@ byte* Thread::callForeign(byte* addr, const string& call_name, const bool& retur
 
     // FIXME: woohoo! segfault!
     Type* returned = nullptr;
-    bool returned_is_reference = false;
     int return_value_register = frames.back()->place_return_value_in;
     bool resolve_return_value_register = frames.back()->resolve_return_value_register;
     if (return_value_register != 0) {
@@ -228,9 +227,6 @@ byte* Thread::callForeign(byte* addr, const string& call_name, const bool& retur
             return_value_register = static_cast<Integer*>(fetch(return_value_register))->value();
         }
         place(return_value_register, returned);
-        if (returned_is_reference) {
-            uregset->flag(return_value_register, REFERENCE);
-        }
     }
 
     return return_address;
