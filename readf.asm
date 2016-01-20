@@ -7,8 +7,6 @@
 
     .mark: loop_begin
     branch counter +1 loop_end
-    echo 2
-    print counter
     idec counter
     jump loop_begin
     .mark: loop_end
@@ -26,6 +24,7 @@
     frame ^[(param 0 (ptr 2 1))]
     msg 0 detach
 
+    echo (strstore 6 "prompt: ")
     frame 0
     print (call 4 std::io::getline)
 
