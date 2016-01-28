@@ -71,8 +71,6 @@ void external_call_worker(queue<ExternalCallRequest*>& fc_queue, mutex& fc_mtx, 
 
         delete ecr;
     }
-
-    cout << "worker returned" << endl;
 }
 
 
@@ -407,8 +405,6 @@ int CPU::run() {
     };
 
     while (burst());
-
-    cout << "finished bursting with thread vector of size " << threads.size() << endl;
 
     if (current_thread_index < threads.size() and threads[current_thread_index]->terminated()) {
         cout << "thread '0:" << hex << threads[current_thread_index] << dec << "' has terminated" << endl;
