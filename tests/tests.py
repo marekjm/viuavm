@@ -693,7 +693,7 @@ class PrototypeSystemTests(unittest.TestCase):
     def testDynamicDispatch(self):
         global MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES
         # FIXME: Valgrind freaks out about dlopen() leaks, comment this line if you know what to do about it
-        MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES = (74351, 74367)
+        MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES = (74351, 74367, 74383)
         runTestSplitlinesNoDisassemblyRerun(self, 'dynamic_method_dispatch.asm',
             [
                 'Good day from Derived',
