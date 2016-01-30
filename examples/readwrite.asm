@@ -2,42 +2,37 @@
 ;
 ; Compilation:
 ;
-;   g++ -std=c++11 -Wall -pedantic -fPIC -c -o registerset.o ../src/cpu/registerset.cpp
-;   g++ -std=c++11 -Wall -pedantic -fPIC -shared -o io.so io.cpp registerset.o
-;   ../bin/vm/asm readwrite.asm
+;   g++ -std=c++11 -Wall -pedantic -fPIC -c -I../include -o registerset.o ../src/cpu/registerset.cpp
+;   g++ -std=c++11 -Wall -pedantic -fPIC -shared -I../include -o io.so io.cpp registerset.o
+;   ../build/bin/vm/asm readwrite.asm
 ;
 ; After libraries and the program are compiled result can be tested with following command
 ; which will ask for a path to read, read it, ask for a path write and write the string to it.
 ;
-;   ../bin/vm/cpu a.out
+;   ../build/bin/vm/cpu a.out
 ;
 
+.signature: io::getline
+.signature: io::read
+.signature: io::write
+
 .function: main
-    eximport "io"
+    import "./io"
 
-    strstore 1 "Path to read: "
-    echo 1
-
+    echo (strstore 1 "Path to read: ")
     frame 0
-    excall io.getline 1
+    print (call 1 io::getline)
 
-    print 1
+    frame ^[(param 0 1)]
+    echo (call 2 io::read)
 
-    frame 1
-    param 0 1
-    excall io.read 2
-    echo 2
-
-    strstore 3 "Path to write: "
-    echo 3
+    echo (strstore 3 "Path to write: ")
     frame 0
-    excall io.getline 3
+    call 3 io::getline
 
-    frame 2
-    param 0 3
-    param 1 2
-    excall io.write 0
+    frame ^[(param 0 3) (param 1 2)]
+    call 0 io::write
 
     izero 0
-    end
+    return
 .end
