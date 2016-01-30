@@ -111,7 +111,6 @@ def valgrindSummary(text):
     interesting_lines = [line[len(valprefix):].strip() for line in output_lines[output_lines.index('{0} HEAP SUMMARY:'.format(valprefix)):]]
 
     in_use_at_exit = valgrindBytesInBlocks(interesting_lines[1], valgrind_regex_heap_summary_in_use_at_exit)
-    # print(interesting_lines[1], in_use_at_exit)
 
     total_heap_usage_matched = valgrind_regex_heap_summary_total_heap_usage.search(interesting_lines[2])
     total_heap_usage = {
@@ -119,28 +118,16 @@ def valgrindSummary(text):
         'frees': int(total_heap_usage_matched.group(2).replace(',', '')),
         'bytes': int(total_heap_usage_matched.group(3).replace(',', '')),
     }
-    # print(interesting_lines[2], total_heap_usage)
 
     definitely_lost = valgrindBytesInBlocks(interesting_lines[5], valgrind_regex_leak_summary_definitely_lost)
-    # print(interesting_lines[5], definitely_lost)
-
     indirectly_lost = valgrindBytesInBlocks(interesting_lines[6], valgrind_regex_leak_summary_indirectly_lost)
-    # print(interesting_lines[6], indirectly_lost)
-
     possibly_lost = valgrindBytesInBlocks(interesting_lines[7], valgrind_regex_leak_summary_possibly_lost)
-    # print(interesting_lines[7], possibly_lost)
-
     still_reachable = valgrindBytesInBlocks(interesting_lines[8], valgrind_regex_leak_summary_still_reachable)
-    # print(interesting_lines[8], still_reachable)
-
     suppressed = valgrindBytesInBlocks(interesting_lines[9], valgrind_regex_leak_summary_suppressed)
-    # print(interesting_lines[9], suppressed)
 
     summary = {'heap': {}, 'leak': {}}
-
     summary['heap']['in_use_at_exit'] = in_use_at_exit
     summary['heap']['total_heap_usage'] = total_heap_usage
-
     summary['leak']['definitely_lost'] = definitely_lost
     summary['leak']['indirectly_lost'] = indirectly_lost
     summary['leak']['possibly_lost'] = possibly_lost
