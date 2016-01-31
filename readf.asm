@@ -1,8 +1,8 @@
-.signature: std::io::getline
+.signature: std::io::readtext
 
 .function: run_in_a_thread
     .name: 1 counter
-    istore counter 1400000
+    istore counter 140
     strstore 2 "iterations left: "
 
     .mark: loop_begin
@@ -28,6 +28,7 @@
     frame 0
     print (call 4 std::io::getline)
 
+    ;print 4
     print (strstore 5 "main/1 returning")
 
     izero 0
