@@ -7,6 +7,9 @@ using namespace std;
 
 
 int_op assembler::operands::getint(const string& s) {
+    if (s.size() == 0) {
+        throw "empty string cannot be used as operand";
+    }
     bool ref = s[0] == '@';
     return tuple<bool, int>(ref, stoi(ref ? str::sub(s, 1) : s));
 }
