@@ -222,7 +222,6 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
 
         string instr;
         string operands;
-        istringstream iss(line);
 
         instr = str::chunk(line);
         operands = str::lstrip(str::sub(line, instr.size()));
