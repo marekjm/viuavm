@@ -7,7 +7,6 @@
 #include <cstdint>
 #include <string>
 #include <vector>
-#include <queue>
 #include <map>
 #include <tuple>
 #include <unordered_set>
@@ -54,10 +53,6 @@ class CPU {
     std::vector<Thread*> threads;
     decltype(threads)::size_type current_thread_index;
     std::mutex threads_mtx;
-
-    std::queue<ExternalCallRequest*> external_calls_queue;
-    std::mutex external_calls_mtx;
-    std::condition_variable external_calls_cv;
 
     // Global register set
     RegisterSet* regset;
