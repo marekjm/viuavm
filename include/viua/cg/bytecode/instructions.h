@@ -95,6 +95,7 @@ namespace cg {
         byte* opthread(byte*, int_op, const std::string&);
         byte* opthjoin(byte*, int_op);
         byte* opthreceive(byte*, int_op);
+        byte* opsupervisor(byte*, const std::string&);
 
         byte* jump(byte*, uint64_t);
         byte* branch(byte*, int_op, uint64_t, uint64_t);
