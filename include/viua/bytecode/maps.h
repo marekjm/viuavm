@@ -101,7 +101,7 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "thread", sizeof(byte) + sizeof(OperandType) + sizeof(int) },
     { "thjoin", sizeof(byte) + sizeof(OperandType) + sizeof(int) },
     { "threceive", sizeof(byte) + sizeof(OperandType) + sizeof(int) },
-    { "supervisor", sizeof(byte) + sizeof(OperandType) + sizeof(int) },
+    { "supervisor", sizeof(byte) },
 
     { "jump",   sizeof(byte) + sizeof(uint64_t) },
     { "branch", sizeof(byte) + sizeof(OperandType)+sizeof(int) + 2*sizeof(uint64_t) },
