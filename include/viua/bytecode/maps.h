@@ -101,6 +101,7 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "thread", sizeof(byte) + sizeof(OperandType) + sizeof(int) },
     { "thjoin", sizeof(byte) + sizeof(OperandType) + sizeof(int) },
     { "threceive", sizeof(byte) + sizeof(OperandType) + sizeof(int) },
+    { "supervisor", sizeof(byte) + sizeof(OperandType) + sizeof(int) },
 
     { "jump",   sizeof(byte) + sizeof(uint64_t) },
     { "branch", sizeof(byte) + sizeof(OperandType)+sizeof(int) + 2*sizeof(uint64_t) },
@@ -219,6 +220,7 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { THREAD,   "thread" },
     { THJOIN,   "thjoin" },
     { THRECEIVE,"threceive" },
+    { SUPERVISOR,"supervisor" },
 
     { JUMP,     "jump" },
     { BRANCH,   "branch" },
@@ -253,6 +255,7 @@ const std::vector<enum OPCODE> OP_VARIABLE_LENGTH = {
     FUNCTION,
     CALL,
     THREAD,
+    SUPERVISOR,
     CATCH,
     ENTER,
     IMPORT,
