@@ -123,6 +123,7 @@ class CPU {
         CPU& iframe(Frame* frm = nullptr, unsigned r = DEFAULT_REGISTER_SIZE);
 
         Thread* spawn(Frame*, Thread* parent_thread = nullptr);
+        Thread* spawnSupervisor(Frame*);
 
         byte* tick(decltype(threads)::size_type thread_index = 0);
         bool burst();
