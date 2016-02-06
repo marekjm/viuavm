@@ -186,6 +186,7 @@ class Thread {
     byte* opthread(byte*);
     byte* opthjoin(byte*);
     byte* opthreceive(byte*);
+    byte* opsupervisor(byte*);
     byte* opreturn(byte*);
 
     byte* jump(byte*);
