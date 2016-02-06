@@ -59,6 +59,12 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         oss << fn_name;
         bptr += fn_name.size();
         ++bptr; // for null character terminating the C-style string not included in std::string
+    } else if (op == SUPERVISOR) {
+        oss << " ";
+        string fn_name = string(bptr);
+        oss << fn_name;
+        bptr += fn_name.size();
+        ++bptr; // for null character terminating the C-style string not included in std::string
     } else if ((op == IMPORT) or (op == ENTER) or (op == LINK)) {
         oss << " ";
         string s = string(bptr);
