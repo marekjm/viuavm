@@ -13,6 +13,7 @@
 #include <viua/types/string.h>
 #include <viua/types/thread.h>
 #include <viua/loader.h>
+#include <viua/cg/disassembler/disassembler.h>
 #include <viua/cpu/cpu.h>
 #include <viua/program.h>
 #include <viua/printutils.h>
@@ -191,7 +192,7 @@ int main(int argc, char* argv[]) {
         string ex_type = thrown_object->type();
 
         cout << "exception after " << cpu.counter() << " ticks" << endl;
-        cout << "offending instruction: " << OP_NAMES.at(OPCODE(*cpu.executionAt())) << endl;
+        cout << "failed instruction: " << get<0>(disassembler::instruction(cpu.executionAt())) << endl;
         cout << "uncaught object: " << ex_type << " = " << (ex ? ex->what() : thrown_object->str()) << endl;
         cout << "\n";
 
