@@ -282,6 +282,7 @@ class Thread {
 
         byte* begin();
         inline uint64_t counter() { return instruction_counter; }
+        inline decltype(instruction_pointer) executionAt() { return instruction_pointer; }
 
         inline std::tuple<int, std::string, std::string> exitcondition() {
             return std::tuple<int, std::string, std::string>(return_code, return_exception, return_message);
