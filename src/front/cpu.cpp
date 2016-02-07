@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <viua/version.h>
+#include <viua/bytecode/maps.h>
 #include <viua/support/string.h>
 #include <viua/support/env.h>
 #include <viua/types/pointer.h>
@@ -190,6 +191,7 @@ int main(int argc, char* argv[]) {
         string ex_type = thrown_object->type();
 
         cout << "exception after " << cpu.counter() << " ticks" << endl;
+        cout << "offending instruction: " << OP_NAMES.at(OPCODE(*cpu.executionAt())) << endl;
         cout << "uncaught object: " << ex_type << " = " << (ex ? ex->what() : thrown_object->str()) << endl;
         cout << "\n";
 
