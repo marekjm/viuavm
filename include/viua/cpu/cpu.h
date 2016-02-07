@@ -133,6 +133,7 @@ class CPU {
             return std::tuple<int, std::string, std::string>(return_code, return_exception, return_message);
         }
         inline std::vector<Frame*> trace() { return threads[current_thread_index]->trace(); }
+        inline byte* executionAt() { return threads[current_thread_index]->executionAt(); }
 
         inline bool terminated() { return (terminating_exception != nullptr); }
         inline Type* terminatedBy() { return terminating_exception; }
