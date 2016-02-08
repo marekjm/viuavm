@@ -44,6 +44,7 @@ class ThreadType : public Type {
         bool stopped();
         bool terminated();
         void transferActiveExceptionTo(Type*&);
+        Type* getReturnValue();
 
         ThreadType(Thread* t): thrd(t) {}
 };

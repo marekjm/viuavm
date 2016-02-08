@@ -66,6 +66,7 @@ class Thread {
     /*  Variables set after CPU executed bytecode.
      *  They describe exit conditions of the bytecode that just stopped running.
      */
+    Type* return_value; // return value of top-most frame on the stack
     int return_code;                // always set
     std::string return_exception;   // set if CPU stopped because of an exception
     std::string return_message;     // message set by exception
@@ -279,6 +280,11 @@ class Thread {
         inline void popFrame() {
             dropFrame();
         }
+        inline Type* getReturnValue() {
+            Type* tmp = return_value;
+            return_value = nullptr;
+            return tmp;
+        }
 
         byte* begin();
         inline uint64_t counter() { return instruction_counter; }
@@ -295,6 +301,7 @@ class Thread {
             jump_base(jb),
             frame_new(nullptr), try_frame_new(nullptr),
             thrown(nullptr), caught(nullptr), has_unhandled_exception(false),
+            return_value(nullptr),
             return_code(0),
             instruction_counter(0),
             instruction_pointer(nullptr),

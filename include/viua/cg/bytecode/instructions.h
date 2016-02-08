@@ -93,7 +93,7 @@ namespace cg {
         byte* argc(byte*, int_op);
         byte* call(byte*, int_op, const std::string&);
         byte* opthread(byte*, int_op, const std::string&);
-        byte* opthjoin(byte*, int_op);
+        byte* opthjoin(byte*, int_op, int_op);
         byte* opthreceive(byte*, int_op);
 
         byte* jump(byte*, uint64_t);

@@ -745,9 +745,10 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* opthjoin(byte* addr_ptr, int_op reg) {
+        byte* opthjoin(byte* addr_ptr, int_op target, int_op source) {
             *(addr_ptr++) = THJOIN;
-            addr_ptr = insertIntegerOperand(addr_ptr, reg);
+            addr_ptr = insertIntegerOperand(addr_ptr, target);
+            addr_ptr = insertIntegerOperand(addr_ptr, source);
             return addr_ptr;
         }
 

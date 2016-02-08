@@ -59,6 +59,10 @@ void ThreadType::transferActiveExceptionTo(Type*& exception_register) {
     return thrd->transferActiveExceptionTo(exception_register);
 }
 
+Type* ThreadType::getReturnValue() {
+    return thrd->getReturnValue();
+}
+
 
 void ThreadType::joinable(Frame* frame, RegisterSet*, RegisterSet*) {
     frame->regset->set(0, new Boolean(thrd->joinable()));

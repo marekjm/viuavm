@@ -129,6 +129,10 @@ void Thread::dropFrame() {
         }
     }
 
+    if (frames.size() == 1) {
+        return_value = frame->regset->pop(0);
+    }
+
     delete frame;
     frames.pop_back();
 
@@ -562,5 +566,9 @@ Thread::~Thread() {
         ++sr;
         static_registers.erase(rkey);
         delete rset;
+    }
+
+    if (return_value != nullptr) {
+        delete return_value;
     }
 }

@@ -50,12 +50,16 @@ byte* Thread::opthjoin(byte* addr) {
     byte* return_addr = (addr-1);
 
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    if (ThreadType* thrd = dynamic_cast<ThreadType*>(fetch(target))) {
+    int source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    if (ThreadType* thrd = dynamic_cast<ThreadType*>(fetch(source))) {
         if (thrd->stopped()) {
             thrd->join();
             return_addr = addr;
             if (thrd->terminated()) {
                 thrd->transferActiveExceptionTo(thrown);
+            }
+            if (target) {
+                place(target, thrd->getReturnValue());
             }
         }
     } else {
