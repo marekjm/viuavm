@@ -25,9 +25,9 @@
     frame ^[(param 0 (strstore 2 "Hello multithreaded World! (2)"))]
     thread 4 print_eager
 
-    thjoin 4
+    thjoin 0 4
     ; do not join the thread to test __entry/0 orphaning detection
-    ;thjoin 3
+    ;thjoin 0 3
 
     izero 0
     return

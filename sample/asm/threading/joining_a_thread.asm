@@ -30,8 +30,8 @@
     frame ^[(param 0 (strstore 2 "Hello multithreaded World! (2)"))]
     thread 4 print_lazy
 
-    thjoin 3
-    thjoin 4
+    thjoin 0 3
+    thjoin 0 4
 
     izero 0
     return

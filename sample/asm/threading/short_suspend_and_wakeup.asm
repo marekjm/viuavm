@@ -28,7 +28,7 @@
     frame ^[(param 0 3)]
     thread 4 thread_waking_up_the_other_one
 
-    thjoin 4
+    thjoin 0 4
 
     izero 0
     return

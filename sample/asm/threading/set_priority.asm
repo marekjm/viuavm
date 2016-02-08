@@ -40,7 +40,7 @@
 
     print (strstore 6 "Hello sequential World!")
 
-    thjoin 1
+    thjoin 0 1
 
     izero 0
     return

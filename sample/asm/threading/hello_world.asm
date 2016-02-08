@@ -21,8 +21,8 @@
     thread 4 print_eager
 
     ; join threads
-    thjoin 3
-    thjoin 4
+    thjoin 0 3
+    thjoin 0 4
 
     izero 0
     return

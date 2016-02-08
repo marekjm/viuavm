@@ -5,7 +5,7 @@
 .end
 
 .block: try_thread_exception
-    thjoin 1
+    thjoin 0 1
     leave
 .end
 
