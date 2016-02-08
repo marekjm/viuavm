@@ -808,6 +808,9 @@ class MultithreadingTests(unittest.TestCase):
     def testTransferringExceptionsOnJoin(self):
         runTest(self, 'transferring_exceptions.asm', 'exception transferred from thread Thread: Hello exception transferring World!')
 
+    def testReturningValuesOnJoin(self):
+        runTest(self, 'return_from_a_thread.asm', '42')
+
     def testSuspendAndWakeup(self):
         runTestSplitlines(self, 'short_suspend_and_wakeup.asm', [
             'suspending thread 0',
