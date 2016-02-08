@@ -174,6 +174,16 @@ Thread* CPU::spawn(Frame* frm, Thread* parent_thread) {
     threads.push_back(thrd);
     return thrd;
 }
+Thread* CPU::spawnSupervisor(Frame* frm) {
+    if (supervisor_thread != nullptr) {
+        throw new Exception("supervisor thread already spawned");
+    }
+    unique_lock<std::mutex> lck{threads_mtx};
+    Thread* thrd = new Thread(frm, this, jump_base, nullptr);
+    thrd->begin();
+    supervisor_thread = thrd;
+    return thrd;
+}
 
 vector<string> CPU::inheritanceChainOf(const string& type_name) {
     /** This methods returns full inheritance chain of a type.
@@ -292,8 +302,12 @@ bool CPU::burst() {
         }
 
         if (th->terminated() and not th->joinable() and th->parent() == nullptr) {
-            cout << "[thread " << th << "]: terminated by runaway exception, aborting" << endl;
-            abort_because_of_thread_termination = true;
+            if (supervisor_thread == nullptr) {
+                cout << "[thread " << th << "]: terminated by runaway exception, aborting" << endl;
+                abort_because_of_thread_termination = true;
+            } else {
+                cout << "[thread " << th << "]: terminated by runaway exception, passing death to supervisor" << endl;
+            }
             break;
         }
 

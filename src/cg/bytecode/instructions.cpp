@@ -758,6 +758,15 @@ namespace cg {
             return addr_ptr;
         }
 
+        byte* opsupervisor(byte* addr_ptr, const string& fn_name) {
+            *(addr_ptr++) = SUPERVISOR;
+            for (unsigned i = 0; i < fn_name.size(); ++i) {
+                *(addr_ptr++) = fn_name[i];
+            }
+            *(addr_ptr++) = '\0';
+            return addr_ptr;
+        }
+
         byte* jump(byte* addr_ptr, uint64_t addr) {
             /*  Inserts jump instruction. Parameter is instruction index.
              *  Byte offset is calculated automatically.

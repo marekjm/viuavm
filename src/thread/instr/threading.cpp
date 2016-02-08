@@ -86,3 +86,37 @@ byte* Thread::opthreceive(byte* addr) {
 
     return return_addr;
 }
+byte* Thread::opsupervisor(byte* addr) {
+    /*  Run supervisor instruction.
+     */
+    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+
+    string call_name = viua::operand::extractString(addr);
+
+    bool is_native = (cpu->function_addresses.count(call_name) or cpu->linked_functions.count(call_name));
+    bool is_foreign = cpu->foreign_functions.count(call_name);
+
+    if (not (is_native or is_foreign)) {
+        throw new Exception("supervisor thread from undefined function: " + call_name);
+    }
+    if (not is_native) {
+        throw new Exception("supervisor thread must be native function, used foreign " + call_name);
+    }
+
+    // clear PASSED flag
+    // since we copy all values when creating threads
+    // we can safely overwrite all registers after the thread has launched
+    for (unsigned i = 0; i < uregset->size(); ++i) {
+        if (uregset->at(i) != nullptr) {
+            uregset->unflag(i, PASSED);
+        }
+    }
+
+    frame_new->captureArguments();
+
+    frame_new->function_name = call_name;
+    cpu->spawnSupervisor(frame_new);
+    frame_new = nullptr;
+
+    return addr;
+}

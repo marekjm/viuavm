@@ -647,6 +647,11 @@ Program& Program::opthreceive(int_op ref) {
     return (*this);
 }
 
+Program& Program::opsupervisor(const string& fn_name) {
+    addr_ptr = cg::bytecode::opsupervisor(addr_ptr, fn_name);
+    return (*this);
+}
+
 Program& Program::jump(uint64_t addr, enum JUMPTYPE is_absolute) {
     /*  Inserts jump instruction. Parameter is instruction index.
      *  Byte offset is calculated automatically.

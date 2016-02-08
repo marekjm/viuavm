@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <queue>
 #include <map>
 #include <tuple>
 #include <unordered_set>
@@ -31,6 +32,8 @@ class CPU {
 
     // vector of all threads machine is executing
     std::vector<Thread*> threads;
+    std::queue<Type*> supervisor_message_buffer;
+    Thread* supervisor_thread;
     decltype(threads)::size_type current_thread_index;
     std::mutex threads_mtx;
 
@@ -120,6 +123,7 @@ class CPU {
         CPU& iframe(Frame* frm = nullptr, unsigned r = DEFAULT_REGISTER_SIZE);
 
         Thread* spawn(Frame*, Thread* parent_thread = nullptr);
+        Thread* spawnSupervisor(Frame*);
 
         byte* tick(decltype(threads)::size_type thread_index = 0);
         bool burst();
@@ -140,6 +144,7 @@ class CPU {
 
         CPU():
             bytecode(nullptr), bytecode_size(0), executable_offset(0),
+            supervisor_thread(nullptr),
             current_thread_index(0),
             regset(nullptr),
             tmp(nullptr),
