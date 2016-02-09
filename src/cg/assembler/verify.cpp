@@ -58,7 +58,7 @@ string assembler::verify::frameBalance(const vector<string>& lines, const map<lo
 
         line = str::lstrip(line);
         instruction = str::chunk(line);
-        if (not (instruction == "call" or instruction == "thread" or instruction == "excall" or instruction == "fcall" or instruction == "frame" or instruction == "msg" or instruction == "end")) {
+        if (not (instruction == "call" or instruction == "thread" or instruction == "excall" or instruction == "fcall" or instruction == "frame" or instruction == "msg" or instruction == "return")) {
             continue;
         }
 
