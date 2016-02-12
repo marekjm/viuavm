@@ -176,7 +176,7 @@ uint64_t Program::countBytes(const vector<string>& lines) {
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (which is a string)
                 inc += (str::extract(line).size() - 2 + 1); // +1: null-terminator, -2: quotes around module name
-            } else if (op == LINK) {
+            } else if (op == LINK or op == SUPERVISOR) {
                 // clear first chunk
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (which is a module name)
@@ -249,7 +249,7 @@ uint64_t Program::getInstructionBytecodeOffset(uint64_t instr, uint64_t count) {
         }
 
         OPCODE opcode = OPCODE(program[offset]);
-        if ((opcode == IMPORT) or (opcode == ENTER) or (opcode == LINK)) {
+        if ((opcode == IMPORT) or (opcode == ENTER) or (opcode == LINK) or (opcode == SUPERVISOR)) {
             string s(program+offset+1);
             if (scream) {
                 cout << '+' << s.size() << " (function/module name at byte " << offset+1 << ": `" << s << "`)";

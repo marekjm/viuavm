@@ -179,6 +179,7 @@ Thread* CPU::spawnSupervisor(Frame* frm) {
         throw new Exception("supervisor thread already spawned");
     }
     unique_lock<std::mutex> lck{threads_mtx};
+    cout << "CPU::spawnSupervisor()" << endl;
     Thread* thrd = new Thread(frm, this, jump_base, nullptr);
     thrd->begin();
     supervisor_thread = thrd;
@@ -302,6 +303,7 @@ bool CPU::burst() {
         }
 
         if (th->terminated() and not th->joinable() and th->parent() == nullptr) {
+            cout << "supervisor? " << supervisor_thread << endl;
             if (supervisor_thread == nullptr) {
                 cout << "[thread " << th << "]: terminated by runaway exception, aborting" << endl;
                 abort_because_of_thread_termination = true;
