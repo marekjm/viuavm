@@ -140,10 +140,10 @@ uint64_t Program::countBytes(const vector<string>& lines) {
         try {
             OPCODE op = instructionToOpcode(instr);
             inc = OP_SIZES.at(instr);
-            if ((op == ENTER)) {
+            if ((op == ENTER) or (op == LINK) or (op == SUPERVISOR)) {
                 // clear first chunk
                 line = str::lstrip(str::sub(line, instr.size()));
-                // get second chunk (function or block name)
+                // get second chunk (function, block or module name)
                 inc += str::chunk(line).size() + 1;
             } else if ((op == CALL) or (op == MSG) or (op == THREAD)) {
                 // clear first chunk (opcode mnemonic)
@@ -176,11 +176,6 @@ uint64_t Program::countBytes(const vector<string>& lines) {
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (which is a string)
                 inc += (str::extract(line).size() - 2 + 1); // +1: null-terminator, -2: quotes around module name
-            } else if (op == LINK or op == SUPERVISOR) {
-                // clear first chunk
-                line = str::lstrip(str::sub(line, instr.size()));
-                // get second chunk (which is a module name)
-                inc += (str::chunk(line).size() + 1); // +1: null-terminator
             } else if (op == CATCH) {
                 // clear first chunk (the opcode)
                 line = str::lstrip(str::sub(line, instr.size()));
