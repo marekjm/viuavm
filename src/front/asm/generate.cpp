@@ -494,7 +494,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             regno_chnk = str::chunk(operands);
             program.opthreceive(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "supervisor")) {
-            string fn_name = str::extract(operands);
+            string fn_name = str::chunk(operands);
             program.opsupervisor(fn_name);
         } else if (str::startswith(line, "branch")) {
             /*  If branch is given three operands, it means its full, three-operands form is being used.
