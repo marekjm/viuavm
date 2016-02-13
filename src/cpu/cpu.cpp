@@ -174,15 +174,15 @@ Thread* CPU::spawn(Frame* frm, Thread* parent_thread) {
     threads.push_back(thrd);
     return thrd;
 }
-Thread* CPU::spawnSupervisor(Frame* frm) {
-    if (supervisor_thread != nullptr) {
-        throw new Exception("supervisor thread already spawned");
+Thread* CPU::spawnWatchdog(Frame* frm) {
+    if (watchdog_thread != nullptr) {
+        throw new Exception("watchdog thread already spawned");
     }
     unique_lock<std::mutex> lck{threads_mtx};
-    cout << "CPU::spawnSupervisor()" << endl;
+    cout << "CPU::spawnWatchdog()" << endl;
     Thread* thrd = new Thread(frm, this, jump_base, nullptr);
     thrd->begin();
-    supervisor_thread = thrd;
+    watchdog_thread = thrd;
     return thrd;
 }
 
@@ -303,12 +303,12 @@ bool CPU::burst() {
         }
 
         if (th->terminated() and not th->joinable() and th->parent() == nullptr) {
-            cout << "supervisor? " << supervisor_thread << endl;
-            if (supervisor_thread == nullptr) {
+            cout << "watchdog? " << watchdog_thread << endl;
+            if (watchdog_thread == nullptr) {
                 cout << "[thread " << th << "]: terminated by runaway exception, aborting" << endl;
                 abort_because_of_thread_termination = true;
             } else {
-                cout << "[thread " << th << "]: terminated by runaway exception, passing death to supervisor" << endl;
+                cout << "[thread " << th << "]: terminated by runaway exception, passing death to watchdog" << endl;
             }
             break;
         }

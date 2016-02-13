@@ -86,8 +86,8 @@ byte* Thread::opthreceive(byte* addr) {
 
     return return_addr;
 }
-byte* Thread::opsupervisor(byte* addr) {
-    /*  Run supervisor instruction.
+byte* Thread::opwatchdog(byte* addr) {
+    /*  Run watchdog instruction.
      */
     string call_name = viua::operand::extractString(addr);
 
@@ -95,10 +95,10 @@ byte* Thread::opsupervisor(byte* addr) {
     bool is_foreign = cpu->foreign_functions.count(call_name);
 
     if (not (is_native or is_foreign)) {
-        throw new Exception("supervisor thread from undefined function: " + call_name);
+        throw new Exception("watchdog thread from undefined function: " + call_name);
     }
     if (not is_native) {
-        throw new Exception("supervisor thread must be native function, used foreign " + call_name);
+        throw new Exception("watchdog thread must be native function, used foreign " + call_name);
     }
 
     // clear PASSED flag
@@ -113,7 +113,7 @@ byte* Thread::opsupervisor(byte* addr) {
     frame_new->captureArguments();
 
     frame_new->function_name = call_name;
-    cpu->spawnSupervisor(frame_new);
+    cpu->spawnWatchdog(frame_new);
     frame_new = nullptr;
 
     return addr;

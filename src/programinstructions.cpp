@@ -647,8 +647,8 @@ Program& Program::opthreceive(int_op ref) {
     return (*this);
 }
 
-Program& Program::opsupervisor(const string& fn_name) {
-    addr_ptr = cg::bytecode::opsupervisor(addr_ptr, fn_name);
+Program& Program::opwatchdog(const string& fn_name) {
+    addr_ptr = cg::bytecode::opwatchdog(addr_ptr, fn_name);
     return (*this);
 }
 

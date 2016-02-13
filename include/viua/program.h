@@ -126,7 +126,7 @@ class Program {
     Program& opthread   (int_op, const std::string&);
     Program& opthjoin   (int_op, int_op);
     Program& opthreceive(int_op);
-    Program& opsupervisor(const std::string&);
+    Program& opwatchdog(const std::string&);
     Program& jump       (uint64_t, enum JUMPTYPE);
     Program& branch     (int_op, uint64_t, enum JUMPTYPE, uint64_t, enum JUMPTYPE);
 

@@ -758,8 +758,8 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* opsupervisor(byte* addr_ptr, const string& fn_name) {
-            *(addr_ptr++) = SUPERVISOR;
+        byte* opwatchdog(byte* addr_ptr, const string& fn_name) {
+            *(addr_ptr++) = WATCHDOG;
             for (unsigned i = 0; i < fn_name.size(); ++i) {
                 *(addr_ptr++) = fn_name[i];
             }
