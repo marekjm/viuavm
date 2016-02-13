@@ -29,15 +29,7 @@ void Object::set(Frame* frame, RegisterSet*, RegisterSet*) {
         throw new Exception("invalid type of first parameter: expected 'String' but got '" + frame->args->at(1)->type() + "'");
     }
 
-    string name = frame->args->at(1)->str();
-
-    // prevent memory leaks during key overwriting
-    if (attributes.count(name)) {
-        delete attributes.at(name);
-        attributes.erase(name);
-    }
-
-    attributes[name] = frame->args->at(2)->copy();
+    set(frame->args->at(1)->str(), frame->args->at(2)->copy());
 }
 void Object::get(Frame* frame, RegisterSet*, RegisterSet*) {
     if (frame->args->size() != 2) {
@@ -55,6 +47,15 @@ void Object::get(Frame* frame, RegisterSet*, RegisterSet*) {
     }
 
     frame->regset->set(0, attributes[name]->copy());
+}
+
+void Object::set(const string& name, Type* object) {
+    // prevent memory leaks during key overwriting
+    if (attributes.count(name)) {
+        delete attributes.at(name);
+        attributes.erase(name);
+    }
+    attributes[name] = object;
 }
 
 

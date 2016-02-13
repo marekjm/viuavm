@@ -31,6 +31,8 @@ class Object: public Type {
 
         virtual void set(Frame*, RegisterSet*, RegisterSet*);
         virtual void get(Frame*, RegisterSet*, RegisterSet*);
+
+        void set(const std::string&, Type*);
         inline Type* at(const std::string& s) { return attributes.at(s); }
 
         virtual Type* copy() const;
