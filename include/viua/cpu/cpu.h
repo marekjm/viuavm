@@ -124,6 +124,7 @@ class CPU {
 
         Thread* spawn(Frame*, Thread* parent_thread = nullptr);
         Thread* spawnWatchdog(Frame*);
+        void resurrectWatchdog();
 
         byte* tick(decltype(threads)::size_type thread_index = 0);
         bool executeQuant(Thread*, unsigned);

@@ -186,6 +186,13 @@ Thread* CPU::spawnWatchdog(Frame* frm) {
     watchdog_thread = thrd;
     return thrd;
 }
+void CPU::resurrectWatchdog() {
+    cout << "watchdog thread terminated by: " << watchdog_thread->getActiveException()->str() << endl;
+    Frame* frm = new Frame(nullptr, 0, watchdog_thread->trace()[0]->regset->size());
+    frm->function_name = watchdog_thread->trace()[0]->function_name;
+    delete watchdog_thread;
+    spawnWatchdog(frm);
+}
 
 vector<string> CPU::inheritanceChainOf(const string& type_name) {
     /** This methods returns full inheritance chain of a type.
@@ -321,11 +328,7 @@ bool CPU::burst() {
                 watchdog_thread->pass(death_message);
                 executeQuant(watchdog_thread, 0);
                 if (watchdog_thread->terminated()) {
-                    cout << "watchdog thread terminated by: " << watchdog_thread->getActiveException()->str() << endl;
-                    Frame* frm = new Frame(nullptr, 0, watchdog_thread->trace()[0]->regset->size());
-                    frm->function_name = watchdog_thread->trace()[0]->function_name;
-                    delete watchdog_thread;
-                    spawnWatchdog(frm);
+                    resurrectWatchdog();
                 }
             }
             break;
