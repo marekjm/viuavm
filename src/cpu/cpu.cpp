@@ -313,7 +313,7 @@ bool CPU::burst() {
                 abort_because_of_thread_termination = true;
             } else {
                 dead_threads.push_back(th);
-                Object* death_message = new Object("DeathMessage");
+                Object* death_message = new Object("Object");
                 Type* exc = nullptr;
                 th->transferActiveExceptionTo(exc);
                 death_message->set("function", new Function(th->trace()[0]->function_name));
