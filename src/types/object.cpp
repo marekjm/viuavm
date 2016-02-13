@@ -60,4 +60,15 @@ void Object::set(const string& name, Type* object) {
 
 
 Object::Object(const std::string& tn): type_name(tn) {}
-Object::~Object() {}
+Object::~Object() {
+    auto kv_pair = attributes.begin();
+    while (kv_pair != attributes.end()) {
+        string key = kv_pair->first;
+        Type* value = kv_pair->second;
+
+        ++kv_pair;
+
+        attributes.erase(key);
+        delete value;
+    }
+}
