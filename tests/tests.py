@@ -820,6 +820,13 @@ class MultithreadingTests(unittest.TestCase):
         ])
 
 
+class WatchdogTests(unittest.TestCase):
+    PATH = './sample/asm/watchdog'
+
+    def testHelloWorldExample(self):
+        runTest(self, 'hello_world.asm', 'thread spawned with <Function: broken_thread> died')
+
+
 def sameLines(self, excode, output, no_of_lines):
     lines = output.splitlines()
     self.assertTrue(len(lines) == no_of_lines)
