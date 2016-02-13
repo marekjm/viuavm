@@ -1,6 +1,5 @@
 #include <sstream>
-#include <viua/bytecode/bytetypedef.h>
-#include <viua/bytecode/opcodes.h>
+#include <viua/bytecode/maps.h>
 #include <viua/types/exception.h>
 #include <viua/thread.h>
 #include <viua/cpu/cpu.h>
@@ -265,7 +264,10 @@ byte* Thread::dispatch(byte* addr) {
             break;
         default:
             ostringstream error;
-            error << "unrecognised instruction (bytecode value: " << int(*addr) << ")";
+            error << "unrecognised instruction (byte value " << int(*addr) << ")";
+            if (OP_NAMES.count(static_cast<OPCODE>(*addr))) {
+                error << ": " << OP_NAMES.at(static_cast<OPCODE>(*addr));
+            }
             throw new Exception(error.str());
     }
     return addr;
