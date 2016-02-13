@@ -188,6 +188,10 @@ class CPU {
             for (unsigned i = 0; i < cxx_dynamic_lib_handles.size(); ++i) {
                 dlclose(cxx_dynamic_lib_handles[i]);
             }
+
+            if (watchdog_thread != nullptr) {
+                delete watchdog_thread;
+            }
         }
 };
 
