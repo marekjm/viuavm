@@ -326,10 +326,6 @@ bool CPU::burst() {
                 death_message->set("function", new Function(th->trace()[0]->function_name));
                 death_message->set("exception", exc);
                 watchdog_thread->pass(death_message);
-                executeQuant(watchdog_thread, 0);
-                if (watchdog_thread->terminated()) {
-                    resurrectWatchdog();
-                }
             }
             break;
         }
@@ -346,6 +342,13 @@ bool CPU::burst() {
 
     if (abort_because_of_thread_termination) {
         return false;
+    }
+
+    while (not watchdog_thread->suspended()) {
+        executeQuant(watchdog_thread, 0);
+        if (watchdog_thread->terminated()) {
+            resurrectWatchdog();
+        }
     }
 
     for (decltype(dead_threads)::size_type i = 0; i < dead_threads.size(); ++i) {
