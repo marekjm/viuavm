@@ -1,4 +1,5 @@
 .function: watchdog_thread
+    .mark: watchdog_start
     threceive 1
 
     frame ^[(param 0 (ptr 2 1)) (param 1 (strstore 3 "function"))]
@@ -7,6 +8,8 @@
     echo (strstore 5 "thread spawned with <")
     echo 4
     print (strstore 5 "> died")
+
+    jump watchdog_start
 
     return
 .end
