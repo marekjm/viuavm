@@ -82,6 +82,8 @@ byte* Thread::opthreceive(byte* addr) {
         place(target, message_queue.front());
         message_queue.pop();
         return_addr = addr;
+    } else {
+        suspend();
     }
 
     return return_addr;

@@ -544,6 +544,7 @@ byte* Thread::tick() {
 
 void Thread::pass(Type* message) {
     message_queue.push(message);
+    wakeup();
 }
 
 byte* Thread::begin() {
