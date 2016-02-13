@@ -126,6 +126,7 @@ class CPU {
         Thread* spawnWatchdog(Frame*);
 
         byte* tick(decltype(threads)::size_type thread_index = 0);
+        bool executeQuant(Thread*, unsigned);
         bool burst();
 
         int run();

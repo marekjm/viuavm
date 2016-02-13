@@ -261,6 +261,35 @@ byte* CPU::tick(decltype(threads)::size_type index) {
     return ip;
 }
 
+bool CPU::executeQuant(Thread* th, unsigned priority) {
+    if (th->stopped() and th->joinable()) {
+        // stopped but still joinable
+        // we don't have to deal with "stopped and unjoinable" case here
+        // because it is handled later (after ticking code)
+        return false;
+    }
+    if (th->suspended()) {
+        // do not execute suspended threads
+        return false;
+    }
+
+    for (unsigned j = 0; (priority == 0 or j < priority); ++j) {
+        if (th->stopped()) {
+            // remember to break if the thread stopped
+            // otherwise the CPU will try to tick the thread and
+            // it will crash (will try to execute instructions from 0x0 pointer)
+            break;
+        }
+        if (th->suspended()) {
+            // do not execute suspended threads
+            break;
+        }
+        th->tick();
+    }
+
+    return true;
+}
+
 bool CPU::burst() {
     if (not threads.size()) {
         // make CPU stop if there are no threads to run
@@ -277,31 +306,7 @@ bool CPU::burst() {
         current_thread_index = i;
         auto th = threads[i];
 
-        if (th->stopped() and th->joinable()) {
-            // stopped but still joinable
-            // we don't have to deal with "stopped and unjoinable" case here
-            // because it is handled later (after ticking code)
-            continue;
-        }
-        if (th->suspended()) {
-            // do not execute suspended threads
-            continue;
-        }
-
-        ticked = true;
-        for (unsigned j = 0; j < th->priority(); ++j) {
-            if (th->stopped()) {
-                // remember to break if the thread stopped
-                // otherwise the CPU will try to tick the thread and
-                // it will crash (will try to execute instructions from 0x0 pointer)
-                break;
-            }
-            if (th->suspended()) {
-                // do not execute suspended threads
-                break;
-            }
-            th->tick();
-        }
+        ticked = (executeQuant(th, th->priority()) or ticked);
 
         if (th->terminated() and not th->joinable() and th->parent() == nullptr) {
             if (watchdog_thread == nullptr) {
