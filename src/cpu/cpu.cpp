@@ -310,10 +310,8 @@ bool CPU::burst() {
 
         if (th->terminated() and not th->joinable() and th->parent() == nullptr) {
             if (watchdog_thread == nullptr) {
-                cout << "[thread " << th << "]: terminated by runaway exception, aborting" << endl;
                 abort_because_of_thread_termination = true;
             } else {
-                cout << "[thread " << th << "]: terminated by runaway exception, passing death to watchdog" << endl;
                 dead_threads.push_back(th);
                 Object* death_message = new Object("DeathMessage");
                 Type* exc = nullptr;
