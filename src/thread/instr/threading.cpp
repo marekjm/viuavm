@@ -89,8 +89,6 @@ byte* Thread::opthreceive(byte* addr) {
 byte* Thread::opsupervisor(byte* addr) {
     /*  Run supervisor instruction.
      */
-    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-
     string call_name = viua::operand::extractString(addr);
 
     bool is_native = (cpu->function_addresses.count(call_name) or cpu->linked_functions.count(call_name));
