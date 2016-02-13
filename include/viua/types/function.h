@@ -27,6 +27,7 @@ class Function : public Type {
 
         // FIXME: implement real dtor
         Function();
+        Function(const std::string&);
         virtual ~Function();
 };
 

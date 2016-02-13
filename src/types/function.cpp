@@ -7,6 +7,8 @@ using namespace std;
 
 Function::Function(): function_name("") {
 }
+Function::Function(const string& name): function_name(name) {
+}
 
 Function::~Function() {
 }
