@@ -50,3 +50,12 @@ There are several categories of change:
 - bic: `std::string::stringify` takes pointer to object to stringify instead of a reference,
   this makes the objects stay/1 within VM's scope-based memory management system,
 - bic: `std::string::represent/1` takes pointer to object to stringify instead of a reference,
+- bic: `end` instruction renamed to `return`,
+- feature: VM provides a mechanism to spawn an immortal watchdog thread to deal with deaths of
+  other threads (the syntax is `watchdog <function-name>`, `watchdog` instruction requires a frame),
+- enhancement: VM provides a mechanism to extract return values from functions running in threads,
+- bic: syntax of `thjoin` instruction changed from `thjoin <thread-handle>`
+  to `thjoin <target-register> <thread-handle>`,
+- enhancement: slightly better messages for some exceptions,
+- feature: threads can be suspended and woken-up,
+- feature: `pamv` instruction added to instruction set, supports pass-by-move,
