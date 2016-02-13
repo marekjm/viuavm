@@ -14,6 +14,8 @@
 #include <viua/types/vector.h>
 #include <viua/types/exception.h>
 #include <viua/types/reference.h>
+#include <viua/types/object.h>
+#include <viua/types/function.h>
 #include <viua/support/pointer.h>
 #include <viua/support/string.h>
 #include <viua/support/env.h>
@@ -179,7 +181,6 @@ Thread* CPU::spawnWatchdog(Frame* frm) {
         throw new Exception("watchdog thread already spawned");
     }
     unique_lock<std::mutex> lck{threads_mtx};
-    cout << "CPU::spawnWatchdog()" << endl;
     Thread* thrd = new Thread(frm, this, jump_base, nullptr);
     thrd->begin();
     watchdog_thread = thrd;
@@ -303,12 +304,18 @@ bool CPU::burst() {
         }
 
         if (th->terminated() and not th->joinable() and th->parent() == nullptr) {
-            cout << "watchdog? " << watchdog_thread << endl;
             if (watchdog_thread == nullptr) {
                 cout << "[thread " << th << "]: terminated by runaway exception, aborting" << endl;
                 abort_because_of_thread_termination = true;
             } else {
                 cout << "[thread " << th << "]: terminated by runaway exception, passing death to watchdog" << endl;
+                dead_threads.push_back(th);
+                Object* death_message = new Object("DeathMessage");
+                Type* exc = nullptr;
+                th->transferActiveExceptionTo(exc);
+                death_message->set("function", new Function(th->trace()[0]->function_name));
+                death_message->set("exception", exc);
+                watchdog_thread->pass(death_message);
             }
             break;
         }
