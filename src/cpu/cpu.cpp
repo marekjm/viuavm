@@ -344,9 +344,9 @@ bool CPU::burst() {
         return false;
     }
 
-    while (not watchdog_thread->suspended()) {
+    while (watchdog_thread != nullptr and not watchdog_thread->suspended()) {
         executeQuant(watchdog_thread, 0);
-        if (watchdog_thread->terminated()) {
+        if (watchdog_thread->terminated() or watchdog_thread->stopped()) {
             resurrectWatchdog();
         }
     }
