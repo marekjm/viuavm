@@ -319,6 +319,14 @@ bool CPU::burst() {
                 death_message->set("function", new Function(th->trace()[0]->function_name));
                 death_message->set("exception", exc);
                 watchdog_thread->pass(death_message);
+                executeQuant(watchdog_thread, 0);
+                if (watchdog_thread->terminated()) {
+                    cout << "watchdog thread terminated by: " << watchdog_thread->getActiveException()->str() << endl;
+                    Frame* frm = new Frame(nullptr, 0, watchdog_thread->trace()[0]->regset->size());
+                    frm->function_name = watchdog_thread->trace()[0]->function_name;
+                    delete watchdog_thread;
+                    spawnWatchdog(frm);
+                }
             }
             break;
         }
