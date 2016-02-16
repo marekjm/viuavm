@@ -29,7 +29,7 @@ There are several categories of change:
 ----
 
 
-# From 0.6.1 to 0.6.2
+# From 0.6.1 to 0.7.0
 
 - bic: `throw` instruction no longer leaves thrown object in its source register;
   thrown object is put in special *throw-register* and the source register in
