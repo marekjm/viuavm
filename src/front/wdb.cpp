@@ -727,7 +727,7 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
     } else if (command == "register.show") {
         printRegisters(operands, cpu.trace().back()->regset);
     } else if (command == "register.local.show") {
-        printRegisters(operands, cpu.trace().back()->regset);
+        printRegisters(operands, cpu.threads[cpu.current_thread_index]->uregset);
     } else if (command == "register.global.show") {
         printRegisters(operands, cpu.regset);
     } else if (command == "register.static.show") {
