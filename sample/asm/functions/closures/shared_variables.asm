@@ -1,10 +1,10 @@
-.function: closure_a
+.function: closure_printer
     ; it has to be 2, because 2 register has been bound
     print 2
     return
 .end
 
-.function: closure_b
+.function: closure_setter
     arg 1 0
 
     ; overwrite bound value with whatever we got
@@ -22,9 +22,9 @@
     ; create two closures binding the same variable
     ; presto, we have two functions that are share some state
     clbind 2
-    closure 3 closure_a
+    closure 3 closure_printer
     clbind 2
-    closure 4 closure_b
+    closure 4 closure_setter
 
     ; push closures to vector...
     vpush 1 3
