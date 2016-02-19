@@ -21,7 +21,6 @@ byte* Thread::clbind(byte* addr) {
      *  contains an object bound outside of its immediate scope.
      *  Objects are not freed from registers marked as BOUND.
      */
-    //int target_closure = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     Closure *target_closure = static_cast<Closure*>(viua::operand::extract(addr)->resolve(this));
     int target_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
