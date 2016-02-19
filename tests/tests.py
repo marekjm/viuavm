@@ -579,6 +579,9 @@ class ClosureTests(unittest.TestCase):
     def testVariableSharingBetweenTwoClosures(self):
         runTestReturnsIntegers(self, 'shared_variables.asm', [42, 69])
 
+    def testAdder(self):
+        runTestReturnsIntegers(self, 'adder.asm', [5, 8, 16])
+
 
 class StaticLinkingTests(unittest.TestCase):
     """Tests for static linking functionality.
