@@ -14,12 +14,7 @@ using namespace std;
 
 
 byte* Thread::clbind(byte* addr) {
-    /** Mark a register to be bound by next closure.
-     *
-     *  After next closure instruction, the BIND mask is removed and
-     *  BOUND mask is inserted to hint the CPU that this register
-     *  contains an object bound outside of its immediate scope.
-     *  Objects are not freed from registers marked as BOUND.
+    /** Enclose object by reference.
      */
     Closure *target_closure = static_cast<Closure*>(viua::operand::extract(addr)->resolve(this));
     int target_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
