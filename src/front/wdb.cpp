@@ -15,6 +15,7 @@
 #include <viua/types/integer.h>
 #include <viua/types/closure.h>
 #include <viua/types/string.h>
+#include <viua/types/reference.h>
 #include <viua/loader.h>
 #define AS_DEBUG_HEADER 1
 #include <viua/cpu/cpu.h>
@@ -92,7 +93,7 @@ bool VERBOSE = false;
 
 
 OPCODE printInstruction(const CPU& cpu) {
-    byte* iptr = cpu.threads[0]->instruction_pointer;
+    byte* iptr = cpu.executionAt();
 
     string instruction;
     unsigned size;
@@ -137,7 +138,8 @@ void printRegisters(const vector<string>& indexes, RegisterSet* regset) {
         if (object) {
             cout << '\n';
             cout << "  pointer:       " << hex << object << dec << endl;
-            cout << "  reference:     " << (regset->isflagged(index, REFERENCE) ? "true" : "false") << '\n';
+            //cout << "  reference:     " << (regset->isflagged(index, REFERENCE) ? "true" : "false") << '\n';
+            cout << "  reference:     " << (dynamic_cast<Reference*>(regset->at(index)) ? "true" : "false") << '\n';
             cout << "  copy-on-write: " << (regset->isflagged(index, COPY_ON_WRITE) ? "true" : "false") << '\n';
             cout << "  keep:          " << (regset->isflagged(index, KEEP) ? "true" : "false") << '\n';
             cout << "  to-be bound:   " << (regset->isflagged(index, BIND) ? "true" : "false") << '\n';
@@ -193,8 +195,8 @@ tuple<bool, string> if_breakpoint_byte(CPU& cpu, vector<byte*>& breakpoints_byte
     ostringstream reason;
     reason.str("");
 
-    if (find(breakpoints_byte.begin(), breakpoints_byte.end(), cpu.threads[0]->instruction_pointer) != breakpoints_byte.end()) {
-        reason << "info: execution paused by byte breakpoint: " << cpu.threads[0]->instruction_pointer;
+    if (find(breakpoints_byte.begin(), breakpoints_byte.end(), cpu.executionAt()) != breakpoints_byte.end()) {
+        reason << "info: execution paused by byte breakpoint: " << cpu.executionAt();
         pause = true;
     }
 
@@ -205,7 +207,7 @@ tuple<bool, string> if_breakpoint_opcode(CPU& cpu, vector<string>& breakpoints_o
     ostringstream reason;
     reason.str("");
 
-    string op_name = OP_NAMES.at(OPCODE(*cpu.threads[0]->instruction_pointer));
+    string op_name = OP_NAMES.at(OPCODE(*cpu.executionAt()));
 
     if (find(breakpoints_opcode.begin(), breakpoints_opcode.end(), op_name) != breakpoints_opcode.end()) {
         reason << "info: execution halted by opcode breakpoint: " << op_name;
@@ -219,10 +221,10 @@ tuple<bool, string> if_breakpoint_function(CPU& cpu, vector<string>& breakpoints
     ostringstream reason;
     reason.str("");
 
-    string op_name = OP_NAMES.at(OPCODE(*cpu.threads[0]->instruction_pointer));
+    string op_name = OP_NAMES.at(OPCODE(*cpu.executionAt()));
 
     if (op_name == "call" or op_name == "excall") {
-        string function_name = string(cpu.threads[0]->instruction_pointer+1+sizeof(bool)+sizeof(int));
+        string function_name = string(cpu.executionAt()+1+sizeof(bool)+sizeof(int));
         if (find(breakpoints_function.begin(), breakpoints_function.end(), function_name) != breakpoints_function.end()) {
             reason << "info: execution halted by function breakpoint: " << function_name;
             pause = true;
@@ -236,7 +238,7 @@ tuple<bool, string> if_watchpoint_local_register_write(CPU& cpu, const State& st
     /** Determine whether the instruction at instruction pointer should trigger a watchpoint.
      */
     bool writing_instruction = true;
-    OPCODE opcode = OPCODE(*cpu.threads[0]->instruction_pointer);
+    OPCODE opcode = OPCODE(*cpu.executionAt());
     if (opcode == NOP or
         opcode == NOP or
         opcode == RESS or
@@ -256,7 +258,7 @@ tuple<bool, string> if_watchpoint_local_register_write(CPU& cpu, const State& st
     }
     int register_index[2] = {-1, -1};
     int writes_to = 0;
-    byte* register_index_ptr = (cpu.threads[0]->instruction_pointer+1);
+    byte* register_index_ptr = (cpu.executionAt()+1);
 
     if (opcode == IZERO or
         opcode == ISTORE or
@@ -331,7 +333,7 @@ tuple<bool, string> if_watchpoint_local_register_write(CPU& cpu, const State& st
     reason.str("");
 
     if (writing_instruction) {
-        auto search = state.watch_register_local_write.find(cpu.threads[0]->trace().back()->function_name);
+        auto search = state.watch_register_local_write.find(cpu.trace().back()->function_name);
         if (search != state.watch_register_local_write.end()) {
             for (int i = 0; i < writes_to; ++i) {
                 if (find(search->second.begin(), search->second.end(), register_index[i]) != search->second.end()) {
@@ -348,7 +350,7 @@ tuple<bool, string> if_watchpoint_global_register_write(CPU& cpu, const State& s
     /** Determine whether the instruction at instruction pointer should trigger a watchpoint.
      */
     bool writing_instruction = true;
-    OPCODE opcode = OPCODE(*cpu.threads[0]->instruction_pointer);
+    OPCODE opcode = OPCODE(*cpu.executionAt());
     if (opcode == NOP or
         opcode == NOP or
         opcode == RESS or
@@ -368,7 +370,7 @@ tuple<bool, string> if_watchpoint_global_register_write(CPU& cpu, const State& s
     }
     int register_index[2] = {-1, -1};
     int writes_to = 0;
-    byte* register_index_ptr = (cpu.threads[0]->instruction_pointer+1);
+    byte* register_index_ptr = (cpu.executionAt()+1);
 
     if (opcode == IZERO or
         opcode == ISTORE or
@@ -671,7 +673,7 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
             state.breakpoints_function.push_back(operands[j]);
         }
     } else if (command == "watch.register.local.write") {
-        string function_name = (operands[0] == "." ? cpu.threads[0]->trace().back()->function_name : operands[0]);
+        string function_name = (operands[0] == "." ? cpu.trace().back()->function_name : operands[0]);
         if (not state.watch_register_local_write.count(function_name)) {
             state.watch_register_local_write[function_name] = vector<int>({});
         }
@@ -700,20 +702,20 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
         state.ticks_left = (operands.size() ? stoi(operands[0]) : 1);
     } else if (command == "cpu.jump") {
         if (operands[0] == "sizeof") {
-            cpu.threads[0]->instruction_pointer += OP_SIZES.at(operands[1]);
+            cpu.threads[cpu.current_thread_index]->instruction_pointer += OP_SIZES.at(operands[1]);
         } else if (operands[0][0] == '+') {
             unsigned long j = stoul(str::sub(operands[0], 1));
             while (j > 0) {
                 string instruction;
                 unsigned size;
-                tie(instruction, size) = disassembler::instruction(cpu.threads[0]->instruction_pointer);
-                cpu.threads[0]->instruction_pointer += size;
+                tie(instruction, size) = disassembler::instruction(cpu.executionAt());
+                cpu.threads[cpu.current_thread_index]->instruction_pointer += size;
                 --j;
             }
         } else if (str::startswith(operands[0], "0x")) {
-            cpu.threads[0]->instruction_pointer = (cpu.bytecode+stoul(operands[0], nullptr, 16));
+            cpu.threads[cpu.current_thread_index]->instruction_pointer = (cpu.bytecode+stoul(operands[0], nullptr, 16));
         } else {
-            cpu.threads[0]->instruction_pointer = (cpu.bytecode+stoul(operands[0]));
+            cpu.threads[cpu.current_thread_index]->instruction_pointer = (cpu.bytecode+stoul(operands[0]));
         }
     } else if (command == "cpu.unpause") {
         state.paused = false;
@@ -723,26 +725,26 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
     } else if (command == "cpu.counter") {
         cout << cpu.counter() << endl;
     } else if (command == "register.show") {
-        printRegisters(operands, cpu.threads[0]->uregset);
+        printRegisters(operands, cpu.trace().back()->regset);
     } else if (command == "register.local.show") {
-        printRegisters(operands, cpu.threads[0]->trace().back()->regset);
+        printRegisters(operands, cpu.trace().back()->regset);
     } else if (command == "register.global.show") {
         printRegisters(operands, cpu.regset);
     } else if (command == "register.static.show") {
-        string fun_name = cpu.threads[0]->trace().back()->function_name;
+        string fun_name = cpu.trace().back()->function_name;
 
         try {
-            printRegisters(operands, cpu.threads[0]->static_registers.at(fun_name));
+            printRegisters(operands, cpu.threads[cpu.current_thread_index]->static_registers.at(fun_name));
         } catch (const std::out_of_range& e) {
             // OK, now we know that our function does not have static registers
             cout << "error: current function does not have static registers allocated" << endl;
         }
     } else if (command == "arguments.show") {
-        printRegisters(operands, cpu.threads[0]->trace().back()->args);
+        printRegisters(operands, cpu.trace().back()->args);
     } else if (command == "print.ahead") {
         printInstruction(cpu);
     } else if (command == "stack.trace.show") {
-        vector<Frame*> stack = cpu.threads[0]->trace();
+        vector<Frame*> stack = cpu.trace();
         string indent("");
         for (unsigned j = 0; j < stack.size(); ++j) {
             cout << indent;
@@ -751,9 +753,9 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
             indent += " ";
         }
     } else if (command == "stack.frame.show") {
-        Frame* top = cpu.threads[0]->trace().back();
+        Frame* top = cpu.trace().back();
         cout << "frame: " << stringifyFunctionInvocation(top) << '\n';
-        cout << "  * index on stack: " << cpu.threads[0]->trace().size() << endl;
+        cout << "  * index on stack: " << cpu.trace().size() << endl;
         cout << "  * return address:  " << top->ret_address() << endl;
         cout << "  * return value:    " << top->place_return_value_in << endl;
         cout << "  * resolve return:  " << (top->resolve_return_value_register ? "yes" : "no") << endl;
@@ -952,9 +954,9 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
 
 
             try {
-                op_name = OP_NAMES.at(OPCODE(*cpu.threads[0]->instruction_pointer));
+                op_name = OP_NAMES.at(OPCODE(*cpu.executionAt()));
             } catch (const std::out_of_range& e) {
-                cout << "fatal: unknown instruction at byte " << (cpu.threads[0]->instruction_pointer-cpu.bytecode) << endl;
+                cout << "fatal: unknown instruction" << endl;
                 state.autoresumes = 0;
                 state.ticks_left = 0;
                 state.paused = true;
