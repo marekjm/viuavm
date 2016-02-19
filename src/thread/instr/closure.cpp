@@ -26,18 +26,16 @@ byte* Thread::clbind(byte* addr) {
     int source_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     Type* enclosed_object = uregset->at(source_register);
-    Reference *rf = nullptr;
-    if (dynamic_cast<Reference*>(enclosed_object)) {
-        target_closure->regset->set(target_register, static_cast<Reference*>(enclosed_object)->copy());
-    } else {
+    Reference *rf = dynamic_cast<Reference*>(enclosed_object);
+    if (rf == nullptr) {
         // turn enclosed object into a reference to take it out of VM's default
         // memory management scheme and put it under reference-counting scheme
         // this is needed to bind the enclosed object's life to lifetime of the closure
         rf = new Reference(enclosed_object);
         uregset->empty(source_register);    // empty - do not delete the enclosed object or SEGFAULTS will follow
         uregset->set(source_register, rf);  // set the register to contain the newly-created reference
-        target_closure->regset->set(target_register, rf->copy());
     }
+    target_closure->regset->set(target_register, rf->copy());
 
     return addr;
 }
