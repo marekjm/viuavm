@@ -23,6 +23,7 @@
     ; presto, we have two functions that are share some state
     clbind 2
     closure 3 closure_printer
+
     clbind 2
     closure 4 closure_setter
 
