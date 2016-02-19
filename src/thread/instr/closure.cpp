@@ -30,11 +30,11 @@ byte* Thread::clbind(byte* addr) {
     }
 
     int source_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    Type* enclosed_object = fetch(source_register);
 
+    Type* enclosed_object = uregset->at(source_register);
     Reference *rf = nullptr;
-    if ((rf = dynamic_cast<Reference*>(enclosed_object))) {
-        target_closure->regset->set(target_register, rf->copy());
+    if (dynamic_cast<Reference*>(enclosed_object)) {
+        target_closure->regset->set(target_register, static_cast<Reference*>(enclosed_object)->copy());
     } else {
         // turn enclosed object into a reference to take it out of VM's default
         // memory management scheme and put it under reference-counting scheme
