@@ -25,7 +25,7 @@ byte* Thread::clbind(byte* addr) {
 
     int source_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    Type* enclosed_object = fetch(source_register);
+    Type* enclosed_object = uregset->at(source_register);
     Reference *rf = nullptr;
     if (dynamic_cast<Reference*>(enclosed_object)) {
         target_closure->regset->set(target_register, static_cast<Reference*>(enclosed_object)->copy());
