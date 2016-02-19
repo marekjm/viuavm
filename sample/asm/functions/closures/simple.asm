@@ -5,8 +5,8 @@
 .end
 
 .function: returns_closure
-    clbind (istore 1 42)
-    move 0 (closure 2 foo)
+    closure 2 foo
+    move 0 (clbind 2 1 (istore 1 42))
     return
 .end
 

@@ -85,7 +85,7 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "print",  sizeof(byte) + sizeof(OperandType) + sizeof(int) },
     { "echo",   sizeof(byte) + sizeof(OperandType) + sizeof(int) },
 
-    { "clbind", sizeof(byte) + sizeof(OperandType) + sizeof(int) },
+    { "clbind", sizeof(byte) + 3*sizeof(OperandType) + 3*sizeof(int) },
     { "closure",sizeof(byte) + sizeof(OperandType) + sizeof(int) },
 
     { "function",sizeof(byte) + sizeof(OperandType) + sizeof(int) },

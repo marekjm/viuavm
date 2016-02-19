@@ -7,8 +7,8 @@
 .function: make_adder
     .name: 1 number
     arg number 0
-    clbind 1
     closure 2 adder
+    clbind 2 1 1
     move 0 2
     return
 .end

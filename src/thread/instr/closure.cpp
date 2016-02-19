@@ -21,8 +21,30 @@ byte* Thread::clbind(byte* addr) {
      *  contains an object bound outside of its immediate scope.
      *  Objects are not freed from registers marked as BOUND.
      */
-    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    uregset->flag(target, BIND);
+    //int target_closure = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    Closure *target_closure = static_cast<Closure*>(viua::operand::extract(addr)->resolve(this));
+    int target_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+
+    if (static_cast<unsigned>(target_register) >= target_closure->regset->size()) {
+        throw new Exception("cannot enclose object: register index out exceeded size of closure register set");
+    }
+
+    int source_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    Type* enclosed_object = fetch(source_register);
+
+    Reference *rf = nullptr;
+    if ((rf = dynamic_cast<Reference*>(enclosed_object))) {
+        target_closure->regset->set(target_register, rf->copy());
+    } else {
+        // turn enclosed object into a reference to take it out of VM's default
+        // memory management scheme and put it under reference-counting scheme
+        // this is needed to bind the enclosed object's life to lifetime of the closure
+        rf = new Reference(enclosed_object);
+        uregset->empty(source_register);    // empty - do not delete the enclosed object or SEGFAULTS will follow
+        uregset->set(source_register, rf);  // set the register to contain the newly-created reference
+        target_closure->regset->set(target_register, rf->copy());
+    }
+
     return addr;
 }
 
@@ -41,31 +63,6 @@ byte* Thread::closure(byte* addr) {
     Closure* clsr = new Closure();
     clsr->function_name = call_name;
     clsr->regset = new RegisterSet(uregset->size());
-
-    for (unsigned i = 0; i < uregset->size(); ++i) {
-        // we must not mark empty registers as references or
-        // segfaults will follow as CPU will try to update objects they are referring to, and
-        // that's obviously no good
-        // also, we shouldn't copy them
-        if (uregset->at(i) == nullptr) { continue; }
-
-        if (uregset->isflagged(i, BIND)) {
-            uregset->unflag(i, BIND);
-
-            Type* object = uregset->at(i);
-            Reference* rf = nullptr;
-            if (dynamic_cast<Reference*>(object)) {
-                //cout << "thou shalt not reference references!" << endl;
-                rf = static_cast<Reference*>(object)->copy();
-                clsr->regset->set(i, rf);
-            } else {
-                rf = new Reference(object);
-                uregset->empty(i);
-                uregset->set(i, rf);
-                clsr->regset->set(i, rf->copy());
-            }
-        }
-    }
 
     place(target, clsr);
 
