@@ -15,13 +15,7 @@ class Reference: public Type {
     /*  These two constructors are used internally by the Reference type to
      *  initialise copies of the reference.
      */
-    Reference(Type **ptr, unsigned *ctr): pointer(ptr), counter(ctr) {
-        /* std::cout << "Reference::Reference[this = 0x"; */
-        /* std::cout << std::hex << long(this); */
-        /* std::cout << "](Type **ptr = 0x"; */
-        /* std::cout << long(*pointer) << ", unsigned *ctr = " << long(counter) << " = "; */
-        /* std::cout << *counter << ')' << std::endl; */
-    }
+    Reference(Type **ptr, unsigned *ctr): pointer(ptr), counter(ctr) {}
 
     public:
         virtual std::string type() const;
