@@ -137,15 +137,26 @@ void printRegisters(const vector<string>& indexes, RegisterSet* regset) {
         Type* object = regset->at(index);
         if (object) {
             cout << '\n';
-            cout << "  pointer:       " << hex << object << dec << endl;
-            //cout << "  reference:     " << (regset->isflagged(index, REFERENCE) ? "true" : "false") << '\n';
-            cout << "  reference:     " << (dynamic_cast<Reference*>(regset->at(index)) ? "true" : "false") << '\n';
-            cout << "  copy-on-write: " << (regset->isflagged(index, COPY_ON_WRITE) ? "true" : "false") << '\n';
-            cout << "  keep:          " << (regset->isflagged(index, KEEP) ? "true" : "false") << '\n';
-            cout << "  to-be bound:   " << (regset->isflagged(index, BIND) ? "true" : "false") << '\n';
-            cout << "  bound:         " << (regset->isflagged(index, BOUND) ? "true" : "false") << '\n';
-            cout << "  object type:   " << object->type() << '\n';
-            cout << "  value:         " << object->repr() << '\n';
+            Reference *rf = nullptr;
+            if ((rf = dynamic_cast<Reference*>(object))) {
+                cout << "  pointer:       " << hex << rf << " -> " << rf->pointsTo() << dec << endl;
+                cout << "  reference:     true" << endl;
+                cout << "  copy-on-write: " << (regset->isflagged(index, COPY_ON_WRITE) ? "true" : "false") << '\n';
+                cout << "  keep:          " << (regset->isflagged(index, KEEP) ? "true" : "false") << '\n';
+                cout << "  to-be bound:   " << (regset->isflagged(index, BIND) ? "true" : "false") << '\n';
+                cout << "  bound:         " << (regset->isflagged(index, BOUND) ? "true" : "false") << '\n';
+                cout << "  object type:   Reference -> " << object->type() << '\n';
+                cout << "  value:         " << rf->repr() << " -> " << object->repr() << '\n';
+            } else {
+                cout << "  pointer:       " << hex << object << dec << endl;
+                cout << "  reference:     false" << endl;
+                cout << "  copy-on-write: " << (regset->isflagged(index, COPY_ON_WRITE) ? "true" : "false") << '\n';
+                cout << "  keep:          " << (regset->isflagged(index, KEEP) ? "true" : "false") << '\n';
+                cout << "  to-be bound:   " << (regset->isflagged(index, BIND) ? "true" : "false") << '\n';
+                cout << "  bound:         " << (regset->isflagged(index, BOUND) ? "true" : "false") << '\n';
+                cout << "  object type:   " << object->type() << '\n';
+                cout << "  value:         " << object->repr() << '\n';
+            }
         } else {
             cout << " [empty]" << endl;
         }
