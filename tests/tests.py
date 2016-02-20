@@ -591,6 +591,9 @@ class ClosureTests(unittest.TestCase):
     def testNestedClosures(self):
         runTest(self, 'nested_closures.asm', '10')
 
+    def testSimpleEncloseByCopy(self):
+        runTest(self, 'simple_enclose_by_copy.asm', '42')
+
 
 class StaticLinkingTests(unittest.TestCase):
     """Tests for static linking functionality.
