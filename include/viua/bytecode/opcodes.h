@@ -90,6 +90,7 @@ enum OPCODE : byte {
     ECHO,
 
     CLBIND,
+    ENCLOSECOPY,
     CLOSURE,
 
     FUNCTION,
