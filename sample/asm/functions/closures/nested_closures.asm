@@ -24,28 +24,25 @@
 .end
 
 .function: closure_level_2
-    ; has registers 1 and 2 occupied by enclosed integers
-    arg 3 0
     closure 0 closure_level_3
+    ; registers 1 and 2 are occupied by enclosed integers
     clbind 0 1 1
     clbind 0 2 2
-    clbind 0 3 3
+    clbind 0 3 (arg 3 0)
     return
 .end
 
 .function: closure_level_1
-    ; has register 1 occupied by enclosed integer
-    arg 2 0
     closure 0 closure_level_2
+    ; register 1 is occupied by enclosed integer
     clbind 0 1 1
-    clbind 0 2 2
+    clbind 0 2 (arg 2 0)
     return
 .end
 
 .function: closure_maker
-    arg 1 0
     closure 0 closure_level_1
-    clbind 0 1 1
+    clbind 0 1 (arg 1 0)
     return
 .end
 
