@@ -537,6 +537,13 @@ Program& Program::clbind(int_op target_closure, int_op target_register, int_op s
     return (*this);
 }
 
+Program& Program::openclosecopy(int_op target_closure, int_op target_register, int_op source_register) {
+    /*  Inserts openclosecopy instuction.
+     */
+    addr_ptr = cg::bytecode::openclosecopy(addr_ptr, target_closure, target_register, source_register);
+    return (*this);
+}
+
 Program& Program::closure(int_op reg, const string& fn) {
     /*  Inserts closure instuction.
      */
