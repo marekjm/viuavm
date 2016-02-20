@@ -18,10 +18,8 @@
 
 .function: closure_level_3
     ; expects 1, 2 and 3 to be enclosed integers
-    iadd 5 1 2
-    iadd 5 3 5
-    iadd 5 (arg 4 0) 5
-    move 0 5
+    .name: 5 accumulator
+    move 0 (iadd accumulator (arg 4 0) (iadd accumulator 3 (iadd accumulator 1 2)))
     return
 .end
 
