@@ -594,6 +594,9 @@ class ClosureTests(unittest.TestCase):
     def testSimpleEncloseByCopy(self):
         runTest(self, 'simple_enclose_by_copy.asm', '42')
 
+    def testEncloseCopyCreatesIndependentObjects(self):
+        runTestSplitlines(self, 'enclosecopy_creates_independent_objects.asm', ['Hello World!', 'Hello World!', '42', 'Hello World!'])
+
 
 class StaticLinkingTests(unittest.TestCase):
     """Tests for static linking functionality.
