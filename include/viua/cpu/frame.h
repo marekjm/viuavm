@@ -9,6 +9,7 @@
 
 class Frame {
         bool deallocate_arguments;
+        bool owns_local_register_set;
     public:
         byte* return_address;
         RegisterSet* args;
@@ -22,9 +23,11 @@ class Frame {
         inline byte* ret_address() { return return_address; }
 
         void captureArguments();
+        void setLocalRegisterSet(RegisterSet*, bool receives_ownership = true);
 
         Frame(byte* ra, long unsigned argsize, long unsigned regsize = 16):
             deallocate_arguments(false),
+            owns_local_register_set(true),
             return_address(ra),
             args(nullptr), regset(nullptr),
             place_return_value_in(0), resolve_return_value_register(false)
@@ -46,7 +49,10 @@ class Frame {
             }
 
             delete args;
-            delete regset;
+
+            if (owns_local_register_set) {
+                delete regset;
+            }
         }
 };
 
