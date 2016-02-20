@@ -122,11 +122,11 @@ byte* Thread::fcall(byte* addr) {
     frame_new->resolve_return_value_register = return_value_ref;
     frame_new->place_return_value_in = return_value_reg;
 
-    pushFrame();
-
     if (fn->type() == "Closure") {
-        uregset = dynamic_cast<Closure*>(fn)->regset;
+        frame_new->setLocalRegisterSet(static_cast<Closure*>(fn)->regset, false);
     }
+
+    pushFrame();
 
     return call_address;
 }
