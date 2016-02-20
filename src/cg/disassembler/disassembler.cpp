@@ -187,6 +187,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case OR:
         case CLBIND:
         case ENCLOSECOPY:
+        case ENCLOSEMOVE:
         case VINSERT:
         case VPOP:
         case VAT:
