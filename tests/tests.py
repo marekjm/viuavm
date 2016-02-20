@@ -588,6 +588,9 @@ class ClosureTests(unittest.TestCase):
     def testChangeEnclosedVariableFromClosure(self):
         runTestSplitlines(self, 'change_enclosed_variable_from_closure.asm', ['Hello World!', '42'])
 
+    def testNestedClosures(self):
+        runTest(self, 'nested_closures.asm', '10')
+
 
 class StaticLinkingTests(unittest.TestCase):
     """Tests for static linking functionality.
