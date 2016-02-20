@@ -169,6 +169,9 @@ byte* Thread::dispatch(byte* addr) {
         case ENCLOSECOPY:
             addr = openclosecopy(addr+1);
             break;
+        case ENCLOSEMOVE:
+            addr = openclosemove(addr+1);
+            break;
         case CLOSURE:
             addr = closure(addr+1);
             break;
