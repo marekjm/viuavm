@@ -20,10 +20,11 @@
     ; print contents of register 1
     print 1
 
-    ; set exit code...
+    ; set exit code
+    ; return values are stored in zeroeth register
     izero 0
-    ; ...and end the main function
-    end
+    ; and return from the main function
+    return
 .end
 ```
 
