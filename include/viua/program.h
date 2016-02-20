@@ -111,6 +111,7 @@ class Program {
 
     Program& clbind     (int_op, int_op, int_op);
     Program& openclosecopy(int_op, int_op, int_op);
+    Program& openclosemove(int_op, int_op, int_op);
     Program& closure    (int_op, const std::string&);
 
     Program& function   (int_op, const std::string&);
