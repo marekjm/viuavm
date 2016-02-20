@@ -55,14 +55,14 @@
     frame ^[(param 0 (istore 1 1))]
     call 2 closure_maker
 
-    frame ^[(param 0 (istore 3 2))]
-    fcall 4 2
+    frame ^[(param 0 (istore 1 2))]
+    fcall 3 2
 
-    frame ^[(param 0 (istore 5 3))]
-    fcall 6 4
+    frame ^[(param 0 (istore 1 3))]
+    fcall 4 3
 
-    frame ^[(param 0 (istore 7 4))]
-    print (fcall 8 6)
+    frame ^[(param 0 (istore 1 4))]
+    print (fcall 5 4)
 
     izero 0
     return
