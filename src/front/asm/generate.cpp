@@ -143,6 +143,7 @@ const map<string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS = {
     { "or",   &Program::logor },
 
     { "clbind", &Program::clbind },
+    { "enclosecopy", &Program::openclosecopy },
 };
 
 void assemble_three_intop_instruction(Program& program, map<string, int>& names, const string& instr, const string& operands) {
@@ -410,6 +411,8 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             program.echo(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "clbind")) {
             assemble_three_intop_instruction(program, names, "clbind", operands);
+        } else if (str::startswith(line, "enclosecopy")) {
+            assemble_three_intop_instruction(program, names, "enclosecopy", operands);
         } else if (str::startswith(line, "closure")) {
             string fn_name, reg;
             tie(reg, fn_name) = assembler::operands::get2(operands);
