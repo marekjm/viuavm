@@ -91,6 +91,7 @@ enum OPCODE : byte {
 
     CLBIND,
     ENCLOSECOPY,
+    ENCLOSEMOVE,
     CLOSURE,
 
     FUNCTION,
