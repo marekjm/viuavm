@@ -636,6 +636,16 @@ namespace cg {
             return addr_ptr;
         }
 
+        byte* openclosemove(byte* addr_ptr, int_op target_closure, int_op target_register, int_op source_register) {
+            /*  Inserts openclosemove instuction.
+             */
+            *(addr_ptr++) = ENCLOSEMOVE;
+            addr_ptr = insertIntegerOperand(addr_ptr, target_closure);
+            addr_ptr = insertIntegerOperand(addr_ptr, target_register);
+            addr_ptr = insertIntegerOperand(addr_ptr, source_register);
+            return addr_ptr;
+        }
+
         byte* closure(byte* addr_ptr, int_op reg, const string& fn) {
             /*  Inserts closure instuction.
              */

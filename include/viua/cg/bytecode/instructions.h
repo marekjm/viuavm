@@ -82,6 +82,7 @@ namespace cg {
 
         byte* clbind(byte*, int_op, int_op, int_op);
         byte* openclosecopy(byte*, int_op, int_op, int_op);
+        byte* openclosemove(byte*, int_op, int_op, int_op);
         byte* closure(byte*, int_op, const std::string&);
         byte* function(byte*, int_op, const std::string&);
         byte* fcall(byte*, int_op, int_op);
