@@ -582,6 +582,9 @@ class ClosureTests(unittest.TestCase):
     def testAdder(self):
         runTestReturnsIntegers(self, 'adder.asm', [5, 8, 16])
 
+    def testEnclosedVariableLeftInScope(self):
+        runTestSplitlines(self, 'enclosed_variable_left_in_scope.asm', ['Hello World!', '42'])
+
 
 class StaticLinkingTests(unittest.TestCase):
     """Tests for static linking functionality.
