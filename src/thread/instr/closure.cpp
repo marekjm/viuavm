@@ -55,6 +55,22 @@ byte* Thread::openclosecopy(byte* addr) {
     return addr;
 }
 
+byte* Thread::openclosemove(byte* addr) {
+    /** Enclose object by move.
+     */
+    Closure *target_closure = static_cast<Closure*>(viua::operand::extract(addr)->resolve(this));
+    int target_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+
+    if (static_cast<unsigned>(target_register) >= target_closure->regset->size()) {
+        throw new Exception("cannot enclose object: register index out exceeded size of closure register set");
+    }
+
+    int source_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    target_closure->regset->set(target_register, uregset->pop(source_register));
+
+    return addr;
+}
+
 byte* Thread::closure(byte* addr) {
     /** Create a closure from a function.
      */

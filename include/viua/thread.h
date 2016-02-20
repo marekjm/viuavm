@@ -172,6 +172,7 @@ class Thread {
 
     byte* clbind(byte*);
     byte* openclosecopy(byte*);
+    byte* openclosemove(byte*);
     byte* closure(byte*);
 
     byte* function(byte*);
