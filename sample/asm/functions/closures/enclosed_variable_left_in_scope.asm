@@ -7,7 +7,7 @@
 .function: main
     ; create a closure and enclose object in register 1 with it
     closure 2 printer_function
-    clbind 2 1 (strstore 1 "Hello World!")
+    enclose 2 1 (strstore 1 "Hello World!")
 
     ; call the closure (should print "Hello World!")
     frame 0

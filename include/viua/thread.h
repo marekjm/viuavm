@@ -170,7 +170,7 @@ class Thread {
     byte* print(byte*);
     byte* echo(byte*);
 
-    byte* clbind(byte*);
+    byte* enclose(byte*);
     byte* openclosecopy(byte*);
     byte* openclosemove(byte*);
     byte* closure(byte*);

@@ -80,7 +80,7 @@ namespace cg {
         byte* print(byte*, int_op);
         byte* echo(byte*, int_op);
 
-        byte* clbind(byte*, int_op, int_op, int_op);
+        byte* enclose(byte*, int_op, int_op, int_op);
         byte* openclosecopy(byte*, int_op, int_op, int_op);
         byte* openclosemove(byte*, int_op, int_op, int_op);
         byte* closure(byte*, int_op, const std::string&);

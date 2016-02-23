@@ -2185,7 +2185,7 @@ Closure instructions.
 \end_layout
 
 \begin_layout Subsubsection
-clbind
+enclose
 \end_layout
 
 \begin_layout Paragraph
@@ -2195,7 +2195,7 @@ Syntax
 \begin_layout Standard
 
 \family typewriter
-clbind <target register>
+enclose <target register>
 \end_layout
 
 \begin_layout Paragraph

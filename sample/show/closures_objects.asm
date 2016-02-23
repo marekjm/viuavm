@@ -35,14 +35,14 @@
     arg 1 0
 
     ; tell the CPU to bind 1st register in a closure
-    clbind 1
+    enclose 1
     ; create a closure from function "set_x" in 3rd register
     closure 3 set_x
 
     ; tell the CPU to bind 1st register in a closure
     ; this is required because CLOSURE opcode resets flags set
-    ; by CLBIND opcode
-    clbind 1
+    ; by ENCLOSE opcode
+    enclose 1
     ; create a closure from function "get_x" in 4th register
     closure 4 get_x
 

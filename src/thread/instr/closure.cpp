@@ -13,7 +13,7 @@
 using namespace std;
 
 
-byte* Thread::clbind(byte* addr) {
+byte* Thread::enclose(byte* addr) {
     /** Enclose object by reference.
      */
     Closure *target_closure = static_cast<Closure*>(viua::operand::extract(addr)->resolve(this));

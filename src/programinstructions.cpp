@@ -530,10 +530,10 @@ Program& Program::echo(int_op reg) {
     return (*this);
 }
 
-Program& Program::clbind(int_op target_closure, int_op target_register, int_op source_register) {
+Program& Program::enclose(int_op target_closure, int_op target_register, int_op source_register) {
     /*  Inserts clbing instuction.
      */
-    addr_ptr = cg::bytecode::clbind(addr_ptr, target_closure, target_register, source_register);
+    addr_ptr = cg::bytecode::enclose(addr_ptr, target_closure, target_register, source_register);
     return (*this);
 }
 

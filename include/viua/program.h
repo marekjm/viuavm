@@ -109,7 +109,7 @@ class Program {
     Program& print      (int_op);
     Program& echo       (int_op);
 
-    Program& clbind     (int_op, int_op, int_op);
+    Program& enclose     (int_op, int_op, int_op);
     Program& openclosecopy(int_op, int_op, int_op);
     Program& openclosemove(int_op, int_op, int_op);
     Program& closure    (int_op, const std::string&);

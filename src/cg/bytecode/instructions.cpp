@@ -616,10 +616,10 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* clbind(byte* addr_ptr, int_op target_closure, int_op target_register, int_op source_register) {
+        byte* enclose(byte* addr_ptr, int_op target_closure, int_op target_register, int_op source_register) {
             /*  Inserts clbing instuction.
              */
-            *(addr_ptr++) = CLBIND;
+            *(addr_ptr++) = ENCLOSE;
             addr_ptr = insertIntegerOperand(addr_ptr, target_closure);
             addr_ptr = insertIntegerOperand(addr_ptr, target_register);
             addr_ptr = insertIntegerOperand(addr_ptr, source_register);

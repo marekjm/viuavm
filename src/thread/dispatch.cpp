@@ -163,8 +163,8 @@ byte* Thread::dispatch(byte* addr) {
         case ECHO:
             addr = echo(addr+1);
             break;
-        case CLBIND:
-            addr = clbind(addr+1);
+        case ENCLOSE:
+            addr = enclose(addr+1);
             break;
         case ENCLOSECOPY:
             addr = openclosecopy(addr+1);

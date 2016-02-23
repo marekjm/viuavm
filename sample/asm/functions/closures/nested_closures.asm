@@ -27,9 +27,9 @@
     closure 0 closure_level_3
     ; registers 1 and 2 are occupied by enclosed integers
     ; but they must be enclosed by the "closure_level_3"
-    clbind 0 1 1
-    clbind 0 2 2
-    clbind 0 3 (arg 3 0)
+    enclose 0 1 1
+    enclose 0 2 2
+    enclose 0 3 (arg 3 0)
     return
 .end
 
@@ -37,15 +37,15 @@
     closure 0 closure_level_2
     ; register 1 is occupied by enclosed integer
     ; but it must be enclosed by the "closure_level_2"
-    clbind 0 1 1
-    clbind 0 2 (arg 2 0)
+    enclose 0 1 1
+    enclose 0 2 (arg 2 0)
     return
 .end
 
 .function: closure_maker
     ; create the outermost closure
     closure 0 closure_level_1
-    clbind 0 1 (arg 1 0)
+    enclose 0 1 (arg 1 0)
     return
 .end
 

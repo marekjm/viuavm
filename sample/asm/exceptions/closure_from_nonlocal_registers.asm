@@ -6,7 +6,7 @@
 .function: main
     ress global
     istore 1 42
-    clbind 1
+    enclose 1
     closure 2 foo
 
     izero 0

@@ -89,7 +89,7 @@ enum OPCODE : byte {
     PRINT,
     ECHO,
 
-    CLBIND,
+    ENCLOSE,
     ENCLOSECOPY,
     ENCLOSEMOVE,
     CLOSURE,

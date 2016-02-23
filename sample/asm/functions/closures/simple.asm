@@ -6,7 +6,7 @@
 
 .function: returns_closure
     closure 2 foo
-    move 0 (clbind 2 1 (istore 1 42))
+    move 0 (enclose 2 1 (istore 1 42))
     return
 .end
 

@@ -50,7 +50,7 @@
     fcall 0 2
 
     strstore 3 "printed from closure"
-    clbind 3
+    enclose 3
     closure 4 linked::dis_a_closure
     frame 0
     fcall 0 4

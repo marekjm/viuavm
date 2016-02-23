@@ -14,7 +14,7 @@
     .name: 1 number
     arg number 0
     closure 2 adder
-    clbind 2 1 1
+    enclose 2 1 1
     move 0 2
     return
 .end
