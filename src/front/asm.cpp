@@ -52,9 +52,9 @@ bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE)
              << "    " << "-d, --debug              - show debugging output\n"
              << "    " << "    --scream             - show so much debugging output it becomes noisy\n"
              << "    " << "-W, --Wall               - warn about everything\n"
-             << "    " << "    --Wmissin-end        - warn about missing 'end' instruction at the end of functions\n"
+             << "    " << "    --Wmissin-return     - warn about missing 'return' instruction at the end of functions\n"
              << "    " << "    --Eall               - treat all warnings as errors\n"
-             << "    " << "    --Emissing-end       - treat missing 'end' instruction at the end of function as error\n"
+             << "    " << "    --Emissing-return    - treat missing 'return' instruction at the end of function as error\n"
              << "    " << "    --Ehalt-is-last      - treat 'halt' being used as last instruction of 'main' function as error\n"
              << "    " << "-c, --lib                - assemble as a library\n"
              << "    " << "-E, --expand             - only expand the source code to simple form (one instruction per line)\n"
@@ -101,13 +101,13 @@ int main(int argc, char* argv[]) {
         } else if (option == "--Eall") {
             ERROR_ALL = true;
             continue;
-        } else if (option == "--Wmissing-end") {
+        } else if (option == "--Wmissing-return") {
             WARNING_MISSING_END = true;
             continue;
-        } else if (option == "--Emissing-end") {
+        } else if (option == "--Emissing-return") {
             ERROR_MISSING_END = true;
             continue;
-        } else if (option == "--Emissing-end") {
+        } else if (option == "--Emissing-return") {
             ERROR_MISSING_END = true;
             continue;
         } else if (option == "--Ehalt-is-last") {
@@ -258,10 +258,10 @@ int main(int argc, char* argv[]) {
         vector<string> flines = function.second;
         if ((flines.size() == 0 or flines.back() != "end") and (function.first != "main" and flines.back() != "halt")) {
             if (ERROR_MISSING_END or ERROR_ALL) {
-                cout << "fatal: missing 'end' at the end of function '" << function.first << "'" << endl;
+                cout << "fatal: missing 'return' at the end of function '" << function.first << "'" << endl;
                 exit(1);
             } else if (WARNING_MISSING_END or WARNING_ALL) {
-                cout << "warning: missing 'end' at the end of function '" << function.first << "'" << endl;
+                cout << "warning: missing 'return' at the end of function '" << function.first << "'" << endl;
             }
         }
     }
@@ -276,7 +276,7 @@ int main(int argc, char* argv[]) {
         }
         string last_line = flines.back();
         if (not (last_line == "leave" or last_line == "end" or last_line == "halt")) {
-            cout << "fatal: missing returning instruction ('leave', 'end' or 'halt') at the end of block '" << block.first << "'" << endl;
+            cout << "fatal: missing returning instruction ('leave', 'return' or 'halt') at the end of block '" << block.first << "'" << endl;
             exit(1);
         }
     }
