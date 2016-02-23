@@ -28,10 +28,10 @@ bool WARNING_ALL = false;
 bool ERROR_ALL = false;
 
 // WARNINGS
-bool WARNING_MISSING_END = false;
+bool WARNING_MISSING_RETURN = false;
 
 // ERRORS
-bool ERROR_MISSING_END = false;
+bool ERROR_MISSING_RETURN = false;
 bool ERROR_HALT_IS_LAST = false;
 
 
@@ -102,13 +102,13 @@ int main(int argc, char* argv[]) {
             ERROR_ALL = true;
             continue;
         } else if (option == "--Wmissing-return") {
-            WARNING_MISSING_END = true;
+            WARNING_MISSING_RETURN = true;
             continue;
         } else if (option == "--Emissing-return") {
-            ERROR_MISSING_END = true;
+            ERROR_MISSING_RETURN = true;
             continue;
         } else if (option == "--Emissing-return") {
-            ERROR_MISSING_END = true;
+            ERROR_MISSING_RETURN = true;
             continue;
         } else if (option == "--Ehalt-is-last") {
             ERROR_HALT_IS_LAST = true;
@@ -257,10 +257,10 @@ int main(int argc, char* argv[]) {
     for (auto function : functions.bodies) {
         vector<string> flines = function.second;
         if ((flines.size() == 0 or flines.back() != "end") and (function.first != "main" and flines.back() != "halt")) {
-            if (ERROR_MISSING_END or ERROR_ALL) {
+            if (ERROR_MISSING_RETURN or ERROR_ALL) {
                 cout << "fatal: missing 'return' at the end of function '" << function.first << "'" << endl;
                 exit(1);
-            } else if (WARNING_MISSING_END or WARNING_ALL) {
+            } else if (WARNING_MISSING_RETURN or WARNING_ALL) {
                 cout << "warning: missing 'return' at the end of function '" << function.first << "'" << endl;
             }
         }
