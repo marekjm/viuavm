@@ -756,7 +756,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, opts=('--Ehalt-is-last',), okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("error: using 'halt' instead of 'end' as last instruction in main function leads to memory leaks", output.strip())
+        self.assertEqual("error: using 'halt' instead of 'return' as last instruction in main function leads to memory leaks", output.strip())
 
 
 class ExternalModulesTests(unittest.TestCase):

@@ -208,7 +208,7 @@ string assembler::verify::mainFunctionDoesNotEndWithHalt(map<string, vector<stri
         return report.str();
     }
     if (str::chunk(str::lstrip(flines.back())) == "halt") {
-        report << "error: using 'halt' instead of 'end' as last instruction in main function leads to memory leaks" << endl;
+        report << "error: using 'halt' instead of 'return' as last instruction in main function leads to memory leaks" << endl;
     }
     return report.str();
 }
