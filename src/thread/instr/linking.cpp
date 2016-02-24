@@ -21,8 +21,7 @@ byte* Thread::import(byte* addr) {
 byte* Thread::link(byte* addr) {
     /** Run link instruction.
      */
-    string module = string(addr);
-    addr += module.size();
+    string module = viua::operand::extractString(addr);
     cpu->loadNativeLibrary(module);
     return addr;
 }
