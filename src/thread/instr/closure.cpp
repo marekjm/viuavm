@@ -80,8 +80,7 @@ byte* Thread::closure(byte* addr) {
 
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    string call_name = string(addr);
-    addr += (call_name.size()+1);
+    string call_name = viua::operand::extractString(addr);
 
     Closure* clsr = new Closure();
     clsr->function_name = call_name;
