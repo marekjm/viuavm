@@ -5,4 +5,5 @@ set -e
 # The command below will clean the build and, then,
 # compile the code with as many threads as you have cores.
 # Fear the great power of pipes and subshells!
+find ./build -name '*.*o' | xargs -n 1 rm -vf
 make clean && make -j $(dc -e "$(cat /proc/cpuinfo | grep 'processor' | tail -n 1 | grep -Po '[0-9]+') 1 + p")
