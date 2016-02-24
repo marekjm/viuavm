@@ -56,7 +56,7 @@ byte* Thread::pull(byte* addr) {
 byte* Thread::vmenter(byte* addr) {
     /*  Run enter instruction.
      */
-    string block_name = string(addr);
+    string block_name = viua::operand::extractString(addr);
 
     bool block_found = (cpu->block_addresses.count(block_name) or cpu->linked_blocks.count(block_name));
     if (not block_found) {
@@ -72,7 +72,7 @@ byte* Thread::vmenter(byte* addr) {
         jump_base = cpu->linked_modules.at(cpu->linked_blocks.at(block_name).first).second;
     }
 
-    try_frame_new->return_address = (addr+block_name.size());
+    try_frame_new->return_address = addr; // address has already been adjusted by extractString()
     try_frame_new->associated_frame = frames.back();
     try_frame_new->block_name = block_name;
 
