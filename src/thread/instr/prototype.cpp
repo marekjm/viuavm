@@ -14,10 +14,7 @@ byte* Thread::vmclass(byte* addr) {
     /** Create a class.
      */
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    string class_name = viua::operand::extractString(addr);
-
-    place(target, new Prototype(class_name));
-
+    place(target, new Prototype(viua::operand::extractString(addr)));
     return addr;
 }
 
