@@ -15,10 +15,7 @@ using namespace std;
 byte* Thread::strstore(byte* addr) {
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    string svalue = string(addr);
-    addr += svalue.size()+1;
-
-    place(target, new String(str::strdecode(svalue)));
+    place(target, new String(str::strdecode(viua::operand::extractString(addr))));
 
     return addr;
 }
