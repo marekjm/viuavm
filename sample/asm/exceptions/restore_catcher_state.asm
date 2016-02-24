@@ -16,10 +16,11 @@
 .function: secondary
     arg 2 0
     istore 4 200
-    frame 1 5
+
+    frame ^[(param 0 2)] 5
     istore 4 250
-    param 0 2
     call tertiary
+
     istore 4 225
     return
 .end
@@ -27,9 +28,10 @@
 .block: main_block
     istore 1 42
     istore 4 100
-    frame 1 5
-    param 0 1
+
+    frame ^[(param 0 1)] 5
     call secondary
+
     istore 2 41
     istore 4 125
     leave
@@ -38,12 +40,14 @@
 
 .function: main
     istore 4 50
+
     try
     catch "Integer" handle_integer
     enter main_block
     ; leave instructions lead here
     print 2
     print 4
+
     izero 0
     return
 .end
