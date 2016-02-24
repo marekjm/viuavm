@@ -9,7 +9,7 @@ using namespace std;
 byte* Thread::dispatch(byte* addr) {
     /** Dispatches instruction at a pointer to its handler.
      */
-    switch (*addr) {
+    switch (static_cast<OPCODE>(*addr)) {
         case IZERO:
             addr = izero(addr+1);
             break;
