@@ -23,8 +23,7 @@ byte* Thread::vmderive(byte* addr) {
      */
     Type* target = viua::operand::extract(addr)->resolve(this);
 
-    string class_name = string(addr);
-    addr += (class_name.size()+1);
+    string class_name = viua::operand::extractString(addr);
 
     if (cpu->typesystem.count(class_name) == 0) {
         throw new Exception("cannot derive from unregistered type: " + class_name);
