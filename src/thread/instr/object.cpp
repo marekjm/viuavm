@@ -43,7 +43,7 @@ byte* Thread::vmmsg(byte* addr) {
         return_register_index = static_cast<Integer*>(fetch(return_register_index))->value();
     }
 
-    string method_name = string(addr);
+    string method_name = viua::operand::extractString(addr);
 
     Type* obj = frame_new->args->at(0);
     if (Pointer* ptr = dynamic_cast<Pointer*>(obj)) {

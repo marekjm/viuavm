@@ -109,7 +109,7 @@ byte* Thread::call(byte* addr) {
     int return_register_index = 0;
     viua::cpu::util::extractIntegerOperand(addr, return_register_ref, return_register_index);
 
-    string call_name = string(addr);
+    string call_name = viua::operand::extractString(addr);
 
     // clear PASSED flag
     // since function calls are blocking, we can be sure that after the function returns

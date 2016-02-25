@@ -143,7 +143,7 @@ void Thread::dropFrame() {
     }
 }
 
-byte* Thread::callNative(byte* addr, const string& call_name, const bool& return_ref, const int& return_index, const string& real_call_name) {
+byte* Thread::callNative(byte* return_address, const string& call_name, const bool& return_ref, const int& return_index, const string& real_call_name) {
     byte* call_address = nullptr;
     if (cpu->function_addresses.count(call_name)) {
         call_address = cpu->bytecode+(cpu->function_addresses.at(call_name));
@@ -152,15 +152,6 @@ byte* Thread::callNative(byte* addr, const string& call_name, const bool& return
         call_address = cpu->linked_functions.at(call_name).second;
         jump_base = cpu->linked_modules.at(cpu->linked_functions.at(call_name).first).second;
     }
-    if (real_call_name.size()) {
-        addr += (real_call_name.size()+1);
-    } else {
-        addr += (call_name.size()+1);
-    }
-
-
-    // save return address for frame
-    byte* return_address = addr;
 
     if (frame_new == nullptr) {
         throw new Exception("function call without first_operand_index frame: use `frame 0' in source code if the function takes no parameters");
@@ -176,16 +167,7 @@ byte* Thread::callNative(byte* addr, const string& call_name, const bool& return
 
     return call_address;
 }
-byte* Thread::callForeign(byte* addr, const string& call_name, const bool& return_ref, const int& return_index, const string& real_call_name) {
-    if (real_call_name.size()) {
-        addr += (real_call_name.size()+1);
-    } else {
-        addr += (call_name.size()+1);
-    }
-
-    // save return address for frame
-    byte* return_address = addr;
-
+byte* Thread::callForeign(byte* return_address, const string& call_name, const bool& return_ref, const int& return_index, const string& real_call_name) {
     if (frame_new == nullptr) {
         throw new Exception("external function call without a frame: use `frame 0' in source code if the function takes no parameters");
     }
@@ -235,16 +217,7 @@ byte* Thread::callForeign(byte* addr, const string& call_name, const bool& retur
 
     return return_address;
 }
-byte* Thread::callForeignMethod(byte* addr, Type* object, const string& call_name, const bool& return_ref, const int& return_index, const string& real_call_name) {
-    if (real_call_name.size()) {
-        addr += (real_call_name.size()+1);
-    } else {
-        addr += (call_name.size()+1);
-    }
-
-    // save return address for frame
-    byte* return_address = addr;
-
+byte* Thread::callForeignMethod(byte* return_address, Type* object, const string& call_name, const bool& return_ref, const int& return_index, const string& real_call_name) {
     if (frame_new == nullptr) {
         throw new Exception("foreign method call without a frame");
     }
