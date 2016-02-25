@@ -16,8 +16,7 @@ byte* Thread::vmnew(byte* addr) {
      */
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    string class_name = string(addr);
-    addr += (class_name.size()+1);
+    string class_name = viua::operand::extractString(addr);
 
     if (cpu->typesystem.count(class_name) == 0) {
         throw new Exception("cannot create new instance of unregistered type: " + class_name);
