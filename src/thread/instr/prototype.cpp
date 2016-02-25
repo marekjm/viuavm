@@ -39,11 +39,8 @@ byte* Thread::vmattach(byte* addr) {
      */
     Type* target = viua::operand::extract(addr)->resolve(this);
 
-    string function_name = string(addr);
-    addr += (function_name.size()+1);
-
-    string method_name = string(addr);
-    addr += (method_name.size()+1);
+    string function_name = viua::operand::extractString(addr);
+    string method_name = viua::operand::extractString(addr);
 
     Prototype* proto = static_cast<Prototype*>(target);
 
