@@ -55,7 +55,7 @@ unique_ptr<viua::operand::Operand> viua::operand::extract(byte*& ip) {
             ip += sizeof(int);
             break;
         case OT_ATOM:
-            operand.reset(new Atom(string(ip)));
+            operand.reset(new Atom(string(reinterpret_cast<char*>(ip))));
             ip += (static_cast<Atom*>(operand.get())->get().size() + 1);
             break;
         default:
@@ -66,7 +66,7 @@ unique_ptr<viua::operand::Operand> viua::operand::extract(byte*& ip) {
 }
 
 string viua::operand::extractString(byte*& ip) {
-    string s = string(ip);
+    string s = string(reinterpret_cast<char*>(ip));
     ip += (s.size()+1);
     return s;
 }

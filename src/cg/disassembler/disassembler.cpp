@@ -45,7 +45,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         pointer::inc<bool, byte>(bptr);
         pointer::inc<int, byte>(bptr);
 
-        string s = string(bptr);
+        string s = string(reinterpret_cast<char*>(bptr));
         oss << " " << str::enquote(s);
         bptr += s.size();
         ++bptr; // for null character terminating the C-style string not included in std::string
@@ -55,13 +55,13 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         pointer::inc<int, byte>(bptr);
 
         oss << " ";
-        string fn_name = string(bptr);
+        string fn_name = string(reinterpret_cast<char*>(bptr));
         oss << fn_name;
         bptr += fn_name.size();
         ++bptr; // for null character terminating the C-style string not included in std::string
     } else if ((op == IMPORT) or (op == ENTER) or (op == LINK) or (op == WATCHDOG)) {
         oss << " ";
-        string s = string(bptr);
+        string s = string(reinterpret_cast<char*>(bptr));
         oss << (op == IMPORT ? str::enquote(s) : s);
         bptr += s.size();
         ++bptr; // for null character terminating the C-style string not included in std::string
@@ -69,13 +69,13 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         string s;
 
         oss << " ";
-        s = string(bptr);
+        s = string(reinterpret_cast<char*>(bptr));
         oss << str::enquote(s);
         bptr += s.size();
         ++bptr; // for null character terminating the C-style string not included in std::string
 
         oss << " ";
-        s = string(bptr);
+        s = string(reinterpret_cast<char*>(bptr));
         oss << s;
         bptr += s.size();
         ++bptr; // for null character terminating the C-style string not included in std::string
@@ -85,13 +85,13 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         pointer::inc<int, byte>(bptr);
 
         oss << " ";
-        string fn_name = string(bptr);
+        string fn_name = string(reinterpret_cast<char*>(bptr));
         oss << fn_name;
         bptr += fn_name.size();
         ++bptr; // for null character terminating the C-style string not included in std::string
 
         oss << " ";
-        string md_name = string(bptr);
+        string md_name = string(reinterpret_cast<char*>(bptr));
         oss << md_name;
         bptr += md_name.size();
         ++bptr; // for null character terminating the C-style string not included in std::string

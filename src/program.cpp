@@ -245,7 +245,7 @@ uint64_t Program::getInstructionBytecodeOffset(uint64_t instr, uint64_t count) {
 
         OPCODE opcode = OPCODE(program[offset]);
         if ((opcode == IMPORT) or (opcode == ENTER) or (opcode == LINK) or (opcode == WATCHDOG)) {
-            string s(program+offset+1);
+            string s(reinterpret_cast<char*>(program+offset+1));
             if (scream) {
                 cout << '+' << s.size() << " (function/module name at byte " << offset+1 << ": `" << s << "`)";
             }
@@ -253,29 +253,29 @@ uint64_t Program::getInstructionBytecodeOffset(uint64_t instr, uint64_t count) {
         }
         if ((opcode == CALL) or (opcode == THREAD) or (opcode == CLOSURE) or (opcode == FUNCTION) or
             (opcode == CLASS) or (opcode == PROTOTYPE) or (opcode == DERIVE) or (opcode == NEW) or (opcode == MSG)) {
-            string s(program+offset+sizeof(bool)+sizeof(int)+1);
+            string s(reinterpret_cast<char*>(program+offset+sizeof(bool)+sizeof(int)+1));
             if (scream) {
                 cout << '+' << s.size() << " (function/module/class name at byte " << offset+1 << ": `" << s << "`)";
             }
             inc += s.size()+1;
         }
         if (opcode == ATTACH) {
-            string f(program+offset+sizeof(bool)+sizeof(int)+1);
+            string f(reinterpret_cast<char*>(program+offset+sizeof(bool)+sizeof(int)+1));
             inc += f.size()+1;
-            string m(program+offset+sizeof(bool)+sizeof(int)+1+f.size()+1);
+            string m(reinterpret_cast<char*>(program+offset+sizeof(bool)+sizeof(int)+1+f.size()+1));
             inc += m.size()+1;
         }
         if (opcode == STRSTORE) {
-            string s(program+offset+inc);
+            string s(reinterpret_cast<char*>(program+offset+inc));
             if (scream) {
                 cout << '+' << s.size()+1 << " (string at byte " << offset+inc << ": `" << s << "`)";
             }
             inc += s.size()+1;
         }
         if (opcode == CATCH) {
-            string exception_name(program+offset+1);
+            string exception_name(reinterpret_cast<char*>(program+offset+1));
             inc += exception_name.size()+1;
-            string catch_block_name(program+offset+1+exception_name.size()+1);
+            string catch_block_name(reinterpret_cast<char*>(program+offset+1+exception_name.size()+1));
             inc += catch_block_name.size()+1;
             if (scream) {
                 cout << '+' << exception_name.size() << " (typename at byte " << offset+1 << ": `" << exception_name << "`)" << endl;

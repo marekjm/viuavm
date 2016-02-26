@@ -235,7 +235,7 @@ tuple<bool, string> if_breakpoint_function(CPU& cpu, vector<string>& breakpoints
     string op_name = OP_NAMES.at(OPCODE(*cpu.executionAt()));
 
     if (op_name == "call" or op_name == "excall") {
-        string function_name = string(cpu.executionAt()+1+sizeof(bool)+sizeof(int));
+        string function_name = string(reinterpret_cast<char*>(cpu.executionAt()+1+sizeof(bool)+sizeof(int)));
         if (find(breakpoints_function.begin(), breakpoints_function.end(), function_name) != breakpoints_function.end()) {
             reason << "info: execution halted by function breakpoint: " << function_name;
             pause = true;
