@@ -870,7 +870,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     /////////////////////////////////////////////////////////
     // GATHER LINKS, GET THEIR SIZES AND ADJUST BYTECODE SIZE
     vector<string> links = assembler::ce::getlinks(ilines);
-    vector<tuple<string, uint64_t, char*> > linked_libs_bytecode;
+    vector<tuple<string, uint64_t, byte*> > linked_libs_bytecode;
     vector<string> linked_function_names;
     vector<string> linked_block_names;
     map<string, vector<uint64_t> > linked_libs_jumptables;
@@ -910,7 +910,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
             }
         }
 
-        linked_libs_bytecode.push_back( tuple<string, uint64_t, char*>(lnk, loader.getBytecodeSize(), loader.getBytecode()) );
+        linked_libs_bytecode.push_back( tuple<string, uint64_t, byte*>(lnk, loader.getBytecodeSize(), loader.getBytecode()) );
         bytes += loader.getBytecodeSize();
     }
 
@@ -1223,7 +1223,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     ////////////////////////////////////
     // WRITE STATICALLY LINKED LIBRARIES
     uint64_t bytes_offset = current_link_offset;
-    for (tuple<string, uint64_t, char*> lnk : linked_libs_bytecode) {
+    for (tuple<string, uint64_t, byte*> lnk : linked_libs_bytecode) {
         string lib_name;
         byte* linked_bytecode;
         uint64_t linked_size;
