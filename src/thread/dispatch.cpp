@@ -242,10 +242,10 @@ byte* Thread::dispatch(byte* addr) {
             addr = leave(addr+1);
             break;
         case IMPORT:
-            addr = import(addr+1);
+            addr = opimport(addr+1);
             break;
         case LINK:
-            addr = link(addr+1);
+            addr = oplink(addr+1);
             break;
         case CLASS:
             addr = vmclass(addr+1);

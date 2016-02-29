@@ -139,8 +139,8 @@ class Program {
     Program& vmthrow    (int_op);
     Program& leave      ();
 
-    Program& import     (std::string);
-    Program& link       (std::string);
+    Program& opimport(std::string);
+    Program& oplink(std::string);
 
     Program& vmclass    (int_op, const std::string&);
     Program& vmderive   (int_op, const std::string&);

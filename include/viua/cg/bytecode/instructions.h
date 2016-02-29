@@ -109,8 +109,8 @@ namespace cg {
         byte* vmthrow(byte*, int_op);
         byte* leave(byte*);
 
-        byte* import(byte*, const std::string&);
-        byte* link(byte*, const std::string&);
+        byte* opimport(byte*, const std::string&);
+        byte* oplink(byte*, const std::string&);
 
         byte* vmclass(byte*, int_op, const std::string&);
         byte* vmderive(byte*, int_op, const std::string&);

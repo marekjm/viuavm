@@ -886,7 +886,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* import(byte* addr_ptr, const string& module_name) {
+        byte* opimport(byte* addr_ptr, const string& module_name) {
             /*  Inserts eximport instruction.
              */
             *(addr_ptr++) = IMPORT;
@@ -897,7 +897,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* link(byte* addr_ptr, const string& module_name) {
+        byte* oplink(byte* addr_ptr, const string& module_name) {
             /*  Inserts eximport instruction.
              */
             *(addr_ptr++) = LINK;

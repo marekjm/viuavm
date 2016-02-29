@@ -604,11 +604,11 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         } else if (str::startswith(line, "import")) {
             string str_chnk;
             str_chnk = str::extract(operands);
-            program.import(str_chnk);
+            program.opimport(str_chnk);
         } else if (str::startswith(line, "link")) {
             string str_chnk;
             str_chnk = str::chunk(operands);
-            program.link(str_chnk);
+            program.oplink(str_chnk);
         } else if (str::startswith(line, "class")) {
             string class_name, reg;
             tie(reg, class_name) = assembler::operands::get2(operands);

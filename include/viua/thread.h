@@ -211,8 +211,8 @@ class Thread {
     byte* vmnew(byte*);
     byte* vmmsg(byte*);
 
-    byte* import(byte*);
-    byte* link(byte*);
+    byte* opimport(byte*);
+    byte* oplink(byte*);
 
     public:
         byte* dispatch(byte*);

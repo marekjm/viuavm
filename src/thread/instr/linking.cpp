@@ -10,7 +10,7 @@
 using namespace std;
 
 
-byte* Thread::import(byte* addr) {
+byte* Thread::opimport(byte* addr) {
     /** Run import instruction.
      */
     string module = viua::operand::extractString(addr);
@@ -18,7 +18,7 @@ byte* Thread::import(byte* addr) {
     return addr;
 }
 
-byte* Thread::link(byte* addr) {
+byte* Thread::oplink(byte* addr) {
     /** Run link instruction.
      */
     string module = viua::operand::extractString(addr);

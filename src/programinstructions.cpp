@@ -750,17 +750,17 @@ Program& Program::leave() {
     return (*this);
 }
 
-Program& Program::import(string module_name) {
+Program& Program::opimport(string module_name) {
     /*  Inserts import instruction.
      */
-    addr_ptr = cg::bytecode::import(addr_ptr, module_name);
+    addr_ptr = cg::bytecode::opimport(addr_ptr, module_name);
     return (*this);
 }
 
-Program& Program::link(string module_name) {
+Program& Program::oplink(string module_name) {
     /*  Inserts link instruction.
      */
-    addr_ptr = cg::bytecode::link(addr_ptr, module_name);
+    addr_ptr = cg::bytecode::oplink(addr_ptr, module_name);
     return (*this);
 }
 
