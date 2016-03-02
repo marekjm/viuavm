@@ -290,7 +290,7 @@ Program& Program::opfeq(int_op rega, int_op regb, int_op regr) {
     return (*this);
 }
 
-Program& Program::bstore(int_op regno, byte_op b) {
+Program& Program::opbstore(int_op regno, byte_op b) {
     /*  Inserts bstore instruction to bytecode.
      *
      *  :params:
@@ -298,7 +298,7 @@ Program& Program::bstore(int_op regno, byte_op b) {
      *  regno - register number
      *  b     - value to store
      */
-    addr_ptr = cg::bytecode::bstore(addr_ptr, regno, b);
+    addr_ptr = cg::bytecode::opbstore(addr_ptr, regno, b);
     return (*this);
 }
 

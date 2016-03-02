@@ -297,7 +297,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         } else if (str::startswith(line, "bstore")) {
             string regno_chnk, byte_chnk;
             tie(regno_chnk, byte_chnk) = assembler::operands::get2(operands);
-            program.bstore(assembler::operands::getint(resolveregister(regno_chnk, names)), assembler::operands::getbyte(resolveregister(byte_chnk, names)));
+            program.opbstore(assembler::operands::getint(resolveregister(regno_chnk, names)), assembler::operands::getbyte(resolveregister(byte_chnk, names)));
         } else if (str::startswith(line, "itof")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = assembler::operands::get2(operands);

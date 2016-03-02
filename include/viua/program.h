@@ -74,7 +74,7 @@ class Program {
     Program& opfgte       (int_op, int_op, int_op);
     Program& opfeq        (int_op, int_op, int_op);
 
-    Program& bstore     (int_op, byte_op);
+    Program& opbstore   (int_op, byte_op);
 
     Program& itof       (int_op, int_op);
     Program& ftoi       (int_op, int_op);

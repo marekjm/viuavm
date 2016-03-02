@@ -343,7 +343,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* bstore(byte* addr_ptr, int_op regno, byte_op b) {
+        byte* opbstore(byte* addr_ptr, int_op regno, byte_op b) {
             /*  Inserts bstore instruction to bytecode.
              *
              *  :params:

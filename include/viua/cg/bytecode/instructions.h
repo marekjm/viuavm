@@ -45,7 +45,7 @@ namespace cg {
         byte* opfgte(byte*, int_op, int_op, int_op);
         byte* opfeq(byte*, int_op, int_op, int_op);
 
-        byte* bstore(byte*, int_op, byte_op);
+        byte* opbstore(byte*, int_op, byte_op);
 
         byte* itof(byte*, int_op, int_op);
         byte* ftoi(byte*, int_op, int_op);

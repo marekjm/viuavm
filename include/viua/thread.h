@@ -133,7 +133,7 @@ class Thread {
     byte* opfgte(byte*);
     byte* opfeq(byte*);
 
-    byte* bstore(byte*);
+    byte* opbstore(byte*);
 
     byte* itof(byte*);
     byte* ftoi(byte*);

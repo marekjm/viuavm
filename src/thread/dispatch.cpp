@@ -80,7 +80,7 @@ byte* Thread::dispatch(byte* addr) {
             addr = opfeq(addr+1);
             break;
         case BSTORE:
-            addr = bstore(addr+1);
+            addr = opbstore(addr+1);
             break;
         case ITOF:
             addr = itof(addr+1);
