@@ -46,21 +46,21 @@ class Program {
     // instruction insertion interface
     Program& nop        ();
 
-    Program& izero      (int_op);
-    Program& istore     (int_op, int_op);
-    Program& iadd       (int_op, int_op, int_op);
-    Program& isub       (int_op, int_op, int_op);
-    Program& imul       (int_op, int_op, int_op);
-    Program& idiv       (int_op, int_op, int_op);
+    Program& opizero    (int_op);
+    Program& opistore   (int_op, int_op);
+    Program& opiadd     (int_op, int_op, int_op);
+    Program& opisub     (int_op, int_op, int_op);
+    Program& opimul     (int_op, int_op, int_op);
+    Program& opidiv     (int_op, int_op, int_op);
 
-    Program& iinc       (int_op);
-    Program& idec       (int_op);
+    Program& opiinc     (int_op);
+    Program& opidec     (int_op);
 
-    Program& ilt        (int_op, int_op, int_op);
-    Program& ilte       (int_op, int_op, int_op);
-    Program& igt        (int_op, int_op, int_op);
-    Program& igte       (int_op, int_op, int_op);
-    Program& ieq        (int_op, int_op, int_op);
+    Program& opilt      (int_op, int_op, int_op);
+    Program& opilte     (int_op, int_op, int_op);
+    Program& opigt      (int_op, int_op, int_op);
+    Program& opigte     (int_op, int_op, int_op);
+    Program& opieq      (int_op, int_op, int_op);
 
     Program& fstore     (int_op, float);
     Program& fadd       (int_op, int_op, int_op);

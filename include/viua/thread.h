@@ -105,21 +105,21 @@ class Thread {
 
     /*  Methods implementing CPU instructions.
      */
-    byte* izero(byte*);
-    byte* istore(byte*);
-    byte* iadd(byte*);
-    byte* isub(byte*);
-    byte* imul(byte*);
-    byte* idiv(byte*);
+    byte* opizero(byte*);
+    byte* opistore(byte*);
+    byte* opiadd(byte*);
+    byte* opisub(byte*);
+    byte* opimul(byte*);
+    byte* opidiv(byte*);
 
-    byte* ilt(byte*);
-    byte* ilte(byte*);
-    byte* igt(byte*);
-    byte* igte(byte*);
-    byte* ieq(byte*);
+    byte* opilt(byte*);
+    byte* opilte(byte*);
+    byte* opigt(byte*);
+    byte* opigte(byte*);
+    byte* opieq(byte*);
 
-    byte* iinc(byte*);
-    byte* idec(byte*);
+    byte* opiinc(byte*);
+    byte* opidec(byte*);
 
     byte* fstore(byte*);
     byte* fadd(byte*);

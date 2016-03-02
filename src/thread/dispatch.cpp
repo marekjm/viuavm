@@ -11,43 +11,43 @@ byte* Thread::dispatch(byte* addr) {
      */
     switch (static_cast<OPCODE>(*addr)) {
         case IZERO:
-            addr = izero(addr+1);
+            addr = opizero(addr+1);
             break;
         case ISTORE:
-            addr = istore(addr+1);
+            addr = opistore(addr+1);
             break;
         case IADD:
-            addr = iadd(addr+1);
+            addr = opiadd(addr+1);
             break;
         case ISUB:
-            addr = isub(addr+1);
+            addr = opisub(addr+1);
             break;
         case IMUL:
-            addr = imul(addr+1);
+            addr = opimul(addr+1);
             break;
         case IDIV:
-            addr = idiv(addr+1);
+            addr = opidiv(addr+1);
             break;
         case IINC:
-            addr = iinc(addr+1);
+            addr = opiinc(addr+1);
             break;
         case IDEC:
-            addr = idec(addr+1);
+            addr = opidec(addr+1);
             break;
         case ILT:
-            addr = ilt(addr+1);
+            addr = opilt(addr+1);
             break;
         case ILTE:
-            addr = ilte(addr+1);
+            addr = opilte(addr+1);
             break;
         case IGT:
-            addr = igt(addr+1);
+            addr = opigt(addr+1);
             break;
         case IGTE:
-            addr = igte(addr+1);
+            addr = opigte(addr+1);
             break;
         case IEQ:
-            addr = ieq(addr+1);
+            addr = opieq(addr+1);
             break;
         case FSTORE:
             addr = fstore(addr+1);

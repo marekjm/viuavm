@@ -119,15 +119,15 @@ string resolveregister(string reg, const map<string, int>& names) {
  */
 typedef Program& (Program::*ThreeIntopAssemblerFunction)(int_op, int_op, int_op);
 const map<string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS = {
-    { "iadd", &Program::iadd },
-    { "isub", &Program::isub },
-    { "imul", &Program::imul },
-    { "idiv", &Program::idiv },
-    { "ilt",  &Program::ilt },
-    { "ilte", &Program::ilte },
-    { "igt",  &Program::igt },
-    { "igte", &Program::igte },
-    { "ieq",  &Program::ieq },
+    { "iadd", &Program::opiadd },
+    { "isub", &Program::opisub },
+    { "imul", &Program::opimul },
+    { "idiv", &Program::opidiv },
+    { "ilt",  &Program::opilt },
+    { "ilte", &Program::opilte },
+    { "igt",  &Program::opigt },
+    { "igte", &Program::opigte },
+    { "ieq",  &Program::opieq },
 
     { "fadd", &Program::fadd },
     { "fsub", &Program::fsub },
@@ -241,11 +241,11 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         } else if (str::startswith(line, "izero")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
-            program.izero(assembler::operands::getint(resolveregister(regno_chnk, names)));
+            program.opizero(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "istore")) {
             string regno_chnk, number_chnk;
             tie(regno_chnk, number_chnk) = assembler::operands::get2(operands);
-            program.istore(assembler::operands::getint(resolveregister(regno_chnk, names)), assembler::operands::getint(resolveregister(number_chnk, names)));
+            program.opistore(assembler::operands::getint(resolveregister(regno_chnk, names)), assembler::operands::getint(resolveregister(number_chnk, names)));
         } else if (str::startswith(line, "iadd")) {
             assemble_three_intop_instruction(program, names, "iadd", operands);
         } else if (str::startswith(line, "isub")) {
@@ -267,11 +267,11 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         } else if (str::startswith(line, "iinc")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
-            program.iinc(assembler::operands::getint(resolveregister(regno_chnk, names)));
+            program.opiinc(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "idec")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
-            program.idec(assembler::operands::getint(resolveregister(regno_chnk, names)));
+            program.opidec(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "fstore")) {
             string regno_chnk, float_chnk;
             tie(regno_chnk, float_chnk) = assembler::operands::get2(operands);

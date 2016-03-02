@@ -11,14 +11,14 @@ Program& Program::nop() {
     return (*this);
 }
 
-Program& Program::izero(int_op regno) {
+Program& Program::opizero(int_op regno) {
     /*  Inserts izero instuction.
      */
-    addr_ptr = cg::bytecode::izero(addr_ptr, regno);
+    addr_ptr = cg::bytecode::opizero(addr_ptr, regno);
     return (*this);
 }
 
-Program& Program::istore(int_op regno, int_op i) {
+Program& Program::opistore(int_op regno, int_op i) {
     /*  Inserts istore instruction to bytecode.
      *
      *  :params:
@@ -26,11 +26,11 @@ Program& Program::istore(int_op regno, int_op i) {
      *  regno:int - register number
      *  i:int     - value to store
      */
-    addr_ptr = cg::bytecode::istore(addr_ptr, regno, i);
+    addr_ptr = cg::bytecode::opistore(addr_ptr, regno, i);
     return (*this);
 }
 
-Program& Program::iadd(int_op rega, int_op regb, int_op regr) {
+Program& Program::opiadd(int_op rega, int_op regb, int_op regr) {
     /*  Inserts iadd instruction to bytecode.
      *
      *  :params:
@@ -39,11 +39,11 @@ Program& Program::iadd(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    addr_ptr = cg::bytecode::iadd(addr_ptr, rega, regb, regr);
+    addr_ptr = cg::bytecode::opiadd(addr_ptr, rega, regb, regr);
     return (*this);
 }
 
-Program& Program::isub(int_op rega, int_op regb, int_op regr) {
+Program& Program::opisub(int_op rega, int_op regb, int_op regr) {
     /*  Inserts isub instruction to bytecode.
      *
      *  :params:
@@ -52,11 +52,11 @@ Program& Program::isub(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    addr_ptr = cg::bytecode::isub(addr_ptr, rega, regb, regr);
+    addr_ptr = cg::bytecode::opisub(addr_ptr, rega, regb, regr);
     return (*this);
 }
 
-Program& Program::imul(int_op rega, int_op regb, int_op regr) {
+Program& Program::opimul(int_op rega, int_op regb, int_op regr) {
     /*  Inserts imul instruction to bytecode.
      *
      *  :params:
@@ -65,11 +65,11 @@ Program& Program::imul(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    addr_ptr = cg::bytecode::imul(addr_ptr, rega, regb, regr);
+    addr_ptr = cg::bytecode::opimul(addr_ptr, rega, regb, regr);
     return (*this);
 }
 
-Program& Program::idiv(int_op rega, int_op regb, int_op regr) {
+Program& Program::opidiv(int_op rega, int_op regb, int_op regr) {
     /*  Inserts idiv instruction to bytecode.
      *
      *  :params:
@@ -78,25 +78,25 @@ Program& Program::idiv(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    addr_ptr = cg::bytecode::idiv(addr_ptr, rega, regb, regr);
+    addr_ptr = cg::bytecode::opidiv(addr_ptr, rega, regb, regr);
     return (*this);
 }
 
-Program& Program::iinc(int_op regno) {
+Program& Program::opiinc(int_op regno) {
     /*  Inserts iinc instuction.
      */
-    addr_ptr = cg::bytecode::iinc(addr_ptr, regno);
+    addr_ptr = cg::bytecode::opiinc(addr_ptr, regno);
     return (*this);
 }
 
-Program& Program::idec(int_op regno) {
+Program& Program::opidec(int_op regno) {
     /*  Inserts idec instuction.
      */
-    addr_ptr = cg::bytecode::idec(addr_ptr, regno);
+    addr_ptr = cg::bytecode::opidec(addr_ptr, regno);
     return (*this);
 }
 
-Program& Program::ilt(int_op rega, int_op regb, int_op regr) {
+Program& Program::opilt(int_op rega, int_op regb, int_op regr) {
     /*  Inserts ilt instruction to bytecode.
      *
      *  :params:
@@ -105,11 +105,11 @@ Program& Program::ilt(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    addr_ptr = cg::bytecode::ilt(addr_ptr, rega, regb, regr);
+    addr_ptr = cg::bytecode::opilt(addr_ptr, rega, regb, regr);
     return (*this);
 }
 
-Program& Program::ilte(int_op rega, int_op regb, int_op regr) {
+Program& Program::opilte(int_op rega, int_op regb, int_op regr) {
     /*  Inserts ilte instruction to bytecode.
      *
      *  :params:
@@ -118,11 +118,11 @@ Program& Program::ilte(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    addr_ptr = cg::bytecode::ilte(addr_ptr, rega, regb, regr);
+    addr_ptr = cg::bytecode::opilte(addr_ptr, rega, regb, regr);
     return (*this);
 }
 
-Program& Program::igt(int_op rega, int_op regb, int_op regr) {
+Program& Program::opigt(int_op rega, int_op regb, int_op regr) {
     /*  Inserts igt instruction to bytecode.
      *
      *  :params:
@@ -131,11 +131,11 @@ Program& Program::igt(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    addr_ptr = cg::bytecode::igt(addr_ptr, rega, regb, regr);
+    addr_ptr = cg::bytecode::opigt(addr_ptr, rega, regb, regr);
     return (*this);
 }
 
-Program& Program::igte(int_op rega, int_op regb, int_op regr) {
+Program& Program::opigte(int_op rega, int_op regb, int_op regr) {
     /*  Inserts igte instruction to bytecode.
      *
      *  :params:
@@ -144,11 +144,11 @@ Program& Program::igte(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    addr_ptr = cg::bytecode::igte(addr_ptr, rega, regb, regr);
+    addr_ptr = cg::bytecode::opigte(addr_ptr, rega, regb, regr);
     return (*this);
 }
 
-Program& Program::ieq(int_op rega, int_op regb, int_op regr) {
+Program& Program::opieq(int_op rega, int_op regb, int_op regr) {
     /*  Inserts ieq instruction to bytecode.
      *
      *  :params:
@@ -157,7 +157,7 @@ Program& Program::ieq(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    addr_ptr = cg::bytecode::ieq(addr_ptr, rega, regb, regr);
+    addr_ptr = cg::bytecode::opieq(addr_ptr, rega, regb, regr);
     return (*this);
 }
 

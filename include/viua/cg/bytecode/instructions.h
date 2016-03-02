@@ -20,19 +20,19 @@ namespace cg {
     namespace bytecode {
         byte* nop(byte*);
 
-        byte* izero(byte*, int_op);
-        byte* istore(byte*, int_op, int_op);
-        byte* iadd(byte*, int_op, int_op, int_op);
-        byte* isub(byte*, int_op, int_op, int_op);
-        byte* imul(byte*, int_op, int_op, int_op);
-        byte* idiv(byte*, int_op, int_op, int_op);
-        byte* iinc(byte*, int_op);
-        byte* idec(byte*, int_op);
-        byte* ilt(byte*, int_op, int_op, int_op);
-        byte* ilte(byte*, int_op, int_op, int_op);
-        byte* igt(byte*, int_op, int_op, int_op);
-        byte* igte(byte*, int_op, int_op, int_op);
-        byte* ieq(byte*, int_op, int_op, int_op);
+        byte* opizero(byte*, int_op);
+        byte* opistore(byte*, int_op, int_op);
+        byte* opiadd(byte*, int_op, int_op, int_op);
+        byte* opisub(byte*, int_op, int_op, int_op);
+        byte* opimul(byte*, int_op, int_op, int_op);
+        byte* opidiv(byte*, int_op, int_op, int_op);
+        byte* opiinc(byte*, int_op);
+        byte* opidec(byte*, int_op);
+        byte* opilt(byte*, int_op, int_op, int_op);
+        byte* opilte(byte*, int_op, int_op, int_op);
+        byte* opigt(byte*, int_op, int_op, int_op);
+        byte* opigte(byte*, int_op, int_op, int_op);
+        byte* opieq(byte*, int_op, int_op, int_op);
 
         byte* fstore(byte*, int_op, float);
         byte* fadd(byte*, int_op, int_op, int_op);

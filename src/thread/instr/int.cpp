@@ -13,12 +13,12 @@
 using namespace std;
 
 
-byte* Thread::izero(byte* addr) {
+byte* Thread::opizero(byte* addr) {
     place(viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this), new Integer(0));
     return addr;
 }
 
-byte* Thread::istore(byte* addr) {
+byte* Thread::opistore(byte* addr) {
     unsigned destination_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     auto source = viua::operand::extract(addr);
@@ -59,48 +59,48 @@ template<class Operator, class ResultType> byte* perform(byte* addr, Thread* t, 
     return addr;
 }
 
-byte* Thread::iadd(byte* addr) {
+byte* Thread::opiadd(byte* addr) {
     return perform<std::plus<int>, Integer>(addr, this, &Thread::place);
 }
 
-byte* Thread::isub(byte* addr) {
+byte* Thread::opisub(byte* addr) {
     return perform<std::minus<int>, Integer>(addr, this, &Thread::place);
 }
 
-byte* Thread::imul(byte* addr) {
+byte* Thread::opimul(byte* addr) {
     return perform<std::multiplies<int>, Integer>(addr, this, &Thread::place);
 }
 
-byte* Thread::idiv(byte* addr) {
+byte* Thread::opidiv(byte* addr) {
     return perform<std::divides<int>, Integer>(addr, this, &Thread::place);
 }
 
-byte* Thread::ilt(byte* addr) {
+byte* Thread::opilt(byte* addr) {
     return perform<std::less<int>, Boolean>(addr, this, &Thread::place);
 }
 
-byte* Thread::ilte(byte* addr) {
+byte* Thread::opilte(byte* addr) {
     return perform<std::less_equal<int>, Boolean>(addr, this, &Thread::place);
 }
 
-byte* Thread::igt(byte* addr) {
+byte* Thread::opigt(byte* addr) {
     return perform<std::greater<int>, Boolean>(addr, this, &Thread::place);
 }
 
-byte* Thread::igte(byte* addr) {
+byte* Thread::opigte(byte* addr) {
     return perform<std::greater_equal<int>, Boolean>(addr, this, &Thread::place);
 }
 
-byte* Thread::ieq(byte* addr) {
+byte* Thread::opieq(byte* addr) {
     return perform<std::equal_to<int>, Boolean>(addr, this, &Thread::place);
 }
 
-byte* Thread::iinc(byte* addr) {
+byte* Thread::opiinc(byte* addr) {
     static_cast<Integer*>(viua::operand::extract(addr)->resolve(this))->increment();
     return addr;
 }
 
-byte* Thread::idec(byte* addr) {
+byte* Thread::opidec(byte* addr) {
     static_cast<Integer*>(viua::operand::extract(addr)->resolve(this))->decrement();
     return addr;
 }

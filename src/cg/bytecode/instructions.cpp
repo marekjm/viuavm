@@ -57,7 +57,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* izero(byte* addr_ptr, int_op regno) {
+        byte* opizero(byte* addr_ptr, int_op regno) {
             /*  Inserts izero instuction.
              */
             *(addr_ptr++) = IZERO;
@@ -65,7 +65,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* istore(byte* addr_ptr, int_op regno, int_op i) {
+        byte* opistore(byte* addr_ptr, int_op regno, int_op i) {
             /*  Inserts istore instruction to bytecode.
              *
              *  :params:
@@ -77,7 +77,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* iadd(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
+        byte* opiadd(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
             /*  Inserts iadd instruction to bytecode.
              *
              *  :params:
@@ -90,7 +90,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* isub(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
+        byte* opisub(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
             /*  Inserts isub instruction to bytecode.
              *
              *  :params:
@@ -103,7 +103,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* imul(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
+        byte* opimul(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
             /*  Inserts imul instruction to bytecode.
              *
              *  :params:
@@ -116,7 +116,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* idiv(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
+        byte* opidiv(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
             /*  Inserts idiv instruction to bytecode.
              *
              *  :params:
@@ -129,7 +129,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* iinc(byte* addr_ptr, int_op regno) {
+        byte* opiinc(byte* addr_ptr, int_op regno) {
             /*  Inserts iinc instuction.
              */
             *(addr_ptr++) = IINC;
@@ -137,7 +137,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* idec(byte* addr_ptr, int_op regno) {
+        byte* opidec(byte* addr_ptr, int_op regno) {
             /*  Inserts idec instuction.
              */
             *(addr_ptr++) = IDEC;
@@ -145,7 +145,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* ilt(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
+        byte* opilt(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
             /*  Inserts ilt instruction to bytecode.
              *
              *  :params:
@@ -158,7 +158,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* ilte(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
+        byte* opilte(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
             /*  Inserts ilte instruction to bytecode.
              *
              *  :params:
@@ -171,7 +171,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* igt(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
+        byte* opigt(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
             /*  Inserts igt instruction to bytecode.
              *
              *  :params:
@@ -184,7 +184,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* igte(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
+        byte* opigte(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
             /*  Inserts igte instruction to bytecode.
              *
              *  :params:
@@ -197,7 +197,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* ieq(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
+        byte* opieq(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
             /*  Inserts ieq instruction to bytecode.
              *
              *  :params:
