@@ -95,7 +95,7 @@ byte* Thread::dispatch(byte* addr) {
             addr = stof(addr+1);
             break;
         case STRSTORE:
-            addr = strstore(addr+1);
+            addr = opstrstore(addr+1);
             break;
         case VEC:
             addr = vec(addr+1);

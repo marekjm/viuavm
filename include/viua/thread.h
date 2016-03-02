@@ -140,7 +140,7 @@ class Thread {
     byte* stoi(byte*);
     byte* stof(byte*);
 
-    byte* strstore(byte*);
+    byte* opstrstore(byte*);
 
     byte* vec(byte*);
     byte* vinsert(byte*);

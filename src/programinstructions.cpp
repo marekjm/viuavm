@@ -330,10 +330,10 @@ Program& Program::stof(int_op a, int_op b) {
     return (*this);
 }
 
-Program& Program::strstore(int_op reg, string s) {
+Program& Program::opstrstore(int_op reg, string s) {
     /*  Inserts strstore instruction.
      */
-    addr_ptr = cg::bytecode::strstore(addr_ptr, reg, s);
+    addr_ptr = cg::bytecode::opstrstore(addr_ptr, reg, s);
     return (*this);
 }
 

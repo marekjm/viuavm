@@ -394,7 +394,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* strstore(byte* addr_ptr, int_op reg, string s) {
+        byte* opstrstore(byte* addr_ptr, int_op reg, string s) {
             /*  Inserts strstore instruction.
              */
             *(addr_ptr++) = STRSTORE;

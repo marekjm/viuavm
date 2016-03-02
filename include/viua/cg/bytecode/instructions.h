@@ -52,7 +52,7 @@ namespace cg {
         byte* stoi(byte*, int_op, int_op);
         byte* stof(byte*, int_op, int_op);
 
-        byte* strstore(byte*, int_op, std::string);
+        byte* opstrstore(byte*, int_op, std::string);
 
         byte* vec(byte*, int_op);
         byte* vinsert(byte*, int_op, int_op, int_op);

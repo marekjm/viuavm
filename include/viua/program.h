@@ -81,7 +81,7 @@ class Program {
     Program& stoi       (int_op, int_op);
     Program& stof       (int_op, int_op);
 
-    Program& strstore   (int_op, std::string);
+    Program& opstrstore   (int_op, std::string);
 
     Program& vec        (int_op);
     Program& vinsert    (int_op, int_op, int_op);

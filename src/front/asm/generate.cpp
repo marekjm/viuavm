@@ -323,7 +323,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             reg_chnk = str::chunk(operands);
             operands = str::lstrip(str::sub(operands, reg_chnk.size()));
             str_chnk = str::extract(operands);
-            program.strstore(assembler::operands::getint(resolveregister(reg_chnk, names)), str_chnk);
+            program.opstrstore(assembler::operands::getint(resolveregister(reg_chnk, names)), str_chnk);
         } else if (str::startswith(line, "vec")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
