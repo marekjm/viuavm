@@ -161,7 +161,7 @@ Program& Program::opieq(int_op rega, int_op regb, int_op regr) {
     return (*this);
 }
 
-Program& Program::fstore(int_op regno, float f) {
+Program& Program::opfstore(int_op regno, float f) {
     /*  Inserts fstore instruction to bytecode.
      *
      *  :params:
@@ -169,11 +169,11 @@ Program& Program::fstore(int_op regno, float f) {
      *  regno - register number
      *  f     - value to store
      */
-    addr_ptr = cg::bytecode::fstore(addr_ptr, regno, f);
+    addr_ptr = cg::bytecode::opfstore(addr_ptr, regno, f);
     return (*this);
 }
 
-Program& Program::fadd(int_op rega, int_op regb, int_op regr) {
+Program& Program::opfadd(int_op rega, int_op regb, int_op regr) {
     /*  Inserts fadd instruction to bytecode.
      *
      *  :params:
@@ -182,11 +182,11 @@ Program& Program::fadd(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    addr_ptr = cg::bytecode::fadd(addr_ptr, rega, regb, regr);
+    addr_ptr = cg::bytecode::opfadd(addr_ptr, rega, regb, regr);
     return (*this);
 }
 
-Program& Program::fsub(int_op rega, int_op regb, int_op regr) {
+Program& Program::opfsub(int_op rega, int_op regb, int_op regr) {
     /*  Inserts fsub instruction to bytecode.
      *
      *  :params:
@@ -195,11 +195,11 @@ Program& Program::fsub(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    addr_ptr = cg::bytecode::fsub(addr_ptr, rega, regb, regr);
+    addr_ptr = cg::bytecode::opfsub(addr_ptr, rega, regb, regr);
     return (*this);
 }
 
-Program& Program::fmul(int_op rega, int_op regb, int_op regr) {
+Program& Program::opfmul(int_op rega, int_op regb, int_op regr) {
     /*  Inserts fmul instruction to bytecode.
      *
      *  :params:
@@ -208,11 +208,11 @@ Program& Program::fmul(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    addr_ptr = cg::bytecode::fmul(addr_ptr, rega, regb, regr);
+    addr_ptr = cg::bytecode::opfmul(addr_ptr, rega, regb, regr);
     return (*this);
 }
 
-Program& Program::fdiv(int_op rega, int_op regb, int_op regr) {
+Program& Program::opfdiv(int_op rega, int_op regb, int_op regr) {
     /*  Inserts fdiv instruction to bytecode.
      *
      *  :params:
@@ -221,11 +221,11 @@ Program& Program::fdiv(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    addr_ptr = cg::bytecode::fdiv(addr_ptr, rega, regb, regr);
+    addr_ptr = cg::bytecode::opfdiv(addr_ptr, rega, regb, regr);
     return (*this);
 }
 
-Program& Program::flt(int_op rega, int_op regb, int_op regr) {
+Program& Program::opflt(int_op rega, int_op regb, int_op regr) {
     /*  Inserts flt instruction to bytecode.
      *
      *  :params:
@@ -234,11 +234,11 @@ Program& Program::flt(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    addr_ptr = cg::bytecode::flt(addr_ptr, rega, regb, regr);
+    addr_ptr = cg::bytecode::opflt(addr_ptr, rega, regb, regr);
     return (*this);
 }
 
-Program& Program::flte(int_op rega, int_op regb, int_op regr) {
+Program& Program::opflte(int_op rega, int_op regb, int_op regr) {
     /*  Inserts flte instruction to bytecode.
      *
      *  :params:
@@ -247,11 +247,11 @@ Program& Program::flte(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the result
      */
-    addr_ptr = cg::bytecode::flte(addr_ptr, rega, regb, regr);
+    addr_ptr = cg::bytecode::opflte(addr_ptr, rega, regb, regr);
     return (*this);
 }
 
-Program& Program::fgt(int_op rega, int_op regb, int_op regr) {
+Program& Program::opfgt(int_op rega, int_op regb, int_op regr) {
     /*  Inserts fgt instruction to bytecode.
      *
      *  :params:
@@ -260,11 +260,11 @@ Program& Program::fgt(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the resugt
      */
-    addr_ptr = cg::bytecode::fgt(addr_ptr, rega, regb, regr);
+    addr_ptr = cg::bytecode::opfgt(addr_ptr, rega, regb, regr);
     return (*this);
 }
 
-Program& Program::fgte(int_op rega, int_op regb, int_op regr) {
+Program& Program::opfgte(int_op rega, int_op regb, int_op regr) {
     /*  Inserts fgte instruction to bytecode.
      *
      *  :params:
@@ -273,11 +273,11 @@ Program& Program::fgte(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the resugt
      */
-    addr_ptr = cg::bytecode::fgte(addr_ptr, rega, regb, regr);
+    addr_ptr = cg::bytecode::opfgte(addr_ptr, rega, regb, regr);
     return (*this);
 }
 
-Program& Program::feq(int_op rega, int_op regb, int_op regr) {
+Program& Program::opfeq(int_op rega, int_op regb, int_op regr) {
     /*  Inserts feq instruction to bytecode.
      *
      *  :params:
@@ -286,7 +286,7 @@ Program& Program::feq(int_op rega, int_op regb, int_op regr) {
      *  regb    - register index of second operand
      *  regr    - register index in which to store the resugt
      */
-    addr_ptr = cg::bytecode::feq(addr_ptr, rega, regb, regr);
+    addr_ptr = cg::bytecode::opfeq(addr_ptr, rega, regb, regr);
     return (*this);
 }
 

@@ -62,17 +62,17 @@ class Program {
     Program& opigte     (int_op, int_op, int_op);
     Program& opieq      (int_op, int_op, int_op);
 
-    Program& fstore     (int_op, float);
-    Program& fadd       (int_op, int_op, int_op);
-    Program& fsub       (int_op, int_op, int_op);
-    Program& fmul       (int_op, int_op, int_op);
-    Program& fdiv       (int_op, int_op, int_op);
+    Program& opfstore     (int_op, float);
+    Program& opfadd       (int_op, int_op, int_op);
+    Program& opfsub       (int_op, int_op, int_op);
+    Program& opfmul       (int_op, int_op, int_op);
+    Program& opfdiv       (int_op, int_op, int_op);
 
-    Program& flt        (int_op, int_op, int_op);
-    Program& flte       (int_op, int_op, int_op);
-    Program& fgt        (int_op, int_op, int_op);
-    Program& fgte       (int_op, int_op, int_op);
-    Program& feq        (int_op, int_op, int_op);
+    Program& opflt        (int_op, int_op, int_op);
+    Program& opflte       (int_op, int_op, int_op);
+    Program& opfgt        (int_op, int_op, int_op);
+    Program& opfgte       (int_op, int_op, int_op);
+    Program& opfeq        (int_op, int_op, int_op);
 
     Program& bstore     (int_op, byte_op);
 

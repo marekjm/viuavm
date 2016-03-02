@@ -11,8 +11,8 @@
 using namespace std;
 
 
-byte* Thread::fstore(byte* addr) {
-    /*  Run istore instruction.
+byte* Thread::opfstore(byte* addr) {
+    /*  Run fstore instruction.
      */
     int destination_register_index;
     float value;
@@ -35,7 +35,7 @@ byte* Thread::fstore(byte* addr) {
 using ObjectPlacer = void(Thread::*)(unsigned,Type*);
 
 template<class Operator, class ResultType> byte* perform(byte* addr, Thread* t, ObjectPlacer placer) {
-    /** Heavily abstracted binary opcode implementation for Integer-related instructions.
+    /** Heavily abstracted binary opcode implementation for Float-related instructions.
      *
      *  First parameter - byte* addr - is the instruction pointer from which operand extraction should begin.
      *
@@ -55,38 +55,38 @@ template<class Operator, class ResultType> byte* perform(byte* addr, Thread* t, 
     return addr;
 }
 
-byte* Thread::fadd(byte* addr) {
+byte* Thread::opfadd(byte* addr) {
     return perform<std::plus<float>, Float>(addr, this, &Thread::place);
 }
 
-byte* Thread::fsub(byte* addr) {
+byte* Thread::opfsub(byte* addr) {
     return perform<std::minus<float>, Float>(addr, this, &Thread::place);
 }
 
-byte* Thread::fmul(byte* addr) {
+byte* Thread::opfmul(byte* addr) {
     return perform<std::multiplies<float>, Float>(addr, this, &Thread::place);
 }
 
-byte* Thread::fdiv(byte* addr) {
+byte* Thread::opfdiv(byte* addr) {
     return perform<std::divides<float>, Float>(addr, this, &Thread::place);
 }
 
-byte* Thread::flt(byte* addr) {
+byte* Thread::opflt(byte* addr) {
     return perform<std::less<float>, Boolean>(addr, this, &Thread::place);
 }
 
-byte* Thread::flte(byte* addr) {
+byte* Thread::opflte(byte* addr) {
     return perform<std::less_equal<float>, Boolean>(addr, this, &Thread::place);
 }
 
-byte* Thread::fgt(byte* addr) {
+byte* Thread::opfgt(byte* addr) {
     return perform<std::greater<float>, Boolean>(addr, this, &Thread::place);
 }
 
-byte* Thread::fgte(byte* addr) {
+byte* Thread::opfgte(byte* addr) {
     return perform<std::greater_equal<float>, Boolean>(addr, this, &Thread::place);
 }
 
-byte* Thread::feq(byte* addr) {
+byte* Thread::opfeq(byte* addr) {
     return perform<std::equal_to<float>, Boolean>(addr, this, &Thread::place);
 }

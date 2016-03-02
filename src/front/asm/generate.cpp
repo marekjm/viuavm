@@ -129,15 +129,15 @@ const map<string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS = {
     { "igte", &Program::opigte },
     { "ieq",  &Program::opieq },
 
-    { "fadd", &Program::fadd },
-    { "fsub", &Program::fsub },
-    { "fmul", &Program::fmul },
-    { "fdiv", &Program::fdiv },
-    { "flt",  &Program::flt },
-    { "flte", &Program::flte },
-    { "fgt",  &Program::fgt },
-    { "fgte", &Program::fgte },
-    { "feq",  &Program::feq },
+    { "fadd", &Program::opfadd },
+    { "fsub", &Program::opfsub },
+    { "fmul", &Program::opfmul },
+    { "fdiv", &Program::opfdiv },
+    { "flt",  &Program::opflt },
+    { "flte", &Program::opflte },
+    { "fgt",  &Program::opfgt },
+    { "fgte", &Program::opfgte },
+    { "feq",  &Program::opfeq },
 
     { "and",  &Program::logand },
     { "or",   &Program::logor },
@@ -275,7 +275,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         } else if (str::startswith(line, "fstore")) {
             string regno_chnk, float_chnk;
             tie(regno_chnk, float_chnk) = assembler::operands::get2(operands);
-            program.fstore(assembler::operands::getint(resolveregister(regno_chnk, names)), static_cast<float>(stod(float_chnk)));
+            program.opfstore(assembler::operands::getint(resolveregister(regno_chnk, names)), static_cast<float>(stod(float_chnk)));
         } else if (str::startswith(line, "fadd")) {
             assemble_three_intop_instruction(program, names, "fadd", operands);
         } else if (str::startswith(line, "fsub")) {

@@ -50,34 +50,34 @@ byte* Thread::dispatch(byte* addr) {
             addr = opieq(addr+1);
             break;
         case FSTORE:
-            addr = fstore(addr+1);
+            addr = opfstore(addr+1);
             break;
         case FADD:
-            addr = fadd(addr+1);
+            addr = opfadd(addr+1);
             break;
         case FSUB:
-            addr = fsub(addr+1);
+            addr = opfsub(addr+1);
             break;
         case FMUL:
-            addr = fmul(addr+1);
+            addr = opfmul(addr+1);
             break;
         case FDIV:
-            addr = fdiv(addr+1);
+            addr = opfdiv(addr+1);
             break;
         case FLT:
-            addr = flt(addr+1);
+            addr = opflt(addr+1);
             break;
         case FLTE:
-            addr = flte(addr+1);
+            addr = opflte(addr+1);
             break;
         case FGT:
-            addr = fgt(addr+1);
+            addr = opfgt(addr+1);
             break;
         case FGTE:
-            addr = fgte(addr+1);
+            addr = opfgte(addr+1);
             break;
         case FEQ:
-            addr = feq(addr+1);
+            addr = opfeq(addr+1);
             break;
         case BSTORE:
             addr = bstore(addr+1);

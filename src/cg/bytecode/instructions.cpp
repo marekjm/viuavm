@@ -210,7 +210,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* fstore(byte* addr_ptr, int_op regno, float f) {
+        byte* opfstore(byte* addr_ptr, int_op regno, float f) {
             /*  Inserts fstore instruction to bytecode.
              *
              *  :params:
@@ -226,7 +226,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* fadd(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
+        byte* opfadd(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
             /*  Inserts fadd instruction to bytecode.
              *
              *  :params:
@@ -239,7 +239,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* fsub(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
+        byte* opfsub(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
             /*  Inserts fsub instruction to bytecode.
              *
              *  :params:
@@ -252,7 +252,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* fmul(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
+        byte* opfmul(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
             /*  Inserts fmul instruction to bytecode.
              *
              *  :params:
@@ -265,7 +265,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* fdiv(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
+        byte* opfdiv(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
             /*  Inserts fdiv instruction to bytecode.
              *
              *  :params:
@@ -278,7 +278,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* flt(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
+        byte* opflt(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
             /*  Inserts flt instruction to bytecode.
              *
              *  :params:
@@ -291,7 +291,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* flte(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
+        byte* opflte(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
             /*  Inserts flte instruction to bytecode.
              *
              *  :params:
@@ -304,7 +304,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* fgt(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
+        byte* opfgt(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
             /*  Inserts fgt instruction to bytecode.
              *
              *  :params:
@@ -317,7 +317,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* fgte(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
+        byte* opfgte(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
             /*  Inserts fgte instruction to bytecode.
              *
              *  :params:
@@ -330,7 +330,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* feq(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
+        byte* opfeq(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
             /*  Inserts feq instruction to bytecode.
              *
              *  :params:

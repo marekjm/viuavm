@@ -121,17 +121,17 @@ class Thread {
     byte* opiinc(byte*);
     byte* opidec(byte*);
 
-    byte* fstore(byte*);
-    byte* fadd(byte*);
-    byte* fsub(byte*);
-    byte* fmul(byte*);
-    byte* fdiv(byte*);
+    byte* opfstore(byte*);
+    byte* opfadd(byte*);
+    byte* opfsub(byte*);
+    byte* opfmul(byte*);
+    byte* opfdiv(byte*);
 
-    byte* flt(byte*);
-    byte* flte(byte*);
-    byte* fgt(byte*);
-    byte* fgte(byte*);
-    byte* feq(byte*);
+    byte* opflt(byte*);
+    byte* opflte(byte*);
+    byte* opfgt(byte*);
+    byte* opfgte(byte*);
+    byte* opfeq(byte*);
 
     byte* bstore(byte*);
 
