@@ -18,7 +18,7 @@ typedef std::tuple<bool, float> float_op;
 
 namespace cg {
     namespace bytecode {
-        byte* nop(byte*);
+        byte* opnop(byte*);
 
         byte* opizero(byte*, int_op);
         byte* opistore(byte*, int_op, int_op);
@@ -68,7 +68,7 @@ namespace cg {
         byte* opmove(byte*, int_op, int_op);
         byte* opcopy(byte*, int_op, int_op);
         byte* opref(byte*, int_op, int_op);
-        byte* opopptr(byte*, int_op, int_op);
+        byte* opptr(byte*, int_op, int_op);
         byte* opswap(byte*, int_op, int_op);
         byte* opdelete(byte*, int_op);
         byte* opempty(byte*, int_op);
@@ -77,50 +77,50 @@ namespace cg {
         byte* optmpri(byte*, int_op);
         byte* optmpro(byte*, int_op);
 
-        byte* print(byte*, int_op);
-        byte* echo(byte*, int_op);
+        byte* opprint(byte*, int_op);
+        byte* opecho(byte*, int_op);
 
-        byte* enclose(byte*, int_op, int_op, int_op);
+        byte* openclose(byte*, int_op, int_op, int_op);
         byte* openclosecopy(byte*, int_op, int_op, int_op);
         byte* openclosemove(byte*, int_op, int_op, int_op);
-        byte* closure(byte*, int_op, const std::string&);
-        byte* function(byte*, int_op, const std::string&);
-        byte* fcall(byte*, int_op, int_op);
+        byte* opclosure(byte*, int_op, const std::string&);
+        byte* opfunction(byte*, int_op, const std::string&);
+        byte* opfcall(byte*, int_op, int_op);
 
-        byte* frame(byte*, int_op, int_op);
-        byte* param(byte*, int_op, int_op);
+        byte* opframe(byte*, int_op, int_op);
+        byte* opparam(byte*, int_op, int_op);
         byte* oppamv(byte*, int_op, int_op);
-        byte* paref(byte*, int_op, int_op);
-        byte* arg(byte*, int_op, int_op);
-        byte* argc(byte*, int_op);
-        byte* call(byte*, int_op, const std::string&);
+        byte* opparef(byte*, int_op, int_op);
+        byte* oparg(byte*, int_op, int_op);
+        byte* opargc(byte*, int_op);
+        byte* opcall(byte*, int_op, const std::string&);
         byte* opthread(byte*, int_op, const std::string&);
         byte* opthjoin(byte*, int_op, int_op);
         byte* opthreceive(byte*, int_op);
         byte* opwatchdog(byte*, const std::string&);
 
-        byte* jump(byte*, uint64_t);
-        byte* branch(byte*, int_op, uint64_t, uint64_t);
+        byte* opjump(byte*, uint64_t);
+        byte* opbranch(byte*, int_op, uint64_t, uint64_t);
 
-        byte* vmtry(byte*);
-        byte* vmcatch(byte*, const std::string&, const std::string&);
-        byte* pull(byte*, int_op);
-        byte* vmenter(byte*, const std::string&);
-        byte* vmthrow(byte*, int_op);
-        byte* leave(byte*);
+        byte* optry(byte*);
+        byte* opcatch(byte*, const std::string&, const std::string&);
+        byte* oppull(byte*, int_op);
+        byte* openter(byte*, const std::string&);
+        byte* opthrow(byte*, int_op);
+        byte* opleave(byte*);
 
         byte* opimport(byte*, const std::string&);
         byte* oplink(byte*, const std::string&);
 
-        byte* vmclass(byte*, int_op, const std::string&);
-        byte* vmderive(byte*, int_op, const std::string&);
-        byte* vmattach(byte*, int_op, const std::string&, const std::string&);
-        byte* vmregister(byte*, int_op);
-        byte* vmnew(byte*, int_op, const std::string&);
-        byte* vmmsg(byte*, int_op, const std::string&);
+        byte* opclass(byte*, int_op, const std::string&);
+        byte* opderive(byte*, int_op, const std::string&);
+        byte* opattach(byte*, int_op, const std::string&, const std::string&);
+        byte* opregister(byte*, int_op);
+        byte* opnew(byte*, int_op, const std::string&);
+        byte* opmsg(byte*, int_op, const std::string&);
 
         byte* opreturn(byte*);
-        byte* halt(byte*);
+        byte* ophalt(byte*);
     }
 }
 

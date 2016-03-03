@@ -157,7 +157,7 @@ class Thread {
     byte* opmove(byte*);
     byte* opcopy(byte*);
     byte* opref(byte*);
-    byte* opopptr(byte*);
+    byte* opptr(byte*);
     byte* opswap(byte*);
     byte* opdelete(byte*);
     byte* opempty(byte*);
@@ -167,49 +167,49 @@ class Thread {
     byte* optmpri(byte*);
     byte* optmpro(byte*);
 
-    byte* print(byte*);
-    byte* echo(byte*);
+    byte* opprint(byte*);
+    byte* opecho(byte*);
 
-    byte* enclose(byte*);
+    byte* openclose(byte*);
     byte* openclosecopy(byte*);
     byte* openclosemove(byte*);
-    byte* closure(byte*);
+    byte* opclosure(byte*);
 
-    byte* function(byte*);
-    byte* fcall(byte*);
+    byte* opfunction(byte*);
+    byte* opfcall(byte*);
 
-    byte* frame(byte*);
-    byte* param(byte*);
+    byte* opframe(byte*);
+    byte* opparam(byte*);
     byte* oppamv(byte*);
-    byte* paref(byte*);
-    byte* arg(byte*);
-    byte* argc(byte*);
+    byte* opparef(byte*);
+    byte* oparg(byte*);
+    byte* opargc(byte*);
 
-    byte* call(byte*);
+    byte* opcall(byte*);
     byte* opthread(byte*);
     byte* opthjoin(byte*);
     byte* opthreceive(byte*);
     byte* opwatchdog(byte*);
     byte* opreturn(byte*);
 
-    byte* jump(byte*);
-    byte* branch(byte*);
+    byte* opjump(byte*);
+    byte* opbranch(byte*);
 
-    byte* vmtry(byte*);
-    byte* vmcatch(byte*);
-    byte* pull(byte*);
-    byte* vmenter(byte*);
-    byte* vmthrow(byte*);
-    byte* leave(byte*);
+    byte* optry(byte*);
+    byte* opcatch(byte*);
+    byte* oppull(byte*);
+    byte* openter(byte*);
+    byte* opthrow(byte*);
+    byte* opleave(byte*);
 
-    byte* vmclass(byte*);
-    byte* prototype(byte*);
-    byte* vmderive(byte*);
-    byte* vmattach(byte*);
-    byte* vmregister(byte*);
+    byte* opclass(byte*);
+    byte* opprototype(byte*);
+    byte* opderive(byte*);
+    byte* opattach(byte*);
+    byte* opregister(byte*);
 
-    byte* vmnew(byte*);
-    byte* vmmsg(byte*);
+    byte* opnew(byte*);
+    byte* opmsg(byte*);
 
     byte* opimport(byte*);
     byte* oplink(byte*);

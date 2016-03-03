@@ -7,7 +7,7 @@
 using namespace std;
 
 
-byte* Thread::frame(byte* addr) {
+byte* Thread::opframe(byte* addr) {
     /** Create new frame for function calls.
      */
     int arguments = viua::operand::getInteger(viua::operand::extract(addr).get(), this);
@@ -18,7 +18,7 @@ byte* Thread::frame(byte* addr) {
     return addr;
 }
 
-byte* Thread::param(byte* addr) {
+byte* Thread::opparam(byte* addr) {
     /** Run param instruction.
      */
     int parameter_no_operand_index = viua::operand::getInteger(viua::operand::extract(addr).get(), this);
@@ -51,7 +51,7 @@ byte* Thread::oppamv(byte* addr) {
     return addr;
 }
 
-byte* Thread::paref(byte* addr) {
+byte* Thread::opparef(byte* addr) {
     /** Run paref instruction.
      */
     int parameter_no_operand_index = viua::operand::getInteger(viua::operand::extract(addr).get(), this);
@@ -74,7 +74,7 @@ byte* Thread::paref(byte* addr) {
     return addr;
 }
 
-byte* Thread::arg(byte* addr) {
+byte* Thread::oparg(byte* addr) {
     /** Run arg instruction.
      */
     int destination_register_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
@@ -95,14 +95,14 @@ byte* Thread::arg(byte* addr) {
     return addr;
 }
 
-byte* Thread::argc(byte* addr) {
+byte* Thread::opargc(byte* addr) {
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     uregset->set(target, new Integer(static_cast<int>(frames.back()->args->size())));
 
     return addr;
 }
 
-byte* Thread::call(byte* addr) {
+byte* Thread::opcall(byte* addr) {
     /*  Run call instruction.
      */
     bool return_register_ref = false;

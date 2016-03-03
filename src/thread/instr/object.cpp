@@ -11,7 +11,7 @@
 using namespace std;
 
 
-byte* Thread::vmnew(byte* addr) {
+byte* Thread::opnew(byte* addr) {
     /** Create new instance of specified class.
      */
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
@@ -27,7 +27,7 @@ byte* Thread::vmnew(byte* addr) {
     return addr;
 }
 
-byte* Thread::vmmsg(byte* addr) {
+byte* Thread::opmsg(byte* addr) {
     /** Send a message to an object.
      *
      *  This instruction is used to perform a method call on an object using dynamic dispatch.

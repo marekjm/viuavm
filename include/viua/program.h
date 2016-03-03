@@ -44,7 +44,7 @@ class Program {
 
     public:
     // instruction insertion interface
-    Program& nop        ();
+    Program& opnop        ();
 
     Program& opizero    (int_op);
     Program& opistore   (int_op, int_op);
@@ -97,7 +97,7 @@ class Program {
     Program& opmove       (int_op, int_op);
     Program& opcopy       (int_op, int_op);
     Program& opref        (int_op, int_op);
-    Program& opopptr      (int_op, int_op);
+    Program& opptr      (int_op, int_op);
     Program& opswap       (int_op, int_op);
     Program& opress       (std::string);
     Program& optmpri      (int_op);
@@ -106,51 +106,51 @@ class Program {
     Program& opempty      (int_op);
     Program& opisnull     (int_op, int_op);
 
-    Program& print      (int_op);
-    Program& echo       (int_op);
+    Program& opprint      (int_op);
+    Program& opecho       (int_op);
 
-    Program& enclose     (int_op, int_op, int_op);
+    Program& openclose     (int_op, int_op, int_op);
     Program& openclosecopy(int_op, int_op, int_op);
     Program& openclosemove(int_op, int_op, int_op);
-    Program& closure    (int_op, const std::string&);
+    Program& opclosure    (int_op, const std::string&);
 
-    Program& function   (int_op, const std::string&);
-    Program& fcall      (int_op, int_op);
+    Program& opfunction   (int_op, const std::string&);
+    Program& opfcall      (int_op, int_op);
 
-    Program& frame      (int_op, int_op);
-    Program& param      (int_op, int_op);
+    Program& opframe      (int_op, int_op);
+    Program& opparam      (int_op, int_op);
     Program& oppamv     (int_op, int_op);
-    Program& paref      (int_op, int_op);
-    Program& arg        (int_op, int_op);
-    Program& argc       (int_op);
+    Program& opparef      (int_op, int_op);
+    Program& oparg        (int_op, int_op);
+    Program& opargc       (int_op);
 
-    Program& call       (int_op, const std::string&);
+    Program& opcall       (int_op, const std::string&);
     Program& opthread   (int_op, const std::string&);
     Program& opthjoin   (int_op, int_op);
     Program& opthreceive(int_op);
     Program& opwatchdog(const std::string&);
-    Program& jump       (uint64_t, enum JUMPTYPE);
-    Program& branch     (int_op, uint64_t, enum JUMPTYPE, uint64_t, enum JUMPTYPE);
+    Program& opjump       (uint64_t, enum JUMPTYPE);
+    Program& opbranch     (int_op, uint64_t, enum JUMPTYPE, uint64_t, enum JUMPTYPE);
 
-    Program& vmtry      ();
-    Program& vmcatch    (std::string, std::string);
-    Program& pull       (int_op);
-    Program& vmenter    (std::string);
-    Program& vmthrow    (int_op);
-    Program& leave      ();
+    Program& optry      ();
+    Program& opcatch    (std::string, std::string);
+    Program& oppull       (int_op);
+    Program& openter    (std::string);
+    Program& opthrow    (int_op);
+    Program& opleave      ();
 
     Program& opimport(std::string);
     Program& oplink(std::string);
 
-    Program& vmclass    (int_op, const std::string&);
-    Program& vmderive   (int_op, const std::string&);
-    Program& vmattach   (int_op, const std::string&, const std::string&);
-    Program& vmregister (int_op);
-    Program& vmnew      (int_op, const std::string&);
-    Program& vmmsg      (int_op, const std::string&);
+    Program& opclass    (int_op, const std::string&);
+    Program& opderive   (int_op, const std::string&);
+    Program& opattach   (int_op, const std::string&, const std::string&);
+    Program& opregister (int_op);
+    Program& opnew      (int_op, const std::string&);
+    Program& opmsg      (int_op, const std::string&);
 
     Program& opreturn   ();
-    Program& halt       ();
+    Program& ophalt       ();
 
 
     /** Functions driving after-insertion calculations.

@@ -6,7 +6,7 @@
 using namespace std;
 
 
-byte* Thread::vmtry(byte* addr) {
+byte* Thread::optry(byte* addr) {
     /** Create new special frame for try blocks.
      */
     if (try_frame_new != nullptr) {
@@ -16,7 +16,7 @@ byte* Thread::vmtry(byte* addr) {
     return addr;
 }
 
-byte* Thread::vmcatch(byte* addr) {
+byte* Thread::opcatch(byte* addr) {
     /** Run catch instruction.
      */
     string type_name = viua::operand::extractString(addr);
@@ -39,7 +39,7 @@ byte* Thread::vmcatch(byte* addr) {
     return addr;
 }
 
-byte* Thread::pull(byte* addr) {
+byte* Thread::oppull(byte* addr) {
     /** Run pull instruction.
      */
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
@@ -53,7 +53,7 @@ byte* Thread::pull(byte* addr) {
     return addr;
 }
 
-byte* Thread::vmenter(byte* addr) {
+byte* Thread::openter(byte* addr) {
     /*  Run enter instruction.
      */
     string block_name = viua::operand::extractString(addr);
@@ -82,7 +82,7 @@ byte* Thread::vmenter(byte* addr) {
     return block_address;
 }
 
-byte* Thread::vmthrow(byte* addr) {
+byte* Thread::opthrow(byte* addr) {
     /** Run throw instruction.
      */
     int source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
@@ -104,7 +104,7 @@ byte* Thread::vmthrow(byte* addr) {
     return addr;
 }
 
-byte* Thread::leave(byte* addr) {
+byte* Thread::opleave(byte* addr) {
     /*  Run leave instruction.
      */
     if (tryframes.size() == 0) {

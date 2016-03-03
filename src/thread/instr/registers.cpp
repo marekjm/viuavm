@@ -57,7 +57,7 @@ byte* Thread::opref(byte* addr) {
 
     return addr;
 }
-byte* Thread::opopptr(byte* addr) {
+byte* Thread::opptr(byte* addr) {
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     place(target, viua::operand::extract(addr)->resolve(this)->pointer());

@@ -134,7 +134,7 @@ byte* Thread::dispatch(byte* addr) {
             addr = opref(addr+1);
             break;
         case PTR:
-            addr = opopptr(addr+1);
+            addr = opptr(addr+1);
             break;
         case SWAP:
             addr = opswap(addr+1);
@@ -158,13 +158,13 @@ byte* Thread::dispatch(byte* addr) {
             addr = optmpro(addr+1);
             break;
         case PRINT:
-            addr = print(addr+1);
+              addr = opprint(addr+1);
             break;
         case ECHO:
-            addr = echo(addr+1);
+              addr = opecho(addr+1);
             break;
         case ENCLOSE:
-            addr = enclose(addr+1);
+              addr = openclose(addr+1);
             break;
         case ENCLOSECOPY:
             addr = openclosecopy(addr+1);
@@ -173,34 +173,34 @@ byte* Thread::dispatch(byte* addr) {
             addr = openclosemove(addr+1);
             break;
         case CLOSURE:
-            addr = closure(addr+1);
+              addr = opclosure(addr+1);
             break;
         case FUNCTION:
-            addr = function(addr+1);
+              addr = opfunction(addr+1);
             break;
         case FCALL:
-            addr = fcall(addr+1);
+              addr = opfcall(addr+1);
             break;
         case FRAME:
-            addr = frame(addr+1);
+              addr = opframe(addr+1);
             break;
         case PARAM:
-            addr = param(addr+1);
+              addr = opparam(addr+1);
             break;
         case PAMV:
             addr = oppamv(addr+1);
             break;
         case PAREF:
-            addr = paref(addr+1);
+              addr = opparef(addr+1);
             break;
         case ARG:
-            addr = arg(addr+1);
+              addr = oparg(addr+1);
             break;
         case ARGC:
-            addr = argc(addr+1);
+              addr = opargc(addr+1);
             break;
         case CALL:
-            addr = call(addr+1);
+              addr = opcall(addr+1);
             break;
         case THREAD:
             addr = opthread(addr+1);
@@ -218,28 +218,28 @@ byte* Thread::dispatch(byte* addr) {
             addr = opreturn(addr);
             break;
         case JUMP:
-            addr = jump(addr+1);
+              addr = opjump(addr+1);
             break;
         case BRANCH:
-            addr = branch(addr+1);
+              addr = opbranch(addr+1);
             break;
         case TRY:
-            addr = vmtry(addr+1);
+            addr = optry(addr+1);
             break;
         case CATCH:
-            addr = vmcatch(addr+1);
+            addr = opcatch(addr+1);
             break;
         case PULL:
-            addr = pull(addr+1);
+              addr = oppull(addr+1);
             break;
         case ENTER:
-            addr = vmenter(addr+1);
+            addr = openter(addr+1);
             break;
         case THROW:
-            addr = vmthrow(addr+1);
+            addr = opthrow(addr+1);
             break;
         case LEAVE:
-            addr = leave(addr+1);
+              addr = opleave(addr+1);
             break;
         case IMPORT:
             addr = opimport(addr+1);
@@ -248,22 +248,22 @@ byte* Thread::dispatch(byte* addr) {
             addr = oplink(addr+1);
             break;
         case CLASS:
-            addr = vmclass(addr+1);
+            addr = opclass(addr+1);
             break;
         case DERIVE:
-            addr = vmderive(addr+1);
+            addr = opderive(addr+1);
             break;
         case ATTACH:
-            addr = vmattach(addr+1);
+            addr = opattach(addr+1);
             break;
         case REGISTER:
-            addr = vmregister(addr+1);
+            addr = opregister(addr+1);
             break;
         case NEW:
-            addr = vmnew(addr+1);
+            addr = opnew(addr+1);
             break;
         case MSG:
-            addr = vmmsg(addr+1);
+            addr = opmsg(addr+1);
             break;
         case HALT:
             throw HaltException();

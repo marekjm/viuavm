@@ -50,7 +50,7 @@ static byte* insertThreeIntegerOpsInstruction(byte* addr_ptr, enum OPCODE instru
 
 namespace cg {
     namespace bytecode {
-        byte* nop(byte* addr_ptr) {
+        byte* opnop(byte* addr_ptr) {
             /*  Inserts nop instuction.
              */
             *(addr_ptr++) = NOP;
@@ -520,7 +520,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* opopptr(byte* addr_ptr, int_op a, int_op b) {
+        byte* opptr(byte* addr_ptr, int_op a, int_op b) {
             addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, PTR, a, b);
             return addr_ptr;
         }
@@ -600,7 +600,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* print(byte* addr_ptr, int_op reg) {
+        byte* opprint(byte* addr_ptr, int_op reg) {
             /*  Inserts print instuction.
              */
             *(addr_ptr++) = PRINT;
@@ -608,7 +608,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* echo(byte* addr_ptr, int_op reg) {
+        byte* opecho(byte* addr_ptr, int_op reg) {
             /*  Inserts echo instuction.
              */
             *(addr_ptr++) = ECHO;
@@ -616,7 +616,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* enclose(byte* addr_ptr, int_op target_closure, int_op target_register, int_op source_register) {
+        byte* openclose(byte* addr_ptr, int_op target_closure, int_op target_register, int_op source_register) {
             /*  Inserts clbing instuction.
              */
             *(addr_ptr++) = ENCLOSE;
@@ -646,7 +646,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* closure(byte* addr_ptr, int_op reg, const string& fn) {
+        byte* opclosure(byte* addr_ptr, int_op reg, const string& fn) {
             /*  Inserts closure instuction.
              */
             *(addr_ptr++) = CLOSURE;
@@ -658,7 +658,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* function(byte* addr_ptr, int_op reg, const string& fn) {
+        byte* opfunction(byte* addr_ptr, int_op reg, const string& fn) {
             /*  Inserts function instuction.
              */
             *(addr_ptr++) = FUNCTION;
@@ -670,21 +670,21 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* fcall(byte* addr_ptr, int_op clsr, int_op ret) {
+        byte* opfcall(byte* addr_ptr, int_op clsr, int_op ret) {
             /*  Inserts fcall instruction to bytecode.
              */
             addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, FCALL, clsr, ret);
             return addr_ptr;
         }
 
-        byte* frame(byte* addr_ptr, int_op a, int_op b) {
+        byte* opframe(byte* addr_ptr, int_op a, int_op b) {
             /*  Inserts frame instruction to bytecode.
              */
             addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, FRAME, a, b);
             return addr_ptr;
         }
 
-        byte* param(byte* addr_ptr, int_op a, int_op b) {
+        byte* opparam(byte* addr_ptr, int_op a, int_op b) {
             /*  Inserts param instruction to bytecode.
              *
              *  :params:
@@ -708,7 +708,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* paref(byte* addr_ptr, int_op a, int_op b) {
+        byte* opparef(byte* addr_ptr, int_op a, int_op b) {
             /*  Inserts paref instruction to bytecode.
              *
              *  :params:
@@ -720,7 +720,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* arg(byte* addr_ptr, int_op a, int_op b) {
+        byte* oparg(byte* addr_ptr, int_op a, int_op b) {
             /*  Inserts arg instruction to bytecode.
              *
              *  :params:
@@ -732,7 +732,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* argc(byte* addr_ptr, int_op a) {
+        byte* opargc(byte* addr_ptr, int_op a) {
             /*  Inserts argc instruction to bytecode.
              *
              *  :params:
@@ -744,7 +744,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* call(byte* addr_ptr, int_op reg, const string& fn_name) {
+        byte* opcall(byte* addr_ptr, int_op reg, const string& fn_name) {
             /*  Inserts call instruction.
              *  Byte offset is calculated automatically.
              */
@@ -789,7 +789,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* jump(byte* addr_ptr, uint64_t addr) {
+        byte* opjump(byte* addr_ptr, uint64_t addr) {
             /*  Inserts jump instruction. Parameter is instruction index.
              *  Byte offset is calculated automatically.
              *
@@ -807,7 +807,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* branch(byte* addr_ptr, int_op regc, uint64_t addr_truth, uint64_t addr_false) {
+        byte* opbranch(byte* addr_ptr, int_op regc, uint64_t addr_truth, uint64_t addr_false) {
             /*  Inserts branch instruction.
              *  Byte offset is calculated automatically.
              */
@@ -824,14 +824,14 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* vmtry(byte* addr_ptr) {
+        byte* optry(byte* addr_ptr) {
             /*  Inserts try instruction.
              */
             *(addr_ptr++) = TRY;
             return addr_ptr;
         }
 
-        byte* vmcatch(byte* addr_ptr, const string& type_name, const string& block_name) {
+        byte* opcatch(byte* addr_ptr, const string& type_name, const string& block_name) {
             /*  Inserts catch instruction.
              */
             *(addr_ptr++) = CATCH;
@@ -851,7 +851,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* pull(byte* addr_ptr, int_op regno) {
+        byte* oppull(byte* addr_ptr, int_op regno) {
             /*  Inserts throw instuction.
              */
             *(addr_ptr++) = PULL;
@@ -859,7 +859,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* vmenter(byte* addr_ptr, const string& block_name) {
+        byte* openter(byte* addr_ptr, const string& block_name) {
             /*  Inserts enter instruction.
              *  Byte offset is calculated automatically.
              */
@@ -871,7 +871,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* vmthrow(byte* addr_ptr, int_op regno) {
+        byte* opthrow(byte* addr_ptr, int_op regno) {
             /*  Inserts throw instuction.
              */
             *(addr_ptr++) = THROW;
@@ -879,7 +879,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* leave(byte* addr_ptr) {
+        byte* opleave(byte* addr_ptr) {
             /*  Inserts leave instruction.
              */
             *(addr_ptr++) = LEAVE;
@@ -908,7 +908,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* vmclass(byte* addr_ptr, int_op reg, const string& class_name) {
+        byte* opclass(byte* addr_ptr, int_op reg, const string& class_name) {
             /*  Inserts class instuction.
              */
             *(addr_ptr++) = CLASS;
@@ -920,7 +920,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* vmderive(byte* addr_ptr, int_op reg, const string& base_class_name) {
+        byte* opderive(byte* addr_ptr, int_op reg, const string& base_class_name) {
             /*  Inserts derive instuction.
              */
             *(addr_ptr++) = DERIVE;
@@ -932,7 +932,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* vmattach(byte* addr_ptr, int_op reg, const string& function_name, const string& method_name) {
+        byte* opattach(byte* addr_ptr, int_op reg, const string& function_name, const string& method_name) {
             /*  Inserts derive instuction.
              */
             *(addr_ptr++) = ATTACH;
@@ -948,7 +948,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* vmregister(byte* addr_ptr, int_op regno) {
+        byte* opregister(byte* addr_ptr, int_op regno) {
             /*  Inserts register instuction.
              */
             *(addr_ptr++) = REGISTER;
@@ -956,7 +956,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* vmnew(byte* addr_ptr, int_op reg, const string& class_name) {
+        byte* opnew(byte* addr_ptr, int_op reg, const string& class_name) {
             /*  Inserts new instuction.
              */
             *(addr_ptr++) = NEW;
@@ -968,7 +968,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* vmmsg(byte* addr_ptr, int_op reg, const string& method_name) {
+        byte* opmsg(byte* addr_ptr, int_op reg, const string& method_name) {
             /*  Inserts msg instuction.
              */
             *(addr_ptr++) = MSG;
@@ -985,7 +985,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* halt(byte* addr_ptr) {
+        byte* ophalt(byte* addr_ptr) {
             /*  Inserts halt instruction.
              */
             *(addr_ptr++) = HALT;

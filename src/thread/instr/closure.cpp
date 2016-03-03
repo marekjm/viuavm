@@ -13,7 +13,7 @@
 using namespace std;
 
 
-byte* Thread::enclose(byte* addr) {
+byte* Thread::openclose(byte* addr) {
     /** Enclose object by reference.
      */
     Closure *target_closure = static_cast<Closure*>(viua::operand::extract(addr)->resolve(this));
@@ -71,7 +71,7 @@ byte* Thread::openclosemove(byte* addr) {
     return addr;
 }
 
-byte* Thread::closure(byte* addr) {
+byte* Thread::opclosure(byte* addr) {
     /** Create a closure from a function.
      */
     if (uregset != frames.back()->regset) {
@@ -91,7 +91,7 @@ byte* Thread::closure(byte* addr) {
     return addr;
 }
 
-byte* Thread::function(byte* addr) {
+byte* Thread::opfunction(byte* addr) {
     /** Create function object in a register.
      *
      *  Such objects can be used to call functions, and
@@ -110,7 +110,7 @@ byte* Thread::function(byte* addr) {
     return addr;
 }
 
-byte* Thread::fcall(byte* addr) {
+byte* Thread::opfcall(byte* addr) {
     /*  Call a function object.
      */
     int return_value_reg;
