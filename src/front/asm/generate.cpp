@@ -139,8 +139,8 @@ const map<string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS = {
     { "fgte", &Program::opfgte },
     { "feq",  &Program::opfeq },
 
-    { "and",  &Program::logand },
-    { "or",   &Program::logor },
+    { "and",  &Program::opand },
+    { "or",   &Program::opor },
 
     { "enclose", &Program::enclose },
     { "enclosecopy", &Program::openclosecopy },
@@ -355,7 +355,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         } else if (str::startswith(line, "not")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
-            program.lognot(assembler::operands::getint(resolveregister(regno_chnk, names)));
+            program.opnot(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "and")) {
             assemble_three_intop_instruction(program, names, "and", operands);
         } else if (str::startswith(line, "or")) {

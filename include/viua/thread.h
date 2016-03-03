@@ -150,9 +150,9 @@ class Thread {
     byte* opvlen(byte*);
 
     byte* boolean(byte*);
-    byte* lognot(byte*);
-    byte* logand(byte*);
-    byte* logor(byte*);
+    byte* opnot(byte*);
+    byte* opand(byte*);
+    byte* opor(byte*);
 
     byte* move(byte*);
     byte* copy(byte*);

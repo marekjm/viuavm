@@ -61,9 +61,9 @@ namespace cg {
         byte* opvat(byte*, int_op, int_op, int_op);
         byte* opvlen(byte*, int_op, int_op);
 
-        byte* lognot(byte*, int_op);
-        byte* logand(byte*, int_op, int_op, int_op);
-        byte* logor(byte*, int_op, int_op, int_op);
+        byte* opnot(byte*, int_op);
+        byte* opand(byte*, int_op, int_op, int_op);
+        byte* opor(byte*, int_op, int_op, int_op);
 
         byte* move(byte*, int_op, int_op);
         byte* copy(byte*, int_op, int_op);

@@ -90,9 +90,9 @@ class Program {
     Program& opvat        (int_op, int_op, int_op);
     Program& opvlen       (int_op, int_op);
 
-    Program& lognot     (int_op);
-    Program& logand     (int_op, int_op, int_op);
-    Program& logor      (int_op, int_op, int_op);
+    Program& opnot     (int_op);
+    Program& opand     (int_op, int_op, int_op);
+    Program& opor      (int_op, int_op, int_op);
 
     Program& move       (int_op, int_op);
     Program& copy       (int_op, int_op);

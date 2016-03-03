@@ -450,7 +450,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* lognot(byte* addr_ptr, int_op reg) {
+        byte* opnot(byte* addr_ptr, int_op reg) {
             /*  Inserts not instuction.
              */
             *(addr_ptr++) = NOT;
@@ -458,7 +458,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* logand(byte* addr_ptr, int_op regr, int_op rega, int_op regb) {
+        byte* opand(byte* addr_ptr, int_op regr, int_op rega, int_op regb) {
             /*  Inserts and instruction to bytecode.
              *
              *  :params:
@@ -471,7 +471,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* logor(byte* addr_ptr, int_op regr, int_op rega, int_op regb) {
+        byte* opor(byte* addr_ptr, int_op regr, int_op rega, int_op regb) {
             /*  Inserts or instruction to bytecode.
              *
              *  :params:

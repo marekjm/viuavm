@@ -116,13 +116,13 @@ byte* Thread::dispatch(byte* addr) {
             addr = opvlen(addr+1);
             break;
         case NOT:
-            addr = lognot(addr+1);
+            addr = opnot(addr+1);
             break;
         case AND:
-            addr = logand(addr+1);
+            addr = opand(addr+1);
             break;
         case OR:
-            addr = logor(addr+1);
+            addr = opor(addr+1);
             break;
         case MOVE:
             addr = move(addr+1);

@@ -379,14 +379,14 @@ Program& Program::opvlen(int_op vec, int_op reg) {
     return (*this);
 }
 
-Program& Program::lognot(int_op reg) {
+Program& Program::opnot(int_op reg) {
     /*  Inserts not instuction.
      */
-    addr_ptr = cg::bytecode::lognot(addr_ptr, reg);
+    addr_ptr = cg::bytecode::opnot(addr_ptr, reg);
     return (*this);
 }
 
-Program& Program::logand(int_op regr, int_op rega, int_op regb) {
+Program& Program::opand(int_op regr, int_op rega, int_op regb) {
     /*  Inserts and instruction to bytecode.
      *
      *  :params:
@@ -395,11 +395,11 @@ Program& Program::logand(int_op regr, int_op rega, int_op regb) {
      *  rega   - register index of first operand
      *  regb   - register index of second operand
      */
-    addr_ptr = cg::bytecode::logand(addr_ptr, regr, rega, regb);
+    addr_ptr = cg::bytecode::opand(addr_ptr, regr, rega, regb);
     return (*this);
 }
 
-Program& Program::logor(int_op regr, int_op rega, int_op regb) {
+Program& Program::opor(int_op regr, int_op rega, int_op regb) {
     /*  Inserts or instruction to bytecode.
      *
      *  :params:
@@ -408,7 +408,7 @@ Program& Program::logor(int_op regr, int_op rega, int_op regb) {
      *  rega   - register index of first operand
      *  regb   - register index of second operand
      */
-    addr_ptr = cg::bytecode::logor(addr_ptr, regr, rega, regb);
+    addr_ptr = cg::bytecode::opor(addr_ptr, regr, rega, regb);
     return (*this);
 }
 
