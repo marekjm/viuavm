@@ -327,31 +327,31 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         } else if (str::startswith(line, "vec")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
-            program.vec(assembler::operands::getint(resolveregister(regno_chnk, names)));
+            program.opvec(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "vinsert")) {
             string vec, src, pos;
             tie(vec, src, pos) = assembler::operands::get3(operands, false);
             if (pos == "") { pos = "0"; }
-            program.vinsert(assembler::operands::getint(resolveregister(vec, names)), assembler::operands::getint(resolveregister(src, names)), assembler::operands::getint(resolveregister(pos, names)));
+            program.opvinsert(assembler::operands::getint(resolveregister(vec, names)), assembler::operands::getint(resolveregister(src, names)), assembler::operands::getint(resolveregister(pos, names)));
         } else if (str::startswith(line, "vpush")) {
             string regno_chnk, number_chnk;
             tie(regno_chnk, number_chnk) = assembler::operands::get2(operands);
-            program.vpush(assembler::operands::getint(resolveregister(regno_chnk, names)), assembler::operands::getint(resolveregister(number_chnk, names)));
+            program.opvpush(assembler::operands::getint(resolveregister(regno_chnk, names)), assembler::operands::getint(resolveregister(number_chnk, names)));
         } else if (str::startswith(line, "vpop")) {
             string vec, dst, pos;
             tie(vec, dst, pos) = assembler::operands::get3(operands, false);
             if (dst == "") { dst = "0"; }
             if (pos == "") { pos = "-1"; }
-            program.vpop(assembler::operands::getint(resolveregister(vec, names)), assembler::operands::getint(resolveregister(dst, names)), assembler::operands::getint(resolveregister(pos, names)));
+            program.opvpop(assembler::operands::getint(resolveregister(vec, names)), assembler::operands::getint(resolveregister(dst, names)), assembler::operands::getint(resolveregister(pos, names)));
         } else if (str::startswith(line, "vat")) {
             string vec, dst, pos;
             tie(vec, dst, pos) = assembler::operands::get3(operands, false);
             if (pos == "") { pos = "-1"; }
-            program.vat(assembler::operands::getint(resolveregister(vec, names)), assembler::operands::getint(resolveregister(dst, names)), assembler::operands::getint(resolveregister(pos, names)));
+            program.opvat(assembler::operands::getint(resolveregister(vec, names)), assembler::operands::getint(resolveregister(dst, names)), assembler::operands::getint(resolveregister(pos, names)));
         } else if (str::startswith(line, "vlen")) {
             string regno_chnk, number_chnk;
             tie(regno_chnk, number_chnk) = assembler::operands::get2(operands);
-            program.vlen(assembler::operands::getint(resolveregister(regno_chnk, names)), assembler::operands::getint(resolveregister(number_chnk, names)));
+            program.opvlen(assembler::operands::getint(resolveregister(regno_chnk, names)), assembler::operands::getint(resolveregister(number_chnk, names)));
         } else if (str::startswith(line, "not")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);

@@ -407,7 +407,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* vec(byte* addr_ptr, int_op index) {
+        byte* opvec(byte* addr_ptr, int_op index) {
             /** Inserts vec instruction.
              */
             *(addr_ptr++) = VEC;
@@ -415,35 +415,35 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* vinsert(byte* addr_ptr, int_op vec, int_op src, int_op dst) {
+        byte* opvinsert(byte* addr_ptr, int_op vec, int_op src, int_op dst) {
             /** Inserts vinsert instruction.
              */
             addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, VINSERT, vec, src, dst);
             return addr_ptr;
         }
 
-        byte* vpush(byte* addr_ptr, int_op vec, int_op src) {
+        byte* opvpush(byte* addr_ptr, int_op vec, int_op src) {
             /** Inserts vpush instruction.
              */
             addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, VPUSH, vec, src);
             return addr_ptr;
         }
 
-        byte* vpop(byte* addr_ptr, int_op vec, int_op dst, int_op pos) {
+        byte* opvpop(byte* addr_ptr, int_op vec, int_op dst, int_op pos) {
             /** Inserts vpop instruction.
              */
             addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, VPOP, vec, dst, pos);
             return addr_ptr;
         }
 
-        byte* vat(byte* addr_ptr, int_op vec, int_op dst, int_op at) {
+        byte* opvat(byte* addr_ptr, int_op vec, int_op dst, int_op at) {
             /** Inserts vat instruction.
              */
             addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, VAT, vec, dst, at);
             return addr_ptr;
         }
 
-        byte* vlen(byte* addr_ptr, int_op vec, int_op reg) {
+        byte* opvlen(byte* addr_ptr, int_op vec, int_op reg) {
             /** Inserts vlen instruction.
              */
             addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, VLEN, vec, reg);

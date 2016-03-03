@@ -10,13 +10,13 @@
 using namespace std;
 
 
-byte* Thread::vec(byte* addr) {
+byte* Thread::opvec(byte* addr) {
     place(viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this), new Vector());
 
     return addr;
 }
 
-byte* Thread::vinsert(byte* addr) {
+byte* Thread::opvinsert(byte* addr) {
     /*  Run vinsert instruction.
      *
      *  Vector always inserts a copy of the object in a register.
@@ -31,7 +31,7 @@ byte* Thread::vinsert(byte* addr) {
     return addr;
 }
 
-byte* Thread::vpush(byte* addr) {
+byte* Thread::opvpush(byte* addr) {
     /*  Run vpush instruction.
      *
      *  Vector always pushes a copy of the object in a register.
@@ -45,7 +45,7 @@ byte* Thread::vpush(byte* addr) {
     return addr;
 }
 
-byte* Thread::vpop(byte* addr) {
+byte* Thread::opvpop(byte* addr) {
     /*  Run vpop instruction.
      *
      *  Vector always pops a copy of the object in a register.
@@ -65,7 +65,7 @@ byte* Thread::vpop(byte* addr) {
     return addr;
 }
 
-byte* Thread::vat(byte* addr) {
+byte* Thread::opvat(byte* addr) {
     /*  Run vat instruction.
      *
      *  Vector always returns a copy of the object in a register.
@@ -86,7 +86,7 @@ byte* Thread::vat(byte* addr) {
     return addr;
 }
 
-byte* Thread::vlen(byte* addr) {
+byte* Thread::opvlen(byte* addr) {
     /*  Run vlen instruction.
      */
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);

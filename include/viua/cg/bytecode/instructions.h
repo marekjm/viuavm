@@ -54,12 +54,12 @@ namespace cg {
 
         byte* opstrstore(byte*, int_op, std::string);
 
-        byte* vec(byte*, int_op);
-        byte* vinsert(byte*, int_op, int_op, int_op);
-        byte* vpush(byte*, int_op, int_op);
-        byte* vpop(byte*, int_op, int_op, int_op);
-        byte* vat(byte*, int_op, int_op, int_op);
-        byte* vlen(byte*, int_op, int_op);
+        byte* opvec(byte*, int_op);
+        byte* opvinsert(byte*, int_op, int_op, int_op);
+        byte* opvpush(byte*, int_op, int_op);
+        byte* opvpop(byte*, int_op, int_op, int_op);
+        byte* opvat(byte*, int_op, int_op, int_op);
+        byte* opvlen(byte*, int_op, int_op);
 
         byte* lognot(byte*, int_op);
         byte* logand(byte*, int_op, int_op, int_op);

@@ -142,12 +142,12 @@ class Thread {
 
     byte* opstrstore(byte*);
 
-    byte* vec(byte*);
-    byte* vinsert(byte*);
-    byte* vpush(byte*);
-    byte* vpop(byte*);
-    byte* vat(byte*);
-    byte* vlen(byte*);
+    byte* opvec(byte*);
+    byte* opvinsert(byte*);
+    byte* opvpush(byte*);
+    byte* opvpop(byte*);
+    byte* opvat(byte*);
+    byte* opvlen(byte*);
 
     byte* boolean(byte*);
     byte* lognot(byte*);

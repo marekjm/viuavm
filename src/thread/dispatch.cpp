@@ -98,22 +98,22 @@ byte* Thread::dispatch(byte* addr) {
             addr = opstrstore(addr+1);
             break;
         case VEC:
-            addr = vec(addr+1);
+            addr = opvec(addr+1);
             break;
         case VINSERT:
-            addr = vinsert(addr+1);
+            addr = opvinsert(addr+1);
             break;
         case VPUSH:
-            addr = vpush(addr+1);
+            addr = opvpush(addr+1);
             break;
         case VPOP:
-            addr = vpop(addr+1);
+            addr = opvpop(addr+1);
             break;
         case VAT:
-            addr = vat(addr+1);
+            addr = opvat(addr+1);
             break;
         case VLEN:
-            addr = vlen(addr+1);
+            addr = opvlen(addr+1);
             break;
         case NOT:
             addr = lognot(addr+1);
