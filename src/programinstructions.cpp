@@ -412,7 +412,7 @@ Program& Program::opor(int_op regr, int_op rega, int_op regb) {
     return (*this);
 }
 
-Program& Program::move(int_op a, int_op b) {
+Program& Program::opmove(int_op a, int_op b) {
     /*  Inserts move instruction to bytecode.
      *
      *  :params:
@@ -420,11 +420,11 @@ Program& Program::move(int_op a, int_op b) {
      *  a - register number (move from...)
      *  b - register number (move to...)
      */
-    addr_ptr = cg::bytecode::move(addr_ptr, a, b);
+    addr_ptr = cg::bytecode::opmove(addr_ptr, a, b);
     return (*this);
 }
 
-Program& Program::copy(int_op a, int_op b) {
+Program& Program::opcopy(int_op a, int_op b) {
     /*  Inserts copy instruction to bytecode.
      *
      *  :params:
@@ -432,11 +432,11 @@ Program& Program::copy(int_op a, int_op b) {
      *  a - register number (copy from...)
      *  b - register number (copy to...)
      */
-    addr_ptr = cg::bytecode::copy(addr_ptr, a, b);
+    addr_ptr = cg::bytecode::opcopy(addr_ptr, a, b);
     return (*this);
 }
 
-Program& Program::ref(int_op a, int_op b) {
+Program& Program::opref(int_op a, int_op b) {
     /*  Inserts ref instruction to bytecode.
      *
      *  :params:
@@ -444,16 +444,16 @@ Program& Program::ref(int_op a, int_op b) {
      *  a - register number
      *  b - register number
      */
-    addr_ptr = cg::bytecode::ref(addr_ptr, a, b);
+    addr_ptr = cg::bytecode::opref(addr_ptr, a, b);
     return (*this);
 }
 
-Program& Program::opptr(int_op a, int_op b) {
-    addr_ptr = cg::bytecode::opptr(addr_ptr, a, b);
+Program& Program::opopptr(int_op a, int_op b) {
+    addr_ptr = cg::bytecode::opopptr(addr_ptr, a, b);
     return (*this);
 }
 
-Program& Program::swap(int_op a, int_op b) {
+Program& Program::opswap(int_op a, int_op b) {
     /*  Inserts swap instruction to bytecode.
      *
      *  :params:
@@ -461,7 +461,7 @@ Program& Program::swap(int_op a, int_op b) {
      *  a - register number
      *  b - register number
      */
-    addr_ptr = cg::bytecode::swap(addr_ptr, a, b);
+    addr_ptr = cg::bytecode::opswap(addr_ptr, a, b);
     return (*this);
 }
 
@@ -472,14 +472,14 @@ Program& Program::opdelete(int_op reg) {
     return (*this);
 }
 
-Program& Program::empty(int_op reg) {
+Program& Program::opempty(int_op reg) {
     /*  Inserts empty instuction.
      */
-    addr_ptr = cg::bytecode::empty(addr_ptr, reg);
+    addr_ptr = cg::bytecode::opempty(addr_ptr, reg);
     return (*this);
 }
 
-Program& Program::isnull(int_op a, int_op b) {
+Program& Program::opisnull(int_op a, int_op b) {
     /*  Inserts isnull instruction to bytecode.
      *
      *  :params:
@@ -487,32 +487,32 @@ Program& Program::isnull(int_op a, int_op b) {
      *  a - register number
      *  b - register number
      */
-    addr_ptr = cg::bytecode::isnull(addr_ptr, a, b);
+    addr_ptr = cg::bytecode::opisnull(addr_ptr, a, b);
     return (*this);
 }
 
-Program& Program::ress(string a) {
+Program& Program::opress(string a) {
     /*  Inserts ress instruction to bytecode.
      *
      *  :params:
      *
      *  a - register set ID
      */
-    addr_ptr = cg::bytecode::ress(addr_ptr, a);
+    addr_ptr = cg::bytecode::opress(addr_ptr, a);
     return (*this);
 }
 
-Program& Program::tmpri(int_op reg) {
+Program& Program::optmpri(int_op reg) {
     /*  Inserts tmpri instuction.
      */
-    addr_ptr = cg::bytecode::tmpri(addr_ptr, reg);
+    addr_ptr = cg::bytecode::optmpri(addr_ptr, reg);
     return (*this);
 }
 
-Program& Program::tmpro(int_op reg) {
+Program& Program::optmpro(int_op reg) {
     /*  Inserts tmpro instuction.
      */
-    addr_ptr = cg::bytecode::tmpro(addr_ptr, reg);
+    addr_ptr = cg::bytecode::optmpro(addr_ptr, reg);
     return (*this);
 }
 

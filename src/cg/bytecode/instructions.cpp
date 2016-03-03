@@ -484,7 +484,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* move(byte* addr_ptr, int_op a, int_op b) {
+        byte* opmove(byte* addr_ptr, int_op a, int_op b) {
             /*  Inserts move instruction to bytecode.
              *
              *  :params:
@@ -496,7 +496,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* copy(byte* addr_ptr, int_op a, int_op b) {
+        byte* opcopy(byte* addr_ptr, int_op a, int_op b) {
             /*  Inserts copy instruction to bytecode.
              *
              *  :params:
@@ -508,7 +508,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* ref(byte* addr_ptr, int_op a, int_op b) {
+        byte* opref(byte* addr_ptr, int_op a, int_op b) {
             /*  Inserts ref instruction to bytecode.
              *
              *  :params:
@@ -520,12 +520,12 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* opptr(byte* addr_ptr, int_op a, int_op b) {
+        byte* opopptr(byte* addr_ptr, int_op a, int_op b) {
             addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, PTR, a, b);
             return addr_ptr;
         }
 
-        byte* swap(byte* addr_ptr, int_op a, int_op b) {
+        byte* opswap(byte* addr_ptr, int_op a, int_op b) {
             /*  Inserts swap instruction to bytecode.
              *
              *  :params:
@@ -543,7 +543,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* empty(byte* addr_ptr, int_op reg) {
+        byte* opempty(byte* addr_ptr, int_op reg) {
             /*  Inserts empty instuction.
              */
             *(addr_ptr++) = EMPTY;
@@ -551,7 +551,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* isnull(byte* addr_ptr, int_op a, int_op b) {
+        byte* opisnull(byte* addr_ptr, int_op a, int_op b) {
             /*  Inserts isnull instruction to bytecode.
              *
              *  :params:
@@ -563,7 +563,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* ress(byte* addr_ptr, const string& a) {
+        byte* opress(byte* addr_ptr, const string& a) {
             /*  Inserts ress instruction to bytecode.
              *
              *  :params:
@@ -584,7 +584,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* tmpri(byte* addr_ptr, int_op reg) {
+        byte* optmpri(byte* addr_ptr, int_op reg) {
             /*  Inserts tmpri instuction.
              */
             *(addr_ptr++) = TMPRI;
@@ -592,7 +592,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* tmpro(byte* addr_ptr, int_op reg) {
+        byte* optmpro(byte* addr_ptr, int_op reg) {
             /*  Inserts tmpro instuction.
              */
             *(addr_ptr++) = TMPRO;

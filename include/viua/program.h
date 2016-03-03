@@ -94,17 +94,17 @@ class Program {
     Program& opand     (int_op, int_op, int_op);
     Program& opor      (int_op, int_op, int_op);
 
-    Program& move       (int_op, int_op);
-    Program& copy       (int_op, int_op);
-    Program& ref        (int_op, int_op);
-    Program& opptr      (int_op, int_op);
-    Program& swap       (int_op, int_op);
-    Program& ress       (std::string);
-    Program& tmpri      (int_op);
-    Program& tmpro      (int_op);
+    Program& opmove       (int_op, int_op);
+    Program& opcopy       (int_op, int_op);
+    Program& opref        (int_op, int_op);
+    Program& opopptr      (int_op, int_op);
+    Program& opswap       (int_op, int_op);
+    Program& opress       (std::string);
+    Program& optmpri      (int_op);
+    Program& optmpro      (int_op);
     Program& opdelete   (int_op);
-    Program& empty      (int_op);
-    Program& isnull     (int_op, int_op);
+    Program& opempty      (int_op);
+    Program& opisnull     (int_op, int_op);
 
     Program& print      (int_op);
     Program& echo       (int_op);

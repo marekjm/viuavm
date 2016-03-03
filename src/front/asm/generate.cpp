@@ -363,23 +363,23 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         } else if (str::startswith(line, "move")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = assembler::operands::get2(operands);
-            program.move(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
+            program.opmove(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "copy")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = assembler::operands::get2(operands);
-            program.copy(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
+            program.opcopy(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "ref")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = assembler::operands::get2(operands);
-            program.ref(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
+            program.opref(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "ptr")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = assembler::operands::get2(operands);
-            program.opptr(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
+            program.opopptr(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "swap")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = assembler::operands::get2(operands);
-            program.swap(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
+            program.opswap(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "delete")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
@@ -387,21 +387,21 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         } else if (str::startswith(line, "empty")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
-            program.empty(assembler::operands::getint(resolveregister(regno_chnk, names)));
+            program.opempty(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "isnull")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = assembler::operands::get2(operands);
-            program.isnull(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
+            program.opisnull(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "ress")) {
-            program.ress(operands);
+            program.opress(operands);
         } else if (str::startswith(line, "tmpri")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
-            program.tmpri(assembler::operands::getint(resolveregister(regno_chnk, names)));
+            program.optmpri(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "tmpro")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
-            program.tmpro(assembler::operands::getint(resolveregister(regno_chnk, names)));
+            program.optmpro(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "print")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);

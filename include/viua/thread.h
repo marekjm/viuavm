@@ -154,18 +154,18 @@ class Thread {
     byte* opand(byte*);
     byte* opor(byte*);
 
-    byte* move(byte*);
-    byte* copy(byte*);
-    byte* ref(byte*);
-    byte* opptr(byte*);
-    byte* swap(byte*);
+    byte* opmove(byte*);
+    byte* opcopy(byte*);
+    byte* opref(byte*);
+    byte* opopptr(byte*);
+    byte* opswap(byte*);
     byte* opdelete(byte*);
-    byte* empty(byte*);
-    byte* isnull(byte*);
+    byte* opempty(byte*);
+    byte* opisnull(byte*);
 
-    byte* ress(byte*);
-    byte* tmpri(byte*);
-    byte* tmpro(byte*);
+    byte* opress(byte*);
+    byte* optmpri(byte*);
+    byte* optmpro(byte*);
 
     byte* print(byte*);
     byte* echo(byte*);

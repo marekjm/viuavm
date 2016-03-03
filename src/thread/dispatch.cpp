@@ -125,37 +125,37 @@ byte* Thread::dispatch(byte* addr) {
             addr = opor(addr+1);
             break;
         case MOVE:
-            addr = move(addr+1);
+            addr = opmove(addr+1);
             break;
         case COPY:
-            addr = copy(addr+1);
+            addr = opcopy(addr+1);
             break;
         case REF:
-            addr = ref(addr+1);
+            addr = opref(addr+1);
             break;
         case PTR:
-            addr = opptr(addr+1);
+            addr = opopptr(addr+1);
             break;
         case SWAP:
-            addr = swap(addr+1);
+            addr = opswap(addr+1);
             break;
         case DELETE:
             addr = opdelete(addr+1);
             break;
         case EMPTY:
-            addr = empty(addr+1);
+            addr = opempty(addr+1);
             break;
         case ISNULL:
-            addr = isnull(addr+1);
+            addr = opisnull(addr+1);
             break;
         case RESS:
-            addr = ress(addr+1);
+            addr = opress(addr+1);
             break;
         case TMPRI:
-            addr = tmpri(addr+1);
+            addr = optmpri(addr+1);
             break;
         case TMPRO:
-            addr = tmpro(addr+1);
+            addr = optmpro(addr+1);
             break;
         case PRINT:
             addr = print(addr+1);
