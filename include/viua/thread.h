@@ -135,10 +135,10 @@ class Thread {
 
     byte* opbstore(byte*);
 
-    byte* itof(byte*);
-    byte* ftoi(byte*);
-    byte* stoi(byte*);
-    byte* stof(byte*);
+    byte* opitof(byte*);
+    byte* opftoi(byte*);
+    byte* opstoi(byte*);
+    byte* opstof(byte*);
 
     byte* opstrstore(byte*);
 

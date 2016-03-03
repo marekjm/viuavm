@@ -47,10 +47,10 @@ namespace cg {
 
         byte* opbstore(byte*, int_op, byte_op);
 
-        byte* itof(byte*, int_op, int_op);
-        byte* ftoi(byte*, int_op, int_op);
-        byte* stoi(byte*, int_op, int_op);
-        byte* stof(byte*, int_op, int_op);
+        byte* opitof(byte*, int_op, int_op);
+        byte* opftoi(byte*, int_op, int_op);
+        byte* opstoi(byte*, int_op, int_op);
+        byte* opstof(byte*, int_op, int_op);
 
         byte* opstrstore(byte*, int_op, std::string);
 

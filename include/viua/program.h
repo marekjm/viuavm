@@ -76,10 +76,10 @@ class Program {
 
     Program& opbstore   (int_op, byte_op);
 
-    Program& itof       (int_op, int_op);
-    Program& ftoi       (int_op, int_op);
-    Program& stoi       (int_op, int_op);
-    Program& stof       (int_op, int_op);
+    Program& opitof       (int_op, int_op);
+    Program& opftoi       (int_op, int_op);
+    Program& opstoi       (int_op, int_op);
+    Program& opstof       (int_op, int_op);
 
     Program& opstrstore   (int_op, std::string);
 

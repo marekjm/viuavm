@@ -302,31 +302,31 @@ Program& Program::opbstore(int_op regno, byte_op b) {
     return (*this);
 }
 
-Program& Program::itof(int_op a, int_op b) {
+Program& Program::opitof(int_op a, int_op b) {
     /*  Inserts itof instruction to bytecode.
      */
-    addr_ptr = cg::bytecode::itof(addr_ptr, a, b);
+    addr_ptr = cg::bytecode::opitof(addr_ptr, a, b);
     return (*this);
 }
 
-Program& Program::ftoi(int_op a, int_op b) {
+Program& Program::opftoi(int_op a, int_op b) {
     /*  Inserts ftoi instruction to bytecode.
      */
-    addr_ptr = cg::bytecode::ftoi(addr_ptr, a, b);
+    addr_ptr = cg::bytecode::opftoi(addr_ptr, a, b);
     return (*this);
 }
 
-Program& Program::stoi(int_op a, int_op b) {
+Program& Program::opstoi(int_op a, int_op b) {
     /*  Inserts stoi instruction to bytecode.
      */
-    addr_ptr = cg::bytecode::stoi(addr_ptr, a, b);
+    addr_ptr = cg::bytecode::opstoi(addr_ptr, a, b);
     return (*this);
 }
 
-Program& Program::stof(int_op a, int_op b) {
+Program& Program::opstof(int_op a, int_op b) {
     /*  Inserts stof instruction to bytecode.
      */
-    addr_ptr = cg::bytecode::stof(addr_ptr, a, b);
+    addr_ptr = cg::bytecode::opstof(addr_ptr, a, b);
     return (*this);
 }
 

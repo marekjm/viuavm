@@ -12,7 +12,7 @@
 using namespace std;
 
 
-byte* Thread::itof(byte* addr) {
+byte* Thread::opitof(byte* addr) {
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     int convert_from = static_cast<Integer*>(viua::operand::extract(addr)->resolve(this))->value();
     place(target, new Float(static_cast<float>(convert_from)));
@@ -20,7 +20,7 @@ byte* Thread::itof(byte* addr) {
     return addr;
 }
 
-byte* Thread::ftoi(byte* addr) {
+byte* Thread::opftoi(byte* addr) {
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     float convert_from = static_cast<Float*>(viua::operand::extract(addr)->resolve(this))->value();
     place(target, new Integer(static_cast<int>(convert_from)));
@@ -28,7 +28,7 @@ byte* Thread::ftoi(byte* addr) {
     return addr;
 }
 
-byte* Thread::stoi(byte* addr) {
+byte* Thread::opstoi(byte* addr) {
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     int result_integer = 0;
@@ -46,7 +46,7 @@ byte* Thread::stoi(byte* addr) {
     return addr;
 }
 
-byte* Thread::stof(byte* addr) {
+byte* Thread::opstof(byte* addr) {
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     string supplied_string = static_cast<String*>(viua::operand::extract(addr)->resolve(this))->value();
     double convert_from = std::stod(supplied_string);

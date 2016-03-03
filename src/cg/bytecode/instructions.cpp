@@ -366,28 +366,28 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* itof(byte* addr_ptr, int_op a, int_op b) {
+        byte* opitof(byte* addr_ptr, int_op a, int_op b) {
             /*  Inserts itof instruction to bytecode.
              */
             addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, ITOF, a, b);
             return addr_ptr;
         }
 
-        byte* ftoi(byte* addr_ptr, int_op a, int_op b) {
+        byte* opftoi(byte* addr_ptr, int_op a, int_op b) {
             /*  Inserts ftoi instruction to bytecode.
              */
             addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, FTOI, a, b);
             return addr_ptr;
         }
 
-        byte* stoi(byte* addr_ptr, int_op a, int_op b) {
+        byte* opstoi(byte* addr_ptr, int_op a, int_op b) {
             /*  Inserts stoi instruction to bytecode.
              */
             addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, STOI, a, b);
             return addr_ptr;
         }
 
-        byte* stof(byte* addr_ptr, int_op a, int_op b) {
+        byte* opstof(byte* addr_ptr, int_op a, int_op b) {
             /*  Inserts stof instruction to bytecode.
              */
             addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, STOF, a, b);

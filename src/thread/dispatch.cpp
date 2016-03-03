@@ -83,16 +83,16 @@ byte* Thread::dispatch(byte* addr) {
             addr = opbstore(addr+1);
             break;
         case ITOF:
-            addr = itof(addr+1);
+            addr = opitof(addr+1);
             break;
         case FTOI:
-            addr = ftoi(addr+1);
+            addr = opftoi(addr+1);
             break;
         case STOI:
-            addr = stoi(addr+1);
+            addr = opstoi(addr+1);
             break;
         case STOF:
-            addr = stof(addr+1);
+            addr = opstof(addr+1);
             break;
         case STRSTORE:
             addr = opstrstore(addr+1);
