@@ -1,5 +1,5 @@
-#ifndef VIUA_THREAD_H
-#define VIUA_THREAD_H
+#ifndef VIUA_PROCESS_H
+#define VIUA_PROCESS_H
 
 #pragma once
 
