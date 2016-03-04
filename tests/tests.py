@@ -779,16 +779,16 @@ class ExternalModulesTests(unittest.TestCase):
         runTestNoDisassemblyRerun(self, 'sqrt.asm', 1.73, 0, lambda o: round(float(o.strip()), 2))
 
 
-class MultithreadingTests(unittest.TestCase):
+class ConcurrencyTests(unittest.TestCase):
     PATH = './sample/asm/threading'
 
     def testHelloWorldExample(self):
         runTestSplitlines(self, 'hello_world.asm', ['Hello multithreaded World! (2)', 'Hello multithreaded World! (1)'], 0)
 
-    def testJoiningThread(self):
+    def testJoiningProcess(self):
         runTestSplitlines(self, 'joining_a_thread.asm', ['Hello multithreaded World! (1)', 'Hello multithreaded World! (2)'], 0)
 
-    def testDetachingThread(self):
+    def testDetachingProcess(self):
         runTestSplitlines(
             self,
             'detaching_a_thread.asm',
@@ -803,20 +803,20 @@ class MultithreadingTests(unittest.TestCase):
             0
         )
 
-    def testStackCorruptedOnMainOrphaningThreads(self):
+    def testStackCorruptedOnMainOrphaningProcesss(self):
         # this will of course generate leaks, but we are not interested in them since
         # after process termination operating system will automatically reclaim memory
         runTestThrowsException(self, 'main_orphaning_threads.asm', 'uncaught object: Exception = joinable thread in dropped frame')
 
-    def testStackCorruptedOnNonMainFunctionOrphaningThreads(self):
+    def testStackCorruptedOnNonMainFunctionOrphaningProcesss(self):
         # this will of course generate leaks, but we are not interested in them since
         # after process termination operating system will automatically reclaim memory
         runTestThrowsException(self, 'non_main_orphaning_threads.asm', 'uncaught object: Exception = joinable thread in dropped frame')
 
-    def testGettingPriorityOfAThread(self):
+    def testGettingPriorityOfAProcess(self):
         runTest(self, 'get_priority.asm', '1')
 
-    def testSettingPriorityOfAThread(self):
+    def testSettingPriorityOfAProcess(self):
         runTestSplitlines(self, 'set_priority.asm', [
             '40',
             'Hello concurrent World!',
@@ -827,7 +827,7 @@ class MultithreadingTests(unittest.TestCase):
         runTest(self, 'message_passing.asm', 'Hello message passing World!')
 
     def testTransferringExceptionsOnJoin(self):
-        runTest(self, 'transferring_exceptions.asm', 'exception transferred from thread Thread: Hello exception transferring World!')
+        runTest(self, 'transferring_exceptions.asm', 'exception transferred from thread Process: Hello exception transferring World!')
 
     def testReturningValuesOnJoin(self):
         runTest(self, 'return_from_a_thread.asm', '42')

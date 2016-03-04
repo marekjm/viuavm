@@ -19,7 +19,7 @@
 
 
 class CPU {
-    friend Thread;
+    friend Process;
 #ifdef AS_DEBUG_HEADER
     public:
 #endif
@@ -31,9 +31,9 @@ class CPU {
     uint64_t executable_offset;
 
     // vector of all threads machine is executing
-    std::vector<Thread*> threads;
+    std::vector<Process*> threads;
     std::queue<Type*> watchdog_message_buffer;
-    Thread* watchdog_thread;
+    Process* watchdog_thread;
     decltype(threads)::size_type current_thread_index;
     std::mutex threads_mtx;
 
@@ -122,12 +122,12 @@ class CPU {
 
         CPU& iframe(Frame* frm = nullptr, unsigned r = DEFAULT_REGISTER_SIZE);
 
-        Thread* spawn(Frame*, Thread* parent_thread = nullptr);
-        Thread* spawnWatchdog(Frame*);
+        Process* spawn(Frame*, Process* parent_thread = nullptr);
+        Process* spawnWatchdog(Frame*);
         void resurrectWatchdog();
 
         byte* tick(decltype(threads)::size_type thread_index = 0);
-        bool executeQuant(Thread*, unsigned);
+        bool executeQuant(Process*, unsigned);
         bool burst();
 
         int run();

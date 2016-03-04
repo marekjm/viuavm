@@ -7,7 +7,7 @@
 using namespace std;
 
 
-byte* Thread::opframe(byte* addr) {
+byte* Process::opframe(byte* addr) {
     /** Create new frame for function calls.
      */
     int arguments = viua::operand::getInteger(viua::operand::extract(addr).get(), this);
@@ -18,7 +18,7 @@ byte* Thread::opframe(byte* addr) {
     return addr;
 }
 
-byte* Thread::opparam(byte* addr) {
+byte* Process::opparam(byte* addr) {
     /** Run param instruction.
      */
     int parameter_no_operand_index = viua::operand::getInteger(viua::operand::extract(addr).get(), this);
@@ -34,7 +34,7 @@ byte* Thread::opparam(byte* addr) {
     return addr;
 }
 
-byte* Thread::oppamv(byte* addr) {
+byte* Process::oppamv(byte* addr) {
     /** Run pamv instruction.
      */
     int parameter_no_operand_index = viua::operand::getInteger(viua::operand::extract(addr).get(), this);
@@ -51,7 +51,7 @@ byte* Thread::oppamv(byte* addr) {
     return addr;
 }
 
-byte* Thread::opparef(byte* addr) {
+byte* Process::opparef(byte* addr) {
     /** Run paref instruction.
      */
     int parameter_no_operand_index = viua::operand::getInteger(viua::operand::extract(addr).get(), this);
@@ -74,7 +74,7 @@ byte* Thread::opparef(byte* addr) {
     return addr;
 }
 
-byte* Thread::oparg(byte* addr) {
+byte* Process::oparg(byte* addr) {
     /** Run arg instruction.
      */
     int destination_register_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
@@ -95,14 +95,14 @@ byte* Thread::oparg(byte* addr) {
     return addr;
 }
 
-byte* Thread::opargc(byte* addr) {
+byte* Process::opargc(byte* addr) {
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     uregset->set(target, new Integer(static_cast<int>(frames.back()->args->size())));
 
     return addr;
 }
 
-byte* Thread::opcall(byte* addr) {
+byte* Process::opcall(byte* addr) {
     /*  Run call instruction.
      */
     bool return_register_ref = false;
@@ -142,11 +142,11 @@ byte* Thread::opcall(byte* addr) {
         return callForeignMethod(addr, obj, call_name, return_register_ref, return_register_index, call_name);
     }
 
-    auto caller = (is_native ? &Thread::callNative : &Thread::callForeign);
+    auto caller = (is_native ? &Process::callNative : &Process::callForeign);
     return (this->*caller)(addr, call_name, return_register_ref, return_register_index, "");
 }
 
-byte* Thread::opreturn(byte* addr) {
+byte* Process::opreturn(byte* addr) {
     if (frames.size() == 0) {
         throw new Exception("no frame on stack: no call to return from");
     }

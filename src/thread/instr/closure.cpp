@@ -13,7 +13,7 @@
 using namespace std;
 
 
-byte* Thread::openclose(byte* addr) {
+byte* Process::openclose(byte* addr) {
     /** Enclose object by reference.
      */
     Closure *target_closure = static_cast<Closure*>(viua::operand::extract(addr)->resolve(this));
@@ -40,7 +40,7 @@ byte* Thread::openclose(byte* addr) {
     return addr;
 }
 
-byte* Thread::openclosecopy(byte* addr) {
+byte* Process::openclosecopy(byte* addr) {
     /** Enclose object by copy.
      */
     Closure *target_closure = static_cast<Closure*>(viua::operand::extract(addr)->resolve(this));
@@ -55,7 +55,7 @@ byte* Thread::openclosecopy(byte* addr) {
     return addr;
 }
 
-byte* Thread::openclosemove(byte* addr) {
+byte* Process::openclosemove(byte* addr) {
     /** Enclose object by move.
      */
     Closure *target_closure = static_cast<Closure*>(viua::operand::extract(addr)->resolve(this));
@@ -71,7 +71,7 @@ byte* Thread::openclosemove(byte* addr) {
     return addr;
 }
 
-byte* Thread::opclosure(byte* addr) {
+byte* Process::opclosure(byte* addr) {
     /** Create a closure from a function.
      */
     if (uregset != frames.back()->regset) {
@@ -91,7 +91,7 @@ byte* Thread::opclosure(byte* addr) {
     return addr;
 }
 
-byte* Thread::opfunction(byte* addr) {
+byte* Process::opfunction(byte* addr) {
     /** Create function object in a register.
      *
      *  Such objects can be used to call functions, and
@@ -110,7 +110,7 @@ byte* Thread::opfunction(byte* addr) {
     return addr;
 }
 
-byte* Thread::opfcall(byte* addr) {
+byte* Process::opfcall(byte* addr) {
     /*  Call a function object.
      */
     int return_value_reg;

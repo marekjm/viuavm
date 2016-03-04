@@ -11,7 +11,7 @@
 using namespace std;
 
 
-Type* Thread::fetch(unsigned index) const {
+Type* Process::fetch(unsigned index) const {
     /*  Return pointer to object at given register.
      *  This method safeguards against reaching for out-of-bounds registers and
      *  reading from an empty register.
@@ -26,7 +26,7 @@ Type* Thread::fetch(unsigned index) const {
     }
     return object;
 }
-void Thread::place(unsigned index, Type* obj) {
+void Process::place(unsigned index, Type* obj) {
     /** Place an object in register with given index.
      *
      *  Before placing an object in register, a check is preformed if the register is empty.
@@ -42,7 +42,7 @@ void Thread::place(unsigned index, Type* obj) {
         updaterefs(old_ref_ptr, obj);
     }
 }
-void Thread::updaterefs(Type* before, Type* now) {
+void Process::updaterefs(Type* before, Type* now) {
     /** This method updates references to a given address present in registers.
      *  It swaps old address for the new one in every register that points to the old address.
      *
@@ -63,7 +63,7 @@ void Thread::updaterefs(Type* before, Type* now) {
         }
     }
 }
-bool Thread::hasrefs(unsigned index) {
+bool Process::hasrefs(unsigned index) {
     /** This method checks if object at a given address exists as a reference in another register.
      */
     bool has = false;
@@ -77,7 +77,7 @@ bool Thread::hasrefs(unsigned index) {
     }
     return has;
 }
-void Thread::ensureStaticRegisters(string function_name) {
+void Process::ensureStaticRegisters(string function_name) {
     /** Makes sure that static register set for requested function is initialized.
      */
     try {
@@ -88,7 +88,7 @@ void Thread::ensureStaticRegisters(string function_name) {
     }
 }
 
-Frame* Thread::requestNewFrame(int arguments_size, int registers_size) {
+Frame* Process::requestNewFrame(int arguments_size, int registers_size) {
     /** Request new frame to be prepared.
      *
      *  Creates new frame if the new-frame hook is empty.
@@ -98,7 +98,7 @@ Frame* Thread::requestNewFrame(int arguments_size, int registers_size) {
     if (frame_new != nullptr) { throw "requested new frame while last one is unused"; }
     return (frame_new = new Frame(nullptr, arguments_size, registers_size));
 }
-void Thread::pushFrame() {
+void Process::pushFrame() {
     /** Pushes new frame to be the current (top-most) one.
      */
     if (frames.size() > MAX_STACK_SIZE) {
@@ -116,13 +116,13 @@ void Thread::pushFrame() {
     frames.push_back(frame_new);
     frame_new = nullptr;
 }
-void Thread::dropFrame() {
+void Process::dropFrame() {
     /** Drops top-most frame from call stack.
      */
     Frame* frame = frames.back();
 
     for (registerset_size_type i = 0; i < frame->regset->size(); ++i) {
-        if (ThreadType* t = dynamic_cast<ThreadType*>(frame->regset->at(i))) {
+        if (ProcessType* t = dynamic_cast<ProcessType*>(frame->regset->at(i))) {
             if (t->joinable()) {
                 throw new Exception("joinable thread in dropped frame");
             }
@@ -143,7 +143,7 @@ void Thread::dropFrame() {
     }
 }
 
-byte* Thread::callNative(byte* return_address, const string& call_name, const bool& return_ref, const int& return_index, const string& real_call_name) {
+byte* Process::callNative(byte* return_address, const string& call_name, const bool& return_ref, const int& return_index, const string& real_call_name) {
     byte* call_address = nullptr;
     if (cpu->function_addresses.count(call_name)) {
         call_address = cpu->bytecode+(cpu->function_addresses.at(call_name));
@@ -167,7 +167,7 @@ byte* Thread::callNative(byte* return_address, const string& call_name, const bo
 
     return call_address;
 }
-byte* Thread::callForeign(byte* return_address, const string& call_name, const bool& return_ref, const int& return_index, const string& real_call_name) {
+byte* Process::callForeign(byte* return_address, const string& call_name, const bool& return_ref, const int& return_index, const string& real_call_name) {
     if (frame_new == nullptr) {
         throw new Exception("external function call without a frame: use `frame 0' in source code if the function takes no parameters");
     }
@@ -217,7 +217,7 @@ byte* Thread::callForeign(byte* return_address, const string& call_name, const b
 
     return return_address;
 }
-byte* Thread::callForeignMethod(byte* return_address, Type* object, const string& call_name, const bool& return_ref, const int& return_index, const string& real_call_name) {
+byte* Process::callForeignMethod(byte* return_address, Type* object, const string& call_name, const bool& return_ref, const int& return_index, const string& real_call_name) {
     if (frame_new == nullptr) {
         throw new Exception("foreign method call without a frame");
     }
@@ -277,7 +277,7 @@ byte* Thread::callForeignMethod(byte* return_address, Type* object, const string
     return return_address;
 }
 
-byte* Thread::xtick() {
+byte* Process::xtick() {
     /** Perform a *tick*, i.e. run a single CPU instruction.
      *
      *  Returns pointer to next instruction upon correct execution.
@@ -416,7 +416,7 @@ byte* Thread::xtick() {
     return instruction_pointer;
 }
 
-byte* Thread::tick() {
+byte* Process::tick() {
     bool halt = false;
 
     ++instruction_counter;
@@ -515,19 +515,19 @@ byte* Thread::tick() {
     return instruction_pointer;
 }
 
-void Thread::pass(Type* message) {
+void Process::pass(Type* message) {
     message_queue.push(message);
     wakeup();
 }
 
-byte* Thread::begin() {
+byte* Process::begin() {
     if (cpu->function_addresses.count(frames[0]->function_name) == 0) {
         throw new Exception("thread from undefined function: " + frames[0]->function_name);
     }
     return (instruction_pointer = (cpu->bytecode + cpu->function_addresses.at(frames[0]->function_name)));
 }
 
-Thread::~Thread() {
+Process::~Process() {
     while (frames.size()) {
         delete frames.back();
         frames.pop_back();

@@ -6,7 +6,7 @@
 using namespace std;
 
 
-byte* Thread::dispatch(byte* addr) {
+byte* Process::dispatch(byte* addr) {
     /** Dispatches instruction at a pointer to its handler.
      */
     switch (static_cast<OPCODE>(*addr)) {

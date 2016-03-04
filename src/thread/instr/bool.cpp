@@ -11,7 +11,7 @@
 using namespace std;
 
 
-byte* Thread::opnot(byte* addr) {
+byte* Process::opnot(byte* addr) {
     auto target = viua::operand::extract(addr);
 
     place(viua::operand::getRegisterIndex(target.get(), this), new Boolean(not target->resolve(this)->boolean()));
@@ -19,7 +19,7 @@ byte* Thread::opnot(byte* addr) {
     return addr;
 }
 
-byte* Thread::opand(byte* addr) {
+byte* Process::opand(byte* addr) {
     auto target = viua::operand::extract(addr);
     auto first = viua::operand::extract(addr);
     auto second = viua::operand::extract(addr);
@@ -29,7 +29,7 @@ byte* Thread::opand(byte* addr) {
     return addr;
 }
 
-byte* Thread::opor(byte* addr) {
+byte* Process::opor(byte* addr) {
     auto target = viua::operand::extract(addr);
     auto first = viua::operand::extract(addr);
     auto second = viua::operand::extract(addr);

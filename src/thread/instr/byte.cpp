@@ -10,7 +10,7 @@
 using namespace std;
 
 
-byte* Thread::opbstore(byte* addr) {
+byte* Process::opbstore(byte* addr) {
     unsigned destination_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     bool operand_ref = false;

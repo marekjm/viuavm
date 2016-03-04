@@ -11,7 +11,7 @@
 using namespace std;
 
 
-byte* Thread::opnew(byte* addr) {
+byte* Process::opnew(byte* addr) {
     /** Create new instance of specified class.
      */
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
@@ -27,7 +27,7 @@ byte* Thread::opnew(byte* addr) {
     return addr;
 }
 
-byte* Thread::opmsg(byte* addr) {
+byte* Process::opmsg(byte* addr) {
     /** Send a message to an object.
      *
      *  This instruction is used to perform a method call on an object using dynamic dispatch.
@@ -81,6 +81,6 @@ byte* Thread::opmsg(byte* addr) {
         return callForeignMethod(addr, obj, function_name, return_register_ref, return_register_index, method_name);
     }
 
-    auto caller = (is_native ? &Thread::callNative : &Thread::callForeign);
+    auto caller = (is_native ? &Process::callNative : &Process::callForeign);
     return (this->*caller)(addr, function_name, return_register_ref, return_register_index, method_name);
 }

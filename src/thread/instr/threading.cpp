@@ -8,7 +8,7 @@
 using namespace std;
 
 
-byte* Thread::opthread(byte* addr) {
+byte* Process::opthread(byte* addr) {
     /*  Run thread instruction.
      */
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
@@ -34,14 +34,14 @@ byte* Thread::opthread(byte* addr) {
     frame_new->captureArguments();
 
     frame_new->function_name = call_name;
-    Thread* vm_thread = cpu->spawn(frame_new, this);
-    ThreadType* thrd = new ThreadType(vm_thread);
+    Process* vm_thread = cpu->spawn(frame_new, this);
+    ProcessType* thrd = new ProcessType(vm_thread);
     place(target, thrd);
     frame_new = nullptr;
 
     return addr;
 }
-byte* Thread::opthjoin(byte* addr) {
+byte* Process::opthjoin(byte* addr) {
     /** Join a thread.
      *
      *  This opcode blocks execution of current thread until
@@ -51,7 +51,7 @@ byte* Thread::opthjoin(byte* addr) {
 
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     int source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    if (ThreadType* thrd = dynamic_cast<ThreadType*>(fetch(source))) {
+    if (ProcessType* thrd = dynamic_cast<ProcessType*>(fetch(source))) {
         if (thrd->stopped()) {
             thrd->join();
             return_addr = addr;
@@ -63,12 +63,12 @@ byte* Thread::opthjoin(byte* addr) {
             }
         }
     } else {
-        throw new Exception("invalid type: expected Thread");
+        throw new Exception("invalid type: expected Process");
     }
 
     return return_addr;
 }
-byte* Thread::opthreceive(byte* addr) {
+byte* Process::opthreceive(byte* addr) {
     /** Receive a message.
      *
      *  This opcode blocks execution of current thread
@@ -88,7 +88,7 @@ byte* Thread::opthreceive(byte* addr) {
 
     return return_addr;
 }
-byte* Thread::opwatchdog(byte* addr) {
+byte* Process::opwatchdog(byte* addr) {
     /*  Run watchdog instruction.
      */
     string call_name = viua::operand::extractString(addr);

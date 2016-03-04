@@ -28,12 +28,12 @@ class HaltException : public std::runtime_error {
 class CPU;
 
 
-class Thread {
+class Process {
 #ifdef AS_DEBUG_HEADER
     public:
 #endif
     CPU *cpu;
-    Thread* parent_thread;
+    Process* parent_thread;
     const std::string entry_function;
 
     bool debug;
@@ -262,7 +262,7 @@ class Thread {
             return is_suspended;
         }
 
-        inline Thread* parent() const { return parent_thread; };
+        inline Process* parent() const { return parent_thread; };
 
         void pass(Type* message);
 
@@ -298,7 +298,7 @@ class Thread {
         }
         inline std::vector<Frame*> trace() { return frames; }
 
-        Thread(Frame* frm, CPU *_cpu, decltype(jump_base) jb, Thread* pt): cpu(_cpu), parent_thread(pt), entry_function(frm->function_name),
+        Process(Frame* frm, CPU *_cpu, decltype(jump_base) jb, Process* pt): cpu(_cpu), parent_thread(pt), entry_function(frm->function_name),
             debug(false),
             regset(nullptr), uregset(nullptr), tmp(nullptr),
             jump_base(jb),
@@ -315,7 +315,7 @@ class Thread {
             uregset = frm->regset;
             frames.push_back(frm);
         }
-        ~Thread();
+        ~Process();
 };
 
 

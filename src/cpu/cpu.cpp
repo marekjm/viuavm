@@ -169,19 +169,19 @@ void CPU::loadForeignLibrary(const string& module) {
 }
 
 
-Thread* CPU::spawn(Frame* frm, Thread* parent_thread) {
+Process* CPU::spawn(Frame* frm, Process* parent_thread) {
     unique_lock<std::mutex> lck{threads_mtx};
-    Thread* thrd = new Thread(frm, this, jump_base, parent_thread);
+    Process* thrd = new Process(frm, this, jump_base, parent_thread);
     thrd->begin();
     threads.push_back(thrd);
     return thrd;
 }
-Thread* CPU::spawnWatchdog(Frame* frm) {
+Process* CPU::spawnWatchdog(Frame* frm) {
     if (watchdog_thread != nullptr) {
         throw new Exception("watchdog thread already spawned");
     }
     unique_lock<std::mutex> lck{threads_mtx};
-    Thread* thrd = new Thread(frm, this, jump_base, nullptr);
+    Process* thrd = new Process(frm, this, jump_base, nullptr);
     thrd->begin();
     watchdog_thread = thrd;
     return thrd;
@@ -251,7 +251,7 @@ CPU& CPU::iframe(Frame* frm, unsigned r) {
     // set global registers
     regset = new RegisterSet(r);
 
-    Thread* t = new Thread(initial_frame, this, jump_base, nullptr);
+    Process* t = new Process(initial_frame, this, jump_base, nullptr);
     t->detach();
     t->priority(16);
     threads.push_back(t);
@@ -268,7 +268,7 @@ byte* CPU::tick(decltype(threads)::size_type index) {
     return ip;
 }
 
-bool CPU::executeQuant(Thread* th, unsigned priority) {
+bool CPU::executeQuant(Process* th, unsigned priority) {
     if (th->stopped() and th->joinable()) {
         // stopped but still joinable
         // we don't have to deal with "stopped and unjoinable" case here

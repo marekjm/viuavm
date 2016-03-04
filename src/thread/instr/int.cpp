@@ -13,12 +13,12 @@
 using namespace std;
 
 
-byte* Thread::opizero(byte* addr) {
+byte* Process::opizero(byte* addr) {
     place(viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this), new Integer(0));
     return addr;
 }
 
-byte* Thread::opistore(byte* addr) {
+byte* Process::opistore(byte* addr) {
     unsigned destination_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     auto source = viua::operand::extract(addr);
@@ -34,20 +34,20 @@ byte* Thread::opistore(byte* addr) {
     return addr;
 }
 
-// ObjectPlacer shall be used only as a type of Thread::place() function when passing it
+// ObjectPlacer shall be used only as a type of Process::place() function when passing it
 // to perform<>() implementation template.
-using ObjectPlacer = void(Thread::*)(unsigned,Type*);
+using ObjectPlacer = void(Process::*)(unsigned,Type*);
 
-template<class Operator, class ResultType> byte* perform(byte* addr, Thread* t, ObjectPlacer placer) {
+template<class Operator, class ResultType> byte* perform(byte* addr, Process* t, ObjectPlacer placer) {
     /** Heavily abstracted binary opcode implementation for Integer-related instructions.
      *
      *  First parameter - byte* addr - is the instruction pointer from which operand extraction should begin.
      *
-     *  Second parameter - Thread* t - is a pointer to current VM thread of execution (passed as `this`).
+     *  Second parameter - Process* t - is a pointer to current VM thread of execution (passed as `this`).
      *
-     *  Third parameter - ObjectPlacer - is a member-function pointer to Thread::place.
+     *  Third parameter - ObjectPlacer - is a member-function pointer to Process::place.
      *  Since it is private, we have to cheat the compiler by extracting its pointer while in
-     *  Thread class's scope and passing it here.
+     *  Process class's scope and passing it here.
      *  Voila - we can place objects in thread's current register set.
      */
     unsigned target_register_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), t);
@@ -59,48 +59,48 @@ template<class Operator, class ResultType> byte* perform(byte* addr, Thread* t, 
     return addr;
 }
 
-byte* Thread::opiadd(byte* addr) {
-    return perform<std::plus<int>, Integer>(addr, this, &Thread::place);
+byte* Process::opiadd(byte* addr) {
+    return perform<std::plus<int>, Integer>(addr, this, &Process::place);
 }
 
-byte* Thread::opisub(byte* addr) {
-    return perform<std::minus<int>, Integer>(addr, this, &Thread::place);
+byte* Process::opisub(byte* addr) {
+    return perform<std::minus<int>, Integer>(addr, this, &Process::place);
 }
 
-byte* Thread::opimul(byte* addr) {
-    return perform<std::multiplies<int>, Integer>(addr, this, &Thread::place);
+byte* Process::opimul(byte* addr) {
+    return perform<std::multiplies<int>, Integer>(addr, this, &Process::place);
 }
 
-byte* Thread::opidiv(byte* addr) {
-    return perform<std::divides<int>, Integer>(addr, this, &Thread::place);
+byte* Process::opidiv(byte* addr) {
+    return perform<std::divides<int>, Integer>(addr, this, &Process::place);
 }
 
-byte* Thread::opilt(byte* addr) {
-    return perform<std::less<int>, Boolean>(addr, this, &Thread::place);
+byte* Process::opilt(byte* addr) {
+    return perform<std::less<int>, Boolean>(addr, this, &Process::place);
 }
 
-byte* Thread::opilte(byte* addr) {
-    return perform<std::less_equal<int>, Boolean>(addr, this, &Thread::place);
+byte* Process::opilte(byte* addr) {
+    return perform<std::less_equal<int>, Boolean>(addr, this, &Process::place);
 }
 
-byte* Thread::opigt(byte* addr) {
-    return perform<std::greater<int>, Boolean>(addr, this, &Thread::place);
+byte* Process::opigt(byte* addr) {
+    return perform<std::greater<int>, Boolean>(addr, this, &Process::place);
 }
 
-byte* Thread::opigte(byte* addr) {
-    return perform<std::greater_equal<int>, Boolean>(addr, this, &Thread::place);
+byte* Process::opigte(byte* addr) {
+    return perform<std::greater_equal<int>, Boolean>(addr, this, &Process::place);
 }
 
-byte* Thread::opieq(byte* addr) {
-    return perform<std::equal_to<int>, Boolean>(addr, this, &Thread::place);
+byte* Process::opieq(byte* addr) {
+    return perform<std::equal_to<int>, Boolean>(addr, this, &Process::place);
 }
 
-byte* Thread::opiinc(byte* addr) {
+byte* Process::opiinc(byte* addr) {
     static_cast<Integer*>(viua::operand::extract(addr)->resolve(this))->increment();
     return addr;
 }
 
-byte* Thread::opidec(byte* addr) {
+byte* Process::opidec(byte* addr) {
     static_cast<Integer*>(viua::operand::extract(addr)->resolve(this))->decrement();
     return addr;
 }

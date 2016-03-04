@@ -9,7 +9,7 @@
 using namespace std;
 
 
-byte* Thread::opmove(byte* addr) {
+byte* Process::opmove(byte* addr) {
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     int source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
@@ -17,14 +17,14 @@ byte* Thread::opmove(byte* addr) {
 
     return addr;
 }
-byte* Thread::opcopy(byte* addr) {
+byte* Process::opcopy(byte* addr) {
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     place(target, viua::operand::extract(addr)->resolve(this)->copy());
 
     return addr;
 }
-byte* Thread::opref(byte* addr) {
+byte* Process::opref(byte* addr) {
     /** Run ref instruction.
      *  Create object_operand_index reference (implementation detail: copy object_operand_index pointer) of an object in one register in
      *  another register.
@@ -57,14 +57,14 @@ byte* Thread::opref(byte* addr) {
 
     return addr;
 }
-byte* Thread::opptr(byte* addr) {
+byte* Process::opptr(byte* addr) {
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     place(target, viua::operand::extract(addr)->resolve(this)->pointer());
 
     return addr;
 }
-byte* Thread::opswap(byte* addr) {
+byte* Process::opswap(byte* addr) {
     int first = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     int second = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
@@ -72,11 +72,11 @@ byte* Thread::opswap(byte* addr) {
 
     return addr;
 }
-byte* Thread::opdelete(byte* addr) {
+byte* Process::opdelete(byte* addr) {
     uregset->free(viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this));
     return addr;
 }
-byte* Thread::opempty(byte* addr) {
+byte* Process::opempty(byte* addr) {
     /** Run empty instruction.
      */
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
@@ -89,7 +89,7 @@ byte* Thread::opempty(byte* addr) {
 
     return addr;
 }
-byte* Thread::opisnull(byte* addr) {
+byte* Process::opisnull(byte* addr) {
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     int source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
@@ -98,7 +98,7 @@ byte* Thread::opisnull(byte* addr) {
     return addr;
 }
 
-byte* Thread::opress(byte* addr) {
+byte* Process::opress(byte* addr) {
     /*  Run ress instruction.
      */
     int to_register_set = 0;
@@ -124,7 +124,7 @@ byte* Thread::opress(byte* addr) {
     return addr;
 }
 
-byte* Thread::optmpri(byte* addr) {
+byte* Process::optmpri(byte* addr) {
     // FIXME: mutex (VERY IMPORTANT!!!)
     if (cpu->tmp != nullptr) {
         cout << "warning: CPU: storing in non-empty temporary register: memory has been leaked" << endl;
@@ -133,7 +133,7 @@ byte* Thread::optmpri(byte* addr) {
 
     return addr;
 }
-byte* Thread::optmpro(byte* addr) {
+byte* Process::optmpro(byte* addr) {
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     if (uregset->at(target) != nullptr) {

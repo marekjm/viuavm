@@ -11,7 +11,7 @@
 using namespace std;
 
 
-byte* Thread::opfstore(byte* addr) {
+byte* Process::opfstore(byte* addr) {
     /*  Run fstore instruction.
      */
     int destination_register_index;
@@ -30,20 +30,20 @@ byte* Thread::opfstore(byte* addr) {
     return addr;
 }
 
-// ObjectPlacer shall be used only as a type of Thread::place() function when passing it
+// ObjectPlacer shall be used only as a type of Process::place() function when passing it
 // to perform<>() implementation template.
-using ObjectPlacer = void(Thread::*)(unsigned,Type*);
+using ObjectPlacer = void(Process::*)(unsigned,Type*);
 
-template<class Operator, class ResultType> byte* perform(byte* addr, Thread* t, ObjectPlacer placer) {
+template<class Operator, class ResultType> byte* perform(byte* addr, Process* t, ObjectPlacer placer) {
     /** Heavily abstracted binary opcode implementation for Float-related instructions.
      *
      *  First parameter - byte* addr - is the instruction pointer from which operand extraction should begin.
      *
-     *  Second parameter - Thread* t - is a pointer to current VM thread of execution (passed as `this`).
+     *  Second parameter - Process* t - is a pointer to current VM thread of execution (passed as `this`).
      *
-     *  Third parameter - ObjectPlacer - is a member-function pointer to Thread::place.
+     *  Third parameter - ObjectPlacer - is a member-function pointer to Process::place.
      *  Since it is private, we have to cheat the compiler by extracting its pointer while in
-     *  Thread class's scope and passing it here.
+     *  Process class's scope and passing it here.
      *  Voila - we can place objects in thread's current register set.
      */
     unsigned target_register_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), t);
@@ -55,38 +55,38 @@ template<class Operator, class ResultType> byte* perform(byte* addr, Thread* t, 
     return addr;
 }
 
-byte* Thread::opfadd(byte* addr) {
-    return perform<std::plus<float>, Float>(addr, this, &Thread::place);
+byte* Process::opfadd(byte* addr) {
+    return perform<std::plus<float>, Float>(addr, this, &Process::place);
 }
 
-byte* Thread::opfsub(byte* addr) {
-    return perform<std::minus<float>, Float>(addr, this, &Thread::place);
+byte* Process::opfsub(byte* addr) {
+    return perform<std::minus<float>, Float>(addr, this, &Process::place);
 }
 
-byte* Thread::opfmul(byte* addr) {
-    return perform<std::multiplies<float>, Float>(addr, this, &Thread::place);
+byte* Process::opfmul(byte* addr) {
+    return perform<std::multiplies<float>, Float>(addr, this, &Process::place);
 }
 
-byte* Thread::opfdiv(byte* addr) {
-    return perform<std::divides<float>, Float>(addr, this, &Thread::place);
+byte* Process::opfdiv(byte* addr) {
+    return perform<std::divides<float>, Float>(addr, this, &Process::place);
 }
 
-byte* Thread::opflt(byte* addr) {
-    return perform<std::less<float>, Boolean>(addr, this, &Thread::place);
+byte* Process::opflt(byte* addr) {
+    return perform<std::less<float>, Boolean>(addr, this, &Process::place);
 }
 
-byte* Thread::opflte(byte* addr) {
-    return perform<std::less_equal<float>, Boolean>(addr, this, &Thread::place);
+byte* Process::opflte(byte* addr) {
+    return perform<std::less_equal<float>, Boolean>(addr, this, &Process::place);
 }
 
-byte* Thread::opfgt(byte* addr) {
-    return perform<std::greater<float>, Boolean>(addr, this, &Thread::place);
+byte* Process::opfgt(byte* addr) {
+    return perform<std::greater<float>, Boolean>(addr, this, &Process::place);
 }
 
-byte* Thread::opfgte(byte* addr) {
-    return perform<std::greater_equal<float>, Boolean>(addr, this, &Thread::place);
+byte* Process::opfgte(byte* addr) {
+    return perform<std::greater_equal<float>, Boolean>(addr, this, &Process::place);
 }
 
-byte* Thread::opfeq(byte* addr) {
-    return perform<std::equal_to<float>, Boolean>(addr, this, &Thread::place);
+byte* Process::opfeq(byte* addr) {
+    return perform<std::equal_to<float>, Boolean>(addr, this, &Process::place);
 }

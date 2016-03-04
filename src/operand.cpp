@@ -8,7 +8,7 @@
 using namespace std;
 
 
-Type* viua::operand::Atom::resolve(Thread* cpu) {
+Type* viua::operand::Atom::resolve(Process* cpu) {
     throw new UnresolvedAtomException(atom);
     // just to satisfy the compiler, after the exception is not thrown unconditionally
     // return real object
@@ -16,18 +16,18 @@ Type* viua::operand::Atom::resolve(Thread* cpu) {
 }
 
 
-Type* viua::operand::RegisterIndex::resolve(Thread* t) {
+Type* viua::operand::RegisterIndex::resolve(Process* t) {
     return t->obtain(index);
 }
-unsigned viua::operand::RegisterIndex::get(Thread* cpu) const {
+unsigned viua::operand::RegisterIndex::get(Process* cpu) const {
     return index;
 }
 
 
-Type* viua::operand::RegisterReference::resolve(Thread* t) {
+Type* viua::operand::RegisterReference::resolve(Process* t) {
     return t->obtain(static_cast<Integer*>(t->obtain(index))->as_integer());
 }
-unsigned viua::operand::RegisterReference::get(Thread* cpu) const {
+unsigned viua::operand::RegisterReference::get(Process* cpu) const {
     Type* o = cpu->obtain(index);
     viua::assertions::assert_typeof(o, "Integer");
     return static_cast<Integer*>(o)->value();
@@ -71,7 +71,7 @@ string viua::operand::extractString(byte*& ip) {
     return s;
 }
 
-unsigned viua::operand::getRegisterIndex(viua::operand::Operand* o, Thread* t) {
+unsigned viua::operand::getRegisterIndex(viua::operand::Operand* o, Process* t) {
     unsigned index = 0;
     if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(o)) {
         index = ri->get(t);
@@ -81,7 +81,7 @@ unsigned viua::operand::getRegisterIndex(viua::operand::Operand* o, Thread* t) {
     return index;
 }
 
-int viua::operand::getInteger(viua::operand::Operand* o, Thread* t) {
+int viua::operand::getInteger(viua::operand::Operand* o, Process* t) {
     int index = 0;
     if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(o)) {
         index = ri->get(t);

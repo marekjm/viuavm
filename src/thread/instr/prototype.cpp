@@ -10,7 +10,7 @@
 using namespace std;
 
 
-byte* Thread::opclass(byte* addr) {
+byte* Process::opclass(byte* addr) {
     /** Create a class.
      */
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
@@ -18,7 +18,7 @@ byte* Thread::opclass(byte* addr) {
     return addr;
 }
 
-byte* Thread::opderive(byte* addr) {
+byte* Process::opderive(byte* addr) {
     /** Push an ancestor class to prototype's inheritance chain.
      */
     Type* target = viua::operand::extract(addr)->resolve(this);
@@ -34,7 +34,7 @@ byte* Thread::opderive(byte* addr) {
     return addr;
 }
 
-byte* Thread::opattach(byte* addr) {
+byte* Process::opattach(byte* addr) {
     /** Attach a function to a prototype as a method.
      */
     Type* target = viua::operand::extract(addr)->resolve(this);
@@ -53,7 +53,7 @@ byte* Thread::opattach(byte* addr) {
     return addr;
 }
 
-byte* Thread::opregister(byte* addr) {
+byte* Process::opregister(byte* addr) {
     /** Register a prototype in the typesystem.
      */
     int reg;

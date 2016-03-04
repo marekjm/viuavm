@@ -8,19 +8,19 @@
 using namespace std;
 
 
-byte* Thread::opecho(byte* addr) {
+byte* Process::opecho(byte* addr) {
     cout << viua::operand::extract(addr)->resolve(this)->str();
     return addr;
 }
 
-byte* Thread::opprint(byte* addr) {
+byte* Process::opprint(byte* addr) {
     addr = opecho(addr);
     cout << '\n';
     return addr;
 }
 
 
-byte* Thread::opjump(byte* addr) {
+byte* Process::opjump(byte* addr) {
     uint64_t* offset = reinterpret_cast<uint64_t*>(addr);
     byte* target = (jump_base+(*offset));
     if (target == addr) {
@@ -29,7 +29,7 @@ byte* Thread::opjump(byte* addr) {
     return target;
 }
 
-byte* Thread::opbranch(byte* addr) {
+byte* Process::opbranch(byte* addr) {
     Type* condition = viua::operand::extract(addr)->resolve(this);
 
     uint64_t addr_true, addr_false;

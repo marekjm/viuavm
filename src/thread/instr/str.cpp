@@ -12,7 +12,7 @@
 using namespace std;
 
 
-byte* Thread::opstrstore(byte* addr) {
+byte* Process::opstrstore(byte* addr) {
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     place(target, new String(str::strdecode(viua::operand::extractString(addr))));

@@ -13,18 +13,18 @@
 
 
 // we only need a pointer so class declaration will be sufficient
-class Thread;
+class Process;
 
 
-class ThreadType : public Type {
-    Thread* thrd;
+class ProcessType : public Type {
+    Process* thrd;
 
     public:
         std::string type() const;
         std::string str() const;
         std::string repr() const;
         bool boolean() const;
-        ThreadType* copy() const;
+        ProcessType* copy() const;
 
         virtual void joinable(Frame*, RegisterSet*, RegisterSet*);
         virtual void detach(Frame*, RegisterSet*, RegisterSet*);
@@ -46,7 +46,7 @@ class ThreadType : public Type {
         void transferActiveExceptionTo(Type*&);
         Type* getReturnValue();
 
-        ThreadType(Thread* t): thrd(t) {}
+        ProcessType(Process* t): thrd(t) {}
 };
 
 
