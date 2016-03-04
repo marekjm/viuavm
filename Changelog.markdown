@@ -29,6 +29,19 @@ There are several categories of change:
 ----
 
 
+# From 0.7.0 to 0.7.1
+
+- feature: `ENCLOSECOPY` instruction for enclosing objects in closures by copying them,
+- feature: `ENCLOSEMOVE` instruction for enclosing objects in closures by moving them
+  inside the closure,
+- bic: renamed `CLBIND` to `ENCLOSE`,
+- bic: changed the way closures are created, i.e. now, the closure is created first and
+  only then objects are enclosed (either by copy, by move or by reference),
+
+
+----
+
+
 # From 0.6.1 to 0.7.0
 
 - bic: `throw` instruction no longer leaves thrown object in its source register;
