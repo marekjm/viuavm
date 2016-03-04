@@ -697,7 +697,7 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
         }
     } else if (command == "cpu.init") {
         cpu.iframe();
-        cpu.threads[0]->begin();
+        cpu.processes[0]->begin();
         state.initialised = true;
     } else if (command == "cpu.preload") {
         cpu.preload();
@@ -713,20 +713,20 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
         state.ticks_left = (operands.size() ? stoi(operands[0]) : 1);
     } else if (command == "cpu.jump") {
         if (operands[0] == "sizeof") {
-            cpu.threads[cpu.current_thread_index]->instruction_pointer += OP_SIZES.at(operands[1]);
+            cpu.processes[cpu.current_process_index]->instruction_pointer += OP_SIZES.at(operands[1]);
         } else if (operands[0][0] == '+') {
             unsigned long j = stoul(str::sub(operands[0], 1));
             while (j > 0) {
                 string instruction;
                 unsigned size;
                 tie(instruction, size) = disassembler::instruction(cpu.executionAt());
-                cpu.threads[cpu.current_thread_index]->instruction_pointer += size;
+                cpu.processes[cpu.current_process_index]->instruction_pointer += size;
                 --j;
             }
         } else if (str::startswith(operands[0], "0x")) {
-            cpu.threads[cpu.current_thread_index]->instruction_pointer = (cpu.bytecode+stoul(operands[0], nullptr, 16));
+            cpu.processes[cpu.current_process_index]->instruction_pointer = (cpu.bytecode+stoul(operands[0], nullptr, 16));
         } else {
-            cpu.threads[cpu.current_thread_index]->instruction_pointer = (cpu.bytecode+stoul(operands[0]));
+            cpu.processes[cpu.current_process_index]->instruction_pointer = (cpu.bytecode+stoul(operands[0]));
         }
     } else if (command == "cpu.unpause") {
         state.paused = false;
@@ -738,14 +738,14 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
     } else if (command == "register.show") {
         printRegisters(operands, cpu.trace().back()->regset);
     } else if (command == "register.local.show") {
-        printRegisters(operands, cpu.threads[cpu.current_thread_index]->uregset);
+        printRegisters(operands, cpu.processes[cpu.current_process_index]->uregset);
     } else if (command == "register.global.show") {
         printRegisters(operands, cpu.regset);
     } else if (command == "register.static.show") {
         string fun_name = cpu.trace().back()->function_name;
 
         try {
-            printRegisters(operands, cpu.threads[cpu.current_thread_index]->static_registers.at(fun_name));
+            printRegisters(operands, cpu.processes[cpu.current_process_index]->static_registers.at(fun_name));
         } catch (const std::out_of_range& e) {
             // OK, now we know that our function does not have static registers
             cout << "error: current function does not have static registers allocated" << endl;

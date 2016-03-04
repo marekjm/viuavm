@@ -170,17 +170,17 @@ void CPU::loadForeignLibrary(const string& module) {
 
 
 Process* CPU::spawn(Frame* frm, Process* parent_thread) {
-    unique_lock<std::mutex> lck{threads_mtx};
+    unique_lock<std::mutex> lck{processes_mtx};
     Process* thrd = new Process(frm, this, jump_base, parent_thread);
     thrd->begin();
-    threads.push_back(thrd);
+    processes.push_back(thrd);
     return thrd;
 }
 Process* CPU::spawnWatchdog(Frame* frm) {
     if (watchdog_thread != nullptr) {
         throw new Exception("watchdog thread already spawned");
     }
-    unique_lock<std::mutex> lck{threads_mtx};
+    unique_lock<std::mutex> lck{processes_mtx};
     Process* thrd = new Process(frm, this, jump_base, nullptr);
     thrd->begin();
     watchdog_thread = thrd;
@@ -254,15 +254,15 @@ CPU& CPU::iframe(Frame* frm, unsigned r) {
     Process* t = new Process(initial_frame, this, jump_base, nullptr);
     t->detach();
     t->priority(16);
-    threads.push_back(t);
+    processes.push_back(t);
 
     return (*this);
 }
 
 
-byte* CPU::tick(decltype(threads)::size_type index) {
-    byte* ip = threads[index]->tick();  // returns instruction pointer
-    if (threads[index]->terminated()) {
+byte* CPU::tick(decltype(processes)::size_type index) {
+    byte* ip = processes[index]->tick();  // returns instruction pointer
+    if (processes[index]->terminated()) {
         return nullptr;
     }
     return ip;
@@ -276,7 +276,7 @@ bool CPU::executeQuant(Process* th, unsigned priority) {
         return false;
     }
     if (th->suspended()) {
-        // do not execute suspended threads
+        // do not execute suspended processes
         return false;
     }
 
@@ -288,7 +288,7 @@ bool CPU::executeQuant(Process* th, unsigned priority) {
             break;
         }
         if (th->suspended()) {
-            // do not execute suspended threads
+            // do not execute suspended processes
             break;
         }
         th->tick();
@@ -298,20 +298,20 @@ bool CPU::executeQuant(Process* th, unsigned priority) {
 }
 
 bool CPU::burst() {
-    if (not threads.size()) {
-        // make CPU stop if there are no threads to run
+    if (not processes.size()) {
+        // make CPU stop if there are no processes to run
         return false;
     }
 
-    current_thread_index = 0;
+    current_process_index = 0;
     bool ticked = false;
 
-    decltype(threads) running_threads;
-    decltype(threads) dead_threads;
+    decltype(processes) running_processes;
+    decltype(processes) dead_processes;
     bool abort_because_of_thread_termination = false;
-    for (decltype(threads)::size_type i = 0; i < threads.size(); ++i) {
-        current_thread_index = i;
-        auto th = threads[i];
+    for (decltype(processes)::size_type i = 0; i < processes.size(); ++i) {
+        current_process_index = i;
+        auto th = processes[i];
 
         ticked = (executeQuant(th, th->priority()) or ticked);
 
@@ -319,7 +319,7 @@ bool CPU::burst() {
             if (watchdog_thread == nullptr) {
                 abort_because_of_thread_termination = true;
             } else {
-                dead_threads.push_back(th);
+                dead_processes.push_back(th);
                 Object* death_message = new Object("Object");
                 Type* exc = nullptr;
                 th->transferActiveExceptionTo(exc);
@@ -331,12 +331,12 @@ bool CPU::burst() {
         }
 
         // if the thread stopped and is not joinable declare it dead and
-        // schedule for removal thus shortening the vector of running threads and
+        // schedule for removal thus shortening the vector of running processes and
         // speeding up execution
         if (th->stopped() and (not th->joinable())) {
-            dead_threads.push_back(th);
+            dead_processes.push_back(th);
         } else {
-            running_threads.push_back(th);
+            running_processes.push_back(th);
         }
     }
 
@@ -351,15 +351,15 @@ bool CPU::burst() {
         }
     }
 
-    for (decltype(dead_threads)::size_type i = 0; i < dead_threads.size(); ++i) {
-        delete dead_threads[i];
+    for (decltype(dead_processes)::size_type i = 0; i < dead_processes.size(); ++i) {
+        delete dead_processes[i];
     }
 
-    // if there were any dead threads we must rebuild the scheduled threads vector
-    if (dead_threads.size()) {
-        threads.erase(threads.begin(), threads.end());
-        for (decltype(running_threads)::size_type i = 0; i < running_threads.size(); ++i) {
-            threads.push_back(running_threads[i]);
+    // if there were any dead processes we must rebuild the scheduled processes vector
+    if (dead_processes.size()) {
+        processes.erase(processes.begin(), processes.end());
+        for (decltype(running_processes)::size_type i = 0; i < running_processes.size(); ++i) {
+            processes.push_back(running_processes[i]);
         }
     }
     return ticked;
@@ -373,12 +373,12 @@ int CPU::run() {
     }
 
     iframe();
-    threads[0]->begin();
+    processes[0]->begin();
     while (burst());
 
-    if (current_thread_index < threads.size() and threads[current_thread_index]->terminated()) {
-        cout << "thread '0:" << hex << threads[current_thread_index] << dec << "' has terminated" << endl;
-        Type* e = threads[current_thread_index]->getActiveException();
+    if (current_process_index < processes.size() and processes[current_process_index]->terminated()) {
+        cout << "thread '0:" << hex << processes[current_process_index] << dec << "' has terminated" << endl;
+        Type* e = processes[current_process_index]->getActiveException();
         cout << e << endl;
 
         return_code = 1;
@@ -400,13 +400,13 @@ int CPU::run() {
     }
     */
 
-    // delete threads and global registers
+    // delete processes and global registers
     // otherwise we get huge memory leak
     // do not delete if execution was halted because of exception
     if (not terminated()) {
-        while (threads.size()) {
-            delete threads.back();
-            threads.pop_back();
+        while (processes.size()) {
+            delete processes.back();
+            processes.pop_back();
         }
         delete regset;
     }

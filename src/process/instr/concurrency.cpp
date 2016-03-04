@@ -23,7 +23,7 @@ byte* Process::opthread(byte* addr) {
     }
 
     // clear PASSED flag
-    // since we copy all values when creating threads
+    // since we copy all values when creating processes
     // we can safely overwrite all registers after the thread has launched
     for (unsigned i = 0; i < uregset->size(); ++i) {
         if (uregset->at(i) != nullptr) {
@@ -104,7 +104,7 @@ byte* Process::opwatchdog(byte* addr) {
     }
 
     // clear PASSED flag
-    // since we copy all values when creating threads
+    // since we copy all values when creating processes
     // we can safely overwrite all registers after the thread has launched
     for (unsigned i = 0; i < uregset->size(); ++i) {
         if (uregset->at(i) != nullptr) {

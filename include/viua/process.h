@@ -241,7 +241,7 @@ class Process {
              *  This function causes the thread to become unjoinable, but
              *  allows it to run in the background.
              *
-             *  Keep in mind that while detached threads cannot be joined,
+             *  Keep in mind that while detached processes cannot be joined,
              *  they can receive messages.
              *  Also, they will run even after the main/1 function has exited.
              */

@@ -30,12 +30,12 @@ class CPU {
     uint64_t bytecode_size;
     uint64_t executable_offset;
 
-    // vector of all threads machine is executing
-    std::vector<Process*> threads;
+    // vector of all processes machine is executing
+    std::vector<Process*> processes;
     std::queue<Type*> watchdog_message_buffer;
     Process* watchdog_thread;
-    decltype(threads)::size_type current_thread_index;
-    std::mutex threads_mtx;
+    decltype(processes)::size_type current_process_index;
+    std::mutex processes_mtx;
 
     // Global register set
     RegisterSet* regset;
@@ -126,20 +126,20 @@ class CPU {
         Process* spawnWatchdog(Frame*);
         void resurrectWatchdog();
 
-        byte* tick(decltype(threads)::size_type thread_index = 0);
+        byte* tick(decltype(processes)::size_type process_index = 0);
         bool executeQuant(Process*, unsigned);
         bool burst();
 
         int run();
         inline decltype(instruction_counter) counter() {
-            return threads[current_thread_index]->counter();
+            return processes[current_process_index]->counter();
         }
 
         inline std::tuple<int, std::string, std::string> exitcondition() {
             return std::tuple<int, std::string, std::string>(return_code, return_exception, return_message);
         }
-        inline std::vector<Frame*> trace() { return threads[current_thread_index]->trace(); }
-        inline byte* executionAt() const { return threads[current_thread_index]->executionAt(); }
+        inline std::vector<Frame*> trace() { return processes[current_process_index]->trace(); }
+        inline byte* executionAt() const { return processes[current_process_index]->executionAt(); }
 
         inline bool terminated() { return (terminating_exception != nullptr); }
         inline Type* terminatedBy() { return terminating_exception; }
@@ -147,7 +147,7 @@ class CPU {
         CPU():
             bytecode(nullptr), bytecode_size(0), executable_offset(0),
             watchdog_thread(nullptr),
-            current_thread_index(0),
+            current_process_index(0),
             regset(nullptr),
             tmp(nullptr),
             jump_base(nullptr),
