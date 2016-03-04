@@ -780,7 +780,7 @@ class ExternalModulesTests(unittest.TestCase):
 
 
 class ConcurrencyTests(unittest.TestCase):
-    PATH = './sample/asm/threading'
+    PATH = './sample/asm/concurrency'
 
     def testHelloWorldExample(self):
         runTestSplitlines(self, 'hello_world.asm', ['Hello multithreaded World! (2)', 'Hello multithreaded World! (1)'], 0)
