@@ -3,7 +3,7 @@
 #include <viua/operand.h>
 #include <viua/types/type.h>
 #include <viua/types/integer.h>
-#include <viua/thread.h>
+#include <viua/process.h>
 #include <viua/exceptions.h>
 using namespace std;
 

@@ -1,7 +1,7 @@
 #include <sstream>
 #include <viua/bytecode/maps.h>
 #include <viua/types/exception.h>
-#include <viua/thread.h>
+#include <viua/process.h>
 #include <viua/cpu/cpu.h>
 using namespace std;
 

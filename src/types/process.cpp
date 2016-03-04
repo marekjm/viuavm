@@ -1,9 +1,9 @@
 #include <iostream>
 #include <string>
 #include <viua/types/boolean.h>
-#include <viua/types/thread.h>
+#include <viua/types/process.h>
 #include <viua/exceptions.h>
-#include <viua/thread.h>
+#include <viua/process.h>
 using namespace std;
 
 

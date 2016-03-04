@@ -11,7 +11,7 @@
 #include <viua/types/pointer.h>
 #include <viua/types/exception.h>
 #include <viua/types/string.h>
-#include <viua/types/thread.h>
+#include <viua/types/process.h>
 #include <viua/loader.h>
 #include <viua/cg/disassembler/disassembler.h>
 #include <viua/cpu/cpu.h>

@@ -15,7 +15,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include <mutex>
-#include <viua/thread.h>
+#include <viua/process.h>
 
 
 class CPU {

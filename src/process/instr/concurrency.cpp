@@ -1,6 +1,6 @@
 #include <viua/types/boolean.h>
 #include <viua/types/reference.h>
-#include <viua/types/thread.h>
+#include <viua/types/process.h>
 #include <viua/cpu/opex.h>
 #include <viua/exceptions.h>
 #include <viua/operand.h>

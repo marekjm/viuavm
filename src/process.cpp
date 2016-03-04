@@ -5,8 +5,8 @@
 #include <viua/types/integer.h>
 #include <viua/types/exception.h>
 #include <viua/types/reference.h>
-#include <viua/types/thread.h>
-#include <viua/thread.h>
+#include <viua/types/process.h>
+#include <viua/process.h>
 #include <viua/cpu/cpu.h>
 using namespace std;
 
