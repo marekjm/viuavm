@@ -17,7 +17,7 @@ string assembler::verify::functionCallsAreDefined(const vector<string>& lines, c
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = str::lstrip(lines[i]);
-        if (not (str::startswith(line, "call") or str::startswith(line, "thread"))) {
+        if (not (str::startswith(line, "call") or str::startswith(line, "thread") or str::startswith(line, "watchdog"))) {
             continue;
         }
 
@@ -38,7 +38,7 @@ string assembler::verify::functionCallsAreDefined(const vector<string>& lines, c
         }
 
         if (is_undefined) {
-            report << "fatal: " << ((instr_name == "call") ? "call to" : "thread from") << " undefined function '" << check_function << "' at line " << (expanded_lines_to_source_lines.at(i)+1);
+            report << "fatal: " << ((instr_name == "call") ? "call to" : instr_name == "thread" ? "thread from" : "watchdog from") << " undefined function '" << check_function << "' at line " << (expanded_lines_to_source_lines.at(i)+1);
             break;
         }
     }
