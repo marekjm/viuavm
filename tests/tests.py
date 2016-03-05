@@ -857,6 +857,9 @@ class WatchdogTests(unittest.TestCase):
     def testWatchdogFromUndefinedFunctionCaughtByAssembler(self):
         runTestFailsToAssemble(self, 'from_undefined_function.asm', 'fatal: watchdog from undefined function \'undefined_function\' at line 41')
 
+    def testWatchdogFromUndefinedFunctionCaughtAtRuntime(self):
+        runTestThrowsException(self, 'from_undefined_function_at_runtime.asm', 'uncaught object: Exception = watchdog process from undefined function: undefined_function')
+
 
 def sameLines(self, excode, output, no_of_lines):
     lines = output.splitlines()

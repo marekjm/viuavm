@@ -95,7 +95,7 @@ byte* Process::opwatchdog(byte* addr) {
     bool is_foreign = cpu->foreign_functions.count(call_name);
 
     if (not (is_native or is_foreign)) {
-        throw new Exception("watchdog thread from undefined function: " + call_name);
+        throw new Exception("watchdog process from undefined function: " + call_name);
     }
     if (not is_native) {
         throw new Exception("watchdog thread must be native function, used foreign " + call_name);
