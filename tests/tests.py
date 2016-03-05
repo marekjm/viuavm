@@ -242,7 +242,7 @@ def runTestThrowsException(self, name, expected_output):
     compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
     assemble(assembly_path, compiled_path)
     excode, output = run(compiled_path, 1)
-    got_exception = [line for line in output.strip().splitlines() if line.startswith('uncaught object:')][0]
+    got_exception = list(filter(lambda line: line.startswith('uncaught object:'), output.strip().splitlines()))[0]
     self.assertEqual(1, excode)
     self.assertEqual(got_exception, expected_output)
 
