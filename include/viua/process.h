@@ -33,7 +33,7 @@ class Process {
     public:
 #endif
     CPU *cpu;
-    Process* parent_thread;
+    Process* parent_process;
     const std::string entry_function;
 
     bool debug;
@@ -100,8 +100,8 @@ class Process {
     bool finished;
     bool is_joinable;
     bool is_suspended;
-    unsigned thread_priority;
-    std::mutex thread_mtx;
+    unsigned process_priority;
+    std::mutex process_mtx;
 
     /*  Methods implementing CPU instructions.
      */
@@ -246,7 +246,7 @@ class Process {
              *  Also, they will run even after the main/1 function has exited.
              */
             is_joinable = false;
-            parent_thread = nullptr;
+            parent_process = nullptr;
         }
 
         inline void suspend() {
@@ -262,12 +262,12 @@ class Process {
             return is_suspended;
         }
 
-        inline Process* parent() const { return parent_thread; };
+        inline Process* parent() const { return parent_process; };
 
         void pass(Type* message);
 
-        decltype(thread_priority) priority() const { return thread_priority; }
-        void priority(decltype(thread_priority) p) { thread_priority = p; }
+        decltype(process_priority) priority() const { return process_priority; }
+        void priority(decltype(process_priority) p) { process_priority = p; }
 
         inline bool stopped() const { return (finished or has_unhandled_exception); }
 
@@ -298,7 +298,7 @@ class Process {
         }
         inline std::vector<Frame*> trace() { return frames; }
 
-        Process(Frame* frm, CPU *_cpu, decltype(jump_base) jb, Process* pt): cpu(_cpu), parent_thread(pt), entry_function(frm->function_name),
+        Process(Frame* frm, CPU *_cpu, decltype(jump_base) jb, Process* pt): cpu(_cpu), parent_process(pt), entry_function(frm->function_name),
             debug(false),
             regset(nullptr), uregset(nullptr), tmp(nullptr),
             jump_base(jb),
@@ -310,7 +310,7 @@ class Process {
             instruction_pointer(nullptr),
             finished(false), is_joinable(true),
             is_suspended(false),
-            thread_priority(1)
+            process_priority(1)
         {
             uregset = frm->regset;
             frames.push_back(frm);
