@@ -34,9 +34,7 @@ byte* Process::opthread(byte* addr) {
     frame_new->captureArguments();
 
     frame_new->function_name = call_name;
-    Process* vm_thread = cpu->spawn(frame_new, this);
-    ProcessType* thrd = new ProcessType(vm_thread);
-    place(target, thrd);
+    place(target, new ProcessType(cpu->spawn(frame_new, this)));
     frame_new = nullptr;
 
     return addr;
