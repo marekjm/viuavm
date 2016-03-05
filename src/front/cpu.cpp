@@ -144,16 +144,16 @@ int main(int argc, char* argv[]) {
     cpu.registerForeignMethod("String::join", static_cast<ForeignMethodMemberPointer>(&String::join));
     cpu.registerForeignMethod("String::size", static_cast<ForeignMethodMemberPointer>(&String::size));
 
-    Prototype* proto_thread = new Prototype("Process");
-    proto_thread->attach("Process::joinable", "joinable");
-    proto_thread->attach("Process::detach", "detach");
-    proto_thread->attach("Process::suspend", "suspend");
-    proto_thread->attach("Process::wakeup", "wakeup");
-    proto_thread->attach("Process::suspended", "suspended");
-    proto_thread->attach("Process::getPriority", "getPriority");
-    proto_thread->attach("Process::setPriority", "setPriority");
-    proto_thread->attach("Process::pass", "pass");
-    cpu.registerForeignPrototype("Process", proto_thread);
+    Prototype* proto_process = new Prototype("Process");
+    proto_process->attach("Process::joinable", "joinable");
+    proto_process->attach("Process::detach", "detach");
+    proto_process->attach("Process::suspend", "suspend");
+    proto_process->attach("Process::wakeup", "wakeup");
+    proto_process->attach("Process::suspended", "suspended");
+    proto_process->attach("Process::getPriority", "getPriority");
+    proto_process->attach("Process::setPriority", "setPriority");
+    proto_process->attach("Process::pass", "pass");
+    cpu.registerForeignPrototype("Process", proto_process);
     cpu.registerForeignMethod("Process::joinable", static_cast<ForeignMethodMemberPointer>(&ProcessType::joinable));
     cpu.registerForeignMethod("Process::detach", static_cast<ForeignMethodMemberPointer>(&ProcessType::detach));
     cpu.registerForeignMethod("Process::suspend", static_cast<ForeignMethodMemberPointer>(&ProcessType::suspend));
