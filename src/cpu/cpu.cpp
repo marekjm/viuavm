@@ -169,28 +169,28 @@ void CPU::loadForeignLibrary(const string& module) {
 }
 
 
-Process* CPU::spawn(Frame* frm, Process* parent_thread) {
+Process* CPU::spawn(Frame* frm, Process* parent_process) {
     unique_lock<std::mutex> lck{processes_mtx};
-    Process* thrd = new Process(frm, this, jump_base, parent_thread);
+    Process* thrd = new Process(frm, this, jump_base, parent_process);
     thrd->begin();
     processes.push_back(thrd);
     return thrd;
 }
 Process* CPU::spawnWatchdog(Frame* frm) {
-    if (watchdog_thread != nullptr) {
+    if (watchdog_process != nullptr) {
         throw new Exception("watchdog thread already spawned");
     }
     unique_lock<std::mutex> lck{processes_mtx};
     Process* thrd = new Process(frm, this, jump_base, nullptr);
     thrd->begin();
-    watchdog_thread = thrd;
+    watchdog_process = thrd;
     return thrd;
 }
 void CPU::resurrectWatchdog() {
-    cout << "watchdog thread terminated by: " << watchdog_thread->getActiveException()->str() << endl;
-    Frame* frm = new Frame(nullptr, 0, watchdog_thread->trace()[0]->regset->size());
-    frm->function_name = watchdog_thread->trace()[0]->function_name;
-    delete watchdog_thread;
+    cout << "watchdog thread terminated by: " << watchdog_process->getActiveException()->str() << endl;
+    Frame* frm = new Frame(nullptr, 0, watchdog_process->trace()[0]->regset->size());
+    frm->function_name = watchdog_process->trace()[0]->function_name;
+    delete watchdog_process;
     spawnWatchdog(frm);
 }
 
@@ -282,8 +282,8 @@ bool CPU::executeQuant(Process* th, unsigned priority) {
 
     for (unsigned j = 0; (priority == 0 or j < priority); ++j) {
         if (th->stopped()) {
-            // remember to break if the thread stopped
-            // otherwise the CPU will try to tick the thread and
+            // remember to break if the process stopped
+            // otherwise the CPU will try to tick the process and
             // it will crash (will try to execute instructions from 0x0 pointer)
             break;
         }
@@ -308,7 +308,7 @@ bool CPU::burst() {
 
     decltype(processes) running_processes;
     decltype(processes) dead_processes;
-    bool abort_because_of_thread_termination = false;
+    bool abort_because_of_process_termination = false;
     for (decltype(processes)::size_type i = 0; i < processes.size(); ++i) {
         current_process_index = i;
         auto th = processes[i];
@@ -316,8 +316,8 @@ bool CPU::burst() {
         ticked = (executeQuant(th, th->priority()) or ticked);
 
         if (th->terminated() and not th->joinable() and th->parent() == nullptr) {
-            if (watchdog_thread == nullptr) {
-                abort_because_of_thread_termination = true;
+            if (watchdog_process == nullptr) {
+                abort_because_of_process_termination = true;
             } else {
                 dead_processes.push_back(th);
                 Object* death_message = new Object("Object");
@@ -325,12 +325,12 @@ bool CPU::burst() {
                 th->transferActiveExceptionTo(exc);
                 death_message->set("function", new Function(th->trace()[0]->function_name));
                 death_message->set("exception", exc);
-                watchdog_thread->pass(death_message);
+                watchdog_process->pass(death_message);
             }
             break;
         }
 
-        // if the thread stopped and is not joinable declare it dead and
+        // if the process stopped and is not joinable declare it dead and
         // schedule for removal thus shortening the vector of running processes and
         // speeding up execution
         if (th->stopped() and (not th->joinable())) {
@@ -340,13 +340,13 @@ bool CPU::burst() {
         }
     }
 
-    if (abort_because_of_thread_termination) {
+    if (abort_because_of_process_termination) {
         return false;
     }
 
-    while (watchdog_thread != nullptr and not watchdog_thread->suspended()) {
-        executeQuant(watchdog_thread, 0);
-        if (watchdog_thread->terminated() or watchdog_thread->stopped()) {
+    while (watchdog_process != nullptr and not watchdog_process->suspended()) {
+        executeQuant(watchdog_process, 0);
+        if (watchdog_process->terminated() or watchdog_process->stopped()) {
             resurrectWatchdog();
         }
     }

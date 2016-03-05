@@ -33,7 +33,7 @@ class CPU {
     // vector of all processes machine is executing
     std::vector<Process*> processes;
     std::queue<Type*> watchdog_message_buffer;
-    Process* watchdog_thread;
+    Process* watchdog_process;
     decltype(processes)::size_type current_process_index;
     std::mutex processes_mtx;
 
@@ -122,7 +122,7 @@ class CPU {
 
         CPU& iframe(Frame* frm = nullptr, unsigned r = DEFAULT_REGISTER_SIZE);
 
-        Process* spawn(Frame*, Process* parent_thread = nullptr);
+        Process* spawn(Frame*, Process* parent_process = nullptr);
         Process* spawnWatchdog(Frame*);
         void resurrectWatchdog();
 
@@ -146,7 +146,7 @@ class CPU {
 
         CPU():
             bytecode(nullptr), bytecode_size(0), executable_offset(0),
-            watchdog_thread(nullptr),
+            watchdog_process(nullptr),
             current_process_index(0),
             regset(nullptr),
             tmp(nullptr),
@@ -190,8 +190,8 @@ class CPU {
                 dlclose(cxx_dynamic_lib_handles[i]);
             }
 
-            if (watchdog_thread != nullptr) {
-                delete watchdog_thread;
+            if (watchdog_process != nullptr) {
+                delete watchdog_process;
             }
         }
 };
