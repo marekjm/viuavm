@@ -246,6 +246,13 @@ def runTestThrowsException(self, name, expected_output):
     self.assertEqual(1, excode)
     self.assertEqual(got_exception, expected_output)
 
+def runTestFailsToAssemble(self, name, expected_output):
+    assembly_path = os.path.join(self.PATH, name)
+    compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+    output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(0, 1))
+    self.assertEqual(1, exit_code)
+    self.assertEqual(output.strip(), expected_output)
+
 
 class IntegerInstructionsTests(unittest.TestCase):
     """Tests for integer instructions.
@@ -846,6 +853,9 @@ class WatchdogTests(unittest.TestCase):
 
     def testHelloWorldExample(self):
         runTest(self, 'hello_world.asm', 'thread spawned with <Function: broken_thread> died')
+
+    def testWatchdogFromUndefinedFunctionCaughtByAssembler(self):
+        runTestFailsToAssemble(self, 'from_undefined_function.asm', 'fatal: watchdog from undefined function \'undefined_function\' at line 41')
 
 
 def sameLines(self, excode, output, no_of_lines):
