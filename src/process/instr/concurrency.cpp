@@ -24,7 +24,7 @@ byte* Process::opthread(byte* addr) {
 
     // clear PASSED flag
     // since we copy all values when creating processes
-    // we can safely overwrite all registers after the thread has launched
+    // we can safely overwrite all registers after the process has launched
     for (unsigned i = 0; i < uregset->size(); ++i) {
         if (uregset->at(i) != nullptr) {
             uregset->unflag(i, PASSED);
@@ -42,10 +42,10 @@ byte* Process::opthread(byte* addr) {
     return addr;
 }
 byte* Process::opthjoin(byte* addr) {
-    /** Join a thread.
+    /** Join a process.
      *
-     *  This opcode blocks execution of current thread until
-     *  the thread being joined finishes execution.
+     *  This opcode blocks execution of current process until
+     *  the process being joined finishes execution.
      */
     byte* return_addr = (addr-1);
 
@@ -71,7 +71,7 @@ byte* Process::opthjoin(byte* addr) {
 byte* Process::opthreceive(byte* addr) {
     /** Receive a message.
      *
-     *  This opcode blocks execution of current thread
+     *  This opcode blocks execution of current process
      *  until a message arrives.
      */
     byte* return_addr = (addr-1);
@@ -105,7 +105,7 @@ byte* Process::opwatchdog(byte* addr) {
 
     // clear PASSED flag
     // since we copy all values when creating processes
-    // we can safely overwrite all registers after the thread has launched
+    // we can safely overwrite all registers after the process has launched
     for (unsigned i = 0; i < uregset->size(); ++i) {
         if (uregset->at(i) != nullptr) {
             uregset->unflag(i, PASSED);
