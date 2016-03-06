@@ -8,7 +8,7 @@
 using namespace std;
 
 
-byte* Process::opthread(byte* addr) {
+byte* Process::opprocess(byte* addr) {
     /*  Run thread instruction.
      */
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);

@@ -490,7 +490,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
         } else if (str::startswith(line, "thread")) {
             string fn_name, reg;
             tie(reg, fn_name) = assembler::operands::get2(operands);
-            program.opthread(assembler::operands::getint(resolveregister(reg, names)), fn_name);
+            program.opprocess(assembler::operands::getint(resolveregister(reg, names)), fn_name);
         } else if (str::startswith(line, "thjoin")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = assembler::operands::get2(operands);

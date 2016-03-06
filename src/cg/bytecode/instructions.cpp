@@ -757,7 +757,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* opthread(byte* addr_ptr, int_op reg, const string& fn_name) {
+        byte* opprocess(byte* addr_ptr, int_op reg, const string& fn_name) {
             *(addr_ptr++) = PROCESS;
             addr_ptr = insertIntegerOperand(addr_ptr, reg);
             for (unsigned i = 0; i < fn_name.size(); ++i) {

@@ -125,7 +125,7 @@ class Program {
     Program& opargc       (int_op);
 
     Program& opcall       (int_op, const std::string&);
-    Program& opthread   (int_op, const std::string&);
+    Program& opprocess   (int_op, const std::string&);
     Program& opthjoin   (int_op, int_op);
     Program& opthreceive(int_op);
     Program& opwatchdog(const std::string&);

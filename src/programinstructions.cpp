@@ -646,8 +646,8 @@ Program& Program::opcall(int_op reg, const string& fn_name) {
     return (*this);
 }
 
-Program& Program::opthread(int_op ref, const string& fn_name) {
-    addr_ptr = cg::bytecode::opthread(addr_ptr, ref, fn_name);
+Program& Program::opprocess(int_op ref, const string& fn_name) {
+    addr_ptr = cg::bytecode::opprocess(addr_ptr, ref, fn_name);
     return (*this);
 }
 

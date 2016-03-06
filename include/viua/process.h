@@ -186,7 +186,7 @@ class Process {
     byte* opargc(byte*);
 
     byte* opcall(byte*);
-    byte* opthread(byte*);
+    byte* opprocess(byte*);
     byte* opthjoin(byte*);
     byte* opthreceive(byte*);
     byte* opwatchdog(byte*);
