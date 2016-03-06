@@ -1,4 +1,4 @@
-.function: broken_thread
+.function: broken_process
     nop
     nop
     nop
@@ -43,7 +43,7 @@
     watchdog undefined_function
 
     frame 0
-    process 1 broken_thread
+    process 1 broken_process
     frame ^[(param 0 (ptr 2 1))]
     msg 0 detach
 

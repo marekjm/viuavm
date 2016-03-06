@@ -20,7 +20,7 @@
     frame ^[(param 0 (strstore 2 "Hello concurrent World! (2)"))]
     process 4 print_eager
 
-    ; join threads
+    ; join processes
     thjoin 0 3
     thjoin 0 4
 

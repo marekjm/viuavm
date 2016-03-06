@@ -1,11 +1,11 @@
-.function: run_in_a_thread
+.function: run_in_a_process
     print (threceive 1)
     return
 .end
 
 .function: main
     frame 0
-    process 1 run_in_a_thread
+    process 1 run_in_a_process
 
     frame ^[(param 0 1)]
     msg 0 detach

@@ -1,4 +1,4 @@
-.function: watchdog_thread
+.function: watchdog_process
     .mark: watchdog_start
     threceive 1
 
@@ -14,7 +14,7 @@
     return
 .end
 
-.function: broken_thread
+.function: broken_process
     nop
     nop
     nop
@@ -54,10 +54,10 @@
 
 .function: main
     frame 0
-    watchdog watchdog_thread
+    watchdog watchdog_process
 
     frame 0
-    process 1 broken_thread
+    process 1 broken_process
     frame ^[(param 0 (ptr 2 1))]
     msg 0 detach
 

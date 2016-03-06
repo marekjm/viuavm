@@ -18,7 +18,7 @@
     return
 .end
 
-.function: thread_spawner
+.function: process_spawner
     frame ^[(param 0 (strstore 1 "Hello concurrent World! (1)"))]
     process 3 print_lazy
 
@@ -34,7 +34,7 @@
 
 .function: main
     frame 0
-    call thread_spawner
+    call process_spawner
 
     izero 0
     return

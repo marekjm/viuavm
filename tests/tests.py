@@ -793,7 +793,7 @@ class ConcurrencyTests(unittest.TestCase):
         runTestSplitlines(self, 'hello_world.asm', ['Hello concurrent World! (2)', 'Hello concurrent World! (1)'], 0)
 
     def testJoiningProcess(self):
-        runTestSplitlines(self, 'joining_a_thread.asm', ['Hello concurrent World! (1)', 'Hello concurrent World! (2)'], 0)
+        runTestSplitlines(self, 'joining_a_process.asm', ['Hello concurrent World! (1)', 'Hello concurrent World! (2)'], 0)
 
     def testJoiningJoinedProcess(self):
         runTestThrowsException(self, 'joining_joined_process.asm', 'uncaught object: Exception = process cannot be joined')
@@ -804,7 +804,7 @@ class ConcurrencyTests(unittest.TestCase):
     def testDetachingProcess(self):
         runTestSplitlines(
             self,
-            'detaching_a_thread.asm',
+            'detaching_a_process.asm',
             [
                 'false',
                 'main/1 exited',
@@ -819,12 +819,12 @@ class ConcurrencyTests(unittest.TestCase):
     def testStackCorruptedOnMainOrphaningProcesss(self):
         # this will of course generate leaks, but we are not interested in them since
         # after process termination operating system will automatically reclaim memory
-        runTestThrowsException(self, 'main_orphaning_threads.asm', 'uncaught object: Exception = joinable process in dropped frame')
+        runTestThrowsException(self, 'main_orphaning_processes.asm', 'uncaught object: Exception = joinable process in dropped frame')
 
     def testStackCorruptedOnNonMainFunctionOrphaningProcesss(self):
         # this will of course generate leaks, but we are not interested in them since
         # after process termination operating system will automatically reclaim memory
-        runTestThrowsException(self, 'non_main_orphaning_threads.asm', 'uncaught object: Exception = joinable process in dropped frame')
+        runTestThrowsException(self, 'non_main_orphaning_processes.asm', 'uncaught object: Exception = joinable process in dropped frame')
 
     def testGettingPriorityOfAProcess(self):
         runTest(self, 'get_priority.asm', '1')
@@ -843,7 +843,7 @@ class ConcurrencyTests(unittest.TestCase):
         runTest(self, 'transferring_exceptions.asm', 'exception transferred from process Process: Hello exception transferring World!')
 
     def testReturningValuesOnJoin(self):
-        runTest(self, 'return_from_a_thread.asm', '42')
+        runTest(self, 'return_from_a_process.asm', '42')
 
     def testSuspendAndWakeup(self):
         runTestSplitlines(self, 'short_suspend_and_wakeup.asm', [
@@ -858,7 +858,7 @@ class WatchdogTests(unittest.TestCase):
     PATH = './sample/asm/watchdog'
 
     def testHelloWorldExample(self):
-        runTest(self, 'hello_world.asm', 'process spawned with <Function: broken_thread> died')
+        runTest(self, 'hello_world.asm', 'process spawned with <Function: broken_process> died')
 
     def testWatchdogFromUndefinedFunctionCaughtByAssembler(self):
         runTestFailsToAssemble(self, 'from_undefined_function.asm', 'fatal: watchdog from undefined function \'undefined_function\' at line 41')

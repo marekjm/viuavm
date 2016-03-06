@@ -1,11 +1,11 @@
-.function: thread_to_suspend
+.function: process_to_suspend
     .name: 1 i
     istore 1 40
     .name: 2 m
     strstore 2 "iterations left (TTS): "
-    .mark: __thread_to_suspend_begin_while_0
+    .mark: __process_to_suspend_begin_while_0
 
-    branch 1 +1 __thread_to_suspend_end_while_0
+    branch 1 +1 __process_to_suspend_end_while_0
 
     echo 2
     nop
@@ -13,15 +13,15 @@
     idec i 
     nop
     print 1
-    jump __thread_to_suspend_begin_while_0
+    jump __process_to_suspend_begin_while_0
 
-    .mark: __thread_to_suspend_end_while_0
+    .mark: __process_to_suspend_end_while_0
 
-    print (strstore 1 "thread_to_suspend/0 returned")
+    print (strstore 1 "process_to_suspend/0 returned")
     return
 .end
 
-.function: thread_to_do_the_suspending
+.function: process_to_do_the_suspending
     frame ^[(param 0 (arg 1 0)]
     msg 0 detach
 
@@ -72,10 +72,10 @@
 
 .function: main
     frame 0
-    process 1 thread_to_suspend
+    process 1 process_to_suspend
     
     frame ^[(param 0 (ptr 2 1))]
-    process 3 thread_to_do_the_suspending
+    process 3 process_to_do_the_suspending
     thjoin 0 3
 
     print (strstore 5 "main/1 returned")

@@ -1,4 +1,4 @@
-.function: run_in_a_thread
+.function: run_in_a_process
 .name: 1 counter
 .name: 2 limit
     izero counter
@@ -17,7 +17,7 @@
 
 .function: main
     frame 0
-    process 1 run_in_a_thread
+    process 1 run_in_a_process
 
     frame ^[(param 0 1) (param 1 (istore 2 40))]
     msg 0 setPriority

@@ -1,15 +1,15 @@
-.function: run_in_a_thread
-    ; will cause a memory leak on detached threads
+.function: run_in_a_process
+    ; will cause a memory leak on detached processes
     throw (threceive 1)
     return
 .end
 
-.block: try_thread_exception
+.block: try_process_exception
     thjoin 0 1
     leave
 .end
 
-.block: handle_thread_exception
+.block: handle_process_exception
     echo (strstore 3 "exception transferred from process ")
     echo 1
     echo (strstore 3 ": ")
@@ -19,7 +19,7 @@
 
 .function: main
     frame 0
-    process 1 run_in_a_thread
+    process 1 run_in_a_process
 
     ;frame ^[(param 0 1)]
     ;msg 0 detach
@@ -31,8 +31,8 @@
     msg 0 pass
 
     try
-    catch "String" handle_thread_exception
-    enter try_thread_exception
+    catch "String" handle_process_exception
+    enter try_process_exception
 
     izero 0
     return

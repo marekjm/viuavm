@@ -1,9 +1,9 @@
-.function: run_this_in_a_thread
+.function: run_this_in_a_process
     print (strstore 1 "hi, I am process 0")
     return
 .end
 
-.function: thread_waking_up_the_other_one
+.function: process_waking_up_the_other_one
     print (strstore 1 "hi, I am process 1")
 
     print (strstore 6 "waking up process 0")
@@ -17,7 +17,7 @@
     izero 1
 
     frame ^[(param 0 1)]
-    process 2 run_this_in_a_thread
+    process 2 run_this_in_a_process
     frame ^[(param 0 (ptr 3 2))]
     msg 0 detach
 
@@ -26,7 +26,7 @@
     msg 0 suspend
 
     frame ^[(param 0 3)]
-    process 4 thread_waking_up_the_other_one
+    process 4 process_waking_up_the_other_one
 
     thjoin 0 4
 

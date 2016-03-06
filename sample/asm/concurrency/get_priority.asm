@@ -1,4 +1,4 @@
-.function: run_in_a_thread
+.function: run_in_a_process
     nop
     nop
     nop
@@ -8,7 +8,7 @@
 
 .function: main
     frame 0
-    process 1 run_in_a_thread
+    process 1 run_in_a_process
 
     frame ^[(param 0 1)]
     print (msg 2 getPriority)
