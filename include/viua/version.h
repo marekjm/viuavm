@@ -4,11 +4,11 @@
 #pragma once
 
 const char* VERSION = "0.7.0";
-const char* MICRO = "82";
+const char* MICRO = "119";
 
 // commit pointed by the hash below is HEAD~1
 // while the MICRO variable shows actual number of commits added since last release,
 // the commit hash is off-by-one
-const char* COMMIT = "ae1d850ef366b9bc34e6f10b79b09f899c75427c";
+const char* COMMIT = "f32b14d4e5704b6fc39cf531eac297ed2fdff18b";
 
 #endif
