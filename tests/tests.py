@@ -869,6 +869,9 @@ class WatchdogTests(unittest.TestCase):
     def testWatchdogAlreadySpawnedCaughtAtRuntime(self):
         runTest(self, 'already_spawned.asm', 'thread spawned with <Function: __entry> died')
 
+    def testWatchdogMustBeANativeFunction(self):
+        runTestThrowsException(self, 'must_be_a_native_function.asm', 'uncaught object: Exception = watchdog process must be native function, used foreign World::print_hello')
+
 
 def sameLines(self, excode, output, no_of_lines):
     lines = output.splitlines()
