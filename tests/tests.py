@@ -214,7 +214,7 @@ def runTestNoDisassemblyRerun(self, name, expected_output, expected_exit_code = 
     assembly_path = os.path.join(self.PATH, name)
     compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
     assemble(assembly_path, compiled_path)
-    excode, output = run(compiled_path)
+    excode, output = run(compiled_path, expected_exit_code)
     got_output = (output.strip() if output_processing_function is None else output_processing_function(output))
     self.assertEqual(expected_output, got_output)
     self.assertEqual(expected_exit_code, excode)
