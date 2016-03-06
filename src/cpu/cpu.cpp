@@ -187,7 +187,7 @@ Process* CPU::spawnWatchdog(Frame* frm) {
     return thrd;
 }
 void CPU::resurrectWatchdog() {
-    cout << "watchdog thread terminated by: " << watchdog_process->getActiveException()->str() << endl;
+    cout << "watchdog process terminated by: " << watchdog_process->getActiveException()->str() << endl;
     Frame* frm = new Frame(nullptr, 0, watchdog_process->trace()[0]->regset->size());
     frm->function_name = watchdog_process->trace()[0]->function_name;
     delete watchdog_process;
@@ -377,7 +377,7 @@ int CPU::run() {
     while (burst());
 
     if (current_process_index < processes.size() and processes[current_process_index]->terminated()) {
-        cout << "thread '0:" << hex << processes[current_process_index] << dec << "' has terminated" << endl;
+        cout << "process '0:" << hex << processes[current_process_index] << dec << "' has terminated" << endl;
         Type* e = processes[current_process_index]->getActiveException();
         cout << e << endl;
 
