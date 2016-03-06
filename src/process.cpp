@@ -447,6 +447,19 @@ byte* Process::tick() {
 
     TryFrame* tframe;
 
+    if (thrown != nullptr and frame_new != nullptr) {
+        /*  Delete active frame after an exception is thrown.
+         *  There're two reasons for such behaviour:
+         *  - it prevents memory leaks if an exception escapes and
+         *    is handled by the watchdog process,
+         *  - if the exception is caught, it provides the servicing block with a
+         *    clean environment (as there is no way of dropping a frame without
+         *    using it),
+         */
+        delete frame_new;
+        frame_new = nullptr;
+    }
+
     if (thrown != nullptr and thrown->type() == "Exception") {
         string exception_detailed_type = static_cast<Exception*>(thrown)->etype();
         for (long unsigned i = tryframes.size(); i > 0; --i) {
