@@ -145,7 +145,7 @@ uint64_t Program::countBytes(const vector<string>& lines) {
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (function, block or module name)
                 inc += str::chunk(line).size() + 1;
-            } else if ((op == CALL) or (op == MSG) or (op == THREAD)) {
+            } else if ((op == CALL) or (op == MSG) or (op == PROCESS)) {
                 // clear first chunk (opcode mnemonic)
                 line = str::lstrip(str::sub(line, instr.size()));
                 // get second chunk (optional register index)
@@ -251,7 +251,7 @@ uint64_t Program::getInstructionBytecodeOffset(uint64_t instr, uint64_t count) {
             }
             inc += s.size()+1;
         }
-        if ((opcode == CALL) or (opcode == THREAD) or (opcode == CLOSURE) or (opcode == FUNCTION) or
+        if ((opcode == CALL) or (opcode == PROCESS) or (opcode == CLOSURE) or (opcode == FUNCTION) or
             (opcode == CLASS) or (opcode == PROTOTYPE) or (opcode == DERIVE) or (opcode == NEW) or (opcode == MSG)) {
             string s(reinterpret_cast<char*>(program+offset+sizeof(bool)+sizeof(int)+1));
             if (scream) {

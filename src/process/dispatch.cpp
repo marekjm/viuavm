@@ -202,7 +202,7 @@ byte* Process::dispatch(byte* addr) {
         case CALL:
               addr = opcall(addr+1);
             break;
-        case THREAD:
+        case PROCESS:
             addr = opthread(addr+1);
             break;
         case THJOIN:

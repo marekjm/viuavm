@@ -105,7 +105,7 @@ enum OPCODE : byte {
     CALL,   // call given function with parameters set in parameter register,
     ARG,    // move an object from argument register to a normal register (inside a function call),
     ARGC,   // store number of supplied parameters in a register
-    THREAD, // spawn a process (call a function and run it in a different process)
+    PROCESS, // spawn a process (call a function and run it in a different process)
     THJOIN, // join a process
     THRECEIVE, // receive passed message, block until one arrives
     WATCHDOG,  // spawn watchdog process

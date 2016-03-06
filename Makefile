@@ -298,7 +298,7 @@ build/types/process.o: src/types/process.cpp include/viua/types/process.h
 
 
 ############################################################
-# CPU AND THREADING MODULES
+# CPU, INSTRUCTION DISPATCH AND IMPLEMENTATION MODULES
 build/process.o: src/process.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -o $@ $<
 
