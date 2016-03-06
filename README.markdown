@@ -41,9 +41,13 @@
 - **massive parallelism**: parallelism model in Viua supports spawning massive amounts of independent, VM-based lightweight processes and
   provides means to either detach spawned processes or join them later during execution
 - **safe inter-process communication** via message-passing (with queueing)
-- **fast debugging**: error handling is performed with exceptions (even across threads), and unserviced exceptions cause the machine
+- **fast debugging**: error handling is performed with exceptions (even across processes), and unserviced exceptions cause the machine
   to generate precise and detailed stack traces;
   running programs are also debuggable with GDB or Viua-specific debugger
+- **reliability**: programs running on Viua should be able to run until they are told to stop, not until they crash;
+  machine helps writing reliable programs by providing a framework for detailed exception-based error communication and
+  a way to register a watchdog process that handles processes killed by runaway exceptions (the exception is serviced by watchdog instead of
+  killing the whole VM)
 
 
 Some features also supported by the VM:
