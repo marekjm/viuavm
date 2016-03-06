@@ -98,7 +98,7 @@ byte* Process::opwatchdog(byte* addr) {
         throw new Exception("watchdog process from undefined function: " + call_name);
     }
     if (not is_native) {
-        throw new Exception("watchdog thread must be native function, used foreign " + call_name);
+        throw new Exception("watchdog process must be native function, used foreign " + call_name);
     }
 
     // clear PASSED flag
