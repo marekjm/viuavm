@@ -798,6 +798,9 @@ class ConcurrencyTests(unittest.TestCase):
     def testJoiningJoinedProcess(self):
         runTestThrowsException(self, 'joining_joined_process.asm', 'uncaught object: Exception = process cannot be joined')
 
+    def testJoiningDetachedProcess(self):
+        runTestThrowsException(self, 'joining_detached_process.asm', 'uncaught object: Exception = process cannot be joined')
+
     def testDetachingProcess(self):
         runTestSplitlines(
             self,
