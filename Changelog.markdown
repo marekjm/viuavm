@@ -37,6 +37,7 @@ There are several categories of change:
 - bic: renamed `CLBIND` to `ENCLOSE`,
 - bic: changed the way closures are created, i.e. now, the closure is created first and
   only then objects are enclosed (either by copy, by move or by reference),
+- bic: renamed `THREAD` to `PROCESS`,
 
 
 ----
