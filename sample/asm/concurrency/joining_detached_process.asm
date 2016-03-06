@@ -3,7 +3,7 @@
 .name: 2 limit
     izero counter
     istore limit 4
-    strstore 1 "Hello World! (from long-running detached thread) "
+    strstore 1 "Hello World! (from long-running detached process) "
 .mark: loop
     branch (igte 3 counter limit) after_loop
     echo 1
@@ -16,7 +16,7 @@
 
 .function: main
     frame 0
-    thread 1 running_detached
+    process 1 running_detached
 
     nop
     nop
@@ -30,7 +30,7 @@
     msg 3 joinable
     print 3
 
-    ; this throws, cannot join detached thread
+    ; this throws, cannot join detached process
     thjoin 0 1
 
     print (strstore 3 "main/1 exited")

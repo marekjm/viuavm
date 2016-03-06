@@ -17,7 +17,7 @@ string assembler::verify::functionCallsAreDefined(const vector<string>& lines, c
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = str::lstrip(lines[i]);
-        if (not (str::startswith(line, "call") or str::startswith(line, "thread") or str::startswith(line, "watchdog"))) {
+        if (not (str::startswith(line, "call") or str::startswith(line, "process") or str::startswith(line, "watchdog"))) {
             continue;
         }
 
@@ -38,7 +38,7 @@ string assembler::verify::functionCallsAreDefined(const vector<string>& lines, c
         }
 
         if (is_undefined) {
-            report << "fatal: " << ((instr_name == "call") ? "call to" : instr_name == "thread" ? "thread from" : "watchdog from") << " undefined function '" << check_function << "' at line " << (expanded_lines_to_source_lines.at(i)+1);
+            report << "fatal: " << ((instr_name == "call") ? "call to" : instr_name == "process" ? "process from" : "watchdog from") << " undefined function '" << check_function << "' at line " << (expanded_lines_to_source_lines.at(i)+1);
             break;
         }
     }
@@ -58,11 +58,11 @@ string assembler::verify::frameBalance(const vector<string>& lines, const map<lo
 
         line = str::lstrip(line);
         instruction = str::chunk(line);
-        if (not (instruction == "call" or instruction == "thread" or instruction == "watchdog" or instruction == "excall" or instruction == "fcall" or instruction == "frame" or instruction == "msg" or instruction == "return")) {
+        if (not (instruction == "call" or instruction == "process" or instruction == "watchdog" or instruction == "excall" or instruction == "fcall" or instruction == "frame" or instruction == "msg" or instruction == "return")) {
             continue;
         }
 
-        if (instruction == "call" or instruction == "thread" or instruction == "excall" or instruction == "fcall" or instruction == "msg" or instruction == "watchdog") {
+        if (instruction == "call" or instruction == "process" or instruction == "excall" or instruction == "fcall" or instruction == "msg" or instruction == "watchdog") {
             --balance;
         }
         if (instruction == "frame") {

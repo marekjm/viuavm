@@ -487,7 +487,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             }
 
             program.opcall(assembler::operands::getint(resolveregister(reg, names)), fn_name);
-        } else if (str::startswith(line, "thread")) {
+        } else if (str::startswith(line, "process")) {
             string fn_name, reg;
             tie(reg, fn_name) = assembler::operands::get2(operands);
             program.opprocess(assembler::operands::getint(resolveregister(reg, names)), fn_name);

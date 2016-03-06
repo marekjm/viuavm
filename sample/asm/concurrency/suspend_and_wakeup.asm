@@ -72,10 +72,10 @@
 
 .function: main
     frame 0
-    thread 1 thread_to_suspend
+    process 1 thread_to_suspend
     
     frame ^[(param 0 (ptr 2 1))]
-    thread 3 thread_to_do_the_suspending
+    process 3 thread_to_do_the_suspending
     thjoin 0 3
 
     print (strstore 5 "main/1 returned")

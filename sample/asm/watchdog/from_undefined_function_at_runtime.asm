@@ -43,7 +43,7 @@
     watchdog undefined_function
 
     frame 0
-    thread 1 broken_thread
+    process 1 broken_thread
     frame ^[(param 0 (ptr 2 1))]
     msg 0 detach
 

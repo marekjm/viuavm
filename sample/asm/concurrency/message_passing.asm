@@ -5,7 +5,7 @@
 
 .function: main
     frame 0
-    thread 1 run_in_a_thread
+    process 1 run_in_a_thread
 
     frame ^[(param 0 1)]
     msg 0 detach

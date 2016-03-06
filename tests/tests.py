@@ -808,10 +808,10 @@ class ConcurrencyTests(unittest.TestCase):
             [
                 'false',
                 'main/1 exited',
-                'Hello World! (from long-running detached thread) 0',
-                'Hello World! (from long-running detached thread) 1',
-                'Hello World! (from long-running detached thread) 2',
-                'Hello World! (from long-running detached thread) 3',
+                'Hello World! (from long-running detached process) 0',
+                'Hello World! (from long-running detached process) 1',
+                'Hello World! (from long-running detached process) 2',
+                'Hello World! (from long-running detached process) 3',
             ],
             0
         )
@@ -840,17 +840,17 @@ class ConcurrencyTests(unittest.TestCase):
         runTest(self, 'message_passing.asm', 'Hello message passing World!')
 
     def testTransferringExceptionsOnJoin(self):
-        runTest(self, 'transferring_exceptions.asm', 'exception transferred from thread Process: Hello exception transferring World!')
+        runTest(self, 'transferring_exceptions.asm', 'exception transferred from process Process: Hello exception transferring World!')
 
     def testReturningValuesOnJoin(self):
         runTest(self, 'return_from_a_thread.asm', '42')
 
     def testSuspendAndWakeup(self):
         runTestSplitlines(self, 'short_suspend_and_wakeup.asm', [
-            'suspending thread 0',
-            'hi, I am thread 1',
-            'waking up thread 0',
-            'hi, I am thread 0',
+            'suspending process 0',
+            'hi, I am process 1',
+            'waking up process 0',
+            'hi, I am process 0',
         ])
 
 
@@ -858,7 +858,7 @@ class WatchdogTests(unittest.TestCase):
     PATH = './sample/asm/watchdog'
 
     def testHelloWorldExample(self):
-        runTest(self, 'hello_world.asm', 'thread spawned with <Function: broken_thread> died')
+        runTest(self, 'hello_world.asm', 'process spawned with <Function: broken_thread> died')
 
     def testWatchdogFromUndefinedFunctionCaughtByAssembler(self):
         runTestFailsToAssemble(self, 'from_undefined_function.asm', 'fatal: watchdog from undefined function \'undefined_function\' at line 41')
@@ -867,7 +867,7 @@ class WatchdogTests(unittest.TestCase):
         runTestThrowsException(self, 'from_undefined_function_at_runtime.asm', 'uncaught object: Exception = watchdog process from undefined function: undefined_function')
 
     def testWatchdogAlreadySpawnedCaughtAtRuntime(self):
-        runTest(self, 'already_spawned.asm', 'thread spawned with <Function: __entry> died')
+        runTest(self, 'already_spawned.asm', 'process spawned with <Function: __entry> died')
 
     def testWatchdogMustBeANativeFunction(self):
         runTestThrowsException(self, 'must_be_a_native_function.asm', 'uncaught object: Exception = watchdog process must be native function, used foreign World::print_hello')
