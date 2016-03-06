@@ -9,7 +9,7 @@ using namespace std;
 
 
 byte* Process::opprocess(byte* addr) {
-    /*  Run thread instruction.
+    /*  Run process instruction.
      */
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
