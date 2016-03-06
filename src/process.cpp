@@ -124,7 +124,7 @@ void Process::dropFrame() {
     for (registerset_size_type i = 0; i < frame->regset->size(); ++i) {
         if (ProcessType* t = dynamic_cast<ProcessType*>(frame->regset->at(i))) {
             if (t->joinable()) {
-                throw new Exception("joinable thread in dropped frame");
+                throw new Exception("joinable process in dropped frame");
             }
         }
     }
@@ -535,7 +535,7 @@ void Process::pass(Type* message) {
 
 byte* Process::begin() {
     if (cpu->function_addresses.count(frames[0]->function_name) == 0) {
-        throw new Exception("thread from undefined function: " + frames[0]->function_name);
+        throw new Exception("process from undefined function: " + frames[0]->function_name);
     }
     return (instruction_pointer = (cpu->bytecode + cpu->function_addresses.at(frames[0]->function_name)));
 }

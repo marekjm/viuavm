@@ -819,12 +819,12 @@ class ConcurrencyTests(unittest.TestCase):
     def testStackCorruptedOnMainOrphaningProcesss(self):
         # this will of course generate leaks, but we are not interested in them since
         # after process termination operating system will automatically reclaim memory
-        runTestThrowsException(self, 'main_orphaning_threads.asm', 'uncaught object: Exception = joinable thread in dropped frame')
+        runTestThrowsException(self, 'main_orphaning_threads.asm', 'uncaught object: Exception = joinable process in dropped frame')
 
     def testStackCorruptedOnNonMainFunctionOrphaningProcesss(self):
         # this will of course generate leaks, but we are not interested in them since
         # after process termination operating system will automatically reclaim memory
-        runTestThrowsException(self, 'non_main_orphaning_threads.asm', 'uncaught object: Exception = joinable thread in dropped frame')
+        runTestThrowsException(self, 'non_main_orphaning_threads.asm', 'uncaught object: Exception = joinable process in dropped frame')
 
     def testGettingPriorityOfAProcess(self):
         runTest(self, 'get_priority.asm', '1')
