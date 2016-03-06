@@ -178,7 +178,7 @@ Process* CPU::spawn(Frame* frm, Process* parent_process) {
 }
 Process* CPU::spawnWatchdog(Frame* frm) {
     if (watchdog_process != nullptr) {
-        throw new Exception("watchdog thread already spawned");
+        throw new Exception("watchdog process already spawned");
     }
     unique_lock<std::mutex> lck{processes_mtx};
     Process* thrd = new Process(frm, this, jump_base, nullptr);

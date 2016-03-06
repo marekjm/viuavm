@@ -860,6 +860,9 @@ class WatchdogTests(unittest.TestCase):
     def testWatchdogFromUndefinedFunctionCaughtAtRuntime(self):
         runTestThrowsException(self, 'from_undefined_function_at_runtime.asm', 'uncaught object: Exception = watchdog process from undefined function: undefined_function')
 
+    def testWatchdogAlreadySpawnedCaughtAtRuntime(self):
+        runTest(self, 'already_spawned.asm', 'thread spawned with <Function: __entry> died')
+
 
 def sameLines(self, excode, output, no_of_lines):
     lines = output.splitlines()
