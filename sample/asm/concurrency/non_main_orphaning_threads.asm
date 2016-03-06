@@ -19,10 +19,10 @@
 .end
 
 .function: thread_spawner
-    frame ^[(param 0 (strstore 1 "Hello multithreaded World! (1)"))]
+    frame ^[(param 0 (strstore 1 "Hello concurrent World! (1)"))]
     process 3 print_lazy
 
-    frame ^[(param 0 (strstore 2 "Hello multithreaded World! (2)"))]
+    frame ^[(param 0 (strstore 2 "Hello concurrent World! (2)"))]
     process 4 print_eager
 
     thjoin 0 4

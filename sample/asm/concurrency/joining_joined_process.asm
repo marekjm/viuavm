@@ -19,7 +19,7 @@
 .end
 
 .function: main
-    frame ^[(param 0 (strstore 1 "Hello multithreaded World! (1)"))]
+    frame ^[(param 0 (strstore 1 "Hello concurrent World! (1)"))]
     process 3 print_lazy
 
     ; this is OK

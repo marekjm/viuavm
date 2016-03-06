@@ -790,10 +790,10 @@ class ConcurrencyTests(unittest.TestCase):
     PATH = './sample/asm/concurrency'
 
     def testHelloWorldExample(self):
-        runTestSplitlines(self, 'hello_world.asm', ['Hello multithreaded World! (2)', 'Hello multithreaded World! (1)'], 0)
+        runTestSplitlines(self, 'hello_world.asm', ['Hello concurrent World! (2)', 'Hello concurrent World! (1)'], 0)
 
     def testJoiningProcess(self):
-        runTestSplitlines(self, 'joining_a_thread.asm', ['Hello multithreaded World! (1)', 'Hello multithreaded World! (2)'], 0)
+        runTestSplitlines(self, 'joining_a_thread.asm', ['Hello concurrent World! (1)', 'Hello concurrent World! (2)'], 0)
 
     def testJoiningJoinedProcess(self):
         runTestThrowsException(self, 'joining_joined_process.asm', 'uncaught object: Exception = process cannot be joined')
