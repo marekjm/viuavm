@@ -35,7 +35,7 @@ void ProcessType::join() {
     if (thrd->joinable()) {
         thrd->join();
     } else {
-        throw new Exception("thread cannot be joined");
+        throw new Exception("process cannot be joined");
     }
 }
 
@@ -43,7 +43,7 @@ void ProcessType::detach() {
     if (thrd->joinable()) {
         thrd->detach();
     } else {
-        throw new Exception("thread cannot be detached");
+        throw new Exception("process cannot be detached");
     }
 }
 
