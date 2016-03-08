@@ -40,12 +40,9 @@
     ; param count of 1 means last param index is 0
     idec 0
 
-    ; obtain the parameter and...
-    arg 4 @0
-    ; ...insert it at the beginning of the vector
-    vinsert 2 4
-    ; delete the leftover copy
-    delete 4
+    ; obtain the parameter and
+    ; insert it at the beginning of the vector
+    vinsert 2 (arg 4 @0)
 
     jump loop_begin
 

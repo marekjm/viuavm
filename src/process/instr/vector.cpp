@@ -26,7 +26,7 @@ byte* Process::opvinsert(byte* addr) {
     int object_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     int position_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    static_cast<Vector*>(vector_operand)->insert(position_operand_index, fetch(object_operand_index)->copy());
+    static_cast<Vector*>(vector_operand)->insert(position_operand_index, pop(object_operand_index));
 
     return addr;
 }
