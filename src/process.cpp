@@ -26,6 +26,18 @@ Type* Process::fetch(unsigned index) const {
     }
     return object;
 }
+Type* Process::pop(unsigned index) {
+    /*  Return pointer to object at given register.
+     *  The object is removed from the register.
+     *  This method safeguards against reaching for out-of-bounds registers and
+     *  reading from an empty register.
+     *
+     *  :params:
+     *
+     *  index:int   - index of a register to pop an object from
+     */
+    return uregset->pop(index);
+}
 void Process::place(unsigned index, Type* obj) {
     /** Place an object in register with given index.
      *

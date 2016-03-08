@@ -78,6 +78,7 @@ class Process {
     std::queue<Type*> message_queue;
 
     Type* fetch(unsigned) const;
+    Type* pop(unsigned);
     void place(unsigned, Type*);
     void updaterefs(Type*, Type*);
     bool hasrefs(unsigned);
