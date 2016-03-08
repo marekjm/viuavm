@@ -1,8 +1,6 @@
 .function: misc::boolean
     ; this function returns boolean value of its parameter
-    arg 0 0
-    not 0
-    not 0
+    not (not (arg 0 0))
     return
 .end
 
