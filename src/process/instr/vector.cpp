@@ -75,10 +75,6 @@ byte* Process::opvat(byte* addr) {
     Type* vector_operand = viua::operand::extract(addr)->resolve(this);
     int position_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    /*  1) fetch vector,
-     *  2) pop value at given index,
-     *  3) put it in a register,
-     */
     Type* ptr = static_cast<Vector*>(vector_operand)->at(position_operand_index);
     // FIXME: a copy? should be at-ed by move
     // However, that would mean that obtaining a copy of an element is a bit too expensive.
