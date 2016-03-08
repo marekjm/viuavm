@@ -48,8 +48,6 @@
     vpush 3 7
 
     .mark: next_iter
-    ; empty the register because vat instruction creates references
-    empty 7
 
     ; increase the counter and go back to the beginning of the loop
     ;     ++i;

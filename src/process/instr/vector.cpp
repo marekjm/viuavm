@@ -38,9 +38,9 @@ byte* Process::opvpush(byte* addr) {
      *  FIXME: make it possible to push references.
      */
     Type* target = viua::operand::extract(addr)->resolve(this);
-    Type* source = viua::operand::extract(addr)->resolve(this);
+    int source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    static_cast<Vector*>(target)->push(source->copy());
+    static_cast<Vector*>(target)->push(pop(source));
 
     return addr;
 }
@@ -80,8 +80,10 @@ byte* Process::opvat(byte* addr) {
      *  3) put it in a register,
      */
     Type* ptr = static_cast<Vector*>(vector_operand)->at(position_operand_index);
-    place(destination_register_index, ptr);
-    uregset->flag(destination_register_index, REFERENCE);
+    // FIXME: a copy? should be at-ed by move
+    // However, that would mean that obtaining a copy of an element is a bit too expensive.
+    // Maybe add distinct instructions for moving-at and copying-at? That sounds like a plan.
+    place(destination_register_index, ptr->copy());
 
     return addr;
 }

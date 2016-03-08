@@ -49,9 +49,6 @@
     ; ...and push result to new vector
     vpush 3 (fcall 8 1)
 
-    ; empty the register, as vat instruction creates references
-    empty 7
-
     ; increase loop counter and go back to the beginning
     ;     ++i;
     ; }

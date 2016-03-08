@@ -36,10 +36,7 @@
     ; store item located inside parameter vector at index denoted by loop_counter in
     ; a register and
     ; pass it as a parameter
-    param @loop_counter (vat slot 2 @loop_counter)
-
-    ; clear parameter slot
-    empty slot
+    pamv @loop_counter (vat slot 2 @loop_counter)
 
     ; loop_counter++
     iinc loop_counter
@@ -60,6 +57,11 @@
     vpush 1 (istore 3 16)
     vpush 1 (istore 4 8)
     vpush 1 (istore 5 -2)
+
+    istore 2 20
+    istore 3 16
+    istore 4 8
+    istore 5 -2
 
     ; call sum/4() function
     frame ^[(param 0 2) (param 1 3) (param 2 4) (param 3 5)]
