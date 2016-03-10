@@ -14,9 +14,6 @@
     .mark: loop
     branch (ilt 8 counter len) +1 break
     print (vat 9 1 @counter)
-    ; empty must be done or second print would fail with a segfault!
-    ; VATed registers are references!
-    empty 9
     iinc counter
     jump loop
 
