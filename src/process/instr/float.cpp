@@ -8,6 +8,7 @@
 #include <viua/cpu/opex.h>
 #include <viua/operand.h>
 #include <viua/cpu/cpu.h>
+#include <viua/assert.h>
 using namespace std;
 
 
@@ -50,6 +51,9 @@ template<class Operator, class ResultType> byte* perform(byte* addr, Process* t,
 
     auto first = viua::operand::extract(addr);
     auto second = viua::operand::extract(addr);
+
+    viua::assertions::expect_types<Float>("Float", first->resolve(t), second->resolve(t));
+
     (t->*placer)(target_register_index, new ResultType(Operator()(static_cast<Float*>(first->resolve(t))->value(), static_cast<Float*>(second->resolve(t))->value())));
 
     return addr;
