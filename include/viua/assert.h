@@ -23,6 +23,14 @@ namespace viua {
 
         void assert_typeof(Type* object, const std::string& expected);
 
+        template<class T, class U> void expect_types(const std::string& expected_1st, const std::string& expected_2nd, Type* got_1st, Type* got_2nd) {
+            if ((not dynamic_cast<T*>(got_1st)) or (not dynamic_cast<U*>(got_2nd))) {
+                throw new Exception("invalid operand types: expected (_, " + expected_1st + ", " + expected_2nd + "), got (_, " + got_1st->type() + ", " + got_2nd->type() + ")");
+            }
+        }
+        template<class T> void expect_types(const std::string& expected_both, Type* got_1st, Type* got_2nd) {
+            expect_types<T, T>(expected_both, expected_both, got_1st, got_2nd);
+        }
 
         template<typename T, typename U> inline bool any_equal(const T& to_compare, const U& first) {
             return (to_compare == first);
