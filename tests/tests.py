@@ -608,6 +608,45 @@ class ClosureTests(unittest.TestCase):
         runTestSplitlines(self, 'simple_enclose_by_move.asm', ['true', 'Hello World!'])
 
 
+class InvalidInstructionOperandTypeTests(unittest.TestCase):
+    """Tests checking detection of invalid operand type during instruction execution.
+    """
+    PATH = './sample/asm/invalid_operand_types'
+
+    def testIADD(self):
+        runTestThrowsException(self, 'iadd.asm', 'uncaught object: Exception = invalid operand types: expected (_, Integer, Integer), got (_, Integer, Float)')
+
+    def testISUB(self):
+        runTestThrowsException(self, 'isub.asm', 'uncaught object: Exception = invalid operand types: expected (_, Integer, Integer), got (_, Integer, String)')
+
+    def testIMUL(self):
+        runTestThrowsException(self, 'imul.asm', 'uncaught object: Exception = invalid operand types: expected (_, Integer, Integer), got (_, Float, String)')
+
+    def testIDIV(self):
+        runTestThrowsException(self, 'idiv.asm', 'uncaught object: Exception = invalid operand types: expected (_, Integer, Integer), got (_, String, Float)')
+
+    def testILT(self):
+        runTestThrowsException(self, 'ilt.asm', 'uncaught object: Exception = invalid operand types: expected (_, Integer, Integer), got (_, String, String)')
+
+    def testILTE(self):
+        runTestThrowsException(self, 'ilte.asm', 'uncaught object: Exception = invalid operand types: expected (_, Integer, Integer), got (_, Foo, String)')
+
+    def testIGT(self):
+        runTestThrowsException(self, 'igt.asm', 'uncaught object: Exception = invalid operand types: expected (_, Integer, Integer), got (_, Foo, Bar)')
+
+    def testIGTE(self):
+        runTestThrowsException(self, 'igte.asm', 'uncaught object: Exception = invalid operand types: expected (_, Integer, Integer), got (_, Foo, Bar)')
+
+    def testIEQ(self):
+        runTestThrowsException(self, 'ieq.asm', 'uncaught object: Exception = invalid operand types: expected (_, Integer, Integer), got (_, Foo, Bar)')
+
+    def testIINC(self):
+        runTestThrowsException(self, 'iinc.asm', 'uncaught object: Exception = invalid operand types: expected (Integer), got (Foo)')
+
+    def testIDEC(self):
+        runTestThrowsException(self, 'idec.asm', 'uncaught object: Exception = invalid operand types: expected (Integer), got (Function)')
+
+
 class StaticLinkingTests(unittest.TestCase):
     """Tests for static linking functionality.
     """
