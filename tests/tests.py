@@ -646,6 +646,33 @@ class InvalidInstructionOperandTypeTests(unittest.TestCase):
     def testIDEC(self):
         runTestThrowsException(self, 'idec.asm', 'uncaught object: Exception = invalid operand types: expected (Integer), got (Function)')
 
+    def testFADD(self):
+        runTestThrowsException(self, 'fadd.asm', 'uncaught object: Exception = invalid operand types: expected (_, Float, Float), got (_, Foo, Float)')
+
+    def testFSUB(self):
+        runTestThrowsException(self, 'fsub.asm', 'uncaught object: Exception = invalid operand types: expected (_, Float, Float), got (_, Foo, Float)')
+
+    def testFMUL(self):
+        runTestThrowsException(self, 'fmul.asm', 'uncaught object: Exception = invalid operand types: expected (_, Float, Float), got (_, Foo, Float)')
+
+    def testFDIV(self):
+        runTestThrowsException(self, 'fdiv.asm', 'uncaught object: Exception = invalid operand types: expected (_, Float, Float), got (_, Foo, Float)')
+
+    def testFLT(self):
+        runTestThrowsException(self, 'flt.asm', 'uncaught object: Exception = invalid operand types: expected (_, Float, Float), got (_, Foo, Float)')
+
+    def testFLTE(self):
+        runTestThrowsException(self, 'flte.asm', 'uncaught object: Exception = invalid operand types: expected (_, Float, Float), got (_, Foo, Float)')
+
+    def testFGT(self):
+        runTestThrowsException(self, 'fgt.asm', 'uncaught object: Exception = invalid operand types: expected (_, Float, Float), got (_, Foo, Float)')
+
+    def testFGTE(self):
+        runTestThrowsException(self, 'fgte.asm', 'uncaught object: Exception = invalid operand types: expected (_, Float, Float), got (_, Foo, Float)')
+
+    def testFEQ(self):
+        runTestThrowsException(self, 'feq.asm', 'uncaught object: Exception = invalid operand types: expected (_, Float, Float), got (_, Foo, Float)')
+
 
 class StaticLinkingTests(unittest.TestCase):
     """Tests for static linking functionality.
