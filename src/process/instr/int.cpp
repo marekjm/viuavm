@@ -100,11 +100,11 @@ byte* Process::opieq(byte* addr) {
 }
 
 byte* Process::opiinc(byte* addr) {
-    static_cast<Integer*>(viua::operand::extract(addr)->resolve(this))->increment();
+    viua::assertions::expect_type<Integer>("Integer", viua::operand::extract(addr)->resolve(this))->increment();
     return addr;
 }
 
 byte* Process::opidec(byte* addr) {
-    static_cast<Integer*>(viua::operand::extract(addr)->resolve(this))->decrement();
+    viua::assertions::expect_type<Integer>("Integer", viua::operand::extract(addr)->resolve(this))->decrement();
     return addr;
 }
