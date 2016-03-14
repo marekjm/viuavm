@@ -43,7 +43,7 @@
     idec 3
     stoi 4 (vat 3 1 @3)
     ; register holding object obtained from vector must be emptied before reuse
-    move (empty 3) 4
+    move 3 4
     ; jump two instructions to skip default lower bound assignment
     jump +2
 
@@ -56,7 +56,7 @@
     idec 4
     stoi 5 (vat 4 1 @4)
     ; register holding object obtained from vector must be emptied before reuse
-    move (empty 4) 5
+    move 4 5
     ; jump two instructions to skip default upper bound assignment
     jump +2
 
