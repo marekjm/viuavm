@@ -3,10 +3,12 @@
 #include <viua/types/integer.h>
 #include <viua/types/pointer.h>
 #include <viua/types/object.h>
+#include <viua/types/string.h>
 #include <viua/cpu/opex.h>
 #include <viua/exceptions.h>
 #include <viua/cpu/registerset.h>
 #include <viua/operand.h>
+#include <viua/assert.h>
 #include <viua/cpu/cpu.h>
 using namespace std;
 
@@ -83,4 +85,19 @@ byte* Process::opmsg(byte* addr) {
 
     auto caller = (is_native ? &Process::callNative : &Process::callForeign);
     return (this->*caller)(addr, function_name, return_register_ref, return_register_index, method_name);
+}
+
+byte* Process::opinsert(byte* addr) {
+    /** Insert an object as an attribute of another object.
+     */
+    Type* object_operand = viua::operand::extract(addr)->resolve(this);
+    Type* key_operand = viua::operand::extract(addr)->resolve(this);
+    int source_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+
+    viua::assertions::assert_implements<Object>(object_operand, "Object");
+    viua::assertions::assert_typeof(key_operand, "String");
+
+    static_cast<Object*>(object_operand)->insert(static_cast<String*>(key_operand)->str(), pop(source_index));
+
+    return addr;
 }
