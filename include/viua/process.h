@@ -211,6 +211,8 @@ class Process {
 
     byte* opnew(byte*);
     byte* opmsg(byte*);
+    byte* opinsert(byte*);
+    byte* opremove(byte*);
 
     byte* opimport(byte*);
     byte* oplink(byte*);
