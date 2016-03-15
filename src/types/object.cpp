@@ -58,6 +58,10 @@ void Object::set(const string& name, Type* object) {
     attributes[name] = object;
 }
 
+void Object::insert(const string& key, Type* value) {
+    set(key, value);
+}
+
 
 Object::Object(const std::string& tn): type_name(tn) {}
 Object::~Object() {

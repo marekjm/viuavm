@@ -29,6 +29,8 @@ class Object: public Type {
             return std::vector<std::string>{"Type"};
         }
 
+        virtual void insert(const std::string& key, Type* value);
+
         virtual void set(Frame*, RegisterSet*, RegisterSet*);
         virtual void get(Frame*, RegisterSet*, RegisterSet*);
 
