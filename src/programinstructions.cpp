@@ -806,6 +806,11 @@ Program& Program::opmsg(int_op reg, const string& method_name) {
     return (*this);
 }
 
+Program& Program::opinsert(int_op target, int_op key, int_op source) {
+    addr_ptr = cg::bytecode::opinsert(addr_ptr, target, key, source);
+    return (*this);
+}
+
 Program& Program::opreturn() {
     addr_ptr = cg::bytecode::opreturn(addr_ptr);
     return (*this);

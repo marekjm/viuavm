@@ -146,8 +146,10 @@ class Program {
     Program& opderive   (int_op, const std::string&);
     Program& opattach   (int_op, const std::string&, const std::string&);
     Program& opregister (int_op);
+
     Program& opnew      (int_op, const std::string&);
     Program& opmsg      (int_op, const std::string&);
+    Program& opinsert(int_op, int_op, int_op);
 
     Program& opreturn   ();
     Program& ophalt       ();
