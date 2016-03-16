@@ -116,8 +116,10 @@ namespace cg {
         byte* opderive(byte*, int_op, const std::string&);
         byte* opattach(byte*, int_op, const std::string&, const std::string&);
         byte* opregister(byte*, int_op);
+
         byte* opnew(byte*, int_op, const std::string&);
         byte* opmsg(byte*, int_op, const std::string&);
+        byte* opinsert(byte*, int_op, int_op, int_op);
 
         byte* opreturn(byte*);
         byte* ophalt(byte*);

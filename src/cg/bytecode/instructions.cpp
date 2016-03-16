@@ -980,6 +980,11 @@ namespace cg {
             return addr_ptr;
         }
 
+        byte* opinsert(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
+            addr_ptr = insertThreeIntegerOpsInstruction(addr_ptr, INSERT, rega, regb, regr);
+            return addr_ptr;
+        }
+
         byte* opreturn(byte* addr_ptr) {
             *(addr_ptr++) = RETURN;
             return addr_ptr;
