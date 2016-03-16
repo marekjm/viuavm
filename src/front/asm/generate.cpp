@@ -145,6 +145,8 @@ const map<string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS = {
     { "enclose", &Program::openclose },
     { "enclosecopy", &Program::openclosecopy },
     { "enclosemove", &Program::openclosemove },
+
+    { "insert", &Program::opinsert },
 };
 
 void assemble_three_intop_instruction(Program& program, map<string, int>& names, const string& instr, const string& operands) {
@@ -633,6 +635,8 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string reg, mtd;
             tie(reg, mtd) = assembler::operands::get2(operands);
             program.opmsg(assembler::operands::getint(resolveregister(reg, names)), mtd);
+        } else if (str::startswithchunk(line, "insert")) {
+            assemble_three_intop_instruction(program, names, "insert", operands);
         } else if (str::startswith(line, "return")) {
             program.opreturn();
         } else if (str::startswith(line, "halt")) {
