@@ -191,6 +191,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case VINSERT:
         case VPOP:
         case VAT:
+        case INSERT:
             oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
             pointer::inc<int, byte>(ptr);
