@@ -14,7 +14,7 @@ class Object: public Type {
      *
      *  This type is used internally inside the VM.
      */
-    protected:
+    private:
         std::string type_name;
         std::map<std::string, Type*> attributes;
 
