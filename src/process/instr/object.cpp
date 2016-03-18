@@ -101,3 +101,18 @@ byte* Process::opinsert(byte* addr) {
 
     return addr;
 }
+
+byte* Process::opremove(byte* addr) {
+    /** Remove an attribute of another object.
+     */
+    int target_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    Type* object_operand = viua::operand::extract(addr)->resolve(this);
+    Type* key_operand = viua::operand::extract(addr)->resolve(this);
+
+    viua::assertions::assert_implements<Object>(object_operand, "Object");
+    viua::assertions::assert_typeof(key_operand, "String");
+
+    place(target_index, static_cast<Object*>(object_operand)->remove(static_cast<String*>(key_operand)->str()));
+
+    return addr;
+}
