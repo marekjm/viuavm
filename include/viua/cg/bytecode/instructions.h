@@ -120,6 +120,7 @@ namespace cg {
         byte* opnew(byte*, int_op, const std::string&);
         byte* opmsg(byte*, int_op, const std::string&);
         byte* opinsert(byte*, int_op, int_op, int_op);
+        byte* opremove(byte*, int_op, int_op, int_op);
 
         byte* opreturn(byte*);
         byte* ophalt(byte*);
