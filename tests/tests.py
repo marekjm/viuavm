@@ -682,6 +682,9 @@ class ObjectInstructionsTests(unittest.TestCase):
     def testInsertRemoveInstructions(self):
         runTestReturnsIntegers(self, 'basic_insert_remove.asm', [42, 42])
 
+    def testInsertMoves(self):
+        runTest(self, 'insert_moves.asm', 'true')
+
 
 class StaticLinkingTests(unittest.TestCase):
     """Tests for static linking functionality.
