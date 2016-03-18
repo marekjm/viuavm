@@ -695,6 +695,9 @@ class ObjectInstructionsTests(unittest.TestCase):
     def testInsertMoves(self):
         runTest(self, 'insert_moves.asm', 'true')
 
+    def testMoveSemanticsForInsertAndRemove(self):
+        runTest(self, 'move_semantics.asm', custom_assert=partiallyAppliedSameLines(2))
+
 
 class StaticLinkingTests(unittest.TestCase):
     """Tests for static linking functionality.
