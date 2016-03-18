@@ -254,6 +254,16 @@ def runTestFailsToAssemble(self, name, expected_output):
     self.assertEqual(output.strip(), expected_output)
 
 
+def sameLines(self, excode, output, no_of_lines):
+    lines = output.splitlines()
+    self.assertTrue(len(lines) == no_of_lines)
+    for i in range(1, no_of_lines):
+        self.assertEqual(lines[0], lines[i])
+
+def partiallyAppliedSameLines(n):
+    return functools.partial(sameLines, no_of_lines=n)
+
+
 class IntegerInstructionsTests(unittest.TestCase):
     """Tests for integer instructions.
     """
@@ -950,15 +960,6 @@ class WatchdogTests(unittest.TestCase):
     def testWatchdogMustBeANativeFunction(self):
         runTestThrowsException(self, 'must_be_a_native_function.asm', 'uncaught object: Exception = watchdog process must be native function, used foreign World::print_hello')
 
-
-def sameLines(self, excode, output, no_of_lines):
-    lines = output.splitlines()
-    self.assertTrue(len(lines) == no_of_lines)
-    for i in range(1, no_of_lines):
-        self.assertEqual(lines[0], lines[i])
-
-def partiallyAppliedSameLines(n):
-    return functools.partial(sameLines, no_of_lines=n)
 
 class StandardRuntimeLibraryModuleString(unittest.TestCase):
     PATH = './sample/standard_library/string'
