@@ -61,6 +61,11 @@ void Object::set(const string& name, Type* object) {
 void Object::insert(const string& key, Type* value) {
     set(key, value);
 }
+Type* Object::remove(const string& key) {
+    Type* o = attributes.at(key);
+    attributes.erase(key);
+    return o;
+}
 
 
 Object::Object(const std::string& tn): type_name(tn) {}

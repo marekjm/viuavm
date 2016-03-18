@@ -30,6 +30,7 @@ class Object: public Type {
         }
 
         virtual void insert(const std::string& key, Type* value);
+        virtual Type* remove(const std::string& key);
 
         virtual void set(Frame*, RegisterSet*, RegisterSet*);
         virtual void get(Frame*, RegisterSet*, RegisterSet*);
