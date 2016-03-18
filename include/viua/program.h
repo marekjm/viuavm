@@ -150,6 +150,7 @@ class Program {
     Program& opnew      (int_op, const std::string&);
     Program& opmsg      (int_op, const std::string&);
     Program& opinsert(int_op, int_op, int_op);
+    Program& opremove(int_op, int_op, int_op);
 
     Program& opreturn   ();
     Program& ophalt       ();

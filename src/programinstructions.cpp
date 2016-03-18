@@ -811,6 +811,11 @@ Program& Program::opinsert(int_op target, int_op key, int_op source) {
     return (*this);
 }
 
+Program& Program::opremove(int_op target, int_op key, int_op source) {
+    addr_ptr = cg::bytecode::opremove(addr_ptr, target, key, source);
+    return (*this);
+}
+
 Program& Program::opreturn() {
     addr_ptr = cg::bytecode::opreturn(addr_ptr);
     return (*this);
