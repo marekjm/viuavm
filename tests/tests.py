@@ -674,6 +674,15 @@ class InvalidInstructionOperandTypeTests(unittest.TestCase):
         runTestThrowsException(self, 'feq.asm', 'uncaught object: Exception = invalid operand types: expected (_, Float, Float), got (_, Foo, Float)')
 
 
+class ObjectInstructionsTests(unittest.TestCase):
+    """Tests checking detection of invalid operand type during instruction execution.
+    """
+    PATH = './sample/asm/objects'
+
+    def testInsertRemoveInstructions(self):
+        runTestReturnsIntegers(self, 'basic_insert_remove.asm', [42, 42])
+
+
 class StaticLinkingTests(unittest.TestCase):
     """Tests for static linking functionality.
     """
