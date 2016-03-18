@@ -265,6 +265,12 @@ byte* Process::dispatch(byte* addr) {
         case MSG:
             addr = opmsg(addr+1);
             break;
+        case INSERT:
+            addr = opinsert(addr+1);
+            break;
+        case REMOVE:
+            addr = opremove(addr+1);
+            break;
         case HALT:
             throw HaltException();
             break;
