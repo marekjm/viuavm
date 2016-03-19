@@ -48,6 +48,12 @@ class ViuaCPUError(ViuaError):
     pass
 
 
+def getCPUArchitecture():
+    p = subprocess.Popen(('uname', '-m'), stdout=subprocess.PIPE)
+    output, error = p.communicate()
+    output = output.decode('utf-8').strip()
+    return output
+
 def assemble(asm, out=None, links=(), opts=(), okcodes=(0,)):
     """Assemble path given as `asm` and put binary in `out`.
     Raises exception if compilation is not successful.
@@ -1015,6 +1021,10 @@ class RuntimeAssertionsTests(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    if getCPUArchitecture() == 'aarch64':
+        # we're running on ARM 64 and
+        # Valgrind acts funny (i.e. showing leaks from itself)
+        MEMORY_LEAK_CHECKS_ALLOWED_LEAK_VALUES += (74351, 74343)
     if not unittest.main(exit=False).result.wasSuccessful():
         exit(1)
     if MEMORY_LEAK_CHECKS_ENABLE:
