@@ -31,6 +31,11 @@ There are several categories of change:
 
 # From 0.7.0 to 0.7.1
 
+Better support for closures: users can control what registers to enclose and
+how to enclose values in them.
+Vector and object modifications have move semantics now (copy semantics must be
+implemented in user code).
+
 - feature: `ENCLOSECOPY` instruction for enclosing objects in closures by copying them,
 - feature: `ENCLOSEMOVE` instruction for enclosing objects in closures by moving them
   inside the closure,
@@ -38,6 +43,10 @@ There are several categories of change:
 - bic: changed the way closures are created, i.e. now, the closure is created first and
   only then objects are enclosed (either by copy, by move or by reference),
 - bic: renamed `THREAD` to `PROCESS`,
+- bic: vector instructions `VINSERT`, `VPUSH` and `VPOP` have move semantics,
+- bic: removed `Object::set` and `Object::get` methods from `Object`'s prototype (object
+  modification instructions `INSERT` and `REMOVE` must be used instead),
+- feature: `INSERT` and `REMOVE` instructions with move semantics for object modification,
 
 
 ----
