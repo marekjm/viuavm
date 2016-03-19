@@ -69,7 +69,6 @@ byte* Process::opvat(byte* addr) {
     /*  Run vat instruction.
      *
      *  Vector always returns a copy of the object in a register.
-     *  FIXME: make it possible to pop references.
      */
     int destination_register_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     Type* vector_operand = viua::operand::extract(addr)->resolve(this);
