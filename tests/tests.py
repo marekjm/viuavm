@@ -970,6 +970,9 @@ class WatchdogTests(unittest.TestCase):
     def testWatchdogMustBeANativeFunction(self):
         runTestThrowsException(self, 'must_be_a_native_function.asm', 'uncaught object: Exception = watchdog process must be native function, used foreign World::print_hello')
 
+    def testWatchdogTerminatedByARunawayExceptionDoesNotLeak(self):
+        runTest(self, 'terminated_watchdog.asm', 'watchdog process terminated by: Function: broken_process')
+
 
 class StandardRuntimeLibraryModuleString(unittest.TestCase):
     PATH = './sample/standard_library/string'
