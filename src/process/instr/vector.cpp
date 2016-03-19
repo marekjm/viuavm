@@ -75,9 +75,6 @@ byte* Process::opvat(byte* addr) {
     int position_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     Type* ptr = static_cast<Vector*>(vector_operand)->at(position_operand_index);
-    // FIXME: a copy? should be at-ed by move
-    // However, that would mean that obtaining a copy of an element is a bit too expensive.
-    // Maybe add distinct instructions for moving-at and copying-at? That sounds like a plan.
     place(destination_register_index, ptr->copy());
 
     return addr;
