@@ -2,8 +2,7 @@
     .mark: watchdog_start
     threceive 1
 
-    frame ^[(param 0 (ptr 2 1)) (param 1 (strstore 3 "function"))]
-    msg 4 get
+    remove 4 1 (strstore 3 "function")
 
     echo (strstore 5 "process spawned with <")
     echo 4
