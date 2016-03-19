@@ -191,6 +191,7 @@ void CPU::resurrectWatchdog() {
     Frame* frm = new Frame(nullptr, 0, watchdog_process->trace()[0]->regset->size());
     frm->function_name = watchdog_process->trace()[0]->function_name;
     delete watchdog_process;
+    watchdog_process = nullptr;
     spawnWatchdog(frm);
 }
 
