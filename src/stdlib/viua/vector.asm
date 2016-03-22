@@ -1,6 +1,8 @@
 .function: std::vector::of_ints/1
-    ; returns a vector of integers from 0 to N-1
+    ; Returns a vector of integers from 0 to N-1.
+    ;
     ; N is received as first and only parameter
+    ;
     .name: 1 limit
     arg limit 0
 
