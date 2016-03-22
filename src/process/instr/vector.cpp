@@ -18,9 +18,6 @@ byte* Process::opvec(byte* addr) {
 
 byte* Process::opvinsert(byte* addr) {
     /*  Run vinsert instruction.
-     *
-     *  Vector always inserts a copy of the object in a register.
-     *  FIXME: make it possible to insert references.
      */
     Type* vector_operand = viua::operand::extract(addr)->resolve(this);
     int object_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
@@ -47,9 +44,6 @@ byte* Process::opvpush(byte* addr) {
 
 byte* Process::opvpop(byte* addr) {
     /*  Run vpop instruction.
-     *
-     *  Vector always pops a copy of the object in a register.
-     *  FIXME: make it possible to pop references.
      */
     int destination_register_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     Type* vector_operand = viua::operand::extract(addr)->resolve(this);
