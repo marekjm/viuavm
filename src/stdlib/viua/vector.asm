@@ -45,3 +45,35 @@
 
     return
 .end
+
+.function: std::vector::reverse_in_place/1
+    ; Returns vector reversed in-place.
+    ;
+    ; This function expects to receive its parameter by move (to avoid
+    ; copying).
+    ;
+    .name: 0 source
+    arg source 0
+
+    .name: 1 counter_down
+    vlen counter_down source
+    idec counter_down
+    .name: 2 counter_up
+    izero counter_up
+    .name: 3 limit
+    copy limit counter_down
+
+    .mark: begin_loop
+    .name: 4 tmp
+    vpop tmp source @counter_down
+    vinsert source tmp @counter_up
+
+    idec limit
+    idec counter_down
+    iinc counter_up
+
+    branch limit begin_loop
+    .mark: end_loop
+
+    return
+.end
