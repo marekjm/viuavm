@@ -127,6 +127,14 @@ build/platform/support_string.o: src/support/string.cpp
 
 
 ############################################################
+# STANDATD LIBRARY
+standardlibrary: build/bin/vm/asm build/stdlib/std/vector.vlib
+
+build/stdlib/std/vector.vlib: src/stdlib/viua/vector.asm build/bin/vm/asm
+	./build/bin/vm/asm --lib -o $@ $<
+
+
+############################################################
 # TESTING
 build/test/World.o: sample/asm/external/World.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -fPIC -o build/test/World.o ./sample/asm/external/World.cpp
