@@ -127,14 +127,6 @@ build/platform/support_string.o: src/support/string.cpp
 
 
 ############################################################
-# STANDATD LIBRARY
-standardlibrary: build/bin/vm/asm build/stdlib/std/vector.vlib
-
-build/stdlib/std/vector.vlib: src/stdlib/viua/vector.asm build/bin/vm/asm
-	./build/bin/vm/asm --lib -o $@ $<
-
-
-############################################################
 # TESTING
 build/test/World.o: sample/asm/external/World.cpp
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -fPIC -o build/test/World.o ./sample/asm/external/World.cpp
@@ -150,7 +142,7 @@ build/test/math.so: build/test/math.o build/platform/registerset.o build/platfor
 
 compile-test: build/test/math.so build/test/World.so
 
-test: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/dis build/test/math.so build/test/World.so stdlib
+test: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/dis build/test/math.so build/test/World.so stdlib standardlibrary
 	VIUAPATH=./build/stdlib python3 ./tests/tests.py --verbose --catch --failfast
 
 
@@ -223,8 +215,13 @@ build/cpu/frame.o: src/cpu/frame.cpp include/viua/cpu/frame.h
 
 ############################################################
 # STANDARD LIBRARY
-stdlib: build/bin/vm/asm
+standardlibrary: build/bin/vm/asm build/stdlib/std/vector.vlib
+
+stdlib: build/bin/vm/asm standardlibrary
 	${MAKE} build/stdlib/std/string.vlib build/stdlib/typesystem.so build/stdlib/io.so build/stdlib/random.so
+
+build/stdlib/std/vector.vlib: src/stdlib/viua/vector.asm build/bin/vm/asm
+	./build/bin/vm/asm --lib -o $@ $<
 
 build/stdlib/std/string.vlib: src/stdlib/viua/string.asm
 	./build/bin/vm/asm --lib -o $@ $<
