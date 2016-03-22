@@ -21,3 +21,27 @@
 
     return
 .end
+
+.function: std::vector::reverse/1
+    ; Returns reversed vector.
+    ;
+    ; This function expects to receive its parameter by copy.
+    ; Vector passed as the parameter is emptied.
+    ; Reversing is *NOT* performed in-place.
+    ;
+    .name: 1 source
+    .name: 0 result
+    arg source 0
+    vec result
+
+    .name: 2 counter
+    vlen counter source
+
+    .mark: begin_loop
+    .name: 3 tmp
+    vpush result (vpop tmp source)
+    branch (idec counter) begin_loop
+    .mark: end_loop
+
+    return
+.end
