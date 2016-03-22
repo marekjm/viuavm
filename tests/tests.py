@@ -984,6 +984,13 @@ class StandardRuntimeLibraryModuleString(unittest.TestCase):
         runTestCustomAssertsNoDisassemblyRerun(self, 'represent.asm', partiallyAppliedSameLines(2))
 
 
+class StandardRuntimeLibraryModuleVector(unittest.TestCase):
+    PATH = './sample/standard_library/vector'
+
+    def testVectorOfInts(self):
+        runTestNoDisassemblyRerun(self, 'of_ints.asm', '[0, 1, 2, 3, 4, 5, 6, 7]')
+
+
 class TypeStringTests(unittest.TestCase):
     PATH = './sample/types/String'
 
