@@ -23,10 +23,15 @@ Type* Vector::push(Type* object) {
 }
 
 Type* Vector::pop(long int index) {
-    // FIXME: allow popping from arbitrary indexes
     Type* ptr = internal_object.back();
-    internal_object.pop_back();
-    return ptr;
+    if (index < 0) { index = (internal_object.size()+index); }
+    if ((index < 0) or (index >= static_cast<long int>(internal_object.size()) and index > 0)) {
+        throw new OutOfRangeException("vector index out of range");
+    }
+    Type* object = internal_object[index];
+    vector<Type*>::iterator it = (internal_object.begin()+index);
+    internal_object.erase(it);
+    return object;
 }
 
 Type* Vector::at(long int index) {
