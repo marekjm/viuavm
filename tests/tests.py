@@ -996,6 +996,9 @@ class StandardRuntimeLibraryModuleVector(unittest.TestCase):
     def testVectorReverseInPlace(self):
         runTestNoDisassemblyRerun(self, 'reverse_in_place.asm', ['[0, 1, 2, 3, 4, 5, 6, 7]', '[7, 6, 5, 4, 3, 2, 1, 0]'], output_processing_function=lambda o: o.strip().splitlines())
 
+    def testVectorEveryReturnsTrue(self):
+        runTestNoDisassemblyRerun(self, 'every_returns_true.asm', 'true')
+
 
 class TypeStringTests(unittest.TestCase):
     PATH = './sample/types/String'
