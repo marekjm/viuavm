@@ -999,6 +999,9 @@ class StandardRuntimeLibraryModuleVector(unittest.TestCase):
     def testVectorEveryReturnsTrue(self):
         runTestNoDisassemblyRerun(self, 'every_returns_true.asm', 'true')
 
+    def testVectorEveryReturnsFalse(self):
+        runTestNoDisassemblyRerun(self, 'every_returns_false.asm', 'false')
+
 
 class TypeStringTests(unittest.TestCase):
     PATH = './sample/types/String'
