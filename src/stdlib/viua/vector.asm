@@ -77,3 +77,37 @@
 
     return
 .end
+
+.function: std::vector::every/2
+    ; Returns true if every element of the vector passes a test (supplied as a function in second parameter), false otherwise.
+    ;
+    .name: 1 vector
+    .name: 2 fn
+    arg vector 0
+    arg fn 1
+
+    .name: 0 result
+    not (izero result)
+
+    .name: 3 limit
+    .name: 4 index
+    vlen limit vector
+    izero index
+
+    ; do loop on zero-length vectors
+    branch limit +1 end_loop
+
+    .mark: begin_loop
+    .name: 5 tmp
+    vpop tmp vector @index
+    ; FIXME: there should be no copy operation - use pass-by-move instead
+    frame ^[(param 0 tmp)]
+    and result (fcall 6 fn) result
+
+    vinsert vector tmp @index
+
+    branch (igte 5 (iinc index) limit) +1 begin_loop
+    .mark: end_loop
+
+    return
+.end
