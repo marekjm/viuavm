@@ -47,6 +47,7 @@ implemented in user code).
 - bic: removed `Object::set` and `Object::get` methods from `Object`'s prototype (object
   modification instructions `INSERT` and `REMOVE` must be used instead),
 - feature: `INSERT` and `REMOVE` instructions with move semantics for object modification,
+- fix: `VPOP` allows popping all indexes, not only the last one,
 
 
 ----
