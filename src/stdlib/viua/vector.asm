@@ -94,7 +94,7 @@
     vlen limit vector
     izero index
 
-    ; do loop on zero-length vectors
+    ; do not loop on zero-length vectors
     branch limit +1 end_loop
 
     .mark: begin_loop
