@@ -106,6 +106,9 @@
 
     vinsert vector tmp @index
 
+    ; break loop if there wasn't a match
+    branch result +1 end_loop
+
     branch (igte 5 (iinc index) limit) +1 begin_loop
     .mark: end_loop
 
