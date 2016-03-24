@@ -114,3 +114,41 @@
 
     return
 .end
+
+.function: std::vector::any/2
+    ; Returns true if every element of the vector passes a test (supplied as a function in second parameter), false otherwise.
+    ;
+    .name: 1 vector
+    .name: 2 fn
+    arg vector 0
+    arg fn 1
+
+    .name: 0 result
+    not (izero result)
+
+    .name: 3 limit
+    .name: 4 index
+    vlen limit vector
+    izero index
+
+    ; do not loop on zero-length vectors
+    branch limit +1 end_loop
+
+    .mark: begin_loop
+    .name: 5 tmp
+    vpop tmp vector @index
+    ; FIXME: there should be no copy operation - use pass-by-move instead
+    frame ^[(param 0 tmp)]
+    move result (fcall 6 fn)
+
+    ; put the value back into the vector
+    vinsert vector tmp @index
+
+    ; break the loop if there was a match
+    branch result end_loop
+
+    branch (igte 5 (iinc index) limit) +1 begin_loop
+    .mark: end_loop
+
+    return
+.end
