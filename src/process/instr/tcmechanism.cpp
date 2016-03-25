@@ -24,7 +24,7 @@ byte* Process::opcatch(byte* addr) {
 
     bool block_found = (cpu->block_addresses.count(catcher_block_name) or cpu->linked_blocks.count(catcher_block_name));
     if (not block_found) {
-        throw new Exception("registering undefined handler block: " + catcher_block_name);
+        throw new Exception("registering undefined handler block '" + catcher_block_name + "' to handle " + type_name);
     }
 
     byte* block_address = nullptr;
