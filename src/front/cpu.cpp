@@ -217,6 +217,9 @@ int main(int argc, char* argv[]) {
                 for (unsigned r = 0; r < last->args->size(); ++r) {
                     if (last->args->at(r) == nullptr) { continue; }
                     cout << "    arguments[" << r << "]: ";
+                    if (last->args->isflagged(r, MOVED)) {
+                        cout << "[moved] ";
+                    }
                     if (Pointer* ptr = dynamic_cast<Pointer*>(last->args->get(r))) {
                         if (ptr->expired()) {
                             cout << "<ExpiredPointer>" << endl;
