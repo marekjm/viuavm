@@ -140,6 +140,11 @@ void Process::dropFrame() {
             }
         }
     }
+    for (registerset_size_type i = 0; i < frame->args->size(); ++i) {
+        if (frame->args->at(i) != nullptr and frame->args->isflagged(i, MOVED)) {
+            throw new Exception("unused pass-by-move parameter");
+        }
+    }
 
     if (frames.size() == 1) {
         return_value = frame->regset->pop(0);
