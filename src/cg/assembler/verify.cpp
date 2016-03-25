@@ -81,7 +81,7 @@ string assembler::verify::frameBalance(const vector<string>& lines, const map<lo
             report << (expanded_lines_to_source_lines.at(previous_frame_spawnline)+1) << ')';
             break;
         }
-        if (instruction == "end" and balance > 0) {
+        if (instruction == "return" and balance > 0) {
             report << "fatal: leftover frame at line " << (expanded_lines_to_source_lines.at(i)+1) << " (spawned at line " << (expanded_lines_to_source_lines.at(previous_frame_spawnline)+1) << ')';
             break;
         }
