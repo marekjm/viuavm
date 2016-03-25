@@ -86,10 +86,7 @@ void RegisterSet::move(unsigned src, unsigned dst) {
      */
     if (src >= registerset_size) { throw new Exception("register access out of bounds: move source"); }
     if (dst >= registerset_size) { throw new Exception("register access out of bounds: move destination"); }
-    registers[dst] = registers[src];    // copy pointer from first-operand register to second-operand register
-    registers[src] = nullptr;           // zero first-operand register
-    masks[dst] = masks[src];            // copy mask
-    masks[src] = 0;                     // reset mask of source register
+    set(dst, pop(src));
 }
 
 void RegisterSet::swap(unsigned src, unsigned dst) {
