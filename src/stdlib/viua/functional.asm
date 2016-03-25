@@ -160,6 +160,18 @@
     return
 .end
 
+.block: std::functional::apply::__try_calling
+    frame 1
+    param 0 2
+    fcall 3 1
+    move 0 3
+    leave
+.end
+.block: std::functional::apply::__catch
+    ; just ignore the error if the function didn't return a value
+    delete (pull 4)
+    leave
+.end
 .function: std::functional::apply
     ; this function applies another function on a single parameter
     ;
@@ -173,12 +185,13 @@
     arg parameter 1
 
     ; apply the function to the parameter...
-    frame 1
-    param 0 parameter
-    fcall 3 func
+    ;frame 1
+    ;param 0 parameter
+    ;fcall 3 func
+    try
+    catch "Exception" std::functional::apply::__catch
+    enter std::functional::apply::__try_calling
 
-    ; ...and return the result
-    move 0 3
     return
 .end
 
