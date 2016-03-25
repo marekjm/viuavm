@@ -1018,6 +1018,9 @@ class StandardRuntimeLibraryModuleFunctional(unittest.TestCase):
     def testApplyHelloWorldHelloJoeHelloMike(self):
         runTestSplitlinesNoDisassemblyRerun(self, 'hello_guys.asm', ['Hello World!', 'Hello Joe!', 'Hello Mike!'])
 
+    def testApplyThatReturnsAValue(self):
+        runTestNoDisassemblyRerun(self, 'apply_simple.asm', '42')
+
 
 class TypeStringTests(unittest.TestCase):
     PATH = './sample/types/String'
