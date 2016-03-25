@@ -17,7 +17,7 @@ There are several categories of change:
 - **fix**: reserved for bugfixes
 - **enhancement**: reserved for backward-compatible enhancements to machine's
   core (e.g. speed improvement, better memory management etc.)
-- **bic**: an acronym for *Backwards Incomparible Change*, these changes (possibly
+- **bic**: an acronym for *Backwards Incompatible Change*, these changes (possibly
   also enhancements) are backwards incompatible and
   may break software written in machine's assembly or using it's public APIs,
   BICs in internal APIs may not be announced here
