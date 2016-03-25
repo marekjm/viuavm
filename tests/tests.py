@@ -1012,6 +1012,13 @@ class StandardRuntimeLibraryModuleVector(unittest.TestCase):
         runTestNoDisassemblyRerun(self, 'any_returns_false.asm', 'false')
 
 
+class StandardRuntimeLibraryModuleFunctional(unittest.TestCase):
+    PATH = './sample/standard_library/functional'
+
+    def testApplyHelloWorldHelloJoeHelloMike(self):
+        runTestSplitlinesNoDisassemblyRerun(self, 'hello_guys.asm', ['Hello World!', 'Hello Joe!', 'Hello Mike!'])
+
+
 class TypeStringTests(unittest.TestCase):
     PATH = './sample/types/String'
 
