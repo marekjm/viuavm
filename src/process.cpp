@@ -477,6 +477,15 @@ byte* Process::tick() {
         frame_new = nullptr;
     }
 
+    // FIXME: this is how it should look like
+    //
+    // findCatchFrame() returns nullptr if it cannot find a catch frame
+    // unwindStack() return instruction pointer (or nullptr if the exception
+    // cannot be handled)
+    //
+    /* if (thrown != nullptr) { */
+    /*     return unwindStack(findCatchFrame(thrown->type())); */
+    /* } */
     if (thrown != nullptr and thrown->type() == "Exception") {
         string exception_detailed_type = static_cast<Exception*>(thrown)->etype();
         for (long unsigned i = tryframes.size(); i > 0; --i) {
