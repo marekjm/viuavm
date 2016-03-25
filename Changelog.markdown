@@ -48,6 +48,7 @@ implemented in user code).
   modification instructions `INSERT` and `REMOVE` must be used instead),
 - feature: `INSERT` and `REMOVE` instructions with move semantics for object modification,
 - fix: `VPOP` allows popping all indexes, not only the last one,
+- fix: `std::functional::apply` works correctly for functions that do not return anything,
 
 
 ----
