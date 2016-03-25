@@ -1,6 +1,6 @@
 ; This script implements basic functions used in functional programming style
 ;
-; It can be dynamically linked to programs running on Viua VM by putting "link functional" instruction in
+; It can be dynamically linked to programs running on Viua VM by putting "link std::functional" instruction in
 ; source code of the script.
 ; Alternatively, it can be statically linked if that would be more suitable.
 ;
