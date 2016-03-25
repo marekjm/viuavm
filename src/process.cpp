@@ -487,6 +487,24 @@ byte* Process::tick() {
                 caught = thrown;
                 thrown = nullptr;
 
+                instruction_pointer = tframe->catchers.at(exception_detailed_type)->block_address;
+
+                unsigned distance = 0;
+                for (long unsigned j = (frames.size()-1); j > 1; --j) {
+                    if (frames[j] == tframe->associated_frame) {
+                        break;
+                    }
+                    ++distance;
+                }
+                for (unsigned j = 0; j < distance; ++j) {
+                    dropFrame();
+                }
+
+                while (tryframes.back() != tframe) {
+                    delete tryframes.back();
+                    tryframes.pop_back();
+                }
+
                 break;
             }
         }
