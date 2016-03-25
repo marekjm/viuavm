@@ -22,6 +22,34 @@
     return
 .end
 
+.function: std::vector::of/2
+    ; Returns a vector of N objects created by supplied function.
+    ;
+    ; N is received as first parameter.
+    ; The spawning function is received as the second parameter.
+    ;
+    .name: 1 limit
+    .name: 2 fn
+    arg limit 0
+    arg fn 1
+
+    .name: 0 vector
+    vec vector
+
+    .name: 3 counter
+    .name: 4 to_push
+    izero counter
+
+    .mark: begin_loop
+    frame ^[(pamv 0 (copy to_push counter))]
+    vpush vector (fcall to_push fn)
+    iinc counter
+    ; reuse 'to_push' register since it's empty
+    branch (igte to_push counter limit) +1 begin_loop
+
+    return
+.end
+
 .function: std::vector::reverse/1
     ; Returns reversed vector.
     ;
