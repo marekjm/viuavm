@@ -487,16 +487,25 @@ byte* Process::tick() {
     /*     return unwindStack(findCatchFrame(thrown->type())); */
     /* } */
     if (thrown != nullptr and thrown->type() == "Exception") {
-        string exception_detailed_type = static_cast<Exception*>(thrown)->etype();
         for (long unsigned i = tryframes.size(); i > 0; --i) {
             tframe = tryframes[(i-1)];
-            if (tframe->catchers.count(exception_detailed_type)) {
-                instruction_pointer = tframe->catchers.at(exception_detailed_type)->block_address;
+            string handler_found_for_type = static_cast<Exception*>(thrown)->etype();
+            bool handler_found = tframe->catchers.at(handler_found_for_type);
 
-                caught = thrown;
-                thrown = nullptr;
+            // FIXME: mutex
+            if ((not handler_found) and cpu->typesystem.count(handler_found_for_type)) {
+                vector<string> types_to_check = cpu->inheritanceChainOf(handler_found_for_type);
+                for (unsigned j = 0; j < types_to_check.size(); ++j) {
+                    if (tframe->catchers.count(types_to_check[j])) {
+                        handler_found = true;
+                        handler_found_for_type = types_to_check[j];
+                        break;
+                    }
+                }
+            }
 
-                instruction_pointer = tframe->catchers.at(exception_detailed_type)->block_address;
+            if (handler_found) {
+                instruction_pointer = tframe->catchers.at(handler_found_for_type)->block_address;
 
                 unsigned distance = 0;
                 for (long unsigned j = (frames.size()-1); j > 1; --j) {
@@ -513,6 +522,9 @@ byte* Process::tick() {
                     delete tryframes.back();
                     tryframes.pop_back();
                 }
+
+                caught = thrown;
+                thrown = nullptr;
 
                 break;
             }
