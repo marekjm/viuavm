@@ -433,6 +433,51 @@ byte* Process::xtick() {
     return instruction_pointer;
 }
 
+void Process::handleActiveException() {
+    TryFrame* tframe;
+    for (long unsigned i = tryframes.size(); i > 0; --i) {
+        tframe = tryframes[(i-1)];
+        string handler_found_for_type = thrown->type();
+        bool handler_found = tframe->catchers.count(handler_found_for_type);
+
+        // FIXME: mutex
+        if ((not handler_found) and cpu->typesystem.count(handler_found_for_type)) {
+            vector<string> types_to_check = cpu->inheritanceChainOf(handler_found_for_type);
+            for (unsigned j = 0; j < types_to_check.size(); ++j) {
+                if (tframe->catchers.count(types_to_check[j])) {
+                    handler_found = true;
+                    handler_found_for_type = types_to_check[j];
+                    break;
+                }
+            }
+        }
+
+        if (handler_found) {
+            instruction_pointer = tframe->catchers.at(handler_found_for_type)->block_address;
+
+            unsigned distance = 0;
+            for (long unsigned j = (frames.size()-1); j > 1; --j) {
+                if (frames[j] == tframe->associated_frame) {
+                    break;
+                }
+                ++distance;
+            }
+            for (unsigned j = 0; j < distance; ++j) {
+                dropFrame();
+            }
+
+            while (tryframes.back() != tframe) {
+                delete tryframes.back();
+                tryframes.pop_back();
+            }
+
+            caught = thrown;
+            thrown = nullptr;
+
+            break;
+        }
+    }
+}
 byte* Process::tick() {
     bool halt = false;
 
@@ -487,50 +532,8 @@ byte* Process::tick() {
     /*     return unwindStack(findCatchFrame(thrown->type())); */
     /* } */
     if (thrown != nullptr) {
-        for (long unsigned i = tryframes.size(); i > 0; --i) {
-            tframe = tryframes[(i-1)];
-            string handler_found_for_type = thrown->type();
-            bool handler_found = tframe->catchers.count(handler_found_for_type);
-
-            // FIXME: mutex
-            if ((not handler_found) and cpu->typesystem.count(handler_found_for_type)) {
-                vector<string> types_to_check = cpu->inheritanceChainOf(handler_found_for_type);
-                for (unsigned j = 0; j < types_to_check.size(); ++j) {
-                    if (tframe->catchers.count(types_to_check[j])) {
-                        handler_found = true;
-                        handler_found_for_type = types_to_check[j];
-                        break;
-                    }
-                }
-            }
-
-            if (handler_found) {
-                instruction_pointer = tframe->catchers.at(handler_found_for_type)->block_address;
-
-                unsigned distance = 0;
-                for (long unsigned j = (frames.size()-1); j > 1; --j) {
-                    if (frames[j] == tframe->associated_frame) {
-                        break;
-                    }
-                    ++distance;
-                }
-                for (unsigned j = 0; j < distance; ++j) {
-                    dropFrame();
-                }
-
-                while (tryframes.back() != tframe) {
-                    delete tryframes.back();
-                    tryframes.pop_back();
-                }
-
-                caught = thrown;
-                thrown = nullptr;
-
-                break;
-            }
-        }
+        handleActiveException();
     }
-
     if (thrown != nullptr) {
         has_unhandled_exception = true;
         return nullptr;

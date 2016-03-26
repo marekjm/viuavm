@@ -98,6 +98,12 @@ class Process {
     // call foreign method (i.e. method of a pure-C++ class loaded into machine's typesystem)
     byte* callForeignMethod(byte*, Type*, const std::string&, const bool&, const int&, const std::string&);
 
+    /*  Stack unwinding methods.
+     */
+    byte* unwindStack(std::tuple<TryFrame*, std::string>);
+    std::tuple<TryFrame*, std::string> findCatchFrame(Type*);
+    void handleActiveException();
+
     bool finished;
     bool is_joinable;
     bool is_suspended;
