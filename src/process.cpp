@@ -445,15 +445,17 @@ void Process::unwindCallStack(TryFrame* tframe) {
         dropFrame();
     }
 }
-void Process::unwindStack(TryFrame* tframe, string handler_found_for_type) {
-    instruction_pointer = tframe->catchers.at(handler_found_for_type)->block_address;
-
-    unwindCallStack(tframe);
-
+void Process::unwindTryStack(TryFrame* tframe) {
     while (tryframes.back() != tframe) {
         delete tryframes.back();
         tryframes.pop_back();
     }
+}
+void Process::unwindStack(TryFrame* tframe, string handler_found_for_type) {
+    instruction_pointer = tframe->catchers.at(handler_found_for_type)->block_address;
+
+    unwindCallStack(tframe);
+    unwindTryStack(tframe);
 
     caught = thrown;
     thrown = nullptr;
