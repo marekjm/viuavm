@@ -522,15 +522,6 @@ byte* Process::tick() {
         frame_new = nullptr;
     }
 
-    // FIXME: this is how it should look like
-    //
-    // findCatchFrame() returns nullptr if it cannot find a catch frame
-    // unwindStack() return instruction pointer (or nullptr if the exception
-    // cannot be handled)
-    //
-    /* if (thrown != nullptr) { */
-    /*     return unwindStack(findCatchFrame(thrown->type())); */
-    /* } */
     if (thrown != nullptr) {
         handleActiveException();
     }
