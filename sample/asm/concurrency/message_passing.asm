@@ -1,5 +1,5 @@
 .function: run_in_a_process
-    print (threceive 1)
+    print (receive 1)
     return
 .end
 

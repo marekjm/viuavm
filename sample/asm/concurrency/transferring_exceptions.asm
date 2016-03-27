@@ -1,6 +1,6 @@
 .function: run_in_a_process
     ; will cause a memory leak on detached processes
-    throw (threceive 1)
+    throw (receive 1)
     return
 .end
 

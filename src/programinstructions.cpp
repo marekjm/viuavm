@@ -656,8 +656,8 @@ Program& Program::opjoin(int_op target, int_op source) {
     return (*this);
 }
 
-Program& Program::opthreceive(int_op ref) {
-    addr_ptr = cg::bytecode::opthreceive(addr_ptr, ref);
+Program& Program::opreceive(int_op ref) {
+    addr_ptr = cg::bytecode::opreceive(addr_ptr, ref);
     return (*this);
 }
 

@@ -1,6 +1,6 @@
 .function: watchdog_process
     .mark: watchdog_start
-    threceive 1
+    receive 1
 
     remove 4 1 (strstore 3 "function")
 

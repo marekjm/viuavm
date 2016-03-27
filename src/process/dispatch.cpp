@@ -208,8 +208,8 @@ byte* Process::dispatch(byte* addr) {
         case JOIN:
             addr = opjoin(addr+1);
             break;
-        case THRECEIVE:
-            addr = opthreceive(addr+1);
+        case RECEIVE:
+            addr = opreceive(addr+1);
             break;
         case WATCHDOG:
             addr = opwatchdog(addr+1);

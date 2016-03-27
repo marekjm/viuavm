@@ -498,10 +498,10 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = assembler::operands::get2(operands);
             program.opjoin(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
-        } else if (str::startswith(line, "threceive")) {
+        } else if (str::startswith(line, "receive")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
-            program.opthreceive(assembler::operands::getint(resolveregister(regno_chnk, names)));
+            program.opreceive(assembler::operands::getint(resolveregister(regno_chnk, names)));
         } else if (str::startswith(line, "watchdog")) {
             string fn_name = str::chunk(operands);
             program.opwatchdog(fn_name);

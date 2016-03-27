@@ -66,7 +66,7 @@ byte* Process::opjoin(byte* addr) {
 
     return return_addr;
 }
-byte* Process::opthreceive(byte* addr) {
+byte* Process::opreceive(byte* addr) {
     /** Receive a message.
      *
      *  This opcode blocks execution of current process

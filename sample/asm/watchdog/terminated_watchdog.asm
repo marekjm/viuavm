@@ -1,6 +1,6 @@
 .function: watchdog_process
     .mark: watchdog_start
-    throw (remove 4 (threceive 1) (strstore 3 "function"))
+    throw (remove 4 (receive 1) (strstore 3 "function"))
 
     ;frame ^[(param 0 (ptr 2 1)) (param 1 (strstore 3 "function"))]
     ;msg 4 get

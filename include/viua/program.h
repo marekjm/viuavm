@@ -127,7 +127,7 @@ class Program {
     Program& opcall       (int_op, const std::string&);
     Program& opprocess   (int_op, const std::string&);
     Program& opjoin   (int_op, int_op);
-    Program& opthreceive(int_op);
+    Program& opreceive(int_op);
     Program& opwatchdog(const std::string&);
     Program& opjump       (uint64_t, enum JUMPTYPE);
     Program& opbranch     (int_op, uint64_t, enum JUMPTYPE, uint64_t, enum JUMPTYPE);
