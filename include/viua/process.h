@@ -100,6 +100,8 @@ class Process {
 
     /*  Stack unwinding methods.
      */
+    void unwindCallStack(TryFrame*);
+    void unwindTryStack(TryFrame*);
     void unwindStack(std::tuple<TryFrame*, std::string>);
     void unwindStack(TryFrame*, std::string);
     std::tuple<TryFrame*, std::string> findCatchFrame();

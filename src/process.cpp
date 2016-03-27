@@ -433,9 +433,7 @@ byte* Process::xtick() {
     return instruction_pointer;
 }
 
-void Process::unwindStack(TryFrame* tframe, string handler_found_for_type) {
-    instruction_pointer = tframe->catchers.at(handler_found_for_type)->block_address;
-
+void Process::unwindCallStack(TryFrame* tframe) {
     unsigned distance = 0;
     for (long unsigned j = (frames.size()-1); j > 1; --j) {
         if (frames[j] == tframe->associated_frame) {
@@ -446,6 +444,11 @@ void Process::unwindStack(TryFrame* tframe, string handler_found_for_type) {
     for (unsigned j = 0; j < distance; ++j) {
         dropFrame();
     }
+}
+void Process::unwindStack(TryFrame* tframe, string handler_found_for_type) {
+    instruction_pointer = tframe->catchers.at(handler_found_for_type)->block_address;
+
+    unwindCallStack(tframe);
 
     while (tryframes.back() != tframe) {
         delete tryframes.back();
