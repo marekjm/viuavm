@@ -100,6 +100,7 @@ class Process {
 
     /*  Stack unwinding methods.
      */
+    void adjustInstructionPointer(TryFrame*, std::string);
     void unwindCallStack(TryFrame*);
     void unwindTryStack(TryFrame*);
     void unwindStack(std::tuple<TryFrame*, std::string>);

@@ -433,6 +433,9 @@ byte* Process::xtick() {
     return instruction_pointer;
 }
 
+void Process::adjustInstructionPointer(TryFrame* tframe, string handler_found_for_type) {
+    instruction_pointer = tframe->catchers.at(handler_found_for_type)->block_address;
+}
 void Process::unwindCallStack(TryFrame* tframe) {
     unsigned distance = 0;
     for (long unsigned j = (frames.size()-1); j > 1; --j) {
@@ -452,8 +455,7 @@ void Process::unwindTryStack(TryFrame* tframe) {
     }
 }
 void Process::unwindStack(TryFrame* tframe, string handler_found_for_type) {
-    instruction_pointer = tframe->catchers.at(handler_found_for_type)->block_address;
-
+    adjustInstructionPointer(tframe, handler_found_for_type);
     unwindCallStack(tframe);
     unwindTryStack(tframe);
 
