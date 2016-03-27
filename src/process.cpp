@@ -458,9 +458,6 @@ void Process::unwindStack(TryFrame* tframe, string handler_found_for_type) {
     adjustInstructionPointer(tframe, handler_found_for_type);
     unwindCallStack(tframe);
     unwindTryStack(tframe);
-
-    caught = thrown;
-    thrown = nullptr;
 }
 tuple<TryFrame*, string> Process::findCatchFrame() {
     TryFrame* found_exception_frame = nullptr;
@@ -499,6 +496,8 @@ void Process::handleActiveException() {
     tie(tframe, handler_found_for_type) = findCatchFrame();
     if (tframe != nullptr) {
         unwindStack(tframe, handler_found_for_type);
+        caught = thrown;
+        thrown = nullptr;
     }
 }
 byte* Process::tick() {
