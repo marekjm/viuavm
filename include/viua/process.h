@@ -229,7 +229,6 @@ class Process {
 
     public:
         byte* dispatch(byte*);
-        byte* xtick();
         byte* tick();
 
         Type* obtain(unsigned i) const {
