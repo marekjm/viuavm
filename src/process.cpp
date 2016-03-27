@@ -397,12 +397,12 @@ byte* Process::tick() {
      *
      *  However, execution *should not* be halted if:
      *      - the offending opcode is RETURN (as this may indicate exiting recursive function),
-     *      - the offending opcode is THJOIN (as this means that a process is waiting for another process to finish),
+     *      - the offending opcode is JOIN (as this means that a process is waiting for another process to finish),
      *      - the offending opcode is THRECEIVE (as this means that a process is waiting for a message),
      *      - an object has been thrown, as the instruction pointer will be adjusted by
      *        catchers or execution will be halted on unhandled types,
      */
-    if (instruction_pointer == previous_instruction_pointer and (OPCODE(*instruction_pointer) != RETURN and OPCODE(*instruction_pointer) != THJOIN and OPCODE(*instruction_pointer) != THRECEIVE) and thrown == nullptr) {
+    if (instruction_pointer == previous_instruction_pointer and (OPCODE(*instruction_pointer) != RETURN and OPCODE(*instruction_pointer) != JOIN and OPCODE(*instruction_pointer) != THRECEIVE) and thrown == nullptr) {
         thrown = new Exception("InstructionUnchanged");
     }
 

@@ -95,7 +95,7 @@ namespace cg {
         byte* opargc(byte*, int_op);
         byte* opcall(byte*, int_op, const std::string&);
         byte* opprocess(byte*, int_op, const std::string&);
-        byte* opthjoin(byte*, int_op, int_op);
+        byte* opjoin(byte*, int_op, int_op);
         byte* opthreceive(byte*, int_op);
         byte* opwatchdog(byte*, const std::string&);
 

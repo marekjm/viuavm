@@ -39,7 +39,7 @@ byte* Process::opprocess(byte* addr) {
 
     return addr;
 }
-byte* Process::opthjoin(byte* addr) {
+byte* Process::opjoin(byte* addr) {
     /** Join a process.
      *
      *  This opcode blocks execution of current process until

@@ -133,7 +133,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case FTOI:
         case STOI:
         case STOF:
-        case THJOIN:
+        case JOIN:
         case FRAME:
         case ARG:
         case PARAM:

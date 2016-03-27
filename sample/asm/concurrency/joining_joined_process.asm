@@ -23,10 +23,10 @@
     process 3 print_lazy
 
     ; this is OK
-    thjoin 0 3
+    join 0 3
 
     ; this throws an exception
-    thjoin 0 3
+    join 0 3
 
     izero 0
     return

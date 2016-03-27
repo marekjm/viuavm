@@ -21,8 +21,8 @@
     process 4 print_eager
 
     ; join processes
-    thjoin 0 3
-    thjoin 0 4
+    join 0 3
+    join 0 4
 
     izero 0
     return

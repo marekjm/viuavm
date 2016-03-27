@@ -651,8 +651,8 @@ Program& Program::opprocess(int_op ref, const string& fn_name) {
     return (*this);
 }
 
-Program& Program::opthjoin(int_op target, int_op source) {
-    addr_ptr = cg::bytecode::opthjoin(addr_ptr, target, source);
+Program& Program::opjoin(int_op target, int_op source) {
+    addr_ptr = cg::bytecode::opjoin(addr_ptr, target, source);
     return (*this);
 }
 

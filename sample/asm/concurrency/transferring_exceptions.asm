@@ -5,7 +5,7 @@
 .end
 
 .block: try_process_exception
-    thjoin 0 1
+    join 0 1
     leave
 .end
 

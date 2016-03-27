@@ -28,7 +28,7 @@
     frame ^[(param 0 3)]
     process 4 process_waking_up_the_other_one
 
-    thjoin 0 4
+    join 0 4
 
     izero 0
     return

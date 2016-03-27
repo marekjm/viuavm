@@ -25,9 +25,9 @@
     frame ^[(param 0 (strstore 2 "Hello concurrent World! (2)"))]
     process 4 print_eager
 
-    thjoin 0 4
+    join 0 4
     ; do not join the process to test __entry/0 orphaning detection
-    ;thjoin 0 3
+    ;join 0 3
 
     izero 0
     return

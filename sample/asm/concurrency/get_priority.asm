@@ -13,7 +13,7 @@
     frame ^[(param 0 1)]
     print (msg 2 getPriority)
 
-    thjoin 0 1
+    join 0 1
 
     izero 0
     return

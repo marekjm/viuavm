@@ -30,8 +30,8 @@
     frame ^[(param 0 (strstore 2 "Hello concurrent World! (2)"))]
     process 4 print_lazy
 
-    thjoin 0 3
-    thjoin 0 4
+    join 0 3
+    join 0 4
 
     izero 0
     return

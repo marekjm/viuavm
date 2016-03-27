@@ -31,7 +31,7 @@
     print 3
 
     ; this throws, cannot join detached process
-    thjoin 0 1
+    join 0 1
 
     print (strstore 3 "main/1 exited")
 
