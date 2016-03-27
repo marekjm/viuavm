@@ -523,8 +523,6 @@ byte* Process::tick() {
         return nullptr;
     }
 
-    TryFrame* tframe;
-
     if (thrown != nullptr and frame_new != nullptr) {
         /*  Delete active frame after an exception is thrown.
          *  There're two reasons for such behaviour:
