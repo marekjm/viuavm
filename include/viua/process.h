@@ -102,7 +102,7 @@ class Process {
      */
     void unwindStack(std::tuple<TryFrame*, std::string>);
     void unwindStack(TryFrame*, std::string);
-    std::tuple<TryFrame*, std::string> findCatchFrame(Type*);
+    std::tuple<TryFrame*, std::string> findCatchFrame();
     void handleActiveException();
 
     bool finished;

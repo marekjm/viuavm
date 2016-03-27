@@ -455,10 +455,12 @@ void Process::unwindStack(TryFrame* tframe, string handler_found_for_type) {
     caught = thrown;
     thrown = nullptr;
 }
-void Process::handleActiveException() {
-    TryFrame* tframe;
+tuple<TryFrame*, string> Process::findCatchFrame() {
+    TryFrame* found_exception_frame = nullptr;
+    string caught_with_type = "";
+
     for (long unsigned i = tryframes.size(); i > 0; --i) {
-        tframe = tryframes[(i-1)];
+        TryFrame* tframe = tryframes[(i-1)];
         string handler_found_for_type = thrown->type();
         bool handler_found = tframe->catchers.count(handler_found_for_type);
 
@@ -475,8 +477,21 @@ void Process::handleActiveException() {
         }
 
         if (handler_found) {
-            unwindStack(tframe, handler_found_for_type);
+            found_exception_frame = tframe;
+            caught_with_type = handler_found_for_type;
+            break;
         }
+    }
+
+    return tuple<TryFrame*, string>(found_exception_frame, caught_with_type);
+}
+void Process::handleActiveException() {
+    TryFrame* tframe = nullptr;
+    string handler_found_for_type = "";
+
+    tie(tframe, handler_found_for_type) = findCatchFrame();
+    if (tframe != nullptr) {
+        unwindStack(tframe, handler_found_for_type);
     }
 }
 byte* Process::tick() {
