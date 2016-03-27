@@ -100,7 +100,8 @@ class Process {
 
     /*  Stack unwinding methods.
      */
-    byte* unwindStack(std::tuple<TryFrame*, std::string>);
+    void unwindStack(std::tuple<TryFrame*, std::string>);
+    void unwindStack(TryFrame*, std::string);
     std::tuple<TryFrame*, std::string> findCatchFrame(Type*);
     void handleActiveException();
 

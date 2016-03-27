@@ -433,6 +433,28 @@ byte* Process::xtick() {
     return instruction_pointer;
 }
 
+void Process::unwindStack(TryFrame* tframe, string handler_found_for_type) {
+    instruction_pointer = tframe->catchers.at(handler_found_for_type)->block_address;
+
+    unsigned distance = 0;
+    for (long unsigned j = (frames.size()-1); j > 1; --j) {
+        if (frames[j] == tframe->associated_frame) {
+            break;
+        }
+        ++distance;
+    }
+    for (unsigned j = 0; j < distance; ++j) {
+        dropFrame();
+    }
+
+    while (tryframes.back() != tframe) {
+        delete tryframes.back();
+        tryframes.pop_back();
+    }
+
+    caught = thrown;
+    thrown = nullptr;
+}
 void Process::handleActiveException() {
     TryFrame* tframe;
     for (long unsigned i = tryframes.size(); i > 0; --i) {
@@ -453,28 +475,7 @@ void Process::handleActiveException() {
         }
 
         if (handler_found) {
-            instruction_pointer = tframe->catchers.at(handler_found_for_type)->block_address;
-
-            unsigned distance = 0;
-            for (long unsigned j = (frames.size()-1); j > 1; --j) {
-                if (frames[j] == tframe->associated_frame) {
-                    break;
-                }
-                ++distance;
-            }
-            for (unsigned j = 0; j < distance; ++j) {
-                dropFrame();
-            }
-
-            while (tryframes.back() != tframe) {
-                delete tryframes.back();
-                tryframes.pop_back();
-            }
-
-            caught = thrown;
-            thrown = nullptr;
-
-            break;
+            unwindStack(tframe, handler_found_for_type);
         }
     }
 }
