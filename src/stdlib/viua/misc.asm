@@ -59,3 +59,26 @@
 
     leave
 .end
+
+.function: std::misc::cycle/1
+    ; executes at least N cycles
+    ;
+    .name: 1 counter
+    arg counter 0
+
+    istore 2 9
+    isub counter counter 2
+    istore 2 2
+    idiv counter counter 2
+
+    .name: 2 zero
+    izero zero
+
+    .mark: __loop_begin
+    branch (ilte 3 counter zero) __loop_end +1
+    idec counter
+    jump __loop_begin
+    .mark: __loop_end
+
+    return
+.end
