@@ -23,6 +23,7 @@
 #include <viua/cg/disassembler/disassembler.h>
 #include <viua/printutils.h>
 #include <viua/include/module.h>
+#include <viua/front/vm.h>
 using namespace std;
 
 
@@ -34,7 +35,6 @@ const char* DEBUGGER_COMMAND_HISTORY = "/.viuavmdb_history";
 const vector<string> DEBUGGER_COMMANDS = {
     "cpu.",
     "cpu.init",
-    "cpu.preload",
     "cpu.run",
     "cpu.tick",
     "cpu.jump",
@@ -530,7 +530,6 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
             verified = false;
         }
     } else if (command == "cpu.init") {
-    } else if (command == "cpu.preload") {
     } else if (command == "cpu.run") {
         if (not state.initialised) {
             cout << "error: CPU is not initialised, use `cpu.init` command before `" << command << "`" << endl;
@@ -699,8 +698,6 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
         cpu.iframe();
         cpu.processes[0]->begin();
         state.initialised = true;
-    } else if (command == "cpu.preload") {
-        cpu.preload();
     } else if (command == "cpu.run") {
         state.ticks_left = -1;
     } else if (command == "cpu.resume") {
@@ -1053,39 +1050,11 @@ int main(int argc, char* argv[]) {
 
     cout << "message: running \"" << filename << "\"" << endl;
 
-    Loader loader(filename);
-    loader.executable();
-
-    uint64_t bytes = loader.getBytecodeSize();
-    byte* bytecode = loader.getBytecode();
-
-    cout << "bytecode size: " << bytes << endl;
-
     CPU cpu;
     cpu.debug = true;
 
-    map<string, uint64_t> function_address_mapping = loader.getFunctionAddresses();
-    for (auto p : function_address_mapping) { cpu.mapfunction(p.first, p.second); }
-    for (auto p : loader.getBlockAddresses()) { cpu.mapblock(p.first, p.second); }
-
-    vector<string> cmdline_args;
-    for (int i = 1; i < argc; ++i) {
-        cmdline_args.push_back(argv[i]);
-    }
-
-    cpu.commandline_arguments = cmdline_args;
-    cpu.load(bytecode).bytes(bytes);
-
-
-    Prototype* proto_object = new Prototype("Object");
-    cpu.registerForeignPrototype("Object", proto_object);
-
-    Prototype* proto_string = new Prototype("String");
-    proto_string->attach("String::stringify", "stringify");
-    proto_string->attach("String::represent", "represent");
-    cpu.registerForeignPrototype("String", proto_string);
-    cpu.registerForeignMethod("String::stringify", static_cast<ForeignMethodMemberPointer>(&String::stringify));
-    cpu.registerForeignMethod("String::represent", static_cast<ForeignMethodMemberPointer>(&String::represent));
+    viua::front::vm::initialise(&cpu, filename, args);
+    viua::front::vm::load_standard_prototypes(&cpu);
 
     string homedir(getenv("HOME"));
     ifstream local_rc_file(homedir + RC_FILENAME);

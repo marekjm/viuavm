@@ -83,17 +83,18 @@ class CPU {
     // Final exception for stacktracing
     Type* terminating_exception;
 
-    /*  Methods dealing with dynamic library loading.
-     */
     std::vector<void*> cxx_dynamic_lib_handles;
-    void loadNativeLibrary(const std::string&);
-    void loadForeignLibrary(const std::string&);
 
     /*  Methods dealing with typesystem related tasks.
      */
     std::vector<std::string> inheritanceChainOf(const std::string&);
 
     public:
+        /*  Methods dealing with dynamic library loading.
+         */
+        void loadNativeLibrary(const std::string&);
+        void loadForeignLibrary(const std::string&);
+
         // debug and error reporting flags
         bool debug, errors;
 
@@ -108,7 +109,6 @@ class CPU {
          */
         CPU& load(byte*);
         CPU& bytes(uint64_t);
-        CPU& preload();
 
         CPU& mapfunction(const std::string&, uint64_t);
         CPU& mapblock(const std::string&, uint64_t);

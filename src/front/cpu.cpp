@@ -6,17 +6,10 @@
 #include <vector>
 #include <viua/version.h>
 #include <viua/bytecode/maps.h>
-#include <viua/support/string.h>
-#include <viua/support/env.h>
-#include <viua/types/pointer.h>
-#include <viua/types/exception.h>
-#include <viua/types/string.h>
-#include <viua/types/process.h>
-#include <viua/loader.h>
 #include <viua/cg/disassembler/disassembler.h>
-#include <viua/cpu/cpu.h>
 #include <viua/program.h>
 #include <viua/printutils.h>
+#include <viua/front/vm.h>
 using namespace std;
 
 
@@ -87,82 +80,18 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    Loader loader(filename);
-    loader.executable();
-
-    uint64_t bytes = loader.getBytecodeSize();
-    byte* bytecode = loader.getBytecode();
-
     CPU cpu;
-
-    map<string, uint64_t> function_address_mapping = loader.getFunctionAddresses();
-    for (auto p : function_address_mapping) { cpu.mapfunction(p.first, p.second); }
-    for (auto p : loader.getBlockAddresses()) { cpu.mapblock(p.first, p.second); }
-
-    vector<string> cmdline_args;
-    for (int i = 1; i < argc; ++i) {
-        cmdline_args.push_back(argv[i]);
-    }
-
-    cpu.commandline_arguments = cmdline_args;
-
-    cpu.load(bytecode).bytes(bytes);
+    viua::front::vm::initialise(&cpu, filename, args);
 
     try {
         // try preloading dynamic libraries specified by environment
-        cpu.preload();
+        viua::front::vm::preload_libraries(&cpu);
     } catch (const Exception* e) {
         cout << "fatal: preload: " << e->what() << endl;
         return 1;
     }
 
-    Prototype* proto_object = new Prototype("Object");
-    cpu.registerForeignPrototype("Object", proto_object);
-
-    Prototype* proto_string = new Prototype("String");
-    proto_string->attach("String::stringify", "stringify");
-    proto_string->attach("String::represent", "represent");
-    proto_string->attach("String::startswith", "startswith");
-    proto_string->attach("String::endswith", "endswith");
-    proto_string->attach("String::format", "format");
-    proto_string->attach("String::substr", "substr");
-    proto_string->attach("String::concatenate", "concatenate");
-    proto_string->attach("String::join", "join");
-    proto_string->attach("String::size", "size");
-    cpu.registerForeignPrototype("String", proto_string);
-    cpu.registerForeignMethod("String::stringify", static_cast<ForeignMethodMemberPointer>(&String::stringify));
-    cpu.registerForeignMethod("String::represent", static_cast<ForeignMethodMemberPointer>(&String::represent));
-    cpu.registerForeignMethod("String::startswith", static_cast<ForeignMethodMemberPointer>(&String::startswith));
-    cpu.registerForeignMethod("String::endswith", static_cast<ForeignMethodMemberPointer>(&String::endswith));
-    cpu.registerForeignMethod("String::format", static_cast<ForeignMethodMemberPointer>(&String::format));
-    cpu.registerForeignMethod("String::substr", static_cast<ForeignMethodMemberPointer>(&String::substr));
-    cpu.registerForeignMethod("String::concatenate", static_cast<ForeignMethodMemberPointer>(&String::concatenate));
-    cpu.registerForeignMethod("String::join", static_cast<ForeignMethodMemberPointer>(&String::join));
-    cpu.registerForeignMethod("String::size", static_cast<ForeignMethodMemberPointer>(&String::size));
-
-    Prototype* proto_process = new Prototype("Process");
-    proto_process->attach("Process::joinable", "joinable");
-    proto_process->attach("Process::detach", "detach");
-    proto_process->attach("Process::suspend", "suspend");
-    proto_process->attach("Process::wakeup", "wakeup");
-    proto_process->attach("Process::suspended", "suspended");
-    proto_process->attach("Process::getPriority", "getPriority");
-    proto_process->attach("Process::setPriority", "setPriority");
-    proto_process->attach("Process::pass", "pass");
-    cpu.registerForeignPrototype("Process", proto_process);
-    cpu.registerForeignMethod("Process::joinable", static_cast<ForeignMethodMemberPointer>(&ProcessType::joinable));
-    cpu.registerForeignMethod("Process::detach", static_cast<ForeignMethodMemberPointer>(&ProcessType::detach));
-    cpu.registerForeignMethod("Process::suspend", static_cast<ForeignMethodMemberPointer>(&ProcessType::suspend));
-    cpu.registerForeignMethod("Process::wakeup", static_cast<ForeignMethodMemberPointer>(&ProcessType::wakeup));
-    cpu.registerForeignMethod("Process::suspended", static_cast<ForeignMethodMemberPointer>(&ProcessType::suspended));
-    cpu.registerForeignMethod("Process::getPriority", static_cast<ForeignMethodMemberPointer>(&ProcessType::getPriority));
-    cpu.registerForeignMethod("Process::setPriority", static_cast<ForeignMethodMemberPointer>(&ProcessType::setPriority));
-    cpu.registerForeignMethod("Process::pass", static_cast<ForeignMethodMemberPointer>(&ProcessType::pass));
-
-    Prototype* proto_pointer = new Prototype("Pointer");
-    proto_pointer->attach("Pointer::expired", "expired");
-    cpu.registerForeignPrototype("Pointer", proto_pointer);
-    cpu.registerForeignMethod("Pointer::expired", static_cast<ForeignMethodMemberPointer>(&Pointer::expired));
+    viua::front::vm::load_standard_prototypes(&cpu);
 
     try {
         cpu.run();
