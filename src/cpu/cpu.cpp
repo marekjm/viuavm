@@ -305,13 +305,23 @@ bool CPU::burst() {
             if (watchdog_process == nullptr) {
                 abort_because_of_process_termination = true;
             } else {
-                dead_processes.push_back(th);
                 Object* death_message = new Object("Object");
                 Type* exc = nullptr;
                 th->transferActiveExceptionTo(exc);
                 death_message->set("function", new Function(th->trace()[0]->function_name));
                 death_message->set("exception", exc);
                 watchdog_process->pass(death_message);
+
+                // push broken process to dead processes list to
+                // erase it later
+                dead_processes.push_back(th);
+
+                // copy what is left after this broken process to running processes array to
+                // prevent losing them
+                // because after the loop the `processes` vector is reset
+                for (decltype(processes)::size_type j = i+1; j < processes.size(); ++j) {
+                    running_processes.push_back(processes[j]);
+                }
             }
             break;
         }
