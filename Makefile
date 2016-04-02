@@ -218,7 +218,7 @@ build/cpu/frame.o: src/cpu/frame.cpp include/viua/cpu/frame.h
 
 ############################################################
 # STANDARD LIBRARY
-standardlibrary: build/bin/vm/asm build/stdlib/std/vector.vlib build/stdlib/std/functional.vlib
+standardlibrary: build/bin/vm/asm build/stdlib/std/vector.vlib build/stdlib/std/functional.vlib build/stdlib/std/misc.vlib
 
 stdlib: build/bin/vm/asm standardlibrary
 	${MAKE} build/stdlib/std/string.vlib build/stdlib/typesystem.so build/stdlib/io.so build/stdlib/random.so
@@ -230,6 +230,9 @@ build/stdlib/std/functional.vlib: src/stdlib/viua/functional.asm build/bin/vm/as
 	./build/bin/vm/asm --lib -o $@ $<
 
 build/stdlib/std/string.vlib: src/stdlib/viua/string.asm
+	./build/bin/vm/asm --lib -o $@ $<
+
+build/stdlib/std/misc.vlib: src/stdlib/viua/misc.asm
 	./build/bin/vm/asm --lib -o $@ $<
 
 build/stdlib/typesystem.o: src/stdlib/typesystem.cpp
