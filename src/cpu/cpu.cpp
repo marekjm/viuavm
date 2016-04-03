@@ -349,13 +349,6 @@ bool CPU::burst() {
         return false;
     }
 
-    while (watchdog_process != nullptr and not watchdog_process->suspended()) {
-        executeQuant(watchdog_process, 0);
-        if (watchdog_process->terminated() or watchdog_process->stopped()) {
-            resurrectWatchdog();
-        }
-    }
-
     for (decltype(dead_processes)::size_type i = 0; i < dead_processes.size(); ++i) {
         delete dead_processes[i];
     }
@@ -367,6 +360,14 @@ bool CPU::burst() {
             processes.push_back(running_processes[i]);
         }
     }
+
+    while (watchdog_process != nullptr and not watchdog_process->suspended()) {
+        executeQuant(watchdog_process, 0);
+        if (watchdog_process->terminated() or watchdog_process->stopped()) {
+            resurrectWatchdog();
+        }
+    }
+
     return ticked;
 }
 
