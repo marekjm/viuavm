@@ -308,8 +308,17 @@ bool CPU::burst() {
                 Object* death_message = new Object("Object");
                 Type* exc = nullptr;
                 th->transferActiveExceptionTo(exc);
+                Vector *parameters = new Vector();
+                RegisterSet *top_args = th->trace()[0]->args;
+                for (unsigned long i = 0; i < top_args->size(); ++i) {
+                    if (top_args->at(i)) {
+                        parameters->push(top_args->at(i));
+                    }
+                }
+                top_args->drop();
                 death_message->set("function", new Function(th->trace()[0]->function_name));
                 death_message->set("exception", exc);
+                death_message->set("parameters", parameters);
                 watchdog_process->pass(death_message);
 
                 // push broken process to dead processes list to
