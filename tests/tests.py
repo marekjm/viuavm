@@ -241,6 +241,12 @@ def runTestSplitlines(self, name, expected_output, expected_exit_code = 0):
 def runTestSplitlinesNoDisassemblyRerun(self, name, expected_output, expected_exit_code = 0, check_memory_leaks = True):
     runTestNoDisassemblyRerun(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: o.strip().splitlines(), check_memory_leaks=check_memory_leaks)
 
+def runTestReturnsUnorderedLines(self, name, expected_output, expected_exit_code = 0):
+    runTest(self, name, sorted(expected_output), expected_exit_code, output_processing_function = lambda o: sorted(o.strip().splitlines()))
+
+def runTestReturnsUnorderedLinesNoDisassemblyRerun(self, name, expected_output, expected_exit_code = 0):
+    runTestNoDisassemblyRerun(self, name, sorted(expected_output), expected_exit_code, output_processing_function = lambda o: sorted(o.strip().splitlines()))
+
 def runTestReturnsIntegers(self, name, expected_output, expected_exit_code = 0, check_memory_leaks=True):
     runTest(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: [int(i) for i in o.strip().splitlines()], check_memory_leaks=check_memory_leaks)
 
@@ -972,6 +978,16 @@ class WatchdogTests(unittest.TestCase):
 
     def testWatchdogTerminatedByARunawayExceptionDoesNotLeak(self):
         runTest(self, 'terminated_watchdog.asm', 'watchdog process terminated by: Function: broken_process')
+
+    def testServicingRunawayExceptionWhileOtherProcessesAreRunning(self):
+        runTestReturnsUnorderedLinesNoDisassemblyRerun(self, 'death_message.asm', [
+            "Hello World (from detached process)!",
+            "Hello World (from joined process)!",
+            "process [ joined ]: 'a_joined_concurrent_process' exiting",
+            "[WARNING] process 'Function: __entry' killed by >>>OH NOES!<<<",
+            "Hello World (from detached process) after a runaway exception!",
+            "process [detached]: 'a_detached_concurrent_process' exiting",
+        ])
 
 
 class StandardRuntimeLibraryModuleString(unittest.TestCase):
