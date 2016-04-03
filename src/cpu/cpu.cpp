@@ -375,7 +375,6 @@ int CPU::run() {
     if (current_process_index < processes.size() and processes[current_process_index]->terminated()) {
         cout << "process '0:" << hex << processes[current_process_index] << dec << "' has terminated" << endl;
         Type* e = processes[current_process_index]->getActiveException();
-        cout << e << endl;
 
         return_code = 1;
         terminating_exception = e;
