@@ -32,6 +32,11 @@ void Object::insert(const string& key, Type* value) {
     set(key, value);
 }
 Type* Object::remove(const string& key) {
+    if (not attributes.count(key)) {
+        ostringstream oss;
+        oss << "attribute not found: " << key;
+        throw new Exception(oss.str());
+    }
     Type* o = attributes.at(key);
     attributes.erase(key);
     return o;
