@@ -371,6 +371,10 @@ bool CPU::burst() {
     return ticked;
 }
 
+void CPU::requestForeignFunctionCall(Frame *frame, Process *requesting_process) {
+    foreign_call_queue.push_back(new ForeignFunctionCallRequest(frame, requesting_process));
+}
+
 int CPU::run() {
     /*  VM CPU implementation.
      */

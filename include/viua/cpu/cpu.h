@@ -97,6 +97,9 @@ class CPU {
      */
     std::map<std::string, ForeignMethod> foreign_methods;
 
+    // Foreign function call requests are placed here to be executed later.
+    std::vector<ForeignFunctionCallRequest*> foreign_call_queue;
+
     // Final exception for stacktracing
     Type* terminating_exception;
 
@@ -146,6 +149,8 @@ class CPU {
         byte* tick(decltype(processes)::size_type process_index = 0);
         bool executeQuant(Process*, unsigned);
         bool burst();
+
+        void requestForeignFunctionCall(Frame*, Process*);
 
         int run();
         inline decltype(instruction_counter) counter() {
