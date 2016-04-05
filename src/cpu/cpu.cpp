@@ -58,7 +58,7 @@ void ForeignFunctionCallRequest::call(ExternalFunction* callback) {
             caller_process->put(return_value_register, returned);
         }
     } catch (Type *exception) {
-        process->raiseException(exception);
+        caller_process->raiseException(exception);
     }
 }
 void ForeignFunctionCallRequest::registerException(Type* object) {
