@@ -229,10 +229,10 @@ build/stdlib/std/vector.vlib: src/stdlib/viua/vector.asm build/bin/vm/asm
 build/stdlib/std/functional.vlib: src/stdlib/viua/functional.asm build/bin/vm/asm
 	./build/bin/vm/asm --lib -o $@ $<
 
-build/stdlib/std/string.vlib: src/stdlib/viua/string.asm
+build/stdlib/std/string.vlib: src/stdlib/viua/string.asm build/bin/vm/asm
 	./build/bin/vm/asm --lib -o $@ $<
 
-build/stdlib/std/misc.vlib: src/stdlib/viua/misc.asm
+build/stdlib/std/misc.vlib: src/stdlib/viua/misc.asm build/bin/vm/asm
 	./build/bin/vm/asm --lib -o $@ $<
 
 build/stdlib/typesystem.o: src/stdlib/typesystem.cpp
