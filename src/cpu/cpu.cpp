@@ -385,6 +385,20 @@ bool CPU::burst() {
         }
     }
 
+    for (decltype(foreign_call_queue)::size_type i = 0; i < foreign_call_queue.size(); ++i) {
+        ForeignFunctionCallRequest *request = foreign_call_queue[i];
+        string call_name = request->functionName();
+        if (foreign_functions.count(call_name) == 0) {
+            request->registerException(new Exception("call to unregistered foreign function: " + call_name));
+        } else {
+            request->call(foreign_functions.at(call_name));
+        }
+        request->wakeup();
+        delete request;
+    }
+    // clear the queue
+    foreign_call_queue.erase(foreign_call_queue.begin(), foreign_call_queue.end());
+
     if (abort_because_of_process_termination) {
         return false;
     }
