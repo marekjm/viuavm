@@ -18,6 +18,23 @@
 #include <viua/process.h>
 
 
+class ForeignFunctionCallRequest {
+    Frame *frame;
+    Process *caller_process;
+
+    public:
+        std::string functionName() const;
+        void call(ExternalFunction*);
+        void registerException(Type*);
+        void wakeup();
+
+        ForeignFunctionCallRequest(Frame *fr, Process *cp): frame(fr), caller_process(cp) {}
+        ~ForeignFunctionCallRequest() {
+            delete frame;
+        }
+};
+
+
 class CPU {
     friend Process;
 #ifdef AS_DEBUG_HEADER
