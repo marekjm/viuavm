@@ -106,7 +106,6 @@ class Process {
     void unwindStack(std::tuple<TryFrame*, std::string>);
     void unwindStack(TryFrame*, std::string);
     std::tuple<TryFrame*, std::string> findCatchFrame();
-    void handleActiveException();
 
     bool finished;
     bool is_joinable;
@@ -292,6 +291,8 @@ class Process {
         inline void raiseException(Type* exception) {
             thrown = exception;
         }
+        void handleActiveException();
+
         inline void popFrame() {
             dropFrame();
         }
