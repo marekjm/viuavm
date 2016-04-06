@@ -140,7 +140,13 @@ build/test/math.o:  sample/asm/external/math.cpp
 build/test/math.so: build/test/math.o build/platform/registerset.o build/platform/exception.o build/platform/type.o build/platform/pointer.o
 	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -fPIC -shared -o build/test/math.so build/test/math.o ./build/platform/registerset.o ./build/platform/exception.o build/platform/type.o build/platform/pointer.o
 
-compile-test: build/test/math.so build/test/World.so
+build/test/throwing.o:  sample/asm/external/throwing.cpp
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -c -fPIC -o $@ $^
+
+build/test/throwing.so: build/test/throwing.o build/platform/registerset.o build/platform/exception.o build/platform/type.o build/platform/pointer.o
+	${CXX} ${CXXFLAGS} ${CXXOPTIMIZATIONFLAGS} -fPIC -shared -o $@ $^
+
+compile-test: build/test/math.so build/test/World.so build/test/throwing.so
 
 test: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/dis build/test/math.so build/test/World.so stdlib standardlibrary
 	VIUAPATH=./build/stdlib python3 ./tests/tests.py --verbose --catch --failfast
