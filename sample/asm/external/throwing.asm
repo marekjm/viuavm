@@ -16,6 +16,9 @@
 
     print 1
 
+    remove 3 1 (strstore 3 "exception")
+    delete 3
+
     jump start_watching
     return
 .end
