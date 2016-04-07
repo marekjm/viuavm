@@ -27,7 +27,7 @@
     import "build/test/throwing"
 
     try
-    catch "Exception" __catch_Exception
+    catch "ExceptionX" __catch_Exception
     enter __try
 
     izero 0
