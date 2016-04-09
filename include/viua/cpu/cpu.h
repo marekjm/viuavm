@@ -208,12 +208,12 @@ class CPU {
                 delete proto_ptr;
             }
 
-            for (unsigned i = 0; i < cxx_dynamic_lib_handles.size(); ++i) {
-                dlclose(cxx_dynamic_lib_handles[i]);
-            }
-
             if (watchdog_process != nullptr) {
                 delete watchdog_process;
+            }
+
+            for (unsigned i = 0; i < cxx_dynamic_lib_handles.size(); ++i) {
+                dlclose(cxx_dynamic_lib_handles[i]);
             }
         }
 };
