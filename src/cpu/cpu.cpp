@@ -351,8 +351,7 @@ bool CPU::burst() {
                 abort_because_of_process_termination = true;
             } else {
                 Object* death_message = new Object("Object");
-                Type* exc = nullptr;
-                th->transferActiveExceptionTo(exc);
+                Type* exc = th->transferActiveException();
                 Vector *parameters = new Vector();
                 RegisterSet *top_args = th->trace()[0]->args;
                 for (unsigned long i = 0; i < top_args->size(); ++i) {

@@ -284,9 +284,10 @@ class Process {
 
         inline bool terminated() const { return has_unhandled_exception; }
         inline Type* getActiveException() { return thrown; }
-        inline void transferActiveExceptionTo(Type*& exception_register) {
-            exception_register = thrown;
+        inline Type* transferActiveException() {
+            Type* tmp = thrown;
             thrown = nullptr;
+            return tmp;
         }
         inline void raiseException(Type* exception) {
             thrown = exception;

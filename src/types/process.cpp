@@ -55,8 +55,8 @@ bool ProcessType::terminated() {
     return thrd->terminated();
 }
 
-void ProcessType::transferActiveExceptionTo(Type*& exception_register) {
-    return thrd->transferActiveExceptionTo(exception_register);
+Type* ProcessType::transferActiveException() {
+    return thrd->transferActiveException();
 }
 
 Type* ProcessType::getReturnValue() {

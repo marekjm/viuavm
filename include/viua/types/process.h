@@ -43,7 +43,7 @@ class ProcessType : public Type {
         void detach();
         bool stopped();
         bool terminated();
-        void transferActiveExceptionTo(Type*&);
+        Type* transferActiveException();
         Type* getReturnValue();
 
         ProcessType(Process* t): thrd(t) {}

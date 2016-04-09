@@ -54,7 +54,7 @@ byte* Process::opjoin(byte* addr) {
             thrd->join();
             return_addr = addr;
             if (thrd->terminated()) {
-                thrd->transferActiveExceptionTo(thrown);
+                thrown = thrd->transferActiveException();
             }
             if (target) {
                 place(target, thrd->getReturnValue());
