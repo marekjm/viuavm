@@ -12,12 +12,12 @@
 
 .function: watchdog_process
     .mark: start_watching
-    receive 1
+    .name: 1 death_message
+    receive death_message
 
-    print 1
-
-    remove 3 1 (strstore 3 "exception")
-    print 3
+    .name: 3 exception
+    remove exception death_message (strstore exception "exception")
+    print exception
 
     jump start_watching
     return
