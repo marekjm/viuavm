@@ -889,6 +889,12 @@ class ExternalModulesTests(unittest.TestCase):
         MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES = (72736,)
         runTestNoDisassemblyRerun(self, 'sqrt.asm', 1.73, 0, lambda o: round(float(o.strip()), 2))
 
+    def testThrowingExceptionHandledByWatchdog(self):
+        global MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES
+        # FIXME: Valgrind freaks out about dlopen() leaks, comment this line if you know what to do about it
+        # or maybe the leak originates in Viua code but I haven't found the leak
+        runTestNoDisassemblyRerun(self, 'throwing.asm', 'OH NOES!', 0)
+
 
 class ConcurrencyTests(unittest.TestCase):
     PATH = './sample/asm/concurrency'
