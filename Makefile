@@ -148,7 +148,7 @@ build/test/throwing.so: build/test/throwing.o build/platform/registerset.o build
 
 compile-test: build/test/math.so build/test/World.so build/test/throwing.so
 
-test: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/dis build/test/math.so build/test/World.so stdlib standardlibrary
+test: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/dis compile-test stdlib standardlibrary
 	VIUAPATH=./build/stdlib python3 ./tests/tests.py --verbose --catch --failfast
 
 
