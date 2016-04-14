@@ -62,6 +62,10 @@ implemented in user code).
 - feature: function `std::vector::any/2` (*check if any element passes a test supplied in function F*) added to standard library,
 - feature: functions `std::vector::reverse/1` and `std::vector::reverse_in_place/1` added to standard library,
 - fix: function `std::functional::apply` correctly handles functions that do not return a value,
+- fix: machine no longer crashes when exceptions thrown by foreign libraries enter watchdog process and
+  are not manually deleted before the foreign library is closed - readonly resources (e.g. `vtable`s) of
+  foreign library (`.so`) were being made unavailable but machine still wanted to access them when
+  deleting objects,
 
 
 ----
