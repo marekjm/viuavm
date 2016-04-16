@@ -225,9 +225,9 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { TAILCALL, "tailcall" },
     { ARG,      "arg" },
     { ARGC,     "argc" },
-    { PROCESS,   "process" },
-    { JOIN,   "join" },
-    { RECEIVE,"receive" },
+    { PROCESS,  "process" },
+    { JOIN,     "join" },
+    { RECEIVE,  "receive" },
     { WATCHDOG, "watchdog" },
 
     { JUMP,     "jump" },
