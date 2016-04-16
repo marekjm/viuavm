@@ -45,10 +45,14 @@ class Frame {
             // drop all pointers in arguments registers set
             // to prevent double deallocation
             if (not deallocate_arguments) {
-                args->drop();
+                if (args != nullptr) {
+                    args->drop();
+                }
             }
 
-            delete args;
+            if (args != nullptr) {
+                delete args;
+            }
 
             if (owns_local_register_set) {
                 delete regset;
