@@ -757,6 +757,18 @@ namespace cg {
             return addr_ptr;
         }
 
+        byte* optailcall(byte* addr_ptr, const string& fn_name) {
+            /*  Inserts tailcall instruction.
+             *  Byte offset is calculated automatically.
+             */
+            *(addr_ptr++) = TAILCALL;
+            for (unsigned i = 0; i < fn_name.size(); ++i) {
+                *(addr_ptr++) = fn_name[i];
+            }
+            *(addr_ptr++) = '\0';
+            return addr_ptr;
+        }
+
         byte* opprocess(byte* addr_ptr, int_op reg, const string& fn_name) {
             *(addr_ptr++) = PROCESS;
             addr_ptr = insertIntegerOperand(addr_ptr, reg);
