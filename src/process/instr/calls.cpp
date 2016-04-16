@@ -145,6 +145,62 @@ byte* Process::opcall(byte* addr) {
     return (this->*caller)(addr, call_name, return_register_ref, return_register_index, "");
 }
 
+byte* Process::optailcall(byte* addr) {
+    /*  Run tailcall instruction.
+     */
+    string call_name = viua::operand::extractString(addr);
+
+    // clear PASSED flag
+    // since function calls are blocking, we can be sure that after the function returns
+    // we can safely overwrite all registers
+    for (unsigned i = 0; i < uregset->size(); ++i) {
+        if (uregset->at(i) != nullptr) {
+            uregset->unflag(i, PASSED);
+        }
+    }
+
+    bool is_native = (cpu->function_addresses.count(call_name) or cpu->linked_functions.count(call_name));
+    bool is_foreign = cpu->foreign_functions.count(call_name);
+    bool is_foreign_method = cpu->foreign_methods.count(call_name);
+
+    if (not (is_native or is_foreign or is_foreign_method)) {
+        throw new Exception("tail call to undefined function: " + call_name);
+    }
+    // FIXME: make to possible to tail call foreign functions and methods
+    if (not is_native) {
+        throw new Exception("tail call to non-native function: " + call_name);
+    }
+
+    /* FIXME: make to possible to tail call foreign functions and methods */
+    /* if (is_foreign_method) { */
+    /*     if (frame_new == nullptr) { */
+    /*         throw new Exception("cannot tail call foreign method without a frame"); */
+    /*     } */
+    /*     if (frame_new->args->size() == 0) { */
+    /*         throw new Exception("cannot tail call foreign method using empty frame"); */
+    /*     } */
+    /*     if (frame_new->args->at(0) == nullptr) { */
+    /*         throw new Exception("frame must have at least one argument when used to tail call a foreign method"); */
+    /*     } */
+    /*     Type* obj = frame_new->args->at(0); */
+    /*     return callForeignMethod(addr, obj, call_name, return_register_ref, return_register_index, call_name); */
+    /* } */
+
+    Frame* last_frame = *(frames.end()-1);
+
+    // move arguments from new frame to old frame
+    delete last_frame->args;
+    last_frame->args = frame_new->args;
+    frame_new->args = nullptr;
+
+    // new frame must be deleted to prevent future errors
+    // it's a simulated "push-and-pop" from the stack
+    delete frame_new;
+    frame_new = nullptr;
+
+    return adjustJumpBaseFor(call_name);
+}
+
 byte* Process::opreturn(byte* addr) {
     if (frames.size() == 0) {
         throw new Exception("no frame on stack: no call to return from");
