@@ -603,6 +603,9 @@ class HigherOrderFunctionTests(unittest.TestCase):
     def testFilterByClosure(self):
         runTest(self, 'filter_closure.asm', [[1, 2, 3, 4, 5], [2, 4]], 0, lambda o: [json.loads(i) for i in o.splitlines()])
 
+    def testFilterByClosureVectorByMove(self):
+        runTest(self, 'filter_closure_vector_by_move.asm', [[1, 2, 3, 4, 5], [2, 4]], 0, lambda o: [json.loads(i) for i in o.splitlines()])
+
 
 class ClosureTests(unittest.TestCase):
     """Tests for closures.

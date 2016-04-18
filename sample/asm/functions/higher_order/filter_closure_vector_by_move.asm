@@ -84,7 +84,7 @@
     frame ^[(param 0 (istore 5 2))]
     call 3 is_divisible_by_2
 
-    frame ^[(param 0 3) (param 1 1)]
+    frame ^[(param 0 3) (pamv 1 1)]
     print (call 4 filter_closure)
 
     izero 0
