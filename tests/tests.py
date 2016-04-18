@@ -594,6 +594,9 @@ class HigherOrderFunctionTests(unittest.TestCase):
     def testFilter(self):
         runTest(self, 'filter.asm', [[1, 2, 3, 4, 5], [2, 4]], 0, lambda o: [json.loads(i) for i in o.splitlines()])
 
+    def testFilterVectorByMove(self):
+        runTest(self, 'filter_vector_by_move.asm', [[1, 2, 3, 4, 5], [2, 4]], 0, lambda o: [json.loads(i) for i in o.splitlines()])
+
     def testFilterByClosure(self):
         runTest(self, 'filter_closure.asm', [[1, 2, 3, 4, 5], [2, 4]], 0, lambda o: [json.loads(i) for i in o.splitlines()])
 
