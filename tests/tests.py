@@ -529,21 +529,7 @@ class FunctionTests(unittest.TestCase):
     PATH = './sample/asm/functions'
 
     def testBasicFunctionSupport(self):
-        name = 'definition.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        assemble(assembly_path, compiled_path)
-        excode, output = run(compiled_path)
-        self.assertEqual('42', output.strip())
-        self.assertEqual(0, excode)
-        # for now disassembler can't figure out what function is used as main
-        # disasm_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.dis.asm'.format(self.PATH[2:].replace('/', '_'), name))
-        # compiled_disasm_path = '{0}.bin'.format(disasm_path)
-        # disassemble(compiled_path, disasm_path)
-        # assemble(disasm_path, compiled_disasm_path)
-        # dis_excode, dis_output = run(compiled_disasm_path)
-        # self.assertEqual(output.strip(), dis_output.strip())
-        # self.assertEqual(excode, dis_excode)
+        runTest(self, 'definition.asm', 42, 0, lambda o: int(o.strip()))
 
     def testNestedFunctionCallSupport(self):
         runTestReturnsIntegers(self, 'nested_calls.asm', [2015, 1995, 69, 42])
