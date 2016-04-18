@@ -50,29 +50,6 @@ byte* Process::oppamv(byte* addr) {
     return addr;
 }
 
-byte* Process::opparef(byte* addr) {
-    /** Run paref instruction.
-     */
-    int parameter_no_operand_index = viua::operand::getInteger(viua::operand::extract(addr).get(), this);
-
-    if (unsigned(parameter_no_operand_index) >= frame_new->args->size()) {
-        throw new Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
-    }
-
-    int object_operand_index = viua::operand::getInteger(viua::operand::extract(addr).get(), this);
-
-    Type* object = uregset->at(object_operand_index);
-    Reference* rf = dynamic_cast<Reference*>(object);
-    if (rf == nullptr) {
-        rf = new Reference(object);
-        uregset->empty(object_operand_index);
-        uregset->set(object_operand_index, rf);
-    }
-    frame_new->args->set(parameter_no_operand_index, rf);
-
-    return addr;
-}
-
 byte* Process::oparg(byte* addr) {
     /** Run arg instruction.
      */

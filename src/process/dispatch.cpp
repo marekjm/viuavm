@@ -190,9 +190,6 @@ byte* Process::dispatch(byte* addr) {
         case PAMV:
             addr = oppamv(addr+1);
             break;
-        case PAREF:
-              addr = opparef(addr+1);
-            break;
         case ARG:
               addr = oparg(addr+1);
             break;

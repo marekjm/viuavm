@@ -191,7 +191,6 @@ class Process {
     byte* opframe(byte*);
     byte* opparam(byte*);
     byte* oppamv(byte*);
-    byte* opparef(byte*);
     byte* oparg(byte*);
     byte* opargc(byte*);
 
