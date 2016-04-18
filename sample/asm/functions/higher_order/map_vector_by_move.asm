@@ -74,7 +74,7 @@
 
     print 1
 
-    frame ^[(param 0 (function 3 square)) (param 1 1)]
+    frame ^[(param 0 (function 3 square)) (pamv 1 1)]
     print (call 4 map)
 
     izero 0
