@@ -504,9 +504,6 @@ class SampleProgramsTests(unittest.TestCase):
     def testLooping(self):
         runTestReturnsIntegers(self, 'looping.asm', [i for i in range(0, 11)])
 
-    def testReferences(self):
-        runTestReturnsIntegers(self, 'refs.asm', [2, 16])
-
     def testRegisterReferencesInIntegerOperands(self):
         runTestReturnsIntegers(self, 'registerref.asm', [16, 1, 1, 16])
 
