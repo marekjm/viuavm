@@ -96,7 +96,6 @@ class Program {
 
     Program& opmove       (int_op, int_op);
     Program& opcopy       (int_op, int_op);
-    Program& opref        (int_op, int_op);
     Program& opptr      (int_op, int_op);
     Program& opswap       (int_op, int_op);
     Program& opress       (std::string);
