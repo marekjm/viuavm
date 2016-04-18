@@ -517,6 +517,13 @@ class SampleProgramsTests(unittest.TestCase):
         """
         runTest(self, 'factorial.asm', '40320')
 
+    def testCalculatingFactorialPassingAccumulatorByMove(self):
+        """The code that is tested by this unit is not the best implementation of factorial calculation.
+        However, it tests passing parameters by value and by reference;
+        so we got that going for us what is nice.
+        """
+        runTest(self, 'factorial_accumulator_by_move.asm', '40320')
+
     def testIterativeFibonacciNumbers(self):
         """45. Fibonacci number calculated iteratively.
         """

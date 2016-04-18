@@ -1,6 +1,9 @@
 .function: factorial
     .name: 1 number
     .name: 2 result
+    ; multiply "result" (reference) by "number" (copy)
+    ; and store the resulting integer in "result"
+    ; calculation is available outside of the local scope
     imul result (arg result 1) (arg number 0)
     idec number
 
@@ -8,7 +11,9 @@
     ; finish "factorial" calls
     branch (ieq 4 number (istore 3 0)) finish
 
-    frame ^[(param 0 number) (param 1 result)]
+    ; this frame must be the same as in "main"
+    ; result must still be a reference
+    frame ^[(param 0 number) (pamv 1 result)]
     call result factorial
 
     .mark: finish
@@ -28,7 +33,7 @@
     ; * first is a copy of the number
     ; * second is a reference to result register
     ;   because we want to display it here, after calls to factorial are finished
-    frame ^[(param 0 number) (param 1 result)]
+    frame ^[(param 0 number) (pamv 1 result)]
     call result factorial
 
     ; print result
