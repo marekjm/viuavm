@@ -508,18 +508,6 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* opref(byte* addr_ptr, int_op a, int_op b) {
-            /*  Inserts ref instruction to bytecode.
-             *
-             *  :params:
-             *
-             *  a - register number
-             *  b - register number
-             */
-            addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, REF, a, b);
-            return addr_ptr;
-        }
-
         byte* opptr(byte* addr_ptr, int_op a, int_op b) {
             addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, PTR, a, b);
             return addr_ptr;
