@@ -36,6 +36,7 @@ how to enclose values in them.
 Vector and object modifications have move semantics now (copy semantics must be
 implemented in user code).
 
+- bic: `PAREF` and `REF` instructions removed, references made an internal tool of the VM,
 - feature: `ENCLOSECOPY` instruction for enclosing objects in closures by copying them,
 - feature: `ENCLOSEMOVE` instruction for enclosing objects in closures by moving them
   inside the closure,
