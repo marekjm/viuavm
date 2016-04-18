@@ -67,6 +67,7 @@ implemented in user code).
   are not manually deleted before the foreign library is closed - readonly resources (e.g. `vtable`s) of
   foreign library (`.so`) were being made unavailable but machine still wanted to access them when
   deleting objects,
+- bic: `PARAM` immediately copies parameters into a frame, not when they are accessed;
 
 
 ----

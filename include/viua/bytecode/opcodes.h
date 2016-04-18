@@ -101,6 +101,7 @@ enum OPCODE : byte {
     PARAM,  // copy object from a register to parameter register (pass-by-value),
     PAMV,   // move object from a register to parameter register (pass-by-move),
     CALL,   // call given function with parameters set in parameter register,
+    TAILCALL,   // perform a tail call to a function
     ARG,    // move an object from argument register to a normal register (inside a function call),
     ARGC,   // store number of supplied parameters in a register
     PROCESS, // spawn a process (call a function and run it in a different process)

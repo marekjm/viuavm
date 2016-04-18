@@ -482,6 +482,9 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             }
 
             program.opcall(assembler::operands::getint(resolveregister(reg, names)), fn_name);
+        } else if (str::startswith(line, "tailcall")) {
+            string fn_name = str::chunk(operands);
+            program.optailcall(fn_name);
         } else if (str::startswith(line, "process")) {
             string fn_name, reg;
             tie(reg, fn_name) = assembler::operands::get2(operands);

@@ -59,7 +59,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         oss << fn_name;
         bptr += fn_name.size();
         ++bptr; // for null character terminating the C-style string not included in std::string
-    } else if ((op == IMPORT) or (op == ENTER) or (op == LINK) or (op == WATCHDOG)) {
+    } else if ((op == IMPORT) or (op == ENTER) or (op == LINK) or (op == WATCHDOG) or (op == TAILCALL)) {
         oss << " ";
         string s = string(reinterpret_cast<char*>(bptr));
         oss << (op == IMPORT ? str::enquote(s) : s);

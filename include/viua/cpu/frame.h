@@ -8,7 +8,6 @@
 #include "registerset.h"
 
 class Frame {
-        bool deallocate_arguments;
         bool owns_local_register_set;
     public:
         byte* return_address;
@@ -22,11 +21,9 @@ class Frame {
 
         inline byte* ret_address() { return return_address; }
 
-        void captureArguments();
         void setLocalRegisterSet(RegisterSet*, bool receives_ownership = true);
 
         Frame(byte* ra, long unsigned argsize, long unsigned regsize = 16):
-            deallocate_arguments(false),
             owns_local_register_set(true),
             return_address(ra),
             args(nullptr), regset(nullptr),
@@ -42,13 +39,9 @@ class Frame {
             // FIXME: oh, and the arguments too, while you're at it!
         }
         ~Frame() {
-            // drop all pointers in arguments registers set
-            // to prevent double deallocation
-            if (not deallocate_arguments) {
-                args->drop();
+            if (args != nullptr) {
+                delete args;
             }
-
-            delete args;
 
             if (owns_local_register_set) {
                 delete regset;

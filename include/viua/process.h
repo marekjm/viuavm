@@ -91,6 +91,7 @@ class Process {
     TryFrame* requestNewTryFrame();
     void pushFrame();
     void dropFrame();
+    byte* adjustJumpBaseFor(const std::string&);
     // call native (i.e. written in Viua) function
     byte* callNative(byte*, const std::string&, const bool&, const int&, const std::string&);
     // call foreign (i.e. from a C++ extension) function
@@ -194,6 +195,7 @@ class Process {
     byte* opargc(byte*);
 
     byte* opcall(byte*);
+    byte* optailcall(byte*);
     byte* opprocess(byte*);
     byte* opjoin(byte*);
     byte* opreceive(byte*);

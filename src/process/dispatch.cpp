@@ -196,6 +196,9 @@ byte* Process::dispatch(byte* addr) {
         case CALL:
               addr = opcall(addr+1);
             break;
+        case TAILCALL:
+              addr = optailcall(addr+1);
+            break;
         case PROCESS:
             addr = opprocess(addr+1);
             break;

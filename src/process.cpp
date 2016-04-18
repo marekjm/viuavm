@@ -160,7 +160,7 @@ void Process::dropFrame() {
     }
 }
 
-byte* Process::callNative(byte* return_address, const string& call_name, const bool& return_ref, const int& return_index, const string& real_call_name) {
+byte* Process::adjustJumpBaseFor(const string& call_name) {
     byte* call_address = nullptr;
     if (cpu->function_addresses.count(call_name)) {
         call_address = cpu->bytecode+(cpu->function_addresses.at(call_name));
@@ -169,6 +169,10 @@ byte* Process::callNative(byte* return_address, const string& call_name, const b
         call_address = cpu->linked_functions.at(call_name).second;
         jump_base = cpu->linked_modules.at(cpu->linked_functions.at(call_name).first).second;
     }
+    return call_address;
+}
+byte* Process::callNative(byte* return_address, const string& call_name, const bool& return_ref, const int& return_index, const string& real_call_name) {
+    byte* call_address = adjustJumpBaseFor(call_name);
 
     if (frame_new == nullptr) {
         throw new Exception("function call without first_operand_index frame: use `frame 0' in source code if the function takes no parameters");

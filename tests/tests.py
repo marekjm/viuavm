@@ -521,6 +521,9 @@ class SampleProgramsTests(unittest.TestCase):
         """
         runTest(self, 'factorial_accumulator_by_move.asm', '40320')
 
+    def testCalculatingFactorialUsingTailcalls(self):
+        runTest(self, 'factorial_tailcall.asm', '40320')
+
     def testIterativeFibonacciNumbers(self):
         """45. Fibonacci number calculated iteratively.
         """

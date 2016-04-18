@@ -123,6 +123,7 @@ class Program {
     Program& opargc       (int_op);
 
     Program& opcall       (int_op, const std::string&);
+    Program& optailcall   (const std::string&);
     Program& opprocess   (int_op, const std::string&);
     Program& opjoin   (int_op, int_op);
     Program& opreceive(int_op);

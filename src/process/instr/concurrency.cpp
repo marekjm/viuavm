@@ -31,8 +31,6 @@ byte* Process::opprocess(byte* addr) {
         }
     }
 
-    frame_new->captureArguments();
-
     frame_new->function_name = call_name;
     place(target, new ProcessType(cpu->spawn(frame_new, this)));
     frame_new = nullptr;
@@ -109,8 +107,6 @@ byte* Process::opwatchdog(byte* addr) {
             uregset->unflag(i, PASSED);
         }
     }
-
-    frame_new->captureArguments();
 
     frame_new->function_name = call_name;
     cpu->spawnWatchdog(frame_new);
