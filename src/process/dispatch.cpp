@@ -130,9 +130,6 @@ byte* Process::dispatch(byte* addr) {
         case COPY:
             addr = opcopy(addr+1);
             break;
-        case REF:
-            addr = opref(addr+1);
-            break;
         case PTR:
             addr = opptr(addr+1);
             break;

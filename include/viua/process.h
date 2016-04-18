@@ -166,7 +166,6 @@ class Process {
 
     byte* opmove(byte*);
     byte* opcopy(byte*);
-    byte* opref(byte*);
     byte* opptr(byte*);
     byte* opswap(byte*);
     byte* opdelete(byte*);
