@@ -28,7 +28,7 @@
     istore 1 5
     function 2 square
 
-    frame ^[(param 0 2) (param 1 1)]
+    frame ^[(param 0 2) (pamv 1 1)]
     print (call 3 apply)
 
     izero 0

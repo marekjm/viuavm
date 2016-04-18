@@ -585,6 +585,9 @@ class HigherOrderFunctionTests(unittest.TestCase):
     def testApply(self):
         runTest(self, 'apply.asm', '25')
 
+    def testApplyByMove(self):
+        runTest(self, 'apply_by_move.asm', '25')
+
     def testInvoke(self):
         runTestSplitlines(self, 'invoke.asm', ['42', '42'])
 
