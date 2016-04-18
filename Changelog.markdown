@@ -68,6 +68,7 @@ implemented in user code).
   foreign library (`.so`) were being made unavailable but machine still wanted to access them when
   deleting objects,
 - bic: `PARAM` immediately copies parameters into a frame, not when they are accessed;
+- feature: new `TAILCALL` instruction,
 
 
 ----
