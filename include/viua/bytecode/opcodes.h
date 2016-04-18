@@ -74,7 +74,6 @@ enum OPCODE : byte {
     // register manipulation
     MOVE,   // move an object from one register to another
     COPY,   // copy an object from one register to another
-    REF,    // create a reference to an object
     PTR,    // create a pointer to an object
     SWAP,   // swap two objects between registers
     DELETE, // delete an object from a register, freeing the memory
@@ -98,10 +97,9 @@ enum OPCODE : byte {
     FCALL,
 
     // Opcodes related to functions.
-    FRAME,  // create new frame (required before param and paref) for future function call
+    FRAME,  // create new frame (required before param and pamv) for future function call
     PARAM,  // copy object from a register to parameter register (pass-by-value),
     PAMV,   // move object from a register to parameter register (pass-by-move),
-    PAREF,  // create a reference to an object in a parameter register (pass-by-reference),
     CALL,   // call given function with parameters set in parameter register,
     TAILCALL,   // perform a tail call to a function
     ARG,    // move an object from argument register to a normal register (inside a function call),

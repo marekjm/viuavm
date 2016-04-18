@@ -436,18 +436,6 @@ Program& Program::opcopy(int_op a, int_op b) {
     return (*this);
 }
 
-Program& Program::opref(int_op a, int_op b) {
-    /*  Inserts ref instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  a - register number
-     *  b - register number
-     */
-    addr_ptr = cg::bytecode::opref(addr_ptr, a, b);
-    return (*this);
-}
-
 Program& Program::opptr(int_op a, int_op b) {
     addr_ptr = cg::bytecode::opptr(addr_ptr, a, b);
     return (*this);
@@ -600,18 +588,6 @@ Program& Program::oppamv(int_op a, int_op b) {
      *  b - register number
      */
     addr_ptr = cg::bytecode::oppamv(addr_ptr, a, b);
-    return (*this);
-}
-
-Program& Program::opparef(int_op a, int_op b) {
-    /*  Inserts paref instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  a - register number
-     *  b - register number
-     */
-    addr_ptr = cg::bytecode::opparef(addr_ptr, a, b);
     return (*this);
 }
 

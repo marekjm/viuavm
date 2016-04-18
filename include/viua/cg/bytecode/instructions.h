@@ -67,7 +67,6 @@ namespace cg {
 
         byte* opmove(byte*, int_op, int_op);
         byte* opcopy(byte*, int_op, int_op);
-        byte* opref(byte*, int_op, int_op);
         byte* opptr(byte*, int_op, int_op);
         byte* opswap(byte*, int_op, int_op);
         byte* opdelete(byte*, int_op);
@@ -90,7 +89,6 @@ namespace cg {
         byte* opframe(byte*, int_op, int_op);
         byte* opparam(byte*, int_op, int_op);
         byte* oppamv(byte*, int_op, int_op);
-        byte* opparef(byte*, int_op, int_op);
         byte* oparg(byte*, int_op, int_op);
         byte* opargc(byte*, int_op);
         byte* opcall(byte*, int_op, const std::string&);

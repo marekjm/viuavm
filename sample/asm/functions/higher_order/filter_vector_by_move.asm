@@ -71,7 +71,7 @@
 
     print 1
 
-    frame ^[(param 0 (function 3 is_divisible_by_2)) (param 1 1)]
+    frame ^[(param 0 (function 3 is_divisible_by_2)) (pamv 1 1)]
     print (call 4 filter)
 
     izero 0

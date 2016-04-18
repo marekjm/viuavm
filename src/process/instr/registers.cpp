@@ -24,39 +24,6 @@ byte* Process::opcopy(byte* addr) {
 
     return addr;
 }
-byte* Process::opref(byte* addr) {
-    /** Run ref instruction.
-     *  Create object_operand_index reference (implementation detail: copy object_operand_index pointer) of an object in one register in
-     *  another register.
-     */
-    int object_operand_index, destination_register_index;
-    bool object_operand_ref = false, destination_register_ref = false;
-
-    viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
-    viua::cpu::util::extractIntegerOperand(addr, object_operand_ref, object_operand_index);
-
-    if (object_operand_ref) {
-        object_operand_index = static_cast<Integer*>(fetch(object_operand_index))->value();
-    }
-    if (destination_register_ref) {
-        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
-    }
-
-    Type* object = uregset->at(object_operand_index);
-    Reference* rf = nullptr;
-    if (dynamic_cast<Reference*>(object)) {
-        //cout << "thou shalt not reference references!" << endl;
-        rf = static_cast<Reference*>(object)->copy();
-        uregset->set(destination_register_index, rf);
-    } else {
-        rf = new Reference(object);
-        uregset->empty(object_operand_index);
-        uregset->set(object_operand_index, rf);
-        uregset->set(destination_register_index, rf->copy());
-    }
-
-    return addr;
-}
 byte* Process::opptr(byte* addr) {
     int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 

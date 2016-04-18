@@ -96,7 +96,6 @@ class Program {
 
     Program& opmove       (int_op, int_op);
     Program& opcopy       (int_op, int_op);
-    Program& opref        (int_op, int_op);
     Program& opptr      (int_op, int_op);
     Program& opswap       (int_op, int_op);
     Program& opress       (std::string);
@@ -120,7 +119,6 @@ class Program {
     Program& opframe      (int_op, int_op);
     Program& opparam      (int_op, int_op);
     Program& oppamv     (int_op, int_op);
-    Program& opparef      (int_op, int_op);
     Program& oparg        (int_op, int_op);
     Program& opargc       (int_op);
 

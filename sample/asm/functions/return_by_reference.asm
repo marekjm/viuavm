@@ -1,5 +1,5 @@
 .function: by_reference
-    arg 0 0
+    move 0 1
     return
 .end
 
@@ -7,14 +7,16 @@
     ; store a number in register
     istore 1 69
 
-    ; pass it by reference to the function
-    frame ^[(paref 0 1)]
+    ; create a closure and enclose a value by reference
+    closure 2 by_reference
+    enclose 2 1 1
 
+    frame 0
     ; store return value in another register (it is a reference!)
-    call 2 by_reference
+    fcall 3 2
 
     ; assign different value to it
-    istore 2 42
+    istore 3 42
 
     ; check if return-by-reference is working (should print 42)
     print 1

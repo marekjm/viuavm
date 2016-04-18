@@ -167,7 +167,6 @@ class Process {
 
     byte* opmove(byte*);
     byte* opcopy(byte*);
-    byte* opref(byte*);
     byte* opptr(byte*);
     byte* opswap(byte*);
     byte* opdelete(byte*);
@@ -192,7 +191,6 @@ class Process {
     byte* opframe(byte*);
     byte* opparam(byte*);
     byte* oppamv(byte*);
-    byte* opparef(byte*);
     byte* oparg(byte*);
     byte* opargc(byte*);
 

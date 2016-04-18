@@ -72,7 +72,6 @@ const std::map<std::string, unsigned> OP_SIZES = {
 
     { "move",   sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
     { "copy",   sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
-    { "ref",    sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
     { "ptr",    sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
     { "swap",   sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
     { "delete", sizeof(byte) + sizeof(OperandType) + sizeof(int) },
@@ -96,7 +95,6 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "frame",  sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
     { "param",  sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
     { "pamv",   sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
-    { "paref",  sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
     { "call",   sizeof(byte) + sizeof(OperandType) + sizeof(int) },
     { "tailcall", sizeof(byte) },
     { "arg",    sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
@@ -196,7 +194,6 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
 
     { MOVE,     "move" },
     { COPY,     "copy" },
-    { REF,      "ref" },
     { PTR,      "ptr" },
     { SWAP,     "swap" },
     { DELETE,   "delete" },
@@ -220,7 +217,6 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { FRAME,    "frame" },
     { PARAM,    "param" },
     { PAMV,     "pamv" },
-    { PAREF,    "paref" },
     { CALL,     "call" },
     { TAILCALL, "tailcall" },
     { ARG,      "arg" },

@@ -1,22 +1,31 @@
-.function: is_divisible_by_2
+.function: is_divisible_by
+    .name: 2 bound_variable
     arg 1 0
-    istore 2 2
 
     .mark: loop_begin
-    branch (ilt 3 1 2) loop_end +1
+    branch (ilt 3 1 bound_variable) loop_end loop_body
 
-    isub 1 1 2
+    .mark: loop_body
+    isub 1 1 bound_variable
     jump loop_begin
+
+    .mark: loop_end
 
     ; make zero "true" and
     ; non-zero values "false"
-    .mark: loop_end
-    not (move 0 1)
-
+    ; FIXME: find out why `not (move 0 1)` causes memory leak
+    not (copy 0 1)
     return
 .end
 
-.function: filter
+.function: is_divisible_by_2
+    closure 1 is_divisible_by
+    enclose 1 2 (arg 2 0)
+    move 0 1
+    return
+.end
+
+.function: filter_closure
     ; classic filter() function
     ; it takes two arguments:
     ;   * a filtering function,
@@ -34,15 +43,16 @@
 
     ; while (...) {
     .mark: loop_begin
-    branch (igte 6 4 5) loop_end +1
+    branch (igte 6 4 5) loop_end
 
     ; call filtering function to determine whether current element
-    ; is a valid value...
-    frame ^[(param 0 (vat 7 2 @4))]
+    ; is a valid value
+    frame ^[(param 0 (vat 7 2 @4))] 0
+    fcall 8 1
 
-    ; ...and if the result from filtering function was "true" - the element should be pushed onto result vector
+    ; if the result from filtering function was "true" - the element should be pushed onto result vector
     ; it it was "false" - skip to next iteration
-    branch (fcall 8 1) element_ok next_iter
+    branch 8 element_ok next_iter
 
     .mark: element_ok
     vpush 3 7
@@ -71,8 +81,11 @@
 
     print 1
 
-    frame ^[(param 0 (function 3 is_divisible_by_2)) (param 1 1)]
-    print (call 4 filter)
+    frame ^[(param 0 (istore 5 2))]
+    call 3 is_divisible_by_2
+
+    frame ^[(param 0 3) (pamv 1 1)]
+    print (call 4 filter_closure)
 
     izero 0
     return

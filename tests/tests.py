@@ -504,9 +504,6 @@ class SampleProgramsTests(unittest.TestCase):
     def testLooping(self):
         runTestReturnsIntegers(self, 'looping.asm', [i for i in range(0, 11)])
 
-    def testReferences(self):
-        runTestReturnsIntegers(self, 'refs.asm', [2, 16])
-
     def testRegisterReferencesInIntegerOperands(self):
         runTestReturnsIntegers(self, 'registerref.asm', [16, 1, 1, 16])
 
@@ -516,6 +513,13 @@ class SampleProgramsTests(unittest.TestCase):
         so we got that going for us what is nice.
         """
         runTest(self, 'factorial.asm', '40320')
+
+    def testCalculatingFactorialPassingAccumulatorByMove(self):
+        """The code that is tested by this unit is not the best implementation of factorial calculation.
+        However, it tests passing parameters by value and by reference;
+        so we got that going for us what is nice.
+        """
+        runTest(self, 'factorial_accumulator_by_move.asm', '40320')
 
     def testIterativeFibonacciNumbers(self):
         """45. Fibonacci number calculated iteratively.
@@ -529,21 +533,7 @@ class FunctionTests(unittest.TestCase):
     PATH = './sample/asm/functions'
 
     def testBasicFunctionSupport(self):
-        name = 'definition.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        assemble(assembly_path, compiled_path)
-        excode, output = run(compiled_path)
-        self.assertEqual('42', output.strip())
-        self.assertEqual(0, excode)
-        # for now disassembler can't figure out what function is used as main
-        # disasm_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.dis.asm'.format(self.PATH[2:].replace('/', '_'), name))
-        # compiled_disasm_path = '{0}.bin'.format(disasm_path)
-        # disassemble(compiled_path, disasm_path)
-        # assemble(disasm_path, compiled_disasm_path)
-        # dis_excode, dis_output = run(compiled_disasm_path)
-        # self.assertEqual(output.strip(), dis_output.strip())
-        # self.assertEqual(excode, dis_excode)
+        runTest(self, 'definition.asm', 42, 0, lambda o: int(o.strip()))
 
     def testNestedFunctionCallSupport(self):
         runTestReturnsIntegers(self, 'nested_calls.asm', [2015, 1995, 69, 42])
@@ -585,17 +575,29 @@ class HigherOrderFunctionTests(unittest.TestCase):
     def testApply(self):
         runTest(self, 'apply.asm', '25')
 
+    def testApplyByMove(self):
+        runTest(self, 'apply_by_move.asm', '25')
+
     def testInvoke(self):
         runTestSplitlines(self, 'invoke.asm', ['42', '42'])
 
     def testMap(self):
         runTest(self, 'map.asm', [[1, 2, 3, 4, 5], [1, 4, 9, 16, 25]], 0, lambda o: [json.loads(i) for i in o.splitlines()])
 
+    def testMapVectorByMove(self):
+        runTest(self, 'map_vector_by_move.asm', [[1, 2, 3, 4, 5], [1, 4, 9, 16, 25]], 0, lambda o: [json.loads(i) for i in o.splitlines()])
+
     def testFilter(self):
         runTest(self, 'filter.asm', [[1, 2, 3, 4, 5], [2, 4]], 0, lambda o: [json.loads(i) for i in o.splitlines()])
 
+    def testFilterVectorByMove(self):
+        runTest(self, 'filter_vector_by_move.asm', [[1, 2, 3, 4, 5], [2, 4]], 0, lambda o: [json.loads(i) for i in o.splitlines()])
+
     def testFilterByClosure(self):
         runTest(self, 'filter_closure.asm', [[1, 2, 3, 4, 5], [2, 4]], 0, lambda o: [json.loads(i) for i in o.splitlines()])
+
+    def testFilterByClosureVectorByMove(self):
+        runTest(self, 'filter_closure_vector_by_move.asm', [[1, 2, 3, 4, 5], [2, 4]], 0, lambda o: [json.loads(i) for i in o.splitlines()])
 
 
 class ClosureTests(unittest.TestCase):
