@@ -26,7 +26,7 @@
 
     nop
 
-    ; reuse the pointer created before
+    ; reuse the pointer created earlier
     frame ^[(param 0 2)]
     msg 3 joinable
     print 3
