@@ -21,12 +21,13 @@
     nop
     nop
 
-    frame ^[(paref 0 1)]
+    frame ^[(param 0 (ptr 2 1))]
     msg 0 detach
 
     nop
 
-    frame ^[(paref 0 1)]
+    ; reuse the pointer created before
+    frame ^[(param 0 2)]
     msg 3 joinable
     print 3
 
