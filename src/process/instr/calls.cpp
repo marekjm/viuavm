@@ -28,7 +28,7 @@ byte* Process::opparam(byte* addr) {
         throw new Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
     }
     uregset->flag(source, PASSED);
-    frame_new->args->set(parameter_no_operand_index, fetch(source));
+    frame_new->args->set(parameter_no_operand_index, fetch(source)->copy());
     frame_new->args->clear(parameter_no_operand_index);
 
     return addr;
