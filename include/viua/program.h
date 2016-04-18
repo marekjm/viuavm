@@ -120,7 +120,6 @@ class Program {
     Program& opframe      (int_op, int_op);
     Program& opparam      (int_op, int_op);
     Program& oppamv     (int_op, int_op);
-    Program& opparef      (int_op, int_op);
     Program& oparg        (int_op, int_op);
     Program& opargc       (int_op);
 
