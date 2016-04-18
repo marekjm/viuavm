@@ -74,7 +74,6 @@ enum OPCODE : byte {
     // register manipulation
     MOVE,   // move an object from one register to another
     COPY,   // copy an object from one register to another
-    REF,    // create a reference to an object
     PTR,    // create a pointer to an object
     SWAP,   // swap two objects between registers
     DELETE, // delete an object from a register, freeing the memory
