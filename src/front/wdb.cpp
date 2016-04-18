@@ -258,7 +258,6 @@ tuple<bool, string> if_watchpoint_local_register_write(CPU& cpu, const State& st
         opcode == ECHO or
         opcode == FRAME or
         opcode == PARAM or
-        opcode == PAREF or
         opcode == CALL or
         opcode == JUMP or
         opcode == BRANCH or
@@ -370,7 +369,6 @@ tuple<bool, string> if_watchpoint_global_register_write(CPU& cpu, const State& s
         opcode == ECHO or
         opcode == FRAME or
         opcode == PARAM or
-        opcode == PAREF or
         opcode == CALL or
         opcode == JUMP or
         opcode == BRANCH or
