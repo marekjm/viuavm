@@ -708,18 +708,6 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* opparef(byte* addr_ptr, int_op a, int_op b) {
-            /*  Inserts paref instruction to bytecode.
-             *
-             *  :params:
-             *
-             *  a - register number
-             *  b - register number
-             */
-            addr_ptr = insertTwoIntegerOpsInstruction(addr_ptr, PAREF, a, b);
-            return addr_ptr;
-        }
-
         byte* oparg(byte* addr_ptr, int_op a, int_op b) {
             /*  Inserts arg instruction to bytecode.
              *

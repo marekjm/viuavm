@@ -90,7 +90,6 @@ namespace cg {
         byte* opframe(byte*, int_op, int_op);
         byte* opparam(byte*, int_op, int_op);
         byte* oppamv(byte*, int_op, int_op);
-        byte* opparef(byte*, int_op, int_op);
         byte* oparg(byte*, int_op, int_op);
         byte* opargc(byte*, int_op);
         byte* opcall(byte*, int_op, const std::string&);
