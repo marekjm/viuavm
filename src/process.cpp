@@ -171,11 +171,11 @@ byte* Process::adjustJumpBaseFor(const string& call_name) {
     }
     return call_address;
 }
-byte* Process::callNative(byte* return_address, const string& call_name, const bool& return_ref, const int& return_index, const string& real_call_name) {
+byte* Process::callNative(byte* return_address, const string& call_name, const bool& return_ref, const int& return_index, const string&) {
     byte* call_address = adjustJumpBaseFor(call_name);
 
     if (frame_new == nullptr) {
-        throw new Exception("function call without first_operand_index frame: use `frame 0' in source code if the function takes no parameters");
+        throw new Exception("function call without a frame: use `frame 0' in source code if the function takes no parameters");
     }
     // set function name and return address
     frame_new->function_name = call_name;
