@@ -101,7 +101,6 @@
 
 .function: main
     link std::misc
-    link std::functional
 
     frame 0
     watchdog watchdog_process
