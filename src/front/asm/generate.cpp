@@ -817,7 +817,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         }
     }
     if (not main_is_defined and (DEBUG or VERBOSE) and not flags.as_lib) {
-        cout << "notice: main function (" << main_function << ") is not defined, deferring main function check to post-link phase" << endl;
+        cout << "notice: main function (" << main_function << ") is not defined in " << filename << ", deferring main function check to post-link phase" << endl;
     }
 
 
