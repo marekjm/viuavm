@@ -182,7 +182,7 @@ string assembler::verify::ressInstructions(const vector<string>& lines, const ma
     return report.str();
 }
 
-string assembler::verify::functionBodiesAreNonempty(const vector<string>& lines, map<string, vector<string> >& functions) {
+string assembler::verify::functionBodiesAreNonempty(map<string, vector<string> >& functions) {
     ostringstream report("");
     string line;
     for (auto function : functions) {

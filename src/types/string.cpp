@@ -137,8 +137,8 @@ void String::format(Frame* frame, RegisterSet*, RegisterSet*) {
 }
 
 void String::substr(Frame* frame, RegisterSet*, RegisterSet*) {
-    int begin = 0;
-    int end = -1;
+    long begin = 0;
+    long end = -1;
 
     assert_arity(frame, 1ul, 2ul, 3ul);
 
@@ -164,9 +164,10 @@ void String::concatenate(Frame* frame, RegisterSet*, RegisterSet*) {
     frame->regset->set(0, new String(static_cast<String*>(frame->args->at(0))->value() + static_cast<String*>(frame->args->at(1))->value()));
 }
 
-void String::join(Frame* frame, RegisterSet*, RegisterSet*) {
+void String::join(Frame*, RegisterSet*, RegisterSet*) {
+    // TODO: implement
 }
 
 void String::size(Frame* frame, RegisterSet*, RegisterSet*) {
-    frame->regset->set(0, new Integer(svalue.size()));
+    frame->regset->set(0, new Integer(static_cast<int>(svalue.size())));
 }

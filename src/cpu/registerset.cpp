@@ -10,13 +10,13 @@
 using namespace std;
 
 
-Type* RegisterSet::put(unsigned index, Type* object) {
+Type* RegisterSet::put(registerset_size_type index, Type* object) {
     if (index >= registerset_size) { throw new Exception("register access out of bounds: write"); }
     registers[index] = object;
     return object;
 }
 
-Type* RegisterSet::pop(unsigned index) {
+Type* RegisterSet::pop(registerset_size_type index) {
     /** Pop an object from the register.
      */
     Type* object = at(index);
@@ -24,7 +24,7 @@ Type* RegisterSet::pop(unsigned index) {
     return object;
 }
 
-Type* RegisterSet::set(unsigned index, Type* object) {
+Type* RegisterSet::set(registerset_size_type index, Type* object) {
     /** Put object inside register specified by given index.
      *
      *  Performs bounds checking.
@@ -43,7 +43,7 @@ Type* RegisterSet::set(unsigned index, Type* object) {
     return object;
 }
 
-Type* RegisterSet::get(unsigned index) {
+Type* RegisterSet::get(registerset_size_type index) {
     /** Fetch object from register specified by given index.
      *
      *  Performs bounds checking.
@@ -63,7 +63,7 @@ Type* RegisterSet::get(unsigned index) {
     return optr;
 }
 
-Type* RegisterSet::at(unsigned index) {
+Type* RegisterSet::at(registerset_size_type index) {
     /** Fetch object from register specified by given index.
      *
      *  Performs bounds checking.
@@ -78,7 +78,7 @@ Type* RegisterSet::at(unsigned index) {
 }
 
 
-void RegisterSet::move(unsigned src, unsigned dst) {
+void RegisterSet::move(registerset_size_type src, registerset_size_type dst) {
     /** Move an object from src register to dst register.
      *
      *  Performs bound checking.
@@ -89,7 +89,7 @@ void RegisterSet::move(unsigned src, unsigned dst) {
     set(dst, pop(src));
 }
 
-void RegisterSet::swap(unsigned src, unsigned dst) {
+void RegisterSet::swap(registerset_size_type src, registerset_size_type dst) {
     /** Swap objects in src and dst registers.
      *
      *  Performs bound checking.
@@ -106,7 +106,7 @@ void RegisterSet::swap(unsigned src, unsigned dst) {
     masks[dst] = tmp_mask;
 }
 
-void RegisterSet::empty(unsigned here) {
+void RegisterSet::empty(registerset_size_type here) {
     /** Empty a register.
      *
      *  Performs bound checking.
@@ -117,7 +117,7 @@ void RegisterSet::empty(unsigned here) {
     masks[here] = 0;
 }
 
-void RegisterSet::free(unsigned here) {
+void RegisterSet::free(registerset_size_type here) {
     /** Free an object inside a register.
      *
      *  Performs bound checking.
@@ -130,7 +130,7 @@ void RegisterSet::free(unsigned here) {
 }
 
 
-void RegisterSet::flag(unsigned index, mask_t filter) {
+void RegisterSet::flag(registerset_size_type index, mask_t filter) {
     /** Enable masks specified by filter for register at given index.
      *
      *  Performs bounds checking.
@@ -145,7 +145,7 @@ void RegisterSet::flag(unsigned index, mask_t filter) {
     masks[index] = (masks[index] | filter);
 }
 
-void RegisterSet::unflag(unsigned index, mask_t filter) {
+void RegisterSet::unflag(registerset_size_type index, mask_t filter) {
     /** Disable masks specified by filter for register at given index.
      *
      *  Performs bounds checking.
@@ -160,7 +160,7 @@ void RegisterSet::unflag(unsigned index, mask_t filter) {
     masks[index] = (masks[index] ^ filter);
 }
 
-void RegisterSet::clear(unsigned index) {
+void RegisterSet::clear(registerset_size_type index) {
     /** Clear masks for given register.
      *
      *  Performs bounds checking.
@@ -169,7 +169,7 @@ void RegisterSet::clear(unsigned index) {
     masks[index] = 0;
 }
 
-bool RegisterSet::isflagged(unsigned index, mask_t filter) {
+bool RegisterSet::isflagged(registerset_size_type index, mask_t filter) {
     /** Returns true if given filter is enabled for register specified by given index.
      *  Returns false otherwise.
      *
@@ -180,7 +180,7 @@ bool RegisterSet::isflagged(unsigned index, mask_t filter) {
     return (masks[index] & filter);
 }
 
-void RegisterSet::setmask(unsigned index, mask_t mask) {
+void RegisterSet::setmask(registerset_size_type index, mask_t mask) {
     /** Set mask for a register.
      *
      *  Performs bounds checking.
@@ -195,7 +195,7 @@ void RegisterSet::setmask(unsigned index, mask_t mask) {
     masks[index] = mask;
 }
 
-mask_t RegisterSet::getmask(unsigned index) {
+mask_t RegisterSet::getmask(registerset_size_type index) {
     /** Get mask of a register.
      *
      *  Performs bounds checking.

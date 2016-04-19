@@ -23,7 +23,6 @@ Type* Vector::push(Type* object) {
 }
 
 Type* Vector::pop(long int index) {
-    Type* ptr = internal_object.back();
     if (index < 0) { index = (internal_object.size()+index); }
     if ((index < 0) or (index >= static_cast<long int>(internal_object.size()) and index > 0)) {
         throw new OutOfRangeException("vector index out of range");

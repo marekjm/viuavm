@@ -8,7 +8,7 @@
 using namespace std;
 
 
-Type* viua::operand::Atom::resolve(Process* cpu) {
+Type* viua::operand::Atom::resolve(Process*) {
     throw new UnresolvedAtomException(atom);
     // just to satisfy the compiler, after the exception is not thrown unconditionally
     // return real object
@@ -19,7 +19,7 @@ Type* viua::operand::Atom::resolve(Process* cpu) {
 Type* viua::operand::RegisterIndex::resolve(Process* t) {
     return t->obtain(index);
 }
-unsigned viua::operand::RegisterIndex::get(Process* cpu) const {
+unsigned viua::operand::RegisterIndex::get(Process*) const {
     return index;
 }
 

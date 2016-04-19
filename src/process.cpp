@@ -188,7 +188,7 @@ byte* Process::callNative(byte* return_address, const string& call_name, const b
 
     return call_address;
 }
-byte* Process::callForeign(byte* return_address, const string& call_name, const bool& return_ref, const int& return_index, const string& real_call_name) {
+byte* Process::callForeign(byte* return_address, const string& call_name, const bool& return_ref, const int& return_index, const string&) {
     if (frame_new == nullptr) {
         throw new Exception("external function call without a frame: use `frame 0' in source code if the function takes no parameters");
     }
@@ -205,7 +205,7 @@ byte* Process::callForeign(byte* return_address, const string& call_name, const 
 
     return return_address;
 }
-byte* Process::callForeignMethod(byte* return_address, Type* object, const string& call_name, const bool& return_ref, const int& return_index, const string& real_call_name) {
+byte* Process::callForeignMethod(byte* return_address, Type* object, const string& call_name, const bool& return_ref, const int& return_index, const string&) {
     if (frame_new == nullptr) {
         throw new Exception("foreign method call without a frame");
     }

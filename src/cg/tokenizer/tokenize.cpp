@@ -7,7 +7,7 @@ vector<string> tokenize(const string& s) {
     vector<string> tokens;
     ostringstream token;
     token.str("");
-    for (unsigned i = 0; i < s.size(); ++i) {
+    for (long unsigned i = 0; i < s.size(); ++i) {
         if (s[i] == ' ' and token.str().size()) {
             tokens.push_back(token.str());
             token.str("");

@@ -68,7 +68,7 @@ void ProcessType::joinable(Frame* frame, RegisterSet*, RegisterSet*) {
     frame->regset->set(0, new Boolean(thrd->joinable()));
 }
 
-void ProcessType::detach(Frame* frame, RegisterSet*, RegisterSet*) {
+void ProcessType::detach(Frame*, RegisterSet*, RegisterSet*) {
     thrd->detach();
 }
 

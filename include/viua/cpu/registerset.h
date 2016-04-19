@@ -27,25 +27,25 @@ class RegisterSet {
 
     public:
         // basic access to registers
-        Type* put(unsigned, Type*);
-        Type* pop(unsigned);
-        Type* set(unsigned, Type*);
-        Type* get(unsigned);
-        Type* at(unsigned);
+        Type* put(registerset_size_type, Type*);
+        Type* pop(registerset_size_type);
+        Type* set(registerset_size_type, Type*);
+        Type* get(registerset_size_type);
+        Type* at(registerset_size_type);
 
         // register modifications
-        void move(unsigned, unsigned);
-        void swap(unsigned, unsigned);
-        void empty(unsigned);
-        void free(unsigned);
+        void move(registerset_size_type, registerset_size_type);
+        void swap(registerset_size_type, registerset_size_type);
+        void empty(registerset_size_type);
+        void free(registerset_size_type);
 
         // mask inspection and manipulation
-        void flag(unsigned, mask_t);
-        void unflag(unsigned, mask_t);
-        void clear(unsigned);
-        bool isflagged(unsigned, mask_t);
-        void setmask(unsigned, mask_t);
-        mask_t getmask(unsigned);
+        void flag(registerset_size_type, mask_t);
+        void unflag(registerset_size_type, mask_t);
+        void clear(registerset_size_type);
+        bool isflagged(registerset_size_type, mask_t);
+        void setmask(registerset_size_type, mask_t);
+        mask_t getmask(registerset_size_type);
 
         void drop();
         inline registerset_size_type size() { return registerset_size; }

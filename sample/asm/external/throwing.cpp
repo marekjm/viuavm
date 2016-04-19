@@ -9,7 +9,7 @@
 using namespace std;
 
 
-void throwing_oh_noes(Frame* frame, RegisterSet*, RegisterSet*) {
+void throwing_oh_noes(Frame*, RegisterSet*, RegisterSet*) {
     throw new Exception("OH NOES!");
 }
 
