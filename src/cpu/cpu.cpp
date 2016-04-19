@@ -216,7 +216,7 @@ Process* CPU::spawnWatchdog(Frame* frm) {
     return thrd;
 }
 void CPU::resurrectWatchdog() {
-    cout << "watchdog process terminated by: " << watchdog_process->getActiveException()->str() << endl;
+    cout << "watchdog process terminated by: " << watchdog_process->getActiveException()->type() << ": '" << watchdog_process->getActiveException()->str() << "'" << endl;
     Frame* frm = new Frame(nullptr, 0, watchdog_process->trace()[0]->regset->size());
     frm->function_name = watchdog_process->trace()[0]->function_name;
     delete watchdog_process->getActiveException();
