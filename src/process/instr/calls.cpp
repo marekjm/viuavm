@@ -27,7 +27,6 @@ byte* Process::opparam(byte* addr) {
     if (unsigned(parameter_no_operand_index) >= frame_new->args->size()) {
         throw new Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
     }
-    uregset->flag(source, PASSED);
     frame_new->args->set(parameter_no_operand_index, fetch(source)->copy());
     frame_new->args->clear(parameter_no_operand_index);
 
@@ -87,15 +86,6 @@ byte* Process::opcall(byte* addr) {
 
     string call_name = viua::operand::extractString(addr);
 
-    // clear PASSED flag
-    // since function calls are blocking, we can be sure that after the function returns
-    // we can safely overwrite all registers
-    for (unsigned i = 0; i < uregset->size(); ++i) {
-        if (uregset->at(i) != nullptr) {
-            uregset->unflag(i, PASSED);
-        }
-    }
-
     bool is_native = (cpu->function_addresses.count(call_name) or cpu->linked_functions.count(call_name));
     bool is_foreign = cpu->foreign_functions.count(call_name);
     bool is_foreign_method = cpu->foreign_methods.count(call_name);
@@ -126,15 +116,6 @@ byte* Process::optailcall(byte* addr) {
     /*  Run tailcall instruction.
      */
     string call_name = viua::operand::extractString(addr);
-
-    // clear PASSED flag
-    // since function calls are blocking, we can be sure that after the function returns
-    // we can safely overwrite all registers
-    for (unsigned i = 0; i < uregset->size(); ++i) {
-        if (uregset->at(i) != nullptr) {
-            uregset->unflag(i, PASSED);
-        }
-    }
 
     bool is_native = (cpu->function_addresses.count(call_name) or cpu->linked_functions.count(call_name));
     bool is_foreign = cpu->foreign_functions.count(call_name);

@@ -22,15 +22,6 @@ byte* Process::opprocess(byte* addr) {
         throw new Exception("call to undefined function: " + call_name);
     }
 
-    // clear PASSED flag
-    // since we copy all values when creating processes
-    // we can safely overwrite all registers after the process has launched
-    for (unsigned i = 0; i < uregset->size(); ++i) {
-        if (uregset->at(i) != nullptr) {
-            uregset->unflag(i, PASSED);
-        }
-    }
-
     frame_new->function_name = call_name;
     place(target, new ProcessType(cpu->spawn(frame_new, this)));
     frame_new = nullptr;
@@ -97,15 +88,6 @@ byte* Process::opwatchdog(byte* addr) {
     }
     if (not is_native) {
         throw new Exception("watchdog process must be native function, used foreign " + call_name);
-    }
-
-    // clear PASSED flag
-    // since we copy all values when creating processes
-    // we can safely overwrite all registers after the process has launched
-    for (unsigned i = 0; i < uregset->size(); ++i) {
-        if (uregset->at(i) != nullptr) {
-            uregset->unflag(i, PASSED);
-        }
     }
 
     frame_new->function_name = call_name;
