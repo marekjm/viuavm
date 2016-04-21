@@ -6,7 +6,7 @@
 using namespace std;
 
 
-void hello(Frame*, RegisterSet*, RegisterSet*) {
+void hello(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*) {
     cout << "Hello World!" << endl;
 }
 

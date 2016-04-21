@@ -8,6 +8,9 @@
 #include <viua/cpu/frame.h>
 
 
+class Process;
+class CPU;
+
 class Pointer: public Type {
         Type* points_to;
         bool valid;
@@ -20,7 +23,7 @@ class Pointer: public Type {
         void reset(Type* t);
         Type* to();
 
-        virtual void expired(Frame*, RegisterSet*, RegisterSet*);
+        virtual void expired(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
 
         std::string str() const override;
 

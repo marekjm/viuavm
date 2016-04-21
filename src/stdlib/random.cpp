@@ -27,7 +27,7 @@ float getrandom() {
     return rfloat;
 }
 
-void random_drandom(Frame* frame, RegisterSet*, RegisterSet*) {
+void random_drandom(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
     /** Return random integer.
      *
      *  Bytes are read from /dev/random random number device.
@@ -42,7 +42,7 @@ void random_drandom(Frame* frame, RegisterSet*, RegisterSet*) {
     frame->regset->set(0, new Integer(rint));
 }
 
-void random_durandom(Frame* frame, RegisterSet*, RegisterSet*) {
+void random_durandom(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
     /** Return random integer.
      *
      *  Bytes are read from /dev/urandom random number device.
@@ -59,13 +59,13 @@ void random_durandom(Frame* frame, RegisterSet*, RegisterSet*) {
     frame->regset->set(0, new Integer(rint));
 }
 
-void random_random(Frame* frame, RegisterSet*, RegisterSet*) {
+void random_random(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
     /** Return random float from range between 0.0 and 1.0.
      */
     frame->regset->set(0, new Float(getrandom()));
 }
 
-void random_randint(Frame* frame, RegisterSet*, RegisterSet*) {
+void random_randint(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
     /** Return random integer from selected range.
      *
      *  Requires two parameters: lower and upper bound.

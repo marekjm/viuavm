@@ -14,6 +14,7 @@
 
 // we only need a pointer so class declaration will be sufficient
 class Process;
+class CPU;
 
 
 class ProcessType : public Type {
@@ -26,17 +27,17 @@ class ProcessType : public Type {
         bool boolean() const;
         ProcessType* copy() const;
 
-        virtual void joinable(Frame*, RegisterSet*, RegisterSet*);
-        virtual void detach(Frame*, RegisterSet*, RegisterSet*);
+        virtual void joinable(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
+        virtual void detach(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
 
-        virtual void suspend(Frame*, RegisterSet*, RegisterSet*);
-        virtual void wakeup(Frame*, RegisterSet*, RegisterSet*);
-        virtual void suspended(Frame*, RegisterSet*, RegisterSet*);
+        virtual void suspend(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
+        virtual void wakeup(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
+        virtual void suspended(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
 
-        virtual void getPriority(Frame*, RegisterSet*, RegisterSet*);
-        virtual void setPriority(Frame*, RegisterSet*, RegisterSet*);
+        virtual void getPriority(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
+        virtual void setPriority(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
 
-        virtual void pass(Frame*, RegisterSet*, RegisterSet*);
+        virtual void pass(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
 
         bool joinable();
         void join();

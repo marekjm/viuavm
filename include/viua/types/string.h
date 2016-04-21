@@ -12,6 +12,9 @@
 #include <viua/cpu/registerset.h>
 
 
+class Process;
+class CPU;
+
 class String : public Type {
     /** String type.
      *
@@ -44,18 +47,18 @@ class String : public Type {
         String* add(String*);
         String* join(Vector*);
 
-        virtual void stringify(Frame*, RegisterSet*, RegisterSet*);
-        virtual void represent(Frame*, RegisterSet*, RegisterSet*);
+        virtual void stringify(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
+        virtual void represent(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
 
-        virtual void startswith(Frame*, RegisterSet*, RegisterSet*);
-        virtual void endswith(Frame*, RegisterSet*, RegisterSet*);
+        virtual void startswith(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
+        virtual void endswith(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
 
-        virtual void format(Frame*, RegisterSet*, RegisterSet*);
-        virtual void substr(Frame*, RegisterSet*, RegisterSet*);
-        virtual void concatenate(Frame*, RegisterSet*, RegisterSet*);
-        virtual void join(Frame*, RegisterSet*, RegisterSet*);
+        virtual void format(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
+        virtual void substr(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
+        virtual void concatenate(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
+        virtual void join(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
 
-        virtual void size(Frame*, RegisterSet*, RegisterSet*);
+        virtual void size(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
 
         String(std::string s = ""): svalue(s) {}
 };

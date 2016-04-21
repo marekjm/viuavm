@@ -12,7 +12,7 @@ class Reference: public Type {
     Type **pointer;
     unsigned *counter;
 
-    /*  These two constructors are used internally by the Reference type to
+    /*  This constructor is used internally by the Reference type to
      *  initialise copies of the reference.
      */
     Reference(Type **ptr, unsigned *ctr): pointer(ptr), counter(ctr) {}

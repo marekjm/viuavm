@@ -11,14 +11,14 @@
 using namespace std;
 
 
-void io_getline(Frame* frame, RegisterSet*, RegisterSet*) {
+void io_getline(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
     string line;
     getline(cin, line);
     frame->regset->set(0, new String(line));
 }
 
 
-void io_readtext(Frame* frame, RegisterSet*, RegisterSet*) {
+void io_readtext(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
     string path = frame->args->get(0)->str();
     ifstream in(path);
 

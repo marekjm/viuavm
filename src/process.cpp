@@ -231,7 +231,7 @@ byte* Process::callForeignMethod(byte* return_address, Type* object, const strin
 
     try {
         // FIXME: supply static and global registers to foreign functions
-        cpu->foreign_methods.at(call_name)(object, frame, nullptr, nullptr);
+        cpu->foreign_methods.at(call_name)(object, frame, nullptr, nullptr, this, cpu);
     } catch (const std::out_of_range& e) {
         throw new Exception(e.what());
     }

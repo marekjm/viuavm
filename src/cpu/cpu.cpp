@@ -36,7 +36,7 @@ void ForeignFunctionCallRequest::call(ExternalFunction* callback) {
      * FIXME: third parameter should be a pointer to global registers
      */
     try {
-        (*callback)(frame, nullptr, nullptr);
+        (*callback)(frame, nullptr, nullptr, caller_process, cpu);
 
         /* // FIXME: woohoo! segfault! */
         Type* returned = nullptr;
@@ -430,7 +430,7 @@ bool CPU::burst() {
 }
 
 void CPU::requestForeignFunctionCall(Frame *frame, Process *requesting_process) {
-    foreign_call_queue.push_back(new ForeignFunctionCallRequest(frame, requesting_process));
+    foreign_call_queue.push_back(new ForeignFunctionCallRequest(frame, requesting_process, this));
 }
 
 int CPU::run() {

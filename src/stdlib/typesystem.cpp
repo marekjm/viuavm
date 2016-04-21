@@ -10,14 +10,14 @@
 using namespace std;
 
 
-void typeof(Frame* frame, RegisterSet*, RegisterSet*) {
+void typeof(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
     if (frame->args->at(0) == 0) {
         throw new Exception("expected object as parameter 0");
     }
     frame->regset->set(0, new String(frame->args->get(0)->type()));
 }
 
-void inheritanceChain(Frame* frame, RegisterSet*, RegisterSet*) {
+void inheritanceChain(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
     if (frame->args->at(0) == 0) {
         throw new Exception("expected object as parameter 0");
     }
@@ -32,7 +32,7 @@ void inheritanceChain(Frame* frame, RegisterSet*, RegisterSet*) {
     frame->regset->set(0, icv);
 }
 
-void bases(Frame* frame, RegisterSet*, RegisterSet*) {
+void bases(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
     if (frame->args->at(0) == 0) {
         throw new Exception("expected object as parameter 0");
     }

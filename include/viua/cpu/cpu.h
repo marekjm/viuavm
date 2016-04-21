@@ -21,6 +21,7 @@
 class ForeignFunctionCallRequest {
     Frame *frame;
     Process *caller_process;
+    CPU *cpu;
 
     public:
         std::string functionName() const;
@@ -28,7 +29,7 @@ class ForeignFunctionCallRequest {
         void registerException(Type*);
         void wakeup();
 
-        ForeignFunctionCallRequest(Frame *fr, Process *cp): frame(fr), caller_process(cp) {}
+        ForeignFunctionCallRequest(Frame *fr, Process *cp, CPU *c): frame(fr), caller_process(cp), cpu(c) {}
         ~ForeignFunctionCallRequest() {
             delete frame;
         }

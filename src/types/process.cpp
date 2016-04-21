@@ -64,31 +64,31 @@ Type* ProcessType::getReturnValue() {
 }
 
 
-void ProcessType::joinable(Frame* frame, RegisterSet*, RegisterSet*) {
+void ProcessType::joinable(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
     frame->regset->set(0, new Boolean(thrd->joinable()));
 }
 
-void ProcessType::detach(Frame*, RegisterSet*, RegisterSet*) {
+void ProcessType::detach(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*) {
     thrd->detach();
 }
 
 
-void ProcessType::suspend(Frame*, RegisterSet*, RegisterSet*) {
+void ProcessType::suspend(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*) {
     thrd->suspend();
 }
-void ProcessType::wakeup(Frame*, RegisterSet*, RegisterSet*) {
+void ProcessType::wakeup(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*) {
     thrd->wakeup();
 }
-void ProcessType::suspended(Frame* frame, RegisterSet*, RegisterSet*) {
+void ProcessType::suspended(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
     frame->regset->set(0, new Boolean(thrd->suspended()));
 }
 
 
-void ProcessType::getPriority(Frame* frame, RegisterSet*, RegisterSet*) {
+void ProcessType::getPriority(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
     frame->regset->set(0, new Integer(thrd->priority()));
 }
 
-void ProcessType::setPriority(Frame* frame, RegisterSet*, RegisterSet*) {
+void ProcessType::setPriority(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
     if (frame->args->at(0) == nullptr) {
         throw new Exception("expected Process as first parameter but got nothing");
     }
@@ -105,7 +105,7 @@ void ProcessType::setPriority(Frame* frame, RegisterSet*, RegisterSet*) {
     thrd->priority(static_cast<Integer*>(frame->args->at(1))->value());
 }
 
-void ProcessType::pass(Frame* frame, RegisterSet*, RegisterSet*) {
+void ProcessType::pass(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
     if (frame->args->at(0) == nullptr) {
         throw new Exception("expected Process as first parameter but got nothing");
     }
