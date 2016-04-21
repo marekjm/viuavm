@@ -49,13 +49,13 @@ void bases(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
 }
 
 
-const ExternalFunctionSpec functions[] = {
+const ForeignFunctionSpec functions[] = {
     { "typesystem::typeof", &typeof },
     { "typesystem::inheritanceChain", &inheritanceChain },
     { "typesystem::bases", &bases },
     { NULL, NULL },
 };
 
-extern "C" const ExternalFunctionSpec* exports() {
+extern "C" const ForeignFunctionSpec* exports() {
     return functions;
 }

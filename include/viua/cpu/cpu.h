@@ -25,7 +25,7 @@ class ForeignFunctionCallRequest {
 
     public:
         std::string functionName() const;
-        void call(ExternalFunction*);
+        void call(ForeignFunction*);
         void registerException(Type*);
         void wakeup();
 
@@ -92,7 +92,7 @@ class CPU {
     /*  This is the interface between programs compiled to VM bytecode and
      *  extension libraries written in C++.
      */
-    std::map<std::string, ExternalFunction*> foreign_functions;
+    std::map<std::string, ForeignFunction*> foreign_functions;
 
     /** This is the mapping Viua uses to dispatch methods on pure-C++ classes.
      */
@@ -134,7 +134,7 @@ class CPU {
         CPU& mapfunction(const std::string&, uint64_t);
         CPU& mapblock(const std::string&, uint64_t);
 
-        CPU& registerExternalFunction(const std::string&, ExternalFunction*);
+        CPU& registerExternalFunction(const std::string&, ForeignFunction*);
         CPU& removeExternalFunction(std::string);
 
         /// These two methods are used to inject pure-C++ classes into machine's typesystem.

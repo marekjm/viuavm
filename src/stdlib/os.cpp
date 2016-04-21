@@ -18,11 +18,11 @@ void os_system(Frame* frame, RegisterSet*, RegisterSet*) {
 }
 
 
-const ExternalFunctionSpec functions[] = {
+const ForeignFunctionSpec functions[] = {
     { "os::system", &os_system },
     { NULL, NULL },
 };
 
-extern "C" const ExternalFunctionSpec* exports() {
+extern "C" const ForeignFunctionSpec* exports() {
     return functions;
 }

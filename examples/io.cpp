@@ -35,7 +35,7 @@ const char* function_names[] = {
     "io::write",
     NULL,
 };
-const ExternalFunction* function_pointers[] = {
+const ForeignFunction* function_pointers[] = {
     &io_getline,
     &io_read,
     &io_write,
@@ -46,6 +46,6 @@ const ExternalFunction* function_pointers[] = {
 extern "C" const char** exports_names() {
     return function_names;
 }
-extern "C" const ExternalFunction** exports_pointers() {
+extern "C" const ForeignFunction** exports_pointers() {
     return function_pointers;
 }

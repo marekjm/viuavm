@@ -624,7 +624,7 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
     } else if (command == "loader.extern.function.map" or command == "loader.extern.function.map.show") {
         command = "loader.extern.function.map.show";
         if (operands.size() == 0) {
-            for (pair<string, ExternalFunction*> mapping : cpu.foreign_functions) {
+            for (pair<string, ForeignFunction*> mapping : cpu.foreign_functions) {
                 operands.push_back(mapping.first);
             }
         }

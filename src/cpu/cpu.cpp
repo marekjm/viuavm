@@ -29,7 +29,7 @@ using namespace std;
 string ForeignFunctionCallRequest::functionName() const {
     return frame->function_name;
 }
-void ForeignFunctionCallRequest::call(ExternalFunction* callback) {
+void ForeignFunctionCallRequest::call(ForeignFunction* callback) {
     /* FIXME: second parameter should be a pointer to static registers or
      *        0 if function does not have static registers registered
      * FIXME: should external functions always have static registers allocated?
@@ -110,7 +110,7 @@ CPU& CPU::mapblock(const string& name, uint64_t address) {
     return (*this);
 }
 
-CPU& CPU::registerExternalFunction(const string& name, ExternalFunction* function_ptr) {
+CPU& CPU::registerExternalFunction(const string& name, ForeignFunction* function_ptr) {
     /** Registers external function in CPU.
      */
     foreign_functions[name] = function_ptr;
@@ -181,12 +181,12 @@ void CPU::loadForeignLibrary(const string& module) {
         throw new Exception("LinkException", ("failed to open handle: " + module));
     }
 
-    ExternalFunctionSpec* (*exports)() = nullptr;
-    if ((exports = (ExternalFunctionSpec*(*)())dlsym(handle, "exports")) == nullptr) {
+    ForeignFunctionSpec* (*exports)() = nullptr;
+    if ((exports = (ForeignFunctionSpec*(*)())dlsym(handle, "exports")) == nullptr) {
         throw new Exception("failed to extract interface from module: " + module);
     }
 
-    ExternalFunctionSpec* exported = (*exports)();
+    ForeignFunctionSpec* exported = (*exports)();
 
     unsigned i = 0;
     while (exported[i].name != NULL) {

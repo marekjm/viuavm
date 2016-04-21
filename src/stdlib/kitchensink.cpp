@@ -15,11 +15,11 @@ void kitchensink_sleep(Frame* frame, RegisterSet*, RegisterSet*) {
     sleep(static_cast<unsigned int>(static_cast<Integer*>(frame->args->at(0))->as_integer()));
 }
 
-const ExternalFunctionSpec functions[] = {
+const ForeignFunctionSpec functions[] = {
     { "std::kitchensink::sleep", &kitchensink_sleep },
     { NULL, NULL },
 };
 
-extern "C" const ExternalFunctionSpec* exports() {
+extern "C" const ForeignFunctionSpec* exports() {
     return functions;
 }

@@ -14,11 +14,11 @@ void throwing_oh_noes(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*) {
 }
 
 
-const ExternalFunctionSpec functions[] = {
+const ForeignFunctionSpec functions[] = {
     { "throwing::oh_noes", &throwing_oh_noes },
     { nullptr, nullptr },
 };
 
-extern "C" const ExternalFunctionSpec* exports() {
+extern "C" const ForeignFunctionSpec* exports() {
     return functions;
 }

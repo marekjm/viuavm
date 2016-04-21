@@ -11,11 +11,11 @@ void hello(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*) {
 }
 
 
-const ExternalFunctionSpec functions[] = {
+const ForeignFunctionSpec functions[] = {
     { "World::print_hello", &hello },
     { nullptr, nullptr },
 };
 
-extern "C" const ExternalFunctionSpec* exports() {
+extern "C" const ForeignFunctionSpec* exports() {
     return functions;
 }

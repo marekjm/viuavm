@@ -31,7 +31,7 @@ class CPU;
 
 
 // External functions must have this signature
-typedef void (ExternalFunction)(
+typedef void (ForeignFunction)(
     Frame*,         // call frame; contains parameters, local registers, name of the function etc.
     RegisterSet*,   // static register set (may be nullptr)
     RegisterSet*,   // global register set (may be nullptr)
@@ -45,7 +45,7 @@ typedef void (ExternalFunction)(
  *  One downside this approach has is that all method calls are performed via the vtable which may not be the most
  *  efficient way.
  *  Of course, you can also use the struct-and-a-bunch-of-free-functions strategy, in which case you are more interested
- *  in the ExternalFunction typedef defined above.
+ *  in the ForeignFunction typedef defined above.
  */
 typedef void (Type::*ForeignMethodMemberPointer)(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
 typedef std::function<void(Type*, Frame*, RegisterSet*, RegisterSet*, Process*, CPU*)> ForeignMethod;
@@ -56,9 +56,9 @@ typedef std::function<void(Type*, Frame*, RegisterSet*, RegisterSet*, Process*, 
  *
  *  The "exports()" function returns an array of below structures.
  */
-struct ExternalFunctionSpec {
+struct ForeignFunctionSpec {
     const char* name;
-    ExternalFunction* fpointer;
+    ForeignFunction* fpointer;
 };
 
 

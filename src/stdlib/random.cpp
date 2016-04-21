@@ -77,7 +77,7 @@ void random_randint(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
     frame->regset->set(0, new Integer(lower_bound + modifer));
 }
 
-const ExternalFunctionSpec functions[] = {
+const ForeignFunctionSpec functions[] = {
     { "std::random::device::random", &random_drandom },
     { "std::random::device::urandom", &random_durandom },
     { "std::random::random", &random_random },
@@ -85,6 +85,6 @@ const ExternalFunctionSpec functions[] = {
     { NULL, NULL },
 };
 
-extern "C" const ExternalFunctionSpec* exports() {
+extern "C" const ForeignFunctionSpec* exports() {
     return functions;
 }

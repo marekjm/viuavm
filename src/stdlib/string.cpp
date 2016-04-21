@@ -33,13 +33,13 @@ void string_stringify(Frame* frame, RegisterSet*, RegisterSet*) {
 }
 
 
-const ExternalFunctionSpec functions[] = {
+const ForeignFunctionSpec functions[] = {
     { "string::string", &string_string },
     { "string::repr", &string_repr },
     { "string::stringify", &string_stringify },
     { NULL, NULL },
 };
 
-extern "C" const ExternalFunctionSpec* exports() {
+extern "C" const ForeignFunctionSpec* exports() {
     return functions;
 }

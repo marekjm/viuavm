@@ -6146,7 +6146,7 @@ status open
 
 \begin_layout Plain Layout
 
-typedef Type* (ExternalFunction)(Frame*, RegisterSet*, RegisterSet*);
+typedef Type* (ForeignFunction)(Frame*, RegisterSet*, RegisterSet*);
 \end_layout
 
 \begin_layout Plain Layout
@@ -6155,7 +6155,7 @@ typedef Type* (ExternalFunction)(Frame*, RegisterSet*, RegisterSet*);
 
 \begin_layout Plain Layout
 
-struct ExternalFunctionSpec {
+struct ForeignFunctionSpec {
 \end_layout
 
 \begin_layout Plain Layout
@@ -6165,7 +6165,7 @@ struct ExternalFunctionSpec {
 
 \begin_layout Plain Layout
 
-    ExternalFunction* fpointer;
+    ForeignFunction* fpointer;
 \end_layout
 
 \begin_layout Plain Layout
