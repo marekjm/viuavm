@@ -13,6 +13,9 @@
 
 .*
 
+contrib/*
+!contrib/example/
+
 build/assembler/*
 
 build/bin/vm/*
