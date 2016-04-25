@@ -70,6 +70,31 @@ void ForeignFunctionCallRequest::wakeup() {
 }
 
 
+void ff_call_processor(std::vector<ForeignFunctionCallRequest*> *requests, map<string, ForeignFunction*>* foreign_functions, std::mutex *mtx, std::condition_variable *cv) {
+    while (true) {
+        std::unique_lock<std::mutex> lock(*mtx);
+        cv->wait(lock, [requests](){ return (requests->size() != 0); });
+        ForeignFunctionCallRequest *request = requests->front();
+
+        if (request == nullptr) {
+            break;
+        }
+
+        requests->erase(requests->begin());
+        lock.unlock();
+
+        string call_name = request->functionName();
+        if (foreign_functions->count(call_name) == 0) {
+            request->registerException(new Exception("call to unregistered foreign function: " + call_name));
+        } else {
+            request->call(foreign_functions->at(call_name));
+        }
+        request->wakeup();
+        delete request;
+    }
+}
+
+
 CPU& CPU::load(byte* bc) {
     /*  Load bytecode into the CPU.
      *  CPU becomes owner of loaded bytecode - meaning it will consider itself responsible for proper
@@ -308,7 +333,7 @@ bool CPU::executeQuant(Process* th, unsigned priority) {
     }
     if (th->suspended()) {
         // do not execute suspended processes
-        return false;
+        return true;
     }
 
     for (unsigned j = 0; (priority == 0 or j < priority); ++j) {
@@ -389,19 +414,19 @@ bool CPU::burst() {
         }
     }
 
-    for (decltype(foreign_call_queue)::size_type i = 0; i < foreign_call_queue.size(); ++i) {
-        ForeignFunctionCallRequest *request = foreign_call_queue[i];
-        string call_name = request->functionName();
-        if (foreign_functions.count(call_name) == 0) {
-            request->registerException(new Exception("call to unregistered foreign function: " + call_name));
-        } else {
-            request->call(foreign_functions.at(call_name));
-        }
-        request->wakeup();
-        delete request;
-    }
-    // clear the queue
-    foreign_call_queue.erase(foreign_call_queue.begin(), foreign_call_queue.end());
+    /* for (decltype(foreign_call_queue)::size_type i = 0; i < foreign_call_queue.size(); ++i) { */
+    /*     ForeignFunctionCallRequest *request = foreign_call_queue[i]; */
+    /*     string call_name = request->functionName(); */
+    /*     if (foreign_functions.count(call_name) == 0) { */
+    /*         request->registerException(new Exception("call to unregistered foreign function: " + call_name)); */
+    /*     } else { */
+    /*         request->call(foreign_functions.at(call_name)); */
+    /*     } */
+    /*     request->wakeup(); */
+    /*     delete request; */
+    /* } */
+    /* // clear the queue */
+    /* foreign_call_queue.erase(foreign_call_queue.begin(), foreign_call_queue.end()); */
 
     if (abort_because_of_process_termination) {
         return false;
@@ -431,6 +456,7 @@ bool CPU::burst() {
 
 void CPU::requestForeignFunctionCall(Frame *frame, Process *requesting_process) {
     foreign_call_queue.push_back(new ForeignFunctionCallRequest(frame, requesting_process, this));
+    foreign_call_queue_condition.notify_all();
 }
 
 int CPU::run() {

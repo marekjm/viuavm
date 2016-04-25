@@ -5,6 +5,7 @@
 
 #include <dlfcn.h>
 #include <cstdint>
+#include <iostream>
 #include <string>
 #include <vector>
 #include <queue>
@@ -15,6 +16,8 @@
 #include <algorithm>
 #include <stdexcept>
 #include <mutex>
+#include <thread>
+#include <condition_variable>
 #include <viua/process.h>
 
 
@@ -34,6 +37,9 @@ class ForeignFunctionCallRequest {
             delete frame;
         }
 };
+
+
+void ff_call_processor(std::vector<ForeignFunctionCallRequest*> *requests, std::map<std::string, ForeignFunction*>* foreign_functions, std::mutex *mtx, std::condition_variable *cv);
 
 
 class CPU {
@@ -100,6 +106,9 @@ class CPU {
 
     // Foreign function call requests are placed here to be executed later.
     std::vector<ForeignFunctionCallRequest*> foreign_call_queue;
+    std::mutex foreign_call_queue_mutex;
+    std::condition_variable foreign_call_queue_condition;
+    std::vector<std::thread*> foreign_call_workers;
 
     // Final exception for stacktracing
     Type* terminating_exception;
@@ -179,13 +188,26 @@ class CPU {
             instruction_counter(0),
             terminating_exception(nullptr),
             debug(false), errors(false)
-        {}
+        {
+            auto t = new std::thread(ff_call_processor, &foreign_call_queue, &foreign_functions, &foreign_call_queue_mutex, &foreign_call_queue_condition);
+            //t->detach();
+            foreign_call_workers.push_back(t);
+        }
 
         ~CPU() {
             /*  Destructor frees memory at bytecode pointer so make sure you passed a copy of the bytecode to the constructor
              *  if you want to keep it around after the CPU is finished.
              */
             if (bytecode) { delete[] bytecode; }
+
+            while (foreign_call_workers.size()) {
+                foreign_call_queue.push_back(nullptr);
+                foreign_call_queue_condition.notify_one();
+                auto w = foreign_call_workers.back();
+                foreign_call_workers.pop_back();
+                w->join();
+                delete w;
+            }
 
             std::map<std::string, std::pair<unsigned, byte*> >::iterator lm = linked_modules.begin();
             while (lm != linked_modules.end()) {
