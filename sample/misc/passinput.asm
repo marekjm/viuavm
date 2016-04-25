@@ -1,42 +1,32 @@
 .signature: std::io::getline
+.signature: std::misc::cycle/1
 
-.function: run_in_a_thread
-    print (strstore 1 "worker thread: starting...")
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    print (strstore 1 "worker thread: started")
-    threceive 1
-    print 1
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    print (strstore 1 "worker thread: stopped")
-    end
+.function: run_in_a_process
+    print (strstore 1 "worker process: starting...")
+
+    frame ^[(pamv 0 (istore 1 65536))]
+    call std::misc::cycle/1
+
+    print (strstore 1 "worker process: started")
+    print (receive 1)
+
+    frame ^[(pamv 0 (istore 1 65536))]
+    call std::misc::cycle/1
+
+    print (strstore 1 "worker process: stopped")
+    return
 .end
 
 .function: main
     import "io"
+    link std::misc
 
     frame 0
-    thread 1 run_in_a_thread
+    process 1 run_in_a_process
 
-    frame ^[(param 0 1) (param 1 (istore 2 40))]
-    msg 0 setPriority
-
-    frame ^[(param 0 1)]
+    frame ^[(param 0 (ptr 2 1))]
     msg 0 detach
-    print (strstore 2 "main/1 detached worker thread")
+    print (strstore 2 "main/1 detached worker process")
 
     echo (strstore 2 "message to pass: ")
     frame 0
@@ -46,5 +36,5 @@
     msg 0 pass
 
     izero 0
-    end
+    return
 .end
