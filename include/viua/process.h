@@ -6,6 +6,7 @@
 #include <string>
 #include <queue>
 #include <mutex>
+#include <atomic>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/types/type.h>
 #include <viua/types/prototype.h>
@@ -109,8 +110,8 @@ class Process {
     std::tuple<TryFrame*, std::string> findCatchFrame();
 
     bool finished;
-    bool is_joinable;
-    bool is_suspended;
+    std::atomic_bool is_joinable;
+    std::atomic_bool is_suspended;
     unsigned process_priority;
     std::mutex process_mtx;
 
@@ -261,15 +262,12 @@ class Process {
         }
 
         inline void suspend() {
-            std::unique_lock<std::mutex> lck;
             is_suspended = true;
         }
         inline void wakeup() {
-            std::unique_lock<std::mutex> lck;
             is_suspended = false;
         }
         inline bool suspended() {
-            std::unique_lock<std::mutex> lck;
             return is_suspended;
         }
 
