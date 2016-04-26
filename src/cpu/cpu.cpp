@@ -456,6 +456,7 @@ bool CPU::burst() {
 }
 
 void CPU::requestForeignFunctionCall(Frame *frame, Process *requesting_process) {
+    unique_lock<mutex> lock(foreign_call_queue_mutex);
     foreign_call_queue.push_back(new ForeignFunctionCallRequest(frame, requesting_process, this));
     foreign_call_queue_condition.notify_all();
 }
