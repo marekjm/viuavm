@@ -180,6 +180,9 @@ def valgrindCheck(self, path):
     return 0
 
 
+def skipValgrind(self):
+    MEMORY_LEAK_CHECKS_SKIP_LIST.append(self)
+
 def runMemoryLeakCheck(self, compiled_path, check_memory_leaks):
     if not MEMORY_LEAK_CHECKS_ENABLE: return
     global MEMORY_LEAK_CHECKS_RUN, MEMORY_LEAK_CHECKS_SKIPPED
