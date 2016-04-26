@@ -201,6 +201,9 @@ class CPU {
              */
             if (bytecode) { delete[] bytecode; }
 
+            /** Send a poison pill to every foreign function call worker thread.
+             *  Collect them after they are killed.
+             */
             while (foreign_call_workers.size()) {
                 foreign_call_queue.push_back(nullptr);
                 foreign_call_queue_condition.notify_one();
