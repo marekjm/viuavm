@@ -70,7 +70,7 @@ void ForeignFunctionCallRequest::wakeup() {
 }
 
 
-void ff_call_processor(std::vector<ForeignFunctionCallRequest*> *requests, map<string, ForeignFunction*>* foreign_functions, std::mutex *mtx, std::condition_variable *cv) {
+void ff_call_processor(std::vector<ForeignFunctionCallRequest*> *requests, map<string, ForeignFunction*>* foreign_functions, std::mutex *ff_map_mtx, std::mutex *mtx, std::condition_variable *cv) {
     while (true) {
         std::unique_lock<std::mutex> lock(*mtx);
         cv->wait(lock, [requests](){ return (requests->size() != 0); });
@@ -84,11 +84,15 @@ void ff_call_processor(std::vector<ForeignFunctionCallRequest*> *requests, map<s
         lock.unlock();
 
         string call_name = request->functionName();
+        unique_lock<mutex> ff_map_lock(*ff_map_mtx);
         if (foreign_functions->count(call_name) == 0) {
             request->registerException(new Exception("call to unregistered foreign function: " + call_name));
         } else {
-            request->call(foreign_functions->at(call_name));
+            auto function = foreign_functions->at(call_name);
+            ff_map_lock.unlock();   // unlock the mutex - foreign call can block for unspecified period of time
+            request->call(function);
         }
+
         request->wakeup();
         delete request;
     }

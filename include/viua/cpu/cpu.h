@@ -39,7 +39,7 @@ class ForeignFunctionCallRequest {
 };
 
 
-void ff_call_processor(std::vector<ForeignFunctionCallRequest*> *requests, std::map<std::string, ForeignFunction*>* foreign_functions, std::mutex *mtx, std::condition_variable *cv);
+void ff_call_processor(std::vector<ForeignFunctionCallRequest*> *requests, std::map<std::string, ForeignFunction*>* foreign_functions, std::mutex *ff_map_mtx, std::mutex *mtx, std::condition_variable *cv);
 
 
 class CPU {
@@ -190,7 +190,7 @@ class CPU {
             terminating_exception(nullptr),
             debug(false), errors(false)
         {
-            auto t = new std::thread(ff_call_processor, &foreign_call_queue, &foreign_functions, &foreign_call_queue_mutex, &foreign_call_queue_condition);
+            auto t = new std::thread(ff_call_processor, &foreign_call_queue, &foreign_functions, &foreign_functions_mutex, &foreign_call_queue_mutex, &foreign_call_queue_condition);
             //t->detach();
             foreign_call_workers.push_back(t);
         }
