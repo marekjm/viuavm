@@ -41,9 +41,11 @@
     ; call methods on it
     new 1 Derived
 
+    ; Good day from Derived
     frame ^[(param 0 1)]
     msg 0 good_day
 
+    ; hello from Derived
     frame ^[(param 0 1)]
     msg 0 hello
 
@@ -54,12 +56,15 @@
     ; call methods on it
     new 2 MoreDerived
 
+    ; Good day from MoreDerived
     frame ^[(param 0 2)]
     msg 0 good_day
 
+    ; Hello from MoreDerived
     frame ^[(param 0 2)]
     msg 0 hello
 
+    ; Hi from MoreDerived
     frame ^[(param 0 2)]
     msg 0 hi
 
