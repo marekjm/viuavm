@@ -191,7 +191,6 @@ class CPU {
             debug(false), errors(false)
         {
             auto t = new std::thread(ff_call_processor, &foreign_call_queue, &foreign_functions, &foreign_functions_mutex, &foreign_call_queue_mutex, &foreign_call_queue_condition);
-            //t->detach();
             foreign_call_workers.push_back(t);
         }
 
