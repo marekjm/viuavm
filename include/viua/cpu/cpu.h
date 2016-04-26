@@ -99,6 +99,7 @@ class CPU {
      *  extension libraries written in C++.
      */
     std::map<std::string, ForeignFunction*> foreign_functions;
+    std::mutex foreign_functions_mutex;
 
     /** This is the mapping Viua uses to dispatch methods on pure-C++ classes.
      */

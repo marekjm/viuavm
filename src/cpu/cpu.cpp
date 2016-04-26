@@ -138,6 +138,7 @@ CPU& CPU::mapblock(const string& name, uint64_t address) {
 CPU& CPU::registerExternalFunction(const string& name, ForeignFunction* function_ptr) {
     /** Registers external function in CPU.
      */
+    unique_lock<mutex> lock(foreign_functions_mutex);
     foreign_functions[name] = function_ptr;
     return (*this);
 }
