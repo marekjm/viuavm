@@ -202,12 +202,34 @@ class CPU {
 
             /** Send a poison pill to every foreign function call worker thread.
              *  Collect them after they are killed.
+             *
+             * Use std::defer_lock to preven constructor from acquiring the mutex
+             * .lock() is called manually later
              */
-            while (foreign_call_workers.size()) {
+            std::unique_lock<std::mutex> lck(foreign_call_queue_mutex, std::defer_lock);
+            for (auto i = foreign_call_workers.size(); i; --i) {
+                // acquire the mutex for foreign call request queue
+                lck.lock();
+
+                // send poison pill;
+                // one per worker thread since we can be sure that a thread consumes at
+                // most one pill
                 foreign_call_queue.push_back(nullptr);
-                foreign_call_queue_condition.notify_one();
+
+                // release the mutex and notify worker thread that there is work to do
+                // the thread consumes the pill and aborts
+                lck.unlock();
+                foreign_call_queue_condition.notify_all();
+            }
+            while (not foreign_call_workers.empty()) {
+                // fetch handle for worker thread and
+                // remove it from the list of workers
                 auto w = foreign_call_workers.back();
                 foreign_call_workers.pop_back();
+
+                // join worker back to main thread and
+                // delete it
+                // by now, all workers should be killed by poison pills we sent them earlier
                 w->join();
                 delete w;
             }

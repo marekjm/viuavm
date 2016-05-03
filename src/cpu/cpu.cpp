@@ -4,6 +4,7 @@
 #include <vector>
 #include <functional>
 #include <regex>
+#include <chrono>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/opcodes.h>
 #include <viua/bytecode/maps.h>
@@ -73,15 +74,25 @@ void ForeignFunctionCallRequest::wakeup() {
 void ff_call_processor(std::vector<ForeignFunctionCallRequest*> *requests, map<string, ForeignFunction*>* foreign_functions, std::mutex *ff_map_mtx, std::mutex *mtx, std::condition_variable *cv) {
     while (true) {
         std::unique_lock<std::mutex> lock(*mtx);
-        cv->wait(lock, [requests](){ return (requests->size() != 0); });
+        cv->wait_for(lock, std::chrono::milliseconds(2000), [requests](){
+            return not requests->empty();
+        });
+
+        if (requests->empty()) {
+            continue;
+        }
+
         ForeignFunctionCallRequest *request = requests->front();
 
+        requests->erase(requests->begin());
+
+        // unlock as soon as the request is obtained
+        lock.unlock();
+
+        // abort if received poison pill
         if (request == nullptr) {
             break;
         }
-
-        requests->erase(requests->begin());
-        lock.unlock();
 
         string call_name = request->functionName();
         unique_lock<mutex> ff_map_lock(*ff_map_mtx);
@@ -462,7 +473,12 @@ bool CPU::burst() {
 void CPU::requestForeignFunctionCall(Frame *frame, Process *requesting_process) {
     unique_lock<mutex> lock(foreign_call_queue_mutex);
     foreign_call_queue.push_back(new ForeignFunctionCallRequest(frame, requesting_process, this));
-    foreign_call_queue_condition.notify_all();
+
+    // unlock before calling notify_one() to avoid waking the worker thread when it
+    // cannot obtain the lock and
+    // fetch the call request
+    lock.unlock();
+    foreign_call_queue_condition.notify_one();
 }
 
 int CPU::run() {
