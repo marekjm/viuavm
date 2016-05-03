@@ -78,10 +78,6 @@ void ff_call_processor(std::vector<ForeignFunctionCallRequest*> *requests, map<s
             return not requests->empty();
         });
 
-        if (requests->empty()) {
-            continue;
-        }
-
         ForeignFunctionCallRequest *request = requests->front();
 
         requests->erase(requests->begin());
