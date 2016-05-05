@@ -74,9 +74,11 @@ void ForeignFunctionCallRequest::wakeup() {
 void ff_call_processor(std::vector<ForeignFunctionCallRequest*> *requests, map<string, ForeignFunction*>* foreign_functions, std::mutex *ff_map_mtx, std::mutex *mtx, std::condition_variable *cv) {
     while (true) {
         std::unique_lock<std::mutex> lock(*mtx);
-        cv->wait_for(lock, std::chrono::milliseconds(2000), [requests](){
+
+        // wait in a loop, because wait_for() can still return even if the requests queue is empty
+        while (not cv->wait_for(lock, std::chrono::milliseconds(2000), [requests](){
             return not requests->empty();
-        });
+        }));
 
         ForeignFunctionCallRequest *request = requests->front();
 
