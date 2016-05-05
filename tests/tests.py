@@ -119,8 +119,6 @@ def valgrindSummary(text):
     valprefix = output_lines[0].split(' ')[0]
     interesting_lines = [line[len(valprefix):].strip() for line in output_lines[output_lines.index('{0} HEAP SUMMARY:'.format(valprefix)):]]
 
-    in_use_at_exit = valgrindBytesInBlocks(interesting_lines[1], valgrind_regex_heap_summary_in_use_at_exit)
-
     total_heap_usage_matched = valgrind_regex_heap_summary_total_heap_usage.search(interesting_lines[2])
     total_heap_usage = {
         'allocs': int(total_heap_usage_matched.group(1).replace(',', '')),
@@ -128,20 +126,14 @@ def valgrindSummary(text):
         'bytes': int(total_heap_usage_matched.group(3).replace(',', '')),
     }
 
-    definitely_lost = valgrindBytesInBlocks(interesting_lines[5], valgrind_regex_leak_summary_definitely_lost)
-    indirectly_lost = valgrindBytesInBlocks(interesting_lines[6], valgrind_regex_leak_summary_indirectly_lost)
-    possibly_lost = valgrindBytesInBlocks(interesting_lines[7], valgrind_regex_leak_summary_possibly_lost)
-    still_reachable = valgrindBytesInBlocks(interesting_lines[8], valgrind_regex_leak_summary_still_reachable)
-    suppressed = valgrindBytesInBlocks(interesting_lines[9], valgrind_regex_leak_summary_suppressed)
-
     summary = {'heap': {}, 'leak': {}}
-    summary['heap']['in_use_at_exit'] = in_use_at_exit
+    summary['heap']['in_use_at_exit'] = valgrindBytesInBlocks(interesting_lines[1], valgrind_regex_heap_summary_in_use_at_exit)
     summary['heap']['total_heap_usage'] = total_heap_usage
-    summary['leak']['definitely_lost'] = definitely_lost
-    summary['leak']['indirectly_lost'] = indirectly_lost
-    summary['leak']['possibly_lost'] = possibly_lost
-    summary['leak']['still_reachable'] = still_reachable
-    summary['leak']['suppressed'] = suppressed
+    summary['leak']['definitely_lost'] = valgrindBytesInBlocks(interesting_lines[5], valgrind_regex_leak_summary_definitely_lost)
+    summary['leak']['indirectly_lost'] = valgrindBytesInBlocks(interesting_lines[6], valgrind_regex_leak_summary_indirectly_lost)
+    summary['leak']['possibly_lost'] = valgrindBytesInBlocks(interesting_lines[7], valgrind_regex_leak_summary_possibly_lost)
+    summary['leak']['still_reachable'] = valgrindBytesInBlocks(interesting_lines[8], valgrind_regex_leak_summary_still_reachable)
+    summary['leak']['suppressed'] = valgrindBytesInBlocks(interesting_lines[9], valgrind_regex_leak_summary_suppressed)
     return summary
 
 def valgrindCheck(self, path):
