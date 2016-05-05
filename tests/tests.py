@@ -110,7 +110,9 @@ valgrind_regex_leak_summary_still_reachable = re.compile('still reachable: (\d+(
 valgrind_regex_leak_summary_suppressed = re.compile('suppressed: (\d+(?:,\d+)?) bytes in (\d+) blocks')
 def valgrindBytesInBlocks(line, regex):
     matched = regex.search(line)
-    return {'bytes': int(matched.group(1).replace(',', '')), 'blocks': int(matched.group(2))}
+    if matched is None:
+        print('failed to extract Valgrind statistics about leaked bytes and blocks: {}'.format(repr(line)))
+    return {'bytes': int((matched.group(1) if matched else '-1').replace(',', '')), 'blocks': int((matched.group(2) if matched else '-1').replace(',', ''))}
 
 def valgrindSummary(text):
     output_lines = text.splitlines()
