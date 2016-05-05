@@ -69,6 +69,9 @@ implemented in user code).
   deleting objects,
 - bic: `PARAM` immediately copies parameters into a frame, not when they are accessed;
 - feature: new `TAILCALL` instruction,
+- enhancement: foreign functions are not called immediately with `CALL` instruction, but are instead scheduled
+  to run on a FFI worker thread - special thread that only executes foreign function calls,
+  this way native Viua code is never blocked by an FFI call,
 
 
 ----
