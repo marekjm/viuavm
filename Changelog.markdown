@@ -35,6 +35,9 @@ Better support for closures: users can control what registers to enclose and
 how to enclose values in them.
 Vector and object modifications have move semantics now (copy semantics must be
 implemented in user code).
+Improvements to standard library (in `std::vector`, `std::misc` and `std::functional` modules).
+Inter-function tail calls.
+FFI worker thread for non-blocking calls to foreign functions.
 
 - bic: `PAREF` and `REF` instructions removed, references made an internal tool of the VM,
 - feature: `ENCLOSECOPY` instruction for enclosing objects in closures by copying them,
