@@ -29,7 +29,7 @@ There are several categories of change:
 ----
 
 
-# From 0.7.0 to 0.7.1
+# From 0.7.0 to 0.8.0
 
 Better support for closures: users can control what registers to enclose and
 how to enclose values in them.
