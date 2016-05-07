@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 CXXFLAGS='-Wall -Wextra -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Winline -pedantic -Wfatal-errors -g -I./include'
 
@@ -11,5 +11,4 @@ fi
 LINES=$(wc -l Makefile | cut -d' ' -f1)
 LINES=$(dc -e "$LINES 1 - p")
 
-echo "CXXFLAGS=$CXXFLAGS"
-cat Makefile | tail -n $LINES
+sed -i "s:CXXFLAGS=-std=.*:CXXFLAGS=$CXXFLAGS:g" Makefile
