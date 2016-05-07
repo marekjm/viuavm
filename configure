@@ -1,3 +1,4 @@
 #!/usr/bin/env sh
 
-./scripts/regenerate_cxxflags.sh > Makefile
+./scripts/regenerate_cxxflags.sh > Makefile.1
+mv Makefile.1 Makefile
