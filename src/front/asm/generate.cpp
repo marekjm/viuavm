@@ -892,6 +892,13 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         Loader loader(lnk);
         loader.load();
 
+        vector<string> fn_names = loader.getFunctions();
+        for (string fn : fn_names) {
+            if (function_addresses.count(fn)) {
+                throw ("duplicate symbol '" + fn + "' found when linking '" + lnk + "'");
+            }
+        }
+
         vector<uint64_t> lib_jumps = loader.getJumps();
         if (DEBUG) {
             cout << "[loader] entries in jump table: " << lib_jumps.size() << endl;
@@ -903,7 +910,6 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         linked_libs_jumptables[lnk] = lib_jumps;
 
         map<string, uint64_t> fn_addresses = loader.getFunctionAddresses();
-        vector<string> fn_names = loader.getFunctions();
         for (string fn : fn_names) {
             function_addresses[fn] = fn_addresses.at(fn) + current_link_offset;
             linked_function_names.push_back(fn);
