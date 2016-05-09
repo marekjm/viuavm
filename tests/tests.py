@@ -873,6 +873,17 @@ class AssemblerErrorTests(unittest.TestCase):
         self.assertEqual("error: using 'halt' instead of 'return' as last instruction in main function leads to memory leaks", output.strip())
 
 
+class AssemblerErrorSingleDefinitionRuleTests(unittest.TestCase):
+    PATH = './sample/asm/errors/single_definition_rule'
+
+    def testRejectingDoubleDefinitionsInLinkedFiles(self):
+        lib_a_path = os.path.join(self.PATH, 'libA.vlib')
+        lib_b_path = os.path.join(self.PATH, 'libB.vlib')
+        assemble(os.path.join(self.PATH, 'lib.asm'), out=lib_a_path, opts=('--lib',))
+        assemble(os.path.join(self.PATH, 'lib.asm'), out=lib_b_path, opts=('--lib',))
+        self.assertRaises(ViuaAssemblerError, assemble, os.path.join(self.PATH, 'exec.asm'), links=(lib_a_path, lib_b_path))
+
+
 class ExternalModulesTests(unittest.TestCase):
     """Tests for C/C++ module importing, and calling external functions.
     """
