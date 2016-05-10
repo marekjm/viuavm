@@ -69,7 +69,6 @@ Current limitations include:
 - calling Viua code from C++ is not tested,
 - concurrent code must be debugged with GDB instead of debugger supplied by the VM,
 - debugging information encoded in compiled files is limited,
-- VM runs in a single process so I/O and foreign function calls block all VM-processes,
 - speed: Viua is not the fastest VM around,
 
 
