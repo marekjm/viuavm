@@ -229,6 +229,10 @@ int main(int argc, char* argv[]) {
         cout << report << endl;
         exit(1);
     }
+    if ((report = assembler::verify::functionCallArities(expanded_lines, expanded_lines_to_source_lines)).size()) {
+        cout << report << endl;
+        return 1;
+    }
     if ((not AS_LIB) and (ERROR_HALT_IS_LAST or ERROR_ALL) and functions.bodies.count("main")) {
         if ((report = assembler::verify::mainFunctionDoesNotEndWithHalt(functions.bodies)).size()) {
             cout << report << endl;

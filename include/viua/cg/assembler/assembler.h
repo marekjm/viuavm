@@ -38,6 +38,7 @@ namespace assembler {
 
     namespace verify {
         std::string functionCallsAreDefined(const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&, const std::vector<std::string>& function_names, const std::vector<std::string>& function_signatures);
+        std::string functionCallArities(const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&);
         std::string frameBalance(const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&);
         std::string callableCreations(const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&, const std::vector<std::string>& function_names, const std::vector<std::string>& function_signatures);
         std::string ressInstructions(const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&, bool as_lib);
