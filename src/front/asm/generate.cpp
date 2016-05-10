@@ -878,6 +878,9 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     map<string, vector<uint64_t> > linked_libs_jumptables;
     uint64_t current_link_offset = bytes;
 
+    // map of symbol names to name of the module the symbol came from
+    map<string, string> symbol_sources;
+
     for (string lnk : commandline_given_links) {
         // FIXME: should giving the same library twice on the commandline be an error?
         if (find(links.begin(), links.end(), lnk) == links.end()) {
@@ -896,7 +899,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         vector<string> fn_names = loader.getFunctions();
         for (string fn : fn_names) {
             if (function_addresses.count(fn)) {
-                throw ("duplicate symbol '" + fn + "' found when linking '" + lnk + "'");
+                throw ("duplicate symbol '" + fn + "' found when linking '" + lnk + "' (previously found in '" + symbol_sources.at(fn) + "')");
             }
         }
 
@@ -913,6 +916,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         map<string, uint64_t> fn_addresses = loader.getFunctionAddresses();
         for (string fn : fn_names) {
             function_addresses[fn] = fn_addresses.at(fn) + current_link_offset;
+            symbol_sources[fn] = lnk;
             linked_function_names.push_back(fn);
             if (DEBUG) {
                 cout << "  \"" << fn << "\": entry point at byte: " << current_link_offset << '+' << fn_addresses.at(fn) << endl;
