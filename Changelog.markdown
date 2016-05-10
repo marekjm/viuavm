@@ -29,6 +29,25 @@ There are several categories of change:
 ----
 
 
+# From 0.8.0 to 0.8.1
+
+More errors are now detected at compile-time; assembler detects duplicate symbols during linking,
+duplicate link requestes (i.e. the same module requested to be linked more than once in a single
+compilation unit), and some arity errors during function calls.
+
+- enhancement: assembler fails when duplicate symbols are found during linking phase, and produces
+  appropriate error message informing the programmer which symbol was duplicated, linking which module
+  triggered the error, and in which module the symbol appeared first,
+- enhancement: assembler fails when a module is given more than once as a static link target in one
+  compilation unit,
+- enhancement: assembler is able to detect some arity errors during compile-time; errors are caught when
+  number of call parameters is known at compile-time, and if the function specifies its arity - which
+  it can do by appending `/N` suffix to its name (where `N` is a non-negative integer),
+
+
+----
+
+
 # From 0.7.0 to 0.8.0
 
 Better support for closures: users can control what registers to enclose and
