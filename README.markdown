@@ -58,7 +58,7 @@ Some features also supported by the VM:
 - straightforward ways to use both dynamic and static method dispatch on objects,
 - first-class functions,
 - closures (with multiple way of enclosing objects inside a closure),
-- passing function parameters by value, reference, pointer and move (non-copying pass),
+- passing function parameters by value, pointer and move (non-copying pass),
 - copy-free function returns,
 
 
