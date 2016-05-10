@@ -883,6 +883,11 @@ class AssemblerErrorRejectingDuplicateSymbolsTests(unittest.TestCase):
         assemble(os.path.join(self.PATH, 'lib.asm'), out=lib_b_path, opts=('--lib',))
         self.assertRaises(ViuaAssemblerError, assemble, os.path.join(self.PATH, 'exec.asm'), links=(lib_a_path, lib_b_path))
 
+    def testRejectingDuplicateLinksOnCommandline(self):
+        lib_a_path = os.path.join(self.PATH, 'libA.vlib')
+        assemble(os.path.join(self.PATH, 'lib.asm'), out=lib_a_path, opts=('--lib',))
+        self.assertRaises(ViuaAssemblerError, assemble, os.path.join(self.PATH, 'exec.asm'), links=(lib_a_path, lib_a_path))
+
 
 class ExternalModulesTests(unittest.TestCase):
     """Tests for C/C++ module importing, and calling external functions.

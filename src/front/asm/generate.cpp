@@ -882,9 +882,10 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     map<string, string> symbol_sources;
 
     for (string lnk : commandline_given_links) {
-        // FIXME: should giving the same library twice on the commandline be an error?
         if (find(links.begin(), links.end(), lnk) == links.end()) {
             links.push_back(lnk);
+        } else {
+            throw ("requested to link module '" + lnk + "' more than once");
         }
     }
 
