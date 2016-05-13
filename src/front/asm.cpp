@@ -217,6 +217,10 @@ int main(int argc, char* argv[]) {
         cout << report << endl;
         return 1;
     }
+    if ((report = assembler::verify::functionNames(filename, lines)).size()) {
+        cout << report << endl;
+        return 1;
+    }
     if ((report = assembler::verify::functionBodiesAreNonempty(functions.bodies)).size()) {
         cout << report << endl;
         return 1;
