@@ -203,7 +203,7 @@ build/bin/vm/cpu: build/cpu.o build/cpu/cpu.o build/front/vm.o build/operand.o b
 build/bin/vm/vdb: build/wdb.o build/lib/linenoise.o build/cpu/cpu.o build/front/vm.o build/operand.o build/assert.o build/process.o build/process/dispatch.o build/cpu/opex.o build/cpu/registserset.o build/cpu/frame.o build/loader.o build/cg/disassembler/disassembler.o build/printutils.o build/support/pointer.o build/support/string.o build/support/env.o $(VIUA_INSTR_FILES_O) build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o build/types/prototype.o build/types/object.o build/types/reference.o build/types/process.o build/types/type.o build/types/pointer.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -lpthread -o $@ $^ $(LIBDL)
 
-build/bin/vm/asm: build/asm.o build/asm/generate.o build/asm/gather.o build/asm/decode.o build/program.o build/programinstructions.o build/cg/tokenizer/tokenize.o build/cg/assembler/operands.o build/cg/assembler/ce.o build/cg/assembler/verify.o build/cg/bytecode/instructions.o build/loader.o build/support/string.o build/support/env.o
+build/bin/vm/asm: build/asm.o build/asm/generate.o build/asm/gather.o build/asm/decode.o build/program.o build/programinstructions.o build/cg/tokenizer/tokenize.o build/cg/assembler/operands.o build/cg/assembler/ce.o build/cg/assembler/verify.o build/cg/assembler/utils.o build/cg/bytecode/instructions.o build/loader.o build/support/string.o build/support/env.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^
 
 build/bin/vm/dis: build/dis.o build/loader.o build/cg/disassembler/disassembler.o build/support/pointer.o build/support/string.o build/support/env.o
@@ -405,6 +405,9 @@ build/cg/assembler/ce.o: src/cg/assembler/codeextract.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
 build/cg/assembler/verify.o: src/cg/assembler/verify.cpp
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
+
+build/cg/assembler/utils.o: src/cg/assembler/utils.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
 
