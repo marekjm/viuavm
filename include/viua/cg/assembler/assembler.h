@@ -9,6 +9,7 @@
 #include <tuple>
 #include <map>
 #include <unordered_set>
+#include <regex>
 #include "../../program.h"
 
 namespace assembler {
@@ -49,6 +50,13 @@ namespace assembler {
 
         std::string directives(const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&);
         std::string instructions(const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&);
+    }
+
+    namespace utils {
+        std::regex getFunctionNameRegex();
+        bool isValidFunctionName(const std::string&);
+        std::smatch matchFunctionName(const std::string&);
+        int getFunctionArity(const std::string&);
     }
 }
 
