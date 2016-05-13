@@ -74,21 +74,12 @@ string assembler::verify::functionCallArities(const vector<string>& lines, const
             function_name = str::chunk(str::lstrip(line.substr(function_name.size())));
         }
 
-        regex function_name_regex{"(?:::)?[a-zA-Z_][a-zA-Z0-9_]*(?:::[a-zA-Z_][a-zA-Z0-9_]*)*(?:/([0-9]+))?"};
-
-        if (not regex_match(function_name, function_name_regex)) {
+        if (not assembler::utils::isValidFunctionName(function_name)) {
             report << "fatal: '" << function_name << "' is not a valid function name at line " << (expanded_lines_to_source_lines.at(i)+1);
             break;
         }
 
-        smatch parts_match;
-        regex_match(function_name, parts_match, function_name_regex);
-
-        int arity = -1;
-        if (parts_match[1].str().size()) {
-            ssub_match a = parts_match[1];
-            arity = stoi(a.str());
-        }
+        int arity = assembler::utils::getFunctionArity(function_name);
 
         if (arity == -1) {
             // arity of the function was not given - skip the check since there is no indication of the correct number of parameters
