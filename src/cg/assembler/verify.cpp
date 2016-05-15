@@ -98,10 +98,11 @@ string assembler::verify::functionCallArities(const vector<string>& lines, const
     return report.str();
 }
 
-string assembler::verify::functionNames(const string& filename, const std::vector<std::string>& lines) {
+string assembler::verify::functionNames(const string& filename, const std::vector<std::string>& lines, const bool warning, const bool error) {
     ostringstream report("");
     string line;
     string function;
+
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = str::lstrip(lines[i]);
         if (str::startswith(line, ".function:")) {
@@ -118,9 +119,17 @@ string assembler::verify::functionNames(const string& filename, const std::vecto
         // FIXME: main with undefined arity is allowed for now
         // it will be an error not to give arity to main in future release
         if (assembler::utils::getFunctionArity(function) == -1 and function != "main") {
-            cout << filename << ':' << i+1 << ": warning: function with undefined arity: " << function << endl;
+            if (warning) {
+                cout << filename << ':' << i+1 << ": warning: function with undefined arity: " << function << endl;
+            } else if (error) {
+                report << filename << ':' << i+1 << ": error: function with undefined arity: " << function;
+                break;
+            } else {
+                // explicitly do nothing if neither warning nor error report was requested
+            }
         }
     }
+
     return report.str();
 }
 

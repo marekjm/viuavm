@@ -29,10 +29,12 @@ bool ERROR_ALL = false;
 
 // WARNINGS
 bool WARNING_MISSING_RETURN = false;
+bool WARNING_UNDEFINED_ARITY = false;
 
 // ERRORS
 bool ERROR_MISSING_RETURN = false;
 bool ERROR_HALT_IS_LAST = false;
+bool ERROR_UNDEFINED_ARITY = false;
 
 
 bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE) {
@@ -46,16 +48,28 @@ bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE)
         cout << "\nUSAGE:\n";
         cout << "    " << program << " [option...] [-o <outfile>] <infile> [<linked-file>...]\n" << endl;
         cout << "OPTIONS:\n";
+
+        // generic options
         cout << "    " << "-V, --version            - show version\n"
              << "    " << "-h, --help               - display this message\n"
+
+        // logging options
              << "    " << "-v, --verbose            - show verbose output\n"
              << "    " << "-d, --debug              - show debugging output\n"
              << "    " << "    --scream             - show so much debugging output it becomes noisy\n"
+
+        // warning reporting level control
              << "    " << "-W, --Wall               - warn about everything\n"
              << "    " << "    --Wmissin-return     - warn about missing 'return' instruction at the end of functions\n"
+             << "    " << "    --Wundefined-arity   - warn about functions declared with undefined arity\n"
+
+        // error reporting level control
              << "    " << "    --Eall               - treat all warnings as errors\n"
              << "    " << "    --Emissing-return    - treat missing 'return' instruction at the end of function as error\n"
+             << "    " << "    --Eundefined-arity   - treat functions declared with undefined arity as errors\n"
              << "    " << "    --Ehalt-is-last      - treat 'halt' being used as last instruction of 'main' function as error\n"
+
+        // compilation options
              << "    " << "-c, --lib                - assemble as a library\n"
              << "    " << "-E, --expand             - only expand the source code to simple form (one instruction per line)\n"
              << "    " << "                           with this option, assembler prints expanded source to standard output\n"
@@ -97,6 +111,9 @@ int main(int argc, char* argv[]) {
         } else if (option == "--Wall" or option == "-W") {
             WARNING_ALL = true;
             continue;
+        } else if (option == "--Wundefined-arity") {
+            WARNING_UNDEFINED_ARITY = true;
+            continue;
         } else if (option == "--Eall") {
             ERROR_ALL = true;
             continue;
@@ -108,6 +125,9 @@ int main(int argc, char* argv[]) {
             continue;
         } else if (option == "--Emissing-return") {
             ERROR_MISSING_RETURN = true;
+            continue;
+        } else if (option == "--Eundefined-arity") {
+            ERROR_UNDEFINED_ARITY = true;
             continue;
         } else if (option == "--Ehalt-is-last") {
             ERROR_HALT_IS_LAST = true;
@@ -216,7 +236,7 @@ int main(int argc, char* argv[]) {
         cout << report << endl;
         return 1;
     }
-    if ((report = assembler::verify::functionNames(filename, lines)).size()) {
+    if ((report = assembler::verify::functionNames(filename, lines, (WARNING_UNDEFINED_ARITY or WARNING_ALL), (ERROR_UNDEFINED_ARITY or ERROR_ALL))).size()) {
         cout << report << endl;
         return 1;
     }
