@@ -60,7 +60,6 @@ bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE)
              << "    " << "-E, --expand             - only expand the source code to simple form (one instruction per line)\n"
              << "    " << "                           with this option, assembler prints expanded source to standard output\n"
              << "    " << "-C, --verify             - verify source code correctness without actually compiling it\n"
-             << "    " << "                         - verify source code correctness without actually compiling it\n"
              << "    " << "                           this option turns assembler into source level debugger and static code analyzer hybrid\n"
              ;
     }
