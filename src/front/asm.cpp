@@ -255,6 +255,10 @@ int main(int argc, char* argv[]) {
         cout << report << endl;
         return 1;
     }
+    if ((report = assembler::verify::functionsEndWithReturn(filename, lines, (WARNING_MISSING_RETURN or WARNING_ALL), (ERROR_MISSING_RETURN or ERROR_ALL))).size()) {
+        cout << report << endl;
+        exit(1);
+    }
     if ((not AS_LIB) and (ERROR_HALT_IS_LAST or ERROR_ALL) and functions.bodies.count("main")) {
         if ((report = assembler::verify::mainFunctionDoesNotEndWithHalt(functions.bodies)).size()) {
             cout << report << endl;
@@ -275,20 +279,6 @@ int main(int argc, char* argv[]) {
         if (line.size() == 0) {
             cout << "fatal: frame instruction without operands at line " << i << " in " << filename << endl;
             return 1;
-        }
-    }
-
-    /////////////////////////
-    // VERIFY FUNCTION BODIES
-    for (auto function : functions.bodies) {
-        vector<string> flines = function.second;
-        if ((flines.size() == 0 or flines.back() != "end") and (function.first != "main" and flines.back() != "halt")) {
-            if (ERROR_MISSING_RETURN or ERROR_ALL) {
-                cout << "fatal: missing 'return' at the end of function '" << function.first << "'" << endl;
-                exit(1);
-            } else if (WARNING_MISSING_RETURN or WARNING_ALL) {
-                cout << "warning: missing 'return' at the end of function '" << function.first << "'" << endl;
-            }
         }
     }
 

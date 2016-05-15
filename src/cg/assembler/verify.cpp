@@ -133,6 +133,42 @@ string assembler::verify::functionNames(const string& filename, const std::vecto
     return report.str();
 }
 
+string assembler::verify::functionsEndWithReturn(const string& filename, const std::vector<std::string>& lines, const bool warning, const bool error) {
+    ostringstream report("");
+    string line;
+    string function;
+
+    for (unsigned i = 0; i < lines.size(); ++i) {
+        line = str::lstrip(lines[i]);
+        if (str::startswith(line, ".function:")) {
+            function = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
+            continue;
+        } else if (str::startswithchunk(line, ".end") and function.size()) {
+            // .end may have been reached while not in a function because blocks also end with .end
+            // so we also make sure that we were inside a function
+        } else {
+            continue;
+        }
+
+        if (i > 1 and (not str::startswithchunk(str::lstrip(lines[i-1]), "return"))) {
+            if (warning) {
+                cout << filename << ':' << i+1 << ": warning: missing 'return' at the end of function " << function << endl;
+            } else if (error) {
+                report << filename << ':' << i+1 << ": error: missing 'return' at the end of function " << function;
+                break;
+            } else {
+                // explicitly do nothing if neither warning nor error report was requested
+            }
+        }
+
+        // if we're here, then the .end at the end of function has been reached and
+        // the function name marker should be reset
+        function = "";
+    }
+
+    return report.str();
+}
+
 string assembler::verify::frameBalance(const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines) {
     ostringstream report("");
     string line;
