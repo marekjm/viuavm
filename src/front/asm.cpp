@@ -60,7 +60,7 @@ bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE)
 
         // warning reporting level control
              << "    " << "-W, --Wall               - warn about everything\n"
-             << "    " << "    --Wmissin-return     - warn about missing 'return' instruction at the end of functions\n"
+             << "    " << "    --Wmissing-return    - warn about missing 'return' instruction at the end of functions\n"
              << "    " << "    --Wundefined-arity   - warn about functions declared with undefined arity\n"
 
         // error reporting level control
@@ -70,6 +70,7 @@ bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE)
              << "    " << "    --Ehalt-is-last      - treat 'halt' being used as last instruction of 'main' function as error\n"
 
         // compilation options
+             << "    " << "-o, --out <file>         - specify output file\n"
              << "    " << "-c, --lib                - assemble as a library\n"
              << "    " << "-e, --expand             - only expand the source code to simple form (one instruction per line)\n"
              << "    " << "                           with this option, assembler prints expanded source to standard output\n"
@@ -90,6 +91,7 @@ int main(int argc, char* argv[]) {
 
     for (int i = 1; i < argc; ++i) {
         option = string(argv[i]);
+
         if (option == "--help" or option == "-h") {
             SHOW_HELP = true;
             continue;
@@ -105,23 +107,17 @@ int main(int argc, char* argv[]) {
         } else if (option == "--scream") {
             SCREAM = true;
             continue;
-        } else if (option == "--lib" or option == "-c") {
-            AS_LIB = true;
-            continue;
         } else if (option == "--Wall" or option == "-W") {
             WARNING_ALL = true;
+            continue;
+        } else if (option == "--Wmissing-return") {
+            WARNING_MISSING_RETURN = true;
             continue;
         } else if (option == "--Wundefined-arity") {
             WARNING_UNDEFINED_ARITY = true;
             continue;
         } else if (option == "--Eall" or option == "-E") {
             ERROR_ALL = true;
-            continue;
-        } else if (option == "--Wmissing-return") {
-            WARNING_MISSING_RETURN = true;
-            continue;
-        } else if (option == "--Emissing-return") {
-            ERROR_MISSING_RETURN = true;
             continue;
         } else if (option == "--Emissing-return") {
             ERROR_MISSING_RETURN = true;
@@ -139,6 +135,9 @@ int main(int argc, char* argv[]) {
                 cout << "error: option '" << argv[i] << "' requires an argument: filename" << endl;
                 exit(1);
             }
+            continue;
+        } else if (option == "--lib" or option == "-c") {
+            AS_LIB = true;
             continue;
         } else if (option == "--expand" or option == "-e") {
             EXPAND_ONLY = true;
