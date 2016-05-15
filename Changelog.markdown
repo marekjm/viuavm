@@ -43,6 +43,10 @@ compilation unit), and some arity errors during function calls.
 - enhancement: assembler is able to detect some arity errors during compile-time; errors are caught when
   number of call parameters is known at compile-time, and if the function specifies its arity - which
   it can do by appending `/N` suffix to its name (where `N` is a non-negative integer),
+- enhancement: assembler may warn (or trigger an error) when it finds a function declared with undefined
+  arity, this is controller by `--Wundefined-arity` and `--Eundefined-arity` options,
+- bic: assembler option `-E` (*expand source code*)  renamed to `-e`,
+- bic/feature: triggering all errors in assembler is enabled by `-E` option,
 
 
 ----
