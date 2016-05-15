@@ -259,6 +259,10 @@ int main(int argc, char* argv[]) {
         cout << report << endl;
         exit(1);
     }
+    if ((report = assembler::verify::blockBodiesAreNonempty(filename, lines)).size()) {
+        cout << report << endl;
+        exit(1);
+    }
     if ((not AS_LIB) and (ERROR_HALT_IS_LAST or ERROR_ALL) and functions.bodies.count("main")) {
         if ((report = assembler::verify::mainFunctionDoesNotEndWithHalt(functions.bodies)).size()) {
             cout << report << endl;
@@ -285,12 +289,7 @@ int main(int argc, char* argv[]) {
     //////////////////////
     // VERIFY BLOCK BODIES
     for (auto block : blocks.bodies) {
-        vector<string> flines = block.second;
-        if (flines.size() == 0) {
-            cout << "fatal: block '" << block.first << "' has empty body" << endl;
-            exit(1);
-        }
-        string last_line = flines.back();
+        string last_line = block.second.back();
         if (not (last_line == "leave" or last_line == "end" or last_line == "halt")) {
             cout << "fatal: missing returning instruction ('leave', 'return' or 'halt') at the end of block '" << block.first << "'" << endl;
             exit(1);

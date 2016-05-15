@@ -150,7 +150,7 @@ string assembler::verify::functionsEndWithReturn(const string& filename, const s
             continue;
         }
 
-        if (i > 1 and (not str::startswithchunk(str::lstrip(lines[i-1]), "return"))) {
+        if (i and (not str::startswithchunk(str::lstrip(lines[i-1]), "return"))) {
             if (warning) {
                 cout << filename << ':' << i+1 << ": warning: missing 'return' at the end of function " << function << endl;
             } else if (error) {
@@ -316,6 +316,32 @@ string assembler::verify::functionBodiesAreNonempty(map<string, vector<string> >
             break;
         }
     }
+    return report.str();
+}
+
+string assembler::verify::blockBodiesAreNonempty(const string& filename, const std::vector<std::string>& lines) {
+    ostringstream report("");
+    string line;
+    string block;
+
+    for (unsigned i = 0; i < lines.size(); ++i) {
+        line = str::lstrip(lines[i]);
+        if (str::startswith(line, ".block:")) {
+            block = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
+            continue;
+        } else if (str::startswithchunk(line, ".end") and block.size()) {
+            // .end may have been reached while not in a block because functions also end with .end
+            // so we also make sure that we were inside a block
+        } else {
+            continue;
+        }
+
+        if (i and str::startswithchunk(str::lstrip(lines[i-1]), ".block:")) {
+            report << filename << ':' << i+1 << ": error: block with empty body: " << block;
+            break;
+        }
+    }
+
     return report.str();
 }
 
