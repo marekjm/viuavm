@@ -77,7 +77,6 @@ OPTIONS
 
 
 
-[[X1]]
 SOURCE CODE EXPANSION
 ---------------------
 Viua VM bytecode generator processes the source code one instruction at a time.
@@ -104,6 +103,19 @@ During source expansion the assembler automaticaly calculates required number of
 in the call frame ('frame ^[...]') and inserts it into expanded version of the program ('frame 2').
 
 The expansion output may be inspected by using the '-e' or '--expand' option.
+
+
+
+FILES AND DIRECTORIES
+---------------------
+The assembler does not have any special files or directories it needs or reads.
+The only special filename is 'a.out' (assembler output) which is the default output file name.
+
+
+
+ENVIRONMENT VARIABLES
+---------------------
+The assembler does not read any environment variables.
 
 
 
