@@ -46,7 +46,7 @@ string assembler::verify::functionCallsAreDefined(const vector<string>& lines, c
     return report.str();
 }
 
-string assembler::verify::functionCallArities(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines) {
+string assembler::verify::functionCallArities(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, bool warning) {
     ostringstream report("");
     string line;
     int frame_parameters_count = 0;
@@ -75,22 +75,24 @@ string assembler::verify::functionCallArities(const string& filename, const vect
         }
 
         if (not assembler::utils::isValidFunctionName(function_name)) {
-            report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: '" << function_name << "' is not a valid function name at line " << (expanded_lines_to_source_lines.at(i)+1);
+            report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: '" << function_name << "' is not a valid function name";
             break;
         }
 
         int arity = assembler::utils::getFunctionArity(function_name);
 
         if (arity == -1) {
-            // arity of the function was not given - skip the check since there is no indication of the correct number of parameters but
-            // print a warning
-            cout << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": warning: call to function with undefined arity ";
-            if (frame_parameters_count >= 0) {
-                cout << "as " << function_name << '/' << frame_parameters_count;
-            } else {
-                cout << ": " << function_name;
+            if (warning) {
+                // arity of the function was not given - skip the check since there is no indication of the correct number of parameters but
+                // print a warning
+                cout << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": warning: call to function with undefined arity ";
+                if (frame_parameters_count >= 0) {
+                    cout << "as " << function_name << '/' << frame_parameters_count;
+                } else {
+                    cout << ": " << function_name;
+                }
+                cout << endl;
             }
-            cout << endl;
             continue;
         }
         if (frame_parameters_count == -1) {
@@ -99,7 +101,7 @@ string assembler::verify::functionCallArities(const string& filename, const vect
         }
 
         if (arity != frame_parameters_count) {
-            report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: invalid number of parameters in call to function '" << function_name << "': expected " << arity << " got " << frame_parameters_count << " at line " << (expanded_lines_to_source_lines.at(i)+1);
+            report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: invalid number of parameters in call to function " << function_name << ": expected " << arity << " got " << frame_parameters_count;
             break;
         }
     }
