@@ -1,4 +1,4 @@
-.function: misc::boolean
+.function: misc::boolean/1
     ; this function returns boolean value of its parameter
     not (not (arg 0 0))
     return
