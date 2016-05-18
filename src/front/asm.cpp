@@ -251,7 +251,7 @@ int main(int argc, char* argv[]) {
         cout << report << endl;
         exit(1);
     }
-    if ((report = assembler::verify::functionCallArities(expanded_lines, expanded_lines_to_source_lines)).size()) {
+    if ((report = assembler::verify::functionCallArities(filename, expanded_lines, expanded_lines_to_source_lines)).size()) {
         cout << report << endl;
         return 1;
     }
