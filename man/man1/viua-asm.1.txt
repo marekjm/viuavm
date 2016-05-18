@@ -1,0 +1,136 @@
+VIUA-ASM(1)
+===========
+:doctype: manpage
+
+
+NAME
+----
+viua-asm - Viua VM assembler and linker
+
+
+SYNOPSIS
+--------
+*viua-vm* ['option' '...'] ['-o' '<output>'] '<source>.asm' ['module' '...']
+
+
+DESCRIPTION
+-----------
+The viua-asm(1) program is an assembler-linker combination for Viua VM.
+It is used to compile '.asm' source files to Viua bytecode, and to link
+resulting object files into executables or linkable modules.
+
+
+
+OPTIONS
+-------
+*-V, --version*::
+    Display version information.
+
+*-h, --help*::
+    Display help message.
+
+*-v, --verbose*::
+    Display verbose output.
+
+*-d, --debug*::
+    Display debugging output.
+
+*--scream*::
+    Scream to the screen (display so much output it becomes noisy, but
+    provide even more information that using just '--debug' option).
+
+*-W, --Wall*::
+    Enable all warnings.
+
+*--Wmissing-return*::
+    Warn when a 'return' instruction is missing at the end of a function.
+
+*--Wundefined-arity*::
+    Warn about functions with undefined arity (declarations, calls etc.).
+
+*-E, --Eall*::
+    Enable all errors (i.e. convert all warnings to errors).
+
+*--Emissing-return*::
+    Raise an error if 'return' instruction is missing at the end of a function.
+
+*--Eundefined-arity*::
+    Raise an error if a function with undefined arity is declared or called.
+
+*--Ehalt-is-last*::
+    Raise an error if 'halt' instruction is used as a last instruction of the 'main/1'
+    function instead of 'return'.
+
+*-o, --output*='<output>'::
+    Write assembled/linked bytecode to '<output>'.
+
+*-c, --lib*::
+    Produce a linkable module instead of an executable.
+
+*-e, --expand*::
+    Expand source to one-instruction-per-line and print result to standard output.
+
+*-C, --verify*::
+    Verify source code correctness without compiling or linking it.
+    This option combined with '--W*' and '--E*' options turns viua-asm(1) into a
+    poor-man's static code analyzer.
+
+
+
+[[X1]]
+SOURCE CODE EXPANSION
+---------------------
+Viua VM bytecode generator processes the source code one instruction at a time.
+
+Syntax of the assembly language permits "wrapping" several instructions on one line and
+the assembler must first rewrite the source code so that every such "wrapped" instruction is
+expanded into several lines with each line containing only one basic instruction to make
+the source digestible for the bytecode generator.
+
+For example, it rewrites this code:
+
+    frame ^[(pamv 0 (istore 1 42)) (param 1 (strstore 1 "Hello World!"))]
+
+to this:
+
+    frame 2
+    istore 1 42
+    pamv 0 1
+    strstore 1 "Hello World!"
+    param 1 1
+
+The first version is for the programmer; the second one is for the bytecode generator.
+During source expansion the assembler automaticaly calculates required number of the parameter slots
+in the call frame ('frame ^[...]') and inserts it into expanded version of the program ('frame 2').
+
+The expansion output may be inspected by using the '-e' or '--expand' option.
+
+
+
+BUGS
+----
+Many.
+See RESOURCES section to learn where to report any new bugs you have found.
+
+
+
+AUTHOR
+------
+Marek Marecki is the primary author.
+See 'CONTRIBUTORS' file for full list of people who worked on Viua VM source code.
+
+
+
+RESOURCES
+---------
+GitHub: <https://github.com/marekjm/viuavm>
+
+Web site: <http://viuavm.org/>
+
+
+
+COPYING
+-------
+Copyright \(C) 2014-2016 Marek Marecki.
+This is free software published under the GNU General Public License 3 (GPLv3).
+
