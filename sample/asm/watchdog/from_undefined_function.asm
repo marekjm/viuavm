@@ -38,7 +38,7 @@
 
 .function: main
     frame 0
-    watchdog undefined_function
+    watchdog undefined_function/0
 
     frame 0
     process 1 broken_process/0

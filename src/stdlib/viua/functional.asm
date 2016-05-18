@@ -4,16 +4,8 @@
 ; source code of the script.
 ; Alternatively, it can be statically linked if that would be more suitable.
 ;
-; When linking dynamically, following signatures can be used:
-;
-;       .signature: std::functional::filter
-;       .signature: std::functional::foreach
-;       .signature: std::functional::map
-;       .signature: std::functional::apply
-;       .signature: std::functional::invoke
-;
 
-.function: std::functional::filter
+.function: std::functional::filter/2
     ; classic filter() function
     ; it takes two arguments:
     ;   * a filtering function,
@@ -67,7 +59,7 @@
     return
 .end
 
-.function: std::functional::foreach
+.function: std::functional::foreach/2
     ; this function takes two mandatory parameters:
     ;
     ;       * a closure, or a function object to call,
@@ -110,7 +102,7 @@
     return
 .end
 
-.function: std::functional::map
+.function: std::functional::map/2
     ; this function takes two arguments:
     ;   * a function,
     ;   * a vector,
@@ -172,7 +164,7 @@
     delete (pull 4)
     leave
 .end
-.function: std::functional::apply
+.function: std::functional::apply/2
     ; this function applies another function on a single parameter
     ;
     ; this function is type agnostic
@@ -195,7 +187,7 @@
     return
 .end
 
-.function: std::functional::invoke
+.function: std::functional::invoke/2
     ; this function takes two parameters:
     ;    1) a function object
     ;    2) a vector of parameters for function given as first parameter

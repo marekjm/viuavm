@@ -47,6 +47,7 @@ compilation unit), and some arity errors during function calls.
   arity, this is controller by `--Wundefined-arity` and `--Eundefined-arity` options,
 - bic: assembler option `-E` (*expand source code*)  renamed to `-e`,
 - bic/feature: triggering all errors in assembler is enabled by `-E` option,
+- bic: functions in `std::functional` module have defined arities,
 
 
 ----

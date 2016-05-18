@@ -878,7 +878,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, opts=('--Ehalt-is-last',), okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("fatal: invalid number of parameters in call to function 'foo/1': expected 1 got 0 at line 8", output.strip())
+        self.assertEqual("./sample/asm/errors/arity_error.asm:8: error: invalid number of parameters in call to function foo/1: expected 1 got 0", output.strip())
 
     def testNoReturnAtTheEndOfAFunctionError(self):
         name = 'no_return_at_the_end_of_a_function.asm'
@@ -1015,7 +1015,7 @@ class WatchdogTests(unittest.TestCase):
         runTest(self, 'hello_world.asm', 'process spawned with <Function: broken_process> died')
 
     def testWatchdogFromUndefinedFunctionCaughtByAssembler(self):
-        runTestFailsToAssemble(self, 'from_undefined_function.asm', 'fatal: watchdog from undefined function \'undefined_function\' at line 41')
+        runTestFailsToAssemble(self, 'from_undefined_function.asm', 'fatal: watchdog from undefined function \'undefined_function/0\' at line 41')
 
     def testWatchdogFromUndefinedFunctionCaughtAtRuntime(self):
         runTestThrowsException(self, 'from_undefined_function_at_runtime.asm', 'uncaught object: Exception = watchdog process from undefined function: undefined_function')
