@@ -767,7 +767,7 @@ uint64_t writeCodeBlocksSection(ofstream& out, const invocables_t& blocks, const
     return block_bodies_size_so_far;
 }
 
-int generate(const vector<string>& expanded_lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, vector<string>& ilines, invocables_t& functions, invocables_t& blocks, string& filename, string& compilename, const vector<string>& commandline_given_links, const compilationflags_t& flags) {
+int generate(const vector<string>& expanded_lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, vector<string>& ilines, invocables_t& functions, invocables_t& blocks, const string& filename, string& compilename, const vector<string>& commandline_given_links, const compilationflags_t& flags) {
     //////////////////////////////
     // SETUP INITIAL BYTECODE SIZE
     uint64_t bytes = 0;
@@ -938,7 +938,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     // AFTER HAVING OBTAINED LINKED NAMES, IT IS POSSIBLE TO VERIFY CALLS AND
     // CALLABLE (FUNCTIONS, CLOSURES, ETC.) CREATIONS
     string report;
-    if ((report = assembler::verify::functionCallsAreDefined(expanded_lines, expanded_lines_to_source_lines, functions.names, functions.signatures)).size()) {
+    if ((report = assembler::verify::functionCallsAreDefined(filename, expanded_lines, expanded_lines_to_source_lines, functions.names, functions.signatures)).size()) {
         cout << report << endl;
         exit(1);
     }

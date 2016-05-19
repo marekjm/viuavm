@@ -13,7 +13,7 @@
 using namespace std;
 
 
-string assembler::verify::functionCallsAreDefined(const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, const vector<string>& function_names, const vector<string>& function_signatures) {
+string assembler::verify::functionCallsAreDefined(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, const vector<string>& function_names, const vector<string>& function_signatures) {
     ostringstream report("");
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
@@ -39,7 +39,7 @@ string assembler::verify::functionCallsAreDefined(const vector<string>& lines, c
         }
 
         if (is_undefined) {
-            report << "fatal: " << ((instr_name == "call" or instr_name == "tailcall") ? "call to" : instr_name == "process" ? "process from" : "watchdog from") << " undefined function '" << check_function << "' at line " << (expanded_lines_to_source_lines.at(i)+1);
+            report << filename << ':' << (expanded_lines_to_source_lines.at(i)+1) << ": error: " << ((instr_name == "call" or instr_name == "tailcall") ? "call to" : instr_name == "process" ? "process from" : "watchdog from") << " undefined function " << check_function;
             break;
         }
     }

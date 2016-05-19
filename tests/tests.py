@@ -1015,7 +1015,7 @@ class WatchdogTests(unittest.TestCase):
         runTest(self, 'hello_world.asm', 'process spawned with <Function: broken_process> died')
 
     def testWatchdogFromUndefinedFunctionCaughtByAssembler(self):
-        runTestFailsToAssemble(self, 'from_undefined_function.asm', 'fatal: watchdog from undefined function \'undefined_function/0\' at line 41')
+        runTestFailsToAssemble(self, 'from_undefined_function.asm', './sample/asm/watchdog/from_undefined_function.asm:41: error: watchdog from undefined function undefined_function/0')
 
     def testWatchdogFromUndefinedFunctionCaughtAtRuntime(self):
         runTestThrowsException(self, 'from_undefined_function_at_runtime.asm', 'uncaught object: Exception = watchdog process from undefined function: undefined_function')
