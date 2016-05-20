@@ -1,2 +1,0 @@
-* linking a function two times shall be detected (this would create dead code),
-* linking into bigger libs should be allowed,
