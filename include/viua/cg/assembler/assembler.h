@@ -42,7 +42,7 @@ namespace assembler {
         std::string functionsEndWithReturn(const std::string&, const std::vector<std::string>&, const bool, const bool);
         std::string functionCallsAreDefined(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&, const std::vector<std::string>& function_names, const std::vector<std::string>& function_signatures);
         std::string functionCallArities(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&, bool);
-        std::string frameBalance(const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&);
+        std::string frameBalance(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&);
         std::string callableCreations(const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&, const std::vector<std::string>& function_names, const std::vector<std::string>& function_signatures);
         std::string ressInstructions(const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&, bool as_lib);
         std::string functionBodiesAreNonempty(std::map<std::string, std::vector<std::string> >& functions);

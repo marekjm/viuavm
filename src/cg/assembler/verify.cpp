@@ -179,7 +179,7 @@ string assembler::verify::functionsEndWithReturn(const string& filename, const s
     return report.str();
 }
 
-string assembler::verify::frameBalance(const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines) {
+string assembler::verify::frameBalance(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines) {
     ostringstream report("");
     string line;
     string instruction;
@@ -204,19 +204,17 @@ string assembler::verify::frameBalance(const vector<string>& lines, const map<lo
         }
 
         if (balance < 0) {
-            report << "fatal: call with '" << instruction << "' without a frame at line ";
-            report << (expanded_lines_to_source_lines.at(i)+1);
+            report << filename << ':' << (expanded_lines_to_source_lines.at(i)+1) << ": error: call with '" << instruction << "' without a frame";
             break;
         }
         if (balance > 1) {
-            report << "fatal: excess frame spawned at line ";
-            report << (expanded_lines_to_source_lines.at(i)+1);
+            report << filename << ':' << (expanded_lines_to_source_lines.at(i)+1) << ": error: excess frame spawned";
             report << " (unused frame spawned at line ";
             report << (expanded_lines_to_source_lines.at(previous_frame_spawnline)+1) << ')';
             break;
         }
         if (instruction == "return" and balance > 0) {
-            report << "fatal: leftover frame at line " << (expanded_lines_to_source_lines.at(i)+1) << " (spawned at line " << (expanded_lines_to_source_lines.at(previous_frame_spawnline)+1) << ')';
+            report << filename << ':' << (expanded_lines_to_source_lines.at(i)+1) << ": error: leftover frame (spawned at line " << (expanded_lines_to_source_lines.at(previous_frame_spawnline)+1) << ')';
             break;
         }
 
