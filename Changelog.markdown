@@ -48,6 +48,8 @@ compilation unit), and some arity errors during function calls.
 - bic: assembler option `-E` (*expand source code*)  renamed to `-e`,
 - bic/feature: triggering all errors in assembler is enabled by `-E` option,
 - bic: functions in `std::functional` module have defined arities,
+- enhancement: assembler reports using the following format `<filename>:<line-number>: <class>: <message>`,
+  for example `./foo.asm:18: call to undefined function foo/1`
 
 
 ----
