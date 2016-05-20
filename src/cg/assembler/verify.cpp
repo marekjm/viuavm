@@ -122,7 +122,7 @@ string assembler::verify::functionNames(const string& filename, const std::vecto
         }
 
         if (not assembler::utils::isValidFunctionName(function)) {
-            report << "fatal: invalid function name '" << function << "' at line " << i;
+            report << filename << ':' << i+1 << ": error: invalid function name: " << function;
             break;
         }
 
