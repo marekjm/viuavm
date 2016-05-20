@@ -912,6 +912,22 @@ class AssemblerErrorTests(unittest.TestCase):
         self.assertEqual(1, exit_code)
         self.assertEqual("./sample/asm/errors/invalid_function_name.asm:11: error: invalid function name: foo/x", output.strip())
 
+    def testExcessFrameSpawned(self):
+        name = 'excess_frame_spawned.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/excess_frame_spawned.asm:8: error: excess frame spawned (unused frame spawned at line 7)", output.strip())
+
+    def testCallWithoutAFrame(self):
+        name = 'call_without_a_frame.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/call_without_a_frame.asm:9: error: call with 'tailcall' without a frame", output.strip())
+
 
 class AssemblerErrorRejectingDuplicateSymbolsTests(unittest.TestCase):
     PATH = './sample/asm/errors/single_definition_rule'
