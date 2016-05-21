@@ -327,7 +327,7 @@ string bodiesAreNonempty(const string& filename, const vector<string>& lines, co
             // prefix ('.function:' or '.block:') is interesting from the point of our analysis
             name = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
             continue;
-        } else if (str::startswithchunk(line, ".end") and name.size()) {
+        } else if (str::startswithchunk(line, ".end")) {
             // '.end' is also interesting because we want to see if it's immediately preceded by
             // the interesting prefix
         } else {
