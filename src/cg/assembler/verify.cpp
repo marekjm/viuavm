@@ -225,7 +225,7 @@ string assembler::verify::frameBalance(const string& filename, const vector<stri
     return report.str();
 }
 
-string assembler::verify::blockTries(const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, const vector<string>& block_names, const vector<string>& block_signatures) {
+string assembler::verify::blockTries(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, const vector<string>& block_names, const vector<string>& block_signatures) {
     ostringstream report("");
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
@@ -242,7 +242,8 @@ string assembler::verify::blockTries(const vector<string>& lines, const map<long
         }
 
         if (is_undefined) {
-            report << "fatal: cannot enter undefined block '" << block << "' at line " << (expanded_lines_to_source_lines.at(i)+1);
+            report << filename << ':' << (expanded_lines_to_source_lines.at(i)+1) << ": error: cannot enter undefined block: " << block;
+            break;
         }
     }
     return report.str();

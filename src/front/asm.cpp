@@ -243,7 +243,7 @@ int main(int argc, char* argv[]) {
         cout << report << endl;
         return 1;
     }
-    if ((report = assembler::verify::blockTries(expanded_lines, expanded_lines_to_source_lines, blocks.names, blocks.signatures)).size()) {
+    if ((report = assembler::verify::blockTries(filename, expanded_lines, expanded_lines_to_source_lines, blocks.names, blocks.signatures)).size()) {
         cout << report << endl;
         return 1;
     }
