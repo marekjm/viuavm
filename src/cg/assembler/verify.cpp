@@ -398,7 +398,7 @@ string assembler::verify::directives(const string& filename, const vector<string
     }
     return report.str();
 }
-string assembler::verify::instructions(const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines) {
+string assembler::verify::instructions(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines) {
     ostringstream report("");
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
@@ -409,9 +409,7 @@ string assembler::verify::instructions(const vector<string>& lines, const map<lo
 
         string token = str::chunk(line);
         if (OP_SIZES.count(token) == 0) {
-            report << "fatal: unrecognised instruction on line ";
-            report << (expanded_lines_to_source_lines.at(i)+1);
-            report << ": `" << token << '`';
+            report << filename << ':' << (expanded_lines_to_source_lines.at(i)+1) << ": error: unknown instruction: '" << token << "'";
             break;
         }
     }
