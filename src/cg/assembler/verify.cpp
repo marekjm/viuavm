@@ -280,7 +280,7 @@ string assembler::verify::callableCreations(const string& filename, const vector
     return report.str();
 }
 
-string assembler::verify::ressInstructions(const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, bool as_lib) {
+string assembler::verify::ressInstructions(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, bool as_lib) {
     ostringstream report("");
     vector<string> legal_register_sets = {
         "global",   // global register set
@@ -303,11 +303,11 @@ string assembler::verify::ressInstructions(const vector<string>& lines, const ma
         string registerset_name = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
 
         if (find(legal_register_sets.begin(), legal_register_sets.end(), registerset_name) == legal_register_sets.end()) {
-            report << "fatal: illegal register set name in ress instruction: '" << registerset_name << "' at line " << (expanded_lines_to_source_lines.at(i)+1);
+            report << filename << ':' << (expanded_lines_to_source_lines.at(i)+1) << ": error: illegal register set name in ress instruction '" << registerset_name << "' in function " << function;
             break;
         }
         if (registerset_name == "global" and as_lib and function != "main") {
-            report << "fatal: global registers used in library function at line " << (expanded_lines_to_source_lines.at(i)+1);
+            report << filename << ':' << (expanded_lines_to_source_lines.at(i)+1) << ": error: global registers used in library function " << function;
             break;
         }
     }

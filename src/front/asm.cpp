@@ -231,7 +231,7 @@ int main(int argc, char* argv[]) {
         cout << report << endl;
         return 1;
     }
-    if ((report = assembler::verify::ressInstructions(expanded_lines, expanded_lines_to_source_lines, AS_LIB)).size()) {
+    if ((report = assembler::verify::ressInstructions(filename, expanded_lines, expanded_lines_to_source_lines, AS_LIB)).size()) {
         cout << report << endl;
         return 1;
     }
