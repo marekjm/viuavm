@@ -314,7 +314,7 @@ string assembler::verify::ressInstructions(const string& filename, const vector<
     return report.str();
 }
 
-string bodiesAreNonempty(const string& filename, const vector<string>& lines, const string& type) {
+string bodiesAreNonempty(const string& filename, const vector<string>& lines) {
     ostringstream report("");
     string line, block, function;
 
@@ -355,11 +355,10 @@ string bodiesAreNonempty(const string& filename, const vector<string>& lines, co
     return report.str();
 }
 string assembler::verify::functionBodiesAreNonempty(const std::string& filename, const vector<string>& lines) {
-    return bodiesAreNonempty(filename, lines, "function");
+    return bodiesAreNonempty(filename, lines);
 }
-
 string assembler::verify::blockBodiesAreNonempty(const string& filename, const std::vector<std::string>& lines) {
-    return bodiesAreNonempty(filename, lines, "block");
+    return bodiesAreNonempty(filename, lines);
 }
 
 string assembler::verify::mainFunctionDoesNotEndWithHalt(map<string, vector<string> >& functions) {
