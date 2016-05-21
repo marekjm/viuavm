@@ -249,7 +249,7 @@ string assembler::verify::blockTries(const string& filename, const vector<string
     return report.str();
 }
 
-string assembler::verify::callableCreations(const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, const vector<string>& function_names, const vector<string>& function_signatures) {
+string assembler::verify::callableCreations(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, const vector<string>& function_names, const vector<string>& function_signatures) {
     ostringstream report("");
     string line;
     string callable_type;
@@ -273,8 +273,7 @@ string assembler::verify::callableCreations(const vector<string>& lines, const m
         }
 
         if (is_undefined) {
-            report << "fatal: " << callable_type << " from undefined function '" << function << "' at line ";
-            report << (expanded_lines_to_source_lines.at(i)+1);
+            report << filename << ':' << (expanded_lines_to_source_lines.at(i)+1) << ": error: " << callable_type << " from undefined function: " << function;
             break;
         }
     }
