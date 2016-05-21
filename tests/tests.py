@@ -952,6 +952,14 @@ class AssemblerErrorTests(unittest.TestCase):
         self.assertEqual(1, exit_code)
         self.assertEqual("./sample/asm/errors/invalid_ress_instruction.asm:2: error: illegal register set name in ress instruction 'foo' in function main", output.strip())
 
+    def testGlobalRegisterSetUsedInLibraryFunction(self):
+        name = 'global_rs_used_in_lib.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, opts=('-c',), okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/global_rs_used_in_lib.asm:2: error: global registers used in library function foo", output.strip())
+
 
 class AssemblerErrorRejectingDuplicateSymbolsTests(unittest.TestCase):
     PATH = './sample/asm/errors/single_definition_rule'
