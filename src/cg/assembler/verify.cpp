@@ -314,56 +314,39 @@ string assembler::verify::ressInstructions(const string& filename, const vector<
     return report.str();
 }
 
-string assembler::verify::functionBodiesAreNonempty(const std::string& filename, const vector<string>& lines) {
+string bodiesAreNonempty(const string& filename, const vector<string>& lines, const string& type) {
     ostringstream report("");
     string line;
-    string function;
+    string name;
+
+    string prefix = ("." + type + ":");
 
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = str::lstrip(lines[i]);
-        if (str::startswith(line, ".function:")) {
-            function = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
+        if (str::startswith(line, prefix)) {
+            name = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
             continue;
-        } else if (str::startswithchunk(line, ".end") and function.size()) {
-            // .end may have been reached while not in a function because blocks also end with .end
-            // so we also make sure that we were inside a function
+        } else if (str::startswithchunk(line, ".end") and name.size()) {
+            // .end may have been reached while not in a function/block because they both end with .end
+            // so we also make sure that we were inside a name
         } else {
             continue;
         }
 
-        if (i and str::startswithchunk(str::lstrip(lines[i-1]), ".function:")) {
-            report << filename << ':' << i << ": error: function with empty body: " << function;
+        if (i and str::startswithchunk(str::lstrip(lines[i-1]), prefix)) {
+            report << filename << ':' << i << ": error: " << type << " with empty body: " << name;
             break;
         }
     }
 
     return report.str();
 }
+string assembler::verify::functionBodiesAreNonempty(const std::string& filename, const vector<string>& lines) {
+    return bodiesAreNonempty(filename, lines, "function");
+}
 
 string assembler::verify::blockBodiesAreNonempty(const string& filename, const std::vector<std::string>& lines) {
-    ostringstream report("");
-    string line;
-    string block;
-
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        line = str::lstrip(lines[i]);
-        if (str::startswith(line, ".block:")) {
-            block = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
-            continue;
-        } else if (str::startswithchunk(line, ".end") and block.size()) {
-            // .end may have been reached while not in a block because functions also end with .end
-            // so we also make sure that we were inside a block
-        } else {
-            continue;
-        }
-
-        if (i and str::startswithchunk(str::lstrip(lines[i-1]), ".block:")) {
-            report << filename << ':' << i << ": error: block with empty body: " << block;
-            break;
-        }
-    }
-
-    return report.str();
+    return bodiesAreNonempty(filename, lines, "block");
 }
 
 string assembler::verify::mainFunctionDoesNotEndWithHalt(map<string, vector<string> >& functions) {
