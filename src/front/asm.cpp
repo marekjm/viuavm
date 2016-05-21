@@ -223,7 +223,7 @@ int main(int argc, char* argv[]) {
     ///////////////////////////////////////////
     // INITIAL VERIFICATION OF CODE CORRECTNESS
     string report;
-    if ((report = assembler::verify::directives(expanded_lines, expanded_lines_to_source_lines)).size()) {
+    if ((report = assembler::verify::directives(filename, expanded_lines, expanded_lines_to_source_lines)).size()) {
         cout << report << endl;
         return 1;
     }

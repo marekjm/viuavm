@@ -380,7 +380,7 @@ string assembler::verify::mainFunctionDoesNotEndWithHalt(const string& filename,
     return report.str();
 }
 
-string assembler::verify::directives(const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines) {
+string assembler::verify::directives(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines) {
     ostringstream report("");
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
@@ -391,9 +391,8 @@ string assembler::verify::directives(const vector<string>& lines, const map<long
 
         string token = str::chunk(line);
         if (not (token == ".function:" or token == ".signature:" or token == ".bsignature:" or token == ".block:" or token == ".end" or token == ".name:" or token == ".mark:" or token == ".main:" or token == ".type:" or token == ".class:")) {
-            report << "fatal: unrecognised assembler directive on line ";
-            report << (expanded_lines_to_source_lines.at(i)+1);
-            report << ": `" << token << '`';
+            report << filename << ':' << (expanded_lines_to_source_lines.at(i)+1) << ": error: illegal directive on line ";
+            report << ": '" << token << "'";
             break;
         }
     }
