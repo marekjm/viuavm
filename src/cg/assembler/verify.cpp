@@ -316,16 +316,18 @@ string assembler::verify::ressInstructions(const string& filename, const vector<
 
 string bodiesAreNonempty(const string& filename, const vector<string>& lines, const string& type) {
     ostringstream report("");
-    string line;
-    string name;
+    string line, block, function;
 
-    string prefix = ("." + type + ":");
+    string block_prefix = ".block:";
+    string function_prefix = ".function:";
 
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = str::lstrip(lines[i]);
-        if (str::startswith(line, prefix)) {
-            // prefix ('.function:' or '.block:') is interesting from the point of our analysis
-            name = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
+        if (str::startswith(line, block_prefix)) {
+            block = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
+            continue;
+        } else if (str::startswith(line, function_prefix)) {
+            function = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
             continue;
         } else if (str::startswithchunk(line, ".end")) {
             // '.end' is also interesting because we want to see if it's immediately preceded by
@@ -334,13 +336,20 @@ string bodiesAreNonempty(const string& filename, const vector<string>& lines, co
             continue;
         }
 
+        if (not (block.size() or function.size())) {
+            report << filename << ':' << i << ": error: stray .end marker";
+            break;
+        }
+
         // this if is reached only of '.end' was matched - so we just check if it is preceded by
         // the interesting prefix, and
         // if it is - report an error
-        if (i and str::startswithchunk(str::lstrip(lines[i-1]), prefix)) {
-            report << filename << ':' << i << ": error: " << type << " with empty body: " << name;
+        if (i and (str::startswithchunk(str::lstrip(lines[i-1]), block_prefix) or str::startswithchunk(str::lstrip(lines[i-1]), function_prefix))) {
+            report << filename << ':' << i << ": error: " << (function.size() ? "function" : "block") << " with empty body: " << (function.size() ? function : block);
             break;
         }
+        function = "";
+        block = "";
     }
 
     return report.str();
