@@ -1,0 +1,111 @@
+# Viua VM list processing library
+
+Viua VM list processing library implements typical functions used
+used in list processing.
+It provides tools to fluently, and in functional style, process
+Vector's and other objects that can be iterated over (after conversion
+to Vector).
+
+> FIXME: Viua VM should support iterators.
+
+----
+
+## API
+
+Proposed API of the streams library is presented below.
+These functions are available in `std::streams` module.
+
+### `filter/2`
+
+(Function, Vector) -> Vector
+
+Canonical filter function.
+
+
+### `map/2`
+
+(Function, Vector) -> Vector
+
+Canonical map function.
+
+
+### `reduce/2`
+
+(Function, Vector) -> Object
+
+Canonical reduce function.
+Requires at least one object to be present in input vector.
+
+
+### `reduce/3`
+
+(Function, Object, Vector) -> Object
+
+Canonical reduce function.
+If input vector is empty, returns just the accumulator object.
+
+
+### `foreach/2`
+
+(Function, Vector) -> Vector
+
+Canonical foreach function.
+Executed just for side-effects.
+
+
+### `partition/2`
+
+(Function, Vector) -> Vector
+
+Canonical partition function.
+Splits vector into two subvectors and
+returns two-element vector.
+First subvector contains matched elements of input vector.
+
+
+### `head/1`
+
+(Vector) -> Object
+
+Returns first element of the input vector.
+Throws exception if vector is empty.
+
+
+### `tail/1`
+
+(Vector) -> Vector
+
+Returns tail of input vector.
+Input vector may be empty.
+
+
+### `flatten/1`
+
+(Vector) -> Vector
+
+Flattens vector of vectors.
+
+
+### `zip/2`
+
+(Vector, Vector) -> Vector
+
+Zips two vectors.
+Resulting vector has the size equal to the size of shorter input
+vector.
+
+
+### `zipn/1`
+
+(Vector) -> Vector
+
+Zips N vectors, where N is the size of the input vector.
+Resulting vector has the size equal to the shortest input
+vector.
+
+
+### `reverse/1`
+
+(Vector) -> Vector
+
+Reverses input vector.
