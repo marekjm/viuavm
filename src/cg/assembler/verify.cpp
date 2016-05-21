@@ -337,7 +337,7 @@ string bodiesAreNonempty(const string& filename, const vector<string>& lines, co
         }
 
         if (not (block.size() or function.size())) {
-            report << filename << ':' << i << ": error: stray .end marker";
+            report << filename << ':' << i+1 << ": error: stray .end marker";
             break;
         }
 
