@@ -324,15 +324,19 @@ string bodiesAreNonempty(const string& filename, const vector<string>& lines, co
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = str::lstrip(lines[i]);
         if (str::startswith(line, prefix)) {
+            // prefix ('.function:' or '.block:') is interesting from the point of our analysis
             name = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
             continue;
         } else if (str::startswithchunk(line, ".end") and name.size()) {
-            // .end may have been reached while not in a function/block because they both end with .end
-            // so we also make sure that we were inside a name
+            // '.end' is also interesting because we want to see if it's immediately preceded by
+            // the interesting prefix
         } else {
             continue;
         }
 
+        // this if is reached only of '.end' was matched - so we just check if it is preceded by
+        // the interesting prefix, and
+        // if it is - report an error
         if (i and str::startswithchunk(str::lstrip(lines[i-1]), prefix)) {
             report << filename << ':' << i << ": error: " << type << " with empty body: " << name;
             break;
