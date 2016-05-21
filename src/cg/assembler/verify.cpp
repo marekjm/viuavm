@@ -361,20 +361,21 @@ string assembler::verify::blockBodiesAreNonempty(const string& filename, const s
     return bodiesAreNonempty(filename, lines);
 }
 
-string assembler::verify::mainFunctionDoesNotEndWithHalt(map<string, vector<string> >& functions) {
+string assembler::verify::mainFunctionDoesNotEndWithHalt(const string& filename, map<string, vector<string> >& functions) {
     ostringstream report("");
     string line;
+
     if (functions.count("main") == 0) {
-        report << "error: cannot verify undefined 'main' function" << endl;
+        report << filename << ": error: cannot verify undefined function if it's undefined";
         return report.str();
     }
     vector<string> flines = functions.at("main");
     if (flines.size() == 0) {
-        report << "error: cannot verify empty 'main' function" << endl;
+        report << filename << ": error: cannot verify empty 'main' function" << endl;
         return report.str();
     }
     if (str::chunk(str::lstrip(flines.back())) == "halt") {
-        report << "error: using 'halt' instead of 'return' as last instruction in main function leads to memory leaks" << endl;
+        report << filename << ": error: using 'halt' instead of 'return' as last instruction in main function leads to memory leaks" << endl;
     }
     return report.str();
 }

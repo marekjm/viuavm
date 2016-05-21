@@ -264,7 +264,7 @@ int main(int argc, char* argv[]) {
         exit(1);
     }
     if ((not AS_LIB) and (ERROR_HALT_IS_LAST or ERROR_ALL) and functions.bodies.count("main")) {
-        if ((report = assembler::verify::mainFunctionDoesNotEndWithHalt(functions.bodies)).size()) {
+        if ((report = assembler::verify::mainFunctionDoesNotEndWithHalt(filename, functions.bodies)).size()) {
             cout << report << endl;
             exit(1);
         }
