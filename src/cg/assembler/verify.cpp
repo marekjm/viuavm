@@ -358,7 +358,7 @@ string assembler::verify::blockBodiesAreNonempty(const string& filename, const s
         }
 
         if (i and str::startswithchunk(str::lstrip(lines[i-1]), ".block:")) {
-            report << filename << ':' << i+1 << ": error: block with empty body: " << block;
+            report << filename << ':' << i << ": error: block with empty body: " << block;
             break;
         }
     }
