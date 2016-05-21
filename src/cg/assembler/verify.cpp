@@ -314,16 +314,29 @@ string assembler::verify::ressInstructions(const string& filename, const vector<
     return report.str();
 }
 
-string assembler::verify::functionBodiesAreNonempty(map<string, vector<string> >& functions) {
+string assembler::verify::functionBodiesAreNonempty(const std::string& filename, const vector<string>& lines) {
     ostringstream report("");
     string line;
-    for (auto function : functions) {
-        vector<string> flines = function.second;
-        if (flines.size() == 0) {
-            report << "fatal: function '" + function.first + "' is empty" << endl;
+    string function;
+
+    for (unsigned i = 0; i < lines.size(); ++i) {
+        line = str::lstrip(lines[i]);
+        if (str::startswith(line, ".function:")) {
+            function = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
+            continue;
+        } else if (str::startswithchunk(line, ".end") and function.size()) {
+            // .end may have been reached while not in a function because blocks also end with .end
+            // so we also make sure that we were inside a function
+        } else {
+            continue;
+        }
+
+        if (i and str::startswithchunk(str::lstrip(lines[i-1]), ".function:")) {
+            report << filename << ':' << i << ": error: function with empty body: " << function;
             break;
         }
     }
+
     return report.str();
 }
 

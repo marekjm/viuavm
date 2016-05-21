@@ -45,7 +45,7 @@ namespace assembler {
         std::string frameBalance(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&);
         std::string callableCreations(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&, const std::vector<std::string>& function_names, const std::vector<std::string>& function_signatures);
         std::string ressInstructions(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&, bool as_lib);
-        std::string functionBodiesAreNonempty(std::map<std::string, std::vector<std::string> >& functions);
+        std::string functionBodiesAreNonempty(const std::string&, const std::vector<std::string>&);
         std::string blockBodiesAreNonempty(const std::string&, const std::vector<std::string>&);
         std::string blockTries(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&, const std::vector<std::string>& block_names, const std::vector<std::string>& block_signatures);
         std::string blockBodiesEndWithLeave(const std::vector<std::string>& lines, std::map<std::string, std::pair<bool, std::vector<std::string> > >& blocks);
