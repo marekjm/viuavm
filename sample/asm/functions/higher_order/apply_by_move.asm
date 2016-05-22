@@ -14,7 +14,7 @@
     .name: 2 parameter
 
     ; apply the function to the parameter...
-    frame ^[(param 0 (arg parameter 1))]
+    frame ^[(pamv 0 (arg parameter 1))]
     fcall 3 (arg func 0)
 
     ; ...and return the result
