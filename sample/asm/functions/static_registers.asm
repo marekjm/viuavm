@@ -33,7 +33,7 @@
     .mark: report
     print 1
     frame ^[(param 0 3)]
-    call 0 counter/1
+    tailcall counter/1
 
     .mark: finish
     return
