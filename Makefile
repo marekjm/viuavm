@@ -170,7 +170,7 @@ build/asm/decode.o: src/front/asm/decode.cpp include/viua/front/asm.h
 build/asm/gather.o: src/front/asm/gather.cpp include/viua/front/asm.h
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
-build/asm/generate.o: src/front/asm/generate.cpp include/viua/front/asm.h
+build/asm/generate.o: src/front/asm/generate.cpp include/viua/front/asm.h include/viua/machine.h
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
 build/asm.o: src/front/asm.cpp include/viua/front/asm.h

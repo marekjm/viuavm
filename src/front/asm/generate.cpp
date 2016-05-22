@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <fstream>
 #include <sstream>
+#include <viua/machine.h>
 #include <viua/bytecode/maps.h>
 #include <viua/support/string.h>
 #include <viua/support/env.h>
@@ -17,10 +18,6 @@ using namespace std;
 extern bool VERBOSE;
 extern bool DEBUG;
 extern bool SCREAM;
-
-
-// ASSEMBLY CONSTANTS
-const string ENTRY_FUNCTION_NAME = "__entry";
 
 
 template<class T> void bwrite(ofstream& out, const T& object) {
