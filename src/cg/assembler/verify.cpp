@@ -108,6 +108,74 @@ string assembler::verify::functionCallArities(const string& filename, const vect
     return report.str();
 }
 
+string assembler::verify::msgArities(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, bool warning) {
+    ostringstream report("");
+    string line;
+    int frame_parameters_count = 0;
+
+    for (unsigned i = 0; i < lines.size(); ++i) {
+        line = str::lstrip(lines[i]);
+        if (not (str::startswith(line, "msg") or str::startswith(line, "frame"))) {
+            continue;
+        }
+
+        string instr_name = str::chunk(line);
+        line = str::lstrip(line.substr(instr_name.size()));
+
+        if (instr_name == "frame") {
+            line = str::chunk(line);
+            if (str::isnum(line)) {
+                frame_parameters_count = stoi(str::chunk(line));
+            } else {
+                frame_parameters_count = -1;
+            }
+            continue;
+        }
+
+        string function_name = str::chunk(line);
+        if (str::isnum(function_name)) {
+            function_name = str::chunk(str::lstrip(line.substr(function_name.size())));
+        }
+
+        if (not assembler::utils::isValidFunctionName(function_name)) {
+            report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: '" << function_name << "' is not a valid function name";
+            break;
+        }
+
+        if (frame_parameters_count == 0) {
+            report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: invalid number of parameters in dynamic dispatch of " << function_name << ": expected at least 1, got 0";
+            break;
+        }
+
+        int arity = assembler::utils::getFunctionArity(function_name);
+
+        if (arity == -1) {
+            if (warning) {
+                // arity of the function was not given - skip the check since there is no indication of the correct number of parameters but
+                // print a warning
+                cout << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": warning: dynamic dispatch call with undefined arity ";
+                if (frame_parameters_count >= 0) {
+                    cout << "as " << function_name << '/' << frame_parameters_count;
+                } else {
+                    cout << ": " << function_name;
+                }
+                cout << endl;
+            }
+            continue;
+        }
+        if (frame_parameters_count == -1) {
+            // frame paramters count could not be statically determined, deffer the check until runtime
+            continue;
+        }
+
+        if (arity != frame_parameters_count) {
+            report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: invalid number of parameters in dynamic dispatch of " << function_name << ": expected " << arity << " got " << frame_parameters_count;
+            break;
+        }
+    }
+    return report.str();
+}
+
 string assembler::verify::functionNames(const string& filename, const std::vector<std::string>& lines, const bool warning, const bool error) {
     ostringstream report("");
     string line;

@@ -258,6 +258,10 @@ int main(int argc, char* argv[]) {
         cout << report << endl;
         return 1;
     }
+    if ((report = assembler::verify::msgArities(filename, expanded_lines, expanded_lines_to_source_lines, (WARNING_UNDEFINED_ARITY or WARNING_ALL))).size()) {
+        cout << report << endl;
+        return 1;
+    }
     if ((report = assembler::verify::functionsEndWithReturn(filename, lines, (WARNING_MISSING_RETURN or WARNING_ALL), (ERROR_MISSING_RETURN or ERROR_ALL))).size()) {
         cout << report << endl;
         exit(1);
