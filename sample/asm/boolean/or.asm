@@ -1,22 +1,14 @@
-.function: boolean
-    arg 1 0
-    not 1
-    not 1
-    move 0 1
+.function: boolean/1
+    move 0 (not (not (arg 1 0)))
     return
 .end
 
 .function: main 1
-    izero 1
-    istore 2 1
+    frame ^[(pamv 0 (izero 1))]
+    call 1 boolean/1
 
-    frame 1
-    param 0 1
-    call 1 boolean
-
-    frame 1
-    param 0 2
-    call 2 boolean
+    frame ^[(pamv 0 (istore 2 1))]
+    call 2 boolean/1
 
     or 3 1 2
 
