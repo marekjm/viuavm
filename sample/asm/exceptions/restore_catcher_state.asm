@@ -6,20 +6,20 @@
     leave
 .end
 
-.function: tertiary
+.function: tertiary/1
     arg 3 0
     istore 4 300
     throw 3
     return
 .end
 
-.function: secondary
+.function: secondary/1
     arg 2 0
     istore 4 200
 
     frame ^[(param 0 2)] 5
     istore 4 250
-    call tertiary
+    call tertiary/1
 
     istore 4 225
     return
@@ -30,7 +30,7 @@
     istore 4 100
 
     frame ^[(param 0 1)] 5
-    call secondary
+    call secondary/1
 
     istore 2 41
     istore 4 125
