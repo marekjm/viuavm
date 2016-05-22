@@ -8,7 +8,7 @@
     leave
 .end
 
-.function: typesystem_setup
+.function: typesystem_setup/0
     register (class 0 SharedBase)
     register (class 1 SharedDerived)
 
@@ -29,7 +29,7 @@
 .end
 
 .function: main
-    call (frame 0) typesystem_setup
+    call (frame 0) typesystem_setup/0
 
     try
     catch "BaseA" handler

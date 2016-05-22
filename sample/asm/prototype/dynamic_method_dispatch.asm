@@ -2,29 +2,29 @@
 .signature: typesystem::typeof
 
 
-.function: typesystem_setup
-    register (attach (class 1 Base) fn_base good_day)
-    register (attach (derive (class 1 Derived) Base) fn_derived hello)
-    register (attach (derive (class 1 MoreDerived) Derived) fn_more_derived hi)
+.function: typesystem_setup/0
+    register (attach (class 1 Base) fn_base/1 good_day)
+    register (attach (derive (class 1 Derived) Base) fn_derived/1 hello)
+    register (attach (derive (class 1 MoreDerived) Derived) fn_more_derived/1 hi)
 
     return
 .end
 
-.function: fn_base
+.function: fn_base/1
     echo (strstore 1 "Good day from ")
     frame ^[(param 0 (arg 2 0))]
     print (call 3 typesystem::typeof)
     return
 .end
 
-.function: fn_derived
+.function: fn_derived/1
     echo (strstore 1 "Hello from ")
     frame ^[(param 0 (arg 2 0))]
     print (call 3 typesystem::typeof)
     return
 .end
 
-.function: fn_more_derived
+.function: fn_more_derived/1
     echo (strstore 1 "Hi from ")
     frame ^[(param 0 (arg 2 0))]
     print (call 3 typesystem::typeof)
@@ -35,7 +35,7 @@
     import "typesystem"
 
     ; setup the typesystem
-    call (frame 0) typesystem_setup
+    call (frame 0) typesystem_setup/0
 
     ; create a Derived object and
     ; call methods on it

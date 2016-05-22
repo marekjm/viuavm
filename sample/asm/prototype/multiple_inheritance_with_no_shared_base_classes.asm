@@ -8,7 +8,7 @@
     leave
 .end
 
-.function: typesystem_setup
+.function: typesystem_setup/0
     register (class 1 BaseA)
     register (derive (class 1 DerivedA) BaseA)
     register (derive (class 1 MoreDerivedA) DerivedA)
@@ -26,7 +26,7 @@
 .end
 
 .function: main
-    call (frame 0) typesystem_setup
+    call (frame 0) typesystem_setup/0
 
     try
     catch "BaseA" handler
