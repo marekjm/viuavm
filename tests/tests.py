@@ -188,12 +188,15 @@ def runMemoryLeakCheck(self, compiled_path, check_memory_leaks):
         MEMORY_LEAK_CHECKS_RUN += 1
         valgrindCheck(self, compiled_path)
 
-def runTest(self, name, expected_output=None, expected_exit_code = 0, output_processing_function = None, check_memory_leaks = True, custom_assert=None):
+def runTest(self, name, expected_output=None, expected_exit_code = 0, output_processing_function = None, check_memory_leaks = True, custom_assert=None, assembly_opts=None):
     if expected_output is None and custom_assert is None:
         raise TypeError('`expected_output` and `custom_assert` cannot be both None')
     assembly_path = os.path.join(self.PATH, name)
     compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-    assemble(assembly_path, compiled_path)
+    if assembly_opts is None:
+        assemble(assembly_path, compiled_path)
+    else:
+        assemble(assembly_path, compiled_path, opts=assembly_opts)
     excode, output = run(compiled_path, expected_exit_code)
     got_output = (output.strip() if output_processing_function is None else output_processing_function(output))
     if custom_assert is not None:
@@ -206,7 +209,10 @@ def runTest(self, name, expected_output=None, expected_exit_code = 0, output_pro
     disasm_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.dis.asm'.format(self.PATH[2:].replace('/', '_'), name))
     compiled_disasm_path = '{0}.bin'.format(disasm_path)
     disassemble(compiled_path, disasm_path)
-    assemble(disasm_path, compiled_disasm_path)
+    if assembly_opts is None:
+        assemble(disasm_path, compiled_disasm_path)
+    else:
+        assemble(disasm_path, compiled_disasm_path, opts=assembly_opts)
     dis_excode, dis_output = run(compiled_disasm_path, expected_exit_code)
     if custom_assert is not None:
         custom_assert(self, dis_excode, (dis_output.strip() if output_processing_function is None else output_processing_function(dis_output)))
@@ -232,8 +238,8 @@ def runTestCustomAssertsNoDisassemblyRerun(self, name, assertions_callback, chec
     assertions_callback(self, excode, output)
     runMemoryLeakCheck(self, compiled_path, check_memory_leaks)
 
-def runTestSplitlines(self, name, expected_output, expected_exit_code = 0):
-    runTest(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: o.strip().splitlines())
+def runTestSplitlines(self, name, expected_output, expected_exit_code = 0, assembly_opts=None):
+    runTest(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: o.strip().splitlines(), assembly_opts=assembly_opts)
 
 def runTestSplitlinesNoDisassemblyRerun(self, name, expected_output, expected_exit_code = 0, check_memory_leaks = True):
     runTestNoDisassemblyRerun(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: o.strip().splitlines(), check_memory_leaks=check_memory_leaks)
