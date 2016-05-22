@@ -1,4 +1,4 @@
-.function: run_in_a_process
+.function: run_in_a_process/0
     ; will cause a memory leak on detached processes
     throw (receive 1)
     return
@@ -19,7 +19,7 @@
 
 .function: main
     frame 0
-    process 1 run_in_a_process
+    process 1 run_in_a_process/0
 
     ;frame ^[(param 0 1)]
     ;msg 0 detach

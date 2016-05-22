@@ -1,4 +1,4 @@
-.function: print_lazy
+.function: print_lazy/1
     nop
     nop
     nop
@@ -20,7 +20,7 @@
 
 .function: main
     frame ^[(param 0 (strstore 1 "Hello concurrent World! (1)"))]
-    process 3 print_lazy
+    process 3 print_lazy/1
 
     ; this is OK
     join 0 3

@@ -1,11 +1,11 @@
-.function: run_in_a_process
+.function: run_in_a_process/0
     istore 0 42
     return
 .end
 
 .function: main
     frame 0
-    print (join 2 (process 1 run_in_a_process))
+    print (join 2 (process 1 run_in_a_process/0))
     izero 0
     return
 .end
