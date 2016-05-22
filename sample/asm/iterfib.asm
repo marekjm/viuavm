@@ -1,4 +1,4 @@
-.function: iterfib
+.function: iterfib/1
     .name: 1 vector
 
     ress static
@@ -28,7 +28,7 @@
     istore expected 1134903170
 
     frame ^[(param 0 (istore 1 45))]
-    print (call result iterfib)
+    print (call result iterfib/1)
 
     izero 0
     return

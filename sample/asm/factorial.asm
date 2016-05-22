@@ -1,4 +1,4 @@
-.function: factorial
+.function: factorial/2
     .name: 1 number
     .name: 2 result
     imul result (arg result 1) (arg number 0)
@@ -9,7 +9,7 @@
     branch (ieq 4 number (istore 3 0)) finish
 
     frame ^[(param 0 number) (param 1 result)]
-    call result factorial
+    call result factorial/2
 
     .mark: finish
     move 0 result
@@ -29,7 +29,7 @@
     ; * second is a reference to result register
     ;   because we want to display it here, after calls to factorial are finished
     frame ^[(param 0 number) (param 1 result)]
-    call result factorial
+    call result factorial/2
 
     ; print result
     print result

@@ -1,7 +1,7 @@
 ; This script's purpose is to stress register-reference syntax in
 ; integer related instructions.
 
-.function: foo
+.function: foo/0
     istore 1 16
     istore 16 1
 
@@ -15,7 +15,7 @@
 
 .function: main
     frame 0 17
-    call foo
+    call foo/0
     izero 0
     return
 .end

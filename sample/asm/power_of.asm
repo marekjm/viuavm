@@ -1,12 +1,12 @@
 ; purpose of this program is to compute n-th power of a number
 
-.function: dummy
+.function: dummy/0
     ; this function is here to stress jump calculation
     izero 0
     return
 .end
 
-.function: power_of
+.function: power_of/2
     .name: 1 base
     .name: 2 exponent
     .name: 3 zero
@@ -45,7 +45,7 @@
 
 .function: main
     frame ^[(param 0 (istore 1 4)) (param 1 (istore 2 3))]
-    print (call 1 power_of)
+    print (call 1 power_of/2)
 
     izero 0
     return

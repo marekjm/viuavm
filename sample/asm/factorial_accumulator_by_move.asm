@@ -1,4 +1,4 @@
-.function: factorial
+.function: factorial/2
     .name: 1 number
     .name: 2 result
     ; multiply "result" (reference) by "number" (copy)
@@ -14,7 +14,7 @@
     ; this frame must be the same as in "main"
     ; result must still be a reference
     frame ^[(param 0 number) (pamv 1 result)]
-    call result factorial
+    call result factorial/2
 
     .mark: finish
     move 0 result
@@ -34,7 +34,7 @@
     ; * second is a reference to result register
     ;   because we want to display it here, after calls to factorial are finished
     frame ^[(param 0 number) (pamv 1 result)]
-    call result factorial
+    call result factorial/2
 
     ; print result
     print result
