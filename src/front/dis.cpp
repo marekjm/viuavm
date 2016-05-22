@@ -200,7 +200,7 @@ int main(int argc, char* argv[]) {
         name = elements[i];
         el_size = element_sizes[name];
 
-        if ((name == "__entry") and not DISASSEMBLE_ENTRY) {
+        if ((name == ENTRY_FUNCTION_NAME) and not DISASSEMBLE_ENTRY) {
             continue;
         }
 
