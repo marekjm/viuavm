@@ -7,6 +7,7 @@
 #include <tuple>
 #include <string>
 #include <viua/version.h>
+#include <viua/machine.h>
 #include <viua/bytecode/opcodes.h>
 #include <viua/bytecode/maps.h>
 #include <viua/cg/disassembler/disassembler.h>
@@ -44,7 +45,7 @@ bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE)
              << "    " << "-v, --verbose            - show verbose output\n"
              << "    " << "-o, --out                - output to given path (by default prints to cout)\n"
              << "    " << "-i, --info               - include information about executable in output\n"
-             << "    " << "-e, --with-entry         - include __entry function in disassembly\n"
+             << "    " << "-e, --with-entry         - include " << ENTRY_FUNCTION_NAME << " function in disassembly\n"
              << "    " << "-L, --line-by-line       - display output line by line\n"
              << "    " << "-F, --function <name>    - disassemble only selected function\n"
              ;
