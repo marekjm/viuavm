@@ -57,6 +57,9 @@ int main(int argc, char* argv[]) {
         } else if (option == "--verbose" or option == "-v") {
             VERBOSE = true;
             continue;
+        } else if (str::startswith(option, "-")) {
+            cout << "error: unknown option: " << option << endl;
+            return 1;
         }
         args.push_back(argv[i]);
     }

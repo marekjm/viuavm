@@ -145,6 +145,9 @@ int main(int argc, char* argv[]) {
         } else if (option == "--verify" or option == "-C") {
             EARLY_VERIFICATION_ONLY = true;
             continue;
+        } else if (str::startswith(option, "-")) {
+            cout << "error: unknown option: " << option << endl;
+            return 1;
         }
         args.push_back(argv[i]);
     }

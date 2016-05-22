@@ -93,6 +93,9 @@ int main(int argc, char* argv[]) {
                 exit(1);
             }
             continue;
+        } else if (str::startswith(option, "-")) {
+            cout << "error: unknown option: " << option << endl;
+            return 1;
         } else {
             args.push_back(argv[i]);
         }
