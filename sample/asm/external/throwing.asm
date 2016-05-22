@@ -10,7 +10,7 @@
     leave
 .end
 
-.function: watchdog_process
+.function: watchdog_process/0
     .mark: start_watching
     .name: 1 death_message
     receive death_message
@@ -25,7 +25,7 @@
 
 .function: main
     frame 0
-    watchdog watchdog_process
+    watchdog watchdog_process/0
 
     import "build/test/throwing"
 
