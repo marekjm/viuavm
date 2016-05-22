@@ -1,4 +1,4 @@
-.function: is_divisible_by
+.function: is_divisible_by/1
     .name: 2 bound_variable
     arg 1 0
 
@@ -18,14 +18,14 @@
     return
 .end
 
-.function: is_divisible_by_2
-    closure 1 is_divisible_by
-    enclose 1 2 (arg 2 0)
+.function: is_divisible_by_2/0
+    closure 1 is_divisible_by/1
+    enclosemove 1 2 (istore 2 2)
     move 0 1
     return
 .end
 
-.function: filter_closure
+.function: filter_closure/2
     ; classic filter() function
     ; it takes two arguments:
     ;   * a filtering function,
@@ -81,11 +81,11 @@
 
     print 1
 
-    frame ^[(param 0 (istore 5 2))]
-    call 3 is_divisible_by_2
+    frame 0
+    call 3 is_divisible_by_2/0
 
     frame ^[(param 0 3) (param 1 1)]
-    print (call 4 filter_closure)
+    print (call 4 filter_closure/2)
 
     izero 0
     return
