@@ -1,10 +1,10 @@
-.function: closure_printer
+.function: closure_printer/0
     ; it has to be 2, because 2 register has been bound
     print 2
     return
 .end
 
-.function: closure_setter
+.function: closure_setter/1
     arg 1 0
 
     ; overwrite bound value with whatever we got
@@ -12,7 +12,7 @@
     return
 .end
 
-.function: returns_closures
+.function: returns_closures/0
     ; create a vector to store closures
     vec 1
 
@@ -21,10 +21,10 @@
 
     ; create two closures binding the same variable
     ; presto, we have two functions that are share some state
-    closure 3 closure_printer
+    closure 3 closure_printer/0
     enclose 3 2 2
 
-    closure 4 closure_setter
+    closure 4 closure_setter/1
     enclose 4 2 2
 
     ; push closures to vector...
@@ -40,7 +40,7 @@
 
 .function: main
     frame 0
-    call 1 returns_closures
+    call 1 returns_closures/0
 
     frame 0
     fcall 0 (vat 2 1 0)

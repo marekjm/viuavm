@@ -1,4 +1,4 @@
-.function: a_closure
+.function: a_closure/0
     ; expects register 1 to be enclosed
     print 1
     return
@@ -7,7 +7,7 @@
 .function: main
     strstore 1 "Hello World!"
 
-    closure 2 a_closure
+    closure 2 a_closure/0
     enclosecopy 2 1 1
 
     print 1

@@ -1,11 +1,11 @@
-.function: adder
+.function: adder/1
     ; expects register 1 to be an enclosed integer
     arg 2 0
     iadd 0 2 1
     return
 .end
 
-.function: make_adder
+.function: make_adder/1
     ; takes an integer and returns a function of one argument adding
     ; given integer to its only parameter
     ;
@@ -13,7 +13,7 @@
     ;   make_adder(3)(5) == 8
     .name: 1 number
     arg number 0
-    closure 2 adder
+    closure 2 adder/1
     enclose 2 1 1
     move 0 2
     return
@@ -23,7 +23,7 @@
     ; create the adder function
     .name: 2 add_three
     frame ^[(param 0 (istore 1 3))]
-    call add_three make_adder
+    call add_three make_adder/1
 
     ; add_three(2)
     frame ^[(param 0 (istore 3 2))]

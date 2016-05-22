@@ -1,4 +1,4 @@
-.function: printer_function
+.function: printer_function/0
     ; expects register 1 to be an enclosed object
     print 1
     return
@@ -6,7 +6,7 @@
 
 .function: main
     ; create a closure and enclose object in register 1 with it
-    closure 2 printer_function
+    closure 2 printer_function/0
     enclose 2 1 (strstore 1 "Hello World!")
 
     ; call the closure (should print "Hello World!")

@@ -1,4 +1,4 @@
-.function: running_detached
+.function: running_detached/0
 .name: 0 counter
 .name: 2 limit
     izero counter
@@ -16,7 +16,7 @@
 
 .function: main
     frame 0
-    process 1 running_detached
+    process 1 running_detached/0
 
     nop
     nop
