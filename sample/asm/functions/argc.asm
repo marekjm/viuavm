@@ -1,4 +1,4 @@
-.function: print_number_of_params
+.function: print_number_of_params/
     print (argc 1)
     return
 .end
@@ -9,9 +9,9 @@
     izero 2
 
     frame ^[(param 0 2) (param 1 2)]
-    call print_number_of_params
+    call print_number_of_params/
 
-    call (frame 0) print_number_of_params
+    call (frame 0) print_number_of_params/
 
     izero 0
     return

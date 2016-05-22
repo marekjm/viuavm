@@ -1,4 +1,4 @@
-.function: by_reference
+.function: by_reference/0
     move 0 1
     return
 .end
@@ -8,7 +8,7 @@
     istore 1 69
 
     ; create a closure and enclose a value by reference
-    closure 2 by_reference
+    closure 2 by_reference/0
     enclose 2 1 1
 
     frame 0

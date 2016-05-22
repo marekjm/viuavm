@@ -1,4 +1,4 @@
-.function: rec__VOID__INT__INT
+.function: recursive/2
     .name: 1 counter
     .name: 2 zero
 
@@ -11,7 +11,7 @@
     print counter
 
     frame ^[(param 0 counter) (pamv 1 zero)]
-    call rec__VOID__INT__INT
+    call recursive/2
 
     .mark: break_rec
     return
@@ -20,7 +20,7 @@
 .function: main
     ; create frame and set initial parameters
     frame ^[(param 0 (istore 1 10)) (pamv 1 (istore 2 0))]
-    call rec__VOID__INT__INT
+    call recursive/2
 
     izero 0
     return

@@ -1,4 +1,4 @@
-.function: set_69
+.function: set_69/0
     ress global
     istore 2 69
     return
@@ -7,7 +7,7 @@
 .function: main
     istore 2 42
 
-    call (frame 0) set_69
+    call (frame 0) set_69/0
     print 2
 
     ress global
