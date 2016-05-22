@@ -5,6 +5,7 @@
 #include <functional>
 #include <regex>
 #include <chrono>
+#include <viua/machine.h>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/opcodes.h>
 #include <viua/bytecode/maps.h>
@@ -220,7 +221,7 @@ CPU& CPU::iframe(Frame* frm, unsigned r) {
     Frame *initial_frame;
     if (frm == nullptr) {
         initial_frame = new Frame(nullptr, 0, 2);
-        initial_frame->function_name = "__entry";
+        initial_frame->function_name = ENTRY_FUNCTION_NAME;
 
         Vector* cmdline = new Vector();
         for (unsigned i = 0; i < commandline_arguments.size(); ++i) {
