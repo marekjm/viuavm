@@ -81,13 +81,13 @@ string assembler::verify::functionCallArities(const string& filename, const vect
 
         int arity = assembler::utils::getFunctionArity(function_name);
 
-        if (arity == -1) {
+        if (arity < 0) {
             if (warning) {
                 // arity of the function was not given - skip the check since there is no indication of the correct number of parameters but
                 // print a warning
                 cout << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": warning: call to function with undefined arity ";
                 if (frame_parameters_count >= 0) {
-                    cout << "as " << function_name << '/' << frame_parameters_count;
+                    cout << "as " << function_name << (arity == -1 ? "/" : "") << frame_parameters_count;
                 } else {
                     cout << ": " << function_name;
                 }
@@ -149,13 +149,13 @@ string assembler::verify::msgArities(const string& filename, const vector<string
 
         int arity = assembler::utils::getFunctionArity(function_name);
 
-        if (arity == -1) {
+        if (arity < 0) {
             if (warning) {
                 // arity of the function was not given - skip the check since there is no indication of the correct number of parameters but
                 // print a warning
                 cout << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": warning: dynamic dispatch call with undefined arity ";
                 if (frame_parameters_count >= 0) {
-                    cout << "as " << function_name << '/' << frame_parameters_count;
+                    cout << "as " << function_name << (arity == -1 ? "/" : "") << frame_parameters_count;
                 } else {
                     cout << ": " << function_name;
                 }
