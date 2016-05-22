@@ -1,11 +1,11 @@
-.function: sum4
+.function: sum/4
     ; this function takes four integers as parameters and
     ; adds them, and returns the sum
     iadd 0 (arg 4 3) (iadd 0 (arg 3 2) (iadd 0 (arg 1 0) (arg 2 1)))
     return
 .end
 
-.function: invoke
+.function: invoke/2
     ; this function takes two parameters:
     ;    1) a function object
     ;    2) a vector of parameters for function given as first parameter
@@ -65,11 +65,11 @@
 
     ; call sum/4() function
     frame ^[(param 0 2) (param 1 3) (param 2 4) (param 3 5)]
-    print (call 6 sum4)
+    print (call 6 sum/4)
 
     ; call sum/4 function via invoke/2 function
-    frame ^[(param 0 (function 7 sum4)) (param 1 1)]
-    print (call 8 invoke)
+    frame ^[(param 0 (function 7 sum/4)) (param 1 1)]
+    print (call 8 invoke/2)
 
     izero 0
     return

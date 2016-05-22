@@ -1,11 +1,11 @@
-.function: square
+.function: square/1
     ; this function takes single integer as its argument,
     ; squares it and returns the result
     imul 0 (arg 1 0) 1
     return
 .end
 
-.function: apply
+.function: apply/2
     ; this function applies another function on a single parameter
     ;
     ; this function is type agnostic
@@ -26,10 +26,10 @@
     ; applies function square/1(int) to 5 and
     ; prints the result
     istore 1 5
-    function 2 square
+    function 2 square/1
 
     frame ^[(param 0 2) (param 1 1)]
-    print (call 3 apply)
+    print (call 3 apply/2)
 
     izero 0
     return

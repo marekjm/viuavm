@@ -1,11 +1,11 @@
-.function: square
+.function: square/1
     ; this function takes single integer as its argument,
     ; squares it and returns the result
     imul 0 (arg 1 0) 1
     return
 .end
 
-.function: apply
+.function: apply/2
     ; this function applies another function on a single parameter
     ;
     ; this function is type agnostic
@@ -22,7 +22,7 @@
     return
 .end
 
-.function: map
+.function: map/2
     ; this function takes two arguments:
     ;   * a function,
     ;   * a vector,
@@ -74,8 +74,8 @@
 
     print 1
 
-    frame ^[(param 0 (function 3 square)) (pamv 1 1)]
-    print (call 4 map)
+    frame ^[(param 0 (function 3 square/1)) (pamv 1 1)]
+    print (call 4 map/2)
 
     izero 0
     return

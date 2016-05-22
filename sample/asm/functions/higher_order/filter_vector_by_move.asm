@@ -1,4 +1,4 @@
-.function: is_divisible_by_2
+.function: is_divisible_by_2/1
     arg 1 0
     istore 2 2
 
@@ -16,7 +16,7 @@
     return
 .end
 
-.function: filter
+.function: filter/2
     ; classic filter() function
     ; it takes two arguments:
     ;   * a filtering function,
@@ -71,8 +71,8 @@
 
     print 1
 
-    frame ^[(param 0 (function 3 is_divisible_by_2)) (pamv 1 1)]
-    print (call 4 filter)
+    frame ^[(param 0 (function 3 is_divisible_by_2/1)) (pamv 1 1)]
+    print (call 4 filter/2)
 
     izero 0
     return
