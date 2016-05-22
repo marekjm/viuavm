@@ -253,10 +253,13 @@ def runTestReturnsUnorderedLinesNoDisassemblyRerun(self, name, expected_output, 
 def runTestReturnsIntegers(self, name, expected_output, expected_exit_code = 0, check_memory_leaks=True):
     runTest(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: [int(i) for i in o.strip().splitlines()], check_memory_leaks=check_memory_leaks)
 
-def runTestThrowsException(self, name, expected_output):
+def runTestThrowsException(self, name, expected_output, assembly_opts=None):
     assembly_path = os.path.join(self.PATH, name)
     compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-    assemble(assembly_path, compiled_path)
+    if assembly_opts is None:
+        assemble(assembly_path, compiled_path)
+    else:
+        assemble(assembly_path, compiled_path, opts=assembly_opts)
     excode, output = run(compiled_path, 1)
     got_exception = list(filter(lambda line: line.startswith('uncaught object:'), output.strip().splitlines()))[0]
     self.assertEqual(1, excode)
