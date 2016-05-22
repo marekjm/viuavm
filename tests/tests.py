@@ -570,10 +570,10 @@ class FunctionTests(unittest.TestCase):
         runTest(self, 'pass_by_move.asm', None, custom_assert=partiallyAppliedSameLines(3))
 
     def testNeverendingFunction(self):
-        runTestSplitlines(self, 'neverending.asm', ['42', '48'])
+        runTestSplitlines(self, 'neverending.asm', ['42', '48'], assembly_opts=())
 
     def testNeverendingFunction0(self):
-        runTestThrowsException(self, 'neverending0.asm', 'uncaught object: Exception = stack size (8192) exceeded with call to \'one/0\'')
+        runTestThrowsException(self, 'neverending0.asm', 'uncaught object: Exception = stack size (8192) exceeded with call to \'one/0\'', assembly_opts=())
 
 
 class HigherOrderFunctionTests(unittest.TestCase):
