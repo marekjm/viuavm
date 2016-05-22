@@ -1,4 +1,4 @@
-.function: counter
+.function: counter/1
     ; switch to static register set
     ress static
 
@@ -33,7 +33,7 @@
     .mark: report
     print 1
     frame ^[(param 0 3)]
-    call 0 counter
+    call 0 counter/1
 
     .mark: finish
     return
@@ -41,6 +41,6 @@
 
 .function: main
     frame ^[(param 0 (istore 1 10))]
-    call ^(izero 0) counter
+    call ^(izero 0) counter/1
     return
 .end
