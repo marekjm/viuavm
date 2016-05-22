@@ -839,7 +839,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     // GENERATE ENTRY FUNCTION
     if (not flags.as_lib) {
         if (DEBUG) {
-            cout << "generating __entry function" << endl;
+            cout << "generating " << ENTRY_FUNCTION_NAME << " function" << endl;
         }
         functions.names.push_back(ENTRY_FUNCTION_NAME);
         function_addresses[ENTRY_FUNCTION_NAME] = starting_instruction;
