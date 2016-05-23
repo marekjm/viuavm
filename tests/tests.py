@@ -1133,13 +1133,13 @@ class WatchdogTests(unittest.TestCase):
     PATH = './sample/asm/watchdog'
 
     def testHelloWorldExample(self):
-        runTest(self, 'hello_world.asm', 'process spawned with <Function: broken_process> died')
+        runTest(self, 'hello_world.asm', 'process spawned with <Function: broken_process/0> died')
 
     def testWatchdogFromUndefinedFunctionCaughtByAssembler(self):
         runTestFailsToAssemble(self, 'from_undefined_function.asm', './sample/asm/watchdog/from_undefined_function.asm:41: error: watchdog from undefined function undefined_function/0')
 
     def testWatchdogFromUndefinedFunctionCaughtAtRuntime(self):
-        runTestThrowsException(self, 'from_undefined_function_at_runtime.asm', 'uncaught object: Exception = watchdog process from undefined function: undefined_function')
+        runTestThrowsException(self, 'from_undefined_function_at_runtime.asm', 'uncaught object: Exception = watchdog process from undefined function: undefined_function/0')
 
     def testWatchdogAlreadySpawnedCaughtAtRuntime(self):
         runTest(self, 'already_spawned.asm', 'process spawned with <Function: __entry> died')
@@ -1148,7 +1148,7 @@ class WatchdogTests(unittest.TestCase):
         runTestThrowsException(self, 'must_be_a_native_function.asm', 'uncaught object: Exception = watchdog process must be native function, used foreign World::print_hello')
 
     def testWatchdogTerminatedByARunawayExceptionDoesNotLeak(self):
-        runTest(self, 'terminated_watchdog.asm', 'watchdog process terminated by: Function: \'Function: broken_process\'')
+        runTest(self, 'terminated_watchdog.asm', 'watchdog process terminated by: Function: \'Function: broken_process/0\'')
 
     def testServicingRunawayExceptionWhileOtherProcessesAreRunning(self):
         runTestReturnsUnorderedLinesNoDisassemblyRerun(self, 'death_message.asm', [
@@ -1164,7 +1164,7 @@ class WatchdogTests(unittest.TestCase):
         runTestReturnsUnorderedLinesNoDisassemblyRerun(self, 'restarting_process.asm', [
             "process [  main  ]: 'main' exiting",
             "Hello World (from detached process)!",
-            "[WARNING] process 'Function: a_division_executing_process[42, 0]' killed by >>>cannot divide by zero<<<",
+            "[WARNING] process 'Function: a_division_executing_process/2[42, 0]' killed by >>>cannot divide by zero<<<",
             "42 / 1 = 42",
             "Hello World (from detached process) after a runaway exception!",
             "process [detached]: 'a_detached_concurrent_process' exiting",

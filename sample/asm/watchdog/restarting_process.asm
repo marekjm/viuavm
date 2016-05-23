@@ -1,4 +1,4 @@
-.function: watchdog_process
+.function: watchdog_process/0
     .mark: __begin
     .name: 1 death_message
     receive death_message
@@ -22,7 +22,7 @@
     ; handle only a_division_executing_process
     frame ^[(param 0 (vat 5 parameters 0)) (param 1 (iinc (vat 6 parameters 1)))]
     ;call 0 a_division_executing_process
-    process 7 a_division_executing_process
+    process 7 a_division_executing_process/2
     frame ^[(param 0 (ptr 5 7))]
     msg 0 detach
 
@@ -31,7 +31,7 @@
     return
 .end
 
-.function: a_detached_concurrent_process
+.function: a_detached_concurrent_process/0
     frame ^[(pamv 0 (istore 1 32))]
     call std::misc::cycle/1
 
@@ -46,12 +46,12 @@
     call std::misc::cycle/1
 
     frame ^[(pamv 0 (strstore 1 "a_detached_concurrent_process"))]
-    call log_exiting_detached
+    call log_exiting_detached/1
 
     return
 .end
 
-.function: a_division_executing_process
+.function: a_division_executing_process/2
     frame ^[(pamv 0 (istore 1 128))]
     call std::misc::cycle/1
 
@@ -78,18 +78,18 @@
     return
 .end
 
-.function: log_exiting_main
+.function: log_exiting_main/0
     print (strstore 2 "process [  main  ]: 'main' exiting")
     return
 .end
-.function: log_exiting_detached
+.function: log_exiting_detached/1
     arg 1 0
     echo (strstore 2 "process [detached]: '")
     echo 1
     print (strstore 2 "' exiting")
     return
 .end
-.function: log_exiting_joined
+.function: log_exiting_joined/0
     arg 1 0
     echo (strstore 2 "process [ joined ]: '")
     echo 1
@@ -103,24 +103,24 @@
     link std::misc
 
     frame 0
-    watchdog watchdog_process
+    watchdog watchdog_process/0
 
     frame 0
-    process 1 a_detached_concurrent_process
+    process 1 a_detached_concurrent_process/0
     frame ^[(param 0 (ptr 2 1))]
     msg 0 detach
     ; delete the pointer to detached process
     delete 2
 
     frame ^[(param 0 (istore 3 42)) (param 1 (istore 4 0))]
-    process 2 a_division_executing_process
+    process 2 a_division_executing_process/2
     frame ^[(param 0 (ptr 3 2))]
     msg 0 detach
     ; delete the pointer to detached process
     delete 3
 
     frame 0
-    call log_exiting_main
+    call log_exiting_main/0
 
     izero 0
     return
