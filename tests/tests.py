@@ -54,7 +54,7 @@ def getCPUArchitecture():
     output = output.decode('utf-8').strip()
     return output
 
-def assemble(asm, out=None, links=(), opts=('-E',), okcodes=(0,)):
+def assemble(asm, out=None, links=(), opts=('-E', '-W',), okcodes=(0,)):
     """Assemble path given as `asm` and put binary in `out`.
     Raises exception if compilation is not successful.
     """
