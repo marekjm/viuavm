@@ -70,8 +70,9 @@ string assembler::verify::functionCallArities(const string& filename, const vect
         }
 
         string function_name = str::chunk(line);
-        if (str::isnum(function_name)) {
-            function_name = str::chunk(str::lstrip(line.substr(function_name.size())));
+        line = str::lstrip(line.substr(function_name.size()));
+        if (line.size()) {
+            function_name = str::chunk(line);
         }
 
         if (not assembler::utils::isValidFunctionName(function_name)) {
