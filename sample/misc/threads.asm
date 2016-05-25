@@ -28,7 +28,7 @@
     end
 .end
 
-.function: main
+.function: main/1
     frame ^[(param 0 (istore 1 1000000))]
     thread 1 thread_spawner
 

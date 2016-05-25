@@ -4,7 +4,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     istore 2 42
 
     call (frame 0) set_69/0

@@ -38,7 +38,7 @@
 
 .signature: undefined_function/0
 
-.function: main
+.function: main/1
     frame 0
     watchdog undefined_function/0
 

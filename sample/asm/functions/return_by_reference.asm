@@ -3,7 +3,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     ; store a number in register
     istore 1 69
 

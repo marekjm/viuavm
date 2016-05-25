@@ -1,7 +1,7 @@
 .signature: std::vector::of_ints/1
 .signature: std::vector::reverse_in_place/1
 
-.function: main
+.function: main/1
     link std::vector
 
     frame ^[(pamv 0 (istore 1 8))]

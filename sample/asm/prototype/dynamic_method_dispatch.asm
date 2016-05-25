@@ -31,7 +31,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     import "typesystem"
 
     ; setup the typesystem

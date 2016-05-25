@@ -22,7 +22,7 @@
 .end
 
 
-.function: main
+.function: main/1
     call (frame 0) bay/0
 
     izero 0

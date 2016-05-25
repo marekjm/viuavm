@@ -1,4 +1,4 @@
-.function: main
+.function: main/1
     frame ^[(param 0 (strstore 1 "Hello, World!"))]
     print (msg 4 substr/)
 

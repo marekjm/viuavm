@@ -3,7 +3,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     print (new 1 Object)
 
     frame ^[(pamv 0 1)]

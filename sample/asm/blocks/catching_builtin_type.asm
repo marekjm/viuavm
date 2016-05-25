@@ -11,7 +11,7 @@
     leave
 .end
 
-.function: main
+.function: main/1
     try
     catch "Integer" handle_integer
     enter main_block

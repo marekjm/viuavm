@@ -22,7 +22,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     .name: 2 result
     .name: 3 expected
     istore expected 1134903170

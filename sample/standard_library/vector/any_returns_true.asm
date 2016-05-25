@@ -5,7 +5,7 @@
 
 .signature: std::vector::any/2
 
-.function: main
+.function: main/1
     link std::vector
 
     vpush (vpush (vpush (vec 2) (istore 1 -1)) (istore 1 0)) (istore 1 1)

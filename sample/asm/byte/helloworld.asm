@@ -1,4 +1,4 @@
-.function: main
+.function: main/1
     .name: 2 H
     .name: 3 e
     .name: 4 l

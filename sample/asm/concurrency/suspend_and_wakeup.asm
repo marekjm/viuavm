@@ -70,7 +70,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     frame 0
     process 1 process_to_suspend
     

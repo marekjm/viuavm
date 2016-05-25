@@ -38,7 +38,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     frame 0
     call 1 returns_closures/0
 

@@ -1,4 +1,4 @@
-.function: main
+.function: main/1
     print (strstore 1 "sample vector program")
 
     vpush (vec 2) 1

@@ -29,7 +29,7 @@
 ;       $ viua-cpu a.out 40
 ;       42
 ;
-.function: main
+.function: main/1
     ; first, import the random module to make std::random functions available
     import "random"
 

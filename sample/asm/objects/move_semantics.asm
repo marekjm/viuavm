@@ -1,4 +1,4 @@
-.function: main
+.function: main/1
     new 1 Object
     new 2 Object
 

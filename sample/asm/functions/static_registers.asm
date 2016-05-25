@@ -39,7 +39,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     frame ^[(param 0 (istore 1 10))]
     call ^(izero 0) counter/1
     return

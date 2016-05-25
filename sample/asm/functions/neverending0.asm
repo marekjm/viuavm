@@ -4,7 +4,7 @@
     ; no return here
 .end
 
-.function: main
+.function: main/1
     call (frame 0 2) one/0
     izero 0
     return

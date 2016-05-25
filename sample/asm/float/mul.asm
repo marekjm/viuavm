@@ -1,6 +1,6 @@
 ; This script tests float multiplication.
 
-.function: main
+.function: main/1
     fstore 1 4.0
     fstore 2 2.001
     fmul 3 1 2

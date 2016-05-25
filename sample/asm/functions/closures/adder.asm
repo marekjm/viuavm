@@ -19,7 +19,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     ; create the adder function
     .name: 2 add_three
     frame ^[(param 0 (istore 1 3))]

@@ -43,7 +43,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     frame ^[(param 0 (istore 1 4)) (param 1 (istore 2 3))]
     print (call 1 power_of/2)
 

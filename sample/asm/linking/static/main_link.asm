@@ -1,1 +1,1 @@
-.main: main
+.main: main/1

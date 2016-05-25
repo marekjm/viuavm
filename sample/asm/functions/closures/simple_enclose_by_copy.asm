@@ -10,7 +10,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     .name: 1 bar
     ; call function that returns the closure
     frame 0

@@ -23,7 +23,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     frame ^[(param 0 (strstore 1 "Hello concurrent World! (1)"))]
     process 3 print_lazy/1
 

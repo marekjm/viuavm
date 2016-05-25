@@ -1,4 +1,4 @@
-.function: main
+.function: main/1
     vec 2
     print (vlen 3 2)
 

@@ -4,7 +4,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     ; create a closure and enclose object in register 1 with it
     closure 2 printer_function/0
     enclose 2 1 (strstore 1 "Hello World!")

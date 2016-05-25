@@ -9,7 +9,7 @@
     leave
 .end
 
-.function: main
+.function: main/1
     try
     catch "TypeException" catch_TypeException
     enter try_TypeException

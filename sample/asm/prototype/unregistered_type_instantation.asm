@@ -8,7 +8,7 @@
     leave
 .end
 
-.function: main
+.function: main/1
     try
     catch "Exception" handler
     enter unregistered_type_instantation

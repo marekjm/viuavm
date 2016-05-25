@@ -1,6 +1,9 @@
 .function: main/1
-    ress foo
+    izero 0
+    return
+.end
 
+.function: main/2
     izero 0
     return
 .end

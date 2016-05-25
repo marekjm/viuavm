@@ -6,7 +6,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     strstore 1 "My morals are relative."
     jump .0
     print 1

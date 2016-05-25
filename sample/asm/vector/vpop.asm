@@ -1,4 +1,4 @@
-.function: main
+.function: main/1
     print (vlen 3 (vec 2))
 
     vpush 2 (strstore 1 "Hello World!")

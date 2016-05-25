@@ -1,4 +1,4 @@
-.function: main
+.function: main/1
     try
     enter foo
 

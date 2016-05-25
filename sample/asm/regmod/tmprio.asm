@@ -1,4 +1,4 @@
-.function: main
+.function: main/1
     ress global
     tmpri 1
     ress local

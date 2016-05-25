@@ -185,9 +185,7 @@ string assembler::verify::functionNames(const string& filename, const std::vecto
             break;
         }
 
-        // FIXME: main with undefined arity is allowed for now
-        // it will be an error not to give arity to main in future release
-        if (assembler::utils::getFunctionArity(function) == -1 and function != "main") {
+        if (assembler::utils::getFunctionArity(function) == -1) {
             report << filename << ':' << i+1 << ": error: function with undefined arity: " << function;
             break;
         }
@@ -359,7 +357,7 @@ string assembler::verify::ressInstructions(const string& filename, const vector<
             report << filename << ':' << (expanded_lines_to_source_lines.at(i)+1) << ": error: illegal register set name in ress instruction '" << registerset_name << "' in function " << function;
             break;
         }
-        if (registerset_name == "global" and as_lib and function != "main") {
+        if (registerset_name == "global" and as_lib and function != "main/1") {
             report << filename << ':' << (expanded_lines_to_source_lines.at(i)+1) << ": error: global registers used in library function " << function;
             break;
         }
@@ -418,13 +416,13 @@ string assembler::verify::mainFunctionDoesNotEndWithHalt(const string& filename,
     ostringstream report("");
     string line;
 
-    if (functions.count("main") == 0) {
+    if (functions.count("main/1") == 0) {
         report << filename << ": error: cannot verify undefined function if it's undefined";
         return report.str();
     }
-    vector<string> flines = functions.at("main");
+    vector<string> flines = functions.at("main/1");
     if (flines.size() == 0) {
-        report << filename << ": error: cannot verify empty 'main' function" << endl;
+        report << filename << ": error: cannot verify empty 'main/1' function" << endl;
         return report.str();
     }
     if (str::chunk(str::lstrip(flines.back())) == "halt") {

@@ -19,7 +19,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     call (frame 0) typesystem_setup/0
 
     ; create a Base object and

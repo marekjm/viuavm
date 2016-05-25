@@ -1,6 +1,6 @@
 ; This script tests integer subtraction.
 
-.function: main
+.function: main/1
     istore 1 4
     istore 2 3
     isub 3 1 2

@@ -72,7 +72,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     vpush (vec 1) (istore 2 1)
     vpush 1 (istore 2 2)
     vpush 1 (istore 2 3)

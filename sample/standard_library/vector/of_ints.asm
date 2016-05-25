@@ -1,6 +1,6 @@
 .signature: std::vector::of_ints/1
 
-.function: main
+.function: main/1
     link std::vector
 
     frame ^[(pamv 0 (istore 1 8))]

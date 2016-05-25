@@ -2,7 +2,7 @@
     print (strstore 1 "Hello World!")
 .end
 
-.function: main
+.function: main/1
     izero 0
     return
 .end

@@ -5,7 +5,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     link std::vector
 
     register (class 1 Foo)

@@ -17,7 +17,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     ; create frame and set initial parameters
     frame ^[(param 0 (istore 1 10)) (pamv 1 (istore 2 0))]
     call recursive/2

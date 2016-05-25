@@ -3,7 +3,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     frame 0
     process 1 run_in_a_process/0
 

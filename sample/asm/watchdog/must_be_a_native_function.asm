@@ -1,6 +1,6 @@
 .signature: World::print_hello/0
 
-.function: main
+.function: main/1
     import "build/test/World"
 
     frame 0

@@ -3,7 +3,7 @@
 ; The nagative-numbers thingy is just nice-to-have and not the
 ; true porpose of this script, though.
 
-.function: main
+.function: main/1
     istore 1 4
     istore 2 -3
     iadd 3 1 2

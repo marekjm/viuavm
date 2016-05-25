@@ -4,7 +4,7 @@
 ;
 ; the purpose of this program is to find an absolute value of an integer
 
-.function: main
+.function: main/1
     .name: 1 number
     .name: 2 zero
     .name: 3 is_negative

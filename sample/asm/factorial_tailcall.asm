@@ -20,7 +20,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     .name: 1 number
     .name: 2 result
     ; store the number of which we want to calculate the factorial

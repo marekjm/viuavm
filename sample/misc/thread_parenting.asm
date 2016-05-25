@@ -12,7 +12,7 @@
     end
 .end
 
-.function: main
+.function: main/1
     frame 0
     thread 1 thread_lanucher
     frame ^[(param 0 1)]

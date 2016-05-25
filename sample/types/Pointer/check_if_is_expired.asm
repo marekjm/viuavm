@@ -8,7 +8,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     istore 1 42
     ptr 2 1
 

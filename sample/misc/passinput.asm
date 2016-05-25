@@ -17,7 +17,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     import "io"
     link std::misc
 

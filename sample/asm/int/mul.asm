@@ -1,6 +1,6 @@
 ; This script tests integer multiplication.
 
-.function: main
+.function: main/1
     istore 1 4
     istore 2 4
     istore 3 -15

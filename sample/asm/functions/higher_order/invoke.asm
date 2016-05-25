@@ -51,7 +51,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     ; create the vector
     vpush (vec 1) (istore 2 20)
     vpush 1 (istore 3 16)

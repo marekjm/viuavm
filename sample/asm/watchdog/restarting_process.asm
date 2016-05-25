@@ -99,7 +99,7 @@
 
 .signature: std::misc::cycle/1
 
-.function: main
+.function: main/1
     link std::misc
 
     frame 0

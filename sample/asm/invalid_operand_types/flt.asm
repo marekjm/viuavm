@@ -1,4 +1,4 @@
-.function: main
+.function: main/1
     register (class 1 Foo)
     new 1 Foo
 

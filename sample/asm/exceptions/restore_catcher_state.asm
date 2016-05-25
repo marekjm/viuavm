@@ -38,7 +38,7 @@
 .end
 
 
-.function: main
+.function: main/1
     istore 4 50
 
     try

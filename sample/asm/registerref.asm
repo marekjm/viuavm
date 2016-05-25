@@ -13,7 +13,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     frame 0 17
     call foo/0
     izero 0

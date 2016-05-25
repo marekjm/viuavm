@@ -92,7 +92,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     istore 0 99
 
     istore 7 1

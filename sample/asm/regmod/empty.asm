@@ -1,6 +1,6 @@
 ; FIXME: remove this test - with removal of REF the EMPTY instruction is not that useful
 
-.function: main
+.function: main/1
     ; check if register 1 is null
     print (isnull 2 1)
 

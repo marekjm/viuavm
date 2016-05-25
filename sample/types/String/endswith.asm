@@ -1,4 +1,4 @@
-.function: main
+.function: main/1
     frame ^[(param 0 (strstore 1 "Hello World!")) (param 1 (strstore 2 "World!"))]
     print (msg 3 endswith/2)
 

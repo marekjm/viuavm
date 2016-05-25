@@ -13,7 +13,7 @@
     leave
 .end
 
-.function: main
+.function: main/1
     ; implements this chapter of "The Rust Book": https://doc.rust-lang.org/book/guessing-game.html
     import "random"
     import "io"

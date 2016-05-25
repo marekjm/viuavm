@@ -1,6 +1,6 @@
 .signature: std::string::represent/1
 
-.function: main
+.function: main/1
     ; this instruction links "std::string" module into running machine
     link std::string
 

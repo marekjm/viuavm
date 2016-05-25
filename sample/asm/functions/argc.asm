@@ -3,7 +3,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     print (argc 1)
 
     izero 2

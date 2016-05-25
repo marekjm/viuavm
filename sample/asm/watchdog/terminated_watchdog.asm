@@ -52,7 +52,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     frame 0
     watchdog watchdog_process/0
 

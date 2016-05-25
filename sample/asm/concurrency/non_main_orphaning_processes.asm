@@ -32,7 +32,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     frame 0
     call process_spawner/0
 

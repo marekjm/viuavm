@@ -16,7 +16,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     frame 0
     call 0 baz
     izero 0

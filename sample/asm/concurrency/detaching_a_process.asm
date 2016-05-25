@@ -14,7 +14,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     frame 0
     process 1 running_detached/0
 

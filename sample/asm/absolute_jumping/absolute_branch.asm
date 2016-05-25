@@ -7,7 +7,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     strstore 1 "I'm relative..."
     istore 1 1
     branch 1 .0

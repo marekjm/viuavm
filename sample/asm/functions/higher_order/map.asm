@@ -62,7 +62,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     ; applies function square/1(int) to 5 and
     ; prints the result
 

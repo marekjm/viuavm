@@ -1,4 +1,4 @@
-.function: main
+.function: main/1
     .name: 1 text_to_print
     .name: 2 condition
 

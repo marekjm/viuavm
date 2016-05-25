@@ -3,7 +3,7 @@
     leave
 .end
 
-.function: main
+.function: main/1
     try
     enter main_block
     ; leave instructions lead here

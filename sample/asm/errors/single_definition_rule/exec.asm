@@ -1,6 +1,6 @@
 ;.signature: lib::foo/1
 
-.function: main
+.function: main/1
     frame ^[(pamv 0 (strstore 1 "Hello World!"))]
     call lib::foo/1
 

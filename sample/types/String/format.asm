@@ -1,4 +1,4 @@
-.function: main
+.function: main/1
     vpush (vpush (vec 1) (strstore 2 "formatted")) (strstore 2 "World")
 
     frame ^[(param 0 (strstore 2 "Hello, #{0} #{1}!")) (param 1 1)]

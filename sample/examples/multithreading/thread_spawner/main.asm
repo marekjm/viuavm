@@ -53,7 +53,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     ; the standard "io" library contains std::io::getline
     import "io"
 

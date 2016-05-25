@@ -1,4 +1,4 @@
-.function: main
+.function: main/1
     istore 1 0
 
     vpush (vpush (vpush (vpush (vpush (vpush (vpush (vpush (vec 2) 1) 1) 1) 1) 1) 1) 1) 1

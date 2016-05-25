@@ -8,7 +8,7 @@
     leave
 .end
 
-.function: main
+.function: main/1
     register (class 1 Base)
 
     register (derive (class 1 Derived) Base)

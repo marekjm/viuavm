@@ -1,4 +1,4 @@
-.function: main
+.function: main/1
     vec 1
     vat 2 1 4
 

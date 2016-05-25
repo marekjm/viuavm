@@ -11,7 +11,7 @@
     leave
 .end
 
-.function: main
+.function: main/1
     try
     catch "Exception" exception_handler
     enter print_block

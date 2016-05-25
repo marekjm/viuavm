@@ -6,7 +6,7 @@
 .signature: std::vector::every/2
 .signature: std::vector::of_ints/1
 
-.function: main
+.function: main/1
     link std::vector
 
     frame ^[(param 0 (istore 1 20))]

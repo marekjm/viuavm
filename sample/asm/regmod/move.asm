@@ -1,4 +1,4 @@
-.function: main
+.function: main/1
     istore 1 1
     move 2 1
     print 2

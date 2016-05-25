@@ -12,7 +12,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     izero 0
     return
 .end

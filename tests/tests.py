@@ -975,7 +975,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/invalid_ress_instruction.asm:2: error: illegal register set name in ress instruction 'foo' in function main", output.strip())
+        self.assertEqual("./sample/asm/errors/invalid_ress_instruction.asm:2: error: illegal register set name in ress instruction 'foo' in function main/1", output.strip())
 
     def testGlobalRegisterSetUsedInLibraryFunction(self):
         name = 'global_rs_used_in_lib.asm'

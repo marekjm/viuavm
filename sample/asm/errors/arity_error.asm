@@ -3,7 +3,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     frame 0
     call foo/1
 

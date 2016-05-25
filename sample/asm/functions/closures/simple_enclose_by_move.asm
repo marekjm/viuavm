@@ -4,7 +4,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     closure 1 a_closure/0
     enclosemove 1 1 (strstore 2 "Hello World!")
 

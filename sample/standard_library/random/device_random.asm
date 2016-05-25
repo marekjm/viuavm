@@ -1,6 +1,6 @@
 .signature: std::random::device::random
 
-.function: main
+.function: main/1
     ; first, import the random module to make std::random functions available
     import "random"
 

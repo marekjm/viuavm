@@ -1,4 +1,4 @@
-.function: main
+.function: main/1
     .name: 2 len
     .name: 3 counter
 

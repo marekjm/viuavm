@@ -1,4 +1,4 @@
-.function: main
+.function: main/1
     strstore 1 "42"
 
     istore 2 27

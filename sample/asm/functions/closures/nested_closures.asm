@@ -49,7 +49,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     frame ^[(param 0 (istore 1 1))]
     call 2 closure_maker/1
 

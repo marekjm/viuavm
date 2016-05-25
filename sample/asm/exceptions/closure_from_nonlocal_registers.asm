@@ -3,7 +3,7 @@
     return
 .end
 
-.function: main
+.function: main/1
     ress global
     istore 1 42
     enclose 1
