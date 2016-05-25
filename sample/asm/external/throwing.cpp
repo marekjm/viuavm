@@ -15,7 +15,7 @@ void throwing_oh_noes(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*) {
 
 
 const ForeignFunctionSpec functions[] = {
-    { "throwing::oh_noes", &throwing_oh_noes },
+    { "throwing::oh_noes/0", &throwing_oh_noes },
     { nullptr, nullptr },
 };
 

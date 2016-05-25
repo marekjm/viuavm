@@ -1,4 +1,4 @@
-.function: jumprint
+.function: jumprint/1
     branch (ilt 2 (istore 2 42) (arg 1 0)) lesser
     strstore 3 ":-)"
     jump +2

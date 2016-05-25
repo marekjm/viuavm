@@ -1,8 +1,7 @@
 .function: main
-    istore 1 42
-    frame 1
-    param 0 1
-    call 0 jumprint
+    frame ^[(param 0 (istore 1 42))]
+    call jumprint/1
+
     izero 0
     return
 .end

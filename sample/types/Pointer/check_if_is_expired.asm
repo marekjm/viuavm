@@ -1,8 +1,8 @@
-.signature: Pointer::expired
+.signature: Pointer::expired/1
 
 .function: isExpired/1
     frame ^[(param 0 (arg 1 0))]
-    call 2 Pointer::expired
+    call 2 Pointer::expired/1
     echo (strstore 3 "expired: ")
     move 0 (print 2)
     return

@@ -1,10 +1,10 @@
-.signature: World::print_hello
+.signature: World::print_hello/0
 
 .function: main
     import "build/test/World"
 
     frame 0
-    watchdog World::print_hello
+    watchdog World::print_hello/0
 
     izero 0
     return

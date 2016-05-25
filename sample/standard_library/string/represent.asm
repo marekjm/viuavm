@@ -1,4 +1,4 @@
-.signature: std::string::represent
+.signature: std::string::represent/1
 
 .function: main
     ; this instruction links "std::string" module into running machine
@@ -11,7 +11,7 @@
     ; note the pass-by-pointer used to avoid copying since
     ; we want to get string representation of exactly the same object
     frame ^[(param 0 (ptr 3 1))]
-    call 2 std::string::represent
+    call 2 std::string::represent/1
 
     ; this should print two, exactly same lines
     print 1

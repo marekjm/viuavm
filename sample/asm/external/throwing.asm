@@ -1,8 +1,8 @@
-.signature: throwing::oh_noes
+.signature: throwing::oh_noes/0
 
 .block: __try
     frame 0
-    call 0 throwing::oh_noes
+    call 0 throwing::oh_noes/0
     leave
 .end
 .block: __catch_Exception

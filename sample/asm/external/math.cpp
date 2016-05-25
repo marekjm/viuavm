@@ -23,7 +23,7 @@ void math_sqrt(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
 
 
 const ForeignFunctionSpec functions[] = {
-    { "math::sqrt", &math_sqrt },
+    { "math::sqrt/1", &math_sqrt },
     { nullptr, nullptr },
 };
 

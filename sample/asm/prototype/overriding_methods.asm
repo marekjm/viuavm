@@ -1,10 +1,10 @@
 ; this program requires standard "typesystem" module to be available
-.signature: typesystem::typeof
+.signature: typesystem::typeof/1
 
 
 .function: typesystem_setup/0
-    register (attach (class 1 Base) Base::saySomething/1 hello)
-    register (attach (derive (class 1 Derived) Base) Derived::saySomethingMore/1 hello)
+    register (attach (class 1 Base) Base::saySomething/1 hello/1)
+    register (attach (derive (class 1 Derived) Base) Derived::saySomethingMore/1 hello/1)
 
     return
 .end
@@ -25,12 +25,12 @@
     ; create a Base object and
     ; send a message to it
     frame ^[(param 0 (new 1 Base))]
-    msg 0 hello
+    msg 0 hello/1
 
     ; create a Derived object and
     ; send a message to it
     frame ^[(param 0 (new 2 Derived))]
-    msg 0 hello
+    msg 0 hello/1
 
     frame ^[(param 0 2)]
     call 0 Base::saySomething/1

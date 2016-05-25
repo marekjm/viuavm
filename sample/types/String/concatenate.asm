@@ -1,6 +1,6 @@
 .function: main
     frame ^[(param 0 (strstore 1 "Hello ")) (param 1 (strstore 2 "World!"))]
-    msg 3 concatenate
+    msg 3 concatenate/2
 
     print 1
     print 2

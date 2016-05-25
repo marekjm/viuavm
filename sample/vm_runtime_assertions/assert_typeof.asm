@@ -1,6 +1,6 @@
 .block: try_TypeException
     frame ^[(param 0 (strstore 1 "Hello, World!")) (param 1 1)]
-    print (msg 2 substr)
+    print (msg 2 substr/)
     leave
 .end
 

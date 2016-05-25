@@ -12,7 +12,7 @@ void hello(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*) {
 
 
 const ForeignFunctionSpec functions[] = {
-    { "World::print_hello", &hello },
+    { "World::print_hello/0", &hello },
     { nullptr, nullptr },
 };
 
