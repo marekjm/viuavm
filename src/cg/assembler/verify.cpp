@@ -46,7 +46,7 @@ string assembler::verify::functionCallsAreDefined(const string& filename, const 
     return report.str();
 }
 
-string assembler::verify::functionCallArities(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, bool warning) {
+string assembler::verify::functionCallArities(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, bool) {
     ostringstream report("");
     string line;
     int frame_parameters_count = 0;
@@ -82,10 +82,8 @@ string assembler::verify::functionCallArities(const string& filename, const vect
 
         int arity = assembler::utils::getFunctionArity(function_name);
 
-        if (arity < 0) {
-            // arity of the function was not given - skip the check since there is no indication of the correct number of parameters but
-            // print a warning
-            report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": warning: call to function with undefined arity ";
+        if (arity == -1) {
+            report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: call to function with undefined arity ";
             if (frame_parameters_count >= 0) {
                 report << "as " << function_name << (arity == -1 ? "/" : "") << frame_parameters_count;
             } else {
@@ -98,7 +96,7 @@ string assembler::verify::functionCallArities(const string& filename, const vect
             continue;
         }
 
-        if (arity != frame_parameters_count) {
+        if (arity > 0 and arity != frame_parameters_count) {
             report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: invalid number of parameters in call to function " << function_name << ": expected " << arity << " got " << frame_parameters_count;
             break;
         }
@@ -106,7 +104,7 @@ string assembler::verify::functionCallArities(const string& filename, const vect
     return report.str();
 }
 
-string assembler::verify::msgArities(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, bool warning) {
+string assembler::verify::msgArities(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, bool) {
     ostringstream report("");
     string line;
     int frame_parameters_count = 0;
@@ -147,10 +145,8 @@ string assembler::verify::msgArities(const string& filename, const vector<string
 
         int arity = assembler::utils::getFunctionArity(function_name);
 
-        if (arity < 0) {
-            // arity of the function was not given - skip the check since there is no indication of the correct number of parameters but
-            // print a warning
-            report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": warning: dynamic dispatch call with undefined arity ";
+        if (arity == -1) {
+            report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: dynamic dispatch call with undefined arity ";
             if (frame_parameters_count >= 0) {
                 report << "as " << function_name << (arity == -1 ? "/" : "") << frame_parameters_count;
             } else {
@@ -163,7 +159,7 @@ string assembler::verify::msgArities(const string& filename, const vector<string
             continue;
         }
 
-        if (arity != frame_parameters_count) {
+        if (arity > 0 and arity != frame_parameters_count) {
             report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: invalid number of parameters in dynamic dispatch of " << function_name << ": expected " << arity << " got " << frame_parameters_count;
             break;
         }
@@ -171,7 +167,7 @@ string assembler::verify::msgArities(const string& filename, const vector<string
     return report.str();
 }
 
-string assembler::verify::functionNames(const string& filename, const std::vector<std::string>& lines, const bool warning, const bool error) {
+string assembler::verify::functionNames(const string& filename, const std::vector<std::string>& lines, const bool, const bool) {
     ostringstream report("");
     string line;
     string function;
