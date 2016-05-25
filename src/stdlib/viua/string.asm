@@ -6,22 +6,22 @@
 ;
 ; Signatures
 ;
-.signature: std::string::stringify
-.signature: std::string::represent
+.signature: std::string::stringify/1
+.signature: std::string::represent/1
 
 ;
 ; Code
 ;
-.function: std::string::stringify
+.function: std::string::stringify/1
     frame ^[(param 0 (ptr 2 (strstore 1 ""))) (param 1 (arg 3 0))]
-    msg 0 stringify
+    msg 0 stringify/2
     move 0 1
     return
 .end
 
-.function: std::string::represent
+.function: std::string::represent/1
     frame ^[(param 0 (ptr 2 (strstore 1 ""))) (param 1 (arg 3 0))]
-    msg 0 represent
+    msg 0 represent/2
     move 0 1
     return
 .end
