@@ -50,9 +50,9 @@ void bases(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
 
 
 const ForeignFunctionSpec functions[] = {
-    { "typesystem::typeof", &typeof },
-    { "typesystem::inheritanceChain", &inheritanceChain },
-    { "typesystem::bases", &bases },
+    { "typesystem::typeof/1", &typeof },
+    { "typesystem::inheritanceChain/1", &inheritanceChain },
+    { "typesystem::bases/1", &bases },
     { NULL, NULL },
 };
 

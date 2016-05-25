@@ -23,15 +23,15 @@ void viua::front::vm::load_standard_prototypes(CPU* cpu) {
     cpu->registerForeignPrototype("Object", proto_object);
 
     Prototype* proto_string = new Prototype("String");
-    proto_string->attach("String::stringify", "stringify");
-    proto_string->attach("String::represent", "represent");
-    proto_string->attach("String::startswith", "startswith");
-    proto_string->attach("String::endswith", "endswith");
-    proto_string->attach("String::format", "format");
-    proto_string->attach("String::substr", "substr");
-    proto_string->attach("String::concatenate", "concatenate");
-    proto_string->attach("String::join", "join");
-    proto_string->attach("String::size", "size");
+    proto_string->attach("String::stringify", "stringify/2");
+    proto_string->attach("String::represent", "represent/2");
+    proto_string->attach("String::startswith", "startswith/2");
+    proto_string->attach("String::endswith", "endswith/2");
+    proto_string->attach("String::format", "format/");  // FIXME: fixed-arity, two- and three-parameter versions
+    proto_string->attach("String::substr", "substr/");  // FIXME: fixed-arity versions (2, 3 and 4 parameters)
+    proto_string->attach("String::concatenate", "concatenate/2");
+    proto_string->attach("String::join", "join/1");
+    proto_string->attach("String::size", "size/1");
     cpu->registerForeignPrototype("String", proto_string);
     cpu->registerForeignMethod("String::stringify", static_cast<ForeignMethodMemberPointer>(&String::stringify));
     cpu->registerForeignMethod("String::represent", static_cast<ForeignMethodMemberPointer>(&String::represent));
@@ -63,9 +63,9 @@ void viua::front::vm::load_standard_prototypes(CPU* cpu) {
     cpu->registerForeignMethod("Process::pass", static_cast<ForeignMethodMemberPointer>(&ProcessType::pass));
 
     Prototype* proto_pointer = new Prototype("Pointer");
-    proto_pointer->attach("Pointer::expired", "expired");
+    proto_pointer->attach("Pointer::expired/1", "expired/1");
     cpu->registerForeignPrototype("Pointer", proto_pointer);
-    cpu->registerForeignMethod("Pointer::expired", static_cast<ForeignMethodMemberPointer>(&Pointer::expired));
+    cpu->registerForeignMethod("Pointer::expired/1", static_cast<ForeignMethodMemberPointer>(&Pointer::expired));
 }
 
 void viua::front::vm::preload_libraries(CPU* cpu) {
