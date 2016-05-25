@@ -1145,7 +1145,7 @@ class WatchdogTests(unittest.TestCase):
         runTest(self, 'already_spawned.asm', 'process spawned with <Function: __entry> died')
 
     def testWatchdogMustBeANativeFunction(self):
-        runTestThrowsException(self, 'must_be_a_native_function.asm', 'uncaught object: Exception = watchdog process must be native function, used foreign World::print_hello')
+        runTestThrowsException(self, 'must_be_a_native_function.asm', 'uncaught object: Exception = watchdog process must be a native function, used foreign World::print_hello/0')
 
     def testWatchdogTerminatedByARunawayExceptionDoesNotLeak(self):
         runTest(self, 'terminated_watchdog.asm', 'watchdog process terminated by: Function: \'Function: broken_process/0\'')
