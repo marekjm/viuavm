@@ -83,18 +83,15 @@ string assembler::verify::functionCallArities(const string& filename, const vect
         int arity = assembler::utils::getFunctionArity(function_name);
 
         if (arity < 0) {
-            if (warning) {
-                // arity of the function was not given - skip the check since there is no indication of the correct number of parameters but
-                // print a warning
-                cout << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": warning: call to function with undefined arity ";
-                if (frame_parameters_count >= 0) {
-                    cout << "as " << function_name << (arity == -1 ? "/" : "") << frame_parameters_count;
-                } else {
-                    cout << ": " << function_name;
-                }
-                cout << endl;
+            // arity of the function was not given - skip the check since there is no indication of the correct number of parameters but
+            // print a warning
+            report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": warning: call to function with undefined arity ";
+            if (frame_parameters_count >= 0) {
+                report << "as " << function_name << (arity == -1 ? "/" : "") << frame_parameters_count;
+            } else {
+                report << ": " << function_name;
             }
-            continue;
+            break;
         }
         if (frame_parameters_count == -1) {
             // frame paramters count could not be statically determined, deffer the check until runtime
@@ -151,18 +148,15 @@ string assembler::verify::msgArities(const string& filename, const vector<string
         int arity = assembler::utils::getFunctionArity(function_name);
 
         if (arity < 0) {
-            if (warning) {
-                // arity of the function was not given - skip the check since there is no indication of the correct number of parameters but
-                // print a warning
-                cout << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": warning: dynamic dispatch call with undefined arity ";
-                if (frame_parameters_count >= 0) {
-                    cout << "as " << function_name << (arity == -1 ? "/" : "") << frame_parameters_count;
-                } else {
-                    cout << ": " << function_name;
-                }
-                cout << endl;
+            // arity of the function was not given - skip the check since there is no indication of the correct number of parameters but
+            // print a warning
+            report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": warning: dynamic dispatch call with undefined arity ";
+            if (frame_parameters_count >= 0) {
+                report << "as " << function_name << (arity == -1 ? "/" : "") << frame_parameters_count;
+            } else {
+                report << ": " << function_name;
             }
-            continue;
+            break;
         }
         if (frame_parameters_count == -1) {
             // frame paramters count could not be statically determined, deffer the check until runtime
@@ -198,14 +192,8 @@ string assembler::verify::functionNames(const string& filename, const std::vecto
         // FIXME: main with undefined arity is allowed for now
         // it will be an error not to give arity to main in future release
         if (assembler::utils::getFunctionArity(function) == -1 and function != "main") {
-            if (warning) {
-                cout << filename << ':' << i+1 << ": warning: function with undefined arity: " << function << endl;
-            } else if (error) {
-                report << filename << ':' << i+1 << ": error: function with undefined arity: " << function;
-                break;
-            } else {
-                // explicitly do nothing if neither warning nor error report was requested
-            }
+            report << filename << ':' << i+1 << ": error: function with undefined arity: " << function;
+            break;
         }
     }
 
