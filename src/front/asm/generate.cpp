@@ -786,7 +786,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     if (main_function == "" and not flags.as_lib) {
         main_function = "main/1";
     }
-    if (((VERBOSE and main_function != "main" and main_function != "") or DEBUG) and not flags.as_lib) {
+    if (((VERBOSE and main_function != "main/1" and main_function != "") or DEBUG) and not flags.as_lib) {
         cout << "debug (notice): main function set to: '" << main_function << "'" << endl;
     }
 
