@@ -173,7 +173,7 @@ int main(int argc, char* argv[]) {
 
     if (compilename == "") {
         if (AS_LIB) {
-            compilename = (filename + ".wlib");
+            compilename = (filename + ".vlib");
         } else {
             compilename = "a.out";
         }
