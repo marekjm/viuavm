@@ -20,10 +20,10 @@
     process 1 run_in_a_process/0
 
     frame ^[(param 0 1) (param 1 (istore 2 40))]
-    msg 0 setPriority
+    msg 0 setPriority/2
 
     frame ^[(param 0 1)]
-    print (msg 2 getPriority)
+    print (msg 2 getPriority/1)
 .name: 3 counter
 .name: 4 limit
     izero counter

@@ -22,13 +22,13 @@
     nop
 
     frame ^[(param 0 (ptr 2 1))]
-    msg 0 detach
+    msg 0 detach/1
 
     nop
 
     ; reuse the pointer created earlier
     frame ^[(param 0 2)]
-    msg 3 joinable
+    msg 3 joinable/1
     print 3
 
     print (strstore 3 "main/1 exited")

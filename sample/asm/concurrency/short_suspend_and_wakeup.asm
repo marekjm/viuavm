@@ -8,7 +8,7 @@
 
     print (strstore 6 "waking up process 0")
     frame ^[(param 0 (arg 2 0))]
-    msg 0 wakeup
+    msg 0 wakeup/1
 
     return
 .end
@@ -19,11 +19,11 @@
     frame ^[(param 0 1)]
     process 2 run_this_in_a_process/1
     frame ^[(param 0 (ptr 3 2))]
-    msg 0 detach
+    msg 0 detach/1
 
     print (strstore 6 "suspending process 0")
     frame ^[(param 0 3)]
-    msg 0 suspend
+    msg 0 suspend/1
 
     frame ^[(param 0 3)]
     process 4 process_waking_up_the_other_one/1

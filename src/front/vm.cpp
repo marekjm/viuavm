@@ -44,14 +44,14 @@ void viua::front::vm::load_standard_prototypes(CPU* cpu) {
     cpu->registerForeignMethod("String::size", static_cast<ForeignMethodMemberPointer>(&String::size));
 
     Prototype* proto_process = new Prototype("Process");
-    proto_process->attach("Process::joinable", "joinable");
-    proto_process->attach("Process::detach", "detach");
-    proto_process->attach("Process::suspend", "suspend");
-    proto_process->attach("Process::wakeup", "wakeup");
-    proto_process->attach("Process::suspended", "suspended");
-    proto_process->attach("Process::getPriority", "getPriority");
-    proto_process->attach("Process::setPriority", "setPriority");
-    proto_process->attach("Process::pass", "pass");
+    proto_process->attach("Process::joinable", "joinable/1");
+    proto_process->attach("Process::detach", "detach/1");
+    proto_process->attach("Process::suspend", "suspend/1");
+    proto_process->attach("Process::wakeup", "wakeup/1");
+    proto_process->attach("Process::suspended", "suspended/1");
+    proto_process->attach("Process::getPriority", "getPriority/1");
+    proto_process->attach("Process::setPriority", "setPriority/2");
+    proto_process->attach("Process::pass", "pass/2");
     cpu->registerForeignPrototype("Process", proto_process);
     cpu->registerForeignMethod("Process::joinable", static_cast<ForeignMethodMemberPointer>(&ProcessType::joinable));
     cpu->registerForeignMethod("Process::detach", static_cast<ForeignMethodMemberPointer>(&ProcessType::detach));

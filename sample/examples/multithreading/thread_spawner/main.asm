@@ -21,7 +21,7 @@
     process 2 worker_process
 
     frame ^[(param 0 (ptr 5 2))]
-    msg 0 detach
+    msg 0 detach/1
     ; explicitly delete the pointer to process handle
     delete 5
 
@@ -48,7 +48,7 @@
     process 2 process_spawner
 
     frame ^[(param 0 (ptr 3 2))]
-    msg 0 detach
+    msg 0 detach/1
 
     return
 .end

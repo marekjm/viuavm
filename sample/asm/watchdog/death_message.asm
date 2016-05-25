@@ -84,7 +84,7 @@
     frame 0
     process 1 a_detached_concurrent_process/0
     frame ^[(param 0 (ptr 2 1))]
-    msg 0 detach
+    msg 0 detach/1
     ; delete the pointer to detached process
     delete 2
 

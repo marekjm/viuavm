@@ -25,7 +25,7 @@
     process 1 run_in_a_process
 
     frame ^[(param 0 (ptr 2 1))]
-    msg 0 detach
+    msg 0 detach/1
     print (strstore 2 "main/1 detached worker process")
 
     echo (strstore 2 "message to pass: ")

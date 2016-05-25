@@ -61,7 +61,7 @@
     frame 0
     process 1 broken_process/0
     frame ^[(param 0 (ptr 2 1))]
-    msg 0 detach
+    msg 0 detach/1
 
     izero 0
     return

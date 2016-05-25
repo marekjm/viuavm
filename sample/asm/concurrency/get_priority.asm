@@ -11,7 +11,7 @@
     process 1 run_in_a_process/0
 
     frame ^[(param 0 1)]
-    print (msg 2 getPriority)
+    print (msg 2 getPriority/1)
 
     join 0 1
 

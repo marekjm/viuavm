@@ -20,7 +20,7 @@
     thread 5 run_in_a_thread
 
     frame ^[(param 0 5)]
-    msg 0 detach
+    msg 0 detach/1
 
     iinc counter
     jump loop
@@ -33,7 +33,7 @@
     thread 1 thread_spawner
 
     frame ^[(param 0 1) (param 1 (istore 2 512))]
-    msg 0 setPriority
+    msg 0 setPriority/2
 
     thjoin 1
 

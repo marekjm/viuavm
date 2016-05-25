@@ -20,13 +20,13 @@
     thread 1 worker
     ptr 2 1
     frame ^[(param 0 2)]
-    msg 0 detach
+    msg 0 detach/1
 
     frame 0
     thread 3 producer
     ptr 4 3
     frame ^[(param 0 4)]
-    msg 0 detach
+    msg 0 detach/1
 
     izero 0
     return
