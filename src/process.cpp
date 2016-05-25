@@ -115,7 +115,7 @@ void Process::pushFrame() {
      */
     if (frames.size() > MAX_STACK_SIZE) {
         ostringstream oss;
-        oss << "stack size (" << MAX_STACK_SIZE << ") exceeded with call to '" << frame_new->function_name << '/' << frame_new->args->size() << '\'';
+        oss << "stack size (" << MAX_STACK_SIZE << ") exceeded with call to '" << frame_new->function_name << '\'';
         throw new Exception(oss.str());
     }
 
