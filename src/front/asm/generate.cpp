@@ -931,6 +931,16 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     for (string name : linked_function_names) { functions.names.push_back(name); }
 
 
+    ///////////////////////////////////////////////
+    // CHECK IF THE FUNCTION SET AS MAIN IS DEFINED
+    // AS ALL THE FUNCTIONS (LOCAL OR LINKED) ARE
+    // NOW AVAILABLE
+    if (find(functions.names.begin(), functions.names.end(), main_function) == functions.names.end() and not flags.as_lib) {
+        cout << "[asm:pre] fatal: main function is undefined: " << main_function << endl;
+        return 1;
+    }
+
+
     /////////////////////////////////////////////////////////////////////////
     // AFTER HAVING OBTAINED LINKED NAMES, IT IS POSSIBLE TO VERIFY CALLS AND
     // CALLABLE (FUNCTIONS, CLOSURES, ETC.) CREATIONS
@@ -1144,16 +1154,6 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
             jmp = jump_table[i];
             bwrite(out, jmp);
         }
-    }
-
-
-    ///////////////////////////////////////////////
-    // CHECK IF THE FUNCTION SET AS MAIN IS DEFINED
-    // AS ALL THE FUNCTIONS (LOCAL OR LINKED) ARE
-    // NOW AVAILABLE
-    if (find(functions.names.begin(), functions.names.end(), main_function) == functions.names.end() and not flags.as_lib) {
-        cout << "[asm:pre] fatal: main function is undefined: " << main_function << endl;
-        return 1;
     }
 
 
