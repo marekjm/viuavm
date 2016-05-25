@@ -841,20 +841,22 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         if (DEBUG) {
             cout << "generating " << ENTRY_FUNCTION_NAME << " function" << endl;
         }
+
+        vector<string> entry_function_lines;
         functions.names.push_back(ENTRY_FUNCTION_NAME);
         function_addresses[ENTRY_FUNCTION_NAME] = starting_instruction;
         // entry function sets global stuff (FIXME: not really)
-        ilines.insert(ilines.begin(), "ress local");
+        entry_function_lines.push_back("ress local");
         // append entry function instructions...
-        ilines.push_back("frame 1");
-        ilines.push_back("param 0 1");
+        entry_function_lines.push_back("frame 1");
+        entry_function_lines.push_back("param 0 1");
         // this must not be hardcoded because we have '.main:' assembler instruction
         // we also save return value in 1 register since 0 means "drop return value"
-        ilines.push_back("call 1 " + main_function);
+        entry_function_lines.push_back("call 1 " + main_function);
         // then, register 1 is moved to register 0 so it counts as a return code
-        ilines.push_back("move 0 1");
-        ilines.push_back("halt");
-        functions.bodies[ENTRY_FUNCTION_NAME] = ilines;
+        entry_function_lines.push_back("move 0 1");
+        entry_function_lines.push_back("halt");
+        functions.bodies[ENTRY_FUNCTION_NAME] = entry_function_lines;
         // instructions were added so bytecode size must be inreased
         bytes += OP_SIZES.at("ress");
         bytes += OP_SIZES.at("frame");
