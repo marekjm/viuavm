@@ -59,7 +59,7 @@ byte* Process::opvpop(byte* addr) {
      *  3) put it in a register,
      */
     Type* ptr = static_cast<Vector*>(vector_operand)->pop(position_operand_index);
-    if (destination_register_index) { place(destination_register_index, ptr); }
+    place(destination_register_index, ptr);
 
     return addr;
 }
