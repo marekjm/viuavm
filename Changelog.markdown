@@ -50,6 +50,9 @@ compilation unit), and some arity errors during function calls.
 - bic: functions in `std::functional` module have defined arities,
 - enhancement: assembler reports using the following format `<filename>:<line-number>: <class>: <message>`,
   for example `./foo.asm:18: call to undefined function foo/1`
+- bic: assembler reports all errors it finds by default, in next versions some error *silencing* options
+  may be introduced,
+- fix: all machine-provided functions have theit arity specified (as either fixed or variable),
 
 
 ----
