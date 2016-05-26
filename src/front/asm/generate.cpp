@@ -936,30 +936,29 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     for (string name : linked_function_names) { functions.names.push_back(name); }
 
 
-    // check if our initial guess for main function is correct and
-    // detect some main-function-related errors
-    vector<string> main_function_found;
-    for (auto f : functions.names) {
-        if (f == "main/0" or f == "main/1" or f == "main/2") {
-            main_function_found.push_back(f);
+    if (not flags.as_lib) {
+        // check if our initial guess for main function is correct and
+        // detect some main-function-related errors
+        vector<string> main_function_found;
+        for (auto f : functions.names) {
+            if (f == "main/0" or f == "main/1" or f == "main/2") {
+                main_function_found.push_back(f);
+            }
         }
-    }
-    if (main_function_found.size() > 1) {
-        cout << filename << ": error: more than one candidate for main function" << endl;
-        for (auto f : main_function_found) {
-            cout << filename << ": note: " << f << " function found in module " << symbol_sources.at(f) << endl;
+        if (main_function_found.size() > 1) {
+            cout << filename << ": error: more than one candidate for main function" << endl;
+            for (auto f : main_function_found) {
+                cout << filename << ": note: " << f << " function found in module " << symbol_sources.at(f) << endl;
+            }
+            return 1;
+        } else if (main_function_found.size() == 0) {
+            cout << filename << ": error: main function is not defined" << endl;
+            return 1;
         }
-        return 1;
-    }
-
-
-    ///////////////////////////////////////////////
-    // CHECK IF THE FUNCTION SET AS MAIN IS DEFINED
-    // AS ALL THE FUNCTIONS (LOCAL OR LINKED) ARE
-    // NOW AVAILABLE
-    if (find(functions.names.begin(), functions.names.end(), main_function) == functions.names.end() and not flags.as_lib) {
-        cout << "[asm:pre] fatal: main function is undefined: " << main_function << endl;
-        return 1;
+        main_function = main_function_found[0];
+        if (main_function != "main/1") {
+            functions.bodies[ENTRY_FUNCTION_NAME][functions.bodies[ENTRY_FUNCTION_NAME].size()-3] = ("call 1 " + main_function);
+        }
     }
 
 
