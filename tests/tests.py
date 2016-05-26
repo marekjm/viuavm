@@ -101,6 +101,7 @@ MEMORY_LEAK_CHECKS_ENABLE = True
 MEMORY_LEAK_CHECKS_SKIP_LIST = []
 MEMORY_LEAK_CHECKS_ALLOWED_LEAK_VALUES = (0, 72704)
 MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES = ()
+MEMORY_LEAK_CHECKS_REPORT_SUPPRESSED = False
 valgrind_regex_heap_summary_in_use_at_exit = re.compile('in use at exit: (\d+(?:,\d+)?) bytes in (\d+) blocks')
 valgrind_regex_heap_summary_total_heap_usage = re.compile('total heap usage: (\d+(?:,\d+)*?) allocs, (\d+(?:,\d+)*?) frees, (\d+(?:,\d+)*?) bytes allocated')
 valgrind_regex_leak_summary_definitely_lost = re.compile('definitely lost: (\d+(?:,\d+)?) bytes in (\d+) blocks')
@@ -159,7 +160,7 @@ def valgrindCheck(self, path):
     # same as above, we have to allow 72704 bytes to leak
     # also, we shall sometimes allow (sigh...) additional memory to "leak" if Valgrind freaks out
     if summary['leak']['still_reachable']['bytes'] not in (MEMORY_LEAK_CHECKS_ALLOWED_LEAK_VALUES + MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES): memory_was_leaked = True
-    if summary['leak']['suppressed']['bytes']: memory_was_leaked = True
+    if summary['leak']['suppressed']['bytes'] and MEMORY_LEAK_CHECKS_REPORT_SUPPRESSED: memory_was_leaked = True
 
     if memory_was_leaked:
         print(error)
