@@ -23,44 +23,44 @@ void viua::front::vm::load_standard_prototypes(CPU* cpu) {
     cpu->registerForeignPrototype("Object", proto_object);
 
     Prototype* proto_string = new Prototype("String");
-    proto_string->attach("String::stringify", "stringify/2");
-    proto_string->attach("String::represent", "represent/2");
-    proto_string->attach("String::startswith", "startswith/2");
-    proto_string->attach("String::endswith", "endswith/2");
-    proto_string->attach("String::format", "format/");  // FIXME: fixed-arity, two- and three-parameter versions
-    proto_string->attach("String::substr", "substr/");  // FIXME: fixed-arity versions (2, 3 and 4 parameters)
-    proto_string->attach("String::concatenate", "concatenate/2");
-    proto_string->attach("String::join", "join/1");
-    proto_string->attach("String::size", "size/1");
+    proto_string->attach("String::stringify/2", "stringify/2");
+    proto_string->attach("String::represent/2", "represent/2");
+    proto_string->attach("String::startswith/2", "startswith/2");
+    proto_string->attach("String::endswith/2", "endswith/2");
+    proto_string->attach("String::format/", "format/");  // FIXME: fixed-arity, two- and three-parameter versions
+    proto_string->attach("String::substr/", "substr/");  // FIXME: fixed-arity versions (2, 3 and 4 parameters)
+    proto_string->attach("String::concatenate/2", "concatenate/2");
+    proto_string->attach("String::join/1", "join/1");
+    proto_string->attach("String::size/1", "size/1");
     cpu->registerForeignPrototype("String", proto_string);
-    cpu->registerForeignMethod("String::stringify", static_cast<ForeignMethodMemberPointer>(&String::stringify));
-    cpu->registerForeignMethod("String::represent", static_cast<ForeignMethodMemberPointer>(&String::represent));
-    cpu->registerForeignMethod("String::startswith", static_cast<ForeignMethodMemberPointer>(&String::startswith));
-    cpu->registerForeignMethod("String::endswith", static_cast<ForeignMethodMemberPointer>(&String::endswith));
-    cpu->registerForeignMethod("String::format", static_cast<ForeignMethodMemberPointer>(&String::format));
-    cpu->registerForeignMethod("String::substr", static_cast<ForeignMethodMemberPointer>(&String::substr));
-    cpu->registerForeignMethod("String::concatenate", static_cast<ForeignMethodMemberPointer>(&String::concatenate));
-    cpu->registerForeignMethod("String::join", static_cast<ForeignMethodMemberPointer>(&String::join));
-    cpu->registerForeignMethod("String::size", static_cast<ForeignMethodMemberPointer>(&String::size));
+    cpu->registerForeignMethod("String::stringify/2", static_cast<ForeignMethodMemberPointer>(&String::stringify));
+    cpu->registerForeignMethod("String::represent/2", static_cast<ForeignMethodMemberPointer>(&String::represent));
+    cpu->registerForeignMethod("String::startswith/2", static_cast<ForeignMethodMemberPointer>(&String::startswith));
+    cpu->registerForeignMethod("String::endswith/2", static_cast<ForeignMethodMemberPointer>(&String::endswith));
+    cpu->registerForeignMethod("String::format/", static_cast<ForeignMethodMemberPointer>(&String::format));
+    cpu->registerForeignMethod("String::substr/", static_cast<ForeignMethodMemberPointer>(&String::substr));
+    cpu->registerForeignMethod("String::concatenate/2", static_cast<ForeignMethodMemberPointer>(&String::concatenate));
+    cpu->registerForeignMethod("String::join/", static_cast<ForeignMethodMemberPointer>(&String::join));
+    cpu->registerForeignMethod("String::size/1", static_cast<ForeignMethodMemberPointer>(&String::size));
 
     Prototype* proto_process = new Prototype("Process");
-    proto_process->attach("Process::joinable", "joinable/1");
-    proto_process->attach("Process::detach", "detach/1");
-    proto_process->attach("Process::suspend", "suspend/1");
-    proto_process->attach("Process::wakeup", "wakeup/1");
-    proto_process->attach("Process::suspended", "suspended/1");
-    proto_process->attach("Process::getPriority", "getPriority/1");
-    proto_process->attach("Process::setPriority", "setPriority/2");
-    proto_process->attach("Process::pass", "pass/2");
+    proto_process->attach("Process::joinable/1", "joinable/1");
+    proto_process->attach("Process::detach/1", "detach/1");
+    proto_process->attach("Process::suspend/1", "suspend/1");
+    proto_process->attach("Process::wakeup/1", "wakeup/1");
+    proto_process->attach("Process::suspended/1", "suspended/1");
+    proto_process->attach("Process::getPriority/1", "getPriority/1");
+    proto_process->attach("Process::setPriority/2", "setPriority/2");
+    proto_process->attach("Process::pass/2", "pass/2");
     cpu->registerForeignPrototype("Process", proto_process);
-    cpu->registerForeignMethod("Process::joinable", static_cast<ForeignMethodMemberPointer>(&ProcessType::joinable));
-    cpu->registerForeignMethod("Process::detach", static_cast<ForeignMethodMemberPointer>(&ProcessType::detach));
-    cpu->registerForeignMethod("Process::suspend", static_cast<ForeignMethodMemberPointer>(&ProcessType::suspend));
-    cpu->registerForeignMethod("Process::wakeup", static_cast<ForeignMethodMemberPointer>(&ProcessType::wakeup));
-    cpu->registerForeignMethod("Process::suspended", static_cast<ForeignMethodMemberPointer>(&ProcessType::suspended));
-    cpu->registerForeignMethod("Process::getPriority", static_cast<ForeignMethodMemberPointer>(&ProcessType::getPriority));
-    cpu->registerForeignMethod("Process::setPriority", static_cast<ForeignMethodMemberPointer>(&ProcessType::setPriority));
-    cpu->registerForeignMethod("Process::pass", static_cast<ForeignMethodMemberPointer>(&ProcessType::pass));
+    cpu->registerForeignMethod("Process::joinable/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::joinable));
+    cpu->registerForeignMethod("Process::detach/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::detach));
+    cpu->registerForeignMethod("Process::suspend/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::suspend));
+    cpu->registerForeignMethod("Process::wakeup/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::wakeup));
+    cpu->registerForeignMethod("Process::suspended/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::suspended));
+    cpu->registerForeignMethod("Process::getPriority/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::getPriority));
+    cpu->registerForeignMethod("Process::setPriority/2", static_cast<ForeignMethodMemberPointer>(&ProcessType::setPriority));
+    cpu->registerForeignMethod("Process::pass/2", static_cast<ForeignMethodMemberPointer>(&ProcessType::pass));
 
     Prototype* proto_pointer = new Prototype("Pointer");
     proto_pointer->attach("Pointer::expired/1", "expired/1");
