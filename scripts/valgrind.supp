@@ -1,0 +1,16 @@
+{
+    dlopen_leak
+    Memcheck:Leak
+    match-leak-kinds: reachable
+    ...
+    fun:dlopen
+    ...
+}
+{
+    emergency_exception_pool
+    Memcheck:Leak
+    match-leak-kinds: reachable
+    fun:malloc
+    fun:pool
+    ...
+}

@@ -139,7 +139,7 @@ def valgrindSummary(text):
 def valgrindCheck(self, path):
     """Run compiled code under Valgrind to check for memory leaks.
     """
-    p = subprocess.Popen(('valgrind', './build/bin/vm/cpu', path), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen(('valgrind', '--suppressions=./scripts/valgrind.supp', './build/bin/vm/cpu', path), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, error = p.communicate()
     exit_code = p.wait()
 
