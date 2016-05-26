@@ -835,6 +835,29 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     }
 
 
+    /////////////////////////////////////////////////////////
+    // GATHER LINKS, GET THEIR SIZES AND ADJUST BYTECODE SIZE
+    vector<string> links = assembler::ce::getlinks(ilines);
+    vector<tuple<string, uint64_t, byte*> > linked_libs_bytecode;
+    vector<string> linked_function_names;
+    vector<string> linked_block_names;
+    map<string, vector<uint64_t> > linked_libs_jumptables;
+
+    // map of symbol names to name of the module the symbol came from
+    map<string, string> symbol_sources;
+    for (auto f : functions.names) {
+        symbol_sources[f] = filename;
+    }
+
+    for (string lnk : commandline_given_links) {
+        if (find(links.begin(), links.end(), lnk) == links.end()) {
+            links.push_back(lnk);
+        } else {
+            throw ("requested to link module '" + lnk + "' more than once");
+        }
+    }
+
+
     //////////////////////////
     // GENERATE ENTRY FUNCTION
     if (not flags.as_lib) {
@@ -868,29 +891,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     }
 
 
-    /////////////////////////////////////////////////////////
-    // GATHER LINKS, GET THEIR SIZES AND ADJUST BYTECODE SIZE
-    vector<string> links = assembler::ce::getlinks(ilines);
-    vector<tuple<string, uint64_t, byte*> > linked_libs_bytecode;
-    vector<string> linked_function_names;
-    vector<string> linked_block_names;
-    map<string, vector<uint64_t> > linked_libs_jumptables;
     uint64_t current_link_offset = bytes;
-
-    // map of symbol names to name of the module the symbol came from
-    map<string, string> symbol_sources;
-    for (auto f : functions.names) {
-        symbol_sources[f] = filename;
-    }
-
-    for (string lnk : commandline_given_links) {
-        if (find(links.begin(), links.end(), lnk) == links.end()) {
-            links.push_back(lnk);
-        } else {
-            throw ("requested to link module '" + lnk + "' more than once");
-        }
-    }
-
     for (string lnk : links) {
         if (DEBUG or VERBOSE) {
             cout << "[loader] message: linking with: '" << lnk << "\'" << endl;
