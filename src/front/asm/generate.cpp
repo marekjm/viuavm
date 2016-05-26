@@ -935,11 +935,11 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
             bytes += OP_SIZES.at("frame");
 
             // pop first element on the list of aruments
-            entry_function_lines.push_back("vpop 2 1 0");
+            entry_function_lines.push_back("vpop 0 1 0");
             bytes += OP_SIZES.at("vpop");
 
             // for parameter for main/2 is the name of the program
-            entry_function_lines.push_back("param 0 2");
+            entry_function_lines.push_back("param 0 0");
             bytes += OP_SIZES.at("param");
 
             // second parameter for main/2 is the vector with the rest
