@@ -53,6 +53,13 @@ compilation unit), and some arity errors during function calls.
 - bic: assembler reports all errors it finds by default, in next versions some error *silencing* options
   may be introduced,
 - fix: all machine-provided functions have theit arity specified (as either fixed or variable),
+- bic: assembler enforces that main function has specified fixed arity
+- enhancement: three variants of main functions are available: `main/0` that receives no arguments,
+  `main/1` which receives a vector with all command line arguments sent to the program and the program name, and
+  `main/2` which receives two parameters - first the name of the program, and second the rest of the command
+  line parameters,
+- bic: popping elements from vector with `VPOP` instruction to zero register does not drop them but
+  places them in the register, popped elements can be then manually deleted,
 
 
 ----
