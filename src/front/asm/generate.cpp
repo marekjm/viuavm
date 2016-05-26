@@ -879,6 +879,9 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
 
     // map of symbol names to name of the module the symbol came from
     map<string, string> symbol_sources;
+    for (auto f : functions.names) {
+        symbol_sources[f] = filename;
+    }
 
     for (string lnk : commandline_given_links) {
         if (find(links.begin(), links.end(), lnk) == links.end()) {
