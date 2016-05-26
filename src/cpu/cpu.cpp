@@ -220,7 +220,7 @@ CPU& CPU::iframe(Frame* frm, unsigned r) {
      */
     Frame *initial_frame;
     if (frm == nullptr) {
-        initial_frame = new Frame(nullptr, 0, 2);
+        initial_frame = new Frame(nullptr, 0, 3);
         initial_frame->function_name = ENTRY_FUNCTION_NAME;
 
         Vector* cmdline = new Vector();

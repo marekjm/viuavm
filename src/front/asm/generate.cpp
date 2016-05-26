@@ -931,9 +931,20 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
             entry_function_lines.push_back("frame 0");
             bytes += OP_SIZES.at("frame");
         } else if (main_function == "main/2") {
-            entry_function_lines.push_back("frame 1");
-            entry_function_lines.push_back("param 0 1");
+            entry_function_lines.push_back("frame 2");
             bytes += OP_SIZES.at("frame");
+
+            // pop first element on the list of aruments
+            entry_function_lines.push_back("vpop 2 1 0");
+            bytes += OP_SIZES.at("vpop");
+
+            // for parameter for main/2 is the name of the program
+            entry_function_lines.push_back("param 0 2");
+            bytes += OP_SIZES.at("param");
+
+            // second parameter for main/2 is the vector with the rest
+            // of the commandl ine parameters
+            entry_function_lines.push_back("param 1 1");
             bytes += OP_SIZES.at("param");
         } else {
             // this is for default main function, i.e. `main/1` or
