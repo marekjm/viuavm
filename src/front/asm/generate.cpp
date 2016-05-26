@@ -857,6 +857,29 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         }
     }
 
+    // gather all linked function names
+    for (string lnk : links) {
+        Loader loader(lnk);
+        loader.load();
+
+        vector<string> fn_names = loader.getFunctions();
+        for (string fn : fn_names) {
+            if (function_addresses.count(fn)) {
+                throw ("duplicate symbol '" + fn + "' found when linking '" + lnk + "' (previously found in '" + symbol_sources.at(fn) + "')");
+            }
+        }
+
+        map<string, uint64_t> fn_addresses = loader.getFunctionAddresses();
+        for (string fn : fn_names) {
+            function_addresses[fn] = 0; // for now we just build a list of all available functions
+            symbol_sources[fn] = lnk;
+            linked_function_names.push_back(fn);
+            if (DEBUG) {
+                cout << filename << ": debug-note: prelinking function " << fn << " from module " << lnk << endl;
+            }
+        }
+    }
+
 
     //////////////////////////
     // GENERATE ENTRY FUNCTION
@@ -901,11 +924,6 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         loader.load();
 
         vector<string> fn_names = loader.getFunctions();
-        for (string fn : fn_names) {
-            if (function_addresses.count(fn)) {
-                throw ("duplicate symbol '" + fn + "' found when linking '" + lnk + "' (previously found in '" + symbol_sources.at(fn) + "')");
-            }
-        }
 
         vector<uint64_t> lib_jumps = loader.getJumps();
         if (DEBUG) {
@@ -920,8 +938,6 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         map<string, uint64_t> fn_addresses = loader.getFunctionAddresses();
         for (string fn : fn_names) {
             function_addresses[fn] = fn_addresses.at(fn) + current_link_offset;
-            symbol_sources[fn] = lnk;
-            linked_function_names.push_back(fn);
             if (DEBUG) {
                 cout << "  \"" << fn << "\": entry point at byte: " << current_link_offset << '+' << fn_addresses.at(fn) << endl;
             }
