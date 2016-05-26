@@ -881,6 +881,12 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     }
 
 
+    //////////////////////////////////////////////////////////////
+    // EXTEND FUNCTION NAMES VECTOR WITH NAMES OF LINKED FUNCTIONS
+    auto local_function_names = functions.names;
+    for (string name : linked_function_names) { functions.names.push_back(name); }
+
+
     //////////////////////////
     // GENERATE ENTRY FUNCTION
     if (not flags.as_lib) {
@@ -946,11 +952,6 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         linked_libs_bytecode.push_back( tuple<string, uint64_t, byte*>(lnk, loader.getBytecodeSize(), loader.getBytecode()) );
         bytes += loader.getBytecodeSize();
     }
-
-
-    //////////////////////////////////////////////////////////////
-    // EXTEND FUNCTION NAMES VECTOR WITH NAMES OF LINKED FUNCTIONS
-    for (string name : linked_function_names) { functions.names.push_back(name); }
 
 
     if (not flags.as_lib) {
