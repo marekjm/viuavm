@@ -1055,6 +1055,16 @@ class AssemblerErrorRejectingDuplicateSymbolsTests(unittest.TestCase):
         self.assertRaises(ViuaAssemblerError, assemble, os.path.join(self.PATH, 'exec.asm'), links=(lib_a_path, lib_a_path))
 
 
+class MiscTests(unittest.TestCase):
+    PATH = './sample/asm/misc'
+
+    def testMain0AsMainFunction(self):
+        runTestSplitlines(self, name='main0_as_main_function.asm', expected_output=['Hello World!', 'received 1 arguments'])
+
+    def testMain2AsMainFunction(self):
+        runTestSplitlines(self, name='main2_as_main_function.asm', expected_output=['Hello World!', 'received 1 arguments'])
+
+
 class ExternalModulesTests(unittest.TestCase):
     """Tests for C/C++ module importing, and calling external functions.
     """
