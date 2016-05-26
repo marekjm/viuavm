@@ -1059,7 +1059,7 @@ class MiscTests(unittest.TestCase):
     PATH = './sample/asm/misc'
 
     def testMain0AsMainFunction(self):
-        runTestSplitlines(self, name='main0_as_main_function.asm', expected_output=['Hello World!', 'received 1 arguments'])
+        runTestSplitlines(self, name='main0_as_main_function.asm', expected_output=['Hello World!', 'received 0 arguments'])
 
     def testMain2AsMainFunction(self):
         runTestSplitlines(self, name='main2_as_main_function.asm', expected_output=['Hello World!', 'received 1 arguments'])

@@ -887,6 +887,29 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     for (string name : linked_function_names) { functions.names.push_back(name); }
 
 
+    if (not flags.as_lib) {
+        // check if our initial guess for main function is correct and
+        // detect some main-function-related errors
+        vector<string> main_function_found;
+        for (auto f : functions.names) {
+            if (f == "main/0" or f == "main/1" or f == "main/2") {
+                main_function_found.push_back(f);
+            }
+        }
+        if (main_function_found.size() > 1) {
+            cout << filename << ": error: more than one candidate for main function" << endl;
+            for (auto f : main_function_found) {
+                cout << filename << ": note: " << f << " function found in module " << symbol_sources.at(f) << endl;
+            }
+            return 1;
+        } else if (main_function_found.size() == 0) {
+            cout << filename << ": error: main function is not defined" << endl;
+            return 1;
+        }
+        main_function = main_function_found[0];
+    }
+
+
     //////////////////////////
     // GENERATE ENTRY FUNCTION
     if (not flags.as_lib) {
@@ -897,26 +920,45 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         vector<string> entry_function_lines;
         functions.names.push_back(ENTRY_FUNCTION_NAME);
         function_addresses[ENTRY_FUNCTION_NAME] = starting_instruction;
+
         // entry function sets global stuff (FIXME: not really)
         entry_function_lines.push_back("ress local");
-        // append entry function instructions...
-        entry_function_lines.push_back("frame 1");
-        entry_function_lines.push_back("param 0 1");
+        bytes += OP_SIZES.at("ress");
+
+        // generate different instructions based on which main function variant
+        // has been selected
+        if (main_function == "main/0") {
+            entry_function_lines.push_back("frame 0");
+            bytes += OP_SIZES.at("frame");
+        } else if (main_function == "main/2") {
+            entry_function_lines.push_back("frame 1");
+            entry_function_lines.push_back("param 0 1");
+            bytes += OP_SIZES.at("frame");
+            bytes += OP_SIZES.at("param");
+        } else {
+            // this is for default main function, i.e. `main/1` or
+            // for custom main functions
+            // FIXME: should custom main function be allowed?
+            entry_function_lines.push_back("frame 1");
+            entry_function_lines.push_back("param 0 1");
+            bytes += OP_SIZES.at("frame");
+            bytes += OP_SIZES.at("param");
+        }
+
         // this must not be hardcoded because we have '.main:' assembler instruction
         // we also save return value in 1 register since 0 means "drop return value"
         entry_function_lines.push_back("call 1 " + main_function);
-        // then, register 1 is moved to register 0 so it counts as a return code
-        entry_function_lines.push_back("move 0 1");
-        entry_function_lines.push_back("halt");
-        functions.bodies[ENTRY_FUNCTION_NAME] = entry_function_lines;
-        // instructions were added so bytecode size must be inreased
-        bytes += OP_SIZES.at("ress");
-        bytes += OP_SIZES.at("frame");
-        bytes += OP_SIZES.at("param");
         bytes += OP_SIZES.at("call");
         bytes += main_function.size()+1;
+
+        // then, register 1 is moved to register 0 so it counts as a return code
+        entry_function_lines.push_back("move 0 1");
         bytes += OP_SIZES.at("move");
+
+        entry_function_lines.push_back("halt");
         bytes += OP_SIZES.at("halt");
+
+        functions.bodies[ENTRY_FUNCTION_NAME] = entry_function_lines;
     }
 
 
@@ -951,32 +993,6 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
 
         linked_libs_bytecode.push_back( tuple<string, uint64_t, byte*>(lnk, loader.getBytecodeSize(), loader.getBytecode()) );
         bytes += loader.getBytecodeSize();
-    }
-
-
-    if (not flags.as_lib) {
-        // check if our initial guess for main function is correct and
-        // detect some main-function-related errors
-        vector<string> main_function_found;
-        for (auto f : functions.names) {
-            if (f == "main/0" or f == "main/1" or f == "main/2") {
-                main_function_found.push_back(f);
-            }
-        }
-        if (main_function_found.size() > 1) {
-            cout << filename << ": error: more than one candidate for main function" << endl;
-            for (auto f : main_function_found) {
-                cout << filename << ": note: " << f << " function found in module " << symbol_sources.at(f) << endl;
-            }
-            return 1;
-        } else if (main_function_found.size() == 0) {
-            cout << filename << ": error: main function is not defined" << endl;
-            return 1;
-        }
-        main_function = main_function_found[0];
-        if (main_function != "main/1") {
-            functions.bodies[ENTRY_FUNCTION_NAME][functions.bodies[ENTRY_FUNCTION_NAME].size()-3] = ("call 1 " + main_function);
-        }
     }
 
 
