@@ -936,6 +936,23 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     for (string name : linked_function_names) { functions.names.push_back(name); }
 
 
+    // check if our initial guess for main function is correct and
+    // detect some main-function-related errors
+    vector<string> main_function_found;
+    for (auto f : functions.names) {
+        if (f == "main/0" or f == "main/1" or f == "main/2") {
+            main_function_found.push_back(f);
+        }
+    }
+    if (main_function_found.size() > 1) {
+        cout << filename << ": error: more than one candidate for main function" << endl;
+        for (auto f : main_function_found) {
+            cout << filename << ": note: " << f << " function found in module " << symbol_sources.at(f) << endl;
+        }
+        return 1;
+    }
+
+
     ///////////////////////////////////////////////
     // CHECK IF THE FUNCTION SET AS MAIN IS DEFINED
     // AS ALL THE FUNCTIONS (LOCAL OR LINKED) ARE
