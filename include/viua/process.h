@@ -262,13 +262,13 @@ class Process {
         }
 
         inline void suspend() {
-            is_suspended = true;
+            is_suspended.store(true);
         }
         inline void wakeup() {
-            is_suspended = false;
+            is_suspended.store(false);
         }
         inline bool suspended() {
-            return is_suspended;
+            return is_suspended.load();
         }
 
         inline Process* parent() const { return parent_process; };
