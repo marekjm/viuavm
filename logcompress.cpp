@@ -72,8 +72,16 @@ int main(int argc, char *argv[]) {
     }
 
     if (line == previous and previous == preprevious) {
-        // another repeated line
-        ++repeated;
+        cout << line << endl;
+        if (repeated > 1) {
+            cout << "\n# repeated " << repeated << " time(s)...\n" << endl;
+            cout << line << endl;
+        } else if (repeated == 1) {
+            cout << line << endl;
+            cout << line << endl;
+        } else {
+            // repeated zero times
+        }
     } else if (line != previous and previous == preprevious) {
         cout << line << endl;
         if (repeated) {
