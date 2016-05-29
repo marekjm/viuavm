@@ -401,6 +401,16 @@ byte* Process::tick() {
     return instruction_pointer;
 }
 
+void Process::suspend() {
+    is_suspended.store(true);
+}
+void Process::wakeup() {
+    is_suspended.store(false);
+}
+bool Process::suspended() {
+    return is_suspended.load();
+}
+
 void Process::pass(Type* message) {
     message_queue.push(message);
     wakeup();
