@@ -38,6 +38,3 @@ fi
 
 # Then, shorten it.
 ./build/bin/tools/log-shortener $VVM_DEBUG_LOG > $VVM_DEBUG_LOG_SHORT
-
-
-echo "shortened log in: $VVM_DEBUG_LOG_SHORT"
