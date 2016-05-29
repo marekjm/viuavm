@@ -163,6 +163,14 @@ version:
 
 
 ############################################################
+# TOOLS
+build/bin/tools/log-shortener: ./tools/log-shortener.cpp
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -o $@ $<
+
+tools: build/bin/tools/log-shortener
+
+
+############################################################
 # VIRTUAL MACHINE CODE
 build/asm/decode.o: src/front/asm/decode.cpp include/viua/front/asm.h
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
