@@ -407,7 +407,7 @@ void Process::join() {
      *  This function causes calling process to be blocked until
      *  this process has stopped.
      */
-    is_joinable = false;
+    is_joinable.store(false, std::memory_order_release);
 }
 void Process::detach() {
     /** Detach a process.
@@ -419,11 +419,11 @@ void Process::detach() {
      *  they can receive messages.
      *  Also, they will run even after the main/1 function has exited.
      */
-    is_joinable = false;
+    is_joinable.store(false, std::memory_order_release);
     parent_process = nullptr;
 }
 bool Process::joinable() const {
-    return is_joinable;
+    return is_joinable.load(std::memory_order_acquire);
 }
 
 void Process::suspend() {
