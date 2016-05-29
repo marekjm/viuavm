@@ -145,32 +145,38 @@ def valgrindCheck(self, path):
     exit_code = p.wait()
 
     error = error.decode('utf-8')
-    summary = valgrindSummary(error)
 
-    memory_was_leaked = False
-    allocation_balance = (summary['heap']['total_heap_usage']['allocs'] - summary['heap']['total_heap_usage']['frees'])
-    # 1 must be allowed to deal with GCC 5.1 bug that causes 72,704 bytes to remain reachable
-    # sources:
-    #   https://stackoverflow.com/questions/30393229/new-libstdc-of-gcc5-1-may-allocate-large-heap-memory
-    #   https://gcc.gnu.org/bugzilla/show_bug.cgi?id=64535
-    if not (allocation_balance == 0 or allocation_balance == 1): memory_was_leaked = True
-    if summary['leak']['definitely_lost']['bytes']: memory_was_leaked = True
-    if summary['leak']['indirectly_lost']['bytes']: memory_was_leaked = True
-    if summary['leak']['possibly_lost']['bytes']: memory_was_leaked = True
-    # same as above, we have to allow 72704 bytes to leak
-    # also, we shall sometimes allow (sigh...) additional memory to "leak" if Valgrind freaks out
-    if summary['leak']['still_reachable']['bytes'] not in (MEMORY_LEAK_CHECKS_ALLOWED_LEAK_VALUES + MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES): memory_was_leaked = True
-    if summary['leak']['suppressed']['bytes'] and MEMORY_LEAK_CHECKS_REPORT_SUPPRESSED: memory_was_leaked = True
+    try:
+        summary = valgrindSummary(error)
 
-    if memory_was_leaked:
+        memory_was_leaked = False
+        allocation_balance = (summary['heap']['total_heap_usage']['allocs'] - summary['heap']['total_heap_usage']['frees'])
+        # 1 must be allowed to deal with GCC 5.1 bug that causes 72,704 bytes to remain reachable
+        # sources:
+        #   https://stackoverflow.com/questions/30393229/new-libstdc-of-gcc5-1-may-allocate-large-heap-memory
+        #   https://gcc.gnu.org/bugzilla/show_bug.cgi?id=64535
+        if not (allocation_balance == 0 or allocation_balance == 1): memory_was_leaked = True
+        if summary['leak']['definitely_lost']['bytes']: memory_was_leaked = True
+        if summary['leak']['indirectly_lost']['bytes']: memory_was_leaked = True
+        if summary['leak']['possibly_lost']['bytes']: memory_was_leaked = True
+        # same as above, we have to allow 72704 bytes to leak
+        # also, we shall sometimes allow (sigh...) additional memory to "leak" if Valgrind freaks out
+        if summary['leak']['still_reachable']['bytes'] not in (MEMORY_LEAK_CHECKS_ALLOWED_LEAK_VALUES + MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES): memory_was_leaked = True
+        if summary['leak']['suppressed']['bytes'] and MEMORY_LEAK_CHECKS_REPORT_SUPPRESSED: memory_was_leaked = True
+
+        if memory_was_leaked:
+            print(error)
+
+        total_leak_bytes  = summary['leak']['definitely_lost']['bytes']
+        total_leak_bytes += summary['leak']['indirectly_lost']['bytes']
+        total_leak_bytes += summary['leak']['possibly_lost']['bytes']
+        total_leak_bytes += summary['leak']['still_reachable']['bytes']
+        total_leak_bytes += summary['leak']['suppressed']['bytes']
+        self.assertIn(total_leak_bytes, (MEMORY_LEAK_CHECKS_ALLOWED_LEAK_VALUES + MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES))
+    except Exception as e:
+        print('error: failed to analyze Valgrind summary due to an exception: {}'.format(e))
+        print('error: here is what Valgring returned:')
         print(error)
-
-    total_leak_bytes  = summary['leak']['definitely_lost']['bytes']
-    total_leak_bytes += summary['leak']['indirectly_lost']['bytes']
-    total_leak_bytes += summary['leak']['possibly_lost']['bytes']
-    total_leak_bytes += summary['leak']['still_reachable']['bytes']
-    total_leak_bytes += summary['leak']['suppressed']['bytes']
-    self.assertIn(total_leak_bytes, (MEMORY_LEAK_CHECKS_ALLOWED_LEAK_VALUES + MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES))
 
     return 0
 
