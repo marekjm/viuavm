@@ -33,6 +33,7 @@ int main(int argc, char *argv[]) {
     unsigned long repeated = 0;
 
     int initialisation = 3;
+    unsigned long line_counter = 0;
 
     while (getline(in, _)) {
         preprevious = previous;
@@ -42,6 +43,7 @@ int main(int argc, char *argv[]) {
         if (initialisation) {
             // first three iterations are just to initialise the state
             --initialisation;
+            ++line_counter;
             continue;
         }
 
@@ -51,7 +53,7 @@ int main(int argc, char *argv[]) {
         } else if (line != previous and previous == preprevious) {
             cout << previous << endl;
             if (repeated > 1) {
-                cout << "\n# repeated " << repeated+1 << " time(s)...\n" << endl;
+                cout << "\n# repeated " << repeated+1 << " time(s), continuing from line " << line_counter << "...\n" << endl;
             } else if (repeated == 1) {
                 cout << previous << endl;
             } else {
@@ -65,6 +67,8 @@ int main(int argc, char *argv[]) {
             cout << previous << endl;
             repeated = 0;
         }
+
+        ++line_counter;
     }
 
     if (line == previous and previous == preprevious) {
