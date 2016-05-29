@@ -199,8 +199,8 @@ byte* Process::callForeign(byte* return_address, const string& call_name, const 
     frame_new->resolve_return_value_register = return_ref;
     frame_new->place_return_value_in = return_index;
 
-    cpu->requestForeignFunctionCall(frame_new, this);
     suspend();
+    cpu->requestForeignFunctionCall(frame_new, this);
     frame_new = nullptr;
 
     return return_address;
