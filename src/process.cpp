@@ -401,6 +401,31 @@ byte* Process::tick() {
     return instruction_pointer;
 }
 
+void Process::join() {
+    /** Join a process with calling process.
+     *
+     *  This function causes calling process to be blocked until
+     *  this process has stopped.
+     */
+    is_joinable = false;
+}
+void Process::detach() {
+    /** Detach a process.
+     *
+     *  This function causes the process to become unjoinable, but
+     *  allows it to run in the background.
+     *
+     *  Keep in mind that while detached processes cannot be joined,
+     *  they can receive messages.
+     *  Also, they will run even after the main/1 function has exited.
+     */
+    is_joinable = false;
+    parent_process = nullptr;
+}
+bool Process::joinable() const {
+    return is_joinable;
+}
+
 void Process::suspend() {
     is_suspended.store(true);
 }

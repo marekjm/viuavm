@@ -238,28 +238,9 @@ class Process {
             place(i, o);
         }
 
-        inline bool joinable() const { return is_joinable; }
-        inline void join() {
-            /** Join a process with calling process.
-             *
-             *  This function causes calling process to be blocked until
-             *  this process has stopped.
-             */
-            is_joinable = false;
-        }
-        inline void detach() {
-            /** Detach a process.
-             *
-             *  This function causes the process to become unjoinable, but
-             *  allows it to run in the background.
-             *
-             *  Keep in mind that while detached processes cannot be joined,
-             *  they can receive messages.
-             *  Also, they will run even after the main/1 function has exited.
-             */
-            is_joinable = false;
-            parent_process = nullptr;
-        }
+        bool joinable() const;
+        void join();
+        void detach();
 
         void suspend();
         void wakeup();
