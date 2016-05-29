@@ -1,3 +1,12 @@
 #!/usr/bin/env bash
 
 ./scripts/regenerate_cxxflags.sh
+
+VALGRIND_VERSION=$(valgrind --version | grep -Po '\d+\.\d+\.\d+' | cat)
+echo "using Valgrind: $VALGRIND_VERSION"
+
+if [[ $VALGRIND_VERSION == '3.7.0' ]]; then
+    # For TravisCI, Valgrind 3.7.0 does not support
+    # the match-leak-kinds flag
+    sed -i 's/    match-leak-kinds: reachable//g' scripts/valgrind.supp
+fi
