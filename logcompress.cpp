@@ -24,6 +24,10 @@ int main(int argc, char *argv[]) {
 
     ifstream in(input_filename);
 
+    // The `preprevious` is just for checking, never for printing while
+    // inside the loop.
+    // After the loop, `preprevious` can be used for printing during
+    // the finishing section.
     string line, previous, preprevious;
     string _;
     unsigned long repeated = 0;
@@ -46,35 +50,27 @@ int main(int argc, char *argv[]) {
             ++repeated;
         } else if (line != previous and previous == preprevious) {
             cout << previous << endl;
-            if (repeated) {
-                cout << "\n# repeated " << repeated << " time(s)...\n" << endl;
+            if (repeated > 1) {
+                cout << "\n# repeated " << repeated+1 << " time(s)...\n" << endl;
+            } else if (repeated == 1) {
                 cout << previous << endl;
+            } else {
+                // repeated zero times
             }
+            cout << previous << endl;
             repeated = 0;
         } else if (line == previous and previous != preprevious) {
-            cout << preprevious << endl;
+            // do nothing
+        } else if (line != previous and previous != preprevious) {
+            cout << previous << endl;
+            repeated = 0;
         }
-
-        /* if (initialisation && line == previous) { */
-        /*     ++repeated; */
-        /* } */
-
-        /* if (line == previous) { */
-        /*     ++repeated; */
-        /* } else { */
-        /*     cout << line << endl; */
-        /*     if (repeated) { */
-        /*         cout << "\n# repeated " << repeated << " time(s)...\n" << endl; */
-        /*         cout << line << endl; */
-        /*     } */
-        /*     repeated = 0; */
-        /* } */
     }
 
     if (line == previous and previous == preprevious) {
         cout << line << endl;
         if (repeated > 1) {
-            cout << "\n# repeated " << repeated << " time(s)...\n" << endl;
+            cout << "\n# repeated " << repeated+1 << " time(s)...\n" << endl;
             cout << line << endl;
         } else if (repeated == 1) {
             cout << line << endl;
@@ -85,11 +81,13 @@ int main(int argc, char *argv[]) {
     } else if (line != previous and previous == preprevious) {
         cout << line << endl;
         if (repeated) {
-            cout << "\n# repeated " << repeated << " time(s)...\n" << endl;
+            cout << "\n# repeated " << repeated+1 << " time(s)...\n" << endl;
             cout << line << endl;
         }
     } else if (line == previous and previous != preprevious) {
         cout << preprevious << endl;
+    } else if (line != previous and previous != preprevious) {
+        cout << previous << endl;
     }
 
 
