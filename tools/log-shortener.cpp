@@ -5,8 +5,38 @@
 using namespace std;
 
 
+/** Log shortener tool; to be used when logs are verbose and plenty.
+ *
+ *  This tools takes a filename on input and prints to standard output.
+ *  It shortens logs by cutting out series of identical lines and
+ *  replacing them with a repetition report.
+ *  For example, this text:
+ *
+ *      foo
+ *      foo
+ *      foo
+ *      foo
+ *      foo
+ *      foo
+ *      foo
+ *      bar
+ *
+ *  ...will be shortened to:
+ *
+ *      foo
+ *
+ *      # repeated 5 time(s), continuing from line 7....
+ *
+ *      foo
+ *      bar
+ *
+ *  This is not a general purpose tool, but one tailored to the format
+ *  of Viua debugging logs.
+ */
+
+
 int main(int argc, char *argv[]) {
-    string input_filename, output_filename;
+    string input_filename;
 
     if (argc < 2) {
         cerr << "error: no input file" << endl;
@@ -16,11 +46,6 @@ int main(int argc, char *argv[]) {
     // extract input and output filenames from
     // commandline parameters
     input_filename = string(argv[1]);
-    if (argc >= 3) {
-        output_filename = string(argv[2]);
-    } else {
-        output_filename = (input_filename + ".compressed.log");
-    }
 
     ifstream in(input_filename);
 
