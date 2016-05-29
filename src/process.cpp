@@ -427,13 +427,13 @@ bool Process::joinable() const {
 }
 
 void Process::suspend() {
-    is_suspended.store(true);
+    is_suspended.store(true, std::memory_order_release);
 }
 void Process::wakeup() {
-    is_suspended.store(false);
+    is_suspended.store(false, std::memory_order_release);
 }
 bool Process::suspended() {
-    return is_suspended.load();
+    return is_suspended.load(std::memory_order_acquire);
 }
 
 void Process::pass(Type* message) {
