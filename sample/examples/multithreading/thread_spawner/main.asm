@@ -1,11 +1,11 @@
-.function: worker_process
+.function: worker_process/1
     echo (strstore 1 "Hello from #")
     echo (arg 2 0)
     print (strstore 1 " worker process!")
     return
 .end
 
-.function: process_spawner
+.function: process_spawner/1
     echo (strstore 1 "number of worker processes: ")
 
     .name: 1 limit
@@ -18,7 +18,7 @@
     branch (igte 4 counter limit) end_loop +1
 
     frame ^[(param 0 counter)]
-    process 2 worker_process
+    process 2 worker_process/1
 
     frame ^[(param 0 (ptr 5 2))]
     msg 0 detach/1
@@ -34,18 +34,18 @@
 
 
 ; std::io::getline/0 is required to get user input
-.signature: std::io::getline
+.signature: std::io::getline/0
 
-.function: get_number_of_processes_to_spawn
+.function: get_number_of_processes_to_spawn/0
     echo (strstore 4 "number of processes to spawn: ")
     frame 0
-    stoi 0 (call 4 std::io::getline)
+    stoi 0 (call 4 std::io::getline/0)
     return
 .end
 
-.function: run_process_spawner
+.function: run_process_spawner/1
     frame ^[(param 0 (arg 1 0))]
-    process 2 process_spawner
+    process 2 process_spawner/1
 
     frame ^[(param 0 (ptr 3 2))]
     msg 0 detach/1
@@ -58,10 +58,10 @@
     import "io"
 
     frame 0
-    call 4 get_number_of_processes_to_spawn
+    call 4 get_number_of_processes_to_spawn/0
 
     frame ^[(param 0 4)]
-    call run_process_spawner
+    call run_process_spawner/1
 
     izero 0
     return
