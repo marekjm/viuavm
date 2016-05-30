@@ -32,8 +32,8 @@ void io_readtext(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
 }
 
 const ForeignFunctionSpec functions[] = {
-    { "std::io::getline", &io_getline },
-    { "std::io::readtext", &io_readtext },
+    { "std::io::getline/0", &io_getline },
+    { "std::io::readtext/1", &io_readtext },
     { NULL, NULL },
 };
 
