@@ -60,6 +60,8 @@ compilation unit), and some arity errors during function calls.
   line parameters,
 - bic: popping elements from vector with `VPOP` instruction to zero register does not drop them but
   places them in the register, popped elements can be then manually deleted,
+- fix: VM does not block on FFI calls when run on one core (fixed race condition that caused the process issuing a
+  FFI call to receive `wakeup()` before `suspend()`),
 
 
 ----
