@@ -4,10 +4,10 @@
     leave
 .end
 
-.def: main 1
-    tryframe
-    try this_throws
+.function: main/0
+    try
+    enter this_throws
 
     izero 0
-    end
+    return
 .end
