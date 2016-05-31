@@ -51,7 +51,7 @@
 .end
 
 .function: main/1
-    frame ^[(param 0 (istore 1 10))]
+    frame ^[(param 0 (istore 1 100000))]
     process 1 process_spawner/1
 
     frame ^[(param 0 1) (param 1 (istore 2 512))]
