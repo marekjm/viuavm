@@ -211,11 +211,11 @@ string assembler::verify::functionsEndWithReturn(const string& filename, const s
             continue;
         }
 
-        if (i and (not str::startswithchunk(str::lstrip(lines[i-1]), "return"))) {
+        if (i and (not (str::startswithchunk(str::lstrip(lines[i-1]), "return") or str::startswithchunk(str::lstrip(lines[i-1]), "tailcall")))) {
             if (warning) {
-                cout << filename << ':' << i+1 << ": warning: missing 'return' at the end of function " << function << endl;
+                cout << filename << ':' << i+1 << ": warning: function does not end with 'return' or 'tailcall': " << function << endl;
             } else if (error) {
-                report << filename << ':' << i+1 << ": error: missing 'return' at the end of function " << function;
+                report << filename << ':' << i+1 << ": error: function does not end with 'return' or 'tailcall': " << function;
                 break;
             } else {
                 // explicitly do nothing if neither warning nor error report was requested
