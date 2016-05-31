@@ -63,6 +63,7 @@ compilation unit), and some arity errors during function calls.
 - fix: VM does not block on FFI calls when run on one core (fixed race condition that caused the process issuing a
   FFI call to receive `wakeup()` before `suspend()`),
 - bic: inspecting type of expired pointers returns "ExpiredPointer" instead of throwing an exception,
+- bic: exiting watchdog process with "return" is a fatal VM exception,
 
 
 ----
