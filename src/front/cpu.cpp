@@ -101,7 +101,12 @@ int main(int argc, char* argv[]) {
     } catch (const Exception* e) {
         cout << "VM error: an irrecoverable VM exception occured: " << e->what() << endl;
         return 1;
+    } catch (const std::exception& e) {
+        cout << "VM error: an irrecoverable host exception occured: " << e.what() << endl;
+        return 1;
     }
+    // the catch (...) is intentionally omitted, if we can't provide useful information about
+    // the error it's better to just crash
 
     int ret_code = 0;
     string return_exception = "", return_message = "";
