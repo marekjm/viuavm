@@ -41,10 +41,7 @@ Type* Pointer::to() {
 }
 
 string Pointer::type() const {
-    if (not valid) {
-        throw new Exception("expired pointer exception");
-    }
-    return (points_to->type() + "Pointer");
+    return ((valid ? points_to->type() : "Expired") + "Pointer");
 }
 
 bool Pointer::boolean() const {
