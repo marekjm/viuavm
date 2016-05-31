@@ -99,7 +99,7 @@ int main(int argc, char* argv[]) {
     try {
         cpu.run();
     } catch (const Exception* e) {
-        cout << "fatal: " << e->what() << endl;
+        cout << "VM error: an irrecoverable exception occured: " << e->what() << endl;
         return 1;
     }
 
