@@ -32,10 +32,6 @@
     ; elegantly follow with process spawner execution
     frame ^[(pamv 0 counter) (pamv 1 limit)]
     tailcall spawn_processes/2
-
-    ; FIXME: assembler should not complain if a function ends with tailcall
-    ; instead of return
-    return
 .end
 
 .function: process_spawner/1
@@ -46,8 +42,6 @@
 
     frame ^[(pamv 0 (izero 3)) (pamv 1 limit)]
     tailcall spawn_processes/2
-
-    return
 .end
 
 .function: main/1
