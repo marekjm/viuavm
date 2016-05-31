@@ -241,7 +241,7 @@ build/cpu/frame.o: src/cpu/frame.cpp include/viua/cpu/frame.h
 standardlibrary: build/bin/vm/asm build/stdlib/std/vector.vlib build/stdlib/std/functional.vlib build/stdlib/std/misc.vlib
 
 stdlib: build/bin/vm/asm standardlibrary
-	$(MAKE) build/stdlib/std/string.vlib build/stdlib/typesystem.so build/stdlib/io.so build/stdlib/random.so
+	$(MAKE) build/stdlib/std/string.vlib build/stdlib/typesystem.so build/stdlib/io.so build/stdlib/random.so build/stdlib/kitchensink.so
 
 build/stdlib/std/vector.vlib: src/stdlib/viua/vector.asm build/bin/vm/asm
 	./build/bin/vm/asm --lib -o $@ $<
