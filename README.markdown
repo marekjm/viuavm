@@ -13,7 +13,7 @@
 #### Hello World in Viua VM
 
 ```
-.function: main
+.function: main/0
     ; store string "Hello World!" in register 1
     strstore 1 "Hello World!"
 
