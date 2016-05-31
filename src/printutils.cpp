@@ -10,8 +10,11 @@ string stringifyFunctionInvocation(const Frame* frame) {
     oss << '(';
     for (unsigned i = 0; i < frame->args->size(); ++i) {
         Type* optr = frame->args->at(i);
-        if (optr == nullptr) { continue; }
-        oss << optr->repr();
+        if (optr == nullptr) {
+            oss << "<moved or void>";
+        } else {
+            oss << optr->repr();
+        }
         if (i < (frame->args->size()-1)) {
             oss << ", ";
         }
