@@ -174,12 +174,25 @@ Process* CPU::spawnWatchdog(Frame* frm) {
     return thrd;
 }
 void CPU::resurrectWatchdog() {
-    cout << "watchdog process terminated by: " << watchdog_process->getActiveException()->type() << ": '" << watchdog_process->getActiveException()->str() << "'" << endl;
-    Frame* frm = new Frame(nullptr, 0, watchdog_process->trace()[0]->regset->size());
-    frm->function_name = watchdog_process->trace()[0]->function_name;
-    delete watchdog_process->getActiveException();
+    auto active_exception = watchdog_process->getActiveException();
+    if (active_exception) {
+        cout << "watchdog process terminated by: " << active_exception->type() << ": '" << active_exception->str() << "'" << endl;
+        delete active_exception;
+    }
+
+    auto trace = watchdog_process->trace();
+    Frame *frm = nullptr;
+    if (trace.size()) {
+        frm = new Frame(nullptr, 0, watchdog_process->trace()[0]->regset->size());
+        frm->function_name = watchdog_process->trace()[0]->function_name;
+    } else {
+        // quite possibly the watchdog exited with plain return - this is a serious bug in the program running
+        throw new Exception("failed to resurrect watchdog: no trace available to analyse");
+    }
+
     delete watchdog_process;
     watchdog_process = nullptr;
+
     spawnWatchdog(frm);
 }
 
