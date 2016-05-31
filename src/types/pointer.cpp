@@ -49,11 +49,7 @@ bool Pointer::boolean() const {
 }
 
 string Pointer::str() const {
-    if (valid) {
-        return type();
-    } else {
-        return "ExpiredPointer";
-    }
+    return type();
 }
 
 Type* Pointer::copy() const {
