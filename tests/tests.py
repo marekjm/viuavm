@@ -97,7 +97,7 @@ def run(path, expected_exit_code=0):
 
 MEMORY_LEAK_CHECKS_SKIPPED = 0
 MEMORY_LEAK_CHECKS_RUN = 0
-MEMORY_LEAK_CHECKS_ENABLE = True
+MEMORY_LEAK_CHECKS_ENABLE = True and 0
 MEMORY_LEAK_CHECKS_SKIP_LIST = []
 MEMORY_LEAK_CHECKS_ALLOWED_LEAK_VALUES = (0, 72704)
 MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES = ()
@@ -1284,6 +1284,9 @@ class TypePointerTests(unittest.TestCase):
 
     def testCheckingIfIsExpired(self):
         runTestNoDisassemblyRerun(self, 'check_if_is_expired.asm', 'expired: false\nexpired: true')
+
+    def testExpiredPointerType(self):
+        runTestNoDisassemblyRerun(self, 'type_of_expired.asm', 'ExpiredPointer')
 
 
 class RuntimeAssertionsTests(unittest.TestCase):
