@@ -1,9 +1,9 @@
-.function: supervisor_function
+.function: supervisor_function/0
     ;receive 1
     return
 .end
 
-.function: will_be_killed_by_a_runaway_exception
+.function: will_be_killed_by_a_runaway_exception/0
     istore 1 80
 
     strstore 3 "iterations left: "
@@ -45,7 +45,7 @@
 
 .function: main/1
     frame 0
-    watchdog supervisor_function
+    watchdog supervisor_function/0
 
     ;frame 0
     ;process 1 will_be_killed_by_a_runaway_exception
