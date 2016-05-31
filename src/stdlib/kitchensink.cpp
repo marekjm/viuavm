@@ -11,12 +11,12 @@
 using namespace std;
 
 
-void kitchensink_sleep(Frame* frame, RegisterSet*, RegisterSet*) {
+void kitchensink_sleep(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
     sleep(static_cast<unsigned int>(static_cast<Integer*>(frame->args->at(0))->as_integer()));
 }
 
 const ForeignFunctionSpec functions[] = {
-    { "std::kitchensink::sleep", &kitchensink_sleep },
+    { "std::kitchensink::sleep/1", &kitchensink_sleep },
     { NULL, NULL },
 };
 
