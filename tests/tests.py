@@ -912,13 +912,13 @@ class AssemblerErrorTests(unittest.TestCase):
         self.assertEqual(1, exit_code)
         self.assertEqual("./sample/asm/errors/msg_arity_mismatch.asm:3: error: invalid number of parameters in dynamic dispatch of add/2: expected 2 got 1", output.strip())
 
-    def testNoReturnAtTheEndOfAFunctionError(self):
+    def testNoReturnOrTailcallAtTheEndOfAFunctionError(self):
         name = 'no_return_at_the_end_of_a_function.asm'
         assembly_path = os.path.join(self.PATH, name)
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, opts=('--Emissing-return',), okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/no_return_at_the_end_of_a_function.asm:3: error: missing 'return' at the end of function foo/0", output.strip())
+        self.assertEqual("./sample/asm/errors/no_return_at_the_end_of_a_function.asm:3: error: function does not end with 'return' or 'tailcall': foo/0", output.strip())
 
     def testBlockWithEmptyBody(self):
         name = 'empty_block_body.asm'
