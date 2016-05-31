@@ -396,12 +396,19 @@ int CPU::run() {
     while (burst());
 
     if (current_process_index < processes.size() and processes[current_process_index]->terminated()) {
+        auto trace = processes[current_process_index]->trace();
         cout << "process " << current_process_index << " spawned using ";
-        if (processes[current_process_index]->trace().size()) {
-            cout << processes[current_process_index]->trace()[0]->function_name;
+        if (trace.size() > 1) {
+            // if trace size if greater than one, detect if this is main process
+            cout << trace[(trace[0]->function_name == ENTRY_FUNCTION_NAME)]->function_name;
+        } else if (trace.size()) {
+            // if trace size is equal to one, just print the top-most function
+            cout << trace[0]->function_name;
         } else {
+            // if we have no trace available, inform the user about it
             cout << "<function unavailable>";
         }
+
         cout << " has terminated" << endl;
         Type* e = processes[current_process_index]->getActiveException();
 

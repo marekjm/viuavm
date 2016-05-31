@@ -110,7 +110,7 @@ int main(int argc, char* argv[]) {
     if (cpu.terminated()) {
         vector<Frame*> trace = cpu.trace();
         cout << "stack trace: from entry point, most recent call last...\n";
-        for (unsigned i = 0; i < trace.size(); ++i) {
+        for (unsigned i = (trace.size() and trace[0]->function_name == "__entry"); i < trace.size(); ++i) {
             cout << "  " << stringifyFunctionInvocation(trace[i]) << "\n";
         }
         cout << "\n";
