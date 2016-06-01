@@ -503,11 +503,3 @@ string assembler::verify::framesHaveNoGaps(const string& filename, const vector<
 
     return report.str();
 }
-string assembler::verify::parametersAreNotDoublePassed(const string&, const vector<string>& lines, const map<long unsigned, long unsigned>&) {
-    ostringstream report("");
-    string line;
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        line = str::lstrip(lines[i]);
-    }
-    return report.str();
-}
