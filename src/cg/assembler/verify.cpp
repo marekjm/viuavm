@@ -406,25 +406,6 @@ string assembler::verify::blockBodiesAreNonempty(const string& filename, const s
     return bodiesAreNonempty(filename, lines);
 }
 
-string assembler::verify::mainFunctionDoesNotEndWithHalt(const string& filename, map<string, vector<string> >& functions) {
-    ostringstream report("");
-    string line;
-
-    if (functions.count("main/1") == 0) {
-        report << filename << ": error: cannot verify main function if it's undefined";
-        return report.str();
-    }
-    vector<string> flines = functions.at("main/1");
-    if (flines.size() == 0) {
-        report << filename << ": error: cannot verify empty 'main/1' function" << endl;
-        return report.str();
-    }
-    if (str::chunk(str::lstrip(flines.back())) == "halt") {
-        report << filename << ": error: using 'halt' instead of 'return' as last instruction in main function leads to memory leaks" << endl;
-    }
-    return report.str();
-}
-
 string assembler::verify::directives(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines) {
     ostringstream report("");
     string line;

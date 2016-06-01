@@ -270,12 +270,6 @@ int main(int argc, char* argv[]) {
         cout << report << endl;
         exit(1);
     }
-    if ((not AS_LIB) and (ERROR_HALT_IS_LAST or ERROR_ALL) and functions.bodies.count("main/1")) {
-        if ((report = assembler::verify::mainFunctionDoesNotEndWithHalt(filename, functions.bodies)).size()) {
-            cout << report << endl;
-            exit(1);
-        }
-    }
 
     ////////////////////////////
     // VERIFY FRAME INSTRUCTIONS

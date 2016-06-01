@@ -50,7 +50,6 @@ namespace assembler {
         std::string blockBodiesAreNonempty(const std::string&, const std::vector<std::string>&);
         std::string blockTries(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&, const std::vector<std::string>& block_names, const std::vector<std::string>& block_signatures);
         std::string blockBodiesEndWithLeave(const std::vector<std::string>& lines, std::map<std::string, std::pair<bool, std::vector<std::string> > >& blocks);
-        std::string mainFunctionDoesNotEndWithHalt(const std::string&, std::map<std::string, std::vector<std::string> >& functions);
 
         std::string directives(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&);
         std::string instructions(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&);
