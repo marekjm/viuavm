@@ -67,6 +67,10 @@ compilation unit), and some arity errors during function calls.
 - bic: functions must end with either `return` or `tailcall` instruction, the same rule applies to `main/` variants,
 - bic: assembler no longer issues errors or warnings about `main/` function ending with `halt` instruction as
   this is not legal - an error about function not ending with `return` or `tailcalll` is issued instead,
+- enhancement: assembler catches frames with gaps, i.e. frames that declare a number of parameter slots but leave
+  some of the slots empty,
+- enhancement: assembler catches parameters passed to slots with too high indexes, i.e. passing parameter to slot
+  with index 3 when frame declares only 3 slots,
 
 
 ----
