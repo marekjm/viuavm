@@ -447,6 +447,9 @@ string assembler::verify::framesHaveNoGaps(const string& filename, const vector<
     string line;
     int frame_parameters_count = 0;
     unsigned last_frame = 0;
+
+    vector<bool> filled_slots;
+
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = str::lstrip(lines[i]);
         if (not (str::startswith(line, "call") or str::startswith(line, "process") or str::startswith(line, "watchdog") or str::startswith(line, "frame") or str::startswith(line, "param") or str::startswith(line, "pamv"))) {
@@ -462,6 +465,10 @@ string assembler::verify::framesHaveNoGaps(const string& filename, const vector<
             line = str::chunk(line);
             if (str::isnum(line)) {
                 frame_parameters_count = stoi(str::chunk(line));
+                filled_slots.clear();
+                if (frame_parameters_count >= 0) {
+                    filled_slots.resize(frame_parameters_count, false);
+                }
             } else {
                 frame_parameters_count = -1;
             }
@@ -478,8 +485,22 @@ string assembler::verify::framesHaveNoGaps(const string& filename, const vector<
                 report << filename << ':' << expanded_lines_to_source_lines.at(i) << ": error: pass to parameter slot " << slot_index << " in frame with only " << frame_parameters_count << " slots available";
                 break;
             }
+            if (slot_index >= 0 and frame_parameters_count >= 0) {
+                filled_slots[slot_index] = true;
+            }
+            continue;
+        }
+
+        if (instr_name == "call" or instr_name == "process" or instr_name == "watchdog") {
+            for (int f = 0; f < frame_parameters_count; ++f) {
+                if (not filled_slots[f]) {
+                    report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: gap in frame defined at line " << expanded_lines_to_source_lines.at(last_frame)+1 << ", slot " << f << " left empty";
+                    break;
+                }
+            }
         }
     }
+
     return report.str();
 }
 string assembler::verify::parametersAreNotDoublePassed(const string&, const vector<string>& lines, const map<long unsigned, long unsigned>&) {
