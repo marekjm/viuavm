@@ -912,7 +912,15 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/passing_to_slot_with_too_high_index.asm:6: error: pass to parameter slot 3 in frame with only 3 slots available", output.strip())
+        self.assertEqual("./sample/asm/errors/passing_to_slot_with_too_high_index.asm:7: error: pass to parameter slot 3 in frame with only 3 slots available", output.strip())
+
+    def testDoublePassing(self):
+        name = 'double_pass.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/double_pass.asm:10: error: double pass to parameter slot 2 in frame defined at line 6, first pass at line 9", output.strip())
 
     def testMsgRequiresAtLeastOneParameter(self):
         name = 'msg_requires_at_least_one_parameter.asm'
