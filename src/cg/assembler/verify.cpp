@@ -417,7 +417,7 @@ string assembler::verify::mainFunctionDoesNotEndWithHalt(const string& filename,
     string line;
 
     if (functions.count("main/1") == 0) {
-        report << filename << ": error: cannot verify undefined function if it's undefined";
+        report << filename << ": error: cannot verify main function if it's undefined";
         return report.str();
     }
     vector<string> flines = functions.at("main/1");
