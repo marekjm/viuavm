@@ -898,6 +898,14 @@ class AssemblerErrorTests(unittest.TestCase):
         self.assertEqual(1, exit_code)
         self.assertEqual("./sample/asm/errors/arity_error.asm:8: error: invalid number of parameters in call to function foo/1: expected 1 got 0", output.strip())
 
+    def testFrameWithGaps(self):
+        name = 'frame_with_gaps.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/frame_with_gaps.asm:9: error: gap in frame defined at line 6, slot 1 left empty", output.strip())
+
     def testMsgRequiresAtLeastOneParameter(self):
         name = 'msg_requires_at_least_one_parameter.asm'
         assembly_path = os.path.join(self.PATH, name)
