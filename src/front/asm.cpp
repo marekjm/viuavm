@@ -286,6 +286,14 @@ int main(int argc, char* argv[]) {
             return 1;
         }
     }
+    if ((report = assembler::verify::framesHaveNoGaps(filename, expanded_lines, expanded_lines_to_source_lines)).size()) {
+        cout << report << endl;
+        return 1;
+    }
+    if ((report = assembler::verify::parametersAreNotDoublePassed(filename, expanded_lines, expanded_lines_to_source_lines)).size()) {
+        cout << report << endl;
+        return 1;
+    }
 
     //////////////////////
     // VERIFY BLOCK BODIES

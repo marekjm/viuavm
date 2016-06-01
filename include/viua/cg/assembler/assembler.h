@@ -53,6 +53,9 @@ namespace assembler {
 
         std::string directives(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&);
         std::string instructions(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&);
+
+        std::string framesHaveNoGaps(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&);
+        std::string parametersAreNotDoublePassed(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&);
     }
 
     namespace utils {
