@@ -64,6 +64,9 @@ compilation unit), and some arity errors during function calls.
   FFI call to receive `wakeup()` before `suspend()`),
 - bic: inspecting type of expired pointers returns "ExpiredPointer" instead of throwing an exception,
 - bic: exiting watchdog process with "return" is a fatal VM exception,
+- bic: functions must end with either `return` or `tailcall` instruction, the same rule applies to `main/` variants,
+- bic: assembler no longer issues errors or warnings about `main/` function ending with `halt` instruction as
+  this is not legal - an error about function not ending with `return` or `tailcalll` is issued instead,
 
 
 ----
