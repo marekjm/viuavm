@@ -449,6 +449,7 @@ string assembler::verify::framesHaveNoGaps(const string& filename, const vector<
     unsigned last_frame = 0;
 
     vector<bool> filled_slots;
+    vector<unsigned> pass_lines;
 
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = str::lstrip(lines[i]);
@@ -466,8 +467,10 @@ string assembler::verify::framesHaveNoGaps(const string& filename, const vector<
             if (str::isnum(line)) {
                 frame_parameters_count = stoi(str::chunk(line));
                 filled_slots.clear();
+                pass_lines.clear();
                 if (frame_parameters_count >= 0) {
                     filled_slots.resize(frame_parameters_count, false);
+                    pass_lines.resize(frame_parameters_count);
                 }
             } else {
                 frame_parameters_count = -1;
@@ -486,7 +489,13 @@ string assembler::verify::framesHaveNoGaps(const string& filename, const vector<
                 break;
             }
             if (slot_index >= 0 and frame_parameters_count >= 0) {
+                if (filled_slots[slot_index]) {
+                    report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: double pass to parameter slot " << slot_index << " in frame defined at line " << expanded_lines_to_source_lines.at(last_frame)+1;
+                    report << ", first pass at line " << expanded_lines_to_source_lines.at(pass_lines[slot_index])+1;
+                    break;
+                }
                 filled_slots[slot_index] = true;
+                pass_lines[slot_index] = i;
             }
             continue;
         }
