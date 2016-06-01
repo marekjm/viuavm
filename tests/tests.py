@@ -886,7 +886,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, opts=('--Ehalt-is-last',), okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/halt_as_last_instruction.asm: error: using 'halt' instead of 'return' as last instruction in main function leads to memory leaks", output.strip())
+        self.assertEqual("./sample/asm/errors/halt_as_last_instruction.asm:4: error: function does not end with 'return' or 'tailcall': main/1", output.strip())
 
     def testArityError(self):
         name = 'arity_error.asm'
