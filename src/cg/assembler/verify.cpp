@@ -482,7 +482,7 @@ string assembler::verify::framesHaveNoGaps(const string& filename, const vector<
                 slot_index = stoi(line);
             }
             if (slot_index >= 0 and frame_parameters_count >= 0 and slot_index >= frame_parameters_count) {
-                report << filename << ':' << expanded_lines_to_source_lines.at(i) << ": error: pass to parameter slot " << slot_index << " in frame with only " << frame_parameters_count << " slots available";
+                report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: pass to parameter slot " << slot_index << " in frame with only " << frame_parameters_count << " slots available";
                 break;
             }
             if (slot_index >= 0 and frame_parameters_count >= 0) {
