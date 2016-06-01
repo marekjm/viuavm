@@ -71,6 +71,7 @@ compilation unit), and some arity errors during function calls.
   some of the slots empty,
 - enhancement: assembler catches parameters passed to slots with too high indexes, i.e. passing parameter to slot
   with index 3 when frame declares only 3 slots,
+- enhancement: assembler catches double passes to parameter slotss,
 
 
 ----
