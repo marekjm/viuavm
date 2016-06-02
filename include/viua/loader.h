@@ -31,6 +31,8 @@ class Loader {
     IdToAddressMapping loadmap(char*, const uint64_t&);
     void calculateFunctionSizes();
 
+    void loadMagicNumber(std::ifstream&);
+
     void loadJumpTable(std::ifstream&);
     void loadFunctionsMap(std::ifstream&);
     void loadBlocksMap(std::ifstream&);

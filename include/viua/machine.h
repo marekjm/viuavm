@@ -4,7 +4,8 @@
 #pragma once
 
 
-const char *ENTRY_FUNCTION_NAME = "__entry";
+extern const char *ENTRY_FUNCTION_NAME;
+extern const char *VIUA_MAGIC_NUMBER;
 
 
 #endif

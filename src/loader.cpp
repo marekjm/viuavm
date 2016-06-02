@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <viua/machine.h>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/loader.h>
 using namespace std;
@@ -51,6 +52,17 @@ void Loader::calculateFunctionSizes() {
         }
 
         function_sizes[name] = el_size;
+    }
+}
+
+void Loader::loadMagicNumber(ifstream& in) {
+    char magic_number[5];
+    in.read(magic_number, sizeof(char)*5);
+    if (magic_number[4] != '\0') {
+        throw "invalid magic number";
+    }
+    if (string(magic_number) != string(VIUA_MAGIC_NUMBER)) {
+        throw (string("invalid magic number: ") + string(magic_number));
     }
 }
 
@@ -113,6 +125,8 @@ Loader& Loader::load() {
         throw ("failed to open file: " + path);
     }
 
+    loadMagicNumber(in);
+
     // jump table must be loaded if loading a library
     loadJumpTable(in);
 
@@ -129,6 +143,8 @@ Loader& Loader::executable() {
     if (!in) {
         throw ("fatal: failed to open file: " + path);
     }
+
+    loadMagicNumber(in);
 
     loadBlocksMap(in);
     loadFunctionsMap(in);

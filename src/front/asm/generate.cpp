@@ -1043,6 +1043,8 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     // CREATE OFSTREAM TO WRITE BYTECODE OUT
     ofstream out(compilename, ios::out | ios::binary);
 
+    out.write(VIUA_MAGIC_NUMBER, sizeof(char)*5);
+
 
     ////////////////////
     // CREATE JUMP TABLE

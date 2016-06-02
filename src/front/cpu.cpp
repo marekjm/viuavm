@@ -84,7 +84,16 @@ int main(int argc, char* argv[]) {
     }
 
     CPU cpu;
-    viua::front::vm::initialise(&cpu, filename, args);
+
+    try {
+        viua::front::vm::initialise(&cpu, filename, args);
+    } catch (const char *e) {
+        cout << "error: " << e << endl;
+        return 1;
+    } catch (const string& e) {
+        cout << "error: " << e << endl;
+        return 1;
+    }
 
     try {
         // try preloading dynamic libraries specified by environment
