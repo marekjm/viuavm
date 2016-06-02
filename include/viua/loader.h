@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <viua/machine.h>
 #include <viua/bytecode/bytetypedef.h>
 
 typedef std::tuple<std::vector<std::string>, std::map<std::string, uint64_t> > IdToAddressMapping;
@@ -32,6 +33,7 @@ class Loader {
     void calculateFunctionSizes();
 
     void loadMagicNumber(std::ifstream&);
+    void assumeBinaryType(std::ifstream&, ViuaBinaryType);
 
     void loadJumpTable(std::ifstream&);
     void loadFunctionsMap(std::ifstream&);

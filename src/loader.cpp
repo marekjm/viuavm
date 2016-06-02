@@ -1,6 +1,7 @@
 #include <cstdint>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <tuple>
 #include <string>
 #include <vector>
@@ -66,6 +67,16 @@ void Loader::loadMagicNumber(ifstream& in) {
     }
 }
 
+void Loader::assumeBinaryType(ifstream& in, ViuaBinaryType assumed_binary_type) {
+    char bt;
+    in.read(&bt, sizeof(decltype(bt)));
+    if (bt != assumed_binary_type) {
+        ostringstream error;
+        error << "not a " << (assumed_binary_type == VIUA_LINKABLE ? "linkable" : "executable") << " file: " << path;
+        throw error.str();
+    }
+}
+
 void Loader::loadJumpTable(ifstream& in) {
     // load jump table
     uint64_t lib_total_jumps;
@@ -126,6 +137,7 @@ Loader& Loader::load() {
     }
 
     loadMagicNumber(in);
+    assumeBinaryType(in, VIUA_LINKABLE);
 
     // jump table must be loaded if loading a library
     loadJumpTable(in);
@@ -145,6 +157,7 @@ Loader& Loader::executable() {
     }
 
     loadMagicNumber(in);
+    assumeBinaryType(in, VIUA_EXECUTABLE);
 
     loadBlocksMap(in);
     loadFunctionsMap(in);

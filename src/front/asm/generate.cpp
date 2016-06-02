@@ -1044,6 +1044,11 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     ofstream out(compilename, ios::out | ios::binary);
 
     out.write(VIUA_MAGIC_NUMBER, sizeof(char)*5);
+    if (flags.as_lib) {
+        out.write(&VIUA_LINKABLE, sizeof(ViuaBinaryType));
+    } else {
+        out.write(&VIUA_EXECUTABLE, sizeof(ViuaBinaryType));
+    }
 
 
     ////////////////////
