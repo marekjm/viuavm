@@ -181,7 +181,7 @@ def valgrindCheck(self, path):
         # push assertion errors up
         raise
     except Exception as e:
-        print('error: failed to analyze Valgrind summary due to an exception: {}'.format(e))
+        print('error: failed to analyze Valgrind summary due to an exception: {}: {}'.format(type(e), e))
         print('error: here is what Valgring returned:')
         print(error)
 
