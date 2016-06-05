@@ -168,6 +168,7 @@ def valgrindCheck(self, path):
         global MEMORY_LEAK_REPORT_MAX_HEAP_USAGE
         if summary['heap']['total_heap_usage']['bytes'] > MEMORY_LEAK_REPORT_MAX_HEAP_USAGE['bytes']:
             MEMORY_LEAK_REPORT_MAX_HEAP_USAGE = summary['heap']['total_heap_usage']
+            MEMORY_LEAK_REPORT_MAX_HEAP_USAGE['test'] = self
         elif summary['heap']['total_heap_usage']['bytes'] == MEMORY_LEAK_REPORT_MAX_HEAP_USAGE['bytes']:
             if type(MEMORY_LEAK_REPORT_MAX_HEAP_USAGE['test']) != list:
                 tst = MEMORY_LEAK_REPORT_MAX_HEAP_USAGE['test']
