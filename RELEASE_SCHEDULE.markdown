@@ -8,14 +8,14 @@ Releases should be small, but rather frequent.
 
 ----
 
-## 0.8.0
+## 0.8.1
 
 - one FFI worker thread,
 
 
 ----
 
-## 0.8.1
+## 0.8.2
 
 - process scheduler is extracted from CPU code, CPU uses scheduler object to
   run VM processes,
@@ -23,21 +23,21 @@ Releases should be small, but rather frequent.
 
 ----
 
-## 0.8.2
+## 0.8.3
 
 - several FFI worker threads,
 
 
 ----
 
-## 0.8.3
+## 0.8.4
 
 - CPU uses several VM process schedulers and each scheduler runs in its own thread,
 
 
 ----
 
-## 0.8.4
+## 0.8.5
 
 - the `viua-vm` frontend exposes `--info` option reporting VM process scheduler and
   FFI worker thread statistics (how many there are, if the number is fixed or dynamic, etc.)
