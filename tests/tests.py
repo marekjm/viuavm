@@ -164,6 +164,10 @@ def valgrindCheck(self, path):
         if summary['leak']['still_reachable']['bytes'] not in (MEMORY_LEAK_CHECKS_ALLOWED_LEAK_VALUES + MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES): memory_was_leaked = True
         if summary['leak']['suppressed']['bytes'] and MEMORY_LEAK_CHECKS_REPORT_SUPPRESSED: memory_was_leaked = True
 
+        if summary['heap']['in_use_at_exit'] == summary['leak']['suppressed']:
+            print(error)
+            return 0
+
         if memory_was_leaked:
             print(error)
 
