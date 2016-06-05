@@ -167,7 +167,8 @@ def valgrindCheck(self, path):
         if memory_was_leaked:
             print(error)
 
-        total_leak_bytes  = summary['leak']['definitely_lost']['bytes']
+        total_leak_bytes = 0
+        total_leak_bytes += summary['leak']['definitely_lost']['bytes']
         total_leak_bytes += summary['leak']['indirectly_lost']['bytes']
         total_leak_bytes += summary['leak']['possibly_lost']['bytes']
         total_leak_bytes += summary['leak']['still_reachable']['bytes']
