@@ -166,7 +166,8 @@ def valgrindCheck(self, path):
 
         in_use_at_exit = summary['heap']['in_use_at_exit']
         if in_use_at_exit == summary['leak']['suppressed']:
-            if in_use_at_exit not in MEMORY_LEAK_CHECKS_ALLOWED_LEAK_VALUES:
+            if in_use_at_exit['bytes'] not in MEMORY_LEAK_CHECKS_ALLOWED_LEAK_VALUES:
+                print('in use at exit: {} bytes in {} block(s), allowed {}'.format(in_use_at_exit['bytes'], in_use_at_exit['blocks'], MEMORY_LEAK_CHECKS_ALLOWED_LEAK_VALUES))
                 print(error)
             return 0
 
