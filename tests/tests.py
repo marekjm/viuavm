@@ -102,6 +102,7 @@ MEMORY_LEAK_CHECKS_SKIP_LIST = []
 MEMORY_LEAK_CHECKS_ALLOWED_LEAK_VALUES = (0, 72704)
 MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES = ()
 MEMORY_LEAK_CHECKS_REPORT_SUPPRESSED = False
+MEMORY_LEAK_REPORT_MAX_HEAP_USAGE = {'bytes': 0, 'allocs': 0, 'frees': 0, 'test': ''}
 valgrind_regex_heap_summary_in_use_at_exit = re.compile('in use at exit: (\d+(?:,\d+)?) bytes in (\d+) blocks')
 valgrind_regex_heap_summary_total_heap_usage = re.compile('total heap usage: (\d+(?:,\d+)*?) allocs, (\d+(?:,\d+)*?) frees, (\d+(?:,\d+)*?) bytes allocated')
 valgrind_regex_leak_summary_definitely_lost = re.compile('definitely lost: (\d+(?:,\d+)?) bytes in (\d+) blocks')
@@ -163,6 +164,16 @@ def valgrindCheck(self, path):
         # also, we shall sometimes allow (sigh...) additional memory to "leak" if Valgrind freaks out
         if summary['leak']['still_reachable']['bytes'] not in (MEMORY_LEAK_CHECKS_ALLOWED_LEAK_VALUES + MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES): memory_was_leaked = True
         if summary['leak']['suppressed']['bytes'] and MEMORY_LEAK_CHECKS_REPORT_SUPPRESSED: memory_was_leaked = True
+
+        global MEMORY_LEAK_REPORT_MAX_HEAP_USAGE
+        if summary['heap']['total_heap_usage']['bytes'] > MEMORY_LEAK_REPORT_MAX_HEAP_USAGE['bytes']:
+            MEMORY_LEAK_REPORT_MAX_HEAP_USAGE = summary['heap']['total_heap_usage']
+        elif summary['heap']['total_heap_usage']['bytes'] == MEMORY_LEAK_REPORT_MAX_HEAP_USAGE['bytes']:
+            if type(MEMORY_LEAK_REPORT_MAX_HEAP_USAGE['test']) != list:
+                tst = MEMORY_LEAK_REPORT_MAX_HEAP_USAGE['test']
+                MEMORY_LEAK_REPORT_MAX_HEAP_USAGE['test'] = ([tst] if tst else [])
+            MEMORY_LEAK_REPORT_MAX_HEAP_USAGE['test'].append(self)
+
 
         in_use_at_exit = summary['heap']['in_use_at_exit']
         if in_use_at_exit == summary['leak']['suppressed']:
@@ -1347,6 +1358,7 @@ if __name__ == '__main__':
     if not unittest.main(exit=False).result.wasSuccessful():
         exit(1)
     if MEMORY_LEAK_CHECKS_ENABLE:
-        print('{0} memory leak check{2} ({1} check{3} skipped)'.format(MEMORY_LEAK_CHECKS_RUN, MEMORY_LEAK_CHECKS_SKIPPED, ('' if MEMORY_LEAK_CHECKS_RUN == 1 else 's'), ('' if MEMORY_LEAK_CHECKS_SKIPPED == 1 else 's')))
+        print('note: {0} memory leak check{2} ({1} check{3} skipped)'.format(MEMORY_LEAK_CHECKS_RUN, MEMORY_LEAK_CHECKS_SKIPPED, ('' if MEMORY_LEAK_CHECKS_RUN == 1 else 's'), ('' if MEMORY_LEAK_CHECKS_SKIPPED == 1 else 's')))
+        print('note: maximum heap usage: {} bytes, {} allocs, {} frees; test: {}'.format(MEMORY_LEAK_REPORT_MAX_HEAP_USAGE['bytes'], MEMORY_LEAK_REPORT_MAX_HEAP_USAGE['allocs'], MEMORY_LEAK_REPORT_MAX_HEAP_USAGE['frees'], MEMORY_LEAK_REPORT_MAX_HEAP_USAGE['test']))
     else:
         print('memory leak checks disabled for this run')
