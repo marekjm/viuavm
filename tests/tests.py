@@ -171,7 +171,10 @@ def valgrindCheck(self, path):
         total_leak_bytes += summary['leak']['indirectly_lost']['bytes']
         total_leak_bytes += summary['leak']['possibly_lost']['bytes']
         total_leak_bytes += summary['leak']['still_reachable']['bytes']
-        total_leak_bytes += summary['leak']['suppressed']['bytes']
+
+        # suppressed bytes are not a leak
+        #total_leak_bytes += summary['leak']['suppressed']['bytes']
+
         self.assertIn(total_leak_bytes, (MEMORY_LEAK_CHECKS_ALLOWED_LEAK_VALUES + MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES))
     except AssertionError:
         # push assertion errors up
