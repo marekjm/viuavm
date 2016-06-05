@@ -173,6 +173,9 @@ def valgrindCheck(self, path):
         total_leak_bytes += summary['leak']['still_reachable']['bytes']
         total_leak_bytes += summary['leak']['suppressed']['bytes']
         self.assertIn(total_leak_bytes, (MEMORY_LEAK_CHECKS_ALLOWED_LEAK_VALUES + MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES))
+    except AssertionError:
+        # push assertion errors up
+        raise
     except Exception as e:
         print('error: failed to analyze Valgrind summary due to an exception: {}'.format(e))
         print('error: here is what Valgring returned:')
