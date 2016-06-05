@@ -196,7 +196,13 @@ def valgrindCheck(self, path):
 
         self.assertIn(total_leak_bytes, (MEMORY_LEAK_CHECKS_ALLOWED_LEAK_VALUES + MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES))
     except AssertionError:
-        # push assertion errors up
+        p = subprocess.Popen(('valgrind', '--suppressions=./scripts/valgrind.supp', '--leak-check=full', '--show-leak-kinds=all', './build/bin/vm/cpu', path), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        output, error = p.communicate()
+        exit_code = p.wait()
+        error = error.decode('utf-8')
+        print('error: memory leak detected: Valgrind rerun with more details, output displayed below')
+        print(error)
+        # send assertion errors up
         raise
     except Exception as e:
         print('error: failed to analyze Valgrind summary due to an exception: {}: {}'.format(type(e), e))
