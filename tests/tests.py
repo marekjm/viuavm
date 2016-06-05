@@ -1344,7 +1344,11 @@ class TypePointerTests(unittest.TestCase):
         runTestNoDisassemblyRerun(self, 'check_if_is_expired.asm', 'expired: false\nexpired: true')
 
     def testExpiredPointerType(self):
+        global MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES
+        # FIXME: Valgrind freaks out about dlopen() leaks, comment this line if you know what to do about it
+        MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES = (72736, 74399, 74375)
         runTestNoDisassemblyRerun(self, 'type_of_expired.asm', 'ExpiredPointer')
+        MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES = ()
 
 
 class RuntimeAssertionsTests(unittest.TestCase):
