@@ -3,7 +3,7 @@
 
 #pragma once
 
-const char* VERSION = "0.8.0";
-const char* MICRO = "214";
+const char* VERSION = "0.8.1";
+const char* MICRO = "0";
 
 #endif
