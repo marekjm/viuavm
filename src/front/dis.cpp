@@ -34,7 +34,7 @@ bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE)
         cout << "Viua VM disassembler, version ";
     }
     if (SHOW_HELP or SHOW_VERSION) {
-        cout << VERSION << '.' << MICRO << ' ' << COMMIT << endl;
+        cout << VERSION << '.' << MICRO << endl;
     }
     if (SHOW_HELP) {
         cout << "\nUSAGE:\n";
