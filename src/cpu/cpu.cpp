@@ -168,6 +168,7 @@ Process* CPU::spawnWatchdog(Frame* frm) {
         throw new Exception("watchdog process already spawned");
     }
     unique_lock<std::mutex> lck{processes_mtx};
+    watchdog_function = frm->function_name;
     Process* thrd = new Process(frm, this, jump_base, nullptr);
     thrd->begin();
     watchdog_process = thrd;
@@ -180,18 +181,12 @@ void CPU::resurrectWatchdog() {
         delete active_exception;
     }
 
-    auto trace = watchdog_process->trace();
-    Frame *frm = nullptr;
-    if (trace.size()) {
-        frm = new Frame(nullptr, 0, watchdog_process->trace()[0]->regset->size());
-        frm->function_name = watchdog_process->trace()[0]->function_name;
-    } else {
-        // quite possibly the watchdog exited with plain return - this is a serious bug in the program running
-        throw new Exception("failed to resurrect watchdog: no trace available to analyse");
-    }
-
     delete watchdog_process;
     watchdog_process = nullptr;
+
+    Frame *frm = nullptr;
+    frm = new Frame(nullptr, 0, watchdog_process_register_count);
+    frm->function_name = watchdog_function;
 
     spawnWatchdog(frm);
 }

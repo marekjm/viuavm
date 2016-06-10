@@ -56,6 +56,8 @@ class CPU {
 
     // vector of all processes machine is executing
     std::vector<Process*> processes;
+    std::string watchdog_function;
+    unsigned watchdog_process_register_count;
     std::queue<Type*> watchdog_message_buffer;
     Process* watchdog_process;
     decltype(processes)::size_type current_process_index;
@@ -179,6 +181,8 @@ class CPU {
 
         CPU():
             bytecode(nullptr), bytecode_size(0), executable_offset(0),
+            watchdog_function(""),
+            watchdog_process_register_count(0),
             watchdog_process(nullptr),
             current_process_index(0),
             regset(nullptr),
