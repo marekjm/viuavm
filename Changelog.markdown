@@ -29,6 +29,13 @@ There are several categories of change:
 ----
 
 
+# From 0.8.1 to 0.8.2
+
+
+
+----
+
+
 # From 0.8.0 to 0.8.1
 
 More errors are now detected at compile-time; assembler detects duplicate symbols during linking,
