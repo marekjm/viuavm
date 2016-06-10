@@ -1,4 +1,6 @@
 .function: supervisor_function/0
+    ; uncomment the `receive 1` and
+    ; the program is no longer broken
     ;receive 1
     return
 .end
