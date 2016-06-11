@@ -112,28 +112,28 @@ uninstall:
 platform: build/platform/exception.o build/platform/string.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/reference.o build/platform/type.o build/platform/pointer.o
 
 build/platform/exception.o: src/types/exception.cpp
-	$(CXX) -std=$(CXX_STANDARD) -fPIC -c -I./include -o ./build/platform/exception.o src/types/exception.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -o ./build/platform/exception.o src/types/exception.cpp
 
 build/platform/type.o: src/types/type.cpp
-	$(CXX) -std=$(CXX_STANDARD) -fPIC -c -I./include -o ./build/platform/type.o src/types/type.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -o ./build/platform/type.o src/types/type.cpp
 
 build/platform/pointer.o: src/types/pointer.cpp
-	$(CXX) -std=$(CXX_STANDARD) -fPIC -c -I./include -o ./build/platform/pointer.o src/types/pointer.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -o ./build/platform/pointer.o src/types/pointer.cpp
 
 build/platform/string.o: src/types/string.cpp
-	$(CXX) -std=$(CXX_STANDARD) -fPIC -c -I./include -o ./build/platform/string.o src/types/string.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -o ./build/platform/string.o src/types/string.cpp
 
 build/platform/vector.o: src/types/vector.cpp
-	$(CXX) -std=$(CXX_STANDARD) -fPIC -c -I./include -o ./build/platform/vector.o src/types/vector.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -o ./build/platform/vector.o src/types/vector.cpp
 
 build/platform/reference.o: src/types/reference.cpp
-	$(CXX) -std=$(CXX_STANDARD) -fPIC -c -I./include -o ./build/platform/reference.o src/types/reference.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -o ./build/platform/reference.o src/types/reference.cpp
 
 build/platform/registerset.o: src/cpu/registerset.cpp
-	$(CXX) -std=$(CXX_STANDARD) -fPIC -c -I./include -o ./build/platform/registerset.o src/cpu/registerset.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -o ./build/platform/registerset.o src/cpu/registerset.cpp
 
 build/platform/support_string.o: src/support/string.cpp
-	$(CXX) -std=$(CXX_STANDARD) -fPIC -c -I./include -o ./build/platform/support_string.o src/support/string.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -o ./build/platform/support_string.o src/support/string.cpp
 
 
 ############################################################
