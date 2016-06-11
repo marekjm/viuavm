@@ -394,16 +394,16 @@ class FloatInstructionsTests(unittest.TestCase):
     PATH = './sample/asm/float'
 
     def testFADD(self):
-        runTest(self, 'add.asm', '0.5', 0)
+        runTest(self, 'add.asm', '0.500000', 0)
 
     def testFSUB(self):
-        runTest(self, 'sub.asm', '1.015', 0)
+        runTest(self, 'sub.asm', '1.015000', 0)
 
     def testFMUL(self):
-        runTest(self, 'mul.asm', '8.004', 0)
+        runTest(self, 'mul.asm', '8.004000', 0)
 
     def testFDIV(self):
-        runTest(self, 'div.asm', '1.57', 0)
+        runTest(self, 'div.asm', '1.570000', 0)
 
     def testFLT(self):
         runTest(self, 'lt.asm', 'true', 0)
@@ -499,7 +499,7 @@ class CastingInstructionsTests(unittest.TestCase):
     PATH = './sample/asm/casts'
 
     def testITOF(self):
-        runTest(self, 'itof.asm', '4.0')
+        runTest(self, 'itof.asm', '4.000000')
 
     def testFTOI(self):
         runTest(self, 'ftoi.asm', '3')
