@@ -103,28 +103,28 @@ uninstall:
 platform: build/platform/exception.o build/platform/string.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/reference.o build/platform/type.o build/platform/pointer.o
 
 build/platform/exception.o: src/types/exception.cpp
-	$(CXX) -std=c++11 -fPIC -c -I./include -o ./build/platform/exception.o src/types/exception.cpp
+	$(CXX) -std=$(CXX_STANDARD) -fPIC -c -I./include -o ./build/platform/exception.o src/types/exception.cpp
 
 build/platform/type.o: src/types/type.cpp
-	$(CXX) -std=c++11 -fPIC -c -I./include -o ./build/platform/type.o src/types/type.cpp
+	$(CXX) -std=$(CXX_STANDARD) -fPIC -c -I./include -o ./build/platform/type.o src/types/type.cpp
 
 build/platform/pointer.o: src/types/pointer.cpp
-	$(CXX) -std=c++11 -fPIC -c -I./include -o ./build/platform/pointer.o src/types/pointer.cpp
+	$(CXX) -std=$(CXX_STANDARD) -fPIC -c -I./include -o ./build/platform/pointer.o src/types/pointer.cpp
 
 build/platform/string.o: src/types/string.cpp
-	$(CXX) -std=c++11 -fPIC -c -I./include -o ./build/platform/string.o src/types/string.cpp
+	$(CXX) -std=$(CXX_STANDARD) -fPIC -c -I./include -o ./build/platform/string.o src/types/string.cpp
 
 build/platform/vector.o: src/types/vector.cpp
-	$(CXX) -std=c++11 -fPIC -c -I./include -o ./build/platform/vector.o src/types/vector.cpp
+	$(CXX) -std=$(CXX_STANDARD) -fPIC -c -I./include -o ./build/platform/vector.o src/types/vector.cpp
 
 build/platform/reference.o: src/types/reference.cpp
-	$(CXX) -std=c++11 -fPIC -c -I./include -o ./build/platform/reference.o src/types/reference.cpp
+	$(CXX) -std=$(CXX_STANDARD) -fPIC -c -I./include -o ./build/platform/reference.o src/types/reference.cpp
 
 build/platform/registerset.o: src/cpu/registerset.cpp
-	$(CXX) -std=c++11 -fPIC -c -I./include -o ./build/platform/registerset.o src/cpu/registerset.cpp
+	$(CXX) -std=$(CXX_STANDARD) -fPIC -c -I./include -o ./build/platform/registerset.o src/cpu/registerset.cpp
 
 build/platform/support_string.o: src/support/string.cpp
-	$(CXX) -std=c++11 -fPIC -c -I./include -o ./build/platform/support_string.o src/support/string.cpp
+	$(CXX) -std=$(CXX_STANDARD) -fPIC -c -I./include -o ./build/platform/support_string.o src/support/string.cpp
 
 
 ############################################################
@@ -260,28 +260,28 @@ build/stdlib/std/misc.vlib: src/stdlib/viua/misc.asm build/bin/vm/asm
 	./build/bin/vm/asm --lib -o $@ $<
 
 build/stdlib/typesystem.o: src/stdlib/typesystem.cpp
-	$(CXX) -std=c++11 -fPIC -c -I./include -o $@ $<
+	$(CXX) -std=$(CXX_STANDARD) -fPIC -c -I./include -o $@ $<
 
 build/stdlib/io.o: src/stdlib/io.cpp
-	$(CXX) -std=c++11 -fPIC -c -I./include -o $@ $<
+	$(CXX) -std=$(CXX_STANDARD) -fPIC -c -I./include -o $@ $<
 
 build/stdlib/random.o: src/stdlib/random.cpp
-	$(CXX) -std=c++11 -fPIC -c -I./include -o $@ $<
+	$(CXX) -std=$(CXX_STANDARD) -fPIC -c -I./include -o $@ $<
 
 build/stdlib/kitchensink.o: src/stdlib/kitchensink.cpp
-	$(CXX) -std=c++11 -fPIC -c -I./include -o $@ $<
+	$(CXX) -std=$(CXX_STANDARD) -fPIC -c -I./include -o $@ $<
 
 build/stdlib/typesystem.so: build/stdlib/typesystem.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o build/platform/type.o build/platform/pointer.o
-	$(CXX) -std=c++11 -fPIC -shared -o $@ $^
+	$(CXX) -std=$(CXX_STANDARD) -fPIC -shared -o $@ $^
 
 build/stdlib/io.so: build/stdlib/io.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o build/platform/type.o build/platform/pointer.o
-	$(CXX) -std=c++11 -fPIC -shared -o $@ $^
+	$(CXX) -std=$(CXX_STANDARD) -fPIC -shared -o $@ $^
 
 build/stdlib/random.so: build/stdlib/random.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o build/platform/type.o build/platform/pointer.o
-	$(CXX) -std=c++11 -fPIC -shared -o $@ $^
+	$(CXX) -std=$(CXX_STANDARD) -fPIC -shared -o $@ $^
 
 build/stdlib/kitchensink.so: build/stdlib/kitchensink.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o build/platform/type.o build/platform/pointer.o
-	$(CXX) -std=c++11 -fPIC -shared -o $@ $^
+	$(CXX) -std=$(CXX_STANDARD) -fPIC -shared -o $@ $^
 
 
 ############################################################
