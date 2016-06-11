@@ -3,9 +3,9 @@
 
 namespace pointer {
     template<class T, class S> void inc(S*& p) {
-        T* ptr = (T*)p;
+        T* ptr = reinterpret_cast<T*>(p);
         ptr++;
-        p = (S*)ptr;
+        p = reinterpret_cast<S*>(ptr);
     }
 }
 
