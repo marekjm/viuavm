@@ -320,9 +320,9 @@ bool CPU::burst() {
                 Type* exc = th->transferActiveException();
                 Vector *parameters = new Vector();
                 RegisterSet *top_args = th->trace()[0]->args;
-                for (unsigned long i = 0; i < top_args->size(); ++i) {
-                    if (top_args->at(i)) {
-                        parameters->push(top_args->at(i));
+                for (unsigned long j = 0; j < top_args->size(); ++j) {
+                    if (top_args->at(j)) {
+                        parameters->push(top_args->at(j));
                     }
                 }
                 top_args->drop();

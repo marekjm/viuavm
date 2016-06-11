@@ -12,7 +12,6 @@
 using namespace std;
 
 
-
 IdToAddressMapping Loader::loadmap(char* bytedump, const uint64_t& bytedump_size) {
     vector<string> order;
     map<string, uint64_t> mapping;

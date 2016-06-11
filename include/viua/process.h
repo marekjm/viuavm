@@ -258,9 +258,9 @@ class Process {
         inline bool terminated() const { return has_unhandled_exception; }
         inline Type* getActiveException() { return thrown; }
         inline Type* transferActiveException() {
-            Type* tmp = thrown;
+            Type* active_exception = thrown;
             thrown = nullptr;
-            return tmp;
+            return active_exception;
         }
         inline void raiseException(Type* exception) {
             thrown = exception;
@@ -271,9 +271,9 @@ class Process {
             dropFrame();
         }
         inline Type* getReturnValue() {
-            Type* tmp = return_value;
+            Type* o = return_value;
             return_value = nullptr;
-            return tmp;
+            return o;
         }
 
         byte* begin();

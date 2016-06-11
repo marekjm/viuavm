@@ -22,14 +22,14 @@ bool SHOW_VERSION = false;
 bool VERBOSE = false;
 
 
-bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE) {
-    if (SHOW_HELP or (SHOW_VERSION and VERBOSE)) {
+bool usage(const char* program, bool show_help, bool show_version, bool verbose) {
+    if (show_help or (show_version and verbose)) {
         cout << "Viua VM CPU, version ";
     }
-    if (SHOW_HELP or SHOW_VERSION) {
+    if (show_help or show_version) {
         cout << VERSION << '.' << MICRO << endl;
     }
-    if (SHOW_HELP) {
+    if (show_help) {
         cout << "\nUSAGE:\n";
         cout << "    " << program << " [option...] <executable>\n" << endl;
         cout << "OPTIONS:\n";
@@ -39,7 +39,7 @@ bool usage(const char* program, bool SHOW_HELP, bool SHOW_VERSION, bool VERBOSE)
              ;
     }
 
-    return (SHOW_HELP or SHOW_VERSION);
+    return (show_help or show_version);
 }
 
 int main(int argc, char* argv[]) {
