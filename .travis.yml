@@ -16,6 +16,7 @@ addons:
             - gcc-5
             - g++-5
             - valgrind
+            - bc
     coverity_scan:
         project:
             name: "marekjm/viuavm"
