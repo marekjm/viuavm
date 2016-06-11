@@ -140,7 +140,7 @@ void CPU::loadForeignLibrary(const string& module) {
     }
 
     ForeignFunctionSpec* (*exports)() = nullptr;
-    if ((exports = (ForeignFunctionSpec*(*)())dlsym(handle, "exports")) == nullptr) {
+    if ((exports = reinterpret_cast<ForeignFunctionSpec*(*)()>(dlsym(handle, "exports"))) == nullptr) {
         throw new Exception("failed to extract interface from module: " + module);
     }
 
