@@ -262,6 +262,10 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
                 case 3:
                     oss << "temp";
                     break;
+                default:
+                    // FIXME: should this only be a warning?
+                    oss << "; WARNING: invalid register set type\n";
+                    oss << int(*ptr);
             }
             break;
         default:

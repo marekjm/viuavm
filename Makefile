@@ -1,12 +1,12 @@
 CXX_STANDARD=c++14
 
 ifeq ($(CXX), g++)
-CXXFLAGS=-std=$(CXX_STANDARD) -Wall -Wextra -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Winline -Wshadow -Werror -Wfatal-errors -pedantic -g -I./include
+CXXFLAGS=-std=$(CXX_STANDARD) -Wall -Wextra -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Winline -Wshadow -Wswitch-default -Werror -Wfatal-errors -pedantic -g -I./include
 else ifeq ($(CXX), g++5)
 # make TravisCI happy
-CXXFLAGS=-std=$(CXX_STANDARD) -Wall -Wextra -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Winline -Wshadow -Werror -Wfatal-errors -pedantic -g -I./include
+CXXFLAGS=-std=$(CXX_STANDARD) -Wall -Wextra -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Winline -Wshadow -Wswitch-default -Werror -Wfatal-errors -pedantic -g -I./include
 else ifeq ($(CXX), clang++)
-CXXFLAGS=-std=$(CXX_STANDARD) -Wall -Wextra -Wint-to-void-pointer-cast -Wconversion -Winline -Wshadow -Werror -Wfatal-errors -pedantic -g -I./include
+CXXFLAGS=-std=$(CXX_STANDARD) -Wall -Wextra -Wint-to-void-pointer-cast -Wconversion -Winline -Wshadow -Wswitch-default -Werror -Wfatal-errors -pedantic -g -I./include
 endif
 
 CXXOPTIMIZATIONFLAGS=

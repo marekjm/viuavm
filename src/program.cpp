@@ -86,6 +86,9 @@ int Program::instructionCount() {
             case JUMP:
                 i += sizeof(uint64_t);
                 break;
+            default:
+                // do nothing
+                break;
         }
         ++counter;
     }
