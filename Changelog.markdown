@@ -32,6 +32,7 @@ There are several categories of change:
 # From 0.8.1 to 0.8.2
 
 - enhancement: VM is able to restart watchdog even with no stack trace available,
+- bic: floats are stringified using the `std::fixed` modifier, which limits decimal digits,
 
 
 ----
