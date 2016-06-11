@@ -194,7 +194,7 @@ string assembler::verify::functionNames(const string& filename, const std::vecto
     return report.str();
 }
 
-string assembler::verify::functionsEndWithReturn(const string& filename, const std::vector<std::string>& lines, const bool warning, const bool error) {
+string assembler::verify::functionsEndWithReturn(const string& filename, const std::vector<std::string>& lines) {
     ostringstream report("");
     string line;
     string function;

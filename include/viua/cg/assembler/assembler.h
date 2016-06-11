@@ -39,7 +39,7 @@ namespace assembler {
 
     namespace verify {
         std::string functionNames(const std::string&, const std::vector<std::string>&, const bool, const bool);
-        std::string functionsEndWithReturn(const std::string&, const std::vector<std::string>&, const bool, const bool);
+        std::string functionsEndWithReturn(const std::string&, const std::vector<std::string>&);
         std::string functionCallsAreDefined(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&, const std::vector<std::string>& function_names, const std::vector<std::string>& function_signatures);
         std::string functionCallArities(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&, bool);
         std::string msgArities(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&, bool);
