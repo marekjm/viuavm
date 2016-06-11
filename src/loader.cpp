@@ -79,17 +79,17 @@ void Loader::assumeBinaryType(ifstream& in, ViuaBinaryType assumed_binary_type) 
 void Loader::loadJumpTable(ifstream& in) {
     // load jump table
     uint64_t lib_total_jumps;
-    in.read((char*)&lib_total_jumps, sizeof(decltype(lib_total_jumps)));
+    readinto(in, &lib_total_jumps);
 
     uint64_t lib_jmp;
     for (uint64_t i = 0; i < lib_total_jumps; ++i) {
-        in.read((char*)&lib_jmp, sizeof(decltype(lib_jmp)));
+        readinto(in, &lib_jmp);
         jumps.push_back(lib_jmp);
     }
 }
 void Loader::loadFunctionsMap(ifstream& in) {
     uint64_t lib_function_ids_section_size = 0;
-    in.read((char*)&lib_function_ids_section_size, sizeof(decltype(lib_function_ids_section_size)));
+    readinto(in, &lib_function_ids_section_size);
 
     char *lib_buffer_function_ids = new char[lib_function_ids_section_size];
     in.read(lib_buffer_function_ids, lib_function_ids_section_size);
@@ -107,7 +107,7 @@ void Loader::loadFunctionsMap(ifstream& in) {
 }
 void Loader::loadBlocksMap(ifstream& in) {
     uint64_t lib_block_ids_section_size = 0;
-    in.read((char*)&lib_block_ids_section_size, sizeof(decltype(lib_block_ids_section_size)));
+    readinto(in, &lib_block_ids_section_size);
 
     char *lib_buffer_block_ids = new char[lib_block_ids_section_size];
     in.read(lib_buffer_block_ids, lib_block_ids_section_size);

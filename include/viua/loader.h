@@ -15,6 +15,10 @@
 
 typedef std::tuple<std::vector<std::string>, std::map<std::string, uint64_t> > IdToAddressMapping;
 
+template<class T> void readinto(std::ifstream& in, T* object) {
+    in.read(reinterpret_cast<char*>(object), sizeof(T));
+}
+
 class Loader {
     std::string path;
 
