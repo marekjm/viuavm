@@ -251,7 +251,6 @@ tuple<bool, string> if_watchpoint_local_register_write(CPU& cpu, const State& st
     bool writing_instruction = true;
     OPCODE opcode = OPCODE(*cpu.executionAt());
     if (opcode == NOP or
-        opcode == NOP or
         opcode == RESS or
         opcode == TMPRI or
         opcode == PRINT or
@@ -361,7 +360,6 @@ tuple<bool, string> if_watchpoint_global_register_write(CPU& cpu, const State& s
     bool writing_instruction = true;
     OPCODE opcode = OPCODE(*cpu.executionAt());
     if (opcode == NOP or
-        opcode == NOP or
         opcode == RESS or
         opcode == TMPRI or
         opcode == PRINT or
