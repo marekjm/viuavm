@@ -31,6 +31,7 @@ There are several categories of change:
 
 # From 0.8.1 to 0.8.2
 
+- enhancement: VM is able to restart watchdog even with no stack trace available,
 
 
 ----
