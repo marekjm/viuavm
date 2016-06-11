@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
 
-CXXFLAGS='-Wall -Wextra -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Winline -pedantic -Wfatal-errors -g -I./include'
-
 if [[ $(g++ --version | head -n 1 | grep -Po 'g\+\+ \(GCC\) 6' | cat) == 'g++ (GCC) 6' ]]; then
-    CXXFLAGS="-std=c++14 $CXXFLAGS"
+    CXX_STANDARD='c++14'
 else
-    CXXFLAGS="-std=c++11 $CXXFLAGS"
+    CXX_STANDARD='c++11'
 fi
 
 LINES=$(wc -l Makefile | cut -d' ' -f1)
 LINES=$(dc -e "$LINES 1 - p")
 
-sed -i "s:CXXFLAGS=-std=.*:CXXFLAGS=$CXXFLAGS:g" Makefile
+sed -i "s:CXX_STANDARD=.*:CXX_STANDARD=$CXX_STANDARD:g" Makefile
