@@ -1,6 +1,6 @@
 CXX_STANDARD=c++14
 
-ifeq ($(CXX), 'g++')
+ifeq ($(CXX), g++)
 CXXFLAGS=-std=$(CXX_STANDARD) -Wall -Wextra -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Winline -Wshadow -Werror -Wfatal-errors -pedantic -g -I./include
 else
 # for clang++
