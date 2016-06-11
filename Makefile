@@ -1,5 +1,12 @@
 CXX_STANDARD=c++14
+
+ifeq ($(CXX), 'g++')
 CXXFLAGS=-std=$(CXX_STANDARD) -Wall -Wextra -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Winline -Werror -Wfatal-errors -pedantic -g -I./include
+else
+# for clang++
+CXXFLAGS=-std=$(CXX_STANDARD) -Wall -Wextra -Wint-to-void-pointer-cast -Wuseless-cast -Wconversion -Winline -Werror -Wfatal-errors -pedantic -g -I./include
+endif
+
 CXXOPTIMIZATIONFLAGS=
 COPTIMIZATIONFLAGS=
 DYNAMIC_SYMS=-Wl,--dynamic-list-cpp-typeinfo
