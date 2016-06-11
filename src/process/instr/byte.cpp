@@ -16,7 +16,7 @@ byte* Process::opbstore(byte* addr) {
     bool operand_ref = false;
     byte operand;
 
-    operand_ref = *((bool*)addr);
+    operand_ref = *(reinterpret_cast<bool*>(addr));
     pointer::inc<bool, byte>(addr);
     operand = *addr;
     ++addr;
