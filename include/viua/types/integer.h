@@ -28,6 +28,7 @@ class Integer : public Type {
         int& value() { return number; }
 
         virtual int as_integer() const { return number; }
+        virtual unsigned as_unsigned() const { return static_cast<unsigned>(number); }
         virtual int increment() { return (++number); }
         virtual int decrement() { return (--number); }
 
