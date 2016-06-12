@@ -25,7 +25,7 @@ byte* Process::opistore(byte* addr) {
     auto source = viua::operand::extract(addr);
     int integer = 0;
     if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(source.get())) {
-        integer = ri->get(this);
+        integer = static_cast<int>(ri->get(this));
     } else {
         throw new Exception("invalid operand type");
     }
