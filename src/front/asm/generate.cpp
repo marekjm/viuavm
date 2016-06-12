@@ -225,7 +225,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
     vector<string> ilines = filter(lines);
 
     string line;
-    int instruction = 0;  // instruction counter
+    uint64_t instruction = 0;  // instruction counter
     for (decltype(ilines)::size_type i = 0; i < ilines.size(); ++i) {
         /*  This is main assembly loop.
          *  It iterates over lines with instructions and
