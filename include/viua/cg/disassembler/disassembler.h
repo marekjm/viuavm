@@ -13,7 +13,7 @@ template<typename T> bool in(std::vector<T> v, T item) {
     return (std::find(v.begin(), v.end(), item) != v.end());
 }
 template<typename K, typename V> bool in(std::map<K, V> m, K key) {
-    return (m.count() == 1);
+    return (m.count(key) == 1);
 }
 
 namespace disassembler {
