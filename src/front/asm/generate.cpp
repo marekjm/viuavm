@@ -51,7 +51,7 @@ tuple<uint64_t, enum JUMPTYPE> resolvejump(string jmp, const map<string, int>& m
             oss << "instruction_index = " << instruction_index;
             throw oss.str();
         }
-        addr = (instruction_index + jump_value);
+        addr = (instruction_index - static_cast<uint64_t>(-1 * jump_value));
     } else if (jmp[0] == '+') {
         addr = (instruction_index + stoul(jmp.substr(1)));
     } else if (jmp[0] == '.') {
