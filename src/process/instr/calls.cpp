@@ -22,7 +22,7 @@ byte* Process::opparam(byte* addr) {
     /** Run param instruction.
      */
     unsigned parameter_no_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    int source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     if (parameter_no_operand_index >= frame_new->args->size()) {
         throw new Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
@@ -37,7 +37,7 @@ byte* Process::oppamv(byte* addr) {
     /** Run pamv instruction.
      */
     unsigned parameter_no_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    int source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     if (parameter_no_operand_index >= frame_new->args->size()) {
         throw new Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
@@ -52,10 +52,10 @@ byte* Process::oppamv(byte* addr) {
 byte* Process::oparg(byte* addr) {
     /** Run arg instruction.
      */
-    int destination_register_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    int parameter_no_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned destination_register_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned parameter_no_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    if (unsigned(parameter_no_operand_index) >= frames.back()->args->size()) {
+    if (parameter_no_operand_index >= frames.back()->args->size()) {
         ostringstream oss;
         oss << "invalid read: read from argument register out of bounds: " << parameter_no_operand_index;
         throw new Exception(oss.str());
@@ -71,7 +71,7 @@ byte* Process::oparg(byte* addr) {
 }
 
 byte* Process::opargc(byte* addr) {
-    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     uregset->set(target, new Integer(static_cast<int>(frames.back()->args->size())));
 
     return addr;
@@ -82,6 +82,7 @@ byte* Process::opcall(byte* addr) {
      */
     bool return_register_ref = false;
     int return_register_index = 0;
+    // FIXME: register indexes should be encoded as unsigned integers
     viua::cpu::util::extractIntegerOperand(addr, return_register_ref, return_register_index);
 
     string call_name = viua::operand::extractString(addr);
@@ -105,7 +106,7 @@ byte* Process::opcall(byte* addr) {
             throw new Exception("frame must have at least one argument when used to call a foreign method");
         }
         Type* obj = frame_new->args->at(0);
-        return callForeignMethod(addr, obj, call_name, return_register_ref, return_register_index, call_name);
+        return callForeignMethod(addr, obj, call_name, return_register_ref, static_cast<unsigned>(return_register_index), call_name);
     }
 
     auto caller = (is_native ? &Process::callNative : &Process::callForeign);
@@ -181,7 +182,7 @@ byte* Process::opreturn(byte* addr) {
     // place return value
     if (returned and frames.size() > 0) {
         if (resolve_return_value_register) {
-            return_value_register = static_cast<Integer*>(fetch(return_value_register))->value();
+            return_value_register = static_cast<Integer*>(fetch(return_value_register))->as_unsigned();
         }
         place(return_value_register, returned);
     }
