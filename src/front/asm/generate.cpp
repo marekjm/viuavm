@@ -755,7 +755,7 @@ uint64_t writeCodeBlocksSection(ofstream& out, const invocables_t& blocks, const
         }
 
         // block name...
-        out.write(name.c_str(), name.size());
+        out.write(name.c_str(), static_cast<std::streamsize>(name.size()));
         // ...requires terminating null character
         out.put('\0');
         // mapped address must come after name
@@ -1246,7 +1246,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     functions_size_so_far = writeCodeBlocksSection(out, functions, linked_function_names, functions_size_so_far);
     for (string name : linked_function_names) {
         // function name...
-        out.write(name.c_str(), name.size());
+        out.write(name.c_str(), static_cast<std::streamsize>(name.size()));
         // ...requires terminating null character
         out.put('\0');
         // mapped address must come after name
