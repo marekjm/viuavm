@@ -16,7 +16,7 @@ int_op assembler::operands::getint(const string& s) {
 
 byte_op assembler::operands::getbyte(const string& s) {
     bool ref = s[0] == '@';
-    return tuple<bool, char>(ref, (char)stoi(ref ? str::sub(s, 1) : s));
+    return tuple<bool, char>(ref, static_cast<char>(stoi(ref ? str::sub(s, 1) : s)));
 }
 
 float_op assembler::operands::getfloat(const string& s) {

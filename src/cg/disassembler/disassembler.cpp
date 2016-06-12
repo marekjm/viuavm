@@ -10,9 +10,9 @@ using namespace std;
 string disassembler::intop(byte* ptr) {
     ostringstream oss;
 
-    oss << ((*(bool*)ptr) ? "@" : "");
+    oss << ((*reinterpret_cast<bool*>(ptr)) ? "@" : "");
     pointer::inc<bool, byte>(ptr);
-    oss << *(int*)ptr;
+    oss << *reinterpret_cast<int*>(ptr);
     pointer::inc<int, byte>(ptr);
 
     return oss.str();
@@ -236,7 +236,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
             pointer::inc<int, byte>(ptr);
 
             oss << " ";
-            oss << *(float*)ptr;
+            oss << *reinterpret_cast<float*>(ptr);
             break;
         case BSTORE:
             oss << " " << intop(ptr);

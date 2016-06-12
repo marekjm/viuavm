@@ -16,13 +16,17 @@ static byte* insertIntegerOperand(byte* addr_ptr, int_op op) {
 
     tie(ref, num) = op;
 
+    /* NOTICE: reinterpret_cast<>'s are ugly, but we know what we're doing here.
+     * Since we store everything in a big array of bytes we have to cast incompatible pointers to
+     * actually put *valid* data inside it.
+     */
     if (ref) {
-        *((OperandType*)addr_ptr) = OT_REGISTER_REFERENCE;
+        *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_REGISTER_REFERENCE;
     } else {
-        *((OperandType*)addr_ptr) = OT_REGISTER_INDEX;
+        *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_REGISTER_INDEX;
     }
     pointer::inc<OperandType, byte>(addr_ptr);
-    *((int*)addr_ptr)  = num;
+    *(reinterpret_cast<int*>(addr_ptr))  = num;
     pointer::inc<int, byte>(addr_ptr);
 
     return addr_ptr;
@@ -220,7 +224,7 @@ namespace cg {
              */
             *(addr_ptr++) = FSTORE;
             addr_ptr = insertIntegerOperand(addr_ptr, regno);
-            *((float*)addr_ptr)  = f;
+            *(reinterpret_cast<float*>(addr_ptr))  = f;
             pointer::inc<float, byte>(addr_ptr);
 
             return addr_ptr;
@@ -358,7 +362,7 @@ namespace cg {
 
             *(addr_ptr++) = BSTORE;
             addr_ptr = insertIntegerOperand(addr_ptr, regno);
-            *((bool*)addr_ptr) = b_ref;
+            *(reinterpret_cast<bool*>(addr_ptr)) = b_ref;
             pointer::inc<bool, byte>(addr_ptr);
             *(addr_ptr) = bt;
             ++addr_ptr;
@@ -559,15 +563,17 @@ namespace cg {
              *  a - register set ID
              */
             *(addr_ptr++) = RESS;
+            int register_set_marker = 0;
             if (a == "global") {
-                *((int*)addr_ptr) = 0;
+                register_set_marker = 0;
             } else if (a == "local") {
-                *((int*)addr_ptr) = 1;
+                register_set_marker = 1;
             } else if (a == "static") {
-                *((int*)addr_ptr) = 2;
+                register_set_marker = 2;
             } else if (a == "temp") {
-                *((int*)addr_ptr) = 3;
+                register_set_marker = 3;
             }
+            *(reinterpret_cast<int*>(addr_ptr)) = register_set_marker;
             pointer::inc<int, byte>(addr_ptr);
             return addr_ptr;
         }
