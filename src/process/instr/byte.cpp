@@ -14,15 +14,15 @@ byte* Process::opbstore(byte* addr) {
     unsigned destination_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     bool operand_ref = false;
-    byte operand;
+    char operand;
 
     operand_ref = *(reinterpret_cast<bool*>(addr));
     pointer::inc<bool, byte>(addr);
-    operand = *addr;
+    operand = static_cast<char>(*addr);
     ++addr;
 
     if (operand_ref) {
-        operand = static_cast<Byte*>(fetch(static_cast<int>(operand)))->value();
+        operand = static_cast<Byte*>(fetch(static_cast<unsigned>(operand)))->value();
     }
 
     place(destination_register, new Byte(operand));
