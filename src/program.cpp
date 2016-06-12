@@ -55,13 +55,13 @@ uint64_t Program::size() {
     return bytes;
 }
 
-int Program::instructionCount() {
+unsigned long Program::instructionCount() {
     /** Returns total number of instructions in the program.
      *
      *  This function should only be called after the program is fully constructed as the size is calculated by
      *  performing bytecode analysis.
      */
-    int counter = 0;
+    unsigned long counter = 0;
     for (decltype(bytes) i = 0; i < bytes; ++i) {
         switch (program[i]) {
             case IADD:

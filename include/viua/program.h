@@ -170,7 +170,7 @@ class Program {
     Program& setscream(bool d = true);
 
     uint64_t size();
-    int instructionCount();
+    unsigned long instructionCount();
 
     static uint64_t countBytes(const std::vector<std::string>&);
 
