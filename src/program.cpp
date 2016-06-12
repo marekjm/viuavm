@@ -300,37 +300,6 @@ uint64_t Program::getInstructionBytecodeOffset(uint64_t instr, uint64_t count) {
     return offset;
 }
 
-// FIXME: is unused, scheduled for removal
-Program& Program::calculateBranches(unsigned offset) {
-    /*  This function should be called after program is constructed
-     *  to calculate correct bytecode offsets for BRANCH and JUMP instructions.
-     */
-    int instruction_count = instructionCount();
-    uint64_t* ptr;
-
-    for (unsigned i = 0; i < branches.size(); ++i) {
-        // usually beware of the reinterpret_cast<>'s but here we *know* what we're doing
-        // we *know* that this location points to uint64_t even if it is stored inside the byte array
-        ptr = reinterpret_cast<uint64_t*>(branches[i]);
-        cout << "[brch] calculating jump at " << (int)(branches[i]-program) << ", " << hex << (long)branches[i] << dec << " (target: " << *ptr << ") with offset " << offset << " = ";
-        // FIXME: branches should be able to hold bigger values
-        (*ptr) = (offset + getInstructionBytecodeOffset(*ptr, instruction_count));
-        cout << *ptr << endl;
-    }
-
-    for (unsigned i = 0; i < branches_absolute.size(); ++i) {
-        // usually beware of the reinterpret_cast<>'s but here we *know* what we're doing
-        // we *know* that this location points to uint64_t even if it is stored inside the byte array
-        ptr = reinterpret_cast<uint64_t*>(branches_absolute[i]);
-        cout << "[brch] calculating jump at " << (int)(branches_absolute[i]-program) << ", " << hex << (long)branches_absolute[i] << dec << " (target: " << *ptr << ") with offset " << 0 << " = ";
-        // FIXME: branches should be able to hold bigger values
-        (*ptr) = getInstructionBytecodeOffset(*ptr, instruction_count);
-        cout << *ptr << endl;
-    }
-
-    return (*this);
-}
-
 Program& Program::calculateJumps(vector<tuple<uint64_t, uint64_t> > jump_positions) {
     /** Calculate jump targets in given bytecode.
      */
