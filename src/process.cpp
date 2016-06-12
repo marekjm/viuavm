@@ -239,7 +239,7 @@ byte* Process::callForeignMethod(byte* return_address, Type* object, const strin
     // FIXME: woohoo! segfault!
     Type* returned = nullptr;
     bool returned_is_reference = false;
-    int return_value_register = frames.back()->place_return_value_in;
+    unsigned return_value_register = frames.back()->place_return_value_in;
     bool resolve_return_value_register = frames.back()->resolve_return_value_register;
     if (return_value_register != 0) {
         // we check in 0. register because it's reserved for return values
@@ -254,7 +254,7 @@ byte* Process::callForeignMethod(byte* return_address, Type* object, const strin
     // place return value
     if (returned and frames.size() > 0) {
         if (resolve_return_value_register) {
-            return_value_register = static_cast<Integer*>(fetch(return_value_register))->value();
+            return_value_register = static_cast<Integer*>(fetch(return_value_register))->as_unsigned();
         }
         place(return_value_register, returned);
         if (returned_is_reference) {

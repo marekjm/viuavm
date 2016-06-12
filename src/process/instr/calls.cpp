@@ -109,7 +109,7 @@ byte* Process::opcall(byte* addr) {
     }
 
     auto caller = (is_native ? &Process::callNative : &Process::callForeign);
-    return (this->*caller)(addr, call_name, return_register_ref, return_register_index, "");
+    return (this->*caller)(addr, call_name, return_register_ref, static_cast<unsigned>(return_register_index), "");
 }
 
 byte* Process::optailcall(byte* addr) {
@@ -166,7 +166,7 @@ byte* Process::opreturn(byte* addr) {
     addr = frames.back()->ret_address();
 
     Type* returned = nullptr;
-    int return_value_register = frames.back()->place_return_value_in;
+    unsigned return_value_register = frames.back()->place_return_value_in;
     bool resolve_return_value_register = frames.back()->resolve_return_value_register;
     if (return_value_register != 0) {
         // we check in 0. register because it's reserved for return values

@@ -19,7 +19,7 @@ void ForeignFunctionCallRequest::call(ForeignFunction* callback) {
 
         /* // FIXME: woohoo! segfault! */
         Type* returned = nullptr;
-        int return_value_register = frame->place_return_value_in;
+        unsigned return_value_register = frame->place_return_value_in;
         bool resolve_return_value_register = frame->resolve_return_value_register;
         if (return_value_register != 0) {
             // we check in 0. register because it's reserved for return values
@@ -32,7 +32,7 @@ void ForeignFunctionCallRequest::call(ForeignFunction* callback) {
         // place return value
         if (returned and caller_process->trace().size() > 0) {
             if (resolve_return_value_register) {
-                return_value_register = static_cast<Integer*>(caller_process->obtain(return_value_register))->value();
+                return_value_register = static_cast<Integer*>(caller_process->obtain(return_value_register))->as_unsigned();
             }
             caller_process->put(return_value_register, returned);
         }

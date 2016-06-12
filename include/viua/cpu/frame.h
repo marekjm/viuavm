@@ -14,7 +14,7 @@ class Frame {
         RegisterSet* args;
         RegisterSet* regset;
 
-        int place_return_value_in;
+        unsigned place_return_value_in;
         bool resolve_return_value_register;
 
         std::string function_name;
