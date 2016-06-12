@@ -1291,18 +1291,18 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         if (DEBUG) {
             cout << "[asm] pushing bytecode of local function '" << name << "' to final byte array" << endl;
         }
-        int fun_size = 0;
+        uint64_t fun_size = 0;
         byte* fun_bytecode = nullptr;
         tie(fun_size, fun_bytecode) = functions_bytecode[name];
 
-        for (int i = 0; i < fun_size; ++i) {
+        for (uint64_t i = 0; i < fun_size; ++i) {
             program_bytecode[program_bytecode_used+i] = fun_bytecode[i];
         }
         program_bytecode_used += fun_size;
     }
 
     // free memory allocated for bytecode of local functions
-    for (pair<string, tuple<int, byte*>> fun : functions_bytecode) {
+    for (pair<string, tuple<uint64_t, byte*>> fun : functions_bytecode) {
         delete[] get<1>(fun.second);
     }
 
