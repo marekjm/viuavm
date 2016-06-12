@@ -42,7 +42,7 @@ byte* Process::opcatch(byte* addr) {
 byte* Process::oppull(byte* addr) {
     /** Run pull instruction.
      */
-    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     if (caught == nullptr) {
         throw new Exception("no caught object to pull");
@@ -85,9 +85,9 @@ byte* Process::openter(byte* addr) {
 byte* Process::opthrow(byte* addr) {
     /** Run throw instruction.
      */
-    int source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    if (unsigned(source) >= uregset->size()) {
+    if (source >= uregset->size()) {
         ostringstream oss;
         oss << "invalid read: register out of bounds: " << source;
         throw new Exception(oss.str());
