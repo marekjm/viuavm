@@ -306,7 +306,7 @@ Program& Program::calculateJumps(vector<tuple<uint64_t, uint64_t> > jump_positio
     uint64_t instruction_count = instructionCount();
     uint64_t* ptr;
 
-    int position, offset;
+    uint64_t position, offset;
     uint64_t adjustment;
     for (auto jmp : jump_positions) {
         tie(position, offset) = jmp;
