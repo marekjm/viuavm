@@ -10,30 +10,30 @@ using namespace std;
 
 
 byte* Process::opmove(byte* addr) {
-    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    int source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     uregset->move(source, target);
 
     return addr;
 }
 byte* Process::opcopy(byte* addr) {
-    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     place(target, viua::operand::extract(addr)->resolve(this)->copy());
 
     return addr;
 }
 byte* Process::opptr(byte* addr) {
-    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     place(target, viua::operand::extract(addr)->resolve(this)->pointer());
 
     return addr;
 }
 byte* Process::opswap(byte* addr) {
-    int first = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    int second = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned first = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned second = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     uregset->swap(first, second);
 
@@ -46,7 +46,7 @@ byte* Process::opdelete(byte* addr) {
 byte* Process::opempty(byte* addr) {
     /** Run empty instruction.
      */
-    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     Type* object = uregset->get(target);
     if (Reference* rf = dynamic_cast<Reference*>(object)) {
@@ -57,8 +57,8 @@ byte* Process::opempty(byte* addr) {
     return addr;
 }
 byte* Process::opisnull(byte* addr) {
-    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    int source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     place(target, new Boolean(uregset->at(source) == nullptr));
 
@@ -101,7 +101,7 @@ byte* Process::optmpri(byte* addr) {
     return addr;
 }
 byte* Process::optmpro(byte* addr) {
-    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     if (uregset->at(target) != nullptr) {
         if (cpu->errors) {
