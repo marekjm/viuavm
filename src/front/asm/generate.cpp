@@ -60,7 +60,8 @@ tuple<uint64_t, enum JUMPTYPE> resolvejump(string jmp, const map<string, int>& m
         exit(1);
     } else {
         try {
-            addr = marks.at(jmp);
+            // FIXME: markers map should use different uint64_t to avoid the need for casting
+            addr = static_cast<uint64_t>(marks.at(jmp));
         } catch (const std::out_of_range& e) {
             throw ("jump to unrecognised marker: " + jmp);
         }
