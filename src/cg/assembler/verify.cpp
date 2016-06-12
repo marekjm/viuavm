@@ -445,7 +445,8 @@ string assembler::verify::instructions(const string& filename, const vector<stri
 string assembler::verify::framesHaveNoGaps(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines) {
     ostringstream report("");
     string line;
-    int frame_parameters_count = 0;
+    unsigned long frame_parameters_count = 0;
+    bool detected_frame_parameters_count = false;
     unsigned last_frame = 0;
 
     vector<bool> filled_slots;
@@ -465,30 +466,31 @@ string assembler::verify::framesHaveNoGaps(const string& filename, const vector<
 
             line = str::chunk(line);
             if (str::isnum(line)) {
-                frame_parameters_count = stoi(str::chunk(line));
+                frame_parameters_count = stoul(str::chunk(line));
                 filled_slots.clear();
                 pass_lines.clear();
-                if (frame_parameters_count >= 0) {
-                    filled_slots.resize(frame_parameters_count, false);
-                    pass_lines.resize(frame_parameters_count);
-                }
+                filled_slots.resize(frame_parameters_count, false);
+                pass_lines.resize(frame_parameters_count);
+                detected_frame_parameters_count = true;
             } else {
-                frame_parameters_count = -1;
+                detected_frame_parameters_count = false;
             }
             continue;
         }
 
         if (instr_name == "param" or instr_name == "pamv") {
             line = str::chunk(line);
-            int slot_index = -1;
+            unsigned long slot_index;
+            bool detected_slot_index = false;
             if (str::isnum(line)) {
-                slot_index = stoi(line);
+                slot_index = stoul(line);
+                detected_slot_index = true;
             }
-            if (slot_index >= 0 and frame_parameters_count >= 0 and slot_index >= frame_parameters_count) {
+            if (detected_slot_index and detected_frame_parameters_count and slot_index >= frame_parameters_count) {
                 report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: pass to parameter slot " << slot_index << " in frame with only " << frame_parameters_count << " slots available";
                 break;
             }
-            if (slot_index >= 0 and frame_parameters_count >= 0) {
+            if (detected_slot_index and detected_frame_parameters_count) {
                 if (filled_slots[slot_index]) {
                     report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: double pass to parameter slot " << slot_index << " in frame defined at line " << expanded_lines_to_source_lines.at(last_frame)+1;
                     report << ", first pass at line " << expanded_lines_to_source_lines.at(pass_lines[slot_index])+1;
@@ -501,7 +503,7 @@ string assembler::verify::framesHaveNoGaps(const string& filename, const vector<
         }
 
         if (instr_name == "call" or instr_name == "process" or instr_name == "watchdog") {
-            for (int f = 0; f < frame_parameters_count; ++f) {
+            for (decltype(frame_parameters_count) f = 0; f < frame_parameters_count; ++f) {
                 if (not filled_slots[f]) {
                     report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: gap in frame defined at line " << expanded_lines_to_source_lines.at(last_frame)+1 << ", slot " << f << " left empty";
                     break;
