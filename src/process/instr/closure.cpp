@@ -17,13 +17,13 @@ byte* Process::openclose(byte* addr) {
     /** Enclose object by reference.
      */
     Closure *target_closure = static_cast<Closure*>(viua::operand::extract(addr)->resolve(this));
-    int target_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    if (static_cast<unsigned>(target_register) >= target_closure->regset->size()) {
+    if (target_register >= target_closure->regset->size()) {
         throw new Exception("cannot enclose object: register index out exceeded size of closure register set");
     }
 
-    int source_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned source_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     Type* enclosed_object = uregset->at(source_register);
     Reference *rf = dynamic_cast<Reference*>(enclosed_object);
@@ -44,9 +44,9 @@ byte* Process::openclosecopy(byte* addr) {
     /** Enclose object by copy.
      */
     Closure *target_closure = static_cast<Closure*>(viua::operand::extract(addr)->resolve(this));
-    int target_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    if (static_cast<unsigned>(target_register) >= target_closure->regset->size()) {
+    if (target_register >= target_closure->regset->size()) {
         throw new Exception("cannot enclose object: register index out exceeded size of closure register set");
     }
 
@@ -59,13 +59,13 @@ byte* Process::openclosemove(byte* addr) {
     /** Enclose object by move.
      */
     Closure *target_closure = static_cast<Closure*>(viua::operand::extract(addr)->resolve(this));
-    int target_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    if (static_cast<unsigned>(target_register) >= target_closure->regset->size()) {
+    if (target_register >= target_closure->regset->size()) {
         throw new Exception("cannot enclose object: register index out exceeded size of closure register set");
     }
 
-    int source_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned source_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     target_closure->regset->set(target_register, uregset->pop(source_register));
 
     return addr;
@@ -78,7 +78,7 @@ byte* Process::opclosure(byte* addr) {
         throw new Exception("creating closures from nonlocal registers is forbidden, go rethink your behaviour");
     }
 
-    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     string call_name = viua::operand::extractString(addr);
 
@@ -98,7 +98,7 @@ byte* Process::opfunction(byte* addr) {
      *  are can be used to pass functions as parameters and
      *  return them from other functions.
      */
-    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     string call_name = viua::operand::extractString(addr);
 
@@ -117,7 +117,7 @@ byte* Process::opfcall(byte* addr) {
     bool return_value_ref;
     viua::cpu::util::extractIntegerOperand(addr, return_value_ref, return_value_reg);
 
-    int fn_reg = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned fn_reg = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     // FIXME: there should be a check it this is *really* a function object
     Function* fn = static_cast<Function*>(fetch(fn_reg));
@@ -149,7 +149,7 @@ byte* Process::opfcall(byte* addr) {
     frame_new->return_address = return_address;
 
     frame_new->resolve_return_value_register = return_value_ref;
-    frame_new->place_return_value_in = return_value_reg;
+    frame_new->place_return_value_in = static_cast<unsigned>(return_value_reg);
 
     if (fn->type() == "Closure") {
         frame_new->setLocalRegisterSet(static_cast<Closure*>(fn)->regset, false);
