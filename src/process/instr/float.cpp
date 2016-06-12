@@ -19,14 +19,15 @@ byte* Process::opfstore(byte* addr) {
     float value;
     bool destination_register_ref = false;
 
+    // FIXME: register indexes should be encoded as unsigned integers
     viua::cpu::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
     viua::cpu::util::extractFloatingPointOperand(addr, value);
 
     if (destination_register_ref) {
-        destination_register_index = static_cast<Integer*>(fetch(destination_register_index))->value();
+        destination_register_index = static_cast<Integer*>(fetch(static_cast<unsigned>(destination_register_index)))->value();
     }
 
-    place(destination_register_index, new Float(value));
+    place(static_cast<unsigned>(destination_register_index), new Float(value));
 
     return addr;
 }
