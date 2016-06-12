@@ -6,7 +6,4 @@ else
     CXX_STANDARD='c++11'
 fi
 
-LINES=$(wc -l Makefile | cut -d' ' -f1)
-LINES=$(dc -e "$LINES 1 - p")
-
 sed -i "s:CXX_STANDARD=.*:CXX_STANDARD=$CXX_STANDARD:g" Makefile
