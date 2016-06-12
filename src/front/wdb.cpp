@@ -285,7 +285,7 @@ tuple<bool, string> if_watchpoint_local_register_write(CPU& cpu, const State& st
         opcode == EMPTY or
         opcode == TMPRO
        ) {
-        register_index[0] = *(int*)(register_index_ptr+1);
+        register_index[0] = *reinterpret_cast<int*>(register_index_ptr+1);
         writes_to = 1;
     } else if (opcode == ITOF or
                opcode == FTOI or
@@ -297,7 +297,7 @@ tuple<bool, string> if_watchpoint_local_register_write(CPU& cpu, const State& st
                opcode == ISNULL or
                opcode == ARG
             ) {
-        register_index[0] = *((int*)(register_index_ptr+2)+1);
+        register_index[0] = *(reinterpret_cast<int*>(register_index_ptr+2)+1);
         writes_to = 1;
     } else if (opcode == IADD or
                opcode == ISUB or
@@ -328,11 +328,11 @@ tuple<bool, string> if_watchpoint_local_register_write(CPU& cpu, const State& st
                opcode == AND or
                opcode == OR
                ) {
-        register_index[0] = *((int*)(register_index_ptr+3)+2);
+        register_index[0] = *(reinterpret_cast<int*>(register_index_ptr+3)+2);
         writes_to = 1;
     } else if (opcode == VPOP or opcode == SWAP) {
-        register_index[0] = *((int*)(++register_index_ptr)++);
-        register_index[1] = *((int*)(++register_index_ptr)++);
+        register_index[0] = *(reinterpret_cast<int*>(++register_index_ptr));
+        register_index[1] = *(reinterpret_cast<int*>(++register_index_ptr)+1);
         writes_to = 2;
     }
 
@@ -394,7 +394,7 @@ tuple<bool, string> if_watchpoint_global_register_write(CPU& cpu, const State& s
         opcode == EMPTY or
         opcode == TMPRO
        ) {
-        register_index[0] = *(int*)(register_index_ptr+1);
+        register_index[0] = *reinterpret_cast<int*>(register_index_ptr+1);
         writes_to = 1;
     } else if (opcode == ITOF or
                opcode == FTOI or
@@ -406,7 +406,7 @@ tuple<bool, string> if_watchpoint_global_register_write(CPU& cpu, const State& s
                opcode == ISNULL or
                opcode == ARG
             ) {
-        register_index[0] = *((int*)(register_index_ptr+2)+1);
+        register_index[0] = *(reinterpret_cast<int*>(register_index_ptr+2)+1);
         writes_to = 1;
     } else if (opcode == IADD or
                opcode == ISUB or
@@ -437,11 +437,11 @@ tuple<bool, string> if_watchpoint_global_register_write(CPU& cpu, const State& s
                opcode == AND or
                opcode == OR
                ) {
-        register_index[0] = *((int*)(register_index_ptr+3)+2);
+        register_index[0] = *(reinterpret_cast<int*>(register_index_ptr+3)+2);
         writes_to = 1;
     } else if (opcode == VPOP or opcode == SWAP) {
-        register_index[0] = *((int*)(++register_index_ptr)++);
-        register_index[1] = *((int*)(++register_index_ptr)++);
+        register_index[0] = *(reinterpret_cast<int*>(++register_index_ptr));
+        register_index[1] = *(reinterpret_cast<int*>(++register_index_ptr)+1);
         writes_to = 2;
     }
 
