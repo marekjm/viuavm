@@ -31,9 +31,9 @@ tuple<uint64_t, enum JUMPTYPE> resolvejump(string jmp, const map<string, int>& m
     uint64_t addr = 0;
     enum JUMPTYPE jump_type = JMP_RELATIVE;
     if (str::isnum(jmp, false)) {
-        addr = stoi(jmp);
+        addr = stoul(jmp);
     } else if (jmp[0] == '.' and str::isnum(str::sub(jmp, 1LU))) {
-        addr = stoi(str::sub(jmp, 1));
+        addr = stoul(str::sub(jmp, 1));
         jump_type = JMP_ABSOLUTE;
     } else if (jmp.substr(0, 2) == "0x") {
         stringstream ss;
@@ -53,7 +53,7 @@ tuple<uint64_t, enum JUMPTYPE> resolvejump(string jmp, const map<string, int>& m
         }
         addr = (instruction_index + jump_value);
     } else if (jmp[0] == '+') {
-        addr = (instruction_index + stoi(jmp.substr(1)));
+        addr = (instruction_index + stoul(jmp.substr(1)));
     } else if (jmp[0] == '.') {
         // FIXME
         cout << "FIXME: global marker jumps (jumps to functions) are not implemented yet" << endl;
