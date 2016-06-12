@@ -35,16 +35,22 @@ Type* Vector::pop(long int index) {
 
 Type* Vector::at(long int index) {
     if (index < 0) { index = (internal_object.size()+index); }
-    if ((index < 0) or (index >= (int)internal_object.size())) {
+    // FIXME: convert signed indexes on input to unsigned indexes for internal usage
+    // to avoid the cast
+    if ((index < 0) or (index >= static_cast<long int>(internal_object.size()))) {
         throw new OutOfRangeException("vector index out of range");
     }
     // FIXME: returned value is a reference, but docs say it's a copy
+    // FIXME: this is a *serious* bug, if user code `delete`'s the object
+    // VM will segfault
     return internal_object[index];
 }
 
 int Vector::len() {
     // FIXME: should return unsigned
-    return (int)internal_object.size();
+    // FIXME: VM does not have unsigned integer type so return value has
+    // to be converted to signed integer
+    return static_cast<int>(internal_object.size());
 }
 
 string Vector::str() const {
