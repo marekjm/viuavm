@@ -80,7 +80,7 @@ namespace str {
     }
 
 
-    string sub(const string& s, long unsigned b, long int e) {
+    string sub(const string& s, unsigned long b, long int e) {
         /*  Returns substring of s.
          *  If only s is passed, returns copy of s.
          */
@@ -89,11 +89,11 @@ namespace str {
         ostringstream part;
         part.str("");
 
-        long unsigned end;
-        if (e < 0) { end = (s.size() + e + 1); }
+        unsigned long end;
+        if (e < 0) { end = (s.size() - static_cast<unsigned long>(-1 * e) + 1); }
         else { end = static_cast<long unsigned>(e); }
 
-        for (long unsigned i = b; i < s.size() and i < end; ++i) {
+        for (unsigned long i = b; i < s.size() and i < end; ++i) {
             part << s[i];
         }
 
