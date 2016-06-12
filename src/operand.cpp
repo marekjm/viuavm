@@ -25,12 +25,12 @@ unsigned viua::operand::RegisterIndex::get(Process*) const {
 
 
 Type* viua::operand::RegisterReference::resolve(Process* t) {
-    return t->obtain(static_cast<Integer*>(t->obtain(index))->as_integer());
+    return t->obtain(static_cast<Integer*>(t->obtain(index))->as_unsigned());
 }
 unsigned viua::operand::RegisterReference::get(Process* cpu) const {
     Type* o = cpu->obtain(index);
     viua::assertions::assert_typeof(o, "Integer");
-    return static_cast<Integer*>(o)->value();
+    return static_cast<Integer*>(o)->as_unsigned();
 }
 
 

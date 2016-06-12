@@ -100,7 +100,7 @@ void Process::ensureStaticRegisters(string function_name) {
     }
 }
 
-Frame* Process::requestNewFrame(int arguments_size, int registers_size) {
+Frame* Process::requestNewFrame(unsigned arguments_size, unsigned registers_size) {
     /** Request new frame to be prepared.
      *
      *  Creates new frame if the new-frame hook is empty.

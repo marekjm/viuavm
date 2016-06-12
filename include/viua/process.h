@@ -88,7 +88,7 @@ class Process {
     /*  Methods dealing with stack and frame manipulation, and
      *  function calls.
      */
-    Frame* requestNewFrame(int arguments_size = 0, int registers_size = 0);
+    Frame* requestNewFrame(unsigned arguments_size = 0, unsigned registers_size = 0);
     TryFrame* requestNewTryFrame();
     void pushFrame();
     void dropFrame();

@@ -13,7 +13,7 @@ byte* Process::opframe(byte* addr) {
     int arguments = viua::operand::getInteger(viua::operand::extract(addr).get(), this);
     int local_registers = viua::operand::getInteger(viua::operand::extract(addr).get(), this);
 
-    requestNewFrame(arguments, local_registers);
+    requestNewFrame(static_cast<unsigned>(arguments), static_cast<unsigned>(local_registers));
 
     return addr;
 }
