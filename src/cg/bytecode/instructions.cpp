@@ -54,6 +54,14 @@ static byte* insertThreeIntegerOpsInstruction(byte* addr_ptr, enum OPCODE instru
 
 namespace cg {
     namespace bytecode {
+        byte* insertString(byte* ptr, const string& s) {
+            for (unsigned i = 0; i < s.size(); ++i) {
+                *(ptr++) = static_cast<unsigned char>(s[i]);
+            }
+            *(ptr++) = '\0';
+            return ptr;
+        }
+
         byte* opnop(byte* addr_ptr) {
             /*  Inserts nop instuction.
              */
@@ -403,11 +411,7 @@ namespace cg {
              */
             *(addr_ptr++) = STRSTORE;
             addr_ptr = insertIntegerOperand(addr_ptr, reg);
-
-            for (unsigned i = 1; i < s.size()-1; ++i) {
-                *(addr_ptr++) = s[i];
-            }
-            *(addr_ptr++) = char(0);
+            addr_ptr = insertString(addr_ptr, s.substr(1, s.size()-2));
             return addr_ptr;
         }
 
@@ -645,10 +649,7 @@ namespace cg {
              */
             *(addr_ptr++) = CLOSURE;
             addr_ptr = insertIntegerOperand(addr_ptr, reg);
-            for (unsigned i = 0; i < fn.size(); ++i) {
-                *(addr_ptr++) = fn[i];
-            }
-            *(addr_ptr++) = '\0';
+            addr_ptr = insertString(addr_ptr, fn);
             return addr_ptr;
         }
 
@@ -657,10 +658,7 @@ namespace cg {
              */
             *(addr_ptr++) = FUNCTION;
             addr_ptr = insertIntegerOperand(addr_ptr, reg);
-            for (unsigned i = 0; i < fn.size(); ++i) {
-                *(addr_ptr++) = fn[i];
-            }
-            *(addr_ptr++) = '\0';
+            addr_ptr = insertString(addr_ptr, fn);
             return addr_ptr;
         }
 
@@ -732,10 +730,7 @@ namespace cg {
              */
             *(addr_ptr++) = CALL;
             addr_ptr = insertIntegerOperand(addr_ptr, reg);
-            for (unsigned i = 0; i < fn_name.size(); ++i) {
-                *(addr_ptr++) = fn_name[i];
-            }
-            *(addr_ptr++) = '\0';
+            addr_ptr = insertString(addr_ptr, fn_name);
             return addr_ptr;
         }
 
