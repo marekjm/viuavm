@@ -11,7 +11,7 @@ using namespace std;
 byte* Process::opprocess(byte* addr) {
     /*  Run process instruction.
      */
-    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     string call_name = viua::operand::extractString(addr);
 
@@ -36,8 +36,8 @@ byte* Process::opjoin(byte* addr) {
      */
     byte* return_addr = (addr-1);
 
-    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    int source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     if (ProcessType* thrd = dynamic_cast<ProcessType*>(fetch(source))) {
         if (thrd->stopped()) {
             thrd->join();
@@ -63,7 +63,7 @@ byte* Process::opreceive(byte* addr) {
      */
     byte* return_addr = (addr-1);
 
-    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     if (message_queue.size()) {
         place(target, message_queue.front());
