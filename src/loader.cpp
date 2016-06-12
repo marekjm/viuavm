@@ -92,7 +92,7 @@ void Loader::loadFunctionsMap(ifstream& in) {
     readinto(in, &lib_function_ids_section_size);
 
     char *lib_buffer_function_ids = new char[lib_function_ids_section_size];
-    in.read(lib_buffer_function_ids, lib_function_ids_section_size);
+    in.read(lib_buffer_function_ids, static_cast<std::streamsize>(lib_function_ids_section_size));
 
     vector<string> order;
     map<string, uint64_t> mapping;
@@ -110,7 +110,7 @@ void Loader::loadBlocksMap(ifstream& in) {
     readinto(in, &lib_block_ids_section_size);
 
     char *lib_buffer_block_ids = new char[lib_block_ids_section_size];
-    in.read(lib_buffer_block_ids, lib_block_ids_section_size);
+    in.read(lib_buffer_block_ids, static_cast<std::streamsize>(lib_block_ids_section_size));
 
     vector<string> order;
     map<string, uint64_t> mapping;
@@ -126,7 +126,7 @@ void Loader::loadBlocksMap(ifstream& in) {
 void Loader::loadBytecode(ifstream& in) {
     in.read(reinterpret_cast<char*>(&size), sizeof(decltype(size)));
     bytecode = new byte[size];
-    in.read(reinterpret_cast<char*>(bytecode), size);
+    in.read(reinterpret_cast<char*>(bytecode), static_cast<std::streamsize>(size));
 }
 
 Loader& Loader::load() {
