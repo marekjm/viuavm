@@ -80,13 +80,3 @@ unsigned viua::operand::getRegisterIndex(viua::operand::Operand* o, Process* t) 
     }
     return index;
 }
-
-int viua::operand::getInteger(viua::operand::Operand* o, Process* t) {
-    int index = 0;
-    if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(o)) {
-        index = ri->get(t);
-    } else {
-        throw new Exception("invalid operand type");
-    }
-    return index;
-}

@@ -10,10 +10,10 @@ using namespace std;
 byte* Process::opframe(byte* addr) {
     /** Create new frame for function calls.
      */
-    int arguments = viua::operand::getInteger(viua::operand::extract(addr).get(), this);
-    int local_registers = viua::operand::getInteger(viua::operand::extract(addr).get(), this);
+    unsigned arguments = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned local_registers = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    requestNewFrame(static_cast<unsigned>(arguments), static_cast<unsigned>(local_registers));
+    requestNewFrame(arguments, local_registers);
 
     return addr;
 }
@@ -21,10 +21,10 @@ byte* Process::opframe(byte* addr) {
 byte* Process::opparam(byte* addr) {
     /** Run param instruction.
      */
-    int parameter_no_operand_index = viua::operand::getInteger(viua::operand::extract(addr).get(), this);
+    unsigned parameter_no_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     int source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    if (unsigned(parameter_no_operand_index) >= frame_new->args->size()) {
+    if (parameter_no_operand_index >= frame_new->args->size()) {
         throw new Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
     }
     frame_new->args->set(parameter_no_operand_index, fetch(source)->copy());
@@ -36,10 +36,10 @@ byte* Process::opparam(byte* addr) {
 byte* Process::oppamv(byte* addr) {
     /** Run pamv instruction.
      */
-    int parameter_no_operand_index = viua::operand::getInteger(viua::operand::extract(addr).get(), this);
+    unsigned parameter_no_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     int source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    if (unsigned(parameter_no_operand_index) >= frame_new->args->size()) {
+    if (parameter_no_operand_index >= frame_new->args->size()) {
         throw new Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
     }
     frame_new->args->set(parameter_no_operand_index, uregset->pop(source));
