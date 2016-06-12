@@ -25,10 +25,10 @@ template<class T> void bwrite(ofstream& out, const T& object) {
 }
 
 
-tuple<int, enum JUMPTYPE> resolvejump(string jmp, const map<string, int>& marks, int instruction_index = -1) {
+tuple<uint64_t, enum JUMPTYPE> resolvejump(string jmp, const map<string, int>& marks, uint64_t instruction_index) {
     /*  This function is used to resolve jumps in `jump` and `branch` instructions.
      */
-    int addr = 0;
+    uint64_t addr = 0;
     enum JUMPTYPE jump_type = JMP_RELATIVE;
     if (str::isnum(jmp, false)) {
         addr = stoi(jmp);
@@ -41,11 +41,16 @@ tuple<int, enum JUMPTYPE> resolvejump(string jmp, const map<string, int>& marks,
         ss >> addr;
         jump_type = JMP_TO_BYTE;
     } else if (jmp[0] == '-') {
-        if (instruction_index < 0) { throw ("invalid use of relative jump: " + jmp); }
-        addr = (instruction_index + stoi(jmp));
-        if (addr < 0) { throw "use of relative jump results in a jump to negative index"; }
+        int jump_value = stoi(jmp);
+        if (instruction_index < static_cast<decltype(addr)>(-1 * jump_value)) {
+            ostringstream oss;
+            oss << "use of relative jump results in a jump to negative index: ";
+            oss << "jump_value = " << jump_value << ", ";
+            oss << "instruction_index = " << instruction_index;
+            throw oss.str();
+        }
+        addr = (instruction_index + jump_value);
     } else if (jmp[0] == '+') {
-        if (instruction_index < 0) { throw ("invalid use of relative jump: " + jmp); }
         addr = (instruction_index + stoi(jmp.substr(1)));
     } else if (jmp[0] == '.') {
         // FIXME
@@ -58,7 +63,7 @@ tuple<int, enum JUMPTYPE> resolvejump(string jmp, const map<string, int>& marks,
             throw ("jump to unrecognised marker: " + jmp);
         }
     }
-    return tuple<int, enum JUMPTYPE>(addr, jump_type);
+    return tuple<uint64_t, enum JUMPTYPE>(addr, jump_type);
 }
 
 string resolveregister(string reg, const map<string, int>& names) {
@@ -216,7 +221,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
 
     string line;
     int instruction = 0;  // instruction counter
-    for (unsigned i = 0; i < ilines.size(); ++i) {
+    for (decltype(ilines)::size_type i = 0; i < ilines.size(); ++i) {
         /*  This is main assembly loop.
          *  It iterates over lines with instructions and
          *  uses bytecode generation API to fill the program with instructions and
@@ -514,7 +519,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             string condition, if_true, if_false;
             tie(condition, if_true, if_false) = assembler::operands::get3(operands, false);
 
-            int addrt_target, addrf_target;
+            uint64_t addrt_target, addrf_target;
             enum JUMPTYPE addrt_jump_type, addrf_jump_type;
             tie(addrt_target, addrt_jump_type) = resolvejump(if_true, marks, i);
             if (if_false != "") {
@@ -559,7 +564,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
              *  If it is a marker jump, assembler will look the marker up in a map and
              *  if it is not found throw an exception about unrecognised marker being used.
              */
-            int jump_target;
+            uint64_t jump_target;
             enum JUMPTYPE jump_type;
             tie(jump_target, jump_type) = resolvejump(operands, marks, i);
 
