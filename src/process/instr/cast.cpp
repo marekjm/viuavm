@@ -13,7 +13,7 @@ using namespace std;
 
 
 byte* Process::opitof(byte* addr) {
-    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     int convert_from = static_cast<Integer*>(viua::operand::extract(addr)->resolve(this))->value();
     place(target, new Float(static_cast<float>(convert_from)));
 
@@ -21,7 +21,7 @@ byte* Process::opitof(byte* addr) {
 }
 
 byte* Process::opftoi(byte* addr) {
-    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     float convert_from = static_cast<Float*>(viua::operand::extract(addr)->resolve(this))->value();
     place(target, new Integer(static_cast<int>(convert_from)));
 
@@ -29,7 +29,7 @@ byte* Process::opftoi(byte* addr) {
 }
 
 byte* Process::opstoi(byte* addr) {
-    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     int result_integer = 0;
     string supplied_string = static_cast<String*>(viua::operand::extract(addr)->resolve(this))->value();
@@ -47,7 +47,7 @@ byte* Process::opstoi(byte* addr) {
 }
 
 byte* Process::opstof(byte* addr) {
-    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     string supplied_string = static_cast<String*>(viua::operand::extract(addr)->resolve(this))->value();
     double convert_from = std::stod(supplied_string);
     place(target, new Float(static_cast<float>(convert_from)));
