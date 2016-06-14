@@ -6,7 +6,7 @@
  *
  *  In this file there are lots of reinterpret_cast<>'s.
  *  It is in bad style, but C-style casts are even worse.
- *  We *know* that specified byte* really encode different datatypes.
+ *  We *know* that specified byte*'s really encode different datatypes.
  *  So, that leaves us with reinterpret_cast<> as it will allow the conversion.
  */
 
