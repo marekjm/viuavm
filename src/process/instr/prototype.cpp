@@ -13,7 +13,7 @@ using namespace std;
 byte* Process::opclass(byte* addr) {
     /** Create a class.
      */
-    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     place(target, new Prototype(viua::operand::extractString(addr)));
     return addr;
 }

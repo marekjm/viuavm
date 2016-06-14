@@ -16,7 +16,7 @@ using namespace std;
 byte* Process::opnew(byte* addr) {
     /** Create new instance of specified class.
      */
-    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     string class_name = viua::operand::extractString(addr);
 
@@ -105,7 +105,7 @@ byte* Process::opinsert(byte* addr) {
 byte* Process::opremove(byte* addr) {
     /** Remove an attribute of another object.
      */
-    int target_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     Type* object_operand = viua::operand::extract(addr)->resolve(this);
     Type* key_operand = viua::operand::extract(addr)->resolve(this);
 
