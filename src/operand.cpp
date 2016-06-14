@@ -39,7 +39,7 @@ unique_ptr<viua::operand::Operand> viua::operand::extract(byte*& ip) {
      *
      *  After the operand is extracted, the address pointer is increased by the size
      *  of the operand.
-     *  Address is modifier in-place.
+     *  Address is modified in-place.
      */
     OperandType ot = *reinterpret_cast<OperandType*>(ip);
     ++ip;
