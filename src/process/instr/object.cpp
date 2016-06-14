@@ -92,7 +92,7 @@ byte* Process::opinsert(byte* addr) {
      */
     Type* object_operand = viua::operand::extract(addr)->resolve(this);
     Type* key_operand = viua::operand::extract(addr)->resolve(this);
-    int source_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned source_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     viua::assertions::assert_implements<Object>(object_operand, "Object");
     viua::assertions::assert_typeof(key_operand, "String");

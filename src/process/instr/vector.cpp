@@ -21,8 +21,8 @@ byte* Process::opvinsert(byte* addr) {
     /*  Run vinsert instruction.
      */
     Type* vector_operand = viua::operand::extract(addr)->resolve(this);
-    int object_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    int position_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned object_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned position_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     viua::assertions::assert_implements<Vector>(vector_operand, "Vector");
 
@@ -38,7 +38,7 @@ byte* Process::opvpush(byte* addr) {
      *  FIXME: make it possible to push references.
      */
     Type* target = viua::operand::extract(addr)->resolve(this);
-    int source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     viua::assertions::assert_implements<Vector>(target, "Vector");
     static_cast<Vector*>(target)->push(pop(source));
@@ -83,7 +83,7 @@ byte* Process::opvat(byte* addr) {
 byte* Process::opvlen(byte* addr) {
     /*  Run vlen instruction.
      */
-    int target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     Type* source = viua::operand::extract(addr)->resolve(this);
 
     viua::assertions::assert_implements<Vector>(source, "Vector");
