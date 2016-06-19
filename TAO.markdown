@@ -48,3 +48,21 @@ If you're passing data up the stack (to more nested calls) pass-by-pointer may a
 ### Divide tasks between processes
 
 Viua can run many virtual processes concurrently - use this feature when applicable.
+
+----
+
+
+## Viua VM core development guidelines
+
+A set of rules guiding development of the core VM (i.e. the actual C++ implemention).
+
+- express ideas directly in code: use comments only when there's no way to express intent
+  in code,
+- write only in standard C++: do not use any platform-specific language extensions,
+- prefer compile-time checks to run-time checks: what can be checked staticaly - should be,
+  what cannot, must be checked at runtime,
+- fail fast, and catch run-time errors early - before they propagate,
+- do not leak resources: the VM must not leak any resources it manages,
+
+These rules were extracted from Bjarne Stroustrup's talk "Writing Good C++14" from CppCon 2015.
+The talk is available here: https://www.youtube.com/watch?v=1OEu9C51K2A
