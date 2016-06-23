@@ -22,7 +22,10 @@
     .mark: increase
     iinc 1
 
-    tmpri 1
+    ; the copy is required because TMPRI moves objects instead
+    ; of copying
+    copy 4 1
+    move (tmpri 1) 4
     ress local
     tmpro 1
 

@@ -96,7 +96,7 @@ byte* Process::optmpri(byte* addr) {
         delete tmp;
     }
 
-    tmp = viua::operand::extract(addr)->resolve(this)->copy();
+    tmp = pop(viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this));
 
     return addr;
 }
