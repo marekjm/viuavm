@@ -93,8 +93,9 @@ byte* Process::opress(byte* addr) {
 
 byte* Process::optmpri(byte* addr) {
     if (tmp != nullptr) {
-        cout << "warning: Process " << this << ": storing in non-empty temporary register: memory has been leaked" << endl;
+        delete tmp;
     }
+
     tmp = viua::operand::extract(addr)->resolve(this)->copy();
 
     return addr;
@@ -103,9 +104,6 @@ byte* Process::optmpro(byte* addr) {
     unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     if (uregset->at(target) != nullptr) {
-        if (cpu->errors) {
-            cerr << "warning: Process " << this << ": droping from temporary into non-empty register: possible references loss and register corruption" << endl;
-        }
         uregset->free(target);
     }
     uregset->set(target, tmp);
