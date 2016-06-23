@@ -63,9 +63,6 @@ class CPU {
     decltype(processes)::size_type current_process_index;
     std::mutex processes_mtx;
 
-    // Global register set
-    RegisterSet* regset;
-
     // Map of the typesystem currently existing inside the VM.
     std::map<std::string, Prototype*> typesystem;
 
@@ -150,7 +147,7 @@ class CPU {
         CPU& registerForeignPrototype(const std::string&, Prototype*);
         CPU& registerForeignMethod(const std::string&, ForeignMethod);
 
-        CPU& iframe(Frame* frm = nullptr, unsigned r = DEFAULT_REGISTER_SIZE);
+        CPU& iframe(Frame* frm = nullptr);
 
         Process* spawn(Frame*, Process* parent_process = nullptr);
         Process* spawnWatchdog(Frame*);
@@ -182,7 +179,6 @@ class CPU {
             watchdog_process_register_count(0),
             watchdog_process(nullptr),
             current_process_index(0),
-            regset(nullptr),
             jump_base(nullptr),
             thrown(nullptr), caught(nullptr),
             return_code(0), return_exception(""), return_message(""),

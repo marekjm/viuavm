@@ -223,7 +223,7 @@ vector<string> CPU::inheritanceChainOf(const string& type_name) {
     return ichain;
 }
 
-CPU& CPU::iframe(Frame* frm, unsigned r) {
+CPU& CPU::iframe(Frame* frm) {
     /** Set initial frame.
      */
     Frame *initial_frame;
@@ -238,15 +238,7 @@ CPU& CPU::iframe(Frame* frm, unsigned r) {
         initial_frame->regset->set(1, cmdline);
     } else {
         initial_frame = frm;
-
-        /*  If a frame was supplied to us to be the initial one,
-         *  set global registers to the locals of supplied frame.
-         */
-        delete regset;
     }
-
-    // set global registers
-    regset = new RegisterSet(r);
 
     Process* t = new Process(initial_frame, this, jump_base, nullptr);
     t->detach();
@@ -447,7 +439,6 @@ int CPU::run() {
             delete processes.back();
             processes.pop_back();
         }
-        delete regset;
     }
 
     return return_code;

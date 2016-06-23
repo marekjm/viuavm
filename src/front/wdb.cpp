@@ -731,7 +731,7 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
     } else if (command == "register.local.show") {
         printRegisters(operands, cpu.processes[cpu.current_process_index]->uregset);
     } else if (command == "register.global.show") {
-        printRegisters(operands, cpu.regset);
+        cout << "FIXME: showing per-process global registers not implemented" << endl;
     } else if (command == "register.static.show") {
         string fun_name = cpu.trace().back()->function_name;
 

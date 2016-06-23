@@ -463,6 +463,8 @@ Process::~Process() {
         delete rset;
     }
 
+    delete regset;
+
     if (return_value != nullptr) {
         delete return_value;
     }

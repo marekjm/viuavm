@@ -39,11 +39,15 @@ class Process {
 
     bool debug;
 
-    // Currently used register set
+    // Global register set
     RegisterSet* regset;
+
+    // Currently used register set
     RegisterSet* uregset;
+
     // Temporary register
     Type* tmp;
+
     // Static registers
     std::map<std::string, RegisterSet*> static_registers;
 
@@ -299,6 +303,7 @@ class Process {
             is_suspended(false),
             process_priority(1)
         {
+            regset = new RegisterSet(DEFAULT_REGISTER_SIZE);
             uregset = frm->regset;
             frames.push_back(frm);
         }
