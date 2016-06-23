@@ -66,9 +66,6 @@ class CPU {
     // Global register set
     RegisterSet* regset;
 
-    // Temporary register
-    Type* tmp;
-
     // Map of the typesystem currently existing inside the VM.
     std::map<std::string, Prototype*> typesystem;
 
@@ -186,7 +183,6 @@ class CPU {
             watchdog_process(nullptr),
             current_process_index(0),
             regset(nullptr),
-            tmp(nullptr),
             jump_base(nullptr),
             thrown(nullptr), caught(nullptr),
             return_code(0), return_exception(""), return_message(""),

@@ -92,11 +92,10 @@ byte* Process::opress(byte* addr) {
 }
 
 byte* Process::optmpri(byte* addr) {
-    // FIXME: mutex (VERY IMPORTANT!!!)
-    if (cpu->tmp != nullptr) {
-        cout << "warning: CPU: storing in non-empty temporary register: memory has been leaked" << endl;
+    if (tmp != nullptr) {
+        cout << "warning: Process " << this << ": storing in non-empty temporary register: memory has been leaked" << endl;
     }
-    cpu->tmp = viua::operand::extract(addr)->resolve(this)->copy();
+    tmp = viua::operand::extract(addr)->resolve(this)->copy();
 
     return addr;
 }
@@ -105,13 +104,12 @@ byte* Process::optmpro(byte* addr) {
 
     if (uregset->at(target) != nullptr) {
         if (cpu->errors) {
-            cerr << "warning: CPU: droping from temporary into non-empty register: possible references loss and register corruption" << endl;
+            cerr << "warning: Process " << this << ": droping from temporary into non-empty register: possible references loss and register corruption" << endl;
         }
         uregset->free(target);
     }
-    // FIXME: mutex (VERY IMPORTANT!!!)
-    uregset->set(target, cpu->tmp);
-    cpu->tmp = nullptr;
+    uregset->set(target, tmp);
+    tmp = nullptr;
 
     return addr;
 }
