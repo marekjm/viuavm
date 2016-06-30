@@ -1,8 +1,12 @@
 #ifndef VIUA_SCHEDULER_VPS_H
 #define VIUA_SCHEDULER_VPS_H
 
+#include <vector>
+#include <string>
+
 
 class CPU;
+class Process;
 
 
 namespace viua {
@@ -13,6 +17,8 @@ namespace viua {
             CPU *cpu;
 
             public:
+
+            Process* bootstrap(const std::vector<std::string>&, byte*);
 
             VirtualProcessScheduler(CPU *attached_cpu);
         };
