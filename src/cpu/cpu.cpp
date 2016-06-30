@@ -24,6 +24,7 @@
 #include <viua/loader.h>
 #include <viua/include/module.h>
 #include <viua/cpu/cpu.h>
+#include <viua/scheduler/vps.h>
 using namespace std;
 
 
@@ -223,32 +224,6 @@ vector<string> CPU::inheritanceChainOf(const string& type_name) {
     return ichain;
 }
 
-CPU& CPU::iframe(Frame* frm) {
-    /** Set initial frame.
-     */
-    Frame *initial_frame;
-    if (frm == nullptr) {
-        initial_frame = new Frame(nullptr, 0, 2);
-        initial_frame->function_name = ENTRY_FUNCTION_NAME;
-
-        Vector* cmdline = new Vector();
-        for (unsigned i = 0; i < commandline_arguments.size(); ++i) {
-            cmdline->push(new String(commandline_arguments[i]));
-        }
-        initial_frame->regset->set(1, cmdline);
-    } else {
-        initial_frame = frm;
-    }
-
-    Process* t = new Process(initial_frame, this, jump_base, nullptr);
-    t->detach();
-    t->priority(16);
-    processes.push_back(t);
-
-    return (*this);
-}
-
-
 byte* CPU::tick(decltype(processes)::size_type index) {
     byte* ip = processes[index]->tick();  // returns instruction pointer
     if (processes[index]->terminated()) {
@@ -391,8 +366,10 @@ int CPU::run() {
         throw "null bytecode (maybe not loaded?)";
     }
 
-    iframe();
-    processes[0]->begin();
+    viua::scheduler::VirtualProcessScheduler vps(this);
+    Process *t = vps.bootstrap(commandline_arguments, jump_base);
+    processes.push_back(t);
+
     while (burst());
 
     if (current_process_index < processes.size() and processes[current_process_index]->terminated()) {

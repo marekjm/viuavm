@@ -23,6 +23,7 @@ Process* viua::scheduler::VirtualProcessScheduler::bootstrap(const vector<string
     Process* t = new Process(initial_frame, cpu, jump_base, nullptr);
     t->detach();
     t->priority(16);
+    t->begin();
 
     return t;
 }
