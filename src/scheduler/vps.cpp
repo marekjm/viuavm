@@ -1,5 +1,6 @@
-#ifndef VIUA_SCHEDULER_VPS_H
-#define VIUA_SCHEDULER_VPS_H
+#include <viua/cpu/cpu.h>
+#include <viua/scheduler/vps.h>
 
 
-#endif
+viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(CPU *attached_cpu): cpu(attached_cpu) {
+}
