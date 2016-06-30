@@ -1,0 +1,5 @@
+#ifndef VIUA_SCHEDULER_VPS_H
+#define VIUA_SCHEDULER_VPS_H
+
+
+#endif
