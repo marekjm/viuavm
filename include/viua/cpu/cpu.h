@@ -158,7 +158,6 @@ class CPU {
         Process* spawnWatchdog(Frame*);
         void resurrectWatchdog();
 
-        byte* tick(decltype(processes)::size_type process_index = 0);
         bool burst(viua::scheduler::VirtualProcessScheduler*);
 
         void requestForeignFunctionCall(Frame*, Process*);

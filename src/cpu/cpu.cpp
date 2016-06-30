@@ -224,14 +224,6 @@ vector<string> CPU::inheritanceChainOf(const string& type_name) {
     return ichain;
 }
 
-byte* CPU::tick(decltype(processes)::size_type index) {
-    byte* ip = processes[index]->tick();  // returns instruction pointer
-    if (processes[index]->terminated()) {
-        return nullptr;
-    }
-    return ip;
-}
-
 bool CPU::burst(viua::scheduler::VirtualProcessScheduler *sched) {
     if (not processes.size()) {
         // make CPU stop if there are no processes to run
