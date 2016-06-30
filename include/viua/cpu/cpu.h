@@ -156,9 +156,8 @@ class CPU {
 
         Process* spawn(Frame*, Process* parent_process = nullptr);
         Process* spawnWatchdog(Frame*);
+        Process* currentWatchdog() { return watchdog_process; }
         void resurrectWatchdog();
-
-        bool burst(viua::scheduler::VirtualProcessScheduler*);
 
         void requestForeignFunctionCall(Frame*, Process*);
 

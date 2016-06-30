@@ -224,93 +224,6 @@ vector<string> CPU::inheritanceChainOf(const string& type_name) {
     return ichain;
 }
 
-bool CPU::burst(viua::scheduler::VirtualProcessScheduler *sched) {
-    if (not processes.size()) {
-        // make CPU stop if there are no processes to run
-        return false;
-    }
-
-    current_process_index = 0;
-    bool ticked = false;
-
-    decltype(processes) running_processes;
-    decltype(processes) dead_processes;
-    bool abort_because_of_process_termination = false;
-    for (decltype(processes)::size_type i = 0; i < processes.size(); ++i) {
-        current_process_index = i;
-        auto th = processes[i];
-
-        ticked = (sched->executeQuant(th, th->priority()) or ticked);
-
-        if (th->terminated() and not th->joinable() and th->parent() == nullptr) {
-            if (watchdog_process == nullptr) {
-                abort_because_of_process_termination = true;
-            } else {
-                Object* death_message = new Object("Object");
-                Type* exc = th->transferActiveException();
-                Vector *parameters = new Vector();
-                RegisterSet *top_args = th->trace()[0]->args;
-                for (unsigned long j = 0; j < top_args->size(); ++j) {
-                    if (top_args->at(j)) {
-                        parameters->push(top_args->at(j));
-                    }
-                }
-                top_args->drop();
-                death_message->set("function", new Function(th->trace()[0]->function_name));
-                death_message->set("exception", exc);
-                death_message->set("parameters", parameters);
-                watchdog_process->pass(death_message);
-
-                // push broken process to dead processes list to
-                // erase it later
-                dead_processes.push_back(th);
-
-                // copy what is left after this broken process to running processes array to
-                // prevent losing them
-                // because after the loop the `processes` vector is reset
-                for (decltype(processes)::size_type j = i+1; j < processes.size(); ++j) {
-                    running_processes.push_back(processes[j]);
-                }
-            }
-            break;
-        }
-
-        // if the process stopped and is not joinable declare it dead and
-        // schedule for removal thus shortening the vector of running processes and
-        // speeding up execution
-        if (th->stopped() and (not th->joinable())) {
-            dead_processes.push_back(th);
-        } else {
-            running_processes.push_back(th);
-        }
-    }
-
-    if (abort_because_of_process_termination) {
-        return false;
-    }
-
-    for (decltype(dead_processes)::size_type i = 0; i < dead_processes.size(); ++i) {
-        delete dead_processes[i];
-    }
-
-    // if there were any dead processes we must rebuild the scheduled processes vector
-    if (dead_processes.size()) {
-        processes.erase(processes.begin(), processes.end());
-        for (decltype(running_processes)::size_type i = 0; i < running_processes.size(); ++i) {
-            processes.push_back(running_processes[i]);
-        }
-    }
-
-    while (watchdog_process != nullptr and not watchdog_process->suspended()) {
-        sched->executeQuant(watchdog_process, 0);
-        if (watchdog_process->terminated() or watchdog_process->stopped()) {
-            resurrectWatchdog();
-        }
-    }
-
-    return ticked;
-}
-
 void CPU::requestForeignFunctionCall(Frame *frame, Process *requesting_process) {
     unique_lock<mutex> lock(foreign_call_queue_mutex);
     foreign_call_queue.push_back(new ForeignFunctionCallRequest(frame, requesting_process, this));
@@ -333,7 +246,7 @@ int CPU::run() {
     Process *t = vps.bootstrap(commandline_arguments, jump_base);
     processes.push_back(t);
 
-    while (burst(&vps));
+    while (vps.burst(processes));
 
     if (current_process_index < processes.size() and processes[current_process_index]->terminated()) {
         auto trace = processes[current_process_index]->trace();

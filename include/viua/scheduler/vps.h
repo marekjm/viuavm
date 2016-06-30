@@ -19,6 +19,7 @@ namespace viua {
             public:
 
             bool executeQuant(Process*, unsigned);
+            bool burst(std::vector<Process*>&);
 
             Process* bootstrap(const std::vector<std::string>&, byte*);
 
