@@ -30,7 +30,7 @@ LIBDL ?= -ldl
 
 ############################################################
 # BASICS
-all: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/vdb build/bin/vm/dis build/bin/opcodes.bin platform stdlib
+all: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/dis build/bin/opcodes.bin platform stdlib
 
 remake: clean all
 
