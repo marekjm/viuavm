@@ -18,6 +18,8 @@ namespace viua {
 
             public:
 
+            bool executeQuant(Process*, unsigned);
+
             Process* bootstrap(const std::vector<std::string>&, byte*);
 
             VirtualProcessScheduler(CPU *attached_cpu);

@@ -42,6 +42,13 @@ class ForeignFunctionCallRequest {
 void ff_call_processor(std::vector<ForeignFunctionCallRequest*> *requests, std::map<std::string, ForeignFunction*>* foreign_functions, std::mutex *ff_map_mtx, std::mutex *mtx, std::condition_variable *cv);
 
 
+namespace viua {
+    namespace scheduler {
+        class VirtualProcessScheduler;
+    }
+}
+
+
 class CPU {
     friend Process;
 #ifdef AS_DEBUG_HEADER
@@ -152,8 +159,7 @@ class CPU {
         void resurrectWatchdog();
 
         byte* tick(decltype(processes)::size_type process_index = 0);
-        bool executeQuant(Process*, unsigned);
-        bool burst();
+        bool burst(viua::scheduler::VirtualProcessScheduler*);
 
         void requestForeignFunctionCall(Frame*, Process*);
 

@@ -232,36 +232,7 @@ byte* CPU::tick(decltype(processes)::size_type index) {
     return ip;
 }
 
-bool CPU::executeQuant(Process* th, unsigned priority) {
-    if (th->stopped() and th->joinable()) {
-        // stopped but still joinable
-        // we don't have to deal with "stopped and unjoinable" case here
-        // because it is handled later (after ticking code)
-        return false;
-    }
-    if (th->suspended()) {
-        // do not execute suspended processes
-        return true;
-    }
-
-    for (unsigned j = 0; (priority == 0 or j < priority); ++j) {
-        if (th->stopped()) {
-            // remember to break if the process stopped
-            // otherwise the CPU will try to tick the process and
-            // it will crash (will try to execute instructions from 0x0 pointer)
-            break;
-        }
-        if (th->suspended()) {
-            // do not execute suspended processes
-            break;
-        }
-        th->tick();
-    }
-
-    return true;
-}
-
-bool CPU::burst() {
+bool CPU::burst(viua::scheduler::VirtualProcessScheduler *sched) {
     if (not processes.size()) {
         // make CPU stop if there are no processes to run
         return false;
@@ -277,7 +248,7 @@ bool CPU::burst() {
         current_process_index = i;
         auto th = processes[i];
 
-        ticked = (executeQuant(th, th->priority()) or ticked);
+        ticked = (sched->executeQuant(th, th->priority()) or ticked);
 
         if (th->terminated() and not th->joinable() and th->parent() == nullptr) {
             if (watchdog_process == nullptr) {
@@ -339,7 +310,7 @@ bool CPU::burst() {
     }
 
     while (watchdog_process != nullptr and not watchdog_process->suspended()) {
-        executeQuant(watchdog_process, 0);
+        sched->executeQuant(watchdog_process, 0);
         if (watchdog_process->terminated() or watchdog_process->stopped()) {
             resurrectWatchdog();
         }
@@ -370,7 +341,7 @@ int CPU::run() {
     Process *t = vps.bootstrap(commandline_arguments, jump_base);
     processes.push_back(t);
 
-    while (burst());
+    while (burst(&vps));
 
     if (current_process_index < processes.size() and processes[current_process_index]->terminated()) {
         auto trace = processes[current_process_index]->trace();
