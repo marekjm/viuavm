@@ -23,13 +23,12 @@ byte* Process::opcatch(byte* addr) {
     string type_name = viua::operand::extractString(addr);
     string catcher_block_name = viua::operand::extractString(addr);
 
-    bool block_found = (scheduler->cpu()->block_addresses.count(catcher_block_name) or scheduler->cpu()->linked_blocks.count(catcher_block_name));
-    if (not block_found) {
+    if (not scheduler->isBlock(catcher_block_name)) {
         throw new Exception("registering undefined handler block '" + catcher_block_name + "' to handle " + type_name);
     }
 
     byte* block_address = nullptr;
-    if (scheduler->cpu()->block_addresses.count(catcher_block_name)) {
+    if (scheduler->isLocalBlock(catcher_block_name)) {
         block_address = scheduler->cpu()->bytecode+scheduler->cpu()->block_addresses.at(catcher_block_name);
     } else {
         block_address = scheduler->cpu()->linked_blocks.at(catcher_block_name).second;
@@ -59,13 +58,12 @@ byte* Process::openter(byte* addr) {
      */
     string block_name = viua::operand::extractString(addr);
 
-    bool block_found = (scheduler->cpu()->block_addresses.count(block_name) or scheduler->cpu()->linked_blocks.count(block_name));
-    if (not block_found) {
+    if (not block_found = scheduler->isBlock(block_name)) {
         throw new Exception("cannot enter undefined block: " + block_name);
     }
 
     byte* block_address = nullptr;
-    if (scheduler->cpu()->block_addresses.count(block_name)) {
+    if (scheduler->isLocalBlock(block_name)) {
         block_address = scheduler->cpu()->bytecode+scheduler->cpu()->block_addresses.at(block_name);
         jump_base = scheduler->cpu()->bytecode;
     } else {
