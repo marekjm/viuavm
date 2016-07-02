@@ -16,8 +16,8 @@ byte* Process::opprocess(byte* addr) {
 
     string call_name = viua::operand::extractString(addr);
 
-    bool is_native = (scheduler->cpu()->function_addresses.count(call_name) or scheduler->cpu()->linked_functions.count(call_name));
-    bool is_foreign = scheduler->cpu()->foreign_functions.count(call_name);
+    bool is_native = scheduler->isNativeFunction(call_name);
+    bool is_foreign = scheduler->isForeignFunction(call_name);
 
     if (not (is_native or is_foreign)) {
         throw new Exception("call to undefined function: " + call_name);
@@ -81,8 +81,8 @@ byte* Process::opwatchdog(byte* addr) {
      */
     string call_name = viua::operand::extractString(addr);
 
-    bool is_native = (scheduler->cpu()->function_addresses.count(call_name) or scheduler->cpu()->linked_functions.count(call_name));
-    bool is_foreign = scheduler->cpu()->foreign_functions.count(call_name);
+    bool is_native = scheduler->isNativeFunction(call_name);
+    bool is_foreign = scheduler->isForeignFunction(call_name);
 
     if (not (is_native or is_foreign)) {
         throw new Exception("watchdog process from undefined function: " + call_name);

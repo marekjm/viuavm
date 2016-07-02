@@ -72,7 +72,7 @@ byte* Process::opmsg(byte* addr) {
         throw new Exception("class '" + obj->type() + "' does not accept method '" + method_name + "'");
     }
 
-    bool is_native = (scheduler->cpu()->function_addresses.count(function_name) or scheduler->cpu()->linked_functions.count(function_name));
+    bool is_native = scheduler->isNativeFunction(function_name);
     bool is_foreign = scheduler->isForeignFunction(function_name);
     bool is_foreign_method = scheduler->isForeignMethod(function_name);
 

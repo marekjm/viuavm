@@ -124,9 +124,8 @@ byte* Process::opfcall(byte* addr) {
     Function* fn = static_cast<Function*>(fetch(fn_reg));
 
     string call_name = fn->name();
-    bool function_found = (scheduler->cpu()->function_addresses.count(call_name) or scheduler->cpu()->linked_functions.count(call_name));
 
-    if (not function_found) {
+    if (not scheduler->isNativeFunction(call_name)) {
         throw new Exception("fcall to undefined function: " + call_name);
     }
 

@@ -439,7 +439,7 @@ void Process::pass(Type* message) {
 }
 
 byte* Process::begin() {
-    if (scheduler->cpu()->function_addresses.count(frames[0]->function_name) == 0) {
+    if (not scheduler->isNativeFunction(frames[0]->function_name)) {
         throw new Exception("process from undefined function: " + frames[0]->function_name);
     }
     return (instruction_pointer = (scheduler->cpu()->bytecode + scheduler->cpu()->function_addresses.at(frames[0]->function_name)));

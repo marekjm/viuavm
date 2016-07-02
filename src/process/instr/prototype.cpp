@@ -45,7 +45,7 @@ byte* Process::opattach(byte* addr) {
 
     Prototype* proto = static_cast<Prototype*>(target);
 
-    if (not (scheduler->cpu()->function_addresses.count(function_name) or scheduler->cpu()->linked_functions.count(function_name) or scheduler->isForeignFunction(function_name))) {
+    if (not (scheduler->isNativeFunction(function_name) or scheduler->isForeignFunction(function_name))) {
         throw new Exception("cannot attach undefined function '" + function_name + "' as a method '" + method_name + "' of prototype '" + proto->getTypeName() + "'");
     }
 

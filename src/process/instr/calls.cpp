@@ -88,7 +88,7 @@ byte* Process::opcall(byte* addr) {
 
     string call_name = viua::operand::extractString(addr);
 
-    bool is_native = (scheduler->cpu()->function_addresses.count(call_name) or scheduler->cpu()->linked_functions.count(call_name));
+    bool is_native = scheduler->isNativeFunction(call_name);
     bool is_foreign = scheduler->isForeignFunction(call_name);
     bool is_foreign_method = scheduler->isForeignMethod(call_name);
 
@@ -119,7 +119,7 @@ byte* Process::optailcall(byte* addr) {
      */
     string call_name = viua::operand::extractString(addr);
 
-    bool is_native = (scheduler->cpu()->function_addresses.count(call_name) or scheduler->cpu()->linked_functions.count(call_name));
+    bool is_native = scheduler->isNativeFunction(call_name);
     bool is_foreign = scheduler->isForeignFunction(call_name);
     bool is_foreign_method = scheduler->isForeignMethod(call_name);
 
@@ -189,7 +189,7 @@ byte* Process::opreturn(byte* addr) {
     }
 
     if (frames.size() > 0) {
-        if (scheduler->cpu()->function_addresses.count(frames.back()->function_name)) {
+        if (scheduler->isLocalFunction(frames.back()->function_name)) {
             jump_base = scheduler->cpu()->bytecode;
         } else {
             jump_base = scheduler->cpu()->linked_modules.at(scheduler->cpu()->linked_functions.at(frames.back()->function_name).first).second;
