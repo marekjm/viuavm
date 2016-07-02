@@ -27,14 +27,7 @@ byte* Process::opcatch(byte* addr) {
         throw new Exception("registering undefined handler block '" + catcher_block_name + "' to handle " + type_name);
     }
 
-    byte* block_address = nullptr;
-    if (scheduler->isLocalBlock(catcher_block_name)) {
-        block_address = scheduler->cpu()->bytecode+scheduler->cpu()->block_addresses.at(catcher_block_name);
-    } else {
-        block_address = scheduler->cpu()->linked_blocks.at(catcher_block_name).second;
-    }
-
-    try_frame_new->catchers[type_name] = new Catcher(type_name, catcher_block_name, block_address);
+    try_frame_new->catchers[type_name] = new Catcher(type_name, catcher_block_name);
 
     return addr;
 }
