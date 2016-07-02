@@ -163,7 +163,7 @@ void Process::dropFrame() {
 
 byte* Process::adjustJumpBaseFor(const string& call_name) {
     byte *entry_point = nullptr;
-    auto ep = scheduler->cpu()->getEntryPointOf(call_name);
+    auto ep = scheduler->getEntryPointOf(call_name);
     entry_point = ep.first;
     jump_base = ep.second;
     return entry_point;
