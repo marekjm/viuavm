@@ -249,9 +249,9 @@ int CPU::run() {
     while (vps.burst());
 
     // FIXME: current_process_index is not updated inside VPS::burst()
-    if (current_process_index < processes.size() and processes[current_process_index]->terminated()) {
-        auto trace = processes[current_process_index]->trace();
-        cout << "process " << current_process_index << " spawned using ";
+    if (vps.cpi() < processes.size() and vps.process()->terminated()) {
+        auto trace = vps.process()->trace();
+        cout << "process " << vps.cpi() << " spawned using ";
         if (trace.size() > 1) {
             // if trace size if greater than one, detect if this is main process
             cout << trace[(trace[0]->function_name == ENTRY_FUNCTION_NAME)]->function_name;
@@ -264,7 +264,7 @@ int CPU::run() {
         }
 
         cout << " has terminated" << endl;
-        Type* e = processes[current_process_index]->getActiveException();
+        Type* e = vps.process()->getActiveException();
 
         return_code = 1;
         terminating_exception = e;
