@@ -40,6 +40,8 @@ concurrent processes running.
 
 - enhancement: VM is able to restart watchdog even with no stack trace available,
 - bic: floats are stringified using the `std::fixed` modifier, which limits decimal digits,
+- misc: `VIUA_TEST_SUITE_VALGRIND_CHECKS` environment variable is checked to see if the
+  memory leak tests are to be performed,
 
 
 ----
