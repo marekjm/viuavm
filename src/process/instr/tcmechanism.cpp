@@ -116,11 +116,7 @@ byte* Process::opleave(byte* addr) {
     tryframes.pop_back();
 
     if (frames.size() > 0) {
-        if (scheduler->isLocalFunction(frames.back()->function_name)) {
-            jump_base = scheduler->cpu()->bytecode;
-        } else {
-            jump_base = scheduler->cpu()->linked_modules.at(scheduler->cpu()->linked_functions.at(frames.back()->function_name).first).second;
-        }
+        adjustJumpBaseFor(frames.back()->function_name);
     }
     return addr;
 }

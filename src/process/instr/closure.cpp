@@ -130,13 +130,7 @@ byte* Process::opfcall(byte* addr) {
     }
 
     byte* call_address = nullptr;
-    if (scheduler->isLocalFunction(call_name)) {
-        call_address = scheduler->cpu()->bytecode+scheduler->cpu()->function_addresses.at(call_name);
-        jump_base = scheduler->cpu()->bytecode;
-    } else {
-        call_address = scheduler->cpu()->linked_functions.at(call_name).second;
-        jump_base = scheduler->cpu()->linked_modules.at(scheduler->cpu()->linked_functions.at(call_name).first).second;
-    }
+    call_address = adjustJumpBaseFor(call_name);
 
     // save return address for frame
     byte* return_address = addr;
