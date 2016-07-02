@@ -261,6 +261,10 @@ void CPU::requestForeignFunctionCall(Frame *frame, Process *requesting_process) 
     foreign_call_queue_condition.notify_one();
 }
 
+void CPU::requestForeignMethodCall(const string& name, Type *object, Frame *frame, RegisterSet*, RegisterSet*, Process *p) {
+    foreign_methods.at(name)(object, frame, nullptr, nullptr, p, this);
+}
+
 int CPU::run() {
     /*  VM CPU implementation.
      */

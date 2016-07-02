@@ -38,6 +38,7 @@ namespace viua {
             std::pair<byte*, byte*> getEntryPointOf(const std::string&) const;
 
             void requestForeignFunctionCall(Frame*, Process*) const;
+            void requestForeignMethodCall(const std::string&, Type*, Frame*, RegisterSet*, RegisterSet*, Process*);
 
             auto cpi() const -> decltype(processes)::size_type;
             Process* process(decltype(processes)::size_type);

@@ -166,6 +166,7 @@ class CPU {
         void resurrectWatchdog();
 
         void requestForeignFunctionCall(Frame*, Process*);
+        void requestForeignMethodCall(const std::string&, Type*, Frame*, RegisterSet*, RegisterSet*, Process*);
 
         int run();
         inline decltype(instruction_counter) counter() {

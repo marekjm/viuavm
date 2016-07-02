@@ -67,6 +67,10 @@ void viua::scheduler::VirtualProcessScheduler::requestForeignFunctionCall(Frame 
     attached_cpu->requestForeignFunctionCall(frame, p);
 }
 
+void viua::scheduler::VirtualProcessScheduler::requestForeignMethodCall(const string& name, Type *object, Frame *frame, RegisterSet*, RegisterSet*, Process *p) {
+    attached_cpu->requestForeignMethodCall(name, object, frame, nullptr, nullptr, p);
+}
+
 auto viua::scheduler::VirtualProcessScheduler::cpi() const -> decltype(processes)::size_type {
     return current_process_index;
 }
