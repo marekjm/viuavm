@@ -42,6 +42,9 @@ concurrent processes running.
 - bic: floats are stringified using the `std::fixed` modifier, which limits decimal digits,
 - misc: `VIUA_TEST_SUITE_VALGRIND_CHECKS` environment variable is checked to see if the
   memory leak tests are to be performed,
+- fix: processes can be spawned from dynamically linked functions,
+- fix: machine does not segfault when an exception is passed between modules (i.e. when
+  module A threw it, and module B caught it),
 
 
 ----
