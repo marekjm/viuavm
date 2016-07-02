@@ -151,6 +151,7 @@ class CPU {
         /*  Methods dealing with typesystem related tasks.
          */
         bool isClass(const std::string&) const;
+        bool classAccepts(const std::string&, const std::string&) const;
         std::vector<std::string> inheritanceChainOf(const std::string&) const;
         bool isLocalFunction(const std::string&) const;
         bool isLinkedFunction(const std::string&) const;

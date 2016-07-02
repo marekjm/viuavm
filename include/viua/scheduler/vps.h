@@ -31,6 +31,7 @@ namespace viua {
             CPU* cpu() const;
 
             bool isClass(const std::string&) const;
+            bool classAccepts(const std::string&, const std::string&) const;
             auto inheritanceChainOf(const std::string& name) const -> decltype(attached_cpu->inheritanceChainOf(name));
             bool isLocalFunction(const std::string&) const;
             bool isLinkedFunction(const std::string&) const;

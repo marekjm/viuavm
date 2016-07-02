@@ -196,6 +196,10 @@ bool CPU::isClass(const string& name) const {
     return typesystem.count(name);
 }
 
+bool CPU::classAccepts(const string& klass, const string& method_name) const {
+    return typesystem.at(klass)->accepts(method_name);
+}
+
 vector<string> CPU::inheritanceChainOf(const string& type_name) const {
     /** This methods returns full inheritance chain of a type.
      */

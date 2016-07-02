@@ -47,6 +47,10 @@ bool viua::scheduler::VirtualProcessScheduler::isClass(const string& name) const
     return attached_cpu->isClass(name);
 }
 
+bool viua::scheduler::VirtualProcessScheduler::classAccepts(const string& klass, const string& method) const {
+    return attached_cpu->classAccepts(klass, method);
+}
+
 auto viua::scheduler::VirtualProcessScheduler::inheritanceChainOf(const std::string& name) const -> decltype(attached_cpu->inheritanceChainOf(name)) {
     return attached_cpu->inheritanceChainOf(name);
 }
