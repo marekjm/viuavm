@@ -242,7 +242,7 @@ build/bin/vm/dis: build/dis.o build/loader.o build/machine.o build/cg/disassembl
 build/scheduler/vps.o: src/scheduler/vps.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
-build/cpu/cpu.o: src/cpu/cpu.cpp include/viua/cpu/cpu.h include/viua/bytecode/opcodes.h include/viua/cpu/frame.h
+build/cpu/cpu.o: src/cpu/cpu.cpp include/viua/cpu/cpu.h include/viua/bytecode/opcodes.h include/viua/cpu/frame.h build/scheduler/vps.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
 build/cpu/registserset.o: src/cpu/registerset.cpp include/viua/cpu/registerset.h
