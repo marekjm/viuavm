@@ -1224,6 +1224,12 @@ class ConcurrencyTests(unittest.TestCase):
             'hi, I am process 0',
         ])
 
+    def testProcessFromDynamicallyLinkedFunction(self):
+        source_lib = 'process_from_linked_fun.asm'
+        lib_path = 'test_module.vlib'
+        assemble(os.path.join(self.PATH, source_lib), out=lib_path, opts=('--lib',))
+        runTestNoDisassemblyRerun(self, 'process_from_linked_base.asm', 'Hello World!')
+
 
 class WatchdogTests(unittest.TestCase):
     PATH = './sample/asm/watchdog'

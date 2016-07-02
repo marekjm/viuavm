@@ -442,7 +442,7 @@ byte* Process::begin() {
     if (not scheduler->isNativeFunction(frames[0]->function_name)) {
         throw new Exception("process from undefined function: " + frames[0]->function_name);
     }
-    return (instruction_pointer = (scheduler->cpu()->bytecode + scheduler->cpu()->function_addresses.at(frames[0]->function_name)));
+    return (instruction_pointer = adjustJumpBaseFor(frames[0]->function_name));
 }
 
 Process::~Process() {
