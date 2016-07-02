@@ -39,6 +39,7 @@ namespace viua {
             bool isForeignMethod(const std::string&) const;
             bool isForeignFunction(const std::string&) const;
 
+            std::string resolveMethodName(const std::string&, const std::string&) const;
             std::pair<byte*, byte*> getEntryPointOf(const std::string&) const;
 
             void requestForeignFunctionCall(Frame*, Process*) const;

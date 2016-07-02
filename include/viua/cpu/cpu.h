@@ -158,6 +158,8 @@ class CPU {
         bool isNativeFunction(const std::string&) const;
         bool isForeignMethod(const std::string&) const;
         bool isForeignFunction(const std::string&) const;
+
+        std::string resolveMethodName(const std::string&, const std::string&) const;
         std::pair<byte*, byte*> getEntryPointOf(const std::string&) const;
 
         /// These two methods are used to inject pure-C++ classes into machine's typesystem.

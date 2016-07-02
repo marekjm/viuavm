@@ -75,6 +75,10 @@ bool viua::scheduler::VirtualProcessScheduler::isForeignFunction(const string& n
     return attached_cpu->isForeignFunction(name);
 }
 
+string viua::scheduler::VirtualProcessScheduler::resolveMethodName(const string& klass, const string& method) const {
+    return attached_cpu->resolveMethodName(klass, method);
+}
+
 pair<byte*, byte*> viua::scheduler::VirtualProcessScheduler::getEntryPointOf(const std::string& name) const {
     return attached_cpu->getEntryPointOf(name);
 }

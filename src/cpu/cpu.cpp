@@ -252,6 +252,10 @@ bool CPU::isForeignFunction(const string& name) const {
     return foreign_functions.count(name);
 }
 
+string CPU::resolveMethodName(const string& klass, const string& method_name) const {
+    return typesystem.at(klass)->resolvesTo(method_name);
+}
+
 pair<byte*, byte*> CPU::getEntryPointOf(const std::string& name) const {
     byte *entry_point = nullptr;
     byte *module_base = nullptr;
