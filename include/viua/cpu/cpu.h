@@ -76,7 +76,6 @@ class CPU {
 
     /*  Function and block names mapped to bytecode addresses.
      */
-    byte* jump_base;
     std::map<std::string, uint64_t> function_addresses;
     std::map<std::string, uint64_t> block_addresses;
 
@@ -201,7 +200,6 @@ class CPU {
             watchdog_process_register_count(0),
             watchdog_process(nullptr),
             current_process_index(0),
-            jump_base(nullptr),
             thrown(nullptr), caught(nullptr),
             return_code(0), return_exception(""), return_message(""),
             instruction_counter(0),

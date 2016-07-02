@@ -296,10 +296,10 @@ class Process {
         }
         inline std::vector<Frame*> trace() { return frames; }
 
-        Process(Frame* frm, viua::scheduler::VirtualProcessScheduler *sch, decltype(jump_base) jb, Process* pt): scheduler(sch), parent_process(pt), entry_function(frm->function_name),
+        Process(Frame* frm, viua::scheduler::VirtualProcessScheduler *sch, Process* pt): scheduler(sch), parent_process(pt), entry_function(frm->function_name),
             debug(false),
             regset(nullptr), uregset(nullptr), tmp(nullptr),
-            jump_base(jb),
+            jump_base(nullptr),
             frame_new(nullptr), try_frame_new(nullptr),
             thrown(nullptr), caught(nullptr), has_unhandled_exception(false),
             return_value(nullptr),

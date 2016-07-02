@@ -42,7 +42,6 @@ CPU& CPU::load(byte* bc) {
      */
     if (bytecode) { delete[] bytecode; }
     bytecode = bc;
-    jump_base = bytecode;
     return (*this);
 }
 
@@ -159,7 +158,7 @@ void CPU::loadForeignLibrary(const string& module) {
 
 Process* CPU::spawn(Frame* frm, Process* parent_process) {
     unique_lock<std::mutex> lck{processes_mtx};
-    Process* thrd = new Process(frm, base_vps, jump_base, parent_process);
+    Process* thrd = new Process(frm, base_vps, parent_process);
     thrd->begin();
     processes.push_back(thrd);
     return thrd;
@@ -170,7 +169,7 @@ Process* CPU::spawnWatchdog(Frame* frm) {
     }
     unique_lock<std::mutex> lck{processes_mtx};
     watchdog_function = frm->function_name;
-    Process* thrd = new Process(frm, base_vps, jump_base, nullptr);
+    Process* thrd = new Process(frm, base_vps, nullptr);
     thrd->begin();
     watchdog_process = thrd;
     return thrd;
@@ -323,7 +322,7 @@ int CPU::run() {
     }
 
     viua::scheduler::VirtualProcessScheduler vps(this, &processes);
-    vps.bootstrap(commandline_arguments, jump_base);
+    vps.bootstrap(commandline_arguments);
 
     base_vps = &vps;
 

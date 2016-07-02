@@ -64,7 +64,7 @@ namespace viua {
             bool executeQuant(Process*, unsigned);
             bool burst();
 
-            void bootstrap(const std::vector<std::string>&, byte*);
+            void bootstrap(const std::vector<std::string>&);
 
             VirtualProcessScheduler(CPU*, decltype(procs) ps);
         };

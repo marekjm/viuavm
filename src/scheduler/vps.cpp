@@ -227,7 +227,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
     return ticked;
 }
 
-void viua::scheduler::VirtualProcessScheduler::bootstrap(const vector<string>& commandline_arguments, byte *jump_base) {
+void viua::scheduler::VirtualProcessScheduler::bootstrap(const vector<string>& commandline_arguments) {
     Frame *initial_frame = new Frame(nullptr, 0, 2);
     initial_frame->function_name = ENTRY_FUNCTION_NAME;
 
@@ -238,7 +238,7 @@ void viua::scheduler::VirtualProcessScheduler::bootstrap(const vector<string>& c
     }
     initial_frame->regset->set(1, cmdline);
 
-    Process* t = new Process(initial_frame, this, jump_base, nullptr);
+    Process* t = new Process(initial_frame, this, nullptr);
     t->detach();
     t->priority(16);
     t->begin();
