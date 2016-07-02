@@ -26,7 +26,7 @@ byte* Process::opderive(byte* addr) {
 
     string class_name = viua::operand::extractString(addr);
 
-    if (scheduler->cpu()->typesystem.count(class_name) == 0) {
+    if (not scheduler->isClass(class_name)) {
         throw new Exception("cannot derive from unregistered type: " + class_name);
     }
 
