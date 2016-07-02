@@ -60,11 +60,11 @@ byte* Process::opmsg(byte* addr) {
 
     string function_name = "";
     for (unsigned i = 0; i < mro.size(); ++i) {
-        if (scheduler->cpu()->typesystem.count(mro[i]) == 0) {
+        if (not scheduler->isClass(mro[i])) {
             throw new Exception("unavailable base type in inheritance hierarchy of " + mro[0] + ": " + mro[i]);
         }
-        if (scheduler->cpu()->typesystem.at(mro[i])->accepts(method_name)) {
-            function_name = scheduler->cpu()->typesystem.at(mro[i])->resolvesTo(method_name);
+        if (scheduler->classAccepts(mro[i], method_name)) {
+            function_name = scheduler->resolveMethodName(mro[i], method_name);
             break;
         }
     }
