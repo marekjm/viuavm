@@ -121,10 +121,6 @@ class CPU {
 
     std::vector<void*> cxx_dynamic_lib_handles;
 
-    /*  Methods dealing with typesystem related tasks.
-     */
-    std::vector<std::string> inheritanceChainOf(const std::string&);
-
     public:
         /*  Methods dealing with dynamic library loading.
          */
@@ -151,6 +147,11 @@ class CPU {
 
         CPU& registerExternalFunction(const std::string&, ForeignFunction*);
         CPU& removeExternalFunction(std::string);
+
+        /*  Methods dealing with typesystem related tasks.
+         */
+        bool isClass(const std::string&) const;
+        std::vector<std::string> inheritanceChainOf(const std::string&) const;
 
         /// These two methods are used to inject pure-C++ classes into machine's typesystem.
         CPU& registerForeignPrototype(const std::string&, Prototype*);

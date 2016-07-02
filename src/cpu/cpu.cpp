@@ -192,7 +192,11 @@ void CPU::resurrectWatchdog() {
     spawnWatchdog(frm);
 }
 
-vector<string> CPU::inheritanceChainOf(const string& type_name) {
+bool CPU::isClass(const string& name) const {
+    return typesystem.count(name);
+}
+
+vector<string> CPU::inheritanceChainOf(const string& type_name) const {
     /** This methods returns full inheritance chain of a type.
      */
     if (typesystem.count(type_name) == 0) {

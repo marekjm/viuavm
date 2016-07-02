@@ -43,6 +43,14 @@ CPU* viua::scheduler::VirtualProcessScheduler::cpu() const {
     return attached_cpu;
 }
 
+bool viua::scheduler::VirtualProcessScheduler::isClass(const string& name) const {
+    return attached_cpu->isClass(name);
+}
+
+auto viua::scheduler::VirtualProcessScheduler::inheritanceChainOf(const std::string& name) const -> decltype(attached_cpu->inheritanceChainOf(name)) {
+    return attached_cpu->inheritanceChainOf(name);
+}
+
 auto viua::scheduler::VirtualProcessScheduler::cpi() const -> decltype(processes)::size_type {
     return current_process_index;
 }

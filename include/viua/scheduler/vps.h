@@ -27,6 +27,9 @@ namespace viua {
 
             CPU* cpu() const;
 
+            bool isClass(const std::string&) const;
+            auto inheritanceChainOf(const std::string& name) const -> decltype(attached_cpu->inheritanceChainOf(name));
+
             auto cpi() const -> decltype(processes)::size_type;
             Process* process(decltype(processes)::size_type);
             Process* process();

@@ -302,8 +302,8 @@ tuple<TryFrame*, string> Process::findCatchFrame() {
         bool handler_found = tframe->catchers.count(handler_found_for_type);
 
         // FIXME: mutex
-        if ((not handler_found) and scheduler->cpu()->typesystem.count(handler_found_for_type)) {
-            vector<string> types_to_check = scheduler->cpu()->inheritanceChainOf(handler_found_for_type);
+        if ((not handler_found) and scheduler->isClass(handler_found_for_type)) {
+            vector<string> types_to_check = scheduler->inheritanceChainOf(handler_found_for_type);
             for (unsigned j = 0; j < types_to_check.size(); ++j) {
                 if (tframe->catchers.count(types_to_check[j])) {
                     handler_found = true;

@@ -21,7 +21,7 @@ byte* Process::opnew(byte* addr) {
 
     string class_name = viua::operand::extractString(addr);
 
-    if (scheduler->cpu()->typesystem.count(class_name) == 0) {
+    if (not scheduler->isClass(class_name)) {
         throw new Exception("cannot create new instance of unregistered type: " + class_name);
     }
 
@@ -52,10 +52,10 @@ byte* Process::opmsg(byte* addr) {
     if (Pointer* ptr = dynamic_cast<Pointer*>(obj)) {
         obj = ptr->to();
     }
-    if (scheduler->cpu()->typesystem.count(obj->type()) == 0) {
+    if (not scheduler->isClass(obj->type())) {
         throw new Exception("unregistered type cannot be used for dynamic dispatch: " + obj->type());
     }
-    vector<string> mro = scheduler->cpu()->inheritanceChainOf(obj->type());
+    vector<string> mro = scheduler->inheritanceChainOf(obj->type());
     mro.insert(mro.begin(), obj->type());
 
     string function_name = "";
