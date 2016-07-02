@@ -56,6 +56,8 @@ namespace viua {
             void loadForeignLibrary(const std::string&);
 
             auto cpi() const -> decltype(processes)::size_type;
+            auto size() const -> decltype(processes)::size_type;
+
             Process* process(decltype(processes)::size_type);
             Process* process();
             Process* spawn(Frame*, Process*);

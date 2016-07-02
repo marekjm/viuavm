@@ -123,6 +123,11 @@ auto viua::scheduler::VirtualProcessScheduler::cpi() const -> decltype(processes
     return current_process_index;
 }
 
+
+auto viua::scheduler::VirtualProcessScheduler::size() const -> decltype(processes)::size_type {
+    return procs->size();
+}
+
 Process* viua::scheduler::VirtualProcessScheduler::process(decltype(processes)::size_type index) {
     return procs->at(index);
 }

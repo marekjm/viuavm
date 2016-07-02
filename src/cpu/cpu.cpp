@@ -329,7 +329,7 @@ int CPU::run() {
     while (vps.burst());
 
     // FIXME: current_process_index is not updated inside VPS::burst()
-    if (vps.cpi() < processes.size() and vps.process()->terminated()) {
+    if (vps.cpi() < vps.size() and vps.process()->terminated()) {
         auto trace = vps.process()->trace();
         cout << "process " << vps.cpi() << " spawned using ";
         if (trace.size() > 1) {
