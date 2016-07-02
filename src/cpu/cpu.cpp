@@ -243,8 +243,7 @@ int CPU::run() {
     }
 
     viua::scheduler::VirtualProcessScheduler vps(this, &processes);
-    Process *t = vps.bootstrap(commandline_arguments, jump_base);
-    processes.push_back(t);
+    vps.bootstrap(commandline_arguments, jump_base);
 
     while (vps.burst());
 
