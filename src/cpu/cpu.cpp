@@ -264,6 +264,20 @@ bool CPU::isLinkedBlock(const string& name) const {
     return linked_blocks.count(name);
 }
 
+pair<byte*, byte*> CPU::getEntryPointOfBlock(const std::string& name) const {
+    byte *entry_point = nullptr;
+    byte *module_base = nullptr;
+    if (block_addresses.count(name)) {
+        entry_point = (bytecode + block_addresses.at(name));
+        module_base = bytecode;
+    } else {
+        auto lf = linked_blocks.at(name);
+        entry_point = lf.second;
+        module_base = linked_modules.at(lf.first).second;
+    }
+    return pair<byte*, byte*>(entry_point, module_base);
+}
+
 string CPU::resolveMethodName(const string& klass, const string& method_name) const {
     return typesystem.at(klass)->resolvesTo(method_name);
 }

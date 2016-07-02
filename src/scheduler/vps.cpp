@@ -87,6 +87,10 @@ bool viua::scheduler::VirtualProcessScheduler::isLinkedBlock(const string& name)
     return attached_cpu->isLinkedBlock(name);
 }
 
+pair<byte*, byte*> viua::scheduler::VirtualProcessScheduler::getEntryPointOfBlock(const std::string& name) const {
+    return attached_cpu->getEntryPointOfBlock(name);
+}
+
 string viua::scheduler::VirtualProcessScheduler::resolveMethodName(const string& klass, const string& method) const {
     return attached_cpu->resolveMethodName(klass, method);
 }

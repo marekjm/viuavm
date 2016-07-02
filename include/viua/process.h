@@ -102,6 +102,7 @@ class Process {
     TryFrame* requestNewTryFrame();
     void pushFrame();
     void dropFrame();
+    byte* adjustJumpBaseForBlock(const std::string&);
     byte* adjustJumpBaseFor(const std::string&);
     // call native (i.e. written in Viua) function
     byte* callNative(byte*, const std::string&, const bool, const unsigned, const std::string&);

@@ -162,6 +162,7 @@ class CPU {
         bool isBlock(const std::string&) const;
         bool isLocalBlock(const std::string&) const;
         bool isLinkedBlock(const std::string&) const;
+        std::pair<byte*, byte*> getEntryPointOfBlock(const std::string&) const;
 
         std::string resolveMethodName(const std::string&, const std::string&) const;
         std::pair<byte*, byte*> getEntryPointOf(const std::string&) const;
