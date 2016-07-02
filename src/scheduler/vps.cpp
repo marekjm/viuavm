@@ -39,6 +39,18 @@ bool viua::scheduler::VirtualProcessScheduler::executeQuant(Process *th, unsigne
     return true;
 }
 
+auto viua::scheduler::VirtualProcessScheduler::cpi() const -> decltype(processes)::size_type {
+    return current_process_index;
+}
+
+Process* viua::scheduler::VirtualProcessScheduler::process(decltype(processes)::size_type index) {
+    return procs->at(index);
+}
+
+Process* viua::scheduler::VirtualProcessScheduler::process() {
+    return process(current_process_index);
+}
+
 bool viua::scheduler::VirtualProcessScheduler::burst() {
     if (not procs->size()) {
         // make CPU stop if there are no processes_list to run
@@ -51,6 +63,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
     decltype(running_processes_list) dead_processes_list;
     bool abort_because_of_process_termination = false;
     for (decltype(running_processes_list)::size_type i = 0; i < procs->size(); ++i) {
+        current_process_index = i;
         auto th = procs->at(i);
 
         ticked = (executeQuant(th, th->priority()) or ticked);

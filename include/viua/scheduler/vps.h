@@ -25,6 +25,10 @@ namespace viua {
 
             public:
 
+            auto cpi() const -> decltype(processes)::size_type;
+            Process* process(decltype(processes)::size_type);
+            Process* process();
+
             bool executeQuant(Process*, unsigned);
             bool burst();
 
