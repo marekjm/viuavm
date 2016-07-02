@@ -242,11 +242,11 @@ int CPU::run() {
         throw "null bytecode (maybe not loaded?)";
     }
 
-    viua::scheduler::VirtualProcessScheduler vps(this);
+    viua::scheduler::VirtualProcessScheduler vps(this, &processes);
     Process *t = vps.bootstrap(commandline_arguments, jump_base);
     processes.push_back(t);
 
-    while (vps.burst(processes));
+    while (vps.burst());
 
     // FIXME: current_process_index is not updated inside VPS::burst()
     if (current_process_index < processes.size() and processes[current_process_index]->terminated()) {
