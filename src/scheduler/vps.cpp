@@ -150,7 +150,7 @@ void viua::scheduler::VirtualProcessScheduler::bootstrap(const vector<string>& c
     }
     initial_frame->regset->set(1, cmdline);
 
-    Process* t = new Process(initial_frame, cpu, jump_base, nullptr);
+    Process* t = new Process(initial_frame, cpu, this, jump_base, nullptr);
     t->detach();
     t->priority(16);
     t->begin();

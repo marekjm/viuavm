@@ -27,6 +27,11 @@ class HaltException : public std::runtime_error {
 
 
 class CPU;
+namespace viua {
+    namespace scheduler {
+        class VirtualProcessScheduler;
+    }
+}
 
 
 class Process {
@@ -34,6 +39,9 @@ class Process {
     public:
 #endif
     CPU *cpu;
+
+    viua::scheduler::VirtualProcessScheduler *scheduler;
+
     Process* parent_process;
     const std::string entry_function;
 
@@ -289,7 +297,7 @@ class Process {
         }
         inline std::vector<Frame*> trace() { return frames; }
 
-        Process(Frame* frm, CPU *_cpu, decltype(jump_base) jb, Process* pt): cpu(_cpu), parent_process(pt), entry_function(frm->function_name),
+        Process(Frame* frm, CPU *_cpu, viua::scheduler::VirtualProcessScheduler *sch, decltype(jump_base) jb, Process* pt): cpu(_cpu), scheduler(sch), parent_process(pt), entry_function(frm->function_name),
             debug(false),
             regset(nullptr), uregset(nullptr), tmp(nullptr),
             jump_base(jb),

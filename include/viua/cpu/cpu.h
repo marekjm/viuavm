@@ -61,6 +61,8 @@ class CPU {
     uint64_t bytecode_size;
     uint64_t executable_offset;
 
+    viua::scheduler::VirtualProcessScheduler *base_vps;
+
     // vector of all processes machine is executing
     std::vector<Process*> processes;
     std::string watchdog_function;
@@ -177,6 +179,7 @@ class CPU {
 
         CPU():
             bytecode(nullptr), bytecode_size(0), executable_offset(0),
+            base_vps(nullptr),
             watchdog_function(""),
             watchdog_process_register_count(0),
             watchdog_process(nullptr),
