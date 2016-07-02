@@ -270,7 +270,7 @@ byte* Process::callForeignMethod(byte* return_address, Type* object, const strin
 }
 
 void Process::adjustInstructionPointer(TryFrame* tframe, string handler_found_for_type) {
-    instruction_pointer = tframe->catchers.at(handler_found_for_type)->block_address;
+    instruction_pointer = adjustJumpBaseForBlock(tframe->catchers.at(handler_found_for_type)->catcher_name);
 }
 void Process::unwindCallStack(TryFrame* tframe) {
     unsigned distance = 0;
