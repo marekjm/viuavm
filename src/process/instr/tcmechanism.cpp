@@ -58,7 +58,7 @@ byte* Process::openter(byte* addr) {
      */
     string block_name = viua::operand::extractString(addr);
 
-    if (not block_found = scheduler->isBlock(block_name)) {
+    if (not scheduler->isBlock(block_name)) {
         throw new Exception("cannot enter undefined block: " + block_name);
     }
 
