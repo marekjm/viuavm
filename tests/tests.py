@@ -839,6 +839,16 @@ class TryCatchBlockTests(unittest.TestCase):
         runTest(self, 'catching_builtin_type.asm', '42')
 
 
+class ThrowCatchMechanismTests(unittest.TestCase):
+    PATH = './sample/asm/exceptions'
+
+    def testCatchingExceptionThrownInDifferentModule(self):
+        source_lib = 'thrown_in_linked_caught_in_static_fun.asm'
+        lib_path = 'test_module.vlib'
+        assemble(os.path.join(self.PATH, source_lib), out=lib_path, opts=('--lib',))
+        runTestNoDisassemblyRerun(self, 'thrown_in_linked_caught_in_static_base.asm', 'Hello World!')
+
+
 class CatchingMachineThrownExceptionTests(unittest.TestCase):
     """Tests for catching machine-thrown exceptions.
     """
