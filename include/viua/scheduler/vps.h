@@ -39,6 +39,10 @@ namespace viua {
             bool isForeignMethod(const std::string&) const;
             bool isForeignFunction(const std::string&) const;
 
+            bool isBlock(const std::string&) const;
+            bool isLocalBlock(const std::string&) const;
+            bool isLinkedBlock(const std::string&) const;
+
             std::string resolveMethodName(const std::string&, const std::string&) const;
             std::pair<byte*, byte*> getEntryPointOf(const std::string&) const;
 

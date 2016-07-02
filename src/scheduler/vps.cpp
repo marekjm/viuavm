@@ -75,6 +75,18 @@ bool viua::scheduler::VirtualProcessScheduler::isForeignFunction(const string& n
     return attached_cpu->isForeignFunction(name);
 }
 
+bool viua::scheduler::VirtualProcessScheduler::isBlock(const string& name) const {
+    return attached_cpu->isBlock(name);
+}
+
+bool viua::scheduler::VirtualProcessScheduler::isLocalBlock(const string& name) const {
+    return attached_cpu->isLocalBlock(name);
+}
+
+bool viua::scheduler::VirtualProcessScheduler::isLinkedBlock(const string& name) const {
+    return attached_cpu->isLinkedBlock(name);
+}
+
 string viua::scheduler::VirtualProcessScheduler::resolveMethodName(const string& klass, const string& method) const {
     return attached_cpu->resolveMethodName(klass, method);
 }

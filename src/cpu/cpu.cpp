@@ -252,6 +252,18 @@ bool CPU::isForeignFunction(const string& name) const {
     return foreign_functions.count(name);
 }
 
+bool CPU::isBlock(const string& name) const {
+    return (block_addresses.count(name) or linked_blocks.count(name));
+}
+
+bool CPU::isLocalBlock(const string& name) const {
+    return block_addresses.count(name);
+}
+
+bool CPU::isLinkedBlock(const string& name) const {
+    return linked_blocks.count(name);
+}
+
 string CPU::resolveMethodName(const string& klass, const string& method_name) const {
     return typesystem.at(klass)->resolvesTo(method_name);
 }
