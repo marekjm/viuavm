@@ -42,6 +42,69 @@ bool usage(const char* program, bool show_help, bool show_version, bool verbose)
     return (show_help or show_version);
 }
 
+void printStackTrace(CPU& cpu) {
+    vector<Frame*> trace = cpu.trace();
+    cout << "stack trace: from entry point, most recent call last...\n";
+    for (unsigned i = (trace.size() and trace[0]->function_name == "__entry"); i < trace.size(); ++i) {
+        cout << "  " << stringifyFunctionInvocation(trace[i]) << "\n";
+    }
+    cout << "\n";
+
+    Type* thrown_object = cpu.terminatedBy();
+    Exception* ex = dynamic_cast<Exception*>(thrown_object);
+    string ex_type = thrown_object->type();
+
+    cout << "exception after " << cpu.counter() << " ticks" << endl;
+    cout << "failed instruction: " << get<0>(disassembler::instruction(cpu.executionAt())) << endl;
+    cout << "uncaught object: " << ex_type << " = " << (ex ? ex->what() : thrown_object->str()) << endl;
+    cout << "\n";
+
+    cout << "frame details:\n";
+
+    if (trace.size()) {
+        Frame* last = trace.back();
+        if (last->regset->size()) {
+            unsigned non_empty = 0;
+            for (unsigned r = 0; r < last->regset->size(); ++r) {
+                if (last->regset->at(r) != nullptr) { ++non_empty; }
+            }
+            cout << "  non-empty registers: " << non_empty << '/' << last->regset->size();
+            cout << (non_empty ? ":\n" : "\n");
+            for (unsigned r = 0; r < last->regset->size(); ++r) {
+                if (last->regset->at(r) == nullptr) { continue; }
+                cout << "    registers[" << r << "]: ";
+                cout << '<' << last->regset->get(r)->type() << "> " << last->regset->get(r)->str() << endl;
+            }
+        } else {
+            cout << "  no registers were allocated for this frame" << endl;
+        }
+
+        if (last->args->size()) {
+            cout << "  non-empty arguments (out of " << last->args->size() << "):" << endl;
+            for (unsigned r = 0; r < last->args->size(); ++r) {
+                if (last->args->at(r) == nullptr) { continue; }
+                cout << "    arguments[" << r << "]: ";
+                if (last->args->isflagged(r, MOVED)) {
+                    cout << "[moved] ";
+                }
+                if (Pointer* ptr = dynamic_cast<Pointer*>(last->args->get(r))) {
+                    if (ptr->expired()) {
+                        cout << "<ExpiredPointer>" << endl;
+                    } else {
+                        cout << '<' << ptr->type() << '>' << endl;
+                    }
+                } else {
+                    cout << '<' << last->args->get(r)->type() << "> " << last->args->get(r)->str() << endl;
+                }
+            }
+        } else {
+            cout << "  no arguments were passed to this frame" << endl;
+        }
+    } else {
+        cout << "no stack trace available" << endl;
+    }
+}
+
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
     vector<string> args;
@@ -122,66 +185,7 @@ int main(int argc, char* argv[]) {
     tie(ret_code, return_exception, return_message) = cpu.exitcondition();
 
     if (cpu.terminated()) {
-        vector<Frame*> trace = cpu.trace();
-        cout << "stack trace: from entry point, most recent call last...\n";
-        for (unsigned i = (trace.size() and trace[0]->function_name == "__entry"); i < trace.size(); ++i) {
-            cout << "  " << stringifyFunctionInvocation(trace[i]) << "\n";
-        }
-        cout << "\n";
-
-        Type* thrown_object = cpu.terminatedBy();
-        Exception* ex = dynamic_cast<Exception*>(thrown_object);
-        string ex_type = thrown_object->type();
-
-        cout << "exception after " << cpu.counter() << " ticks" << endl;
-        cout << "failed instruction: " << get<0>(disassembler::instruction(cpu.executionAt())) << endl;
-        cout << "uncaught object: " << ex_type << " = " << (ex ? ex->what() : thrown_object->str()) << endl;
-        cout << "\n";
-
-        cout << "frame details:\n";
-
-        if (trace.size()) {
-            Frame* last = trace.back();
-            if (last->regset->size()) {
-                unsigned non_empty = 0;
-                for (unsigned r = 0; r < last->regset->size(); ++r) {
-                    if (last->regset->at(r) != nullptr) { ++non_empty; }
-                }
-                cout << "  non-empty registers: " << non_empty << '/' << last->regset->size();
-                cout << (non_empty ? ":\n" : "\n");
-                for (unsigned r = 0; r < last->regset->size(); ++r) {
-                    if (last->regset->at(r) == nullptr) { continue; }
-                    cout << "    registers[" << r << "]: ";
-                    cout << '<' << last->regset->get(r)->type() << "> " << last->regset->get(r)->str() << endl;
-                }
-            } else {
-                cout << "  no registers were allocated for this frame" << endl;
-            }
-
-            if (last->args->size()) {
-                cout << "  non-empty arguments (out of " << last->args->size() << "):" << endl;
-                for (unsigned r = 0; r < last->args->size(); ++r) {
-                    if (last->args->at(r) == nullptr) { continue; }
-                    cout << "    arguments[" << r << "]: ";
-                    if (last->args->isflagged(r, MOVED)) {
-                        cout << "[moved] ";
-                    }
-                    if (Pointer* ptr = dynamic_cast<Pointer*>(last->args->get(r))) {
-                        if (ptr->expired()) {
-                            cout << "<ExpiredPointer>" << endl;
-                        } else {
-                            cout << '<' << ptr->type() << '>' << endl;
-                        }
-                    } else {
-                        cout << '<' << last->args->get(r)->type() << "> " << last->args->get(r)->str() << endl;
-                    }
-                }
-            } else {
-                cout << "  no arguments were passed to this frame" << endl;
-            }
-        } else {
-            cout << "no stack trace available" << endl;
-        }
+        printStackTrace(cpu);
     }
 
     return ret_code;
