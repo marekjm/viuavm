@@ -16,6 +16,9 @@ namespace viua {
              */
             CPU *cpu;
 
+            std::vector<Process*> processes;
+            decltype(processes)::size_type current_process_index;
+
             public:
 
             bool executeQuant(Process*, unsigned);
