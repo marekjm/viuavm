@@ -228,6 +228,18 @@ vector<string> CPU::inheritanceChainOf(const string& type_name) const {
     return ichain;
 }
 
+bool CPU::isLocalFunction(const string& name) const {
+    return function_addresses.count(name);
+}
+
+bool CPU::isLinkedFunction(const string& name) const {
+    return linked_functions.count(name);
+}
+
+bool CPU::isNativeFunction(const string& name) const {
+    return (function_addresses.count(name) or linked_functions.count(name));
+}
+
 bool CPU::isForeignMethod(const string& name) const {
     return foreign_methods.count(name);
 }

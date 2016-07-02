@@ -152,6 +152,9 @@ class CPU {
          */
         bool isClass(const std::string&) const;
         std::vector<std::string> inheritanceChainOf(const std::string&) const;
+        bool isLocalFunction(const std::string&) const;
+        bool isLinkedFunction(const std::string&) const;
+        bool isNativeFunction(const std::string&) const;
         bool isForeignMethod(const std::string&) const;
         bool isForeignFunction(const std::string&) const;
         std::pair<byte*, byte*> getEntryPointOf(const std::string&) const;

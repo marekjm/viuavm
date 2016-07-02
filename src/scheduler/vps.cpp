@@ -51,6 +51,18 @@ auto viua::scheduler::VirtualProcessScheduler::inheritanceChainOf(const std::str
     return attached_cpu->inheritanceChainOf(name);
 }
 
+bool viua::scheduler::VirtualProcessScheduler::isLocalFunction(const string& name) const {
+    return attached_cpu->isLocalFunction(name);
+}
+
+bool viua::scheduler::VirtualProcessScheduler::isLinkedFunction(const string& name) const {
+    return attached_cpu->isLinkedFunction(name);
+}
+
+bool viua::scheduler::VirtualProcessScheduler::isNativeFunction(const string& name) const {
+    return attached_cpu->isNativeFunction(name);
+}
+
 bool viua::scheduler::VirtualProcessScheduler::isForeignMethod(const string& name) const {
     return attached_cpu->isForeignMethod(name);
 }
