@@ -270,6 +270,10 @@ pair<byte*, byte*> CPU::getEntryPointOf(const std::string& name) const {
     return pair<byte*, byte*>(entry_point, module_base);
 }
 
+void CPU::registerPrototype(Prototype *proto) {
+    typesystem[proto->getTypeName()] = proto;
+}
+
 void CPU::requestForeignFunctionCall(Frame *frame, Process *requesting_process) {
     unique_lock<mutex> lock(foreign_call_queue_mutex);
     foreign_call_queue.push_back(new ForeignFunctionCallRequest(frame, requesting_process, this));

@@ -83,6 +83,10 @@ pair<byte*, byte*> viua::scheduler::VirtualProcessScheduler::getEntryPointOf(con
     return attached_cpu->getEntryPointOf(name);
 }
 
+void viua::scheduler::VirtualProcessScheduler::registerPrototype(Prototype *proto) {
+    attached_cpu->registerPrototype(proto);
+}
+
 void viua::scheduler::VirtualProcessScheduler::requestForeignFunctionCall(Frame *frame, Process *p) const {
     attached_cpu->requestForeignFunctionCall(frame, p);
 }

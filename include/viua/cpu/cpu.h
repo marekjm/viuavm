@@ -162,6 +162,8 @@ class CPU {
         std::string resolveMethodName(const std::string&, const std::string&) const;
         std::pair<byte*, byte*> getEntryPointOf(const std::string&) const;
 
+        void registerPrototype(Prototype*);
+
         /// These two methods are used to inject pure-C++ classes into machine's typesystem.
         CPU& registerForeignPrototype(const std::string&, Prototype*);
         CPU& registerForeignMethod(const std::string&, ForeignMethod);

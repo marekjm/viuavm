@@ -67,8 +67,7 @@ byte* Process::opregister(byte* addr) {
     }
 
     Prototype* new_proto = static_cast<Prototype*>(fetch(reg));
-    // FIXME: mutex
-    scheduler->cpu()->typesystem[new_proto->getTypeName()] = new_proto;
+    scheduler->registerPrototype(new_proto);
     uregset->empty(reg);
 
     return addr;
