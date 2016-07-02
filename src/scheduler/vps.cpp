@@ -55,6 +55,10 @@ pair<byte*, byte*> viua::scheduler::VirtualProcessScheduler::getEntryPointOf(con
     return attached_cpu->getEntryPointOf(name);
 }
 
+void viua::scheduler::VirtualProcessScheduler::requestForeignFunctionCall(Frame *frame, Process *p) const {
+    attached_cpu->requestForeignFunctionCall(frame, p);
+}
+
 auto viua::scheduler::VirtualProcessScheduler::cpi() const -> decltype(processes)::size_type {
     return current_process_index;
 }

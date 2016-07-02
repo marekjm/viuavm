@@ -5,6 +5,7 @@
 #include <string>
 #include <utility>
 #include <viua/bytecode/bytetypedef.h>
+#include <viua/cpu/frame.h>
 
 
 class CPU;
@@ -32,6 +33,8 @@ namespace viua {
             bool isClass(const std::string&) const;
             auto inheritanceChainOf(const std::string& name) const -> decltype(attached_cpu->inheritanceChainOf(name));
             std::pair<byte*, byte*> getEntryPointOf(const std::string&) const;
+
+            void requestForeignFunctionCall(Frame*, Process*) const;
 
             auto cpi() const -> decltype(processes)::size_type;
             Process* process(decltype(processes)::size_type);
