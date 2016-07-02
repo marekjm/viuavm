@@ -92,7 +92,7 @@ byte* Process::opwatchdog(byte* addr) {
     }
 
     frame_new->function_name = call_name;
-    scheduler->cpu()->spawnWatchdog(frame_new);
+    scheduler->spawnWatchdog(frame_new);
     frame_new = nullptr;
 
     return addr;

@@ -135,6 +135,10 @@ Process* viua::scheduler::VirtualProcessScheduler::spawn(Frame *frame, Process *
     return attached_cpu->spawn(frame, parent);
 }
 
+void viua::scheduler::VirtualProcessScheduler::spawnWatchdog(Frame *frame) {
+    attached_cpu->spawnWatchdog(frame);
+}
+
 bool viua::scheduler::VirtualProcessScheduler::burst() {
     if (not procs->size()) {
         // make CPU stop if there are no processes_list to run
