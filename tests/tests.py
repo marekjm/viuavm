@@ -846,7 +846,7 @@ class ThrowCatchMechanismTests(unittest.TestCase):
         source_lib = 'thrown_in_linked_caught_in_static_fun.asm'
         lib_path = 'test_module.vlib'
         assemble(os.path.join(self.PATH, source_lib), out=lib_path, opts=('--lib',))
-        runTestNoDisassemblyRerun(self, 'thrown_in_linked_caught_in_static_base.asm', 'Hello World!')
+        runTestNoDisassemblyRerun(self, 'thrown_in_linked_caught_in_static_base.asm', 'looks falsey: 0')
 
 
 class CatchingMachineThrownExceptionTests(unittest.TestCase):

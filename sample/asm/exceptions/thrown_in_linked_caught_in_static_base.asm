@@ -10,8 +10,8 @@
     echo (strstore 2 "looks ")
 
     branch 1 +2
-    strstore 2 "falsey"
     strstore 2 "truthy"
+    strstore 2 "falsey"
 
     echo 2
     echo (strstore 2 ": ")
