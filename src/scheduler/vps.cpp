@@ -95,6 +95,14 @@ void viua::scheduler::VirtualProcessScheduler::requestForeignMethodCall(const st
     attached_cpu->requestForeignMethodCall(name, object, frame, nullptr, nullptr, p);
 }
 
+void viua::scheduler::VirtualProcessScheduler::loadNativeLibrary(const string& name) {
+    attached_cpu->loadNativeLibrary(name);
+}
+
+void viua::scheduler::VirtualProcessScheduler::loadForeignLibrary(const string& name) {
+    attached_cpu->loadForeignLibrary(name);
+}
+
 auto viua::scheduler::VirtualProcessScheduler::cpi() const -> decltype(processes)::size_type {
     return current_process_index;
 }

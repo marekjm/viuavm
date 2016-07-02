@@ -47,6 +47,9 @@ namespace viua {
             void requestForeignFunctionCall(Frame*, Process*) const;
             void requestForeignMethodCall(const std::string&, Type*, Frame*, RegisterSet*, RegisterSet*, Process*);
 
+            void loadNativeLibrary(const std::string&);
+            void loadForeignLibrary(const std::string&);
+
             auto cpi() const -> decltype(processes)::size_type;
             Process* process(decltype(processes)::size_type);
             Process* process();

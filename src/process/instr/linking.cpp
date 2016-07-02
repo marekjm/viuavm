@@ -15,7 +15,7 @@ byte* Process::opimport(byte* addr) {
     /** Run import instruction.
      */
     string module = viua::operand::extractString(addr);
-    scheduler->cpu()->loadForeignLibrary(module);
+    scheduler->loadForeignLibrary(module);
     return addr;
 }
 
@@ -23,6 +23,6 @@ byte* Process::oplink(byte* addr) {
     /** Run link instruction.
      */
     string module = viua::operand::extractString(addr);
-    scheduler->cpu()->loadNativeLibrary(module);
+    scheduler->loadNativeLibrary(module);
     return addr;
 }
