@@ -55,14 +55,7 @@ byte* Process::openter(byte* addr) {
         throw new Exception("cannot enter undefined block: " + block_name);
     }
 
-    byte* block_address = nullptr;
-    if (scheduler->isLocalBlock(block_name)) {
-        block_address = scheduler->cpu()->bytecode+scheduler->cpu()->block_addresses.at(block_name);
-        jump_base = scheduler->cpu()->bytecode;
-    } else {
-        block_address = scheduler->cpu()->linked_blocks.at(block_name).second;
-        jump_base = scheduler->cpu()->linked_modules.at(scheduler->cpu()->linked_blocks.at(block_name).first).second;
-    }
+    byte* block_address = adjustJumpBaseForBlock(block_name);
 
     try_frame_new->return_address = addr; // address has already been adjusted by extractString()
     try_frame_new->associated_frame = frames.back();
