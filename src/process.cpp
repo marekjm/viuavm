@@ -8,6 +8,7 @@
 #include <viua/types/process.h>
 #include <viua/process.h>
 #include <viua/cpu/cpu.h>
+#include <viua/scheduler/vps.h>
 using namespace std;
 
 
@@ -162,12 +163,12 @@ void Process::dropFrame() {
 
 byte* Process::adjustJumpBaseFor(const string& call_name) {
     byte* call_address = nullptr;
-    if (cpu->function_addresses.count(call_name)) {
-        call_address = cpu->bytecode+(cpu->function_addresses.at(call_name));
-        jump_base = cpu->bytecode;
+    if (scheduler->cpu()->function_addresses.count(call_name)) {
+        call_address = scheduler->cpu()->bytecode+(scheduler->cpu()->function_addresses.at(call_name));
+        jump_base = scheduler->cpu()->bytecode;
     } else {
-        call_address = cpu->linked_functions.at(call_name).second;
-        jump_base = cpu->linked_modules.at(cpu->linked_functions.at(call_name).first).second;
+        call_address = scheduler->cpu()->linked_functions.at(call_name).second;
+        jump_base = scheduler->cpu()->linked_modules.at(scheduler->cpu()->linked_functions.at(call_name).first).second;
     }
     return call_address;
 }
@@ -200,7 +201,7 @@ byte* Process::callForeign(byte* return_address, const string& call_name, const 
     frame_new->place_return_value_in = return_index;
 
     suspend();
-    cpu->requestForeignFunctionCall(frame_new, this);
+    scheduler->cpu()->requestForeignFunctionCall(frame_new, this);
     frame_new = nullptr;
 
     return return_address;
@@ -220,7 +221,7 @@ byte* Process::callForeignMethod(byte* return_address, Type* object, const strin
 
     pushFrame();
 
-    if (cpu->foreign_methods.count(call_name) == 0) {
+    if (scheduler->cpu()->foreign_methods.count(call_name) == 0) {
         throw new Exception("call to unregistered foreign method: " + call_name);
     }
 
@@ -231,7 +232,7 @@ byte* Process::callForeignMethod(byte* return_address, Type* object, const strin
 
     try {
         // FIXME: supply static and global registers to foreign functions
-        cpu->foreign_methods.at(call_name)(object, frame, nullptr, nullptr, this, cpu);
+        scheduler->cpu()->foreign_methods.at(call_name)(object, frame, nullptr, nullptr, this, scheduler->cpu());
     } catch (const std::out_of_range& e) {
         throw new Exception(e.what());
     }
@@ -301,8 +302,8 @@ tuple<TryFrame*, string> Process::findCatchFrame() {
         bool handler_found = tframe->catchers.count(handler_found_for_type);
 
         // FIXME: mutex
-        if ((not handler_found) and cpu->typesystem.count(handler_found_for_type)) {
-            vector<string> types_to_check = cpu->inheritanceChainOf(handler_found_for_type);
+        if ((not handler_found) and scheduler->cpu()->typesystem.count(handler_found_for_type)) {
+            vector<string> types_to_check = scheduler->cpu()->inheritanceChainOf(handler_found_for_type);
             for (unsigned j = 0; j < types_to_check.size(); ++j) {
                 if (tframe->catchers.count(types_to_check[j])) {
                     handler_found = true;
@@ -442,10 +443,10 @@ void Process::pass(Type* message) {
 }
 
 byte* Process::begin() {
-    if (cpu->function_addresses.count(frames[0]->function_name) == 0) {
+    if (scheduler->cpu()->function_addresses.count(frames[0]->function_name) == 0) {
         throw new Exception("process from undefined function: " + frames[0]->function_name);
     }
-    return (instruction_pointer = (cpu->bytecode + cpu->function_addresses.at(frames[0]->function_name)));
+    return (instruction_pointer = (scheduler->cpu()->bytecode + scheduler->cpu()->function_addresses.at(frames[0]->function_name)));
 }
 
 Process::~Process() {

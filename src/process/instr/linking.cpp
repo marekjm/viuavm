@@ -7,6 +7,7 @@
 #include <viua/cpu/opex.h>
 #include <viua/exceptions.h>
 #include <viua/cpu/cpu.h>
+#include <viua/scheduler/vps.h>
 using namespace std;
 
 
@@ -14,7 +15,7 @@ byte* Process::opimport(byte* addr) {
     /** Run import instruction.
      */
     string module = viua::operand::extractString(addr);
-    cpu->loadForeignLibrary(module);
+    scheduler->cpu()->loadForeignLibrary(module);
     return addr;
 }
 
@@ -22,6 +23,6 @@ byte* Process::oplink(byte* addr) {
     /** Run link instruction.
      */
     string module = viua::operand::extractString(addr);
-    cpu->loadNativeLibrary(module);
+    scheduler->cpu()->loadNativeLibrary(module);
     return addr;
 }

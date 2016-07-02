@@ -39,6 +39,10 @@ bool viua::scheduler::VirtualProcessScheduler::executeQuant(Process *th, unsigne
     return true;
 }
 
+CPU* viua::scheduler::VirtualProcessScheduler::cpu() const {
+    return attached_cpu;
+}
+
 auto viua::scheduler::VirtualProcessScheduler::cpi() const -> decltype(processes)::size_type {
     return current_process_index;
 }
@@ -69,7 +73,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
         ticked = (executeQuant(th, th->priority()) or ticked);
 
         if (th->terminated() and not th->joinable() and th->parent() == nullptr) {
-            if (cpu->currentWatchdog() == nullptr) {
+            if (attached_cpu->currentWatchdog() == nullptr) {
                 abort_because_of_process_termination = true;
             } else {
                 Object* death_message = new Object("Object");
@@ -85,7 +89,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                 death_message->set("function", new Function(th->trace()[0]->function_name));
                 death_message->set("exception", exc);
                 death_message->set("parameters", parameters);
-                cpu->currentWatchdog()->pass(death_message);
+                attached_cpu->currentWatchdog()->pass(death_message);
 
                 // push broken process to dead processes_list list to
                 // erase it later
@@ -127,12 +131,12 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
         }
     }
 
-    Process *watchdog_process = cpu->currentWatchdog();
+    Process *watchdog_process = attached_cpu->currentWatchdog();
     while (watchdog_process != nullptr and not watchdog_process->suspended()) {
         executeQuant(watchdog_process, 0);
-        watchdog_process = cpu->currentWatchdog();
+        watchdog_process = attached_cpu->currentWatchdog();
         if (watchdog_process->terminated() or watchdog_process->stopped()) {
-            cpu->resurrectWatchdog();
+            attached_cpu->resurrectWatchdog();
         }
     }
 
@@ -150,7 +154,7 @@ void viua::scheduler::VirtualProcessScheduler::bootstrap(const vector<string>& c
     }
     initial_frame->regset->set(1, cmdline);
 
-    Process* t = new Process(initial_frame, cpu, this, jump_base, nullptr);
+    Process* t = new Process(initial_frame, this, jump_base, nullptr);
     t->detach();
     t->priority(16);
     t->begin();
@@ -159,8 +163,8 @@ void viua::scheduler::VirtualProcessScheduler::bootstrap(const vector<string>& c
 }
 
 
-viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(CPU *attached_cpu, decltype(procs) ps):
-    cpu(attached_cpu),
+viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(CPU *acpu, decltype(procs) ps):
+    attached_cpu(acpu),
     current_process_index(0),
     procs(ps)
 {

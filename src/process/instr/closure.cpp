@@ -10,6 +10,7 @@
 #include <viua/cpu/registerset.h>
 #include <viua/operand.h>
 #include <viua/cpu/cpu.h>
+#include <viua/scheduler/vps.h>
 using namespace std;
 
 
@@ -123,19 +124,19 @@ byte* Process::opfcall(byte* addr) {
     Function* fn = static_cast<Function*>(fetch(fn_reg));
 
     string call_name = fn->name();
-    bool function_found = (cpu->function_addresses.count(call_name) or cpu->linked_functions.count(call_name));
+    bool function_found = (scheduler->cpu()->function_addresses.count(call_name) or scheduler->cpu()->linked_functions.count(call_name));
 
     if (not function_found) {
         throw new Exception("fcall to undefined function: " + call_name);
     }
 
     byte* call_address = nullptr;
-    if (cpu->function_addresses.count(call_name)) {
-        call_address = cpu->bytecode+cpu->function_addresses.at(call_name);
-        jump_base = cpu->bytecode;
+    if (scheduler->cpu()->function_addresses.count(call_name)) {
+        call_address = scheduler->cpu()->bytecode+scheduler->cpu()->function_addresses.at(call_name);
+        jump_base = scheduler->cpu()->bytecode;
     } else {
-        call_address = cpu->linked_functions.at(call_name).second;
-        jump_base = cpu->linked_modules.at(cpu->linked_functions.at(call_name).first).second;
+        call_address = scheduler->cpu()->linked_functions.at(call_name).second;
+        jump_base = scheduler->cpu()->linked_modules.at(scheduler->cpu()->linked_functions.at(call_name).first).second;
     }
 
     // save return address for frame

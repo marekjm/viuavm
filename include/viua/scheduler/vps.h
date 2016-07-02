@@ -14,7 +14,7 @@ namespace viua {
         class VirtualProcessScheduler {
             /** Scheduler of Viua VM virtual processes.
              */
-            CPU *cpu;
+            CPU *attached_cpu;
 
             std::vector<Process*> processes;
             decltype(processes)::size_type current_process_index;
@@ -25,6 +25,8 @@ namespace viua {
 
             public:
 
+            CPU* cpu() const;
+
             auto cpi() const -> decltype(processes)::size_type;
             Process* process(decltype(processes)::size_type);
             Process* process();
@@ -34,7 +36,7 @@ namespace viua {
 
             void bootstrap(const std::vector<std::string>&, byte*);
 
-            VirtualProcessScheduler(CPU *attached_cpu, decltype(procs) ps);
+            VirtualProcessScheduler(CPU*, decltype(procs) ps);
         };
     }
 }

@@ -10,6 +10,7 @@
 #include <viua/operand.h>
 #include <viua/assert.h>
 #include <viua/cpu/cpu.h>
+#include <viua/scheduler/vps.h>
 using namespace std;
 
 
@@ -20,7 +21,7 @@ byte* Process::opnew(byte* addr) {
 
     string class_name = viua::operand::extractString(addr);
 
-    if (cpu->typesystem.count(class_name) == 0) {
+    if (scheduler->cpu()->typesystem.count(class_name) == 0) {
         throw new Exception("cannot create new instance of unregistered type: " + class_name);
     }
 
@@ -51,19 +52,19 @@ byte* Process::opmsg(byte* addr) {
     if (Pointer* ptr = dynamic_cast<Pointer*>(obj)) {
         obj = ptr->to();
     }
-    if (cpu->typesystem.count(obj->type()) == 0) {
+    if (scheduler->cpu()->typesystem.count(obj->type()) == 0) {
         throw new Exception("unregistered type cannot be used for dynamic dispatch: " + obj->type());
     }
-    vector<string> mro = cpu->inheritanceChainOf(obj->type());
+    vector<string> mro = scheduler->cpu()->inheritanceChainOf(obj->type());
     mro.insert(mro.begin(), obj->type());
 
     string function_name = "";
     for (unsigned i = 0; i < mro.size(); ++i) {
-        if (cpu->typesystem.count(mro[i]) == 0) {
+        if (scheduler->cpu()->typesystem.count(mro[i]) == 0) {
             throw new Exception("unavailable base type in inheritance hierarchy of " + mro[0] + ": " + mro[i]);
         }
-        if (cpu->typesystem.at(mro[i])->accepts(method_name)) {
-            function_name = cpu->typesystem.at(mro[i])->resolvesTo(method_name);
+        if (scheduler->cpu()->typesystem.at(mro[i])->accepts(method_name)) {
+            function_name = scheduler->cpu()->typesystem.at(mro[i])->resolvesTo(method_name);
             break;
         }
     }
@@ -71,9 +72,9 @@ byte* Process::opmsg(byte* addr) {
         throw new Exception("class '" + obj->type() + "' does not accept method '" + method_name + "'");
     }
 
-    bool is_native = (cpu->function_addresses.count(function_name) or cpu->linked_functions.count(function_name));
-    bool is_foreign = cpu->foreign_functions.count(function_name);
-    bool is_foreign_method = cpu->foreign_methods.count(function_name);
+    bool is_native = (scheduler->cpu()->function_addresses.count(function_name) or scheduler->cpu()->linked_functions.count(function_name));
+    bool is_foreign = scheduler->cpu()->foreign_functions.count(function_name);
+    bool is_foreign_method = scheduler->cpu()->foreign_methods.count(function_name);
 
     if (not (is_native or is_foreign or is_foreign_method)) {
         throw new Exception("method '" + method_name + "' resolves to undefined function '" + function_name + "' on class '" + obj->type() + "'");

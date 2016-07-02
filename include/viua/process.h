@@ -38,8 +38,6 @@ class Process {
 #ifdef AS_DEBUG_HEADER
     public:
 #endif
-    CPU *cpu;
-
     viua::scheduler::VirtualProcessScheduler *scheduler;
 
     Process* parent_process;
@@ -297,7 +295,7 @@ class Process {
         }
         inline std::vector<Frame*> trace() { return frames; }
 
-        Process(Frame* frm, CPU *_cpu, viua::scheduler::VirtualProcessScheduler *sch, decltype(jump_base) jb, Process* pt): cpu(_cpu), scheduler(sch), parent_process(pt), entry_function(frm->function_name),
+        Process(Frame* frm, viua::scheduler::VirtualProcessScheduler *sch, decltype(jump_base) jb, Process* pt): scheduler(sch), parent_process(pt), entry_function(frm->function_name),
             debug(false),
             regset(nullptr), uregset(nullptr), tmp(nullptr),
             jump_base(jb),

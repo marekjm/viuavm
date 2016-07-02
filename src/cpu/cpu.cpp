@@ -159,7 +159,7 @@ void CPU::loadForeignLibrary(const string& module) {
 
 Process* CPU::spawn(Frame* frm, Process* parent_process) {
     unique_lock<std::mutex> lck{processes_mtx};
-    Process* thrd = new Process(frm, this, base_vps, jump_base, parent_process);
+    Process* thrd = new Process(frm, base_vps, jump_base, parent_process);
     thrd->begin();
     processes.push_back(thrd);
     return thrd;
@@ -170,7 +170,7 @@ Process* CPU::spawnWatchdog(Frame* frm) {
     }
     unique_lock<std::mutex> lck{processes_mtx};
     watchdog_function = frm->function_name;
-    Process* thrd = new Process(frm, this, base_vps, jump_base, nullptr);
+    Process* thrd = new Process(frm, base_vps, jump_base, nullptr);
     thrd->begin();
     watchdog_process = thrd;
     return thrd;

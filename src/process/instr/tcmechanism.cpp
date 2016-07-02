@@ -3,6 +3,7 @@
 #include <viua/exceptions.h>
 #include <viua/operand.h>
 #include <viua/cpu/cpu.h>
+#include <viua/scheduler/vps.h>
 using namespace std;
 
 
@@ -22,16 +23,16 @@ byte* Process::opcatch(byte* addr) {
     string type_name = viua::operand::extractString(addr);
     string catcher_block_name = viua::operand::extractString(addr);
 
-    bool block_found = (cpu->block_addresses.count(catcher_block_name) or cpu->linked_blocks.count(catcher_block_name));
+    bool block_found = (scheduler->cpu()->block_addresses.count(catcher_block_name) or scheduler->cpu()->linked_blocks.count(catcher_block_name));
     if (not block_found) {
         throw new Exception("registering undefined handler block '" + catcher_block_name + "' to handle " + type_name);
     }
 
     byte* block_address = nullptr;
-    if (cpu->block_addresses.count(catcher_block_name)) {
-        block_address = cpu->bytecode+cpu->block_addresses.at(catcher_block_name);
+    if (scheduler->cpu()->block_addresses.count(catcher_block_name)) {
+        block_address = scheduler->cpu()->bytecode+scheduler->cpu()->block_addresses.at(catcher_block_name);
     } else {
-        block_address = cpu->linked_blocks.at(catcher_block_name).second;
+        block_address = scheduler->cpu()->linked_blocks.at(catcher_block_name).second;
     }
 
     try_frame_new->catchers[type_name] = new Catcher(type_name, catcher_block_name, block_address);
@@ -58,18 +59,18 @@ byte* Process::openter(byte* addr) {
      */
     string block_name = viua::operand::extractString(addr);
 
-    bool block_found = (cpu->block_addresses.count(block_name) or cpu->linked_blocks.count(block_name));
+    bool block_found = (scheduler->cpu()->block_addresses.count(block_name) or scheduler->cpu()->linked_blocks.count(block_name));
     if (not block_found) {
         throw new Exception("cannot enter undefined block: " + block_name);
     }
 
     byte* block_address = nullptr;
-    if (cpu->block_addresses.count(block_name)) {
-        block_address = cpu->bytecode+cpu->block_addresses.at(block_name);
-        jump_base = cpu->bytecode;
+    if (scheduler->cpu()->block_addresses.count(block_name)) {
+        block_address = scheduler->cpu()->bytecode+scheduler->cpu()->block_addresses.at(block_name);
+        jump_base = scheduler->cpu()->bytecode;
     } else {
-        block_address = cpu->linked_blocks.at(block_name).second;
-        jump_base = cpu->linked_modules.at(cpu->linked_blocks.at(block_name).first).second;
+        block_address = scheduler->cpu()->linked_blocks.at(block_name).second;
+        jump_base = scheduler->cpu()->linked_modules.at(scheduler->cpu()->linked_blocks.at(block_name).first).second;
     }
 
     try_frame_new->return_address = addr; // address has already been adjusted by extractString()
@@ -115,10 +116,10 @@ byte* Process::opleave(byte* addr) {
     tryframes.pop_back();
 
     if (frames.size() > 0) {
-        if (cpu->function_addresses.count(frames.back()->function_name)) {
-            jump_base = cpu->bytecode;
+        if (scheduler->cpu()->function_addresses.count(frames.back()->function_name)) {
+            jump_base = scheduler->cpu()->bytecode;
         } else {
-            jump_base = cpu->linked_modules.at(cpu->linked_functions.at(frames.back()->function_name).first).second;
+            jump_base = scheduler->cpu()->linked_modules.at(scheduler->cpu()->linked_functions.at(frames.back()->function_name).first).second;
         }
     }
     return addr;

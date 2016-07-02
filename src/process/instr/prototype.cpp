@@ -7,6 +7,7 @@
 #include <viua/cpu/registerset.h>
 #include <viua/operand.h>
 #include <viua/cpu/cpu.h>
+#include <viua/scheduler/vps.h>
 using namespace std;
 
 
@@ -25,7 +26,7 @@ byte* Process::opderive(byte* addr) {
 
     string class_name = viua::operand::extractString(addr);
 
-    if (cpu->typesystem.count(class_name) == 0) {
+    if (scheduler->cpu()->typesystem.count(class_name) == 0) {
         throw new Exception("cannot derive from unregistered type: " + class_name);
     }
 
@@ -44,7 +45,7 @@ byte* Process::opattach(byte* addr) {
 
     Prototype* proto = static_cast<Prototype*>(target);
 
-    if (not (cpu->function_addresses.count(function_name) or cpu->linked_functions.count(function_name) or cpu->foreign_functions.count(function_name))) {
+    if (not (scheduler->cpu()->function_addresses.count(function_name) or scheduler->cpu()->linked_functions.count(function_name) or scheduler->cpu()->foreign_functions.count(function_name))) {
         throw new Exception("cannot attach undefined function '" + function_name + "' as a method '" + method_name + "' of prototype '" + proto->getTypeName() + "'");
     }
 
@@ -67,7 +68,7 @@ byte* Process::opregister(byte* addr) {
 
     Prototype* new_proto = static_cast<Prototype*>(fetch(reg));
     // FIXME: mutex
-    cpu->typesystem[new_proto->getTypeName()] = new_proto;
+    scheduler->cpu()->typesystem[new_proto->getTypeName()] = new_proto;
     uregset->empty(reg);
 
     return addr;

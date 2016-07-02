@@ -31,6 +31,13 @@ There are several categories of change:
 
 # From 0.8.1 to 0.8.2
 
+CPU access from processes is now routed through the scheduler, which allows
+decoupling process code from the CPU code and further parallelisation of the VM.
+Only schedulers will "talk" with the heart of the VM, processes only access
+information local to their scheduler - and since they run sequentially under
+schedulers control the access can be lock-less even if there are myriads of
+concurrent processes running.
+
 - enhancement: VM is able to restart watchdog even with no stack trace available,
 - bic: floats are stringified using the `std::fixed` modifier, which limits decimal digits,
 

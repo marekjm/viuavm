@@ -5,6 +5,7 @@
 #include <viua/exceptions.h>
 #include <viua/operand.h>
 #include <viua/cpu/cpu.h>
+#include <viua/scheduler/vps.h>
 using namespace std;
 
 
@@ -15,15 +16,15 @@ byte* Process::opprocess(byte* addr) {
 
     string call_name = viua::operand::extractString(addr);
 
-    bool is_native = (cpu->function_addresses.count(call_name) or cpu->linked_functions.count(call_name));
-    bool is_foreign = cpu->foreign_functions.count(call_name);
+    bool is_native = (scheduler->cpu()->function_addresses.count(call_name) or scheduler->cpu()->linked_functions.count(call_name));
+    bool is_foreign = scheduler->cpu()->foreign_functions.count(call_name);
 
     if (not (is_native or is_foreign)) {
         throw new Exception("call to undefined function: " + call_name);
     }
 
     frame_new->function_name = call_name;
-    place(target, new ProcessType(cpu->spawn(frame_new, this)));
+    place(target, new ProcessType(scheduler->cpu()->spawn(frame_new, this)));
     frame_new = nullptr;
 
     return addr;
@@ -80,8 +81,8 @@ byte* Process::opwatchdog(byte* addr) {
      */
     string call_name = viua::operand::extractString(addr);
 
-    bool is_native = (cpu->function_addresses.count(call_name) or cpu->linked_functions.count(call_name));
-    bool is_foreign = cpu->foreign_functions.count(call_name);
+    bool is_native = (scheduler->cpu()->function_addresses.count(call_name) or scheduler->cpu()->linked_functions.count(call_name));
+    bool is_foreign = scheduler->cpu()->foreign_functions.count(call_name);
 
     if (not (is_native or is_foreign)) {
         throw new Exception("watchdog process from undefined function: " + call_name);
@@ -91,7 +92,7 @@ byte* Process::opwatchdog(byte* addr) {
     }
 
     frame_new->function_name = call_name;
-    cpu->spawnWatchdog(frame_new);
+    scheduler->cpu()->spawnWatchdog(frame_new);
     frame_new = nullptr;
 
     return addr;
