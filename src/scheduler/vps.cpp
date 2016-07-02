@@ -51,6 +51,10 @@ auto viua::scheduler::VirtualProcessScheduler::inheritanceChainOf(const std::str
     return attached_cpu->inheritanceChainOf(name);
 }
 
+pair<byte*, byte*> viua::scheduler::VirtualProcessScheduler::getEntryPointOf(const std::string& name) const {
+    return attached_cpu->getEntryPointOf(name);
+}
+
 auto viua::scheduler::VirtualProcessScheduler::cpi() const -> decltype(processes)::size_type {
     return current_process_index;
 }

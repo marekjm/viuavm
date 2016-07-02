@@ -162,15 +162,11 @@ void Process::dropFrame() {
 }
 
 byte* Process::adjustJumpBaseFor(const string& call_name) {
-    byte* call_address = nullptr;
-    if (scheduler->cpu()->function_addresses.count(call_name)) {
-        call_address = scheduler->cpu()->bytecode+(scheduler->cpu()->function_addresses.at(call_name));
-        jump_base = scheduler->cpu()->bytecode;
-    } else {
-        call_address = scheduler->cpu()->linked_functions.at(call_name).second;
-        jump_base = scheduler->cpu()->linked_modules.at(scheduler->cpu()->linked_functions.at(call_name).first).second;
-    }
-    return call_address;
+    byte *entry_point = nullptr;
+    auto ep = scheduler->cpu()->getEntryPointOf(call_name);
+    entry_point = ep.first;
+    jump_base = ep.second;
+    return entry_point;
 }
 byte* Process::callNative(byte* return_address, const string& call_name, const bool return_ref, const unsigned return_index, const string&) {
     byte* call_address = adjustJumpBaseFor(call_name);

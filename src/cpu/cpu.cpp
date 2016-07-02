@@ -228,6 +228,20 @@ vector<string> CPU::inheritanceChainOf(const string& type_name) const {
     return ichain;
 }
 
+pair<byte*, byte*> CPU::getEntryPointOf(const std::string& name) const {
+    byte *entry_point = nullptr;
+    byte *module_base = nullptr;
+    if (function_addresses.count(name)) {
+        entry_point = (bytecode + function_addresses.at(name));
+        module_base = bytecode;
+    } else {
+        auto lf = linked_functions.at(name);
+        entry_point = lf.second;
+        module_base = linked_modules.at(lf.first).second;
+    }
+    return pair<byte*, byte*>(entry_point, module_base);
+}
+
 void CPU::requestForeignFunctionCall(Frame *frame, Process *requesting_process) {
     unique_lock<mutex> lock(foreign_call_queue_mutex);
     foreign_call_queue.push_back(new ForeignFunctionCallRequest(frame, requesting_process, this));

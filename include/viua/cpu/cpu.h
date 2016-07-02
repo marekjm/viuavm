@@ -152,6 +152,7 @@ class CPU {
          */
         bool isClass(const std::string&) const;
         std::vector<std::string> inheritanceChainOf(const std::string&) const;
+        std::pair<byte*, byte*> getEntryPointOf(const std::string&) const;
 
         /// These two methods are used to inject pure-C++ classes into machine's typesystem.
         CPU& registerForeignPrototype(const std::string&, Prototype*);
