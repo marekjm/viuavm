@@ -50,7 +50,6 @@ namespace viua {
 
 
 class CPU {
-    friend Process;
 #ifdef AS_DEBUG_HEADER
     public:
 #endif
