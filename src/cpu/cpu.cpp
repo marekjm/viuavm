@@ -228,6 +228,14 @@ vector<string> CPU::inheritanceChainOf(const string& type_name) const {
     return ichain;
 }
 
+bool CPU::isForeignMethod(const string& name) const {
+    return foreign_methods.count(name);
+}
+
+bool CPU::isForeignFunction(const string& name) const {
+    return foreign_functions.count(name);
+}
+
 pair<byte*, byte*> CPU::getEntryPointOf(const std::string& name) const {
     byte *entry_point = nullptr;
     byte *module_base = nullptr;

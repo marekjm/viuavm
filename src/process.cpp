@@ -217,7 +217,7 @@ byte* Process::callForeignMethod(byte* return_address, Type* object, const strin
 
     pushFrame();
 
-    if (scheduler->cpu()->foreign_methods.count(call_name) == 0) {
+    if (not scheduler->isForeignMethod(call_name)) {
         throw new Exception("call to unregistered foreign method: " + call_name);
     }
 

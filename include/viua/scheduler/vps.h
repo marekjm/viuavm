@@ -32,6 +32,9 @@ namespace viua {
 
             bool isClass(const std::string&) const;
             auto inheritanceChainOf(const std::string& name) const -> decltype(attached_cpu->inheritanceChainOf(name));
+            bool isForeignMethod(const std::string&) const;
+            bool isForeignFunction(const std::string&) const;
+
             std::pair<byte*, byte*> getEntryPointOf(const std::string&) const;
 
             void requestForeignFunctionCall(Frame*, Process*) const;

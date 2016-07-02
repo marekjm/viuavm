@@ -51,6 +51,14 @@ auto viua::scheduler::VirtualProcessScheduler::inheritanceChainOf(const std::str
     return attached_cpu->inheritanceChainOf(name);
 }
 
+bool viua::scheduler::VirtualProcessScheduler::isForeignMethod(const string& name) const {
+    return attached_cpu->isForeignMethod(name);
+}
+
+bool viua::scheduler::VirtualProcessScheduler::isForeignFunction(const string& name) const {
+    return attached_cpu->isForeignFunction(name);
+}
+
 pair<byte*, byte*> viua::scheduler::VirtualProcessScheduler::getEntryPointOf(const std::string& name) const {
     return attached_cpu->getEntryPointOf(name);
 }

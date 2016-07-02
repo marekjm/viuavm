@@ -89,8 +89,8 @@ byte* Process::opcall(byte* addr) {
     string call_name = viua::operand::extractString(addr);
 
     bool is_native = (scheduler->cpu()->function_addresses.count(call_name) or scheduler->cpu()->linked_functions.count(call_name));
-    bool is_foreign = scheduler->cpu()->foreign_functions.count(call_name);
-    bool is_foreign_method = scheduler->cpu()->foreign_methods.count(call_name);
+    bool is_foreign = scheduler->isForeignFunction(call_name);
+    bool is_foreign_method = scheduler->isForeignMethod(call_name);
 
     if (not (is_native or is_foreign or is_foreign_method)) {
         throw new Exception("call to undefined function: " + call_name);
@@ -120,8 +120,8 @@ byte* Process::optailcall(byte* addr) {
     string call_name = viua::operand::extractString(addr);
 
     bool is_native = (scheduler->cpu()->function_addresses.count(call_name) or scheduler->cpu()->linked_functions.count(call_name));
-    bool is_foreign = scheduler->cpu()->foreign_functions.count(call_name);
-    bool is_foreign_method = scheduler->cpu()->foreign_methods.count(call_name);
+    bool is_foreign = scheduler->isForeignFunction(call_name);
+    bool is_foreign_method = scheduler->isForeignMethod(call_name);
 
     if (not (is_native or is_foreign or is_foreign_method)) {
         throw new Exception("tail call to undefined function: " + call_name);

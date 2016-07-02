@@ -73,8 +73,8 @@ byte* Process::opmsg(byte* addr) {
     }
 
     bool is_native = (scheduler->cpu()->function_addresses.count(function_name) or scheduler->cpu()->linked_functions.count(function_name));
-    bool is_foreign = scheduler->cpu()->foreign_functions.count(function_name);
-    bool is_foreign_method = scheduler->cpu()->foreign_methods.count(function_name);
+    bool is_foreign = scheduler->isForeignFunction(function_name);
+    bool is_foreign_method = scheduler->isForeignMethod(function_name);
 
     if (not (is_native or is_foreign or is_foreign_method)) {
         throw new Exception("method '" + method_name + "' resolves to undefined function '" + function_name + "' on class '" + obj->type() + "'");
