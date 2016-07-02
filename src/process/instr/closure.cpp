@@ -130,7 +130,7 @@ byte* Process::opfcall(byte* addr) {
     }
 
     byte* call_address = nullptr;
-    if (scheduler->cpu()->function_addresses.count(call_name)) {
+    if (scheduler->isLocalFunction(call_name)) {
         call_address = scheduler->cpu()->bytecode+scheduler->cpu()->function_addresses.at(call_name);
         jump_base = scheduler->cpu()->bytecode;
     } else {
