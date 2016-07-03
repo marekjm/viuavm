@@ -314,6 +314,10 @@ void CPU::requestForeignMethodCall(const string& name, Type *object, Frame *fram
     foreign_methods.at(name)(object, frame, nullptr, nullptr, p, this);
 }
 
+int CPU::exit() const {
+    return return_code;
+}
+
 int CPU::run() {
     /*  VM CPU implementation.
      */

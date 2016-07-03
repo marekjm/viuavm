@@ -184,6 +184,7 @@ class CPU {
             return processes[current_process_index]->counter();
         }
 
+        int exit() const;
         inline std::tuple<int, std::string, std::string> exitcondition() {
             return std::tuple<int, std::string, std::string>(return_code, return_exception, return_message);
         }
