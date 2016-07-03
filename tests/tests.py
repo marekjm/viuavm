@@ -299,8 +299,7 @@ def runTestThrowsException(self, name, expected_output, assembly_opts=None):
         assemble(assembly_path, compiled_path)
     else:
         assemble(assembly_path, compiled_path, opts=assembly_opts)
-    # FIXME: change it to 1 - machine should exit with exit code 1 if main/ function errors
-    expected_exit_code = 0
+    expected_exit_code = 1
     excode, output = run(compiled_path, expected_exit_code)
     got_exception = list(filter(lambda line: line.startswith('uncaught object:'), output.strip().splitlines()))[0]
     self.assertEqual(expected_exit_code, excode)

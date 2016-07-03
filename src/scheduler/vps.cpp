@@ -229,6 +229,10 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
 
         if (th->terminated() and not th->joinable() and th->parent() == nullptr) {
             if (attached_cpu->currentWatchdog() == nullptr) {
+                if (th == main_process) {
+                    exit_code = 1;
+                }
+
                 auto trace = th->trace();
 
                 cout << "process " << current_process_index << " spawned using ";
@@ -316,14 +320,20 @@ void viua::scheduler::VirtualProcessScheduler::bootstrap(const vector<string>& c
     t->detach();
     t->priority(16);
     t->begin();
+    main_process = t;
 
     procs->push_back(t);
 }
 
+int viua::scheduler::VirtualProcessScheduler::exit() const {
+    return exit_code;
+}
 
 viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(CPU *acpu, decltype(procs) ps):
     attached_cpu(acpu),
+    main_process(nullptr),
     current_process_index(0),
-    procs(ps)
+    procs(ps),
+    exit_code(0)
 {
 }

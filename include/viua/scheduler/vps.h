@@ -19,12 +19,15 @@ namespace viua {
              */
             CPU *attached_cpu;
 
+            Process *main_process;
             std::vector<Process*> processes;
             decltype(processes)::size_type current_process_index;
 
             // this will be used during a transition period
             // it is a pointer to processes vector inside the CPU
             decltype(processes) *procs;
+
+            int exit_code;
 
             public:
 
@@ -67,6 +70,7 @@ namespace viua {
             bool burst();
 
             void bootstrap(const std::vector<std::string>&);
+            int exit() const;
 
             VirtualProcessScheduler(CPU*, decltype(procs) ps);
         };

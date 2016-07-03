@@ -328,6 +328,8 @@ int CPU::run() {
 
     while (vps.burst());
 
+    return_code = vps.exit();
+
     // FIXME: current_process_index is not updated inside VPS::burst()
     if (vps.cpi() < vps.size() and vps.process()->terminated()) {
         auto trace = vps.process()->trace();
