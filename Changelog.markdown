@@ -45,6 +45,11 @@ concurrent processes running.
 - fix: processes can be spawned from dynamically linked functions,
 - fix: machine does not segfault when an exception is passed between modules (i.e. when
   module A threw it, and module B caught it),
+- bic: if an exception escapes from a process it does not bring down the whole VM - other
+  processes continue to run uninterrupted,
+- bic: stack traces for failed processes are printed during runtime, not in the "aftermath"
+  inside CPU frontend,
+- bic: machine exits with non-zero exit code only if the `main/` function fails,
 
 
 ----
