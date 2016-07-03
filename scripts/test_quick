@@ -2,4 +2,6 @@
 
 set -e
 
+make standardlibrary stdlib compile-test
+
 VIUA_TEST_SUITE_VALGRIND_CHECKS=0 VIUAPATH=./build/stdlib python3 ./tests/tests.py --verbose --catch --failfast $@
