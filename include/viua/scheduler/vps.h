@@ -26,10 +26,6 @@ namespace viua {
             std::string watchdog_function;
             Process *watchdog_process;
 
-            // this will be used during a transition period
-            // it is a pointer to processes vector inside the CPU
-            decltype(processes) *procs;
-
             int exit_code;
 
             void resurrectWatchdog();
