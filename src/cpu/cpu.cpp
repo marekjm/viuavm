@@ -156,34 +156,6 @@ void CPU::loadForeignLibrary(const string& module) {
 }
 
 
-Process* CPU::spawnWatchdog(Frame* frm) {
-    if (watchdog_process != nullptr) {
-        throw new Exception("watchdog process already spawned");
-    }
-    unique_lock<std::mutex> lck{processes_mtx};
-    watchdog_function = frm->function_name;
-    Process* thrd = new Process(frm, base_vps, nullptr);
-    thrd->begin();
-    watchdog_process = thrd;
-    return thrd;
-}
-void CPU::resurrectWatchdog() {
-    auto active_exception = watchdog_process->getActiveException();
-    if (active_exception) {
-        cout << "watchdog process terminated by: " << active_exception->type() << ": '" << active_exception->str() << "'" << endl;
-        delete active_exception;
-    }
-
-    delete watchdog_process;
-    watchdog_process = nullptr;
-
-    Frame *frm = nullptr;
-    frm = new Frame(nullptr, 0, watchdog_process_register_count);
-    frm->function_name = watchdog_function;
-
-    spawnWatchdog(frm);
-}
-
 bool CPU::isClass(const string& name) const {
     return typesystem.count(name);
 }

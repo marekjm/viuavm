@@ -211,7 +211,30 @@ Process* viua::scheduler::VirtualProcessScheduler::spawn(Frame *frame, Process *
 }
 
 void viua::scheduler::VirtualProcessScheduler::spawnWatchdog(Frame *frame) {
-    attached_cpu->spawnWatchdog(frame);
+    if (watchdog_process) {
+        throw new Exception("watchdog process already spawned");
+    }
+    watchdog_function = frame->function_name;
+    Process *p = new Process(frame, this, nullptr);
+    p->begin();
+    watchdog_process = p;
+}
+
+void viua::scheduler::VirtualProcessScheduler::resurrectWatchdog() {
+    auto active_exception = watchdog_process->getActiveException();
+    if (active_exception) {
+        cout << "watchdog process terminated by: " << active_exception->type() << ": '" << active_exception->str() << "'" << endl;
+        delete active_exception;
+    }
+
+    delete watchdog_process;
+    watchdog_process = nullptr;
+
+    Frame *frm = nullptr;
+    frm = new Frame(nullptr, 0, 64);
+    frm->function_name = watchdog_function;
+
+    spawnWatchdog(frm);
 }
 
 bool viua::scheduler::VirtualProcessScheduler::burst() {
@@ -231,7 +254,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
         ticked = (executeQuant(th, th->priority()) or ticked);
 
         if (th->terminated() and not th->joinable() and th->parent() == nullptr) {
-            if (attached_cpu->currentWatchdog() == nullptr) {
+            if (watchdog_process == nullptr) {
                 if (th == main_process) {
                     exit_code = 1;
                 }
@@ -264,7 +287,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                 death_message->set("function", new Function(th->trace()[0]->function_name));
                 death_message->set("exception", exc);
                 death_message->set("parameters", parameters);
-                attached_cpu->currentWatchdog()->pass(death_message);
+                watchdog_process->pass(death_message);
             }
 
             // push broken process to dead processes_list list to
@@ -296,12 +319,10 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
         }
     }
 
-    Process *watchdog_process = attached_cpu->currentWatchdog();
     while (watchdog_process != nullptr and not watchdog_process->suspended()) {
         executeQuant(watchdog_process, 0);
-        watchdog_process = attached_cpu->currentWatchdog();
         if (watchdog_process->terminated() or watchdog_process->stopped()) {
-            attached_cpu->resurrectWatchdog();
+            resurrectWatchdog();
         }
     }
 
@@ -336,7 +357,14 @@ viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(CPU *acpu, dec
     attached_cpu(acpu),
     main_process(nullptr),
     current_process_index(0),
+    watchdog_process(nullptr),
     procs(ps),
     exit_code(0)
 {
+}
+
+viua::scheduler::VirtualProcessScheduler::~VirtualProcessScheduler() {
+    if (watchdog_process) {
+        delete watchdog_process;
+    }
 }

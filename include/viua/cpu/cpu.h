@@ -64,10 +64,6 @@ class CPU {
 
     // vector of all processes machine is executing
     std::vector<Process*> processes;
-    std::string watchdog_function;
-    unsigned watchdog_process_register_count;
-    std::queue<Type*> watchdog_message_buffer;
-    Process* watchdog_process;
     decltype(processes)::size_type current_process_index;
     std::mutex processes_mtx;
 
@@ -163,10 +159,6 @@ class CPU {
         CPU& registerForeignPrototype(const std::string&, Prototype*);
         CPU& registerForeignMethod(const std::string&, ForeignMethod);
 
-        Process* spawnWatchdog(Frame*);
-        Process* currentWatchdog() { return watchdog_process; }
-        void resurrectWatchdog();
-
         void requestForeignFunctionCall(Frame*, Process*);
         void requestForeignMethodCall(const std::string&, Type*, Frame*, RegisterSet*, RegisterSet*, Process*);
 
@@ -177,9 +169,6 @@ class CPU {
         CPU():
             bytecode(nullptr), bytecode_size(0), executable_offset(0),
             base_vps(nullptr),
-            watchdog_function(""),
-            watchdog_process_register_count(0),
-            watchdog_process(nullptr),
             current_process_index(0),
             thrown(nullptr), caught(nullptr),
             return_code(0),
@@ -249,10 +238,6 @@ class CPU {
 
                 typesystem.erase(proto_name);
                 delete proto_ptr;
-            }
-
-            if (watchdog_process != nullptr) {
-                delete watchdog_process;
             }
 
             for (unsigned i = 0; i < cxx_dynamic_lib_handles.size(); ++i) {
