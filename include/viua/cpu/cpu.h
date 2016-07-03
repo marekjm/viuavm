@@ -42,13 +42,6 @@ class ForeignFunctionCallRequest {
 void ff_call_processor(std::vector<ForeignFunctionCallRequest*> *requests, std::map<std::string, ForeignFunction*>* foreign_functions, std::mutex *ff_map_mtx, std::mutex *mtx, std::condition_variable *cv);
 
 
-namespace viua {
-    namespace scheduler {
-        class VirtualProcessScheduler;
-    }
-}
-
-
 class CPU {
 #ifdef AS_DEBUG_HEADER
     public:
@@ -59,8 +52,6 @@ class CPU {
     byte* bytecode;
     uint64_t bytecode_size;
     uint64_t executable_offset;
-
-    viua::scheduler::VirtualProcessScheduler *base_vps;
 
     // Map of the typesystem currently existing inside the VM.
     std::map<std::string, Prototype*> typesystem;
@@ -163,7 +154,6 @@ class CPU {
 
         CPU():
             bytecode(nullptr), bytecode_size(0), executable_offset(0),
-            base_vps(nullptr),
             thrown(nullptr), caught(nullptr),
             return_code(0),
             debug(false), errors(false)
