@@ -77,7 +77,7 @@ namespace viua {
             void bootstrap(const std::vector<std::string>&);
             int exit() const;
 
-            VirtualProcessScheduler(CPU*, decltype(procs) ps);
+            VirtualProcessScheduler(CPU*);
             ~VirtualProcessScheduler();
         };
     }

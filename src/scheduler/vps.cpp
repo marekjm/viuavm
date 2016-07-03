@@ -192,11 +192,11 @@ auto viua::scheduler::VirtualProcessScheduler::cpi() const -> decltype(processes
 
 
 auto viua::scheduler::VirtualProcessScheduler::size() const -> decltype(processes)::size_type {
-    return procs->size();
+    return processes.size();
 }
 
 Process* viua::scheduler::VirtualProcessScheduler::process(decltype(processes)::size_type index) {
-    return procs->at(index);
+    return processes.at(index);
 }
 
 Process* viua::scheduler::VirtualProcessScheduler::process() {
@@ -206,7 +206,7 @@ Process* viua::scheduler::VirtualProcessScheduler::process() {
 Process* viua::scheduler::VirtualProcessScheduler::spawn(Frame *frame, Process *parent) {
     Process *p = new Process(frame, this, parent);
     p->begin();
-    procs->push_back(p);
+    processes.push_back(p);
     return p;
 }
 
@@ -238,7 +238,7 @@ void viua::scheduler::VirtualProcessScheduler::resurrectWatchdog() {
 }
 
 bool viua::scheduler::VirtualProcessScheduler::burst() {
-    if (not procs->size()) {
+    if (not processes.size()) {
         // make CPU stop if there are no processes_list to run
         return false;
     }
@@ -247,9 +247,9 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
 
     vector<Process*> running_processes_list;
     decltype(running_processes_list) dead_processes_list;
-    for (decltype(running_processes_list)::size_type i = 0; i < procs->size(); ++i) {
+    for (decltype(running_processes_list)::size_type i = 0; i < processes.size(); ++i) {
         current_process_index = i;
-        auto th = procs->at(i);
+        auto th = processes.at(i);
 
         ticked = (executeQuant(th, th->priority()) or ticked);
 
@@ -313,9 +313,9 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
 
     // if there were any dead processes_list we must rebuild the scheduled processes_list vector
     if (dead_processes_list.size()) {
-        procs->erase(procs->begin(), procs->end());
+        processes.erase(processes.begin(), processes.end());
         for (decltype(running_processes_list)::size_type i = 0; i < running_processes_list.size(); ++i) {
-            procs->push_back(running_processes_list[i]);
+            processes.push_back(running_processes_list[i]);
         }
     }
 
@@ -346,19 +346,18 @@ void viua::scheduler::VirtualProcessScheduler::bootstrap(const vector<string>& c
     t->begin();
     main_process = t;
 
-    procs->push_back(t);
+    processes.push_back(t);
 }
 
 int viua::scheduler::VirtualProcessScheduler::exit() const {
     return exit_code;
 }
 
-viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(CPU *acpu, decltype(procs) ps):
+viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(CPU *acpu):
     attached_cpu(acpu),
     main_process(nullptr),
     current_process_index(0),
     watchdog_process(nullptr),
-    procs(ps),
     exit_code(0)
 {
 }
@@ -366,5 +365,10 @@ viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(CPU *acpu, dec
 viua::scheduler::VirtualProcessScheduler::~VirtualProcessScheduler() {
     if (watchdog_process) {
         delete watchdog_process;
+    }
+
+    while (processes.size()) {
+        delete processes.back();
+        processes.pop_back();
     }
 }

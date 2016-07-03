@@ -62,11 +62,6 @@ class CPU {
 
     viua::scheduler::VirtualProcessScheduler *base_vps;
 
-    // vector of all processes machine is executing
-    std::vector<Process*> processes;
-    decltype(processes)::size_type current_process_index;
-    std::mutex processes_mtx;
-
     // Map of the typesystem currently existing inside the VM.
     std::map<std::string, Prototype*> typesystem;
 
@@ -169,7 +164,6 @@ class CPU {
         CPU():
             bytecode(nullptr), bytecode_size(0), executable_offset(0),
             base_vps(nullptr),
-            current_process_index(0),
             thrown(nullptr), caught(nullptr),
             return_code(0),
             debug(false), errors(false)
