@@ -352,21 +352,6 @@ int CPU::run() {
         terminating_exception = e;
     }
 
-    /*
-    if (return_code == 0 and regset->at(0)) {
-        // if return code if the default one and
-        // return register is not unused
-        // copy value of return register as return code
-        try {
-            return_code = static_cast<Integer*>(regset->get(0))->value();
-        } catch (const Exception* e) {
-            return_code = 1;
-            return_exception = e->type();
-            return_message = e->what();
-        }
-    }
-    */
-
     // delete processes and global registers
     // otherwise we get huge memory leak
     // do not delete if execution was halted because of exception
