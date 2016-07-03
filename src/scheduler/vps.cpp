@@ -1,13 +1,80 @@
 #include <vector>
 #include <string>
 #include <viua/machine.h>
+#include <viua/printutils.h>
 #include <viua/types/vector.h>
 #include <viua/types/string.h>
 #include <viua/types/function.h>
+#include <viua/types/exception.h>
+#include <viua/types/pointer.h>
 #include <viua/process.h>
 #include <viua/cpu/cpu.h>
 #include <viua/scheduler/vps.h>
 using namespace std;
+
+
+void printStackTrace(Process *process) {
+    auto trace = process->trace();
+    cout << "stack trace: from entry point, most recent call last...\n";
+    for (unsigned i = (trace.size() and trace[0]->function_name == "__entry"); i < trace.size(); ++i) {
+        cout << "  " << stringifyFunctionInvocation(trace[i]) << "\n";
+    }
+    cout << "\n";
+
+    Type *thrown_object = process->transferActiveException();
+    Exception* ex = dynamic_cast<Exception*>(thrown_object);
+    string ex_type = thrown_object->type();
+
+    //cout << "exception after " << cpu.counter() << " ticks" << endl;
+    //cout << "failed instruction: " << get<0>(disassembler::instruction(process->executionAt())) << endl;
+    cout << "uncaught object: " << ex_type << " = " << (ex ? ex->what() : thrown_object->str()) << endl;
+    cout << "\n";
+
+    cout << "frame details:\n";
+
+    if (trace.size()) {
+        Frame* last = trace.back();
+        if (last->regset->size()) {
+            unsigned non_empty = 0;
+            for (unsigned r = 0; r < last->regset->size(); ++r) {
+                if (last->regset->at(r) != nullptr) { ++non_empty; }
+            }
+            cout << "  non-empty registers: " << non_empty << '/' << last->regset->size();
+            cout << (non_empty ? ":\n" : "\n");
+            for (unsigned r = 0; r < last->regset->size(); ++r) {
+                if (last->regset->at(r) == nullptr) { continue; }
+                cout << "    registers[" << r << "]: ";
+                cout << '<' << last->regset->get(r)->type() << "> " << last->regset->get(r)->str() << endl;
+            }
+        } else {
+            cout << "  no registers were allocated for this frame" << endl;
+        }
+
+        if (last->args->size()) {
+            cout << "  non-empty arguments (out of " << last->args->size() << "):" << endl;
+            for (unsigned r = 0; r < last->args->size(); ++r) {
+                if (last->args->at(r) == nullptr) { continue; }
+                cout << "    arguments[" << r << "]: ";
+                if (last->args->isflagged(r, MOVED)) {
+                    cout << "[moved] ";
+                }
+                if (Pointer* ptr = dynamic_cast<Pointer*>(last->args->get(r))) {
+                    if (ptr->expired()) {
+                        cout << "<ExpiredPointer>" << endl;
+                    } else {
+                        cout << '<' << ptr->type() << '>' << endl;
+                    }
+                } else {
+                    cout << '<' << last->args->get(r)->type() << "> " << last->args->get(r)->str() << endl;
+                }
+            }
+        } else {
+            cout << "  no arguments were passed to this frame" << endl;
+        }
+    } else {
+        cout << "no stack trace available" << endl;
+    }
+}
 
 
 bool viua::scheduler::VirtualProcessScheduler::executeQuant(Process *th, unsigned priority) {
@@ -154,7 +221,6 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
 
     vector<Process*> running_processes_list;
     decltype(running_processes_list) dead_processes_list;
-    bool abort_because_of_process_termination = false;
     for (decltype(running_processes_list)::size_type i = 0; i < procs->size(); ++i) {
         current_process_index = i;
         auto th = procs->at(i);
@@ -163,7 +229,20 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
 
         if (th->terminated() and not th->joinable() and th->parent() == nullptr) {
             if (attached_cpu->currentWatchdog() == nullptr) {
-                abort_because_of_process_termination = true;
+                auto trace = th->trace();
+
+                cout << "process " << current_process_index << " spawned using ";
+                if (trace.size() > 1) {
+                    // if trace size if greater than one, detect if this is main process
+                    cout << trace[(trace[0]->function_name == ENTRY_FUNCTION_NAME)]->function_name;
+                } else if (trace.size()) {
+                    // if trace size is equal to one, just print the top-most function
+                    cout << trace[0]->function_name;
+                } else {
+                    cout << "<function unavailable>";
+                }
+                cout << " has terminated\n";
+                printStackTrace(th);
             } else {
                 Object* death_message = new Object("Object");
                 Type* exc = th->transferActiveException();
@@ -179,19 +258,13 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                 death_message->set("exception", exc);
                 death_message->set("parameters", parameters);
                 attached_cpu->currentWatchdog()->pass(death_message);
-
-                // push broken process to dead processes_list list to
-                // erase it later
-                dead_processes_list.push_back(th);
-
-                // copy what is left after this broken process to running processes_list array to
-                // prevent losing them
-                // because after the loop the `processes_list` vector is reset
-                for (decltype(running_processes_list)::size_type j = i+1; j < procs->size(); ++j) {
-                    running_processes_list.push_back(procs->at(j));
-                }
             }
-            break;
+
+            // push broken process to dead processes_list list to
+            // erase it later
+            dead_processes_list.push_back(th);
+
+            continue;
         }
 
         // if the process stopped and is not joinable declare it dead and
@@ -202,10 +275,6 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
         } else {
             running_processes_list.push_back(th);
         }
-    }
-
-    if (abort_because_of_process_termination) {
-        return false;
     }
 
     for (decltype(dead_processes_list)::size_type i = 0; i < dead_processes_list.size(); ++i) {
