@@ -334,36 +334,9 @@ int CPU::run() {
 
     return_code = vps.exit();
 
-    // FIXME: current_process_index is not updated inside VPS::burst()
-    if (vps.cpi() < vps.size() and vps.process()->terminated()) {
-        auto trace = vps.process()->trace();
-        cout << "process " << vps.cpi() << " spawned using ";
-        if (trace.size() > 1) {
-            // if trace size if greater than one, detect if this is main process
-            cout << trace[(trace[0]->function_name == ENTRY_FUNCTION_NAME)]->function_name;
-        } else if (trace.size()) {
-            // if trace size is equal to one, just print the top-most function
-            cout << trace[0]->function_name;
-        } else {
-            // if we have no trace available, inform the user about it
-            cout << "<function unavailable>";
-        }
-
-        cout << " has terminated" << endl;
-        Type* e = vps.process()->getActiveException();
-
-        return_code = 1;
-        terminating_exception = e;
-    }
-
-    // delete processes and global registers
-    // otherwise we get huge memory leak
-    // do not delete if execution was halted because of exception
-    if (not terminated()) {
-        while (processes.size()) {
-            delete processes.back();
-            processes.pop_back();
-        }
+    while (processes.size()) {
+        delete processes.back();
+        processes.pop_back();
     }
 
     return return_code;

@@ -89,12 +89,7 @@ class CPU {
     Type* thrown;
     Type* caught;
 
-    /*  Variables set after CPU executed bytecode.
-     *  They describe exit conditions of the bytecode that just stopped running.
-     */
-    int return_code;                // always set
-    std::string return_exception;   // set if CPU stopped because of an exception
-    std::string return_message;     // message set by exception
+    int return_code;
 
     uint64_t instruction_counter;
 
@@ -113,9 +108,6 @@ class CPU {
     std::mutex foreign_call_queue_mutex;
     std::condition_variable foreign_call_queue_condition;
     std::vector<std::thread*> foreign_call_workers;
-
-    // Final exception for stacktracing
-    Type* terminating_exception;
 
     std::vector<void*> cxx_dynamic_lib_handles;
 
@@ -180,19 +172,8 @@ class CPU {
         void requestForeignMethodCall(const std::string&, Type*, Frame*, RegisterSet*, RegisterSet*, Process*);
 
         int run();
-        inline decltype(instruction_counter) counter() {
-            return processes[current_process_index]->counter();
-        }
 
         int exit() const;
-        inline std::tuple<int, std::string, std::string> exitcondition() {
-            return std::tuple<int, std::string, std::string>(return_code, return_exception, return_message);
-        }
-        inline std::vector<Frame*> trace() { return processes[current_process_index]->trace(); }
-        inline byte* executionAt() const { return processes[current_process_index]->executionAt(); }
-
-        inline bool terminated() { return (terminating_exception != nullptr); }
-        inline Type* terminatedBy() { return terminating_exception; }
 
         CPU():
             bytecode(nullptr), bytecode_size(0), executable_offset(0),
@@ -202,9 +183,7 @@ class CPU {
             watchdog_process(nullptr),
             current_process_index(0),
             thrown(nullptr), caught(nullptr),
-            return_code(0), return_exception(""), return_message(""),
-            instruction_counter(0),
-            terminating_exception(nullptr),
+            return_code(0),
             debug(false), errors(false)
         {
             auto t = new std::thread(ff_call_processor, &foreign_call_queue, &foreign_functions, &foreign_functions_mutex, &foreign_call_queue_mutex, &foreign_call_queue_condition);
