@@ -156,13 +156,6 @@ void CPU::loadForeignLibrary(const string& module) {
 }
 
 
-Process* CPU::spawn(Frame* frm, Process* parent_process) {
-    unique_lock<std::mutex> lck{processes_mtx};
-    Process* thrd = new Process(frm, base_vps, parent_process);
-    thrd->begin();
-    processes.push_back(thrd);
-    return thrd;
-}
 Process* CPU::spawnWatchdog(Frame* frm) {
     if (watchdog_process != nullptr) {
         throw new Exception("watchdog process already spawned");

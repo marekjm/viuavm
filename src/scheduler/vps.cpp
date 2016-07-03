@@ -204,7 +204,10 @@ Process* viua::scheduler::VirtualProcessScheduler::process() {
 }
 
 Process* viua::scheduler::VirtualProcessScheduler::spawn(Frame *frame, Process *parent) {
-    return attached_cpu->spawn(frame, parent);
+    Process *p = new Process(frame, this, parent);
+    p->begin();
+    procs->push_back(p);
+    return p;
 }
 
 void viua::scheduler::VirtualProcessScheduler::spawnWatchdog(Frame *frame) {

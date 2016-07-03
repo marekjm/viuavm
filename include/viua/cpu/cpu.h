@@ -163,7 +163,6 @@ class CPU {
         CPU& registerForeignPrototype(const std::string&, Prototype*);
         CPU& registerForeignMethod(const std::string&, ForeignMethod);
 
-        Process* spawn(Frame*, Process* parent_process = nullptr);
         Process* spawnWatchdog(Frame*);
         Process* currentWatchdog() { return watchdog_process; }
         void resurrectWatchdog();
