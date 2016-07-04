@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <utility>
+#include <memory>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/cpu/frame.h>
 
@@ -24,7 +25,7 @@ namespace viua {
             decltype(processes)::size_type current_process_index;
 
             std::string watchdog_function;
-            Process *watchdog_process;
+            std::unique_ptr<Process> watchdog_process;
 
             int exit_code;
 

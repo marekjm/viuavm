@@ -215,9 +215,8 @@ void viua::scheduler::VirtualProcessScheduler::spawnWatchdog(Frame *frame) {
         throw new Exception("watchdog process already spawned");
     }
     watchdog_function = frame->function_name;
-    Process *p = new Process(frame, this, nullptr);
-    p->begin();
-    watchdog_process = p;
+    watchdog_process.reset(new Process(frame, this, nullptr));
+    watchdog_process->begin();
 }
 
 void viua::scheduler::VirtualProcessScheduler::resurrectWatchdog() {
@@ -227,8 +226,7 @@ void viua::scheduler::VirtualProcessScheduler::resurrectWatchdog() {
         delete active_exception;
     }
 
-    delete watchdog_process;
-    watchdog_process = nullptr;
+    watchdog_process.reset(nullptr);
 
     Frame *frm = nullptr;
     frm = new Frame(nullptr, 0, 64);
@@ -254,7 +252,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
         ticked = (executeQuant(th, th->priority()) or ticked);
 
         if (th->terminated() and not th->joinable() and th->parent() == nullptr) {
-            if (watchdog_process == nullptr) {
+            if (not watchdog_process) {
                 if (th == main_process) {
                     exit_code = 1;
                 }
@@ -319,8 +317,8 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
         }
     }
 
-    while (watchdog_process != nullptr and not watchdog_process->suspended()) {
-        executeQuant(watchdog_process, 0);
+    while (watchdog_process and not watchdog_process->suspended()) {
+        executeQuant(watchdog_process.get(), 0);
         if (watchdog_process->terminated() or watchdog_process->stopped()) {
             resurrectWatchdog();
         }
@@ -363,10 +361,6 @@ viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(CPU *acpu):
 }
 
 viua::scheduler::VirtualProcessScheduler::~VirtualProcessScheduler() {
-    if (watchdog_process) {
-        delete watchdog_process;
-    }
-
     while (processes.size()) {
         delete processes.back();
         processes.pop_back();
