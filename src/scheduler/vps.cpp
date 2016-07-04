@@ -196,7 +196,7 @@ auto viua::scheduler::VirtualProcessScheduler::size() const -> decltype(processe
 }
 
 Process* viua::scheduler::VirtualProcessScheduler::process(decltype(processes)::size_type index) {
-    return processes.at(index);
+    return processes.at(index).get();
 }
 
 Process* viua::scheduler::VirtualProcessScheduler::process() {
@@ -204,10 +204,10 @@ Process* viua::scheduler::VirtualProcessScheduler::process() {
 }
 
 Process* viua::scheduler::VirtualProcessScheduler::spawn(Frame *frame, Process *parent) {
-    Process *p = new Process(frame, this, parent);
+    unique_ptr<Process> p(new Process(frame, this, parent));
     p->begin();
-    processes.push_back(p);
-    return p;
+    processes.push_back(std::move(p));
+    return processes.back().get();
 }
 
 void viua::scheduler::VirtualProcessScheduler::spawnWatchdog(Frame *frame) {
@@ -243,11 +243,11 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
 
     bool ticked = false;
 
-    vector<Process*> running_processes_list;
+    vector<unique_ptr<Process>> running_processes_list;
     decltype(running_processes_list) dead_processes_list;
     for (decltype(running_processes_list)::size_type i = 0; i < processes.size(); ++i) {
         current_process_index = i;
-        auto th = processes.at(i);
+        auto th = processes.at(i).get();
 
         ticked = (executeQuant(th, th->priority()) or ticked);
 
@@ -290,7 +290,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
 
             // push broken process to dead processes_list list to
             // erase it later
-            dead_processes_list.push_back(th);
+            dead_processes_list.push_back(std::move(processes.at(i)));
 
             continue;
         }
@@ -299,23 +299,14 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
         // schedule for removal thus shortening the vector of running processes_list and
         // speeding up execution
         if (th->stopped() and (not th->joinable())) {
-            dead_processes_list.push_back(th);
+            dead_processes_list.push_back(std::move(processes.at(i)));
         } else {
-            running_processes_list.push_back(th);
+            running_processes_list.push_back(std::move(processes.at(i)));
         }
     }
 
-    for (decltype(dead_processes_list)::size_type i = 0; i < dead_processes_list.size(); ++i) {
-        delete dead_processes_list[i];
-    }
-
-    // if there were any dead processes_list we must rebuild the scheduled processes_list vector
-    if (dead_processes_list.size()) {
-        processes.erase(processes.begin(), processes.end());
-        for (decltype(running_processes_list)::size_type i = 0; i < running_processes_list.size(); ++i) {
-            processes.push_back(running_processes_list[i]);
-        }
-    }
+    processes.erase(processes.begin(), processes.end());
+    processes.swap(running_processes_list);
 
     while (watchdog_process and not watchdog_process->suspended()) {
         executeQuant(watchdog_process.get(), 0);
@@ -338,13 +329,13 @@ void viua::scheduler::VirtualProcessScheduler::bootstrap(const vector<string>& c
     }
     initial_frame->regset->set(1, cmdline);
 
-    Process* t = new Process(initial_frame, this, nullptr);
+    unique_ptr<Process> t(new Process(initial_frame, this, nullptr));
     t->detach();
     t->priority(16);
     t->begin();
-    main_process = t;
+    main_process = t.get();
 
-    processes.push_back(t);
+    processes.push_back(std::move(t));
 }
 
 int viua::scheduler::VirtualProcessScheduler::exit() const {
@@ -360,9 +351,4 @@ viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(CPU *acpu):
 {
 }
 
-viua::scheduler::VirtualProcessScheduler::~VirtualProcessScheduler() {
-    while (processes.size()) {
-        delete processes.back();
-        processes.pop_back();
-    }
-}
+viua::scheduler::VirtualProcessScheduler::~VirtualProcessScheduler() {}

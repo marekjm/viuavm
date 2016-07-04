@@ -21,7 +21,7 @@ namespace viua {
             CPU *attached_cpu;
 
             Process *main_process;
-            std::vector<Process*> processes;
+            std::vector<std::unique_ptr<Process>> processes;
             decltype(processes)::size_type current_process_index;
 
             std::string watchdog_function;
