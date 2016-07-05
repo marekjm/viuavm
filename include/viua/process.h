@@ -27,7 +27,6 @@ class HaltException : public std::runtime_error {
 };
 
 
-class CPU;
 namespace viua {
     namespace scheduler {
         class VirtualProcessScheduler;
