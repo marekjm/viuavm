@@ -326,13 +326,9 @@ void viua::scheduler::VirtualProcessScheduler::bootstrap(const vector<string>& c
     }
     initial_frame->regset->set(1, cmdline);
 
-    unique_ptr<Process> t(new Process(std::move(initial_frame), this, nullptr));
-    t->detach();
-    t->priority(16);
-    t->begin();
-    main_process = t.get();
-
-    processes.push_back(std::move(t));
+    main_process = spawn(std::move(initial_frame), nullptr);
+    main_process->detach();
+    main_process->priority(16);
 }
 
 int viua::scheduler::VirtualProcessScheduler::exit() const {
