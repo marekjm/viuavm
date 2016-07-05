@@ -53,7 +53,7 @@ class Process {
     RegisterSet* uregset;
 
     // Temporary register
-    Type* tmp;
+    std::unique_ptr<Type> tmp;
 
     // Static registers
     std::map<std::string, RegisterSet*> static_registers;

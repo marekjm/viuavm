@@ -92,12 +92,7 @@ byte* Process::opress(byte* addr) {
 }
 
 byte* Process::optmpri(byte* addr) {
-    if (tmp != nullptr) {
-        delete tmp;
-    }
-
-    tmp = pop(viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this));
-
+    tmp.reset(pop(viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this)));
     return addr;
 }
 byte* Process::optmpro(byte* addr) {
@@ -106,8 +101,7 @@ byte* Process::optmpro(byte* addr) {
     if (uregset->at(target) != nullptr) {
         uregset->free(target);
     }
-    uregset->set(target, tmp);
-    tmp = nullptr;
+    uregset->set(target, tmp.release());
 
     return addr;
 }
