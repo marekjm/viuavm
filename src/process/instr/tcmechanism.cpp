@@ -60,7 +60,7 @@ byte* Process::openter(byte* addr) {
     try_frame_new->associated_frame = frames.back().get();
     try_frame_new->block_name = block_name;
 
-    tryframes.push_back(try_frame_new.release());
+    tryframes.push_back(std::move(try_frame_new));
 
     return block_address;
 }
@@ -93,7 +93,6 @@ byte* Process::opleave(byte* addr) {
         throw new Exception("bad leave: no block has been entered");
     }
     addr = tryframes.back()->return_address;
-    delete tryframes.back();
     tryframes.pop_back();
 
     if (frames.size() > 0) {

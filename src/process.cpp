@@ -282,8 +282,7 @@ void Process::unwindCallStack(TryFrame* tframe) {
     }
 }
 void Process::unwindTryStack(TryFrame* tframe) {
-    while (tryframes.back() != tframe) {
-        delete tryframes.back();
+    while (tryframes.back().get() != tframe) {
         tryframes.pop_back();
     }
 }
@@ -297,7 +296,7 @@ tuple<TryFrame*, string> Process::findCatchFrame() {
     string caught_with_type = "";
 
     for (long unsigned i = tryframes.size(); i > 0; --i) {
-        TryFrame* tframe = tryframes[(i-1)];
+        TryFrame* tframe = tryframes[(i-1)].get();
         string handler_found_for_type = thrown->type();
         bool handler_found = tframe->catchers.count(handler_found_for_type);
 
