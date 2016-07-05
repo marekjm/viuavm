@@ -27,6 +27,9 @@ Type* Process::fetch(unsigned index) const {
     }
     return object;
 }
+Type* Process::obtain(unsigned index) const {
+    return fetch(index);
+}
 Type* Process::pop(unsigned index) {
     /*  Return pointer to object at given register.
      *  The object is removed from the register.
@@ -54,6 +57,9 @@ void Process::place(unsigned index, Type* obj) {
     if (old_ref_ptr and not uregset->isflagged(index, REFERENCE)) {
         updaterefs(old_ref_ptr, obj);
     }
+}
+void Process::put(unsigned index, Type *o) {
+    place(index, o);
 }
 void Process::updaterefs(Type* before, Type* now) {
     /** This method updates references to a given address present in registers.
@@ -154,6 +160,10 @@ void Process::dropFrame() {
     } else {
         uregset = regset.get();
     }
+}
+void Process::popFrame() {
+    // popFrame() is a public function for dropping frames
+    dropFrame();
 }
 
 byte* Process::adjustJumpBaseForBlock(const string& call_name) {
@@ -431,6 +441,25 @@ bool Process::suspended() {
     return is_suspended.load(std::memory_order_acquire);
 }
 
+Process* Process::parent() const {
+    return parent_process;
+}
+
+auto Process::priority() const -> decltype(process_priority) {
+    return process_priority;
+}
+void Process::priority(decltype(process_priority) p) {
+    process_priority = p;
+}
+
+bool Process::stopped() const {
+    return (finished or has_unhandled_exception);
+}
+
+bool Process::terminated() const {
+    return has_unhandled_exception;
+}
+
 void Process::pass(unique_ptr<Type> message) {
     message_queue.push(std::move(message));
     wakeup();
@@ -460,6 +489,12 @@ byte* Process::begin() {
         throw new Exception("process from undefined function: " + frames[0]->function_name);
     }
     return (instruction_pointer = adjustJumpBaseFor(frames[0]->function_name));
+}
+uint64_t Process::counter() const {
+    return instruction_counter;
+}
+auto Process::executionAt() const -> decltype(instruction_pointer) {
+    return instruction_pointer;
 }
 
 

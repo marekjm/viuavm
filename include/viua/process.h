@@ -237,12 +237,8 @@ class Process {
         byte* dispatch(byte*);
         byte* tick();
 
-        Type* obtain(unsigned i) const {
-            return fetch(i);
-        }
-        void put(unsigned i, Type* o) {
-            place(i, o);
-        }
+        Type* obtain(unsigned) const;
+        void put(unsigned, Type*);
 
         bool joinable() const;
         void join();
@@ -252,29 +248,27 @@ class Process {
         void wakeup();
         bool suspended();
 
-        inline Process* parent() const { return parent_process; };
+        Process* parent() const;
 
         void pass(std::unique_ptr<Type>);
 
-        decltype(process_priority) priority() const { return process_priority; }
-        void priority(decltype(process_priority) p) { process_priority = p; }
+        auto priority() const -> decltype(process_priority);
+        void priority(decltype(process_priority) p);
 
-        inline bool stopped() const { return (finished or has_unhandled_exception); }
+        bool stopped() const;
 
-        inline bool terminated() const { return has_unhandled_exception; }
+        bool terminated() const;
         Type* getActiveException();
         Type* transferActiveException();
         void raiseException(Type*);
         void handleActiveException();
 
-        inline void popFrame() {
-            dropFrame();
-        }
+        void popFrame();
         std::unique_ptr<Type> getReturnValue();
 
         byte* begin();
-        inline uint64_t counter() { return instruction_counter; }
-        inline decltype(instruction_pointer) executionAt() { return instruction_pointer; }
+        uint64_t counter() const;
+        auto executionAt() const -> decltype(instruction_pointer);
 
         std::vector<Frame*> trace() const;
 
