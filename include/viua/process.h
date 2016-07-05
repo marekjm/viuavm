@@ -56,7 +56,7 @@ class Process {
     std::unique_ptr<Type> tmp;
 
     // Static registers
-    std::map<std::string, RegisterSet*> static_registers;
+    std::map<std::string, std::unique_ptr<RegisterSet>> static_registers;
 
 
     // Call stack

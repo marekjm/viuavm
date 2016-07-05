@@ -80,7 +80,7 @@ byte* Process::opress(byte* addr) {
             break;
         case 2:
             ensureStaticRegisters(frames.back()->function_name);
-            uregset = static_registers.at(frames.back()->function_name);
+            uregset = static_registers.at(frames.back()->function_name).get();
             break;
         case 3:
             // TODO: switching to temporary registers

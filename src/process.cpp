@@ -97,7 +97,7 @@ void Process::ensureStaticRegisters(string function_name) {
         static_registers.at(function_name);
     } catch (const std::out_of_range& e) {
         // FIXME: amount of static registers should be customizable
-        static_registers[function_name] = new RegisterSet(16);
+        static_registers[function_name] = unique_ptr<RegisterSet>(new RegisterSet(16));
     }
 }
 
@@ -494,13 +494,4 @@ Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualProcessScheduler
     frames.push_back(std::move(frm));
 }
 
-Process::~Process() {
-    decltype(static_registers)::iterator sr = static_registers.begin();
-    while (sr != static_registers.end()) {
-        auto rkey = sr->first;
-        auto rset = sr->second;
-        ++sr;
-        static_registers.erase(rkey);
-        delete rset;
-    }
-}
+Process::~Process() {}
