@@ -68,18 +68,18 @@ class Process {
     std::unique_ptr<TryFrame> try_frame_new;
 
     /*  Slot for thrown objects (typically exceptions).
-     *  Can be set by user code and the CPU.
+     *  Can be set either by user code, or the VM.
      */
     std::unique_ptr<Type> thrown;
     std::unique_ptr<Type> caught;
     bool has_unhandled_exception;
 
-    /*  Variables set after CPU executed bytecode.
+    /*  Variables set after the VM has executed bytecode.
      *  They describe exit conditions of the bytecode that just stopped running.
      */
     std::unique_ptr<Type> return_value; // return value of top-most frame on the stack
     int return_code;                // always set
-    std::string return_exception;   // set if CPU stopped because of an exception
+    std::string return_exception;   // set if execution stopped because of an exception
     std::string return_message;     // message set by exception
 
     // FIXME: change unsigned to uint64_t
@@ -126,7 +126,7 @@ class Process {
     unsigned process_priority;
     std::mutex process_mtx;
 
-    /*  Methods implementing CPU instructions.
+    /*  Methods implementing individual instructions.
      */
     byte* opizero(byte*);
     byte* opistore(byte*);
