@@ -37,11 +37,10 @@ byte* Process::oppull(byte* addr) {
      */
     unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    if (caught == nullptr) {
+    if (not caught) {
         throw new Exception("no caught object to pull");
     }
-    uregset->set(target, caught);
-    caught = nullptr;
+    uregset->set(target, caught.release());
 
     return addr;
 }
@@ -83,8 +82,7 @@ byte* Process::opthrow(byte* addr) {
         throw new Exception(oss.str());
     }
 
-    thrown = uregset->get(source);
-    uregset->empty(source);
+    thrown.reset(uregset->pop(source));
 
     return addr;
 }

@@ -332,8 +332,7 @@ void Process::handleActiveException() {
     tie(tframe, handler_found_for_type) = findCatchFrame();
     if (tframe != nullptr) {
         unwindStack(tframe, handler_found_for_type);
-        caught = thrown;
-        thrown = nullptr;
+        caught.reset(thrown.release());
     }
 }
 byte* Process::tick() {
@@ -352,13 +351,13 @@ byte* Process::tick() {
          *
          * If user code cannot deal with them (i.e. did not register a catcher block) they will terminate execution later.
          */
-        thrown = e;
+        thrown.reset(e);
     } catch (const HaltException& e) {
         halt = true;
     } catch (Type* e) {
-        thrown = e;
+        thrown.reset(e);
     } catch (const char* e) {
-        thrown = new Exception(e);
+        thrown.reset(new Exception(e));
     }
 
     if (halt or frames.size() == 0) {
@@ -378,7 +377,7 @@ byte* Process::tick() {
      *        catchers or execution will be halted on unhandled types,
      */
     if (instruction_pointer == previous_instruction_pointer and (OPCODE(*instruction_pointer) != RETURN and OPCODE(*instruction_pointer) != JOIN and OPCODE(*instruction_pointer) != RECEIVE) and thrown == nullptr) {
-        thrown = new Exception("InstructionUnchanged");
+        thrown.reset(new Exception("InstructionUnchanged"));
     }
 
     if (thrown != nullptr and frame_new != nullptr) {
@@ -444,6 +443,20 @@ void Process::pass(Type* message) {
     message_queue.push(message);
     wakeup();
 }
+
+
+Type* Process::getActiveException() {
+    return thrown.get();
+}
+
+Type* Process::transferActiveException() {
+    return thrown.release();
+}
+
+void Process::raiseException(Type *exception) {
+    thrown.reset(exception);
+}
+
 
 byte* Process::begin() {
     if (not scheduler->isNativeFunction(frames[0]->function_name)) {

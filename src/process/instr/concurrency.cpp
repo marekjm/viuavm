@@ -44,7 +44,7 @@ byte* Process::opjoin(byte* addr) {
             thrd->join();
             return_addr = addr;
             if (thrd->terminated()) {
-                thrown = thrd->transferActiveException();
+                thrown.reset(thrd->transferActiveException());
             }
             if (target) {
                 place(target, thrd->getReturnValue());

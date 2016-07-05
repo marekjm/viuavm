@@ -71,8 +71,8 @@ class Process {
     /*  Slot for thrown objects (typically exceptions).
      *  Can be set by user code and the CPU.
      */
-    Type* thrown;
-    Type* caught;
+    std::unique_ptr<Type> thrown;
+    std::unique_ptr<Type> caught;
     bool has_unhandled_exception;
 
     /*  Variables set after CPU executed bytecode.
@@ -268,15 +268,9 @@ class Process {
         inline bool stopped() const { return (finished or has_unhandled_exception); }
 
         inline bool terminated() const { return has_unhandled_exception; }
-        inline Type* getActiveException() { return thrown; }
-        inline Type* transferActiveException() {
-            Type* active_exception = thrown;
-            thrown = nullptr;
-            return active_exception;
-        }
-        inline void raiseException(Type* exception) {
-            thrown = exception;
-        }
+        Type* getActiveException();
+        Type* transferActiveException();
+        void raiseException(Type*);
         void handleActiveException();
 
         inline void popFrame() {

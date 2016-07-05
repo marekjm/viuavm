@@ -223,7 +223,6 @@ void viua::scheduler::VirtualProcessScheduler::resurrectWatchdog() {
     auto active_exception = watchdog_process->getActiveException();
     if (active_exception) {
         cout << "watchdog process terminated by: " << active_exception->type() << ": '" << active_exception->str() << "'" << endl;
-        delete active_exception;
     }
 
     watchdog_process.reset(nullptr);
