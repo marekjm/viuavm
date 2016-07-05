@@ -46,7 +46,7 @@ byte* Process::opjoin(byte* addr) {
                 thrown.reset(thrd->transferActiveException());
             }
             if (target) {
-                place(target, thrd->getReturnValue());
+                place(target, thrd->getReturnValue().release());
             }
         }
     } else {

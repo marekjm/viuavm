@@ -59,8 +59,8 @@ Type* ProcessType::transferActiveException() {
     return thrd->transferActiveException();
 }
 
-Type* ProcessType::getReturnValue() {
-    return thrd->getReturnValue();
+unique_ptr<Type> ProcessType::getReturnValue() {
+    return std::move(thrd->getReturnValue());
 }
 
 

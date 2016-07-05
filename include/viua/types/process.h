@@ -4,6 +4,7 @@
 #pragma once
 
 #include <string>
+#include <memory>
 #include "type.h"
 #include "vector.h"
 #include "integer.h"
@@ -45,7 +46,7 @@ class ProcessType : public Type {
         bool stopped();
         bool terminated();
         Type* transferActiveException();
-        Type* getReturnValue();
+        std::unique_ptr<Type> getReturnValue();
 
         ProcessType(Process* t): thrd(t) {}
 };

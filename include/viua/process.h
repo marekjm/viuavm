@@ -78,7 +78,7 @@ class Process {
     /*  Variables set after CPU executed bytecode.
      *  They describe exit conditions of the bytecode that just stopped running.
      */
-    Type* return_value; // return value of top-most frame on the stack
+    std::unique_ptr<Type> return_value; // return value of top-most frame on the stack
     int return_code;                // always set
     std::string return_exception;   // set if CPU stopped because of an exception
     std::string return_message;     // message set by exception
@@ -276,11 +276,7 @@ class Process {
         inline void popFrame() {
             dropFrame();
         }
-        inline Type* getReturnValue() {
-            Type* o = return_value;
-            return_value = nullptr;
-            return o;
-        }
+        std::unique_ptr<Type> getReturnValue();
 
         byte* begin();
         inline uint64_t counter() { return instruction_counter; }

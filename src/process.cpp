@@ -149,7 +149,7 @@ void Process::dropFrame() {
     }
 
     if (frames.size() == 0) {
-        return_value = frame->regset->pop(0);
+        return_value.reset(frame->regset->pop(0));
     }
 
     if (frames.size()) {
@@ -453,6 +453,11 @@ void Process::raiseException(Type *exception) {
 }
 
 
+unique_ptr<Type> Process::getReturnValue() {
+    return std::move(return_value);
+}
+
+
 byte* Process::begin() {
     if (not scheduler->isNativeFunction(frames[0]->function_name)) {
         throw new Exception("process from undefined function: " + frames[0]->function_name);
@@ -497,9 +502,5 @@ Process::~Process() {
         ++sr;
         static_registers.erase(rkey);
         delete rset;
-    }
-
-    if (return_value != nullptr) {
-        delete return_value;
     }
 }
