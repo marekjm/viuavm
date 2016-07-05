@@ -210,12 +210,12 @@ Process* viua::scheduler::VirtualProcessScheduler::spawn(Frame *frame, Process *
     return processes.back().get();
 }
 
-void viua::scheduler::VirtualProcessScheduler::spawnWatchdog(Frame *frame) {
+void viua::scheduler::VirtualProcessScheduler::spawnWatchdog(unique_ptr<Frame> frame) {
     if (watchdog_process) {
         throw new Exception("watchdog process already spawned");
     }
     watchdog_function = frame->function_name;
-    watchdog_process.reset(new Process(frame, this, nullptr));
+    watchdog_process.reset(new Process(frame.release(), this, nullptr));
     watchdog_process->begin();
 }
 
@@ -227,11 +227,9 @@ void viua::scheduler::VirtualProcessScheduler::resurrectWatchdog() {
 
     watchdog_process.reset(nullptr);
 
-    Frame *frm = nullptr;
-    frm = new Frame(nullptr, 0, 64);
+    unique_ptr<Frame> frm(new Frame(nullptr, 0, 64));
     frm->function_name = watchdog_function;
-
-    spawnWatchdog(frm);
+    spawnWatchdog(std::move(frm));
 }
 
 bool viua::scheduler::VirtualProcessScheduler::burst() {

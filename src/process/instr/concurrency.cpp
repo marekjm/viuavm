@@ -92,8 +92,9 @@ byte* Process::opwatchdog(byte* addr) {
     }
 
     frame_new->function_name = call_name;
-    scheduler->spawnWatchdog(frame_new);
+    unique_ptr<Frame> frn(frame_new);
     frame_new = nullptr;
+    scheduler->spawnWatchdog(std::move(frn));
 
     return addr;
 }
