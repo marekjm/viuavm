@@ -66,7 +66,7 @@ class Process {
 
     // Block stack
     std::vector<TryFrame*> tryframes;
-    TryFrame* try_frame_new;
+    std::unique_ptr<TryFrame> try_frame_new;
 
     /*  Slot for thrown objects (typically exceptions).
      *  Can be set by user code and the CPU.

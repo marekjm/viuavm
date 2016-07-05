@@ -10,10 +10,10 @@ using namespace std;
 byte* Process::optry(byte* addr) {
     /** Create new special frame for try blocks.
      */
-    if (try_frame_new != nullptr) {
+    if (try_frame_new) {
         throw "new block frame requested while last one is unused";
     }
-    try_frame_new = new TryFrame();
+    try_frame_new.reset(new TryFrame());
     return addr;
 }
 
@@ -60,8 +60,7 @@ byte* Process::openter(byte* addr) {
     try_frame_new->associated_frame = frames.back();
     try_frame_new->block_name = block_name;
 
-    tryframes.push_back(try_frame_new);
-    try_frame_new = nullptr;
+    tryframes.push_back(try_frame_new.release());
 
     return block_address;
 }
