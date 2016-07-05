@@ -96,6 +96,10 @@ byte* Process::optmpri(byte* addr) {
     return addr;
 }
 byte* Process::optmpro(byte* addr) {
+    if (not tmp) {
+        throw new Exception("temporary register set is empty");
+    }
+
     unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     if (uregset->at(target) != nullptr) {

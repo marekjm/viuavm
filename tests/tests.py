@@ -532,6 +532,9 @@ class RegisterManipulationInstructionsTests(unittest.TestCase):
     def testEMPTY(self):
         runTest(self, 'empty.asm', 'true')
 
+    def testFetchingFromEmptyTemporaryRegister(self):
+        runTestThrowsException(self, 'fetching_from_empty_tmp_register.asm', 'uncaught object: Exception = temporary register set is empty')
+
 
 class SampleProgramsTests(unittest.TestCase):
     """Tests for various sample programs.
