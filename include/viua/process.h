@@ -62,7 +62,7 @@ class Process {
     // Call stack
     byte* jump_base;
     std::vector<Frame*> frames;
-    Frame* frame_new;
+    std::unique_ptr<Frame> frame_new;
 
     // Block stack
     std::vector<TryFrame*> tryframes;

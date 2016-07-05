@@ -155,8 +155,7 @@ byte* Process::optailcall(byte* addr) {
 
     // new frame must be deleted to prevent future errors
     // it's a simulated "push-and-pop" from the stack
-    delete frame_new;
-    frame_new = nullptr;
+    frame_new.reset(nullptr);
 
     return adjustJumpBaseFor(call_name);
 }

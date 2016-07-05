@@ -108,8 +108,9 @@ Frame* Process::requestNewFrame(unsigned arguments_size, unsigned registers_size
      *  Throws an exception otherwise.
      *  Returns pointer to the newly created frame.
      */
-    if (frame_new != nullptr) { throw "requested new frame while last one is unused"; }
-    return (frame_new = new Frame(nullptr, arguments_size, registers_size));
+    if (frame_new) { throw "requested new frame while last one is unused"; }
+    frame_new.reset(new Frame(nullptr, arguments_size, registers_size));
+    return frame_new.get();
 }
 void Process::pushFrame() {
     /** Pushes new frame to be the current (top-most) one.
@@ -121,13 +122,12 @@ void Process::pushFrame() {
     }
 
     uregset = frame_new->regset;
-    if (find(frames.begin(), frames.end(), frame_new) != frames.end()) {
+    if (find(frames.begin(), frames.end(), frame_new.get()) != frames.end()) {
         ostringstream oss;
-        oss << "stack corruption: frame " << hex << frame_new << dec << " for function " << frame_new->function_name << '/' << frame_new->args->size() << " pushed more than once";
+        oss << "stack corruption: frame " << hex << frame_new.get() << dec << " for function " << frame_new->function_name << '/' << frame_new->args->size() << " pushed more than once";
         throw oss.str();
     }
-    frames.push_back(frame_new);
-    frame_new = nullptr;
+    frames.push_back(frame_new.release());
 }
 void Process::dropFrame() {
     /** Drops top-most frame from call stack.
@@ -178,7 +178,7 @@ byte* Process::adjustJumpBaseFor(const string& call_name) {
 byte* Process::callNative(byte* return_address, const string& call_name, const bool return_ref, const unsigned return_index, const string&) {
     byte* call_address = adjustJumpBaseFor(call_name);
 
-    if (frame_new == nullptr) {
+    if (not frame_new) {
         throw new Exception("function call without a frame: use `frame 0' in source code if the function takes no parameters");
     }
     // set function name and return address
@@ -193,7 +193,7 @@ byte* Process::callNative(byte* return_address, const string& call_name, const b
     return call_address;
 }
 byte* Process::callForeign(byte* return_address, const string& call_name, const bool return_ref, const unsigned return_index, const string&) {
-    if (frame_new == nullptr) {
+    if (not frame_new) {
         throw new Exception("external function call without a frame: use `frame 0' in source code if the function takes no parameters");
     }
     // set function name and return address
@@ -204,13 +204,12 @@ byte* Process::callForeign(byte* return_address, const string& call_name, const 
     frame_new->place_return_value_in = return_index;
 
     suspend();
-    scheduler->requestForeignFunctionCall(frame_new, this);
-    frame_new = nullptr;
+    scheduler->requestForeignFunctionCall(frame_new.release(), this);
 
     return return_address;
 }
 byte* Process::callForeignMethod(byte* return_address, Type* object, const string& call_name, const bool return_ref, const unsigned return_index, const string&) {
-    if (frame_new == nullptr) {
+    if (not frame_new) {
         throw new Exception("foreign method call without a frame");
     }
     // set function name and return address
@@ -220,7 +219,7 @@ byte* Process::callForeignMethod(byte* return_address, Type* object, const strin
     frame_new->resolve_return_value_register = return_ref;
     frame_new->place_return_value_in = return_index;
 
-    Frame* frame = frame_new;
+    Frame* frame = frame_new.get();
 
     pushFrame();
 
@@ -376,11 +375,11 @@ byte* Process::tick() {
      *      - an object has been thrown, as the instruction pointer will be adjusted by
      *        catchers or execution will be halted on unhandled types,
      */
-    if (instruction_pointer == previous_instruction_pointer and (OPCODE(*instruction_pointer) != RETURN and OPCODE(*instruction_pointer) != JOIN and OPCODE(*instruction_pointer) != RECEIVE) and thrown == nullptr) {
+    if (instruction_pointer == previous_instruction_pointer and (OPCODE(*instruction_pointer) != RETURN and OPCODE(*instruction_pointer) != JOIN and OPCODE(*instruction_pointer) != RECEIVE) and (not thrown)) {
         thrown.reset(new Exception("InstructionUnchanged"));
     }
 
-    if (thrown != nullptr and frame_new != nullptr) {
+    if (thrown and frame_new) {
         /*  Delete active frame after an exception is thrown.
          *  There're two reasons for such behaviour:
          *  - it prevents memory leaks if an exception escapes and
@@ -389,14 +388,13 @@ byte* Process::tick() {
          *    clean environment (as there is no way of dropping a frame without
          *    using it),
          */
-        delete frame_new;
-        frame_new = nullptr;
+        frame_new.reset(nullptr);
     }
 
-    if (thrown != nullptr) {
+    if (thrown) {
         handleActiveException();
     }
-    if (thrown != nullptr) {
+    if (thrown) {
         has_unhandled_exception = true;
         return nullptr;
     }

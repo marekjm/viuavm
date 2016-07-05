@@ -24,8 +24,7 @@ byte* Process::opprocess(byte* addr) {
     }
 
     frame_new->function_name = call_name;
-    place(target, new ProcessType(scheduler->spawn(frame_new, this)));
-    frame_new = nullptr;
+    place(target, new ProcessType(scheduler->spawn(frame_new.release(), this)));
 
     return addr;
 }
@@ -92,9 +91,7 @@ byte* Process::opwatchdog(byte* addr) {
     }
 
     frame_new->function_name = call_name;
-    unique_ptr<Frame> frn(frame_new);
-    frame_new = nullptr;
-    scheduler->spawnWatchdog(std::move(frn));
+    scheduler->spawnWatchdog(std::move(frame_new));
 
     return addr;
 }
