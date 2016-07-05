@@ -43,8 +43,6 @@ class Process {
     Process* parent_process;
     const std::string entry_function;
 
-    bool debug;
-
     // Global register set
     std::unique_ptr<RegisterSet> regset;
 
@@ -78,9 +76,6 @@ class Process {
      *  They describe exit conditions of the bytecode that just stopped running.
      */
     std::unique_ptr<Type> return_value; // return value of top-most frame on the stack
-    int return_code;                // always set
-    std::string return_exception;   // set if execution stopped because of an exception
-    std::string return_message;     // message set by exception
 
     // FIXME: change unsigned to uint64_t
     uint64_t instruction_counter;
@@ -281,9 +276,6 @@ class Process {
         inline uint64_t counter() { return instruction_counter; }
         inline decltype(instruction_pointer) executionAt() { return instruction_pointer; }
 
-        inline std::tuple<int, std::string, std::string> exitcondition() {
-            return std::tuple<int, std::string, std::string>(return_code, return_exception, return_message);
-        }
         std::vector<Frame*> trace() const;
 
         Process(std::unique_ptr<Frame>, viua::scheduler::VirtualProcessScheduler*, Process*);

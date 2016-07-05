@@ -66,9 +66,6 @@ void Process::updaterefs(Type* before, Type* now) {
     // FIXME: this function should update references in all registersets
     for (unsigned i = 0; i < uregset->size(); ++i) {
         if (uregset->at(i) == before) {
-            if (debug) {
-                cout << "\nCPU: updating reference address in register " << i << hex << ": " << before << " -> " << now << dec << endl;
-            }
             mask_t had_mask = uregset->getmask(i);
             uregset->empty(i);
             uregset->set(i, now);
@@ -476,13 +473,11 @@ vector<Frame*> Process::trace() const {
 
 
 Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualProcessScheduler *sch, Process* pt): scheduler(sch), parent_process(pt), entry_function(frm->function_name),
-    debug(false),
     regset(nullptr), uregset(nullptr), tmp(nullptr),
     jump_base(nullptr),
     frame_new(nullptr), try_frame_new(nullptr),
     thrown(nullptr), caught(nullptr), has_unhandled_exception(false),
     return_value(nullptr),
-    return_code(0),
     instruction_counter(0),
     instruction_pointer(nullptr),
     finished(false), is_joinable(true),
