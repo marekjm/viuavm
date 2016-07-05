@@ -203,8 +203,8 @@ Process* viua::scheduler::VirtualProcessScheduler::process() {
     return process(current_process_index);
 }
 
-Process* viua::scheduler::VirtualProcessScheduler::spawn(Frame *frame, Process *parent) {
-    unique_ptr<Process> p(new Process(frame, this, parent));
+Process* viua::scheduler::VirtualProcessScheduler::spawn(unique_ptr<Frame> frame, Process *parent) {
+    unique_ptr<Process> p(new Process(std::move(frame), this, parent));
     p->begin();
     processes.push_back(std::move(p));
     return processes.back().get();
@@ -215,7 +215,7 @@ void viua::scheduler::VirtualProcessScheduler::spawnWatchdog(unique_ptr<Frame> f
         throw new Exception("watchdog process already spawned");
     }
     watchdog_function = frame->function_name;
-    watchdog_process.reset(new Process(frame.release(), this, nullptr));
+    watchdog_process.reset(new Process(std::move(frame), this, nullptr));
     watchdog_process->begin();
 }
 
@@ -316,7 +316,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
 }
 
 void viua::scheduler::VirtualProcessScheduler::bootstrap(const vector<string>& commandline_arguments) {
-    Frame *initial_frame = new Frame(nullptr, 0, 2);
+    unique_ptr<Frame> initial_frame(new Frame(nullptr, 0, 2));
     initial_frame->function_name = ENTRY_FUNCTION_NAME;
 
     Vector* cmdline = new Vector();
@@ -326,7 +326,7 @@ void viua::scheduler::VirtualProcessScheduler::bootstrap(const vector<string>& c
     }
     initial_frame->regset->set(1, cmdline);
 
-    unique_ptr<Process> t(new Process(initial_frame, this, nullptr));
+    unique_ptr<Process> t(new Process(std::move(initial_frame), this, nullptr));
     t->detach();
     t->priority(16);
     t->begin();

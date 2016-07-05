@@ -24,7 +24,7 @@ byte* Process::opprocess(byte* addr) {
     }
 
     frame_new->function_name = call_name;
-    place(target, new ProcessType(scheduler->spawn(frame_new.release(), this)));
+    place(target, new ProcessType(scheduler->spawn(std::move(frame_new), this)));
 
     return addr;
 }

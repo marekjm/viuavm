@@ -61,7 +61,7 @@ class Process {
 
     // Call stack
     byte* jump_base;
-    std::vector<Frame*> frames;
+    std::vector<std::unique_ptr<Frame>> frames;
     std::unique_ptr<Frame> frame_new;
 
     // Block stack
@@ -289,9 +289,9 @@ class Process {
         inline std::tuple<int, std::string, std::string> exitcondition() {
             return std::tuple<int, std::string, std::string>(return_code, return_exception, return_message);
         }
-        inline std::vector<Frame*> trace() { return frames; }
+        std::vector<Frame*> trace() const;
 
-        Process(Frame* frm, viua::scheduler::VirtualProcessScheduler *sch, Process* pt);
+        Process(std::unique_ptr<Frame>, viua::scheduler::VirtualProcessScheduler*, Process*);
         ~Process();
 };
 

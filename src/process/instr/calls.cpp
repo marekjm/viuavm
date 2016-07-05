@@ -146,7 +146,7 @@ byte* Process::optailcall(byte* addr) {
     /*     return callForeignMethod(addr, obj, call_name, return_register_ref, return_register_index, call_name); */
     /* } */
 
-    Frame* last_frame = *(frames.end()-1);
+    Frame *last_frame = frames.back().get();
 
     // move arguments from new frame to old frame
     delete last_frame->args;

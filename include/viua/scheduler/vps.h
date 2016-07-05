@@ -65,7 +65,7 @@ namespace viua {
 
             Process* process(decltype(processes)::size_type);
             Process* process();
-            Process* spawn(Frame*, Process*);
+            Process* spawn(std::unique_ptr<Frame>, Process*);
             void spawnWatchdog(std::unique_ptr<Frame>);
 
             bool executeQuant(Process*, unsigned);

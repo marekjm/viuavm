@@ -122,17 +122,18 @@ void Process::pushFrame() {
     }
 
     uregset = frame_new->regset;
-    if (find(frames.begin(), frames.end(), frame_new.get()) != frames.end()) {
+    if (find(frames.begin(), frames.end(), frame_new) != frames.end()) {
         ostringstream oss;
         oss << "stack corruption: frame " << hex << frame_new.get() << dec << " for function " << frame_new->function_name << '/' << frame_new->args->size() << " pushed more than once";
         throw oss.str();
     }
-    frames.push_back(frame_new.release());
+    frames.push_back(std::move(frame_new));
 }
 void Process::dropFrame() {
     /** Drops top-most frame from call stack.
      */
-    Frame* frame = frames.back();
+    unique_ptr<Frame> frame(std::move(frames.back()));
+    frames.pop_back();
 
     for (registerset_size_type i = 0; i < frame->regset->size(); ++i) {
         if (ProcessType* t = dynamic_cast<ProcessType*>(frame->regset->at(i))) {
@@ -147,12 +148,9 @@ void Process::dropFrame() {
         }
     }
 
-    if (frames.size() == 1) {
+    if (frames.size() == 0) {
         return_value = frame->regset->pop(0);
     }
-
-    delete frame;
-    frames.pop_back();
 
     if (frames.size()) {
         uregset = frames.back()->regset;
@@ -274,7 +272,7 @@ void Process::adjustInstructionPointer(TryFrame* tframe, string handler_found_fo
 void Process::unwindCallStack(TryFrame* tframe) {
     unsigned distance = 0;
     for (long unsigned j = (frames.size()-1); j > 1; --j) {
-        if (frames[j] == tframe->associated_frame) {
+        if (frames[j].get() == tframe->associated_frame) {
             break;
         }
         ++distance;
@@ -463,7 +461,17 @@ byte* Process::begin() {
     return (instruction_pointer = adjustJumpBaseFor(frames[0]->function_name));
 }
 
-Process::Process(Frame* frm, viua::scheduler::VirtualProcessScheduler *sch, Process* pt): scheduler(sch), parent_process(pt), entry_function(frm->function_name),
+
+vector<Frame*> Process::trace() const {
+    vector<Frame*> tr;
+    for (auto& each : frames) {
+        tr.push_back(each.get());
+    }
+    return tr;
+}
+
+
+Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualProcessScheduler *sch, Process* pt): scheduler(sch), parent_process(pt), entry_function(frm->function_name),
     debug(false),
     regset(nullptr), uregset(nullptr), tmp(nullptr),
     jump_base(nullptr),
@@ -479,15 +487,10 @@ Process::Process(Frame* frm, viua::scheduler::VirtualProcessScheduler *sch, Proc
 {
     regset.reset(new RegisterSet(DEFAULT_REGISTER_SIZE));
     uregset = frm->regset;
-    frames.push_back(frm);
+    frames.push_back(std::move(frm));
 }
 
 Process::~Process() {
-    while (frames.size()) {
-        delete frames.back();
-        frames.pop_back();
-    }
-
     decltype(static_registers)::iterator sr = static_registers.begin();
     while (sr != static_registers.end()) {
         auto rkey = sr->first;
