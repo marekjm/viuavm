@@ -282,7 +282,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                 death_message->set("function", new Function(th->trace()[0]->function_name));
                 death_message->set("exception", exc);
                 death_message->set("parameters", parameters);
-                watchdog_process->pass(death_message);
+                watchdog_process->pass(unique_ptr<Type>(death_message));
             }
 
             // push broken process to dead processes_list list to

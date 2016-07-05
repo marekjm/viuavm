@@ -260,7 +260,6 @@ class Process {
 
         inline Process* parent() const { return parent_process; };
 
-        void pass(Type* message);
         void pass(std::unique_ptr<Type>);
 
         decltype(process_priority) priority() const { return process_priority; }

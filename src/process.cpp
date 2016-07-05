@@ -434,8 +434,8 @@ bool Process::suspended() {
     return is_suspended.load(std::memory_order_acquire);
 }
 
-void Process::pass(Type* message) {
-    message_queue.push(unique_ptr<Type>(message));
+void Process::pass(unique_ptr<Type> message) {
+    message_queue.push(std::move(message));
     wakeup();
 }
 

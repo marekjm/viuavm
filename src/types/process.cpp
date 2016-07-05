@@ -116,5 +116,5 @@ void ProcessType::pass(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*)
         throw new Exception("expected Process as first parameter but got " + frame->args->at(0)->type());
     }
 
-    thrd->pass(frame->args->at(1)->copy());
+    thrd->pass(unique_ptr<Type>(frame->args->at(1)->copy()));
 }
