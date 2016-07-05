@@ -435,7 +435,7 @@ bool Process::suspended() {
 }
 
 void Process::pass(Type* message) {
-    message_queue.push(message);
+    message_queue.push(unique_ptr<Type>(message));
     wakeup();
 }
 

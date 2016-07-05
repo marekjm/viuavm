@@ -87,7 +87,7 @@ class Process {
     uint64_t instruction_counter;
     byte* instruction_pointer;
 
-    std::queue<Type*> message_queue;
+    std::queue<std::unique_ptr<Type>> message_queue;
 
     Type* fetch(unsigned) const;
     Type* pop(unsigned);
@@ -261,6 +261,7 @@ class Process {
         inline Process* parent() const { return parent_process; };
 
         void pass(Type* message);
+        void pass(std::unique_ptr<Type>);
 
         decltype(process_priority) priority() const { return process_priority; }
         void priority(decltype(process_priority) p) { process_priority = p; }

@@ -66,7 +66,7 @@ byte* Process::opreceive(byte* addr) {
     unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     if (message_queue.size()) {
-        place(target, message_queue.front());
+        place(target, message_queue.front().release());
         message_queue.pop();
         return_addr = addr;
     } else {
