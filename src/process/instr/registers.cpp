@@ -73,7 +73,7 @@ byte* Process::opress(byte* addr) {
 
     switch (to_register_set) {
         case 0:
-            uregset = regset;
+            uregset = regset.get();
             break;
         case 1:
             uregset = frames.back()->regset;

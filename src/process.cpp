@@ -157,7 +157,7 @@ void Process::dropFrame() {
     if (frames.size()) {
         uregset = frames.back()->regset;
     } else {
-        uregset = regset;
+        uregset = regset.get();
     }
 }
 
@@ -452,6 +452,25 @@ byte* Process::begin() {
     return (instruction_pointer = adjustJumpBaseFor(frames[0]->function_name));
 }
 
+Process::Process(Frame* frm, viua::scheduler::VirtualProcessScheduler *sch, Process* pt): scheduler(sch), parent_process(pt), entry_function(frm->function_name),
+    debug(false),
+    regset(nullptr), uregset(nullptr), tmp(nullptr),
+    jump_base(nullptr),
+    frame_new(nullptr), try_frame_new(nullptr),
+    thrown(nullptr), caught(nullptr), has_unhandled_exception(false),
+    return_value(nullptr),
+    return_code(0),
+    instruction_counter(0),
+    instruction_pointer(nullptr),
+    finished(false), is_joinable(true),
+    is_suspended(false),
+    process_priority(1)
+{
+    regset.reset(new RegisterSet(DEFAULT_REGISTER_SIZE));
+    uregset = frm->regset;
+    frames.push_back(frm);
+}
+
 Process::~Process() {
     while (frames.size()) {
         delete frames.back();
@@ -466,8 +485,6 @@ Process::~Process() {
         static_registers.erase(rkey);
         delete rset;
     }
-
-    delete regset;
 
     if (return_value != nullptr) {
         delete return_value;
