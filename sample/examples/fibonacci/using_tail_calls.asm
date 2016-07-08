@@ -4,14 +4,14 @@
     arg current_value 0
     arg accumulator 1
 
-    branch current_value +1 fibonacci/0__finished
+    branch current_value +1 fibonacci/2__finished
 
     iadd accumulator current_value
 
     frame ^[(pamv 0 (idec current_value)) (pamv 1 accumulator)]
     tailcall fibonacci/2
 
-    .mark: fibonacci/0__finished
+    .mark: fibonacci/2__finished
     move 0 accumulator
     return
 .end

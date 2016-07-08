@@ -5,13 +5,13 @@
     arg accumulator 1
 
     .mark: fibonacci/2__loop
-    branch current_value +1 fibonacci/0__finished
+    branch current_value +1 fibonacci/2__finished
 
     iadd accumulator ^(idec current_value)
 
     jump fibonacci/2__loop
 
-    .mark: fibonacci/0__finished
+    .mark: fibonacci/2__finished
     move 0 accumulator
     return
 .end

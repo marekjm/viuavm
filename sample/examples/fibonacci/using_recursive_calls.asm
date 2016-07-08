@@ -2,14 +2,14 @@
     .name: 1 current_value
     arg current_value 0
 
-    branch current_value +1 fibonacci/0__finished
+    branch current_value +1 fibonacci/1__finished
 
     frame ^[(pamv 0 (idec (copy 2 current_value)))]
     call 2 fibonacci/1
 
     iadd current_value 2
 
-    .mark: fibonacci/0__finished
+    .mark: fibonacci/1__finished
     move 0 current_value
     return
 .end
