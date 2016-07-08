@@ -18,10 +18,10 @@
 
 .function: fibonacci/1
     .name: 2 accumulator
-    frame ^[(pamv 0 (arg 1 0)) (pamv 1 (izero 2))]
+
+    frame ^[(pamv 0 (arg 1 0)) (pamv 1 (izero accumulator))]
     call accumulator fibonacci/2
 
-    .mark: fibonacci/0__finished
     move 0 accumulator
     return
 .end
