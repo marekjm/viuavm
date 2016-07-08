@@ -16,14 +16,23 @@
     return
 .end
 
+.function: fibonacci/1
+    .name: 2 accumulator
+
+    frame ^[(pamv 0 (arg 1 0)) (pamv 1 (izero accumulator))]
+    call accumulator fibonacci/2
+
+    move 0 accumulator
+    return
+.end
+
 .function: main/0
     .name: 1 result
 
     istore result 5
 
-    ; pass accumulator in second parameter slot
-    frame ^[(pamv 0 result) (pamv 1 (izero 2)]
-    call result fibonacci/2
+    frame ^[(pamv 0 result)]
+    call result fibonacci/1
 
     print result
 
