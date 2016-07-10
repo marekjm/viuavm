@@ -29,6 +29,16 @@ There are several categories of change:
 ----
 
 
+# From 0.8.2 to 0.8.3
+
+- feature: the `--` string can now be used to begin comments,
+  the same as `;` comments, `--` comments must appear on their own line and
+  run only until the end of their line,
+
+
+----
+
+
 # From 0.8.1 to 0.8.2
 
 CPU access from processes is now routed through the scheduler, which allows
