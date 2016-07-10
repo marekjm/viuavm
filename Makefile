@@ -95,7 +95,7 @@ installdevel: platform
 	mkdir -p $(LIB_PATH)/platform
 	cp ./build/platform/*.o $(LIB_PATH)/platform
 
-install: bininstall installdevel
+install: bininstall libinstall
 	mkdir -p $(H_PATH)
 	cp -R ./include/viua/. $(H_PATH)/
 
