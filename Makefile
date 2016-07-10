@@ -16,7 +16,7 @@ DYNAMIC_SYMS=-Wl,--dynamic-list-cpp-typeinfo
 VIUA_INSTR_FILES_O=build/process/instr/general.o build/process/instr/registers.o build/process/instr/calls.o build/process/instr/concurrency.o build/process/instr/linking.o build/process/instr/tcmechanism.o build/process/instr/closure.o build/process/instr/int.o build/process/instr/float.o build/process/instr/byte.o build/process/instr/str.o build/process/instr/bool.o build/process/instr/cast.o build/process/instr/vector.o build/process/instr/prototype.o build/process/instr/object.o
 
 
-PREFIX=/usr
+PREFIX=/usr/local
 BIN_PATH=$(PREFIX)/bin
 LIB_PATH=$(PREFIX)/lib/viua
 H_PATH=$(PREFIX)/include/viua
