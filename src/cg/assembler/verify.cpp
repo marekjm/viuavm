@@ -429,7 +429,7 @@ string assembler::verify::instructions(const string& filename, const vector<stri
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = str::lstrip(lines[i]);
-        if (line.size() == 0 or line[0] == '.' or line[0] == ';') {
+        if (line.size() == 0 or line[0] == '.' or line[0] == ';' or str::startswith(line, "--")) {
             continue;
         }
 

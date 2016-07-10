@@ -709,7 +709,7 @@ vector<string> expandSource(const vector<string>& lines, map<long unsigned, long
         } else if (str::startswith(stripped_lines[i], ".end")) {
             expanded_lines_to_source_lines[asm_lines.size()] = i;
             asm_lines.push_back(lines[i]);
-        } else if (stripped_lines[i][0] == ';') {
+        } else if (stripped_lines[i][0] == ';' or str::startswith(stripped_lines[i], "--")) {
             expanded_lines_to_source_lines[asm_lines.size()] = i;
             asm_lines.push_back(lines[i]);
         } else if (not str::contains(stripped_lines[i], '(')) {

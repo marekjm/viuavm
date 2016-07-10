@@ -16,7 +16,7 @@ vector<string> assembler::ce::getilines(const vector<string>& lines) {
 
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = str::lstrip(lines[i]);
-        if (!line.size() or line[0] == ';') continue;
+        if (!line.size() or line[0] == ';' or str::startswith(line, "--")) continue;
         ilines.push_back(line);
     }
 
