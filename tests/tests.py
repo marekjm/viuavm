@@ -934,7 +934,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, opts=('--Ehalt-is-last',), okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/halt_as_last_instruction.asm:4: error: function does not end with 'return' or 'tailcall': main/1", output.strip())
+        self.assertEqual("./sample/asm/errors/halt_as_last_instruction.asm:23: error: function does not end with 'return' or 'tailcall': main/1", output.strip())
 
     def testArityError(self):
         name = 'arity_error.asm'
@@ -942,7 +942,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, opts=('--Ehalt-is-last',), okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/arity_error.asm:8: error: invalid number of parameters in call to function foo/1: expected 1 got 0", output.strip())
+        self.assertEqual("./sample/asm/errors/arity_error.asm:27: error: invalid number of parameters in call to function foo/1: expected 1 got 0", output.strip())
 
     def testFrameWithGaps(self):
         name = 'frame_with_gaps.asm'
@@ -950,7 +950,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/frame_with_gaps.asm:9: error: gap in frame defined at line 6, slot 1 left empty", output.strip())
+        self.assertEqual("./sample/asm/errors/frame_with_gaps.asm:28: error: gap in frame defined at line 25, slot 1 left empty", output.strip())
 
     def testPassingParameterToASlotWithTooHighIndex(self):
         name = 'passing_to_slot_with_too_high_index.asm'
@@ -958,7 +958,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/passing_to_slot_with_too_high_index.asm:7: error: pass to parameter slot 3 in frame with only 3 slots available", output.strip())
+        self.assertEqual("./sample/asm/errors/passing_to_slot_with_too_high_index.asm:26: error: pass to parameter slot 3 in frame with only 3 slots available", output.strip())
 
     def testDoublePassing(self):
         name = 'double_pass.asm'
@@ -966,7 +966,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/double_pass.asm:10: error: double pass to parameter slot 2 in frame defined at line 6, first pass at line 9", output.strip())
+        self.assertEqual("./sample/asm/errors/double_pass.asm:29: error: double pass to parameter slot 2 in frame defined at line 25, first pass at line 28", output.strip())
 
     def testMsgRequiresAtLeastOneParameter(self):
         name = 'msg_requires_at_least_one_parameter.asm'
@@ -974,7 +974,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, opts=('--Ehalt-is-last',), okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/msg_requires_at_least_one_parameter.asm:3: error: invalid number of parameters in dynamic dispatch of foo: expected at least 1, got 0", output.strip())
+        self.assertEqual("./sample/asm/errors/msg_requires_at_least_one_parameter.asm:22: error: invalid number of parameters in dynamic dispatch of foo: expected at least 1, got 0", output.strip())
 
     def testMsgArityMismatch(self):
         name = 'msg_arity_mismatch.asm'
@@ -982,7 +982,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, opts=('--Ehalt-is-last',), okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/msg_arity_mismatch.asm:3: error: invalid number of parameters in dynamic dispatch of add/2: expected 2 got 1", output.strip())
+        self.assertEqual("./sample/asm/errors/msg_arity_mismatch.asm:22: error: invalid number of parameters in dynamic dispatch of add/2: expected 2 got 1", output.strip())
 
     def testNoReturnOrTailcallAtTheEndOfAFunctionError(self):
         name = 'no_return_at_the_end_of_a_function.asm'
@@ -990,7 +990,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, opts=('--Emissing-return',), okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/no_return_at_the_end_of_a_function.asm:3: error: function does not end with 'return' or 'tailcall': foo/0", output.strip())
+        self.assertEqual("./sample/asm/errors/no_return_at_the_end_of_a_function.asm:22: error: function does not end with 'return' or 'tailcall': foo/0", output.strip())
 
     def testBlockWithEmptyBody(self):
         name = 'empty_block_body.asm'
@@ -998,7 +998,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/empty_block_body.asm:1: error: block with empty body: foo", output.strip())
+        self.assertEqual("./sample/asm/errors/empty_block_body.asm:20: error: block with empty body: foo", output.strip())
 
     def testCallToUndefinedFunction(self):
         name = 'call_to_undefined_function.asm'
@@ -1006,7 +1006,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/call_to_undefined_function.asm:3: error: call to undefined function foo/1", output.strip())
+        self.assertEqual("./sample/asm/errors/call_to_undefined_function.asm:22: error: call to undefined function foo/1", output.strip())
 
     def testInvalidFunctionName(self):
         name = 'invalid_function_name.asm'
@@ -1014,7 +1014,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/invalid_function_name.asm:11: error: invalid function name: foo/x", output.strip())
+        self.assertEqual("./sample/asm/errors/invalid_function_name.asm:30: error: invalid function name: foo/x", output.strip())
 
     def testExcessFrameSpawned(self):
         name = 'excess_frame_spawned.asm'
@@ -1022,7 +1022,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/excess_frame_spawned.asm:8: error: excess frame spawned (unused frame spawned at line 7)", output.strip())
+        self.assertEqual("./sample/asm/errors/excess_frame_spawned.asm:27: error: excess frame spawned (unused frame spawned at line 26)", output.strip())
 
     def testCallWithoutAFrame(self):
         name = 'call_without_a_frame.asm'
@@ -1030,7 +1030,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/call_without_a_frame.asm:9: error: call with 'tailcall' without a frame", output.strip())
+        self.assertEqual("./sample/asm/errors/call_without_a_frame.asm:28: error: call with 'tailcall' without a frame", output.strip())
 
     def testEnteringUndefinedBlock(self):
         name = 'entering_undefined_block.asm'
@@ -1038,7 +1038,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/entering_undefined_block.asm:3: error: cannot enter undefined block: foo", output.strip())
+        self.assertEqual("./sample/asm/errors/entering_undefined_block.asm:22: error: cannot enter undefined block: foo", output.strip())
 
     def testFunctionFromUndefinedFunction(self):
         name = 'function_from_undefined_function.asm'
@@ -1046,7 +1046,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/function_from_undefined_function.asm:2: error: function from undefined function: foo/0", output.strip())
+        self.assertEqual("./sample/asm/errors/function_from_undefined_function.asm:21: error: function from undefined function: foo/0", output.strip())
 
     def testInvalidRegisterSetName(self):
         name = 'invalid_ress_instruction.asm'
@@ -1054,7 +1054,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/invalid_ress_instruction.asm:2: error: illegal register set name in ress instruction 'foo' in function main/1", output.strip())
+        self.assertEqual("./sample/asm/errors/invalid_ress_instruction.asm:21: error: illegal register set name in ress instruction 'foo' in function main/1", output.strip())
 
     def testGlobalRegisterSetUsedInLibraryFunction(self):
         name = 'global_rs_used_in_lib.asm'
@@ -1062,7 +1062,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, opts=('-c',), okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/global_rs_used_in_lib.asm:2: error: global registers used in library function foo", output.strip())
+        self.assertEqual("./sample/asm/errors/global_rs_used_in_lib.asm:21: error: global registers used in library function foo", output.strip())
 
     def testFunctionWithEmptyBody(self):
         name = 'empty_function_body.asm'
@@ -1070,7 +1070,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/empty_function_body.asm:1: error: function with empty body: foo/0", output.strip())
+        self.assertEqual("./sample/asm/errors/empty_function_body.asm:20: error: function with empty body: foo/0", output.strip())
 
     def testStrayEndMarked(self):
         name = 'stray_end.asm'
@@ -1078,7 +1078,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/stray_end.asm:1: error: stray .end marker", output.strip())
+        self.assertEqual("./sample/asm/errors/stray_end.asm:20: error: stray .end marker", output.strip())
 
     def testIllegalDirective(self):
         name = 'illegal_directive.asm'
@@ -1086,7 +1086,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/illegal_directive.asm:1: error: illegal directive on line : '.fuction:'", output.strip())
+        self.assertEqual("./sample/asm/errors/illegal_directive.asm:20: error: illegal directive on line : '.fuction:'", output.strip())
 
     def testUnknownInstruction(self):
         name = 'unknown_instruction.asm'
@@ -1094,7 +1094,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/unknown_instruction.asm:2: error: unknown instruction: 'prnt'", output.strip())
+        self.assertEqual("./sample/asm/errors/unknown_instruction.asm:21: error: unknown instruction: 'prnt'", output.strip())
 
     def testMoreThanOneMainFunction(self):
         name = 'more_than_one_main_function.asm'
@@ -1252,7 +1252,7 @@ class WatchdogTests(unittest.TestCase):
         runTest(self, 'hello_world.asm', 'process spawned with <Function: broken_process/0> died')
 
     def testWatchdogFromUndefinedFunctionCaughtByAssembler(self):
-        runTestFailsToAssemble(self, 'from_undefined_function.asm', './sample/asm/watchdog/from_undefined_function.asm:41: error: watchdog from undefined function undefined_function/0')
+        runTestFailsToAssemble(self, 'from_undefined_function.asm', './sample/asm/watchdog/from_undefined_function.asm:60: error: watchdog from undefined function undefined_function/0')
 
     def testWatchdogFromUndefinedFunctionCaughtAtRuntime(self):
         runTestThrowsException(self, 'from_undefined_function_at_runtime.asm', 'uncaught object: Exception = watchdog process from undefined function: undefined_function/0')
