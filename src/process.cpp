@@ -418,7 +418,6 @@ byte* Process::tick() {
         handleActiveException();
     }
     if (thrown) {
-        has_unhandled_exception = true;
         return nullptr;
     }
 
@@ -472,11 +471,11 @@ void Process::priority(decltype(process_priority) p) {
 }
 
 bool Process::stopped() const {
-    return (finished or has_unhandled_exception);
+    return (finished or terminated());
 }
 
 bool Process::terminated() const {
-    return has_unhandled_exception;
+    return static_cast<bool>(thrown);
 }
 
 void Process::pass(unique_ptr<Type> message) {
@@ -530,7 +529,7 @@ Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualProcessScheduler
     regset(nullptr), uregset(nullptr), tmp(nullptr),
     jump_base(nullptr),
     frame_new(nullptr), try_frame_new(nullptr),
-    thrown(nullptr), caught(nullptr), has_unhandled_exception(false),
+    thrown(nullptr), caught(nullptr),
     return_value(nullptr),
     instruction_counter(0),
     instruction_pointer(nullptr),

@@ -89,7 +89,6 @@ class Process {
      */
     std::unique_ptr<Type> thrown;
     std::unique_ptr<Type> caught;
-    bool has_unhandled_exception;
 
     /*  Variables set after the VM has executed bytecode.
      *  They describe exit conditions of the bytecode that just stopped running.
