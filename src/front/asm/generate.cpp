@@ -1266,6 +1266,19 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
 
 
     /////////////////////////////////////////////////////////////
+    // WRITE EXTERNAL FUNCTION SIGNATURES
+    uint64_t signatures_section_size = 0;
+    for (const auto each : functions.signatures) {
+        signatures_section_size += (each.size() + 1); // +1 for null byte after each signature
+    }
+    bwrite(out, signatures_section_size);
+    for (const auto each : functions.signatures) {
+        out.write(each.c_str(), each.size());
+        out.put('\0');
+    }
+
+
+    /////////////////////////////////////////////////////////////
     // WRITE BLOCK AND FUNCTION ENTRY POINT ADDRESSES TO BYTECODE
     uint64_t functions_size_so_far = writeCodeBlocksSection(out, blocks, linked_block_names);
     functions_size_so_far = writeCodeBlocksSection(out, functions, linked_function_names, functions_size_so_far);

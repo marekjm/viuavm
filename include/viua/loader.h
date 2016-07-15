@@ -58,6 +58,7 @@ class Loader {
     void loadMagicNumber(std::ifstream&);
     void assumeBinaryType(std::ifstream&, ViuaBinaryType);
 
+    void loadExternalSignatures(std::ifstream&);
     void loadJumpTable(std::ifstream&);
     void loadFunctionsMap(std::ifstream&);
     void loadBlocksMap(std::ifstream&);

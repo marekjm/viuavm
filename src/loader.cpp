@@ -95,6 +95,13 @@ void Loader::assumeBinaryType(ifstream& in, ViuaBinaryType assumed_binary_type) 
     }
 }
 
+void Loader::loadExternalSignatures(ifstream& in) {
+    uint64_t signatures_section_size = 0;
+    readinto(in, &signatures_section_size);
+
+    char *signatures_section_buffer = new char[signatures_section_size];
+    in.read(signatures_section_buffer, signatures_section_size);
+}
 void Loader::loadJumpTable(ifstream& in) {
     // load jump table
     uint64_t lib_total_jumps;
@@ -160,6 +167,7 @@ Loader& Loader::load() {
     // jump table must be loaded if loading a library
     loadJumpTable(in);
 
+    loadExternalSignatures(in);
     loadBlocksMap(in);
     loadFunctionsMap(in);
     loadBytecode(in);
@@ -177,6 +185,7 @@ Loader& Loader::executable() {
     loadMagicNumber(in);
     assumeBinaryType(in, VIUA_EXECUTABLE);
 
+    loadExternalSignatures(in);
     loadBlocksMap(in);
     loadFunctionsMap(in);
     loadBytecode(in);
