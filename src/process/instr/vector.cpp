@@ -32,10 +32,27 @@ using namespace std;
 
 byte* Process::opvec(byte* addr) {
     auto register_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    viua::operand::extract(addr);
-    viua::operand::extract(addr);
+    auto pack_start_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    auto pack_length = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    place(register_index, new Vector());
+    if ((register_index > pack_start_index) and (register_index < (pack_start_index+pack_length))) {
+        throw new Exception("vec would pack itself");
+    }
+    if ((pack_start_index+pack_length) >= uregset->size()) {
+        throw new Exception("vec: packing outside of register set range");
+    }
+    for (decltype(pack_length) i = 0; i < pack_length; ++i) {
+        if (uregset->at(pack_start_index+i) == nullptr) {
+            throw new Exception("vec: cannot pack null register");
+        }
+    }
+
+    unique_ptr<Vector> v(new Vector());
+    for (decltype(pack_length) i = 0; i < pack_length; ++i) {
+        v->push(pop(pack_start_index+i));
+    }
+
+    place(register_index, v.release());
 
     return addr;
 }
