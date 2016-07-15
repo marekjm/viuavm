@@ -31,7 +31,11 @@ using namespace std;
 
 
 byte* Process::opvec(byte* addr) {
-    place(viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this), new Vector());
+    auto register_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    viua::operand::extract(addr);
+    viua::operand::extract(addr);
+
+    place(register_index, new Vector());
 
     return addr;
 }

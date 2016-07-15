@@ -356,10 +356,10 @@ Program& Program::opstrstore(int_op reg, string s) {
     return (*this);
 }
 
-Program& Program::opvec(int_op index) {
+Program& Program::opvec(int_op index, int_op pack_start_index, int_op pack_length) {
     /** Inserts vec instruction.
      */
-    addr_ptr = cg::bytecode::opvec(addr_ptr, index);
+    addr_ptr = cg::bytecode::opvec(addr_ptr, index, pack_start_index, pack_length);
     return (*this);
 }
 

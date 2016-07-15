@@ -354,9 +354,15 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
             str_chnk = str::extract(operands);
             program.opstrstore(assembler::operands::getint(resolveregister(reg_chnk, names)), str_chnk);
         } else if (str::startswith(line, "vec")) {
-            string regno_chnk;
-            regno_chnk = str::chunk(operands);
-            program.opvec(assembler::operands::getint(resolveregister(regno_chnk, names)));
+            string regno_chnk, pack_start_index_chnk, pack_length_chnk;
+            tie(regno_chnk, pack_start_index_chnk, pack_length_chnk) = assembler::operands::get3(operands, false);
+            if (pack_start_index_chnk.size() == 0) {
+                pack_start_index_chnk = "0";
+            }
+            if (pack_length_chnk.size() == 0) {
+                pack_length_chnk = "0";
+            }
+            program.opvec(assembler::operands::getint(resolveregister(regno_chnk, names)), assembler::operands::getint(resolveregister(pack_start_index_chnk, names)), assembler::operands::getint(resolveregister(pack_length_chnk, names)));
         } else if (str::startswith(line, "vinsert")) {
             string vec, src, pos;
             tie(vec, src, pos) = assembler::operands::get3(operands, false);
