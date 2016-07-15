@@ -184,3 +184,14 @@ It will be appreciated and will make the merge process faster.
 ## License
 
 The code is licensed under GNU GPL v3.
+
+
+----
+
+### Contact information
+
+Project website: [viuavm.org](http://viuavm.org/)
+
+Maintainer: <marekjm at ozro dot pw>
+
+Bugtracker: https://github.com/marekjm/viuavm/issues
