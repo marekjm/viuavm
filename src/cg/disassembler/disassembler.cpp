@@ -137,7 +137,6 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case EMPTY:
         case TMPRI:
         case TMPRO:
-        case VEC:
         case ARGC:
         case THROW:
         case PULL:
@@ -205,6 +204,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case ENCLOSE:
         case ENCLOSECOPY:
         case ENCLOSEMOVE:
+        case VEC:
         case VINSERT:
         case VPOP:
         case VAT:

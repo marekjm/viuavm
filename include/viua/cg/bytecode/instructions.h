@@ -73,7 +73,7 @@ namespace cg {
 
         byte* opstrstore(byte*, int_op, std::string);
 
-        byte* opvec(byte*, int_op);
+        byte* opvec(byte*, int_op, int_op, int_op);
         byte* opvinsert(byte*, int_op, int_op, int_op);
         byte* opvpush(byte*, int_op, int_op);
         byte* opvpop(byte*, int_op, int_op, int_op);

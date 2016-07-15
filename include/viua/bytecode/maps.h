@@ -77,7 +77,7 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "strstore",sizeof(byte) + sizeof(OperandType) + sizeof(int) },
     { "streq",  sizeof(byte) + 3*sizeof(OperandType) + 3*sizeof(int) },
 
-    { "vec",    sizeof(byte) + sizeof(OperandType) + sizeof(int) },
+    { "vec",    sizeof(byte) + 3*sizeof(OperandType) + 3*sizeof(int) },
     { "vinsert",sizeof(byte) + 3*sizeof(OperandType) + 3*sizeof(int) },
     { "vpush",  sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
     { "vpop",   sizeof(byte) + 3*sizeof(OperandType) + 3*sizeof(int) },

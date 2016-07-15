@@ -34,6 +34,7 @@ There are several categories of change:
 - feature: the `--` string can now be used to begin comments,
   the same as `;` comments, `--` comments must appear on their own line and
   run only until the end of their line,
+- feature: `vec` instruction can pack objects
 
 
 ----

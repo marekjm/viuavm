@@ -497,6 +497,18 @@ class VectorInstructionsTests(unittest.TestCase):
     """
     PATH = './sample/asm/vector'
 
+    def testPackingVec(self):
+        runTest(self, 'vec_packing.asm', '["answer to life", 42]', 0, lambda o: o.strip())
+
+    def testPackingVecRefusesToPackItself(self):
+        runTestThrowsException(self, 'vec_packing_self_pack.asm', 'uncaught object: Exception = vec would pack itself')
+
+    def testPackingVecRefusesToOutOfRegisterSetRange(self):
+        runTestThrowsException(self, 'vec_packing_out_of_range.asm', 'uncaught object: Exception = vec: packing outside of register set range')
+
+    def testPackingVecRefusesToPackNullRegister(self):
+        runTestThrowsException(self, 'vec_packing_null.asm', 'uncaught object: Exception = vec: cannot pack null register')
+
     def testVLEN(self):
         runTest(self, 'vlen.asm', '8', 0)
 

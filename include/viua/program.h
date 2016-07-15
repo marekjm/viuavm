@@ -102,7 +102,7 @@ class Program {
 
     Program& opstrstore   (int_op, std::string);
 
-    Program& opvec        (int_op);
+    Program& opvec        (int_op, int_op, int_op);
     Program& opvinsert    (int_op, int_op, int_op);
     Program& opvpush      (int_op, int_op);
     Program& opvpop       (int_op, int_op, int_op);

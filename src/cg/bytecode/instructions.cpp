@@ -434,11 +434,13 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* opvec(byte* addr_ptr, int_op index) {
+        byte* opvec(byte* addr_ptr, int_op index, int_op pack_start_index, int_op pack_length) {
             /** Inserts vec instruction.
              */
             *(addr_ptr++) = VEC;
             addr_ptr = insertIntegerOperand(addr_ptr, index);
+            addr_ptr = insertIntegerOperand(addr_ptr, pack_start_index);
+            addr_ptr = insertIntegerOperand(addr_ptr, pack_length);
             return addr_ptr;
         }
 
