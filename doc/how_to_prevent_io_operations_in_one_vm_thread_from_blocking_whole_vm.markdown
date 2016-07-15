@@ -58,3 +58,13 @@ The mechanism could be implemented as such:
   performed operation and unblocks t0 so scheduler can pick t0 up for execution,
 - I/O threads processes further requests,
 - t0 processes the result of I/O operation (possibly handling an exception) and continues execution,
+
+---
+
+#### Copyright (C) 2015, 2016 Marek Marecki
+
+This documentation file is part of Viua VM, and
+published under GNU GPL v3 or later.
+
+You should have received a copy of the GNU General Public License
+along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.

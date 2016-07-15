@@ -27,3 +27,13 @@ First time - because of the `print 1` instruction, which says *print register 1*
 second time - because the `print @2` instruction says print a value at a register *with index taken from* register 2.
 
 In short, the `@` operator means *take a number at this register as an operand*.
+
+---
+
+#### Copyright (C) 2015, 2016 Marek Marecki
+
+This documentation file is part of Viua VM, and
+published under GNU GPL v3 or later.
+
+You should have received a copy of the GNU General Public License
+along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.

@@ -59,3 +59,13 @@ A translation unit is considered to be the "main" unit of a program if:
 The `main/` function **MUST** be contained in the final executable - it cannot be linked
 during runtime (it is the only function, apart from `__entry`, the cannot be linked
 dynamically).
+
+---
+
+#### Copyright (C) 2015, 2016 Marek Marecki
+
+This documentation file is part of Viua VM, and
+published under GNU GPL v3 or later.
+
+You should have received a copy of the GNU General Public License
+along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.

@@ -89,3 +89,13 @@ If used in global context (i.e. when only main function is called) it is equival
 **syntax**: `halt`
 
 This instruction causes the CPU to halt, exiting the program in effect.
+
+---
+
+#### Copyright (C) 2015, 2016 Marek Marecki
+
+This documentation file is part of Viua VM, and
+published under GNU GPL v3 or later.
+
+You should have received a copy of the GNU General Public License
+along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.

@@ -154,3 +154,13 @@ an undefined manner).
 
 So, lesson for today: use `virtual` on your destructors when tinkering with polymorphism.
 And, as a reminder, compile with `-Wall -pedantic` once in a while to catch errors you missed earlier.
+
+---
+
+#### Copyright (C) 2015, 2016 Marek Marecki
+
+This documentation file is part of Viua VM, and
+published under GNU GPL v3 or later.
+
+You should have received a copy of the GNU General Public License
+along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.

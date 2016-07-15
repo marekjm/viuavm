@@ -61,3 +61,13 @@ Assembler will abort translation if no `main` function is defined and `.main:` d
 **Syntax**: `.link: <module>`
 
 Used to statically link link modules and libraries.
+
+---
+
+#### Copyright (C) 2015, 2016 Marek Marecki
+
+This documentation file is part of Viua VM, and
+published under GNU GPL v3 or later.
+
+You should have received a copy of the GNU General Public License
+along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.

@@ -229,3 +229,13 @@ Example:
 This post briefly described the differences between three methods of passing arguments to functions in Viua VM;
 that is, the pass-by *value*, *pointer*, and *reference*.
 It also described differences between pointers and references, and how to use them in source code.
+
+---
+
+#### Copyright (C) 2015, 2016 Marek Marecki
+
+This documentation file is part of Viua VM, and
+published under GNU GPL v3 or later.
+
+You should have received a copy of the GNU General Public License
+along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.

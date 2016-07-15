@@ -125,3 +125,13 @@ This is technique exploits two aspects of C++:
 
 This looks like dark voodoo-magic but works and can be explained, even if it raises your eyebrows.
 In fact, you are not the first person to ask me *Why would you do that?* or *Does this even work?*. 
+
+---
+
+#### Copyright (C) 2015, 2016 Marek Marecki
+
+This documentation file is part of Viua VM, and
+published under GNU GPL v3 or later.
+
+You should have received a copy of the GNU General Public License
+along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
