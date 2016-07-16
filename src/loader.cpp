@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <memory>
 #include <viua/machine.h>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/loader.h>
@@ -99,8 +100,8 @@ void Loader::loadExternalSignatures(ifstream& in) {
     uint64_t signatures_section_size = 0;
     readinto(in, &signatures_section_size);
 
-    char *signatures_section_buffer = new char[signatures_section_size];
-    in.read(signatures_section_buffer, signatures_section_size);
+    unique_ptr<char[]> signatures_section_buffer(new char[signatures_section_size]);
+    in.read(signatures_section_buffer.get(), signatures_section_size);
 }
 void Loader::loadJumpTable(ifstream& in) {
     // load jump table
