@@ -216,6 +216,9 @@ int main(int argc, char* argv[]) {
     }
 
     auto signatures = loader.getExternalSignatures();
+    if (signatures.size()) {
+        disassembled_lines.push_back("; external function signatures\n");
+    }
     for (const auto each : signatures) {
         disassembled_lines.push_back(".signature: " + each + "\n");
     }
