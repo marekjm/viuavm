@@ -24,7 +24,7 @@
 
 #include <string>
 #include <sstream>
-#include "type.h"
+#include <viua/types/type.h>
 
 
 class Integer : public Type {

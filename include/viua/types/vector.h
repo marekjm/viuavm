@@ -24,7 +24,7 @@
 
 #include <string>
 #include <vector>
-#include "type.h"
+#include <viua/types/type.h>
 
 
 class Vector : public Type {

@@ -24,7 +24,7 @@
 
 #include <string>
 #include <sstream>
-#include "integer.h"
+#include <viua/types/integer.h>
 
 
 class Boolean : public Integer {

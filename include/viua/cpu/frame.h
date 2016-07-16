@@ -23,8 +23,8 @@
 #pragma once
 
 #include <string>
-#include "../bytecode/bytetypedef.h"
-#include "registerset.h"
+#include <viua/bytecode/bytetypedef.h>
+#include <viua/cpu/registerset.h>
 
 class Frame {
         bool owns_local_register_set;

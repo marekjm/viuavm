@@ -28,7 +28,7 @@
 #include <tuple>
 #include <map>
 #include <regex>
-#include "../../program.h"
+#include <viua/program.h>
 
 namespace assembler {
     namespace operands {

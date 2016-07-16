@@ -24,8 +24,8 @@
 
 #include <string>
 #include <tuple>
-#include "../../bytecode/opcodes.h"
-#include "../../support/pointer.h"
+#include <viua/bytecode/opcodes.h>
+#include <viua/support/pointer.h>
 
 
 /** typedefs for various types of operands

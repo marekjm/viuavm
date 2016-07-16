@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "../types/type.h"
+#include <viua/types/type.h>
 
 typedef unsigned char mask_t;
 typedef long unsigned registerset_size_type;

@@ -25,7 +25,7 @@
 #include <string>
 #include <ios>
 #include <sstream>
-#include "type.h"
+#include <viua/types/type.h>
 
 
 class Float : public Type {

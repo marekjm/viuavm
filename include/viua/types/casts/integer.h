@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "../type.h"
+#include <viua/types/type.h>
 
 class IntegerCast: public Type {
     public:

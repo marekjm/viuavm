@@ -23,10 +23,10 @@
 #pragma once
 
 #include <string>
-#include "type.h"
-#include "vector.h"
-#include "integer.h"
-#include "../support/string.h"
+#include <viua/types/type.h>
+#include <viua/types/vector.h>
+#include <viua/types/integer.h>
+#include <viua/support/string.h>
 #include <viua/cpu/frame.h>
 #include <viua/cpu/registerset.h>
 

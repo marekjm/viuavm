@@ -23,8 +23,8 @@
 #pragma once
 
 #include <string>
-#include "type.h"
-#include "../support/string.h"
+#include <viua/types/type.h>
+#include <viua/support/string.h>
 
 
 class Exception : public Type {

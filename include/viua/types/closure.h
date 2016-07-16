@@ -23,9 +23,9 @@
 #pragma once
 
 #include <string>
-#include "../bytecode/bytetypedef.h"
-#include "../cpu/registerset.h"
-#include "function.h"
+#include <viua/bytecode/bytetypedef.h>
+#include <viua/cpu/registerset.h>
+#include <viua/types/function.h>
 
 
 class Closure : public Function {
