@@ -193,7 +193,7 @@ string assembler::verify::functionNames(const string& filename, const std::vecto
 
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = str::lstrip(lines[i]);
-        if (str::startswith(line, ".function:")) {
+        if (assembler::utils::lines::is_function(line)) {
             function = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
         } else {
             continue;
@@ -220,7 +220,7 @@ string assembler::verify::functionsEndWithReturn(const string& filename, const s
 
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = str::lstrip(lines[i]);
-        if (str::startswith(line, ".function:")) {
+        if (assembler::utils::lines::is_function(line)) {
             function = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
             continue;
         } else if (str::startswithchunk(line, ".end") and function.size()) {
@@ -356,7 +356,7 @@ string assembler::verify::ressInstructions(const string& filename, const vector<
     string function;
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = str::lstrip(lines[i]);
-        if (str::startswith(line, ".function:")) {
+        if (assembler::utils::lines::is_function(line)) {
             function = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
             continue;
         }
@@ -382,18 +382,15 @@ string bodiesAreNonempty(const string& filename, const vector<string>& lines) {
     ostringstream report("");
     string line, block, function;
 
-    string block_prefix = ".block:";
-    string function_prefix = ".function:";
-
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = str::lstrip(lines[i]);
-        if (str::startswith(line, block_prefix)) {
+        if (assembler::utils::lines::is_block(line)) {
             block = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
             continue;
-        } else if (str::startswith(line, function_prefix)) {
+        } else if (assembler::utils::lines::is_function(line)) {
             function = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
             continue;
-        } else if (str::startswithchunk(line, ".end")) {
+        } else if (assembler::utils::lines::is_end(line)) {
             // '.end' is also interesting because we want to see if it's immediately preceded by
             // the interesting prefix
         } else {
@@ -408,7 +405,7 @@ string bodiesAreNonempty(const string& filename, const vector<string>& lines) {
         // this if is reached only of '.end' was matched - so we just check if it is preceded by
         // the interesting prefix, and
         // if it is - report an error
-        if (i and (str::startswithchunk(str::lstrip(lines[i-1]), block_prefix) or str::startswithchunk(str::lstrip(lines[i-1]), function_prefix))) {
+        if (i and (assembler::utils::lines::is_block(str::lstrip(lines[i-1])) or assembler::utils::lines::is_function(str::lstrip(lines[i-1])))) {
             report << filename << ':' << i << ": error: " << (function.size() ? "function" : "block") << " with empty body: " << (function.size() ? function : block);
             break;
         }
@@ -434,9 +431,8 @@ string assembler::verify::directives(const string& filename, const vector<string
             continue;
         }
 
-        string token = str::chunk(line);
-        if (not (token == ".function:" or token == ".signature:" or token == ".bsignature:" or token == ".block:" or token == ".end" or token == ".name:" or token == ".mark:" or token == ".main:" or token == ".info:")) {
-            report << filename << ':' << (expanded_lines_to_source_lines.at(i)+1) << ": error: illegal directive: '" << token << "'";
+        if (not assembler::utils::lines::is_directive(line)) {
+            report << filename << ':' << (expanded_lines_to_source_lines.at(i)+1) << ": error: illegal directive: '" << str::chunk(line) << "'";
             break;
         }
     }

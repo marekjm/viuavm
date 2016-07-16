@@ -202,32 +202,12 @@ vector<string> filter(const vector<string>& lines) {
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = lines[i];
-        if (str::startswith(line, ".mark:") or str::startswith(line, ".name:") or str::startswith(line, ".main:") or str::startswith(line, ".link:") or str::startswith(line, ".signature:") or str::startswith(line, ".bsignature:") or str::startswith(line, ".type:") or str::startswith(line, ".info:")) {
-            /*  Lines beginning with `.mark:` are just markers placed in code and
-             *  are do not produce any bytecode.
-             *  Lines beginning with `.name:` are asm directives that assign human-rememberable names to
-             *  registers.
-             *  Lines beginning with `.signature:` and `.bsignature:` covey information about functions and
-             *  blocks that will be available at runtime but may not be available during compilation.
-             *  Lines beginning with `.type:` inform the assembler that definition of this type will be
-             *  supplied later (either by `.class:` block, or by dynamically defining the type during runtime).
-             *
-             *  Assembler directives are discarded by the assembler during the bytecode-generation phase
+        if (assembler::utils::lines::is_directive(line)) {
+            /*  Assembler directives are discarded by the assembler during the bytecode-generation phase
              *  so they can be skipped in this step as fast as possible
              *  to avoid complicating code that appears later and
              *  deals with assembling CPU instructions.
              */
-            continue;
-        }
-
-        if (str::startswith(line, ".function:") or str::startswith(line, ".block:")) {
-            // skip function and block definition blocks
-            while (lines[++i] != ".end");
-            continue;
-        }
-        if (str::startswith(line, ".class:")) {
-            // skip class definition lines
-            while (lines[++i] != ".end");
             continue;
         }
 
@@ -809,7 +789,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     // GET MAIN FUNCTION NAME
     string main_function = "";
     for (string line : ilines) {
-        if (str::startswith(line, ".main:")) {
+        if (assembler::utils::lines::is_main(line)) {
             if (DEBUG) {
                 cout << "setting main function to: ";
             }
@@ -991,7 +971,8 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
             bytes += OP_SIZES.at("param");
         }
 
-        // this must not be hardcoded because we have '.main:' assembler instruction
+        // name of the main function must not be hardcoded because there is '.main:' assembler
+        // directive which can set an arbitrary function as main
         // we also save return value in 1 register since 0 means "drop return value"
         entry_function_lines.push_back("call 1 " + main_function);
         bytes += OP_SIZES.at("call");

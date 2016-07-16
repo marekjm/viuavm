@@ -91,7 +91,7 @@ map<string, string> gatherMetaInformation(const vector<string>& ilines) {
     string line;
     for (std::remove_reference<decltype(ilines)>::type::size_type i = 0; i < ilines.size(); ++i) {
         line = ilines[i];
-        if (str::startswith(line, ".info:")) {
+        if (assembler::utils::lines::is_info(line)) {
             line = str::lstrip(line.substr(6));
 
             string key, value;
