@@ -261,6 +261,10 @@ vector<uint64_t> Loader::getJumps() {
     return jumps;
 }
 
+map<string, string> Loader::getMetaInformation() {
+    return meta_information;
+}
+
 vector<string> Loader::getExternalSignatures() {
     return external_signatures;
 }

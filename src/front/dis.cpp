@@ -215,6 +215,17 @@ int main(int argc, char* argv[]) {
         disassembled_lines.push_back(oss.str());
     }
 
+    auto meta_information = loader.getMetaInformation();
+    if (meta_information.size()) {
+        disassembled_lines.push_back("; meta information\n");
+    }
+    for (const auto each : meta_information) {
+        disassembled_lines.push_back(".info: " + each.first + ' ' + str::enquote(each.second) + "\n");
+    }
+    if (meta_information.size()) {
+        disassembled_lines.push_back("\n");
+    }
+
     auto signatures = loader.getExternalSignatures();
     if (signatures.size()) {
         disassembled_lines.push_back("; external function signatures\n");

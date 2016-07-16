@@ -81,6 +81,8 @@ class Loader {
 
     std::vector<uint64_t> getJumps();
 
+    std::map<std::string, std::string> getMetaInformation();
+
     std::vector<std::string> getExternalSignatures();
     std::vector<std::string> getExternalBlockSignatures();
 
