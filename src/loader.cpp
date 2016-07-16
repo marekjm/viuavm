@@ -96,7 +96,7 @@ void Loader::assumeBinaryType(ifstream& in, ViuaBinaryType assumed_binary_type) 
     }
 }
 
-void Loader::loadExternalSignatures(ifstream& in) {
+vector<string> load_string_list(ifstream& in) {
     uint64_t signatures_section_size = 0;
     readinto(in, &signatures_section_size);
 
@@ -106,28 +106,22 @@ void Loader::loadExternalSignatures(ifstream& in) {
     uint64_t i = 0;
     char *buffer = signatures_section_buffer.get();
     string sig;
+    vector<string> strings_list;
     while (i < signatures_section_size) {
         sig = string(buffer+i);
         i += (sig.size() + 1);
-        external_signatures.push_back(sig);
+        strings_list.push_back(sig);
     }
+
+    return strings_list;
+}
+void Loader::loadExternalSignatures(ifstream& in) {
+    external_signatures = std::move(load_string_list(in));
 }
 void Loader::loadExternalBlockSignatures(ifstream& in) {
-    uint64_t signatures_section_size = 0;
-    readinto(in, &signatures_section_size);
-
-    unique_ptr<char[]> signatures_section_buffer(new char[signatures_section_size]);
-    in.read(signatures_section_buffer.get(), signatures_section_size);
-
-    uint64_t i = 0;
-    char *buffer = signatures_section_buffer.get();
-    string sig;
-    while (i < signatures_section_size) {
-        sig = string(buffer+i);
-        i += (sig.size() + 1);
-        external_signatures_block.push_back(sig);
-    }
+    external_signatures_block = std::move(load_string_list(in));
 }
+
 void Loader::loadJumpTable(ifstream& in) {
     // load jump table
     uint64_t lib_total_jumps;
