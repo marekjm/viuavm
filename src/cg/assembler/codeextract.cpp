@@ -230,17 +230,3 @@ map<string, vector<string> > assembler::ce::getInvokables(const string& type, co
 
     return invokables;
 }
-
-unordered_set<string> assembler::ce::getTypeNames(const vector<string>& lines) {
-    unordered_set<string> names;
-
-    string line, holdline;
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        holdline = line = lines[i];
-        if (!str::startswith(line, ".type:")) { continue; }
-        line = str::lstrip(str::sub(line, str::chunk(line).size()));
-        names.insert(str::chunk(line));
-    }
-
-    return names;
-}
