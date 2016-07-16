@@ -29,6 +29,7 @@
 #include <viua/machine.h>
 #include <viua/bytecode/opcodes.h>
 #include <viua/bytecode/maps.h>
+#include <viua/cg/assembler/assembler.h>
 #include <viua/cg/disassembler/disassembler.h>
 #include <viua/support/string.h>
 #include <viua/support/pointer.h>
@@ -231,7 +232,7 @@ int main(int argc, char* argv[]) {
         disassembled_lines.push_back("; external function signatures\n");
     }
     for (const auto each : signatures) {
-        disassembled_lines.push_back(".signature: " + each + "\n");
+        disassembled_lines.push_back(assembler::utils::lines::make_function_signature(each) + "\n");
     }
     if (signatures.size()) {
         disassembled_lines.push_back("\n");
@@ -242,7 +243,7 @@ int main(int argc, char* argv[]) {
         disassembled_lines.push_back("; external block signatures\n");
     }
     for (const auto each : block_signatures) {
-        disassembled_lines.push_back(".bsignature: " + each + "\n");
+        disassembled_lines.push_back(assembler::utils::lines::make_block_signature(each) + "\n");
     }
     if (block_signatures.size()) {
         disassembled_lines.push_back("\n");

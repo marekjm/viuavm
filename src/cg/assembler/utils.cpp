@@ -101,3 +101,11 @@ bool assembler::utils::lines::is_directive(const string& line) {
         false
     );
 }
+
+string assembler::utils::lines::make_function_signature(const string& name) {
+    return (".signature: " + name);
+}
+
+string assembler::utils::lines::make_block_signature(const string& name) {
+    return (".bsignature: " + name);
+}
