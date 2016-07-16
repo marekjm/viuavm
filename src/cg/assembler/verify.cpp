@@ -436,8 +436,7 @@ string assembler::verify::directives(const string& filename, const vector<string
 
         string token = str::chunk(line);
         if (not (token == ".function:" or token == ".signature:" or token == ".bsignature:" or token == ".block:" or token == ".end" or token == ".name:" or token == ".mark:" or token == ".main:" or token == ".type:" or token == ".class:")) {
-            report << filename << ':' << (expanded_lines_to_source_lines.at(i)+1) << ": error: illegal directive on line ";
-            report << ": '" << token << "'";
+            report << filename << ':' << (expanded_lines_to_source_lines.at(i)+1) << ": error: illegal directive: '" << token << "'";
             break;
         }
     }

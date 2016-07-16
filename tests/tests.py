@@ -1101,7 +1101,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/illegal_directive.asm:20: error: illegal directive on line : '.fuction:'", output.strip())
+        self.assertEqual("./sample/asm/errors/illegal_directive.asm:20: error: illegal directive: '.fuction:'", output.strip())
 
     def testUnknownInstruction(self):
         name = 'unknown_instruction.asm'
