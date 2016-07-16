@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <memory>
 #include <viua/machine.h>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/loader.h>
@@ -95,6 +96,32 @@ void Loader::assumeBinaryType(ifstream& in, ViuaBinaryType assumed_binary_type) 
     }
 }
 
+vector<string> load_string_list(ifstream& in) {
+    uint64_t signatures_section_size = 0;
+    readinto(in, &signatures_section_size);
+
+    unique_ptr<char[]> signatures_section_buffer(new char[signatures_section_size]);
+    in.read(signatures_section_buffer.get(), signatures_section_size);
+
+    uint64_t i = 0;
+    char *buffer = signatures_section_buffer.get();
+    string sig;
+    vector<string> strings_list;
+    while (i < signatures_section_size) {
+        sig = string(buffer+i);
+        i += (sig.size() + 1);
+        strings_list.push_back(sig);
+    }
+
+    return strings_list;
+}
+void Loader::loadExternalSignatures(ifstream& in) {
+    external_signatures = std::move(load_string_list(in));
+}
+void Loader::loadExternalBlockSignatures(ifstream& in) {
+    external_signatures_block = std::move(load_string_list(in));
+}
+
 void Loader::loadJumpTable(ifstream& in) {
     // load jump table
     uint64_t lib_total_jumps;
@@ -160,6 +187,8 @@ Loader& Loader::load() {
     // jump table must be loaded if loading a library
     loadJumpTable(in);
 
+    loadExternalSignatures(in);
+    loadExternalBlockSignatures(in);
     loadBlocksMap(in);
     loadFunctionsMap(in);
     loadBytecode(in);
@@ -177,6 +206,8 @@ Loader& Loader::executable() {
     loadMagicNumber(in);
     assumeBinaryType(in, VIUA_EXECUTABLE);
 
+    loadExternalSignatures(in);
+    loadExternalBlockSignatures(in);
     loadBlocksMap(in);
     loadFunctionsMap(in);
     loadBytecode(in);
@@ -198,6 +229,14 @@ byte* Loader::getBytecode() {
 
 vector<uint64_t> Loader::getJumps() {
     return jumps;
+}
+
+vector<string> Loader::getExternalSignatures() {
+    return external_signatures;
+}
+
+vector<string> Loader::getExternalBlockSignatures() {
+    return external_signatures_block;
 }
 
 map<string, uint64_t> Loader::getFunctionAddresses() {

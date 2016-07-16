@@ -1074,18 +1074,6 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     }
 
 
-    ////////////////////////////////////////
-    // CREATE OFSTREAM TO WRITE BYTECODE OUT
-    ofstream out(compilename, ios::out | ios::binary);
-
-    out.write(VIUA_MAGIC_NUMBER, sizeof(char)*5);
-    if (flags.as_lib) {
-        out.write(&VIUA_LINKABLE, sizeof(ViuaBinaryType));
-    } else {
-        out.write(&VIUA_EXECUTABLE, sizeof(ViuaBinaryType));
-    }
-
-
     ////////////////////
     // CREATE JUMP TABLE
     vector<uint64_t> jump_table;
@@ -1247,6 +1235,18 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     }
 
 
+    ////////////////////////////////////////
+    // CREATE OFSTREAM TO WRITE BYTECODE OUT
+    ofstream out(compilename, ios::out | ios::binary);
+
+    out.write(VIUA_MAGIC_NUMBER, sizeof(char)*5);
+    if (flags.as_lib) {
+        out.write(&VIUA_LINKABLE, sizeof(ViuaBinaryType));
+    } else {
+        out.write(&VIUA_EXECUTABLE, sizeof(ViuaBinaryType));
+    }
+
+
     //////////////////////////
     // IF ASSEMBLING A LIBRARY
     // WRITE OUT JUMP TABLE
@@ -1262,6 +1262,32 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
             jmp = jump_table[i];
             bwrite(out, jmp);
         }
+    }
+
+
+    /////////////////////////////////////////////////////////////
+    // WRITE EXTERNAL FUNCTION SIGNATURES
+    uint64_t signatures_section_size = 0;
+    for (const auto each : functions.signatures) {
+        signatures_section_size += (each.size() + 1); // +1 for null byte after each signature
+    }
+    bwrite(out, signatures_section_size);
+    for (const auto each : functions.signatures) {
+        out.write(each.c_str(), each.size());
+        out.put('\0');
+    }
+
+
+    /////////////////////////////////////////////////////////////
+    // WRITE EXTERNAL BLOCK SIGNATURES
+    signatures_section_size = 0;
+    for (const auto each : blocks.signatures) {
+        signatures_section_size += (each.size() + 1); // +1 for null byte after each signature
+    }
+    bwrite(out, signatures_section_size);
+    for (const auto each : blocks.signatures) {
+        out.write(each.c_str(), each.size());
+        out.put('\0');
     }
 
 

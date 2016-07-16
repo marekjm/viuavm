@@ -278,17 +278,7 @@ def runTest(self, name, expected_output=None, expected_exit_code = 0, output_pro
         self.assertEqual(got_output, (dis_output.strip() if output_processing_function is None else output_processing_function(dis_output)))
         self.assertEqual(excode, dis_excode)
 
-def runTestNoDisassemblyRerun(self, name, expected_output, expected_exit_code = 0, output_processing_function = None, check_memory_leaks = True):
-    assembly_path = os.path.join(self.PATH, name)
-    compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-    assemble(assembly_path, compiled_path)
-    excode, output = run(compiled_path, expected_exit_code)
-    got_output = (output.strip() if output_processing_function is None else output_processing_function(output))
-    self.assertEqual(expected_output, got_output)
-    self.assertEqual(expected_exit_code, excode)
-    runMemoryLeakCheck(self, compiled_path, check_memory_leaks)
-
-def runTestCustomAssertsNoDisassemblyRerun(self, name, assertions_callback, check_memory_leaks = True):
+def runTestCustomAsserts(self, name, assertions_callback, check_memory_leaks = True):
     assembly_path = os.path.join(self.PATH, name)
     compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
     assemble(assembly_path, compiled_path)
@@ -299,14 +289,8 @@ def runTestCustomAssertsNoDisassemblyRerun(self, name, assertions_callback, chec
 def runTestSplitlines(self, name, expected_output, expected_exit_code = 0, assembly_opts=None):
     runTest(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: o.strip().splitlines(), assembly_opts=assembly_opts)
 
-def runTestSplitlinesNoDisassemblyRerun(self, name, expected_output, expected_exit_code = 0, check_memory_leaks = True):
-    runTestNoDisassemblyRerun(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: o.strip().splitlines(), check_memory_leaks=check_memory_leaks)
-
 def runTestReturnsUnorderedLines(self, name, expected_output, expected_exit_code = 0):
     runTest(self, name, sorted(expected_output), expected_exit_code, output_processing_function = lambda o: sorted(o.strip().splitlines()))
-
-def runTestReturnsUnorderedLinesNoDisassemblyRerun(self, name, expected_output, expected_exit_code = 0):
-    runTestNoDisassemblyRerun(self, name, sorted(expected_output), expected_exit_code, output_processing_function = lambda o: sorted(o.strip().splitlines()))
 
 def runTestReturnsIntegers(self, name, expected_output, expected_exit_code = 0, check_memory_leaks=True):
     runTest(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: [int(i) for i in o.strip().splitlines()], check_memory_leaks=check_memory_leaks)
@@ -632,7 +616,7 @@ class FunctionTests(unittest.TestCase):
 
     def testObtainingVectorWithPassedParameters(self):
         assemble('./src/stdlib/viua/misc.asm', './misc.vlib', opts=('-c',))
-        runTestNoDisassemblyRerun(self, 'parameters_vector.asm', '[0, 1, 2, 3]')
+        runTest(self, 'parameters_vector.asm', '[0, 1, 2, 3]')
 
     def testReturningReferences(self):
         runTest(self, 'return_by_reference.asm', 42, 0, lambda o: int(o.strip()))
@@ -881,7 +865,7 @@ class ThrowCatchMechanismTests(unittest.TestCase):
         source_lib = 'thrown_in_linked_caught_in_static_fun.asm'
         lib_path = 'test_module.vlib'
         assemble(os.path.join(self.PATH, source_lib), out=lib_path, opts=('--lib',))
-        runTestNoDisassemblyRerun(self, 'thrown_in_linked_caught_in_static_base.asm', 'looks falsey: 0')
+        runTest(self, 'thrown_in_linked_caught_in_static_base.asm', 'looks falsey: 0')
 
 
 class CatchingMachineThrownExceptionTests(unittest.TestCase):
@@ -924,7 +908,7 @@ class PrototypeSystemTests(unittest.TestCase):
         # FIXME: Valgrind freaks out about dlopen() leaks, comment this line if you know what to do about it
         MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES = (74351, 74367, 74383, 72736, 74399, 74375)
         #skipValgrind(self)
-        runTestSplitlinesNoDisassemblyRerun(self, 'dynamic_method_dispatch.asm',
+        runTestSplitlines(self, 'dynamic_method_dispatch.asm',
             [
                 'Good day from Derived',
                 'Hello from Derived',
@@ -937,7 +921,7 @@ class PrototypeSystemTests(unittest.TestCase):
         MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES = ()
 
     def testOverridingMethods(self):
-        runTestSplitlinesNoDisassemblyRerun(self, 'overriding_methods.asm',
+        runTestSplitlines(self, 'overriding_methods.asm',
             [
                 'Hello Base World!',
                 'Hello Derived World!',
@@ -1185,21 +1169,21 @@ class ExternalModulesTests(unittest.TestCase):
         # FIXME: Valgrind freaks out about dlopen() leaks, comment this line if you know what to do about it
         # or maybe the leak originates in Viua code but I haven't found the leak
         MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES = (72736,)
-        runTestNoDisassemblyRerun(self, 'hello_world.asm', "Hello World!")
+        runTest(self, 'hello_world.asm', "Hello World!")
 
     def testReturningAValue(self):
         global MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES
         # FIXME: Valgrind freaks out about dlopen() leaks, comment this line if you know what to do about it
         # or maybe the leak originates in Viua code but I haven't found the leak
         MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES = (72736,)
-        runTestNoDisassemblyRerun(self, 'sqrt.asm', 1.73, 0, lambda o: round(float(o.strip()), 2))
+        runTest(self, 'sqrt.asm', 1.73, 0, lambda o: round(float(o.strip()), 2))
 
     def testThrowingExceptionHandledByWatchdog(self):
         global MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES
         # FIXME: Valgrind freaks out about dlopen() leaks, comment this line if you know what to do about it
         # or maybe the leak originates in Viua code but I haven't found the leak
         MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES = (72736,)
-        runTestNoDisassemblyRerun(self, 'throwing.asm', 'OH NOES!', 0)
+        runTest(self, 'throwing.asm', 'OH NOES!', 0)
 
 
 class ConcurrencyTests(unittest.TestCase):
@@ -1273,7 +1257,7 @@ class ConcurrencyTests(unittest.TestCase):
         source_lib = 'process_from_linked_fun.asm'
         lib_path = 'test_module.vlib'
         assemble(os.path.join(self.PATH, source_lib), out=lib_path, opts=('--lib',))
-        runTestNoDisassemblyRerun(self, 'process_from_linked_base.asm', 'Hello World!')
+        runTest(self, 'process_from_linked_base.asm', 'Hello World!')
 
 
 class WatchdogTests(unittest.TestCase):
@@ -1298,7 +1282,7 @@ class WatchdogTests(unittest.TestCase):
         runTest(self, 'terminated_watchdog.asm', 'watchdog process terminated by: Function: \'Function: broken_process/0\'')
 
     def testServicingRunawayExceptionWhileOtherProcessesAreRunning(self):
-        runTestReturnsUnorderedLinesNoDisassemblyRerun(self, 'death_message.asm', [
+        runTestReturnsUnorderedLines(self, 'death_message.asm', [
             "Hello World (from detached process)!",
             "Hello World (from joined process)!",
             "process [ joined ]: 'a_joined_concurrent_process' exiting",
@@ -1308,7 +1292,7 @@ class WatchdogTests(unittest.TestCase):
         ])
 
     def testRestartingProcessesAfterAbortedByRunawayException(self):
-        runTestReturnsUnorderedLinesNoDisassemblyRerun(self, 'restarting_process.asm', [
+        runTestReturnsUnorderedLines(self, 'restarting_process.asm', [
             "process [  main  ]: 'main' exiting",
             "Hello World (from detached process)!",
             "[WARNING] process 'Function: a_division_executing_process/2[42, 0]' killed by >>>cannot divide by zero<<<",
@@ -1322,48 +1306,48 @@ class StandardRuntimeLibraryModuleString(unittest.TestCase):
     PATH = './sample/standard_library/string'
 
     def testStringifyFunction(self):
-        runTestCustomAssertsNoDisassemblyRerun(self, 'stringify.asm', partiallyAppliedSameLines(2))
+        runTestCustomAsserts(self, 'stringify.asm', partiallyAppliedSameLines(2))
 
     def testRepresentFunction(self):
-        runTestCustomAssertsNoDisassemblyRerun(self, 'represent.asm', partiallyAppliedSameLines(2))
+        runTestCustomAsserts(self, 'represent.asm', partiallyAppliedSameLines(2))
 
 
 class StandardRuntimeLibraryModuleVector(unittest.TestCase):
     PATH = './sample/standard_library/vector'
 
     def testVectorOfInts(self):
-        runTestNoDisassemblyRerun(self, 'of_ints.asm', '[0, 1, 2, 3, 4, 5, 6, 7]')
+        runTest(self, 'of_ints.asm', '[0, 1, 2, 3, 4, 5, 6, 7]')
 
     def testVectorOf(self):
-        runTestNoDisassemblyRerun(self, 'of.asm', '[0, 1, 2, 3, 4, 5, 6, 7]')
+        runTest(self, 'of.asm', '[0, 1, 2, 3, 4, 5, 6, 7]')
 
     def testVectorReverse(self):
-        runTestNoDisassemblyRerun(self, 'reverse.asm', ['[0, 1, 2, 3, 4, 5, 6, 7]', '[7, 6, 5, 4, 3, 2, 1, 0]'], output_processing_function=lambda o: o.strip().splitlines())
+        runTest(self, 'reverse.asm', ['[0, 1, 2, 3, 4, 5, 6, 7]', '[7, 6, 5, 4, 3, 2, 1, 0]'], output_processing_function=lambda o: o.strip().splitlines())
 
     def testVectorReverseInPlace(self):
-        runTestNoDisassemblyRerun(self, 'reverse_in_place.asm', ['[0, 1, 2, 3, 4, 5, 6, 7]', '[7, 6, 5, 4, 3, 2, 1, 0]'], output_processing_function=lambda o: o.strip().splitlines())
+        runTest(self, 'reverse_in_place.asm', ['[0, 1, 2, 3, 4, 5, 6, 7]', '[7, 6, 5, 4, 3, 2, 1, 0]'], output_processing_function=lambda o: o.strip().splitlines())
 
     def testVectorEveryReturnsTrue(self):
-        runTestNoDisassemblyRerun(self, 'every_returns_true.asm', 'true')
+        runTest(self, 'every_returns_true.asm', 'true')
 
     def testVectorEveryReturnsFalse(self):
-        runTestNoDisassemblyRerun(self, 'every_returns_false.asm', 'false')
+        runTest(self, 'every_returns_false.asm', 'false')
 
     def testVectorAnyReturnsTrue(self):
-        runTestNoDisassemblyRerun(self, 'any_returns_true.asm', 'true')
+        runTest(self, 'any_returns_true.asm', 'true')
 
     def testVectorAnyReturnsFalse(self):
-        runTestNoDisassemblyRerun(self, 'any_returns_false.asm', 'false')
+        runTest(self, 'any_returns_false.asm', 'false')
 
 
 class StandardRuntimeLibraryModuleFunctional(unittest.TestCase):
     PATH = './sample/standard_library/functional'
 
     def testApplyHelloWorldHelloJoeHelloMike(self):
-        runTestSplitlinesNoDisassemblyRerun(self, 'hello_guys.asm', ['Hello World!', 'Hello Joe!', 'Hello Mike!'])
+        runTestSplitlines(self, 'hello_guys.asm', ['Hello World!', 'Hello Joe!', 'Hello Mike!'])
 
     def testApplyThatReturnsAValue(self):
-        runTestNoDisassemblyRerun(self, 'apply_simple.asm', '42')
+        runTest(self, 'apply_simple.asm', '42')
 
 
 class TypeStringTests(unittest.TestCase):
@@ -1392,13 +1376,13 @@ class TypePointerTests(unittest.TestCase):
     PATH = './sample/types/Pointer'
 
     def testCheckingIfIsExpired(self):
-        runTestNoDisassemblyRerun(self, 'check_if_is_expired.asm', 'expired: false\nexpired: true')
+        runTest(self, 'check_if_is_expired.asm', 'expired: false\nexpired: true')
 
     def testExpiredPointerType(self):
         global MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES
         # FIXME: Valgrind freaks out about dlopen() leaks, comment this line if you know what to do about it
         MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES = (72736, 74399, 74375)
-        runTestNoDisassemblyRerun(self, 'type_of_expired.asm', 'ExpiredPointer')
+        runTest(self, 'type_of_expired.asm', 'ExpiredPointer')
         MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES = ()
 
 
