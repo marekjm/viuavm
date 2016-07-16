@@ -57,17 +57,17 @@ map<string, int> assembler::ce::getmarks(const vector<string>& lines) {
     int instruction = 0;  // we need separate instruction counter because number of lines is not exactly number of instructions
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = lines[i];
-        if (str::startswith(line, ".name:") or str::startswith(line, ".link:")) {
+        if (assembler::utils::lines::is_name(line) or assembler::utils::lines::is_link(line)) {
             // names and links can be safely skipped as they are not CPU instructions
             continue;
         }
-        if (str::startswith(line, ".function:")) {
+        if (assembler::utils::lines::is_function(line)) {
             // instructions in functions are counted separately so they are
             // not included here
             while (!str::startswith(lines[i], ".end")) { ++i; }
             continue;
         }
-        if (!str::startswith(line, ".mark:")) {
+        if (not assembler::utils::lines::is_mark(line)) {
             // if all previous checks were false, then this line must be either .mark: directive or
             // an instruction
             // if this check is true - then it is an instruction
@@ -99,7 +99,7 @@ map<string, int> assembler::ce::getnames(const vector<string>& lines) {
     string line, reg, name;
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = lines[i];
-        if (!str::startswith(line, ".name:")) {
+        if (not assembler::utils::lines::is_name(line)) {
             continue;
         }
 
@@ -125,7 +125,7 @@ vector<string> assembler::ce::getlinks(const vector<string>& lines) {
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = lines[i];
-        if (str::startswith(line, ".link:")) {
+        if (assembler::utils::lines::is_link(line)) {
             line = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
             links.push_back(line);
         }
@@ -139,10 +139,10 @@ vector<string> assembler::ce::getFunctionNames(const vector<string>& lines) {
     string line, holdline;
     for (unsigned i = 0; i < lines.size(); ++i) {
         holdline = line = lines[i];
-        if (!str::startswith(line, ".function:")) { continue; }
+        if (not assembler::utils::lines::is_function(line)) { continue; }
 
-        if (str::startswith(line, ".function:")) {
-            for (unsigned j = i+1; lines[j] != ".end"; ++j, ++i) {}
+        if (assembler::utils::lines::is_function(line)) {
+            for (unsigned j = i+1; not assembler::utils::lines::is_end(lines[j]); ++j, ++i) {}
         }
 
         line = str::lstrip(str::sub(line, str::chunk(line).size()));
@@ -157,7 +157,7 @@ vector<string> assembler::ce::getSignatures(const vector<string>& lines) {
     string line, holdline;
     for (unsigned i = 0; i < lines.size(); ++i) {
         holdline = line = lines[i];
-        if (!str::startswith(line, ".signature:")) { continue; }
+        if (not assembler::utils::lines::is_function_signature(line)) { continue; }
         line = str::lstrip(str::sub(line, str::chunk(line).size()));
         names.push_back(str::chunk(line));
     }
@@ -170,10 +170,10 @@ vector<string> assembler::ce::getBlockNames(const vector<string>& lines) {
     string line, holdline;
     for (unsigned i = 0; i < lines.size(); ++i) {
         holdline = line = lines[i];
-        if (not str::startswith(line, ".block:")) { continue; }
+        if (not assembler::utils::lines::is_block(line)) { continue; }
 
-        if (str::startswith(line, ".block:")) {
-            for (unsigned j = i+1; lines[j] != ".end"; ++j, ++i) {}
+        if (assembler::utils::lines::is_block(line)) {
+            for (unsigned j = i+1; not assembler::utils::lines::is_end(lines[j]); ++j, ++i) {}
         }
 
         line = str::lstrip(str::sub(line, str::chunk(line).size()));
@@ -190,7 +190,7 @@ vector<string> assembler::ce::getBlockSignatures(const vector<string>& lines) {
     string line, holdline;
     for (unsigned i = 0; i < lines.size(); ++i) {
         holdline = line = lines[i];
-        if (!str::startswith(line, ".bsignature:")) { continue; }
+        if (not assembler::utils::lines::is_block_signature(line)) { continue; }
         line = str::lstrip(str::sub(line, str::chunk(line).size()));
         names.push_back(str::chunk(line));
     }
