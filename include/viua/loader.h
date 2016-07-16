@@ -46,6 +46,8 @@ class Loader {
 
     std::vector<uint64_t> jumps;
 
+    std::vector<std::string> external_signatures;
+
     std::map<std::string, uint64_t> function_addresses;
     std::map<std::string, uint64_t> function_sizes;
     std::vector<std::string> functions;
@@ -72,6 +74,8 @@ class Loader {
     byte* getBytecode();
 
     std::vector<uint64_t> getJumps();
+
+    std::vector<std::string> getExternalSignatures();
 
     std::map<std::string, uint64_t> getFunctionAddresses();
     std::map<std::string, uint64_t> getFunctionSizes();

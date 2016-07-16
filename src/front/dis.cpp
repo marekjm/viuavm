@@ -215,6 +215,14 @@ int main(int argc, char* argv[]) {
         disassembled_lines.push_back(oss.str());
     }
 
+    auto signatures = loader.getExternalSignatures();
+    for (const auto each : signatures) {
+        disassembled_lines.push_back(".signature: " + each + "\n");
+    }
+    if (signatures.size()) {
+        disassembled_lines.push_back("\n");
+    }
+
     for (unsigned i = 0; i < elements.size(); ++i) {
         name = elements[i];
         el_size = element_sizes[name];

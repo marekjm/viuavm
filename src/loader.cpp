@@ -102,6 +102,15 @@ void Loader::loadExternalSignatures(ifstream& in) {
 
     unique_ptr<char[]> signatures_section_buffer(new char[signatures_section_size]);
     in.read(signatures_section_buffer.get(), signatures_section_size);
+
+    uint64_t i = 0;
+    char *buffer = signatures_section_buffer.get();
+    string sig;
+    while (i < signatures_section_size) {
+        sig = string(buffer+i);
+        i += (sig.size() + 1);
+        external_signatures.push_back(sig);
+    }
 }
 void Loader::loadJumpTable(ifstream& in) {
     // load jump table
@@ -208,6 +217,10 @@ byte* Loader::getBytecode() {
 
 vector<uint64_t> Loader::getJumps() {
     return jumps;
+}
+
+vector<string> Loader::getExternalSignatures() {
+    return external_signatures;
 }
 
 map<string, uint64_t> Loader::getFunctionAddresses() {
