@@ -98,7 +98,7 @@ map<string, string> gatherMetaInformation(const vector<string>& ilines) {
             key = str::chunk(line);
             line = str::lstrip(str::sub(line, key.size()));
             value = str::extract(line);
-            meta_information[key] = value;
+            meta_information[key] = value.substr(1, value.size()-2);
         }
     }
 
