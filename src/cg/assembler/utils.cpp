@@ -109,3 +109,7 @@ string assembler::utils::lines::make_function_signature(const string& name) {
 string assembler::utils::lines::make_block_signature(const string& name) {
     return (".bsignature: " + name);
 }
+
+string assembler::utils::lines::make_info(const string& key, const string& value) {
+    return (".info: " + key + ' ' + str::enquote(str::strencode(value)));
+}

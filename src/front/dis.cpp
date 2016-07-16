@@ -221,7 +221,7 @@ int main(int argc, char* argv[]) {
         disassembled_lines.push_back("; meta information\n");
     }
     for (const auto each : meta_information) {
-        disassembled_lines.push_back(".info: " + each.first + ' ' + str::enquote(str::strencode(each.second)) + "\n");
+        disassembled_lines.push_back(assembler::utils::lines::make_info(each.first, each.second) + "\n");
     }
     if (meta_information.size()) {
         disassembled_lines.push_back("\n");
