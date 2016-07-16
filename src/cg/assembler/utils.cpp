@@ -87,6 +87,10 @@ bool assembler::utils::lines::is_main(const string& line) {
     return str::chunk(line) == ".main:";
 }
 
+bool assembler::utils::lines::is_link(const string& line) {
+    return str::chunk(line) == ".link:";
+}
+
 bool assembler::utils::lines::is_directive(const string& line) {
     return (
         is_function(line) or
