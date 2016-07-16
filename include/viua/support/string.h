@@ -69,6 +69,7 @@ namespace str {
 
     std::string enquote(const std::string&);
     std::string strdecode(const std::string&);
+    std::string strencode(const std::string&);
 
     std::string stringify(const std::vector<std::string>&);
     std::string stringify(unsigned);

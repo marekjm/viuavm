@@ -271,7 +271,7 @@ namespace str {
          *
          *  If a character that does not encode an escape sequence is
          *  preceded by a backslash (\\) the function consumes the backslash and
-         *  leaves only the character preceded by it in the outpur string.
+         *  leaves only the character preceded by it in the output string.
          *
          */
         ostringstream decoded;
@@ -321,6 +321,67 @@ namespace str {
             decoded << c;
         }
         return decoded.str();
+    }
+    string strencode(const string& s) {
+        /** Encode escape sequences in strings.
+         *
+         *  This function recognizes escape sequences as listed on:
+         *  http://en.cppreference.com/w/cpp/language/escape
+         *  The function does not recognize sequences for:
+         *      - arbitrary octal numbers (escape: \nnn),
+         *      - arbitrary hexadecimal numbers (escape: \xnn),
+         *      - short arbitrary Unicode values (escape: \unnnn),
+         *      - long arbitrary Unicode values (escape: \Unnnnnnnn),
+         *
+         */
+        ostringstream encoded;
+        char c;
+        bool escape = false;
+        for (unsigned i = 0; i < s.size(); ++i) {
+            c = s[i];
+            switch (s[i]) {
+                case '\\':
+                    escape = true;
+                    c = '\\';
+                    break;
+                case '\a':
+                    escape = true;
+                    c = 'a';
+                    break;
+                case '\b':
+                    escape = true;
+                    c = 'b';
+                    break;
+                case '\f':
+                    escape = true;
+                    c = 'f';
+                    break;
+                case '\n':
+                    escape = true;
+                    c = 'n';
+                    break;
+                case '\r':
+                    escape = true;
+                    c = 'r';
+                    break;
+                case '\t':
+                    escape = true;
+                    c = 't';
+                    break;
+                case '\v':
+                    escape = true;
+                    c = 'v';
+                    break;
+                default:
+                    escape = false;
+                    c = s[i];
+            }
+            if (escape) {
+                encoded << '\\';
+            }
+            encoded << c;
+        }
+        return encoded.str();
     }
 
 
