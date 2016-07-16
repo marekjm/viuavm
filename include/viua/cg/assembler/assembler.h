@@ -81,6 +81,20 @@ namespace assembler {
         bool isValidFunctionName(const std::string&);
         std::smatch matchFunctionName(const std::string&);
         int getFunctionArity(const std::string&);
+
+        namespace lines {
+            bool is_directive(const std::string&);
+
+            bool is_function(const std::string&);
+            bool is_block(const std::string&);
+            bool is_function_signature(const std::string&);
+            bool is_block_signature(const std::string&);
+            bool is_name(const std::string&);
+            bool is_mark(const std::string&);
+            bool is_info(const std::string&);
+            bool is_end(const std::string&);
+            bool is_main(const std::string&);
+        }
     }
 }
 

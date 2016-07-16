@@ -19,6 +19,7 @@
 
 #include <string>
 #include <regex>
+#include <viua/support/string.h>
 #include <viua/cg/assembler/assembler.h>
 using namespace std;
 
@@ -48,4 +49,55 @@ int assembler::utils::getFunctionArity(const string& function_name) {
         arity = -2;
     }
     return arity;
+}
+
+bool assembler::utils::lines::is_function(const string& line) {
+    return str::chunk(line) == ".function:";
+}
+
+bool assembler::utils::lines::is_block(const string& line) {
+    return str::chunk(line) == ".block:";
+}
+
+bool assembler::utils::lines::is_function_signature(const string& line) {
+    return str::chunk(line) == ".signature:";
+}
+
+bool assembler::utils::lines::is_block_signature(const string& line) {
+    return str::chunk(line) == ".bsignature:";
+}
+
+bool assembler::utils::lines::is_name(const string& line) {
+    return str::chunk(line) == ".name:";
+}
+
+bool assembler::utils::lines::is_mark(const string& line) {
+    return str::chunk(line) == ".mark:";
+}
+
+bool assembler::utils::lines::is_info(const string& line) {
+    return str::chunk(line) == ".info:";
+}
+
+bool assembler::utils::lines::is_end(const string& line) {
+    return str::chunk(line) == ".end:";
+}
+
+bool assembler::utils::lines::is_main(const string& line) {
+    return str::chunk(line) == ".main:";
+}
+
+bool assembler::utils::lines::is_directive(const string& line) {
+    return (
+        is_function(line) or
+        is_block(line) or
+        is_function_signature(line) or
+        is_block_signature(line) or
+        is_name(line) or
+        is_mark(line) or
+        is_info(line) or
+        is_end(line) or
+        is_main(line) or
+        true
+    );
 }
