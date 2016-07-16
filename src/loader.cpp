@@ -115,6 +115,28 @@ vector<string> load_string_list(ifstream& in) {
 
     return strings_list;
 }
+map<string, string> load_meta_information_map(ifstream& in) {
+    uint64_t meta_information_map_size = 0;
+    readinto(in, &meta_information_map_size);
+
+    unique_ptr<char[]> meta_information_map_buffer(new char[meta_information_map_size]);
+    in.read(meta_information_map_buffer.get(), meta_information_map_size);
+
+    map<string, string> meta_information_map;
+
+    char *buffer = meta_information_map_buffer.get();
+    uint64_t i = 0;
+    string key, value;
+    while (i < meta_information_map_size) {
+        key = string(buffer+i);
+        i += (key.size() + 1);
+        value = string(buffer+i);
+        i += (value.size() + 1);
+        meta_information_map[key] = value;
+    }
+
+    return meta_information_map;
+}
 void Loader::loadExternalSignatures(ifstream& in) {
     external_signatures = std::move(load_string_list(in));
 }
@@ -184,6 +206,8 @@ Loader& Loader::load() {
     loadMagicNumber(in);
     assumeBinaryType(in, VIUA_LINKABLE);
 
+    load_meta_information_map(in);
+
     // jump table must be loaded if loading a library
     loadJumpTable(in);
 
@@ -205,6 +229,8 @@ Loader& Loader::executable() {
 
     loadMagicNumber(in);
     assumeBinaryType(in, VIUA_EXECUTABLE);
+
+    load_meta_information_map(in);
 
     loadExternalSignatures(in);
     loadExternalBlockSignatures(in);

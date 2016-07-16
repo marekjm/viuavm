@@ -1249,8 +1249,19 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
 
     /////////////////////////////////////////////////////////////
     // WRITE META-INFORMATION MAP
-    for (auto each : gatherMetaInformation(ilines)) {
-        cout << each.first << ": " << each.second << endl;
+    auto meta_information_map = gatherMetaInformation(ilines);
+    uint64_t meta_information_map_size = 0;
+    for (auto each : meta_information_map) {
+        meta_information_map_size += (each.first.size() + each.second.size() + 2);
+    }
+
+    bwrite(out, meta_information_map_size);
+    for (auto each : meta_information_map) {
+        cout << each.first << ": '" << each.second << "'" << endl;
+        out.write(each.first.c_str(), each.first.size());
+        out.put('\0');
+        out.write(each.second.c_str(), each.second.size());
+        out.put('\0');
     }
 
 
