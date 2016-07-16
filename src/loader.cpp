@@ -96,25 +96,6 @@ void Loader::assumeBinaryType(ifstream& in, ViuaBinaryType assumed_binary_type) 
     }
 }
 
-vector<string> load_string_list(ifstream& in) {
-    uint64_t signatures_section_size = 0;
-    readinto(in, &signatures_section_size);
-
-    unique_ptr<char[]> signatures_section_buffer(new char[signatures_section_size]);
-    in.read(signatures_section_buffer.get(), signatures_section_size);
-
-    uint64_t i = 0;
-    char *buffer = signatures_section_buffer.get();
-    string sig;
-    vector<string> strings_list;
-    while (i < signatures_section_size) {
-        sig = string(buffer+i);
-        i += (sig.size() + 1);
-        strings_list.push_back(sig);
-    }
-
-    return strings_list;
-}
 map<string, string> load_meta_information_map(ifstream& in) {
     uint64_t meta_information_map_size = 0;
     readinto(in, &meta_information_map_size);
@@ -136,6 +117,29 @@ map<string, string> load_meta_information_map(ifstream& in) {
     }
 
     return meta_information_map;
+}
+void Loader::loadMetaInformation(ifstream& in) {
+    meta_information = std::move(load_meta_information_map(in));
+}
+
+vector<string> load_string_list(ifstream& in) {
+    uint64_t signatures_section_size = 0;
+    readinto(in, &signatures_section_size);
+
+    unique_ptr<char[]> signatures_section_buffer(new char[signatures_section_size]);
+    in.read(signatures_section_buffer.get(), signatures_section_size);
+
+    uint64_t i = 0;
+    char *buffer = signatures_section_buffer.get();
+    string sig;
+    vector<string> strings_list;
+    while (i < signatures_section_size) {
+        sig = string(buffer+i);
+        i += (sig.size() + 1);
+        strings_list.push_back(sig);
+    }
+
+    return strings_list;
 }
 void Loader::loadExternalSignatures(ifstream& in) {
     external_signatures = std::move(load_string_list(in));
@@ -206,7 +210,7 @@ Loader& Loader::load() {
     loadMagicNumber(in);
     assumeBinaryType(in, VIUA_LINKABLE);
 
-    load_meta_information_map(in);
+    loadMetaInformation(in);
 
     // jump table must be loaded if loading a library
     loadJumpTable(in);
@@ -230,7 +234,7 @@ Loader& Loader::executable() {
     loadMagicNumber(in);
     assumeBinaryType(in, VIUA_EXECUTABLE);
 
-    load_meta_information_map(in);
+    loadMetaInformation(in);
 
     loadExternalSignatures(in);
     loadExternalBlockSignatures(in);

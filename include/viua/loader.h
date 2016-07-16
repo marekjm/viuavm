@@ -46,6 +46,8 @@ class Loader {
 
     std::vector<uint64_t> jumps;
 
+    std::map<std::string, std::string> meta_information;
+
     std::vector<std::string> external_signatures;
     std::vector<std::string> external_signatures_block;
 
@@ -60,6 +62,8 @@ class Loader {
 
     void loadMagicNumber(std::ifstream&);
     void assumeBinaryType(std::ifstream&, ViuaBinaryType);
+
+    void loadMetaInformation(std::ifstream&);
 
     void loadExternalSignatures(std::ifstream&);
     void loadExternalBlockSignatures(std::ifstream&);
