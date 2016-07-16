@@ -47,6 +47,7 @@ class Loader {
     std::vector<uint64_t> jumps;
 
     std::vector<std::string> external_signatures;
+    std::vector<std::string> external_signatures_block;
 
     std::map<std::string, uint64_t> function_addresses;
     std::map<std::string, uint64_t> function_sizes;
@@ -61,6 +62,7 @@ class Loader {
     void assumeBinaryType(std::ifstream&, ViuaBinaryType);
 
     void loadExternalSignatures(std::ifstream&);
+    void loadExternalBlockSignatures(std::ifstream&);
     void loadJumpTable(std::ifstream&);
     void loadFunctionsMap(std::ifstream&);
     void loadBlocksMap(std::ifstream&);
@@ -76,6 +78,7 @@ class Loader {
     std::vector<uint64_t> getJumps();
 
     std::vector<std::string> getExternalSignatures();
+    std::vector<std::string> getExternalBlockSignatures();
 
     std::map<std::string, uint64_t> getFunctionAddresses();
     std::map<std::string, uint64_t> getFunctionSizes();

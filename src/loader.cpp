@@ -112,6 +112,22 @@ void Loader::loadExternalSignatures(ifstream& in) {
         external_signatures.push_back(sig);
     }
 }
+void Loader::loadExternalBlockSignatures(ifstream& in) {
+    uint64_t signatures_section_size = 0;
+    readinto(in, &signatures_section_size);
+
+    unique_ptr<char[]> signatures_section_buffer(new char[signatures_section_size]);
+    in.read(signatures_section_buffer.get(), signatures_section_size);
+
+    uint64_t i = 0;
+    char *buffer = signatures_section_buffer.get();
+    string sig;
+    while (i < signatures_section_size) {
+        sig = string(buffer+i);
+        i += (sig.size() + 1);
+        external_signatures_block.push_back(sig);
+    }
+}
 void Loader::loadJumpTable(ifstream& in) {
     // load jump table
     uint64_t lib_total_jumps;
@@ -178,6 +194,7 @@ Loader& Loader::load() {
     loadJumpTable(in);
 
     loadExternalSignatures(in);
+    loadExternalBlockSignatures(in);
     loadBlocksMap(in);
     loadFunctionsMap(in);
     loadBytecode(in);
@@ -196,6 +213,7 @@ Loader& Loader::executable() {
     assumeBinaryType(in, VIUA_EXECUTABLE);
 
     loadExternalSignatures(in);
+    loadExternalBlockSignatures(in);
     loadBlocksMap(in);
     loadFunctionsMap(in);
     loadBytecode(in);
@@ -221,6 +239,10 @@ vector<uint64_t> Loader::getJumps() {
 
 vector<string> Loader::getExternalSignatures() {
     return external_signatures;
+}
+
+vector<string> Loader::getExternalBlockSignatures() {
+    return external_signatures_block;
 }
 
 map<string, uint64_t> Loader::getFunctionAddresses() {

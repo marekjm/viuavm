@@ -226,6 +226,17 @@ int main(int argc, char* argv[]) {
         disassembled_lines.push_back("\n");
     }
 
+    auto block_signatures = loader.getExternalBlockSignatures();
+    if (block_signatures.size()) {
+        disassembled_lines.push_back("; external block signatures\n");
+    }
+    for (const auto each : block_signatures) {
+        disassembled_lines.push_back(".bsignature: " + each + "\n");
+    }
+    if (block_signatures.size()) {
+        disassembled_lines.push_back("\n");
+    }
+
     for (unsigned i = 0; i < elements.size(); ++i) {
         name = elements[i];
         el_size = element_sizes[name];
