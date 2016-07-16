@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+#include <viua/support/string.h>
 #include <viua/cg/assembler/assembler.h>
 #include <viua/front/asm.h>
 using namespace std;
@@ -82,4 +83,24 @@ int gatherBlocks(invocables_t* invocables, const vector<string>& expanded_lines,
     }
 
     return 0;
+}
+
+map<string, string> gatherMetaInformation(const vector<string>& ilines) {
+    map<string, string> meta_information;
+
+    string line;
+    for (std::remove_reference<decltype(ilines)>::type::size_type i = 0; i < ilines.size(); ++i) {
+        line = ilines[i];
+        if (str::startswith(line, ".info:")) {
+            line = str::lstrip(line.substr(6));
+
+            string key, value;
+            key = str::chunk(line);
+            line = str::lstrip(str::sub(line, key.size()));
+            value = str::extract(line);
+            meta_information[key] = value;
+        }
+    }
+
+    return meta_information;
 }

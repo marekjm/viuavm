@@ -202,7 +202,7 @@ vector<string> filter(const vector<string>& lines) {
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = lines[i];
-        if (str::startswith(line, ".mark:") or str::startswith(line, ".name:") or str::startswith(line, ".main:") or str::startswith(line, ".link:") or str::startswith(line, ".signature:") or str::startswith(line, ".bsignature:") or str::startswith(line, ".type:")) {
+        if (str::startswith(line, ".mark:") or str::startswith(line, ".name:") or str::startswith(line, ".main:") or str::startswith(line, ".link:") or str::startswith(line, ".signature:") or str::startswith(line, ".bsignature:") or str::startswith(line, ".type:") or str::startswith(line, ".info:")) {
             /*  Lines beginning with `.mark:` are just markers placed in code and
              *  are do not produce any bytecode.
              *  Lines beginning with `.name:` are asm directives that assign human-rememberable names to
@@ -1244,6 +1244,13 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
         out.write(&VIUA_LINKABLE, sizeof(ViuaBinaryType));
     } else {
         out.write(&VIUA_EXECUTABLE, sizeof(ViuaBinaryType));
+    }
+
+
+    /////////////////////////////////////////////////////////////
+    // WRITE META-INFORMATION MAP
+    for (auto each : gatherMetaInformation(ilines)) {
+        cout << each.first << ": " << each.second << endl;
     }
 
 
