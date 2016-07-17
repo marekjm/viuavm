@@ -36,6 +36,7 @@ There are several categories of change:
   run only until the end of their line,
 - feature: `vec` instruction can pack objects
 - feature: external function and block signatures are included in disassembler output
+- feature: `.info: <key> "<value>"` directive may be used to embed additional information in compiled files,
 
 
 ----
