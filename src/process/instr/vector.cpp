@@ -91,7 +91,16 @@ byte* Process::opvpop(byte* addr) {
      */
     unsigned destination_register_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     Type* vector_operand = viua::operand::extract(addr)->resolve(this);
-    int position_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+
+    int position_operand_index = 0;
+    bool reg_ref = false;
+
+    viua::cpu::util::extractIntegerOperand(addr, reg_ref, position_operand_index);
+
+    if (reg_ref) {
+        // register index references cannot be negative so it's safe to cast to unsigned
+        position_operand_index = static_cast<Integer*>(fetch(static_cast<unsigned>(position_operand_index)))->value();
+    }
 
     viua::assertions::assert_implements<Vector>(vector_operand, "Vector");
     /*  1) fetch vector,
@@ -111,7 +120,16 @@ byte* Process::opvat(byte* addr) {
      */
     unsigned destination_register_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     Type* vector_operand = viua::operand::extract(addr)->resolve(this);
-    int position_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+
+    int position_operand_index = 0;
+    bool reg_ref = false;
+
+    viua::cpu::util::extractIntegerOperand(addr, reg_ref, position_operand_index);
+
+    if (reg_ref) {
+        // register index references cannot be negative so it's safe to cast to unsigned
+        position_operand_index = static_cast<Integer*>(fetch(static_cast<unsigned>(position_operand_index)))->value();
+    }
 
     viua::assertions::assert_implements<Vector>(vector_operand, "Vector");
     Type* ptr = static_cast<Vector*>(vector_operand)->at(position_operand_index);
