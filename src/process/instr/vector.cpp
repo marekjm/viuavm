@@ -89,7 +89,7 @@ byte* Process::opvpush(byte* addr) {
 byte* Process::opvpop(byte* addr) {
     /*  Run vpop instruction.
      */
-    int destination_register_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned destination_register_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     Type* vector_operand = viua::operand::extract(addr)->resolve(this);
     int position_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
@@ -109,7 +109,7 @@ byte* Process::opvat(byte* addr) {
      *
      *  Vector always returns a copy of the object in a register.
      */
-    int destination_register_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned destination_register_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     Type* vector_operand = viua::operand::extract(addr)->resolve(this);
     int position_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
