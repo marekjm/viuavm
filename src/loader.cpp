@@ -142,10 +142,10 @@ vector<string> load_string_list(ifstream& in) {
     return strings_list;
 }
 void Loader::loadExternalSignatures(ifstream& in) {
-    external_signatures = std::move(load_string_list(in));
+    external_signatures = load_string_list(in);
 }
 void Loader::loadExternalBlockSignatures(ifstream& in) {
-    external_signatures_block = std::move(load_string_list(in));
+    external_signatures_block = load_string_list(in);
 }
 
 void Loader::loadJumpTable(ifstream& in) {
