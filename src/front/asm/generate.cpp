@@ -43,7 +43,7 @@ template<class T> void bwrite(ofstream& out, const T& object) {
     out.write(reinterpret_cast<const char*>(&object), sizeof(T));
 }
 void strwrite(ofstream& out, const string& s) {
-    out.write(s.c_str(), s.size());
+    out.write(s.c_str(), static_cast<std::streamsize>(s.size()));
     out.put('\0');
 }
 
