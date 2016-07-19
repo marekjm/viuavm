@@ -101,7 +101,7 @@ map<string, string> load_meta_information_map(ifstream& in) {
     readinto(in, &meta_information_map_size);
 
     unique_ptr<char[]> meta_information_map_buffer(new char[meta_information_map_size]);
-    in.read(meta_information_map_buffer.get(), meta_information_map_size);
+    in.read(meta_information_map_buffer.get(), static_cast<std::streamsize>(meta_information_map_size));
 
     map<string, string> meta_information_map;
 
@@ -127,7 +127,7 @@ vector<string> load_string_list(ifstream& in) {
     readinto(in, &signatures_section_size);
 
     unique_ptr<char[]> signatures_section_buffer(new char[signatures_section_size]);
-    in.read(signatures_section_buffer.get(), signatures_section_size);
+    in.read(signatures_section_buffer.get(), static_cast<std::streamsize>(signatures_section_size));
 
     uint64_t i = 0;
     char *buffer = signatures_section_buffer.get();
