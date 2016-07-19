@@ -119,7 +119,7 @@ map<string, string> load_meta_information_map(ifstream& in) {
     return meta_information_map;
 }
 void Loader::loadMetaInformation(ifstream& in) {
-    meta_information = std::move(load_meta_information_map(in));
+    meta_information = load_meta_information_map(in);
 }
 
 vector<string> load_string_list(ifstream& in) {
