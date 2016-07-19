@@ -42,6 +42,10 @@ extern bool SCREAM;
 template<class T> void bwrite(ofstream& out, const T& object) {
     out.write(reinterpret_cast<const char*>(&object), sizeof(T));
 }
+void strwrite(ofstream& out, const string& s) {
+    out.write(s.c_str(), s.size());
+    out.put('\0');
+}
 
 
 tuple<uint64_t, enum JUMPTYPE> resolvejump(string jmp, const map<string, int>& marks, uint64_t instruction_index) {
@@ -759,10 +763,7 @@ uint64_t writeCodeBlocksSection(ofstream& out, const invocables_t& blocks, const
             cout << endl;
         }
 
-        // block name...
-        out.write(name.c_str(), static_cast<std::streamsize>(name.size()));
-        // ...requires terminating null character
-        out.put('\0');
+        strwrite(out, name);
         // mapped address must come after name
         // FIXME: use uncasted uint64_t
         bwrite(out, block_bodies_size_so_far);
@@ -1239,10 +1240,8 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     bwrite(out, meta_information_map_size);
     for (auto each : meta_information_map) {
         cout << each.first << ": '" << each.second << "'" << endl;
-        out.write(each.first.c_str(), each.first.size());
-        out.put('\0');
-        out.write(each.second.c_str(), each.second.size());
-        out.put('\0');
+        strwrite(out, each.first);
+        strwrite(out, each.second);
     }
 
 
@@ -1272,8 +1271,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     }
     bwrite(out, signatures_section_size);
     for (const auto each : functions.signatures) {
-        out.write(each.c_str(), each.size());
-        out.put('\0');
+        strwrite(out, each);
     }
 
 
@@ -1285,8 +1283,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     }
     bwrite(out, signatures_section_size);
     for (const auto each : blocks.signatures) {
-        out.write(each.c_str(), each.size());
-        out.put('\0');
+        strwrite(out, each);
     }
 
 
@@ -1295,10 +1292,7 @@ int generate(const vector<string>& expanded_lines, const map<long unsigned, long
     uint64_t functions_size_so_far = writeCodeBlocksSection(out, blocks, linked_block_names);
     functions_size_so_far = writeCodeBlocksSection(out, functions, linked_function_names, functions_size_so_far);
     for (string name : linked_function_names) {
-        // function name...
-        out.write(name.c_str(), static_cast<std::streamsize>(name.size()));
-        // ...requires terminating null character
-        out.put('\0');
+        strwrite(out, name);
         // mapped address must come after name
         uint64_t address = function_addresses[name];
         bwrite(out, address);
