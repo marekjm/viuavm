@@ -28,7 +28,10 @@
 using namespace std;
 
 
-void throwing_oh_noes(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*) {
+extern "C" const ForeignFunctionSpec* exports();
+
+
+static void throwing_oh_noes(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*) {
     throw new Exception("OH NOES!");
 }
 

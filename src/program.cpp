@@ -115,7 +115,7 @@ unsigned long Program::instructionCount() {
 }
 
 
-OPCODE instructionToOpcode(const string& s) {
+static OPCODE instructionToOpcode(const string& s) {
     OPCODE op = NOP;
     bool found = false;
     for (auto it : OP_NAMES) {

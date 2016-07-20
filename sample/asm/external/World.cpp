@@ -25,7 +25,10 @@
 using namespace std;
 
 
-void hello(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*) {
+extern "C" const ForeignFunctionSpec* exports();
+
+
+static void hello(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*) {
     cout << "Hello World!" << endl;
 }
 

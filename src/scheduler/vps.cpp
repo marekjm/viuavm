@@ -32,7 +32,7 @@
 using namespace std;
 
 
-void printStackTrace(Process *process) {
+static void printStackTrace(Process *process) {
     auto trace = process->trace();
     cout << "stack trace: from entry point, most recent call last...\n";
     for (unsigned i = (trace.size() and trace[0]->function_name == "__entry"); i < trace.size(); ++i) {

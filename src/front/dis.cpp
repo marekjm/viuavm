@@ -49,7 +49,7 @@ bool LINE_BY_LINE = false;
 string SELECTED_FUNCTION = "";
 
 
-bool usage(const char* program, bool show_help, bool show_version, bool verbose) {
+static bool usage(const char* program, bool show_help, bool show_version, bool verbose) {
     if (show_help or (show_version and verbose)) {
         cout << "Viua VM disassembler, version ";
     }

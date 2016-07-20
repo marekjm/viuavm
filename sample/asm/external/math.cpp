@@ -28,7 +28,10 @@
 using namespace std;
 
 
-void math_sqrt(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
+extern "C" const ForeignFunctionSpec* exports();
+
+
+static void math_sqrt(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
     if (frame->args->at(0) == nullptr) {
         throw new Exception("expected float as first argument");
     }

@@ -42,13 +42,13 @@ extern bool SCREAM;
 template<class T> void bwrite(ofstream& out, const T& object) {
     out.write(reinterpret_cast<const char*>(&object), sizeof(T));
 }
-void strwrite(ofstream& out, const string& s) {
+static void strwrite(ofstream& out, const string& s) {
     out.write(s.c_str(), static_cast<std::streamsize>(s.size()));
     out.put('\0');
 }
 
 
-tuple<uint64_t, enum JUMPTYPE> resolvejump(string jmp, const map<string, int>& marks, uint64_t instruction_index) {
+static tuple<uint64_t, enum JUMPTYPE> resolvejump(string jmp, const map<string, int>& marks, uint64_t instruction_index) {
     /*  This function is used to resolve jumps in `jump` and `branch` instructions.
      */
     uint64_t addr = 0;
@@ -94,7 +94,7 @@ tuple<uint64_t, enum JUMPTYPE> resolvejump(string jmp, const map<string, int>& m
     return tuple<uint64_t, enum JUMPTYPE>(addr, jump_type);
 }
 
-string resolveregister(string reg, const map<string, int>& names) {
+static string resolveregister(string reg, const map<string, int>& names) {
     /*  This function is used to register numbers when a register is accessed, e.g.
      *  in `istore` instruction or in `branch` in condition operand.
      *
@@ -186,7 +186,7 @@ const map<string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS = {
     { "remove", &Program::opremove },
 };
 
-void assemble_three_intop_instruction(Program& program, map<string, int>& names, const string& instr, const string& operands) {
+static void assemble_three_intop_instruction(Program& program, map<string, int>& names, const string& instr, const string& operands) {
     string rega, regb, regr;
     tie(rega, regb, regr) = assembler::operands::get3(operands);
     rega = resolveregister(rega, names);
@@ -202,7 +202,7 @@ void assemble_three_intop_instruction(Program& program, map<string, int>& names,
 }
 
 
-vector<string> filter(const vector<string>& lines) {
+static vector<string> filter(const vector<string>& lines) {
     /** Return lines for current function.
      *
      *  Filters out all non-local (i.e. outside the scope of current function) and non-opcode lines.
@@ -227,7 +227,7 @@ vector<string> filter(const vector<string>& lines) {
     return filtered;
 }
 
-Program& compile(Program& program, const vector<string>& lines, map<string, int>& marks, map<string, int>& names) {
+static Program& compile(Program& program, const vector<string>& lines, map<string, int>& marks, map<string, int>& names) {
     /** Compile instructions into bytecode using bytecode generation API.
      *
      */
@@ -671,7 +671,7 @@ Program& compile(Program& program, const vector<string>& lines, map<string, int>
 }
 
 
-void assemble(Program& program, const vector<string>& lines) {
+static void assemble(Program& program, const vector<string>& lines) {
     /** Assemble instructions in lines into a program.
      *  This function first garthers required information about markers, named registers and functions.
      *  Then, it passes all gathered data into compilation function.
@@ -687,7 +687,7 @@ void assemble(Program& program, const vector<string>& lines) {
 }
 
 
-map<string, uint64_t> mapInvocableAddresses(uint64_t& starting_instruction, const vector<string>& names, const map<string, vector<string> >& sources) {
+static map<string, uint64_t> mapInvocableAddresses(uint64_t& starting_instruction, const vector<string>& names, const map<string, vector<string> >& sources) {
     map<string, uint64_t> addresses;
     for (string name : names) {
         addresses[name] = starting_instruction;
@@ -743,7 +743,7 @@ vector<string> expandSource(const vector<string>& lines, map<long unsigned, long
     return asm_lines;
 }
 
-uint64_t writeCodeBlocksSection(ofstream& out, const invocables_t& blocks, const vector<string>& linked_block_names, uint64_t block_bodies_size_so_far = 0) {
+static uint64_t writeCodeBlocksSection(ofstream& out, const invocables_t& blocks, const vector<string>& linked_block_names, uint64_t block_bodies_size_so_far = 0) {
     uint64_t block_ids_section_size = 0;
     for (string name : blocks.names) { block_ids_section_size += name.size(); }
     // we need to insert address after every block

@@ -56,7 +56,7 @@ bool ERROR_HALT_IS_LAST = false;
 bool ERROR_UNDEFINED_ARITY = false;
 
 
-bool usage(const char* program, bool show_help, bool show_version, bool verbose) {
+static bool usage(const char* program, bool show_help, bool show_version, bool verbose) {
     if (show_help or (show_version and verbose)) {
         cout << "Viua VM assembler, version ";
     }

@@ -96,7 +96,7 @@ void Loader::assumeBinaryType(ifstream& in, ViuaBinaryType assumed_binary_type) 
     }
 }
 
-map<string, string> load_meta_information_map(ifstream& in) {
+static map<string, string> load_meta_information_map(ifstream& in) {
     uint64_t meta_information_map_size = 0;
     readinto(in, &meta_information_map_size);
 
@@ -122,7 +122,7 @@ void Loader::loadMetaInformation(ifstream& in) {
     meta_information = load_meta_information_map(in);
 }
 
-vector<string> load_string_list(ifstream& in) {
+static vector<string> load_string_list(ifstream& in) {
     uint64_t signatures_section_size = 0;
     readinto(in, &signatures_section_size);
 

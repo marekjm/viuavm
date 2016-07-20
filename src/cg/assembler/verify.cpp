@@ -378,7 +378,7 @@ string assembler::verify::ressInstructions(const string& filename, const vector<
     return report.str();
 }
 
-string bodiesAreNonempty(const string& filename, const vector<string>& lines) {
+static string bodiesAreNonempty(const string& filename, const vector<string>& lines) {
     ostringstream report("");
     string line, block, function;
 
