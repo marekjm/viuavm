@@ -70,17 +70,16 @@ static byte* insertThreeIntegerOpsInstruction(byte* addr_ptr, enum OPCODE instru
     return addr_ptr;
 }
 
+static byte* insertString(byte* ptr, const string& s) {
+    for (unsigned i = 0; i < s.size(); ++i) {
+        *(ptr++) = static_cast<unsigned char>(s[i]);
+    }
+    *(ptr++) = '\0';
+    return ptr;
+}
 
 namespace cg {
     namespace bytecode {
-        byte* insertString(byte* ptr, const string& s) {
-            for (unsigned i = 0; i < s.size(); ++i) {
-                *(ptr++) = static_cast<unsigned char>(s[i]);
-            }
-            *(ptr++) = '\0';
-            return ptr;
-        }
-
         byte* opnop(byte* addr_ptr) {
             /*  Inserts nop instuction.
              */
