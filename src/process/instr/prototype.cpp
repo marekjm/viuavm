@@ -82,7 +82,8 @@ byte* Process::opregister(byte* addr) {
     viua::cpu::util::extractIntegerOperand(addr, reg_ref, reg);
 
     if (reg_ref) {
-        reg = static_cast<Integer*>(fetch(reg))->value();
+        // register index references cannot be negative so it's safe to cast to unsigned
+        reg = static_cast<Integer*>(fetch(static_cast<unsigned>(reg)))->value();
     }
 
     Prototype* new_proto = static_cast<Prototype*>(fetch(reg));
