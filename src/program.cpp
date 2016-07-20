@@ -251,7 +251,7 @@ uint64_t Program::getInstructionBytecodeOffset(uint64_t instr, uint64_t count) {
             opcode_name = OP_NAMES.at(OPCODE(program[offset]));
         } catch (const std::out_of_range& e) {
             ostringstream oss;
-            oss << "instruction not found in OP_NAMES: " << OPCODE(program[offset]);
+            oss << "opcode not found in bytecode definition: " << OPCODE(program[offset]);
             throw oss.str();
         }
 
