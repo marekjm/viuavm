@@ -258,7 +258,7 @@ uint64_t Program::getInstructionBytecodeOffset(uint64_t instr, uint64_t count) {
         try {
             inc = OP_SIZES.at(opcode_name);
         } catch (const std::out_of_range& e) {
-            throw ("instruction " + opcode_name + " not found in OP_SIZES");
+            throw ("failed to determine size of instruction " + opcode_name);
         }
 
         if (scream) {
