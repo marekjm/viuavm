@@ -76,19 +76,11 @@ byte* Process::opattach(byte* addr) {
 byte* Process::opregister(byte* addr) {
     /** Register a prototype in the typesystem.
      */
-    int reg;
-    bool reg_ref;
+    unsigned source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    viua::cpu::util::extractIntegerOperand(addr, reg_ref, reg);
-
-    if (reg_ref) {
-        // register index references cannot be negative so it's safe to cast to unsigned
-        reg = static_cast<Integer*>(fetch(static_cast<unsigned>(reg)))->value();
-    }
-
-    Prototype* new_proto = static_cast<Prototype*>(fetch(reg));
+    Prototype* new_proto = static_cast<Prototype*>(fetch(source));
     scheduler->registerPrototype(new_proto);
-    uregset->empty(reg);
+    uregset->empty(source);
 
     return addr;
 }
