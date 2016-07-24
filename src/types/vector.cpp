@@ -29,6 +29,7 @@ using namespace std;
 Type* Vector::insert(long int index, Type* object) {
     long offset = 0;
 
+    // FIXME: REFACTORING: move bounds-checking to a separate function
     if (index > 0 and static_cast<decltype(internal_object)::size_type>(index) > internal_object.size()) {
         throw new OutOfRangeException("positive vector index out of range");
     } else if (index < 0 and static_cast<decltype(internal_object)::size_type>(-index) > internal_object.size()) {
@@ -53,6 +54,7 @@ Type* Vector::push(Type* object) {
 Type* Vector::pop(long int index) {
     long offset = 0;
 
+    // FIXME: REFACTORING: move bounds-checking to a separate function
     if (index > 0 and static_cast<decltype(internal_object)::size_type>(index) >= internal_object.size()) {
         throw new OutOfRangeException("positive vector index out of range");
     } else if (index < 0 and static_cast<decltype(internal_object)::size_type>(-index) > internal_object.size()) {
@@ -74,6 +76,7 @@ Type* Vector::pop(long int index) {
 Type* Vector::at(long int index) {
     long offset = 0;
 
+    // FIXME: REFACTORING: move bounds-checking to a separate function
     if (index > 0 and static_cast<decltype(internal_object)::size_type>(index) >= internal_object.size()) {
         throw new OutOfRangeException("positive vector index out of range");
     } else if (index < 0 and static_cast<decltype(internal_object)::size_type>(-index) > internal_object.size()) {
