@@ -27,11 +27,20 @@ using namespace std;
 
 
 Type* Vector::insert(long int index, Type* object) {
-    if (index < 0) { index = (internal_object.size()+index); }
-    if ((index < 0) or (index > (static_cast<long int>(internal_object.size())+1) and index > 0)) {
-        throw new OutOfRangeException("vector index out of range");
+    long offset = 0;
+
+    if (index > 0 and static_cast<decltype(internal_object)::size_type>(index) > internal_object.size()) {
+        throw new OutOfRangeException("positive vector index out of range");
+    } else if (index < 0 and static_cast<decltype(internal_object)::size_type>(-index) > internal_object.size()) {
+        throw new OutOfRangeException("negative vector index out of range");
     }
-    vector<Type*>::iterator it = (internal_object.begin()+index);
+    if (index < 0) {
+        offset = (static_cast<decltype(index)>(internal_object.size()) + index);
+    } else {
+        offset = index;
+    }
+
+    vector<Type*>::iterator it = (internal_object.begin()+offset);
     internal_object.insert(it, object);
     return object;
 }
@@ -42,27 +51,43 @@ Type* Vector::push(Type* object) {
 }
 
 Type* Vector::pop(long int index) {
-    if (index < 0) { index = (internal_object.size()+index); }
-    if ((index < 0) or (index >= static_cast<long int>(internal_object.size()) and index > 0)) {
-        throw new OutOfRangeException("vector index out of range");
+    long offset = 0;
+
+    if (index > 0 and static_cast<decltype(internal_object)::size_type>(index) >= internal_object.size()) {
+        throw new OutOfRangeException("positive vector index out of range");
+    } else if (index < 0 and static_cast<decltype(internal_object)::size_type>(-index) > internal_object.size()) {
+        throw new OutOfRangeException("negative vector index out of range");
     }
-    Type* object = internal_object[index];
-    vector<Type*>::iterator it = (internal_object.begin()+index);
+
+    if (index < 0) {
+        offset = (static_cast<decltype(index)>(internal_object.size()) + index);
+    } else {
+        offset = index;
+    }
+
+    vector<Type*>::iterator it = (internal_object.begin()+offset);
+    Type *object = *it;
     internal_object.erase(it);
     return object;
 }
 
 Type* Vector::at(long int index) {
-    if (index < 0) { index = (internal_object.size()+index); }
-    // FIXME: convert signed indexes on input to unsigned indexes for internal usage
-    // to avoid the cast
-    if ((index < 0) or (index >= static_cast<long int>(internal_object.size()))) {
-        throw new OutOfRangeException("vector index out of range");
+    long offset = 0;
+
+    if (index > 0 and static_cast<decltype(internal_object)::size_type>(index) >= internal_object.size()) {
+        throw new OutOfRangeException("positive vector index out of range");
+    } else if (index < 0 and static_cast<decltype(internal_object)::size_type>(-index) > internal_object.size()) {
+        throw new OutOfRangeException("negative vector index out of range");
     }
-    // FIXME: returned value is a reference, but docs say it's a copy
-    // FIXME: this is a *serious* bug, if user code `delete`'s the object
-    // VM will segfault
-    return internal_object[index];
+
+    if (index < 0) {
+        offset = (static_cast<decltype(index)>(internal_object.size()) + index);
+    } else {
+        offset = index;
+    }
+
+    vector<Type*>::iterator it = (internal_object.begin()+offset);
+    return *it;
 }
 
 int Vector::len() {

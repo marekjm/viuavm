@@ -499,6 +499,9 @@ class VectorInstructionsTests(unittest.TestCase):
     def testVINSERT(self):
         runTest(self, 'vinsert.asm', ['Hurr', 'durr', 'Im\'a', 'sheep!'], 0, lambda o: o.strip().splitlines())
 
+    def testInsertingOutOfRangeWithPositiveIndex(self):
+        runTestThrowsException(self, 'out_of_range_index_positive.asm', 'uncaught object: OutOfRangeException = positive vector index out of range')
+
     def testVPUSH(self):
         runTest(self, 'vpush.asm', ['0', '1', 'Hello World!'], 0, lambda o: o.strip().splitlines())
 
