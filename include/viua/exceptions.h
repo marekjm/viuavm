@@ -29,12 +29,9 @@
 
 
 class OutOfRangeException: public Exception {
-    protected:
-        std::string cause;
-
     public:
         std::string type() const { return "OutOfRangeException"; }
-        OutOfRangeException(const std::string& s): cause(s) {}
+        OutOfRangeException(const std::string& s): Exception(s) {}
 };
 
 class ArityException: public Exception {
