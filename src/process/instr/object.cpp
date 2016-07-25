@@ -62,7 +62,9 @@ byte* Process::opmsg(byte* addr) {
     viua::cpu::util::extractIntegerOperand(addr, return_register_ref, return_register_index);
 
     if (return_register_ref) {
-        return_register_index = static_cast<Integer*>(fetch(return_register_index))->value();
+        // FIXME: remove the need for static_cast<>
+        // the cast is safe because register indexes cannot be negative, but it looks ugly
+        return_register_index = static_cast<Integer*>(fetch(static_cast<unsigned>(return_register_index)))->value();
     }
 
     string method_name = viua::operand::extractString(addr);
@@ -100,11 +102,15 @@ byte* Process::opmsg(byte* addr) {
     }
 
     if (is_foreign_method) {
-        return callForeignMethod(addr, obj, function_name, return_register_ref, return_register_index, method_name);
+        // FIXME: remove the need for static_cast<>
+        // the cast is safe because register indexes cannot be negative, but it looks ugly
+        return callForeignMethod(addr, obj, function_name, return_register_ref, static_cast<unsigned>(return_register_index), method_name);
     }
 
     auto caller = (is_native ? &Process::callNative : &Process::callForeign);
-    return (this->*caller)(addr, function_name, return_register_ref, return_register_index, method_name);
+    // FIXME: remove the need for static_cast<>
+    // the cast is safe because register indexes cannot be negative, but it looks ugly
+    return (this->*caller)(addr, function_name, return_register_ref, static_cast<unsigned>(return_register_index), method_name);
 }
 
 byte* Process::opinsert(byte* addr) {
