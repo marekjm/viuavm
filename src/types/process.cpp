@@ -104,7 +104,9 @@ void ProcessType::suspended(Frame* frame, RegisterSet*, RegisterSet*, Process*, 
 
 
 void ProcessType::getPriority(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
-    frame->regset->set(0, new Integer(thrd->priority()));
+    // FIXME: cast to silence compiler warning about implicit conversion changing signedness of the int
+    // the cast is not *truly* safe, because unsigned can store positive numbers signed int cannot
+    frame->regset->set(0, new Integer(static_cast<int>(thrd->priority())));
 }
 
 void ProcessType::setPriority(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
@@ -121,7 +123,13 @@ void ProcessType::setPriority(Frame* frame, RegisterSet*, RegisterSet*, Process*
         throw new Exception("expected Integer as first parameter but got " + frame->args->at(0)->type());
     }
 
-    thrd->priority(static_cast<Integer*>(frame->args->at(1))->value());
+    int new_priority = static_cast<Integer*>(frame->args->at(1))->value();
+    if (new_priority < 1) {
+        throw new Exception("process priority must be a positive integer, got: " + frame->args->at(1)->str());
+    }
+    // FIXME: cast to silence compiler warning about implicit conversion changing signedness of the int
+    // the cast is safe because the integer is guaranteed to be positive
+    thrd->priority(static_cast<unsigned>(new_priority));
 }
 
 void ProcessType::pass(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
