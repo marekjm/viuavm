@@ -192,6 +192,6 @@ The code is licensed under GNU GPL v3.
 
 Project website: [viuavm.org](http://viuavm.org/)
 
-Maintainer: <marekjm at ozro dot pw>
+Maintainer: &lt;marekjm at ozro dot pw&gt;
 
 Bugtracker: https://github.com/marekjm/viuavm/issues
