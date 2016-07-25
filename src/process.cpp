@@ -35,10 +35,6 @@ Type* Process::fetch(unsigned index) const {
     /*  Return pointer to object at given register.
      *  This method safeguards against reaching for out-of-bounds registers and
      *  reading from an empty register.
-     *
-     *  :params:
-     *
-     *  index:int   - index of a register to fetch
      */
     Type* object = uregset->get(index);
     if (dynamic_cast<Reference*>(object)) {
