@@ -185,10 +185,7 @@ void String::substr(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
             end = i->value();
         }
     }
-    if (end < 0) {
-        end = (svalue.size()+end+1);
-    }
-    frame->regset->set(0, new String(svalue.substr(begin, end)));
+    frame->regset->set(0, sub(begin, end));
 }
 
 void String::concatenate(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
