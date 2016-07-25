@@ -156,8 +156,8 @@ void String::format(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
 }
 
 void String::substr(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
-    long begin = 0;
-    long end = -1;
+    int begin = 0;
+    int end = -1;
 
     assert_arity(frame, 1ul, 2ul, 3ul);
 
