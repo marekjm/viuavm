@@ -45,7 +45,19 @@ Integer* String::size() {
 String* String::sub(int b, int e) {
     /** Return substring extracted from this object.
      */
-    return new String(str::sub(svalue, b, e));
+    string::size_type cut_from, cut_to;
+    // these casts are ugly as hell, but without them Clang warns about implicit sign-changing
+    if (b < 0) {
+        cut_from = (svalue.size() - static_cast<unsigned>(-b));
+    } else {
+        cut_from = static_cast<decltype(cut_from)>(b);
+    }
+    if (e < 0) {
+        cut_to = (svalue.size() - static_cast<unsigned>(-e) + 1);
+    } else {
+        cut_to = static_cast<decltype(cut_to)>(e);
+    }
+    return new String(svalue.substr(cut_from, cut_to));
 }
 
 String* String::add(String* s) {
