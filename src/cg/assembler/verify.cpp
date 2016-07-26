@@ -313,6 +313,36 @@ string assembler::verify::blockTries(const string& filename, const vector<string
     return report.str();
 }
 
+string assembler::verify::blockCatches(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, const vector<string>& block_names, const vector<string>& block_signatures) {
+    ostringstream report("");
+    string line;
+    for (unsigned i = 0; i < lines.size(); ++i) {
+        line = str::lstrip(lines[i]);
+        if (not str::startswithchunk(line, "catch")) {
+            continue;
+        }
+
+        // remove instruction
+        line = str::lstrip(str::sub(line, str::chunk(line).size()));
+
+        // remove name of caught type
+        line = str::lstrip(str::sub(line, str::chunk(line).size()));
+
+        string block = str::chunk(line);
+        bool is_undefined = (find(block_names.begin(), block_names.end(), block) == block_names.end());
+        // if block is undefined, check if we got a signature for it
+        if (is_undefined) {
+            is_undefined = (find(block_signatures.begin(), block_signatures.end(), block) == block_signatures.end());
+        }
+
+        if (is_undefined) {
+            report << filename << ':' << (expanded_lines_to_source_lines.at(i)+1) << ": error: cannot catch using undefined block: " << block;
+            break;
+        }
+    }
+    return report.str();
+}
+
 string assembler::verify::callableCreations(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, const vector<string>& function_names, const vector<string>& function_signatures) {
     ostringstream report("");
     string line;
