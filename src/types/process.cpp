@@ -74,7 +74,7 @@ bool ProcessType::terminated() {
     return thrd->terminated();
 }
 
-Type* ProcessType::transferActiveException() {
+unique_ptr<Type> ProcessType::transferActiveException() {
     return thrd->transferActiveException();
 }
 

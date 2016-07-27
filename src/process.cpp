@@ -484,8 +484,8 @@ Type* Process::getActiveException() {
     return thrown.get();
 }
 
-Type* Process::transferActiveException() {
-    return thrown.release();
+unique_ptr<Type> Process::transferActiveException() {
+    return std::move(thrown);
 }
 
 void Process::raiseException(Type *exception) {

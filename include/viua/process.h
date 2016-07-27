@@ -277,7 +277,7 @@ class Process {
 
         bool terminated() const;
         Type* getActiveException();
-        Type* transferActiveException();
+        std::unique_ptr<Type> transferActiveException();
         void raiseException(Type*);
         void handleActiveException();
 

@@ -64,7 +64,7 @@ class ProcessType : public Type {
         void detach();
         bool stopped();
         bool terminated();
-        Type* transferActiveException();
+        std::unique_ptr<Type> transferActiveException();
         std::unique_ptr<Type> getReturnValue();
 
         ProcessType(Process* t): thrd(t) {}

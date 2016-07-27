@@ -40,8 +40,8 @@ static void printStackTrace(Process *process) {
     }
     cout << "\n";
 
-    Type *thrown_object = process->transferActiveException();
-    Exception* ex = dynamic_cast<Exception*>(thrown_object);
+    unique_ptr<Type> thrown_object(process->transferActiveException());
+    Exception* ex = dynamic_cast<Exception*>(thrown_object.get());
     string ex_type = thrown_object->type();
 
     //cout << "exception after " << cpu.counter() << " ticks" << endl;
@@ -289,7 +289,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                 printStackTrace(th);
             } else {
                 Object* death_message = new Object("Object");
-                Type* exc = th->transferActiveException();
+                unique_ptr<Type> exc(th->transferActiveException());
                 Vector *parameters = new Vector();
                 RegisterSet *top_args = th->trace()[0]->args;
                 for (unsigned long j = 0; j < top_args->size(); ++j) {
@@ -299,7 +299,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                 }
                 top_args->drop();
                 death_message->set("function", new Function(th->trace()[0]->function_name));
-                death_message->set("exception", exc);
+                death_message->set("exception", exc.release());
                 death_message->set("parameters", parameters);
                 watchdog_process->pass(unique_ptr<Type>(death_message));
             }
