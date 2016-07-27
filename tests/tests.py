@@ -308,6 +308,19 @@ def runTestThrowsException(self, name, expected_output, assembly_opts=None):
     self.assertEqual(expected_exit_code, excode)
     self.assertEqual(got_exception, expected_output)
 
+def runTestReportsException(self, name, expected_output, assembly_opts=None):
+    assembly_path = os.path.join(self.PATH, name)
+    compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+    if assembly_opts is None:
+        assemble(assembly_path, compiled_path)
+    else:
+        assemble(assembly_path, compiled_path, opts=assembly_opts)
+    expected_exit_code = 0
+    excode, output = run(compiled_path, expected_exit_code)
+    got_exception = list(filter(lambda line: line.startswith('uncaught object:'), output.strip().splitlines()))[0]
+    self.assertEqual(expected_exit_code, excode)
+    self.assertEqual(got_exception, expected_output)
+
 def runTestFailsToAssemble(self, name, expected_output):
     assembly_path = os.path.join(self.PATH, name)
     compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
@@ -1203,6 +1216,13 @@ class ExternalModulesTests(unittest.TestCase):
         # or maybe the leak originates in Viua code but I haven't found the leak
         MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES = (72736,)
         runTest(self, 'throwing.asm', 'OH NOES!', 0)
+
+
+class ProcessAbstractionTests(unittest.TestCase):
+    PATH = './sample/asm/process_abstraction'
+
+    def testProcessesHaveSeparateGlobalRegisterSets(self):
+        runTestReportsException(self, 'separate_global_rs.asm', 'uncaught object: Exception = (get) read from null register: 1')
 
 
 class ConcurrencyTests(unittest.TestCase):
