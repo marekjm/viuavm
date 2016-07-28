@@ -293,6 +293,10 @@ int main(int argc, char* argv[]) {
         cout << report << endl;
         exit(1);
     }
+    if ((report = assembler::verify::jumpsAreInRange(filename, expanded_lines, expanded_lines_to_source_lines)).size()) {
+        cout << report << endl;
+        exit(1);
+    }
 
     ////////////////////////////
     // VERIFY FRAME INSTRUCTIONS
