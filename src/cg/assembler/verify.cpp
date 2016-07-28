@@ -601,8 +601,14 @@ string assembler::verify::jumpsAreInRange(const string& filename, const vector<s
                 target = stoi(second_part);
             } else if (str::startswith(second_part, "+") and str::isnum(second_part.substr(1))) {
                 target = (function_instruction_counter + stoi(second_part.substr(1)));
-            } else if (str::startswith(second_part, ".")) {
-                // FIXME: TODO: verify function-local absolute jumps
+            } else if (str::startswith(second_part, ".") and str::isnum(second_part.substr(1))) {
+                if (stoi(second_part.substr(1)) < 0) {
+                    report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: ";
+                    report << "absolute jump with negative value";
+                    break;
+                }
+                // absolute jumps cannot be verified without knowing how many bytes the bytecode spans
+                // this is a FIXME: add check for absolute jumps
                 continue;
             } else if (str::ishex(second_part)) {
                 // absolute jumps cannot be verified without knowing how many bytes the bytecode spans
@@ -658,5 +664,6 @@ string assembler::verify::jumpsAreInRange(const string& filename, const vector<s
             }
         }
     }
+
     return report.str();
 }
