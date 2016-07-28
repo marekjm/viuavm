@@ -33,6 +33,7 @@ namespace str {
     bool endswith(const std::string& s, const std::string& w);
 
     bool isnum(const std::string& s, bool negatives = true);
+    bool ishex(const std::string& s, bool negatives = true);
     bool isfloat(const std::string& s, bool negatives = true);
 
     std::string sub(const std::string& s, long unsigned b = 0, long int e = -1);

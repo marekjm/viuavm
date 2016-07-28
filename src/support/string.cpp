@@ -21,6 +21,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <regex>
 #include <viua/types/string.h>
 using namespace std;
 
@@ -75,6 +76,13 @@ namespace str {
             if (!num) break;
         }
         return num;
+    }
+
+    bool ishex(const std::string& s, bool) {
+        /*  Returns true if s is a valid hexadecimal number.
+         */
+        static regex hexadecimal_number("^-?0x[0-9a-fA-F]+$");
+        return regex_match(s, hexadecimal_number);
     }
 
     bool isfloat(const std::string& s, bool negatives) {
