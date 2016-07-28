@@ -81,7 +81,7 @@ namespace str {
     bool ishex(const std::string& s, bool) {
         /*  Returns true if s is a valid hexadecimal number.
          */
-        static regex hexadecimal_number("^-?0x[0-9a-fA-F]+$");
+        static regex hexadecimal_number("^0x[0-9a-fA-F]+$");
         return regex_match(s, hexadecimal_number);
     }
 
