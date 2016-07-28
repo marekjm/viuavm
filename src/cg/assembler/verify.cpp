@@ -564,11 +564,12 @@ string assembler::verify::jumpsAreInRange(const string& filename, const vector<s
     string line;
 
     map<string, int> jump_targets;
+    vector<pair<unsigned, int>> forward_jumps;
     int function_instruction_counter = 0;
 
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = str::lstrip(lines[i]);
-        if (not (str::startswith(line, ".function:") or str::startswith(line, "jump") or str::startswith(line, ".mark:"))) {
+        if (not (str::startswith(line, ".function:") or str::startswith(line, "jump") or str::startswith(line, ".mark:") or str::startswith(line, ".end"))) {
             continue;
         }
 
@@ -581,6 +582,7 @@ string assembler::verify::jumpsAreInRange(const string& filename, const vector<s
         if (first_part == ".function:") {
             function_instruction_counter = 0;
             jump_targets.clear();
+            forward_jumps.clear();
             continue;
         } else if (first_part == "jump") {
             int target = -1;
@@ -598,8 +600,23 @@ string assembler::verify::jumpsAreInRange(const string& filename, const vector<s
                 report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: backward out-of-function jump";
                 break;
             }
+            if (target > function_instruction_counter) {
+                forward_jumps.push_back({i, target});
+            }
         } else if (first_part == ".mark:") {
             // TODO
+        } else if (first_part == ".end") {
+            bool detected_out_of_range_jump = false;
+            for (auto jmp : forward_jumps) {
+                if (jmp.second > function_instruction_counter) {
+                    report << filename << ':' << expanded_lines_to_source_lines.at(jmp.first)+1 << ": error: forward out-of-function jump";
+                    detected_out_of_range_jump = true;
+                    break;
+                }
+            }
+            if (detected_out_of_range_jump) {
+                break;
+            }
         }
 
         ++function_instruction_counter;
