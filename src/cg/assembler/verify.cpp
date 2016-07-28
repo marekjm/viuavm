@@ -565,10 +565,19 @@ string assembler::verify::jumpsAreInRange(const string& filename, const vector<s
 
     map<string, int> jump_targets;
     vector<pair<unsigned, int>> forward_jumps;
+    vector<pair<unsigned, string>> deferred_marker_jumps;
     int function_instruction_counter = 0;
+    string function_name;
 
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = str::lstrip(lines[i]);
+
+        if (line.size() == 0) {
+            continue;
+        }
+        if (function_name.size() > 0 and not str::startswith(line, ".")) {
+            ++function_instruction_counter;
+        }
         if (not (str::startswith(line, ".function:") or str::startswith(line, "jump") or str::startswith(line, ".mark:") or str::startswith(line, ".end"))) {
             continue;
         }
@@ -580,9 +589,11 @@ string assembler::verify::jumpsAreInRange(const string& filename, const vector<s
         line = str::lstrip(line.substr(second_part.size()));
 
         if (first_part == ".function:") {
-            function_instruction_counter = 0;
+            function_instruction_counter = -1;
             jump_targets.clear();
             forward_jumps.clear();
+            deferred_marker_jumps.clear();
+            function_name = second_part;
             continue;
         } else if (first_part == "jump") {
             int target = -1;
@@ -590,10 +601,20 @@ string assembler::verify::jumpsAreInRange(const string& filename, const vector<s
                 target = stoi(second_part);
             } else if (str::startswith(second_part, "+") and str::isnum(second_part.substr(1))) {
                 target = (function_instruction_counter + stoi(second_part.substr(1)));
-            } else {
+            } else if (str::startswith(second_part, ".")) {
+                // FIXME: TODO: verify function-local absolute jumps
                 continue;
-                // TODO
-                //cout << filename << ':' << expanded_lines_to_source_lines.at(i) << ": warning: failed to detect jump target: " << lines[i] << endl;
+            } else if (str::ishex(second_part)) {
+                // absolute jumps cannot be verified without knowing how many bytes the bytecode spans
+                // this is a FIXME: add check for absolute jumps
+                continue;
+            } else {
+                if (jump_targets.count(second_part) == 0) {
+                    deferred_marker_jumps.push_back({i, second_part});
+                    continue;
+                } else {
+                    target = jump_targets.at(second_part);
+                }
             }
 
             if (target < 0 and (function_instruction_counter+target) < 0) {
@@ -604,8 +625,11 @@ string assembler::verify::jumpsAreInRange(const string& filename, const vector<s
                 forward_jumps.push_back({i, target});
             }
         } else if (first_part == ".mark:") {
-            // TODO
+            jump_targets[second_part] = function_instruction_counter;
+            continue;
         } else if (first_part == ".end") {
+            function_name = "";
+
             bool detected_out_of_range_jump = false;
             for (auto jmp : forward_jumps) {
                 if (jmp.second > function_instruction_counter) {
@@ -617,9 +641,22 @@ string assembler::verify::jumpsAreInRange(const string& filename, const vector<s
             if (detected_out_of_range_jump) {
                 break;
             }
+            for (auto jmp : deferred_marker_jumps) {
+                if (jump_targets.count(jmp.second) == 0) {
+                    report << filename << ':' << expanded_lines_to_source_lines.at(jmp.first)+1 << ": error: jump to unrecognised marker: " << jmp.second;
+                    detected_out_of_range_jump = true;
+                    break;
+                }
+                if (jump_targets.at(jmp.second) > function_instruction_counter) {
+                    report << filename << ':' << expanded_lines_to_source_lines.at(jmp.first)+1 << ": error: marker out-of-function jump";
+                    detected_out_of_range_jump = true;
+                    break;
+                }
+            }
+            if (detected_out_of_range_jump) {
+                break;
+            }
         }
-
-        ++function_instruction_counter;
     }
     return report.str();
 }
