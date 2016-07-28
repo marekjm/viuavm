@@ -558,3 +558,51 @@ string assembler::verify::framesHaveNoGaps(const string& filename, const vector<
 
     return report.str();
 }
+
+string assembler::verify::jumpsAreInRange(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines) {
+    ostringstream report("");
+    string line;
+
+    map<string, int> jump_targets;
+    int function_instruction_counter = 0;
+
+    for (unsigned i = 0; i < lines.size(); ++i) {
+        line = str::lstrip(lines[i]);
+        if (not (str::startswith(line, ".function:") or str::startswith(line, "jump") or str::startswith(line, ".mark:"))) {
+            continue;
+        }
+
+        string first_part = str::chunk(line);
+        line = str::lstrip(line.substr(first_part.size()));
+
+        string second_part = str::chunk(line);
+        line = str::lstrip(line.substr(second_part.size()));
+
+        if (first_part == ".function:") {
+            function_instruction_counter = 0;
+            jump_targets.clear();
+            continue;
+        } else if (first_part == "jump") {
+            int target = -1;
+            if (str::isnum(second_part)) {
+                target = stoi(second_part);
+            } else if (str::startswith(second_part, "+") and str::isnum(second_part.substr(1))) {
+                target = (function_instruction_counter + stoi(second_part.substr(1)));
+            } else {
+                continue;
+                // TODO
+                //cout << filename << ':' << expanded_lines_to_source_lines.at(i) << ": warning: failed to detect jump target: " << lines[i] << endl;
+            }
+
+            if (target < 0 and (function_instruction_counter+target) < 0) {
+                report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: negative out-of-function jump";
+                break;
+            }
+        } else if (first_part == ".mark:") {
+            // TODO
+        }
+
+        ++function_instruction_counter;
+    }
+    return report.str();
+}
