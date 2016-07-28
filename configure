@@ -1,23 +1,12 @@
 #!/usr/bin/env bash
 
-if [[ $TRAVIS_OS_NAME != 'osx' ]]; then
-    ./scripts/regenerate_cxxflags.sh
+./scripts/regenerate_cxxflags.sh
 
-    VALGRIND_VERSION=$(valgrind --version | grep -Po '\d+\.\d+\.\d+' | cat)
-    echo "using Valgrind: $VALGRIND_VERSION"
+VALGRIND_VERSION=$(valgrind --version | grep -Po '\d+\.\d+\.\d+' | cat)
+echo "using Valgrind: $VALGRIND_VERSION"
 
-    if [[ $VALGRIND_VERSION == '3.7.0' ]]; then
-        # For TravisCI, Valgrind 3.7.0 does not support
-        # the match-leak-kinds flag
-        sed -i 's/    match-leak-kinds: reachable//g' scripts/valgrind.supp
-    elif [[ $VALGRIND_VERSION == '' ]]; then
-        # disable Valgrind checks if the tool is not available
-        sed -i 's/MEMORY_LEAK_CHECKS_ENABLE = .*/MEMORY_LEAK_CHECKS_ENABLE = False/g' tests/tests.py
-    fi
-fi
-
-if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-    sed -i 's/CXX=c++14/c++11/g' Makefile
-    sed -i 's/MEMORY_LEAK_CHECKS_ENABLE = .*/MEMORY_LEAK_CHECKS_ENABLE = False/g' tests/tests.py
-    CXX=g++
+if [[ $VALGRIND_VERSION == '3.7.0' ]]; then
+    # For TravisCI, Valgrind 3.7.0 does not support
+    # the match-leak-kinds flag
+    sed -i 's/    match-leak-kinds: reachable//g' scripts/valgrind.supp
 fi
