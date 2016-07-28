@@ -595,7 +595,7 @@ string assembler::verify::jumpsAreInRange(const string& filename, const vector<s
             }
 
             if (target < 0 and (function_instruction_counter+target) < 0) {
-                report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: negative out-of-function jump";
+                report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: backward out-of-function jump";
                 break;
             }
         } else if (first_part == ".mark:") {
