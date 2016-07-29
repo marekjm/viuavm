@@ -1069,7 +1069,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/catching_with_undefined_block.asm:8: error: cannot catch using undefined block: main/0__catch", output.strip())
+        self.assertEqual("./sample/asm/errors/catching_with_undefined_block.asm:27: error: cannot catch using undefined block: main/0__catch", output.strip())
 
     def testEnteringUndefinedBlock(self):
         name = 'entering_undefined_block.asm'
@@ -1170,7 +1170,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/backward_out_of_function_jump.asm:2: error: backward out-of-function jump", output.strip())
+        self.assertEqual("./sample/asm/errors/backward_out_of_function_jump.asm:21: error: backward out-of-function jump", output.strip())
 
     def testForwardOutOfFunctionJump(self):
         name = 'forward_out_of_function_jump.asm'
@@ -1178,7 +1178,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/forward_out_of_function_jump.asm:2: error: forward out-of-function jump", output.strip())
+        self.assertEqual("./sample/asm/errors/forward_out_of_function_jump.asm:21: error: forward out-of-function jump", output.strip())
 
     def testJumpToUnrecognisedMarker(self):
         name = 'jump_to_unrecognised_marker.asm'
@@ -1186,7 +1186,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/jump_to_unrecognised_marker.asm:2: error: jump to unrecognised marker: foo", output.strip())
+        self.assertEqual("./sample/asm/errors/jump_to_unrecognised_marker.asm:21: error: jump to unrecognised marker: foo", output.strip())
 
     def testAbsoluteJumpWithNegativeValue(self):
         name = 'absolute_jump_negative.asm'
@@ -1194,7 +1194,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/absolute_jump_negative.asm:2: error: absolute jump with negative value", output.strip())
+        self.assertEqual("./sample/asm/errors/absolute_jump_negative.asm:21: error: absolute jump with negative value", output.strip())
 
     def testFrameWithoutOperands(self):
         name = 'frame_without_operands.asm'
@@ -1202,7 +1202,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/frame_without_operands.asm:6: error: frame instruction without operands", output.strip())
+        self.assertEqual("./sample/asm/errors/frame_without_operands.asm:25: error: frame instruction without operands", output.strip())
 
     def testBlocksEndWithReturningInstruction(self):
         name = 'blocks_end_with_returning_instruction.asm'
@@ -1210,7 +1210,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/blocks_end_with_returning_instruction.asm:3: error: missing returning instruction (leave, return or halt) at the end of block 'foo__block'", output.strip())
+        self.assertEqual("./sample/asm/errors/blocks_end_with_returning_instruction.asm:22: error: missing returning instruction (leave, return or halt) at the end of block 'foo__block'", output.strip())
 
 
 class AssemblerErrorRejectingDuplicateSymbolsTests(unittest.TestCase):
