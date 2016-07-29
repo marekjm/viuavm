@@ -1212,6 +1212,46 @@ class AssemblerErrorTests(unittest.TestCase):
         self.assertEqual(1, exit_code)
         self.assertEqual("./sample/asm/errors/blocks_end_with_returning_instruction.asm:22: error: missing returning instruction (leave, return or halt) at the end of block 'foo__block'", output.strip())
 
+    def testBranchWithoutTarget(self):
+        name = 'branch_without_a_target.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/branch_without_a_target.asm:23: error: branch without a target", output.strip())
+
+    def testBranchTrueBackwardOutOfRange(self):
+        name = 'branch_true_backward_out_of_range.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/branch_true_backward_out_of_range.asm:23: error: backward out-of-function jump", output.strip())
+
+    def testBranchTrueForwardOutOfRange(self):
+        name = 'branch_true_forward_out_of_range.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/branch_true_forward_out_of_range.asm:23: error: forward out-of-function jump", output.strip())
+
+    def testBranchFalseBackwardOutOfRange(self):
+        name = 'branch_false_backward_out_of_range.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/branch_false_backward_out_of_range.asm:23: error: backward out-of-function jump", output.strip())
+
+    def testBranchFalseForwardOutOfRange(self):
+        name = 'branch_false_forward_out_of_range.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/branch_false_forward_out_of_range.asm:23: error: forward out-of-function jump", output.strip())
+
 
 class AssemblerErrorRejectingDuplicateSymbolsTests(unittest.TestCase):
     PATH = './sample/asm/errors/single_definition_rule'

@@ -665,7 +665,7 @@ void assembler::verify::jumpsAreInRange(const vector<string>& lines) {
         if (function_name.size() > 0 and not str::startswith(line, ".")) {
             ++function_instruction_counter;
         }
-        if (not (str::startswith(line, ".function:") or str::startswith(line, "jump") or str::startswith(line, ".mark:") or str::startswith(line, ".end"))) {
+        if (not (str::startswith(line, ".function:") or str::startswith(line, ".block:") or str::startswith(line, "jump") or str::startswith(line, "branch") or str::startswith(line, ".mark:") or str::startswith(line, ".end"))) {
             continue;
         }
 
@@ -675,7 +675,7 @@ void assembler::verify::jumpsAreInRange(const vector<string>& lines) {
         string second_part = str::chunk(line);
         line = str::lstrip(line.substr(second_part.size()));
 
-        if (first_part == ".function:") {
+        if (first_part == ".function:" or first_part == ".block:") {
             function_instruction_counter = -1;
             jump_targets.clear();
             forward_jumps.clear();
@@ -684,6 +684,23 @@ void assembler::verify::jumpsAreInRange(const vector<string>& lines) {
             continue;
         } else if (first_part == "jump") {
             validate_jump(i, second_part, function_instruction_counter, forward_jumps, deferred_marker_jumps, jump_targets);
+        } else if (first_part == "branch") {
+            if (line.size() == 0) {
+                throw ErrorReport(i, "branch without a target");
+            }
+
+            string when_true = str::chunk(line);
+            line = str::lstrip(line.substr(when_true.size()));
+
+            string when_false = str::chunk(line);
+
+            if (when_true.size()) {
+                validate_jump(i, when_true, function_instruction_counter, forward_jumps, deferred_marker_jumps, jump_targets);
+            }
+
+            if (when_false.size()) {
+                validate_jump(i, when_false, function_instruction_counter, forward_jumps, deferred_marker_jumps, jump_targets);
+            }
         } else if (first_part == ".mark:") {
             jump_targets[second_part] = function_instruction_counter;
             continue;
