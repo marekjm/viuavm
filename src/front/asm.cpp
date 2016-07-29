@@ -244,69 +244,74 @@ int main(int argc, char* argv[]) {
 
     ///////////////////////////////////////////
     // INITIAL VERIFICATION OF CODE CORRECTNESS
-    string report;
-    if ((report = assembler::verify::directives(filename, expanded_lines, expanded_lines_to_source_lines)).size()) {
-        cout << report << endl;
-        return 1;
-    }
-    if ((report = assembler::verify::instructions(filename, expanded_lines, expanded_lines_to_source_lines)).size()) {
-        cout << report << endl;
-        return 1;
-    }
-    if ((report = assembler::verify::ressInstructions(filename, expanded_lines, expanded_lines_to_source_lines, AS_LIB)).size()) {
-        cout << report << endl;
-        return 1;
-    }
-    if ((report = assembler::verify::functionNames(filename, lines, (WARNING_UNDEFINED_ARITY or WARNING_ALL), (ERROR_UNDEFINED_ARITY or ERROR_ALL))).size()) {
-        cout << report << endl;
-        return 1;
-    }
-    if ((report = assembler::verify::functionBodiesAreNonempty(filename, lines)).size()) {
-        cout << report << endl;
-        return 1;
-    }
-    if ((report = assembler::verify::blockTries(filename, expanded_lines, expanded_lines_to_source_lines, blocks.names, blocks.signatures)).size()) {
-        cout << report << endl;
-        return 1;
-    }
-    if ((report = assembler::verify::blockCatches(filename, expanded_lines, expanded_lines_to_source_lines, blocks.names, blocks.signatures)).size()) {
-        cout << report << endl;
-        return 1;
-    }
-    if ((report = assembler::verify::frameBalance(filename, expanded_lines, expanded_lines_to_source_lines)).size()) {
-        cout << report << endl;
-        exit(1);
-    }
-    if ((report = assembler::verify::functionCallArities(filename, expanded_lines, expanded_lines_to_source_lines, (WARNING_UNDEFINED_ARITY or WARNING_ALL))).size()) {
-        cout << report << endl;
-        return 1;
-    }
-    if ((report = assembler::verify::msgArities(filename, expanded_lines, expanded_lines_to_source_lines, (WARNING_UNDEFINED_ARITY or WARNING_ALL))).size()) {
-        cout << report << endl;
-        return 1;
-    }
-    if ((report = assembler::verify::functionsEndWithReturn(filename, lines)).size()) {
-        cout << report << endl;
-        exit(1);
-    }
-    if ((report = assembler::verify::blockBodiesAreNonempty(filename, lines)).size()) {
-        cout << report << endl;
-        exit(1);
-    }
-    if ((report = assembler::verify::jumpsAreInRange(filename, expanded_lines, expanded_lines_to_source_lines)).size()) {
-        cout << report << endl;
-        exit(1);
-    }
-    if ((report = assembler::verify::framesHaveOperands(filename, expanded_lines, expanded_lines_to_source_lines)).size()) {
-        cout << report << endl;
-        return 1;
-    }
-    if ((report = assembler::verify::framesHaveNoGaps(filename, expanded_lines, expanded_lines_to_source_lines)).size()) {
-        cout << report << endl;
-        return 1;
-    }
-    if ((report = assembler::verify::blocksEndWithFinishingInstruction(filename, expanded_lines, expanded_lines_to_source_lines)).size()) {
-        cout << report << endl;
+    try {
+        string report;
+        if ((report = assembler::verify::directives(filename, expanded_lines, expanded_lines_to_source_lines)).size()) {
+            cout << report << endl;
+            return 1;
+        }
+        if ((report = assembler::verify::instructions(filename, expanded_lines, expanded_lines_to_source_lines)).size()) {
+            cout << report << endl;
+            return 1;
+        }
+        if ((report = assembler::verify::ressInstructions(filename, expanded_lines, expanded_lines_to_source_lines, AS_LIB)).size()) {
+            cout << report << endl;
+            return 1;
+        }
+        if ((report = assembler::verify::functionNames(filename, lines, (WARNING_UNDEFINED_ARITY or WARNING_ALL), (ERROR_UNDEFINED_ARITY or ERROR_ALL))).size()) {
+            cout << report << endl;
+            return 1;
+        }
+        if ((report = assembler::verify::functionBodiesAreNonempty(filename, lines)).size()) {
+            cout << report << endl;
+            return 1;
+        }
+        if ((report = assembler::verify::blockTries(filename, expanded_lines, expanded_lines_to_source_lines, blocks.names, blocks.signatures)).size()) {
+            cout << report << endl;
+            return 1;
+        }
+        if ((report = assembler::verify::blockCatches(filename, expanded_lines, expanded_lines_to_source_lines, blocks.names, blocks.signatures)).size()) {
+            cout << report << endl;
+            return 1;
+        }
+        if ((report = assembler::verify::frameBalance(filename, expanded_lines, expanded_lines_to_source_lines)).size()) {
+            cout << report << endl;
+            exit(1);
+        }
+        if ((report = assembler::verify::functionCallArities(filename, expanded_lines, expanded_lines_to_source_lines, (WARNING_UNDEFINED_ARITY or WARNING_ALL))).size()) {
+            cout << report << endl;
+            return 1;
+        }
+        if ((report = assembler::verify::msgArities(filename, expanded_lines, expanded_lines_to_source_lines, (WARNING_UNDEFINED_ARITY or WARNING_ALL))).size()) {
+            cout << report << endl;
+            return 1;
+        }
+        if ((report = assembler::verify::functionsEndWithReturn(filename, lines)).size()) {
+            cout << report << endl;
+            exit(1);
+        }
+        if ((report = assembler::verify::blockBodiesAreNonempty(filename, lines)).size()) {
+            cout << report << endl;
+            exit(1);
+        }
+        if ((report = assembler::verify::jumpsAreInRange(filename, expanded_lines, expanded_lines_to_source_lines)).size()) {
+            cout << report << endl;
+            exit(1);
+        }
+        if ((report = assembler::verify::framesHaveOperands(filename, expanded_lines, expanded_lines_to_source_lines)).size()) {
+            cout << report << endl;
+            return 1;
+        }
+        if ((report = assembler::verify::framesHaveNoGaps(filename, expanded_lines, expanded_lines_to_source_lines)).size()) {
+            cout << report << endl;
+            return 1;
+        }
+        if ((report = assembler::verify::blocksEndWithFinishingInstruction(filename, expanded_lines, expanded_lines_to_source_lines)).size()) {
+            cout << report << endl;
+            return 1;
+        }
+    } catch (const pair<unsigned, string>& e) {
+        cout << filename << ':' << e.first << ": error: " << e.second << endl;
         return 1;
     }
 
