@@ -1284,6 +1284,22 @@ class AssemblerErrorTests(unittest.TestCase):
         self.assertEqual(1, exit_code)
         self.assertEqual("./sample/asm/errors/branch_false_negative_absolute.asm:23: error: absolute jump with negative value", output.strip())
 
+    def testBranchTrueToUnrecognisedMarker(self):
+        name = 'branch_true_to_unrecognised_marker.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/branch_true_to_unrecognised_marker.asm:23: error: jump to unrecognised marker: foo", output.strip())
+
+    def testBranchFalseToUnrecognisedMarker(self):
+        name = 'branch_false_to_unrecognised_marker.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/branch_false_to_unrecognised_marker.asm:23: error: jump to unrecognised marker: foo", output.strip())
+
 
 class AssemblerErrorRejectingDuplicateSymbolsTests(unittest.TestCase):
     PATH = './sample/asm/errors/single_definition_rule'
