@@ -593,6 +593,40 @@ void assembler::verify::framesHaveNoGaps(const vector<string>& lines, const map<
     }
 }
 
+static void validate_jump(const unsigned lineno, const string& extracted_jump, int function_instruction_counter, vector<pair<unsigned, int>>& forward_jumps, vector<pair<unsigned, string>>& deferred_marker_jumps, const map<string, int>& jump_targets) {
+    int target = -1;
+    if (str::isnum(extracted_jump)) {
+        target = stoi(extracted_jump);
+    } else if (str::startswith(extracted_jump, "+") and str::isnum(extracted_jump.substr(1))) {
+        target = (function_instruction_counter + stoi(extracted_jump.substr(1)));
+    } else if (str::startswith(extracted_jump, ".") and str::isnum(extracted_jump.substr(1))) {
+        if (stoi(extracted_jump.substr(1)) < 0) {
+            throw ErrorReport(lineno, "absolute jump with negative value");
+        }
+        // absolute jumps cannot be verified without knowing how many bytes the bytecode spans
+        // this is a FIXME: add check for absolute jumps
+        return;
+    } else if (str::ishex(extracted_jump)) {
+        // absolute jumps cannot be verified without knowing how many bytes the bytecode spans
+        // this is a FIXME: add check for absolute jumps
+        return;
+    } else {
+        if (jump_targets.count(extracted_jump) == 0) {
+            deferred_marker_jumps.push_back({lineno, extracted_jump});
+            return;
+        } else {
+            target = jump_targets.at(extracted_jump);
+        }
+    }
+
+    if (target < 0 and (function_instruction_counter+target) < 0) {
+        throw ErrorReport(lineno, "backward out-of-function jump");
+    }
+    if (target > function_instruction_counter) {
+        forward_jumps.push_back({lineno, target});
+    }
+}
+
 void assembler::verify::jumpsAreInRange(const vector<string>& lines) {
     ostringstream report("");
     string line;
@@ -630,37 +664,7 @@ void assembler::verify::jumpsAreInRange(const vector<string>& lines) {
             function_name = second_part;
             continue;
         } else if (first_part == "jump") {
-            int target = -1;
-            if (str::isnum(second_part)) {
-                target = stoi(second_part);
-            } else if (str::startswith(second_part, "+") and str::isnum(second_part.substr(1))) {
-                target = (function_instruction_counter + stoi(second_part.substr(1)));
-            } else if (str::startswith(second_part, ".") and str::isnum(second_part.substr(1))) {
-                if (stoi(second_part.substr(1)) < 0) {
-                    throw ErrorReport(i, "absolute jump with negative value");
-                }
-                // absolute jumps cannot be verified without knowing how many bytes the bytecode spans
-                // this is a FIXME: add check for absolute jumps
-                continue;
-            } else if (str::ishex(second_part)) {
-                // absolute jumps cannot be verified without knowing how many bytes the bytecode spans
-                // this is a FIXME: add check for absolute jumps
-                continue;
-            } else {
-                if (jump_targets.count(second_part) == 0) {
-                    deferred_marker_jumps.push_back({i, second_part});
-                    continue;
-                } else {
-                    target = jump_targets.at(second_part);
-                }
-            }
-
-            if (target < 0 and (function_instruction_counter+target) < 0) {
-                throw ErrorReport(i, "backward out-of-function jump");
-            }
-            if (target > function_instruction_counter) {
-                forward_jumps.push_back({i, target});
-            }
+            validate_jump(i, second_part, function_instruction_counter, forward_jumps, deferred_marker_jumps, jump_targets);
         } else if (first_part == ".mark:") {
             jump_targets[second_part] = function_instruction_counter;
             continue;
