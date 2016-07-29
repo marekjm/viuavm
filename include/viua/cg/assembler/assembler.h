@@ -55,28 +55,35 @@ namespace assembler {
     }
 
     namespace verify {
-        std::string functionNames(const std::string&, const std::vector<std::string>&, const bool, const bool);
-        std::string functionsEndWithReturn(const std::string&, const std::vector<std::string>&);
-        std::string functionCallsAreDefined(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&, const std::vector<std::string>& function_names, const std::vector<std::string>& function_signatures);
-        std::string functionCallArities(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&, bool);
-        std::string msgArities(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&, bool);
-        std::string frameBalance(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&);
-        std::string callableCreations(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&, const std::vector<std::string>& function_names, const std::vector<std::string>& function_signatures);
-        std::string ressInstructions(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&, bool as_lib);
-        std::string functionBodiesAreNonempty(const std::string&, const std::vector<std::string>&);
-        std::string blockBodiesAreNonempty(const std::string&, const std::vector<std::string>&);
-        std::string blocksEndWithFinishingInstruction(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&);
-        std::string blockTries(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&, const std::vector<std::string>& block_names, const std::vector<std::string>& block_signatures);
-        std::string blockCatches(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&, const std::vector<std::string>& block_names, const std::vector<std::string>& block_signatures);
-        std::string blockBodiesEndWithLeave(const std::vector<std::string>& lines, std::map<std::string, std::pair<bool, std::vector<std::string> > >& blocks);
+        void functionCallsAreDefined(const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<std::string>&);
 
-        std::string directives(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&);
-        std::string instructions(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&);
+        void functionCallArities(const std::vector<std::string>&);
+        void msgArities(const std::vector<std::string>& lines);
 
-        std::string framesHaveOperands(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&);
-        std::string framesHaveNoGaps(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&);
+        void functionNames(const std::vector<std::string>&);
+        void functionsEndWithReturn(const std::vector<std::string>&);
 
-        std::string jumpsAreInRange(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&);
+        void frameBalance(const std::vector<std::string>&, const std::map<unsigned long, unsigned long>&);
+
+        void blockTries(const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<std::string>&);
+        void blockCatches(const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<std::string>&);
+
+        void callableCreations(const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<std::string>&);
+
+        void ressInstructions(const std::vector<std::string>&, bool);
+
+        void functionBodiesAreNonempty(const std::vector<std::string>&);
+        void blockBodiesAreNonempty(const std::vector<std::string>&);
+
+        void blocksEndWithFinishingInstruction(const std::vector<std::string>&);
+
+        void directives(const std::vector<std::string>&);
+        void instructions(const std::vector<std::string>&);
+
+        void framesHaveOperands(const std::vector<std::string>&);
+        void framesHaveNoGaps(const std::vector<std::string>&, const std::map<unsigned long, unsigned long>&);
+
+        void jumpsAreInRange(const std::vector<std::string>&);
     }
 
     namespace utils {

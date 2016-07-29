@@ -1029,7 +1029,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/empty_block_body.asm:20: error: block with empty body: foo", output.strip())
+        self.assertEqual("./sample/asm/errors/empty_block_body.asm:21: error: block with empty body: foo", output.strip())
 
     def testCallToUndefinedFunction(self):
         name = 'call_to_undefined_function.asm'
@@ -1109,7 +1109,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/empty_function_body.asm:20: error: function with empty body: foo/0", output.strip())
+        self.assertEqual("./sample/asm/errors/empty_function_body.asm:21: error: function with empty body: foo/0", output.strip())
 
     def testStrayEndMarked(self):
         name = 'stray_end.asm'

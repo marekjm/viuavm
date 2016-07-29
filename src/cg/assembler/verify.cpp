@@ -32,7 +32,10 @@
 using namespace std;
 
 
-string assembler::verify::functionCallsAreDefined(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, const vector<string>& function_names, const vector<string>& function_signatures) {
+using ErrorReport = pair<unsigned, string>;
+
+
+void assembler::verify::functionCallsAreDefined(const vector<string>& lines, const vector<string>& function_names, const vector<string>& function_signatures) {
     ostringstream report("");
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
@@ -58,14 +61,13 @@ string assembler::verify::functionCallsAreDefined(const string& filename, const 
         }
 
         if (is_undefined) {
-            report << filename << ':' << (expanded_lines_to_source_lines.at(i)+1) << ": error: " << ((instr_name == "call" or instr_name == "tailcall") ? "call to" : instr_name == "process" ? "process from" : "watchdog from") << " undefined function " << check_function;
-            break;
+            report << ((instr_name == "call" or instr_name == "tailcall") ? "call to" : instr_name == "process" ? "process from" : "watchdog from") << " undefined function " << check_function;
+            throw ErrorReport(i, report.str());
         }
     }
-    return report.str();
 }
 
-string assembler::verify::functionCallArities(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, bool) {
+void assembler::verify::functionCallArities(const vector<string>& lines) {
     ostringstream report("");
     string line;
     int frame_parameters_count = 0;
@@ -95,20 +97,20 @@ string assembler::verify::functionCallArities(const string& filename, const vect
         }
 
         if (not assembler::utils::isValidFunctionName(function_name)) {
-            report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: '" << function_name << "' is not a valid function name";
-            break;
+            report << "'" << function_name << "' is not a valid function name";
+            throw ErrorReport(i, report.str());
         }
 
         int arity = assembler::utils::getFunctionArity(function_name);
 
         if (arity == -1) {
-            report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: call to function with undefined arity ";
+            report << "call to function with undefined arity ";
             if (frame_parameters_count >= 0) {
                 report << "as " << function_name << (arity == -1 ? "/" : "") << frame_parameters_count;
             } else {
                 report << ": " << function_name;
             }
-            break;
+            throw ErrorReport(i, report.str());
         }
         if (frame_parameters_count == -1) {
             // frame paramters count could not be statically determined, deffer the check until runtime
@@ -116,14 +118,13 @@ string assembler::verify::functionCallArities(const string& filename, const vect
         }
 
         if (arity > 0 and arity != frame_parameters_count) {
-            report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: invalid number of parameters in call to function " << function_name << ": expected " << arity << " got " << frame_parameters_count;
-            break;
+            report << "invalid number of parameters in call to function " << function_name << ": expected " << arity << " got " << frame_parameters_count;
+            throw ErrorReport(i, report.str());
         }
     }
-    return report.str();
 }
 
-string assembler::verify::msgArities(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, bool) {
+void assembler::verify::msgArities(const vector<string>& lines) {
     ostringstream report("");
     string line;
     int frame_parameters_count = 0;
@@ -153,25 +154,25 @@ string assembler::verify::msgArities(const string& filename, const vector<string
         }
 
         if (not assembler::utils::isValidFunctionName(function_name)) {
-            report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: '" << function_name << "' is not a valid function name";
-            break;
+            report << "'" << function_name << "' is not a valid function name";
+            throw ErrorReport(i, report.str());
         }
 
         if (frame_parameters_count == 0) {
-            report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: invalid number of parameters in dynamic dispatch of " << function_name << ": expected at least 1, got 0";
-            break;
+            report << "invalid number of parameters in dynamic dispatch of " << function_name << ": expected at least 1, got 0";
+            throw ErrorReport(i, report.str());
         }
 
         int arity = assembler::utils::getFunctionArity(function_name);
 
         if (arity == -1) {
-            report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: dynamic dispatch call with undefined arity ";
+            report << "dynamic dispatch call with undefined arity ";
             if (frame_parameters_count >= 0) {
                 report << "as " << function_name << (arity == -1 ? "/" : "") << frame_parameters_count;
             } else {
                 report << ": " << function_name;
             }
-            break;
+            throw ErrorReport(i, report.str());
         }
         if (frame_parameters_count == -1) {
             // frame paramters count could not be statically determined, deffer the check until runtime
@@ -179,14 +180,13 @@ string assembler::verify::msgArities(const string& filename, const vector<string
         }
 
         if (arity > 0 and arity != frame_parameters_count) {
-            report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: invalid number of parameters in dynamic dispatch of " << function_name << ": expected " << arity << " got " << frame_parameters_count;
-            break;
+            report << "invalid number of parameters in dynamic dispatch of " << function_name << ": expected " << arity << " got " << frame_parameters_count;
+            throw ErrorReport(i, report.str());
         }
     }
-    return report.str();
 }
 
-string assembler::verify::functionNames(const string& filename, const std::vector<std::string>& lines, const bool, const bool) {
+void assembler::verify::functionNames(const std::vector<std::string>& lines) {
     ostringstream report("");
     string line;
     string function;
@@ -200,20 +200,18 @@ string assembler::verify::functionNames(const string& filename, const std::vecto
         }
 
         if (not assembler::utils::isValidFunctionName(function)) {
-            report << filename << ':' << i+1 << ": error: invalid function name: " << function;
-            break;
+            report << "invalid function name: " << function;
+            throw ErrorReport(i, report.str());
         }
 
         if (assembler::utils::getFunctionArity(function) == -1) {
-            report << filename << ':' << i+1 << ": error: function with undefined arity: " << function;
-            break;
+            report << "function with undefined arity: " << function;
+            throw ErrorReport(i, report.str());
         }
     }
-
-    return report.str();
 }
 
-string assembler::verify::functionsEndWithReturn(const string& filename, const std::vector<std::string>& lines) {
+void assembler::verify::functionsEndWithReturn(const std::vector<std::string>& lines) {
     ostringstream report("");
     string line;
     string function;
@@ -231,19 +229,17 @@ string assembler::verify::functionsEndWithReturn(const string& filename, const s
         }
 
         if (i and (not (str::startswithchunk(str::lstrip(lines[i-1]), "return") or str::startswithchunk(str::lstrip(lines[i-1]), "tailcall")))) {
-            report << filename << ':' << i+1 << ": error: function does not end with 'return' or 'tailcall': " << function;
-            break;
+            report << "function does not end with 'return' or 'tailcall': " << function;
+            throw ErrorReport(i, report.str());
         }
 
         // if we're here, then the .end at the end of function has been reached and
         // the function name marker should be reset
         function = "";
     }
-
-    return report.str();
 }
 
-string assembler::verify::frameBalance(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines) {
+void assembler::verify::frameBalance(const vector<string>& lines, const map<unsigned long, unsigned long>& expanded_lines_to_source_lines) {
     ostringstream report("");
     string line;
     string instruction;
@@ -268,28 +264,26 @@ string assembler::verify::frameBalance(const string& filename, const vector<stri
         }
 
         if (balance < 0) {
-            report << filename << ':' << (expanded_lines_to_source_lines.at(i)+1) << ": error: call with '" << instruction << "' without a frame";
-            break;
+            report << "call with '" << instruction << "' without a frame";
+            throw ErrorReport(i, report.str());
         }
         if (balance > 1) {
-            report << filename << ':' << (expanded_lines_to_source_lines.at(i)+1) << ": error: excess frame spawned";
-            report << " (unused frame spawned at line ";
+            report << "excess frame spawned (unused frame spawned at line ";
             report << (expanded_lines_to_source_lines.at(previous_frame_spawnline)+1) << ')';
-            break;
+            throw ErrorReport(i, report.str());
         }
         if (instruction == "return" and balance > 0) {
-            report << filename << ':' << (expanded_lines_to_source_lines.at(i)+1) << ": error: leftover frame (spawned at line " << (expanded_lines_to_source_lines.at(previous_frame_spawnline)+1) << ')';
-            break;
+            report << "leftover frame (spawned at line " << (expanded_lines_to_source_lines.at(previous_frame_spawnline)+1) << ')';
+            throw ErrorReport(i, report.str());
         }
 
         if (instruction == "frame") {
             previous_frame_spawnline = i;
         }
     }
-    return report.str();
 }
 
-string assembler::verify::blockTries(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, const vector<string>& block_names, const vector<string>& block_signatures) {
+void assembler::verify::blockTries(const vector<string>& lines, const vector<string>& block_names, const vector<string>& block_signatures) {
     ostringstream report("");
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
@@ -306,14 +300,13 @@ string assembler::verify::blockTries(const string& filename, const vector<string
         }
 
         if (is_undefined) {
-            report << filename << ':' << (expanded_lines_to_source_lines.at(i)+1) << ": error: cannot enter undefined block: " << block;
-            break;
+            report << "cannot enter undefined block: " << block;
+            throw ErrorReport(i, report.str());
         }
     }
-    return report.str();
 }
 
-string assembler::verify::blockCatches(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, const vector<string>& block_names, const vector<string>& block_signatures) {
+void assembler::verify::blockCatches(const vector<string>& lines, const vector<string>& block_names, const vector<string>& block_signatures) {
     ostringstream report("");
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
@@ -336,14 +329,13 @@ string assembler::verify::blockCatches(const string& filename, const vector<stri
         }
 
         if (is_undefined) {
-            report << filename << ':' << (expanded_lines_to_source_lines.at(i)+1) << ": error: cannot catch using undefined block: " << block;
-            break;
+            report << "cannot catch using undefined block: " << block;
+            throw ErrorReport(i, report.str());
         }
     }
-    return report.str();
 }
 
-string assembler::verify::callableCreations(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, const vector<string>& function_names, const vector<string>& function_signatures) {
+void assembler::verify::callableCreations(const vector<string>& lines, const vector<string>& function_names, const vector<string>& function_signatures) {
     ostringstream report("");
     string line;
     string callable_type;
@@ -367,14 +359,13 @@ string assembler::verify::callableCreations(const string& filename, const vector
         }
 
         if (is_undefined) {
-            report << filename << ':' << (expanded_lines_to_source_lines.at(i)+1) << ": error: " << callable_type << " from undefined function: " << function;
-            break;
+            report << callable_type << " from undefined function: " << function;
+            throw ErrorReport(i, report.str());
         }
     }
-    return report.str();
 }
 
-string assembler::verify::ressInstructions(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines, bool as_lib) {
+void assembler::verify::ressInstructions(const vector<string>& lines, bool as_lib) {
     ostringstream report("");
     vector<string> legal_register_sets = {
         "global",   // global register set
@@ -397,18 +388,17 @@ string assembler::verify::ressInstructions(const string& filename, const vector<
         string registerset_name = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
 
         if (find(legal_register_sets.begin(), legal_register_sets.end(), registerset_name) == legal_register_sets.end()) {
-            report << filename << ':' << (expanded_lines_to_source_lines.at(i)+1) << ": error: illegal register set name in ress instruction '" << registerset_name << "' in function " << function;
-            break;
+            report << "illegal register set name in ress instruction '" << registerset_name << "' in function " << function;
+            throw ErrorReport(i, report.str());
         }
         if (registerset_name == "global" and as_lib and function != "main/1") {
-            report << filename << ':' << (expanded_lines_to_source_lines.at(i)+1) << ": error: global registers used in library function " << function;
-            break;
+            report << "global registers used in library function " << function;
+            throw ErrorReport(i, report.str());
         }
     }
-    return report.str();
 }
 
-static string bodiesAreNonempty(const string& filename, const vector<string>& lines) {
+static void bodiesAreNonempty(const vector<string>& lines) {
     ostringstream report("");
     string line, block, function;
 
@@ -428,31 +418,29 @@ static string bodiesAreNonempty(const string& filename, const vector<string>& li
         }
 
         if (not (block.size() or function.size())) {
-            report << filename << ':' << i+1 << ": error: stray .end marker";
-            break;
+            report << "stray .end marker";
+            throw ErrorReport(i, report.str());
         }
 
         // this if is reached only of '.end' was matched - so we just check if it is preceded by
         // the interesting prefix, and
         // if it is - report an error
         if (i and (assembler::utils::lines::is_block(str::lstrip(lines[i-1])) or assembler::utils::lines::is_function(str::lstrip(lines[i-1])))) {
-            report << filename << ':' << i << ": error: " << (function.size() ? "function" : "block") << " with empty body: " << (function.size() ? function : block);
-            break;
+            report << (function.size() ? "function" : "block") << " with empty body: " << (function.size() ? function : block);
+            throw ErrorReport(i, report.str());
         }
         function = "";
         block = "";
     }
-
-    return report.str();
 }
-string assembler::verify::functionBodiesAreNonempty(const std::string& filename, const vector<string>& lines) {
-    return bodiesAreNonempty(filename, lines);
+void assembler::verify::functionBodiesAreNonempty(const vector<string>& lines) {
+    bodiesAreNonempty(lines);
 }
-string assembler::verify::blockBodiesAreNonempty(const string& filename, const std::vector<std::string>& lines) {
-    return bodiesAreNonempty(filename, lines);
+void assembler::verify::blockBodiesAreNonempty(const std::vector<std::string>& lines) {
+    bodiesAreNonempty(lines);
 }
 
-string assembler::verify::blocksEndWithFinishingInstruction(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines) {
+void assembler::verify::blocksEndWithFinishingInstruction(const vector<string>& lines) {
     ostringstream report("");
     string line;
     string block;
@@ -470,19 +458,17 @@ string assembler::verify::blocksEndWithFinishingInstruction(const string& filena
         }
 
         if (i and (not (str::startswithchunk(str::lstrip(lines[i-1]), "leave") or str::startswithchunk(str::lstrip(lines[i-1]), "return") or str::startswithchunk(str::lstrip(lines[i-1]), "halt")))) {
-            report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: missing returning instruction (leave, return or halt) at the end of block '" << block << "'";
-            break;
+            report << "missing returning instruction (leave, return or halt) at the end of block '" << block << "'";
+            throw ErrorReport(i, report.str());
         }
 
         // if we're here, then the .end at the end of function has been reached and
         // the block name marker should be reset
         block = "";
     }
-
-    return report.str();
 }
 
-string assembler::verify::directives(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines) {
+void assembler::verify::directives(const vector<string>& lines) {
     ostringstream report("");
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
@@ -492,13 +478,12 @@ string assembler::verify::directives(const string& filename, const vector<string
         }
 
         if (not assembler::utils::lines::is_directive(line)) {
-            report << filename << ':' << (expanded_lines_to_source_lines.at(i)+1) << ": error: illegal directive: '" << str::chunk(line) << "'";
-            break;
+            report << "illegal directive: '" << str::chunk(line) << "'";
+            throw ErrorReport(i, report.str());
         }
     }
-    return report.str();
 }
-string assembler::verify::instructions(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines) {
+void assembler::verify::instructions(const vector<string>& lines) {
     ostringstream report("");
     string line;
     for (unsigned i = 0; i < lines.size(); ++i) {
@@ -509,14 +494,13 @@ string assembler::verify::instructions(const string& filename, const vector<stri
 
         string token = str::chunk(line);
         if (OP_SIZES.count(token) == 0) {
-            report << filename << ':' << (expanded_lines_to_source_lines.at(i)+1) << ": error: unknown instruction: '" << token << "'";
-            break;
+            report << "unknown instruction: '" << token << "'";
+            throw ErrorReport(i, report.str());
         }
     }
-    return report.str();
 }
 
-string assembler::verify::framesHaveOperands(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines) {
+void assembler::verify::framesHaveOperands(const vector<string>& lines) {
     ostringstream report("");
     string line;
 
@@ -532,15 +516,13 @@ string assembler::verify::framesHaveOperands(const string& filename, const vecto
         line = str::lstrip(str::sub(line, str::chunk(line).size()));
 
         if (line.size() == 0) {
-            report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: frame instruction without operands";
-            break;
+            report << "frame instruction without operands";
+            throw ErrorReport(i, report.str());
         }
     }
-
-    return report.str();
 }
 
-string assembler::verify::framesHaveNoGaps(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines) {
+void assembler::verify::framesHaveNoGaps(const vector<string>& lines, const map<unsigned long, unsigned long>& expanded_lines_to_source_lines) {
     ostringstream report("");
     string line;
     unsigned long frame_parameters_count = 0;
@@ -585,14 +567,14 @@ string assembler::verify::framesHaveNoGaps(const string& filename, const vector<
                 detected_slot_index = true;
             }
             if (detected_slot_index and detected_frame_parameters_count and slot_index >= frame_parameters_count) {
-                report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: pass to parameter slot " << slot_index << " in frame with only " << frame_parameters_count << " slots available";
-                break;
+                report << "pass to parameter slot " << slot_index << " in frame with only " << frame_parameters_count << " slots available";
+                throw ErrorReport(i, report.str());
             }
             if (detected_slot_index and detected_frame_parameters_count) {
                 if (filled_slots[slot_index]) {
-                    report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: double pass to parameter slot " << slot_index << " in frame defined at line " << expanded_lines_to_source_lines.at(last_frame)+1;
+                    report << "double pass to parameter slot " << slot_index << " in frame defined at line " << expanded_lines_to_source_lines.at(last_frame)+1;
                     report << ", first pass at line " << expanded_lines_to_source_lines.at(pass_lines[slot_index])+1;
-                    break;
+                    throw ErrorReport(i, report.str());
                 }
                 filled_slots[slot_index] = true;
                 pass_lines[slot_index] = i;
@@ -603,17 +585,15 @@ string assembler::verify::framesHaveNoGaps(const string& filename, const vector<
         if (instr_name == "call" or instr_name == "process" or instr_name == "watchdog") {
             for (decltype(frame_parameters_count) f = 0; f < frame_parameters_count; ++f) {
                 if (not filled_slots[f]) {
-                    report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: gap in frame defined at line " << expanded_lines_to_source_lines.at(last_frame)+1 << ", slot " << f << " left empty";
-                    break;
+                    report << "gap in frame defined at line " << expanded_lines_to_source_lines.at(last_frame)+1 << ", slot " << f << " left empty";
+                    throw ErrorReport(i, report.str());
                 }
             }
         }
     }
-
-    return report.str();
 }
 
-string assembler::verify::jumpsAreInRange(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines) {
+void assembler::verify::jumpsAreInRange(const vector<string>& lines) {
     ostringstream report("");
     string line;
 
@@ -657,9 +637,7 @@ string assembler::verify::jumpsAreInRange(const string& filename, const vector<s
                 target = (function_instruction_counter + stoi(second_part.substr(1)));
             } else if (str::startswith(second_part, ".") and str::isnum(second_part.substr(1))) {
                 if (stoi(second_part.substr(1)) < 0) {
-                    report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: ";
-                    report << "absolute jump with negative value";
-                    break;
+                    throw ErrorReport(i, "absolute jump with negative value");
                 }
                 // absolute jumps cannot be verified without knowing how many bytes the bytecode spans
                 // this is a FIXME: add check for absolute jumps
@@ -678,8 +656,7 @@ string assembler::verify::jumpsAreInRange(const string& filename, const vector<s
             }
 
             if (target < 0 and (function_instruction_counter+target) < 0) {
-                report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: backward out-of-function jump";
-                break;
+                throw ErrorReport(i, "backward out-of-function jump");
             }
             if (target > function_instruction_counter) {
                 forward_jumps.push_back({i, target});
@@ -690,34 +667,22 @@ string assembler::verify::jumpsAreInRange(const string& filename, const vector<s
         } else if (first_part == ".end") {
             function_name = "";
 
-            bool detected_out_of_range_jump = false;
             for (auto jmp : forward_jumps) {
                 if (jmp.second > function_instruction_counter) {
-                    report << filename << ':' << expanded_lines_to_source_lines.at(jmp.first)+1 << ": error: forward out-of-function jump";
-                    detected_out_of_range_jump = true;
-                    break;
+                    report << "forward out-of-function jump";
+                    throw ErrorReport(jmp.first, report.str());
                 }
-            }
-            if (detected_out_of_range_jump) {
-                break;
             }
             for (auto jmp : deferred_marker_jumps) {
                 if (jump_targets.count(jmp.second) == 0) {
-                    report << filename << ':' << expanded_lines_to_source_lines.at(jmp.first)+1 << ": error: jump to unrecognised marker: " << jmp.second;
-                    detected_out_of_range_jump = true;
-                    break;
+                    report << "jump to unrecognised marker: " << jmp.second;
+                    throw ErrorReport(jmp.first, report.str());
                 }
                 if (jump_targets.at(jmp.second) > function_instruction_counter) {
-                    report << filename << ':' << expanded_lines_to_source_lines.at(jmp.first)+1 << ": error: marker out-of-function jump";
-                    detected_out_of_range_jump = true;
-                    break;
+                    report << "marker out-of-function jump";
+                    throw ErrorReport(jmp.first, report.str());
                 }
-            }
-            if (detected_out_of_range_jump) {
-                break;
             }
         }
     }
-
-    return report.str();
 }

@@ -58,7 +58,7 @@ int gatherFunctions(invocables_t*, const std::vector<std::string>&, const std::v
 int gatherBlocks(invocables_t*, const std::vector<std::string>&, const std::vector<std::string>&);
 std::map<std::string, std::string> gatherMetaInformation(const std::vector<std::string>&);
 
-int generate(const std::vector<std::string>&, const std::map<long unsigned, long unsigned>&, std::vector<std::string>&, invocables_t&, invocables_t&, const std::string&, std::string&, const std::vector<std::string>&, const compilationflags_t&);
+int generate(const std::vector<std::string>&, std::vector<std::string>&, invocables_t&, invocables_t&, const std::string&, std::string&, const std::vector<std::string>&, const compilationflags_t&);
 
 
 #endif
