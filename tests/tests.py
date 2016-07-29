@@ -1170,7 +1170,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/backward_out_of_function_jump.asm:21: error: backward out-of-function jump", output.strip())
+        self.assertEqual("./sample/asm/errors/backward_out_of_function_jump.asm:21: error: backward out-of-range jump", output.strip())
 
     def testForwardOutOfFunctionJump(self):
         name = 'forward_out_of_function_jump.asm'
@@ -1178,7 +1178,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/forward_out_of_function_jump.asm:21: error: forward out-of-function jump", output.strip())
+        self.assertEqual("./sample/asm/errors/forward_out_of_function_jump.asm:21: error: forward out-of-range jump", output.strip())
 
     def testJumpToUnrecognisedMarker(self):
         name = 'jump_to_unrecognised_marker.asm'
@@ -1226,7 +1226,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/branch_true_backward_out_of_range.asm:23: error: backward out-of-function jump", output.strip())
+        self.assertEqual("./sample/asm/errors/branch_true_backward_out_of_range.asm:23: error: backward out-of-range jump", output.strip())
 
     def testBranchTrueForwardOutOfRange(self):
         name = 'branch_true_forward_out_of_range.asm'
@@ -1234,7 +1234,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/branch_true_forward_out_of_range.asm:23: error: forward out-of-function jump", output.strip())
+        self.assertEqual("./sample/asm/errors/branch_true_forward_out_of_range.asm:23: error: forward out-of-range jump", output.strip())
 
     def testBranchFalseBackwardOutOfRange(self):
         name = 'branch_false_backward_out_of_range.asm'
@@ -1242,7 +1242,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/branch_false_backward_out_of_range.asm:23: error: backward out-of-function jump", output.strip())
+        self.assertEqual("./sample/asm/errors/branch_false_backward_out_of_range.asm:23: error: backward out-of-range jump", output.strip())
 
     def testBranchFalseForwardOutOfRange(self):
         name = 'branch_false_forward_out_of_range.asm'
@@ -1250,7 +1250,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/branch_false_forward_out_of_range.asm:23: error: forward out-of-function jump", output.strip())
+        self.assertEqual("./sample/asm/errors/branch_false_forward_out_of_range.asm:23: error: forward out-of-range jump", output.strip())
 
     def testBranchTrueForwardOutOfRangeNonrelative(self):
         name = 'branch_true_forward_out_of_range_nonrelative.asm'
@@ -1258,7 +1258,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/branch_true_forward_out_of_range_nonrelative.asm:23: error: forward out-of-function jump", output.strip())
+        self.assertEqual("./sample/asm/errors/branch_true_forward_out_of_range_nonrelative.asm:23: error: forward out-of-range jump", output.strip())
 
     def testBranchFalseForwardOutOfRangeNonrelative(self):
         name = 'branch_false_forward_out_of_range_nonrelative.asm'
@@ -1266,7 +1266,7 @@ class AssemblerErrorTests(unittest.TestCase):
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/branch_false_forward_out_of_range_nonrelative.asm:23: error: forward out-of-function jump", output.strip())
+        self.assertEqual("./sample/asm/errors/branch_false_forward_out_of_range_nonrelative.asm:23: error: forward out-of-range jump", output.strip())
 
     def testBranchTrueNegativeAbsolute(self):
         name = 'branch_true_negative_absolute.asm'

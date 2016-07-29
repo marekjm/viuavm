@@ -620,7 +620,7 @@ static void validate_jump(const unsigned lineno, const string& extracted_jump, c
     }
 
     if (target < 0 and (function_instruction_counter+target) < 0) {
-        throw ErrorReport(lineno, "backward out-of-function jump");
+        throw ErrorReport(lineno, "backward out-of-range jump");
     }
     if (target > function_instruction_counter) {
         forward_jumps.push_back({lineno, target});
@@ -630,7 +630,7 @@ static void validate_jump(const unsigned lineno, const string& extracted_jump, c
 static void verify_forward_jumps(const int function_instruction_counter, const vector<pair<unsigned, int>>& forward_jumps) {
     for (auto jmp : forward_jumps) {
         if (jmp.second > function_instruction_counter) {
-            throw ErrorReport(jmp.first, "forward out-of-function jump");
+            throw ErrorReport(jmp.first, "forward out-of-range jump");
         }
     }
 }
@@ -641,7 +641,7 @@ static void verify_marker_jumps(const int function_instruction_counter, const ve
             throw ErrorReport(jmp.first, ("jump to unrecognised marker: " + jmp.second));
         }
         if (jump_targets.at(jmp.second) > function_instruction_counter) {
-            throw ErrorReport(jmp.first, "marker out-of-function jump");
+            throw ErrorReport(jmp.first, "marker out-of-range jump");
         }
     }
 }
