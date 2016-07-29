@@ -593,7 +593,7 @@ void assembler::verify::framesHaveNoGaps(const vector<string>& lines, const map<
     }
 }
 
-static void validate_jump(const unsigned lineno, const string& extracted_jump, int function_instruction_counter, vector<pair<unsigned, int>>& forward_jumps, vector<pair<unsigned, string>>& deferred_marker_jumps, const map<string, int>& jump_targets) {
+static void validate_jump(const unsigned lineno, const string& extracted_jump, const int function_instruction_counter, vector<pair<unsigned, int>>& forward_jumps, vector<pair<unsigned, string>>& deferred_marker_jumps, const map<string, int>& jump_targets) {
     int target = -1;
     if (str::isnum(extracted_jump)) {
         target = stoi(extracted_jump);
