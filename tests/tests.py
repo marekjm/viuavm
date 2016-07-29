@@ -1252,6 +1252,38 @@ class AssemblerErrorTests(unittest.TestCase):
         self.assertEqual(1, exit_code)
         self.assertEqual("./sample/asm/errors/branch_false_forward_out_of_range.asm:23: error: forward out-of-function jump", output.strip())
 
+    def testBranchTrueForwardOutOfRangeNonrelative(self):
+        name = 'branch_true_forward_out_of_range_nonrelative.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/branch_true_forward_out_of_range_nonrelative.asm:23: error: forward out-of-function jump", output.strip())
+
+    def testBranchFalseForwardOutOfRangeNonrelative(self):
+        name = 'branch_false_forward_out_of_range_nonrelative.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/branch_false_forward_out_of_range_nonrelative.asm:23: error: forward out-of-function jump", output.strip())
+
+    def testBranchTrueNegativeAbsolute(self):
+        name = 'branch_true_negative_absolute.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/branch_true_negative_absolute.asm:23: error: absolute jump with negative value", output.strip())
+
+    def testBranchFalseNegativeAbsolute(self):
+        name = 'branch_false_negative_absolute.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/branch_false_negative_absolute.asm:23: error: absolute jump with negative value", output.strip())
+
 
 class AssemblerErrorRejectingDuplicateSymbolsTests(unittest.TestCase):
     PATH = './sample/asm/errors/single_definition_rule'
