@@ -627,6 +627,25 @@ static void validate_jump(const unsigned lineno, const string& extracted_jump, i
     }
 }
 
+static void verify_forward_jumps(const int function_instruction_counter, const vector<pair<unsigned, int>>& forward_jumps) {
+    for (auto jmp : forward_jumps) {
+        if (jmp.second > function_instruction_counter) {
+            throw ErrorReport(jmp.first, "forward out-of-function jump");
+        }
+    }
+}
+
+static void verify_marker_jumps(const int function_instruction_counter, const vector<pair<unsigned, string>>& deferred_marker_jumps, const map<string, int>& jump_targets) {
+    for (auto jmp : deferred_marker_jumps) {
+        if (jump_targets.count(jmp.second) == 0) {
+            throw ErrorReport(jmp.first, ("jump to unrecognised marker: " + jmp.second));
+        }
+        if (jump_targets.at(jmp.second) > function_instruction_counter) {
+            throw ErrorReport(jmp.first, "marker out-of-function jump");
+        }
+    }
+}
+
 void assembler::verify::jumpsAreInRange(const vector<string>& lines) {
     ostringstream report("");
     string line;
@@ -670,23 +689,8 @@ void assembler::verify::jumpsAreInRange(const vector<string>& lines) {
             continue;
         } else if (first_part == ".end") {
             function_name = "";
-
-            for (auto jmp : forward_jumps) {
-                if (jmp.second > function_instruction_counter) {
-                    report << "forward out-of-function jump";
-                    throw ErrorReport(jmp.first, report.str());
-                }
-            }
-            for (auto jmp : deferred_marker_jumps) {
-                if (jump_targets.count(jmp.second) == 0) {
-                    report << "jump to unrecognised marker: " << jmp.second;
-                    throw ErrorReport(jmp.first, report.str());
-                }
-                if (jump_targets.at(jmp.second) > function_instruction_counter) {
-                    report << "marker out-of-function jump";
-                    throw ErrorReport(jmp.first, report.str());
-                }
-            }
+            verify_forward_jumps(function_instruction_counter, forward_jumps);
+            verify_marker_jumps(function_instruction_counter, deferred_marker_jumps, jump_targets);
         }
     }
 }
