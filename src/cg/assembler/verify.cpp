@@ -486,6 +486,30 @@ string assembler::verify::instructions(const string& filename, const vector<stri
     return report.str();
 }
 
+string assembler::verify::framesHaveOperands(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines) {
+    ostringstream report("");
+    string line;
+
+    for (unsigned i = 0; i < lines.size(); ++i) {
+        line = str::lstrip(lines[i]);
+
+        if (not str::startswith(line, "frame")) {
+            continue;
+        }
+
+        // remove leading instruction name and
+        // strip the remaining string of leading whitespace
+        line = str::lstrip(str::sub(line, str::chunk(line).size()));
+
+        if (line.size() == 0) {
+            report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: frame instruction without operands";
+            break;
+        }
+    }
+
+    return report.str();
+}
+
 string assembler::verify::framesHaveNoGaps(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines) {
     ostringstream report("");
     string line;

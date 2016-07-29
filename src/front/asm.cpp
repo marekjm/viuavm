@@ -297,21 +297,9 @@ int main(int argc, char* argv[]) {
         cout << report << endl;
         exit(1);
     }
-
-    ////////////////////////////
-    // VERIFY FRAME INSTRUCTIONS
-    for (unsigned i = 0; i < expanded_lines.size(); ++i) {
-        line = str::lstrip(expanded_lines[i]);
-        if (not str::startswith(line, "frame")) {
-            continue;
-        }
-
-        line = str::lstrip(str::sub(line, str::chunk(line).size()));
-
-        if (line.size() == 0) {
-            cout << "fatal: frame instruction without operands at line " << i << " in " << filename << endl;
-            return 1;
-        }
+    if ((report = assembler::verify::framesHaveOperands(filename, expanded_lines, expanded_lines_to_source_lines)).size()) {
+        cout << report << endl;
+        return 1;
     }
     if ((report = assembler::verify::framesHaveNoGaps(filename, expanded_lines, expanded_lines_to_source_lines)).size()) {
         cout << report << endl;
