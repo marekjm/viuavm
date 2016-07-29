@@ -37,8 +37,8 @@ There are several categories of change:
 - feature: `vec` instruction can pack objects
 - feature: external function and block signatures are included in disassembler output
 - feature: `.info: <key> "<value>"` directive may be used to embed additional information in compiled files,
-- feature: assembler is able to verify ranges of function-local jumps and refuses to compile code that contains
-  out-of-range jumps
+- feature: assembler is able to verify ranges of function- and block-local jumps and refuses to compile code that
+  contains out-of-range jumps
 
 
 ----
