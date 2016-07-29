@@ -65,6 +65,7 @@ namespace assembler {
         std::string ressInstructions(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&, bool as_lib);
         std::string functionBodiesAreNonempty(const std::string&, const std::vector<std::string>&);
         std::string blockBodiesAreNonempty(const std::string&, const std::vector<std::string>&);
+        std::string blocksEndWithFinishingInstruction(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&);
         std::string blockTries(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&, const std::vector<std::string>& block_names, const std::vector<std::string>& block_signatures);
         std::string blockCatches(const std::string&, const std::vector<std::string>& lines, const std::map<long unsigned, long unsigned>&, const std::vector<std::string>& block_names, const std::vector<std::string>& block_signatures);
         std::string blockBodiesEndWithLeave(const std::vector<std::string>& lines, std::map<std::string, std::pair<bool, std::vector<std::string> > >& blocks);

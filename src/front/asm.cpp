@@ -305,15 +305,9 @@ int main(int argc, char* argv[]) {
         cout << report << endl;
         return 1;
     }
-
-    //////////////////////
-    // VERIFY BLOCK BODIES
-    for (auto block : blocks.bodies) {
-        string last_line = block.second.back();
-        if (not (last_line == "leave" or last_line == "end" or last_line == "halt")) {
-            cout << "fatal: missing returning instruction ('leave', 'return' or 'halt') at the end of block '" << block.first << "'" << endl;
-            exit(1);
-        }
+    if ((report = assembler::verify::blocksEndWithFinishingInstruction(filename, expanded_lines, expanded_lines_to_source_lines)).size()) {
+        cout << report << endl;
+        return 1;
     }
 
 

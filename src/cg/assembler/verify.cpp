@@ -452,6 +452,36 @@ string assembler::verify::blockBodiesAreNonempty(const string& filename, const s
     return bodiesAreNonempty(filename, lines);
 }
 
+string assembler::verify::blocksEndWithFinishingInstruction(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines) {
+    ostringstream report("");
+    string line;
+    string block;
+
+    for (unsigned i = 0; i < lines.size(); ++i) {
+        line = str::lstrip(lines[i]);
+        if (assembler::utils::lines::is_block(line)) {
+            block = str::chunk(str::lstrip(str::sub(line, string(".block:").size())));
+            continue;
+        } else if (str::startswithchunk(line, ".end") and block.size()) {
+            // .end may have been reached while not in a block because functions also end with .end
+            // so we also make sure that we were inside a block
+        } else {
+            continue;
+        }
+
+        if (i and (not (str::startswithchunk(str::lstrip(lines[i-1]), "leave") or str::startswithchunk(str::lstrip(lines[i-1]), "return") or str::startswithchunk(str::lstrip(lines[i-1]), "halt")))) {
+            report << filename << ':' << expanded_lines_to_source_lines.at(i)+1 << ": error: missing returning instruction (leave, return or halt) at the end of block '" << block << "'";
+            break;
+        }
+
+        // if we're here, then the .end at the end of function has been reached and
+        // the block name marker should be reset
+        block = "";
+    }
+
+    return report.str();
+}
+
 string assembler::verify::directives(const string& filename, const vector<string>& lines, const map<long unsigned, long unsigned>& expanded_lines_to_source_lines) {
     ostringstream report("");
     string line;
