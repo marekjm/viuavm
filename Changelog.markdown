@@ -39,6 +39,8 @@ There are several categories of change:
 - feature: `.info: <key> "<value>"` directive may be used to embed additional information in compiled files,
 - feature: assembler is able to verify ranges of function- and block-local jumps and refuses to compile code that
   contains out-of-range jumps
+- fix: removed race condition that would swallow exceptions thrown in FFI calls without registering them in watchdog, or
+  priting stack trace
 
 
 ----

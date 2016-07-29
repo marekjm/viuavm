@@ -267,6 +267,33 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
 
         ticked = (executeQuant(th, th->priority()) or ticked);
 
+        if (th->suspended()) {
+            // This check is required to avoid race condition later in the function.
+            // When a process is suspended its state cannot really be detected correctly except
+            // for the fact that the process is still possibly running.
+            //
+            // Race condition arises when an exception is thrown during an FFI call;
+            // as FFI results and exceptions are transferred back asynchronously a following sequence
+            // of events may occur:
+            //
+            //  - process requests FFI call, and is suspended
+            //  - an exception is thrown during FFI call
+            //  - the exception is registered in a process, and the process enters "terminated" state
+            //  - the process is woken up, and enters "stopped" state
+            //
+            // Now, if the process is woken up between the next if (the `if (th-terminated() ...)`), and
+            // the `if (th->stopped() ...)` one it will be marked as dead without handling the exception
+            // because when the VPS was checking for presence of an exception it was not there yet.
+            //
+            // Checking if the process is suspended here and, if it is, immediately marking it as
+            // running prevents the race condition.
+            //
+            // REMEMBER: the last thing that is done after servicing an FFI call is waking the process up so
+            // as long as the process is suspended it must be considered to be running.
+            running_processes_list.push_back(std::move(processes.at(i)));
+            continue;
+        }
+
         if (th->terminated() and not th->joinable() and th->parent() == nullptr) {
             if (not watchdog_process) {
                 if (th == main_process) {
