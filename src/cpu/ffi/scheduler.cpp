@@ -20,6 +20,7 @@
 #include <vector>
 #include <thread>
 #include <condition_variable>
+#include <memory>
 #include <viua/types/exception.h>
 #include <viua/cpu/cpu.h>
 using namespace std;
@@ -34,7 +35,7 @@ void ff_call_processor(vector<ForeignFunctionCallRequest*> *requests, map<string
             return not requests->empty();
         }));
 
-        ForeignFunctionCallRequest *request = requests->front();
+        unique_ptr<ForeignFunctionCallRequest> request(requests->front());
 
         requests->erase(requests->begin());
 
@@ -57,6 +58,5 @@ void ff_call_processor(vector<ForeignFunctionCallRequest*> *requests, map<string
         }
 
         request->wakeup();
-        delete request;
     }
 }
