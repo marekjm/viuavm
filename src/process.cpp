@@ -451,7 +451,7 @@ void Process::suspend() {
 void Process::wakeup() {
     is_suspended.store(false, std::memory_order_release);
 }
-bool Process::suspended() {
+bool Process::suspended() const {
     return is_suspended.load(std::memory_order_acquire);
 }
 

@@ -264,7 +264,7 @@ class Process {
 
         void suspend();
         void wakeup();
-        bool suspended();
+        bool suspended() const;
 
         Process* parent() const;
 
