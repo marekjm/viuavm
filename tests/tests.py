@@ -1317,6 +1317,23 @@ class AssemblerErrorRejectingDuplicateSymbolsTests(unittest.TestCase):
         self.assertRaises(ViuaAssemblerError, assemble, os.path.join(self.PATH, 'exec.asm'), links=(lib_a_path, lib_a_path))
 
 
+class ExceptionMechanismTests(unittest.TestCase):
+    PATH = './sample/asm/exceptions'
+
+    def testTerminatingProcessDoesNotBreakOtherProcesses(self):
+        expected_output = [
+            'Hello World from process 5',
+            'Hello World from process 1',
+            'Hello World from process 4',
+            'Hello World from process 6',
+            'Hello World from process 2',
+            'uncaught object: Integer = 42',
+            'Hello World from process 3',
+            'Hello World from process 0',
+        ]
+        runTest(self, 'terminating_processes.asm', sorted(expected_output), output_processing_function=lambda _: sorted(filter(lambda _: (_.startswith('Hello') or _.startswith('uncaught')), _.strip().splitlines())))
+
+
 class MiscTests(unittest.TestCase):
     PATH = './sample/asm/misc'
 
