@@ -1,4 +1,4 @@
-# History of Wudoo VM
+# History of Viua VM
 
 This file aims to be a kind of development diary, for things I'd like to save for later or
 things I'd like to remember - because I know I will forget - or just to write down what I have learned
@@ -9,6 +9,7 @@ during development of the VM.
 
 ## Versions and name changes
 
+- `0.5.0`: **Viua VM**
 - `0.1.0`: **Wudoo VM**
 - `0.0.1`: **Tatanka VM**
 
