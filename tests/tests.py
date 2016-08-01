@@ -1333,6 +1333,9 @@ class ExceptionMechanismTests(unittest.TestCase):
         ]
         runTest(self, 'terminating_processes.asm', sorted(expected_output), output_processing_function=lambda _: sorted(filter(lambda _: (_.startswith('Hello') or _.startswith('uncaught')), _.strip().splitlines())))
 
+    def testClosureFromGlobalResgisterSet(self):
+        runTestThrowsException(self, 'closure_from_nonlocal_registers.asm', 'uncaught object: Exception = creating closures from nonlocal registers is forbidden')
+
 
 class MiscTests(unittest.TestCase):
     PATH = './sample/asm/misc'

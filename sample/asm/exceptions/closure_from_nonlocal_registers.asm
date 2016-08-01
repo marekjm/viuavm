@@ -17,7 +17,7 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: foo
+.function: foo/0
     print 1
     return
 .end
@@ -25,8 +25,11 @@
 .function: main/1
     ress global
     istore 1 42
-    enclose 1
-    closure 2 foo
+
+    ; FIXME: static checking of enclose* and closure combos to ensure that
+    ; there is always a closure before any "closing" happens
+    closure 2 foo/0
+    enclose 2 1
 
     izero 0
     return
