@@ -18,10 +18,8 @@
 ;
 
 .block: exception_handler
-    strstore 1 "exception encountered: "
-    pull 2
-    echo 1
-    print 2
+    echo (strstore 1 "exception encountered: ")
+    print (pull 2)
     leave
 .end
 

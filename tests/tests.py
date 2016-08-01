@@ -867,28 +867,6 @@ class TryCatchBlockTests(unittest.TestCase):
         runTest(self, 'catching_builtin_type.asm', '42')
 
 
-class ThrowCatchMechanismTests(unittest.TestCase):
-    PATH = './sample/asm/exceptions'
-
-    def testCatchingExceptionThrownInDifferentModule(self):
-        source_lib = 'thrown_in_linked_caught_in_static_fun.asm'
-        lib_path = 'test_module.vlib'
-        assemble(os.path.join(self.PATH, source_lib), out=lib_path, opts=('--lib',))
-        runTest(self, 'thrown_in_linked_caught_in_static_base.asm', 'looks falsey: 0')
-
-
-class CatchingMachineThrownExceptionTests(unittest.TestCase):
-    """Tests for catching machine-thrown exceptions.
-    """
-    PATH = './sample/asm/exceptions'
-
-    def testCatchingMachineThrownException(self):
-        runTest(self, 'nullregister_access.asm', "exception encountered: (get) read from null register: 1")
-
-    def testCatcherState(self):
-        runTestSplitlines(self, 'restore_catcher_state.asm', ['42','100','42','100'])
-
-
 class PrototypeSystemTests(unittest.TestCase):
     """Tests for prototype system inside the machine.
     """
@@ -1310,7 +1288,7 @@ class AssemblerErrorRejectingDuplicateSymbolsTests(unittest.TestCase):
         self.assertRaises(ViuaAssemblerError, assemble, os.path.join(self.PATH, 'exec.asm'), links=(lib_a_path, lib_a_path))
 
 
-class ExceptionMechanismTests(unittest.TestCase):
+class MiscExceptionTests(unittest.TestCase):
     PATH = './sample/asm/exceptions'
 
     def testTerminatingProcessDoesNotBreakOtherProcesses(self):
@@ -1328,6 +1306,21 @@ class ExceptionMechanismTests(unittest.TestCase):
 
     def testClosureFromGlobalResgisterSet(self):
         runTestThrowsException(self, 'closure_from_nonlocal_registers.asm', ('Exception', 'creating closures from nonlocal registers is forbidden',))
+
+    def testCatchingMachineThrownException(self):
+        runTest(self, 'nullregister_access.asm', "exception encountered: (get) read from null register: 1")
+
+    def testCatcherState(self):
+        runTestSplitlines(self, 'restore_catcher_state.asm', ['42','100','42','100'])
+
+    def testCatchingExceptionThrownInDifferentModule(self):
+        source_lib = 'thrown_in_linked_caught_in_static_fun.asm'
+        lib_path = 'test_module.vlib'
+        assemble(os.path.join(self.PATH, source_lib), out=lib_path, opts=('--lib',))
+        runTest(self, 'thrown_in_linked_caught_in_static_base.asm', 'looks falsey: 0')
+
+    def testVectorOutOfRangeRead(self):
+        runTestThrowsException(self, 'vector_out_of_range_read.asm', ('OutOfRangeException', 'positive vector index out of range',))
 
 
 class MiscTests(unittest.TestCase):
