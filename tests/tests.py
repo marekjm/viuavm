@@ -295,33 +295,22 @@ def runTestReturnsUnorderedLines(self, name, expected_output, expected_exit_code
 def runTestReturnsIntegers(self, name, expected_output, expected_exit_code = 0, check_memory_leaks=True):
     runTest(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: [int(i) for i in o.strip().splitlines()], check_memory_leaks=check_memory_leaks)
 
-def runTestThrowsException(self, name, expected_output, assembly_opts=None):
-    assembly_path = os.path.join(self.PATH, name)
-    compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-    if assembly_opts is None:
-        assemble(assembly_path, compiled_path)
-    else:
-        assemble(assembly_path, compiled_path, opts=assembly_opts)
-    expected_exit_code = 1
-    excode, output = run(compiled_path, expected_exit_code)
+def extractExceptionsThrown(output):
     uncaught_object_prefix = 'uncaught object: '
-    got_exception = tuple(list(filter(lambda line: line.startswith(uncaught_object_prefix), output.strip().splitlines()))[0][len(uncaught_object_prefix):].split(' = ', 1))
-    self.assertEqual(expected_exit_code, excode)
-    self.assertEqual(got_exception, expected_output)
+    return list(map(lambda _: (_[0].strip(), _[1].strip(),),
+                    map(lambda _: _.split(' = ', 1),
+                        map(lambda _: _[len(uncaught_object_prefix):],
+                            filter(lambda _: _.startswith(uncaught_object_prefix),
+                                output.strip().splitlines())))))
+
+def extractFirstException(output):
+    return extractExceptionsThrown(output)[0]
+
+def runTestThrowsException(self, name, expected_output, assembly_opts=None):
+    runTest(self, name, expected_output, expected_exit_code=1, output_processing_function=extractFirstException)
 
 def runTestReportsException(self, name, expected_output, assembly_opts=None):
-    assembly_path = os.path.join(self.PATH, name)
-    compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-    if assembly_opts is None:
-        assemble(assembly_path, compiled_path)
-    else:
-        assemble(assembly_path, compiled_path, opts=assembly_opts)
-    expected_exit_code = 0
-    excode, output = run(compiled_path, expected_exit_code)
-    uncaught_object_prefix = 'uncaught object: '
-    got_exception = tuple(list(filter(lambda line: line.startswith(uncaught_object_prefix), output.strip().splitlines()))[0][len(uncaught_object_prefix):].split(' = ', 1))
-    self.assertEqual(expected_exit_code, excode)
-    self.assertEqual(got_exception, expected_output)
+    runTest(self, name, expected_output, expected_exit_code=0, output_processing_function=extractFirstException)
 
 def runTestFailsToAssemble(self, name, expected_output):
     assembly_path = os.path.join(self.PATH, name)
