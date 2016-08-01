@@ -312,7 +312,7 @@ def runTestThrowsException(self, name, expected_output, assembly_opts=None):
     runTest(self, name, expected_output, expected_exit_code=1, output_processing_function=extractFirstException, valgrind_enable=False)
 
 def runTestReportsException(self, name, expected_output, assembly_opts=None):
-    runTest(self, name, expected_output, expected_exit_code=0, output_processing_function=extractFirstException, valgrind_enable=False)
+    runTest(self, name, expected_output, expected_exit_code=0, output_processing_function=extractFirstException)
 
 def runTestFailsToAssemble(self, name, expected_output):
     assembly_path = os.path.join(self.PATH, name)
