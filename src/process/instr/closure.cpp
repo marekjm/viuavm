@@ -95,7 +95,7 @@ byte* Process::opclosure(byte* addr) {
     /** Create a closure from a function.
      */
     if (uregset != frames.back()->regset) {
-        throw new Exception("creating closures from nonlocal registers is forbidden, go rethink your behaviour");
+        throw new Exception("creating closures from nonlocal registers is forbidden");
     }
 
     unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
