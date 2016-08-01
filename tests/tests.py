@@ -246,7 +246,7 @@ def runMemoryLeakCheck(self, compiled_path, check_memory_leaks):
         MEMORY_LEAK_CHECKS_RUN += 1
         valgrindCheck(self, compiled_path)
 
-def runTest(self, name, expected_output=None, expected_exit_code = 0, output_processing_function = None, check_memory_leaks = True, custom_assert=None, assembly_opts=None):
+def runTest(self, name, expected_output=None, expected_exit_code = 0, output_processing_function = None, check_memory_leaks = True, custom_assert=None, assembly_opts=None, valgrind_enable=True):
     if expected_output is None and custom_assert is None:
         raise TypeError('`expected_output` and `custom_assert` cannot be both None')
     assembly_path = os.path.join(self.PATH, name)
@@ -262,7 +262,9 @@ def runTest(self, name, expected_output=None, expected_exit_code = 0, output_pro
     else:
         self.assertEqual(expected_output, got_output)
         self.assertEqual(expected_exit_code, excode)
-    runMemoryLeakCheck(self, compiled_path, check_memory_leaks)
+
+    if valgrind_enable:
+        runMemoryLeakCheck(self, compiled_path, check_memory_leaks)
 
     disasm_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.dis.asm'.format(self.PATH[2:].replace('/', '_'), name))
     compiled_disasm_path = '{0}.bin'.format(disasm_path)
@@ -307,10 +309,10 @@ def extractFirstException(output):
     return extractExceptionsThrown(output)[0]
 
 def runTestThrowsException(self, name, expected_output, assembly_opts=None):
-    runTest(self, name, expected_output, expected_exit_code=1, output_processing_function=extractFirstException)
+    runTest(self, name, expected_output, expected_exit_code=1, output_processing_function=extractFirstException, valgrind_enable=False)
 
 def runTestReportsException(self, name, expected_output, assembly_opts=None):
-    runTest(self, name, expected_output, expected_exit_code=0, output_processing_function=extractFirstException)
+    runTest(self, name, expected_output, expected_exit_code=0, output_processing_function=extractFirstException, valgrind_enable=False)
 
 def runTestFailsToAssemble(self, name, expected_output):
     assembly_path = os.path.join(self.PATH, name)
