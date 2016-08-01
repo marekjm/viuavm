@@ -304,7 +304,8 @@ def runTestThrowsException(self, name, expected_output, assembly_opts=None):
         assemble(assembly_path, compiled_path, opts=assembly_opts)
     expected_exit_code = 1
     excode, output = run(compiled_path, expected_exit_code)
-    got_exception = list(filter(lambda line: line.startswith('uncaught object:'), output.strip().splitlines()))[0]
+    uncaught_object_prefix = 'uncaught object: '
+    got_exception = tuple(list(filter(lambda line: line.startswith(uncaught_object_prefix), output.strip().splitlines()))[0][len(uncaught_object_prefix):].split(' = ', 1))
     self.assertEqual(expected_exit_code, excode)
     self.assertEqual(got_exception, expected_output)
 
@@ -317,7 +318,8 @@ def runTestReportsException(self, name, expected_output, assembly_opts=None):
         assemble(assembly_path, compiled_path, opts=assembly_opts)
     expected_exit_code = 0
     excode, output = run(compiled_path, expected_exit_code)
-    got_exception = list(filter(lambda line: line.startswith('uncaught object:'), output.strip().splitlines()))[0]
+    uncaught_object_prefix = 'uncaught object: '
+    got_exception = tuple(list(filter(lambda line: line.startswith(uncaught_object_prefix), output.strip().splitlines()))[0][len(uncaught_object_prefix):].split(' = ', 1))
     self.assertEqual(expected_exit_code, excode)
     self.assertEqual(got_exception, expected_output)
 
@@ -498,13 +500,13 @@ class VectorInstructionsTests(unittest.TestCase):
         runTest(self, 'vec_packing.asm', '["answer to life", 42]', 0, lambda o: o.strip())
 
     def testPackingVecRefusesToPackItself(self):
-        runTestThrowsException(self, 'vec_packing_self_pack.asm', 'uncaught object: Exception = vec would pack itself')
+        runTestThrowsException(self, 'vec_packing_self_pack.asm', ('Exception', 'vec would pack itself',))
 
     def testPackingVecRefusesToOutOfRegisterSetRange(self):
-        runTestThrowsException(self, 'vec_packing_out_of_range.asm', 'uncaught object: Exception = vec: packing outside of register set range')
+        runTestThrowsException(self, 'vec_packing_out_of_range.asm', ('Exception', 'vec: packing outside of register set range',))
 
     def testPackingVecRefusesToPackNullRegister(self):
-        runTestThrowsException(self, 'vec_packing_null.asm', 'uncaught object: Exception = vec: cannot pack null register')
+        runTestThrowsException(self, 'vec_packing_null.asm', ('Exception', 'vec: cannot pack null register',))
 
     def testVLEN(self):
         runTest(self, 'vlen.asm', '8', 0)
@@ -513,7 +515,7 @@ class VectorInstructionsTests(unittest.TestCase):
         runTest(self, 'vinsert.asm', ['Hurr', 'durr', 'Im\'a', 'sheep!'], 0, lambda o: o.strip().splitlines())
 
     def testInsertingOutOfRangeWithPositiveIndex(self):
-        runTestThrowsException(self, 'out_of_range_index_positive.asm', 'uncaught object: OutOfRangeException = positive vector index out of range')
+        runTestThrowsException(self, 'out_of_range_index_positive.asm', ('OutOfRangeException', 'positive vector index out of range',))
 
     def testVPUSH(self):
         runTest(self, 'vpush.asm', ['0', '1', 'Hello World!'], 0, lambda o: o.strip().splitlines())
@@ -564,7 +566,7 @@ class RegisterManipulationInstructionsTests(unittest.TestCase):
         runTest(self, 'empty.asm', 'true')
 
     def testFetchingFromEmptyTemporaryRegister(self):
-        runTestThrowsException(self, 'fetching_from_empty_tmp_register.asm', 'uncaught object: Exception = temporary register set is empty')
+        runTestThrowsException(self, 'fetching_from_empty_tmp_register.asm', ('Exception', 'temporary register set is empty',))
 
 
 class SampleProgramsTests(unittest.TestCase):
@@ -649,7 +651,7 @@ class FunctionTests(unittest.TestCase):
 
     @unittest.skip('functions not ending with "return" or "tailcall" are forbidden')
     def testNeverendingFunction0(self):
-        runTestThrowsException(self, 'neverending0.asm', 'uncaught object: Exception = stack size (8192) exceeded with call to \'one/0\'', assembly_opts=())
+        runTestThrowsException(self, 'neverending0.asm', ('Exception', 'stack size (8192) exceeded with call to \'one/0\'',), assembly_opts=())
 
 
 class HigherOrderFunctionTests(unittest.TestCase):
@@ -724,64 +726,64 @@ class InvalidInstructionOperandTypeTests(unittest.TestCase):
     PATH = './sample/asm/invalid_operand_types'
 
     def testIADD(self):
-        runTestThrowsException(self, 'iadd.asm', 'uncaught object: Exception = invalid operand types: expected (_, Integer, Integer), got (_, Integer, Float)')
+        runTestThrowsException(self, 'iadd.asm', ('Exception', 'invalid operand types: expected (_, Integer, Integer), got (_, Integer, Float)',))
 
     def testISUB(self):
-        runTestThrowsException(self, 'isub.asm', 'uncaught object: Exception = invalid operand types: expected (_, Integer, Integer), got (_, Integer, String)')
+        runTestThrowsException(self, 'isub.asm', ('Exception', 'invalid operand types: expected (_, Integer, Integer), got (_, Integer, String)',))
 
     def testIMUL(self):
-        runTestThrowsException(self, 'imul.asm', 'uncaught object: Exception = invalid operand types: expected (_, Integer, Integer), got (_, Float, String)')
+        runTestThrowsException(self, 'imul.asm', ('Exception', 'invalid operand types: expected (_, Integer, Integer), got (_, Float, String)',))
 
     def testIDIV(self):
-        runTestThrowsException(self, 'idiv.asm', 'uncaught object: Exception = invalid operand types: expected (_, Integer, Integer), got (_, String, Float)')
+        runTestThrowsException(self, 'idiv.asm', ('Exception', 'invalid operand types: expected (_, Integer, Integer), got (_, String, Float)',))
 
     def testILT(self):
-        runTestThrowsException(self, 'ilt.asm', 'uncaught object: Exception = invalid operand types: expected (_, Integer, Integer), got (_, String, String)')
+        runTestThrowsException(self, 'ilt.asm', ('Exception', 'invalid operand types: expected (_, Integer, Integer), got (_, String, String)',))
 
     def testILTE(self):
-        runTestThrowsException(self, 'ilte.asm', 'uncaught object: Exception = invalid operand types: expected (_, Integer, Integer), got (_, Foo, String)')
+        runTestThrowsException(self, 'ilte.asm', ('Exception', 'invalid operand types: expected (_, Integer, Integer), got (_, Foo, String)',))
 
     def testIGT(self):
-        runTestThrowsException(self, 'igt.asm', 'uncaught object: Exception = invalid operand types: expected (_, Integer, Integer), got (_, Foo, Bar)')
+        runTestThrowsException(self, 'igt.asm', ('Exception', 'invalid operand types: expected (_, Integer, Integer), got (_, Foo, Bar)',))
 
     def testIGTE(self):
-        runTestThrowsException(self, 'igte.asm', 'uncaught object: Exception = invalid operand types: expected (_, Integer, Integer), got (_, Foo, Bar)')
+        runTestThrowsException(self, 'igte.asm', ('Exception', 'invalid operand types: expected (_, Integer, Integer), got (_, Foo, Bar)',))
 
     def testIEQ(self):
-        runTestThrowsException(self, 'ieq.asm', 'uncaught object: Exception = invalid operand types: expected (_, Integer, Integer), got (_, Foo, Bar)')
+        runTestThrowsException(self, 'ieq.asm', ('Exception', 'invalid operand types: expected (_, Integer, Integer), got (_, Foo, Bar)',))
 
     def testIINC(self):
-        runTestThrowsException(self, 'iinc.asm', 'uncaught object: Exception = invalid operand types: expected (Integer), got (Foo)')
+        runTestThrowsException(self, 'iinc.asm', ('Exception', 'invalid operand types: expected (Integer), got (Foo)',))
 
     def testIDEC(self):
-        runTestThrowsException(self, 'idec.asm', 'uncaught object: Exception = invalid operand types: expected (Integer), got (Function)')
+        runTestThrowsException(self, 'idec.asm', ('Exception', 'invalid operand types: expected (Integer), got (Function)',))
 
     def testFADD(self):
-        runTestThrowsException(self, 'fadd.asm', 'uncaught object: Exception = invalid operand types: expected (_, Float, Float), got (_, Foo, Float)')
+        runTestThrowsException(self, 'fadd.asm', ('Exception', 'invalid operand types: expected (_, Float, Float), got (_, Foo, Float)',))
 
     def testFSUB(self):
-        runTestThrowsException(self, 'fsub.asm', 'uncaught object: Exception = invalid operand types: expected (_, Float, Float), got (_, Foo, Float)')
+        runTestThrowsException(self, 'fsub.asm', ('Exception', 'invalid operand types: expected (_, Float, Float), got (_, Foo, Float)',))
 
     def testFMUL(self):
-        runTestThrowsException(self, 'fmul.asm', 'uncaught object: Exception = invalid operand types: expected (_, Float, Float), got (_, Foo, Float)')
+        runTestThrowsException(self, 'fmul.asm', ('Exception', 'invalid operand types: expected (_, Float, Float), got (_, Foo, Float)',))
 
     def testFDIV(self):
-        runTestThrowsException(self, 'fdiv.asm', 'uncaught object: Exception = invalid operand types: expected (_, Float, Float), got (_, Foo, Float)')
+        runTestThrowsException(self, 'fdiv.asm', ('Exception', 'invalid operand types: expected (_, Float, Float), got (_, Foo, Float)',))
 
     def testFLT(self):
-        runTestThrowsException(self, 'flt.asm', 'uncaught object: Exception = invalid operand types: expected (_, Float, Float), got (_, Foo, Float)')
+        runTestThrowsException(self, 'flt.asm', ('Exception', 'invalid operand types: expected (_, Float, Float), got (_, Foo, Float)',))
 
     def testFLTE(self):
-        runTestThrowsException(self, 'flte.asm', 'uncaught object: Exception = invalid operand types: expected (_, Float, Float), got (_, Foo, Float)')
+        runTestThrowsException(self, 'flte.asm', ('Exception', 'invalid operand types: expected (_, Float, Float), got (_, Foo, Float)',))
 
     def testFGT(self):
-        runTestThrowsException(self, 'fgt.asm', 'uncaught object: Exception = invalid operand types: expected (_, Float, Float), got (_, Foo, Float)')
+        runTestThrowsException(self, 'fgt.asm', ('Exception', 'invalid operand types: expected (_, Float, Float), got (_, Foo, Float)',))
 
     def testFGTE(self):
-        runTestThrowsException(self, 'fgte.asm', 'uncaught object: Exception = invalid operand types: expected (_, Float, Float), got (_, Foo, Float)')
+        runTestThrowsException(self, 'fgte.asm', ('Exception', 'invalid operand types: expected (_, Float, Float), got (_, Foo, Float)',))
 
     def testFEQ(self):
-        runTestThrowsException(self, 'feq.asm', 'uncaught object: Exception = invalid operand types: expected (_, Float, Float), got (_, Foo, Float)')
+        runTestThrowsException(self, 'feq.asm', ('Exception', 'invalid operand types: expected (_, Float, Float), got (_, Foo, Float)',))
 
 
 class ObjectInstructionsTests(unittest.TestCase):
@@ -1334,7 +1336,7 @@ class ExceptionMechanismTests(unittest.TestCase):
         runTest(self, 'terminating_processes.asm', sorted(expected_output), output_processing_function=lambda _: sorted(filter(lambda _: (_.startswith('Hello') or _.startswith('uncaught')), _.strip().splitlines())))
 
     def testClosureFromGlobalResgisterSet(self):
-        runTestThrowsException(self, 'closure_from_nonlocal_registers.asm', 'uncaught object: Exception = creating closures from nonlocal registers is forbidden')
+        runTestThrowsException(self, 'closure_from_nonlocal_registers.asm', ('Exception', 'creating closures from nonlocal registers is forbidden',))
 
 
 class MiscTests(unittest.TestCase):
@@ -1378,7 +1380,7 @@ class ProcessAbstractionTests(unittest.TestCase):
     PATH = './sample/asm/process_abstraction'
 
     def testProcessesHaveSeparateGlobalRegisterSets(self):
-        runTestReportsException(self, 'separate_global_rs.asm', 'uncaught object: Exception = (get) read from null register: 1')
+        runTestReportsException(self, 'separate_global_rs.asm', ('Exception', '(get) read from null register: 1',))
 
 
 class ConcurrencyTests(unittest.TestCase):
@@ -1391,10 +1393,10 @@ class ConcurrencyTests(unittest.TestCase):
         runTestSplitlines(self, 'joining_a_process.asm', ['Hello concurrent World! (1)', 'Hello concurrent World! (2)'], 0)
 
     def testJoiningJoinedProcess(self):
-        runTestThrowsException(self, 'joining_joined_process.asm', 'uncaught object: Exception = process cannot be joined')
+        runTestThrowsException(self, 'joining_joined_process.asm', ('Exception', 'process cannot be joined',))
 
     def testJoiningDetachedProcess(self):
-        runTestThrowsException(self, 'joining_detached_process.asm', 'uncaught object: Exception = process cannot be joined')
+        runTestThrowsException(self, 'joining_detached_process.asm', ('Exception', 'process cannot be joined',))
 
     def testDetachingProcess(self):
         runTestSplitlines(
@@ -1414,12 +1416,12 @@ class ConcurrencyTests(unittest.TestCase):
     def testStackCorruptedOnMainOrphaningProcess(self):
         # this will of course generate leaks, but we are not interested in them since
         # after process termination operating system will automatically reclaim memory
-        runTestThrowsException(self, 'main_orphaning_processes.asm', 'uncaught object: Exception = joinable process in dropped frame')
+        runTestThrowsException(self, 'main_orphaning_processes.asm', ('Exception', 'joinable process in dropped frame',))
 
     def testStackCorruptedOnNonMainFunctionOrphaningProcess(self):
         # this will of course generate leaks, but we are not interested in them since
         # after process termination operating system will automatically reclaim memory
-        runTestThrowsException(self, 'non_main_orphaning_processes.asm', 'uncaught object: Exception = joinable process in dropped frame')
+        runTestThrowsException(self, 'non_main_orphaning_processes.asm', ('Exception', 'joinable process in dropped frame',))
 
     def testGettingPriorityOfAProcess(self):
         runTest(self, 'get_priority.asm', '1')
@@ -1465,13 +1467,13 @@ class WatchdogTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'from_undefined_function.asm', './sample/asm/watchdog/from_undefined_function.asm:60: error: watchdog from undefined function undefined_function/0')
 
     def testWatchdogFromUndefinedFunctionCaughtAtRuntime(self):
-        runTestThrowsException(self, 'from_undefined_function_at_runtime.asm', 'uncaught object: Exception = watchdog process from undefined function: undefined_function/0')
+        runTestThrowsException(self, 'from_undefined_function_at_runtime.asm', ('Exception', 'watchdog process from undefined function: undefined_function/0',))
 
     def testWatchdogAlreadySpawnedCaughtAtRuntime(self):
         runTest(self, 'already_spawned.asm', 'process spawned with <Function: __entry> died')
 
     def testWatchdogMustBeANativeFunction(self):
-        runTestThrowsException(self, 'must_be_a_native_function.asm', 'uncaught object: Exception = watchdog process must be a native function, used foreign World::print_hello/0')
+        runTestThrowsException(self, 'must_be_a_native_function.asm', ('Exception', 'watchdog process must be a native function, used foreign World::print_hello/0',))
 
     def testWatchdogTerminatedByARunawayExceptionDoesNotLeak(self):
         runTest(self, 'terminated_watchdog.asm', 'watchdog process terminated by: Function: \'Function: broken_process/0\'')
