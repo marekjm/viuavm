@@ -318,3 +318,80 @@ int CPU::run() {
 
     return return_code;
 }
+
+CPU::CPU():
+    bytecode(nullptr), bytecode_size(0), executable_offset(0),
+    thrown(nullptr), caught(nullptr),
+    return_code(0),
+    debug(false), errors(false)
+{
+    auto t = new std::thread(ff_call_processor, &foreign_call_queue, &foreign_functions, &foreign_functions_mutex, &foreign_call_queue_mutex, &foreign_call_queue_condition);
+    foreign_call_workers.push_back(t);
+}
+
+CPU::~CPU() {
+    /*  Destructor frees memory at bytecode pointer so make sure you passed a copy of the bytecode to the constructor
+     *  if you want to keep it around after the CPU is finished.
+     */
+    if (bytecode) { delete[] bytecode; }
+
+    /** Send a poison pill to every foreign function call worker thread.
+     *  Collect them after they are killed.
+     *
+     * Use std::defer_lock to preven constructor from acquiring the mutex
+     * .lock() is called manually later
+     */
+    std::unique_lock<std::mutex> lck(foreign_call_queue_mutex, std::defer_lock);
+    for (auto i = foreign_call_workers.size(); i; --i) {
+        // acquire the mutex for foreign call request queue
+        lck.lock();
+
+        // send poison pill;
+        // one per worker thread since we can be sure that a thread consumes at
+        // most one pill
+        foreign_call_queue.push_back(nullptr);
+
+        // release the mutex and notify worker thread that there is work to do
+        // the thread consumes the pill and aborts
+        lck.unlock();
+        foreign_call_queue_condition.notify_all();
+    }
+    while (not foreign_call_workers.empty()) {
+        // fetch handle for worker thread and
+        // remove it from the list of workers
+        auto w = foreign_call_workers.back();
+        foreign_call_workers.pop_back();
+
+        // join worker back to main thread and
+        // delete it
+        // by now, all workers should be killed by poison pills we sent them earlier
+        w->join();
+        delete w;
+    }
+
+    std::map<std::string, std::pair<unsigned, byte*> >::iterator lm = linked_modules.begin();
+    while (lm != linked_modules.end()) {
+        std::string lkey = lm->first;
+        byte *ptr = lm->second.second;
+
+        ++lm;
+
+        linked_modules.erase(lkey);
+        delete[] ptr;
+    }
+
+    std::map<std::string, Prototype*>::iterator pr = typesystem.begin();
+    while (pr != typesystem.end()) {
+        std::string proto_name = pr->first;
+        Prototype* proto_ptr = pr->second;
+
+        ++pr;
+
+        typesystem.erase(proto_name);
+        delete proto_ptr;
+    }
+
+    for (unsigned i = 0; i < cxx_dynamic_lib_handles.size(); ++i) {
+        dlclose(cxx_dynamic_lib_handles[i]);
+    }
+}
