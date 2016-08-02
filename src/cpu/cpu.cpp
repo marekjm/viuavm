@@ -325,8 +325,7 @@ CPU::CPU():
     return_code(0),
     debug(false), errors(false)
 {
-    auto t = new std::thread(ff_call_processor, &foreign_call_queue, &foreign_functions, &foreign_functions_mutex, &foreign_call_queue_mutex, &foreign_call_queue_condition);
-    foreign_call_workers.push_back(t);
+    foreign_call_workers.push_back(new std::thread(ff_call_processor, &foreign_call_queue, &foreign_functions, &foreign_functions_mutex, &foreign_call_queue_mutex, &foreign_call_queue_condition));
 }
 
 CPU::~CPU() {
