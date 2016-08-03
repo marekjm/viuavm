@@ -1359,6 +1359,25 @@ class ExternalModulesTests(unittest.TestCase):
         MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES = (72736,)
         runTest(self, 'throwing.asm', 'OH NOES!', 0)
 
+    def testManyHelloWorld(self):
+        # expected output must be sorted because it is not defined in what order the messages will be printed if
+        # there is more than one FFI or VP scheduler running
+        expected_output = sorted([
+            'Hello Joe!',
+            'Hello Robert!',
+            'Hello Mike!',
+            'Hello Bjarne!',
+            'Hello Guido!',
+            'Hello Dennis!',
+            'Hello Bram!',
+            'Hello Herb!',
+            'Hello Anthony!',
+            'Hello Alan!',
+            'Hello Ada!',
+            'Hello Charles!',
+        ])
+        runTest(self, 'many_hello_world.asm', expected_output, 0, output_processing_function=lambda _: sorted(_.strip().splitlines()))
+
 
 class ProcessAbstractionTests(unittest.TestCase):
     PATH = './sample/asm/process_abstraction'
