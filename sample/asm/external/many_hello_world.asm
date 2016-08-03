@@ -21,6 +21,7 @@
 
 
 .function: printer_wrapper/1
+    -- just print the parameter received
     frame ^[(pamv 0 (arg 1 0))]
     call printer::print/1
 
@@ -28,9 +29,13 @@
 .end
 
 .function: process_spawner/1
+    -- call printer::print/1 in a new process to
+    -- not block the execution
     frame ^[(pamv 0 (arg 1 0))]
     process 1 printer_wrapper/1
 
+    -- detach the process since
+    -- we do not care about its return value
     frame ^[(param 0 1)]
     msg 0 detach/1
 
@@ -38,8 +43,15 @@
 .end
 
 .function: main/0
+    -- link foreign printer module
     import "build/test/printer"
 
+    -- spawn several processes, each printing a different "Hello {who}!"
+    -- the hellos do not have to appear in the order their functions are
+    -- called if there are multiple FFI or VP schedulers spawned
+    --
+    -- this program is embarrassingly simple but it exhibits the uncertainty
+    -- of order the parallelism introduces
     frame ^[(pamv 0 (strstore 1 "Joe"))]
     call process_spawner/1
 
