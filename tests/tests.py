@@ -1378,6 +1378,31 @@ class ExternalModulesTests(unittest.TestCase):
         ])
         runTest(self, 'many_hello_world.asm', expected_output, 0, output_processing_function=lambda _: sorted(_.strip().splitlines()))
 
+    def testLongRunningFunctionBlocksOneScheduler(self):
+        # expected output must be sorted because it is not defined in what order the messages will be printed if
+        # there is more than one FFI or VP scheduler running
+        expected_output = sorted([
+            'sleeper::lazy_print/0: sleep for 5ms',
+            'Hello Joe!',
+            'Hello Robert!',
+            'Hello Mike!',
+            'Hello Bjarne!',
+            'Hello Guido!',
+            'Hello Dennis!',
+            'Hello Bram!',
+            'Hello Herb!',
+            'Hello Anthony!',
+            'Hello Alan!',
+            'Hello Ada!',
+            'Hello Charles!',
+            'sleeper::lazy_print/0: sleep for 15ms',
+            'sleeper::lazy_print/0: sleep for 25ms',
+            'sleeper::lazy_print/0: sleep for 10ms',
+            'sleeper::lazy_print/0: sleep for 100ms',
+            'sleeper::lazy_print/0: done',
+        ])
+        runTest(self, 'sleeper.asm', expected_output, 0, output_processing_function=lambda _: sorted(_.strip().splitlines()))
+
 
 class ProcessAbstractionTests(unittest.TestCase):
     PATH = './sample/asm/process_abstraction'

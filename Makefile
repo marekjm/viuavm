@@ -148,6 +148,12 @@ build/test/printer.o: sample/asm/external/printer.cpp
 build/test/printer.so: build/test/printer.o build/platform/registerset.o build/platform/type.o build/platform/exception.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -fPIC -shared -o $@ $^
 
+build/test/sleeper.o: sample/asm/external/sleeper.cpp
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o build/test/sleeper.o ./sample/asm/external/sleeper.cpp
+
+build/test/sleeper.so: build/test/sleeper.o build/platform/registerset.o build/platform/type.o build/platform/exception.o
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -fPIC -shared -o $@ $^
+
 build/test/math.o:  sample/asm/external/math.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o build/test/math.o ./sample/asm/external/math.cpp
 
@@ -160,7 +166,7 @@ build/test/throwing.o:  sample/asm/external/throwing.cpp
 build/test/throwing.so: build/test/throwing.o build/platform/registerset.o build/platform/exception.o build/platform/type.o build/platform/pointer.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -fPIC -shared -o $@ $^
 
-compile-test: build/test/math.so build/test/World.so build/test/throwing.so build/test/printer.so
+compile-test: build/test/math.so build/test/World.so build/test/throwing.so build/test/printer.so build/test/sleeper.so
 
 test: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/dis compile-test stdlib standardlibrary
 	VIUAPATH=./build/stdlib python3 ./tests/tests.py --verbose --catch --failfast
