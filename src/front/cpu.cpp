@@ -35,18 +35,41 @@ using namespace std;
 const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file which cannot be run on CPU without prior compilation";
 
 
-// MISC FLAGS
-bool SHOW_HELP = false;
-bool SHOW_VERSION = false;
-bool VERBOSE = false;
+static bool usage(const string program, const vector<string>& args) {
+    bool show_help = false;
+    bool show_version = false;
+    bool verbose = false;
+    bool show_info = false;
 
+    for (auto option : args) {
+        if (option == "--help" or option == "-h") {
+            show_help = true;
+            continue;
+        } else if (option == "--version" or option == "-V") {
+            show_version = true;
+            continue;
+        } else if (option == "--verbose" or option == "-v") {
+            verbose = true;
+            continue;
+        } else if (option == "--info" or option == "-i") {
+            show_info = true;
+            continue;
+        } else if (str::startswith(option, "-")) {
+            cout << "error: unknown option: " << option << endl;
+            exit(1);
+        }
+    }
 
-static bool usage(const char* program, bool show_help, bool show_version, bool verbose) {
     if (show_help or (show_version and verbose)) {
         cout << "Viua VM CPU, version ";
     }
     if (show_help or show_version) {
         cout << VERSION << '.' << MICRO << endl;
+    }
+    if (show_info) {
+        cout << "version=" << VERSION << '.' << MICRO << endl;
+        cout << "sched:ffi=" << VIUA_SCHED_FFI << endl;
+        cout << "sched:vp=" << VIUA_SCHED_VP << endl;
     }
     if (show_help) {
         cout << "\nUSAGE:\n";
@@ -58,32 +81,17 @@ static bool usage(const char* program, bool show_help, bool show_version, bool v
              ;
     }
 
-    return (show_help or show_version);
+    return (show_help or show_version or show_info);
 }
 
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
     vector<string> args;
-    string option;
     for (int i = 1; i < argc; ++i) {
-        option = string(argv[i]);
-        if (option == "--help" or option == "-h") {
-            SHOW_HELP = true;
-            continue;
-        } else if (option == "--version" or option == "-V") {
-            SHOW_VERSION = true;
-            continue;
-        } else if (option == "--verbose" or option == "-v") {
-            VERBOSE = true;
-            continue;
-        } else if (str::startswith(option, "-")) {
-            cout << "error: unknown option: " << option << endl;
-            return 1;
-        }
         args.push_back(argv[i]);
     }
 
-    if (usage(argv[0], SHOW_HELP, SHOW_VERSION, VERBOSE)) { return 0; }
+    if (usage(argv[0], args)) { return 0; }
 
     if (args.size() == 0) {
         cout << "fatal: no input file" << endl;
