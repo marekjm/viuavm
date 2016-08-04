@@ -323,10 +323,12 @@ CPU::CPU():
     bytecode(nullptr), bytecode_size(0), executable_offset(0),
     thrown(nullptr), caught(nullptr),
     return_code(0),
+    ffi_schedulers_limit(2),
     debug(false), errors(false)
 {
-    foreign_call_workers.push_back(new std::thread(ff_call_processor, &foreign_call_queue, &foreign_functions, &foreign_functions_mutex, &foreign_call_queue_mutex, &foreign_call_queue_condition));
-    foreign_call_workers.push_back(new std::thread(ff_call_processor, &foreign_call_queue, &foreign_functions, &foreign_functions_mutex, &foreign_call_queue_mutex, &foreign_call_queue_condition));
+    for (auto i = ffi_schedulers_limit; i; --i) {
+        foreign_call_workers.push_back(new std::thread(ff_call_processor, &foreign_call_queue, &foreign_functions, &foreign_functions_mutex, &foreign_call_queue_mutex, &foreign_call_queue_condition));
+    }
 }
 
 CPU::~CPU() {
