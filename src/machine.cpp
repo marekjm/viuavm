@@ -24,3 +24,5 @@ const char *VIUA_MAGIC_NUMBER = "VIUA";
 
 const ViuaBinaryType VIUA_LINKABLE = 'L';
 const ViuaBinaryType VIUA_EXECUTABLE = 'E';
+
+const unsigned VIUA_SCHED_FFI = 2;

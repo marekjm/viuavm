@@ -323,7 +323,7 @@ CPU::CPU():
     bytecode(nullptr), bytecode_size(0), executable_offset(0),
     thrown(nullptr), caught(nullptr),
     return_code(0),
-    ffi_schedulers_limit(2),
+    ffi_schedulers_limit(VIUA_SCHED_FFI),
     debug(false), errors(false)
 {
     for (auto i = ffi_schedulers_limit; i; --i) {
