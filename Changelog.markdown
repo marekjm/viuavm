@@ -41,6 +41,9 @@ There are several categories of change:
   contains out-of-range jumps
 - fix: removed race condition that would swallow exceptions thrown in FFI calls without registering them in watchdog, or
   priting stack trace
+- feature: machine can spawn and utilise multiple FFI schedulers to execute several foreign calls in parallel
+  sufficient hardware resources (CPU cores) are required to avoid overscheduling, currently the number of FFI schedulers
+  spawned by default is 2
 
 
 ----
