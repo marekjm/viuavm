@@ -32,6 +32,7 @@ extern const ViuaBinaryType VIUA_LINKABLE;
 extern const ViuaBinaryType VIUA_EXECUTABLE;
 
 extern const unsigned VIUA_SCHED_FFI;
+extern const unsigned VIUA_SCHED_VP;
 
 
 #endif

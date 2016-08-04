@@ -26,3 +26,4 @@ const ViuaBinaryType VIUA_LINKABLE = 'L';
 const ViuaBinaryType VIUA_EXECUTABLE = 'E';
 
 const unsigned VIUA_SCHED_FFI = 2;
+const unsigned VIUA_SCHED_VP = 1;
