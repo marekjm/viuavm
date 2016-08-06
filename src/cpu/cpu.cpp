@@ -312,7 +312,7 @@ int CPU::run() {
     viua::scheduler::VirtualProcessScheduler vps(this);
     vps.bootstrap(commandline_arguments);
 
-    while (vps.burst());
+    while (vps());
 
     return_code = vps.exit();
 
