@@ -360,8 +360,8 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
 
     return ticked;
 }
-bool viua::scheduler::VirtualProcessScheduler::operator()() {
-    return burst();
+void viua::scheduler::VirtualProcessScheduler::operator()() {
+    while (burst());
 }
 
 void viua::scheduler::VirtualProcessScheduler::bootstrap(const vector<string>& commandline_arguments) {
