@@ -92,8 +92,6 @@ class CPU {
 
     int return_code;
 
-    uint64_t instruction_counter;
-
     /*  This is the interface between programs compiled to VM bytecode and
      *  extension libraries written in C++.
      */
