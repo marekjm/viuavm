@@ -84,12 +84,6 @@ class CPU {
     std::map<std::string, std::pair<std::string, byte*>> linked_blocks;
     std::map<std::string, std::pair<unsigned, byte*> > linked_modules;
 
-    /*  Slot for thrown objects (typically exceptions).
-     *  Can be set by user code and the CPU.
-     */
-    Type* thrown;
-    Type* caught;
-
     int return_code;
 
     /*  This is the interface between programs compiled to VM bytecode and

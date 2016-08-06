@@ -321,7 +321,6 @@ int CPU::run() {
 
 CPU::CPU():
     bytecode(nullptr), bytecode_size(0), executable_offset(0),
-    thrown(nullptr), caught(nullptr),
     return_code(0),
     ffi_schedulers_limit(VIUA_SCHED_FFI),
     debug(false), errors(false)
