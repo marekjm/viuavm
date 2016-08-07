@@ -102,7 +102,10 @@ class CPU {
     std::vector<std::unique_ptr<Process>> free_virtual_processes;
     std::mutex free_virtual_processes_mutex;
     std::condition_variable free_virtual_processes_cv;
-    std::vector<viua::scheduler::VirtualProcessScheduler*> virtual_process_schedulers;
+    // list of running VP schedulers, pairs of {scheduler-pointer, thread}
+    std::vector<std::pair<viua::scheduler::VirtualProcessScheduler*, std::thread>> virtual_process_schedulers;
+    // list of idle VP schedulers
+    std::vector<viua::scheduler::VirtualProcessScheduler*> idle_virtual_process_schedulers;
 
     /*  This is the interface between programs compiled to VM bytecode and
      *  extension libraries written in C++.
