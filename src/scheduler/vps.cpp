@@ -369,7 +369,7 @@ void viua::scheduler::VirtualProcessScheduler::operator()() {
             return not free_processes->empty();
         }));
 
-        unique_ptr<Process> adopted_process(free_processes->front());
+        unique_ptr<Process> adopted_process(std::move(free_processes->front()));
         free_processes->erase(free_processes->begin());
 
         // unlock as soon as possible to allow other threads to access the free
@@ -405,7 +405,7 @@ int viua::scheduler::VirtualProcessScheduler::exit() const {
     return exit_code;
 }
 
-viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(CPU *acpu, vector<Process*> *fp,
+viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(CPU *acpu, vector<unique_ptr<Process>> *fp,
                                                                   mutex *fp_mtx,
                                                                   condition_variable *fp_cv):
     attached_cpu(acpu),

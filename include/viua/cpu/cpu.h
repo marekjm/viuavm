@@ -98,7 +98,8 @@ class CPU {
      *
      *  Also, a list of spawned VP schedulers.
      */
-    std::vector<Process*> free_virtual_processes;
+    // list of virtual processes not associated with any VP scheduler
+    std::vector<std::unique_ptr<Process>> free_virtual_processes;
     std::mutex free_virtual_processes_mutex;
     std::condition_variable free_virtual_processes_cv;
     std::vector<viua::scheduler::VirtualProcessScheduler*> virtual_process_schedulers;
