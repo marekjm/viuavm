@@ -55,6 +55,10 @@ namespace viua {
 
             void resurrectWatchdog();
 
+            // if scheduler hits heavy load it starts posting processes to CPU
+            // to let other schedulers at them
+            const decltype(processes)::size_type heavy_load = 16;
+
             public:
 
             CPU* cpu() const;
