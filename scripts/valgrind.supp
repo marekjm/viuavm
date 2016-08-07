@@ -41,3 +41,21 @@
     fun:pool
     ...
 }
+{
+    dlopen_doit/calloc suppression for TravisCI
+    Memcheck:Leak
+    match-leak-kinds: reachable
+    fun:calloc
+    ...
+    fun:dlopen_doit
+    ...
+}
+{
+    dlopen_doit/malloc suppression for TravisCI
+    Memcheck:Leak
+    match-leak-kinds: reachable
+    fun:malloc
+    ...
+    fun:dlopen_doit
+    ...
+}
