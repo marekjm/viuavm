@@ -382,7 +382,7 @@ void viua::scheduler::VirtualProcessScheduler::operator()() {
             break;
         }
 
-        while (processes.size() < light_load or not free_processes->empty()) {
+        while (processes.size() < light_load and not free_processes->empty()) {
             processes.push_back(std::move(free_processes->front()));
             free_processes->erase(free_processes->begin());
         }
