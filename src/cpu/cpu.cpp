@@ -316,17 +316,21 @@ int CPU::run() {
         throw "null bytecode (maybe not loaded?)";
     }
 
-    viua::scheduler::VirtualProcessScheduler vps(this, &free_virtual_processes, &free_virtual_processes_mutex, &free_virtual_processes_cv);
-    vps.bootstrap(commandline_arguments);
+    viua::scheduler::VirtualProcessScheduler primary_vps(this, &free_virtual_processes, &free_virtual_processes_mutex, &free_virtual_processes_cv);
+    primary_vps.bootstrap(commandline_arguments);
 
-    auto vps_thread = thread([&vps]{ vps(); });
+    viua::scheduler::VirtualProcessScheduler secondary_vps(this, &free_virtual_processes, &free_virtual_processes_mutex, &free_virtual_processes_cv);
 
-    //free_virtual_processes.push_back(nullptr);
-    //free_virtual_processes_cv.notify_one();
-    vps.shutdown();
-    vps_thread.join();
+    auto primary_vps_thread = thread([&primary_vps]{ primary_vps(); });
+    auto secondary_vps_thread = thread([&secondary_vps]{ secondary_vps(); });
 
-    return_code = vps.exit();
+    primary_vps.shutdown();
+    primary_vps_thread.join();
+
+    secondary_vps.shutdown();
+    secondary_vps_thread.join();
+
+    return_code = primary_vps.exit();
 
     return return_code;
 }
