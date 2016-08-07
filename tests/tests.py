@@ -216,7 +216,10 @@ def valgrindCheck(self, path):
 
         self.assertIn(total_leak_bytes, (MEMORY_LEAK_CHECKS_ALLOWED_LEAK_VALUES + MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES))
     except AssertionError:
-        p = subprocess.Popen(('valgrind', '--suppressions=./scripts/valgrind.supp', '--leak-check=full', './build/bin/vm/cpu', path), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        options = ('--suppressions=./scripts/valgrind.supp', '--leak-check=full',)
+        if os.environ.get('PROJECT_NAME', ''):  # running on TravisCI
+            options += ('--show-reachable=yes',)
+        p = subprocess.Popen(('valgrind', *options, './build/bin/vm/cpu', path), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output, error = p.communicate()
         exit_code = p.wait()
         error = error.decode('utf-8')
