@@ -225,7 +225,12 @@ Process* viua::scheduler::VirtualProcessScheduler::process() {
 Process* viua::scheduler::VirtualProcessScheduler::spawn(unique_ptr<Frame> frame, Process *parent) {
     unique_ptr<Process> p(new Process(std::move(frame), this, parent));
     p->begin();
-    processes.push_back(std::move(p));
+    if (processes.size() > heavy_load) {
+        attached_cpu->postFreeProcess(std::move(p));
+    } else {
+        processes.push_back(std::move(p));
+    }
+
     return processes.back().get();
 }
 
@@ -366,22 +371,18 @@ void viua::scheduler::VirtualProcessScheduler::operator()() {
 
         unique_lock<mutex> lock(*free_processes_mutex);
         while (not free_processes_cv->wait_for(lock, chrono::milliseconds(100), [this]{
-            return not free_processes->empty();
+            return (not free_processes->empty() or shut_down);
         }));
 
-        unique_ptr<Process> adopted_process(std::move(free_processes->front()));
-        free_processes->erase(free_processes->begin());
-
-        // unlock as soon as possible to allow other threads to access the free
-        // processes list
-        lock.unlock();
-
-        // finish running if received poison pill
-        if (adopted_process == nullptr) {
+        if (free_processes->empty()) {
+            // this means that shutdown() was received
             break;
         }
 
-        processes.push_back(std::move(adopted_process));
+        while (processes.size() < light_load or not free_processes->empty()) {
+            processes.push_back(std::move(free_processes->front()));
+            free_processes->erase(free_processes->begin());
+        }
     }
 }
 
@@ -405,6 +406,10 @@ int viua::scheduler::VirtualProcessScheduler::exit() const {
     return exit_code;
 }
 
+void viua::scheduler::VirtualProcessScheduler::shutdown() {
+    shut_down = true;
+}
+
 viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(CPU *acpu, vector<unique_ptr<Process>> *fp,
                                                                   mutex *fp_mtx,
                                                                   condition_variable *fp_cv):
@@ -415,7 +420,8 @@ viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(CPU *acpu, vec
     main_process(nullptr),
     current_process_index(0),
     watchdog_process(nullptr),
-    exit_code(0)
+    exit_code(0),
+    shut_down(false)
 {
 }
 

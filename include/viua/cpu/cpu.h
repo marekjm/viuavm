@@ -181,6 +181,8 @@ class CPU {
         void requestForeignFunctionCall(Frame*, Process*);
         void requestForeignMethodCall(const std::string&, Type*, Frame*, RegisterSet*, RegisterSet*, Process*);
 
+        void postFreeProcess(std::unique_ptr<Process>);
+
         int run();
 
         int exit() const;

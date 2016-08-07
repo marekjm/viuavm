@@ -25,6 +25,7 @@
 #include <utility>
 #include <memory>
 #include <mutex>
+#include <atomic>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/cpu/frame.h>
 
@@ -58,6 +59,8 @@ namespace viua {
             // if scheduler hits heavy load it starts posting processes to CPU
             // to let other schedulers at them
             const decltype(processes)::size_type heavy_load = 16;
+            const decltype(processes)::size_type light_load = 4;
+            std::atomic_bool shut_down;
 
             public:
 
@@ -102,6 +105,7 @@ namespace viua {
             void operator()();
 
             void bootstrap(const std::vector<std::string>&);
+            void shutdown();
             int exit() const;
 
             VirtualProcessScheduler(CPU*, std::vector<std::unique_ptr<Process>>*, std::mutex*, std::condition_variable*);

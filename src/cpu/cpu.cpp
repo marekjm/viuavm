@@ -298,6 +298,13 @@ void CPU::requestForeignMethodCall(const string& name, Type *object, Frame *fram
     foreign_methods.at(name)(object, frame, nullptr, nullptr, p, this);
 }
 
+void CPU::postFreeProcess(unique_ptr<Process> p) {
+    unique_lock<mutex> lock(free_virtual_processes_mutex);
+    free_virtual_processes.push_back(std::move(p));
+    lock.unlock();
+    free_virtual_processes_cv.notify_one();
+}
+
 int CPU::exit() const {
     return return_code;
 }
@@ -314,8 +321,9 @@ int CPU::run() {
 
     auto vps_thread = thread([&vps]{ vps(); });
 
-    free_virtual_processes.push_back(nullptr);
-    free_virtual_processes_cv.notify_one();
+    //free_virtual_processes.push_back(nullptr);
+    //free_virtual_processes_cv.notify_one();
+    vps.shutdown();
     vps_thread.join();
 
     return_code = vps.exit();
