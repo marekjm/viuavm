@@ -24,6 +24,7 @@
 #include <string>
 #include <utility>
 #include <memory>
+#include <mutex>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/cpu/frame.h>
 
@@ -38,6 +39,10 @@ namespace viua {
             /** Scheduler of Viua VM virtual processes.
              */
             CPU *attached_cpu;
+
+            std::vector<Process*> *free_processes;
+            std::mutex *free_processes_mutex;
+            std::condition_variable *free_processes_cv;
 
             Process *main_process;
             std::vector<std::unique_ptr<Process>> processes;
@@ -95,7 +100,7 @@ namespace viua {
             void bootstrap(const std::vector<std::string>&);
             int exit() const;
 
-            VirtualProcessScheduler(CPU*);
+            VirtualProcessScheduler(CPU*, std::vector<Process*>*, std::mutex*, std::condition_variable*);
             ~VirtualProcessScheduler();
         };
     }

@@ -309,10 +309,14 @@ int CPU::run() {
         throw "null bytecode (maybe not loaded?)";
     }
 
-    viua::scheduler::VirtualProcessScheduler vps(this);
+    viua::scheduler::VirtualProcessScheduler vps(this, &free_virtual_processes, &free_virtual_processes_mutex, &free_virtual_processes_cv);
     vps.bootstrap(commandline_arguments);
 
-    vps();
+    auto vps_thread = thread([&vps]{ vps(); });
+
+    free_virtual_processes.push_back(nullptr);
+    free_virtual_processes_cv.notify_one();
+    vps_thread.join();
 
     return_code = vps.exit();
 

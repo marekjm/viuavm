@@ -361,7 +361,28 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
     return ticked;
 }
 void viua::scheduler::VirtualProcessScheduler::operator()() {
-    while (burst());
+    while (true) {
+        while (burst());
+
+        unique_lock<mutex> lock(*free_processes_mutex);
+        while (not free_processes_cv->wait_for(lock, chrono::milliseconds(100), [this]{
+            return not free_processes->empty();
+        }));
+
+        unique_ptr<Process> adopted_process(free_processes->front());
+        free_processes->erase(free_processes->begin());
+
+        // unlock as soon as possible to allow other threads to access the free
+        // processes list
+        lock.unlock();
+
+        // finish running if received poison pill
+        if (adopted_process == nullptr) {
+            break;
+        }
+
+        processes.push_back(std::move(adopted_process));
+    }
 }
 
 void viua::scheduler::VirtualProcessScheduler::bootstrap(const vector<string>& commandline_arguments) {
@@ -384,8 +405,13 @@ int viua::scheduler::VirtualProcessScheduler::exit() const {
     return exit_code;
 }
 
-viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(CPU *acpu):
+viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(CPU *acpu, vector<Process*> *fp,
+                                                                  mutex *fp_mtx,
+                                                                  condition_variable *fp_cv):
     attached_cpu(acpu),
+    free_processes(fp),
+    free_processes_mutex(fp_mtx),
+    free_processes_cv(fp_cv),
     main_process(nullptr),
     current_process_index(0),
     watchdog_process(nullptr),

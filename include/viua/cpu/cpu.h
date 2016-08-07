@@ -86,6 +86,23 @@ class CPU {
 
     int return_code;
 
+    /*
+     *  VIRTUAL PROCESSES SCHEDULING
+     *
+     *  List of virtual processes that do not belong to any scheduler, and
+     *  are waiting to be adopted, along with means of synchronization of
+     *  concurrent accesses to said list.
+     *  Schedulers can post their spawned processes to the CPU to let
+     *  other schedulers execute them (sometimes, a scheduler may fetch
+     *  its own process back).
+     *
+     *  Also, a list of spawned VP schedulers.
+     */
+    std::vector<Process*> free_virtual_processes;
+    std::mutex free_virtual_processes_mutex;
+    std::condition_variable free_virtual_processes_cv;
+    std::vector<viua::scheduler::VirtualProcessScheduler*> virtual_process_schedulers;
+
     /*  This is the interface between programs compiled to VM bytecode and
      *  extension libraries written in C++.
      */
