@@ -225,13 +225,16 @@ Process* viua::scheduler::VirtualProcessScheduler::process() {
 Process* viua::scheduler::VirtualProcessScheduler::spawn(unique_ptr<Frame> frame, Process *parent) {
     unique_ptr<Process> p(new Process(std::move(frame), this, parent));
     p->begin();
+
+    Process *process_ptr = p.get();
+
     if (processes.size() > heavy_load) {
         attached_cpu->postFreeProcess(std::move(p));
     } else {
         processes.push_back(std::move(p));
     }
 
-    return processes.back().get();
+    return process_ptr;
 }
 
 void viua::scheduler::VirtualProcessScheduler::spawnWatchdog(unique_ptr<Frame> frame) {
