@@ -1488,6 +1488,12 @@ class ConcurrencyTests(unittest.TestCase):
         assemble(os.path.join(self.PATH, source_lib), out=lib_path, opts=('--lib',))
         runTest(self, 'process_from_linked_base.asm', 'Hello World!')
 
+    def testMigratingProcessesBetweenSchedulers(self):
+        # sorted because the order is semi-random due to OS scheduling of
+        # VP scheduler threads
+        expected_output = ['Hello {}!'.format(i) for i in range(1, 65)]
+        runTestReturnsUnorderedLines(self, 'migrating_processes_between_schedulers.asm', expected_output)
+
 
 class WatchdogTests(unittest.TestCase):
     PATH = './sample/asm/watchdog'
