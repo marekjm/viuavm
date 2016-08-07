@@ -373,7 +373,7 @@ void viua::scheduler::VirtualProcessScheduler::operator()() {
         while (burst());
 
         unique_lock<mutex> lock(*free_processes_mutex);
-        while (not free_processes_cv->wait_for(lock, chrono::milliseconds(100), [this]{
+        while (not free_processes_cv->wait_for(lock, chrono::milliseconds(10), [this]{
             return (not free_processes->empty() or shut_down);
         }));
 
