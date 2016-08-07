@@ -219,7 +219,7 @@ def valgrindCheck(self, path):
         options = ('--suppressions=./scripts/valgrind.supp', '--leak-check=full',)
         if os.environ.get('PROJECT_NAME', ''):  # running on TravisCI
             options += ('--show-reachable=yes',)
-        arguments = ('valgrind', *options, './build/bin/vm/cpu', path)
+        arguments = ('valgrind',) + options + ('./build/bin/vm/cpu', path,)
         p = subprocess.Popen(arguments, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output, error = p.communicate()
         exit_code = p.wait()
