@@ -318,7 +318,10 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                     // if trace size is equal to one, just print the top-most function
                     cout << trace[0]->function_name;
                 } else {
-                    cout << "<function unavailable>";
+                    // in all other cases print the function the process has been started with
+                    // it is a safe bet (perhaps even safer than printing the top-most function on
+                    // the stack as that may have been changed by a tail call...)
+                    cout << th->starting_function();
                 }
                 cout << " has terminated\n";
                 printStackTrace(th);

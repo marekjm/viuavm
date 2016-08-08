@@ -459,6 +459,10 @@ Process* Process::parent() const {
     return parent_process;
 }
 
+string Process::starting_function() const {
+    return entry_function;
+}
+
 auto Process::priority() const -> decltype(process_priority) {
     return process_priority;
 }

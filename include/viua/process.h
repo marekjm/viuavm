@@ -267,6 +267,7 @@ class Process {
         bool suspended() const;
 
         Process* parent() const;
+        std::string starting_function() const;
 
         void pass(std::unique_ptr<Type>);
 
