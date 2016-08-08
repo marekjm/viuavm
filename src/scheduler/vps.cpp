@@ -314,7 +314,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                 if (trace.size() > 1) {
                     // if trace size if greater than one, detect if this is main process
                     cout << trace[(trace[0]->function_name == ENTRY_FUNCTION_NAME)]->function_name;
-                } else if (trace.size()) {
+                } else if (trace.size() == 1) {
                     // if trace size is equal to one, just print the top-most function
                     cout << trace[0]->function_name;
                 } else {
