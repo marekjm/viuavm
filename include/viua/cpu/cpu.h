@@ -32,6 +32,7 @@
 #include <tuple>
 #include <unordered_set>
 #include <utility>
+#include <memory>
 #include <algorithm>
 #include <stdexcept>
 #include <mutex>
@@ -112,6 +113,8 @@ class CPU {
     std::vector<std::thread*> foreign_call_workers;
 
     std::vector<void*> cxx_dynamic_lib_handles;
+
+    std::map<PID, std::vector<std::unique_ptr<Type>>> mailboxes;
 
     public:
         /*  Methods dealing with dynamic library loading.
