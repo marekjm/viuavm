@@ -154,6 +154,10 @@ class Process {
     unsigned process_priority;
     std::mutex process_mtx;
 
+    /*  Process identifier.
+     */
+    PID process_id;
+
     /*  Methods implementing individual instructions.
      */
     byte* opizero(byte*);
@@ -304,6 +308,8 @@ class Process {
         auto executionAt() const -> decltype(instruction_pointer);
 
         std::vector<Frame*> trace() const;
+
+        PID pid() const;
 
         Process(std::unique_ptr<Frame>, viua::scheduler::VirtualProcessScheduler*, Process*);
         ~Process();

@@ -540,6 +540,10 @@ vector<Frame*> Process::trace() const {
     return tr;
 }
 
+PID Process::pid() const {
+    return process_id;
+}
+
 
 Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualProcessScheduler *sch, Process* pt): scheduler(sch), parent_process(pt), entry_function(frm->function_name),
     regset(nullptr), uregset(nullptr), tmp(nullptr),
@@ -551,7 +555,8 @@ Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualProcessScheduler
     instruction_pointer(nullptr),
     finished(false), is_joinable(true),
     is_suspended(false),
-    process_priority(1)
+    process_priority(1),
+    process_id(this)
 {
     regset.reset(new RegisterSet(DEFAULT_REGISTER_SIZE));
     uregset = frm->regset;
