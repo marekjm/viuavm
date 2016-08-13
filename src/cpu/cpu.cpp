@@ -299,9 +299,11 @@ void CPU::requestForeignMethodCall(const string& name, Type *object, Frame *fram
 }
 
 void CPU::createMailbox(const PID pid) {
+    unique_lock<mutex> lck(mailbox_mutex);
     mailboxes.emplace(pid, vector<unique_ptr<Type>>{});
 }
 void CPU::deleteMailbox(const PID pid) {
+    unique_lock<mutex> lck(mailbox_mutex);
     mailboxes.erase(pid);
 }
 void CPU::send(const PID pid, unique_ptr<Type> message) {
