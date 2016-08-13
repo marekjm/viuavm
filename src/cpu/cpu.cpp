@@ -304,6 +304,13 @@ void CPU::createMailbox(const PID pid) {
 void CPU::deleteMailbox(const PID pid) {
     mailboxes.erase(pid);
 }
+void CPU::send(const PID pid, unique_ptr<Type> message) {
+    unique_lock<mutex> lck(mailbox_mutex);
+    if (mailboxes.count(pid) == 0) {
+        throw new Exception("invalid PID");
+    }
+    mailboxes[pid].push_back(std::move(message));
+}
 
 int CPU::exit() const {
     return return_code;
