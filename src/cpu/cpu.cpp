@@ -298,6 +298,13 @@ void CPU::requestForeignMethodCall(const string& name, Type *object, Frame *fram
     foreign_methods.at(name)(object, frame, nullptr, nullptr, p, this);
 }
 
+void CPU::createMailbox(const PID pid) {
+    mailboxes.emplace(pid, vector<unique_ptr<Type>>{});
+}
+void CPU::deleteMailbox(const PID pid) {
+    mailboxes.erase(pid);
+}
+
 int CPU::exit() const {
     return return_code;
 }

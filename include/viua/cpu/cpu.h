@@ -171,6 +171,9 @@ class CPU {
         void requestForeignFunctionCall(Frame*, Process*);
         void requestForeignMethodCall(const std::string&, Type*, Frame*, RegisterSet*, RegisterSet*, Process*);
 
+        void createMailbox(const PID);
+        void deleteMailbox(const PID);
+
         int run();
 
         int exit() const;
