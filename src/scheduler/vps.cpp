@@ -332,7 +332,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                 watchdog_process->pass(unique_ptr<Type>(death_message));
             }
 
-            attached_cpu->deleteMailbox(processes.at(i)->pid());
+            attached_cpu->deleteMailbox(th->pid());
             // push broken process to dead processes_list list to
             // erase it later
             dead_processes_list.push_back(std::move(processes.at(i)));
