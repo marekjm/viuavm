@@ -236,6 +236,7 @@ void viua::scheduler::VirtualProcessScheduler::spawnWatchdog(unique_ptr<Frame> f
     }
     watchdog_function = frame->function_name;
     watchdog_process.reset(new Process(std::move(frame), this, nullptr));
+    watchdog_process->hidden(true);
     watchdog_process->begin();
 }
 

@@ -547,6 +547,12 @@ vector<Frame*> Process::trace() const {
 PID Process::pid() const {
     return process_id;
 }
+bool Process::hidden() const {
+    return is_hidden;
+}
+void Process::hidden(bool state) {
+    is_hidden = state;
+}
 
 
 Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualProcessScheduler *sch, Process* pt): scheduler(sch), parent_process(pt), entry_function(frm->function_name),

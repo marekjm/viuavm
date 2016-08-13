@@ -157,6 +157,7 @@ class Process {
     /*  Process identifier.
      */
     PID process_id;
+    bool is_hidden;
 
     /*  Methods implementing individual instructions.
      */
@@ -310,6 +311,8 @@ class Process {
         std::vector<Frame*> trace() const;
 
         PID pid() const;
+        bool hidden() const;
+        void hidden(bool);
 
         Process(std::unique_ptr<Frame>, viua::scheduler::VirtualProcessScheduler*, Process*);
         ~Process();
