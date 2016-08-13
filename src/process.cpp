@@ -31,6 +31,26 @@
 using namespace std;
 
 
+PID::PID(const Process* p): associated_process(p) {
+}
+bool PID::operator==(const PID& that) const {
+    return (associated_process == that.associated_process);
+}
+bool PID::operator==(const Process* that) const {
+    return (associated_process == that);
+}
+bool PID::operator<(const PID&) const {
+    // PIDs can't really have a less-than relation
+    // they are either equal or not, and that's it
+    return false;
+}
+bool PID::operator>(const PID&) const {
+    // PIDs can't really have a greater-than relation
+    // they are either equal or not, and that's it
+    return false;
+}
+
+
 Type* Process::fetch(unsigned index) const {
     /*  Return pointer to object at given register.
      *  This method safeguards against reaching for out-of-bounds registers and

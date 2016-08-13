@@ -53,6 +53,21 @@ namespace viua {
 }
 
 
+class Process;
+
+
+class PID {
+    const Process *associated_process;
+
+    public:
+    bool operator==(const PID&) const;
+    bool operator==(const Process*) const;
+    bool operator<(const PID&) const;
+    bool operator>(const PID&) const;
+
+    PID(const Process*);
+};
+
 class Process {
 #ifdef AS_DEBUG_HEADER
     public:
