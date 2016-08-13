@@ -225,6 +225,7 @@ Process* viua::scheduler::VirtualProcessScheduler::process() {
 Process* viua::scheduler::VirtualProcessScheduler::spawn(unique_ptr<Frame> frame, Process *parent) {
     unique_ptr<Process> p(new Process(std::move(frame), this, parent));
     p->begin();
+    attached_cpu->createMailbox(p->pid());
     processes.push_back(std::move(p));
     return processes.back().get();
 }
@@ -331,6 +332,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                 watchdog_process->pass(unique_ptr<Type>(death_message));
             }
 
+            attached_cpu->deleteMailbox(processes.at(i)->pid());
             // push broken process to dead processes_list list to
             // erase it later
             dead_processes_list.push_back(std::move(processes.at(i)));
@@ -342,6 +344,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
         // schedule for removal thus shortening the vector of running processes_list and
         // speeding up execution
         if (th->stopped() and (not th->joinable())) {
+            attached_cpu->deleteMailbox(processes.at(i)->pid());
             dead_processes_list.push_back(std::move(processes.at(i)));
         } else {
             running_processes_list.push_back(std::move(processes.at(i)));
