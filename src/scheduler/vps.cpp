@@ -253,6 +253,10 @@ void viua::scheduler::VirtualProcessScheduler::resurrectWatchdog() {
     spawnWatchdog(std::move(frm));
 }
 
+void viua::scheduler::VirtualProcessScheduler::receive(const PID pid, queue<unique_ptr<Type>>& message_queue) {
+    attached_cpu->receive(pid, message_queue);
+}
+
 bool viua::scheduler::VirtualProcessScheduler::burst() {
     if (not processes.size()) {
         // make CPU stop if there are no processes_list to run

@@ -84,12 +84,18 @@ byte* Process::opreceive(byte* addr) {
 
     unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
-    if (message_queue.size()) {
+    if (not is_hidden) {
+        scheduler->receive(process_id, message_queue);
+    }
+
+    if (not message_queue.empty()) {
         place(target, message_queue.front().release());
         message_queue.pop();
         return_addr = addr;
     } else {
-        suspend();
+        if (is_hidden) {
+            suspend();
+        }
     }
 
     return return_addr;

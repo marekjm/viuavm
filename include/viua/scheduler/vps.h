@@ -21,6 +21,7 @@
 #define VIUA_SCHEDULER_VPS_H
 
 #include <vector>
+#include <queue>
 #include <string>
 #include <utility>
 #include <memory>
@@ -86,6 +87,8 @@ namespace viua {
             Process* process();
             Process* spawn(std::unique_ptr<Frame>, Process*);
             void spawnWatchdog(std::unique_ptr<Frame>);
+
+            void receive(const PID, std::queue<std::unique_ptr<Type>>&);
 
             bool executeQuant(Process*, unsigned);
             bool burst();

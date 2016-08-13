@@ -175,6 +175,7 @@ class CPU {
         void createMailbox(const PID);
         void deleteMailbox(const PID);
         void send(const PID, std::unique_ptr<Type>);
+        void receive(const PID, std::queue<std::unique_ptr<Type>>&);
 
         int run();
 

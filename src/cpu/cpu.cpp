@@ -313,6 +313,17 @@ void CPU::send(const PID pid, unique_ptr<Type> message) {
     }
     mailboxes[pid].push_back(std::move(message));
 }
+void CPU::receive(const PID pid, queue<unique_ptr<Type>>& message_queue) {
+    unique_lock<mutex> lck(mailbox_mutex);
+    if (mailboxes.count(pid) == 0) {
+        throw new Exception("invalid PID");
+    }
+
+    for (auto& message : mailboxes[pid]) {
+        message_queue.push(std::move(message));
+    }
+    mailboxes[pid].clear();
+}
 
 int CPU::exit() const {
     return return_code;
