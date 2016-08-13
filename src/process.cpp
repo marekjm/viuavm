@@ -39,15 +39,19 @@ bool PID::operator==(const PID& that) const {
 bool PID::operator==(const Process* that) const {
     return (associated_process == that);
 }
-bool PID::operator<(const PID&) const {
+bool PID::operator<(const PID& that) const {
     // PIDs can't really have a less-than relation
     // they are either equal or not, and that's it
-    return false;
+    // less-than relation is implemented only so that PID objects may be used as
+    // keys in std::map<>
+    return (reinterpret_cast<uint64_t>(associated_process) < reinterpret_cast<uint64_t>(that.associated_process));
 }
-bool PID::operator>(const PID&) const {
+bool PID::operator>(const PID& that) const {
     // PIDs can't really have a greater-than relation
     // they are either equal or not, and that's it
-    return false;
+    // greater-than relation is implemented only so that PID objects may be used as
+    // keys in std::map<>
+    return (reinterpret_cast<uint64_t>(associated_process) > reinterpret_cast<uint64_t>(that.associated_process));
 }
 
 
