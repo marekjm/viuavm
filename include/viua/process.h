@@ -65,6 +65,8 @@ class PID {
     bool operator<(const PID&) const;
     bool operator>(const PID&) const;
 
+    auto get() const -> const decltype(associated_process);
+
     PID(const Process*);
 };
 
