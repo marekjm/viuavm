@@ -32,6 +32,7 @@
 #include <tuple>
 #include <unordered_set>
 #include <utility>
+#include <memory>
 #include <algorithm>
 #include <stdexcept>
 #include <mutex>
@@ -126,6 +127,9 @@ class CPU {
 
     std::vector<void*> cxx_dynamic_lib_handles;
 
+    std::map<PID, std::vector<std::unique_ptr<Type>>> mailboxes;
+    std::mutex mailbox_mutex;
+
     public:
         /*  Methods dealing with dynamic library loading.
          */
@@ -182,6 +186,11 @@ class CPU {
         void requestForeignMethodCall(const std::string&, Type*, Frame*, RegisterSet*, RegisterSet*, Process*);
 
         void postFreeProcess(std::unique_ptr<Process>);
+
+        void createMailbox(const PID);
+        void deleteMailbox(const PID);
+        void send(const PID, std::unique_ptr<Type>);
+        void receive(const PID, std::queue<std::unique_ptr<Type>>&);
 
         int run();
 

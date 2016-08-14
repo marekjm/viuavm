@@ -23,6 +23,7 @@
 #include <viua/types/process.h>
 #include <viua/exceptions.h>
 #include <viua/process.h>
+#include <viua/cpu/cpu.h>
 using namespace std;
 
 
@@ -132,7 +133,7 @@ void ProcessType::setPriority(Frame* frame, RegisterSet*, RegisterSet*, Process*
     thrd->priority(static_cast<unsigned>(new_priority));
 }
 
-void ProcessType::pass(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
+void ProcessType::pass(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU* attached_cpu) {
     if (frame->args->at(0) == nullptr) {
         throw new Exception("expected Process as first parameter but got nothing");
     }
@@ -143,5 +144,5 @@ void ProcessType::pass(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*)
         throw new Exception("expected Process as first parameter but got " + frame->args->at(0)->type());
     }
 
-    thrd->pass(unique_ptr<Type>(frame->args->at(1)->copy()));
+    attached_cpu->send(thrd->pid(), unique_ptr<Type>(frame->args->at(1)->copy()));
 }

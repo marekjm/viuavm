@@ -305,6 +305,48 @@ void CPU::postFreeProcess(unique_ptr<Process> p) {
     free_virtual_processes_cv.notify_one();
 }
 
+void CPU::createMailbox(const PID pid) {
+    unique_lock<mutex> lck(mailbox_mutex);
+#if VIUA_VM_DEBUG_LOG
+    cerr << "[cpu:mailbox:create] pid = " << pid.get() << endl;
+#endif
+    mailboxes.emplace(pid, vector<unique_ptr<Type>>{});
+}
+void CPU::deleteMailbox(const PID pid) {
+    unique_lock<mutex> lck(mailbox_mutex);
+#if VIUA_VM_DEBUG_LOG
+    cerr << "[cpu:mailbox:delete] pid = " << pid.get() << ", queued messages = " << mailboxes[pid].size() << endl;
+#endif
+    mailboxes.erase(pid);
+}
+void CPU::send(const PID pid, unique_ptr<Type> message) {
+    unique_lock<mutex> lck(mailbox_mutex);
+    if (mailboxes.count(pid) == 0) {
+        throw new Exception("invalid PID");
+    }
+#if VIUA_VM_DEBUG_LOG
+    cerr << "[cpu:receive:send] pid = " << pid.get() << ", queued messages = " << mailboxes[pid].size() << "+1" << endl;
+#endif
+    mailboxes[pid].push_back(std::move(message));
+}
+void CPU::receive(const PID pid, queue<unique_ptr<Type>>& message_queue) {
+    unique_lock<mutex> lck(mailbox_mutex);
+    if (mailboxes.count(pid) == 0) {
+        throw new Exception("invalid PID");
+    }
+
+#if VIUA_VM_DEBUG_LOG
+    cerr << "[cpu:receive:pre] pid = " << pid.get() << ", queued messages = " << message_queue.size() << endl;
+#endif
+    for (auto& message : mailboxes[pid]) {
+        message_queue.push(std::move(message));
+    }
+#if VIUA_VM_DEBUG_LOG
+    cerr << "[cpu:receive:post] pid = " << pid.get() << ", queued messages = " << message_queue.size() << endl;
+#endif
+    mailboxes[pid].clear();
+}
+
 int CPU::exit() const {
     return return_code;
 }

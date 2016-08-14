@@ -53,6 +53,23 @@ namespace viua {
 }
 
 
+class Process;
+
+
+class PID {
+    const Process *associated_process;
+
+    public:
+    bool operator==(const PID&) const;
+    bool operator==(const Process*) const;
+    bool operator<(const PID&) const;
+    bool operator>(const PID&) const;
+
+    auto get() const -> decltype(associated_process);
+
+    PID(const Process*);
+};
+
 class Process {
 #ifdef AS_DEBUG_HEADER
     public:
@@ -138,6 +155,11 @@ class Process {
     std::atomic_bool is_suspended;
     unsigned process_priority;
     std::mutex process_mtx;
+
+    /*  Process identifier.
+     */
+    PID process_id;
+    bool is_hidden;
 
     /*  Methods implementing individual instructions.
      */
@@ -290,6 +312,10 @@ class Process {
         auto executionAt() const -> decltype(instruction_pointer);
 
         std::vector<Frame*> trace() const;
+
+        PID pid() const;
+        bool hidden() const;
+        void hidden(bool);
 
         Process(std::unique_ptr<Frame>, viua::scheduler::VirtualProcessScheduler*, Process*);
         ~Process();

@@ -119,6 +119,10 @@ bool viua::scheduler::VirtualProcessScheduler::executeQuant(Process *th, unsigne
             // do not execute suspended processes
             break;
         }
+#if VIUA_VM_DEBUG_LOG
+        cerr << "[sched:vps:quant] pid = " << th->pid().get() << ", tick = " << j << endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+#endif
         th->tick();
     }
 
@@ -227,6 +231,7 @@ Process* viua::scheduler::VirtualProcessScheduler::spawn(unique_ptr<Frame> frame
     p->begin();
 
     Process *process_ptr = p.get();
+    attached_cpu->createMailbox(process_ptr->pid());
 
     if (processes.size() > heavy_load) {
         attached_cpu->postFreeProcess(std::move(p));
@@ -243,6 +248,10 @@ void viua::scheduler::VirtualProcessScheduler::spawnWatchdog(unique_ptr<Frame> f
     }
     watchdog_function = frame->function_name;
     watchdog_process.reset(new Process(std::move(frame), this, nullptr));
+#if VIUA_VM_DEBUG_LOG
+    cerr << "[sched:vps:watchdog:spawn] pid = " << watchdog_process->pid().get() << endl;
+#endif
+    watchdog_process->hidden(true);
     watchdog_process->begin();
 }
 
@@ -259,6 +268,13 @@ void viua::scheduler::VirtualProcessScheduler::resurrectWatchdog() {
     spawnWatchdog(std::move(frm));
 }
 
+void viua::scheduler::VirtualProcessScheduler::receive(const PID pid, queue<unique_ptr<Type>>& message_queue) {
+#if VIUA_VM_DEBUG_LOG
+    cerr << "[sched:vps:receive] pid = " << pid.get() << endl;
+#endif
+    attached_cpu->receive(pid, message_queue);
+}
+
 bool viua::scheduler::VirtualProcessScheduler::burst() {
     if (not processes.size()) {
         // make CPU stop if there are no processes_list to run
@@ -273,6 +289,10 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
         current_process_index = i;
         auto th = processes.at(i).get();
 
+#if VIUA_VM_DEBUG_LOG
+        cerr << "[sched:vps:burst] pid = " << th->pid().get() << endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+#endif
         ticked = (executeQuant(th, th->priority()) or ticked);
 
         if (th->suspended()) {
@@ -303,6 +323,9 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
         }
 
         if (th->terminated() and not th->joinable() and th->parent() == nullptr) {
+#if VIUA_VM_DEBUG_LOG
+            cerr << "[sched:vps:died] pid = " << th->pid().get() << endl;
+#endif
             if (not watchdog_process) {
                 if (th == main_process) {
                     exit_code = 1;
@@ -339,9 +362,13 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                 death_message->set("function", new Function(th->trace()[0]->function_name));
                 death_message->set("exception", exc.release());
                 death_message->set("parameters", parameters);
+#if VIUA_VM_DEBUG_LOG
+                cerr << "[sched:vps:died:notify-watchdog] pid = " << th->pid().get() << endl;
+#endif
                 watchdog_process->pass(unique_ptr<Type>(death_message));
             }
 
+            attached_cpu->deleteMailbox(th->pid());
             // push broken process to dead processes_list list to
             // erase it later
             dead_processes_list.push_back(std::move(processes.at(i)));
@@ -353,6 +380,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
         // schedule for removal thus shortening the vector of running processes_list and
         // speeding up execution
         if (th->stopped() and (not th->joinable())) {
+            attached_cpu->deleteMailbox(processes.at(i)->pid());
             dead_processes_list.push_back(std::move(processes.at(i)));
         } else {
             running_processes_list.push_back(std::move(processes.at(i)));

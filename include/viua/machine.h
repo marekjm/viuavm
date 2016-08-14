@@ -22,6 +22,8 @@
 
 #pragma once
 
+#define VIUA_VM_DEBUG_LOG 0
+
 
 extern const char *ENTRY_FUNCTION_NAME;
 extern const char *VIUA_MAGIC_NUMBER;
