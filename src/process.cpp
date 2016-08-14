@@ -54,7 +54,7 @@ bool PID::operator>(const PID& that) const {
     return (reinterpret_cast<uint64_t>(associated_process) > reinterpret_cast<uint64_t>(that.associated_process));
 }
 
-auto PID::get() const -> const decltype(associated_process) {
+auto PID::get() const -> decltype(associated_process) {
     return associated_process;
 }
 
