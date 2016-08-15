@@ -293,7 +293,8 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
         cerr << "[sched:vps:burst] pid = " << th->pid().get() << endl;
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
 #endif
-        ticked = (executeQuant(th, th->priority()) or ticked);
+        executeQuant(th, th->priority());
+        ticked = (th->progressed() or ticked);
 
         if (th->suspended()) {
             // This check is required to avoid race condition later in the function.

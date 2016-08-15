@@ -161,6 +161,8 @@ class Process {
     PID process_id;
     bool is_hidden;
 
+    bool has_progressed;
+
     /*  Methods implementing individual instructions.
      */
     byte* opizero(byte*);
@@ -287,6 +289,7 @@ class Process {
         void suspend();
         void wakeup();
         bool suspended() const;
+        bool progressed() const;
 
         Process* parent() const;
         std::string starting_function() const;

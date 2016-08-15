@@ -387,6 +387,8 @@ byte* Process::tick() {
     byte* previous_instruction_pointer = instruction_pointer;
     ++instruction_counter;
 
+    has_progressed = true;
+
     try {
         instruction_pointer = dispatch(instruction_pointer);
     } catch (Exception* e) {
@@ -441,6 +443,10 @@ byte* Process::tick() {
     if (thrown) {
         handleActiveException();
     }
+
+    // check here, becauseexception handling may change instruction pointer
+    has_progressed = (instruction_pointer != previous_instruction_pointer);
+
     if (thrown) {
         return nullptr;
     }
@@ -481,6 +487,10 @@ void Process::wakeup() {
 }
 bool Process::suspended() const {
     return is_suspended.load(std::memory_order_acquire);
+}
+
+bool Process::progressed() const {
+    return has_progressed;
 }
 
 Process* Process::parent() const {
