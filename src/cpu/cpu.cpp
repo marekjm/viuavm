@@ -363,14 +363,14 @@ int CPU::run() {
 
     viua::scheduler::VirtualProcessScheduler secondary_vps(this, &free_virtual_processes, &free_virtual_processes_mutex, &free_virtual_processes_cv);
 
-    auto primary_vps_thread = thread([&primary_vps]{ primary_vps(); });
-    auto secondary_vps_thread = thread([&secondary_vps]{ secondary_vps(); });
+    primary_vps.launch();
+    secondary_vps.launch();
 
     primary_vps.shutdown();
-    primary_vps_thread.join();
+    primary_vps.join();
 
     secondary_vps.shutdown();
-    secondary_vps_thread.join();
+    secondary_vps.join();
 
     return_code = primary_vps.exit();
 
