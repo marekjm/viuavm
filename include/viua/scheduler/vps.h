@@ -25,6 +25,7 @@
 #include <string>
 #include <utility>
 #include <memory>
+#include <thread>
 #include <mutex>
 #include <atomic>
 #include <viua/bytecode/bytetypedef.h>
@@ -62,6 +63,7 @@ namespace viua {
             const decltype(processes)::size_type heavy_load = 16;
             const decltype(processes)::size_type light_load = 4;
             std::atomic_bool shut_down;
+            std::thread scheduler_thread;
 
             public:
 
@@ -108,7 +110,9 @@ namespace viua {
             void operator()();
 
             void bootstrap(const std::vector<std::string>&);
+            void launch();
             void shutdown();
+            void join();
             int exit() const;
 
             VirtualProcessScheduler(CPU*, std::vector<std::unique_ptr<Process>>*, std::mutex*, std::condition_variable*);

@@ -437,12 +437,20 @@ void viua::scheduler::VirtualProcessScheduler::bootstrap(const vector<string>& c
     main_process->priority(16);
 }
 
-int viua::scheduler::VirtualProcessScheduler::exit() const {
-    return exit_code;
+void viua::scheduler::VirtualProcessScheduler::launch() {
+    scheduler_thread = thread([sched = this]{ (*sched)(); });
 }
 
 void viua::scheduler::VirtualProcessScheduler::shutdown() {
     shut_down = true;
+}
+
+void viua::scheduler::VirtualProcessScheduler::join() {
+    scheduler_thread.join();
+}
+
+int viua::scheduler::VirtualProcessScheduler::exit() const {
+    return exit_code;
 }
 
 viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(CPU *acpu, vector<unique_ptr<Process>> *fp,
