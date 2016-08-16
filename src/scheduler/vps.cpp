@@ -406,7 +406,7 @@ void viua::scheduler::VirtualProcessScheduler::operator()() {
 
         unique_lock<mutex> lock(*free_processes_mutex);
         while (not free_processes_cv->wait_for(lock, chrono::milliseconds(10), [this]{
-            return (not free_processes->empty() or shut_down);
+            return (not free_processes->empty() or shut_down.load(std::memory_order_acquire));
         }));
 
         if (free_processes->empty()) {
@@ -442,7 +442,7 @@ void viua::scheduler::VirtualProcessScheduler::launch() {
 }
 
 void viua::scheduler::VirtualProcessScheduler::shutdown() {
-    shut_down = true;
+    shut_down.store(true, std::memory_order_release);
 }
 
 void viua::scheduler::VirtualProcessScheduler::join() {
