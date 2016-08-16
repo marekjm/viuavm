@@ -444,7 +444,7 @@ byte* Process::tick() {
         handleActiveException();
     }
 
-    // check here, becauseexception handling may change instruction pointer
+    // check here, because exception handling may change instruction pointer
     has_progressed = (instruction_pointer != previous_instruction_pointer);
 
     if (thrown) {
