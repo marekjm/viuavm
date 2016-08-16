@@ -116,6 +116,7 @@ namespace viua {
             int exit() const;
 
             VirtualProcessScheduler(CPU*, std::vector<std::unique_ptr<Process>>*, std::mutex*, std::condition_variable*);
+            VirtualProcessScheduler(VirtualProcessScheduler&&);
             ~VirtualProcessScheduler();
         };
     }

@@ -468,4 +468,26 @@ viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(CPU *acpu, vec
 {
 }
 
+viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(VirtualProcessScheduler&& that) {
+    attached_cpu = that.attached_cpu;
+
+    free_processes = that.free_processes;
+    free_processes_mutex = that.free_processes_mutex;
+    free_processes_cv = that.free_processes_cv;
+
+    main_process = that.main_process;
+    that.main_process = nullptr;
+    processes = std::move(that.processes);
+    current_process_index = that.current_process_index;
+    that.current_process_index = 0;
+
+    watchdog_function = that.watchdog_function;
+    watchdog_process = std::move(that.watchdog_process);
+
+    exit_code = that.exit_code;
+    shut_down.store(that.shut_down.load());
+
+    scheduler_thread = std::move(that.scheduler_thread);
+}
+
 viua::scheduler::VirtualProcessScheduler::~VirtualProcessScheduler() {}
