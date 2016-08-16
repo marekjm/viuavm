@@ -358,21 +358,29 @@ int CPU::run() {
         throw "null bytecode (maybe not loaded?)";
     }
 
-    viua::scheduler::VirtualProcessScheduler primary_vps(this, &free_virtual_processes, &free_virtual_processes_mutex, &free_virtual_processes_cv);
-    primary_vps.bootstrap(commandline_arguments);
+    const unsigned VP_SCHEDULERS_LIMIT = 2;
+    vector<viua::scheduler::VirtualProcessScheduler> vp_schedulers;
 
-    viua::scheduler::VirtualProcessScheduler secondary_vps(this, &free_virtual_processes, &free_virtual_processes_mutex, &free_virtual_processes_cv);
+    // reserver memory for all schedulers ahead of time
+    vp_schedulers.reserve(VP_SCHEDULERS_LIMIT);
 
-    primary_vps.launch();
-    secondary_vps.launch();
+    vp_schedulers.emplace_back(this, &free_virtual_processes, &free_virtual_processes_mutex, &free_virtual_processes_cv);
+    vp_schedulers.front().bootstrap(commandline_arguments);
 
-    primary_vps.shutdown();
-    primary_vps.join();
+    for (auto i = (VP_SCHEDULERS_LIMIT-1); i; --i) {
+        vp_schedulers.emplace_back(this, &free_virtual_processes, &free_virtual_processes_mutex, &free_virtual_processes_cv);
+    }
 
-    secondary_vps.shutdown();
-    secondary_vps.join();
+    for (auto& sched : vp_schedulers) {
+        sched.launch();
+    }
 
-    return_code = primary_vps.exit();
+    for (auto& sched : vp_schedulers) {
+        sched.shutdown();
+        sched.join();
+    }
+
+    return_code = vp_schedulers.front().exit();
 
     return return_code;
 }
