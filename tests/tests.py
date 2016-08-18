@@ -1445,13 +1445,11 @@ class ConcurrencyTests(unittest.TestCase):
             0
         )
 
-    @unittest.skip('all processes detached')
     def testStackCorruptedOnMainOrphaningProcess(self):
         # this will of course generate leaks, but we are not interested in them since
         # after process termination operating system will automatically reclaim memory
         runTestThrowsException(self, 'main_orphaning_processes.asm', ('Exception', 'joinable process in dropped frame',))
 
-    @unittest.skip('all processes detached')
     def testStackCorruptedOnNonMainFunctionOrphaningProcess(self):
         # this will of course generate leaks, but we are not interested in them since
         # after process termination operating system will automatically reclaim memory
