@@ -294,7 +294,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
 #endif
         executeQuant(th, th->priority());
-        ticked = (th->progressed() or ticked);
+        ticked = (ticked or (not th->stopped()) or th->suspended());
 
         if (th->suspended()) {
             // This check is required to avoid race condition later in the function.
