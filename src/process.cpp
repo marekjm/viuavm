@@ -575,7 +575,8 @@ Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualProcessScheduler
     finished(false), is_joinable(true),
     is_suspended(false),
     process_priority(1),
-    process_id(this)
+    process_id(this),
+    is_hidden(false)
 {
     regset.reset(new RegisterSet(DEFAULT_REGISTER_SIZE));
     uregset = frm->regset;
