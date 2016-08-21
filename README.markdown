@@ -38,12 +38,15 @@
 - **predictable memory behaviour**: in Viua you do not have to guess when the memory will be released, or
   remember about the possibility of a gargabe collector kicking in and interrupting your program;
   Viua manages memory without a GC in a strictly scope-based manner
-- **massive parallelism**: parallelism model in Viua supports spawning massive amounts of independent, VM-based lightweight processes and
-  provides means to either detach spawned processes or join them later during execution
+- **massive parallelism**: Viua architecture supports spawning massive amounts of independent, VM-based lightweight processes that can
+  run in parallel due to implemented SMP with compile-time configurable number of parallel virtual-process schedulers
+- **scatter/gather processes**: processes communicate using messages but machine supports a *join* instruction - which synchronises virtual
+  processes execution, it blocks calling process until called process finishes and receives return value of called process (**WIP**)
 - **safe inter-process communication** via message-passing (with queueing)
-- **fast debugging**: error handling is performed with exceptions (even across processes), and unserviced exceptions cause the machine
-  to generate precise and detailed stack traces;
-  running programs are also debuggable with GDB or Viua-specific debugger
+- **soft-realtime capabilities**: join and receive operations with timeouts (throwing exceptions if nothing has been received) make Viua
+  a VM suitable to host soft-realtime programs (**WIP**)
+- **fast debugging**: error handling is performed with exceptions (even across virtual processes), and unserviced exceptions cause the machine
+  to generate precise and detailed stack traces; running programs are also debuggable with GDB
 - **reliability**: programs running on Viua should be able to run until they are told to stop, not until they crash;
   machine helps writing reliable programs by providing a framework for detailed exception-based error communication and
   a way to register a watchdog process that handles processes killed by runaway exceptions (the exception is serviced by watchdog instead of
@@ -52,24 +55,25 @@
 
 Some features also supported by the VM:
 
-- separate compilation,
-- static and dynamic linking of Viua-native libraries,
-- multiple inheritance,
-- straightforward ways to use both dynamic and static method dispatch on objects,
-- first-class functions,
-- closures (with multiple way of enclosing objects inside a closure),
-- passing function parameters by value, pointer and move (non-copying pass),
-- copy-free function returns,
+- separate compilation of Viua code modules
+- static and dynamic linking of Viua-native libraries
+- built-in, simple algorithm supporting multiple inheritance of user-defined types in Viua
+- straightforward ways to use both dynamic and static method dispatch on objects
+- first-class functions
+- closures (with multiple way of enclosing objects inside a closure)
+- passing function parameters by value, pointer and move (non-copying pass)
+- copy-free function returns
+- inter-function tail calls
 
 
 Current limitations include:
 
 - severly limited introspection,
-- no way to express atoms (i.e. all names must be known at compile time, and there is no way to tell the machine "Here, take this string, convert it to atom and return corresponding function/class/etc."),
-- calling Viua code from C++ is not tested,
-- concurrent code must be debugged with GDB instead of debugger supplied by the VM,
-- debugging information encoded in compiled files is limited,
-- speed: Viua is not the fastest VM around,
+- no way to express atoms (i.e. all names must be known at compile time, and there is no way to tell the machine "Here, take this string,
+  convert it to atom and return corresponding function/class/etc.")
+- calling Viua code from C++ is not tested
+- debugging information encoded in compiled files is limited
+- speed: Viua is not the fastest VM around
 
 
 ##### Software state notice
@@ -97,14 +101,12 @@ Syntax of Viua assembly may remind some people of Lisp (and for a good reason).
 ## Programming in Viua
 
 Viua can be programmed in an assembly-like language which must be compiled into bytecode.
-Typical code-n-debug cycle is shown below (assuming current working directory
-is the local clone of Viua repository):
+Typical code-n-run cycle is shown below (assuming current working directory is the local clone of Viua repository):
 
 ```
 vi some_file.asm
 ./build/bin/vm/asm -o some_file.out some_file.asm
 ./build/bin/vm/cpu some_file.out
-./build/bin/vm/vdb some_file.out
 ```
 
 
@@ -129,9 +131,18 @@ Compilation on BSD should also work but it may be problematic when compiling wit
 Compilation on other operating systems is not tested.
 
 
+## Cloning the repository
+
+Best way to clone a repository (ensuring that the most recent code, and all submodules are fetched) is:
+
+```
+git clone --recursive --branch devel https://github.com/marekjm/viuavm
+```
+
+
 ## Compilation
 
-Before compiling, Git submodule for `linenoise` library must be initialised.
+> Before compiling, Git submodule for `linenoise` library must be initialised.
 
 Compilation is simple and can be executed by typing `make` in the shell.
 Full, clean compilation can also be performed by the `./scripts/recompile` script.
