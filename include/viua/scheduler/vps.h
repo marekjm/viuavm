@@ -99,7 +99,7 @@ namespace viua {
 
             Process* process(decltype(processes)::size_type);
             Process* process();
-            Process* spawn(std::unique_ptr<Frame>, Process*);
+            Process* spawn(std::unique_ptr<Frame>, Process*, bool);
             void spawnWatchdog(std::unique_ptr<Frame>);
 
             void receive(const PID, std::queue<std::unique_ptr<Type>>&);

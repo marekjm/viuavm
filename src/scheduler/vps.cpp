@@ -226,9 +226,12 @@ Process* viua::scheduler::VirtualProcessScheduler::process() {
     return process(current_process_index);
 }
 
-Process* viua::scheduler::VirtualProcessScheduler::spawn(unique_ptr<Frame> frame, Process *parent) {
+Process* viua::scheduler::VirtualProcessScheduler::spawn(unique_ptr<Frame> frame, Process *parent, bool disown) {
     unique_ptr<Process> p(new Process(std::move(frame), this, parent));
     p->begin();
+    if (disown) {
+        p->detach();
+    }
 
     Process *process_ptr = p.get();
     attached_cpu->createMailbox(process_ptr->pid());
@@ -432,8 +435,7 @@ void viua::scheduler::VirtualProcessScheduler::bootstrap(const vector<string>& c
     }
     initial_frame->regset->set(1, cmdline);
 
-    main_process = spawn(std::move(initial_frame), nullptr);
-    main_process->detach();
+    main_process = spawn(std::move(initial_frame), nullptr, true);
     main_process->priority(16);
 }
 

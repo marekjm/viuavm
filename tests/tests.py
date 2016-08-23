@@ -1418,6 +1418,9 @@ class ProcessAbstractionTests(unittest.TestCase):
 class ConcurrencyTests(unittest.TestCase):
     PATH = './sample/asm/concurrency'
 
+    def testImmediatelyDetachingProcess(self):
+        runTest(self, 'immediately_detached.asm', 'Hello World (from detached)!')
+
     def testHelloWorldExample(self):
         runTestSplitlines(self, 'hello_world.asm', ['Hello concurrent World! (2)', 'Hello concurrent World! (1)'], 0)
 

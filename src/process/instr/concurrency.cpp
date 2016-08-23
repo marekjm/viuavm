@@ -43,7 +43,12 @@ byte* Process::opprocess(byte* addr) {
     }
 
     frame_new->function_name = call_name;
-    place(target, new ProcessType(scheduler->spawn(std::move(frame_new), this)));
+
+    bool disown = (target == 0);
+    auto spawned_process = scheduler->spawn(std::move(frame_new), this, disown);
+    if (not disown) {
+        place(target, new ProcessType(spawned_process));
+    }
 
     return addr;
 }
