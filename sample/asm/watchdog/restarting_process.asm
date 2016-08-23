@@ -41,9 +41,7 @@
     ; handle only a_division_executing_process
     frame ^[(param 0 (vat 5 parameters 0)) (param 1 (iinc (vat 6 parameters 1)))]
     ;call 0 a_division_executing_process
-    process 7 a_division_executing_process/2
-    frame ^[(param 0 (ptr 5 7))]
-    msg 0 detach/1
+    process 0 a_division_executing_process/2
 
     jump __begin
 
@@ -125,18 +123,10 @@
     watchdog watchdog_process/0
 
     frame 0
-    process 1 a_detached_concurrent_process/0
-    frame ^[(param 0 (ptr 2 1))]
-    msg 0 detach/1
-    ; delete the pointer to detached process
-    delete 2
+    process 0 a_detached_concurrent_process/0
 
     frame ^[(param 0 (istore 3 42)) (param 1 (istore 4 0))]
-    process 2 a_division_executing_process/2
-    frame ^[(param 0 (ptr 3 2))]
-    msg 0 detach/1
-    ; delete the pointer to detached process
-    delete 3
+    process 0 a_division_executing_process/2
 
     frame 0
     call log_exiting_main/0

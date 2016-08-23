@@ -39,11 +39,7 @@
 
 .function: process_spawner/1
     frame ^[(pamv 0 (arg 1 0))]
-    process 1 print_hello/1
-
-    frame ^[(param 0 1)]
-    msg 0 detach/1
-
+    process 0 print_hello/1
     return
 .end
 

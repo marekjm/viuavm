@@ -31,15 +31,10 @@
 
 .function: process_spawner/1
     -- call printer::print/1 in a new process to
-    -- not block the execution
+    -- not block the execution, and
+    -- detach the process as we do not care about its return value
     frame ^[(pamv 0 (arg 1 0))]
-    process 1 printer_wrapper/1
-
-    -- detach the process since
-    -- we do not care about its return value
-    frame ^[(param 0 1)]
-    msg 0 detach/1
-
+    process 0 printer_wrapper/1
     return
 .end
 

@@ -76,12 +76,7 @@
     ; spawn_process/1 receives number of cycles to burn as its sole parameter and
     ; forwards it to cycle_burner/2
     param 1 (arg 1 0)
-    process 1 cycle_burner/2
-
-    ; detach the process so the VM does not complain about destroying handles to
-    ; joinable processes
-    frame ^[(param 0 1)]
-    msg 0 detach/1
+    process 0 cycle_burner/2
 
     return
 .end
@@ -92,9 +87,7 @@
 
     ; spawn process that will crash
     frame 0
-    process 1 will_be_terminated/0
-    frame ^[(param 0 1)]
-    msg 0 detach/1
+    process 0 will_be_terminated/0
 
     ; spawn some more processes that will run so that the
     ; will_be_terminated/0 process crashes while some other

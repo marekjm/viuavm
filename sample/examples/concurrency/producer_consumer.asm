@@ -57,11 +57,7 @@
     ; pass-by-move to avoid copying, the handle will not be used by main/1 at
     ; any later point
     frame ^[(pamv 0 1)]
-    process 3 producer/1
-
-    ; detach producer process
-    frame ^[(param 0 (ptr 4 3))]
-    msg 0 detach/1
+    process 0 producer/1
 
     ; main/1 may safely exit
     izero 0

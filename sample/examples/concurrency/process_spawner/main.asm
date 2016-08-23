@@ -37,12 +37,7 @@
     branch (igte 4 counter limit) end_loop +1
 
     frame ^[(param 0 counter)]
-    process 2 worker_process/1
-
-    frame ^[(param 0 (ptr 5 2))]
-    msg 0 detach/1
-    ; explicitly delete the pointer to process handle
-    delete 5
+    process 0 worker_process/1
 
     iinc counter
     jump begin_loop
@@ -64,11 +59,7 @@
 
 .function: run_process_spawner/1
     frame ^[(param 0 (arg 1 0))]
-    process 2 process_spawner/1
-
-    frame ^[(param 0 (ptr 3 2))]
-    msg 0 detach/1
-
+    process 0 process_spawner/1
     return
 .end
 

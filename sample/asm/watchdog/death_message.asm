@@ -101,11 +101,7 @@
     watchdog watchdog_process/0
 
     frame 0
-    process 1 a_detached_concurrent_process/0
-    frame ^[(param 0 (ptr 2 1))]
-    msg 0 detach/1
-    ; delete the pointer to detached process
-    delete 2
+    process 0 a_detached_concurrent_process/0
 
     frame 0
     process 2 a_joined_concurrent_process/0
