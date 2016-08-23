@@ -317,6 +317,8 @@ class Process {
         bool hidden() const;
         void hidden(bool);
 
+        bool empty() const;
+
         Process(std::unique_ptr<Frame>, viua::scheduler::VirtualProcessScheduler*, Process*);
         ~Process();
 };

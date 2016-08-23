@@ -563,6 +563,10 @@ void Process::hidden(bool state) {
     is_hidden = state;
 }
 
+bool Process::empty() const {
+    return message_queue.empty();
+}
+
 
 Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualProcessScheduler *sch, Process* pt): scheduler(sch), parent_process(pt), entry_function(frm->function_name),
     regset(nullptr), uregset(nullptr), tmp(nullptr),
