@@ -1336,6 +1336,9 @@ class MiscTests(unittest.TestCase):
     def testMain2AsMainFunction(self):
         runTestSplitlines(self, name='main2_as_main_function.asm', expected_output=['Hello World!', 'received 2 arguments'])
 
+    def testBrokenWatchdog(self):
+        runTest(self, 'broken_watchdog.asm', 'main/1 exiting')
+
 
 class ExternalModulesTests(unittest.TestCase):
     """Tests for C/C++ module importing, and calling external functions.

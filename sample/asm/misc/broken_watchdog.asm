@@ -21,6 +21,11 @@
     ; uncomment the `receive 1` and
     ; the program is no longer broken
     ;receive 1
+    -- this program tests if the machine can quit if
+    -- watchdog is pathologically broken
+    --
+    -- this test will fail if this watchdog function gets
+    -- at least one message
     return
 .end
 
