@@ -29,6 +29,13 @@ There are several categories of change:
 ----
 
 
+# From 0.8.3 to 0.8.4
+
+- enhancement: VM is able to execute several virtual processes in parallel if it's compiled with SMP support, i.e.
+  with more than one VP scheduler
+- bic: `process 0` will not create a process object in register 0 and immediately detach new process upon spawning
+
+
 # From 0.8.2 to 0.8.3
 
 - feature: the `--` string can now be used to begin comments,
