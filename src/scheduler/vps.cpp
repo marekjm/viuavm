@@ -394,7 +394,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
     processes.erase(processes.begin(), processes.end());
     processes.swap(running_processes_list);
 
-    while (watchdog_process and not watchdog_process->suspended()) {
+    while (watchdog_process and not watchdog_process->suspended() and not watchdog_process->empty()) {
         executeQuant(watchdog_process.get(), 0);
         if (watchdog_process->terminated() or watchdog_process->stopped()) {
             resurrectWatchdog();
