@@ -396,6 +396,10 @@ CPU::CPU():
     ffi_schedulers_limit(VIUA_SCHED_FFI),
     debug(false), errors(false)
 {
+    char *env_ffi_schedulers_limit = getenv("VIUA_FFI_SCHEDULERS");
+    if (env_ffi_schedulers_limit != nullptr) {
+        ffi_schedulers_limit = atoi(env_ffi_schedulers_limit);
+    }
     for (auto i = ffi_schedulers_limit; i; --i) {
         foreign_call_workers.push_back(new std::thread(ff_call_processor, &foreign_call_queue, &foreign_functions, &foreign_functions_mutex, &foreign_call_queue_mutex, &foreign_call_queue_condition));
     }
