@@ -358,16 +358,20 @@ int CPU::run() {
         throw "null bytecode (maybe not loaded?)";
     }
 
-    const unsigned VP_SCHEDULERS_LIMIT = 2;
+    char *env_vp_schedulers_limit = getenv("VIUA_VP_SCHEDULERS");
+    if (env_vp_schedulers_limit != nullptr) {
+        vp_schedulers_limit = atoi(env_vp_schedulers_limit);
+    }
+
     vector<viua::scheduler::VirtualProcessScheduler> vp_schedulers;
 
     // reserver memory for all schedulers ahead of time
-    vp_schedulers.reserve(VP_SCHEDULERS_LIMIT);
+    vp_schedulers.reserve(vp_schedulers_limit);
 
     vp_schedulers.emplace_back(this, &free_virtual_processes, &free_virtual_processes_mutex, &free_virtual_processes_cv);
     vp_schedulers.front().bootstrap(commandline_arguments);
 
-    for (auto i = (VP_SCHEDULERS_LIMIT-1); i; --i) {
+    for (auto i = (vp_schedulers_limit-1); i; --i) {
         vp_schedulers.emplace_back(this, &free_virtual_processes, &free_virtual_processes_mutex, &free_virtual_processes_cv);
     }
 
@@ -388,6 +392,7 @@ int CPU::run() {
 CPU::CPU():
     bytecode(nullptr), bytecode_size(0), executable_offset(0),
     return_code(0),
+    vp_schedulers_limit(default_vp_schedulers_limit),
     ffi_schedulers_limit(VIUA_SCHED_FFI),
     debug(false), errors(false)
 {

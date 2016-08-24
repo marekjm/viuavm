@@ -108,6 +108,9 @@ class CPU {
     // list of idle VP schedulers
     std::vector<viua::scheduler::VirtualProcessScheduler*> idle_virtual_process_schedulers;
 
+    static const unsigned default_vp_schedulers_limit = 2;
+    unsigned vp_schedulers_limit;
+
     /*  This is the interface between programs compiled to VM bytecode and
      *  extension libraries written in C++.
      */
