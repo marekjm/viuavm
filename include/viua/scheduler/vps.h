@@ -62,6 +62,7 @@ namespace viua {
             // to let other schedulers at them
             const decltype(processes)::size_type heavy_load = 16;
             const decltype(processes)::size_type light_load = 4;
+            decltype(processes)::size_type current_load;
             std::atomic_bool shut_down;
             std::thread scheduler_thread;
 

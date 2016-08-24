@@ -288,6 +288,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
 
     vector<unique_ptr<Process>> running_processes_list;
     decltype(running_processes_list) dead_processes_list;
+    current_load = 0;
     for (decltype(running_processes_list)::size_type i = 0; i < processes.size(); ++i) {
         current_process_index = i;
         auto th = processes.at(i).get();
@@ -298,6 +299,10 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
 #endif
         executeQuant(th, th->priority());
         ticked = (ticked or (not th->stopped()) or th->suspended());
+
+        if (not (th->suspended() or th->terminated() or th->stopped())) {
+            ++current_load;
+        }
 
         if (th->suspended()) {
             // This check is required to avoid race condition later in the function.
@@ -417,9 +422,10 @@ void viua::scheduler::VirtualProcessScheduler::operator()() {
             break;
         }
 
-        while (processes.size() < light_load and not free_processes->empty()) {
+        while (current_load < light_load and not free_processes->empty()) {
             processes.push_back(std::move(free_processes->front()));
             free_processes->erase(free_processes->begin());
+            ++current_load;
         }
     }
 }
@@ -466,6 +472,7 @@ viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(CPU *acpu, vec
     current_process_index(0),
     watchdog_process(nullptr),
     exit_code(0),
+    current_load(0),
     shut_down(false)
 {
 }
