@@ -108,8 +108,8 @@ class CPU {
     // list of idle VP schedulers
     std::vector<viua::scheduler::VirtualProcessScheduler*> idle_virtual_process_schedulers;
 
-    static const unsigned default_vp_schedulers_limit = 2;
-    unsigned vp_schedulers_limit;
+    static const long unsigned default_vp_schedulers_limit = 2UL;
+    long unsigned vp_schedulers_limit;
 
     /*  This is the interface between programs compiled to VM bytecode and
      *  extension libraries written in C++.
@@ -125,7 +125,7 @@ class CPU {
     std::vector<ForeignFunctionCallRequest*> foreign_call_queue;
     std::mutex foreign_call_queue_mutex;
     std::condition_variable foreign_call_queue_condition;
-    unsigned ffi_schedulers_limit;
+    long unsigned ffi_schedulers_limit;
     std::vector<std::thread*> foreign_call_workers;
 
     std::vector<void*> cxx_dynamic_lib_handles;
