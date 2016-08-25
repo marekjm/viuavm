@@ -196,6 +196,9 @@ class CPU {
         void send(const PID, std::unique_ptr<Type>);
         void receive(const PID, std::queue<std::unique_ptr<Type>>&);
 
+        auto static no_of_vp_schedulers() -> decltype(vp_schedulers_limit);
+        auto static no_of_ffi_schedulers() -> decltype(ffi_schedulers_limit);
+
         int run();
 
         int exit() const;

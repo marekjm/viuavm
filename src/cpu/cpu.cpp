@@ -351,6 +351,23 @@ int CPU::exit() const {
     return return_code;
 }
 
+auto CPU::no_of_vp_schedulers() -> decltype(vp_schedulers_limit) {
+    decltype(vp_schedulers_limit) limit = default_vp_schedulers_limit;
+    char *env_vp_schedulers_limit = getenv("VIUA_VP_SCHEDULERS");
+    if (env_vp_schedulers_limit != nullptr) {
+        limit = stoul(env_vp_schedulers_limit);
+    }
+    return limit;
+}
+auto CPU::no_of_ffi_schedulers() -> decltype(ffi_schedulers_limit) {
+    decltype(ffi_schedulers_limit) limit = default_ffi_schedulers_limit;
+    char *env_ffi_schedulers_limit = getenv("VIUA_FFI_SCHEDULERS");
+    if (env_ffi_schedulers_limit != nullptr) {
+        limit = stoul(env_ffi_schedulers_limit);
+    }
+    return limit;
+}
+
 int CPU::run() {
     /*  VM CPU implementation.
      */
