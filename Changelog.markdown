@@ -34,6 +34,13 @@ There are several categories of change:
 - enhancement: VM is able to execute several virtual processes in parallel if it's compiled with SMP support, i.e.
   with more than one VP scheduler
 - bic: `process 0` will not create a process object in register 0 and immediately detach new process upon spawning
+- feature: `VIUA_FFI_SCHEDULERS` environment variable affects number of FFI schedulers the VM spawns
+- feature: `VIUA_VP_SCHEDULERS` environment variable affects number of VP schedulers the VM spawns
+- feature: `-i/--info` option in CPU frontend prints information about Viua VM (number of schedulers, version, etc.)
+- feature: `--json` option in CPU frontend same as `--info` but in JSON format
+
+
+----
 
 
 # From 0.8.2 to 0.8.3
