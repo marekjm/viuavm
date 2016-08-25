@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 /** This header contains only one typedef - for byte.
  *
  *  This is because this typedef is required by various files across Viua
@@ -31,6 +33,6 @@
  *
  */
 
-typedef unsigned char byte;
+typedef uint8_t byte;
 
 #endif
