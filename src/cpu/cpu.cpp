@@ -375,10 +375,7 @@ int CPU::run() {
         throw "null bytecode (maybe not loaded?)";
     }
 
-    char *env_vp_schedulers_limit = getenv("VIUA_VP_SCHEDULERS");
-    if (env_vp_schedulers_limit != nullptr) {
-        vp_schedulers_limit = stoul(env_vp_schedulers_limit);
-    }
+    vp_schedulers_limit = no_of_vp_schedulers();
 
     vector<viua::scheduler::VirtualProcessScheduler> vp_schedulers;
 
@@ -413,10 +410,7 @@ CPU::CPU():
     ffi_schedulers_limit(default_ffi_schedulers_limit),
     debug(false), errors(false)
 {
-    char *env_ffi_schedulers_limit = getenv("VIUA_FFI_SCHEDULERS");
-    if (env_ffi_schedulers_limit != nullptr) {
-        ffi_schedulers_limit = stoul(env_ffi_schedulers_limit);
-    }
+    ffi_schedulers_limit = no_of_ffi_schedulers();
     for (auto i = ffi_schedulers_limit; i; --i) {
         foreign_call_workers.push_back(new std::thread(ff_call_processor, &foreign_call_queue, &foreign_functions, &foreign_functions_mutex, &foreign_call_queue_mutex, &foreign_call_queue_condition));
     }
