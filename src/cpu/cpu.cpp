@@ -351,21 +351,22 @@ int CPU::exit() const {
     return return_code;
 }
 
-auto CPU::no_of_vp_schedulers() -> decltype(vp_schedulers_limit) {
-    decltype(vp_schedulers_limit) limit = default_vp_schedulers_limit;
-    char *env_vp_schedulers_limit = getenv("VIUA_VP_SCHEDULERS");
-    if (env_vp_schedulers_limit != nullptr) {
-        limit = stoul(env_vp_schedulers_limit);
+static auto no_of_schedulers(const char *env_name, unsigned long default_limit) -> decltype(default_limit) {
+    decltype(default_limit) limit = 0;
+    char *env_limit = getenv(env_name);
+    if (env_limit != nullptr) {
+        int raw_limit = stoi(env_limit);
+        if (raw_limit >= 0) {
+            limit = static_cast<decltype(limit)>(raw_limit);
+        }
     }
-    return limit;
+    return (limit or default_limit);
+}
+auto CPU::no_of_vp_schedulers() -> decltype(vp_schedulers_limit) {
+    return no_of_schedulers("VIUA_VP_SCHEDULERS", default_vp_schedulers_limit);
 }
 auto CPU::no_of_ffi_schedulers() -> decltype(ffi_schedulers_limit) {
-    decltype(ffi_schedulers_limit) limit = default_ffi_schedulers_limit;
-    char *env_ffi_schedulers_limit = getenv("VIUA_FFI_SCHEDULERS");
-    if (env_ffi_schedulers_limit != nullptr) {
-        limit = stoul(env_ffi_schedulers_limit);
-    }
-    return limit;
+    return no_of_schedulers("VIUA_FFI_SCHEDULERS", default_ffi_schedulers_limit);
 }
 
 int CPU::run() {
