@@ -393,7 +393,7 @@ CPU::CPU():
     bytecode(nullptr), bytecode_size(0), executable_offset(0),
     return_code(0),
     vp_schedulers_limit(default_vp_schedulers_limit),
-    ffi_schedulers_limit(VIUA_SCHED_FFI),
+    ffi_schedulers_limit(default_ffi_schedulers_limit),
     debug(false), errors(false)
 {
     char *env_ffi_schedulers_limit = getenv("VIUA_FFI_SCHEDULERS");

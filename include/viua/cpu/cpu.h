@@ -125,6 +125,7 @@ class CPU {
     std::vector<ForeignFunctionCallRequest*> foreign_call_queue;
     std::mutex foreign_call_queue_mutex;
     std::condition_variable foreign_call_queue_condition;
+    static const long unsigned default_ffi_schedulers_limit = 2UL;
     long unsigned ffi_schedulers_limit;
     std::vector<std::thread*> foreign_call_workers;
 
