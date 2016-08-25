@@ -40,6 +40,7 @@ static bool usage(const string program, const vector<string>& args) {
     bool show_version = false;
     bool verbose = false;
     bool show_info = false;
+    bool show_json = false;
 
     for (auto option : args) {
         if (option == "--help" or option == "-h") {
@@ -54,22 +55,34 @@ static bool usage(const string program, const vector<string>& args) {
         } else if (option == "--info" or option == "-i") {
             show_info = true;
             continue;
+        } else if (option == "--json") {
+            show_json = true;
         } else if (str::startswith(option, "-")) {
             cout << "error: unknown option: " << option << endl;
             exit(1);
         }
     }
 
+    if (show_json) {
+        cout << "{\"version\": \"" << VERSION << '.' << MICRO << "\", \"sched\": {\"ffi\": " << CPU::no_of_ffi_schedulers() << ", ";
+        cout << "\"vp\": " << CPU::no_of_vp_schedulers() << "}}\n";
+        return true;
+    }
+
     if (show_help or (show_version and verbose)) {
         cout << "Viua VM CPU, version ";
     }
-    if (show_help or show_version) {
-        cout << VERSION << '.' << MICRO << endl;
+    if (show_help or show_version or show_info) {
+        cout << VERSION << '.' << MICRO;
+        if (not show_info) {
+            cout << endl;
+        }
     }
     if (show_info) {
-        cout << "version=" << VERSION << '.' << MICRO << endl;
-        cout << "sched:ffi=" << VIUA_SCHED_FFI << endl;
-        cout << "sched:vp=" << VIUA_SCHED_VP << endl;
+        cout << ' ';
+        cout << "[sched:ffi=" << CPU::no_of_ffi_schedulers() << ']';
+        cout << ' ';
+        cout << "[sched:vp=" << CPU::no_of_vp_schedulers() << ']' << endl;
     }
     if (show_help) {
         cout << "\nUSAGE:\n";
@@ -78,6 +91,8 @@ static bool usage(const string program, const vector<string>& args) {
         cout << "    " << "-V, --version            - show version\n"
              << "    " << "-h, --help               - display this message\n"
              << "    " << "-v, --verbose            - show verbose output\n"
+             << "    " << "-i, --info               - show information about VM configuration (number of schedulers, version etc.)\n"
+             << "    " << "    --json               - same as --info but in JSON format\n"
              ;
     }
 
