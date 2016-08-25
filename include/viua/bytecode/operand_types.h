@@ -20,9 +20,11 @@
 #ifndef VIUA_OPERAND_TYPES_H
 #define VIUA_OPERAND_TYPES_H
 
+#include <stdint.h>
+
 #pragma once
 
-enum OperandType: unsigned char {
+enum OperandType: uint8_t {
     OT_REGISTER_INDEX,
     OT_REGISTER_REFERENCE,
     OT_ATOM,
