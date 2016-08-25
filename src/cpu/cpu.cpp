@@ -362,10 +362,10 @@ static auto no_of_schedulers(const char *env_name, unsigned long default_limit) 
     }
     return (limit or default_limit);
 }
-auto CPU::no_of_vp_schedulers() -> decltype(vp_schedulers_limit) {
+auto CPU::no_of_vp_schedulers() -> decltype(default_vp_schedulers_limit) {
     return no_of_schedulers("VIUA_VP_SCHEDULERS", default_vp_schedulers_limit);
 }
-auto CPU::no_of_ffi_schedulers() -> decltype(ffi_schedulers_limit) {
+auto CPU::no_of_ffi_schedulers() -> decltype(default_ffi_schedulers_limit) {
     return no_of_schedulers("VIUA_FFI_SCHEDULERS", default_ffi_schedulers_limit);
 }
 
