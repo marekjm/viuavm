@@ -352,15 +352,15 @@ int CPU::exit() const {
 }
 
 static auto no_of_schedulers(const char *env_name, unsigned long default_limit) -> decltype(default_limit) {
-    decltype(default_limit) limit = 0;
+    decltype(default_limit) limit = default_limit;
     char *env_limit = getenv(env_name);
     if (env_limit != nullptr) {
         int raw_limit = stoi(env_limit);
-        if (raw_limit >= 0) {
+        if (raw_limit > 0) {
             limit = static_cast<decltype(limit)>(raw_limit);
         }
     }
-    return (limit or default_limit);
+    return limit;
 }
 auto CPU::no_of_vp_schedulers() -> decltype(default_vp_schedulers_limit) {
     return no_of_schedulers("VIUA_VP_SCHEDULERS", default_vp_schedulers_limit);
