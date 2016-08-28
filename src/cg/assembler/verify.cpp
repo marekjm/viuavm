@@ -685,7 +685,6 @@ void assembler::verify::jumpsAreInRange(const vector<string>& lines) {
             forward_jumps.clear();
             deferred_marker_jumps.clear();
             function_name = second_part;
-            continue;
         } else if (first_part == "jump") {
             validate_jump(i, second_part, function_instruction_counter, forward_jumps, deferred_marker_jumps, jump_targets);
         } else if (first_part == "branch") {
@@ -707,7 +706,6 @@ void assembler::verify::jumpsAreInRange(const vector<string>& lines) {
             }
         } else if (first_part == ".mark:") {
             jump_targets[second_part] = function_instruction_counter;
-            continue;
         } else if (first_part == ".end") {
             function_name = "";
             verify_forward_jumps(function_instruction_counter, forward_jumps);
