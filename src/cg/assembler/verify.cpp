@@ -598,7 +598,11 @@ static void validate_jump(const unsigned lineno, const string& extracted_jump, c
     if (str::isnum(extracted_jump)) {
         target = stoi(extracted_jump);
     } else if (str::startswith(extracted_jump, "+") and str::isnum(extracted_jump.substr(1))) {
-        target = (function_instruction_counter + stoi(extracted_jump.substr(1)));
+        int jump_offset = stoi(extracted_jump.substr(1));
+        if (jump_offset == 0) {
+            throw ErrorReport(lineno, "zero-distance jump");
+        }
+        target = (function_instruction_counter + jump_offset);
     } else if (str::startswith(extracted_jump, ".") and str::isnum(extracted_jump.substr(1))) {
         if (stoi(extracted_jump.substr(1)) < 0) {
             throw ErrorReport(lineno, "absolute jump with negative value");
