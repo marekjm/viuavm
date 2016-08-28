@@ -28,7 +28,7 @@ vector<string> tokenize(const string& s) {
     token.str("");
     for (long unsigned i = 0; i < s.size(); ++i) {
         if (s[i] == ' ' and token.str().size()) {
-            tokens.push_back(token.str());
+            tokens.emplace_back(token.str());
             token.str("");
             continue;
         }
@@ -37,45 +37,45 @@ vector<string> tokenize(const string& s) {
         }
         if (s[i] == '^') {
             if (token.str().size()) {
-                tokens.push_back(token.str());
+                tokens.emplace_back(token.str());
                 token.str("");
             }
-            tokens.push_back("^");
+            tokens.emplace_back("^");
         }
         if (s[i] == '(' or s[i] == ')') {
             if (token.str().size()) {
-                tokens.push_back(token.str());
+                tokens.emplace_back(token.str());
                 token.str("");
             }
-            tokens.push_back((s[i] == '(' ? "(" : ")"));
+            tokens.emplace_back((s[i] == '(' ? "(" : ")"));
             continue;
         }
         if (s[i] == '[' or s[i] == ']') {
             if (token.str().size()) {
-                tokens.push_back(token.str());
+                tokens.emplace_back(token.str());
                 token.str("");
             }
-            tokens.push_back((s[i] == '[' ? "[" : "]"));
+            tokens.emplace_back((s[i] == '[' ? "[" : "]"));
             continue;
         }
         if (s[i] == '{' or s[i] == '}') {
             if (token.str().size()) {
-                tokens.push_back(token.str());
+                tokens.emplace_back(token.str());
                 token.str("");
             }
-            tokens.push_back((s[i] == '{' ? "{" : "}"));
+            tokens.emplace_back((s[i] == '{' ? "{" : "}"));
             continue;
         }
         if (s[i] == '"' or s[i] == '\'') {
             string ss = str::extract(s.substr(i));
             i += (ss.size()-1);
-            tokens.push_back(ss);
+            tokens.emplace_back(ss);
             continue;
         }
         token << s[i];
     }
     if (token.str().size()) {
-        tokens.push_back(token.str());
+        tokens.emplace_back(token.str());
     }
     return tokens;
 }

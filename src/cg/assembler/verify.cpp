@@ -612,7 +612,7 @@ static void validate_jump(const unsigned lineno, const string& extracted_jump, c
         return;
     } else {
         if (jump_targets.count(extracted_jump) == 0) {
-            deferred_marker_jumps.push_back({lineno, extracted_jump});
+            deferred_marker_jumps.emplace_back(lineno, extracted_jump);
             return;
         } else {
             target = jump_targets.at(extracted_jump);
@@ -623,7 +623,7 @@ static void validate_jump(const unsigned lineno, const string& extracted_jump, c
         throw ErrorReport(lineno, "backward out-of-range jump");
     }
     if (target > function_instruction_counter) {
-        forward_jumps.push_back({lineno, target});
+        forward_jumps.emplace_back(lineno, target);
     }
 }
 

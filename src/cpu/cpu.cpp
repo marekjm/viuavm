@@ -209,7 +209,7 @@ vector<string> CPU::inheritanceChainOf(const string& type_name) const {
         } else {
             pushed.insert(element);
         }
-        linearised_inheritance_chain.push_back(element);
+        linearised_inheritance_chain.emplace_back(element);
     }
 
     return ichain;

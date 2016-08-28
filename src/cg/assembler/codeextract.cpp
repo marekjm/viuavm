@@ -36,7 +36,7 @@ vector<string> assembler::ce::getilines(const vector<string>& lines) {
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = str::lstrip(lines[i]);
         if (!line.size() or line[0] == ';' or str::startswith(line, "--")) continue;
-        ilines.push_back(line);
+        ilines.emplace_back(line);
     }
 
     return ilines;
@@ -127,7 +127,7 @@ vector<string> assembler::ce::getlinks(const vector<string>& lines) {
         line = lines[i];
         if (assembler::utils::lines::is_link(line)) {
             line = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
-            links.push_back(line);
+            links.emplace_back(line);
         }
     }
     return links;
@@ -146,7 +146,7 @@ vector<string> assembler::ce::getFunctionNames(const vector<string>& lines) {
         }
 
         line = str::lstrip(str::sub(line, str::chunk(line).size()));
-        names.push_back(str::chunk(line));
+        names.emplace_back(str::chunk(line));
     }
 
     return names;
@@ -159,7 +159,7 @@ vector<string> assembler::ce::getSignatures(const vector<string>& lines) {
         holdline = line = lines[i];
         if (not assembler::utils::lines::is_function_signature(line)) { continue; }
         line = str::lstrip(str::sub(line, str::chunk(line).size()));
-        names.push_back(str::chunk(line));
+        names.emplace_back(str::chunk(line));
     }
 
     return names;
@@ -179,7 +179,7 @@ vector<string> assembler::ce::getBlockNames(const vector<string>& lines) {
         line = str::lstrip(str::sub(line, str::chunk(line).size()));
         string name = str::chunk(line);
 
-        names.push_back(name);
+        names.emplace_back(name);
     }
 
     return names;
@@ -192,7 +192,7 @@ vector<string> assembler::ce::getBlockSignatures(const vector<string>& lines) {
         holdline = line = lines[i];
         if (not assembler::utils::lines::is_block_signature(line)) { continue; }
         line = str::lstrip(str::sub(line, str::chunk(line).size()));
-        names.push_back(str::chunk(line));
+        names.emplace_back(str::chunk(line));
     }
 
     return names;
@@ -218,7 +218,7 @@ map<string, vector<string> > assembler::ce::getInvokables(const string& type, co
             if (str::startswith(lines[j], opening)) {
                 throw ("another " + type + " opened before assembler reached .end after '" + str::chunk(str::sub(holdline, str::chunk(holdline).size())) + "' " + type);
             }
-            flines.push_back(lines[j]);
+            flines.emplace_back(lines[j]);
         }
 
         line = str::lstrip(str::sub(line, opening.size()));
