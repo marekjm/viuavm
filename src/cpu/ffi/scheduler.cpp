@@ -26,7 +26,7 @@
 using namespace std;
 
 
-void ff_call_processor(vector<ForeignFunctionCallRequest*> *requests, map<string, ForeignFunction*>* foreign_functions, mutex *ff_map_mtx, mutex *mtx, condition_variable *cv) {
+void ff_call_processor(vector<unique_ptr<ForeignFunctionCallRequest>> *requests, map<string, ForeignFunction*>* foreign_functions, mutex *ff_map_mtx, mutex *mtx, condition_variable *cv) {
     while (true) {
         unique_lock<mutex> lock(*mtx);
 
@@ -35,8 +35,7 @@ void ff_call_processor(vector<ForeignFunctionCallRequest*> *requests, map<string
             return not requests->empty();
         }));
 
-        unique_ptr<ForeignFunctionCallRequest> request(requests->front());
-
+        unique_ptr<ForeignFunctionCallRequest> request(std::move(requests->front()));
         requests->erase(requests->begin());
 
         // unlock as soon as the request is obtained

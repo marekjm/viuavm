@@ -285,7 +285,7 @@ void CPU::registerPrototype(Prototype *proto) {
 
 void CPU::requestForeignFunctionCall(Frame *frame, Process *requesting_process) {
     unique_lock<mutex> lock(foreign_call_queue_mutex);
-    foreign_call_queue.push_back(new ForeignFunctionCallRequest(frame, requesting_process, this));
+    foreign_call_queue.emplace_back(new ForeignFunctionCallRequest(frame, requesting_process, this));
 
     // unlock before calling notify_one() to avoid waking the worker thread when it
     // cannot obtain the lock and

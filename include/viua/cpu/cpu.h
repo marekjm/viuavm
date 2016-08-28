@@ -57,7 +57,7 @@ class ForeignFunctionCallRequest {
 };
 
 
-void ff_call_processor(std::vector<ForeignFunctionCallRequest*> *requests, std::map<std::string, ForeignFunction*>* foreign_functions, std::mutex *ff_map_mtx, std::mutex *mtx, std::condition_variable *cv);
+void ff_call_processor(std::vector<std::unique_ptr<ForeignFunctionCallRequest>> *requests, std::map<std::string, ForeignFunction*> *foreign_functions, std::mutex *ff_map_mtx, std::mutex *mtx, std::condition_variable *cv);
 
 
 class CPU {
@@ -120,7 +120,7 @@ class CPU {
     std::map<std::string, ForeignMethod> foreign_methods;
 
     // Foreign function call requests are placed here to be executed later.
-    std::vector<ForeignFunctionCallRequest*> foreign_call_queue;
+    std::vector<std::unique_ptr<ForeignFunctionCallRequest>> foreign_call_queue;
     std::mutex foreign_call_queue_mutex;
     std::condition_variable foreign_call_queue_condition;
     static const long unsigned default_ffi_schedulers_limit = 2UL;
