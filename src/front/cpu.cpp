@@ -103,7 +103,7 @@ int main(int argc, char* argv[]) {
     // setup command line arguments vector
     vector<string> args;
     for (int i = 1; i < argc; ++i) {
-        args.push_back(argv[i]);
+        args.emplace_back(argv[i]);
     }
 
     if (usage(argv[0], args)) { return 0; }

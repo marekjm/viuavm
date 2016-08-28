@@ -168,7 +168,7 @@ int main(int argc, char* argv[]) {
             cout << "error: unknown option: " << option << endl;
             return 1;
         }
-        args.push_back(argv[i]);
+        args.emplace_back(argv[i]);
     }
 
     if (usage(argv[0], SHOW_HELP, SHOW_VERSION, VERBOSE)) { return 0; }
@@ -207,7 +207,7 @@ int main(int argc, char* argv[]) {
     // GATHER LINKS OBTAINED FROM COMMAND LINE
     vector<string> commandline_given_links;
     for (unsigned i = 1; i < args.size(); ++i) {
-        commandline_given_links.push_back(args[i]);
+        commandline_given_links.emplace_back(args[i]);
     }
 
 
@@ -221,7 +221,7 @@ int main(int argc, char* argv[]) {
 
     vector<string> lines;
     string line;
-    while (getline(in, line)) { lines.push_back(line); }
+    while (getline(in, line)) { lines.emplace_back(line); }
 
     map<long unsigned, long unsigned> expanded_lines_to_source_lines;
     vector<string> expanded_lines = expandSource(lines, expanded_lines_to_source_lines);

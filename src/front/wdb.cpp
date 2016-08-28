@@ -501,7 +501,7 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
                 verified = false;
             }
             if (operands.size() == 1) {
-                operands.push_back("true");
+                operands.emplace_back("true");
             }
         } else {
             cout << "error: invalid setting" << endl;
@@ -562,7 +562,7 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
             }
         }
         if (operands.size() == 0) {
-            operands.push_back("0");
+            operands.emplace_back("0");
         }
     } else if (command == "cpu.tick") {
         if (not state.initialised) {
@@ -628,21 +628,21 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
         command = "loader.function.map.show";
         if (operands.size() == 0) {
             for (pair<string, unsigned> mapping : cpu.function_addresses) {
-                operands.push_back(mapping.first);
+                operands.emplace_back(mapping.first);
             }
         }
     } else if (command == "loader.block.map" or command == "loader.block.map.show") {
         command = "loader.block.map.show";
         if (operands.size() == 0) {
             for (pair<string, unsigned> mapping : cpu.block_addresses) {
-                operands.push_back(mapping.first);
+                operands.emplace_back(mapping.first);
             }
         }
     } else if (command == "loader.extern.function.map" or command == "loader.extern.function.map.show") {
         command = "loader.extern.function.map.show";
         if (operands.size() == 0) {
             for (pair<string, ForeignFunction*> mapping : cpu.foreign_functions) {
-                operands.push_back(mapping.first);
+                operands.emplace_back(mapping.first);
             }
         }
     } else if (command == "quit") {
@@ -682,18 +682,18 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
     } else if (command == "breakpoint.set.at") {
         for (unsigned j = 0; j < operands.size(); ++j) {
             if (str::isnum(operands[j])) {
-                state.breakpoints_byte.push_back(cpu.bytecode+stoi(operands[j]));
+                state.breakpoints_byte.emplace_back(cpu.bytecode+stoi(operands[j]));
             } else {
                 cout << "warn: invalid operand, expected integer: " << operands[j] << endl;
             }
         }
     } else if (command == "breakpoint.set.on.opcode") {
         for (unsigned j = 0; j < operands.size(); ++j) {
-            state.breakpoints_opcode.push_back(operands[j]);
+            state.breakpoints_opcode.emplace_back(operands[j]);
         }
     } else if (command == "breakpoint.set.on.function") {
         for (unsigned j = 0; j < operands.size(); ++j) {
-            state.breakpoints_function.push_back(operands[j]);
+            state.breakpoints_function.emplace_back(operands[j]);
         }
     } else if (command == "watch.register.local.write") {
         string function_name = (operands[0] == "." ? cpu.trace().back()->function_name : operands[0]);
@@ -1042,7 +1042,7 @@ int main(int argc, char* argv[]) {
             cout << "error: unknown option: " << option << endl;
             return 1;
         }
-        args.push_back(argv[i]);
+        args.emplace_back(argv[i]);
     }
 
     if (usage(argv[0], SHOW_HELP, SHOW_VERSION, VERBOSE)) { return 0; }

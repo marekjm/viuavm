@@ -221,7 +221,7 @@ static vector<string> filter(const vector<string>& lines) {
             continue;
         }
 
-        filtered.push_back(line);
+        filtered.emplace_back(line);
     }
 
     return filtered;
@@ -704,38 +704,38 @@ vector<string> expandSource(const vector<string>& lines, map<long unsigned, long
     vector<string> stripped_lines;
 
     for (unsigned i = 0; i < lines.size(); ++i) {
-        stripped_lines.push_back(str::lstrip(lines[i]));
+        stripped_lines.emplace_back(str::lstrip(lines[i]));
     }
 
     vector<string> asm_lines;
     for (unsigned i = 0; i < stripped_lines.size(); ++i) {
         if (stripped_lines[i] == "") {
             expanded_lines_to_source_lines[asm_lines.size()] = i;
-            asm_lines.push_back(lines[i]);
+            asm_lines.emplace_back(lines[i]);
         } else if (str::startswith(stripped_lines[i], ".signature")) {
             expanded_lines_to_source_lines[asm_lines.size()] = i;
-            asm_lines.push_back(lines[i]);
+            asm_lines.emplace_back(lines[i]);
         } else if (str::startswith(stripped_lines[i], ".bsignature")) {
             expanded_lines_to_source_lines[asm_lines.size()] = i;
-            asm_lines.push_back(lines[i]);
+            asm_lines.emplace_back(lines[i]);
         } else if (str::startswith(stripped_lines[i], ".function")) {
             expanded_lines_to_source_lines[asm_lines.size()] = i;
-            asm_lines.push_back(lines[i]);
+            asm_lines.emplace_back(lines[i]);
         } else if (str::startswith(stripped_lines[i], ".end")) {
             expanded_lines_to_source_lines[asm_lines.size()] = i;
-            asm_lines.push_back(lines[i]);
+            asm_lines.emplace_back(lines[i]);
         } else if (stripped_lines[i][0] == ';' or str::startswith(stripped_lines[i], "--")) {
             expanded_lines_to_source_lines[asm_lines.size()] = i;
-            asm_lines.push_back(lines[i]);
+            asm_lines.emplace_back(lines[i]);
         } else if (not str::contains(stripped_lines[i], '(')) {
             expanded_lines_to_source_lines[asm_lines.size()] = i;
-            asm_lines.push_back(lines[i]);
+            asm_lines.emplace_back(lines[i]);
         } else {
             vector<vector<string>> decoded_lines = decode_line(stripped_lines[i]);
             auto indent = (lines[i].size() - stripped_lines[i].size());
             for (decltype(decoded_lines)::size_type j = 0; j < decoded_lines.size(); ++j) {
                 expanded_lines_to_source_lines[asm_lines.size()] = i;
-                asm_lines.push_back(str::strmul<char>(' ', indent) + str::join<char>(decoded_lines[j], ' '));
+                asm_lines.emplace_back(str::strmul<char>(' ', indent) + str::join<char>(decoded_lines[j], ' '));
             }
         }
     }
@@ -873,7 +873,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, invoc
 
     for (string lnk : commandline_given_links) {
         if (find(links.begin(), links.end(), lnk) == links.end()) {
-            links.push_back(lnk);
+            links.emplace_back(lnk);
         } else {
             throw ("requested to link module '" + lnk + "' more than once");
         }
@@ -895,7 +895,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, invoc
         for (string fn : fn_names) {
             function_addresses[fn] = 0; // for now we just build a list of all available functions
             symbol_sources[fn] = lnk;
-            linked_function_names.push_back(fn);
+            linked_function_names.emplace_back(fn);
             if (DEBUG) {
                 cout << filename << ": debug-note: prelinking function " << fn << " from module " << lnk << endl;
             }
@@ -906,7 +906,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, invoc
     //////////////////////////////////////////////////////////////
     // EXTEND FUNCTION NAMES VECTOR WITH NAMES OF LINKED FUNCTIONS
     auto local_function_names = functions.names;
-    for (string name : linked_function_names) { functions.names.push_back(name); }
+    for (string name : linked_function_names) { functions.names.emplace_back(name); }
 
 
     if (not flags.as_lib) {
@@ -915,7 +915,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, invoc
         vector<string> main_function_found;
         for (auto f : functions.names) {
             if (f == "main/0" or f == "main/1" or f == "main/2") {
-                main_function_found.push_back(f);
+                main_function_found.emplace_back(f);
             }
         }
         if (main_function_found.size() > 1) {
@@ -940,40 +940,40 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, invoc
         }
 
         vector<string> entry_function_lines;
-        functions.names.push_back(ENTRY_FUNCTION_NAME);
+        functions.names.emplace_back(ENTRY_FUNCTION_NAME);
         function_addresses[ENTRY_FUNCTION_NAME] = starting_instruction;
 
         // entry function sets global stuff (FIXME: not really)
-        entry_function_lines.push_back("ress local");
+        entry_function_lines.emplace_back("ress local");
         bytes += OP_SIZES.at("ress");
 
         // generate different instructions based on which main function variant
         // has been selected
         if (main_function == "main/0") {
-            entry_function_lines.push_back("frame 0");
+            entry_function_lines.emplace_back("frame 0");
             bytes += OP_SIZES.at("frame");
         } else if (main_function == "main/2") {
-            entry_function_lines.push_back("frame 2");
+            entry_function_lines.emplace_back("frame 2");
             bytes += OP_SIZES.at("frame");
 
             // pop first element on the list of aruments
-            entry_function_lines.push_back("vpop 0 1 0");
+            entry_function_lines.emplace_back("vpop 0 1 0");
             bytes += OP_SIZES.at("vpop");
 
             // for parameter for main/2 is the name of the program
-            entry_function_lines.push_back("param 0 0");
+            entry_function_lines.emplace_back("param 0 0");
             bytes += OP_SIZES.at("param");
 
             // second parameter for main/2 is the vector with the rest
             // of the commandl ine parameters
-            entry_function_lines.push_back("param 1 1");
+            entry_function_lines.emplace_back("param 1 1");
             bytes += OP_SIZES.at("param");
         } else {
             // this is for default main function, i.e. `main/1` or
             // for custom main functions
             // FIXME: should custom main function be allowed?
-            entry_function_lines.push_back("frame 1");
-            entry_function_lines.push_back("param 0 1");
+            entry_function_lines.emplace_back("frame 1");
+            entry_function_lines.emplace_back("param 0 1");
             bytes += OP_SIZES.at("frame");
             bytes += OP_SIZES.at("param");
         }
@@ -981,15 +981,15 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, invoc
         // name of the main function must not be hardcoded because there is '.main:' assembler
         // directive which can set an arbitrary function as main
         // we also save return value in 1 register since 0 means "drop return value"
-        entry_function_lines.push_back("call 1 " + main_function);
+        entry_function_lines.emplace_back("call 1 " + main_function);
         bytes += OP_SIZES.at("call");
         bytes += main_function.size()+1;
 
         // then, register 1 is moved to register 0 so it counts as a return code
-        entry_function_lines.push_back("move 0 1");
+        entry_function_lines.emplace_back("move 0 1");
         bytes += OP_SIZES.at("move");
 
-        entry_function_lines.push_back("halt");
+        entry_function_lines.emplace_back("halt");
         bytes += OP_SIZES.at("halt");
 
         functions.bodies[ENTRY_FUNCTION_NAME] = entry_function_lines;
@@ -1025,7 +1025,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, invoc
             }
         }
 
-        linked_libs_bytecode.push_back( tuple<string, uint64_t, byte*>(lnk, loader.getBytecodeSize(), loader.getBytecode()) );
+        linked_libs_bytecode.emplace_back(lnk, loader.getBytecodeSize(), loader.getBytecode());
         bytes += loader.getBytecodeSize();
     }
 
@@ -1114,7 +1114,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, invoc
         vector<tuple<uint64_t, uint64_t> > local_jumps;
         for (unsigned i = 0; i < jumps.size(); ++i) {
             uint64_t jmp = jumps[i];
-            local_jumps.push_back(tuple<int, int>(jmp, block_bodies_section_size));
+            local_jumps.emplace_back(jmp, block_bodies_section_size);
         }
         func.calculateJumps(local_jumps);
 
@@ -1129,14 +1129,14 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, invoc
             if (DEBUG) {
                 cout << "[asm] debug: pushed relative jump to jump table: " << jmp << '+' << block_bodies_section_size << endl;
             }
-            jump_table.push_back(jmp+block_bodies_section_size);
+            jump_table.emplace_back(jmp+block_bodies_section_size);
         }
 
         for (unsigned i = 0; i < jumps_absolute.size(); ++i) {
             if (DEBUG) {
                 cout << "[asm] debug: pushed absolute jump to jump table: " << jumps_absolute[i] << "+0" << endl;
             }
-            jump_positions.push_back(tuple<int, int>(jumps_absolute[i]+block_bodies_section_size, 0));
+            jump_positions.emplace_back(jumps_absolute[i]+block_bodies_section_size, 0);
         }
 
         block_bodies_section_size += func.size();
@@ -1187,7 +1187,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, invoc
         vector<tuple<uint64_t, uint64_t> > local_jumps;
         for (unsigned i = 0; i < jumps.size(); ++i) {
             uint64_t jmp = jumps[i];
-            local_jumps.push_back(tuple<int, int>(jmp, functions_section_size));
+            local_jumps.emplace_back(jmp, functions_section_size);
         }
         func.calculateJumps(local_jumps);
 
@@ -1202,14 +1202,14 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, invoc
             if (DEBUG) {
                 cout << "[asm] debug: pushed relative jump to jump table: " << jmp << '+' << functions_section_size << endl;
             }
-            jump_table.push_back(jmp+functions_section_size);
+            jump_table.emplace_back(jmp+functions_section_size);
         }
 
         for (unsigned i = 0; i < jumps_absolute.size(); ++i) {
             if (DEBUG) {
                 cout << "[asm] debug: pushed absolute jump to jump table: " << jumps_absolute[i] << "+0" << endl;
             }
-            jump_positions.push_back(tuple<int, int>(jumps_absolute[i]+functions_section_size, 0));
+            jump_positions.emplace_back(jumps_absolute[i]+functions_section_size, 0);
         }
 
         functions_section_size += func.size();

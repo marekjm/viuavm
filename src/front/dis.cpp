@@ -118,7 +118,7 @@ int main(int argc, char* argv[]) {
             cout << "error: unknown option: " << option << endl;
             return 1;
         } else {
-            args.push_back(argv[i]);
+            args.emplace_back(argv[i]);
         }
     }
 
@@ -191,7 +191,7 @@ int main(int argc, char* argv[]) {
         element_sizes[name] = el_size;
         element_types[name] = "block";
         element_address_mapping[name] = block_address_mapping[name];
-        elements.push_back(name);
+        elements.emplace_back(name);
     }
 
     for (unsigned i = 0; i < functions.size(); ++i) {
@@ -199,7 +199,7 @@ int main(int argc, char* argv[]) {
         element_sizes[name] = function_sizes[name];
         element_types[name] = "function";
         element_address_mapping[name] = function_address_mapping[name];
-        elements.push_back(name);
+        elements.emplace_back(name);
     }
 
     if (INCLUDE_INFO) {
@@ -213,40 +213,40 @@ int main(int argc, char* argv[]) {
         }
         oss << "\n\n";
 
-        disassembled_lines.push_back(oss.str());
+        disassembled_lines.emplace_back(oss.str());
     }
 
     auto meta_information = loader.getMetaInformation();
     if (meta_information.size()) {
-        disassembled_lines.push_back("; meta information\n");
+        disassembled_lines.emplace_back("; meta information\n");
     }
     for (const auto each : meta_information) {
-        disassembled_lines.push_back(assembler::utils::lines::make_info(each.first, each.second) + "\n");
+        disassembled_lines.emplace_back(assembler::utils::lines::make_info(each.first, each.second) + "\n");
     }
     if (meta_information.size()) {
-        disassembled_lines.push_back("\n");
+        disassembled_lines.emplace_back("\n");
     }
 
     auto signatures = loader.getExternalSignatures();
     if (signatures.size()) {
-        disassembled_lines.push_back("; external function signatures\n");
+        disassembled_lines.emplace_back("; external function signatures\n");
     }
     for (const auto each : signatures) {
-        disassembled_lines.push_back(assembler::utils::lines::make_function_signature(each) + "\n");
+        disassembled_lines.emplace_back(assembler::utils::lines::make_function_signature(each) + "\n");
     }
     if (signatures.size()) {
-        disassembled_lines.push_back("\n");
+        disassembled_lines.emplace_back("\n");
     }
 
     auto block_signatures = loader.getExternalBlockSignatures();
     if (block_signatures.size()) {
-        disassembled_lines.push_back("; external block signatures\n");
+        disassembled_lines.emplace_back("; external block signatures\n");
     }
     for (const auto each : block_signatures) {
-        disassembled_lines.push_back(assembler::utils::lines::make_block_signature(each) + "\n");
+        disassembled_lines.emplace_back(assembler::utils::lines::make_block_signature(each) + "\n");
     }
     if (block_signatures.size()) {
-        disassembled_lines.push_back("\n");
+        disassembled_lines.emplace_back("\n");
     }
 
     for (unsigned i = 0; i < elements.size(); ++i) {
@@ -294,7 +294,7 @@ int main(int argc, char* argv[]) {
             }
         }
         if (disasm_terminated) {
-            disassembled_lines.push_back(oss.str());
+            disassembled_lines.emplace_back(oss.str());
             break;
         }
 
@@ -310,7 +310,7 @@ int main(int argc, char* argv[]) {
         }
 
         if ((not SELECTED_FUNCTION.size()) or (SELECTED_FUNCTION == name)) {
-            disassembled_lines.push_back(oss.str());
+            disassembled_lines.emplace_back(oss.str());
         }
     }
 
