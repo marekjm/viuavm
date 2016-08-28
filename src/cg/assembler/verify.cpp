@@ -610,8 +610,12 @@ static void validate_jump(const unsigned lineno, const string& extracted_jump, c
         }
         target = (function_instruction_counter + jump_offset);
     } else if (str::startswith(extracted_jump, ".") and str::isnum(extracted_jump.substr(1))) {
-        if (stoi(extracted_jump.substr(1)) < 0) {
+        target = stoi(extracted_jump.substr(1));
+        if (target < 0) {
             throw ErrorReport(lineno, "absolute jump with negative value");
+        }
+        if (target == 0 and function_instruction_counter == 0) {
+            throw ErrorReport(lineno, "zero-distance jump");
         }
         // absolute jumps cannot be verified without knowing how many bytes the bytecode spans
         // this is a FIXME: add check for absolute jumps
