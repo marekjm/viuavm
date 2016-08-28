@@ -114,6 +114,7 @@ def run(path, expected_exit_code=0):
         raise ViuaCPUError('{0} [{1}]: {2}'.format(path, exit_code, output.decode('utf-8').strip()))
     return (exit_code, output.decode('utf-8'))
 
+FLAG_TEST_ONLY_ASSEMBLING = bool(int(os.environ.get('VIUA_TEST_ONLY_ASMING', 0)))
 MEMORY_LEAK_CHECKS_SKIPPED = 0
 MEMORY_LEAK_CHECKS_RUN = 0
 MEMORY_LEAK_CHECKS_ENABLE = bool(int(os.environ.get('VIUA_TEST_SUITE_VALGRIND_CHECKS', 1)))
@@ -259,16 +260,17 @@ def runTest(self, name, expected_output=None, expected_exit_code = 0, output_pro
         assemble(assembly_path, compiled_path)
     else:
         assemble(assembly_path, compiled_path, opts=assembly_opts)
-    excode, output = run(compiled_path, expected_exit_code)
-    got_output = (output.strip() if output_processing_function is None else output_processing_function(output))
-    if custom_assert is not None:
-        custom_assert(self, excode, got_output)
-    else:
-        self.assertEqual(expected_output, got_output)
-        self.assertEqual(expected_exit_code, excode)
+    if not FLAG_TEST_ONLY_ASSEMBLING:
+        excode, output = run(compiled_path, expected_exit_code)
+        got_output = (output.strip() if output_processing_function is None else output_processing_function(output))
+        if custom_assert is not None:
+            custom_assert(self, excode, got_output)
+        else:
+            self.assertEqual(expected_output, got_output)
+            self.assertEqual(expected_exit_code, excode)
 
-    if valgrind_enable:
-        runMemoryLeakCheck(self, compiled_path, check_memory_leaks)
+        if valgrind_enable:
+            runMemoryLeakCheck(self, compiled_path, check_memory_leaks)
 
     disasm_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.dis.asm'.format(self.PATH[2:].replace('/', '_'), name))
     compiled_disasm_path = '{0}.bin'.format(disasm_path)
@@ -277,20 +279,22 @@ def runTest(self, name, expected_output=None, expected_exit_code = 0, output_pro
         assemble(disasm_path, compiled_disasm_path)
     else:
         assemble(disasm_path, compiled_disasm_path, opts=assembly_opts)
-    dis_excode, dis_output = run(compiled_disasm_path, expected_exit_code)
-    if custom_assert is not None:
-        custom_assert(self, dis_excode, (dis_output.strip() if output_processing_function is None else output_processing_function(dis_output)))
-    else:
-        self.assertEqual(got_output, (dis_output.strip() if output_processing_function is None else output_processing_function(dis_output)))
-        self.assertEqual(excode, dis_excode)
+    if not FLAG_TEST_ONLY_ASSEMBLING:
+        dis_excode, dis_output = run(compiled_disasm_path, expected_exit_code)
+        if custom_assert is not None:
+            custom_assert(self, dis_excode, (dis_output.strip() if output_processing_function is None else output_processing_function(dis_output)))
+        else:
+            self.assertEqual(got_output, (dis_output.strip() if output_processing_function is None else output_processing_function(dis_output)))
+            self.assertEqual(excode, dis_excode)
 
 def runTestCustomAsserts(self, name, assertions_callback, check_memory_leaks = True):
     assembly_path = os.path.join(self.PATH, name)
     compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
     assemble(assembly_path, compiled_path)
-    excode, output = run(compiled_path)
-    assertions_callback(self, excode, output)
-    runMemoryLeakCheck(self, compiled_path, check_memory_leaks)
+    if not FLAG_TEST_ONLY_ASSEMBLING:
+        excode, output = run(compiled_path)
+        assertions_callback(self, excode, output)
+        runMemoryLeakCheck(self, compiled_path, check_memory_leaks)
 
 def runTestSplitlines(self, name, expected_output, expected_exit_code = 0, assembly_opts=None):
     runTest(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: o.strip().splitlines(), assembly_opts=assembly_opts)
