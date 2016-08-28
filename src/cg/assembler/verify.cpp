@@ -634,6 +634,9 @@ static void validate_jump(const unsigned lineno, const string& extracted_jump, c
     if (target < 0) {
         throw ErrorReport(lineno, "backward out-of-range jump");
     }
+    if (target == function_instruction_counter) {
+        throw ErrorReport(lineno, "zero-distance jump");
+    }
     if (target > function_instruction_counter) {
         forward_jumps.emplace_back(lineno, target);
     }
