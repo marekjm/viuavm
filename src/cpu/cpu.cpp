@@ -300,7 +300,7 @@ void CPU::requestForeignMethodCall(const string& name, Type *object, Frame *fram
 
 void CPU::postFreeProcess(unique_ptr<Process> p) {
     unique_lock<mutex> lock(free_virtual_processes_mutex);
-    free_virtual_processes.push_back(std::move(p));
+    free_virtual_processes.emplace_back(std::move(p));
     lock.unlock();
     free_virtual_processes_cv.notify_one();
 }
@@ -327,7 +327,7 @@ void CPU::send(const PID pid, unique_ptr<Type> message) {
 #if VIUA_VM_DEBUG_LOG
     cerr << "[cpu:receive:send] pid = " << pid.get() << ", queued messages = " << mailboxes[pid].size() << "+1" << endl;
 #endif
-    mailboxes[pid].push_back(std::move(message));
+    mailboxes[pid].emplace_back(std::move(message));
 }
 void CPU::receive(const PID pid, queue<unique_ptr<Type>>& message_queue) {
     unique_lock<mutex> lck(mailbox_mutex);
