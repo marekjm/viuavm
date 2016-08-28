@@ -34,8 +34,6 @@ Releases should be small, but rather frequent.
 
 - CPU uses several VM process schedulers and each scheduler runs in its own thread,
 - remove `join` operation, use only message passing
-- `process` opcode returns only PID to the process; PID lets you send and
-  receive messages, but can't be used to suspend or resume a process from user code
 
 When using `process <non-zero> foo/0` parent process subscribes to the child process, and
 can use `join` on it.
@@ -65,6 +63,8 @@ the return message of any process.
   FFI worker thread statistics (how many there are, if the number is fixed or dynamic, etc.)
 - standard VM library includes `std::vm::info/0` function that provides the same information
   to programs as `viua-vm --info` provides to users,
+- `process` opcode returns only PID to the process; PID lets you send and
+  receive messages, but can't be used to suspend or resume a process from user code
 
 
 ----
