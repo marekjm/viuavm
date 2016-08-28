@@ -33,7 +33,6 @@ Releases should be small, but rather frequent.
 ## 0.8.4
 
 - CPU uses several VM process schedulers and each scheduler runs in its own thread,
-- remove `join` operation, use only message passing
 
 When using `process <non-zero> foo/0` parent process subscribes to the child process, and
 can use `join` on it.
