@@ -48,7 +48,7 @@ IdToAddressMapping Loader::loadmap(char* bytedump, const uint64_t& bytedump_size
         i += sizeof(decltype(lib_fn_address));
         lib_function_ids_map = bytedump+i;
         mapping[lib_fn_name] = lib_fn_address;
-        order.push_back(lib_fn_name);
+        order.emplace_back(lib_fn_name);
     }
 
     return IdToAddressMapping(order, mapping);
@@ -136,7 +136,7 @@ static vector<string> load_string_list(ifstream& in) {
     while (i < signatures_section_size) {
         sig = string(buffer+i);
         i += (sig.size() + 1);
-        strings_list.push_back(sig);
+        strings_list.emplace_back(sig);
     }
 
     return strings_list;
@@ -172,7 +172,7 @@ void Loader::loadFunctionsMap(ifstream& in) {
     tie(order, mapping) = loadmap(lib_buffer_function_ids, lib_function_ids_section_size);
 
     for (string p : order) {
-        functions.push_back(p);
+        functions.emplace_back(p);
         function_addresses[p] = mapping[p];
     }
     delete[] lib_buffer_function_ids;
@@ -190,7 +190,7 @@ void Loader::loadBlocksMap(ifstream& in) {
     tie(order, mapping) = loadmap(lib_buffer_block_ids, lib_block_ids_section_size);
 
     for (string p : order) {
-        blocks.push_back(p);
+        blocks.emplace_back(p);
         block_addresses[p] = mapping[p];
     }
     delete[] lib_buffer_block_ids;
