@@ -595,10 +595,16 @@ void assembler::verify::framesHaveNoGaps(const vector<string>& lines, const map<
 
 static void validate_jump(const unsigned lineno, const string& extracted_jump, const int function_instruction_counter, vector<pair<unsigned, int>>& forward_jumps, vector<pair<unsigned, string>>& deferred_marker_jumps, const map<string, int>& jump_targets) {
     int target = -1;
-    if (str::isnum(extracted_jump)) {
+    if (str::isnum(extracted_jump, false)) {
         target = stoi(extracted_jump);
     } else if (str::startswith(extracted_jump, "+") and str::isnum(extracted_jump.substr(1))) {
         int jump_offset = stoi(extracted_jump.substr(1));
+        if (jump_offset == 0) {
+            throw ErrorReport(lineno, "zero-distance jump");
+        }
+        target = (function_instruction_counter + jump_offset);
+    } else if (str::startswith(extracted_jump, "-") and str::isnum(extracted_jump)) {
+        int jump_offset = stoi(extracted_jump);
         if (jump_offset == 0) {
             throw ErrorReport(lineno, "zero-distance jump");
         }
@@ -619,11 +625,13 @@ static void validate_jump(const unsigned lineno, const string& extracted_jump, c
             deferred_marker_jumps.emplace_back(lineno, extracted_jump);
             return;
         } else {
-            target = jump_targets.at(extracted_jump);
+            // FIXME: jump targets are saved with an off-by-one error, that surfaces when
+            // a .mark: directive immediately follows .function: declaration
+            target = jump_targets.at(extracted_jump)+1;
         }
     }
 
-    if (target < 0 and (function_instruction_counter+target) < 0) {
+    if (target < 0) {
         throw ErrorReport(lineno, "backward out-of-range jump");
     }
     if (target > function_instruction_counter) {
