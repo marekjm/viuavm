@@ -1279,6 +1279,126 @@ class AssemblerErrorTests(unittest.TestCase):
         self.assertEqual(1, exit_code)
         self.assertEqual("./sample/asm/errors/branch_false_to_unrecognised_marker.asm:23: error: jump to unrecognised marker: foo", output.strip())
 
+    def testZeroDistanceAbsoluteFalseBranch(self):
+        name = 'zero_distance_absolute_false_branch.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/zero_distance_absolute_false_branch.asm:21: error: zero-distance jump", output.strip())
+
+    def testZeroDistanceAbsoluteJump(self):
+        name = 'zero_distance_absolute_jump.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/zero_distance_absolute_jump.asm:21: error: zero-distance jump", output.strip())
+
+    def testZeroDistanceAbsoluteTrueBranch(self):
+        name = 'zero_distance_absolute_true_branch.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/zero_distance_absolute_true_branch.asm:21: error: zero-distance jump", output.strip())
+
+    def testZeroDistanceBackwardFalseBranch(self):
+        name = 'zero_distance_backward_false_branch.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/zero_distance_backward_false_branch.asm:21: error: zero-distance jump", output.strip())
+
+    def testZeroDistanceBackwardJump(self):
+        name = 'zero_distance_backward_jump.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/zero_distance_backward_jump.asm:21: error: zero-distance jump", output.strip())
+
+    def testZeroDistanceBackwardTrueBranch(self):
+        name = 'zero_distance_backward_true_branch.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/zero_distance_backward_true_branch.asm:21: error: zero-distance jump", output.strip())
+
+    def testZeroDistanceFalseBranch(self):
+        name = 'zero_distance_false_branch.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/zero_distance_false_branch.asm:24: error: zero-distance jump", output.strip())
+
+    def testZeroDistanceForwardFalseBranch(self):
+        name = 'zero_distance_forward_false_branch.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/zero_distance_forward_false_branch.asm:21: error: zero-distance jump", output.strip())
+
+    def testZeroDistanceForwardJump(self):
+        name = 'zero_distance_forward_jump.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/zero_distance_forward_jump.asm:21: error: zero-distance jump", output.strip())
+
+    def testZeroDistanceForwardTrueBranch(self):
+        name = 'zero_distance_forward_true_branch.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/zero_distance_forward_true_branch.asm:21: error: zero-distance jump", output.strip())
+
+    def testZeroDistanceJump(self):
+        name = 'zero_distance_jump.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/zero_distance_jump.asm:24: error: zero-distance jump", output.strip())
+
+    def testZeroDistanceMarkerFalseBranch(self):
+        name = 'zero_distance_marker_false_branch.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/zero_distance_marker_false_branch.asm:25: error: zero-distance jump", output.strip())
+
+    def testZeroDistanceMarkerJump(self):
+        name = 'zero_distance_marker_jump.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/zero_distance_marker_jump.asm:24: error: zero-distance jump", output.strip())
+
+    def testZeroDistanceMarkerTrueBranch(self):
+        name = 'zero_distance_marker_true_branch.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/zero_distance_marker_true_branch.asm:25: error: zero-distance jump", output.strip())
+
+    def testZeroDistanceTrueBranch(self):
+        name = 'zero_distance_true_branch.asm'
+        assembly_path = os.path.join(self.PATH, name)
+        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
+        self.assertEqual(1, exit_code)
+        self.assertEqual("./sample/asm/errors/zero_distance_true_branch.asm:24: error: zero-distance jump", output.strip())
+
 
 class AssemblerErrorRejectingDuplicateSymbolsTests(unittest.TestCase):
     PATH = './sample/asm/errors/single_definition_rule'
