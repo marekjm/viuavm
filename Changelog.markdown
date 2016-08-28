@@ -15,8 +15,7 @@ For that you have to reference Git commit log.
 There are several categories of change:
 
 - **fix**: reserved for bugfixes
-- **enhancement**: reserved for backward-compatible enhancements to machine's
-  core (e.g. speed improvement, better memory management etc.)
+- **enhancement**: reserved for backward-compatible enhancements
 - **bic**: an acronym for *Backwards Incompatible Change*, these changes (possibly
   also enhancements) are backwards incompatible and
   may break software written in machine's assembly or using it's public APIs,
@@ -24,6 +23,13 @@ There are several categories of change:
 - **feature**: resereved for new features implemented in the VM, e.g. a new
   instruction, or a new feature in a standard library
 - **misc**: various other changes not really fitting into any other category,
+
+
+----
+
+# From 0.8.4 to 0.8.5
+
+- enhancement: assembler is able to catch most zero-distance jumps preventing infinite loops at compile time
 
 
 ----
