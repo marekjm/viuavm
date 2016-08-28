@@ -362,3 +362,41 @@ vector<uint64_t> Program::jumpsAbsolute() {
     for (byte* jmp : branches_absolute) { jmps.push_back( static_cast<uint64_t>(jmp-program) ); }
     return jmps;
 }
+
+Program::Program(uint64_t bts): bytes(bts), debug(false), scream(false) {
+    program = new byte[bytes];
+    /* Filling bytecode with zeroes (which are interpreted by CPU as NOP instructions) is a safe way
+     * to prevent many hiccups.
+     */
+    for (decltype(bytes) i = 0; i < bytes; ++i) { program[i] = byte(0); }
+    addr_ptr = program;
+}
+Program::Program(const Program& that): program(nullptr), bytes(that.bytes), addr_ptr(nullptr), branches({}) {
+    program = new byte[bytes];
+    for (decltype(bytes) i = 0; i < bytes; ++i) {
+        program[i] = that.program[i];
+    }
+    addr_ptr = program+(that.addr_ptr - that.program);
+    for (unsigned i = 0; i < that.branches.size(); ++i) {
+        branches.push_back(program+(that.branches[i]-that.program));
+    }
+}
+Program::~Program() {
+    delete[] program;
+}
+Program& Program::operator=(const Program& that) {
+    if (this != &that) {
+        delete[] program;
+        bytes = that.bytes;
+        program = new byte[bytes];
+        for (decltype(bytes) i = 0; i < bytes; ++i) {
+            program[i] = that.program[i];
+        }
+        addr_ptr = program+(that.addr_ptr - that.program);
+        while (branches.size()) { branches.pop_back(); }
+        for (unsigned i = 0; i < that.branches.size(); ++i) {
+            branches.push_back(program+(that.branches[i]-that.program));
+        }
+    }
+    return (*this);
+}
