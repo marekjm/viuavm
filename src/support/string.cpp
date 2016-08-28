@@ -151,7 +151,7 @@ namespace str {
         while (tmp.size()) {
             chnk = chunk(tmp);
             tmp = lstrip(sub(tmp, chnk.size()));
-            chnks.push_back(chnk);
+            chnks.emplace_back(chnk);
         }
         return chnks;
     }

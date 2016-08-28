@@ -79,7 +79,7 @@ byte* Process::openter(byte* addr) {
     try_frame_new->associated_frame = frames.back().get();
     try_frame_new->block_name = block_name;
 
-    tryframes.push_back(std::move(try_frame_new));
+    tryframes.emplace_back(std::move(try_frame_new));
 
     return block_address;
 }

@@ -173,7 +173,7 @@ void Process::pushFrame() {
         oss << "stack corruption: frame " << hex << frame_new.get() << dec << " for function " << frame_new->function_name << '/' << frame_new->args->size() << " pushed more than once";
         throw oss.str();
     }
-    frames.push_back(std::move(frame_new));
+    frames.emplace_back(std::move(frame_new));
 }
 void Process::dropFrame() {
     /** Drops top-most frame from call stack.
@@ -584,7 +584,7 @@ Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualProcessScheduler
 {
     regset.reset(new RegisterSet(DEFAULT_REGISTER_SIZE));
     uregset = frm->regset;
-    frames.push_back(std::move(frm));
+    frames.emplace_back(std::move(frm));
 }
 
 Process::~Process() {}

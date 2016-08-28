@@ -140,7 +140,7 @@ void String::format(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
     if (regex_search(result, key_regex)) {
         vector<string> matches;
         for (sregex_iterator match = sregex_iterator(result.begin(), result.end(), key_regex); match != sregex_iterator(); ++match) {
-            matches.push_back(match->str());
+            matches.emplace_back(match->str());
         }
 
         for (auto i : matches) {

@@ -44,7 +44,7 @@ vector<string> Prototype::getAncestors() const {
 }
 
 Prototype* Prototype::derive(const string& base_class_name) {
-    ancestors.push_back(base_class_name);
+    ancestors.emplace_back(base_class_name);
     return this;
 }
 

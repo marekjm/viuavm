@@ -36,7 +36,7 @@ namespace support {
             while (i < PATH.size()) {
                 if (PATH[i] == ':') {
                     if (path.size()) {
-                        paths.push_back(path);
+                        paths.emplace_back(path);
                         path = "";
                         ++i;
                     }
@@ -45,7 +45,7 @@ namespace support {
                 ++i;
             }
             if (path.size()) {
-                paths.push_back(path);
+                paths.emplace_back(path);
             }
 
             return paths;

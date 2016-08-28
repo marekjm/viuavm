@@ -239,7 +239,7 @@ Process* viua::scheduler::VirtualProcessScheduler::spawn(unique_ptr<Frame> frame
     if (processes.size() > heavy_load) {
         attached_cpu->postFreeProcess(std::move(p));
     } else {
-        processes.push_back(std::move(p));
+        processes.emplace_back(std::move(p));
     }
 
     return process_ptr;
@@ -327,7 +327,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
             //
             // REMEMBER: the last thing that is done after servicing an FFI call is waking the process up so
             // as long as the process is suspended it must be considered to be running.
-            running_processes_list.push_back(std::move(processes.at(i)));
+            running_processes_list.emplace_back(std::move(processes.at(i)));
             continue;
         }
 
@@ -380,7 +380,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
             attached_cpu->deleteMailbox(th->pid());
             // push broken process to dead processes_list list to
             // erase it later
-            dead_processes_list.push_back(std::move(processes.at(i)));
+            dead_processes_list.emplace_back(std::move(processes.at(i)));
 
             continue;
         }
@@ -390,9 +390,9 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
         // speeding up execution
         if (th->stopped() and (not th->joinable())) {
             attached_cpu->deleteMailbox(processes.at(i)->pid());
-            dead_processes_list.push_back(std::move(processes.at(i)));
+            dead_processes_list.emplace_back(std::move(processes.at(i)));
         } else {
-            running_processes_list.push_back(std::move(processes.at(i)));
+            running_processes_list.emplace_back(std::move(processes.at(i)));
         }
     }
 
@@ -423,7 +423,7 @@ void viua::scheduler::VirtualProcessScheduler::operator()() {
         }
 
         while (current_load < light_load and not free_processes->empty()) {
-            processes.push_back(std::move(free_processes->front()));
+            processes.emplace_back(std::move(free_processes->front()));
             free_processes->erase(free_processes->begin());
             ++current_load;
         }
