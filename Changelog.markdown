@@ -30,6 +30,7 @@ There are several categories of change:
 # From 0.8.4 to 0.8.5
 
 - enhancement: assembler is able to catch most zero-distance jumps preventing infinite loops at compile time
+- bic: remove all warning and error options from assembler frontend (all enabled by default)
 
 
 ----

@@ -73,7 +73,7 @@ def getCPUArchitecture():
     output = output.decode('utf-8').strip()
     return output
 
-def assemble(asm, out=None, links=(), opts=('-E', '-W',), okcodes=(0,)):
+def assemble(asm, out=None, links=(), opts=(), okcodes=(0,)):
     """Assemble path given as `asm` and put binary in `out`.
     Raises exception if compilation is not successful.
     """
@@ -942,7 +942,7 @@ class AssemblerErrorTests(unittest.TestCase):
         name = 'halt_as_last_instruction.asm'
         assembly_path = os.path.join(self.PATH, name)
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, opts=('--Ehalt-is-last',), okcodes=(1,0))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
         self.assertEqual("./sample/asm/errors/halt_as_last_instruction.asm:23: error: function does not end with 'return' or 'tailcall': main/1", output.strip())
 
@@ -950,7 +950,7 @@ class AssemblerErrorTests(unittest.TestCase):
         name = 'arity_error.asm'
         assembly_path = os.path.join(self.PATH, name)
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, opts=('--Ehalt-is-last',), okcodes=(1,0))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
         self.assertEqual("./sample/asm/errors/arity_error.asm:27: error: invalid number of parameters in call to function foo/1: expected 1 got 0", output.strip())
 
@@ -982,7 +982,7 @@ class AssemblerErrorTests(unittest.TestCase):
         name = 'msg_requires_at_least_one_parameter.asm'
         assembly_path = os.path.join(self.PATH, name)
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, opts=('--Ehalt-is-last',), okcodes=(1,0))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
         self.assertEqual("./sample/asm/errors/msg_requires_at_least_one_parameter.asm:22: error: invalid number of parameters in dynamic dispatch of foo: expected at least 1, got 0", output.strip())
 
@@ -990,7 +990,7 @@ class AssemblerErrorTests(unittest.TestCase):
         name = 'msg_arity_mismatch.asm'
         assembly_path = os.path.join(self.PATH, name)
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, opts=('--Ehalt-is-last',), okcodes=(1,0))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
         self.assertEqual("./sample/asm/errors/msg_arity_mismatch.asm:22: error: invalid number of parameters in dynamic dispatch of add/2: expected 2 got 1", output.strip())
 
@@ -998,7 +998,7 @@ class AssemblerErrorTests(unittest.TestCase):
         name = 'no_return_at_the_end_of_a_function.asm'
         assembly_path = os.path.join(self.PATH, name)
         compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, opts=('--Emissing-return',), okcodes=(1,0))
+        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
         self.assertEqual("./sample/asm/errors/no_return_at_the_end_of_a_function.asm:22: error: function does not end with 'return' or 'tailcall': foo/0", output.strip())
 

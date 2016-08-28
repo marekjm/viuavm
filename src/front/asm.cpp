@@ -43,18 +43,6 @@ bool VERBOSE = false;
 bool DEBUG = false;
 bool SCREAM = false;
 
-bool WARNING_ALL = false;
-bool ERROR_ALL = false;
-
-// WARNINGS
-bool WARNING_MISSING_RETURN = false;
-bool WARNING_UNDEFINED_ARITY = false;
-
-// ERRORS
-bool ERROR_MISSING_RETURN = false;
-bool ERROR_HALT_IS_LAST = false;
-bool ERROR_UNDEFINED_ARITY = false;
-
 
 static bool usage(const char* program, bool show_help, bool show_version, bool verbose) {
     if (show_help or (show_version and verbose)) {
@@ -125,27 +113,6 @@ int main(int argc, char* argv[]) {
             continue;
         } else if (option == "--scream") {
             SCREAM = true;
-            continue;
-        } else if (option == "--Wall" or option == "-W") {
-            WARNING_ALL = true;
-            continue;
-        } else if (option == "--Wmissing-return") {
-            WARNING_MISSING_RETURN = true;
-            continue;
-        } else if (option == "--Wundefined-arity") {
-            WARNING_UNDEFINED_ARITY = true;
-            continue;
-        } else if (option == "--Eall" or option == "-E") {
-            ERROR_ALL = true;
-            continue;
-        } else if (option == "--Emissing-return") {
-            ERROR_MISSING_RETURN = true;
-            continue;
-        } else if (option == "--Eundefined-arity") {
-            ERROR_UNDEFINED_ARITY = true;
-            continue;
-        } else if (option == "--Ehalt-is-last") {
-            ERROR_HALT_IS_LAST = true;
             continue;
         } else if (option == "--out" or option == "-o") {
             if (i < argc-1) {
