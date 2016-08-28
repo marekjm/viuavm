@@ -42,7 +42,7 @@
 
 
 class ForeignFunctionCallRequest {
-    Frame *frame;
+    std::unique_ptr<Frame> frame;
     Process *caller_process;
     CPU *cpu;
 
@@ -53,9 +53,7 @@ class ForeignFunctionCallRequest {
         void wakeup();
 
         ForeignFunctionCallRequest(Frame *fr, Process *cp, CPU *c): frame(fr), caller_process(cp), cpu(c) {}
-        ~ForeignFunctionCallRequest() {
-            delete frame;
-        }
+        ~ForeignFunctionCallRequest() {}
 };
 
 
