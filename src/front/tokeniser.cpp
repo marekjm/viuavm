@@ -179,6 +179,25 @@ static vector<Token> remove_comments(vector<Token> input_tokens) {
     return tokens;
 }
 
+static vector<Token> reduce_newlines(vector<Token> input_tokens) {
+    vector<Token> tokens;
+
+    string newline("\n");
+    for (auto it = input_tokens.begin(); it < input_tokens.end(); ++it) {
+        if (it->str() == newline) {
+            tokens.push_back(*it);
+            while (it->str() == newline) {
+                ++it;
+            }
+            --it;
+        } else {
+            tokens.push_back(*it);
+        }
+    }
+
+    return tokens;
+}
+
 
 static bool usage(const char* program, bool show_help, bool show_version, bool verbose) {
     if (show_help or (show_version and verbose)) {
@@ -262,7 +281,7 @@ int main(int argc, char* argv[]) {
 
     vector<Token> tokens;
     try {
-        tokens = remove_comments(remove_spaces(tokenise(source)));
+        tokens = reduce_newlines(remove_comments(remove_spaces(tokenise(source))));
         cout << tokens.size() << endl;
 
         for (const auto& t : tokens) {
