@@ -138,6 +138,39 @@ static vector<Token> tokenise(const string& source) {
 }
 
 
+static vector<Token> remove_spaces(vector<Token> input_tokens) {
+    vector<Token> tokens;
+
+    string space(" ");
+    for (auto t : input_tokens) {
+        if (t.str() != space) {
+            tokens.push_back(t);
+        }
+    }
+
+    return tokens;
+}
+
+static vector<Token> remove_comments(vector<Token> input_tokens) {
+    vector<Token> tokens;
+
+    string colon(";");
+    string newline("\n");
+    for (auto it = input_tokens.begin(); it < input_tokens.end(); ++it) {
+        if (it->str() != colon and it->str() != newline) {
+            tokens.push_back(*it);
+        }
+        if (it->str() == colon) {
+            do {
+                ++it;
+            } while (it->str() != newline);
+        }
+    }
+
+    return tokens;
+}
+
+
 static bool usage(const char* program, bool show_help, bool show_version, bool verbose) {
     if (show_help or (show_version and verbose)) {
         cout << "Viua VM tokenizer, version ";
@@ -220,7 +253,7 @@ int main(int argc, char* argv[]) {
 
     vector<Token> tokens;
     try {
-        tokens = tokenise(source);
+        tokens = remove_comments(remove_spaces(tokenise(source)));
         cout << tokens.size() << endl;
 
         for (const auto& t : tokens) {
