@@ -166,13 +166,13 @@ static vector<Token> remove_comments(vector<Token> input_tokens) {
     string colon(";");
     string newline("\n");
     for (auto it = input_tokens.begin(); it < input_tokens.end(); ++it) {
-        if (it->str() != colon and it->str() != newline) {
+        if (it->str() != colon) {
             tokens.push_back(*it);
-        }
-        if (it->str() == colon) {
+        } else {
             do {
                 ++it;
             } while (it->str() != newline);
+            tokens.push_back(*it);
         }
     }
 
