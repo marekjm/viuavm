@@ -110,6 +110,8 @@ static vector<Token> tokenise(const string& source) {
             case '>':
             case '/':
             case '?':
+            case '\'':
+            case '"':
                 found_breaking_character = true;
                 break;
             default:
@@ -122,9 +124,16 @@ static vector<Token> tokenise(const string& source) {
                 character_in_line += candidate_token.str().size();
                 candidate_token.str("");
             }
-            candidate_token << current_char;
-            tokens.emplace_back(line_number, character_in_line, candidate_token.str());
-            candidate_token.str("");
+            if (current_char == '\'' or current_char == '"') {
+                string s = str::extract(source.substr(i));
+                tokens.emplace_back(line_number, character_in_line, s);
+                character_in_line += (s.size() - 1);
+                i += (s.size() - 1);
+            } else {
+                candidate_token << current_char;
+                tokens.emplace_back(line_number, character_in_line, candidate_token.str());
+                candidate_token.str("");
+            }
 
             ++character_in_line;
             if (current_char == '\n') {
