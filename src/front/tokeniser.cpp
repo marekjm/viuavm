@@ -56,6 +56,9 @@ class Token {
     bool operator==(const string& s) {
         return (content == s);
     }
+    bool operator!=(const string& s) {
+        return (content != s);
+    }
 
     Token(unsigned line_, unsigned character_, string content_): content(content_), line_number(line_), character_in_line(character_) {
     }
@@ -204,6 +207,7 @@ static vector<Token> reduce_newlines(vector<Token> input_tokens) {
 static vector<Token> unwrap_lines(vector<Token> input_tokens) {
     decltype(input_tokens) unwrapped_tokens;
     decltype(input_tokens) tokens;
+    decltype(input_tokens) final_tokens;
 
     decltype(tokens.size()) i = 0, limit = input_tokens.size();
     bool invert = false;
@@ -218,47 +222,63 @@ static vector<Token> unwrap_lines(vector<Token> input_tokens) {
             vector<Token> subtokens;
             ++i;
             unsigned balance = 1;
-            while (i < limit and balance) {
+            while (i < limit) {
                 if (input_tokens[i] == "(") {
                     ++balance;
                 } else if (input_tokens[i] == ")") {
                     --balance;
                 }
                 if (balance == 0) {
+                    ++i;
                     break;
                 }
                 subtokens.push_back(input_tokens[i]);
                 ++i;
             }
             Token tok = subtokens.at(1);
-            subtokens = unwrap_lines(subtokens);
-            for (auto subt : subtokens) {
+            for (auto subt : unwrap_lines(subtokens)) {
                 unwrapped_tokens.push_back(subt);
             }
             unwrapped_tokens.emplace_back(t.line(), t.character(), "\n");
-            tokens.push_back(tok);
-            ++i;
+
+            if (invert) {
+                final_tokens.push_back(tok);
+                while (i < limit and input_tokens[i] != "\n") {
+                    final_tokens.push_back(input_tokens[i]);
+                    ++i;
+                }
+
+                // this line is to push \n to the token list
+                final_tokens.push_back(input_tokens[i++]);
+
+                for (auto to : unwrapped_tokens) {
+                    final_tokens.push_back(to);
+                }
+            } else {
+                vector<Token> foo;
+                while (final_tokens.size() and final_tokens[final_tokens.size()-1] != "\n") {
+                    foo.insert(foo.begin(), final_tokens.back());
+                    final_tokens.pop_back();
+                }
+
+                for (auto to : unwrapped_tokens) {
+                    final_tokens.push_back(to);
+                }
+
+                for (auto to : foo) {
+                    final_tokens.push_back(to);
+                }
+                final_tokens.push_back(tok);
+            }
+
+            invert = false;
+            unwrapped_tokens.clear();
+            tokens.clear();
+
             continue;
         }
-        tokens.push_back(t);
+        final_tokens.push_back(t);
         ++i;
-    }
-
-    decltype(unwrapped_tokens) final_tokens;
-    if (invert) {
-        for (auto t : tokens) {
-            final_tokens.push_back(t);
-        }
-        for (auto t : unwrapped_tokens) {
-            final_tokens.push_back(t);
-        }
-    } else {
-        for (auto t : unwrapped_tokens) {
-            final_tokens.push_back(t);
-        }
-        for (auto t : tokens) {
-            final_tokens.push_back(t);
-        }
     }
 
     return final_tokens;
