@@ -34,7 +34,7 @@ void ForeignFunctionCallRequest::call(ForeignFunction* callback) {
      * FIXME: third parameter should be a pointer to global registers
      */
     try {
-        (*callback)(frame, nullptr, nullptr, caller_process, cpu);
+        (*callback)(frame.get(), nullptr, nullptr, caller_process, cpu);
 
         /* // FIXME: woohoo! segfault! */
         Type* returned = nullptr;
