@@ -73,7 +73,7 @@ namespace str {
     std::string strencode(const std::string&);
 
     std::string stringify(const std::vector<std::string>&);
-    std::string stringify(unsigned);
+    std::string stringify(long unsigned);
 }
 
 

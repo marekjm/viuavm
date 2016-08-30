@@ -406,7 +406,7 @@ namespace str {
         oss << ']';
         return oss.str();
     }
-    string stringify(unsigned n) {
+    string stringify(long unsigned n) {
         ostringstream oss;
         oss << n << endl;
         return oss.str();
