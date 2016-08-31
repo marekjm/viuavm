@@ -204,6 +204,27 @@ static vector<Token> reduce_newlines(vector<Token> input_tokens) {
     return tokens;
 }
 
+static vector<Token> reduce_end_directive(vector<Token> input_tokens) {
+    decltype(input_tokens) tokens;
+
+    const auto limit = input_tokens.size();
+    for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
+        const auto t = input_tokens[i];
+        if (t.str() == "." and i < limit-1 and input_tokens[i+1] == "end") {
+            if (t.line() == input_tokens[i+1].line()) {
+                if (t.ends() == input_tokens[i+1].character()) {
+                    tokens.emplace_back(t.line(), t.character(), ".end");
+                    ++i; // skip "end" token
+                    continue;
+                }
+            }
+        }
+        tokens.push_back(t);
+    }
+
+    return tokens;
+}
+
 static vector<Token> unwrap_lines(vector<Token> input_tokens, bool full = true) {
     decltype(input_tokens) unwrapped_tokens;
     decltype(input_tokens) tokens;
