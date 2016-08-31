@@ -495,6 +495,29 @@ template<class T> static auto enumerate(const vector<T>& v) -> vector<pair<typen
     return enumerated_vector;
 }
 
+static void encode_json(const string& filename, const vector<Token>& tokens) {
+    const string INDENT = "  ";
+    cout << "{\n";
+    cout << INDENT << str::enquote("file") << ": " << str::enquote(filename) << ",\n";
+    cout << INDENT << str::enquote("tokens") << ": [\n";
+
+    const auto limit = tokens.size();
+    for (const auto& t : enumerate(tokens)) {
+        cout << INDENT << INDENT << "{\n";
+        cout << INDENT << INDENT << INDENT << str::enquote("line") << ": " << t.second.line() << ",\n";
+        cout << INDENT << INDENT << INDENT << str::enquote("character") << ": " << t.second.character() << ",\n";
+        cout << INDENT << INDENT << INDENT << str::enquote("content") << ": " << str::enquote(str::strencode(t.second.str())) << "\n";
+        cout << INDENT << INDENT << '}';
+        if (t.first+1 < limit) {
+            cout << ',';
+        }
+        cout << '\n';
+    }
+
+    cout << INDENT << "]\n";
+    cout << "}\n";
+}
+
 static bool usage(const char* program, bool show_help, bool show_version, bool verbose) {
     if (show_help or (show_version and verbose)) {
         cout << "Viua VM tokenizer, version ";
@@ -578,27 +601,7 @@ int main(int argc, char* argv[]) {
     vector<Token> tokens;
     try {
         tokens = reduce_function_signatures(reduce_double_colon(reduce_end_directive(reduce_function_directive(unwrap_lines(reduce_newlines(remove_comments(remove_spaces(tokenise(source)))))))));
-
-        const string INDENT = "  ";
-        cout << "{\n";
-        cout << INDENT << str::enquote("file") << ": " << str::enquote(filename) << ",\n";
-        cout << INDENT << str::enquote("tokens") << ": [\n";
-
-        const auto limit = tokens.size();
-        for (const auto& t : enumerate(tokens)) {
-            cout << INDENT << INDENT << "{\n";
-            cout << INDENT << INDENT << INDENT << str::enquote("line") << ": " << t.second.line() << ",\n";
-            cout << INDENT << INDENT << INDENT << str::enquote("character") << ": " << t.second.character() << ",\n";
-            cout << INDENT << INDENT << INDENT << str::enquote("content") << ": " << str::enquote(str::strencode(t.second.str())) << "\n";
-            cout << INDENT << INDENT << '}';
-            if (t.first+1 < limit) {
-                cout << ',';
-            }
-            cout << '\n';
-        }
-
-        cout << INDENT << "]\n";
-        cout << "}\n";
+        encode_json(filename, tokens);
     } catch (const InvalidSyntax& e) {
         cerr << filename << ':' << e.line_number << ':' << e.character_in_line << ": error: invalid syntax: " << e.content << endl;
         return 1;
