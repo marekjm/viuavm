@@ -204,6 +204,28 @@ static vector<Token> reduce_newlines(vector<Token> input_tokens) {
     return tokens;
 }
 
+static vector<Token> reduce_function_directive(vector<Token> input_tokens) {
+    decltype(input_tokens) tokens;
+
+    const auto limit = input_tokens.size();
+    for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
+        const auto t = input_tokens[i];
+        if (t.str() == "." and i < limit-2 and input_tokens[i+1] == "function" and input_tokens[i+2].str() == ":") {
+            if (t.line() == input_tokens[i+1].line() and t.line() == input_tokens[i+2].line()) {
+                if (t.ends() == input_tokens[i+1].character() and input_tokens[i+1].ends() == input_tokens[i+2].character()) {
+                    tokens.emplace_back(t.line(), t.character(), ".function:");
+                    ++i; // skip "function" token
+                    ++i; // skip ":" token
+                    continue;
+                }
+            }
+        }
+        tokens.push_back(t);
+    }
+
+    return tokens;
+}
+
 static vector<Token> reduce_end_directive(vector<Token> input_tokens) {
     decltype(input_tokens) tokens;
 
