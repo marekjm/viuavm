@@ -35,6 +35,7 @@ namespace str {
     bool isnum(const std::string& s, bool negatives = true);
     bool ishex(const std::string& s, bool negatives = true);
     bool isfloat(const std::string& s, bool negatives = true);
+    bool isid(const std::string& s);
 
     std::string sub(const std::string& s, long unsigned b = 0, long int e = -1);
 

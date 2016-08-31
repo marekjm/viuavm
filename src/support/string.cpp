@@ -106,6 +106,13 @@ namespace str {
         return is;
     }
 
+    bool isid(const std::string& s) {
+        /*  Returns true if s is a valid identifier.
+         */
+        static regex identifier("^[a-zA-Z_][a-zA-Z0-9_]*$");
+        return regex_match(s, identifier);
+    }
+
 
     string sub(const string& s, unsigned long b, long int e) {
         /*  Returns substring of s.
