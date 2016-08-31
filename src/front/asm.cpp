@@ -38,6 +38,8 @@ bool AS_LIB = false;
 bool EXPAND_ONLY = false;
 // are we only verifying source code correctness?
 bool EARLY_VERIFICATION_ONLY = false;
+// are we only checking what size will the bytecode by?
+bool REPORT_BYTECODE_SIZE = false;
 
 bool VERBOSE = false;
 bool DEBUG = false;
@@ -83,6 +85,7 @@ static bool usage(const char* program, bool show_help, bool show_version, bool v
              << "    " << "                           with this option, assembler prints expanded source to standard output\n"
              << "    " << "-C, --verify             - verify source code correctness without actually compiling it\n"
              << "    " << "                           this option turns assembler into source level debugger and static code analyzer hybrid\n"
+             << "    " << "    --size               - calculate and report final bytecode size\n";
              ;
     }
 
@@ -131,7 +134,10 @@ int main(int argc, char* argv[]) {
         } else if (option == "--verify" or option == "-C") {
             EARLY_VERIFICATION_ONLY = true;
             continue;
-        } else if (str::startswith(option, "-")) {
+        } else if (option == "--size") {
+            REPORT_BYTECODE_SIZE = true;
+            continue;
+        }else if (str::startswith(option, "-")) {
             cout << "error: unknown option: " << option << endl;
             return 1;
         }
@@ -235,6 +241,10 @@ int main(int argc, char* argv[]) {
 
 
     if (EARLY_VERIFICATION_ONLY) {
+        return 0;
+    }
+    if (REPORT_BYTECODE_SIZE) {
+        cout << Program::countBytes(ilines) << endl;
         return 0;
     }
 

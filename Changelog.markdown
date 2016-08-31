@@ -31,6 +31,7 @@ There are several categories of change:
 
 - enhancement: assembler is able to catch most zero-distance jumps preventing infinite loops at compile time
 - bic: remove all warning and error options from assembler frontend (all enabled by default)
+- feature: `--size` option in assembler frontend reporting calculated size of bytecode
 
 
 ----
