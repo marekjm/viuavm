@@ -496,7 +496,7 @@ int main(int argc, char* argv[]) {
 
     vector<Token> tokens;
     try {
-        tokens = unwrap_lines(reduce_newlines(remove_comments(remove_spaces(tokenise(source)))));
+        tokens = reduce_end_directive(reduce_function_directive(unwrap_lines(reduce_newlines(remove_comments(remove_spaces(tokenise(source)))))));
 
         const string INDENT = "  ";
         cout << "{\n";
