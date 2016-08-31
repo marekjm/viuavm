@@ -204,6 +204,25 @@ static vector<Token> reduce_newlines(vector<Token> input_tokens) {
     return tokens;
 }
 
+template<class T, typename... R> bool adjacent(T first, T second) {
+    if (first.line() != second.line()) {
+        return false;
+    }
+    if (first.ends() != second.character()) {
+        return false;
+    }
+    return true;
+}
+template<class T, typename... R> bool adjacent(T first, T second, R... rest) {
+    if (first.line() != second.line()) {
+        return false;
+    }
+    if (first.ends() != second.character()) {
+        return false;
+    }
+    return adjacent(second, rest...);
+}
+
 static vector<Token> reduce_function_directive(vector<Token> input_tokens) {
     decltype(input_tokens) tokens;
 
@@ -211,13 +230,11 @@ static vector<Token> reduce_function_directive(vector<Token> input_tokens) {
     for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
         const auto t = input_tokens[i];
         if (t.str() == "." and i < limit-2 and input_tokens[i+1] == "function" and input_tokens[i+2].str() == ":") {
-            if (t.line() == input_tokens[i+1].line() and t.line() == input_tokens[i+2].line()) {
-                if (t.ends() == input_tokens[i+1].character() and input_tokens[i+1].ends() == input_tokens[i+2].character()) {
-                    tokens.emplace_back(t.line(), t.character(), ".function:");
-                    ++i; // skip "function" token
-                    ++i; // skip ":" token
-                    continue;
-                }
+            if (adjacent(t, input_tokens[i+1], input_tokens[i+2])) {
+                tokens.emplace_back(t.line(), t.character(), ".function:");
+                ++i; // skip "function" token
+                ++i; // skip ":" token
+                continue;
             }
         }
         tokens.push_back(t);
@@ -233,12 +250,10 @@ static vector<Token> reduce_end_directive(vector<Token> input_tokens) {
     for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
         const auto t = input_tokens[i];
         if (t.str() == "." and i < limit-1 and input_tokens[i+1] == "end") {
-            if (t.line() == input_tokens[i+1].line()) {
-                if (t.ends() == input_tokens[i+1].character()) {
-                    tokens.emplace_back(t.line(), t.character(), ".end");
-                    ++i; // skip "end" token
-                    continue;
-                }
+            if (adjacent(t, input_tokens[i+1])) {
+                tokens.emplace_back(t.line(), t.character(), ".end");
+                ++i; // skip "end" token
+                continue;
             }
         }
         tokens.push_back(t);
