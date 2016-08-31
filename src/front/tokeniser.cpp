@@ -274,6 +274,26 @@ namespace viua {
                 return tokens;
             }
 
+            static vector<Token> reduce_signature_directive(vector<Token> input_tokens) {
+                decltype(input_tokens) tokens;
+
+                const auto limit = input_tokens.size();
+                for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
+                    const auto t = input_tokens[i];
+                    if (t.str() == "." and i < limit-2 and input_tokens[i+1] == "signature" and input_tokens[i+2].str() == ":") {
+                        if (adjacent(t, input_tokens[i+1], input_tokens[i+2])) {
+                            tokens.emplace_back(t.line(), t.character(), ".signature:");
+                            ++i; // skip "signature" token
+                            ++i; // skip ":" token
+                            continue;
+                        }
+                    }
+                    tokens.push_back(t);
+                }
+
+                return tokens;
+            }
+
             static vector<Token> reduce_double_colon(vector<Token> input_tokens) {
                 decltype(input_tokens) tokens;
 
@@ -486,7 +506,7 @@ namespace viua {
             }
 
             static vector<Token> reduce(vector<Token> tokens) {
-                return reduce_function_signatures(reduce_double_colon(reduce_end_directive(reduce_function_directive(unwrap_lines(reduce_newlines(remove_comments(remove_spaces(tokens))))))));
+                return reduce_signature_directive(reduce_function_signatures(reduce_double_colon(reduce_end_directive(reduce_function_directive(unwrap_lines(reduce_newlines(remove_comments(remove_spaces(tokens)))))))));
             }
         }
     }
