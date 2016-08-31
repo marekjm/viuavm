@@ -359,6 +359,17 @@ static vector<Token> unwrap_lines(vector<Token> input_tokens, bool full = true) 
     return final_tokens;
 }
 
+template<class T> static auto enumerate(const vector<T>& v) -> vector<pair<typename vector<T>::size_type, T>> {
+    vector<pair<typename vector<T>::size_type, T>> enumerated_vector;
+
+    typename vector<T>::size_type i = 0;
+    for (const auto& each : v) {
+        enumerated_vector.emplace_back(i, each);
+        ++i;
+    }
+
+    return enumerated_vector;
+}
 
 static bool usage(const char* program, bool show_help, bool show_version, bool verbose) {
     if (show_help or (show_version and verbose)) {
@@ -443,11 +454,27 @@ int main(int argc, char* argv[]) {
     vector<Token> tokens;
     try {
         tokens = unwrap_lines(reduce_newlines(remove_comments(remove_spaces(tokenise(source)))));
-        cout << tokens.size() << endl;
 
-        for (const auto& t : tokens) {
-            cout << t.line() << ':' << t.character() << ".." << t.ends() << ": ```" << t.str() << "'''" << endl;
+        const string INDENT = "  ";
+        cout << "{\n";
+        cout << INDENT << str::enquote("file") << ": " << str::enquote(filename) << ",\n";
+        cout << INDENT << str::enquote("tokens") << ": [\n";
+
+        const auto limit = tokens.size();
+        for (const auto& t : enumerate(tokens)) {
+            cout << INDENT << INDENT << "{\n";
+            cout << INDENT << INDENT << INDENT << str::enquote("line") << ": " << t.second.line() << ",\n";
+            cout << INDENT << INDENT << INDENT << str::enquote("character") << ": " << t.second.character() << ",\n";
+            cout << INDENT << INDENT << INDENT << str::enquote("content") << ": " << str::enquote(str::strencode(t.second.str())) << "\n";
+            cout << INDENT << INDENT << '}';
+            if (t.first+1 < limit) {
+                cout << ',';
+            }
+            cout << '\n';
         }
+
+        cout << INDENT << "]\n";
+        cout << "}\n";
     } catch (const InvalidSyntax& e) {
         cerr << filename << ':' << e.line_number << ':' << e.character_in_line << ": error: invalid syntax: " << e.content << endl;
         return 1;
