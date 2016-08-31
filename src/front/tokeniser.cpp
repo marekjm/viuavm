@@ -153,6 +153,34 @@ static vector<Token> tokenise(const string& source) {
     return tokens;
 }
 
+template<class T, typename... R> bool adjacent(T first, T second) {
+    if (first.line() != second.line()) {
+        return false;
+    }
+    if (first.ends() != second.character()) {
+        return false;
+    }
+    return true;
+}
+template<class T, typename... R> bool adjacent(T first, T second, R... rest) {
+    if (first.line() != second.line()) {
+        return false;
+    }
+    if (first.ends() != second.character()) {
+        return false;
+    }
+    return adjacent(second, rest...);
+}
+
+static string join_tokens(const vector<Token> tokens, const decltype(tokens)::size_type from, const decltype(from) to) {
+    ostringstream joined;
+
+    for (auto i = from; i < tokens.size() and i < to; ++i) {
+        joined << tokens[i].str();
+    }
+
+    return joined.str();
+}
 
 static vector<Token> remove_spaces(vector<Token> input_tokens) {
     vector<Token> tokens;
@@ -202,25 +230,6 @@ static vector<Token> reduce_newlines(vector<Token> input_tokens) {
     }
 
     return tokens;
-}
-
-template<class T, typename... R> bool adjacent(T first, T second) {
-    if (first.line() != second.line()) {
-        return false;
-    }
-    if (first.ends() != second.character()) {
-        return false;
-    }
-    return true;
-}
-template<class T, typename... R> bool adjacent(T first, T second, R... rest) {
-    if (first.line() != second.line()) {
-        return false;
-    }
-    if (first.ends() != second.character()) {
-        return false;
-    }
-    return adjacent(second, rest...);
 }
 
 static vector<Token> reduce_function_directive(vector<Token> input_tokens) {
@@ -279,16 +288,6 @@ static vector<Token> reduce_double_colon(vector<Token> input_tokens) {
     }
 
     return tokens;
-}
-
-static string join_tokens(const vector<Token> tokens, const decltype(tokens)::size_type from, const decltype(from) to) {
-    ostringstream joined;
-
-    for (auto i = from; i < tokens.size() and i < to; ++i) {
-        joined << tokens[i].str();
-    }
-
-    return joined.str();
 }
 
 static vector<Token> reduce_function_signatures(vector<Token> input_tokens) {
