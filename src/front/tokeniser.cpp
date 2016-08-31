@@ -262,6 +262,72 @@ static vector<Token> reduce_end_directive(vector<Token> input_tokens) {
     return tokens;
 }
 
+static vector<Token> reduce_double_colon(vector<Token> input_tokens) {
+    decltype(input_tokens) tokens;
+
+    const auto limit = input_tokens.size();
+    for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
+        const auto t = input_tokens[i];
+        if (t.str() == ":" and i < limit-1 and input_tokens[i+1].str() == ":") {
+            if (adjacent(t, input_tokens[i+1])) {
+                tokens.emplace_back(t.line(), t.character(), "::");
+                ++i; // skip second ":" token
+                continue;
+            }
+        }
+        tokens.push_back(t);
+    }
+
+    return tokens;
+}
+
+static string join_tokens(const vector<Token> tokens, const decltype(tokens)::size_type from, const decltype(from) to) {
+    ostringstream joined;
+
+    for (auto i = from; i < tokens.size() and i < to; ++i) {
+        joined << tokens[i].str();
+    }
+
+    return joined.str();
+}
+
+static vector<Token> reduce_function_signatures(vector<Token> input_tokens) {
+    decltype(input_tokens) tokens;
+
+    const auto limit = input_tokens.size();
+    for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
+        const auto t = input_tokens[i];
+        if (str::isid(t.str())) {
+            auto j = i;
+            while (j+2 < limit and input_tokens[j+1].str() == "::" and str::isid(input_tokens[j+2].str()) and adjacent(input_tokens[j], input_tokens[j+1], input_tokens[j+2])) {
+                ++j; // swallow "::" token
+                ++j; // swallow identifier token
+            }
+            if (j+1 < limit and input_tokens[j+1].str() == "/") {
+                if (j+2 < limit and str::isnum(input_tokens[j+2].str(), false)) {
+                    if (adjacent(input_tokens[j], input_tokens[j+1], input_tokens[j+2])) {
+                        tokens.emplace_back(t.line(), t.character(), join_tokens(input_tokens, i, j+3));
+                        ++j; // skip "/" token
+                        ++j; // skip integer encoding arity
+                        i = j;
+                        continue;
+                    }
+                } else if (j+2 < limit and input_tokens[j+2].str() == "\n") {
+                    if (adjacent(input_tokens[j], input_tokens[j+1])) {
+                        tokens.emplace_back(t.line(), t.character(), join_tokens(input_tokens, i, j+2));
+                        ++j; // skip "/" token
+                        i = j;
+                        continue;
+                    }
+                }
+            }
+        }
+        tokens.push_back(t);
+    }
+
+    return tokens;
+}
+
 static vector<Token> unwrap_lines(vector<Token> input_tokens, bool full = true) {
     decltype(input_tokens) unwrapped_tokens;
     decltype(input_tokens) tokens;
@@ -511,7 +577,7 @@ int main(int argc, char* argv[]) {
 
     vector<Token> tokens;
     try {
-        tokens = reduce_end_directive(reduce_function_directive(unwrap_lines(reduce_newlines(remove_comments(remove_spaces(tokenise(source)))))));
+        tokens = reduce_function_signatures(reduce_double_colon(reduce_end_directive(reduce_function_directive(unwrap_lines(reduce_newlines(remove_comments(remove_spaces(tokenise(source)))))))));
 
         const string INDENT = "  ";
         cout << "{\n";
