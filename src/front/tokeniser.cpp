@@ -65,10 +65,10 @@ class Token {
 };
 
 struct InvalidSyntax {
-    unsigned line_number, character_in_line;
+    long unsigned line_number, character_in_line;
     string content;
 
-    InvalidSyntax(unsigned ln, unsigned ch, string ct): line_number(ln), character_in_line(ch), content(ct) {
+    InvalidSyntax(long unsigned ln, long unsigned ch, string ct): line_number(ln), character_in_line(ch), content(ct) {
     }
 };
 
