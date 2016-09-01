@@ -158,6 +158,25 @@ namespace viua {
                 return tokens;
             }
 
+            static vector<Token> standardise(vector<Token> input_tokens) {
+                vector<Token> tokens;
+
+                const auto limit = input_tokens.size();
+                for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
+                    Token token = input_tokens.at(i);
+                    if (token == "call" or token == "process") {
+                        tokens.push_back(token);
+                        if (not str::isnum(input_tokens.at(i+1).str(), false)) {
+                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "0");
+                        }
+                    } else {
+                        tokens.push_back(token);
+                    }
+                }
+
+                return tokens;
+            }
+
             template<class T, typename... R> bool adjacent(T first, T second) {
                 if (first.line() != second.line()) {
                     return false;
@@ -615,9 +634,7 @@ static uint64_t calculate_bytecode_size(const vector<Token>& tokens) {
                 // get second chunk (function, block or module name)
                 inc += (tokens.at(i+1).str().size() + 1);
             } else if (any(op, CALL, MSG, PROCESS)) {
-                if (str::isnum(tokens.at(i+1).str())) {
-                    ++i;
-                }
+                ++i; // skip register index
                 if (tokens.at(i+1).str() == "\n") {
                     throw InvalidSyntax(token.line(), token.character(), token.str());
                 }
@@ -722,7 +739,7 @@ int main(int argc, char* argv[]) {
 
     vector<Token> tokens;
     try {
-        tokens = viua::cg::lex::reduce(viua::cg::lex::tokenise(source));
+        tokens = viua::cg::lex::standardise(viua::cg::lex::reduce(viua::cg::lex::tokenise(source)));
     } catch (const InvalidSyntax& e) {
         cerr << filename << ':' << e.line_number << ':' << e.character_in_line << ": error: invalid syntax: " << e.content << endl;
         return 1;
