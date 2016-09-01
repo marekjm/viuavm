@@ -609,7 +609,6 @@ static uint64_t calculate_bytecode_size(const vector<Token>& tokens) {
         }
         OPCODE op;
         try {
-            cout << "increasing by: '" << token.str() << "' = ";
             op = mnemonic_to_opcode(token.str());
             inc = OP_SIZES.at(token.str());
             if (any(op, ENTER, LINK, WATCHDOG, TAILCALL)) {
@@ -650,8 +649,6 @@ static uint64_t calculate_bytecode_size(const vector<Token>& tokens) {
         while (i < limit and tokens[i].str() != "\n") {
             ++i;
         }
-
-        cout << inc << endl;
 
         bytes += inc;
     }
