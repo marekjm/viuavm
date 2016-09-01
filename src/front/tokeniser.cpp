@@ -17,10 +17,12 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cstdint>
 #include <iostream>
 #include <fstream>
 #include <utility>
 #include <functional>
+#include <viua/bytecode/maps.h>
 #include <viua/support/string.h>
 #include <viua/support/env.h>
 #include <viua/version.h>
@@ -565,6 +567,100 @@ static bool usage(const char* program, bool show_help, bool show_version, bool v
     return (show_help or show_version);
 }
 
+template<class T> static bool any(T item, T other) {
+    return (item == other);
+}
+template<class T, class... R> static bool any(T item, T first, R... rest) {
+    if (item == first) {
+        return true;
+    }
+    return any(item, rest...);
+}
+
+static OPCODE mnemonic_to_opcode(const string& s) {
+    OPCODE op = NOP;
+    bool found = false;
+    for (auto it : OP_NAMES) {
+        if (it.second == s) {
+            found = true;
+            op = it.first;
+            break;
+        }
+    }
+    if (not found) {
+        throw std::out_of_range("invalid instruction name: " + s);
+    }
+    return op;
+}
+static uint64_t calculate_bytecode_size(const vector<Token>& tokens) {
+    uint64_t bytes = 0, inc = 0;
+
+    const auto limit = tokens.size();
+    for (decltype(tokens.size()) i = 0; i < limit; ++i) {
+        Token token = tokens[i];
+        if (token.str().substr(0, 1) == ".") {
+            while (i < limit and tokens[i].str() != "\n") {
+                ++i;
+            }
+            continue;
+        }
+        if (token.str() == "\n") {
+            continue;
+        }
+        OPCODE op;
+        try {
+            cout << "increasing by: '" << token.str() << "' = ";
+            op = mnemonic_to_opcode(token.str());
+            inc = OP_SIZES.at(token.str());
+            if (any(op, ENTER, LINK, WATCHDOG, TAILCALL)) {
+                // get second chunk (function, block or module name)
+                inc += (tokens.at(i+1).str().size() + 1);
+            } else if (any(op, CALL, MSG, PROCESS)) {
+                if (str::isnum(tokens.at(i+1).str())) {
+                    ++i;
+                }
+                if (tokens.at(i+1).str() == "\n") {
+                    throw InvalidSyntax(token.line(), token.character(), token.str());
+                }
+                inc += (tokens.at(i+1).str().size() + 1);
+            } else if (any(op, CLOSURE, FUNCTION, CLASS, PROTOTYPE, DERIVE, NEW)) {
+                ++i; // skip register index
+                if (tokens.at(i+1).str() == "\n") {
+                    throw InvalidSyntax(token.line(), token.character(), token.str());
+                }
+                inc += (tokens.at(i+1).str().size() + 1);
+            } else if (op == ATTACH) {
+                ++i; // skip register index
+                inc += (tokens[++i].str().size() + 1);
+                inc += (tokens[++i].str().size() + 1);
+            } else if (op == IMPORT) {
+                inc += (tokens[++i].str().size() - 2 + 1);
+            } else if (op == CATCH) {
+                inc += (tokens[++i].str().size() - 2 + 1); // +1: null-terminator, -2: quotes
+                inc += (tokens[++i].str().size() + 1);
+            } else if (op == STRSTORE) {
+                ++i; // skip register index
+                inc += (tokens[++i].str().size() - 2 + 1 );
+            }
+        } catch (const std::out_of_range& e) {
+            throw InvalidSyntax(token.line(), token.character(), token.str());
+        }
+
+        // skip tokens until "\n" after an instruction has been counted
+        while (i < limit and tokens[i].str() != "\n") {
+            ++i;
+        }
+
+        cout << inc << endl;
+
+        bytes += inc;
+    }
+
+    return bytes;
+}
+
+static bool DISPLAY_SIZE = false;
+
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
     vector<string> args;
@@ -583,6 +679,9 @@ int main(int argc, char* argv[]) {
             continue;
         } else if (option == "--verbose" or option == "-v") {
             VERBOSE = true;
+            continue;
+        } else if (option == "--size") {
+            DISPLAY_SIZE = true;
             continue;
         } else if (str::startswith(option, "-")) {
             cout << "error: unknown option: " << option << endl;
@@ -627,11 +726,22 @@ int main(int argc, char* argv[]) {
     vector<Token> tokens;
     try {
         tokens = viua::cg::lex::reduce(viua::cg::lex::tokenise(source));
-        encode_json(filename, tokens);
     } catch (const InvalidSyntax& e) {
         cerr << filename << ':' << e.line_number << ':' << e.character_in_line << ": error: invalid syntax: " << e.content << endl;
         return 1;
     }
+
+    if (DISPLAY_SIZE) {
+        try {
+            cout << calculate_bytecode_size(tokens) << endl;
+        } catch (const InvalidSyntax& e) {
+            cerr << filename << ':' << e.line_number << ':' << e.character_in_line;
+            cerr << ": error: invalid syntax: " << str::strencode(e.content) << endl;
+        }
+        return 0;
+    }
+
+    encode_json(filename, tokens);
 
     return 0;
 }
