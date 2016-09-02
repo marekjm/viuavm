@@ -94,8 +94,28 @@ static bool usage(const char* program, bool show_help, bool show_version, bool v
     return (show_help or show_version);
 }
 
+static string read_file(ifstream& in) {
+    ostringstream source_in;
+    string line;
+    while (getline(in, line)) { source_in << line << '\n'; }
+
+    return source_in.str();
+}
 
 static bool DISPLAY_SIZE = false;
+static void display_results(const string& filename, const vector<Token>& tokens) {
+    if (DISPLAY_SIZE) {
+        try {
+            cout << viua::cg::tools::calculate_bytecode_size(tokens) << endl;
+        } catch (const InvalidSyntax& e) {
+            cerr << filename << ':' << e.line_number << ':' << e.character_in_line;
+            cerr << ": error: invalid syntax: " << str::strencode(e.content) << endl;
+        }
+        return;
+    }
+
+    encode_json(filename, tokens);
+}
 
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
@@ -153,11 +173,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    ostringstream source_in;
-    string line;
-    while (getline(in, line)) { source_in << line << '\n'; }
-
-    string source = source_in.str();
+    string source = read_file(in);
 
     vector<Token> tokens;
     try {
@@ -167,17 +183,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    if (DISPLAY_SIZE) {
-        try {
-            cout << viua::cg::tools::calculate_bytecode_size(tokens) << endl;
-        } catch (const InvalidSyntax& e) {
-            cerr << filename << ':' << e.line_number << ':' << e.character_in_line;
-            cerr << ": error: invalid syntax: " << str::strencode(e.content) << endl;
-        }
-        return 0;
-    }
-
-    encode_json(filename, tokens);
+    display_results(filename, tokens);
 
     return 0;
 }
