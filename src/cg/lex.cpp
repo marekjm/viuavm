@@ -313,6 +313,28 @@ namespace viua {
                 return tokens;
             }
 
+            vector<Token> reduce_names(vector<Token> input_tokens) {
+                decltype(input_tokens) tokens;
+
+                const auto limit = input_tokens.size();
+                for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
+                    const auto t = input_tokens[i];
+                    if (str::isid(t.str())) {
+                        auto j = i;
+                        while (j+2 < limit and input_tokens[j+1].str() == "::" and str::isid(input_tokens[j+2].str()) and adjacent(input_tokens[j], input_tokens[j+1], input_tokens[j+2])) {
+                            ++j; // swallow "::" token
+                            ++j; // swallow identifier token
+                        }
+                        tokens.emplace_back(t.line(), t.character(), join_tokens(input_tokens, i, j+1));
+                        i = j;
+                        continue;
+                    }
+                    tokens.push_back(t);
+                }
+
+                return tokens;
+            }
+
             vector<Token> unwrap_lines(vector<Token> input_tokens, bool full) {
                 decltype(input_tokens) unwrapped_tokens;
                 decltype(input_tokens) tokens;
@@ -469,7 +491,7 @@ namespace viua {
             }
 
             vector<Token> reduce(vector<Token> tokens) {
-                return reduce_signature_directive(reduce_function_signatures(reduce_double_colon(reduce_end_directive(reduce_function_directive(unwrap_lines(reduce_newlines(remove_comments(remove_spaces(tokens)))))))));
+                return reduce_signature_directive(reduce_names(reduce_function_signatures(reduce_double_colon(reduce_end_directive(reduce_function_directive(unwrap_lines(reduce_newlines(remove_comments(remove_spaces(tokens))))))))));
             }
         }
     }
