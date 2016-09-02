@@ -42,12 +42,16 @@ namespace viua {
                 decltype(candidate_token.str().size()) line_number = 0, character_in_line = 0;
 
                 const auto limit = source.size();
+
+                unsigned hyphens = 0;
+                bool active_comment = false;
                 for (decltype(source.size()) i = 0; i < limit; ++i) {
                     char current_char = source[i];
                     bool found_breaking_character = false;
 
                     switch (current_char) {
                         case '\n':
+                        case '-':
                         case '\t':
                         case ' ':
                         case '~':
@@ -62,7 +66,6 @@ namespace viua {
                         case '*':
                         case '(':
                         case ')':
-                        case '-':
                         case '+':
                         case '=':
                         case '{':
@@ -86,14 +89,26 @@ namespace viua {
                             candidate_token << source[i];
                     }
 
+                    if (current_char == ';') {
+                        active_comment = true;
+                    }
+                    if (current_char == '-') {
+                        if (++hyphens >= 2) {
+                            active_comment = true;
+                        }
+                    } else {
+                        hyphens = 0;
+                    }
+
                     if (found_breaking_character) {
                         if (candidate_token.str().size()) {
                             tokens.emplace_back(line_number, character_in_line, candidate_token.str());
                             character_in_line += candidate_token.str().size();
                             candidate_token.str("");
                         }
-                        if (current_char == '\'' or current_char == '"') {
+                        if ((current_char == '\'' or current_char == '"') and not active_comment) {
                             string s = str::extract(source.substr(i));
+
                             tokens.emplace_back(line_number, character_in_line, s);
                             character_in_line += (s.size() - 1);
                             i += (s.size() - 1);
@@ -107,6 +122,7 @@ namespace viua {
                         if (current_char == '\n') {
                             ++line_number;
                             character_in_line = 0;
+                            active_comment = false;
                         }
                     }
                 }
