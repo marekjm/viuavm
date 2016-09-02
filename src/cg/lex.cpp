@@ -205,16 +205,17 @@ namespace viua {
             vector<Token> reduce_newlines(vector<Token> input_tokens) {
                 vector<Token> tokens;
 
-                for (auto it = input_tokens.begin(); it < input_tokens.end(); ++it) {
-                    // FIXME this is ugly
-                    if (*it == "\n") {
-                        tokens.push_back(*it);
-                        while (*it == "\n") {
-                            ++it;
+                const auto limit = input_tokens.size();
+                for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
+                    Token token = input_tokens[i];
+                    if (token.str() == "\n") {
+                        tokens.push_back(token);
+                        while (i < limit and input_tokens[i].str() == "\n") {
+                            ++i;
                         }
-                        --it;
+                        --i;
                     } else {
-                        tokens.push_back(*it);
+                        tokens.push_back(token);
                     }
                 }
 
