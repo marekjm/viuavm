@@ -366,6 +366,7 @@ namespace viua {
 
                 decltype(tokens.size()) i = 0, limit = input_tokens.size();
                 bool invert = false;
+
                 while (i < limit) {
                     Token t = input_tokens[i];
                     if (t == "^") {
@@ -391,7 +392,34 @@ namespace viua {
                             ++i;
                         }
 
-                        Token tok = subtokens.at(1);
+                        Token tok;
+                        try {
+                            unsigned long check = 1;
+                            do {
+                                /*
+                                 * Loop until first operand's token is not "(".
+                                 * Unwrapping works on second token that appears after the wrap, but
+                                 * if it is also a "(" then lexer must switch to next second token.
+                                 * Example:
+                                 *
+                                 * iinc (iinc (iinc (iinc (arg 0 1))))
+                                 *      |     ^     ^     ^    ^
+                                 *      |     1     3     5    7
+                                 *      |
+                                 *       \
+                                 *       start unwrapping;
+                                 *       1, 3, and 5 must be skipped because they open inner wraps that
+                                 *       must be unwrapped before their targets become available
+                                 *
+                                 *       skipping by two allows us to fetch the target value without waiting
+                                 *       for instructions to become unwrapped
+                                 */
+                                tok = subtokens.at(check);
+                                check += 2;
+                            } while (tok.str() == "(");
+                        } catch (const std::out_of_range& e) {
+                            throw InvalidSyntax(t.line(), t.character(), t.str());
+                        }
 
                         for (auto subt : unwrap_lines(subtokens)) {
                             unwrapped_tokens.push_back(subt);
