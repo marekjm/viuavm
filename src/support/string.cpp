@@ -204,15 +204,19 @@ namespace str {
         int backs = 0;
         for (unsigned i = 1; i < s.size(); ++i) {
             chnk << s[i];
-            if (s[i] == quote and (backs == 0)) {
-                break;
-            }
-            if (s[i] == quote and (backs != 0)) {
+            if (backs and s[i] != '\\' and s[i] != quote) {
                 backs = 0;
                 continue;
             }
+            if (s[i] == quote and ((backs % 2) != 0)) {
+                backs = 0;
+                continue;
+            } else if (s[i] == quote and ((backs % 2) == 0)) {
+                break;
+            }
             if (s[i] == '\\') {
                 ++backs;
+                //cout << "backs = " << backs << endl;
             }
         }
 
