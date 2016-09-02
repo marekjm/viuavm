@@ -179,7 +179,7 @@ int main(int argc, char* argv[]) {
     try {
         tokens = viua::cg::lex::standardise(viua::cg::lex::reduce(viua::cg::lex::tokenise(source)));
     } catch (const InvalidSyntax& e) {
-        cerr << filename << ':' << e.line_number << ':' << e.character_in_line << ": error: invalid syntax: " << e.content << endl;
+        cerr << filename << ':' << e.line_number+1 << ':' << e.character_in_line+1 << ": error: invalid syntax" << endl;
         return 1;
     }
 
