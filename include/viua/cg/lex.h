@@ -25,7 +25,7 @@ namespace viua {
                 bool operator==(const std::string& s);
                 bool operator!=(const std::string& s);
 
-                Token(decltype(line_number), decltype(character_in_line), std::string);
+                Token(decltype(line_number) = 0, decltype(character_in_line) = 0, std::string = "");
             };
 
             struct InvalidSyntax {
