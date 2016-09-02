@@ -159,20 +159,27 @@ namespace viua {
             vector<Token> remove_comments(vector<Token> input_tokens) {
                 vector<Token> tokens;
 
-                string colon(";");
-                string newline("\n");
-                const auto limit = input_tokens.end();
-                for (auto it = input_tokens.begin(); it < limit; ++it) {
-                    if (it->str() != colon) {
-                        tokens.push_back(*it);
-                    } else {
+                const auto limit = input_tokens.size();
+                for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
+                    Token token = input_tokens[i];
+                    if (token.str() == ";") {
                         // FIXME this is ugly as hell
                         do {
-                            ++it;
-                        } while (it < limit and it->str() != newline);
-                        if (it < limit) {
-                            tokens.push_back(*it);
+                            ++i;
+                        } while (i < limit and input_tokens[i].str() != "\n");
+                        if (i < limit) {
+                            tokens.push_back(input_tokens[i]);
                         }
+                    } else if (i+2 < limit and adjacent(token, input_tokens.at(i+1)) and token.str() == "-" and input_tokens.at(i+1).str() == "-") {
+                        // FIXME this is ugly as hell
+                        do {
+                            ++i;
+                        } while (i < limit and input_tokens[i].str() != "\n");
+                        if (i < limit) {
+                            tokens.push_back(input_tokens[i]);
+                        }
+                    } else {
+                        tokens.push_back(token);
                     }
                 }
 
