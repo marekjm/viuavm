@@ -586,7 +586,7 @@ static Program& compile(Program& program, const vector<string>& lines, map<strin
              */
             uint64_t jump_target;
             enum JUMPTYPE jump_type;
-            tie(jump_target, jump_type) = resolvejump(operands, marks, i);
+            tie(jump_target, jump_type) = resolvejump(str::chunk(operands), marks, i);
 
             if (DEBUG) {
                 if (jump_type == JMP_TO_BYTE) {
