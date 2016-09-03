@@ -25,6 +25,8 @@ namespace viua {
                 bool operator==(const std::string& s);
                 bool operator!=(const std::string& s);
 
+                operator std::string() const;
+
                 Token(decltype(line_number) = 0, decltype(character_in_line) = 0, std::string = "");
             };
 
@@ -65,6 +67,8 @@ namespace viua {
             std::vector<Token> reduce_function_directive(std::vector<Token>);
             std::vector<Token> reduce_end_directive(std::vector<Token>);
             std::vector<Token> reduce_signature_directive(std::vector<Token>);
+            std::vector<Token> reduce_bsignature_directive(std::vector<Token>);
+            std::vector<Token> reduce_block_directive(std::vector<Token>);
             std::vector<Token> reduce_double_colon(std::vector<Token>);
             std::vector<Token> reduce_function_signatures(std::vector<Token>);
             std::vector<Token> reduce_names(std::vector<Token>);

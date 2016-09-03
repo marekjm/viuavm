@@ -27,6 +27,10 @@ namespace viua {
                 return (content != s);
             }
 
+            Token::operator string() const {
+                return str();
+            }
+
             Token::Token(decltype(line_number) line_, decltype(character_in_line) character_, string content_): content(content_), line_number(line_), character_in_line(character_) {
             }
 
@@ -281,6 +285,46 @@ namespace viua {
                 return tokens;
             }
 
+            vector<Token> reduce_bsignature_directive(vector<Token> input_tokens) {
+                decltype(input_tokens) tokens;
+
+                const auto limit = input_tokens.size();
+                for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
+                    const auto t = input_tokens[i];
+                    if (t.str() == "." and i < limit-2 and input_tokens[i+1] == "bsignature" and input_tokens[i+2].str() == ":") {
+                        if (adjacent(t, input_tokens[i+1], input_tokens[i+2])) {
+                            tokens.emplace_back(t.line(), t.character(), ".bsignature:");
+                            ++i; // skip "bsignature" token
+                            ++i; // skip ":" token
+                            continue;
+                        }
+                    }
+                    tokens.push_back(t);
+                }
+
+                return tokens;
+            }
+
+            vector<Token> reduce_block_directive(vector<Token> input_tokens) {
+                decltype(input_tokens) tokens;
+
+                const auto limit = input_tokens.size();
+                for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
+                    const auto t = input_tokens[i];
+                    if (t.str() == "." and i < limit-2 and input_tokens[i+1] == "block" and input_tokens[i+2].str() == ":") {
+                        if (adjacent(t, input_tokens[i+1], input_tokens[i+2])) {
+                            tokens.emplace_back(t.line(), t.character(), ".block:");
+                            ++i; // skip "bsignature" token
+                            ++i; // skip ":" token
+                            continue;
+                        }
+                    }
+                    tokens.push_back(t);
+                }
+
+                return tokens;
+            }
+
             vector<Token> reduce_double_colon(vector<Token> input_tokens) {
                 decltype(input_tokens) tokens;
 
@@ -306,29 +350,30 @@ namespace viua {
                 const auto limit = input_tokens.size();
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
                     const auto t = input_tokens[i];
-                    if (str::isid(t.str())) {
+                    if (str::isid(t)) {
                         auto j = i;
-                        while (j+2 < limit and input_tokens[j+1].str() == "::" and str::isid(input_tokens[j+2].str()) and adjacent(input_tokens[j], input_tokens[j+1], input_tokens[j+2])) {
+                        while (j+2 < limit and input_tokens[j+1].str() == "::" and str::isid(input_tokens[j+2]) and adjacent(input_tokens[j], input_tokens[j+1], input_tokens[j+2])) {
                             ++j; // swallow "::" token
                             ++j; // swallow identifier token
                         }
                         if (j+1 < limit and input_tokens[j+1].str() == "/") {
                             if (j+2 < limit and str::isnum(input_tokens[j+2].str(), false)) {
                                 if (adjacent(input_tokens[j], input_tokens[j+1], input_tokens[j+2])) {
-                                    tokens.emplace_back(t.line(), t.character(), join_tokens(input_tokens, i, j+3));
                                     ++j; // skip "/" token
                                     ++j; // skip integer encoding arity
-                                    i = j;
-                                    continue;
                                 }
                             } else if (j+2 < limit and input_tokens[j+2].str() == "\n") {
                                 if (adjacent(input_tokens[j], input_tokens[j+1])) {
-                                    tokens.emplace_back(t.line(), t.character(), join_tokens(input_tokens, i, j+2));
                                     ++j; // skip "/" token
-                                    i = j;
-                                    continue;
                                 }
                             }
+                            if (j < limit and str::isid(input_tokens[j]) and adjacent(input_tokens[j-1], input_tokens[j])) {
+                                ++j;
+
+                            }
+                            tokens.emplace_back(t.line(), t.character(), join_tokens(input_tokens, i, j+1));
+                            i = j;
+                            continue;
                         }
                     }
                     tokens.push_back(t);
@@ -343,11 +388,22 @@ namespace viua {
                 const auto limit = input_tokens.size();
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
                     const auto t = input_tokens[i];
-                    if (str::isid(t.str())) {
+                    if (str::isid(t)) {
                         auto j = i;
-                        while (j+2 < limit and input_tokens[j+1].str() == "::" and str::isid(input_tokens[j+2].str()) and adjacent(input_tokens[j], input_tokens[j+1], input_tokens[j+2])) {
+                        while (j+2 < limit and input_tokens[j+1].str() == "::" and str::isid(input_tokens[j+2]) and adjacent(input_tokens[j], input_tokens[j+1], input_tokens[j+2])) {
                             ++j; // swallow "::" token
                             ++j; // swallow identifier token
+                        }
+                        if (j+1 < limit and input_tokens[j+1].str() == "/") {
+                            ++j; // skip "/" token
+                            if (j+1 < limit and input_tokens[j+1].str() != "\n") {
+                                if (adjacent(input_tokens[j], input_tokens[j+1])) {
+                                    ++j; // skip next token, append it to name
+                                }
+                            }
+                            tokens.emplace_back(t.line(), t.character(), join_tokens(input_tokens, i, j+1));
+                            i = j;
+                            continue;
                         }
                         tokens.emplace_back(t.line(), t.character(), join_tokens(input_tokens, i, j+1));
                         i = j;
@@ -543,7 +599,7 @@ namespace viua {
             }
 
             vector<Token> reduce(vector<Token> tokens) {
-                return reduce_signature_directive(reduce_names(reduce_function_signatures(reduce_double_colon(reduce_end_directive(reduce_function_directive(unwrap_lines(reduce_newlines(remove_comments(remove_spaces(tokens))))))))));
+                return reduce_block_directive(reduce_bsignature_directive(reduce_signature_directive(reduce_names(reduce_function_signatures(reduce_double_colon(reduce_end_directive(reduce_function_directive(unwrap_lines(reduce_newlines(remove_comments(remove_spaces(tokens))))))))))));
             }
         }
     }
