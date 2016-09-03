@@ -171,35 +171,36 @@ vector<string> assembler::ce::getSignatures(const vector<Token>& tokens) {
 
     return names;
 }
-vector<string> assembler::ce::getBlockNames(const vector<string>& lines) {
+vector<string> assembler::ce::getBlockNames(const vector<Token>& tokens) {
     vector<string> names;
 
-    string line, holdline;
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        holdline = line = lines[i];
-        if (not assembler::utils::lines::is_block(line)) { continue; }
-
-        if (assembler::utils::lines::is_block(line)) {
-            for (unsigned j = i+1; not assembler::utils::lines::is_end(lines[j]); ++j, ++i) {}
+    const auto limit = tokens.size();
+    for (decltype(tokens.size()) i = 0; i < limit; ++i) {
+        if (tokens[i].str() == ".block:") {
+            ++i;
+            if (i < limit) {
+                names.emplace_back(tokens.at(i).str());
+            } else {
+                throw tokens[i-1];
+            }
         }
-
-        line = str::lstrip(str::sub(line, str::chunk(line).size()));
-        string name = str::chunk(line);
-
-        names.emplace_back(name);
     }
 
     return names;
 }
-vector<string> assembler::ce::getBlockSignatures(const vector<string>& lines) {
+vector<string> assembler::ce::getBlockSignatures(const vector<Token>& tokens) {
     vector<string> names;
 
-    string line, holdline;
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        holdline = line = lines[i];
-        if (not assembler::utils::lines::is_block_signature(line)) { continue; }
-        line = str::lstrip(str::sub(line, str::chunk(line).size()));
-        names.emplace_back(str::chunk(line));
+    const auto limit = tokens.size();
+    for (decltype(tokens.size()) i = 0; i < limit; ++i) {
+        if (tokens[i].str() == ".bsignature:") {
+            ++i;
+            if (i < limit) {
+                names.emplace_back(tokens.at(i).str());
+            } else {
+                throw tokens[i-1];
+            }
+        }
     }
 
     return names;

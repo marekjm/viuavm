@@ -56,7 +56,7 @@ std::vector<std::vector<std::string>> decode_line_tokens(const std::vector<std::
 std::vector<std::vector<std::string>> decode_line(const std::string&);
 
 int gatherFunctions(invocables_t*, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<viua::cg::lex::Token>&);
-int gatherBlocks(invocables_t*, const std::vector<std::string>&, const std::vector<std::string>&);
+int gatherBlocks(invocables_t*, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<viua::cg::lex::Token>&);
 std::map<std::string, std::string> gatherMetaInformation(const std::vector<std::string>&);
 
 int generate(const std::vector<std::string>&, std::vector<std::string>&, invocables_t&, invocables_t&, const std::string&, std::string&, const std::vector<std::string>&, const compilationflags_t&);

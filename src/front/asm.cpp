@@ -227,7 +227,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
     invocables_t blocks;
-    if (gatherBlocks(&blocks, expanded_lines, ilines)) {
+    if (gatherBlocks(&blocks, expanded_lines, ilines, tokens)) {
         return 1;
     }
 

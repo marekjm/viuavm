@@ -49,9 +49,9 @@ namespace assembler {
         std::vector<std::string> getlinks(const std::vector<std::string>& lines);
 
         std::vector<std::string> getFunctionNames(const std::vector<viua::cg::lex::Token>&);
-        std::vector<std::string> getSignatures(const std::vector<viua::cg::lex::Token>& lines);
-        std::vector<std::string> getBlockNames(const std::vector<std::string>& lines);
-        std::vector<std::string> getBlockSignatures(const std::vector<std::string>& lines);
+        std::vector<std::string> getSignatures(const std::vector<viua::cg::lex::Token>&);
+        std::vector<std::string> getBlockNames(const std::vector<viua::cg::lex::Token>&);
+        std::vector<std::string> getBlockSignatures(const std::vector<viua::cg::lex::Token>&);
         std::map<std::string, std::vector<std::string> > getInvokables(const std::string& type, const std::vector<std::string>& lines);
     }
 

@@ -57,17 +57,17 @@ int gatherFunctions(invocables_t* invocables, const vector<string>&, const vecto
     return 0;
 }
 
-int gatherBlocks(invocables_t* invocables, const vector<string>& expanded_lines, const vector<string>& ilines) {
+int gatherBlocks(invocables_t* invocables, const vector<string>&, const vector<string>& ilines, const vector<viua::cg::lex::Token>& tokens) {
     /////////////////////
     // GATHER BLOCK NAMES
     try {
-        invocables->names = assembler::ce::getBlockNames(expanded_lines);
+        invocables->names = assembler::ce::getBlockNames(tokens);
     } catch (const string& e) {
         cout << "fatal: " << e << endl;
         return 1;
     }
     try {
-        invocables->signatures = assembler::ce::getBlockSignatures(expanded_lines);
+        invocables->signatures = assembler::ce::getBlockSignatures(tokens);
     } catch (const string& e) {
         cout << "fatal: " << e << endl;
         return 1;
