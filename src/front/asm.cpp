@@ -224,7 +224,7 @@ int main(int argc, char* argv[]) {
 
     invocables_t functions;
     try {
-        if (gatherFunctions(&functions, expanded_lines, ilines, tokens)) {
+        if (gatherFunctions(&functions, tokens)) {
             return 1;
         }
     } catch (const viua::cg::lex::InvalidSyntax& e) {
@@ -233,7 +233,7 @@ int main(int argc, char* argv[]) {
     }
     invocables_t blocks;
     try {
-        if (gatherBlocks(&blocks, expanded_lines, ilines, tokens)) {
+        if (gatherBlocks(&blocks, tokens)) {
             return 1;
         }
     } catch (const viua::cg::lex::InvalidSyntax& e) {

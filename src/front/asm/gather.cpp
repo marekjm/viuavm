@@ -24,7 +24,7 @@
 using namespace std;
 
 
-int gatherFunctions(invocables_t* invocables, const vector<string>&, const vector<string>&, const vector<viua::cg::lex::Token>& tokens) {
+int gatherFunctions(invocables_t* invocables, const vector<viua::cg::lex::Token>& tokens) {
     ///////////////////////////////////////////
     // GATHER FUNCTION NAMES AND SIGNATURES
     //
@@ -57,7 +57,7 @@ int gatherFunctions(invocables_t* invocables, const vector<string>&, const vecto
     return 0;
 }
 
-int gatherBlocks(invocables_t* invocables, const vector<string>&, const vector<string>&, const vector<viua::cg::lex::Token>& tokens) {
+int gatherBlocks(invocables_t* invocables, const vector<viua::cg::lex::Token>& tokens) {
     /////////////////////
     // GATHER BLOCK NAMES
     try {
