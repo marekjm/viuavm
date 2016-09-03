@@ -255,7 +255,7 @@ static Program& compile(Program& program, const vector<string>& lines, map<strin
             cout << "[asm] compiling line: `" << line << "`" << endl;
         }
 
-        if (line == "nop") {
+        if (instr == "nop") {
             program.opnop();
         } else if (str::startswith(line, "izero")) {
             string regno_chnk;
