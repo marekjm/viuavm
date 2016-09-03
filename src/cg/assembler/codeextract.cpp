@@ -154,15 +154,19 @@ vector<string> assembler::ce::getFunctionNames(const vector<Token>& tokens) {
 
     return names;
 }
-vector<string> assembler::ce::getSignatures(const vector<string>& lines) {
+vector<string> assembler::ce::getSignatures(const vector<Token>& tokens) {
     vector<string> names;
 
-    string line, holdline;
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        holdline = line = lines[i];
-        if (not assembler::utils::lines::is_function_signature(line)) { continue; }
-        line = str::lstrip(str::sub(line, str::chunk(line).size()));
-        names.emplace_back(str::chunk(line));
+    const auto limit = tokens.size();
+    for (decltype(tokens.size()) i = 0; i < limit; ++i) {
+        if (tokens[i].str() == ".signature:") {
+            ++i;
+            if (i < limit) {
+                names.emplace_back(tokens.at(i).str());
+            } else {
+                throw tokens[i-1];
+            }
+        }
     }
 
     return names;

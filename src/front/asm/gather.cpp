@@ -24,7 +24,7 @@
 using namespace std;
 
 
-int gatherFunctions(invocables_t* invocables, const vector<string>& expanded_lines, const vector<string>& ilines, const vector<viua::cg::lex::Token>& tokens) {
+int gatherFunctions(invocables_t* invocables, const vector<string>&, const vector<string>& ilines, const vector<viua::cg::lex::Token>& tokens) {
     ///////////////////////////////////////////
     // GATHER FUNCTION NAMES AND SIGNATURES
     //
@@ -39,7 +39,7 @@ int gatherFunctions(invocables_t* invocables, const vector<string>& expanded_lin
     }
 
     try {
-        invocables->signatures = assembler::ce::getSignatures(expanded_lines);
+        invocables->signatures = assembler::ce::getSignatures(tokens);
     } catch (const string& e) {
         cout << "fatal: " << e << endl;
         return 1;
