@@ -596,6 +596,10 @@ namespace cg {
                 register_set_marker = 2;
             } else if (a == "temp") {
                 register_set_marker = 3;
+            } else {
+                // FIXME: detect invalid register set names
+                // after switching to token-based code generation
+                // it will not be necessary
             }
             *(reinterpret_cast<int*>(addr_ptr)) = register_set_marker;
             pointer::inc<int, byte>(addr_ptr);

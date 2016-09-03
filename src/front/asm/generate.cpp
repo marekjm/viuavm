@@ -414,7 +414,7 @@ static Program& compile(Program& program, const vector<string>& lines, map<strin
             tie(a_chnk, b_chnk) = assembler::operands::get2(operands);
             program.opisnull(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "ress")) {
-            program.opress(operands);
+            program.opress(str::chunk(operands));
         } else if (str::startswith(line, "tmpri")) {
             string regno_chnk;
             regno_chnk = str::chunk(operands);
