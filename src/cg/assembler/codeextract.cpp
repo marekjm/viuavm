@@ -137,12 +137,13 @@ vector<string> assembler::ce::getlinks(const vector<string>& lines) {
     return links;
 }
 
-vector<string> assembler::ce::getFunctionNames(const vector<Token>& tokens) {
+static vector<string> get_instruction_block_names(const vector<Token>& tokens, string directive) {
     vector<string> names;
 
     const auto limit = tokens.size();
+    string looking_for = ("." + directive + ":");
     for (decltype(tokens.size()) i = 0; i < limit; ++i) {
-        if (tokens[i].str() == ".function:") {
+        if (tokens[i].str() == looking_for) {
             ++i;
             if (i < limit) {
                 names.emplace_back(tokens.at(i).str());
@@ -153,57 +154,18 @@ vector<string> assembler::ce::getFunctionNames(const vector<Token>& tokens) {
     }
 
     return names;
+}
+vector<string> assembler::ce::getFunctionNames(const vector<Token>& tokens) {
+    return get_instruction_block_names(tokens, "function");
 }
 vector<string> assembler::ce::getSignatures(const vector<Token>& tokens) {
-    vector<string> names;
-
-    const auto limit = tokens.size();
-    for (decltype(tokens.size()) i = 0; i < limit; ++i) {
-        if (tokens[i].str() == ".signature:") {
-            ++i;
-            if (i < limit) {
-                names.emplace_back(tokens.at(i).str());
-            } else {
-                throw tokens[i-1];
-            }
-        }
-    }
-
-    return names;
+    return get_instruction_block_names(tokens, "signature");
 }
 vector<string> assembler::ce::getBlockNames(const vector<Token>& tokens) {
-    vector<string> names;
-
-    const auto limit = tokens.size();
-    for (decltype(tokens.size()) i = 0; i < limit; ++i) {
-        if (tokens[i].str() == ".block:") {
-            ++i;
-            if (i < limit) {
-                names.emplace_back(tokens.at(i).str());
-            } else {
-                throw tokens[i-1];
-            }
-        }
-    }
-
-    return names;
+    return get_instruction_block_names(tokens, "block");
 }
 vector<string> assembler::ce::getBlockSignatures(const vector<Token>& tokens) {
-    vector<string> names;
-
-    const auto limit = tokens.size();
-    for (decltype(tokens.size()) i = 0; i < limit; ++i) {
-        if (tokens[i].str() == ".bsignature:") {
-            ++i;
-            if (i < limit) {
-                names.emplace_back(tokens.at(i).str());
-            } else {
-                throw tokens[i-1];
-            }
-        }
-    }
-
-    return names;
+    return get_instruction_block_names(tokens, "bsignature");
 }
 
 map<string, vector<string> > assembler::ce::getInvokables(const string& type, const vector<string>& lines) {
