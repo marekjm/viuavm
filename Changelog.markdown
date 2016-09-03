@@ -33,6 +33,7 @@ There are several categories of change:
 - bic: remove all warning and error options from assembler frontend (all enabled by default)
 - feature: `--size` option in assembler frontend reporting calculated size of bytecode
 - enhancement: better error messages from assembler
+- fix: assembler catches unbalanced parenthesis in wrapped instructions
 
 
 ----

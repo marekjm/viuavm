@@ -89,7 +89,7 @@
     nop
     nop
     nop
-    print (strstore 1 "Hello World (from detached)!"
+    print (strstore 1 "Hello World (from detached)!")
     return
 .end
 

@@ -571,6 +571,9 @@ namespace viua {
                             subtokens.push_back(input_tokens[i]);
                             ++i;
                         }
+                        if (i >= limit and balance != 0) {
+                            throw InvalidSyntax(t, "unbalanced parenthesis in wrapped instruction");
+                        }
 
                         Token tok;
                         try {
