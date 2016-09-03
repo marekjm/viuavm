@@ -79,6 +79,7 @@ namespace viua {
             std::vector<Token> reduce_function_signatures(std::vector<Token>);
             std::vector<Token> reduce_names(std::vector<Token>);
             std::vector<Token> reduce_offset_jumps(std::vector<Token>);
+            std::vector<Token> reduce_at_prefixed_registers(std::vector<Token>);
 
             std::vector<Token> unwrap_lines(std::vector<Token>, bool full = true);
 

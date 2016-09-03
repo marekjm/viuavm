@@ -481,6 +481,24 @@ namespace viua {
                 return tokens;
             }
 
+            vector<Token> reduce_at_prefixed_registers(vector<Token> input_tokens) {
+                decltype(input_tokens) tokens;
+
+                const auto limit = input_tokens.size();
+                for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
+                    const auto t = input_tokens[i];
+
+                    if (i+1 < limit and t.str() == "@" and input_tokens[i+1].str() != "\n" and adjacent(t, input_tokens[i+1])) {
+                        tokens.emplace_back(t.line(), t.character(), (t.str() + input_tokens[i+1].str()));
+                        ++i;
+                        continue;
+                    }
+                    tokens.push_back(t);
+                }
+
+                return tokens;
+            }
+
             vector<Token> unwrap_lines(vector<Token> input_tokens, bool full) {
                 decltype(input_tokens) unwrapped_tokens;
                 decltype(input_tokens) tokens;
@@ -665,7 +683,7 @@ namespace viua {
             }
 
             vector<Token> reduce(vector<Token> tokens) {
-                return reduce_offset_jumps(reduce_mark_directive(reduce_name_directive(reduce_block_directive(reduce_bsignature_directive(reduce_signature_directive(reduce_names(reduce_function_signatures(reduce_double_colon(reduce_end_directive(reduce_function_directive(unwrap_lines(reduce_newlines(remove_comments(remove_spaces(tokens)))))))))))))));
+                return reduce_at_prefixed_registers(reduce_offset_jumps(reduce_mark_directive(reduce_name_directive(reduce_block_directive(reduce_bsignature_directive(reduce_signature_directive(reduce_names(reduce_function_signatures(reduce_double_colon(reduce_end_directive(reduce_function_directive(unwrap_lines(reduce_newlines(remove_comments(remove_spaces(tokens))))))))))))))));
             }
         }
     }
