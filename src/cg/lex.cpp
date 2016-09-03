@@ -34,7 +34,13 @@ namespace viua {
             Token::Token(decltype(line_number) line_, decltype(character_in_line) character_, string content_): content(content_), line_number(line_), character_in_line(character_) {
             }
 
+            const char* InvalidSyntax::what() const {
+                return message.c_str();
+            }
+
             InvalidSyntax::InvalidSyntax(long unsigned ln, long unsigned ch, string ct): line_number(ln), character_in_line(ch), content(ct) {
+            }
+            InvalidSyntax::InvalidSyntax(Token t, string m): line_number(t.line()), character_in_line(t.character()), content(t.str()), message(m) {
             }
 
             vector<Token> tokenise(const string& source) {

@@ -33,8 +33,12 @@ namespace viua {
             struct InvalidSyntax {
                 long unsigned line_number, character_in_line;
                 std::string content;
+                std::string message;
+
+                const char* what() const;
 
                 InvalidSyntax(long unsigned, long unsigned, std::string);
+                InvalidSyntax(Token, std::string = "");
             };
 
             std::vector<Token> tokenise(const std::string&);
