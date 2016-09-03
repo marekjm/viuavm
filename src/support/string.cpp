@@ -143,7 +143,7 @@ namespace str {
         string str = (ignore_leading_ws ? lstrip(s) : s);
 
         for (unsigned i = 0; i < str.size(); ++i) {
-            if (str[i] == *" " or str[i] == *"\t" or str[i] == *"\v" or str[i] == *"\n") break;
+            if (str[i] == ' ' or str[i] == '\t' or str[i] == '\v' or str[i] == '\n') break;
             chnk << str[i];
         }
         return chnk.str();
