@@ -86,7 +86,7 @@ static tuple<uint64_t, enum JUMPTYPE> resolvejump(string jmp, const map<string, 
             // FIXME: markers map should use uint64_t to avoid the need for casting
             addr = static_cast<uint64_t>(marks.at(jmp));
         } catch (const std::out_of_range& e) {
-            throw ("jump to unrecognised marker: " + jmp);
+            throw ("jump to unrecognised marker: " + str::enquote(str::strencode(jmp)));
         }
     }
 
@@ -1098,13 +1098,13 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, invoc
         try {
             assemble(func, blocks.bodies.at(name));
         } catch (const string& e) {
-            cout << (DEBUG ? "\n" : "") << "fatal: error during assembling: " << e << endl;
+            cout << (DEBUG ? "\n" : "") << "error: in block '" << name << "': " << e << endl;
             exit(1);
         } catch (const char*& e) {
-            cout << (DEBUG ? "\n" : "") << "fatal: error during assembling: " << e << endl;
+            cout << (DEBUG ? "\n" : "") << "error: in block '" << name << "': " << e << endl;
             exit(1);
         } catch (const std::out_of_range& e) {
-            cout << (DEBUG ? "\n" : "") << "[asm] fatal: could not assemble block '" << name << "' (" << e.what() << ')' << endl;
+            cout << (DEBUG ? "\n" : "") << "error: in block '" << name << "': " << e.what() << endl;
             exit(1);
         }
 
@@ -1171,13 +1171,13 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, invoc
         try {
             assemble(func, functions.bodies.at(name));
         } catch (const string& e) {
-            cout << (DEBUG ? "\n" : "") << "fatal: error during assembling: " << e << endl;
+            cout << (DEBUG ? "\n" : "") << "error: in function '" << name << "': " << e << endl;
             exit(1);
         } catch (const char*& e) {
-            cout << (DEBUG ? "\n" : "") << "fatal: error during assembling: " << e << endl;
+            cout << (DEBUG ? "\n" : "") << "error: in function '" << name << "': " << e << endl;
             exit(1);
         } catch (const std::out_of_range& e) {
-            cout << (DEBUG ? "\n" : "") << "[asm] fatal: could not assemble function '" << name << "' (" << e.what() << ')' << endl;
+            cout << (DEBUG ? "\n" : "") << "error: in function '" << name << "': " << e.what() << endl;
             exit(1);
         }
 
