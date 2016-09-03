@@ -20,10 +20,10 @@ namespace viua {
                 return (character_in_line + content.size());
             }
 
-            bool Token::operator==(const string& s) {
+            bool Token::operator==(const string& s) const {
                 return (content == s);
             }
-            bool Token::operator!=(const string& s) {
+            bool Token::operator!=(const string& s) const {
                 return (content != s);
             }
 

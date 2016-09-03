@@ -22,8 +22,8 @@ namespace viua {
 
                 auto ends() const -> decltype(character_in_line);
 
-                bool operator==(const std::string& s);
-                bool operator!=(const std::string& s);
+                bool operator==(const std::string& s) const;
+                bool operator!=(const std::string& s) const;
 
                 operator std::string() const;
 
