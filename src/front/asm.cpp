@@ -223,11 +223,21 @@ int main(int argc, char* argv[]) {
     auto tokens = viua::cg::lex::standardise(viua::cg::lex::reduce(viua::cg::lex::tokenise(source)));
 
     invocables_t functions;
-    if (gatherFunctions(&functions, expanded_lines, ilines, tokens)) {
+    try {
+        if (gatherFunctions(&functions, expanded_lines, ilines, tokens)) {
+            return 1;
+        }
+    } catch (const viua::cg::lex::InvalidSyntax& e) {
+        cout << filename << ':' << e.line_number+1 << ':' << e.character_in_line+1 << ": error: " << e.what() << endl;
         return 1;
     }
     invocables_t blocks;
-    if (gatherBlocks(&blocks, expanded_lines, ilines, tokens)) {
+    try {
+        if (gatherBlocks(&blocks, expanded_lines, ilines, tokens)) {
+            return 1;
+        }
+    } catch (const viua::cg::lex::InvalidSyntax& e) {
+        cout << filename << ':' << e.line_number+1 << ':' << e.character_in_line+1 << ": error: " << e.what() << endl;
         return 1;
     }
 

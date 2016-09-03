@@ -168,35 +168,75 @@ vector<string> assembler::ce::getBlockSignatures(const vector<Token>& tokens) {
     return get_instruction_block_names(tokens, "bsignature");
 }
 
-map<string, vector<string> > assembler::ce::getInvokables(const string& type, const vector<string>& lines) {
-    map<string, vector<string> > invokables;
 
-    string opening;
-    if (type == "function") {
-        opening = ".function:";
-    } else if (type == "block") {
-        opening = ".block:";
-    }
+static map<string, vector<Token>> get_raw_block_bodies(const string& type, const vector<Token>& tokens) {
+    map<string, vector<Token>> invokables;
 
-    string line, holdline;
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        holdline = line = lines[i];
-        if (!str::startswith(line, opening)) { continue; }
+    string looking_for = ("." + type + ":");
+    string name;
+    vector<Token> body;
 
-        vector<string> flines;
-        for (unsigned j = i+1; lines[j] != ".end"; ++j, ++i) {
-            if (str::startswith(lines[j], opening)) {
-                throw ("another " + type + " opened before assembler reached .end after '" + str::chunk(str::sub(holdline, str::chunk(holdline).size())) + "' " + type);
+    for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
+        if (tokens[i] == looking_for) {
+            ++i; // skip directive
+            name = tokens[i];
+            ++i; // skip name
+            ++i; // skip '\n' token
+            while (i < tokens.size() and tokens[i].str() != ".end") {
+                if (tokens[i] == looking_for) {
+                    throw viua::cg::lex::InvalidSyntax(tokens[i], ("another " + type + " opened before assembler reached .end after '" + name + "' " + type));
+                }
+                body.push_back(tokens[i]);
+                ++i;
             }
-            flines.emplace_back(lines[j]);
+            ++i; // skip .end token
+
+            invokables[name] = body;
+            name = "";
+            body.clear();
         }
-
-        line = str::lstrip(str::sub(line, opening.size()));
-        string name = str::chunk(line);
-        line = str::lstrip(str::sub(line, name.size()));
-
-        invokables[name] = flines;
     }
 
     return invokables;
+}
+static vector<string> make_lines(const vector<Token>& tokens) {
+    vector<string> lines;
+
+    if (tokens.size() == 0) {
+        return lines;
+    }
+
+    auto current_line_no = tokens.at(0).line();
+    ostringstream current_line;
+    for (const auto& token : tokens) {
+        if ((token.line() != current_line_no) or (token.str() == "\n")) {
+            string line = current_line.str();
+            if (line.size() > 0) {
+                lines.emplace_back(current_line.str());
+            }
+            current_line_no = token.line();
+            current_line.str("");
+        }
+        if (token.str() == "\n") {
+            continue;
+        }
+        current_line << token.str() << ' ';
+    }
+    if (current_line.str().size()) {
+        lines.emplace_back(current_line.str());
+    }
+
+    return lines;
+}
+static map<string, vector<string>> get_cooked_block_bodies(map<string, vector<Token>> raw_bodies) {
+    map<string, vector<string>> cooked_bodies;
+
+    for (const auto& each : raw_bodies) {
+        cooked_bodies[each.first] = make_lines(each.second);
+    }
+
+    return cooked_bodies;
+}
+map<string, vector<string>> assembler::ce::getInvokables(const string& type, const vector<Token>& tokens) {
+    return get_cooked_block_bodies(get_raw_block_bodies(type, tokens));
 }

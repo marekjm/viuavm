@@ -24,7 +24,7 @@
 using namespace std;
 
 
-int gatherFunctions(invocables_t* invocables, const vector<string>&, const vector<string>& ilines, const vector<viua::cg::lex::Token>& tokens) {
+int gatherFunctions(invocables_t* invocables, const vector<string>&, const vector<string>&, const vector<viua::cg::lex::Token>& tokens) {
     ///////////////////////////////////////////
     // GATHER FUNCTION NAMES AND SIGNATURES
     //
@@ -48,7 +48,7 @@ int gatherFunctions(invocables_t* invocables, const vector<string>&, const vecto
     ///////////////////////////////
     // GATHER FUNCTIONS' CODE LINES
     try {
-         invocables->bodies = assembler::ce::getInvokables("function", ilines);
+         invocables->bodies = assembler::ce::getInvokables("function", tokens);
     } catch (const string& e) {
         cout << "error: function gathering failed: " << e << endl;
         return 1;
@@ -57,7 +57,7 @@ int gatherFunctions(invocables_t* invocables, const vector<string>&, const vecto
     return 0;
 }
 
-int gatherBlocks(invocables_t* invocables, const vector<string>&, const vector<string>& ilines, const vector<viua::cg::lex::Token>& tokens) {
+int gatherBlocks(invocables_t* invocables, const vector<string>&, const vector<string>&, const vector<viua::cg::lex::Token>& tokens) {
     /////////////////////
     // GATHER BLOCK NAMES
     try {
@@ -76,7 +76,7 @@ int gatherBlocks(invocables_t* invocables, const vector<string>&, const vector<s
     ///////////////////////////////
     // GATHER BLOCK CODE LINES
     try {
-         invocables->bodies = assembler::ce::getInvokables("block", ilines);
+         invocables->bodies = assembler::ce::getInvokables("block", tokens);
     } catch (const string& e) {
         cout << "error: block gathering failed: " << e << endl;
         return 1;
