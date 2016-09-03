@@ -1096,6 +1096,9 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, invoc
         Program func(fun_bytes);
         func.setdebug(DEBUG).setscream(SCREAM);
         try {
+            if (DEBUG) {
+                cout << "[debug] assembling block '" << name << "'\n";
+            }
             assemble(func, blocks.bodies.at(name));
         } catch (const string& e) {
             cout << (DEBUG ? "\n" : "") << "error: in block '" << name << "': " << e << endl;
@@ -1169,6 +1172,9 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, invoc
         Program func(fun_bytes);
         func.setdebug(DEBUG).setscream(SCREAM);
         try {
+            if (DEBUG) {
+                cout << "[debug] assembling function '" << name << "'\n";
+            }
             assemble(func, functions.bodies.at(name));
         } catch (const string& e) {
             cout << (DEBUG ? "\n" : "") << "error: in function '" << name << "': " << e << endl;
