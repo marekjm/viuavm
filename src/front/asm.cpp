@@ -282,6 +282,8 @@ int main(int argc, char* argv[]) {
     } catch (const pair<unsigned, string>& e) {
         cout << filename << ':' << expanded_lines_to_source_lines.at(e.first)+1 << ": error: " << e.second << endl;
         return 1;
+    } catch (const viua::cg::lex::InvalidSyntax& e) {
+        cout << filename << ':' << e.line_number+1 << ':' << e.character_in_line+1 << ": error: " << e.what() << endl;
     }
 
     return ret_code;

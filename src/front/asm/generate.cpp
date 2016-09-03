@@ -662,7 +662,7 @@ static Program& compile(Program& program, const vector<string>& lines, map<strin
         } else if (str::startswith(line, "halt")) {
             program.ophalt();
         } else {
-            throw ("unimplemented instruction: " + instr);
+            throw ("unimplemented instruction: " + str::enquote(str::strencode(instr)));
         }
         ++instruction;
     }
