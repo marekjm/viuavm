@@ -68,6 +68,8 @@ namespace viua {
             std::vector<Token> remove_spaces(std::vector<Token>);
             std::vector<Token> remove_comments(std::vector<Token>);
             std::vector<Token> reduce_newlines(std::vector<Token>);
+            std::vector<Token> reduce_mark_directive(std::vector<Token>);
+            std::vector<Token> reduce_name_directive(std::vector<Token>);
             std::vector<Token> reduce_function_directive(std::vector<Token>);
             std::vector<Token> reduce_end_directive(std::vector<Token>);
             std::vector<Token> reduce_signature_directive(std::vector<Token>);

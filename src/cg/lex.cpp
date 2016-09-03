@@ -232,6 +232,46 @@ namespace viua {
                 return tokens;
             }
 
+            vector<Token> reduce_mark_directive(vector<Token> input_tokens) {
+                decltype(input_tokens) tokens;
+
+                const auto limit = input_tokens.size();
+                for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
+                    const auto t = input_tokens[i];
+                    if (t.str() == "." and i < limit-2 and input_tokens[i+1] == "mark" and input_tokens[i+2].str() == ":") {
+                        if (adjacent(t, input_tokens[i+1], input_tokens[i+2])) {
+                            tokens.emplace_back(t.line(), t.character(), ".mark:");
+                            ++i; // skip "mark" token
+                            ++i; // skip ":" token
+                            continue;
+                        }
+                    }
+                    tokens.push_back(t);
+                }
+
+                return tokens;
+            }
+
+            vector<Token> reduce_name_directive(vector<Token> input_tokens) {
+                decltype(input_tokens) tokens;
+
+                const auto limit = input_tokens.size();
+                for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
+                    const auto t = input_tokens[i];
+                    if (t.str() == "." and i < limit-2 and input_tokens[i+1] == "name" and input_tokens[i+2].str() == ":") {
+                        if (adjacent(t, input_tokens[i+1], input_tokens[i+2])) {
+                            tokens.emplace_back(t.line(), t.character(), ".name:");
+                            ++i; // skip "name" token
+                            ++i; // skip ":" token
+                            continue;
+                        }
+                    }
+                    tokens.push_back(t);
+                }
+
+                return tokens;
+            }
+
             vector<Token> reduce_function_directive(vector<Token> input_tokens) {
                 decltype(input_tokens) tokens;
 
@@ -605,7 +645,7 @@ namespace viua {
             }
 
             vector<Token> reduce(vector<Token> tokens) {
-                return reduce_block_directive(reduce_bsignature_directive(reduce_signature_directive(reduce_names(reduce_function_signatures(reduce_double_colon(reduce_end_directive(reduce_function_directive(unwrap_lines(reduce_newlines(remove_comments(remove_spaces(tokens))))))))))));
+                return reduce_mark_directive(reduce_name_directive(reduce_block_directive(reduce_bsignature_directive(reduce_signature_directive(reduce_names(reduce_function_signatures(reduce_double_colon(reduce_end_directive(reduce_function_directive(unwrap_lines(reduce_newlines(remove_comments(remove_spaces(tokens))))))))))))));
             }
         }
     }
