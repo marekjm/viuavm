@@ -17,10 +17,10 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: foo
+.function: foo/0
     return
 ; below should be .end and not .function
-.function: bar
+.function: bar/0
 
 .function: main/1
     izero 0
