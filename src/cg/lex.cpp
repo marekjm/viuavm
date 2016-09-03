@@ -499,6 +499,46 @@ namespace viua {
                 return tokens;
             }
 
+            vector<Token> reduce_floats(vector<Token> input_tokens) {
+                decltype(input_tokens) tokens;
+
+                const auto limit = input_tokens.size();
+                for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
+                    const auto t = input_tokens[i];
+                    if (str::isnum(t) and i < limit-2 and input_tokens[i+1] == "." and str::isnum(input_tokens[i+2])) {
+                        if (adjacent(t, input_tokens[i+1], input_tokens[i+2])) {
+                            tokens.emplace_back(t.line(), t.character(), join_tokens(input_tokens, i, i+3));
+                            ++i; // skip "name" token
+                            ++i; // skip ":" token
+                            continue;
+                        }
+                    }
+                    tokens.push_back(t);
+                }
+
+                return tokens;
+            }
+
+            vector<Token> reduce_absolute_jumps(vector<Token> input_tokens) {
+                decltype(input_tokens) tokens;
+
+                const auto limit = input_tokens.size();
+                for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
+                    const auto t = input_tokens[i];
+
+                    if (i+1 < limit and t == "." and str::isnum(input_tokens[i+1], false)) {
+                        if (adjacent(t, input_tokens[i+1])) {
+                            tokens.emplace_back(t.line(), t.character(), (t.str() + input_tokens[i+1].str()));
+                            ++i;
+                            continue;
+                        }
+                    }
+                    tokens.push_back(t);
+                }
+
+                return tokens;
+            }
+
             vector<Token> unwrap_lines(vector<Token> input_tokens, bool full) {
                 decltype(input_tokens) unwrapped_tokens;
                 decltype(input_tokens) tokens;
@@ -683,7 +723,7 @@ namespace viua {
             }
 
             vector<Token> reduce(vector<Token> tokens) {
-                return reduce_at_prefixed_registers(reduce_offset_jumps(reduce_mark_directive(reduce_name_directive(reduce_block_directive(reduce_bsignature_directive(reduce_signature_directive(reduce_names(reduce_function_signatures(reduce_double_colon(reduce_end_directive(reduce_function_directive(unwrap_lines(reduce_newlines(remove_comments(remove_spaces(tokens))))))))))))))));
+                return reduce_absolute_jumps(reduce_floats(reduce_at_prefixed_registers(reduce_offset_jumps(reduce_mark_directive(reduce_name_directive(reduce_block_directive(reduce_bsignature_directive(reduce_signature_directive(reduce_names(reduce_function_signatures(reduce_double_colon(reduce_end_directive(reduce_function_directive(unwrap_lines(reduce_newlines(remove_comments(remove_spaces(tokens))))))))))))))))));
             }
         }
     }
