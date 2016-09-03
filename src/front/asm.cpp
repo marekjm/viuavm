@@ -23,6 +23,8 @@
 #include <viua/support/env.h>
 #include <viua/version.h>
 #include <viua/cg/assembler/assembler.h>
+#include <viua/cg/lex.h>
+#include <viua/cg/tools.h>
 #include <viua/front/asm.h>
 using namespace std;
 
@@ -90,6 +92,16 @@ static bool usage(const char* program, bool show_help, bool show_version, bool v
     }
 
     return (show_help or show_version);
+}
+
+static string read_file(const string& path) {
+    ifstream in(path, ios::in | ios::binary);
+
+    ostringstream source_in;
+    string line;
+    while (getline(in, line)) { source_in << line << '\n'; }
+
+    return source_in.str();
 }
 
 int main(int argc, char* argv[]) {
@@ -206,8 +218,12 @@ int main(int argc, char* argv[]) {
     }
 
     vector<string> ilines = assembler::ce::getilines(expanded_lines);
+
+    auto source = read_file(filename);
+    auto tokens = viua::cg::lex::standardise(viua::cg::lex::reduce(viua::cg::lex::tokenise(source)));
+
     invocables_t functions;
-    if (gatherFunctions(&functions, expanded_lines, ilines)) {
+    if (gatherFunctions(&functions, expanded_lines, ilines, tokens)) {
         return 1;
     }
     invocables_t blocks;

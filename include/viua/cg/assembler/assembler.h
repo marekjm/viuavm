@@ -28,6 +28,7 @@
 #include <tuple>
 #include <map>
 #include <regex>
+#include <viua/cg/lex.h>
 #include <viua/program.h>
 
 namespace assembler {
@@ -47,7 +48,7 @@ namespace assembler {
         std::map<std::string, int> getnames(const std::vector<std::string>& lines);
         std::vector<std::string> getlinks(const std::vector<std::string>& lines);
 
-        std::vector<std::string> getFunctionNames(const std::vector<std::string>& lines);
+        std::vector<std::string> getFunctionNames(const std::vector<viua::cg::lex::Token>&);
         std::vector<std::string> getSignatures(const std::vector<std::string>& lines);
         std::vector<std::string> getBlockNames(const std::vector<std::string>& lines);
         std::vector<std::string> getBlockSignatures(const std::vector<std::string>& lines);

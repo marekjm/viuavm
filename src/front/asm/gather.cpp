@@ -24,7 +24,7 @@
 using namespace std;
 
 
-int gatherFunctions(invocables_t* invocables, const vector<string>& expanded_lines, const vector<string>& ilines) {
+int gatherFunctions(invocables_t* invocables, const vector<string>& expanded_lines, const vector<string>& ilines, const vector<viua::cg::lex::Token>& tokens) {
     ///////////////////////////////////////////
     // GATHER FUNCTION NAMES AND SIGNATURES
     //
@@ -32,7 +32,7 @@ int gatherFunctions(invocables_t* invocables, const vector<string>& expanded_lin
     // AS ASSEMBLER WOULD COMPLAIN ABOUT
     // CALLS TO UNDEFINED FUNCTIONS
     try {
-        invocables->names = assembler::ce::getFunctionNames(expanded_lines);
+        invocables->names = assembler::ce::getFunctionNames(tokens);
     } catch (const string& e) {
         cout << "fatal: " << e << endl;
         return 1;

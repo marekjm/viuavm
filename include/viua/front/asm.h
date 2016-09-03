@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <viua/cg/lex.h>
 
 
 struct invocables_t {
@@ -54,7 +55,7 @@ std::vector<std::string> expandSource(const std::vector<std::string>&, std::map<
 std::vector<std::vector<std::string>> decode_line_tokens(const std::vector<std::string>&);
 std::vector<std::vector<std::string>> decode_line(const std::string&);
 
-int gatherFunctions(invocables_t*, const std::vector<std::string>&, const std::vector<std::string>&);
+int gatherFunctions(invocables_t*, const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<viua::cg::lex::Token>&);
 int gatherBlocks(invocables_t*, const std::vector<std::string>&, const std::vector<std::string>&);
 std::map<std::string, std::string> gatherMetaInformation(const std::vector<std::string>&);
 

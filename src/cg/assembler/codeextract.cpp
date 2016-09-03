@@ -23,8 +23,12 @@
 #include <map>
 #include <viua/support/string.h>
 #include <viua/cg/assembler/assembler.h>
+#include <viua/cg/lex.h>
 #include <viua/program.h>
 using namespace std;
+
+
+using Token = viua::cg::lex::Token;
 
 
 vector<string> assembler::ce::getilines(const vector<string>& lines) {
@@ -133,20 +137,19 @@ vector<string> assembler::ce::getlinks(const vector<string>& lines) {
     return links;
 }
 
-vector<string> assembler::ce::getFunctionNames(const vector<string>& lines) {
+vector<string> assembler::ce::getFunctionNames(const vector<Token>& tokens) {
     vector<string> names;
 
-    string line, holdline;
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        holdline = line = lines[i];
-        if (not assembler::utils::lines::is_function(line)) { continue; }
-
-        if (assembler::utils::lines::is_function(line)) {
-            for (unsigned j = i+1; not assembler::utils::lines::is_end(lines[j]); ++j, ++i) {}
+    const auto limit = tokens.size();
+    for (decltype(tokens.size()) i = 0; i < limit; ++i) {
+        if (tokens[i].str() == ".function:") {
+            ++i;
+            if (i < limit) {
+                names.emplace_back(tokens.at(i).str());
+            } else {
+                throw tokens[i-1];
+            }
         }
-
-        line = str::lstrip(str::sub(line, str::chunk(line).size()));
-        names.emplace_back(str::chunk(line));
     }
 
     return names;
