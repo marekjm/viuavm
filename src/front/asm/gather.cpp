@@ -49,7 +49,13 @@ int gatherFunctions(invocables_t* invocables, const vector<viua::cg::lex::Token>
     // GATHER FUNCTIONS' CODE LINES
     try {
          invocables->bodies = assembler::ce::getInvokables("function", tokens);
+         for (const auto& each : assembler::ce::getInvokables("closure", tokens)) {
+            invocables->bodies[each.first] = each.second;
+         }
          invocables->tokens = assembler::ce::getInvokablesTokenBodies("function", tokens);
+         for (const auto& each : assembler::ce::getInvokablesTokenBodies("closure", tokens)) {
+            invocables->tokens[each.first] = each.second;
+         }
     } catch (const string& e) {
         cout << "error: function gathering failed: " << e << endl;
         return 1;

@@ -55,6 +55,10 @@ bool assembler::utils::lines::is_function(const string& line) {
     return str::chunk(line) == ".function:";
 }
 
+bool assembler::utils::lines::is_closure(const string& line) {
+    return str::chunk(line) == ".closure:";
+}
+
 bool assembler::utils::lines::is_block(const string& line) {
     return str::chunk(line) == ".block:";
 }
@@ -102,6 +106,7 @@ bool assembler::utils::lines::is_directive(const string& line) {
         is_info(line) or
         is_end(line) or
         is_main(line) or
+        is_closure(line) or
         false
     );
 }

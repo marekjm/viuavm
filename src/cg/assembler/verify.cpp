@@ -411,6 +411,9 @@ static void bodiesAreNonempty(const vector<string>& lines) {
         } else if (assembler::utils::lines::is_function(line)) {
             function = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
             continue;
+        } else if (assembler::utils::lines::is_closure(line)) {
+            function = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
+            continue;
         } else if (assembler::utils::lines::is_end(line)) {
             // '.end' is also interesting because we want to see if it's immediately preceded by
             // the interesting prefix

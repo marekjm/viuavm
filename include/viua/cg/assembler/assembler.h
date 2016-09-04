@@ -98,6 +98,7 @@ namespace assembler {
             bool is_directive(const std::string&);
 
             bool is_function(const std::string&);
+            bool is_closure(const std::string&);
             bool is_block(const std::string&);
             bool is_function_signature(const std::string&);
             bool is_block_signature(const std::string&);

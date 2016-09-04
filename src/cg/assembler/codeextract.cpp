@@ -156,7 +156,11 @@ static vector<string> get_instruction_block_names(const vector<Token>& tokens, s
     return names;
 }
 vector<string> assembler::ce::getFunctionNames(const vector<Token>& tokens) {
-    return get_instruction_block_names(tokens, "function");
+    auto names = get_instruction_block_names(tokens, "function");
+    for (const auto& each : get_instruction_block_names(tokens, "closure")) {
+        names.push_back(each);
+    }
+    return names;
 }
 vector<string> assembler::ce::getSignatures(const vector<Token>& tokens) {
     return get_instruction_block_names(tokens, "signature");
