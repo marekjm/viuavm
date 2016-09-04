@@ -23,6 +23,7 @@
 #include <vector>
 #include <tuple>
 #include <map>
+#include <set>
 #include <algorithm>
 #include <regex>
 #include <viua/support/string.h>
@@ -727,6 +728,129 @@ void assembler::verify::jumpsAreInRange(const vector<string>& lines) {
             function_name = "";
             verify_forward_jumps(function_instruction_counter, forward_jumps);
             verify_marker_jumps(function_instruction_counter, deferred_marker_jumps, jump_targets);
+        }
+    }
+}
+
+static auto skip_till_next_line(const std::vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> decltype(i) {
+    do {
+        ++i;
+    } while (i < tokens.size() and tokens.at(i) != "\n");
+    return i;
+}
+static string resolve_register_name(const map<string, string>& named_registers, viua::cg::lex::Token token) {
+    string name = token;
+    if (name.at(0) == '@') {
+        name = name.substr(1);
+    }
+    if (str::isnum(name)) {
+        return name;
+    }
+    if (named_registers.count(name) == 0) {
+        throw viua::cg::lex::InvalidSyntax(token, ("not a named register: " + name));
+    }
+    return named_registers.at(name);
+}
+void assembler::verify::manipulationOfDefinedRegisters(const std::vector<viua::cg::lex::Token>& tokens, const bool debug) {
+    map<string, string> named_registers;
+    set<string> defined_registers;
+    string opened_function;
+    for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
+        auto token = tokens.at(i);
+        if (token == "\n") {
+            continue;
+        }
+        if (token == ".function:") {
+            opened_function = tokens.at(i+1);
+            if (debug) {
+                cout << "analysing '" << opened_function << "'\n";
+            }
+            i = skip_till_next_line(tokens, i);
+            continue;
+        }
+        if (token == ".end") {
+            named_registers.clear();
+            defined_registers.clear();
+            opened_function = "";
+            i = skip_till_next_line(tokens, i);
+            continue;
+        }
+        if (opened_function == "") {
+            continue;
+        }
+        if (token == ".name:") {
+            named_registers[tokens.at(i+2)] = tokens.at(i+1);
+            if (debug) {
+                cout << "  " << "register " << str::enquote(str::strencode(tokens.at(i+1))) << " is named " << str::enquote(str::strencode(tokens.at(i+2))) << endl;
+            }
+            i = skip_till_next_line(tokens, i);
+            continue;
+        }
+        if (token == ".mark:" or token == "nop" or token == "tryframe" or token == "try" or token == "catch" or token == "frame" or
+            token == "enter" or token == "tailcall" or token == "leave" or token == "return" or token == "halt" or
+            token == "watchdog" or token == "branch" or token == "jump" or token == "param" or
+            token == "link" or token == "import" or token == "ress") {
+            i = skip_till_next_line(tokens, i);
+            continue;
+        }
+        if (token == "move") {
+            if (defined_registers.find(resolve_register_name(named_registers, tokens.at(i+2))) == defined_registers.end()) {
+                throw viua::cg::lex::InvalidSyntax(tokens.at(i+2), ("move from undefined register: " + str::strencode(tokens.at(i+2))));
+            }
+            defined_registers.insert(resolve_register_name(named_registers, tokens.at(i+1)));
+            defined_registers.erase(defined_registers.find(resolve_register_name(named_registers, tokens.at(i+2))));
+            i = skip_till_next_line(tokens, i);
+            continue;
+        } else if (token == "delete") {
+            if (defined_registers.find(resolve_register_name(named_registers, tokens.at(i+1))) == defined_registers.end()) {
+                throw viua::cg::lex::InvalidSyntax(tokens.at(i+1), ("delete of undefined register: " + str::strencode(tokens.at(i+2))));
+            }
+            defined_registers.erase(defined_registers.find(resolve_register_name(named_registers, tokens.at(i+1))));
+            i = skip_till_next_line(tokens, i);
+        } else if (token == "pamv" or token == "param") {
+            if (defined_registers.find(resolve_register_name(named_registers, tokens.at(i+2))) == defined_registers.end()) {
+                throw viua::cg::lex::InvalidSyntax(tokens.at(i+2), ("parameter pass from undefined register: " + str::strencode(tokens.at(i+2))));
+            }
+            if (token == "pamv") {
+                defined_registers.erase(defined_registers.find(resolve_register_name(named_registers, tokens.at(i+2))));
+            }
+            i = skip_till_next_line(tokens, i);
+            continue;
+        } else if (token == "copy") {
+            string copy_from = tokens.at(i+2);
+            if ((not str::isnum(copy_from)) and named_registers.count(copy_from)) {
+                copy_from = named_registers.at(copy_from);
+            }
+            if (defined_registers.find(resolve_register_name(named_registers, tokens.at(i+2))) == defined_registers.end()) {
+                throw viua::cg::lex::InvalidSyntax(tokens.at(i+2), ("copy from undefined register: " + str::strencode(tokens.at(i+2))));
+            }
+            defined_registers.insert(resolve_register_name(named_registers, tokens.at(i+1)));
+            i = skip_till_next_line(tokens, i);
+            continue;
+        } else if (token == "swap") {
+            if (defined_registers.find(resolve_register_name(named_registers, tokens.at(i+1))) == defined_registers.end()) {
+                throw viua::cg::lex::InvalidSyntax(tokens.at(i+1), ("swap with undefined register: " + str::strencode(tokens.at(i+1))));
+            }
+            if (defined_registers.find(resolve_register_name(named_registers, tokens.at(i+2))) == defined_registers.end()) {
+                throw viua::cg::lex::InvalidSyntax(tokens.at(i+2), ("swap with undefined register: " + str::strencode(tokens.at(i+2))));
+            }
+            i = skip_till_next_line(tokens, i);
+            continue;
+        } else {
+            string reg_original = tokens.at(i+1), reg = resolve_register_name(named_registers, tokens.at(i+1));
+            if (debug) {
+                cout << "  " << str::enquote(token) << " defined register " << str::enquote(str::strencode(reg_original));
+                if (reg != reg_original) {
+                    cout << " = " << str::enquote(str::strencode(reg));
+                }
+                cout << endl;
+            }
+
+            if (not ((token == "call" or token == "process") and tokens.at(i+1) == "0")) {
+                defined_registers.insert(reg);
+            }
+            i = skip_till_next_line(tokens, i);
+            continue;
         }
     }
 }

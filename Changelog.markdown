@@ -37,6 +37,11 @@ There are several categories of change:
 - enhancement: assembler provides context for errors
 - enhancement: token-based return value checking of main function (the assembler actually checks if the return register
   is being correctly set)
+- feature: add `.closure:` directive marking blocks as closures; closures are almost the same as functions, but they are
+  not directly callable, i.e. `call closure/0` is illegal, but `fcall <closure>` is OK - this distinction was introduced
+  because closures are currently not statically checkable
+- feature: passing `--static-check` option to assembler runs basic static analysis on the source code; it is able to catch
+  undefined register accesses (i.e. accesses to registers that will be empty at runtime) most of the time
 
 
 ----

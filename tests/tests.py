@@ -251,7 +251,7 @@ def runMemoryLeakCheck(self, compiled_path, check_memory_leaks):
         MEMORY_LEAK_CHECKS_RUN += 1
         valgrindCheck(self, compiled_path)
 
-def runTest(self, name, expected_output=None, expected_exit_code = 0, output_processing_function = None, check_memory_leaks = True, custom_assert=None, assembly_opts=None, valgrind_enable=True):
+def runTest(self, name, expected_output=None, expected_exit_code = 0, output_processing_function = None, check_memory_leaks = True, custom_assert=None, assembly_opts=('--static-check',), valgrind_enable=True):
     if expected_output is None and custom_assert is None:
         raise TypeError('`expected_output` and `custom_assert` cannot be both None')
     assembly_path = os.path.join(self.PATH, name)
@@ -636,7 +636,10 @@ class FunctionTests(unittest.TestCase):
         runTest(self, 'parameters_vector.asm', '[0, 1, 2, 3]')
 
     def testReturningReferences(self):
-        runTest(self, 'return_by_reference.asm', 42, 0, lambda o: int(o.strip()))
+        # FIXME: disassembler must understand the .closure: directive
+        # for now, don't pass the --static-check flag and
+        # all will be OK
+        runTest(self, 'return_by_reference.asm', 42, 0, lambda o: int(o.strip())), assembly_opts=None)
 
     def testStaticRegisters(self):
         runTestReturnsIntegers(self, 'static_registers.asm', [i for i in range(0, 10)])

@@ -17,7 +17,7 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: by_reference/0
+.closure: by_reference/0
     move 0 1
     return
 .end
