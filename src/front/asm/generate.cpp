@@ -787,12 +787,20 @@ static uint64_t writeCodeBlocksSection(ofstream& out, const invocables_t& blocks
     return block_bodies_size_so_far;
 }
 
-static string get_main_function(const vector<viua::cg::lex::Token>& tokens) {
-    string main_function = "main/1";
+static string get_main_function(const vector<viua::cg::lex::Token>& tokens, const vector<string>& available_functions) {
+    string main_function = "";
     for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
         if (tokens.at(i) == ".main:") {
             main_function = tokens.at(i+1);
             break;
+        }
+    }
+    if (main_function == "") {
+        for (auto f : available_functions) {
+            if (f == "main/0" or f == "main/1" or f == "main/2") {
+                main_function = f;
+                break;
+            }
         }
     }
     return main_function;
@@ -912,7 +920,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
 
     /////////////////////////
     // GET MAIN FUNCTION NAME
-    string main_function = get_main_function(tokens);
+    string main_function = get_main_function(tokens, functions.names);
     if (((VERBOSE and main_function != "main/1" and main_function != "") or DEBUG) and not flags.as_lib) {
         cout << "debug (notice): main function set to: '" << main_function << "'" << endl;
     }
@@ -924,20 +932,54 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
     // this must be better implemented or we will receive "function did not set return register" exceptions at runtime
     bool main_is_defined = (find(functions.names.begin(), functions.names.end(), main_function) != functions.names.end());
     if (not flags.as_lib and main_is_defined) {
-        string main_second_but_last;
-        try {
-            main_second_but_last = *(functions.bodies.at(main_function).end()-2);
-        } catch (const std::out_of_range& e) {
-            cout << "[asm] fatal: could not find main function (during return value check)" << endl;
-            exit(1);
+        auto main_function_tokens = functions.tokens.at(main_function);
+        int found_newlines = 0;
+
+        // Why three newlines?
+        //
+        // Here's why:
+        //
+        // - first newline is after the final 'return' instruction
+        // - second newline is after the last-but-one instruction which should set the return register
+        // - third newline is the marker after which we look for the instruction that will set the return register
+        //
+        // Example:
+        //
+        //   1st newline
+        //         |
+        //         |  2nd newline
+        //         |   |
+        //      nop    |
+        //      izero 0
+        //      return
+        //            |
+        //          3rd newline
+        //
+        // If these three newlines are found then the main function is considered "full".
+        // Anything less, and things get suspicious.
+        // If there are two newlines - maybe the function just returns something.
+        // If there is only one newline - the main function is invalid, because there is no way
+        // to correctly set the return register, and return from the function with one instruction.
+        //
+        const int expected_newlines = 3;
+
+        auto i = main_function_tokens.size()-1;
+        while (i and found_newlines < expected_newlines) {
+            if (main_function_tokens.at(i--) == "\n") {
+                ++found_newlines;
+            }
         }
-        if (!str::startswith(main_second_but_last, "copy") and
-            !str::startswith(main_second_but_last, "move") and
-            !str::startswith(main_second_but_last, "swap") and
-            !str::startswith(main_second_but_last, "izero")
-            ) {
-            cout << "fatal: main function does not return a value" << endl;
-            return 1;
+        if (found_newlines >= expected_newlines) {
+            // if found newlines number at least equals the expected number we
+            // have to adjust token counter to skip past last required newline and the token before it
+            i += 2;
+        }
+        auto last_instruction = main_function_tokens.at(i);
+        if (not (last_instruction == "copy" or last_instruction == "move" or last_instruction == "swap" or last_instruction == "izero" or last_instruction == "istore")) {
+            throw viua::cg::lex::InvalidSyntax(last_instruction, ("main function does not return a value: " + main_function));
+        }
+        if (main_function_tokens.at(i+1) != "0") {
+            throw viua::cg::lex::InvalidSyntax(last_instruction, ("main function does not return a value: " + main_function));
         }
     }
     if (not main_is_defined and (DEBUG or VERBOSE) and not flags.as_lib) {
