@@ -754,7 +754,7 @@ static uint64_t writeCodeBlocksSection(ofstream& out, const invocables_t& blocks
 
     /////////////////////////////////////////////
     // WRITE OUT BLOCK IDS SECTION
-    // THIS ALSO INCLUDES IDS OF LINKED blocks.bodies
+    // THIS ALSO INCLUDES IDS OF LINKED BLOCKS
     bwrite(out, block_ids_section_size);
     for (string name : blocks.names) {
         if (DEBUG) {
@@ -947,7 +947,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
 
     /////////////////////////////////
     // MAP FUNCTIONS TO ADDRESSES AND
-    // MAP blocks.bodies TO ADDRESSES AND
+    // MAP BLOCKS TO ADDRESSES AND
     // SET STARTING INSTRUCTION
     uint64_t starting_instruction = 0;  // the bytecode offset to first executable instruction
     map<string, uint64_t> function_addresses;
@@ -1109,7 +1109,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
 
 
     /////////////////////////////////////////////////////////
-    // GENERATE BYTECODE OF LOCAL FUNCTIONS AND blocks.bodies
+    // GENERATE BYTECODE OF LOCAL FUNCTIONS AND BLOCKS
     //
     // BYTECODE IS GENERATED HERE BUT NOT YET WRITTEN TO FILE
     // THIS MUST BE GENERATED HERE TO OBTAIN FILL JUMP TABLE
@@ -1121,7 +1121,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
     vector<tuple<uint64_t, uint64_t> > jump_positions;
 
     for (string name : blocks.names) {
-        // do not generate bytecode for blocks.bodies that were linked
+        // do not generate bytecode for blocks that were linked
         if (find(linked_block_names.begin(), linked_block_names.end(), name) != linked_block_names.end()) { continue; }
 
         if (VERBOSE or DEBUG) {
@@ -1362,7 +1362,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
     ////////////////////////////////////////////////////
     // WRITE BYTECODE OF LOCAL BLOCKS TO BYTECODE BUFFER
     for (string name : blocks.names) {
-        // linked blocks.bodies are to be inserted later
+        // linked blocks are to be inserted later
         if (find(linked_block_names.begin(), linked_block_names.end(), name) != linked_block_names.end()) { continue; }
 
         if (DEBUG) {
