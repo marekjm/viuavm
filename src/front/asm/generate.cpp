@@ -806,6 +806,69 @@ static string get_main_function(const vector<viua::cg::lex::Token>& tokens) {
     return main_function;
 }
 
+static uint64_t generate_entry_function(uint64_t bytes, map<string, uint64_t> function_addresses, invocables_t& functions, const string& main_function, uint64_t starting_instruction) {
+    if (DEBUG) {
+        cout << "generating " << ENTRY_FUNCTION_NAME << " function" << endl;
+    }
+
+    vector<string> entry_function_lines;
+    functions.names.emplace_back(ENTRY_FUNCTION_NAME);
+    function_addresses[ENTRY_FUNCTION_NAME] = starting_instruction;
+
+    // entry function sets global stuff (FIXME: not really)
+    entry_function_lines.emplace_back("ress local");
+    bytes += OP_SIZES.at("ress");
+
+    // generate different instructions based on which main function variant
+    // has been selected
+    if (main_function == "main/0") {
+        entry_function_lines.emplace_back("frame 0");
+        bytes += OP_SIZES.at("frame");
+    } else if (main_function == "main/2") {
+        entry_function_lines.emplace_back("frame 2");
+        bytes += OP_SIZES.at("frame");
+
+        // pop first element on the list of aruments
+        entry_function_lines.emplace_back("vpop 0 1 0");
+        bytes += OP_SIZES.at("vpop");
+
+        // for parameter for main/2 is the name of the program
+        entry_function_lines.emplace_back("param 0 0");
+        bytes += OP_SIZES.at("param");
+
+        // second parameter for main/2 is the vector with the rest
+        // of the commandl ine parameters
+        entry_function_lines.emplace_back("param 1 1");
+        bytes += OP_SIZES.at("param");
+    } else {
+        // this is for default main function, i.e. `main/1` or
+        // for custom main functions
+        // FIXME: should custom main function be allowed?
+        entry_function_lines.emplace_back("frame 1");
+        entry_function_lines.emplace_back("param 0 1");
+        bytes += OP_SIZES.at("frame");
+        bytes += OP_SIZES.at("param");
+    }
+
+    // name of the main function must not be hardcoded because there is '.main:' assembler
+    // directive which can set an arbitrary function as main
+    // we also save return value in 1 register since 0 means "drop return value"
+    entry_function_lines.emplace_back("call 1 " + main_function);
+    bytes += OP_SIZES.at("call");
+    bytes += main_function.size()+1;
+
+    // then, register 1 is moved to register 0 so it counts as a return code
+    entry_function_lines.emplace_back("move 0 1");
+    bytes += OP_SIZES.at("move");
+
+    entry_function_lines.emplace_back("halt");
+    bytes += OP_SIZES.at("halt");
+
+    functions.bodies[ENTRY_FUNCTION_NAME] = entry_function_lines;
+
+    return bytes;
+}
+
 int generate(const vector<string>& expanded_lines, vector<string>& ilines, vector<viua::cg::lex::Token>& tokens, invocables_t& functions, invocables_t& blocks, const string& filename, string& compilename, const vector<string>& commandline_given_links, const compilationflags_t& flags) {
     //////////////////////////////
     // SETUP INITIAL BYTECODE SIZE
@@ -942,64 +1005,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
     //////////////////////////
     // GENERATE ENTRY FUNCTION
     if (not flags.as_lib) {
-        if (DEBUG) {
-            cout << "generating " << ENTRY_FUNCTION_NAME << " function" << endl;
-        }
-
-        vector<string> entry_function_lines;
-        functions.names.emplace_back(ENTRY_FUNCTION_NAME);
-        function_addresses[ENTRY_FUNCTION_NAME] = starting_instruction;
-
-        // entry function sets global stuff (FIXME: not really)
-        entry_function_lines.emplace_back("ress local");
-        bytes += OP_SIZES.at("ress");
-
-        // generate different instructions based on which main function variant
-        // has been selected
-        if (main_function == "main/0") {
-            entry_function_lines.emplace_back("frame 0");
-            bytes += OP_SIZES.at("frame");
-        } else if (main_function == "main/2") {
-            entry_function_lines.emplace_back("frame 2");
-            bytes += OP_SIZES.at("frame");
-
-            // pop first element on the list of aruments
-            entry_function_lines.emplace_back("vpop 0 1 0");
-            bytes += OP_SIZES.at("vpop");
-
-            // for parameter for main/2 is the name of the program
-            entry_function_lines.emplace_back("param 0 0");
-            bytes += OP_SIZES.at("param");
-
-            // second parameter for main/2 is the vector with the rest
-            // of the commandl ine parameters
-            entry_function_lines.emplace_back("param 1 1");
-            bytes += OP_SIZES.at("param");
-        } else {
-            // this is for default main function, i.e. `main/1` or
-            // for custom main functions
-            // FIXME: should custom main function be allowed?
-            entry_function_lines.emplace_back("frame 1");
-            entry_function_lines.emplace_back("param 0 1");
-            bytes += OP_SIZES.at("frame");
-            bytes += OP_SIZES.at("param");
-        }
-
-        // name of the main function must not be hardcoded because there is '.main:' assembler
-        // directive which can set an arbitrary function as main
-        // we also save return value in 1 register since 0 means "drop return value"
-        entry_function_lines.emplace_back("call 1 " + main_function);
-        bytes += OP_SIZES.at("call");
-        bytes += main_function.size()+1;
-
-        // then, register 1 is moved to register 0 so it counts as a return code
-        entry_function_lines.emplace_back("move 0 1");
-        bytes += OP_SIZES.at("move");
-
-        entry_function_lines.emplace_back("halt");
-        bytes += OP_SIZES.at("halt");
-
-        functions.bodies[ENTRY_FUNCTION_NAME] = entry_function_lines;
+        bytes = generate_entry_function(bytes, function_addresses, functions, main_function, starting_instruction);
     }
 
 
