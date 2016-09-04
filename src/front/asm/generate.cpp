@@ -688,16 +688,12 @@ static void assemble(Program& program, const vector<string>& lines) {
 }
 
 
-static map<string, uint64_t> mapInvocableAddresses(uint64_t& starting_instruction, const vector<string>& names, const map<string, vector<string>>& sources, const map<string, vector<viua::cg::lex::Token>>& tokens) {
+static map<string, uint64_t> mapInvocableAddresses(uint64_t& starting_instruction, const invocables_t& blocks) {
     map<string, uint64_t> addresses;
-    for (string name : names) {
+    for (string name : blocks.names) {
         addresses[name] = starting_instruction;
         try {
-            if (name == ENTRY_FUNCTION_NAME) {
-                starting_instruction += Program::countBytes(sources.at(name));
-            } else {
-                starting_instruction += viua::cg::tools::calculate_bytecode_size(tokens.at(name));
-            }
+            starting_instruction += viua::cg::tools::calculate_bytecode_size(blocks.tokens.at(name));
         } catch (const std::out_of_range& e) {
             throw ("could not find block '" + name + "'");
         }
@@ -781,11 +777,7 @@ static uint64_t writeCodeBlocksSection(ofstream& out, const invocables_t& blocks
         // block_bodies_size_so_far size must be incremented by the actual size of block's bytecode size
         // to give correct offset for next block
         try {
-            if (name == ENTRY_FUNCTION_NAME) {
-                block_bodies_size_so_far += Program::countBytes(blocks.bodies.at(name));
-            } else {
-                block_bodies_size_so_far += viua::cg::tools::calculate_bytecode_size(blocks.tokens.at(name));
-            }
+            block_bodies_size_so_far += viua::cg::tools::calculate_bytecode_size(blocks.tokens.at(name));
         } catch (const std::out_of_range& e) {
             cout << "fatal: could not find block '" << name << "' during address table write" << endl;
             exit(1);
@@ -961,8 +953,8 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
     map<string, uint64_t> function_addresses;
     map<string, uint64_t> block_addresses;
     try {
-        block_addresses = mapInvocableAddresses(starting_instruction, blocks.names, blocks.bodies, blocks.tokens);
-        function_addresses = mapInvocableAddresses(starting_instruction, functions.names, functions.bodies, functions.tokens);
+        block_addresses = mapInvocableAddresses(starting_instruction, blocks);
+        function_addresses = mapInvocableAddresses(starting_instruction, functions);
         bytes = viua::cg::tools::calculate_bytecode_size(tokens);
     } catch (const string& e) {
         cout << "error: bytecode size calculation failed: " << e << endl;
@@ -1213,11 +1205,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
         }
         uint64_t fun_bytes = 0;
         try {
-            if (name == ENTRY_FUNCTION_NAME) {
-                fun_bytes = Program::countBytes(filter(functions.bodies.at(name)));
-            } else {
-                fun_bytes = viua::cg::tools::calculate_bytecode_size(functions.tokens.at(name));
-            }
+            fun_bytes = viua::cg::tools::calculate_bytecode_size(functions.tokens.at(name));
             if (VERBOSE or DEBUG) {
                 cout << " (" << fun_bytes << " bytes at byte " << functions_section_size << ')' << endl;
             }
