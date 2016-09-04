@@ -104,6 +104,39 @@ static string read_file(const string& path) {
     return source_in.str();
 }
 
+static void display_error_in_context(const vector<viua::cg::lex::Token>& tokens, viua::cg::lex::InvalidSyntax error, const string& filename) {
+    cout << filename << ':' << error.line()+1 << ':' << error.character()+1 << ": error: " << error.what() << endl;
+    cout << "\n";
+
+    auto error_line = error.line();
+    const unsigned context_lines = 2;
+    decltype(error_line) context_before, context_after = (error_line+context_lines);
+    if (error_line < context_lines) {
+        context_before = 0;
+    } else {
+        context_before = (error_line-context_lines);
+    }
+
+    for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
+        auto token = tokens[i];
+        auto token_line = token.line();
+        if (token_line >= context_before and token_line <= context_after) {
+            cout << (token_line == error_line ? ">>>>" : "    ") << " " << token_line+1 << "  ";
+
+            cout << token.str();
+            while (i < tokens.size() and tokens[i].line() == token_line) {
+                cout << tokens[i].str();
+                ++i;
+            }
+            --i;
+        }
+        if (token.line() > error_line) {
+            break;
+        }
+    }
+    cout << endl;
+}
+
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
     vector<string> args;
@@ -220,11 +253,19 @@ int main(int argc, char* argv[]) {
     vector<string> ilines = assembler::ce::getilines(expanded_lines);
 
     auto source = read_file(filename);
-    auto tokens = viua::cg::lex::standardise(viua::cg::lex::reduce(viua::cg::lex::tokenise(source)));
+    auto raw_tokens = viua::cg::lex::tokenise(source);
+    decltype(raw_tokens) cooked_tokens;
+
+    try {
+        cooked_tokens = viua::cg::lex::standardise(viua::cg::lex::reduce(raw_tokens));
+    } catch (const viua::cg::lex::InvalidSyntax& e) {
+        display_error_in_context(raw_tokens, e, filename);
+        return 1;
+    }
 
     invocables_t functions;
     try {
-        if (gatherFunctions(&functions, tokens)) {
+        if (gatherFunctions(&functions, cooked_tokens)) {
             return 1;
         }
     } catch (const viua::cg::lex::InvalidSyntax& e) {
@@ -233,7 +274,7 @@ int main(int argc, char* argv[]) {
     }
     invocables_t blocks;
     try {
-        if (gatherBlocks(&blocks, tokens)) {
+        if (gatherBlocks(&blocks, cooked_tokens)) {
             return 1;
         }
     } catch (const viua::cg::lex::InvalidSyntax& e) {
