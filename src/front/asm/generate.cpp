@@ -820,6 +820,7 @@ static uint64_t generate_entry_function(uint64_t bytes, map<string, uint64_t> fu
     entry_function_lines.emplace_back("ress local");
     entry_function_tokens.emplace_back(0, 0, "ress");
     entry_function_tokens.emplace_back(0, 0, "local");
+    entry_function_tokens.emplace_back(0, 0, "\n");
     bytes += OP_SIZES.at("ress");
 
     // generate different instructions based on which main function variant
@@ -828,11 +829,13 @@ static uint64_t generate_entry_function(uint64_t bytes, map<string, uint64_t> fu
         entry_function_lines.emplace_back("frame 0");
         entry_function_tokens.emplace_back(0, 0, "frame");
         entry_function_tokens.emplace_back(0, 0, "0");
+        entry_function_tokens.emplace_back(0, 0, "\n");
         bytes += OP_SIZES.at("frame");
     } else if (main_function == "main/2") {
         entry_function_lines.emplace_back("frame 2");
         entry_function_tokens.emplace_back(0, 0, "frame");
         entry_function_tokens.emplace_back(0, 0, "2");
+        entry_function_tokens.emplace_back(0, 0, "\n");
         bytes += OP_SIZES.at("frame");
 
         // pop first element on the list of aruments
@@ -841,6 +844,7 @@ static uint64_t generate_entry_function(uint64_t bytes, map<string, uint64_t> fu
         entry_function_tokens.emplace_back(0, 0, "0");
         entry_function_tokens.emplace_back(0, 0, "1");
         entry_function_tokens.emplace_back(0, 0, "0");
+        entry_function_tokens.emplace_back(0, 0, "\n");
         bytes += OP_SIZES.at("vpop");
 
         // for parameter for main/2 is the name of the program
@@ -848,6 +852,7 @@ static uint64_t generate_entry_function(uint64_t bytes, map<string, uint64_t> fu
         entry_function_tokens.emplace_back(0, 0, "param");
         entry_function_tokens.emplace_back(0, 0, "0");
         entry_function_tokens.emplace_back(0, 0, "0");
+        entry_function_tokens.emplace_back(0, 0, "\n");
         bytes += OP_SIZES.at("param");
 
         // second parameter for main/2 is the vector with the rest
@@ -856,6 +861,7 @@ static uint64_t generate_entry_function(uint64_t bytes, map<string, uint64_t> fu
         entry_function_tokens.emplace_back(0, 0, "param");
         entry_function_tokens.emplace_back(0, 0, "1");
         entry_function_tokens.emplace_back(0, 0, "1");
+        entry_function_tokens.emplace_back(0, 0, "\n");
         bytes += OP_SIZES.at("param");
     } else {
         // this is for default main function, i.e. `main/1` or
@@ -864,11 +870,13 @@ static uint64_t generate_entry_function(uint64_t bytes, map<string, uint64_t> fu
         entry_function_lines.emplace_back("frame 1");
         entry_function_tokens.emplace_back(0, 0, "frame");
         entry_function_tokens.emplace_back(0, 0, "1");
+        entry_function_tokens.emplace_back(0, 0, "\n");
 
         entry_function_lines.emplace_back("param 0 1");
         entry_function_tokens.emplace_back(0, 0, "param");
         entry_function_tokens.emplace_back(0, 0, "0");
         entry_function_tokens.emplace_back(0, 0, "1");
+        entry_function_tokens.emplace_back(0, 0, "\n");
 
         bytes += OP_SIZES.at("frame");
         bytes += OP_SIZES.at("param");
@@ -881,6 +889,7 @@ static uint64_t generate_entry_function(uint64_t bytes, map<string, uint64_t> fu
     entry_function_tokens.emplace_back(0, 0, "call");
     entry_function_tokens.emplace_back(0, 0, "1");
     entry_function_tokens.emplace_back(0, 0, main_function);
+    entry_function_tokens.emplace_back(0, 0, "\n");
     bytes += OP_SIZES.at("call");
     bytes += main_function.size()+1;
 
@@ -889,10 +898,12 @@ static uint64_t generate_entry_function(uint64_t bytes, map<string, uint64_t> fu
     entry_function_tokens.emplace_back(0, 0, "move");
     entry_function_tokens.emplace_back(0, 0, "0");
     entry_function_tokens.emplace_back(0, 0, "1");
+    entry_function_tokens.emplace_back(0, 0, "\n");
     bytes += OP_SIZES.at("move");
 
     entry_function_lines.emplace_back("halt");
     entry_function_tokens.emplace_back(0, 0, "halt");
+    entry_function_tokens.emplace_back(0, 0, "\n");
     bytes += OP_SIZES.at("halt");
 
     functions.bodies[ENTRY_FUNCTION_NAME] = entry_function_lines;
