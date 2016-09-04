@@ -322,10 +322,10 @@ def runTestThrowsException(self, name, expected_output, assembly_opts=None):
 def runTestReportsException(self, name, expected_output, assembly_opts=None):
     runTest(self, name, expected_output, expected_exit_code=0, output_processing_function=extractFirstException)
 
-def runTestFailsToAssemble(self, name, expected_output):
+def runTestFailsToAssemble(self, name, expected_output, asm_opts=()):
     assembly_path = os.path.join(self.PATH, name)
     compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-    output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(0, 1))
+    output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(0, 1), opts=asm_opts)
     self.assertEqual(1, exit_code)
     self.assertEqual(output.strip().splitlines()[0], expected_output)
 
@@ -931,188 +931,73 @@ class AssemblerErrorTests(unittest.TestCase):
     PATH = './sample/asm/errors'
 
     def testNoEndBetweenDefs(self):
-        name = 'no_end_between_defs.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,))
-        self.assertEqual("./sample/asm/errors/no_end_between_defs.asm:23:1: error: another function opened before assembler reached .end after 'foo/0' function", output.strip().splitlines()[0])
-        self.assertEqual(1, exit_code)
+        runTestFailsToAssemble(self, 'no_end_between_defs.asm', "./sample/asm/errors/no_end_between_defs.asm:23:1: error: another function opened before assembler reached .end after 'foo/0' function")
 
     def testHaltAsLastInstruction(self):
-        name = 'halt_as_last_instruction.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/halt_as_last_instruction.asm:23: error: function does not end with 'return' or 'tailcall': main/1", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'halt_as_last_instruction.asm', "./sample/asm/errors/halt_as_last_instruction.asm:23: error: function does not end with 'return' or 'tailcall': main/1")
 
     def testArityError(self):
-        name = 'arity_error.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/arity_error.asm:27: error: invalid number of parameters in call to function foo/1: expected 1 got 0", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'arity_error.asm', "./sample/asm/errors/arity_error.asm:27: error: invalid number of parameters in call to function foo/1: expected 1 got 0")
 
     def testFrameWithGaps(self):
-        name = 'frame_with_gaps.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/frame_with_gaps.asm:28: error: gap in frame defined at line 25, slot 1 left empty", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'frame_with_gaps.asm', "./sample/asm/errors/frame_with_gaps.asm:28: error: gap in frame defined at line 25, slot 1 left empty")
 
     def testPassingParameterToASlotWithTooHighIndex(self):
-        name = 'passing_to_slot_with_too_high_index.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/passing_to_slot_with_too_high_index.asm:26: error: pass to parameter slot 3 in frame with only 3 slots available", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'passing_to_slot_with_too_high_index.asm', "./sample/asm/errors/passing_to_slot_with_too_high_index.asm:26: error: pass to parameter slot 3 in frame with only 3 slots available")
 
     def testDoublePassing(self):
-        name = 'double_pass.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/double_pass.asm:29: error: double pass to parameter slot 2 in frame defined at line 25, first pass at line 28", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'double_pass.asm', "./sample/asm/errors/double_pass.asm:29: error: double pass to parameter slot 2 in frame defined at line 25, first pass at line 28")
 
     def testMsgRequiresAtLeastOneParameter(self):
-        name = 'msg_requires_at_least_one_parameter.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/msg_requires_at_least_one_parameter.asm:22: error: invalid number of parameters in dynamic dispatch of foo: expected at least 1, got 0", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'msg_requires_at_least_one_parameter.asm', "./sample/asm/errors/msg_requires_at_least_one_parameter.asm:22: error: invalid number of parameters in dynamic dispatch of foo: expected at least 1, got 0")
 
     def testMsgArityMismatch(self):
-        name = 'msg_arity_mismatch.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/msg_arity_mismatch.asm:22: error: invalid number of parameters in dynamic dispatch of add/2: expected 2 got 1", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'msg_arity_mismatch.asm', "./sample/asm/errors/msg_arity_mismatch.asm:22: error: invalid number of parameters in dynamic dispatch of add/2: expected 2 got 1")
 
     def testNoReturnOrTailcallAtTheEndOfAFunctionError(self):
-        name = 'no_return_at_the_end_of_a_function.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/no_return_at_the_end_of_a_function.asm:22: error: function does not end with 'return' or 'tailcall': foo/0", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'no_return_at_the_end_of_a_function.asm', "./sample/asm/errors/no_return_at_the_end_of_a_function.asm:22: error: function does not end with 'return' or 'tailcall': foo/0")
 
     def testBlockWithEmptyBody(self):
-        name = 'empty_block_body.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/empty_block_body.asm:21: error: block with empty body: foo", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'empty_block_body.asm', "./sample/asm/errors/empty_block_body.asm:21: error: block with empty body: foo")
 
     def testCallToUndefinedFunction(self):
-        name = 'call_to_undefined_function.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/call_to_undefined_function.asm:22: error: call to undefined function foo/1", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'call_to_undefined_function.asm', "./sample/asm/errors/call_to_undefined_function.asm:22: error: call to undefined function foo/1")
 
     def testInvalidFunctionName(self):
-        name = 'invalid_function_name.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/invalid_function_name.asm:30: error: invalid function name: foo/x", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'invalid_function_name.asm', "./sample/asm/errors/invalid_function_name.asm:30: error: invalid function name: foo/x")
 
     def testExcessFrameSpawned(self):
-        name = 'excess_frame_spawned.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/excess_frame_spawned.asm:27: error: excess frame spawned (unused frame spawned at line 26)", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'excess_frame_spawned.asm', "./sample/asm/errors/excess_frame_spawned.asm:27: error: excess frame spawned (unused frame spawned at line 26)")
 
     def testCallWithoutAFrame(self):
-        name = 'call_without_a_frame.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/call_without_a_frame.asm:28: error: call with 'tailcall' without a frame", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'call_without_a_frame.asm', "./sample/asm/errors/call_without_a_frame.asm:28: error: call with 'tailcall' without a frame")
 
     def testCatchingWithUndefinedBlock(self):
-        name = 'catching_with_undefined_block.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/catching_with_undefined_block.asm:27: error: cannot catch using undefined block: main/0__catch", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'catching_with_undefined_block.asm', "./sample/asm/errors/catching_with_undefined_block.asm:27: error: cannot catch using undefined block: main/0__catch")
 
     def testEnteringUndefinedBlock(self):
-        name = 'entering_undefined_block.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/entering_undefined_block.asm:22: error: cannot enter undefined block: foo", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'entering_undefined_block.asm', "./sample/asm/errors/entering_undefined_block.asm:22: error: cannot enter undefined block: foo")
 
     def testFunctionFromUndefinedFunction(self):
-        name = 'function_from_undefined_function.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/function_from_undefined_function.asm:21: error: function from undefined function: foo/0", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'function_from_undefined_function.asm', "./sample/asm/errors/function_from_undefined_function.asm:21: error: function from undefined function: foo/0")
 
     def testInvalidRegisterSetName(self):
-        name = 'invalid_ress_instruction.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/invalid_ress_instruction.asm:21: error: illegal register set name in ress instruction 'foo' in function main/1", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'invalid_ress_instruction.asm', "./sample/asm/errors/invalid_ress_instruction.asm:21: error: illegal register set name in ress instruction 'foo' in function main/1")
 
     def testGlobalRegisterSetUsedInLibraryFunction(self):
-        name = 'global_rs_used_in_lib.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, opts=('-c',), okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/global_rs_used_in_lib.asm:21: error: global registers used in library function foo", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'global_rs_used_in_lib.asm', "./sample/asm/errors/global_rs_used_in_lib.asm:21: error: global registers used in library function foo/0", asm_opts=('-c',))
 
     def testFunctionWithEmptyBody(self):
-        name = 'empty_function_body.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/empty_function_body.asm:21: error: function with empty body: foo/0", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'empty_function_body.asm', "./sample/asm/errors/empty_function_body.asm:21: error: function with empty body: foo/0")
 
     def testStrayEndMarked(self):
-        name = 'stray_end.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/stray_end.asm:20: error: stray .end marker", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'stray_end.asm', "./sample/asm/errors/stray_end.asm:20: error: stray .end marker")
 
     def testIllegalDirective(self):
-        name = 'illegal_directive.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/illegal_directive.asm:20: error: illegal directive: '.fuction:'", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'illegal_directive.asm', "./sample/asm/errors/illegal_directive.asm:20: error: illegal directive: '.fuction:'")
 
     def testUnknownInstruction(self):
-        name = 'unknown_instruction.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/unknown_instruction.asm:21: error: unknown instruction: 'prnt'", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'unknown_instruction.asm', "./sample/asm/errors/unknown_instruction.asm:21: error: unknown instruction: 'prnt'")
 
     def testMoreThanOneMainFunction(self):
         name = 'more_than_one_main_function.asm'
@@ -1128,276 +1013,106 @@ class AssemblerErrorTests(unittest.TestCase):
         self.assertEqual(error_lines, output.strip().splitlines())
 
     def testMainFunctionIsNotDefined(self):
-        name = 'main_function_is_not_defined.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/main_function_is_not_defined.asm: error: main function is not defined", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'main_function_is_not_defined.asm', "./sample/asm/errors/main_function_is_not_defined.asm: error: main function is not defined")
 
     def testRegisterIndexesCannotBeNegative(self):
-        name = 'register_indexes_cannot_be_negative.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("error: in function 'main/0': register indexes cannot be negative: @-1", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'register_indexes_cannot_be_negative.asm', "error: in function 'main/0': register indexes cannot be negative: @-1")
 
     def testBackwardOutOfFunctionJump(self):
-        name = 'backward_out_of_function_jump.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/backward_out_of_function_jump.asm:21: error: backward out-of-range jump", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'backward_out_of_function_jump.asm', "./sample/asm/errors/backward_out_of_function_jump.asm:21: error: backward out-of-range jump")
 
     def testForwardOutOfFunctionJump(self):
-        name = 'forward_out_of_function_jump.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/forward_out_of_function_jump.asm:21: error: forward out-of-range jump", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'forward_out_of_function_jump.asm', "./sample/asm/errors/forward_out_of_function_jump.asm:21: error: forward out-of-range jump")
 
     def testJumpToUnrecognisedMarker(self):
-        name = 'jump_to_unrecognised_marker.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/jump_to_unrecognised_marker.asm:21: error: jump to unrecognised marker: foo", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'jump_to_unrecognised_marker.asm', "./sample/asm/errors/jump_to_unrecognised_marker.asm:21: error: jump to unrecognised marker: foo")
 
     def testAbsoluteJumpWithNegativeValue(self):
-        name = 'absolute_jump_negative.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/absolute_jump_negative.asm:21: error: absolute jump with negative value", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'absolute_jump_negative.asm', "./sample/asm/errors/absolute_jump_negative.asm:21: error: absolute jump with negative value")
 
     def testFrameWithoutOperands(self):
-        name = 'frame_without_operands.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/frame_without_operands.asm:25: error: frame instruction without operands", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'frame_without_operands.asm', "./sample/asm/errors/frame_without_operands.asm:25: error: frame instruction without operands")
 
     def testBlocksEndWithReturningInstruction(self):
-        name = 'blocks_end_with_returning_instruction.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/blocks_end_with_returning_instruction.asm:22: error: missing returning instruction (leave, return or halt) at the end of block 'foo__block'", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'blocks_end_with_returning_instruction.asm', "./sample/asm/errors/blocks_end_with_returning_instruction.asm:22: error: missing returning instruction (leave, return or halt) at the end of block 'foo__block'")
 
     def testBranchWithoutTarget(self):
-        name = 'branch_without_a_target.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/branch_without_a_target.asm:23: error: branch without a target", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'branch_without_a_target.asm', "./sample/asm/errors/branch_without_a_target.asm:23: error: branch without a target")
 
     def testBranchTrueBackwardOutOfRange(self):
-        name = 'branch_true_backward_out_of_range.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/branch_true_backward_out_of_range.asm:23: error: backward out-of-range jump", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'branch_true_backward_out_of_range.asm', "./sample/asm/errors/branch_true_backward_out_of_range.asm:23: error: backward out-of-range jump")
 
     def testBranchTrueForwardOutOfRange(self):
-        name = 'branch_true_forward_out_of_range.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/branch_true_forward_out_of_range.asm:23: error: forward out-of-range jump", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'branch_true_forward_out_of_range.asm', "./sample/asm/errors/branch_true_forward_out_of_range.asm:23: error: forward out-of-range jump")
 
     def testBranchFalseBackwardOutOfRange(self):
-        name = 'branch_false_backward_out_of_range.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/branch_false_backward_out_of_range.asm:23: error: backward out-of-range jump", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'branch_false_backward_out_of_range.asm', "./sample/asm/errors/branch_false_backward_out_of_range.asm:23: error: backward out-of-range jump")
 
     def testBranchFalseForwardOutOfRange(self):
-        name = 'branch_false_forward_out_of_range.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/branch_false_forward_out_of_range.asm:23: error: forward out-of-range jump", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'branch_false_forward_out_of_range.asm', "./sample/asm/errors/branch_false_forward_out_of_range.asm:23: error: forward out-of-range jump")
 
     def testBranchTrueForwardOutOfRangeNonrelative(self):
-        name = 'branch_true_forward_out_of_range_nonrelative.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/branch_true_forward_out_of_range_nonrelative.asm:23: error: forward out-of-range jump", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'branch_true_forward_out_of_range_nonrelative.asm', "./sample/asm/errors/branch_true_forward_out_of_range_nonrelative.asm:23: error: forward out-of-range jump")
 
     def testBranchFalseForwardOutOfRangeNonrelative(self):
-        name = 'branch_false_forward_out_of_range_nonrelative.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/branch_false_forward_out_of_range_nonrelative.asm:23: error: forward out-of-range jump", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'branch_false_forward_out_of_range_nonrelative.asm', "./sample/asm/errors/branch_false_forward_out_of_range_nonrelative.asm:23: error: forward out-of-range jump")
 
     def testBranchTrueNegativeAbsolute(self):
-        name = 'branch_true_negative_absolute.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/branch_true_negative_absolute.asm:23: error: absolute jump with negative value", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'branch_true_negative_absolute.asm', "./sample/asm/errors/branch_true_negative_absolute.asm:23: error: absolute jump with negative value")
 
     def testBranchFalseNegativeAbsolute(self):
-        name = 'branch_false_negative_absolute.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/branch_false_negative_absolute.asm:23: error: absolute jump with negative value", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'branch_false_negative_absolute.asm', "./sample/asm/errors/branch_false_negative_absolute.asm:23: error: absolute jump with negative value")
 
     def testBranchTrueToUnrecognisedMarker(self):
-        name = 'branch_true_to_unrecognised_marker.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/branch_true_to_unrecognised_marker.asm:23: error: jump to unrecognised marker: foo", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'branch_true_to_unrecognised_marker.asm', "./sample/asm/errors/branch_true_to_unrecognised_marker.asm:23: error: jump to unrecognised marker: foo")
 
     def testBranchFalseToUnrecognisedMarker(self):
-        name = 'branch_false_to_unrecognised_marker.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/branch_false_to_unrecognised_marker.asm:23: error: jump to unrecognised marker: foo", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'branch_false_to_unrecognised_marker.asm', "./sample/asm/errors/branch_false_to_unrecognised_marker.asm:23: error: jump to unrecognised marker: foo")
 
     def testZeroDistanceAbsoluteFalseBranch(self):
-        name = 'zero_distance_absolute_false_branch.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/zero_distance_absolute_false_branch.asm:21: error: zero-distance jump", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'zero_distance_absolute_false_branch.asm', "./sample/asm/errors/zero_distance_absolute_false_branch.asm:21: error: zero-distance jump")
 
     def testZeroDistanceAbsoluteJump(self):
-        name = 'zero_distance_absolute_jump.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/zero_distance_absolute_jump.asm:21: error: zero-distance jump", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'zero_distance_absolute_jump.asm', "./sample/asm/errors/zero_distance_absolute_jump.asm:21: error: zero-distance jump")
 
     def testZeroDistanceAbsoluteTrueBranch(self):
-        name = 'zero_distance_absolute_true_branch.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/zero_distance_absolute_true_branch.asm:21: error: zero-distance jump", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'zero_distance_absolute_true_branch.asm', "./sample/asm/errors/zero_distance_absolute_true_branch.asm:21: error: zero-distance jump")
 
     def testZeroDistanceBackwardFalseBranch(self):
-        name = 'zero_distance_backward_false_branch.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/zero_distance_backward_false_branch.asm:21: error: zero-distance jump", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'zero_distance_backward_false_branch.asm', "./sample/asm/errors/zero_distance_backward_false_branch.asm:21: error: zero-distance jump")
 
     def testZeroDistanceBackwardJump(self):
-        name = 'zero_distance_backward_jump.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/zero_distance_backward_jump.asm:21: error: zero-distance jump", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'zero_distance_backward_jump.asm', "./sample/asm/errors/zero_distance_backward_jump.asm:21: error: zero-distance jump")
 
     def testZeroDistanceBackwardTrueBranch(self):
-        name = 'zero_distance_backward_true_branch.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/zero_distance_backward_true_branch.asm:21: error: zero-distance jump", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'zero_distance_backward_true_branch.asm', "./sample/asm/errors/zero_distance_backward_true_branch.asm:21: error: zero-distance jump")
 
     def testZeroDistanceFalseBranch(self):
-        name = 'zero_distance_false_branch.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/zero_distance_false_branch.asm:24: error: zero-distance jump", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'zero_distance_false_branch.asm', "./sample/asm/errors/zero_distance_false_branch.asm:24: error: zero-distance jump")
 
     def testZeroDistanceForwardFalseBranch(self):
-        name = 'zero_distance_forward_false_branch.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/zero_distance_forward_false_branch.asm:21: error: zero-distance jump", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'zero_distance_forward_false_branch.asm', "./sample/asm/errors/zero_distance_forward_false_branch.asm:21: error: zero-distance jump")
 
     def testZeroDistanceForwardJump(self):
-        name = 'zero_distance_forward_jump.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/zero_distance_forward_jump.asm:21: error: zero-distance jump", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'zero_distance_forward_jump.asm', "./sample/asm/errors/zero_distance_forward_jump.asm:21: error: zero-distance jump")
 
     def testZeroDistanceForwardTrueBranch(self):
-        name = 'zero_distance_forward_true_branch.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/zero_distance_forward_true_branch.asm:21: error: zero-distance jump", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'zero_distance_forward_true_branch.asm', "./sample/asm/errors/zero_distance_forward_true_branch.asm:21: error: zero-distance jump")
 
     def testZeroDistanceJump(self):
-        name = 'zero_distance_jump.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/zero_distance_jump.asm:24: error: zero-distance jump", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'zero_distance_jump.asm', "./sample/asm/errors/zero_distance_jump.asm:24: error: zero-distance jump")
 
     def testZeroDistanceMarkerFalseBranch(self):
-        name = 'zero_distance_marker_false_branch.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/zero_distance_marker_false_branch.asm:25: error: zero-distance jump", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'zero_distance_marker_false_branch.asm', "./sample/asm/errors/zero_distance_marker_false_branch.asm:25: error: zero-distance jump")
 
     def testZeroDistanceMarkerJump(self):
-        name = 'zero_distance_marker_jump.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/zero_distance_marker_jump.asm:24: error: zero-distance jump", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'zero_distance_marker_jump.asm', "./sample/asm/errors/zero_distance_marker_jump.asm:24: error: zero-distance jump")
 
     def testZeroDistanceMarkerTrueBranch(self):
-        name = 'zero_distance_marker_true_branch.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/zero_distance_marker_true_branch.asm:25: error: zero-distance jump", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'zero_distance_marker_true_branch.asm', "./sample/asm/errors/zero_distance_marker_true_branch.asm:25: error: zero-distance jump")
 
     def testZeroDistanceTrueBranch(self):
-        name = 'zero_distance_true_branch.asm'
-        assembly_path = os.path.join(self.PATH, name)
-        compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
-        output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
-        self.assertEqual(1, exit_code)
-        self.assertEqual("./sample/asm/errors/zero_distance_true_branch.asm:24: error: zero-distance jump", output.strip().splitlines()[0])
+        runTestFailsToAssemble(self, 'zero_distance_true_branch.asm', "./sample/asm/errors/zero_distance_true_branch.asm:24: error: zero-distance jump")
 
 
 class AssemblerErrorRejectingDuplicateSymbolsTests(unittest.TestCase):

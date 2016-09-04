@@ -17,7 +17,7 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: foo
+.function: foo/0
     ress global
     return
 .end
