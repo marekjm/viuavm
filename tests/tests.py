@@ -639,7 +639,7 @@ class FunctionTests(unittest.TestCase):
         # FIXME: disassembler must understand the .closure: directive
         # for now, don't pass the --static-check flag and
         # all will be OK
-        runTest(self, 'return_by_reference.asm', 42, 0, lambda o: int(o.strip())), assembly_opts=None)
+        runTest(self, 'return_by_reference.asm', 42, 0, lambda o: int(o.strip()), assembly_opts=None)
 
     def testStaticRegisters(self):
         runTestReturnsIntegers(self, 'static_registers.asm', [i for i in range(0, 10)])
