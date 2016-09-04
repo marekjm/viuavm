@@ -806,6 +806,56 @@ static string get_main_function(const vector<viua::cg::lex::Token>& tokens, cons
     return main_function;
 }
 
+static void check_main_function(const string& main_function, const vector<viua::cg::lex::Token>& main_function_tokens) {
+        // Why three newlines?
+        //
+        // Here's why:
+        //
+        // - first newline is after the final 'return' instruction
+        // - second newline is after the last-but-one instruction which should set the return register
+        // - third newline is the marker after which we look for the instruction that will set the return register
+        //
+        // Example:
+        //
+        //   1st newline
+        //         |
+        //         |  2nd newline
+        //         |   |
+        //      nop    |
+        //      izero 0
+        //      return
+        //            |
+        //          3rd newline
+        //
+        // If these three newlines are found then the main function is considered "full".
+        // Anything less, and things get suspicious.
+        // If there are two newlines - maybe the function just returns something.
+        // If there is only one newline - the main function is invalid, because there is no way
+        // to correctly set the return register, and return from the function with one instruction.
+        //
+        const int expected_newlines = 3;
+
+        int found_newlines = 0;
+        auto i = main_function_tokens.size()-1;
+        while (i and found_newlines < expected_newlines) {
+            if (main_function_tokens.at(i--) == "\n") {
+                ++found_newlines;
+            }
+        }
+        if (found_newlines >= expected_newlines) {
+            // if found newlines number at least equals the expected number we
+            // have to adjust token counter to skip past last required newline and the token before it
+            i += 2;
+        }
+        auto last_instruction = main_function_tokens.at(i);
+        if (not (last_instruction == "copy" or last_instruction == "move" or last_instruction == "swap" or last_instruction == "izero" or last_instruction == "istore")) {
+            throw viua::cg::lex::InvalidSyntax(last_instruction, ("main function does not return a value: " + main_function));
+        }
+        if (main_function_tokens.at(i+1) != "0") {
+            throw viua::cg::lex::InvalidSyntax(last_instruction, ("main function does not return a value: " + main_function));
+        }
+}
+
 static uint64_t generate_entry_function(uint64_t bytes, map<string, uint64_t> function_addresses, invocables_t& functions, const string& main_function, uint64_t starting_instruction) {
     if (DEBUG) {
         cout << "generating " << ENTRY_FUNCTION_NAME << " function" << endl;
@@ -932,55 +982,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
     // this must be better implemented or we will receive "function did not set return register" exceptions at runtime
     bool main_is_defined = (find(functions.names.begin(), functions.names.end(), main_function) != functions.names.end());
     if (not flags.as_lib and main_is_defined) {
-        auto main_function_tokens = functions.tokens.at(main_function);
-        int found_newlines = 0;
-
-        // Why three newlines?
-        //
-        // Here's why:
-        //
-        // - first newline is after the final 'return' instruction
-        // - second newline is after the last-but-one instruction which should set the return register
-        // - third newline is the marker after which we look for the instruction that will set the return register
-        //
-        // Example:
-        //
-        //   1st newline
-        //         |
-        //         |  2nd newline
-        //         |   |
-        //      nop    |
-        //      izero 0
-        //      return
-        //            |
-        //          3rd newline
-        //
-        // If these three newlines are found then the main function is considered "full".
-        // Anything less, and things get suspicious.
-        // If there are two newlines - maybe the function just returns something.
-        // If there is only one newline - the main function is invalid, because there is no way
-        // to correctly set the return register, and return from the function with one instruction.
-        //
-        const int expected_newlines = 3;
-
-        auto i = main_function_tokens.size()-1;
-        while (i and found_newlines < expected_newlines) {
-            if (main_function_tokens.at(i--) == "\n") {
-                ++found_newlines;
-            }
-        }
-        if (found_newlines >= expected_newlines) {
-            // if found newlines number at least equals the expected number we
-            // have to adjust token counter to skip past last required newline and the token before it
-            i += 2;
-        }
-        auto last_instruction = main_function_tokens.at(i);
-        if (not (last_instruction == "copy" or last_instruction == "move" or last_instruction == "swap" or last_instruction == "izero" or last_instruction == "istore")) {
-            throw viua::cg::lex::InvalidSyntax(last_instruction, ("main function does not return a value: " + main_function));
-        }
-        if (main_function_tokens.at(i+1) != "0") {
-            throw viua::cg::lex::InvalidSyntax(last_instruction, ("main function does not return a value: " + main_function));
-        }
+        check_main_function(main_function, functions.tokens.at(main_function));
     }
     if (not main_is_defined and (DEBUG or VERBOSE) and not flags.as_lib) {
         cout << "notice: main function (" << main_function << ") is not defined in " << filename << ", deferring main function check to post-link phase" << endl;
