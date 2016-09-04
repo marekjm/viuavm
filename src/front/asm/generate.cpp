@@ -774,10 +774,14 @@ static uint64_t writeCodeBlocksSection(ofstream& out, const invocables_t& blocks
         // mapped address must come after name
         // FIXME: use uncasted uint64_t
         bwrite(out, block_bodies_size_so_far);
-        // blocks.bodies size must be incremented by the actual size of block's bytecode size
+        // block_bodies_size_so_far size must be incremented by the actual size of block's bytecode size
         // to give correct offset for next block
         try {
-            block_bodies_size_so_far += Program::countBytes(blocks.bodies.at(name));
+            if (name == ENTRY_FUNCTION_NAME) {
+                block_bodies_size_so_far += Program::countBytes(blocks.bodies.at(name));
+            } else {
+                block_bodies_size_so_far += viua::cg::tools::calculate_bytecode_size(blocks.tokens.at(name));
+            }
         } catch (const std::out_of_range& e) {
             cout << "fatal: could not find block '" << name << "' during address table write" << endl;
             exit(1);
