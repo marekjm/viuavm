@@ -35,6 +35,8 @@ There are several categories of change:
 - enhancement: better error messages from assembler
 - fix: assembler catches unbalanced parenthesis in wrapped instructions
 - enhancement: assembler provides context for errors
+- enhancement: token-based return value checking of main function (the assembler actually checks if the return register
+  is being correctly set)
 
 
 ----
