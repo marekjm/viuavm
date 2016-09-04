@@ -787,6 +787,17 @@ static uint64_t writeCodeBlocksSection(ofstream& out, const invocables_t& blocks
     return block_bodies_size_so_far;
 }
 
+static string get_main_function(const vector<viua::cg::lex::Token>& tokens) {
+    string main_function = "main/1";
+    for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
+        if (tokens.at(i) == ".main:") {
+            main_function = tokens.at(i+1);
+            break;
+        }
+    }
+    return main_function;
+}
+
 int generate(const vector<string>& expanded_lines, vector<string>& ilines, vector<viua::cg::lex::Token>& tokens, invocables_t& functions, invocables_t& blocks, const string& filename, string& compilename, const vector<string>& commandline_given_links, const compilationflags_t& flags) {
     //////////////////////////////
     // SETUP INITIAL BYTECODE SIZE
@@ -795,20 +806,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
 
     /////////////////////////
     // GET MAIN FUNCTION NAME
-    string main_function = "";
-    for (string line : ilines) {
-        if (assembler::utils::lines::is_main(line)) {
-            if (DEBUG) {
-                cout << "setting main function to: ";
-            }
-            main_function = str::lstrip(str::sub(line, 6));
-            cout << main_function << endl;
-            break;
-        }
-    }
-    if (main_function == "" and not flags.as_lib) {
-        main_function = "main/1";
-    }
+    string main_function = get_main_function(tokens);
     if (((VERBOSE and main_function != "main/1" and main_function != "") or DEBUG) and not flags.as_lib) {
         cout << "debug (notice): main function set to: '" << main_function << "'" << endl;
     }
