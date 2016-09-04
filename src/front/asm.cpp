@@ -124,9 +124,9 @@ static void display_error_in_context(const vector<viua::cg::lex::Token>& tokens,
             cout << (token_line == error_line ? ">>>>" : "    ") << " " << token_line+1 << "  ";
 
             cout << token.str();
+            ++i;
             while (i < tokens.size() and tokens[i].line() == token_line) {
-                cout << tokens[i].str();
-                ++i;
+                cout << tokens[i++].str();
             }
             --i;
         }
@@ -269,7 +269,7 @@ int main(int argc, char* argv[]) {
             return 1;
         }
     } catch (const viua::cg::lex::InvalidSyntax& e) {
-        cout << filename << ':' << e.line_number+1 << ':' << e.character_in_line+1 << ": error: " << e.what() << endl;
+        display_error_in_context(raw_tokens, e, filename);
         return 1;
     }
     invocables_t blocks;
@@ -278,7 +278,7 @@ int main(int argc, char* argv[]) {
             return 1;
         }
     } catch (const viua::cg::lex::InvalidSyntax& e) {
-        cout << filename << ':' << e.line_number+1 << ':' << e.character_in_line+1 << ": error: " << e.what() << endl;
+        display_error_in_context(raw_tokens, e, filename);
         return 1;
     }
 
@@ -334,7 +334,8 @@ int main(int argc, char* argv[]) {
         cout << filename << ':' << expanded_lines_to_source_lines.at(e.first)+1 << ": error: " << e.second << endl;
         return 1;
     } catch (const viua::cg::lex::InvalidSyntax& e) {
-        cout << filename << ':' << e.line_number+1 << ':' << e.character_in_line+1 << ": error: " << e.what() << endl;
+        display_error_in_context(raw_tokens, e, filename);
+        return 1;
     }
 
     return ret_code;

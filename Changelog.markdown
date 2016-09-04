@@ -34,6 +34,7 @@ There are several categories of change:
 - feature: `--size` option in assembler frontend reporting calculated size of bytecode
 - enhancement: better error messages from assembler
 - fix: assembler catches unbalanced parenthesis in wrapped instructions
+- enhancement: assembler provides context for errors
 
 
 ----
