@@ -286,7 +286,7 @@ int main(int argc, char* argv[]) {
     // INITIAL VERIFICATION OF CODE CORRECTNESS
     try {
         assembler::verify::directives(cooked_tokens);
-        assembler::verify::instructions(expanded_lines);
+        assembler::verify::instructions(cooked_tokens);
         assembler::verify::ressInstructions(expanded_lines, AS_LIB);
         assembler::verify::functionNames(expanded_lines);
         assembler::verify::functionBodiesAreNonempty(expanded_lines);

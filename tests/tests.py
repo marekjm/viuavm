@@ -997,7 +997,7 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'illegal_directive.asm', "./sample/asm/errors/illegal_directive.asm:20:1: error: illegal directive")
 
     def testUnknownInstruction(self):
-        runTestFailsToAssemble(self, 'unknown_instruction.asm', "./sample/asm/errors/unknown_instruction.asm:21: error: unknown instruction: 'prnt'")
+        runTestFailsToAssemble(self, 'unknown_instruction.asm', "./sample/asm/errors/unknown_instruction.asm:21:5: error: unknown instruction: 'prnt'")
 
     def testMoreThanOneMainFunction(self):
         name = 'more_than_one_main_function.asm'

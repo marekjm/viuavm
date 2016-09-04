@@ -484,19 +484,18 @@ void assembler::verify::directives(const vector<Token>& tokens) {
     }
 }
 
-void assembler::verify::instructions(const vector<string>& lines) {
-    ostringstream report("");
-    string line;
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        line = str::lstrip(lines[i]);
-        if (line.size() == 0 or line[0] == '.' or line[0] == ';' or str::startswith(line, "--")) {
+void assembler::verify::instructions(const vector<Token>& tokens) {
+    for (decltype(tokens.size()) i = 1; i < tokens.size(); ++i) {
+        // instructions can only appear after newline
+        if (tokens.at(i-1) != "\n") {
             continue;
         }
-
-        string token = str::chunk(line);
-        if (OP_SIZES.count(token) == 0) {
-            report << "unknown instruction: '" << token << "'";
-            throw ErrorReport(i, report.str());
+        // directives and newlines can *also* apear after newline so filter them out
+        if (tokens.at(i).str().at(0) == '.' or tokens.at(i) == "\n") {
+            continue;
+        }
+        if (OP_SIZES.count(tokens.at(i)) == 0) {
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("unknown instruction: '" + tokens.at(i).str() + "'"));
         }
     }
 }
