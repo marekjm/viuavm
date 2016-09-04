@@ -994,7 +994,7 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'stray_end.asm', "./sample/asm/errors/stray_end.asm:20: error: stray .end marker")
 
     def testIllegalDirective(self):
-        runTestFailsToAssemble(self, 'illegal_directive.asm', "./sample/asm/errors/illegal_directive.asm:20: error: illegal directive: '.fuction:'")
+        runTestFailsToAssemble(self, 'illegal_directive.asm', "./sample/asm/errors/illegal_directive.asm:20:1: error: illegal directive")
 
     def testUnknownInstruction(self):
         runTestFailsToAssemble(self, 'unknown_instruction.asm', "./sample/asm/errors/unknown_instruction.asm:21: error: unknown instruction: 'prnt'")

@@ -285,7 +285,7 @@ int main(int argc, char* argv[]) {
     ///////////////////////////////////////////
     // INITIAL VERIFICATION OF CODE CORRECTNESS
     try {
-        assembler::verify::directives(expanded_lines);
+        assembler::verify::directives(cooked_tokens);
         assembler::verify::instructions(expanded_lines);
         assembler::verify::ressInstructions(expanded_lines, AS_LIB);
         assembler::verify::functionNames(expanded_lines);
@@ -303,6 +303,9 @@ int main(int argc, char* argv[]) {
         assembler::verify::blocksEndWithFinishingInstruction(expanded_lines);
     } catch (const pair<unsigned, string>& e) {
         cout << filename << ':' << expanded_lines_to_source_lines.at(e.first)+1 << ": error: " << e.second << endl;
+        return 1;
+    } catch (const viua::cg::lex::InvalidSyntax& e) {
+        display_error_in_context(raw_tokens, e, filename);
         return 1;
     }
 

@@ -27,12 +27,14 @@
 #include <regex>
 #include <viua/support/string.h>
 #include <viua/bytecode/maps.h>
+#include <viua/cg/lex.h>
 #include <viua/cg/assembler/assembler.h>
 #include <viua/program.h>
 using namespace std;
 
 
 using ErrorReport = pair<unsigned, string>;
+using Token = viua::cg::lex::Token;
 
 
 void assembler::verify::functionCallsAreDefined(const vector<string>& lines, const vector<string>& function_names, const vector<string>& function_signatures) {
@@ -468,21 +470,20 @@ void assembler::verify::blocksEndWithFinishingInstruction(const vector<string>& 
     }
 }
 
-void assembler::verify::directives(const vector<string>& lines) {
-    ostringstream report("");
-    string line;
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        line = str::lstrip(lines[i]);
-        if (line.size() == 0 or line[0] != '.') {
+void assembler::verify::directives(const vector<Token>& tokens) {
+    for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
+        if (not (i == 0 or tokens.at(i-1) == "\n")) {
             continue;
         }
-
-        if (not assembler::utils::lines::is_directive(line)) {
-            report << "illegal directive: '" << str::chunk(line) << "'";
-            throw ErrorReport(i, report.str());
+        if (tokens.at(i).str().at(0) != '.') {
+            continue;
+        }
+        if (not assembler::utils::lines::is_directive(tokens.at(i))) {
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i), "illegal directive");
         }
     }
 }
+
 void assembler::verify::instructions(const vector<string>& lines) {
     ostringstream report("");
     string line;

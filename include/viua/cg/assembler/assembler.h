@@ -78,7 +78,7 @@ namespace assembler {
 
         void blocksEndWithFinishingInstruction(const std::vector<std::string>&);
 
-        void directives(const std::vector<std::string>&);
+        void directives(const std::vector<viua::cg::lex::Token>&);
         void instructions(const std::vector<std::string>&);
 
         void framesHaveOperands(const std::vector<std::string>&);
