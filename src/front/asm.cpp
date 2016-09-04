@@ -311,7 +311,7 @@ int main(int argc, char* argv[]) {
         return 0;
     }
     if (REPORT_BYTECODE_SIZE) {
-        cout << Program::countBytes(ilines) << endl;
+        cout << viua::cg::tools::calculate_bytecode_size(cooked_tokens) << endl;
         return 0;
     }
 
@@ -323,7 +323,7 @@ int main(int argc, char* argv[]) {
 
     int ret_code = 0;
     try {
-        ret_code = generate(expanded_lines, ilines, functions, blocks, filename, compilename, commandline_given_links, flags);
+        ret_code = generate(expanded_lines, ilines, cooked_tokens, functions, blocks, filename, compilename, commandline_given_links, flags);
     } catch (const string& e) {
         ret_code = 1;
         cout << "fatal: exception occured during assembling: " << e << endl;

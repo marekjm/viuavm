@@ -28,6 +28,7 @@
 #include <viua/support/env.h>
 #include <viua/loader.h>
 #include <viua/program.h>
+#include <viua/cg/tools.h>
 #include <viua/cg/tokenizer.h>
 #include <viua/cg/assembler/assembler.h>
 #include <viua/front/asm.h>
@@ -786,7 +787,7 @@ static uint64_t writeCodeBlocksSection(ofstream& out, const invocables_t& blocks
     return block_bodies_size_so_far;
 }
 
-int generate(const vector<string>& expanded_lines, vector<string>& ilines, invocables_t& functions, invocables_t& blocks, const string& filename, string& compilename, const vector<string>& commandline_given_links, const compilationflags_t& flags) {
+int generate(const vector<string>& expanded_lines, vector<string>& ilines, vector<viua::cg::lex::Token>& tokens, invocables_t& functions, invocables_t& blocks, const string& filename, string& compilename, const vector<string>& commandline_given_links, const compilationflags_t& flags) {
     //////////////////////////////
     // SETUP INITIAL BYTECODE SIZE
     uint64_t bytes = 0;
@@ -850,7 +851,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, invoc
     try {
         block_addresses = mapInvocableAddresses(starting_instruction, blocks.names, blocks.bodies);
         function_addresses = mapInvocableAddresses(starting_instruction, functions.names, functions.bodies);
-        bytes = Program::countBytes(ilines);
+        bytes = viua::cg::tools::calculate_bytecode_size(tokens);
     } catch (const string& e) {
         cout << "error: bytecode size calculation failed: " << e << endl;
         return 1;
