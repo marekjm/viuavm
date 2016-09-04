@@ -37,6 +37,9 @@ namespace viua {
 
                 const char* what() const;
 
+                auto line() const -> decltype(line_number);
+                auto character() const -> decltype(character_in_line);
+
                 InvalidSyntax(long unsigned, long unsigned, std::string);
                 InvalidSyntax(Token, std::string = "");
             };

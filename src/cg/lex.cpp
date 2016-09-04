@@ -38,6 +38,13 @@ namespace viua {
                 return message.c_str();
             }
 
+            auto InvalidSyntax::line() const -> decltype(line_number) {
+                return line_number;
+            }
+            auto InvalidSyntax::character() const -> decltype(character_in_line) {
+                return character_in_line;
+            }
+
             InvalidSyntax::InvalidSyntax(long unsigned ln, long unsigned ch, string ct): line_number(ln), character_in_line(ch), content(ct) {
             }
             InvalidSyntax::InvalidSyntax(Token t, string m): line_number(t.line()), character_in_line(t.character()), content(t.str()), message(m) {
