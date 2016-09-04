@@ -1125,7 +1125,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
     /////////////////////////////////////////////////////////////////////////
     // AFTER HAVING OBTAINED LINKED NAMES, IT IS POSSIBLE TO VERIFY CALLS AND
     // CALLABLE (FUNCTIONS, CLOSURES, ETC.) CREATIONS
-    assembler::verify::functionCallsAreDefined(expanded_lines, functions.names, functions.signatures);
+    assembler::verify::functionCallsAreDefined(tokens, functions.names, functions.signatures);
     assembler::verify::callableCreations(expanded_lines, functions.names, functions.signatures);
 
 

@@ -961,7 +961,13 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'empty_block_body.asm', "./sample/asm/errors/empty_block_body.asm:21: error: block with empty body: foo")
 
     def testCallToUndefinedFunction(self):
-        runTestFailsToAssemble(self, 'call_to_undefined_function.asm', "./sample/asm/errors/call_to_undefined_function.asm:22: error: call to undefined function foo/1")
+        runTestFailsToAssemble(self, 'call_to_undefined_function.asm', "./sample/asm/errors/call_to_undefined_function.asm:22:10: error: call to undefined function foo/1")
+
+    def testTailCallToUndefinedFunction(self):
+        runTestFailsToAssemble(self, 'tail_call_to_undefined_function.asm', "./sample/asm/errors/tail_call_to_undefined_function.asm:22:14: error: tail call to undefined function foo/0")
+
+    def testProcessFromUndefinedFunction(self):
+        runTestFailsToAssemble(self, 'process_from_undefined_function.asm', "./sample/asm/errors/process_from_undefined_function.asm:22:13: error: process from undefined function foo/0")
 
     def testInvalidFunctionName(self):
         runTestFailsToAssemble(self, 'invalid_function_name.asm', "./sample/asm/errors/invalid_function_name.asm:30: error: invalid function name: foo/x")
@@ -1347,7 +1353,7 @@ class WatchdogTests(unittest.TestCase):
         runTest(self, 'hello_world.asm', 'process spawned with <Function: broken_process/0> died')
 
     def testWatchdogFromUndefinedFunctionCaughtByAssembler(self):
-        runTestFailsToAssemble(self, 'from_undefined_function.asm', './sample/asm/watchdog/from_undefined_function.asm:60: error: watchdog from undefined function undefined_function/0')
+        runTestFailsToAssemble(self, 'from_undefined_function.asm', './sample/asm/watchdog/from_undefined_function.asm:60:14: error: watchdog from undefined function undefined_function/0')
 
     def testWatchdogFromUndefinedFunctionCaughtAtRuntime(self):
         runTestThrowsException(self, 'from_undefined_function_at_runtime.asm', ('Exception', 'watchdog process from undefined function: undefined_function/0',))

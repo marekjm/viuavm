@@ -37,34 +37,33 @@ using ErrorReport = pair<unsigned, string>;
 using Token = viua::cg::lex::Token;
 
 
-void assembler::verify::functionCallsAreDefined(const vector<string>& lines, const vector<string>& function_names, const vector<string>& function_signatures) {
+static bool is_defined(string function_name, const vector<string>& function_names, const vector<string>& function_signatures) {
+    bool is_undefined = (find(function_names.begin(), function_names.end(), function_name) == function_names.end());
+    // if function is undefined, check if we got a signature for it
+    if (is_undefined) {
+        is_undefined = (find(function_signatures.begin(), function_signatures.end(), function_name) == function_signatures.end());
+    }
+    return (not is_undefined);
+}
+void assembler::verify::functionCallsAreDefined(const vector<Token>& tokens, const vector<string>& function_names, const vector<string>& function_signatures) {
     ostringstream report("");
     string line;
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        line = str::lstrip(lines[i]);
-        if (not (str::startswith(line, "call") or str::startswith(line, "process") or str::startswith(line, "watchdog"))) {
+    for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
+        auto token = tokens.at(i);
+        if (not (token == "call" or token == "process" or token == "watchdog" or token == "tailcall")) {
             continue;
         }
 
-        string instr_name = str::chunk(line);
-        line = str::lstrip(line.substr(instr_name.size()));
-        string return_register = str::chunk(line);
-        line = str::lstrip(line.substr(return_register.size()));
-        string function = str::chunk(line);
-
-        // return register is optional to give
-        // if it is not given - second operand is empty, and function name must be taken from first operand
-        string& check_function = (function.size() ? function : return_register);
-
-        bool is_undefined = (find(function_names.begin(), function_names.end(), check_function) == function_names.end());
-        // if function is undefined, check if we got a signature for it
-        if (is_undefined) {
-            is_undefined = (find(function_signatures.begin(), function_signatures.end(), check_function) == function_signatures.end());
-        }
-
-        if (is_undefined) {
-            report << ((instr_name == "call" or instr_name == "tailcall") ? "call to" : instr_name == "process" ? "process from" : "watchdog from") << " undefined function " << check_function;
-            throw ErrorReport(i, report.str());
+        if (token == "tailcall" or token == "watchdog") {
+            string function_name = tokens.at(i+1);
+            if (not is_defined(function_name, function_names, function_signatures)) {
+                throw viua::cg::lex::InvalidSyntax(tokens.at(i+1), (string(token == "tailcall" ? "tail call to" : "watchdog from") + " undefined function " + function_name));
+            }
+        } else if (token == "call" or token == "process") {
+            string function_name = tokens.at(i+2);
+            if (not is_defined(function_name, function_names, function_signatures)) {
+                throw viua::cg::lex::InvalidSyntax(tokens.at(i+2), (string(token == "call" ? "call to" : "process from") + " undefined function " + function_name));
+            }
         }
     }
 }
