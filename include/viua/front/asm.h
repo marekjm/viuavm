@@ -32,6 +32,7 @@ struct invocables_t {
     std::vector<std::string> names;
     std::vector<std::string> signatures;
     std::map<std::string, std::vector<std::string>> bodies;
+    std::map<std::string, std::vector<viua::cg::lex::Token>> tokens;
 };
 
 struct compilationflags_t {

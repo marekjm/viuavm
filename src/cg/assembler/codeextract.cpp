@@ -240,3 +240,6 @@ static map<string, vector<string>> get_cooked_block_bodies(map<string, vector<To
 map<string, vector<string>> assembler::ce::getInvokables(const string& type, const vector<Token>& tokens) {
     return get_cooked_block_bodies(get_raw_block_bodies(type, tokens));
 }
+map<string, vector<Token>> assembler::ce::getInvokablesTokenBodies(const string& type, const vector<Token>& tokens) {
+    return get_raw_block_bodies(type, tokens);
+}

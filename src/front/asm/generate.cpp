@@ -1080,7 +1080,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
         }
         uint64_t fun_bytes = 0;
         try {
-            fun_bytes = Program::countBytes(blocks.bodies.at(name));
+            fun_bytes = viua::cg::tools::calculate_bytecode_size(blocks.tokens.at(name));
             if (VERBOSE or DEBUG) {
                 cout << " (" << fun_bytes << " bytes at byte " << block_bodies_section_size << ')' << endl;
             }
@@ -1156,7 +1156,11 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
         }
         uint64_t fun_bytes = 0;
         try {
-            fun_bytes = Program::countBytes(name == ENTRY_FUNCTION_NAME ? filter(functions.bodies.at(name)) : functions.bodies.at(name));
+            if (name == ENTRY_FUNCTION_NAME) {
+                fun_bytes = Program::countBytes(filter(functions.bodies.at(name)));
+            } else {
+                fun_bytes = viua::cg::tools::calculate_bytecode_size(functions.tokens.at(name));
+            }
             if (VERBOSE or DEBUG) {
                 cout << " (" << fun_bytes << " bytes at byte " << functions_section_size << ')' << endl;
             }
