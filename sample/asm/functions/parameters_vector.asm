@@ -22,7 +22,6 @@
 .function: foo/4
     link misc
 
-    ; FIXME: try will not be needed when ENTER instruction is implemented
     try
     enter misc::argsvector
 
