@@ -35,14 +35,14 @@
 ;   closure_maker(1)(2)(3)(4) == 10
 ;
 
-.function: closure_level_3/1
+.closure: closure_level_3/1
     ; expects 1, 2 and 3 to be enclosed integers
     .name: 5 accumulator
     move 0 (iadd accumulator (arg 4 0) (iadd accumulator 3 (iadd accumulator 1 2)))
     return
 .end
 
-.function: closure_level_2/1
+.closure: closure_level_2/1
     closure 0 closure_level_3/1
     ; registers 1 and 2 are occupied by enclosed integers
     ; but they must be enclosed by the "closure_level_3"
@@ -52,7 +52,7 @@
     return
 .end
 
-.function: closure_level_1/1
+.closure: closure_level_1/1
     closure 0 closure_level_2/1
     ; register 1 is occupied by enclosed integer
     ; but it must be enclosed by the "closure_level_2"
