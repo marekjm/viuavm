@@ -884,7 +884,7 @@ class TryCatchBlockTests(unittest.TestCase):
     def testBasicNoThrowNoCatchBlock(self):
         # FIXME implement running block checks as they are entered; then, default assembly options may
         # be used
-        runTest(self, 'basic.asm', '42', assembly_opts=('--no-sa',))
+        runTest(self, 'basic.asm', '42')
 
     def testCatchingBuiltinType(self):
         runTest(self, 'catching_builtin_type.asm', '42')
@@ -1220,8 +1220,7 @@ class MiscExceptionTests(unittest.TestCase):
         runTest(self, 'nullregister_access.asm', "exception encountered: (get) read from null register: 1", assembly_opts=('--no-sa',))
 
     def testCatcherState(self):
-        # FIXME: passing custom assembler options will not be needed once .closure: support is completely implemented
-        runTestSplitlines(self, 'restore_catcher_state.asm', ['42','100','42','100'], assembly_opts=('--no-sa',))
+        runTestSplitlines(self, 'restore_catcher_state.asm', ['42','100','42','100'])
 
     def testCatchingExceptionThrownInDifferentModule(self):
         source_lib = 'thrown_in_linked_caught_in_static_fun.asm'
