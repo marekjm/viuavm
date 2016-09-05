@@ -1216,7 +1216,8 @@ class MiscExceptionTests(unittest.TestCase):
         runTestThrowsException(self, 'closure_from_nonlocal_registers.asm', ('Exception', 'creating closures from nonlocal registers is forbidden',), assembly_opts=('--no-sa',))
 
     def testCatchingMachineThrownException(self):
-        runTest(self, 'nullregister_access.asm', "exception encountered: (get) read from null register: 1")
+        # pass --no-sa flag; we want to check runtime exception
+        runTest(self, 'nullregister_access.asm', "exception encountered: (get) read from null register: 1", assembly_opts=('--no-sa',))
 
     def testCatcherState(self):
         # FIXME: passing custom assembler options will not be needed once .closure: support is completely implemented

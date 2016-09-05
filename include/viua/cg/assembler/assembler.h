@@ -87,7 +87,7 @@ namespace assembler {
 
         void jumpsAreInRange(const std::vector<std::string>&);
 
-        void manipulationOfDefinedRegisters(const std::vector<viua::cg::lex::Token>&, const bool);
+        void manipulationOfDefinedRegisters(const std::vector<viua::cg::lex::Token>&, const std::map<std::string, std::vector<viua::cg::lex::Token>>&, const bool);
     }
 
     namespace utils {

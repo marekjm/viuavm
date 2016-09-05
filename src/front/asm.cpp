@@ -307,7 +307,7 @@ int main(int argc, char* argv[]) {
         assembler::verify::framesHaveNoGaps(expanded_lines, expanded_lines_to_source_lines);
         assembler::verify::blocksEndWithFinishingInstruction(expanded_lines);
         if (PERFORM_STATIC_ANALYSIS) {
-            assembler::verify::manipulationOfDefinedRegisters(cooked_tokens, DEBUG);
+            assembler::verify::manipulationOfDefinedRegisters(cooked_tokens, blocks.tokens, DEBUG);
         }
     } catch (const pair<unsigned, string>& e) {
         cout << filename << ':' << expanded_lines_to_source_lines.at(e.first)+1 << ": error: " << e.second << endl;
