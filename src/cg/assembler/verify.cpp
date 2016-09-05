@@ -743,8 +743,11 @@ static string resolve_register_name(const map<string, string>& named_registers, 
     if (name.at(0) == '@') {
         name = name.substr(1);
     }
-    if (str::isnum(name)) {
+    if (str::isnum(name, false)) {
         return name;
+    }
+    if (str::isnum(name, true)) {
+        throw viua::cg::lex::InvalidSyntax(token, ("register indexes cannot be negative: " + name));
     }
     if (named_registers.count(name) == 0) {
         throw viua::cg::lex::InvalidSyntax(token, ("not a named register: " + name));
