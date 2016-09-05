@@ -40,8 +40,9 @@ There are several categories of change:
 - feature: add `.closure:` directive marking blocks as closures; closures are almost the same as functions, but they are
   not directly callable, i.e. `call closure/0` is illegal, but `fcall <closure>` is OK - this distinction was introduced
   because closures are currently not statically checkable
-- feature: passing `--static-check` option to assembler runs basic static analysis on the source code; it is able to catch
-  undefined register accesses (i.e. accesses to registers that will be empty at runtime) most of the time
+- feature: assembler is able to perform basic static analysis of register accesses, and detect some places where a register is
+  accessed but would be empty at runtime; this can be disable using `--no-sa` (*no static analysis*) flag if the static analyser
+  throws a false positive
 
 
 ----

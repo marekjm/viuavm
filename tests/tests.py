@@ -253,7 +253,7 @@ def runMemoryLeakCheck(self, compiled_path, check_memory_leaks):
 
 def runTest(self, name, expected_output=None, expected_exit_code = 0, output_processing_function = None, check_memory_leaks = True, custom_assert=None, assembly_opts=None, valgrind_enable=True):
     if assembly_opts is None:
-        assembly_opts = ('--static-check',)
+        assembly_opts = ()
     if expected_output is None and custom_assert is None:
         raise TypeError('`expected_output` and `custom_assert` cannot be both None')
     assembly_path = os.path.join(self.PATH, name)
@@ -324,7 +324,7 @@ def runTestThrowsException(self, name, expected_output, assembly_opts=None):
 def runTestReportsException(self, name, expected_output, assembly_opts=None):
     runTest(self, name, expected_output, expected_exit_code=0, output_processing_function=extractFirstException, assembly_opts=assembly_opts)
 
-def runTestFailsToAssemble(self, name, expected_output, asm_opts=('--static-check',)):
+def runTestFailsToAssemble(self, name, expected_output, asm_opts=()):
     assembly_path = os.path.join(self.PATH, name)
     compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
     output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(0, 1), opts=asm_opts)
@@ -635,13 +635,12 @@ class FunctionTests(unittest.TestCase):
 
     def testObtainingVectorWithPassedParameters(self):
         assemble('./src/stdlib/viua/misc.asm', './misc.vlib', opts=('-c',))
-        runTest(self, 'parameters_vector.asm', '[0, 1, 2, 3]', assembly_opts=())
+        runTest(self, 'parameters_vector.asm', '[0, 1, 2, 3]', assembly_opts=('--no-sa',))
 
     def testReturningReferences(self):
         # FIXME: disassembler must understand the .closure: directive
-        # for now, don't pass the --static-check flag and
-        # all will be OK
-        runTest(self, 'return_by_reference.asm', 42, 0, lambda o: int(o.strip()), assembly_opts=())
+        # for now, the --no-sa flag and everything's gonna be find, believe me
+        runTest(self, 'return_by_reference.asm', 42, 0, lambda o: int(o.strip()), assembly_opts=('--no-sa',))
 
     def testStaticRegisters(self):
         runTestReturnsIntegers(self, 'static_registers.asm', [i for i in range(0, 10)])
@@ -651,11 +650,11 @@ class FunctionTests(unittest.TestCase):
 
     @unittest.skip('functions not ending with "return" or "tailcall" are forbidden')
     def testNeverendingFunction(self):
-        runTestSplitlines(self, 'neverending.asm', ['42', '48'], assembly_opts=())
+        runTestSplitlines(self, 'neverending.asm', ['42', '48'], assembly_opts=('--no-sa',))
 
     @unittest.skip('functions not ending with "return" or "tailcall" are forbidden')
     def testNeverendingFunction0(self):
-        runTestThrowsException(self, 'neverending0.asm', ('Exception', 'stack size (8192) exceeded with call to \'one/0\'',), assembly_opts=())
+        runTestThrowsException(self, 'neverending0.asm', ('Exception', 'stack size (8192) exceeded with call to \'one/0\'',), assembly_opts=('--no-sa',))
 
 
 class HigherOrderFunctionTests(unittest.TestCase):
@@ -698,39 +697,39 @@ class ClosureTests(unittest.TestCase):
 
     def testSimpleClosure(self):
         # FIXME: passing custom assembler options will not be needed once .closure: support is completely implemented
-        runTest(self, 'simple.asm', '42', output_processing_function=None, assembly_opts=())
+        runTest(self, 'simple.asm', '42', output_processing_function=None, assembly_opts=('--no-sa',))
 
     def testVariableSharingBetweenTwoClosures(self):
         # FIXME: passing custom assembler options will not be needed once .closure: support is completely implemented
-        runTestReturnsIntegers(self, 'shared_variables.asm', [42, 69], assembly_opts=())
+        runTestReturnsIntegers(self, 'shared_variables.asm', [42, 69], assembly_opts=('--no-sa',))
 
     def testAdder(self):
         # FIXME: passing custom assembler options will not be needed once .closure: support is completely implemented
-        runTestReturnsIntegers(self, 'adder.asm', [5, 8, 16], assembly_opts=())
+        runTestReturnsIntegers(self, 'adder.asm', [5, 8, 16], assembly_opts=('--no-sa',))
 
     def testEnclosedVariableLeftInScope(self):
         # FIXME: passing custom assembler options will not be needed once .closure: support is completely implemented
-        runTestSplitlines(self, 'enclosed_variable_left_in_scope.asm', ['Hello World!', '42'], assembly_opts=())
+        runTestSplitlines(self, 'enclosed_variable_left_in_scope.asm', ['Hello World!', '42'], assembly_opts=('--no-sa',))
 
     def testChangeEnclosedVariableFromClosure(self):
         # FIXME: passing custom assembler options will not be needed once .closure: support is completely implemented
-        runTestSplitlines(self, 'change_enclosed_variable_from_closure.asm', ['Hello World!', '42'], assembly_opts=())
+        runTestSplitlines(self, 'change_enclosed_variable_from_closure.asm', ['Hello World!', '42'], assembly_opts=('--no-sa',))
 
     def testNestedClosures(self):
         # FIXME: passing custom assembler options will not be needed once .closure: support is completely implemented
-        runTest(self, 'nested_closures.asm', '10', assembly_opts=())
+        runTest(self, 'nested_closures.asm', '10', assembly_opts=('--no-sa',))
 
     def testSimpleEncloseByCopy(self):
         # FIXME: passing custom assembler options will not be needed once .closure: support is completely implemented
-        runTest(self, 'simple_enclose_by_copy.asm', '42', assembly_opts=())
+        runTest(self, 'simple_enclose_by_copy.asm', '42', assembly_opts=('--no-sa',))
 
     def testEncloseCopyCreatesIndependentObjects(self):
         # FIXME: passing custom assembler options will not be needed once .closure: support is completely implemented
-        runTestSplitlines(self, 'enclosecopy_creates_independent_objects.asm', ['Hello World!', 'Hello World!', '42', 'Hello World!'], assembly_opts=())
+        runTestSplitlines(self, 'enclosecopy_creates_independent_objects.asm', ['Hello World!', 'Hello World!', '42', 'Hello World!'], assembly_opts=('--no-sa',))
 
     def testSimpleEncloseByMove(self):
         # FIXME: passing custom assembler options will not be needed once .closure: support is completely implemented
-        runTestSplitlines(self, 'simple_enclose_by_move.asm', ['true', 'Hello World!'], assembly_opts=())
+        runTestSplitlines(self, 'simple_enclose_by_move.asm', ['true', 'Hello World!'], assembly_opts=('--no-sa',))
 
 
 class InvalidInstructionOperandTypeTests(unittest.TestCase):
@@ -885,7 +884,7 @@ class TryCatchBlockTests(unittest.TestCase):
     def testBasicNoThrowNoCatchBlock(self):
         # FIXME implement running block checks as they are entered; then, default assembly options may
         # be used
-        runTest(self, 'basic.asm', '42', assembly_opts=())
+        runTest(self, 'basic.asm', '42', assembly_opts=('--no-sa',))
 
     def testCatchingBuiltinType(self):
         runTest(self, 'catching_builtin_type.asm', '42')
@@ -1214,14 +1213,14 @@ class MiscExceptionTests(unittest.TestCase):
 
     def testClosureFromGlobalResgisterSet(self):
         # FIXME: passing custom assembler options will not be needed once .closure: support is completely implemented
-        runTestThrowsException(self, 'closure_from_nonlocal_registers.asm', ('Exception', 'creating closures from nonlocal registers is forbidden',), assembly_opts=())
+        runTestThrowsException(self, 'closure_from_nonlocal_registers.asm', ('Exception', 'creating closures from nonlocal registers is forbidden',), assembly_opts=('--no-sa',))
 
     def testCatchingMachineThrownException(self):
         runTest(self, 'nullregister_access.asm', "exception encountered: (get) read from null register: 1")
 
     def testCatcherState(self):
         # FIXME: passing custom assembler options will not be needed once .closure: support is completely implemented
-        runTestSplitlines(self, 'restore_catcher_state.asm', ['42','100','42','100'], assembly_opts=())
+        runTestSplitlines(self, 'restore_catcher_state.asm', ['42','100','42','100'], assembly_opts=('--no-sa',))
 
     def testCatchingExceptionThrownInDifferentModule(self):
         source_lib = 'thrown_in_linked_caught_in_static_fun.asm'
@@ -1321,8 +1320,8 @@ class ProcessAbstractionTests(unittest.TestCase):
     PATH = './sample/asm/process_abstraction'
 
     def testProcessesHaveSeparateGlobalRegisterSets(self):
-        # do not pass the --static-check option; this test checks runtime exception
-        runTestReportsException(self, 'separate_global_rs.asm', ('Exception', '(get) read from null register: 1',), assembly_opts=())
+        # FIXME global registers should not be statically checked
+        runTestReportsException(self, 'separate_global_rs.asm', ('Exception', '(get) read from null register: 1',), assembly_opts=('--no-sa',))
 
 
 class ConcurrencyTests(unittest.TestCase):
