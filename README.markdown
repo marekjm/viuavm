@@ -7,7 +7,7 @@
 ![License](https://img.shields.io/github/license/marekjm/viuavm.svg)
 
 
-> A simple, register-based virtual machine programmable in custom assembly lookalike language with
+> A register-based virtual machine programmable in custom assembly lookalike language with
 > strong emphasis on reliability and predictability.
 
 #### Hello World in Viua VM
@@ -39,7 +39,9 @@
   remember about the possibility of a gargabe collector kicking in and interrupting your program;
   Viua manages memory without a GC in a strictly scope-based manner
 - **massive parallelism**: Viua architecture supports spawning massive amounts of independent, VM-based lightweight processes that can
-  run in parallel due to implemented SMP with compile-time configurable number of parallel virtual-process schedulers
+  run in parallel due to implemented SMP
+- **concurrent I/O and FFI**: I/O operations and FFI calls cannot block the VM as they are executed on dedicated schedulers, so block only the
+  process that called them
 - **scatter/gather processes**: processes communicate using messages but machine supports a *join* instruction - which synchronises virtual
   processes execution, it blocks calling process until called process finishes and receives return value of called process (**WIP**)
 - **safe inter-process communication** via message-passing (with queueing)
@@ -74,6 +76,9 @@ Current limitations include:
 - calling Viua code from C++ is not tested
 - debugging information encoded in compiled files is limited
 - speed: Viua is not the fastest VM around
+- VM cannot distinguish FFI calls that are CPU or I/O bound (**WIP**), so if the program performs many I/O operations it may saturate all
+  FFI schedulers (which will effectively prevent the program from quickly executing more FFI calls; virtual processes are still running, and
+  Viua functions are still freely callable, though)
 
 
 ##### Software state notice
