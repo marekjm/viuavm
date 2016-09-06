@@ -857,7 +857,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, se
                     defined_registers.erase(str::stringify(j, false));
                 }
             }
-            defined_registers.insert(body_tokens.at(i));
+            defined_registers.insert(resolve_register_name(named_registers, body_tokens.at(i)));
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else {
