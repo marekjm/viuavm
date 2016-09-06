@@ -982,6 +982,12 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
     def testBranchDependsOnEmptyRegister(self):
         runTestFailsToAssemble(self, 'branch_depends_on_empty_register.asm', "./sample/asm/static_analysis_errors/branch_depends_on_empty_register.asm:21:12: error: branch depends on empty register: 1")
 
+    def testPackingVecEmptiesRegisters(self):
+        runTestFailsToAssemble(self, 'packing_vec_empties_registers.asm', "./sample/asm/static_analysis_errors/packing_vec_empties_registers.asm:26:11: error: print of empty register: 1")
+
+    def testPackingEmptyRegister(self):
+        runTestFailsToAssemble(self, 'packing_empty_register.asm', "./sample/asm/static_analysis_errors/packing_empty_register.asm:23:5: error: packing empty register: 4")
+
 
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.

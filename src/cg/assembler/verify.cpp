@@ -845,6 +845,21 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, se
             }
             i = skip_till_next_line(body_tokens, i);
             continue;
+        } else if (token == "vec") {
+            ++i; // the "vec" token
+            int starting_register = stoi(resolve_register_name(named_registers, body_tokens.at(i+1)));
+            int registers_to_pack = stoi(resolve_register_name(named_registers, body_tokens.at(i+2)));
+            if (registers_to_pack) {
+                for (int j = starting_register; j < (starting_register+registers_to_pack); ++j) {
+                    if (defined_registers.find(str::stringify(j, false)) == defined_registers.end()) {
+                        throw viua::cg::lex::InvalidSyntax(token, ("packing empty register: " + str::stringify(j, false)));
+                    }
+                    defined_registers.erase(str::stringify(j, false));
+                }
+            }
+            defined_registers.insert(body_tokens.at(i));
+            i = skip_till_next_line(body_tokens, i);
+            continue;
         } else {
             if (not ((token == "call" or token == "process") and body_tokens.at(i+1) == "0")) {
                 string reg_original = body_tokens.at(i+1), reg = resolve_register_name(named_registers, body_tokens.at(i+1));
