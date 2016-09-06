@@ -501,13 +501,16 @@ class VectorInstructionsTests(unittest.TestCase):
         runTest(self, 'vec_packing.asm', '["answer to life", 42]', 0, lambda o: o.strip())
 
     def testPackingVecRefusesToPackItself(self):
-        runTestThrowsException(self, 'vec_packing_self_pack.asm', ('Exception', 'vec would pack itself',))
+        # pass --no-sa because we want to test runtime exception
+        runTestThrowsException(self, 'vec_packing_self_pack.asm', ('Exception', 'vec would pack itself',), assembly_opts=('--no-sa',))
 
     def testPackingVecRefusesToOutOfRegisterSetRange(self):
-        runTestThrowsException(self, 'vec_packing_out_of_range.asm', ('Exception', 'vec: packing outside of register set range',))
+        # pass --no-sa because we want to test runtime exception
+        runTestThrowsException(self, 'vec_packing_out_of_range.asm', ('Exception', 'vec: packing outside of register set range',), assembly_opts=('--no-sa',))
 
     def testPackingVecRefusesToPackNullRegister(self):
-        runTestThrowsException(self, 'vec_packing_null.asm', ('Exception', 'vec: cannot pack null register',))
+        # pass --no-sa because we want to test runtime exception
+        runTestThrowsException(self, 'vec_packing_null.asm', ('Exception', 'vec: cannot pack null register',), assembly_opts=('--no-sa',))
 
     def testVLEN(self):
         runTest(self, 'vlen.asm', '8', 0)
