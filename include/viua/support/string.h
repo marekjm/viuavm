@@ -74,7 +74,7 @@ namespace str {
     std::string strencode(const std::string&);
 
     std::string stringify(const std::vector<std::string>&);
-    std::string stringify(long unsigned);
+    std::string stringify(const long unsigned, const bool = true);
 }
 
 
