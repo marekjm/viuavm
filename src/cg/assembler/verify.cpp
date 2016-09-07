@@ -687,7 +687,7 @@ void assembler::verify::jumpsAreInRange(const vector<string>& lines) {
         if (function_name.size() > 0 and not str::startswith(line, ".")) {
             ++function_instruction_counter;
         }
-        if (not (str::startswith(line, ".function:") or str::startswith(line, ".block:") or str::startswith(line, "jump") or str::startswith(line, "branch") or str::startswith(line, ".mark:") or str::startswith(line, ".end"))) {
+        if (not (str::startswith(line, ".function:") or str::startswith(line, ".closure:") or str::startswith(line, ".block:") or str::startswith(line, "jump") or str::startswith(line, "branch") or str::startswith(line, ".mark:") or str::startswith(line, ".end"))) {
             continue;
         }
 
@@ -697,7 +697,7 @@ void assembler::verify::jumpsAreInRange(const vector<string>& lines) {
         string second_part = str::chunk(line);
         line = str::lstrip(line.substr(second_part.size()));
 
-        if (first_part == ".function:" or first_part == ".block:") {
+        if (first_part == ".function:" or first_part ==".closure:" or first_part == ".block:") {
             function_instruction_counter = -1;
             jump_targets.clear();
             forward_jumps.clear();

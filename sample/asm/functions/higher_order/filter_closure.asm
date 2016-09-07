@@ -17,7 +17,7 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: is_divisible_by/1
+.closure: is_divisible_by/1
     .name: 2 bound_variable
     arg 1 0
 
