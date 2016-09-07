@@ -687,10 +687,12 @@ class HigherOrderFunctionTests(unittest.TestCase):
         runTest(self, 'filter_vector_by_move.asm', [[1, 2, 3, 4, 5], [2, 4]], 0, lambda o: [json.loads(i) for i in o.splitlines()])
 
     def testFilterByClosure(self):
-        runTest(self, 'filter_closure.asm', [[1, 2, 3, 4, 5], [2, 4]], 0, lambda o: [json.loads(i) for i in o.splitlines()])
+        # FIXME --no-sa may be removed once closures are differentatied from functions
+        runTest(self, 'filter_closure.asm', [[1, 2, 3, 4, 5], [2, 4]], 0, lambda o: [json.loads(i) for i in o.splitlines()], assembly_opts=('--no-sa',))
 
     def testFilterByClosureVectorByMove(self):
-        runTest(self, 'filter_closure_vector_by_move.asm', [[1, 2, 3, 4, 5], [2, 4]], 0, lambda o: [json.loads(i) for i in o.splitlines()])
+        # FIXME --no-sa may be removed once closures are differentatied from functions
+        runTest(self, 'filter_closure_vector_by_move.asm', [[1, 2, 3, 4, 5], [2, 4]], 0, lambda o: [json.loads(i) for i in o.splitlines()], assembly_opts=('--no-sa',))
 
 
 class ClosureTests(unittest.TestCase):
