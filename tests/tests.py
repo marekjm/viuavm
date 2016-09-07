@@ -993,6 +993,18 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
     def testPackingEmptyRegister(self):
         runTestFailsToAssemble(self, 'packing_empty_register.asm', "./sample/asm/static_analysis_errors/packing_empty_register.asm:23:5: error: packing empty register: 4")
 
+    def testUseOfEmptyFirstRegisterInAnd(self):
+        runTestFailsToAssemble(self, 'and_use_of_empty_register_1st.asm', "./sample/asm/static_analysis_errors/and_use_of_empty_register_1st.asm:21:5: error: use of empty register: 1")
+
+    def testUseOfEmptySecondRegisterInAnd(self):
+        runTestFailsToAssemble(self, 'and_use_of_empty_register_2nd.asm', "./sample/asm/static_analysis_errors/and_use_of_empty_register_2nd.asm:22:5: error: use of empty register: 2")
+
+    def testUseOfEmptyFirstRegisterInOr(self):
+        runTestFailsToAssemble(self, 'or_use_of_empty_register_1st.asm', "./sample/asm/static_analysis_errors/or_use_of_empty_register_1st.asm:21:5: error: use of empty register: 1")
+
+    def testUseOfEmptySecondRegisterInOr(self):
+        runTestFailsToAssemble(self, 'or_use_of_empty_register_2nd.asm', "./sample/asm/static_analysis_errors/or_use_of_empty_register_2nd.asm:22:5: error: use of empty register: 2")
+
 
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.
