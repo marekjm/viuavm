@@ -417,12 +417,4 @@ namespace str {
         oss << ']';
         return oss.str();
     }
-    string stringify(const long unsigned n, const bool nl) {
-        ostringstream oss;
-        oss << n;
-        if (nl) {
-            oss << "\n";
-        }
-        return oss.str();
-    }
 }

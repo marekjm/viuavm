@@ -74,7 +74,14 @@ namespace str {
     std::string strencode(const std::string&);
 
     std::string stringify(const std::vector<std::string>&);
-    std::string stringify(const long unsigned, const bool = true);
+    template<class T> std::string stringify(const T o, const bool nl = true) {
+        std::ostringstream oss;
+        oss << o;
+        if (nl) {
+            oss << "\n";
+        }
+        return oss.str();
+    }
 }
 
 
