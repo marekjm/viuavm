@@ -860,6 +860,21 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, se
             defined_registers.insert(resolve_register_name(named_registers, body_tokens.at(i)));
             i = skip_till_next_line(body_tokens, i);
             continue;
+        } else if (token == "iadd" or token == "isub" or token == "imul" or token == "idiv" or
+                   token == "ilt" or token == "ilte" or token == "igt" or token == "igte" or token == "ieq" or
+                   token == "fadd" or token == "fsub" or token == "fmul" or token == "fdiv" or
+                   token == "flt" or token == "flte" or token == "fgt" or token == "fgte" or token == "feq" or
+                   token == "and" or token == "or") {
+            ++i; // skip mnemonic token
+            if (defined_registers.find(resolve_register_name(named_registers, body_tokens.at(i+1))) == defined_registers.end()) {
+                throw viua::cg::lex::InvalidSyntax(token, ("use of empty register: " + body_tokens.at(i+1).str()));
+            }
+            if (body_tokens.at(i+2) != "\n" and defined_registers.find(resolve_register_name(named_registers, body_tokens.at(i+2))) == defined_registers.end()) {
+                throw viua::cg::lex::InvalidSyntax(token, ("use of empty register: " + body_tokens.at(i+2).str()));
+            }
+            defined_registers.insert(resolve_register_name(named_registers, body_tokens.at(i)));
+            i = skip_till_next_line(body_tokens, i);
+            continue;
         } else {
             if (not ((token == "call" or token == "process") and body_tokens.at(i+1) == "0")) {
                 string reg_original = body_tokens.at(i+1), reg = resolve_register_name(named_registers, body_tokens.at(i+1));
