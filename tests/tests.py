@@ -1011,6 +1011,18 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
     def testNotOfEmptyRegisters(self):
         runTestFailsToAssemble(self, 'not_of_empty_register.asm', "./sample/asm/static_analysis_errors/not_of_empty_register.asm:21:9: error: not of empty register: 1")
 
+    def testCastOfEmptyRegistersFtoi(self):
+        runTestFailsToAssemble(self, 'cast_of_empty_register_ftoi.asm', "./sample/asm/static_analysis_errors/cast_of_empty_register_ftoi.asm:21:10: error: use of empty register: 1")
+
+    def testCastOfEmptyRegistersItof(self):
+        runTestFailsToAssemble(self, 'cast_of_empty_register_itof.asm', "./sample/asm/static_analysis_errors/cast_of_empty_register_itof.asm:21:10: error: use of empty register: 1")
+
+    def testCastOfEmptyRegistersStoi(self):
+        runTestFailsToAssemble(self, 'cast_of_empty_register_stoi.asm', "./sample/asm/static_analysis_errors/cast_of_empty_register_stoi.asm:21:10: error: use of empty register: 1")
+
+    def testCastOfEmptyRegistersStof(self):
+        runTestFailsToAssemble(self, 'cast_of_empty_register_stof.asm', "./sample/asm/static_analysis_errors/cast_of_empty_register_stof.asm:21:10: error: use of empty register: 1")
+
 
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.

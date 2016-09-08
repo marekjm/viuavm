@@ -845,6 +845,13 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, se
             }
             i = skip_till_next_line(body_tokens, i);
             continue;
+        } else if (token == "itof" or token == "ftoi" or token == "stoi" or token == "stof") {
+            if (defined_registers.find(resolve_register_name(named_registers, body_tokens.at(i+2))) == defined_registers.end()) {
+                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+1), ("use of empty register: " + str::strencode(body_tokens.at(i+2))));
+            }
+            defined_registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)));
+            i = skip_till_next_line(body_tokens, i);
+            continue;
         } else if (token == "vec") {
             ++i; // the "vec" token
             int starting_register = stoi(resolve_register_name(named_registers, body_tokens.at(i+1)));
