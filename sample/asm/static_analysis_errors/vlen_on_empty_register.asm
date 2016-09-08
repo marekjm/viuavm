@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    -- code goes here
+    vlen 2 1
 
     izero 0
     return

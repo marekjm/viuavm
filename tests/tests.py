@@ -1041,17 +1041,14 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
     def testVpushIntoEmptyRegister(self):
         runTestFailsToAssemble(self, 'vpush_into_empty_register.asm', "./sample/asm/static_analysis_errors/vpush_into_empty_register.asm:21:11: error: vpush into empty register: 2")
 
-    @unittest.skip('FIXME not implemented')
     def testVpopFromEmptyRegister(self):
-        runTestFailsToAssemble(self, 'vpop_from_empty_register.asm', "")
+        runTestFailsToAssemble(self, 'vpop_from_empty_register.asm', "./sample/asm/static_analysis_errors/vpop_from_empty_register.asm:21:12: error: vpop from empty register: 1")
 
-    @unittest.skip('FIXME not implemented')
     def testVatOnEmptyRegister(self):
-        runTestFailsToAssemble(self, 'vat_on_empty_register.asm', "")
+        runTestFailsToAssemble(self, 'vat_on_empty_register.asm', "./sample/asm/static_analysis_errors/vat_on_empty_register.asm:21:11: error: vat from empty register: 1")
 
-    @unittest.skip('FIXME not implemented')
     def testVlenOnEmptyRegister(self):
-        runTestFailsToAssemble(self, 'vlen_on_empty_register.asm', "")
+        runTestFailsToAssemble(self, 'vlen_on_empty_register.asm', "./sample/asm/static_analysis_errors/vlen_on_empty_register.asm:21:12: error: vlen from empty register: 1")
 
 
 class AssemblerErrorTests(unittest.TestCase):

@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    -- code goes here
+    vat 2 1 0
 
     izero 0
     return
