@@ -1032,13 +1032,14 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
     def testVinsertIntoEmptyRegister(self):
         runTestFailsToAssemble(self, 'vinsert_into_empty_register.asm', "./sample/asm/static_analysis_errors/vinsert_into_empty_register.asm:21:13: error: vinsert into empty register: 2")
 
-    @unittest.skip('FIXME not implemented')
     def testVpushEmptiesRegisters(self):
-        runTestFailsToAssemble(self, 'vpush_empties_registers.asm', "")
+        runTestFailsToAssemble(self, 'vpush_empties_registers.asm', "./sample/asm/static_analysis_errors/vpush_empties_registers.asm:22:11: error: print of empty register: 1")
 
-    @unittest.skip('FIXME not implemented')
     def testVpushOfEmptyRegister(self):
-        runTestFailsToAssemble(self, 'vpush_of_empty_register.asm', "")
+        runTestFailsToAssemble(self, 'vpush_of_empty_register.asm', "./sample/asm/static_analysis_errors/vpush_of_empty_register.asm:21:19: error: vpush from empty register: 1")
+
+    def testVpushIntoEmptyRegister(self):
+        runTestFailsToAssemble(self, 'vpush_into_empty_register.asm', "./sample/asm/static_analysis_errors/vpush_into_empty_register.asm:21:11: error: vpush into empty register: 2")
 
     @unittest.skip('FIXME not implemented')
     def testVpopFromEmptyRegister(self):

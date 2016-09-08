@@ -792,12 +792,12 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, se
             defined_registers.erase(defined_registers.find(resolve_register_name(named_registers, body_tokens.at(i+2))));
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "vinsert") {
+        } else if (token == "vinsert" or token == "vpush") {
             if (defined_registers.find(resolve_register_name(named_registers, body_tokens.at(i+1))) == defined_registers.end()) {
-                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+1), ("vinsert into empty register: " + str::strencode(body_tokens.at(i+1))));
+                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+1), (token.str() + " into empty register: " + str::strencode(body_tokens.at(i+1))));
             }
             if (defined_registers.find(resolve_register_name(named_registers, body_tokens.at(i+2))) == defined_registers.end()) {
-                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), ("vinsert from empty register: " + str::strencode(body_tokens.at(i+2))));
+                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), (token.str() + " from empty register: " + str::strencode(body_tokens.at(i+2))));
             }
             defined_registers.erase(defined_registers.find(resolve_register_name(named_registers, body_tokens.at(i+2))));
             i = skip_till_next_line(body_tokens, i);
