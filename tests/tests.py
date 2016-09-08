@@ -1005,6 +1005,9 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
     def testUseOfEmptySecondRegisterInOr(self):
         runTestFailsToAssemble(self, 'or_use_of_empty_register_2nd.asm', "./sample/asm/static_analysis_errors/or_use_of_empty_register_2nd.asm:22:5: error: use of empty register: 2")
 
+    def testIaddOfEmptyRegisters(self):
+        runTestFailsToAssemble(self, 'iadd_of_empty_registers.asm', "./sample/asm/static_analysis_errors/iadd_of_empty_registers.asm:21:5: error: use of empty register: 1")
+
 
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.
