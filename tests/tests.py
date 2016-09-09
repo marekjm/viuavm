@@ -1047,6 +1047,9 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
     def testVlenOnEmptyRegister(self):
         runTestFailsToAssemble(self, 'vlen_on_empty_register.asm', "./sample/asm/static_analysis_errors/vlen_on_empty_register.asm:21:12: error: vlen from empty register: 1")
 
+    def testPointerFromEmptyRegister(self):
+        runTestFailsToAssemble(self, 'pointer_from_empty_register.asm', "./sample/asm/static_analysis_errors/pointer_from_empty_register.asm:21:11: error: pointer from empty register: 1")
+
 
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.
