@@ -89,7 +89,6 @@ namespace cg {
         byte* opptr(byte*, int_op, int_op);
         byte* opswap(byte*, int_op, int_op);
         byte* opdelete(byte*, int_op);
-        byte* opempty(byte*, int_op);
         byte* opisnull(byte*, int_op, int_op);
         byte* opress(byte*, const std::string&);
         byte* optmpri(byte*, int_op);

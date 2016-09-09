@@ -479,13 +479,6 @@ Program& Program::opdelete(int_op reg) {
     return (*this);
 }
 
-Program& Program::opempty(int_op reg) {
-    /*  Inserts empty instuction.
-     */
-    addr_ptr = cg::bytecode::opempty(addr_ptr, reg);
-    return (*this);
-}
-
 Program& Program::opisnull(int_op a, int_op b) {
     /*  Inserts isnull instruction to bytecode.
      *

@@ -158,9 +158,6 @@ byte* Process::dispatch(byte* addr) {
         case DELETE:
             addr = opdelete(addr+1);
             break;
-        case EMPTY:
-            addr = opempty(addr+1);
-            break;
         case ISNULL:
             addr = opisnull(addr+1);
             break;

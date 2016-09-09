@@ -39,6 +39,9 @@ Type* RegisterSet::pop(registerset_size_type index) {
     /** Pop an object from the register.
      */
     Type* object = at(index);
+    if (not object) {
+        // FIXME: throw an exception on read from empty register
+    }
     empty(index);
     return object;
 }

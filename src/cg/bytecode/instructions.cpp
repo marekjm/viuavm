@@ -559,14 +559,6 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* opempty(byte* addr_ptr, int_op reg) {
-            /*  Inserts empty instuction.
-             */
-            *(addr_ptr++) = EMPTY;
-            addr_ptr = insertIntegerOperand(addr_ptr, reg);
-            return addr_ptr;
-        }
-
         byte* opisnull(byte* addr_ptr, int_op a, int_op b) {
             /*  Inserts isnull instruction to bytecode.
              *

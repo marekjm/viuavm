@@ -96,7 +96,6 @@ enum OPCODE : byte {
     PTR,    // create a pointer to an object
     SWAP,   // swap two objects between registers
     DELETE, // delete an object from a register, freeing the memory
-    EMPTY,  // empty the register and set its flags to 0
     ISNULL, // checks if register is null (empty)
     RESS,   // REgister Set Switch - switches register set
     TMPRI,  // temporary register in - move object from current

@@ -62,19 +62,6 @@ byte* Process::opdelete(byte* addr) {
     uregset->free(viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this));
     return addr;
 }
-byte* Process::opempty(byte* addr) {
-    /** Run empty instruction.
-     */
-    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-
-    Type* object = uregset->get(target);
-    if (Reference* rf = dynamic_cast<Reference*>(object)) {
-        delete rf;
-    }
-    uregset->empty(target);
-
-    return addr;
-}
 byte* Process::opisnull(byte* addr) {
     unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     unsigned source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);

@@ -121,7 +121,6 @@ class Program {
     Program& optmpri      (int_op);
     Program& optmpro      (int_op);
     Program& opdelete   (int_op);
-    Program& opempty      (int_op);
     Program& opisnull     (int_op, int_op);
 
     Program& opprint      (int_op);

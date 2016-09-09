@@ -134,7 +134,6 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case BOOL:
         case NOT:
         case DELETE:
-        case EMPTY:
         case TMPRI:
         case TMPRO:
         case ARGC:

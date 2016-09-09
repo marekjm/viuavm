@@ -62,8 +62,6 @@
     vpush 3 7
 
     .mark: next_iter
-    ; empty the register because vat instruction creates references
-    empty 7
 
     ; increase the counter and go back to the beginning of the loop
     ;     ++i;
@@ -110,9 +108,6 @@
     param 0 6
     fcall 7 callback
 
-    ; empty register (required for VAT instruction)
-    empty 6
-
     iinc counter
     jump loop_begin
 
@@ -154,9 +149,6 @@
 
     ; push result to new vector
     vpush 3 8
-
-    ; empty the register, as vat instruction creates references
-    empty 7
 
     ; increase loop counter and go back to the beginning
     ;     ++i;
@@ -242,9 +234,6 @@
 
     ; add parameter
     param @loop_counter slot
-
-    ; clear parameter slot
-    empty slot
 
     ; loop_counter++
     iinc loop_counter

@@ -217,7 +217,6 @@ class Process {
     byte* opptr(byte*);
     byte* opswap(byte*);
     byte* opdelete(byte*);
-    byte* opempty(byte*);
     byte* opisnull(byte*);
 
     byte* opress(byte*);
