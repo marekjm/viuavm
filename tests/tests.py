@@ -1050,6 +1050,9 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
     def testPointerFromEmptyRegister(self):
         runTestFailsToAssemble(self, 'pointer_from_empty_register.asm', "./sample/asm/static_analysis_errors/pointer_from_empty_register.asm:21:11: error: pointer from empty register: 1")
 
+    def testThrowFromEmptyRegister(self):
+        runTestFailsToAssemble(self, 'throw_from_empty_register.asm', "./sample/asm/static_analysis_errors/throw_from_empty_register.asm:21:11: error: throw from empty register: 1")
+
 
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.

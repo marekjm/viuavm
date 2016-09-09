@@ -815,6 +815,12 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, se
             }
             defined_registers.erase(defined_registers.find(resolve_register_name(named_registers, body_tokens.at(i+1))));
             i = skip_till_next_line(body_tokens, i);
+        } else if (token == "throw") {
+            if (defined_registers.find(resolve_register_name(named_registers, body_tokens.at(i+1))) == defined_registers.end()) {
+                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+1), ("throw from empty register: " + str::strencode(body_tokens.at(i+1))));
+            }
+            defined_registers.erase(defined_registers.find(resolve_register_name(named_registers, body_tokens.at(i+1))));
+            i = skip_till_next_line(body_tokens, i);
         } else if (token == "branch") {
             if (defined_registers.find(resolve_register_name(named_registers, body_tokens.at(i+1))) == defined_registers.end()) {
                 throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+1), ("branch depends on empty register: " + str::strencode(body_tokens.at(i+1))));
