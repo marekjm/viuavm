@@ -566,9 +566,6 @@ class RegisterManipulationInstructionsTests(unittest.TestCase):
     def testDELETE(self):
         runTest(self, 'delete.asm', 'true')
 
-    def testEMPTY(self):
-        runTest(self, 'empty.asm', 'true')
-
     def testFetchingFromEmptyTemporaryRegister(self):
         runTestThrowsException(self, 'fetching_from_empty_tmp_register.asm', ('Exception', 'temporary register set is empty',))
 
