@@ -960,6 +960,9 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
     def testParameterMoveFromEmptyRegister(self):
         runTestFailsToAssemble(self, 'parameter_move_from_empty_register.asm', "./sample/asm/static_analysis_errors/parameter_move_from_empty_register.asm:26:12: error: parameter move from empty register: 1")
 
+    def testParameterMoveEmptiesRegisters(self):
+        runTestFailsToAssemble(self, 'parameter_move_empties_registers.asm', "./sample/asm/static_analysis_errors/parameter_move_empties_registers.asm:30:11: error: print of empty register: 1")
+
     def testSwapWithEmptyFirstRegister(self):
         runTestFailsToAssemble(self, 'swap_with_empty_first_register.asm', "./sample/asm/static_analysis_errors/swap_with_empty_first_register.asm:21:10: error: swap with empty register: 1")
 
