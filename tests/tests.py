@@ -1059,6 +1059,12 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
     def testInsertFromEmptyRegister(self):
         runTestFailsToAssemble(self, 'insert_from_empty_register.asm', "./sample/asm/static_analysis_errors/insert_from_empty_register.asm:23:46: error: insert from empty register: value")
 
+    def testRemoveKeyFromEmptyRegister(self):
+        runTestFailsToAssemble(self, 'remove_key_from_empty_register.asm', "./sample/asm/static_analysis_errors/remove_key_from_empty_register.asm:25:39: error: remove key from empty register: key")
+
+    def testRemoveFromEmptyRegister(self):
+        runTestFailsToAssemble(self, 'remove_from_empty_register.asm', "./sample/asm/static_analysis_errors/remove_from_empty_register.asm:25:19: error: remove from empty register: source")
+
     def testPointerFromEmptyRegister(self):
         runTestFailsToAssemble(self, 'pointer_from_empty_register.asm', "./sample/asm/static_analysis_errors/pointer_from_empty_register.asm:21:11: error: pointer from empty register: 1")
 
