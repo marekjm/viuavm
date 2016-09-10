@@ -1074,6 +1074,9 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
     def testIsnullFailsOnNonemptyRegisters(self):
         runTestFailsToAssemble(self, 'isnull_fails_on_nonempty_registers.asm', "./sample/asm/static_analysis_errors/isnull_fails_on_nonempty_registers.asm:22:19: error: useless check, register will always be defined: 1")
 
+    def testFcallFromEmptyRegister(self):
+        runTestFailsToAssemble(self, 'fcall_from_empty_register.asm', "./sample/asm/static_analysis_errors/fcall_from_empty_register.asm:22:13: error: fcall from empty register: 1")
+
 
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.
