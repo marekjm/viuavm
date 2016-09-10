@@ -139,6 +139,20 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, se
             }
             defined_registers.erase(defined_registers.find(resolve_register_name(named_registers, body_tokens.at(i+1))));
             i = skip_till_next_line(body_tokens, i);
+        } else if (token == "isnull") {
+            // it makes little sense to statically check "isnull" instruction for accessing null registers as it gracefully handles
+            // accessing them;
+            // "isnull" instruction is used, for example, to implement static variables in functions (during initialisation), and
+            // in closures
+            // it is not viable to statically check for register emptiness in the context of "isnull" instruction
+            // instead, statically check for the "non-emptiness" and thrown an error is we can determine that the register access
+            // will always be valid
+            if (defined_registers.find(resolve_register_name(named_registers, body_tokens.at(i+2))) != defined_registers.end()) {
+                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+1), ("useless check, register will always be defined: " + str::strencode(body_tokens.at(i+2))));
+            }
+            defined_registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)));
+            i = skip_till_next_line(body_tokens, i);
+            continue;
         } else if (token == "tmpri") {
             if (defined_registers.find(resolve_register_name(named_registers, body_tokens.at(i+1))) == defined_registers.end()) {
                 throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+1), ("move to tmp register from empty register: " + str::strencode(body_tokens.at(i+1))));

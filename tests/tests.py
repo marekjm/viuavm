@@ -1071,6 +1071,9 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
     def testTmproMakesRegistersNonempty(self):
         runTestThrowsException(self, 'tmpro_makes_registers_nonempty.asm', ('Exception', 'temporary register set is empty'))
 
+    def testIsnullFailsOnNonemptyRegisters(self):
+        runTestFailsToAssemble(self, 'isnull_fails_on_nonempty_registers.asm', "./sample/asm/static_analysis_errors/isnull_fails_on_nonempty_registers.asm:22:19: error: useless check, register will always be defined: 1")
+
 
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.
