@@ -1080,6 +1080,9 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
     def testFcallFromEmptyRegister(self):
         runTestFailsToAssemble(self, 'fcall_from_empty_register.asm', "./sample/asm/static_analysis_errors/fcall_from_empty_register.asm:22:13: error: fcall from empty register: 1")
 
+    def testJoinFromEmptyRegister(self):
+        runTestFailsToAssemble(self, 'join_from_empty_register.asm', "./sample/asm/static_analysis_errors/join_from_empty_register.asm:21:12: error: join from empty register: 1")
+
 
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.
