@@ -1053,6 +1053,15 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
     def testThrowFromEmptyRegister(self):
         runTestFailsToAssemble(self, 'throw_from_empty_register.asm', "./sample/asm/static_analysis_errors/throw_from_empty_register.asm:21:11: error: throw from empty register: 1")
 
+    def testTmpriEmptiesRegisters(self):
+        runTestFailsToAssemble(self, 'tmpri_empties_registers.asm', "./sample/asm/static_analysis_errors/tmpri_empties_registers.asm:21:25: error: print of empty register: 1")
+
+    def testTmpriFromEmptyRegister(self):
+        runTestFailsToAssemble(self, 'tmpri_from_empty_register.asm', "./sample/asm/static_analysis_errors/tmpri_from_empty_register.asm:21:11: error: move to tmp register from empty register: 1")
+
+    def testTmproMakesRegistersNonempty(self):
+        runTestThrowsException(self, 'tmpro_makes_registers_nonempty.asm', ('Exception', 'temporary register set is empty'))
+
 
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.
