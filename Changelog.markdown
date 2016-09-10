@@ -43,6 +43,7 @@ There are several categories of change:
 - feature: assembler is able to perform basic static analysis of register accesses, and detect some places where a register is
   accessed but would be empty at runtime; this can be disable using `--no-sa` (*no static analysis*) flag if the static analyser
   throws a false positive
+- bic: remove `empty` instruction
 
 
 ----
