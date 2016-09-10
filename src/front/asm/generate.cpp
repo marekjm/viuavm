@@ -130,7 +130,7 @@ static string resolveregister(string reg, const map<string, int>& names) {
             // first, check if the name is non-empty
             if (reg != "") {
                 // Jinkies! This name was not declared.
-                throw ("undeclared name: " + reg);
+                throw ("undeclared register name: " + reg);
             } else {
                 throw "not enough operands";
             }
