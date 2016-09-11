@@ -28,9 +28,7 @@
     ; print contents of global register 1
     ; it should cause an exception
     .name: 1 printer_process_handle
-    arg printer_process_handle 0
-    frame ^[(param 0 printer_process_handle) (param 1 (izero 3))]
-    msg 0 pass/2
+    send (arg printer_process_handle 0) (izero 3)
 
     return
 .end

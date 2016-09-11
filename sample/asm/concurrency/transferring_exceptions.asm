@@ -46,8 +46,7 @@
     frame ^[(param 0 1) (param 1 (istore 2 40))]
     msg 0 setPriority/2
 
-    frame ^[(param 0 1) (param 1 (strstore 2 "Hello exception transferring World!"))]
-    msg 0 pass/2
+    send 1 (strstore 2 "Hello exception transferring World!")
 
     try
     catch "String" handle_process_exception
