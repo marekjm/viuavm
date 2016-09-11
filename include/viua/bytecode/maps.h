@@ -119,6 +119,7 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "argc",   sizeof(byte) + sizeof(OperandType) + sizeof(int) },
     { "process", sizeof(byte) + sizeof(OperandType) + sizeof(int) },
     { "join", sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
+    { "send", sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
     { "receive", sizeof(byte) + sizeof(OperandType) + sizeof(int) },
     { "watchdog", sizeof(byte) },
 
@@ -240,6 +241,7 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { ARGC,     "argc" },
     { PROCESS,  "process" },
     { JOIN,     "join" },
+    { SEND,     "send" },
     { RECEIVE,  "receive" },
     { WATCHDOG, "watchdog" },
 

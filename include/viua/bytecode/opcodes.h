@@ -124,6 +124,7 @@ enum OPCODE : byte {
     ARGC,   // store number of supplied parameters in a register
     PROCESS, // spawn a process (call a function and run it in a different process)
     JOIN, // join a process
+    SEND,   // send a message to a process
     RECEIVE, // receive passed message, block until one arrives
     WATCHDOG,  // spawn watchdog process
 
