@@ -57,7 +57,6 @@ class ProcessType : public Type {
         virtual void getPriority(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
         virtual void setPriority(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
 
-        virtual void pass(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
         PID pid() const;
 
         bool joinable();

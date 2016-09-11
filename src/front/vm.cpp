@@ -70,7 +70,6 @@ void viua::front::vm::load_standard_prototypes(CPU* cpu) {
     proto_process->attach("Process::suspended/1", "suspended/1");
     proto_process->attach("Process::getPriority/1", "getPriority/1");
     proto_process->attach("Process::setPriority/2", "setPriority/2");
-    proto_process->attach("Process::pass/2", "pass/2");
     cpu->registerForeignPrototype("Process", proto_process);
     cpu->registerForeignMethod("Process::joinable/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::joinable));
     cpu->registerForeignMethod("Process::detach/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::detach));
@@ -79,7 +78,6 @@ void viua::front::vm::load_standard_prototypes(CPU* cpu) {
     cpu->registerForeignMethod("Process::suspended/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::suspended));
     cpu->registerForeignMethod("Process::getPriority/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::getPriority));
     cpu->registerForeignMethod("Process::setPriority/2", static_cast<ForeignMethodMemberPointer>(&ProcessType::setPriority));
-    cpu->registerForeignMethod("Process::pass/2", static_cast<ForeignMethodMemberPointer>(&ProcessType::pass));
 
     Prototype* proto_pointer = new Prototype("Pointer");
     proto_pointer->attach("Pointer::expired/1", "expired/1");

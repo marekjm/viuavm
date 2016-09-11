@@ -133,20 +133,6 @@ void ProcessType::setPriority(Frame* frame, RegisterSet*, RegisterSet*, Process*
     thrd->priority(static_cast<unsigned>(new_priority));
 }
 
-void ProcessType::pass(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU* attached_cpu) {
-    if (frame->args->at(0) == nullptr) {
-        throw new Exception("expected Process as first parameter but got nothing");
-    }
-    if (frame->args->at(1) == nullptr) {
-        throw new Exception("expected object as second parameter but got nothing");
-    }
-    if (frame->args->at(0)->type() != "Process") {
-        throw new Exception("expected Process as first parameter but got " + frame->args->at(0)->type());
-    }
-
-    attached_cpu->send(thrd->pid(), unique_ptr<Type>(frame->args->at(1)->copy()));
-}
-
 PID ProcessType::pid() const {
     return thrd->pid();
 }
