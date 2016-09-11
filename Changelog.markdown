@@ -44,6 +44,8 @@ There are several categories of change:
   accessed but would be empty at runtime; this can be disable using `--no-sa` (*no static analysis*) flag if the static analyser
   throws a false positive
 - bic: remove `empty` instruction
+- feature: add `send` instruction; it supersedes the `Process::pass/2` function
+- bic: remove obsolete `Process::pass/2` function
 
 
 ----
