@@ -244,6 +244,7 @@ class Process {
     byte* optailcall(byte*);
     byte* opprocess(byte*);
     byte* opjoin(byte*);
+    byte* opsend(byte*);
     byte* opreceive(byte*);
     byte* opwatchdog(byte*);
     byte* opreturn(byte*);

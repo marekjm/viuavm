@@ -773,6 +773,13 @@ namespace cg {
             return addr_ptr;
         }
 
+        byte* opsend(byte* addr_ptr, int_op target, int_op source) {
+            *(addr_ptr++) = SEND;
+            addr_ptr = insertIntegerOperand(addr_ptr, target);
+            addr_ptr = insertIntegerOperand(addr_ptr, source);
+            return addr_ptr;
+        }
+
         byte* opreceive(byte* addr_ptr, int_op reg) {
             *(addr_ptr++) = RECEIVE;
             addr_ptr = insertIntegerOperand(addr_ptr, reg);

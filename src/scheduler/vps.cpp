@@ -271,6 +271,13 @@ void viua::scheduler::VirtualProcessScheduler::resurrectWatchdog() {
     spawnWatchdog(std::move(frm));
 }
 
+void viua::scheduler::VirtualProcessScheduler::send(const PID pid, unique_ptr<Type> message) {
+#if VIUA_VM_DEBUG_LOG
+    cerr << "[sched:vps:send] pid = " << pid.get() << endl;
+#endif
+    attached_cpu->send(pid, std::move(message));
+}
+
 void viua::scheduler::VirtualProcessScheduler::receive(const PID pid, queue<unique_ptr<Type>>& message_queue) {
 #if VIUA_VM_DEBUG_LOG
     cerr << "[sched:vps:receive] pid = " << pid.get() << endl;

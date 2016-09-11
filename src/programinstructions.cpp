@@ -652,6 +652,11 @@ Program& Program::opjoin(int_op target, int_op source) {
     return (*this);
 }
 
+Program& Program::opsend(int_op target, int_op source) {
+    addr_ptr = cg::bytecode::opsend(addr_ptr, target, source);
+    return (*this);
+}
+
 Program& Program::opreceive(int_op ref) {
     addr_ptr = cg::bytecode::opreceive(addr_ptr, ref);
     return (*this);

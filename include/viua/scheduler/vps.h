@@ -103,6 +103,7 @@ namespace viua {
             Process* spawn(std::unique_ptr<Frame>, Process*, bool);
             void spawnWatchdog(std::unique_ptr<Frame>);
 
+            void send(const PID, std::unique_ptr<Type>);
             void receive(const PID, std::queue<std::unique_ptr<Type>>&);
 
             bool executeQuant(Process*, unsigned);

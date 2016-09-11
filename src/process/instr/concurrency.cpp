@@ -79,6 +79,19 @@ byte* Process::opjoin(byte* addr) {
 
     return return_addr;
 }
+byte* Process::opsend(byte* addr) {
+    /** Send a message to a process.
+     */
+    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    if (ProcessType* thrd = dynamic_cast<ProcessType*>(fetch(target))) {
+        scheduler->send(thrd->pid(), unique_ptr<Type>(pop(source)));
+    } else {
+        throw new Exception("invalid type: expected Process");
+    }
+
+    return addr;
+}
 byte* Process::opreceive(byte* addr) {
     /** Receive a message.
      *

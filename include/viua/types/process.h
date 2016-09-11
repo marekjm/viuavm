@@ -30,10 +30,10 @@
 #include <viua/support/string.h>
 #include <viua/cpu/frame.h>
 #include <viua/cpu/registerset.h>
+#include <viua/process.h>
 
 
 // we only need a pointer so class declaration will be sufficient
-class Process;
 class CPU;
 
 
@@ -58,6 +58,7 @@ class ProcessType : public Type {
         virtual void setPriority(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
 
         virtual void pass(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
+        PID pid() const;
 
         bool joinable();
         void join();

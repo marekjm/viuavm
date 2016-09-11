@@ -151,6 +151,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case STOI:
         case STOF:
         case JOIN:
+        case SEND:
         case FRAME:
         case ARG:
         case PARAM:

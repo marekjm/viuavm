@@ -146,3 +146,7 @@ void ProcessType::pass(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU* 
 
     attached_cpu->send(thrd->pid(), unique_ptr<Type>(frame->args->at(1)->copy()));
 }
+
+PID ProcessType::pid() const {
+    return thrd->pid();
+}
