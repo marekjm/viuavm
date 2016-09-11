@@ -41,7 +41,7 @@ That's why sharing is reduced to minimum.
 It should be clear to whom each piece of data belongs.
 Although it might be achieved with copying, many instructions default to move semantics.
 If you need copy semantics, copy the data before the instruction moves it.
-If you're passing data up the stack (to more nested calls) pass-by-pointer may also suffice.
+If you're passing data to more nested calls pass-by-pointer may also suffice.
 
 ----
 
