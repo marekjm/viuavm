@@ -1519,6 +1519,9 @@ class ConcurrencyTests(unittest.TestCase):
         expected_output = ['Hello {}!'.format(i) for i in range(1, 65)]
         runTestReturnsUnorderedLines(self, 'migrating_processes_between_schedulers.asm', expected_output)
 
+    def testObtainingSelfPid(self):
+        runTest(self, 'obtaining_self_pid.asm', 'Hello World (from self)!')
+
 
 class WatchdogTests(unittest.TestCase):
     PATH = './sample/asm/watchdog'
