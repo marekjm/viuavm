@@ -243,6 +243,7 @@ class Process {
     byte* opcall(byte*);
     byte* optailcall(byte*);
     byte* opprocess(byte*);
+    byte* opself(byte*);
     byte* opjoin(byte*);
     byte* opsend(byte*);
     byte* opreceive(byte*);

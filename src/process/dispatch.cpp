@@ -218,6 +218,9 @@ byte* Process::dispatch(byte* addr) {
         case PROCESS:
             addr = opprocess(addr+1);
             break;
+        case SELF:
+            addr = opself(addr+1);
+            break;
         case JOIN:
             addr = opjoin(addr+1);
             break;

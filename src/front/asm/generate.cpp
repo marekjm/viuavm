@@ -508,6 +508,8 @@ static Program& compile(Program& program, const vector<string>& lines, map<strin
             string fn_name, reg;
             tie(reg, fn_name) = assembler::operands::get2(operands);
             program.opprocess(assembler::operands::getint(resolveregister(reg, names)), fn_name);
+        } else if (str::startswith(line, "self")) {
+            program.opself(assembler::operands::getint(resolveregister(str::chunk(operands), names)));
         } else if (str::startswith(line, "join")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = assembler::operands::get2(operands);

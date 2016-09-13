@@ -137,6 +137,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case TMPRI:
         case TMPRO:
         case ARGC:
+        case SELF:
         case THROW:
         case PULL:
         case REGISTER:

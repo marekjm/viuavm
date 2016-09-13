@@ -143,6 +143,7 @@ class Program {
     Program& opcall       (int_op, const std::string&);
     Program& optailcall   (const std::string&);
     Program& opprocess   (int_op, const std::string&);
+    Program& opself     (int_op);
     Program& opjoin   (int_op, int_op);
     Program& opsend   (int_op, int_op);
     Program& opreceive(int_op);

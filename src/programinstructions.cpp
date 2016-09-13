@@ -647,6 +647,13 @@ Program& Program::opprocess(int_op ref, const string& fn_name) {
     return (*this);
 }
 
+Program& Program::opself(int_op target) {
+    /*  Inserts self instuction.
+     */
+    addr_ptr = cg::bytecode::opself(addr_ptr, target);
+    return (*this);
+}
+
 Program& Program::opjoin(int_op target, int_op source) {
     addr_ptr = cg::bytecode::opjoin(addr_ptr, target, source);
     return (*this);

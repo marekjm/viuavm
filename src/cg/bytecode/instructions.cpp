@@ -766,6 +766,14 @@ namespace cg {
             return addr_ptr;
         }
 
+        byte* opself(byte* addr_ptr, int_op target) {
+            /*  Inserts self instuction.
+             */
+            *(addr_ptr++) = SELF;
+            addr_ptr = insertIntegerOperand(addr_ptr, target);
+            return addr_ptr;
+        }
+
         byte* opjoin(byte* addr_ptr, int_op target, int_op source) {
             *(addr_ptr++) = JOIN;
             addr_ptr = insertIntegerOperand(addr_ptr, target);

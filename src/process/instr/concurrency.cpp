@@ -138,3 +138,11 @@ byte* Process::opwatchdog(byte* addr) {
 
     return addr;
 }
+byte* Process::opself(byte* addr) {
+    /*  Run process instruction.
+     */
+    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    place(target, new ProcessType(this));
+
+    return addr;
+}
