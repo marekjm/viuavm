@@ -122,7 +122,9 @@ enum OPCODE : byte {
     TAILCALL,   // perform a tail call to a function
     ARG,    // move an object from argument register to a normal register (inside a function call),
     ARGC,   // store number of supplied parameters in a register
+
     PROCESS, // spawn a process (call a function and run it in a different process)
+    SELF,   // store a PID of the running process in a register
     JOIN, // join a process
     SEND,   // send a message to a process
     RECEIVE, // receive passed message, block until one arrives
