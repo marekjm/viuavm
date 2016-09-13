@@ -46,6 +46,7 @@ There are several categories of change:
 - bic: remove `empty` instruction
 - feature: add `send` instruction; it supersedes the `Process::pass/2` function
 - bic: remove obsolete `Process::pass/2` function
+- feature: `self` instruction: stores PID of process that executed the instruction in a register
 
 
 ----
