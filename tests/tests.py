@@ -1522,6 +1522,15 @@ class ConcurrencyTests(unittest.TestCase):
     def testObtainingSelfPid(self):
         runTest(self, 'obtaining_self_pid.asm', 'Hello World (from self)!')
 
+    def testReceiveTimeoutZeroMilliseconds(self):
+        runTestThrowsException(self, 'receive_timeout_zero_milliseconds.asm', ('Exception', 'no message received',))
+
+    def testReceiveTimeout500ms(self):
+        runTestThrowsException(self, 'receive_timeout_500ms.asm', ('Exception', 'no message received',))
+
+    def testReceiveTimeoutFailsToAssemble(self):
+        runTestFailsToAssemble(self, 'receive_invalid_timeout.asm', './sample/asm/concurrency/receive_invalid_timeout.asm:21:15: error: invalid timeout operand')
+
 
 class WatchdogTests(unittest.TestCase):
     PATH = './sample/asm/watchdog'
