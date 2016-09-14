@@ -47,6 +47,9 @@ There are several categories of change:
 - feature: add `send` instruction; it supersedes the `Process::pass/2` function
 - bic: remove obsolete `Process::pass/2` function
 - feature: `self` instruction: stores PID of process that executed the instruction in a register
+- enhancement: timeouts for `receive` instruction; `receive` got new operand - a timeout, its value may be given as a non-negative number
+  of milliseconds, or a token `infinity`; examples: wait 100 milliseconds - `receive 1 100ms`, wait indefinitely - `receive 1 infinity`;
+  after a timeout expires the VM raises an exception in the process
 
 
 ----
