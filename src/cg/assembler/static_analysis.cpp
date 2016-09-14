@@ -288,7 +288,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, se
             }
             const regex timeout_regex{"^(?:0|[1-9]\\d*)ms$"};
             if (body_tokens.at(i+2) != "infinity" and not regex_match(body_tokens.at(i+2).str(), timeout_regex)) {
-                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), "invalid operand to 'receive'");
+                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), "invalid timeout operand");
             }
             i = skip_till_next_line(body_tokens, i);
         } else {
