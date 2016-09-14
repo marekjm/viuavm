@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <chrono>
 #include <viua/types/boolean.h>
 #include <viua/types/reference.h>
 #include <viua/types/process.h>
@@ -101,6 +102,14 @@ byte* Process::opreceive(byte* addr) {
     byte* return_addr = (addr-1);
 
     unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned timeout = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    if (timeout and not timeout_active) {
+        waiting_until = (std::chrono::steady_clock::now() + std::chrono::milliseconds(timeout-1));
+        timeout_active = true;
+    } else if (not timeout and not timeout_active) {
+        wait_until_infinity = true;
+        timeout_active = true;
+    }
 
     if (not is_hidden) {
         scheduler->receive(process_id, message_queue);
@@ -109,10 +118,18 @@ byte* Process::opreceive(byte* addr) {
     if (not message_queue.empty()) {
         place(target, message_queue.front().release());
         message_queue.pop();
+        timeout_active = false;
+        wait_until_infinity = false;
         return_addr = addr;
     } else {
         if (is_hidden) {
             suspend();
+        }
+        if (timeout_active and (not wait_until_infinity) and (waiting_until < std::chrono::steady_clock::now())) {
+            timeout_active = false;
+            wait_until_infinity = false;
+            thrown.reset(new Exception("no message received"));
+            return_addr = addr;
         }
     }
 

@@ -27,6 +27,7 @@
 #include <mutex>
 #include <atomic>
 #include <memory>
+#include <chrono>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/types/type.h>
 #include <viua/types/prototype.h>
@@ -160,6 +161,13 @@ class Process {
      */
     PID process_id;
     bool is_hidden;
+
+    /*  Timeouts for message passing, and
+     *  multiprocessing.
+     */
+    std::chrono::steady_clock::time_point waiting_until;
+    bool timeout_active = false;
+    bool wait_until_infinity = false;
 
     /*  Methods implementing individual instructions.
      */

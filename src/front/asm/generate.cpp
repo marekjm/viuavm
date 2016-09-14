@@ -519,9 +519,15 @@ static Program& compile(Program& program, const vector<string>& lines, map<strin
             tie(a_chnk, b_chnk) = assembler::operands::get2(operands);
             program.opsend(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
         } else if (str::startswith(line, "receive")) {
-            string regno_chnk;
-            regno_chnk = str::chunk(operands);
-            program.opreceive(assembler::operands::getint(resolveregister(regno_chnk, names)));
+            string regno_chnk, timeout_chnk;
+            tie(regno_chnk, timeout_chnk) = assembler::operands::get2(operands);
+            int_op to{false, 0};
+            if (timeout_chnk != "infinity") {
+                // remove the 'ms' part from timeout
+                to = assembler::operands::getint(timeout_chnk.substr(0, timeout_chnk.size()-2));
+                ++get<1>(to);
+            }
+            program.opreceive(assembler::operands::getint(resolveregister(regno_chnk, names)), to);
         } else if (str::startswith(line, "watchdog")) {
             string fn_name = str::chunk(operands);
             program.opwatchdog(fn_name);

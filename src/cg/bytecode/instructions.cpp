@@ -788,9 +788,10 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* opreceive(byte* addr_ptr, int_op reg) {
+        byte* opreceive(byte* addr_ptr, int_op reg, int_op timeout) {
             *(addr_ptr++) = RECEIVE;
             addr_ptr = insertIntegerOperand(addr_ptr, reg);
+            addr_ptr = insertIntegerOperand(addr_ptr, timeout);
             return addr_ptr;
         }
 

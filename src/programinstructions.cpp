@@ -664,8 +664,8 @@ Program& Program::opsend(int_op target, int_op source) {
     return (*this);
 }
 
-Program& Program::opreceive(int_op ref) {
-    addr_ptr = cg::bytecode::opreceive(addr_ptr, ref);
+Program& Program::opreceive(int_op ref, int_op timeout) {
+    addr_ptr = cg::bytecode::opreceive(addr_ptr, ref, timeout);
     return (*this);
 }
 

@@ -37,6 +37,9 @@ string disassembler::intop(byte* ptr) {
     return oss.str();
 }
 
+static int decode_integer(byte *ptr) {
+    return *reinterpret_cast<int*>(ptr);
+}
 tuple<string, unsigned> disassembler::instruction(byte* ptr) {
     byte* bptr = ptr;
 
@@ -129,7 +132,6 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case BINC:
         case BDEC:
         case PRINT:
-        case RECEIVE:
         case ECHO:
         case BOOL:
         case NOT:
@@ -287,6 +289,21 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
                     oss << "; WARNING: invalid register set type\n";
                     oss << int(*ptr);
             }
+            break;
+        case RECEIVE:
+            oss << " " << intop(ptr);
+            pointer::inc<bool, byte>(ptr);
+            pointer::inc<int, byte>(ptr);
+
+            pointer::inc<bool, byte>(ptr);
+            oss << ' ';
+            if (decode_integer(ptr)) {
+                oss << decode_integer(ptr)-1 << "ms";
+            } else {
+                oss << "infinity";
+            }
+            pointer::inc<int, byte>(ptr);
+
             break;
         default:
             // if opcode was not covered here, it means it must have been a variable-length opcode

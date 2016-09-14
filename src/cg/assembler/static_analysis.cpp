@@ -280,6 +280,17 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, se
             defined_registers.insert(resolve_register_name(named_registers, body_tokens.at(i)));
             i = skip_till_next_line(body_tokens, i);
             continue;
+        } else if (token == "receive") {
+            string reg_original = body_tokens.at(i+1), reg = resolve_register_name(named_registers, body_tokens.at(i+1));
+            defined_registers.insert(reg);
+            if (body_tokens.at(i+2) == "\n") {
+                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), "missing timeout operand");
+            }
+            const regex timeout_regex{"^(?:0|[1-9]\\d*)ms$"};
+            if (body_tokens.at(i+2) != "infinity" and not regex_match(body_tokens.at(i+2).str(), timeout_regex)) {
+                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), "invalid operand to 'receive'");
+            }
+            i = skip_till_next_line(body_tokens, i);
         } else {
             if (not ((token == "call" or token == "process") and body_tokens.at(i+1) == "0")) {
                 string reg_original = body_tokens.at(i+1), reg = resolve_register_name(named_registers, body_tokens.at(i+1));
