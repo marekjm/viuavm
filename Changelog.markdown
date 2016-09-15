@@ -50,6 +50,7 @@ There are several categories of change:
 - enhancement: timeouts for `receive` instruction; `receive` got new operand - a timeout, its value may be given as a non-negative number
   of milliseconds, or a token `infinity`; examples: wait 100 milliseconds - `receive 1 100ms`, wait indefinitely - `receive 1 infinity`;
   after a timeout expires the VM raises an exception in the process
+- enhancement: timeouts for `join` instruction; work the same as for `receive` instruction
 
 
 ----
