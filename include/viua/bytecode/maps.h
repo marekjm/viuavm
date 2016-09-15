@@ -119,7 +119,7 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "argc",   sizeof(byte) + sizeof(OperandType) + sizeof(int) },
     { "process", sizeof(byte) + sizeof(OperandType) + sizeof(int) },
     { "self", sizeof(byte) + sizeof(OperandType) + sizeof(int) },
-    { "join", sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
+    { "join", sizeof(byte) + 3*sizeof(OperandType) + 3*sizeof(int) },
     { "send", sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
     { "receive", sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
 

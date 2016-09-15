@@ -226,7 +226,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, se
             defined_registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)));
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "fcall" or token == "join") {
+        } else if (token == "fcall") {
             if (defined_registers.find(resolve_register_name(named_registers, body_tokens.at(i+2))) == defined_registers.end()) {
                 throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), (token.str() + " from empty register: " + str::strencode(body_tokens.at(i+2))));
             }
@@ -287,6 +287,14 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, se
                 throw viua::cg::lex::InvalidSyntax(token, ("use of empty register: " + body_tokens.at(i+2).str()));
             }
             defined_registers.insert(resolve_register_name(named_registers, body_tokens.at(i)));
+            i = skip_till_next_line(body_tokens, i);
+            continue;
+        } else if (token == "join") {
+            if (defined_registers.find(resolve_register_name(named_registers, body_tokens.at(i+2))) == defined_registers.end()) {
+                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), (token.str() + " from empty register: " + str::strencode(body_tokens.at(i+2))));
+            }
+            check_timeout_operand(body_tokens.at(i+3));
+            defined_registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)));
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "receive") {

@@ -654,8 +654,8 @@ Program& Program::opself(int_op target) {
     return (*this);
 }
 
-Program& Program::opjoin(int_op target, int_op source) {
-    addr_ptr = cg::bytecode::opjoin(addr_ptr, target, source);
+Program& Program::opjoin(int_op target, int_op source, int_op timeout) {
+    addr_ptr = cg::bytecode::opjoin(addr_ptr, target, source, timeout);
     return (*this);
 }
 

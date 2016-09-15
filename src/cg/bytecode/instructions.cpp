@@ -774,10 +774,11 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* opjoin(byte* addr_ptr, int_op target, int_op source) {
+        byte* opjoin(byte* addr_ptr, int_op target, int_op source, int_op timeout) {
             *(addr_ptr++) = JOIN;
             addr_ptr = insertIntegerOperand(addr_ptr, target);
             addr_ptr = insertIntegerOperand(addr_ptr, source);
+            addr_ptr = insertIntegerOperand(addr_ptr, timeout);
             return addr_ptr;
         }
 

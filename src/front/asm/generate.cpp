@@ -511,9 +511,15 @@ static Program& compile(Program& program, const vector<string>& lines, map<strin
         } else if (str::startswith(line, "self")) {
             program.opself(assembler::operands::getint(resolveregister(str::chunk(operands), names)));
         } else if (str::startswith(line, "join")) {
-            string a_chnk, b_chnk;
-            tie(a_chnk, b_chnk) = assembler::operands::get2(operands);
-            program.opjoin(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
+            string a_chnk, b_chnk, timeout_chnk;
+            tie(a_chnk, b_chnk, timeout_chnk) = assembler::operands::get3(operands);
+            int_op timeout{false, 0};
+            if (timeout_chnk != "infinity") {
+                // remove the 'ms' part from timeout
+                timeout = assembler::operands::getint(timeout_chnk.substr(0, timeout_chnk.size()-2));
+                ++get<1>(timeout);
+            }
+            program.opjoin(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)), timeout);
         } else if (str::startswith(line, "send")) {
             string a_chnk, b_chnk;
             tie(a_chnk, b_chnk) = assembler::operands::get2(operands);

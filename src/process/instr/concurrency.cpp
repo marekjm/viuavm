@@ -63,6 +63,15 @@ byte* Process::opjoin(byte* addr) {
 
     unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     unsigned source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned timeout = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    if (timeout and not timeout_active) {
+        waiting_until = (std::chrono::steady_clock::now() + std::chrono::milliseconds(timeout-1));
+        timeout_active = true;
+    } else if (not timeout and not timeout_active) {
+        wait_until_infinity = true;
+        timeout_active = true;
+    }
+
     if (ProcessType* thrd = dynamic_cast<ProcessType*>(fetch(source))) {
         if (thrd->stopped()) {
             thrd->join();
@@ -73,6 +82,11 @@ byte* Process::opjoin(byte* addr) {
             if (target) {
                 place(target, thrd->getReturnValue().release());
             }
+        } else if (timeout_active and (not wait_until_infinity) and (waiting_until < std::chrono::steady_clock::now())) {
+            timeout_active = false;
+            wait_until_infinity = false;
+            thrown.reset(new Exception("process did not join"));
+            return_addr = addr;
         }
     } else {
         throw new Exception("invalid type: expected Process");

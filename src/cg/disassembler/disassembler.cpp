@@ -153,7 +153,6 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case FTOI:
         case STOI:
         case STOF:
-        case JOIN:
         case SEND:
         case FRAME:
         case ARG:
@@ -290,6 +289,10 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
                     oss << int(*ptr);
             }
             break;
+        case JOIN:
+            oss << " " << intop(ptr);
+            pointer::inc<bool, byte>(ptr);
+            pointer::inc<int, byte>(ptr);
         case RECEIVE:
             oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
