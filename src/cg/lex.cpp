@@ -642,6 +642,9 @@ namespace viua {
                         if (i >= limit and balance != 0) {
                             throw InvalidSyntax(t, "unbalanced parenthesis in wrapped instruction");
                         }
+                        if (subtokens.size() < 2) {
+                            throw InvalidSyntax(t, "at least two tokens are required in a wrapped instruction");
+                        }
 
                         Token tok;
                         try {
