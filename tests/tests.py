@@ -1534,6 +1534,18 @@ class ConcurrencyTests(unittest.TestCase):
     def testReceiveTimeoutFailsToAssemble(self):
         runTestFailsToAssemble(self, 'receive_invalid_timeout.asm', './sample/asm/concurrency/receive_invalid_timeout.asm:21:15: error: invalid timeout operand')
 
+    def testJoinDefaultTimeout(self):
+        runTest(self, 'join_timeout_default.asm', 'child process done')
+
+    def testJoinInfiniteTimeout(self):
+        runTest(self, 'join_timeout_infinite.asm', 'child process done')
+
+    def testJoinTimeout500ms(self):
+        runTestThrowsException(self, 'join_timeout_500ms.asm', ('Exception', 'process did not join',))
+
+    def testJoinTimeout0ms(self):
+        runTestThrowsException(self, 'join_timeout_0ms.asm', ('Exception', 'process did not join',))
+
 
 class WatchdogTests(unittest.TestCase):
     PATH = './sample/asm/watchdog'
