@@ -63,7 +63,7 @@ namespace viua {
                 unsigned hyphens = 0;
                 bool active_comment = false;
                 for (decltype(source.size()) i = 0; i < limit; ++i) {
-                    char current_char = source[i];
+                    char current_char = source.at(i);
                     bool found_breaking_character = false;
 
                     switch (current_char) {
@@ -103,7 +103,7 @@ namespace viua {
                             found_breaking_character = true;
                             break;
                         default:
-                            candidate_token << source[i];
+                            candidate_token << source.at(i);
                     }
 
                     if (current_char == ';') {
@@ -191,7 +191,7 @@ namespace viua {
                 ostringstream joined;
 
                 for (auto i = from; i < tokens.size() and i < to; ++i) {
-                    joined << tokens[i].str();
+                    joined << tokens.at(i).str();
                 }
 
                 return joined.str();
@@ -215,22 +215,22 @@ namespace viua {
 
                 const auto limit = input_tokens.size();
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    Token token = input_tokens[i];
+                    Token token = input_tokens.at(i);
                     if (token.str() == ";") {
                         // FIXME this is ugly as hell
                         do {
                             ++i;
-                        } while (i < limit and input_tokens[i].str() != "\n");
+                        } while (i < limit and input_tokens.at(i).str() != "\n");
                         if (i < limit) {
-                            tokens.push_back(input_tokens[i]);
+                            tokens.push_back(input_tokens.at(i));
                         }
                     } else if (i+2 < limit and adjacent(token, input_tokens.at(i+1)) and token.str() == "-" and input_tokens.at(i+1).str() == "-") {
                         // FIXME this is ugly as hell
                         do {
                             ++i;
-                        } while (i < limit and input_tokens[i].str() != "\n");
+                        } while (i < limit and input_tokens.at(i).str() != "\n");
                         if (i < limit) {
-                            tokens.push_back(input_tokens[i]);
+                            tokens.push_back(input_tokens.at(i));
                         }
                     } else {
                         tokens.push_back(token);
@@ -245,10 +245,10 @@ namespace viua {
 
                 const auto limit = input_tokens.size();
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    Token token = input_tokens[i];
+                    Token token = input_tokens.at(i);
                     if (token.str() == "\n") {
                         tokens.push_back(token);
-                        while (i < limit and input_tokens[i].str() == "\n") {
+                        while (i < limit and input_tokens.at(i).str() == "\n") {
                             ++i;
                         }
                         --i;
@@ -265,9 +265,9 @@ namespace viua {
 
                 const auto limit = input_tokens.size();
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens[i];
-                    if (t.str() == "." and i < limit-2 and input_tokens[i+1] == "mark" and input_tokens[i+2].str() == ":") {
-                        if (adjacent(t, input_tokens[i+1], input_tokens[i+2])) {
+                    const auto t = input_tokens.at(i);
+                    if (t.str() == "." and i < limit-2 and input_tokens.at(i+1) == "mark" and input_tokens.at(i+2).str() == ":") {
+                        if (adjacent(t, input_tokens.at(i+1), input_tokens.at(i+2))) {
                             tokens.emplace_back(t.line(), t.character(), ".mark:");
                             ++i; // skip "mark" token
                             ++i; // skip ":" token
@@ -285,9 +285,9 @@ namespace viua {
 
                 const auto limit = input_tokens.size();
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens[i];
-                    if (t.str() == "." and i < limit-2 and input_tokens[i+1] == "name" and input_tokens[i+2].str() == ":") {
-                        if (adjacent(t, input_tokens[i+1], input_tokens[i+2])) {
+                    const auto t = input_tokens.at(i);
+                    if (t.str() == "." and i < limit-2 and input_tokens.at(i+1) == "name" and input_tokens.at(i+2).str() == ":") {
+                        if (adjacent(t, input_tokens.at(i+1), input_tokens.at(i+2))) {
                             tokens.emplace_back(t.line(), t.character(), ".name:");
                             ++i; // skip "name" token
                             ++i; // skip ":" token
@@ -305,9 +305,9 @@ namespace viua {
 
                 const auto limit = input_tokens.size();
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens[i];
-                    if (t.str() == "." and i < limit-2 and input_tokens[i+1] == "main" and input_tokens[i+2].str() == ":") {
-                        if (adjacent(t, input_tokens[i+1], input_tokens[i+2])) {
+                    const auto t = input_tokens.at(i);
+                    if (t.str() == "." and i < limit-2 and input_tokens.at(i+1) == "main" and input_tokens.at(i+2).str() == ":") {
+                        if (adjacent(t, input_tokens.at(i+1), input_tokens.at(i+2))) {
                             tokens.emplace_back(t.line(), t.character(), ".main:");
                             ++i; // skip "main" token
                             ++i; // skip ":" token
@@ -325,9 +325,9 @@ namespace viua {
 
                 const auto limit = input_tokens.size();
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens[i];
-                    if (t.str() == "." and i < limit-2 and input_tokens[i+1] == "function" and input_tokens[i+2].str() == ":") {
-                        if (adjacent(t, input_tokens[i+1], input_tokens[i+2])) {
+                    const auto t = input_tokens.at(i);
+                    if (t.str() == "." and i < limit-2 and input_tokens.at(i+1) == "function" and input_tokens.at(i+2).str() == ":") {
+                        if (adjacent(t, input_tokens.at(i+1), input_tokens.at(i+2))) {
                             tokens.emplace_back(t.line(), t.character(), ".function:");
                             ++i; // skip "function" token
                             ++i; // skip ":" token
@@ -345,9 +345,9 @@ namespace viua {
 
                 const auto limit = input_tokens.size();
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens[i];
-                    if (t.str() == "." and i < limit-2 and input_tokens[i+1] == "closure" and input_tokens[i+2].str() == ":") {
-                        if (adjacent(t, input_tokens[i+1], input_tokens[i+2])) {
+                    const auto t = input_tokens.at(i);
+                    if (t.str() == "." and i < limit-2 and input_tokens.at(i+1) == "closure" and input_tokens.at(i+2).str() == ":") {
+                        if (adjacent(t, input_tokens.at(i+1), input_tokens.at(i+2))) {
                             tokens.emplace_back(t.line(), t.character(), ".closure:");
                             ++i; // skip "closure" token
                             ++i; // skip ":" token
@@ -365,9 +365,9 @@ namespace viua {
 
                 const auto limit = input_tokens.size();
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens[i];
-                    if (t.str() == "." and i < limit-1 and input_tokens[i+1] == "end") {
-                        if (adjacent(t, input_tokens[i+1])) {
+                    const auto t = input_tokens.at(i);
+                    if (t.str() == "." and i < limit-1 and input_tokens.at(i+1) == "end") {
+                        if (adjacent(t, input_tokens.at(i+1))) {
                             tokens.emplace_back(t.line(), t.character(), ".end");
                             ++i; // skip "end" token
                             continue;
@@ -384,9 +384,9 @@ namespace viua {
 
                 const auto limit = input_tokens.size();
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens[i];
-                    if (t.str() == "." and i < limit-2 and input_tokens[i+1] == "signature" and input_tokens[i+2].str() == ":") {
-                        if (adjacent(t, input_tokens[i+1], input_tokens[i+2])) {
+                    const auto t = input_tokens.at(i);
+                    if (t.str() == "." and i < limit-2 and input_tokens.at(i+1) == "signature" and input_tokens.at(i+2).str() == ":") {
+                        if (adjacent(t, input_tokens.at(i+1), input_tokens.at(i+2))) {
                             tokens.emplace_back(t.line(), t.character(), ".signature:");
                             ++i; // skip "signature" token
                             ++i; // skip ":" token
@@ -404,9 +404,9 @@ namespace viua {
 
                 const auto limit = input_tokens.size();
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens[i];
-                    if (t.str() == "." and i < limit-2 and input_tokens[i+1] == "bsignature" and input_tokens[i+2].str() == ":") {
-                        if (adjacent(t, input_tokens[i+1], input_tokens[i+2])) {
+                    const auto t = input_tokens.at(i);
+                    if (t.str() == "." and i < limit-2 and input_tokens.at(i+1) == "bsignature" and input_tokens.at(i+2).str() == ":") {
+                        if (adjacent(t, input_tokens.at(i+1), input_tokens.at(i+2))) {
                             tokens.emplace_back(t.line(), t.character(), ".bsignature:");
                             ++i; // skip "bsignature" token
                             ++i; // skip ":" token
@@ -424,9 +424,9 @@ namespace viua {
 
                 const auto limit = input_tokens.size();
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens[i];
-                    if (t.str() == "." and i < limit-2 and input_tokens[i+1] == "block" and input_tokens[i+2].str() == ":") {
-                        if (adjacent(t, input_tokens[i+1], input_tokens[i+2])) {
+                    const auto t = input_tokens.at(i);
+                    if (t.str() == "." and i < limit-2 and input_tokens.at(i+1) == "block" and input_tokens.at(i+2).str() == ":") {
+                        if (adjacent(t, input_tokens.at(i+1), input_tokens.at(i+2))) {
                             tokens.emplace_back(t.line(), t.character(), ".block:");
                             ++i; // skip "bsignature" token
                             ++i; // skip ":" token
@@ -444,9 +444,9 @@ namespace viua {
 
                 const auto limit = input_tokens.size();
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens[i];
-                    if (t.str() == ":" and i < limit-1 and input_tokens[i+1].str() == ":") {
-                        if (adjacent(t, input_tokens[i+1])) {
+                    const auto t = input_tokens.at(i);
+                    if (t.str() == ":" and i < limit-1 and input_tokens.at(i+1).str() == ":") {
+                        if (adjacent(t, input_tokens.at(i+1))) {
                             tokens.emplace_back(t.line(), t.character(), "::");
                             ++i; // skip second ":" token
                             continue;
@@ -463,25 +463,25 @@ namespace viua {
 
                 const auto limit = input_tokens.size();
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens[i];
+                    const auto t = input_tokens.at(i);
                     if (str::isid(t)) {
                         auto j = i;
-                        while (j+2 < limit and input_tokens[j+1].str() == "::" and str::isid(input_tokens[j+2]) and adjacent(input_tokens[j], input_tokens[j+1], input_tokens[j+2])) {
+                        while (j+2 < limit and input_tokens.at(j+1).str() == "::" and str::isid(input_tokens.at(j+2)) and adjacent(input_tokens.at(j), input_tokens.at(j+1), input_tokens.at(j+2))) {
                             ++j; // swallow "::" token
                             ++j; // swallow identifier token
                         }
-                        if (j+1 < limit and input_tokens[j+1].str() == "/") {
-                            if (j+2 < limit and str::isnum(input_tokens[j+2].str(), false)) {
-                                if (adjacent(input_tokens[j], input_tokens[j+1], input_tokens[j+2])) {
+                        if (j+1 < limit and input_tokens.at(j+1).str() == "/") {
+                            if (j+2 < limit and str::isnum(input_tokens.at(j+2).str(), false)) {
+                                if (adjacent(input_tokens.at(j), input_tokens.at(j+1), input_tokens.at(j+2))) {
                                     ++j; // skip "/" token
                                     ++j; // skip integer encoding arity
                                 }
-                            } else if (j+2 < limit and input_tokens[j+2].str() == "\n") {
-                                if (adjacent(input_tokens[j], input_tokens[j+1])) {
+                            } else if (j+2 < limit and input_tokens.at(j+2).str() == "\n") {
+                                if (adjacent(input_tokens.at(j), input_tokens.at(j+1))) {
                                     ++j; // skip "/" token
                                 }
                             }
-                            if (j < limit and str::isid(input_tokens[j]) and adjacent(input_tokens[j-1], input_tokens[j])) {
+                            if (j < limit and str::isid(input_tokens.at(j)) and adjacent(input_tokens.at(j-1), input_tokens.at(j))) {
                                 ++j;
 
                             }
@@ -501,17 +501,17 @@ namespace viua {
 
                 const auto limit = input_tokens.size();
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens[i];
+                    const auto t = input_tokens.at(i);
                     if (str::isid(t)) {
                         auto j = i;
-                        while (j+2 < limit and input_tokens[j+1].str() == "::" and str::isid(input_tokens[j+2]) and adjacent(input_tokens[j], input_tokens[j+1], input_tokens[j+2])) {
+                        while (j+2 < limit and input_tokens.at(j+1).str() == "::" and str::isid(input_tokens.at(j+2)) and adjacent(input_tokens.at(j), input_tokens.at(j+1), input_tokens.at(j+2))) {
                             ++j; // swallow "::" token
                             ++j; // swallow identifier token
                         }
-                        if (j+1 < limit and input_tokens[j+1].str() == "/") {
+                        if (j+1 < limit and input_tokens.at(j+1).str() == "/") {
                             ++j; // skip "/" token
-                            if (j+1 < limit and input_tokens[j+1].str() != "\n") {
-                                if (adjacent(input_tokens[j], input_tokens[j+1])) {
+                            if (j+1 < limit and input_tokens.at(j+1).str() != "\n") {
+                                if (adjacent(input_tokens.at(j), input_tokens.at(j+1))) {
                                     ++j; // skip next token, append it to name
                                 }
                             }
@@ -534,11 +534,11 @@ namespace viua {
 
                 const auto limit = input_tokens.size();
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens[i];
+                    const auto t = input_tokens.at(i);
 
-                    if (i+1 < limit and (t.str() == "+" or t.str() == "-") and str::isnum(input_tokens[i+1])) {
-                        if (adjacent(t, input_tokens[i+1])) {
-                            tokens.emplace_back(t.line(), t.character(), (t.str() + input_tokens[i+1].str()));
+                    if (i+1 < limit and (t.str() == "+" or t.str() == "-") and str::isnum(input_tokens.at(i+1))) {
+                        if (adjacent(t, input_tokens.at(i+1))) {
+                            tokens.emplace_back(t.line(), t.character(), (t.str() + input_tokens.at(i+1).str()));
                             ++i;
                             continue;
                         }
@@ -554,10 +554,10 @@ namespace viua {
 
                 const auto limit = input_tokens.size();
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens[i];
+                    const auto t = input_tokens.at(i);
 
-                    if (i+1 < limit and t.str() == "@" and input_tokens[i+1].str() != "\n" and adjacent(t, input_tokens[i+1])) {
-                        tokens.emplace_back(t.line(), t.character(), (t.str() + input_tokens[i+1].str()));
+                    if (i+1 < limit and t.str() == "@" and input_tokens.at(i+1).str() != "\n" and adjacent(t, input_tokens.at(i+1))) {
+                        tokens.emplace_back(t.line(), t.character(), (t.str() + input_tokens.at(i+1).str()));
                         ++i;
                         continue;
                     }
@@ -572,9 +572,9 @@ namespace viua {
 
                 const auto limit = input_tokens.size();
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens[i];
-                    if (str::isnum(t) and i < limit-2 and input_tokens[i+1] == "." and str::isnum(input_tokens[i+2])) {
-                        if (adjacent(t, input_tokens[i+1], input_tokens[i+2])) {
+                    const auto t = input_tokens.at(i);
+                    if (str::isnum(t) and i < limit-2 and input_tokens.at(i+1) == "." and str::isnum(input_tokens.at(i+2))) {
+                        if (adjacent(t, input_tokens.at(i+1), input_tokens.at(i+2))) {
                             tokens.emplace_back(t.line(), t.character(), join_tokens(input_tokens, i, i+3));
                             ++i; // skip "name" token
                             ++i; // skip ":" token
@@ -592,11 +592,11 @@ namespace viua {
 
                 const auto limit = input_tokens.size();
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens[i];
+                    const auto t = input_tokens.at(i);
 
-                    if (i+1 < limit and t == "." and str::isnum(input_tokens[i+1], false)) {
-                        if (adjacent(t, input_tokens[i+1])) {
-                            tokens.emplace_back(t.line(), t.character(), (t.str() + input_tokens[i+1].str()));
+                    if (i+1 < limit and t == "." and str::isnum(input_tokens.at(i+1), false)) {
+                        if (adjacent(t, input_tokens.at(i+1))) {
+                            tokens.emplace_back(t.line(), t.character(), (t.str() + input_tokens.at(i+1).str()));
                             ++i;
                             continue;
                         }
@@ -616,7 +616,7 @@ namespace viua {
                 bool invert = false;
 
                 while (i < limit) {
-                    Token t = input_tokens[i];
+                    Token t = input_tokens.at(i);
                     if (t == "^") {
                         invert = true;
                         ++i;
@@ -627,16 +627,16 @@ namespace viua {
                         ++i;
                         unsigned balance = 1;
                         while (i < limit) {
-                            if (input_tokens[i] == "(") {
+                            if (input_tokens.at(i) == "(") {
                                 ++balance;
-                            } else if (input_tokens[i] == ")") {
+                            } else if (input_tokens.at(i) == ")") {
                                 --balance;
                             }
                             if (balance == 0) {
                                 ++i;
                                 break;
                             }
-                            subtokens.push_back(input_tokens[i]);
+                            subtokens.push_back(input_tokens.at(i));
                             ++i;
                         }
                         if (i >= limit and balance != 0) {
@@ -682,20 +682,20 @@ namespace viua {
 
                         if (invert) {
                             final_tokens.push_back(tok);
-                            while (i < limit and input_tokens[i] != "\n") {
-                                final_tokens.push_back(input_tokens[i]);
+                            while (i < limit and input_tokens.at(i) != "\n") {
+                                final_tokens.push_back(input_tokens.at(i));
                                 ++i;
                             }
 
                             // this line is to push \n to the token list
-                            final_tokens.push_back(input_tokens[i++]);
+                            final_tokens.push_back(input_tokens.at(i++));
 
                             for (auto to : unwrapped_tokens) {
                                 final_tokens.push_back(to);
                             }
                         } else {
                             vector<Token> foo;
-                            while (final_tokens.size() and final_tokens[final_tokens.size()-1] != "\n") {
+                            while (final_tokens.size() and final_tokens.at(final_tokens.size()-1) != "\n") {
                                 foo.insert(foo.begin(), final_tokens.back());
                                 final_tokens.pop_back();
                             }
@@ -725,22 +725,22 @@ namespace viua {
                         unsigned toplevel_subexpressions_balance = 0;
                         unsigned toplevel_subexpressions = 0;
                         while (i < limit) {
-                            if (input_tokens[i] == "[") {
+                            if (input_tokens.at(i) == "[") {
                                 ++balance;
-                            } else if (input_tokens[i] == "]") {
+                            } else if (input_tokens.at(i) == "]") {
                                 --balance;
                             }
-                            if (input_tokens[i] == "(") {
+                            if (input_tokens.at(i) == "(") {
                                 if ((++toplevel_subexpressions_balance) == 1) { ++toplevel_subexpressions; }
                             }
-                            if (input_tokens[i] == ")") {
+                            if (input_tokens.at(i) == ")") {
                                 --toplevel_subexpressions_balance;
                             }
                             if (balance == 0) {
                                 ++i;
                                 break;
                             }
-                            subtokens.push_back(input_tokens[i]);
+                            subtokens.push_back(input_tokens.at(i));
                             ++i;
                         }
 
@@ -755,20 +755,20 @@ namespace viua {
 
                         if (invert) {
                             final_tokens.push_back(tok);
-                            while (i < limit and input_tokens[i] != "\n") {
-                                final_tokens.push_back(input_tokens[i]);
+                            while (i < limit and input_tokens.at(i) != "\n") {
+                                final_tokens.push_back(input_tokens.at(i));
                                 ++i;
                             }
 
                             // this line is to push \n to the token list
-                            final_tokens.push_back(input_tokens[i++]);
+                            final_tokens.push_back(input_tokens.at(i++));
 
                             for (auto to : unwrapped_tokens) {
                                 final_tokens.push_back(to);
                             }
                         } else {
                             vector<Token> foo;
-                            while (final_tokens.size() and final_tokens[final_tokens.size()-1] != "\n") {
+                            while (final_tokens.size() and final_tokens.at(final_tokens.size()-1) != "\n") {
                                 foo.insert(foo.begin(), final_tokens.back());
                                 final_tokens.pop_back();
                             }

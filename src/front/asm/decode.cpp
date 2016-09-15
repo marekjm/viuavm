@@ -31,59 +31,59 @@ vector<vector<string>> decode_line_tokens(const vector<string>& tokens) {
     unsigned i = 0;
     bool invert = false;
     while (i < tokens.size()) {
-        if (tokens[i] == "^") {
+        if (tokens.at(i) == "^") {
             invert = true;
             ++i;
             continue;
         }
-        if (tokens[i] == "(") {
+        if (tokens.at(i) == "(") {
             vector<string> subtokens;
             ++i;
             int balance = 1;
             while (i < tokens.size()) {
-                if (tokens[i] == "(") { ++balance; }
-                if (tokens[i] == ")") { --balance; }
+                if (tokens.at(i) == "(") { ++balance; }
+                if (tokens.at(i) == ")") { --balance; }
                 if (balance == 0) { break; }
-                subtokens.emplace_back(tokens[i]);
+                subtokens.emplace_back(tokens.at(i));
                 ++i;
             }
             vector<vector<string>> sublines = decode_line_tokens(subtokens);
             for (unsigned j = 0; j < sublines.size(); ++j) {
-                decoded_lines.emplace_back(sublines[j]);
+                decoded_lines.emplace_back(sublines.at(j));
             }
-            main_line.emplace_back(sublines[sublines.size()-1][1]);
+            main_line.emplace_back(sublines.at(sublines.size()-1).at(1));
             ++i;
             continue;
         }
-        if (tokens[i] == "[") {
+        if (tokens.at(i) == "[") {
             vector<string> subtokens;
             ++i;
             int balance = 1;
             int toplevel_subexpr_balance = 0;
             unsigned len = 0;
             while (i < tokens.size()) {
-                if (tokens[i] == "[") { ++balance; }
-                if (tokens[i] == "]") { --balance; }
-                if (tokens[i] == "(") {
+                if (tokens.at(i) == "[") { ++balance; }
+                if (tokens.at(i) == "]") { --balance; }
+                if (tokens.at(i) == "(") {
                     if ((++toplevel_subexpr_balance) == 1) { ++len; }
                 }
-                if (tokens[i] == ")") {
+                if (tokens.at(i) == ")") {
                     --toplevel_subexpr_balance;
                 }
                 if (balance == 0) { break; }
-                subtokens.emplace_back(tokens[i]);
+                subtokens.emplace_back(tokens.at(i));
                 ++i;
             }
             vector<vector<string>> sublines = decode_line_tokens(subtokens);
             sublines.pop_back();
             for (unsigned j = 0; j < sublines.size(); ++j) {
-                decoded_lines.emplace_back(sublines[j]);
+                decoded_lines.emplace_back(sublines.at(j));
             }
             main_line.emplace_back(str::stringify(len));
             ++i;
             continue;
         }
-        main_line.emplace_back(tokens[i]);
+        main_line.emplace_back(tokens.at(i));
         ++i;
     }
 
