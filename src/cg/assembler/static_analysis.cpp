@@ -55,7 +55,7 @@ static string resolve_register_name(const map<string, string>& named_registers, 
         throw viua::cg::lex::InvalidSyntax(token, ("register indexes cannot be negative: " + name));
     }
     if (named_registers.count(name) == 0) {
-        throw viua::cg::lex::InvalidSyntax(token, ("not a named register: " + name));
+        throw viua::cg::lex::InvalidSyntax(token, ("not a named register: " + str::strencode(name)));
     }
     return named_registers.at(name);
 }
