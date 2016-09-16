@@ -63,116 +63,116 @@ class Program {
 
     public:
     // instruction insertion interface
-    Program& opnop        ();
+    Program& opnop();
 
-    Program& opizero    (int_op);
-    Program& opistore   (int_op, int_op);
-    Program& opiadd     (int_op, int_op, int_op);
-    Program& opisub     (int_op, int_op, int_op);
-    Program& opimul     (int_op, int_op, int_op);
-    Program& opidiv     (int_op, int_op, int_op);
+    Program& opizero(int_op);
+    Program& opistore(int_op, int_op);
+    Program& opiadd(int_op, int_op, int_op);
+    Program& opisub(int_op, int_op, int_op);
+    Program& opimul(int_op, int_op, int_op);
+    Program& opidiv(int_op, int_op, int_op);
 
-    Program& opiinc     (int_op);
-    Program& opidec     (int_op);
+    Program& opiinc(int_op);
+    Program& opidec(int_op);
 
-    Program& opilt      (int_op, int_op, int_op);
-    Program& opilte     (int_op, int_op, int_op);
-    Program& opigt      (int_op, int_op, int_op);
-    Program& opigte     (int_op, int_op, int_op);
-    Program& opieq      (int_op, int_op, int_op);
+    Program& opilt(int_op, int_op, int_op);
+    Program& opilte(int_op, int_op, int_op);
+    Program& opigt(int_op, int_op, int_op);
+    Program& opigte(int_op, int_op, int_op);
+    Program& opieq(int_op, int_op, int_op);
 
-    Program& opfstore     (int_op, float);
-    Program& opfadd       (int_op, int_op, int_op);
-    Program& opfsub       (int_op, int_op, int_op);
-    Program& opfmul       (int_op, int_op, int_op);
-    Program& opfdiv       (int_op, int_op, int_op);
+    Program& opfstore(int_op, float);
+    Program& opfadd(int_op, int_op, int_op);
+    Program& opfsub(int_op, int_op, int_op);
+    Program& opfmul(int_op, int_op, int_op);
+    Program& opfdiv(int_op, int_op, int_op);
 
-    Program& opflt        (int_op, int_op, int_op);
-    Program& opflte       (int_op, int_op, int_op);
-    Program& opfgt        (int_op, int_op, int_op);
-    Program& opfgte       (int_op, int_op, int_op);
-    Program& opfeq        (int_op, int_op, int_op);
+    Program& opflt(int_op, int_op, int_op);
+    Program& opflte(int_op, int_op, int_op);
+    Program& opfgt(int_op, int_op, int_op);
+    Program& opfgte(int_op, int_op, int_op);
+    Program& opfeq(int_op, int_op, int_op);
 
-    Program& opbstore   (int_op, byte_op);
+    Program& opbstore(int_op, byte_op);
 
-    Program& opitof       (int_op, int_op);
-    Program& opftoi       (int_op, int_op);
-    Program& opstoi       (int_op, int_op);
-    Program& opstof       (int_op, int_op);
+    Program& opitof(int_op, int_op);
+    Program& opftoi(int_op, int_op);
+    Program& opstoi(int_op, int_op);
+    Program& opstof(int_op, int_op);
 
-    Program& opstrstore   (int_op, std::string);
+    Program& opstrstore(int_op, std::string);
 
-    Program& opvec        (int_op, int_op, int_op);
-    Program& opvinsert    (int_op, int_op, int_op);
-    Program& opvpush      (int_op, int_op);
-    Program& opvpop       (int_op, int_op, int_op);
-    Program& opvat        (int_op, int_op, int_op);
-    Program& opvlen       (int_op, int_op);
+    Program& opvec(int_op, int_op, int_op);
+    Program& opvinsert(int_op, int_op, int_op);
+    Program& opvpush(int_op, int_op);
+    Program& opvpop(int_op, int_op, int_op);
+    Program& opvat(int_op, int_op, int_op);
+    Program& opvlen(int_op, int_op);
 
-    Program& opnot     (int_op);
-    Program& opand     (int_op, int_op, int_op);
-    Program& opor      (int_op, int_op, int_op);
+    Program& opnot(int_op);
+    Program& opand(int_op, int_op, int_op);
+    Program& opor(int_op, int_op, int_op);
 
-    Program& opmove       (int_op, int_op);
-    Program& opcopy       (int_op, int_op);
-    Program& opptr      (int_op, int_op);
-    Program& opswap       (int_op, int_op);
-    Program& opress       (std::string);
-    Program& optmpri      (int_op);
-    Program& optmpro      (int_op);
-    Program& opdelete   (int_op);
-    Program& opisnull     (int_op, int_op);
+    Program& opmove(int_op, int_op);
+    Program& opcopy(int_op, int_op);
+    Program& opptr(int_op, int_op);
+    Program& opswap(int_op, int_op);
+    Program& opress(std::string);
+    Program& optmpri(int_op);
+    Program& optmpro(int_op);
+    Program& opdelete(int_op);
+    Program& opisnull(int_op, int_op);
 
-    Program& opprint      (int_op);
-    Program& opecho       (int_op);
+    Program& opprint(int_op);
+    Program& opecho(int_op);
 
-    Program& openclose     (int_op, int_op, int_op);
+    Program& openclose(int_op, int_op, int_op);
     Program& openclosecopy(int_op, int_op, int_op);
     Program& openclosemove(int_op, int_op, int_op);
-    Program& opclosure    (int_op, const std::string&);
+    Program& opclosure(int_op, const std::string&);
 
-    Program& opfunction   (int_op, const std::string&);
-    Program& opfcall      (int_op, int_op);
+    Program& opfunction(int_op, const std::string&);
+    Program& opfcall(int_op, int_op);
 
-    Program& opframe      (int_op, int_op);
-    Program& opparam      (int_op, int_op);
-    Program& oppamv     (int_op, int_op);
-    Program& oparg        (int_op, int_op);
-    Program& opargc       (int_op);
+    Program& opframe(int_op, int_op);
+    Program& opparam(int_op, int_op);
+    Program& oppamv(int_op, int_op);
+    Program& oparg(int_op, int_op);
+    Program& opargc(int_op);
 
-    Program& opcall       (int_op, const std::string&);
-    Program& optailcall   (const std::string&);
-    Program& opprocess   (int_op, const std::string&);
-    Program& opself     (int_op);
-    Program& opjoin   (int_op, int_op, int_op);
-    Program& opsend   (int_op, int_op);
+    Program& opcall(int_op, const std::string&);
+    Program& optailcall(const std::string&);
+    Program& opprocess(int_op, const std::string&);
+    Program& opself(int_op);
+    Program& opjoin(int_op, int_op, int_op);
+    Program& opsend(int_op, int_op);
     Program& opreceive(int_op, int_op);
     Program& opwatchdog(const std::string&);
-    Program& opjump       (uint64_t, enum JUMPTYPE);
-    Program& opbranch     (int_op, uint64_t, enum JUMPTYPE, uint64_t, enum JUMPTYPE);
+    Program& opjump(uint64_t, enum JUMPTYPE);
+    Program& opbranch(int_op, uint64_t, enum JUMPTYPE, uint64_t, enum JUMPTYPE);
 
-    Program& optry      ();
-    Program& opcatch    (std::string, std::string);
-    Program& oppull       (int_op);
-    Program& openter    (std::string);
-    Program& opthrow    (int_op);
-    Program& opleave      ();
+    Program& optry();
+    Program& opcatch(std::string, std::string);
+    Program& oppull(int_op);
+    Program& openter(std::string);
+    Program& opthrow(int_op);
+    Program& opleave();
 
     Program& opimport(std::string);
     Program& oplink(std::string);
 
-    Program& opclass    (int_op, const std::string&);
-    Program& opderive   (int_op, const std::string&);
-    Program& opattach   (int_op, const std::string&, const std::string&);
-    Program& opregister (int_op);
+    Program& opclass(int_op, const std::string&);
+    Program& opderive(int_op, const std::string&);
+    Program& opattach(int_op, const std::string&, const std::string&);
+    Program& opregister(int_op);
 
-    Program& opnew      (int_op, const std::string&);
-    Program& opmsg      (int_op, const std::string&);
+    Program& opnew(int_op, const std::string&);
+    Program& opmsg(int_op, const std::string&);
     Program& opinsert(int_op, int_op, int_op);
     Program& opremove(int_op, int_op, int_op);
 
-    Program& opreturn   ();
-    Program& ophalt       ();
+    Program& opreturn();
+    Program& ophalt();
 
 
     /** Functions driving after-insertion calculations.
