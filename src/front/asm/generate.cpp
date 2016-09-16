@@ -217,7 +217,7 @@ static vector<string> filter(const vector<string>& lines) {
             /*  Assembler directives are discarded by the assembler during the bytecode-generation phase
              *  so they can be skipped in this step as fast as possible
              *  to avoid complicating code that appears later and
-             *  deals with assembling CPU instructions.
+             *  deals with assembling Kernel instructions.
              */
             continue;
         }

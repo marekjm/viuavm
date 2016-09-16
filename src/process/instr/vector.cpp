@@ -23,10 +23,10 @@
 #include <viua/types/type.h>
 #include <viua/types/integer.h>
 #include <viua/types/vector.h>
-#include <viua/cpu/opex.h>
-#include <viua/cpu/registerset.h>
+#include <viua/kernel/opex.h>
+#include <viua/kernel/registerset.h>
 #include <viua/operand.h>
-#include <viua/cpu/cpu.h>
+#include <viua/kernel/kernel.h>
 using namespace std;
 
 
@@ -95,7 +95,7 @@ byte* Process::opvpop(byte* addr) {
     int position_operand_index = 0;
     bool reg_ref = false;
 
-    viua::cpu::util::extractIntegerOperand(addr, reg_ref, position_operand_index);
+    viua::kernel::util::extractIntegerOperand(addr, reg_ref, position_operand_index);
 
     if (reg_ref) {
         // register index references cannot be negative so it's safe to cast to unsigned
@@ -124,7 +124,7 @@ byte* Process::opvat(byte* addr) {
     int position_operand_index = 0;
     bool reg_ref = false;
 
-    viua::cpu::util::extractIntegerOperand(addr, reg_ref, position_operand_index);
+    viua::kernel::util::extractIntegerOperand(addr, reg_ref, position_operand_index);
 
     if (reg_ref) {
         // register index references cannot be negative so it's safe to cast to unsigned

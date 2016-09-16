@@ -23,8 +23,8 @@
 #pragma once
 
 #include <vector>
-#include <viua/cpu/frame.h>
-#include <viua/cpu/registerset.h>
+#include <viua/kernel/frame.h>
+#include <viua/kernel/registerset.h>
 #include <viua/types/type.h>
 
 

@@ -24,11 +24,11 @@
 #include <viua/types/function.h>
 #include <viua/types/closure.h>
 #include <viua/types/reference.h>
-#include <viua/cpu/opex.h>
+#include <viua/kernel/opex.h>
 #include <viua/exceptions.h>
-#include <viua/cpu/registerset.h>
+#include <viua/kernel/registerset.h>
 #include <viua/operand.h>
-#include <viua/cpu/cpu.h>
+#include <viua/kernel/kernel.h>
 #include <viua/scheduler/vps.h>
 using namespace std;
 
@@ -135,7 +135,7 @@ byte* Process::opfcall(byte* addr) {
      */
     int return_value_reg;
     bool return_value_ref;
-    viua::cpu::util::extractIntegerOperand(addr, return_value_ref, return_value_reg);
+    viua::kernel::util::extractIntegerOperand(addr, return_value_ref, return_value_reg);
 
     unsigned fn_reg = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 

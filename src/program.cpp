@@ -365,7 +365,7 @@ vector<uint64_t> Program::jumpsAbsolute() {
 
 Program::Program(uint64_t bts): bytes(bts), debug(false), scream(false) {
     program = new byte[bytes];
-    /* Filling bytecode with zeroes (which are interpreted by CPU as NOP instructions) is a safe way
+    /* Filling bytecode with zeroes (which are interpreted by Kernel as NOP instructions) is a safe way
      * to prevent many hiccups.
      */
     for (decltype(bytes) i = 0; i < bytes; ++i) { program[i] = byte(0); }

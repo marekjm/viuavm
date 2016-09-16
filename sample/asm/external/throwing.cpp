@@ -22,8 +22,8 @@
 #include <viua/types/type.h>
 #include <viua/types/float.h>
 #include <viua/types/exception.h>
-#include <viua/cpu/frame.h>
-#include <viua/cpu/registerset.h>
+#include <viua/kernel/frame.h>
+#include <viua/kernel/registerset.h>
 #include <viua/include/module.h>
 using namespace std;
 
@@ -31,7 +31,7 @@ using namespace std;
 extern "C" const ForeignFunctionSpec* exports();
 
 
-static void throwing_oh_noes(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*) {
+static void throwing_oh_noes(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     throw new Exception("OH NOES!");
 }
 

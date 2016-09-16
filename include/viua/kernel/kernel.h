@@ -44,7 +44,7 @@
 class ForeignFunctionCallRequest {
     std::unique_ptr<Frame> frame;
     Process *caller_process;
-    CPU *cpu;
+    Kernel *kernel;
 
     public:
         std::string functionName() const;
@@ -52,7 +52,7 @@ class ForeignFunctionCallRequest {
         void registerException(Type*);
         void wakeup();
 
-        ForeignFunctionCallRequest(Frame *fr, Process *cp, CPU *c): frame(fr), caller_process(cp), cpu(c) {}
+        ForeignFunctionCallRequest(Frame *fr, Process *cp, Kernel *c): frame(fr), caller_process(cp), kernel(c) {}
         ~ForeignFunctionCallRequest() {}
 };
 
@@ -60,7 +60,7 @@ class ForeignFunctionCallRequest {
 void ff_call_processor(std::vector<std::unique_ptr<ForeignFunctionCallRequest>> *requests, std::map<std::string, ForeignFunction*> *foreign_functions, std::mutex *ff_map_mtx, std::mutex *mtx, std::condition_variable *cv);
 
 
-class CPU {
+class Kernel {
 #ifdef AS_DEBUG_HEADER
     public:
 #endif
@@ -91,7 +91,7 @@ class CPU {
      *  List of virtual processes that do not belong to any scheduler, and
      *  are waiting to be adopted, along with means of synchronization of
      *  concurrent accesses to said list.
-     *  Schedulers can post their spawned processes to the CPU to let
+     *  Schedulers can post their spawned processes to the Kernel to let
      *  other schedulers execute them (sometimes, a scheduler may fetch
      *  its own process back).
      *
@@ -143,21 +143,21 @@ class CPU {
 
         std::vector<std::string> commandline_arguments;
 
-        /*  Public API of the CPU provides basic actions:
+        /*  Public API of the Kernel provides basic actions:
          *
          *      * load bytecode,
          *      * set its size,
-         *      * tell the CPU where to start execution,
-         *      * kick the CPU so it starts running,
+         *      * tell the Kernel where to start execution,
+         *      * kick the Kernel so it starts running,
          */
-        CPU& load(byte*);
-        CPU& bytes(uint64_t);
+        Kernel& load(byte*);
+        Kernel& bytes(uint64_t);
 
-        CPU& mapfunction(const std::string&, uint64_t);
-        CPU& mapblock(const std::string&, uint64_t);
+        Kernel& mapfunction(const std::string&, uint64_t);
+        Kernel& mapblock(const std::string&, uint64_t);
 
-        CPU& registerExternalFunction(const std::string&, ForeignFunction*);
-        CPU& removeExternalFunction(std::string);
+        Kernel& registerExternalFunction(const std::string&, ForeignFunction*);
+        Kernel& removeExternalFunction(std::string);
 
         /*  Methods dealing with typesystem related tasks.
          */
@@ -181,8 +181,8 @@ class CPU {
         void registerPrototype(Prototype*);
 
         /// These two methods are used to inject pure-C++ classes into machine's typesystem.
-        CPU& registerForeignPrototype(const std::string&, Prototype*);
-        CPU& registerForeignMethod(const std::string&, ForeignMethod);
+        Kernel& registerForeignPrototype(const std::string&, Prototype*);
+        Kernel& registerForeignMethod(const std::string&, ForeignMethod);
 
         void requestForeignFunctionCall(Frame*, Process*);
         void requestForeignMethodCall(const std::string&, Type*, Frame*, RegisterSet*, RegisterSet*, Process*);
@@ -201,8 +201,8 @@ class CPU {
 
         int exit() const;
 
-        CPU();
-        ~CPU();
+        Kernel();
+        ~Kernel();
 };
 
 #endif

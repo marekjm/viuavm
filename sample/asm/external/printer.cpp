@@ -21,8 +21,8 @@
 #include <sstream>
 #include <memory>
 #include <viua/types/type.h>
-#include <viua/cpu/frame.h>
-#include <viua/cpu/registerset.h>
+#include <viua/kernel/frame.h>
+#include <viua/kernel/registerset.h>
 #include <viua/include/module.h>
 using namespace std;
 
@@ -30,7 +30,7 @@ using namespace std;
 extern "C" const ForeignFunctionSpec* exports();
 
 
-static void printer_print(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
+static void printer_print(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     unique_ptr<Type> arg(frame->args->pop(0));
     // concatenate before printing to avoid mangled output
     cout << ("Hello " + arg->str() + "!\n");

@@ -111,7 +111,17 @@ Typical code-n-run cycle is shown below (assuming current working directory is t
 ```
 vi some_file.asm
 ./build/bin/vm/asm -o some_file.out some_file.asm
-./build/bin/vm/cpu some_file.out
+./build/bin/vm/kernel some_file.out
+```
+
+The "Hello World!" program:
+
+```
+.function: main/0
+    print (strstore 1 "Hello World!")
+    izero 0
+    return
+.end
 ```
 
 

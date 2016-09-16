@@ -26,7 +26,7 @@
 #include <viua/support/pointer.h>
 
 namespace viua {
-    namespace cpu {
+    namespace kernel {
         namespace util {
             void extractIntegerOperand(byte*& instruction_stream, bool& boolean, int& integer);
             void extractFloatingPointOperand(byte*& instruction_stream, float& fp);

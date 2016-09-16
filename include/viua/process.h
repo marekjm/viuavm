@@ -31,9 +31,9 @@
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/types/type.h>
 #include <viua/types/prototype.h>
-#include <viua/cpu/registerset.h>
-#include <viua/cpu/frame.h>
-#include <viua/cpu/tryframe.h>
+#include <viua/kernel/registerset.h>
+#include <viua/kernel/frame.h>
+#include <viua/kernel/tryframe.h>
 #include <viua/include/module.h>
 
 

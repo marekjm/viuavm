@@ -25,7 +25,7 @@
 #include <viua/types/byte.h>
 #include <viua/types/exception.h>
 #include <viua/types/reference.h>
-#include <viua/cpu/registerset.h>
+#include <viua/kernel/registerset.h>
 using namespace std;
 
 

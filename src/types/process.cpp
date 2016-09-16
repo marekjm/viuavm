@@ -23,7 +23,7 @@
 #include <viua/types/process.h>
 #include <viua/exceptions.h>
 #include <viua/process.h>
-#include <viua/cpu/cpu.h>
+#include <viua/kernel/kernel.h>
 using namespace std;
 
 
@@ -84,33 +84,33 @@ unique_ptr<Type> ProcessType::getReturnValue() {
 }
 
 
-void ProcessType::joinable(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
+void ProcessType::joinable(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     frame->regset->set(0, new Boolean(thrd->joinable()));
 }
 
-void ProcessType::detach(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*) {
+void ProcessType::detach(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     thrd->detach();
 }
 
 
-void ProcessType::suspend(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*) {
+void ProcessType::suspend(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     thrd->suspend();
 }
-void ProcessType::wakeup(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*) {
+void ProcessType::wakeup(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     thrd->wakeup();
 }
-void ProcessType::suspended(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
+void ProcessType::suspended(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     frame->regset->set(0, new Boolean(thrd->suspended()));
 }
 
 
-void ProcessType::getPriority(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
+void ProcessType::getPriority(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     // FIXME: cast to silence compiler warning about implicit conversion changing signedness of the int
     // the cast is not *truly* safe, because unsigned can store positive numbers signed int cannot
     frame->regset->set(0, new Integer(static_cast<int>(thrd->priority())));
 }
 
-void ProcessType::setPriority(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
+void ProcessType::setPriority(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     if (frame->args->at(0) == nullptr) {
         throw new Exception("expected Process as first parameter but got nothing");
     }

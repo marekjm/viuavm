@@ -26,7 +26,7 @@
 #include <viua/types/reference.h>
 #include <viua/types/process.h>
 #include <viua/process.h>
-#include <viua/cpu/cpu.h>
+#include <viua/kernel/kernel.h>
 #include <viua/scheduler/vps.h>
 using namespace std;
 

@@ -21,7 +21,7 @@
 #include <viua/types/integer.h>
 #include <viua/types/exception.h>
 #include <viua/include/module.h>
-#include <viua/cpu/cpu.h>
+#include <viua/kernel/kernel.h>
 using namespace std;
 
 string ForeignFunctionCallRequest::functionName() const {
@@ -34,7 +34,7 @@ void ForeignFunctionCallRequest::call(ForeignFunction* callback) {
      * FIXME: third parameter should be a pointer to global registers
      */
     try {
-        (*callback)(frame.get(), nullptr, nullptr, caller_process, cpu);
+        (*callback)(frame.get(), nullptr, nullptr, caller_process, kernel);
 
         /* // FIXME: woohoo! segfault! */
         Type* returned = nullptr;

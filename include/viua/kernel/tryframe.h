@@ -25,8 +25,8 @@
 #include <string>
 #include <map>
 #include <viua/bytecode/bytetypedef.h>
-#include <viua/cpu/frame.h>
-#include <viua/cpu/catcher.h>
+#include <viua/kernel/frame.h>
+#include <viua/kernel/catcher.h>
 
 class TryFrame {
     public:

@@ -24,8 +24,8 @@
 #include <viua/types/string.h>
 #include <viua/types/vector.h>
 #include <viua/types/exception.h>
-#include <viua/cpu/frame.h>
-#include <viua/cpu/registerset.h>
+#include <viua/kernel/frame.h>
+#include <viua/kernel/registerset.h>
 #include <viua/include/module.h>
 using namespace std;
 

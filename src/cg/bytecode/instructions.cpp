@@ -26,7 +26,7 @@ static byte* insertIntegerOperand(byte* addr_ptr, int_op op) {
     /** Insert integer operand into bytecode.
      *
      *  When using integer operand, it usually is a plain number - which translates to a regsiter index.
-     *  However, when preceded by `@` integer operand will not be interpreted directly, but instead CPU
+     *  However, when preceded by `@` integer operand will not be interpreted directly, but instead Kernel
      *  will look into a register the integer points to, fetch an integer from this register and
      *  use the fetched register as the operand.
      */

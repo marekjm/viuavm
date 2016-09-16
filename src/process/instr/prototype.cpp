@@ -21,11 +21,11 @@
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/types/integer.h>
 #include <viua/types/prototype.h>
-#include <viua/cpu/opex.h>
+#include <viua/kernel/opex.h>
 #include <viua/exceptions.h>
-#include <viua/cpu/registerset.h>
+#include <viua/kernel/registerset.h>
 #include <viua/operand.h>
-#include <viua/cpu/cpu.h>
+#include <viua/kernel/kernel.h>
 #include <viua/scheduler/vps.h>
 using namespace std;
 

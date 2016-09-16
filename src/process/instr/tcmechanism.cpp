@@ -18,10 +18,10 @@
  */
 
 #include <viua/types/integer.h>
-#include <viua/cpu/opex.h>
+#include <viua/kernel/opex.h>
 #include <viua/exceptions.h>
 #include <viua/operand.h>
-#include <viua/cpu/cpu.h>
+#include <viua/kernel/kernel.h>
 #include <viua/scheduler/vps.h>
 using namespace std;
 

@@ -32,7 +32,7 @@
 using namespace std;
 
 
-const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file which cannot be run on CPU without prior compilation";
+const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file which cannot be run on Kernel without prior compilation";
 
 
 static bool usage(const string program, const vector<string>& args) {
@@ -64,13 +64,13 @@ static bool usage(const string program, const vector<string>& args) {
     }
 
     if (show_json) {
-        cout << "{\"version\": \"" << VERSION << '.' << MICRO << "\", \"sched\": {\"ffi\": " << CPU::no_of_ffi_schedulers() << ", ";
-        cout << "\"vp\": " << CPU::no_of_vp_schedulers() << "}}\n";
+        cout << "{\"version\": \"" << VERSION << '.' << MICRO << "\", \"sched\": {\"ffi\": " << Kernel::no_of_ffi_schedulers() << ", ";
+        cout << "\"vp\": " << Kernel::no_of_vp_schedulers() << "}}\n";
         return true;
     }
 
     if (show_help or (show_version and verbose)) {
-        cout << "Viua VM CPU, version ";
+        cout << "Viua VM Kernel, version ";
     }
     if (show_help or show_version or show_info) {
         cout << VERSION << '.' << MICRO;
@@ -80,9 +80,9 @@ static bool usage(const string program, const vector<string>& args) {
     }
     if (show_info) {
         cout << ' ';
-        cout << "[sched:ffi=" << CPU::no_of_ffi_schedulers() << ']';
+        cout << "[sched:ffi=" << Kernel::no_of_ffi_schedulers() << ']';
         cout << ' ';
-        cout << "[sched:vp=" << CPU::no_of_vp_schedulers() << ']' << endl;
+        cout << "[sched:vp=" << Kernel::no_of_vp_schedulers() << ']' << endl;
     }
     if (show_help) {
         cout << "\nUSAGE:\n";
@@ -125,10 +125,10 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    CPU cpu;
+    Kernel kernel;
 
     try {
-        viua::front::vm::initialise(&cpu, filename, args);
+        viua::front::vm::initialise(&kernel, filename, args);
     } catch (const char *e) {
         cout << "error: " << e << endl;
         return 1;
@@ -139,16 +139,16 @@ int main(int argc, char* argv[]) {
 
     try {
         // try preloading dynamic libraries specified by environment
-        viua::front::vm::preload_libraries(&cpu);
+        viua::front::vm::preload_libraries(&kernel);
     } catch (const Exception* e) {
         cout << "fatal: preload: " << e->what() << endl;
         return 1;
     }
 
-    viua::front::vm::load_standard_prototypes(&cpu);
+    viua::front::vm::load_standard_prototypes(&kernel);
 
     try {
-        cpu.run();
+        kernel.run();
     } catch (const Exception* e) {
         cout << "VM error: an irrecoverable VM exception occured: " << e->what() << endl;
         return 1;
@@ -159,5 +159,5 @@ int main(int argc, char* argv[]) {
     // the catch (...) is intentionally omitted, if we can't provide useful information about
     // the error it's better to just crash
 
-    return cpu.exit();
+    return kernel.exit();
 }

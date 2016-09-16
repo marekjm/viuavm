@@ -21,7 +21,7 @@
 using namespace std;
 
 
-void viua::front::vm::initialise(CPU *cpu, const string& program, vector<string> args) {
+void viua::front::vm::initialise(Kernel *kernel, const string& program, vector<string> args) {
     Loader loader(program);
     loader.executable();
 
@@ -29,17 +29,17 @@ void viua::front::vm::initialise(CPU *cpu, const string& program, vector<string>
     byte* bytecode = loader.getBytecode();
 
     map<string, uint64_t> function_address_mapping = loader.getFunctionAddresses();
-    for (auto p : function_address_mapping) { cpu->mapfunction(p.first, p.second); }
-    for (auto p : loader.getBlockAddresses()) { cpu->mapblock(p.first, p.second); }
+    for (auto p : function_address_mapping) { kernel->mapfunction(p.first, p.second); }
+    for (auto p : loader.getBlockAddresses()) { kernel->mapblock(p.first, p.second); }
 
-    cpu->commandline_arguments = args;
+    kernel->commandline_arguments = args;
 
-    cpu->load(bytecode).bytes(bytes);
+    kernel->load(bytecode).bytes(bytes);
 }
 
-void viua::front::vm::load_standard_prototypes(CPU* cpu) {
+void viua::front::vm::load_standard_prototypes(Kernel* kernel) {
     Prototype* proto_object = new Prototype("Object");
-    cpu->registerForeignPrototype("Object", proto_object);
+    kernel->registerForeignPrototype("Object", proto_object);
 
     Prototype* proto_string = new Prototype("String");
     proto_string->attach("String::stringify/2", "stringify/2");
@@ -51,16 +51,16 @@ void viua::front::vm::load_standard_prototypes(CPU* cpu) {
     proto_string->attach("String::concatenate/2", "concatenate/2");
     proto_string->attach("String::join/1", "join/1");
     proto_string->attach("String::size/1", "size/1");
-    cpu->registerForeignPrototype("String", proto_string);
-    cpu->registerForeignMethod("String::stringify/2", static_cast<ForeignMethodMemberPointer>(&String::stringify));
-    cpu->registerForeignMethod("String::represent/2", static_cast<ForeignMethodMemberPointer>(&String::represent));
-    cpu->registerForeignMethod("String::startswith/2", static_cast<ForeignMethodMemberPointer>(&String::startswith));
-    cpu->registerForeignMethod("String::endswith/2", static_cast<ForeignMethodMemberPointer>(&String::endswith));
-    cpu->registerForeignMethod("String::format/", static_cast<ForeignMethodMemberPointer>(&String::format));
-    cpu->registerForeignMethod("String::substr/", static_cast<ForeignMethodMemberPointer>(&String::substr));
-    cpu->registerForeignMethod("String::concatenate/2", static_cast<ForeignMethodMemberPointer>(&String::concatenate));
-    cpu->registerForeignMethod("String::join/", static_cast<ForeignMethodMemberPointer>(&String::join));
-    cpu->registerForeignMethod("String::size/1", static_cast<ForeignMethodMemberPointer>(&String::size));
+    kernel->registerForeignPrototype("String", proto_string);
+    kernel->registerForeignMethod("String::stringify/2", static_cast<ForeignMethodMemberPointer>(&String::stringify));
+    kernel->registerForeignMethod("String::represent/2", static_cast<ForeignMethodMemberPointer>(&String::represent));
+    kernel->registerForeignMethod("String::startswith/2", static_cast<ForeignMethodMemberPointer>(&String::startswith));
+    kernel->registerForeignMethod("String::endswith/2", static_cast<ForeignMethodMemberPointer>(&String::endswith));
+    kernel->registerForeignMethod("String::format/", static_cast<ForeignMethodMemberPointer>(&String::format));
+    kernel->registerForeignMethod("String::substr/", static_cast<ForeignMethodMemberPointer>(&String::substr));
+    kernel->registerForeignMethod("String::concatenate/2", static_cast<ForeignMethodMemberPointer>(&String::concatenate));
+    kernel->registerForeignMethod("String::join/", static_cast<ForeignMethodMemberPointer>(&String::join));
+    kernel->registerForeignMethod("String::size/1", static_cast<ForeignMethodMemberPointer>(&String::size));
 
     Prototype* proto_process = new Prototype("Process");
     proto_process->attach("Process::joinable/1", "joinable/1");
@@ -70,31 +70,31 @@ void viua::front::vm::load_standard_prototypes(CPU* cpu) {
     proto_process->attach("Process::suspended/1", "suspended/1");
     proto_process->attach("Process::getPriority/1", "getPriority/1");
     proto_process->attach("Process::setPriority/2", "setPriority/2");
-    cpu->registerForeignPrototype("Process", proto_process);
-    cpu->registerForeignMethod("Process::joinable/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::joinable));
-    cpu->registerForeignMethod("Process::detach/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::detach));
-    cpu->registerForeignMethod("Process::suspend/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::suspend));
-    cpu->registerForeignMethod("Process::wakeup/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::wakeup));
-    cpu->registerForeignMethod("Process::suspended/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::suspended));
-    cpu->registerForeignMethod("Process::getPriority/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::getPriority));
-    cpu->registerForeignMethod("Process::setPriority/2", static_cast<ForeignMethodMemberPointer>(&ProcessType::setPriority));
+    kernel->registerForeignPrototype("Process", proto_process);
+    kernel->registerForeignMethod("Process::joinable/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::joinable));
+    kernel->registerForeignMethod("Process::detach/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::detach));
+    kernel->registerForeignMethod("Process::suspend/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::suspend));
+    kernel->registerForeignMethod("Process::wakeup/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::wakeup));
+    kernel->registerForeignMethod("Process::suspended/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::suspended));
+    kernel->registerForeignMethod("Process::getPriority/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::getPriority));
+    kernel->registerForeignMethod("Process::setPriority/2", static_cast<ForeignMethodMemberPointer>(&ProcessType::setPriority));
 
     Prototype* proto_pointer = new Prototype("Pointer");
     proto_pointer->attach("Pointer::expired/1", "expired/1");
-    cpu->registerForeignPrototype("Pointer", proto_pointer);
-    cpu->registerForeignMethod("Pointer::expired/1", static_cast<ForeignMethodMemberPointer>(&Pointer::expired));
+    kernel->registerForeignPrototype("Pointer", proto_pointer);
+    kernel->registerForeignMethod("Pointer::expired/1", static_cast<ForeignMethodMemberPointer>(&Pointer::expired));
 }
 
-void viua::front::vm::preload_libraries(CPU* cpu) {
+void viua::front::vm::preload_libraries(Kernel* kernel) {
     /** This method preloads dynamic libraries specified by environment.
      */
     vector<string> preload_native = support::env::getpaths("VIUAPRELINK");
     for (unsigned i = 0; i < preload_native.size(); ++i) {
-        cpu->loadNativeLibrary(preload_native[i]);
+        kernel->loadNativeLibrary(preload_native[i]);
     }
 
     vector<string> preload_foreign = support::env::getpaths("VIUAPREIMPORT");
     for (unsigned i = 0; i < preload_foreign.size(); ++i) {
-        cpu->loadForeignLibrary(preload_foreign[i]);
+        kernel->loadForeignLibrary(preload_foreign[i]);
     }
 }

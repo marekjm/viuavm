@@ -24,20 +24,20 @@
 #include <viua/types/string.h>
 #include <viua/types/vector.h>
 #include <viua/types/exception.h>
-#include <viua/cpu/frame.h>
-#include <viua/cpu/registerset.h>
+#include <viua/kernel/frame.h>
+#include <viua/kernel/registerset.h>
 #include <viua/include/module.h>
 using namespace std;
 
 
-void io_getline(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
+void io_getline(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     string line;
     getline(cin, line);
     frame->regset->set(0, new String(line));
 }
 
 
-void io_readtext(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
+void io_readtext(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     string path = frame->args->get(0)->str();
     ifstream in(path);
 

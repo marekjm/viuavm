@@ -22,7 +22,7 @@
 #include <condition_variable>
 #include <memory>
 #include <viua/types/exception.h>
-#include <viua/cpu/cpu.h>
+#include <viua/kernel/kernel.h>
 using namespace std;
 
 

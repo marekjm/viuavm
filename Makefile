@@ -30,7 +30,7 @@ LIBDL ?= -ldl
 
 ############################################################
 # BASICS
-all: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/dis build/bin/vm/lex build/bin/opcodes.bin platform stdlib
+all: build/bin/vm/asm build/bin/vm/kernel build/bin/vm/dis build/bin/vm/lex build/bin/opcodes.bin platform stdlib
 
 remake: clean all
 
@@ -41,7 +41,7 @@ clean: clean-support clean-test-compiles clean-stdlib
 	rm -f ./build/bin/vm/*
 	rm -f ./build/bin/opcodes.bin
 	rm -f ./build/lib/*.o
-	rm -f ./build/cpu/*.o
+	rm -f ./build/kernel/*.o
 	rm -f ./build/process/instr/*.o
 	rm -f ./build/process/*.o
 	rm -f ./build/cg/assembler/*.o
@@ -76,11 +76,11 @@ doc/viua_virtual_machine.pdf: doc/viua_virtual_machine.lyx
 
 ############################################################
 # INSTALLATION AND UNINSTALLATION
-bininstall: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/dis
+bininstall: build/bin/vm/asm build/bin/vm/kernel build/bin/vm/dis
 	mkdir -p $(BIN_PATH)
 	cp ./build/bin/vm/asm $(BIN_PATH)/viua-asm
 	chmod 755 $(BIN_PATH)/viua-asm
-	cp ./build/bin/vm/cpu $(BIN_PATH)/viua-vm
+	cp ./build/bin/vm/kernel $(BIN_PATH)/viua-vm
 	chmod 755 $(BIN_PATH)/viua-vm
 	cp ./build/bin/vm/dis $(BIN_PATH)/viua-dis
 	chmod 755 $(BIN_PATH)/viua-dis
@@ -127,8 +127,8 @@ build/platform/vector.o: src/types/vector.cpp
 build/platform/reference.o: src/types/reference.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -o ./build/platform/reference.o src/types/reference.cpp
 
-build/platform/registerset.o: src/cpu/registerset.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c -o ./build/platform/registerset.o src/cpu/registerset.cpp
+build/platform/registerset.o: src/kernel/registerset.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -o ./build/platform/registerset.o src/kernel/registerset.cpp
 
 build/platform/support_string.o: src/support/string.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -o ./build/platform/support_string.o src/support/string.cpp
@@ -168,7 +168,7 @@ build/test/throwing.so: build/test/throwing.o build/platform/registerset.o build
 
 compile-test: build/test/math.so build/test/World.so build/test/throwing.so build/test/printer.so build/test/sleeper.so
 
-test: build/bin/vm/asm build/bin/vm/cpu build/bin/vm/dis compile-test stdlib standardlibrary
+test: build/bin/vm/asm build/bin/vm/kernel build/bin/vm/dis compile-test stdlib standardlibrary
 	VIUAPATH=./build/stdlib python3 ./tests/tests.py --verbose --catch --failfast
 
 
@@ -178,7 +178,7 @@ version:
 	./scripts/update_commit_info.sh
 	touch src/front/asm.cpp
 	touch src/front/dis.cpp
-	touch src/front/cpu.cpp
+	touch src/front/kernel.cpp
 	touch src/front/wdb.cpp
 
 
@@ -204,7 +204,7 @@ build/asm/generate.o: src/front/asm/generate.cpp include/viua/front/asm.h includ
 build/asm.o: src/front/asm.cpp include/viua/front/asm.h
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
-build/cpu.o: src/front/cpu.cpp
+build/kernel.o: src/front/kernel.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $^
 
 build/dis.o: src/front/dis.cpp
@@ -213,13 +213,13 @@ build/dis.o: src/front/dis.cpp
 build/wdb.o: src/front/wdb.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $^
 
-build/cpu/opex.o: src/cpu/opex.cpp
+build/kernel/opex.o: src/kernel/opex.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $^
 
-build/cpu/ffi/request.o: src/cpu/ffi/request.cpp
+build/kernel/ffi/request.o: src/kernel/ffi/request.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $^
 
-build/cpu/ffi/scheduler.o: src/cpu/ffi/scheduler.cpp
+build/kernel/ffi/scheduler.o: src/kernel/ffi/scheduler.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $^
 
 build/operand.o: src/operand.cpp
@@ -234,10 +234,10 @@ build/front/vm.o: src/front/vm.cpp
 build/machine.o: src/machine.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $^
 
-build/bin/vm/cpu: build/cpu.o build/cpu/cpu.o build/scheduler/vps.o build/front/vm.o build/operand.o build/assert.o build/process.o build/process/dispatch.o build/cpu/opex.o build/cpu/ffi/request.o build/cpu/ffi/scheduler.o build/cpu/registserset.o build/cpu/frame.o build/loader.o build/machine.o build/printutils.o build/support/pointer.o build/support/string.o build/support/env.o $(VIUA_INSTR_FILES_O) build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o build/types/prototype.o build/types/object.o build/types/reference.o build/types/process.o build/types/type.o build/types/pointer.o build/cg/disassembler/disassembler.o
+build/bin/vm/kernel: build/kernel.o build/kernel/kernel.o build/scheduler/vps.o build/front/vm.o build/operand.o build/assert.o build/process.o build/process/dispatch.o build/kernel/opex.o build/kernel/ffi/request.o build/kernel/ffi/scheduler.o build/kernel/registserset.o build/kernel/frame.o build/loader.o build/machine.o build/printutils.o build/support/pointer.o build/support/string.o build/support/env.o $(VIUA_INSTR_FILES_O) build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o build/types/prototype.o build/types/object.o build/types/reference.o build/types/process.o build/types/type.o build/types/pointer.o build/cg/disassembler/disassembler.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -lpthread -o $@ $^ $(LIBDL)
 
-build/bin/vm/vdb: build/wdb.o build/lib/linenoise.o build/cpu/cpu.o build/scheduler/vps.o build/front/vm.o build/operand.o build/assert.o build/process.o build/process/dispatch.o build/cpu/opex.o build/cpu/ffi/request.o build/cpu/ffi/scheduler.o build/cpu/registserset.o build/cpu/frame.o build/loader.o build/machine.o build/cg/disassembler/disassembler.o build/printutils.o build/support/pointer.o build/support/string.o build/support/env.o $(VIUA_INSTR_FILES_O) build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o build/types/prototype.o build/types/object.o build/types/reference.o build/types/process.o build/types/type.o build/types/pointer.o
+build/bin/vm/vdb: build/wdb.o build/lib/linenoise.o build/kernel/kernel.o build/scheduler/vps.o build/front/vm.o build/operand.o build/assert.o build/process.o build/process/dispatch.o build/kernel/opex.o build/kernel/ffi/request.o build/kernel/ffi/scheduler.o build/kernel/registserset.o build/kernel/frame.o build/loader.o build/machine.o build/cg/disassembler/disassembler.o build/printutils.o build/support/pointer.o build/support/string.o build/support/env.o $(VIUA_INSTR_FILES_O) build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o build/types/prototype.o build/types/object.o build/types/reference.o build/types/process.o build/types/type.o build/types/pointer.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -lpthread -o $@ $^ $(LIBDL)
 
 build/bin/vm/asm: build/asm.o build/asm/generate.o build/asm/gather.o build/asm/decode.o build/program.o build/programinstructions.o build/cg/tokenizer/tokenize.o build/cg/assembler/operands.o build/cg/assembler/ce.o build/cg/lex.o build/cg/tools.o build/cg/assembler/verify.o build/cg/assembler/static_analysis.o build/cg/assembler/utils.o build/cg/bytecode/instructions.o build/loader.o build/machine.o build/support/string.o build/support/env.o
@@ -251,17 +251,17 @@ build/bin/vm/dis: build/dis.o build/loader.o build/machine.o build/cg/disassembl
 
 
 ############################################################
-# OBJECTS COMMON FOR DEBUGGER AND CPU COMPILATION
+# OBJECTS COMMON FOR DEBUGGER AND KERNEL COMPILATION
 build/scheduler/vps.o: src/scheduler/vps.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
-build/cpu/cpu.o: src/cpu/cpu.cpp include/viua/cpu/cpu.h include/viua/bytecode/opcodes.h include/viua/cpu/frame.h build/scheduler/vps.o
+build/kernel/kernel.o: src/kernel/kernel.cpp include/viua/kernel/kernel.h include/viua/bytecode/opcodes.h include/viua/kernel/frame.h build/scheduler/vps.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
-build/cpu/registserset.o: src/cpu/registerset.cpp include/viua/cpu/registerset.h
+build/kernel/registserset.o: src/kernel/registerset.cpp include/viua/kernel/registerset.h
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
-build/cpu/frame.o: src/cpu/frame.cpp include/viua/cpu/frame.h
+build/kernel/frame.o: src/kernel/frame.cpp include/viua/kernel/frame.h
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
 
@@ -367,7 +367,7 @@ build/types/process.o: src/types/process.cpp include/viua/types/process.h
 
 
 ############################################################
-# CPU, INSTRUCTION DISPATCH AND IMPLEMENTATION MODULES
+# KERNEL, INSTRUCTION DISPATCH AND IMPLEMENTATION MODULES
 build/process.o: src/process.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 

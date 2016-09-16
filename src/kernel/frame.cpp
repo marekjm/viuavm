@@ -17,7 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <viua/cpu/frame.h>
+#include <viua/kernel/frame.h>
 
 
 void Frame::setLocalRegisterSet(RegisterSet* rs, bool receives_ownership) {

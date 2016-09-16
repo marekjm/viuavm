@@ -28,13 +28,13 @@
 #include <viua/types/vector.h>
 #include <viua/types/integer.h>
 #include <viua/support/string.h>
-#include <viua/cpu/frame.h>
-#include <viua/cpu/registerset.h>
+#include <viua/kernel/frame.h>
+#include <viua/kernel/registerset.h>
 #include <viua/process.h>
 
 
 // we only need a pointer so class declaration will be sufficient
-class CPU;
+class Kernel;
 
 
 class ProcessType : public Type {
@@ -47,15 +47,15 @@ class ProcessType : public Type {
         bool boolean() const;
         ProcessType* copy() const;
 
-        virtual void joinable(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
-        virtual void detach(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
+        virtual void joinable(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
+        virtual void detach(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
 
-        virtual void suspend(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
-        virtual void wakeup(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
-        virtual void suspended(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
+        virtual void suspend(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
+        virtual void wakeup(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
+        virtual void suspended(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
 
-        virtual void getPriority(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
-        virtual void setPriority(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
+        virtual void getPriority(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
+        virtual void setPriority(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
 
         PID pid() const;
 

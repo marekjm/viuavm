@@ -19,8 +19,8 @@
 
 #include <iostream>
 #include <viua/types/type.h>
-#include <viua/cpu/frame.h>
-#include <viua/cpu/registerset.h>
+#include <viua/kernel/frame.h>
+#include <viua/kernel/registerset.h>
 #include <viua/include/module.h>
 using namespace std;
 
@@ -28,7 +28,7 @@ using namespace std;
 extern "C" const ForeignFunctionSpec* exports();
 
 
-static void hello(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*) {
+static void hello(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     cout << "Hello World!" << endl;
 }
 

@@ -23,8 +23,8 @@
 #include <thread>
 #include <chrono>
 #include <viua/types/type.h>
-#include <viua/cpu/frame.h>
-#include <viua/cpu/registerset.h>
+#include <viua/kernel/frame.h>
+#include <viua/kernel/registerset.h>
 #include <viua/include/module.h>
 using namespace std;
 
@@ -32,7 +32,7 @@ using namespace std;
 extern "C" const ForeignFunctionSpec* exports();
 
 
-static void sleeper_lazy_print(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*) {
+static void sleeper_lazy_print(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     cout << "sleeper::lazy_print/0: sleep for 5ms" << endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
 

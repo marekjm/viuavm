@@ -25,8 +25,8 @@
 #include <viua/types/integer.h>
 #include <viua/types/float.h>
 #include <viua/types/exception.h>
-#include <viua/cpu/frame.h>
-#include <viua/cpu/registerset.h>
+#include <viua/kernel/frame.h>
+#include <viua/kernel/registerset.h>
 #include <viua/include/module.h>
 using namespace std;
 
@@ -46,7 +46,7 @@ float getrandom() {
     return rfloat;
 }
 
-void random_drandom(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
+void random_drandom(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     /** Return random integer.
      *
      *  Bytes are read from /dev/random random number device.
@@ -61,7 +61,7 @@ void random_drandom(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
     frame->regset->set(0, new Integer(rint));
 }
 
-void random_durandom(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
+void random_durandom(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     /** Return random integer.
      *
      *  Bytes are read from /dev/urandom random number device.
@@ -78,13 +78,13 @@ void random_durandom(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
     frame->regset->set(0, new Integer(rint));
 }
 
-void random_random(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
+void random_random(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     /** Return random float from range between 0.0 and 1.0.
      */
     frame->regset->set(0, new Float(getrandom()));
 }
 
-void random_randint(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
+void random_randint(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     /** Return random integer from selected range.
      *
      *  Requires two parameters: lower and upper bound.

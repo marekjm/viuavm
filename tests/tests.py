@@ -107,7 +107,7 @@ def disassemble(path, out=None):
 def run(path, expected_exit_code=0):
     """Run given file with Viua CPU and return its output.
     """
-    p = subprocess.Popen(('./build/bin/vm/cpu', path), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen(('./build/bin/vm/kernel', path), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, error = p.communicate()
     exit_code = p.wait()
     if exit_code not in (expected_exit_code if type(expected_exit_code) in [list, tuple] else (expected_exit_code,)):

@@ -21,10 +21,10 @@
 #include <viua/types/pointer.h>
 #include <viua/types/boolean.h>
 #include <viua/types/reference.h>
-#include <viua/cpu/opex.h>
+#include <viua/kernel/opex.h>
 #include <viua/exceptions.h>
 #include <viua/operand.h>
-#include <viua/cpu/cpu.h>
+#include <viua/kernel/kernel.h>
 using namespace std;
 
 
@@ -75,7 +75,7 @@ byte* Process::opress(byte* addr) {
     /*  Run ress instruction.
      */
     int to_register_set = 0;
-    viua::cpu::util::extractOperand<decltype(to_register_set)>(addr, to_register_set);
+    viua::kernel::util::extractOperand<decltype(to_register_set)>(addr, to_register_set);
 
     switch (to_register_set) {
         case 0:

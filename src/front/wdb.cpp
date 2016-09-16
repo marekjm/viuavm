@@ -37,7 +37,7 @@
 #include <viua/types/reference.h>
 #include <viua/loader.h>
 #define AS_DEBUG_HEADER 1
-#include <viua/cpu/cpu.h>
+#include <viua/kernel/kernel.h>
 #include <viua/program.h>
 #include <viua/cg/disassembler/disassembler.h>
 #include <viua/printutils.h>
@@ -46,21 +46,21 @@
 using namespace std;
 
 
-const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file which cannot be run on CPU without prior compilation";
+const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file which cannot be run on Kernel without prior compilation";
 const char* RC_FILENAME = "/.viuavm.db.rc";
 const char* DEBUGGER_COMMAND_HISTORY = "/.viuavmdb_history";
 
 
 const vector<string> DEBUGGER_COMMANDS = {
-    "cpu.",
-    "cpu.init",
-    "cpu.run",
-    "cpu.tick",
-    "cpu.jump",
-    "cpu.unpause",
-    "cpu.resume",
-    "cpu.unfinish",
-    "cpu.counter",
+    "kernel.",
+    "kernel.init",
+    "kernel.run",
+    "kernel.tick",
+    "kernel.jump",
+    "kernel.unpause",
+    "kernel.resume",
+    "kernel.unfinish",
+    "kernel.counter",
     "breakpoint.",
     "breakpoint.set.",
     "breakpoint.set.at",
@@ -111,14 +111,14 @@ bool SHOW_VERSION = false;
 bool VERBOSE = false;
 
 
-OPCODE printInstruction(const CPU& cpu) {
-    byte* iptr = cpu.executionAt();
+OPCODE printInstruction(const Kernel& kernel) {
+    byte* iptr = kernel.executionAt();
 
     string instruction;
     unsigned size;
     tie(instruction, size) = disassembler::instruction(iptr);
 
-    cout << "byte " << (iptr-cpu.bytecode) << hex << " (0x" << (iptr-cpu.bytecode) << ") ";
+    cout << "byte " << (iptr-kernel.bytecode) << hex << " (0x" << (iptr-kernel.bytecode) << ") ";
     cout << "at 0x" << long(iptr) << dec << ": ";
     cout << instruction << endl;
 
@@ -220,24 +220,24 @@ struct State {
 };
 
 
-tuple<bool, string> if_breakpoint_byte(CPU& cpu, vector<byte*>& breakpoints_byte) {
+tuple<bool, string> if_breakpoint_byte(Kernel& kernel, vector<byte*>& breakpoints_byte) {
     bool pause = false;
     ostringstream reason;
     reason.str("");
 
-    if (find(breakpoints_byte.begin(), breakpoints_byte.end(), cpu.executionAt()) != breakpoints_byte.end()) {
-        reason << "info: execution paused by byte breakpoint: " << cpu.executionAt();
+    if (find(breakpoints_byte.begin(), breakpoints_byte.end(), kernel.executionAt()) != breakpoints_byte.end()) {
+        reason << "info: execution paused by byte breakpoint: " << kernel.executionAt();
         pause = true;
     }
 
     return tuple<bool, string>(pause, reason.str());
 }
-tuple<bool, string> if_breakpoint_opcode(CPU& cpu, vector<string>& breakpoints_opcode) {
+tuple<bool, string> if_breakpoint_opcode(Kernel& kernel, vector<string>& breakpoints_opcode) {
     bool pause = false;
     ostringstream reason;
     reason.str("");
 
-    string op_name = OP_NAMES.at(OPCODE(*cpu.executionAt()));
+    string op_name = OP_NAMES.at(OPCODE(*kernel.executionAt()));
 
     if (find(breakpoints_opcode.begin(), breakpoints_opcode.end(), op_name) != breakpoints_opcode.end()) {
         reason << "info: execution halted by opcode breakpoint: " << op_name;
@@ -246,15 +246,15 @@ tuple<bool, string> if_breakpoint_opcode(CPU& cpu, vector<string>& breakpoints_o
 
     return tuple<bool, string>(pause, reason.str());
 }
-tuple<bool, string> if_breakpoint_function(CPU& cpu, vector<string>& breakpoints_function) {
+tuple<bool, string> if_breakpoint_function(Kernel& kernel, vector<string>& breakpoints_function) {
     bool pause = false;
     ostringstream reason;
     reason.str("");
 
-    string op_name = OP_NAMES.at(OPCODE(*cpu.executionAt()));
+    string op_name = OP_NAMES.at(OPCODE(*kernel.executionAt()));
 
     if (op_name == "call") {
-        string function_name = string(reinterpret_cast<char*>(cpu.executionAt()+1+sizeof(bool)+sizeof(int)));
+        string function_name = string(reinterpret_cast<char*>(kernel.executionAt()+1+sizeof(bool)+sizeof(int)));
         if (find(breakpoints_function.begin(), breakpoints_function.end(), function_name) != breakpoints_function.end()) {
             reason << "info: execution halted by function breakpoint: " << function_name;
             pause = true;
@@ -264,11 +264,11 @@ tuple<bool, string> if_breakpoint_function(CPU& cpu, vector<string>& breakpoints
     return tuple<bool, string>(pause, reason.str());
 }
 
-tuple<bool, string> if_watchpoint_local_register_write(CPU& cpu, const State& state) {
+tuple<bool, string> if_watchpoint_local_register_write(Kernel& kernel, const State& state) {
     /** Determine whether the instruction at instruction pointer should trigger a watchpoint.
      */
     bool writing_instruction = true;
-    OPCODE opcode = OPCODE(*cpu.executionAt());
+    OPCODE opcode = OPCODE(*kernel.executionAt());
     if (opcode == NOP or
         opcode == RESS or
         opcode == TMPRI or
@@ -286,7 +286,7 @@ tuple<bool, string> if_watchpoint_local_register_write(CPU& cpu, const State& st
     }
     int register_index[2] = {-1, -1};
     int writes_to = 0;
-    byte* register_index_ptr = (cpu.executionAt()+1);
+    byte* register_index_ptr = (kernel.executionAt()+1);
 
     if (opcode == IZERO or
         opcode == ISTORE or
@@ -360,7 +360,7 @@ tuple<bool, string> if_watchpoint_local_register_write(CPU& cpu, const State& st
     reason.str("");
 
     if (writing_instruction) {
-        auto search = state.watch_register_local_write.find(cpu.trace().back()->function_name);
+        auto search = state.watch_register_local_write.find(kernel.trace().back()->function_name);
         if (search != state.watch_register_local_write.end()) {
             for (int i = 0; i < writes_to; ++i) {
                 if (find(search->second.begin(), search->second.end(), register_index[i]) != search->second.end()) {
@@ -373,11 +373,11 @@ tuple<bool, string> if_watchpoint_local_register_write(CPU& cpu, const State& st
 
     return tuple<bool, string>(pause, reason.str());
 }
-tuple<bool, string> if_watchpoint_global_register_write(CPU& cpu, const State& state) {
+tuple<bool, string> if_watchpoint_global_register_write(Kernel& kernel, const State& state) {
     /** Determine whether the instruction at instruction pointer should trigger a watchpoint.
      */
     bool writing_instruction = true;
-    OPCODE opcode = OPCODE(*cpu.executionAt());
+    OPCODE opcode = OPCODE(*kernel.executionAt());
     if (opcode == NOP or
         opcode == RESS or
         opcode == TMPRI or
@@ -395,7 +395,7 @@ tuple<bool, string> if_watchpoint_global_register_write(CPU& cpu, const State& s
     }
     int register_index[2] = {-1, -1};
     int writes_to = 0;
-    byte* register_index_ptr = (cpu.executionAt()+1);
+    byte* register_index_ptr = (kernel.executionAt()+1);
 
     if (opcode == IZERO or
         opcode == ISTORE or
@@ -481,7 +481,7 @@ tuple<bool, string> if_watchpoint_global_register_write(CPU& cpu, const State& s
 }
 
 
-bool command_verify(string& command, vector<string>& operands, const CPU& cpu, const State& state) {
+bool command_verify(string& command, vector<string>& operands, const Kernel& kernel, const State& state) {
     /** Basic command verification.
      *
      *  This function check only for the most obvious errors and
@@ -495,7 +495,7 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
         if (not operands.size()) {
             cout << "error: missing operands: <key> [value]" << endl;
             verified = false;
-        } else if (operands[0] == "cpu.debug") {
+        } else if (operands[0] == "kernel.debug") {
             if (operands.size() != 1 and (operands.size() > 1 and not (operands[1] == "true" or operands[1] == "false"))) {
                 cout << "error: invalid operand, expected 'true' of 'false'" << endl;
                 verified = false;
@@ -542,16 +542,16 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
             cout << "error: expected at least one integer operand" << endl;
             verified = false;
         }
-    } else if (command == "cpu.init") {
-    } else if (command == "cpu.run") {
+    } else if (command == "kernel.init") {
+    } else if (command == "kernel.run") {
         if (not state.initialised) {
-            cout << "error: CPU is not initialised, use `cpu.init` command before `" << command << "`" << endl;
+            cout << "error: Kernel is not initialised, use `kernel.init` command before `" << command << "`" << endl;
             verified = false;
         } else if (state.paused) {
-            cout << "warn: CPU is paused, use `cpu.resume` command instead of `" << command << "`" << endl;
+            cout << "warn: Kernel is paused, use `kernel.resume` command instead of `" << command << "`" << endl;
             verified = false;
         }
-    } else if (command == "cpu.resume") {
+    } else if (command == "kernel.resume") {
         if (not state.paused) {
             cout << "error: execution has not been paused, cannot resume" << endl;
             verified = false;
@@ -564,15 +564,15 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
         if (operands.size() == 0) {
             operands.emplace_back("0");
         }
-    } else if (command == "cpu.tick") {
+    } else if (command == "kernel.tick") {
         if (not state.initialised) {
-            cout << "error: CPU is not initialised, use `cpu.init` command before `" << command << "`" << endl;
+            cout << "error: Kernel is not initialised, use `kernel.init` command before `" << command << "`" << endl;
             verified = false;
         } else if (state.finished) {
-            cout << "error: CPU has finished execution of loaded program" << endl;
+            cout << "error: Kernel has finished execution of loaded program" << endl;
             verified = false;
         } else if (state.paused) {
-            cout << "warn: CPU is paused, use `cpu.resume` command instead of `" << command << "`" << endl;
+            cout << "warn: Kernel is paused, use `kernel.resume` command instead of `" << command << "`" << endl;
             verified = false;
         } else if (operands.size() > 1) {
             cout << "error: invalid operand size, expected 0 or 1 operand but got " << operands.size() << endl;
@@ -581,7 +581,7 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
             cout << "error: invalid operand, expected integer" << endl;
             verified = false;
         }
-    } else if (command == "cpu.jump") {
+    } else if (command == "kernel.jump") {
         if (operands.size() == 1) {
             if (not (str::isnum(operands[0]) or str::startswith(operands[0], "0x") or operands[0][0] == '+')) {
                 cout << "error: invalid operand, expected:" << endl;
@@ -601,20 +601,20 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
             cout << "error: invalid operand size, expected 1 operand" << endl;
             verified = false;
         }
-    } else if (command == "cpu.unpause") {
+    } else if (command == "kernel.unpause") {
         if (state.finished) {
-            cout << "error: CPU has finished execution, use `cpu.unfinish` instead" << endl;
+            cout << "error: Kernel has finished execution, use `kernel.unfinish` instead" << endl;
             verified = false;
         } else if (not state.paused) {
-            cout << "warning: CPU has not been paused" << endl;
+            cout << "warning: Kernel has not been paused" << endl;
             verified = false;
         }
-    } else if (command == "cpu.unfinish") {
+    } else if (command == "kernel.unfinish") {
         if (not state.finished) {
-            cout << "error: CPU has not finished execution yet" << endl;
+            cout << "error: Kernel has not finished execution yet" << endl;
             verified = false;
         }
-    } else if (command == "cpu.counter") {
+    } else if (command == "kernel.counter") {
     } else if (command == "register.show") {
     } else if (command == "register.local.show") {
     } else if (command == "register.global.show") {
@@ -627,21 +627,21 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
     } else if (command == "loader.function.map" or command == "loader.function.map.show") {
         command = "loader.function.map.show";
         if (operands.size() == 0) {
-            for (pair<string, unsigned> mapping : cpu.function_addresses) {
+            for (pair<string, unsigned> mapping : kernel.function_addresses) {
                 operands.emplace_back(mapping.first);
             }
         }
     } else if (command == "loader.block.map" or command == "loader.block.map.show") {
         command = "loader.block.map.show";
         if (operands.size() == 0) {
-            for (pair<string, unsigned> mapping : cpu.block_addresses) {
+            for (pair<string, unsigned> mapping : kernel.block_addresses) {
                 operands.emplace_back(mapping.first);
             }
         }
     } else if (command == "loader.extern.function.map" or command == "loader.extern.function.map.show") {
         command = "loader.extern.function.map.show";
         if (operands.size() == 0) {
-            for (pair<string, ForeignFunction*> mapping : cpu.foreign_functions) {
+            for (pair<string, ForeignFunction*> mapping : kernel.foreign_functions) {
                 operands.emplace_back(mapping.first);
             }
         }
@@ -654,7 +654,7 @@ bool command_verify(string& command, vector<string>& operands, const CPU& cpu, c
 
     return verified;
 }
-bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State& state) {
+bool command_dispatch(string& command, vector<string>& operands, Kernel& kernel, State& state) {
     /** Command dispatching logic.
      *
      *  This function will modify state of the debugger according to received command and
@@ -664,13 +664,13 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
      *  Returns true on success, false otherwise.
      *  If false is returned, current iteration of debuggers's REPL should be skipped.
      */
-    if (not command_verify(command, operands, cpu, state)) { return false; }
+    if (not command_verify(command, operands, kernel, state)) { return false; }
 
     if (command == "") {
         // do nothing...
     } else if (command == "conf.set") {
-        if (operands[0] == "cpu.debug") {
-            cpu.debug = (operands[0] == "true");
+        if (operands[0] == "kernel.debug") {
+            kernel.debug = (operands[0] == "true");
         }
     } else if (command == "conf.get") {
     } else if (command == "conf.load") {
@@ -682,7 +682,7 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
     } else if (command == "breakpoint.set.at") {
         for (unsigned j = 0; j < operands.size(); ++j) {
             if (str::isnum(operands[j])) {
-                state.breakpoints_byte.emplace_back(cpu.bytecode+stoi(operands[j]));
+                state.breakpoints_byte.emplace_back(kernel.bytecode+stoi(operands[j]));
             } else {
                 cout << "warn: invalid operand, expected integer: " << operands[j] << endl;
             }
@@ -696,7 +696,7 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
             state.breakpoints_function.emplace_back(operands[j]);
         }
     } else if (command == "watch.register.local.write") {
-        string function_name = (operands[0] == "." ? cpu.trace().back()->function_name : operands[0]);
+        string function_name = (operands[0] == "." ? kernel.trace().back()->function_name : operands[0]);
         if (not state.watch_register_local_write.count(function_name)) {
             state.watch_register_local_write[function_name] = vector<int>({});
         }
@@ -707,65 +707,65 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
         for (unsigned i = 1; i < operands.size(); ++i) {
             state.watch_register_global_write.push_back(stoi(operands[i]));
         }
-    } else if (command == "cpu.init") {
-        cpu.iframe();
-        cpu.processes[0]->begin();
+    } else if (command == "kernel.init") {
+        kernel.iframe();
+        kernel.processes[0]->begin();
         state.initialised = true;
-    } else if (command == "cpu.run") {
+    } else if (command == "kernel.run") {
         state.ticks_left = -1;
-    } else if (command == "cpu.resume") {
+    } else if (command == "kernel.resume") {
         state.autoresumes = stoi(operands[0]);
         state.paused = false;
         if (state.ticks_left == 0) {
             cout << "info: resumed, but ticks counter has already reached 0" << endl;
         }
-    } else if (command == "cpu.tick") {
+    } else if (command == "kernel.tick") {
         state.ticks_left = (operands.size() ? stoi(operands[0]) : 1);
-    } else if (command == "cpu.jump") {
+    } else if (command == "kernel.jump") {
         if (operands[0] == "sizeof") {
-            cpu.processes[cpu.current_process_index]->instruction_pointer += OP_SIZES.at(operands[1]);
+            kernel.processes[kernel.current_process_index]->instruction_pointer += OP_SIZES.at(operands[1]);
         } else if (operands[0][0] == '+') {
             unsigned long j = stoul(str::sub(operands[0], 1));
             while (j > 0) {
                 string instruction;
                 unsigned size;
-                tie(instruction, size) = disassembler::instruction(cpu.executionAt());
-                cpu.processes[cpu.current_process_index]->instruction_pointer += size;
+                tie(instruction, size) = disassembler::instruction(kernel.executionAt());
+                kernel.processes[kernel.current_process_index]->instruction_pointer += size;
                 --j;
             }
         } else if (str::startswith(operands[0], "0x")) {
-            cpu.processes[cpu.current_process_index]->instruction_pointer = (cpu.bytecode+stoul(operands[0], nullptr, 16));
+            kernel.processes[kernel.current_process_index]->instruction_pointer = (kernel.bytecode+stoul(operands[0], nullptr, 16));
         } else {
-            cpu.processes[cpu.current_process_index]->instruction_pointer = (cpu.bytecode+stoul(operands[0]));
+            kernel.processes[kernel.current_process_index]->instruction_pointer = (kernel.bytecode+stoul(operands[0]));
         }
-    } else if (command == "cpu.unpause") {
+    } else if (command == "kernel.unpause") {
         state.paused = false;
         state.ticks_left = 0;
-    } else if (command == "cpu.unfinish") {
+    } else if (command == "kernel.unfinish") {
         state.finished = false;
-    } else if (command == "cpu.counter") {
-        cout << cpu.counter() << endl;
+    } else if (command == "kernel.counter") {
+        cout << kernel.counter() << endl;
     } else if (command == "register.show") {
-        printRegisters(operands, cpu.trace().back()->regset);
+        printRegisters(operands, kernel.trace().back()->regset);
     } else if (command == "register.local.show") {
-        printRegisters(operands, cpu.processes[cpu.current_process_index]->uregset);
+        printRegisters(operands, kernel.processes[kernel.current_process_index]->uregset);
     } else if (command == "register.global.show") {
         cout << "FIXME: showing per-process global registers not implemented" << endl;
     } else if (command == "register.static.show") {
-        string fun_name = cpu.trace().back()->function_name;
+        string fun_name = kernel.trace().back()->function_name;
 
         try {
-            printRegisters(operands, cpu.processes[cpu.current_process_index]->static_registers.at(fun_name));
+            printRegisters(operands, kernel.processes[kernel.current_process_index]->static_registers.at(fun_name));
         } catch (const std::out_of_range& e) {
             // OK, now we know that our function does not have static registers
             cout << "error: current function does not have static registers allocated" << endl;
         }
     } else if (command == "arguments.show") {
-        printRegisters(operands, cpu.trace().back()->args);
+        printRegisters(operands, kernel.trace().back()->args);
     } else if (command == "print.ahead") {
-        printInstruction(cpu);
+        printInstruction(kernel);
     } else if (command == "stack.trace.show") {
-        vector<Frame*> stack = cpu.trace();
+        vector<Frame*> stack = kernel.trace();
         string indent("");
         for (unsigned j = 0; j < stack.size(); ++j) {
             cout << indent;
@@ -774,9 +774,9 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
             indent += " ";
         }
     } else if (command == "stack.frame.show") {
-        Frame* top = cpu.trace().back();
+        Frame* top = kernel.trace().back();
         cout << "frame: " << stringifyFunctionInvocation(top) << '\n';
-        cout << "  * index on stack: " << cpu.trace().size() << endl;
+        cout << "  * index on stack: " << kernel.trace().size() << endl;
         cout << "  * return address:  " << top->ret_address() << endl;
         cout << "  * return value:    " << top->place_return_value_in << endl;
         cout << "  * resolve return:  " << (top->resolve_return_value_register ? "yes" : "no") << endl;
@@ -785,7 +785,7 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
         bool exists = false;
         for (string fun : operands) {
             try {
-                addr = cpu.function_addresses.at(fun);
+                addr = kernel.function_addresses.at(fun);
                 exists = true;
             } catch (const std::out_of_range& e) {
                 exists = false;
@@ -802,7 +802,7 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
         bool exists = false;
         for (string fun : operands) {
             try {
-                addr = cpu.block_addresses.at(fun);
+                addr = kernel.block_addresses.at(fun);
                 exists = true;
             } catch (const std::out_of_range& e) {
                 exists = false;
@@ -818,7 +818,7 @@ bool command_dispatch(string& command, vector<string>& operands, CPU& cpu, State
         bool exists = false;
         for (string fun : operands) {
             try {
-                cpu.foreign_functions.at(fun);
+                kernel.foreign_functions.at(fun);
                 exists = true;
             } catch (const std::out_of_range& e) {
                 exists = false;
@@ -866,7 +866,7 @@ void completion(const char* buf, linenoiseCompletions* lc) {
     }
 }
 
-void debuggerMainLoop(CPU& cpu, deque<string> init) {
+void debuggerMainLoop(Kernel& kernel, deque<string> init) {
     /** This function implements main REPL of the debugger.
      *
      *  Viua debugger is kind of interactive beast.
@@ -911,7 +911,7 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
         command = str::chunk(line);
         operands = str::chunks(str::sub(line, command.size()));
 
-        if (not command_dispatch(command, operands, cpu, state)) {
+        if (not command_dispatch(command, operands, kernel, state)) {
             continue;
         }
 
@@ -924,18 +924,18 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
 
             OPCODE printed = NOP;
             try {
-                printed = printInstruction(cpu);
+                printed = printInstruction(kernel);
             } catch (const std::out_of_range& e) {
                 state.exception_type = "RuntimeException";
                 state.exception_message = "unrecognised instruction";
                 state.exception_raised = true;
             }
 
-            byte* ticked = cpu.tick();
+            byte* ticked = kernel.tick();
             if (not state.exception_raised and not state.finished and ticked == nullptr) {
-                state.finished = (cpu.return_exception == "" ? true : false);
+                state.finished = (kernel.return_exception == "" ? true : false);
                 state.ticks_left = 0;
-                cout << "\nmessage: execution " << (cpu.return_exception == "" ? "finished" : "broken") << ": " << cpu.counter() << " instructions executed" << endl;
+                cout << "\nmessage: execution " << (kernel.return_exception == "" ? "finished" : "broken") << ": " << kernel.counter() << " instructions executed" << endl;
             }
 
             if (state.finished) {
@@ -945,9 +945,9 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
                 cout << endl;
             }
 
-            if (cpu.return_exception != "") {
-                state.exception_type = cpu.return_exception;
-                state.exception_message = cpu.return_message;
+            if (kernel.return_exception != "") {
+                state.exception_type = kernel.return_exception;
+                state.exception_message = kernel.return_message;
                 state.exception_raised = true;
             }
 
@@ -958,15 +958,15 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
 
             string pause_reason = "";
 
-            tie(state.paused, pause_reason) = if_breakpoint_byte(cpu, state.breakpoints_byte);
+            tie(state.paused, pause_reason) = if_breakpoint_byte(kernel, state.breakpoints_byte);
             if (not state.paused) {
-                tie(state.paused, pause_reason) = if_breakpoint_opcode(cpu, state.breakpoints_opcode);
+                tie(state.paused, pause_reason) = if_breakpoint_opcode(kernel, state.breakpoints_opcode);
             }
             if (not state.paused) {
-                tie(state.paused, pause_reason) = if_breakpoint_function(cpu, state.breakpoints_function);
+                tie(state.paused, pause_reason) = if_breakpoint_function(kernel, state.breakpoints_function);
             }
             if (not state.paused) {
-                tie(state.paused, pause_reason) = if_watchpoint_local_register_write(cpu, state);
+                tie(state.paused, pause_reason) = if_watchpoint_local_register_write(kernel, state);
             }
 
             if (state.paused) {
@@ -975,7 +975,7 @@ void debuggerMainLoop(CPU& cpu, deque<string> init) {
 
 
             try {
-                op_name = OP_NAMES.at(OPCODE(*cpu.executionAt()));
+                op_name = OP_NAMES.at(OPCODE(*kernel.executionAt()));
             } catch (const std::out_of_range& e) {
                 cout << "fatal: unknown instruction" << endl;
                 state.autoresumes = 0;
@@ -1066,11 +1066,11 @@ int main(int argc, char* argv[]) {
 
     cout << "message: running \"" << filename << "\"" << endl;
 
-    CPU cpu;
-    cpu.debug = true;
+    Kernel kernel;
+    kernel.debug = true;
 
-    viua::front::vm::initialise(&cpu, filename, args);
-    viua::front::vm::load_standard_prototypes(&cpu);
+    viua::front::vm::initialise(&kernel, filename, args);
+    viua::front::vm::load_standard_prototypes(&kernel);
 
     string homedir(getenv("HOME"));
     ifstream local_rc_file(homedir + RC_FILENAME);
@@ -1085,7 +1085,7 @@ int main(int argc, char* argv[]) {
         while (getline(local_rc_file, line)) { init_commands.push_back(line); }
     }
 
-    debuggerMainLoop(cpu, init_commands);
+    debuggerMainLoop(kernel, init_commands);
 
     return 0;
 }

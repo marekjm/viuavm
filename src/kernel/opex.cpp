@@ -18,7 +18,7 @@
  */
 
 #include <viua/bytecode/operand_types.h>
-#include <viua/cpu/opex.h>
+#include <viua/kernel/opex.h>
 
 
 /** NOTICE
@@ -29,7 +29,7 @@
  *  So, that leaves us with reinterpret_cast<> as it will allow the conversion.
  */
 
-void viua::cpu::util::extractIntegerOperand(byte*& instruction_stream, bool& boolean, int& integer) {
+void viua::kernel::util::extractIntegerOperand(byte*& instruction_stream, bool& boolean, int& integer) {
     bool b = false;
     if (*reinterpret_cast<OperandType*>(instruction_stream) == OT_REGISTER_REFERENCE) {
         b = true;
@@ -39,6 +39,6 @@ void viua::cpu::util::extractIntegerOperand(byte*& instruction_stream, bool& boo
     extractOperand<int>(instruction_stream, integer);
 }
 
-void viua::cpu::util::extractFloatingPointOperand(byte*& instruction_stream, float& fp) {
+void viua::kernel::util::extractFloatingPointOperand(byte*& instruction_stream, float& fp) {
     extractOperand<float>(instruction_stream, fp);
 }

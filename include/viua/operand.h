@@ -29,7 +29,7 @@
 #include <viua/bytecode/bytetypedef.h>
 
 
-// forward declaration since we need a pointer to CPU
+// forward declaration since we need a pointer to Kernel
 class Process;
 // and a pointer to Type
 class Type;

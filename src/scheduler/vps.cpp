@@ -27,7 +27,7 @@
 #include <viua/types/exception.h>
 #include <viua/types/pointer.h>
 #include <viua/process.h>
-#include <viua/cpu/cpu.h>
+#include <viua/kernel/kernel.h>
 #include <viua/scheduler/vps.h>
 using namespace std;
 
@@ -44,7 +44,7 @@ static void printStackTrace(Process *process) {
     Exception* ex = dynamic_cast<Exception*>(thrown_object.get());
     string ex_type = thrown_object->type();
 
-    //cout << "exception after " << cpu.counter() << " ticks" << endl;
+    //cout << "exception after " << kernel.counter() << " ticks" << endl;
     //cout << "failed instruction: " << get<0>(disassembler::instruction(process->executionAt())) << endl;
     cout << "uncaught object: " << ex_type << " = " << (ex ? ex->what() : thrown_object->str()) << endl;
     cout << "\n";
@@ -111,7 +111,7 @@ bool viua::scheduler::VirtualProcessScheduler::executeQuant(Process *th, unsigne
     for (unsigned j = 0; (priority == 0 or j < priority); ++j) {
         if (th->stopped()) {
             // remember to break if the process stopped
-            // otherwise the CPU will try to tick the process and
+            // otherwise the Kernel will try to tick the process and
             // it will crash (will try to execute instructions from 0x0 pointer)
             break;
         }
@@ -129,84 +129,84 @@ bool viua::scheduler::VirtualProcessScheduler::executeQuant(Process *th, unsigne
     return true;
 }
 
-CPU* viua::scheduler::VirtualProcessScheduler::cpu() const {
-    return attached_cpu;
+Kernel* viua::scheduler::VirtualProcessScheduler::kernel() const {
+    return attached_kernel;
 }
 
 bool viua::scheduler::VirtualProcessScheduler::isClass(const string& name) const {
-    return attached_cpu->isClass(name);
+    return attached_kernel->isClass(name);
 }
 
 bool viua::scheduler::VirtualProcessScheduler::classAccepts(const string& klass, const string& method) const {
-    return attached_cpu->classAccepts(klass, method);
+    return attached_kernel->classAccepts(klass, method);
 }
 
-auto viua::scheduler::VirtualProcessScheduler::inheritanceChainOf(const std::string& name) const -> decltype(attached_cpu->inheritanceChainOf(name)) {
-    return attached_cpu->inheritanceChainOf(name);
+auto viua::scheduler::VirtualProcessScheduler::inheritanceChainOf(const std::string& name) const -> decltype(attached_kernel->inheritanceChainOf(name)) {
+    return attached_kernel->inheritanceChainOf(name);
 }
 
 bool viua::scheduler::VirtualProcessScheduler::isLocalFunction(const string& name) const {
-    return attached_cpu->isLocalFunction(name);
+    return attached_kernel->isLocalFunction(name);
 }
 
 bool viua::scheduler::VirtualProcessScheduler::isLinkedFunction(const string& name) const {
-    return attached_cpu->isLinkedFunction(name);
+    return attached_kernel->isLinkedFunction(name);
 }
 
 bool viua::scheduler::VirtualProcessScheduler::isNativeFunction(const string& name) const {
-    return attached_cpu->isNativeFunction(name);
+    return attached_kernel->isNativeFunction(name);
 }
 
 bool viua::scheduler::VirtualProcessScheduler::isForeignMethod(const string& name) const {
-    return attached_cpu->isForeignMethod(name);
+    return attached_kernel->isForeignMethod(name);
 }
 
 bool viua::scheduler::VirtualProcessScheduler::isForeignFunction(const string& name) const {
-    return attached_cpu->isForeignFunction(name);
+    return attached_kernel->isForeignFunction(name);
 }
 
 bool viua::scheduler::VirtualProcessScheduler::isBlock(const string& name) const {
-    return attached_cpu->isBlock(name);
+    return attached_kernel->isBlock(name);
 }
 
 bool viua::scheduler::VirtualProcessScheduler::isLocalBlock(const string& name) const {
-    return attached_cpu->isLocalBlock(name);
+    return attached_kernel->isLocalBlock(name);
 }
 
 bool viua::scheduler::VirtualProcessScheduler::isLinkedBlock(const string& name) const {
-    return attached_cpu->isLinkedBlock(name);
+    return attached_kernel->isLinkedBlock(name);
 }
 
 pair<byte*, byte*> viua::scheduler::VirtualProcessScheduler::getEntryPointOfBlock(const std::string& name) const {
-    return attached_cpu->getEntryPointOfBlock(name);
+    return attached_kernel->getEntryPointOfBlock(name);
 }
 
 string viua::scheduler::VirtualProcessScheduler::resolveMethodName(const string& klass, const string& method) const {
-    return attached_cpu->resolveMethodName(klass, method);
+    return attached_kernel->resolveMethodName(klass, method);
 }
 
 pair<byte*, byte*> viua::scheduler::VirtualProcessScheduler::getEntryPointOf(const std::string& name) const {
-    return attached_cpu->getEntryPointOf(name);
+    return attached_kernel->getEntryPointOf(name);
 }
 
 void viua::scheduler::VirtualProcessScheduler::registerPrototype(Prototype *proto) {
-    attached_cpu->registerPrototype(proto);
+    attached_kernel->registerPrototype(proto);
 }
 
 void viua::scheduler::VirtualProcessScheduler::requestForeignFunctionCall(Frame *frame, Process *p) const {
-    attached_cpu->requestForeignFunctionCall(frame, p);
+    attached_kernel->requestForeignFunctionCall(frame, p);
 }
 
 void viua::scheduler::VirtualProcessScheduler::requestForeignMethodCall(const string& name, Type *object, Frame *frame, RegisterSet*, RegisterSet*, Process *p) {
-    attached_cpu->requestForeignMethodCall(name, object, frame, nullptr, nullptr, p);
+    attached_kernel->requestForeignMethodCall(name, object, frame, nullptr, nullptr, p);
 }
 
 void viua::scheduler::VirtualProcessScheduler::loadNativeLibrary(const string& name) {
-    attached_cpu->loadNativeLibrary(name);
+    attached_kernel->loadNativeLibrary(name);
 }
 
 void viua::scheduler::VirtualProcessScheduler::loadForeignLibrary(const string& name) {
-    attached_cpu->loadForeignLibrary(name);
+    attached_kernel->loadForeignLibrary(name);
 }
 
 auto viua::scheduler::VirtualProcessScheduler::cpi() const -> decltype(processes)::size_type {
@@ -234,10 +234,10 @@ Process* viua::scheduler::VirtualProcessScheduler::spawn(unique_ptr<Frame> frame
     }
 
     Process *process_ptr = p.get();
-    attached_cpu->createMailbox(process_ptr->pid());
+    attached_kernel->createMailbox(process_ptr->pid());
 
     if (processes.size() > heavy_load) {
-        attached_cpu->postFreeProcess(std::move(p));
+        attached_kernel->postFreeProcess(std::move(p));
     } else {
         processes.emplace_back(std::move(p));
     }
@@ -275,19 +275,19 @@ void viua::scheduler::VirtualProcessScheduler::send(const PID pid, unique_ptr<Ty
 #if VIUA_VM_DEBUG_LOG
     cerr << "[sched:vps:send] pid = " << pid.get() << endl;
 #endif
-    attached_cpu->send(pid, std::move(message));
+    attached_kernel->send(pid, std::move(message));
 }
 
 void viua::scheduler::VirtualProcessScheduler::receive(const PID pid, queue<unique_ptr<Type>>& message_queue) {
 #if VIUA_VM_DEBUG_LOG
     cerr << "[sched:vps:receive] pid = " << pid.get() << endl;
 #endif
-    attached_cpu->receive(pid, message_queue);
+    attached_kernel->receive(pid, message_queue);
 }
 
 bool viua::scheduler::VirtualProcessScheduler::burst() {
     if (not processes.size()) {
-        // make CPU stop if there are no processes_list to run
+        // make Kernel stop if there are no processes_list to run
         return false;
     }
 
@@ -384,7 +384,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                 watchdog_process->pass(unique_ptr<Type>(death_message));
             }
 
-            attached_cpu->deleteMailbox(th->pid());
+            attached_kernel->deleteMailbox(th->pid());
             // push broken process to dead processes_list list to
             // erase it later
             dead_processes_list.emplace_back(std::move(processes.at(i)));
@@ -396,7 +396,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
         // schedule for removal thus shortening the vector of running processes_list and
         // speeding up execution
         if (th->stopped() and (not th->joinable())) {
-            attached_cpu->deleteMailbox(processes.at(i)->pid());
+            attached_kernel->deleteMailbox(processes.at(i)->pid());
             dead_processes_list.emplace_back(std::move(processes.at(i)));
         } else {
             running_processes_list.emplace_back(std::move(processes.at(i)));
@@ -468,10 +468,10 @@ int viua::scheduler::VirtualProcessScheduler::exit() const {
     return exit_code;
 }
 
-viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(CPU *acpu, vector<unique_ptr<Process>> *fp,
+viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(Kernel *akernel, vector<unique_ptr<Process>> *fp,
                                                                   mutex *fp_mtx,
                                                                   condition_variable *fp_cv):
-    attached_cpu(acpu),
+    attached_kernel(akernel),
     free_processes(fp),
     free_processes_mutex(fp_mtx),
     free_processes_cv(fp_cv),
@@ -485,7 +485,7 @@ viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(CPU *acpu, vec
 }
 
 viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(VirtualProcessScheduler&& that) {
-    attached_cpu = that.attached_cpu;
+    attached_kernel = that.attached_kernel;
 
     free_processes = that.free_processes;
     free_processes_mutex = that.free_processes_mutex;

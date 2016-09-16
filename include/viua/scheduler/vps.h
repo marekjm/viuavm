@@ -29,10 +29,10 @@
 #include <mutex>
 #include <atomic>
 #include <viua/bytecode/bytetypedef.h>
-#include <viua/cpu/frame.h>
+#include <viua/kernel/frame.h>
 
 
-class CPU;
+class Kernel;
 class Process;
 
 
@@ -41,7 +41,7 @@ namespace viua {
         class VirtualProcessScheduler {
             /** Scheduler of Viua VM virtual processes.
              */
-            CPU *attached_cpu;
+            Kernel *attached_kernel;
 
             std::vector<std::unique_ptr<Process>> *free_processes;
             std::mutex *free_processes_mutex;
@@ -58,7 +58,7 @@ namespace viua {
 
             void resurrectWatchdog();
 
-            // if scheduler hits heavy load it starts posting processes to CPU
+            // if scheduler hits heavy load it starts posting processes to Kernel
             // to let other schedulers at them
             const decltype(processes)::size_type heavy_load = 16;
             const decltype(processes)::size_type light_load = 4;
@@ -68,11 +68,11 @@ namespace viua {
 
             public:
 
-            CPU* cpu() const;
+            Kernel* kernel() const;
 
             bool isClass(const std::string&) const;
             bool classAccepts(const std::string&, const std::string&) const;
-            auto inheritanceChainOf(const std::string& name) const -> decltype(attached_cpu->inheritanceChainOf(name));
+            auto inheritanceChainOf(const std::string& name) const -> decltype(attached_kernel->inheritanceChainOf(name));
             bool isLocalFunction(const std::string&) const;
             bool isLinkedFunction(const std::string&) const;
             bool isNativeFunction(const std::string&) const;
@@ -117,7 +117,7 @@ namespace viua {
             void join();
             int exit() const;
 
-            VirtualProcessScheduler(CPU*, std::vector<std::unique_ptr<Process>>*, std::mutex*, std::condition_variable*);
+            VirtualProcessScheduler(Kernel*, std::vector<std::unique_ptr<Process>>*, std::mutex*, std::condition_variable*);
             VirtualProcessScheduler(VirtualProcessScheduler&&);
             ~VirtualProcessScheduler();
         };

@@ -80,7 +80,7 @@ Type* Pointer::copy() const {
 }
 
 
-void Pointer::expired(Frame* frm, RegisterSet*, RegisterSet*, Process*, CPU*) {
+void Pointer::expired(Frame* frm, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     frm->regset->set(0, new Boolean(expired()));
 }
 

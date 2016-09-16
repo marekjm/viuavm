@@ -26,15 +26,15 @@
 #include <viua/types/string.h>
 #include <viua/types/process.h>
 #include <viua/loader.h>
-#include <viua/cpu/cpu.h>
+#include <viua/kernel/kernel.h>
 
 
 namespace viua {
     namespace front {
         namespace vm {
-            void initialise(CPU*, const std::string&, std::vector<std::string>);
-            void load_standard_prototypes(CPU*);
-            void preload_libraries(CPU*);
+            void initialise(Kernel*, const std::string&, std::vector<std::string>);
+            void load_standard_prototypes(Kernel*);
+            void preload_libraries(Kernel*);
         }
     }
 }

@@ -24,11 +24,11 @@
 
 #include <vector>
 #include <viua/types/type.h>
-#include <viua/cpu/frame.h>
+#include <viua/kernel/frame.h>
 
 
 class Process;
-class CPU;
+class Kernel;
 
 class Pointer: public Type {
         Type* points_to;
@@ -42,7 +42,7 @@ class Pointer: public Type {
         void reset(Type* t);
         Type* to();
 
-        virtual void expired(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
+        virtual void expired(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
 
         std::string str() const override;
 

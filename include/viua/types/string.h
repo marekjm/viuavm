@@ -27,12 +27,12 @@
 #include <viua/types/vector.h>
 #include <viua/types/integer.h>
 #include <viua/support/string.h>
-#include <viua/cpu/frame.h>
-#include <viua/cpu/registerset.h>
+#include <viua/kernel/frame.h>
+#include <viua/kernel/registerset.h>
 
 
 class Process;
-class CPU;
+class Kernel;
 
 class String : public Type {
     /** String type.
@@ -66,18 +66,18 @@ class String : public Type {
         String* add(String*);
         String* join(Vector*);
 
-        virtual void stringify(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
-        virtual void represent(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
+        virtual void stringify(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
+        virtual void represent(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
 
-        virtual void startswith(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
-        virtual void endswith(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
+        virtual void startswith(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
+        virtual void endswith(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
 
-        virtual void format(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
-        virtual void substr(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
-        virtual void concatenate(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
-        virtual void join(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
+        virtual void format(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
+        virtual void substr(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
+        virtual void concatenate(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
+        virtual void join(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
 
-        virtual void size(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*);
+        virtual void size(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
 
         String(std::string s = ""): svalue(s) {}
 };

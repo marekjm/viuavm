@@ -23,20 +23,20 @@
 #include <viua/types/string.h>
 #include <viua/types/vector.h>
 #include <viua/types/exception.h>
-#include <viua/cpu/frame.h>
-#include <viua/cpu/registerset.h>
+#include <viua/kernel/frame.h>
+#include <viua/kernel/registerset.h>
 #include <viua/include/module.h>
 using namespace std;
 
 
-void typeof(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
+void typeof(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     if (frame->args->at(0) == 0) {
         throw new Exception("expected object as parameter 0");
     }
     frame->regset->set(0, new String(frame->args->get(0)->type()));
 }
 
-void inheritanceChain(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
+void inheritanceChain(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     if (frame->args->at(0) == 0) {
         throw new Exception("expected object as parameter 0");
     }
@@ -51,7 +51,7 @@ void inheritanceChain(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) 
     frame->regset->set(0, icv);
 }
 
-void bases(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
+void bases(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     if (frame->args->at(0) == 0) {
         throw new Exception("expected object as parameter 0");
     }

@@ -22,7 +22,7 @@
 #include <sstream>
 #include <viua/types/object.h>
 #include <viua/types/exception.h>
-#include <viua/cpu/frame.h>
+#include <viua/kernel/frame.h>
 using namespace std;
 
 

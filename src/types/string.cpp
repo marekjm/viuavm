@@ -82,21 +82,21 @@ String* String::join(Vector* v) {
 }
 
 // foreign methods
-void String::stringify(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
+void String::stringify(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     if (frame->args->size() < 2) {
         throw new Exception("expected 2 parameters");
     }
     svalue = static_cast<Pointer*>(frame->args->at(1))->to()->str();
 }
 
-void String::represent(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
+void String::represent(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     if (frame->args->size() < 2) {
         throw new Exception("expected 2 parameters");
     }
     svalue = static_cast<Pointer*>(frame->args->at(1))->to()->repr();
 }
 
-void String::startswith(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
+void String::startswith(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     string s = static_cast<String*>(frame->args->at(1))->value();
     bool starts_with = false;
 
@@ -113,7 +113,7 @@ void String::startswith(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*
     frame->regset->set(0, new Boolean(starts_with));
 }
 
-void String::endswith(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
+void String::endswith(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     string s = static_cast<String*>(frame->args->at(1))->value();
     bool ends_with = false;
 
@@ -132,7 +132,7 @@ void String::endswith(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) 
     frame->regset->set(0, new Boolean(ends_with));
 }
 
-void String::format(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
+void String::format(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     regex key_regex("#\\{(?:(?:0|[1-9][0-9]*)|[a-zA-Z_][a-zA-Z0-9_]*)\\}");
 
     string result = svalue;
@@ -167,7 +167,7 @@ void String::format(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
     frame->regset->set(0, new String(result));
 }
 
-void String::substr(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
+void String::substr(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     int begin = 0;
     int end = -1;
 
@@ -188,14 +188,14 @@ void String::substr(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
     frame->regset->set(0, sub(begin, end));
 }
 
-void String::concatenate(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
+void String::concatenate(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     frame->regset->set(0, new String(static_cast<String*>(frame->args->at(0))->value() + static_cast<String*>(frame->args->at(1))->value()));
 }
 
-void String::join(Frame*, RegisterSet*, RegisterSet*, Process*, CPU*) {
+void String::join(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     // TODO: implement
 }
 
-void String::size(Frame* frame, RegisterSet*, RegisterSet*, Process*, CPU*) {
+void String::size(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     frame->regset->set(0, new Integer(static_cast<int>(svalue.size())));
 }

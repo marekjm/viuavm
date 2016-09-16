@@ -19,10 +19,10 @@
 
 #include <viua/types/boolean.h>
 #include <viua/types/reference.h>
-#include <viua/cpu/opex.h>
+#include <viua/kernel/opex.h>
 #include <viua/exceptions.h>
 #include <viua/operand.h>
-#include <viua/cpu/cpu.h>
+#include <viua/kernel/kernel.h>
 #include <viua/scheduler/vps.h>
 using namespace std;
 
@@ -103,7 +103,7 @@ byte* Process::opcall(byte* addr) {
     bool return_register_ref = false;
     int return_register_index = 0;
     // FIXME: register indexes should be encoded as unsigned integers
-    viua::cpu::util::extractIntegerOperand(addr, return_register_ref, return_register_index);
+    viua::kernel::util::extractIntegerOperand(addr, return_register_ref, return_register_index);
 
     string call_name = viua::operand::extractString(addr);
 

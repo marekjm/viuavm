@@ -23,12 +23,12 @@
 #include <viua/types/pointer.h>
 #include <viua/types/object.h>
 #include <viua/types/string.h>
-#include <viua/cpu/opex.h>
+#include <viua/kernel/opex.h>
 #include <viua/exceptions.h>
-#include <viua/cpu/registerset.h>
+#include <viua/kernel/registerset.h>
 #include <viua/operand.h>
 #include <viua/assert.h>
-#include <viua/cpu/cpu.h>
+#include <viua/kernel/kernel.h>
 #include <viua/scheduler/vps.h>
 using namespace std;
 
@@ -59,7 +59,7 @@ byte* Process::opmsg(byte* addr) {
     int return_register_index;
     bool return_register_ref = false;
 
-    viua::cpu::util::extractIntegerOperand(addr, return_register_ref, return_register_index);
+    viua::kernel::util::extractIntegerOperand(addr, return_register_ref, return_register_index);
 
     if (return_register_ref) {
         // FIXME: remove the need for static_cast<>

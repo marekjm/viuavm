@@ -24,7 +24,7 @@
 
 #include <string>
 #include <viua/bytecode/bytetypedef.h>
-#include <viua/cpu/registerset.h>
+#include <viua/kernel/registerset.h>
 
 class Frame {
         bool owns_local_register_set;

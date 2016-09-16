@@ -20,10 +20,10 @@
 #include <cstdint>
 #include <iostream>
 #include <viua/types/boolean.h>
-#include <viua/cpu/opex.h>
+#include <viua/kernel/opex.h>
 #include <viua/exceptions.h>
 #include <viua/operand.h>
-#include <viua/cpu/cpu.h>
+#include <viua/kernel/kernel.h>
 using namespace std;
 
 
@@ -52,8 +52,8 @@ byte* Process::opbranch(byte* addr) {
     Type* condition = viua::operand::extract(addr)->resolve(this);
 
     uint64_t addr_true, addr_false;
-    viua::cpu::util::extractOperand<decltype(addr_true)>(addr, addr_true);
-    viua::cpu::util::extractOperand<decltype(addr_false)>(addr, addr_false);
+    viua::kernel::util::extractOperand<decltype(addr_true)>(addr, addr_true);
+    viua::kernel::util::extractOperand<decltype(addr_false)>(addr, addr_false);
 
     return (jump_base + (condition->boolean() ? addr_true : addr_false));
 }

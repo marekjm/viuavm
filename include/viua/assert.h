@@ -23,7 +23,7 @@
 #pragma once
 
 #include <string>
-#include <viua/cpu/frame.h>
+#include <viua/kernel/frame.h>
 #include <viua/types/type.h>
 #include <viua/exceptions.h>
 

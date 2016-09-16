@@ -21,7 +21,7 @@
 #include <viua/bytecode/maps.h>
 #include <viua/types/exception.h>
 #include <viua/process.h>
-#include <viua/cpu/cpu.h>
+#include <viua/kernel/kernel.h>
 using namespace std;
 
 

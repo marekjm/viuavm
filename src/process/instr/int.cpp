@@ -26,9 +26,9 @@
 #include <viua/types/byte.h>
 #include <viua/types/casts/integer.h>
 #include <viua/exceptions.h>
-#include <viua/cpu/opex.h>
+#include <viua/kernel/opex.h>
 #include <viua/operand.h>
-#include <viua/cpu/cpu.h>
+#include <viua/kernel/kernel.h>
 #include <viua/assert.h>
 using namespace std;
 
