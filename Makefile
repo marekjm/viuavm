@@ -38,20 +38,13 @@ remake: clean all
 ############################################################
 # CLEANING
 clean: clean-support clean-test-compiles clean-stdlib
-	rm -f ./build/bin/vm/*
-	rm -f ./build/bin/opcodes.bin
-	rm -f ./build/lib/*.o
-	rm -f ./build/kernel/*.o
-	rm -f ./build/process/instr/*.o
-	rm -f ./build/process/*.o
-	rm -f ./build/cg/assembler/*.o
-	rm -f ./build/cg/disassembler/*.o
-	rm -f ./build/cg/bytecode/*.o
-	rm -f ./build/bin/vm/*
-	rm -f ./build/platform/*.o
-	rm -f ./build/test/*
-	rm -f ./build/types/*.o
-	rm -f ./build/*.o
+	find ./build -name '*.o' | xargs -n 1 rm -fv
+	find ./build -name '*.so' | xargs -n 1 rm -fv
+	find ./build -name '*.bin' | xargs -n 1 rm -fv
+	find ./build -name '*.vlib' | xargs -n 1 rm -fv
+	rm -fv *.o
+	rm -fv *.so
+	rm -fv *.vlib
 
 clean-support:
 	rm -f ./build/support/*.o
