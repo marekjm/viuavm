@@ -41,21 +41,23 @@ byte* Process::opnot(byte* addr) {
 }
 
 byte* Process::opand(byte* addr) {
-    auto target = viua::operand::extract(addr);
-    auto first = viua::operand::extract(addr);
-    auto second = viua::operand::extract(addr);
+    unsigned target = 0, first = 0, second = 0;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, first) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, second) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    place(viua::operand::getRegisterIndex(target.get(), this), new Boolean(first->resolve(this)->boolean() and second->resolve(this)->boolean()));
+    place(target, new Boolean(fetch(first)->boolean() and fetch(second)->boolean()));
 
     return addr;
 }
 
 byte* Process::opor(byte* addr) {
-    auto target = viua::operand::extract(addr);
-    auto first = viua::operand::extract(addr);
-    auto second = viua::operand::extract(addr);
+    unsigned target = 0, first = 0, second = 0;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, first) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, second) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    place(viua::operand::getRegisterIndex(target.get(), this), new Boolean(first->resolve(this)->boolean() or second->resolve(this)->boolean()));
+    place(target, new Boolean(fetch(first)->boolean() or fetch(second)->boolean()));
 
     return addr;
 }
