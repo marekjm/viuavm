@@ -111,7 +111,8 @@ byte* Process::opcall(byte* addr) {
     // FIXME: register indexes should be encoded as unsigned integers
     viua::kernel::util::extractIntegerOperand(addr, return_register_ref, return_register_index);
 
-    string call_name = viua::operand::extractString(addr);
+    string call_name;
+    tie(addr, call_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     bool is_native = scheduler->isNativeFunction(call_name);
     bool is_foreign = scheduler->isForeignFunction(call_name);
@@ -142,7 +143,8 @@ byte* Process::opcall(byte* addr) {
 byte* Process::optailcall(byte* addr) {
     /*  Run tailcall instruction.
      */
-    string call_name = viua::operand::extractString(addr);
+    string call_name;
+    tie(addr, call_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     bool is_native = scheduler->isNativeFunction(call_name);
     bool is_foreign = scheduler->isForeignFunction(call_name);
