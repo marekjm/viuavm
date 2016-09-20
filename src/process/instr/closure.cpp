@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <viua/bytecode/bytetypedef.h>
+#include <viua/bytecode/decoder/operands.h>
 #include <viua/types/type.h>
 #include <viua/types/integer.h>
 #include <viua/types/function.h>
@@ -133,11 +134,9 @@ byte* Process::opfunction(byte* addr) {
 byte* Process::opfcall(byte* addr) {
     /*  Call a function object.
      */
-    int return_value_reg;
-    bool return_value_ref;
-    viua::kernel::util::extractIntegerOperand(addr, return_value_ref, return_value_reg);
-
-    unsigned fn_reg = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned return_register = 0, fn_reg = 0;
+    tie(addr, return_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, fn_reg) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     // FIXME: there should be a check it this is *really* a function object
     Function* fn = static_cast<Function*>(fetch(fn_reg));
@@ -161,8 +160,7 @@ byte* Process::opfcall(byte* addr) {
     frame_new->function_name = call_name;
     frame_new->return_address = return_address;
 
-    frame_new->resolve_return_value_register = return_value_ref;
-    frame_new->place_return_value_in = static_cast<unsigned>(return_value_reg);
+    frame_new->place_return_value_in = return_register;
 
     if (fn->type() == "Closure") {
         frame_new->setLocalRegisterSet(static_cast<Closure*>(fn)->regset, false);

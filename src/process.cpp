@@ -223,7 +223,7 @@ byte* Process::adjustJumpBaseFor(const string& call_name) {
     jump_base = ep.second;
     return entry_point;
 }
-byte* Process::callNative(byte* return_address, const string& call_name, const bool return_ref, const unsigned return_index, const string&) {
+byte* Process::callNative(byte* return_address, const string& call_name, const unsigned return_index, const string&) {
     byte* call_address = adjustJumpBaseFor(call_name);
 
     if (not frame_new) {
@@ -233,14 +233,13 @@ byte* Process::callNative(byte* return_address, const string& call_name, const b
     frame_new->function_name = call_name;
     frame_new->return_address = return_address;
 
-    frame_new->resolve_return_value_register = return_ref;
     frame_new->place_return_value_in = return_index;
 
     pushFrame();
 
     return call_address;
 }
-byte* Process::callForeign(byte* return_address, const string& call_name, const bool return_ref, const unsigned return_index, const string&) {
+byte* Process::callForeign(byte* return_address, const string& call_name, const unsigned return_index, const string&) {
     if (not frame_new) {
         throw new Exception("external function call without a frame: use `frame 0' in source code if the function takes no parameters");
     }
@@ -248,7 +247,6 @@ byte* Process::callForeign(byte* return_address, const string& call_name, const 
     frame_new->function_name = call_name;
     frame_new->return_address = return_address;
 
-    frame_new->resolve_return_value_register = return_ref;
     frame_new->place_return_value_in = return_index;
 
     suspend();
@@ -256,7 +254,7 @@ byte* Process::callForeign(byte* return_address, const string& call_name, const 
 
     return return_address;
 }
-byte* Process::callForeignMethod(byte* return_address, Type* object, const string& call_name, const bool return_ref, const unsigned return_index, const string&) {
+byte* Process::callForeignMethod(byte* return_address, Type* object, const string& call_name, const unsigned return_index, const string&) {
     if (not frame_new) {
         throw new Exception("foreign method call without a frame");
     }
@@ -264,7 +262,6 @@ byte* Process::callForeignMethod(byte* return_address, Type* object, const strin
     frame_new->function_name = call_name;
     frame_new->return_address = return_address;
 
-    frame_new->resolve_return_value_register = return_ref;
     frame_new->place_return_value_in = return_index;
 
     Frame* frame = frame_new.get();
@@ -291,7 +288,6 @@ byte* Process::callForeignMethod(byte* return_address, Type* object, const strin
     Type* returned = nullptr;
     bool returned_is_reference = false;
     unsigned return_value_register = frames.back()->place_return_value_in;
-    bool resolve_return_value_register = frames.back()->resolve_return_value_register;
     if (return_value_register != 0) {
         // we check in 0. register because it's reserved for return values
         if (uregset->at(0) == nullptr) {
@@ -304,9 +300,6 @@ byte* Process::callForeignMethod(byte* return_address, Type* object, const strin
 
     // place return value
     if (returned and frames.size() > 0) {
-        if (resolve_return_value_register) {
-            return_value_register = static_cast<Integer*>(fetch(return_value_register))->as_unsigned();
-        }
         place(return_value_register, returned);
         if (returned_is_reference) {
             uregset->flag(return_value_register, REFERENCE);

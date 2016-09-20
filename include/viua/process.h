@@ -136,11 +136,11 @@ class Process {
     byte* adjustJumpBaseForBlock(const std::string&);
     byte* adjustJumpBaseFor(const std::string&);
     // call native (i.e. written in Viua) function
-    byte* callNative(byte*, const std::string&, const bool, const unsigned, const std::string&);
+    byte* callNative(byte*, const std::string&, const unsigned, const std::string&);
     // call foreign (i.e. from a C++ extension) function
-    byte* callForeign(byte*, const std::string&, const bool, const unsigned, const std::string&);
+    byte* callForeign(byte*, const std::string&, const unsigned, const std::string&);
     // call foreign method (i.e. method of a pure-C++ class loaded into machine's typesystem)
-    byte* callForeignMethod(byte*, Type*, const std::string&, const bool, const unsigned, const std::string&);
+    byte* callForeignMethod(byte*, Type*, const std::string&, const unsigned, const std::string&);
 
     /*  Stack unwinding methods.
      */

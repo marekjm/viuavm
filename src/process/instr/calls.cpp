@@ -131,11 +131,11 @@ byte* Process::opcall(byte* addr) {
             throw new Exception("frame must have at least one argument when used to call a foreign method");
         }
         Type* obj = frame_new->args->at(0);
-        return callForeignMethod(addr, obj, call_name, false, return_register, call_name);
+        return callForeignMethod(addr, obj, call_name, return_register, call_name);
     }
 
     auto caller = (is_native ? &Process::callNative : &Process::callForeign);
-    return (this->*caller)(addr, call_name, false, return_register, "");
+    return (this->*caller)(addr, call_name, return_register, "");
 }
 
 byte* Process::optailcall(byte* addr) {
@@ -178,7 +178,6 @@ byte* Process::opreturn(byte* addr) {
 
     Type* returned = nullptr;
     unsigned return_value_register = frames.back()->place_return_value_in;
-    bool resolve_return_value_register = frames.back()->resolve_return_value_register;
     if (return_value_register != 0) {
         // we check in 0. register because it's reserved for return values
         if (uregset->at(0) == nullptr) {
@@ -191,9 +190,6 @@ byte* Process::opreturn(byte* addr) {
 
     // place return value
     if (returned and frames.size() > 0) {
-        if (resolve_return_value_register) {
-            return_value_register = static_cast<Integer*>(fetch(return_value_register))->as_unsigned();
-        }
         place(return_value_register, returned);
     }
 

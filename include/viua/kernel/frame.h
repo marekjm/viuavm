@@ -34,7 +34,6 @@ class Frame {
         RegisterSet* regset;
 
         unsigned place_return_value_in;
-        bool resolve_return_value_register;
 
         std::string function_name;
 
@@ -46,7 +45,7 @@ class Frame {
             owns_local_register_set(true),
             return_address(ra),
             args(nullptr), regset(nullptr),
-            place_return_value_in(0), resolve_return_value_register(false)
+            place_return_value_in(0)
         {
             args = new RegisterSet(argsize);
             regset = new RegisterSet(regsize);
