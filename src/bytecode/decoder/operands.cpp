@@ -55,5 +55,5 @@ auto viua::bytecode::decoder::operands::fetch_register_index(byte *ip, Process *
         }
         register_index = static_cast<unsigned>(i->as_integer());
     }
-    return {ip, register_index};
+    return tuple<byte*, unsigned>(ip, register_index);
 }
