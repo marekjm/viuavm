@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <viua/bytecode/decoder/operands.h>
 #include <viua/types/boolean.h>
 #include <viua/types/reference.h>
 #include <viua/kernel/opex.h>
@@ -30,8 +31,9 @@ using namespace std;
 byte* Process::opframe(byte* addr) {
     /** Create new frame for function calls.
      */
-    unsigned arguments = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    unsigned local_registers = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned arguments = 0, local_registers = 0;
+    tie(addr, arguments) = viua::bytecode::decoder::operands::fetch_primitive_uint(addr, this);
+    tie(addr, local_registers) = viua::bytecode::decoder::operands::fetch_primitive_uint(addr, this);
 
     requestNewFrame(arguments, local_registers);
 
