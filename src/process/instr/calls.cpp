@@ -76,8 +76,9 @@ byte* Process::oppamv(byte* addr) {
 byte* Process::oparg(byte* addr) {
     /** Run arg instruction.
      */
-    unsigned destination_register_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    unsigned parameter_no_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned destination_register_index = 0, parameter_no_operand_index = 0;
+    tie(addr, destination_register_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, parameter_no_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     if (parameter_no_operand_index >= frames.back()->args->size()) {
         ostringstream oss;
@@ -95,7 +96,8 @@ byte* Process::oparg(byte* addr) {
 }
 
 byte* Process::opargc(byte* addr) {
-    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = 0;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     uregset->set(target, new Integer(static_cast<int>(frames.back()->args->size())));
 
     return addr;
