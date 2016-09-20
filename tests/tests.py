@@ -45,6 +45,8 @@ import unittest
 
 COMPILED_SAMPLES_PATH = './tests/compiled'
 
+VIUA_KERNEL_PATH = './build/bin/vm/kernel'
+
 
 class ViuaError(Exception):
     """Generic Viua exception.
@@ -107,7 +109,7 @@ def disassemble(path, out=None):
 def run(path, expected_exit_code=0):
     """Run given file with Viua CPU and return its output.
     """
-    p = subprocess.Popen(('./build/bin/vm/kernel', path), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen((VIUA_KERNEL_PATH, path), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, error = p.communicate()
     exit_code = p.wait()
     if exit_code not in (expected_exit_code if type(expected_exit_code) in [list, tuple] else (expected_exit_code,)):
@@ -161,7 +163,7 @@ def valgrindSummary(text):
 def valgrindCheck(self, path):
     """Run compiled code under Valgrind to check for memory leaks.
     """
-    p = subprocess.Popen(('valgrind', '--suppressions=./scripts/valgrind.supp', './build/bin/vm/cpu', path), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen(('valgrind', '--suppressions=./scripts/valgrind.supp', VIUA_KERNEL_PATH, path), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, error = p.communicate()
     exit_code = p.wait()
 
@@ -220,7 +222,7 @@ def valgrindCheck(self, path):
         options = ('--suppressions=./scripts/valgrind.supp', '--leak-check=full',)
         if os.environ.get('PROJECT_NAME', ''):  # running on TravisCI
             options += ('--show-reachable=yes',)
-        arguments = ('valgrind',) + options + ('./build/bin/vm/cpu', path,)
+        arguments = ('valgrind',) + options + (VIUA_KERNEL_PATH, path,)
         p = subprocess.Popen(arguments, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output, error = p.communicate()
         exit_code = p.wait()
