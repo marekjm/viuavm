@@ -19,6 +19,7 @@
 
 #include <string>
 #include <viua/bytecode/bytetypedef.h>
+#include <viua/bytecode/decoder/operands.h>
 #include <viua/types/type.h>
 #include <viua/types/integer.h>
 #include <viua/types/float.h>
@@ -32,26 +33,34 @@ using namespace std;
 
 
 byte* Process::opitof(byte* addr) {
-    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    int convert_from = static_cast<Integer*>(viua::operand::extract(addr)->resolve(this))->value();
+    unsigned target = 0, source = 0;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+
+    int convert_from = static_cast<Integer*>(fetch(source))->value();
     place(target, new Float(static_cast<float>(convert_from)));
 
     return addr;
 }
 
 byte* Process::opftoi(byte* addr) {
-    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    float convert_from = static_cast<Float*>(viua::operand::extract(addr)->resolve(this))->value();
+    unsigned target = 0, source = 0;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+
+    float convert_from = static_cast<Float*>(fetch(source))->value();
     place(target, new Integer(static_cast<int>(convert_from)));
 
     return addr;
 }
 
 byte* Process::opstoi(byte* addr) {
-    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = 0, source = 0;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     int result_integer = 0;
-    string supplied_string = static_cast<String*>(viua::operand::extract(addr)->resolve(this))->value();
+    string supplied_string = static_cast<String*>(fetch(source))->value();
     try {
         result_integer = std::stoi(supplied_string);
     } catch (const std::out_of_range& e) {
@@ -66,8 +75,11 @@ byte* Process::opstoi(byte* addr) {
 }
 
 byte* Process::opstof(byte* addr) {
-    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    string supplied_string = static_cast<String*>(viua::operand::extract(addr)->resolve(this))->value();
+    unsigned target = 0, source = 0;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+
+    string supplied_string = static_cast<String*>(fetch(source))->value();
     double convert_from = std::stod(supplied_string);
     place(target, new Float(static_cast<float>(convert_from)));
 
