@@ -20,6 +20,7 @@
 #include <utility>
 #include <viua/bytecode/operand_types.h>
 #include <viua/types/type.h>
+#include <viua/types/byte.h>
 #include <viua/types/integer.h>
 #include <viua/process.h>
 #include <viua/exceptions.h>
@@ -56,4 +57,24 @@ auto viua::bytecode::decoder::operands::fetch_register_index(byte *ip, Process *
         register_index = static_cast<unsigned>(i->as_integer());
     }
     return tuple<byte*, unsigned>(ip, register_index);
+}
+
+auto viua::bytecode::decoder::operands::fetch_primitive_char(byte *ip, Process *process) -> tuple<byte*, char> {
+    OperandType ot = get_operand_type(ip);
+    ++ip;
+
+    char value = 0;
+    if (ot == OT_REGISTER_INDEX or ot == OT_REGISTER_REFERENCE) {
+        value = extract<char>(ip);
+        ip += sizeof(char);
+    } else {
+        throw new Exception("decoded invalid operand type");
+    }
+    if (ot == OT_REGISTER_REFERENCE) {
+        // FIXME once dynamic operand types are implemented the need for this cast will go away
+        // because the operand *will* be encoded as a real uint
+        Byte *i = static_cast<Byte*>(process->obtain(static_cast<unsigned>(value)));
+        value = i->value();
+    }
+    return tuple<byte*, unsigned>(ip, value);
 }

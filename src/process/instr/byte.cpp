@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <viua/bytecode/bytetypedef.h>
+#include <viua/bytecode/decoder/operands.h>
 #include <viua/types/type.h>
 #include <viua/types/integer.h>
 #include <viua/types/boolean.h>
@@ -30,19 +31,11 @@ using namespace std;
 
 
 byte* Process::opbstore(byte* addr) {
-    unsigned destination_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned destination_register = 0;
+    tie(addr, destination_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    bool operand_ref = false;
-    char operand;
-
-    operand_ref = *(reinterpret_cast<bool*>(addr));
-    pointer::inc<bool, byte>(addr);
-    operand = static_cast<char>(*addr);
-    ++addr;
-
-    if (operand_ref) {
-        operand = static_cast<Byte*>(fetch(static_cast<unsigned>(operand)))->value();
-    }
+    char operand = 0;
+    tie(addr, operand) = viua::bytecode::decoder::operands::fetch_primitive_char(addr, this);
 
     place(destination_register, new Byte(operand));
 
