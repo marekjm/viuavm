@@ -78,3 +78,8 @@ auto viua::bytecode::decoder::operands::fetch_primitive_char(byte *ip, Process *
     }
     return tuple<byte*, unsigned>(ip, value);
 }
+
+auto viua::bytecode::decoder::operands::fetch_primitive_uint(byte *ip, Process *process) -> tuple<byte*, unsigned> {
+    // currently the logic is the same since RI's are encoded as unsigned integers
+    return fetch_register_index(ip, process);
+}
