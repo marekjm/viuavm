@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include <string>
 #include <utility>
 #include <viua/bytecode/bytetypedef.h>
 
@@ -35,6 +36,7 @@ namespace viua {
                 auto fetch_register_index(byte*, Process*) -> std::tuple<byte*, unsigned>;
                 auto fetch_primitive_char(byte*, Process*) -> std::tuple<byte*, char>;
                 auto fetch_primitive_uint(byte*, Process*) -> std::tuple<byte*, unsigned>;
+                auto fetch_atom(byte*, Process*) -> std::tuple<byte*, std::string>;
             }
         }
     }

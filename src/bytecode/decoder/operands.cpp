@@ -31,6 +31,9 @@ using namespace std;
 template<class T> static auto extract(byte *ip) -> T {
     return *reinterpret_cast<T*>(ip);
 }
+template<class T> static auto extract_ptr(byte *ip) -> T* {
+    return reinterpret_cast<T*>(ip);
+}
 
 static auto get_operand_type(byte *ip) -> OperandType {
     return extract<OperandType>(ip);
@@ -82,4 +85,10 @@ auto viua::bytecode::decoder::operands::fetch_primitive_char(byte *ip, Process *
 auto viua::bytecode::decoder::operands::fetch_primitive_uint(byte *ip, Process *process) -> tuple<byte*, unsigned> {
     // currently the logic is the same since RI's are encoded as unsigned integers
     return fetch_register_index(ip, process);
+}
+
+auto viua::bytecode::decoder::operands::fetch_atom(byte *ip, Process*) -> tuple<byte*, string> {
+    string s(extract_ptr<const char>(ip));
+    ip += (s.size() + 1);
+    return tuple<byte*, string>(ip, s);
 }
