@@ -43,8 +43,9 @@ byte* Process::opframe(byte* addr) {
 byte* Process::opparam(byte* addr) {
     /** Run param instruction.
      */
-    unsigned parameter_no_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    unsigned source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned parameter_no_operand_index = 0, source = 0;
+    tie(addr, parameter_no_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     if (parameter_no_operand_index >= frame_new->args->size()) {
         throw new Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
@@ -58,8 +59,9 @@ byte* Process::opparam(byte* addr) {
 byte* Process::oppamv(byte* addr) {
     /** Run pamv instruction.
      */
-    unsigned parameter_no_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    unsigned source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned parameter_no_operand_index = 0, source = 0;
+    tie(addr, parameter_no_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     if (parameter_no_operand_index >= frame_new->args->size()) {
         throw new Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
