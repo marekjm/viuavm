@@ -156,21 +156,6 @@ byte* Process::optailcall(byte* addr) {
         throw new Exception("tail call to non-native function: " + call_name);
     }
 
-    /* FIXME: make to possible to tail call foreign functions and methods */
-    /* if (is_foreign_method) { */
-    /*     if (frame_new == nullptr) { */
-    /*         throw new Exception("cannot tail call foreign method without a frame"); */
-    /*     } */
-    /*     if (frame_new->args->size() == 0) { */
-    /*         throw new Exception("cannot tail call foreign method using empty frame"); */
-    /*     } */
-    /*     if (frame_new->args->at(0) == nullptr) { */
-    /*         throw new Exception("frame must have at least one argument when used to tail call a foreign method"); */
-    /*     } */
-    /*     Type* obj = frame_new->args->at(0); */
-    /*     return callForeignMethod(addr, obj, call_name, return_register_ref, return_register_index, call_name); */
-    /* } */
-
     Frame *last_frame = frames.back().get();
 
     // move arguments from new frame to old frame
