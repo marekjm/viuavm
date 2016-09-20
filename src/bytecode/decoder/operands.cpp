@@ -1,0 +1,59 @@
+/*
+ *  Copyright (C) 2016 Marek Marecki
+ *
+ *  This file is part of Viua VM.
+ *
+ *  Viua VM is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Viua VM is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <utility>
+#include <viua/bytecode/operand_types.h>
+#include <viua/types/type.h>
+#include <viua/types/integer.h>
+#include <viua/process.h>
+#include <viua/exceptions.h>
+#include <viua/bytecode/decoder/operands.h>
+using namespace std;
+
+
+template<class T> static auto extract(byte *ip) -> T {
+    return *reinterpret_cast<T*>(ip);
+}
+
+static auto get_operand_type(byte *ip) -> OperandType {
+    return extract<OperandType>(ip);
+}
+
+auto viua::bytecode::decoder::operands::fetch_register_index(byte *ip, Process *process) -> tuple<byte*, unsigned> {
+    OperandType ot = get_operand_type(ip);
+    ++ip;
+
+    unsigned register_index = 0;
+    if (ot == OT_REGISTER_INDEX or ot == OT_REGISTER_REFERENCE) {
+        // FIXME currently RI's are encoded as signed integers
+        // remove this ugly cast when this is fixed
+        register_index = static_cast<unsigned>(extract<int>(ip));
+        ip += sizeof(int);
+    } else {
+        throw new Exception("decoded invalid operand type");
+    }
+    if (ot == OT_REGISTER_REFERENCE) {
+        Integer *i = static_cast<Integer*>(process->obtain(register_index));
+        if (i->as_integer() < 0) {
+            throw new Exception("register indexes cannot be negative");
+        }
+        register_index = static_cast<unsigned>(i->as_integer());
+    }
+    return {ip, register_index};
+}

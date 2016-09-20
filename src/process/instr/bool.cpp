@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+#include <viua/bytecode/decoder/operands.h>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/types/type.h>
 #include <viua/types/integer.h>
@@ -31,9 +32,10 @@ using namespace std;
 
 
 byte* Process::opnot(byte* addr) {
-    auto target = viua::operand::extract(addr);
+    unsigned register_index = 0;
+    tie(addr, register_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    place(viua::operand::getRegisterIndex(target.get(), this), new Boolean(not target->resolve(this)->boolean()));
+    place(register_index, new Boolean(not fetch(register_index)->boolean()));
 
     return addr;
 }
