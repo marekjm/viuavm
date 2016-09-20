@@ -106,10 +106,8 @@ byte* Process::opargc(byte* addr) {
 byte* Process::opcall(byte* addr) {
     /*  Run call instruction.
      */
-    bool return_register_ref = false;
-    int return_register_index = 0;
-    // FIXME: register indexes should be encoded as unsigned integers
-    viua::kernel::util::extractIntegerOperand(addr, return_register_ref, return_register_index);
+    unsigned return_register = 0;
+    tie(addr, return_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     string call_name;
     tie(addr, call_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
@@ -133,11 +131,11 @@ byte* Process::opcall(byte* addr) {
             throw new Exception("frame must have at least one argument when used to call a foreign method");
         }
         Type* obj = frame_new->args->at(0);
-        return callForeignMethod(addr, obj, call_name, return_register_ref, static_cast<unsigned>(return_register_index), call_name);
+        return callForeignMethod(addr, obj, call_name, false, return_register, call_name);
     }
 
     auto caller = (is_native ? &Process::callNative : &Process::callForeign);
-    return (this->*caller)(addr, call_name, return_register_ref, static_cast<unsigned>(return_register_index), "");
+    return (this->*caller)(addr, call_name, false, return_register, "");
 }
 
 byte* Process::optailcall(byte* addr) {
