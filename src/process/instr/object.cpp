@@ -37,9 +37,11 @@ using namespace std;
 byte* Process::opnew(byte* addr) {
     /** Create new instance of specified class.
      */
-    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = 0;
+    string class_name;
 
-    string class_name = viua::operand::extractString(addr);
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, class_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     if (not scheduler->isClass(class_name)) {
         throw new Exception("cannot create new instance of unregistered type: " + class_name);
