@@ -79,7 +79,7 @@ auto viua::bytecode::decoder::operands::fetch_primitive_char(byte *ip, Process *
         Byte *i = static_cast<Byte*>(process->obtain(static_cast<unsigned>(value)));
         value = i->value();
     }
-    return tuple<byte*, unsigned>(ip, value);
+    return tuple<byte*, char>(ip, value);
 }
 
 auto viua::bytecode::decoder::operands::fetch_primitive_uint(byte *ip, Process *process) -> tuple<byte*, unsigned> {
