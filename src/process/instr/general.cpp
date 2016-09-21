@@ -19,6 +19,7 @@
 
 #include <cstdint>
 #include <iostream>
+#include <viua/bytecode/decoder/operands.h>
 #include <viua/types/boolean.h>
 #include <viua/kernel/opex.h>
 #include <viua/exceptions.h>
@@ -40,8 +41,7 @@ byte* Process::opprint(byte* addr) {
 
 
 byte* Process::opjump(byte* addr) {
-    uint64_t* offset = reinterpret_cast<uint64_t*>(addr);
-    byte* target = (jump_base+(*offset));
+    byte* target = (jump_base + viua::bytecode::decoder::operands::extract_primitive_uint64(addr, this));
     if (target == addr) {
         throw new Exception("aborting: JUMP instruction pointing to itself");
     }
@@ -49,11 +49,12 @@ byte* Process::opjump(byte* addr) {
 }
 
 byte* Process::opbranch(byte* addr) {
-    Type* condition = viua::operand::extract(addr)->resolve(this);
+    unsigned source_register_index = 0;
+    uint64_t addr_true = 0, addr_false = 0;
 
-    uint64_t addr_true, addr_false;
-    viua::kernel::util::extractOperand<decltype(addr_true)>(addr, addr_true);
-    viua::kernel::util::extractOperand<decltype(addr_false)>(addr, addr_false);
+    tie(addr, source_register_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, addr_true) = viua::bytecode::decoder::operands::fetch_primitive_uint64(addr, this);
+    tie(addr, addr_false) = viua::bytecode::decoder::operands::fetch_primitive_uint64(addr, this);
 
-    return (jump_base + (condition->boolean() ? addr_true : addr_false));
+    return (jump_base + (fetch(source_register_index)->boolean() ? addr_true : addr_false));
 }
