@@ -17,9 +17,9 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
 #include <functional>
 #include <viua/bytecode/bytetypedef.h>
+#include <viua/bytecode/decoder/operands.h>
 #include <viua/types/type.h>
 #include <viua/types/boolean.h>
 #include <viua/types/integer.h>
@@ -51,11 +51,7 @@ byte* Process::opfstore(byte* addr) {
     return addr;
 }
 
-// ObjectPlacer shall be used only as a type of Process::place() function when passing it
-// to perform<>() implementation template.
-using ObjectPlacer = void(Process::*)(unsigned,Type*);
-
-template<class Operator, class ResultType> byte* perform(byte* addr, Process* t, ObjectPlacer placer) {
+template<class Operator, class ResultType> byte* perform(byte* addr, Process* t) {
     /** Heavily abstracted binary opcode implementation for Float-related instructions.
      *
      *  First parameter - byte* addr - is the instruction pointer from which operand extraction should begin.
@@ -67,50 +63,55 @@ template<class Operator, class ResultType> byte* perform(byte* addr, Process* t,
      *  Process class's scope and passing it here.
      *  Voila - we can place objects in process's current register set.
      */
-    unsigned target_register_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), t);
+    unsigned target_register_index = 0, first_operand_index = 0, second_operand_index = 0;
+    tie(addr, target_register_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, t);
+    tie(addr, first_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, t);
+    tie(addr, second_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, t);
 
-    auto first = viua::operand::extract(addr);
-    auto second = viua::operand::extract(addr);
+    /* auto first = viua::operand::extract(addr); */
+    /* auto second = viua::operand::extract(addr); */
+    auto first = t->obtain(first_operand_index);
+    auto second = t->obtain(second_operand_index);
 
-    viua::assertions::expect_types<Float>("Float", first->resolve(t), second->resolve(t));
+    viua::assertions::expect_types<Float>("Float", first, second);
 
-    (t->*placer)(target_register_index, new ResultType(Operator()(static_cast<Float*>(first->resolve(t))->value(), static_cast<Float*>(second->resolve(t))->value())));
+    t->put(target_register_index, new ResultType(Operator()(static_cast<Float*>(first)->value(), static_cast<Float*>(second)->value())));
 
     return addr;
 }
 
 byte* Process::opfadd(byte* addr) {
-    return perform<std::plus<float>, Float>(addr, this, &Process::place);
+    return perform<std::plus<float>, Float>(addr, this);
 }
 
 byte* Process::opfsub(byte* addr) {
-    return perform<std::minus<float>, Float>(addr, this, &Process::place);
+    return perform<std::minus<float>, Float>(addr, this);
 }
 
 byte* Process::opfmul(byte* addr) {
-    return perform<std::multiplies<float>, Float>(addr, this, &Process::place);
+    return perform<std::multiplies<float>, Float>(addr, this);
 }
 
 byte* Process::opfdiv(byte* addr) {
-    return perform<std::divides<float>, Float>(addr, this, &Process::place);
+    return perform<std::divides<float>, Float>(addr, this);
 }
 
 byte* Process::opflt(byte* addr) {
-    return perform<std::less<float>, Boolean>(addr, this, &Process::place);
+    return perform<std::less<float>, Boolean>(addr, this);
 }
 
 byte* Process::opflte(byte* addr) {
-    return perform<std::less_equal<float>, Boolean>(addr, this, &Process::place);
+    return perform<std::less_equal<float>, Boolean>(addr, this);
 }
 
 byte* Process::opfgt(byte* addr) {
-    return perform<std::greater<float>, Boolean>(addr, this, &Process::place);
+    return perform<std::greater<float>, Boolean>(addr, this);
 }
 
 byte* Process::opfgte(byte* addr) {
-    return perform<std::greater_equal<float>, Boolean>(addr, this, &Process::place);
+    return perform<std::greater_equal<float>, Boolean>(addr, this);
 }
 
 byte* Process::opfeq(byte* addr) {
-    return perform<std::equal_to<float>, Boolean>(addr, this, &Process::place);
+    return perform<std::equal_to<float>, Boolean>(addr, this);
 }
