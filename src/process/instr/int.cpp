@@ -20,6 +20,7 @@
 #include <memory>
 #include <functional>
 #include <viua/bytecode/bytetypedef.h>
+#include <viua/bytecode/decoder/operands.h>
 #include <viua/types/type.h>
 #include <viua/types/integer.h>
 #include <viua/types/boolean.h>
@@ -34,31 +35,25 @@ using namespace std;
 
 
 byte* Process::opizero(byte* addr) {
-    place(viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this), new Integer(0));
+    unsigned target = 0;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    place(target, new Integer(0));
     return addr;
 }
 
 byte* Process::opistore(byte* addr) {
-    unsigned destination_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-
-    auto source = viua::operand::extract(addr);
+    unsigned target = 0;
     int integer = 0;
-    if (viua::operand::RegisterIndex* ri = dynamic_cast<viua::operand::RegisterIndex*>(source.get())) {
-        integer = static_cast<int>(ri->get(this));
-    } else {
-        throw new Exception("invalid operand type");
-    }
 
-    place(destination_register, new Integer(integer));
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, integer) = viua::bytecode::decoder::operands::fetch_primitive_uint(addr, this);
+
+    place(target, new Integer(integer));
 
     return addr;
 }
 
-// ObjectPlacer shall be used only as a type of Process::place() function when passing it
-// to perform<>() implementation template.
-using ObjectPlacer = void(Process::*)(unsigned,Type*);
-
-template<class Operator, class ResultType> byte* perform(byte* addr, Process* t, ObjectPlacer placer) {
+template<class Operator, class ResultType> byte* perform(byte* addr, Process* t) {
     /** Heavily abstracted binary opcode implementation for Integer-related instructions.
      *
      *  First parameter - byte* addr - is the instruction pointer from which operand extraction should begin.
@@ -70,60 +65,71 @@ template<class Operator, class ResultType> byte* perform(byte* addr, Process* t,
      *  Process class's scope and passing it here.
      *  Voila - we can place objects in process's current register set.
      */
-    unsigned target_register_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), t);
+    unsigned target_register_index = 0, first_operand_index = 0, second_operand_index = 0;
+    tie(addr, target_register_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, t);
+    tie(addr, first_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, t);
+    tie(addr, second_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, t);
 
-    auto first = viua::operand::extract(addr);
-    auto second = viua::operand::extract(addr);
+    auto first = t->obtain(first_operand_index);
+    auto second = t->obtain(second_operand_index);
 
-    viua::assertions::expect_types<Integer>("Integer", first->resolve(t), second->resolve(t));
+    viua::assertions::expect_types<Integer>("Integer", first, second);
 
-    (t->*placer)(target_register_index, new ResultType(Operator()(static_cast<Integer*>(first->resolve(t))->as_integer(), static_cast<Integer*>(second->resolve(t))->as_integer())));
+    t->put(target_register_index, new ResultType(Operator()(static_cast<Integer*>(first)->as_integer(), static_cast<Integer*>(second)->as_integer())));
 
     return addr;
 }
 
 byte* Process::opiadd(byte* addr) {
-    return perform<std::plus<int>, Integer>(addr, this, &Process::place);
+    return perform<std::plus<int>, Integer>(addr, this);
 }
 
 byte* Process::opisub(byte* addr) {
-    return perform<std::minus<int>, Integer>(addr, this, &Process::place);
+    return perform<std::minus<int>, Integer>(addr, this);
 }
 
 byte* Process::opimul(byte* addr) {
-    return perform<std::multiplies<int>, Integer>(addr, this, &Process::place);
+    return perform<std::multiplies<int>, Integer>(addr, this);
 }
 
 byte* Process::opidiv(byte* addr) {
-    return perform<std::divides<int>, Integer>(addr, this, &Process::place);
+    return perform<std::divides<int>, Integer>(addr, this);
 }
 
 byte* Process::opilt(byte* addr) {
-    return perform<std::less<int>, Boolean>(addr, this, &Process::place);
+    return perform<std::less<int>, Boolean>(addr, this);
 }
 
 byte* Process::opilte(byte* addr) {
-    return perform<std::less_equal<int>, Boolean>(addr, this, &Process::place);
+    return perform<std::less_equal<int>, Boolean>(addr, this);
 }
 
 byte* Process::opigt(byte* addr) {
-    return perform<std::greater<int>, Boolean>(addr, this, &Process::place);
+    return perform<std::greater<int>, Boolean>(addr, this);
 }
 
 byte* Process::opigte(byte* addr) {
-    return perform<std::greater_equal<int>, Boolean>(addr, this, &Process::place);
+    return perform<std::greater_equal<int>, Boolean>(addr, this);
 }
 
 byte* Process::opieq(byte* addr) {
-    return perform<std::equal_to<int>, Boolean>(addr, this, &Process::place);
+    return perform<std::equal_to<int>, Boolean>(addr, this);
 }
 
 byte* Process::opiinc(byte* addr) {
-    viua::assertions::expect_type<Integer>("Integer", viua::operand::extract(addr)->resolve(this))->increment();
+    unsigned target = 0;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+
+    viua::assertions::expect_type<Integer>("Integer", fetch(target))->increment();
+
     return addr;
 }
 
 byte* Process::opidec(byte* addr) {
-    viua::assertions::expect_type<Integer>("Integer", viua::operand::extract(addr)->resolve(this))->decrement();
+    unsigned target = 0;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+
+    viua::assertions::expect_type<Integer>("Integer", fetch(target))->decrement();
+
     return addr;
 }
