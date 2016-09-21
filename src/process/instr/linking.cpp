@@ -21,6 +21,7 @@
 #include <sys/stat.h>
 #include <cstdlib>
 #include <iostream>
+#include <viua/bytecode/decoder/operands.h>
 #include <viua/types/integer.h>
 #include <viua/operand.h>
 #include <viua/kernel/opex.h>
@@ -33,7 +34,8 @@ using namespace std;
 byte* Process::opimport(byte* addr) {
     /** Run import instruction.
      */
-    string module = viua::operand::extractString(addr);
+    string module;
+    tie(addr, module) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
     scheduler->loadForeignLibrary(module);
     return addr;
 }
@@ -41,7 +43,8 @@ byte* Process::opimport(byte* addr) {
 byte* Process::oplink(byte* addr) {
     /** Run link instruction.
      */
-    string module = viua::operand::extractString(addr);
+    string module;
+    tie(addr, module) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
     scheduler->loadNativeLibrary(module);
     return addr;
 }
