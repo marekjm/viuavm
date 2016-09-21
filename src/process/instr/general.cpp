@@ -29,7 +29,9 @@ using namespace std;
 
 
 byte* Process::opecho(byte* addr) {
-    cout << viua::operand::extract(addr)->resolve(this)->str();
+    unsigned source = 0;
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    cout << fetch(source)->str();
     return addr;
 }
 
