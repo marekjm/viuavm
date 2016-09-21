@@ -25,6 +25,7 @@
 #include <string>
 #include <utility>
 #include <viua/bytecode/bytetypedef.h>
+#include <viua/types/type.h>
 
 // forward declaration for functions declared in this file
 class Process;
@@ -39,6 +40,7 @@ namespace viua {
                 auto fetch_primitive_uint64(byte*, Process*) -> std::tuple<byte*, uint64_t>;
                 auto fetch_primitive_int(byte*, Process*) -> std::tuple<byte*, int>;
                 auto fetch_atom(byte*, Process*) -> std::tuple<byte*, std::string>;
+                auto fetch_object(byte*, Process*) -> std::tuple<byte*, Type*>;
 
                 auto extract_primitive_uint64(byte*, Process*) -> uint64_t;
             }

@@ -110,3 +110,9 @@ auto viua::bytecode::decoder::operands::fetch_atom(byte *ip, Process*) -> tuple<
     ip += (s.size() + 1);
     return tuple<byte*, string>(ip, s);
 }
+
+auto viua::bytecode::decoder::operands::fetch_object(byte *ip, Process *p) -> tuple<byte*, Type*> {
+    unsigned register_index = 0;
+    tie(ip, register_index) = fetch_register_index(ip, p);
+    return tuple<byte*, Type*>(ip, p->obtain(register_index));
+}
