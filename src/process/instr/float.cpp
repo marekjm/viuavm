@@ -68,8 +68,6 @@ template<class Operator, class ResultType> byte* perform(byte* addr, Process* t)
     tie(addr, first_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, t);
     tie(addr, second_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, t);
 
-    /* auto first = viua::operand::extract(addr); */
-    /* auto second = viua::operand::extract(addr); */
     auto first = t->obtain(first_operand_index);
     auto second = t->obtain(second_operand_index);
 
