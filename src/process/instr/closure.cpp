@@ -105,12 +105,14 @@ byte* Process::opclosure(byte* addr) {
         throw new Exception("creating closures from nonlocal registers is forbidden");
     }
 
-    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = 0;
+    string function_name;
 
-    string call_name = viua::operand::extractString(addr);
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, function_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     Closure* clsr = new Closure();
-    clsr->function_name = call_name;
+    clsr->function_name = function_name;
     clsr->regset = new RegisterSet(uregset->size());
 
     place(target, clsr);
@@ -125,12 +127,14 @@ byte* Process::opfunction(byte* addr) {
      *  are can be used to pass functions as parameters and
      *  return them from other functions.
      */
-    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = 0;
+    string function_name;
 
-    string call_name = viua::operand::extractString(addr);
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, function_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     Function* fn = new Function();
-    fn->function_name = call_name;
+    fn->function_name = function_name;
 
     place(target, fn);
 
