@@ -37,14 +37,15 @@ using namespace std;
 byte* Process::openclose(byte* addr) {
     /** Enclose object by reference.
      */
-    Closure *target_closure = static_cast<Closure*>(viua::operand::extract(addr)->resolve(this));
-    unsigned target_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target_closure_register = 0, target_register = 0, source_register = 0;
+    tie(addr, target_closure_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, target_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, source_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
+    Closure *target_closure = static_cast<Closure*>(fetch(target_closure_register));
     if (target_register >= target_closure->regset->size()) {
         throw new Exception("cannot enclose object: register index out exceeded size of closure register set");
     }
-
-    unsigned source_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
 
     Type* enclosed_object = uregset->at(source_register);
     Reference *rf = dynamic_cast<Reference*>(enclosed_object);
@@ -64,14 +65,17 @@ byte* Process::openclose(byte* addr) {
 byte* Process::openclosecopy(byte* addr) {
     /** Enclose object by copy.
      */
-    Closure *target_closure = static_cast<Closure*>(viua::operand::extract(addr)->resolve(this));
-    unsigned target_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target_closure_register = 0, target_register = 0, source_register = 0;
+    tie(addr, target_closure_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, target_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, source_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
+    Closure *target_closure = static_cast<Closure*>(fetch(target_closure_register));
     if (target_register >= target_closure->regset->size()) {
         throw new Exception("cannot enclose object: register index out exceeded size of closure register set");
     }
 
-    target_closure->regset->set(target_register, viua::operand::extract(addr)->resolve(this)->copy());
+    target_closure->regset->set(target_register, fetch(source_register)->copy());
 
     return addr;
 }
@@ -79,14 +83,16 @@ byte* Process::openclosecopy(byte* addr) {
 byte* Process::openclosemove(byte* addr) {
     /** Enclose object by move.
      */
-    Closure *target_closure = static_cast<Closure*>(viua::operand::extract(addr)->resolve(this));
-    unsigned target_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target_closure_register = 0, target_register = 0, source_register = 0;
+    tie(addr, target_closure_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, target_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, source_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
+    Closure *target_closure = static_cast<Closure*>(fetch(target_closure_register));
     if (target_register >= target_closure->regset->size()) {
         throw new Exception("cannot enclose object: register index out exceeded size of closure register set");
     }
 
-    unsigned source_register = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
     target_closure->regset->set(target_register, uregset->pop(source_register));
 
     return addr;
