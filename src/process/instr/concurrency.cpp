@@ -103,8 +103,11 @@ byte* Process::opjoin(byte* addr) {
 byte* Process::opsend(byte* addr) {
     /** Send a message to a process.
      */
-    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    unsigned source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = 0, source = 0;
+
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+
     if (ProcessType* thrd = dynamic_cast<ProcessType*>(fetch(target))) {
         scheduler->send(thrd->pid(), unique_ptr<Type>(pop(source)));
     } else {
@@ -121,8 +124,11 @@ byte* Process::opreceive(byte* addr) {
      */
     byte* return_addr = (addr-1);
 
-    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    unsigned timeout = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = 0, timeout = 0;
+
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, timeout) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+
     if (timeout and not timeout_active) {
         waiting_until = (std::chrono::steady_clock::now() + std::chrono::milliseconds(timeout-1));
         timeout_active = true;
