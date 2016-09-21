@@ -112,9 +112,12 @@ byte* Process::opmsg(byte* addr) {
 byte* Process::opinsert(byte* addr) {
     /** Insert an object as an attribute of another object.
      */
-    Type* object_operand = viua::operand::extract(addr)->resolve(this);
-    Type* key_operand = viua::operand::extract(addr)->resolve(this);
-    unsigned source_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    Type *object_operand = nullptr, *key_operand = nullptr;
+    unsigned source_index = 0;
+
+    tie(addr, object_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    tie(addr, key_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    tie(addr, source_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     viua::assertions::assert_implements<Object>(object_operand, "Object");
     viua::assertions::assert_typeof(key_operand, "String");
@@ -127,9 +130,12 @@ byte* Process::opinsert(byte* addr) {
 byte* Process::opremove(byte* addr) {
     /** Remove an attribute of another object.
      */
-    unsigned target_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    Type* object_operand = viua::operand::extract(addr)->resolve(this);
-    Type* key_operand = viua::operand::extract(addr)->resolve(this);
+    unsigned target_index = 0;
+    Type *object_operand = nullptr, *key_operand = nullptr;
+
+    tie(addr, target_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, object_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    tie(addr, key_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
     viua::assertions::assert_implements<Object>(object_operand, "Object");
     viua::assertions::assert_typeof(key_operand, "String");
