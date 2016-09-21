@@ -36,7 +36,10 @@ namespace viua {
                 auto fetch_register_index(byte*, Process*) -> std::tuple<byte*, unsigned>;
                 auto fetch_primitive_char(byte*, Process*) -> std::tuple<byte*, char>;
                 auto fetch_primitive_uint(byte*, Process*) -> std::tuple<byte*, unsigned>;
+                auto fetch_primitive_uint64(byte*, Process*) -> std::tuple<byte*, uint64_t>;
                 auto fetch_atom(byte*, Process*) -> std::tuple<byte*, std::string>;
+
+                auto extract_primitive_uint64(byte*, Process*) -> uint64_t;
             }
         }
     }

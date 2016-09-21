@@ -87,6 +87,16 @@ auto viua::bytecode::decoder::operands::fetch_primitive_uint(byte *ip, Process *
     return fetch_register_index(ip, process);
 }
 
+auto viua::bytecode::decoder::operands::fetch_primitive_uint64(byte *ip, Process*) -> tuple<byte*, uint64_t> {
+    uint64_t integer = extract<decltype(integer)>(ip);
+    ip += sizeof(decltype(integer));
+    return tuple<byte*, decltype(integer)>(ip, integer);
+}
+
+auto viua::bytecode::decoder::operands::extract_primitive_uint64(byte *ip, Process*) -> uint64_t {
+    return extract<uint64_t>(ip);
+}
+
 auto viua::bytecode::decoder::operands::fetch_atom(byte *ip, Process*) -> tuple<byte*, string> {
     string s(extract_ptr<const char>(ip));
     ip += (s.size() + 1);
