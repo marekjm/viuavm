@@ -47,7 +47,7 @@ class Closure : public Function {
         virtual std::string name() const;
 
         // FIXME: implement real dtor
-        Closure();
+        Closure(const std::string& = "", RegisterSet* = nullptr);
         virtual ~Closure();
 };
 

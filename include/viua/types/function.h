@@ -45,8 +45,7 @@ class Function : public Type {
         virtual std::string name() const;
 
         // FIXME: implement real dtor
-        Function();
-        Function(const std::string&);
+        Function(const std::string& = "");
         virtual ~Function();
 };
 

@@ -24,7 +24,7 @@
 using namespace std;
 
 
-Closure::Closure(): regset(nullptr), function_name("") {
+Closure::Closure(const string& name, RegisterSet *rs): regset(rs), function_name(name) {
 }
 
 Closure::~Closure() {

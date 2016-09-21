@@ -111,11 +111,7 @@ byte* Process::opclosure(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, function_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
-    Closure* clsr = new Closure();
-    clsr->function_name = function_name;
-    clsr->regset = new RegisterSet(uregset->size());
-
-    place(target, clsr);
+    place(target, new Closure(function_name, new RegisterSet(uregset->size())));
 
     return addr;
 }
@@ -133,10 +129,7 @@ byte* Process::opfunction(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, function_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
-    Function* fn = new Function();
-    fn->function_name = function_name;
-
-    place(target, fn);
+    place(target, new Function(function_name));
 
     return addr;
 }
