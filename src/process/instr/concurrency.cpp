@@ -158,7 +158,8 @@ byte* Process::opreceive(byte* addr) {
 byte* Process::opwatchdog(byte* addr) {
     /*  Run watchdog instruction.
      */
-    string call_name = viua::operand::extractString(addr);
+    string call_name;
+    tie(addr, call_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     bool is_native = scheduler->isNativeFunction(call_name);
     bool is_foreign = scheduler->isForeignFunction(call_name);
