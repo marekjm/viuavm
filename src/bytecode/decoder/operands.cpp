@@ -93,6 +93,26 @@ auto viua::bytecode::decoder::operands::fetch_primitive_uint64(byte *ip, Process
     return tuple<byte*, decltype(integer)>(ip, integer);
 }
 
+auto viua::bytecode::decoder::operands::fetch_primitive_int(byte *ip, Process* p) -> tuple<byte*, int> {
+    OperandType ot = get_operand_type(ip);
+    ++ip;
+
+    int value = 0;
+    if (ot == OT_REGISTER_INDEX or ot == OT_REGISTER_REFERENCE) {
+        value = extract<int>(ip);
+        ip += sizeof(int);
+    } else {
+        throw new Exception("decoded invalid operand type");
+    }
+    if (ot == OT_REGISTER_REFERENCE) {
+        // FIXME once dynamic operand types are implemented the need for this cast will go away
+        // because the operand *will* be encoded as a real uint
+        Integer *i = static_cast<Integer*>(p->obtain(static_cast<unsigned>(value)));
+        value = i->value();
+    }
+    return tuple<byte*, int>(ip, value);
+}
+
 auto viua::bytecode::decoder::operands::extract_primitive_uint64(byte *ip, Process*) -> uint64_t {
     return extract<uint64_t>(ip);
 }
