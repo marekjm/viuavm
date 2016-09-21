@@ -18,6 +18,7 @@
  */
 
 #include <chrono>
+#include <viua/bytecode/decoder/operands.h>
 #include <viua/types/boolean.h>
 #include <viua/types/reference.h>
 #include <viua/types/process.h>
@@ -32,9 +33,11 @@ using namespace std;
 byte* Process::opprocess(byte* addr) {
     /*  Run process instruction.
      */
-    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = 0;
+    string call_name;
 
-    string call_name = viua::operand::extractString(addr);
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, call_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     bool is_native = scheduler->isNativeFunction(call_name);
     bool is_foreign = scheduler->isForeignFunction(call_name);
@@ -61,9 +64,12 @@ byte* Process::opjoin(byte* addr) {
      */
     byte* return_addr = (addr-1);
 
-    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    unsigned source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    unsigned timeout = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = 0, source = 0, timeout = 0;
+
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, timeout) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+
     if (timeout and not timeout_active) {
         waiting_until = (std::chrono::steady_clock::now() + std::chrono::milliseconds(timeout-1));
         timeout_active = true;
@@ -172,7 +178,9 @@ byte* Process::opwatchdog(byte* addr) {
 byte* Process::opself(byte* addr) {
     /*  Run process instruction.
      */
-    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = 0;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+
     place(target, new ProcessType(this));
 
     return addr;
