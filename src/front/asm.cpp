@@ -112,12 +112,11 @@ static string read_file(const string& path) {
     return source_in.str();
 }
 
-static void display_error_in_context(const vector<viua::cg::lex::Token>& tokens, viua::cg::lex::InvalidSyntax error, const string& filename) {
-    cout << COLOR_FG_WHITE << filename << ':' << error.line()+1 << ':' << error.character()+1 << ':' << ATTR_RESET << ' ';
-    cout << COLOR_FG_RED << "error" << ATTR_RESET << ": " << error.what() << endl;
+static void display_error_in_context(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) error_line, decltype(error_line) error_character, const string& filename, string message) {
+    cout << COLOR_FG_WHITE << filename << ':' << error_line+1 << ':' << error_character+1 << ':' << ATTR_RESET << ' ';
+    cout << COLOR_FG_RED << "error" << ATTR_RESET << ": " << message << endl;
     cout << "\n";
 
-    auto error_line = error.line();
     const unsigned context_lines = 2;
     decltype(error_line) context_before, context_after = (error_line+context_lines);
     if (error_line < context_lines) {
@@ -140,13 +139,13 @@ static void display_error_in_context(const vector<viua::cg::lex::Token>& tokens,
 
             cout << token.str();
             ++i;
-            if (token.line() == error.line()) {
+            if (token.line() == error_line) {
                 cout << COLOR_FG_WHITE;
             }
             while (i < tokens.size() and tokens[i].line() == token_line) {
                 cout << tokens[i++].str();
             }
-            if (token.line() == error.line()) {
+            if (token.line() == error_line) {
                 cout << ATTR_RESET;
             }
             --i;
@@ -156,6 +155,9 @@ static void display_error_in_context(const vector<viua::cg::lex::Token>& tokens,
         }
     }
     cout << endl;
+}
+static void display_error_in_context(const vector<viua::cg::lex::Token>& tokens, viua::cg::lex::InvalidSyntax error, const string& filename) {
+    display_error_in_context(tokens, error.line(), error.character(), filename, error.what());
 }
 
 int main(int argc, char* argv[]) {
@@ -328,7 +330,7 @@ int main(int argc, char* argv[]) {
             assembler::verify::manipulationOfDefinedRegisters(cooked_tokens, blocks.tokens, DEBUG);
         }
     } catch (const pair<unsigned, string>& e) {
-        cout << filename << ':' << expanded_lines_to_source_lines.at(e.first)+1 << ": error: " << e.second << endl;
+        display_error_in_context(raw_tokens, expanded_lines_to_source_lines.at(e.first), 0, filename, e.second);
         return 1;
     } catch (const viua::cg::lex::InvalidSyntax& e) {
         display_error_in_context(raw_tokens, e, filename);
@@ -360,7 +362,7 @@ int main(int argc, char* argv[]) {
         ret_code = 1;
         cout << "fatal: exception occured during assembling: " << e << endl;
     } catch (const pair<unsigned, string>& e) {
-        cout << filename << ':' << expanded_lines_to_source_lines.at(e.first)+1 << ": error: " << e.second << endl;
+        display_error_in_context(raw_tokens, expanded_lines_to_source_lines.at(e.first), 0, filename, e.second);
         return 1;
     } catch (const viua::cg::lex::InvalidSyntax& e) {
         display_error_in_context(raw_tokens, e, filename);
