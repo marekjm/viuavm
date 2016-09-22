@@ -17,8 +17,8 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
 #include <viua/bytecode/bytetypedef.h>
+#include <viua/bytecode/decoder/operands.h>
 #include <viua/types/integer.h>
 #include <viua/types/prototype.h>
 #include <viua/kernel/opex.h>
@@ -33,17 +33,25 @@ using namespace std;
 byte* Process::opclass(byte* addr) {
     /** Create a class.
      */
-    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    place(target, new Prototype(viua::operand::extractString(addr)));
+    unsigned target = 0;
+    string class_name;
+
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, class_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
+
+    place(target, new Prototype(class_name));
+
     return addr;
 }
 
 byte* Process::opderive(byte* addr) {
     /** Push an ancestor class to prototype's inheritance chain.
      */
-    Type* target = viua::operand::extract(addr)->resolve(this);
+    Type* target = nullptr;
+    string class_name;
 
-    string class_name = viua::operand::extractString(addr);
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    tie(addr, class_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     if (not scheduler->isClass(class_name)) {
         throw new Exception("cannot derive from unregistered type: " + class_name);
@@ -57,10 +65,12 @@ byte* Process::opderive(byte* addr) {
 byte* Process::opattach(byte* addr) {
     /** Attach a function to a prototype as a method.
      */
-    Type* target = viua::operand::extract(addr)->resolve(this);
+    Type* target = nullptr;
+    string function_name, method_name;
 
-    string function_name = viua::operand::extractString(addr);
-    string method_name = viua::operand::extractString(addr);
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    tie(addr, function_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
+    tie(addr, method_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     Prototype* proto = static_cast<Prototype*>(target);
 
@@ -76,7 +86,8 @@ byte* Process::opattach(byte* addr) {
 byte* Process::opregister(byte* addr) {
     /** Register a prototype in the typesystem.
      */
-    unsigned source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned source = 0;
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     Prototype* new_proto = static_cast<Prototype*>(fetch(source));
     scheduler->registerPrototype(new_proto);
