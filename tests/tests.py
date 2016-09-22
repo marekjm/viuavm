@@ -73,6 +73,14 @@ def getCPUArchitecture():
     output = output.decode('utf-8').strip()
     return output
 
+def strip_colors(s):
+    # remove color markers used by Viua
+    s = s.replace('\x1b[38;5;1m', '')
+    s = s.replace('\x1b[38;5;3m', '')
+    s = s.replace('\x1b[38;5;15m', '')
+    s = s.replace('\x1b[0m', '')
+    return s
+
 def assemble(asm, out=None, links=(), opts=(), okcodes=(0,)):
     """Assemble path given as `asm` and put binary in `out`.
     Raises exception if compilation is not successful.
@@ -83,7 +91,7 @@ def assemble(asm, out=None, links=(), opts=(), okcodes=(0,)):
     asmargs += links
     p = subprocess.Popen(asmargs, stdout=subprocess.PIPE)
     output, error = p.communicate()
-    output = output.decode('utf-8')
+    output = strip_colors(output.decode('utf-8'))
     exit_code = p.wait()
     if exit_code not in okcodes:
         raise ViuaAssemblerError('{0}: {1}'.format(asm, output.strip()))
@@ -112,7 +120,8 @@ def run(path, expected_exit_code=0):
     exit_code = p.wait()
     if exit_code not in (expected_exit_code if type(expected_exit_code) in [list, tuple] else (expected_exit_code,)):
         raise ViuaCPUError('{0} [{1}]: {2}'.format(path, exit_code, output.decode('utf-8').strip()))
-    return (exit_code, output.decode('utf-8'))
+    output = strip_colors(output.decode('utf-8'))
+    return (exit_code, output)
 
 FLAG_TEST_ONLY_ASSEMBLING = bool(int(os.environ.get('VIUA_TEST_ONLY_ASMING', 0)))
 MEMORY_LEAK_CHECKS_SKIPPED = 0
