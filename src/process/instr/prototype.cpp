@@ -89,9 +89,7 @@ byte* Process::opregister(byte* addr) {
     unsigned source = 0;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    Prototype* new_proto = static_cast<Prototype*>(fetch(source));
-    scheduler->registerPrototype(new_proto);
-    uregset->empty(source);
+    scheduler->registerPrototype(static_cast<Prototype*>(pop(source)));
 
     return addr;
 }
