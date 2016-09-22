@@ -49,6 +49,12 @@ bool DEBUG = false;
 bool SCREAM = false;
 
 
+const string COLOR_FG_RED = "\x1b[38;5;1m";
+const string COLOR_FG_YELLOW = "\x1b[38;5;3m";
+const string COLOR_FG_WHITE = "\x1b[38;5;15m";
+const string ATTR_RESET = "\x1b[0m";
+
+
 static bool usage(const char* program, bool show_help, bool show_version, bool verbose) {
     if (show_help or (show_version and verbose)) {
         cout << "Viua VM assembler, version ";
@@ -107,7 +113,8 @@ static string read_file(const string& path) {
 }
 
 static void display_error_in_context(const vector<viua::cg::lex::Token>& tokens, viua::cg::lex::InvalidSyntax error, const string& filename) {
-    cout << filename << ':' << error.line()+1 << ':' << error.character()+1 << ": error: " << error.what() << endl;
+    cout << COLOR_FG_WHITE << filename << ':' << error.line()+1 << ':' << error.character()+1 << ':' << ATTR_RESET << ' ';
+    cout << COLOR_FG_RED << "error" << ATTR_RESET << ": " << error.what() << endl;
     cout << "\n";
 
     auto error_line = error.line();
@@ -123,12 +130,24 @@ static void display_error_in_context(const vector<viua::cg::lex::Token>& tokens,
         auto token = tokens[i];
         auto token_line = token.line();
         if (token_line >= context_before and token_line <= context_after) {
-            cout << (token_line == error_line ? ">>>>" : "    ") << " " << token_line+1 << "  ";
+            cout << (token_line == error_line ? (COLOR_FG_RED + ">>>>" + ATTR_RESET) : "    ") << ' ';
+            if (token_line == error_line) {
+                cout << COLOR_FG_YELLOW << token_line+1 << ATTR_RESET;
+            } else {
+                cout << token_line+1;
+            }
+            cout << "  ";
 
             cout << token.str();
             ++i;
+            if (token.line() == error.line()) {
+                cout << COLOR_FG_WHITE;
+            }
             while (i < tokens.size() and tokens[i].line() == token_line) {
                 cout << tokens[i++].str();
+            }
+            if (token.line() == error.line()) {
+                cout << ATTR_RESET;
             }
             --i;
         }
