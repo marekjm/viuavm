@@ -20,7 +20,6 @@
 #include <dlfcn.h>
 #include <sys/stat.h>
 #include <cstdlib>
-#include <iostream>
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/types/integer.h>
 #include <viua/exceptions.h>
