@@ -21,7 +21,6 @@
 #include <viua/types/pointer.h>
 #include <viua/types/boolean.h>
 #include <viua/types/reference.h>
-#include <viua/kernel/opex.h>
 #include <viua/exceptions.h>
 #include <viua/operand.h>
 #include <viua/kernel/kernel.h>

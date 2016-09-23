@@ -24,7 +24,6 @@
 #include <viua/types/boolean.h>
 #include <viua/types/integer.h>
 #include <viua/types/float.h>
-#include <viua/kernel/opex.h>
 #include <viua/operand.h>
 #include <viua/kernel/kernel.h>
 #include <viua/assert.h>

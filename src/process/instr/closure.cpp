@@ -25,7 +25,6 @@
 #include <viua/types/function.h>
 #include <viua/types/closure.h>
 #include <viua/types/reference.h>
-#include <viua/kernel/opex.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/registerset.h>
 #include <viua/operand.h>

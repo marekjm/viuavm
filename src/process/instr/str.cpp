@@ -24,7 +24,6 @@
 #include <viua/types/boolean.h>
 #include <viua/types/byte.h>
 #include <viua/types/string.h>
-#include <viua/kernel/opex.h>
 #include <viua/support/string.h>
 #include <viua/operand.h>
 #include <viua/kernel/kernel.h>

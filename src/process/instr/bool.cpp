@@ -25,7 +25,6 @@
 #include <viua/types/boolean.h>
 #include <viua/types/byte.h>
 #include <viua/types/boolean.h>
-#include <viua/kernel/opex.h>
 #include <viua/operand.h>
 #include <viua/kernel/kernel.h>
 using namespace std;

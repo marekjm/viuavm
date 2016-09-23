@@ -206,9 +206,6 @@ build/dis.o: src/front/dis.cpp
 build/wdb.o: src/front/wdb.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $^
 
-build/kernel/opex.o: src/kernel/opex.cpp
-	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $^
-
 build/kernel/ffi/request.o: src/kernel/ffi/request.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $^
 
@@ -227,10 +224,10 @@ build/front/vm.o: src/front/vm.cpp
 build/machine.o: src/machine.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $^
 
-build/bin/vm/kernel: build/kernel.o build/kernel/kernel.o build/scheduler/vps.o build/front/vm.o build/operand.o build/assert.o build/process.o build/process/dispatch.o build/kernel/opex.o build/kernel/ffi/request.o build/kernel/ffi/scheduler.o build/kernel/registserset.o build/kernel/frame.o build/loader.o build/machine.o build/printutils.o build/support/pointer.o build/support/string.o build/support/env.o $(VIUA_INSTR_FILES_O) build/bytecode/decoder/operands.o build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o build/types/prototype.o build/types/object.o build/types/reference.o build/types/process.o build/types/type.o build/types/pointer.o build/cg/disassembler/disassembler.o
+build/bin/vm/kernel: build/kernel.o build/kernel/kernel.o build/scheduler/vps.o build/front/vm.o build/operand.o build/assert.o build/process.o build/process/dispatch.o build/kernel/ffi/request.o build/kernel/ffi/scheduler.o build/kernel/registserset.o build/kernel/frame.o build/loader.o build/machine.o build/printutils.o build/support/pointer.o build/support/string.o build/support/env.o $(VIUA_INSTR_FILES_O) build/bytecode/decoder/operands.o build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o build/types/prototype.o build/types/object.o build/types/reference.o build/types/process.o build/types/type.o build/types/pointer.o build/cg/disassembler/disassembler.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -lpthread -o $@ $^ $(LIBDL)
 
-build/bin/vm/vdb: build/wdb.o build/lib/linenoise.o build/kernel/kernel.o build/scheduler/vps.o build/front/vm.o build/operand.o build/assert.o build/process.o build/process/dispatch.o build/kernel/opex.o build/kernel/ffi/request.o build/kernel/ffi/scheduler.o build/kernel/registserset.o build/kernel/frame.o build/loader.o build/machine.o build/cg/disassembler/disassembler.o build/printutils.o build/support/pointer.o build/support/string.o build/support/env.o $(VIUA_INSTR_FILES_O) build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o build/types/prototype.o build/types/object.o build/types/reference.o build/types/process.o build/types/type.o build/types/pointer.o
+build/bin/vm/vdb: build/wdb.o build/lib/linenoise.o build/kernel/kernel.o build/scheduler/vps.o build/front/vm.o build/operand.o build/assert.o build/process.o build/process/dispatch.o build/kernel/ffi/request.o build/kernel/ffi/scheduler.o build/kernel/registserset.o build/kernel/frame.o build/loader.o build/machine.o build/cg/disassembler/disassembler.o build/printutils.o build/support/pointer.o build/support/string.o build/support/env.o $(VIUA_INSTR_FILES_O) build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/exception.o build/types/prototype.o build/types/object.o build/types/reference.o build/types/process.o build/types/type.o build/types/pointer.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -lpthread -o $@ $^ $(LIBDL)
 
 build/bin/vm/asm: build/asm.o build/asm/generate.o build/asm/gather.o build/asm/decode.o build/program.o build/programinstructions.o build/cg/tokenizer/tokenize.o build/cg/assembler/operands.o build/cg/assembler/ce.o build/cg/lex.o build/cg/tools.o build/cg/assembler/verify.o build/cg/assembler/static_analysis.o build/cg/assembler/utils.o build/cg/bytecode/instructions.o build/loader.o build/machine.o build/support/string.o build/support/env.o

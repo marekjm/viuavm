@@ -24,7 +24,6 @@
 #include <viua/types/pointer.h>
 #include <viua/types/object.h>
 #include <viua/types/string.h>
-#include <viua/kernel/opex.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/registerset.h>
 #include <viua/operand.h>
