@@ -137,8 +137,11 @@ byte* Process::opvat(byte* addr) {
 byte* Process::opvlen(byte* addr) {
     /*  Run vlen instruction.
      */
-    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    Type* source = viua::operand::extract(addr)->resolve(this);
+    unsigned target = 0;
+    Type* source = nullptr;
+
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
     viua::assertions::assert_implements<Vector>(source, "Vector");
     place(target, new Integer(static_cast<Vector*>(source)->len()));
