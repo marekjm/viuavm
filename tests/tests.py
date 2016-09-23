@@ -1116,31 +1116,31 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'no_end_between_defs.asm', "./sample/asm/errors/no_end_between_defs.asm:23:1: error: another function opened before assembler reached .end after 'foo/0' function")
 
     def testHaltAsLastInstruction(self):
-        runTestFailsToAssemble(self, 'halt_as_last_instruction.asm', "./sample/asm/errors/halt_as_last_instruction.asm:23: error: function does not end with 'return' or 'tailcall': main/1")
+        runTestFailsToAssemble(self, 'halt_as_last_instruction.asm', "./sample/asm/errors/halt_as_last_instruction.asm:23:1: error: function does not end with 'return' or 'tailcall': main/1")
 
     def testArityError(self):
-        runTestFailsToAssemble(self, 'arity_error.asm', "./sample/asm/errors/arity_error.asm:27: error: invalid number of parameters in call to function foo/1: expected 1 got 0")
+        runTestFailsToAssemble(self, 'arity_error.asm', "./sample/asm/errors/arity_error.asm:27:1: error: invalid number of parameters in call to function foo/1: expected 1 got 0")
 
     def testFrameWithGaps(self):
-        runTestFailsToAssemble(self, 'frame_with_gaps.asm', "./sample/asm/errors/frame_with_gaps.asm:28: error: gap in frame defined at line 25, slot 1 left empty")
+        runTestFailsToAssemble(self, 'frame_with_gaps.asm', "./sample/asm/errors/frame_with_gaps.asm:28:1: error: gap in frame defined at line 25, slot 1 left empty")
 
     def testPassingParameterToASlotWithTooHighIndex(self):
-        runTestFailsToAssemble(self, 'passing_to_slot_with_too_high_index.asm', "./sample/asm/errors/passing_to_slot_with_too_high_index.asm:26: error: pass to parameter slot 3 in frame with only 3 slots available")
+        runTestFailsToAssemble(self, 'passing_to_slot_with_too_high_index.asm', "./sample/asm/errors/passing_to_slot_with_too_high_index.asm:26:1: error: pass to parameter slot 3 in frame with only 3 slots available")
 
     def testDoublePassing(self):
-        runTestFailsToAssemble(self, 'double_pass.asm', "./sample/asm/errors/double_pass.asm:29: error: double pass to parameter slot 2 in frame defined at line 25, first pass at line 28")
+        runTestFailsToAssemble(self, 'double_pass.asm', "./sample/asm/errors/double_pass.asm:29:1: error: double pass to parameter slot 2 in frame defined at line 25, first pass at line 28")
 
     def testMsgRequiresAtLeastOneParameter(self):
-        runTestFailsToAssemble(self, 'msg_requires_at_least_one_parameter.asm', "./sample/asm/errors/msg_requires_at_least_one_parameter.asm:22: error: invalid number of parameters in dynamic dispatch of foo: expected at least 1, got 0")
+        runTestFailsToAssemble(self, 'msg_requires_at_least_one_parameter.asm', "./sample/asm/errors/msg_requires_at_least_one_parameter.asm:22:1: error: invalid number of parameters in dynamic dispatch of foo: expected at least 1, got 0")
 
     def testMsgArityMismatch(self):
-        runTestFailsToAssemble(self, 'msg_arity_mismatch.asm', "./sample/asm/errors/msg_arity_mismatch.asm:22: error: invalid number of parameters in dynamic dispatch of add/2: expected 2 got 1")
+        runTestFailsToAssemble(self, 'msg_arity_mismatch.asm', "./sample/asm/errors/msg_arity_mismatch.asm:22:1: error: invalid number of parameters in dynamic dispatch of add/2: expected 2 got 1")
 
     def testNoReturnOrTailcallAtTheEndOfAFunctionError(self):
-        runTestFailsToAssemble(self, 'no_return_at_the_end_of_a_function.asm', "./sample/asm/errors/no_return_at_the_end_of_a_function.asm:22: error: function does not end with 'return' or 'tailcall': foo/0")
+        runTestFailsToAssemble(self, 'no_return_at_the_end_of_a_function.asm', "./sample/asm/errors/no_return_at_the_end_of_a_function.asm:22:1: error: function does not end with 'return' or 'tailcall': foo/0")
 
     def testBlockWithEmptyBody(self):
-        runTestFailsToAssemble(self, 'empty_block_body.asm', "./sample/asm/errors/empty_block_body.asm:21: error: block with empty body: foo")
+        runTestFailsToAssemble(self, 'empty_block_body.asm', "./sample/asm/errors/empty_block_body.asm:21:1: error: block with empty body: foo")
 
     def testCallToUndefinedFunction(self):
         runTestFailsToAssemble(self, 'call_to_undefined_function.asm', "./sample/asm/errors/call_to_undefined_function.asm:22:10: error: call to undefined function foo/1")
@@ -1152,34 +1152,34 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'process_from_undefined_function.asm', "./sample/asm/errors/process_from_undefined_function.asm:22:13: error: process from undefined function foo/0")
 
     def testInvalidFunctionName(self):
-        runTestFailsToAssemble(self, 'invalid_function_name.asm', "./sample/asm/errors/invalid_function_name.asm:30: error: invalid function name: foo/x")
+        runTestFailsToAssemble(self, 'invalid_function_name.asm', "./sample/asm/errors/invalid_function_name.asm:30:1: error: invalid function name: foo/x")
 
     def testExcessFrameSpawned(self):
-        runTestFailsToAssemble(self, 'excess_frame_spawned.asm', "./sample/asm/errors/excess_frame_spawned.asm:27: error: excess frame spawned (unused frame spawned at line 26)")
+        runTestFailsToAssemble(self, 'excess_frame_spawned.asm', "./sample/asm/errors/excess_frame_spawned.asm:27:1: error: excess frame spawned (unused frame spawned at line 26)")
 
     def testCallWithoutAFrame(self):
-        runTestFailsToAssemble(self, 'call_without_a_frame.asm', "./sample/asm/errors/call_without_a_frame.asm:28: error: call with 'tailcall' without a frame")
+        runTestFailsToAssemble(self, 'call_without_a_frame.asm', "./sample/asm/errors/call_without_a_frame.asm:28:1: error: call with 'tailcall' without a frame")
 
     def testCatchingWithUndefinedBlock(self):
-        runTestFailsToAssemble(self, 'catching_with_undefined_block.asm', "./sample/asm/errors/catching_with_undefined_block.asm:27: error: cannot catch using undefined block: main/0__catch")
+        runTestFailsToAssemble(self, 'catching_with_undefined_block.asm', "./sample/asm/errors/catching_with_undefined_block.asm:27:1: error: cannot catch using undefined block: main/0__catch")
 
     def testEnteringUndefinedBlock(self):
-        runTestFailsToAssemble(self, 'entering_undefined_block.asm', "./sample/asm/errors/entering_undefined_block.asm:22: error: cannot enter undefined block: foo")
+        runTestFailsToAssemble(self, 'entering_undefined_block.asm', "./sample/asm/errors/entering_undefined_block.asm:22:1: error: cannot enter undefined block: foo")
 
     def testFunctionFromUndefinedFunction(self):
-        runTestFailsToAssemble(self, 'function_from_undefined_function.asm', "./sample/asm/errors/function_from_undefined_function.asm:21: error: function from undefined function: foo/0")
+        runTestFailsToAssemble(self, 'function_from_undefined_function.asm', "./sample/asm/errors/function_from_undefined_function.asm:21:1: error: function from undefined function: foo/0")
 
     def testInvalidRegisterSetName(self):
-        runTestFailsToAssemble(self, 'invalid_ress_instruction.asm', "./sample/asm/errors/invalid_ress_instruction.asm:21: error: illegal register set name in ress instruction 'foo' in function main/1")
+        runTestFailsToAssemble(self, 'invalid_ress_instruction.asm', "./sample/asm/errors/invalid_ress_instruction.asm:21:1: error: illegal register set name in ress instruction 'foo' in function main/1")
 
     def testGlobalRegisterSetUsedInLibraryFunction(self):
-        runTestFailsToAssemble(self, 'global_rs_used_in_lib.asm', "./sample/asm/errors/global_rs_used_in_lib.asm:21: error: global registers used in library function foo/0", asm_opts=('-c',))
+        runTestFailsToAssemble(self, 'global_rs_used_in_lib.asm', "./sample/asm/errors/global_rs_used_in_lib.asm:21:1: error: global registers used in library function foo/0", asm_opts=('-c',))
 
     def testFunctionWithEmptyBody(self):
-        runTestFailsToAssemble(self, 'empty_function_body.asm', "./sample/asm/errors/empty_function_body.asm:21: error: function with empty body: foo/0")
+        runTestFailsToAssemble(self, 'empty_function_body.asm', "./sample/asm/errors/empty_function_body.asm:21:1: error: function with empty body: foo/0")
 
     def testStrayEndMarked(self):
-        runTestFailsToAssemble(self, 'stray_end.asm', "./sample/asm/errors/stray_end.asm:20: error: stray .end marker")
+        runTestFailsToAssemble(self, 'stray_end.asm', "./sample/asm/errors/stray_end.asm:20:1: error: stray .end marker")
 
     def testIllegalDirective(self):
         runTestFailsToAssemble(self, 'illegal_directive.asm', "./sample/asm/errors/illegal_directive.asm:20:1: error: illegal directive")
@@ -1207,100 +1207,100 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'register_indexes_cannot_be_negative.asm', "./sample/asm/errors/register_indexes_cannot_be_negative.asm:27:11: error: register indexes cannot be negative: -1")
 
     def testBackwardOutOfFunctionJump(self):
-        runTestFailsToAssemble(self, 'backward_out_of_function_jump.asm', "./sample/asm/errors/backward_out_of_function_jump.asm:21: error: backward out-of-range jump")
+        runTestFailsToAssemble(self, 'backward_out_of_function_jump.asm', "./sample/asm/errors/backward_out_of_function_jump.asm:21:1: error: backward out-of-range jump")
 
     def testForwardOutOfFunctionJump(self):
-        runTestFailsToAssemble(self, 'forward_out_of_function_jump.asm', "./sample/asm/errors/forward_out_of_function_jump.asm:21: error: forward out-of-range jump")
+        runTestFailsToAssemble(self, 'forward_out_of_function_jump.asm', "./sample/asm/errors/forward_out_of_function_jump.asm:21:1: error: forward out-of-range jump")
 
     def testJumpToUnrecognisedMarker(self):
-        runTestFailsToAssemble(self, 'jump_to_unrecognised_marker.asm', "./sample/asm/errors/jump_to_unrecognised_marker.asm:21: error: jump to unrecognised marker: foo")
+        runTestFailsToAssemble(self, 'jump_to_unrecognised_marker.asm', "./sample/asm/errors/jump_to_unrecognised_marker.asm:21:1: error: jump to unrecognised marker: foo")
 
     def testAbsoluteJumpWithNegativeValue(self):
-        runTestFailsToAssemble(self, 'absolute_jump_negative.asm', "./sample/asm/errors/absolute_jump_negative.asm:21: error: absolute jump with negative value")
+        runTestFailsToAssemble(self, 'absolute_jump_negative.asm', "./sample/asm/errors/absolute_jump_negative.asm:21:1: error: absolute jump with negative value")
 
     def testFrameWithoutOperands(self):
-        runTestFailsToAssemble(self, 'frame_without_operands.asm', "./sample/asm/errors/frame_without_operands.asm:25: error: frame instruction without operands")
+        runTestFailsToAssemble(self, 'frame_without_operands.asm', "./sample/asm/errors/frame_without_operands.asm:25:1: error: frame instruction without operands")
 
     def testBlocksEndWithReturningInstruction(self):
-        runTestFailsToAssemble(self, 'blocks_end_with_returning_instruction.asm', "./sample/asm/errors/blocks_end_with_returning_instruction.asm:22: error: missing returning instruction (leave, return or halt) at the end of block 'foo__block'")
+        runTestFailsToAssemble(self, 'blocks_end_with_returning_instruction.asm', "./sample/asm/errors/blocks_end_with_returning_instruction.asm:22:1: error: missing returning instruction (leave, return or halt) at the end of block 'foo__block'")
 
     def testBranchWithoutTarget(self):
-        runTestFailsToAssemble(self, 'branch_without_a_target.asm', "./sample/asm/errors/branch_without_a_target.asm:23: error: branch without a target")
+        runTestFailsToAssemble(self, 'branch_without_a_target.asm', "./sample/asm/errors/branch_without_a_target.asm:23:1: error: branch without a target")
 
     def testBranchTrueBackwardOutOfRange(self):
-        runTestFailsToAssemble(self, 'branch_true_backward_out_of_range.asm', "./sample/asm/errors/branch_true_backward_out_of_range.asm:23: error: backward out-of-range jump")
+        runTestFailsToAssemble(self, 'branch_true_backward_out_of_range.asm', "./sample/asm/errors/branch_true_backward_out_of_range.asm:23:1: error: backward out-of-range jump")
 
     def testBranchTrueForwardOutOfRange(self):
-        runTestFailsToAssemble(self, 'branch_true_forward_out_of_range.asm', "./sample/asm/errors/branch_true_forward_out_of_range.asm:23: error: forward out-of-range jump")
+        runTestFailsToAssemble(self, 'branch_true_forward_out_of_range.asm', "./sample/asm/errors/branch_true_forward_out_of_range.asm:23:1: error: forward out-of-range jump")
 
     def testBranchFalseBackwardOutOfRange(self):
-        runTestFailsToAssemble(self, 'branch_false_backward_out_of_range.asm', "./sample/asm/errors/branch_false_backward_out_of_range.asm:23: error: backward out-of-range jump")
+        runTestFailsToAssemble(self, 'branch_false_backward_out_of_range.asm', "./sample/asm/errors/branch_false_backward_out_of_range.asm:23:1: error: backward out-of-range jump")
 
     def testBranchFalseForwardOutOfRange(self):
-        runTestFailsToAssemble(self, 'branch_false_forward_out_of_range.asm', "./sample/asm/errors/branch_false_forward_out_of_range.asm:23: error: forward out-of-range jump")
+        runTestFailsToAssemble(self, 'branch_false_forward_out_of_range.asm', "./sample/asm/errors/branch_false_forward_out_of_range.asm:23:1: error: forward out-of-range jump")
 
     def testBranchTrueForwardOutOfRangeNonrelative(self):
-        runTestFailsToAssemble(self, 'branch_true_forward_out_of_range_nonrelative.asm', "./sample/asm/errors/branch_true_forward_out_of_range_nonrelative.asm:23: error: forward out-of-range jump")
+        runTestFailsToAssemble(self, 'branch_true_forward_out_of_range_nonrelative.asm', "./sample/asm/errors/branch_true_forward_out_of_range_nonrelative.asm:23:1: error: forward out-of-range jump")
 
     def testBranchFalseForwardOutOfRangeNonrelative(self):
-        runTestFailsToAssemble(self, 'branch_false_forward_out_of_range_nonrelative.asm', "./sample/asm/errors/branch_false_forward_out_of_range_nonrelative.asm:23: error: forward out-of-range jump")
+        runTestFailsToAssemble(self, 'branch_false_forward_out_of_range_nonrelative.asm', "./sample/asm/errors/branch_false_forward_out_of_range_nonrelative.asm:23:1: error: forward out-of-range jump")
 
     def testBranchTrueNegativeAbsolute(self):
-        runTestFailsToAssemble(self, 'branch_true_negative_absolute.asm', "./sample/asm/errors/branch_true_negative_absolute.asm:23: error: absolute jump with negative value")
+        runTestFailsToAssemble(self, 'branch_true_negative_absolute.asm', "./sample/asm/errors/branch_true_negative_absolute.asm:23:1: error: absolute jump with negative value")
 
     def testBranchFalseNegativeAbsolute(self):
-        runTestFailsToAssemble(self, 'branch_false_negative_absolute.asm', "./sample/asm/errors/branch_false_negative_absolute.asm:23: error: absolute jump with negative value")
+        runTestFailsToAssemble(self, 'branch_false_negative_absolute.asm', "./sample/asm/errors/branch_false_negative_absolute.asm:23:1: error: absolute jump with negative value")
 
     def testBranchTrueToUnrecognisedMarker(self):
-        runTestFailsToAssemble(self, 'branch_true_to_unrecognised_marker.asm', "./sample/asm/errors/branch_true_to_unrecognised_marker.asm:23: error: jump to unrecognised marker: foo")
+        runTestFailsToAssemble(self, 'branch_true_to_unrecognised_marker.asm', "./sample/asm/errors/branch_true_to_unrecognised_marker.asm:23:1: error: jump to unrecognised marker: foo")
 
     def testBranchFalseToUnrecognisedMarker(self):
-        runTestFailsToAssemble(self, 'branch_false_to_unrecognised_marker.asm', "./sample/asm/errors/branch_false_to_unrecognised_marker.asm:23: error: jump to unrecognised marker: foo")
+        runTestFailsToAssemble(self, 'branch_false_to_unrecognised_marker.asm', "./sample/asm/errors/branch_false_to_unrecognised_marker.asm:23:1: error: jump to unrecognised marker: foo")
 
     def testZeroDistanceAbsoluteFalseBranch(self):
-        runTestFailsToAssemble(self, 'zero_distance_absolute_false_branch.asm', "./sample/asm/errors/zero_distance_absolute_false_branch.asm:21: error: zero-distance jump")
+        runTestFailsToAssemble(self, 'zero_distance_absolute_false_branch.asm', "./sample/asm/errors/zero_distance_absolute_false_branch.asm:21:1: error: zero-distance jump")
 
     def testZeroDistanceAbsoluteJump(self):
-        runTestFailsToAssemble(self, 'zero_distance_absolute_jump.asm', "./sample/asm/errors/zero_distance_absolute_jump.asm:21: error: zero-distance jump")
+        runTestFailsToAssemble(self, 'zero_distance_absolute_jump.asm', "./sample/asm/errors/zero_distance_absolute_jump.asm:21:1: error: zero-distance jump")
 
     def testZeroDistanceAbsoluteTrueBranch(self):
-        runTestFailsToAssemble(self, 'zero_distance_absolute_true_branch.asm', "./sample/asm/errors/zero_distance_absolute_true_branch.asm:21: error: zero-distance jump")
+        runTestFailsToAssemble(self, 'zero_distance_absolute_true_branch.asm', "./sample/asm/errors/zero_distance_absolute_true_branch.asm:21:1: error: zero-distance jump")
 
     def testZeroDistanceBackwardFalseBranch(self):
-        runTestFailsToAssemble(self, 'zero_distance_backward_false_branch.asm', "./sample/asm/errors/zero_distance_backward_false_branch.asm:21: error: zero-distance jump")
+        runTestFailsToAssemble(self, 'zero_distance_backward_false_branch.asm', "./sample/asm/errors/zero_distance_backward_false_branch.asm:21:1: error: zero-distance jump")
 
     def testZeroDistanceBackwardJump(self):
-        runTestFailsToAssemble(self, 'zero_distance_backward_jump.asm', "./sample/asm/errors/zero_distance_backward_jump.asm:21: error: zero-distance jump")
+        runTestFailsToAssemble(self, 'zero_distance_backward_jump.asm', "./sample/asm/errors/zero_distance_backward_jump.asm:21:1: error: zero-distance jump")
 
     def testZeroDistanceBackwardTrueBranch(self):
-        runTestFailsToAssemble(self, 'zero_distance_backward_true_branch.asm', "./sample/asm/errors/zero_distance_backward_true_branch.asm:21: error: zero-distance jump")
+        runTestFailsToAssemble(self, 'zero_distance_backward_true_branch.asm', "./sample/asm/errors/zero_distance_backward_true_branch.asm:21:1: error: zero-distance jump")
 
     def testZeroDistanceFalseBranch(self):
-        runTestFailsToAssemble(self, 'zero_distance_false_branch.asm', "./sample/asm/errors/zero_distance_false_branch.asm:24: error: zero-distance jump")
+        runTestFailsToAssemble(self, 'zero_distance_false_branch.asm', "./sample/asm/errors/zero_distance_false_branch.asm:24:1: error: zero-distance jump")
 
     def testZeroDistanceForwardFalseBranch(self):
-        runTestFailsToAssemble(self, 'zero_distance_forward_false_branch.asm', "./sample/asm/errors/zero_distance_forward_false_branch.asm:21: error: zero-distance jump")
+        runTestFailsToAssemble(self, 'zero_distance_forward_false_branch.asm', "./sample/asm/errors/zero_distance_forward_false_branch.asm:21:1: error: zero-distance jump")
 
     def testZeroDistanceForwardJump(self):
-        runTestFailsToAssemble(self, 'zero_distance_forward_jump.asm', "./sample/asm/errors/zero_distance_forward_jump.asm:21: error: zero-distance jump")
+        runTestFailsToAssemble(self, 'zero_distance_forward_jump.asm', "./sample/asm/errors/zero_distance_forward_jump.asm:21:1: error: zero-distance jump")
 
     def testZeroDistanceForwardTrueBranch(self):
-        runTestFailsToAssemble(self, 'zero_distance_forward_true_branch.asm', "./sample/asm/errors/zero_distance_forward_true_branch.asm:21: error: zero-distance jump")
+        runTestFailsToAssemble(self, 'zero_distance_forward_true_branch.asm', "./sample/asm/errors/zero_distance_forward_true_branch.asm:21:1: error: zero-distance jump")
 
     def testZeroDistanceJump(self):
-        runTestFailsToAssemble(self, 'zero_distance_jump.asm', "./sample/asm/errors/zero_distance_jump.asm:24: error: zero-distance jump")
+        runTestFailsToAssemble(self, 'zero_distance_jump.asm', "./sample/asm/errors/zero_distance_jump.asm:24:1: error: zero-distance jump")
 
     def testZeroDistanceMarkerFalseBranch(self):
-        runTestFailsToAssemble(self, 'zero_distance_marker_false_branch.asm', "./sample/asm/errors/zero_distance_marker_false_branch.asm:25: error: zero-distance jump")
+        runTestFailsToAssemble(self, 'zero_distance_marker_false_branch.asm', "./sample/asm/errors/zero_distance_marker_false_branch.asm:25:1: error: zero-distance jump")
 
     def testZeroDistanceMarkerJump(self):
-        runTestFailsToAssemble(self, 'zero_distance_marker_jump.asm', "./sample/asm/errors/zero_distance_marker_jump.asm:24: error: zero-distance jump")
+        runTestFailsToAssemble(self, 'zero_distance_marker_jump.asm', "./sample/asm/errors/zero_distance_marker_jump.asm:24:1: error: zero-distance jump")
 
     def testZeroDistanceMarkerTrueBranch(self):
-        runTestFailsToAssemble(self, 'zero_distance_marker_true_branch.asm', "./sample/asm/errors/zero_distance_marker_true_branch.asm:25: error: zero-distance jump")
+        runTestFailsToAssemble(self, 'zero_distance_marker_true_branch.asm', "./sample/asm/errors/zero_distance_marker_true_branch.asm:25:1: error: zero-distance jump")
 
     def testZeroDistanceTrueBranch(self):
-        runTestFailsToAssemble(self, 'zero_distance_true_branch.asm', "./sample/asm/errors/zero_distance_true_branch.asm:24: error: zero-distance jump")
+        runTestFailsToAssemble(self, 'zero_distance_true_branch.asm', "./sample/asm/errors/zero_distance_true_branch.asm:24:1: error: zero-distance jump")
 
     def testAtLeastTwoTokensAreRequiredInAWrappedInstruction(self):
         runTestFailsToAssemble(self, 'at_least_two_tokens_required_in_a_wrapped_instruction.asm', "./sample/asm/errors/at_least_two_tokens_required_in_a_wrapped_instruction.asm:25:27: error: at least two tokens are required in a wrapped instruction")
