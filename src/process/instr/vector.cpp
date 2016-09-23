@@ -17,8 +17,8 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
 #include <viua/bytecode/bytetypedef.h>
+#include <viua/bytecode/decoder/operands.h>
 #include <viua/assert.h>
 #include <viua/types/type.h>
 #include <viua/types/integer.h>
@@ -31,9 +31,10 @@ using namespace std;
 
 
 byte* Process::opvec(byte* addr) {
-    auto register_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    auto pack_start_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    auto pack_length = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned register_index = 0, pack_start_index = 0, pack_length = 0;
+    tie(addr, register_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, pack_start_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, pack_length) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     if ((register_index > pack_start_index) and (register_index < (pack_start_index+pack_length))) {
         throw new Exception("vec would pack itself");
