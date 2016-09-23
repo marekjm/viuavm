@@ -78,7 +78,7 @@ byte* Process::openter(byte* addr) {
 
     byte* block_address = adjustJumpBaseForBlock(block_name);
 
-    try_frame_new->return_address = addr; // address has already been adjusted by extractString()
+    try_frame_new->return_address = addr;
     try_frame_new->associated_frame = frames.back().get();
     try_frame_new->block_name = block_name;
 
