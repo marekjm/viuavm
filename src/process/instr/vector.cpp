@@ -119,18 +119,13 @@ byte* Process::opvat(byte* addr) {
      *
      *  Vector always returns a copy of the object in a register.
      */
-    unsigned destination_register_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    Type* vector_operand = viua::operand::extract(addr)->resolve(this);
-
+    unsigned destination_register_index = 0;
+    Type* vector_operand = nullptr;
     int position_operand_index = 0;
-    bool reg_ref = false;
 
-    viua::kernel::util::extractIntegerOperand(addr, reg_ref, position_operand_index);
-
-    if (reg_ref) {
-        // register index references cannot be negative so it's safe to cast to unsigned
-        position_operand_index = static_cast<Integer*>(fetch(static_cast<unsigned>(position_operand_index)))->value();
-    }
+    tie(addr, destination_register_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, vector_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    tie(addr, position_operand_index) = viua::bytecode::decoder::operands::fetch_primitive_int(addr, this);
 
     viua::assertions::assert_implements<Vector>(vector_operand, "Vector");
     Type* ptr = static_cast<Vector*>(vector_operand)->at(position_operand_index);
