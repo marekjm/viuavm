@@ -37,6 +37,8 @@ byte* Process::opvec(byte* addr) {
     tie(addr, pack_length) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     if ((register_index > pack_start_index) and (register_index < (pack_start_index+pack_length))) {
+        // FIXME vector is inserted into a register after packing, so this exception is not entirely well thought-out
+        // allow packing target register
         throw new Exception("vec would pack itself");
     }
     if ((pack_start_index+pack_length) >= uregset->size()) {
