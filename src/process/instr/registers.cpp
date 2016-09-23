@@ -111,7 +111,10 @@ byte* Process::opress(byte* addr) {
 }
 
 byte* Process::optmpri(byte* addr) {
-    tmp.reset(pop(viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this)));
+    unsigned target = 0;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+
+    tmp.reset(pop(target));
     return addr;
 }
 byte* Process::optmpro(byte* addr) {
@@ -119,7 +122,8 @@ byte* Process::optmpro(byte* addr) {
         throw new Exception("temporary register set is empty");
     }
 
-    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = 0;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     if (uregset->at(target) != nullptr) {
         uregset->free(target);
