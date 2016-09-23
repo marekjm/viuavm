@@ -63,9 +63,12 @@ byte* Process::opvec(byte* addr) {
 byte* Process::opvinsert(byte* addr) {
     /*  Run vinsert instruction.
      */
-    Type* vector_operand = viua::operand::extract(addr)->resolve(this);
-    unsigned object_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    unsigned position_operand_index = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    Type* vector_operand = nullptr;
+    unsigned object_operand_index = 0, position_operand_index = 0;
+
+    tie(addr, vector_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    tie(addr, object_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, position_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     viua::assertions::assert_implements<Vector>(vector_operand, "Vector");
 
