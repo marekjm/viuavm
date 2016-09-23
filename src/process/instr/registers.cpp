@@ -17,7 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
+#include <viua/bytecode/decoder/operands.h>
 #include <viua/types/pointer.h>
 #include <viua/types/boolean.h>
 #include <viua/types/reference.h>
@@ -29,8 +29,9 @@ using namespace std;
 
 
 byte* Process::opmove(byte* addr) {
-    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    unsigned source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = 0, source = 0;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     uregset->move(source, target);
 
