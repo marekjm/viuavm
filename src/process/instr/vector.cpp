@@ -76,9 +76,6 @@ byte* Process::opvinsert(byte* addr) {
 
 byte* Process::opvpush(byte* addr) {
     /*  Run vpush instruction.
-     *
-     *  Vector always pushes a copy of the object in a register.
-     *  FIXME: make it possible to push references.
      */
     Type* target = viua::operand::extract(addr)->resolve(this);
     unsigned source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
