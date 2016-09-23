@@ -61,6 +61,7 @@ namespace viua {
                  *  immediates.
                  */
                 auto fetch_raw_int(byte *ip, Process* p) -> std::tuple<byte*, int>;
+                auto fetch_raw_float(byte*, Process*) -> std::tuple<byte*, float>;
 
                 /*
                  *  Extract data decoding it from bytecode without advancing the bytecode

@@ -34,19 +34,13 @@ using namespace std;
 byte* Process::opfstore(byte* addr) {
     /*  Run fstore instruction.
      */
-    int destination_register_index;
-    float value;
-    bool destination_register_ref = false;
+    unsigned target = 0;
+    float value = 0.0;
 
-    // FIXME: register indexes should be encoded as unsigned integers
-    viua::kernel::util::extractIntegerOperand(addr, destination_register_ref, destination_register_index);
-    viua::kernel::util::extractFloatingPointOperand(addr, value);
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, value) = viua::bytecode::decoder::operands::fetch_raw_float(addr, this);
 
-    if (destination_register_ref) {
-        destination_register_index = static_cast<Integer*>(fetch(static_cast<unsigned>(destination_register_index)))->value();
-    }
-
-    place(static_cast<unsigned>(destination_register_index), new Float(value));
+    place(target, new Float(value));
 
     return addr;
 }
