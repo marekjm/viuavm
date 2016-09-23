@@ -48,9 +48,12 @@ byte* Process::opcopy(byte* addr) {
     return addr;
 }
 byte* Process::opptr(byte* addr) {
-    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = 0;
+    Type *source = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    place(target, viua::operand::extract(addr)->resolve(this)->pointer());
+    place(target, source->pointer());
 
     return addr;
 }
