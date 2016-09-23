@@ -88,7 +88,7 @@ byte* Process::opress(byte* addr) {
     /*  Run ress instruction.
      */
     int to_register_set = 0;
-    viua::kernel::util::extractOperand<decltype(to_register_set)>(addr, to_register_set);
+    tie(addr, to_register_set) = viua::bytecode::decoder::operands::fetch_raw_int(addr, this);
 
     switch (to_register_set) {
         case 0:

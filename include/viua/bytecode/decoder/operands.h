@@ -42,6 +42,8 @@ namespace viua {
                 auto fetch_atom(byte*, Process*) -> std::tuple<byte*, std::string>;
                 auto fetch_object(byte*, Process*) -> std::tuple<byte*, Type*>;
 
+                auto fetch_raw_int(byte *ip, Process* p) -> std::tuple<byte*, int>;
+
                 auto extract_primitive_uint64(byte*, Process*) -> uint64_t;
             }
         }

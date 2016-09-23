@@ -101,6 +101,10 @@ auto viua::bytecode::decoder::operands::fetch_primitive_int(byte *ip, Process* p
     return fetch_primitive_value<int, Integer>(ip, p, 0);
 }
 
+auto viua::bytecode::decoder::operands::fetch_raw_int(byte *ip, Process* p) -> tuple<byte*, int> {
+    return tuple<byte*, int>((ip+sizeof(int)), extract<int>(ip));
+}
+
 auto viua::bytecode::decoder::operands::extract_primitive_uint64(byte *ip, Process*) -> uint64_t {
     return extract<uint64_t>(ip);
 }
