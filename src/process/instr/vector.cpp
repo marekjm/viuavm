@@ -80,8 +80,11 @@ byte* Process::opvinsert(byte* addr) {
 byte* Process::opvpush(byte* addr) {
     /*  Run vpush instruction.
      */
-    Type* target = viua::operand::extract(addr)->resolve(this);
-    unsigned source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    Type* target = nullptr;
+    unsigned source = 0;
+
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     viua::assertions::assert_implements<Vector>(target, "Vector");
     static_cast<Vector*>(target)->push(pop(source));
