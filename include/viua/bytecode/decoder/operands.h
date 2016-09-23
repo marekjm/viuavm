@@ -35,8 +35,15 @@ namespace viua {
         namespace decoder {
             namespace operands {
                 /*
-                 *  Fetch fully specified operands, i.e. data preceded by operand type,
-                 *  possibly stored in registers.
+                 *  Fetch fully specified operands, possibly stored in registers.
+                 *  These functions will correctly decode and return:
+                 *
+                 *  - immediates
+                 *  - values from registers specified as register indexes
+                 *  - values from registers specified as register references
+                 *
+                 *  These functions are used most often bymajority of the instructions.
+                 *
                  */
                 auto fetch_register_index(byte*, Process*) -> std::tuple<byte*, unsigned>;
                 auto fetch_primitive_char(byte*, Process*) -> std::tuple<byte*, char>;
@@ -49,12 +56,16 @@ namespace viua {
                 /*
                  *  Fetch raw data decoding it directly from bytecode.
                  *  No register access is neccessary.
+                 *  These functions are used by instructions whose operands are always
+                 *  immediates.
                  */
                 auto fetch_raw_int(byte *ip, Process* p) -> std::tuple<byte*, int>;
 
                 /*
                  *  Extract data decoding it from bytecode without advancing the bytecode
                  *  pointer.
+                 *  These functions are used by instructions whose operands are always
+                 *  immediates.
                  */
                 auto extract_primitive_uint64(byte*, Process*) -> uint64_t;
             }
