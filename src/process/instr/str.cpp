@@ -18,6 +18,7 @@
  */
 
 #include <viua/bytecode/bytetypedef.h>
+#include <viua/bytecode/decoder/operands.h>
 #include <viua/types/type.h>
 #include <viua/types/integer.h>
 #include <viua/types/boolean.h>
@@ -31,9 +32,13 @@ using namespace std;
 
 
 byte* Process::opstrstore(byte* addr) {
-    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = 0;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    place(target, new String(str::strdecode(viua::operand::extractString(addr))));
+    string s;
+    tie(addr, s) = viua::bytecode::decoder::operands::fetch_primitive_string(addr, this);
+
+    place(target, new String(str::strdecode(s)));
 
     return addr;
 }
