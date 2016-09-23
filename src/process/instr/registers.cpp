@@ -67,7 +67,11 @@ byte* Process::opswap(byte* addr) {
     return addr;
 }
 byte* Process::opdelete(byte* addr) {
-    uregset->free(viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this));
+    unsigned target = 0;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+
+    uregset->free(target);
+
     return addr;
 }
 byte* Process::opisnull(byte* addr) {
