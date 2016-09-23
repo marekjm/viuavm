@@ -24,7 +24,6 @@
 #include <viua/types/integer.h>
 #include <viua/types/vector.h>
 #include <viua/kernel/registerset.h>
-#include <viua/operand.h>
 #include <viua/kernel/kernel.h>
 using namespace std;
 

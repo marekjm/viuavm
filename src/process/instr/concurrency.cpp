@@ -23,7 +23,6 @@
 #include <viua/types/reference.h>
 #include <viua/types/process.h>
 #include <viua/exceptions.h>
-#include <viua/operand.h>
 #include <viua/kernel/kernel.h>
 #include <viua/scheduler/vps.h>
 using namespace std;

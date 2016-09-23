@@ -25,7 +25,6 @@
 #include <viua/types/byte.h>
 #include <viua/types/string.h>
 #include <viua/support/string.h>
-#include <viua/operand.h>
 #include <viua/kernel/kernel.h>
 using namespace std;
 

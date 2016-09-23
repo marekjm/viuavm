@@ -22,7 +22,6 @@
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/types/boolean.h>
 #include <viua/exceptions.h>
-#include <viua/operand.h>
 #include <viua/kernel/kernel.h>
 using namespace std;
 

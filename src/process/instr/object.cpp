@@ -26,7 +26,6 @@
 #include <viua/types/string.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/registerset.h>
-#include <viua/operand.h>
 #include <viua/assert.h>
 #include <viua/kernel/kernel.h>
 #include <viua/scheduler/vps.h>

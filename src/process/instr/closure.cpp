@@ -27,7 +27,6 @@
 #include <viua/types/reference.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/registerset.h>
-#include <viua/operand.h>
 #include <viua/kernel/kernel.h>
 #include <viua/scheduler/vps.h>
 using namespace std;

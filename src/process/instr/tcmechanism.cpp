@@ -20,7 +20,6 @@
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/types/integer.h>
 #include <viua/exceptions.h>
-#include <viua/operand.h>
 #include <viua/kernel/kernel.h>
 #include <viua/scheduler/vps.h>
 using namespace std;
