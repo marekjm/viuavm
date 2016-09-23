@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <viua/bytecode/decoder/operands.h>
 #include <viua/types/integer.h>
 #include <viua/kernel/opex.h>
 #include <viua/exceptions.h>
@@ -39,8 +40,9 @@ byte* Process::optry(byte* addr) {
 byte* Process::opcatch(byte* addr) {
     /** Run catch instruction.
      */
-    string type_name = viua::operand::extractString(addr);
-    string catcher_block_name = viua::operand::extractString(addr);
+    string type_name, catcher_block_name;
+    tie(addr, type_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
+    tie(addr, catcher_block_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     if (not scheduler->isBlock(catcher_block_name)) {
         throw new Exception("registering undefined handler block '" + catcher_block_name + "' to handle " + type_name);
@@ -54,7 +56,8 @@ byte* Process::opcatch(byte* addr) {
 byte* Process::oppull(byte* addr) {
     /** Run pull instruction.
      */
-    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = 0;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     if (not caught) {
         throw new Exception("no caught object to pull");
@@ -67,7 +70,8 @@ byte* Process::oppull(byte* addr) {
 byte* Process::openter(byte* addr) {
     /*  Run enter instruction.
      */
-    string block_name = viua::operand::extractString(addr);
+    string block_name;
+    tie(addr, block_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     if (not scheduler->isBlock(block_name)) {
         throw new Exception("cannot enter undefined block: " + block_name);
@@ -87,7 +91,8 @@ byte* Process::openter(byte* addr) {
 byte* Process::opthrow(byte* addr) {
     /** Run throw instruction.
      */
-    unsigned source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned source = 0;
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     if (source >= uregset->size()) {
         ostringstream oss;
