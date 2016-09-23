@@ -75,8 +75,9 @@ byte* Process::opdelete(byte* addr) {
     return addr;
 }
 byte* Process::opisnull(byte* addr) {
-    unsigned target = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
-    unsigned source = viua::operand::getRegisterIndex(viua::operand::extract(addr).get(), this);
+    unsigned target = 0, source = 0;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     place(target, new Boolean(uregset->at(source) == nullptr));
 
