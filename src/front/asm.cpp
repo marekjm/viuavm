@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <unistd.h>
 #include <iostream>
 #include <fstream>
 #include <viua/support/string.h>
@@ -53,6 +54,15 @@ const string COLOR_FG_RED = "\x1b[38;5;1m";
 const string COLOR_FG_YELLOW = "\x1b[38;5;3m";
 const string COLOR_FG_WHITE = "\x1b[38;5;15m";
 const string ATTR_RESET = "\x1b[0m";
+
+
+static string send_control_seq(const string& mode) {
+    static auto is_terminal = isatty(1);
+    if (is_terminal) {
+        return mode;
+    }
+    return "";
+}
 
 
 static bool usage(const char* program, bool show_help, bool show_version, bool verbose) {
@@ -113,8 +123,8 @@ static string read_file(const string& path) {
 }
 
 static void display_error_in_context(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) error_line, decltype(error_line) error_character, const string& filename, string message) {
-    cout << COLOR_FG_WHITE << filename << ':' << error_line+1 << ':' << error_character+1 << ':' << ATTR_RESET << ' ';
-    cout << COLOR_FG_RED << "error" << ATTR_RESET << ": " << message << endl;
+    cout << send_control_seq(COLOR_FG_WHITE) << filename << ':' << error_line+1 << ':' << error_character+1 << ':' << send_control_seq(ATTR_RESET) << ' ';
+    cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET) << ": " << message << endl;
     cout << "\n";
 
     const unsigned context_lines = 2;
@@ -129,9 +139,9 @@ static void display_error_in_context(const vector<viua::cg::lex::Token>& tokens,
         auto token = tokens[i];
         auto token_line = token.line();
         if (token_line >= context_before and token_line <= context_after) {
-            cout << (token_line == error_line ? (COLOR_FG_RED + ">>>>" + ATTR_RESET) : "    ") << ' ';
+            cout << (token_line == error_line ? (send_control_seq(COLOR_FG_RED) + ">>>>" + send_control_seq(ATTR_RESET)) : "    ") << ' ';
             if (token_line == error_line) {
-                cout << COLOR_FG_YELLOW << token_line+1 << ATTR_RESET;
+                cout << send_control_seq(COLOR_FG_YELLOW) << token_line+1 << send_control_seq(ATTR_RESET);
             } else {
                 cout << token_line+1;
             }
@@ -140,13 +150,13 @@ static void display_error_in_context(const vector<viua::cg::lex::Token>& tokens,
             cout << token.str();
             ++i;
             if (token.line() == error_line) {
-                cout << COLOR_FG_WHITE;
+                cout << send_control_seq(COLOR_FG_WHITE);
             }
             while (i < tokens.size() and tokens[i].line() == token_line) {
                 cout << tokens[i++].str();
             }
             if (token.line() == error_line) {
-                cout << ATTR_RESET;
+                cout << send_control_seq(ATTR_RESET);
             }
             --i;
         }
