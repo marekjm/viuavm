@@ -1053,19 +1053,19 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'vlen_on_empty_register.asm', "./sample/asm/static_analysis_errors/vlen_on_empty_register.asm:21:12: error: vlen from empty register: 1")
 
     def testInsertIntoEmptyRegister(self):
-        runTestFailsToAssemble(self, 'insert_into_empty_register.asm', "./sample/asm/static_analysis_errors/insert_into_empty_register.asm:23:12: error: insert into empty register: target")
+        runTestFailsToAssemble(self, 'insert_into_empty_register.asm', "./sample/asm/static_analysis_errors/insert_into_empty_register.asm:23:12: error: insert into empty register: target := 1")
 
     def testInsertKeyFromEmptyRegister(self):
-        runTestFailsToAssemble(self, 'insert_key_from_empty_register.asm', "./sample/asm/static_analysis_errors/insert_key_from_empty_register.asm:23:27: error: insert key from empty register: key")
+        runTestFailsToAssemble(self, 'insert_key_from_empty_register.asm', "./sample/asm/static_analysis_errors/insert_key_from_empty_register.asm:23:27: error: insert key from empty register: key := 2")
 
     def testInsertFromEmptyRegister(self):
-        runTestFailsToAssemble(self, 'insert_from_empty_register.asm', "./sample/asm/static_analysis_errors/insert_from_empty_register.asm:23:46: error: insert from empty register: value")
+        runTestFailsToAssemble(self, 'insert_from_empty_register.asm', "./sample/asm/static_analysis_errors/insert_from_empty_register.asm:23:46: error: insert from empty register: value := 3")
 
     def testRemoveKeyFromEmptyRegister(self):
-        runTestFailsToAssemble(self, 'remove_key_from_empty_register.asm', "./sample/asm/static_analysis_errors/remove_key_from_empty_register.asm:25:39: error: remove key from empty register: key")
+        runTestFailsToAssemble(self, 'remove_key_from_empty_register.asm', "./sample/asm/static_analysis_errors/remove_key_from_empty_register.asm:25:39: error: remove key from empty register: key := 3")
 
     def testRemoveFromEmptyRegister(self):
-        runTestFailsToAssemble(self, 'remove_from_empty_register.asm', "./sample/asm/static_analysis_errors/remove_from_empty_register.asm:25:19: error: remove from empty register: source")
+        runTestFailsToAssemble(self, 'remove_from_empty_register.asm', "./sample/asm/static_analysis_errors/remove_from_empty_register.asm:25:19: error: remove from empty register: source := 2")
 
     def testPointerFromEmptyRegister(self):
         runTestFailsToAssemble(self, 'pointer_from_empty_register.asm', "./sample/asm/static_analysis_errors/pointer_from_empty_register.asm:21:11: error: pointer from empty register: 1")
@@ -1092,7 +1092,7 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'join_from_empty_register.asm', "./sample/asm/static_analysis_errors/join_from_empty_register.asm:21:12: error: join from empty register: 1")
 
     def testSendTargetFromEmptyRegister(self):
-        runTestFailsToAssemble(self, 'send_target_from_empty_register.asm', "./sample/asm/static_analysis_errors/send_target_from_empty_register.asm:22:10: error: send target from empty register: pid")
+        runTestFailsToAssemble(self, 'send_target_from_empty_register.asm', "./sample/asm/static_analysis_errors/send_target_from_empty_register.asm:22:10: error: send target from empty register: pid := 1")
 
     def testSendFromEmptyRegister(self):
         runTestFailsToAssemble(self, 'send_from_empty_register.asm', "./sample/asm/static_analysis_errors/send_from_empty_register.asm:27:12: error: send from empty register: 2")

@@ -65,8 +65,7 @@ static auto skip_till_next_line(const std::vector<viua::cg::lex::Token>& tokens,
     } while (i < tokens.size() and tokens.at(i) != "\n");
     return i;
 }
-static string resolve_register_name(const map<string, string>& named_registers, viua::cg::lex::Token token) {
-    string name = token;
+static string resolve_register_name(const map<string, string>& named_registers, viua::cg::lex::Token token, string name) {
     if (name.at(0) == '@') {
         name = name.substr(1);
     }
@@ -81,6 +80,9 @@ static string resolve_register_name(const map<string, string>& named_registers, 
     }
     return named_registers.at(name);
 }
+static string resolve_register_name(const map<string, string>& named_registers, viua::cg::lex::Token token) {
+    return resolve_register_name(named_registers, token, token.str());
+}
 static void check_timeout_operand(Token token) {
     if (token == "\n") {
         throw viua::cg::lex::InvalidSyntax(token, "missing timeout operand");
@@ -90,15 +92,18 @@ static void check_timeout_operand(Token token) {
         throw viua::cg::lex::InvalidSyntax(token, "invalid timeout operand");
     }
 }
-static void check_use_of_register(const vector<viua::cg::lex::Token>& tokens, long unsigned i, Registers& registers, map<string, string>& named_registers, const string& message_prefix) {
-    string resolved_register_name = resolve_register_name(named_registers, tokens.at(i));
+static void check_use_of_register_index(const vector<viua::cg::lex::Token>& tokens, long unsigned i, string register_index, Registers& registers, map<string, string>& named_registers, const string& message_prefix) {
+    string resolved_register_name = resolve_register_name(named_registers, tokens.at(i), register_index);
     if (not registers.defined(resolved_register_name)) {
-        string message = (message_prefix + ": " + str::strencode(tokens.at(i)));
-        if (resolved_register_name != tokens.at(i).str()) {
-            message += (" = " + resolved_register_name);
+        string message = (message_prefix + ": " + str::strencode(register_index));
+        if (resolved_register_name != register_index) {
+            message += (" := " + resolved_register_name);
         }
         throw viua::cg::lex::InvalidSyntax(tokens.at(i), message);
     }
+}
+static void check_use_of_register(const vector<viua::cg::lex::Token>& tokens, long unsigned i, Registers& registers, map<string, string>& named_registers, const string& message_prefix) {
+    check_use_of_register_index(tokens, i, tokens.at(i), registers, named_registers, message_prefix);
 }
 static void check_use_of_register(const vector<viua::cg::lex::Token>& tokens, long unsigned i, Registers& registers, map<string, string>& named_registers) {
     check_use_of_register(tokens, i, registers, named_registers, "use of empty register");
@@ -141,63 +146,41 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, Re
             continue;
         }
         if (token == "move") {
-            if (not registers.defined(resolve_register_name(named_registers, body_tokens.at(i+2)))) {
-                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), ("move from empty register: " + str::strencode(body_tokens.at(i+2))));
-            }
+            check_use_of_register(body_tokens, i+2, registers, named_registers, "move from empty register");
             registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), i+1);
             registers.erase(resolve_register_name(named_registers, body_tokens.at(i+2)));
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "vpop" or token == "vat" or token == "vlen") {
-            if (not registers.defined(resolve_register_name(named_registers, body_tokens.at(i+2)))) {
-                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), (token.str() + " from empty register: " + str::strencode(body_tokens.at(i+2))));
-            }
+            check_use_of_register(body_tokens, i+2, registers, named_registers, (token.str() + " from empty register"));
             registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), i+1);
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "vinsert" or token == "vpush") {
-            if (not registers.defined(resolve_register_name(named_registers, body_tokens.at(i+1)))) {
-                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+1), (token.str() + " into empty register: " + str::strencode(body_tokens.at(i+1))));
-            }
-            if (not registers.defined(resolve_register_name(named_registers, body_tokens.at(i+2)))) {
-                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), (token.str() + " from empty register: " + str::strencode(body_tokens.at(i+2))));
-            }
+            check_use_of_register(body_tokens, i+1, registers, named_registers, (token.str() + " into empty register"));
+            check_use_of_register(body_tokens, i+2, registers, named_registers, (token.str() + " from empty register"));
             registers.erase(resolve_register_name(named_registers, body_tokens.at(i+2)));
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "insert") {
-            if (not registers.defined(resolve_register_name(named_registers, body_tokens.at(i+1)))) {
-                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+1), ("insert into empty register: " + str::strencode(body_tokens.at(i+1))));
-            }
-            if (not registers.defined(resolve_register_name(named_registers, body_tokens.at(i+2)))) {
-                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), ("insert key from empty register: " + str::strencode(body_tokens.at(i+2))));
-            }
-            if (not registers.defined(resolve_register_name(named_registers, body_tokens.at(i+3)))) {
-                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+3), ("insert from empty register: " + str::strencode(body_tokens.at(i+3))));
-            }
+            check_use_of_register(body_tokens, i+1, registers, named_registers, "insert into empty register");
+            check_use_of_register(body_tokens, i+2, registers, named_registers, "insert key from empty register");
+            check_use_of_register(body_tokens, i+3, registers, named_registers, "insert from empty register");
             registers.erase(resolve_register_name(named_registers, body_tokens.at(i+3)));
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "remove") {
-            if (not registers.defined(resolve_register_name(named_registers, body_tokens.at(i+2)))) {
-                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), ("remove from empty register: " + str::strencode(body_tokens.at(i+2))));
-            }
-            if (not registers.defined(resolve_register_name(named_registers, body_tokens.at(i+3)))) {
-                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+3), ("remove key from empty register: " + str::strencode(body_tokens.at(i+3))));
-            }
+            check_use_of_register(body_tokens, i+2, registers, named_registers, "remove from empty register");
+            check_use_of_register(body_tokens, i+3, registers, named_registers, "remove key from empty register");
             registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), i+1);
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "delete") {
-            if (not registers.defined(resolve_register_name(named_registers, body_tokens.at(i+1)))) {
-                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+1), ("delete of empty register: " + str::strencode(body_tokens.at(i+1))));
-            }
+            check_use_of_register(body_tokens, i+1, registers, named_registers, "delete of empty register");
             registers.erase(resolve_register_name(named_registers, body_tokens.at(i+1)));
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "throw") {
-            if (not registers.defined(resolve_register_name(named_registers, body_tokens.at(i+1)))) {
-                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+1), ("throw from empty register: " + str::strencode(body_tokens.at(i+1))));
-            }
+            check_use_of_register(body_tokens, i+1, registers, named_registers, "throw from empty register");
             registers.erase(resolve_register_name(named_registers, body_tokens.at(i+1)));
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "isnull") {
@@ -215,18 +198,14 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, Re
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "tmpri") {
-            if (not registers.defined(resolve_register_name(named_registers, body_tokens.at(i+1)))) {
-                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+1), ("move to tmp register from empty register: " + str::strencode(body_tokens.at(i+1))));
-            }
+            check_use_of_register(body_tokens, i+1, registers, named_registers, "move to tmp register from empty register");
             registers.erase(resolve_register_name(named_registers, body_tokens.at(i+1)));
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "tmpro") {
             registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), i+1);
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "branch") {
-            if (not registers.defined(resolve_register_name(named_registers, body_tokens.at(i+1)))) {
-                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+1), ("branch depends on empty register: " + str::strencode(body_tokens.at(i+1))));
-            }
+            check_use_of_register(body_tokens, i+1, registers, named_registers, "branch depends on empty register");
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "echo" or token == "print" or token == "not") {
             check_use_of_register(body_tokens, i+1, registers, named_registers, (token.str() + " of empty register"));
@@ -235,61 +214,30 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, Re
             if (debug) {
                 cout << str::enquote(token) << " from register " << str::enquote(str::strencode(body_tokens.at(i+2))) << endl;
             }
-            if (not registers.defined(resolve_register_name(named_registers, body_tokens.at(i+2)))) {
-                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), ("parameter " + string(token.str() == "pamv" ? "move" : "pass") + " from empty register: " + str::strencode(body_tokens.at(i+2))));
-            }
+            check_use_of_register(body_tokens, i+2, registers, named_registers, ("parameter " + string(token.str() == "pamv" ? "move" : "pass") + " from empty register"));
             if (token == "pamv") {
                 registers.erase(resolve_register_name(named_registers, body_tokens.at(i+2)));
             }
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "enclose" or token == "enclosecopy" or token == "enclosemove") {
-            if (not registers.defined(resolve_register_name(named_registers, body_tokens.at(i+2)))) {
-                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), ("closure of empty register: " + str::strencode(body_tokens.at(i+2))));
-            }
+            check_use_of_register(body_tokens, i+2, registers, named_registers, "closure of empty register");
             i = skip_till_next_line(body_tokens, i);
-        } else if (token == "copy") {
-            string copy_from = body_tokens.at(i+2);
-            if ((not str::isnum(copy_from)) and named_registers.count(copy_from)) {
-                copy_from = named_registers.at(copy_from);
-            }
-            if (not registers.defined(resolve_register_name(named_registers, body_tokens.at(i+2)))) {
-                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), ("copy from empty register: " + str::strencode(body_tokens.at(i+2))));
-            }
-            registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), i+1);
-            i = skip_till_next_line(body_tokens, i);
-            continue;
-        } else if (token == "ptr") {
-            if (not registers.defined(resolve_register_name(named_registers, body_tokens.at(i+2)))) {
-                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), ("pointer from empty register: " + str::strencode(body_tokens.at(i+2))));
-            }
-            registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), i+1);
-            i = skip_till_next_line(body_tokens, i);
-            continue;
-        } else if (token == "fcall") {
-            if (not registers.defined(resolve_register_name(named_registers, body_tokens.at(i+2)))) {
-                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), (token.str() + " from empty register: " + str::strencode(body_tokens.at(i+2))));
-            }
+        } else if (token == "copy" or token == "ptr" or token == "fcall") {
+            string opcode_name = token;
+            check_use_of_register(body_tokens, i+2, registers, named_registers, ((opcode_name == "ptr" ? "pointer" : opcode_name) + " from empty register"));
             registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), i+1);
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "send") {
-            if (not registers.defined(resolve_register_name(named_registers, body_tokens.at(i+2)))) {
-                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), ("send from empty register: " + str::strencode(body_tokens.at(i+2))));
-            }
-            if (not registers.defined(resolve_register_name(named_registers, body_tokens.at(i+1)))) {
-                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+1), ("send target from empty register: " + str::strencode(body_tokens.at(i+1))));
-            }
+            check_use_of_register(body_tokens, i+2, registers, named_registers, "send from empty register");
+            check_use_of_register(body_tokens, i+1, registers, named_registers, "send target from empty register");
             registers.erase(resolve_register_name(named_registers, body_tokens.at(i+2)));
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "swap") {
-            if (not registers.defined(resolve_register_name(named_registers, body_tokens.at(i+1)))) {
-                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+1), ("swap with empty register: " + str::strencode(body_tokens.at(i+1))));
-            }
-            if (not registers.defined(resolve_register_name(named_registers, body_tokens.at(i+2)))) {
-                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), ("swap with empty register: " + str::strencode(body_tokens.at(i+2))));
-            }
+            check_use_of_register(body_tokens, i+1, registers, named_registers, "swap with empty register");
+            check_use_of_register(body_tokens, i+2, registers, named_registers, "swap with empty register");
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "itof" or token == "ftoi" or token == "stoi" or token == "stof") {
@@ -303,9 +251,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, Re
             int registers_to_pack = stoi(resolve_register_name(named_registers, body_tokens.at(i+2)));
             if (registers_to_pack) {
                 for (int j = starting_register; j < (starting_register+registers_to_pack); ++j) {
-                    if (not registers.defined(str::stringify(j, false))) {
-                        throw viua::cg::lex::InvalidSyntax(token, ("packing empty register: " + str::stringify(j, false)));
-                    }
+                    check_use_of_register_index(body_tokens, i-1, str::stringify(j, false), registers, named_registers, "packing empty register");
                     registers.erase(str::stringify(j, false));
                 }
             }
@@ -324,9 +270,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, Re
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "join") {
-            if (not registers.defined(resolve_register_name(named_registers, body_tokens.at(i+2)))) {
-                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), (token.str() + " from empty register: " + str::strencode(body_tokens.at(i+2))));
-            }
+            check_use_of_register(body_tokens, i+2, registers, named_registers, "join from empty register");
             check_timeout_operand(body_tokens.at(i+3));
             registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), i+1);
             i = skip_till_next_line(body_tokens, i);
