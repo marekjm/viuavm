@@ -25,11 +25,29 @@
 #pragma once
 
 enum OperandType: uint8_t {
-    OT_REGISTER_INDEX,
-    OT_REGISTER_REFERENCE,
-    OT_ATOM,
-    OT_PRIMITIVE_BYTE,
-    OT_PRIMITIVE_INT,
+    OT_REGISTER_INDEX,      // register index
+    OT_REGISTER_REFERENCE,  // register reference (indirect register index)
+
+    OT_POINTER,             // index of register containing a pointer that
+                            // should be dereferenced (should be decoded to
+                            // dereferenced value)
+
+    OT_ATOM,                // null-terminated ASCII string
+    OT_STRING,              // UTF-8 encoded Unicode string
+    OT_BYTES,               // size-prefixed byte string
+
+    OT_INT8,                // 8bit signed integer
+    OT_INT16,               // 16bit signed integer
+    OT_INT32,               // 32bit signed integer
+    OT_INT64,               // 64bit signed integer
+
+    OT_UINT8,               // 8bit unsigned integer
+    OT_UINT16,              // 16bit unsigned integer
+    OT_UINT32,              // 32bit unsigned integer
+    OT_UINT64,              // 64bit unsigned integer
+
+    OT_FLOAT32,             // 32bit floating point number
+    OT_FLOAT64,             // 64bit floating point number
 };
 
 #endif
