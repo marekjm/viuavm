@@ -62,13 +62,7 @@ map<string, int> assembler::ce::getmarks(const vector<string>& lines) {
     for (unsigned i = 0; i < lines.size(); ++i) {
         line = lines[i];
         if (assembler::utils::lines::is_name(line) or assembler::utils::lines::is_link(line)) {
-            // names and links can be safely skipped as they are not Kernel instructions
-            continue;
-        }
-        if (assembler::utils::lines::is_function(line)) {
-            // instructions in functions are counted separately so they are
-            // not included here
-            while (!str::startswith(lines[i], ".end")) { ++i; }
+            // names and links can be safely skipped as they are not CPU instructions
             continue;
         }
         if (not assembler::utils::lines::is_mark(line)) {
