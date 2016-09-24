@@ -147,7 +147,7 @@ static string resolveregister(string reg, const map<string, int>& names) {
  *
  *  BE WARNED!
  *  This mapping (and the assemble_three_intop_instruction() function) *greatly* reduce the amount of code repetition
- *  in the assembler but are kinda black voodoo magic...
+ *  in the assembler but is kinda black voodoo magic...
  *
  *  NOTE TO FUTURE SELF:
  *  If you feel comfortable with taking pointers of member functions and calling such things - go on.
