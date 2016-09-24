@@ -50,13 +50,7 @@ bool DEBUG = false;
 bool SCREAM = false;
 
 
-const string COLOR_FG_RED = "\x1b[38;5;1m";
-const string COLOR_FG_YELLOW = "\x1b[38;5;3m";
-const string COLOR_FG_WHITE = "\x1b[38;5;15m";
-const string ATTR_RESET = "\x1b[0m";
-
-
-static string send_control_seq(const string& mode) {
+string send_control_seq(const string& mode) {
     static auto is_terminal = isatty(1);
     if (is_terminal) {
         return mode;
@@ -199,7 +193,9 @@ int main(int argc, char* argv[]) {
             if (i < argc-1) {
                 compilename = string(argv[++i]);
             } else {
-                cout << "error: option '" << argv[i] << "' requires an argument: filename" << endl;
+                cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
+                cout << ": option '" << send_control_seq(COLOR_FG_WHITE) << argv[i] << send_control_seq(ATTR_RESET) << "' requires an argument: filename";
+                cout << endl;
                 exit(1);
             }
             continue;
@@ -219,7 +215,10 @@ int main(int argc, char* argv[]) {
             PERFORM_STATIC_ANALYSIS = false;
             continue;
         } else if (str::startswith(option, "-")) {
-            cout << "error: unknown option: " << option << endl;
+            cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
+            cout << ": unknown option: ";
+            cout << send_control_seq(COLOR_FG_WHITE) << option << send_control_seq(ATTR_RESET);
+            cout << endl;
             return 1;
         }
         args.emplace_back(argv[i]);
@@ -228,7 +227,8 @@ int main(int argc, char* argv[]) {
     if (usage(argv[0], SHOW_HELP, SHOW_VERSION, VERBOSE)) { return 0; }
 
     if (args.size() == 0) {
-        cout << "fatal: no input file" << endl;
+        cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
+        cout << ": no input file" << endl;
         return 1;
     }
 
@@ -236,11 +236,14 @@ int main(int argc, char* argv[]) {
     // FIND FILENAME AND COMPILENAME
     filename = args[0];
     if (!filename.size()) {
-        cout << "fatal: no file to assemble" << endl;
+        cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
+        cout << ": no file to assemble" << endl;
         return 1;
     }
     if (!support::env::isfile(filename)) {
-        cout << "fatal: could not open file: " << filename << endl;
+        cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET) << ": ";
+        cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
+        cout << ": could not open file" << endl;
         return 1;
     }
 
@@ -253,7 +256,13 @@ int main(int argc, char* argv[]) {
     }
 
     if (VERBOSE or DEBUG) {
-        cout << "message: assembling \"" << filename << "\" to \"" << compilename << "\"" << endl;
+        cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
+        cout << ": ";
+        cout << send_control_seq(COLOR_FG_LIGHT_CYAN) << "message" << send_control_seq(ATTR_RESET);
+        cout << ": ";
+        cout << "assembling to \"";
+        cout << send_control_seq(COLOR_FG_WHITE) << compilename << send_control_seq(ATTR_RESET);
+        cout << "\"\n";
     }
 
 
@@ -279,7 +288,9 @@ int main(int argc, char* argv[]) {
     // READ LINES IN
     ifstream in(filename, ios::in | ios::binary);
     if (!in) {
-        cout << "fatal: file could not be opened: " << filename << endl;
+        cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET) << ": ";
+        cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
+        cout << ": file could not be opened" << endl;
         return 1;
     }
 
@@ -367,10 +378,14 @@ int main(int argc, char* argv[]) {
         ret_code = generate(expanded_lines, ilines, cooked_tokens, functions, blocks, filename, compilename, commandline_given_links, flags);
     } catch (const string& e) {
         ret_code = 1;
-        cout << "fatal: exception occured during assembling: " << e << endl;
+        cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET) << ": ";
+        cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
+        cout << ": " << e << endl;
     } catch (const char* e) {
         ret_code = 1;
-        cout << "fatal: exception occured during assembling: " << e << endl;
+        cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET) << ": ";
+        cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
+        cout << ": " << e << endl;
     } catch (const pair<unsigned, string>& e) {
         display_error_in_context(raw_tokens, expanded_lines_to_source_lines.at(e.first), 0, filename, e.second);
         return 1;

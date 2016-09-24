@@ -253,7 +253,9 @@ static Program& compile(Program& program, const vector<string>& lines, map<strin
         vector<string> tokens = tokenize(operands);
 
         if (DEBUG and SCREAM) {
-            cout << "[asm] compiling line: `" << line << "`" << endl;
+            cout << send_control_seq(COLOR_FG_LIGHT_CYAN) << "message" << send_control_seq(ATTR_RESET);
+            cout << ": ";
+            cout << "compiling line: " << str::strencode(line) << endl;
         }
 
         if (instr == "nop") {
@@ -772,7 +774,11 @@ static uint64_t writeCodeBlocksSection(ofstream& out, const invocables_t& blocks
     bwrite(out, block_ids_section_size);
     for (string name : blocks.names) {
         if (DEBUG) {
-            cout << "[asm:write] writing block '" << name << "' to block address table";
+            cout << send_control_seq(COLOR_FG_LIGHT_CYAN) << "message" << send_control_seq(ATTR_RESET);
+            cout << ": ";
+            cout << "writing block '";
+            cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << name << send_control_seq(ATTR_RESET);
+            cout << "' to block address table";
         }
         if (find(linked_block_names.begin(), linked_block_names.end(), name) != linked_block_names.end()) {
             if (DEBUG) {
@@ -793,8 +799,7 @@ static uint64_t writeCodeBlocksSection(ofstream& out, const invocables_t& blocks
         try {
             block_bodies_size_so_far += viua::cg::tools::calculate_bytecode_size(blocks.tokens.at(name));
         } catch (const std::out_of_range& e) {
-            cout << "fatal: could not find block '" << name << "' during address table write" << endl;
-            exit(1);
+            throw ("could not find block '" + name + "' during address table write");
         }
     }
 
@@ -872,7 +877,11 @@ static void check_main_function(const string& main_function, const vector<viua::
 
 static uint64_t generate_entry_function(uint64_t bytes, map<string, uint64_t> function_addresses, invocables_t& functions, const string& main_function, uint64_t starting_instruction) {
     if (DEBUG) {
-        cout << "generating " << ENTRY_FUNCTION_NAME << " function" << endl;
+        cout << send_control_seq(COLOR_FG_LIGHT_CYAN) << "message" << send_control_seq(ATTR_RESET);
+        cout << ": ";
+        cout << "generating ";
+        cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << ENTRY_FUNCTION_NAME << send_control_seq(ATTR_RESET);
+        cout << " function" << endl;
     }
 
     vector<string> entry_function_lines;
@@ -986,7 +995,13 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
     // GET MAIN FUNCTION NAME
     string main_function = get_main_function(tokens, functions.names);
     if (((VERBOSE and main_function != "main/1" and main_function != "") or DEBUG) and not flags.as_lib) {
-        cout << "debug (notice): main function set to: '" << main_function << "'" << endl;
+        cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
+        cout << ": ";
+        cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
+        cout << ": ";
+        cout << "main function set to: ";
+        cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << main_function << send_control_seq(ATTR_RESET);
+        cout << endl;
     }
 
 
@@ -999,7 +1014,13 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
         check_main_function(main_function, functions.tokens.at(main_function));
     }
     if (not main_is_defined and (DEBUG or VERBOSE) and not flags.as_lib) {
-        cout << "notice: main function (" << main_function << ") is not defined in " << filename << ", deferring main function check to post-link phase" << endl;
+        cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
+        cout << ": ";
+        cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
+        cout << ": ";
+        cout << "main function (";
+        cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << main_function << send_control_seq(ATTR_RESET);
+        cout << ") is not defined, deferring main function check to post-link phase" << endl;
     }
 
 
@@ -1015,8 +1036,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
         function_addresses = mapInvocableAddresses(starting_instruction, functions);
         bytes = viua::cg::tools::calculate_bytecode_size(tokens);
     } catch (const string& e) {
-        cout << "error: bytecode size calculation failed: " << e << endl;
-        return 1;
+        throw ("bytecode size calculation failed: " + e);
     }
 
 
@@ -1060,7 +1080,15 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
             symbol_sources[fn] = lnk;
             linked_function_names.emplace_back(fn);
             if (DEBUG) {
-                cout << filename << ": debug-note: prelinking function " << fn << " from module " << lnk << endl;
+                cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
+                cout << ": ";
+                cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
+                cout << ": ";
+                cout << "prelinking function ";
+                cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << fn << send_control_seq(ATTR_RESET);
+                cout << " from module ";
+                cout << send_control_seq(COLOR_FG_WHITE) << lnk << send_control_seq(ATTR_RESET);
+                cout << endl;
             }
         }
     }
@@ -1082,14 +1110,19 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
             }
         }
         if (main_function_found.size() > 1) {
-            cout << filename << ": error: more than one candidate for main function" << endl;
             for (auto f : main_function_found) {
-                cout << filename << ": note: " << f << " function found in module " << symbol_sources.at(f) << endl;
+                cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
+                cout << ": ";
+                cout << send_control_seq(COLOR_FG_CYAN) << "note" << send_control_seq(ATTR_RESET);
+                cout << ": ";
+                cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << f << send_control_seq(ATTR_RESET);
+                cout << " function found in module ";
+                cout << send_control_seq(COLOR_FG_WHITE) << symbol_sources.at(f) << send_control_seq(ATTR_RESET);
+                cout << endl;
             }
-            return 1;
+            throw "more than one candidate for main function";
         } else if (main_function_found.size() == 0) {
-            cout << filename << ": error: main function is not defined" << endl;
-            return 1;
+            throw "main function is not defined";
         }
         main_function = main_function_found[0];
     }
@@ -1105,7 +1138,13 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
     uint64_t current_link_offset = bytes;
     for (string lnk : links) {
         if (DEBUG or VERBOSE) {
-            cout << "[loader] message: linking with: '" << lnk << "\'" << endl;
+            cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
+            cout << ": ";
+            cout << send_control_seq(COLOR_FG_LIGHT_CYAN) << "message" << send_control_seq(ATTR_RESET);
+            cout << ": ";
+            cout << "[loader] linking with: '";
+            cout << send_control_seq(COLOR_FG_WHITE) << lnk << send_control_seq(ATTR_RESET);
+            cout << "'" << endl;
         }
 
         Loader loader(lnk);
@@ -1115,6 +1154,10 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
 
         vector<uint64_t> lib_jumps = loader.getJumps();
         if (DEBUG) {
+            cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
+            cout << ": ";
+            cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
+            cout << ": ";
             cout << "[loader] entries in jump table: " << lib_jumps.size() << endl;
             for (unsigned i = 0; i < lib_jumps.size(); ++i) {
                 cout << "  jump at byte: " << lib_jumps[i] << endl;
@@ -1127,7 +1170,13 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
         for (string fn : fn_names) {
             function_addresses[fn] = fn_addresses.at(fn) + current_link_offset;
             if (DEBUG) {
-                cout << "  \"" << fn << "\": entry point at byte: " << current_link_offset << '+' << fn_addresses.at(fn) << endl;
+                cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
+                cout << ": ";
+                cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
+                cout << ": ";
+                cout << "\"" << send_control_seq(COLOR_FG_LIGHT_GREEN) << fn << send_control_seq(ATTR_RESET) << "\": ";
+                cout << "entry point at byte: " << current_link_offset << '+' << fn_addresses.at(fn);
+                cout << endl;
             }
         }
 
@@ -1146,18 +1195,31 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
     /////////////////////////////
     // REPORT TOTAL BYTECODE SIZE
     if ((VERBOSE or DEBUG) and linked_function_names.size() != 0) {
-        cout << "message: total required bytes: " << bytes << " bytes" << endl;
+        cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
+        cout << ": ";
+        cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
+        cout << ": ";
+        cout << "total required bytes: " << bytes << " bytes" << endl;
     }
     if (DEBUG) {
-        cout << "debug: required bytes: " << (bytes-(bytes-current_link_offset)) << " local" << endl;
-        cout << "debug: required bytes: " << (bytes-current_link_offset) << " linked" << endl;
+        cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
+        cout << ": ";
+        cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
+        cout << ": ";
+        cout << "required bytes: " << (bytes-(bytes-current_link_offset)) << " local, ";
+        cout << (bytes-current_link_offset) << " linked";
+        cout << endl;
     }
 
 
     ///////////////////////////
     // REPORT FIRST INSTRUCTION
     if ((VERBOSE or DEBUG) and not flags.as_lib) {
-        cout << "message: first instruction pointer: " << starting_instruction << endl;
+        cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
+        cout << ": ";
+        cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
+        cout << ": ";
+        cout << "first instruction pointer: " << starting_instruction << endl;
     }
 
 
@@ -1183,7 +1245,13 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
         if (find(linked_block_names.begin(), linked_block_names.end(), name) != linked_block_names.end()) { continue; }
 
         if (VERBOSE or DEBUG) {
-            cout << "[asm] message: generating bytecode for block \"" << name << '"';
+            cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
+            cout << ": ";
+            cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
+            cout << ": ";
+            cout << "generating bytecode for block \"";
+            cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << name << send_control_seq(ATTR_RESET);
+            cout << '"';
         }
         uint64_t fun_bytes = 0;
         try {
@@ -1192,29 +1260,30 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
                 cout << " (" << fun_bytes << " bytes at byte " << block_bodies_section_size << ')' << endl;
             }
         } catch (const string& e) {
-            cout << "fatal: error during block size count (pre-assembling): " << e << endl;
-            exit(1);
+            throw ("failed block size count (during pre-assembling): " + e);
         } catch (const std::out_of_range& e) {
-            cout << e.what() << endl;
-            exit(1);
+            throw ("in block '" + name + "': " + e.what());
         }
 
         Program func(fun_bytes);
         func.setdebug(DEBUG).setscream(SCREAM);
         try {
             if (DEBUG) {
-                cout << "[debug] assembling block '" << name << "'\n";
+                cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
+                cout << ": ";
+                cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
+                cout << ": ";
+                cout << "assembling block '";
+                cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << name << send_control_seq(ATTR_RESET);
+                cout << "'\n";
             }
             assemble(func, blocks.bodies.at(name));
         } catch (const string& e) {
-            cout << (DEBUG ? "\n" : "") << "error: in block '" << name << "': " << e << endl;
-            exit(1);
+            throw ("in block '" + name + "': " + e);
         } catch (const char*& e) {
-            cout << (DEBUG ? "\n" : "") << "error: in block '" << name << "': " << e << endl;
-            exit(1);
+            throw ("in block '" + name + "': " + e);
         } catch (const std::out_of_range& e) {
-            cout << (DEBUG ? "\n" : "") << "error: in block '" << name << "': " << e.what() << endl;
-            exit(1);
+            throw ("in block '" + name + "': " + e.what());
         }
 
         vector<uint64_t> jumps = func.jumps();
@@ -1236,14 +1305,22 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
         for (unsigned i = 0; i < jumps.size(); ++i) {
             uint64_t jmp = jumps[i];
             if (DEBUG) {
-                cout << "[asm] debug: pushed relative jump to jump table: " << jmp << '+' << block_bodies_section_size << endl;
+                cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
+                cout << ": ";
+                cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
+                cout << ": ";
+                cout << "pushed relative jump to jump table: " << jmp << '+' << block_bodies_section_size << endl;
             }
             jump_table.emplace_back(jmp+block_bodies_section_size);
         }
 
         for (unsigned i = 0; i < jumps_absolute.size(); ++i) {
             if (DEBUG) {
-                cout << "[asm] debug: pushed absolute jump to jump table: " << jumps_absolute[i] << "+0" << endl;
+                cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
+                cout << ": ";
+                cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
+                cout << ": ";
+                cout << "pushed absolute jump to jump table: " << jumps_absolute[i] << "+0" << endl;
             }
             jump_positions.emplace_back(jumps_absolute[i]+block_bodies_section_size, 0);
         }
@@ -1259,7 +1336,13 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
         if (find(linked_function_names.begin(), linked_function_names.end(), name) != linked_function_names.end()) { continue; }
 
         if (VERBOSE or DEBUG) {
-            cout << "[asm] message: generating bytecode for function \"" << name << '"';
+            cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
+            cout << ": ";
+            cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
+            cout << ": ";
+            cout << "generating bytecode for function \"";
+            cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << name << send_control_seq(ATTR_RESET);
+            cout << '"';
         }
         uint64_t fun_bytes = 0;
         try {
@@ -1268,29 +1351,30 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
                 cout << " (" << fun_bytes << " bytes at byte " << functions_section_size << ')' << endl;
             }
         } catch (const string& e) {
-            cout << "fatal: error during function size count (pre-assembling): " << e << endl;
-            exit(1);
+            throw ("failed function size count (during pre-assembling): " + e);
         } catch (const std::out_of_range& e) {
-            cout << e.what() << endl;
-            exit(1);
+            throw e.what();
         }
 
         Program func(fun_bytes);
         func.setdebug(DEBUG).setscream(SCREAM);
         try {
             if (DEBUG) {
-                cout << "[debug] assembling function '" << name << "'\n";
+                cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
+                cout << ": ";
+                cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
+                cout << ": ";
+                cout << "assembling function '";
+                cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << name << send_control_seq(ATTR_RESET);
+                cout << "'\n";
             }
             assemble(func, functions.bodies.at(name));
         } catch (const string& e) {
-            cout << (DEBUG ? "\n" : "") << "error: in function '" << name << "': " << e << endl;
-            exit(1);
+            throw ("in function '" + name + "': " + e);
         } catch (const char*& e) {
-            cout << (DEBUG ? "\n" : "") << "error: in function '" << name << "': " << e << endl;
-            exit(1);
+            throw ("in function '" + name + "': " + e);
         } catch (const std::out_of_range& e) {
-            cout << (DEBUG ? "\n" : "") << "error: in function '" << name << "': " << e.what() << endl;
-            exit(1);
+            throw ("in function '" + name + "': " + e.what());
         }
 
         vector<uint64_t> jumps = func.jumps();
@@ -1312,14 +1396,22 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
         for (unsigned i = 0; i < jumps.size(); ++i) {
             uint64_t jmp = jumps[i];
             if (DEBUG) {
-                cout << "[asm] debug: pushed relative jump to jump table: " << jmp << '+' << functions_section_size << endl;
+                cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
+                cout << ": ";
+                cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
+                cout << ": ";
+                cout << "pushed relative jump to jump table: " << jmp << '+' << functions_section_size << endl;
             }
             jump_table.emplace_back(jmp+functions_section_size);
         }
 
         for (unsigned i = 0; i < jumps_absolute.size(); ++i) {
             if (DEBUG) {
-                cout << "[asm] debug: pushed absolute jump to jump table: " << jumps_absolute[i] << "+0" << endl;
+                cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
+                cout << ": ";
+                cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
+                cout << ": ";
+                cout << "pushed absolute jump to jump table: " << jumps_absolute[i] << "+0" << endl;
             }
             jump_positions.emplace_back(jumps_absolute[i]+functions_section_size, 0);
         }
@@ -1349,8 +1441,17 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
     }
 
     bwrite(out, meta_information_map_size);
+    if (DEBUG) {
+        cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
+        cout << ": ";
+        cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
+        cout << ": ";
+        cout << "writing meta information\n";
+    }
     for (auto each : meta_information_map) {
-        cout << each.first << ": '" << each.second << "'" << endl;
+        if (DEBUG) {
+            cout << "  " << str::enquote(each.first) << ": " << str::enquote(each.second) << endl;
+        }
         strwrite(out, each.first);
         strwrite(out, each.second);
     }
@@ -1361,7 +1462,11 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
     // WRITE OUT JUMP TABLE
     if (flags.as_lib) {
         if (DEBUG) {
-            cout << "debug: jump table has " << jump_table.size() << " entries" << endl;
+            cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
+            cout << ": ";
+            cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
+            cout << ": ";
+            cout << "jump table has " << jump_table.size() << " entries" << endl;
         }
         uint64_t total_jumps = jump_table.size();
         bwrite(out, total_jumps);
@@ -1424,7 +1529,13 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
         if (find(linked_block_names.begin(), linked_block_names.end(), name) != linked_block_names.end()) { continue; }
 
         if (DEBUG) {
-            cout << "[asm] pushing bytecode of local block '" << name << "' to final byte array" << endl;
+            cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
+            cout << ": ";
+            cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
+            cout << ": ";
+            cout << "pushing bytecode of local block '";
+            cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << name << send_control_seq(ATTR_RESET);
+            cout << "' to final byte array" << endl;
         }
         uint64_t fun_size = 0;
         byte* fun_bytecode = nullptr;
@@ -1444,7 +1555,13 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
         if (find(linked_function_names.begin(), linked_function_names.end(), name) != linked_function_names.end()) { continue; }
 
         if (DEBUG) {
-            cout << "[asm] pushing bytecode of local function '" << name << "' to final byte array" << endl;
+            cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
+            cout << ": ";
+            cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
+            cout << ": ";
+            cout << "pushing bytecode of local function '";
+            cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << name << send_control_seq(ATTR_RESET);
+            cout << "' to final byte array" << endl;
         }
         uint64_t fun_size = 0;
         byte* fun_bytecode = nullptr;
@@ -1464,7 +1581,11 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
     Program calculator(bytes);
     calculator.setdebug(DEBUG).setscream(SCREAM);
     if (DEBUG) {
-        cout << "[asm:post] calculating absolute jumps..." << endl;
+        cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
+        cout << ": ";
+        cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
+        cout << ": ";
+        cout << "calculating absolute jumps..." << endl;
     }
     calculator.fill(program_bytecode).calculateJumps(jump_positions);
 
@@ -1479,15 +1600,20 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
         tie(lib_name, linked_size, linked_bytecode) = lnk;
 
         if (VERBOSE or DEBUG) {
-            cout << "[linker] message: linked module \"" << lib_name <<  "\" written at offset " << bytes_offset << endl;
+            cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
+            cout << ": ";
+            cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
+            cout << ": ";
+            cout << "linked module \"";
+            cout << send_control_seq(COLOR_FG_WHITE) << lib_name << send_control_seq(ATTR_RESET);
+            cout << "\" written at offset " << bytes_offset << endl;
         }
 
         vector<uint64_t> linked_jumptable;
         try {
             linked_jumptable = linked_libs_jumptables[lib_name];
         } catch (const std::out_of_range& e) {
-            cout << "[linker] fatal: could not find jumptable for '" << lib_name << "' (maybe not loaded?)" << endl;
-            exit(1);
+            throw ("[linker] could not find jumptable for '" + lib_name + "' (maybe not loaded?)");
         }
 
         uint64_t jmp, jmp_target;
@@ -1496,7 +1622,11 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
             // we know what we're doing here
             jmp_target = *reinterpret_cast<uint64_t*>(linked_bytecode+jmp);
             if (DEBUG) {
-                cout << "[linker] adjusting jump: at position " << jmp << ", " << jmp_target << '+' << bytes_offset << " -> " << (jmp_target+bytes_offset) << endl;
+                cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
+                cout << ": ";
+                cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
+                cout << ": ";
+                cout << "adjusting jump: at position " << jmp << ", " << jmp_target << '+' << bytes_offset << " -> " << (jmp_target+bytes_offset) << endl;
             }
             *reinterpret_cast<uint64_t*>(linked_bytecode+jmp) += bytes_offset;
         }

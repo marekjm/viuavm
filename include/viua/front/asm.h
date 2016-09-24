@@ -51,6 +51,18 @@ struct srcline_t {
 };
 
 
+const std::string COLOR_FG_RED = "\x1b[38;5;1m";
+const std::string COLOR_FG_YELLOW = "\x1b[38;5;3m";
+const std::string COLOR_FG_CYAN = "\x1b[38;5;6m";
+const std::string COLOR_FG_LIGHT_GREEN = "\x1b[38;5;10m";
+const std::string COLOR_FG_LIGHT_YELLOW = "\x1b[38;5;11m";
+const std::string COLOR_FG_LIGHT_CYAN = "\x1b[38;5;14m";
+const std::string COLOR_FG_WHITE = "\x1b[38;5;15m";
+const std::string ATTR_RESET = "\x1b[0m";
+
+std::string send_control_seq(const std::string&);
+
+
 std::vector<std::string> expandSource(const std::vector<std::string>&, std::map<long unsigned, long unsigned>&);
 
 std::vector<std::vector<std::string>> decode_line_tokens(const std::vector<std::string>&);

@@ -1191,9 +1191,9 @@ class AssemblerErrorTests(unittest.TestCase):
         output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(1,0))
         self.assertEqual(1, exit_code)
         error_lines = [
-            "./sample/asm/errors/more_than_one_main_function.asm: error: more than one candidate for main function",
             "./sample/asm/errors/more_than_one_main_function.asm: note: main/1 function found in module ./sample/asm/errors/more_than_one_main_function.asm",
             "./sample/asm/errors/more_than_one_main_function.asm: note: main/2 function found in module ./sample/asm/errors/more_than_one_main_function.asm",
+            "./sample/asm/errors/more_than_one_main_function.asm: error: more than one candidate for main function",
         ]
         self.assertEqual(error_lines, output.strip().splitlines())
 
