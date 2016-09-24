@@ -52,10 +52,9 @@
     .name: 1 counter
     arg counter 0
 
-    istore 2 9
-    isub counter counter 2
-    istore 2 2
-    idiv counter counter 2
+    .name: 4 i
+    isub counter counter (istore i 9)
+    idiv counter counter (istore i 2)
 
     .name: 2 zero
     izero zero

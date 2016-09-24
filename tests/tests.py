@@ -1100,6 +1100,9 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
     def testRegisterNameAlreadyTaken(self):
         runTestFailsToAssemble(self, 'register_name_already_taken.asm', "./sample/asm/static_analysis_errors/register_name_already_taken.asm:22:14: error: register name already taken: named_register")
 
+    def testRegisterUsedBeforeBeingNamed(self):
+        runTestFailsToAssemble(self, 'register_defined_before_being_named.asm', "./sample/asm/static_analysis_errors/register_defined_before_being_named.asm:22:12: error: register defined before being named: 1 = named_register")
+
 
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.
