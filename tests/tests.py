@@ -1097,6 +1097,9 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
     def testSendFromEmptyRegister(self):
         runTestFailsToAssemble(self, 'send_from_empty_register.asm', "./sample/asm/static_analysis_errors/send_from_empty_register.asm:27:12: error: send from empty register: 2")
 
+    def testRegisterNameAlreadyTaken(self):
+        runTestFailsToAssemble(self, 'register_name_already_taken.asm', "./sample/asm/static_analysis_errors/register_name_already_taken.asm:22:14: error: register name already taken: named_register")
+
 
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.

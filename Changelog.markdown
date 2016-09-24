@@ -52,6 +52,7 @@ There are several categories of change:
   after a timeout expires the VM raises an exception in the process
 - enhancement: timeouts for `join` instruction; work the same as for `receive` instruction
 - misc: error messages from assembler are colorised
+- enhancement: assembler checks `.name:` directives and detects when a name is reused in a single block
 
 
 ----

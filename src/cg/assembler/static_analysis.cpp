@@ -76,6 +76,9 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, se
             continue;
         }
         if (token == ".name:") {
+            if (named_registers.count(body_tokens.at(i+2))) {
+                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), ("register name already taken: " + str::strencode(body_tokens.at(i+2))));
+            }
             named_registers[body_tokens.at(i+2)] = body_tokens.at(i+1);
             if (debug) {
                 cout << "  " << "register " << str::enquote(str::strencode(body_tokens.at(i+1))) << " is named " << str::enquote(str::strencode(body_tokens.at(i+2))) << endl;
