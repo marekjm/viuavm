@@ -96,49 +96,6 @@ static tuple<uint64_t, enum JUMPTYPE> resolvejump(viua::cg::lex::Token token, co
     return tuple<uint64_t, enum JUMPTYPE>(addr, jump_type);
 }
 
-static string resolveregister(string reg, const map<string, int>& names) {
-    /*  This function is used to register numbers when a register is accessed, e.g.
-     *  in `istore` instruction or in `branch` in condition operand.
-     *
-     *  This function MUST return string as teh result is further passed to assembler::operands::getint() function which *expects* string.
-     */
-    ostringstream out;
-    if (str::isnum(reg)) {
-        /*  Basic case - the register is accessed as real index, everything is nice and simple.
-         */
-        out.str(reg);
-    } else if (reg[0] == '@' and str::isnum(str::sub(reg, 1))) {
-        /*  Basic case - the register index is taken from another register, everything is still nice and simple.
-         */
-        if (stoi(reg.substr(1)) < 0) {
-            throw ("register indexes cannot be negative: " + reg);
-        }
-
-        // FIXME: analyse source and detect if the referenced register really holds an integer (the only value suitable to use
-        // as register reference)
-        out.str(reg);
-    } else {
-        /*  Case is no longer basic - it seems that a register is being accessed by name.
-         *  Names must be checked to see if the one used was declared.
-         */
-        if (reg[0] == '@') {
-            out << '@';
-            reg = str::sub(reg, 1);
-        }
-        try {
-            out << names.at(reg);
-        } catch (const std::out_of_range& e) {
-            // first, check if the name is non-empty
-            if (reg != "") {
-                // Jinkies! This name was not declared.
-                throw ("undeclared register name: " + reg);
-            } else {
-                throw "not enough operands";
-            }
-        }
-    }
-    return out.str();
-}
 static string resolveregister(viua::cg::lex::Token token, const map<string, int>& names) {
     /*  This function is used to register numbers when a register is accessed, e.g.
      *  in `istore` instruction or in `branch` in condition operand.
@@ -310,17 +267,17 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
     } else if (tokens.at(i) == "vec") {
         program.opvec(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
     } else if (tokens.at(i) == "vinsert") {
-        string vec = tokens.at(i+1), src = tokens.at(i+2), pos = tokens.at(i+3);
-        if (pos == "\n") { pos = "0"; }
+        viua::cg::lex::Token vec = tokens.at(i+1), src = tokens.at(i+2), pos = tokens.at(i+3);
+        if (pos == "\n") { pos = viua::cg::lex::Token(src.line(), src.character(), "0"); }
         program.opvinsert(assembler::operands::getint(resolveregister(vec, names)), assembler::operands::getint(resolveregister(src, names)), assembler::operands::getint(resolveregister(pos, names)));
     } else if (tokens.at(i) == "vpush") {
         program.opvpush(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
     } else if (tokens.at(i) == "vpop") {
-        string vec = tokens.at(i+1), dst = tokens.at(i+2), pos = tokens.at(i+3);
+        viua::cg::lex::Token vec = tokens.at(i+1), dst = tokens.at(i+2), pos = tokens.at(i+3);
         program.opvpop(assembler::operands::getint(resolveregister(vec, names)), assembler::operands::getint(resolveregister(dst, names)), assembler::operands::getint(resolveregister(pos, names)));
     } else if (tokens.at(i) == "vat") {
-        string vec = tokens.at(i+1), dst = tokens.at(i+2), pos = tokens.at(i+3);
-        if (pos == "\n") { pos = "-1"; }
+        viua::cg::lex::Token vec = tokens.at(i+1), dst = tokens.at(i+2), pos = tokens.at(i+3);
+        if (pos == "\n") { pos = viua::cg::lex::Token(dst.line(), dst.character(), "-1"); }
         program.opvat(assembler::operands::getint(resolveregister(vec, names)), assembler::operands::getint(resolveregister(dst, names)), assembler::operands::getint(resolveregister(pos, names)));
     } else if (tokens.at(i) == "vlen") {
         program.opvlen(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
@@ -396,16 +353,16 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
          *
          *  Good luck with debugging your code, then.
          */
-        string fn_name = tokens.at(i+2), reg = tokens.at(i+1);
+        viua::cg::lex::Token fn_name = tokens.at(i+2), reg = tokens.at(i+1);
 
         // if second operand is a newline, fill it with zero
         // which means that return value will be discarded
         if (fn_name == "\n") {
             fn_name = reg;
-            reg = "0";
+            reg = viua::cg::lex::Token(fn_name.line(), fn_name.character(), "0");
         }
 
-        program.opcall(assembler::operands::getint(resolveregister(reg, names)), fn_name);
+        program.opcall(assembler::operands::getint(resolveregister(reg, names)), fn_name.str());
     } else if (tokens.at(i) == "tailcall") {
         program.optailcall(tokens.at(i+1));
     } else if (tokens.at(i) == "process") {
@@ -413,22 +370,22 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
     } else if (tokens.at(i) == "self") {
         program.opself(assembler::operands::getint(resolveregister(tokens.at(i+1), names)));
     } else if (tokens.at(i) == "join") {
-        string a_chnk = tokens.at(i+1), b_chnk = tokens.at(i+2), timeout_chnk = tokens.at(i+3);
+        viua::cg::lex::Token a_chnk = tokens.at(i+1), b_chnk = tokens.at(i+2), timeout_chnk = tokens.at(i+3);
         int_op timeout{false, 0};
         if (timeout_chnk != "infinity") {
             // remove the 'ms' part from timeout
-            timeout = assembler::operands::getint(timeout_chnk.substr(0, timeout_chnk.size()-2));
+            timeout = assembler::operands::getint(timeout_chnk.str().substr(0, timeout_chnk.str().size()-2));
             ++get<1>(timeout);
         }
         program.opjoin(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)), timeout);
     } else if (tokens.at(i) == "send") {
         program.opsend(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
     } else if (tokens.at(i) == "receive") {
-        string regno_chnk = tokens.at(i+1), timeout_chnk = tokens.at(i+2);
+        viua::cg::lex::Token regno_chnk = tokens.at(i+1), timeout_chnk = tokens.at(i+2);
         int_op to{false, 0};
         if (timeout_chnk != "infinity") {
             // remove the 'ms' part from timeout
-            to = assembler::operands::getint(timeout_chnk.substr(0, timeout_chnk.size()-2));
+            to = assembler::operands::getint(timeout_chnk.str().substr(0, timeout_chnk.str().size()-2));
             ++get<1>(to);
         }
         program.opreceive(assembler::operands::getint(resolveregister(regno_chnk, names)), to);
@@ -448,7 +405,7 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
          *
          *      * third operands is the address to which to jump if register is false,
          */
-        string condition = tokens.at(i+1), if_true = tokens.at(i+2), if_false = tokens.at(i+3);
+        viua::cg::lex::Token condition = tokens.at(i+1), if_true = tokens.at(i+2), if_false = tokens.at(i+3);
 
         uint64_t addrt_target, addrf_target;
         enum JUMPTYPE addrt_jump_type, addrf_jump_type;
