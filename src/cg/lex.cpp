@@ -207,6 +207,13 @@ namespace viua {
                             continue;
                         }
                         tokens.push_back(input_tokens.at(++i)); // second source register
+                    } else if (token == "istore") {
+                        tokens.push_back(token);                // mnemonic
+                        tokens.push_back(input_tokens.at(++i)); // target register
+                        if (input_tokens.at(i+1) == "\n") {
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "0");
+                        }
+                        continue;
                     } else {
                         tokens.push_back(token);
                     }
