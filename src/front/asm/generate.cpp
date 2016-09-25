@@ -235,7 +235,6 @@ static Program& compile(Program& program, const vector<string>& lines, map<strin
     vector<string> ilines = filter(lines);
 
     string line;
-    uint64_t instruction = 0;  // instruction counter
     for (decltype(ilines)::size_type i = 0; i < ilines.size(); ++i) {
         /*  This is main assembly loop.
          *  It iterates over lines with instructions and
@@ -563,7 +562,7 @@ static Program& compile(Program& program, const vector<string>& lines, map<strin
                 tie(addrf_target, addrf_jump_type) = resolvejump(if_false, marks, i);
             } else {
                 addrf_jump_type = JMP_RELATIVE;
-                addrf_target = instruction+1;
+                addrf_target = i+1;
             }
 
             if (DEBUG) {
@@ -681,7 +680,6 @@ static Program& compile(Program& program, const vector<string>& lines, map<strin
         } else {
             throw ("unimplemented instruction: " + str::enquote(str::strencode(instr)));
         }
-        ++instruction;
     }
 
     return program;
