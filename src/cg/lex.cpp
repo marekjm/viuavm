@@ -646,8 +646,8 @@ namespace viua {
                     if (str::isnum(t) and i < limit-2 and input_tokens.at(i+1) == "." and str::isnum(input_tokens.at(i+2))) {
                         if (adjacent(t, input_tokens.at(i+1), input_tokens.at(i+2))) {
                             tokens.emplace_back(t.line(), t.character(), join_tokens(input_tokens, i, i+3));
-                            ++i; // skip "name" token
-                            ++i; // skip ":" token
+                            ++i; // skip "." token
+                            ++i; // skip second numeric part
                             continue;
                         }
                     }
