@@ -40,6 +40,9 @@ extern bool DEBUG;
 extern bool SCREAM;
 
 
+using Token = viua::cg::lex::Token;
+
+
 template<class T> void bwrite(ofstream& out, const T& object) {
     out.write(reinterpret_cast<const char*>(&object), sizeof(T));
 }
@@ -49,7 +52,7 @@ static void strwrite(ofstream& out, const string& s) {
 }
 
 
-static tuple<uint64_t, enum JUMPTYPE> resolvejump(viua::cg::lex::Token token, const map<string, int>& marks, uint64_t instruction_index) {
+static tuple<uint64_t, enum JUMPTYPE> resolvejump(Token token, const map<string, int>& marks, uint64_t instruction_index) {
     /*  This function is used to resolve jumps in `jump` and `branch` instructions.
      */
     string jmp = token.str();
@@ -96,7 +99,7 @@ static tuple<uint64_t, enum JUMPTYPE> resolvejump(viua::cg::lex::Token token, co
     return tuple<uint64_t, enum JUMPTYPE>(addr, jump_type);
 }
 
-static string resolveregister(viua::cg::lex::Token token, const map<string, int>& names) {
+static string resolveregister(Token token, const map<string, int>& names) {
     /*  This function is used to register numbers when a register is accessed, e.g.
      *  in `istore` instruction or in `branch` in condition operand.
      *
@@ -190,7 +193,7 @@ const map<string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS = {
 };
 
 
-static uint64_t assemble_instruction(Program& program, uint64_t& instruction, uint64_t i, const vector<viua::cg::lex::Token>& tokens, map<string, int>& marks, map<string, int>& names) {
+static uint64_t assemble_instruction(Program& program, uint64_t& instruction, uint64_t i, const vector<Token>& tokens, map<string, int>& marks, map<string, int>& names) {
     /*  This is main assembly loop.
      *  It iterates over lines with instructions and
      *  uses bytecode generation API to fill the program with instructions and
@@ -267,17 +270,17 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
     } else if (tokens.at(i) == "vec") {
         program.opvec(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
     } else if (tokens.at(i) == "vinsert") {
-        viua::cg::lex::Token vec = tokens.at(i+1), src = tokens.at(i+2), pos = tokens.at(i+3);
-        if (pos == "\n") { pos = viua::cg::lex::Token(src.line(), src.character(), "0"); }
+        Token vec = tokens.at(i+1), src = tokens.at(i+2), pos = tokens.at(i+3);
+        if (pos == "\n") { pos = Token(src.line(), src.character(), "0"); }
         program.opvinsert(assembler::operands::getint(resolveregister(vec, names)), assembler::operands::getint(resolveregister(src, names)), assembler::operands::getint(resolveregister(pos, names)));
     } else if (tokens.at(i) == "vpush") {
         program.opvpush(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
     } else if (tokens.at(i) == "vpop") {
-        viua::cg::lex::Token vec = tokens.at(i+1), dst = tokens.at(i+2), pos = tokens.at(i+3);
+        Token vec = tokens.at(i+1), dst = tokens.at(i+2), pos = tokens.at(i+3);
         program.opvpop(assembler::operands::getint(resolveregister(vec, names)), assembler::operands::getint(resolveregister(dst, names)), assembler::operands::getint(resolveregister(pos, names)));
     } else if (tokens.at(i) == "vat") {
-        viua::cg::lex::Token vec = tokens.at(i+1), dst = tokens.at(i+2), pos = tokens.at(i+3);
-        if (pos == "\n") { pos = viua::cg::lex::Token(dst.line(), dst.character(), "-1"); }
+        Token vec = tokens.at(i+1), dst = tokens.at(i+2), pos = tokens.at(i+3);
+        if (pos == "\n") { pos = Token(dst.line(), dst.character(), "-1"); }
         program.opvat(assembler::operands::getint(resolveregister(vec, names)), assembler::operands::getint(resolveregister(dst, names)), assembler::operands::getint(resolveregister(pos, names)));
     } else if (tokens.at(i) == "vlen") {
         program.opvlen(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
@@ -353,13 +356,13 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
          *
          *  Good luck with debugging your code, then.
          */
-        viua::cg::lex::Token fn_name = tokens.at(i+2), reg = tokens.at(i+1);
+        Token fn_name = tokens.at(i+2), reg = tokens.at(i+1);
 
         // if second operand is a newline, fill it with zero
         // which means that return value will be discarded
         if (fn_name == "\n") {
             fn_name = reg;
-            reg = viua::cg::lex::Token(fn_name.line(), fn_name.character(), "0");
+            reg = Token(fn_name.line(), fn_name.character(), "0");
         }
 
         program.opcall(assembler::operands::getint(resolveregister(reg, names)), fn_name.str());
@@ -370,7 +373,7 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
     } else if (tokens.at(i) == "self") {
         program.opself(assembler::operands::getint(resolveregister(tokens.at(i+1), names)));
     } else if (tokens.at(i) == "join") {
-        viua::cg::lex::Token a_chnk = tokens.at(i+1), b_chnk = tokens.at(i+2), timeout_chnk = tokens.at(i+3);
+        Token a_chnk = tokens.at(i+1), b_chnk = tokens.at(i+2), timeout_chnk = tokens.at(i+3);
         int_op timeout{false, 0};
         if (timeout_chnk != "infinity") {
             // remove the 'ms' part from timeout
@@ -381,7 +384,7 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
     } else if (tokens.at(i) == "send") {
         program.opsend(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
     } else if (tokens.at(i) == "receive") {
-        viua::cg::lex::Token regno_chnk = tokens.at(i+1), timeout_chnk = tokens.at(i+2);
+        Token regno_chnk = tokens.at(i+1), timeout_chnk = tokens.at(i+2);
         int_op to{false, 0};
         if (timeout_chnk != "infinity") {
             // remove the 'ms' part from timeout
@@ -405,7 +408,7 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
          *
          *      * third operands is the address to which to jump if register is false,
          */
-        viua::cg::lex::Token condition = tokens.at(i+1), if_true = tokens.at(i+2), if_false = tokens.at(i+3);
+        Token condition = tokens.at(i+1), if_true = tokens.at(i+2), if_false = tokens.at(i+3);
 
         uint64_t addrt_target, addrf_target;
         enum JUMPTYPE addrt_jump_type, addrf_jump_type;
@@ -491,7 +494,7 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
     ++i;  // skip the newline
     return i;
 }
-static Program& compile(Program& program, const vector<viua::cg::lex::Token>& tokens, map<string, int>& marks, map<string, int>& names) {
+static Program& compile(Program& program, const vector<Token>& tokens, map<string, int>& marks, map<string, int>& names) {
     /** Compile instructions into bytecode using bytecode generation API.
      *
      */
@@ -504,7 +507,7 @@ static Program& compile(Program& program, const vector<viua::cg::lex::Token>& to
 }
 
 
-static void assemble(Program& program, const vector<viua::cg::lex::Token>& tokens) {
+static void assemble(Program& program, const vector<Token>& tokens) {
     /** Assemble instructions in lines into a program.
      *  This function first garthers required information about markers, named registers and functions.
      *  Then, it passes all gathered data into compilation function.
@@ -622,7 +625,7 @@ static uint64_t writeCodeBlocksSection(ofstream& out, const invocables_t& blocks
     return block_bodies_size_so_far;
 }
 
-static string get_main_function(const vector<viua::cg::lex::Token>& tokens, const vector<string>& available_functions) {
+static string get_main_function(const vector<Token>& tokens, const vector<string>& available_functions) {
     string main_function = "";
     for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
         if (tokens.at(i) == ".main:") {
@@ -641,7 +644,7 @@ static string get_main_function(const vector<viua::cg::lex::Token>& tokens, cons
     return main_function;
 }
 
-static void check_main_function(const string& main_function, const vector<viua::cg::lex::Token>& main_function_tokens) {
+static void check_main_function(const string& main_function, const vector<Token>& main_function_tokens) {
         // Why three newlines?
         //
         // Here's why:
@@ -701,7 +704,7 @@ static uint64_t generate_entry_function(uint64_t bytes, map<string, uint64_t> fu
     }
 
     vector<string> entry_function_lines;
-    vector<viua::cg::lex::Token> entry_function_tokens;
+    vector<Token> entry_function_tokens;
     functions.names.emplace_back(ENTRY_FUNCTION_NAME);
     function_addresses[ENTRY_FUNCTION_NAME] = starting_instruction;
 
@@ -804,7 +807,7 @@ static uint64_t generate_entry_function(uint64_t bytes, map<string, uint64_t> fu
     return bytes;
 }
 
-int generate(const vector<string>& expanded_lines, vector<string>& ilines, vector<viua::cg::lex::Token>& tokens, invocables_t& functions, invocables_t& blocks, const string& filename, string& compilename, const vector<string>& commandline_given_links, const compilationflags_t& flags) {
+int generate(const vector<string>& expanded_lines, vector<string>& ilines, vector<Token>& tokens, invocables_t& functions, invocables_t& blocks, const string& filename, string& compilename, const vector<string>& commandline_given_links, const compilationflags_t& flags) {
     //////////////////////////////
     // SETUP INITIAL BYTECODE SIZE
     uint64_t bytes = 0;
