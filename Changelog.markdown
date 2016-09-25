@@ -53,6 +53,9 @@ There are several categories of change:
 - enhancement: timeouts for `join` instruction; work the same as for `receive` instruction
 - misc: error messages from assembler are colorised
 - enhancement: assembler checks `.name:` directives and detects when a name is reused in a single block
+- enhancement: `istore` instruction has `0` as a default second operand (i.e. `istore 1` is assembled as `istore 1 0`)
+- enhancement: `fstore` instruction has `0.0` as a default second operand (i.e. `fstore 1` is assembled as `fstore 1 0`)
+- enhancement: `strstore` instruction has `""` as a default second operand (i.e. `strstore 1` is assembled as `strstore 1 ""`)
 
 
 ----
