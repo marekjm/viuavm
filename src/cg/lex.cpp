@@ -235,6 +235,24 @@ namespace viua {
                             continue;
                         }
                         tokens.push_back(input_tokens.at(++i)); // second source register
+                    } else if (token == "enclose" or token == "enclosecopy" or token == "enclosemove") {
+                        tokens.push_back(token);    // mnemonic
+                        tokens.push_back(input_tokens.at(++i)); // target register
+                        tokens.push_back(input_tokens.at(++i)); // source register
+                        if (input_tokens.at(i+1).str() == "\n") {
+                            // if only two operands are given, double source register
+                            // this will expand the following instruction:
+                            //
+                            //      opcode T S
+                            // to:
+                            //
+                            //      opcode T S S
+                            //
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), tokens.back().str());
+                        } else {
+                            tokens.push_back(input_tokens.at(++i)); // source register
+                        }
+                        continue;
                     } else if (token == "istore") {
                         tokens.push_back(token);                // mnemonic
                         tokens.push_back(input_tokens.at(++i)); // target register
