@@ -542,11 +542,10 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
     ++i;  // skip the newline
     return i;
 }
-static Program& compile(Program& program, const vector<string>& lines, const vector<viua::cg::lex::Token>& tokens, map<string, int>& marks, map<string, int>& names) {
+static Program& compile(Program& program, const vector<viua::cg::lex::Token>& tokens, map<string, int>& marks, map<string, int>& names) {
     /** Compile instructions into bytecode using bytecode generation API.
      *
      */
-    if (lines.size()) {}
     uint64_t instruction = 0;
     for (decltype(tokens.size()) i = 0; i < tokens.size();) {
         i = assemble_instruction(program, instruction, i, tokens, marks, names);
@@ -556,7 +555,7 @@ static Program& compile(Program& program, const vector<string>& lines, const vec
 }
 
 
-static void assemble(Program& program, const vector<string>& lines, const vector<viua::cg::lex::Token>& tokens) {
+static void assemble(Program& program, const vector<viua::cg::lex::Token>& tokens) {
     /** Assemble instructions in lines into a program.
      *  This function first garthers required information about markers, named registers and functions.
      *  Then, it passes all gathered data into compilation function.
@@ -568,7 +567,7 @@ static void assemble(Program& program, const vector<string>& lines, const vector
      */
     map<string, int> marks = assembler::ce::getmarks(tokens);
     map<string, int> names = assembler::ce::getnames(tokens);
-    compile(program, lines, tokens, marks, names);
+    compile(program, tokens, marks, names);
 }
 
 
@@ -1148,7 +1147,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
                 cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << name << send_control_seq(ATTR_RESET);
                 cout << "'\n";
             }
-            assemble(func, blocks.bodies.at(name), blocks.tokens.at(name));
+            assemble(func, blocks.tokens.at(name));
         } catch (const string& e) {
             throw ("in block '" + name + "': " + e);
         } catch (const char*& e) {
@@ -1239,7 +1238,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
                 cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << name << send_control_seq(ATTR_RESET);
                 cout << "'\n";
             }
-            assemble(func, functions.bodies.at(name), functions.tokens.at(name));
+            assemble(func, functions.tokens.at(name));
         } catch (const string& e) {
             string msg = ("in function '"
                           + send_control_seq(COLOR_FG_LIGHT_GREEN) + name
