@@ -274,6 +274,16 @@ namespace viua {
                             tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "\"\"");
                         }
                         continue;
+                    } else if (token == "itof" or token == "ftoi" or token == "stoi" or token == "stof") {
+                        tokens.push_back(token);                // mnemonic
+                        tokens.push_back(input_tokens.at(++i)); // target register
+
+                        if (input_tokens.at(i+1).str() == "\n") {
+                            tokens.push_back(tokens.back());
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                        }
+                        continue;
                     } else {
                         tokens.push_back(token);
                     }

@@ -298,21 +298,13 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
     } else if (tokens.at(i) == "bstore") {
         program.opbstore(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getbyte(resolveregister(tokens.at(i+2), names)));
     } else if (tokens.at(i) == "itof") {
-        string a_chnk = tokens.at(i+1), b_chnk = tokens.at(i+2);
-        if (b_chnk == "\n") { b_chnk = a_chnk; }
-        program.opitof(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
+        program.opitof(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
     } else if (tokens.at(i) == "ftoi") {
-        string a_chnk = tokens.at(i+1), b_chnk = tokens.at(i+2);
-        if (b_chnk == "\n") { b_chnk = a_chnk; }
-        program.opftoi(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
+        program.opftoi(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
     } else if (tokens.at(i) == "stoi") {
-        string a_chnk = tokens.at(i+1), b_chnk = tokens.at(i+2);
-        if (b_chnk == "\n") { b_chnk = a_chnk; }
-        program.opstoi(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
+        program.opstoi(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
     } else if (tokens.at(i) == "stof") {
-        string a_chnk = tokens.at(i+1), b_chnk = tokens.at(i+2);
-        if (b_chnk == "\n") { b_chnk = a_chnk; }
-        program.opstof(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)));
+        program.opstof(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
     } else if (tokens.at(i) == "strstore") {
         program.opstrstore(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), tokens.at(i+2));
     } else if (tokens.at(i) == "vec") {
