@@ -349,6 +349,9 @@ class IntegerInstructionsTests(unittest.TestCase):
     """
     PATH = './sample/asm/int'
 
+    def testIstoreDefault(self):
+        runTest(self, 'istore_default.asm', '0', 0)
+
     def testIADD(self):
         runTest(self, 'add.asm', '1', 0)
 
@@ -415,6 +418,9 @@ class FloatInstructionsTests(unittest.TestCase):
     """
     PATH = './sample/asm/float'
 
+    def testFstoreDefault(self):
+        runTest(self, 'fstore_default.asm', '0.000000', 0)
+
     def testFADD(self):
         runTest(self, 'add.asm', '0.500000', 0)
 
@@ -459,6 +465,9 @@ class StringInstructionsTests(unittest.TestCase):
     """Tests for string instructions.
     """
     PATH = './sample/asm/string'
+
+    def testStrstoreDefault(self):
+        runTest(self, 'strstore_default.asm', '', 0)
 
     def testHelloWorld(self):
         runTest(self, 'hello_world.asm', 'Hello World!', 0)
