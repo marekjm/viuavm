@@ -22,7 +22,7 @@
     return
 .end
 
-.function: main/1 1
+.function: main/1
     frame ^[(pamv 0 (izero 1))]
     call 1 boolean/1
 

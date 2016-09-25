@@ -22,7 +22,7 @@
     return
 .end
 
-.function: main/1 1
+.function: main/1
     izero 1
     istore 2 1
 
