@@ -245,7 +245,9 @@ static void assemble_instruction(Program& program, const string& line, const uin
     if (DEBUG and SCREAM) {
         cout << send_control_seq(COLOR_FG_LIGHT_CYAN) << "message" << send_control_seq(ATTR_RESET);
         cout << ": ";
-        cout << "compiling line: " << str::strencode(line) << endl;
+        cout << "assembling '";
+        cout << send_control_seq(COLOR_FG_WHITE) << instr << send_control_seq(ATTR_RESET);
+        cout << "' instruction\n";
     }
 
     if (instr == "nop") {
