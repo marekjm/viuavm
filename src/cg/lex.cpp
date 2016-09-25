@@ -158,6 +158,19 @@ namespace viua {
                         if ((not str::isnum(input_tokens.at(i+1).str(), false)) and input_tokens.at(i+2).str() == "\n") {
                             tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "0");
                         }
+                    } else if (token == "frame") {
+                        tokens.push_back(token);
+
+                        if ((not str::isnum(input_tokens.at(i+1).str(), false)) and input_tokens.at(i+1).str() == "\n") {
+                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "0");
+                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "16");
+                            continue;
+                        }
+
+                        tokens.push_back(input_tokens.at(++i));
+                        if ((not str::isnum(input_tokens.at(i+1).str(), false)) and input_tokens.at(i+1).str() == "\n") {
+                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "16");
+                        }
                     } else if (token == "vec") {
                         tokens.push_back(token);
                         tokens.push_back(input_tokens.at(++i));
