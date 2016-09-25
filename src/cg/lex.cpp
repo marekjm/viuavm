@@ -814,7 +814,7 @@ namespace viua {
                             ++i;
                         }
 
-                        Token tok(subtokens.at(0).line(), subtokens.at(0).character(), str::stringify(toplevel_subexpressions));
+                        Token tok(subtokens.at(0).line(), subtokens.at(0).character(), str::stringify(toplevel_subexpressions, false));
 
                         subtokens = unwrap_lines(subtokens, false);
 
