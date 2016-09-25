@@ -698,7 +698,7 @@ static void assemble(Program& program, const vector<string>& lines, const vector
      *  program         - Program object which will be used for assembling
      *  lines           - lines with instructions
      */
-    map<string, int> marks = assembler::ce::getmarks(lines);
+    map<string, int> marks = assembler::ce::getmarks(tokens);
     map<string, int> names = assembler::ce::getnames(tokens);
     compile(program, lines, marks, names);
 }

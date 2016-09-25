@@ -46,40 +46,32 @@ vector<string> assembler::ce::getilines(const vector<string>& lines) {
     return ilines;
 }
 
-map<string, int> assembler::ce::getmarks(const vector<string>& lines) {
+map<string, int> assembler::ce::getmarks(const vector<viua::cg::lex::Token>& tokens) {
     /** This function will pass over all instructions and
      * gather "marks", i.e. `.mark: <name>` directives which may be used by
      * `jump` and `branch` instructions.
-     *
-     * When referring to a mark in code, you should use: `jump :<name>`.
-     *
-     * The colon before name of the marker is placed here to make it possible to use numeric markers
-     * which would otherwise be treated as instruction indexes.
      */
     map<string, int> marks;
-    string line, mark;
     int instruction = 0;  // we need separate instruction counter because number of lines is not exactly number of instructions
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        line = lines[i];
-        if (assembler::utils::lines::is_name(line) or assembler::utils::lines::is_link(line)) {
-            // names and links can be safely skipped as they are not CPU instructions
+
+    for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
+        if (tokens.at(i) == ".name:" or tokens.at(i) == ".link:") {
+            do {
+                ++i;
+            } while (i < tokens.size() and tokens.at(i) != "\n");
             continue;
         }
-        if (not assembler::utils::lines::is_mark(line)) {
-            // if all previous checks were false, then this line must be either .mark: directive or
-            // an instruction
-            // if this check is true - then it is an instruction
+        if (tokens.at(i) == ".mark:") {
+            ++i;    // skip ".mark:" token
+            marks.emplace(tokens.at(i), instruction);
+            ++i;    // skip marker name
+            continue;
+        }
+        if (tokens.at(i) == "\n") {
             ++instruction;
-            continue;
         }
-
-        // get mark name
-        line = str::lstrip(str::sub(line, 6));
-        mark = str::chunk(line);
-
-        // create mark for current instruction
-        marks[mark] = instruction;
     }
+
     return marks;
 }
 
