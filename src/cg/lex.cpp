@@ -191,7 +191,8 @@ namespace viua {
                                token == "ilt" or token == "ilte" or token == "igt" or token == "igte" or token == "ieq" or
                                token == "fadd" or token == "fsub" or token == "fmul" or token == "fdiv" or
                                token == "flt" or token == "flte" or token == "fgt" or token == "fgte" or token == "feq" or
-                               token == "and" or token == "or") {
+                               token == "and" or token == "or"
+                    ) {
                         tokens.push_back(token);    // mnemonic
                         tokens.push_back(input_tokens.at(++i)); // target register
                         if (input_tokens.at(i+2).str() == "\n") {
