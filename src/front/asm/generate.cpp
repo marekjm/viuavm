@@ -1370,11 +1370,26 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
             }
             assemble(func, functions.bodies.at(name), functions.tokens.at(name));
         } catch (const string& e) {
-            throw ("in function '" + name + "': " + e);
+            string msg = ("in function '"
+                          + send_control_seq(COLOR_FG_LIGHT_GREEN) + name
+                          + send_control_seq(ATTR_RESET)
+                          + "': " + e
+                          );
+            throw msg;
         } catch (const char*& e) {
-            throw ("in function '" + name + "': " + e);
+            string msg = ("in function '"
+                          + send_control_seq(COLOR_FG_LIGHT_GREEN) + name
+                          + send_control_seq(ATTR_RESET)
+                          + "': " + e
+                          );
+            throw msg;
         } catch (const std::out_of_range& e) {
-            throw ("in function '" + name + "': " + e.what());
+            string msg = ("in function '"
+                          + send_control_seq(COLOR_FG_LIGHT_GREEN) + name
+                          + send_control_seq(ATTR_RESET)
+                          + "': " + e.what()
+                          );
+            throw msg;
         }
 
         vector<uint64_t> jumps = func.jumps();
