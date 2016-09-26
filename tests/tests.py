@@ -1314,6 +1314,9 @@ class AssemblerErrorTests(unittest.TestCase):
     def testInvalidRegisterIndexInNameDirective(self):
         runTestFailsToAssemble(self, 'invalid_register_index_in_name_directive.asm', "./sample/asm/errors/invalid_register_index_in_name_directive.asm: error: in function 'main/0': invalid register index in name directive: named_register := \"bad\"")
 
+    def testInvalidRegisterIndexInNameDirective(self):
+        runTestFailsToAssemble(self, 'empty_link_directive.asm', "./sample/asm/errors/empty_link_directive.asm:21:11: error: missing module name in link directive")
+
 
 class AssemblerErrorRejectingDuplicateSymbolsTests(unittest.TestCase):
     PATH = './sample/asm/errors/single_definition_rule'

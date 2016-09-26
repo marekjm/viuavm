@@ -112,6 +112,9 @@ vector<string> assembler::ce::getlinks(const vector<viua::cg::lex::Token>& token
     for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
         if (tokens.at(i) == ".link:") {
             ++i;    // skip '.link:' token
+            if (tokens.at(i) == "\n") {
+                throw viua::cg::lex::InvalidSyntax(tokens.at(i), "missing module name in link directive");
+            }
             links.emplace_back(tokens.at(i));
             ++i;    // skip module name token
         }
