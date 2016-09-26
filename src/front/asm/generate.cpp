@@ -807,7 +807,7 @@ static uint64_t generate_entry_function(uint64_t bytes, map<string, uint64_t> fu
     return bytes;
 }
 
-int generate(const vector<string>&, vector<string>&, vector<Token>& tokens, invocables_t& functions, invocables_t& blocks, const string& filename, string& compilename, const vector<string>& commandline_given_links, const compilationflags_t& flags) {
+int generate(vector<Token>& tokens, invocables_t& functions, invocables_t& blocks, const string& filename, string& compilename, const vector<string>& commandline_given_links, const compilationflags_t& flags) {
     //////////////////////////////
     // SETUP INITIAL BYTECODE SIZE
     uint64_t bytes = 0;
