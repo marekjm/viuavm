@@ -1383,6 +1383,17 @@ class MiscTests(unittest.TestCase):
     def testBrokenWatchdog(self):
         runTest(self, 'broken_watchdog.asm', 'main/1 exiting')
 
+    def testMetaInformationEncoding(self):
+        pth = 'meta_information.asm'
+        output, error, exit_code = assemble(os.path.join(self.PATH, pth), out='/tmp/mi.bin')
+        output, error, exit_code = disassemble('/tmp/mi.bin', out='/tmp/mi.asm')
+        output, error, exit_code = assemble('/tmp/mi.asm', out='/tmp/mi.bin', opts=('--meta',))
+        expected_output = [
+            'key = "value"',
+            'foo = "multiline\\nbar"',
+        ]
+        self.assertEqual(sorted(expected_output), sorted(output.strip().splitlines()))
+
 
 class ExternalModulesTests(unittest.TestCase):
     """Tests for C/C++ module importing, and calling external functions.
