@@ -46,7 +46,7 @@ namespace assembler {
 
         std::map<std::string, int> getmarks(const std::vector<viua::cg::lex::Token>&);
         std::map<std::string, int> getnames(const std::vector<viua::cg::lex::Token>&);
-        std::vector<std::string> getlinks(const std::vector<std::string>& lines);
+        std::vector<std::string> getlinks(const std::vector<viua::cg::lex::Token>&);
 
         std::vector<std::string> getFunctionNames(const std::vector<viua::cg::lex::Token>&);
         std::vector<std::string> getSignatures(const std::vector<viua::cg::lex::Token>&);

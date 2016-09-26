@@ -104,17 +104,16 @@ map<string, int> assembler::ce::getnames(const vector<viua::cg::lex::Token>& tok
     return names;
 }
 
-vector<string> assembler::ce::getlinks(const vector<string>& lines) {
+vector<string> assembler::ce::getlinks(const vector<viua::cg::lex::Token>& tokens) {
     /** This function will pass over all instructions and
      * gather .link: assembler instructions.
      */
     vector<string> links;
-    string line;
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        line = lines[i];
-        if (assembler::utils::lines::is_link(line)) {
-            line = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
-            links.emplace_back(line);
+    for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
+        if (tokens.at(i) == ".link:") {
+            ++i;    // skip '.link:' token
+            links.emplace_back(tokens.at(i));
+            ++i;    // skip module name token
         }
     }
     return links;

@@ -864,7 +864,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
 
     /////////////////////////////////////////////////////////
     // GATHER LINKS, GET THEIR SIZES AND ADJUST BYTECODE SIZE
-    vector<string> links = assembler::ce::getlinks(ilines);
+    vector<string> links = assembler::ce::getlinks(tokens);
     vector<tuple<string, uint64_t, byte*> > linked_libs_bytecode;
     vector<string> linked_function_names;
     vector<string> linked_block_names;
