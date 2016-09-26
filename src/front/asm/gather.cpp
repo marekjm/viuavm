@@ -105,7 +105,7 @@ map<string, string> gatherMetaInformation(const vector<viua::cg::lex::Token>& to
             if (value == "\n") {
                 throw viua::cg::lex::InvalidSyntax(tokens.at(i), "missing value in .info: directive");
             }
-            meta_information.emplace(key, value.str().substr(1, value.str().size()-2));
+            meta_information.emplace(key, str::strdecode(value.str().substr(1, value.str().size()-2)));
         }
     }
 
