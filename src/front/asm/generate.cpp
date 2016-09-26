@@ -807,7 +807,7 @@ static uint64_t generate_entry_function(uint64_t bytes, map<string, uint64_t> fu
     return bytes;
 }
 
-int generate(const vector<string>& expanded_lines, vector<string>& ilines, vector<Token>& tokens, invocables_t& functions, invocables_t& blocks, const string& filename, string& compilename, const vector<string>& commandline_given_links, const compilationflags_t& flags) {
+int generate(const vector<string>& expanded_lines, vector<string>&, vector<Token>& tokens, invocables_t& functions, invocables_t& blocks, const string& filename, string& compilename, const vector<string>& commandline_given_links, const compilationflags_t& flags) {
     //////////////////////////////
     // SETUP INITIAL BYTECODE SIZE
     uint64_t bytes = 0;
@@ -1271,7 +1271,7 @@ int generate(const vector<string>& expanded_lines, vector<string>& ilines, vecto
 
     /////////////////////////////////////////////////////////////
     // WRITE META-INFORMATION MAP
-    auto meta_information_map = gatherMetaInformation(ilines);
+    auto meta_information_map = gatherMetaInformation(tokens);
     uint64_t meta_information_map_size = 0;
     for (auto each : meta_information_map) {
         meta_information_map_size += (each.first.size() + each.second.size() + 2);

@@ -93,20 +93,19 @@ int gatherBlocks(invocables_t* invocables, const vector<viua::cg::lex::Token>& t
     return 0;
 }
 
-map<string, string> gatherMetaInformation(const vector<string>& ilines) {
+map<string, string> gatherMetaInformation(const vector<viua::cg::lex::Token>& tokens) {
     map<string, string> meta_information;
 
-    string line;
-    for (std::remove_reference<decltype(ilines)>::type::size_type i = 0; i < ilines.size(); ++i) {
-        line = ilines[i];
-        if (assembler::utils::lines::is_info(line)) {
-            line = str::lstrip(line.substr(6));
-
-            string key, value;
-            key = str::chunk(line);
-            line = str::lstrip(str::sub(line, key.size()));
-            value = str::extract(line);
-            meta_information[key] = str::strdecode(value.substr(1, value.size()-2));
+    for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
+        if (tokens.at(i) == ".info:") {
+            viua::cg::lex::Token key = tokens.at(i+1), value = tokens.at(i+2);
+            if (key == "\n") {
+                throw viua::cg::lex::InvalidSyntax(tokens.at(i), "missing key and value in .info: directive");
+            }
+            if (value == "\n") {
+                throw viua::cg::lex::InvalidSyntax(tokens.at(i), "missing value in .info: directive");
+            }
+            meta_information.emplace(key, value.str().substr(1, value.str().size()-2));
         }
     }
 
