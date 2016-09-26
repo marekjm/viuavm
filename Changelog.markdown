@@ -56,6 +56,7 @@ There are several categories of change:
 - enhancement: `istore` instruction has `0` as a default second operand (i.e. `istore 1` is assembled as `istore 1 0`)
 - enhancement: `fstore` instruction has `0.0` as a default second operand (i.e. `fstore 1` is assembled as `fstore 1 0`)
 - enhancement: `strstore` instruction has `""` as a default second operand (i.e. `strstore 1` is assembled as `strstore 1 ""`)
+- enhancement: assembler detects missing module names in `.link:` directive
 
 
 ----
