@@ -337,23 +337,17 @@ void assembler::verify::blockCatches(const vector<string>& lines, const vector<s
     }
 }
 
-void assembler::verify::callableCreations(const vector<string>& lines, const vector<string>& function_names, const vector<string>& function_signatures) {
-    ostringstream report("");
-    string line;
-    string callable_type;
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        line = str::lstrip(lines[i]);
-        if (not str::startswith(line, "closure") and not str::startswith(line, "function")) {
+void assembler::verify::callableCreations(const vector<Token>& tokens, const vector<string>& function_names, const vector<string>& function_signatures) {
+    for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
+        if (not (tokens.at(i) == "closure" or tokens.at(i) == "function")) {
+            // skip while lines to avoid triggering the check by registers named 'function' or 'closure'
+            while (i < tokens.size() and tokens.at(i) != "\n") {
+                ++i;
+            }
             continue;
         }
 
-        callable_type = str::chunk(line);
-        line = str::lstrip(str::sub(line, callable_type.size()));
-
-        string register_index = str::chunk(line);
-        line = str::lstrip(str::sub(line, register_index.size()));
-
-        string function = str::chunk(line);
+        string function = tokens.at(i+2);
         bool is_undefined = (find(function_names.begin(), function_names.end(), function) == function_names.end());
         // if function is undefined, check if we got a signature for it
         if (is_undefined) {
@@ -361,9 +355,9 @@ void assembler::verify::callableCreations(const vector<string>& lines, const vec
         }
 
         if (is_undefined) {
-            report << callable_type << " from undefined function: " << function;
-            throw ErrorReport(i, report.str());
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i), (tokens.at(i).str() + " from undefined function: " + function));
         }
+        i += 2;
     }
 }
 

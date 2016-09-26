@@ -1173,7 +1173,7 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'entering_undefined_block.asm', "./sample/asm/errors/entering_undefined_block.asm:22:1: error: cannot enter undefined block: foo")
 
     def testFunctionFromUndefinedFunction(self):
-        runTestFailsToAssemble(self, 'function_from_undefined_function.asm', "./sample/asm/errors/function_from_undefined_function.asm:21:1: error: function from undefined function: foo/0")
+        runTestFailsToAssemble(self, 'function_from_undefined_function.asm', "./sample/asm/errors/function_from_undefined_function.asm:21:5: error: function from undefined function: foo/0")
 
     def testInvalidRegisterSetName(self):
         runTestFailsToAssemble(self, 'invalid_ress_instruction.asm', "./sample/asm/errors/invalid_ress_instruction.asm:21:1: error: illegal register set name in ress instruction 'foo' in function main/1")
