@@ -445,6 +445,26 @@ namespace viua {
                 return tokens;
             }
 
+            vector<Token> reduce_link_directive(vector<Token> input_tokens) {
+                decltype(input_tokens) tokens;
+
+                const auto limit = input_tokens.size();
+                for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
+                    const auto t = input_tokens.at(i);
+                    if (t.str() == "." and i < limit-2 and input_tokens.at(i+1) == "link" and input_tokens.at(i+2).str() == ":") {
+                        if (adjacent(t, input_tokens.at(i+1), input_tokens.at(i+2))) {
+                            tokens.emplace_back(t.line(), t.character(), ".link:");
+                            ++i; // skip "link" token
+                            ++i; // skip ":" token
+                            continue;
+                        }
+                    }
+                    tokens.push_back(t);
+                }
+
+                return tokens;
+            }
+
             vector<Token> reduce_function_directive(vector<Token> input_tokens) {
                 decltype(input_tokens) tokens;
 
@@ -922,7 +942,7 @@ namespace viua {
             }
 
             vector<Token> reduce(vector<Token> tokens) {
-                return reduce_newlines(reduce_absolute_jumps(reduce_floats(reduce_at_prefixed_registers(reduce_offset_jumps(reduce_mark_directive(reduce_main_directive(reduce_name_directive(reduce_info_directive(reduce_block_directive(reduce_bsignature_directive(reduce_signature_directive(reduce_names(reduce_function_signatures(reduce_double_colon(reduce_end_directive(reduce_closure_directive(reduce_function_directive(unwrap_lines(reduce_newlines(remove_comments(remove_spaces(tokens))))))))))))))))))))));
+                return reduce_newlines(reduce_absolute_jumps(reduce_floats(reduce_at_prefixed_registers(reduce_offset_jumps(reduce_mark_directive(reduce_link_directive(reduce_main_directive(reduce_name_directive(reduce_info_directive(reduce_block_directive(reduce_bsignature_directive(reduce_signature_directive(reduce_names(reduce_function_signatures(reduce_double_colon(reduce_end_directive(reduce_closure_directive(reduce_function_directive(unwrap_lines(reduce_newlines(remove_comments(remove_spaces(tokens)))))))))))))))))))))));
             }
         }
     }

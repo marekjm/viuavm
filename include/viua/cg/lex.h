@@ -75,6 +75,7 @@ namespace viua {
             std::vector<Token> reduce_name_directive(std::vector<Token>);
             std::vector<Token> reduce_info_directive(std::vector<Token>);
             std::vector<Token> reduce_main_directive(std::vector<Token>);
+            std::vector<Token> reduce_link_directive(std::vector<Token>);
             std::vector<Token> reduce_function_directive(std::vector<Token>);
             std::vector<Token> reduce_closure_directive(std::vector<Token>);
             std::vector<Token> reduce_end_directive(std::vector<Token>);
