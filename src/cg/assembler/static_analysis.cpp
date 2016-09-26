@@ -133,7 +133,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, Re
         if (token == "leave" or token == "return") {
             return;
         }
-        if (token == ".mark:" or token == "nop" or token == "tryframe" or token == "try" or token == "catch" or token == "frame" or
+        if (token == ".mark:" or token == ".link:" or token == "nop" or token == "tryframe" or token == "try" or token == "catch" or token == "frame" or
             token == "tailcall" or token == "halt" or
             token == "watchdog" or token == "jump" or
             token == "link" or token == "import" or token == "ress") {
