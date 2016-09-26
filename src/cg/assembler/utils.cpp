@@ -106,6 +106,7 @@ bool assembler::utils::lines::is_directive(const string& line) {
         is_info(line) or
         is_end(line) or
         is_main(line) or
+        is_link(line) or
         is_closure(line) or
         false
     );
