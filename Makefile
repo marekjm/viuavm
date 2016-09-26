@@ -37,28 +37,14 @@ remake: clean all
 
 ############################################################
 # CLEANING
-clean: clean-support clean-test-compiles clean-stdlib
-	find ./build -name '*.o' | xargs -n 1 rm -fv
-	find ./build -name '*.so' | xargs -n 1 rm -fv
-	find ./build -name '*.bin' | xargs -n 1 rm -fv
-	find ./build -name '*.vlib' | xargs -n 1 rm -fv
-	rm -fv *.o
-	rm -fv *.so
-	rm -fv *.vlib
-
-clean-support:
-	rm -f ./build/support/*.o
+clean: clean-test-compiles
+	find . -name '*.o' | xargs -n 1 rm -fv
+	find . -name '*.so' | xargs -n 1 rm -fv
+	find . -name '*.bin' | xargs -n 1 rm -fv
+	find . -name '*.vlib' | xargs -n 1 rm -fv
 
 clean-test-compiles:
-	rm -f ./tests/compiled/*.bin
-	rm -f ./tests/compiled/*.asm
-	rm -f ./tests/compiled/*.wlib
-	rm -f ./misc.vlib
-
-clean-stdlib:
-	rm -f ./build/stdlib/*.o
-	rm -f ./build/stdlib/*.so
-	rm -f ./build/stdlib/std/*
+	find ./tests/compiled -name '*.asm' | xargs rm -fv
 
 
 ############################################################

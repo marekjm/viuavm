@@ -21,11 +21,6 @@
 
 set -e
 
-# Clean standard library modules to avoid errors due to bytecode format changes.
-# Such issues would arise when a library that has been compiled with older tools
-# is linked into CPU that accepts new bytecode format.
-make clean-stdlib
-
 if [[ $CXX == '' ]]; then
     CXX=g++
 fi
