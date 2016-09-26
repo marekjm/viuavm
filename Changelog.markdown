@@ -57,6 +57,7 @@ There are several categories of change:
 - enhancement: `fstore` instruction has `0.0` as a default second operand (i.e. `fstore 1` is assembled as `fstore 1 0`)
 - enhancement: `strstore` instruction has `""` as a default second operand (i.e. `strstore 1` is assembled as `strstore 1 ""`)
 - enhancement: assembler detects missing module names in `.link:` directive
+- feature: `--meta` option in assembler displays meta information embedded in source code
 
 
 ----

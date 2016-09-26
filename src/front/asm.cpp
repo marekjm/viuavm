@@ -44,6 +44,7 @@ bool EARLY_VERIFICATION_ONLY = false;
 // are we only checking what size will the bytecode by?
 bool REPORT_BYTECODE_SIZE = false;
 bool PERFORM_STATIC_ANALYSIS = true;
+bool SHOW_META = false;
 
 bool VERBOSE = false;
 bool DEBUG = false;
@@ -99,6 +100,7 @@ static bool usage(const char* program, bool show_help, bool show_version, bool v
              << "    " << "-C, --verify             - verify source code correctness without actually compiling it\n"
              << "    " << "                           this option turns assembler into source level debugger and static code analyzer hybrid\n"
              << "    " << "    --size               - calculate and report final bytecode size\n"
+             << "    " << "    --meta               - display information embedded in source code and exit\n"
              << "    " << "    --no-sa              - disable static checking of register accesses (use in case of false positives)\n"
              ;
     }
@@ -210,6 +212,9 @@ int main(int argc, char* argv[]) {
             continue;
         } else if (option == "--size") {
             REPORT_BYTECODE_SIZE = true;
+            continue;
+        } else if (option == "--meta") {
+            SHOW_META = true;
             continue;
         } else if (option == "--no-sa") {
             PERFORM_STATIC_ANALYSIS = false;
@@ -372,6 +377,14 @@ int main(int argc, char* argv[]) {
     flags.verbose = VERBOSE;
     flags.debug = DEBUG;
     flags.scream = SCREAM;
+
+    if (SHOW_META) {
+        auto meta = gatherMetaInformation(cooked_tokens);
+        for (auto each : meta) {
+            cout << each.first << " = " << str::enquote(str::strencode(each.second)) << endl;
+        }
+        return 0;
+    }
 
     int ret_code = 0;
     try {
