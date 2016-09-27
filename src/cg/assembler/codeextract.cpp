@@ -57,6 +57,7 @@ static void assert_is_not_reserved_keyword(Token token, const string& message) {
         "null",
         "void",
         "iota",
+        "const",
 
         /*
          * Reserved for future use as boolean literals.
