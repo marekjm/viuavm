@@ -25,14 +25,14 @@
     .name: 2 exception
     remove exception 1 (strstore exception "exception")
 
-    .name: 3 function
-    remove function 1 (strstore function "function")
+    .name: 3 aborted_function
+    remove aborted_function 1 (strstore aborted_function "function")
 
     .name: 4 parameters
     remove parameters 1 (strstore parameters "parameters")
 
     echo (strstore 5 "[WARNING] process '")
-    echo function
+    echo aborted_function
     echo parameters
     echo (strstore 5 "' killed by >>>")
     echo exception

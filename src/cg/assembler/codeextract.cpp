@@ -21,6 +21,8 @@
 #include <vector>
 #include <tuple>
 #include <map>
+#include <set>
+#include <viua/bytecode/maps.h>
 #include <viua/support/string.h>
 #include <viua/cg/assembler/assembler.h>
 #include <viua/cg/lex.h>
@@ -29,6 +31,61 @@ using namespace std;
 
 
 using Token = viua::cg::lex::Token;
+
+
+static void assert_is_not_reserved_keyword(Token token, const string& message) {
+    string s = token;
+    static const set<string> reserved_keywords {
+        /*
+         * Used for timeouts in 'join' and 'receive' instructions
+         */
+        "infinity",
+
+        /*
+         *  Reserved as register set names.
+         */
+        "local",
+        "static",
+        "global",
+
+        /*
+         * Reserved for future use.
+         */
+        "auto",
+        "default",
+        "undefined",
+        "null",
+        "void",
+        "iota",
+
+        /*
+         * Reserved for future use as boolean literals.
+         */
+        "true",
+        "false",
+
+        /*
+         * Reserved for future use as instruction names.
+         */
+        "int",
+        "int8",
+        "int16",
+        "int32",
+        "int64",
+        "uint",
+        "uint8",
+        "uint16",
+        "uint32",
+        "uint64",
+        "float32",
+        "float64",
+        "string",
+        "bits",
+    };
+    if (reserved_keywords.count(s) or OP_SIZES.count(s)) {
+        throw viua::cg::lex::InvalidSyntax(token, ("invalid " + message + ": '" + s + "' is a registered keyword"));
+    }
+}
 
 
 vector<string> assembler::ce::getilines(const vector<string>& lines) {
@@ -63,6 +120,7 @@ map<string, int> assembler::ce::getmarks(const vector<viua::cg::lex::Token>& tok
         }
         if (tokens.at(i) == ".mark:") {
             ++i;    // skip ".mark:" token
+            assert_is_not_reserved_keyword(tokens.at(i), "marker name");
             marks.emplace(tokens.at(i), instruction);
             ++i;    // skip marker name
             continue;
@@ -91,6 +149,7 @@ map<string, int> assembler::ce::getnames(const vector<viua::cg::lex::Token>& tok
         if (tokens.at(i) == ".name:") {
             reg = tokens.at(i+1);
             name = tokens.at(i+2);
+            assert_is_not_reserved_keyword(tokens.at(i+2), "register name");
         } else {
             continue;
         }

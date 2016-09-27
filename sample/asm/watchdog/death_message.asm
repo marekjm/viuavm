@@ -25,11 +25,11 @@
     .name: 2 exception
     remove exception 1 (strstore exception "exception")
 
-    .name: 3 function
-    remove function 1 (strstore function "function")
+    .name: 3 aborted_function
+    remove aborted_function 1 (strstore aborted_function "function")
 
     echo (strstore 4 "[WARNING] process '")
-    echo function
+    echo aborted_function
     echo (strstore 4 "' killed by >>>")
     echo exception
     print (strstore 4 "<<<")
