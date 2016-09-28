@@ -349,7 +349,7 @@ void assembler::verify::ressInstructions(const vector<string>& lines, bool as_li
         "global",   // global register set
         "local",    // local register set for function
         "static",   // static register set
-        "temp",     // temporary register set
+        "temporary",// temporary register set
     };
     string line;
     string function;

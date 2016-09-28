@@ -47,6 +47,7 @@ static void assert_is_not_reserved_keyword(Token token, const string& message) {
         "local",
         "static",
         "global",
+        "temporary",
 
         /*
          * Reserved for future use.
