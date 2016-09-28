@@ -339,7 +339,7 @@ int main(int argc, char* argv[]) {
         assembler::verify::ressInstructions(expanded_lines, AS_LIB);
         assembler::verify::functionNames(cooked_tokens);
         assembler::verify::functionBodiesAreNonempty(expanded_lines);
-        assembler::verify::blockTries(expanded_lines, blocks.names, blocks.signatures);
+        assembler::verify::blockTries(cooked_tokens, blocks.names, blocks.signatures);
         assembler::verify::blockCatches(expanded_lines, blocks.names, blocks.signatures);
         assembler::verify::frameBalance(expanded_lines, expanded_lines_to_source_lines);
         assembler::verify::functionCallArities(expanded_lines);
