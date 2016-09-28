@@ -297,22 +297,16 @@ void assembler::verify::blockTries(const vector<Token>& tokens, const vector<str
     }
 }
 
-void assembler::verify::blockCatches(const vector<string>& lines, const vector<string>& block_names, const vector<string>& block_signatures) {
-    ostringstream report("");
-    string line;
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        line = str::lstrip(lines[i]);
-        if (not str::startswithchunk(line, "catch")) {
+void assembler::verify::blockCatches(const vector<Token>& tokens, const vector<string>& block_names, const vector<string>& block_signatures) {
+    for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
+        if (tokens.at(i) != "catch") {
             continue;
         }
 
-        // remove instruction
-        line = str::lstrip(str::sub(line, str::chunk(line).size()));
+        // skip type name token
+        ++i;
+        string block = tokens.at(++i);
 
-        // remove name of caught type
-        line = str::lstrip(str::sub(line, str::chunk(line).size()));
-
-        string block = str::chunk(line);
         bool is_undefined = (find(block_names.begin(), block_names.end(), block) == block_names.end());
         // if block is undefined, check if we got a signature for it
         if (is_undefined) {
@@ -320,8 +314,7 @@ void assembler::verify::blockCatches(const vector<string>& lines, const vector<s
         }
 
         if (is_undefined) {
-            report << "cannot catch using undefined block: " << block;
-            throw ErrorReport(i, report.str());
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("cannot catch using undefined block: " + block));
         }
     }
 }

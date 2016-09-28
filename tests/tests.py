@@ -1167,7 +1167,7 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'call_without_a_frame.asm', "./sample/asm/errors/call_without_a_frame.asm:28:1: error: call with 'tailcall' without a frame")
 
     def testCatchingWithUndefinedBlock(self):
-        runTestFailsToAssemble(self, 'catching_with_undefined_block.asm', "./sample/asm/errors/catching_with_undefined_block.asm:27:1: error: cannot catch using undefined block: main/0__catch")
+        runTestFailsToAssemble(self, 'catching_with_undefined_block.asm', "./sample/asm/errors/catching_with_undefined_block.asm:27:21: error: cannot catch using undefined block: main/0__catch")
 
     def testEnteringUndefinedBlock(self):
         runTestFailsToAssemble(self, 'entering_undefined_block.asm', "./sample/asm/errors/entering_undefined_block.asm:22:11: error: cannot enter undefined block: foo")

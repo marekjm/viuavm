@@ -68,7 +68,7 @@ namespace assembler {
         void frameBalance(const std::vector<std::string>&, const std::map<unsigned long, unsigned long>&);
 
         void blockTries(const std::vector<viua::cg::lex::Token>&, const std::vector<std::string>&, const std::vector<std::string>&);
-        void blockCatches(const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<std::string>&);
+        void blockCatches(const std::vector<viua::cg::lex::Token>&, const std::vector<std::string>&, const std::vector<std::string>&);
 
         void callableCreations(const std::vector<viua::cg::lex::Token>&, const std::vector<std::string>&, const std::vector<std::string>&);
 
