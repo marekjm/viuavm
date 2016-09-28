@@ -72,7 +72,7 @@ namespace assembler {
 
         void callableCreations(const std::vector<viua::cg::lex::Token>&, const std::vector<std::string>&, const std::vector<std::string>&);
 
-        void ressInstructions(const std::vector<std::string>&, bool);
+        void ressInstructions(const std::vector<viua::cg::lex::Token>&, bool);
 
         void functionBodiesAreNonempty(const std::vector<std::string>&);
         void blockBodiesAreNonempty(const std::vector<std::string>&);

@@ -1176,10 +1176,10 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'function_from_undefined_function.asm', "./sample/asm/errors/function_from_undefined_function.asm:21:5: error: function from undefined function: foo/0")
 
     def testInvalidRegisterSetName(self):
-        runTestFailsToAssemble(self, 'invalid_ress_instruction.asm', "./sample/asm/errors/invalid_ress_instruction.asm:21:1: error: illegal register set name in ress instruction 'foo' in function main/1")
+        runTestFailsToAssemble(self, 'invalid_ress_instruction.asm', "./sample/asm/errors/invalid_ress_instruction.asm:21:10: error: illegal register set name in ress instruction 'foo' in function main/1")
 
     def testGlobalRegisterSetUsedInLibraryFunction(self):
-        runTestFailsToAssemble(self, 'global_rs_used_in_lib.asm', "./sample/asm/errors/global_rs_used_in_lib.asm:21:1: error: global registers used in library function foo/0", asm_opts=('-c',))
+        runTestFailsToAssemble(self, 'global_rs_used_in_lib.asm', "./sample/asm/errors/global_rs_used_in_lib.asm:21:10: error: global registers used in library function foo/0", asm_opts=('-c',))
 
     def testFunctionWithEmptyBody(self):
         runTestFailsToAssemble(self, 'empty_function_body.asm', "./sample/asm/errors/empty_function_body.asm:21:1: error: function with empty body: foo/0")

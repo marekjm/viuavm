@@ -343,7 +343,7 @@ void assembler::verify::callableCreations(const vector<Token>& tokens, const vec
     }
 }
 
-void assembler::verify::ressInstructions(const vector<string>& lines, bool as_lib) {
+void assembler::verify::ressInstructions(const vector<Token>& tokens, bool as_lib) {
     ostringstream report("");
     vector<string> legal_register_sets = {
         "global",   // global register set
@@ -351,27 +351,23 @@ void assembler::verify::ressInstructions(const vector<string>& lines, bool as_li
         "static",   // static register set
         "temporary",// temporary register set
     };
-    string line;
     string function;
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        line = str::lstrip(lines[i]);
-        if (assembler::utils::lines::is_function(line)) {
-            function = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
+    for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
+        if (tokens.at(i) == ".function:") {
+            function = tokens.at(i+1);
             continue;
         }
-        if (not str::startswith(line, "ress")) {
+        if (tokens.at(i) != "ress") {
             continue;
         }
 
-        string registerset_name = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
+        string registerset_name = tokens.at(++i);
 
         if (find(legal_register_sets.begin(), legal_register_sets.end(), registerset_name) == legal_register_sets.end()) {
-            report << "illegal register set name in ress instruction '" << registerset_name << "' in function " << function;
-            throw ErrorReport(i, report.str());
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("illegal register set name in ress instruction '" + registerset_name + "' in function " + function));
         }
         if (registerset_name == "global" and as_lib and function != "main/1") {
-            report << "global registers used in library function " << function;
-            throw ErrorReport(i, report.str());
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("global registers used in library function " + function));
         }
     }
 }
