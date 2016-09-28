@@ -188,27 +188,20 @@ void assembler::verify::msgArities(const vector<string>& lines) {
     }
 }
 
-void assembler::verify::functionNames(const std::vector<std::string>& lines) {
-    ostringstream report("");
-    string line;
-    string function;
-
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        line = str::lstrip(lines[i]);
-        if (assembler::utils::lines::is_function(line)) {
-            function = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
-        } else {
+void assembler::verify::functionNames(const vector<Token>& tokens) {
+    for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
+        if (tokens.at(i) != ".function:") {
             continue;
         }
 
+        string function = tokens.at(++i);
+
         if (not assembler::utils::isValidFunctionName(function)) {
-            report << "invalid function name: " << function;
-            throw ErrorReport(i, report.str());
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("invalid function name: " + function));
         }
 
         if (assembler::utils::getFunctionArity(function) == -1) {
-            report << "function with undefined arity: " << function;
-            throw ErrorReport(i, report.str());
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("function with undefined arity: " + function));
         }
     }
 }

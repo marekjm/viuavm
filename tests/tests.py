@@ -1158,7 +1158,7 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'process_from_undefined_function.asm', "./sample/asm/errors/process_from_undefined_function.asm:22:13: error: process from undefined function foo/0")
 
     def testInvalidFunctionName(self):
-        runTestFailsToAssemble(self, 'invalid_function_name.asm', "./sample/asm/errors/invalid_function_name.asm:30:1: error: invalid function name: foo/x")
+        runTestFailsToAssemble(self, 'invalid_function_name.asm', "./sample/asm/errors/invalid_function_name.asm:30:12: error: invalid function name: foo/x")
 
     def testExcessFrameSpawned(self):
         runTestFailsToAssemble(self, 'excess_frame_spawned.asm', "./sample/asm/errors/excess_frame_spawned.asm:27:1: error: excess frame spawned (unused frame spawned at line 26)")

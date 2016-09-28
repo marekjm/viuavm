@@ -62,7 +62,7 @@ namespace assembler {
         void functionCallArities(const std::vector<std::string>&);
         void msgArities(const std::vector<std::string>& lines);
 
-        void functionNames(const std::vector<std::string>&);
+        void functionNames(const std::vector<viua::cg::lex::Token>&);
         void functionsEndWithReturn(const std::vector<std::string>&);
 
         void frameBalance(const std::vector<std::string>&, const std::map<unsigned long, unsigned long>&);
