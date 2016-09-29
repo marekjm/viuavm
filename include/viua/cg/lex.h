@@ -19,6 +19,7 @@ namespace viua {
                 auto line() const -> decltype(line_number);
                 auto character() const -> decltype(character_in_line);
                 auto str() const -> decltype(content);
+                auto str(std::string) -> void;
 
                 auto ends() const -> decltype(character_in_line);
 

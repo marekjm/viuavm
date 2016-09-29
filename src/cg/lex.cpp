@@ -15,6 +15,9 @@ namespace viua {
             auto Token::str() const -> decltype(content) {
                 return content;
             }
+            auto Token::str(string s) -> void {
+                content = s;
+            }
 
             auto Token::ends() const -> decltype(character_in_line) {
                 return (character_in_line + content.size());
