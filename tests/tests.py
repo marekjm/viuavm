@@ -1140,10 +1140,13 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'double_pass.asm', "./sample/asm/errors/double_pass.asm:29:1: error: double pass to parameter slot 2 in frame defined at line 25, first pass at line 28")
 
     def testMsgRequiresAtLeastOneParameter(self):
-        runTestFailsToAssemble(self, 'msg_requires_at_least_one_parameter.asm', "./sample/asm/errors/msg_requires_at_least_one_parameter.asm:22:1: error: invalid number of parameters in dynamic dispatch of foo: expected at least 1, got 0")
+        runTestFailsToAssemble(self, 'msg_requires_at_least_one_parameter.asm', "./sample/asm/errors/msg_requires_at_least_one_parameter.asm:22:5: error: invalid number of parameters in dynamic dispatch of foo: expected at least 1, got 0")
+
+    def testNotAValidFunctionNameMsg(self):
+        runTestFailsToAssemble(self, 'not_a_valid_function_name_msg.asm', "./sample/asm/errors/not_a_valid_function_name_msg.asm:22:11: error: not a valid function name: foo/x")
 
     def testMsgArityMismatch(self):
-        runTestFailsToAssemble(self, 'msg_arity_mismatch.asm', "./sample/asm/errors/msg_arity_mismatch.asm:22:1: error: invalid number of parameters in dynamic dispatch of add/2: expected 2 got 1")
+        runTestFailsToAssemble(self, 'msg_arity_mismatch.asm', "./sample/asm/errors/msg_arity_mismatch.asm:22:5: error: invalid number of parameters in dynamic dispatch of add/2: expected 2 got 1")
 
     def testNoReturnOrTailcallAtTheEndOfAFunctionError(self):
         runTestFailsToAssemble(self, 'no_return_at_the_end_of_a_function.asm', "./sample/asm/errors/no_return_at_the_end_of_a_function.asm:22:1: error: function does not end with 'return' or 'tailcall': foo/0")

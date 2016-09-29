@@ -343,7 +343,7 @@ int main(int argc, char* argv[]) {
         assembler::verify::blockCatches(cooked_tokens, blocks.names, blocks.signatures);
         assembler::verify::frameBalance(cooked_tokens);
         assembler::verify::functionCallArities(cooked_tokens);
-        assembler::verify::msgArities(expanded_lines);
+        assembler::verify::msgArities(cooked_tokens);
         assembler::verify::functionsEndWithReturn(expanded_lines);
         assembler::verify::blockBodiesAreNonempty(cooked_tokens);
         assembler::verify::jumpsAreInRange(expanded_lines);

@@ -60,7 +60,7 @@ namespace assembler {
         void functionCallsAreDefined(const std::vector<viua::cg::lex::Token>&, const std::vector<std::string>&, const std::vector<std::string>&);
 
         void functionCallArities(const std::vector<viua::cg::lex::Token>&);
-        void msgArities(const std::vector<std::string>& lines);
+        void msgArities(const std::vector<viua::cg::lex::Token>& lines);
 
         void functionNames(const std::vector<viua::cg::lex::Token>&);
         void functionsEndWithReturn(const std::vector<std::string>&);
