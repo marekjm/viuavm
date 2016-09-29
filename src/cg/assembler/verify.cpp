@@ -115,7 +115,7 @@ void assembler::verify::functionCallArities(const vector<string>& lines) {
             throw ErrorReport(i, report.str());
         }
         if (frame_parameters_count == -1) {
-            // frame paramters count could not be statically determined, deffer the check until runtime
+            // frame paramters count could not be statically determined, defer the check until runtime
             continue;
         }
 
