@@ -59,7 +59,7 @@ namespace assembler {
     namespace verify {
         void functionCallsAreDefined(const std::vector<viua::cg::lex::Token>&, const std::vector<std::string>&, const std::vector<std::string>&);
 
-        void functionCallArities(const std::vector<std::string>&);
+        void functionCallArities(const std::vector<viua::cg::lex::Token>&);
         void msgArities(const std::vector<std::string>& lines);
 
         void functionNames(const std::vector<viua::cg::lex::Token>&);

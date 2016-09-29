@@ -69,50 +69,44 @@ void assembler::verify::functionCallsAreDefined(const vector<Token>& tokens, con
     }
 }
 
-void assembler::verify::functionCallArities(const vector<string>& lines) {
-    ostringstream report("");
-    string line;
+void assembler::verify::functionCallArities(const vector<Token>& tokens) {
     int frame_parameters_count = 0;
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        line = str::lstrip(lines[i]);
-        if (not (str::startswith(line, "call") or str::startswith(line, "process") or str::startswith(line, "watchdog") or str::startswith(line, "frame"))) {
+    for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
+        if (not (tokens.at(i) == "call" or tokens.at(i) == "process" or tokens.at(i) == "watchdog" or tokens.at(i) == "frame")) {
             continue;
         }
 
-        string instr_name = str::chunk(line);
-        line = str::lstrip(line.substr(instr_name.size()));
-
-        if (instr_name == "frame") {
-            line = str::chunk(line);
-            if (str::isnum(line)) {
-                frame_parameters_count = stoi(str::chunk(line));
+        if (tokens.at(i) == "frame") {
+            if (str::isnum(tokens.at(i+1))) {
+                frame_parameters_count = stoi(tokens.at(i+1));
             } else {
                 frame_parameters_count = -1;
             }
             continue;
         }
 
-        string function_name = str::chunk(line);
-        line = str::lstrip(line.substr(function_name.size()));
-        if (line.size()) {
-            function_name = str::chunk(line);
+        Token function_name;
+        if (tokens.at(i) == "call" or tokens.at(i) == "process") {
+            function_name = tokens.at(i+2);
+        } else {
+            function_name = tokens.at(i+1);
         }
 
         if (not assembler::utils::isValidFunctionName(function_name)) {
-            report << "'" << function_name << "' is not a valid function name";
-            throw ErrorReport(i, report.str());
+            throw viua::cg::lex::InvalidSyntax(function_name, ("not a valid function name: " + str::strencode(function_name)));
         }
 
         int arity = assembler::utils::getFunctionArity(function_name);
 
         if (arity == -1) {
+            ostringstream report;
             report << "call to function with undefined arity ";
             if (frame_parameters_count >= 0) {
-                report << "as " << function_name << (arity == -1 ? "/" : "") << frame_parameters_count;
+                report << "as " << function_name.str() << (arity == -1 ? "/" : "") << frame_parameters_count;
             } else {
-                report << ": " << function_name;
+                report << ": " << function_name.str();
             }
-            throw ErrorReport(i, report.str());
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i), report.str());
         }
         if (frame_parameters_count == -1) {
             // frame paramters count could not be statically determined, defer the check until runtime
@@ -120,8 +114,9 @@ void assembler::verify::functionCallArities(const vector<string>& lines) {
         }
 
         if (arity > 0 and arity != frame_parameters_count) {
-            report << "invalid number of parameters in call to function " << function_name << ": expected " << arity << " got " << frame_parameters_count;
-            throw ErrorReport(i, report.str());
+            ostringstream report;
+            report << "invalid number of parameters in call to function " << function_name.str() << ": expected " << arity << " got " << frame_parameters_count;
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i), report.str());
         }
     }
 }

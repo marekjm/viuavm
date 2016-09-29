@@ -1125,7 +1125,10 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'halt_as_last_instruction.asm', "./sample/asm/errors/halt_as_last_instruction.asm:23:1: error: function does not end with 'return' or 'tailcall': main/1")
 
     def testArityError(self):
-        runTestFailsToAssemble(self, 'arity_error.asm', "./sample/asm/errors/arity_error.asm:27:1: error: invalid number of parameters in call to function foo/1: expected 1 got 0")
+        runTestFailsToAssemble(self, 'arity_error.asm', "./sample/asm/errors/arity_error.asm:27:5: error: invalid number of parameters in call to function foo/1: expected 1 got 0")
+
+    def testIsNotAValidFunctionName(self):
+        runTestFailsToAssemble(self, 'is_not_a_valid_function_name.asm', "./sample/asm/errors/is_not_a_valid_function_name.asm:26:10: error: not a valid function name: foo/x")
 
     def testFrameWithGaps(self):
         runTestFailsToAssemble(self, 'frame_with_gaps.asm', "./sample/asm/errors/frame_with_gaps.asm:28:1: error: gap in frame defined at line 25, slot 1 left empty")
