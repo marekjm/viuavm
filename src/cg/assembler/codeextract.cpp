@@ -83,6 +83,40 @@ static void assert_is_not_reserved_keyword(Token token, const string& message) {
         "float64",
         "string",
         "bits",
+        "coroutine",
+        "yield",
+        "channel",
+        "publish",
+        "subscribe",
+
+        /*
+         * Reserved  for future use as bit-operation instruction names.
+         * Shifts:
+         *
+         *      shl <target> <source> <width>
+         *
+         *          logical bit shift left;
+         *          <source> is shifted left by <width> bits
+         *          bits shifted out of <source> are put in <target>
+         *          <target> has the same bitsize as <source>
+         *
+         *      ashr <target> <source> <width>
+         *
+         *          arithmetic bit shift right;
+         *          same as logical bit shift right, only the highest bit is preserved
+         *
+         *      ashl <target> <source> <width>
+         *
+         *          arithmetic bit shift left;
+         *          same as logical bit shift left, only the lowest bit is preserved
+         */
+        "shl",  // logical shift left
+        "shr",  // logical shift right
+        "ashl", // arithmetic shift left
+        "ashr", // arithmetic shift right
+
+        "rol",  // rotate left
+        "ror",  // rotate right
     };
     if (reserved_keywords.count(s) or OP_SIZES.count(s)) {
         throw viua::cg::lex::InvalidSyntax(token, ("invalid " + message + ": '" + s + "' is a registered keyword"));
