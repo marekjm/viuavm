@@ -1146,7 +1146,7 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'no_return_at_the_end_of_a_function.asm', "./sample/asm/errors/no_return_at_the_end_of_a_function.asm:22:1: error: function does not end with 'return' or 'tailcall': foo/0")
 
     def testBlockWithEmptyBody(self):
-        runTestFailsToAssemble(self, 'empty_block_body.asm', "./sample/asm/errors/empty_block_body.asm:21:1: error: block with empty body: foo")
+        runTestFailsToAssemble(self, 'empty_block_body.asm', "./sample/asm/errors/empty_block_body.asm:20:9: error: block with empty body: foo")
 
     def testCallToUndefinedFunction(self):
         runTestFailsToAssemble(self, 'call_to_undefined_function.asm', "./sample/asm/errors/call_to_undefined_function.asm:22:10: error: call to undefined function foo/1")
@@ -1182,7 +1182,7 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'global_rs_used_in_lib.asm', "./sample/asm/errors/global_rs_used_in_lib.asm:21:10: error: global registers used in library function foo/0", asm_opts=('-c',))
 
     def testFunctionWithEmptyBody(self):
-        runTestFailsToAssemble(self, 'empty_function_body.asm', "./sample/asm/errors/empty_function_body.asm:21:1: error: function with empty body: foo/0")
+        runTestFailsToAssemble(self, 'empty_function_body.asm', "./sample/asm/errors/empty_function_body.asm:20:12: error: function with empty body: foo/0")
 
     def testStrayEndMarked(self):
         runTestFailsToAssemble(self, 'stray_end.asm', "./sample/asm/errors/stray_end.asm:20:1: error: stray .end marker")

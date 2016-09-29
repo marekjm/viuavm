@@ -74,8 +74,8 @@ namespace assembler {
 
         void ressInstructions(const std::vector<viua::cg::lex::Token>&, bool);
 
-        void functionBodiesAreNonempty(const std::vector<std::string>&);
-        void blockBodiesAreNonempty(const std::vector<std::string>&);
+        void functionBodiesAreNonempty(const std::vector<viua::cg::lex::Token>&);
+        void blockBodiesAreNonempty(const std::vector<viua::cg::lex::Token>&);
 
         void blocksEndWithFinishingInstruction(const std::vector<std::string>&);
 

@@ -372,49 +372,50 @@ void assembler::verify::ressInstructions(const vector<Token>& tokens, bool as_li
     }
 }
 
-static void bodiesAreNonempty(const vector<string>& lines) {
+static void bodiesAreNonempty(const vector<Token>& tokens) {
     ostringstream report("");
-    string line, block, function;
+    Token block;
+    bool function = false;
 
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        line = str::lstrip(lines[i]);
-        if (assembler::utils::lines::is_block(line)) {
-            block = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
+    for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
+        if (tokens.at(i) == ".block:") {
+            block = tokens.at(i);
+            function = false;
             continue;
-        } else if (assembler::utils::lines::is_function(line)) {
-            function = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
+        } else if (tokens.at(i) == ".function:") {
+            block = tokens.at(i);
+            function = true;
             continue;
-        } else if (assembler::utils::lines::is_closure(line)) {
-            function = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
+        } else if (tokens.at(i) == ".closure:") {
+            block = tokens.at(i);
+            function = true;
             continue;
-        } else if (assembler::utils::lines::is_end(line)) {
+        } else if (tokens.at(i) == ".end") {
             // '.end' is also interesting because we want to see if it's immediately preceded by
             // the interesting prefix
         } else {
             continue;
         }
 
-        if (not (block.size() or function.size())) {
-            report << "stray .end marker";
-            throw ErrorReport(i, report.str());
+        if (not block.str().size()) {
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i), "stray .end marker");
         }
 
-        // this if is reached only of '.end' was matched - so we just check if it is preceded by
+        // this 'if' is reached only if '.end' was matched - so we just check if it is preceded by
         // the interesting prefix, and
         // if it is - report an error
-        if (i and (assembler::utils::lines::is_block(str::lstrip(lines[i-1])) or assembler::utils::lines::is_function(str::lstrip(lines[i-1])))) {
-            report << (function.size() ? "function" : "block") << " with empty body: " << (function.size() ? function : block);
-            throw ErrorReport(i, report.str());
+        if (i and (tokens.at(i-3) == ".function:" or tokens.at(i-3) == ".block:" or tokens.at(i-3) == ".closure:")) {
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i-2), (string(function ? "function" : "block") + " with empty body: " + tokens.at(i-2).str()));
         }
-        function = "";
-        block = "";
+        function = false;
+        block.str("");
     }
 }
-void assembler::verify::functionBodiesAreNonempty(const vector<string>& lines) {
-    bodiesAreNonempty(lines);
+void assembler::verify::functionBodiesAreNonempty(const vector<Token>& tokens) {
+    bodiesAreNonempty(tokens);
 }
-void assembler::verify::blockBodiesAreNonempty(const std::vector<std::string>& lines) {
-    bodiesAreNonempty(lines);
+void assembler::verify::blockBodiesAreNonempty(const vector<Token>& tokens) {
+    bodiesAreNonempty(tokens);
 }
 
 void assembler::verify::blocksEndWithFinishingInstruction(const vector<string>& lines) {

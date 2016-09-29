@@ -338,14 +338,14 @@ int main(int argc, char* argv[]) {
         assembler::verify::instructions(cooked_tokens);
         assembler::verify::ressInstructions(cooked_tokens, AS_LIB);
         assembler::verify::functionNames(cooked_tokens);
-        assembler::verify::functionBodiesAreNonempty(expanded_lines);
+        assembler::verify::functionBodiesAreNonempty(cooked_tokens);
         assembler::verify::blockTries(cooked_tokens, blocks.names, blocks.signatures);
         assembler::verify::blockCatches(cooked_tokens, blocks.names, blocks.signatures);
         assembler::verify::frameBalance(expanded_lines, expanded_lines_to_source_lines);
         assembler::verify::functionCallArities(expanded_lines);
         assembler::verify::msgArities(expanded_lines);
         assembler::verify::functionsEndWithReturn(expanded_lines);
-        assembler::verify::blockBodiesAreNonempty(expanded_lines);
+        assembler::verify::blockBodiesAreNonempty(cooked_tokens);
         assembler::verify::jumpsAreInRange(expanded_lines);
         assembler::verify::framesHaveOperands(expanded_lines);
         assembler::verify::framesHaveNoGaps(expanded_lines, expanded_lines_to_source_lines);
