@@ -241,7 +241,8 @@ void assembler::verify::frameBalance(const vector<Token>& tokens) {
     Token previous_frame_spawned;
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
         instruction = tokens.at(i);
-        if (not (instruction == "call" or instruction == "tailcall" or instruction == "process" or instruction == "watchdog" or instruction == "fcall" or instruction == "frame" or instruction == "msg" or instruction == "return")) {
+        if (not (instruction == "call" or instruction == "tailcall" or instruction == "process" or instruction == "watchdog" or instruction == "fcall" or instruction == "frame" or instruction == "msg" or
+                 instruction == "return" or instruction == "leave" or instruction == "throw" or instruction == ".end")) {
             continue;
         }
 
@@ -258,7 +259,7 @@ void assembler::verify::frameBalance(const vector<Token>& tokens) {
         if (balance > 1) {
             throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("excess frame spawned (unused frame spawned at line " + str::stringify(previous_frame_spawned.line()+1, false) + ")"));
         }
-        if (instruction == "return" and balance > 0) {
+        if ((instruction == "return"  or instruction == "leave" or instruction == "throw" or instruction == ".end") and balance > 0) {
             throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("leftover frame (spawned at line " + str::stringify(previous_frame_spawned.line()+1, false) + ")"));
         }
 

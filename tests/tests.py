@@ -1163,6 +1163,18 @@ class AssemblerErrorTests(unittest.TestCase):
     def testExcessFrameSpawned(self):
         runTestFailsToAssemble(self, 'excess_frame_spawned.asm', "./sample/asm/errors/excess_frame_spawned.asm:27:5: error: excess frame spawned (unused frame spawned at line 26)")
 
+    def testLeftoverFrameTriggeredByReturn(self):
+        runTestFailsToAssemble(self, 'leftover_frame_return.asm', "./sample/asm/errors/leftover_frame_return.asm:23:5: error: leftover frame (spawned at line 21)")
+
+    def testLeftoverFrameTriggeredByThrow(self):
+        runTestFailsToAssemble(self, 'leftover_frame_throw.asm', "./sample/asm/errors/leftover_frame_throw.asm:22:5: error: leftover frame (spawned at line 21)")
+
+    def testLeftoverFrameTriggeredByLeave(self):
+        runTestFailsToAssemble(self, 'leftover_frame_leave.asm', "./sample/asm/errors/leftover_frame_leave.asm:22:5: error: leftover frame (spawned at line 21)")
+
+    def testLeftoverFrameTriggeredByEnd(self):
+        runTestFailsToAssemble(self, 'leftover_frame_end.asm', "./sample/asm/errors/leftover_frame_end.asm:24:5: error: leftover frame (spawned at line 21)")
+
     def testCallWithoutAFrame(self):
         runTestFailsToAssemble(self, 'call_without_a_frame.asm', "./sample/asm/errors/call_without_a_frame.asm:28:5: error: call with 'tailcall' without a frame")
 
