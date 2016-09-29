@@ -942,7 +942,29 @@ namespace viua {
             }
 
             vector<Token> reduce(vector<Token> tokens) {
-                return reduce_newlines(reduce_absolute_jumps(reduce_floats(reduce_at_prefixed_registers(reduce_offset_jumps(reduce_mark_directive(reduce_link_directive(reduce_main_directive(reduce_name_directive(reduce_info_directive(reduce_block_directive(reduce_bsignature_directive(reduce_signature_directive(reduce_names(reduce_function_signatures(reduce_double_colon(reduce_end_directive(reduce_closure_directive(reduce_function_directive(unwrap_lines(reduce_newlines(remove_comments(remove_spaces(tokens)))))))))))))))))))))));
+                tokens = remove_spaces(tokens);
+                tokens = remove_comments(tokens);
+                tokens = reduce_newlines(tokens);
+                tokens = unwrap_lines(tokens);
+                tokens = reduce_function_directive(tokens);
+                tokens = reduce_closure_directive(tokens);
+                tokens = reduce_end_directive(tokens);
+                tokens = reduce_double_colon(tokens);
+                tokens = reduce_function_signatures(tokens);
+                tokens = reduce_names(tokens);
+                tokens = reduce_signature_directive(tokens);
+                tokens = reduce_bsignature_directive(tokens);
+                tokens = reduce_block_directive(tokens);
+                tokens = reduce_info_directive(tokens);
+                tokens = reduce_name_directive(tokens);
+                tokens = reduce_main_directive(tokens);
+                tokens = reduce_link_directive(tokens);
+                tokens = reduce_mark_directive(tokens);
+                tokens = reduce_offset_jumps(tokens);
+                tokens = reduce_at_prefixed_registers(tokens);
+                tokens = reduce_floats(tokens);
+                tokens = reduce_absolute_jumps(tokens);
+                return reduce_newlines(tokens);
             }
         }
     }
