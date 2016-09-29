@@ -234,19 +234,13 @@ void assembler::verify::functionsEndWithReturn(const std::vector<std::string>& l
     }
 }
 
-void assembler::verify::frameBalance(const vector<string>& lines, const map<unsigned long, unsigned long>& expanded_lines_to_source_lines) {
-    ostringstream report("");
-    string line;
+void assembler::verify::frameBalance(const vector<Token>& tokens) {
     string instruction;
 
     int balance = 0;
-    long unsigned previous_frame_spawnline = 0;
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        line = lines[i];
-        if (line.size() == 0) { continue; }
-
-        line = str::lstrip(line);
-        instruction = str::chunk(line);
+    Token previous_frame_spawned;
+    for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
+        instruction = tokens.at(i);
         if (not (instruction == "call" or instruction == "tailcall" or instruction == "process" or instruction == "watchdog" or instruction == "fcall" or instruction == "frame" or instruction == "msg" or instruction == "return")) {
             continue;
         }
@@ -259,21 +253,17 @@ void assembler::verify::frameBalance(const vector<string>& lines, const map<unsi
         }
 
         if (balance < 0) {
-            report << "call with '" << instruction << "' without a frame";
-            throw ErrorReport(i, report.str());
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("call with '" + instruction + "' without a frame"));
         }
         if (balance > 1) {
-            report << "excess frame spawned (unused frame spawned at line ";
-            report << (expanded_lines_to_source_lines.at(previous_frame_spawnline)+1) << ')';
-            throw ErrorReport(i, report.str());
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("excess frame spawned (unused frame spawned at line " + str::stringify(previous_frame_spawned.line()+1, false) + ")"));
         }
         if (instruction == "return" and balance > 0) {
-            report << "leftover frame (spawned at line " << (expanded_lines_to_source_lines.at(previous_frame_spawnline)+1) << ')';
-            throw ErrorReport(i, report.str());
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("leftover frame (spawned at line " + str::stringify(previous_frame_spawned.line()+1, false) + ")"));
         }
 
         if (instruction == "frame") {
-            previous_frame_spawnline = i;
+            previous_frame_spawned = tokens.at(i);
         }
     }
 }

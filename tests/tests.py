@@ -1161,10 +1161,10 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'invalid_function_name.asm', "./sample/asm/errors/invalid_function_name.asm:30:12: error: invalid function name: foo/x")
 
     def testExcessFrameSpawned(self):
-        runTestFailsToAssemble(self, 'excess_frame_spawned.asm', "./sample/asm/errors/excess_frame_spawned.asm:27:1: error: excess frame spawned (unused frame spawned at line 26)")
+        runTestFailsToAssemble(self, 'excess_frame_spawned.asm', "./sample/asm/errors/excess_frame_spawned.asm:27:5: error: excess frame spawned (unused frame spawned at line 26)")
 
     def testCallWithoutAFrame(self):
-        runTestFailsToAssemble(self, 'call_without_a_frame.asm', "./sample/asm/errors/call_without_a_frame.asm:28:1: error: call with 'tailcall' without a frame")
+        runTestFailsToAssemble(self, 'call_without_a_frame.asm', "./sample/asm/errors/call_without_a_frame.asm:28:5: error: call with 'tailcall' without a frame")
 
     def testCatchingWithUndefinedBlock(self):
         runTestFailsToAssemble(self, 'catching_with_undefined_block.asm', "./sample/asm/errors/catching_with_undefined_block.asm:27:21: error: cannot catch using undefined block: main/0__catch")
