@@ -1,4 +1,3 @@
-#include <iostream>
 #include <sstream>
 #include <viua/support/string.h>
 #include <viua/cg/lex.h>
