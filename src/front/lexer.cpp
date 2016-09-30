@@ -88,7 +88,12 @@ static bool usage(const char* program, bool show_help, bool show_version, bool v
         // generic options
         cout << "    " << "-V, --version            - show version\n"
              << "    " << "-h, --help               - display this message\n"
-         ;
+        // misc options
+             << "    " << "    --size               - calculate and display compiled bytecode size\n"
+             << "    " << "    --raw                - dump raw token list\n"
+             << "    " << "    --ws                 - reduce whitespace and remove comments\n"
+             << "    " << "    --dirs               - reduce directives\n"
+        ;
     }
 
     return (show_help or show_version);
@@ -103,6 +108,11 @@ static string read_file(ifstream& in) {
 }
 
 static bool DISPLAY_SIZE = false;
+static bool DISPLAY_RAW = false;
+static bool MANUAL_REDUCING = false;
+static bool REDUCE_WHITESPACE = false;
+static bool REDUCE_DIRECTIVES = false;
+
 static void display_results(const string& filename, const vector<Token>& tokens) {
     if (DISPLAY_SIZE) {
         try {
@@ -138,6 +148,18 @@ int main(int argc, char* argv[]) {
             continue;
         } else if (option == "--size") {
             DISPLAY_SIZE = true;
+            continue;
+        } else if (option == "--raw") {
+            DISPLAY_RAW = true;
+            MANUAL_REDUCING = true;
+            continue;
+        } else if (option == "--ws") {
+            REDUCE_WHITESPACE = true;
+            MANUAL_REDUCING = true;
+            continue;
+        } else if (option == "--dirs") {
+            REDUCE_DIRECTIVES = true;
+            MANUAL_REDUCING = true;
             continue;
         } else if (str::startswith(option, "-")) {
             cout << "error: unknown option: " << option << endl;
@@ -177,7 +199,33 @@ int main(int argc, char* argv[]) {
 
     vector<Token> tokens;
     try {
-        tokens = viua::cg::lex::standardise(viua::cg::lex::reduce(viua::cg::lex::tokenise(source)));
+        tokens = viua::cg::lex::tokenise(source);
+        if (not MANUAL_REDUCING) {
+            tokens = viua::cg::lex::standardise(viua::cg::lex::reduce(tokens));
+        }
+        if (MANUAL_REDUCING) {
+            if (REDUCE_WHITESPACE or REDUCE_DIRECTIVES) {
+                tokens = viua::cg::lex::remove_spaces(tokens);
+                tokens = viua::cg::lex::remove_comments(tokens);
+                tokens = viua::cg::lex::reduce_newlines(tokens);
+            }
+            if (REDUCE_DIRECTIVES) {
+                tokens = reduce_function_directive(tokens);
+                tokens = reduce_closure_directive(tokens);
+                tokens = reduce_end_directive(tokens);
+                tokens = reduce_double_colon(tokens);
+                tokens = reduce_function_signatures(tokens);
+                tokens = reduce_names(tokens);
+                tokens = reduce_signature_directive(tokens);
+                tokens = reduce_bsignature_directive(tokens);
+                tokens = reduce_block_directive(tokens);
+                tokens = reduce_info_directive(tokens);
+                tokens = reduce_name_directive(tokens);
+                tokens = reduce_main_directive(tokens);
+                tokens = reduce_link_directive(tokens);
+                tokens = reduce_mark_directive(tokens);
+            }
+        }
     } catch (const InvalidSyntax& e) {
         string message = e.what();
         cerr << filename << ':' << e.line_number+1 << ':' << e.character_in_line+1 << ": error: " << (message.size() ? message : "invalid syntax") << endl;
