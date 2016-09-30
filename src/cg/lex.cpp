@@ -975,7 +975,7 @@ namespace viua {
 
                     if (token == ".iota:") {
                         if (iotas.empty()) {
-                            throw viua::cg::lex::InvalidSyntax(token, "'.iota:' directive used while not inside iota scope");
+                            throw viua::cg::lex::InvalidSyntax(token, "'.iota:' directive used outside of iota scope");
                         }
                         if (not str::isnum(input_tokens.at(i+1))) {
                             throw viua::cg::lex::InvalidSyntax(input_tokens.at(i+1), ("invalid argument to '.iota:' directive: " + str::strencode(input_tokens.at(i+1))));

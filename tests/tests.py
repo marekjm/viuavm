@@ -1353,6 +1353,12 @@ class KeywordIotaTests(unittest.TestCase):
     def testIotaInReceivingArguments(self):
         runTestSplitlines(self, 'iota_in_receiving_arguments.asm', ['Hello World!', '42'])
 
+    def testInvalidArgumentToIota(self):
+        runTestFailsToAssemble(self, 'invalid_argument_to_iota.asm', "./sample/asm/keyword/iota/invalid_argument_to_iota.asm:21:12: error: invalid argument to '.iota:' directive: foo")
+
+    def testIotaDirectiveUsedOutsideOfIotaScope(self):
+        runTestFailsToAssemble(self, 'iota_directive_used_outside_of_iota_scope.asm', "./sample/asm/keyword/iota/iota_directive_used_outside_of_iota_scope.asm:20:1: error: '.iota:' directive used outside of iota scope")
+
 
 class AssemblerErrorRejectingDuplicateSymbolsTests(unittest.TestCase):
     PATH = './sample/asm/errors/single_definition_rule'
