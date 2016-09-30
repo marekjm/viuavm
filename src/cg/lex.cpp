@@ -956,7 +956,7 @@ namespace viua {
                     if (token == "[") {
                         iotas.push_back(0);
                     }
-                    if (token == ".end" or token == "]") {
+                    if ((token == ".end" or token == "]") and not iotas.empty()) {
                         iotas.pop_back();
                     }
 
