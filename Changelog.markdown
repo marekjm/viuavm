@@ -58,6 +58,7 @@ There are several categories of change:
 - enhancement: `strstore` instruction has `""` as a default second operand (i.e. `strstore 1` is assembled as `strstore 1 ""`)
 - enhancement: assembler detects missing module names in `.link:` directive
 - feature: `--meta` option in assembler displays meta information embedded in source code
+- feature: `iota` keyword, and `.iota:` directive, they are explained here: https://github.com/marekjm/viuavm/issues/163
 
 
 ----
