@@ -892,7 +892,7 @@ namespace viua {
                             ++i;
                         }
 
-                        Token tok(subtokens.at(0).line(), subtokens.at(0).character(), str::stringify(toplevel_subexpressions, false));
+                        Token counter_token(subtokens.at(0).line(), subtokens.at(0).character(), str::stringify(toplevel_subexpressions, false));
 
                         subtokens = unwrap_lines(subtokens, false);
 
@@ -901,8 +901,9 @@ namespace viua {
                         }
                         unwrapped_tokens.emplace_back(t.line(), t.character(), "\n");
 
+                        unsigned iota = 0;
                         if (invert) {
-                            final_tokens.push_back(tok);
+                            final_tokens.push_back(counter_token);
                             while (i < limit and input_tokens.at(i) != "\n") {
                                 final_tokens.push_back(input_tokens.at(i));
                                 ++i;
@@ -928,7 +929,7 @@ namespace viua {
                             for (auto to : foo) {
                                 final_tokens.push_back(to);
                             }
-                            final_tokens.push_back(tok);
+                            final_tokens.push_back(counter_token);
                         }
 
                         invert = false;
