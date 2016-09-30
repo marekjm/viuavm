@@ -658,7 +658,8 @@ namespace viua {
                         }
                         if (j+1 < limit and input_tokens.at(j+1).str() == "/") {
                             ++j; // skip "/" token
-                            if (j+1 < limit and input_tokens.at(j+1).str() != "\n") {
+                            auto next_token = input_tokens.at(j+1).str();
+                            if (j+1 < limit and (next_token != "\n" and next_token != "^" and next_token != "(" and next_token != ")" and next_token != "[" and next_token != "]")) {
                                 if (adjacent(input_tokens.at(j), input_tokens.at(j+1))) {
                                     ++j; // skip next token, append it to name
                                 }
