@@ -1,3 +1,4 @@
+#include <iostream>
 #include <sstream>
 #include <viua/support/string.h>
 #include <viua/cg/lex.h>
@@ -945,10 +946,36 @@ namespace viua {
                 return final_tokens;
             }
 
+            vector<Token> replace_iotas(vector<Token> input_tokens) {
+                vector<Token> tokens;
+                vector<unsigned long> iotas;
+
+                for (const auto& token : input_tokens) {
+                    if (token == ".function:" or token == ".closure:" or token == ".block:") {
+                        iotas.push_back(1);
+                    }
+                    if (token == "[") {
+                        iotas.push_back(0);
+                    }
+                    if (token == ".end" or token == "]") {
+                        iotas.pop_back();
+                    }
+
+                    if (token == "iota") {
+                        tokens.emplace_back(token.line(), token.character(), str::stringify(iotas.back()++, false));
+                    } else {
+                        tokens.push_back(token);
+                    }
+                }
+
+                return tokens;
+            }
+
             vector<Token> reduce(vector<Token> tokens) {
                 tokens = remove_spaces(tokens);
                 tokens = remove_comments(tokens);
                 tokens = reduce_newlines(tokens);
+                tokens = replace_iotas(tokens);
                 tokens = unwrap_lines(tokens);
                 tokens = reduce_function_directive(tokens);
                 tokens = reduce_closure_directive(tokens);

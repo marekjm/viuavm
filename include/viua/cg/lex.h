@@ -91,6 +91,7 @@ namespace viua {
             std::vector<Token> reduce_floats(std::vector<Token>);
             std::vector<Token> reduce_absolute_jumps(std::vector<Token>);
 
+            std::vector<Token> replace_iotas(std::vector<Token>);
             std::vector<Token> unwrap_lines(std::vector<Token>, bool full = true);
 
             std::vector<Token> reduce(std::vector<Token>);

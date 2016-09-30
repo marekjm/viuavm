@@ -1336,6 +1336,15 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'empty_link_directive.asm', "./sample/asm/errors/empty_link_directive.asm:21:11: error: missing module name in link directive")
 
 
+class KeywordIotaTests(unittest.TestCase):
+    """Tests for `iota` keyword.
+    """
+    PATH = './sample/asm/keyword/iota'
+
+    def testIotaInFrame(self):
+        runTestSplitlines(self, 'iota_in_frame.asm', [ 'Hello World!', '42'])
+
+
 class AssemblerErrorRejectingDuplicateSymbolsTests(unittest.TestCase):
     PATH = './sample/asm/errors/single_definition_rule'
 
