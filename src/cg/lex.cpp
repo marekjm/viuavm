@@ -567,6 +567,26 @@ namespace viua {
                 return tokens;
             }
 
+            vector<Token> reduce_iota_directive(vector<Token> input_tokens) {
+                decltype(input_tokens) tokens;
+
+                const auto limit = input_tokens.size();
+                for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
+                    const auto t = input_tokens.at(i);
+                    if (t.str() == "." and i < limit-2 and input_tokens.at(i+1) == "iota" and input_tokens.at(i+2).str() == ":") {
+                        if (adjacent(t, input_tokens.at(i+1), input_tokens.at(i+2))) {
+                            tokens.emplace_back(t.line(), t.character(), ".iota:");
+                            ++i; // skip "iota" token
+                            ++i; // skip ":" token
+                            continue;
+                        }
+                    }
+                    tokens.push_back(t);
+                }
+
+                return tokens;
+            }
+
             vector<Token> reduce_block_directive(vector<Token> input_tokens) {
                 decltype(input_tokens) tokens;
 
@@ -950,7 +970,23 @@ namespace viua {
                 vector<Token> tokens;
                 vector<unsigned long> iotas;
 
-                for (const auto& token : input_tokens) {
+                for (decltype(input_tokens)::size_type i = 0; i < input_tokens.size(); ++i) {
+                    const auto& token = input_tokens.at(i);
+
+                    if (token == ".iota:") {
+                        if (iotas.empty()) {
+                            throw viua::cg::lex::InvalidSyntax(token, "'.iota:' directive used while not inside iota scope");
+                        }
+                        if (not str::isnum(input_tokens.at(i+1))) {
+                            throw viua::cg::lex::InvalidSyntax(input_tokens.at(i+1), ("invalid argument to '.iota:' directive: " + str::strencode(input_tokens.at(i+1))));
+                        }
+
+                        iotas.back() = stoul(input_tokens.at(i+1));
+
+                        ++i;
+                        continue;
+                    }
+
                     if (token == ".function:" or token == ".closure:" or token == ".block:") {
                         iotas.push_back(1);
                     }
@@ -989,6 +1025,7 @@ namespace viua {
                 tokens = reduce_main_directive(tokens);
                 tokens = reduce_link_directive(tokens);
                 tokens = reduce_mark_directive(tokens);
+                tokens = reduce_iota_directive(tokens);
                 tokens = replace_iotas(tokens);
                 tokens = unwrap_lines(tokens);
                 tokens = reduce_offset_jumps(tokens);
