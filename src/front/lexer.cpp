@@ -82,7 +82,7 @@ static bool usage(const char* program, bool show_help, bool show_version, bool v
     }
     if (show_help) {
         cout << "\nUSAGE:\n";
-        cout << "    " << program << " [option...] [-o <outfile>] <infile> [<linked-file>...]\n" << endl;
+        cout << "    " << program << " [option...] <infile>\n" << endl;
         cout << "OPTIONS:\n";
 
         // generic options
