@@ -1342,13 +1342,13 @@ class KeywordIotaTests(unittest.TestCase):
     PATH = './sample/asm/keyword/iota'
 
     def testIotaInFrame(self):
-        runTestSplitlines(self, 'iota_in_frame.asm', [ 'Hello World!', '42'])
+        runTestSplitlines(self, 'iota_in_frame.asm', ['Hello World!', '42'])
 
     def testIotaInNames(self):
-        runTestSplitlines(self, 'iota_in_names.asm', [ 'Hello World!', '42'])
+        runTestSplitlines(self, 'iota_in_names.asm', ['Hello World!', '42'])
 
     def testIotaInRegisterIndexes(self):
-        runTestSplitlines(self, 'iota_in_register_indexes.asm', [ 'Hello World!', '42'])
+        runTestSplitlines(self, 'iota_in_register_indexes.asm', ['Hello World!', '42'])
 
     def testIotaInReceivingArguments(self):
         runTestSplitlines(self, 'iota_in_receiving_arguments.asm', ['Hello World!', '42'])
