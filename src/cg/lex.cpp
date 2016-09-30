@@ -901,7 +901,6 @@ namespace viua {
                         }
                         unwrapped_tokens.emplace_back(t.line(), t.character(), "\n");
 
-                        unsigned iota = 0;
                         if (invert) {
                             final_tokens.push_back(counter_token);
                             while (i < limit and input_tokens.at(i) != "\n") {
