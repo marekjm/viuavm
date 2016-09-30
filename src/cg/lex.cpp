@@ -975,8 +975,6 @@ namespace viua {
                 tokens = remove_spaces(tokens);
                 tokens = remove_comments(tokens);
                 tokens = reduce_newlines(tokens);
-                tokens = replace_iotas(tokens);
-                tokens = unwrap_lines(tokens);
                 tokens = reduce_function_directive(tokens);
                 tokens = reduce_closure_directive(tokens);
                 tokens = reduce_end_directive(tokens);
@@ -991,6 +989,8 @@ namespace viua {
                 tokens = reduce_main_directive(tokens);
                 tokens = reduce_link_directive(tokens);
                 tokens = reduce_mark_directive(tokens);
+                tokens = replace_iotas(tokens);
+                tokens = unwrap_lines(tokens);
                 tokens = reduce_offset_jumps(tokens);
                 tokens = reduce_at_prefixed_registers(tokens);
                 tokens = reduce_floats(tokens);
