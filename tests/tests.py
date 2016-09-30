@@ -1131,13 +1131,13 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'is_not_a_valid_function_name.asm', "./sample/asm/errors/is_not_a_valid_function_name.asm:26:10: error: not a valid function name: foo/x")
 
     def testFrameWithGaps(self):
-        runTestFailsToAssemble(self, 'frame_with_gaps.asm', "./sample/asm/errors/frame_with_gaps.asm:28:1: error: gap in frame defined at line 25, slot 1 left empty")
+        runTestFailsToAssemble(self, 'frame_with_gaps.asm', "./sample/asm/errors/frame_with_gaps.asm:28:5: error: gap in frame defined at line 25, slot 1 left empty")
 
     def testPassingParameterToASlotWithTooHighIndex(self):
-        runTestFailsToAssemble(self, 'passing_to_slot_with_too_high_index.asm', "./sample/asm/errors/passing_to_slot_with_too_high_index.asm:26:1: error: pass to parameter slot 3 in frame with only 3 slots available")
+        runTestFailsToAssemble(self, 'passing_to_slot_with_too_high_index.asm', "./sample/asm/errors/passing_to_slot_with_too_high_index.asm:26:5: error: pass to parameter slot 3 in frame with only 3 slots available")
 
     def testDoublePassing(self):
-        runTestFailsToAssemble(self, 'double_pass.asm', "./sample/asm/errors/double_pass.asm:29:1: error: double pass to parameter slot 2 in frame defined at line 25, first pass at line 28")
+        runTestFailsToAssemble(self, 'double_pass.asm', "./sample/asm/errors/double_pass.asm:29:5: error: double pass to parameter slot 2 in frame defined at line 25, first pass at line 28")
 
     def testMsgRequiresAtLeastOneParameter(self):
         runTestFailsToAssemble(self, 'msg_requires_at_least_one_parameter.asm', "./sample/asm/errors/msg_requires_at_least_one_parameter.asm:22:5: error: invalid number of parameters in dynamic dispatch of foo: expected at least 1, got 0")

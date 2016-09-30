@@ -474,31 +474,24 @@ void assembler::verify::framesHaveOperands(const vector<string>& lines) {
     }
 }
 
-void assembler::verify::framesHaveNoGaps(const vector<string>& lines, const map<unsigned long, unsigned long>& expanded_lines_to_source_lines) {
-    ostringstream report("");
-    string line;
+void assembler::verify::framesHaveNoGaps(const vector<Token>& tokens) {
     unsigned long frame_parameters_count = 0;
     bool detected_frame_parameters_count = false;
-    unsigned last_frame = 0;
+    unsigned long last_frame = 0;
 
     vector<bool> filled_slots;
-    vector<unsigned> pass_lines;
+    vector<unsigned long> pass_lines;
 
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        line = str::lstrip(lines[i]);
-        if (not (str::startswith(line, "call") or str::startswith(line, "process") or str::startswith(line, "watchdog") or str::startswith(line, "frame") or str::startswith(line, "param") or str::startswith(line, "pamv"))) {
+    for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
+        if (not (tokens.at(i) == "call" or tokens.at(i) == "process" or tokens.at(i) == "watchdog" or tokens.at(i) == "frame" or tokens.at(i) == "param" or tokens.at(i) == "pamv")) {
             continue;
         }
 
-        string instr_name = str::chunk(line);
-        line = str::lstrip(line.substr(instr_name.size()));
+        if (tokens.at(i) == "frame") {
+            last_frame = tokens.at(i).line();
 
-        if (instr_name == "frame") {
-            last_frame = i;
-
-            line = str::chunk(line);
-            if (str::isnum(line)) {
-                frame_parameters_count = stoul(str::chunk(line));
+            if (str::isnum(tokens.at(i+1))) {
+                frame_parameters_count = stoul(tokens.at(i+1));
                 filled_slots.clear();
                 pass_lines.clear();
                 filled_slots.resize(frame_parameters_count, false);
@@ -510,35 +503,37 @@ void assembler::verify::framesHaveNoGaps(const vector<string>& lines, const map<
             continue;
         }
 
-        if (instr_name == "param" or instr_name == "pamv") {
-            line = str::chunk(line);
+        if (tokens.at(i) == "param" or tokens.at(i) == "pamv") {
             unsigned long slot_index;
             bool detected_slot_index = false;
-            if (str::isnum(line)) {
-                slot_index = stoul(line);
+            if (str::isnum(tokens.at(i+1))) {
+                slot_index = stoul(tokens.at(i+1));
                 detected_slot_index = true;
             }
             if (detected_slot_index and detected_frame_parameters_count and slot_index >= frame_parameters_count) {
+                ostringstream report;
                 report << "pass to parameter slot " << slot_index << " in frame with only " << frame_parameters_count << " slots available";
-                throw ErrorReport(i, report.str());
+                throw viua::cg::lex::InvalidSyntax(tokens.at(i), report.str());
             }
             if (detected_slot_index and detected_frame_parameters_count) {
                 if (filled_slots[slot_index]) {
-                    report << "double pass to parameter slot " << slot_index << " in frame defined at line " << expanded_lines_to_source_lines.at(last_frame)+1;
-                    report << ", first pass at line " << expanded_lines_to_source_lines.at(pass_lines[slot_index])+1;
-                    throw ErrorReport(i, report.str());
+                    ostringstream report;
+                    report << "double pass to parameter slot " << slot_index << " in frame defined at line " << last_frame+1;
+                    report << ", first pass at line " << pass_lines[slot_index]+1;
+                    throw viua::cg::lex::InvalidSyntax(tokens.at(i), report.str());
                 }
                 filled_slots[slot_index] = true;
-                pass_lines[slot_index] = i;
+                pass_lines[slot_index] = tokens.at(i).line();
             }
             continue;
         }
 
-        if (instr_name == "call" or instr_name == "process" or instr_name == "watchdog") {
+        if (tokens.at(i) == "call" or tokens.at(i) == "process" or tokens.at(i) == "watchdog") {
             for (decltype(frame_parameters_count) f = 0; f < frame_parameters_count; ++f) {
                 if (not filled_slots[f]) {
-                    report << "gap in frame defined at line " << expanded_lines_to_source_lines.at(last_frame)+1 << ", slot " << f << " left empty";
-                    throw ErrorReport(i, report.str());
+                    ostringstream report;
+                    report << "gap in frame defined at line " << last_frame+1 << ", slot " << f << " left empty";
+                    throw viua::cg::lex::InvalidSyntax(tokens.at(i), report.str());
                 }
             }
         }
