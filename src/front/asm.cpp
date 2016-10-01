@@ -347,7 +347,6 @@ int main(int argc, char* argv[]) {
         assembler::verify::functionsEndWithReturn(cooked_tokens);
         assembler::verify::blockBodiesAreNonempty(cooked_tokens);
         assembler::verify::jumpsAreInRange(expanded_lines);
-        assembler::verify::framesHaveOperands(expanded_lines);
         assembler::verify::framesHaveNoGaps(cooked_tokens);
         assembler::verify::blocksEndWithFinishingInstruction(expanded_lines);
         if (PERFORM_STATIC_ANALYSIS) {

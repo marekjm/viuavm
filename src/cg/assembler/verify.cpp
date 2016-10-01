@@ -450,28 +450,6 @@ void assembler::verify::instructions(const vector<Token>& tokens) {
     }
 }
 
-void assembler::verify::framesHaveOperands(const vector<string>& lines) {
-    ostringstream report("");
-    string line;
-
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        line = str::lstrip(lines[i]);
-
-        if (not str::startswith(line, "frame")) {
-            continue;
-        }
-
-        // remove leading instruction name and
-        // strip the remaining string of leading whitespace
-        line = str::lstrip(str::sub(line, str::chunk(line).size()));
-
-        if (line.size() == 0) {
-            report << "frame instruction without operands";
-            throw ErrorReport(i, report.str());
-        }
-    }
-}
-
 void assembler::verify::framesHaveNoGaps(const vector<Token>& tokens) {
     unsigned long frame_parameters_count = 0;
     bool detected_frame_parameters_count = false;

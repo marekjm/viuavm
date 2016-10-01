@@ -1242,9 +1242,6 @@ class AssemblerErrorTests(unittest.TestCase):
     def testAbsoluteJumpWithNegativeValue(self):
         runTestFailsToAssemble(self, 'absolute_jump_negative.asm', "./sample/asm/errors/absolute_jump_negative.asm:21:1: error: absolute jump with negative value")
 
-    def testFrameWithoutOperands(self):
-        runTestFailsToAssemble(self, 'frame_without_operands.asm', "./sample/asm/errors/frame_without_operands.asm:25:1: error: frame instruction without operands")
-
     def testBlocksEndWithReturningInstruction(self):
         runTestFailsToAssemble(self, 'blocks_end_with_returning_instruction.asm', "./sample/asm/errors/blocks_end_with_returning_instruction.asm:22:1: error: missing returning instruction (leave, return or halt) at the end of block 'foo__block'")
 

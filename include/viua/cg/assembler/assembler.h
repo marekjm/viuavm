@@ -82,7 +82,6 @@ namespace assembler {
         void directives(const std::vector<viua::cg::lex::Token>&);
         void instructions(const std::vector<viua::cg::lex::Token>&);
 
-        void framesHaveOperands(const std::vector<std::string>&);
         void framesHaveNoGaps(const std::vector<viua::cg::lex::Token>&);
 
         void jumpsAreInRange(const std::vector<std::string>&);
