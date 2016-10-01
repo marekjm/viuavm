@@ -1058,6 +1058,15 @@ namespace viua {
                 tokens = reduce_function_signatures(tokens);
                 tokens = reduce_names(tokens);
 
+                /*
+                 * Reduce other tokens that are not lexed as single entities, e.g. floating-point literals, or
+                 * @-prefixed registers.
+                 *
+                 * The order should not be changed as the functions make assumptions about input list, and
+                 * parsing may break if the assumptions are false.
+                 * Order may be changed if the externally visible outputs from assembler (i.e. compiled bytecode)
+                 * do not change.
+                 */
                 tokens = reduce_offset_jumps(tokens);
                 tokens = reduce_at_prefixed_registers(tokens);
                 tokens = reduce_floats(tokens);
