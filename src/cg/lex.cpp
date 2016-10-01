@@ -1026,12 +1026,13 @@ namespace viua {
                 tokens = reduce_link_directive(tokens);
                 tokens = reduce_mark_directive(tokens);
                 tokens = reduce_iota_directive(tokens);
-                tokens = replace_iotas(tokens);
-                tokens = unwrap_lines(tokens);
                 tokens = reduce_offset_jumps(tokens);
                 tokens = reduce_at_prefixed_registers(tokens);
                 tokens = reduce_floats(tokens);
                 tokens = reduce_absolute_jumps(tokens);
+                tokens = replace_iotas(tokens);
+                tokens = unwrap_lines(tokens);
+
                 return reduce_newlines(tokens);
             }
         }
