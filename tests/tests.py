@@ -1243,7 +1243,7 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'absolute_jump_negative.asm', "./sample/asm/errors/absolute_jump_negative.asm:21:1: error: absolute jump with negative value")
 
     def testBlocksEndWithReturningInstruction(self):
-        runTestFailsToAssemble(self, 'blocks_end_with_returning_instruction.asm', "./sample/asm/errors/blocks_end_with_returning_instruction.asm:22:1: error: missing returning instruction (leave, return or halt) at the end of block 'foo__block'")
+        runTestFailsToAssemble(self, 'blocks_end_with_returning_instruction.asm', "./sample/asm/errors/blocks_end_with_returning_instruction.asm:22:1: error: missing returning instruction (leave, return, tailcall or halt) at the end of block: foo__block")
 
     def testBranchWithoutTarget(self):
         runTestFailsToAssemble(self, 'branch_without_a_target.asm', "./sample/asm/errors/branch_without_a_target.asm:23:1: error: branch without a target")

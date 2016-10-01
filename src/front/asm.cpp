@@ -348,7 +348,7 @@ int main(int argc, char* argv[]) {
         assembler::verify::blockBodiesAreNonempty(cooked_tokens);
         assembler::verify::jumpsAreInRange(expanded_lines);
         assembler::verify::framesHaveNoGaps(cooked_tokens);
-        assembler::verify::blocksEndWithFinishingInstruction(expanded_lines);
+        assembler::verify::blocksEndWithFinishingInstruction(cooked_tokens);
         if (PERFORM_STATIC_ANALYSIS) {
             assembler::verify::manipulationOfDefinedRegisters(cooked_tokens, blocks.tokens, DEBUG);
         }

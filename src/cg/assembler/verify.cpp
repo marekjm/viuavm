@@ -392,26 +392,24 @@ void assembler::verify::blockBodiesAreNonempty(const vector<Token>& tokens) {
     bodiesAreNonempty(tokens);
 }
 
-void assembler::verify::blocksEndWithFinishingInstruction(const vector<string>& lines) {
-    ostringstream report("");
-    string line;
+void assembler::verify::blocksEndWithFinishingInstruction(const vector<Token>& tokens) {
     string block;
 
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        line = str::lstrip(lines[i]);
-        if (assembler::utils::lines::is_block(line)) {
-            block = str::chunk(str::lstrip(str::sub(line, string(".block:").size())));
+    for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
+        if (tokens.at(i) == ".block:") {
+            block = tokens.at(i+1);
             continue;
-        } else if (str::startswithchunk(line, ".end") and block.size()) {
+        } else if (tokens.at(i) == ".end" and block.size()) {
             // .end may have been reached while not in a block because functions also end with .end
             // so we also make sure that we were inside a block
         } else {
             continue;
         }
 
-        if (i and (not (str::startswithchunk(str::lstrip(lines[i-1]), "leave") or str::startswithchunk(str::lstrip(lines[i-1]), "return") or str::startswithchunk(str::lstrip(lines[i-1]), "halt")))) {
-            report << "missing returning instruction (leave, return or halt) at the end of block '" << block << "'";
-            throw ErrorReport(i, report.str());
+        bool last_token_returns = (tokens.at(i-1) == "leave" or tokens.at(i-1) == "return" or tokens.at(i-1) == "tailcall" or tokens.at(i-1) == "halt");
+        bool last_but_one_token_returns = (tokens.at(i-1) == "\n" and (tokens.at(i-2) == "leave" or tokens.at(i-2) == "return" or tokens.at(i-2) == "tailcall" or tokens.at(i-2) == "halt"));
+        if (not (last_token_returns or last_but_one_token_returns)) {
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("missing returning instruction (leave, return, tailcall or halt) at the end of block: " + block));
         }
 
         // if we're here, then the .end at the end of function has been reached and
