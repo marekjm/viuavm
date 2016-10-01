@@ -63,7 +63,7 @@ namespace assembler {
         void msgArities(const std::vector<viua::cg::lex::Token>& lines);
 
         void functionNames(const std::vector<viua::cg::lex::Token>&);
-        void functionsEndWithReturn(const std::vector<std::string>&);
+        void functionsEndWithReturn(const std::vector<viua::cg::lex::Token>&);
 
         void frameBalance(const std::vector<viua::cg::lex::Token>&);
 

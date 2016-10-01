@@ -191,26 +191,24 @@ void assembler::verify::functionNames(const vector<Token>& tokens) {
     }
 }
 
-void assembler::verify::functionsEndWithReturn(const std::vector<std::string>& lines) {
-    ostringstream report("");
-    string line;
+void assembler::verify::functionsEndWithReturn(const std::vector<Token>& tokens) {
     string function;
 
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        line = str::lstrip(lines[i]);
-        if (assembler::utils::lines::is_function(line)) {
-            function = str::chunk(str::lstrip(str::sub(line, str::chunk(line).size())));
+    for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
+        if (tokens.at(i) == ".function:") {
+            function = tokens.at(i+1);
             continue;
-        } else if (str::startswithchunk(line, ".end") and function.size()) {
+        } else if (tokens.at(i) == ".end" and function.size()) {
             // .end may have been reached while not in a function because blocks also end with .end
             // so we also make sure that we were inside a function
         } else {
             continue;
         }
 
-        if (i and (not (str::startswithchunk(str::lstrip(lines[i-1]), "return") or str::startswithchunk(str::lstrip(lines[i-1]), "tailcall")))) {
-            report << "function does not end with 'return' or 'tailcall': " << function;
-            throw ErrorReport(i, report.str());
+        bool last_token_returns = (tokens.at(i-1) == "return" or tokens.at(i-1) == "tailcall");
+        bool last_but_one_token_returns = (tokens.at(i-1) == "\n" and (tokens.at(i-2) == "return" or tokens.at(i-2) == "tailcall"));
+        if (not (last_token_returns or last_but_one_token_returns)) {
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("function does not end with 'return' or 'tailcall': " + function));
         }
 
         // if we're here, then the .end at the end of function has been reached and
