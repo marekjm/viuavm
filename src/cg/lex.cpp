@@ -1008,9 +1008,30 @@ namespace viua {
             }
 
             vector<Token> reduce(vector<Token> tokens) {
+                /*
+                 * Remove whitespace as first step to reduce noise in token stream.
+                 * Remember not to remove newlines ('\n') because they act as separators
+                 * in Viua assembly language, and are thus quite important.
+                 */
                 tokens = remove_spaces(tokens);
                 tokens = remove_comments(tokens);
+
+                /*
+                 * Reduce consecutive newline tokens to a single newline.
+                 * For example, ["foo", "\n", "\n", "\n", "bar"] is reduced to ["foo", "\n", "bar"].
+                 * This further reduces noise, and allows later reductions to make the assumption
+                 * that there is always only one newline when newline may appear.
+                 */
                 tokens = reduce_newlines(tokens);
+
+                /*
+                 * Reduce directives as lexer emits them as multiple tokens.
+                 * This lets later reductions to check jsut one token to see if it is an assembler
+                 * directive instead of looking two or three tokens ahead.
+                 *
+                 * Also, reduce other multi-token sequences: function, block, and module names;
+                 * floating point numbers; absolute jumps; @-prefixed register names and indexes.
+                 */
                 tokens = reduce_function_directive(tokens);
                 tokens = reduce_closure_directive(tokens);
                 tokens = reduce_end_directive(tokens);
@@ -1030,10 +1051,30 @@ namespace viua {
                 tokens = reduce_at_prefixed_registers(tokens);
                 tokens = reduce_floats(tokens);
                 tokens = reduce_absolute_jumps(tokens);
+
+                /*
+                 * Replace 'iota' keywords with their integers.
+                 * This **MUST** be run before unwrapping instructions because '[]' are needed to correctly
+                 * replace iotas inside them (the '[]' create new iota scopes).
+                 */
                 tokens = replace_iotas(tokens);
+
+                /*
+                 * Unroll instruction wrapped in '()' and '[]'.
+                 * This makes assembler's and static analyser's work easier since they can deal with linear
+                 * token sequence.
+                 */
                 tokens = unwrap_lines(tokens);
 
-                return reduce_newlines(tokens);
+                /*
+                 * Reduce newlines once more, since unwrap_lines() may sometimes insert a spurious newline into the
+                 * token stream.
+                 * It's easier to just clean the newlines up after unwrap_lines() than to add extra ifs to it, and
+                 * it also helps readability (unwrap_lines() may be less convulted).
+                 */
+                tokens = reduce_newlines(tokens);
+
+                return tokens;
             }
         }
     }
