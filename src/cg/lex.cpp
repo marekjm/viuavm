@@ -1035,9 +1035,6 @@ namespace viua {
                 tokens = reduce_function_directive(tokens);
                 tokens = reduce_closure_directive(tokens);
                 tokens = reduce_end_directive(tokens);
-                tokens = reduce_double_colon(tokens);
-                tokens = reduce_function_signatures(tokens);
-                tokens = reduce_names(tokens);
                 tokens = reduce_signature_directive(tokens);
                 tokens = reduce_bsignature_directive(tokens);
                 tokens = reduce_block_directive(tokens);
@@ -1047,6 +1044,20 @@ namespace viua {
                 tokens = reduce_link_directive(tokens);
                 tokens = reduce_mark_directive(tokens);
                 tokens = reduce_iota_directive(tokens);
+
+                /*
+                 * Reduce double-colon token to make life easier for name reductions.
+                 */
+                tokens = reduce_double_colon(tokens);
+
+                /*
+                 * Then, reduce function signatues and names.
+                 * Reduce function names first because they have the arity suffix ('/<integer>') apart
+                 * from the 'name ("::" name)*' core which both reducers recognise.
+                 */
+                tokens = reduce_function_signatures(tokens);
+                tokens = reduce_names(tokens);
+
                 tokens = reduce_offset_jumps(tokens);
                 tokens = reduce_at_prefixed_registers(tokens);
                 tokens = reduce_floats(tokens);
