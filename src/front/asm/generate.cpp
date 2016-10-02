@@ -200,7 +200,7 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
      *  from them generate the bytecode.
      */
     if (DEBUG and SCREAM) {
-        cout << send_control_seq(COLOR_FG_LIGHT_CYAN) << "message" << send_control_seq(ATTR_RESET);
+        cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << "message" << send_control_seq(ATTR_RESET);
         cout << ": ";
         cout << "assembling '";
         cout << send_control_seq(COLOR_FG_WHITE) << tokens.at(i).str() << send_control_seq(ATTR_RESET);
@@ -593,7 +593,7 @@ static uint64_t writeCodeBlocksSection(ofstream& out, const invocables_t& blocks
     bwrite(out, block_ids_section_size);
     for (string name : blocks.names) {
         if (DEBUG) {
-            cout << send_control_seq(COLOR_FG_LIGHT_CYAN) << "message" << send_control_seq(ATTR_RESET);
+            cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << "message" << send_control_seq(ATTR_RESET);
             cout << ": ";
             cout << "writing block '";
             cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << name << send_control_seq(ATTR_RESET);
@@ -696,7 +696,7 @@ static void check_main_function(const string& main_function, const vector<Token>
 
 static uint64_t generate_entry_function(uint64_t bytes, map<string, uint64_t> function_addresses, invocables_t& functions, const string& main_function, uint64_t starting_instruction) {
     if (DEBUG) {
-        cout << send_control_seq(COLOR_FG_LIGHT_CYAN) << "message" << send_control_seq(ATTR_RESET);
+        cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << "message" << send_control_seq(ATTR_RESET);
         cout << ": ";
         cout << "generating ";
         cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << ENTRY_FUNCTION_NAME << send_control_seq(ATTR_RESET);
@@ -962,7 +962,7 @@ int generate(vector<Token>& tokens, invocables_t& functions, invocables_t& block
         if (DEBUG or VERBOSE) {
             cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
             cout << ": ";
-            cout << send_control_seq(COLOR_FG_LIGHT_CYAN) << "message" << send_control_seq(ATTR_RESET);
+            cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << "message" << send_control_seq(ATTR_RESET);
             cout << ": ";
             cout << "[loader] linking with: '";
             cout << send_control_seq(COLOR_FG_WHITE) << lnk << send_control_seq(ATTR_RESET);

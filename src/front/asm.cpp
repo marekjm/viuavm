@@ -263,7 +263,7 @@ int main(int argc, char* argv[]) {
     if (VERBOSE or DEBUG) {
         cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
         cout << ": ";
-        cout << send_control_seq(COLOR_FG_LIGHT_CYAN) << "message" << send_control_seq(ATTR_RESET);
+        cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << "message" << send_control_seq(ATTR_RESET);
         cout << ": ";
         cout << "assembling to \"";
         cout << send_control_seq(COLOR_FG_WHITE) << compilename << send_control_seq(ATTR_RESET);
