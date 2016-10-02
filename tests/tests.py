@@ -1112,6 +1112,15 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
     def testRegisterUsedBeforeBeingNamed(self):
         runTestFailsToAssemble(self, 'register_defined_before_being_named.asm', "./sample/asm/static_analysis_errors/register_defined_before_being_named.asm:22:12: error: register defined before being named: 1 = named_register")
 
+    def testUselessBranchSimpleMarker(self):
+        runTestFailsToAssemble(self, 'useless_branch_simple_marker.asm', "./sample/asm/static_analysis_errors/useless_branch_simple_marker.asm:21:5: error: useless branch: both targets point to the same instruction")
+
+    def testUselessBranchSimpleOffset(self):
+        runTestFailsToAssemble(self, 'useless_branch_simple_offset.asm', "./sample/asm/static_analysis_errors/useless_branch_simple_offset.asm:21:5: error: useless branch: both targets point to the same instruction")
+
+    def testUselessBranchSimpleIndex(self):
+        runTestFailsToAssemble(self, 'useless_branch_simple_index.asm', "./sample/asm/static_analysis_errors/useless_branch_simple_index.asm:21:5: error: useless branch: both targets point to the same instruction")
+
 
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.
