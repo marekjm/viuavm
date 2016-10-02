@@ -763,7 +763,7 @@ namespace viua {
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
                     const auto t = input_tokens.at(i);
 
-                    if (i+1 < limit and t == "." and str::isnum(input_tokens.at(i+1), false)) {
+                    if (i+1 < limit and t == "." and str::isnum(input_tokens.at(i+1))) {
                         if (adjacent(t, input_tokens.at(i+1))) {
                             tokens.emplace_back(t.line(), t.character(), (t.str() + input_tokens.at(i+1).str()));
                             ++i;
