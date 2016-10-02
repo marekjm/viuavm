@@ -131,9 +131,27 @@ static void display_error_in_context(const vector<viua::cg::lex::Token>& tokens,
         context_before = (error_line-context_lines);
     }
 
+    bool was_error_line = false;
     for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
         auto token = tokens[i];
         auto token_line = token.line();
+
+        if (token_line == error_line) {
+            was_error_line = true;
+        }
+        if (token_line > error_line and was_error_line) {
+            was_error_line = false;
+            decltype(error_character) j = 0;
+            cout << "     " << error_line << ' ';
+            cout << send_control_seq(COLOR_FG_RED_1);
+            cout << "~~";
+            while (j++ < error_character) {
+                cout << '~';
+            }
+            cout << '^';
+            cout << send_control_seq(ATTR_RESET);
+            cout << '\n';
+        }
         if (token_line >= context_before and token_line <= context_after) {
             cout << (token_line == error_line ? (send_control_seq(COLOR_FG_RED) + ">>>>" + send_control_seq(ATTR_RESET)) : "    ") << ' ';
             if (token_line == error_line) {
