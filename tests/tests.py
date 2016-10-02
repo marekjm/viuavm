@@ -1128,7 +1128,16 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'useless_branch_mixed_index_offset_forward.asm', "./sample/asm/static_analysis_errors/useless_branch_mixed_index_offset_forward.asm:21:5: error: useless branch: both targets point to the same instruction")
 
     def testUselessBranchMixedMarker(self):
-        runTestFailsToAssemble(self, 'useless_branch_mixed_marker.asm', "./sample/asm/static_analysis_errors/useless_branch_mixed_marker.asm:22:12: error: useless branch: both targets point to the same instruction")
+        runTestFailsToAssemble(self, 'useless_branch_mixed_marker.asm', "./sample/asm/static_analysis_errors/useless_branch_mixed_marker.asm:21:5: error: useless branch: both targets point to the same instruction")
+
+    def testUselessBranchMixedMarkerIndex(self):
+        runTestFailsToAssemble(self, 'useless_branch_mixed_marker_index.asm', "./sample/asm/static_analysis_errors/useless_branch_mixed_marker_index.asm:21:5: error: useless branch: both targets point to the same instruction")
+
+    def testUselessBranchMixedMarkerOffsetBackward(self):
+        runTestFailsToAssemble(self, 'useless_branch_mixed_marker_offset_backward.asm', "./sample/asm/static_analysis_errors/useless_branch_mixed_marker_offset_backward.asm:27:5: error: useless branch: both targets point to the same instruction")
+
+    def testUselessBranchMixedMarkerOffsetForward(self):
+        runTestFailsToAssemble(self, 'useless_branch_mixed_marker_offset_forward.asm', "./sample/asm/static_analysis_errors/useless_branch_mixed_marker_offset_forward.asm:21:5: error: useless branch: both targets point to the same instruction")
 
 
 class AssemblerErrorTests(unittest.TestCase):
