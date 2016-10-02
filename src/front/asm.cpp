@@ -114,74 +114,100 @@ static string read_file(const string& path) {
     return source_in.str();
 }
 
-static void display_error_in_context(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) error_line, decltype(error_line) error_character, const string& filename, string message) {
+static void underline_error_token(const viua::cg::lex::InvalidSyntax& error) {
+        cout << "     ";
+
+        auto len = str::stringify((error.line()+1), false).size();
+        while (len--) {
+            cout << ' ';
+        }
+        cout << ' ';
+
+        auto j = error.character();
+        while (j--) {
+            cout << ' ';
+        }
+
+        auto k = error.content.size();
+        cout << send_control_seq(COLOR_FG_RED_1);
+        while (k--) {
+            cout << '^';
+        }
+        cout << send_control_seq(ATTR_RESET);
+
+        cout << '\n';
+}
+static auto display_error_line(const vector<viua::cg::lex::Token>& tokens, const viua::cg::lex::InvalidSyntax& error, decltype(tokens.size()) i) -> decltype(i) {
+    const auto token_line = tokens.at(i).line();
+
+    cout << send_control_seq(COLOR_FG_RED);
+    cout << ">>>>"; // message indent, ">>>>" on error line
+    cout << ' ';
+
+    cout << send_control_seq(COLOR_FG_YELLOW);
+    cout << token_line+1;
+    cout << ' ';
+
+    cout << send_control_seq(COLOR_FG_WHITE);
+    while (i < tokens.size() and tokens.at(i).line() == token_line) {
+        if (tokens.at(i).line() == error.line() and tokens.at(i).character() >= error.character() and tokens.at(i).ends() <= (error.character()+error.content.size())) {
+            cout << send_control_seq(COLOR_FG_ORANGE_RED_1);
+        }
+        cout << tokens.at(i++).str();
+        if (i < tokens.size() and tokens.at(i).line() == error.line() and tokens.at(i).character() >= error.character() and tokens.at(i).ends() <= (error.character()+error.content.size())) {
+            cout << send_control_seq(COLOR_FG_WHITE);
+        }
+    }
+
+    cout << send_control_seq(ATTR_RESET);
+
+    underline_error_token(error);
+
+    return i;
+}
+static auto display_context_line(const vector<viua::cg::lex::Token>& tokens, const viua::cg::lex::InvalidSyntax&, decltype(tokens.size()) i) -> decltype(i) {
+    const auto token_line = tokens.at(i).line();
+
+    cout << "    "; // message indent, ">>>>" on error line
+    cout << ' ';
+    cout << token_line+1;
+    cout << ' ';
+
+    while (i < tokens.size() and tokens.at(i).line() == token_line) {
+        cout << tokens.at(i++).str();
+    }
+
+    return i;
+}
+static void display_error_in_context(const vector<viua::cg::lex::Token>& tokens, viua::cg::lex::InvalidSyntax error, const string& filename) {
+    const auto error_line = error.line();
+    const auto error_character = error.character();
+    const auto message = error.what();
+
     cout << send_control_seq(COLOR_FG_WHITE) << filename << ':' << error_line+1 << ':' << error_character+1 << ':' << send_control_seq(ATTR_RESET) << ' ';
     cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET) << ": " << message << endl;
     cout << "\n";
 
     const unsigned context_lines = 2;
-    decltype(error_line) context_before, context_after = (error_line+context_lines);
-    if (error_line < context_lines) {
-        context_before = 0;
-    } else {
+    decltype(error.line()) context_before = 0, context_after = (error_line+context_lines);
+    if (error_line >= context_lines) {
         context_before = (error_line-context_lines);
     }
 
-    bool was_error_line = false;
-    for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
-        auto token = tokens[i];
-        auto token_line = token.line();
-
-        if (token_line == error_line) {
-            was_error_line = true;
-        }
-        if (token_line > error_line and was_error_line) {
-            was_error_line = false;
-            decltype(error_character) j = 0;
-            cout << "     ";
-            auto len = str::stringify((error_line+1), false).size();
-            while (len--) {
-                cout << ' ';
-            }
-            cout << send_control_seq(COLOR_FG_RED_1);
-            cout << "~~";
-            while (j++ < error_character) {
-                cout << '~';
-            }
-            cout << '^';
-            cout << send_control_seq(ATTR_RESET);
-            cout << '\n';
-        }
-        if (token_line >= context_before and token_line <= context_after) {
-            cout << (token_line == error_line ? (send_control_seq(COLOR_FG_RED) + ">>>>" + send_control_seq(ATTR_RESET)) : "    ") << ' ';
-            if (token_line == error_line) {
-                cout << send_control_seq(COLOR_FG_YELLOW) << token_line+1 << send_control_seq(ATTR_RESET);
-            } else {
-                cout << token_line+1;
-            }
-            cout << "  ";
-
-            cout << token.str();
-            ++i;
-            if (token.line() == error_line) {
-                cout << send_control_seq(COLOR_FG_WHITE);
-            }
-            while (i < tokens.size() and tokens[i].line() == token_line) {
-                cout << tokens[i++].str();
-            }
-            if (token.line() == error_line) {
-                cout << send_control_seq(ATTR_RESET);
-            }
-            --i;
-        }
-        if (token.line() > error_line) {
+    for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size();) {
+        if (tokens.at(i).line() > context_after) {
             break;
         }
+        if (tokens.at(i).line() >= context_before) {
+            if (tokens.at(i).line() == error_line) {
+                i = display_error_line(tokens, error, i);
+            } else {
+                i = display_context_line(tokens, error, i);
+            }
+            continue;
+        }
+        ++i;
     }
-    cout << endl;
-}
-static void display_error_in_context(const vector<viua::cg::lex::Token>& tokens, viua::cg::lex::InvalidSyntax error, const string& filename) {
-    display_error_in_context(tokens, error.line(), error.character(), filename, error.what());
 }
 
 int main(int argc, char* argv[]) {
