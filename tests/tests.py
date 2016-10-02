@@ -1118,6 +1118,9 @@ class AssemblerErrorTests(unittest.TestCase):
     """
     PATH = './sample/asm/errors'
 
+    def testBranchWithoutOperands(self):
+        runTestFailsToAssemble(self, 'branch_without_operands.asm', "./sample/asm/errors/branch_without_operands.asm:21:5: error: branch without operands")
+
     def testNoEndBetweenDefs(self):
         runTestFailsToAssemble(self, 'no_end_between_defs.asm', "./sample/asm/errors/no_end_between_defs.asm:23:1: error: another function opened before assembler reached .end after 'foo/0' function")
 
