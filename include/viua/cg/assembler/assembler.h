@@ -84,7 +84,7 @@ namespace assembler {
 
         void framesHaveNoGaps(const std::vector<viua::cg::lex::Token>&);
 
-        void jumpsAreInRange(const std::vector<std::string>&);
+        void jumpsAreInRange(const std::vector<viua::cg::lex::Token>&);
 
         void manipulationOfDefinedRegisters(const std::vector<viua::cg::lex::Token>&, const std::map<std::string, std::vector<viua::cg::lex::Token>>&, const bool);
     }

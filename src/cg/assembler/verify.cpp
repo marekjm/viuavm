@@ -514,29 +514,29 @@ void assembler::verify::framesHaveNoGaps(const vector<Token>& tokens) {
     }
 }
 
-static void validate_jump(const unsigned lineno, const string& extracted_jump, const int function_instruction_counter, vector<pair<unsigned, int>>& forward_jumps, vector<pair<unsigned, string>>& deferred_marker_jumps, const map<string, int>& jump_targets) {
+static void validate_jump(const Token token, const string& extracted_jump, const int function_instruction_counter, vector<pair<Token, int>>& forward_jumps, vector<pair<Token, string>>& deferred_marker_jumps, const map<string, int>& jump_targets) {
     int target = -1;
     if (str::isnum(extracted_jump, false)) {
         target = stoi(extracted_jump);
     } else if (str::startswith(extracted_jump, "+") and str::isnum(extracted_jump.substr(1))) {
         int jump_offset = stoi(extracted_jump.substr(1));
         if (jump_offset == 0) {
-            throw ErrorReport(lineno, "zero-distance jump");
+            throw viua::cg::lex::InvalidSyntax(token, "zero-distance jump");
         }
         target = (function_instruction_counter + jump_offset);
     } else if (str::startswith(extracted_jump, "-") and str::isnum(extracted_jump)) {
         int jump_offset = stoi(extracted_jump);
         if (jump_offset == 0) {
-            throw ErrorReport(lineno, "zero-distance jump");
+            throw viua::cg::lex::InvalidSyntax(token, "zero-distance jump");
         }
         target = (function_instruction_counter + jump_offset);
     } else if (str::startswith(extracted_jump, ".") and str::isnum(extracted_jump.substr(1))) {
         target = stoi(extracted_jump.substr(1));
         if (target < 0) {
-            throw ErrorReport(lineno, "absolute jump with negative value");
+            throw viua::cg::lex::InvalidSyntax(token, "absolute jump with negative value");
         }
         if (target == 0 and function_instruction_counter == 0) {
-            throw ErrorReport(lineno, "zero-distance jump");
+            throw viua::cg::lex::InvalidSyntax(token, "zero-distance jump");
         }
         // absolute jumps cannot be verified without knowing how many bytes the bytecode spans
         // this is a FIXME: add check for absolute jumps
@@ -547,7 +547,7 @@ static void validate_jump(const unsigned lineno, const string& extracted_jump, c
         return;
     } else {
         if (jump_targets.count(extracted_jump) == 0) {
-            deferred_marker_jumps.emplace_back(lineno, extracted_jump);
+            deferred_marker_jumps.emplace_back(token, extracted_jump);
             return;
         } else {
             // FIXME: jump targets are saved with an off-by-one error, that surfaces when
@@ -557,95 +557,86 @@ static void validate_jump(const unsigned lineno, const string& extracted_jump, c
     }
 
     if (target < 0) {
-        throw ErrorReport(lineno, "backward out-of-range jump");
+        throw viua::cg::lex::InvalidSyntax(token, "backward out-of-range jump");
     }
     if (target == function_instruction_counter) {
-        throw ErrorReport(lineno, "zero-distance jump");
+        throw viua::cg::lex::InvalidSyntax(token, "zero-distance jump");
     }
     if (target > function_instruction_counter) {
-        forward_jumps.emplace_back(lineno, target);
+        forward_jumps.emplace_back(token, target);
     }
 }
 
-static void verify_forward_jumps(const int function_instruction_counter, const vector<pair<unsigned, int>>& forward_jumps) {
+static void verify_forward_jumps(const int function_instruction_counter, const vector<pair<Token, int>>& forward_jumps) {
     for (auto jmp : forward_jumps) {
         if (jmp.second > function_instruction_counter) {
-            throw ErrorReport(jmp.first, "forward out-of-range jump");
+            throw viua::cg::lex::InvalidSyntax(jmp.first, "forward out-of-range jump");
         }
     }
 }
 
-static void verify_marker_jumps(const int function_instruction_counter, const vector<pair<unsigned, string>>& deferred_marker_jumps, const map<string, int>& jump_targets) {
+static void verify_marker_jumps(const int function_instruction_counter, const vector<pair<Token, string>>& deferred_marker_jumps, const map<string, int>& jump_targets) {
     for (auto jmp : deferred_marker_jumps) {
         if (jump_targets.count(jmp.second) == 0) {
-            throw ErrorReport(jmp.first, ("jump to unrecognised marker: " + jmp.second));
+            throw viua::cg::lex::InvalidSyntax(jmp.first, ("jump to unrecognised marker: " + jmp.second));
         }
         if (jump_targets.at(jmp.second) > function_instruction_counter) {
-            throw ErrorReport(jmp.first, "marker out-of-range jump");
+            throw viua::cg::lex::InvalidSyntax(jmp.first, "marker out-of-range jump");
         }
     }
 }
 
-void assembler::verify::jumpsAreInRange(const vector<string>& lines) {
-    ostringstream report("");
-    string line;
-
+static auto skip_till_next_line(const std::vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> decltype(i) {
+    do {
+        ++i;
+    } while (i < tokens.size() and tokens.at(i) != "\n");
+    return i;
+}
+void assembler::verify::jumpsAreInRange(const vector<viua::cg::lex::Token>& tokens) {
     map<string, int> jump_targets;
-    vector<pair<unsigned, int>> forward_jumps;
-    vector<pair<unsigned, string>> deferred_marker_jumps;
+    vector<pair<Token, int>> forward_jumps;
+    vector<pair<Token, string>> deferred_marker_jumps;
     int function_instruction_counter = 0;
     string function_name;
 
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        line = str::lstrip(lines[i]);
-
-        if (line.size() == 0) {
-            continue;
-        }
-        if (function_name.size() > 0 and not str::startswith(line, ".")) {
+    for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
+        if ((not function_name.empty()) and not str::startswith(tokens.at(i), ".")) {
             ++function_instruction_counter;
         }
-        if (not (str::startswith(line, ".function:") or str::startswith(line, ".closure:") or str::startswith(line, ".block:") or str::startswith(line, "jump") or str::startswith(line, "branch") or str::startswith(line, ".mark:") or str::startswith(line, ".end"))) {
+
+        string mnemonic = tokens.at(i);
+        if (not (mnemonic == ".function:" or mnemonic == ".closure:" or mnemonic == ".block:" or mnemonic == "jump" or mnemonic == "branch" or mnemonic == ".mark:" or mnemonic == ".end")) {
+            i = skip_till_next_line(tokens, i);
             continue;
         }
 
-        string first_part = str::chunk(line);
-        line = str::lstrip(line.substr(first_part.size()));
-
-        string second_part = str::chunk(line);
-        line = str::lstrip(line.substr(second_part.size()));
-
-        if (first_part == ".function:" or first_part ==".closure:" or first_part == ".block:") {
+        if (mnemonic == ".function:" or mnemonic ==".closure:" or mnemonic == ".block:") {
             function_instruction_counter = -1;
             jump_targets.clear();
             forward_jumps.clear();
             deferred_marker_jumps.clear();
-            function_name = second_part;
-        } else if (first_part == "jump") {
-            validate_jump(i, second_part, function_instruction_counter, forward_jumps, deferred_marker_jumps, jump_targets);
-        } else if (first_part == "branch") {
-            if (line.size() == 0) {
-                throw ErrorReport(i, "branch without a target");
+            function_name = tokens.at(i+1);
+        } else if (mnemonic == "jump") {
+            validate_jump(tokens.at(i+1), tokens.at(i+1), function_instruction_counter, forward_jumps, deferred_marker_jumps, jump_targets);
+        } else if (mnemonic == "branch") {
+            Token when_true = tokens.at(i+2);
+            Token when_false = tokens.at(i+3);
+
+            if (not when_true.str().empty()) {
+                validate_jump(when_true, when_true, function_instruction_counter, forward_jumps, deferred_marker_jumps, jump_targets);
             }
 
-            string when_true = str::chunk(line);
-            line = str::lstrip(line.substr(when_true.size()));
-
-            string when_false = str::chunk(line);
-
-            if (when_true.size()) {
-                validate_jump(i, when_true, function_instruction_counter, forward_jumps, deferred_marker_jumps, jump_targets);
+            if (not when_false.str().empty()) {
+                validate_jump(when_false, when_false, function_instruction_counter, forward_jumps, deferred_marker_jumps, jump_targets);
             }
-
-            if (when_false.size()) {
-                validate_jump(i, when_false, function_instruction_counter, forward_jumps, deferred_marker_jumps, jump_targets);
-            }
-        } else if (first_part == ".mark:") {
-            jump_targets[second_part] = function_instruction_counter;
-        } else if (first_part == ".end") {
+        } else if (mnemonic == ".mark:") {
+            jump_targets[tokens.at(i+1)] = function_instruction_counter;
+        } else if (mnemonic == ".end") {
             function_name = "";
             verify_forward_jumps(function_instruction_counter, forward_jumps);
             verify_marker_jumps(function_instruction_counter, deferred_marker_jumps, jump_targets);
         }
+
+        i = skip_till_next_line(tokens, i);
     }
 }
