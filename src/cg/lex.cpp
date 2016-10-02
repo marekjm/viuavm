@@ -287,6 +287,22 @@ namespace viua {
                             tokens.push_back(input_tokens.at(++i));
                         }
                         continue;
+                    } else if (token == "branch") {
+                        tokens.push_back(token);                // mnemonic
+                        if (input_tokens.at(i+1) == "\n") {
+                            throw viua::cg::lex::InvalidSyntax(token, "branch without operands");
+                        }
+
+                        tokens.push_back(input_tokens.at(++i)); // checked register
+                        if (input_tokens.at(i+1) == "\n") {
+                            throw viua::cg::lex::InvalidSyntax(token, "branch without a target");
+                        }
+
+                        tokens.push_back(input_tokens.at(++i)); // target if true branch
+                        if (input_tokens.at(i+1) == "\n") {
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "+1");
+                        }
+                        continue;
                     } else {
                         tokens.push_back(token);
                     }
