@@ -536,49 +536,6 @@ static map<string, uint64_t> mapInvocableAddresses(uint64_t& starting_instructio
     return addresses;
 }
 
-vector<string> expandSource(const vector<string>& lines, map<long unsigned, long unsigned>& expanded_lines_to_source_lines) {
-    vector<string> stripped_lines;
-
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        stripped_lines.emplace_back(str::lstrip(lines[i]));
-    }
-
-    vector<string> asm_lines;
-    for (unsigned i = 0; i < stripped_lines.size(); ++i) {
-        if (stripped_lines[i] == "") {
-            expanded_lines_to_source_lines[asm_lines.size()] = i;
-            asm_lines.emplace_back(lines[i]);
-        } else if (str::startswith(stripped_lines[i], ".signature")) {
-            expanded_lines_to_source_lines[asm_lines.size()] = i;
-            asm_lines.emplace_back(lines[i]);
-        } else if (str::startswith(stripped_lines[i], ".bsignature")) {
-            expanded_lines_to_source_lines[asm_lines.size()] = i;
-            asm_lines.emplace_back(lines[i]);
-        } else if (str::startswith(stripped_lines[i], ".function")) {
-            expanded_lines_to_source_lines[asm_lines.size()] = i;
-            asm_lines.emplace_back(lines[i]);
-        } else if (str::startswith(stripped_lines[i], ".end")) {
-            expanded_lines_to_source_lines[asm_lines.size()] = i;
-            asm_lines.emplace_back(lines[i]);
-        } else if (stripped_lines[i][0] == ';' or str::startswith(stripped_lines[i], "--")) {
-            expanded_lines_to_source_lines[asm_lines.size()] = i;
-            asm_lines.emplace_back(lines[i]);
-        } else if (not str::contains(stripped_lines[i], '(')) {
-            expanded_lines_to_source_lines[asm_lines.size()] = i;
-            asm_lines.emplace_back(lines[i]);
-        } else {
-            vector<vector<string>> decoded_lines = decode_line(stripped_lines[i]);
-            auto indent = (lines[i].size() - stripped_lines[i].size());
-            for (decltype(decoded_lines)::size_type j = 0; j < decoded_lines.size(); ++j) {
-                expanded_lines_to_source_lines[asm_lines.size()] = i;
-                asm_lines.emplace_back(str::strmul<char>(' ', indent) + str::join<char>(decoded_lines[j], ' '));
-            }
-        }
-    }
-
-    return asm_lines;
-}
-
 static uint64_t writeCodeBlocksSection(ofstream& out, const invocables_t& blocks, const vector<string>& linked_block_names, uint64_t block_bodies_size_so_far = 0) {
     uint64_t block_ids_section_size = 0;
     for (string name : blocks.names) { block_ids_section_size += name.size(); }

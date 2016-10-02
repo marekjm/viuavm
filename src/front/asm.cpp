@@ -37,8 +37,6 @@ bool SHOW_VERSION = false;
 // are we assembling a library?
 bool AS_LIB = false;
 
-// are we just expanding the source to simple form?
-bool EXPAND_ONLY = false;
 // are we only verifying source code correctness?
 bool EARLY_VERIFICATION_ONLY = false;
 // are we only checking what size will the bytecode by?
@@ -95,8 +93,6 @@ static bool usage(const char* program, bool show_help, bool show_version, bool v
         // compilation options
              << "    " << "-o, --out <file>         - specify output file\n"
              << "    " << "-c, --lib                - assemble as a library\n"
-             << "    " << "-e, --expand             - only expand the source code to simple form (one instruction per line)\n"
-             << "    " << "                           with this option, assembler prints expanded source to standard output\n"
              << "    " << "-C, --verify             - verify source code correctness without actually compiling it\n"
              << "    " << "                           this option turns assembler into source level debugger and static code analyzer hybrid\n"
              << "    " << "    --size               - calculate and report final bytecode size\n"
@@ -226,9 +222,6 @@ int main(int argc, char* argv[]) {
         } else if (option == "--lib" or option == "-c") {
             AS_LIB = true;
             continue;
-        } else if (option == "--expand" or option == "-e") {
-            EXPAND_ONLY = true;
-            continue;
         } else if (option == "--verify" or option == "-C") {
             EARLY_VERIFICATION_ONLY = true;
             continue;
@@ -311,29 +304,6 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    ////////////////
-    // READ LINES IN
-    ifstream in(filename, ios::in | ios::binary);
-    if (!in) {
-        cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET) << ": ";
-        cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
-        cout << ": file could not be opened" << endl;
-        return 1;
-    }
-
-    vector<string> lines;
-    string line;
-    while (getline(in, line)) { lines.emplace_back(line); }
-
-    map<long unsigned, long unsigned> expanded_lines_to_source_lines;
-    vector<string> expanded_lines = expandSource(lines, expanded_lines_to_source_lines);
-    if (EXPAND_ONLY) {
-        for (unsigned i = 0; i < expanded_lines.size(); ++i) {
-            cout << expanded_lines[i] << endl;
-        }
-        return 0;
-    }
-
     invocables_t functions;
     try {
         if (gatherFunctions(&functions, cooked_tokens)) {
@@ -374,9 +344,6 @@ int main(int argc, char* argv[]) {
         if (PERFORM_STATIC_ANALYSIS) {
             assembler::verify::manipulationOfDefinedRegisters(cooked_tokens, blocks.tokens, DEBUG);
         }
-    } catch (const pair<unsigned, string>& e) {
-        display_error_in_context(raw_tokens, expanded_lines_to_source_lines.at(e.first), 0, filename, e.second);
-        return 1;
     } catch (const viua::cg::lex::InvalidSyntax& e) {
         display_error_in_context(raw_tokens, e, filename);
         return 1;
@@ -418,9 +385,6 @@ int main(int argc, char* argv[]) {
         cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET) << ": ";
         cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
         cout << ": " << e << endl;
-    } catch (const pair<unsigned, string>& e) {
-        display_error_in_context(raw_tokens, expanded_lines_to_source_lines.at(e.first), 0, filename, e.second);
-        return 1;
     } catch (const viua::cg::lex::InvalidSyntax& e) {
         display_error_in_context(raw_tokens, e, filename);
         return 1;

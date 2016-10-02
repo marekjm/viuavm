@@ -124,21 +124,6 @@ static void assert_is_not_reserved_keyword(Token token, const string& message) {
 }
 
 
-vector<string> assembler::ce::getilines(const vector<string>& lines) {
-    /*  Clears code from empty lines and comments.
-     */
-    vector<string> ilines;
-    string line;
-
-    for (unsigned i = 0; i < lines.size(); ++i) {
-        line = str::lstrip(lines[i]);
-        if (!line.size() or line[0] == ';' or str::startswith(line, "--")) continue;
-        ilines.emplace_back(line);
-    }
-
-    return ilines;
-}
-
 map<string, int> assembler::ce::getmarks(const vector<viua::cg::lex::Token>& tokens) {
     /** This function will pass over all instructions and
      * gather "marks", i.e. `.mark: <name>` directives which may be used by

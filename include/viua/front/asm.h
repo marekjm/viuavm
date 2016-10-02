@@ -64,8 +64,6 @@ const std::string ATTR_RESET = "\x1b[0m";
 std::string send_control_seq(const std::string&);
 
 
-std::vector<std::string> expandSource(const std::vector<std::string>&, std::map<long unsigned, long unsigned>&);
-
 std::vector<std::vector<std::string>> decode_line_tokens(const std::vector<std::string>&);
 std::vector<std::vector<std::string>> decode_line(const std::string&);
 
