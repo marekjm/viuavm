@@ -352,7 +352,11 @@ namespace viua {
                 vector<Token> tokens;
 
                 const auto limit = input_tokens.size();
-                for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
+                decltype(input_tokens)::size_type i = 0;
+                while (i < limit and input_tokens.at(i) == "\n") {
+                    ++i;
+                }
+                for (; i < limit; ++i) {
                     Token token = input_tokens.at(i);
                     if (token.str() == "\n") {
                         tokens.push_back(token);
