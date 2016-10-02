@@ -150,11 +150,13 @@ static auto display_error_line(const vector<viua::cg::lex::Token>& tokens, const
 
     cout << send_control_seq(COLOR_FG_WHITE);
     while (i < tokens.size() and tokens.at(i).line() == token_line) {
+        bool highlighted = false;
         if (tokens.at(i).line() == error.line() and tokens.at(i).character() >= error.character() and tokens.at(i).ends() <= (error.character()+error.content.size())) {
             cout << send_control_seq(COLOR_FG_ORANGE_RED_1);
+            highlighted = true;
         }
         cout << tokens.at(i++).str();
-        if (i < tokens.size() and tokens.at(i).line() == error.line() and tokens.at(i).character() >= error.character() and tokens.at(i).ends() <= (error.character()+error.content.size())) {
+        if (highlighted) {
             cout << send_control_seq(COLOR_FG_WHITE);
         }
     }
