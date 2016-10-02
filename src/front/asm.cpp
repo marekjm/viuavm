@@ -179,19 +179,15 @@ static auto display_context_line(const vector<viua::cg::lex::Token>& tokens, con
 
     return i;
 }
-static void display_error_in_context(const vector<viua::cg::lex::Token>& tokens, viua::cg::lex::InvalidSyntax error, const string& filename) {
-    const auto error_line = error.line();
-    const auto error_character = error.character();
-    const auto message = error.what();
-
-    cout << send_control_seq(COLOR_FG_WHITE) << filename << ':' << error_line+1 << ':' << error_character+1 << ':' << send_control_seq(ATTR_RESET) << ' ';
-    cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET) << ": " << message << endl;
-    cout << "\n";
-
+static void display_error_header(const viua::cg::lex::InvalidSyntax& error, const string& filename) {
+    cout << send_control_seq(COLOR_FG_WHITE) << filename << ':' << error.line()+1 << ':' << error.character()+1 << ':' << send_control_seq(ATTR_RESET) << ' ';
+    cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET) << ": " << error.what() << endl;
+}
+static void display_error_location(const vector<viua::cg::lex::Token>& tokens, const viua::cg::lex::InvalidSyntax error) {
     const unsigned context_lines = 2;
-    decltype(error.line()) context_before = 0, context_after = (error_line+context_lines);
-    if (error_line >= context_lines) {
-        context_before = (error_line-context_lines);
+    decltype(error.line()) context_before = 0, context_after = (error.line()+context_lines);
+    if (error.line() >= context_lines) {
+        context_before = (error.line()-context_lines);
     }
 
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size();) {
@@ -199,7 +195,7 @@ static void display_error_in_context(const vector<viua::cg::lex::Token>& tokens,
             break;
         }
         if (tokens.at(i).line() >= context_before) {
-            if (tokens.at(i).line() == error_line) {
+            if (tokens.at(i).line() == error.line()) {
                 i = display_error_line(tokens, error, i);
             } else {
                 i = display_context_line(tokens, error, i);
@@ -208,6 +204,11 @@ static void display_error_in_context(const vector<viua::cg::lex::Token>& tokens,
         }
         ++i;
     }
+}
+static void display_error_in_context(const vector<viua::cg::lex::Token>& tokens, const viua::cg::lex::InvalidSyntax error, const string& filename) {
+    display_error_header(error, filename);
+    cout << "\n";
+    display_error_location(tokens, error);
 }
 
 int main(int argc, char* argv[]) {
