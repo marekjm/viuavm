@@ -567,6 +567,62 @@ static void validate_jump(const Token token, const string& extracted_jump, const
     }
 }
 
+static void validate_jump_pair(
+    const Token& branch_token,
+    const Token& when_true,
+    const Token& when_false,
+    int function_instruction_counter,
+    vector<tuple<Token, Token, Token, int>>& deferred_jump_pair_checks,
+    const map<string, int>& jump_targets
+) {
+    if (when_true.str() == when_false.str()) {
+        throw viua::cg::lex::InvalidSyntax(branch_token, "useless branch: both targets point to the same instruction");
+    }
+
+    int true_target = 0, false_target = 0;
+    if (str::isnum(when_true, false)) {
+        true_target = stoi(when_true);
+    } else if (str::startswith(when_true, "+") and str::isnum(when_true.str().substr(1))) {
+        int jump_offset = stoi(when_true.str().substr(1));
+        true_target = (function_instruction_counter + jump_offset);
+    } else if (str::startswith(when_true, "-") and str::isnum(when_true)) {
+        int jump_offset = stoi(when_true);
+        true_target = (function_instruction_counter + jump_offset);
+    } else {
+        if (jump_targets.count(when_true) == 0) {
+            deferred_jump_pair_checks.emplace_back(branch_token, when_true, when_false, function_instruction_counter);
+            return;
+        } else {
+            // FIXME: jump targets are saved with an off-by-one error, that surfaces when
+            // a .mark: directive immediately follows .function: declaration
+            true_target = jump_targets.at(when_true)+1;
+        }
+    }
+
+    if (str::isnum(when_false, false)) {
+        false_target = stoi(when_false);
+    } else if (str::startswith(when_false, "+") and str::isnum(when_false.str().substr(1))) {
+        int jump_offset = stoi(when_false.str().substr(1));
+        false_target = (function_instruction_counter + jump_offset);
+    } else if (str::startswith(when_false, "-") and str::isnum(when_false)) {
+        int jump_offset = stoi(when_false);
+        false_target = (function_instruction_counter + jump_offset);
+    } else {
+        if (jump_targets.count(when_false) == 0) {
+            deferred_jump_pair_checks.emplace_back(branch_token, when_true, when_false, function_instruction_counter);
+            return;
+        } else {
+            // FIXME: jump targets are saved with an off-by-one error, that surfaces when
+            // a .mark: directive immediately follows .function: declaration
+            false_target = jump_targets.at(when_false)+1;
+        }
+    }
+
+    if (true_target == false_target) {
+        throw viua::cg::lex::InvalidSyntax(branch_token, "useless branch: both targets point to the same instruction");
+    }
+}
+
 static void verify_forward_jumps(const int function_instruction_counter, const vector<pair<Token, int>>& forward_jumps) {
     for (auto jmp : forward_jumps) {
         if (jmp.second > function_instruction_counter) {
@@ -586,6 +642,47 @@ static void verify_marker_jumps(const int function_instruction_counter, const ve
     }
 }
 
+static void verify_deferred_jump_pairs(const vector<tuple<Token, Token, Token, int>>& deferred_jump_pair_checks, const map<string, int>& jump_targets) {
+    for (const auto& each : deferred_jump_pair_checks) {
+        int function_instruction_counter = 0;
+        Token branch_token, when_true, when_false;
+        tie(branch_token, when_true, when_false, function_instruction_counter) = each;
+
+        int true_target = 0, false_target = 0;
+        if (str::isnum(when_true, false)) {
+            true_target = stoi(when_true);
+        } else if (str::startswith(when_true, "+") and str::isnum(when_true.str().substr(1))) {
+            int jump_offset = stoi(when_true.str().substr(1));
+            true_target = (function_instruction_counter + jump_offset);
+        } else if (str::startswith(when_true, "-") and str::isnum(when_true)) {
+            int jump_offset = stoi(when_true);
+            true_target = (function_instruction_counter + jump_offset);
+        } else {
+            // FIXME: jump targets are saved with an off-by-one error, that surfaces when
+            // a .mark: directive immediately follows .function: declaration
+            true_target = jump_targets.at(when_true)+1;
+        }
+
+        if (str::isnum(when_false, false)) {
+            false_target = stoi(when_false);
+        } else if (str::startswith(when_false, "+") and str::isnum(when_false.str().substr(1))) {
+            int jump_offset = stoi(when_false.str().substr(1));
+            false_target = (function_instruction_counter + jump_offset);
+        } else if (str::startswith(when_false, "-") and str::isnum(when_false)) {
+            int jump_offset = stoi(when_false);
+            false_target = (function_instruction_counter + jump_offset);
+        } else {
+            // FIXME: jump targets are saved with an off-by-one error, that surfaces when
+            // a .mark: directive immediately follows .function: declaration
+            false_target = jump_targets.at(when_false)+1;
+        }
+
+        if (true_target == false_target) {
+            throw viua::cg::lex::InvalidSyntax(branch_token, "useless branch: both targets point to the same instruction");
+        }
+    }
+}
+
 static auto skip_till_next_line(const std::vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> decltype(i) {
     do {
         ++i;
@@ -596,6 +693,7 @@ void assembler::verify::jumpsAreInRange(const vector<viua::cg::lex::Token>& toke
     map<string, int> jump_targets;
     vector<pair<Token, int>> forward_jumps;
     vector<pair<Token, string>> deferred_marker_jumps;
+    vector<tuple<Token, Token, Token, int>> deferred_jump_pair_checks;
     int function_instruction_counter = 0;
     string function_name;
 
@@ -615,6 +713,7 @@ void assembler::verify::jumpsAreInRange(const vector<viua::cg::lex::Token>& toke
             jump_targets.clear();
             forward_jumps.clear();
             deferred_marker_jumps.clear();
+            deferred_jump_pair_checks.clear();
             function_name = tokens.at(i+1);
         } else if (mnemonic == "jump") {
             validate_jump(tokens.at(i+1), tokens.at(i+1), function_instruction_counter, forward_jumps, deferred_marker_jumps, jump_targets);
@@ -624,12 +723,14 @@ void assembler::verify::jumpsAreInRange(const vector<viua::cg::lex::Token>& toke
 
             validate_jump(when_true, when_true, function_instruction_counter, forward_jumps, deferred_marker_jumps, jump_targets);
             validate_jump(when_false, when_false, function_instruction_counter, forward_jumps, deferred_marker_jumps, jump_targets);
+            validate_jump_pair(tokens.at(i), when_true, when_false, function_instruction_counter, deferred_jump_pair_checks, jump_targets);
         } else if (mnemonic == ".mark:") {
             jump_targets[tokens.at(i+1)] = function_instruction_counter;
         } else if (mnemonic == ".end") {
             function_name = "";
             verify_forward_jumps(function_instruction_counter, forward_jumps);
             verify_marker_jumps(function_instruction_counter, deferred_marker_jumps, jump_targets);
+            verify_deferred_jump_pairs(deferred_jump_pair_checks, jump_targets);
         }
 
         i = skip_till_next_line(tokens, i);
