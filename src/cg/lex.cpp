@@ -882,9 +882,6 @@ namespace viua {
                  * Reduce directives as lexer emits them as multiple tokens.
                  * This lets later reductions to check jsut one token to see if it is an assembler
                  * directive instead of looking two or three tokens ahead.
-                 *
-                 * Also, reduce other multi-token sequences: function, block, and module names;
-                 * floating point numbers; absolute jumps; @-prefixed register names and indexes.
                  */
                 tokens = reduce_function_directive(tokens);
                 tokens = reduce_closure_directive(tokens);
