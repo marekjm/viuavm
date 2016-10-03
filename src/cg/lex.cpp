@@ -395,7 +395,8 @@ namespace viua {
 
                 decltype(i) n = 0;
                 while (n < sequence.size()) {
-                    if (tokens.at(i+n) != sequence.at(n)) {
+                    // empty string in the sequence means "any token"
+                    if ((not sequence.at(n).empty()) and tokens.at(i+n) != sequence.at(n)) {
                         return false;
                     }
                     if (n and not adjacent(tokens.at(i+n-1), tokens.at(i+n))) {
