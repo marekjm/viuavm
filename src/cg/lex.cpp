@@ -388,24 +388,41 @@ namespace viua {
                 return tokens;
             }
 
-            static vector<Token> reduce_directive(vector<Token> input_tokens, string directive) {
+            static bool match(const vector<Token>& tokens, std::remove_reference<decltype(tokens)>::type::size_type i, const vector<string>& sequence) {
+                if (i+sequence.size() >= tokens.size()) {
+                    return false;
+                }
+
+                decltype(i) n = 0;
+                while (n < sequence.size()) {
+                    if (tokens.at(i+n) != sequence.at(n)) {
+                        return false;
+                    }
+                    ++n;
+                }
+
+                return true;
+            }
+
+            static vector<Token> reduce_token_sequence(vector<Token> input_tokens, vector<string> sequence) {
                 decltype(input_tokens) tokens;
 
                 const auto limit = input_tokens.size();
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
                     const auto t = input_tokens.at(i);
-                    if (t.str() == "." and i < limit-2 and input_tokens.at(i+1) == directive and input_tokens.at(i+2).str() == ":") {
-                        if (adjacent(t, input_tokens.at(i+1), input_tokens.at(i+2))) {
-                            tokens.emplace_back(t.line(), t.character(), ("." + directive + ":"));
-                            ++i; // skip directive name token
-                            ++i; // skip ":" token
-                            continue;
-                        }
+                    if (match(input_tokens, i, sequence)) {
+                        tokens.emplace_back(t.line(), t.character(), join_tokens(input_tokens, i, (i+sequence.size())));
+                        i += (sequence.size()-1);
+                        continue;
                     }
                     tokens.push_back(t);
                 }
 
                 return tokens;
+            }
+
+            static vector<Token> reduce_directive(vector<Token> input_tokens, string directive) {
+                return reduce_token_sequence(input_tokens, {".", directive, ":"});
             }
 
             vector<Token> reduce_mark_directive(vector<Token> input_tokens) {
