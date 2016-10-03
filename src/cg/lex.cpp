@@ -388,16 +388,16 @@ namespace viua {
                 return tokens;
             }
 
-            vector<Token> reduce_mark_directive(vector<Token> input_tokens) {
+            static vector<Token> reduce_directive(vector<Token> input_tokens, string directive) {
                 decltype(input_tokens) tokens;
 
                 const auto limit = input_tokens.size();
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
                     const auto t = input_tokens.at(i);
-                    if (t.str() == "." and i < limit-2 and input_tokens.at(i+1) == "mark" and input_tokens.at(i+2).str() == ":") {
+                    if (t.str() == "." and i < limit-2 and input_tokens.at(i+1) == directive and input_tokens.at(i+2).str() == ":") {
                         if (adjacent(t, input_tokens.at(i+1), input_tokens.at(i+2))) {
-                            tokens.emplace_back(t.line(), t.character(), ".mark:");
-                            ++i; // skip "mark" token
+                            tokens.emplace_back(t.line(), t.character(), ("." + directive + ":"));
+                            ++i; // skip directive name token
                             ++i; // skip ":" token
                             continue;
                         }
@@ -406,126 +406,34 @@ namespace viua {
                 }
 
                 return tokens;
+            }
+
+            vector<Token> reduce_mark_directive(vector<Token> input_tokens) {
+                return reduce_directive(input_tokens, "mark");
             }
 
             vector<Token> reduce_name_directive(vector<Token> input_tokens) {
-                decltype(input_tokens) tokens;
-
-                const auto limit = input_tokens.size();
-                for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens.at(i);
-                    if (t.str() == "." and i < limit-2 and input_tokens.at(i+1) == "name" and input_tokens.at(i+2).str() == ":") {
-                        if (adjacent(t, input_tokens.at(i+1), input_tokens.at(i+2))) {
-                            tokens.emplace_back(t.line(), t.character(), ".name:");
-                            ++i; // skip "name" token
-                            ++i; // skip ":" token
-                            continue;
-                        }
-                    }
-                    tokens.push_back(t);
-                }
-
-                return tokens;
+                return reduce_directive(input_tokens, "name");
             }
 
             vector<Token> reduce_info_directive(vector<Token> input_tokens) {
-                decltype(input_tokens) tokens;
-
-                const auto limit = input_tokens.size();
-                for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens.at(i);
-                    if (t.str() == "." and i < limit-2 and input_tokens.at(i+1) == "info" and input_tokens.at(i+2).str() == ":") {
-                        if (adjacent(t, input_tokens.at(i+1), input_tokens.at(i+2))) {
-                            tokens.emplace_back(t.line(), t.character(), ".info:");
-                            ++i; // skip "info" token
-                            ++i; // skip ":" token
-                            continue;
-                        }
-                    }
-                    tokens.push_back(t);
-                }
-
-                return tokens;
+                return reduce_directive(input_tokens, "info");
             }
 
             vector<Token> reduce_main_directive(vector<Token> input_tokens) {
-                decltype(input_tokens) tokens;
-
-                const auto limit = input_tokens.size();
-                for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens.at(i);
-                    if (t.str() == "." and i < limit-2 and input_tokens.at(i+1) == "main" and input_tokens.at(i+2).str() == ":") {
-                        if (adjacent(t, input_tokens.at(i+1), input_tokens.at(i+2))) {
-                            tokens.emplace_back(t.line(), t.character(), ".main:");
-                            ++i; // skip "main" token
-                            ++i; // skip ":" token
-                            continue;
-                        }
-                    }
-                    tokens.push_back(t);
-                }
-
-                return tokens;
+                return reduce_directive(input_tokens, "main");
             }
 
             vector<Token> reduce_link_directive(vector<Token> input_tokens) {
-                decltype(input_tokens) tokens;
-
-                const auto limit = input_tokens.size();
-                for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens.at(i);
-                    if (t.str() == "." and i < limit-2 and input_tokens.at(i+1) == "link" and input_tokens.at(i+2).str() == ":") {
-                        if (adjacent(t, input_tokens.at(i+1), input_tokens.at(i+2))) {
-                            tokens.emplace_back(t.line(), t.character(), ".link:");
-                            ++i; // skip "link" token
-                            ++i; // skip ":" token
-                            continue;
-                        }
-                    }
-                    tokens.push_back(t);
-                }
-
-                return tokens;
+                return reduce_directive(input_tokens, "link");
             }
 
             vector<Token> reduce_function_directive(vector<Token> input_tokens) {
-                decltype(input_tokens) tokens;
-
-                const auto limit = input_tokens.size();
-                for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens.at(i);
-                    if (t.str() == "." and i < limit-2 and input_tokens.at(i+1) == "function" and input_tokens.at(i+2).str() == ":") {
-                        if (adjacent(t, input_tokens.at(i+1), input_tokens.at(i+2))) {
-                            tokens.emplace_back(t.line(), t.character(), ".function:");
-                            ++i; // skip "function" token
-                            ++i; // skip ":" token
-                            continue;
-                        }
-                    }
-                    tokens.push_back(t);
-                }
-
-                return tokens;
+                return reduce_directive(input_tokens, "function");
             }
 
             vector<Token> reduce_closure_directive(vector<Token> input_tokens) {
-                decltype(input_tokens) tokens;
-
-                const auto limit = input_tokens.size();
-                for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens.at(i);
-                    if (t.str() == "." and i < limit-2 and input_tokens.at(i+1) == "closure" and input_tokens.at(i+2).str() == ":") {
-                        if (adjacent(t, input_tokens.at(i+1), input_tokens.at(i+2))) {
-                            tokens.emplace_back(t.line(), t.character(), ".closure:");
-                            ++i; // skip "closure" token
-                            ++i; // skip ":" token
-                            continue;
-                        }
-                    }
-                    tokens.push_back(t);
-                }
-
-                return tokens;
+                return reduce_directive(input_tokens, "closure");
             }
 
             vector<Token> reduce_end_directive(vector<Token> input_tokens) {
@@ -548,83 +456,19 @@ namespace viua {
             }
 
             vector<Token> reduce_signature_directive(vector<Token> input_tokens) {
-                decltype(input_tokens) tokens;
-
-                const auto limit = input_tokens.size();
-                for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens.at(i);
-                    if (t.str() == "." and i < limit-2 and input_tokens.at(i+1) == "signature" and input_tokens.at(i+2).str() == ":") {
-                        if (adjacent(t, input_tokens.at(i+1), input_tokens.at(i+2))) {
-                            tokens.emplace_back(t.line(), t.character(), ".signature:");
-                            ++i; // skip "signature" token
-                            ++i; // skip ":" token
-                            continue;
-                        }
-                    }
-                    tokens.push_back(t);
-                }
-
-                return tokens;
+                return reduce_directive(input_tokens, "signature");
             }
 
             vector<Token> reduce_bsignature_directive(vector<Token> input_tokens) {
-                decltype(input_tokens) tokens;
-
-                const auto limit = input_tokens.size();
-                for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens.at(i);
-                    if (t.str() == "." and i < limit-2 and input_tokens.at(i+1) == "bsignature" and input_tokens.at(i+2).str() == ":") {
-                        if (adjacent(t, input_tokens.at(i+1), input_tokens.at(i+2))) {
-                            tokens.emplace_back(t.line(), t.character(), ".bsignature:");
-                            ++i; // skip "bsignature" token
-                            ++i; // skip ":" token
-                            continue;
-                        }
-                    }
-                    tokens.push_back(t);
-                }
-
-                return tokens;
+                return reduce_directive(input_tokens, "bsignature");
             }
 
             vector<Token> reduce_iota_directive(vector<Token> input_tokens) {
-                decltype(input_tokens) tokens;
-
-                const auto limit = input_tokens.size();
-                for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens.at(i);
-                    if (t.str() == "." and i < limit-2 and input_tokens.at(i+1) == "iota" and input_tokens.at(i+2).str() == ":") {
-                        if (adjacent(t, input_tokens.at(i+1), input_tokens.at(i+2))) {
-                            tokens.emplace_back(t.line(), t.character(), ".iota:");
-                            ++i; // skip "iota" token
-                            ++i; // skip ":" token
-                            continue;
-                        }
-                    }
-                    tokens.push_back(t);
-                }
-
-                return tokens;
+                return reduce_directive(input_tokens, "iota");
             }
 
             vector<Token> reduce_block_directive(vector<Token> input_tokens) {
-                decltype(input_tokens) tokens;
-
-                const auto limit = input_tokens.size();
-                for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens.at(i);
-                    if (t.str() == "." and i < limit-2 and input_tokens.at(i+1) == "block" and input_tokens.at(i+2).str() == ":") {
-                        if (adjacent(t, input_tokens.at(i+1), input_tokens.at(i+2))) {
-                            tokens.emplace_back(t.line(), t.character(), ".block:");
-                            ++i; // skip "bsignature" token
-                            ++i; // skip ":" token
-                            continue;
-                        }
-                    }
-                    tokens.push_back(t);
-                }
-
-                return tokens;
+                return reduce_directive(input_tokens, "block");
             }
 
             vector<Token> reduce_double_colon(vector<Token> input_tokens) {
