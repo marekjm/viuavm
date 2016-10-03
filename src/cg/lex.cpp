@@ -398,6 +398,9 @@ namespace viua {
                     if (tokens.at(i+n) != sequence.at(n)) {
                         return false;
                     }
+                    if (n and not adjacent(tokens.at(i+n-1), tokens.at(i+n))) {
+                        return false;
+                    }
                     ++n;
                 }
 
@@ -454,22 +457,7 @@ namespace viua {
             }
 
             vector<Token> reduce_end_directive(vector<Token> input_tokens) {
-                decltype(input_tokens) tokens;
-
-                const auto limit = input_tokens.size();
-                for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens.at(i);
-                    if (t.str() == "." and i < limit-1 and input_tokens.at(i+1) == "end") {
-                        if (adjacent(t, input_tokens.at(i+1))) {
-                            tokens.emplace_back(t.line(), t.character(), ".end");
-                            ++i; // skip "end" token
-                            continue;
-                        }
-                    }
-                    tokens.push_back(t);
-                }
-
-                return tokens;
+                return reduce_token_sequence(input_tokens, {".", "end"});
             }
 
             vector<Token> reduce_signature_directive(vector<Token> input_tokens) {
@@ -489,22 +477,7 @@ namespace viua {
             }
 
             vector<Token> reduce_double_colon(vector<Token> input_tokens) {
-                decltype(input_tokens) tokens;
-
-                const auto limit = input_tokens.size();
-                for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens.at(i);
-                    if (t.str() == ":" and i < limit-1 and input_tokens.at(i+1).str() == ":") {
-                        if (adjacent(t, input_tokens.at(i+1))) {
-                            tokens.emplace_back(t.line(), t.character(), "::");
-                            ++i; // skip second ":" token
-                            continue;
-                        }
-                    }
-                    tokens.push_back(t);
-                }
-
-                return tokens;
+                return reduce_token_sequence(input_tokens, {":", ":"});
             }
 
             vector<Token> reduce_function_signatures(vector<Token> input_tokens) {
