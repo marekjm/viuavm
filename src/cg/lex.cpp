@@ -898,6 +898,11 @@ namespace viua {
                 tokens = reduce_iota_directive(tokens);
 
                 /*
+                 * Reduce directive-looking strings.
+                 */
+                tokens = reduce_token_sequence(tokens, {".", "", ":"});
+
+                /*
                  * Reduce double-colon token to make life easier for name reductions.
                  */
                 tokens = reduce_double_colon(tokens);
