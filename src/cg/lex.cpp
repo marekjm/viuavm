@@ -868,6 +868,13 @@ namespace viua {
                 for (decltype(input_tokens)::size_type i = 0; i < input_tokens.size(); ++i) {
                     const auto& token = input_tokens.at(i);
                     tokens.push_back(token);
+
+                    if (token == "arg") {
+                        if (input_tokens.at(i+1) == "default") {
+                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "0");
+                            ++i;
+                        }
+                    }
                 }
 
                 return tokens;
