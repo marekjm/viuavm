@@ -874,12 +874,14 @@ namespace viua {
                             tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "0");
                             ++i;
                         }
+                        continue;
                     }
                     if (token == "call") {
                         if (input_tokens.at(i+1) == "default") {
                             tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "0");
                             ++i;
                         }
+                        continue;
                     }
                 }
 
