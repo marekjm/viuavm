@@ -268,47 +268,6 @@ static map<string, vector<Token>> get_raw_block_bodies(const string& type, const
 
     return invokables;
 }
-static vector<string> make_lines(const vector<Token>& tokens) {
-    vector<string> lines;
-
-    if (tokens.size() == 0) {
-        return lines;
-    }
-
-    auto current_line_no = tokens.at(0).line();
-    ostringstream current_line;
-    for (const auto& token : tokens) {
-        if ((token.line() != current_line_no) or (token.str() == "\n")) {
-            string line = current_line.str();
-            if (line.size() > 0) {
-                lines.emplace_back(current_line.str());
-            }
-            current_line_no = token.line();
-            current_line.str("");
-        }
-        if (token.str() == "\n") {
-            continue;
-        }
-        current_line << token.str() << ' ';
-    }
-    if (current_line.str().size()) {
-        lines.emplace_back(current_line.str());
-    }
-
-    return lines;
-}
-static map<string, vector<string>> get_cooked_block_bodies(map<string, vector<Token>> raw_bodies) {
-    map<string, vector<string>> cooked_bodies;
-
-    for (const auto& each : raw_bodies) {
-        cooked_bodies[each.first] = make_lines(each.second);
-    }
-
-    return cooked_bodies;
-}
-map<string, vector<string>> assembler::ce::getInvokables(const string& type, const vector<Token>& tokens) {
-    return get_cooked_block_bodies(get_raw_block_bodies(type, tokens));
-}
 map<string, vector<Token>> assembler::ce::getInvokablesTokenBodies(const string& type, const vector<Token>& tokens) {
     return get_raw_block_bodies(type, tokens);
 }

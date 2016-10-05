@@ -48,10 +48,6 @@ int gatherFunctions(invocables_t* invocables, const vector<viua::cg::lex::Token>
     ///////////////////////////////
     // GATHER FUNCTIONS' CODE LINES
     try {
-         invocables->bodies = assembler::ce::getInvokables("function", tokens);
-         for (const auto& each : assembler::ce::getInvokables("closure", tokens)) {
-            invocables->bodies[each.first] = each.second;
-         }
          invocables->tokens = assembler::ce::getInvokablesTokenBodies("function", tokens);
          for (const auto& each : assembler::ce::getInvokablesTokenBodies("closure", tokens)) {
             invocables->tokens[each.first] = each.second;
@@ -83,7 +79,6 @@ int gatherBlocks(invocables_t* invocables, const vector<viua::cg::lex::Token>& t
     ///////////////////////////////
     // GATHER BLOCK CODE LINES
     try {
-         invocables->bodies = assembler::ce::getInvokables("block", tokens);
          invocables->tokens = assembler::ce::getInvokablesTokenBodies("block", tokens);
     } catch (const string& e) {
         cout << "error: block gathering failed: " << e << endl;
