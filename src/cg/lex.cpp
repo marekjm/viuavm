@@ -883,6 +883,14 @@ namespace viua {
                         }
                         continue;
                     }
+                    if (token == "istore") {
+                        if (input_tokens.size() and input_tokens.at(i+2) == "default") {
+                            tokens.push_back(input_tokens.at(++i));  // push target register token
+                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "0");
+                            ++i;
+                        }
+                        continue;
+                    }
                 }
 
                 return tokens;
