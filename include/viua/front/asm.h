@@ -31,7 +31,6 @@
 struct invocables_t {
     std::vector<std::string> names;
     std::vector<std::string> signatures;
-    std::map<std::string, std::vector<std::string>> bodies;
     std::map<std::string, std::vector<viua::cg::lex::Token>> tokens;
 };
 
@@ -41,13 +40,6 @@ struct compilationflags_t {
     bool verbose;
     bool debug;
     bool scream;
-};
-
-struct srcline_t {
-    std::string line;
-    unsigned expanded_from;
-
-    srcline_t(const std::string& l, unsigned ef): line(l), expanded_from(ef) {}
 };
 
 
