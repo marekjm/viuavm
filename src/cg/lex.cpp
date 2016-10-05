@@ -862,6 +862,17 @@ namespace viua {
                 return tokens;
             }
 
+            vector<Token> replace_defaults(vector<Token> input_tokens) {
+                vector<Token> tokens;
+
+                for (decltype(input_tokens)::size_type i = 0; i < input_tokens.size(); ++i) {
+                    const auto& token = input_tokens.at(i);
+                    tokens.push_back(token);
+                }
+
+                return tokens;
+            }
+
             vector<Token> reduce(vector<Token> tokens) {
                 /*
                  * Remove whitespace as first step to reduce noise in token stream.
@@ -935,6 +946,14 @@ namespace viua {
                  * replace iotas inside them (the '[]' create new iota scopes).
                  */
                 tokens = replace_iotas(tokens);
+
+                /*
+                 * Replace 'default' keywords with their values.
+                 * This **MUST** be run before unwrapping instructions because unwrapping copies and
+                 * rearranges tokens in a list so "default" may be copied somewhere where the expansion would be
+                 * incorrect, or illegal.
+                 */
+                tokens = replace_defaults(tokens);
 
                 /*
                  * Unroll instruction wrapped in '()' and '[]'.
