@@ -388,6 +388,23 @@ namespace viua {
                 return tokens;
             }
 
+            static bool match(const vector<Token>& tokens, std::remove_reference<decltype(tokens)>::type::size_type i, const vector<string>& sequence) {
+                if (i+sequence.size() >= tokens.size()) {
+                    return false;
+                }
+
+                decltype(i) n = 0;
+                while (n < sequence.size()) {
+                    // empty string in the sequence means "any token"
+                    if ((not sequence.at(n).empty()) and tokens.at(i+n) != sequence.at(n)) {
+                        return false;
+                    }
+                    ++n;
+                }
+
+                return true;
+            }
+
             static bool match_adjacent(const vector<Token>& tokens, std::remove_reference<decltype(tokens)>::type::size_type i, const vector<string>& sequence) {
                 if (i+sequence.size() >= tokens.size()) {
                     return false;
@@ -869,42 +886,27 @@ namespace viua {
                     const auto& token = input_tokens.at(i);
                     tokens.push_back(token);
 
-                    if (token == "arg") {
-                        if (input_tokens.at(i+1) == "default") {
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "0");
-                            ++i;
-                        }
+                    if (match(input_tokens, i, {"arg", "default"}) or match(input_tokens, i, {"call", "default"})) {
+                        ++i;
+                        tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "0");
                         continue;
                     }
-                    if (token == "call") {
-                        if (input_tokens.at(i+1) == "default") {
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "0");
-                            ++i;
-                        }
+                    if (match(input_tokens, i, {"istore", "", "default"})) {
+                        tokens.push_back(input_tokens.at(++i));  // push target register token
+                        ++i;
+                        tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "0");
                         continue;
                     }
-                    if (token == "istore") {
-                        if (input_tokens.size() and input_tokens.at(i+2) == "default") {
-                            tokens.push_back(input_tokens.at(++i));  // push target register token
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "0");
-                            ++i;
-                        }
+                    if (match(input_tokens, i, {"fstore", "", "default"})) {
+                        tokens.push_back(input_tokens.at(++i));  // push target register token
+                        ++i;
+                        tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "0.0");
                         continue;
                     }
-                    if (token == "fstore") {
-                        if (input_tokens.size() and input_tokens.at(i+2) == "default") {
-                            tokens.push_back(input_tokens.at(++i));  // push target register token
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "0.0");
-                            ++i;
-                        }
-                        continue;
-                    }
-                    if (token == "strstore") {
-                        if (input_tokens.size() and input_tokens.at(i+2) == "default") {
-                            tokens.push_back(input_tokens.at(++i));  // push target register token
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "\"\"");
-                            ++i;
-                        }
+                    if (match(input_tokens, i, {"strstore", "", "default"})) {
+                        tokens.push_back(input_tokens.at(++i));  // push target register token
+                        ++i;
+                        tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "\"\"");
                         continue;
                     }
                 }
