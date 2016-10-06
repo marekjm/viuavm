@@ -1387,6 +1387,27 @@ class KeywordIotaTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'iota_directive_used_outside_of_iota_scope.asm', "./sample/asm/keyword/iota/iota_directive_used_outside_of_iota_scope.asm:20:1: error: '.iota:' directive used outside of iota scope")
 
 
+class KeywordDefaultTests(unittest.TestCase):
+    """Tests for `default` keyword.
+    """
+    PATH = './sample/asm/keyword/default'
+
+    def testDefaultInArg(self):
+        runTest(self, 'arg.asm', 'Hello default World!')
+
+    def testDefaultInCall(self):
+        runTest(self, 'call.asm', '')
+
+    def testDefaultInIstore(self):
+        runTest(self, 'istore.asm', '0')
+
+    def testDefaultInFstore(self):
+        runTest(self, 'fstore.asm', '0.000000')
+
+    def testDefaultInStrstore(self):
+        runTest(self, 'strstore.asm', 'default:')
+
+
 class AssemblerErrorRejectingDuplicateSymbolsTests(unittest.TestCase):
     PATH = './sample/asm/errors/single_definition_rule'
 
