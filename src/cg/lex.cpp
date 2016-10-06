@@ -891,6 +891,14 @@ namespace viua {
                         }
                         continue;
                     }
+                    if (token == "fstore") {
+                        if (input_tokens.size() and input_tokens.at(i+2) == "default") {
+                            tokens.push_back(input_tokens.at(++i));  // push target register token
+                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "0.0");
+                            ++i;
+                        }
+                        continue;
+                    }
                     if (token == "strstore") {
                         if (input_tokens.size() and input_tokens.at(i+2) == "default") {
                             tokens.push_back(input_tokens.at(++i));  // push target register token
