@@ -59,6 +59,8 @@ There are several categories of change:
 - enhancement: assembler detects missing module names in `.link:` directive
 - feature: `--meta` option in assembler displays meta information embedded in source code
 - feature: `iota` keyword, and `.iota:` directive, they are explained here: https://github.com/marekjm/viuavm/issues/163
+- feature: `default` keyword is expanded to default values of operands of some instructions (default target in `call` and `arg`, and
+  default values for `istore`, `fstore`, and `strstore`)
 
 
 ----
