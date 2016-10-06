@@ -388,7 +388,7 @@ namespace viua {
                 return tokens;
             }
 
-            static bool match(const vector<Token>& tokens, std::remove_reference<decltype(tokens)>::type::size_type i, const vector<string>& sequence) {
+            static bool match_adjacent(const vector<Token>& tokens, std::remove_reference<decltype(tokens)>::type::size_type i, const vector<string>& sequence) {
                 if (i+sequence.size() >= tokens.size()) {
                     return false;
                 }
@@ -414,7 +414,7 @@ namespace viua {
                 const auto limit = input_tokens.size();
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
                     const auto t = input_tokens.at(i);
-                    if (match(input_tokens, i, sequence)) {
+                    if (match_adjacent(input_tokens, i, sequence)) {
                         tokens.emplace_back(t.line(), t.character(), join_tokens(input_tokens, i, (i+sequence.size())));
                         i += (sequence.size()-1);
                         continue;
