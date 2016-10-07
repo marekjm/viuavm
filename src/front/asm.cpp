@@ -212,6 +212,12 @@ static void display_error_in_context(const vector<viua::cg::lex::Token>& tokens,
     cout << "\n";
     display_error_location(tokens, error);
 }
+static void display_error_in_context(const vector<viua::cg::lex::Token>& tokens, const viua::cg::lex::TracedSyntaxError error, const string& filename) {
+    for (auto const& e : error.errors) {
+        display_error_in_context(tokens, e, filename);
+        cout << "\n";
+    }
+}
 
 int main(int argc, char* argv[]) {
     // setup command line arguments vector
@@ -376,6 +382,9 @@ int main(int argc, char* argv[]) {
     } catch (const viua::cg::lex::InvalidSyntax& e) {
         display_error_in_context(raw_tokens, e, filename);
         return 1;
+    } catch (const viua::cg::lex::TracedSyntaxError& e) {
+        display_error_in_context(raw_tokens, e, filename);
+        return 1;
     }
 
 
@@ -415,6 +424,9 @@ int main(int argc, char* argv[]) {
         cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
         cout << ": " << e << endl;
     } catch (const viua::cg::lex::InvalidSyntax& e) {
+        display_error_in_context(raw_tokens, e, filename);
+        return 1;
+    } catch (const viua::cg::lex::TracedSyntaxError& e) {
         display_error_in_context(raw_tokens, e, filename);
         return 1;
     }
