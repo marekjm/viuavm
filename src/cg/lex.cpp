@@ -925,6 +925,19 @@ namespace viua {
                         tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "\"\"");
                         continue;
                     }
+                    if (match(input_tokens, i, {"receive", "", "default"})) {
+                        tokens.push_back(input_tokens.at(++i));  // push target register token
+                        ++i;
+                        tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "infinity");
+                        continue;
+                    }
+                    if (match(input_tokens, i, {"join", "", "", "default"})) {
+                        tokens.push_back(input_tokens.at(++i));  // push target register token
+                        tokens.push_back(input_tokens.at(++i));  // push source register token
+                        ++i;
+                        tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "infinity");
+                        continue;
+                    }
                 }
 
                 return tokens;
