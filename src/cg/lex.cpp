@@ -53,6 +53,22 @@ namespace viua {
             InvalidSyntax::InvalidSyntax(Token t, string m): line_number(t.line()), character_in_line(t.character()), content(t.str()), message(m) {
             }
 
+            const char* TracedSyntaxError::what() const {
+                return errors.front().what();
+            }
+
+            auto TracedSyntaxError::line() const -> decltype(errors.front().line()) {
+                return errors.front().line();
+            }
+            auto TracedSyntaxError::character() const -> decltype(errors.front().character()) {
+                return errors.front().character();
+            }
+
+            auto TracedSyntaxError::append(const InvalidSyntax& e) -> TracedSyntaxError& {
+                errors.push_back(e);
+                return (*this);
+            }
+
             vector<Token> tokenise(const string& source) {
                 vector<Token> tokens;
 

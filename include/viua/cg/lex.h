@@ -45,6 +45,17 @@ namespace viua {
                 InvalidSyntax(Token, std::string = "");
             };
 
+            struct TracedSyntaxError {
+                std::vector<InvalidSyntax> errors;
+
+                const char* what() const;
+
+                auto line() const -> decltype(errors.front().line());
+                auto character() const -> decltype(errors.front().character());
+
+                auto append(const InvalidSyntax&) -> TracedSyntaxError&;
+            };
+
             std::vector<Token> tokenise(const std::string&);
             std::vector<Token> standardise(std::vector<Token>);
 
