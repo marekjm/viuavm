@@ -1655,6 +1655,9 @@ class ConcurrencyTests(unittest.TestCase):
     def testReceiveTimeout500ms(self):
         runTestThrowsException(self, 'receive_timeout_500ms.asm', ('Exception', 'no message received',))
 
+    def testReceiveTimeoutInfinite(self):
+        runTest(self, 'receive_timeout_infinite.asm', 'Hello World!')
+
     def testReceiveTimeoutFailsToAssemble(self):
         runTestFailsToAssemble(self, 'receive_invalid_timeout.asm', './sample/asm/concurrency/receive_invalid_timeout.asm:21:15: error: invalid timeout operand')
 
