@@ -111,7 +111,14 @@ static void check_use_of_register_index(const vector<viua::cg::lex::Token>& toke
         if (resolved_register_name != register_index) {
             message += (" := " + resolved_register_name);
         }
-        throw viua::cg::lex::InvalidSyntax(tokens.at(i), message);
+        auto base_error = viua::cg::lex::InvalidSyntax(tokens.at(i), message);
+        if (not registers.erased(resolved_register_name)) {
+            throw base_error;
+        }
+        viua::cg::lex::TracedSyntaxError traced_error;
+        traced_error.append(base_error);
+        traced_error.append(viua::cg::lex::InvalidSyntax(registers.erased_by(resolved_register_name), "erased by:"));
+        throw traced_error;
     }
 }
 static void check_use_of_register(const vector<viua::cg::lex::Token>& tokens, long unsigned i, Registers& registers, map<string, string>& named_registers, const string& message_prefix) {
