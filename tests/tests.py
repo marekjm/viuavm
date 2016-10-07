@@ -1670,6 +1670,9 @@ class ConcurrencyTests(unittest.TestCase):
     def testJoinInfiniteTimeout(self):
         runTest(self, 'join_timeout_infinite.asm', 'child process done')
 
+    def testJoinDefaultKeywordTimeout(self):
+        runTest(self, 'join_timeout_default_keyword.asm', 'child process done')
+
     def testJoinTimeout500ms(self):
         runTestThrowsException(self, 'join_timeout_500ms.asm', ('Exception', 'process did not join',))
 
