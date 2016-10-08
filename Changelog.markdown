@@ -48,8 +48,9 @@ There are several categories of change:
 - bic: remove obsolete `Process::pass/2` function
 - feature: `self` instruction: stores PID of process that executed the instruction in a register
 - enhancement: timeouts for `receive` instruction; `receive` got new operand - a timeout, its value may be given as a non-negative number
-  of milliseconds, or a token `infinity`; examples: wait 100 milliseconds - `receive 1 100ms`, wait indefinitely - `receive 1 infinity`;
-  after a timeout expires the VM raises an exception in the process
+  of milliseconds, seconds, or a token `infinity`;
+  examples: wait 100 milliseconds - `receive 1 100ms`, wait 1 second - `receive 1 1s`, wait indefinitely - `receive 1 infinity`;
+  after a timeout expires the VM raises an exception in the process that issued a timeout
 - enhancement: timeouts for `join` instruction; work the same as for `receive` instruction
 - misc: error messages from assembler are colorised
 - enhancement: assembler checks `.name:` directives and detects when a name is reused in a single block
