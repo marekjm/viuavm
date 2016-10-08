@@ -193,6 +193,15 @@ const map<string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS = {
 };
 
 
+static int timeout_to_int(const string& timeout) {
+    const auto timeout_str_size = timeout.size();
+    if (timeout[timeout_str_size-2] == 'm') {
+        return stoi(timeout.substr(0, timeout_str_size-2));
+    } else {
+        return (stoi(timeout.substr(0, timeout_str_size-1)) * 1000);
+    }
+}
+
 static uint64_t assemble_instruction(Program& program, uint64_t& instruction, uint64_t i, const vector<Token>& tokens, map<string, int>& marks, map<string, int>& names) {
     /*  This is main assembly loop.
      *  It iterates over lines with instructions and
@@ -376,8 +385,7 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
         Token a_chnk = tokens.at(i+1), b_chnk = tokens.at(i+2), timeout_chnk = tokens.at(i+3);
         int_op timeout{false, 0};
         if (timeout_chnk != "infinity") {
-            // remove the 'ms' part from timeout
-            timeout = assembler::operands::getint(timeout_chnk.str().substr(0, timeout_chnk.str().size()-2));
+            timeout = {false, timeout_to_int(timeout_chnk)};
             ++get<1>(timeout);
         }
         program.opjoin(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)), timeout);
@@ -385,13 +393,11 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
         program.opsend(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
     } else if (tokens.at(i) == "receive") {
         Token regno_chnk = tokens.at(i+1), timeout_chnk = tokens.at(i+2);
-        int_op to{false, 0};
+        int_op timeout{false, 0};
         if (timeout_chnk != "infinity") {
-            // remove the 'ms' part from timeout
-            to = assembler::operands::getint(timeout_chnk.str().substr(0, timeout_chnk.str().size()-2));
-            ++get<1>(to);
-        }
-        program.opreceive(assembler::operands::getint(resolveregister(regno_chnk, names)), to);
+            timeout = {false, timeout_to_int(timeout_chnk)};
+            ++get<1>(timeout);
+        } program.opreceive(assembler::operands::getint(resolveregister(regno_chnk, names)), timeout);
     } else if (tokens.at(i) == "watchdog") {
         program.opwatchdog(tokens.at(i+1));
     } else if (tokens.at(i) == "branch") {

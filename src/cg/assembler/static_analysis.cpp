@@ -99,7 +99,7 @@ static void check_timeout_operand(Token token) {
     if (token == "\n") {
         throw viua::cg::lex::InvalidSyntax(token, "missing timeout operand");
     }
-    static const regex timeout_regex{"^(?:0|[1-9]\\d*)ms$"};
+    static const regex timeout_regex{"^(?:0|[1-9]\\d*)m?s$"};
     if (token != "infinity" and not regex_match(token.str(), timeout_regex)) {
         throw viua::cg::lex::InvalidSyntax(token, "invalid timeout operand");
     }
