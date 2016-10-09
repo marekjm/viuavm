@@ -45,6 +45,7 @@ There are several categories of change:
   throws a false positive
 - bic: remove `empty` instruction
 - feature: add `send` instruction; it supersedes the `Process::pass/2` function
+- bic: sending a message cannot fail
 - bic: remove obsolete `Process::pass/2` function
 - feature: `self` instruction: stores PID of process that executed the instruction in a register
 - enhancement: timeouts for `receive` instruction; `receive` got new operand - a timeout, its value may be given as a non-negative number
