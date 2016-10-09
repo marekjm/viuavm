@@ -322,7 +322,9 @@ void Kernel::deleteMailbox(const PID pid) {
 void Kernel::send(const PID pid, unique_ptr<Type> message) {
     unique_lock<mutex> lck(mailbox_mutex);
     if (mailboxes.count(pid) == 0) {
-        throw new Exception("invalid PID");
+        // sending a message to an unknown address just drops the message
+        // instead of crashing the sending process
+        return;
     }
 #if VIUA_VM_DEBUG_LOG
     cerr << "[kernel:receive:send] pid = " << pid.get() << ", queued messages = " << mailboxes[pid].size() << "+1" << endl;
