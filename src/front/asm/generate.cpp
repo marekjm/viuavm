@@ -383,21 +383,24 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
         program.opself(assembler::operands::getint(resolveregister(tokens.at(i+1), names)));
     } else if (tokens.at(i) == "join") {
         Token a_chnk = tokens.at(i+1), b_chnk = tokens.at(i+2), timeout_chnk = tokens.at(i+3);
-        int_op timeout{false, 0};
+        int timeout_milliseconds = 0;
         if (timeout_chnk != "infinity") {
-            timeout = {false, timeout_to_int(timeout_chnk)};
-            ++get<1>(timeout);
+            timeout_milliseconds = timeout_to_int(timeout_chnk);
+            ++timeout_milliseconds;
         }
+        int_op timeout{false, timeout_milliseconds};
         program.opjoin(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)), timeout);
     } else if (tokens.at(i) == "send") {
         program.opsend(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
     } else if (tokens.at(i) == "receive") {
         Token regno_chnk = tokens.at(i+1), timeout_chnk = tokens.at(i+2);
-        int_op timeout{false, 0};
+        int timeout_milliseconds = 0;
         if (timeout_chnk != "infinity") {
-            timeout = {false, timeout_to_int(timeout_chnk)};
-            ++get<1>(timeout);
-        } program.opreceive(assembler::operands::getint(resolveregister(regno_chnk, names)), timeout);
+            timeout_milliseconds = timeout_to_int(timeout_chnk);
+            ++timeout_milliseconds;
+        }
+        int_op timeout{false, timeout_milliseconds};
+        program.opreceive(assembler::operands::getint(resolveregister(regno_chnk, names)), timeout);
     } else if (tokens.at(i) == "watchdog") {
         program.opwatchdog(tokens.at(i+1));
     } else if (tokens.at(i) == "branch") {
