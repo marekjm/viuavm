@@ -21,6 +21,7 @@
 #include <fstream>
 #include <sstream>
 #include <viua/types/type.h>
+#include <viua/types/pointer.h>
 #include <viua/types/string.h>
 #include <viua/types/vector.h>
 #include <viua/types/exception.h>
@@ -28,6 +29,51 @@
 #include <viua/kernel/registerset.h>
 #include <viua/include/module.h>
 using namespace std;
+
+
+class Ifstream: public Type {
+        ifstream in;
+        const string filename;
+
+    public:
+        string type() const override {
+            return "Ifstream";
+        }
+        string str() const override {
+            return type();
+        }
+        string repr() const override {
+            return str();
+        }
+        bool boolean() const override {
+            return in.is_open();
+        }
+
+        virtual std::vector<std::string> bases() const {
+            return std::vector<std::string>{"Type"};
+        }
+        virtual std::vector<std::string> inheritancechain() const {
+            return std::vector<std::string>{"Type"};
+        }
+
+        string getline() {
+            string line;
+            std::getline(in, line);
+            return line;
+        }
+
+        virtual Type* copy() const {
+        }
+
+        Ifstream(const string& path): filename(path) {
+            in.open(filename);
+        }
+        virtual ~Ifstream() {
+            if (in.is_open()) {
+                in.close();
+            }
+        }
+};
 
 
 void io_stdin_getline(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
@@ -50,9 +96,20 @@ void io_file_read(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     frame->regset->set(0, new String(oss.str()));
 }
 
+void io_ifstream_open(Frame *frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
+    frame->regset->set(0, new Ifstream(frame->args->get(0)->str()));
+}
+
+void io_ifstream_getline(Frame *frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
+    Ifstream *in = dynamic_cast<Ifstream*>(static_cast<Pointer*>(frame->args->get(0))->to());
+    frame->regset->set(0, new String(in->getline()));
+}
+
 const ForeignFunctionSpec functions[] = {
     { "std::io::stdin::getline/0", &io_stdin_getline },
     { "std::io::file::read/1", &io_file_read },
+    { "std::io::ifstream::open/1", &io_ifstream_open },
+    { "std::io::ifstream::getline/1", &io_ifstream_getline },
     { NULL, NULL },
 };
 
