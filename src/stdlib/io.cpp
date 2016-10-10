@@ -30,14 +30,14 @@
 using namespace std;
 
 
-void io_getline(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
+void io_stdin_getline(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     string line;
     getline(cin, line);
     frame->regset->set(0, new String(line));
 }
 
 
-void io_readtext(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
+void io_file_read(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     string path = frame->args->get(0)->str();
     ifstream in(path);
 
@@ -51,8 +51,8 @@ void io_readtext(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
 }
 
 const ForeignFunctionSpec functions[] = {
-    { "std::io::getline/0", &io_getline },
-    { "std::io::readtext/1", &io_readtext },
+    { "std::io::stdin::getline/0", &io_stdin_getline },
+    { "std::io::file::read/1", &io_file_read },
     { NULL, NULL },
 };
 
