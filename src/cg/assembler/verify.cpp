@@ -205,8 +205,8 @@ void assembler::verify::functionsEndWithReturn(const std::vector<Token>& tokens)
             continue;
         }
 
-        bool last_token_returns = (tokens.at(i-1) == "return" or tokens.at(i-1) == "tailcall");
-        bool last_but_one_token_returns = (tokens.at(i-1) == "\n" and (tokens.at(i-2) == "return" or tokens.at(i-2) == "tailcall"));
+        bool last_token_returns = (tokens.at(i-1) == "return" or tokens.at(i-2) == "tailcall");
+        bool last_but_one_token_returns = (tokens.at(i-1) == "\n" and (tokens.at(i-2) == "return" or tokens.at(i-3) == "tailcall"));
         if (not (last_token_returns or last_but_one_token_returns)) {
             throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("function does not end with 'return' or 'tailcall': " + function));
         }
