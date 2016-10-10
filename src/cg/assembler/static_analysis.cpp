@@ -240,7 +240,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, Re
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "enclose" or token == "enclosecopy" or token == "enclosemove") {
-            check_use_of_register(body_tokens, i+2, registers, named_registers, "closure of empty register");
+            check_use_of_register(body_tokens, i+3, registers, named_registers, "closure of empty register");
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "copy" or token == "ptr" or token == "fcall") {
             string opcode_name = token;
