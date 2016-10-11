@@ -63,6 +63,9 @@ There are several categories of change:
 - feature: `iota` keyword, and `.iota:` directive, they are explained here: https://github.com/marekjm/viuavm/issues/163
 - feature: `default` keyword is expanded to default values of operands of some instructions (default target in `call` and `arg`, and
   default values for `istore`, `fstore`, and `strstore`)
+- misc: standard library `io` module provides following functions:  `std::io::stdin::getline/0`, `std::io::file::read/1`,
+  `std::io::ifstream::open/1`, and `std::io::ifstream::getline/1`; no `std::io::ifstream::close/1` function is provided as files are
+  automatically closed upon destruction of ifstream object
 
 
 ----
