@@ -22,7 +22,7 @@ istore condition 1
 
 ; branch to :good if condition is true
 ; else branch to :bad
-branch condition :good :bad
+if condition :good :bad
 
 ; the :good marker will output 1 before going to halt
 .mark: good

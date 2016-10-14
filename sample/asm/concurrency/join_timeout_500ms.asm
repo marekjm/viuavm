@@ -19,7 +19,7 @@
 
 .function: child_process/1
     .name: 1 counter
-    branch (idec (arg counter 0)) +1 end_this
+    if (idec (arg counter 0)) +1 end_this
     frame ^[(pamv 0 counter)]
     tailcall child_process/1
     .mark: end_this

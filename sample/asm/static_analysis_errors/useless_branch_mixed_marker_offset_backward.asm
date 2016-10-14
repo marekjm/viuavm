@@ -24,7 +24,7 @@
     print (strstore 1 "Hello World!")
 
     .mark: after
-    branch (not (not (izero 0))) here -5
+    if (not (not (izero 0))) here -5
 
     izero 0
     return

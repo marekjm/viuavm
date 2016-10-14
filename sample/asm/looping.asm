@@ -30,7 +30,7 @@
     ; invert value to use short form of branch instruction, i.e.: branch <cond> <true>
     ; and expliot the fact that it will default false to "next instruction"
     not 3
-    branch 3 final_print
+    if 3 final_print
     print 1
     iinc 1
     jump loop

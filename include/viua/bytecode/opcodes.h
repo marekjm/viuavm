@@ -131,7 +131,7 @@ enum OPCODE : byte {
     WATCHDOG,  // spawn watchdog process
 
     JUMP,
-    BRANCH,
+    IF,
 
     THROW,      // throw an object
     CATCH,      // register a catcher block for given type

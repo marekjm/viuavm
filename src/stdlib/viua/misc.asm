@@ -51,7 +51,7 @@
     ; counting from N to zero
     ; when 0 is reached, stop iterating
     igt 3 0 1
-    branch 3 loop_body loop_end
+    if 3 loop_body loop_end
 
     .mark: loop_body
 
@@ -93,7 +93,7 @@
     izero zero
 
     .mark: __loop_begin
-    branch (ilte 3 counter zero) __loop_end +1
+    if (ilte 3 counter zero) __loop_end +1
     idec counter
     jump __loop_begin
     .mark: __loop_end

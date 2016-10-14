@@ -22,7 +22,7 @@
     istore 2 2
 
     .mark: loop_begin
-    branch (ilt 3 1 2) loop_end +1
+    if (ilt 3 1 2) loop_end +1
 
     isub 1 1 2
     jump loop_begin
@@ -53,7 +53,7 @@
 
     ; while (...) {
     .mark: loop_begin
-    branch (igte 6 4 5) loop_end +1
+    if (igte 6 4 5) loop_end +1
 
     ; call filtering function to determine whether current element
     ; is a valid value...
@@ -61,7 +61,7 @@
 
     ; ...and if the result from filtering function was "true" - the element should be pushed onto result vector
     ; it it was "false" - skip to next iteration
-    branch (fcall 8 1) element_ok next_iter
+    if (fcall 8 1) element_ok next_iter
 
     .mark: element_ok
     vpush 3 7

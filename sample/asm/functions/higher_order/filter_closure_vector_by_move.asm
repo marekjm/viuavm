@@ -22,7 +22,7 @@
     arg 1 0
 
     .mark: loop_begin
-    branch (ilt 3 1 bound_variable) loop_end loop_body
+    if (ilt 3 1 bound_variable) loop_end loop_body
 
     .mark: loop_body
     isub 1 1 bound_variable
@@ -62,7 +62,7 @@
 
     ; while (...) {
     .mark: loop_begin
-    branch (igte 6 4 5) loop_end
+    if (igte 6 4 5) loop_end
 
     ; call filtering function to determine whether current element
     ; is a valid value
@@ -71,7 +71,7 @@
 
     ; if the result from filtering function was "true" - the element should be pushed onto result vector
     ; it it was "false" - skip to next iteration
-    branch 8 element_ok next_iter
+    if 8 element_ok next_iter
 
     .mark: element_ok
     vpush 3 7

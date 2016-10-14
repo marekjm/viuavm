@@ -36,7 +36,7 @@
     vpush vector (copy to_push counter)
     iinc counter
     ; reuse 'to_push' register since it's empty
-    branch (igte to_push counter limit) +1 begin_loop
+    if (igte to_push counter limit) +1 begin_loop
 
     return
 .end
@@ -64,7 +64,7 @@
     vpush vector (fcall to_push fn)
     iinc counter
     ; reuse 'to_push' register since it's empty
-    branch (igte to_push counter limit) +1 begin_loop
+    if (igte to_push counter limit) +1 begin_loop
 
     return
 .end
@@ -87,7 +87,7 @@
     .mark: begin_loop
     .name: 3 tmp
     vpush result (vpop tmp source)
-    branch (idec counter) begin_loop
+    if (idec counter) begin_loop
     .mark: end_loop
 
     return
@@ -119,7 +119,7 @@
     idec counter_down
     iinc counter_up
 
-    branch limit begin_loop
+    if limit begin_loop
     .mark: end_loop
 
     return
@@ -142,7 +142,7 @@
     izero index
 
     ; do not loop on zero-length vectors
-    branch limit +1 end_loop
+    if limit +1 end_loop
 
     .mark: begin_loop
     .name: 5 tmp
@@ -154,9 +154,9 @@
     vinsert vector tmp @index
 
     ; break loop if there wasn't a match
-    branch result +1 end_loop
+    if result +1 end_loop
 
-    branch (igte 5 (iinc index) limit) +1 begin_loop
+    if (igte 5 (iinc index) limit) +1 begin_loop
     .mark: end_loop
 
     return
@@ -179,7 +179,7 @@
     izero index
 
     ; do not loop on zero-length vectors
-    branch limit +1 end_loop
+    if limit +1 end_loop
 
     .mark: begin_loop
     .name: 5 tmp
@@ -192,9 +192,9 @@
     vinsert vector tmp @index
 
     ; break the loop if there was a match
-    branch result end_loop
+    if result end_loop
 
-    branch (igte 5 (iinc index) limit) +1 begin_loop
+    if (igte 5 (iinc index) limit) +1 begin_loop
     .mark: end_loop
 
     return

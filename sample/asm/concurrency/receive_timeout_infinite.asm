@@ -38,7 +38,7 @@
     catch "Exception" pull_and_do_nothing
     enter await_message
 
-    branch times next_iteration
+    if times next_iteration
     send pid (strstore 3 "Hello World!")
     return
 

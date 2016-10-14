@@ -81,7 +81,7 @@
     .name: 3 zero
     izero zero
 
-    branch (ieq 4 divide_by zero) +1 __after_throw
+    if (ieq 4 divide_by zero) +1 __after_throw
     throw (strstore 4 "cannot divide by zero")
     .mark: __after_throw
 

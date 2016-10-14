@@ -34,7 +34,7 @@
     izero counter
 
     .mark: begin_loop
-    branch (igte 4 counter limit) end_loop +1
+    if (igte 4 counter limit) end_loop +1
 
     frame ^[(param 0 counter)]
     process 0 worker_process/1

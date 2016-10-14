@@ -119,7 +119,7 @@ namespace cg {
         byte* opwatchdog(byte*, const std::string&);
 
         byte* opjump(byte*, uint64_t);
-        byte* opbranch(byte*, int_op, uint64_t, uint64_t);
+        byte* opif(byte*, int_op, uint64_t, uint64_t);
 
         byte* optry(byte*);
         byte* opcatch(byte*, const std::string&, const std::string&);

@@ -24,7 +24,7 @@
     strstore 2 "iterations left (TTS): "
     .mark: __process_to_suspend_begin_while_0
 
-    branch 1 +1 __process_to_suspend_end_while_0
+    if 1 +1 __process_to_suspend_end_while_0
 
     echo 2
     nop
@@ -47,7 +47,7 @@
     istore 4 10
     strstore 5 "iterations left (TDD): "
     .mark: loop_begin_0
-    branch 4 +1 loop_end_0
+    if 4 +1 loop_end_0
     echo 5
     nop
     nop
@@ -68,7 +68,7 @@
     istore 4 10
     strstore 5 "iterations left (TDD): "
     .mark: loop_begin
-    branch 4 +1 loop_end
+    if 4 +1 loop_end
     echo 5
     nop
     nop

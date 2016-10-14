@@ -820,11 +820,11 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* opbranch(byte* addr_ptr, int_op regc, uint64_t addr_truth, uint64_t addr_false) {
+        byte* opif(byte* addr_ptr, int_op regc, uint64_t addr_truth, uint64_t addr_false) {
             /*  Inserts branch instruction.
              *  Byte offset is calculated automatically.
              */
-            *(addr_ptr++) = BRANCH;
+            *(addr_ptr++) = IF;
             addr_ptr = insertIntegerOperand(addr_ptr, regc);
 
             // we *know* that following locations in the byte array point to uint64_t so

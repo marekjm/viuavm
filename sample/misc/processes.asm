@@ -37,7 +37,7 @@
     iinc counter
 
     ; if the counter is equal to limit return immediately
-    branch (ieq 3 counter limit) +1 +2
+    if (ieq 3 counter limit) +1 +2
     return
 
     ; spawn a new process

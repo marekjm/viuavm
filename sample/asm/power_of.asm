@@ -36,7 +36,7 @@
 
     ; if the exponent is equal to zero, store 1 in first register and jump to print
     ; invert so short form of branch instruction can be used
-    branch (not (ieq 4 (arg exponent 1) (izero zero))) algorithm
+    if (not (ieq 4 (arg exponent 1) (izero zero))) algorithm
     istore result 1
     jump final
 
@@ -49,7 +49,7 @@
     istore result @base
 
     .mark: loop
-    branch (ilt 4 counter exponent) 12 final
+    if (ilt 4 counter exponent) 12 final
     imul result result base
     nop
     iinc counter

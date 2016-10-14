@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    branch 2 1 -0
+    if 2 1 -0
 
     izero 0
     return

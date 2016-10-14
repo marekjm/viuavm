@@ -21,7 +21,7 @@
     .name: 1 current_value
     arg current_value 0
 
-    branch current_value +1 fibonacci/1__finished
+    if current_value +1 fibonacci/1__finished
 
     frame ^[(pamv 0 (idec (copy 2 current_value)))]
     call 2 fibonacci/1

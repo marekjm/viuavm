@@ -20,7 +20,7 @@
 .function: main/0
     izero 1
 
-    branch 1 foo +1
+    if 1 foo +1
 
     izero 0
     return

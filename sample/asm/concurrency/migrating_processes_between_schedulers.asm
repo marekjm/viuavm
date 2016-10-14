@@ -48,7 +48,7 @@
     arg limit 0
 
     -- run until "limit" hits zero
-    branch limit +1 spawn_processes/1__epilogue
+    if limit +1 spawn_processes/1__epilogue
 
     -- spawn a printer process with current limit value
     -- as its only parameter

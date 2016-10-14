@@ -61,7 +61,7 @@
 
     ; while (...) {
     .mark: loop_begin
-    branch (igte 6 4 5) loop_end
+    if (igte 6 4 5) loop_end
 
     ; call supplied function on current element...
     frame ^[(param 0 (vat 7 2 @4))]

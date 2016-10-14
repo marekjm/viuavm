@@ -56,7 +56,7 @@
     ; initialise it if necessary
     ; static register set is used to preserve the value across calls
     ress static
-    branch (isnull 2 process_counter) +1 already_initialised
+    if (isnull 2 process_counter) +1 already_initialised
     ; initialisation to -1 makes later code simpler as there is no need
     ; to special-case the first call to preserve the zero
     istore process_counter -1

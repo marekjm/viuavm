@@ -29,7 +29,7 @@
 .function: main/1
     strstore 1 "I'm relative..."
     istore 1 1
-    branch 1 .0
+    if 1 .0
 
     print 1
     izero 0

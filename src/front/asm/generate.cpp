@@ -403,7 +403,7 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
         program.opreceive(assembler::operands::getint(resolveregister(regno_chnk, names)), timeout);
     } else if (tokens.at(i) == "watchdog") {
         program.opwatchdog(tokens.at(i+1));
-    } else if (tokens.at(i) == "branch") {
+    } else if (tokens.at(i) == "if") {
         /*  If branch is given three operands, it means its full, three-operands form is being used.
          *  Otherwise, it is short, two-operands form instruction and assembler should fill third operand accordingly.
          *
@@ -429,7 +429,7 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
             addrf_target = instruction+1;
         }
 
-        program.opbranch(assembler::operands::getint(resolveregister(condition, names)), addrt_target, addrt_jump_type, addrf_target, addrf_jump_type);
+        program.opif(assembler::operands::getint(resolveregister(condition, names)), addrt_target, addrt_jump_type, addrf_target, addrf_jump_type);
     } else if (tokens.at(i) == "jump") {
         /*  Jump instruction can be written in two forms:
          *

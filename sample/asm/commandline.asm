@@ -25,7 +25,7 @@
     istore counter 0
 
     .mark: loop
-    branch (ilt 4 counter len) +1 break
+    if (ilt 4 counter len) +1 break
 
     print (vat 5 1 @counter)
 

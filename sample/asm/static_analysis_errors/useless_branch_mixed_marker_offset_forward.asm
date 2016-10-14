@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    branch (izero 0) here +1
+    if (izero 0) here +1
 
     .mark: here
     print (strstore 1 "Hello World!")

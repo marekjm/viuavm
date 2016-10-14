@@ -711,7 +711,7 @@ void assembler::verify::jumpsAreInRange(const vector<viua::cg::lex::Token>& toke
         }
 
         string mnemonic = tokens.at(i);
-        if (not (mnemonic == ".function:" or mnemonic == ".closure:" or mnemonic == ".block:" or mnemonic == "jump" or mnemonic == "branch" or mnemonic == ".mark:" or mnemonic == ".end")) {
+        if (not (mnemonic == ".function:" or mnemonic == ".closure:" or mnemonic == ".block:" or mnemonic == "jump" or mnemonic == "if" or mnemonic == ".mark:" or mnemonic == ".end")) {
             i = skip_till_next_line(tokens, i);
             continue;
         }
@@ -725,7 +725,7 @@ void assembler::verify::jumpsAreInRange(const vector<viua::cg::lex::Token>& toke
             function_name = tokens.at(i+1);
         } else if (mnemonic == "jump") {
             validate_jump(tokens.at(i+1), tokens.at(i+1), function_instruction_counter, forward_jumps, deferred_marker_jumps, jump_targets);
-        } else if (mnemonic == "branch") {
+        } else if (mnemonic == "if") {
             Token when_true = tokens.at(i+2);
             Token when_false = tokens.at(i+3);
 

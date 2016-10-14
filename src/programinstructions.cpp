@@ -691,7 +691,7 @@ Program& Program::opjump(uint64_t addr, enum JUMPTYPE is_absolute) {
     return (*this);
 }
 
-Program& Program::opbranch(int_op regc, uint64_t addr_truth, enum JUMPTYPE absolute_truth, uint64_t addr_false, enum JUMPTYPE absolute_false) {
+Program& Program::opif(int_op regc, uint64_t addr_truth, enum JUMPTYPE absolute_truth, uint64_t addr_false, enum JUMPTYPE absolute_false) {
     /*  Inserts branch instruction.
      *  Byte offset is calculated automatically.
      */
@@ -711,7 +711,7 @@ Program& Program::opbranch(int_op regc, uint64_t addr_truth, enum JUMPTYPE absol
         (absolute_truth == JMP_ABSOLUTE ? branches_absolute : branches).push_back(jump_position_in_bytecode);
     }
 
-    addr_ptr = cg::bytecode::opbranch(addr_ptr, regc, addr_truth, addr_false);
+    addr_ptr = cg::bytecode::opif(addr_ptr, regc, addr_truth, addr_false);
     return (*this);
 }
 

@@ -259,7 +259,7 @@ class Process {
     byte* opreturn(byte*);
 
     byte* opjump(byte*);
-    byte* opbranch(byte*);
+    byte* opif(byte*);
 
     byte* optry(byte*);
     byte* opcatch(byte*);

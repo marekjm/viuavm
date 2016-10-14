@@ -43,7 +43,7 @@
     ; while (...) {
     .mark: loop_begin
     igte 6 4 5
-    branch 6 loop_end loop_body
+    if 6 loop_end loop_body
 
     .mark: loop_body
 
@@ -56,7 +56,7 @@
 
     ; if the result from filtering function was "true" - the element should be pushed onto result vector
     ; it it was "false" - skip to next iteration
-    branch 8 element_ok next_iter
+    if 8 element_ok next_iter
 
     .mark: element_ok
     vpush 3 7
@@ -96,7 +96,7 @@
     ; loop condition
     .mark: loop_begin
     ilt 5 3 4
-    branch 5 loop_body loop_end
+    if 5 loop_body loop_end
 
     .mark: loop_body
 
@@ -137,7 +137,7 @@
     ; while (...) {
     .mark: loop_begin
     igte 6 4 5
-    branch 6 loop_end loop_body
+    if 6 loop_end loop_body
 
     .mark: loop_body
 
@@ -223,7 +223,7 @@
     ; while (loop_counter < vector_length) {
     .name: 5 loop_condition
     igte loop_condition loop_counter vector_length
-    branch loop_condition while_end while_body
+    if loop_condition while_end while_body
 
     .mark: while_body
 

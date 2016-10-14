@@ -126,7 +126,7 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "watchdog",       sizeof(byte) },
 
     { "jump",           sizeof(byte) + sizeof(uint64_t) },
-    { "branch",         sizeof(byte) + sizeof(OperandType)+sizeof(int) + 2*sizeof(uint64_t) },
+    { "if",             sizeof(byte) + sizeof(OperandType)+sizeof(int) + 2*sizeof(uint64_t) },
 
     { "throw",          sizeof(byte) + sizeof(OperandType) + sizeof(int) },
     { "catch",          sizeof(byte) }, // catch "<type>" <block>
@@ -249,7 +249,7 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { WATCHDOG,     "watchdog" },
 
     { JUMP,         "jump" },
-    { BRANCH,       "branch" },
+    { IF,           "if" },
 
     { THROW,        "throw" },
     { CATCH,        "catch" },

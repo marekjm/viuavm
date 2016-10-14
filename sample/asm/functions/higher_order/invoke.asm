@@ -47,7 +47,7 @@
 
     ; simple condition:
     ; while (loop_counter < vector_length) {
-    branch (igte 5 loop_counter vector_length) while_end while_body
+    if (igte 5 loop_counter vector_length) while_end while_body
 
     .mark: while_body
 

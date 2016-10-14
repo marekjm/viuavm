@@ -66,6 +66,7 @@ There are several categories of change:
 - misc: standard library `io` module provides following functions:  `std::io::stdin::getline/0`, `std::io::file::read/1`,
   `std::io::ifstream::open/1`, and `std::io::ifstream::getline/1`; no `std::io::ifstream::close/1` function is provided as files are
   automatically closed upon destruction of ifstream object
+- bic: change `branch` instruction to `if`
 
 
 ----

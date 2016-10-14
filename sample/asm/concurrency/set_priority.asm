@@ -23,7 +23,7 @@
     izero counter
     istore limit 32
 .mark: loop
-    branch (igte 4 counter limit) endloop +1
+    if (igte 4 counter limit) endloop +1
     ; execute nops to make the process longer
     nop
     iinc counter
@@ -50,7 +50,7 @@
     ; the priority settings take effect
     istore limit 16
 .mark: loop
-    branch (igte 5 counter limit) endloop +1
+    if (igte 5 counter limit) endloop +1
     ; execute nops to make main process do something
     nop
     iinc counter

@@ -149,7 +149,7 @@ class Program {
     Program& opreceive(int_op, int_op);
     Program& opwatchdog(const std::string&);
     Program& opjump(uint64_t, enum JUMPTYPE);
-    Program& opbranch(int_op, uint64_t, enum JUMPTYPE, uint64_t, enum JUMPTYPE);
+    Program& opif(int_op, uint64_t, enum JUMPTYPE, uint64_t, enum JUMPTYPE);
 
     Program& optry();
     Program& opcatch(std::string, std::string);

@@ -24,12 +24,12 @@
     istore 4 1
     ieq 4 4 0
 
-    branch 4 +1 +2
+    if 4 +1 +2
     strstore 1 " bottle"
 
     izero 4
     ieq 4 4 0
-    branch 4 zero_bottles
+    if 4 zero_bottles
 
     echo 0
     echo 1
@@ -54,7 +54,7 @@
     istore 4 1
     ieq 4 4 0
 
-    branch 4 +1 +2
+    if 4 +1 +2
     strstore 1 " bottle"
 
     echo 0
@@ -104,7 +104,7 @@
     paref 0 0
     call report_state_of_the_wall
 
-    branch 0 again
+    if 0 again
 
     izero 0
     return

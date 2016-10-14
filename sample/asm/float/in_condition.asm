@@ -29,7 +29,7 @@
     ieq 2 2 3
 
     ; check
-    branch 1 ok fin
+    if 1 ok fin
     .mark: ok
     not 2
     .mark: fin

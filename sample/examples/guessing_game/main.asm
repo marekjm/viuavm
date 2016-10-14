@@ -55,10 +55,10 @@
     catch "Exception" failed_to_convert
     enter check_the_number
 
-    branch (ieq 4 3 0) abort
-    branch (ieq 4 3 1) correct
+    if (ieq 4 3 0) abort
+    if (ieq 4 3 1) correct
 
-    branch (ilt 4 3 1) +1 +3
+    if (ilt 4 3 1) +1 +3
     strstore 4 "guess: your number is less than the target"
     jump incorrect
     strstore 4 "guess: your number is greater than the target"

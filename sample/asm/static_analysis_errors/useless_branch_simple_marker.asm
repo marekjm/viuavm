@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    branch (izero 1) here here
+    if (izero 1) here here
 
     .mark: here
     izero 0

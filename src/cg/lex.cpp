@@ -303,7 +303,7 @@ namespace viua {
                             tokens.push_back(input_tokens.at(++i));
                         }
                         continue;
-                    } else if (token == "branch") {
+                    } else if (token == "if") {
                         tokens.push_back(token);                // mnemonic
                         if (input_tokens.at(i+1) == "\n") {
                             throw viua::cg::lex::InvalidSyntax(token, "branch without operands");

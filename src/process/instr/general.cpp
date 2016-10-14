@@ -48,7 +48,7 @@ byte* Process::opjump(byte* addr) {
     return target;
 }
 
-byte* Process::opbranch(byte* addr) {
+byte* Process::opif(byte* addr) {
     unsigned source_register_index = 0;
     uint64_t addr_true = 0, addr_false = 0;
 

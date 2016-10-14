@@ -239,8 +239,8 @@ byte* Process::dispatch(byte* addr) {
         case JUMP:
               addr = opjump(addr+1);
             break;
-        case BRANCH:
-              addr = opbranch(addr+1);
+        case IF:
+              addr = opif(addr+1);
             break;
         case TRY:
             addr = optry(addr+1);

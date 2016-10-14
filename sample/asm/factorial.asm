@@ -25,7 +25,7 @@
 
     ; if counter is equal to zero
     ; finish "factorial" calls
-    branch (ieq 4 number (istore 3 0)) finish
+    if (ieq 4 number (istore 3 0)) finish
 
     frame ^[(param 0 number) (param 1 result)]
     call result factorial/2

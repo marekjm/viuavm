@@ -23,7 +23,7 @@
     arg current_value 0
     arg accumulator 1
 
-    branch current_value +1 fibonacci/2__finished
+    if current_value +1 fibonacci/2__finished
 
     iadd accumulator current_value
 

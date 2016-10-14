@@ -28,7 +28,7 @@
     pull 1
     echo (strstore 2 "looks ")
 
-    branch 1 +2
+    if 1 +2
     strstore 2 "truthy"
     strstore 2 "falsey"
 

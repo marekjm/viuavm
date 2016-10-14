@@ -233,7 +233,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
             oss << dec;
 
             break;
-        case BRANCH:
+        case IF:
             oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
             pointer::inc<int, byte>(ptr);

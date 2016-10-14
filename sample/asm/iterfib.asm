@@ -21,7 +21,7 @@
     .name: 1 vector
 
     ress static
-    branch (not (isnull 2 vector)) logic
+    if (not (isnull 2 vector)) logic
     vpush (vpush (vec vector) (istore 2 1)) (istore 2 1)
 
     .mark: logic
@@ -31,7 +31,7 @@
     arg number 0
 
     .mark: loop
-    branch (not (ilt 5 (vlen length vector) number)) finished
+    if (not (ilt 5 (vlen length vector) number)) finished
     iadd 8 (vat 6 vector -1) (vat 7 vector -2)
     vpush vector 8
     jump loop

@@ -223,7 +223,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, Re
         } else if (token == "tmpro") {
             registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), i+1);
             i = skip_till_next_line(body_tokens, i);
-        } else if (token == "branch") {
+        } else if (token == "if") {
             check_use_of_register(body_tokens, i+1, registers, named_registers, "branch depends on empty register");
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "echo" or token == "print" or token == "not") {

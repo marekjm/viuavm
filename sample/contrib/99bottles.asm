@@ -45,7 +45,7 @@
 
     idec 0
 
-    branch 0 more_beer
+    if 0 more_beer
     echo 6
     jump rest
 
@@ -61,8 +61,8 @@
     print 5
 
     ieq 8 7 0
-    branch 8 one_beer
-    branch 0 again
+    if 8 one_beer
+    if 0 again
 
     izero 0
     return

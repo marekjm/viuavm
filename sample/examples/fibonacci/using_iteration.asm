@@ -24,7 +24,7 @@
     arg accumulator 1
 
     .mark: fibonacci/2__loop
-    branch current_value +1 fibonacci/2__finished
+    if current_value +1 fibonacci/2__finished
 
     iadd accumulator ^(idec current_value)
 

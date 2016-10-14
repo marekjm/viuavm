@@ -22,7 +22,7 @@
     nop
 
     .mark: here
-    branch 2 3 here
+    if 2 3 here
 
     izero 0
     return

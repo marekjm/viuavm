@@ -92,7 +92,7 @@ unsigned long Program::instructionCount() {
             case IGT:
             case IGTE:
             case IEQ:
-            case BRANCH:
+            case IF:
                 i += sizeof(int);
                 i += 2*sizeof(uint64_t);
                 break;

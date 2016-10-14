@@ -23,7 +23,7 @@
 
     ; if register 1 is *not null* jump to increase marker
     ; otherwise continue execution to perform initial set up of static registers
-    branch (not (isnull 2 1)) increase
+    if (not (isnull 2 1)) increase
 
     ; these instructions are executed only when 1 register was null
     ; they first setup static counter variable
@@ -50,7 +50,7 @@
 
     ; integer at 1 is *at least* N
     ; N is the parameter the function received
-    branch (not (ilt 4 1 (arg 3 0))) finish
+    if (not (ilt 4 1 (arg 3 0))) finish
 
     .mark: report
     print 1

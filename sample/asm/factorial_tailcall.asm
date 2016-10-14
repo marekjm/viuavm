@@ -28,7 +28,7 @@
 
     ; if counter is equal to zero
     ; finish "factorial" calls
-    branch (ieq 4 number (istore 3 0)) finish
+    if (ieq 4 number (istore 3 0)) finish
 
     ; this frame must be the same as in "main"
     ; result must still be a reference

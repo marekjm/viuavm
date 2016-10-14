@@ -21,7 +21,7 @@
     nop
     nop
 
-    branch 2 3 2
+    if 2 3 2
 
     izero 0
     return

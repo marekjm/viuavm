@@ -29,7 +29,7 @@
 
     ; if number is less than modulo, jump straight to result printing
     ilt 4 number modulo
-    branch 4 final
+    if 4 final
 
     ; otherwise we must perform some calculations
     idiv number number modulo

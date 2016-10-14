@@ -278,7 +278,7 @@ tuple<bool, string> if_watchpoint_local_register_write(Kernel& kernel, const Sta
         opcode == PARAM or
         opcode == CALL or
         opcode == JUMP or
-        opcode == BRANCH or
+        opcode == IF or
         opcode == RETURN or
         opcode == HALT
        ) {
@@ -387,7 +387,7 @@ tuple<bool, string> if_watchpoint_global_register_write(Kernel& kernel, const St
         opcode == PARAM or
         opcode == CALL or
         opcode == JUMP or
-        opcode == BRANCH or
+        opcode == IF or
         opcode == RETURN or
         opcode == HALT
        ) {

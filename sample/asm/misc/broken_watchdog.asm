@@ -35,7 +35,7 @@
     strstore 3 "iterations left: "
 
     .mark: __will_be_killed_by_a_runaway_exception_begin_while_0
-    branch 1 +1 __will_be_killed_by_a_runaway_exception_end_while_1
+    if 1 +1 __will_be_killed_by_a_runaway_exception_end_while_1
     echo 3
     print (idec 1)
     jump __will_be_killed_by_a_runaway_exception_begin_while_0
@@ -60,7 +60,7 @@
     izero zero
 
     .mark: __loop_begin
-    branch (ilte 3 counter zero) __loop_end +1
+    if (ilte 3 counter zero) __loop_end +1
     idec counter
     jump __loop_begin
     .mark: __loop_end
