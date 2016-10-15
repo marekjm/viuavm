@@ -67,6 +67,9 @@ There are several categories of change:
   `std::io::ifstream::open/1`, and `std::io::ifstream::getline/1`; no `std::io::ifstream::close/1` function is provided as files are
   automatically closed upon destruction of ifstream object
 - bic: change `branch` instruction to `if`
+- feature: basic support for nested blocks in functions; blocks can be nested one level deep, this feature is thought of as a shortcut, not
+  to provide full-fledged nesting support, and should be used when a block is not reused acros functions and is relatively simple;
+  nested blocks do not share register names with their enclosing function, but they *do* share iotas
 
 
 ----
