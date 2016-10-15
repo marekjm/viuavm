@@ -664,6 +664,61 @@ namespace viua {
                 return tokens;
             }
 
+            vector<Token> move_inline_blocks_out(vector<Token> input_tokens) {
+                decltype(input_tokens) tokens;
+                decltype(tokens) block_tokens, nested_block_tokens;
+
+                bool block_opened = false;
+                bool nested_block_opened = false;
+
+                for (const auto& token : input_tokens) {
+                    if (token == ".block:" or token == ".function:" or token == ".closure:") {
+                        if (block_opened and token == ".block:") {
+                            nested_block_opened = true;
+                        }
+                        block_opened = true;
+                    }
+
+                    if (block_opened) {
+                        if (nested_block_opened) {
+                            nested_block_tokens.push_back(token);
+                        } else {
+                            block_tokens.push_back(token);
+                        }
+                    } else {
+                        tokens.push_back(token);
+                    }
+
+                    if (token == ".end") {
+                        if (nested_block_opened) {
+                            for (const auto& ntoken : nested_block_tokens) {
+                                tokens.push_back(ntoken);
+                            }
+                            tokens.emplace_back(nested_block_tokens.front().line(), nested_block_tokens.front().character(), "\n");
+                            nested_block_opened = false;
+
+                            // Push nested block name.
+                            // This "substitutes" nested block body with block's name.
+                            block_tokens.push_back(nested_block_tokens.at(1));
+
+                            nested_block_tokens.clear();
+                            continue;
+                        }
+
+                        if (block_opened) {
+                            for (const auto& btoken : block_tokens) {
+                                tokens.push_back(btoken);
+                            }
+                            block_opened = false;
+                            block_tokens.clear();
+                            continue;
+                        }
+                    }
+                }
+
+                return tokens;
+            }
+
             vector<Token> unwrap_lines(vector<Token> input_tokens, bool full) {
                 // FIXME: this function need refactoring
                 decltype(input_tokens) unwrapped_tokens;
@@ -1024,6 +1079,16 @@ namespace viua {
                  * incorrect, or illegal.
                  */
                 tokens = replace_defaults(tokens);
+
+                /*
+                 * Move inlined blocks out of their functions.
+                 * This makes life easier for functions at later processing stages as they do not have to deal with
+                 * nested blocks.
+                 *
+                 * Still, this must be run after iota expansion because nested blocks should share iotas with their
+                 * functions.
+                 */
+                tokens = move_inline_blocks_out(tokens);
 
                 /*
                  * Unroll instruction wrapped in '()' and '[]'.
