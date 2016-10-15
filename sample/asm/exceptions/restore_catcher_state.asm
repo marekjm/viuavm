@@ -17,13 +17,7 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.block: handle_integer
-    ; pull caught object into 2 register
-    pull 2
-    print 2
-    print 4
-    leave
-.end
+
 
 .function: tertiary/1
     arg 3 0
@@ -44,25 +38,27 @@
     return
 .end
 
-.block: main_block
-    istore 1 42
-    istore 4 100
-
-    frame ^[(param 0 1)] 5
-    call secondary/1
-
-    istore 2 41
-    istore 4 125
-    leave
-.end
-
-
 .function: main/1
     istore 4 50
 
     try
-    catch "Integer" handle_integer
-    enter main_block
+    catch "Integer" .block: handle_integer
+        ; pull caught object into 2 register
+        print (pull 2)
+        print 4
+        leave
+    .end
+    enter .block: main_block
+        istore 4 100
+
+        frame ^[(param 0 (istore 1 42))] 5
+        call secondary/1
+
+        istore 2 41
+        istore 4 125
+        leave
+    .end
+
     ; leave instructions lead here
     print 2
     print 4

@@ -17,21 +17,17 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.block: exception_handler
-    echo (strstore 1 "exception encountered: ")
-    print (pull 2)
-    leave
-.end
-
-.block: print_block
-    print 1
-    leave
-.end
-
 .function: main/1
     try
-    catch "Exception" exception_handler
-    enter print_block
+    catch "Exception" .block: exception_handler
+        echo (strstore 1 "exception encountered: ")
+        print (pull 2)
+        leave
+    .end
+    enter .block: print_block
+        print 1
+        leave
+    .end
 
     izero 0
     return
