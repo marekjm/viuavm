@@ -67,6 +67,12 @@ Some features also supported by the VM:
 - copy-free function returns
 - inter-function tail calls
 
+For enhanced reliability, Viua assembler provides a built-in static analyser that is able to detect most common errors related to
+register manipulation at compile time.
+It provides traced errors whenever possible, i.e. when SA detects an error and is able to trace execution path that would trigger it,
+a sequence of instructions (with source code locations) leading to the detected error is presented to the user instead of a single offending
+instruction.
+
 
 Current limitations include:
 
