@@ -128,9 +128,42 @@ static void check_use_of_register(const vector<viua::cg::lex::Token>& tokens, lo
     check_use_of_register(tokens, i, registers, named_registers, "use of empty register");
 }
 
-static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, Registers& registers, const map<string, vector<viua::cg::lex::Token>>& block_bodies, const bool debug) {
-    map<string, string> named_registers;
-    for (decltype(body_tokens.size()) i = 0; i < body_tokens.size(); ++i) {
+static auto in_block_offset(const vector<viua::cg::lex::Token>& body_tokens, std::remove_reference<decltype(body_tokens)>::type::size_type i) -> decltype(i) {
+    const auto& checked_token = body_tokens.at(i);
+
+    if (checked_token.str().at(0) == '+') {
+        auto n = stoul(checked_token.str().substr(1));
+        while (n--) {
+            i = skip_till_next_line(body_tokens, i);
+        }
+    } else if (checked_token.str().at(0) == '-') {
+        // FIXME: no support for negative jumps
+        // not safe - if SA only jumps forwards it *will* finish analysis
+        // but jumping backwards can create endless loops
+        i = skip_till_next_line(body_tokens, i);
+    } else if (checked_token.str().at(0) == '.') {
+        // FIXME: no support for absolute jumps
+        // not certain - maybe support for absolute jumps should be removed since
+        // they cannot be easily checked by the SA; neither in this check, nor in
+        // any other one - they are just ignored
+        i = skip_till_next_line(body_tokens, i);
+    } else if (str::isnum(checked_token)) {
+        // FIXME: no support for non-relative jumps
+        i = skip_till_next_line(body_tokens, i);
+    } else {
+        while (i < body_tokens.size()-1 and not (body_tokens.at(i) == ".mark:" and body_tokens.at(i+1) == checked_token.str())) {
+            i = skip_till_next_line(body_tokens, i);
+        }
+    }
+
+    return i;
+}
+
+static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, decltype(body_tokens.size()), Registers&, const map<string, vector<viua::cg::lex::Token>>&, const bool);
+static void check_block_body(const vector<viua::cg::lex::Token>&, Registers&, const map<string, vector<viua::cg::lex::Token>>&, const bool);
+
+static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, decltype(body_tokens.size()) i, Registers& registers, map<string, string> named_registers, const map<string, vector<viua::cg::lex::Token>>& block_bodies, const bool debug) {
+    for (; i < body_tokens.size(); ++i) {
         auto token = body_tokens.at(i);
         if (token == "\n") {
             continue;
@@ -160,7 +193,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, Re
             continue;
         }
         if (token == "enter") {
-            check_block_body(block_bodies.at(body_tokens.at(i+1)), registers, block_bodies, debug);
+            check_block_body(block_bodies.at(body_tokens.at(i+1)), 0, registers, block_bodies, debug);
             i = skip_till_next_line(body_tokens, i);
             continue;
         }
@@ -224,8 +257,23 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, Re
             registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), i+1);
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "if") {
-            check_use_of_register(body_tokens, i+1, registers, named_registers, "branch depends on empty register");
-            i = skip_till_next_line(body_tokens, i);
+            check_use_of_register(body_tokens, ++i, registers, named_registers, "branch depends on empty register");
+            try {
+                check_block_body(body_tokens, in_block_offset(body_tokens, i+1), registers, named_registers, block_bodies, debug);
+            } catch (const viua::cg::lex::InvalidSyntax& e) {
+                throw viua::cg::lex::TracedSyntaxError().append(e).append(viua::cg::lex::InvalidSyntax(body_tokens.at(i+1), "after taking true branch:"));
+            } catch (viua::cg::lex::TracedSyntaxError& e) {
+                throw e.append(viua::cg::lex::InvalidSyntax(body_tokens.at(i+1), "after taking true branch:"));
+            }
+            try {
+                check_block_body(body_tokens, in_block_offset(body_tokens, i+2), registers, named_registers, block_bodies, debug);
+            } catch (const viua::cg::lex::InvalidSyntax& e) {
+                throw viua::cg::lex::TracedSyntaxError().append(e).append(viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), "after taking false branch:"));
+            } catch (viua::cg::lex::TracedSyntaxError& e) {
+                throw e.append(viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), "after taking false branch:"));
+            }
+            // early return because we already checked both true, and false branches
+            return;
         } else if (token == "echo" or token == "print" or token == "not") {
             check_use_of_register(body_tokens, i+1, registers, named_registers, (token.str() + " of empty register"));
             i = skip_till_next_line(body_tokens, i);
@@ -316,6 +364,14 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, Re
         }
     }
 }
+static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, decltype(body_tokens.size()) i, Registers& registers, const map<string, vector<viua::cg::lex::Token>>& block_bodies, const bool debug) {
+    map<string, string> named_registers;
+    check_block_body(body_tokens, i, registers, named_registers, block_bodies, debug);
+}
+static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, Registers& registers, const map<string, vector<viua::cg::lex::Token>>& block_bodies, const bool debug) {
+    check_block_body(body_tokens, 0, registers, block_bodies, debug);
+}
+
 void assembler::verify::manipulationOfDefinedRegisters(const std::vector<viua::cg::lex::Token>& tokens, const map<string, vector<viua::cg::lex::Token>>& block_bodies, const bool debug) {
     string opened_function;
 
