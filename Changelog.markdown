@@ -71,6 +71,14 @@ There are several categories of change:
   to provide full-fledged nesting support, and should be used when a block is not reused acros functions and is relatively simple;
   nested blocks do not share register names with their enclosing function, but they *do* share iotas
 
+One limitation of static analyser (SA) introduced in this release is its inability to handle backwards jumps.
+This, however, is not a problem if the code does not use loops and
+instead employ recursion using `tailcall` instruction - SA is able to verify forward jumps without problems, and
+using recursion as a method for "looping" would eliminate the need for backward jumps.
+If the SA throws false positives `--no-sa` flag can be used.
+Problematic code sections should be moved to a separate compilation unit so code that is consumable by SA can still
+be checked.
+
 
 ----
 
