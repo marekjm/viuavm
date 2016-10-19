@@ -333,6 +333,14 @@ def runTestFailsToAssemble(self, name, expected_output, asm_opts=()):
     self.assertEqual(1, exit_code)
     self.assertEqual(output.strip().splitlines()[0], expected_output)
 
+def runTestFailsToAssembleDetailed(self, name, expected_output, asm_opts=()):
+    assembly_path = os.path.join(self.PATH, name)
+    compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
+    output, error, exit_code = assemble(assembly_path, compiled_path, okcodes=(0, 1), opts=asm_opts)
+    self.assertEqual(1, exit_code)
+    lines = map(lambda l: l[len(assembly_path)+1:], filter(lambda l: l.startswith(assembly_path), output.strip().splitlines()))
+    self.assertEqual(list(lines), expected_output)
+
 
 def sameLines(self, excode, output, no_of_lines):
     lines = output.splitlines()
@@ -1140,6 +1148,56 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
 
     def testUselessBranchMixedMarkerOffsetForward(self):
         runTestFailsToAssemble(self, 'useless_branch_mixed_marker_offset_forward.asm', "./sample/asm/static_analysis_errors/useless_branch_mixed_marker_offset_forward.asm:21:5: error: useless branch: both targets point to the same instruction")
+
+    def testEmptyRegisterAccessAfterTakingBranchOffsetTrue(self):
+        runTestFailsToAssembleDetailed(self, 'sa_taking_true_branch_forward_offset.asm', [
+            '27:11: error: print of empty register: value := 1',
+            '24:5: error: erased by:',
+            '23:10: error: after taking true branch:',
+            '20:12: error: in function main/0',
+        ])
+
+    def testEmptyRegisterAccessAfterTakingBranchOffsetFalse(self):
+        runTestFailsToAssembleDetailed(self, 'sa_taking_false_branch_forward_offset.asm', [
+            '27:11: error: print of empty register: value := 1',
+            '25:5: error: erased by:',
+            '23:13: error: after taking false branch:',
+            '20:12: error: in function main/0',
+        ])
+
+    def testEmptyRegisterAccessAfterTakingBranchMarkerTrue(self):
+        runTestFailsToAssembleDetailed(self, 'sa_taking_true_branch_forward_marker.asm', [
+            '27:11: error: print of empty register: value := 1',
+            '24:5: error: erased by:',
+            '23:10: error: after taking true branch:',
+            '20:12: error: in function main/0',
+        ])
+
+    def testEmptyRegisterAccessAfterTakingBranchMarkerFalse(self):
+        runTestFailsToAssembleDetailed(self, 'sa_taking_false_branch_forward_marker.asm', [
+            '27:11: error: print of empty register: value := 1',
+            '25:5: error: erased by:',
+            '23:13: error: after taking false branch:',
+            '20:12: error: in function main/0',
+        ])
+
+    def testUseOfEmptyFirstOperandInIadd(self):
+        runTestFailsToAssembleDetailed(self, 'use_of_empty_first_operand_in_iadd.asm', [
+            '24:30: error: use of empty register: first := 1',
+            '20:12: error: in function main/0',
+        ])
+
+    def testUseOfEmptySecondOperandInIadd(self):
+        runTestFailsToAssembleDetailed(self, 'use_of_empty_second_operand_in_iadd.asm', [
+            '24:36: error: use of empty register: second := 2',
+            '20:12: error: in function main/0',
+        ])
+
+    def testUseOfEmptyOperandInIinc(self):
+        runTestFailsToAssembleDetailed(self, 'use_of_empty_operand_in_iinc.asm', [
+            '22:10: error: use of empty register: value := 1',
+            '20:12: error: in function main/0',
+        ])
 
 
 class AssemblerErrorTests(unittest.TestCase):
