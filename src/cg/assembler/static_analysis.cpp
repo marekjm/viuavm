@@ -403,7 +403,13 @@ void assembler::verify::manipulationOfDefinedRegisters(const std::vector<viua::c
                 cout << "running analysis of '" << opened_function << "' (" << body.size() << " tokens)\n";
             }
             Registers registers;
-            check_block_body(body, registers, block_bodies, debug);
+            try {
+                check_block_body(body, registers, block_bodies, debug);
+            } catch (const viua::cg::lex::InvalidSyntax& e) {
+                throw viua::cg::lex::TracedSyntaxError().append(e).append(viua::cg::lex::InvalidSyntax(tokens.at(i-body.size()-2), ("in function " + opened_function)));
+            } catch (viua::cg::lex::TracedSyntaxError& e) {
+                throw e.append(viua::cg::lex::InvalidSyntax(tokens.at(i-body.size()-2), ("in function " + opened_function)));
+            }
             body.clear();
             opened_function = "";
             i = skip_till_next_line(tokens, i);
