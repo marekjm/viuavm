@@ -18,6 +18,7 @@
 ;
 
 .function: counter/1
+    ; FIXME static analyser does not handle swicthes between registers sets well
     ; switch to static register set
     ress static
 
@@ -39,6 +40,7 @@
     jump report
 
     .mark: increase
+    ; FIXME static analyser does not handle swicthes between registers sets well
     iinc 1
 
     ; the copy is required because TMPRI moves objects instead
