@@ -53,7 +53,8 @@ There are several categories of change:
   examples: wait 100 milliseconds - `receive 1 100ms`, wait 1 second - `receive 1 1s`, wait indefinitely - `receive 1 infinity`;
   after a timeout expires the VM raises an exception in the process that issued a timeout
 - enhancement: timeouts for `join` instruction; work the same as for `receive` instruction
-- misc: error messages from assembler are colorised
+- misc: error messages from assembler are colorised (colorisation is controlled using `VIUAVM_ASM_COLOUR` environment variable;
+  value values are: `default` - colorise only when stdout is a terminal, `never`, and `always`)
 - enhancement: assembler checks `.name:` directives and detects when a name is reused in a single block
 - enhancement: `istore` instruction has `0` as a default second operand (i.e. `istore 1` is assembled as `istore 1 0`)
 - enhancement: `fstore` instruction has `0.0` as a default second operand (i.e. `fstore 1` is assembled as `fstore 1 0`)
