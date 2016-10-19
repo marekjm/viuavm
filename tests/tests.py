@@ -621,7 +621,8 @@ class SampleProgramsTests(unittest.TestCase):
     def testIterativeFibonacciNumbers(self):
         """45. Fibonacci number calculated iteratively.
         """
-        runTest(self, 'iterfib.asm', 1134903170, 0, lambda o: int(o.strip()))
+        # FIXME: SA needs basic support for static register set
+        runTest(self, 'iterfib.asm', 1134903170, 0, lambda o: int(o.strip()), assembly_opts=('--no-sa',))
 
 
 class FunctionTests(unittest.TestCase):
@@ -654,7 +655,8 @@ class FunctionTests(unittest.TestCase):
         runTest(self, 'return_by_reference.asm', 42, 0, lambda o: int(o.strip()), assembly_opts=('--no-sa',))
 
     def testStaticRegisters(self):
-        runTestReturnsIntegers(self, 'static_registers.asm', [i for i in range(0, 10)])
+        # FIXME: SA needs basic support for static register set
+        runTestReturnsIntegers(self, 'static_registers.asm', [i for i in range(0, 10)], assembly_opts=('--no-sa',))
 
     def testCallWithPassByMove(self):
         runTest(self, 'pass_by_move.asm', None, custom_assert=partiallyAppliedSameLines(3))
@@ -1438,7 +1440,8 @@ class MiscExceptionTests(unittest.TestCase):
             'Hello World from process 3',
             'Hello World from process 0',
         ]
-        runTest(self, 'terminating_processes.asm', sorted(expected_output), output_processing_function=lambda _: sorted(filter(lambda _: (_.startswith('Hello') or _.startswith('uncaught')), _.strip().splitlines())))
+        # FIXME: SA needs basic support for static register set
+        runTest(self, 'terminating_processes.asm', sorted(expected_output), output_processing_function=lambda _: sorted(filter(lambda _: (_.startswith('Hello') or _.startswith('uncaught')), _.strip().splitlines())), assembly_opts=('--no-sa',))
 
     def testClosureFromGlobalResgisterSet(self):
         # FIXME: passing custom assembler options will not be needed once .closure: support is completely implemented

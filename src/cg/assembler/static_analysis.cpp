@@ -124,14 +124,28 @@ static void check_use_of_register(const vector<viua::cg::lex::Token>& tokens, lo
     check_use_of_register(tokens, i, registers, named_registers, "use of empty register");
 }
 
-static auto in_block_offset(const vector<viua::cg::lex::Token>& body_tokens, std::remove_reference<decltype(body_tokens)>::type::size_type i) -> decltype(i) {
+static auto in_block_offset(const vector<viua::cg::lex::Token>& body_tokens, std::remove_reference<decltype(body_tokens)>::type::size_type i, Registers& registers, map<string, string>& named_registers) -> decltype(i) {
     const auto& checked_token = body_tokens.at(i);
 
     if (checked_token.str().at(0) == '+') {
         auto n = stoul(checked_token.str().substr(1));
         while (n--) {
             i = skip_till_next_line(body_tokens, i);
+            ++i;
+            if (str::startswith(body_tokens.at(i), ".")) {
+                ++n;
+            }
+            if (body_tokens.at(i) == ".name:") {
+                if (named_registers.count(body_tokens.at(i+2))) {
+                    throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), ("register name already taken: " + str::strencode(body_tokens.at(i+2))));
+                }
+                if (registers.defined(body_tokens.at(i+1))) {
+                    throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+1), ("register defined before being named: " + str::strencode(body_tokens.at(i+1)) + " = " + str::strencode(body_tokens.at(i+2))));
+                }
+                named_registers[body_tokens.at(i+2)] = body_tokens.at(i+1);
+            }
         }
+        --i;
     } else if (checked_token.str().at(0) == '-') {
         // FIXME: no support for negative jumps
         // not safe - if SA only jumps forwards it *will* finish analysis
@@ -149,6 +163,16 @@ static auto in_block_offset(const vector<viua::cg::lex::Token>& body_tokens, std
     } else {
         while (i < body_tokens.size()-1 and not (body_tokens.at(i) == ".mark:" and body_tokens.at(i+1) == checked_token.str())) {
             i = skip_till_next_line(body_tokens, i);
+            ++i;
+            if (i < body_tokens.size()-1 and body_tokens.at(i) == ".name:") {
+                if (named_registers.count(body_tokens.at(i+2))) {
+                    throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), ("register name already taken: " + str::strencode(body_tokens.at(i+2))));
+                }
+                if (registers.defined(body_tokens.at(i+1))) {
+                    throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+1), ("register defined before being named: " + str::strencode(body_tokens.at(i+1)) + " = " + str::strencode(body_tokens.at(i+2))));
+                }
+                named_registers[body_tokens.at(i+2)] = body_tokens.at(i+1);
+            }
         }
     }
 
@@ -255,14 +279,18 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
         } else if (token == "if") {
             check_use_of_register(body_tokens, ++i, registers, named_registers, "branch depends on empty register");
             try {
-                check_block_body(body_tokens, in_block_offset(body_tokens, i+1), registers, named_registers, block_bodies, debug);
+                auto copied_registers = registers;
+                auto copied_named_registers = named_registers;
+                check_block_body(body_tokens, in_block_offset(body_tokens, i+1, copied_registers, copied_named_registers), copied_registers, copied_named_registers, block_bodies, debug);
             } catch (const viua::cg::lex::InvalidSyntax& e) {
                 throw viua::cg::lex::TracedSyntaxError().append(e).append(viua::cg::lex::InvalidSyntax(body_tokens.at(i+1), "after taking true branch:"));
             } catch (viua::cg::lex::TracedSyntaxError& e) {
                 throw e.append(viua::cg::lex::InvalidSyntax(body_tokens.at(i+1), "after taking true branch:"));
             }
             try {
-                check_block_body(body_tokens, in_block_offset(body_tokens, i+2), registers, named_registers, block_bodies, debug);
+                auto copied_registers = registers;
+                auto copied_named_registers = named_registers;
+                check_block_body(body_tokens, in_block_offset(body_tokens, i+2, copied_registers, copied_named_registers), copied_registers, copied_named_registers, block_bodies, debug);
             } catch (const viua::cg::lex::InvalidSyntax& e) {
                 throw viua::cg::lex::TracedSyntaxError().append(e).append(viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), "after taking false branch:"));
             } catch (viua::cg::lex::TracedSyntaxError& e) {
