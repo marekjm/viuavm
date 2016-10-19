@@ -43,19 +43,15 @@ class Registers {
 
     public:
     bool defined(const string& r) {
-        //cout << "defined(r = " << r << ")\n";
         return (defined_registers.count(r) == 1);
     }
     void insert(string r, long unsigned where) {
-        //cout << "insert(r = " << r << ", where = " << where << ")\n";
         defined_registers.emplace(r, where);
     }
     void erase(const string& r) {
-        //cout << "erase(r = " << r << ")\n";
         defined_registers.erase(defined_registers.find(r));
     }
     void erase(const string& r, const Token& token) {
-        //cout << "erase(r = " << r << ")\n";
         erased_registers.emplace(r, token);
         defined_registers.erase(defined_registers.find(r));
     }
