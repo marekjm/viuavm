@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdlib.h>
 #include <unistd.h>
 #include <iostream>
 #include <fstream>
@@ -51,7 +52,21 @@ bool SCREAM = false;
 
 string send_control_seq(const string& mode) {
     static auto is_terminal = isatty(1);
-    if (is_terminal) {
+    static string env_color_flag { getenv("VIUAVM_ASM_COLOUR") };
+
+    bool colorise = is_terminal;
+    if (env_color_flag == "default") {
+        // do nothing; the default is to colorise when printing to teminal and
+        // do not colorise otherwise
+    } else if (env_color_flag == "never") {
+        colorise = false;
+    } else if (env_color_flag == "always") {
+        colorise = true;
+    } else {
+        // unknown value, do nothing
+    }
+
+    if (colorise) {
         return mode;
     }
     return "";
