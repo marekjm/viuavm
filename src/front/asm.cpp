@@ -52,7 +52,7 @@ bool SCREAM = false;
 
 string send_control_seq(const string& mode) {
     static auto is_terminal = isatty(1);
-    static string env_color_flag { getenv("VIUAVM_ASM_COLOUR") };
+    static string env_color_flag { getenv("VIUAVM_ASM_COLOUR") ? getenv("VIUAVM_ASM_COLOUR") : "default" };
 
     bool colorise = is_terminal;
     if (env_color_flag == "default") {
