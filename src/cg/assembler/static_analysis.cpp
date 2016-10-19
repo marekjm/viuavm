@@ -343,6 +343,22 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             registers.insert(reg, i);
             check_timeout_operand(body_tokens.at(i+2));
             i = skip_till_next_line(body_tokens, i);
+        } else if (token == "iadd" or token == "isub" or token == "imul" or token == "idiv" or
+                   token == "ieq" or token == "ilt" or token == "ilte" or token == "igt" or token == "igte" or
+                   token == "fadd" or token == "fsub" or token == "fmul" or token == "fdiv" or
+                   token == "feq" or token == "flt" or token == "flte" or token == "fgt" or token == "fgte" or
+                   false
+                   ) {
+            // skip mnemonic
+            ++i;
+
+            registers.insert(resolve_register_name(named_registers, body_tokens.at(i)), i);
+            check_use_of_register(body_tokens, i+1, registers, named_registers, "use of empty register as first operand");
+            check_use_of_register(body_tokens, i+2, registers, named_registers, "use of empty register as second operand");
+        } else if (token == "iinc" or token == "idec") {
+            // skip mnemonic
+            ++i;
+            check_use_of_register(body_tokens, i, registers, named_registers, "use of empty register");
         } else {
             if (not ((token == "call" or token == "process") and body_tokens.at(i+1) == "0")) {
                 string reg_original = body_tokens.at(i+1), reg = resolve_register_name(named_registers, body_tokens.at(i+1));
