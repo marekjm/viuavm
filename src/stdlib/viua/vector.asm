@@ -138,14 +138,13 @@
 
     .name: 3 limit
     .name: 4 index
+    .name: 5 tmp
     vlen limit vector
     izero index
 
     ; do not loop on zero-length vectors
     if limit +1 end_loop
-
     .mark: begin_loop
-    .name: 5 tmp
     vpop tmp vector @index
     ; FIXME: there should be no copy operation - use pass-by-move instead
     frame ^[(param 0 tmp)]
@@ -175,14 +174,13 @@
 
     .name: 3 limit
     .name: 4 index
+    .name: 5 tmp
     vlen limit vector
     izero index
 
     ; do not loop on zero-length vectors
     if limit +1 end_loop
-
     .mark: begin_loop
-    .name: 5 tmp
     vpop tmp vector @index
     ; FIXME: there should be no copy operation - use pass-by-move instead
     frame ^[(param 0 tmp)]
