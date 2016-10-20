@@ -59,26 +59,4 @@ class Integer : public Type {
 };
 
 
-class UnsignedInteger : public Integer {
-    /** Unsigned variant of Integer type.
-     */
-    unsigned number;
-
-    public:
-        std::string type() const {
-            return "UnsignedInteger";
-        }
-        std::string str() const {
-            std::ostringstream s;
-            s << number;
-            return s.str();
-        }
-        bool boolean() const { return number != 0; }
-
-        unsigned value() { return number; }
-
-        UnsignedInteger(unsigned n = 0): number(n) {}
-};
-
-
 #endif
