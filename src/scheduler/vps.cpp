@@ -234,9 +234,25 @@ Process* viua::scheduler::VirtualProcessScheduler::spawn(unique_ptr<Frame> frame
     }
 
     Process *process_ptr = p.get();
-    attached_kernel->createMailbox(process_ptr->pid());
+    const auto total_processes = attached_kernel->createMailbox(process_ptr->pid());
+    const auto running_schedulers = attached_kernel->no_of_vp_schedulers();
 
-    if (processes.size() > heavy_load) {
+    /*
+     * Determine if this scheduler is overburdened and should post processes to kernel.
+     *
+     * The algorithm is simple: if current load is slightly more than our fair share,
+     * post spawned process to kernel and let other schedulers handle it.
+     * The "slightly more" part is there because we try to be a good scheduler and
+     * don't just push our processes to others as soon as we're a little bit tired.
+     * Also, because the processes may be short-lived and the costs of synchronisation
+     * may outweight the benefits of increased concurrency.
+     *
+     * Benchmarks proved that dealing locally with increased load for a period of time
+     * before posting processes to kernel is a better solution than posting immediately.
+     * This was measured using lots of short-lived processes in the "N bottles of beer"
+     * bechmark: 16384 bottles, 8 schedulers, on a CPU with 4 physical cores.
+     */
+    if (processes.size() > ((total_processes / running_schedulers) / 100 * 140)) {
         attached_kernel->postFreeProcess(std::move(p));
     } else {
         processes.emplace_back(std::move(p));
@@ -429,7 +445,31 @@ void viua::scheduler::VirtualProcessScheduler::operator()() {
             break;
         }
 
-        while (current_load < light_load and not free_processes->empty()) {
+        /*
+         * Determine if this scheduler should fetch processes from kernel if any
+         * are available.
+         *
+         * The algorithm is simple: if current load is less than our fair share,
+         * fetch a process.
+         * Repear until we're a good, hardworking scheduler.
+         */
+        const auto total_processes = attached_kernel->pids();
+        const auto running_schedulers = attached_kernel->no_of_vp_schedulers();
+        /*
+         * The "<=" check is *FREAKIN' IMPORTANT* because if:
+         *
+         *  - schedulers load is zero, and
+         *  - wanted load (total processes / number of schedulers) is zero
+         *
+         * VM would deadlock as current load would not be *less* than wanted, which
+         * is a prerequisite for fetching processes.
+         * Such a situation could occur if you'd run the VM with high number of
+         * schedulers, and low number of processes.
+         *
+         * *REMEMBER* about corner cases, or they will come back to bite you when
+         * you least expect it.
+         */
+        while (current_load <= (total_processes / running_schedulers) and not free_processes->empty()) {
             processes.emplace_back(std::move(free_processes->front()));
             free_processes->erase(free_processes->begin());
             ++current_load;

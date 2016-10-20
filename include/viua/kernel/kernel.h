@@ -35,6 +35,7 @@
 #include <memory>
 #include <algorithm>
 #include <stdexcept>
+#include <atomic>
 #include <mutex>
 #include <thread>
 #include <condition_variable>
@@ -105,6 +106,8 @@ class Kernel {
     std::vector<std::pair<viua::scheduler::VirtualProcessScheduler*, std::thread>> virtual_process_schedulers;
     // list of idle VP schedulers
     std::vector<viua::scheduler::VirtualProcessScheduler*> idle_virtual_process_schedulers;
+
+    std::atomic<uint64_t> running_processes { 0 };
 
     static const long unsigned default_vp_schedulers_limit = 2UL;
     long unsigned vp_schedulers_limit;
@@ -189,10 +192,11 @@ class Kernel {
 
         void postFreeProcess(std::unique_ptr<Process>);
 
-        void createMailbox(const PID);
-        void deleteMailbox(const PID);
+        uint64_t createMailbox(const PID);
+        uint64_t deleteMailbox(const PID);
         void send(const PID, std::unique_ptr<Type>);
         void receive(const PID, std::queue<std::unique_ptr<Type>>&);
+        uint64_t pids() const;
 
         auto static no_of_vp_schedulers() -> decltype(default_vp_schedulers_limit);
         auto static no_of_ffi_schedulers() -> decltype(default_ffi_schedulers_limit);

@@ -75,6 +75,9 @@ There are several categories of change:
 - bic: dropping joinable processes in frames is no longer an error; this was a common situation - spawn process A, obtain its PID, pass
   the PID to some other process and forget about process A;
   now it is not required to detach the process before dropping its PID
+- enhancement: better load balancing across VP schedulers; previous implementation was not using all available cores effectively and
+  could leave available CPU cores idle even under "heavier" loads; revised implementation ensures that load balancing kicks in earlier and
+  spreads processes across VP schedulers in a more even manner
 
 One limitation of static analyser (SA) introduced in this release is its inability to handle backwards jumps.
 This, however, is not a problem if the code does not use loops and

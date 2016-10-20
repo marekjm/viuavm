@@ -305,19 +305,21 @@ void Kernel::postFreeProcess(unique_ptr<Process> p) {
     free_virtual_processes_cv.notify_one();
 }
 
-void Kernel::createMailbox(const PID pid) {
+uint64_t Kernel::createMailbox(const PID pid) {
     unique_lock<mutex> lck(mailbox_mutex);
 #if VIUA_VM_DEBUG_LOG
     cerr << "[kernel:mailbox:create] pid = " << pid.get() << endl;
 #endif
     mailboxes.emplace(pid, vector<unique_ptr<Type>>{});
+    return ++running_processes;
 }
-void Kernel::deleteMailbox(const PID pid) {
+uint64_t Kernel::deleteMailbox(const PID pid) {
     unique_lock<mutex> lck(mailbox_mutex);
 #if VIUA_VM_DEBUG_LOG
     cerr << "[kernel:mailbox:delete] pid = " << pid.get() << ", queued messages = " << mailboxes[pid].size() << endl;
 #endif
     mailboxes.erase(pid);
+    return --running_processes;
 }
 void Kernel::send(const PID pid, unique_ptr<Type> message) {
     unique_lock<mutex> lck(mailbox_mutex);
@@ -347,6 +349,10 @@ void Kernel::receive(const PID pid, queue<unique_ptr<Type>>& message_queue) {
     cerr << "[kernel:receive:post] pid = " << pid.get() << ", queued messages = " << message_queue.size() << endl;
 #endif
     mailboxes[pid].clear();
+}
+
+uint64_t Kernel::pids() const {
+    return running_processes;
 }
 
 int Kernel::exit() const {
