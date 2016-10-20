@@ -18,17 +18,17 @@
 ;
 
 .function: run_in_a_process/0
-.name: 1 counter
-.name: 2 limit
+    .name: 1 counter
+    .name: 2 limit
     izero counter
     istore limit 32
-.mark: loop
+    .mark: loop
     if (igte 4 counter limit) endloop +1
     ; execute nops to make the process longer
     nop
     iinc counter
     jump loop
-.mark: endloop
+    .mark: endloop
 
     print (strstore 5 "Hello concurrent World!")
     return
@@ -43,19 +43,19 @@
 
     frame ^[(param 0 1)]
     print (msg 2 getPriority/1)
-.name: 3 counter
-.name: 4 limit
+    .name: 3 counter
+    .name: 4 limit
     izero counter
     ; set lower limit than for spawned process to force
     ; the priority settings take effect
     istore limit 16
-.mark: loop
+    .mark: loop
     if (igte 5 counter limit) endloop +1
     ; execute nops to make main process do something
     nop
     iinc counter
     jump loop
-.mark: endloop
+    .mark: endloop
 
     print (strstore 6 "Hello sequential World!")
 

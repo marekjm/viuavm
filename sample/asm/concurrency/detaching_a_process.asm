@@ -18,18 +18,22 @@
 ;
 
 .function: running_detached/0
-.name: 0 counter
-.name: 2 limit
-    izero counter
-    istore limit 4
-    strstore 1 "Hello World! (from long-running detached process) "
-.mark: loop
-    if (igte 3 counter limit) after_loop
-    echo 1
-    print counter
+    izero (.name: iota counter)
+    istore (.name: iota limit) 4
+    strstore (.name: iota report_text_format) "Hello World! (from long-running detached process) #{0}"
+
+    .mark: loop
+    .name: iota format_parameters
+    if (igte iota counter limit) after_loop
+
+    frame ^[(param iota report_text_format) (param iota (vec format_parameters (copy format_parameters counter) 1))]
+    print (msg iota format/)
+
     iinc counter
+
     jump loop
-.mark: after_loop
+    .mark: after_loop
+
     return
 .end
 
