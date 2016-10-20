@@ -93,8 +93,6 @@ class Program {
     Program& opfgte(int_op, int_op, int_op);
     Program& opfeq(int_op, int_op, int_op);
 
-    Program& opbstore(int_op, byte_op);
-
     Program& opitof(int_op, int_op);
     Program& opftoi(int_op, int_op);
     Program& opstoi(int_op, int_op);

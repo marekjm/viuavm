@@ -199,8 +199,6 @@ class Process {
     byte* opfgte(byte*);
     byte* opfeq(byte*);
 
-    byte* opbstore(byte*);
-
     byte* opitof(byte*);
     byte* opftoi(byte*);
     byte* opstoi(byte*);

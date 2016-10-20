@@ -264,8 +264,6 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
         program.opfgte(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
     } else if (tokens.at(i) == "feq") {
         program.opfeq(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
-    } else if (tokens.at(i) == "bstore") {
-        program.opbstore(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getbyte(resolveregister(tokens.at(i+2), names)));
     } else if (tokens.at(i) == "itof") {
         program.opitof(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
     } else if (tokens.at(i) == "ftoi") {

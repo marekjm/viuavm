@@ -373,29 +373,6 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* opbstore(byte* addr_ptr, int_op regno, byte_op b) {
-            /*  Inserts bstore instruction to bytecode.
-             *
-             *  :params:
-             *
-             *  regno - register number
-             *  b     - value to store
-             */
-            bool b_ref = false;
-            byte bt;
-
-            tie(b_ref, bt) = b;
-
-            *(addr_ptr++) = BSTORE;
-            addr_ptr = insertIntegerOperand(addr_ptr, regno);
-            *(reinterpret_cast<bool*>(addr_ptr)) = b_ref;
-            pointer::inc<bool, byte>(addr_ptr);
-            *(addr_ptr) = bt;
-            ++addr_ptr;
-
-            return addr_ptr;
-        }
-
         byte* opitof(byte* addr_ptr, int_op a, int_op b) {
             /*  Inserts itof instruction to bytecode.
              */

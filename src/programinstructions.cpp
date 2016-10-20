@@ -309,18 +309,6 @@ Program& Program::opfeq(int_op rega, int_op regb, int_op regr) {
     return (*this);
 }
 
-Program& Program::opbstore(int_op regno, byte_op b) {
-    /*  Inserts bstore instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  regno - register number
-     *  b     - value to store
-     */
-    addr_ptr = cg::bytecode::opbstore(addr_ptr, regno, b);
-    return (*this);
-}
-
 Program& Program::opitof(int_op a, int_op b) {
     /*  Inserts itof instruction to bytecode.
      */

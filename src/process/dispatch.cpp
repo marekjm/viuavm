@@ -98,9 +98,6 @@ byte* Process::dispatch(byte* addr) {
         case FEQ:
             addr = opfeq(addr+1);
             break;
-        case BSTORE:
-            addr = opbstore(addr+1);
-            break;
         case ITOF:
             addr = opitof(addr+1);
             break;

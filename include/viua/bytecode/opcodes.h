@@ -54,18 +54,6 @@ enum OPCODE : byte {
     FGTE,
     FEQ,
 
-    // byte instructions
-    BSTORE,
-    BADD,
-    BSUB,
-    BINC,
-    BDEC,
-    BLT,
-    BLTE,
-    BGT,
-    BGTE,
-    BEQ,
-
     // numeric conversion instructions
     ITOF,   // convert integer to float
     FTOI,   // convert float to integer

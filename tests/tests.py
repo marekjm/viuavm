@@ -460,15 +460,6 @@ class FloatInstructionsTests(unittest.TestCase):
         runTest(self, 'in_condition.asm', 'true', 0)
 
 
-class ByteInstructionsTests(unittest.TestCase):
-    """Tests for byte instructions.
-    """
-    PATH = './sample/asm/byte'
-
-    def testHelloWorld(self):
-        runTest(self, 'helloworld.asm', 'Hello World!', 0)
-
-
 class StringInstructionsTests(unittest.TestCase):
     """Tests for string instructions.
     """

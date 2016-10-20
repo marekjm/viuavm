@@ -129,8 +129,6 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case IZERO:
         case IINC:
         case IDEC:
-        case BINC:
-        case BDEC:
         case PRINT:
         case ECHO:
         case BOOL:
@@ -193,13 +191,6 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case FGT:
         case FGTE:
         case FEQ:
-        case BADD:
-        case BSUB:
-        case BLT:
-        case BLTE:
-        case BGT:
-        case BGTE:
-        case BEQ:
         case STREQ:
         case AND:
         case OR:
@@ -258,15 +249,6 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
 
             oss << " ";
             oss << *reinterpret_cast<float*>(ptr);
-            break;
-        case BSTORE:
-            oss << " " << intop(ptr);
-            pointer::inc<bool, byte>(ptr);
-            pointer::inc<int, byte>(ptr);
-
-            oss << " ";
-            pointer::inc<bool, byte>(ptr);
-            oss << int(*ptr);
             break;
         case RESS:
             oss << " ";
