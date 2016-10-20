@@ -181,13 +181,6 @@ void Process::dropFrame() {
     unique_ptr<Frame> frame(std::move(frames.back()));
     frames.pop_back();
 
-    for (registerset_size_type i = 0; i < frame->regset->size(); ++i) {
-        if (ProcessType* t = dynamic_cast<ProcessType*>(frame->regset->at(i))) {
-            if (t->joinable()) {
-                throw new Exception("joinable process in dropped frame");
-            }
-        }
-    }
     for (registerset_size_type i = 0; i < frame->args->size(); ++i) {
         if (frame->args->at(i) != nullptr and frame->args->isflagged(i, MOVED)) {
             throw new Exception("unused pass-by-move parameter");

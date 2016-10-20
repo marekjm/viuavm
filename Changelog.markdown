@@ -72,6 +72,9 @@ There are several categories of change:
   to provide full-fledged nesting support, and should be used when a block is not reused acros functions and is relatively simple;
   nested blocks do not share register names with their enclosing function, but they *do* share iotas
 - bic: removed byte instructions, they will be superseded with fixed-size 8-bit integer instructions
+- bic: dropping joinable processes in frames is no longer an error; this was a common situation - spawn process A, obtain its PID, pass
+  the PID to some other process and forget about process A;
+  now it is not required to detach the process before dropping its PID
 
 One limitation of static analyser (SA) introduced in this release is its inability to handle backwards jumps.
 This, however, is not a problem if the code does not use loops and
