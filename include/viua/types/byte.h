@@ -59,26 +59,4 @@ class Byte : public Type {
 };
 
 
-class UnsignedByte : public Byte {
-    /** Unsigned variant of Byte type.
-     */
-    unsigned char ubyte_;
-
-    public:
-        std::string type() const {
-            return "UnsignedByte";
-        }
-        std::string str() const {
-            std::ostringstream s;
-            s << ubyte_;
-            return s.str();
-        }
-        bool boolean() const { return ubyte_ != 0; }
-
-        unsigned char& value() { return ubyte_; }
-
-        UnsignedByte(unsigned char b = 0): ubyte_(b) {}
-};
-
-
 #endif
