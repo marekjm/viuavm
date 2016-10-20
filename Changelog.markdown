@@ -71,6 +71,7 @@ There are several categories of change:
 - feature: basic support for nested blocks in functions; blocks can be nested one level deep, this feature is thought of as a shortcut, not
   to provide full-fledged nesting support, and should be used when a block is not reused acros functions and is relatively simple;
   nested blocks do not share register names with their enclosing function, but they *do* share iotas
+- bic: removed byte instructions, they will be superseded with fixed-size 8-bit integer instructions
 
 One limitation of static analyser (SA) introduced in this release is its inability to handle backwards jumps.
 This, however, is not a problem if the code does not use loops and
