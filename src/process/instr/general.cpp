@@ -34,8 +34,9 @@ byte* Process::opecho(byte* addr) {
 }
 
 byte* Process::opprint(byte* addr) {
-    addr = opecho(addr);
-    cout << '\n';
+    unsigned source = 0;
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    cout << fetch(source)->str() + '\n';
     return addr;
 }
 
