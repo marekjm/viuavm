@@ -20,7 +20,6 @@
 #include <utility>
 #include <viua/bytecode/operand_types.h>
 #include <viua/types/type.h>
-#include <viua/types/byte.h>
 #include <viua/types/integer.h>
 #include <viua/process.h>
 #include <viua/exceptions.h>
@@ -80,10 +79,6 @@ auto viua::bytecode::decoder::operands::fetch_register_index(byte *ip, Process *
         register_index = static_cast<unsigned>(i->as_integer());
     }
     return tuple<byte*, unsigned>(ip, register_index);
-}
-
-auto viua::bytecode::decoder::operands::fetch_primitive_char(byte *ip, Process *process) -> tuple<byte*, char> {
-    return fetch_primitive_value<char, Byte>(ip, process, 0);
 }
 
 auto viua::bytecode::decoder::operands::fetch_primitive_uint(byte *ip, Process *process) -> tuple<byte*, unsigned> {

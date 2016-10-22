@@ -22,7 +22,6 @@
 #include <sstream>
 #include <viua/types/type.h>
 #include <viua/types/integer.h>
-#include <viua/types/byte.h>
 #include <viua/types/exception.h>
 #include <viua/types/reference.h>
 #include <viua/kernel/registerset.h>

@@ -30,7 +30,6 @@
 #include <viua/bytecode/maps.h>
 #include <viua/types/type.h>
 #include <viua/types/integer.h>
-#include <viua/types/byte.h>
 #include <viua/types/string.h>
 #include <viua/types/vector.h>
 #include <viua/types/exception.h>

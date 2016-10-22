@@ -22,7 +22,6 @@
 #include <viua/types/type.h>
 #include <viua/types/integer.h>
 #include <viua/types/boolean.h>
-#include <viua/types/byte.h>
 #include <viua/types/boolean.h>
 #include <viua/kernel/kernel.h>
 using namespace std;
