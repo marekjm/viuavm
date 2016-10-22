@@ -34,6 +34,7 @@ Acceptable memory leak is at most 0 bytes.
 Memory leak tests may be disabled for some runs as they are slow.
 """
 
+import datetime
 import functools
 import json
 import os
@@ -253,7 +254,7 @@ def runMemoryLeakCheck(self, compiled_path, check_memory_leaks):
         MEMORY_LEAK_CHECKS_RUN += 1
         valgrindCheck(self, compiled_path)
 
-def runTest(self, name, expected_output=None, expected_exit_code = 0, output_processing_function = None, check_memory_leaks = True, custom_assert=None, assembly_opts=None, valgrind_enable=True):
+def runTestBackend(self, name, expected_output=None, expected_exit_code = 0, output_processing_function = None, check_memory_leaks = True, custom_assert=None, assembly_opts=None, valgrind_enable=True):
     if assembly_opts is None:
         assembly_opts = ()
     if expected_output is None and custom_assert is None:
@@ -290,6 +291,17 @@ def runTest(self, name, expected_output=None, expected_exit_code = 0, output_pro
         else:
             self.assertEqual(got_output, (dis_output.strip() if output_processing_function is None else output_processing_function(dis_output)))
             self.assertEqual(excode, dis_excode)
+
+measured_run_times = []
+def runTest(self, name, expected_output=None, expected_exit_code = 0, output_processing_function = None, check_memory_leaks = True, custom_assert=None, assembly_opts=None, valgrind_enable=True):
+    begin = datetime.datetime.now()
+    try:
+        runTestBackend(self, name, expected_output, expected_exit_code, output_processing_function, check_memory_leaks, custom_assert, assembly_opts, valgrind_enable)
+    finally:
+        end = datetime.datetime.now()
+        delta = (end - begin)
+        print('timed = {}'.format(delta))
+        measured_run_times.append(delta)
 
 def runTestCustomAsserts(self, name, assertions_callback, check_memory_leaks = True):
     assembly_path = os.path.join(self.PATH, name)
@@ -1865,7 +1877,9 @@ if __name__ == '__main__':
         # we're running on ARM 64 and
         # Valgrind acts funny (i.e. showing leaks from itself)
         MEMORY_LEAK_CHECKS_ALLOWED_LEAK_VALUES += (74351, 74343)
-    if not unittest.main(exit=False).result.wasSuccessful():
+    successful = unittest.main(exit=False).result.wasSuccessful()
+    print('average run time for test: {}'.format(sum(measured_run_times, datetime.timedelta()) / len(measured_run_times)))
+    if not successful:
         exit(1)
     if MEMORY_LEAK_CHECKS_ENABLE:
         print('note: {0} memory leak check{2} ({1} check{3} skipped)'.format(MEMORY_LEAK_CHECKS_RUN, MEMORY_LEAK_CHECKS_SKIPPED, ('' if MEMORY_LEAK_CHECKS_RUN == 1 else 's'), ('' if MEMORY_LEAK_CHECKS_SKIPPED == 1 else 's')))
