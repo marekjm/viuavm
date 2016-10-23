@@ -41,6 +41,8 @@ class Object: public Type {
         virtual std::string type() const;
         virtual bool boolean() const;
 
+        virtual std::string str() const override;
+
         virtual std::vector<std::string> bases() const {
             return std::vector<std::string>{"Type"};
         }

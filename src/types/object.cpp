@@ -33,6 +33,19 @@ bool Object::boolean() const {
     return true;
 }
 
+string Object::str() const {
+    ostringstream oss;
+
+    oss << type_name << '#';
+    oss << '{';
+    for (const auto& each : attributes) {
+        oss << each.first << ": " << each.second->str() << ", ";
+    }
+    oss << '}';
+
+    return oss.str();
+}
+
 Type* Object::copy() const {
     Object* cp = new Object(type_name);
     for (const auto& each : attributes) {

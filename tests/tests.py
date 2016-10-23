@@ -922,22 +922,22 @@ class PrototypeSystemTests(unittest.TestCase):
     PATH = './sample/asm/prototype'
 
     def testSimplePrototypeRegistrationAndInstantation(self):
-        runTest(self, 'simple.asm', ["<'Prototype' object at", "<'Custom' object at"], 0, lambda o: [' '.join(i.split()[:-1]) for i in o.splitlines()])
+        runTestSplitlines(self, 'simple.asm', ["Prototype for Custom", "Custom#{}"])
 
     def testExceptionThrownOnUnknownTypeInstantation(self):
         runTest(self, 'unregistered_type_instantation.asm', "cannot create new instance of unregistered type: Nonexistent")
 
     def testCatchingDerivedTypesWithBaseClassHandlers(self):
-        runTest(self, 'derived_class_catching.asm', "<'Derived' object at", 0, lambda o: ' '.join(o.split()[:-1]))
+        runTest(self, 'derived_class_catching.asm', "Derived#{}")
 
     def testCatchingDeeplyDerivedTypesWithBaseClassHandlers(self):
-        runTest(self, 'deeply_derived_class_catching.asm', "<'DeeplyDerived' object at", 0, lambda o: ' '.join(o.split()[:-1]))
+        runTest(self, 'deeply_derived_class_catching.asm', "DeeplyDerived#{}")
 
     def testCatchingObjectsUsingMultipleInheritanceWithNoSharedBases(self):
-        runTest(self, 'multiple_inheritance_with_no_shared_base_classes.asm', "<'Combined' object at", 0, lambda o: ' '.join(o.split()[:-1]))
+        runTest(self, 'multiple_inheritance_with_no_shared_base_classes.asm', "Combined#{}")
 
     def testCatchingObjectsUsingMultipleInheritanceWithSharedBases(self):
-        runTest(self, 'shared_bases.asm', "<'Combined' object at", 0, lambda o: ' '.join(o.split()[:-1]))
+        runTest(self, 'shared_bases.asm', "Combined#{}")
 
     def testDynamicDispatch(self):
         global MEMORY_LEAK_CHECKS_EXTRA_ALLOWED_LEAK_VALUES

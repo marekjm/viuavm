@@ -30,6 +30,10 @@ bool Prototype::boolean() const {
     return true;
 }
 
+string Prototype::str() const {
+    return ("Prototype for " + type_name);
+}
+
 Type* Prototype::copy() const {
     Prototype* cp = new Prototype(type_name);
     return cp;

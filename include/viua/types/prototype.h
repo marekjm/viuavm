@@ -38,8 +38,10 @@ class Prototype: public Type {
     std::vector<std::string> attributes;
 
     public:
-        virtual std::string type() const;
-        virtual bool boolean() const;
+        virtual std::string type() const override;
+        virtual bool boolean() const override;
+
+        virtual std::string str() const override;
 
         std::string getTypeName() const;
         std::vector<std::string> getAncestors() const;
