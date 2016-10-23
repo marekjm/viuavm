@@ -35,6 +35,9 @@ bool Object::boolean() const {
 
 Type* Object::copy() const {
     Object* cp = new Object(type_name);
+    for (const auto& each : attributes) {
+        cp->set(each.first, each.second->copy());
+    }
     return cp;
 }
 
