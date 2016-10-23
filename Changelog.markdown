@@ -78,6 +78,8 @@ There are several categories of change:
 - enhancement: better load balancing across VP schedulers; previous implementation was not using all available cores effectively and
   could leave available CPU cores idle even under "heavier" loads; revised implementation ensures that load balancing kicks in earlier and
   spreads processes across VP schedulers in a more even manner
+- fix: `copy` instruction correctly copies objects
+- enhancement: better stringification for objects
 
 One limitation of static analyser (SA) introduced in this release is its inability to handle backwards jumps.
 This, however, is not a problem if the code does not use loops and
