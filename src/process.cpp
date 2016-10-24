@@ -576,7 +576,7 @@ bool Process::empty() const {
     return message_queue.empty();
 }
 
-void Process::bind_to(viua::scheduler::VirtualProcessScheduler *sch) {
+void Process::migrate_to(viua::scheduler::VirtualProcessScheduler *sch) {
     scheduler = sch;
 }
 

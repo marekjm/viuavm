@@ -313,7 +313,7 @@ class Process {
         void raiseException(Type*);
         void handleActiveException();
 
-        void bind_to(viua::scheduler::VirtualProcessScheduler*);
+        void migrate_to(viua::scheduler::VirtualProcessScheduler*);
 
         void popFrame();
         std::unique_ptr<Type> getReturnValue();
