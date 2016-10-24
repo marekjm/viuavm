@@ -48,7 +48,6 @@ namespace viua {
             std::condition_variable *free_processes_cv;
 
             Process *main_process;
-            bool retained_process { false };
             std::vector<std::unique_ptr<Process>> processes;
             decltype(processes)::size_type current_process_index;
 
