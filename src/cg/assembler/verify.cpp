@@ -241,10 +241,16 @@ void assembler::verify::frameBalance(const vector<Token>& tokens) {
             throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("call with '" + instruction + "' without a frame"));
         }
         if (balance > 1) {
-            throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("excess frame spawned (unused frame spawned at line " + str::stringify(previous_frame_spawned.line()+1, false) + ")"));
+            throw viua::cg::lex::TracedSyntaxError()
+                .append(viua::cg::lex::InvalidSyntax(tokens.at(i), "excess frame spawned"))
+                .append(viua::cg::lex::InvalidSyntax(previous_frame_spawned, "unused frame:"))
+                ;
         }
         if ((instruction == "return"  or instruction == "leave" or instruction == "throw" or instruction == ".end") and balance > 0) {
-            throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("leftover frame (spawned at line " + str::stringify(previous_frame_spawned.line()+1, false) + ")"));
+            throw viua::cg::lex::TracedSyntaxError()
+                .append(viua::cg::lex::InvalidSyntax(tokens.at(i), "leftover frame:"))
+                .append(viua::cg::lex::InvalidSyntax(previous_frame_spawned, "spawned here:"))
+                ;
         }
 
         if (instruction == "frame") {
