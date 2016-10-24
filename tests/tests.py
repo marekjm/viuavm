@@ -1894,6 +1894,7 @@ if __name__ == '__main__':
         MEMORY_LEAK_CHECKS_ALLOWED_LEAK_VALUES += (74351, 74343)
     successful = unittest.main(exit=False).result.wasSuccessful()
     print('average run time for test: {}'.format(sum(measured_run_times, datetime.timedelta()) / len(measured_run_times)))
+    print('summed run time for test: {}'.format(sum(measured_run_times, datetime.timedelta())))
     if not successful:
         exit(1)
     if MEMORY_LEAK_CHECKS_ENABLE:
