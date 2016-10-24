@@ -384,7 +384,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
 #if VIUA_VM_DEBUG_LOG
             viua_err( "[sched:vps:died] pid = ", th->pid().get());
 #endif
-            if (not watchdog_process) {
+            if (not th->watchdogged()) {
                 if (th == main_process) {
                     exit_code = 1;
                 }
@@ -409,8 +409,14 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                 cerr << (errss.str() + '\n');
 
                 printStackTrace(th);
+
+                attached_kernel->deleteMailbox(th->pid());
+                // push broken process to dead processes_list list to
+                // erase it later
+                viua_err( "[scheduler:vps] process ", processes.at(i).get(), ": marked as dead");
+                dead_processes_list.emplace_back(std::move(processes.at(i)));
             } else {
-                Object* death_message = new Object("Object");
+                unique_ptr<Object> death_message(new Object("Object"));
                 unique_ptr<Type> exc(th->transferActiveException());
                 Vector *parameters = new Vector();
                 RegisterSet *top_args = th->trace()[0]->args;
@@ -429,10 +435,17 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                 death_message->set("exception", exc.release());
                 death_message->set("parameters", parameters);
 
-            attached_kernel->deleteMailbox(th->pid());
-            // push broken process to dead processes_list list to
-            // erase it later
-            dead_processes_list.emplace_back(std::move(processes.at(i)));
+                unique_ptr<Frame> death_frame(new Frame(nullptr, 1));
+                death_frame->args->set(0, death_message.release());
+                viua_err( "[scheduler:vps:", this, ":watchdogging] process ", th, ':', th->starting_function(), ": died, becomes ", th->watchdog());
+                viua_err( "[scheduler:vps:", this, ":watchdogging] process ", th, ": joinable = ", th->joinable());
+                viua_err( "[scheduler:vps:", this, ":watchdogging] process ", th, ": stopped = ", th->stopped());
+                viua_err( "[scheduler:vps:", this, ":watchdogging] process ", th, ": terminated = ", th->terminated());
+                viua_err( "[scheduler:vps:", this, ":watchdogging] process ", th, ": suspended = ", th->suspended());
+                th->become(th->watchdog(), std::move(death_frame));
+                running_processes_list.emplace_back(std::move(processes.at(i)));
+                ticked = true;
+            }
 
             continue;
         }
