@@ -80,6 +80,14 @@ There are several categories of change:
   spreads processes across VP schedulers in a more even manner
 - fix: `copy` instruction correctly copies objects
 - enhancement: better stringification for objects
+- bic, enhancement: watchdog is set per-process instead of per-scheduler;
+  upon failure, crashed processes *become* their watchdog processes - their stack is unwound, exception state is reset to clear, and
+  they start executing the function set as theit watchdog;
+  this is a performance and safety optimisation - processes and failures are more isolated, and if restarting a process takes a long time this
+  time is taken only from crashed process, not from all other processes on the same scheduler
+- fix: processes are bound to new schedulers upon migration; before this fix, if a scheduler was shut down, and then one of the processes it spawned (A)
+  spawned a new process (B) after being migrated to another scheduler, the newly spawned process (B) was never executed because it was spawned in a
+  shut down scheduler
 
 One limitation of static analyser (SA) introduced in this release is its inability to handle backwards jumps.
 This, however, is not a problem if the code does not use loops and
@@ -88,6 +96,12 @@ using recursion as a method for "looping" would eliminate the need for backward 
 If the SA throws false positives `--no-sa` flag can be used.
 Problematic code sections should be moved to a separate compilation unit so code that is consumable by SA can still
 be checked.
+
+Static analyser displays *traces* for some errors, e.g. frame balance errors, and errors caused by branching and jumps.
+These traces are displayed as step-by-step explanations of how the SA reached the error, complete with line and character numbers, and
+context lines.
+When the SA is not able to provide a trace (e.g. reaching an error takes only one step, or SA does not have enough information) a
+single-step message is provided.
 
 
 ----
