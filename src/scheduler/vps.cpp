@@ -287,32 +287,6 @@ Process* viua::scheduler::VirtualProcessScheduler::spawn(unique_ptr<Frame> frame
     return process_ptr;
 }
 
-void viua::scheduler::VirtualProcessScheduler::spawnWatchdog(unique_ptr<Frame> frame) {
-    if (watchdog_process) {
-        throw new Exception("watchdog process already spawned");
-    }
-    watchdog_function = frame->function_name;
-    watchdog_process.reset(new Process(std::move(frame), this, nullptr));
-#if VIUA_VM_DEBUG_LOG
-    viua_err( "[sched:vps:watchdog:spawn] pid = ", watchdog_process->pid().get());
-#endif
-    watchdog_process->hidden(true);
-    watchdog_process->begin();
-}
-
-void viua::scheduler::VirtualProcessScheduler::resurrectWatchdog() {
-    auto active_exception = watchdog_process->getActiveException();
-    if (active_exception) {
-        cout << "watchdog process terminated by: " << active_exception->type() << ": '" << active_exception->str() << "'" << endl;
-    }
-
-    watchdog_process.reset(nullptr);
-
-    unique_ptr<Frame> frm(new Frame(nullptr, 0, 64));
-    frm->function_name = watchdog_function;
-    spawnWatchdog(std::move(frm));
-}
-
 void viua::scheduler::VirtualProcessScheduler::send(const PID pid, unique_ptr<Type> message) {
 #if VIUA_VM_DEBUG_LOG
     viua_err( "[sched:vps:send] pid = ", pid.get());
@@ -471,13 +445,6 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
     processes.erase(processes.begin(), processes.end());
     processes.swap(running_processes_list);
 
-    while (watchdog_process and not watchdog_process->suspended() and not watchdog_process->empty()) {
-        executeQuant(watchdog_process.get(), 0);
-        if (watchdog_process->terminated() or watchdog_process->stopped()) {
-            resurrectWatchdog();
-        }
-    }
-
     bool continue_running = (ticked or retained_process);
     if (continue_running and retained_process) {
         viua_err("[scheduler:vps:", this, "] continue running after retaining one or more processes");
@@ -577,7 +544,6 @@ viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(Kernel *akerne
     free_processes_cv(fp_cv),
     main_process(nullptr),
     current_process_index(0),
-    watchdog_process(nullptr),
     exit_code(0),
     current_load(0),
     shut_down(false)
@@ -596,9 +562,6 @@ viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(VirtualProcess
     processes = std::move(that.processes);
     current_process_index = that.current_process_index;
     that.current_process_index = 0;
-
-    watchdog_function = that.watchdog_function;
-    watchdog_process = std::move(that.watchdog_process);
 
     exit_code = that.exit_code;
     shut_down.store(that.shut_down.load());

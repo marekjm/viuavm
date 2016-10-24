@@ -52,12 +52,7 @@ namespace viua {
             std::vector<std::unique_ptr<Process>> processes;
             decltype(processes)::size_type current_process_index;
 
-            std::string watchdog_function;
-            std::unique_ptr<Process> watchdog_process;
-
             int exit_code;
-
-            void resurrectWatchdog();
 
             // if scheduler hits heavy load it starts posting processes to Kernel
             // to let other schedulers at them
@@ -100,7 +95,6 @@ namespace viua {
             Process* process(decltype(processes)::size_type);
             Process* process();
             Process* spawn(std::unique_ptr<Frame>, Process*, bool);
-            void spawnWatchdog(std::unique_ptr<Frame>);
 
             void send(const PID, std::unique_ptr<Type>);
             void receive(const PID, std::queue<std::unique_ptr<Type>>&);
