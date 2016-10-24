@@ -516,6 +516,7 @@ void viua::scheduler::VirtualProcessScheduler::operator()() {
         while (current_load <= (total_processes / running_schedulers) and not free_processes->empty()) {
             processes.emplace_back(std::move(free_processes->front()));
             free_processes->erase(free_processes->begin());
+            processes.back()->bind_to(this);
             viua_err("[scheduler:vps:", this, ":process-grab] grabbed process ", processes.back().get(), ':', processes.back()->starting_function());
             ++current_load;
         }
