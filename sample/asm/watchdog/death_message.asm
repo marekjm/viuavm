@@ -17,10 +17,8 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: watchdog_process/0
-    .mark: __begin
-    .name: 1 death_message
-    receive death_message
+.function: watchdog_process/1
+    arg (.name: 1 death_message) 0
 
     .name: 2 exception
     remove exception 1 (strstore exception "exception")
@@ -33,8 +31,6 @@
     echo (strstore 4 "' killed by >>>")
     echo exception
     print (strstore 4 "<<<")
-
-    jump __begin
 
     return
 .end
@@ -97,8 +93,7 @@
 .function: main/1
     link std::misc
 
-    frame 0
-    watchdog watchdog_process/0
+    watchdog watchdog_process/1
 
     frame 0
     process 0 a_detached_concurrent_process/0

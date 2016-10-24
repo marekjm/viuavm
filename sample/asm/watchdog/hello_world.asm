@@ -17,9 +17,10 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: watchdog_process/0
-    .mark: watchdog_start
-    receive 1
+.function: watchdog_process/1
+    arg 1 0
+
+    ;print 1
 
     remove 4 1 (strstore 3 "function")
 
@@ -27,12 +28,12 @@
     echo 4
     print (strstore 5 "> died")
 
-    jump watchdog_start
-
     return
 .end
 
 .function: broken_process/0
+    watchdog watchdog_process/1
+
     nop
     nop
     nop
@@ -71,8 +72,8 @@
 .end
 
 .function: main/1
-    frame 0
-    watchdog watchdog_process/0
+    ;frame 0
+    ;watchdog watchdog_process/0
 
     frame 0
     process 0 broken_process/0

@@ -19,7 +19,7 @@
 
 .function: watchdog_process/0
     .mark: watchdog_start
-    throw (remove 4 (receive 1) (strstore 3 "function"))
+    throw (remove 4 (arg 1 0) (strstore 3 "function"))
 
     ;frame ^[(param 0 (ptr 2 1)) (param 1 (strstore 3 "function"))]
     ;msg 4 get
@@ -34,6 +34,8 @@
 .end
 
 .function: broken_process/0
+    watchdog watchdog_process/0
+
     nop
     nop
     nop
@@ -72,9 +74,6 @@
 .end
 
 .function: main/1
-    frame 0
-    watchdog watchdog_process/0
-
     frame 0
     process 0 broken_process/0
 

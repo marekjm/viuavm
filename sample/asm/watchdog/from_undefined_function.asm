@@ -56,7 +56,6 @@
 .end
 
 .function: main/1
-    frame 0
     watchdog undefined_function/0
 
     frame 0

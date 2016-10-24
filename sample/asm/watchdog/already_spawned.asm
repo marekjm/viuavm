@@ -17,17 +17,20 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: watchdog_process/0
-    .mark: watchdog_start
-    receive 1
+.function: watchdog_process/1
+    arg (.name: 1 death_message) 0
 
-    remove 4 1 (strstore 3 "function")
+    .name: 2 exception
+    remove exception 1 (strstore exception "exception")
 
-    echo (strstore 5 "process spawned with <")
-    echo 4
-    print (strstore 5 "> died")
+    .name: 3 aborted_function
+    remove aborted_function 1 (strstore aborted_function "function")
 
-    jump watchdog_start
+    echo (strstore 4 "process spawned with <")
+    echo aborted_function
+    echo (strstore 4 "> killed by >>>")
+    echo exception
+    print (strstore 4 "<<<")
 
     return
 .end
@@ -71,11 +74,9 @@
 .end
 
 .function: main/1
-    frame 0
-    watchdog watchdog_process/0
+    watchdog watchdog_process/1
 
-    frame 0
-    watchdog watchdog_process/0
+    watchdog watchdog_process/1
 
     frame 0
     process 0 broken_process/0

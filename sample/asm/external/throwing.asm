@@ -30,20 +30,16 @@
 .end
 
 .function: watchdog_process/0
-    .mark: start_watching
-    .name: 1 death_message
-    receive death_message
+    arg (.name: 1 death_message) 0
 
     .name: 3 exception
     remove exception death_message (strstore exception "exception")
     print exception
 
-    jump start_watching
     return
 .end
 
 .function: main/1
-    frame 0
     watchdog watchdog_process/0
 
     import "build/test/throwing"
