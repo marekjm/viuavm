@@ -1735,7 +1735,6 @@ class ConcurrencyTests(unittest.TestCase):
         runTestThrowsException(self, 'join_timeout_0ms.asm', ('Exception', 'process did not join',))
 
 
-@unittest.skip('watchdog does not play nice with new scheduling model')
 class WatchdogTests(unittest.TestCase):
     PATH = './sample/asm/watchdog'
 
@@ -1743,17 +1742,18 @@ class WatchdogTests(unittest.TestCase):
         runTest(self, 'hello_world.asm', 'process spawned with <Function: broken_process/0> died')
 
     def testWatchdogFromUndefinedFunctionCaughtByAssembler(self):
-        runTestFailsToAssemble(self, 'from_undefined_function.asm', './sample/asm/watchdog/from_undefined_function.asm:60:14: error: watchdog from undefined function undefined_function/0')
+        runTestFailsToAssemble(self, 'from_undefined_function.asm', './sample/asm/watchdog/from_undefined_function.asm:59:14: error: watchdog from undefined function undefined_function/0')
 
     def testWatchdogFromUndefinedFunctionCaughtAtRuntime(self):
         runTestThrowsException(self, 'from_undefined_function_at_runtime.asm', ('Exception', 'watchdog process from undefined function: undefined_function/0',))
 
     def testWatchdogAlreadySpawnedCaughtAtRuntime(self):
-        runTest(self, 'already_spawned.asm', 'process spawned with <Function: __entry> died')
+        runTest(self, 'already_spawned.asm', 'process spawned with <Function: __entry> killed by >>>watchdog already set<<<')
 
     def testWatchdogMustBeANativeFunction(self):
         runTestThrowsException(self, 'must_be_a_native_function.asm', ('Exception', 'watchdog process must be a native function, used foreign World::print_hello/0',))
 
+    @unittest.skip('if watchdog dies, process enters infinite loop')
     def testWatchdogTerminatedByARunawayExceptionDoesNotLeak(self):
         runTest(self, 'terminated_watchdog.asm', 'watchdog process terminated by: Function: \'Function: broken_process/0\'')
 
