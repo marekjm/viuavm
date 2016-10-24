@@ -516,6 +516,29 @@ unique_ptr<Type> Process::getReturnValue() {
     return std::move(return_value);
 }
 
+bool Process::watchdogged() const {
+    return (not watchdog_function.empty());
+}
+string Process::watchdog() const {
+    return watchdog_function;
+}
+byte* Process::become(const string& function_name, std::unique_ptr<Frame> frame_to_use) {
+    if (not scheduler->isNativeFunction(function_name)) {
+        throw new Exception("process from undefined function: " + function_name);
+    }
+
+    frames.clear();
+    thrown.reset(nullptr);
+    caught.reset(nullptr);
+    finished = false;
+
+    frame_to_use->function_name = function_name;
+    frame_new = std::move(frame_to_use);
+
+    pushFrame();
+
+    return (instruction_pointer = adjustJumpBaseFor(function_name));
+}
 
 byte* Process::begin() {
     if (not scheduler->isNativeFunction(frames[0]->function_name)) {
@@ -553,6 +576,9 @@ bool Process::empty() const {
     return message_queue.empty();
 }
 
+void Process::bind_to(viua::scheduler::VirtualProcessScheduler *sch) {
+    scheduler = sch;
+}
 
 Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualProcessScheduler *sch, Process* pt): scheduler(sch), parent_process(pt), entry_function(frm->function_name),
     regset(nullptr), uregset(nullptr), tmp(nullptr),

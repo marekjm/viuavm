@@ -80,6 +80,9 @@ class Process {
     Process* parent_process;
     const std::string entry_function;
 
+    std::string watchdog_function { "" };
+    bool watchdog_failed { false };
+
     // Global register set
     std::unique_ptr<RegisterSet> regset;
 
@@ -310,8 +313,14 @@ class Process {
         void raiseException(Type*);
         void handleActiveException();
 
+        void bind_to(viua::scheduler::VirtualProcessScheduler*);
+
         void popFrame();
         std::unique_ptr<Type> getReturnValue();
+
+        bool watchdogged() const;
+        std::string watchdog() const;
+        byte* become(const std::string&, std::unique_ptr<Frame>);
 
         byte* begin();
         uint64_t counter() const;

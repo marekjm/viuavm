@@ -175,8 +175,11 @@ byte* Process::opwatchdog(byte* addr) {
         throw new Exception("watchdog process must be a native function, used foreign " + call_name);
     }
 
-    frame_new->function_name = call_name;
-    scheduler->spawnWatchdog(std::move(frame_new));
+    if (not watchdog_function.empty()) {
+        throw new Exception("watchdog already set");
+    }
+
+    watchdog_function = call_name;
 
     return addr;
 }
