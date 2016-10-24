@@ -113,7 +113,6 @@ class Process {
      */
     std::unique_ptr<Type> return_value; // return value of top-most frame on the stack
 
-    // FIXME: change unsigned to uint64_t
     uint64_t instruction_counter;
     byte* instruction_pointer;
 
