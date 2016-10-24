@@ -72,7 +72,8 @@ void assembler::verify::functionCallsAreDefined(const vector<Token>& tokens, con
 void assembler::verify::functionCallArities(const vector<Token>& tokens) {
     int frame_parameters_count = 0;
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
-        if (not (tokens.at(i) == "call" or tokens.at(i) == "process" or tokens.at(i) == "watchdog" or tokens.at(i) == "frame")) {
+        // watchdog function should be unary
+        if (not (tokens.at(i) == "call" or tokens.at(i) == "process" /*or tokens.at(i) == "watchdog"*/ or tokens.at(i) == "frame")) {
             continue;
         }
 
@@ -224,12 +225,12 @@ void assembler::verify::frameBalance(const vector<Token>& tokens) {
     Token previous_frame_spawned;
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
         instruction = tokens.at(i);
-        if (not (instruction == "call" or instruction == "tailcall" or instruction == "process" or instruction == "watchdog" or instruction == "fcall" or instruction == "frame" or instruction == "msg" or
+        if (not (instruction == "call" or instruction == "tailcall" or instruction == "process" or instruction == "fcall" or instruction == "frame" or instruction == "msg" or
                  instruction == "return" or instruction == "leave" or instruction == "throw" or instruction == ".end")) {
             continue;
         }
 
-        if (instruction == "call" or instruction == "tailcall" or instruction == "process" or instruction == "fcall" or instruction == "msg" or instruction == "watchdog") {
+        if (instruction == "call" or instruction == "tailcall" or instruction == "process" or instruction == "fcall" or instruction == "msg") {
             --balance;
         }
         if (instruction == "frame") {
@@ -457,7 +458,7 @@ void assembler::verify::framesHaveNoGaps(const vector<Token>& tokens) {
     vector<unsigned long> pass_lines;
 
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
-        if (not (tokens.at(i) == "call" or tokens.at(i) == "process" or tokens.at(i) == "watchdog" or tokens.at(i) == "frame" or tokens.at(i) == "param" or tokens.at(i) == "pamv")) {
+        if (not (tokens.at(i) == "call" or tokens.at(i) == "process" or tokens.at(i) == "frame" or tokens.at(i) == "param" or tokens.at(i) == "pamv")) {
             continue;
         }
 
@@ -502,7 +503,7 @@ void assembler::verify::framesHaveNoGaps(const vector<Token>& tokens) {
             continue;
         }
 
-        if (tokens.at(i) == "call" or tokens.at(i) == "process" or tokens.at(i) == "watchdog") {
+        if (tokens.at(i) == "call" or tokens.at(i) == "process") {
             for (decltype(frame_parameters_count) f = 0; f < frame_parameters_count; ++f) {
                 if (not filled_slots[f]) {
                     ostringstream report;
