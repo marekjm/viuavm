@@ -352,6 +352,9 @@ int main(int argc, char* argv[]) {
     } catch (const viua::cg::lex::InvalidSyntax& e) {
         display_error_in_context(raw_tokens, e, filename);
         return 1;
+    } catch (const viua::cg::lex::TracedSyntaxError& e) {
+        display_error_in_context(raw_tokens, e, filename);
+        return 1;
     }
 
     invocables_t functions;
@@ -362,13 +365,20 @@ int main(int argc, char* argv[]) {
     } catch (const viua::cg::lex::InvalidSyntax& e) {
         display_error_in_context(raw_tokens, e, filename);
         return 1;
+    } catch (const viua::cg::lex::TracedSyntaxError& e) {
+        display_error_in_context(raw_tokens, e, filename);
+        return 1;
     }
+
     invocables_t blocks;
     try {
         if (gatherBlocks(&blocks, cooked_tokens)) {
             return 1;
         }
     } catch (const viua::cg::lex::InvalidSyntax& e) {
+        display_error_in_context(raw_tokens, e, filename);
+        return 1;
+    } catch (const viua::cg::lex::TracedSyntaxError& e) {
         display_error_in_context(raw_tokens, e, filename);
         return 1;
     }
