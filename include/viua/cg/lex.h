@@ -11,15 +11,19 @@ namespace viua {
     namespace cg {
         namespace lex {
             class Token {
-                std::string content;
+                std::string content, original_content;
                 decltype(content.size()) line_number, character_in_line;
 
                 public:
 
                 auto line() const -> decltype(line_number);
                 auto character() const -> decltype(character_in_line);
+
                 auto str() const -> decltype(content);
                 auto str(std::string) -> void;
+
+                auto original() const -> decltype(original_content);
+                auto original(std::string) -> void;
 
                 auto ends() const -> decltype(character_in_line);
 

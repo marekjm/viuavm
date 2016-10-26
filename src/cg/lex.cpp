@@ -12,11 +12,19 @@ namespace viua {
             auto Token::character() const -> decltype(character_in_line) {
                 return character_in_line;
             }
+
             auto Token::str() const -> decltype(content) {
                 return content;
             }
             auto Token::str(string s) -> void {
                 content = s;
+            }
+
+            auto Token::original() const -> decltype(original_content) {
+                return original_content;
+            }
+            auto Token::original(string s) -> void {
+                original_content = s;
             }
 
             auto Token::ends() const -> decltype(character_in_line) {
@@ -34,7 +42,7 @@ namespace viua {
                 return str();
             }
 
-            Token::Token(decltype(line_number) line_, decltype(character_in_line) character_, string content_): content(content_), line_number(line_), character_in_line(character_) {
+            Token::Token(decltype(line_number) line_, decltype(character_in_line) character_, string content_): content(content_), original_content(content), line_number(line_), character_in_line(character_) {
             }
 
             const char* InvalidSyntax::what() const {
@@ -50,7 +58,7 @@ namespace viua {
 
             InvalidSyntax::InvalidSyntax(long unsigned ln, long unsigned ch, string ct): line_number(ln), character_in_line(ch), content(ct) {
             }
-            InvalidSyntax::InvalidSyntax(Token t, string m): line_number(t.line()), character_in_line(t.character()), content(t.str()), message(m) {
+            InvalidSyntax::InvalidSyntax(Token t, string m): line_number(t.line()), character_in_line(t.character()), content(t.original()), message(m) {
             }
 
             const char* TracedSyntaxError::what() const {
@@ -942,6 +950,7 @@ namespace viua {
 
                     if (token == "iota") {
                         tokens.emplace_back(token.line(), token.character(), str::stringify(iotas.back()++, false));
+                        tokens.back().original("iota");
                     } else {
                         tokens.push_back(token);
                     }

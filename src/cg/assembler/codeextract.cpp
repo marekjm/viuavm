@@ -34,7 +34,7 @@ using Token = viua::cg::lex::Token;
 
 
 static void assert_is_not_reserved_keyword(Token token, const string& message) {
-    string s = token;
+    string s = token.original();
     static const set<string> reserved_keywords {
         /*
          * Used for timeouts in 'join' and 'receive' instructions
