@@ -202,7 +202,7 @@ vector<string> assembler::ce::getlinks(const vector<viua::cg::lex::Token>& token
     return links;
 }
 
-static vector<string> get_instruction_block_names(const vector<Token>& tokens, string directive) {
+static vector<string> get_instruction_block_names(const vector<Token>& tokens, string directive, void predicate(Token) = [](Token){}) {
     vector<string> names;
 
     const auto limit = tokens.size();
@@ -211,6 +211,7 @@ static vector<string> get_instruction_block_names(const vector<Token>& tokens, s
         if (tokens[i].str() == looking_for) {
             ++i;
             if (i < limit) {
+                predicate(tokens.at(i));
                 names.emplace_back(tokens.at(i).str());
             } else {
                 throw tokens[i-1];
@@ -221,20 +222,28 @@ static vector<string> get_instruction_block_names(const vector<Token>& tokens, s
     return names;
 }
 vector<string> assembler::ce::getFunctionNames(const vector<Token>& tokens) {
-    auto names = get_instruction_block_names(tokens, "function");
+    auto names = get_instruction_block_names(tokens, "function", [](Token t) {
+        assert_is_not_reserved_keyword(t, "function name");
+    });
     for (const auto& each : get_instruction_block_names(tokens, "closure")) {
         names.push_back(each);
     }
     return names;
 }
 vector<string> assembler::ce::getSignatures(const vector<Token>& tokens) {
-    return get_instruction_block_names(tokens, "signature");
+    return get_instruction_block_names(tokens, "signature", [](Token t) {
+        assert_is_not_reserved_keyword(t, "function name");
+    });
 }
 vector<string> assembler::ce::getBlockNames(const vector<Token>& tokens) {
-    return get_instruction_block_names(tokens, "block");
+    return get_instruction_block_names(tokens, "block", [](Token t) {
+        assert_is_not_reserved_keyword(t, "block name");
+    });
 }
 vector<string> assembler::ce::getBlockSignatures(const vector<Token>& tokens) {
-    return get_instruction_block_names(tokens, "bsignature");
+    return get_instruction_block_names(tokens, "bsignature", [](Token t) {
+        assert_is_not_reserved_keyword(t, "block name");
+    });
 }
 
 
