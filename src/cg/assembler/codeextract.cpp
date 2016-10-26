@@ -204,18 +204,27 @@ vector<string> assembler::ce::getlinks(const vector<viua::cg::lex::Token>& token
 
 static vector<string> get_instruction_block_names(const vector<Token>& tokens, string directive, void predicate(Token) = [](Token){}) {
     vector<string> names;
+    map<string, Token> defined_where;
 
     const auto limit = tokens.size();
     string looking_for = ("." + directive + ":");
     for (decltype(tokens.size()) i = 0; i < limit; ++i) {
         if (tokens[i].str() == looking_for) {
             ++i;
-            if (i < limit) {
-                predicate(tokens.at(i));
-                names.emplace_back(tokens.at(i).str());
-            } else {
+            if (i >= limit) {
                 throw tokens[i-1];
             }
+
+            predicate(tokens.at(i));
+            if (defined_where.count(tokens.at(i)) > 0) {
+                throw viua::cg::lex::TracedSyntaxError()
+                    .append(viua::cg::lex::InvalidSyntax(tokens.at(i), ("duplicated name: " + tokens.at(i).str())))
+                    .append(viua::cg::lex::InvalidSyntax(defined_where.at(tokens.at(i)), "already defined here:"))
+                    ;
+            }
+
+            names.emplace_back(tokens.at(i).str());
+            defined_where.emplace(tokens.at(i), tokens.at(i));
         }
     }
 

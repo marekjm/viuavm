@@ -1443,6 +1443,12 @@ class AssemblerErrorTests(unittest.TestCase):
     def testReservedWordAsBlockName(self):
         runTestFailsToAssemble(self, 'reserved_word_as_block_name.asm', "./sample/asm/errors/reserved_word_as_block_name.asm:20:9: error: invalid block name: 'iota' is a registered keyword")
 
+    def testDuplicatedFunctionNames(self):
+        runTestFailsToAssembleDetailed(self, 'duplicated_function_names.asm', [
+            "24:12: error: duplicated name: foo/0",
+            "20:12: error: already defined here:",
+        ])
+
 
 class KeywordIotaTests(unittest.TestCase):
     """Tests for `iota` keyword.
