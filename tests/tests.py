@@ -1579,6 +1579,9 @@ class MiscTests(unittest.TestCase):
         ]
         self.assertEqual(sorted(expected_output), sorted(output.strip().splitlines()))
 
+    def testMangledNestedBlockNames(self):
+        runTest(self, 'mangled_nested_block_names.asm', '')
+
 
 class ExternalModulesTests(unittest.TestCase):
     """Tests for C/C++ module importing, and calling external functions.

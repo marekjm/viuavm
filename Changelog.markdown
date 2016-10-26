@@ -71,6 +71,7 @@ There are several categories of change:
 - feature: basic support for nested blocks in functions; blocks can be nested one level deep, this feature is thought of as a shortcut, not
   to provide full-fledged nesting support, and should be used when a block is not reused acros functions and is relatively simple;
   nested blocks do not share register names with their enclosing function, but they *do* share iotas
+  nested blocks names **are mangled** when unwrapped
 - bic: removed byte instructions, they will be superseded with fixed-size 8-bit integer instructions
 - bic: dropping joinable processes in frames is no longer an error; this was a common situation - spawn process A, obtain its PID, pass
   the PID to some other process and forget about process A;

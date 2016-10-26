@@ -675,21 +675,34 @@ namespace viua {
             vector<Token> move_inline_blocks_out(vector<Token> input_tokens) {
                 decltype(input_tokens) tokens;
                 decltype(tokens) block_tokens, nested_block_tokens;
+                string opened_inside;
 
                 bool block_opened = false;
                 bool nested_block_opened = false;
 
-                for (const auto& token : input_tokens) {
+                for (decltype(input_tokens)::size_type i = 0; i < input_tokens.size(); ++i) {
+                    const auto& token = input_tokens.at(i);
+
                     if (token == ".block:" or token == ".function:" or token == ".closure:") {
                         if (block_opened and token == ".block:") {
                             nested_block_opened = true;
+                        }
+                        if (not nested_block_opened) {
+                            opened_inside = input_tokens.at(i+1);
                         }
                         block_opened = true;
                     }
 
                     if (block_opened) {
                         if (nested_block_opened) {
-                            nested_block_tokens.push_back(token);
+                            if (nested_block_tokens.size() == 1) {
+                                // name is pushed here
+                                // must be mangled because we want to allow many functions to have a nested 'foo' block
+                                nested_block_tokens.emplace_back(token.line(), token.character(), (opened_inside + "__nested__" + token.str()));
+                                nested_block_tokens.back().original(token);
+                            } else {
+                                nested_block_tokens.push_back(token);
+                            }
                         } else {
                             block_tokens.push_back(token);
                         }
