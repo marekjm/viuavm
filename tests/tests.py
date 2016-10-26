@@ -1440,6 +1440,9 @@ class AssemblerErrorTests(unittest.TestCase):
     def testInvalidRegisterIndexInNameDirective(self):
         runTestFailsToAssemble(self, 'empty_link_directive.asm', "./sample/asm/errors/empty_link_directive.asm:21:11: error: missing module name in link directive")
 
+    def testReservedWordAsBlockName(self):
+        runTestFailsToAssemble(self, 'reserved_word_as_block_name.asm', "./sample/asm/errors/reserved_word_as_block_name.asm:20:9: error: invalid block name: 'iota' is a registered keyword")
+
 
 class KeywordIotaTests(unittest.TestCase):
     """Tests for `iota` keyword.
