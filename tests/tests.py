@@ -1449,6 +1449,12 @@ class AssemblerErrorTests(unittest.TestCase):
             "20:12: error: already defined here:",
         ])
 
+    def testDuplicatedBlockAndFunctionName(self):
+        runTestFailsToAssembleDetailed(self, 'duplicated_block_and_function_name.asm', [
+            "24:9: error: duplicated name: foo/0",
+            "20:12: error: already defined here:",
+        ])
+
 
 class KeywordIotaTests(unittest.TestCase):
     """Tests for `iota` keyword.

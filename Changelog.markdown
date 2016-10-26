@@ -88,7 +88,7 @@ There are several categories of change:
 - fix: processes are bound to new schedulers upon migration; before this fix, if a scheduler was shut down, and then one of the processes it spawned (A)
   spawned a new process (B) after being migrated to another scheduler, the newly spawned process (B) was never executed because it was spawned in a
   shut down scheduler
-- fix: duplicated names are not allowed in a single source file; blocks and functions *can* have the same name
+- fix: duplicated names are not allowed in a single source file
 
 One limitation of static analyser (SA) introduced in this release is its inability to handle backwards jumps.
 This, however, is not a problem if the code does not use loops and

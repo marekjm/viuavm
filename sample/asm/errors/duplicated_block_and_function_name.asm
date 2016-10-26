@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016 Marek Marecki
+;   Copyright (C) 2016 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -17,19 +17,15 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-; This module contains various string utility functions.
-; It is a part of standard Viua runtime library.
-
-.function: std::string::stringify/1
-    frame ^[(param 0 (ptr 2 (strstore 1 ""))) (param 1 (arg 3 0))]
-    msg 0 stringify/2
-    move 0 1
+.function: foo/0
     return
 .end
 
-.function: std::string::represent/1
-    frame ^[(param 0 (ptr 2 (strstore 1 ""))) (param 1 (arg 3 0))]
-    msg 0 represent/2
-    move 0 1
+.block: foo/0
+    leave
+.end
+
+.function: main/0
+    izero 0
     return
 .end
