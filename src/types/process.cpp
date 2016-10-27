@@ -93,46 +93,6 @@ void ProcessType::detach(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*) 
 }
 
 
-void ProcessType::suspend(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*) {
-    thrd->suspend();
-}
-void ProcessType::wakeup(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*) {
-    thrd->wakeup();
-}
-void ProcessType::suspended(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
-    frame->regset->set(0, new Boolean(thrd->suspended()));
-}
-
-
-void ProcessType::getPriority(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
-    // FIXME: cast to silence compiler warning about implicit conversion changing signedness of the int
-    // the cast is not *truly* safe, because unsigned can store positive numbers signed int cannot
-    frame->regset->set(0, new Integer(static_cast<int>(thrd->priority())));
-}
-
-void ProcessType::setPriority(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
-    if (frame->args->at(0) == nullptr) {
-        throw new Exception("expected Process as first parameter but got nothing");
-    }
-    if (frame->args->at(1) == nullptr) {
-        throw new Exception("expected Integer as first parameter but got nothing");
-    }
-    if (frame->args->at(0)->type() != "Process") {
-        throw new Exception("expected Process as first parameter but got " + frame->args->at(0)->type());
-    }
-    if (frame->args->at(1)->type() != "Integer") {
-        throw new Exception("expected Integer as first parameter but got " + frame->args->at(0)->type());
-    }
-
-    int new_priority = static_cast<Integer*>(frame->args->at(1))->value();
-    if (new_priority < 1) {
-        throw new Exception("process priority must be a positive integer, got: " + frame->args->at(1)->str());
-    }
-    // FIXME: cast to silence compiler warning about implicit conversion changing signedness of the int
-    // the cast is safe because the integer is guaranteed to be positive
-    thrd->priority(static_cast<unsigned>(new_priority));
-}
-
 PID ProcessType::pid() const {
     return thrd->pid();
 }

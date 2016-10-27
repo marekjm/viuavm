@@ -41,26 +41,38 @@ class ProcessType : public Type {
     Process* thrd;
 
     public:
+        /*
+         * For use by the VM and user code.
+         * Provides interface common to all values in Viua.
+         */
         std::string type() const;
         std::string str() const;
         std::string repr() const;
         bool boolean() const;
         ProcessType* copy() const;
 
+        /*
+         * For use by user code.
+         * Users should be able to check if a process is joinable, and
+         * to detach a process.
+         */
         virtual void joinable(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
         virtual void detach(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
 
-        virtual void suspend(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
-        virtual void wakeup(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
-        virtual void suspended(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
-
-        virtual void getPriority(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
-        virtual void setPriority(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
-
+        /*
+         * For use by the VM.
+         * User code has no way of discovering PIDs - it must receive them.
+         */
         PID pid() const;
 
-        bool joinable();
+        /*
+         * For use by the VM.
+         * Use code *must not* touch these functions.
+         * Well, technically, it can - e.g. via a FFI calls to libraries hooking into the VM but
+         * then all bets are off.
+         */
         void join();
+        bool joinable();
         void detach();
         bool stopped();
         bool terminated();

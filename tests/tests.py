@@ -1695,16 +1695,6 @@ class ConcurrencyTests(unittest.TestCase):
             0
         )
 
-    def testGettingPriorityOfAProcess(self):
-        runTest(self, 'get_priority.asm', '1')
-
-    def testSettingPriorityOfAProcess(self):
-        runTestReturnsUnorderedLines(self, 'set_priority.asm', [
-            '40',
-            'Hello concurrent World!',
-            'Hello sequential World!',
-        ])
-
     def testMessagePassing(self):
         runTest(self, 'message_passing.asm', 'Hello message passing World!')
 
@@ -1713,14 +1703,6 @@ class ConcurrencyTests(unittest.TestCase):
 
     def testReturningValuesOnJoin(self):
         runTest(self, 'return_from_a_process.asm', '42')
-
-    def testSuspendAndWakeup(self):
-        runTestReturnsUnorderedLines(self, 'short_suspend_and_wakeup.asm', [
-            'suspending process 0',
-            'hi, I am process 1',
-            'waking up process 0',
-            'hi, I am process 0',
-        ])
 
     def testProcessFromDynamicallyLinkedFunction(self):
         source_lib = 'process_from_linked_fun.asm'

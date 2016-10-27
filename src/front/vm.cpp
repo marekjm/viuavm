@@ -65,19 +65,9 @@ void viua::front::vm::load_standard_prototypes(Kernel* kernel) {
     Prototype* proto_process = new Prototype("Process");
     proto_process->attach("Process::joinable/1", "joinable/1");
     proto_process->attach("Process::detach/1", "detach/1");
-    proto_process->attach("Process::suspend/1", "suspend/1");
-    proto_process->attach("Process::wakeup/1", "wakeup/1");
-    proto_process->attach("Process::suspended/1", "suspended/1");
-    proto_process->attach("Process::getPriority/1", "getPriority/1");
-    proto_process->attach("Process::setPriority/2", "setPriority/2");
     kernel->registerForeignPrototype("Process", proto_process);
     kernel->registerForeignMethod("Process::joinable/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::joinable));
     kernel->registerForeignMethod("Process::detach/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::detach));
-    kernel->registerForeignMethod("Process::suspend/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::suspend));
-    kernel->registerForeignMethod("Process::wakeup/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::wakeup));
-    kernel->registerForeignMethod("Process::suspended/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::suspended));
-    kernel->registerForeignMethod("Process::getPriority/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::getPriority));
-    kernel->registerForeignMethod("Process::setPriority/2", static_cast<ForeignMethodMemberPointer>(&ProcessType::setPriority));
 
     Prototype* proto_pointer = new Prototype("Pointer");
     proto_pointer->attach("Pointer::expired/1", "expired/1");

@@ -43,9 +43,6 @@
     ;frame ^[(param 0 1)]
     ;msg 0 detach/1
 
-    frame ^[(param 0 1) (param 1 (istore 2 40))]
-    msg 0 setPriority/2
-
     send 1 (strstore 2 "Hello exception transferring World!")
 
     try
