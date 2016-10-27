@@ -90,6 +90,7 @@ There are several categories of change:
   spawned a new process (B) after being migrated to another scheduler, the newly spawned process (B) was never executed because it was spawned in a
   shut down scheduler
 - fix: duplicated names are not allowed in a single source file
+- bic: processes cannot be suspended, and their priority cannot be adjusted, from user code; VM is the sole ruler of processes
 
 One limitation of static analyser (SA) introduced in this release is its inability to handle backwards jumps.
 This, however, is not a problem if the code does not use loops and
