@@ -25,7 +25,7 @@
 
 .function: returns_closure/0
     closure 2 foo/0
-    move 0 (enclose 2 1 (istore 1 42))
+    move 0 (capture 2 1 (istore 1 42))
     return
 .end
 

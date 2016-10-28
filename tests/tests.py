@@ -733,11 +733,11 @@ class ClosureTests(unittest.TestCase):
         # FIXME: passing custom assembler options will not be needed once .closure: support is completely implemented
         runTestReturnsIntegers(self, 'adder.asm', [5, 8, 16], assembly_opts=('--no-sa',))
 
-    def testEnclosedVariableLeftInScope(self):
+    def testCapturedVariableLeftInScope(self):
         # FIXME: passing custom assembler options will not be needed once .closure: support is completely implemented
-        runTestSplitlines(self, 'enclosed_variable_left_in_scope.asm', ['Hello World!', '42'], assembly_opts=('--no-sa',))
+        runTestSplitlines(self, 'captured_variable_left_in_scope.asm', ['Hello World!', '42'], assembly_opts=('--no-sa',))
 
-    def testChangeEnclosedVariableFromClosure(self):
+    def testChangeCapturedVariableFromClosure(self):
         # FIXME: passing custom assembler options will not be needed once .closure: support is completely implemented
         runTestSplitlines(self, 'change_enclosed_variable_from_closure.asm', ['Hello World!', '42'], assembly_opts=('--no-sa',))
 
@@ -745,15 +745,15 @@ class ClosureTests(unittest.TestCase):
         # FIXME: passing custom assembler options will not be needed once .closure: support is completely implemented
         runTest(self, 'nested_closures.asm', '10', assembly_opts=('--no-sa',))
 
-    def testSimpleEncloseByCopy(self):
+    def testSimpleCaptureByCopy(self):
         # FIXME: passing custom assembler options will not be needed once .closure: support is completely implemented
         runTest(self, 'simple_enclose_by_copy.asm', '42', assembly_opts=('--no-sa',))
 
-    def testEncloseCopyCreatesIndependentObjects(self):
+    def testCaptureCopyCreatesIndependentObjects(self):
         # FIXME: passing custom assembler options will not be needed once .closure: support is completely implemented
-        runTestSplitlines(self, 'enclosecopy_creates_independent_objects.asm', ['Hello World!', 'Hello World!', '42', 'Hello World!'], assembly_opts=('--no-sa',))
+        runTestSplitlines(self, 'capturecopy_creates_independent_objects.asm', ['Hello World!', 'Hello World!', '42', 'Hello World!'], assembly_opts=('--no-sa',))
 
-    def testSimpleEncloseByMove(self):
+    def testSimpleCaptureByMove(self):
         # FIXME: passing custom assembler options will not be needed once .closure: support is completely implemented
         runTestSplitlines(self, 'simple_enclose_by_move.asm', ['true', 'Hello World!'], assembly_opts=('--no-sa',))
 
@@ -993,14 +993,14 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
     def testSwapWithEmptySecondRegister(self):
         runTestFailsToAssemble(self, 'swap_with_empty_second_register.asm', "./sample/asm/static_analysis_errors/swap_with_empty_second_register.asm:22:12: error: swap with empty register: 2")
 
-    def testEncloseEmptyRegisterByCopy(self):
-        runTestFailsToAssemble(self, 'enclose_empty_register_by_copy.asm', "./sample/asm/static_analysis_errors/enclose_empty_register_by_copy.asm:21:19: error: closure of empty register: 1")
+    def testCaptureEmptyRegisterByCopy(self):
+        runTestFailsToAssemble(self, 'capture_empty_register_by_copy.asm', "./sample/asm/static_analysis_errors/capture_empty_register_by_copy.asm:21:19: error: closure of empty register: 1")
 
-    def testEncloseEmptyRegisterByMove(self):
-        runTestFailsToAssemble(self, 'enclose_empty_register_by_move.asm', "./sample/asm/static_analysis_errors/enclose_empty_register_by_move.asm:21:19: error: closure of empty register: 1")
+    def testCaptureEmptyRegisterByMove(self):
+        runTestFailsToAssemble(self, 'capture_empty_register_by_move.asm', "./sample/asm/static_analysis_errors/capture_empty_register_by_move.asm:21:19: error: closure of empty register: 1")
 
-    def testEncloseEmptyRegisterByReference(self):
-        runTestFailsToAssemble(self, 'enclose_empty_register_by_reference.asm', "./sample/asm/static_analysis_errors/enclose_empty_register_by_reference.asm:21:15: error: closure of empty register: 1")
+    def testCaptureEmptyRegisterByReference(self):
+        runTestFailsToAssemble(self, 'capture_empty_register_by_reference.asm', "./sample/asm/static_analysis_errors/capture_empty_register_by_reference.asm:21:15: error: closure of empty register: 1")
 
     def testEchoOfEmptyRegister(self):
         runTestFailsToAssemble(self, 'echo_of_empty_register.asm', "./sample/asm/static_analysis_errors/echo_of_empty_register.asm:21:10: error: echo of empty register: 1")
@@ -1893,7 +1893,7 @@ if __name__ == '__main__':
         # Valgrind acts funny (i.e. showing leaks from itself)
         MEMORY_LEAK_CHECKS_ALLOWED_LEAK_VALUES += (74351, 74343)
     successful = unittest.main(exit=False).result.wasSuccessful()
-    print('average run time for test: {}'.format(sum(measured_run_times, datetime.timedelta()) / len(measured_run_times)))
+    print('average run time for test: {}'.format(sum(measured_run_times, datetime.timedelta()) / max(1, len(measured_run_times))))
     print('summed run time for test: {}'.format(sum(measured_run_times, datetime.timedelta())))
     if not successful:
         exit(1)

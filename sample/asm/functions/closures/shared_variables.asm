@@ -41,10 +41,10 @@
     ; create two closures binding the same variable
     ; presto, we have two functions that are share some state
     closure 3 closure_printer/0
-    enclose 3 2 2
+    capture 3 2 2
 
     closure 4 closure_setter/1
-    enclose 4 2 2
+    capture 4 2 2
 
     ; push closures to vector...
     vpush 1 3

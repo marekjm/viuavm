@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2016 Marek Marecki
+;   Copyright (C) 2015, 2016 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -17,8 +17,28 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: main/0
-    enclosemove 2 1
+.function: printer_function/0
+    ; expects register 1 to be an captured object
+    print 1
+    return
+.end
+
+.function: main/1
+    ; create a closure and capture object in register 1 with it
+    closure 2 printer_function/0
+    capture 2 1 (strstore 1 "Hello World!")
+
+    ; call the closure (should print "Hello World!")
+    frame 0
+    fcall 0 2
+
+    ; store 42 in register 1, keep in mind that register 1 holds a reference so
+    ; the istore will rebind the reference - it will now point to Integer(42)
+    istore 1 42
+
+    ; call the closure (should print "42")
+    frame 0
+    fcall 0 2
 
     izero 0
     return

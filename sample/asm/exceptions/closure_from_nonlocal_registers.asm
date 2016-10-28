@@ -26,10 +26,10 @@
     ress global
     istore 1 42
 
-    ; FIXME: static checking of enclose* and closure combos to ensure that
+    ; FIXME: static checking of capture* and closure combos to ensure that
     ; there is always a closure before any "closing" happens
     closure 2 foo/0
-    enclose 2 1
+    capture 2 1
 
     izero 0
     return

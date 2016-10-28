@@ -194,9 +194,9 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case STREQ:
         case AND:
         case OR:
-        case ENCLOSE:
-        case ENCLOSECOPY:
-        case ENCLOSEMOVE:
+        case CAPTURE:
+        case CAPTURECOPY:
+        case CAPTUREMOVE:
         case VEC:
         case VINSERT:
         case VPOP:

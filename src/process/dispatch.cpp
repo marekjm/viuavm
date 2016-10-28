@@ -173,13 +173,13 @@ byte* Process::dispatch(byte* addr) {
         case ECHO:
               addr = opecho(addr+1);
             break;
-        case ENCLOSE:
+        case CAPTURE:
               addr = openclose(addr+1);
             break;
-        case ENCLOSECOPY:
+        case CAPTURECOPY:
             addr = openclosecopy(addr+1);
             break;
-        case ENCLOSEMOVE:
+        case CAPTUREMOVE:
             addr = openclosemove(addr+1);
             break;
         case CLOSURE:

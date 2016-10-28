@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    enclose 2 1
+    capturecopy 2 1
 
     izero 0
     return

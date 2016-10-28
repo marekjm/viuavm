@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016 Marek Marecki
+;   Copyright (C) 2016 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -17,29 +17,8 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: a_closure/0
-    ; expects register 1 to be enclosed
-    print 1
-    return
-.end
-
-.function: main/1
-    strstore 1 "Hello World!"
-
-    closure 2 a_closure/0
-    enclosecopy 2 1 1
-
-    print 1
-    ; call the closure
-    frame 0
-    fcall 0 2
-
-    ; this should not affect the object enclosed a "a_closure"
-    print (istore 1 42)
-
-    ; call the closure
-    frame 0
-    fcall 0 2
+.function: main/0
+    capture 2 1
 
     izero 0
     return

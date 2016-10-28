@@ -18,14 +18,14 @@
 ;
 
 .function: a_closure/0
-    ; expects register 1 to be enclosed object
+    ; expects register 1 to be captured object
     print 1
     return
 .end
 
 .function: main/1
     closure 1 a_closure/0
-    enclosemove 1 1 (strstore 2 "Hello World!")
+    capturemove 1 1 (strstore 2 "Hello World!")
 
     print (isnull 3 2)
 

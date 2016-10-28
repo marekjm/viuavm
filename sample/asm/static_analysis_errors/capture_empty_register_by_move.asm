@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    enclosecopy 2 1
+    capturemove 2 1
 
     izero 0
     return

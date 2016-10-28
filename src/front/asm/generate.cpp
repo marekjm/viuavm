@@ -184,9 +184,9 @@ const map<string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS = {
     { "and",  &Program::opand },
     { "or",   &Program::opor },
 
-    { "enclose", &Program::openclose },
-    { "enclosecopy", &Program::openclosecopy },
-    { "enclosemove", &Program::openclosemove },
+    { "capture", &Program::openclose },
+    { "capturecopy", &Program::openclosecopy },
+    { "capturemove", &Program::openclosemove },
 
     { "insert", &Program::opinsert },
     { "remove", &Program::opremove },
@@ -319,11 +319,11 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
         program.opprint(assembler::operands::getint(resolveregister(tokens.at(i+1), names)));
     } else if (tokens.at(i) == "echo") {
         program.opecho(assembler::operands::getint(resolveregister(tokens.at(i+1), names)));
-    } else if (tokens.at(i) == "enclose") {
+    } else if (tokens.at(i) == "capture") {
         program.openclose(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
-    } else if (tokens.at(i) == "enclosecopy") {
+    } else if (tokens.at(i) == "capturecopy") {
         program.openclosecopy(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
-    } else if (tokens.at(i) == "enclosemove") {
+    } else if (tokens.at(i) == "capturemove") {
         program.openclosemove(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
     } else if (tokens.at(i) == "closure") {
         program.opclosure(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), tokens.at(i+2));

@@ -18,14 +18,14 @@
 ;
 
 .function: foo/0
-    ; register 1 is enclosed from 'returns_closure' function
+    ; register 1 is captured from 'returns_closure' function
     print 1
     return
 .end
 
 .function: returns_closure/0
     closure 2 foo/0
-    move 0 (enclosecopy 2 1 (istore 1 42))
+    move 0 (capturecopy 2 1 (istore 1 42))
     return
 .end
 

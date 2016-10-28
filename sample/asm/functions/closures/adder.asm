@@ -18,7 +18,7 @@
 ;
 
 .function: adder/1
-    ; expects register 1 to be an enclosed integer
+    ; expects register 1 to be an captured integer
     arg 2 0
     iadd 0 2 1
     return
@@ -33,7 +33,7 @@
     .name: 1 number
     arg number 0
     closure 2 adder/1
-    enclose 2 1 1
+    capture 2 1 1
     move 0 2
     return
 .end

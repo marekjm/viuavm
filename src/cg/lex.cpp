@@ -262,7 +262,7 @@ namespace viua {
                             continue;
                         }
                         tokens.push_back(input_tokens.at(++i)); // second source register
-                    } else if (token == "enclose" or token == "enclosecopy" or token == "enclosemove") {
+                    } else if (token == "capture" or token == "capturecopy" or token == "capturemove") {
                         tokens.push_back(token);    // mnemonic
                         tokens.push_back(input_tokens.at(++i)); // target register
                         tokens.push_back(input_tokens.at(++i)); // source register

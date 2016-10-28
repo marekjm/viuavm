@@ -91,9 +91,9 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "print",          sizeof(byte) + sizeof(OperandType) + sizeof(int) },
     { "echo",           sizeof(byte) + sizeof(OperandType) + sizeof(int) },
 
-    { "enclose",        sizeof(byte) + 3*sizeof(OperandType) + 3*sizeof(int) },
-    { "enclosecopy",    sizeof(byte) + 3*sizeof(OperandType) + 3*sizeof(int) },
-    { "enclosemove",    sizeof(byte) + 3*sizeof(OperandType) + 3*sizeof(int) },
+    { "capture",        sizeof(byte) + 3*sizeof(OperandType) + 3*sizeof(int) },
+    { "capturecopy",    sizeof(byte) + 3*sizeof(OperandType) + 3*sizeof(int) },
+    { "capturemove",    sizeof(byte) + 3*sizeof(OperandType) + 3*sizeof(int) },
     { "closure",        sizeof(byte) + sizeof(OperandType) + sizeof(int) },
 
     { "function",       sizeof(byte) + sizeof(OperandType) + sizeof(int) },
@@ -204,9 +204,9 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { PRINT,        "print" },
     { ECHO,         "echo" },
 
-    { ENCLOSE,      "enclose" },
-    { ENCLOSECOPY,  "enclosecopy" },
-    { ENCLOSEMOVE,  "enclosemove" },
+    { CAPTURE,      "capture" },
+    { CAPTURECOPY,  "capturecopy" },
+    { CAPTUREMOVE,  "capturemove" },
     { CLOSURE,      "closure" },
 
     { FUNCTION,     "function" },

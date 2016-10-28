@@ -311,7 +311,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             }
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "enclose" or token == "enclosecopy" or token == "enclosemove") {
+        } else if (token == "capture" or token == "capturecopy" or token == "capturemove") {
             check_use_of_register(body_tokens, i+3, registers, named_registers, "closure of empty register");
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "copy" or token == "ptr" or token == "fcall") {

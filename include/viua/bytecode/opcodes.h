@@ -94,9 +94,9 @@ enum OPCODE : byte {
     PRINT,
     ECHO,
 
-    ENCLOSE,
-    ENCLOSECOPY,
-    ENCLOSEMOVE,
+    CAPTURE,
+    CAPTURECOPY,
+    CAPTUREMOVE,
     CLOSURE,
 
     FUNCTION,

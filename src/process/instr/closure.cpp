@@ -32,7 +32,7 @@ using namespace std;
 
 
 byte* Process::openclose(byte* addr) {
-    /** Enclose object by reference.
+    /** Capture object by reference.
      */
     unsigned target_closure_register = 0, target_register = 0, source_register = 0;
     tie(addr, target_closure_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
@@ -41,17 +41,17 @@ byte* Process::openclose(byte* addr) {
 
     Closure *target_closure = static_cast<Closure*>(fetch(target_closure_register));
     if (target_register >= target_closure->regset->size()) {
-        throw new Exception("cannot enclose object: register index out exceeded size of closure register set");
+        throw new Exception("cannot capture object: register index out exceeded size of closure register set");
     }
 
-    Type* enclosed_object = uregset->at(source_register);
-    Reference *rf = dynamic_cast<Reference*>(enclosed_object);
+    Type* captured_object = uregset->at(source_register);
+    Reference *rf = dynamic_cast<Reference*>(captured_object);
     if (rf == nullptr) {
-        // turn enclosed object into a reference to take it out of VM's default
+        // turn captured object into a reference to take it out of VM's default
         // memory management scheme and put it under reference-counting scheme
-        // this is needed to bind the enclosed object's life to lifetime of the closure
-        rf = new Reference(enclosed_object);
-        uregset->empty(source_register);    // empty - do not delete the enclosed object or SEGFAULTS will follow
+        // this is needed to bind the captured object's life to lifetime of the closure
+        rf = new Reference(captured_object);
+        uregset->empty(source_register);    // empty - do not delete the captured object or SEGFAULTS will follow
         uregset->set(source_register, rf);  // set the register to contain the newly-created reference
     }
     target_closure->regset->set(target_register, rf->copy());
@@ -60,7 +60,7 @@ byte* Process::openclose(byte* addr) {
 }
 
 byte* Process::openclosecopy(byte* addr) {
-    /** Enclose object by copy.
+    /** Capture object by copy.
      */
     unsigned target_closure_register = 0, target_register = 0, source_register = 0;
     tie(addr, target_closure_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
@@ -69,7 +69,7 @@ byte* Process::openclosecopy(byte* addr) {
 
     Closure *target_closure = static_cast<Closure*>(fetch(target_closure_register));
     if (target_register >= target_closure->regset->size()) {
-        throw new Exception("cannot enclose object: register index out exceeded size of closure register set");
+        throw new Exception("cannot capture object: register index out exceeded size of closure register set");
     }
 
     target_closure->regset->set(target_register, fetch(source_register)->copy());
@@ -78,7 +78,7 @@ byte* Process::openclosecopy(byte* addr) {
 }
 
 byte* Process::openclosemove(byte* addr) {
-    /** Enclose object by move.
+    /** Capture object by move.
      */
     unsigned target_closure_register = 0, target_register = 0, source_register = 0;
     tie(addr, target_closure_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
@@ -87,7 +87,7 @@ byte* Process::openclosemove(byte* addr) {
 
     Closure *target_closure = static_cast<Closure*>(fetch(target_closure_register));
     if (target_register >= target_closure->regset->size()) {
-        throw new Exception("cannot enclose object: register index out exceeded size of closure register set");
+        throw new Exception("cannot capture object: register index out exceeded size of closure register set");
     }
 
     target_closure->regset->set(target_register, uregset->pop(source_register));

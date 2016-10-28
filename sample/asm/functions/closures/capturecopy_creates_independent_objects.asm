@@ -17,26 +17,27 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: printer_function/0
-    ; expects register 1 to be an enclosed object
+.function: a_closure/0
+    ; expects register 1 to be captured
     print 1
     return
 .end
 
 .function: main/1
-    ; create a closure and enclose object in register 1 with it
-    closure 2 printer_function/0
-    enclose 2 1 (strstore 1 "Hello World!")
+    strstore 1 "Hello World!"
 
-    ; call the closure (should print "Hello World!")
+    closure 2 a_closure/0
+    capturecopy 2 1 1
+
+    print 1
+    ; call the closure
     frame 0
     fcall 0 2
 
-    ; store 42 in register 1, keep in mind that register 1 holds a reference so
-    ; the istore will rebind the reference - it will now point to Integer(42)
-    istore 1 42
+    ; this should not affect the object captured a "a_closure"
+    print (istore 1 42)
 
-    ; call the closure (should print "42")
+    ; call the closure
     frame 0
     fcall 0 2
 

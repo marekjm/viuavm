@@ -39,7 +39,7 @@
 
 .function: is_divisible_by_2/0
     closure 1 is_divisible_by/1
-    enclosemove 1 2 (istore 2 2)
+    capturemove 1 2 (istore 2 2)
     move 0 1
     return
 .end
