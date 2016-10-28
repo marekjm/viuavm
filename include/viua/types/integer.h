@@ -24,36 +24,41 @@
 
 #include <string>
 #include <sstream>
-#include <viua/types/type.h>
+#include <viua/types/number.h>
 
 
-class Integer : public Type {
+class Integer : public viua::types::numeric::Number {
     /** Basic integer type.
      *  It is suitable for mathematical operations.
      */
     int number;
 
     public:
-        std::string type() const {
-            return "Integer";
-        }
-        std::string str() const {
-            std::ostringstream s;
-            s << number;
-            return s.str();
-        }
-        bool boolean() const { return number != 0; }
+        std::string type() const override;
+        std::string str() const override;
+        bool boolean() const override;
 
-        int& value() { return number; }
+        int& value();
 
-        virtual int as_integer() const { return number; }
-        virtual unsigned as_unsigned() const { return static_cast<unsigned>(number); }
-        virtual int increment() { return (++number); }
-        virtual int decrement() { return (--number); }
+        virtual int as_integer() const;
+        virtual unsigned as_unsigned() const;
+        virtual int increment();
+        virtual int decrement();
 
-        Type* copy() const {
-            return new Integer(number);
-        }
+        Type* copy() const override;
+
+        int8_t as_int8() const override;
+        int16_t as_int16() const override;
+        int32_t as_int32() const override;
+        int64_t as_int64() const override;
+
+        uint8_t as_uint8() const override;
+        uint16_t as_uint16() const override;
+        uint32_t as_uint32() const override;
+        uint64_t as_uint64() const override;
+
+        viua::float32 as_float32() const override;
+        viua::float64 as_float64() const override;
 
         Integer(int n = 0): number(n) {}
 };

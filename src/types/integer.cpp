@@ -34,6 +34,25 @@ bool Integer::boolean() const {
     return (number != 0);
 }
 
+int& Integer::value() { return number; }
+
+int Integer::as_integer() const {
+    return number;
+}
+unsigned Integer::as_unsigned() const {
+    return static_cast<unsigned>(number);
+}
+int Integer::increment() {
+    return (++number);
+}
+int Integer::decrement() {
+    return (--number);
+}
+
+Type* Integer::copy() const {
+    return new Integer(number);
+}
+
 int8_t Integer::as_int8() const {
     return static_cast<int8_t>(number);
 }
