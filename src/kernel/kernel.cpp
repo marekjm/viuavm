@@ -154,7 +154,7 @@ void Kernel::loadForeignLibrary(const string& module) {
     void* handle = dlopen(path.c_str(), RTLD_LAZY);
 
     if (handle == nullptr) {
-        throw new Exception("LinkException", ("failed to open handle: " + module));
+        throw new Exception("LinkException", ("failed to open handle: " + module + ": " + dlerror()));
     }
 
     ForeignFunctionSpec* (*exports)() = nullptr;
