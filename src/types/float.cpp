@@ -35,7 +35,7 @@ bool Float::boolean() const {
     return (number != 0);
 }
 
-float& Float::value() {
+auto Float::value() -> decltype(number)& {
     return number;
 }
 
@@ -76,4 +76,4 @@ viua::float64 Float::as_float64() const {
     return static_cast<viua::float64>(number);
 }
 
-Float::Float(float n): number(n) {}
+Float::Float(decltype(number) n): number(n) {}

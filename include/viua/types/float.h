@@ -32,14 +32,14 @@ class Float : public viua::types::numeric::Number {
     /** Basic integer type.
      *  It is suitable for mathematical operations.
      */
-    float number;
+    double number;
 
     public:
         std::string type() const override;
         std::string str() const override;
         bool boolean() const override;
 
-        float& value();
+        auto value() -> decltype(number)&;
 
         Type* copy() const override;
 
@@ -56,7 +56,7 @@ class Float : public viua::types::numeric::Number {
         viua::float32 as_float32() const override;
         viua::float64 as_float64() const override;
 
-        Float(float n = 0);
+        Float(decltype(number) n = 0);
 };
 
 

@@ -78,7 +78,7 @@ byte* Process::opstof(byte* addr) {
 
     string supplied_string = static_cast<String*>(fetch(source))->value();
     double convert_from = std::stod(supplied_string);
-    place(target, new Float(static_cast<float>(convert_from)));
+    place(target, new Float(convert_from));
 
     return addr;
 }
