@@ -1725,6 +1725,9 @@ class ConcurrencyTests(unittest.TestCase):
     def testReceiveTimeout500ms(self):
         runTestThrowsException(self, 'receive_timeout_500ms.asm', ('Exception', 'no message received',))
 
+    def testReceiveTimeout1s(self):
+        runTestThrowsException(self, 'receive_timeout_1s.asm', ('Exception', 'no message received',))
+
     def testReceiveTimeoutInfinite(self):
         runTest(self, 'receive_timeout_infinite.asm', 'Hello World!')
 
