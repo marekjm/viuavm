@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -e
+
+LEXER_OUTPUT=/tmp/lex.json
+
+./build/bin/vm/lex $@ > $LEXER_OUTPUT
+json-glib-format --prettify $LEXER_OUTPUT | less
