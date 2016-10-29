@@ -34,8 +34,7 @@ byte* Process::opitof(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    int convert_from = static_cast<Integer*>(fetch(source))->value();
-    place(target, new Float(static_cast<float>(convert_from)));
+    place(target, new Float(static_cast<Integer*>(fetch(source))->as_float64()));
 
     return addr;
 }
@@ -45,8 +44,7 @@ byte* Process::opftoi(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    float convert_from = static_cast<Float*>(fetch(source))->value();
-    place(target, new Integer(static_cast<int>(convert_from)));
+    place(target, new Integer(static_cast<Float*>(fetch(source))->as_int32()));
 
     return addr;
 }

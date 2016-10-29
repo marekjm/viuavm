@@ -69,9 +69,12 @@ template<class Operator, class ResultType> byte* perform(byte* addr, Process* t)
     auto first = t->obtain(first_operand_index);
     auto second = t->obtain(second_operand_index);
 
-    viua::assertions::expect_types<Integer>("Integer", first, second);
+    using viua::types::numeric::Number;
 
-    t->put(target_register_index, new ResultType(Operator()(static_cast<Integer*>(first)->as_integer(), static_cast<Integer*>(second)->as_integer())));
+    viua::assertions::expect_types<Number>("Number", first, second);
+
+    // FIXME use 64 bit integers by default
+    t->put(target_register_index, new ResultType(Operator()(dynamic_cast<Number*>(first)->as_int32(), dynamic_cast<Number*>(second)->as_int32())));
 
     return addr;
 }

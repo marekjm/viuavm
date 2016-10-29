@@ -63,9 +63,11 @@ template<class Operator, class ResultType> byte* perform(byte* addr, Process* t)
     auto first = t->obtain(first_operand_index);
     auto second = t->obtain(second_operand_index);
 
-    viua::assertions::expect_types<Float>("Float", first, second);
+    using viua::types::numeric::Number;
 
-    t->put(target_register_index, new ResultType(Operator()(static_cast<Float*>(first)->value(), static_cast<Float*>(second)->value())));
+    viua::assertions::expect_types<Number>("Number", first, second);
+
+    t->put(target_register_index, new ResultType(Operator()(dynamic_cast<Number*>(first)->as_float32(), dynamic_cast<Number*>(second)->as_float32())));
 
     return addr;
 }
