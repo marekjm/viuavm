@@ -18,13 +18,12 @@
 ;
 
 .function: main/1
-    istore 1 42
-    istore 2 69
+    istore (.name: iota forty_two) 42
+    istore (.name: iota sixty_nine) 69
 
-    ilt 3 1 2
+    ilt (.name: iota compared) forty_two sixty_nine
 
-    iadd 4 2 3
-    print 4
+    print (iadd iota sixty_nine compared)
 
     izero 0
     return

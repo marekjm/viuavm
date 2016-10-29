@@ -764,31 +764,31 @@ class InvalidInstructionOperandTypeTests(unittest.TestCase):
     PATH = './sample/asm/invalid_operand_types'
 
     def testIADD(self):
-        runTestThrowsException(self, 'iadd.asm', ('Exception', 'invalid operand types: expected (_, Integer, Integer), got (_, Integer, Float)',))
+        runTestThrowsException(self, 'iadd.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Integer, String)',))
 
     def testISUB(self):
-        runTestThrowsException(self, 'isub.asm', ('Exception', 'invalid operand types: expected (_, Integer, Integer), got (_, Integer, String)',))
+        runTestThrowsException(self, 'isub.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Integer, String)',))
 
     def testIMUL(self):
-        runTestThrowsException(self, 'imul.asm', ('Exception', 'invalid operand types: expected (_, Integer, Integer), got (_, Float, String)',))
+        runTestThrowsException(self, 'imul.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Float, String)',))
 
     def testIDIV(self):
-        runTestThrowsException(self, 'idiv.asm', ('Exception', 'invalid operand types: expected (_, Integer, Integer), got (_, String, Float)',))
+        runTestThrowsException(self, 'idiv.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, String, Float)',))
 
     def testILT(self):
-        runTestThrowsException(self, 'ilt.asm', ('Exception', 'invalid operand types: expected (_, Integer, Integer), got (_, String, String)',))
+        runTestThrowsException(self, 'ilt.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, String, String)',))
 
     def testILTE(self):
-        runTestThrowsException(self, 'ilte.asm', ('Exception', 'invalid operand types: expected (_, Integer, Integer), got (_, Foo, String)',))
+        runTestThrowsException(self, 'ilte.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, String)',))
 
     def testIGT(self):
-        runTestThrowsException(self, 'igt.asm', ('Exception', 'invalid operand types: expected (_, Integer, Integer), got (_, Foo, Bar)',))
+        runTestThrowsException(self, 'igt.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Bar)',))
 
     def testIGTE(self):
-        runTestThrowsException(self, 'igte.asm', ('Exception', 'invalid operand types: expected (_, Integer, Integer), got (_, Foo, Bar)',))
+        runTestThrowsException(self, 'igte.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Bar)',))
 
     def testIEQ(self):
-        runTestThrowsException(self, 'ieq.asm', ('Exception', 'invalid operand types: expected (_, Integer, Integer), got (_, Foo, Bar)',))
+        runTestThrowsException(self, 'ieq.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Bar)',))
 
     def testIINC(self):
         runTestThrowsException(self, 'iinc.asm', ('Exception', 'invalid operand types: expected (Integer), got (Foo)',))
@@ -797,31 +797,31 @@ class InvalidInstructionOperandTypeTests(unittest.TestCase):
         runTestThrowsException(self, 'idec.asm', ('Exception', 'invalid operand types: expected (Integer), got (Function)',))
 
     def testFADD(self):
-        runTestThrowsException(self, 'fadd.asm', ('Exception', 'invalid operand types: expected (_, Float, Float), got (_, Foo, Float)',))
+        runTestThrowsException(self, 'fadd.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Float)',))
 
     def testFSUB(self):
-        runTestThrowsException(self, 'fsub.asm', ('Exception', 'invalid operand types: expected (_, Float, Float), got (_, Foo, Float)',))
+        runTestThrowsException(self, 'fsub.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Float)',))
 
     def testFMUL(self):
-        runTestThrowsException(self, 'fmul.asm', ('Exception', 'invalid operand types: expected (_, Float, Float), got (_, Foo, Float)',))
+        runTestThrowsException(self, 'fmul.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Float)',))
 
     def testFDIV(self):
-        runTestThrowsException(self, 'fdiv.asm', ('Exception', 'invalid operand types: expected (_, Float, Float), got (_, Foo, Float)',))
+        runTestThrowsException(self, 'fdiv.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Float)',))
 
     def testFLT(self):
-        runTestThrowsException(self, 'flt.asm', ('Exception', 'invalid operand types: expected (_, Float, Float), got (_, Foo, Float)',))
+        runTestThrowsException(self, 'flt.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Float)',))
 
     def testFLTE(self):
-        runTestThrowsException(self, 'flte.asm', ('Exception', 'invalid operand types: expected (_, Float, Float), got (_, Foo, Float)',))
+        runTestThrowsException(self, 'flte.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Float)',))
 
     def testFGT(self):
-        runTestThrowsException(self, 'fgt.asm', ('Exception', 'invalid operand types: expected (_, Float, Float), got (_, Foo, Float)',))
+        runTestThrowsException(self, 'fgt.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Float)',))
 
     def testFGTE(self):
-        runTestThrowsException(self, 'fgte.asm', ('Exception', 'invalid operand types: expected (_, Float, Float), got (_, Foo, Float)',))
+        runTestThrowsException(self, 'fgte.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Float)',))
 
     def testFEQ(self):
-        runTestThrowsException(self, 'feq.asm', ('Exception', 'invalid operand types: expected (_, Float, Float), got (_, Foo, Float)',))
+        runTestThrowsException(self, 'feq.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Float)',))
 
 
 class ObjectInstructionsTests(unittest.TestCase):

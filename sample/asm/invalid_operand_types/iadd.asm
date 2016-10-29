@@ -18,8 +18,10 @@
 ;
 
 .function: main/1
+    ;.name: iota foo
     istore 1 1
-    fstore 2 1.0
+    strstore 2 "Oh, look, a bug"
+
     iadd 3 1 2
 
     izero 0
