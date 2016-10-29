@@ -56,12 +56,25 @@ class Boolean : public Integer {
             return std::vector<std::string>{"Integer"};
         }
         virtual std::vector<std::string> inheritancechain() const {
-            return std::vector<std::string>{"Integer", "Type"};
+            return std::vector<std::string>{"Integer", "Number", "Type"};
         }
 
         Type* copy() const {
             return new Boolean(b);
         }
+
+        int8_t as_int8() const override { return b; }
+        int16_t as_int16() const override { return b; }
+        int32_t as_int32() const override { return b; }
+        int64_t as_int64() const override { return b; }
+
+        uint8_t as_uint8() const override { return b; }
+        uint16_t as_uint16() const override { return b; }
+        uint32_t as_uint32() const override { return b; }
+        uint64_t as_uint64() const override { return b; }
+
+        viua::float32 as_float32() const override { return b; }
+        viua::float64 as_float64() const override { return b; }
 
         Boolean(bool v = false): b(v) {}
 };
