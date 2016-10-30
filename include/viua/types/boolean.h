@@ -24,10 +24,10 @@
 
 #include <string>
 #include <sstream>
-#include <viua/types/integer.h>
+#include <viua/types/number.h>
 
 
-class Boolean : public Integer {
+class Boolean : public viua::types::numeric::Number {
     /** Boolean object.
      *
      *  This type is used to hold true and false values.
@@ -53,10 +53,10 @@ class Boolean : public Integer {
         int decrement() { return (b = false); }
 
         virtual std::vector<std::string> bases() const {
-            return std::vector<std::string>{"Integer"};
+            return std::vector<std::string>{"Number"};
         }
         virtual std::vector<std::string> inheritancechain() const {
-            return std::vector<std::string>{"Integer", "Number", "Type"};
+            return std::vector<std::string>{"Number", "Type"};
         }
 
         Type* copy() const {
