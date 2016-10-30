@@ -40,8 +40,6 @@ class Integer : public viua::types::numeric::Number {
 
         int& value();
 
-        virtual int as_integer() const;
-        virtual unsigned as_unsigned() const;
         virtual int increment();
         virtual int decrement();
 

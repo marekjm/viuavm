@@ -36,12 +36,6 @@ bool Integer::boolean() const {
 
 int& Integer::value() { return number; }
 
-int Integer::as_integer() const {
-    return number;
-}
-unsigned Integer::as_unsigned() const {
-    return static_cast<unsigned>(number);
-}
 int Integer::increment() {
     return (++number);
 }

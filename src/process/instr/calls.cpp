@@ -18,7 +18,7 @@
  */
 
 #include <viua/bytecode/decoder/operands.h>
-#include <viua/types/boolean.h>
+#include <viua/types/integer.h>
 #include <viua/types/reference.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>

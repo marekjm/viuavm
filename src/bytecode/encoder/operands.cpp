@@ -68,10 +68,10 @@ auto viua::bytecode::decoder::operands::fetch_register_index(byte *ip, Process *
     }
     if (ot == OT_REGISTER_REFERENCE) {
         Integer *i = static_cast<Integer*>(process->obtain(register_index));
-        if (i->as_integer() < 0) {
+        if (i->as_int32() < 0) {
             throw new Exception("register indexes cannot be negative");
         }
-        register_index = static_cast<unsigned>(i->as_integer());
+        register_index = i->as_uint32();
     }
     return tuple<byte*, unsigned>(ip, register_index);
 }

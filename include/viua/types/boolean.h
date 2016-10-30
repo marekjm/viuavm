@@ -48,7 +48,6 @@ class Boolean : public viua::types::numeric::Number {
         bool& value() { return b; }
 
         // Integer methods
-        int as_integer() const { return int(b); }
         int increment() { return (b = true); }
         int decrement() { return (b = false); }
 

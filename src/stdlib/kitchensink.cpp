@@ -22,7 +22,7 @@
 #include <viua/types/type.h>
 #include <viua/types/string.h>
 #include <viua/types/vector.h>
-#include <viua/types/integer.h>
+#include <viua/types/number.h>
 #include <viua/types/exception.h>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
@@ -31,7 +31,7 @@ using namespace std;
 
 
 void kitchensink_sleep(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
-    sleep(static_cast<unsigned int>(static_cast<Integer*>(frame->args->at(0))->as_integer()));
+    sleep(dynamic_cast<viua::types::numeric::Number*>(frame->args->at(0))->as_int32());
 }
 
 const ForeignFunctionSpec functions[] = {
