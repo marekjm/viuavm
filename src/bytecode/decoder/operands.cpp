@@ -72,7 +72,7 @@ auto viua::bytecode::decoder::operands::fetch_register_index(byte *ip, Process *
         throw new Exception("decoded invalid operand type");
     }
     if (ot == OT_REGISTER_REFERENCE) {
-        Integer *i = static_cast<Integer*>(process->obtain(register_index));
+        auto i = static_cast<viua::types::Integer*>(process->obtain(register_index));
         // FIXME Number::negative() -> bool is needed
         if (i->as_int32() < 0) {
             throw new Exception("register indexes cannot be negative");
@@ -94,7 +94,7 @@ auto viua::bytecode::decoder::operands::fetch_primitive_uint64(byte *ip, Process
 }
 
 auto viua::bytecode::decoder::operands::fetch_primitive_int(byte *ip, Process* p) -> tuple<byte*, int> {
-    return fetch_primitive_value<int, Integer>(ip, p, 0);
+    return fetch_primitive_value<int, viua::types::Integer>(ip, p, 0);
 }
 
 auto viua::bytecode::decoder::operands::fetch_raw_int(byte *ip, Process*) -> tuple<byte*, int> {

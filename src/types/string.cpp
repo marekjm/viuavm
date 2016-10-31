@@ -34,6 +34,7 @@
 #include <viua/exceptions.h>
 using namespace std;
 using namespace viua::assertions;
+using namespace viua::types;
 
 
 Integer* String::size() {

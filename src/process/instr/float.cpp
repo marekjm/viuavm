@@ -38,7 +38,7 @@ byte* Process::opfstore(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, value) = viua::bytecode::decoder::operands::fetch_raw_float(addr, this);
 
-    place(target, new Float(value));
+    place(target, new viua::types::Float(value));
 
     return addr;
 }
@@ -73,19 +73,19 @@ template<class Operator, class ResultType> byte* perform(byte* addr, Process* t)
 }
 
 byte* Process::opfadd(byte* addr) {
-    return perform<std::plus<float>, Float>(addr, this);
+    return perform<std::plus<float>, viua::types::Float>(addr, this);
 }
 
 byte* Process::opfsub(byte* addr) {
-    return perform<std::minus<float>, Float>(addr, this);
+    return perform<std::minus<float>, viua::types::Float>(addr, this);
 }
 
 byte* Process::opfmul(byte* addr) {
-    return perform<std::multiplies<float>, Float>(addr, this);
+    return perform<std::multiplies<float>, viua::types::Float>(addr, this);
 }
 
 byte* Process::opfdiv(byte* addr) {
-    return perform<std::divides<float>, Float>(addr, this);
+    return perform<std::divides<float>, viua::types::Float>(addr, this);
 }
 
 byte* Process::opflt(byte* addr) {

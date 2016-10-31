@@ -52,15 +52,15 @@ void viua::front::vm::load_standard_prototypes(Kernel* kernel) {
     proto_string->attach("String::join/1", "join/1");
     proto_string->attach("String::size/1", "size/1");
     kernel->registerForeignPrototype("String", proto_string);
-    kernel->registerForeignMethod("String::stringify/2", static_cast<ForeignMethodMemberPointer>(&String::stringify));
-    kernel->registerForeignMethod("String::represent/2", static_cast<ForeignMethodMemberPointer>(&String::represent));
-    kernel->registerForeignMethod("String::startswith/2", static_cast<ForeignMethodMemberPointer>(&String::startswith));
-    kernel->registerForeignMethod("String::endswith/2", static_cast<ForeignMethodMemberPointer>(&String::endswith));
-    kernel->registerForeignMethod("String::format/", static_cast<ForeignMethodMemberPointer>(&String::format));
-    kernel->registerForeignMethod("String::substr/", static_cast<ForeignMethodMemberPointer>(&String::substr));
-    kernel->registerForeignMethod("String::concatenate/2", static_cast<ForeignMethodMemberPointer>(&String::concatenate));
-    kernel->registerForeignMethod("String::join/", static_cast<ForeignMethodMemberPointer>(&String::join));
-    kernel->registerForeignMethod("String::size/1", static_cast<ForeignMethodMemberPointer>(&String::size));
+    kernel->registerForeignMethod("String::stringify/2", static_cast<ForeignMethodMemberPointer>(&viua::types::String::stringify));
+    kernel->registerForeignMethod("String::represent/2", static_cast<ForeignMethodMemberPointer>(&viua::types::String::represent));
+    kernel->registerForeignMethod("String::startswith/2", static_cast<ForeignMethodMemberPointer>(&viua::types::String::startswith));
+    kernel->registerForeignMethod("String::endswith/2", static_cast<ForeignMethodMemberPointer>(&viua::types::String::endswith));
+    kernel->registerForeignMethod("String::format/", static_cast<ForeignMethodMemberPointer>(&viua::types::String::format));
+    kernel->registerForeignMethod("String::substr/", static_cast<ForeignMethodMemberPointer>(&viua::types::String::substr));
+    kernel->registerForeignMethod("String::concatenate/2", static_cast<ForeignMethodMemberPointer>(&viua::types::String::concatenate));
+    kernel->registerForeignMethod("String::join/", static_cast<ForeignMethodMemberPointer>(&viua::types::String::join));
+    kernel->registerForeignMethod("String::size/1", static_cast<ForeignMethodMemberPointer>(&viua::types::String::size));
 
     Prototype* proto_process = new Prototype("Process");
     proto_process->attach("Process::joinable/1", "joinable/1");

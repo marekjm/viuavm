@@ -34,7 +34,7 @@ byte* Process::opitof(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    place(target, new Float(static_cast<Integer*>(fetch(source))->as_float64()));
+    place(target, new viua::types::Float(static_cast<viua::types::Integer*>(fetch(source))->as_float64()));
 
     return addr;
 }
@@ -44,7 +44,7 @@ byte* Process::opftoi(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    place(target, new Integer(static_cast<Float*>(fetch(source))->as_int32()));
+    place(target, new viua::types::Integer(static_cast<viua::types::Float*>(fetch(source))->as_int32()));
 
     return addr;
 }
@@ -55,7 +55,7 @@ byte* Process::opstoi(byte* addr) {
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     int result_integer = 0;
-    string supplied_string = static_cast<String*>(fetch(source))->value();
+    string supplied_string = static_cast<viua::types::String*>(fetch(source))->value();
     try {
         result_integer = std::stoi(supplied_string);
     } catch (const std::out_of_range& e) {
@@ -64,7 +64,7 @@ byte* Process::opstoi(byte* addr) {
         throw new Exception("invalid argument: " + supplied_string);
     }
 
-    place(target, new Integer(result_integer));
+    place(target, new viua::types::Integer(result_integer));
 
     return addr;
 }
@@ -74,9 +74,9 @@ byte* Process::opstof(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    string supplied_string = static_cast<String*>(fetch(source))->value();
+    string supplied_string = static_cast<viua::types::String*>(fetch(source))->value();
     double convert_from = std::stod(supplied_string);
-    place(target, new Float(convert_from));
+    place(target, new viua::types::Float(convert_from));
 
     return addr;
 }

@@ -21,6 +21,8 @@
 #include <sstream>
 #include <viua/types/integer.h>
 using namespace std;
+using namespace viua::types;
+
 
 string Integer::type() const {
     return "Integer";

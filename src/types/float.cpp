@@ -21,6 +21,8 @@
 #include <sstream>
 #include <viua/types/float.h>
 using namespace std;
+using namespace viua::types;
+
 
 string Float::type() const {
     return "Float";

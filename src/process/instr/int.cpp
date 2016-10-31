@@ -33,7 +33,7 @@ using namespace std;
 byte* Process::opizero(byte* addr) {
     unsigned target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    place(target, new Integer(0));
+    place(target, new viua::types::Integer(0));
     return addr;
 }
 
@@ -44,7 +44,7 @@ byte* Process::opistore(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, integer) = viua::bytecode::decoder::operands::fetch_primitive_uint(addr, this);
 
-    place(target, new Integer(integer));
+    place(target, new viua::types::Integer(integer));
 
     return addr;
 }
@@ -80,19 +80,19 @@ template<class Operator, class ResultType> byte* perform(byte* addr, Process* t)
 }
 
 byte* Process::opiadd(byte* addr) {
-    return perform<std::plus<int>, Integer>(addr, this);
+    return perform<std::plus<int>, viua::types::Integer>(addr, this);
 }
 
 byte* Process::opisub(byte* addr) {
-    return perform<std::minus<int>, Integer>(addr, this);
+    return perform<std::minus<int>, viua::types::Integer>(addr, this);
 }
 
 byte* Process::opimul(byte* addr) {
-    return perform<std::multiplies<int>, Integer>(addr, this);
+    return perform<std::multiplies<int>, viua::types::Integer>(addr, this);
 }
 
 byte* Process::opidiv(byte* addr) {
-    return perform<std::divides<int>, Integer>(addr, this);
+    return perform<std::divides<int>, viua::types::Integer>(addr, this);
 }
 
 byte* Process::opilt(byte* addr) {
@@ -119,7 +119,7 @@ byte* Process::opiinc(byte* addr) {
     unsigned target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    viua::assertions::expect_type<Integer>("Integer", fetch(target))->increment();
+    viua::assertions::expect_type<viua::types::Integer>("Integer", fetch(target))->increment();
 
     return addr;
 }
@@ -128,7 +128,7 @@ byte* Process::opidec(byte* addr) {
     unsigned target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    viua::assertions::expect_type<Integer>("Integer", fetch(target))->decrement();
+    viua::assertions::expect_type<viua::types::Integer>("Integer", fetch(target))->decrement();
 
     return addr;
 }

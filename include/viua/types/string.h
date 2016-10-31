@@ -34,53 +34,57 @@
 class Process;
 class Kernel;
 
-class String : public Type {
-    /** String type.
-     *
-     *  Designed to hold text.
-     */
-    std::string svalue;
+namespace viua {
+    namespace types {
+        class String : public Type {
+            /** String type.
+             *
+             *  Designed to hold text.
+             */
+            std::string svalue;
 
-    public:
-        std::string type() const {
-            return "String";
-        }
-        std::string str() const {
-            return svalue;
-        }
-        std::string repr() const {
-            return str::enquote(svalue);
-        }
-        bool boolean() const {
-            return svalue.size() != 0;
-        }
+            public:
+                std::string type() const {
+                    return "String";
+                }
+                std::string str() const {
+                    return svalue;
+                }
+                std::string repr() const {
+                    return str::enquote(svalue);
+                }
+                bool boolean() const {
+                    return svalue.size() != 0;
+                }
 
-        Type* copy() const {
-            return new String(svalue);
-        }
+                Type* copy() const {
+                    return new String(svalue);
+                }
 
-        std::string& value() { return svalue; }
+                std::string& value() { return svalue; }
 
-        Integer* size();
-        String* sub(int b = 0, int e = -1);
-        String* add(String*);
-        String* join(Vector*);
+                Integer* size();
+                String* sub(int b = 0, int e = -1);
+                String* add(String*);
+                String* join(Vector*);
 
-        virtual void stringify(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
-        virtual void represent(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
+                virtual void stringify(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
+                virtual void represent(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
 
-        virtual void startswith(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
-        virtual void endswith(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
+                virtual void startswith(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
+                virtual void endswith(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
 
-        virtual void format(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
-        virtual void substr(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
-        virtual void concatenate(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
-        virtual void join(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
+                virtual void format(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
+                virtual void substr(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
+                virtual void concatenate(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
+                virtual void join(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
 
-        virtual void size(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
+                virtual void size(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
 
-        String(std::string s = ""): svalue(s) {}
-};
+                String(std::string s = ""): svalue(s) {}
+        };
+    }
+}
 
 
 #endif

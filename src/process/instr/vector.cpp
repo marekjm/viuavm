@@ -142,7 +142,7 @@ byte* Process::opvlen(byte* addr) {
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
     viua::assertions::assert_implements<Vector>(source, "Vector");
-    place(target, new Integer(static_cast<Vector*>(source)->len()));
+    place(target, new viua::types::Integer(static_cast<Vector*>(source)->len()));
 
     return addr;
 }

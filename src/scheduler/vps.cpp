@@ -523,7 +523,7 @@ void viua::scheduler::VirtualProcessScheduler::bootstrap(const vector<string>& c
     Vector* cmdline = new Vector();
     auto limit = commandline_arguments.size();
     for (decltype(limit) i = 0; i < limit; ++i) {
-        cmdline->push(new String(commandline_arguments[i]));
+        cmdline->push(new viua::types::String(commandline_arguments[i]));
     }
     initial_frame->regset->set(1, cmdline);
 

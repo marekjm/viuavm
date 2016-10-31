@@ -119,7 +119,7 @@ byte* Process::opinsert(byte* addr) {
     viua::assertions::assert_implements<Object>(object_operand, "Object");
     viua::assertions::assert_typeof(key_operand, "String");
 
-    static_cast<Object*>(object_operand)->insert(static_cast<String*>(key_operand)->str(), pop(source_index));
+    static_cast<Object*>(object_operand)->insert(static_cast<viua::types::String*>(key_operand)->str(), pop(source_index));
 
     return addr;
 }
@@ -137,7 +137,7 @@ byte* Process::opremove(byte* addr) {
     viua::assertions::assert_implements<Object>(object_operand, "Object");
     viua::assertions::assert_typeof(key_operand, "String");
 
-    place(target_index, static_cast<Object*>(object_operand)->remove(static_cast<String*>(key_operand)->str()));
+    place(target_index, static_cast<Object*>(object_operand)->remove(static_cast<viua::types::String*>(key_operand)->str()));
 
     return addr;
 }

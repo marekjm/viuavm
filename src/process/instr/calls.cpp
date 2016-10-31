@@ -96,7 +96,7 @@ byte* Process::oparg(byte* addr) {
 byte* Process::opargc(byte* addr) {
     unsigned target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    uregset->set(target, new Integer(static_cast<int>(frames.back()->args->size())));
+    uregset->set(target, new viua::types::Integer(static_cast<int>(frames.back()->args->size())));
 
     return addr;
 }
