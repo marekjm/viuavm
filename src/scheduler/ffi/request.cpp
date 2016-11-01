@@ -26,10 +26,10 @@
 using namespace std;
 
 
-string ForeignFunctionCallRequest::functionName() const {
+string viua::scheduler::ffi::ForeignFunctionCallRequest::functionName() const {
     return frame->function_name;
 }
-void ForeignFunctionCallRequest::call(ForeignFunction* callback) {
+void viua::scheduler::ffi::ForeignFunctionCallRequest::call(ForeignFunction* callback) {
     /* FIXME: second parameter should be a pointer to static registers or
      *        0 if function does not have static registers registered
      * FIXME: should external functions always have static registers allocated?
@@ -58,9 +58,9 @@ void ForeignFunctionCallRequest::call(ForeignFunction* callback) {
         caller_process->handleActiveException();
     }
 }
-void ForeignFunctionCallRequest::registerException(viua::types::Type* object) {
+void viua::scheduler::ffi::ForeignFunctionCallRequest::registerException(viua::types::Type* object) {
     caller_process->raiseException(object);
 }
-void ForeignFunctionCallRequest::wakeup() {
+void viua::scheduler::ffi::ForeignFunctionCallRequest::wakeup() {
     caller_process->wakeup();
 }

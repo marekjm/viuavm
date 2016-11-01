@@ -27,7 +27,7 @@
 using namespace std;
 
 
-void ff_call_processor(vector<unique_ptr<ForeignFunctionCallRequest>> *requests, map<string, ForeignFunction*>* foreign_functions, mutex *ff_map_mtx, mutex *mtx, condition_variable *cv) {
+void viua::scheduler::ffi::ff_call_processor(vector<unique_ptr<viua::scheduler::ffi::ForeignFunctionCallRequest>> *requests, map<string, ForeignFunction*>* foreign_functions, mutex *ff_map_mtx, mutex *mtx, condition_variable *cv) {
     while (true) {
         unique_lock<mutex> lock(*mtx);
 

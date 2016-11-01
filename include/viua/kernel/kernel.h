@@ -46,11 +46,14 @@
 
 
 class Process;
-class ForeignFunctionCallRequest;
 
 namespace viua {
     namespace scheduler {
         class VirtualProcessScheduler;
+
+        namespace ffi {
+            class ForeignFunctionCallRequest;
+        }
     }
 }
 
@@ -117,7 +120,7 @@ class Kernel {
     std::map<std::string, ForeignMethod> foreign_methods;
 
     // Foreign function call requests are placed here to be executed later.
-    std::vector<std::unique_ptr<ForeignFunctionCallRequest>> foreign_call_queue;
+    std::vector<std::unique_ptr<viua::scheduler::ffi::ForeignFunctionCallRequest>> foreign_call_queue;
     std::mutex foreign_call_queue_mutex;
     std::condition_variable foreign_call_queue_condition;
     static const long unsigned default_ffi_schedulers_limit = 2UL;

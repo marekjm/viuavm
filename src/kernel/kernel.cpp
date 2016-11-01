@@ -285,7 +285,7 @@ void Kernel::registerPrototype(viua::types::Prototype *proto) {
 
 void Kernel::requestForeignFunctionCall(Frame *frame, Process *requesting_process) {
     unique_lock<mutex> lock(foreign_call_queue_mutex);
-    foreign_call_queue.emplace_back(new ForeignFunctionCallRequest(frame, requesting_process, this));
+    foreign_call_queue.emplace_back(new viua::scheduler::ffi::ForeignFunctionCallRequest(frame, requesting_process, this));
 
     // unlock before calling notify_one() to avoid waking the worker thread when it
     // cannot obtain the lock and
@@ -421,7 +421,7 @@ Kernel::Kernel():
 {
     ffi_schedulers_limit = no_of_ffi_schedulers();
     for (auto i = ffi_schedulers_limit; i; --i) {
-        foreign_call_workers.push_back(new std::thread(ff_call_processor, &foreign_call_queue, &foreign_functions, &foreign_functions_mutex, &foreign_call_queue_mutex, &foreign_call_queue_condition));
+        foreign_call_workers.push_back(new std::thread(viua::scheduler::ffi::ff_call_processor, &foreign_call_queue, &foreign_functions, &foreign_functions_mutex, &foreign_call_queue_mutex, &foreign_call_queue_condition));
     }
 }
 
