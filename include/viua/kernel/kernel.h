@@ -39,26 +39,20 @@
 #include <mutex>
 #include <thread>
 #include <condition_variable>
+#include <viua/bytecode/bytetypedef.h>
+#include <viua/types/prototype.h>
+#include <viua/include/module.h>
 #include <viua/process.h>
 
 
-class ForeignFunctionCallRequest {
-    std::unique_ptr<Frame> frame;
-    Process *caller_process;
-    Kernel *kernel;
+class Process;
+class ForeignFunctionCallRequest;
 
-    public:
-        std::string functionName() const;
-        void call(ForeignFunction*);
-        void registerException(viua::types::Type*);
-        void wakeup();
-
-        ForeignFunctionCallRequest(Frame *fr, Process *cp, Kernel *c): frame(fr), caller_process(cp), kernel(c) {}
-        ~ForeignFunctionCallRequest() {}
-};
-
-
-void ff_call_processor(std::vector<std::unique_ptr<ForeignFunctionCallRequest>> *requests, std::map<std::string, ForeignFunction*> *foreign_functions, std::mutex *ff_map_mtx, std::mutex *mtx, std::condition_variable *cv);
+namespace viua {
+    namespace scheduler {
+        class VirtualProcessScheduler;
+    }
+}
 
 
 class Kernel {

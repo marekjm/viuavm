@@ -22,7 +22,8 @@
 #include <condition_variable>
 #include <memory>
 #include <viua/types/exception.h>
-#include <viua/kernel/kernel.h>
+#include <viua/kernel/frame.h>
+#include <viua/scheduler/ffi.h>
 using namespace std;
 
 

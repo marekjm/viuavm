@@ -21,8 +21,10 @@
 #include <viua/types/integer.h>
 #include <viua/types/exception.h>
 #include <viua/include/module.h>
-#include <viua/kernel/kernel.h>
+#include <viua/scheduler/ffi.h>
+#include <viua/process.h>
 using namespace std;
+
 
 string ForeignFunctionCallRequest::functionName() const {
     return frame->function_name;
