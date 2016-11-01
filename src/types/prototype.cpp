@@ -23,44 +23,44 @@
 using namespace std;
 
 
-string Prototype::type() const {
-    return "Prototype";
+string viua::types::Prototype::type() const {
+    return "viua::types::Prototype";
 }
-bool Prototype::boolean() const {
+bool viua::types::Prototype::boolean() const {
     return true;
 }
 
-string Prototype::str() const {
+string viua::types::Prototype::str() const {
     return ("Prototype for " + type_name);
 }
 
-Type* Prototype::copy() const {
-    Prototype* cp = new Prototype(type_name);
+viua::types::Type* viua::types::Prototype::copy() const {
+    viua::types::Prototype* cp = new viua::types::Prototype(type_name);
     return cp;
 }
 
 
-string Prototype::getTypeName() const {
+string viua::types::Prototype::getTypeName() const {
     return type_name;
 }
-vector<string> Prototype::getAncestors() const {
+vector<string> viua::types::Prototype::getAncestors() const {
     return ancestors;
 }
 
-Prototype* Prototype::derive(const string& base_class_name) {
+viua::types::Prototype* viua::types::Prototype::derive(const string& base_class_name) {
     ancestors.emplace_back(base_class_name);
     return this;
 }
 
-Prototype* Prototype::attach(const string& function_name, const string& method_name) {
+viua::types::Prototype* viua::types::Prototype::attach(const string& function_name, const string& method_name) {
     methods[method_name] = function_name;
     return this;
 }
 
-bool Prototype::accepts(const string& method_name) const {
+bool viua::types::Prototype::accepts(const string& method_name) const {
     return methods.count(method_name);
 }
 
-string Prototype::resolvesTo(const string& method_name) const {
+string viua::types::Prototype::resolvesTo(const string& method_name) const {
     return methods.at(method_name);
 }

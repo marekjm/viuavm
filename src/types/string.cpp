@@ -85,14 +85,14 @@ String* String::join(Vector* v) {
 // foreign methods
 void String::stringify(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     if (frame->args->size() < 2) {
-        throw new Exception("expected 2 parameters");
+        throw new viua::types::Exception("expected 2 parameters");
     }
     svalue = static_cast<Pointer*>(frame->args->at(1))->to()->str();
 }
 
 void String::represent(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     if (frame->args->size() < 2) {
-        throw new Exception("expected 2 parameters");
+        throw new viua::types::Exception("expected 2 parameters");
     }
     svalue = static_cast<Pointer*>(frame->args->at(1))->to()->repr();
 }
@@ -111,7 +111,7 @@ void String::startswith(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kern
         }
     }
 
-    frame->regset->set(0, new Boolean(starts_with));
+    frame->regset->set(0, new viua::types::Boolean(starts_with));
 }
 
 void String::endswith(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
@@ -130,7 +130,7 @@ void String::endswith(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel
         }
     }
 
-    frame->regset->set(0, new Boolean(ends_with));
+    frame->regset->set(0, new viua::types::Boolean(ends_with));
 }
 
 void String::format(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {

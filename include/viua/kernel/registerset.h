@@ -27,6 +27,7 @@
 typedef unsigned char mask_t;
 typedef long unsigned registerset_size_type;
 
+
 enum REGISTER_MASKS: mask_t {
     REFERENCE       = (1 << 0),
     COPY_ON_WRITE   = (1 << 1),
@@ -41,16 +42,16 @@ enum REGISTER_MASKS: mask_t {
 
 class RegisterSet {
     registerset_size_type registerset_size;
-    Type** registers;
+    viua::types::Type** registers;
     mask_t*  masks;
 
     public:
         // basic access to registers
-        Type* put(registerset_size_type, Type*);
-        Type* pop(registerset_size_type);
-        Type* set(registerset_size_type, Type*);
-        Type* get(registerset_size_type);
-        Type* at(registerset_size_type);
+        viua::types::Type* put(registerset_size_type, viua::types::Type*);
+        viua::types::Type* pop(registerset_size_type);
+        viua::types::Type* set(registerset_size_type, viua::types::Type*);
+        viua::types::Type* get(registerset_size_type);
+        viua::types::Type* at(registerset_size_type);
 
         // register modifications
         void move(registerset_size_type, registerset_size_type);

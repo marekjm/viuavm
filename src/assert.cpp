@@ -21,7 +21,7 @@
 using namespace std;
 
 
-void viua::assertions::assert_typeof(Type* object, const string& expected) {
+void viua::assertions::assert_typeof(viua::types::Type* object, const string& expected) {
     /** Use this assertion when strict type checking is required.
      *
      *  Example: checking if an object is an Integer.

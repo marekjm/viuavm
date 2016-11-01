@@ -37,7 +37,7 @@ byte* Process::opmove(byte* addr) {
 }
 byte* Process::opcopy(byte* addr) {
     unsigned target = 0;
-    Type *source = nullptr;
+    viua::types::Type *source = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
@@ -47,7 +47,7 @@ byte* Process::opcopy(byte* addr) {
 }
 byte* Process::opptr(byte* addr) {
     unsigned target = 0;
-    Type *source = nullptr;
+    viua::types::Type *source = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
@@ -77,7 +77,7 @@ byte* Process::opisnull(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    place(target, new Boolean(uregset->at(source) == nullptr));
+    place(target, new viua::types::Boolean(uregset->at(source) == nullptr));
 
     return addr;
 }
@@ -102,7 +102,7 @@ byte* Process::opress(byte* addr) {
         case 3:
             // TODO: switching to temporary registers
         default:
-            throw new Exception("illegal register set ID in ress instruction");
+            throw new viua::types::Exception("illegal register set ID in ress instruction");
     }
 
     return addr;
@@ -117,7 +117,7 @@ byte* Process::optmpri(byte* addr) {
 }
 byte* Process::optmpro(byte* addr) {
     if (not tmp) {
-        throw new Exception("temporary register set is empty");
+        throw new viua::types::Exception("temporary register set is empty");
     }
 
     unsigned target = 0;

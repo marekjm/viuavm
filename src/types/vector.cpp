@@ -26,7 +26,7 @@
 using namespace std;
 
 
-Type* Vector::insert(long int index, Type* object) {
+viua::types::Type* viua::types::Vector::insert(long int index, viua::types::Type* object) {
     long offset = 0;
 
     // FIXME: REFACTORING: move bounds-checking to a separate function
@@ -41,17 +41,17 @@ Type* Vector::insert(long int index, Type* object) {
         offset = index;
     }
 
-    vector<Type*>::iterator it = (internal_object.begin()+offset);
+    vector<viua::types::Type*>::iterator it = (internal_object.begin()+offset);
     internal_object.insert(it, object);
     return object;
 }
 
-Type* Vector::push(Type* object) {
+viua::types::Type* viua::types::Vector::push(viua::types::Type* object) {
     internal_object.push_back(object);
     return object;
 }
 
-Type* Vector::pop(long int index) {
+viua::types::Type* viua::types::Vector::pop(long int index) {
     long offset = 0;
 
     // FIXME: REFACTORING: move bounds-checking to a separate function
@@ -67,13 +67,13 @@ Type* Vector::pop(long int index) {
         offset = index;
     }
 
-    vector<Type*>::iterator it = (internal_object.begin()+offset);
-    Type *object = *it;
+    vector<viua::types::Type*>::iterator it = (internal_object.begin()+offset);
+    viua::types::Type *object = *it;
     internal_object.erase(it);
     return object;
 }
 
-Type* Vector::at(long int index) {
+viua::types::Type* viua::types::Vector::at(long int index) {
     long offset = 0;
 
     // FIXME: REFACTORING: move bounds-checking to a separate function
@@ -89,18 +89,18 @@ Type* Vector::at(long int index) {
         offset = index;
     }
 
-    vector<Type*>::iterator it = (internal_object.begin()+offset);
+    vector<viua::types::Type*>::iterator it = (internal_object.begin()+offset);
     return *it;
 }
 
-int Vector::len() {
+int viua::types::Vector::len() {
     // FIXME: should return unsigned
     // FIXME: VM does not have unsigned integer type so return value has
     // to be converted to signed integer
     return static_cast<int>(internal_object.size());
 }
 
-string Vector::str() const {
+string viua::types::Vector::str() const {
     ostringstream oss;
     oss << "[";
     for (unsigned i = 0; i < internal_object.size(); ++i) {

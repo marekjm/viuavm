@@ -27,72 +27,72 @@
 using namespace std;
 
 
-string ProcessType::type() const {
+string viua::types::ProcessType::type() const {
     return "Process";
 }
 
-string ProcessType::str() const {
+string viua::types::ProcessType::str() const {
     return "Process";
 }
 
-string ProcessType::repr() const {
+string viua::types::ProcessType::repr() const {
     return "Process";
 }
 
-bool ProcessType::boolean() const {
+bool viua::types::ProcessType::boolean() const {
     return thrd->joinable();
 }
 
-ProcessType* ProcessType::copy() const {
-    return new ProcessType(thrd);
+viua::types::ProcessType* viua::types::ProcessType::copy() const {
+    return new viua::types::ProcessType(thrd);
 }
 
-bool ProcessType::joinable() {
+bool viua::types::ProcessType::joinable() {
     return thrd->joinable();
 }
 
-void ProcessType::join() {
+void viua::types::ProcessType::join() {
     if (thrd->joinable()) {
         thrd->join();
     } else {
-        throw new Exception("process cannot be joined");
+        throw new viua::types::Exception("process cannot be joined");
     }
 }
 
-void ProcessType::detach() {
+void viua::types::ProcessType::detach() {
     if (thrd->joinable()) {
         thrd->detach();
     } else {
-        throw new Exception("process cannot be detached");
+        throw new viua::types::Exception("process cannot be detached");
     }
 }
 
-bool ProcessType::stopped() {
+bool viua::types::ProcessType::stopped() {
     return thrd->stopped();
 }
 
-bool ProcessType::terminated() {
+bool viua::types::ProcessType::terminated() {
     return thrd->terminated();
 }
 
-unique_ptr<Type> ProcessType::transferActiveException() {
+unique_ptr<viua::types::Type> viua::types::ProcessType::transferActiveException() {
     return thrd->transferActiveException();
 }
 
-unique_ptr<Type> ProcessType::getReturnValue() {
+unique_ptr<viua::types::Type> viua::types::ProcessType::getReturnValue() {
     return thrd->getReturnValue();
 }
 
 
-void ProcessType::joinable(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
-    frame->regset->set(0, new Boolean(thrd->joinable()));
+void viua::types::ProcessType::joinable(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
+    frame->regset->set(0, new viua::types::Boolean(thrd->joinable()));
 }
 
-void ProcessType::detach(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*) {
+void viua::types::ProcessType::detach(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     thrd->detach();
 }
 
 
-PID ProcessType::pid() const {
+PID viua::types::ProcessType::pid() const {
     return thrd->pid();
 }

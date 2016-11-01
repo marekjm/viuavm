@@ -28,7 +28,7 @@ string stringifyFunctionInvocation(const Frame* frame) {
     oss << frame->function_name << '/' << frame->args->size();
     oss << '(';
     for (unsigned i = 0; i < frame->args->size(); ++i) {
-        Type* optr = frame->args->at(i);
+        auto optr = frame->args->at(i);
         if (optr == nullptr) {
             oss << "<moved or void>";
         } else {

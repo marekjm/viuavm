@@ -27,56 +27,60 @@
 #include <viua/types/number.h>
 
 
-class Boolean : public viua::types::numeric::Number {
-    /** Boolean object.
-     *
-     *  This type is used to hold true and false values.
-     */
-    bool b;
+namespace viua {
+    namespace types {
+        class Boolean : public viua::types::numeric::Number {
+            /** Boolean object.
+             *
+             *  This type is used to hold true and false values.
+             */
+            bool b;
 
-    public:
-        std::string type() const {
-            return "Boolean";
-        }
-        std::string str() const {
-            return ( b ? "true" : "false" );
-        }
-        bool boolean() const {
-            return b;
-        }
+            public:
+                std::string type() const {
+                    return "Boolean";
+                }
+                std::string str() const {
+                    return ( b ? "true" : "false" );
+                }
+                bool boolean() const {
+                    return b;
+                }
 
-        bool& value() { return b; }
+                bool& value() { return b; }
 
-        // Integer methods
-        int increment() { return (b = true); }
-        int decrement() { return (b = false); }
+                // Integer methods
+                int increment() { return (b = true); }
+                int decrement() { return (b = false); }
 
-        virtual std::vector<std::string> bases() const {
-            return std::vector<std::string>{"Number"};
-        }
-        virtual std::vector<std::string> inheritancechain() const {
-            return std::vector<std::string>{"Number", "Type"};
-        }
+                virtual std::vector<std::string> bases() const {
+                    return std::vector<std::string>{"Number"};
+                }
+                virtual std::vector<std::string> inheritancechain() const {
+                    return std::vector<std::string>{"Number", "Type"};
+                }
 
-        Type* copy() const {
-            return new Boolean(b);
-        }
+                Type* copy() const {
+                    return new Boolean(b);
+                }
 
-        int8_t as_int8() const override { return b; }
-        int16_t as_int16() const override { return b; }
-        int32_t as_int32() const override { return b; }
-        int64_t as_int64() const override { return b; }
+                int8_t as_int8() const override { return b; }
+                int16_t as_int16() const override { return b; }
+                int32_t as_int32() const override { return b; }
+                int64_t as_int64() const override { return b; }
 
-        uint8_t as_uint8() const override { return b; }
-        uint16_t as_uint16() const override { return b; }
-        uint32_t as_uint32() const override { return b; }
-        uint64_t as_uint64() const override { return b; }
+                uint8_t as_uint8() const override { return b; }
+                uint16_t as_uint16() const override { return b; }
+                uint32_t as_uint32() const override { return b; }
+                uint64_t as_uint64() const override { return b; }
 
-        viua::float32 as_float32() const override { return b; }
-        viua::float64 as_float64() const override { return b; }
+                viua::float32 as_float32() const override { return b; }
+                viua::float64 as_float64() const override { return b; }
 
-        Boolean(bool v = false): b(v) {}
-};
+                Boolean(bool v = false): b(v) {}
+        };
+    }
+}
 
 
 #endif

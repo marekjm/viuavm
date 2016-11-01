@@ -44,7 +44,7 @@ byte* Process::opprint(byte* addr) {
 byte* Process::opjump(byte* addr) {
     byte* target = (jump_base + viua::bytecode::decoder::operands::extract_primitive_uint64(addr, this));
     if (target == addr) {
-        throw new Exception("aborting: JUMP instruction pointing to itself");
+        throw new viua::types::Exception("aborting: JUMP instruction pointing to itself");
     }
     return target;
 }

@@ -32,21 +32,21 @@ using namespace std;
 
 void string_string(Frame* frame, RegisterSet*, RegisterSet*) {
     if (frame->args->at(0) == 0) {
-        throw new Exception("expected object as parameter 0");
+        throw new viua::types::Exception("expected object as parameter 0");
     }
     frame->regset->set(0, new String(frame->args->get(0)->str()));
 }
 
 void string_repr(Frame* frame, RegisterSet*, RegisterSet*) {
     if (frame->args->at(0) == 0) {
-        throw new Exception("expected object as parameter 0");
+        throw new viua::types::Exception("expected object as parameter 0");
     }
     frame->regset->set(0, new String(frame->args->get(0)->repr()));
 }
 
 void string_stringify(Frame* frame, RegisterSet*, RegisterSet*) {
     if (frame->args->at(0) == 0) {
-        throw new Exception("expected object as parameter 0");
+        throw new viua::types::Exception("expected object as parameter 0");
     }
     frame->regset->set(0, new String(str::enquote(frame->args->get(0)->str())));
 }

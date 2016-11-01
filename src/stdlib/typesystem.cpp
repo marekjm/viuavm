@@ -31,18 +31,18 @@ using namespace std;
 
 void typeof(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     if (frame->args->at(0) == 0) {
-        throw new Exception("expected object as parameter 0");
+        throw new viua::types::Exception("expected object as parameter 0");
     }
     frame->regset->set(0, new viua::types::String(frame->args->get(0)->type()));
 }
 
 void inheritanceChain(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     if (frame->args->at(0) == 0) {
-        throw new Exception("expected object as parameter 0");
+        throw new viua::types::Exception("expected object as parameter 0");
     }
 
     vector<string> ic = frame->args->at(0)->inheritancechain();
-    Vector* icv = new Vector();
+    viua::types::Vector* icv = new viua::types::Vector();
 
     for (unsigned i = 0; i < ic.size(); ++i) {
         icv->push(new viua::types::String(ic[i]));
@@ -53,12 +53,12 @@ void inheritanceChain(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel
 
 void bases(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
     if (frame->args->at(0) == 0) {
-        throw new Exception("expected object as parameter 0");
+        throw new viua::types::Exception("expected object as parameter 0");
     }
 
-    Type* object = frame->args->at(0);
+    viua::types::Type* object = frame->args->at(0);
     vector<string> ic = object->bases();
-    Vector* icv = new Vector();
+    viua::types::Vector* icv = new viua::types::Vector();
 
     for (unsigned i = 0; i < ic.size(); ++i) {
         icv->push(new viua::types::String(ic[i]));

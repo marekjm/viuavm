@@ -43,7 +43,7 @@ byte* Process::opcatch(byte* addr) {
     tie(addr, catcher_block_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     if (not scheduler->isBlock(catcher_block_name)) {
-        throw new Exception("registering undefined handler block '" + catcher_block_name + "' to handle " + type_name);
+        throw new viua::types::Exception("registering undefined handler block '" + catcher_block_name + "' to handle " + type_name);
     }
 
     try_frame_new->catchers[type_name] = new Catcher(type_name, catcher_block_name);
@@ -58,7 +58,7 @@ byte* Process::oppull(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     if (not caught) {
-        throw new Exception("no caught object to pull");
+        throw new viua::types::Exception("no caught object to pull");
     }
     uregset->set(target, caught.release());
 
@@ -72,7 +72,7 @@ byte* Process::openter(byte* addr) {
     tie(addr, block_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     if (not scheduler->isBlock(block_name)) {
-        throw new Exception("cannot enter undefined block: " + block_name);
+        throw new viua::types::Exception("cannot enter undefined block: " + block_name);
     }
 
     byte* block_address = adjustJumpBaseForBlock(block_name);
@@ -95,12 +95,12 @@ byte* Process::opthrow(byte* addr) {
     if (source >= uregset->size()) {
         ostringstream oss;
         oss << "invalid read: register out of bounds: " << source;
-        throw new Exception(oss.str());
+        throw new viua::types::Exception(oss.str());
     }
     if (uregset->at(source) == nullptr) {
         ostringstream oss;
         oss << "invalid throw: register " << source << " is empty";
-        throw new Exception(oss.str());
+        throw new viua::types::Exception(oss.str());
     }
 
     thrown.reset(uregset->pop(source));
@@ -112,7 +112,7 @@ byte* Process::opleave(byte* addr) {
     /*  Run leave instruction.
      */
     if (tryframes.size() == 0) {
-        throw new Exception("bad leave: no block has been entered");
+        throw new viua::types::Exception("bad leave: no block has been entered");
     }
     addr = tryframes.back()->return_address;
     tryframes.pop_back();

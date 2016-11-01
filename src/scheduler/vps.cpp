@@ -41,8 +41,8 @@ static void printStackTrace(Process *process) {
     }
     cout << "\n";
 
-    unique_ptr<Type> thrown_object(process->transferActiveException());
-    Exception* ex = dynamic_cast<Exception*>(thrown_object.get());
+    unique_ptr<viua::types::Type> thrown_object(process->transferActiveException());
+    auto ex = dynamic_cast<viua::types::Exception*>(thrown_object.get());
     string ex_type = thrown_object->type();
 
     //cout << "exception after " << kernel.counter() << " ticks" << endl;
@@ -78,7 +78,7 @@ static void printStackTrace(Process *process) {
                 if (last->args->isflagged(r, MOVED)) {
                     cout << "[moved] ";
                 }
-                if (Pointer* ptr = dynamic_cast<Pointer*>(last->args->get(r))) {
+                if (auto ptr = dynamic_cast<viua::types::Pointer*>(last->args->get(r))) {
                     if (ptr->expired()) {
                         cout << "<ExpiredPointer>" << endl;
                     } else {
@@ -212,7 +212,7 @@ pair<byte*, byte*> viua::scheduler::VirtualProcessScheduler::getEntryPointOf(con
     return attached_kernel->getEntryPointOf(name);
 }
 
-void viua::scheduler::VirtualProcessScheduler::registerPrototype(Prototype *proto) {
+void viua::scheduler::VirtualProcessScheduler::registerPrototype(viua::types::Prototype *proto) {
     attached_kernel->registerPrototype(proto);
 }
 
@@ -220,7 +220,7 @@ void viua::scheduler::VirtualProcessScheduler::requestForeignFunctionCall(Frame 
     attached_kernel->requestForeignFunctionCall(frame, p);
 }
 
-void viua::scheduler::VirtualProcessScheduler::requestForeignMethodCall(const string& name, Type *object, Frame *frame, RegisterSet*, RegisterSet*, Process *p) {
+void viua::scheduler::VirtualProcessScheduler::requestForeignMethodCall(const string& name, viua::types::Type *object, Frame *frame, RegisterSet*, RegisterSet*, Process *p) {
     attached_kernel->requestForeignMethodCall(name, object, frame, nullptr, nullptr, p);
 }
 
@@ -290,14 +290,14 @@ Process* viua::scheduler::VirtualProcessScheduler::spawn(unique_ptr<Frame> frame
     return process_ptr;
 }
 
-void viua::scheduler::VirtualProcessScheduler::send(const PID pid, unique_ptr<Type> message) {
+void viua::scheduler::VirtualProcessScheduler::send(const PID pid, unique_ptr<viua::types::Type> message) {
 #if VIUA_VM_DEBUG_LOG
     viua_err( "[sched:vps:send] pid = ", pid.get());
 #endif
     attached_kernel->send(pid, std::move(message));
 }
 
-void viua::scheduler::VirtualProcessScheduler::receive(const PID pid, queue<unique_ptr<Type>>& message_queue) {
+void viua::scheduler::VirtualProcessScheduler::receive(const PID pid, queue<unique_ptr<viua::types::Type>>& message_queue) {
 #if VIUA_VM_DEBUG_LOG
     viua_err( "[sched:vps:receive] pid = ", pid.get());
 #endif
@@ -405,9 +405,9 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
 #endif
                 dead_processes_list.emplace_back(std::move(processes.at(i)));
             } else {
-                unique_ptr<Object> death_message(new Object("Object"));
-                unique_ptr<Type> exc(th->transferActiveException());
-                Vector *parameters = new Vector();
+                unique_ptr<viua::types::Object> death_message(new viua::types::Object("Object"));
+                unique_ptr<viua::types::Type> exc(th->transferActiveException());
+                auto parameters = new viua::types::Vector();
                 RegisterSet *top_args = th->trace()[0]->args;
                 for (unsigned long j = 0; j < top_args->size(); ++j) {
                     if (top_args->at(j)) {
@@ -420,7 +420,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                 viua_err( "[sched:vps:died:notify-watchdog] pid = ", th->pid().get(), ", death cause: ", exc->str());
 #endif
 
-                death_message->set("function", new Function(th->trace()[0]->function_name));
+                death_message->set("function", new viua::types::Function(th->trace()[0]->function_name));
                 death_message->set("exception", exc.release());
                 death_message->set("parameters", parameters);
 
@@ -520,7 +520,7 @@ void viua::scheduler::VirtualProcessScheduler::bootstrap(const vector<string>& c
     unique_ptr<Frame> initial_frame(new Frame(nullptr, 0, 2));
     initial_frame->function_name = ENTRY_FUNCTION_NAME;
 
-    Vector* cmdline = new Vector();
+    auto cmdline = new viua::types::Vector();
     auto limit = commandline_arguments.size();
     for (decltype(limit) i = 0; i < limit; ++i) {
         cmdline->push(new viua::types::String(commandline_arguments[i]));

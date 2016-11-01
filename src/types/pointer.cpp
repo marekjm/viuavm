@@ -28,67 +28,67 @@
 using namespace std;
 
 
-void Pointer::attach() {
+void viua::types::Pointer::attach() {
     points_to->pointers.push_back(this);
     valid = true;
 }
-void Pointer::detach() {
+void viua::types::Pointer::detach() {
     if (valid) {
         points_to->pointers.erase(std::find(points_to->pointers.begin(), points_to->pointers.end(), this));
     }
     valid = false;
 }
 
-void Pointer::invalidate(Type* t) {
+void viua::types::Pointer::invalidate(viua::types::Type* t) {
     if (t == points_to) {
         valid = false;
     }
 }
-bool Pointer::expired() {
+bool viua::types::Pointer::expired() {
     return !valid;
 }
-void Pointer::reset(Type* t) {
+void viua::types::Pointer::reset(viua::types::Type* t) {
     detach();
     points_to = t;
     attach();
 }
-Type* Pointer::to() {
+viua::types::Type* viua::types::Pointer::to() {
     if (not valid) {
-        throw new Exception("expired pointer exception");
+        throw new viua::types::Exception("expired pointer exception");
     }
     return points_to;
 }
 
-string Pointer::type() const {
+string viua::types::Pointer::type() const {
     return ((valid ? points_to->type() : "Expired") + "Pointer");
 }
 
-bool Pointer::boolean() const {
+bool viua::types::Pointer::boolean() const {
     return valid;
 }
 
-string Pointer::str() const {
+string viua::types::Pointer::str() const {
     return type();
 }
 
-Type* Pointer::copy() const {
+viua::types::Type* viua::types::Pointer::copy() const {
     if (not valid) {
-        return new Pointer();
+        return new viua::types::Pointer();
     } else {
-        return new Pointer(points_to);
+        return new viua::types::Pointer(points_to);
     }
 }
 
 
-void Pointer::expired(Frame* frm, RegisterSet*, RegisterSet*, Process*, Kernel*) {
-    frm->regset->set(0, new Boolean(expired()));
+void viua::types::Pointer::expired(Frame* frm, RegisterSet*, RegisterSet*, Process*, Kernel*) {
+    frm->regset->set(0, new viua::types::Boolean(expired()));
 }
 
 
-Pointer::Pointer(): points_to(nullptr), valid(false) {}
-Pointer::Pointer(Type* t): points_to(t), valid(true) {
+viua::types::Pointer::Pointer(): points_to(nullptr), valid(false) {}
+viua::types::Pointer::Pointer(viua::types::Type* t): points_to(t), valid(true) {
     attach();
 }
-Pointer::~Pointer() {
+viua::types::Pointer::~Pointer() {
     detach();
 }

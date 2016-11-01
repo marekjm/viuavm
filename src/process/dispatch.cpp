@@ -299,7 +299,7 @@ byte* Process::dispatch(byte* addr) {
             if (OP_NAMES.count(static_cast<OPCODE>(*addr))) {
                 error << ": " << OP_NAMES.at(static_cast<OPCODE>(*addr));
             }
-            throw new Exception(error.str());
+            throw new viua::types::Exception(error.str());
     }
     return addr;
 }

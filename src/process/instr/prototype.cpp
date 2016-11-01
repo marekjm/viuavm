@@ -37,7 +37,7 @@ byte* Process::opclass(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, class_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
-    place(target, new Prototype(class_name));
+    place(target, new viua::types::Prototype(class_name));
 
     return addr;
 }
@@ -45,17 +45,17 @@ byte* Process::opclass(byte* addr) {
 byte* Process::opderive(byte* addr) {
     /** Push an ancestor class to prototype's inheritance chain.
      */
-    Type* target = nullptr;
+    viua::types::Type* target = nullptr;
     string class_name;
 
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_object(addr, this);
     tie(addr, class_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     if (not scheduler->isClass(class_name)) {
-        throw new Exception("cannot derive from unregistered type: " + class_name);
+        throw new viua::types::Exception("cannot derive from unregistered type: " + class_name);
     }
 
-    static_cast<Prototype*>(target)->derive(class_name);
+    static_cast<viua::types::Prototype*>(target)->derive(class_name);
 
     return addr;
 }
@@ -63,17 +63,17 @@ byte* Process::opderive(byte* addr) {
 byte* Process::opattach(byte* addr) {
     /** Attach a function to a prototype as a method.
      */
-    Type* target = nullptr;
+    viua::types::Type* target = nullptr;
     string function_name, method_name;
 
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_object(addr, this);
     tie(addr, function_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
     tie(addr, method_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
-    Prototype* proto = static_cast<Prototype*>(target);
+    viua::types::Prototype* proto = static_cast<viua::types::Prototype*>(target);
 
     if (not (scheduler->isNativeFunction(function_name) or scheduler->isForeignFunction(function_name))) {
-        throw new Exception("cannot attach undefined function '" + function_name + "' as a method '" + method_name + "' of prototype '" + proto->getTypeName() + "'");
+        throw new viua::types::Exception("cannot attach undefined function '" + function_name + "' as a method '" + method_name + "' of prototype '" + proto->getTypeName() + "'");
     }
 
     proto->attach(function_name, method_name);
@@ -87,7 +87,7 @@ byte* Process::opregister(byte* addr) {
     unsigned source = 0;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    scheduler->registerPrototype(static_cast<Prototype*>(pop(source)));
+    scheduler->registerPrototype(static_cast<viua::types::Prototype*>(pop(source)));
 
     return addr;
 }

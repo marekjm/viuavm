@@ -41,10 +41,10 @@ byte* Process::opnew(byte* addr) {
     tie(addr, class_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     if (not scheduler->isClass(class_name)) {
-        throw new Exception("cannot create new instance of unregistered type: " + class_name);
+        throw new viua::types::Exception("cannot create new instance of unregistered type: " + class_name);
     }
 
-    place(target, new Object(class_name));
+    place(target, new viua::types::Object(class_name));
 
     return addr;
 }
@@ -62,12 +62,12 @@ byte* Process::opmsg(byte* addr) {
     string method_name;
     tie(addr, method_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
-    Type* obj = frame_new->args->at(0);
-    if (Pointer* ptr = dynamic_cast<Pointer*>(obj)) {
+    auto obj = frame_new->args->at(0);
+    if (auto ptr = dynamic_cast<viua::types::Pointer*>(obj)) {
         obj = ptr->to();
     }
     if (not scheduler->isClass(obj->type())) {
-        throw new Exception("unregistered type cannot be used for dynamic dispatch: " + obj->type());
+        throw new viua::types::Exception("unregistered type cannot be used for dynamic dispatch: " + obj->type());
     }
     vector<string> mro = scheduler->inheritanceChainOf(obj->type());
     mro.insert(mro.begin(), obj->type());
@@ -75,7 +75,7 @@ byte* Process::opmsg(byte* addr) {
     string function_name = "";
     for (unsigned i = 0; i < mro.size(); ++i) {
         if (not scheduler->isClass(mro[i])) {
-            throw new Exception("unavailable base type in inheritance hierarchy of " + mro[0] + ": " + mro[i]);
+            throw new viua::types::Exception("unavailable base type in inheritance hierarchy of " + mro[0] + ": " + mro[i]);
         }
         if (scheduler->classAccepts(mro[i], method_name)) {
             function_name = scheduler->resolveMethodName(mro[i], method_name);
@@ -83,7 +83,7 @@ byte* Process::opmsg(byte* addr) {
         }
     }
     if (function_name.size() == 0) {
-        throw new Exception("class '" + obj->type() + "' does not accept method '" + method_name + "'");
+        throw new viua::types::Exception("class '" + obj->type() + "' does not accept method '" + method_name + "'");
     }
 
     bool is_native = scheduler->isNativeFunction(function_name);
@@ -91,7 +91,7 @@ byte* Process::opmsg(byte* addr) {
     bool is_foreign_method = scheduler->isForeignMethod(function_name);
 
     if (not (is_native or is_foreign or is_foreign_method)) {
-        throw new Exception("method '" + method_name + "' resolves to undefined function '" + function_name + "' on class '" + obj->type() + "'");
+        throw new viua::types::Exception("method '" + method_name + "' resolves to undefined function '" + function_name + "' on class '" + obj->type() + "'");
     }
 
     if (is_foreign_method) {
@@ -109,17 +109,17 @@ byte* Process::opmsg(byte* addr) {
 byte* Process::opinsert(byte* addr) {
     /** Insert an object as an attribute of another object.
      */
-    Type *object_operand = nullptr, *key_operand = nullptr;
+    viua::types::Type *object_operand = nullptr, *key_operand = nullptr;
     unsigned source_index = 0;
 
     tie(addr, object_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
     tie(addr, key_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
     tie(addr, source_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    viua::assertions::assert_implements<Object>(object_operand, "Object");
+    viua::assertions::assert_implements<viua::types::Object>(object_operand, "viua::types::Object");
     viua::assertions::assert_typeof(key_operand, "String");
 
-    static_cast<Object*>(object_operand)->insert(static_cast<viua::types::String*>(key_operand)->str(), pop(source_index));
+    static_cast<viua::types::Object*>(object_operand)->insert(static_cast<viua::types::String*>(key_operand)->str(), pop(source_index));
 
     return addr;
 }
@@ -128,16 +128,16 @@ byte* Process::opremove(byte* addr) {
     /** Remove an attribute of another object.
      */
     unsigned target_index = 0;
-    Type *object_operand = nullptr, *key_operand = nullptr;
+    viua::types::Type *object_operand = nullptr, *key_operand = nullptr;
 
     tie(addr, target_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, object_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
     tie(addr, key_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    viua::assertions::assert_implements<Object>(object_operand, "Object");
+    viua::assertions::assert_implements<viua::types::Object>(object_operand, "viua::types::Object");
     viua::assertions::assert_typeof(key_operand, "String");
 
-    place(target_index, static_cast<Object*>(object_operand)->remove(static_cast<viua::types::String*>(key_operand)->str()));
+    place(target_index, static_cast<viua::types::Object*>(object_operand)->remove(static_cast<viua::types::String*>(key_operand)->str()));
 
     return addr;
 }

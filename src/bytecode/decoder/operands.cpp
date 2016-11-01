@@ -47,7 +47,7 @@ template<class Value, class Class> static auto fetch_primitive_value(byte *ip, P
         value = extract<Value>(ip);
         ip += sizeof(Value);
     } else {
-        throw new Exception("decoded invalid operand type");
+        throw new viua::types::Exception("decoded invalid operand type");
     }
     if (ot == OT_REGISTER_REFERENCE) {
         // FIXME once dynamic operand types are implemented the need for this cast will go away
@@ -69,13 +69,13 @@ auto viua::bytecode::decoder::operands::fetch_register_index(byte *ip, Process *
         register_index = static_cast<unsigned>(extract<int>(ip));
         ip += sizeof(int);
     } else {
-        throw new Exception("decoded invalid operand type");
+        throw new viua::types::Exception("decoded invalid operand type");
     }
     if (ot == OT_REGISTER_REFERENCE) {
         auto i = static_cast<viua::types::Integer*>(process->obtain(register_index));
         // FIXME Number::negative() -> bool is needed
         if (i->as_int32() < 0) {
-            throw new Exception("register indexes cannot be negative");
+            throw new viua::types::Exception("register indexes cannot be negative");
         }
         register_index = i->as_uint32();
     }
@@ -121,8 +121,8 @@ auto viua::bytecode::decoder::operands::fetch_atom(byte *ip, Process*) -> tuple<
     return tuple<byte*, string>(ip, s);
 }
 
-auto viua::bytecode::decoder::operands::fetch_object(byte *ip, Process *p) -> tuple<byte*, Type*> {
+auto viua::bytecode::decoder::operands::fetch_object(byte *ip, Process *p) -> tuple<byte*, viua::types::Type*> {
     unsigned register_index = 0;
     tie(ip, register_index) = fetch_register_index(ip, p);
-    return tuple<byte*, Type*>(ip, p->obtain(register_index));
+    return tuple<byte*, viua::types::Type*>(ip, p->obtain(register_index));
 }

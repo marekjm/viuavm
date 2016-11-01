@@ -93,7 +93,7 @@ Kernel& Kernel::registerExternalFunction(const string& name, ForeignFunction* fu
     return (*this);
 }
 
-Kernel& Kernel::registerForeignPrototype(const string& name, Prototype* proto) {
+Kernel& Kernel::registerForeignPrototype(const string& name, viua::types::Prototype* proto) {
     /** Registers foreign prototype in Kernel.
      */
     typesystem[name] = proto;
@@ -138,7 +138,7 @@ void Kernel::loadNativeLibrary(const string& module) {
             linked_blocks[bl_linkname] = pair<string, byte*>(module, (lnk_btcd+bl_addrs[bl_linkname]));
         }
     } else {
-        throw new Exception("failed to link: " + module);
+        throw new viua::types::Exception("failed to link: " + module);
     }
 }
 void Kernel::loadForeignLibrary(const string& module) {
@@ -148,18 +148,18 @@ void Kernel::loadForeignLibrary(const string& module) {
     if (path.size() == 0) { path = support::env::viua::getmodpath(module, "so", support::env::getpaths("VIUAAFTERPATH")); }
 
     if (path.size() == 0) {
-        throw new Exception("LinkException", ("failed to link library: " + module));
+        throw new viua::types::Exception("LinkException", ("failed to link library: " + module));
     }
 
     void* handle = dlopen(path.c_str(), RTLD_LAZY);
 
     if (handle == nullptr) {
-        throw new Exception("LinkException", ("failed to open handle: " + module + ": " + dlerror()));
+        throw new viua::types::Exception("LinkException", ("failed to open handle: " + module + ": " + dlerror()));
     }
 
     ForeignFunctionSpec* (*exports)() = nullptr;
     if ((exports = reinterpret_cast<ForeignFunctionSpec*(*)()>(dlsym(handle, "exports"))) == nullptr) {
-        throw new Exception("failed to extract interface from module: " + module);
+        throw new viua::types::Exception("failed to extract interface from module: " + module);
     }
 
     ForeignFunctionSpec* exported = (*exports)();
@@ -187,7 +187,7 @@ vector<string> Kernel::inheritanceChainOf(const string& type_name) const {
      */
     if (typesystem.count(type_name) == 0) {
         // FIXME: better exception message
-        throw new Exception("unregistered type: " + type_name);
+        throw new viua::types::Exception("unregistered type: " + type_name);
     }
     vector<string> ichain = typesystem.at(type_name)->getAncestors();
     for (unsigned i = 0; i < ichain.size(); ++i) {
@@ -278,7 +278,7 @@ pair<byte*, byte*> Kernel::getEntryPointOf(const std::string& name) const {
     return pair<byte*, byte*>(entry_point, module_base);
 }
 
-void Kernel::registerPrototype(Prototype *proto) {
+void Kernel::registerPrototype(viua::types::Prototype *proto) {
     typesystem[proto->getTypeName()] = proto;
 }
 
@@ -293,7 +293,7 @@ void Kernel::requestForeignFunctionCall(Frame *frame, Process *requesting_proces
     foreign_call_queue_condition.notify_one();
 }
 
-void Kernel::requestForeignMethodCall(const string& name, Type *object, Frame *frame, RegisterSet*, RegisterSet*, Process *p) {
+void Kernel::requestForeignMethodCall(const string& name, viua::types::Type *object, Frame *frame, RegisterSet*, RegisterSet*, Process *p) {
     foreign_methods.at(name)(object, frame, nullptr, nullptr, p, this);
 }
 
@@ -309,7 +309,7 @@ uint64_t Kernel::createMailbox(const PID pid) {
 #if VIUA_VM_DEBUG_LOG
     cerr << "[kernel:mailbox:create] pid = " << pid.get() << endl;
 #endif
-    mailboxes.emplace(pid, vector<unique_ptr<Type>>{});
+    mailboxes.emplace(pid, vector<unique_ptr<viua::types::Type>>{});
     return ++running_processes;
 }
 uint64_t Kernel::deleteMailbox(const PID pid) {
@@ -320,7 +320,7 @@ uint64_t Kernel::deleteMailbox(const PID pid) {
     mailboxes.erase(pid);
     return --running_processes;
 }
-void Kernel::send(const PID pid, unique_ptr<Type> message) {
+void Kernel::send(const PID pid, unique_ptr<viua::types::Type> message) {
     unique_lock<mutex> lck(mailbox_mutex);
     if (mailboxes.count(pid) == 0) {
         // sending a message to an unknown address just drops the message
@@ -332,10 +332,10 @@ void Kernel::send(const PID pid, unique_ptr<Type> message) {
 #endif
     mailboxes[pid].emplace_back(std::move(message));
 }
-void Kernel::receive(const PID pid, queue<unique_ptr<Type>>& message_queue) {
+void Kernel::receive(const PID pid, queue<unique_ptr<viua::types::Type>>& message_queue) {
     unique_lock<mutex> lck(mailbox_mutex);
     if (mailboxes.count(pid) == 0) {
-        throw new Exception("invalid PID");
+        throw new viua::types::Exception("invalid PID");
     }
 
 #if VIUA_VM_DEBUG_LOG
@@ -464,7 +464,7 @@ Kernel::~Kernel() {
         delete w;
     }
 
-    std::map<std::string, std::pair<unsigned, byte*> >::iterator lm = linked_modules.begin();
+    auto lm = linked_modules.begin();
     while (lm != linked_modules.end()) {
         std::string lkey = lm->first;
         byte *ptr = lm->second.second;
@@ -475,10 +475,10 @@ Kernel::~Kernel() {
         delete[] ptr;
     }
 
-    std::map<std::string, Prototype*>::iterator pr = typesystem.begin();
+    auto pr = typesystem.begin();
     while (pr != typesystem.end()) {
         std::string proto_name = pr->first;
-        Prototype* proto_ptr = pr->second;
+        viua::types::Prototype* proto_ptr = pr->second;
 
         ++pr;
 

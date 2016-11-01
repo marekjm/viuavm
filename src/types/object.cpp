@@ -26,14 +26,14 @@
 using namespace std;
 
 
-string Object::type() const {
+string viua::types::Object::type() const {
     return type_name;
 }
-bool Object::boolean() const {
+bool viua::types::Object::boolean() const {
     return true;
 }
 
-string Object::str() const {
+string viua::types::Object::str() const {
     ostringstream oss;
 
     oss << type_name << '#';
@@ -46,15 +46,15 @@ string Object::str() const {
     return oss.str();
 }
 
-Type* Object::copy() const {
-    Object* cp = new Object(type_name);
+viua::types::Type* viua::types::Object::copy() const {
+    viua::types::Object* cp = new viua::types::Object(type_name);
     for (const auto& each : attributes) {
         cp->set(each.first, each.second->copy());
     }
     return cp;
 }
 
-void Object::set(const string& name, Type* object) {
+void viua::types::Object::set(const string& name, viua::types::Type* object) {
     // prevent memory leaks during key overwriting
     if (attributes.count(name)) {
         delete attributes.at(name);
@@ -63,27 +63,27 @@ void Object::set(const string& name, Type* object) {
     attributes[name] = object;
 }
 
-void Object::insert(const string& key, Type* value) {
+void viua::types::Object::insert(const string& key, viua::types::Type* value) {
     set(key, value);
 }
-Type* Object::remove(const string& key) {
+viua::types::Type* viua::types::Object::remove(const string& key) {
     if (not attributes.count(key)) {
         ostringstream oss;
         oss << "attribute not found: " << key;
-        throw new Exception(oss.str());
+        throw new viua::types::Exception(oss.str());
     }
-    Type* o = attributes.at(key);
+    viua::types::Type* o = attributes.at(key);
     attributes.erase(key);
     return o;
 }
 
 
-Object::Object(const std::string& tn): type_name(tn) {}
-Object::~Object() {
+viua::types::Object::Object(const std::string& tn): type_name(tn) {}
+viua::types::Object::~Object() {
     auto kv_pair = attributes.begin();
     while (kv_pair != attributes.end()) {
         string key = kv_pair->first;
-        Type* value = kv_pair->second;
+        viua::types::Type* value = kv_pair->second;
 
         ++kv_pair;
 

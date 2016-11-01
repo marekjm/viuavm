@@ -50,7 +50,7 @@ class ForeignFunctionCallRequest {
     public:
         std::string functionName() const;
         void call(ForeignFunction*);
-        void registerException(Type*);
+        void registerException(viua::types::Type*);
         void wakeup();
 
         ForeignFunctionCallRequest(Frame *fr, Process *cp, Kernel *c): frame(fr), caller_process(cp), kernel(c) {}
@@ -73,7 +73,7 @@ class Kernel {
     uint64_t executable_offset;
 
     // Map of the typesystem currently existing inside the VM.
-    std::map<std::string, Prototype*> typesystem;
+    std::map<std::string, viua::types::Prototype*> typesystem;
 
     /*  Function and block names mapped to bytecode addresses.
      */
@@ -132,7 +132,7 @@ class Kernel {
 
     std::vector<void*> cxx_dynamic_lib_handles;
 
-    std::map<PID, std::vector<std::unique_ptr<Type>>> mailboxes;
+    std::map<PID, std::vector<std::unique_ptr<viua::types::Type>>> mailboxes;
     std::mutex mailbox_mutex;
 
     public:
@@ -181,21 +181,21 @@ class Kernel {
         std::string resolveMethodName(const std::string&, const std::string&) const;
         std::pair<byte*, byte*> getEntryPointOf(const std::string&) const;
 
-        void registerPrototype(Prototype*);
+        void registerPrototype(viua::types::Prototype*);
 
         /// These two methods are used to inject pure-C++ classes into machine's typesystem.
-        Kernel& registerForeignPrototype(const std::string&, Prototype*);
+        Kernel& registerForeignPrototype(const std::string&, viua::types::Prototype*);
         Kernel& registerForeignMethod(const std::string&, ForeignMethod);
 
         void requestForeignFunctionCall(Frame*, Process*);
-        void requestForeignMethodCall(const std::string&, Type*, Frame*, RegisterSet*, RegisterSet*, Process*);
+        void requestForeignMethodCall(const std::string&, viua::types::Type*, Frame*, RegisterSet*, RegisterSet*, Process*);
 
         void postFreeProcess(std::unique_ptr<Process>);
 
         uint64_t createMailbox(const PID);
         uint64_t deleteMailbox(const PID);
-        void send(const PID, std::unique_ptr<Type>);
-        void receive(const PID, std::queue<std::unique_ptr<Type>>&);
+        void send(const PID, std::unique_ptr<viua::types::Type>);
+        void receive(const PID, std::queue<std::unique_ptr<viua::types::Type>>&);
         uint64_t pids() const;
 
         auto static no_of_vp_schedulers() -> decltype(default_vp_schedulers_limit);

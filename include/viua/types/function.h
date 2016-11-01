@@ -28,26 +28,30 @@
 #include <viua/types/type.h>
 
 
-class Function : public Type {
-    /** Type representing a function.
-     */
-    public:
-        std::string function_name;
+namespace viua {
+    namespace types {
+        class Function : public Type {
+            /** Type representing a function.
+             */
+            public:
+                std::string function_name;
 
-        virtual std::string type() const;
-        virtual std::string str() const;
-        virtual std::string repr() const;
+                virtual std::string type() const;
+                virtual std::string str() const;
+                virtual std::string repr() const;
 
-        virtual bool boolean() const;
+                virtual bool boolean() const;
 
-        virtual Type* copy() const;
+                virtual Type* copy() const;
 
-        virtual std::string name() const;
+                virtual std::string name() const;
 
-        // FIXME: implement real dtor
-        Function(const std::string& = "");
-        virtual ~Function();
-};
+                // FIXME: implement real dtor
+                Function(const std::string& = "");
+                virtual ~Function();
+        };
+    }
+}
 
 
 #endif

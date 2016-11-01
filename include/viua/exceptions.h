@@ -28,13 +28,13 @@
 #include <viua/types/exception.h>
 
 
-class OutOfRangeException: public Exception {
+class OutOfRangeException: public viua::types::Exception {
     public:
         std::string type() const { return "OutOfRangeException"; }
-        OutOfRangeException(const std::string& s): Exception(s) {}
+        OutOfRangeException(const std::string& s): viua::types::Exception(s) {}
 };
 
-class ArityException: public Exception {
+class ArityException: public viua::types::Exception {
         unsigned long got_arity;
         std::vector<decltype(got_arity)> valid_arities;
     public:
@@ -67,7 +67,7 @@ class ArityException: public Exception {
         ~ArityException() {}
 };
 
-class TypeException: public Exception {
+class TypeException: public viua::types::Exception {
         std::string expected;
         std::string got;
     public:
@@ -93,7 +93,7 @@ class TypeException: public Exception {
         ~TypeException() {}
 };
 
-class UnresolvedAtomException: public Exception {
+class UnresolvedAtomException: public viua::types::Exception {
         std::string atom;
     public:
         std::string type() const override {
@@ -116,7 +116,7 @@ class UnresolvedAtomException: public Exception {
         ~UnresolvedAtomException() {}
 };
 
-class OperandTypeException: public Exception {
+class OperandTypeException: public viua::types::Exception {
     public:
         std::string type() const override {
             return "OperandTypeException";

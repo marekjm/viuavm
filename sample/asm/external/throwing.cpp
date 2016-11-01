@@ -32,7 +32,7 @@ extern "C" const ForeignFunctionSpec* exports();
 
 
 static void throwing_oh_noes(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*) {
-    throw new Exception("OH NOES!");
+    throw new viua::types::Exception("OH NOES!");
 }
 
 

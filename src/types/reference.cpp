@@ -22,45 +22,45 @@
 using namespace std;
 
 
-Type* Reference::pointsTo() const {
+viua::types::Type* viua::types::Reference::pointsTo() const {
     return *pointer;
 }
 
-void Reference::rebind(Type* ptr) {
+void viua::types::Reference::rebind(viua::types::Type* ptr) {
     delete (*pointer);
     (*pointer) = ptr;
 }
 
 
-string Reference::type() const {
+string viua::types::Reference::type() const {
     return (*pointer)->type();
 }
 
-string Reference::str() const {
+string viua::types::Reference::str() const {
     return (*pointer)->str();
 }
-string Reference::repr() const {
+string viua::types::Reference::repr() const {
     return (*pointer)->repr();
 }
-bool Reference::boolean() const {
+bool viua::types::Reference::boolean() const {
     return (*pointer)->boolean();
 }
 
-vector<string> Reference::bases() const {
+vector<string> viua::types::Reference::bases() const {
     return vector<string>({});
 }
-vector<string> Reference::inheritancechain() const {
+vector<string> viua::types::Reference::inheritancechain() const {
     return vector<string>({});
 }
 
-Reference* Reference::copy() const {
+viua::types::Reference* viua::types::Reference::copy() const {
     ++(*counter);
-    return new Reference(pointer, counter);
+    return new viua::types::Reference(pointer, counter);
 }
 
-Reference::Reference(Type *ptr): pointer(new Type*(ptr)), counter(new unsigned(1)) {
+viua::types::Reference::Reference(viua::types::Type *ptr): pointer(new viua::types::Type*(ptr)), counter(new unsigned(1)) {
 }
-Reference::~Reference() {
+viua::types::Reference::~Reference() {
     /** Copies of the reference may be freely spawned and destroyed, but
      *  the internal object *MUST* be preserved until its refcount reaches zero.
      */

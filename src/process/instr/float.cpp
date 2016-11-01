@@ -89,21 +89,21 @@ byte* Process::opfdiv(byte* addr) {
 }
 
 byte* Process::opflt(byte* addr) {
-    return perform<std::less<float>, Boolean>(addr, this);
+    return perform<std::less<float>, viua::types::Boolean>(addr, this);
 }
 
 byte* Process::opflte(byte* addr) {
-    return perform<std::less_equal<float>, Boolean>(addr, this);
+    return perform<std::less_equal<float>, viua::types::Boolean>(addr, this);
 }
 
 byte* Process::opfgt(byte* addr) {
-    return perform<std::greater<float>, Boolean>(addr, this);
+    return perform<std::greater<float>, viua::types::Boolean>(addr, this);
 }
 
 byte* Process::opfgte(byte* addr) {
-    return perform<std::greater_equal<float>, Boolean>(addr, this);
+    return perform<std::greater_equal<float>, viua::types::Boolean>(addr, this);
 }
 
 byte* Process::opfeq(byte* addr) {
-    return perform<std::equal_to<float>, Boolean>(addr, this);
+    return perform<std::equal_to<float>, viua::types::Boolean>(addr, this);
 }

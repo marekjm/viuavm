@@ -49,7 +49,7 @@ void ff_call_processor(vector<unique_ptr<ForeignFunctionCallRequest>> *requests,
         string call_name = request->functionName();
         unique_lock<mutex> ff_map_lock(*ff_map_mtx);
         if (foreign_functions->count(call_name) == 0) {
-            request->registerException(new Exception("call to unregistered foreign function: " + call_name));
+            request->registerException(new viua::types::Exception("call to unregistered foreign function: " + call_name));
         } else {
             auto function = foreign_functions->at(call_name);
             ff_map_lock.unlock();   // unlock the mutex - foreign call can block for unspecified period of time

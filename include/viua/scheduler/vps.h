@@ -80,10 +80,10 @@ namespace viua {
             std::string resolveMethodName(const std::string&, const std::string&) const;
             std::pair<byte*, byte*> getEntryPointOf(const std::string&) const;
 
-            void registerPrototype(Prototype*);
+            void registerPrototype(viua::types::Prototype*);
 
             void requestForeignFunctionCall(Frame*, Process*) const;
-            void requestForeignMethodCall(const std::string&, Type*, Frame*, RegisterSet*, RegisterSet*, Process*);
+            void requestForeignMethodCall(const std::string&, viua::types::Type*, Frame*, RegisterSet*, RegisterSet*, Process*);
 
             void loadNativeLibrary(const std::string&);
             void loadForeignLibrary(const std::string&);
@@ -95,8 +95,8 @@ namespace viua {
             Process* process();
             Process* spawn(std::unique_ptr<Frame>, Process*, bool);
 
-            void send(const PID, std::unique_ptr<Type>);
-            void receive(const PID, std::queue<std::unique_ptr<Type>>&);
+            void send(const PID, std::unique_ptr<viua::types::Type>);
+            void receive(const PID, std::queue<std::unique_ptr<viua::types::Type>>&);
 
             bool executeQuant(Process*, unsigned);
             bool burst();

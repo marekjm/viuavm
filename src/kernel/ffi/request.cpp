@@ -37,12 +37,12 @@ void ForeignFunctionCallRequest::call(ForeignFunction* callback) {
         (*callback)(frame.get(), nullptr, nullptr, caller_process, kernel);
 
         /* // FIXME: woohoo! segfault! */
-        Type* returned = nullptr;
+        viua::types::Type* returned = nullptr;
         unsigned return_value_register = frame->place_return_value_in;
         if (return_value_register != 0) {
             // we check in 0. register because it's reserved for return values
             if (frame->regset->at(0) == nullptr) {
-                caller_process->raiseException(new Exception("return value requested by frame but external function did not set return register"));
+                caller_process->raiseException(new viua::types::Exception("return value requested by frame but external function did not set return register"));
             }
             returned = frame->regset->pop(0);
         }
@@ -51,12 +51,12 @@ void ForeignFunctionCallRequest::call(ForeignFunction* callback) {
         if (returned and caller_process->trace().size() > 0) {
             caller_process->put(return_value_register, returned);
         }
-    } catch (Type *exception) {
+    } catch (viua::types::Type *exception) {
         caller_process->raiseException(exception);
         caller_process->handleActiveException();
     }
 }
-void ForeignFunctionCallRequest::registerException(Type* object) {
+void ForeignFunctionCallRequest::registerException(viua::types::Type* object) {
     caller_process->raiseException(object);
 }
 void ForeignFunctionCallRequest::wakeup() {

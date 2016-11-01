@@ -30,38 +30,42 @@
 class Process;
 class Kernel;
 
-class Pointer: public Type {
-        Type* points_to;
-        bool valid;
+namespace viua {
+    namespace types {
+        class Pointer: public Type {
+                Type* points_to;
+                bool valid;
 
-        void attach();
-        void detach();
-    public:
-        void invalidate(Type* t);
-        bool expired();
-        void reset(Type* t);
-        Type* to();
+                void attach();
+                void detach();
+            public:
+                void invalidate(Type* t);
+                bool expired();
+                void reset(Type* t);
+                Type* to();
 
-        virtual void expired(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
+                virtual void expired(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
 
-        std::string str() const override;
+                std::string str() const override;
 
-        std::string type() const override;
-        bool boolean() const override;
+                std::string type() const override;
+                bool boolean() const override;
 
-        std::vector<std::string> bases() const override {
-            return std::vector<std::string>{"Type"};
-        }
-        std::vector<std::string> inheritancechain() const override {
-            return std::vector<std::string>{"Type"};
-        }
+                std::vector<std::string> bases() const override {
+                    return std::vector<std::string>{"Type"};
+                }
+                std::vector<std::string> inheritancechain() const override {
+                    return std::vector<std::string>{"Type"};
+                }
 
-        Type* copy() const override;
+                Type* copy() const override;
 
-        Pointer();
-        Pointer(Type* t);
-        virtual ~Pointer();
-};
+                Pointer();
+                Pointer(Type* t);
+                virtual ~Pointer();
+        };
+    }
+}
 
 
 #endif

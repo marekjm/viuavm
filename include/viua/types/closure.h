@@ -28,28 +28,32 @@
 #include <viua/types/function.h>
 
 
-class Closure : public Function {
-    /** Closure type.
-     */
-    public:
-        RegisterSet* regset;
+namespace viua {
+    namespace types {
+        class Closure : public Function {
+            /** Closure type.
+             */
+            public:
+                RegisterSet* regset;
 
-        std::string function_name;
+                std::string function_name;
 
-        virtual std::string type() const;
-        virtual std::string str() const;
-        virtual std::string repr() const;
+                virtual std::string type() const;
+                virtual std::string str() const;
+                virtual std::string repr() const;
 
-        virtual bool boolean() const;
+                virtual bool boolean() const;
 
-        virtual Type* copy() const;
+                virtual Type* copy() const;
 
-        virtual std::string name() const;
+                virtual std::string name() const;
 
-        // FIXME: implement real dtor
-        Closure(const std::string& = "", RegisterSet* = nullptr);
-        virtual ~Closure();
-};
+                // FIXME: implement real dtor
+                Closure(const std::string& = "", RegisterSet* = nullptr);
+                virtual ~Closure();
+        };
+    }
+}
 
 
 #endif

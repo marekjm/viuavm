@@ -90,7 +90,7 @@ class Process {
     RegisterSet* uregset;
 
     // Temporary register
-    std::unique_ptr<Type> tmp;
+    std::unique_ptr<viua::types::Type> tmp;
 
     // Static registers
     std::map<std::string, std::unique_ptr<RegisterSet>> static_registers;
@@ -108,23 +108,23 @@ class Process {
     /*  Slot for thrown objects (typically exceptions).
      *  Can be set either by user code, or the VM.
      */
-    std::unique_ptr<Type> thrown;
-    std::unique_ptr<Type> caught;
+    std::unique_ptr<viua::types::Type> thrown;
+    std::unique_ptr<viua::types::Type> caught;
 
     /*  Variables set after the VM has executed bytecode.
      *  They describe exit conditions of the bytecode that just stopped running.
      */
-    std::unique_ptr<Type> return_value; // return value of top-most frame on the stack
+    std::unique_ptr<viua::types::Type> return_value; // return value of top-most frame on the stack
 
     uint64_t instruction_counter;
     byte* instruction_pointer;
 
-    std::queue<std::unique_ptr<Type>> message_queue;
+    std::queue<std::unique_ptr<viua::types::Type>> message_queue;
 
-    Type* fetch(unsigned) const;
-    Type* pop(unsigned);
-    void place(unsigned, Type*);
-    void updaterefs(Type*, Type*);
+    viua::types::Type* fetch(unsigned) const;
+    viua::types::Type* pop(unsigned);
+    void place(unsigned, viua::types::Type*);
+    void updaterefs(viua::types::Type*, viua::types::Type*);
     bool hasrefs(unsigned);
     void ensureStaticRegisters(std::string);
 
@@ -142,7 +142,7 @@ class Process {
     // call foreign (i.e. from a C++ extension) function
     byte* callForeign(byte*, const std::string&, const unsigned, const std::string&);
     // call foreign method (i.e. method of a pure-C++ class loaded into machine's typesystem)
-    byte* callForeignMethod(byte*, Type*, const std::string&, const unsigned, const std::string&);
+    byte* callForeignMethod(byte*, viua::types::Type*, const std::string&, const unsigned, const std::string&);
 
     /*  Stack unwinding methods.
      */
@@ -286,8 +286,8 @@ class Process {
         byte* dispatch(byte*);
         byte* tick();
 
-        Type* obtain(unsigned) const;
-        void put(unsigned, Type*);
+        viua::types::Type* obtain(unsigned) const;
+        void put(unsigned, viua::types::Type*);
 
         bool joinable() const;
         void join();
@@ -300,7 +300,7 @@ class Process {
         Process* parent() const;
         std::string starting_function() const;
 
-        void pass(std::unique_ptr<Type>);
+        void pass(std::unique_ptr<viua::types::Type>);
 
         auto priority() const -> decltype(process_priority);
         void priority(decltype(process_priority) p);
@@ -308,15 +308,15 @@ class Process {
         bool stopped() const;
 
         bool terminated() const;
-        Type* getActiveException();
-        std::unique_ptr<Type> transferActiveException();
-        void raiseException(Type*);
+        viua::types::Type* getActiveException();
+        std::unique_ptr<viua::types::Type> transferActiveException();
+        void raiseException(viua::types::Type*);
         void handleActiveException();
 
         void migrate_to(viua::scheduler::VirtualProcessScheduler*);
 
         void popFrame();
-        std::unique_ptr<Type> getReturnValue();
+        std::unique_ptr<viua::types::Type> getReturnValue();
 
         bool watchdogged() const;
         std::string watchdog() const;

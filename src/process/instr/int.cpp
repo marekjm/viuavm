@@ -96,23 +96,23 @@ byte* Process::opidiv(byte* addr) {
 }
 
 byte* Process::opilt(byte* addr) {
-    return perform<std::less<int>, Boolean>(addr, this);
+    return perform<std::less<int>, viua::types::Boolean>(addr, this);
 }
 
 byte* Process::opilte(byte* addr) {
-    return perform<std::less_equal<int>, Boolean>(addr, this);
+    return perform<std::less_equal<int>, viua::types::Boolean>(addr, this);
 }
 
 byte* Process::opigt(byte* addr) {
-    return perform<std::greater<int>, Boolean>(addr, this);
+    return perform<std::greater<int>, viua::types::Boolean>(addr, this);
 }
 
 byte* Process::opigte(byte* addr) {
-    return perform<std::greater_equal<int>, Boolean>(addr, this);
+    return perform<std::greater_equal<int>, viua::types::Boolean>(addr, this);
 }
 
 byte* Process::opieq(byte* addr) {
-    return perform<std::equal_to<int>, Boolean>(addr, this);
+    return perform<std::equal_to<int>, viua::types::Boolean>(addr, this);
 }
 
 byte* Process::opiinc(byte* addr) {

@@ -24,34 +24,34 @@
 using namespace std;
 
 
-Closure::Closure(const string& name, RegisterSet *rs): regset(rs), function_name(name) {
+viua::types::Closure::Closure(const string& name, RegisterSet *rs): regset(rs), function_name(name) {
 }
 
-Closure::~Closure() {
+viua::types::Closure::~Closure() {
     delete regset;
 }
 
 
-string Closure::type() const {
+string viua::types::Closure::type() const {
     return "Closure";
 }
 
-string Closure::str() const {
+string viua::types::Closure::str() const {
     ostringstream oss;
     oss << "Closure: " << function_name;
     return oss.str();
 }
 
-string Closure::repr() const {
+string viua::types::Closure::repr() const {
     return str();
 }
 
-bool Closure::boolean() const {
+bool viua::types::Closure::boolean() const {
     return true;
 }
 
-Type* Closure::copy() const {
-    Closure* clsr = new Closure();
+viua::types::Type* viua::types::Closure::copy() const {
+    auto clsr = new viua::types::Closure();
     clsr->function_name = function_name;
     // FIXME: for the above one, copy ctor would be nice
     clsr->regset = regset->copy();
@@ -59,6 +59,6 @@ Type* Closure::copy() const {
 }
 
 
-string Closure::name() const {
+string viua::types::Closure::name() const {
     return function_name;
 }

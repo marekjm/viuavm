@@ -31,7 +31,7 @@ byte* Process::opnot(byte* addr) {
     unsigned register_index = 0;
     tie(addr, register_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    place(register_index, new Boolean(not fetch(register_index)->boolean()));
+    place(register_index, new viua::types::Boolean(not fetch(register_index)->boolean()));
 
     return addr;
 }
@@ -42,7 +42,7 @@ byte* Process::opand(byte* addr) {
     tie(addr, first) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, second) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    place(target, new Boolean(fetch(first)->boolean() and fetch(second)->boolean()));
+    place(target, new viua::types::Boolean(fetch(first)->boolean() and fetch(second)->boolean()));
 
     return addr;
 }
@@ -53,7 +53,7 @@ byte* Process::opor(byte* addr) {
     tie(addr, first) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, second) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    place(target, new Boolean(fetch(first)->boolean() or fetch(second)->boolean()));
+    place(target, new viua::types::Boolean(fetch(first)->boolean() or fetch(second)->boolean()));
 
     return addr;
 }

@@ -38,10 +38,10 @@ void viua::front::vm::initialise(Kernel *kernel, const string& program, vector<s
 }
 
 void viua::front::vm::load_standard_prototypes(Kernel* kernel) {
-    Prototype* proto_object = new Prototype("Object");
+    auto proto_object = new viua::types::Prototype("Object");
     kernel->registerForeignPrototype("Object", proto_object);
 
-    Prototype* proto_string = new Prototype("String");
+    auto proto_string = new viua::types::Prototype("String");
     proto_string->attach("String::stringify/2", "stringify/2");
     proto_string->attach("String::represent/2", "represent/2");
     proto_string->attach("String::startswith/2", "startswith/2");
@@ -62,17 +62,17 @@ void viua::front::vm::load_standard_prototypes(Kernel* kernel) {
     kernel->registerForeignMethod("String::join/", static_cast<ForeignMethodMemberPointer>(&viua::types::String::join));
     kernel->registerForeignMethod("String::size/1", static_cast<ForeignMethodMemberPointer>(&viua::types::String::size));
 
-    Prototype* proto_process = new Prototype("Process");
+    auto proto_process = new viua::types::Prototype("Process");
     proto_process->attach("Process::joinable/1", "joinable/1");
     proto_process->attach("Process::detach/1", "detach/1");
     kernel->registerForeignPrototype("Process", proto_process);
-    kernel->registerForeignMethod("Process::joinable/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::joinable));
-    kernel->registerForeignMethod("Process::detach/1", static_cast<ForeignMethodMemberPointer>(&ProcessType::detach));
+    kernel->registerForeignMethod("Process::joinable/1", static_cast<ForeignMethodMemberPointer>(&viua::types::ProcessType::joinable));
+    kernel->registerForeignMethod("Process::detach/1", static_cast<ForeignMethodMemberPointer>(&viua::types::ProcessType::detach));
 
-    Prototype* proto_pointer = new Prototype("Pointer");
+    auto proto_pointer = new viua::types::Prototype("Pointer");
     proto_pointer->attach("Pointer::expired/1", "expired/1");
     kernel->registerForeignPrototype("Pointer", proto_pointer);
-    kernel->registerForeignMethod("Pointer::expired/1", static_cast<ForeignMethodMemberPointer>(&Pointer::expired));
+    kernel->registerForeignMethod("Pointer::expired/1", static_cast<ForeignMethodMemberPointer>(&viua::types::Pointer::expired));
 }
 
 void viua::front::vm::preload_libraries(Kernel* kernel) {

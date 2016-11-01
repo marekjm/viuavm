@@ -31,7 +31,7 @@
 using namespace std;
 
 
-class Ifstream: public Type {
+class Ifstream: public viua::types::Type {
         ifstream in;
         const string filename;
 
@@ -50,10 +50,10 @@ class Ifstream: public Type {
         }
 
         virtual std::vector<std::string> bases() const {
-            return std::vector<std::string>{"Type"};
+            return std::vector<std::string>{"viua::types::Type"};
         }
         virtual std::vector<std::string> inheritancechain() const {
-            return std::vector<std::string>{"Type"};
+            return std::vector<std::string>{"viua::types::Type"};
         }
 
         string getline() {
@@ -62,7 +62,7 @@ class Ifstream: public Type {
             return line;
         }
 
-        virtual Type* copy() const {
+        virtual viua::types::Type* copy() const {
         }
 
         Ifstream(const string& path): filename(path) {
@@ -101,7 +101,7 @@ void io_ifstream_open(Frame *frame, RegisterSet*, RegisterSet*, Process*, Kernel
 }
 
 void io_ifstream_getline(Frame *frame, RegisterSet*, RegisterSet*, Process*, Kernel*) {
-    Ifstream *in = dynamic_cast<Ifstream*>(static_cast<Pointer*>(frame->args->get(0))->to());
+    Ifstream *in = dynamic_cast<Ifstream*>(static_cast<viua::types::Pointer*>(frame->args->get(0))->to());
     frame->regset->set(0, new viua::types::String(in->getline()));
 }
 

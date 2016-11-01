@@ -38,7 +38,7 @@ float getrandom() {
      */
     ifstream in("/dev/urandom");
     if (!in) {
-        throw new Exception("failed to open random device: /dev/urandom");
+        throw new viua::types::Exception("failed to open random device: /dev/urandom");
     }
     unsigned long long int rullint = 0;
     in.read((char*)&rullint, sizeof(unsigned long long int));
@@ -54,7 +54,7 @@ void random_drandom(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*)
      */
     ifstream in("/dev/random");
     if (!in) {
-        throw new Exception("failed to open random device: /dev/random");
+        throw new viua::types::Exception("failed to open random device: /dev/random");
     }
     int rint = 0;
     in.read((char*)&rint, sizeof(int));
@@ -71,7 +71,7 @@ void random_durandom(Frame* frame, RegisterSet*, RegisterSet*, Process*, Kernel*
      */
     ifstream in("/dev/urandom");
     if (!in) {
-        throw new Exception("failed to open random device: /dev/urandom");
+        throw new viua::types::Exception("failed to open random device: /dev/urandom");
     }
     int rint = 0;
     in.read((char*)&rint, sizeof(int));

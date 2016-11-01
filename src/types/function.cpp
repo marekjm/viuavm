@@ -24,38 +24,38 @@
 using namespace std;
 
 
-Function::Function(const string& name): function_name(name) {
+viua::types::Function::Function(const string& name): function_name(name) {
 }
 
-Function::~Function() {
+viua::types::Function::~Function() {
 }
 
 
-string Function::type() const {
+string viua::types::Function::type() const {
     return "Function";
 }
 
-string Function::str() const {
+string viua::types::Function::str() const {
     ostringstream oss;
     oss << "Function: " << function_name;
     return oss.str();
 }
 
-string Function::repr() const {
+string viua::types::Function::repr() const {
     return str();
 }
 
-bool Function::boolean() const {
+bool viua::types::Function::boolean() const {
     return true;
 }
 
-Type* Function::copy() const {
-    Function* fn = new Function();
+viua::types::Type* viua::types::Function::copy() const {
+    auto fn = new viua::types::Function();
     fn->function_name = function_name;
     return fn;
 }
 
 
-string Function::name() const {
+string viua::types::Function::name() const {
     return function_name;
 }

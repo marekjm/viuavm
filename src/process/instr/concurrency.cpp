@@ -41,7 +41,7 @@ byte* Process::opprocess(byte* addr) {
     bool is_foreign = scheduler->isForeignFunction(call_name);
 
     if (not (is_native or is_foreign)) {
-        throw new Exception("call to undefined function: " + call_name);
+        throw new viua::types::Exception("call to undefined function: " + call_name);
     }
 
     frame_new->function_name = call_name;
@@ -49,7 +49,7 @@ byte* Process::opprocess(byte* addr) {
     bool disown = (target == 0);
     auto spawned_process = scheduler->spawn(std::move(frame_new), this, disown);
     if (not disown) {
-        place(target, new ProcessType(spawned_process));
+        place(target, new viua::types::ProcessType(spawned_process));
     }
 
     return addr;
@@ -76,7 +76,7 @@ byte* Process::opjoin(byte* addr) {
         timeout_active = true;
     }
 
-    if (ProcessType* thrd = dynamic_cast<ProcessType*>(fetch(source))) {
+    if (auto thrd = dynamic_cast<viua::types::ProcessType*>(fetch(source))) {
         if (thrd->stopped()) {
             thrd->join();
             return_addr = addr;
@@ -89,11 +89,11 @@ byte* Process::opjoin(byte* addr) {
         } else if (timeout_active and (not wait_until_infinity) and (waiting_until < std::chrono::steady_clock::now())) {
             timeout_active = false;
             wait_until_infinity = false;
-            thrown.reset(new Exception("process did not join"));
+            thrown.reset(new viua::types::Exception("process did not join"));
             return_addr = addr;
         }
     } else {
-        throw new Exception("invalid type: expected Process");
+        throw new viua::types::Exception("invalid type: expected Process");
     }
 
     return return_addr;
@@ -106,10 +106,10 @@ byte* Process::opsend(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    if (ProcessType* thrd = dynamic_cast<ProcessType*>(fetch(target))) {
-        scheduler->send(thrd->pid(), unique_ptr<Type>(pop(source)));
+    if (auto thrd = dynamic_cast<viua::types::ProcessType*>(fetch(target))) {
+        scheduler->send(thrd->pid(), unique_ptr<viua::types::Type>(pop(source)));
     } else {
-        throw new Exception("invalid type: expected Process");
+        throw new viua::types::Exception("invalid type: expected Process");
     }
 
     return addr;
@@ -152,7 +152,7 @@ byte* Process::opreceive(byte* addr) {
         if (timeout_active and (not wait_until_infinity) and (waiting_until < std::chrono::steady_clock::now())) {
             timeout_active = false;
             wait_until_infinity = false;
-            thrown.reset(new Exception("no message received"));
+            thrown.reset(new viua::types::Exception("no message received"));
             return_addr = addr;
         }
     }
@@ -169,14 +169,14 @@ byte* Process::opwatchdog(byte* addr) {
     bool is_foreign = scheduler->isForeignFunction(call_name);
 
     if (not (is_native or is_foreign)) {
-        throw new Exception("watchdog process from undefined function: " + call_name);
+        throw new viua::types::Exception("watchdog process from undefined function: " + call_name);
     }
     if (not is_native) {
-        throw new Exception("watchdog process must be a native function, used foreign " + call_name);
+        throw new viua::types::Exception("watchdog process must be a native function, used foreign " + call_name);
     }
 
     if (not watchdog_function.empty()) {
-        throw new Exception("watchdog already set");
+        throw new viua::types::Exception("watchdog already set");
     }
 
     watchdog_function = call_name;
@@ -189,7 +189,7 @@ byte* Process::opself(byte* addr) {
     unsigned target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    place(target, new ProcessType(this));
+    place(target, new viua::types::ProcessType(this));
 
     return addr;
 }

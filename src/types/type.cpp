@@ -27,11 +27,11 @@
 using namespace std;
 
 
-Pointer* Type::pointer() {
-    return new Pointer(this);
+viua::types::Pointer* viua::types::Type::pointer() {
+    return new viua::types::Pointer(this);
 }
 
-Type::~Type() {
+viua::types::Type::~Type() {
     for (auto p : pointers) {
         p->invalidate(this);
     }

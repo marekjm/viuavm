@@ -29,7 +29,7 @@ using namespace std;
 
 void os_system(Frame* frame, RegisterSet*, RegisterSet*) {
     if (frame->args->at(0) == 0) {
-        throw new Exception("expected command to launch (string) as parameter 0");
+        throw new viua::types::Exception("expected command to launch (string) as parameter 0");
     }
     string command = frame->args->get(0)->str();
     int ret = system(command.c_str());

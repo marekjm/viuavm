@@ -28,16 +28,16 @@
 using namespace std;
 
 
-Type* RegisterSet::put(registerset_size_type index, Type* object) {
-    if (index >= registerset_size) { throw new Exception("register access out of bounds: write"); }
+viua::types::Type* RegisterSet::put(registerset_size_type index, viua::types::Type* object) {
+    if (index >= registerset_size) { throw new viua::types::Exception("register access out of bounds: write"); }
     registers[index] = object;
     return object;
 }
 
-Type* RegisterSet::pop(registerset_size_type index) {
+viua::types::Type* RegisterSet::pop(registerset_size_type index) {
     /** Pop an object from the register.
      */
-    Type* object = at(index);
+    viua::types::Type* object = at(index);
     if (not object) {
         // FIXME: throw an exception on read from empty register
     }
@@ -45,17 +45,17 @@ Type* RegisterSet::pop(registerset_size_type index) {
     return object;
 }
 
-Type* RegisterSet::set(registerset_size_type index, Type* object) {
+viua::types::Type* RegisterSet::set(registerset_size_type index, viua::types::Type* object) {
     /** Put object inside register specified by given index.
      *
      *  Performs bounds checking.
      */
-    if (index >= registerset_size) { throw new Exception("register access out of bounds: write"); }
+    if (index >= registerset_size) { throw new viua::types::Exception("register access out of bounds: write"); }
 
     if (registers[index] == nullptr) {
         registers[index] = object;
-    } else if (dynamic_cast<Reference*>(registers[index])) {
-        static_cast<Reference*>(registers[index])->rebind(object);
+    } else if (dynamic_cast<viua::types::Reference*>(registers[index])) {
+        static_cast<viua::types::Reference*>(registers[index])->rebind(object);
     } else {
         delete registers[index];
         registers[index] = object;
@@ -64,7 +64,7 @@ Type* RegisterSet::set(registerset_size_type index, Type* object) {
     return object;
 }
 
-Type* RegisterSet::get(registerset_size_type index) {
+viua::types::Type* RegisterSet::get(registerset_size_type index) {
     /** Fetch object from register specified by given index.
      *
      *  Performs bounds checking.
@@ -73,18 +73,18 @@ Type* RegisterSet::get(registerset_size_type index) {
     if (index >= registerset_size) {
         ostringstream emsg;
         emsg << "register access out of bounds: read from " << index;
-        throw new Exception(emsg.str());
+        throw new viua::types::Exception(emsg.str());
     }
-    Type* optr = registers[index];
+    viua::types::Type* optr = registers[index];
     if (optr == nullptr) {
         ostringstream oss;
         oss << "(get) read from null register: " << index;
-        throw new Exception(oss.str());
+        throw new viua::types::Exception(oss.str());
     }
     return optr;
 }
 
-Type* RegisterSet::at(registerset_size_type index) {
+viua::types::Type* RegisterSet::at(registerset_size_type index) {
     /** Fetch object from register specified by given index.
      *
      *  Performs bounds checking.
@@ -93,7 +93,7 @@ Type* RegisterSet::at(registerset_size_type index) {
     if (index >= registerset_size) {
         ostringstream emsg;
         emsg << "register access out of bounds: read from " << index;
-        throw new Exception(emsg.str());
+        throw new viua::types::Exception(emsg.str());
     }
     return registers[index];
 }
@@ -105,8 +105,8 @@ void RegisterSet::move(registerset_size_type src, registerset_size_type dst) {
      *  Performs bound checking.
      *  Both source and destination can be empty.
      */
-    if (src >= registerset_size) { throw new Exception("register access out of bounds: move source"); }
-    if (dst >= registerset_size) { throw new Exception("register access out of bounds: move destination"); }
+    if (src >= registerset_size) { throw new viua::types::Exception("register access out of bounds: move source"); }
+    if (dst >= registerset_size) { throw new viua::types::Exception("register access out of bounds: move destination"); }
     set(dst, pop(src));
 }
 
@@ -116,9 +116,9 @@ void RegisterSet::swap(registerset_size_type src, registerset_size_type dst) {
      *  Performs bound checking.
      *  Both source and destination can be empty.
      */
-    if (src >= registerset_size) { throw new Exception("register access out of bounds: swap source"); }
-    if (dst >= registerset_size) { throw new Exception("register access out of bounds: swap destination"); }
-    Type* tmp = registers[src];
+    if (src >= registerset_size) { throw new viua::types::Exception("register access out of bounds: swap source"); }
+    if (dst >= registerset_size) { throw new viua::types::Exception("register access out of bounds: swap destination"); }
+    viua::types::Type* tmp = registers[src];
     registers[src] = registers[dst];
     registers[dst] = tmp;
 
@@ -133,7 +133,7 @@ void RegisterSet::empty(registerset_size_type here) {
      *  Performs bound checking.
      *  Does not throw if the register is empty.
      */
-    if (here >= registerset_size) { throw new Exception("register access out of bounds: empty"); }
+    if (here >= registerset_size) { throw new viua::types::Exception("register access out of bounds: empty"); }
     registers[here] = nullptr;
     masks[here] = 0;
 }
@@ -144,8 +144,8 @@ void RegisterSet::free(registerset_size_type here) {
      *  Performs bound checking.
      *  Throws if the register is empty.
      */
-    if (here >= registerset_size) { throw new Exception("register access out of bounds: free"); }
-    if (registers[here] == nullptr) { throw new Exception("invalid free: trying to free a null pointer"); }
+    if (here >= registerset_size) { throw new viua::types::Exception("register access out of bounds: free"); }
+    if (registers[here] == nullptr) { throw new viua::types::Exception("invalid free: trying to free a null pointer"); }
     delete registers[here];
     empty(here);
 }
@@ -157,11 +157,11 @@ void RegisterSet::flag(registerset_size_type index, mask_t filter) {
      *  Performs bounds checking.
      *  Throws exception when accessing empty register.
      */
-    if (index >= registerset_size) { throw new Exception("register access out of bounds: mask_enable"); }
+    if (index >= registerset_size) { throw new viua::types::Exception("register access out of bounds: mask_enable"); }
     if (registers[index] == nullptr) {
         ostringstream oss;
         oss << "(flag) flagging null register: " << index;
-        throw new Exception(oss.str());
+        throw new viua::types::Exception(oss.str());
     }
     masks[index] = (masks[index] | filter);
 }
@@ -172,11 +172,11 @@ void RegisterSet::unflag(registerset_size_type index, mask_t filter) {
      *  Performs bounds checking.
      *  Throws exception when accessing empty register.
      */
-    if (index >= registerset_size) { throw new Exception("register access out of bounds: mask_disable"); }
+    if (index >= registerset_size) { throw new viua::types::Exception("register access out of bounds: mask_disable"); }
     if (registers[index] == nullptr) {
         ostringstream oss;
         oss << "(unflag) unflagging null register: " << index;
-        throw new Exception(oss.str());
+        throw new viua::types::Exception(oss.str());
     }
     masks[index] = (masks[index] ^ filter);
 }
@@ -186,7 +186,7 @@ void RegisterSet::clear(registerset_size_type index) {
      *
      *  Performs bounds checking.
      */
-    if (index >= registerset_size) { throw new Exception("register access out of bounds: mask_clear"); }
+    if (index >= registerset_size) { throw new viua::types::Exception("register access out of bounds: mask_clear"); }
     masks[index] = 0;
 }
 
@@ -196,7 +196,7 @@ bool RegisterSet::isflagged(registerset_size_type index, mask_t filter) {
      *
      *  Performs bounds checking.
      */
-    if (index >= registerset_size) { throw new Exception("register access out of bounds: mask_isenabled"); }
+    if (index >= registerset_size) { throw new viua::types::Exception("register access out of bounds: mask_isenabled"); }
     // FIXME: should throw when accessing empty register, but that breaks set()
     return (masks[index] & filter);
 }
@@ -207,11 +207,11 @@ void RegisterSet::setmask(registerset_size_type index, mask_t mask) {
      *  Performs bounds checking.
      *  Throws exception when accessing empty register.
      */
-    if (index >= registerset_size) { throw new Exception("register access out of bounds: mask_disable"); }
+    if (index >= registerset_size) { throw new viua::types::Exception("register access out of bounds: mask_disable"); }
     if (registers[index] == nullptr) {
         ostringstream oss;
         oss << "(setmask) setting mask for null register: " << index;
-        throw new Exception(oss.str());
+        throw new viua::types::Exception(oss.str());
     }
     masks[index] = mask;
 }
@@ -222,11 +222,11 @@ mask_t RegisterSet::getmask(registerset_size_type index) {
      *  Performs bounds checking.
      *  Throws exception when accessing empty register.
      */
-    if (index >= registerset_size) { throw new Exception("register access out of bounds: mask_disable"); }
+    if (index >= registerset_size) { throw new viua::types::Exception("register access out of bounds: mask_disable"); }
     if (registers[index] == nullptr) {
         ostringstream oss;
         oss << "(getmask) getting mask of null register: " << index;
-        throw new Exception(oss.str());
+        throw new viua::types::Exception(oss.str());
     }
     return masks[index];
 }
@@ -262,7 +262,7 @@ RegisterSet::RegisterSet(registerset_size_type sz): registerset_size(sz), regist
     /** Create register set with specified size.
      */
     if (sz > 0) {
-        registers = new Type*[sz];
+        registers = new viua::types::Type*[sz];
         masks = new mask_t[sz];
         for (unsigned i = 0; i < sz; ++i) {
             registers[i] = nullptr;

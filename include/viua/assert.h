@@ -30,32 +30,32 @@
 
 namespace viua {
     namespace assertions {
-        template<class T> void assert_implements(Type* object, const std::string& s) {
+        template<class T> void assert_implements(viua::types::Type* object, const std::string& s) {
             /** Use this assertion when casting to interface type (C++ abstract class).
              *
              *  Example: casting Vector to Iterator.
              */
             if (dynamic_cast<T*>(object) == nullptr) {
-                throw new Exception(object->type() + " does not implement " + s);
+                throw new viua::types::Exception(object->type() + " does not implement " + s);
             }
         }
 
-        void assert_typeof(Type* object, const std::string& expected);
+        void assert_typeof(viua::types::Type* object, const std::string& expected);
 
-        template<class T> T* expect_type(const std::string& expected_1st, Type* got_1st) {
+        template<class T> T* expect_type(const std::string& expected_1st, viua::types::Type* got_1st) {
             T* ptr = dynamic_cast<T*>(got_1st);
             if (not ptr) {
-                throw new Exception("invalid operand types: expected (" + expected_1st + "), got (" + got_1st->type() + ")");
+                throw new viua::types::Exception("invalid operand types: expected (" + expected_1st + "), got (" + got_1st->type() + ")");
             }
             return ptr;
         }
 
-        template<class T, class U> void expect_types(const std::string& expected_1st, const std::string& expected_2nd, Type* got_1st, Type* got_2nd) {
+        template<class T, class U> void expect_types(const std::string& expected_1st, const std::string& expected_2nd, viua::types::Type* got_1st, viua::types::Type* got_2nd) {
             if ((not dynamic_cast<T*>(got_1st)) or (not dynamic_cast<U*>(got_2nd))) {
-                throw new Exception("invalid operand types: expected (_, " + expected_1st + ", " + expected_2nd + "), got (_, " + got_1st->type() + ", " + got_2nd->type() + ")");
+                throw new viua::types::Exception("invalid operand types: expected (_, " + expected_1st + ", " + expected_2nd + "), got (_, " + got_1st->type() + ", " + got_2nd->type() + ")");
             }
         }
-        template<class T> void expect_types(const std::string& expected_both, Type* got_1st, Type* got_2nd) {
+        template<class T> void expect_types(const std::string& expected_both, viua::types::Type* got_1st, viua::types::Type* got_2nd) {
             expect_types<T, T>(expected_both, expected_both, got_1st, got_2nd);
         }
 

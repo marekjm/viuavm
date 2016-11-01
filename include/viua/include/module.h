@@ -66,8 +66,8 @@ typedef void (ForeignFunction)(
  *  Of course, you can also use the struct-and-a-bunch-of-free-functions strategy, in which case you are more interested
  *  in the ForeignFunction typedef defined above.
  */
-typedef void (Type::*ForeignMethodMemberPointer)(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
-typedef std::function<void(Type*, Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*)> ForeignMethod;
+typedef void (viua::types::Type::*ForeignMethodMemberPointer)(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
+typedef std::function<void(viua::types::Type*, Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*)> ForeignMethod;
 
 
 /** External modules must export the "exports()" function.

@@ -59,21 +59,21 @@ auto PID::get() const -> decltype(associated_process) {
 }
 
 
-Type* Process::fetch(unsigned index) const {
+viua::types::Type* Process::fetch(unsigned index) const {
     /*  Return pointer to object at given register.
      *  This method safeguards against reaching for out-of-bounds registers and
      *  reading from an empty register.
      */
-    Type* object = uregset->get(index);
-    if (dynamic_cast<Reference*>(object)) {
-        object = static_cast<Reference*>(object)->pointsTo();
+    viua::types::Type* object = uregset->get(index);
+    if (dynamic_cast<viua::types::Reference*>(object)) {
+        object = static_cast<viua::types::Reference*>(object)->pointsTo();
     }
     return object;
 }
-Type* Process::obtain(unsigned index) const {
+viua::types::Type* Process::obtain(unsigned index) const {
     return fetch(index);
 }
-Type* Process::pop(unsigned index) {
+viua::types::Type* Process::pop(unsigned index) {
     /*  Return pointer to object at given register.
      *  The object is removed from the register.
      *  This method safeguards against reaching for out-of-bounds registers and
@@ -85,14 +85,14 @@ Type* Process::pop(unsigned index) {
      */
     return uregset->pop(index);
 }
-void Process::place(unsigned index, Type* obj) {
+void Process::place(unsigned index, viua::types::Type* obj) {
     /** Place an object in register with given index.
      *
      *  Before placing an object in register, a check is preformed if the register is empty.
-     *  If not - the `Type` previously stored in it is destroyed.
+     *  If not - the `viua::types::Type` previously stored in it is destroyed.
      *
      */
-    Type* old_ref_ptr = (hasrefs(index) ? uregset->at(index) : nullptr);
+    viua::types::Type* old_ref_ptr = (hasrefs(index) ? uregset->at(index) : nullptr);
     uregset->set(index, obj);
 
     // update references *if, and only if* the register being set has references and
@@ -101,10 +101,10 @@ void Process::place(unsigned index, Type* obj) {
         updaterefs(old_ref_ptr, obj);
     }
 }
-void Process::put(unsigned index, Type *o) {
+void Process::put(unsigned index, viua::types::Type *o) {
     place(index, o);
 }
-void Process::updaterefs(Type* before, Type* now) {
+void Process::updaterefs(viua::types::Type* before, viua::types::Type* now) {
     /** This method updates references to a given address present in registers.
      *  It swaps old address for the new one in every register that points to the old address.
      *
@@ -164,7 +164,7 @@ void Process::pushFrame() {
     if (frames.size() > MAX_STACK_SIZE) {
         ostringstream oss;
         oss << "stack size (" << MAX_STACK_SIZE << ") exceeded with call to '" << frame_new->function_name << '\'';
-        throw new Exception(oss.str());
+        throw new viua::types::Exception(oss.str());
     }
 
     uregset = frame_new->regset;
@@ -183,7 +183,7 @@ void Process::dropFrame() {
 
     for (registerset_size_type i = 0; i < frame->args->size(); ++i) {
         if (frame->args->at(i) != nullptr and frame->args->isflagged(i, MOVED)) {
-            throw new Exception("unused pass-by-move parameter");
+            throw new viua::types::Exception("unused pass-by-move parameter");
         }
     }
 
@@ -220,7 +220,7 @@ byte* Process::callNative(byte* return_address, const string& call_name, const u
     byte* call_address = adjustJumpBaseFor(call_name);
 
     if (not frame_new) {
-        throw new Exception("function call without a frame: use `frame 0' in source code if the function takes no parameters");
+        throw new viua::types::Exception("function call without a frame: use `frame 0' in source code if the function takes no parameters");
     }
     // set function name and return address
     frame_new->function_name = call_name;
@@ -234,7 +234,7 @@ byte* Process::callNative(byte* return_address, const string& call_name, const u
 }
 byte* Process::callForeign(byte* return_address, const string& call_name, const unsigned return_index, const string&) {
     if (not frame_new) {
-        throw new Exception("external function call without a frame: use `frame 0' in source code if the function takes no parameters");
+        throw new viua::types::Exception("external function call without a frame: use `frame 0' in source code if the function takes no parameters");
     }
     // set function name and return address
     frame_new->function_name = call_name;
@@ -247,9 +247,9 @@ byte* Process::callForeign(byte* return_address, const string& call_name, const 
 
     return return_address;
 }
-byte* Process::callForeignMethod(byte* return_address, Type* object, const string& call_name, const unsigned return_index, const string&) {
+byte* Process::callForeignMethod(byte* return_address, viua::types::Type* object, const string& call_name, const unsigned return_index, const string&) {
     if (not frame_new) {
-        throw new Exception("foreign method call without a frame");
+        throw new viua::types::Exception("foreign method call without a frame");
     }
     // set function name and return address
     frame_new->function_name = call_name;
@@ -262,11 +262,11 @@ byte* Process::callForeignMethod(byte* return_address, Type* object, const strin
     pushFrame();
 
     if (not scheduler->isForeignMethod(call_name)) {
-        throw new Exception("call to unregistered foreign method: " + call_name);
+        throw new viua::types::Exception("call to unregistered foreign method: " + call_name);
     }
 
-    Reference* rf = nullptr;
-    if ((rf = dynamic_cast<Reference*>(object))) {
+    viua::types::Reference* rf = nullptr;
+    if ((rf = dynamic_cast<viua::types::Reference*>(object))) {
         object = rf->pointsTo();
     }
 
@@ -274,17 +274,17 @@ byte* Process::callForeignMethod(byte* return_address, Type* object, const strin
         // FIXME: supply static and global registers to foreign functions
         scheduler->requestForeignMethodCall(call_name, object, frame, nullptr, nullptr, this);
     } catch (const std::out_of_range& e) {
-        throw new Exception(e.what());
+        throw new viua::types::Exception(e.what());
     }
 
     // FIXME: woohoo! segfault!
-    Type* returned = nullptr;
+    viua::types::Type* returned = nullptr;
     bool returned_is_reference = false;
     unsigned return_value_register = frames.back()->place_return_value_in;
     if (return_value_register != 0) {
         // we check in 0. register because it's reserved for return values
         if (uregset->at(0) == nullptr) {
-            throw new Exception("return value requested by frame but foreign method did not set return register");
+            throw new viua::types::Exception("return value requested by frame but foreign method did not set return register");
         }
         returned = uregset->pop(0);
     }
@@ -375,10 +375,10 @@ byte* Process::tick() {
 
     try {
         instruction_pointer = dispatch(instruction_pointer);
-    } catch (Exception* e) {
+    } catch (viua::types::Exception* e) {
         /* All machine-thrown exceptions are passed back to user code.
          * This is much easier than checking for erroneous conditions and
-         * terminating functions conditionally, instead - machine just throws Exception objects which
+         * terminating functions conditionally, instead - machine just throws viua::types::Exception objects which
          * are then caught here.
          *
          * If user code cannot deal with them (i.e. did not register a catcher block) they will terminate execution later.
@@ -386,10 +386,10 @@ byte* Process::tick() {
         thrown.reset(e);
     } catch (const HaltException& e) {
         halt = true;
-    } catch (Type* e) {
+    } catch (viua::types::Type* e) {
         thrown.reset(e);
     } catch (const char* e) {
-        thrown.reset(new Exception(e));
+        thrown.reset(new viua::types::Exception(e));
     }
 
     if (halt or frames.size() == 0) {
@@ -409,7 +409,7 @@ byte* Process::tick() {
      *        catchers or execution will be halted on unhandled types,
      */
     if (instruction_pointer == previous_instruction_pointer and (OPCODE(*instruction_pointer) != RETURN and OPCODE(*instruction_pointer) != JOIN and OPCODE(*instruction_pointer) != RECEIVE) and (not thrown)) {
-        thrown.reset(new Exception("InstructionUnchanged"));
+        thrown.reset(new viua::types::Exception("InstructionUnchanged"));
     }
 
     if (thrown and frame_new) {
@@ -493,26 +493,26 @@ bool Process::terminated() const {
     return static_cast<bool>(thrown);
 }
 
-void Process::pass(unique_ptr<Type> message) {
+void Process::pass(unique_ptr<viua::types::Type> message) {
     message_queue.push(std::move(message));
     wakeup();
 }
 
 
-Type* Process::getActiveException() {
+viua::types::Type* Process::getActiveException() {
     return thrown.get();
 }
 
-unique_ptr<Type> Process::transferActiveException() {
+unique_ptr<viua::types::Type> Process::transferActiveException() {
     return std::move(thrown);
 }
 
-void Process::raiseException(Type *exception) {
+void Process::raiseException(viua::types::Type *exception) {
     thrown.reset(exception);
 }
 
 
-unique_ptr<Type> Process::getReturnValue() {
+unique_ptr<viua::types::Type> Process::getReturnValue() {
     return std::move(return_value);
 }
 
@@ -524,7 +524,7 @@ string Process::watchdog() const {
 }
 byte* Process::become(const string& function_name, std::unique_ptr<Frame> frame_to_use) {
     if (not scheduler->isNativeFunction(function_name)) {
-        throw new Exception("process from undefined function: " + function_name);
+        throw new viua::types::Exception("process from undefined function: " + function_name);
     }
 
     frames.clear();
@@ -542,7 +542,7 @@ byte* Process::become(const string& function_name, std::unique_ptr<Frame> frame_
 
 byte* Process::begin() {
     if (not scheduler->isNativeFunction(frames[0]->function_name)) {
-        throw new Exception("process from undefined function: " + frames[0]->function_name);
+        throw new viua::types::Exception("process from undefined function: " + frames[0]->function_name);
     }
     return (instruction_pointer = adjustJumpBaseFor(frames[0]->function_name));
 }
