@@ -28,7 +28,7 @@
 using namespace std;
 
 
-byte* Process::opimport(byte* addr) {
+byte* viua::process::Process::opimport(byte* addr) {
     /** Run import instruction.
      */
     string module;
@@ -37,7 +37,7 @@ byte* Process::opimport(byte* addr) {
     return addr;
 }
 
-byte* Process::oplink(byte* addr) {
+byte* viua::process::Process::oplink(byte* addr) {
     /** Run link instruction.
      */
     string module;

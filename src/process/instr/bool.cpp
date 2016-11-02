@@ -27,7 +27,7 @@
 using namespace std;
 
 
-byte* Process::opnot(byte* addr) {
+byte* viua::process::Process::opnot(byte* addr) {
     unsigned register_index = 0;
     tie(addr, register_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
@@ -36,7 +36,7 @@ byte* Process::opnot(byte* addr) {
     return addr;
 }
 
-byte* Process::opand(byte* addr) {
+byte* viua::process::Process::opand(byte* addr) {
     unsigned target = 0, first = 0, second = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, first) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
@@ -47,7 +47,7 @@ byte* Process::opand(byte* addr) {
     return addr;
 }
 
-byte* Process::opor(byte* addr) {
+byte* viua::process::Process::opor(byte* addr) {
     unsigned target = 0, first = 0, second = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, first) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);

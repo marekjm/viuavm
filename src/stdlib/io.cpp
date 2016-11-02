@@ -76,14 +76,14 @@ class Ifstream: public viua::types::Type {
 };
 
 
-void io_stdin_getline(Frame* frame, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*) {
+void io_stdin_getline(Frame* frame, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     string line;
     getline(cin, line);
     frame->regset->set(0, new viua::types::String(line));
 }
 
 
-void io_file_read(Frame* frame, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*) {
+void io_file_read(Frame* frame, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     string path = frame->args->get(0)->str();
     ifstream in(path);
 
@@ -96,11 +96,11 @@ void io_file_read(Frame* frame, RegisterSet*, RegisterSet*, Process*, viua::kern
     frame->regset->set(0, new viua::types::String(oss.str()));
 }
 
-void io_ifstream_open(Frame *frame, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*) {
+void io_ifstream_open(Frame *frame, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     frame->regset->set(0, new Ifstream(frame->args->get(0)->str()));
 }
 
-void io_ifstream_getline(Frame *frame, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*) {
+void io_ifstream_getline(Frame *frame, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     Ifstream *in = dynamic_cast<Ifstream*>(static_cast<viua::types::Pointer*>(frame->args->get(0))->to());
     frame->regset->set(0, new viua::types::String(in->getline()));
 }

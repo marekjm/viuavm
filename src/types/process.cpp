@@ -84,11 +84,11 @@ unique_ptr<viua::types::Type> viua::types::ProcessType::getReturnValue() {
 }
 
 
-void viua::types::ProcessType::joinable(Frame* frame, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*) {
+void viua::types::ProcessType::joinable(Frame* frame, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     frame->regset->set(0, new viua::types::Boolean(thrd->joinable()));
 }
 
-void viua::types::ProcessType::detach(Frame*, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*) {
+void viua::types::ProcessType::detach(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     thrd->detach();
 }
 

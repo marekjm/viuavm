@@ -32,8 +32,10 @@
 #include <viua/kernel/frame.h>
 
 
-class Process;
 namespace viua {
+    namespace process {
+        class Process;
+    }
     namespace kernel {
         class Kernel;
     }
@@ -47,12 +49,12 @@ namespace viua {
              */
             viua::kernel::Kernel *attached_kernel;
 
-            std::vector<std::unique_ptr<Process>> *free_processes;
+            std::vector<std::unique_ptr<viua::process::Process>> *free_processes;
             std::mutex *free_processes_mutex;
             std::condition_variable *free_processes_cv;
 
-            Process *main_process;
-            std::vector<std::unique_ptr<Process>> processes;
+            viua::process::Process *main_process;
+            std::vector<std::unique_ptr<viua::process::Process>> processes;
             decltype(processes)::size_type current_process_index;
 
             int exit_code;
@@ -86,8 +88,8 @@ namespace viua {
 
             void registerPrototype(viua::types::Prototype*);
 
-            void requestForeignFunctionCall(Frame*, Process*) const;
-            void requestForeignMethodCall(const std::string&, viua::types::Type*, Frame*, RegisterSet*, RegisterSet*, Process*);
+            void requestForeignFunctionCall(Frame*, viua::process::Process*) const;
+            void requestForeignMethodCall(const std::string&, viua::types::Type*, Frame*, RegisterSet*, RegisterSet*, viua::process::Process*);
 
             void loadNativeLibrary(const std::string&);
             void loadForeignLibrary(const std::string&);
@@ -95,14 +97,14 @@ namespace viua {
             auto cpi() const -> decltype(processes)::size_type;
             auto size() const -> decltype(processes)::size_type;
 
-            Process* process(decltype(processes)::size_type);
-            Process* process();
-            Process* spawn(std::unique_ptr<Frame>, Process*, bool);
+            viua::process::Process* process(decltype(processes)::size_type);
+            viua::process::Process* process();
+            viua::process::Process* spawn(std::unique_ptr<Frame>, viua::process::Process*, bool);
 
             void send(const viua::process::PID, std::unique_ptr<viua::types::Type>);
             void receive(const viua::process::PID, std::queue<std::unique_ptr<viua::types::Type>>&);
 
-            bool executeQuant(Process*, unsigned);
+            bool executeQuant(viua::process::Process*, unsigned);
             bool burst();
 
             void operator()();
@@ -113,7 +115,7 @@ namespace viua {
             void join();
             int exit() const;
 
-            VirtualProcessScheduler(viua::kernel::Kernel*, std::vector<std::unique_ptr<Process>>*, std::mutex*, std::condition_variable*);
+            VirtualProcessScheduler(viua::kernel::Kernel*, std::vector<std::unique_ptr<viua::process::Process>>*, std::mutex*, std::condition_variable*);
             VirtualProcessScheduler(VirtualProcessScheduler&&);
             ~VirtualProcessScheduler();
         };

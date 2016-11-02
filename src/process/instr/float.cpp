@@ -29,7 +29,7 @@
 using namespace std;
 
 
-byte* Process::opfstore(byte* addr) {
+byte* viua::process::Process::opfstore(byte* addr) {
     /*  Run fstore instruction.
      */
     unsigned target = 0;
@@ -43,16 +43,16 @@ byte* Process::opfstore(byte* addr) {
     return addr;
 }
 
-template<class Operator, class ResultType> byte* perform(byte* addr, Process* t) {
+template<class Operator, class ResultType> byte* perform(byte* addr, viua::process::Process* t) {
     /** Heavily abstracted binary opcode implementation for Float-related instructions.
      *
      *  First parameter - byte* addr - is the instruction pointer from which operand extraction should begin.
      *
-     *  Second parameter - Process* t - is a pointer to current VM process (passed as `this`).
+     *  Second parameter - viua::process::Process* t - is a pointer to current VM process (passed as `this`).
      *
-     *  Third parameter - ObjectPlacer - is a member-function pointer to Process::place.
+     *  Third parameter - ObjectPlacer - is a member-function pointer to viua::process::Process::place.
      *  Since it is private, we have to cheat the compiler by extracting its pointer while in
-     *  Process class's scope and passing it here.
+     *  viua::process::Process class's scope and passing it here.
      *  Voila - we can place objects in process's current register set.
      */
     unsigned target_register_index = 0, first_operand_index = 0, second_operand_index = 0;
@@ -72,38 +72,38 @@ template<class Operator, class ResultType> byte* perform(byte* addr, Process* t)
     return addr;
 }
 
-byte* Process::opfadd(byte* addr) {
+byte* viua::process::Process::opfadd(byte* addr) {
     return perform<std::plus<float>, viua::types::Float>(addr, this);
 }
 
-byte* Process::opfsub(byte* addr) {
+byte* viua::process::Process::opfsub(byte* addr) {
     return perform<std::minus<float>, viua::types::Float>(addr, this);
 }
 
-byte* Process::opfmul(byte* addr) {
+byte* viua::process::Process::opfmul(byte* addr) {
     return perform<std::multiplies<float>, viua::types::Float>(addr, this);
 }
 
-byte* Process::opfdiv(byte* addr) {
+byte* viua::process::Process::opfdiv(byte* addr) {
     return perform<std::divides<float>, viua::types::Float>(addr, this);
 }
 
-byte* Process::opflt(byte* addr) {
+byte* viua::process::Process::opflt(byte* addr) {
     return perform<std::less<float>, viua::types::Boolean>(addr, this);
 }
 
-byte* Process::opflte(byte* addr) {
+byte* viua::process::Process::opflte(byte* addr) {
     return perform<std::less_equal<float>, viua::types::Boolean>(addr, this);
 }
 
-byte* Process::opfgt(byte* addr) {
+byte* viua::process::Process::opfgt(byte* addr) {
     return perform<std::greater<float>, viua::types::Boolean>(addr, this);
 }
 
-byte* Process::opfgte(byte* addr) {
+byte* viua::process::Process::opfgte(byte* addr) {
     return perform<std::greater_equal<float>, viua::types::Boolean>(addr, this);
 }
 
-byte* Process::opfeq(byte* addr) {
+byte* viua::process::Process::opfeq(byte* addr) {
     return perform<std::equal_to<float>, viua::types::Boolean>(addr, this);
 }

@@ -31,12 +31,12 @@
 using namespace std;
 
 
-viua::process::PID::PID(const Process* p): associated_process(p) {
+viua::process::PID::PID(const viua::process::Process* p): associated_process(p) {
 }
 bool viua::process::PID::operator==(const viua::process::PID& that) const {
     return (associated_process == that.associated_process);
 }
-bool viua::process::PID::operator==(const Process* that) const {
+bool viua::process::PID::operator==(const viua::process::Process* that) const {
     return (associated_process == that);
 }
 bool viua::process::PID::operator<(const viua::process::PID& that) const {

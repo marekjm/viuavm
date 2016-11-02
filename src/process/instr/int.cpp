@@ -30,14 +30,14 @@
 using namespace std;
 
 
-byte* Process::opizero(byte* addr) {
+byte* viua::process::Process::opizero(byte* addr) {
     unsigned target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     place(target, new viua::types::Integer(0));
     return addr;
 }
 
-byte* Process::opistore(byte* addr) {
+byte* viua::process::Process::opistore(byte* addr) {
     unsigned target = 0;
     int integer = 0;
 
@@ -49,16 +49,16 @@ byte* Process::opistore(byte* addr) {
     return addr;
 }
 
-template<class Operator, class ResultType> byte* perform(byte* addr, Process* t) {
+template<class Operator, class ResultType> byte* perform(byte* addr, viua::process::Process* t) {
     /** Heavily abstracted binary opcode implementation for Integer-related instructions.
      *
      *  First parameter - byte* addr - is the instruction pointer from which operand extraction should begin.
      *
-     *  Second parameter - Process* t - is a pointer to current VM process (passed as `this`).
+     *  Second parameter - viua::process::Process* t - is a pointer to current VM process (passed as `this`).
      *
-     *  Third parameter - ObjectPlacer - is a member-function pointer to Process::place.
+     *  Third parameter - ObjectPlacer - is a member-function pointer to viua::process::Process::place.
      *  Since it is private, we have to cheat the compiler by extracting its pointer while in
-     *  Process class's scope and passing it here.
+     *  viua::process::Process class's scope and passing it here.
      *  Voila - we can place objects in process's current register set.
      */
     unsigned target_register_index = 0, first_operand_index = 0, second_operand_index = 0;
@@ -79,43 +79,43 @@ template<class Operator, class ResultType> byte* perform(byte* addr, Process* t)
     return addr;
 }
 
-byte* Process::opiadd(byte* addr) {
+byte* viua::process::Process::opiadd(byte* addr) {
     return perform<std::plus<int>, viua::types::Integer>(addr, this);
 }
 
-byte* Process::opisub(byte* addr) {
+byte* viua::process::Process::opisub(byte* addr) {
     return perform<std::minus<int>, viua::types::Integer>(addr, this);
 }
 
-byte* Process::opimul(byte* addr) {
+byte* viua::process::Process::opimul(byte* addr) {
     return perform<std::multiplies<int>, viua::types::Integer>(addr, this);
 }
 
-byte* Process::opidiv(byte* addr) {
+byte* viua::process::Process::opidiv(byte* addr) {
     return perform<std::divides<int>, viua::types::Integer>(addr, this);
 }
 
-byte* Process::opilt(byte* addr) {
+byte* viua::process::Process::opilt(byte* addr) {
     return perform<std::less<int>, viua::types::Boolean>(addr, this);
 }
 
-byte* Process::opilte(byte* addr) {
+byte* viua::process::Process::opilte(byte* addr) {
     return perform<std::less_equal<int>, viua::types::Boolean>(addr, this);
 }
 
-byte* Process::opigt(byte* addr) {
+byte* viua::process::Process::opigt(byte* addr) {
     return perform<std::greater<int>, viua::types::Boolean>(addr, this);
 }
 
-byte* Process::opigte(byte* addr) {
+byte* viua::process::Process::opigte(byte* addr) {
     return perform<std::greater_equal<int>, viua::types::Boolean>(addr, this);
 }
 
-byte* Process::opieq(byte* addr) {
+byte* viua::process::Process::opieq(byte* addr) {
     return perform<std::equal_to<int>, viua::types::Boolean>(addr, this);
 }
 
-byte* Process::opiinc(byte* addr) {
+byte* viua::process::Process::opiinc(byte* addr) {
     unsigned target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
@@ -124,7 +124,7 @@ byte* Process::opiinc(byte* addr) {
     return addr;
 }
 
-byte* Process::opidec(byte* addr) {
+byte* viua::process::Process::opidec(byte* addr) {
     unsigned target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 

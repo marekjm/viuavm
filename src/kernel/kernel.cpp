@@ -283,7 +283,7 @@ void viua::kernel::Kernel::registerPrototype(viua::types::Prototype *proto) {
     typesystem[proto->getTypeName()] = proto;
 }
 
-void viua::kernel::Kernel::requestForeignFunctionCall(Frame *frame, Process *requesting_process) {
+void viua::kernel::Kernel::requestForeignFunctionCall(Frame *frame, viua::process::Process *requesting_process) {
     unique_lock<mutex> lock(foreign_call_queue_mutex);
     foreign_call_queue.emplace_back(new viua::scheduler::ffi::ForeignFunctionCallRequest(frame, requesting_process, this));
 
@@ -294,11 +294,11 @@ void viua::kernel::Kernel::requestForeignFunctionCall(Frame *frame, Process *req
     foreign_call_queue_condition.notify_one();
 }
 
-void viua::kernel::Kernel::requestForeignMethodCall(const string& name, viua::types::Type *object, Frame *frame, RegisterSet*, RegisterSet*, Process *p) {
+void viua::kernel::Kernel::requestForeignMethodCall(const string& name, viua::types::Type *object, Frame *frame, RegisterSet*, RegisterSet*, viua::process::Process *p) {
     foreign_methods.at(name)(object, frame, nullptr, nullptr, p, this);
 }
 
-void viua::kernel::Kernel::postFreeProcess(unique_ptr<Process> p) {
+void viua::kernel::Kernel::postFreeProcess(unique_ptr<viua::process::Process> p) {
     unique_lock<mutex> lock(free_virtual_processes_mutex);
     free_virtual_processes.emplace_back(std::move(p));
     lock.unlock();

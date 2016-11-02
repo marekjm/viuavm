@@ -31,7 +31,7 @@ using namespace std;
 extern "C" const ForeignFunctionSpec* exports();
 
 
-static void math_sqrt(Frame* frame, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*) {
+static void math_sqrt(Frame* frame, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     if (frame->args->at(0) == nullptr) {
         throw new viua::types::Exception("expected float as first argument");
     }

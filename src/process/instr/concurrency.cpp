@@ -28,7 +28,7 @@
 using namespace std;
 
 
-byte* Process::opprocess(byte* addr) {
+byte* viua::process::Process::opprocess(byte* addr) {
     /*  Run process instruction.
      */
     unsigned target = 0;
@@ -54,7 +54,7 @@ byte* Process::opprocess(byte* addr) {
 
     return addr;
 }
-byte* Process::opjoin(byte* addr) {
+byte* viua::process::Process::opjoin(byte* addr) {
     /** Join a process.
      *
      *  This opcode blocks execution of current process until
@@ -93,12 +93,12 @@ byte* Process::opjoin(byte* addr) {
             return_addr = addr;
         }
     } else {
-        throw new viua::types::Exception("invalid type: expected Process");
+        throw new viua::types::Exception("invalid type: expected viua::process::Process");
     }
 
     return return_addr;
 }
-byte* Process::opsend(byte* addr) {
+byte* viua::process::Process::opsend(byte* addr) {
     /** Send a message to a process.
      */
     unsigned target = 0, source = 0;
@@ -109,12 +109,12 @@ byte* Process::opsend(byte* addr) {
     if (auto thrd = dynamic_cast<viua::types::ProcessType*>(fetch(target))) {
         scheduler->send(thrd->pid(), unique_ptr<viua::types::Type>(pop(source)));
     } else {
-        throw new viua::types::Exception("invalid type: expected Process");
+        throw new viua::types::Exception("invalid type: expected viua::process::Process");
     }
 
     return addr;
 }
-byte* Process::opreceive(byte* addr) {
+byte* viua::process::Process::opreceive(byte* addr) {
     /** Receive a message.
      *
      *  This opcode blocks execution of current process
@@ -159,7 +159,7 @@ byte* Process::opreceive(byte* addr) {
 
     return return_addr;
 }
-byte* Process::opwatchdog(byte* addr) {
+byte* viua::process::Process::opwatchdog(byte* addr) {
     /*  Run watchdog instruction.
      */
     string call_name;
@@ -183,7 +183,7 @@ byte* Process::opwatchdog(byte* addr) {
 
     return addr;
 }
-byte* Process::opself(byte* addr) {
+byte* viua::process::Process::opself(byte* addr) {
     /*  Run process instruction.
      */
     unsigned target = 0;

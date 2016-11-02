@@ -44,7 +44,7 @@ namespace viua {
 namespace viua {
     namespace types {
         class ProcessType : public Type {
-            Process* thrd;
+            viua::process::Process* thrd;
 
             public:
                 /*
@@ -62,8 +62,8 @@ namespace viua {
                  * Users should be able to check if a process is joinable, and
                  * to detach a process.
                  */
-                virtual void joinable(Frame*, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*);
-                virtual void detach(Frame*, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*);
+                virtual void joinable(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
+                virtual void detach(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
 
                 /*
                  * For use by the VM.
@@ -85,7 +85,7 @@ namespace viua {
                 std::unique_ptr<Type> transferActiveException();
                 std::unique_ptr<Type> getReturnValue();
 
-                ProcessType(Process* t): thrd(t) {}
+                ProcessType(viua::process::Process* t): thrd(t) {}
         };
     }
 }

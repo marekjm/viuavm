@@ -28,7 +28,7 @@ using namespace std;
 extern "C" const ForeignFunctionSpec* exports();
 
 
-static void hello(Frame*, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*) {
+static void hello(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     cout << "Hello World!" << endl;
 }
 

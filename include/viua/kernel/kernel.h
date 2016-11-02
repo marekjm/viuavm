@@ -45,9 +45,10 @@
 #include <viua/process.h>
 
 
-class Process;
-
 namespace viua {
+    namespace process {
+        class Process;
+    }
     namespace scheduler {
         class VirtualProcessScheduler;
 
@@ -98,7 +99,7 @@ namespace viua {
              *  Also, a list of spawned VP schedulers.
              */
             // list of virtual processes not associated with any VP scheduler
-            std::vector<std::unique_ptr<Process>> free_virtual_processes;
+            std::vector<std::unique_ptr<viua::process::Process>> free_virtual_processes;
             std::mutex free_virtual_processes_mutex;
             std::condition_variable free_virtual_processes_cv;
             // list of running VP schedulers, pairs of {scheduler-pointer, thread}
@@ -186,10 +187,10 @@ namespace viua {
                 Kernel& registerForeignPrototype(const std::string&, viua::types::Prototype*);
                 Kernel& registerForeignMethod(const std::string&, ForeignMethod);
 
-                void requestForeignFunctionCall(Frame*, Process*);
-                void requestForeignMethodCall(const std::string&, viua::types::Type*, Frame*, RegisterSet*, RegisterSet*, Process*);
+                void requestForeignFunctionCall(Frame*, viua::process::Process*);
+                void requestForeignMethodCall(const std::string&, viua::types::Type*, Frame*, RegisterSet*, RegisterSet*, viua::process::Process*);
 
-                void postFreeProcess(std::unique_ptr<Process>);
+                void postFreeProcess(std::unique_ptr<viua::process::Process>);
 
                 uint64_t createMailbox(const viua::process::PID);
                 uint64_t deleteMailbox(const viua::process::PID);

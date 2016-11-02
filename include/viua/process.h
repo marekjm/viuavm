@@ -54,272 +54,276 @@ namespace viua {
     }
 }
 
-class Process {
+namespace viua {
+    namespace process {
+        class Process {
 #ifdef AS_DEBUG_HEADER
-    public:
+            public:
 #endif
-    viua::scheduler::VirtualProcessScheduler *scheduler;
+            viua::scheduler::VirtualProcessScheduler *scheduler;
 
-    Process* parent_process;
-    const std::string entry_function;
+            viua::process::Process* parent_process;
+            const std::string entry_function;
 
-    std::string watchdog_function { "" };
-    bool watchdog_failed { false };
+            std::string watchdog_function { "" };
+            bool watchdog_failed { false };
 
-    // Global register set
-    std::unique_ptr<RegisterSet> regset;
+            // Global register set
+            std::unique_ptr<RegisterSet> regset;
 
-    // Currently used register set
-    RegisterSet* uregset;
+            // Currently used register set
+            RegisterSet* uregset;
 
-    // Temporary register
-    std::unique_ptr<viua::types::Type> tmp;
+            // Temporary register
+            std::unique_ptr<viua::types::Type> tmp;
 
-    // Static registers
-    std::map<std::string, std::unique_ptr<RegisterSet>> static_registers;
+            // Static registers
+            std::map<std::string, std::unique_ptr<RegisterSet>> static_registers;
 
 
-    // Call stack
-    byte* jump_base;
-    std::vector<std::unique_ptr<Frame>> frames;
-    std::unique_ptr<Frame> frame_new;
+            // Call stack
+            byte* jump_base;
+            std::vector<std::unique_ptr<Frame>> frames;
+            std::unique_ptr<Frame> frame_new;
 
-    // Block stack
-    std::vector<std::unique_ptr<TryFrame>> tryframes;
-    std::unique_ptr<TryFrame> try_frame_new;
+            // Block stack
+            std::vector<std::unique_ptr<TryFrame>> tryframes;
+            std::unique_ptr<TryFrame> try_frame_new;
 
-    /*  Slot for thrown objects (typically exceptions).
-     *  Can be set either by user code, or the VM.
-     */
-    std::unique_ptr<viua::types::Type> thrown;
-    std::unique_ptr<viua::types::Type> caught;
+            /*  Slot for thrown objects (typically exceptions).
+             *  Can be set either by user code, or the VM.
+             */
+            std::unique_ptr<viua::types::Type> thrown;
+            std::unique_ptr<viua::types::Type> caught;
 
-    /*  Variables set after the VM has executed bytecode.
-     *  They describe exit conditions of the bytecode that just stopped running.
-     */
-    std::unique_ptr<viua::types::Type> return_value; // return value of top-most frame on the stack
+            /*  Variables set after the VM has executed bytecode.
+             *  They describe exit conditions of the bytecode that just stopped running.
+             */
+            std::unique_ptr<viua::types::Type> return_value; // return value of top-most frame on the stack
 
-    uint64_t instruction_counter;
-    byte* instruction_pointer;
+            uint64_t instruction_counter;
+            byte* instruction_pointer;
 
-    std::queue<std::unique_ptr<viua::types::Type>> message_queue;
+            std::queue<std::unique_ptr<viua::types::Type>> message_queue;
 
-    viua::types::Type* fetch(unsigned) const;
-    viua::types::Type* pop(unsigned);
-    void place(unsigned, viua::types::Type*);
-    void updaterefs(viua::types::Type*, viua::types::Type*);
-    bool hasrefs(unsigned);
-    void ensureStaticRegisters(std::string);
+            viua::types::Type* fetch(unsigned) const;
+            viua::types::Type* pop(unsigned);
+            void place(unsigned, viua::types::Type*);
+            void updaterefs(viua::types::Type*, viua::types::Type*);
+            bool hasrefs(unsigned);
+            void ensureStaticRegisters(std::string);
 
-    /*  Methods dealing with stack and frame manipulation, and
-     *  function calls.
-     */
-    Frame* requestNewFrame(unsigned arguments_size = 0, unsigned registers_size = 0);
-    TryFrame* requestNewTryFrame();
-    void pushFrame();
-    void dropFrame();
-    byte* adjustJumpBaseForBlock(const std::string&);
-    byte* adjustJumpBaseFor(const std::string&);
-    // call native (i.e. written in Viua) function
-    byte* callNative(byte*, const std::string&, const unsigned, const std::string&);
-    // call foreign (i.e. from a C++ extension) function
-    byte* callForeign(byte*, const std::string&, const unsigned, const std::string&);
-    // call foreign method (i.e. method of a pure-C++ class loaded into machine's typesystem)
-    byte* callForeignMethod(byte*, viua::types::Type*, const std::string&, const unsigned, const std::string&);
+            /*  Methods dealing with stack and frame manipulation, and
+             *  function calls.
+             */
+            Frame* requestNewFrame(unsigned arguments_size = 0, unsigned registers_size = 0);
+            TryFrame* requestNewTryFrame();
+            void pushFrame();
+            void dropFrame();
+            byte* adjustJumpBaseForBlock(const std::string&);
+            byte* adjustJumpBaseFor(const std::string&);
+            // call native (i.e. written in Viua) function
+            byte* callNative(byte*, const std::string&, const unsigned, const std::string&);
+            // call foreign (i.e. from a C++ extension) function
+            byte* callForeign(byte*, const std::string&, const unsigned, const std::string&);
+            // call foreign method (i.e. method of a pure-C++ class loaded into machine's typesystem)
+            byte* callForeignMethod(byte*, viua::types::Type*, const std::string&, const unsigned, const std::string&);
 
-    /*  Stack unwinding methods.
-     */
-    void adjustInstructionPointer(TryFrame*, std::string);
-    void unwindCallStack(TryFrame*);
-    void unwindTryStack(TryFrame*);
-    void unwindStack(std::tuple<TryFrame*, std::string>);
-    void unwindStack(TryFrame*, std::string);
-    std::tuple<TryFrame*, std::string> findCatchFrame();
+            /*  Stack unwinding methods.
+             */
+            void adjustInstructionPointer(TryFrame*, std::string);
+            void unwindCallStack(TryFrame*);
+            void unwindTryStack(TryFrame*);
+            void unwindStack(std::tuple<TryFrame*, std::string>);
+            void unwindStack(TryFrame*, std::string);
+            std::tuple<TryFrame*, std::string> findCatchFrame();
 
-    bool finished;
-    std::atomic_bool is_joinable;
-    std::atomic_bool is_suspended;
-    unsigned process_priority;
-    std::mutex process_mtx;
+            bool finished;
+            std::atomic_bool is_joinable;
+            std::atomic_bool is_suspended;
+            unsigned process_priority;
+            std::mutex process_mtx;
 
-    /*  Process identifier.
-     */
-    viua::process::PID process_id;
-    bool is_hidden;
+            /*  viua::process::Process identifier.
+             */
+            viua::process::PID process_id;
+            bool is_hidden;
 
-    /*  Timeouts for message passing, and
-     *  multiprocessing.
-     */
-    std::chrono::steady_clock::time_point waiting_until;
-    bool timeout_active = false;
-    bool wait_until_infinity = false;
+            /*  Timeouts for message passing, and
+             *  multiprocessing.
+             */
+            std::chrono::steady_clock::time_point waiting_until;
+            bool timeout_active = false;
+            bool wait_until_infinity = false;
 
-    /*  Methods implementing individual instructions.
-     */
-    byte* opizero(byte*);
-    byte* opistore(byte*);
-    byte* opiadd(byte*);
-    byte* opisub(byte*);
-    byte* opimul(byte*);
-    byte* opidiv(byte*);
+            /*  Methods implementing individual instructions.
+             */
+            byte* opizero(byte*);
+            byte* opistore(byte*);
+            byte* opiadd(byte*);
+            byte* opisub(byte*);
+            byte* opimul(byte*);
+            byte* opidiv(byte*);
 
-    byte* opilt(byte*);
-    byte* opilte(byte*);
-    byte* opigt(byte*);
-    byte* opigte(byte*);
-    byte* opieq(byte*);
+            byte* opilt(byte*);
+            byte* opilte(byte*);
+            byte* opigt(byte*);
+            byte* opigte(byte*);
+            byte* opieq(byte*);
 
-    byte* opiinc(byte*);
-    byte* opidec(byte*);
+            byte* opiinc(byte*);
+            byte* opidec(byte*);
 
-    byte* opfstore(byte*);
-    byte* opfadd(byte*);
-    byte* opfsub(byte*);
-    byte* opfmul(byte*);
-    byte* opfdiv(byte*);
+            byte* opfstore(byte*);
+            byte* opfadd(byte*);
+            byte* opfsub(byte*);
+            byte* opfmul(byte*);
+            byte* opfdiv(byte*);
 
-    byte* opflt(byte*);
-    byte* opflte(byte*);
-    byte* opfgt(byte*);
-    byte* opfgte(byte*);
-    byte* opfeq(byte*);
+            byte* opflt(byte*);
+            byte* opflte(byte*);
+            byte* opfgt(byte*);
+            byte* opfgte(byte*);
+            byte* opfeq(byte*);
 
-    byte* opitof(byte*);
-    byte* opftoi(byte*);
-    byte* opstoi(byte*);
-    byte* opstof(byte*);
+            byte* opitof(byte*);
+            byte* opftoi(byte*);
+            byte* opstoi(byte*);
+            byte* opstof(byte*);
 
-    byte* opstrstore(byte*);
+            byte* opstrstore(byte*);
 
-    byte* opvec(byte*);
-    byte* opvinsert(byte*);
-    byte* opvpush(byte*);
-    byte* opvpop(byte*);
-    byte* opvat(byte*);
-    byte* opvlen(byte*);
+            byte* opvec(byte*);
+            byte* opvinsert(byte*);
+            byte* opvpush(byte*);
+            byte* opvpop(byte*);
+            byte* opvat(byte*);
+            byte* opvlen(byte*);
 
-    byte* boolean(byte*);
-    byte* opnot(byte*);
-    byte* opand(byte*);
-    byte* opor(byte*);
+            byte* boolean(byte*);
+            byte* opnot(byte*);
+            byte* opand(byte*);
+            byte* opor(byte*);
 
-    byte* opmove(byte*);
-    byte* opcopy(byte*);
-    byte* opptr(byte*);
-    byte* opswap(byte*);
-    byte* opdelete(byte*);
-    byte* opisnull(byte*);
+            byte* opmove(byte*);
+            byte* opcopy(byte*);
+            byte* opptr(byte*);
+            byte* opswap(byte*);
+            byte* opdelete(byte*);
+            byte* opisnull(byte*);
 
-    byte* opress(byte*);
-    byte* optmpri(byte*);
-    byte* optmpro(byte*);
+            byte* opress(byte*);
+            byte* optmpri(byte*);
+            byte* optmpro(byte*);
 
-    byte* opprint(byte*);
-    byte* opecho(byte*);
+            byte* opprint(byte*);
+            byte* opecho(byte*);
 
-    byte* openclose(byte*);
-    byte* openclosecopy(byte*);
-    byte* openclosemove(byte*);
-    byte* opclosure(byte*);
+            byte* openclose(byte*);
+            byte* openclosecopy(byte*);
+            byte* openclosemove(byte*);
+            byte* opclosure(byte*);
 
-    byte* opfunction(byte*);
-    byte* opfcall(byte*);
+            byte* opfunction(byte*);
+            byte* opfcall(byte*);
 
-    byte* opframe(byte*);
-    byte* opparam(byte*);
-    byte* oppamv(byte*);
-    byte* oparg(byte*);
-    byte* opargc(byte*);
+            byte* opframe(byte*);
+            byte* opparam(byte*);
+            byte* oppamv(byte*);
+            byte* oparg(byte*);
+            byte* opargc(byte*);
 
-    byte* opcall(byte*);
-    byte* optailcall(byte*);
-    byte* opprocess(byte*);
-    byte* opself(byte*);
-    byte* opjoin(byte*);
-    byte* opsend(byte*);
-    byte* opreceive(byte*);
-    byte* opwatchdog(byte*);
-    byte* opreturn(byte*);
+            byte* opcall(byte*);
+            byte* optailcall(byte*);
+            byte* opprocess(byte*);
+            byte* opself(byte*);
+            byte* opjoin(byte*);
+            byte* opsend(byte*);
+            byte* opreceive(byte*);
+            byte* opwatchdog(byte*);
+            byte* opreturn(byte*);
 
-    byte* opjump(byte*);
-    byte* opif(byte*);
+            byte* opjump(byte*);
+            byte* opif(byte*);
 
-    byte* optry(byte*);
-    byte* opcatch(byte*);
-    byte* oppull(byte*);
-    byte* openter(byte*);
-    byte* opthrow(byte*);
-    byte* opleave(byte*);
+            byte* optry(byte*);
+            byte* opcatch(byte*);
+            byte* oppull(byte*);
+            byte* openter(byte*);
+            byte* opthrow(byte*);
+            byte* opleave(byte*);
 
-    byte* opclass(byte*);
-    byte* opprototype(byte*);
-    byte* opderive(byte*);
-    byte* opattach(byte*);
-    byte* opregister(byte*);
+            byte* opclass(byte*);
+            byte* opprototype(byte*);
+            byte* opderive(byte*);
+            byte* opattach(byte*);
+            byte* opregister(byte*);
 
-    byte* opnew(byte*);
-    byte* opmsg(byte*);
-    byte* opinsert(byte*);
-    byte* opremove(byte*);
+            byte* opnew(byte*);
+            byte* opmsg(byte*);
+            byte* opinsert(byte*);
+            byte* opremove(byte*);
 
-    byte* opimport(byte*);
-    byte* oplink(byte*);
+            byte* opimport(byte*);
+            byte* oplink(byte*);
 
-    public:
-        byte* dispatch(byte*);
-        byte* tick();
+            public:
+                byte* dispatch(byte*);
+                byte* tick();
 
-        viua::types::Type* obtain(unsigned) const;
-        void put(unsigned, viua::types::Type*);
+                viua::types::Type* obtain(unsigned) const;
+                void put(unsigned, viua::types::Type*);
 
-        bool joinable() const;
-        void join();
-        void detach();
+                bool joinable() const;
+                void join();
+                void detach();
 
-        void suspend();
-        void wakeup();
-        bool suspended() const;
+                void suspend();
+                void wakeup();
+                bool suspended() const;
 
-        Process* parent() const;
-        std::string starting_function() const;
+                viua::process::Process* parent() const;
+                std::string starting_function() const;
 
-        void pass(std::unique_ptr<viua::types::Type>);
+                void pass(std::unique_ptr<viua::types::Type>);
 
-        auto priority() const -> decltype(process_priority);
-        void priority(decltype(process_priority) p);
+                auto priority() const -> decltype(process_priority);
+                void priority(decltype(process_priority) p);
 
-        bool stopped() const;
+                bool stopped() const;
 
-        bool terminated() const;
-        viua::types::Type* getActiveException();
-        std::unique_ptr<viua::types::Type> transferActiveException();
-        void raiseException(viua::types::Type*);
-        void handleActiveException();
+                bool terminated() const;
+                viua::types::Type* getActiveException();
+                std::unique_ptr<viua::types::Type> transferActiveException();
+                void raiseException(viua::types::Type*);
+                void handleActiveException();
 
-        void migrate_to(viua::scheduler::VirtualProcessScheduler*);
+                void migrate_to(viua::scheduler::VirtualProcessScheduler*);
 
-        void popFrame();
-        std::unique_ptr<viua::types::Type> getReturnValue();
+                void popFrame();
+                std::unique_ptr<viua::types::Type> getReturnValue();
 
-        bool watchdogged() const;
-        std::string watchdog() const;
-        byte* become(const std::string&, std::unique_ptr<Frame>);
+                bool watchdogged() const;
+                std::string watchdog() const;
+                byte* become(const std::string&, std::unique_ptr<Frame>);
 
-        byte* begin();
-        uint64_t counter() const;
-        auto executionAt() const -> decltype(instruction_pointer);
+                byte* begin();
+                uint64_t counter() const;
+                auto executionAt() const -> decltype(instruction_pointer);
 
-        std::vector<Frame*> trace() const;
+                std::vector<Frame*> trace() const;
 
-        viua::process::PID pid() const;
-        bool hidden() const;
-        void hidden(bool);
+                viua::process::PID pid() const;
+                bool hidden() const;
+                void hidden(bool);
 
-        bool empty() const;
+                bool empty() const;
 
-        Process(std::unique_ptr<Frame>, viua::scheduler::VirtualProcessScheduler*, Process*);
-        ~Process();
-};
+                Process(std::unique_ptr<Frame>, viua::scheduler::VirtualProcessScheduler*, viua::process::Process*);
+                ~Process();
+        };
+    }
+}
 
 
 #endif

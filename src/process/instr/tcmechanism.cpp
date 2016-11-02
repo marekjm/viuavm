@@ -25,7 +25,7 @@
 using namespace std;
 
 
-byte* Process::optry(byte* addr) {
+byte* viua::process::Process::optry(byte* addr) {
     /** Create new special frame for try blocks.
      */
     if (try_frame_new) {
@@ -35,7 +35,7 @@ byte* Process::optry(byte* addr) {
     return addr;
 }
 
-byte* Process::opcatch(byte* addr) {
+byte* viua::process::Process::opcatch(byte* addr) {
     /** Run catch instruction.
      */
     string type_name, catcher_block_name;
@@ -51,7 +51,7 @@ byte* Process::opcatch(byte* addr) {
     return addr;
 }
 
-byte* Process::oppull(byte* addr) {
+byte* viua::process::Process::oppull(byte* addr) {
     /** Run pull instruction.
      */
     unsigned target = 0;
@@ -65,7 +65,7 @@ byte* Process::oppull(byte* addr) {
     return addr;
 }
 
-byte* Process::openter(byte* addr) {
+byte* viua::process::Process::openter(byte* addr) {
     /*  Run enter instruction.
      */
     string block_name;
@@ -86,7 +86,7 @@ byte* Process::openter(byte* addr) {
     return block_address;
 }
 
-byte* Process::opthrow(byte* addr) {
+byte* viua::process::Process::opthrow(byte* addr) {
     /** Run throw instruction.
      */
     unsigned source = 0;
@@ -108,7 +108,7 @@ byte* Process::opthrow(byte* addr) {
     return addr;
 }
 
-byte* Process::opleave(byte* addr) {
+byte* viua::process::Process::opleave(byte* addr) {
     /*  Run leave instruction.
      */
     if (tryframes.size() == 0) {

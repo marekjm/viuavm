@@ -31,12 +31,15 @@
 #include <viua/kernel/registerset.h>
 
 
-class Process;
 namespace viua {
+    namespace process {
+        class Process;
+    }
     namespace kernel {
         class Kernel;
     }
 }
+
 
 namespace viua {
     namespace types {
@@ -72,18 +75,18 @@ namespace viua {
                 String* add(String*);
                 String* join(Vector*);
 
-                virtual void stringify(Frame*, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*);
-                virtual void represent(Frame*, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*);
+                virtual void stringify(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
+                virtual void represent(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
 
-                virtual void startswith(Frame*, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*);
-                virtual void endswith(Frame*, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*);
+                virtual void startswith(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
+                virtual void endswith(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
 
-                virtual void format(Frame*, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*);
-                virtual void substr(Frame*, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*);
-                virtual void concatenate(Frame*, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*);
-                virtual void join(Frame*, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*);
+                virtual void format(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
+                virtual void substr(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
+                virtual void concatenate(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
+                virtual void join(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
 
-                virtual void size(Frame*, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*);
+                virtual void size(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
 
                 String(std::string s = ""): svalue(s) {}
         };

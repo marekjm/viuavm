@@ -25,7 +25,7 @@
 using namespace std;
 
 
-byte* Process::dispatch(byte* addr) {
+byte* viua::process::Process::dispatch(byte* addr) {
     /** Dispatches instruction at a pointer to its handler.
      */
     switch (static_cast<OPCODE>(*addr)) {

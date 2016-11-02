@@ -23,23 +23,22 @@
 #pragma once
 
 
-class Process;
-
-
 namespace viua {
     namespace process {
+        class Process;
+
         class PID {
-            const Process *associated_process;
+            const viua::process::Process *associated_process;
 
             public:
             bool operator==(const viua::process::PID&) const;
-            bool operator==(const Process*) const;
+            bool operator==(const viua::process::Process*) const;
             bool operator<(const viua::process::PID&) const;
             bool operator>(const viua::process::PID&) const;
 
             auto get() const -> decltype(associated_process);
 
-            PID(const Process*);
+            PID(const viua::process::Process*);
         };
     }
 }

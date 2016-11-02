@@ -26,7 +26,7 @@
 using namespace std;
 
 
-byte* Process::opmove(byte* addr) {
+byte* viua::process::Process::opmove(byte* addr) {
     unsigned target = 0, source = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
@@ -35,7 +35,7 @@ byte* Process::opmove(byte* addr) {
 
     return addr;
 }
-byte* Process::opcopy(byte* addr) {
+byte* viua::process::Process::opcopy(byte* addr) {
     unsigned target = 0;
     viua::types::Type *source = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
@@ -45,7 +45,7 @@ byte* Process::opcopy(byte* addr) {
 
     return addr;
 }
-byte* Process::opptr(byte* addr) {
+byte* viua::process::Process::opptr(byte* addr) {
     unsigned target = 0;
     viua::types::Type *source = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
@@ -55,7 +55,7 @@ byte* Process::opptr(byte* addr) {
 
     return addr;
 }
-byte* Process::opswap(byte* addr) {
+byte* viua::process::Process::opswap(byte* addr) {
     unsigned target = 0, source = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
@@ -64,7 +64,7 @@ byte* Process::opswap(byte* addr) {
 
     return addr;
 }
-byte* Process::opdelete(byte* addr) {
+byte* viua::process::Process::opdelete(byte* addr) {
     unsigned target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
@@ -72,7 +72,7 @@ byte* Process::opdelete(byte* addr) {
 
     return addr;
 }
-byte* Process::opisnull(byte* addr) {
+byte* viua::process::Process::opisnull(byte* addr) {
     unsigned target = 0, source = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
@@ -82,7 +82,7 @@ byte* Process::opisnull(byte* addr) {
     return addr;
 }
 
-byte* Process::opress(byte* addr) {
+byte* viua::process::Process::opress(byte* addr) {
     /*  Run ress instruction.
      */
     int to_register_set = 0;
@@ -108,14 +108,14 @@ byte* Process::opress(byte* addr) {
     return addr;
 }
 
-byte* Process::optmpri(byte* addr) {
+byte* viua::process::Process::optmpri(byte* addr) {
     unsigned target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     tmp.reset(pop(target));
     return addr;
 }
-byte* Process::optmpro(byte* addr) {
+byte* viua::process::Process::optmpro(byte* addr) {
     if (not tmp) {
         throw new viua::types::Exception("temporary register set is empty");
     }

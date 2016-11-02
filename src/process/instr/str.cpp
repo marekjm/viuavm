@@ -28,7 +28,7 @@
 using namespace std;
 
 
-byte* Process::opstrstore(byte* addr) {
+byte* viua::process::Process::opstrstore(byte* addr) {
     unsigned target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 

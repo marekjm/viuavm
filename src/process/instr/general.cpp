@@ -26,14 +26,14 @@
 using namespace std;
 
 
-byte* Process::opecho(byte* addr) {
+byte* viua::process::Process::opecho(byte* addr) {
     unsigned source = 0;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     cout << fetch(source)->str();
     return addr;
 }
 
-byte* Process::opprint(byte* addr) {
+byte* viua::process::Process::opprint(byte* addr) {
     unsigned source = 0;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     cout << fetch(source)->str() + '\n';
@@ -41,7 +41,7 @@ byte* Process::opprint(byte* addr) {
 }
 
 
-byte* Process::opjump(byte* addr) {
+byte* viua::process::Process::opjump(byte* addr) {
     byte* target = (jump_base + viua::bytecode::decoder::operands::extract_primitive_uint64(addr, this));
     if (target == addr) {
         throw new viua::types::Exception("aborting: JUMP instruction pointing to itself");
@@ -49,7 +49,7 @@ byte* Process::opjump(byte* addr) {
     return target;
 }
 
-byte* Process::opif(byte* addr) {
+byte* viua::process::Process::opif(byte* addr) {
     unsigned source_register_index = 0;
     uint64_t addr_true = 0, addr_false = 0;
 

@@ -29,14 +29,14 @@
 using namespace std;
 
 
-void typeof(Frame* frame, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*) {
+void typeof(Frame* frame, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     if (frame->args->at(0) == 0) {
         throw new viua::types::Exception("expected object as parameter 0");
     }
     frame->regset->set(0, new viua::types::String(frame->args->get(0)->type()));
 }
 
-void inheritanceChain(Frame* frame, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*) {
+void inheritanceChain(Frame* frame, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     if (frame->args->at(0) == 0) {
         throw new viua::types::Exception("expected object as parameter 0");
     }
@@ -51,7 +51,7 @@ void inheritanceChain(Frame* frame, RegisterSet*, RegisterSet*, Process*, viua::
     frame->regset->set(0, icv);
 }
 
-void bases(Frame* frame, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*) {
+void bases(Frame* frame, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     if (frame->args->at(0) == 0) {
         throw new viua::types::Exception("expected object as parameter 0");
     }

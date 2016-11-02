@@ -33,7 +33,7 @@
 using namespace std;
 
 
-static void printStackTrace(Process *process) {
+static void printStackTrace(viua::process::Process *process) {
     auto trace = process->trace();
     cout << "stack trace: from entry point, most recent call last...\n";
     for (unsigned i = (trace.size() and trace[0]->function_name == "__entry"); i < trace.size(); ++i) {
@@ -119,7 +119,7 @@ template<class ...Ts> static void viua_err(Ts&&... args) {
 }
 
 
-bool viua::scheduler::VirtualProcessScheduler::executeQuant(Process *th, unsigned priority) {
+bool viua::scheduler::VirtualProcessScheduler::executeQuant(viua::process::Process *th, unsigned priority) {
     if (th->stopped() and th->joinable()) {
         // stopped but still joinable
         // we don't have to deal with "stopped and unjoinable" case here
@@ -216,11 +216,11 @@ void viua::scheduler::VirtualProcessScheduler::registerPrototype(viua::types::Pr
     attached_kernel->registerPrototype(proto);
 }
 
-void viua::scheduler::VirtualProcessScheduler::requestForeignFunctionCall(Frame *frame, Process *p) const {
+void viua::scheduler::VirtualProcessScheduler::requestForeignFunctionCall(Frame *frame, viua::process::Process *p) const {
     attached_kernel->requestForeignFunctionCall(frame, p);
 }
 
-void viua::scheduler::VirtualProcessScheduler::requestForeignMethodCall(const string& name, viua::types::Type *object, Frame *frame, RegisterSet*, RegisterSet*, Process *p) {
+void viua::scheduler::VirtualProcessScheduler::requestForeignMethodCall(const string& name, viua::types::Type *object, Frame *frame, RegisterSet*, RegisterSet*, viua::process::Process *p) {
     attached_kernel->requestForeignMethodCall(name, object, frame, nullptr, nullptr, p);
 }
 
@@ -241,22 +241,22 @@ auto viua::scheduler::VirtualProcessScheduler::size() const -> decltype(processe
     return processes.size();
 }
 
-Process* viua::scheduler::VirtualProcessScheduler::process(decltype(processes)::size_type index) {
+viua::process::Process* viua::scheduler::VirtualProcessScheduler::process(decltype(processes)::size_type index) {
     return processes.at(index).get();
 }
 
-Process* viua::scheduler::VirtualProcessScheduler::process() {
+viua::process::Process* viua::scheduler::VirtualProcessScheduler::process() {
     return process(current_process_index);
 }
 
-Process* viua::scheduler::VirtualProcessScheduler::spawn(unique_ptr<Frame> frame, Process *parent, bool disown) {
-    unique_ptr<Process> p(new Process(std::move(frame), this, parent));
+viua::process::Process* viua::scheduler::VirtualProcessScheduler::spawn(unique_ptr<Frame> frame, viua::process::Process *parent, bool disown) {
+    unique_ptr<viua::process::Process> p(new viua::process::Process(std::move(frame), this, parent));
     p->begin();
     if (disown) {
         p->detach();
     }
 
-    Process *process_ptr = p.get();
+    viua::process::Process *process_ptr = p.get();
     const auto total_processes = attached_kernel->createMailbox(process_ptr->pid());
     const auto running_schedulers = attached_kernel->no_of_vp_schedulers();
 
@@ -312,7 +312,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
 
     bool ticked = false;
 
-    vector<unique_ptr<Process>> running_processes_list;
+    vector<unique_ptr<viua::process::Process>> running_processes_list;
     decltype(running_processes_list) dead_processes_list;
     current_load = 0;
     for (decltype(running_processes_list)::size_type i = 0; i < processes.size(); ++i) {
@@ -547,7 +547,7 @@ int viua::scheduler::VirtualProcessScheduler::exit() const {
     return exit_code;
 }
 
-viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(viua::kernel::Kernel *akernel, vector<unique_ptr<Process>> *fp,
+viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(viua::kernel::Kernel *akernel, vector<unique_ptr<viua::process::Process>> *fp,
                                                                   mutex *fp_mtx,
                                                                   condition_variable *fp_cv):
     attached_kernel(akernel),

@@ -31,7 +31,7 @@
 using namespace std;
 
 
-byte* Process::opnew(byte* addr) {
+byte* viua::process::Process::opnew(byte* addr) {
     /** Create new instance of specified class.
      */
     unsigned target = 0;
@@ -49,7 +49,7 @@ byte* Process::opnew(byte* addr) {
     return addr;
 }
 
-byte* Process::opmsg(byte* addr) {
+byte* viua::process::Process::opmsg(byte* addr) {
     /** Send a message to an object.
      *
      *  This instruction is used to perform a method call on an object using dynamic dispatch.
@@ -100,13 +100,13 @@ byte* Process::opmsg(byte* addr) {
         return callForeignMethod(addr, obj, function_name, return_register, method_name);
     }
 
-    auto caller = (is_native ? &Process::callNative : &Process::callForeign);
+    auto caller = (is_native ? &viua::process::Process::callNative : &viua::process::Process::callForeign);
     // FIXME: remove the need for static_cast<>
     // the cast is safe because register indexes cannot be negative, but it looks ugly
     return (this->*caller)(addr, function_name, return_register, method_name);
 }
 
-byte* Process::opinsert(byte* addr) {
+byte* viua::process::Process::opinsert(byte* addr) {
     /** Insert an object as an attribute of another object.
      */
     viua::types::Type *object_operand = nullptr, *key_operand = nullptr;
@@ -124,7 +124,7 @@ byte* Process::opinsert(byte* addr) {
     return addr;
 }
 
-byte* Process::opremove(byte* addr) {
+byte* viua::process::Process::opremove(byte* addr) {
     /** Remove an attribute of another object.
      */
     unsigned target_index = 0;

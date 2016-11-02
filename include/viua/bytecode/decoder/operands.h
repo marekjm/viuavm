@@ -27,8 +27,13 @@
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/types/type.h>
 
-// forward declaration for functions declared in this file
-class Process;
+
+namespace viua {
+    namespace process {
+        class Process;
+    }
+}
+
 
 namespace viua {
     namespace bytecode {
@@ -45,13 +50,13 @@ namespace viua {
                  *  These functions are used most often bymajority of the instructions.
                  *
                  */
-                auto fetch_register_index(byte*, Process*) -> std::tuple<byte*, unsigned>;
-                auto fetch_primitive_uint(byte*, Process*) -> std::tuple<byte*, unsigned>;
-                auto fetch_primitive_uint64(byte*, Process*) -> std::tuple<byte*, uint64_t>;
-                auto fetch_primitive_int(byte*, Process*) -> std::tuple<byte*, int>;
-                auto fetch_primitive_string(byte*, Process*) -> std::tuple<byte*, std::string>;
-                auto fetch_atom(byte*, Process*) -> std::tuple<byte*, std::string>;
-                auto fetch_object(byte*, Process*) -> std::tuple<byte*, viua::types::Type*>;
+                auto fetch_register_index(byte*, viua::process::Process*) -> std::tuple<byte*, unsigned>;
+                auto fetch_primitive_uint(byte*, viua::process::Process*) -> std::tuple<byte*, unsigned>;
+                auto fetch_primitive_uint64(byte*, viua::process::Process*) -> std::tuple<byte*, uint64_t>;
+                auto fetch_primitive_int(byte*, viua::process::Process*) -> std::tuple<byte*, int>;
+                auto fetch_primitive_string(byte*, viua::process::Process*) -> std::tuple<byte*, std::string>;
+                auto fetch_atom(byte*, viua::process::Process*) -> std::tuple<byte*, std::string>;
+                auto fetch_object(byte*, viua::process::Process*) -> std::tuple<byte*, viua::types::Type*>;
 
                 /*
                  *  Fetch raw data decoding it directly from bytecode.
@@ -59,8 +64,8 @@ namespace viua {
                  *  These functions are used by instructions whose operands are always
                  *  immediates.
                  */
-                auto fetch_raw_int(byte *ip, Process* p) -> std::tuple<byte*, int>;
-                auto fetch_raw_float(byte*, Process*) -> std::tuple<byte*, float>;
+                auto fetch_raw_int(byte *ip, viua::process::Process* p) -> std::tuple<byte*, int>;
+                auto fetch_raw_float(byte*, viua::process::Process*) -> std::tuple<byte*, float>;
 
                 /*
                  *  Extract data decoding it from bytecode without advancing the bytecode
@@ -68,7 +73,7 @@ namespace viua {
                  *  These functions are used by instructions whose operands are always
                  *  immediates.
                  */
-                auto extract_primitive_uint64(byte*, Process*) -> uint64_t;
+                auto extract_primitive_uint64(byte*, viua::process::Process*) -> uint64_t;
             }
         }
     }

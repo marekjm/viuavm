@@ -31,7 +31,7 @@
 using namespace std;
 
 
-byte* Process::openclose(byte* addr) {
+byte* viua::process::Process::openclose(byte* addr) {
     /** Capture object by reference.
      */
     unsigned target_closure_register = 0, target_register = 0, source_register = 0;
@@ -59,7 +59,7 @@ byte* Process::openclose(byte* addr) {
     return addr;
 }
 
-byte* Process::openclosecopy(byte* addr) {
+byte* viua::process::Process::openclosecopy(byte* addr) {
     /** Capture object by copy.
      */
     unsigned target_closure_register = 0, target_register = 0, source_register = 0;
@@ -77,7 +77,7 @@ byte* Process::openclosecopy(byte* addr) {
     return addr;
 }
 
-byte* Process::openclosemove(byte* addr) {
+byte* viua::process::Process::openclosemove(byte* addr) {
     /** Capture object by move.
      */
     unsigned target_closure_register = 0, target_register = 0, source_register = 0;
@@ -95,7 +95,7 @@ byte* Process::openclosemove(byte* addr) {
     return addr;
 }
 
-byte* Process::opclosure(byte* addr) {
+byte* viua::process::Process::opclosure(byte* addr) {
     /** Create a closure from a function.
      */
     if (uregset != frames.back()->regset) {
@@ -113,7 +113,7 @@ byte* Process::opclosure(byte* addr) {
     return addr;
 }
 
-byte* Process::opfunction(byte* addr) {
+byte* viua::process::Process::opfunction(byte* addr) {
     /** Create function object in a register.
      *
      *  Such objects can be used to call functions, and
@@ -131,7 +131,7 @@ byte* Process::opfunction(byte* addr) {
     return addr;
 }
 
-byte* Process::opfcall(byte* addr) {
+byte* viua::process::Process::opfcall(byte* addr) {
     /*  Call a function object.
      */
     unsigned return_register = 0, fn_reg = 0;

@@ -28,7 +28,7 @@
 using namespace std;
 
 
-byte* Process::opclass(byte* addr) {
+byte* viua::process::Process::opclass(byte* addr) {
     /** Create a class.
      */
     unsigned target = 0;
@@ -42,7 +42,7 @@ byte* Process::opclass(byte* addr) {
     return addr;
 }
 
-byte* Process::opderive(byte* addr) {
+byte* viua::process::Process::opderive(byte* addr) {
     /** Push an ancestor class to prototype's inheritance chain.
      */
     viua::types::Type* target = nullptr;
@@ -60,7 +60,7 @@ byte* Process::opderive(byte* addr) {
     return addr;
 }
 
-byte* Process::opattach(byte* addr) {
+byte* viua::process::Process::opattach(byte* addr) {
     /** Attach a function to a prototype as a method.
      */
     viua::types::Type* target = nullptr;
@@ -81,7 +81,7 @@ byte* Process::opattach(byte* addr) {
     return addr;
 }
 
-byte* Process::opregister(byte* addr) {
+byte* viua::process::Process::opregister(byte* addr) {
     /** Register a prototype in the typesystem.
      */
     unsigned source = 0;

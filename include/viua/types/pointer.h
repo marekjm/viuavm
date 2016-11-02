@@ -27,8 +27,10 @@
 #include <viua/kernel/frame.h>
 
 
-class Process;
 namespace viua {
+    namespace process {
+        class Process;
+    }
     namespace kernel {
         class Kernel;
     }
@@ -49,7 +51,7 @@ namespace viua {
                 void reset(Type* t);
                 Type* to();
 
-                virtual void expired(Frame*, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*);
+                virtual void expired(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
 
                 std::string str() const override;
 
