@@ -294,7 +294,7 @@ void viua::kernel::Kernel::requestForeignFunctionCall(Frame *frame, viua::proces
     foreign_call_queue_condition.notify_one();
 }
 
-void viua::kernel::Kernel::requestForeignMethodCall(const string& name, viua::types::Type *object, Frame *frame, RegisterSet*, RegisterSet*, viua::process::Process *p) {
+void viua::kernel::Kernel::requestForeignMethodCall(const string& name, viua::types::Type *object, Frame *frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process *p) {
     foreign_methods.at(name)(object, frame, nullptr, nullptr, p, this);
 }
 

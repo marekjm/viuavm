@@ -51,7 +51,7 @@ namespace viua {
                 void reset(Type* t);
                 Type* to();
 
-                virtual void expired(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
+                virtual void expired(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
 
                 std::string str() const override;
 

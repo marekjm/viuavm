@@ -80,7 +80,7 @@ viua::types::Type* viua::types::Pointer::copy() const {
 }
 
 
-void viua::types::Pointer::expired(Frame* frm, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+void viua::types::Pointer::expired(Frame* frm, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     frm->regset->set(0, new viua::types::Boolean(expired()));
 }
 

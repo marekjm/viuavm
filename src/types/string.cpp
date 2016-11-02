@@ -83,21 +83,21 @@ String* String::join(Vector* v) {
 }
 
 // foreign methods
-void String::stringify(Frame* frame, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+void String::stringify(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     if (frame->args->size() < 2) {
         throw new viua::types::Exception("expected 2 parameters");
     }
     svalue = static_cast<Pointer*>(frame->args->at(1))->to()->str();
 }
 
-void String::represent(Frame* frame, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+void String::represent(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     if (frame->args->size() < 2) {
         throw new viua::types::Exception("expected 2 parameters");
     }
     svalue = static_cast<Pointer*>(frame->args->at(1))->to()->repr();
 }
 
-void String::startswith(Frame* frame, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+void String::startswith(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     string s = static_cast<String*>(frame->args->at(1))->value();
     bool starts_with = false;
 
@@ -114,7 +114,7 @@ void String::startswith(Frame* frame, RegisterSet*, RegisterSet*, viua::process:
     frame->regset->set(0, new viua::types::Boolean(starts_with));
 }
 
-void String::endswith(Frame* frame, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+void String::endswith(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     string s = static_cast<String*>(frame->args->at(1))->value();
     bool ends_with = false;
 
@@ -133,7 +133,7 @@ void String::endswith(Frame* frame, RegisterSet*, RegisterSet*, viua::process::P
     frame->regset->set(0, new viua::types::Boolean(ends_with));
 }
 
-void String::format(Frame* frame, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+void String::format(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     regex key_regex("#\\{(?:(?:0|[1-9][0-9]*)|[a-zA-Z_][a-zA-Z0-9_]*)\\}");
 
     string result = svalue;
@@ -168,7 +168,7 @@ void String::format(Frame* frame, RegisterSet*, RegisterSet*, viua::process::Pro
     frame->regset->set(0, new String(result));
 }
 
-void String::substr(Frame* frame, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+void String::substr(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     int begin = 0;
     int end = -1;
 
@@ -189,14 +189,14 @@ void String::substr(Frame* frame, RegisterSet*, RegisterSet*, viua::process::Pro
     frame->regset->set(0, sub(begin, end));
 }
 
-void String::concatenate(Frame* frame, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+void String::concatenate(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     frame->regset->set(0, new String(static_cast<String*>(frame->args->at(0))->value() + static_cast<String*>(frame->args->at(1))->value()));
 }
 
-void String::join(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+void String::join(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     // TODO: implement
 }
 
-void String::size(Frame* frame, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+void String::size(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     frame->regset->set(0, new Integer(static_cast<int>(svalue.size())));
 }

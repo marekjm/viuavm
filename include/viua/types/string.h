@@ -75,18 +75,18 @@ namespace viua {
                 String* add(String*);
                 String* join(Vector*);
 
-                virtual void stringify(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
-                virtual void represent(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
+                virtual void stringify(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
+                virtual void represent(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
 
-                virtual void startswith(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
-                virtual void endswith(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
+                virtual void startswith(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
+                virtual void endswith(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
 
-                virtual void format(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
-                virtual void substr(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
-                virtual void concatenate(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
-                virtual void join(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
+                virtual void format(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
+                virtual void substr(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
+                virtual void concatenate(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
+                virtual void join(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
 
-                virtual void size(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
+                virtual void size(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
 
                 String(std::string s = ""): svalue(s) {}
         };

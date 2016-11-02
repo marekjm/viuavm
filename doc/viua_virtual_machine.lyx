@@ -6164,7 +6164,7 @@ status open
 
 \begin_layout Plain Layout
 
-typedef Type* (ForeignFunction)(Frame*, RegisterSet*, RegisterSet*);
+typedef Type* (ForeignFunction)(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*);
 \end_layout
 
 \begin_layout Plain Layout

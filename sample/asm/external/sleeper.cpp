@@ -32,7 +32,7 @@ using namespace std;
 extern "C" const ForeignFunctionSpec* exports();
 
 
-static void sleeper_lazy_print(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+static void sleeper_lazy_print(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     cout << "sleeper::lazy_print/0: sleep for 5ms" << endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
 

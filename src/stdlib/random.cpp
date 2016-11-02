@@ -46,7 +46,7 @@ float getrandom() {
     return rfloat;
 }
 
-void random_drandom(Frame* frame, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+void random_drandom(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     /** Return random integer.
      *
      *  Bytes are read from /dev/random random number device.
@@ -61,7 +61,7 @@ void random_drandom(Frame* frame, RegisterSet*, RegisterSet*, viua::process::Pro
     frame->regset->set(0, new viua::types::Integer(rint));
 }
 
-void random_durandom(Frame* frame, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+void random_durandom(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     /** Return random integer.
      *
      *  Bytes are read from /dev/urandom random number device.
@@ -78,13 +78,13 @@ void random_durandom(Frame* frame, RegisterSet*, RegisterSet*, viua::process::Pr
     frame->regset->set(0, new viua::types::Integer(rint));
 }
 
-void random_random(Frame* frame, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+void random_random(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     /** Return random float from range between 0.0 and 1.0.
      */
     frame->regset->set(0, new viua::types::Float(getrandom()));
 }
 
-void random_randint(Frame* frame, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+void random_randint(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     /** Return random integer from selected range.
      *
      *  Requires two parameters: lower and upper bound.

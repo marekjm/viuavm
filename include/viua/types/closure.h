@@ -34,7 +34,7 @@ namespace viua {
             /** Closure type.
              */
             public:
-                RegisterSet* regset;
+                viua::kernel::RegisterSet* regset;
 
                 std::string function_name;
 
@@ -49,7 +49,7 @@ namespace viua {
                 virtual std::string name() const;
 
                 // FIXME: implement real dtor
-                Closure(const std::string& = "", RegisterSet* = nullptr);
+                Closure(const std::string& = "", viua::kernel::RegisterSet* = nullptr);
                 virtual ~Closure();
         };
     }

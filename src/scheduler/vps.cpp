@@ -220,7 +220,7 @@ void viua::scheduler::VirtualProcessScheduler::requestForeignFunctionCall(Frame 
     attached_kernel->requestForeignFunctionCall(frame, p);
 }
 
-void viua::scheduler::VirtualProcessScheduler::requestForeignMethodCall(const string& name, viua::types::Type *object, Frame *frame, RegisterSet*, RegisterSet*, viua::process::Process *p) {
+void viua::scheduler::VirtualProcessScheduler::requestForeignMethodCall(const string& name, viua::types::Type *object, Frame *frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process *p) {
     attached_kernel->requestForeignMethodCall(name, object, frame, nullptr, nullptr, p);
 }
 
@@ -408,7 +408,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                 unique_ptr<viua::types::Object> death_message(new viua::types::Object("Object"));
                 unique_ptr<viua::types::Type> exc(th->transferActiveException());
                 auto parameters = new viua::types::Vector();
-                RegisterSet *top_args = th->trace()[0]->args;
+                viua::kernel::RegisterSet *top_args = th->trace()[0]->args;
                 for (unsigned long j = 0; j < top_args->size(); ++j) {
                     if (top_args->at(j)) {
                         parameters->push(top_args->at(j));

@@ -125,7 +125,7 @@ OPCODE printInstruction(const viua::kernel::Kernel& kernel) {
     return OPCODE(*iptr);
 }
 
-void printRegisters(const vector<string>& indexes, RegisterSet* regset) {
+void printRegisters(const vector<string>& indexes, viua::kernel::RegisterSet* regset) {
     /** Print selected registers.
      *
      *  This function handles pretty printing of register contents.

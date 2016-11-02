@@ -24,7 +24,7 @@
 using namespace std;
 
 
-viua::types::Closure::Closure(const string& name, RegisterSet *rs): regset(rs), function_name(name) {
+viua::types::Closure::Closure(const string& name, viua::kernel::RegisterSet *rs): regset(rs), function_name(name) {
 }
 
 viua::types::Closure::~Closure() {

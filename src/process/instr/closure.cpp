@@ -108,7 +108,7 @@ byte* viua::process::Process::opclosure(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, function_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
-    place(target, new viua::types::Closure(function_name, new RegisterSet(uregset->size())));
+    place(target, new viua::types::Closure(function_name, new viua::kernel::RegisterSet(uregset->size())));
 
     return addr;
 }

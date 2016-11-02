@@ -125,7 +125,7 @@ of base class* appears.
 Foreign methods have special signature and must conform to
 
 ```
-typedef Type* (Type::*ForeignMethodMemberPointer)(Frame*, RegisterSet*, RegisterSet*)
+typedef Type* (Type::*ForeignMethodMemberPointer)(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*)
 ```
 
 Apart from this, they **must** also be declared `virtual` to make compiler dispatch them at runtime via a `vtable`.

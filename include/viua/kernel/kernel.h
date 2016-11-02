@@ -188,7 +188,7 @@ namespace viua {
                 Kernel& registerForeignMethod(const std::string&, ForeignMethod);
 
                 void requestForeignFunctionCall(Frame*, viua::process::Process*);
-                void requestForeignMethodCall(const std::string&, viua::types::Type*, Frame*, RegisterSet*, RegisterSet*, viua::process::Process*);
+                void requestForeignMethodCall(const std::string&, viua::types::Type*, Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*);
 
                 void postFreeProcess(std::unique_ptr<viua::process::Process>);
 

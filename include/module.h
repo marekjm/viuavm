@@ -42,7 +42,7 @@ const std::vector<const char*> VIUAPATH = {
  */
 
 // External functions must have this signature
-typedef Type* (ForeignFunction)(Frame*, RegisterSet*, RegisterSet*);
+typedef Type* (ForeignFunction)(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*);
 
 // Specification of single external function
 // The "exports()" function returns an array of such structures.

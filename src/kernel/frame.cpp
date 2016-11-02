@@ -20,7 +20,7 @@
 #include <viua/kernel/frame.h>
 
 
-void Frame::setLocalRegisterSet(RegisterSet* rs, bool receives_ownership) {
+void Frame::setLocalRegisterSet(viua::kernel::RegisterSet* rs, bool receives_ownership) {
     if (owns_local_register_set) {
         delete regset;
     }

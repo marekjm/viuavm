@@ -62,8 +62,8 @@ namespace viua {
                  * Users should be able to check if a process is joinable, and
                  * to detach a process.
                  */
-                virtual void joinable(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
-                virtual void detach(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
+                virtual void joinable(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
+                virtual void detach(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
 
                 /*
                  * For use by the VM.

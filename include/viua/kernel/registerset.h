@@ -40,41 +40,45 @@ enum REGISTER_MASKS: mask_t {
 };
 
 
-class RegisterSet {
-    registerset_size_type registerset_size;
-    viua::types::Type** registers;
-    mask_t*  masks;
+namespace viua {
+    namespace kernel {
+        class RegisterSet {
+            registerset_size_type registerset_size;
+            viua::types::Type** registers;
+            mask_t*  masks;
 
-    public:
-        // basic access to registers
-        viua::types::Type* put(registerset_size_type, viua::types::Type*);
-        viua::types::Type* pop(registerset_size_type);
-        viua::types::Type* set(registerset_size_type, viua::types::Type*);
-        viua::types::Type* get(registerset_size_type);
-        viua::types::Type* at(registerset_size_type);
+            public:
+                // basic access to registers
+                viua::types::Type* put(registerset_size_type, viua::types::Type*);
+                viua::types::Type* pop(registerset_size_type);
+                viua::types::Type* set(registerset_size_type, viua::types::Type*);
+                viua::types::Type* get(registerset_size_type);
+                viua::types::Type* at(registerset_size_type);
 
-        // register modifications
-        void move(registerset_size_type, registerset_size_type);
-        void swap(registerset_size_type, registerset_size_type);
-        void empty(registerset_size_type);
-        void free(registerset_size_type);
+                // register modifications
+                void move(registerset_size_type, registerset_size_type);
+                void swap(registerset_size_type, registerset_size_type);
+                void empty(registerset_size_type);
+                void free(registerset_size_type);
 
-        // mask inspection and manipulation
-        void flag(registerset_size_type, mask_t);
-        void unflag(registerset_size_type, mask_t);
-        void clear(registerset_size_type);
-        bool isflagged(registerset_size_type, mask_t);
-        void setmask(registerset_size_type, mask_t);
-        mask_t getmask(registerset_size_type);
+                // mask inspection and manipulation
+                void flag(registerset_size_type, mask_t);
+                void unflag(registerset_size_type, mask_t);
+                void clear(registerset_size_type);
+                bool isflagged(registerset_size_type, mask_t);
+                void setmask(registerset_size_type, mask_t);
+                mask_t getmask(registerset_size_type);
 
-        void drop();
-        inline registerset_size_type size() { return registerset_size; }
+                void drop();
+                inline registerset_size_type size() { return registerset_size; }
 
-        RegisterSet* copy();
+                RegisterSet* copy();
 
-        RegisterSet(registerset_size_type sz);
-        ~RegisterSet();
-};
+                RegisterSet(registerset_size_type sz);
+                ~RegisterSet();
+        };
+    }
+}
 
 
 #endif

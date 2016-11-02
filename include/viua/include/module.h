@@ -57,8 +57,8 @@ namespace viua {
 // External functions must have this signature
 typedef void (ForeignFunction)(
     Frame*,         // call frame; contains parameters, local registers, name of the function etc.
-    RegisterSet*,   // static register set (may be nullptr)
-    RegisterSet*,   // global register set (may be nullptr)
+    viua::kernel::RegisterSet*,   // static register set (may be nullptr)
+    viua::kernel::RegisterSet*,   // global register set (may be nullptr)
     viua::process::Process*,       // calling process
     viua::kernel::Kernel*            // VM viua::kernel::Kernel the calling process is running on
 );
@@ -71,8 +71,8 @@ typedef void (ForeignFunction)(
  *  Of course, you can also use the struct-and-a-bunch-of-free-functions strategy, in which case you are more interested
  *  in the ForeignFunction typedef defined above.
  */
-typedef void (viua::types::Type::*ForeignMethodMemberPointer)(Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
-typedef std::function<void(viua::types::Type*, Frame*, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*)> ForeignMethod;
+typedef void (viua::types::Type::*ForeignMethodMemberPointer)(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
+typedef std::function<void(viua::types::Type*, Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*)> ForeignMethod;
 
 
 /** External modules must export the "exports()" function.

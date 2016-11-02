@@ -30,8 +30,8 @@ class Frame {
         bool owns_local_register_set;
     public:
         byte* return_address;
-        RegisterSet* args;
-        RegisterSet* regset;
+        viua::kernel::RegisterSet* args;
+        viua::kernel::RegisterSet* regset;
 
         unsigned place_return_value_in;
 
@@ -39,7 +39,7 @@ class Frame {
 
         inline byte* ret_address() { return return_address; }
 
-        void setLocalRegisterSet(RegisterSet*, bool receives_ownership = true);
+        void setLocalRegisterSet(viua::kernel::RegisterSet*, bool receives_ownership = true);
 
         Frame(byte* ra, long unsigned argsize, long unsigned regsize = 16):
             owns_local_register_set(true),
@@ -47,8 +47,8 @@ class Frame {
             args(nullptr), regset(nullptr),
             place_return_value_in(0)
         {
-            args = new RegisterSet(argsize);
-            regset = new RegisterSet(regsize);
+            args = new viua::kernel::RegisterSet(argsize);
+            regset = new viua::kernel::RegisterSet(regsize);
         }
         Frame(const Frame& that) {
             return_address = that.return_address;

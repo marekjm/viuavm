@@ -69,16 +69,16 @@ namespace viua {
             bool watchdog_failed { false };
 
             // Global register set
-            std::unique_ptr<RegisterSet> regset;
+            std::unique_ptr<viua::kernel::RegisterSet> regset;
 
             // Currently used register set
-            RegisterSet* uregset;
+            viua::kernel::RegisterSet* uregset;
 
             // Temporary register
             std::unique_ptr<viua::types::Type> tmp;
 
             // Static registers
-            std::map<std::string, std::unique_ptr<RegisterSet>> static_registers;
+            std::map<std::string, std::unique_ptr<viua::kernel::RegisterSet>> static_registers;
 
 
             // Call stack

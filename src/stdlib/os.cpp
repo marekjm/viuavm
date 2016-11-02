@@ -27,7 +27,7 @@
 using namespace std;
 
 
-void os_system(Frame* frame, RegisterSet*, RegisterSet*) {
+void os_system(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*) {
     if (frame->args->at(0) == 0) {
         throw new viua::types::Exception("expected command to launch (string) as parameter 0");
     }

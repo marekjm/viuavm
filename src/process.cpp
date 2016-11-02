@@ -115,7 +115,7 @@ void viua::process::Process::ensureStaticRegisters(string function_name) {
         static_registers.at(function_name);
     } catch (const std::out_of_range& e) {
         // FIXME: amount of static registers should be customizable
-        static_registers[function_name] = unique_ptr<RegisterSet>(new RegisterSet(16));
+        static_registers[function_name] = unique_ptr<viua::kernel::RegisterSet>(new viua::kernel::RegisterSet(16));
     }
 }
 
@@ -566,7 +566,7 @@ viua::process::Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualP
     process_id(this),
     is_hidden(false)
 {
-    regset.reset(new RegisterSet(DEFAULT_REGISTER_SIZE));
+    regset.reset(new viua::kernel::RegisterSet(DEFAULT_REGISTER_SIZE));
     uregset = frm->regset;
     frames.emplace_back(std::move(frm));
 }

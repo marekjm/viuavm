@@ -30,7 +30,7 @@ using namespace std;
 extern "C" const ForeignFunctionSpec* exports();
 
 
-static void printer_print(Frame* frame, RegisterSet*, RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+static void printer_print(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     unique_ptr<viua::types::Type> arg(frame->args->pop(0));
     // concatenate before printing to avoid mangled output
     cout << ("Hello " + arg->str() + "!\n");

@@ -89,7 +89,7 @@ namespace viua {
             void registerPrototype(viua::types::Prototype*);
 
             void requestForeignFunctionCall(Frame*, viua::process::Process*) const;
-            void requestForeignMethodCall(const std::string&, viua::types::Type*, Frame*, RegisterSet*, RegisterSet*, viua::process::Process*);
+            void requestForeignMethodCall(const std::string&, viua::types::Type*, Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*);
 
             void loadNativeLibrary(const std::string&);
             void loadForeignLibrary(const std::string&);

@@ -26,13 +26,13 @@
 #include <viua/include/module.h>
 using namespace std;
 
-void io_getline(Frame* frame, RegisterSet*, RegisterSet*) {
+void io_getline(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*) {
     string s;
     getline(cin, s);
     frame->regset->set(0, new String(s));
 }
 
-void io_read(Frame* frame, RegisterSet*, RegisterSet*) {
+void io_read(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*) {
     ifstream in(dynamic_cast<String*>(frame->args->get(0))->value());
     ostringstream oss;
     string line;
@@ -41,7 +41,7 @@ void io_read(Frame* frame, RegisterSet*, RegisterSet*) {
     frame->regset->set(0, new String(oss.str()));
 }
 
-void io_write(Frame* frame, RegisterSet*, RegisterSet*) {
+void io_write(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*) {
     ofstream out(dynamic_cast<String*>(frame->args->get(0))->value());
     out << dynamic_cast<String*>(frame->args->get(1))->value();
     out.close();
