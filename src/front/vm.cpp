@@ -66,8 +66,8 @@ void viua::front::vm::load_standard_prototypes(viua::kernel::Kernel* kernel) {
     proto_process->attach("Process::joinable/1", "joinable/1");
     proto_process->attach("Process::detach/1", "detach/1");
     kernel->registerForeignPrototype("Process", proto_process);
-    kernel->registerForeignMethod("Process::joinable/1", static_cast<ForeignMethodMemberPointer>(&viua::types::ProcessType::joinable));
-    kernel->registerForeignMethod("Process::detach/1", static_cast<ForeignMethodMemberPointer>(&viua::types::ProcessType::detach));
+    kernel->registerForeignMethod("Process::joinable/1", static_cast<ForeignMethodMemberPointer>(&viua::types::Process::joinable));
+    kernel->registerForeignMethod("Process::detach/1", static_cast<ForeignMethodMemberPointer>(&viua::types::Process::detach));
 
     auto proto_pointer = new viua::types::Prototype("Pointer");
     proto_pointer->attach("Pointer::expired/1", "expired/1");

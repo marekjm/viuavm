@@ -49,7 +49,7 @@ byte* viua::process::Process::opprocess(byte* addr) {
     bool disown = (target == 0);
     auto spawned_process = scheduler->spawn(std::move(frame_new), this, disown);
     if (not disown) {
-        place(target, new viua::types::ProcessType(spawned_process));
+        place(target, new viua::types::Process(spawned_process));
     }
 
     return addr;
@@ -76,7 +76,7 @@ byte* viua::process::Process::opjoin(byte* addr) {
         timeout_active = true;
     }
 
-    if (auto thrd = dynamic_cast<viua::types::ProcessType*>(fetch(source))) {
+    if (auto thrd = dynamic_cast<viua::types::Process*>(fetch(source))) {
         if (thrd->stopped()) {
             thrd->join();
             return_addr = addr;
@@ -106,7 +106,7 @@ byte* viua::process::Process::opsend(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    if (auto thrd = dynamic_cast<viua::types::ProcessType*>(fetch(target))) {
+    if (auto thrd = dynamic_cast<viua::types::Process*>(fetch(target))) {
         scheduler->send(thrd->pid(), unique_ptr<viua::types::Type>(pop(source)));
     } else {
         throw new viua::types::Exception("invalid type: expected viua::process::Process");
@@ -189,7 +189,7 @@ byte* viua::process::Process::opself(byte* addr) {
     unsigned target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    place(target, new viua::types::ProcessType(this));
+    place(target, new viua::types::Process(this));
 
     return addr;
 }

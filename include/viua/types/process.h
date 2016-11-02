@@ -43,7 +43,7 @@ namespace viua {
 
 namespace viua {
     namespace types {
-        class ProcessType : public Type {
+        class Process : public Type {
             viua::process::Process* thrd;
 
             public:
@@ -55,7 +55,7 @@ namespace viua {
                 std::string str() const;
                 std::string repr() const;
                 bool boolean() const;
-                ProcessType* copy() const;
+                Process* copy() const;
 
                 /*
                  * For use by user code.
@@ -85,7 +85,7 @@ namespace viua {
                 std::unique_ptr<Type> transferActiveException();
                 std::unique_ptr<Type> getReturnValue();
 
-                ProcessType(viua::process::Process* t): thrd(t) {}
+                Process(viua::process::Process* t): thrd(t) {}
         };
     }
 }
