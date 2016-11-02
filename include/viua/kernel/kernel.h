@@ -131,7 +131,7 @@ namespace viua {
 
             std::vector<void*> cxx_dynamic_lib_handles;
 
-            std::map<PID, std::vector<std::unique_ptr<viua::types::Type>>> mailboxes;
+            std::map<viua::process::PID, std::vector<std::unique_ptr<viua::types::Type>>> mailboxes;
             std::mutex mailbox_mutex;
 
             public:
@@ -191,10 +191,10 @@ namespace viua {
 
                 void postFreeProcess(std::unique_ptr<Process>);
 
-                uint64_t createMailbox(const PID);
-                uint64_t deleteMailbox(const PID);
-                void send(const PID, std::unique_ptr<viua::types::Type>);
-                void receive(const PID, std::queue<std::unique_ptr<viua::types::Type>>&);
+                uint64_t createMailbox(const viua::process::PID);
+                uint64_t deleteMailbox(const viua::process::PID);
+                void send(const viua::process::PID, std::unique_ptr<viua::types::Type>);
+                void receive(const viua::process::PID, std::queue<std::unique_ptr<viua::types::Type>>&);
                 uint64_t pids() const;
 
                 auto static no_of_vp_schedulers() -> decltype(default_vp_schedulers_limit);

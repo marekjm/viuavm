@@ -305,7 +305,7 @@ void viua::kernel::Kernel::postFreeProcess(unique_ptr<Process> p) {
     free_virtual_processes_cv.notify_one();
 }
 
-uint64_t viua::kernel::Kernel::createMailbox(const PID pid) {
+uint64_t viua::kernel::Kernel::createMailbox(const viua::process::PID pid) {
     unique_lock<mutex> lck(mailbox_mutex);
 #if VIUA_VM_DEBUG_LOG
     cerr << "[kernel:mailbox:create] pid = " << pid.get() << endl;
@@ -313,7 +313,7 @@ uint64_t viua::kernel::Kernel::createMailbox(const PID pid) {
     mailboxes.emplace(pid, vector<unique_ptr<viua::types::Type>>{});
     return ++running_processes;
 }
-uint64_t viua::kernel::Kernel::deleteMailbox(const PID pid) {
+uint64_t viua::kernel::Kernel::deleteMailbox(const viua::process::PID pid) {
     unique_lock<mutex> lck(mailbox_mutex);
 #if VIUA_VM_DEBUG_LOG
     cerr << "[kernel:mailbox:delete] pid = " << pid.get() << ", queued messages = " << mailboxes[pid].size() << endl;
@@ -321,7 +321,7 @@ uint64_t viua::kernel::Kernel::deleteMailbox(const PID pid) {
     mailboxes.erase(pid);
     return --running_processes;
 }
-void viua::kernel::Kernel::send(const PID pid, unique_ptr<viua::types::Type> message) {
+void viua::kernel::Kernel::send(const viua::process::PID pid, unique_ptr<viua::types::Type> message) {
     unique_lock<mutex> lck(mailbox_mutex);
     if (mailboxes.count(pid) == 0) {
         // sending a message to an unknown address just drops the message
@@ -333,7 +333,7 @@ void viua::kernel::Kernel::send(const PID pid, unique_ptr<viua::types::Type> mes
 #endif
     mailboxes[pid].emplace_back(std::move(message));
 }
-void viua::kernel::Kernel::receive(const PID pid, queue<unique_ptr<viua::types::Type>>& message_queue) {
+void viua::kernel::Kernel::receive(const viua::process::PID pid, queue<unique_ptr<viua::types::Type>>& message_queue) {
     unique_lock<mutex> lck(mailbox_mutex);
     if (mailboxes.count(pid) == 0) {
         throw new viua::types::Exception("invalid PID");

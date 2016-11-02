@@ -31,29 +31,29 @@
 using namespace std;
 
 
-PID::PID(const Process* p): associated_process(p) {
+viua::process::PID::PID(const Process* p): associated_process(p) {
 }
-bool PID::operator==(const PID& that) const {
+bool viua::process::PID::operator==(const viua::process::PID& that) const {
     return (associated_process == that.associated_process);
 }
-bool PID::operator==(const Process* that) const {
+bool viua::process::PID::operator==(const Process* that) const {
     return (associated_process == that);
 }
-bool PID::operator<(const PID& that) const {
+bool viua::process::PID::operator<(const viua::process::PID& that) const {
     // PIDs can't really have a less-than relation
     // they are either equal or not, and that's it
-    // less-than relation is implemented only so that PID objects may be used as
+    // less-than relation is implemented only so that viua::process::PID objects may be used as
     // keys in std::map<>
     return (reinterpret_cast<uint64_t>(associated_process) < reinterpret_cast<uint64_t>(that.associated_process));
 }
-bool PID::operator>(const PID& that) const {
+bool viua::process::PID::operator>(const viua::process::PID& that) const {
     // PIDs can't really have a greater-than relation
     // they are either equal or not, and that's it
-    // greater-than relation is implemented only so that PID objects may be used as
+    // greater-than relation is implemented only so that viua::process::PID objects may be used as
     // keys in std::map<>
     return (reinterpret_cast<uint64_t>(associated_process) > reinterpret_cast<uint64_t>(that.associated_process));
 }
 
-auto PID::get() const -> decltype(associated_process) {
+auto viua::process::PID::get() const -> decltype(associated_process) {
     return associated_process;
 }

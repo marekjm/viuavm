@@ -69,7 +69,7 @@ namespace viua {
                  * For use by the VM.
                  * User code has no way of discovering PIDs - it must receive them.
                  */
-                PID pid() const;
+                viua::process::PID pid() const;
 
                 /*
                  * For use by the VM.

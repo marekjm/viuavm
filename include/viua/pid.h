@@ -26,19 +26,23 @@
 class Process;
 
 
-class PID {
-    const Process *associated_process;
+namespace viua {
+    namespace process {
+        class PID {
+            const Process *associated_process;
 
-    public:
-    bool operator==(const PID&) const;
-    bool operator==(const Process*) const;
-    bool operator<(const PID&) const;
-    bool operator>(const PID&) const;
+            public:
+            bool operator==(const viua::process::PID&) const;
+            bool operator==(const Process*) const;
+            bool operator<(const viua::process::PID&) const;
+            bool operator>(const viua::process::PID&) const;
 
-    auto get() const -> decltype(associated_process);
+            auto get() const -> decltype(associated_process);
 
-    PID(const Process*);
-};
+            PID(const Process*);
+        };
+    }
+}
 
 
 #endif

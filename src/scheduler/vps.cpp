@@ -290,14 +290,14 @@ Process* viua::scheduler::VirtualProcessScheduler::spawn(unique_ptr<Frame> frame
     return process_ptr;
 }
 
-void viua::scheduler::VirtualProcessScheduler::send(const PID pid, unique_ptr<viua::types::Type> message) {
+void viua::scheduler::VirtualProcessScheduler::send(const viua::process::PID pid, unique_ptr<viua::types::Type> message) {
 #if VIUA_VM_DEBUG_LOG
     viua_err( "[sched:vps:send] pid = ", pid.get());
 #endif
     attached_kernel->send(pid, std::move(message));
 }
 
-void viua::scheduler::VirtualProcessScheduler::receive(const PID pid, queue<unique_ptr<viua::types::Type>>& message_queue) {
+void viua::scheduler::VirtualProcessScheduler::receive(const viua::process::PID pid, queue<unique_ptr<viua::types::Type>>& message_queue) {
 #if VIUA_VM_DEBUG_LOG
     viua_err( "[sched:vps:receive] pid = ", pid.get());
 #endif

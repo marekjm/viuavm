@@ -99,8 +99,8 @@ namespace viua {
             Process* process();
             Process* spawn(std::unique_ptr<Frame>, Process*, bool);
 
-            void send(const PID, std::unique_ptr<viua::types::Type>);
-            void receive(const PID, std::queue<std::unique_ptr<viua::types::Type>>&);
+            void send(const viua::process::PID, std::unique_ptr<viua::types::Type>);
+            void receive(const viua::process::PID, std::queue<std::unique_ptr<viua::types::Type>>&);
 
             bool executeQuant(Process*, unsigned);
             bool burst();

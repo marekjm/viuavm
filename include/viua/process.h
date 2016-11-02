@@ -144,7 +144,7 @@ class Process {
 
     /*  Process identifier.
      */
-    PID process_id;
+    viua::process::PID process_id;
     bool is_hidden;
 
     /*  Timeouts for message passing, and
@@ -311,7 +311,7 @@ class Process {
 
         std::vector<Frame*> trace() const;
 
-        PID pid() const;
+        viua::process::PID pid() const;
         bool hidden() const;
         void hidden(bool);
 

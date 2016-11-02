@@ -534,7 +534,7 @@ vector<Frame*> Process::trace() const {
     return tr;
 }
 
-PID Process::pid() const {
+viua::process::PID Process::pid() const {
     return process_id;
 }
 bool Process::hidden() const {
