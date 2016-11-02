@@ -34,7 +34,11 @@
 
 
 // we only need a pointer so class declaration will be sufficient
-class Kernel;
+namespace viua {
+    namespace kernel {
+        class Kernel;
+    }
+}
 
 
 namespace viua {
@@ -58,8 +62,8 @@ namespace viua {
                  * Users should be able to check if a process is joinable, and
                  * to detach a process.
                  */
-                virtual void joinable(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
-                virtual void detach(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
+                virtual void joinable(Frame*, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*);
+                virtual void detach(Frame*, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*);
 
                 /*
                  * For use by the VM.

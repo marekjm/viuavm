@@ -32,8 +32,12 @@
 #include <viua/kernel/frame.h>
 
 
-class Kernel;
 class Process;
+namespace viua {
+    namespace kernel {
+        class Kernel;
+    }
+}
 
 
 namespace viua {
@@ -41,7 +45,7 @@ namespace viua {
         class VirtualProcessScheduler {
             /** Scheduler of Viua VM virtual processes.
              */
-            Kernel *attached_kernel;
+            viua::kernel::Kernel *attached_kernel;
 
             std::vector<std::unique_ptr<Process>> *free_processes;
             std::mutex *free_processes_mutex;
@@ -53,7 +57,7 @@ namespace viua {
 
             int exit_code;
 
-            // if scheduler hits heavy load it starts posting processes to Kernel
+            // if scheduler hits heavy load it starts posting processes to viua::kernel::Kernel
             // to let other schedulers at them
             decltype(processes)::size_type current_load;
             std::atomic_bool shut_down;
@@ -61,7 +65,7 @@ namespace viua {
 
             public:
 
-            Kernel* kernel() const;
+            viua::kernel::Kernel* kernel() const;
 
             bool isClass(const std::string&) const;
             bool classAccepts(const std::string&, const std::string&) const;
@@ -109,7 +113,7 @@ namespace viua {
             void join();
             int exit() const;
 
-            VirtualProcessScheduler(Kernel*, std::vector<std::unique_ptr<Process>>*, std::mutex*, std::condition_variable*);
+            VirtualProcessScheduler(viua::kernel::Kernel*, std::vector<std::unique_ptr<Process>>*, std::mutex*, std::condition_variable*);
             VirtualProcessScheduler(VirtualProcessScheduler&&);
             ~VirtualProcessScheduler();
         };

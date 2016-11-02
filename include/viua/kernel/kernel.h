@@ -58,152 +58,156 @@ namespace viua {
 }
 
 
-class Kernel {
+namespace viua {
+    namespace kernel {
+        class Kernel {
 #ifdef AS_DEBUG_HEADER
-    public:
+            public:
 #endif
-    /*  Bytecode pointer is a pointer to program's code.
-     *  Size and executable offset are metadata exported from bytecode dump.
-     */
-    byte* bytecode;
-    uint64_t bytecode_size;
-    uint64_t executable_offset;
+            /*  Bytecode pointer is a pointer to program's code.
+             *  Size and executable offset are metadata exported from bytecode dump.
+             */
+            byte* bytecode;
+            uint64_t bytecode_size;
+            uint64_t executable_offset;
 
-    // Map of the typesystem currently existing inside the VM.
-    std::map<std::string, viua::types::Prototype*> typesystem;
+            // Map of the typesystem currently existing inside the VM.
+            std::map<std::string, viua::types::Prototype*> typesystem;
 
-    /*  Function and block names mapped to bytecode addresses.
-     */
-    std::map<std::string, uint64_t> function_addresses;
-    std::map<std::string, uint64_t> block_addresses;
+            /*  Function and block names mapped to bytecode addresses.
+             */
+            std::map<std::string, uint64_t> function_addresses;
+            std::map<std::string, uint64_t> block_addresses;
 
-    std::map<std::string, std::pair<std::string, byte*>> linked_functions;
-    std::map<std::string, std::pair<std::string, byte*>> linked_blocks;
-    std::map<std::string, std::pair<unsigned, byte*> > linked_modules;
+            std::map<std::string, std::pair<std::string, byte*>> linked_functions;
+            std::map<std::string, std::pair<std::string, byte*>> linked_blocks;
+            std::map<std::string, std::pair<unsigned, byte*> > linked_modules;
 
-    int return_code;
+            int return_code;
 
-    /*
-     *  VIRTUAL PROCESSES SCHEDULING
-     *
-     *  List of virtual processes that do not belong to any scheduler, and
-     *  are waiting to be adopted, along with means of synchronization of
-     *  concurrent accesses to said list.
-     *  Schedulers can post their spawned processes to the Kernel to let
-     *  other schedulers execute them (sometimes, a scheduler may fetch
-     *  its own process back).
-     *
-     *  Also, a list of spawned VP schedulers.
-     */
-    // list of virtual processes not associated with any VP scheduler
-    std::vector<std::unique_ptr<Process>> free_virtual_processes;
-    std::mutex free_virtual_processes_mutex;
-    std::condition_variable free_virtual_processes_cv;
-    // list of running VP schedulers, pairs of {scheduler-pointer, thread}
-    std::vector<std::pair<viua::scheduler::VirtualProcessScheduler*, std::thread>> virtual_process_schedulers;
-    // list of idle VP schedulers
-    std::vector<viua::scheduler::VirtualProcessScheduler*> idle_virtual_process_schedulers;
+            /*
+             *  VIRTUAL PROCESSES SCHEDULING
+             *
+             *  List of virtual processes that do not belong to any scheduler, and
+             *  are waiting to be adopted, along with means of synchronization of
+             *  concurrent accesses to said list.
+             *  Schedulers can post their spawned processes to the Kernel to let
+             *  other schedulers execute them (sometimes, a scheduler may fetch
+             *  its own process back).
+             *
+             *  Also, a list of spawned VP schedulers.
+             */
+            // list of virtual processes not associated with any VP scheduler
+            std::vector<std::unique_ptr<Process>> free_virtual_processes;
+            std::mutex free_virtual_processes_mutex;
+            std::condition_variable free_virtual_processes_cv;
+            // list of running VP schedulers, pairs of {scheduler-pointer, thread}
+            std::vector<std::pair<viua::scheduler::VirtualProcessScheduler*, std::thread>> virtual_process_schedulers;
+            // list of idle VP schedulers
+            std::vector<viua::scheduler::VirtualProcessScheduler*> idle_virtual_process_schedulers;
 
-    std::atomic<uint64_t> running_processes { 0 };
+            std::atomic<uint64_t> running_processes { 0 };
 
-    static const long unsigned default_vp_schedulers_limit = 2UL;
-    long unsigned vp_schedulers_limit;
+            static const long unsigned default_vp_schedulers_limit = 2UL;
+            long unsigned vp_schedulers_limit;
 
-    /*  This is the interface between programs compiled to VM bytecode and
-     *  extension libraries written in C++.
-     */
-    std::map<std::string, ForeignFunction*> foreign_functions;
-    std::mutex foreign_functions_mutex;
+            /*  This is the interface between programs compiled to VM bytecode and
+             *  extension libraries written in C++.
+             */
+            std::map<std::string, ForeignFunction*> foreign_functions;
+            std::mutex foreign_functions_mutex;
 
-    /** This is the mapping Viua uses to dispatch methods on pure-C++ classes.
-     */
-    std::map<std::string, ForeignMethod> foreign_methods;
+            /** This is the mapping Viua uses to dispatch methods on pure-C++ classes.
+             */
+            std::map<std::string, ForeignMethod> foreign_methods;
 
-    // Foreign function call requests are placed here to be executed later.
-    std::vector<std::unique_ptr<viua::scheduler::ffi::ForeignFunctionCallRequest>> foreign_call_queue;
-    std::mutex foreign_call_queue_mutex;
-    std::condition_variable foreign_call_queue_condition;
-    static const long unsigned default_ffi_schedulers_limit = 2UL;
-    long unsigned ffi_schedulers_limit;
-    std::vector<std::thread*> foreign_call_workers;
+            // Foreign function call requests are placed here to be executed later.
+            std::vector<std::unique_ptr<viua::scheduler::ffi::ForeignFunctionCallRequest>> foreign_call_queue;
+            std::mutex foreign_call_queue_mutex;
+            std::condition_variable foreign_call_queue_condition;
+            static const long unsigned default_ffi_schedulers_limit = 2UL;
+            long unsigned ffi_schedulers_limit;
+            std::vector<std::thread*> foreign_call_workers;
 
-    std::vector<void*> cxx_dynamic_lib_handles;
+            std::vector<void*> cxx_dynamic_lib_handles;
 
-    std::map<PID, std::vector<std::unique_ptr<viua::types::Type>>> mailboxes;
-    std::mutex mailbox_mutex;
+            std::map<PID, std::vector<std::unique_ptr<viua::types::Type>>> mailboxes;
+            std::mutex mailbox_mutex;
 
-    public:
-        /*  Methods dealing with dynamic library loading.
-         */
-        void loadNativeLibrary(const std::string&);
-        void loadForeignLibrary(const std::string&);
+            public:
+                /*  Methods dealing with dynamic library loading.
+                 */
+                void loadNativeLibrary(const std::string&);
+                void loadForeignLibrary(const std::string&);
 
-        // debug and error reporting flags
-        bool debug, errors;
+                // debug and error reporting flags
+                bool debug, errors;
 
-        std::vector<std::string> commandline_arguments;
+                std::vector<std::string> commandline_arguments;
 
-        /*  Public API of the Kernel provides basic actions:
-         *
-         *      * load bytecode,
-         *      * set its size,
-         *      * tell the Kernel where to start execution,
-         *      * kick the Kernel so it starts running,
-         */
-        Kernel& load(byte*);
-        Kernel& bytes(uint64_t);
+                /*  Public API of the Kernel provides basic actions:
+                 *
+                 *      * load bytecode,
+                 *      * set its size,
+                 *      * tell the Kernel where to start execution,
+                 *      * kick the Kernel so it starts running,
+                 */
+                Kernel& load(byte*);
+                Kernel& bytes(uint64_t);
 
-        Kernel& mapfunction(const std::string&, uint64_t);
-        Kernel& mapblock(const std::string&, uint64_t);
+                Kernel& mapfunction(const std::string&, uint64_t);
+                Kernel& mapblock(const std::string&, uint64_t);
 
-        Kernel& registerExternalFunction(const std::string&, ForeignFunction*);
-        Kernel& removeExternalFunction(std::string);
+                Kernel& registerExternalFunction(const std::string&, ForeignFunction*);
+                Kernel& removeExternalFunction(std::string);
 
-        /*  Methods dealing with typesystem related tasks.
-         */
-        bool isClass(const std::string&) const;
-        bool classAccepts(const std::string&, const std::string&) const;
-        std::vector<std::string> inheritanceChainOf(const std::string&) const;
-        bool isLocalFunction(const std::string&) const;
-        bool isLinkedFunction(const std::string&) const;
-        bool isNativeFunction(const std::string&) const;
-        bool isForeignMethod(const std::string&) const;
-        bool isForeignFunction(const std::string&) const;
+                /*  Methods dealing with typesystem related tasks.
+                 */
+                bool isClass(const std::string&) const;
+                bool classAccepts(const std::string&, const std::string&) const;
+                std::vector<std::string> inheritanceChainOf(const std::string&) const;
+                bool isLocalFunction(const std::string&) const;
+                bool isLinkedFunction(const std::string&) const;
+                bool isNativeFunction(const std::string&) const;
+                bool isForeignMethod(const std::string&) const;
+                bool isForeignFunction(const std::string&) const;
 
-        bool isBlock(const std::string&) const;
-        bool isLocalBlock(const std::string&) const;
-        bool isLinkedBlock(const std::string&) const;
-        std::pair<byte*, byte*> getEntryPointOfBlock(const std::string&) const;
+                bool isBlock(const std::string&) const;
+                bool isLocalBlock(const std::string&) const;
+                bool isLinkedBlock(const std::string&) const;
+                std::pair<byte*, byte*> getEntryPointOfBlock(const std::string&) const;
 
-        std::string resolveMethodName(const std::string&, const std::string&) const;
-        std::pair<byte*, byte*> getEntryPointOf(const std::string&) const;
+                std::string resolveMethodName(const std::string&, const std::string&) const;
+                std::pair<byte*, byte*> getEntryPointOf(const std::string&) const;
 
-        void registerPrototype(viua::types::Prototype*);
+                void registerPrototype(viua::types::Prototype*);
 
-        /// These two methods are used to inject pure-C++ classes into machine's typesystem.
-        Kernel& registerForeignPrototype(const std::string&, viua::types::Prototype*);
-        Kernel& registerForeignMethod(const std::string&, ForeignMethod);
+                /// These two methods are used to inject pure-C++ classes into machine's typesystem.
+                Kernel& registerForeignPrototype(const std::string&, viua::types::Prototype*);
+                Kernel& registerForeignMethod(const std::string&, ForeignMethod);
 
-        void requestForeignFunctionCall(Frame*, Process*);
-        void requestForeignMethodCall(const std::string&, viua::types::Type*, Frame*, RegisterSet*, RegisterSet*, Process*);
+                void requestForeignFunctionCall(Frame*, Process*);
+                void requestForeignMethodCall(const std::string&, viua::types::Type*, Frame*, RegisterSet*, RegisterSet*, Process*);
 
-        void postFreeProcess(std::unique_ptr<Process>);
+                void postFreeProcess(std::unique_ptr<Process>);
 
-        uint64_t createMailbox(const PID);
-        uint64_t deleteMailbox(const PID);
-        void send(const PID, std::unique_ptr<viua::types::Type>);
-        void receive(const PID, std::queue<std::unique_ptr<viua::types::Type>>&);
-        uint64_t pids() const;
+                uint64_t createMailbox(const PID);
+                uint64_t deleteMailbox(const PID);
+                void send(const PID, std::unique_ptr<viua::types::Type>);
+                void receive(const PID, std::queue<std::unique_ptr<viua::types::Type>>&);
+                uint64_t pids() const;
 
-        auto static no_of_vp_schedulers() -> decltype(default_vp_schedulers_limit);
-        auto static no_of_ffi_schedulers() -> decltype(default_ffi_schedulers_limit);
+                auto static no_of_vp_schedulers() -> decltype(default_vp_schedulers_limit);
+                auto static no_of_ffi_schedulers() -> decltype(default_ffi_schedulers_limit);
 
-        int run();
+                int run();
 
-        int exit() const;
+                int exit() const;
 
-        Kernel();
-        ~Kernel();
-};
+                Kernel();
+                ~Kernel();
+        };
+    }
+}
 
 #endif

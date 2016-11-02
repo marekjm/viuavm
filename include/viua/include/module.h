@@ -46,7 +46,11 @@ const std::vector<std::string> VIUAPATH = {
 
 // forward declarations since only pointers are needed
 class Process;
-class Kernel;
+namespace viua {
+    namespace kernel {
+        class Kernel;
+    }
+}
 
 
 // External functions must have this signature
@@ -55,7 +59,7 @@ typedef void (ForeignFunction)(
     RegisterSet*,   // static register set (may be nullptr)
     RegisterSet*,   // global register set (may be nullptr)
     Process*,       // calling process
-    Kernel*            // VM Kernel the calling process is running on
+    viua::kernel::Kernel*            // VM viua::kernel::Kernel the calling process is running on
 );
 
 /** Custom types for Viua VM can be written in C++ and loaded into the typesystem with minimal amount of bookkeeping.
@@ -66,8 +70,8 @@ typedef void (ForeignFunction)(
  *  Of course, you can also use the struct-and-a-bunch-of-free-functions strategy, in which case you are more interested
  *  in the ForeignFunction typedef defined above.
  */
-typedef void (viua::types::Type::*ForeignMethodMemberPointer)(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
-typedef std::function<void(viua::types::Type*, Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*)> ForeignMethod;
+typedef void (viua::types::Type::*ForeignMethodMemberPointer)(Frame*, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*);
+typedef std::function<void(viua::types::Type*, Frame*, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*)> ForeignMethod;
 
 
 /** External modules must export the "exports()" function.

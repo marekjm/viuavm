@@ -47,9 +47,9 @@
 using namespace std;
 
 
-Kernel& Kernel::load(byte* bc) {
-    /*  Load bytecode into the Kernel.
-     *  Kernel becomes owner of loaded bytecode - meaning it will consider itself responsible for proper
+viua::kernel::Kernel& viua::kernel::Kernel::load(byte* bc) {
+    /*  Load bytecode into the viua::kernel::Kernel.
+     *  viua::kernel::Kernel becomes owner of loaded bytecode - meaning it will consider itself responsible for proper
      *  destruction of it, so make sure you have a copy of the bytecode.
      *
      *  Any previously loaded bytecode is freed.
@@ -64,52 +64,52 @@ Kernel& Kernel::load(byte* bc) {
     return (*this);
 }
 
-Kernel& Kernel::bytes(uint64_t sz) {
-    /*  Set bytecode size, so the Kernel can stop execution even if it doesn't reach HALT instruction but reaches
+viua::kernel::Kernel& viua::kernel::Kernel::bytes(uint64_t sz) {
+    /*  Set bytecode size, so the viua::kernel::Kernel can stop execution even if it doesn't reach HALT instruction but reaches
      *  bytecode address out of bounds.
      */
     bytecode_size = sz;
     return (*this);
 }
 
-Kernel& Kernel::mapfunction(const string& name, uint64_t address) {
+viua::kernel::Kernel& viua::kernel::Kernel::mapfunction(const string& name, uint64_t address) {
     /** Maps function name to bytecode address.
      */
     function_addresses[name] = address;
     return (*this);
 }
 
-Kernel& Kernel::mapblock(const string& name, uint64_t address) {
+viua::kernel::Kernel& viua::kernel::Kernel::mapblock(const string& name, uint64_t address) {
     /** Maps block name to bytecode address.
      */
     block_addresses[name] = address;
     return (*this);
 }
 
-Kernel& Kernel::registerExternalFunction(const string& name, ForeignFunction* function_ptr) {
-    /** Registers external function in Kernel.
+viua::kernel::Kernel& viua::kernel::Kernel::registerExternalFunction(const string& name, ForeignFunction* function_ptr) {
+    /** Registers external function in viua::kernel::Kernel.
      */
     unique_lock<mutex> lock(foreign_functions_mutex);
     foreign_functions[name] = function_ptr;
     return (*this);
 }
 
-Kernel& Kernel::registerForeignPrototype(const string& name, viua::types::Prototype* proto) {
-    /** Registers foreign prototype in Kernel.
+viua::kernel::Kernel& viua::kernel::Kernel::registerForeignPrototype(const string& name, viua::types::Prototype* proto) {
+    /** Registers foreign prototype in viua::kernel::Kernel.
      */
     typesystem[name] = proto;
     return (*this);
 }
 
-Kernel& Kernel::registerForeignMethod(const string& name, ForeignMethod method) {
-    /** Registers foreign prototype in Kernel.
+viua::kernel::Kernel& viua::kernel::Kernel::registerForeignMethod(const string& name, ForeignMethod method) {
+    /** Registers foreign prototype in viua::kernel::Kernel.
      */
     foreign_methods[name] = method;
     return (*this);
 }
 
 
-void Kernel::loadNativeLibrary(const string& module) {
+void viua::kernel::Kernel::loadNativeLibrary(const string& module) {
     regex double_colon("::");
     ostringstream oss;
     oss << regex_replace(module, double_colon, "/");
@@ -142,7 +142,7 @@ void Kernel::loadNativeLibrary(const string& module) {
         throw new viua::types::Exception("failed to link: " + module);
     }
 }
-void Kernel::loadForeignLibrary(const string& module) {
+void viua::kernel::Kernel::loadForeignLibrary(const string& module) {
     string path = "";
     path = support::env::viua::getmodpath(module, "so", support::env::getpaths("VIUAPATH"));
     if (path.size() == 0) { path = support::env::viua::getmodpath(module, "so", VIUAPATH); }
@@ -175,15 +175,15 @@ void Kernel::loadForeignLibrary(const string& module) {
 }
 
 
-bool Kernel::isClass(const string& name) const {
+bool viua::kernel::Kernel::isClass(const string& name) const {
     return typesystem.count(name);
 }
 
-bool Kernel::classAccepts(const string& klass, const string& method_name) const {
+bool viua::kernel::Kernel::classAccepts(const string& klass, const string& method_name) const {
     return typesystem.at(klass)->accepts(method_name);
 }
 
-vector<string> Kernel::inheritanceChainOf(const string& type_name) const {
+vector<string> viua::kernel::Kernel::inheritanceChainOf(const string& type_name) const {
     /** This methods returns full inheritance chain of a type.
      */
     if (typesystem.count(type_name) == 0) {
@@ -215,39 +215,39 @@ vector<string> Kernel::inheritanceChainOf(const string& type_name) const {
     return ichain;
 }
 
-bool Kernel::isLocalFunction(const string& name) const {
+bool viua::kernel::Kernel::isLocalFunction(const string& name) const {
     return function_addresses.count(name);
 }
 
-bool Kernel::isLinkedFunction(const string& name) const {
+bool viua::kernel::Kernel::isLinkedFunction(const string& name) const {
     return linked_functions.count(name);
 }
 
-bool Kernel::isNativeFunction(const string& name) const {
+bool viua::kernel::Kernel::isNativeFunction(const string& name) const {
     return (function_addresses.count(name) or linked_functions.count(name));
 }
 
-bool Kernel::isForeignMethod(const string& name) const {
+bool viua::kernel::Kernel::isForeignMethod(const string& name) const {
     return foreign_methods.count(name);
 }
 
-bool Kernel::isForeignFunction(const string& name) const {
+bool viua::kernel::Kernel::isForeignFunction(const string& name) const {
     return foreign_functions.count(name);
 }
 
-bool Kernel::isBlock(const string& name) const {
+bool viua::kernel::Kernel::isBlock(const string& name) const {
     return (block_addresses.count(name) or linked_blocks.count(name));
 }
 
-bool Kernel::isLocalBlock(const string& name) const {
+bool viua::kernel::Kernel::isLocalBlock(const string& name) const {
     return block_addresses.count(name);
 }
 
-bool Kernel::isLinkedBlock(const string& name) const {
+bool viua::kernel::Kernel::isLinkedBlock(const string& name) const {
     return linked_blocks.count(name);
 }
 
-pair<byte*, byte*> Kernel::getEntryPointOfBlock(const std::string& name) const {
+pair<byte*, byte*> viua::kernel::Kernel::getEntryPointOfBlock(const std::string& name) const {
     byte *entry_point = nullptr;
     byte *module_base = nullptr;
     if (block_addresses.count(name)) {
@@ -261,11 +261,11 @@ pair<byte*, byte*> Kernel::getEntryPointOfBlock(const std::string& name) const {
     return pair<byte*, byte*>(entry_point, module_base);
 }
 
-string Kernel::resolveMethodName(const string& klass, const string& method_name) const {
+string viua::kernel::Kernel::resolveMethodName(const string& klass, const string& method_name) const {
     return typesystem.at(klass)->resolvesTo(method_name);
 }
 
-pair<byte*, byte*> Kernel::getEntryPointOf(const std::string& name) const {
+pair<byte*, byte*> viua::kernel::Kernel::getEntryPointOf(const std::string& name) const {
     byte *entry_point = nullptr;
     byte *module_base = nullptr;
     if (function_addresses.count(name)) {
@@ -279,11 +279,11 @@ pair<byte*, byte*> Kernel::getEntryPointOf(const std::string& name) const {
     return pair<byte*, byte*>(entry_point, module_base);
 }
 
-void Kernel::registerPrototype(viua::types::Prototype *proto) {
+void viua::kernel::Kernel::registerPrototype(viua::types::Prototype *proto) {
     typesystem[proto->getTypeName()] = proto;
 }
 
-void Kernel::requestForeignFunctionCall(Frame *frame, Process *requesting_process) {
+void viua::kernel::Kernel::requestForeignFunctionCall(Frame *frame, Process *requesting_process) {
     unique_lock<mutex> lock(foreign_call_queue_mutex);
     foreign_call_queue.emplace_back(new viua::scheduler::ffi::ForeignFunctionCallRequest(frame, requesting_process, this));
 
@@ -294,18 +294,18 @@ void Kernel::requestForeignFunctionCall(Frame *frame, Process *requesting_proces
     foreign_call_queue_condition.notify_one();
 }
 
-void Kernel::requestForeignMethodCall(const string& name, viua::types::Type *object, Frame *frame, RegisterSet*, RegisterSet*, Process *p) {
+void viua::kernel::Kernel::requestForeignMethodCall(const string& name, viua::types::Type *object, Frame *frame, RegisterSet*, RegisterSet*, Process *p) {
     foreign_methods.at(name)(object, frame, nullptr, nullptr, p, this);
 }
 
-void Kernel::postFreeProcess(unique_ptr<Process> p) {
+void viua::kernel::Kernel::postFreeProcess(unique_ptr<Process> p) {
     unique_lock<mutex> lock(free_virtual_processes_mutex);
     free_virtual_processes.emplace_back(std::move(p));
     lock.unlock();
     free_virtual_processes_cv.notify_one();
 }
 
-uint64_t Kernel::createMailbox(const PID pid) {
+uint64_t viua::kernel::Kernel::createMailbox(const PID pid) {
     unique_lock<mutex> lck(mailbox_mutex);
 #if VIUA_VM_DEBUG_LOG
     cerr << "[kernel:mailbox:create] pid = " << pid.get() << endl;
@@ -313,7 +313,7 @@ uint64_t Kernel::createMailbox(const PID pid) {
     mailboxes.emplace(pid, vector<unique_ptr<viua::types::Type>>{});
     return ++running_processes;
 }
-uint64_t Kernel::deleteMailbox(const PID pid) {
+uint64_t viua::kernel::Kernel::deleteMailbox(const PID pid) {
     unique_lock<mutex> lck(mailbox_mutex);
 #if VIUA_VM_DEBUG_LOG
     cerr << "[kernel:mailbox:delete] pid = " << pid.get() << ", queued messages = " << mailboxes[pid].size() << endl;
@@ -321,7 +321,7 @@ uint64_t Kernel::deleteMailbox(const PID pid) {
     mailboxes.erase(pid);
     return --running_processes;
 }
-void Kernel::send(const PID pid, unique_ptr<viua::types::Type> message) {
+void viua::kernel::Kernel::send(const PID pid, unique_ptr<viua::types::Type> message) {
     unique_lock<mutex> lck(mailbox_mutex);
     if (mailboxes.count(pid) == 0) {
         // sending a message to an unknown address just drops the message
@@ -333,7 +333,7 @@ void Kernel::send(const PID pid, unique_ptr<viua::types::Type> message) {
 #endif
     mailboxes[pid].emplace_back(std::move(message));
 }
-void Kernel::receive(const PID pid, queue<unique_ptr<viua::types::Type>>& message_queue) {
+void viua::kernel::Kernel::receive(const PID pid, queue<unique_ptr<viua::types::Type>>& message_queue) {
     unique_lock<mutex> lck(mailbox_mutex);
     if (mailboxes.count(pid) == 0) {
         throw new viua::types::Exception("invalid PID");
@@ -351,11 +351,11 @@ void Kernel::receive(const PID pid, queue<unique_ptr<viua::types::Type>>& messag
     mailboxes[pid].clear();
 }
 
-uint64_t Kernel::pids() const {
+uint64_t viua::kernel::Kernel::pids() const {
     return running_processes;
 }
 
-int Kernel::exit() const {
+int viua::kernel::Kernel::exit() const {
     return return_code;
 }
 
@@ -370,15 +370,15 @@ static auto no_of_schedulers(const char *env_name, unsigned long default_limit) 
     }
     return limit;
 }
-auto Kernel::no_of_vp_schedulers() -> decltype(default_vp_schedulers_limit) {
+auto viua::kernel::Kernel::no_of_vp_schedulers() -> decltype(default_vp_schedulers_limit) {
     return no_of_schedulers("VIUA_VP_SCHEDULERS", default_vp_schedulers_limit);
 }
-auto Kernel::no_of_ffi_schedulers() -> decltype(default_ffi_schedulers_limit) {
+auto viua::kernel::Kernel::no_of_ffi_schedulers() -> decltype(default_ffi_schedulers_limit) {
     return no_of_schedulers("VIUA_FFI_SCHEDULERS", default_ffi_schedulers_limit);
 }
 
-int Kernel::run() {
-    /*  VM Kernel implementation.
+int viua::kernel::Kernel::run() {
+    /*  VM viua::kernel::Kernel implementation.
      */
     if (!bytecode) {
         throw "null bytecode (maybe not loaded?)";
@@ -412,7 +412,7 @@ int Kernel::run() {
     return return_code;
 }
 
-Kernel::Kernel():
+viua::kernel::Kernel::Kernel():
     bytecode(nullptr), bytecode_size(0), executable_offset(0),
     return_code(0),
     vp_schedulers_limit(default_vp_schedulers_limit),
@@ -425,9 +425,9 @@ Kernel::Kernel():
     }
 }
 
-Kernel::~Kernel() {
+viua::kernel::Kernel::~Kernel() {
     /*  Destructor frees memory at bytecode pointer so make sure you passed a copy of the bytecode to the constructor
-     *  if you want to keep it around after the Kernel is finished.
+     *  if you want to keep it around after the viua::kernel::Kernel is finished.
      */
     if (bytecode) { delete[] bytecode; }
 

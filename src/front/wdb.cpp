@@ -46,7 +46,7 @@
 using namespace std;
 
 
-const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file which cannot be run on Kernel without prior compilation";
+const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file which cannot be run without prior compilation";
 const char* RC_FILENAME = "/.viuavm.db.rc";
 const char* DEBUGGER_COMMAND_HISTORY = "/.viuavmdb_history";
 
@@ -111,7 +111,7 @@ bool SHOW_VERSION = false;
 bool VERBOSE = false;
 
 
-OPCODE printInstruction(const Kernel& kernel) {
+OPCODE printInstruction(const viua::kernel::Kernel& kernel) {
     byte* iptr = kernel.executionAt();
 
     string instruction;
@@ -220,7 +220,7 @@ struct State {
 };
 
 
-tuple<bool, string> if_breakpoint_byte(Kernel& kernel, vector<byte*>& breakpoints_byte) {
+tuple<bool, string> if_breakpoint_byte(viua::kernel::Kernel& kernel, vector<byte*>& breakpoints_byte) {
     bool pause = false;
     ostringstream reason;
     reason.str("");
@@ -232,7 +232,7 @@ tuple<bool, string> if_breakpoint_byte(Kernel& kernel, vector<byte*>& breakpoint
 
     return tuple<bool, string>(pause, reason.str());
 }
-tuple<bool, string> if_breakpoint_opcode(Kernel& kernel, vector<string>& breakpoints_opcode) {
+tuple<bool, string> if_breakpoint_opcode(viua::kernel::Kernel& kernel, vector<string>& breakpoints_opcode) {
     bool pause = false;
     ostringstream reason;
     reason.str("");
@@ -246,7 +246,7 @@ tuple<bool, string> if_breakpoint_opcode(Kernel& kernel, vector<string>& breakpo
 
     return tuple<bool, string>(pause, reason.str());
 }
-tuple<bool, string> if_breakpoint_function(Kernel& kernel, vector<string>& breakpoints_function) {
+tuple<bool, string> if_breakpoint_function(viua::kernel::Kernel& kernel, vector<string>& breakpoints_function) {
     bool pause = false;
     ostringstream reason;
     reason.str("");
@@ -264,7 +264,7 @@ tuple<bool, string> if_breakpoint_function(Kernel& kernel, vector<string>& break
     return tuple<bool, string>(pause, reason.str());
 }
 
-tuple<bool, string> if_watchpoint_local_register_write(Kernel& kernel, const State& state) {
+tuple<bool, string> if_watchpoint_local_register_write(viua::kernel::Kernel& kernel, const State& state) {
     /** Determine whether the instruction at instruction pointer should trigger a watchpoint.
      */
     bool writing_instruction = true;
@@ -373,7 +373,7 @@ tuple<bool, string> if_watchpoint_local_register_write(Kernel& kernel, const Sta
 
     return tuple<bool, string>(pause, reason.str());
 }
-tuple<bool, string> if_watchpoint_global_register_write(Kernel& kernel, const State& state) {
+tuple<bool, string> if_watchpoint_global_register_write(viua::kernel::Kernel& kernel, const State& state) {
     /** Determine whether the instruction at instruction pointer should trigger a watchpoint.
      */
     bool writing_instruction = true;
@@ -481,7 +481,7 @@ tuple<bool, string> if_watchpoint_global_register_write(Kernel& kernel, const St
 }
 
 
-bool command_verify(string& command, vector<string>& operands, const Kernel& kernel, const State& state) {
+bool command_verify(string& command, vector<string>& operands, const viua::kernel::Kernel& kernel, const State& state) {
     /** Basic command verification.
      *
      *  This function check only for the most obvious errors and
@@ -545,10 +545,10 @@ bool command_verify(string& command, vector<string>& operands, const Kernel& ker
     } else if (command == "kernel.init") {
     } else if (command == "kernel.run") {
         if (not state.initialised) {
-            cout << "error: Kernel is not initialised, use `kernel.init` command before `" << command << "`" << endl;
+            cout << "error: viua::kernel::Kernel is not initialised, use `kernel.init` command before `" << command << "`" << endl;
             verified = false;
         } else if (state.paused) {
-            cout << "warn: Kernel is paused, use `kernel.resume` command instead of `" << command << "`" << endl;
+            cout << "warn: viua::kernel::Kernel is paused, use `kernel.resume` command instead of `" << command << "`" << endl;
             verified = false;
         }
     } else if (command == "kernel.resume") {
@@ -566,13 +566,13 @@ bool command_verify(string& command, vector<string>& operands, const Kernel& ker
         }
     } else if (command == "kernel.tick") {
         if (not state.initialised) {
-            cout << "error: Kernel is not initialised, use `kernel.init` command before `" << command << "`" << endl;
+            cout << "error: viua::kernel::Kernel is not initialised, use `kernel.init` command before `" << command << "`" << endl;
             verified = false;
         } else if (state.finished) {
-            cout << "error: Kernel has finished execution of loaded program" << endl;
+            cout << "error: viua::kernel::Kernel has finished execution of loaded program" << endl;
             verified = false;
         } else if (state.paused) {
-            cout << "warn: Kernel is paused, use `kernel.resume` command instead of `" << command << "`" << endl;
+            cout << "warn: viua::kernel::Kernel is paused, use `kernel.resume` command instead of `" << command << "`" << endl;
             verified = false;
         } else if (operands.size() > 1) {
             cout << "error: invalid operand size, expected 0 or 1 operand but got " << operands.size() << endl;
@@ -603,15 +603,15 @@ bool command_verify(string& command, vector<string>& operands, const Kernel& ker
         }
     } else if (command == "kernel.unpause") {
         if (state.finished) {
-            cout << "error: Kernel has finished execution, use `kernel.unfinish` instead" << endl;
+            cout << "error: viua::kernel::Kernel has finished execution, use `kernel.unfinish` instead" << endl;
             verified = false;
         } else if (not state.paused) {
-            cout << "warning: Kernel has not been paused" << endl;
+            cout << "warning: viua::kernel::Kernel has not been paused" << endl;
             verified = false;
         }
     } else if (command == "kernel.unfinish") {
         if (not state.finished) {
-            cout << "error: Kernel has not finished execution yet" << endl;
+            cout << "error: viua::kernel::Kernel has not finished execution yet" << endl;
             verified = false;
         }
     } else if (command == "kernel.counter") {
@@ -654,7 +654,7 @@ bool command_verify(string& command, vector<string>& operands, const Kernel& ker
 
     return verified;
 }
-bool command_dispatch(string& command, vector<string>& operands, Kernel& kernel, State& state) {
+bool command_dispatch(string& command, vector<string>& operands, viua::kernel::Kernel& kernel, State& state) {
     /** Command dispatching logic.
      *
      *  This function will modify state of the debugger according to received command and
@@ -866,7 +866,7 @@ void completion(const char* buf, linenoiseCompletions* lc) {
     }
 }
 
-void debuggerMainLoop(Kernel& kernel, deque<string> init) {
+void debuggerMainLoop(viua::kernel::Kernel& kernel, deque<string> init) {
     /** This function implements main REPL of the debugger.
      *
      *  Viua debugger is kind of interactive beast.
@@ -1066,7 +1066,7 @@ int main(int argc, char* argv[]) {
 
     cout << "message: running \"" << filename << "\"" << endl;
 
-    Kernel kernel;
+    viua::kernel::Kernel kernel;
     kernel.debug = true;
 
     viua::front::vm::initialise(&kernel, filename, args);

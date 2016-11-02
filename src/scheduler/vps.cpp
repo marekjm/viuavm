@@ -134,7 +134,7 @@ bool viua::scheduler::VirtualProcessScheduler::executeQuant(Process *th, unsigne
     for (unsigned j = 0; (priority == 0 or j < priority); ++j) {
         if (th->stopped()) {
             // remember to break if the process stopped
-            // otherwise the Kernel will try to tick the process and
+            // otherwise the kernel will try to tick the process and
             // it will crash (will try to execute instructions from 0x0 pointer)
             break;
         }
@@ -152,7 +152,7 @@ bool viua::scheduler::VirtualProcessScheduler::executeQuant(Process *th, unsigne
     return true;
 }
 
-Kernel* viua::scheduler::VirtualProcessScheduler::kernel() const {
+viua::kernel::Kernel* viua::scheduler::VirtualProcessScheduler::kernel() const {
     return attached_kernel;
 }
 
@@ -306,7 +306,7 @@ void viua::scheduler::VirtualProcessScheduler::receive(const PID pid, queue<uniq
 
 bool viua::scheduler::VirtualProcessScheduler::burst() {
     if (not processes.size()) {
-        // make Kernel stop if there are no processes_list to run
+        // make kernel stop if there are no processes_list to run
         return false;
     }
 
@@ -547,7 +547,7 @@ int viua::scheduler::VirtualProcessScheduler::exit() const {
     return exit_code;
 }
 
-viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(Kernel *akernel, vector<unique_ptr<Process>> *fp,
+viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(viua::kernel::Kernel *akernel, vector<unique_ptr<Process>> *fp,
                                                                   mutex *fp_mtx,
                                                                   condition_variable *fp_cv):
     attached_kernel(akernel),

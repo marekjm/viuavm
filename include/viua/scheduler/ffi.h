@@ -26,8 +26,12 @@
 #include <viua/include/module.h>
 
 
-class Kernel;
 class Process;
+namespace viua {
+    namespace kernel {
+        class Kernel;
+    }
+}
 
 
 namespace viua {
@@ -36,7 +40,7 @@ namespace viua {
             class ForeignFunctionCallRequest {
                 std::unique_ptr<Frame> frame;
                 Process *caller_process;
-                Kernel *kernel;
+                viua::kernel::Kernel *kernel;
 
                 public:
                     std::string functionName() const;
@@ -44,7 +48,7 @@ namespace viua {
                     void registerException(viua::types::Type*);
                     void wakeup();
 
-                    ForeignFunctionCallRequest(Frame *fr, Process *cp, Kernel *c): frame(fr), caller_process(cp), kernel(c) {}
+                    ForeignFunctionCallRequest(Frame *fr, Process *cp, viua::kernel::Kernel *c): frame(fr), caller_process(cp), kernel(c) {}
                     ~ForeignFunctionCallRequest() {}
             };
 

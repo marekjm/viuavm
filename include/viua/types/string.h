@@ -32,7 +32,11 @@
 
 
 class Process;
-class Kernel;
+namespace viua {
+    namespace kernel {
+        class Kernel;
+    }
+}
 
 namespace viua {
     namespace types {
@@ -68,18 +72,18 @@ namespace viua {
                 String* add(String*);
                 String* join(Vector*);
 
-                virtual void stringify(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
-                virtual void represent(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
+                virtual void stringify(Frame*, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*);
+                virtual void represent(Frame*, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*);
 
-                virtual void startswith(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
-                virtual void endswith(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
+                virtual void startswith(Frame*, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*);
+                virtual void endswith(Frame*, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*);
 
-                virtual void format(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
-                virtual void substr(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
-                virtual void concatenate(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
-                virtual void join(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
+                virtual void format(Frame*, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*);
+                virtual void substr(Frame*, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*);
+                virtual void concatenate(Frame*, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*);
+                virtual void join(Frame*, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*);
 
-                virtual void size(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
+                virtual void size(Frame*, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*);
 
                 String(std::string s = ""): svalue(s) {}
         };

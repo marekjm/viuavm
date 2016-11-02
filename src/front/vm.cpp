@@ -21,7 +21,7 @@
 using namespace std;
 
 
-void viua::front::vm::initialise(Kernel *kernel, const string& program, vector<string> args) {
+void viua::front::vm::initialise(viua::kernel::Kernel *kernel, const string& program, vector<string> args) {
     Loader loader(program);
     loader.executable();
 
@@ -37,7 +37,7 @@ void viua::front::vm::initialise(Kernel *kernel, const string& program, vector<s
     kernel->load(bytecode).bytes(bytes);
 }
 
-void viua::front::vm::load_standard_prototypes(Kernel* kernel) {
+void viua::front::vm::load_standard_prototypes(viua::kernel::Kernel* kernel) {
     auto proto_object = new viua::types::Prototype("Object");
     kernel->registerForeignPrototype("Object", proto_object);
 
@@ -75,7 +75,7 @@ void viua::front::vm::load_standard_prototypes(Kernel* kernel) {
     kernel->registerForeignMethod("Pointer::expired/1", static_cast<ForeignMethodMemberPointer>(&viua::types::Pointer::expired));
 }
 
-void viua::front::vm::preload_libraries(Kernel* kernel) {
+void viua::front::vm::preload_libraries(viua::kernel::Kernel* kernel) {
     /** This method preloads dynamic libraries specified by environment.
      */
     vector<string> preload_native = support::env::getpaths("VIUAPRELINK");

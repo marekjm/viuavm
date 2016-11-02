@@ -28,7 +28,12 @@
 
 
 class Process;
-class Kernel;
+namespace viua {
+    namespace kernel {
+        class Kernel;
+    }
+}
+
 
 namespace viua {
     namespace types {
@@ -44,7 +49,7 @@ namespace viua {
                 void reset(Type* t);
                 Type* to();
 
-                virtual void expired(Frame*, RegisterSet*, RegisterSet*, Process*, Kernel*);
+                virtual void expired(Frame*, RegisterSet*, RegisterSet*, Process*, viua::kernel::Kernel*);
 
                 std::string str() const override;
 

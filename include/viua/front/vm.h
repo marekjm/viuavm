@@ -32,9 +32,9 @@
 namespace viua {
     namespace front {
         namespace vm {
-            void initialise(Kernel*, const std::string&, std::vector<std::string>);
-            void load_standard_prototypes(Kernel*);
-            void preload_libraries(Kernel*);
+            void initialise(viua::kernel::Kernel*, const std::string&, std::vector<std::string>);
+            void load_standard_prototypes(viua::kernel::Kernel*);
+            void preload_libraries(viua::kernel::Kernel*);
         }
     }
 }
