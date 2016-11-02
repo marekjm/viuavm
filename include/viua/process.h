@@ -35,6 +35,7 @@
 #include <viua/kernel/frame.h>
 #include <viua/kernel/tryframe.h>
 #include <viua/include/module.h>
+#include <viua/pid.h>
 
 
 const unsigned DEFAULT_REGISTER_SIZE = 256;
@@ -52,24 +53,6 @@ namespace viua {
         class VirtualProcessScheduler;
     }
 }
-
-
-class Process;
-
-
-class PID {
-    const Process *associated_process;
-
-    public:
-    bool operator==(const PID&) const;
-    bool operator==(const Process*) const;
-    bool operator<(const PID&) const;
-    bool operator>(const PID&) const;
-
-    auto get() const -> decltype(associated_process);
-
-    PID(const Process*);
-};
 
 class Process {
 #ifdef AS_DEBUG_HEADER
