@@ -27,6 +27,8 @@
 enum OperandType: uint8_t {
     OT_REGISTER_INDEX,      // register index
     OT_REGISTER_REFERENCE,  // register reference (indirect register index)
+    OT_REGISTER_INDEX_ANNOTATED,    // register index with an annotation from which
+                                    // register set it should be taken
 
     OT_POINTER,             // index of register containing a pointer that
                             // should be dereferenced (should be decoded to
