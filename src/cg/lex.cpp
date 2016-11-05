@@ -979,7 +979,7 @@ namespace viua {
                     const auto& token = input_tokens.at(i);
                     tokens.push_back(token);
 
-                    if (match(input_tokens, i, {"arg", "default"}) or match(input_tokens, i, {"call", "default"})) {
+                    if (match(input_tokens, i, {"arg", "default"}) or match(input_tokens, i, {"call", "default"}) or match(input_tokens, i, {"msg", "default"})) {
                         ++i;
                         tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "0");
                         continue;
