@@ -50,6 +50,8 @@ enum OperandType: uint8_t {
 
     OT_FLOAT32,             // 32bit floating point number
     OT_FLOAT64,             // 64bit floating point number
+
+    OT_VOID,                // encodes the abstract concept of "nothing"
 };
 
 #endif
