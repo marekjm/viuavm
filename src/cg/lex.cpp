@@ -982,30 +982,35 @@ namespace viua {
                     if (match(input_tokens, i, {"arg", "default"}) or match(input_tokens, i, {"call", "default"}) or match(input_tokens, i, {"msg", "default"})) {
                         ++i;
                         tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "0");
+                        tokens.back().original("default");
                         continue;
                     }
                     if (match(input_tokens, i, {"istore", "", "default"})) {
                         tokens.push_back(input_tokens.at(++i));  // push target register token
                         ++i;
                         tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "0");
+                        tokens.back().original("default");
                         continue;
                     }
                     if (match(input_tokens, i, {"fstore", "", "default"})) {
                         tokens.push_back(input_tokens.at(++i));  // push target register token
                         ++i;
                         tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "0.0");
+                        tokens.back().original("default");
                         continue;
                     }
                     if (match(input_tokens, i, {"strstore", "", "default"})) {
                         tokens.push_back(input_tokens.at(++i));  // push target register token
                         ++i;
                         tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "\"\"");
+                        tokens.back().original("default");
                         continue;
                     }
                     if (match(input_tokens, i, {"receive", "", "default"})) {
                         tokens.push_back(input_tokens.at(++i));  // push target register token
                         ++i;
                         tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "infinity");
+                        tokens.back().original("default");
                         continue;
                     }
                     if (match(input_tokens, i, {"join", "", "", "default"})) {
@@ -1013,6 +1018,7 @@ namespace viua {
                         tokens.push_back(input_tokens.at(++i));  // push source register token
                         ++i;
                         tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "infinity");
+                        tokens.back().original("default");
                         continue;
                     }
                 }
