@@ -759,7 +759,7 @@ namespace viua {
             }
 
             vector<Token> unwrap_lines(vector<Token> input_tokens, bool full) {
-                // FIXME: this function need refactoring
+                // FIXME: this function needs refactoring
                 decltype(input_tokens) unwrapped_tokens;
                 decltype(input_tokens) tokens;
                 decltype(input_tokens) final_tokens;
