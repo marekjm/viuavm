@@ -121,6 +121,8 @@ static string resolveregister(Token token, const map<string, int>& names) {
         // FIXME: analyse source and detect if the referenced register really holds an integer (the only value suitable to use
         // as register reference)
         out.str(reg);
+    } else if (reg == "void") {
+        out << '0';
     } else {
         /*  Case is no longer basic - it seems that a register is being accessed by name.
          *  Names must be checked to see if the one used was declared.

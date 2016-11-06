@@ -22,7 +22,7 @@
 
 .function: std::string::stringify/1
     frame ^[(param 0 (ptr 2 (strstore 1 ""))) (param 1 (arg 3 0))]
-    msg default stringify/2
+    msg void stringify/2
     move 0 1
     return
 .end

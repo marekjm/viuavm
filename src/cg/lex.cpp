@@ -997,9 +997,9 @@ namespace viua {
                     const auto& token = input_tokens.at(i);
                     tokens.push_back(token);
 
-                    if (match(input_tokens, i, {"arg", "default"}) or match(input_tokens, i, {"call", "default"}) or match(input_tokens, i, {"msg", "default"})) {
+                    if (match(input_tokens, i, {"arg", "default"}) or match(input_tokens, i, {"call", "default"}) or match(input_tokens, i, {"msg", "default"}) or match(input_tokens, i, {"process", "default"})) {
                         ++i;
-                        tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "0");
+                        tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "void");
                         tokens.back().original("default");
                         continue;
                     }
@@ -1025,14 +1025,26 @@ namespace viua {
                         continue;
                     }
                     if (match(input_tokens, i, {"receive", "", "default"})) {
-                        tokens.push_back(input_tokens.at(++i));  // push target register token
+                        ++i;
+                        if (input_tokens.at(i) == "default") {
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "void");
+                            tokens.back().original("default");
+                        } else {
+                            tokens.push_back(input_tokens.at(i));  // push target register token
+                        }
                         ++i;
                         tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "infinity");
                         tokens.back().original("default");
                         continue;
                     }
                     if (match(input_tokens, i, {"join", "", "", "default"})) {
-                        tokens.push_back(input_tokens.at(++i));  // push target register token
+                        ++i;
+                        if (input_tokens.at(i) == "default") {
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "void");
+                            tokens.back().original("default");
+                        } else {
+                            tokens.push_back(input_tokens.at(i));  // push target register token
+                        }
                         tokens.push_back(input_tokens.at(++i));  // push source register token
                         ++i;
                         tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "infinity");

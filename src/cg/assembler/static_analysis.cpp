@@ -74,6 +74,9 @@ static auto skip_till_next_line(const std::vector<viua::cg::lex::Token>& tokens,
     return i;
 }
 static string resolve_register_name(const map<string, string>& named_registers, viua::cg::lex::Token token, string name) {
+    if (name == "void") {
+        return name;
+    }
     if (name.at(0) == '@') {
         name = name.substr(1);
     }
