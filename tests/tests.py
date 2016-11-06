@@ -1486,7 +1486,10 @@ class KeywordDefaultTests(unittest.TestCase):
     PATH = './sample/asm/keyword/default'
 
     def testDefaultInArg(self):
-        runTest(self, 'arg.asm', 'Hello default World!')
+        runTestFailsToAssembleDetailed(self, 'arg.asm', [
+                '21:16: error: use of void as input register:',
+                '20:12: error: in function foo/1',
+       ])
 
     def testDefaultInCall(self):
         runTest(self, 'call.asm', '')

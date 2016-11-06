@@ -106,7 +106,7 @@ static void check_timeout_operand(Token token) {
 static void check_use_of_register_index(const vector<viua::cg::lex::Token>& tokens, long unsigned i, long unsigned by, string register_index, Registers& registers, map<string, string>& named_registers, const string& message_prefix) {
     string resolved_register_name = resolve_register_name(named_registers, tokens.at(i), register_index);
     if (resolved_register_name == "void") {
-        auto base_error = viua::cg::lex::InvalidSyntax(tokens.at(i), "use of void as input register index:");
+        auto base_error = viua::cg::lex::InvalidSyntax(tokens.at(i), "use of void as input register:");
         base_error.add(tokens.at(by));
         throw base_error;
     }
