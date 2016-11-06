@@ -44,6 +44,7 @@ namespace viua {
 
             Token::Token(decltype(line_number) line_, decltype(character_in_line) character_, string content_): content(content_), original_content(content), line_number(line_), character_in_line(character_) {
             }
+            Token::Token(): Token(0, 0, "") {}
 
             const char* InvalidSyntax::what() const {
                 return message.c_str();
