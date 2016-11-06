@@ -207,16 +207,23 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
         }
         if (token == ".mark:" or token == ".link:" or token == "nop" or token == "tryframe" or token == "try" or token == "catch" or token == "frame" or
             token == "tailcall" or token == "halt" or
-            token == "watchdog" or token == "jump" or
+            token == "watchdog" or
             token == "link" or token == "import" or token == "ress") {
             i = skip_till_next_line(body_tokens, i);
             continue;
         }
+
         if (token == "enter") {
             check_block_body(block_bodies.at(body_tokens.at(i+1)), 0, registers, block_bodies, debug);
             i = skip_till_next_line(body_tokens, i);
             continue;
         }
+
+        if (token == "jump") {
+            i = in_block_offset(body_tokens, i+1, registers, named_registers)-1;
+            continue;
+        }
+
         if (token == "move") {
             check_use_of_register(body_tokens, i+2, registers, named_registers, "move from empty register");
             registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), body_tokens.at(i+1));
