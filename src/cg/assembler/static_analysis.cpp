@@ -381,6 +381,10 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             // skip mnemonic
             ++i;
             check_use_of_register(body_tokens, i, registers, named_registers, "use of empty register");
+        } else if (token == "register") {
+            check_use_of_register(body_tokens, i+1, registers, named_registers, "registering class from empty register");
+            registers.erase(resolve_register_name(named_registers, body_tokens.at(i+1)), token);
+            i = skip_till_next_line(body_tokens, i);
         } else {
             if (not ((token == "call" or token == "process") and body_tokens.at(i+1) == "0")) {
                 string reg_original = body_tokens.at(i+1), reg = resolve_register_name(named_registers, body_tokens.at(i+1));
