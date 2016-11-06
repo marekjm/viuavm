@@ -42,8 +42,7 @@
 
     ; while (...) {
     .mark: loop_begin
-    igte 6 4 5
-    if 6 loop_end loop_body
+    if (igte 6 4 5) loop_end loop_body
 
     .mark: loop_body
 
