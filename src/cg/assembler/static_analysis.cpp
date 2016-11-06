@@ -37,15 +37,15 @@ using namespace std;
 using Token = viua::cg::lex::Token;
 
 class Registers {
-    map<string, long unsigned> defined_registers;
-    map<string, long unsigned> used_registers;
+    map<string, Token> defined_registers;
+    map<string, Token> used_registers;
     map<string, Token> erased_registers;
 
     public:
     bool defined(const string& r) {
         return (defined_registers.count(r) == 1);
     }
-    void insert(string r, long unsigned where) {
+    void insert(string r, Token where) {
         defined_registers.emplace(r, where);
     }
     void erase(const string& r) {
@@ -61,7 +61,7 @@ class Registers {
     Token erased_by(const string& r) {
         return erased_registers.at(r);
     }
-    void use(string r, long unsigned where) {
+    void use(string r, Token where) {
         used_registers.emplace(r, where);
     }
 };
@@ -219,13 +219,13 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
         }
         if (token == "move") {
             check_use_of_register(body_tokens, i+2, registers, named_registers, "move from empty register");
-            registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), i+1);
+            registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), body_tokens.at(i+1));
             registers.erase(resolve_register_name(named_registers, body_tokens.at(i+2)), token);
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "vpop" or token == "vat" or token == "vlen") {
             check_use_of_register(body_tokens, i+2, registers, named_registers, (token.str() + " from empty register"));
-            registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), i+1);
+            registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), body_tokens.at(i+1));
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "vinsert" or token == "vpush") {
@@ -244,7 +244,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
         } else if (token == "remove") {
             check_use_of_register(body_tokens, i+2, registers, named_registers, "remove from empty register");
             check_use_of_register(body_tokens, i+3, registers, named_registers, "remove key from empty register");
-            registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), i+1);
+            registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), body_tokens.at(i+1));
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "delete") {
@@ -266,7 +266,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             if (registers.defined(resolve_register_name(named_registers, body_tokens.at(i+2)))) {
                 throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+1), ("useless check, register will always be defined: " + str::strencode(body_tokens.at(i+2))));
             }
-            registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), i+1);
+            registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), body_tokens.at(i+1));
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "tmpri") {
@@ -274,7 +274,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             registers.erase(resolve_register_name(named_registers, body_tokens.at(i+1)), token);
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "tmpro") {
-            registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), i+1);
+            registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), body_tokens.at(i+1));
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "if") {
             check_use_of_register(body_tokens, ++i, registers, named_registers, "branch depends on empty register");
@@ -317,7 +317,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
         } else if (token == "copy" or token == "ptr" or token == "fcall") {
             string opcode_name = token;
             check_use_of_register(body_tokens, i+2, registers, named_registers, ((opcode_name == "ptr" ? "pointer" : opcode_name) + " from empty register"));
-            registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), i+1);
+            registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), body_tokens.at(i+1));
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "send") {
@@ -333,7 +333,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             continue;
         } else if (token == "itof" or token == "ftoi" or token == "stoi" or token == "stof") {
             check_use_of_register(body_tokens, i+2, registers, named_registers);
-            registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), i+1);
+            registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), body_tokens.at(i+1));
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "vec") {
@@ -346,7 +346,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
                     registers.erase(str::stringify(j, false), token);
                 }
             }
-            registers.insert(resolve_register_name(named_registers, body_tokens.at(i)), i);
+            registers.insert(resolve_register_name(named_registers, body_tokens.at(i)), body_tokens.at(i));
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "iadd" or token == "isub" or token == "imul" or token == "idiv" or
@@ -357,18 +357,18 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             ++i; // skip mnemonic token
             check_use_of_register(body_tokens, i+1, registers, named_registers);
             check_use_of_register(body_tokens, i+2, registers, named_registers);
-            registers.insert(resolve_register_name(named_registers, body_tokens.at(i)), i);
+            registers.insert(resolve_register_name(named_registers, body_tokens.at(i)), body_tokens.at(i));
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "join") {
             check_use_of_register(body_tokens, i+2, registers, named_registers, "join from empty register");
             check_timeout_operand(body_tokens.at(i+3));
-            registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), i+1);
+            registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), body_tokens.at(i+1));
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "receive") {
             string reg_original = body_tokens.at(i+1), reg = resolve_register_name(named_registers, body_tokens.at(i+1));
-            registers.insert(reg, i);
+            registers.insert(reg, body_tokens.at(i));
             check_timeout_operand(body_tokens.at(i+2));
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "iinc" or token == "idec") {
@@ -378,7 +378,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
         } else {
             if (not ((token == "call" or token == "process") and body_tokens.at(i+1) == "0")) {
                 string reg_original = body_tokens.at(i+1), reg = resolve_register_name(named_registers, body_tokens.at(i+1));
-                registers.insert(reg, 1);
+                registers.insert(reg, body_tokens.at(1));
                 if (debug) {
                     cout << "  " << str::enquote(token) << " defined register " << str::enquote(str::strencode(reg_original));
                     if (reg != reg_original) {
