@@ -367,8 +367,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "receive") {
-            string reg_original = body_tokens.at(i+1), reg = resolve_register_name(named_registers, body_tokens.at(i+1));
-            registers.insert(reg, body_tokens.at(i+1));
+            registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), body_tokens.at(i+1));
             check_timeout_operand(body_tokens.at(i+2));
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "iinc" or token == "idec") {
