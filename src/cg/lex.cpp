@@ -57,9 +57,26 @@ namespace viua {
                 return character_in_line;
             }
 
+            auto InvalidSyntax::match(Token token) const -> bool {
+                for (const auto& each : tokens) {
+                    if (token.line() == each.line() and token.character() == each.character()) {
+                        return true;
+                    }
+                    if (token.line() == each.line() and token.character() >= each.character() and token.ends() <= each.ends()) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            auto InvalidSyntax::add(Token token) -> void {
+                tokens.push_back(std::move(token));
+            }
+
             InvalidSyntax::InvalidSyntax(long unsigned ln, long unsigned ch, string ct): line_number(ln), character_in_line(ch), content(ct) {
             }
             InvalidSyntax::InvalidSyntax(Token t, string m): line_number(t.line()), character_in_line(t.character()), content(t.original()), message(m) {
+                add(t);
             }
 
             const char* TracedSyntaxError::what() const {

@@ -41,10 +41,15 @@ namespace viua {
                 std::string content;
                 std::string message;
 
+                std::vector<Token> tokens;
+
                 const char* what() const;
 
                 auto line() const -> decltype(line_number);
                 auto character() const -> decltype(character_in_line);
+                auto match(Token) const -> bool;
+
+                auto add(Token) -> void;
 
                 InvalidSyntax(long unsigned, long unsigned, std::string);
                 InvalidSyntax(Token, std::string = "");

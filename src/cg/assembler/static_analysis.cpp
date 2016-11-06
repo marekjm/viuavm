@@ -100,14 +100,20 @@ static void check_timeout_operand(Token token) {
         throw viua::cg::lex::InvalidSyntax(token, "invalid timeout operand");
     }
 }
-static void check_use_of_register_index(const vector<viua::cg::lex::Token>& tokens, long unsigned i, string register_index, Registers& registers, map<string, string>& named_registers, const string& message_prefix) {
+static void check_use_of_register_index(const vector<viua::cg::lex::Token>& tokens, long unsigned i, long unsigned by, string register_index, Registers& registers, map<string, string>& named_registers, const string& message_prefix) {
     string resolved_register_name = resolve_register_name(named_registers, tokens.at(i), register_index);
+    if (resolved_register_name == "void") {
+        auto base_error = viua::cg::lex::InvalidSyntax(tokens.at(i), "use of void as input register index:");
+        base_error.add(tokens.at(by));
+        throw base_error;
+    }
     if (not registers.defined(resolved_register_name)) {
         string message = (message_prefix + ": " + str::strencode(register_index));
         if (resolved_register_name != register_index) {
             message += (" := " + resolved_register_name);
         }
         auto base_error = viua::cg::lex::InvalidSyntax(tokens.at(i), message);
+        base_error.add(tokens.at(by));
         if (not registers.erased(resolved_register_name)) {
             throw base_error;
         }
@@ -117,11 +123,11 @@ static void check_use_of_register_index(const vector<viua::cg::lex::Token>& toke
         throw traced_error;
     }
 }
-static void check_use_of_register(const vector<viua::cg::lex::Token>& tokens, long unsigned i, Registers& registers, map<string, string>& named_registers, const string& message_prefix) {
-    check_use_of_register_index(tokens, i, tokens.at(i), registers, named_registers, message_prefix);
+static void check_use_of_register(const vector<viua::cg::lex::Token>& tokens, long unsigned i, long unsigned by, Registers& registers, map<string, string>& named_registers, const string& message_prefix) {
+    check_use_of_register_index(tokens, i, by, tokens.at(i), registers, named_registers, message_prefix);
 }
-static void check_use_of_register(const vector<viua::cg::lex::Token>& tokens, long unsigned i, Registers& registers, map<string, string>& named_registers) {
-    check_use_of_register(tokens, i, registers, named_registers, "use of empty register");
+static void check_use_of_register(const vector<viua::cg::lex::Token>& tokens, long unsigned i, long unsigned by, Registers& registers, map<string, string>& named_registers) {
+    check_use_of_register_index(tokens, i, by, tokens.at(i), registers, named_registers, "use of empty register");
 }
 
 static auto in_block_offset(const vector<viua::cg::lex::Token>& body_tokens, std::remove_reference<decltype(body_tokens)>::type::size_type i, Registers& registers, map<string, string>& named_registers) -> decltype(i) {
@@ -225,41 +231,41 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
         }
 
         if (token == "move") {
-            check_use_of_register(body_tokens, i+2, registers, named_registers, "move from empty register");
+            check_use_of_register(body_tokens, i+2, i, registers, named_registers, "move from empty register");
             registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), body_tokens.at(i+1));
             registers.erase(resolve_register_name(named_registers, body_tokens.at(i+2)), token);
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "vpop" or token == "vat" or token == "vlen") {
-            check_use_of_register(body_tokens, i+2, registers, named_registers, (token.str() + " from empty register"));
+            check_use_of_register(body_tokens, i+2, i, registers, named_registers, (token.str() + " from empty register"));
             registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), body_tokens.at(i+1));
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "vinsert" or token == "vpush") {
-            check_use_of_register(body_tokens, i+1, registers, named_registers, (token.str() + " into empty register"));
-            check_use_of_register(body_tokens, i+2, registers, named_registers, (token.str() + " from empty register"));
+            check_use_of_register(body_tokens, i+1, i, registers, named_registers, (token.str() + " into empty register"));
+            check_use_of_register(body_tokens, i+2, i, registers, named_registers, (token.str() + " from empty register"));
             registers.erase(resolve_register_name(named_registers, body_tokens.at(i+2)), token);
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "insert") {
-            check_use_of_register(body_tokens, i+1, registers, named_registers, "insert into empty register");
-            check_use_of_register(body_tokens, i+2, registers, named_registers, "insert key from empty register");
-            check_use_of_register(body_tokens, i+3, registers, named_registers, "insert from empty register");
+            check_use_of_register(body_tokens, i+1, i, registers, named_registers, "insert into empty register");
+            check_use_of_register(body_tokens, i+2, i, registers, named_registers, "insert key from empty register");
+            check_use_of_register(body_tokens, i+3, i, registers, named_registers, "insert from empty register");
             registers.erase(resolve_register_name(named_registers, body_tokens.at(i+3)), token);
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "remove") {
-            check_use_of_register(body_tokens, i+2, registers, named_registers, "remove from empty register");
-            check_use_of_register(body_tokens, i+3, registers, named_registers, "remove key from empty register");
+            check_use_of_register(body_tokens, i+2, i, registers, named_registers, "remove from empty register");
+            check_use_of_register(body_tokens, i+3, i, registers, named_registers, "remove key from empty register");
             registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), body_tokens.at(i+1));
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "delete") {
-            check_use_of_register(body_tokens, i+1, registers, named_registers, "delete of empty register");
+            check_use_of_register(body_tokens, i+1, i, registers, named_registers, "delete of empty register");
             registers.erase(resolve_register_name(named_registers, body_tokens.at(i+1)), token);
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "throw") {
-            check_use_of_register(body_tokens, i+1, registers, named_registers, "throw from empty register");
+            check_use_of_register(body_tokens, i+1, i, registers, named_registers, "throw from empty register");
             registers.erase(resolve_register_name(named_registers, body_tokens.at(i+1)), token);
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "isnull") {
@@ -277,14 +283,15 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "tmpri") {
-            check_use_of_register(body_tokens, i+1, registers, named_registers, "move to tmp register from empty register");
+            check_use_of_register(body_tokens, i+1, i, registers, named_registers, "move to tmp register from empty register");
             registers.erase(resolve_register_name(named_registers, body_tokens.at(i+1)), token);
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "tmpro") {
             registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), body_tokens.at(i+1));
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "if") {
-            check_use_of_register(body_tokens, ++i, registers, named_registers, "branch depends on empty register");
+            ++i;
+            check_use_of_register(body_tokens, i, i-1, registers, named_registers, "branch depends on empty register");
             try {
                 auto copied_registers = registers;
                 auto copied_named_registers = named_registers;
@@ -306,40 +313,40 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             // early return because we already checked both true, and false branches
             return;
         } else if (token == "echo" or token == "print" or token == "not") {
-            check_use_of_register(body_tokens, i+1, registers, named_registers, (token.str() + " of empty register"));
+            check_use_of_register(body_tokens, i+1, i, registers, named_registers, (token.str() + " of empty register"));
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "pamv" or token == "param") {
             if (debug) {
                 cout << str::enquote(token) << " from register " << str::enquote(str::strencode(body_tokens.at(i+2))) << endl;
             }
-            check_use_of_register(body_tokens, i+2, registers, named_registers, ("parameter " + string(token.str() == "pamv" ? "move" : "pass") + " from empty register"));
+            check_use_of_register(body_tokens, i+2, i, registers, named_registers, ("parameter " + string(token.str() == "pamv" ? "move" : "pass") + " from empty register"));
             if (token == "pamv") {
                 registers.erase(resolve_register_name(named_registers, body_tokens.at(i+2)), token);
             }
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "capture" or token == "capturecopy" or token == "capturemove") {
-            check_use_of_register(body_tokens, i+3, registers, named_registers, "closure of empty register");
+            check_use_of_register(body_tokens, i+3, i, registers, named_registers, "closure of empty register");
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "copy" or token == "ptr" or token == "fcall") {
             string opcode_name = token;
-            check_use_of_register(body_tokens, i+2, registers, named_registers, ((opcode_name == "ptr" ? "pointer" : opcode_name) + " from empty register"));
+            check_use_of_register(body_tokens, i+2, i, registers, named_registers, ((opcode_name == "ptr" ? "pointer" : opcode_name) + " from empty register"));
             registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), body_tokens.at(i+1));
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "send") {
-            check_use_of_register(body_tokens, i+2, registers, named_registers, "send from empty register");
-            check_use_of_register(body_tokens, i+1, registers, named_registers, "send target from empty register");
+            check_use_of_register(body_tokens, i+2, i, registers, named_registers, "send from empty register");
+            check_use_of_register(body_tokens, i+1, i, registers, named_registers, "send target from empty register");
             registers.erase(resolve_register_name(named_registers, body_tokens.at(i+2)), token);
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "swap") {
-            check_use_of_register(body_tokens, i+1, registers, named_registers, "swap with empty register");
-            check_use_of_register(body_tokens, i+2, registers, named_registers, "swap with empty register");
+            check_use_of_register(body_tokens, i+1, i, registers, named_registers, "swap with empty register");
+            check_use_of_register(body_tokens, i+2, i, registers, named_registers, "swap with empty register");
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "itof" or token == "ftoi" or token == "stoi" or token == "stof") {
-            check_use_of_register(body_tokens, i+2, registers, named_registers);
+            check_use_of_register(body_tokens, i+2, i, registers, named_registers);
             registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), body_tokens.at(i+1));
             i = skip_till_next_line(body_tokens, i);
             continue;
@@ -349,7 +356,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             int registers_to_pack = stoi(resolve_register_name(named_registers, body_tokens.at(i+2)));
             if (registers_to_pack) {
                 for (int j = starting_register; j < (starting_register+registers_to_pack); ++j) {
-                    check_use_of_register_index(body_tokens, i-1, str::stringify(j, false), registers, named_registers, "packing empty register");
+                    check_use_of_register_index(body_tokens, i-1, i-1, str::stringify(j, false), registers, named_registers, "packing empty register");
                     registers.erase(str::stringify(j, false), token);
                 }
             }
@@ -362,40 +369,54 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
                    token == "flt" or token == "flte" or token == "fgt" or token == "fgte" or token == "feq" or
                    token == "and" or token == "or") {
             ++i; // skip mnemonic token
-            check_use_of_register(body_tokens, i+1, registers, named_registers);
-            check_use_of_register(body_tokens, i+2, registers, named_registers);
+            check_use_of_register(body_tokens, i+1, i, registers, named_registers);
+            check_use_of_register(body_tokens, i+2, i, registers, named_registers);
             registers.insert(resolve_register_name(named_registers, body_tokens.at(i)), body_tokens.at(i));
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "join") {
-            check_use_of_register(body_tokens, i+2, registers, named_registers, "join from empty register");
             check_timeout_operand(body_tokens.at(i+3));
-            registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), body_tokens.at(i+1));
+            check_use_of_register(body_tokens, i+2, i, registers, named_registers, "join from empty register");
+            if (body_tokens.at(i+1) != "void" and body_tokens.at(i+1) != "0") {
+                registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), body_tokens.at(i+1));
+            }
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "receive") {
-            registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), body_tokens.at(i+1));
+            if (not (body_tokens.at(i+1) == "0" or body_tokens.at(i+1) == "void")) {
+                registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), body_tokens.at(i+1));
+            }
             check_timeout_operand(body_tokens.at(i+2));
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "iinc" or token == "idec") {
             // skip mnemonic
             ++i;
-            check_use_of_register(body_tokens, i, registers, named_registers, "use of empty register");
+            check_use_of_register(body_tokens, i, i-1, registers, named_registers, "use of empty register");
         } else if (token == "register") {
-            check_use_of_register(body_tokens, i+1, registers, named_registers, "registering class from empty register");
+            check_use_of_register(body_tokens, i+1, i, registers, named_registers, "registering class from empty register");
             registers.erase(resolve_register_name(named_registers, body_tokens.at(i+1)), token);
             i = skip_till_next_line(body_tokens, i);
+        } else if (token == "msg" or token == "call" or token == "process") {
+            if (not (body_tokens.at(i+1) == "0" or body_tokens.at(i+1) == "void")) {
+                registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), body_tokens.at(i+1));
+            }
+            i = skip_till_next_line(body_tokens, i);
+            continue;
+        } else if (token == "arg") {
+            if (not (body_tokens.at(i+1) == "void")) {
+                registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), body_tokens.at(i+1));
+            }
+            i = skip_till_next_line(body_tokens, i);
+            continue;
         } else {
-            if (not ((token == "call" or token == "process") and body_tokens.at(i+1) == "0")) {
-                string reg_original = body_tokens.at(i+1), reg = resolve_register_name(named_registers, body_tokens.at(i+1));
-                registers.insert(reg, body_tokens.at(1+1));
-                if (debug) {
-                    cout << "  " << str::enquote(token) << " defined register " << str::enquote(str::strencode(reg_original));
-                    if (reg != reg_original) {
-                        cout << " = " << str::enquote(str::strencode(reg));
-                    }
-                    cout << endl;
+            string reg_original = body_tokens.at(i+1), reg = resolve_register_name(named_registers, body_tokens.at(i+1));
+            registers.insert(reg, body_tokens.at(1+1));
+            if (debug) {
+                cout << "  " << str::enquote(token) << " defined register " << str::enquote(str::strencode(reg_original));
+                if (reg != reg_original) {
+                    cout << " = " << str::enquote(str::strencode(reg));
                 }
+                cout << endl;
             }
             i = skip_till_next_line(body_tokens, i);
             continue;

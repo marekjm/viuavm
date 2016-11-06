@@ -129,7 +129,7 @@ static string read_file(const string& path) {
     return source_in.str();
 }
 
-static void underline_error_token(const viua::cg::lex::InvalidSyntax& error) {
+static void underline_error_token(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i, const viua::cg::lex::InvalidSyntax& error) {
         cout << "     ";
 
         auto len = str::stringify((error.line()+1), false).size();
@@ -138,17 +138,28 @@ static void underline_error_token(const viua::cg::lex::InvalidSyntax& error) {
         }
         cout << ' ';
 
-        auto j = error.character();
-        while (j--) {
-            cout << ' ';
-        }
+        while (i < tokens.size()) {
+            const auto& each = tokens.at(i++);
+            bool match = error.match(each);
 
-        auto k = error.content.size();
-        cout << send_control_seq(COLOR_FG_RED_1);
-        while (k--) {
-            cout << '^';
+            if (match) {
+                cout << send_control_seq(COLOR_FG_RED_1);
+            }
+
+            char c = (match ? '^' : ' ');
+            len = each.str().size();
+            while (len--) {
+                cout << c;
+            }
+
+            if (match) {
+                cout << send_control_seq(ATTR_RESET);
+            }
+
+            if (each == "\n") {
+                break;
+            }
         }
-        cout << send_control_seq(ATTR_RESET);
 
         cout << '\n';
 }
@@ -163,10 +174,12 @@ static auto display_error_line(const vector<viua::cg::lex::Token>& tokens, const
     cout << token_line+1;
     cout << ' ';
 
+    auto original_i = i;
+
     cout << send_control_seq(COLOR_FG_WHITE);
     while (i < tokens.size() and tokens.at(i).line() == token_line) {
         bool highlighted = false;
-        if (tokens.at(i).line() == error.line() and tokens.at(i).character() >= error.character() and tokens.at(i).ends() <= (error.character()+error.content.size())) {
+        if (error.match(tokens.at(i))) {
             cout << send_control_seq(COLOR_FG_ORANGE_RED_1);
             highlighted = true;
         }
@@ -178,7 +191,7 @@ static auto display_error_line(const vector<viua::cg::lex::Token>& tokens, const
 
     cout << send_control_seq(ATTR_RESET);
 
-    underline_error_token(error);
+    underline_error_token(tokens, original_i, error);
 
     return i;
 }
