@@ -92,6 +92,7 @@ There are several categories of change:
 - fix: duplicated names are not allowed in a single source file
 - bic: processes cannot be suspended, and their priority cannot be adjusted, from user code; VM is the sole ruler of processes
 - bic: rename `enclose` family of instructions (`enclose`, `enclosecopy`, and `enclosemove`) as `capture` family
+- bic, enhancement: `receive` instruction drops messages if its target register index is 0
 
 One limitation of static analyser (SA) introduced in this release is its inability to handle backwards jumps.
 This, however, is not a problem if the code does not use loops and

@@ -140,7 +140,9 @@ byte* viua::process::Process::opreceive(byte* addr) {
     }
 
     if (not message_queue.empty()) {
-        place(target, message_queue.front().release());
+        if (target) {
+            place(target, message_queue.front().release());
+        }
         message_queue.pop();
         timeout_active = false;
         wait_until_infinity = false;
