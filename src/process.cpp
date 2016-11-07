@@ -188,7 +188,7 @@ byte* viua::process::Process::adjustJumpBaseFor(const string& call_name) {
     jump_base = ep.second;
     return entry_point;
 }
-byte* viua::process::Process::callNative(byte* return_address, const string& call_name, const unsigned return_index, const string&) {
+byte* viua::process::Process::callNative(byte* return_address, const string& call_name, const bool return_void, const unsigned return_index, const string&) {
     byte* call_address = adjustJumpBaseFor(call_name);
 
     if (not frame_new) {
@@ -198,13 +198,14 @@ byte* viua::process::Process::callNative(byte* return_address, const string& cal
     frame_new->function_name = call_name;
     frame_new->return_address = return_address;
 
+    frame_new->return_void = return_void;
     frame_new->place_return_value_in = return_index;
 
     pushFrame();
 
     return call_address;
 }
-byte* viua::process::Process::callForeign(byte* return_address, const string& call_name, const unsigned return_index, const string&) {
+byte* viua::process::Process::callForeign(byte* return_address, const string& call_name, const bool return_void, const unsigned return_index, const string&) {
     if (not frame_new) {
         throw new viua::types::Exception("external function call without a frame: use `frame 0' in source code if the function takes no parameters");
     }
@@ -212,6 +213,7 @@ byte* viua::process::Process::callForeign(byte* return_address, const string& ca
     frame_new->function_name = call_name;
     frame_new->return_address = return_address;
 
+    frame_new->return_void = return_void;
     frame_new->place_return_value_in = return_index;
 
     suspend();
@@ -219,7 +221,7 @@ byte* viua::process::Process::callForeign(byte* return_address, const string& ca
 
     return return_address;
 }
-byte* viua::process::Process::callForeignMethod(byte* return_address, viua::types::Type* object, const string& call_name, const unsigned return_index, const string&) {
+byte* viua::process::Process::callForeignMethod(byte* return_address, viua::types::Type* object, const string& call_name, const bool return_void, const unsigned return_index, const string&) {
     if (not frame_new) {
         throw new viua::types::Exception("foreign method call without a frame");
     }
@@ -227,6 +229,7 @@ byte* viua::process::Process::callForeignMethod(byte* return_address, viua::type
     frame_new->function_name = call_name;
     frame_new->return_address = return_address;
 
+    frame_new->return_void = return_void;
     frame_new->place_return_value_in = return_index;
 
     Frame* frame = frame_new.get();
@@ -253,7 +256,7 @@ byte* viua::process::Process::callForeignMethod(byte* return_address, viua::type
     viua::types::Type* returned = nullptr;
     bool returned_is_reference = false;
     unsigned return_value_register = frames.back()->place_return_value_in;
-    if (return_value_register != 0) {
+    if (return_value_register != 0 and not frames.back()->return_void) {
         // we check in 0. register because it's reserved for return values
         if (uregset->at(0) == nullptr) {
             throw new viua::types::Exception("return value requested by frame but foreign method did not set return register");

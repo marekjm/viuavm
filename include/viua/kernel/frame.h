@@ -33,6 +33,7 @@ class Frame {
         viua::kernel::RegisterSet* args;
         viua::kernel::RegisterSet* regset;
 
+        bool return_void;
         unsigned place_return_value_in;
 
         std::string function_name;
@@ -45,6 +46,7 @@ class Frame {
             owns_local_register_set(true),
             return_address(ra),
             args(nullptr), regset(nullptr),
+            return_void(false),
             place_return_value_in(0)
         {
             args = new viua::kernel::RegisterSet(argsize);

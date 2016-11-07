@@ -30,10 +30,19 @@ static byte* insertIntegerOperand(byte* addr_ptr, int_op op) {
      *  will look into a register the integer points to, fetch an integer from this register and
      *  use the fetched register as the operand.
      */
-    bool ref;
-    int num;
+    bool ref = false;
+    int num = 0;
+    bool is_void = false;
 
-    tie(ref, num) = op;
+    tie(ref, num, is_void) = op;
+
+    if (is_void) {
+        *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_VOID;
+        pointer::inc<OperandType, byte>(addr_ptr);
+        *(reinterpret_cast<int*>(addr_ptr)) = 0;
+        pointer::inc<int, byte>(addr_ptr);
+        return addr_ptr;
+    }
 
     /* NOTICE: reinterpret_cast<>'s are ugly, but we know what we're doing here.
      * Since we store everything in a big array of bytes we have to cast incompatible pointers to

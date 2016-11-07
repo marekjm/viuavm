@@ -72,9 +72,16 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         bptr += s.size();
         ++bptr; // for null character terminating the C-style string not included in std::string
     } else if ((op == CALL) or (op == PROCESS) or (op == CLOSURE) or (op == FUNCTION) or (op == CLASS) or (op == NEW) or (op == DERIVE) or (op == MSG)) {
-        oss << " " << intop(bptr);
-        pointer::inc<bool, byte>(bptr);
-        pointer::inc<int, byte>(bptr);
+        if ((*bptr == OT_REGISTER_INDEX) || (*bptr == OT_REGISTER_REFERENCE)) {
+            oss << " " << intop(bptr);
+            pointer::inc<bool, byte>(bptr);
+            pointer::inc<int, byte>(bptr);
+        }
+        if (*bptr == OT_VOID) {
+            oss << " void";
+            ++bptr;
+            pointer::inc<int, byte>(bptr);
+        }
 
         oss << " ";
         string fn_name = string(reinterpret_cast<char*>(bptr));
