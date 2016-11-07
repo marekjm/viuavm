@@ -30,12 +30,15 @@ using namespace std;
 template<class T> static auto extract(byte *ip) -> T {
     return *reinterpret_cast<T*>(ip);
 }
+template<class T> static auto extract(const byte *ip) -> T {
+    return *reinterpret_cast<T*>(ip);
+}
 template<class T> static auto extract_ptr(byte *ip) -> T* {
     return reinterpret_cast<T*>(ip);
 }
 
-static auto get_operand_type(byte *ip) -> OperandType {
-    return extract<OperandType>(ip);
+static auto get_operand_type(const byte *ip) -> OperandType {
+    return extract<const OperandType>(ip);
 }
 
 template<class Value, class Class> static auto fetch_primitive_value(byte *ip, viua::process::Process *p, Value initial) -> tuple<byte*, Value> {
@@ -56,6 +59,23 @@ template<class Value, class Class> static auto fetch_primitive_value(byte *ip, v
         value = i->value();
     }
     return tuple<byte*, Value>(ip, value);
+}
+
+auto viua::bytecode::decoder::operands::is_void(const byte *ip) -> bool {
+    OperandType ot = get_operand_type(ip);
+    return (ot == OT_VOID);
+}
+
+auto viua::bytecode::decoder::operands::fetch_void(byte *ip) -> byte* {
+    OperandType ot = get_operand_type(ip);
+    ++ip;
+    ip += sizeof(int);
+
+    if (ot != OT_VOID) {
+        throw new viua::types::Exception("decoded invalid operand type");
+    }
+
+    return ip;
 }
 
 auto viua::bytecode::decoder::operands::fetch_register_index(byte *ip, viua::process::Process *process) -> tuple<byte*, unsigned> {

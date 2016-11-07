@@ -50,6 +50,8 @@ namespace viua {
                  *  These functions are used most often bymajority of the instructions.
                  *
                  */
+                auto is_void(const byte*) -> bool;
+                auto fetch_void(byte*) -> byte*;
                 auto fetch_register_index(byte*, viua::process::Process*) -> std::tuple<byte*, unsigned>;
                 auto fetch_primitive_uint(byte*, viua::process::Process*) -> std::tuple<byte*, unsigned>;
                 auto fetch_primitive_uint64(byte*, viua::process::Process*) -> std::tuple<byte*, uint64_t>;
