@@ -39,7 +39,7 @@
 
 .function: process_spawner/1
     frame ^[(pamv 0 (arg 1 0))]
-    process 0 print_hello/1
+    process void print_hello/1
     return
 .end
 

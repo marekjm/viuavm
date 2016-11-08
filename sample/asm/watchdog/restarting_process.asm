@@ -37,7 +37,7 @@
     print (strstore 5 "<<<")
 
     frame ^[(param 0 (vat 5 parameters 0)) (param 1 (iinc (vat 6 parameters 1)))]
-    process 0 a_division_executing_process/2
+    process void a_division_executing_process/2
 
     return
 .end
@@ -128,10 +128,10 @@
     link std::misc
 
     frame 0
-    process 0 a_detached_concurrent_process/0
+    process void a_detached_concurrent_process/0
 
     frame ^[(param 0 (istore 3 42)) (param 1 (istore 4 0))]
-    process 0 a_division_executing_process/2
+    process void a_division_executing_process/2
 
     frame 0
     call log_exiting_main/0

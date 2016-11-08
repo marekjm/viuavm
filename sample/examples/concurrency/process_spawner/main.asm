@@ -37,7 +37,7 @@
     if (igte 4 counter limit) end_loop +1
 
     frame ^[(param 0 counter)]
-    process 0 worker_process/1
+    process void worker_process/1
 
     iinc counter
     jump begin_loop
@@ -59,7 +59,7 @@
 
 .function: run_process_spawner/1
     frame ^[(param 0 (arg 1 0))]
-    process 0 process_spawner/1
+    process void process_spawner/1
     return
 .end
 

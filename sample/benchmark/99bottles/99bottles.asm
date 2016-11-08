@@ -78,7 +78,7 @@
 
     if how_many_bottles +1 no_more_bottles
     frame ^[(param 0 how_many_bottles) (param 1 printer_pid)]
-    process 0 bottles_on_the_wall/2
+    process void bottles_on_the_wall/2
 
     frame ^[(pamv iota (idec how_many_bottles)) (pamv iota printer_pid)]
     tailcall spawner/2

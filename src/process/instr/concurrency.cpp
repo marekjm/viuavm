@@ -32,9 +32,15 @@ byte* viua::process::Process::opprocess(byte* addr) {
     /*  Run process instruction.
      */
     unsigned target = 0;
-    string call_name;
+    bool target_is_void = viua::bytecode::decoder::operands::is_void(addr);
 
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    if (not target_is_void) {
+        tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    } else {
+        addr = viua::bytecode::decoder::operands::fetch_void(addr);
+    }
+
+    string call_name;
     tie(addr, call_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     bool is_native = scheduler->isNativeFunction(call_name);
@@ -46,9 +52,8 @@ byte* viua::process::Process::opprocess(byte* addr) {
 
     frame_new->function_name = call_name;
 
-    bool disown = (target == 0);
-    auto spawned_process = scheduler->spawn(std::move(frame_new), this, disown);
-    if (not disown) {
+    auto spawned_process = scheduler->spawn(std::move(frame_new), this, target_is_void);
+    if (not target_is_void) {
         place(target, new viua::types::Process(spawned_process));
     }
 
