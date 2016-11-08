@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <memory>
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/types/integer.h>
 #include <viua/types/reference.h>
@@ -75,7 +76,14 @@ byte* viua::process::Process::oparg(byte* addr) {
     /** Run arg instruction.
      */
     unsigned destination_register_index = 0, parameter_no_operand_index = 0;
-    tie(addr, destination_register_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    bool destination_is_void = viua::bytecode::decoder::operands::is_void(addr);
+
+    if (not destination_is_void) {
+        tie(addr, destination_register_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    } else {
+        addr = viua::bytecode::decoder::operands::fetch_void(addr);
+    }
+
     tie(addr, parameter_no_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     if (parameter_no_operand_index >= frames.back()->args->size()) {
@@ -84,10 +92,16 @@ byte* viua::process::Process::oparg(byte* addr) {
         throw new viua::types::Exception(oss.str());
     }
 
+    unique_ptr<viua::types::Type> argument;
+
     if (frames.back()->args->isflagged(parameter_no_operand_index, MOVED)) {
-        uregset->set(destination_register_index, frames.back()->args->pop(parameter_no_operand_index));
+        argument.reset(frames.back()->args->pop(parameter_no_operand_index));
     } else {
-        uregset->set(destination_register_index, frames.back()->args->get(parameter_no_operand_index)->copy());
+        argument.reset(frames.back()->args->get(parameter_no_operand_index)->copy());
+    }
+
+    if (not destination_is_void) {
+        uregset->set(destination_register_index, argument.release());
     }
 
     return addr;
