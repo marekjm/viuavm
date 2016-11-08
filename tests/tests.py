@@ -1213,10 +1213,10 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
             '20:12: error: in function main/0',
         ])
 
-    def testUseOfEmptyOperandInIinc(self):
-        runTestFailsToAssembleDetailed(self, 'use_of_empty_operand_in_iinc.asm', [
-            '22:10: error: use of empty register: value := 1',
-            '20:12: error: in function main/0',
+    def testUseOfVoidAsInputRegister(self):
+        runTestFailsToAssembleDetailed(self, 'void_as_input_register.asm', [
+            '26:17: error: use of void as input register:',
+            '24:12: error: in function main/0',
         ])
 
 
