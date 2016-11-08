@@ -56,8 +56,8 @@ byte* viua::process::Process::opmsg(byte* addr) {
      *  To call a method using static dispatch (where a correct function is resolved during compilation) use
      *  "call" instruction.
      */
-    bool return_void = viua::bytecode::decoder::operands::is_void(addr);
     unsigned return_register = 0;
+    bool return_void = viua::bytecode::decoder::operands::is_void(addr);
 
     if (not return_void) {
         tie(addr, return_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
