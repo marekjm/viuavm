@@ -134,9 +134,16 @@ byte* viua::process::Process::opreceive(byte* addr) {
      */
     byte* return_addr = (addr-1);
 
-    unsigned target = 0, timeout = 0;
+    unsigned target = 0;
+    bool target_is_void = viua::bytecode::decoder::operands::is_void(addr);
 
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    if (not target_is_void) {
+        tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    } else {
+        addr = viua::bytecode::decoder::operands::fetch_void(addr);
+    }
+
+    unsigned timeout = 0;
     tie(addr, timeout) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     if (timeout and not timeout_active) {
