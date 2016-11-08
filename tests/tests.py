@@ -1497,6 +1497,28 @@ class KeywordIotaTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'iota_directive_used_outside_of_iota_scope.asm', "./sample/asm/keyword/iota/iota_directive_used_outside_of_iota_scope.asm:20:1: error: '.iota:' directive used outside of iota scope")
 
 
+class KeywordVoidTests(unittest.TestCase):
+    PATH = './sample/asm/keyword/void'
+
+    def testVoidInArg(self):
+        runTest(self, 'in_arg.asm', '')
+
+    def testVoidInCall(self):
+        runTest(self, 'in_call.asm', '')
+
+    def testVoidInJoin(self):
+        runTest(self, 'in_join.asm', '')
+
+    def testVoidInMsg(self):
+        runTest(self, 'in_receive.asm', '')
+
+    def testVoidInProcess(self):
+        runTest(self, 'in_process.asm', 'Hello World!')
+
+    def testVoidInReceive(self):
+        runTest(self, 'in_receive.asm', '')
+
+
 class KeywordDefaultTests(unittest.TestCase):
     """Tests for `default` keyword.
     """
