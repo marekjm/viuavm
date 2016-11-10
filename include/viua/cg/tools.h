@@ -23,6 +23,7 @@ namespace viua {
 
             OPCODE mnemonic_to_opcode(const std::string&);
             uint64_t calculate_bytecode_size(const std::vector<viua::cg::lex::Token>&);
+            uint64_t calculate_bytecode_size2(const std::vector<viua::cg::lex::Token>&);
         }
     }
 }

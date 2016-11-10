@@ -431,6 +431,7 @@ int main(int argc, char* argv[]) {
     }
     if (REPORT_BYTECODE_SIZE) {
         cout << viua::cg::tools::calculate_bytecode_size(cooked_tokens) << endl;
+        cout << viua::cg::tools::calculate_bytecode_size2(cooked_tokens) << endl;
         return 0;
     }
 
