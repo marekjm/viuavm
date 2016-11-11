@@ -1472,6 +1472,11 @@ class AssemblerErrorTests(unittest.TestCase):
             "20:12: error: already defined here:",
         ])
 
+    def testInvalidRegisterIndexInName(self):
+        runTestFailsToAssembleDetailed(self, 'invalid_register_index_in_name.asm', [
+            '21:12: error: invalid register index: a_name := "a"',
+        ])
+
 
 class KeywordIotaTests(unittest.TestCase):
     """Tests for `iota` keyword.
