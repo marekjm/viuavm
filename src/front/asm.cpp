@@ -361,7 +361,7 @@ int main(int argc, char* argv[]) {
     auto raw_tokens = viua::cg::lex::tokenise(source);
     decltype(raw_tokens) cooked_tokens;
     try {
-        cooked_tokens = viua::cg::lex::standardise(viua::cg::lex::reduce(raw_tokens));
+        cooked_tokens = viua::cg::lex::standardise(viua::cg::lex::cook(raw_tokens));
     } catch (const viua::cg::lex::InvalidSyntax& e) {
         display_error_in_context(raw_tokens, e, filename);
         return 1;

@@ -1056,7 +1056,7 @@ namespace viua {
                 return tokens;
             }
 
-            vector<Token> reduce(vector<Token> tokens) {
+            vector<Token> cook(vector<Token> tokens) {
                 /*
                  * Remove whitespace as first step to reduce noise in token stream.
                  * Remember not to remove newlines ('\n') because they act as separators
