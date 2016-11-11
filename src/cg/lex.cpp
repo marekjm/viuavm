@@ -1139,6 +1139,13 @@ namespace viua {
                 tokens = replace_defaults(tokens);
 
                 /*
+                 * Unroll instruction wrapped in '()' and '[]'.
+                 * This makes assembler's and static analyser's work easier since they can deal with linear
+                 * token sequence.
+                 */
+                tokens = unwrap_lines(tokens);
+
+                /*
                  * Move inlined blocks out of their functions.
                  * This makes life easier for functions at later processing stages as they do not have to deal with
                  * nested blocks.
@@ -1147,13 +1154,6 @@ namespace viua {
                  * functions.
                  */
                 tokens = move_inline_blocks_out(tokens);
-
-                /*
-                 * Unroll instruction wrapped in '()' and '[]'.
-                 * This makes assembler's and static analyser's work easier since they can deal with linear
-                 * token sequence.
-                 */
-                tokens = unwrap_lines(tokens);
 
                 /*
                  * Reduce newlines once more, since unwrap_lines() may sometimes insert a spurious newline into the
