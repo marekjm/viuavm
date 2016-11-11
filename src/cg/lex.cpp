@@ -1,4 +1,7 @@
 #include <sstream>
+#include <map>
+#include <set>
+#include <viua/bytecode/maps.h>
 #include <viua/support/string.h>
 #include <viua/cg/lex.h>
 using namespace std;
@@ -1056,7 +1059,150 @@ namespace viua {
                 return tokens;
             }
 
-            vector<Token> cook(vector<Token> tokens) {
+            static void assert_is_not_reserved_keyword(Token token, const string& message) {
+                string s = token.original();
+                static const set<string> reserved_keywords {
+                    /*
+                     * Used for timeouts in 'join' and 'receive' instructions
+                     */
+                    "infinity",
+
+                    /*
+                     *  Reserved as register set names.
+                     */
+                    "local",
+                    "static",
+                    "global",
+                    "temporary",
+
+                    /*
+                     * Reserved for future use.
+                     */
+                    "auto",
+                    "default",
+                    "undefined",
+                    "null",
+                    "void",
+                    "iota",
+                    "const",
+
+                    /*
+                     * Reserved for future use as boolean literals.
+                     */
+                    "true",
+                    "false",
+
+                    /*
+                     * Reserved for future use as instruction names.
+                     */
+                    "int",
+                    "int8",
+                    "int16",
+                    "int32",
+                    "int64",
+                    "uint",
+                    "uint8",
+                    "uint16",
+                    "uint32",
+                    "uint64",
+                    "float32",
+                    "float64",
+                    "string",
+                    "bits",
+                    "coroutine",
+                    "yield",
+                    "channel",
+                    "publish",
+                    "subscribe",
+
+                    /*
+                     * Reserved  for future use as bit-operation instruction names.
+                     * Shifts:
+                     *
+                     *      shl <target> <source> <width>
+                     *
+                     *          logical bit shift left;
+                     *          <source> is shifted left by <width> bits
+                     *          bits shifted out of <source> are put in <target>
+                     *          <target> has the same bitsize as <source>
+                     *
+                     *      ashr <target> <source> <width>
+                     *
+                     *          arithmetic bit shift right;
+                     *          same as logical bit shift right, only the highest bit is preserved
+                     *
+                     *      ashl <target> <source> <width>
+                     *
+                     *          arithmetic bit shift left;
+                     *          same as logical bit shift left, only the lowest bit is preserved
+                     */
+                    "shl",  // logical shift left
+                    "shr",  // logical shift right
+                    "ashl", // arithmetic shift left
+                    "ashr", // arithmetic shift right
+
+                    "rol",  // rotate left
+                    "ror",  // rotate right
+                };
+                if (reserved_keywords.count(s) or OP_SIZES.count(s)) {
+                    throw viua::cg::lex::InvalidSyntax(token, ("invalid " + message + ": '" + s + "' is a registered keyword"));
+                }
+            }
+
+            std::vector<Token> replace_named_registers(std::vector<Token> input_tokens) {
+                vector<Token> tokens;
+                map<string, string> names;
+                unsigned open_blocks = 0;
+
+                for (decltype(input_tokens)::size_type i = 0; i < input_tokens.size(); ++i) {
+                    const auto& token = input_tokens.at(i);
+
+                    if (str::isnum(token)) {
+                        tokens.push_back(token);
+                        continue;
+                    }
+
+                    if (token == ".function:" or token == ".closure:" or token == ".block:") {
+                        ++open_blocks;
+                    }
+                    if (token == ".end") {
+                        --open_blocks;
+                    }
+
+                    if (token == ".name:") {
+                        Token name = input_tokens.at(i+2);
+                        Token index = input_tokens.at(i+1);
+
+                        assert_is_not_reserved_keyword(name, "register name");
+
+                        if (not str::isnum(index)) {
+                            throw viua::cg::lex::InvalidSyntax(input_tokens.at(i+1), ("invalid register index: " + str::strencode(name) + " := " + str::enquote(str::strencode(index))));
+                        }
+
+                        names[name] = index;
+                        i += 2;
+                        continue;
+                    }
+
+                    if (names.count(token)) {
+                        tokens.emplace_back(token.line(), token.character(), names.at(token));
+                        tokens.back().original(token.str());
+                    } else if (token.str().at(0) == '@' and names.count(token.str().substr(1))) {
+                        tokens.emplace_back(token.line(), token.character(), ("@" + names.at(token.str().substr(1))));
+                        tokens.back().original(token.str().substr(1));
+                    } else {
+                        tokens.push_back(token);
+                    }
+
+                    if (open_blocks == 0) {
+                        names.clear();
+                    }
+                }
+
+                return tokens;
+            }
+
+            vector<Token> cook(vector<Token> tokens, const bool with_replaced_names) {
                 /*
                  * Remove whitespace as first step to reduce noise in token stream.
                  * Remember not to remove newlines ('\n') because they act as separators
@@ -1144,6 +1290,15 @@ namespace viua {
                  * token sequence.
                  */
                 tokens = unwrap_lines(tokens);
+
+                /*
+                 * Replace register names set by '.name:' directive by their register indexes.
+                 * At later processing stages functions need not concern themselves with names and
+                 * may operate on register indexes only.
+                 */
+                if (with_replaced_names) {
+                    tokens = replace_named_registers(tokens);
+                }
 
                 /*
                  * Move inlined blocks out of their functions.
