@@ -190,8 +190,6 @@ class Program {
     uint64_t size();
     unsigned long instructionCount();
 
-    static uint64_t countBytes(const std::vector<std::string>&);
-
     Program(uint64_t bts = 2);
     Program(const Program& that);
     ~Program();
