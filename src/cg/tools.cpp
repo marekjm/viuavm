@@ -1,4 +1,3 @@
-#include <iostream>
 #include <tuple>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/support/string.h>
@@ -90,18 +89,14 @@ namespace viua {
             static auto size_of_register_index_operand(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
                 uint64_t calculated_size = 0;
 
-                cout << "    size_of_register_index_operand(" << str::enquote(tokens.at(i).str()) << ", ...)" << endl;
                 if (tokens.at(i) == "void") {
-                    cout << "  increasing size for: void" << endl;
                     calculated_size += sizeof(byte);
                     ++i;
                 } else if (str::isnum(tokens.at(i))) {
-                    cout << "  increasing size for: register index" << endl;
                     calculated_size += sizeof(byte);
                     calculated_size += sizeof(int);
                     ++i;
                 } else if (tokens.at(i).str().at(0) == '@') {
-                    cout << "  increasing size for: register reference" << endl;
                     calculated_size += sizeof(byte);
                     calculated_size += sizeof(int);
                     ++i;
@@ -585,8 +580,6 @@ namespace viua {
                     if (token == "\n" or token == ".end") {
                         continue;
                     }
-
-                    cout << "calculating: " << token.str() << endl;
 
                     uint64_t increase = 0;
                     if (tokens.at(i) == "nop") {
