@@ -223,7 +223,17 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
         }
 
         if (token == "enter") {
-            check_block_body(block_bodies.at(body_tokens.at(i+1)), 0, registers, block_bodies, debug);
+            try {
+                check_block_body(block_bodies.at(body_tokens.at(i+1)), 0, registers, block_bodies, debug);
+            } catch (viua::cg::lex::InvalidSyntax& e) {
+                viua::cg::lex::InvalidSyntax base_error {token, ("after entering block " + str::enquote(body_tokens.at(i+1).original()))};
+                base_error.add(body_tokens.at(i+1));
+                throw viua::cg::lex::TracedSyntaxError().append(e).append(base_error);
+            } catch (viua::cg::lex::TracedSyntaxError& e) {
+                viua::cg::lex::InvalidSyntax base_error {token, ("after entering block " + str::enquote(body_tokens.at(i+1).original()))};
+                base_error.add(body_tokens.at(i+1));
+                throw e.append(base_error);
+            }
             i = skip_till_next_line(body_tokens, i);
             continue;
         }
