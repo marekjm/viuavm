@@ -115,10 +115,11 @@ namespace viua {
 
             std::vector<Token> replace_iotas(std::vector<Token>);
             std::vector<Token> replace_defaults(std::vector<Token>);
+            std::vector<Token> replace_named_registers(std::vector<Token>);
             std::vector<Token> move_inline_blocks_out(std::vector<Token>);
             std::vector<Token> unwrap_lines(std::vector<Token>, bool full = true);
 
-            std::vector<Token> reduce(std::vector<Token>);
+            std::vector<Token> cook(std::vector<Token>, const bool = true);
         }
     }
 }

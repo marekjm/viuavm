@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016 Marek Marecki
+;   Copyright (C) 2016 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -17,66 +17,14 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: watchdog_process/1
-    arg 1 0
-
-    ;print 1
-
-    remove 4 1 (strstore 3 "function")
-
-    echo (strstore 5 "process spawned with <")
-    echo 4
-    print (strstore 5 "> died")
-
+.function: greeter/0
+    print (strstore iota "Hello World!")
     return
 .end
 
-.function: broken_process/0
-    watchdog watchdog_process/1
-
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    throw (istore 1 42)
-    return
-.end
-
-.function: main/1
-    ;frame 0
-    ;watchdog watchdog_process/0
-
+.function: main/0
     frame 0
-    process void broken_process/0
+    process void greeter/0
 
     izero 0
     return

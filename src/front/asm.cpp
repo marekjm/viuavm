@@ -359,9 +359,10 @@ int main(int argc, char* argv[]) {
 
     auto source = read_file(filename);
     auto raw_tokens = viua::cg::lex::tokenise(source);
-    decltype(raw_tokens) cooked_tokens;
+    decltype(raw_tokens) cooked_tokens, cooked_tokens_without_names_replaced;
     try {
-        cooked_tokens = viua::cg::lex::standardise(viua::cg::lex::reduce(raw_tokens));
+        cooked_tokens = viua::cg::lex::standardise(viua::cg::lex::cook(raw_tokens));
+        cooked_tokens_without_names_replaced = viua::cg::lex::standardise(viua::cg::lex::cook(raw_tokens, false));
     } catch (const viua::cg::lex::InvalidSyntax& e) {
         display_error_in_context(raw_tokens, e, filename);
         return 1;
@@ -399,23 +400,23 @@ int main(int argc, char* argv[]) {
     ///////////////////////////////////////////
     // INITIAL VERIFICATION OF CODE CORRECTNESS
     try {
-        assembler::verify::directives(cooked_tokens);
-        assembler::verify::instructions(cooked_tokens);
-        assembler::verify::ressInstructions(cooked_tokens, AS_LIB);
-        assembler::verify::functionNames(cooked_tokens);
-        assembler::verify::functionBodiesAreNonempty(cooked_tokens);
-        assembler::verify::blockTries(cooked_tokens, blocks.names, blocks.signatures);
-        assembler::verify::blockCatches(cooked_tokens, blocks.names, blocks.signatures);
-        assembler::verify::frameBalance(cooked_tokens);
-        assembler::verify::functionCallArities(cooked_tokens);
-        assembler::verify::msgArities(cooked_tokens);
-        assembler::verify::functionsEndWithReturn(cooked_tokens);
-        assembler::verify::blockBodiesAreNonempty(cooked_tokens);
-        assembler::verify::jumpsAreInRange(cooked_tokens);
-        assembler::verify::framesHaveNoGaps(cooked_tokens);
-        assembler::verify::blocksEndWithFinishingInstruction(cooked_tokens);
+        assembler::verify::directives(cooked_tokens_without_names_replaced);
+        assembler::verify::instructions(cooked_tokens_without_names_replaced);
+        assembler::verify::ressInstructions(cooked_tokens_without_names_replaced, AS_LIB);
+        assembler::verify::functionNames(cooked_tokens_without_names_replaced);
+        assembler::verify::functionBodiesAreNonempty(cooked_tokens_without_names_replaced);
+        assembler::verify::blockTries(cooked_tokens_without_names_replaced, blocks.names, blocks.signatures);
+        assembler::verify::blockCatches(cooked_tokens_without_names_replaced, blocks.names, blocks.signatures);
+        assembler::verify::frameBalance(cooked_tokens_without_names_replaced);
+        assembler::verify::functionCallArities(cooked_tokens_without_names_replaced);
+        assembler::verify::msgArities(cooked_tokens_without_names_replaced);
+        assembler::verify::functionsEndWithReturn(cooked_tokens_without_names_replaced);
+        assembler::verify::blockBodiesAreNonempty(cooked_tokens_without_names_replaced);
+        assembler::verify::jumpsAreInRange(cooked_tokens_without_names_replaced);
+        assembler::verify::framesHaveNoGaps(cooked_tokens_without_names_replaced);
+        assembler::verify::blocksEndWithFinishingInstruction(cooked_tokens_without_names_replaced);
         if (PERFORM_STATIC_ANALYSIS) {
-            assembler::verify::manipulationOfDefinedRegisters(cooked_tokens, blocks.tokens, DEBUG);
+            assembler::verify::manipulationOfDefinedRegisters(cooked_tokens_without_names_replaced, blocks.tokens, DEBUG);
         }
     } catch (const viua::cg::lex::InvalidSyntax& e) {
         display_error_in_context(raw_tokens, e, filename);
@@ -431,6 +432,7 @@ int main(int argc, char* argv[]) {
     }
     if (REPORT_BYTECODE_SIZE) {
         cout << viua::cg::tools::calculate_bytecode_size(cooked_tokens) << endl;
+        cout << viua::cg::tools::calculate_bytecode_size2(cooked_tokens) << endl;
         return 0;
     }
 

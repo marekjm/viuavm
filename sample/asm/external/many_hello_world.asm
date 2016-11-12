@@ -33,7 +33,7 @@
     -- not block the execution, and
     -- detach the process as we do not care about its return value
     frame ^[(pamv 0 (arg 1 0))]
-    process 0 printer_wrapper/1
+    process void printer_wrapper/1
     return
 .end
 

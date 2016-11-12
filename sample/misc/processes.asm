@@ -42,7 +42,7 @@
 
     ; spawn a new process
     frame ^[(param 0 counter)]
-    process 0 run_in_a_process/1
+    process void run_in_a_process/1
 
     ; take advantage of tail recursion in Viua and
     ; elegantly follow with process spawner execution

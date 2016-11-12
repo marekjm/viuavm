@@ -201,7 +201,7 @@ int main(int argc, char* argv[]) {
     try {
         tokens = viua::cg::lex::tokenise(source);
         if (not MANUAL_REDUCING) {
-            tokens = viua::cg::lex::standardise(viua::cg::lex::reduce(tokens));
+            tokens = viua::cg::lex::standardise(viua::cg::lex::cook(tokens));
         }
         if (MANUAL_REDUCING) {
             if (REDUCE_WHITESPACE or REDUCE_DIRECTIVES) {

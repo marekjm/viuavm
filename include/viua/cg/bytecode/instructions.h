@@ -31,7 +31,7 @@
 /** typedefs for various types of operands
  *  that Viua asm instructions may use.
  */
-typedef std::tuple<bool, int> int_op;
+typedef std::tuple<bool, int, bool> int_op;
 typedef std::tuple<bool, byte> byte_op;
 typedef std::tuple<bool, float> float_op;
 

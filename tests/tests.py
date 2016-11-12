@@ -151,14 +151,31 @@ def valgrindSummary(text):
         'bytes': int(total_heap_usage_matched.group(3).replace(',', '')),
     }
 
-    summary = {'heap': {}, 'leak': {}}
-    summary['heap']['in_use_at_exit'] = valgrindBytesInBlocks(interesting_lines[1], valgrind_regex_heap_summary_in_use_at_exit)
-    summary['heap']['total_heap_usage'] = total_heap_usage
-    summary['leak']['definitely_lost'] = valgrindBytesInBlocks(interesting_lines[5], valgrind_regex_leak_summary_definitely_lost)
-    summary['leak']['indirectly_lost'] = valgrindBytesInBlocks(interesting_lines[6], valgrind_regex_leak_summary_indirectly_lost)
-    summary['leak']['possibly_lost'] = valgrindBytesInBlocks(interesting_lines[7], valgrind_regex_leak_summary_possibly_lost)
-    summary['leak']['still_reachable'] = valgrindBytesInBlocks(interesting_lines[8], valgrind_regex_leak_summary_still_reachable)
-    summary['leak']['suppressed'] = valgrindBytesInBlocks(interesting_lines[9], valgrind_regex_leak_summary_suppressed)
+    summary = {
+        'heap': {
+            'in_use_at_exit': valgrindBytesInBlocks(interesting_lines[1], valgrind_regex_heap_summary_in_use_at_exit),
+            'total_heap_usage': total_heap_usage,
+        },
+        'leak': {
+            'definitely_lost': {'bytes': 0, 'blocks': 0},
+            'indirectly_lost': {'bytes': 0, 'blocks': 0},
+            'possibly_lost': {'bytes': 0, 'blocks': 0},
+            'still_reachable': {'bytes': 0, 'blocks': 0},
+            'suppressed': {'bytes': 0, 'blocks': 0},
+        }
+    }
+    if summary['heap']['in_use_at_exit']['bytes'] == 0:
+        # early return because if no bytes were leaked then there's no use in analysing Valgrind's output
+        # also, in such a case Valgrind does not generate the report so we wouldn't get any results anyway (only a bunch of regex-match errors)
+        return summary
+    try:
+        summary['leak']['definitely_lost'] = valgrindBytesInBlocks(interesting_lines[5], valgrind_regex_leak_summary_definitely_lost)
+        summary['leak']['indirectly_lost'] = valgrindBytesInBlocks(interesting_lines[6], valgrind_regex_leak_summary_indirectly_lost)
+        summary['leak']['possibly_lost'] = valgrindBytesInBlocks(interesting_lines[7], valgrind_regex_leak_summary_possibly_lost)
+        summary['leak']['still_reachable'] = valgrindBytesInBlocks(interesting_lines[8], valgrind_regex_leak_summary_still_reachable)
+        summary['leak']['suppressed'] = valgrindBytesInBlocks(interesting_lines[9], valgrind_regex_leak_summary_suppressed)
+    except IndexError:
+        pass
     return summary
 
 def valgrindCheck(self, path):
@@ -1196,10 +1213,10 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
             '20:12: error: in function main/0',
         ])
 
-    def testUseOfEmptyOperandInIinc(self):
-        runTestFailsToAssembleDetailed(self, 'use_of_empty_operand_in_iinc.asm', [
-            '22:10: error: use of empty register: value := 1',
-            '20:12: error: in function main/0',
+    def testUseOfVoidAsInputRegister(self):
+        runTestFailsToAssembleDetailed(self, 'void_as_input_register.asm', [
+            '26:17: error: use of void as input register:',
+            '24:12: error: in function main/0',
         ])
 
 
@@ -1455,6 +1472,11 @@ class AssemblerErrorTests(unittest.TestCase):
             "20:12: error: already defined here:",
         ])
 
+    def testInvalidRegisterIndexInName(self):
+        runTestFailsToAssembleDetailed(self, 'invalid_register_index_in_name.asm', [
+            '21:12: error: invalid register index: a_name := "a"',
+        ])
+
 
 class KeywordIotaTests(unittest.TestCase):
     """Tests for `iota` keyword.
@@ -1478,6 +1500,28 @@ class KeywordIotaTests(unittest.TestCase):
 
     def testIotaDirectiveUsedOutsideOfIotaScope(self):
         runTestFailsToAssemble(self, 'iota_directive_used_outside_of_iota_scope.asm', "./sample/asm/keyword/iota/iota_directive_used_outside_of_iota_scope.asm:20:1: error: '.iota:' directive used outside of iota scope")
+
+
+class KeywordVoidTests(unittest.TestCase):
+    PATH = './sample/asm/keyword/void'
+
+    def testVoidInArg(self):
+        runTest(self, 'in_arg.asm', '')
+
+    def testVoidInCall(self):
+        runTest(self, 'in_call.asm', '')
+
+    def testVoidInJoin(self):
+        runTest(self, 'in_join.asm', '')
+
+    def testVoidInMsg(self):
+        runTest(self, 'in_receive.asm', '')
+
+    def testVoidInProcess(self):
+        runTest(self, 'in_process.asm', 'Hello World!')
+
+    def testVoidInReceive(self):
+        runTest(self, 'in_receive.asm', '')
 
 
 class KeywordDefaultTests(unittest.TestCase):

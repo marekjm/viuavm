@@ -40,6 +40,19 @@ string disassembler::intop(byte* ptr) {
 static int decode_integer(byte *ptr) {
     return *reinterpret_cast<int*>(ptr);
 }
+static byte* disassemble_target_register(ostream& oss, byte *ptr) {
+    if ((*ptr == OT_REGISTER_INDEX) || (*ptr == OT_REGISTER_REFERENCE)) {
+        oss << " " << disassembler::intop(ptr);
+        pointer::inc<bool, byte>(ptr);
+        pointer::inc<int, byte>(ptr);
+    }
+    if (*ptr == OT_VOID) {
+        oss << " void";
+        ++ptr;
+        pointer::inc<int, byte>(ptr);
+    }
+    return ptr;
+}
 tuple<string, unsigned> disassembler::instruction(byte* ptr) {
     byte* bptr = ptr;
 
@@ -72,9 +85,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         bptr += s.size();
         ++bptr; // for null character terminating the C-style string not included in std::string
     } else if ((op == CALL) or (op == PROCESS) or (op == CLOSURE) or (op == FUNCTION) or (op == CLASS) or (op == NEW) or (op == DERIVE) or (op == MSG)) {
-        oss << " " << intop(bptr);
-        pointer::inc<bool, byte>(bptr);
-        pointer::inc<int, byte>(bptr);
+        bptr = disassemble_target_register(oss, bptr);
 
         oss << " ";
         string fn_name = string(reinterpret_cast<char*>(bptr));
@@ -141,10 +152,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case THROW:
         case PULL:
         case REGISTER:
-            oss << " " << intop(ptr);
-            pointer::inc<bool, byte>(ptr);
-            pointer::inc<int, byte>(ptr);
-
+            ptr = disassemble_target_register(oss, ptr);
             break;
         case ISTORE:
         case ITOF:
@@ -164,9 +172,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case VPUSH:
         case VLEN:
         case FCALL:
-            oss << " " << intop(ptr);
-            pointer::inc<bool, byte>(ptr);
-            pointer::inc<int, byte>(ptr);
+            ptr = disassemble_target_register(oss, ptr);
 
             oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
@@ -203,9 +209,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case VAT:
         case INSERT:
         case REMOVE:
-            oss << " " << intop(ptr);
-            pointer::inc<bool, byte>(ptr);
-            pointer::inc<int, byte>(ptr);
+            ptr = disassemble_target_register(oss, ptr);
 
             oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
@@ -243,9 +247,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
 
             break;
         case FSTORE:
-            oss << " " << intop(ptr);
-            pointer::inc<bool, byte>(ptr);
-            pointer::inc<int, byte>(ptr);
+            ptr = disassemble_target_register(oss, ptr);
 
             oss << " ";
             oss << *reinterpret_cast<float*>(ptr);
@@ -272,13 +274,9 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
             }
             break;
         case JOIN:
-            oss << " " << intop(ptr);
-            pointer::inc<bool, byte>(ptr);
-            pointer::inc<int, byte>(ptr);
+            ptr = disassemble_target_register(oss, ptr);
         case RECEIVE:
-            oss << " " << intop(ptr);
-            pointer::inc<bool, byte>(ptr);
-            pointer::inc<int, byte>(ptr);
+            ptr = disassemble_target_register(oss, ptr);
 
             pointer::inc<bool, byte>(ptr);
             oss << ' ';

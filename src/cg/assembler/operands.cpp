@@ -29,8 +29,13 @@ int_op assembler::operands::getint(const string& s) {
     if (s.size() == 0) {
         throw "empty string cannot be used as operand";
     }
+
+    if (s == "void") {
+        return tuple<bool, int, bool>(false, 0, true);
+    }
+
     bool ref = s[0] == '@';
-    return tuple<bool, int>(ref, stoi(ref ? str::sub(s, 1) : s));
+    return tuple<bool, int, bool>(ref, stoi(ref ? str::sub(s, 1) : s), false);
 }
 
 byte_op assembler::operands::getbyte(const string& s) {

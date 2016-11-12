@@ -96,7 +96,7 @@
     watchdog watchdog_process/1
 
     frame 0
-    process 0 a_detached_concurrent_process/0
+    process void a_detached_concurrent_process/0
 
     frame 0
     process 2 a_joined_concurrent_process/0

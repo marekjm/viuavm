@@ -51,7 +51,7 @@
 
 .function: main/0
     frame ^[(pamv iota (istore 1 5)) (pamv iota (self 1))]
-    process 0 message_sender/2
+    process void message_sender/2
 
     print (receive iota)
 

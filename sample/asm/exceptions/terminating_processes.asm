@@ -76,7 +76,7 @@
     ; spawn_process/1 receives number of cycles to burn as its sole parameter and
     ; forwards it to cycle_burner/2
     param 1 (arg 1 0)
-    process 0 cycle_burner/2
+    process void cycle_burner/2
 
     return
 .end
@@ -87,7 +87,7 @@
 
     ; spawn process that will crash
     frame 0
-    process 0 will_be_terminated/0
+    process void will_be_terminated/0
 
     ; spawn some more processes that will run so that the
     ; will_be_terminated/0 process crashes while some other

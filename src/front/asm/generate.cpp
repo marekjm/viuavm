@@ -122,7 +122,7 @@ static string resolveregister(Token token, const map<string, int>& names) {
         // as register reference)
         out.str(reg);
     } else if (reg == "void") {
-        out << '0';
+        out << reg;
     } else {
         /*  Case is no longer basic - it seems that a register is being accessed by name.
          *  Names must be checked to see if the one used was declared.
@@ -388,7 +388,7 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
             timeout_milliseconds = timeout_to_int(timeout_chnk);
             ++timeout_milliseconds;
         }
-        int_op timeout{false, timeout_milliseconds};
+        int_op timeout{false, timeout_milliseconds, false};
         program.opjoin(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)), timeout);
     } else if (tokens.at(i) == "send") {
         program.opsend(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
@@ -399,7 +399,7 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
             timeout_milliseconds = timeout_to_int(timeout_chnk);
             ++timeout_milliseconds;
         }
-        int_op timeout{false, timeout_milliseconds};
+        int_op timeout{false, timeout_milliseconds, false};
         program.opreceive(assembler::operands::getint(resolveregister(regno_chnk, names)), timeout);
     } else if (tokens.at(i) == "watchdog") {
         program.opwatchdog(tokens.at(i+1));

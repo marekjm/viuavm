@@ -17,43 +17,14 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.block: pull_and_do_nothing
-    pull 3
-    leave
-.end
-
-.block: await_message
-    idec 1
-    receive 3 100ms
-    leave
-.end
-
-.function: message_sender/2
-    .name: iota times
-    .name: iota pid
-    arg times .iota: 0 iota
-    arg pid 1
-
-    try
-    catch "Exception" pull_and_do_nothing
-    enter await_message
-
-    if times next_iteration
-    send pid (strstore 3 "Hello World!")
-    return
-
-    .mark: next_iteration
-    frame ^[(pamv iota times) (pamv iota pid)]
-    tailcall message_sender/2
-
-    return
-.end
-
 .function: main/0
-    frame ^[(pamv iota (istore 1 5)) (pamv iota (self 1))]
-    process void message_sender/2
+    strstore (.name: iota format) "Hello #{0}!"
 
-    print (receive iota infinity)
+    vec (.name: iota format_params) (strstore iota "World") 1
+
+    frame ^[(param iota format) (param iota format_params)]
+    ;msg void format/
+    msg 0 format/
 
     izero 0
     return

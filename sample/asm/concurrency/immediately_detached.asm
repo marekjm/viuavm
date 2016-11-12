@@ -95,7 +95,7 @@
 
 .function: main/0
     frame 0
-    process 0 running_detached/0
+    process void running_detached/0
 
     izero 0
     return

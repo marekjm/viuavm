@@ -79,7 +79,7 @@
     watchdog watchdog_process/1
 
     frame 0
-    process 0 broken_process/0
+    process void broken_process/0
 
     izero 0
     return

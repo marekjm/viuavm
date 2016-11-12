@@ -178,7 +178,7 @@ map<string, int> assembler::ce::getnames(const vector<viua::cg::lex::Token>& tok
         try {
             names[name] = stoi(reg);
         } catch (const std::invalid_argument& e) {
-            throw ("invalid register index in name directive: " + str::strencode(name) + " := " + str::enquote(str::strencode(reg)));
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i+1), ("invalid register index: " + str::strencode(name) + " := " + str::enquote(str::strencode(reg))));
         }
     }
     return names;

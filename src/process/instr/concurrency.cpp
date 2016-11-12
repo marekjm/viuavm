@@ -32,9 +32,15 @@ byte* viua::process::Process::opprocess(byte* addr) {
     /*  Run process instruction.
      */
     unsigned target = 0;
-    string call_name;
+    bool target_is_void = viua::bytecode::decoder::operands::is_void(addr);
 
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    if (not target_is_void) {
+        tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    } else {
+        addr = viua::bytecode::decoder::operands::fetch_void(addr);
+    }
+
+    string call_name;
     tie(addr, call_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     bool is_native = scheduler->isNativeFunction(call_name);
@@ -46,9 +52,8 @@ byte* viua::process::Process::opprocess(byte* addr) {
 
     frame_new->function_name = call_name;
 
-    bool disown = (target == 0);
-    auto spawned_process = scheduler->spawn(std::move(frame_new), this, disown);
-    if (not disown) {
+    auto spawned_process = scheduler->spawn(std::move(frame_new), this, target_is_void);
+    if (not target_is_void) {
         place(target, new viua::types::Process(spawned_process));
     }
 
@@ -62,9 +67,16 @@ byte* viua::process::Process::opjoin(byte* addr) {
      */
     byte* return_addr = (addr-1);
 
-    unsigned target = 0, source = 0, timeout = 0;
+    unsigned target = 0;
+    bool target_is_void = viua::bytecode::decoder::operands::is_void(addr);
 
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    if (not target_is_void) {
+        tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    } else {
+        addr = viua::bytecode::decoder::operands::fetch_void(addr);
+    }
+
+    unsigned source = 0, timeout = 0;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, timeout) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
@@ -83,7 +95,7 @@ byte* viua::process::Process::opjoin(byte* addr) {
             if (thrd->terminated()) {
                 thrown = thrd->transferActiveException();
             }
-            if (target) {
+            if (not target_is_void) {
                 place(target, thrd->getReturnValue().release());
             }
         } else if (timeout_active and (not wait_until_infinity) and (waiting_until < std::chrono::steady_clock::now())) {
@@ -122,9 +134,16 @@ byte* viua::process::Process::opreceive(byte* addr) {
      */
     byte* return_addr = (addr-1);
 
-    unsigned target = 0, timeout = 0;
+    unsigned target = 0;
+    bool target_is_void = viua::bytecode::decoder::operands::is_void(addr);
 
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    if (not target_is_void) {
+        tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    } else {
+        addr = viua::bytecode::decoder::operands::fetch_void(addr);
+    }
+
+    unsigned timeout = 0;
     tie(addr, timeout) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     if (timeout and not timeout_active) {
