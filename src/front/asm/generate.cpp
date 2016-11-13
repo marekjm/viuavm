@@ -99,7 +99,7 @@ static tuple<uint64_t, enum JUMPTYPE> resolvejump(Token token, const map<string,
     return tuple<uint64_t, enum JUMPTYPE>(addr, jump_type);
 }
 
-static string resolveregister(Token token, const map<string, int>& names) {
+static string resolveregister(Token token) {
     /*  This function is used to register numbers when a register is accessed, e.g.
      *  in `istore` instruction or in `branch` in condition operand.
      *
@@ -124,24 +124,7 @@ static string resolveregister(Token token, const map<string, int>& names) {
     } else if (reg == "void") {
         out << reg;
     } else {
-        /*  Case is no longer basic - it seems that a register is being accessed by name.
-         *  Names must be checked to see if the one used was declared.
-         */
-        if (reg[0] == '@') {
-            out << '@';
-            reg = str::sub(reg, 1);
-        }
-        try {
-            out << names.at(reg);
-        } catch (const std::out_of_range& e) {
-            // first, check if the name is non-empty
-            if (reg != "") {
-                // Jinkies! This name was not declared.
-                throw viua::cg::lex::InvalidSyntax(token, ("undeclared register name: " + str::strencode(reg)));
-            } else {
-                throw viua::cg::lex::InvalidSyntax(token, "not enough operands");
-            }
-        }
+        throw viua::cg::lex::InvalidSyntax(token, "not enough operands");
     }
     return out.str();
 }
@@ -204,7 +187,7 @@ static int timeout_to_int(const string& timeout) {
     }
 }
 
-static uint64_t assemble_instruction(Program& program, uint64_t& instruction, uint64_t i, const vector<Token>& tokens, map<string, int>& marks, map<string, int>& names) {
+static uint64_t assemble_instruction(Program& program, uint64_t& instruction, uint64_t i, const vector<Token>& tokens, map<string, int>& marks) {
     /*  This is main assembly loop.
      *  It iterates over lines with instructions and
      *  uses bytecode generation API to fill the program with instructions and
@@ -221,128 +204,128 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
     if (tokens.at(i) == "nop") {
         program.opnop();
     } else if (tokens.at(i) == "izero") {
-        program.opizero(assembler::operands::getint(resolveregister(tokens.at(i+1), names)));
+        program.opizero(assembler::operands::getint(resolveregister(tokens.at(i+1))));
     } else if (tokens.at(i) == "istore") {
-        program.opistore(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
+        program.opistore(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
     } else if (tokens.at(i) == "iadd") {
-        program.opiadd(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
+        program.opiadd(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "isub") {
-        program.opisub(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
+        program.opisub(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "imul") {
-        program.opimul(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
+        program.opimul(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "idiv") {
-        program.opidiv(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
+        program.opidiv(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "ilt") {
-        program.opilt(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
+        program.opilt(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "ilte") {
-        program.opilte(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
+        program.opilte(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "igte") {
-        program.opigte(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
+        program.opigte(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "igt") {
-        program.opigt(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
+        program.opigt(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "ieq") {
-        program.opieq(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
+        program.opieq(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "iinc") {
-        program.opiinc(assembler::operands::getint(resolveregister(tokens.at(i+1), names)));
+        program.opiinc(assembler::operands::getint(resolveregister(tokens.at(i+1))));
     } else if (tokens.at(i) == "idec") {
-        program.opidec(assembler::operands::getint(resolveregister(tokens.at(i+1), names)));
+        program.opidec(assembler::operands::getint(resolveregister(tokens.at(i+1))));
     } else if (tokens.at(i) == "fstore") {
-        program.opfstore(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), static_cast<float>(stod(tokens.at(i+2).str())));
+        program.opfstore(assembler::operands::getint(resolveregister(tokens.at(i+1))), static_cast<float>(stod(tokens.at(i+2).str())));
     } else if (tokens.at(i) == "fadd") {
-        program.opfadd(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
+        program.opfadd(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "fsub") {
-        program.opfsub(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
+        program.opfsub(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "fmul") {
-        program.opfmul(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
+        program.opfmul(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "fdiv") {
-        program.opfdiv(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
+        program.opfdiv(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "flt") {
-        program.opflt(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
+        program.opflt(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "flte") {
-        program.opflte(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
+        program.opflte(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "fgt") {
-        program.opfgt(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
+        program.opfgt(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "fgte") {
-        program.opfgte(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
+        program.opfgte(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "feq") {
-        program.opfeq(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
+        program.opfeq(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "itof") {
-        program.opitof(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
+        program.opitof(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
     } else if (tokens.at(i) == "ftoi") {
-        program.opftoi(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
+        program.opftoi(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
     } else if (tokens.at(i) == "stoi") {
-        program.opstoi(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
+        program.opstoi(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
     } else if (tokens.at(i) == "stof") {
-        program.opstof(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
+        program.opstof(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
     } else if (tokens.at(i) == "strstore") {
-        program.opstrstore(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), tokens.at(i+2));
+        program.opstrstore(assembler::operands::getint(resolveregister(tokens.at(i+1))), tokens.at(i+2));
     } else if (tokens.at(i) == "vec") {
-        program.opvec(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
+        program.opvec(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "vinsert") {
         Token vec = tokens.at(i+1), src = tokens.at(i+2), pos = tokens.at(i+3);
         if (pos == "\n") { pos = Token(src.line(), src.character(), "0"); }
-        program.opvinsert(assembler::operands::getint(resolveregister(vec, names)), assembler::operands::getint(resolveregister(src, names)), assembler::operands::getint(resolveregister(pos, names)));
+        program.opvinsert(assembler::operands::getint(resolveregister(vec)), assembler::operands::getint(resolveregister(src)), assembler::operands::getint(resolveregister(pos)));
     } else if (tokens.at(i) == "vpush") {
-        program.opvpush(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
+        program.opvpush(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
     } else if (tokens.at(i) == "vpop") {
         Token vec = tokens.at(i+1), dst = tokens.at(i+2), pos = tokens.at(i+3);
-        program.opvpop(assembler::operands::getint(resolveregister(vec, names)), assembler::operands::getint(resolveregister(dst, names)), assembler::operands::getint(resolveregister(pos, names)));
+        program.opvpop(assembler::operands::getint(resolveregister(vec)), assembler::operands::getint(resolveregister(dst)), assembler::operands::getint(resolveregister(pos)));
     } else if (tokens.at(i) == "vat") {
         Token vec = tokens.at(i+1), dst = tokens.at(i+2), pos = tokens.at(i+3);
         if (pos == "\n") { pos = Token(dst.line(), dst.character(), "-1"); }
-        program.opvat(assembler::operands::getint(resolveregister(vec, names)), assembler::operands::getint(resolveregister(dst, names)), assembler::operands::getint(resolveregister(pos, names)));
+        program.opvat(assembler::operands::getint(resolveregister(vec)), assembler::operands::getint(resolveregister(dst)), assembler::operands::getint(resolveregister(pos)));
     } else if (tokens.at(i) == "vlen") {
-        program.opvlen(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
+        program.opvlen(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
     } else if (tokens.at(i) == "not") {
-        program.opnot(assembler::operands::getint(resolveregister(tokens.at(i+1), names)));
+        program.opnot(assembler::operands::getint(resolveregister(tokens.at(i+1))));
     } else if (tokens.at(i) == "and") {
-        program.opand(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
+        program.opand(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "or") {
-        program.opor(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
+        program.opor(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "move") {
-        program.opmove(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
+        program.opmove(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
     } else if (tokens.at(i) == "copy") {
-        program.opcopy(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
+        program.opcopy(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
     } else if (tokens.at(i) == "ptr") {
-        program.opptr(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
+        program.opptr(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
     } else if (tokens.at(i) == "swap") {
-        program.opswap(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
+        program.opswap(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
     } else if (tokens.at(i) == "delete") {
-        program.opdelete(assembler::operands::getint(resolveregister(tokens.at(i+1), names)));
+        program.opdelete(assembler::operands::getint(resolveregister(tokens.at(i+1))));
     } else if (tokens.at(i) == "isnull") {
-        program.opisnull(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
+        program.opisnull(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
     } else if (tokens.at(i) == "ress") {
         program.opress(tokens.at(i+1));
     } else if (tokens.at(i) == "tmpri") {
-        program.optmpri(assembler::operands::getint(resolveregister(tokens.at(i+1), names)));
+        program.optmpri(assembler::operands::getint(resolveregister(tokens.at(i+1))));
     } else if (tokens.at(i) == "tmpro") {
-        program.optmpro(assembler::operands::getint(resolveregister(tokens.at(i+1), names)));
+        program.optmpro(assembler::operands::getint(resolveregister(tokens.at(i+1))));
     } else if (tokens.at(i) == "print") {
-        program.opprint(assembler::operands::getint(resolveregister(tokens.at(i+1), names)));
+        program.opprint(assembler::operands::getint(resolveregister(tokens.at(i+1))));
     } else if (tokens.at(i) == "echo") {
-        program.opecho(assembler::operands::getint(resolveregister(tokens.at(i+1), names)));
+        program.opecho(assembler::operands::getint(resolveregister(tokens.at(i+1))));
     } else if (tokens.at(i) == "capture") {
-        program.openclose(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
+        program.openclose(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "capturecopy") {
-        program.openclosecopy(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
+        program.openclosecopy(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "capturemove") {
-        program.openclosemove(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
+        program.openclosemove(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "closure") {
-        program.opclosure(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), tokens.at(i+2));
+        program.opclosure(assembler::operands::getint(resolveregister(tokens.at(i+1))), tokens.at(i+2));
     } else if (tokens.at(i) == "function") {
-        program.opfunction(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), tokens.at(i+2));
+        program.opfunction(assembler::operands::getint(resolveregister(tokens.at(i+1))), tokens.at(i+2));
     } else if (tokens.at(i) == "fcall") {
-        program.opfcall(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
+        program.opfcall(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
     } else if (tokens.at(i) == "frame") {
-        program.opframe(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
+        program.opframe(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
     } else if (tokens.at(i) == "param") {
-        program.opparam(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
+        program.opparam(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
     } else if (tokens.at(i) == "pamv") {
-        program.oppamv(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
+        program.oppamv(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
     } else if (tokens.at(i) == "arg") {
-        program.oparg(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
+        program.oparg(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
     } else if (tokens.at(i) == "argc") {
-        program.opargc(assembler::operands::getint(resolveregister(tokens.at(i+1), names)));
+        program.opargc(assembler::operands::getint(resolveregister(tokens.at(i+1))));
     } else if (tokens.at(i) == "call") {
         /** Full form of call instruction has two operands: function name and return value register index.
          *  If call is given only one operand - it means it is the instruction index and returned value is discarded.
@@ -374,13 +357,13 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
             reg = Token(fn_name.line(), fn_name.character(), "0");
         }
 
-        program.opcall(assembler::operands::getint(resolveregister(reg, names)), fn_name.str());
+        program.opcall(assembler::operands::getint(resolveregister(reg)), fn_name.str());
     } else if (tokens.at(i) == "tailcall") {
         program.optailcall(tokens.at(i+1));
     } else if (tokens.at(i) == "process") {
-        program.opprocess(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), tokens.at(i+2));
+        program.opprocess(assembler::operands::getint(resolveregister(tokens.at(i+1))), tokens.at(i+2));
     } else if (tokens.at(i) == "self") {
-        program.opself(assembler::operands::getint(resolveregister(tokens.at(i+1), names)));
+        program.opself(assembler::operands::getint(resolveregister(tokens.at(i+1))));
     } else if (tokens.at(i) == "join") {
         Token a_chnk = tokens.at(i+1), b_chnk = tokens.at(i+2), timeout_chnk = tokens.at(i+3);
         int timeout_milliseconds = 0;
@@ -389,9 +372,9 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
             ++timeout_milliseconds;
         }
         int_op timeout{false, timeout_milliseconds, false};
-        program.opjoin(assembler::operands::getint(resolveregister(a_chnk, names)), assembler::operands::getint(resolveregister(b_chnk, names)), timeout);
+        program.opjoin(assembler::operands::getint(resolveregister(a_chnk)), assembler::operands::getint(resolveregister(b_chnk)), timeout);
     } else if (tokens.at(i) == "send") {
-        program.opsend(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)));
+        program.opsend(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
     } else if (tokens.at(i) == "receive") {
         Token regno_chnk = tokens.at(i+1), timeout_chnk = tokens.at(i+2);
         int timeout_milliseconds = 0;
@@ -400,7 +383,7 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
             ++timeout_milliseconds;
         }
         int_op timeout{false, timeout_milliseconds, false};
-        program.opreceive(assembler::operands::getint(resolveregister(regno_chnk, names)), timeout);
+        program.opreceive(assembler::operands::getint(resolveregister(regno_chnk)), timeout);
     } else if (tokens.at(i) == "watchdog") {
         program.opwatchdog(tokens.at(i+1));
     } else if (tokens.at(i) == "if") {
@@ -429,7 +412,7 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
             addrf_target = instruction+1;
         }
 
-        program.opif(assembler::operands::getint(resolveregister(condition, names)), addrt_target, addrt_jump_type, addrf_target, addrf_jump_type);
+        program.opif(assembler::operands::getint(resolveregister(condition)), addrt_target, addrt_jump_type, addrf_target, addrf_jump_type);
     } else if (tokens.at(i) == "jump") {
         /*  Jump instruction can be written in two forms:
          *
@@ -455,11 +438,11 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
         string type_chnk, catcher_chnk;
         program.opcatch(tokens.at(i+1), tokens.at(i+2));
     } else if (tokens.at(i) == "pull") {
-        program.oppull(assembler::operands::getint(resolveregister(tokens.at(i+1), names)));
+        program.oppull(assembler::operands::getint(resolveregister(tokens.at(i+1))));
     } else if (tokens.at(i) == "enter") {
         program.openter(tokens.at(i+1));
     } else if (tokens.at(i) == "throw") {
-        program.opthrow(assembler::operands::getint(resolveregister(tokens.at(i+1), names)));
+        program.opthrow(assembler::operands::getint(resolveregister(tokens.at(i+1))));
     } else if (tokens.at(i) == "leave") {
         program.opleave();
     } else if (tokens.at(i) == "import") {
@@ -467,21 +450,21 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
     } else if (tokens.at(i) == "link") {
         program.oplink(tokens.at(i+1));
     } else if (tokens.at(i) == "class") {
-        program.opclass(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), tokens.at(i+2));
+        program.opclass(assembler::operands::getint(resolveregister(tokens.at(i+1))), tokens.at(i+2));
     } else if (tokens.at(i) == "derive") {
-        program.opderive(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), tokens.at(i+2));
+        program.opderive(assembler::operands::getint(resolveregister(tokens.at(i+1))), tokens.at(i+2));
     } else if (tokens.at(i) == "attach") {
-        program.opattach(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), tokens.at(i+2), tokens.at(i+3));
+        program.opattach(assembler::operands::getint(resolveregister(tokens.at(i+1))), tokens.at(i+2), tokens.at(i+3));
     } else if (tokens.at(i) == "register") {
-        program.opregister(assembler::operands::getint(resolveregister(tokens.at(i+1), names)));
+        program.opregister(assembler::operands::getint(resolveregister(tokens.at(i+1))));
     } else if (tokens.at(i) == "new") {
-        program.opnew(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), tokens.at(i+2));
+        program.opnew(assembler::operands::getint(resolveregister(tokens.at(i+1))), tokens.at(i+2));
     } else if (tokens.at(i) == "msg") {
-        program.opmsg(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), tokens.at(i+2));
+        program.opmsg(assembler::operands::getint(resolveregister(tokens.at(i+1))), tokens.at(i+2));
     } else if (tokens.at(i) == "insert") {
-        program.opinsert(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
+        program.opinsert(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "remove") {
-        program.opremove(assembler::operands::getint(resolveregister(tokens.at(i+1), names)), assembler::operands::getint(resolveregister(tokens.at(i+2), names)), assembler::operands::getint(resolveregister(tokens.at(i+3), names)));
+        program.opremove(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "return") {
         program.opreturn();
     } else if (tokens.at(i) == "halt") {
@@ -503,13 +486,13 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
     ++i;  // skip the newline
     return i;
 }
-static Program& compile(Program& program, const vector<Token>& tokens, map<string, int>& marks, map<string, int>& names) {
+static Program& compile(Program& program, const vector<Token>& tokens, map<string, int>& marks) {
     /** Compile instructions into bytecode using bytecode generation API.
      *
      */
     uint64_t instruction = 0;
     for (decltype(tokens.size()) i = 0; i < tokens.size();) {
-        i = assemble_instruction(program, instruction, i, tokens, marks, names);
+        i = assemble_instruction(program, instruction, i, tokens, marks);
     }
 
     return program;
@@ -527,8 +510,7 @@ static void assemble(Program& program, const vector<Token>& tokens) {
      *  lines           - lines with instructions
      */
     map<string, int> marks = assembler::ce::getmarks(tokens);
-    map<string, int> names = assembler::ce::getnames(tokens);
-    compile(program, tokens, marks, names);
+    compile(program, tokens, marks);
 }
 
 

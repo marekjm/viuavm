@@ -154,36 +154,6 @@ map<string, int> assembler::ce::getmarks(const vector<viua::cg::lex::Token>& tok
     return marks;
 }
 
-map<string, int> assembler::ce::getnames(const vector<viua::cg::lex::Token>& tokens) {
-    /** This function will pass over all instructions and
-     *  gather "names", i.e. `.name: <register> <name>` instructions which may be used by
-     *  as substitutes for register indexes to more easily remember what is stored where.
-     *
-     *  Example name instruction: `.name: 1 base`.
-     *  This allows to access first register with name `base` instead of its index.
-     *
-     *  Example (which also uses marks) name reference could be: `branch if_equals_0 :finish`.
-     */
-    map<string, int> names;
-    string reg, name;
-    for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
-        if (tokens.at(i) == ".name:") {
-            reg = tokens.at(i+1);
-            name = tokens.at(i+2);
-            assert_is_not_reserved_keyword(tokens.at(i+2), "register name");
-        } else {
-            continue;
-        }
-
-        try {
-            names[name] = stoi(reg);
-        } catch (const std::invalid_argument& e) {
-            throw viua::cg::lex::InvalidSyntax(tokens.at(i+1), ("invalid register index: " + str::strencode(name) + " := " + str::enquote(str::strencode(reg))));
-        }
-    }
-    return names;
-}
-
 vector<string> assembler::ce::getlinks(const vector<viua::cg::lex::Token>& tokens) {
     /** This function will pass over all instructions and
      * gather .link: assembler instructions.
