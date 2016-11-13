@@ -111,7 +111,6 @@ namespace viua {
             std::vector<Token> reduce_offset_jumps(std::vector<Token>);
             std::vector<Token> reduce_at_prefixed_registers(std::vector<Token>);
             std::vector<Token> reduce_floats(std::vector<Token>);
-            std::vector<Token> reduce_absolute_jumps(std::vector<Token>);
 
             std::vector<Token> replace_iotas(std::vector<Token>);
             std::vector<Token> replace_defaults(std::vector<Token>);

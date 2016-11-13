@@ -60,9 +60,6 @@ static tuple<uint64_t, enum JUMPTYPE> resolvejump(Token token, const map<string,
     enum JUMPTYPE jump_type = JMP_RELATIVE;
     if (str::isnum(jmp, false)) {
         addr = stoul(jmp);
-    } else if (jmp[0] == '.' and str::isnum(str::sub(jmp, 1LU))) {
-        addr = stoul(str::sub(jmp, 1));
-        jump_type = JMP_ABSOLUTE;
     } else if (jmp.substr(0, 2) == "0x") {
         stringstream ss;
         ss << hex << jmp;
@@ -82,10 +79,6 @@ static tuple<uint64_t, enum JUMPTYPE> resolvejump(Token token, const map<string,
         addr = (instruction_index - static_cast<uint64_t>(-1 * jump_value));
     } else if (jmp[0] == '+') {
         addr = (instruction_index + stoul(jmp.substr(1)));
-    } else if (jmp[0] == '.') {
-        // FIXME
-        cout << "FIXME: global marker jumps (jumps to functions) are not implemented yet" << endl;
-        exit(1);
     } else {
         try {
             // FIXME: markers map should use uint64_t to avoid the need for casting
@@ -1047,8 +1040,7 @@ int generate(vector<Token>& tokens, invocables_t& functions, invocables_t& block
         vector<uint64_t> jumps_absolute = func.jumpsAbsolute();
 
         vector<tuple<uint64_t, uint64_t> > local_jumps;
-        for (unsigned i = 0; i < jumps.size(); ++i) {
-            uint64_t jmp = jumps[i];
+        for (auto jmp : jumps) {
             local_jumps.emplace_back(jmp, block_bodies_section_size);
         }
         func.calculateJumps(local_jumps);

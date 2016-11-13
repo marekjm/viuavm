@@ -906,12 +906,6 @@ class JumpingTests(unittest.TestCase):
     """
     PATH = './sample/asm/absolute_jumping'
 
-    def testAbsoluteJump(self):
-        runTest(self, 'absolute_jump.asm', "Hey babe, I'm absolute.")
-
-    def testAbsoluteBranch(self):
-        runTest(self, 'absolute_branch.asm', "Hey babe, I'm absolute.")
-
     def testRelativeJump(self):
         runTest(self, 'relative_jumps.asm', "Hello World")
 
@@ -1364,9 +1358,6 @@ class AssemblerErrorTests(unittest.TestCase):
     def testJumpToUnrecognisedMarker(self):
         runTestFailsToAssemble(self, 'jump_to_unrecognised_marker.asm', "./sample/asm/errors/jump_to_unrecognised_marker.asm:21:10: error: jump to unrecognised marker: foo")
 
-    def testAbsoluteJumpWithNegativeValue(self):
-        runTestFailsToAssemble(self, 'absolute_jump_negative.asm', "./sample/asm/errors/absolute_jump_negative.asm:21:10: error: absolute jump with negative value")
-
     def testBlocksEndWithReturningInstruction(self):
         runTestFailsToAssemble(self, 'blocks_end_with_returning_instruction.asm', "./sample/asm/errors/blocks_end_with_returning_instruction.asm:22:1: error: missing returning instruction (leave, return, tailcall or halt) at the end of block: foo__block")
 
@@ -1391,26 +1382,11 @@ class AssemblerErrorTests(unittest.TestCase):
     def testBranchFalseForwardOutOfRangeNonrelative(self):
         runTestFailsToAssemble(self, 'branch_false_forward_out_of_range_nonrelative.asm', "./sample/asm/errors/branch_false_forward_out_of_range_nonrelative.asm:23:13: error: forward out-of-range jump")
 
-    def testBranchTrueNegativeAbsolute(self):
-        runTestFailsToAssemble(self, 'branch_true_negative_absolute.asm', "./sample/asm/errors/branch_true_negative_absolute.asm:23:10: error: absolute jump with negative value")
-
-    def testBranchFalseNegativeAbsolute(self):
-        runTestFailsToAssemble(self, 'branch_false_negative_absolute.asm', "./sample/asm/errors/branch_false_negative_absolute.asm:23:13: error: absolute jump with negative value")
-
     def testBranchTrueToUnrecognisedMarker(self):
         runTestFailsToAssemble(self, 'branch_true_to_unrecognised_marker.asm', "./sample/asm/errors/branch_true_to_unrecognised_marker.asm:23:10: error: jump to unrecognised marker: foo")
 
     def testBranchFalseToUnrecognisedMarker(self):
         runTestFailsToAssemble(self, 'branch_false_to_unrecognised_marker.asm', "./sample/asm/errors/branch_false_to_unrecognised_marker.asm:23:13: error: jump to unrecognised marker: foo")
-
-    def testZeroDistanceAbsoluteFalseBranch(self):
-        runTestFailsToAssemble(self, 'zero_distance_absolute_false_branch.asm', "./sample/asm/errors/zero_distance_absolute_false_branch.asm:21:12: error: zero-distance jump")
-
-    def testZeroDistanceAbsoluteJump(self):
-        runTestFailsToAssemble(self, 'zero_distance_absolute_jump.asm', "./sample/asm/errors/zero_distance_absolute_jump.asm:21:10: error: zero-distance jump")
-
-    def testZeroDistanceAbsoluteTrueBranch(self):
-        runTestFailsToAssemble(self, 'zero_distance_absolute_true_branch.asm', "./sample/asm/errors/zero_distance_absolute_true_branch.asm:21:10: error: zero-distance jump")
 
     def testZeroDistanceBackwardFalseBranch(self):
         runTestFailsToAssemble(self, 'zero_distance_backward_false_branch.asm', "./sample/asm/errors/zero_distance_backward_false_branch.asm:21:12: error: zero-distance jump")

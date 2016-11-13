@@ -673,26 +673,6 @@ namespace viua {
                 return tokens;
             }
 
-            vector<Token> reduce_absolute_jumps(vector<Token> input_tokens) {
-                decltype(input_tokens) tokens;
-
-                const auto limit = input_tokens.size();
-                for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
-                    const auto t = input_tokens.at(i);
-
-                    if (i+1 < limit and t == "." and str::isnum(input_tokens.at(i+1))) {
-                        if (adjacent(t, input_tokens.at(i+1))) {
-                            tokens.emplace_back(t.line(), t.character(), (t.str() + input_tokens.at(i+1).str()));
-                            ++i;
-                            continue;
-                        }
-                    }
-                    tokens.push_back(t);
-                }
-
-                return tokens;
-            }
-
             vector<Token> move_inline_blocks_out(vector<Token> input_tokens) {
                 decltype(input_tokens) tokens;
                 decltype(tokens) block_tokens, nested_block_tokens;
@@ -1267,7 +1247,6 @@ namespace viua {
                 tokens = reduce_offset_jumps(tokens);
                 tokens = reduce_at_prefixed_registers(tokens);
                 tokens = reduce_floats(tokens);
-                tokens = reduce_absolute_jumps(tokens);
 
                 /*
                  * Replace 'iota' keywords with their integers.
