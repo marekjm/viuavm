@@ -24,10 +24,9 @@ namespace viua {
                 return op;
             }
 
-            uint64_t calculate_bytecode_size(const vector<viua::cg::lex::Token>& tokens) {
+            uint64_t calculate_bytecode_size_in_range(const vector<viua::cg::lex::Token>& tokens, std::remove_reference<decltype(tokens)>::type::size_type limit) {
                 uint64_t bytes = 0, inc = 0;
 
-                const auto limit = tokens.size();
                 for (decltype(tokens.size()) i = 0; i < limit; ++i) {
                     viua::cg::lex::Token token = tokens[i];
                     if (token.str().substr(0, 1) == ".") {
@@ -84,6 +83,10 @@ namespace viua {
                 }
 
                 return bytes;
+            }
+
+            uint64_t calculate_bytecode_size(const vector<viua::cg::lex::Token>& tokens) {
+                return calculate_bytecode_size_in_range(tokens, tokens.size());
             }
 
             static auto size_of_register_index_operand(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
