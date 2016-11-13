@@ -242,14 +242,6 @@ vector<uint64_t> Program::jumps() {
     return jmps;
 }
 
-vector<uint64_t> Program::jumpsAbsolute() {
-    /** Returns vector if bytecode points which contain absolute jumps.
-     */
-    vector<uint64_t> jmps;
-    for (byte* jmp : branches_absolute) { jmps.push_back( static_cast<uint64_t>(jmp-program) ); }
-    return jmps;
-}
-
 Program::Program(uint64_t bts): bytes(bts), debug(false), scream(false) {
     program = new byte[bytes];
     /* Filling bytecode with zeroes (which are interpreted by kernel as NOP instructions) is a safe way

@@ -179,7 +179,6 @@ class Program {
      */
     Program& calculateJumps(std::vector<std::tuple<uint64_t, uint64_t> >);
     std::vector<uint64_t> jumps();
-    std::vector<uint64_t> jumpsAbsolute();
 
     byte* bytecode();
     Program& fill(byte*);

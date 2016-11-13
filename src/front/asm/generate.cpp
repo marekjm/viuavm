@@ -1036,7 +1036,6 @@ int generate(vector<Token>& tokens, invocables_t& functions, invocables_t& block
         }
 
         vector<uint64_t> jumps = func.jumps();
-        vector<uint64_t> jumps_absolute = func.jumpsAbsolute();
 
         vector<tuple<uint64_t, uint64_t> > local_jumps;
         for (auto jmp : jumps) {
@@ -1060,17 +1059,6 @@ int generate(vector<Token>& tokens, invocables_t& functions, invocables_t& block
                 cout << "pushed relative jump to jump table: " << jmp << '+' << block_bodies_section_size << endl;
             }
             jump_table.emplace_back(jmp+block_bodies_section_size);
-        }
-
-        for (unsigned i = 0; i < jumps_absolute.size(); ++i) {
-            if (DEBUG) {
-                cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
-                cout << ": ";
-                cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
-                cout << ": ";
-                cout << "pushed absolute jump to jump table: " << jumps_absolute[i] << "+0" << endl;
-            }
-            jump_positions.emplace_back(jumps_absolute[i]+block_bodies_section_size, 0);
         }
 
         block_bodies_section_size += func.size();
@@ -1141,7 +1129,6 @@ int generate(vector<Token>& tokens, invocables_t& functions, invocables_t& block
         }
 
         vector<uint64_t> jumps = func.jumps();
-        vector<uint64_t> jumps_absolute = func.jumpsAbsolute();
 
         vector<tuple<uint64_t, uint64_t> > local_jumps;
         for (unsigned i = 0; i < jumps.size(); ++i) {
@@ -1166,17 +1153,6 @@ int generate(vector<Token>& tokens, invocables_t& functions, invocables_t& block
                 cout << "pushed relative jump to jump table: " << jmp << '+' << functions_section_size << endl;
             }
             jump_table.emplace_back(jmp+functions_section_size);
-        }
-
-        for (unsigned i = 0; i < jumps_absolute.size(); ++i) {
-            if (DEBUG) {
-                cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
-                cout << ": ";
-                cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
-                cout << ": ";
-                cout << "pushed absolute jump to jump table: " << jumps_absolute[i] << "+0" << endl;
-            }
-            jump_positions.emplace_back(jumps_absolute[i]+functions_section_size, 0);
         }
 
         functions_section_size += func.size();
@@ -1340,18 +1316,6 @@ int generate(vector<Token>& tokens, invocables_t& functions, invocables_t& block
     for (pair<string, tuple<uint64_t, byte*>> fun : functions_bytecode) {
         delete[] get<1>(fun.second);
     }
-
-    Program calculator(bytes);
-    calculator.setdebug(DEBUG).setscream(SCREAM);
-    if (DEBUG) {
-        cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
-        cout << ": ";
-        cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
-        cout << ": ";
-        cout << "calculating absolute jumps..." << endl;
-    }
-    calculator.fill(program_bytecode).calculateJumps(jump_positions);
-
 
     ////////////////////////////////////
     // WRITE STATICALLY LINKED LIBRARIES
