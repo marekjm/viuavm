@@ -68,7 +68,6 @@ static tuple<uint64_t, enum JUMPTYPE> resolvejump(Token token, const map<string,
     } else if (jmp[0] == '-') {
         int jump_value = stoi(jmp);
         if (instruction_index < static_cast<decltype(addr)>(-1 * jump_value)) {
-            // FIXME: generate line numbers in error message
             // FIXME: move jump verification to assembler::verify namespace function
             ostringstream oss;
             oss << "use of relative jump results in a jump to negative index: ";
