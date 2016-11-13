@@ -1041,7 +1041,7 @@ int generate(vector<Token>& tokens, invocables_t& functions, invocables_t& block
         for (auto jmp : jumps) {
             local_jumps.emplace_back(jmp, block_bodies_section_size);
         }
-        func.calculateJumps(local_jumps);
+        func.calculateJumps(local_jumps, blocks.tokens.at(name));
 
         byte* btcode = func.bytecode();
 
@@ -1135,7 +1135,7 @@ int generate(vector<Token>& tokens, invocables_t& functions, invocables_t& block
             uint64_t jmp = jumps[i];
             local_jumps.emplace_back(jmp, functions_section_size);
         }
-        func.calculateJumps(local_jumps);
+        func.calculateJumps(local_jumps, functions.tokens.at(name));
 
         byte* btcode = func.bytecode();
 

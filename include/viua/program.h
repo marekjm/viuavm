@@ -26,6 +26,7 @@
 #include <map>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/cg/bytecode/instructions.h>
+#include <viua/cg/lex.h>
 
 
 enum JUMPTYPE {
@@ -177,7 +178,7 @@ class Program {
      *  These must be called after the bytecode is already generated as they must know
      *  size of the program.
      */
-    Program& calculateJumps(std::vector<std::tuple<uint64_t, uint64_t> >);
+    Program& calculateJumps(std::vector<std::tuple<uint64_t, uint64_t>>, std::vector<viua::cg::lex::Token>&);
     std::vector<uint64_t> jumps();
 
     byte* bytecode();

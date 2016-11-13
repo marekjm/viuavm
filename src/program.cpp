@@ -23,6 +23,7 @@
 #include <viua/support/string.h>
 #include <viua/bytecode/opcodes.h>
 #include <viua/bytecode/maps.h>
+#include <viua/cg/tools.h>
 #include <viua/program.h>
 using namespace std;
 
@@ -206,11 +207,11 @@ uint64_t Program::getInstructionBytecodeOffset(uint64_t instr, uint64_t count) {
     return offset;
 }
 
-Program& Program::calculateJumps(vector<tuple<uint64_t, uint64_t> > jump_positions) {
+using Token = viua::cg::lex::Token;
+Program& Program::calculateJumps(vector<tuple<uint64_t, uint64_t> > jump_positions, vector<Token>& tokens) {
     /** Calculate jump targets in given bytecode.
      */
-    uint64_t instruction_count = instructionCount();
-    uint64_t* ptr;
+    uint64_t* ptr = nullptr;
 
     uint64_t position, offset;
     uint64_t adjustment;
@@ -223,7 +224,7 @@ Program& Program::calculateJumps(vector<tuple<uint64_t, uint64_t> > jump_positio
         if (debug) {
             cout << "[bcgen:jump] calculating jump at " << position << " (target: " << *ptr << ") with offset " << offset << endl;
         }
-        adjustment = getInstructionBytecodeOffset(*ptr, instruction_count);
+        adjustment = viua::cg::tools::calculate_bytecode_size_of_first_n_instructions(tokens, *ptr);
         (*ptr) = (offset + adjustment);
         if (debug) {
             cout << "[bcgen:jump] calculated jump at " << position << " (total: " << adjustment << ") with offset " << offset << " = ";

@@ -24,6 +24,71 @@ namespace viua {
                 return op;
             }
 
+            uint64_t calculate_bytecode_size_of_first_n_instructions(const vector<viua::cg::lex::Token>& tokens, std::remove_reference<decltype(tokens)>::type::size_type count_instructions) {
+                uint64_t bytes = 0, inc = 0;
+
+                const auto limit = tokens.size();
+                decltype(count_instructions) instructions_counter = 0;
+                for (decltype(tokens.size()) i = 0; (i < limit) and (instructions_counter < count_instructions); ++i) {
+                    viua::cg::lex::Token token = tokens[i];
+                    if (token.str().substr(0, 1) == ".") {
+                        while (i < limit and tokens[i].str() != "\n") {
+                            ++i;
+                        }
+                        continue;
+                    }
+                    if (token.str() == "\n") {
+                        ++instructions_counter;
+                        continue;
+                    }
+                    OPCODE op;
+                    try {
+                        op = mnemonic_to_opcode(token.str());
+                        inc = OP_SIZES.at(token.str());
+                        if (any(op, ENTER, LINK, WATCHDOG, TAILCALL)) {
+                            // get second chunk (function, block or module name)
+                            inc += (tokens.at(i+1).str().size() + 1);
+                        } else if (any(op, CALL, MSG, PROCESS)) {
+                            ++i; // skip register index
+                            if (tokens.at(i+1).str() == "\n") {
+                                throw viua::cg::lex::InvalidSyntax(token.line(), token.character(), token.str());
+                            }
+                            inc += (tokens.at(i+1).str().size() + 1);
+                        } else if (any(op, CLOSURE, FUNCTION, CLASS, PROTOTYPE, DERIVE, NEW)) {
+                            ++i; // skip register index
+                            if (tokens.at(i+1).str() == "\n") {
+                                throw viua::cg::lex::InvalidSyntax(token.line(), token.character(), token.str());
+                            }
+                            inc += (tokens.at(i+1).str().size() + 1);
+                        } else if (op == ATTACH) {
+                            ++i; // skip register index
+                            inc += (tokens[++i].str().size() + 1);
+                            inc += (tokens[++i].str().size() + 1);
+                        } else if (op == IMPORT) {
+                            inc += (tokens[++i].str().size() - 2 + 1);
+                        } else if (op == CATCH) {
+                            inc += (tokens[++i].str().size() - 2 + 1); // +1: null-terminator, -2: quotes
+                            inc += (tokens[++i].str().size() + 1);
+                        } else if (op == STRSTORE) {
+                            ++i; // skip register index
+                            inc += (tokens[++i].str().size() - 2 + 1 );
+                        }
+                    } catch (const std::out_of_range& e) {
+                        throw viua::cg::lex::InvalidSyntax(token.line(), token.character(), token.str());
+                    }
+
+                    // skip tokens until "\n" after an instruction has been counted
+                    while (i < limit and tokens[i].str() != "\n") {
+                        ++i;
+                    }
+                    ++instructions_counter;
+
+                    bytes += inc;
+                }
+
+                return bytes;
+            }
+
             uint64_t calculate_bytecode_size_in_range(const vector<viua::cg::lex::Token>& tokens, std::remove_reference<decltype(tokens)>::type::size_type limit) {
                 uint64_t bytes = 0, inc = 0;
 
