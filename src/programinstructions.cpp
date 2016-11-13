@@ -688,12 +688,13 @@ Program& Program::opif(int_op regc, uint64_t addr_truth, enum JUMPTYPE absolute_
     jump_position_in_bytecode += sizeof(byte); // for opcode
     jump_position_in_bytecode += sizeof(bool); // for at-register flag
     jump_position_in_bytecode += sizeof(int);  // for integer with register index
+
     // save jump position if jump is not to byte
     if (absolute_truth != JMP_TO_BYTE) {
         (absolute_truth == JMP_ABSOLUTE ? branches_absolute : branches).push_back(jump_position_in_bytecode);
     }
-
     jump_position_in_bytecode += sizeof(uint64_t);  // for integer with jump address
+
     // save jump position if jump is not to byte
     if (absolute_false != JMP_TO_BYTE) {
         (absolute_truth == JMP_ABSOLUTE ? branches_absolute : branches).push_back(jump_position_in_bytecode);
