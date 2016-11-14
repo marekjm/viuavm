@@ -60,8 +60,6 @@ class Program {
     bool debug;
     bool scream;
 
-    uint64_t getInstructionBytecodeOffset(uint64_t, uint64_t count = 0);
-
     public:
     // instruction insertion interface
     Program& opnop();
@@ -188,7 +186,6 @@ class Program {
     Program& setscream(bool d = true);
 
     uint64_t size();
-    unsigned long instructionCount();
 
     Program(uint64_t bts = 2);
     Program(const Program& that);
