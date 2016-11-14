@@ -670,9 +670,8 @@ Program& Program::opjump(uint64_t addr, enum JUMPTYPE is_absolute) {
      *
      *  addr:int    - index of the instruction to which to branch
      */
-    // save jump position if jump is not to byte
     if (is_absolute != JMP_TO_BYTE) {
-        (is_absolute == JMP_ABSOLUTE ? branches_absolute : branches).push_back((addr_ptr+1));
+        branches.push_back((addr_ptr+1));
     }
 
     addr_ptr = cg::bytecode::opjump(addr_ptr, addr);
@@ -689,15 +688,13 @@ Program& Program::opif(int_op regc, uint64_t addr_truth, enum JUMPTYPE absolute_
     jump_position_in_bytecode += sizeof(bool); // for at-register flag
     jump_position_in_bytecode += sizeof(int);  // for integer with register index
 
-    // save jump position if jump is not to byte
     if (absolute_truth != JMP_TO_BYTE) {
-        (absolute_truth == JMP_ABSOLUTE ? branches_absolute : branches).push_back(jump_position_in_bytecode);
+        branches.push_back(jump_position_in_bytecode);
     }
-    jump_position_in_bytecode += sizeof(uint64_t);  // for integer with jump address
+    jump_position_in_bytecode += sizeof(uint64_t);
 
-    // save jump position if jump is not to byte
     if (absolute_false != JMP_TO_BYTE) {
-        (absolute_truth == JMP_ABSOLUTE ? branches_absolute : branches).push_back(jump_position_in_bytecode);
+        branches.push_back(jump_position_in_bytecode);
     }
 
     addr_ptr = cg::bytecode::opif(addr_ptr, regc, addr_truth, addr_false);

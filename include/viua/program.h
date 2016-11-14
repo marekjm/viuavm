@@ -50,11 +50,10 @@ class Program {
     byte* addr_ptr;
 
     /** Branches inside bytecode must be stored for later recalculation.
-     *  Absolute and local branches must be distinguished between as
-     *  they are calculated a bit differently.
+     *  Jumps must be recalculated because each function is compiled separately with jump offset 0, but
+     *  when they are assembled into a single binary the offsets change.
      */
     std::vector<byte*> branches;
-    std::vector<byte*> branches_absolute;
 
     // simple, whether to print debugging information or not
     bool debug;
