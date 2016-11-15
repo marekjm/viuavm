@@ -502,6 +502,7 @@ namespace viua {
             static auto size_of_jump(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
                 uint64_t calculated_size = sizeof(byte);
                 calculated_size += sizeof(uint64_t);
+                ++i;
                 return tuple<uint64_t, decltype(i)>(calculated_size, i);
             }
             static auto size_of_if(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
@@ -513,6 +514,7 @@ namespace viua {
                 calculated_size += size_increment;
 
                 calculated_size += 2 * sizeof(uint64_t);
+                i += 2;
 
                 return tuple<uint64_t, decltype(i)>(calculated_size, i);
             }
