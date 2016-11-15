@@ -224,15 +224,7 @@ namespace viua {
                 return tuple<uint64_t, decltype(i)>(calculated_size, i);
             }
             static auto size_of_izero(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                uint64_t calculated_size = sizeof(byte);    // start with the size of a single opcode
-
-                decltype(calculated_size) size_increment = 0;
-
-                // for target register
-                tie(size_increment, i) = size_of_register_index_operand(tokens, i);
-                calculated_size += size_increment;
-
-                return tuple<uint64_t, decltype(i)>(calculated_size, i);
+                return size_of_instruction_with_one_ri_operand(tokens, i);
             }
             static auto size_of_istore(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands(tokens, i);
