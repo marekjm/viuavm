@@ -242,10 +242,10 @@ namespace viua {
                 return size_of_instruction_with_three_ri_operands(tokens, i);
             }
             static auto size_of_iinc(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                return size_of_instruction_with_three_ri_operands(tokens, i);
+                return size_of_instruction_with_one_ri_operand(tokens, i);
             }
             static auto size_of_idec(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                return size_of_instruction_with_three_ri_operands(tokens, i);
+                return size_of_instruction_with_one_ri_operand(tokens, i);
             }
             static auto size_of_ilt(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands(tokens, i);
