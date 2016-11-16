@@ -255,7 +255,6 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
         program.opvec(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "vinsert") {
         Token vec = tokens.at(i+1), src = tokens.at(i+2), pos = tokens.at(i+3);
-        if (pos == "\n") { pos = Token(src.line(), src.character(), "0"); }
         program.opvinsert(assembler::operands::getint(resolveregister(vec)), assembler::operands::getint(resolveregister(src)), assembler::operands::getint(resolveregister(pos)));
     } else if (tokens.at(i) == "vpush") {
         program.opvpush(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));

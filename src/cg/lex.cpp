@@ -247,6 +247,14 @@ namespace viua {
                         if ((not str::isnum(input_tokens.at(i+1).str(), false)) and input_tokens.at(i+1).str() == "\n") {
                             tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "-1");
                         }
+                    } else if (token == "vinsert") {
+                        tokens.push_back(token);
+                        tokens.push_back(input_tokens.at(++i));
+                        tokens.push_back(input_tokens.at(++i));
+
+                        if (input_tokens.at(i+1).str() == "\n") {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "0");
+                        }
                     } else if (token == "join") {
                         tokens.push_back(token);
                         tokens.push_back(input_tokens.at(++i));
