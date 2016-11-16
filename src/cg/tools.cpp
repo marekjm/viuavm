@@ -283,6 +283,8 @@ namespace viua {
             }
             static auto size_of_fstore(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
                 uint64_t calculated_size = sizeof(byte);
+                calculated_size += sizeof(byte);
+                calculated_size += sizeof(double);
                 return tuple<uint64_t, decltype(i)>(calculated_size, i);
             }
             static auto size_of_fadd(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
@@ -390,7 +392,7 @@ namespace viua {
             }
             static auto size_of_ress(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
                 uint64_t calculated_size = sizeof(byte);
-                calculated_size += sizeof(byte);
+                calculated_size += sizeof(int);
                 return tuple<uint64_t, decltype(i)>(calculated_size, i);
             }
             static auto size_of_tmpri(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
