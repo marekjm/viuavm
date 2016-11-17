@@ -212,6 +212,8 @@ namespace viua {
                     calculated_size += sizeof(byte);
                     calculated_size += sizeof(int);
                     ++i;
+                } else {
+                    throw viua::cg::lex::InvalidSyntax(tokens.at(i), "invalid operand token");
                 }
 
                 return tuple<uint64_t, decltype(i)>(calculated_size, i);
