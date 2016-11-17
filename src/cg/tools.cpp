@@ -196,6 +196,9 @@ namespace viua {
 
                 if (tokens.at(i) == "void") {
                     calculated_size += sizeof(byte);
+                    // FIXME should not be needed after port to new bytecode emitter is
+                    // finished
+                    calculated_size += sizeof(int);
                     ++i;
                 } else if (str::isnum(tokens.at(i))) {
                     calculated_size += sizeof(byte);
