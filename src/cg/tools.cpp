@@ -173,6 +173,24 @@ namespace viua {
                 return calculate_bytecode_size_in_range(tokens, tokens.size());
             }
 
+            static auto looks_like_timeout(const viua::cg::lex::Token& token) -> bool {
+                string s = token;
+                if (s == "infinity") {
+                    return true;
+                }
+
+                const auto size = s.size();
+                if (size < 2) {
+                    return false;
+                }
+                if (s.at(size-2) == 'm' and s.at(size-1) == 's' and str::isnum(s.substr(0, size-2))) {
+                    return true;
+                }
+                if (s.at(size-1) == 's' and str::isnum(s.substr(0, size-1))) {
+                    return true;
+                }
+                return false;
+            }
             static auto size_of_register_index_operand(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
                 uint64_t calculated_size = 0;
 
@@ -184,6 +202,10 @@ namespace viua {
                     calculated_size += sizeof(int);
                     ++i;
                 } else if (tokens.at(i).str().at(0) == '@') {
+                    calculated_size += sizeof(byte);
+                    calculated_size += sizeof(int);
+                    ++i;
+                } else if (looks_like_timeout(tokens.at(i))) {
                     calculated_size += sizeof(byte);
                     calculated_size += sizeof(int);
                     ++i;
