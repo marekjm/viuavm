@@ -342,16 +342,16 @@ namespace viua {
                 return size_of_instruction_with_three_ri_operands(tokens, i);
             }
             static auto size_of_itof(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                return size_of_instruction_with_three_ri_operands(tokens, i);
+                return size_of_instruction_with_two_ri_operands(tokens, i);
             }
             static auto size_of_ftoi(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                return size_of_instruction_with_three_ri_operands(tokens, i);
+                return size_of_instruction_with_two_ri_operands(tokens, i);
             }
             static auto size_of_stoi(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                return size_of_instruction_with_three_ri_operands(tokens, i);
+                return size_of_instruction_with_two_ri_operands(tokens, i);
             }
             static auto size_of_stof(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                return size_of_instruction_with_three_ri_operands(tokens, i);
+                return size_of_instruction_with_two_ri_operands(tokens, i);
             }
             static auto size_of_strstore(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
                 uint64_t calculated_size = sizeof(byte);
@@ -509,7 +509,7 @@ namespace viua {
                 return size_of_instruction_with_two_ri_operands(tokens, i);
             }
             static auto size_of_argc(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                return size_of_instruction_with_two_ri_operands(tokens, i);
+                return size_of_instruction_with_one_ri_operand(tokens, i);
             }
             static auto size_of_process(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
                 uint64_t calculated_size = sizeof(byte);    // start with the size of a single opcode
@@ -530,7 +530,7 @@ namespace viua {
             }
             static auto size_of_join(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
                 // FIXME: timeout
-                return size_of_instruction_with_two_ri_operands(tokens, i);
+                return size_of_instruction_with_three_ri_operands(tokens, i);
             }
             static auto size_of_send(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands(tokens, i);
@@ -666,12 +666,10 @@ namespace viua {
                 return tuple<uint64_t, decltype(i)>(calculated_size, i);
             }
             static auto size_of_insert(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                uint64_t calculated_size = sizeof(byte);
-                return tuple<uint64_t, decltype(i)>(calculated_size, i);
+                return size_of_instruction_with_three_ri_operands(tokens, i);
             }
             static auto size_of_remove(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                uint64_t calculated_size = sizeof(byte);
-                return tuple<uint64_t, decltype(i)>(calculated_size, i);
+                return size_of_instruction_with_three_ri_operands(tokens, i);
             }
             static auto size_of_return(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
                 uint64_t calculated_size = sizeof(byte);    // start with the size of a single opcode
