@@ -63,6 +63,7 @@ class Ifstream: public viua::types::Type {
         }
 
         virtual viua::types::Type* copy() const {
+            throw new viua::types::Exception("Ifstream is not copyable");
         }
 
         Ifstream(const string& path): filename(path) {
