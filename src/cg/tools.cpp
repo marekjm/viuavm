@@ -637,6 +637,16 @@ namespace viua {
             }
             static auto size_of_derive(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
                 uint64_t calculated_size = sizeof(byte);
+
+                // for target register
+                calculated_size += sizeof(byte);
+                calculated_size += sizeof(int);
+                ++i;
+
+                // for class name, +1 for null-terminator
+                calculated_size += (tokens.at(i).str().size() + 1);
+                ++i;
+
                 return tuple<uint64_t, decltype(i)>(calculated_size, i);
             }
             static auto size_of_attach(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
