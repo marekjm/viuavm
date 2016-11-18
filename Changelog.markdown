@@ -96,6 +96,7 @@ There are several categories of change:
 - enhancement: `void` can be used as target register index to denote that result of the instruction should be dropped (implemented for `call`, `msg`,
   `process`, `join`, `receive`, and `arg`)
 - bic: remove support for `.`-prefixed absolute jumps; this makes reasoning about machine easier since only jumps inside single block of code are valid
+- bic, feature: `void` operands are now only one byte long
 
 One limitation of static analyser (SA) introduced in this release is its inability to handle backwards jumps.
 This, however, is not a problem if the code does not use loops and
