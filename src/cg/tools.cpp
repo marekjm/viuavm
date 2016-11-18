@@ -668,8 +668,7 @@ namespace viua {
                 return tuple<uint64_t, decltype(i)>(calculated_size, i);
             }
             static auto size_of_register(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                uint64_t calculated_size = sizeof(byte);
-                return tuple<uint64_t, decltype(i)>(calculated_size, i);
+                return size_of_instruction_with_one_ri_operand(tokens, i);
             }
             static auto size_of_new(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
                 uint64_t calculated_size = sizeof(byte);
