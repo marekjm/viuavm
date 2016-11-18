@@ -510,7 +510,7 @@ static map<string, uint64_t> mapInvocableAddresses(uint64_t& starting_instructio
     for (string name : blocks.names) {
         addresses[name] = starting_instruction;
         try {
-            starting_instruction += viua::cg::tools::calculate_bytecode_size(blocks.tokens.at(name));
+            starting_instruction += viua::cg::tools::calculate_bytecode_size2(blocks.tokens.at(name));
         } catch (const std::out_of_range& e) {
             throw ("could not find block '" + name + "'");
         }
@@ -555,7 +555,7 @@ static uint64_t writeCodeBlocksSection(ofstream& out, const invocables_t& blocks
         // block_bodies_size_so_far size must be incremented by the actual size of block's bytecode size
         // to give correct offset for next block
         try {
-            block_bodies_size_so_far += viua::cg::tools::calculate_bytecode_size(blocks.tokens.at(name));
+            block_bodies_size_so_far += viua::cg::tools::calculate_bytecode_size2(blocks.tokens.at(name));
         } catch (const std::out_of_range& e) {
             throw ("could not find block '" + name + "' during address table write");
         }
@@ -782,7 +782,7 @@ int generate(vector<Token>& tokens, invocables_t& functions, invocables_t& block
     try {
         block_addresses = mapInvocableAddresses(starting_instruction, blocks);
         function_addresses = mapInvocableAddresses(starting_instruction, functions);
-        bytes = viua::cg::tools::calculate_bytecode_size(tokens);
+        bytes = viua::cg::tools::calculate_bytecode_size2(tokens);
     } catch (const string& e) {
         throw ("bytecode size calculation failed: " + e);
     }
@@ -1003,7 +1003,7 @@ int generate(vector<Token>& tokens, invocables_t& functions, invocables_t& block
         }
         uint64_t fun_bytes = 0;
         try {
-            fun_bytes = viua::cg::tools::calculate_bytecode_size(blocks.tokens.at(name));
+            fun_bytes = viua::cg::tools::calculate_bytecode_size2(blocks.tokens.at(name));
             if (VERBOSE or DEBUG) {
                 cout << " (" << fun_bytes << " bytes at byte " << block_bodies_section_size << ')' << endl;
             }
@@ -1081,7 +1081,7 @@ int generate(vector<Token>& tokens, invocables_t& functions, invocables_t& block
         }
         uint64_t fun_bytes = 0;
         try {
-            fun_bytes = viua::cg::tools::calculate_bytecode_size(functions.tokens.at(name));
+            fun_bytes = viua::cg::tools::calculate_bytecode_size2(functions.tokens.at(name));
             if (VERBOSE or DEBUG) {
                 cout << " (" << fun_bytes << " bytes at byte " << functions_section_size << ')' << endl;
             }
