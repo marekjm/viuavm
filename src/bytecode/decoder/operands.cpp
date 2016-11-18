@@ -69,7 +69,6 @@ auto viua::bytecode::decoder::operands::is_void(const byte *ip) -> bool {
 auto viua::bytecode::decoder::operands::fetch_void(byte *ip) -> byte* {
     OperandType ot = get_operand_type(ip);
     ++ip;
-    ip += sizeof(int);
 
     if (ot != OT_VOID) {
         throw new viua::types::Exception("decoded invalid operand type");

@@ -49,93 +49,79 @@ static byte* disassemble_target_register(ostream& oss, byte *ptr) {
     if (*ptr == OT_VOID) {
         oss << " void";
         ++ptr;
-        pointer::inc<int, byte>(ptr);
     }
     return ptr;
 }
 tuple<string, unsigned> disassembler::instruction(byte* ptr) {
-    byte* bptr = ptr;
+    byte* saved_ptr = ptr;
 
-    OPCODE op = OPCODE(*bptr);
+    OPCODE op = OPCODE(*saved_ptr);
     string opname;
     try {
         opname = OP_NAMES.at(op);
+        ++ptr;
     } catch (const std::out_of_range& e) {
         ostringstream emsg;
         emsg << "could not find name for opcode: " << op;
         throw emsg.str();
     }
 
-    ++bptr; // instruction byte is not needed anymore
-
     ostringstream oss;
     oss << opname;
-    if (in(OP_VARIABLE_LENGTH, op)) {
-    }
 
-    if (not in(OP_VARIABLE_LENGTH, op)) {
-        bptr += (OP_SIZES.at(opname)-1); // -1 because OP_SIZES add one for instruction-storing byte
-    } else if (op == STRSTORE) {
-        oss << " " << intop(bptr);
-        pointer::inc<bool, byte>(bptr);
-        pointer::inc<int, byte>(bptr);
+    if (op == STRSTORE) {
+        ptr = disassemble_target_register(oss, ptr);
 
-        string s = string(reinterpret_cast<char*>(bptr));
+        string s = string(reinterpret_cast<char*>(ptr));
         oss << " " << str::enquote(s);
-        bptr += s.size();
-        ++bptr; // for null character terminating the C-style string not included in std::string
+        ptr += s.size();
+        ++ptr; // for null character terminating the C-style string not included in std::string
     } else if ((op == CALL) or (op == PROCESS) or (op == CLOSURE) or (op == FUNCTION) or (op == CLASS) or (op == NEW) or (op == DERIVE) or (op == MSG)) {
-        bptr = disassemble_target_register(oss, bptr);
+        ptr = disassemble_target_register(oss, ptr);
 
         oss << " ";
-        string fn_name = string(reinterpret_cast<char*>(bptr));
+        string fn_name = string(reinterpret_cast<char*>(ptr));
         oss << fn_name;
-        bptr += fn_name.size();
-        ++bptr; // for null character terminating the C-style string not included in std::string
+        ptr += fn_name.size();
+        ++ptr; // for null character terminating the C-style string not included in std::string
     } else if ((op == IMPORT) or (op == ENTER) or (op == LINK) or (op == WATCHDOG) or (op == TAILCALL)) {
         oss << " ";
-        string s = string(reinterpret_cast<char*>(bptr));
+        string s = string(reinterpret_cast<char*>(ptr));
         oss << (op == IMPORT ? str::enquote(s) : s);
-        bptr += s.size();
-        ++bptr; // for null character terminating the C-style string not included in std::string
+        ptr += s.size();
+        ++ptr; // for null character terminating the C-style string not included in std::string
     } else if (op == CATCH) {
         string s;
 
         oss << " ";
-        s = string(reinterpret_cast<char*>(bptr));
+        s = string(reinterpret_cast<char*>(ptr));
         oss << str::enquote(s);
-        bptr += s.size();
-        ++bptr; // for null character terminating the C-style string not included in std::string
+        ptr += s.size();
+        ++ptr; // for null character terminating the C-style string not included in std::string
 
         oss << " ";
-        s = string(reinterpret_cast<char*>(bptr));
+        s = string(reinterpret_cast<char*>(ptr));
         oss << s;
-        bptr += s.size();
-        ++bptr; // for null character terminating the C-style string not included in std::string
+        ptr += s.size();
+        ++ptr; // for null character terminating the C-style string not included in std::string
     } else if (op == ATTACH) {
-        oss << " " << intop(bptr);
-        pointer::inc<bool, byte>(bptr);
-        pointer::inc<int, byte>(bptr);
+        oss << " " << intop(ptr);
+        pointer::inc<bool, byte>(ptr);
+        pointer::inc<int, byte>(ptr);
 
         oss << " ";
-        string fn_name = string(reinterpret_cast<char*>(bptr));
+        string fn_name = string(reinterpret_cast<char*>(ptr));
         oss << fn_name;
-        bptr += fn_name.size();
-        ++bptr; // for null character terminating the C-style string not included in std::string
+        ptr += fn_name.size();
+        ++ptr; // for null character terminating the C-style string not included in std::string
 
         oss << " ";
-        string md_name = string(reinterpret_cast<char*>(bptr));
+        string md_name = string(reinterpret_cast<char*>(ptr));
         oss << md_name;
-        bptr += md_name.size();
-        ++bptr; // for null character terminating the C-style string not included in std::string
+        ptr += md_name.size();
+        ++ptr; // for null character terminating the C-style string not included in std::string
     }
 
-    long increase = (bptr-ptr);
-    if (increase < 0) {
-        throw ("bytecode pointer increase less than zero: near " + OP_NAMES.at(op) + " instruction");
-    }
-
-    ++ptr;
     switch (op) {
         case IZERO:
         case IINC:
@@ -224,6 +210,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
             oss << " 0x";
             oss << hex;
             oss << *reinterpret_cast<uint64_t*>(ptr);
+            pointer::inc<uint64_t, byte>(ptr);
 
             oss << dec;
 
@@ -251,6 +238,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
 
             oss << " ";
             oss << *reinterpret_cast<float*>(ptr);
+            pointer::inc<float, byte>(ptr);
             break;
         case RESS:
             oss << " ";
@@ -272,6 +260,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
                     oss << "; WARNING: invalid register set type\n";
                     oss << int(*ptr);
             }
+            pointer::inc<int, byte>(ptr);
             break;
         case JOIN:
             ptr = disassemble_target_register(oss, ptr);
@@ -293,6 +282,11 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
             oss << "";
     }
 
+    long increase = (ptr-saved_ptr);
+    if (increase < 0) {
+        throw ("bytecode pointer increase less than zero: near " + OP_NAMES.at(op) + " instruction");
+    }
+
     // cast increase to unsigned as at this point it is safe to assume that it is greater than zero
-    return tuple<string, unsigned>(oss.str(), unsigned(increase));
+    return tuple<string, unsigned>(oss.str(), static_cast<unsigned>(increase));
 }

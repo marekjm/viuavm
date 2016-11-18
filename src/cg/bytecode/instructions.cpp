@@ -39,8 +39,6 @@ static byte* insertIntegerOperand(byte* addr_ptr, int_op op) {
     if (is_void) {
         *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_VOID;
         pointer::inc<OperandType, byte>(addr_ptr);
-        *(reinterpret_cast<int*>(addr_ptr)) = 0;
-        pointer::inc<int, byte>(addr_ptr);
         return addr_ptr;
     }
 
