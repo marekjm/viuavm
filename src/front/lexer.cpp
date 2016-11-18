@@ -116,7 +116,7 @@ static bool REDUCE_DIRECTIVES = false;
 static void display_results(const string& filename, const vector<Token>& tokens) {
     if (DISPLAY_SIZE) {
         try {
-            cout << viua::cg::tools::calculate_bytecode_size(tokens) << endl;
+            cout << viua::cg::tools::calculate_bytecode_size2(tokens) << endl;
         } catch (const InvalidSyntax& e) {
             cerr << filename << ':' << e.line_number << ':' << e.character_in_line;
             cerr << ": error: invalid syntax: " << str::strencode(e.content) << endl;
