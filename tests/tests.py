@@ -609,6 +609,24 @@ class RegisterManipulationInstructionsTests(unittest.TestCase):
         runTestThrowsException(self, 'fetching_from_empty_tmp_register.asm', ('Exception', 'temporary register set is empty',))
 
 
+class PointersTests(unittest.TestCase):
+    """Tests for register-manipulation instructions.
+    """
+    PATH = './sample/asm/pointers'
+
+    def testHelloWorld(self):
+        runTest(self, 'hello_world.asm', 'Hello World!')
+
+    def testIncrementDecrement(self):
+        runTestReturnsIntegers(self, 'increment_decrement.asm', [43, 42])
+
+    def testIntegerArithmetic(self):
+        runTest(self, 'integer_arithmetic.asm', '42')
+
+    def testFloatArithmetic(self):
+        runTest(self, 'float_arithmetic.asm', '3.550000')
+
+
 class SampleProgramsTests(unittest.TestCase):
     """Tests for various sample programs.
 
