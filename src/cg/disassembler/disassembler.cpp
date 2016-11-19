@@ -153,7 +153,6 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case PRINT:
         case ECHO:
         case BOOL:
-        case NOT:
         case DELETE:
         case TMPRI:
         case TMPRO:
@@ -174,6 +173,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case ARG:
         case PARAM:
         case PAMV:
+        case NOT:
         case MOVE:
         case COPY:
         case PTR:

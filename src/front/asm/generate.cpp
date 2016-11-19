@@ -276,7 +276,7 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
     } else if (tokens.at(i) == "vlen") {
         program.opvlen(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
     } else if (tokens.at(i) == "not") {
-        program.opnot(assembler::operands::getint(resolveregister(tokens.at(i+1))));
+        program.opnot(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
     } else if (tokens.at(i) == "and") {
         program.opand(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "or") {

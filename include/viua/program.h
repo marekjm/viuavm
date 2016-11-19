@@ -105,7 +105,7 @@ class Program {
     Program& opvat(int_op, int_op, int_op);
     Program& opvlen(int_op, int_op);
 
-    Program& opnot(int_op);
+    Program& opnot(int_op, int_op);
     Program& opand(int_op, int_op, int_op);
     Program& opor(int_op, int_op, int_op);
 

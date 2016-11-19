@@ -98,6 +98,7 @@ There are several categories of change:
 - bic: remove support for `.`-prefixed absolute jumps; this makes reasoning about machine easier since only jumps inside single block of code are valid
 - bic, feature: `void` operands are now only one byte long
 - fix: `std::io::ifstream::getline/1` throws an exception when EOF is reached
+- bic, enhancement: `not` has two operands: target and source registers
 
 One limitation of static analyser (SA) introduced in this release is its inability to handle backwards jumps.
 This, however, is not a problem if the code does not use loops and

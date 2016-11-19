@@ -466,11 +466,12 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* opnot(byte* addr_ptr, int_op reg) {
+        byte* opnot(byte* addr_ptr, int_op target, int_op source) {
             /*  Inserts not instuction.
              */
             *(addr_ptr++) = NOT;
-            addr_ptr = insertIntegerOperand(addr_ptr, reg);
+            addr_ptr = insertIntegerOperand(addr_ptr, target);
+            addr_ptr = insertIntegerOperand(addr_ptr, source);
             return addr_ptr;
         }
 

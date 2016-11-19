@@ -386,10 +386,10 @@ Program& Program::opvlen(int_op vec, int_op reg) {
     return (*this);
 }
 
-Program& Program::opnot(int_op reg) {
+Program& Program::opnot(int_op target, int_op source) {
     /*  Inserts not instuction.
      */
-    addr_ptr = cg::bytecode::opnot(addr_ptr, reg);
+    addr_ptr = cg::bytecode::opnot(addr_ptr, target, source);
     return (*this);
 }
 

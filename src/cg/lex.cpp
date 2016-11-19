@@ -356,6 +356,13 @@ namespace viua {
                             tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "+1");
                         }
                         continue;
+                    } else if (token == "not") {
+                        tokens.push_back(token);                // mnemonic
+                        tokens.push_back(input_tokens.at(++i)); // target register
+                        if (input_tokens.at(i+1) == "\n") {
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), input_tokens.at(i).str());
+                        }
+                        continue;
                     } else {
                         tokens.push_back(token);
                     }

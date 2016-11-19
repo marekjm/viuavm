@@ -325,8 +325,12 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             }
             // early return because we already checked both true, and false branches
             return;
-        } else if (token == "echo" or token == "print" or token == "not") {
+        } else if (token == "echo" or token == "print") {
             check_use_of_register(body_tokens, i+1, i, registers, named_registers, (token.str() + " of empty register"));
+            i = skip_till_next_line(body_tokens, i);
+        } else if (token == "not") {
+            check_use_of_register(body_tokens, i+2, i, registers, named_registers, (token.str() + " of empty register"));
+            registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), body_tokens.at(i+1));
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "pamv" or token == "param") {
             if (debug) {
