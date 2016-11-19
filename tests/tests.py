@@ -629,8 +629,8 @@ class PointersTests(unittest.TestCase):
     def testLogicalAnd(self):
         runTest(self, 'and.asm', 'false')
 
-    # def testLogicalNot(self):
-    #     runTest(self, 'not.asm', 'true')
+    def testLogicalNot(self):
+        runTest(self, 'not.asm', 'true')
 
     def testLogicalOr(self):
         runTest(self, 'or.asm', 'true')

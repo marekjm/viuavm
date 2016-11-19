@@ -28,10 +28,13 @@ using namespace std;
 
 
 byte* viua::process::Process::opnot(byte* addr) {
-    unsigned register_index = 0;
-    tie(addr, register_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    unsigned target = 0;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    place(register_index, new viua::types::Boolean(not fetch(register_index)->boolean()));
+    viua::types::Type *source = nullptr;
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+
+    place(target, new viua::types::Boolean(not source->boolean()));
 
     return addr;
 }
