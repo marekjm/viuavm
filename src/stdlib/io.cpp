@@ -57,6 +57,10 @@ class Ifstream: public viua::types::Type {
         }
 
         string getline() {
+            if (in.eof()) {
+                throw new viua::types::Exception("EOF");
+            }
+
             string line;
             std::getline(in, line);
             return line;
