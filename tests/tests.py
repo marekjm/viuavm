@@ -626,6 +626,15 @@ class PointersTests(unittest.TestCase):
     def testFloatArithmetic(self):
         runTest(self, 'float_arithmetic.asm', '3.550000')
 
+    def testLogicalAnd(self):
+        runTest(self, 'and.asm', 'false')
+
+    # def testLogicalNot(self):
+    #     runTest(self, 'not.asm', 'true')
+
+    def testLogicalOr(self):
+        runTest(self, 'or.asm', 'true')
+
 
 class SampleProgramsTests(unittest.TestCase):
     """Tests for various sample programs.
