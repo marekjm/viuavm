@@ -29,10 +29,24 @@ using namespace std;
 string disassembler::intop(byte* ptr) {
     ostringstream oss;
 
-    oss << ((*reinterpret_cast<bool*>(ptr)) ? "@" : "");
-    pointer::inc<bool, byte>(ptr);
-    oss << *reinterpret_cast<int*>(ptr);
-    pointer::inc<int, byte>(ptr);
+    auto type = *reinterpret_cast<OperandType*>(ptr);
+    pointer::inc<OperandType, byte>(ptr);
+
+    switch (type) {
+        case OT_VOID:
+            oss << "void";
+            break;
+        case OT_REGISTER_INDEX:
+            oss << *reinterpret_cast<int*>(ptr);
+            pointer::inc<int, byte>(ptr);
+            break;
+        case OT_REGISTER_REFERENCE:
+            oss << '@' << *reinterpret_cast<int*>(ptr);
+            pointer::inc<int, byte>(ptr);
+            break;
+        default:
+            throw "invalid operand type detected";
+    }
 
     return oss.str();
 }
@@ -41,14 +55,19 @@ static int decode_integer(byte *ptr) {
     return *reinterpret_cast<int*>(ptr);
 }
 static byte* disassemble_target_register(ostream& oss, byte *ptr) {
-    if ((*ptr == OT_REGISTER_INDEX) || (*ptr == OT_REGISTER_REFERENCE)) {
-        oss << " " << disassembler::intop(ptr);
-        pointer::inc<bool, byte>(ptr);
-        pointer::inc<int, byte>(ptr);
-    }
-    if (*ptr == OT_VOID) {
-        oss << " void";
-        ++ptr;
+    oss << " " << disassembler::intop(ptr);
+
+    switch (*ptr) {
+        case OT_REGISTER_INDEX:
+        case OT_REGISTER_REFERENCE:
+            pointer::inc<OperandType, byte>(ptr);
+            pointer::inc<int, byte>(ptr);
+            break;
+        case OT_VOID:
+            pointer::inc<OperandType, byte>(ptr);
+            break;
+        default:
+            throw "invalid operand type detected";
     }
     return ptr;
 }

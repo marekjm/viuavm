@@ -362,7 +362,7 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
             timeout_milliseconds = timeout_to_int(timeout_chnk);
             ++timeout_milliseconds;
         }
-        int_op timeout{false, timeout_milliseconds, false};
+        int_op timeout {timeout_milliseconds};
         program.opjoin(assembler::operands::getint(resolveregister(a_chnk)), assembler::operands::getint(resolveregister(b_chnk)), timeout);
     } else if (tokens.at(i) == "send") {
         program.opsend(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
@@ -373,7 +373,7 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
             timeout_milliseconds = timeout_to_int(timeout_chnk);
             ++timeout_milliseconds;
         }
-        int_op timeout{false, timeout_milliseconds, false};
+        int_op timeout {timeout_milliseconds};
         program.opreceive(assembler::operands::getint(resolveregister(regno_chnk)), timeout);
     } else if (tokens.at(i) == "watchdog") {
         program.opwatchdog(tokens.at(i+1));

@@ -28,10 +28,26 @@
 #include <viua/support/pointer.h>
 
 
+enum class IntegerOperandType {
+    PLAIN = 0,
+    INDEX,
+    REGISTER_REFERENCE,
+    POINTER_DEREFERENCE,
+    VOID,
+};
+
+struct int_op {
+    IntegerOperandType type;
+    int value;
+
+    int_op();
+    int_op(IntegerOperandType, int = 0);
+    int_op(int);
+};
+
 /** typedefs for various types of operands
  *  that Viua asm instructions may use.
  */
-typedef std::tuple<bool, int, bool> int_op;
 typedef std::tuple<bool, byte> byte_op;
 typedef std::tuple<bool, float> float_op;
 

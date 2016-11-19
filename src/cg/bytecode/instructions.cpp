@@ -22,6 +22,14 @@
 using namespace std;
 
 
+int_op::int_op(): type(IntegerOperandType::PLAIN), value(0) {
+}
+int_op::int_op(IntegerOperandType t, int n): type(t), value(n) {
+}
+int_op::int_op(int n): type(IntegerOperandType::PLAIN), value(n) {
+}
+
+
 static byte* insertIntegerOperand(byte* addr_ptr, int_op op) {
     /** Insert integer operand into bytecode.
      *
@@ -30,13 +38,7 @@ static byte* insertIntegerOperand(byte* addr_ptr, int_op op) {
      *  will look into a register the integer points to, fetch an integer from this register and
      *  use the fetched register as the operand.
      */
-    bool ref = false;
-    int num = 0;
-    bool is_void = false;
-
-    tie(ref, num, is_void) = op;
-
-    if (is_void) {
+    if (op.type == IntegerOperandType::VOID) {
         *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_VOID;
         pointer::inc<OperandType, byte>(addr_ptr);
         return addr_ptr;
@@ -46,14 +48,14 @@ static byte* insertIntegerOperand(byte* addr_ptr, int_op op) {
      * Since we store everything in a big array of bytes we have to cast incompatible pointers to
      * actually put *valid* data inside it.
      */
-    if (ref) {
+    if (op.type == IntegerOperandType::REGISTER_REFERENCE) {
         *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_REGISTER_REFERENCE;
     } else {
         *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_REGISTER_INDEX;
     }
     pointer::inc<OperandType, byte>(addr_ptr);
-    *(reinterpret_cast<int*>(addr_ptr))  = num;
-    pointer::inc<int, byte>(addr_ptr);
+    *(reinterpret_cast<int*>(addr_ptr))  = op.value;
+    pointer::inc<decltype(op.value), byte>(addr_ptr);
 
     return addr_ptr;
 }

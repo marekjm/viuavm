@@ -31,11 +31,14 @@ int_op assembler::operands::getint(const string& s) {
     }
 
     if (s == "void") {
-        return tuple<bool, int, bool>(false, 0, true);
+        return int_op(IntegerOperandType::VOID);
+    }
+    if (s.at(0) == '@') {
+        return int_op(IntegerOperandType::REGISTER_REFERENCE, stoi(s.substr(1)));
+    }
     }
 
-    bool ref = s[0] == '@';
-    return tuple<bool, int, bool>(ref, stoi(ref ? str::sub(s, 1) : s), false);
+    return int_op(stoi(s));
 }
 
 byte_op assembler::operands::getbyte(const string& s) {
