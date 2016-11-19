@@ -635,6 +635,18 @@ class PointersTests(unittest.TestCase):
     def testLogicalOr(self):
         runTest(self, 'or.asm', 'true')
 
+    def testCastItof(self):
+        runTest(self, 'itof.asm', '0.000000')
+
+    def testCastFtoi(self):
+        runTest(self, 'ftoi.asm', '0')
+
+    def testCastStoi(self):
+        runTest(self, 'stoi.asm', '42')
+
+    def testCastStof(self):
+        runTest(self, 'stof.asm', '3.140000')
+
 
 class SampleProgramsTests(unittest.TestCase):
     """Tests for various sample programs.

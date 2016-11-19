@@ -30,32 +30,38 @@ using namespace std;
 
 
 byte* viua::process::Process::opitof(byte* addr) {
-    unsigned target = 0, source = 0;
+    unsigned target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    place(target, new viua::types::Float(static_cast<viua::types::Integer*>(fetch(source))->as_float64()));
+    viua::types::Type* source = nullptr;
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+
+    place(target, new viua::types::Float(static_cast<viua::types::Integer*>(source)->as_float64()));
 
     return addr;
 }
 
 byte* viua::process::Process::opftoi(byte* addr) {
-    unsigned target = 0, source = 0;
+    unsigned target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    place(target, new viua::types::Integer(static_cast<viua::types::Float*>(fetch(source))->as_int32()));
+    viua::types::Type* source = nullptr;
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+
+    place(target, new viua::types::Integer(static_cast<viua::types::Float*>(source)->as_int32()));
 
     return addr;
 }
 
 byte* viua::process::Process::opstoi(byte* addr) {
-    unsigned target = 0, source = 0;
+    unsigned target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+
+    viua::types::Type* source = nullptr;
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
     int result_integer = 0;
-    string supplied_string = static_cast<viua::types::String*>(fetch(source))->value();
+    string supplied_string = static_cast<viua::types::String*>(source)->value();
     try {
         result_integer = std::stoi(supplied_string);
     } catch (const std::out_of_range& e) {
@@ -70,11 +76,13 @@ byte* viua::process::Process::opstoi(byte* addr) {
 }
 
 byte* viua::process::Process::opstof(byte* addr) {
-    unsigned target = 0, source = 0;
+    unsigned target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    string supplied_string = static_cast<viua::types::String*>(fetch(source))->value();
+    viua::types::Type* source = nullptr;
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+
+    string supplied_string = static_cast<viua::types::String*>(source)->value();
     double convert_from = std::stod(supplied_string);
     place(target, new viua::types::Float(convert_from));
 
