@@ -113,6 +113,14 @@ static string resolveregister(Token token) {
         // FIXME: analyse source and detect if the referenced register really holds an integer (the only value suitable to use
         // as register reference)
         out.str(reg);
+    } else if (reg[0] == '*' and str::isnum(str::sub(reg, 1))) {
+        /*  Basic case - the register index is taken from another register, everything is still nice and simple.
+         */
+        if (stoi(reg.substr(1)) < 0) {
+            throw ("register indexes cannot be negative: " + reg);
+        }
+
+        out.str(reg);
     } else if (reg == "void") {
         out << reg;
     } else {

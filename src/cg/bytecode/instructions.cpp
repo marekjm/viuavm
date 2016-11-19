@@ -48,7 +48,9 @@ static byte* insertIntegerOperand(byte* addr_ptr, int_op op) {
      * Since we store everything in a big array of bytes we have to cast incompatible pointers to
      * actually put *valid* data inside it.
      */
-    if (op.type == IntegerOperandType::REGISTER_REFERENCE) {
+    if (op.type == IntegerOperandType::POINTER_DEREFERENCE) {
+        *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_POINTER;
+    } else if (op.type == IntegerOperandType::REGISTER_REFERENCE) {
         *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_REGISTER_REFERENCE;
     } else {
         *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_REGISTER_INDEX;

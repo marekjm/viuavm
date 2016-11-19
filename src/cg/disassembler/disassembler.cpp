@@ -44,6 +44,10 @@ string disassembler::intop(byte* ptr) {
             oss << '@' << *reinterpret_cast<int*>(ptr);
             pointer::inc<int, byte>(ptr);
             break;
+        case OT_POINTER:
+            oss << '*' << *reinterpret_cast<int*>(ptr);
+            pointer::inc<int, byte>(ptr);
+            break;
         default:
             throw "invalid operand type detected";
     }
@@ -60,6 +64,7 @@ static byte* disassemble_target_register(ostream& oss, byte *ptr) {
     switch (*ptr) {
         case OT_REGISTER_INDEX:
         case OT_REGISTER_REFERENCE:
+        case OT_POINTER:
             pointer::inc<OperandType, byte>(ptr);
             pointer::inc<int, byte>(ptr);
             break;

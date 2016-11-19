@@ -654,6 +654,10 @@ namespace viua {
                         tokens.emplace_back(t.line(), t.character(), (t.str() + input_tokens.at(i+1).str()));
                         ++i;
                         continue;
+                    } else if (i+1 < limit and t.str() == "*" and input_tokens.at(i+1).str() != "\n" and adjacent(t, input_tokens.at(i+1))) {
+                        tokens.emplace_back(t.line(), t.character(), (t.str() + input_tokens.at(i+1).str()));
+                        ++i;
+                        continue;
                     }
                     tokens.push_back(t);
                 }
@@ -1177,6 +1181,9 @@ namespace viua {
                         tokens.back().original(token.str());
                     } else if (token.str().at(0) == '@' and names.count(token.str().substr(1))) {
                         tokens.emplace_back(token.line(), token.character(), ("@" + names.at(token.str().substr(1))));
+                        tokens.back().original(token.str().substr(1));
+                    } else if (token.str().at(0) == '*' and names.count(token.str().substr(1))) {
+                        tokens.emplace_back(token.line(), token.character(), ("*" + names.at(token.str().substr(1))));
                         tokens.back().original(token.str().substr(1));
                     } else {
                         tokens.push_back(token);
