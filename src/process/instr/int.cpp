@@ -61,13 +61,12 @@ template<class Operator, class ResultType> byte* perform(byte* addr, viua::proce
      *  viua::process::Process class's scope and passing it here.
      *  Voila - we can place objects in process's current register set.
      */
-    unsigned target_register_index = 0, first_operand_index = 0, second_operand_index = 0;
+    unsigned target_register_index = 0;
     tie(addr, target_register_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, t);
-    tie(addr, first_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, t);
-    tie(addr, second_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, t);
 
-    auto first = t->obtain(first_operand_index);
-    auto second = t->obtain(second_operand_index);
+    viua::types::Type *first = nullptr, *second = nullptr;
+    tie(addr, first) = viua::bytecode::decoder::operands::fetch_object(addr, t);
+    tie(addr, second) = viua::bytecode::decoder::operands::fetch_object(addr, t);
 
     using viua::types::numeric::Number;
 
