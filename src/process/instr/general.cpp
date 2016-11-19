@@ -27,16 +27,16 @@ using namespace std;
 
 
 byte* viua::process::Process::opecho(byte* addr) {
-    unsigned source = 0;
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    cout << fetch(source)->str();
+    viua::types::Type* source { nullptr };
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    cout << source->str();
     return addr;
 }
 
 byte* viua::process::Process::opprint(byte* addr) {
-    unsigned source = 0;
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    cout << fetch(source)->str() + '\n';
+    viua::types::Type* source { nullptr };
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    cout << source->str() + '\n';
     return addr;
 }
 
