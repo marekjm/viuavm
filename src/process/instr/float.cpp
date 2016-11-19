@@ -49,11 +49,6 @@ template<class Operator, class ResultType> byte* perform(byte* addr, viua::proce
      *  First parameter - byte* addr - is the instruction pointer from which operand extraction should begin.
      *
      *  Second parameter - viua::process::Process* t - is a pointer to current VM process (passed as `this`).
-     *
-     *  Third parameter - ObjectPlacer - is a member-function pointer to viua::process::Process::place.
-     *  Since it is private, we have to cheat the compiler by extracting its pointer while in
-     *  viua::process::Process class's scope and passing it here.
-     *  Voila - we can place objects in process's current register set.
      */
     unsigned target_register_index = 0;
     tie(addr, target_register_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, t);
