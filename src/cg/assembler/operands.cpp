@@ -36,7 +36,6 @@ int_op assembler::operands::getint(const string& s) {
     if (s.at(0) == '@') {
         return int_op(IntegerOperandType::REGISTER_REFERENCE, stoi(s.substr(1)));
     }
-    }
 
     return int_op(stoi(s));
 }
