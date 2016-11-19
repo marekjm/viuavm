@@ -281,7 +281,7 @@ build/stdlib/kitchensink.o: src/stdlib/kitchensink.cpp
 build/stdlib/typesystem.so: build/stdlib/typesystem.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o build/platform/type.o build/platform/pointer.o build/platform/integer.o
 	$(CXX) -std=$(CXX_STANDARD) -fPIC -shared -o $@ $^
 
-build/stdlib/io.so: build/stdlib/io.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o build/platform/type.o build/platform/pointer.o
+build/stdlib/io.so: build/stdlib/io.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o build/platform/type.o build/platform/pointer.o build/platform/integer.o
 	$(CXX) -std=$(CXX_STANDARD) -fPIC -shared -o $@ $^
 
 build/stdlib/random.so: build/stdlib/random.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o build/platform/type.o build/platform/pointer.o
