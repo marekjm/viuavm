@@ -21,6 +21,7 @@
 #include <viua/bytecode/operand_types.h>
 #include <viua/types/type.h>
 #include <viua/types/integer.h>
+#include <viua/types/pointer.h>
 #include <viua/process.h>
 #include <viua/exceptions.h>
 #include <viua/bytecode/decoder/operands.h>
@@ -82,7 +83,7 @@ auto viua::bytecode::decoder::operands::fetch_register_index(byte *ip, viua::pro
     ++ip;
 
     unsigned register_index = 0;
-    if (ot == OT_REGISTER_INDEX or ot == OT_REGISTER_REFERENCE) {
+    if (ot == OT_REGISTER_INDEX or ot == OT_REGISTER_REFERENCE or ot == OT_POINTER) {
         // FIXME currently RI's are encoded as signed integers
         // remove this ugly cast when this is fixed
         register_index = static_cast<unsigned>(extract<int>(ip));
@@ -142,6 +143,19 @@ auto viua::bytecode::decoder::operands::fetch_atom(byte *ip, viua::process::Proc
 
 auto viua::bytecode::decoder::operands::fetch_object(byte *ip, viua::process::Process *p) -> tuple<byte*, viua::types::Type*> {
     unsigned register_index = 0;
+
+    bool is_pointer = (get_operand_type(ip) == OT_POINTER);
+
     tie(ip, register_index) = fetch_register_index(ip, p);
-    return tuple<byte*, viua::types::Type*>(ip, p->obtain(register_index));
+    auto object = p->obtain(register_index);
+
+    if (is_pointer) {
+        auto pointer_object = dynamic_cast<viua::types::Pointer*>(object);
+        if (pointer_object == nullptr) {
+            throw new viua::types::Exception("dereferenced type is not a pointer: " + object->type());
+        }
+        object = pointer_object->to();
+    }
+
+    return tuple<byte*, viua::types::Type*>(ip, object);
 }
