@@ -121,7 +121,8 @@ Normally, the object is removed from source register of these instructions but w
 If the result of a pointer dereference is inserted into an object, should the pointer be removed from its register even if it's not directly affected?
 Should the object pointed-to be removed from its register?
 Answer to both of these questions is no.
-The typical *move* semantics change to *copy-pointed-to* semantics whenever pointer dereference is used as the source.
+Whenever pointer dereference is used as the source either the typical *move* semantics change to *copy-pointed-to* semantics, or
+the code is invalid and will result in an exception being thrown.
 
 
 ----
