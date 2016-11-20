@@ -657,6 +657,9 @@ class PointersTests(unittest.TestCase):
     def testIf(self):
         runTest(self, 'if.asm', 'Nope')
 
+    def testInsertPointerDereference(self):
+        runTestSplitlines(self, 'insert_pointer_dereference.asm', ['Object#{foo: "bar"}', 'bar'])
+
 
 class SampleProgramsTests(unittest.TestCase):
     """Tests for various sample programs.

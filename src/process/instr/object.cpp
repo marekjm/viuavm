@@ -116,16 +116,20 @@ byte* viua::process::Process::opinsert(byte* addr) {
     /** Insert an object as an attribute of another object.
      */
     viua::types::Type *object_operand = nullptr, *key_operand = nullptr;
-    unsigned source_index = 0;
-
     tie(addr, object_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
     tie(addr, key_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
-    tie(addr, source_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-
     viua::assertions::assert_implements<viua::types::Object>(object_operand, "viua::types::Object");
     viua::assertions::assert_typeof(key_operand, "String");
 
-    static_cast<viua::types::Object*>(object_operand)->insert(static_cast<viua::types::String*>(key_operand)->str(), pop(source_index));
+    if (viua::bytecode::decoder::operands::get_operand_type(addr) == OT_POINTER) {
+        viua::types::Type* source = nullptr;
+        tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+        static_cast<viua::types::Object*>(object_operand)->insert(static_cast<viua::types::String*>(key_operand)->str(), source->copy());
+    } else {
+        unsigned source_index = 0;
+        tie(addr, source_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+        static_cast<viua::types::Object*>(object_operand)->insert(static_cast<viua::types::String*>(key_operand)->str(), pop(source_index));
+    }
 
     return addr;
 }
