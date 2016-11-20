@@ -647,6 +647,10 @@ class PointersTests(unittest.TestCase):
     def testCastStof(self):
         runTest(self, 'stof.asm', '3.140000')
 
+    def testCaptureCopy(self):
+        # FIXME: passing custom assembler options will not be needed once .closure: support is completely implemented
+        runTest(self, 'capturecopy.asm', 'Hello World!', assembly_opts=('--no-sa',))
+
 
 class SampleProgramsTests(unittest.TestCase):
     """Tests for various sample programs.
