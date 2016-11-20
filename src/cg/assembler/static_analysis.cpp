@@ -74,6 +74,9 @@ static auto skip_till_next_line(const std::vector<viua::cg::lex::Token>& tokens,
     return i;
 }
 static string resolve_register_name(const map<string, string>& named_registers, viua::cg::lex::Token token, string name) {
+    if (name == "\n") {
+        throw viua::cg::lex::InvalidSyntax(token, "expected operand, found newline");
+    }
     if (name == "void") {
         return name;
     }

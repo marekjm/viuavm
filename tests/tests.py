@@ -1262,6 +1262,12 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
             '24:12: error: in function main/0',
         ])
 
+    def testExpectedOperandFoundNewline(self):
+        runTestFailsToAssembleDetailed(self, 'found_newline.asm', [
+            '21:10: error: expected operand, found newline',
+            '20:12: error: in function main/0',
+        ])
+
 
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.
