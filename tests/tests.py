@@ -1563,6 +1563,9 @@ class KeywordVoidTests(unittest.TestCase):
     def testVoidInReceive(self):
         runTest(self, 'in_receive.asm', '')
 
+    def testRemoveVoidTarget(self):
+        runTest(self, 'remove_void_target.asm', 'Object#{}')
+
 
 class KeywordDefaultTests(unittest.TestCase):
     """Tests for `default` keyword.

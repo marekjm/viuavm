@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <memory>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/types/integer.h>
@@ -138,16 +139,25 @@ byte* viua::process::Process::opremove(byte* addr) {
     /** Remove an attribute of another object.
      */
     unsigned target_index = 0;
-    viua::types::Type *object_operand = nullptr, *key_operand = nullptr;
+    bool void_target = false;
+    if (viua::bytecode::decoder::operands::get_operand_type(addr) == OT_VOID) {
+        void_target = true;
+        addr = viua::bytecode::decoder::operands::fetch_void(addr);
+    } else {
+        tie(addr, target_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    }
 
-    tie(addr, target_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    viua::types::Type *object_operand = nullptr, *key_operand = nullptr;
     tie(addr, object_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
     tie(addr, key_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
     viua::assertions::assert_implements<viua::types::Object>(object_operand, "viua::types::Object");
     viua::assertions::assert_typeof(key_operand, "String");
 
-    place(target_index, static_cast<viua::types::Object*>(object_operand)->remove(static_cast<viua::types::String*>(key_operand)->str()));
+    unique_ptr<viua::types::Type> result { static_cast<viua::types::Object*>(object_operand)->remove(static_cast<viua::types::String*>(key_operand)->str()) };
+    if (not void_target) {
+        place(target_index, result.release());
+    }
 
     return addr;
 }
