@@ -99,6 +99,8 @@ There are several categories of change:
 - bic, feature: `void` operands are now only one byte long
 - fix: `std::io::ifstream::getline/1` throws an exception when EOF is reached
 - bic, enhancement: `not` has two operands: target and source registers
+- feature: pointer dereference using `*<register-index>` (e.g. `*pointer`) syntax; exception is thrown when expired pointer is dereferenced, or
+  program tries to dereference something that is not a pointer
 
 One limitation of static analyser (SA) introduced in this release is its inability to handle backwards jumps.
 This, however, is not a problem if the code does not use loops and
@@ -113,6 +115,13 @@ These traces are displayed as step-by-step explanations of how the SA reached th
 context lines.
 When the SA is not able to provide a trace (e.g. reaching an error takes only one step, or SA does not have enough information) a
 single-step message is provided.
+
+Pointer dereferences alter semantics of some instructions, e.g. `send` and `insert`.
+Normally, the object is removed from source register of these instructions but when pointer derefence is used things get interesting.
+If the result of a pointer dereference is inserted into an object, should the pointer be removed from its register even if it's not directly affected?
+Should the object pointed-to be removed from its register?
+Answer to both of these questions is no.
+The typical *move* semantics change to *copy-pointed-to* semantics whenever pointer dereference is used as the source.
 
 
 ----
