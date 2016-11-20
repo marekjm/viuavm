@@ -651,6 +651,9 @@ class PointersTests(unittest.TestCase):
         # FIXME: passing custom assembler options will not be needed once .closure: support is completely implemented
         runTest(self, 'capturecopy.asm', 'Hello World!', assembly_opts=('--no-sa',))
 
+    def testFcall(self):
+        runTestReturnsIntegers(self, 'fcall.asm', [2, 1])
+
 
 class SampleProgramsTests(unittest.TestCase):
     """Tests for various sample programs.
