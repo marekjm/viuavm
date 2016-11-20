@@ -134,8 +134,16 @@ byte* viua::process::Process::opfunction(byte* addr) {
 byte* viua::process::Process::opfcall(byte* addr) {
     /*  Call a function object.
      */
-    unsigned return_register = 0, fn_reg = 0;
-    tie(addr, return_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    bool return_void = viua::bytecode::decoder::operands::is_void(addr);
+    unsigned return_register = 0;
+
+    if (not return_void) {
+        tie(addr, return_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    } else {
+        addr = viua::bytecode::decoder::operands::fetch_void(addr);
+    }
+
+    unsigned fn_reg = 0;
     tie(addr, fn_reg) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     // FIXME: there should be a check it this is *really* a function object
@@ -160,6 +168,7 @@ byte* viua::process::Process::opfcall(byte* addr) {
     frame_new->function_name = call_name;
     frame_new->return_address = return_address;
 
+    frame_new->return_void = return_void;
     frame_new->place_return_value_in = return_register;
 
     if (fn->type() == "Closure") {
