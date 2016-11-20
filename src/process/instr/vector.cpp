@@ -91,13 +91,18 @@ byte* viua::process::Process::opvpush(byte* addr) {
     /*  Run vpush instruction.
      */
     viua::types::Type* target = nullptr;
-    unsigned source = 0;
-
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_object(addr, this);
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-
     viua::assertions::assert_implements<viua::types::Vector>(target, "viua::types::Vector");
-    static_cast<viua::types::Vector*>(target)->push(pop(source));
+
+    if (viua::bytecode::decoder::operands::get_operand_type(addr) == OT_POINTER) {
+        viua::types::Type* source = nullptr;
+        tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+        static_cast<viua::types::Vector*>(target)->push(source->copy());
+    } else {
+        unsigned source = 0;
+        tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+        static_cast<viua::types::Vector*>(target)->push(pop(source));
+    }
 
     return addr;
 }
