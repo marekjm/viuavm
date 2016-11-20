@@ -38,12 +38,12 @@ template<class T> static auto extract_ptr(byte *ip) -> T* {
     return reinterpret_cast<T*>(ip);
 }
 
-static auto get_operand_type(const byte *ip) -> OperandType {
+auto viua::bytecode::decoder::operands::get_operand_type(const byte *ip) -> OperandType {
     return extract<const OperandType>(ip);
 }
 
 template<class Value, class Class> static auto fetch_primitive_value(byte *ip, viua::process::Process *p, Value initial) -> tuple<byte*, Value> {
-    OperandType ot = get_operand_type(ip);
+    OperandType ot = viua::bytecode::decoder::operands::get_operand_type(ip);
     ++ip;
 
     Value value = initial;

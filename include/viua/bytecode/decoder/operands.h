@@ -25,6 +25,7 @@
 #include <string>
 #include <utility>
 #include <viua/bytecode/bytetypedef.h>
+#include <viua/bytecode/operand_types.h>
 #include <viua/types/type.h>
 
 
@@ -39,6 +40,8 @@ namespace viua {
     namespace bytecode {
         namespace decoder {
             namespace operands {
+                auto get_operand_type(const byte*) -> OperandType;
+
                 /*
                  *  Fetch fully specified operands, possibly stored in registers.
                  *  These functions will correctly decode and return:
