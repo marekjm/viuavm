@@ -122,9 +122,9 @@ class Program {
     Program& opprint(int_op);
     Program& opecho(int_op);
 
-    Program& openclose(int_op, int_op, int_op);
-    Program& openclosecopy(int_op, int_op, int_op);
-    Program& openclosemove(int_op, int_op, int_op);
+    Program& opcapture(int_op, int_op, int_op);
+    Program& opcapturecopy(int_op, int_op, int_op);
+    Program& opcapturemove(int_op, int_op, int_op);
     Program& opclosure(int_op, const std::string&);
 
     Program& opfunction(int_op, const std::string&);

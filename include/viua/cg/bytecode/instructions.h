@@ -111,9 +111,9 @@ namespace cg {
         byte* opprint(byte*, int_op);
         byte* opecho(byte*, int_op);
 
-        byte* openclose(byte*, int_op, int_op, int_op);
-        byte* openclosecopy(byte*, int_op, int_op, int_op);
-        byte* openclosemove(byte*, int_op, int_op, int_op);
+        byte* opcapture(byte*, int_op, int_op, int_op);
+        byte* opcapturecopy(byte*, int_op, int_op, int_op);
+        byte* opcapturemove(byte*, int_op, int_op, int_op);
         byte* opclosure(byte*, int_op, const std::string&);
         byte* opfunction(byte*, int_op, const std::string&);
         byte* opfcall(byte*, int_op, int_op);

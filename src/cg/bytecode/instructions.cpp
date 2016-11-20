@@ -619,7 +619,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* openclose(byte* addr_ptr, int_op target_closure, int_op target_register, int_op source_register) {
+        byte* opcapture(byte* addr_ptr, int_op target_closure, int_op target_register, int_op source_register) {
             /*  Inserts clbing instuction.
              */
             *(addr_ptr++) = CAPTURE;
@@ -629,7 +629,7 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* openclosecopy(byte* addr_ptr, int_op target_closure, int_op target_register, int_op source_register) {
+        byte* opcapturecopy(byte* addr_ptr, int_op target_closure, int_op target_register, int_op source_register) {
             /*  Inserts capturecopy instuction.
              */
             *(addr_ptr++) = CAPTURECOPY;
@@ -639,8 +639,8 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* openclosemove(byte* addr_ptr, int_op target_closure, int_op target_register, int_op source_register) {
-            /*  Inserts openclosemove instuction.
+        byte* opcapturemove(byte* addr_ptr, int_op target_closure, int_op target_register, int_op source_register) {
+            /*  Inserts opcapturemove instuction.
              */
             *(addr_ptr++) = CAPTUREMOVE;
             addr_ptr = insertIntegerOperand(addr_ptr, target_closure);

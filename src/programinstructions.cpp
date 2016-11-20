@@ -518,24 +518,24 @@ Program& Program::opecho(int_op reg) {
     return (*this);
 }
 
-Program& Program::openclose(int_op target_closure, int_op target_register, int_op source_register) {
+Program& Program::opcapture(int_op target_closure, int_op target_register, int_op source_register) {
     /*  Inserts clbing instuction.
      */
-    addr_ptr = cg::bytecode::openclose(addr_ptr, target_closure, target_register, source_register);
+    addr_ptr = cg::bytecode::opcapture(addr_ptr, target_closure, target_register, source_register);
     return (*this);
 }
 
-Program& Program::openclosecopy(int_op target_closure, int_op target_register, int_op source_register) {
-    /*  Inserts openclosecopy instuction.
+Program& Program::opcapturecopy(int_op target_closure, int_op target_register, int_op source_register) {
+    /*  Inserts opcapturecopy instuction.
      */
-    addr_ptr = cg::bytecode::openclosecopy(addr_ptr, target_closure, target_register, source_register);
+    addr_ptr = cg::bytecode::opcapturecopy(addr_ptr, target_closure, target_register, source_register);
     return (*this);
 }
 
-Program& Program::openclosemove(int_op target_closure, int_op target_register, int_op source_register) {
-    /*  Inserts openclosemove instuction.
+Program& Program::opcapturemove(int_op target_closure, int_op target_register, int_op source_register) {
+    /*  Inserts opcapturemove instuction.
      */
-    addr_ptr = cg::bytecode::openclosemove(addr_ptr, target_closure, target_register, source_register);
+    addr_ptr = cg::bytecode::opcapturemove(addr_ptr, target_closure, target_register, source_register);
     return (*this);
 }
 

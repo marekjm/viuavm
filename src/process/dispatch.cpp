@@ -174,13 +174,13 @@ byte* viua::process::Process::dispatch(byte* addr) {
               addr = opecho(addr+1);
             break;
         case CAPTURE:
-              addr = openclose(addr+1);
+              addr = opcapture(addr+1);
             break;
         case CAPTURECOPY:
-            addr = openclosecopy(addr+1);
+            addr = opcapturecopy(addr+1);
             break;
         case CAPTUREMOVE:
-            addr = openclosemove(addr+1);
+            addr = opcapturemove(addr+1);
             break;
         case CLOSURE:
               addr = opclosure(addr+1);

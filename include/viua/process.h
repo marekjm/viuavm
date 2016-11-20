@@ -219,9 +219,9 @@ namespace viua {
             byte* opprint(byte*);
             byte* opecho(byte*);
 
-            byte* openclose(byte*);
-            byte* openclosecopy(byte*);
-            byte* openclosemove(byte*);
+            byte* opcapture(byte*);
+            byte* opcapturecopy(byte*);
+            byte* opcapturemove(byte*);
             byte* opclosure(byte*);
 
             byte* opfunction(byte*);

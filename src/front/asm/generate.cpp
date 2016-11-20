@@ -169,9 +169,9 @@ const map<string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS = {
     { "and",  &Program::opand },
     { "or",   &Program::opor },
 
-    { "capture", &Program::openclose },
-    { "capturecopy", &Program::openclosecopy },
-    { "capturemove", &Program::openclosemove },
+    { "capture", &Program::opcapture },
+    { "capturecopy", &Program::opcapturecopy },
+    { "capturemove", &Program::opcapturemove },
 
     { "insert", &Program::opinsert },
     { "remove", &Program::opremove },
@@ -304,11 +304,11 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
     } else if (tokens.at(i) == "echo") {
         program.opecho(assembler::operands::getint(resolveregister(tokens.at(i+1))));
     } else if (tokens.at(i) == "capture") {
-        program.openclose(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
+        program.opcapture(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "capturecopy") {
-        program.openclosecopy(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
+        program.opcapturecopy(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "capturemove") {
-        program.openclosemove(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
+        program.opcapturemove(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "closure") {
         program.opclosure(assembler::operands::getint(resolveregister(tokens.at(i+1))), tokens.at(i+2));
     } else if (tokens.at(i) == "function") {

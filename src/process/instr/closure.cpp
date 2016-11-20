@@ -31,7 +31,7 @@
 using namespace std;
 
 
-byte* viua::process::Process::openclose(byte* addr) {
+byte* viua::process::Process::opcapture(byte* addr) {
     /** Capture object by reference.
      */
     unsigned target_closure_register = 0, target_register = 0, source_register = 0;
@@ -59,7 +59,7 @@ byte* viua::process::Process::openclose(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::openclosecopy(byte* addr) {
+byte* viua::process::Process::opcapturecopy(byte* addr) {
     /** Capture object by copy.
      */
     unsigned target_closure_register = 0, target_register = 0, source_register = 0;
@@ -77,7 +77,7 @@ byte* viua::process::Process::openclosecopy(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::openclosemove(byte* addr) {
+byte* viua::process::Process::opcapturemove(byte* addr) {
     /** Capture object by move.
      */
     unsigned target_closure_register = 0, target_register = 0, source_register = 0;
