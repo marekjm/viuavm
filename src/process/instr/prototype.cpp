@@ -46,9 +46,9 @@ byte* viua::process::Process::opderive(byte* addr) {
     /** Push an ancestor class to prototype's inheritance chain.
      */
     viua::types::Type* target = nullptr;
-    string class_name;
-
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+
+    string class_name;
     tie(addr, class_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     if (not scheduler->isClass(class_name)) {
@@ -64,9 +64,9 @@ byte* viua::process::Process::opattach(byte* addr) {
     /** Attach a function to a prototype as a method.
      */
     viua::types::Type* target = nullptr;
-    string function_name, method_name;
-
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+
+    string function_name, method_name;
     tie(addr, function_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
     tie(addr, method_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
