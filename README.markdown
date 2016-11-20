@@ -33,9 +33,12 @@
 
 Viua is a runtime environment focused on reliability, predictability, and concurrency.
 It is suitable for long-running software like servers, message queues, and system daemons.
+The VM is able to fully utilise all cores of the CPU it's running on (tested on a system with 8 hardware threads) so can
+generate high CPU loads, but is relatively light on RAM and should not contain any memory leaks (all runtime tests are
+run under Valgrind to ensure this).
 
-It ships with are assembler, static analyser, and a kernel.
 The virtual machine is covered by ~380 tests to provide safety, and guard against possible regressions.
+It ships with an assembler, and a static analyser, but does not provide any higher-level language compiler.
 
 
 ----
