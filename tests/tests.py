@@ -1575,6 +1575,9 @@ class KeywordVoidTests(unittest.TestCase):
     def testRemoveVoidTarget(self):
         runTest(self, 'remove_void_target.asm', 'Object#{}')
 
+    def testVpopVoidTarget(self):
+        runTest(self, 'vpop_void_target.asm', '[]')
+
 
 class KeywordDefaultTests(unittest.TestCase):
     """Tests for `default` keyword.

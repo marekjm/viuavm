@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <memory>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/assert.h>
@@ -111,20 +112,29 @@ byte* viua::process::Process::opvpop(byte* addr) {
     /*  Run vpop instruction.
      */
     unsigned destination_register_index = 0;
-    viua::types::Type* vector_operand = nullptr;
-    int position_operand_index = 0;
+    bool destination_is_void = false;
+    if (viua::bytecode::decoder::operands::get_operand_type(addr) == OT_VOID) {
+        destination_is_void = true;
+        addr = viua::bytecode::decoder::operands::fetch_void(addr);
+    } else {
+        tie(addr, destination_register_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    }
 
-    tie(addr, destination_register_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    viua::types::Type* vector_operand = nullptr;
     tie(addr, vector_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    viua::assertions::assert_implements<viua::types::Vector>(vector_operand, "viua::types::Vector");
+
+    int position_operand_index = 0;
     tie(addr, position_operand_index) = viua::bytecode::decoder::operands::fetch_primitive_int(addr, this);
 
-    viua::assertions::assert_implements<viua::types::Vector>(vector_operand, "viua::types::Vector");
     /*  1) fetch vector,
      *  2) pop value at given index,
      *  3) put it in a register,
      */
-    viua::types::Type* ptr = static_cast<viua::types::Vector*>(vector_operand)->pop(position_operand_index);
-    place(destination_register_index, ptr);
+    unique_ptr<viua::types::Type> ptr { static_cast<viua::types::Vector*>(vector_operand)->pop(position_operand_index) };
+    if (not destination_is_void) {
+        place(destination_register_index, ptr.release());
+    }
 
     return addr;
 }
