@@ -666,6 +666,12 @@ class PointersTests(unittest.TestCase):
     def testInsertPointerDereferenceAsTarget(self):
         runTest(self, 'insert_pointer_dereference_as_target.asm', 'Object#{foo: "bar"}')
 
+    def testVinsertPointerDereferenceAsSource(self):
+        runTestSplitlines(self, 'vinsert_pointer_dereference_as_source.asm', ['[0]', '0'])
+
+    def testVinsertPointerDereferenceAsTarget(self):
+        runTest(self, 'vinsert_pointer_dereference_as_target.asm', '[0]')
+
 
 class SampleProgramsTests(unittest.TestCase):
     """Tests for various sample programs.

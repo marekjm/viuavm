@@ -62,15 +62,27 @@ byte* viua::process::Process::opvinsert(byte* addr) {
     /*  Run vinsert instruction.
      */
     viua::types::Type* vector_operand = nullptr;
-    unsigned object_operand_index = 0, position_operand_index = 0;
-
     tie(addr, vector_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
-    tie(addr, object_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    tie(addr, position_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-
     viua::assertions::assert_implements<viua::types::Vector>(vector_operand, "viua::types::Vector");
 
-    static_cast<viua::types::Vector*>(vector_operand)->insert(position_operand_index, pop(object_operand_index));
+    // FIXME reorder "vinsert" operand order to 'target, position, source' from 'target, source, position' so this code can be less convulted
+    if (viua::bytecode::decoder::operands::get_operand_type(addr) == OT_POINTER) {
+        viua::types::Type* source = nullptr;
+        tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+
+        unsigned position_operand_index = 0;
+        tie(addr, position_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+
+        static_cast<viua::types::Vector*>(vector_operand)->insert(position_operand_index, source->copy());
+    } else {
+        unsigned object_operand_index = 0;
+        tie(addr, object_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+
+        unsigned position_operand_index = 0;
+        tie(addr, position_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+
+        static_cast<viua::types::Vector*>(vector_operand)->insert(position_operand_index, pop(object_operand_index));
+    }
 
     return addr;
 }
