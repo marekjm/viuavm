@@ -50,12 +50,12 @@ byte* viua::process::Process::opjump(byte* addr) {
 }
 
 byte* viua::process::Process::opif(byte* addr) {
-    unsigned source_register_index = 0;
-    uint64_t addr_true = 0, addr_false = 0;
+    viua::types::Type* source = nullptr;
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    tie(addr, source_register_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    uint64_t addr_true = 0, addr_false = 0;
     tie(addr, addr_true) = viua::bytecode::decoder::operands::fetch_primitive_uint64(addr, this);
     tie(addr, addr_false) = viua::bytecode::decoder::operands::fetch_primitive_uint64(addr, this);
 
-    return (jump_base + (fetch(source_register_index)->boolean() ? addr_true : addr_false));
+    return (jump_base + (source->boolean() ? addr_true : addr_false));
 }

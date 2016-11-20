@@ -654,6 +654,9 @@ class PointersTests(unittest.TestCase):
     def testFcall(self):
         runTestReturnsIntegers(self, 'fcall.asm', [2, 1])
 
+    def testIf(self):
+        runTest(self, 'if.asm', 'Nope')
+
 
 class SampleProgramsTests(unittest.TestCase):
     """Tests for various sample programs.
