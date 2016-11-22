@@ -318,7 +318,9 @@ void assembler::verify::callableCreations(const vector<Token>& tokens, const vec
         }
 
         if (is_undefined) {
-            throw viua::cg::lex::InvalidSyntax(tokens.at(i), (tokens.at(i).str() + " from undefined function: " + function));
+            viua::cg::lex::InvalidSyntax e(tokens.at(i), (tokens.at(i).str() + " from undefined function: " + function));
+            e.add(tokens.at(i+2));
+            throw e;
         }
         i += 2;
     }
