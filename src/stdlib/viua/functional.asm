@@ -90,22 +90,20 @@
     ; loop termination variable
     .name: 3 counter
     izero counter
-    vlen 4 list
+    vlen (.name: 4 list_length) list
 
     ; loop condition
     .mark: loop_begin
-    ilt 5 3 4
-    if 5 loop_body loop_end
+    if (ilt 5 counter list_length) loop_body loop_end
 
     .mark: loop_body
 
     ; extract parameter value
-    vat 6 list @counter
+    vat (.name: 6 element) list @counter
 
     ; invoke given callback
-    frame 1
-    param 0 6
-    fcall 7 callback
+    frame ^[(param 0 element)]
+    fcall void callback
 
     iinc counter
     jump loop_begin
