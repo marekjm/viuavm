@@ -439,7 +439,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             continue;
         } else {
             string reg_original = body_tokens.at(i+1), reg = resolve_register_name(named_registers, body_tokens.at(i+1));
-            registers.insert(reg, body_tokens.at(1+1));
+            registers.insert(reg, body_tokens.at(i+1));
             if (debug) {
                 cout << "  " << str::enquote(token) << " defined register " << str::enquote(str::strencode(reg_original));
                 if (reg != reg_original) {
