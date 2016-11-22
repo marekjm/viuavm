@@ -173,6 +173,7 @@ static auto in_block_offset(const vector<viua::cg::lex::Token>& body_tokens, std
         // FIXME: no support for non-relative jumps
         i = skip_till_next_line(body_tokens, i);
     } else {
+        auto saved_i = i;
         while (i < body_tokens.size()-1 and not (body_tokens.at(i) == ".mark:" and body_tokens.at(i+1) == checked_token.str())) {
             i = skip_till_next_line(body_tokens, i);
             ++i;
@@ -185,6 +186,12 @@ static auto in_block_offset(const vector<viua::cg::lex::Token>& body_tokens, std
                 }
                 named_registers[body_tokens.at(i+2)] = body_tokens.at(i+1);
             }
+        }
+        if (i >= body_tokens.size()-1) {
+            // if this 'if' block is entered, the jump has been to a label defined before the jump
+            // SA does not support backward jumps so just skip the jump and
+            // go to next instruction
+            i = skip_till_next_line(body_tokens, saved_i);
         }
     }
 
