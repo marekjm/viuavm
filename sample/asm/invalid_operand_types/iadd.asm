@@ -23,6 +23,7 @@
     strstore 2 "Oh, look, a bug"
 
     iadd 3 1 2
+    print 3
 
     izero 0
     return

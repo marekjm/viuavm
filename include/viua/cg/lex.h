@@ -55,6 +55,10 @@ namespace viua {
                 InvalidSyntax(Token, std::string = "");
             };
 
+            struct UnusedValue: public InvalidSyntax {
+                UnusedValue(Token);
+            };
+
             struct TracedSyntaxError {
                 std::vector<InvalidSyntax> errors;
 

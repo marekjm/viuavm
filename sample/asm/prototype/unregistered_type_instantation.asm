@@ -24,6 +24,7 @@
 
 .block: unregistered_type_instantation
     new 1 Nonexistent
+    print 1
     leave
 .end
 

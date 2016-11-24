@@ -23,6 +23,7 @@
     register (class 2 Foo)
     new 2 Foo
     ilte 3 2 1
+    print 3
 
     izero 0
     return

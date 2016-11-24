@@ -21,14 +21,14 @@
 
 .function: tertiary/1
     arg 3 0
-    istore 4 300
+    istore (.unused: 4) 300
     throw 3
     return
 .end
 
 .function: secondary/1
     arg 2 0
-    istore 4 200
+    istore (.unused: 4) 200
 
     frame ^[(param 0 2)] 5
     istore 4 250

@@ -82,6 +82,9 @@ namespace viua {
                 add(t);
             }
 
+            UnusedValue::UnusedValue(Token token): InvalidSyntax(token, ("unused value in register " + token.str())) {
+            }
+
             const char* TracedSyntaxError::what() const {
                 return errors.front().what();
             }

@@ -108,6 +108,7 @@ bool assembler::utils::lines::is_directive(const string& line) {
         is_main(line) or
         is_link(line) or
         is_closure(line) or
+        line == ".unused:" or
         false
     );
 }

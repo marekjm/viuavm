@@ -21,6 +21,7 @@
     istore 1 1
     strstore 2 "Hello World!"
     isub 3 1 2
+    print 3
 
     izero 0
     return

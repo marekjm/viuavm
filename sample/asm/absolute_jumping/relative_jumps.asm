@@ -27,6 +27,8 @@
 
     jump -2
 
+    delete 1
+
     izero 0
     return
 .end

@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    receive 1 0ms
+    receive void 0ms
 
     izero 0
     return

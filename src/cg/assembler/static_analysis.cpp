@@ -40,16 +40,19 @@ class Registers {
     map<string, Token> defined_registers;
     map<string, Token> used_registers;
     map<string, Token> erased_registers;
+    set<string> maybe_unused_registers;
 
     public:
     bool defined(const string& r) {
         return (defined_registers.count(r) == 1);
     }
-    void insert(string r, Token where) {
-        defined_registers.emplace(r, where);
+    Token defined_where(string r) {
+        return defined_registers.at(r);
     }
-    void erase(const string& r) {
-        defined_registers.erase(defined_registers.find(r));
+    void insert(string r, Token where) {
+        if (r != "void") {
+            defined_registers.emplace(r, where);
+        }
     }
     void erase(const string& r, const Token& token) {
         erased_registers.emplace(r, token);
@@ -63,6 +66,23 @@ class Registers {
     }
     void use(string r, Token where) {
         used_registers.emplace(r, where);
+    }
+    bool used(string r) {
+        return used_registers.count(r);
+    }
+
+    void unused(string r) {
+        maybe_unused_registers.insert(r);
+    }
+    auto maybe_unused(string r) -> bool {
+        return (maybe_unused_registers.count(r) != 0);
+    }
+
+    auto begin() -> decltype(defined_registers.begin()) {
+        return defined_registers.begin();
+    }
+    auto end() -> decltype(defined_registers.end()) {
+        return defined_registers.end();
     }
 };
 
@@ -128,12 +148,25 @@ static void check_use_of_register_index(const vector<viua::cg::lex::Token>& toke
         traced_error.append(viua::cg::lex::InvalidSyntax(registers.erased_by(resolved_register_name), "erased by:"));
         throw traced_error;
     }
+    registers.use(resolved_register_name, tokens.at(i));
 }
 static void check_use_of_register(const vector<viua::cg::lex::Token>& tokens, long unsigned i, long unsigned by, Registers& registers, map<string, string>& named_registers, const string& message_prefix) {
     check_use_of_register_index(tokens, i, by, tokens.at(i), registers, named_registers, message_prefix);
 }
 static void check_use_of_register(const vector<viua::cg::lex::Token>& tokens, long unsigned i, long unsigned by, Registers& registers, map<string, string>& named_registers) {
     check_use_of_register_index(tokens, i, by, tokens.at(i), registers, named_registers, "use of empty register");
+}
+
+static void check_defined_but_unused(Registers& registers) {
+    for (auto it = registers.begin(); it != registers.end(); ++it) {
+        const auto& each = *it;
+        if (each.first == "0") {
+            continue;
+        }
+        if ((not registers.used(each.first)) and (not registers.erased(each.first)) and (not registers.maybe_unused(each.first))) {
+            throw viua::cg::lex::UnusedValue(each.second);
+        }
+    }
 }
 
 static auto in_block_offset(const vector<viua::cg::lex::Token>& body_tokens, std::remove_reference<decltype(body_tokens)>::type::size_type i, Registers& registers, map<string, string>& named_registers) -> decltype(i) {
@@ -230,13 +263,30 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             i = skip_till_next_line(body_tokens, i);
             continue;
         }
-        if (token == "leave" or token == "return") {
+        if (token == ".unused:") {
+            registers.unused(body_tokens.at(i+1));
+            i = skip_till_next_line(body_tokens, i);
+            continue;
+        }
+        if (token == "leave") {
             return;
+        }
+        if (token == "return") {
+            check_defined_but_unused(registers);
+            return;
+        }
+        if (token == "ress") {
+            if (body_tokens.at(i+1) == "global" or body_tokens.at(i+1) == "static") {
+                // FIXME SA cannot reliably verify functions that use global or static registers
+                return;
+            }
+            i = skip_till_next_line(body_tokens, i);
+            continue;
         }
         if (token == ".mark:" or token == ".link:" or token == "nop" or token == "tryframe" or token == "try" or token == "catch" or token == "frame" or
             token == "tailcall" or token == "halt" or
             token == "watchdog" or
-            token == "link" or token == "import" or token == "ress") {
+            token == "link" or token == "import") {
             i = skip_till_next_line(body_tokens, i);
             continue;
         }
@@ -324,10 +374,17 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
         } else if (token == "if") {
             ++i;
             check_use_of_register(body_tokens, i, i-1, registers, named_registers, "branch depends on empty register");
+
+            string register_with_unused_value;
+
             try {
                 auto copied_registers = registers;
                 auto copied_named_registers = named_registers;
                 check_block_body(body_tokens, in_block_offset(body_tokens, i+1, copied_registers, copied_named_registers), copied_registers, copied_named_registers, block_bodies, debug);
+            } catch (viua::cg::lex::UnusedValue& e) {
+                // do not fail yet, because the value may be used by false branch
+                // save the error for later
+                register_with_unused_value = e.what();
             } catch (const viua::cg::lex::InvalidSyntax& e) {
                 throw viua::cg::lex::TracedSyntaxError().append(e).append(viua::cg::lex::InvalidSyntax(body_tokens.at(i+1), "after taking true branch:"));
             } catch (viua::cg::lex::TracedSyntaxError& e) {
@@ -337,6 +394,10 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
                 auto copied_registers = registers;
                 auto copied_named_registers = named_registers;
                 check_block_body(body_tokens, in_block_offset(body_tokens, i+2, copied_registers, copied_named_registers), copied_registers, copied_named_registers, block_bodies, debug);
+            } catch (viua::cg::lex::UnusedValue& e) {
+                if (register_with_unused_value == e.what()) {
+                    throw viua::cg::lex::TracedSyntaxError().append(e).append(viua::cg::lex::InvalidSyntax(body_tokens.at(i-1), "after taking either branch at:"));
+                }
             } catch (const viua::cg::lex::InvalidSyntax& e) {
                 throw viua::cg::lex::TracedSyntaxError().append(e).append(viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), "after taking false branch:"));
             } catch (viua::cg::lex::TracedSyntaxError& e) {
@@ -458,6 +519,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             continue;
         }
     }
+    check_defined_but_unused(registers);
 }
 static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, decltype(body_tokens.size()) i, Registers& registers, const map<string, vector<viua::cg::lex::Token>>& block_bodies, const bool debug) {
     map<string, string> named_registers;

@@ -18,7 +18,7 @@
 ;
 
 .function: foo/1
-    arg 1 0
+    arg void 0
     return
 .end
 
