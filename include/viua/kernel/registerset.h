@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include <memory>
+#include <vector>
 #include <viua/types/type.h>
 
 typedef unsigned char mask_t;
@@ -44,8 +46,8 @@ namespace viua {
     namespace kernel {
         class RegisterSet {
             registerset_size_type registerset_size;
-            viua::types::Type** registers;
-            mask_t*  masks;
+            std::vector<std::unique_ptr<viua::types::Type>> registers;
+            std::vector<mask_t>  masks;
 
             public:
                 // basic access to registers
