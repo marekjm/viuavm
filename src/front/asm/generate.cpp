@@ -1265,7 +1265,7 @@ int generate(vector<Token>& tokens, invocables_t& functions, invocables_t& block
     // WRITE BYTECODE SIZE
     bwrite(out, bytes);
 
-    byte* program_bytecode = new byte[bytes];
+    unique_ptr<byte[]> program_bytecode {new byte[bytes]};
     uint64_t program_bytecode_used = 0;
 
     ////////////////////////////////////////////////////
@@ -1371,7 +1371,7 @@ int generate(vector<Token>& tokens, invocables_t& functions, invocables_t& block
         program_bytecode_used += linked_size;
     }
 
-    out.write(reinterpret_cast<const char*>(program_bytecode), static_cast<std::streamsize>(bytes));
+    out.write(reinterpret_cast<const char*>(program_bytecode.get()), static_cast<std::streamsize>(bytes));
     out.close();
 
     return 0;
