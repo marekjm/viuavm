@@ -139,7 +139,7 @@ void viua::process::Process::pushFrame() {
         throw new viua::types::Exception(oss.str());
     }
 
-    uregset = frame_new->regset;
+    uregset = frame_new->regset.get();
     if (find(frames.begin(), frames.end(), frame_new) != frames.end()) {
         ostringstream oss;
         oss << "stack corruption: frame " << hex << frame_new.get() << dec << " for function " << frame_new->function_name << '/' << frame_new->args->size() << " pushed more than once";
@@ -164,7 +164,7 @@ void viua::process::Process::dropFrame() {
     }
 
     if (frames.size()) {
-        uregset = frames.back()->regset;
+        uregset = frames.back()->regset.get();
     } else {
         uregset = regset.get();
     }
@@ -570,7 +570,7 @@ viua::process::Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualP
     is_hidden(false)
 {
     regset.reset(new viua::kernel::RegisterSet(DEFAULT_REGISTER_SIZE));
-    uregset = frm->regset;
+    uregset = frm->regset.get();
     frames.emplace_back(std::move(frm));
 }
 

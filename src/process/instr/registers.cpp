@@ -93,7 +93,7 @@ byte* viua::process::Process::opress(byte* addr) {
             uregset = regset.get();
             break;
         case 1:
-            uregset = frames.back()->regset;
+            uregset = frames.back()->regset.get();
             break;
         case 2:
             ensureStaticRegisters(frames.back()->function_name);

@@ -176,10 +176,7 @@ byte* viua::process::Process::optailcall(byte* addr) {
 
     Frame *last_frame = frames.back().get();
 
-    // move arguments from new frame to old frame
-    delete last_frame->args;
-    last_frame->args = frame_new->args;
-    frame_new->args = nullptr;
+    last_frame->args = std::move(frame_new->args);
 
     // new frame must be deleted to prevent future errors
     // it's a simulated "push-and-pop" from the stack

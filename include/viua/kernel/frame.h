@@ -23,6 +23,7 @@
 #pragma once
 
 #include <string>
+#include <memory>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/kernel/registerset.h>
 
@@ -30,8 +31,8 @@ class Frame {
         bool owns_local_register_set;
     public:
         byte* return_address;
-        viua::kernel::RegisterSet* args;
-        viua::kernel::RegisterSet* regset;
+        std::unique_ptr<viua::kernel::RegisterSet> args;
+        std::unique_ptr<viua::kernel::RegisterSet> regset;
 
         bool return_void;
         unsigned place_return_value_in;
@@ -49,8 +50,8 @@ class Frame {
             return_void(false),
             place_return_value_in(0)
         {
-            args = new viua::kernel::RegisterSet(argsize);
-            regset = new viua::kernel::RegisterSet(regsize);
+            args.reset(new viua::kernel::RegisterSet(argsize));
+            regset.reset(new viua::kernel::RegisterSet(regsize));
         }
         Frame(const Frame& that) {
             return_address = that.return_address;
@@ -59,12 +60,9 @@ class Frame {
             // FIXME: oh, and the arguments too, while you're at it!
         }
         ~Frame() {
-            if (args != nullptr) {
-                delete args;
-            }
-
-            if (owns_local_register_set) {
-                delete regset;
+            if (not owns_local_register_set) {
+                // FIXME use std::shared_ptr<> maybe?
+                regset.release();
             }
         }
 };

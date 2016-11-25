@@ -100,7 +100,7 @@ byte* viua::process::Process::opcapturemove(byte* addr) {
 byte* viua::process::Process::opclosure(byte* addr) {
     /** Create a closure from a function.
      */
-    if (uregset != frames.back()->regset) {
+    if (uregset != frames.back()->regset.get()) {
         throw new viua::types::Exception("creating closures from nonlocal registers is forbidden");
     }
 
