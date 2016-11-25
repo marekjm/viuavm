@@ -28,7 +28,6 @@ viua::types::Closure::Closure(const string& name, viua::kernel::RegisterSet *rs)
 }
 
 viua::types::Closure::~Closure() {
-    delete regset;
 }
 
 
@@ -53,8 +52,7 @@ bool viua::types::Closure::boolean() const {
 viua::types::Type* viua::types::Closure::copy() const {
     auto clsr = new viua::types::Closure();
     clsr->function_name = function_name;
-    // FIXME: for the above one, copy ctor would be nice
-    clsr->regset = regset->copy();
+    clsr->regset = std::move(regset->copy());
     return clsr;
 }
 

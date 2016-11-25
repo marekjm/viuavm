@@ -74,7 +74,7 @@ namespace viua {
                 void drop();
                 inline registerset_size_type size() { return registerset_size; }
 
-                RegisterSet* copy();
+                std::unique_ptr<RegisterSet> copy();
 
                 RegisterSet(registerset_size_type sz);
                 ~RegisterSet();

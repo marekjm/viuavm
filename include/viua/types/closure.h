@@ -23,6 +23,7 @@
 #pragma once
 
 #include <string>
+#include <memory>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/kernel/registerset.h>
 #include <viua/types/function.h>
@@ -34,7 +35,7 @@ namespace viua {
             /** Closure type.
              */
             public:
-                viua::kernel::RegisterSet* regset;
+                std::unique_ptr<viua::kernel::RegisterSet> regset;
 
                 std::string function_name;
 

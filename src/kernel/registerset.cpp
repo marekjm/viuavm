@@ -240,8 +240,8 @@ void viua::kernel::RegisterSet::drop() {
 }
 
 
-viua::kernel::RegisterSet* viua::kernel::RegisterSet::copy() {
-    auto rscopy = new viua::kernel::RegisterSet(size());
+unique_ptr<viua::kernel::RegisterSet> viua::kernel::RegisterSet::copy() {
+    unique_ptr<viua::kernel::RegisterSet> rscopy {new viua::kernel::RegisterSet(size())};
     for (unsigned i = 0; i < size(); ++i) {
         if (at(i) == nullptr) { continue; }
 
@@ -252,7 +252,7 @@ viua::kernel::RegisterSet* viua::kernel::RegisterSet::copy() {
         }
         rscopy->setmask(i, getmask(i));
     }
-    return rscopy;
+    return std::move(rscopy);
 }
 
 viua::kernel::RegisterSet::RegisterSet(registerset_size_type sz): registerset_size(sz) {
