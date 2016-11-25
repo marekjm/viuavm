@@ -408,7 +408,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                 unique_ptr<viua::types::Object> death_message(new viua::types::Object("Object"));
                 unique_ptr<viua::types::Type> exc(th->transferActiveException());
                 auto parameters = new viua::types::Vector();
-                viua::kernel::RegisterSet *top_args = th->trace()[0]->args.get();
+                viua::kernel::RegisterSet *top_args = th->trace().at(0)->args.get();
                 for (unsigned long j = 0; j < top_args->size(); ++j) {
                     if (top_args->at(j)) {
                         parameters->push(top_args->at(j));
@@ -420,7 +420,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                 viua_err( "[sched:vps:died:notify-watchdog] pid = ", th->pid().get(), ", death cause: ", exc->str());
 #endif
 
-                death_message->set("function", new viua::types::Function(th->trace()[0]->function_name));
+                death_message->set("function", new viua::types::Function(th->trace().at(0)->function_name));
                 death_message->set("exception", exc.release());
                 death_message->set("parameters", parameters);
 
