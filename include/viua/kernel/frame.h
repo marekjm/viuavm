@@ -25,14 +25,14 @@
 #include <string>
 #include <memory>
 #include <viua/bytecode/bytetypedef.h>
+#include <viua/util/memory.h>
 #include <viua/kernel/registerset.h>
 
 class Frame {
-        bool owns_local_register_set;
     public:
         byte* return_address;
         std::unique_ptr<viua::kernel::RegisterSet> args;
-        std::unique_ptr<viua::kernel::RegisterSet> regset;
+        viua::util::memory::maybe_unique_ptr<viua::kernel::RegisterSet> regset;
 
         bool return_void;
         unsigned place_return_value_in;
@@ -44,9 +44,9 @@ class Frame {
         void setLocalRegisterSet(viua::kernel::RegisterSet*, bool receives_ownership = true);
 
         Frame(byte* ra, long unsigned argsize, long unsigned regsize = 16):
-            owns_local_register_set(true),
             return_address(ra),
-            args(nullptr), regset(nullptr),
+            args(nullptr),
+            regset(nullptr),
             return_void(false),
             place_return_value_in(0)
         {
@@ -60,10 +60,6 @@ class Frame {
             // FIXME: oh, and the arguments too, while you're at it!
         }
         ~Frame() {
-            if (not owns_local_register_set) {
-                // FIXME use std::shared_ptr<> maybe?
-                regset.release();
-            }
         }
 };
 

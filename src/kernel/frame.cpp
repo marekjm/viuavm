@@ -21,9 +21,5 @@
 
 
 void Frame::setLocalRegisterSet(viua::kernel::RegisterSet* rs, bool receives_ownership) {
-    if (not owns_local_register_set) {
-        regset.release();
-    }
-    owns_local_register_set = receives_ownership;
-    regset.reset(rs);
+    regset.reset(rs, receives_ownership);
 }
