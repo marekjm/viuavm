@@ -86,7 +86,7 @@ namespace viua {
             std::string resolveMethodName(const std::string&, const std::string&) const;
             std::pair<byte*, byte*> getEntryPointOf(const std::string&) const;
 
-            void registerPrototype(viua::types::Prototype*);
+            void registerPrototype(std::unique_ptr<viua::types::Prototype>);
 
             void requestForeignFunctionCall(Frame*, viua::process::Process*) const;
             void requestForeignMethodCall(const std::string&, viua::types::Type*, Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*);

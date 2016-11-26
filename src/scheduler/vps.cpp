@@ -212,8 +212,8 @@ pair<byte*, byte*> viua::scheduler::VirtualProcessScheduler::getEntryPointOf(con
     return attached_kernel->getEntryPointOf(name);
 }
 
-void viua::scheduler::VirtualProcessScheduler::registerPrototype(viua::types::Prototype *proto) {
-    attached_kernel->registerPrototype(proto);
+void viua::scheduler::VirtualProcessScheduler::registerPrototype(unique_ptr<viua::types::Prototype> proto) {
+    attached_kernel->registerPrototype(std::move(proto));
 }
 
 void viua::scheduler::VirtualProcessScheduler::requestForeignFunctionCall(Frame *frame, viua::process::Process *p) const {

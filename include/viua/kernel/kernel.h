@@ -181,11 +181,11 @@ namespace viua {
                 std::string resolveMethodName(const std::string&, const std::string&) const;
                 std::pair<byte*, byte*> getEntryPointOf(const std::string&) const;
 
-                void registerPrototype(const std::string&, viua::types::Prototype*);
-                void registerPrototype(viua::types::Prototype*);
+                void registerPrototype(const std::string&, std::unique_ptr<viua::types::Prototype>);
+                void registerPrototype(std::unique_ptr<viua::types::Prototype>);
 
                 /// These two methods are used to inject pure-C++ classes into machine's typesystem.
-                Kernel& registerForeignPrototype(const std::string&, viua::types::Prototype*);
+                Kernel& registerForeignPrototype(const std::string&, std::unique_ptr<viua::types::Prototype>);
                 Kernel& registerForeignMethod(const std::string&, ForeignMethod);
 
                 void requestForeignFunctionCall(Frame*, viua::process::Process*);

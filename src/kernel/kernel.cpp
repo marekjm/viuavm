@@ -94,10 +94,10 @@ viua::kernel::Kernel& viua::kernel::Kernel::registerExternalFunction(const strin
     return (*this);
 }
 
-viua::kernel::Kernel& viua::kernel::Kernel::registerForeignPrototype(const string& name, viua::types::Prototype* proto) {
+viua::kernel::Kernel& viua::kernel::Kernel::registerForeignPrototype(const string& name, unique_ptr<viua::types::Prototype> proto) {
     /** Registers foreign prototype in viua::kernel::Kernel.
      */
-    registerPrototype(name, proto);
+    registerPrototype(name, std::move(proto));
     return (*this);
 }
 
@@ -279,11 +279,13 @@ pair<byte*, byte*> viua::kernel::Kernel::getEntryPointOf(const std::string& name
     return pair<byte*, byte*>(entry_point, module_base);
 }
 
-void viua::kernel::Kernel::registerPrototype(const string& type_name, viua::types::Prototype *proto) {
-    typesystem.emplace(type_name, proto);
+void viua::kernel::Kernel::registerPrototype(const string& type_name, unique_ptr<viua::types::Prototype> proto) {
+    typesystem.emplace(type_name, nullptr);
+    typesystem.at(type_name) = std::move(proto);
 }
-void viua::kernel::Kernel::registerPrototype(viua::types::Prototype *proto) {
-    registerPrototype(proto->getTypeName(), proto);
+void viua::kernel::Kernel::registerPrototype(unique_ptr<viua::types::Prototype> proto) {
+    auto type_name = proto->getTypeName();
+    registerPrototype(type_name, std::move(proto));
 }
 
 void viua::kernel::Kernel::requestForeignFunctionCall(Frame *frame, viua::process::Process *requesting_process) {
