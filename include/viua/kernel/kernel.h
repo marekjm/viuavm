@@ -73,7 +73,7 @@ namespace viua {
             uint64_t executable_offset;
 
             // Map of the typesystem currently existing inside the VM.
-            std::map<std::string, viua::types::Prototype*> typesystem;
+            std::map<std::string, std::unique_ptr<viua::types::Prototype>> typesystem;
 
             /*  Function and block names mapped to bytecode addresses.
              */
@@ -181,6 +181,7 @@ namespace viua {
                 std::string resolveMethodName(const std::string&, const std::string&) const;
                 std::pair<byte*, byte*> getEntryPointOf(const std::string&) const;
 
+                void registerPrototype(const std::string&, viua::types::Prototype*);
                 void registerPrototype(viua::types::Prototype*);
 
                 /// These two methods are used to inject pure-C++ classes into machine's typesystem.

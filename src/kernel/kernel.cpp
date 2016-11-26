@@ -97,7 +97,7 @@ viua::kernel::Kernel& viua::kernel::Kernel::registerExternalFunction(const strin
 viua::kernel::Kernel& viua::kernel::Kernel::registerForeignPrototype(const string& name, viua::types::Prototype* proto) {
     /** Registers foreign prototype in viua::kernel::Kernel.
      */
-    typesystem[name] = proto;
+    registerPrototype(name, proto);
     return (*this);
 }
 
@@ -279,8 +279,11 @@ pair<byte*, byte*> viua::kernel::Kernel::getEntryPointOf(const std::string& name
     return pair<byte*, byte*>(entry_point, module_base);
 }
 
+void viua::kernel::Kernel::registerPrototype(const string& type_name, viua::types::Prototype *proto) {
+    typesystem.emplace(type_name, proto);
+}
 void viua::kernel::Kernel::registerPrototype(viua::types::Prototype *proto) {
-    typesystem[proto->getTypeName()] = proto;
+    registerPrototype(proto->getTypeName(), proto);
 }
 
 void viua::kernel::Kernel::requestForeignFunctionCall(Frame *frame, viua::process::Process *requesting_process) {
@@ -474,17 +477,6 @@ viua::kernel::Kernel::~Kernel() {
 
         linked_modules.erase(lkey);
         delete[] ptr;
-    }
-
-    auto pr = typesystem.begin();
-    while (pr != typesystem.end()) {
-        std::string proto_name = pr->first;
-        viua::types::Prototype* proto_ptr = pr->second;
-
-        ++pr;
-
-        typesystem.erase(proto_name);
-        delete proto_ptr;
     }
 
     for (unsigned i = 0; i < cxx_dynamic_lib_handles.size(); ++i) {
