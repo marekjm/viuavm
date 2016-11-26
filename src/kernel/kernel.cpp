@@ -53,14 +53,9 @@ viua::kernel::Kernel& viua::kernel::Kernel::load(byte* bc) {
      *  destruction of it, so make sure you have a copy of the bytecode.
      *
      *  Any previously loaded bytecode is freed.
-     *  To free bytecode without loading anything new it is possible to call .load(0).
-     *
-     *  :params:
-     *
-     *  bc:char*    - pointer to byte array containing bytecode with a program to run
+     *  To free bytecode without loading anything new it is possible to call .load(nullptr).
      */
-    if (bytecode) { delete[] bytecode; }
-    bytecode = bc;
+    bytecode.reset(bc);
     return (*this);
 }
 
@@ -251,8 +246,8 @@ pair<byte*, byte*> viua::kernel::Kernel::getEntryPointOfBlock(const std::string&
     byte *entry_point = nullptr;
     byte *module_base = nullptr;
     if (block_addresses.count(name)) {
-        entry_point = (bytecode + block_addresses.at(name));
-        module_base = bytecode;
+        entry_point = (bytecode.get() + block_addresses.at(name));
+        module_base = bytecode.get();
     } else {
         auto lf = linked_blocks.at(name);
         entry_point = lf.second;
@@ -269,8 +264,8 @@ pair<byte*, byte*> viua::kernel::Kernel::getEntryPointOf(const std::string& name
     byte *entry_point = nullptr;
     byte *module_base = nullptr;
     if (function_addresses.count(name)) {
-        entry_point = (bytecode + function_addresses.at(name));
-        module_base = bytecode;
+        entry_point = (bytecode.get() + function_addresses.at(name));
+        module_base = bytecode.get();
     } else {
         auto lf = linked_functions.at(name);
         entry_point = lf.second;
@@ -431,11 +426,6 @@ viua::kernel::Kernel::Kernel():
 }
 
 viua::kernel::Kernel::~Kernel() {
-    /*  Destructor frees memory at bytecode pointer so make sure you passed a copy of the bytecode to the constructor
-     *  if you want to keep it around after the viua::kernel::Kernel is finished.
-     */
-    if (bytecode) { delete[] bytecode; }
-
     /** Send a poison pill to every foreign function call worker thread.
      *  Collect them after they are killed.
      *

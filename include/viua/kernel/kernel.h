@@ -68,7 +68,7 @@ namespace viua {
             /*  Bytecode pointer is a pointer to program's code.
              *  Size and executable offset are metadata exported from bytecode dump.
              */
-            byte* bytecode;
+            std::unique_ptr<byte[]> bytecode;
             uint64_t bytecode_size;
             uint64_t executable_offset;
 
