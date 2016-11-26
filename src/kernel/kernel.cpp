@@ -117,22 +117,23 @@ void viua::kernel::Kernel::loadNativeLibrary(const string& module) {
         Loader loader(path);
         loader.load();
 
-        byte* lnk_btcd = loader.getBytecode();
-        linked_modules[module] = pair<unsigned, byte*>(static_cast<unsigned>(loader.getBytecodeSize()), lnk_btcd);
+        unique_ptr<byte[]> lnk_btcd {loader.getBytecode()};
 
         vector<string> fn_names = loader.getFunctions();
         map<string, uint64_t> fn_addrs = loader.getFunctionAddresses();
         for (unsigned i = 0; i < fn_names.size(); ++i) {
             string fn_linkname = fn_names[i];
-            linked_functions[fn_linkname] = pair<string, byte*>(module, (lnk_btcd+fn_addrs[fn_names[i]]));
+            linked_functions[fn_linkname] = pair<string, byte*>(module, (lnk_btcd.get()+fn_addrs[fn_names[i]]));
         }
 
         vector<string> bl_names = loader.getBlocks();
         map<string, uint64_t> bl_addrs = loader.getBlockAddresses();
         for (unsigned i = 0; i < bl_names.size(); ++i) {
             string bl_linkname = bl_names[i];
-            linked_blocks[bl_linkname] = pair<string, byte*>(module, (lnk_btcd+bl_addrs[bl_linkname]));
+            linked_blocks[bl_linkname] = pair<string, byte*>(module, (lnk_btcd.get()+bl_addrs[bl_linkname]));
         }
+
+        linked_modules[module] = pair<unsigned, unique_ptr<byte[]>>(static_cast<unsigned>(loader.getBytecodeSize()), std::move(lnk_btcd));
     } else {
         throw new viua::types::Exception("failed to link: " + module);
     }
@@ -251,7 +252,7 @@ pair<byte*, byte*> viua::kernel::Kernel::getEntryPointOfBlock(const std::string&
     } else {
         auto lf = linked_blocks.at(name);
         entry_point = lf.second;
-        module_base = linked_modules.at(lf.first).second;
+        module_base = linked_modules.at(lf.first).second.get();
     }
     return pair<byte*, byte*>(entry_point, module_base);
 }
@@ -269,7 +270,7 @@ pair<byte*, byte*> viua::kernel::Kernel::getEntryPointOf(const std::string& name
     } else {
         auto lf = linked_functions.at(name);
         entry_point = lf.second;
-        module_base = linked_modules.at(lf.first).second;
+        module_base = linked_modules.at(lf.first).second.get();
     }
     return pair<byte*, byte*>(entry_point, module_base);
 }
@@ -457,17 +458,6 @@ viua::kernel::Kernel::~Kernel() {
         // delete it
         // by now, all workers should be killed by poison pills we sent them earlier
         w->join();
-    }
-
-    auto lm = linked_modules.begin();
-    while (lm != linked_modules.end()) {
-        std::string lkey = lm->first;
-        byte *ptr = lm->second.second;
-
-        ++lm;
-
-        linked_modules.erase(lkey);
-        delete[] ptr;
     }
 
     for (unsigned i = 0; i < cxx_dynamic_lib_handles.size(); ++i) {

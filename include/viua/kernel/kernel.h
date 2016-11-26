@@ -82,7 +82,7 @@ namespace viua {
 
             std::map<std::string, std::pair<std::string, byte*>> linked_functions;
             std::map<std::string, std::pair<std::string, byte*>> linked_blocks;
-            std::map<std::string, std::pair<unsigned, byte*> > linked_modules;
+            std::map<std::string, std::pair<unsigned, std::unique_ptr<byte[]>>> linked_modules;
 
             int return_code;
 
