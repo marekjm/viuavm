@@ -174,7 +174,7 @@ byte* viua::process::Process::opfcall(byte* addr) {
     frame_new->place_return_value_in = return_register;
 
     if (fn->type() == "Closure") {
-        frame_new->setLocalRegisterSet(static_cast<viua::types::Closure*>(fn)->regset, false);
+        frame_new->setLocalRegisterSet(static_cast<viua::types::Closure*>(fn)->regset.get(), false);
     }
 
     pushFrame();
