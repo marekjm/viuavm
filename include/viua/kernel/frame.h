@@ -43,24 +43,8 @@ class Frame {
 
         void setLocalRegisterSet(viua::kernel::RegisterSet*, bool receives_ownership = true);
 
-        Frame(byte* ra, long unsigned argsize, long unsigned regsize = 16):
-            return_address(ra),
-            args(nullptr),
-            regset(nullptr),
-            return_void(false),
-            place_return_value_in(0)
-        {
-            args.reset(new viua::kernel::RegisterSet(argsize));
-            regset.reset(new viua::kernel::RegisterSet(regsize));
-        }
-        Frame(const Frame& that) {
-            return_address = that.return_address;
-
-            // FIXME: copy the registers maybe?
-            // FIXME: oh, and the arguments too, while you're at it!
-        }
-        ~Frame() {
-        }
+        Frame(byte*, long unsigned, long unsigned = 16);
+        Frame(const Frame&);
 };
 
 
