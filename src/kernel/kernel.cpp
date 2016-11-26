@@ -426,7 +426,7 @@ viua::kernel::Kernel::Kernel():
 {
     ffi_schedulers_limit = no_of_ffi_schedulers();
     for (auto i = ffi_schedulers_limit; i; --i) {
-        foreign_call_workers.push_back(new std::thread(viua::scheduler::ffi::ff_call_processor, &foreign_call_queue, &foreign_functions, &foreign_functions_mutex, &foreign_call_queue_mutex, &foreign_call_queue_condition));
+        foreign_call_workers.emplace_back(new std::thread(viua::scheduler::ffi::ff_call_processor, &foreign_call_queue, &foreign_functions, &foreign_functions_mutex, &foreign_call_queue_mutex, &foreign_call_queue_condition));
     }
 }
 
@@ -460,14 +460,13 @@ viua::kernel::Kernel::~Kernel() {
     while (not foreign_call_workers.empty()) {
         // fetch handle for worker thread and
         // remove it from the list of workers
-        auto w = foreign_call_workers.back();
+        auto w = std::move(foreign_call_workers.back());
         foreign_call_workers.pop_back();
 
         // join worker back to main thread and
         // delete it
         // by now, all workers should be killed by poison pills we sent them earlier
         w->join();
-        delete w;
     }
 
     auto lm = linked_modules.begin();
