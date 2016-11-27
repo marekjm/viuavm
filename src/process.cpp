@@ -69,20 +69,6 @@ void viua::process::Process::place(unsigned index, viua::types::Type* obj) {
 void viua::process::Process::put(unsigned index, viua::types::Type *o) {
     place(index, o);
 }
-bool viua::process::Process::hasrefs(unsigned index) {
-    /** This method checks if object at a given address exists as a reference in another register.
-     */
-    bool has = false;
-    // FIXME: this should check for references in every register set; gonna be slow, isn't it?
-    for (unsigned i = 0; i < uregset->size(); ++i) {
-        if (i == index) continue;
-        if (uregset->at(i) == uregset->at(index)) {
-            has = true;
-            break;
-        }
-    }
-    return has;
-}
 void viua::process::Process::ensureStaticRegisters(string function_name) {
     /** Makes sure that static register set for requested function is initialized.
      */
