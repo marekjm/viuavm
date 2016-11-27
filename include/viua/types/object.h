@@ -53,7 +53,7 @@ namespace viua {
                 }
 
                 virtual void insert(const std::string& key, Type* value);
-                virtual Type* remove(const std::string& key);
+                virtual std::unique_ptr<Type> remove(const std::string& key);
 
                 void set(const std::string&, Type*);
                 inline Type* at(const std::string& s) { return attributes.at(s).get(); }

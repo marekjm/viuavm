@@ -66,7 +66,7 @@ void viua::types::Object::set(const string& name, viua::types::Type* object) {
 void viua::types::Object::insert(const string& key, viua::types::Type* value) {
     set(key, value);
 }
-viua::types::Type* viua::types::Object::remove(const string& key) {
+unique_ptr<viua::types::Type> viua::types::Object::remove(const string& key) {
     if (not attributes.count(key)) {
         ostringstream oss;
         oss << "attribute not found: " << key;
@@ -74,7 +74,7 @@ viua::types::Type* viua::types::Object::remove(const string& key) {
     }
     auto o = std::move(attributes.at(key));
     attributes.erase(key);
-    return o.release();
+    return std::move(o);
 }
 
 
