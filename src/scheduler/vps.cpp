@@ -411,7 +411,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                 viua::kernel::RegisterSet *top_args = th->trace().at(0)->args.get();
                 for (unsigned long j = 0; j < top_args->size(); ++j) {
                     if (top_args->at(j)) {
-                        parameters->push(top_args->pop(j).release());
+                        parameters->push(std::move(top_args->pop(j)));
                     }
                 }
 
@@ -519,12 +519,12 @@ void viua::scheduler::VirtualProcessScheduler::bootstrap(const vector<string>& c
     unique_ptr<Frame> initial_frame(new Frame(nullptr, 0, 2));
     initial_frame->function_name = ENTRY_FUNCTION_NAME;
 
-    auto cmdline = new viua::types::Vector();
+    unique_ptr<viua::types::Vector> cmdline {new viua::types::Vector()};
     auto limit = commandline_arguments.size();
     for (decltype(limit) i = 0; i < limit; ++i) {
-        cmdline->push(new viua::types::String(commandline_arguments[i]));
+        cmdline->push(unique_ptr<viua::types::Type>{new viua::types::String(commandline_arguments[i])});
     }
-    initial_frame->regset->set(1, cmdline);
+    initial_frame->regset->set(1, cmdline.release());
 
     main_process = spawn(std::move(initial_frame), nullptr, true);
     main_process->priority(16);

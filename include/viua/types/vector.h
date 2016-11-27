@@ -44,8 +44,8 @@ namespace viua {
 
                 std::vector<std::unique_ptr<Type>>& value();
 
-                Type* insert(long int, Type*);
-                Type* push(Type*);
+                void insert(long int, std::unique_ptr<Type>);
+                void push(std::unique_ptr<Type>);
                 std::unique_ptr<Type> pop(long int);
                 Type* at(long int);
                 int len();

@@ -26,7 +26,7 @@
 using namespace std;
 
 
-viua::types::Type* viua::types::Vector::insert(long int index, viua::types::Type* object) {
+void viua::types::Vector::insert(long int index, unique_ptr<viua::types::Type> object) {
     long offset = 0;
 
     // FIXME: REFACTORING: move bounds-checking to a separate function
@@ -42,14 +42,11 @@ viua::types::Type* viua::types::Vector::insert(long int index, viua::types::Type
     }
 
     auto it = (internal_object.begin()+offset);
-    unique_ptr<viua::types::Type> holder { object };
-    internal_object.insert(it, std::move(holder));
-    return object;
+    internal_object.insert(it, std::move(object));
 }
 
-viua::types::Type* viua::types::Vector::push(viua::types::Type* object) {
-    internal_object.emplace_back(object);
-    return object;
+void viua::types::Vector::push(unique_ptr<viua::types::Type> object) {
+    internal_object.emplace_back(std::move(object));
 }
 
 unique_ptr<viua::types::Type> viua::types::Vector::pop(long int index) {
@@ -118,7 +115,7 @@ bool viua::types::Vector::boolean() const {
 unique_ptr<viua::types::Type> viua::types::Vector::copy() const {
     unique_ptr<viua::types::Vector> vec {new Vector()};
     for (unsigned i = 0; i < internal_object.size(); ++i) {
-        vec->push(internal_object[i]->copy().release());
+        vec->push(std::move(internal_object[i]->copy()));
     }
     return std::move(vec);
 }

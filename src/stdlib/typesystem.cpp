@@ -42,13 +42,13 @@ void inheritanceChain(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Re
     }
 
     vector<string> ic = frame->args->at(0)->inheritancechain();
-    viua::types::Vector* icv = new viua::types::Vector();
+    unique_ptr<viua::types::Vector> icv {new viua::types::Vector()};
 
     for (unsigned i = 0; i < ic.size(); ++i) {
-        icv->push(new viua::types::String(ic[i]));
+        icv->push(unique_ptr<viua::types::Type>{new viua::types::String(ic[i])});
     }
 
-    frame->regset->set(0, icv);
+    frame->regset->set(0, icv.release());
 }
 
 void bases(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
@@ -58,13 +58,13 @@ void bases(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
 
     viua::types::Type* object = frame->args->at(0);
     vector<string> ic = object->bases();
-    viua::types::Vector* icv = new viua::types::Vector();
+    unique_ptr<viua::types::Vector> icv {new viua::types::Vector()};
 
     for (unsigned i = 0; i < ic.size(); ++i) {
-        icv->push(new viua::types::String(ic[i]));
+        icv->push(unique_ptr<viua::types::Type>{new viua::types::String(ic[i])});
     }
 
-    frame->regset->set(0, icv);
+    frame->regset->set(0, icv.release());
 }
 
 
