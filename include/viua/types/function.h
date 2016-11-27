@@ -42,7 +42,7 @@ namespace viua {
 
                 virtual bool boolean() const;
 
-                virtual Type* copy() const;
+                virtual std::unique_ptr<Type> copy() const override;
 
                 virtual std::string name() const;
 

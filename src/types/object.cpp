@@ -51,12 +51,12 @@ string viua::types::Object::str() const {
     return oss.str();
 }
 
-viua::types::Type* viua::types::Object::copy() const {
-    viua::types::Object* cp = new viua::types::Object(type_name);
+unique_ptr<viua::types::Type> viua::types::Object::copy() const {
+    unique_ptr<viua::types::Object> cp {new viua::types::Object(type_name)};
     for (const auto& each : attributes) {
-        cp->set(each.first, each.second->copy());
+        cp->set(each.first, each.second->copy().release());
     }
-    return cp;
+    return std::move(cp);
 }
 
 void viua::types::Object::set(const string& name, viua::types::Type* object) {

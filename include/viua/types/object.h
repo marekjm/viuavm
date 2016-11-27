@@ -58,7 +58,7 @@ namespace viua {
                 void set(const std::string&, Type*);
                 inline Type* at(const std::string& s) { return attributes.at(s); }
 
-                virtual Type* copy() const;
+                virtual std::unique_ptr<Type> copy() const override;
 
                 Object(const std::string& tn);
                 virtual ~Object();

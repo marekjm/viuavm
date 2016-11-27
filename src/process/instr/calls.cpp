@@ -49,7 +49,7 @@ byte* viua::process::Process::opparam(byte* addr) {
     if (parameter_no_operand_index >= frame_new->args->size()) {
         throw new viua::types::Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
     }
-    frame_new->args->set(parameter_no_operand_index, fetch(source)->copy());
+    frame_new->args->set(parameter_no_operand_index, fetch(source)->copy().release());
     frame_new->args->clear(parameter_no_operand_index);
 
     return addr;
@@ -97,7 +97,7 @@ byte* viua::process::Process::oparg(byte* addr) {
     if (frames.back()->args->isflagged(parameter_no_operand_index, MOVED)) {
         argument.reset(frames.back()->args->pop(parameter_no_operand_index));
     } else {
-        argument.reset(frames.back()->args->get(parameter_no_operand_index)->copy());
+        argument.reset(frames.back()->args->get(parameter_no_operand_index)->copy().release());
     }
 
     if (not destination_is_void) {

@@ -45,8 +45,8 @@ int Integer::decrement() {
     return (--number);
 }
 
-Type* Integer::copy() const {
-    return new Integer(number);
+unique_ptr<Type> Integer::copy() const {
+    return unique_ptr<Type>{new Integer(number)};
 }
 
 int8_t Integer::as_int8() const {

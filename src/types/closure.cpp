@@ -49,11 +49,11 @@ bool viua::types::Closure::boolean() const {
     return true;
 }
 
-viua::types::Type* viua::types::Closure::copy() const {
-    auto clsr = new viua::types::Closure();
+unique_ptr<viua::types::Type> viua::types::Closure::copy() const {
+    unique_ptr<viua::types::Closure> clsr {new viua::types::Closure()};
     clsr->function_name = function_name;
     clsr->regset = std::move(regset->copy());
-    return clsr;
+    return std::move(clsr);
 }
 
 

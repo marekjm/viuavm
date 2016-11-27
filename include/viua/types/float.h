@@ -43,7 +43,7 @@ namespace viua {
 
                 auto value() -> decltype(number)&;
 
-                Type* copy() const override;
+                std::unique_ptr<Type> copy() const override;
 
                 int8_t as_int8() const override;
                 int16_t as_int16() const override;

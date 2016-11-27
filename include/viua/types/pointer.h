@@ -65,7 +65,7 @@ namespace viua {
                     return std::vector<std::string>{"Type"};
                 }
 
-                Type* copy() const override;
+                std::unique_ptr<Type> copy() const override;
 
                 Pointer();
                 Pointer(Type* t);

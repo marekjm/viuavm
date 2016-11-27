@@ -41,7 +41,7 @@ byte* viua::process::Process::opcopy(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    place(target, source->copy());
+    place(target, source->copy().release());
 
     return addr;
 }

@@ -55,8 +55,8 @@ class ArityException: public viua::types::Exception {
             return oss.str();
         }
 
-        Type* copy() const override {
-            return new ArityException(got_arity, valid_arities);
+        std::unique_ptr<Type> copy() const override {
+            return std::unique_ptr<Type>{new ArityException(got_arity, valid_arities)};
         }
 
         std::string what() const override {
@@ -81,8 +81,8 @@ class TypeException: public viua::types::Exception {
             return oss.str();
         }
 
-        Type* copy() const override {
-            return new TypeException(expected, got);
+        std::unique_ptr<Type> copy() const override {
+            return std::unique_ptr<Type>{new TypeException(expected, got)};
         }
 
         std::string what() const override {
@@ -104,8 +104,8 @@ class UnresolvedAtomException: public viua::types::Exception {
             return ("atom '" + atom + "' could not be resolved");
         }
 
-        Type* copy() const override {
-            return new UnresolvedAtomException(atom);
+        std::unique_ptr<Type> copy() const override {
+            return std::unique_ptr<Type>{new UnresolvedAtomException(atom)};
         }
 
         std::string what() const override {
@@ -126,8 +126,8 @@ class OperandTypeException: public viua::types::Exception {
             return "invalid operand type";
         }
 
-        Type* copy() const override {
-            return new OperandTypeException();
+        std::unique_ptr<Type> copy() const override {
+            return std::unique_ptr<Type>{new OperandTypeException()};
         }
 
         std::string what() const override {

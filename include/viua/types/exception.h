@@ -52,8 +52,8 @@ namespace viua {
                     return true;
                 }
 
-                Type* copy() const {
-                    return new Exception(cause);
+                std::unique_ptr<Type> copy() const override {
+                    return std::unique_ptr<viua::types::Type>{new Exception(cause)};
                 }
 
                 virtual std::string what() const;

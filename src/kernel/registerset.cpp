@@ -244,7 +244,7 @@ unique_ptr<viua::kernel::RegisterSet> viua::kernel::RegisterSet::copy() {
     unique_ptr<viua::kernel::RegisterSet> rscopy {new viua::kernel::RegisterSet(size())};
     for (unsigned i = 0; i < size(); ++i) {
         if (at(i) == nullptr) { continue; }
-        rscopy->set(i, at(i)->copy());
+        rscopy->set(i, at(i)->copy().release());
         rscopy->setmask(i, getmask(i));
     }
     return std::move(rscopy);

@@ -71,12 +71,11 @@ string viua::types::Pointer::str() const {
     return type();
 }
 
-viua::types::Type* viua::types::Pointer::copy() const {
+unique_ptr<viua::types::Type> viua::types::Pointer::copy() const {
     if (not valid) {
-        return new viua::types::Pointer();
-    } else {
-        return new viua::types::Pointer(points_to);
+        return unique_ptr<viua::types::Type>{new viua::types::Pointer()};
     }
+    return unique_ptr<viua::types::Type>{new viua::types::Pointer(points_to)};
 }
 
 

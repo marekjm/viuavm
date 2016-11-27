@@ -66,7 +66,7 @@ class Ifstream: public viua::types::Type {
             return line;
         }
 
-        virtual viua::types::Type* copy() const {
+        unique_ptr<viua::types::Type> copy() const override {
             throw new viua::types::Exception("Ifstream is not copyable");
         }
 

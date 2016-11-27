@@ -41,8 +41,8 @@ auto Float::value() -> decltype(number)& {
     return number;
 }
 
-Type* Float::copy() const {
-    return new Float(number);
+unique_ptr<viua::types::Type> Float::copy() const {
+    return unique_ptr<viua::types::Type>{new Float(number)};
 }
 
 int8_t Float::as_int8() const {

@@ -54,7 +54,7 @@ byte* viua::process::Process::opcapture(byte* addr) {
         uregset->empty(source_register);    // empty - do not delete the captured object or SEGFAULTS will follow
         uregset->set(source_register, rf);  // set the register to contain the newly-created reference
     }
-    target_closure->regset->set(target_register, rf->copy());
+    target_closure->regset->set(target_register, rf->copy().release());
 
     return addr;
 }
@@ -74,7 +74,7 @@ byte* viua::process::Process::opcapturecopy(byte* addr) {
         throw new viua::types::Exception("cannot capture object: register index out exceeded size of closure register set");
     }
 
-    target_closure->regset->set(target_register, source->copy());
+    target_closure->regset->set(target_register, source->copy().release());
 
     return addr;
 }

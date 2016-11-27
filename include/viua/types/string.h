@@ -64,8 +64,8 @@ namespace viua {
                     return svalue.size() != 0;
                 }
 
-                Type* copy() const {
-                    return new String(svalue);
+                std::unique_ptr<Type> copy() const override {
+                    return std::unique_ptr<viua::types::Type>{new String(svalue)};
                 }
 
                 std::string& value() { return svalue; }

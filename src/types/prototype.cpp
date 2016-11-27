@@ -34,9 +34,8 @@ string viua::types::Prototype::str() const {
     return ("Prototype for " + type_name);
 }
 
-viua::types::Type* viua::types::Prototype::copy() const {
-    viua::types::Prototype* cp = new viua::types::Prototype(type_name);
-    return cp;
+unique_ptr<viua::types::Type> viua::types::Prototype::copy() const {
+    return unique_ptr<viua::types::Type>{new viua::types::Prototype(type_name)};
 }
 
 

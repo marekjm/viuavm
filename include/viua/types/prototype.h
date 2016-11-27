@@ -67,7 +67,7 @@ namespace viua {
                     return std::vector<std::string>{"Type"};
                 }
 
-                virtual Type* copy() const;
+                virtual std::unique_ptr<Type> copy() const override;
 
                 Prototype(const std::string& tn): type_name(tn) {}
                 virtual ~Prototype() {}

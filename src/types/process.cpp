@@ -43,8 +43,8 @@ bool viua::types::Process::boolean() const {
     return thrd->joinable();
 }
 
-viua::types::Process* viua::types::Process::copy() const {
-    return new viua::types::Process(thrd);
+unique_ptr<viua::types::Type> viua::types::Process::copy() const {
+    return unique_ptr<viua::types::Type>{new viua::types::Process(thrd)};
 }
 
 bool viua::types::Process::joinable() {

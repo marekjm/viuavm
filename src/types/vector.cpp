@@ -109,3 +109,33 @@ string viua::types::Vector::str() const {
     oss << "]";
     return oss.str();
 }
+
+bool viua::types::Vector::boolean() const {
+    return internal_object.size() != 0;
+}
+
+unique_ptr<viua::types::Type> viua::types::Vector::copy() const {
+    unique_ptr<viua::types::Vector> vec {new Vector()};
+    for (unsigned i = 0; i < internal_object.size(); ++i) {
+        vec->push(internal_object[i]->copy().release());
+    }
+    return std::move(vec);
+}
+
+vector<viua::types::Type*>& viua::types::Vector::value() {
+    return internal_object;
+}
+
+viua::types::Vector::Vector() {
+}
+viua::types::Vector::Vector(const std::vector<viua::types::Type*>& v) {
+    for (unsigned i = 0; i < v.size(); ++i) {
+        internal_object.push_back(v[i]->copy().release());
+    }
+}
+viua::types::Vector::~Vector() {
+    while (internal_object.size()) {
+        delete internal_object.back();
+        internal_object.pop_back();
+    }
+}

@@ -47,7 +47,7 @@ namespace viua {
                 virtual std::vector<std::string> bases() const;
                 virtual std::vector<std::string> inheritancechain() const;
 
-                virtual Reference* copy() const;
+                virtual std::unique_ptr<Type> copy() const override;
                 virtual Type* pointsTo() const;
                 virtual void rebind(Type*);
 

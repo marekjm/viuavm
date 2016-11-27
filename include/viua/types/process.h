@@ -55,7 +55,7 @@ namespace viua {
                 std::string str() const;
                 std::string repr() const;
                 bool boolean() const;
-                Process* copy() const;
+                std::unique_ptr<Type> copy() const override;
 
                 /*
                  * For use by user code.

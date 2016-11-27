@@ -49,10 +49,8 @@ bool viua::types::Function::boolean() const {
     return true;
 }
 
-viua::types::Type* viua::types::Function::copy() const {
-    auto fn = new viua::types::Function();
-    fn->function_name = function_name;
-    return fn;
+unique_ptr<viua::types::Type> viua::types::Function::copy() const {
+    return unique_ptr<viua::types::Type>{new viua::types::Function(function_name)};
 }
 
 

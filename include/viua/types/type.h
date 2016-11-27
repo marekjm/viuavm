@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -85,7 +86,7 @@ namespace viua {
                     return std::vector<std::string>{"Type"};
                 }
 
-                virtual Type* copy() const = 0;
+                virtual std::unique_ptr<Type> copy() const = 0;
 
                 // We need to construct and destroy our basic object.
                 Type() {}

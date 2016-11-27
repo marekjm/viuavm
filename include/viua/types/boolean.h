@@ -60,8 +60,8 @@ namespace viua {
                     return std::vector<std::string>{"Number", "Type"};
                 }
 
-                Type* copy() const {
-                    return new Boolean(b);
+                std::unique_ptr<Type> copy() const override {
+                    return std::unique_ptr<viua::types::Type>{new Boolean(b)};
                 }
 
                 int8_t as_int8() const override { return b; }
