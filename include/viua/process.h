@@ -109,7 +109,6 @@ namespace viua {
             viua::types::Type* fetch(unsigned) const;
             viua::types::Type* pop(unsigned);
             void place(unsigned, viua::types::Type*);
-            void updaterefs(viua::types::Type*, viua::types::Type*);
             bool hasrefs(unsigned);
             void ensureStaticRegisters(std::string);
 

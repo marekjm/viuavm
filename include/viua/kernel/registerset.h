@@ -31,14 +31,12 @@ typedef long unsigned registerset_size_type;
 
 
 enum REGISTER_MASKS: mask_t {
-    REFERENCE       = (1 << 0),
-    COPY_ON_WRITE   = (1 << 1),
-    KEEP            = (1 << 2), // do not delete when frame is popped from stack
-    BIND            = (1 << 3), // hint for closure instruction what registers to bind
-    BOUND           = (1 << 4), // markes registers bound in closures
-    PASSED          = (1 << 5), // marks registers containing objects passed to functions by parameter
+    COPY_ON_WRITE   = (1 << 0),
+    KEEP            = (1 << 1), // do not delete when frame is popped from stack
+    BIND            = (1 << 2), // hint for closure instruction what registers to bind
+    PASSED          = (1 << 3), // marks registers containing objects passed to functions by parameter
                                 // these registers *MUST NOT* be overwritten
-    MOVED           = (1 << 6), // marks registers containing moved parameters
+    MOVED           = (1 << 4), // marks registers containing moved parameters
 };
 
 

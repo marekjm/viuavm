@@ -64,35 +64,10 @@ void viua::process::Process::place(unsigned index, viua::types::Type* obj) {
      *  If not - the `viua::types::Type` previously stored in it is destroyed.
      *
      */
-    viua::types::Type* old_ref_ptr = (hasrefs(index) ? uregset->at(index) : nullptr);
     uregset->set(index, obj);
-
-    // update references *if, and only if* the register being set has references and
-    // is *not marked a reference* itself, i.e. is the origin register
-    if (old_ref_ptr and not uregset->isflagged(index, REFERENCE)) {
-        updaterefs(old_ref_ptr, obj);
-    }
 }
 void viua::process::Process::put(unsigned index, viua::types::Type *o) {
     place(index, o);
-}
-void viua::process::Process::updaterefs(viua::types::Type* before, viua::types::Type* now) {
-    /** This method updates references to a given address present in registers.
-     *  It swaps old address for the new one in every register that points to the old address.
-     *
-     *  There is no need to delete old object in this function, as it will be deleted as soon as
-     *  it is replaced in the origin register (i.e. the register that holds the original pointer to
-     *  the object - the one from which all references had been derived).
-     */
-    // FIXME: this function should update references in all registersets
-    for (unsigned i = 0; i < uregset->size(); ++i) {
-        if (uregset->at(i) == before) {
-            mask_t had_mask = uregset->getmask(i);
-            uregset->empty(i);
-            uregset->set(i, now);
-            uregset->setmask(i, had_mask);
-        }
-    }
 }
 bool viua::process::Process::hasrefs(unsigned index) {
     /** This method checks if object at a given address exists as a reference in another register.
@@ -254,7 +229,6 @@ byte* viua::process::Process::callForeignMethod(byte* return_address, viua::type
 
     // FIXME: woohoo! segfault!
     viua::types::Type* returned = nullptr;
-    bool returned_is_reference = false;
     unsigned return_value_register = frames.back()->place_return_value_in;
     if (return_value_register != 0 and not frames.back()->return_void) {
         // we check in 0. register because it's reserved for return values
@@ -269,9 +243,6 @@ byte* viua::process::Process::callForeignMethod(byte* return_address, viua::type
     // place return value
     if (returned and frames.size() > 0) {
         place(return_value_register, returned);
-        if (returned_is_reference) {
-            uregset->flag(return_value_register, REFERENCE);
-        }
     }
 
     return return_address;
