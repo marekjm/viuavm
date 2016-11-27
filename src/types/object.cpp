@@ -60,12 +60,7 @@ unique_ptr<viua::types::Type> viua::types::Object::copy() const {
 }
 
 void viua::types::Object::set(const string& name, viua::types::Type* object) {
-    // prevent memory leaks during key overwriting
-    if (attributes.count(name)) {
-        delete attributes.at(name);
-        attributes.erase(name);
-    }
-    attributes[name] = object;
+    attributes[name] = unique_ptr<viua::types::Type>(object);
 }
 
 void viua::types::Object::insert(const string& key, viua::types::Type* value) {
@@ -77,22 +72,12 @@ viua::types::Type* viua::types::Object::remove(const string& key) {
         oss << "attribute not found: " << key;
         throw new viua::types::Exception(oss.str());
     }
-    viua::types::Type* o = attributes.at(key);
+    auto o = std::move(attributes.at(key));
     attributes.erase(key);
-    return o;
+    return o.release();
 }
 
 
 viua::types::Object::Object(const std::string& tn): type_name(tn) {}
 viua::types::Object::~Object() {
-    auto kv_pair = attributes.begin();
-    while (kv_pair != attributes.end()) {
-        string key = kv_pair->first;
-        viua::types::Type* value = kv_pair->second;
-
-        ++kv_pair;
-
-        attributes.erase(key);
-        delete value;
-    }
 }

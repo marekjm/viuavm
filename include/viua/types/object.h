@@ -37,7 +37,7 @@ namespace viua {
              */
             private:
                 std::string type_name;
-                std::map<std::string, Type*> attributes;
+                std::map<std::string, std::unique_ptr<Type>> attributes;
 
             public:
                 virtual std::string type() const;
@@ -56,7 +56,7 @@ namespace viua {
                 virtual Type* remove(const std::string& key);
 
                 void set(const std::string&, Type*);
-                inline Type* at(const std::string& s) { return attributes.at(s); }
+                inline Type* at(const std::string& s) { return attributes.at(s).get(); }
 
                 virtual std::unique_ptr<Type> copy() const override;
 
