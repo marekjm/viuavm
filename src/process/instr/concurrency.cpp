@@ -119,7 +119,7 @@ byte* viua::process::Process::opsend(byte* addr) {
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     if (auto thrd = dynamic_cast<viua::types::Process*>(fetch(target))) {
-        scheduler->send(thrd->pid(), unique_ptr<viua::types::Type>(pop(source)));
+        scheduler->send(thrd->pid(), std::move(pop(source)));
     } else {
         throw new viua::types::Exception("invalid type: expected viua::process::Process");
     }

@@ -107,7 +107,7 @@ namespace viua {
             std::queue<std::unique_ptr<viua::types::Type>> message_queue;
 
             viua::types::Type* fetch(unsigned) const;
-            viua::types::Type* pop(unsigned);
+            std::unique_ptr<viua::types::Type> pop(unsigned);
             void place(unsigned, viua::types::Type*);
             void ensureStaticRegisters(std::string);
 

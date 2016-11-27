@@ -112,7 +112,7 @@ byte* viua::process::Process::optmpri(byte* addr) {
     unsigned target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    tmp.reset(pop(target));
+    tmp = std::move(pop(target));
     return addr;
 }
 byte* viua::process::Process::optmpro(byte* addr) {

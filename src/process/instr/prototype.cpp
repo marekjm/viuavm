@@ -87,7 +87,7 @@ byte* viua::process::Process::opregister(byte* addr) {
     unsigned source = 0;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    unique_ptr<viua::types::Prototype> prototype {static_cast<viua::types::Prototype*>(pop(source))};
+    unique_ptr<viua::types::Prototype> prototype {static_cast<viua::types::Prototype*>(pop(source).release())};
     scheduler->registerPrototype(std::move(prototype));
 
     return addr;

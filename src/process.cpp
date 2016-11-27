@@ -45,17 +45,8 @@ viua::types::Type* viua::process::Process::fetch(unsigned index) const {
 viua::types::Type* viua::process::Process::obtain(unsigned index) const {
     return fetch(index);
 }
-viua::types::Type* viua::process::Process::pop(unsigned index) {
-    /*  Return pointer to object at given register.
-     *  The object is removed from the register.
-     *  This method safeguards against reaching for out-of-bounds registers and
-     *  reading from an empty register.
-     *
-     *  :params:
-     *
-     *  index:int   - index of a register to pop an object from
-     */
-    return uregset->pop(index).release();
+unique_ptr<viua::types::Type> viua::process::Process::pop(unsigned index) {
+    return std::move(uregset->pop(index));
 }
 void viua::process::Process::place(unsigned index, viua::types::Type* obj) {
     /** Place an object in register with given index.

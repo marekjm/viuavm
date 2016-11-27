@@ -51,7 +51,7 @@ byte* viua::process::Process::opvec(byte* addr) {
 
     unique_ptr<viua::types::Vector> v(new viua::types::Vector());
     for (decltype(pack_length) i = 0; i < pack_length; ++i) {
-        v->push(pop(pack_start_index+i));
+        v->push(pop(pack_start_index+i).release());
     }
 
     place(register_index, v.release());
@@ -82,7 +82,7 @@ byte* viua::process::Process::opvinsert(byte* addr) {
         unsigned position_operand_index = 0;
         tie(addr, position_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-        static_cast<viua::types::Vector*>(vector_operand)->insert(position_operand_index, pop(object_operand_index));
+        static_cast<viua::types::Vector*>(vector_operand)->insert(position_operand_index, pop(object_operand_index).release());
     }
 
     return addr;
@@ -102,7 +102,7 @@ byte* viua::process::Process::opvpush(byte* addr) {
     } else {
         unsigned source = 0;
         tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-        static_cast<viua::types::Vector*>(target)->push(pop(source));
+        static_cast<viua::types::Vector*>(target)->push(pop(source).release());
     }
 
     return addr;
