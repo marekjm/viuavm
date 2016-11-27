@@ -52,10 +52,10 @@ namespace viua {
                     return std::vector<std::string>{"Type"};
                 }
 
-                virtual void insert(const std::string& key, Type* value);
+                virtual void insert(const std::string& key, std::unique_ptr<Type> value);
                 virtual std::unique_ptr<Type> remove(const std::string& key);
 
-                void set(const std::string&, Type*);
+                void set(const std::string&, std::unique_ptr<Type>);
                 inline Type* at(const std::string& s) { return attributes.at(s).get(); }
 
                 virtual std::unique_ptr<Type> copy() const override;

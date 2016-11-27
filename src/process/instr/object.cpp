@@ -125,11 +125,11 @@ byte* viua::process::Process::opinsert(byte* addr) {
     if (viua::bytecode::decoder::operands::get_operand_type(addr) == OT_POINTER) {
         viua::types::Type* source = nullptr;
         tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
-        static_cast<viua::types::Object*>(object_operand)->insert(static_cast<viua::types::String*>(key_operand)->str(), source->copy().release());
+        static_cast<viua::types::Object*>(object_operand)->insert(static_cast<viua::types::String*>(key_operand)->str(), std::move(source->copy()));
     } else {
         unsigned source_index = 0;
         tie(addr, source_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-        static_cast<viua::types::Object*>(object_operand)->insert(static_cast<viua::types::String*>(key_operand)->str(), pop(source_index).release());
+        static_cast<viua::types::Object*>(object_operand)->insert(static_cast<viua::types::String*>(key_operand)->str(), std::move(pop(source_index)));
     }
 
     return addr;
