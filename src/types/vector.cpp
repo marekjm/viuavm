@@ -52,7 +52,7 @@ viua::types::Type* viua::types::Vector::push(viua::types::Type* object) {
     return object;
 }
 
-viua::types::Type* viua::types::Vector::pop(long int index) {
+unique_ptr<viua::types::Type> viua::types::Vector::pop(long int index) {
     long offset = 0;
 
     // FIXME: REFACTORING: move bounds-checking to a separate function
@@ -71,7 +71,7 @@ viua::types::Type* viua::types::Vector::pop(long int index) {
     auto it = (internal_object.begin()+offset);
     unique_ptr<viua::types::Type> object = std::move(*it);
     internal_object.erase(it);
-    return object.release();
+    return std::move(object);
 }
 
 viua::types::Type* viua::types::Vector::at(long int index) {

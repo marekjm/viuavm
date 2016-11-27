@@ -131,7 +131,7 @@ byte* viua::process::Process::opvpop(byte* addr) {
      *  2) pop value at given index,
      *  3) put it in a register,
      */
-    unique_ptr<viua::types::Type> ptr { static_cast<viua::types::Vector*>(vector_operand)->pop(position_operand_index) };
+    unique_ptr<viua::types::Type> ptr = std::move(static_cast<viua::types::Vector*>(vector_operand)->pop(position_operand_index));
     if (not destination_is_void) {
         place(destination_register_index, ptr.release());
     }
