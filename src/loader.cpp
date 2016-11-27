@@ -163,42 +163,40 @@ void Loader::loadFunctionsMap(ifstream& in) {
     uint64_t lib_function_ids_section_size = 0;
     readinto(in, &lib_function_ids_section_size);
 
-    char *lib_buffer_function_ids = new char[lib_function_ids_section_size];
-    in.read(lib_buffer_function_ids, static_cast<std::streamsize>(lib_function_ids_section_size));
+    unique_ptr<char[]> lib_buffer_function_ids {new char[lib_function_ids_section_size]};
+    in.read(lib_buffer_function_ids.get(), static_cast<std::streamsize>(lib_function_ids_section_size));
 
     vector<string> order;
     map<string, uint64_t> mapping;
 
-    tie(order, mapping) = loadmap(lib_buffer_function_ids, lib_function_ids_section_size);
+    tie(order, mapping) = loadmap(lib_buffer_function_ids.get(), lib_function_ids_section_size);
 
     for (string p : order) {
         functions.emplace_back(p);
         function_addresses[p] = mapping[p];
     }
-    delete[] lib_buffer_function_ids;
 }
 void Loader::loadBlocksMap(ifstream& in) {
     uint64_t lib_block_ids_section_size = 0;
     readinto(in, &lib_block_ids_section_size);
 
-    char *lib_buffer_block_ids = new char[lib_block_ids_section_size];
-    in.read(lib_buffer_block_ids, static_cast<std::streamsize>(lib_block_ids_section_size));
+    unique_ptr<char[]> lib_buffer_block_ids {new char[lib_block_ids_section_size]};
+    in.read(lib_buffer_block_ids.get(), static_cast<std::streamsize>(lib_block_ids_section_size));
 
     vector<string> order;
     map<string, uint64_t> mapping;
 
-    tie(order, mapping) = loadmap(lib_buffer_block_ids, lib_block_ids_section_size);
+    tie(order, mapping) = loadmap(lib_buffer_block_ids.get(), lib_block_ids_section_size);
 
     for (string p : order) {
         blocks.emplace_back(p);
         block_addresses[p] = mapping[p];
     }
-    delete[] lib_buffer_block_ids;
 }
 void Loader::loadBytecode(ifstream& in) {
     in.read(reinterpret_cast<char*>(&size), sizeof(decltype(size)));
-    bytecode = new byte[size];
-    in.read(reinterpret_cast<char*>(bytecode), static_cast<std::streamsize>(size));
+    bytecode.reset(new byte[size]);
+    in.read(reinterpret_cast<char*>(bytecode.get()), static_cast<std::streamsize>(size));
 }
 
 Loader& Loader::load() {
@@ -249,12 +247,12 @@ Loader& Loader::executable() {
 uint64_t Loader::getBytecodeSize() {
     return size;
 }
-byte* Loader::getBytecode() {
-    byte* copy = new byte[size];
+unique_ptr<byte[]> Loader::getBytecode() {
+    unique_ptr<byte[]> copy {new byte[size]};
     for (uint64_t i = 0; i < size; ++i) {
         copy[i] = bytecode[i];
     }
-    return copy;
+    return std::move(copy);
 }
 
 vector<uint64_t> Loader::getJumps() {

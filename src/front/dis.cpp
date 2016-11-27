@@ -150,7 +150,7 @@ int main(int argc, char* argv[]) {
     }
 
     uint64_t bytes = loader.getBytecodeSize();
-    byte* bytecode = loader.getBytecode();
+    unique_ptr<byte[]> bytecode = std::move(loader.getBytecode());
 
     map<string, uint64_t> function_address_mapping = loader.getFunctionAddresses();
     vector<string> functions = loader.getFunctions();
@@ -271,7 +271,7 @@ int main(int argc, char* argv[]) {
             string instruction;
             try {
                 unsigned size;
-                tie(instruction, size) = disassembler::instruction((bytecode+element_address_mapping[name]+j));
+                tie(instruction, size) = disassembler::instruction((bytecode.get()+element_address_mapping[name]+j));
                 oss << "    " << instruction << '\n';
                 j += size;
             } catch (const out_of_range& e) {

@@ -29,6 +29,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <memory>
 #include <viua/machine.h>
 #include <viua/bytecode/bytetypedef.h>
 
@@ -42,7 +43,7 @@ class Loader {
     std::string path;
 
     uint64_t size;
-    byte* bytecode;
+    std::unique_ptr<byte[]> bytecode;
 
     std::vector<uint64_t> jumps;
 
@@ -77,7 +78,7 @@ class Loader {
     Loader& executable();
 
     uint64_t getBytecodeSize();
-    byte* getBytecode();
+    std::unique_ptr<byte[]> getBytecode();
 
     std::vector<uint64_t> getJumps();
 
@@ -95,7 +96,6 @@ class Loader {
 
     Loader(std::string pth): path(pth), size(0), bytecode(nullptr) {}
     ~Loader() {
-        delete[] bytecode;
     }
 };
 

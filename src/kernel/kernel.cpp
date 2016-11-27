@@ -47,7 +47,7 @@
 using namespace std;
 
 
-viua::kernel::Kernel& viua::kernel::Kernel::load(byte* bc) {
+viua::kernel::Kernel& viua::kernel::Kernel::load(unique_ptr<byte[]> bc) {
     /*  Load bytecode into the viua::kernel::Kernel.
      *  viua::kernel::Kernel becomes owner of loaded bytecode - meaning it will consider itself responsible for proper
      *  destruction of it, so make sure you have a copy of the bytecode.
@@ -55,7 +55,7 @@ viua::kernel::Kernel& viua::kernel::Kernel::load(byte* bc) {
      *  Any previously loaded bytecode is freed.
      *  To free bytecode without loading anything new it is possible to call .load(nullptr).
      */
-    bytecode.reset(bc);
+    bytecode = std::move(bc);
     return (*this);
 }
 

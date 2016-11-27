@@ -799,7 +799,7 @@ int generate(vector<Token>& tokens, invocables_t& functions, invocables_t& block
     /////////////////////////////////////////////////////////
     // GATHER LINKS, GET THEIR SIZES AND ADJUST BYTECODE SIZE
     vector<string> links = assembler::ce::getlinks(tokens);
-    vector<tuple<string, uint64_t, byte*> > linked_libs_bytecode;
+    vector<tuple<string, uint64_t, std::unique_ptr<byte[]>> > linked_libs_bytecode;
     vector<string> linked_function_names;
     vector<string> linked_block_names;
     map<string, vector<uint64_t> > linked_libs_jumptables;
@@ -936,7 +936,7 @@ int generate(vector<Token>& tokens, invocables_t& functions, invocables_t& block
             }
         }
 
-        linked_libs_bytecode.emplace_back(lnk, loader.getBytecodeSize(), loader.getBytecode());
+        linked_libs_bytecode.emplace_back(lnk, loader.getBytecodeSize(), std::move(loader.getBytecode()));
         bytes += loader.getBytecodeSize();
     }
 
@@ -1327,11 +1327,12 @@ int generate(vector<Token>& tokens, invocables_t& functions, invocables_t& block
     ////////////////////////////////////
     // WRITE STATICALLY LINKED LIBRARIES
     uint64_t bytes_offset = current_link_offset;
-    for (tuple<string, uint64_t, byte*> lnk : linked_libs_bytecode) {
-        string lib_name;
-        byte* linked_bytecode;
-        uint64_t linked_size;
-        tie(lib_name, linked_size, linked_bytecode) = lnk;
+    for (auto& lnk : linked_libs_bytecode) {
+        string lib_name = get<0>(lnk);
+        byte* linked_bytecode = get<2>(lnk).get();
+        uint64_t linked_size = get<1>(lnk);
+
+        //tie(lib_name, linked_size, linked_bytecode) = lnk;
 
         if (VERBOSE or DEBUG) {
             cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);

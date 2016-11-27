@@ -27,7 +27,7 @@ void viua::front::vm::initialise(viua::kernel::Kernel *kernel, const string& pro
     loader.executable();
 
     uint64_t bytes = loader.getBytecodeSize();
-    byte* bytecode = loader.getBytecode();
+    unique_ptr<byte[]> bytecode = std::move(loader.getBytecode());
 
     map<string, uint64_t> function_address_mapping = loader.getFunctionAddresses();
     for (auto p : function_address_mapping) { kernel->mapfunction(p.first, p.second); }
@@ -35,7 +35,7 @@ void viua::front::vm::initialise(viua::kernel::Kernel *kernel, const string& pro
 
     kernel->commandline_arguments = args;
 
-    kernel->load(bytecode).bytes(bytes);
+    kernel->load(std::move(bytecode)).bytes(bytes);
 }
 
 void viua::front::vm::load_standard_prototypes(viua::kernel::Kernel* kernel) {

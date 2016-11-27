@@ -153,7 +153,7 @@ namespace viua {
                  *      * tell the Kernel where to start execution,
                  *      * kick the Kernel so it starts running,
                  */
-                Kernel& load(byte*);
+                Kernel& load(std::unique_ptr<byte[]>);
                 Kernel& bytes(uint64_t);
 
                 Kernel& mapfunction(const std::string&, uint64_t);
