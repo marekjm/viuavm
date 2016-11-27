@@ -55,7 +55,7 @@ viua::types::Type* viua::process::Process::pop(unsigned index) {
      *
      *  index:int   - index of a register to pop an object from
      */
-    return uregset->pop(index);
+    return uregset->pop(index).release();
 }
 void viua::process::Process::place(unsigned index, viua::types::Type* obj) {
     /** Place an object in register with given index.
@@ -121,7 +121,7 @@ void viua::process::Process::dropFrame() {
     }
 
     if (frames.size() == 0) {
-        return_value.reset(frame->regset->pop(0));
+        return_value = std::move(frame->regset->pop(0));
     }
 
     if (frames.size()) {
@@ -214,21 +214,21 @@ byte* viua::process::Process::callForeignMethod(byte* return_address, viua::type
     }
 
     // FIXME: woohoo! segfault!
-    viua::types::Type* returned = nullptr;
+    unique_ptr<viua::types::Type> returned;
     unsigned return_value_register = frames.back()->place_return_value_in;
     if (return_value_register != 0 and not frames.back()->return_void) {
         // we check in 0. register because it's reserved for return values
         if (uregset->at(0) == nullptr) {
             throw new viua::types::Exception("return value requested by frame but foreign method did not set return register");
         }
-        returned = uregset->pop(0);
+        returned = std::move(uregset->pop(0));
     }
 
     dropFrame();
 
     // place return value
     if (returned and frames.size() > 0) {
-        place(return_value_register, returned);
+        place(return_value_register, returned.release());
     }
 
     return return_address;

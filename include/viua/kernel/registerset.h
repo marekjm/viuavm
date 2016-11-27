@@ -50,7 +50,7 @@ namespace viua {
             public:
                 // basic access to registers
                 viua::types::Type* put(registerset_size_type, viua::types::Type*);
-                viua::types::Type* pop(registerset_size_type);
+                std::unique_ptr<viua::types::Type> pop(registerset_size_type);
                 viua::types::Type* set(registerset_size_type, viua::types::Type*);
                 viua::types::Type* get(registerset_size_type);
                 viua::types::Type* at(registerset_size_type);

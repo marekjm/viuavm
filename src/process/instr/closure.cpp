@@ -92,7 +92,7 @@ byte* viua::process::Process::opcapturemove(byte* addr) {
         throw new viua::types::Exception("cannot capture object: register index out exceeded size of closure register set");
     }
 
-    target_closure->regset->set(target_register, uregset->pop(source_register));
+    target_closure->regset->set(target_register, uregset->pop(source_register).release());
 
     return addr;
 }

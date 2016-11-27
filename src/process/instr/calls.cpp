@@ -65,7 +65,7 @@ byte* viua::process::Process::oppamv(byte* addr) {
     if (parameter_no_operand_index >= frame_new->args->size()) {
         throw new viua::types::Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
     }
-    frame_new->args->set(parameter_no_operand_index, uregset->pop(source));
+    frame_new->args->set(parameter_no_operand_index, uregset->pop(source).release());
     frame_new->args->clear(parameter_no_operand_index);
     frame_new->args->flag(parameter_no_operand_index, MOVED);
 
@@ -95,9 +95,9 @@ byte* viua::process::Process::oparg(byte* addr) {
     unique_ptr<viua::types::Type> argument;
 
     if (frames.back()->args->isflagged(parameter_no_operand_index, MOVED)) {
-        argument.reset(frames.back()->args->pop(parameter_no_operand_index));
+        argument = std::move(frames.back()->args->pop(parameter_no_operand_index));
     } else {
-        argument.reset(frames.back()->args->get(parameter_no_operand_index)->copy().release());
+        argument = std::move(frames.back()->args->get(parameter_no_operand_index)->copy());
     }
 
     if (not destination_is_void) {
@@ -191,21 +191,21 @@ byte* viua::process::Process::opreturn(byte* addr) {
     }
     addr = frames.back()->ret_address();
 
-    viua::types::Type* returned = nullptr;
+    unique_ptr<viua::types::Type> returned;
     unsigned return_value_register = frames.back()->place_return_value_in;
     if (return_value_register != 0 and not frames.back()->return_void) {
         // we check in 0. register because it's reserved for return values
         if (uregset->at(0) == nullptr) {
             throw new viua::types::Exception("return value requested by frame but function did not set return register");
         }
-        returned = uregset->pop(0);
+        returned = std::move(uregset->pop(0));
     }
 
     dropFrame();
 
     // place return value
     if (returned and frames.size() > 0) {
-        place(return_value_register, returned);
+        place(return_value_register, returned.release());
     }
 
     if (frames.size() > 0) {
