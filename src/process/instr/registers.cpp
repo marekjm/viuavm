@@ -51,7 +51,7 @@ byte* viua::process::Process::opptr(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    place(target, source->pointer());
+    place(target, source->pointer().release());
 
     return addr;
 }

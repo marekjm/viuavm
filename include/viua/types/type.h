@@ -77,7 +77,7 @@ namespace viua {
                     return false;
                 }
 
-                virtual Pointer* pointer();
+                virtual std::unique_ptr<Pointer> pointer();
 
                 virtual std::vector<std::string> bases() const {
                     return std::vector<std::string>{"Type"};
