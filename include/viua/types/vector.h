@@ -32,7 +32,7 @@ namespace viua {
         class Vector : public Type {
             /** Vector type.
              */
-            std::vector<Type*> internal_object;
+            std::vector<std::unique_ptr<Type>> internal_object;
 
             public:
                 std::string type() const {
@@ -42,7 +42,7 @@ namespace viua {
                 bool boolean() const override;
                 std::unique_ptr<Type> copy() const override;
 
-                std::vector<Type*>& value();
+                std::vector<std::unique_ptr<Type>>& value();
 
                 Type* insert(long int, Type*);
                 Type* push(Type*);

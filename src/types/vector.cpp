@@ -41,13 +41,14 @@ viua::types::Type* viua::types::Vector::insert(long int index, viua::types::Type
         offset = index;
     }
 
-    vector<viua::types::Type*>::iterator it = (internal_object.begin()+offset);
-    internal_object.insert(it, object);
+    auto it = (internal_object.begin()+offset);
+    unique_ptr<viua::types::Type> holder { object };
+    internal_object.insert(it, std::move(holder));
     return object;
 }
 
 viua::types::Type* viua::types::Vector::push(viua::types::Type* object) {
-    internal_object.push_back(object);
+    internal_object.emplace_back(object);
     return object;
 }
 
@@ -67,10 +68,10 @@ viua::types::Type* viua::types::Vector::pop(long int index) {
         offset = index;
     }
 
-    vector<viua::types::Type*>::iterator it = (internal_object.begin()+offset);
-    viua::types::Type *object = *it;
+    auto it = (internal_object.begin()+offset);
+    unique_ptr<viua::types::Type> object = std::move(*it);
     internal_object.erase(it);
-    return object;
+    return object.release();
 }
 
 viua::types::Type* viua::types::Vector::at(long int index) {
@@ -89,8 +90,8 @@ viua::types::Type* viua::types::Vector::at(long int index) {
         offset = index;
     }
 
-    vector<viua::types::Type*>::iterator it = (internal_object.begin()+offset);
-    return *it;
+    auto it = (internal_object.begin()+offset);
+    return it->get();
 }
 
 int viua::types::Vector::len() {
@@ -122,7 +123,7 @@ unique_ptr<viua::types::Type> viua::types::Vector::copy() const {
     return std::move(vec);
 }
 
-vector<viua::types::Type*>& viua::types::Vector::value() {
+vector<unique_ptr<viua::types::Type>>& viua::types::Vector::value() {
     return internal_object;
 }
 
@@ -130,12 +131,8 @@ viua::types::Vector::Vector() {
 }
 viua::types::Vector::Vector(const std::vector<viua::types::Type*>& v) {
     for (unsigned i = 0; i < v.size(); ++i) {
-        internal_object.push_back(v[i]->copy().release());
+        internal_object.push_back(std::move(v[i]->copy()));
     }
 }
 viua::types::Vector::~Vector() {
-    while (internal_object.size()) {
-        delete internal_object.back();
-        internal_object.pop_back();
-    }
 }
