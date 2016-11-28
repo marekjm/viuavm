@@ -28,10 +28,9 @@
 using namespace std;
 
 
-viua::types::Type* viua::kernel::RegisterSet::put(registerset_size_type index, viua::types::Type* object) {
+void viua::kernel::RegisterSet::put(registerset_size_type index, unique_ptr<viua::types::Type> object) {
     if (index >= registerset_size) { throw new viua::types::Exception("register access out of bounds: write"); }
-    registers.at(index).reset(object);
-    return object;
+    registers.at(index).reset(object.release());
 }
 
 unique_ptr<viua::types::Type> viua::kernel::RegisterSet::pop(registerset_size_type index) {
@@ -45,7 +44,7 @@ unique_ptr<viua::types::Type> viua::kernel::RegisterSet::pop(registerset_size_ty
     return std::move(object);
 }
 
-viua::types::Type* viua::kernel::RegisterSet::set(registerset_size_type index, viua::types::Type* object) {
+void viua::kernel::RegisterSet::set(registerset_size_type index, unique_ptr<viua::types::Type> object) {
     /** Put object inside register specified by given index.
      *
      *  Performs bounds checking.
@@ -53,12 +52,10 @@ viua::types::Type* viua::kernel::RegisterSet::set(registerset_size_type index, v
     if (index >= registers.size()) { throw new viua::types::Exception("register access out of bounds: write"); }
 
     if (dynamic_cast<viua::types::Reference*>(registers.at(index).get())) {
-        static_cast<viua::types::Reference*>(registers.at(index).get())->rebind(object);
+        static_cast<viua::types::Reference*>(registers.at(index).get())->rebind(object.release());
     } else {
-        registers.at(index).reset(object);
+        registers.at(index).reset(object.release());
     }
-
-    return object;
 }
 
 viua::types::Type* viua::kernel::RegisterSet::get(registerset_size_type index) {
@@ -104,7 +101,7 @@ void viua::kernel::RegisterSet::move(registerset_size_type src, registerset_size
      */
     if (src >= registerset_size) { throw new viua::types::Exception("register access out of bounds: move source"); }
     if (dst >= registerset_size) { throw new viua::types::Exception("register access out of bounds: move destination"); }
-    set(dst, pop(src).release());
+    set(dst, std::move(pop(src)));
 }
 
 void viua::kernel::RegisterSet::swap(registerset_size_type src, registerset_size_type dst) {
@@ -244,7 +241,7 @@ unique_ptr<viua::kernel::RegisterSet> viua::kernel::RegisterSet::copy() {
     unique_ptr<viua::kernel::RegisterSet> rscopy {new viua::kernel::RegisterSet(size())};
     for (unsigned i = 0; i < size(); ++i) {
         if (at(i) == nullptr) { continue; }
-        rscopy->set(i, at(i)->copy().release());
+        rscopy->set(i, std::move(at(i)->copy()));
         rscopy->setmask(i, getmask(i));
     }
     return std::move(rscopy);

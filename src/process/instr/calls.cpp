@@ -49,7 +49,7 @@ byte* viua::process::Process::opparam(byte* addr) {
     if (parameter_no_operand_index >= frame_new->args->size()) {
         throw new viua::types::Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
     }
-    frame_new->args->set(parameter_no_operand_index, fetch(source)->copy().release());
+    frame_new->args->set(parameter_no_operand_index, std::move(fetch(source)->copy()));
     frame_new->args->clear(parameter_no_operand_index);
 
     return addr;
@@ -65,7 +65,7 @@ byte* viua::process::Process::oppamv(byte* addr) {
     if (parameter_no_operand_index >= frame_new->args->size()) {
         throw new viua::types::Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
     }
-    frame_new->args->set(parameter_no_operand_index, uregset->pop(source).release());
+    frame_new->args->set(parameter_no_operand_index, std::move(uregset->pop(source)));
     frame_new->args->clear(parameter_no_operand_index);
     frame_new->args->flag(parameter_no_operand_index, MOVED);
 
@@ -101,7 +101,7 @@ byte* viua::process::Process::oparg(byte* addr) {
     }
 
     if (not destination_is_void) {
-        uregset->set(destination_register_index, argument.release());
+        uregset->set(destination_register_index, std::move(argument));
     }
 
     return addr;
@@ -110,7 +110,7 @@ byte* viua::process::Process::oparg(byte* addr) {
 byte* viua::process::Process::opargc(byte* addr) {
     unsigned target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    uregset->set(target, new viua::types::Integer(static_cast<int>(frames.back()->args->size())));
+    uregset->set(target, unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<int>(frames.back()->args->size()))});
 
     return addr;
 }

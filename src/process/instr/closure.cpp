@@ -52,9 +52,9 @@ byte* viua::process::Process::opcapture(byte* addr) {
         // this is needed to bind the captured object's life to lifetime of the closure
         rf = new viua::types::Reference(captured_object);
         uregset->empty(source_register);    // empty - do not delete the captured object or SEGFAULTS will follow
-        uregset->set(source_register, rf);  // set the register to contain the newly-created reference
+        uregset->set(source_register, unique_ptr<viua::types::Type>{rf});  // set the register to contain the newly-created reference
     }
-    target_closure->regset->set(target_register, rf->copy().release());
+    target_closure->regset->set(target_register, std::move(rf->copy()));
 
     return addr;
 }
@@ -74,7 +74,7 @@ byte* viua::process::Process::opcapturecopy(byte* addr) {
         throw new viua::types::Exception("cannot capture object: register index out exceeded size of closure register set");
     }
 
-    target_closure->regset->set(target_register, source->copy().release());
+    target_closure->regset->set(target_register, std::move(source->copy()));
 
     return addr;
 }
@@ -92,7 +92,7 @@ byte* viua::process::Process::opcapturemove(byte* addr) {
         throw new viua::types::Exception("cannot capture object: register index out exceeded size of closure register set");
     }
 
-    target_closure->regset->set(target_register, uregset->pop(source_register).release());
+    target_closure->regset->set(target_register, std::move(uregset->pop(source_register)));
 
     return addr;
 }

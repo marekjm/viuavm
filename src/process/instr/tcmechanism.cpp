@@ -60,7 +60,7 @@ byte* viua::process::Process::oppull(byte* addr) {
     if (not caught) {
         throw new viua::types::Exception("no caught object to pull");
     }
-    uregset->set(target, caught.release());
+    uregset->set(target, std::move(caught));
 
     return addr;
 }

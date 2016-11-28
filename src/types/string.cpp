@@ -111,7 +111,7 @@ void String::startswith(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::
         }
     }
 
-    frame->regset->set(0, new viua::types::Boolean(starts_with));
+    frame->regset->set(0, unique_ptr<viua::types::Type>{new viua::types::Boolean(starts_with)});
 }
 
 void String::endswith(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
@@ -130,7 +130,7 @@ void String::endswith(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Re
         }
     }
 
-    frame->regset->set(0, new viua::types::Boolean(ends_with));
+    frame->regset->set(0, unique_ptr<viua::types::Type>{new viua::types::Boolean(ends_with)});
 }
 
 void String::format(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
@@ -165,7 +165,7 @@ void String::format(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Regi
         }
     }
 
-    frame->regset->set(0, new String(result));
+    frame->regset->set(0, unique_ptr<viua::types::Type>{new String(result)});
 }
 
 void String::substr(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
@@ -186,11 +186,11 @@ void String::substr(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Regi
             end = i->value();
         }
     }
-    frame->regset->set(0, sub(begin, end));
+    frame->regset->set(0, unique_ptr<viua::types::Type>{sub(begin, end)});
 }
 
 void String::concatenate(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
-    frame->regset->set(0, new String(static_cast<String*>(frame->args->at(0))->value() + static_cast<String*>(frame->args->at(1))->value()));
+    frame->regset->set(0, unique_ptr<viua::types::Type>{new String(static_cast<String*>(frame->args->at(0))->value() + static_cast<String*>(frame->args->at(1))->value())});
 }
 
 void String::join(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
@@ -198,5 +198,5 @@ void String::join(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*
 }
 
 void String::size(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
-    frame->regset->set(0, new Integer(static_cast<int>(svalue.size())));
+    frame->regset->set(0, unique_ptr<viua::types::Type>{new Integer(static_cast<int>(svalue.size()))});
 }

@@ -58,7 +58,7 @@ void random_drandom(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Regi
     }
     int rint = 0;
     in.read((char*)&rint, sizeof(int));
-    frame->regset->set(0, new viua::types::Integer(rint));
+    frame->regset->set(0, unique_ptr<viua::types::Type>{new viua::types::Integer(rint)});
 }
 
 void random_durandom(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
@@ -75,13 +75,13 @@ void random_durandom(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Reg
     }
     int rint = 0;
     in.read((char*)&rint, sizeof(int));
-    frame->regset->set(0, new viua::types::Integer(rint));
+    frame->regset->set(0, unique_ptr<viua::types::Type>{new viua::types::Integer(rint)});
 }
 
 void random_random(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     /** Return random float from range between 0.0 and 1.0.
      */
-    frame->regset->set(0, new viua::types::Float(getrandom()));
+    frame->regset->set(0, unique_ptr<viua::types::Type>{new viua::types::Float(getrandom())});
 }
 
 void random_randint(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
@@ -93,7 +93,7 @@ void random_randint(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Regi
     int lower_bound = static_cast<viua::types::Integer*>(frame->args->at(0))->value();
     int upper_bound = static_cast<viua::types::Integer*>(frame->args->at(1))->value();
     int modifer = ((upper_bound - lower_bound) * getrandom());
-    frame->regset->set(0, new viua::types::Integer(lower_bound + modifer));
+    frame->regset->set(0, unique_ptr<viua::types::Type>{new viua::types::Integer(lower_bound + modifer)});
 }
 
 const ForeignFunctionSpec functions[] = {

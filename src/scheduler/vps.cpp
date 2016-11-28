@@ -424,7 +424,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                 death_message->set("parameters", std::move(parameters));
 
                 unique_ptr<Frame> death_frame(new Frame(nullptr, 1));
-                death_frame->args->set(0, death_message.release());
+                death_frame->args->set(0, std::move(death_message));
 #if VIUA_VM_DEBUG_LOG
                 viua_err( "[scheduler:vps:", this, ":watchdogging] process ", th, ':', th->starting_function(), ": died, becomes ", th->watchdog());
 #endif
@@ -524,7 +524,7 @@ void viua::scheduler::VirtualProcessScheduler::bootstrap(const vector<string>& c
     for (decltype(limit) i = 0; i < limit; ++i) {
         cmdline->push(unique_ptr<viua::types::Type>{new viua::types::String(commandline_arguments[i])});
     }
-    initial_frame->regset->set(1, cmdline.release());
+    initial_frame->regset->set(1, std::move(cmdline));
 
     main_process = spawn(std::move(initial_frame), nullptr, true);
     main_process->priority(16);

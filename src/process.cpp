@@ -55,7 +55,7 @@ void viua::process::Process::place(unsigned index, viua::types::Type* obj) {
      *  If not - the `viua::types::Type` previously stored in it is destroyed.
      *
      */
-    uregset->set(index, obj);
+    uregset->set(index, unique_ptr<viua::types::Type>{obj});
 }
 void viua::process::Process::put(unsigned index, viua::types::Type *o) {
     place(index, o);

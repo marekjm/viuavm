@@ -126,7 +126,7 @@ byte* viua::process::Process::optmpro(byte* addr) {
     if (uregset->at(target) != nullptr) {
         uregset->free(target);
     }
-    uregset->set(target, tmp.release());
+    uregset->set(target, std::move(tmp));
 
     return addr;
 }

@@ -33,7 +33,7 @@ void typeof(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*
     if (frame->args->at(0) == 0) {
         throw new viua::types::Exception("expected object as parameter 0");
     }
-    frame->regset->set(0, new viua::types::String(frame->args->get(0)->type()));
+    frame->regset->set(0, unique_ptr<viua::types::Type>{new viua::types::String(frame->args->get(0)->type())});
 }
 
 void inheritanceChain(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
@@ -48,7 +48,7 @@ void inheritanceChain(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Re
         icv->push(unique_ptr<viua::types::Type>{new viua::types::String(ic[i])});
     }
 
-    frame->regset->set(0, icv.release());
+    frame->regset->set(0, std::move(icv));
 }
 
 void bases(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
@@ -64,7 +64,7 @@ void bases(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
         icv->push(unique_ptr<viua::types::Type>{new viua::types::String(ic[i])});
     }
 
-    frame->regset->set(0, icv.release());
+    frame->regset->set(0, std::move(icv));
 }
 
 
