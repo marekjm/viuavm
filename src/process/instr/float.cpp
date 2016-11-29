@@ -38,7 +38,7 @@ byte* viua::process::Process::opfstore(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, value) = viua::bytecode::decoder::operands::fetch_raw_float(addr, this);
 
-    place(target, new viua::types::Float(value));
+    place(target, unique_ptr<viua::types::Type>{new viua::types::Float(value)});
 
     return addr;
 }

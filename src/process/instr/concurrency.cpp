@@ -54,7 +54,7 @@ byte* viua::process::Process::opprocess(byte* addr) {
 
     auto spawned_process = scheduler->spawn(std::move(frame_new), this, target_is_void);
     if (not target_is_void) {
-        place(target, new viua::types::Process(spawned_process));
+        place(target, unique_ptr<viua::types::Type>{new viua::types::Process(spawned_process)});
     }
 
     return addr;
@@ -96,7 +96,7 @@ byte* viua::process::Process::opjoin(byte* addr) {
                 thrown = thrd->transferActiveException();
             }
             if (not target_is_void) {
-                place(target, thrd->getReturnValue().release());
+                place(target, std::move(thrd->getReturnValue()));
             }
         } else if (timeout_active and (not wait_until_infinity) and (waiting_until < std::chrono::steady_clock::now())) {
             timeout_active = false;
@@ -160,7 +160,7 @@ byte* viua::process::Process::opreceive(byte* addr) {
 
     if (not message_queue.empty()) {
         if (target) {
-            place(target, message_queue.front().release());
+            place(target, std::move(message_queue.front()));
         }
         message_queue.pop();
         timeout_active = false;
@@ -210,7 +210,7 @@ byte* viua::process::Process::opself(byte* addr) {
     unsigned target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    place(target, new viua::types::Process(this));
+    place(target, unique_ptr<viua::types::Type>{new viua::types::Process(this)});
 
     return addr;
 }

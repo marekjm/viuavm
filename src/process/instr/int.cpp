@@ -33,7 +33,7 @@ using namespace std;
 byte* viua::process::Process::opizero(byte* addr) {
     unsigned target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    place(target, new viua::types::Integer(0));
+    place(target, unique_ptr<viua::types::Type>{new viua::types::Integer(0)});
     return addr;
 }
 
@@ -44,7 +44,7 @@ byte* viua::process::Process::opistore(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, integer) = viua::bytecode::decoder::operands::fetch_primitive_uint(addr, this);
 
-    place(target, new viua::types::Integer(integer));
+    place(target, unique_ptr<viua::types::Type>{new viua::types::Integer(integer)});
 
     return addr;
 }

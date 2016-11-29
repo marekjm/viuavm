@@ -45,7 +45,7 @@ byte* viua::process::Process::opnew(byte* addr) {
         throw new viua::types::Exception("cannot create new instance of unregistered type: " + class_name);
     }
 
-    place(target, new viua::types::Object(class_name));
+    place(target, unique_ptr<viua::types::Type>{new viua::types::Object(class_name)});
 
     return addr;
 }
@@ -156,7 +156,7 @@ byte* viua::process::Process::opremove(byte* addr) {
 
     unique_ptr<viua::types::Type> result { static_cast<viua::types::Object*>(object_operand)->remove(static_cast<viua::types::String*>(key_operand)->str()) };
     if (not void_target) {
-        place(target_index, result.release());
+        place(target_index, std::move(result));
     }
 
     return addr;

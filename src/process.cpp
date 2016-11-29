@@ -48,17 +48,17 @@ viua::types::Type* viua::process::Process::obtain(unsigned index) const {
 unique_ptr<viua::types::Type> viua::process::Process::pop(unsigned index) {
     return std::move(uregset->pop(index));
 }
-void viua::process::Process::place(unsigned index, viua::types::Type* obj) {
+void viua::process::Process::place(unsigned index, unique_ptr<viua::types::Type> obj) {
     /** Place an object in register with given index.
      *
      *  Before placing an object in register, a check is preformed if the register is empty.
      *  If not - the `viua::types::Type` previously stored in it is destroyed.
      *
      */
-    uregset->set(index, unique_ptr<viua::types::Type>{obj});
+    uregset->set(index, std::move(obj));
 }
 void viua::process::Process::put(unsigned index, viua::types::Type *o) {
-    place(index, o);
+    place(index, unique_ptr<viua::types::Type>{o});
 }
 void viua::process::Process::ensureStaticRegisters(string function_name) {
     /** Makes sure that static register set for requested function is initialized.
@@ -219,7 +219,7 @@ byte* viua::process::Process::callForeignMethod(byte* return_address, viua::type
 
     // place return value
     if (returned and frames.size() > 0) {
-        place(return_value_register, returned.release());
+        place(return_value_register, std::move(returned));
     }
 
     return return_address;

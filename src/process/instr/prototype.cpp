@@ -37,7 +37,7 @@ byte* viua::process::Process::opclass(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, class_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
-    place(target, new viua::types::Prototype(class_name));
+    place(target, unique_ptr<viua::types::Type>{new viua::types::Prototype(class_name)});
 
     return addr;
 }

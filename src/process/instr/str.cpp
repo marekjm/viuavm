@@ -35,7 +35,7 @@ byte* viua::process::Process::opstrstore(byte* addr) {
     string s;
     tie(addr, s) = viua::bytecode::decoder::operands::fetch_primitive_string(addr, this);
 
-    place(target, new viua::types::String(str::strdecode(s)));
+    place(target, unique_ptr<viua::types::Type>{new viua::types::String(str::strdecode(s))});
 
     return addr;
 }

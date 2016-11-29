@@ -36,7 +36,7 @@ byte* viua::process::Process::opitof(byte* addr) {
     viua::types::Type* source = nullptr;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    place(target, new viua::types::Float(static_cast<viua::types::Integer*>(source)->as_float64()));
+    place(target, unique_ptr<viua::types::Type>{new viua::types::Float(static_cast<viua::types::Integer*>(source)->as_float64())});
 
     return addr;
 }
@@ -48,7 +48,7 @@ byte* viua::process::Process::opftoi(byte* addr) {
     viua::types::Type* source = nullptr;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    place(target, new viua::types::Integer(static_cast<viua::types::Float*>(source)->as_int32()));
+    place(target, unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<viua::types::Float*>(source)->as_int32())});
 
     return addr;
 }
@@ -70,7 +70,7 @@ byte* viua::process::Process::opstoi(byte* addr) {
         throw new viua::types::Exception("invalid argument: " + supplied_string);
     }
 
-    place(target, new viua::types::Integer(result_integer));
+    place(target, unique_ptr<viua::types::Type>{new viua::types::Integer(result_integer)});
 
     return addr;
 }
@@ -84,7 +84,7 @@ byte* viua::process::Process::opstof(byte* addr) {
 
     string supplied_string = static_cast<viua::types::String*>(source)->value();
     double convert_from = std::stod(supplied_string);
-    place(target, new viua::types::Float(convert_from));
+    place(target, unique_ptr<viua::types::Type>{new viua::types::Float(convert_from)});
 
     return addr;
 }

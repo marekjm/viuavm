@@ -205,7 +205,7 @@ byte* viua::process::Process::opreturn(byte* addr) {
 
     // place return value
     if (returned and frames.size() > 0) {
-        place(return_value_register, returned.release());
+        place(return_value_register, std::move(returned));
     }
 
     if (frames.size() > 0) {

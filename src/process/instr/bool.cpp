@@ -34,7 +34,7 @@ byte* viua::process::Process::opnot(byte* addr) {
     viua::types::Type *source = nullptr;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    place(target, new viua::types::Boolean(not source->boolean()));
+    place(target, unique_ptr<viua::types::Type>{new viua::types::Boolean(not source->boolean())});
 
     return addr;
 }
@@ -47,7 +47,7 @@ byte* viua::process::Process::opand(byte* addr) {
     tie(addr, first) = viua::bytecode::decoder::operands::fetch_object(addr, this);
     tie(addr, second) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    place(target, new viua::types::Boolean(first->boolean() and second->boolean()));
+    place(target, unique_ptr<viua::types::Type>{new viua::types::Boolean(first->boolean() and second->boolean())});
 
     return addr;
 }
@@ -60,7 +60,7 @@ byte* viua::process::Process::opor(byte* addr) {
     tie(addr, first) = viua::bytecode::decoder::operands::fetch_object(addr, this);
     tie(addr, second) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    place(target, new viua::types::Boolean(first->boolean() or second->boolean()));
+    place(target, unique_ptr<viua::types::Type>{new viua::types::Boolean(first->boolean() or second->boolean())});
 
     return addr;
 }

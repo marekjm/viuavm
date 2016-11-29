@@ -41,7 +41,7 @@ byte* viua::process::Process::opcopy(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    place(target, source->copy().release());
+    place(target, std::move(source->copy()));
 
     return addr;
 }
@@ -51,7 +51,7 @@ byte* viua::process::Process::opptr(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    place(target, source->pointer().release());
+    place(target, std::move(source->pointer()));
 
     return addr;
 }
@@ -77,7 +77,7 @@ byte* viua::process::Process::opisnull(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    place(target, new viua::types::Boolean(uregset->at(source) == nullptr));
+    place(target, unique_ptr<viua::types::Type>{new viua::types::Boolean(uregset->at(source) == nullptr)});
 
     return addr;
 }

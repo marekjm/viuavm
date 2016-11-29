@@ -108,7 +108,7 @@ namespace viua {
 
             viua::types::Type* fetch(unsigned) const;
             std::unique_ptr<viua::types::Type> pop(unsigned);
-            void place(unsigned, viua::types::Type*);
+            void place(unsigned, std::unique_ptr<viua::types::Type>);
             void ensureStaticRegisters(std::string);
 
             /*  Methods dealing with stack and frame manipulation, and
