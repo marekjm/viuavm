@@ -57,8 +57,8 @@ void viua::process::Process::place(unsigned index, unique_ptr<viua::types::Type>
      */
     uregset->set(index, std::move(obj));
 }
-void viua::process::Process::put(unsigned index, viua::types::Type *o) {
-    place(index, unique_ptr<viua::types::Type>{o});
+void viua::process::Process::put(unsigned index, unique_ptr<viua::types::Type> o) {
+    place(index, std::move(o));
 }
 void viua::process::Process::ensureStaticRegisters(string function_name) {
     /** Makes sure that static register set for requested function is initialized.

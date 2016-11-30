@@ -61,7 +61,7 @@ template<class Operator, class ResultType> byte* perform(byte* addr, viua::proce
 
     viua::assertions::expect_types<Number>("Number", first, second);
 
-    t->put(target_register_index, new ResultType(Operator()(dynamic_cast<Number*>(first)->as_float32(), dynamic_cast<Number*>(second)->as_float32())));
+    t->put(target_register_index, unique_ptr<viua::types::Type>{new ResultType(Operator()(dynamic_cast<Number*>(first)->as_float32(), dynamic_cast<Number*>(second)->as_float32()))});
 
     return addr;
 }

@@ -270,7 +270,7 @@ namespace viua {
                 byte* tick();
 
                 viua::types::Type* obtain(unsigned) const;
-                void put(unsigned, viua::types::Type*);
+                void put(unsigned, std::unique_ptr<viua::types::Type>);
 
                 bool joinable() const;
                 void join();

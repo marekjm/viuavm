@@ -51,7 +51,7 @@ void viua::scheduler::ffi::ForeignFunctionCallRequest::call(ForeignFunction* cal
 
         // place return value
         if (returned and caller_process->trace().size() > 0) {
-            caller_process->put(return_value_register, returned.release());
+            caller_process->put(return_value_register, std::move(returned));
         }
     } catch (viua::types::Type *exception) {
         caller_process->raiseException(exception);
