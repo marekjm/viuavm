@@ -293,7 +293,7 @@ namespace viua {
                 bool terminated() const;
                 viua::types::Type* getActiveException();
                 std::unique_ptr<viua::types::Type> transferActiveException();
-                void raiseException(std::unique_ptr<viua::types::Type>);
+                void raise(std::unique_ptr<viua::types::Type>);
                 void handleActiveException();
 
                 void migrate_to(viua::scheduler::VirtualProcessScheduler*);
