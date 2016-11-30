@@ -38,13 +38,12 @@ void viua::scheduler::ffi::ForeignFunctionCallRequest::call(ForeignFunction* cal
     try {
         (*callback)(frame.get(), nullptr, nullptr, caller_process, kernel);
 
-        /* // FIXME: woohoo! segfault! */
         unique_ptr<viua::types::Type> returned;
         unsigned return_value_register = frame->place_return_value_in;
         if (return_value_register != 0 and not frame->return_void) {
             // we check in 0. register because it's reserved for return values
             if (frame->regset->at(0) == nullptr) {
-                caller_process->raiseException(new viua::types::Exception("return value requested by frame but external function did not set return register"));
+                caller_process->raiseException(unique_ptr<viua::types::Type>{new viua::types::Exception("return value requested by frame but external function did not set return register")});
             }
             returned = std::move(frame->regset->pop(0));
         }
@@ -54,12 +53,12 @@ void viua::scheduler::ffi::ForeignFunctionCallRequest::call(ForeignFunction* cal
             caller_process->put(return_value_register, std::move(returned));
         }
     } catch (viua::types::Type *exception) {
-        caller_process->raiseException(exception);
+        caller_process->raiseException(unique_ptr<viua::types::Type>{exception});
         caller_process->handleActiveException();
     }
 }
-void viua::scheduler::ffi::ForeignFunctionCallRequest::registerException(viua::types::Type* object) {
-    caller_process->raiseException(object);
+void viua::scheduler::ffi::ForeignFunctionCallRequest::registerException(unique_ptr<viua::types::Type> object) {
+    caller_process->raiseException(std::move(object));
 }
 void viua::scheduler::ffi::ForeignFunctionCallRequest::wakeup() {
     caller_process->wakeup();

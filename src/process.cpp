@@ -430,8 +430,8 @@ unique_ptr<viua::types::Type> viua::process::Process::transferActiveException() 
     return std::move(thrown);
 }
 
-void viua::process::Process::raiseException(viua::types::Type *exception) {
-    thrown.reset(exception);
+void viua::process::Process::raiseException(unique_ptr<viua::types::Type> exception) {
+    thrown = std::move(exception);
 }
 
 
