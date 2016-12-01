@@ -18,8 +18,8 @@
 ;
 
 .block: handle_integer
-    ; pull caught object into 2 register
-    pull 2
+    ; draw caught object into 2 register
+    draw 2
     print 2
     leave
 .end

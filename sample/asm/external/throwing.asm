@@ -25,7 +25,7 @@
     leave
 .end
 .block: __catch_Exception
-    print (pull 1)
+    print (draw 1)
     leave
 .end
 

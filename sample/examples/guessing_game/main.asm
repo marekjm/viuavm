@@ -27,7 +27,7 @@
 
 .block: failed_to_convert
     echo (strstore 10 "guess: exception: ")
-    print (pull 9)
+    print (draw 9)
     istore 3 -1
     leave
 .end

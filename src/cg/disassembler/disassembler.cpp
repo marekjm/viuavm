@@ -159,7 +159,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case ARGC:
         case SELF:
         case THROW:
-        case PULL:
+        case DRAW:
         case REGISTER:
             ptr = disassemble_target_register(oss, ptr);
             break;

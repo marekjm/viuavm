@@ -465,8 +465,8 @@ namespace cg {
             return addr_ptr;
         }
 
-        byte* oppull(byte* addr_ptr, int_op regno) {
-            *(addr_ptr++) = PULL;
+        byte* opdraw(byte* addr_ptr, int_op regno) {
+            *(addr_ptr++) = DRAW;
             return insertIntegerOperand(addr_ptr, regno);
         }
 

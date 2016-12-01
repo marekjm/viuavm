@@ -32,7 +32,7 @@
     echo (strstore 3 "exception transferred from process ")
     echo 1
     echo (strstore 3 ": ")
-    print (pull 3)
+    print (draw 3)
     leave
 .end
 

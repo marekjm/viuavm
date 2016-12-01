@@ -24,7 +24,7 @@
 .end
 
 .block: catch_ArityException
-    print (pull 6)
+    print (draw 6)
     leave
 .end
 

@@ -102,6 +102,7 @@ There are several categories of change:
 - feature: pointer dereference using `*<register-index>` (e.g. `*pointer`) syntax; exception is thrown when expired pointer is dereferenced, or
   program tries to dereference something that is not a pointer
 - feature: `.unused: <register>` directive to tell SA that a value in marked register may be potentially unused
+- bic: rename `pull` instruction to `draw`
 
 One limitation of static analyser (SA) introduced in this release is its inability to handle backwards jumps.
 This, however, is not a problem if the code does not use loops and

@@ -169,7 +169,7 @@
 .end
 .block: std::functional::apply::__catch
     ; just ignore the error if the function didn't return a value
-    delete (pull 4)
+    delete (draw 4)
     leave
 .end
 .function: std::functional::apply/2

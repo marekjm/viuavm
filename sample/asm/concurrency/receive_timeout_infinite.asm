@@ -18,7 +18,7 @@
 ;
 
 .block: pull_and_do_nothing
-    pull 3
+    draw 3
     leave
 .end
 

@@ -245,8 +245,8 @@ byte* viua::process::Process::dispatch(byte* addr) {
         case CATCH:
             addr = opcatch(addr+1);
             break;
-        case PULL:
-              addr = oppull(addr+1);
+        case DRAW:
+              addr = opdraw(addr+1);
             break;
         case ENTER:
             addr = openter(addr+1);

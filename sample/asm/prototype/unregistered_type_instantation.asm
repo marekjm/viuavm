@@ -18,7 +18,7 @@
 ;
 
 .block: handler
-    print (pull 1)
+    print (draw 1)
     leave
 .end
 

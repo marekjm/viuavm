@@ -715,10 +715,10 @@ Program& Program::opcatch(string type_name, string block_name) {
     return (*this);
 }
 
-Program& Program::oppull(int_op regno) {
+Program& Program::opdraw(int_op regno) {
     /*  Inserts throw instuction.
      */
-    addr_ptr = cg::bytecode::oppull(addr_ptr, regno);
+    addr_ptr = cg::bytecode::opdraw(addr_ptr, regno);
     return (*this);
 }
 

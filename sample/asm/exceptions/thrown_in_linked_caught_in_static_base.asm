@@ -25,7 +25,7 @@
     leave
 .end
 .block: handle_Integer
-    pull 1
+    draw 1
     echo (strstore 2 "looks ")
 
     if 1 +2

@@ -51,14 +51,14 @@ byte* viua::process::Process::opcatch(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::oppull(byte* addr) {
-    /** Run pull instruction.
+byte* viua::process::Process::opdraw(byte* addr) {
+    /** Run draw instruction.
      */
     unsigned target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     if (not caught) {
-        throw new viua::types::Exception("no caught object to pull");
+        throw new viua::types::Exception("no caught object to draw");
     }
     uregset->set(target, std::move(caught));
 

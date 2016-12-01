@@ -436,8 +436,8 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
     } else if (tokens.at(i) == "catch") {
         string type_chnk, catcher_chnk;
         program.opcatch(tokens.at(i+1), tokens.at(i+2));
-    } else if (tokens.at(i) == "pull") {
-        program.oppull(assembler::operands::getint(resolveregister(tokens.at(i+1))));
+    } else if (tokens.at(i) == "draw") {
+        program.opdraw(assembler::operands::getint(resolveregister(tokens.at(i+1))));
     } else if (tokens.at(i) == "enter") {
         program.openter(tokens.at(i+1));
     } else if (tokens.at(i) == "throw") {

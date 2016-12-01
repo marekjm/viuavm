@@ -21,7 +21,7 @@
     try
     catch "Exception" .block: exception_handler
         echo (strstore 1 "exception encountered: ")
-        print (pull 2)
+        print (draw 2)
         leave
     .end
     enter .block: print_block

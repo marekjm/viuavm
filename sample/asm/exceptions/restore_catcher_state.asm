@@ -43,8 +43,8 @@
 
     try
     catch "Integer" .block: handle_integer
-        ; pull caught object into 2 register
-        print (pull 2)
+        ; draw caught object into 2 register
+        print (draw 2)
         print 4
         leave
     .end

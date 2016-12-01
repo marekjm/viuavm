@@ -149,7 +149,7 @@ class Program {
 
     Program& optry();
     Program& opcatch(std::string, std::string);
-    Program& oppull(int_op);
+    Program& opdraw(int_op);
     Program& openter(std::string);
     Program& opthrow(int_op);
     Program& opleave();

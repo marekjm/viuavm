@@ -123,7 +123,15 @@ enum OPCODE : byte {
 
     THROW,      // throw an object
     CATCH,      // register a catcher block for given type
-    PULL,       // pull caught object into a register (it becomes local object for current frame)
+    DRAW,       // move caught object into a register (it becomes local object for current frame)
+                // the "draw" name has been chosen because the sequence of events:
+                //
+                //  1) an object is thrown
+                //  2) that object is caught
+                //  3) the catcher draws the object into a register
+                //
+                // nicely describes the situation these instructions model.
+
     TRY,        // create a frame for try block
     ENTER,      // enter a block, if an exception is thrown and no catcher claims it, it is propagated up
                 // ENTER instructions do not require any CATCH to precede them

@@ -246,7 +246,7 @@ namespace viua {
 
             byte* optry(byte*);
             byte* opcatch(byte*);
-            byte* oppull(byte*);
+            byte* opdraw(byte*);
             byte* openter(byte*);
             byte* opthrow(byte*);
             byte* opleave(byte*);

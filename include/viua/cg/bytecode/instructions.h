@@ -137,7 +137,7 @@ namespace cg {
 
         byte* optry(byte*);
         byte* opcatch(byte*, const std::string&, const std::string&);
-        byte* oppull(byte*, int_op);
+        byte* opdraw(byte*, int_op);
         byte* openter(byte*, const std::string&);
         byte* opthrow(byte*, int_op);
         byte* opleave(byte*);

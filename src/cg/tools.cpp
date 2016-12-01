@@ -812,7 +812,7 @@ namespace viua {
                     } else if (tokens.at(i) == "catch") {
                         ++i;
                         tie(increase, i) = size_of_catch(tokens, i);
-                    } else if (tokens.at(i) == "pull") {
+                    } else if (tokens.at(i) == "draw") {
                         ++i;
                         tie(increase, i) = size_of_pull(tokens, i);
                     } else if (tokens.at(i) == "try") {
@@ -1120,7 +1120,7 @@ namespace viua {
                     } else if (tokens.at(i) == "catch") {
                         ++i;
                         tie(increase, i) = size_of_catch(tokens, i);
-                    } else if (tokens.at(i) == "pull") {
+                    } else if (tokens.at(i) == "draw") {
                         ++i;
                         tie(increase, i) = size_of_pull(tokens, i);
                     } else if (tokens.at(i) == "try") {
