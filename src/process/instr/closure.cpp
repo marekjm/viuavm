@@ -148,8 +148,10 @@ byte* viua::process::Process::opfcall(byte* addr) {
     viua::types::Type* fn_source = nullptr;
     tie(addr, fn_source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    // FIXME: there should be a check it this is *really* a function object
-    auto fn = static_cast<viua::types::Function*>(fn_source);
+    auto fn = dynamic_cast<viua::types::Function*>(fn_source);
+    if (not fn) {
+        throw new viua::types::Exception("type is not callable: " + fn_source->type());
+    }
 
     string call_name = fn->name();
 
