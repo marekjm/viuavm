@@ -228,13 +228,16 @@ namespace viua {
 
                         if ((not str::isnum(input_tokens.at(i+1).str(), false)) and input_tokens.at(i+1).str() == "\n") {
                             tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "0"); // starting register
+                            tokens.back().original("\n");
                             tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "0"); // number of registers to pack
+                            tokens.back().original("\n");
                             continue;
                         }
 
                         tokens.push_back(input_tokens.at(++i)); // starting register
                         if ((not str::isnum(input_tokens.at(i+1).str(), false)) and input_tokens.at(i+1).str() == "\n") {
                             tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "0"); // number of registers to pack
+                            tokens.back().original("\n");
                         }
                     } else if (token == "vpop") {
                         tokens.push_back(token);
