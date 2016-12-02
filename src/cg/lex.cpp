@@ -854,9 +854,9 @@ namespace viua {
                                 final_tokens.push_back(to);
                             }
                         } else {
-                            vector<Token> foo;
+                            vector<Token> last_line;
                             while (final_tokens.size() and final_tokens.at(final_tokens.size()-1) != "\n") {
-                                foo.insert(foo.begin(), final_tokens.back());
+                                last_line.insert(last_line.begin(), final_tokens.back());
                                 final_tokens.pop_back();
                             }
 
@@ -864,7 +864,7 @@ namespace viua {
                                 final_tokens.push_back(to);
                             }
 
-                            for (auto to : foo) {
+                            for (auto to : last_line) {
                                 final_tokens.push_back(to);
                             }
                             if (full) {
