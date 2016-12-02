@@ -806,7 +806,7 @@ namespace viua {
                             throw InvalidSyntax(t, "at least two tokens are required in a wrapped instruction");
                         }
 
-                        Token tok;
+                        Token inner_target_token;
                         try {
                             unsigned long check = 1;
                             do {
@@ -828,9 +828,9 @@ namespace viua {
                                  *       skipping by two allows us to fetch the target value without waiting
                                  *       for instructions to become unwrapped
                                  */
-                                tok = subtokens.at(check);
+                                inner_target_token = subtokens.at(check);
                                 check += 2;
-                            } while (tok.str() == "(");
+                            } while (inner_target_token.str() == "(");
                         } catch (const std::out_of_range& e) {
                             throw InvalidSyntax(t.line(), t.character(), t.str());
                         }
@@ -841,7 +841,7 @@ namespace viua {
                         unwrapped_tokens.emplace_back(t.line(), t.character(), "\n");
 
                         if (invert) {
-                            final_tokens.push_back(tok);
+                            final_tokens.push_back(inner_target_token);
                             while (i < limit and input_tokens.at(i) != "\n") {
                                 final_tokens.push_back(input_tokens.at(i));
                                 ++i;
@@ -868,7 +868,7 @@ namespace viua {
                                 final_tokens.push_back(to);
                             }
                             if (full) {
-                                final_tokens.push_back(tok);
+                                final_tokens.push_back(inner_target_token);
                             }
                         }
 
