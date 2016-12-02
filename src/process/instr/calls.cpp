@@ -42,14 +42,16 @@ byte* viua::process::Process::opframe(byte* addr) {
 byte* viua::process::Process::opparam(byte* addr) {
     /** Run param instruction.
      */
-    unsigned parameter_no_operand_index = 0, source = 0;
+    unsigned parameter_no_operand_index = 0;
     tie(addr, parameter_no_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+
+    viua::types::Type *source = nullptr;
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
     if (parameter_no_operand_index >= frame_new->args->size()) {
         throw new viua::types::Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
     }
-    frame_new->args->set(parameter_no_operand_index, std::move(fetch(source)->copy()));
+    frame_new->args->set(parameter_no_operand_index, std::move(source->copy()));
     frame_new->args->clear(parameter_no_operand_index);
 
     return addr;
