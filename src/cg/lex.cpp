@@ -803,6 +803,39 @@ namespace viua {
                 }
                 unwrapped_tokens.emplace_back(token.line(), token.character(), "\n");
             }
+            static auto get_subtokens(const vector<Token>& input_tokens, std::remove_reference<decltype(input_tokens)>::type::size_type i) -> std::tuple<decltype(i), vector<Token>, unsigned, unsigned, unsigned> {
+                string paren_type = input_tokens.at(i);
+                string closing_paren_type = ((paren_type == "(") ? ")" : "]");
+                ++i;
+
+                vector<Token> subtokens;
+                const auto limit = input_tokens.size();
+
+                unsigned balance = 1;
+                unsigned toplevel_subexpressions_balance = 0;
+                unsigned toplevel_subexpressions = 0;
+                while (i < limit) {
+                    if (input_tokens.at(i) == paren_type) {
+                        ++balance;
+                    } else if (input_tokens.at(i) == closing_paren_type) {
+                        --balance;
+                    }
+                    if (input_tokens.at(i) == "(") {
+                        if ((++toplevel_subexpressions_balance) == 1) { ++toplevel_subexpressions; }
+                    }
+                    if (input_tokens.at(i) == ")") {
+                        --toplevel_subexpressions_balance;
+                    }
+                    if (balance == 0) {
+                        ++i;
+                        break;
+                    }
+                    subtokens.push_back(input_tokens.at(i));
+                    ++i;
+                }
+
+                return std::tuple<decltype(i), vector<Token>, unsigned, unsigned, unsigned>{i, std::move(subtokens), balance, toplevel_subexpressions_balance, toplevel_subexpressions};
+            }
             vector<Token> unwrap_lines(vector<Token> input_tokens, bool full) {
                 // FIXME: this function needs refactoring
                 decltype(input_tokens) unwrapped_tokens;
@@ -819,112 +852,80 @@ namespace viua {
                         ++i;
                         continue;
                     }
-                    if (t == "(") {
+                    if (t == "(" or t == "[") {
                         vector<Token> subtokens;
-                        ++i;
-                        unsigned balance = 1;
-                        while (i < limit) {
-                            if (input_tokens.at(i) == "(") {
-                                ++balance;
-                            } else if (input_tokens.at(i) == ")") {
-                                --balance;
-                            }
-                            if (balance == 0) {
-                                ++i;
-                                break;
-                            }
-                            subtokens.push_back(input_tokens.at(i));
-                            ++i;
-                        }
-                        if (i >= limit and balance != 0) {
-                            throw InvalidSyntax(t, "unbalanced parenthesis in wrapped instruction");
-                        }
-                        if (subtokens.size() < 2) {
-                            throw InvalidSyntax(t, "at least two tokens are required in a wrapped instruction");
-                        }
-
-                        Token inner_target_token;
-                        try {
-                            unsigned long check = 1;
-                            do {
-                                /*
-                                 * Loop until first operand's token is not "(".
-                                 * Unwrapping works on second token that appears after the wrap, but
-                                 * if it is also a "(" then lexer must switch to next second token.
-                                 * Example:
-                                 *
-                                 * iinc (iinc (iinc (iinc (arg 0 1))))
-                                 *      |     ^     ^     ^    ^
-                                 *      |     1     3     5    7
-                                 *      |
-                                 *       \
-                                 *       start unwrapping;
-                                 *       1, 3, and 5 must be skipped because they open inner wraps that
-                                 *       must be unwrapped before their targets become available
-                                 *
-                                 *       skipping by two allows us to fetch the target value without waiting
-                                 *       for instructions to become unwrapped
-                                 */
-                                inner_target_token = subtokens.at(check);
-                                check += 2;
-                            } while (inner_target_token.str() == "(");
-                        } catch (const std::out_of_range& e) {
-                            throw InvalidSyntax(t.line(), t.character(), t.str());
-                        }
-
-                        unwrap_subtokens(unwrapped_tokens, subtokens, t);
-                        push_unwrapped_lines(invert, inner_target_token, final_tokens, unwrapped_tokens, input_tokens, i);
-                        if ((not invert) and full) {
-                            final_tokens.push_back(inner_target_token);
-                        }
-
-                        invert = false;
-                        unwrapped_tokens.clear();
-                        tokens.clear();
-
-                        continue;
-                    }
-                    if (t == "[") {
-                        vector<Token> subtokens;
-                        ++i;
                         unsigned balance = 1;
                         unsigned toplevel_subexpressions_balance = 0;
                         unsigned toplevel_subexpressions = 0;
-                        while (i < limit) {
-                            if (input_tokens.at(i) == "[") {
-                                ++balance;
-                            } else if (input_tokens.at(i) == "]") {
-                                --balance;
+
+                        tie(i, subtokens, balance, toplevel_subexpressions_balance, toplevel_subexpressions) = get_subtokens(input_tokens, i);
+
+                        if (t == "(") {
+                            if (i >= limit and balance != 0) {
+                                throw InvalidSyntax(t, "unbalanced parenthesis in wrapped instruction");
                             }
-                            if (input_tokens.at(i) == "(") {
-                                if ((++toplevel_subexpressions_balance) == 1) { ++toplevel_subexpressions; }
+                            if (subtokens.size() < 2) {
+                                throw InvalidSyntax(t, "at least two tokens are required in a wrapped instruction");
                             }
-                            if (input_tokens.at(i) == ")") {
-                                --toplevel_subexpressions_balance;
+
+                            Token inner_target_token;
+                            try {
+                                unsigned long check = 1;
+                                do {
+                                    /*
+                                     * Loop until first operand's token is not "(".
+                                     * Unwrapping works on second token that appears after the wrap, but
+                                     * if it is also a "(" then lexer must switch to next second token.
+                                     * Example:
+                                     *
+                                     * iinc (iinc (iinc (iinc (arg 0 1))))
+                                     *      |     ^     ^     ^    ^
+                                     *      |     1     3     5    7
+                                     *      |
+                                     *       \
+                                     *       start unwrapping;
+                                     *       1, 3, and 5 must be skipped because they open inner wraps that
+                                     *       must be unwrapped before their targets become available
+                                     *
+                                     *       skipping by two allows us to fetch the target value without waiting
+                                     *       for instructions to become unwrapped
+                                     */
+                                    inner_target_token = subtokens.at(check);
+                                    check += 2;
+                                } while (inner_target_token.str() == "(");
+                            } catch (const std::out_of_range& e) {
+                                throw InvalidSyntax(t.line(), t.character(), t.str());
                             }
-                            if (balance == 0) {
-                                ++i;
-                                break;
+
+                            unwrap_subtokens(unwrapped_tokens, subtokens, t);
+                            push_unwrapped_lines(invert, inner_target_token, final_tokens, unwrapped_tokens, input_tokens, i);
+                            if ((not invert) and full) {
+                                final_tokens.push_back(inner_target_token);
                             }
-                            subtokens.push_back(input_tokens.at(i));
-                            ++i;
+
+                            invert = false;
+                            unwrapped_tokens.clear();
+                            tokens.clear();
+
+                            continue;
                         }
+                        if (t == "[") {
+                            Token counter_token(subtokens.at(0).line(), subtokens.at(0).character(), str::stringify(toplevel_subexpressions, false));
 
-                        Token counter_token(subtokens.at(0).line(), subtokens.at(0).character(), str::stringify(toplevel_subexpressions, false));
+                            subtokens = unwrap_lines(subtokens, false);
 
-                        subtokens = unwrap_lines(subtokens, false);
+                            unwrap_subtokens(unwrapped_tokens, subtokens, t);
+                            push_unwrapped_lines(invert, counter_token, final_tokens, unwrapped_tokens, input_tokens, i);
+                            if (not invert) {
+                                final_tokens.push_back(counter_token);
+                            }
 
-                        unwrap_subtokens(unwrapped_tokens, subtokens, t);
-                        push_unwrapped_lines(invert, counter_token, final_tokens, unwrapped_tokens, input_tokens, i);
-                        if (not invert) {
-                            final_tokens.push_back(counter_token);
+                            invert = false;
+                            unwrapped_tokens.clear();
+                            tokens.clear();
+
+                            continue;
                         }
-
-                        invert = false;
-                        unwrapped_tokens.clear();
-                        tokens.clear();
-
-                        continue;
                     }
                     final_tokens.push_back(t);
                     ++i;
