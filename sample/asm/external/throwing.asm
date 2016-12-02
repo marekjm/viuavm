@@ -30,9 +30,9 @@
 .end
 
 .function: watchdog_process/0
-    arg (.name: 1 death_message) 0
+    arg (.name: iota death_message) 0
 
-    .name: 3 exception
+    .name: iota exception
     remove exception death_message (strstore exception "exception")
     print exception
 

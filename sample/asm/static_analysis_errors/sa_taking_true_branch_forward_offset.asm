@@ -20,7 +20,7 @@
 .function: main/0
     istore (.name: iota value) 42
 
-    if 1 +1 go_here
+    if value +1 go_here
     delete value
 
     .mark: go_here

@@ -93,7 +93,21 @@ static auto skip_till_next_line(const std::vector<viua::cg::lex::Token>& tokens,
     } while (i < tokens.size() and tokens.at(i) != "\n");
     return i;
 }
-static string resolve_register_name(const map<string, string>& named_registers, viua::cg::lex::Token token, string name) {
+static auto is_named(const map<string, string>& named_registers, string name) -> bool {
+    return (std::find_if(named_registers.begin(), named_registers.end(), [name](std::remove_reference<decltype(named_registers)>::type::value_type t) {
+        return (t.second == name);
+    }) != named_registers.end());
+}
+static auto get_name(const map<string, string>& named_registers, string name, Token context) -> string {
+    auto it = std::find_if(named_registers.begin(), named_registers.end(), [name](std::remove_reference<decltype(named_registers)>::type::value_type t) {
+        return (t.second == name);
+    });
+    if (it == named_registers.end()) {
+        throw viua::cg::lex::InvalidSyntax(context, ("register is not named: " + name));
+    }
+    return it->first;
+}
+static string resolve_register_name(const map<string, string>& named_registers, viua::cg::lex::Token token, string name, const bool allow_direct_access = false) {
     if (name == "\n") {
         throw viua::cg::lex::InvalidSyntax(token, "expected operand, found newline");
     }
@@ -104,6 +118,9 @@ static string resolve_register_name(const map<string, string>& named_registers, 
         name = name.substr(1);
     }
     if (str::isnum(name, false)) {
+        if ((not allow_direct_access) and is_named(named_registers, name) and not (token.original() == "iota" or token.original() == "\n")) {
+            throw viua::cg::lex::InvalidSyntax(token, ("accessing named register using direct index: " + str::enquote(get_name(named_registers, name, token)) + " := " + name));
+        }
         return name;
     }
     if (str::isnum(name, true)) {
@@ -127,7 +144,7 @@ static void check_timeout_operand(Token token) {
     }
 }
 static void check_use_of_register_index(const vector<viua::cg::lex::Token>& tokens, long unsigned i, long unsigned by, string register_index, Registers& registers, map<string, string>& named_registers, const string& message_prefix) {
-    string resolved_register_name = resolve_register_name(named_registers, tokens.at(i), register_index);
+    string resolved_register_name = resolve_register_name(named_registers, tokens.at(i), register_index, true);
     if (resolved_register_name == "void") {
         auto base_error = viua::cg::lex::InvalidSyntax(tokens.at(i), "use of void as input register:");
         base_error.add(tokens.at(by));

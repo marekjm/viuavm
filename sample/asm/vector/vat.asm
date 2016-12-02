@@ -18,14 +18,14 @@
 ;
 
 .function: main/1
-    vec 2
-    print (vlen 3 2)
+    vec (.name: iota a_vector)
+    print (vlen (.name: iota length) a_vector)
 
-    vpush 2 (strstore 1 "Hello World!")
-    print (vlen 3 2)
+    vpush a_vector (strstore iota "Hello World!")
+    print (vlen length a_vector)
 
-    vat 4 2 -1
-    print (vlen 3 2)
+    vat (.name: iota something) a_vector -1
+    print (vlen length a_vector)
 
     print 4
 

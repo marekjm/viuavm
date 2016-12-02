@@ -82,18 +82,16 @@
 .function: std::misc::cycle/1
     ; executes at least N cycles
     ;
-    .name: 1 counter
-    arg counter 0
+    arg (.name: iota counter) 0
 
-    .name: 3 i
+    .name: iota i
     isub counter counter (istore i 9)
     idiv counter counter (istore i 2)
 
-    .name: 2 zero
-    izero zero
+    izero (.name: iota zero)
 
     .mark: __loop_begin
-    if (ilte 3 counter zero) __loop_end +1
+    if (ilte i counter zero) __loop_end +1
     idec counter
     jump __loop_begin
     .mark: __loop_end

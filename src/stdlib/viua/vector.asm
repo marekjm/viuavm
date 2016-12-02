@@ -155,7 +155,7 @@
     ; break loop if there wasn't a match
     if result +1 end_loop
 
-    if (igte 5 (iinc index) limit) +1 begin_loop
+    if (igte tmp (iinc index) limit) +1 begin_loop
     .mark: end_loop
 
     return
@@ -192,7 +192,7 @@
     ; break the loop if there was a match
     if result end_loop
 
-    if (igte 5 (iinc index) limit) +1 begin_loop
+    if (igte tmp (iinc index) limit) +1 begin_loop
     .mark: end_loop
 
     return

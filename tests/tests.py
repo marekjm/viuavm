@@ -1239,7 +1239,7 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
         runTestFailsToAssembleDetailed(self, 'sa_taking_true_branch_forward_offset.asm', [
             '27:11: error: print of empty register: value := 1',
             '24:5: error: erased by:',
-            '23:10: error: after taking true branch:',
+            '23:14: error: after taking true branch:',
             '20:12: error: in function main/0',
         ])
 
@@ -1247,7 +1247,7 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
         runTestFailsToAssembleDetailed(self, 'sa_taking_false_branch_forward_offset.asm', [
             '27:11: error: print of empty register: value := 1',
             '25:5: error: erased by:',
-            '23:13: error: after taking false branch:',
+            '23:17: error: after taking false branch:',
             '20:12: error: in function main/0',
         ])
 
@@ -1255,7 +1255,7 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
         runTestFailsToAssembleDetailed(self, 'sa_taking_true_branch_forward_marker.asm', [
             '27:11: error: print of empty register: value := 1',
             '24:5: error: erased by:',
-            '23:10: error: after taking true branch:',
+            '23:14: error: after taking true branch:',
             '20:12: error: in function main/0',
         ])
 
@@ -1263,7 +1263,7 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
         runTestFailsToAssembleDetailed(self, 'sa_taking_false_branch_forward_marker.asm', [
             '27:11: error: print of empty register: value := 1',
             '25:5: error: erased by:',
-            '23:13: error: after taking false branch:',
+            '23:17: error: after taking false branch:',
             '20:12: error: in function main/0',
         ])
 

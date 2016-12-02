@@ -81,25 +81,22 @@
     ;       * a closure, or a function object to call,
     ;       * a vector of values that will be supplied as parameters to given callback,
     ;
-    .name: 1 callback
-    .name: 2 list
-    arg callback 0
-    arg list 1
+    arg (.name: iota callback) 0
+    arg (.name: iota list) 1
 
     ; setup loop counter and
     ; loop termination variable
-    .name: 3 counter
-    izero counter
-    vlen (.name: 4 list_length) list
+    izero (.name: iota counter)
+    vlen (.name: iota list_length) list
 
     ; loop condition
     .mark: loop_begin
-    if (ilt 5 counter list_length) loop_body loop_end
+    if (ilt iota counter list_length) loop_body loop_end
 
     .mark: loop_body
 
     ; extract parameter value
-    vat (.name: 6 element) list @counter
+    vat (.name: iota element) list @counter
 
     ; invoke given callback
     frame ^[(param 0 element)]
