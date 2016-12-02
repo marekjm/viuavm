@@ -871,7 +871,6 @@ namespace viua {
                 return Token{subtokens.at(0).line(), subtokens.at(0).character(), str::stringify(toplevel_subexpressions, false)};
             }
             vector<Token> unwrap_lines(vector<Token> input_tokens, bool full) {
-                // FIXME: this function needs refactoring
                 decltype(input_tokens) unwrapped_tokens;
                 decltype(input_tokens) tokens;
                 decltype(input_tokens) final_tokens;
@@ -908,12 +907,6 @@ namespace viua {
                             if ((not invert) and full) {
                                 final_tokens.push_back(inner_target_token);
                             }
-
-                            invert = false;
-                            unwrapped_tokens.clear();
-                            tokens.clear();
-
-                            continue;
                         }
                         if (t == "[") {
                             Token counter_token = get_counter_token(subtokens, toplevel_subexpressions);
@@ -925,13 +918,13 @@ namespace viua {
                             if (not invert) {
                                 final_tokens.push_back(counter_token);
                             }
-
-                            invert = false;
-                            unwrapped_tokens.clear();
-                            tokens.clear();
-
-                            continue;
                         }
+
+                        invert = false;
+                        unwrapped_tokens.clear();
+                        tokens.clear();
+
+                        continue;
                     }
                     final_tokens.push_back(t);
                     ++i;
