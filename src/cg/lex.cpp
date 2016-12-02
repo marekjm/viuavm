@@ -836,6 +836,40 @@ namespace viua {
 
                 return std::tuple<decltype(i), vector<Token>, unsigned, unsigned, unsigned>{i, std::move(subtokens), balance, toplevel_subexpressions_balance, toplevel_subexpressions};
             }
+            static auto get_innermost_target_token(const vector<Token>& subtokens, const Token& t) -> Token {
+                Token inner_target_token;
+                try {
+                    unsigned long check = 1;
+                    do {
+                        /*
+                         * Loop until first operand's token is not "(".
+                         * Unwrapping works on second token that appears after the wrap, but
+                         * if it is also a "(" then lexer must switch to next second token.
+                         * Example:
+                         *
+                         * iinc (iinc (iinc (iinc (arg 0 1))))
+                         *      |     ^     ^     ^    ^
+                         *      |     1     3     5    7
+                         *      |
+                         *       \
+                         *       start unwrapping;
+                         *       1, 3, and 5 must be skipped because they open inner wraps that
+                         *       must be unwrapped before their targets become available
+                         *
+                         *       skipping by two allows us to fetch the target value without waiting
+                         *       for instructions to become unwrapped
+                         */
+                        inner_target_token = subtokens.at(check);
+                        check += 2;
+                    } while (inner_target_token.str() == "(");
+                } catch (const std::out_of_range& e) {
+                    throw InvalidSyntax(t.line(), t.character(), t.str());
+                }
+                return inner_target_token;
+            }
+            static auto get_counter_token(const vector<Token>& subtokens, const unsigned toplevel_subexpressions) -> Token {
+                return Token{subtokens.at(0).line(), subtokens.at(0).character(), str::stringify(toplevel_subexpressions, false)};
+            }
             vector<Token> unwrap_lines(vector<Token> input_tokens, bool full) {
                 // FIXME: this function needs refactoring
                 decltype(input_tokens) unwrapped_tokens;
@@ -868,35 +902,7 @@ namespace viua {
                                 throw InvalidSyntax(t, "at least two tokens are required in a wrapped instruction");
                             }
 
-                            Token inner_target_token;
-                            try {
-                                unsigned long check = 1;
-                                do {
-                                    /*
-                                     * Loop until first operand's token is not "(".
-                                     * Unwrapping works on second token that appears after the wrap, but
-                                     * if it is also a "(" then lexer must switch to next second token.
-                                     * Example:
-                                     *
-                                     * iinc (iinc (iinc (iinc (arg 0 1))))
-                                     *      |     ^     ^     ^    ^
-                                     *      |     1     3     5    7
-                                     *      |
-                                     *       \
-                                     *       start unwrapping;
-                                     *       1, 3, and 5 must be skipped because they open inner wraps that
-                                     *       must be unwrapped before their targets become available
-                                     *
-                                     *       skipping by two allows us to fetch the target value without waiting
-                                     *       for instructions to become unwrapped
-                                     */
-                                    inner_target_token = subtokens.at(check);
-                                    check += 2;
-                                } while (inner_target_token.str() == "(");
-                            } catch (const std::out_of_range& e) {
-                                throw InvalidSyntax(t.line(), t.character(), t.str());
-                            }
-
+                            Token inner_target_token = get_innermost_target_token(subtokens, t);
                             unwrap_subtokens(unwrapped_tokens, subtokens, t);
                             push_unwrapped_lines(invert, inner_target_token, final_tokens, unwrapped_tokens, input_tokens, i);
                             if ((not invert) and full) {
@@ -910,7 +916,7 @@ namespace viua {
                             continue;
                         }
                         if (t == "[") {
-                            Token counter_token(subtokens.at(0).line(), subtokens.at(0).character(), str::stringify(toplevel_subexpressions, false));
+                            Token counter_token = get_counter_token(subtokens, toplevel_subexpressions);
 
                             subtokens = unwrap_lines(subtokens, false);
 
