@@ -797,6 +797,12 @@ namespace viua {
                     }
                 }
             }
+            static void unwrap_subtokens(vector<Token>& unwrapped_tokens, const vector<Token>& subtokens, const Token& token) {
+                for (auto subt : unwrap_lines(subtokens)) {
+                    unwrapped_tokens.push_back(subt);
+                }
+                unwrapped_tokens.emplace_back(token.line(), token.character(), "\n");
+            }
             vector<Token> unwrap_lines(vector<Token> input_tokens, bool full) {
                 // FIXME: this function needs refactoring
                 decltype(input_tokens) unwrapped_tokens;
@@ -866,11 +872,7 @@ namespace viua {
                             throw InvalidSyntax(t.line(), t.character(), t.str());
                         }
 
-                        for (auto subt : unwrap_lines(subtokens)) {
-                            unwrapped_tokens.push_back(subt);
-                        }
-                        unwrapped_tokens.emplace_back(t.line(), t.character(), "\n");
-
+                        unwrap_subtokens(unwrapped_tokens, subtokens, t);
                         push_unwrapped_lines(invert, inner_target_token, final_tokens, unwrapped_tokens, input_tokens, i);
                         if ((not invert) and full) {
                             final_tokens.push_back(inner_target_token);
@@ -912,11 +914,7 @@ namespace viua {
 
                         subtokens = unwrap_lines(subtokens, false);
 
-                        for (auto subt : unwrap_lines(subtokens)) {
-                            unwrapped_tokens.push_back(subt);
-                        }
-                        unwrapped_tokens.emplace_back(t.line(), t.character(), "\n");
-
+                        unwrap_subtokens(unwrapped_tokens, subtokens, t);
                         push_unwrapped_lines(invert, counter_token, final_tokens, unwrapped_tokens, input_tokens, i);
                         if (not invert) {
                             final_tokens.push_back(counter_token);
