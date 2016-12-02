@@ -18,25 +18,20 @@
 ;
 
 .function: watchdog_process/1
-    arg (.name: 1 death_message) 0
+    arg (.name: iota death_message) 0
+    remove (.name: iota exception) 1 (strstore exception "exception")
+    remove (.name: iota aborted_function) 1 (strstore aborted_function "function")
+    remove (.name: iota parameters) 1 (strstore parameters "parameters")
 
-    .name: 2 exception
-    remove exception 1 (strstore exception "exception")
-
-    .name: 3 aborted_function
-    remove aborted_function 1 (strstore aborted_function "function")
-
-    .name: 4 parameters
-    remove parameters 1 (strstore parameters "parameters")
-
-    echo (strstore 5 "[WARNING] process '")
+    .name: iota message
+    echo (strstore message "[WARNING] process '")
     echo aborted_function
     echo parameters
-    echo (strstore 5 "' killed by >>>")
+    echo (strstore message "' killed by >>>")
     echo exception
-    print (strstore 5 "<<<")
+    print (strstore message "<<<")
 
-    frame ^[(param 0 (vat 5 parameters 0)) (param 1 (iinc (vat 6 parameters 1)))]
+    frame ^[(param 0 (vat message parameters 0)) (param 1 (iinc (vat iota parameters 1)))]
     process void a_division_executing_process/2
 
     return
@@ -70,7 +65,7 @@
 
     strstore (.name: iota format_string) "#{0} / #{1}"
     frame ^[(param 0 format_string) (param 1 divide_what) (param 2 divide_by)]
-    move 0 (msg 1 format/)
+    move 0 (msg iota format/)
 
     return
 .end

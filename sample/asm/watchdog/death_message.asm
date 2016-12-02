@@ -18,19 +18,15 @@
 ;
 
 .function: watchdog_process/1
-    arg (.name: 1 death_message) 0
+    arg (.name: iota death_message) 0
+    remove (.name: iota exception) 1 (strstore exception "exception")
+    remove (.name: iota aborted_function) 1 (strstore aborted_function "function")
 
-    .name: 2 exception
-    remove exception 1 (strstore exception "exception")
-
-    .name: 3 aborted_function
-    remove aborted_function 1 (strstore aborted_function "function")
-
-    echo (strstore 4 "[WARNING] process '")
+    echo (strstore (.name: iota message) "[WARNING] process '")
     echo aborted_function
-    echo (strstore 4 "' killed by >>>")
+    echo (strstore message "' killed by >>>")
     echo exception
-    print (strstore 4 "<<<")
+    print (strstore message "<<<")
 
     return
 .end

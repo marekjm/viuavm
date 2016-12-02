@@ -24,9 +24,9 @@
 ; the purpose of this program is to find an absolute value of an integer
 
 .function: main/1
-    .name: 1 number
-    .name: 2 zero
-    .name: 3 is_negative
+    .name: iota number
+    .name: iota zero
+    .name: iota is_negative
 
     ; store the int, of which we want to get an absolute value
     istore number -17
@@ -36,7 +36,7 @@
     ; the negation of boolean is just to use short form of branch
     ; instruction - this construction starts emerging as a pattern...
     if (not (ilt is_negative number (istore zero 0))) final_print
-    imul 1 (istore 4 -1)
+    imul number (istore iota -1)
 
     .mark: final_print
     print number
