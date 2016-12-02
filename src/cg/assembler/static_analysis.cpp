@@ -450,7 +450,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
         } else if (token == "vec") {
             ++i; // the "vec" token
             int starting_register = stoi(resolve_register_name(named_registers, body_tokens.at(i+1)));
-            int registers_to_pack = stoi(resolve_register_name(named_registers, body_tokens.at(i+2)));
+            int registers_to_pack = stoi(body_tokens.at(i+2));
             if (registers_to_pack) {
                 for (int j = starting_register; j < (starting_register+registers_to_pack); ++j) {
                     check_use_of_register_index(body_tokens, i-1, i-1, str::stringify(j, false), registers, named_registers, "packing empty register");
