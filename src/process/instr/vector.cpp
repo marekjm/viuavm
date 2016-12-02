@@ -24,6 +24,7 @@
 #include <viua/types/type.h>
 #include <viua/types/integer.h>
 #include <viua/types/vector.h>
+#include <viua/types/pointer.h>
 #include <viua/kernel/registerset.h>
 #include <viua/kernel/kernel.h>
 using namespace std;
@@ -143,8 +144,7 @@ byte* viua::process::Process::opvat(byte* addr) {
     tie(addr, position_operand_index) = viua::bytecode::decoder::operands::fetch_primitive_int(addr, this);
 
     viua::assertions::assert_implements<viua::types::Vector>(vector_operand, "viua::types::Vector");
-    viua::types::Type* ptr = static_cast<viua::types::Vector*>(vector_operand)->at(position_operand_index);
-    place(destination_register_index, std::move(ptr->copy()));
+    place(destination_register_index, std::move(static_cast<viua::types::Vector*>(vector_operand)->at(position_operand_index)->pointer()));
 
     return addr;
 }

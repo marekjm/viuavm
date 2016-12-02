@@ -32,12 +32,12 @@
 
     .mark: loop
     if (not (ilt 5 (vlen length vector) number)) finished
-    iadd 8 (vat 6 vector -1) (vat 7 vector -2)
+    iadd 8 *(vat 6 vector -1) *(vat 7 vector -2)
     vpush vector 8
     jump loop
 
     .mark: finished
-    move 0 (vat 9 vector -1)
+    copy 0 *(vat 9 vector -1)
     return
 .end
 

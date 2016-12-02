@@ -1541,7 +1541,9 @@ class KeywordIotaTests(unittest.TestCase):
         runTestSplitlines(self, 'iota_in_frame.asm', ['Hello World!', '42'])
 
     def testIotaInNames(self):
-        runTestSplitlines(self, 'iota_in_names.asm', ['Hello World!', '42'])
+        # --no-sa because otherwise SA complains about accessing named registers using
+        # bare indexes
+        runTestSplitlines(self, 'iota_in_names.asm', ['Hello World!', '42'], assembly_opts=('--no-sa',))
 
     def testIotaInRegisterIndexes(self):
         runTestSplitlines(self, 'iota_in_register_indexes.asm', ['Hello World!', '42'])

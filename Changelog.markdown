@@ -103,6 +103,7 @@ There are several categories of change:
   program tries to dereference something that is not a pointer
 - feature: `.unused: <register>` directive to tell SA that a value in marked register may be potentially unused
 - bic: rename `pull` instruction to `draw`
+- bic: `vat` returns not a copy, but a pointer to an object held inside a vector
 - fix: VM does not crash when source of `fcall` instruction is not callable, and throws an exception instead
 
 One limitation of static analyser (SA) introduced in this release is its inability to handle backwards jumps.

@@ -66,7 +66,7 @@
 
     ; call filtering function to determine whether current element
     ; is a valid value
-    frame ^[(param 0 (vat 7 2 @4))] 0
+    frame ^[(param 0 *(vat 7 2 @4))] 0
     fcall 8 1
 
     ; if the result from filtering function was "true" - the element should be pushed onto result vector
@@ -74,7 +74,7 @@
     if 8 element_ok next_iter
 
     .mark: element_ok
-    vpush 3 7
+    vpush 3 *7
 
     .mark: next_iter
 

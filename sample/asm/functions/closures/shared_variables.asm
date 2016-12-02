@@ -59,16 +59,16 @@
 
 .function: main/1
     frame 0
-    call 1 returns_closures/0
+    call (.name: iota the_closures) returns_closures/0
 
     frame 0
-    fcall 0 (vat 2 1 0)
+    fcall void *(vat (.name: iota getter_closure) the_closures 0)
 
-    frame ^[(param 0 (istore 4 69))]
-    fcall 0 (vat 3 1 1)
+    frame ^[(param 0 (istore iota 69))]
+    fcall void *(vat (.name: iota setter_closure) the_closures 1)
 
     frame 0
-    fcall 0 2
+    fcall void *getter_closure
 
     izero 0
     return

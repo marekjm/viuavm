@@ -32,7 +32,7 @@
 
     .mark: loop
     if (ilt 8 counter len) +1 break
-    print (vat 9 1 @counter)
+    print *(vat 9 1 @counter)
     iinc counter
     jump loop
 

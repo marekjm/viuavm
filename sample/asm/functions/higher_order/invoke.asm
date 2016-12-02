@@ -32,30 +32,30 @@
     ; it then creates a frame with required number of parameter slots (as
     ; specified by length of the vector), and calls given function with this
     ; frame
-    arg 1 0
-    arg 2 1
+    arg (.name: iota fn_to_call) 0
+    arg (.name: iota parameters_list) 1
 
     ; take length of the vector
-    .name: 4 vector_length
+    .name: iota vector_length
     vlen vector_length 2
     frame @vector_length
 
     ; zero loop counter
-    .name: 3 loop_counter
+    .name: iota loop_counter
     izero loop_counter
     .mark: while_begin
 
     ; simple condition:
     ; while (loop_counter < vector_length) {
-    if (igte 5 loop_counter vector_length) while_end while_body
+    if (igte iota loop_counter vector_length) while_end while_body
 
     .mark: while_body
 
-    .name: 7 slot
+    .name: iota slot
     ; store item located inside parameter vector at index denoted by loop_counter in
     ; a register and
     ; pass it as a parameter
-    pamv @loop_counter (vat slot 2 @loop_counter)
+    pamv @loop_counter (copy iota *(vat slot parameters_list @loop_counter))
 
     ; loop_counter++
     iinc loop_counter
@@ -66,7 +66,7 @@
 
     ; finally, after the frame is ready
     ; call the function
-    move 0 (fcall 8 1)
+    move 0 (fcall iota fn_to_call)
     return
 .end
 

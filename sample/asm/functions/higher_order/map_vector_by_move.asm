@@ -64,7 +64,7 @@
     if (igte 6 4 5) loop_end
 
     ; call supplied function on current element...
-    frame ^[(param 0 (vat 7 2 @4))]
+    frame ^[(param 0 *(vat 7 2 @4))]
     ; ...and push result to new vector
     vpush 3 (fcall 8 1)
 

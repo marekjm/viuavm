@@ -27,7 +27,7 @@
     vat (.name: iota something) a_vector -1
     print (vlen length a_vector)
 
-    print 4
+    print *something
 
     izero 0
     return

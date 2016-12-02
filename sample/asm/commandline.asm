@@ -27,7 +27,7 @@
     .mark: loop
     if (ilt 4 counter len) +1 break
 
-    print (vat 5 1 @counter)
+    print *(vat 5 1 @counter)
 
     iinc counter
     jump loop
