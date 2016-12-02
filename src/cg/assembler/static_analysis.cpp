@@ -143,8 +143,8 @@ static void check_timeout_operand(Token token) {
         throw viua::cg::lex::InvalidSyntax(token, "invalid timeout operand");
     }
 }
-static void check_use_of_register_index(const vector<viua::cg::lex::Token>& tokens, long unsigned i, long unsigned by, string register_index, Registers& registers, map<string, string>& named_registers, const string& message_prefix) {
-    string resolved_register_name = resolve_register_name(named_registers, tokens.at(i), register_index, true);
+static void check_use_of_register_index(const vector<viua::cg::lex::Token>& tokens, long unsigned i, long unsigned by, string register_index, Registers& registers, map<string, string>& named_registers, const string& message_prefix, const bool allow_direct_access_to_target = true) {
+    string resolved_register_name = resolve_register_name(named_registers, tokens.at(i), register_index, allow_direct_access_to_target);
     if (resolved_register_name == "void") {
         auto base_error = viua::cg::lex::InvalidSyntax(tokens.at(i), "use of void as input register:");
         base_error.add(tokens.at(by));
@@ -167,8 +167,8 @@ static void check_use_of_register_index(const vector<viua::cg::lex::Token>& toke
     }
     registers.use(resolved_register_name, tokens.at(i));
 }
-static void check_use_of_register(const vector<viua::cg::lex::Token>& tokens, long unsigned i, long unsigned by, Registers& registers, map<string, string>& named_registers, const string& message_prefix) {
-    check_use_of_register_index(tokens, i, by, tokens.at(i), registers, named_registers, message_prefix);
+static void check_use_of_register(const vector<viua::cg::lex::Token>& tokens, long unsigned i, long unsigned by, Registers& registers, map<string, string>& named_registers, const string& message_prefix, const bool allow_direct_access_to_target = true) {
+    check_use_of_register_index(tokens, i, by, tokens.at(i), registers, named_registers, message_prefix, allow_direct_access_to_target);
 }
 static void check_use_of_register(const vector<viua::cg::lex::Token>& tokens, long unsigned i, long unsigned by, Registers& registers, map<string, string>& named_registers) {
     check_use_of_register_index(tokens, i, by, tokens.at(i), registers, named_registers, "use of empty register");
@@ -423,7 +423,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             // early return because we already checked both true, and false branches
             return;
         } else if (token == "echo" or token == "print") {
-            check_use_of_register(body_tokens, i+1, i, registers, named_registers, (token.str() + " of empty register"));
+            check_use_of_register(body_tokens, i+1, i, registers, named_registers, (token.str() + " of empty register"), false);
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "not") {
             check_use_of_register(body_tokens, i+2, i, registers, named_registers, (token.str() + " of empty register"));
