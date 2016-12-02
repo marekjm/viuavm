@@ -60,8 +60,6 @@ byte* viua::process::Process::opvec(byte* addr) {
 }
 
 byte* viua::process::Process::opvinsert(byte* addr) {
-    /*  Run vinsert instruction.
-     */
     viua::types::Type* vector_operand = nullptr;
     tie(addr, vector_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
     viua::assertions::assert_implements<viua::types::Vector>(vector_operand, "viua::types::Vector");
@@ -89,8 +87,6 @@ byte* viua::process::Process::opvinsert(byte* addr) {
 }
 
 byte* viua::process::Process::opvpush(byte* addr) {
-    /*  Run vpush instruction.
-     */
     viua::types::Type* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_object(addr, this);
     viua::assertions::assert_implements<viua::types::Vector>(target, "viua::types::Vector");
@@ -109,8 +105,6 @@ byte* viua::process::Process::opvpush(byte* addr) {
 }
 
 byte* viua::process::Process::opvpop(byte* addr) {
-    /*  Run vpop instruction.
-     */
     unsigned destination_register_index = 0;
     bool destination_is_void = false;
     if (viua::bytecode::decoder::operands::get_operand_type(addr) == OT_VOID) {
@@ -140,10 +134,6 @@ byte* viua::process::Process::opvpop(byte* addr) {
 }
 
 byte* viua::process::Process::opvat(byte* addr) {
-    /*  Run vat instruction.
-     *
-     *  viua::types::Vector always returns a copy of the object in a register.
-     */
     unsigned destination_register_index = 0;
     viua::types::Type* vector_operand = nullptr;
     int position_operand_index = 0;
@@ -160,8 +150,6 @@ byte* viua::process::Process::opvat(byte* addr) {
 }
 
 byte* viua::process::Process::opvlen(byte* addr) {
-    /*  Run vlen instruction.
-     */
     unsigned target = 0;
     viua::types::Type* source = nullptr;
 
