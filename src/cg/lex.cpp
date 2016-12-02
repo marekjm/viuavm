@@ -766,6 +766,37 @@ namespace viua {
                 return tokens;
             }
 
+            static void push_unwrapped_lines(const bool invert, const Token& inner_target_token, vector<Token>& final_tokens, const vector<Token>& unwrapped_tokens, const vector<Token>& input_tokens, std::remove_reference<decltype(input_tokens)>::type::size_type& i) {
+                const auto limit = input_tokens.size();
+                if (invert) {
+                    final_tokens.push_back(inner_target_token);
+                    while (i < limit and input_tokens.at(i) != "\n") {
+                        final_tokens.push_back(input_tokens.at(i));
+                        ++i;
+                    }
+
+                    // this line is to push \n to the token list
+                    final_tokens.push_back(input_tokens.at(i++));
+
+                    for (auto to : unwrapped_tokens) {
+                        final_tokens.push_back(to);
+                    }
+                } else {
+                    vector<Token> last_line;
+                    while (final_tokens.size() and final_tokens.at(final_tokens.size()-1) != "\n") {
+                        last_line.insert(last_line.begin(), final_tokens.back());
+                        final_tokens.pop_back();
+                    }
+
+                    for (auto to : unwrapped_tokens) {
+                        final_tokens.push_back(to);
+                    }
+
+                    for (auto to : last_line) {
+                        final_tokens.push_back(to);
+                    }
+                }
+            }
             vector<Token> unwrap_lines(vector<Token> input_tokens, bool full) {
                 // FIXME: this function needs refactoring
                 decltype(input_tokens) unwrapped_tokens;
@@ -840,34 +871,7 @@ namespace viua {
                         }
                         unwrapped_tokens.emplace_back(t.line(), t.character(), "\n");
 
-                        if (invert) {
-                            final_tokens.push_back(inner_target_token);
-                            while (i < limit and input_tokens.at(i) != "\n") {
-                                final_tokens.push_back(input_tokens.at(i));
-                                ++i;
-                            }
-
-                            // this line is to push \n to the token list
-                            final_tokens.push_back(input_tokens.at(i++));
-
-                            for (auto to : unwrapped_tokens) {
-                                final_tokens.push_back(to);
-                            }
-                        } else {
-                            vector<Token> last_line;
-                            while (final_tokens.size() and final_tokens.at(final_tokens.size()-1) != "\n") {
-                                last_line.insert(last_line.begin(), final_tokens.back());
-                                final_tokens.pop_back();
-                            }
-
-                            for (auto to : unwrapped_tokens) {
-                                final_tokens.push_back(to);
-                            }
-
-                            for (auto to : last_line) {
-                                final_tokens.push_back(to);
-                            }
-                        }
+                        push_unwrapped_lines(invert, inner_target_token, final_tokens, unwrapped_tokens, input_tokens, i);
                         if ((not invert) and full) {
                             final_tokens.push_back(inner_target_token);
                         }
@@ -913,34 +917,7 @@ namespace viua {
                         }
                         unwrapped_tokens.emplace_back(t.line(), t.character(), "\n");
 
-                        if (invert) {
-                            final_tokens.push_back(counter_token);
-                            while (i < limit and input_tokens.at(i) != "\n") {
-                                final_tokens.push_back(input_tokens.at(i));
-                                ++i;
-                            }
-
-                            // this line is to push \n to the token list
-                            final_tokens.push_back(input_tokens.at(i++));
-
-                            for (auto to : unwrapped_tokens) {
-                                final_tokens.push_back(to);
-                            }
-                        } else {
-                            vector<Token> last_line;
-                            while (final_tokens.size() and final_tokens.at(final_tokens.size()-1) != "\n") {
-                                last_line.insert(last_line.begin(), final_tokens.back());
-                                final_tokens.pop_back();
-                            }
-
-                            for (auto to : unwrapped_tokens) {
-                                final_tokens.push_back(to);
-                            }
-
-                            for (auto to : last_line) {
-                                final_tokens.push_back(to);
-                            }
-                        }
+                        push_unwrapped_lines(invert, counter_token, final_tokens, unwrapped_tokens, input_tokens, i);
                         if (not invert) {
                             final_tokens.push_back(counter_token);
                         }
