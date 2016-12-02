@@ -1276,6 +1276,16 @@ namespace viua {
                 tokens = unwrap_lines(tokens);
 
                 /*
+                 * Reduce @- and *-prefixed registers once more.
+                 * This is to support constructions like this:
+                 *
+                 *  print *(ptr X A)
+                 *
+                 * where the prefix and register name are disconnected before the lines are unwrapped.
+                 */
+                tokens = reduce_at_prefixed_registers(tokens);
+
+                /*
                  * Replace register names set by '.name:' directive by their register indexes.
                  * At later processing stages functions need not concern themselves with names and
                  * may operate on register indexes only.
