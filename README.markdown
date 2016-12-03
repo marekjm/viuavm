@@ -32,7 +32,8 @@
 ### Use cases
 
 Viua is a runtime environment focused on reliability, predictability, and concurrency.
-It is suitable for long-running software like servers, message queues, and system daemons.
+It is suitable for writing long-running software that runs in the background providing infrastructure services; servers, message queues, and
+system and application daemons.
 The VM is able to fully utilise all cores of the CPU it's running on (tested on a system with 8 hardware threads) so can
 generate high CPU loads, but is relatively light on RAM and should not contain any memory leaks (all runtime tests are
 run under Valgrind to ensure this).
@@ -53,7 +54,7 @@ It ships with an assembler, and a static analyser, but does not provide any high
 - **massive parallelism**: Viua architecture supports spawning massive amounts of independent, VM-based lightweight processes that can
   run in parallel (Viua is capable of providing true parallelism given sufficient hardware resources, i.e. at least two CPU cores)
 - **concurrent I/O and FFI**: I/O operations and FFI calls cannot block the VM as they are executed on dedicated schedulers, so block only the
-  process that called them
+  virtual process that called them without affecting other virtual processes
 - **easy scatter/gather processing**: processes communicate using messages but machine supports a *join* instruction - which synchronises virtual
   processes execution, it blocks calling process until called process finishes and receives return value of called process (**WIP**)
 - **safe inter-process communication** via message-passing (with queueing)
