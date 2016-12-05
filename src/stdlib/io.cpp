@@ -87,6 +87,14 @@ void io_stdin_getline(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Re
     frame->regset->set(0, unique_ptr<viua::types::Type>{new viua::types::String(line)});
 }
 
+void io_stdout_write(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+    cout << frame->args->at(0)->str();
+}
+
+void io_stderr_write(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+    cerr << frame->args->at(0)->str();
+}
+
 
 void io_file_read(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     string path = frame->args->get(0)->str();
@@ -112,6 +120,8 @@ void io_ifstream_getline(Frame *frame, viua::kernel::RegisterSet*, viua::kernel:
 
 const ForeignFunctionSpec functions[] = {
     { "std::io::stdin::getline/0", &io_stdin_getline },
+    { "std::io::stdout::write/1", &io_stdout_write },
+    { "std::io::stderr::write/1", &io_stderr_write },
     { "std::io::file::read/1", &io_file_read },
     { "std::io::ifstream::open/1", &io_ifstream_open },
     { "std::io::ifstream::getline/1", &io_ifstream_getline },
