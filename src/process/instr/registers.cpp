@@ -90,7 +90,7 @@ byte* viua::process::Process::opress(byte* addr) {
 
     switch (to_register_set) {
         case 0:
-            currently_used_register_set = regset.get();
+            currently_used_register_set = global_register_set.get();
             break;
         case 1:
             currently_used_register_set = frames.back()->regset.get();

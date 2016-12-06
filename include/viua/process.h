@@ -68,8 +68,7 @@ namespace viua {
             std::string watchdog_function { "" };
             bool watchdog_failed { false };
 
-            // Global register set
-            std::unique_ptr<viua::kernel::RegisterSet> regset;
+            std::unique_ptr<viua::kernel::RegisterSet> global_register_set;
 
             /*
              * This pointer points different register sets during the process's lifetime.

@@ -118,7 +118,7 @@ void viua::process::Process::dropFrame() {
     if (frames.size()) {
         currently_used_register_set = frames.back()->regset.get();
     } else {
-        currently_used_register_set = regset.get();
+        currently_used_register_set = global_register_set.get();
     }
 }
 void viua::process::Process::popFrame() {
@@ -504,7 +504,7 @@ void viua::process::Process::migrate_to(viua::scheduler::VirtualProcessScheduler
 }
 
 viua::process::Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualProcessScheduler *sch, viua::process::Process* pt): scheduler(sch), parent_process(pt), entry_function(frm->function_name),
-    regset(nullptr), currently_used_register_set(nullptr), tmp(nullptr),
+    global_register_set(nullptr), currently_used_register_set(nullptr), tmp(nullptr),
     jump_base(nullptr),
     frame_new(nullptr), try_frame_new(nullptr),
     thrown(nullptr), caught(nullptr),
@@ -517,7 +517,7 @@ viua::process::Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualP
     process_id(this),
     is_hidden(false)
 {
-    regset.reset(new viua::kernel::RegisterSet(DEFAULT_REGISTER_SIZE));
+    global_register_set.reset(new viua::kernel::RegisterSet(DEFAULT_REGISTER_SIZE));
     currently_used_register_set = frm->regset.get();
     frames.emplace_back(std::move(frm));
 }
