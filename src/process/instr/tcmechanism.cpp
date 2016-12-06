@@ -60,7 +60,7 @@ byte* viua::process::Process::opdraw(byte* addr) {
     if (not caught) {
         throw new viua::types::Exception("no caught object to draw");
     }
-    uregset->set(target, std::move(caught));
+    currently_used_register_set->set(target, std::move(caught));
 
     return addr;
 }
@@ -92,18 +92,18 @@ byte* viua::process::Process::opthrow(byte* addr) {
     unsigned source = 0;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    if (source >= uregset->size()) {
+    if (source >= currently_used_register_set->size()) {
         ostringstream oss;
         oss << "invalid read: register out of bounds: " << source;
         throw new viua::types::Exception(oss.str());
     }
-    if (uregset->at(source) == nullptr) {
+    if (currently_used_register_set->at(source) == nullptr) {
         ostringstream oss;
         oss << "invalid throw: register " << source << " is empty";
         throw new viua::types::Exception(oss.str());
     }
 
-    thrown = std::move(uregset->pop(source));
+    thrown = std::move(currently_used_register_set->pop(source));
 
     return addr;
 }

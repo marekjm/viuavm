@@ -67,7 +67,7 @@ byte* viua::process::Process::oppamv(byte* addr) {
     if (parameter_no_operand_index >= frame_new->args->size()) {
         throw new viua::types::Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
     }
-    frame_new->args->set(parameter_no_operand_index, std::move(uregset->pop(source)));
+    frame_new->args->set(parameter_no_operand_index, std::move(currently_used_register_set->pop(source)));
     frame_new->args->clear(parameter_no_operand_index);
     frame_new->args->flag(parameter_no_operand_index, MOVED);
 
@@ -103,7 +103,7 @@ byte* viua::process::Process::oparg(byte* addr) {
     }
 
     if (not destination_is_void) {
-        uregset->set(destination_register_index, std::move(argument));
+        currently_used_register_set->set(destination_register_index, std::move(argument));
     }
 
     return addr;
@@ -112,7 +112,7 @@ byte* viua::process::Process::oparg(byte* addr) {
 byte* viua::process::Process::opargc(byte* addr) {
     unsigned target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    uregset->set(target, unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<int>(frames.back()->args->size()))});
+    currently_used_register_set->set(target, unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<int>(frames.back()->args->size()))});
 
     return addr;
 }
@@ -197,10 +197,10 @@ byte* viua::process::Process::opreturn(byte* addr) {
     unsigned return_value_register = frames.back()->place_return_value_in;
     if (return_value_register != 0 and not frames.back()->return_void) {
         // we check in 0. register because it's reserved for return values
-        if (uregset->at(0) == nullptr) {
+        if (currently_used_register_set->at(0) == nullptr) {
             throw new viua::types::Exception("return value requested by frame but function did not set return register");
         }
-        returned = std::move(uregset->pop(0));
+        returned = std::move(currently_used_register_set->pop(0));
     }
 
     dropFrame();

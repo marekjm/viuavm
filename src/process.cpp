@@ -36,7 +36,7 @@ viua::types::Type* viua::process::Process::fetch(unsigned index) const {
      *  This method safeguards against reaching for out-of-bounds registers and
      *  reading from an empty register.
      */
-    viua::types::Type* object = uregset->get(index);
+    viua::types::Type* object = currently_used_register_set->get(index);
     if (dynamic_cast<viua::types::Reference*>(object)) {
         object = static_cast<viua::types::Reference*>(object)->pointsTo();
     }
@@ -46,7 +46,7 @@ viua::types::Type* viua::process::Process::obtain(unsigned index) const {
     return fetch(index);
 }
 unique_ptr<viua::types::Type> viua::process::Process::pop(unsigned index) {
-    return std::move(uregset->pop(index));
+    return std::move(currently_used_register_set->pop(index));
 }
 void viua::process::Process::place(unsigned index, unique_ptr<viua::types::Type> obj) {
     /** Place an object in register with given index.
@@ -55,7 +55,7 @@ void viua::process::Process::place(unsigned index, unique_ptr<viua::types::Type>
      *  If not - the `viua::types::Type` previously stored in it is destroyed.
      *
      */
-    uregset->set(index, std::move(obj));
+    currently_used_register_set->set(index, std::move(obj));
 }
 void viua::process::Process::put(unsigned index, unique_ptr<viua::types::Type> o) {
     place(index, std::move(o));
@@ -91,7 +91,7 @@ void viua::process::Process::pushFrame() {
         throw new viua::types::Exception(oss.str());
     }
 
-    uregset = frame_new->regset.get();
+    currently_used_register_set = frame_new->regset.get();
     if (find(frames.begin(), frames.end(), frame_new) != frames.end()) {
         ostringstream oss;
         oss << "stack corruption: frame " << hex << frame_new.get() << dec << " for function " << frame_new->function_name << '/' << frame_new->args->size() << " pushed more than once";
@@ -116,9 +116,9 @@ void viua::process::Process::dropFrame() {
     }
 
     if (frames.size()) {
-        uregset = frames.back()->regset.get();
+        currently_used_register_set = frames.back()->regset.get();
     } else {
-        uregset = regset.get();
+        currently_used_register_set = regset.get();
     }
 }
 void viua::process::Process::popFrame() {
@@ -209,10 +209,10 @@ byte* viua::process::Process::callForeignMethod(byte* return_address, viua::type
     unsigned return_value_register = frames.back()->place_return_value_in;
     if (return_value_register != 0 and not frames.back()->return_void) {
         // we check in 0. register because it's reserved for return values
-        if (uregset->at(0) == nullptr) {
+        if (currently_used_register_set->at(0) == nullptr) {
             throw new viua::types::Exception("return value requested by frame but foreign method did not set return register");
         }
-        returned = std::move(uregset->pop(0));
+        returned = std::move(currently_used_register_set->pop(0));
     }
 
     dropFrame();
@@ -504,7 +504,7 @@ void viua::process::Process::migrate_to(viua::scheduler::VirtualProcessScheduler
 }
 
 viua::process::Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualProcessScheduler *sch, viua::process::Process* pt): scheduler(sch), parent_process(pt), entry_function(frm->function_name),
-    regset(nullptr), uregset(nullptr), tmp(nullptr),
+    regset(nullptr), currently_used_register_set(nullptr), tmp(nullptr),
     jump_base(nullptr),
     frame_new(nullptr), try_frame_new(nullptr),
     thrown(nullptr), caught(nullptr),
@@ -518,7 +518,7 @@ viua::process::Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualP
     is_hidden(false)
 {
     regset.reset(new viua::kernel::RegisterSet(DEFAULT_REGISTER_SIZE));
-    uregset = frm->regset.get();
+    currently_used_register_set = frm->regset.get();
     frames.emplace_back(std::move(frm));
 }
 

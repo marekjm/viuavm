@@ -31,7 +31,7 @@ byte* viua::process::Process::opmove(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    uregset->move(source, target);
+    currently_used_register_set->move(source, target);
 
     return addr;
 }
@@ -60,7 +60,7 @@ byte* viua::process::Process::opswap(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    uregset->swap(target, source);
+    currently_used_register_set->swap(target, source);
 
     return addr;
 }
@@ -68,7 +68,7 @@ byte* viua::process::Process::opdelete(byte* addr) {
     unsigned target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    uregset->free(target);
+    currently_used_register_set->free(target);
 
     return addr;
 }
@@ -77,7 +77,7 @@ byte* viua::process::Process::opisnull(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    place(target, unique_ptr<viua::types::Type>{new viua::types::Boolean(uregset->at(source) == nullptr)});
+    place(target, unique_ptr<viua::types::Type>{new viua::types::Boolean(currently_used_register_set->at(source) == nullptr)});
 
     return addr;
 }
@@ -90,14 +90,14 @@ byte* viua::process::Process::opress(byte* addr) {
 
     switch (to_register_set) {
         case 0:
-            uregset = regset.get();
+            currently_used_register_set = regset.get();
             break;
         case 1:
-            uregset = frames.back()->regset.get();
+            currently_used_register_set = frames.back()->regset.get();
             break;
         case 2:
             ensureStaticRegisters(frames.back()->function_name);
-            uregset = static_registers.at(frames.back()->function_name).get();
+            currently_used_register_set = static_registers.at(frames.back()->function_name).get();
             break;
         case 3:
             // TODO: switching to temporary registers
@@ -123,10 +123,10 @@ byte* viua::process::Process::optmpro(byte* addr) {
     unsigned target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    if (uregset->at(target) != nullptr) {
-        uregset->free(target);
+    if (currently_used_register_set->at(target) != nullptr) {
+        currently_used_register_set->free(target);
     }
-    uregset->set(target, std::move(tmp));
+    currently_used_register_set->set(target, std::move(tmp));
 
     return addr;
 }

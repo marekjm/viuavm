@@ -44,15 +44,15 @@ byte* viua::process::Process::opcapture(byte* addr) {
         throw new viua::types::Exception("cannot capture object: register index out exceeded size of closure register set");
     }
 
-    auto captured_object = uregset->at(source_register);
+    auto captured_object = currently_used_register_set->at(source_register);
     auto rf = dynamic_cast<viua::types::Reference*>(captured_object);
     if (rf == nullptr) {
         // turn captured object into a reference to take it out of VM's default
         // memory management scheme and put it under reference-counting scheme
         // this is needed to bind the captured object's life to lifetime of the closure
         rf = new viua::types::Reference(captured_object);
-        uregset->empty(source_register);    // empty - do not delete the captured object or SEGFAULTS will follow
-        uregset->set(source_register, unique_ptr<viua::types::Type>{rf});  // set the register to contain the newly-created reference
+        currently_used_register_set->empty(source_register);    // empty - do not delete the captured object or SEGFAULTS will follow
+        currently_used_register_set->set(source_register, unique_ptr<viua::types::Type>{rf});  // set the register to contain the newly-created reference
     }
     target_closure->regset->set(target_register, std::move(rf->copy()));
 
@@ -92,7 +92,7 @@ byte* viua::process::Process::opcapturemove(byte* addr) {
         throw new viua::types::Exception("cannot capture object: register index out exceeded size of closure register set");
     }
 
-    target_closure->regset->set(target_register, std::move(uregset->pop(source_register)));
+    target_closure->regset->set(target_register, std::move(currently_used_register_set->pop(source_register)));
 
     return addr;
 }
@@ -100,7 +100,7 @@ byte* viua::process::Process::opcapturemove(byte* addr) {
 byte* viua::process::Process::opclosure(byte* addr) {
     /** Create a closure from a function.
      */
-    if (uregset != frames.back()->regset.get()) {
+    if (currently_used_register_set != frames.back()->regset.get()) {
         throw new viua::types::Exception("creating closures from nonlocal registers is forbidden");
     }
 
@@ -110,7 +110,7 @@ byte* viua::process::Process::opclosure(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, function_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
-    place(target, unique_ptr<viua::types::Type>{new viua::types::Closure(function_name, new viua::kernel::RegisterSet(uregset->size()))});
+    place(target, unique_ptr<viua::types::Type>{new viua::types::Closure(function_name, new viua::kernel::RegisterSet(currently_used_register_set->size()))});
 
     return addr;
 }

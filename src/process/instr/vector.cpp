@@ -41,11 +41,11 @@ byte* viua::process::Process::opvec(byte* addr) {
         // allow packing target register
         throw new viua::types::Exception("vec would pack itself");
     }
-    if ((pack_start_index+pack_length) >= uregset->size()) {
+    if ((pack_start_index+pack_length) >= currently_used_register_set->size()) {
         throw new viua::types::Exception("vec: packing outside of register set range");
     }
     for (decltype(pack_length) i = 0; i < pack_length; ++i) {
-        if (uregset->at(pack_start_index+i) == nullptr) {
+        if (currently_used_register_set->at(pack_start_index+i) == nullptr) {
             throw new viua::types::Exception("vec: cannot pack null register");
         }
     }

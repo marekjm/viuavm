@@ -71,8 +71,12 @@ namespace viua {
             // Global register set
             std::unique_ptr<viua::kernel::RegisterSet> regset;
 
-            // Currently used register set
-            viua::kernel::RegisterSet* uregset;
+            /*
+             * This pointer points different register sets during the process's lifetime.
+             * It can be explicitly adjusted by the user code (using "ress" instruction), or
+             * implicitly by the VM (e.g. when calling a closure).
+             */
+            viua::kernel::RegisterSet* currently_used_register_set;
 
             // Temporary register
             std::unique_ptr<viua::types::Type> tmp;

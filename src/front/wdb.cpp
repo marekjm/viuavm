@@ -748,7 +748,7 @@ bool command_dispatch(string& command, vector<string>& operands, viua::kernel::K
     } else if (command == "register.show") {
         printRegisters(operands, kernel.trace().back()->regset);
     } else if (command == "register.local.show") {
-        printRegisters(operands, kernel.processes[kernel.current_process_index]->uregset);
+        printRegisters(operands, kernel.processes[kernel.current_process_index]->currently_used_register_set);
     } else if (command == "register.global.show") {
         cout << "FIXME: showing per-process global registers not implemented" << endl;
     } else if (command == "register.static.show") {
