@@ -374,7 +374,7 @@ void viua::process::Process::detach() {
      *
      *  Keep in mind that while detached processes cannot be joined,
      *  they can receive messages.
-     *  Also, they will run even after the main/1 function has exited.
+     *  Also, they will run even after the main/ function has exited.
      */
     is_joinable.store(false, std::memory_order_release);
     parent_process = nullptr;
