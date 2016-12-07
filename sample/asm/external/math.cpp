@@ -32,15 +32,15 @@ extern "C" const ForeignFunctionSpec* exports();
 
 
 static void math_sqrt(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
-    if (frame->args->at(0) == nullptr) {
+    if (frame->arguments->at(0) == nullptr) {
         throw new viua::types::Exception("expected float as first argument");
     }
-    if (frame->args->at(0)->type() != "Float") {
+    if (frame->arguments->at(0)->type() != "Float") {
         throw new viua::types::Exception("invalid type of parameter 0: expected Float");
     }
 
-    auto square_root = sqrt(dynamic_cast<viua::types::numeric::Number*>(frame->args->at(0))->as_float64());
-    frame->regset->set(0, unique_ptr<viua::types::Type>{new viua::types::Float(square_root)});
+    auto square_root = sqrt(dynamic_cast<viua::types::numeric::Number*>(frame->arguments->at(0))->as_float64());
+    frame->local_register_set->set(0, unique_ptr<viua::types::Type>{new viua::types::Float(square_root)});
 }
 
 

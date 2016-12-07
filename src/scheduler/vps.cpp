@@ -54,38 +54,38 @@ static void printStackTrace(viua::process::Process *process) {
 
     if (trace.size()) {
         Frame* last = trace.back();
-        if (last->regset->size()) {
+        if (last->local_register_set->size()) {
             unsigned non_empty = 0;
-            for (unsigned r = 0; r < last->regset->size(); ++r) {
-                if (last->regset->at(r) != nullptr) { ++non_empty; }
+            for (unsigned r = 0; r < last->local_register_set->size(); ++r) {
+                if (last->local_register_set->at(r) != nullptr) { ++non_empty; }
             }
-            cout << "  non-empty registers: " << non_empty << '/' << last->regset->size();
+            cout << "  non-empty registers: " << non_empty << '/' << last->local_register_set->size();
             cout << (non_empty ? ":\n" : "\n");
-            for (unsigned r = 0; r < last->regset->size(); ++r) {
-                if (last->regset->at(r) == nullptr) { continue; }
+            for (unsigned r = 0; r < last->local_register_set->size(); ++r) {
+                if (last->local_register_set->at(r) == nullptr) { continue; }
                 cout << "    registers[" << r << "]: ";
-                cout << '<' << last->regset->get(r)->type() << "> " << last->regset->get(r)->str() << endl;
+                cout << '<' << last->local_register_set->get(r)->type() << "> " << last->local_register_set->get(r)->str() << endl;
             }
         } else {
             cout << "  no registers were allocated for this frame" << endl;
         }
 
-        if (last->args->size()) {
-            cout << "  non-empty arguments (out of " << last->args->size() << "):" << endl;
-            for (unsigned r = 0; r < last->args->size(); ++r) {
-                if (last->args->at(r) == nullptr) { continue; }
+        if (last->arguments->size()) {
+            cout << "  non-empty arguments (out of " << last->arguments->size() << "):" << endl;
+            for (unsigned r = 0; r < last->arguments->size(); ++r) {
+                if (last->arguments->at(r) == nullptr) { continue; }
                 cout << "    arguments[" << r << "]: ";
-                if (last->args->isflagged(r, MOVED)) {
+                if (last->arguments->isflagged(r, MOVED)) {
                     cout << "[moved] ";
                 }
-                if (auto ptr = dynamic_cast<viua::types::Pointer*>(last->args->get(r))) {
+                if (auto ptr = dynamic_cast<viua::types::Pointer*>(last->arguments->get(r))) {
                     if (ptr->expired()) {
                         cout << "<ExpiredPointer>" << endl;
                     } else {
                         cout << '<' << ptr->type() << '>' << endl;
                     }
                 } else {
-                    cout << '<' << last->args->get(r)->type() << "> " << last->args->get(r)->str() << endl;
+                    cout << '<' << last->arguments->get(r)->type() << "> " << last->arguments->get(r)->str() << endl;
                 }
             }
         } else {
@@ -111,10 +111,10 @@ template<class T, class ...Ts> static void viua_err(
     viua_err(oss, std::forward<Ts>(Rest)...);
 }
 
-template<class ...Ts> static void viua_err(Ts&&... args) {
+template<class ...Ts> static void viua_err(Ts&&... arguments) {
     ostringstream oss;
     oss << std::chrono::steady_clock::now().time_since_epoch().count() << ' ';
-    viua_err(oss, std::forward<Ts>(args)...);
+    viua_err(oss, std::forward<Ts>(arguments)...);
     cerr << (oss.str() + '\n');
 }
 
@@ -408,7 +408,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                 unique_ptr<viua::types::Object> death_message(new viua::types::Object("Object"));
                 unique_ptr<viua::types::Type> exc(th->transferActiveException());
                 unique_ptr<viua::types::Vector> parameters {new viua::types::Vector()};
-                viua::kernel::RegisterSet *top_args = th->trace().at(0)->args.get();
+                viua::kernel::RegisterSet *top_args = th->trace().at(0)->arguments.get();
                 for (unsigned long j = 0; j < top_args->size(); ++j) {
                     if (top_args->at(j)) {
                         parameters->push(std::move(top_args->pop(j)));
@@ -424,7 +424,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                 death_message->set("parameters", std::move(parameters));
 
                 unique_ptr<Frame> death_frame(new Frame(nullptr, 1));
-                death_frame->args->set(0, std::move(death_message));
+                death_frame->arguments->set(0, std::move(death_message));
 #if VIUA_VM_DEBUG_LOG
                 viua_err( "[scheduler:vps:", this, ":watchdogging] process ", th, ':', th->starting_function(), ": died, becomes ", th->watchdog());
 #endif
@@ -524,7 +524,7 @@ void viua::scheduler::VirtualProcessScheduler::bootstrap(const vector<string>& c
     for (decltype(limit) i = 0; i < limit; ++i) {
         cmdline->push(unique_ptr<viua::types::Type>{new viua::types::String(commandline_arguments[i])});
     }
-    initial_frame->regset->set(1, std::move(cmdline));
+    initial_frame->local_register_set->set(1, std::move(cmdline));
 
     main_process = spawn(std::move(initial_frame), nullptr, true);
     main_process->priority(16);

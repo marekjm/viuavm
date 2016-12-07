@@ -35,7 +35,7 @@ namespace viua {
             /** Closure type.
              */
             public:
-                std::unique_ptr<viua::kernel::RegisterSet> regset;
+                std::unique_ptr<viua::kernel::RegisterSet> local_register_set;
 
                 std::string function_name;
 

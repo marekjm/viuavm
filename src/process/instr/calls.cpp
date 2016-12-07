@@ -48,11 +48,11 @@ byte* viua::process::Process::opparam(byte* addr) {
     viua::types::Type *source = nullptr;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    if (parameter_no_operand_index >= frame_new->args->size()) {
+    if (parameter_no_operand_index >= frame_new->arguments->size()) {
         throw new viua::types::Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
     }
-    frame_new->args->set(parameter_no_operand_index, std::move(source->copy()));
-    frame_new->args->clear(parameter_no_operand_index);
+    frame_new->arguments->set(parameter_no_operand_index, std::move(source->copy()));
+    frame_new->arguments->clear(parameter_no_operand_index);
 
     return addr;
 }
@@ -64,12 +64,12 @@ byte* viua::process::Process::oppamv(byte* addr) {
     tie(addr, parameter_no_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    if (parameter_no_operand_index >= frame_new->args->size()) {
+    if (parameter_no_operand_index >= frame_new->arguments->size()) {
         throw new viua::types::Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
     }
-    frame_new->args->set(parameter_no_operand_index, std::move(currently_used_register_set->pop(source)));
-    frame_new->args->clear(parameter_no_operand_index);
-    frame_new->args->flag(parameter_no_operand_index, MOVED);
+    frame_new->arguments->set(parameter_no_operand_index, std::move(currently_used_register_set->pop(source)));
+    frame_new->arguments->clear(parameter_no_operand_index);
+    frame_new->arguments->flag(parameter_no_operand_index, MOVED);
 
     return addr;
 }
@@ -88,7 +88,7 @@ byte* viua::process::Process::oparg(byte* addr) {
 
     tie(addr, parameter_no_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    if (parameter_no_operand_index >= frames.back()->args->size()) {
+    if (parameter_no_operand_index >= frames.back()->arguments->size()) {
         ostringstream oss;
         oss << "invalid read: read from argument register out of bounds: " << parameter_no_operand_index;
         throw new viua::types::Exception(oss.str());
@@ -96,10 +96,10 @@ byte* viua::process::Process::oparg(byte* addr) {
 
     unique_ptr<viua::types::Type> argument;
 
-    if (frames.back()->args->isflagged(parameter_no_operand_index, MOVED)) {
-        argument = std::move(frames.back()->args->pop(parameter_no_operand_index));
+    if (frames.back()->arguments->isflagged(parameter_no_operand_index, MOVED)) {
+        argument = std::move(frames.back()->arguments->pop(parameter_no_operand_index));
     } else {
-        argument = std::move(frames.back()->args->get(parameter_no_operand_index)->copy());
+        argument = std::move(frames.back()->arguments->get(parameter_no_operand_index)->copy());
     }
 
     if (not destination_is_void) {
@@ -112,7 +112,7 @@ byte* viua::process::Process::oparg(byte* addr) {
 byte* viua::process::Process::opargc(byte* addr) {
     unsigned target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    currently_used_register_set->set(target, unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<int>(frames.back()->args->size()))});
+    currently_used_register_set->set(target, unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<int>(frames.back()->arguments->size()))});
 
     return addr;
 }
@@ -144,13 +144,13 @@ byte* viua::process::Process::opcall(byte* addr) {
         if (frame_new == nullptr) {
             throw new viua::types::Exception("cannot call foreign method without a frame");
         }
-        if (frame_new->args->size() == 0) {
+        if (frame_new->arguments->size() == 0) {
             throw new viua::types::Exception("cannot call foreign method using empty frame");
         }
-        if (frame_new->args->at(0) == nullptr) {
+        if (frame_new->arguments->at(0) == nullptr) {
             throw new viua::types::Exception("frame must have at least one argument when used to call a foreign method");
         }
-        auto obj = frame_new->args->at(0);
+        auto obj = frame_new->arguments->at(0);
         return callForeignMethod(addr, obj, call_name, return_void, return_register, call_name);
     }
 
@@ -178,7 +178,7 @@ byte* viua::process::Process::optailcall(byte* addr) {
 
     Frame *last_frame = frames.back().get();
 
-    last_frame->args = std::move(frame_new->args);
+    last_frame->arguments = std::move(frame_new->arguments);
 
     // new frame must be deleted to prevent future errors
     // it's a simulated "push-and-pop" from the stack

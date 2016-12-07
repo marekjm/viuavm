@@ -25,16 +25,16 @@ using namespace std;
 
 string stringifyFunctionInvocation(const Frame* frame) {
     ostringstream oss;
-    oss << frame->function_name << '/' << frame->args->size();
+    oss << frame->function_name << '/' << frame->arguments->size();
     oss << '(';
-    for (unsigned i = 0; i < frame->args->size(); ++i) {
-        auto optr = frame->args->at(i);
+    for (unsigned i = 0; i < frame->arguments->size(); ++i) {
+        auto optr = frame->arguments->at(i);
         if (optr == nullptr) {
             oss << "<moved or void>";
         } else {
             oss << optr->repr();
         }
-        if (i < (frame->args->size()-1)) {
+        if (i < (frame->arguments->size()-1)) {
             oss << ", ";
         }
     }

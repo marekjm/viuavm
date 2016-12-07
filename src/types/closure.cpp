@@ -24,7 +24,7 @@
 using namespace std;
 
 
-viua::types::Closure::Closure(const string& name, viua::kernel::RegisterSet *rs): regset(rs), function_name(name) {
+viua::types::Closure::Closure(const string& name, viua::kernel::RegisterSet *rs): local_register_set(rs), function_name(name) {
 }
 
 viua::types::Closure::~Closure() {
@@ -52,7 +52,7 @@ bool viua::types::Closure::boolean() const {
 unique_ptr<viua::types::Type> viua::types::Closure::copy() const {
     unique_ptr<viua::types::Closure> clsr {new viua::types::Closure()};
     clsr->function_name = function_name;
-    clsr->regset = std::move(regset->copy());
+    clsr->local_register_set = std::move(local_register_set->copy());
     return std::move(clsr);
 }
 

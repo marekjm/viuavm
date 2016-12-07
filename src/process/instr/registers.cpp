@@ -93,7 +93,7 @@ byte* viua::process::Process::opress(byte* addr) {
             currently_used_register_set = global_register_set.get();
             break;
         case 1:
-            currently_used_register_set = frames.back()->regset.get();
+            currently_used_register_set = frames.back()->local_register_set.get();
             break;
         case 2:
             ensureStaticRegisters(frames.back()->function_name);

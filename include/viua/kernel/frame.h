@@ -31,8 +31,8 @@
 class Frame {
     public:
         byte* return_address;
-        std::unique_ptr<viua::kernel::RegisterSet> args;
-        viua::util::memory::maybe_unique_ptr<viua::kernel::RegisterSet> regset;
+        std::unique_ptr<viua::kernel::RegisterSet> arguments;
+        viua::util::memory::maybe_unique_ptr<viua::kernel::RegisterSet> local_register_set;
 
         bool return_void;
         unsigned place_return_value_in;

@@ -91,10 +91,10 @@ void viua::process::Process::pushFrame() {
         throw new viua::types::Exception(oss.str());
     }
 
-    currently_used_register_set = frame_new->regset.get();
+    currently_used_register_set = frame_new->local_register_set.get();
     if (find(frames.begin(), frames.end(), frame_new) != frames.end()) {
         ostringstream oss;
-        oss << "stack corruption: frame " << hex << frame_new.get() << dec << " for function " << frame_new->function_name << '/' << frame_new->args->size() << " pushed more than once";
+        oss << "stack corruption: frame " << hex << frame_new.get() << dec << " for function " << frame_new->function_name << '/' << frame_new->arguments->size() << " pushed more than once";
         throw oss.str();
     }
     frames.emplace_back(std::move(frame_new));
@@ -105,18 +105,18 @@ void viua::process::Process::dropFrame() {
     unique_ptr<Frame> frame(std::move(frames.back()));
     frames.pop_back();
 
-    for (registerset_size_type i = 0; i < frame->args->size(); ++i) {
-        if (frame->args->at(i) != nullptr and frame->args->isflagged(i, MOVED)) {
+    for (registerset_size_type i = 0; i < frame->arguments->size(); ++i) {
+        if (frame->arguments->at(i) != nullptr and frame->arguments->isflagged(i, MOVED)) {
             throw new viua::types::Exception("unused pass-by-move parameter");
         }
     }
 
     if (frames.size() == 0) {
-        return_value = std::move(frame->regset->pop(0));
+        return_value = std::move(frame->local_register_set->pop(0));
     }
 
     if (frames.size()) {
-        currently_used_register_set = frames.back()->regset.get();
+        currently_used_register_set = frames.back()->local_register_set.get();
     } else {
         currently_used_register_set = global_register_set.get();
     }
@@ -518,7 +518,7 @@ viua::process::Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualP
     is_hidden(false)
 {
     global_register_set.reset(new viua::kernel::RegisterSet(DEFAULT_REGISTER_SIZE));
-    currently_used_register_set = frm->regset.get();
+    currently_used_register_set = frm->local_register_set.get();
     frames.emplace_back(std::move(frm));
 }
 

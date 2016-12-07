@@ -84,20 +84,20 @@ class Ifstream: public viua::types::Type {
 void io_stdin_getline(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     string line;
     getline(cin, line);
-    frame->regset->set(0, unique_ptr<viua::types::Type>{new viua::types::String(line)});
+    frame->local_register_set->set(0, unique_ptr<viua::types::Type>{new viua::types::String(line)});
 }
 
 void io_stdout_write(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
-    cout << frame->args->at(0)->str();
+    cout << frame->arguments->at(0)->str();
 }
 
 void io_stderr_write(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
-    cerr << frame->args->at(0)->str();
+    cerr << frame->arguments->at(0)->str();
 }
 
 
 void io_file_read(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
-    string path = frame->args->get(0)->str();
+    string path = frame->arguments->get(0)->str();
     ifstream in(path);
 
     ostringstream oss;
@@ -106,16 +106,16 @@ void io_file_read(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Regist
         oss << line << '\n';
     }
 
-    frame->regset->set(0, unique_ptr<viua::types::Type>{new viua::types::String(oss.str())});
+    frame->local_register_set->set(0, unique_ptr<viua::types::Type>{new viua::types::String(oss.str())});
 }
 
 void io_ifstream_open(Frame *frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
-    frame->regset->set(0, unique_ptr<viua::types::Type>{new Ifstream(frame->args->get(0)->str())});
+    frame->local_register_set->set(0, unique_ptr<viua::types::Type>{new Ifstream(frame->arguments->get(0)->str())});
 }
 
 void io_ifstream_getline(Frame *frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
-    Ifstream *in = dynamic_cast<Ifstream*>(static_cast<viua::types::Pointer*>(frame->args->get(0))->to());
-    frame->regset->set(0, unique_ptr<viua::types::Type>{new viua::types::String(in->getline())});
+    Ifstream *in = dynamic_cast<Ifstream*>(static_cast<viua::types::Pointer*>(frame->arguments->get(0))->to());
+    frame->local_register_set->set(0, unique_ptr<viua::types::Type>{new viua::types::String(in->getline())});
 }
 
 const ForeignFunctionSpec functions[] = {
