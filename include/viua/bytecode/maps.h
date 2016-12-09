@@ -63,6 +63,16 @@ const std::map<std::string, unsigned> OP_SIZES = {
     { "stoi",           sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
     { "stof",           sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
 
+    { "add",            0 },
+    { "sub",            0 },
+    { "mul",            0 },
+    { "div",            0 },
+    { "lt",             0 },
+    { "lte",            0 },
+    { "gt",             0 },
+    { "gte",            0 },
+    { "eq",             0 },
+
     { "strstore",       sizeof(byte) + sizeof(OperandType) + sizeof(int) },
     { "streq",          sizeof(byte) + 3*sizeof(OperandType) + 3*sizeof(int) },
 

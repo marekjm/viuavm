@@ -22,7 +22,9 @@
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/types/type.h>
+#include <viua/types/number.h>
 #include <viua/types/integer.h>
+#include <viua/types/float.h>
 #include <viua/types/boolean.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
@@ -37,13 +39,31 @@ byte* viua::process::Process::opadd(byte* addr) {
     unsigned target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    viua::types::Type* lhs = nullptr;
-    tie(addr, lhs) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    viua::types::Type* lhs_raw = nullptr;
+    tie(addr, lhs_raw) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    auto lhs = static_cast<viua::types::numeric::Number*>(lhs_raw);
 
-    viua::types::Type* rhs = nullptr;
-    tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    viua::types::Type* rhs_raw = nullptr;
+    tie(addr, rhs_raw) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    auto rhs = static_cast<viua::types::numeric::Number*>(rhs_raw);
 
-    place(target, unique_ptr<viua::types::Type>{new viua::types::Integer(0)});
+    if (result_type == OperandType::OT_INT
+        or result_type == OperandType::OT_INT8
+        or result_type == OperandType::OT_INT16
+        or result_type == OperandType::OT_INT32
+        or result_type == OperandType::OT_INT64
+    ) {
+        place(target, unique_ptr<viua::types::Type>{new viua::types::Integer(lhs->as_int32() + rhs->as_int32())});
+    } else if (result_type == OperandType::OT_UINT
+        or result_type == OperandType::OT_UINT8
+        or result_type == OperandType::OT_UINT16
+        or result_type == OperandType::OT_UINT32
+        or result_type == OperandType::OT_UINT64
+    ) {
+        place(target, unique_ptr<viua::types::Type>{new viua::types::Integer(lhs->as_int32() + rhs->as_int32())});
+    } else if (result_type == OperandType::OT_FLOAT or result_type == OperandType::OT_FLOAT32 or result_type == OperandType::OT_FLOAT64) {
+        place(target, unique_ptr<viua::types::Type>{new viua::types::Float(lhs->as_float64() + rhs->as_float64())});
+    }
 
     return addr;
 }
