@@ -337,6 +337,11 @@ Program& Program::opstof(int_op a, int_op b) {
     return (*this);
 }
 
+Program& Program::opadd(string result_type, int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opadd(addr_ptr, result_type, target, lhs, rhs);
+    return (*this);
+}
+
 Program& Program::opstrstore(int_op reg, string s) {
     /*  Inserts strstore instruction.
      */
