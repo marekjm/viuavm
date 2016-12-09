@@ -257,6 +257,8 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
         program.opstoi(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
     } else if (tokens.at(i) == "stof") {
         program.opstof(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
+    } else if (tokens.at(i) == "add") {
+        program.opadd(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))), assembler::operands::getint(resolveregister(tokens.at(i+4))));
     } else if (tokens.at(i) == "strstore") {
         program.opstrstore(assembler::operands::getint(resolveregister(tokens.at(i+1))), tokens.at(i+2));
     } else if (tokens.at(i) == "vec") {
