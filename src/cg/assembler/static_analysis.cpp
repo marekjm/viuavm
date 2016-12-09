@@ -488,6 +488,15 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             registers.insert(resolve_register_name(named_registers, body_tokens.at(i)), body_tokens.at(i));
             i = skip_till_next_line(body_tokens, i);
             continue;
+        } else if (token == "add" or token == "sub" or token == "mul" or token == "div" or
+                   token == "lt" or token == "lte" or token == "gt" or token == "gte" or token == "eq") {
+            ++i; // skip mnemonic token
+            ++i; // skip result type token
+            check_use_of_register(body_tokens, i+1, i, registers, named_registers);
+            check_use_of_register(body_tokens, i+2, i, registers, named_registers);
+            registers.insert(resolve_register_name(named_registers, body_tokens.at(i)), body_tokens.at(i));
+            i = skip_till_next_line(body_tokens, i);
+            continue;
         } else if (token == "join") {
             check_timeout_operand(body_tokens.at(i+3));
             check_use_of_register(body_tokens, i+2, i, registers, named_registers, "join from empty register");
