@@ -50,11 +50,12 @@ namespace viua {
                  *  - values from registers specified as register indexes
                  *  - values from registers specified as register references
                  *
-                 *  These functions are used most often bymajority of the instructions.
+                 *  These functions are used most often by majority of the instructions.
                  *
                  */
                 auto is_void(const byte*) -> bool;
                 auto fetch_void(byte*) -> byte*;
+                auto fetch_operand_type(byte*) -> std::tuple<byte*, OperandType>;
                 auto fetch_register_index(byte*, viua::process::Process*) -> std::tuple<byte*, unsigned>;
                 auto fetch_primitive_uint(byte*, viua::process::Process*) -> std::tuple<byte*, unsigned>;
                 auto fetch_primitive_uint64(byte*, viua::process::Process*) -> std::tuple<byte*, uint64_t>;

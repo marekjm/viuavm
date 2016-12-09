@@ -78,6 +78,12 @@ auto viua::bytecode::decoder::operands::fetch_void(byte *ip) -> byte* {
     return ip;
 }
 
+auto viua::bytecode::decoder::operands::fetch_operand_type(byte *ip) -> tuple<byte*, OperandType> {
+    OperandType ot = get_operand_type(ip);
+    ++ip;
+    return tuple<byte*, OperandType>{ip, ot};
+}
+
 static auto extract_register_index(byte *ip, viua::process::Process *process, bool pointers_allowed = false) -> tuple<byte*, unsigned> {
     OperandType ot = viua::bytecode::decoder::operands::get_operand_type(ip);
     ++ip;
