@@ -101,6 +101,100 @@ namespace viua {
                 return (*this);
             }
 
+
+            static bool is_reserved_keyword(string s) {
+                static const set<string> reserved_keywords {
+                    /*
+                     * Used for timeouts in 'join' and 'receive' instructions
+                     */
+                    "infinity",
+
+                    /*
+                     *  Reserved as register set names.
+                     */
+                    "local",
+                    "static",
+                    "global",
+                    "temporary",
+
+                    /*
+                     * Reserved for future use.
+                     */
+                    "auto",
+                    "default",
+                    "undefined",
+                    "null",
+                    "void",
+                    "iota",
+                    "const",
+
+                    /*
+                     * Reserved for future use as boolean literals.
+                     */
+                    "true",
+                    "false",
+
+                    /*
+                     * Reserved for future use as instruction names.
+                     */
+                    "int",
+                    "int8",
+                    "int16",
+                    "int32",
+                    "int64",
+                    "uint",
+                    "uint8",
+                    "uint16",
+                    "uint32",
+                    "uint64",
+                    "float32",
+                    "float64",
+                    "string",
+                    "bits",
+                    "coroutine",
+                    "yield",
+                    "channel",
+                    "publish",
+                    "subscribe",
+
+                    /*
+                     * Reserved  for future use as bit-operation instruction names.
+                     * Shifts:
+                     *
+                     *      shl <target> <source> <width>
+                     *
+                     *          logical bit shift left;
+                     *          <source> is shifted left by <width> bits
+                     *          bits shifted out of <source> are put in <target>
+                     *          <target> has the same bitsize as <source>
+                     *
+                     *      ashr <target> <source> <width>
+                     *
+                     *          arithmetic bit shift right;
+                     *          same as logical bit shift right, only the highest bit is preserved
+                     *
+                     *      ashl <target> <source> <width>
+                     *
+                     *          arithmetic bit shift left;
+                     *          same as logical bit shift left, only the lowest bit is preserved
+                     */
+                    "shl",  // logical shift left
+                    "shr",  // logical shift right
+                    "ashl", // arithmetic shift left
+                    "ashr", // arithmetic shift right
+
+                    "rol",  // rotate left
+                    "ror",  // rotate right
+                };
+                return (reserved_keywords.count(s) or OP_SIZES.count(s));
+            }
+            static void assert_is_not_reserved_keyword(Token token, const string& message) {
+                string s = token.original();
+                if (is_reserved_keyword(s)) {
+                    throw viua::cg::lex::InvalidSyntax(token, ("invalid " + message + ": '" + s + "' is a registered keyword"));
+                }
+            }
+
             vector<Token> tokenise(const string& source) {
                 vector<Token> tokens;
 
@@ -1042,96 +1136,6 @@ namespace viua {
                 }
 
                 return tokens;
-            }
-
-            static void assert_is_not_reserved_keyword(Token token, const string& message) {
-                string s = token.original();
-                static const set<string> reserved_keywords {
-                    /*
-                     * Used for timeouts in 'join' and 'receive' instructions
-                     */
-                    "infinity",
-
-                    /*
-                     *  Reserved as register set names.
-                     */
-                    "local",
-                    "static",
-                    "global",
-                    "temporary",
-
-                    /*
-                     * Reserved for future use.
-                     */
-                    "auto",
-                    "default",
-                    "undefined",
-                    "null",
-                    "void",
-                    "iota",
-                    "const",
-
-                    /*
-                     * Reserved for future use as boolean literals.
-                     */
-                    "true",
-                    "false",
-
-                    /*
-                     * Reserved for future use as instruction names.
-                     */
-                    "int",
-                    "int8",
-                    "int16",
-                    "int32",
-                    "int64",
-                    "uint",
-                    "uint8",
-                    "uint16",
-                    "uint32",
-                    "uint64",
-                    "float32",
-                    "float64",
-                    "string",
-                    "bits",
-                    "coroutine",
-                    "yield",
-                    "channel",
-                    "publish",
-                    "subscribe",
-
-                    /*
-                     * Reserved  for future use as bit-operation instruction names.
-                     * Shifts:
-                     *
-                     *      shl <target> <source> <width>
-                     *
-                     *          logical bit shift left;
-                     *          <source> is shifted left by <width> bits
-                     *          bits shifted out of <source> are put in <target>
-                     *          <target> has the same bitsize as <source>
-                     *
-                     *      ashr <target> <source> <width>
-                     *
-                     *          arithmetic bit shift right;
-                     *          same as logical bit shift right, only the highest bit is preserved
-                     *
-                     *      ashl <target> <source> <width>
-                     *
-                     *          arithmetic bit shift left;
-                     *          same as logical bit shift left, only the lowest bit is preserved
-                     */
-                    "shl",  // logical shift left
-                    "shr",  // logical shift right
-                    "ashl", // arithmetic shift left
-                    "ashr", // arithmetic shift right
-
-                    "rol",  // rotate left
-                    "ror",  // rotate right
-                };
-                if (reserved_keywords.count(s) or OP_SIZES.count(s)) {
-                    throw viua::cg::lex::InvalidSyntax(token, ("invalid " + message + ": '" + s + "' is a registered keyword"));
-                }
             }
 
             std::vector<Token> replace_named_registers(std::vector<Token> input_tokens) {
