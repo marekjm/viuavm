@@ -85,6 +85,8 @@ namespace cg {
         byte* opstoi(byte*, int_op, int_op);
         byte* opstof(byte*, int_op, int_op);
 
+        byte* opadd(byte*, std::string, int_op, int_op, int_op);
+
         byte* opstrstore(byte*, int_op, std::string);
 
         byte* opvec(byte*, int_op, int_op, int_op);

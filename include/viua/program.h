@@ -96,6 +96,8 @@ class Program {
     Program& opstoi(int_op, int_op);
     Program& opstof(int_op, int_op);
 
+    Program& opadd(std::string, int_op, int_op, int_op);
+
     Program& opstrstore(int_op, std::string);
 
     Program& opvec(int_op, int_op, int_op);
