@@ -122,6 +122,21 @@ byte* viua::process::Process::dispatch(byte* addr) {
         case DIV:
             addr = opdiv(addr+1);
             break;
+        case LT:
+            addr = oplt(addr+1);
+            break;
+        case LTE:
+            addr = oplte(addr+1);
+            break;
+        case GT:
+            addr = opgt(addr+1);
+            break;
+        case GTE:
+            addr = opgte(addr+1);
+            break;
+        case EQ:
+            addr = opeq(addr+1);
+            break;
         case STRSTORE:
             addr = opstrstore(addr+1);
             break;
