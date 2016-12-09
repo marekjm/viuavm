@@ -60,6 +60,16 @@ enum OPCODE : byte {
     STOI,   // convert string to integer
     STOF,   // convert string to float
 
+    ADD,
+    SUB,
+    MUL,
+    DIV,
+    LT,
+    LTE,
+    GT,
+    GTE,
+    EQ,
+
     // string instructions
     STRSTORE,
     STREQ,
