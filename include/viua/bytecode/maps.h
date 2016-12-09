@@ -176,6 +176,16 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { STOI,         "stoi" },
     { STOF,         "stof" },
 
+    { ADD,          "add" },
+    { SUB,          "sub" },
+    { MUL,          "mul" },
+    { DIV,          "div" },
+    { LT,           "lt" },
+    { LTE,          "lte" },
+    { GT,           "gt" },
+    { GTE,          "gte" },
+    { EQ,           "eq" },
+
     { STRSTORE,     "strstore" },
     { STREQ,        "streq" },
 
