@@ -238,13 +238,16 @@ namespace cg {
             }
             return addr_ptr;
         }
-        byte* opadd(byte* addr_ptr, std::string result_type, int_op target, int_op lhs, int_op rhs) {
-            *(addr_ptr++) = ADD;
+        static byte* emit_instruction_alu(byte* addr_ptr, OPCODE instruction, std::string result_type, int_op target, int_op lhs, int_op rhs) {
+            *(addr_ptr++) = instruction;
 
             addr_ptr = encode_operand_type(addr_ptr, result_type);
             addr_ptr = insertIntegerOperand(addr_ptr, target);
             addr_ptr = insertIntegerOperand(addr_ptr, lhs);
             return insertIntegerOperand(addr_ptr, rhs);
+        }
+        byte* opadd(byte* addr_ptr, std::string result_type, int_op target, int_op lhs, int_op rhs) {
+            return emit_instruction_alu(addr_ptr, ADD, result_type, target, lhs, rhs);
         }
 
         byte* opstrstore(byte* addr_ptr, int_op reg, string s) {
