@@ -87,3 +87,15 @@ template<template <typename T> class Operator> static byte* decode_operands_and_
 byte* viua::process::Process::opadd(byte* addr) {
     return decode_operands_and_perform_arithmetic<plus>(addr, this);
 }
+
+byte* viua::process::Process::opsub(byte* addr) {
+    return decode_operands_and_perform_arithmetic<minus>(addr, this);
+}
+
+byte* viua::process::Process::opmul(byte* addr) {
+    return decode_operands_and_perform_arithmetic<multiplies>(addr, this);
+}
+
+byte* viua::process::Process::opdiv(byte* addr) {
+    return decode_operands_and_perform_arithmetic<divides>(addr, this);
+}

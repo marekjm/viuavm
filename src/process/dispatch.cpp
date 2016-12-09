@@ -113,6 +113,15 @@ byte* viua::process::Process::dispatch(byte* addr) {
         case ADD:
             addr = opadd(addr+1);
             break;
+        case SUB:
+            addr = opsub(addr+1);
+            break;
+        case MUL:
+            addr = opmul(addr+1);
+            break;
+        case DIV:
+            addr = opdiv(addr+1);
+            break;
         case STRSTORE:
             addr = opstrstore(addr+1);
             break;

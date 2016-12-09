@@ -193,6 +193,9 @@ namespace viua {
             byte* opstof(byte*);
 
             byte* opadd(byte*);
+            byte* opsub(byte*);
+            byte* opmul(byte*);
+            byte* opdiv(byte*);
 
             byte* opstrstore(byte*);
 
