@@ -26,11 +26,43 @@
 #include <viua/types/integer.h>
 #include <viua/types/float.h>
 #include <viua/types/boolean.h>
+#include <viua/types/exception.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/assert.h>
 using namespace std;
 
+template<template <typename T> class Operator> static void perform_arithmetic(OperandType result_type, viua::process::Process* process, unsigned target, viua::types::numeric::Number* lhs, viua::types::numeric::Number* rhs) {
+    if (result_type == OperandType::OT_INT) {
+        process->put(target, unique_ptr<viua::types::Type>{new viua::types::Integer(Operator<int32_t>()(lhs->as_int32(), rhs->as_int32()))});
+    } else if (result_type == OperandType::OT_INT8) {
+        process->put(target, unique_ptr<viua::types::Type>{new viua::types::Integer(Operator<int32_t>()(lhs->as_int32(), rhs->as_int32()))});
+    } else if (result_type == OperandType::OT_INT16) {
+        process->put(target, unique_ptr<viua::types::Type>{new viua::types::Integer(Operator<int32_t>()(lhs->as_int32(), rhs->as_int32()))});
+    } else if (result_type == OperandType::OT_INT32) {
+        process->put(target, unique_ptr<viua::types::Type>{new viua::types::Integer(Operator<int32_t>()(lhs->as_int32(), rhs->as_int32()))});
+    } else if (result_type == OperandType::OT_INT64) {
+        process->put(target, unique_ptr<viua::types::Type>{new viua::types::Integer(Operator<int32_t>()(lhs->as_int32(), rhs->as_int32()))});
+    } else if (result_type == OperandType::OT_UINT) {
+        process->put(target, unique_ptr<viua::types::Type>{new viua::types::Integer(Operator<int32_t>()(lhs->as_int32(), rhs->as_int32()))});
+    } else if (result_type == OperandType::OT_UINT8) {
+        process->put(target, unique_ptr<viua::types::Type>{new viua::types::Integer(Operator<int32_t>()(lhs->as_int32(), rhs->as_int32()))});
+    } else if (result_type == OperandType::OT_UINT16) {
+        process->put(target, unique_ptr<viua::types::Type>{new viua::types::Integer(Operator<int32_t>()(lhs->as_int32(), rhs->as_int32()))});
+    } else if (result_type == OperandType::OT_UINT32) {
+        process->put(target, unique_ptr<viua::types::Type>{new viua::types::Integer(Operator<int32_t>()(lhs->as_int32(), rhs->as_int32()))});
+    } else if (result_type == OperandType::OT_UINT64) {
+        process->put(target, unique_ptr<viua::types::Type>{new viua::types::Integer(Operator<int32_t>()(lhs->as_int32(), rhs->as_int32()))});
+    } else if (result_type == OperandType::OT_FLOAT) {
+        process->put(target, unique_ptr<viua::types::Type>{new viua::types::Float(Operator<double>()(lhs->as_float64(), rhs->as_float64()))});
+    } else if (result_type == OperandType::OT_FLOAT32) {
+        process->put(target, unique_ptr<viua::types::Type>{new viua::types::Float(Operator<double>()(lhs->as_float64(), rhs->as_float64()))});
+    } else if (result_type == OperandType::OT_FLOAT64) {
+        process->put(target, unique_ptr<viua::types::Type>{new viua::types::Float(Operator<double>()(lhs->as_float64(), rhs->as_float64()))});
+    } else {
+        throw new viua::types::Exception("invalid operand type: illegal result type");
+    }
+}
 
 byte* viua::process::Process::opadd(byte* addr) {
     OperandType result_type = OperandType::OT_VOID;
@@ -47,23 +79,7 @@ byte* viua::process::Process::opadd(byte* addr) {
     tie(addr, rhs_raw) = viua::bytecode::decoder::operands::fetch_object(addr, this);
     auto rhs = static_cast<viua::types::numeric::Number*>(rhs_raw);
 
-    if (result_type == OperandType::OT_INT
-        or result_type == OperandType::OT_INT8
-        or result_type == OperandType::OT_INT16
-        or result_type == OperandType::OT_INT32
-        or result_type == OperandType::OT_INT64
-    ) {
-        place(target, unique_ptr<viua::types::Type>{new viua::types::Integer(lhs->as_int32() + rhs->as_int32())});
-    } else if (result_type == OperandType::OT_UINT
-        or result_type == OperandType::OT_UINT8
-        or result_type == OperandType::OT_UINT16
-        or result_type == OperandType::OT_UINT32
-        or result_type == OperandType::OT_UINT64
-    ) {
-        place(target, unique_ptr<viua::types::Type>{new viua::types::Integer(lhs->as_int32() + rhs->as_int32())});
-    } else if (result_type == OperandType::OT_FLOAT or result_type == OperandType::OT_FLOAT32 or result_type == OperandType::OT_FLOAT64) {
-        place(target, unique_ptr<viua::types::Type>{new viua::types::Float(lhs->as_float64() + rhs->as_float64())});
-    }
+    perform_arithmetic<plus>(result_type, this, target, lhs, rhs);
 
     return addr;
 }
