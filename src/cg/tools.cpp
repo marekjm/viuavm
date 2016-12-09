@@ -119,6 +119,12 @@ namespace viua {
 
                 return tuple<uint64_t, decltype(i)>(calculated_size, i);
             }
+            static auto size_of_instruction_alu(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
+                ++i;
+                auto sz = size_of_instruction_with_three_ri_operands(tokens, i);
+                ++get<0>(sz);
+                return sz;
+            }
 
             static auto size_of_nop(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
                 uint64_t calculated_size = sizeof(byte);
@@ -207,6 +213,33 @@ namespace viua {
             }
             static auto size_of_stof(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands(tokens, i);
+            }
+            static auto size_of_add(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
+                return size_of_instruction_alu(tokens, i);
+            }
+            static auto size_of_sub(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
+                return size_of_instruction_alu(tokens, i);
+            }
+            static auto size_of_mul(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
+                return size_of_instruction_alu(tokens, i);
+            }
+            static auto size_of_div(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
+                return size_of_instruction_alu(tokens, i);
+            }
+            static auto size_of_lt(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
+                return size_of_instruction_alu(tokens, i);
+            }
+            static auto size_of_lte(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
+                return size_of_instruction_alu(tokens, i);
+            }
+            static auto size_of_gt(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
+                return size_of_instruction_alu(tokens, i);
+            }
+            static auto size_of_gte(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
+                return size_of_instruction_alu(tokens, i);
+            }
+            static auto size_of_eq(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
+                return size_of_instruction_alu(tokens, i);
             }
             static auto size_of_strstore(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
                 uint64_t calculated_size = sizeof(byte);
@@ -674,6 +707,33 @@ namespace viua {
                     } else if (tokens.at(i) == "stof") {
                         ++i;
                         tie(increase, i) = size_of_stof(tokens, i);
+                    } else if (tokens.at(i) == "add") {
+                        ++i;
+                        tie(increase, i) = size_of_add(tokens, i);
+                    } else if (tokens.at(i) == "sub") {
+                        ++i;
+                        tie(increase, i) = size_of_sub(tokens, i);
+                    } else if (tokens.at(i) == "mul") {
+                        ++i;
+                        tie(increase, i) = size_of_mul(tokens, i);
+                    } else if (tokens.at(i) == "div") {
+                        ++i;
+                        tie(increase, i) = size_of_div(tokens, i);
+                    } else if (tokens.at(i) == "lt") {
+                        ++i;
+                        tie(increase, i) = size_of_lt(tokens, i);
+                    } else if (tokens.at(i) == "lte") {
+                        ++i;
+                        tie(increase, i) = size_of_lte(tokens, i);
+                    } else if (tokens.at(i) == "gt") {
+                        ++i;
+                        tie(increase, i) = size_of_gt(tokens, i);
+                    } else if (tokens.at(i) == "gte") {
+                        ++i;
+                        tie(increase, i) = size_of_gte(tokens, i);
+                    } else if (tokens.at(i) == "eq") {
+                        ++i;
+                        tie(increase, i) = size_of_eq(tokens, i);
                     } else if (tokens.at(i) == "strstore") {
                         ++i;
                         tie(increase, i) = size_of_strstore(tokens, i);
@@ -982,6 +1042,33 @@ namespace viua {
                     } else if (tokens.at(i) == "stof") {
                         ++i;
                         tie(increase, i) = size_of_stof(tokens, i);
+                    } else if (tokens.at(i) == "add") {
+                        ++i;
+                        tie(increase, i) = size_of_add(tokens, i);
+                    } else if (tokens.at(i) == "sub") {
+                        ++i;
+                        tie(increase, i) = size_of_sub(tokens, i);
+                    } else if (tokens.at(i) == "mul") {
+                        ++i;
+                        tie(increase, i) = size_of_mul(tokens, i);
+                    } else if (tokens.at(i) == "div") {
+                        ++i;
+                        tie(increase, i) = size_of_div(tokens, i);
+                    } else if (tokens.at(i) == "lt") {
+                        ++i;
+                        tie(increase, i) = size_of_lt(tokens, i);
+                    } else if (tokens.at(i) == "lte") {
+                        ++i;
+                        tie(increase, i) = size_of_lte(tokens, i);
+                    } else if (tokens.at(i) == "gt") {
+                        ++i;
+                        tie(increase, i) = size_of_gt(tokens, i);
+                    } else if (tokens.at(i) == "gte") {
+                        ++i;
+                        tie(increase, i) = size_of_gte(tokens, i);
+                    } else if (tokens.at(i) == "eq") {
+                        ++i;
+                        tie(increase, i) = size_of_eq(tokens, i);
                     } else if (tokens.at(i) == "strstore") {
                         ++i;
                         tie(increase, i) = size_of_strstore(tokens, i);
