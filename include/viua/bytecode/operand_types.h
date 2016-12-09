@@ -38,16 +38,19 @@ enum OperandType: uint8_t {
     OT_STRING,              // UTF-8 encoded Unicode string
     OT_BYTES,               // size-prefixed byte string
 
+    OT_INT,                 // unlimited size signed integer
     OT_INT8,                // 8bit signed integer
     OT_INT16,               // 16bit signed integer
     OT_INT32,               // 32bit signed integer
     OT_INT64,               // 64bit signed integer
 
+    OT_UINT,                // unlimited size unsigned integer
     OT_UINT8,               // 8bit unsigned integer
     OT_UINT16,              // 16bit unsigned integer
     OT_UINT32,              // 32bit unsigned integer
     OT_UINT64,              // 64bit unsigned integer
 
+    OT_FLOAT,               // unlimited precision floating point number
     OT_FLOAT32,             // 32bit floating point number
     OT_FLOAT64,             // 64bit floating point number
 
