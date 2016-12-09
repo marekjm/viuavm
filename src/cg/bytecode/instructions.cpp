@@ -206,6 +206,44 @@ namespace cg {
             return insertTwoIntegerOpsInstruction(addr_ptr, STOF, a, b);
         }
 
+        byte* opadd(byte* addr_ptr, std::string result_type, int_op target, int_op lhs, int_op rhs) {
+            *(addr_ptr++) = ADD;
+
+            if (result_type == "int") {
+                *(addr_ptr++) = OperandType::OT_INT;
+            } else if (result_type == "int8") {
+                *(addr_ptr++) = OperandType::OT_INT8;
+            } else if (result_type == "int16") {
+                *(addr_ptr++) = OperandType::OT_INT16;
+            } else if (result_type == "int32") {
+                *(addr_ptr++) = OperandType::OT_INT32;
+            } else if (result_type == "int64") {
+                *(addr_ptr++) = OperandType::OT_INT64;
+            } else if (result_type == "uint") {
+                *(addr_ptr++) = OperandType::OT_UINT;
+            } else if (result_type == "uint8") {
+                *(addr_ptr++) = OperandType::OT_UINT8;
+            } else if (result_type == "uint16") {
+                *(addr_ptr++) = OperandType::OT_UINT16;
+            } else if (result_type == "uint32") {
+                *(addr_ptr++) = OperandType::OT_UINT32;
+            } else if (result_type == "uint64") {
+                *(addr_ptr++) = OperandType::OT_UINT64;
+            } else if (result_type == "float") {
+                *(addr_ptr++) = OperandType::OT_FLOAT;
+            } else if (result_type == "float32") {
+                *(addr_ptr++) = OperandType::OT_FLOAT32;
+            } else if (result_type == "float64") {
+                *(addr_ptr++) = OperandType::OT_FLOAT64;
+            } else {
+                *(addr_ptr++) = OperandType::OT_VOID;
+            }
+
+            addr_ptr = insertIntegerOperand(addr_ptr, target);
+            addr_ptr = insertIntegerOperand(addr_ptr, lhs);
+            return insertIntegerOperand(addr_ptr, rhs);
+        }
+
         byte* opstrstore(byte* addr_ptr, int_op reg, string s) {
             *(addr_ptr++) = STRSTORE;
             addr_ptr = insertIntegerOperand(addr_ptr, reg);
