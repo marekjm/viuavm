@@ -206,39 +206,42 @@ namespace cg {
             return insertTwoIntegerOpsInstruction(addr_ptr, STOF, a, b);
         }
 
-        byte* opadd(byte* addr_ptr, std::string result_type, int_op target, int_op lhs, int_op rhs) {
-            *(addr_ptr++) = ADD;
-
-            if (result_type == "int") {
+        static byte* encode_operand_type(byte* addr_ptr, string operand_type) {
+            if (operand_type == "int") {
                 *(addr_ptr++) = OperandType::OT_INT;
-            } else if (result_type == "int8") {
+            } else if (operand_type == "int8") {
                 *(addr_ptr++) = OperandType::OT_INT8;
-            } else if (result_type == "int16") {
+            } else if (operand_type == "int16") {
                 *(addr_ptr++) = OperandType::OT_INT16;
-            } else if (result_type == "int32") {
+            } else if (operand_type == "int32") {
                 *(addr_ptr++) = OperandType::OT_INT32;
-            } else if (result_type == "int64") {
+            } else if (operand_type == "int64") {
                 *(addr_ptr++) = OperandType::OT_INT64;
-            } else if (result_type == "uint") {
+            } else if (operand_type == "uint") {
                 *(addr_ptr++) = OperandType::OT_UINT;
-            } else if (result_type == "uint8") {
+            } else if (operand_type == "uint8") {
                 *(addr_ptr++) = OperandType::OT_UINT8;
-            } else if (result_type == "uint16") {
+            } else if (operand_type == "uint16") {
                 *(addr_ptr++) = OperandType::OT_UINT16;
-            } else if (result_type == "uint32") {
+            } else if (operand_type == "uint32") {
                 *(addr_ptr++) = OperandType::OT_UINT32;
-            } else if (result_type == "uint64") {
+            } else if (operand_type == "uint64") {
                 *(addr_ptr++) = OperandType::OT_UINT64;
-            } else if (result_type == "float") {
+            } else if (operand_type == "float") {
                 *(addr_ptr++) = OperandType::OT_FLOAT;
-            } else if (result_type == "float32") {
+            } else if (operand_type == "float32") {
                 *(addr_ptr++) = OperandType::OT_FLOAT32;
-            } else if (result_type == "float64") {
+            } else if (operand_type == "float64") {
                 *(addr_ptr++) = OperandType::OT_FLOAT64;
             } else {
                 *(addr_ptr++) = OperandType::OT_VOID;
             }
+            return addr_ptr;
+        }
+        byte* opadd(byte* addr_ptr, std::string result_type, int_op target, int_op lhs, int_op rhs) {
+            *(addr_ptr++) = ADD;
 
+            addr_ptr = encode_operand_type(addr_ptr, result_type);
             addr_ptr = insertIntegerOperand(addr_ptr, target);
             addr_ptr = insertIntegerOperand(addr_ptr, lhs);
             return insertIntegerOperand(addr_ptr, rhs);
