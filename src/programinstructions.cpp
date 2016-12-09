@@ -342,6 +342,46 @@ Program& Program::opadd(string result_type, int_op target, int_op lhs, int_op rh
     return (*this);
 }
 
+Program& Program::opsub(string result_type, int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opsub(addr_ptr, result_type, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opmul(string result_type, int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opmul(addr_ptr, result_type, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opdiv(string result_type, int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opdiv(addr_ptr, result_type, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::oplt(string result_type, int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::oplt(addr_ptr, result_type, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::oplte(string result_type, int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::oplte(addr_ptr, result_type, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opgt(string result_type, int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opgt(addr_ptr, result_type, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opgte(string result_type, int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opgte(addr_ptr, result_type, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opeq(string result_type, int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opeq(addr_ptr, result_type, target, lhs, rhs);
+    return (*this);
+}
+
 Program& Program::opstrstore(int_op reg, string s) {
     /*  Inserts strstore instruction.
      */

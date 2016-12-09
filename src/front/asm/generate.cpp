@@ -259,6 +259,22 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
         program.opstof(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
     } else if (tokens.at(i) == "add") {
         program.opadd(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))), assembler::operands::getint(resolveregister(tokens.at(i+4))));
+    } else if (tokens.at(i) == "sub") {
+        program.opsub(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))), assembler::operands::getint(resolveregister(tokens.at(i+4))));
+    } else if (tokens.at(i) == "mul") {
+        program.opmul(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))), assembler::operands::getint(resolveregister(tokens.at(i+4))));
+    } else if (tokens.at(i) == "div") {
+        program.opdiv(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))), assembler::operands::getint(resolveregister(tokens.at(i+4))));
+    } else if (tokens.at(i) == "lt") {
+        program.oplt(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))), assembler::operands::getint(resolveregister(tokens.at(i+4))));
+    } else if (tokens.at(i) == "lte") {
+        program.oplte(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))), assembler::operands::getint(resolveregister(tokens.at(i+4))));
+    } else if (tokens.at(i) == "gt") {
+        program.opgt(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))), assembler::operands::getint(resolveregister(tokens.at(i+4))));
+    } else if (tokens.at(i) == "gte") {
+        program.opgte(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))), assembler::operands::getint(resolveregister(tokens.at(i+4))));
+    } else if (tokens.at(i) == "eq") {
+        program.opeq(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))), assembler::operands::getint(resolveregister(tokens.at(i+4))));
     } else if (tokens.at(i) == "strstore") {
         program.opstrstore(assembler::operands::getint(resolveregister(tokens.at(i+1))), tokens.at(i+2));
     } else if (tokens.at(i) == "vec") {
