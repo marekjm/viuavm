@@ -86,6 +86,14 @@ namespace cg {
         byte* opstof(byte*, int_op, int_op);
 
         byte* opadd(byte*, std::string, int_op, int_op, int_op);
+        byte* opsub(byte*, std::string, int_op, int_op, int_op);
+        byte* opmul(byte*, std::string, int_op, int_op, int_op);
+        byte* opdiv(byte*, std::string, int_op, int_op, int_op);
+        byte* oplt(byte*, std::string, int_op, int_op, int_op);
+        byte* oplte(byte*, std::string, int_op, int_op, int_op);
+        byte* opgt(byte*, std::string, int_op, int_op, int_op);
+        byte* opgte(byte*, std::string, int_op, int_op, int_op);
+        byte* opeq(byte*, std::string, int_op, int_op, int_op);
 
         byte* opstrstore(byte*, int_op, std::string);
 

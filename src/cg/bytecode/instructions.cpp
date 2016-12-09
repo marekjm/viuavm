@@ -249,6 +249,30 @@ namespace cg {
         byte* opadd(byte* addr_ptr, std::string result_type, int_op target, int_op lhs, int_op rhs) {
             return emit_instruction_alu(addr_ptr, ADD, result_type, target, lhs, rhs);
         }
+        byte* opsub(byte* addr_ptr, std::string result_type, int_op target, int_op lhs, int_op rhs) {
+            return emit_instruction_alu(addr_ptr, SUB, result_type, target, lhs, rhs);
+        }
+        byte* opmul(byte* addr_ptr, std::string result_type, int_op target, int_op lhs, int_op rhs) {
+            return emit_instruction_alu(addr_ptr, MUL, result_type, target, lhs, rhs);
+        }
+        byte* opdiv(byte* addr_ptr, std::string result_type, int_op target, int_op lhs, int_op rhs) {
+            return emit_instruction_alu(addr_ptr, DIV, result_type, target, lhs, rhs);
+        }
+        byte* oplt(byte* addr_ptr, std::string result_type, int_op target, int_op lhs, int_op rhs) {
+            return emit_instruction_alu(addr_ptr, LT, result_type, target, lhs, rhs);
+        }
+        byte* oplte(byte* addr_ptr, std::string result_type, int_op target, int_op lhs, int_op rhs) {
+            return emit_instruction_alu(addr_ptr, LTE, result_type, target, lhs, rhs);
+        }
+        byte* opgt(byte* addr_ptr, std::string result_type, int_op target, int_op lhs, int_op rhs) {
+            return emit_instruction_alu(addr_ptr, GT, result_type, target, lhs, rhs);
+        }
+        byte* opgte(byte* addr_ptr, std::string result_type, int_op target, int_op lhs, int_op rhs) {
+            return emit_instruction_alu(addr_ptr, GTE, result_type, target, lhs, rhs);
+        }
+        byte* opeq(byte* addr_ptr, std::string result_type, int_op target, int_op lhs, int_op rhs) {
+            return emit_instruction_alu(addr_ptr, EQ, result_type, target, lhs, rhs);
+        }
 
         byte* opstrstore(byte* addr_ptr, int_op reg, string s) {
             *(addr_ptr++) = STRSTORE;
