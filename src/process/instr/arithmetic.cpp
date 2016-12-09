@@ -64,22 +64,26 @@ template<template <typename T> class Operator> static void perform_arithmetic(Op
     }
 }
 
-byte* viua::process::Process::opadd(byte* addr) {
+template<template <typename T> class Operator> static byte* decode_operands_and_perform_arithmetic(byte* addr, viua::process::Process *process) {
     OperandType result_type = OperandType::OT_VOID;
     tie(addr, result_type) = viua::bytecode::decoder::operands::fetch_operand_type(addr);
 
     unsigned target = 0;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, process);
 
     viua::types::Type* lhs_raw = nullptr;
-    tie(addr, lhs_raw) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    tie(addr, lhs_raw) = viua::bytecode::decoder::operands::fetch_object(addr, process);
     auto lhs = static_cast<viua::types::numeric::Number*>(lhs_raw);
 
     viua::types::Type* rhs_raw = nullptr;
-    tie(addr, rhs_raw) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    tie(addr, rhs_raw) = viua::bytecode::decoder::operands::fetch_object(addr, process);
     auto rhs = static_cast<viua::types::numeric::Number*>(rhs_raw);
 
-    perform_arithmetic<plus>(result_type, this, target, lhs, rhs);
+    perform_arithmetic<Operator>(result_type, process, target, lhs, rhs);
 
     return addr;
+}
+
+byte* viua::process::Process::opadd(byte* addr) {
+    return decode_operands_and_perform_arithmetic<plus>(addr, this);
 }
