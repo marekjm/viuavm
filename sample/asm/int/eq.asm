@@ -23,7 +23,7 @@
 .function: main/1
     istore 1 1
     istore 2 1
-    ieq 1 1 2
+    eq int64 1 1 2
 
     ; should be true
     print 1

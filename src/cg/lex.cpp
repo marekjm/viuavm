@@ -370,12 +370,26 @@ namespace viua {
                         if (input_tokens.at(i+1).str() == "\n") {
                             tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "infinity"); // number of registers to pack
                         }
-                    } else if (token == "iadd" or token == "isub" or token == "imul" or token == "idiv" or
-                               token == "ilt" or token == "ilte" or token == "igt" or token == "igte" or token == "ieq" or
-                               token == "fadd" or token == "fsub" or token == "fmul" or token == "fdiv" or
-                               token == "flt" or token == "flte" or token == "fgt" or token == "fgte" or token == "feq" or
-                               token == "and" or token == "or"
+                    } else if (token == "add" or token == "sub" or token == "mul" or token == "div" or
+                               token == "lt" or token == "lte" or token == "gt" or token == "gte" or token == "eq"
                     ) {
+                        tokens.push_back(token);    // mnemonic
+                        tokens.push_back(input_tokens.at(++i)); // result type specifier
+                        tokens.push_back(input_tokens.at(++i)); // target register
+                        if (input_tokens.at(i+2).str() == "\n") {
+                            // if only two operands are given, double target register
+                            // this will expand the following instruction:
+                            //
+                            //      opcode T S
+                            // to:
+                            //
+                            //      opcode T T S
+                            //
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), tokens.back().str());
+                            continue;
+                        }
+                        tokens.push_back(input_tokens.at(++i)); // second source register
+                    } else if (token == "and" or token == "or") {
                         tokens.push_back(token);    // mnemonic
                         tokens.push_back(input_tokens.at(++i)); // target register
                         if (input_tokens.at(i+2).str() == "\n") {

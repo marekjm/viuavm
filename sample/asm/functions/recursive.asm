@@ -26,7 +26,7 @@
     arg zero 1
 
     ; decrease counter and check if it's less than zero
-    if (ilt 3 (idec counter) zero) break_rec
+    if (lt int64 3 (idec counter) zero) break_rec
     print counter
 
     frame ^[(param 0 counter) (pamv 1 zero)]

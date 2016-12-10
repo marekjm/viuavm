@@ -73,10 +73,16 @@ template<template <typename T> class Operator> static byte* decode_operands_and_
 
     viua::types::Type* lhs_raw = nullptr;
     tie(addr, lhs_raw) = viua::bytecode::decoder::operands::fetch_object(addr, process);
-    auto lhs = static_cast<viua::types::numeric::Number*>(lhs_raw);
 
     viua::types::Type* rhs_raw = nullptr;
     tie(addr, rhs_raw) = viua::bytecode::decoder::operands::fetch_object(addr, process);
+
+    using viua::types::numeric::Number;
+
+    viua::assertions::expect_types<Number>("Number", lhs_raw, rhs_raw);
+
+
+    auto lhs = static_cast<viua::types::numeric::Number*>(lhs_raw);
     auto rhs = static_cast<viua::types::numeric::Number*>(rhs_raw);
 
     perform_arithmetic<Operator>(result_type, process, target, lhs, rhs);
@@ -125,10 +131,15 @@ template<template <typename T> class Operator> static byte* decode_operands_and_
 
     viua::types::Type* lhs_raw = nullptr;
     tie(addr, lhs_raw) = viua::bytecode::decoder::operands::fetch_object(addr, process);
-    auto lhs = static_cast<viua::types::numeric::Number*>(lhs_raw);
 
     viua::types::Type* rhs_raw = nullptr;
     tie(addr, rhs_raw) = viua::bytecode::decoder::operands::fetch_object(addr, process);
+
+    using viua::types::numeric::Number;
+
+    viua::assertions::expect_types<Number>("Number", lhs_raw, rhs_raw);
+
+    auto lhs = static_cast<viua::types::numeric::Number*>(lhs_raw);
     auto rhs = static_cast<viua::types::numeric::Number*>(rhs_raw);
 
     perform_comparison<Operator>(result_type, process, target, lhs, rhs);

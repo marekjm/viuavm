@@ -23,7 +23,7 @@
 
     fstore 2 1.0
 
-    fdiv 3 1 2
+    div float32 3 1 2
     print 3
 
     izero 0

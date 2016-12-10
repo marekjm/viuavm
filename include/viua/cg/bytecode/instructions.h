@@ -57,28 +57,10 @@ namespace cg {
 
         byte* opizero(byte*, int_op);
         byte* opistore(byte*, int_op, int_op);
-        byte* opiadd(byte*, int_op, int_op, int_op);
-        byte* opisub(byte*, int_op, int_op, int_op);
-        byte* opimul(byte*, int_op, int_op, int_op);
-        byte* opidiv(byte*, int_op, int_op, int_op);
         byte* opiinc(byte*, int_op);
         byte* opidec(byte*, int_op);
-        byte* opilt(byte*, int_op, int_op, int_op);
-        byte* opilte(byte*, int_op, int_op, int_op);
-        byte* opigt(byte*, int_op, int_op, int_op);
-        byte* opigte(byte*, int_op, int_op, int_op);
-        byte* opieq(byte*, int_op, int_op, int_op);
 
         byte* opfstore(byte*, int_op, float);
-        byte* opfadd(byte*, int_op, int_op, int_op);
-        byte* opfsub(byte*, int_op, int_op, int_op);
-        byte* opfmul(byte*, int_op, int_op, int_op);
-        byte* opfdiv(byte*, int_op, int_op, int_op);
-        byte* opflt(byte*, int_op, int_op, int_op);
-        byte* opflte(byte*, int_op, int_op, int_op);
-        byte* opfgt(byte*, int_op, int_op, int_op);
-        byte* opfgte(byte*, int_op, int_op, int_op);
-        byte* opfeq(byte*, int_op, int_op, int_op);
 
         byte* opitof(byte*, int_op, int_op);
         byte* opftoi(byte*, int_op, int_op);

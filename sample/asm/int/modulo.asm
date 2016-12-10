@@ -28,13 +28,13 @@
     istore result @number
 
     ; if number is less than modulo, jump straight to result printing
-    ilt 4 number modulo
+    lt int64 4 number modulo
     if 4 final
 
     ; otherwise we must perform some calculations
-    idiv number number modulo
-    imul number number modulo
-    isub result result number
+    div int64 number number modulo
+    mul int64 number number modulo
+    sub int64 result result number
 
 
     .mark: final

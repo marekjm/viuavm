@@ -228,24 +228,6 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
                 oss << " " << "void";
             }
             ++ptr;
-        case IADD:
-        case ISUB:
-        case IMUL:
-        case IDIV:
-        case ILT:
-        case ILTE:
-        case IGT:
-        case IGTE:
-        case IEQ:
-        case FADD:
-        case FSUB:
-        case FMUL:
-        case FDIV:
-        case FLT:
-        case FLTE:
-        case FGT:
-        case FGTE:
-        case FEQ:
         case STREQ:
         case AND:
         case OR:

@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    iadd 2 1 3
+    add int8 2 1 3
 
     izero 0
     return

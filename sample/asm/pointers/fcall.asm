@@ -21,7 +21,7 @@
     arg (.name: iota lhs) 0
     arg (.name: iota rhs) 0
 
-    iadd 0 lhs rhs
+    add int64 0 lhs rhs
 
     return
 .end
@@ -30,7 +30,7 @@
     arg (.name: iota lhs) 0
     arg (.name: iota rhs) 0
 
-    imul 0 lhs rhs
+    mul int64 0 lhs rhs
 
     return
 .end

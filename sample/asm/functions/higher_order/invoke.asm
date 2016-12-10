@@ -20,7 +20,7 @@
 .function: sum/4
     ; this function takes four integers as parameters and
     ; adds them, and returns the sum
-    iadd 0 (arg 4 3) (iadd 0 (arg 3 2) (iadd 0 (arg 1 0) (arg 2 1)))
+    add int64 0 (arg 4 3) (add int64 0 (arg 3 2) (add int64 0 (arg 1 0) (arg 2 1)))
     return
 .end
 
@@ -47,7 +47,7 @@
 
     ; simple condition:
     ; while (loop_counter < vector_length) {
-    if (igte iota loop_counter vector_length) while_end while_body
+    if (gte int64 iota loop_counter vector_length) while_end while_body
 
     .mark: while_body
 

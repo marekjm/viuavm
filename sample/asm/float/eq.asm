@@ -23,7 +23,7 @@
 .function: main/1
     fstore 1 0.69
     fstore 2 0.69
-    feq 1 1 2
+    eq float32 1 1 2
 
     ; should be true
     print 1

@@ -24,7 +24,7 @@
     istore limit 4
     strstore 1 "Hello World! (from long-running detached process) "
 .mark: loop
-    if (igte 3 counter limit) after_loop
+    if (gte int64 3 counter limit) after_loop
     echo 1
     print counter
     iinc counter

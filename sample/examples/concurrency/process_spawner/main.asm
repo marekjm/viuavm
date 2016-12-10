@@ -34,7 +34,7 @@
     izero counter
 
     .mark: begin_loop
-    if (igte 4 counter limit) end_loop +1
+    if (gte int64 4 counter limit) end_loop +1
 
     frame ^[(param 0 counter)]
     process void worker_process/1

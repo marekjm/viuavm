@@ -146,26 +146,6 @@ static string resolveregister(Token token) {
  */
 typedef Program& (Program::*ThreeIntopAssemblerFunction)(int_op, int_op, int_op);
 const map<string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS = {
-    { "iadd", &Program::opiadd },
-    { "isub", &Program::opisub },
-    { "imul", &Program::opimul },
-    { "idiv", &Program::opidiv },
-    { "ilt",  &Program::opilt },
-    { "ilte", &Program::opilte },
-    { "igt",  &Program::opigt },
-    { "igte", &Program::opigte },
-    { "ieq",  &Program::opieq },
-
-    { "fadd", &Program::opfadd },
-    { "fsub", &Program::opfsub },
-    { "fmul", &Program::opfmul },
-    { "fdiv", &Program::opfdiv },
-    { "flt",  &Program::opflt },
-    { "flte", &Program::opflte },
-    { "fgt",  &Program::opfgt },
-    { "fgte", &Program::opfgte },
-    { "feq",  &Program::opfeq },
-
     { "and",  &Program::opand },
     { "or",   &Program::opor },
 
@@ -207,48 +187,12 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
         program.opizero(assembler::operands::getint(resolveregister(tokens.at(i+1))));
     } else if (tokens.at(i) == "istore") {
         program.opistore(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
-    } else if (tokens.at(i) == "iadd") {
-        program.opiadd(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
-    } else if (tokens.at(i) == "isub") {
-        program.opisub(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
-    } else if (tokens.at(i) == "imul") {
-        program.opimul(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
-    } else if (tokens.at(i) == "idiv") {
-        program.opidiv(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
-    } else if (tokens.at(i) == "ilt") {
-        program.opilt(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
-    } else if (tokens.at(i) == "ilte") {
-        program.opilte(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
-    } else if (tokens.at(i) == "igte") {
-        program.opigte(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
-    } else if (tokens.at(i) == "igt") {
-        program.opigt(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
-    } else if (tokens.at(i) == "ieq") {
-        program.opieq(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "iinc") {
         program.opiinc(assembler::operands::getint(resolveregister(tokens.at(i+1))));
     } else if (tokens.at(i) == "idec") {
         program.opidec(assembler::operands::getint(resolveregister(tokens.at(i+1))));
     } else if (tokens.at(i) == "fstore") {
         program.opfstore(assembler::operands::getint(resolveregister(tokens.at(i+1))), static_cast<float>(stod(tokens.at(i+2).str())));
-    } else if (tokens.at(i) == "fadd") {
-        program.opfadd(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
-    } else if (tokens.at(i) == "fsub") {
-        program.opfsub(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
-    } else if (tokens.at(i) == "fmul") {
-        program.opfmul(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
-    } else if (tokens.at(i) == "fdiv") {
-        program.opfdiv(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
-    } else if (tokens.at(i) == "flt") {
-        program.opflt(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
-    } else if (tokens.at(i) == "flte") {
-        program.opflte(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
-    } else if (tokens.at(i) == "fgt") {
-        program.opfgt(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
-    } else if (tokens.at(i) == "fgte") {
-        program.opfgte(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
-    } else if (tokens.at(i) == "feq") {
-        program.opfeq(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
     } else if (tokens.at(i) == "itof") {
         program.opitof(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
     } else if (tokens.at(i) == "ftoi") {

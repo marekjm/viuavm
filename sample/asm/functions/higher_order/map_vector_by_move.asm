@@ -20,7 +20,7 @@
 .function: square/1
     ; this function takes single integer as its argument,
     ; squares it and returns the result
-    imul 0 (arg 1 0) 1
+    mul int64 0 (arg 1 0) 1
     return
 .end
 
@@ -61,7 +61,7 @@
 
     ; while (...) {
     .mark: loop_begin
-    if (igte 6 4 5) loop_end
+    if (gte int64 6 4 5) loop_end
 
     ; call supplied function on current element...
     frame ^[(param 0 *(vat 7 2 @4))]

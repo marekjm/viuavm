@@ -65,31 +65,10 @@ class Program {
 
     Program& opizero(int_op);
     Program& opistore(int_op, int_op);
-    Program& opiadd(int_op, int_op, int_op);
-    Program& opisub(int_op, int_op, int_op);
-    Program& opimul(int_op, int_op, int_op);
-    Program& opidiv(int_op, int_op, int_op);
-
     Program& opiinc(int_op);
     Program& opidec(int_op);
 
-    Program& opilt(int_op, int_op, int_op);
-    Program& opilte(int_op, int_op, int_op);
-    Program& opigt(int_op, int_op, int_op);
-    Program& opigte(int_op, int_op, int_op);
-    Program& opieq(int_op, int_op, int_op);
-
     Program& opfstore(int_op, float);
-    Program& opfadd(int_op, int_op, int_op);
-    Program& opfsub(int_op, int_op, int_op);
-    Program& opfmul(int_op, int_op, int_op);
-    Program& opfdiv(int_op, int_op, int_op);
-
-    Program& opflt(int_op, int_op, int_op);
-    Program& opflte(int_op, int_op, int_op);
-    Program& opfgt(int_op, int_op, int_op);
-    Program& opfgte(int_op, int_op, int_op);
-    Program& opfeq(int_op, int_op, int_op);
 
     Program& opitof(int_op, int_op);
     Program& opftoi(int_op, int_op);

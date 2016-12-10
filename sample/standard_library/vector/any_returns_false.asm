@@ -18,7 +18,7 @@
 ;
 
 .function: is_not_negative/1
-    igte 0 (arg 1 0) (izero 2)
+    gte int64 0 (arg 1 0) (izero 2)
     return
 .end
 

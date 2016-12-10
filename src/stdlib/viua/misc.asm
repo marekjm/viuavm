@@ -50,7 +50,7 @@
     .mark: loop_begin
     ; counting from N to zero
     ; when 0 is reached, stop iterating
-    igt 3 0 1
+    gt int64 3 0 1
     if 3 loop_body loop_end
 
     .mark: loop_body
@@ -85,13 +85,13 @@
     arg (.name: iota counter) 0
 
     .name: iota i
-    isub counter counter (istore i 9)
-    idiv counter counter (istore i 2)
+    sub int64 counter counter (istore i 9)
+    div int64 counter counter (istore i 2)
 
     izero (.name: iota zero)
 
     .mark: __loop_begin
-    if (ilte i counter zero) __loop_end +1
+    if (lte int64 i counter zero) __loop_end +1
     idec counter
     jump __loop_begin
     .mark: __loop_end

@@ -42,7 +42,7 @@
 
     ; while (...) {
     .mark: loop_begin
-    if (igte 6 4 5) loop_end loop_body
+    if (gte int64 6 4 5) loop_end loop_body
 
     .mark: loop_body
 
@@ -91,7 +91,7 @@
 
     ; loop condition
     .mark: loop_begin
-    if (ilt iota counter list_length) loop_body loop_end
+    if (lt int64 iota counter list_length) loop_body loop_end
 
     .mark: loop_body
 
@@ -130,7 +130,7 @@
 
     ; while (...) {
     .mark: loop_begin
-    igte 6 4 5
+    gte int64 6 4 5
     if 6 loop_end loop_body
 
     .mark: loop_body
@@ -216,7 +216,7 @@
     ; simple condition:
     ; while (loop_counter < vector_length) {
     .name: 5 loop_condition
-    igte loop_condition loop_counter vector_length
+    gte int64 loop_condition loop_counter vector_length
     if loop_condition while_end while_body
 
     .mark: while_body

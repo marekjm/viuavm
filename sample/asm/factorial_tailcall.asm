@@ -23,12 +23,12 @@
     ; multiply "result" (reference) by "number" (copy)
     ; and store the resulting integer in "result"
     ; calculation is available outside of the local scope
-    imul result (arg result 1) (arg number 0)
+    mul int64 result (arg result 1) (arg number 0)
     idec number
 
     ; if counter is equal to zero
     ; finish "factorial" calls
-    if (ieq 4 number (istore 3 0)) finish
+    if (eq int64 4 number (istore 3 0)) finish
 
     ; this frame must be the same as in "main"
     ; result must still be a reference

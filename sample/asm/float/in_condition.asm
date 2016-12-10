@@ -26,7 +26,7 @@
     ; generate false
     istore 2 0
     istore 3 1
-    ieq 2 2 3
+    eq int64 2 2 3
 
     ; check
     if 1 ok fin

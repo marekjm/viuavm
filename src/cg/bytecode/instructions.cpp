@@ -99,22 +99,6 @@ namespace cg {
             return insertTwoIntegerOpsInstruction(addr_ptr, ISTORE, regno, i);
         }
 
-        byte* opiadd(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
-            return insertThreeIntegerOpsInstruction(addr_ptr, IADD, rega, regb, regr);
-        }
-
-        byte* opisub(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
-            return insertThreeIntegerOpsInstruction(addr_ptr, ISUB, rega, regb, regr);
-        }
-
-        byte* opimul(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
-            return insertThreeIntegerOpsInstruction(addr_ptr, IMUL, rega, regb, regr);
-        }
-
-        byte* opidiv(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
-            return insertThreeIntegerOpsInstruction(addr_ptr, IDIV, rega, regb, regr);
-        }
-
         byte* opiinc(byte* addr_ptr, int_op regno) {
             *(addr_ptr++) = IINC;
             return insertIntegerOperand(addr_ptr, regno);
@@ -125,26 +109,6 @@ namespace cg {
             return insertIntegerOperand(addr_ptr, regno);
         }
 
-        byte* opilt(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
-            return insertThreeIntegerOpsInstruction(addr_ptr, ILT, rega, regb, regr);
-        }
-
-        byte* opilte(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
-            return insertThreeIntegerOpsInstruction(addr_ptr, ILTE, rega, regb, regr);
-        }
-
-        byte* opigt(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
-            return insertThreeIntegerOpsInstruction(addr_ptr, IGT, rega, regb, regr);
-        }
-
-        byte* opigte(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
-            return insertThreeIntegerOpsInstruction(addr_ptr, IGTE, rega, regb, regr);
-        }
-
-        byte* opieq(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
-            return insertThreeIntegerOpsInstruction(addr_ptr, IEQ, rega, regb, regr);
-        }
-
         byte* opfstore(byte* addr_ptr, int_op regno, float f) {
             *(addr_ptr++) = FSTORE;
             addr_ptr = insertIntegerOperand(addr_ptr, regno);
@@ -152,42 +116,6 @@ namespace cg {
             pointer::inc<float, byte>(addr_ptr);
 
             return addr_ptr;
-        }
-
-        byte* opfadd(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
-            return insertThreeIntegerOpsInstruction(addr_ptr, FADD, rega, regb, regr);
-        }
-
-        byte* opfsub(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
-            return insertThreeIntegerOpsInstruction(addr_ptr, FSUB, rega, regb, regr);
-        }
-
-        byte* opfmul(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
-            return insertThreeIntegerOpsInstruction(addr_ptr, FMUL, rega, regb, regr);
-        }
-
-        byte* opfdiv(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
-            return insertThreeIntegerOpsInstruction(addr_ptr, FDIV, rega, regb, regr);
-        }
-
-        byte* opflt(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
-            return insertThreeIntegerOpsInstruction(addr_ptr, FLT, rega, regb, regr);
-        }
-
-        byte* opflte(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
-            return insertThreeIntegerOpsInstruction(addr_ptr, FLTE, rega, regb, regr);
-        }
-
-        byte* opfgt(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
-            return insertThreeIntegerOpsInstruction(addr_ptr, FGT, rega, regb, regr);
-        }
-
-        byte* opfgte(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
-            return insertThreeIntegerOpsInstruction(addr_ptr, FGTE, rega, regb, regr);
-        }
-
-        byte* opfeq(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
-            return insertThreeIntegerOpsInstruction(addr_ptr, FEQ, rega, regb, regr);
         }
 
         byte* opitof(byte* addr_ptr, int_op a, int_op b) {

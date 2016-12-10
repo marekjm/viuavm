@@ -23,7 +23,7 @@
 
     fstore 2 1.0
 
-    flt 3 1 2
+    lt float32 3 1 2
     print 3
 
     izero 0

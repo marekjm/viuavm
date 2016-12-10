@@ -35,68 +35,14 @@ byte* viua::process::Process::dispatch(byte* addr) {
         case ISTORE:
             addr = opistore(addr+1);
             break;
-        case IADD:
-            addr = opiadd(addr+1);
-            break;
-        case ISUB:
-            addr = opisub(addr+1);
-            break;
-        case IMUL:
-            addr = opimul(addr+1);
-            break;
-        case IDIV:
-            addr = opidiv(addr+1);
-            break;
         case IINC:
             addr = opiinc(addr+1);
             break;
         case IDEC:
             addr = opidec(addr+1);
             break;
-        case ILT:
-            addr = opilt(addr+1);
-            break;
-        case ILTE:
-            addr = opilte(addr+1);
-            break;
-        case IGT:
-            addr = opigt(addr+1);
-            break;
-        case IGTE:
-            addr = opigte(addr+1);
-            break;
-        case IEQ:
-            addr = opieq(addr+1);
-            break;
         case FSTORE:
             addr = opfstore(addr+1);
-            break;
-        case FADD:
-            addr = opfadd(addr+1);
-            break;
-        case FSUB:
-            addr = opfsub(addr+1);
-            break;
-        case FMUL:
-            addr = opfmul(addr+1);
-            break;
-        case FDIV:
-            addr = opfdiv(addr+1);
-            break;
-        case FLT:
-            addr = opflt(addr+1);
-            break;
-        case FLTE:
-            addr = opflte(addr+1);
-            break;
-        case FGT:
-            addr = opfgt(addr+1);
-            break;
-        case FGTE:
-            addr = opfgte(addr+1);
-            break;
-        case FEQ:
-            addr = opfeq(addr+1);
             break;
         case ITOF:
             addr = opitof(addr+1);

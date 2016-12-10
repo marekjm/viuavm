@@ -52,7 +52,7 @@
 
     ; integer at 1 is *at least* N
     ; N is the parameter the function received
-    if (not (ilt 4 1 (arg 3 0))) finish
+    if (not (lt int64 4 1 (arg 3 0))) finish
 
     .mark: report
     print 1

@@ -161,31 +161,10 @@ namespace viua {
              */
             byte* opizero(byte*);
             byte* opistore(byte*);
-            byte* opiadd(byte*);
-            byte* opisub(byte*);
-            byte* opimul(byte*);
-            byte* opidiv(byte*);
-
-            byte* opilt(byte*);
-            byte* opilte(byte*);
-            byte* opigt(byte*);
-            byte* opigte(byte*);
-            byte* opieq(byte*);
-
             byte* opiinc(byte*);
             byte* opidec(byte*);
 
             byte* opfstore(byte*);
-            byte* opfadd(byte*);
-            byte* opfsub(byte*);
-            byte* opfmul(byte*);
-            byte* opfdiv(byte*);
-
-            byte* opflt(byte*);
-            byte* opflte(byte*);
-            byte* opfgt(byte*);
-            byte* opfgte(byte*);
-            byte* opfeq(byte*);
 
             byte* opitof(byte*);
             byte* opftoi(byte*);

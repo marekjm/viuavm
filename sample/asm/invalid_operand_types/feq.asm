@@ -23,7 +23,7 @@
 
     fstore 2 1.0
 
-    feq 3 1 2
+    eq float32 3 1 2
     print 3
 
     izero 0

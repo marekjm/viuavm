@@ -20,7 +20,7 @@
 .function: main/1
     istore 1 1
     strstore 2 "Hello World!"
-    isub 3 1 2
+    sub int64 3 1 2
     print 3
 
     izero 0

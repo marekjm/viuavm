@@ -31,8 +31,8 @@
     arg number 0
 
     .mark: loop
-    if (not (ilt 5 (vlen length vector) number)) finished
-    iadd 8 *(vat 6 vector -1) *(vat 7 vector -2)
+    if (not (lt int64 5 (vlen length vector) number)) finished
+    add int64 8 *(vat 6 vector -1) *(vat 7 vector -2)
     vpush vector 8
     jump loop
 

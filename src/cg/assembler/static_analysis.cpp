@@ -477,11 +477,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             registers.insert(resolve_register_name(named_registers, body_tokens.at(i)), body_tokens.at(i));
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "iadd" or token == "isub" or token == "imul" or token == "idiv" or
-                   token == "ilt" or token == "ilte" or token == "igt" or token == "igte" or token == "ieq" or
-                   token == "fadd" or token == "fsub" or token == "fmul" or token == "fdiv" or
-                   token == "flt" or token == "flte" or token == "fgt" or token == "fgte" or token == "feq" or
-                   token == "and" or token == "or") {
+        } else if (token == "and" or token == "or") {
             ++i; // skip mnemonic token
             check_use_of_register(body_tokens, i+1, i, registers, named_registers);
             check_use_of_register(body_tokens, i+2, i, registers, named_registers);

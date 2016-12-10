@@ -49,66 +49,6 @@ byte* viua::process::Process::opistore(byte* addr) {
     return addr;
 }
 
-template<class Operator, class ResultType> byte* perform(byte* addr, viua::process::Process* t) {
-    /** Heavily abstracted binary opcode implementation for Integer-related instructions.
-     *
-     *  First parameter - byte* addr - is the instruction pointer from which operand extraction should begin.
-     *
-     *  Second parameter - viua::process::Process* t - is a pointer to current VM process (passed as `this`).
-     */
-    unsigned target_register_index = 0;
-    tie(addr, target_register_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, t);
-
-    viua::types::Type *first = nullptr, *second = nullptr;
-    tie(addr, first) = viua::bytecode::decoder::operands::fetch_object(addr, t);
-    tie(addr, second) = viua::bytecode::decoder::operands::fetch_object(addr, t);
-
-    using viua::types::numeric::Number;
-
-    viua::assertions::expect_types<Number>("Number", first, second);
-
-    // FIXME use 64 bit integers by default
-    t->put(target_register_index, unique_ptr<viua::types::Type>{new ResultType(Operator()(dynamic_cast<Number*>(first)->as_int32(), dynamic_cast<Number*>(second)->as_int32()))});
-
-    return addr;
-}
-
-byte* viua::process::Process::opiadd(byte* addr) {
-    return perform<std::plus<int>, viua::types::Integer>(addr, this);
-}
-
-byte* viua::process::Process::opisub(byte* addr) {
-    return perform<std::minus<int>, viua::types::Integer>(addr, this);
-}
-
-byte* viua::process::Process::opimul(byte* addr) {
-    return perform<std::multiplies<int>, viua::types::Integer>(addr, this);
-}
-
-byte* viua::process::Process::opidiv(byte* addr) {
-    return perform<std::divides<int>, viua::types::Integer>(addr, this);
-}
-
-byte* viua::process::Process::opilt(byte* addr) {
-    return perform<std::less<int>, viua::types::Boolean>(addr, this);
-}
-
-byte* viua::process::Process::opilte(byte* addr) {
-    return perform<std::less_equal<int>, viua::types::Boolean>(addr, this);
-}
-
-byte* viua::process::Process::opigt(byte* addr) {
-    return perform<std::greater<int>, viua::types::Boolean>(addr, this);
-}
-
-byte* viua::process::Process::opigte(byte* addr) {
-    return perform<std::greater_equal<int>, viua::types::Boolean>(addr, this);
-}
-
-byte* viua::process::Process::opieq(byte* addr) {
-    return perform<std::equal_to<int>, viua::types::Boolean>(addr, this);
-}
-
 byte* viua::process::Process::opiinc(byte* addr) {
     viua::types::Type* target { nullptr };
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_object(addr, this);

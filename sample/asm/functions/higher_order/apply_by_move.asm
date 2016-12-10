@@ -20,7 +20,7 @@
 .function: square/1
     ; this function takes single integer as its argument,
     ; squares it and returns the result
-    imul 0 (arg 1 0) 1
+    mul int64 0 (arg 1 0) 1
     return
 .end
 

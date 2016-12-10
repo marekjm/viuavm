@@ -24,7 +24,7 @@
 
     .mark: loop
     .name: iota format_parameters
-    if (igte iota counter limit) after_loop
+    if (gte int64 iota counter limit) after_loop
 
     frame ^[(param iota report_text_format) (param iota (vec format_parameters (copy format_parameters counter) 1))]
     print (msg iota format/)

@@ -18,7 +18,7 @@
 ;
 
 .function: adder/1
-    iadd 0 (arg 0 0) (istore 1 21)
+    add int64 0 (arg 0 0) (istore 1 21)
     return
 .end
 

@@ -23,7 +23,7 @@
 .function: main/1
     istore 1 2
     istore 2 1
-    ilte 3 2 1
+    lte int64 3 2 1
     print 3
     izero 0
     return

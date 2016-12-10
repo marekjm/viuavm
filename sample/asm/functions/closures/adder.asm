@@ -20,7 +20,7 @@
 .function: adder/1
     ; expects register 1 to be an captured integer
     arg 2 0
-    iadd 0 2 1
+    add int32 0 2 1
     return
 .end
 

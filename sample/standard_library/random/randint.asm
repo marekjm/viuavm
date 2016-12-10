@@ -58,7 +58,7 @@
 
     ; extract lower bound if 2 or more operands were given, default to 0 otherwise
     istore 3 2
-    if (igte 5 2 3) +1 default_lower_bound
+    if (gte int64 5 2 3) +1 default_lower_bound
     idec 3
     stoi 4 *(vat 3 1 @3)
     ; register holding object obtained from vector must be emptied before reuse
@@ -71,7 +71,7 @@
 
     ; extract upper bound if 3 or more operands were given, default to 100 otherwise
     istore 4 3
-    if (igte 5 2 4) +1 default_upper_bound
+    if (gte int64 5 2 4) +1 default_upper_bound
     idec 4
     stoi 5 *(vat 4 1 @4)
     ; register holding object obtained from vector must be emptied before reuse

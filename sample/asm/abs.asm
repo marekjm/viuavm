@@ -35,8 +35,8 @@
     ; else, branch directly to print instruction
     ; the negation of boolean is just to use short form of branch
     ; instruction - this construction starts emerging as a pattern...
-    if (not (ilt is_negative number (istore zero 0))) final_print
-    imul number (istore iota -1)
+    if (not (lt int64 is_negative number (istore zero 0))) final_print
+    mul int64 number (istore iota -1)
 
     .mark: final_print
     print number

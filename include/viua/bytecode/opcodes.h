@@ -30,29 +30,11 @@ enum OPCODE : byte {
     // integer instructions
     IZERO,
     ISTORE,
-    IADD,
-    ISUB,
-    IMUL,
-    IDIV,
     IINC,
     IDEC,
-    ILT,
-    ILTE,
-    IGT,
-    IGTE,
-    IEQ,
 
     // float instructions
     FSTORE,
-    FADD,
-    FSUB,
-    FMUL,
-    FDIV,
-    FLT,
-    FLTE,
-    FGT,
-    FGTE,
-    FEQ,
 
     // numeric conversion instructions
     ITOF,   // convert integer to float

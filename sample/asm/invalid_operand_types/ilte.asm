@@ -22,7 +22,7 @@
 
     register (class 2 Foo)
     new 2 Foo
-    ilte 3 2 1
+    lte int64 3 2 1
     print 3
 
     izero 0

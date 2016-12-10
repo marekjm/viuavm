@@ -38,7 +38,7 @@
 .closure: closure_level_3/1
     ; expects 1, 2 and 3 to be captured integers
     .name: 5 accumulator
-    move 0 (iadd accumulator (arg 4 0) (iadd accumulator 3 (iadd accumulator 1 2)))
+    move 0 (add int64 accumulator (arg 4 0) (add int8 accumulator 3 (add int8 accumulator 1 2)))
     return
 .end
 

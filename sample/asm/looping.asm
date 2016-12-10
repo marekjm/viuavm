@@ -26,7 +26,7 @@
 
     ; mark the beginning of the loop
     .mark: loop
-    ilt 3 1 2
+    lt int64 3 1 2
     ; invert value to use short form of branch instruction, i.e.: branch <cond> <true>
     ; and expliot the fact that it will default false to "next instruction"
     not 3
