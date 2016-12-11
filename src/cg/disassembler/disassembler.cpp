@@ -48,6 +48,10 @@ string disassembler::intop(byte* ptr) {
             oss << '*' << *reinterpret_cast<int*>(ptr);
             pointer::inc<int, byte>(ptr);
             break;
+        case OT_INT:
+            oss << *reinterpret_cast<int*>(ptr);
+            pointer::inc<int, byte>(ptr);
+            break;
         default:
             throw "invalid operand type detected";
     }
