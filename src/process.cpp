@@ -140,7 +140,7 @@ byte* viua::process::Process::adjustJumpBaseFor(const string& call_name) {
     jump_base = ep.second;
     return entry_point;
 }
-byte* viua::process::Process::callNative(byte* return_address, const string& call_name, const bool return_void, const unsigned return_index, const string&) {
+byte* viua::process::Process::callNative(byte* return_address, const string& call_name, const bool return_void, const viua::internals::types::register_index return_index, const string&) {
     byte* call_address = adjustJumpBaseFor(call_name);
 
     if (not frame_new) {
@@ -157,7 +157,7 @@ byte* viua::process::Process::callNative(byte* return_address, const string& cal
 
     return call_address;
 }
-byte* viua::process::Process::callForeign(byte* return_address, const string& call_name, const bool return_void, const unsigned return_index, const string&) {
+byte* viua::process::Process::callForeign(byte* return_address, const string& call_name, const bool return_void, const viua::internals::types::register_index return_index, const string&) {
     if (not frame_new) {
         throw new viua::types::Exception("external function call without a frame: use `frame 0' in source code if the function takes no parameters");
     }
@@ -173,7 +173,7 @@ byte* viua::process::Process::callForeign(byte* return_address, const string& ca
 
     return return_address;
 }
-byte* viua::process::Process::callForeignMethod(byte* return_address, viua::types::Type* object, const string& call_name, const bool return_void, const unsigned return_index, const string&) {
+byte* viua::process::Process::callForeignMethod(byte* return_address, viua::types::Type* object, const string& call_name, const bool return_void, const viua::internals::types::register_index return_index, const string&) {
     if (not frame_new) {
         throw new viua::types::Exception("foreign method call without a frame");
     }
@@ -206,7 +206,7 @@ byte* viua::process::Process::callForeignMethod(byte* return_address, viua::type
 
     // FIXME: woohoo! segfault!
     unique_ptr<viua::types::Type> returned;
-    unsigned return_value_register = frames.back()->place_return_value_in;
+    viua::internals::types::register_index return_value_register = frames.back()->place_return_value_in;
     if (return_value_register != 0 and not frames.back()->return_void) {
         // we check in 0. register because it's reserved for return values
         if (currently_used_register_set->at(0) == nullptr) {
