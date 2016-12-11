@@ -50,7 +50,7 @@ bool viua::types::Closure::boolean() const {
 }
 
 unique_ptr<viua::types::Type> viua::types::Closure::copy() const {
-    return unique_ptr<viua::types::Closure>{new viua::types::Closure(function_name, std::move(local_register_set->copy()))};
+    return unique_ptr<viua::types::Closure>{new viua::types::Closure(function_name, local_register_set->copy())};
 }
 
 

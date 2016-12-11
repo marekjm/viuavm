@@ -45,7 +45,7 @@ void viua::scheduler::ffi::ForeignFunctionCallRequest::call(ForeignFunction* cal
             if (frame->local_register_set->at(0) == nullptr) {
                 caller_process->raise(unique_ptr<viua::types::Type>{new viua::types::Exception("return value requested by frame but external function did not set return register")});
             }
-            returned = std::move(frame->local_register_set->pop(0));
+            returned = frame->local_register_set->pop(0);
         }
 
         // place return value

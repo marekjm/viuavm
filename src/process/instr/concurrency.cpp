@@ -98,7 +98,7 @@ byte* viua::process::Process::opjoin(byte* addr) {
                 thrown = thrd->transferActiveException();
             }
             if (not target_is_void) {
-                place(target, std::move(thrd->getReturnValue()));
+                place(target, thrd->getReturnValue());
             }
         } else if (timeout_active and (not wait_until_infinity) and (waiting_until < std::chrono::steady_clock::now())) {
             timeout_active = false;
@@ -121,7 +121,7 @@ byte* viua::process::Process::opsend(byte* addr) {
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     if (auto thrd = dynamic_cast<viua::types::Process*>(fetch(target))) {
-        scheduler->send(thrd->pid(), std::move(pop(source)));
+        scheduler->send(thrd->pid(), pop(source));
     } else {
         throw new viua::types::Exception("invalid type: expected viua::process::Process");
     }

@@ -41,7 +41,7 @@ byte* viua::process::Process::opcopy(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    place(target, std::move(source->copy()));
+    place(target, source->copy());
 
     return addr;
 }
@@ -51,7 +51,7 @@ byte* viua::process::Process::opptr(byte* addr) {
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    place(target, std::move(source->pointer()));
+    place(target, source->pointer());
 
     return addr;
 }
@@ -112,7 +112,7 @@ byte* viua::process::Process::optmpri(byte* addr) {
     viua::internals::types::register_index target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    tmp = std::move(pop(target));
+    tmp = pop(target);
     return addr;
 }
 byte* viua::process::Process::optmpro(byte* addr) {

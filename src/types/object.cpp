@@ -54,7 +54,7 @@ string viua::types::Object::str() const {
 unique_ptr<viua::types::Type> viua::types::Object::copy() const {
     unique_ptr<viua::types::Object> cp {new viua::types::Object(type_name)};
     for (const auto& each : attributes) {
-        cp->set(each.first, std::move(each.second->copy()));
+        cp->set(each.first, each.second->copy());
     }
     return std::move(cp);
 }
@@ -74,7 +74,7 @@ unique_ptr<viua::types::Type> viua::types::Object::remove(const string& key) {
     }
     auto o = std::move(attributes.at(key));
     attributes.erase(key);
-    return std::move(o);
+    return o;
 }
 
 

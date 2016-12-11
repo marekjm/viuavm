@@ -898,7 +898,7 @@ int generate(vector<Token>& tokens, invocables_t& functions, invocables_t& block
             }
         }
 
-        linked_libs_bytecode.emplace_back(lnk, loader.getBytecodeSize(), std::move(loader.getBytecode()));
+        linked_libs_bytecode.emplace_back(lnk, loader.getBytecodeSize(), loader.getBytecode());
         bytes += loader.getBytecodeSize();
     }
 

@@ -252,7 +252,7 @@ unique_ptr<byte[]> Loader::getBytecode() {
     for (uint64_t i = 0; i < size; ++i) {
         copy[i] = bytecode[i];
     }
-    return std::move(copy);
+    return copy;
 }
 
 vector<uint64_t> Loader::getJumps() {

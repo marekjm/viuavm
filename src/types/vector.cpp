@@ -68,7 +68,7 @@ unique_ptr<viua::types::Type> viua::types::Vector::pop(long int index) {
     auto it = (internal_object.begin()+offset);
     unique_ptr<viua::types::Type> object = std::move(*it);
     internal_object.erase(it);
-    return std::move(object);
+    return object;
 }
 
 viua::types::Type* viua::types::Vector::at(long int index) {
@@ -115,7 +115,7 @@ bool viua::types::Vector::boolean() const {
 unique_ptr<viua::types::Type> viua::types::Vector::copy() const {
     unique_ptr<viua::types::Vector> vec {new Vector()};
     for (unsigned i = 0; i < internal_object.size(); ++i) {
-        vec->push(std::move(internal_object[i]->copy()));
+        vec->push(internal_object[i]->copy());
     }
     return std::move(vec);
 }
@@ -128,7 +128,7 @@ viua::types::Vector::Vector() {
 }
 viua::types::Vector::Vector(const std::vector<viua::types::Type*>& v) {
     for (unsigned i = 0; i < v.size(); ++i) {
-        internal_object.push_back(std::move(v[i]->copy()));
+        internal_object.push_back(v[i]->copy());
     }
 }
 viua::types::Vector::~Vector() {

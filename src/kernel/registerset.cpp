@@ -41,7 +41,7 @@ unique_ptr<viua::types::Type> viua::kernel::RegisterSet::pop(registerset_size_ty
         // FIXME: throw an exception on read from empty register
     }
     empty(index);
-    return std::move(object);
+    return object;
 }
 
 void viua::kernel::RegisterSet::set(registerset_size_type index, unique_ptr<viua::types::Type> object) {
@@ -101,7 +101,7 @@ void viua::kernel::RegisterSet::move(registerset_size_type src, registerset_size
      */
     if (src >= registerset_size) { throw new viua::types::Exception("register access out of bounds: move source"); }
     if (dst >= registerset_size) { throw new viua::types::Exception("register access out of bounds: move destination"); }
-    set(dst, std::move(pop(src)));
+    set(dst, pop(src));
 }
 
 void viua::kernel::RegisterSet::swap(registerset_size_type src, registerset_size_type dst) {
@@ -241,10 +241,10 @@ unique_ptr<viua::kernel::RegisterSet> viua::kernel::RegisterSet::copy() {
     unique_ptr<viua::kernel::RegisterSet> rscopy {new viua::kernel::RegisterSet(size())};
     for (unsigned i = 0; i < size(); ++i) {
         if (at(i) == nullptr) { continue; }
-        rscopy->set(i, std::move(at(i)->copy()));
+        rscopy->set(i, at(i)->copy());
         rscopy->setmask(i, getmask(i));
     }
-    return std::move(rscopy);
+    return rscopy;
 }
 
 viua::kernel::RegisterSet::RegisterSet(registerset_size_type sz): registerset_size(sz) {

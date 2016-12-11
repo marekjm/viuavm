@@ -411,7 +411,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                 viua::kernel::RegisterSet *top_args = th->trace().at(0)->arguments.get();
                 for (unsigned long j = 0; j < top_args->size(); ++j) {
                     if (top_args->at(j)) {
-                        parameters->push(std::move(top_args->pop(j)));
+                        parameters->push(top_args->pop(j));
                     }
                 }
 

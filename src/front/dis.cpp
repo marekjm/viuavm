@@ -150,7 +150,7 @@ int main(int argc, char* argv[]) {
     }
 
     uint64_t bytes = loader.getBytecodeSize();
-    unique_ptr<byte[]> bytecode = std::move(loader.getBytecode());
+    unique_ptr<byte[]> bytecode = loader.getBytecode();
 
     map<string, uint64_t> function_address_mapping = loader.getFunctionAddresses();
     vector<string> functions = loader.getFunctions();

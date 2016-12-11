@@ -103,7 +103,7 @@ byte* viua::process::Process::opthrow(byte* addr) {
         throw new viua::types::Exception(oss.str());
     }
 
-    thrown = std::move(currently_used_register_set->pop(source));
+    thrown = currently_used_register_set->pop(source);
 
     return addr;
 }
