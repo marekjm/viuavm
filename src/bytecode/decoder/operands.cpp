@@ -91,6 +91,20 @@ auto viua::bytecode::decoder::operands::fetch_register_index(byte *ip, viua::pro
     return extract_register_index(ip, process);
 }
 
+auto viua::bytecode::decoder::operands::fetch_timeout(byte *ip, viua::process::Process*) -> tuple<byte*, unsigned> {
+    OperandType ot = viua::bytecode::decoder::operands::get_operand_type(ip);
+    ++ip;
+
+    viua::internals::types::timeout value = 0;
+    if (ot == OT_INT) {
+        value = *reinterpret_cast<decltype(value)*>(ip);
+        ip += sizeof(decltype(value));
+    } else {
+        throw new viua::types::Exception("decoded invalid operand type");
+    }
+    return tuple<byte*, int>(ip, value);
+}
+
 auto viua::bytecode::decoder::operands::fetch_primitive_uint(byte *ip, viua::process::Process *process) -> tuple<byte*, unsigned> {
     // currently the logic is the same since RI's are encoded as unsigned integers
     return fetch_register_index(ip, process);

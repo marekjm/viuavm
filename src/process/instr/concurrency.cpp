@@ -76,9 +76,11 @@ byte* viua::process::Process::opjoin(byte* addr) {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 
-    unsigned source = 0, timeout = 0;
+    unsigned source = 0;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    tie(addr, timeout) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+
+    unsigned timeout = 0;
+    tie(addr, timeout) = viua::bytecode::decoder::operands::fetch_timeout(addr, this);
 
     if (timeout and not timeout_active) {
         waiting_until = (std::chrono::steady_clock::now() + std::chrono::milliseconds(timeout-1));
@@ -144,7 +146,7 @@ byte* viua::process::Process::opreceive(byte* addr) {
     }
 
     unsigned timeout = 0;
-    tie(addr, timeout) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, timeout) = viua::bytecode::decoder::operands::fetch_timeout(addr, this);
 
     if (timeout and not timeout_active) {
         waiting_until = (std::chrono::steady_clock::now() + std::chrono::milliseconds(timeout-1));

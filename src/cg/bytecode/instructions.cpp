@@ -424,7 +424,14 @@ namespace cg {
             *(addr_ptr++) = JOIN;
             addr_ptr = insert_ri_operand(addr_ptr, target);
             addr_ptr = insert_ri_operand(addr_ptr, source);
-            return insert_ri_operand(addr_ptr, timeout);
+
+            // FIXME change to OT_TIMEOUT?
+            *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_INT;
+            pointer::inc<OperandType, byte>(addr_ptr);
+            *(reinterpret_cast<viua::internals::types::timeout*>(addr_ptr))  = timeout.value;
+            pointer::inc<viua::internals::types::timeout, byte>(addr_ptr);
+
+            return addr_ptr;
         }
 
         byte* opsend(byte* addr_ptr, int_op target, int_op source) {
@@ -436,7 +443,14 @@ namespace cg {
         byte* opreceive(byte* addr_ptr, int_op reg, int_op timeout) {
             *(addr_ptr++) = RECEIVE;
             addr_ptr = insert_ri_operand(addr_ptr, reg);
-            return insert_ri_operand(addr_ptr, timeout);
+
+            // FIXME change to OT_TIMEOUT?
+            *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_INT;
+            pointer::inc<OperandType, byte>(addr_ptr);
+            *(reinterpret_cast<viua::internals::types::timeout*>(addr_ptr))  = timeout.value;
+            pointer::inc<viua::internals::types::timeout, byte>(addr_ptr);
+
+            return addr_ptr;
         }
 
         byte* opwatchdog(byte* addr_ptr, const string& fn_name) {
