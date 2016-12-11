@@ -109,9 +109,9 @@ namespace viua {
 
             std::queue<std::unique_ptr<viua::types::Type>> message_queue;
 
-            viua::types::Type* fetch(unsigned) const;
-            std::unique_ptr<viua::types::Type> pop(unsigned);
-            void place(unsigned, std::unique_ptr<viua::types::Type>);
+            viua::types::Type* fetch(viua::internals::types::register_index) const;
+            std::unique_ptr<viua::types::Type> pop(viua::internals::types::register_index);
+            void place(viua::internals::types::register_index, std::unique_ptr<viua::types::Type>);
             void ensureStaticRegisters(std::string);
 
             /*  Methods dealing with stack and frame manipulation, and
@@ -124,11 +124,11 @@ namespace viua {
             byte* adjustJumpBaseForBlock(const std::string&);
             byte* adjustJumpBaseFor(const std::string&);
             // call native (i.e. written in Viua) function
-            byte* callNative(byte*, const std::string&, const bool, const unsigned, const std::string&);
+            byte* callNative(byte*, const std::string&, const bool, const viua::internals::types::register_index, const std::string&);
             // call foreign (i.e. from a C++ extension) function
-            byte* callForeign(byte*, const std::string&, const bool, const unsigned, const std::string&);
+            byte* callForeign(byte*, const std::string&, const bool, const viua::internals::types::register_index, const std::string&);
             // call foreign method (i.e. method of a pure-C++ class loaded into machine's typesystem)
-            byte* callForeignMethod(byte*, viua::types::Type*, const std::string&, const bool, const unsigned, const std::string&);
+            byte* callForeignMethod(byte*, viua::types::Type*, const std::string&, const bool, const viua::internals::types::register_index, const std::string&);
 
             /*  Stack unwinding methods.
              */
@@ -261,8 +261,8 @@ namespace viua {
                 byte* dispatch(byte*);
                 byte* tick();
 
-                viua::types::Type* obtain(unsigned) const;
-                void put(unsigned, std::unique_ptr<viua::types::Type>);
+                viua::types::Type* obtain(viua::internals::types::register_index) const;
+                void put(viua::internals::types::register_index, std::unique_ptr<viua::types::Type>);
 
                 bool joinable() const;
                 void join();

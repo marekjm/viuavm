@@ -31,7 +31,7 @@
 using namespace std;
 
 
-viua::types::Type* viua::process::Process::fetch(unsigned index) const {
+viua::types::Type* viua::process::Process::fetch(viua::internals::types::register_index index) const {
     /*  Return pointer to object at given register.
      *  This method safeguards against reaching for out-of-bounds registers and
      *  reading from an empty register.
@@ -42,13 +42,13 @@ viua::types::Type* viua::process::Process::fetch(unsigned index) const {
     }
     return object;
 }
-viua::types::Type* viua::process::Process::obtain(unsigned index) const {
+viua::types::Type* viua::process::Process::obtain(viua::internals::types::register_index index) const {
     return fetch(index);
 }
-unique_ptr<viua::types::Type> viua::process::Process::pop(unsigned index) {
+unique_ptr<viua::types::Type> viua::process::Process::pop(viua::internals::types::register_index index) {
     return std::move(currently_used_register_set->pop(index));
 }
-void viua::process::Process::place(unsigned index, unique_ptr<viua::types::Type> obj) {
+void viua::process::Process::place(viua::internals::types::register_index index, unique_ptr<viua::types::Type> obj) {
     /** Place an object in register with given index.
      *
      *  Before placing an object in register, a check is preformed if the register is empty.
@@ -57,7 +57,7 @@ void viua::process::Process::place(unsigned index, unique_ptr<viua::types::Type>
      */
     currently_used_register_set->set(index, std::move(obj));
 }
-void viua::process::Process::put(unsigned index, unique_ptr<viua::types::Type> o) {
+void viua::process::Process::put(viua::internals::types::register_index index, unique_ptr<viua::types::Type> o) {
     place(index, std::move(o));
 }
 void viua::process::Process::ensureStaticRegisters(string function_name) {

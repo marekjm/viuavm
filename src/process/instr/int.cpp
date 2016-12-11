@@ -39,9 +39,9 @@ byte* viua::process::Process::opizero(byte* addr) {
 
 byte* viua::process::Process::opistore(byte* addr) {
     viua::internals::types::register_index target = 0;
-    int integer = 0;
-
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+
+    int integer = 0;
     tie(addr, integer) = viua::bytecode::decoder::operands::fetch_primitive_int(addr, this);
 
     place(target, unique_ptr<viua::types::Type>{new viua::types::Integer(integer)});

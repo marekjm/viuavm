@@ -39,7 +39,7 @@ void viua::scheduler::ffi::ForeignFunctionCallRequest::call(ForeignFunction* cal
         (*callback)(frame.get(), nullptr, nullptr, caller_process, kernel);
 
         unique_ptr<viua::types::Type> returned;
-        unsigned return_value_register = frame->place_return_value_in;
+        viua::internals::types::register_index return_value_register = frame->place_return_value_in;
         if (return_value_register != 0 and not frame->return_void) {
             // we check in 0. register because it's reserved for return values
             if (frame->local_register_set->at(0) == nullptr) {
