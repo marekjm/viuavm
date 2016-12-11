@@ -34,7 +34,7 @@ using namespace std;
 byte* viua::process::Process::opcapture(byte* addr) {
     /** Capture object by reference.
      */
-    unsigned target_closure_register = 0, target_register = 0, source_register = 0;
+    viua::internals::types::register_index target_closure_register = 0, target_register = 0, source_register = 0;
     tie(addr, target_closure_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, target_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
@@ -62,7 +62,7 @@ byte* viua::process::Process::opcapture(byte* addr) {
 byte* viua::process::Process::opcapturecopy(byte* addr) {
     /** Capture object by copy.
      */
-    unsigned target_closure_register = 0, target_register = 0;
+    viua::internals::types::register_index target_closure_register = 0, target_register = 0;
     tie(addr, target_closure_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, target_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
@@ -82,7 +82,7 @@ byte* viua::process::Process::opcapturecopy(byte* addr) {
 byte* viua::process::Process::opcapturemove(byte* addr) {
     /** Capture object by move.
      */
-    unsigned target_closure_register = 0, target_register = 0, source_register = 0;
+    viua::internals::types::register_index target_closure_register = 0, target_register = 0, source_register = 0;
     tie(addr, target_closure_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, target_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
@@ -104,7 +104,7 @@ byte* viua::process::Process::opclosure(byte* addr) {
         throw new viua::types::Exception("creating closures from nonlocal registers is forbidden");
     }
 
-    unsigned target = 0;
+    viua::internals::types::register_index target = 0;
     string function_name;
 
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
@@ -125,7 +125,7 @@ byte* viua::process::Process::opfunction(byte* addr) {
      *  are can be used to pass functions as parameters and
      *  return them from other functions.
      */
-    unsigned target = 0;
+    viua::internals::types::register_index target = 0;
     string function_name;
 
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
@@ -140,7 +140,7 @@ byte* viua::process::Process::opfcall(byte* addr) {
     /*  Call a function object.
      */
     bool return_void = viua::bytecode::decoder::operands::is_void(addr);
-    unsigned return_register = 0;
+    viua::internals::types::register_index return_register = 0;
 
     if (not return_void) {
         tie(addr, return_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);

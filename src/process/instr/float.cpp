@@ -32,7 +32,7 @@ using namespace std;
 byte* viua::process::Process::opfstore(byte* addr) {
     /*  Run fstore instruction.
      */
-    unsigned target = 0;
+    viua::internals::types::register_index target = 0;
     float value = 0.0;
 
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);

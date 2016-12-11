@@ -35,7 +35,7 @@ using namespace std;
 byte* viua::process::Process::opnew(byte* addr) {
     /** Create new instance of specified class.
      */
-    unsigned target = 0;
+    viua::internals::types::register_index target = 0;
     string class_name;
 
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
@@ -57,7 +57,7 @@ byte* viua::process::Process::opmsg(byte* addr) {
      *  To call a method using static dispatch (where a correct function is resolved during compilation) use
      *  "call" instruction.
      */
-    unsigned return_register = 0;
+    viua::internals::types::register_index return_register = 0;
     bool return_void = viua::bytecode::decoder::operands::is_void(addr);
 
     if (not return_void) {
@@ -80,7 +80,7 @@ byte* viua::process::Process::opmsg(byte* addr) {
     mro.insert(mro.begin(), obj->type());
 
     string function_name = "";
-    for (unsigned i = 0; i < mro.size(); ++i) {
+    for (decltype(mro.size()) i = 0; i < mro.size(); ++i) {
         if (not scheduler->isClass(mro[i])) {
             throw new viua::types::Exception("unavailable base type in inheritance hierarchy of " + mro[0] + ": " + mro[i]);
         }
@@ -127,7 +127,7 @@ byte* viua::process::Process::opinsert(byte* addr) {
         tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
         static_cast<viua::types::Object*>(object_operand)->insert(static_cast<viua::types::String*>(key_operand)->str(), std::move(source->copy()));
     } else {
-        unsigned source_index = 0;
+        viua::internals::types::register_index source_index = 0;
         tie(addr, source_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
         static_cast<viua::types::Object*>(object_operand)->insert(static_cast<viua::types::String*>(key_operand)->str(), std::move(pop(source_index)));
     }
@@ -138,7 +138,7 @@ byte* viua::process::Process::opinsert(byte* addr) {
 byte* viua::process::Process::opremove(byte* addr) {
     /** Remove an attribute of another object.
      */
-    unsigned target_index = 0;
+    viua::internals::types::register_index target_index = 0;
     bool void_target = false;
     if (viua::bytecode::decoder::operands::get_operand_type(addr) == OT_VOID) {
         void_target = true;

@@ -31,7 +31,7 @@ using namespace std;
 byte* viua::process::Process::opprocess(byte* addr) {
     /*  Run process instruction.
      */
-    unsigned target = 0;
+    viua::internals::types::register_index target = 0;
     bool target_is_void = viua::bytecode::decoder::operands::is_void(addr);
 
     if (not target_is_void) {
@@ -67,7 +67,7 @@ byte* viua::process::Process::opjoin(byte* addr) {
      */
     byte* return_addr = (addr-1);
 
-    unsigned target = 0;
+    viua::internals::types::register_index target = 0;
     bool target_is_void = viua::bytecode::decoder::operands::is_void(addr);
 
     if (not target_is_void) {
@@ -76,7 +76,7 @@ byte* viua::process::Process::opjoin(byte* addr) {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 
-    unsigned source = 0;
+    viua::internals::types::register_index source = 0;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     viua::internals::types::timeout timeout = 0;
@@ -115,7 +115,7 @@ byte* viua::process::Process::opjoin(byte* addr) {
 byte* viua::process::Process::opsend(byte* addr) {
     /** Send a message to a process.
      */
-    unsigned target = 0, source = 0;
+    viua::internals::types::register_index target = 0, source = 0;
 
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
@@ -136,7 +136,7 @@ byte* viua::process::Process::opreceive(byte* addr) {
      */
     byte* return_addr = (addr-1);
 
-    unsigned target = 0;
+    viua::internals::types::register_index target = 0;
     bool target_is_void = viua::bytecode::decoder::operands::is_void(addr);
 
     if (not target_is_void) {
@@ -209,7 +209,7 @@ byte* viua::process::Process::opwatchdog(byte* addr) {
 byte* viua::process::Process::opself(byte* addr) {
     /*  Run process instruction.
      */
-    unsigned target = 0;
+    viua::internals::types::register_index target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     place(target, unique_ptr<viua::types::Type>{new viua::types::Process(this)});

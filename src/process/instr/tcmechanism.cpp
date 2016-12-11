@@ -54,7 +54,7 @@ byte* viua::process::Process::opcatch(byte* addr) {
 byte* viua::process::Process::opdraw(byte* addr) {
     /** Run draw instruction.
      */
-    unsigned target = 0;
+    viua::internals::types::register_index target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     if (not caught) {
@@ -89,7 +89,7 @@ byte* viua::process::Process::openter(byte* addr) {
 byte* viua::process::Process::opthrow(byte* addr) {
     /** Run throw instruction.
      */
-    unsigned source = 0;
+    viua::internals::types::register_index source = 0;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     if (source >= currently_used_register_set->size()) {

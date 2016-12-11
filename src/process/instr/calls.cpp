@@ -42,7 +42,7 @@ byte* viua::process::Process::opframe(byte* addr) {
 byte* viua::process::Process::opparam(byte* addr) {
     /** Run param instruction.
      */
-    unsigned parameter_no_operand_index = 0;
+    viua::internals::types::register_index parameter_no_operand_index = 0;
     tie(addr, parameter_no_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     viua::types::Type *source = nullptr;
@@ -60,7 +60,7 @@ byte* viua::process::Process::opparam(byte* addr) {
 byte* viua::process::Process::oppamv(byte* addr) {
     /** Run pamv instruction.
      */
-    unsigned parameter_no_operand_index = 0, source = 0;
+    viua::internals::types::register_index parameter_no_operand_index = 0, source = 0;
     tie(addr, parameter_no_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
@@ -77,7 +77,7 @@ byte* viua::process::Process::oppamv(byte* addr) {
 byte* viua::process::Process::oparg(byte* addr) {
     /** Run arg instruction.
      */
-    unsigned destination_register_index = 0, parameter_no_operand_index = 0;
+    viua::internals::types::register_index destination_register_index = 0, parameter_no_operand_index = 0;
     bool destination_is_void = viua::bytecode::decoder::operands::is_void(addr);
 
     if (not destination_is_void) {
@@ -110,7 +110,7 @@ byte* viua::process::Process::oparg(byte* addr) {
 }
 
 byte* viua::process::Process::opargc(byte* addr) {
-    unsigned target = 0;
+    viua::internals::types::register_index target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     currently_used_register_set->set(target, unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<int>(frames.back()->arguments->size()))});
 
@@ -121,7 +121,7 @@ byte* viua::process::Process::opcall(byte* addr) {
     /*  Run call instruction.
      */
     bool return_void = viua::bytecode::decoder::operands::is_void(addr);
-    unsigned return_register = 0;
+    viua::internals::types::register_index return_register = 0;
 
     if (not return_void) {
         tie(addr, return_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
@@ -194,7 +194,7 @@ byte* viua::process::Process::opreturn(byte* addr) {
     addr = frames.back()->ret_address();
 
     unique_ptr<viua::types::Type> returned;
-    unsigned return_value_register = frames.back()->place_return_value_in;
+    viua::internals::types::register_index return_value_register = frames.back()->place_return_value_in;
     if (return_value_register != 0 and not frames.back()->return_void) {
         // we check in 0. register because it's reserved for return values
         if (currently_used_register_set->at(0) == nullptr) {

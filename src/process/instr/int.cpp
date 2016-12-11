@@ -31,14 +31,14 @@ using namespace std;
 
 
 byte* viua::process::Process::opizero(byte* addr) {
-    unsigned target = 0;
+    viua::internals::types::register_index target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     place(target, unique_ptr<viua::types::Type>{new viua::types::Integer(0)});
     return addr;
 }
 
 byte* viua::process::Process::opistore(byte* addr) {
-    unsigned target = 0;
+    viua::internals::types::register_index target = 0;
     int integer = 0;
 
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);

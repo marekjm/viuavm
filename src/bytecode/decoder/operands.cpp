@@ -64,15 +64,13 @@ auto viua::bytecode::decoder::operands::fetch_operand_type(byte *ip) -> tuple<by
     return tuple<byte*, OperandType>{ip, ot};
 }
 
-static auto extract_register_index(byte *ip, viua::process::Process *process, bool pointers_allowed = false) -> tuple<byte*, unsigned> {
+static auto extract_register_index(byte *ip, viua::process::Process *process, bool pointers_allowed = false) -> tuple<byte*, viua::internals::types::register_index> {
     OperandType ot = viua::bytecode::decoder::operands::get_operand_type(ip);
     ++ip;
 
-    unsigned register_index = 0;
+    viua::internals::types::register_index register_index = 0;
     if (ot == OT_REGISTER_INDEX or ot == OT_REGISTER_REFERENCE or (pointers_allowed and ot == OT_POINTER)) {
-        // FIXME currently RI's are encoded as signed integers
-        // remove this ugly cast when this is fixed
-        register_index = static_cast<unsigned>(extract<viua::internals::types::register_index>(ip));
+        register_index = extract<viua::internals::types::register_index>(ip);
         ip += sizeof(viua::internals::types::register_index);
     } else {
         throw new viua::types::Exception("decoded invalid operand type");
@@ -85,9 +83,9 @@ static auto extract_register_index(byte *ip, viua::process::Process *process, bo
         }
         register_index = i->as_uint32();
     }
-    return tuple<byte*, unsigned>(ip, register_index);
+    return tuple<byte*, viua::internals::types::register_index>(ip, register_index);
 }
-auto viua::bytecode::decoder::operands::fetch_register_index(byte *ip, viua::process::Process *process) -> tuple<byte*, unsigned> {
+auto viua::bytecode::decoder::operands::fetch_register_index(byte *ip, viua::process::Process *process) -> tuple<byte*, viua::internals::types::register_index> {
     return extract_register_index(ip, process);
 }
 
@@ -105,7 +103,7 @@ auto viua::bytecode::decoder::operands::fetch_timeout(byte *ip, viua::process::P
     return tuple<byte*, viua::internals::types::timeout>(ip, value);
 }
 
-auto viua::bytecode::decoder::operands::fetch_primitive_uint(byte *ip, viua::process::Process *process) -> tuple<byte*, unsigned> {
+auto viua::bytecode::decoder::operands::fetch_primitive_uint(byte *ip, viua::process::Process *process) -> tuple<byte*, viua::internals::types::register_index> {
     // currently the logic is the same since RI's are encoded as unsigned integers
     return fetch_register_index(ip, process);
 }

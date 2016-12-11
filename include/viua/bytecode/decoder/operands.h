@@ -56,7 +56,7 @@ namespace viua {
                 auto is_void(const byte*) -> bool;
                 auto fetch_void(byte*) -> byte*;
                 auto fetch_operand_type(byte*) -> std::tuple<byte*, OperandType>;
-                auto fetch_register_index(byte*, viua::process::Process*) -> std::tuple<byte*, unsigned>;
+                auto fetch_register_index(byte*, viua::process::Process*) -> std::tuple<byte*, viua::internals::types::register_index>;
                 auto fetch_timeout(byte*, viua::process::Process*) -> std::tuple<byte*, viua::internals::types::timeout>;
                 auto fetch_primitive_uint(byte*, viua::process::Process*) -> std::tuple<byte*, unsigned>;
                 auto fetch_primitive_uint64(byte*, viua::process::Process*) -> std::tuple<byte*, uint64_t>;

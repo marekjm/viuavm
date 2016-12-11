@@ -35,7 +35,7 @@ class Frame {
         viua::util::memory::maybe_unique_ptr<viua::kernel::RegisterSet> local_register_set;
 
         bool return_void;
-        unsigned place_return_value_in;
+        viua::internals::types::register_index place_return_value_in;
 
         std::string function_name;
 

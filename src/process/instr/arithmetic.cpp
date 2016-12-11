@@ -32,7 +32,7 @@
 #include <viua/assert.h>
 using namespace std;
 
-template<template <typename T> class Operator> static void perform_arithmetic(OperandType result_type, viua::process::Process* process, unsigned target, viua::types::numeric::Number* lhs, viua::types::numeric::Number* rhs) {
+template<template <typename T> class Operator> static void perform_arithmetic(OperandType result_type, viua::process::Process* process, viua::internals::types::register_index target, viua::types::numeric::Number* lhs, viua::types::numeric::Number* rhs) {
     if (result_type == OperandType::OT_INT) {
         process->put(target, unique_ptr<viua::types::Type>{new viua::types::Integer(Operator<int32_t>()(lhs->as_int32(), rhs->as_int32()))});
     } else if (result_type == OperandType::OT_INT8) {
@@ -68,7 +68,7 @@ template<template <typename T> class Operator> static byte* decode_operands_and_
     OperandType result_type = OperandType::OT_VOID;
     tie(addr, result_type) = viua::bytecode::decoder::operands::fetch_operand_type(addr);
 
-    unsigned target = 0;
+    viua::internals::types::register_index target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, process);
 
     viua::types::Type* lhs_raw = nullptr;
@@ -90,7 +90,7 @@ template<template <typename T> class Operator> static byte* decode_operands_and_
     return addr;
 }
 
-template<template <typename T> class Operator> static void perform_comparison(OperandType result_type, viua::process::Process* process, unsigned target, viua::types::numeric::Number* lhs, viua::types::numeric::Number* rhs) {
+template<template <typename T> class Operator> static void perform_comparison(OperandType result_type, viua::process::Process* process, viua::internals::types::register_index target, viua::types::numeric::Number* lhs, viua::types::numeric::Number* rhs) {
     if (result_type == OperandType::OT_INT) {
         process->put(target, unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<int32_t>()(lhs->as_int32(), rhs->as_int32()))});
     } else if (result_type == OperandType::OT_INT8) {
@@ -126,7 +126,7 @@ template<template <typename T> class Operator> static byte* decode_operands_and_
     OperandType result_type = OperandType::OT_VOID;
     tie(addr, result_type) = viua::bytecode::decoder::operands::fetch_operand_type(addr);
 
-    unsigned target = 0;
+    viua::internals::types::register_index target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, process);
 
     viua::types::Type* lhs_raw = nullptr;

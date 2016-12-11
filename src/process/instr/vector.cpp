@@ -31,7 +31,7 @@ using namespace std;
 
 
 byte* viua::process::Process::opvec(byte* addr) {
-    unsigned register_index = 0, pack_start_index = 0, pack_length = 0;
+    viua::internals::types::register_index register_index = 0, pack_start_index = 0, pack_length = 0;
     tie(addr, register_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, pack_start_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, pack_length) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
@@ -70,15 +70,15 @@ byte* viua::process::Process::opvinsert(byte* addr) {
         viua::types::Type* source = nullptr;
         tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-        unsigned position_operand_index = 0;
+        viua::internals::types::register_index position_operand_index = 0;
         tie(addr, position_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
         static_cast<viua::types::Vector*>(vector_operand)->insert(position_operand_index, std::move(source->copy()));
     } else {
-        unsigned object_operand_index = 0;
+        viua::internals::types::register_index object_operand_index = 0;
         tie(addr, object_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-        unsigned position_operand_index = 0;
+        viua::internals::types::register_index position_operand_index = 0;
         tie(addr, position_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
         static_cast<viua::types::Vector*>(vector_operand)->insert(position_operand_index, std::move(pop(object_operand_index)));
@@ -97,7 +97,7 @@ byte* viua::process::Process::opvpush(byte* addr) {
         tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
         static_cast<viua::types::Vector*>(target)->push(std::move(source->copy()));
     } else {
-        unsigned source = 0;
+        viua::internals::types::register_index source = 0;
         tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
         static_cast<viua::types::Vector*>(target)->push(std::move(pop(source)));
     }
@@ -106,7 +106,7 @@ byte* viua::process::Process::opvpush(byte* addr) {
 }
 
 byte* viua::process::Process::opvpop(byte* addr) {
-    unsigned destination_register_index = 0;
+    viua::internals::types::register_index destination_register_index = 0;
     bool destination_is_void = false;
     if (viua::bytecode::decoder::operands::get_operand_type(addr) == OT_VOID) {
         destination_is_void = true;
@@ -135,7 +135,7 @@ byte* viua::process::Process::opvpop(byte* addr) {
 }
 
 byte* viua::process::Process::opvat(byte* addr) {
-    unsigned destination_register_index = 0;
+    viua::internals::types::register_index destination_register_index = 0;
     viua::types::Type* vector_operand = nullptr;
     int position_operand_index = 0;
 
@@ -150,7 +150,7 @@ byte* viua::process::Process::opvat(byte* addr) {
 }
 
 byte* viua::process::Process::opvlen(byte* addr) {
-    unsigned target = 0;
+    viua::internals::types::register_index target = 0;
     viua::types::Type* source = nullptr;
 
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);

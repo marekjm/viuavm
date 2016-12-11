@@ -31,7 +31,7 @@ using namespace std;
 byte* viua::process::Process::opclass(byte* addr) {
     /** Create a class.
      */
-    unsigned target = 0;
+    viua::internals::types::register_index target = 0;
     string class_name;
 
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
@@ -84,7 +84,7 @@ byte* viua::process::Process::opattach(byte* addr) {
 byte* viua::process::Process::opregister(byte* addr) {
     /** Register a prototype in the typesystem.
      */
-    unsigned source = 0;
+    viua::internals::types::register_index source = 0;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     unique_ptr<viua::types::Prototype> prototype {static_cast<viua::types::Prototype*>(pop(source).release())};
