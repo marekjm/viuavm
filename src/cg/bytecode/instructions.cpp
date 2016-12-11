@@ -99,10 +99,10 @@ namespace cg {
             *(addr_ptr++) = ISTORE;
             addr_ptr = insert_ri_operand(addr_ptr, regno);
 
-            *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_REGISTER_INDEX;
+            *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_INT;
             pointer::inc<OperandType, byte>(addr_ptr);
-            *(reinterpret_cast<viua::internals::types::register_index*>(addr_ptr))  = i.value;
-            pointer::inc<viua::internals::types::register_index, byte>(addr_ptr);
+            *(reinterpret_cast<int*>(addr_ptr))  = i.value;
+            pointer::inc<int, byte>(addr_ptr);
 
             return addr_ptr;
         }
@@ -232,11 +232,37 @@ namespace cg {
         }
 
         byte* opvpop(byte* addr_ptr, int_op vec, int_op dst, int_op pos) {
-            return insert_three_ri_instruction(addr_ptr, VPOP, vec, dst, pos);
+            addr_ptr = insert_two_ri_instruction(addr_ptr, VPOP, vec, dst);
+
+            // FIXME types different from OT_REGISTER_REFERENCE and OT_INT should
+            // throw an error
+            if (pos.type == IntegerOperandType::REGISTER_REFERENCE) {
+                *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_REGISTER_REFERENCE;
+            } else {
+                *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_INT;
+            }
+            pointer::inc<OperandType, byte>(addr_ptr);
+            *(reinterpret_cast<viua::internals::types::register_index*>(addr_ptr))  = pos.value;
+            pointer::inc<viua::internals::types::register_index, byte>(addr_ptr);
+
+            return addr_ptr;
         }
 
         byte* opvat(byte* addr_ptr, int_op vec, int_op dst, int_op at) {
-            return insert_three_ri_instruction(addr_ptr, VAT, vec, dst, at);
+            addr_ptr = insert_two_ri_instruction(addr_ptr, VAT, vec, dst);
+
+            // FIXME types different from OT_REGISTER_REFERENCE and OT_INT should
+            // throw an error
+            if (at.type == IntegerOperandType::REGISTER_REFERENCE) {
+                *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_REGISTER_REFERENCE;
+            } else {
+                *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_INT;
+            }
+            pointer::inc<OperandType, byte>(addr_ptr);
+            *(reinterpret_cast<viua::internals::types::register_index*>(addr_ptr))  = at.value;
+            pointer::inc<viua::internals::types::register_index, byte>(addr_ptr);
+
+            return addr_ptr;
         }
 
         byte* opvlen(byte* addr_ptr, int_op vec, int_op reg) {

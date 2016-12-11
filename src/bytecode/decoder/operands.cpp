@@ -42,26 +42,6 @@ auto viua::bytecode::decoder::operands::get_operand_type(const byte *ip) -> Oper
     return extract<const OperandType>(ip);
 }
 
-template<class Value, class Class> static auto fetch_primitive_value(byte *ip, viua::process::Process *p, Value initial) -> tuple<byte*, Value> {
-    OperandType ot = viua::bytecode::decoder::operands::get_operand_type(ip);
-    ++ip;
-
-    Value value = initial;
-    if (ot == OT_REGISTER_INDEX or ot == OT_REGISTER_REFERENCE) {
-        value = extract<Value>(ip);
-        ip += sizeof(Value);
-    } else {
-        throw new viua::types::Exception("decoded invalid operand type");
-    }
-    if (ot == OT_REGISTER_REFERENCE) {
-        // FIXME once dynamic operand types are implemented the need for this cast will go away
-        // because the operand *will* be encoded as a real uint
-        Class *i = static_cast<Class*>(p->obtain(static_cast<unsigned>(value)));
-        value = i->value();
-    }
-    return tuple<byte*, Value>(ip, value);
-}
-
 auto viua::bytecode::decoder::operands::is_void(const byte *ip) -> bool {
     OperandType ot = get_operand_type(ip);
     return (ot == OT_VOID);
@@ -123,7 +103,24 @@ auto viua::bytecode::decoder::operands::fetch_primitive_uint64(byte *ip, viua::p
 }
 
 auto viua::bytecode::decoder::operands::fetch_primitive_int(byte *ip, viua::process::Process* p) -> tuple<byte*, int> {
-    return fetch_primitive_value<int, viua::types::Integer>(ip, p, 0);
+    OperandType ot = viua::bytecode::decoder::operands::get_operand_type(ip);
+    ++ip;
+
+    int value = 0;
+    if (ot == OT_REGISTER_REFERENCE) {
+        value = *reinterpret_cast<decltype(value)*>(ip);
+        ip += sizeof(decltype(value));
+        // FIXME once dynamic operand types are implemented the need for this cast will go away
+        // because the operand *will* be encoded as a real uint
+        viua::types::Integer *i = static_cast<viua::types::Integer*>(p->obtain(static_cast<unsigned>(value)));
+        value = i->value();
+    } else if (ot == OT_INT) {
+        value = *reinterpret_cast<decltype(value)*>(ip);
+        ip += sizeof(decltype(value));
+    } else {
+        throw new viua::types::Exception("decoded invalid operand type");
+    }
+    return tuple<byte*, int>(ip, value);
 }
 
 auto viua::bytecode::decoder::operands::fetch_raw_int(byte *ip, viua::process::Process*) -> tuple<byte*, int> {
