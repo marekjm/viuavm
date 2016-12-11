@@ -42,6 +42,8 @@ namespace viua {
             typedef int register_index;
 
             typedef int plain_int;
+
+            typedef int timeout;
         }
     }
 }

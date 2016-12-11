@@ -63,10 +63,6 @@ namespace viua {
                     calculated_size += sizeof(byte);
                     calculated_size += sizeof(viua::internals::types::register_index);
                     ++i;
-                } else if (looks_like_timeout(tokens.at(i))) {
-                    calculated_size += sizeof(byte);
-                    calculated_size += sizeof(int);
-                    ++i;
                 } else {
                     throw viua::cg::lex::InvalidSyntax(tokens.at(i), "invalid operand token");
                 }
@@ -417,13 +413,35 @@ namespace viua {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
             static auto size_of_join(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                return size_of_instruction_with_three_ri_operands(tokens, i);
+                uint64_t calculated_size = 0;
+                tie(calculated_size, i) = size_of_instruction_with_two_ri_operands(tokens, i);
+
+                if (looks_like_timeout(tokens.at(i))) {
+                    calculated_size += sizeof(byte);
+                    calculated_size += sizeof(viua::internals::types::timeout);
+                    ++i;
+                } else {
+                    throw viua::cg::lex::InvalidSyntax(tokens.at(i), "invalid operand token");
+                }
+
+                return tuple<uint64_t, decltype(i)>(calculated_size, i);
             }
             static auto size_of_send(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands(tokens, i);
             }
             static auto size_of_receive(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                return size_of_instruction_with_two_ri_operands(tokens, i);
+                uint64_t calculated_size = 0;
+                tie(calculated_size, i) = size_of_instruction_with_one_ri_operand(tokens, i);
+
+                if (looks_like_timeout(tokens.at(i))) {
+                    calculated_size += sizeof(byte);
+                    calculated_size += sizeof(viua::internals::types::timeout);
+                    ++i;
+                } else {
+                    throw viua::cg::lex::InvalidSyntax(tokens.at(i), "invalid operand token");
+                }
+
+                return tuple<uint64_t, decltype(i)>(calculated_size, i);
             }
             static auto size_of_watchdog(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
                 uint64_t calculated_size = sizeof(byte);    // start with the size of a single opcode
