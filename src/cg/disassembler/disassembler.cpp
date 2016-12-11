@@ -37,20 +37,20 @@ string disassembler::intop(byte* ptr) {
             oss << "void";
             break;
         case OT_REGISTER_INDEX:
-            oss << *reinterpret_cast<int*>(ptr);
-            pointer::inc<int, byte>(ptr);
+            oss << *reinterpret_cast<viua::internals::types::register_index*>(ptr);
+            pointer::inc<viua::internals::types::register_index, byte>(ptr);
             break;
         case OT_REGISTER_REFERENCE:
-            oss << '@' << *reinterpret_cast<int*>(ptr);
-            pointer::inc<int, byte>(ptr);
+            oss << '@' << *reinterpret_cast<viua::internals::types::register_index*>(ptr);
+            pointer::inc<viua::internals::types::register_index, byte>(ptr);
             break;
         case OT_POINTER:
-            oss << '*' << *reinterpret_cast<int*>(ptr);
-            pointer::inc<int, byte>(ptr);
+            oss << '*' << *reinterpret_cast<viua::internals::types::register_index*>(ptr);
+            pointer::inc<viua::internals::types::register_index, byte>(ptr);
             break;
         case OT_INT:
-            oss << *reinterpret_cast<int*>(ptr);
-            pointer::inc<int, byte>(ptr);
+            oss << *reinterpret_cast<viua::internals::types::plain_int*>(ptr);
+            pointer::inc<viua::internals::types::plain_int, byte>(ptr);
             break;
         default:
             throw "invalid operand type detected";
@@ -59,8 +59,11 @@ string disassembler::intop(byte* ptr) {
     return oss.str();
 }
 
-static int decode_integer(byte *ptr) {
-    return *reinterpret_cast<int*>(ptr);
+static viua::internals::types::plain_int decode_integer(byte *ptr) {
+    return *reinterpret_cast<viua::internals::types::plain_int*>(ptr);
+}
+static viua::internals::types::timeout decode_timeout(byte *ptr) {
+    return *reinterpret_cast<viua::internals::types::timeout*>(ptr);
 }
 static byte* disassemble_target_register(ostream& oss, byte *ptr) {
     oss << " " << disassembler::intop(ptr);
@@ -70,7 +73,7 @@ static byte* disassemble_target_register(ostream& oss, byte *ptr) {
         case OT_REGISTER_REFERENCE:
         case OT_POINTER:
             pointer::inc<OperandType, byte>(ptr);
-            pointer::inc<int, byte>(ptr);
+            pointer::inc<viua::internals::types::plain_int, byte>(ptr);
             break;
         case OT_VOID:
             pointer::inc<OperandType, byte>(ptr);
@@ -135,7 +138,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
     } else if (op == ATTACH) {
         oss << " " << intop(ptr);
         pointer::inc<bool, byte>(ptr);
-        pointer::inc<int, byte>(ptr);
+        pointer::inc<viua::internals::types::register_index, byte>(ptr);
 
         oss << " ";
         string fn_name = string(reinterpret_cast<char*>(ptr));
@@ -168,6 +171,17 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
             ptr = disassemble_target_register(oss, ptr);
             break;
         case ISTORE:
+            ptr = disassemble_target_register(oss, ptr);
+
+            oss << ' ';
+            if (*ptr == OT_REGISTER_REFERENCE) {
+                oss << '@';
+            }
+            pointer::inc<bool, byte>(ptr);
+            oss << decode_integer(ptr);
+            pointer::inc<viua::internals::types::plain_int, byte>(ptr);
+
+            break;
         case ITOF:
         case FTOI:
         case STOI:
@@ -190,7 +204,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
 
             oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
-            pointer::inc<int, byte>(ptr);
+            pointer::inc<viua::internals::types::register_index, byte>(ptr);
 
             break;
         case ADD:
@@ -248,11 +262,11 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
 
             oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
-            pointer::inc<int, byte>(ptr);
+            pointer::inc<viua::internals::types::register_index, byte>(ptr);
 
             oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
-            pointer::inc<int, byte>(ptr);
+            pointer::inc<viua::internals::types::register_index, byte>(ptr);
 
             break;
         case JUMP:
@@ -267,7 +281,7 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case IF:
             oss << " " << intop(ptr);
             pointer::inc<bool, byte>(ptr);
-            pointer::inc<int, byte>(ptr);
+            pointer::inc<viua::internals::types::register_index, byte>(ptr);
 
             oss << " 0x";
             oss << hex;
@@ -318,12 +332,12 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
 
             pointer::inc<bool, byte>(ptr);
             oss << ' ';
-            if (decode_integer(ptr)) {
-                oss << decode_integer(ptr)-1 << "ms";
+            if (decode_timeout(ptr)) {
+                oss << decode_timeout(ptr)-1 << "ms";
             } else {
                 oss << "infinity";
             }
-            pointer::inc<int, byte>(ptr);
+            pointer::inc<viua::internals::types::timeout, byte>(ptr);
 
             break;
         default:
