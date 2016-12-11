@@ -96,7 +96,10 @@ namespace cg {
         }
 
         byte* opistore(byte* addr_ptr, int_op regno, int_op i) {
-            return insert_two_ri_instruction(addr_ptr, ISTORE, regno, i);
+            *(addr_ptr++) = ISTORE;
+            addr_ptr = insert_ri_operand(addr_ptr, regno);
+            addr_ptr = insert_ri_operand(addr_ptr, i);
+            return addr_ptr;
         }
 
         byte* opiinc(byte* addr_ptr, int_op regno) {
