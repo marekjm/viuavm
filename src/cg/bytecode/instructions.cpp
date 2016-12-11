@@ -56,7 +56,7 @@ static byte* insert_ri_operand(byte* addr_ptr, int_op op) {
         *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_REGISTER_INDEX;
     }
     pointer::inc<OperandType, byte>(addr_ptr);
-    *(reinterpret_cast<viua::internals::types::register_index*>(addr_ptr)) = op.value;
+    *(reinterpret_cast<viua::internals::types::register_index*>(addr_ptr)) = static_cast<viua::internals::types::register_index>(op.value);
     pointer::inc<viua::internals::types::register_index, byte>(addr_ptr);
 
     return addr_ptr;
@@ -428,7 +428,7 @@ namespace cg {
             // FIXME change to OT_TIMEOUT?
             *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_INT;
             pointer::inc<OperandType, byte>(addr_ptr);
-            *(reinterpret_cast<viua::internals::types::timeout*>(addr_ptr))  = timeout.value;
+            *(reinterpret_cast<viua::internals::types::timeout*>(addr_ptr))  = static_cast<viua::internals::types::timeout>(timeout.value);
             pointer::inc<viua::internals::types::timeout, byte>(addr_ptr);
 
             return addr_ptr;
@@ -447,7 +447,7 @@ namespace cg {
             // FIXME change to OT_TIMEOUT?
             *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_INT;
             pointer::inc<OperandType, byte>(addr_ptr);
-            *(reinterpret_cast<viua::internals::types::timeout*>(addr_ptr))  = timeout.value;
+            *(reinterpret_cast<viua::internals::types::timeout*>(addr_ptr))  = static_cast<viua::internals::types::timeout>(timeout.value);
             pointer::inc<viua::internals::types::timeout, byte>(addr_ptr);
 
             return addr_ptr;
