@@ -25,7 +25,7 @@
     istore number 166737
     istore modulo 176
 
-    istore result @number
+    copy result number
 
     ; if number is less than modulo, jump straight to result printing
     lt int64 4 number modulo

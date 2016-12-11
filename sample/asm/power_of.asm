@@ -46,7 +46,7 @@
     istore counter 1
     ; in register 6, store the base of power as
     ; we will need it for multiplication
-    istore result @base
+    copy result base
 
     .mark: loop
     if (lt int64 4 counter exponent) 12 final

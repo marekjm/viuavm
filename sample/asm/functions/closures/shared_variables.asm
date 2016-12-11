@@ -27,7 +27,7 @@
     arg 1 0
 
     ; overwrite bound value with whatever we got
-    istore 2 @1
+    copy 2 1
     return
 .end
 

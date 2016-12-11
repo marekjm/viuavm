@@ -98,7 +98,12 @@ namespace cg {
         byte* opistore(byte* addr_ptr, int_op regno, int_op i) {
             *(addr_ptr++) = ISTORE;
             addr_ptr = insert_ri_operand(addr_ptr, regno);
-            addr_ptr = insert_ri_operand(addr_ptr, i);
+
+            *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_REGISTER_INDEX;
+            pointer::inc<OperandType, byte>(addr_ptr);
+            *(reinterpret_cast<viua::internals::types::register_index*>(addr_ptr))  = i.value;
+            pointer::inc<viua::internals::types::register_index, byte>(addr_ptr);
+
             return addr_ptr;
         }
 
