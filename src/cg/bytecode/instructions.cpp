@@ -56,8 +56,8 @@ static byte* insertIntegerOperand(byte* addr_ptr, int_op op) {
         *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_REGISTER_INDEX;
     }
     pointer::inc<OperandType, byte>(addr_ptr);
-    *(reinterpret_cast<int*>(addr_ptr))  = op.value;
-    pointer::inc<decltype(op.value), byte>(addr_ptr);
+    *(reinterpret_cast<viua::internals::types::register_index*>(addr_ptr))  = op.value;
+    pointer::inc<viua::internals::types::register_index, byte>(addr_ptr);
 
     return addr_ptr;
 }
