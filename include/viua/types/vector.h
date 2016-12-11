@@ -35,10 +35,10 @@ namespace viua {
             std::vector<std::unique_ptr<Type>> internal_object;
 
             public:
-                std::string type() const {
+                std::string type() const override {
                     return "Vector";
                 }
-                std::string str() const;
+                std::string str() const override;
                 bool boolean() const override;
                 std::unique_ptr<Type> copy() const override;
 

@@ -39,16 +39,16 @@ namespace viua {
                 std::string cause;
                 std::string detailed_type;
             public:
-                std::string type() const {
+                std::string type() const override {
                     return "Exception";
                 }
-                std::string str() const {
+                std::string str() const override {
                     return cause;
                 }
-                std::string repr() const {
+                std::string repr() const override {
                     return (etype() + ": " + str::enquote(cause));
                 }
-                bool boolean() const {
+                bool boolean() const override {
                     return true;
                 }
 

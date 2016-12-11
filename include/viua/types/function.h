@@ -36,11 +36,11 @@ namespace viua {
             public:
                 std::string function_name;
 
-                virtual std::string type() const;
-                virtual std::string str() const;
-                virtual std::string repr() const;
+                virtual std::string type() const override;
+                virtual std::string str() const override;
+                virtual std::string repr() const override;
 
-                virtual bool boolean() const;
+                virtual bool boolean() const override;
 
                 virtual std::unique_ptr<Type> copy() const override;
 

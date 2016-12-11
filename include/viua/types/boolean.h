@@ -37,13 +37,13 @@ namespace viua {
             bool b;
 
             public:
-                std::string type() const {
+                std::string type() const override {
                     return "Boolean";
                 }
-                std::string str() const {
+                std::string str() const override {
                     return ( b ? "true" : "false" );
                 }
-                bool boolean() const {
+                bool boolean() const override {
                     return b;
                 }
 
@@ -53,10 +53,10 @@ namespace viua {
                 int increment() { return (b = true); }
                 int decrement() { return (b = false); }
 
-                virtual std::vector<std::string> bases() const {
+                virtual std::vector<std::string> bases() const override {
                     return std::vector<std::string>{"Number"};
                 }
-                virtual std::vector<std::string> inheritancechain() const {
+                virtual std::vector<std::string> inheritancechain() const override {
                     return std::vector<std::string>{"Number", "Type"};
                 }
 

@@ -49,10 +49,10 @@ class Ifstream: public viua::types::Type {
             return in.is_open();
         }
 
-        virtual std::vector<std::string> bases() const {
+        virtual std::vector<std::string> bases() const override {
             return std::vector<std::string>{"viua::types::Type"};
         }
-        virtual std::vector<std::string> inheritancechain() const {
+        virtual std::vector<std::string> inheritancechain() const override {
             return std::vector<std::string>{"viua::types::Type"};
         }
 
