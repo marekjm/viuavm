@@ -44,7 +44,7 @@ namespace viua {
             typedef int plain_int;
             typedef double plain_float;
 
-            typedef int timeout;
+            typedef unsigned timeout;
         }
     }
 }
