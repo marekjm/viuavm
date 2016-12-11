@@ -30,7 +30,7 @@ int_op::int_op(int n): type(IntegerOperandType::PLAIN), value(n) {
 }
 
 
-static byte* insertIntegerOperand(byte* addr_ptr, int_op op) {
+static byte* insert_ri_operand(byte* addr_ptr, int_op op) {
     /** Insert integer operand into bytecode.
      *
      *  When using integer operand, it usually is a plain number - which translates to a regsiter index.
@@ -62,17 +62,17 @@ static byte* insertIntegerOperand(byte* addr_ptr, int_op op) {
     return addr_ptr;
 }
 
-static byte* insertTwoIntegerOpsInstruction(byte* addr_ptr, enum OPCODE instruction, int_op a, int_op b) {
+static byte* insert_two_ri_instruction(byte* addr_ptr, enum OPCODE instruction, int_op a, int_op b) {
     *(addr_ptr++) = instruction;
-    addr_ptr = insertIntegerOperand(addr_ptr, a);
-    return insertIntegerOperand(addr_ptr, b);
+    addr_ptr = insert_ri_operand(addr_ptr, a);
+    return insert_ri_operand(addr_ptr, b);
 }
 
-static byte* insertThreeIntegerOpsInstruction(byte* addr_ptr, enum OPCODE instruction, int_op a, int_op b, int_op c) {
+static byte* insert_three_ri_instruction(byte* addr_ptr, enum OPCODE instruction, int_op a, int_op b, int_op c) {
     *(addr_ptr++) = instruction;
-    addr_ptr = insertIntegerOperand(addr_ptr, a);
-    addr_ptr = insertIntegerOperand(addr_ptr, b);
-    return insertIntegerOperand(addr_ptr, c);
+    addr_ptr = insert_ri_operand(addr_ptr, a);
+    addr_ptr = insert_ri_operand(addr_ptr, b);
+    return insert_ri_operand(addr_ptr, c);
 }
 
 static byte* insertString(byte* ptr, const string& s) {
@@ -92,26 +92,26 @@ namespace cg {
 
         byte* opizero(byte* addr_ptr, int_op regno) {
             *(addr_ptr++) = IZERO;
-            return insertIntegerOperand(addr_ptr, regno);
+            return insert_ri_operand(addr_ptr, regno);
         }
 
         byte* opistore(byte* addr_ptr, int_op regno, int_op i) {
-            return insertTwoIntegerOpsInstruction(addr_ptr, ISTORE, regno, i);
+            return insert_two_ri_instruction(addr_ptr, ISTORE, regno, i);
         }
 
         byte* opiinc(byte* addr_ptr, int_op regno) {
             *(addr_ptr++) = IINC;
-            return insertIntegerOperand(addr_ptr, regno);
+            return insert_ri_operand(addr_ptr, regno);
         }
 
         byte* opidec(byte* addr_ptr, int_op regno) {
             *(addr_ptr++) = IDEC;
-            return insertIntegerOperand(addr_ptr, regno);
+            return insert_ri_operand(addr_ptr, regno);
         }
 
         byte* opfstore(byte* addr_ptr, int_op regno, float f) {
             *(addr_ptr++) = FSTORE;
-            addr_ptr = insertIntegerOperand(addr_ptr, regno);
+            addr_ptr = insert_ri_operand(addr_ptr, regno);
             *(reinterpret_cast<float*>(addr_ptr))  = f;
             pointer::inc<float, byte>(addr_ptr);
 
@@ -119,19 +119,19 @@ namespace cg {
         }
 
         byte* opitof(byte* addr_ptr, int_op a, int_op b) {
-            return insertTwoIntegerOpsInstruction(addr_ptr, ITOF, a, b);
+            return insert_two_ri_instruction(addr_ptr, ITOF, a, b);
         }
 
         byte* opftoi(byte* addr_ptr, int_op a, int_op b) {
-            return insertTwoIntegerOpsInstruction(addr_ptr, FTOI, a, b);
+            return insert_two_ri_instruction(addr_ptr, FTOI, a, b);
         }
 
         byte* opstoi(byte* addr_ptr, int_op a, int_op b) {
-            return insertTwoIntegerOpsInstruction(addr_ptr, STOI, a, b);
+            return insert_two_ri_instruction(addr_ptr, STOI, a, b);
         }
 
         byte* opstof(byte* addr_ptr, int_op a, int_op b) {
-            return insertTwoIntegerOpsInstruction(addr_ptr, STOF, a, b);
+            return insert_two_ri_instruction(addr_ptr, STOF, a, b);
         }
 
         static byte* encode_operand_type(byte* addr_ptr, string operand_type) {
@@ -170,9 +170,9 @@ namespace cg {
             *(addr_ptr++) = instruction;
 
             addr_ptr = encode_operand_type(addr_ptr, result_type);
-            addr_ptr = insertIntegerOperand(addr_ptr, target);
-            addr_ptr = insertIntegerOperand(addr_ptr, lhs);
-            return insertIntegerOperand(addr_ptr, rhs);
+            addr_ptr = insert_ri_operand(addr_ptr, target);
+            addr_ptr = insert_ri_operand(addr_ptr, lhs);
+            return insert_ri_operand(addr_ptr, rhs);
         }
         byte* opadd(byte* addr_ptr, std::string result_type, int_op target, int_op lhs, int_op rhs) {
             return emit_instruction_alu(addr_ptr, ADD, result_type, target, lhs, rhs);
@@ -204,74 +204,74 @@ namespace cg {
 
         byte* opstrstore(byte* addr_ptr, int_op reg, string s) {
             *(addr_ptr++) = STRSTORE;
-            addr_ptr = insertIntegerOperand(addr_ptr, reg);
+            addr_ptr = insert_ri_operand(addr_ptr, reg);
             return insertString(addr_ptr, s.substr(1, s.size()-2));
         }
 
         byte* opvec(byte* addr_ptr, int_op index, int_op pack_start_index, int_op pack_length) {
             *(addr_ptr++) = VEC;
-            addr_ptr = insertIntegerOperand(addr_ptr, index);
-            addr_ptr = insertIntegerOperand(addr_ptr, pack_start_index);
-            return insertIntegerOperand(addr_ptr, pack_length);
+            addr_ptr = insert_ri_operand(addr_ptr, index);
+            addr_ptr = insert_ri_operand(addr_ptr, pack_start_index);
+            return insert_ri_operand(addr_ptr, pack_length);
         }
 
         byte* opvinsert(byte* addr_ptr, int_op vec, int_op src, int_op dst) {
-            return insertThreeIntegerOpsInstruction(addr_ptr, VINSERT, vec, src, dst);
+            return insert_three_ri_instruction(addr_ptr, VINSERT, vec, src, dst);
         }
 
         byte* opvpush(byte* addr_ptr, int_op vec, int_op src) {
-            return insertTwoIntegerOpsInstruction(addr_ptr, VPUSH, vec, src);
+            return insert_two_ri_instruction(addr_ptr, VPUSH, vec, src);
         }
 
         byte* opvpop(byte* addr_ptr, int_op vec, int_op dst, int_op pos) {
-            return insertThreeIntegerOpsInstruction(addr_ptr, VPOP, vec, dst, pos);
+            return insert_three_ri_instruction(addr_ptr, VPOP, vec, dst, pos);
         }
 
         byte* opvat(byte* addr_ptr, int_op vec, int_op dst, int_op at) {
-            return insertThreeIntegerOpsInstruction(addr_ptr, VAT, vec, dst, at);
+            return insert_three_ri_instruction(addr_ptr, VAT, vec, dst, at);
         }
 
         byte* opvlen(byte* addr_ptr, int_op vec, int_op reg) {
-            return insertTwoIntegerOpsInstruction(addr_ptr, VLEN, vec, reg);
+            return insert_two_ri_instruction(addr_ptr, VLEN, vec, reg);
         }
 
         byte* opnot(byte* addr_ptr, int_op target, int_op source) {
             *(addr_ptr++) = NOT;
-            addr_ptr = insertIntegerOperand(addr_ptr, target);
-            return insertIntegerOperand(addr_ptr, source);
+            addr_ptr = insert_ri_operand(addr_ptr, target);
+            return insert_ri_operand(addr_ptr, source);
         }
 
         byte* opand(byte* addr_ptr, int_op regr, int_op rega, int_op regb) {
-            return insertThreeIntegerOpsInstruction(addr_ptr, AND, regr, rega, regb);
+            return insert_three_ri_instruction(addr_ptr, AND, regr, rega, regb);
         }
 
         byte* opor(byte* addr_ptr, int_op regr, int_op rega, int_op regb) {
-            return insertThreeIntegerOpsInstruction(addr_ptr, OR, regr, rega, regb);
+            return insert_three_ri_instruction(addr_ptr, OR, regr, rega, regb);
         }
 
         byte* opmove(byte* addr_ptr, int_op a, int_op b) {
-            return insertTwoIntegerOpsInstruction(addr_ptr, MOVE, a, b);
+            return insert_two_ri_instruction(addr_ptr, MOVE, a, b);
         }
 
         byte* opcopy(byte* addr_ptr, int_op a, int_op b) {
-            return insertTwoIntegerOpsInstruction(addr_ptr, COPY, a, b);
+            return insert_two_ri_instruction(addr_ptr, COPY, a, b);
         }
 
         byte* opptr(byte* addr_ptr, int_op a, int_op b) {
-            return insertTwoIntegerOpsInstruction(addr_ptr, PTR, a, b);
+            return insert_two_ri_instruction(addr_ptr, PTR, a, b);
         }
 
         byte* opswap(byte* addr_ptr, int_op a, int_op b) {
-            return insertTwoIntegerOpsInstruction(addr_ptr, SWAP, a, b);
+            return insert_two_ri_instruction(addr_ptr, SWAP, a, b);
         }
 
         byte* opdelete(byte* addr_ptr, int_op reg) {
             *(addr_ptr++) = DELETE;
-            return insertIntegerOperand(addr_ptr, reg);
+            return insert_ri_operand(addr_ptr, reg);
         }
 
         byte* opisnull(byte* addr_ptr, int_op a, int_op b) {
-            return insertTwoIntegerOpsInstruction(addr_ptr, ISNULL, a, b);
+            return insert_two_ri_instruction(addr_ptr, ISNULL, a, b);
         }
 
         byte* opress(byte* addr_ptr, const string& a) {
@@ -297,85 +297,85 @@ namespace cg {
 
         byte* optmpri(byte* addr_ptr, int_op reg) {
             *(addr_ptr++) = TMPRI;
-            return insertIntegerOperand(addr_ptr, reg);
+            return insert_ri_operand(addr_ptr, reg);
         }
 
         byte* optmpro(byte* addr_ptr, int_op reg) {
             *(addr_ptr++) = TMPRO;
-            return insertIntegerOperand(addr_ptr, reg);
+            return insert_ri_operand(addr_ptr, reg);
         }
 
         byte* opprint(byte* addr_ptr, int_op reg) {
             *(addr_ptr++) = PRINT;
-            return insertIntegerOperand(addr_ptr, reg);
+            return insert_ri_operand(addr_ptr, reg);
         }
 
         byte* opecho(byte* addr_ptr, int_op reg) {
             *(addr_ptr++) = ECHO;
-            return insertIntegerOperand(addr_ptr, reg);
+            return insert_ri_operand(addr_ptr, reg);
         }
 
         byte* opcapture(byte* addr_ptr, int_op target_closure, int_op target_register, int_op source_register) {
             *(addr_ptr++) = CAPTURE;
-            addr_ptr = insertIntegerOperand(addr_ptr, target_closure);
-            addr_ptr = insertIntegerOperand(addr_ptr, target_register);
-            return insertIntegerOperand(addr_ptr, source_register);
+            addr_ptr = insert_ri_operand(addr_ptr, target_closure);
+            addr_ptr = insert_ri_operand(addr_ptr, target_register);
+            return insert_ri_operand(addr_ptr, source_register);
         }
 
         byte* opcapturecopy(byte* addr_ptr, int_op target_closure, int_op target_register, int_op source_register) {
             *(addr_ptr++) = CAPTURECOPY;
-            addr_ptr = insertIntegerOperand(addr_ptr, target_closure);
-            addr_ptr = insertIntegerOperand(addr_ptr, target_register);
-            return insertIntegerOperand(addr_ptr, source_register);
+            addr_ptr = insert_ri_operand(addr_ptr, target_closure);
+            addr_ptr = insert_ri_operand(addr_ptr, target_register);
+            return insert_ri_operand(addr_ptr, source_register);
         }
 
         byte* opcapturemove(byte* addr_ptr, int_op target_closure, int_op target_register, int_op source_register) {
             *(addr_ptr++) = CAPTUREMOVE;
-            addr_ptr = insertIntegerOperand(addr_ptr, target_closure);
-            addr_ptr = insertIntegerOperand(addr_ptr, target_register);
-            return insertIntegerOperand(addr_ptr, source_register);
+            addr_ptr = insert_ri_operand(addr_ptr, target_closure);
+            addr_ptr = insert_ri_operand(addr_ptr, target_register);
+            return insert_ri_operand(addr_ptr, source_register);
         }
 
         byte* opclosure(byte* addr_ptr, int_op reg, const string& fn) {
             *(addr_ptr++) = CLOSURE;
-            addr_ptr = insertIntegerOperand(addr_ptr, reg);
+            addr_ptr = insert_ri_operand(addr_ptr, reg);
             return insertString(addr_ptr, fn);
         }
 
         byte* opfunction(byte* addr_ptr, int_op reg, const string& fn) {
             *(addr_ptr++) = FUNCTION;
-            addr_ptr = insertIntegerOperand(addr_ptr, reg);
+            addr_ptr = insert_ri_operand(addr_ptr, reg);
             return insertString(addr_ptr, fn);
         }
 
         byte* opfcall(byte* addr_ptr, int_op clsr, int_op ret) {
-            return insertTwoIntegerOpsInstruction(addr_ptr, FCALL, clsr, ret);
+            return insert_two_ri_instruction(addr_ptr, FCALL, clsr, ret);
         }
 
         byte* opframe(byte* addr_ptr, int_op a, int_op b) {
-            return insertTwoIntegerOpsInstruction(addr_ptr, FRAME, a, b);
+            return insert_two_ri_instruction(addr_ptr, FRAME, a, b);
         }
 
         byte* opparam(byte* addr_ptr, int_op a, int_op b) {
-            return insertTwoIntegerOpsInstruction(addr_ptr, PARAM, a, b);
+            return insert_two_ri_instruction(addr_ptr, PARAM, a, b);
         }
 
         byte* oppamv(byte* addr_ptr, int_op a, int_op b) {
-            return insertTwoIntegerOpsInstruction(addr_ptr, PAMV, a, b);
+            return insert_two_ri_instruction(addr_ptr, PAMV, a, b);
         }
 
         byte* oparg(byte* addr_ptr, int_op a, int_op b) {
-            return insertTwoIntegerOpsInstruction(addr_ptr, ARG, a, b);
+            return insert_two_ri_instruction(addr_ptr, ARG, a, b);
         }
 
         byte* opargc(byte* addr_ptr, int_op a) {
             *(addr_ptr++) = ARGC;
-            return insertIntegerOperand(addr_ptr, a);
+            return insert_ri_operand(addr_ptr, a);
         }
 
         byte* opcall(byte* addr_ptr, int_op reg, const string& fn_name) {
             *(addr_ptr++) = CALL;
-            addr_ptr = insertIntegerOperand(addr_ptr, reg);
+            addr_ptr = insert_ri_operand(addr_ptr, reg);
             return insertString(addr_ptr, fn_name);
         }
 
@@ -386,32 +386,32 @@ namespace cg {
 
         byte* opprocess(byte* addr_ptr, int_op reg, const string& fn_name) {
             *(addr_ptr++) = PROCESS;
-            addr_ptr = insertIntegerOperand(addr_ptr, reg);
+            addr_ptr = insert_ri_operand(addr_ptr, reg);
             return insertString(addr_ptr, fn_name);
         }
 
         byte* opself(byte* addr_ptr, int_op target) {
             *(addr_ptr++) = SELF;
-            return insertIntegerOperand(addr_ptr, target);
+            return insert_ri_operand(addr_ptr, target);
         }
 
         byte* opjoin(byte* addr_ptr, int_op target, int_op source, int_op timeout) {
             *(addr_ptr++) = JOIN;
-            addr_ptr = insertIntegerOperand(addr_ptr, target);
-            addr_ptr = insertIntegerOperand(addr_ptr, source);
-            return insertIntegerOperand(addr_ptr, timeout);
+            addr_ptr = insert_ri_operand(addr_ptr, target);
+            addr_ptr = insert_ri_operand(addr_ptr, source);
+            return insert_ri_operand(addr_ptr, timeout);
         }
 
         byte* opsend(byte* addr_ptr, int_op target, int_op source) {
             *(addr_ptr++) = SEND;
-            addr_ptr = insertIntegerOperand(addr_ptr, target);
-            return insertIntegerOperand(addr_ptr, source);
+            addr_ptr = insert_ri_operand(addr_ptr, target);
+            return insert_ri_operand(addr_ptr, source);
         }
 
         byte* opreceive(byte* addr_ptr, int_op reg, int_op timeout) {
             *(addr_ptr++) = RECEIVE;
-            addr_ptr = insertIntegerOperand(addr_ptr, reg);
-            return insertIntegerOperand(addr_ptr, timeout);
+            addr_ptr = insert_ri_operand(addr_ptr, reg);
+            return insert_ri_operand(addr_ptr, timeout);
         }
 
         byte* opwatchdog(byte* addr_ptr, const string& fn_name) {
@@ -432,7 +432,7 @@ namespace cg {
 
         byte* opif(byte* addr_ptr, int_op regc, uint64_t addr_truth, uint64_t addr_false) {
             *(addr_ptr++) = IF;
-            addr_ptr = insertIntegerOperand(addr_ptr, regc);
+            addr_ptr = insert_ri_operand(addr_ptr, regc);
 
             // we *know* that following locations in the byte array point to uint64_t so
             // the reinterpret_cast<> is justified
@@ -463,7 +463,7 @@ namespace cg {
 
         byte* opdraw(byte* addr_ptr, int_op regno) {
             *(addr_ptr++) = DRAW;
-            return insertIntegerOperand(addr_ptr, regno);
+            return insert_ri_operand(addr_ptr, regno);
         }
 
         byte* openter(byte* addr_ptr, const string& block_name) {
@@ -473,7 +473,7 @@ namespace cg {
 
         byte* opthrow(byte* addr_ptr, int_op regno) {
             *(addr_ptr++) = THROW;
-            return insertIntegerOperand(addr_ptr, regno);
+            return insert_ri_operand(addr_ptr, regno);
         }
 
         byte* opleave(byte* addr_ptr) {
@@ -493,46 +493,46 @@ namespace cg {
 
         byte* opclass(byte* addr_ptr, int_op reg, const string& class_name) {
             *(addr_ptr++) = CLASS;
-            addr_ptr = insertIntegerOperand(addr_ptr, reg);
+            addr_ptr = insert_ri_operand(addr_ptr, reg);
             return insertString(addr_ptr, class_name);
         }
 
         byte* opderive(byte* addr_ptr, int_op reg, const string& base_class_name) {
             *(addr_ptr++) = DERIVE;
-            addr_ptr = insertIntegerOperand(addr_ptr, reg);
+            addr_ptr = insert_ri_operand(addr_ptr, reg);
             return insertString(addr_ptr, base_class_name);
         }
 
         byte* opattach(byte* addr_ptr, int_op reg, const string& function_name, const string& method_name) {
             *(addr_ptr++) = ATTACH;
-            addr_ptr = insertIntegerOperand(addr_ptr, reg);
+            addr_ptr = insert_ri_operand(addr_ptr, reg);
             addr_ptr = insertString(addr_ptr, function_name);
             return insertString(addr_ptr, method_name);
         }
 
         byte* opregister(byte* addr_ptr, int_op regno) {
             *(addr_ptr++) = REGISTER;
-            return insertIntegerOperand(addr_ptr, regno);
+            return insert_ri_operand(addr_ptr, regno);
         }
 
         byte* opnew(byte* addr_ptr, int_op reg, const string& class_name) {
             *(addr_ptr++) = NEW;
-            addr_ptr = insertIntegerOperand(addr_ptr, reg);
+            addr_ptr = insert_ri_operand(addr_ptr, reg);
             return insertString(addr_ptr, class_name);
         }
 
         byte* opmsg(byte* addr_ptr, int_op reg, const string& method_name) {
             *(addr_ptr++) = MSG;
-            addr_ptr = insertIntegerOperand(addr_ptr, reg);
+            addr_ptr = insert_ri_operand(addr_ptr, reg);
             return insertString(addr_ptr, method_name);
         }
 
         byte* opinsert(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
-            return insertThreeIntegerOpsInstruction(addr_ptr, INSERT, rega, regb, regr);
+            return insert_three_ri_instruction(addr_ptr, INSERT, rega, regb, regr);
         }
 
         byte* opremove(byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
-            return insertThreeIntegerOpsInstruction(addr_ptr, REMOVE, rega, regb, regr);
+            return insert_three_ri_instruction(addr_ptr, REMOVE, rega, regb, regr);
         }
 
         byte* opreturn(byte* addr_ptr) {
