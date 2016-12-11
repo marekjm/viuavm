@@ -73,7 +73,7 @@ static auto extract_register_index(byte *ip, viua::process::Process *process, bo
         // FIXME currently RI's are encoded as signed integers
         // remove this ugly cast when this is fixed
         register_index = static_cast<unsigned>(extract<viua::internals::types::register_index>(ip));
-        ip += sizeof(int);
+        ip += sizeof(viua::internals::types::register_index);
     } else {
         throw new viua::types::Exception("decoded invalid operand type");
     }
