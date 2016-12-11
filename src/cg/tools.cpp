@@ -130,7 +130,14 @@ namespace viua {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
             static auto size_of_istore(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                return size_of_instruction_with_two_ri_operands(tokens, i);
+                uint64_t calculated_size = 0;
+                tie(calculated_size, i) = size_of_instruction_with_one_ri_operand(tokens, i);
+
+                calculated_size += sizeof(byte);
+                calculated_size += sizeof(viua::internals::types::plain_int);
+                ++i;
+
+                return tuple<uint64_t, decltype(i)>(calculated_size, i);
             }
             static auto size_of_iinc(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
