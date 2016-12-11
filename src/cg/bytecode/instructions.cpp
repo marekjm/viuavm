@@ -86,8 +86,8 @@ static byte* insert_two_ri_and_primitive_int_instruction(byte* addr_ptr, enum OP
                 *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_INT;
             }
             pointer::inc<OperandType, byte>(addr_ptr);
-            *(reinterpret_cast<int*>(addr_ptr))  = c.value;
-            pointer::inc<int, byte>(addr_ptr);
+            *(reinterpret_cast<viua::internals::types::plain_int*>(addr_ptr))  = c.value;
+            pointer::inc<viua::internals::types::plain_int, byte>(addr_ptr);
 
             return addr_ptr;
 }
@@ -118,8 +118,8 @@ namespace cg {
 
             *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_INT;
             pointer::inc<OperandType, byte>(addr_ptr);
-            *(reinterpret_cast<int*>(addr_ptr))  = i.value;
-            pointer::inc<int, byte>(addr_ptr);
+            *(reinterpret_cast<viua::internals::types::plain_int*>(addr_ptr))  = i.value;
+            pointer::inc<viua::internals::types::plain_int, byte>(addr_ptr);
 
             return addr_ptr;
         }

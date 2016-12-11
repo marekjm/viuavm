@@ -40,6 +40,8 @@ namespace viua {
         namespace types {
             // FIXME should be uint8_t
             typedef int register_index;
+
+            typedef int plain_int;
         }
     }
 }
