@@ -168,7 +168,7 @@ namespace viua {
             static auto size_of_fstore(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
                 uint64_t calculated_size = sizeof(byte);
                 calculated_size += sizeof(byte);
-                calculated_size += sizeof(double);
+                calculated_size += sizeof(viua::internals::types::plain_float);
                 return tuple<uint64_t, decltype(i)>(calculated_size, i);
             }
             static auto size_of_fadd(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
