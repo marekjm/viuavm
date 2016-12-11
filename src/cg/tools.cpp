@@ -132,71 +132,17 @@ namespace viua {
             static auto size_of_istore(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands(tokens, i);
             }
-            static auto size_of_iadd(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                return size_of_instruction_with_three_ri_operands(tokens, i);
-            }
-            static auto size_of_isub(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                return size_of_instruction_with_three_ri_operands(tokens, i);
-            }
-            static auto size_of_imul(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                return size_of_instruction_with_three_ri_operands(tokens, i);
-            }
-            static auto size_of_idiv(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                return size_of_instruction_with_three_ri_operands(tokens, i);
-            }
             static auto size_of_iinc(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
             static auto size_of_idec(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
-            static auto size_of_ilt(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                return size_of_instruction_with_three_ri_operands(tokens, i);
-            }
-            static auto size_of_ilte(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                return size_of_instruction_with_three_ri_operands(tokens, i);
-            }
-            static auto size_of_igt(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                return size_of_instruction_with_three_ri_operands(tokens, i);
-            }
-            static auto size_of_igte(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                return size_of_instruction_with_three_ri_operands(tokens, i);
-            }
-            static auto size_of_ieq(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                return size_of_instruction_with_three_ri_operands(tokens, i);
-            }
             static auto size_of_fstore(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
                 uint64_t calculated_size = sizeof(byte);
                 calculated_size += sizeof(byte);
                 calculated_size += sizeof(viua::internals::types::plain_float);
                 return tuple<uint64_t, decltype(i)>(calculated_size, i);
-            }
-            static auto size_of_fadd(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                return size_of_instruction_with_three_ri_operands(tokens, i);
-            }
-            static auto size_of_fsub(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                return size_of_instruction_with_three_ri_operands(tokens, i);
-            }
-            static auto size_of_fmul(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                return size_of_instruction_with_three_ri_operands(tokens, i);
-            }
-            static auto size_of_fdiv(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                return size_of_instruction_with_three_ri_operands(tokens, i);
-            }
-            static auto size_of_flt(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                return size_of_instruction_with_three_ri_operands(tokens, i);
-            }
-            static auto size_of_flte(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                return size_of_instruction_with_three_ri_operands(tokens, i);
-            }
-            static auto size_of_fgt(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                return size_of_instruction_with_three_ri_operands(tokens, i);
-            }
-            static auto size_of_fgte(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                return size_of_instruction_with_three_ri_operands(tokens, i);
-            }
-            static auto size_of_feq(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
-                return size_of_instruction_with_three_ri_operands(tokens, i);
             }
             static auto size_of_itof(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<uint64_t, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands(tokens, i);
@@ -650,69 +596,15 @@ namespace viua {
                     } else if (tokens.at(i) == "istore") {
                         ++i;
                         tie(increase, i) = size_of_istore(tokens, i);
-                    } else if (tokens.at(i) == "iadd") {
-                        ++i;
-                        tie(increase, i) = size_of_iadd(tokens, i);
-                    } else if (tokens.at(i) == "isub") {
-                        ++i;
-                        tie(increase, i) = size_of_isub(tokens, i);
-                    } else if (tokens.at(i) == "imul") {
-                        ++i;
-                        tie(increase, i) = size_of_imul(tokens, i);
-                    } else if (tokens.at(i) == "idiv") {
-                        ++i;
-                        tie(increase, i) = size_of_idiv(tokens, i);
                     } else if (tokens.at(i) == "iinc") {
                         ++i;
                         tie(increase, i) = size_of_iinc(tokens, i);
                     } else if (tokens.at(i) == "idec") {
                         ++i;
                         tie(increase, i) = size_of_idec(tokens, i);
-                    } else if (tokens.at(i) == "ilt") {
-                        ++i;
-                        tie(increase, i) = size_of_ilt(tokens, i);
-                    } else if (tokens.at(i) == "ilte") {
-                        ++i;
-                        tie(increase, i) = size_of_ilte(tokens, i);
-                    } else if (tokens.at(i) == "igt") {
-                        ++i;
-                        tie(increase, i) = size_of_igt(tokens, i);
-                    } else if (tokens.at(i) == "igte") {
-                        ++i;
-                        tie(increase, i) = size_of_igte(tokens, i);
-                    } else if (tokens.at(i) == "ieq") {
-                        ++i;
-                        tie(increase, i) = size_of_ieq(tokens, i);
                     } else if (tokens.at(i) == "fstore") {
                         ++i;
                         tie(increase, i) = size_of_fstore(tokens, i);
-                    } else if (tokens.at(i) == "fadd") {
-                        ++i;
-                        tie(increase, i) = size_of_fadd(tokens, i);
-                    } else if (tokens.at(i) == "fsub") {
-                        ++i;
-                        tie(increase, i) = size_of_fsub(tokens, i);
-                    } else if (tokens.at(i) == "fmul") {
-                        ++i;
-                        tie(increase, i) = size_of_fmul(tokens, i);
-                    } else if (tokens.at(i) == "fdiv") {
-                        ++i;
-                        tie(increase, i) = size_of_fdiv(tokens, i);
-                    } else if (tokens.at(i) == "flt") {
-                        ++i;
-                        tie(increase, i) = size_of_flt(tokens, i);
-                    } else if (tokens.at(i) == "flte") {
-                        ++i;
-                        tie(increase, i) = size_of_flte(tokens, i);
-                    } else if (tokens.at(i) == "fgt") {
-                        ++i;
-                        tie(increase, i) = size_of_fgt(tokens, i);
-                    } else if (tokens.at(i) == "fgte") {
-                        ++i;
-                        tie(increase, i) = size_of_fgte(tokens, i);
-                    } else if (tokens.at(i) == "feq") {
-                        ++i;
-                        tie(increase, i) = size_of_feq(tokens, i);
                     } else if (tokens.at(i) == "itof") {
                         ++i;
                         tie(increase, i) = size_of_itof(tokens, i);
@@ -985,69 +877,15 @@ namespace viua {
                     } else if (tokens.at(i) == "istore") {
                         ++i;
                         tie(increase, i) = size_of_istore(tokens, i);
-                    } else if (tokens.at(i) == "iadd") {
-                        ++i;
-                        tie(increase, i) = size_of_iadd(tokens, i);
-                    } else if (tokens.at(i) == "isub") {
-                        ++i;
-                        tie(increase, i) = size_of_isub(tokens, i);
-                    } else if (tokens.at(i) == "imul") {
-                        ++i;
-                        tie(increase, i) = size_of_imul(tokens, i);
-                    } else if (tokens.at(i) == "idiv") {
-                        ++i;
-                        tie(increase, i) = size_of_idiv(tokens, i);
                     } else if (tokens.at(i) == "iinc") {
                         ++i;
                         tie(increase, i) = size_of_iinc(tokens, i);
                     } else if (tokens.at(i) == "idec") {
                         ++i;
                         tie(increase, i) = size_of_idec(tokens, i);
-                    } else if (tokens.at(i) == "ilt") {
-                        ++i;
-                        tie(increase, i) = size_of_ilt(tokens, i);
-                    } else if (tokens.at(i) == "ilte") {
-                        ++i;
-                        tie(increase, i) = size_of_ilte(tokens, i);
-                    } else if (tokens.at(i) == "igt") {
-                        ++i;
-                        tie(increase, i) = size_of_igt(tokens, i);
-                    } else if (tokens.at(i) == "igte") {
-                        ++i;
-                        tie(increase, i) = size_of_igte(tokens, i);
-                    } else if (tokens.at(i) == "ieq") {
-                        ++i;
-                        tie(increase, i) = size_of_ieq(tokens, i);
                     } else if (tokens.at(i) == "fstore") {
                         ++i;
                         tie(increase, i) = size_of_fstore(tokens, i);
-                    } else if (tokens.at(i) == "fadd") {
-                        ++i;
-                        tie(increase, i) = size_of_fadd(tokens, i);
-                    } else if (tokens.at(i) == "fsub") {
-                        ++i;
-                        tie(increase, i) = size_of_fsub(tokens, i);
-                    } else if (tokens.at(i) == "fmul") {
-                        ++i;
-                        tie(increase, i) = size_of_fmul(tokens, i);
-                    } else if (tokens.at(i) == "fdiv") {
-                        ++i;
-                        tie(increase, i) = size_of_fdiv(tokens, i);
-                    } else if (tokens.at(i) == "flt") {
-                        ++i;
-                        tie(increase, i) = size_of_flt(tokens, i);
-                    } else if (tokens.at(i) == "flte") {
-                        ++i;
-                        tie(increase, i) = size_of_flte(tokens, i);
-                    } else if (tokens.at(i) == "fgt") {
-                        ++i;
-                        tie(increase, i) = size_of_fgt(tokens, i);
-                    } else if (tokens.at(i) == "fgte") {
-                        ++i;
-                        tie(increase, i) = size_of_fgte(tokens, i);
-                    } else if (tokens.at(i) == "feq") {
-                        ++i;
-                        tie(increase, i) = size_of_feq(tokens, i);
                     } else if (tokens.at(i) == "itof") {
                         ++i;
                         tie(increase, i) = size_of_itof(tokens, i);
