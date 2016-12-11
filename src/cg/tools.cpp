@@ -53,15 +53,15 @@ namespace viua {
                     ++i;
                 } else if (str::isnum(tokens.at(i))) {
                     calculated_size += sizeof(byte);
-                    calculated_size += sizeof(int);
+                    calculated_size += sizeof(viua::internals::types::register_index);
                     ++i;
                 } else if (tokens.at(i).str().at(0) == '@') {
                     calculated_size += sizeof(byte);
-                    calculated_size += sizeof(int);
+                    calculated_size += sizeof(viua::internals::types::register_index);
                     ++i;
                 } else if (tokens.at(i).str().at(0) == '*') {
                     calculated_size += sizeof(byte);
-                    calculated_size += sizeof(int);
+                    calculated_size += sizeof(viua::internals::types::register_index);
                     ++i;
                 } else if (looks_like_timeout(tokens.at(i))) {
                     calculated_size += sizeof(byte);

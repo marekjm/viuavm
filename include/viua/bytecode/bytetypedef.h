@@ -35,4 +35,13 @@
 
 typedef uint8_t byte;
 
+namespace viua {
+    namespace internals {
+        namespace types {
+            // FIXME should be uint8_t
+            typedef int register_index;
+        }
+    }
+}
+
 #endif
