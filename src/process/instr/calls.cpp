@@ -30,9 +30,9 @@ using namespace std;
 byte* viua::process::Process::opframe(byte* addr) {
     /** Create new frame for function calls.
      */
-    unsigned arguments = 0, local_registers = 0;
-    tie(addr, arguments) = viua::bytecode::decoder::operands::fetch_primitive_uint(addr, this);
-    tie(addr, local_registers) = viua::bytecode::decoder::operands::fetch_primitive_uint(addr, this);
+    viua::internals::types::register_index arguments = 0, local_registers = 0;
+    tie(addr, arguments) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, local_registers) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     requestNewFrame(arguments, local_registers);
 
