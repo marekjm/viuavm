@@ -39,7 +39,7 @@ namespace viua {
     namespace internals {
         namespace types {
             // FIXME should be uint8_t
-            typedef unsigned register_index;
+            typedef uint32_t register_index;
 
             typedef int plain_int;
             typedef double plain_float;
