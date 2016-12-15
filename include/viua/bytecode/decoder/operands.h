@@ -71,7 +71,7 @@ namespace viua {
                  *  These functions are used by instructions whose operands are always
                  *  immediates.
                  */
-                auto fetch_raw_int(byte *ip, viua::process::Process* p) -> std::tuple<byte*, int>;
+                auto fetch_raw_int(byte *ip, viua::process::Process* p) -> std::tuple<byte*, viua::internals::types::plain_int>;
                 auto fetch_raw_float(byte*, viua::process::Process*) -> std::tuple<byte*, float>;
 
                 /*
