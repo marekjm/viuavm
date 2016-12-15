@@ -38,11 +38,11 @@ enum class IntegerOperandType {
 
 struct int_op {
     IntegerOperandType type;
-    int value;
+    viua::internals::types::plain_int value;
 
     int_op();
-    int_op(IntegerOperandType, int = 0);
-    int_op(int);
+    int_op(IntegerOperandType, viua::internals::types::plain_int = 0);
+    int_op(viua::internals::types::plain_int);
 };
 
 /** typedefs for various types of operands

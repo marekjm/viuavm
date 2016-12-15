@@ -24,9 +24,9 @@ using namespace std;
 
 int_op::int_op(): type(IntegerOperandType::PLAIN), value(0) {
 }
-int_op::int_op(IntegerOperandType t, int n): type(t), value(n) {
+int_op::int_op(IntegerOperandType t, viua::internals::types::plain_int n): type(t), value(n) {
 }
-int_op::int_op(int n): type(IntegerOperandType::PLAIN), value(n) {
+int_op::int_op(viua::internals::types::plain_int n): type(IntegerOperandType::PLAIN), value(n) {
 }
 
 
