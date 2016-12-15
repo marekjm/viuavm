@@ -52,7 +52,7 @@ static void strwrite(ofstream& out, const string& s) {
 }
 
 
-static tuple<uint64_t, enum JUMPTYPE> resolvejump(Token token, const map<string, int>& marks, uint64_t instruction_index) {
+static tuple<uint64_t, enum JUMPTYPE> resolvejump(Token token, const map<string, vector<Token>::size_type>& marks, uint64_t instruction_index) {
     /*  This function is used to resolve jumps in `jump` and `branch` instructions.
      */
     string jmp = token.str();
@@ -167,7 +167,7 @@ static int timeout_to_int(const string& timeout) {
     }
 }
 
-static uint64_t assemble_instruction(Program& program, uint64_t& instruction, uint64_t i, const vector<Token>& tokens, map<string, int>& marks) {
+static uint64_t assemble_instruction(Program& program, uint64_t& instruction, uint64_t i, const vector<Token>& tokens, map<string, std::remove_reference<decltype(tokens)>::type::size_type>& marks) {
     /*  This is main assembly loop.
      *  It iterates over lines with instructions and
      *  uses bytecode generation API to fill the program with instructions and
@@ -447,7 +447,7 @@ static uint64_t assemble_instruction(Program& program, uint64_t& instruction, ui
     ++i;  // skip the newline
     return i;
 }
-static Program& compile(Program& program, const vector<Token>& tokens, map<string, int>& marks) {
+static Program& compile(Program& program, const vector<Token>& tokens, map<string, std::remove_reference<decltype(tokens)>::type::size_type>& marks) {
     /** Compile instructions into bytecode using bytecode generation API.
      *
      */
@@ -470,7 +470,7 @@ static void assemble(Program& program, const vector<Token>& tokens) {
      *  program         - Program object which will be used for assembling
      *  lines           - lines with instructions
      */
-    map<string, int> marks = assembler::ce::getmarks(tokens);
+    auto marks = assembler::ce::getmarks(tokens);
     compile(program, tokens, marks);
 }
 
