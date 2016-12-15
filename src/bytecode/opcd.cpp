@@ -28,7 +28,7 @@ using namespace std;
 
 
 int main() {
-    long unsigned max_mnemonic_length = 0;
+    std::string::size_type max_mnemonic_length = 0;
     for (pair<const OPCODE, string> i : OP_NAMES) {
         max_mnemonic_length = ((max_mnemonic_length >= i.second.size()) ? max_mnemonic_length : i.second.size());
     }
