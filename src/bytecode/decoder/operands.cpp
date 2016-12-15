@@ -114,7 +114,7 @@ auto viua::bytecode::decoder::operands::fetch_primitive_uint64(byte *ip, viua::p
     return tuple<byte*, decltype(integer)>(ip, integer);
 }
 
-auto viua::bytecode::decoder::operands::fetch_primitive_int(byte *ip, viua::process::Process* p) -> tuple<byte*, int> {
+auto viua::bytecode::decoder::operands::fetch_primitive_int(byte *ip, viua::process::Process* p) -> tuple<byte*, viua::internals::types::plain_int> {
     OperandType ot = viua::bytecode::decoder::operands::get_operand_type(ip);
     ++ip;
 

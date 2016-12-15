@@ -60,7 +60,7 @@ namespace viua {
                 auto fetch_timeout(byte*, viua::process::Process*) -> std::tuple<byte*, viua::internals::types::timeout>;
                 auto fetch_primitive_uint(byte*, viua::process::Process*) -> std::tuple<byte*, viua::internals::types::register_index>;
                 auto fetch_primitive_uint64(byte*, viua::process::Process*) -> std::tuple<byte*, uint64_t>;
-                auto fetch_primitive_int(byte*, viua::process::Process*) -> std::tuple<byte*, int>;
+                auto fetch_primitive_int(byte*, viua::process::Process*) -> std::tuple<byte*, viua::internals::types::plain_int>;
                 auto fetch_primitive_string(byte*, viua::process::Process*) -> std::tuple<byte*, std::string>;
                 auto fetch_atom(byte*, viua::process::Process*) -> std::tuple<byte*, std::string>;
                 auto fetch_object(byte*, viua::process::Process*) -> std::tuple<byte*, viua::types::Type*>;
