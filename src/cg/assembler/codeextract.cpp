@@ -118,7 +118,7 @@ static void assert_is_not_reserved_keyword(Token token, const string& message) {
         "rol",  // rotate left
         "ror",  // rotate right
     };
-    if (reserved_keywords.count(s) or OP_SIZES.count(s)) {
+    if (reserved_keywords.count(s) or OP_MNEMONICS.count(s)) {
         throw viua::cg::lex::InvalidSyntax(token, ("invalid " + message + ": '" + s + "' is a registered keyword"));
     }
 }

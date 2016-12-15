@@ -25,113 +25,114 @@
 #include <cstdint>
 #include <map>
 #include <vector>
+#include <set>
 #include <string>
 #include <viua/bytecode/opcodes.h>
 #include <viua/bytecode/operand_types.h>
 
 
-const std::map<std::string, unsigned> OP_SIZES = {
-    { "nop",            sizeof(byte) },
+const std::set<std::string> OP_MNEMONICS = {
+    "nop",
 
-    { "izero",          sizeof(byte) + sizeof(OperandType) + sizeof(int) },
-    { "istore",         sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
-    { "iinc",           sizeof(byte) + sizeof(OperandType) + sizeof(int) },
-    { "idec",           sizeof(byte) + sizeof(OperandType) + sizeof(int) },
+    "izero",
+    "istore",
+    "iinc",
+    "idec",
 
-    { "fstore",         sizeof(byte) + sizeof(OperandType) + sizeof(int) + sizeof(float) },
+    "fstore",
 
-    { "itof",           sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
-    { "ftoi",           sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
-    { "stoi",           sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
-    { "stof",           sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
+    "itof",
+    "ftoi",
+    "stoi",
+    "stof",
 
-    { "add",            0 },
-    { "sub",            0 },
-    { "mul",            0 },
-    { "div",            0 },
-    { "lt",             0 },
-    { "lte",            0 },
-    { "gt",             0 },
-    { "gte",            0 },
-    { "eq",             0 },
+    "add",
+    "sub",
+    "mul",
+    "div",
+    "lt",
+    "lte",
+    "gt",
+    "gte",
+    "eq",
 
-    { "strstore",       sizeof(byte) + sizeof(OperandType) + sizeof(int) },
-    { "streq",          sizeof(byte) + 3*sizeof(OperandType) + 3*sizeof(int) },
+    "strstore",
+    "streq",
 
-    { "vec",            sizeof(byte) + 3*sizeof(OperandType) + 3*sizeof(int) },
-    { "vinsert",        sizeof(byte) + 3*sizeof(OperandType) + 3*sizeof(int) },
-    { "vpush",          sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
-    { "vpop",           sizeof(byte) + 3*sizeof(OperandType) + 3*sizeof(int) },
-    { "vat",            sizeof(byte) + 3*sizeof(OperandType) + 3*sizeof(int) },
-    { "vlen",           sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
+    "vec",
+    "vinsert",
+    "vpush",
+    "vpop",
+    "vat",
+    "vlen",
 
-    { "bool",           sizeof(byte) + sizeof(OperandType) + sizeof(int) },
-    { "not",            sizeof(byte) + sizeof(OperandType) + sizeof(int) },
-    { "and",            sizeof(byte) + 3*sizeof(OperandType) + 3*sizeof(int) },
-    { "or",             sizeof(byte) + 3*sizeof(OperandType) + 3*sizeof(int) },
+    "bool",
+    "not",
+    "and",
+    "or",
 
-    { "move",           sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
-    { "copy",           sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
-    { "ptr",            sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
-    { "swap",           sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
-    { "delete",         sizeof(byte) + sizeof(OperandType) + sizeof(int) },
-    { "isnull",         sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
-    { "ress",           sizeof(byte) + sizeof(int) },
-    { "tmpri",          sizeof(byte) + sizeof(OperandType) + sizeof(int) },
-    { "tmpro",          sizeof(byte) + sizeof(OperandType) + sizeof(int) },
+    "move",
+    "copy",
+    "ptr",
+    "swap",
+    "delete",
+    "isnull",
+    "ress",
+    "tmpri",
+    "tmpro",
 
-    { "print",          sizeof(byte) + sizeof(OperandType) + sizeof(int) },
-    { "echo",           sizeof(byte) + sizeof(OperandType) + sizeof(int) },
+    "print",
+    "echo",
 
-    { "capture",        sizeof(byte) + 3*sizeof(OperandType) + 3*sizeof(int) },
-    { "capturecopy",    sizeof(byte) + 3*sizeof(OperandType) + 3*sizeof(int) },
-    { "capturemove",    sizeof(byte) + 3*sizeof(OperandType) + 3*sizeof(int) },
-    { "closure",        sizeof(byte) + sizeof(OperandType) + sizeof(int) },
+    "capture",
+    "capturecopy",
+    "capturemove",
+    "closure",
 
-    { "function",       sizeof(byte) + sizeof(OperandType) + sizeof(int) },
-    { "fcall",          sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
+    "function",
+    "fcall",
 
-    { "frame",          sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
-    { "param",          sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
-    { "pamv",           sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
-    { "call",           sizeof(byte) + sizeof(OperandType) + sizeof(int) },
-    { "tailcall",       sizeof(byte) },
-    { "arg",            sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
-    { "argc",           sizeof(byte) + sizeof(OperandType) + sizeof(int) },
-    { "process",        sizeof(byte) + sizeof(OperandType) + sizeof(int) },
-    { "self",           sizeof(byte) + sizeof(OperandType) + sizeof(int) },
-    { "join",           sizeof(byte) + 3*sizeof(OperandType) + 3*sizeof(int) },
-    { "send",           sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
-    { "receive",        sizeof(byte) + 2*sizeof(OperandType) + 2*sizeof(int) },
+    "frame",
+    "param",
+    "pamv",
+    "call",
+    "tailcall",
+    "arg",
+    "argc",
+    "process",
+    "self",
+    "join",
+    "send",
+    "receive",
 
-    { "watchdog",       sizeof(byte) },
+    "watchdog",
 
-    { "jump",           sizeof(byte) + sizeof(uint64_t) },
-    { "if",             sizeof(byte) + sizeof(OperandType)+sizeof(int) + 2*sizeof(uint64_t) },
+    "jump",
+    "if",
 
-    { "throw",          sizeof(byte) + sizeof(OperandType) + sizeof(int) },
-    { "catch",          sizeof(byte) }, // catch "<type>" <block>
-    { "draw",           sizeof(byte) + sizeof(OperandType) + sizeof(int) }, // draw <register>
-    { "try",            sizeof(byte) },
-    { "enter",          sizeof(byte) },
-    { "leave",          sizeof(byte) },
+    "throw",
+    "catch",
+    "draw",
+    "try",
+    "enter",
+    "leave",
 
-    { "import",         sizeof(byte) },
-    { "link",           sizeof(byte) },
+    "import",
+    "link",
 
-    { "class",          sizeof(byte) + sizeof(OperandType) + sizeof(int) },    // class 1 Foo
-    { "prototype",      sizeof(byte) + sizeof(OperandType) + sizeof(int) },  // prototype 1 Foo
-    { "derive",         sizeof(byte) + sizeof(OperandType) + sizeof(int) },    // derive 1 Bar
-    { "attach",         sizeof(byte) + sizeof(OperandType) + sizeof(int) },    // attach 1 function method
-    { "register",       sizeof(byte) + sizeof(OperandType) + sizeof(int) },   // register 1
+    "class",
+    "prototype",
+    "derive",
+    "attach",
+    "register",
 
-    { "new",            sizeof(byte) + sizeof(OperandType) + sizeof(int) },    // new <target> Foo
-    { "msg",            sizeof(byte) + sizeof(OperandType) + sizeof(int) },    // msg <return> method
-    { "insert",         sizeof(byte) + 3*sizeof(OperandType) + 3*sizeof(int) },
-    { "remove",         sizeof(byte) + 3*sizeof(OperandType) + 3*sizeof(int) },
+    "new",
+    "msg",
+    "insert",
+    "remove",
 
-    { "return",         sizeof(byte) },
-    { "halt",           sizeof(byte) },
+    "return",
+    "halt",
 };
 
 

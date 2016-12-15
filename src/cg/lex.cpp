@@ -186,7 +186,7 @@ namespace viua {
                     "rol",  // rotate left
                     "ror",  // rotate right
                 };
-                return (reserved_keywords.count(s) or OP_SIZES.count(s));
+                return (reserved_keywords.count(s) or OP_MNEMONICS.count(s));
             }
             static void assert_is_not_reserved_keyword(Token token, const string& message) {
                 string s = token.original();

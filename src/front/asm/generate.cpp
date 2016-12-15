@@ -620,7 +620,7 @@ static uint64_t generate_entry_function(uint64_t bytes, map<string, uint64_t> fu
     entry_function_tokens.emplace_back(0, 0, "ress");
     entry_function_tokens.emplace_back(0, 0, "local");
     entry_function_tokens.emplace_back(0, 0, "\n");
-    bytes += OP_SIZES.at("ress");
+    bytes += sizeof(byte) + sizeof(int);
 
     // generate different instructions based on which main function variant
     // has been selected
@@ -629,13 +629,13 @@ static uint64_t generate_entry_function(uint64_t bytes, map<string, uint64_t> fu
         entry_function_tokens.emplace_back(0, 0, "0");
         entry_function_tokens.emplace_back(0, 0, "16");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += OP_SIZES.at("frame");
+        bytes += sizeof(byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(byte);
     } else if (main_function == "main/2") {
         entry_function_tokens.emplace_back(0, 0, "frame");
         entry_function_tokens.emplace_back(0, 0, "2");
         entry_function_tokens.emplace_back(0, 0, "16");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += OP_SIZES.at("frame");
+        bytes += sizeof(byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(byte);
 
         // pop first element on the list of aruments
         entry_function_tokens.emplace_back(0, 0, "vpop");
@@ -643,14 +643,14 @@ static uint64_t generate_entry_function(uint64_t bytes, map<string, uint64_t> fu
         entry_function_tokens.emplace_back(0, 0, "1");
         entry_function_tokens.emplace_back(0, 0, "0");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += OP_SIZES.at("vpop");
+        bytes += sizeof(byte) + 3*sizeof(viua::internals::types::register_index) + 3*sizeof(byte);
 
         // for parameter for main/2 is the name of the program
         entry_function_tokens.emplace_back(0, 0, "param");
         entry_function_tokens.emplace_back(0, 0, "0");
         entry_function_tokens.emplace_back(0, 0, "0");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += OP_SIZES.at("param");
+        bytes += sizeof(byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(byte);
 
         // second parameter for main/2 is the vector with the rest
         // of the commandl ine parameters
@@ -658,7 +658,7 @@ static uint64_t generate_entry_function(uint64_t bytes, map<string, uint64_t> fu
         entry_function_tokens.emplace_back(0, 0, "1");
         entry_function_tokens.emplace_back(0, 0, "1");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += OP_SIZES.at("param");
+        bytes += sizeof(byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(byte);
     } else {
         // this is for default main function, i.e. `main/1` or
         // for custom main functions
@@ -667,14 +667,13 @@ static uint64_t generate_entry_function(uint64_t bytes, map<string, uint64_t> fu
         entry_function_tokens.emplace_back(0, 0, "1");
         entry_function_tokens.emplace_back(0, 0, "16");
         entry_function_tokens.emplace_back(0, 0, "\n");
+        bytes += sizeof(byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(byte);
 
         entry_function_tokens.emplace_back(0, 0, "param");
         entry_function_tokens.emplace_back(0, 0, "0");
         entry_function_tokens.emplace_back(0, 0, "1");
         entry_function_tokens.emplace_back(0, 0, "\n");
-
-        bytes += OP_SIZES.at("frame");
-        bytes += OP_SIZES.at("param");
+        bytes += sizeof(byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(byte);
     }
 
     // name of the main function must not be hardcoded because there is '.main:' assembler
@@ -684,7 +683,7 @@ static uint64_t generate_entry_function(uint64_t bytes, map<string, uint64_t> fu
     entry_function_tokens.emplace_back(0, 0, "1");
     entry_function_tokens.emplace_back(0, 0, main_function);
     entry_function_tokens.emplace_back(0, 0, "\n");
-    bytes += OP_SIZES.at("call");
+    bytes += sizeof(byte) + sizeof(viua::internals::types::register_index) + sizeof(byte);
     bytes += main_function.size()+1;
 
     // then, register 1 is moved to register 0 so it counts as a return code
@@ -692,11 +691,11 @@ static uint64_t generate_entry_function(uint64_t bytes, map<string, uint64_t> fu
     entry_function_tokens.emplace_back(0, 0, "0");
     entry_function_tokens.emplace_back(0, 0, "1");
     entry_function_tokens.emplace_back(0, 0, "\n");
-    bytes += OP_SIZES.at("move");
+    bytes += sizeof(byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(byte);
 
     entry_function_tokens.emplace_back(0, 0, "halt");
     entry_function_tokens.emplace_back(0, 0, "\n");
-    bytes += OP_SIZES.at("halt");
+    bytes += sizeof(byte);
 
     functions.tokens[ENTRY_FUNCTION_NAME] = entry_function_tokens;
 
