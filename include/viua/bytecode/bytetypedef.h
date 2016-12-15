@@ -41,7 +41,7 @@ namespace viua {
             // FIXME should be uint8_t
             typedef uint32_t register_index;
 
-            typedef int plain_int;
+            typedef int32_t plain_int;
             typedef double plain_float;
 
             typedef uint32_t timeout;
