@@ -93,7 +93,7 @@ static byte* insert_two_ri_and_primitive_int_instruction(byte* addr_ptr, enum OP
 }
 
 static byte* insertString(byte* ptr, const string& s) {
-    for (unsigned i = 0; i < s.size(); ++i) {
+    for (std::string::size_type i = 0; i < s.size(); ++i) {
         *(ptr++) = static_cast<byte>(s[i]);
     }
     *(ptr++) = '\0';
