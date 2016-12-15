@@ -114,7 +114,7 @@ namespace str {
     }
 
 
-    string sub(const string& s, unsigned long b, long int e) {
+    string sub(const string& s, std::string::size_type b, long int e) {
         /*  Returns substring of s.
          *  If only s is passed, returns copy of s.
          */
@@ -123,11 +123,11 @@ namespace str {
         ostringstream part;
         part.str("");
 
-        unsigned long end;
-        if (e < 0) { end = (s.size() - static_cast<unsigned long>(-1 * e) + 1); }
-        else { end = static_cast<long unsigned>(e); }
+        std::string::size_type end = 0;
+        if (e < 0) { end = (s.size() - static_cast<std::string::size_type>(-1 * e) + 1); }
+        else { end = static_cast<std::string::size_type>(e); }
 
-        for (unsigned long i = b; i < s.size() and i < end; ++i) {
+        for (auto i = b; i < s.size() and i < end; ++i) {
             part << s[i];
         }
 
@@ -238,9 +238,9 @@ namespace str {
     }
 
 
-    unsigned lshare(const string& s, const string& w) {
-        unsigned share = 0;
-        for (unsigned i = 0; i < s.size() and i < w.size(); ++i) {
+    std::string::size_type lshare(const string& s, const string& w) {
+        std::string::size_type share = 0;
+        for (std::string::size_type i = 0; i < s.size() and i < w.size(); ++i) {
             if (s[i] == w[i]) {
                 ++share;
             } else {
