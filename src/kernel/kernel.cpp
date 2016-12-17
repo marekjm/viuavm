@@ -306,7 +306,7 @@ void viua::kernel::Kernel::postFreeProcess(unique_ptr<viua::process::Process> p)
     free_virtual_processes_cv.notify_one();
 }
 
-uint64_t viua::kernel::Kernel::createMailbox(const viua::process::PID pid) {
+auto viua::kernel::Kernel::createMailbox(const viua::process::PID pid) -> decltype(running_processes) {
     unique_lock<mutex> lck(mailbox_mutex);
 #if VIUA_VM_DEBUG_LOG
     cerr << "[kernel:mailbox:create] pid = " << pid.get() << endl;
@@ -314,7 +314,7 @@ uint64_t viua::kernel::Kernel::createMailbox(const viua::process::PID pid) {
     mailboxes.emplace(pid, vector<unique_ptr<viua::types::Type>>{});
     return ++running_processes;
 }
-uint64_t viua::kernel::Kernel::deleteMailbox(const viua::process::PID pid) {
+auto viua::kernel::Kernel::deleteMailbox(const viua::process::PID pid) -> decltype(running_processes) {
     unique_lock<mutex> lck(mailbox_mutex);
 #if VIUA_VM_DEBUG_LOG
     cerr << "[kernel:mailbox:delete] pid = " << pid.get() << ", queued messages = " << mailboxes[pid].size() << endl;

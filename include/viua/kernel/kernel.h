@@ -193,8 +193,9 @@ namespace viua {
 
                 void postFreeProcess(std::unique_ptr<viua::process::Process>);
 
-                uint64_t createMailbox(const viua::process::PID);
-                uint64_t deleteMailbox(const viua::process::PID);
+                auto createMailbox(const viua::process::PID) -> decltype(running_processes);
+                auto deleteMailbox(const viua::process::PID) -> decltype(running_processes);
+
                 void send(const viua::process::PID, std::unique_ptr<viua::types::Type>);
                 void receive(const viua::process::PID, std::queue<std::unique_ptr<viua::types::Type>>&);
                 uint64_t pids() const;
