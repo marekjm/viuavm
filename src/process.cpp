@@ -45,6 +45,11 @@ viua::types::Type* viua::process::Process::fetch(viua::internals::types::registe
 viua::types::Type* viua::process::Process::obtain(viua::internals::types::register_index index) const {
     return fetch(index);
 }
+
+viua::kernel::Register* viua::process::Process::register_at(viua::internals::types::register_index i) {
+    return currently_used_register_set->register_at(i);
+}
+
 unique_ptr<viua::types::Type> viua::process::Process::pop(viua::internals::types::register_index index) {
     return currently_used_register_set->pop(index);
 }

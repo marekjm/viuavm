@@ -264,6 +264,8 @@ namespace viua {
                 viua::types::Type* obtain(viua::internals::types::register_index) const;
                 void put(viua::internals::types::register_index, std::unique_ptr<viua::types::Type>);
 
+                viua::kernel::Register* register_at(viua::internals::types::register_index);
+
                 bool joinable() const;
                 void join();
                 void detach();

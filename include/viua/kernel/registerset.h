@@ -72,6 +72,8 @@ namespace viua {
                 viua::types::Type* get(viua::internals::types::register_index);
                 viua::types::Type* at(viua::internals::types::register_index);
 
+                Register* register_at(viua::internals::types::register_index);
+
                 // register modifications
                 void move(viua::internals::types::register_index, viua::internals::types::register_index);
                 void swap(viua::internals::types::register_index, viua::internals::types::register_index);

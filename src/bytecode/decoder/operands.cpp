@@ -89,6 +89,12 @@ auto viua::bytecode::decoder::operands::fetch_register_index(viua::internals::ty
     return extract_register_index(ip, process);
 }
 
+auto viua::bytecode::decoder::operands::fetch_register(viua::internals::types::byte *ip, viua::process::Process *process) -> tuple<viua::internals::types::byte*, viua::kernel::Register*> {
+    viua::internals::types::register_index target = 0;
+    tie(ip, target) = viua::bytecode::decoder::operands::fetch_register_index(ip, process);
+    return tuple<viua::internals::types::byte*, viua::kernel::Register*>(ip, process->register_at(target));
+}
+
 auto viua::bytecode::decoder::operands::fetch_timeout(viua::internals::types::byte *ip, viua::process::Process*) -> tuple<viua::internals::types::byte*, viua::internals::types::timeout> {
     OperandType ot = viua::bytecode::decoder::operands::get_operand_type(ip);
     ++ip;

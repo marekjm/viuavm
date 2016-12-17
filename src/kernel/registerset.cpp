@@ -136,6 +136,15 @@ viua::types::Type* viua::kernel::RegisterSet::at(viua::internals::types::registe
     return registers.at(index).get();
 }
 
+viua::kernel::Register* viua::kernel::RegisterSet::register_at(viua::internals::types::register_index index) {
+    if (index >= registerset_size) {
+        ostringstream emsg;
+        emsg << "register access out of bounds: read from " << index;
+        throw new viua::types::Exception(emsg.str());
+    }
+    return &(registers.at(index));
+}
+
 
 void viua::kernel::RegisterSet::move(viua::internals::types::register_index src, viua::internals::types::register_index dst) {
     /** Move an object from src register to dst register.

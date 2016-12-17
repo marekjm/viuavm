@@ -27,6 +27,7 @@
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/operand_types.h>
 #include <viua/types/type.h>
+#include <viua/kernel/registerset.h>
 
 
 namespace viua {
@@ -57,6 +58,7 @@ namespace viua {
                 auto fetch_void(viua::internals::types::byte*) -> viua::internals::types::byte*;
                 auto fetch_operand_type(viua::internals::types::byte*) -> std::tuple<viua::internals::types::byte*, OperandType>;
                 auto fetch_register_index(viua::internals::types::byte*, viua::process::Process*) -> std::tuple<viua::internals::types::byte*, viua::internals::types::register_index>;
+                auto fetch_register(viua::internals::types::byte*, viua::process::Process*) -> std::tuple<viua::internals::types::byte*, viua::kernel::Register*>;
                 auto fetch_timeout(viua::internals::types::byte*, viua::process::Process*) -> std::tuple<viua::internals::types::byte*, viua::internals::types::timeout>;
                 auto fetch_registerset_type(viua::internals::types::byte*, viua::process::Process*) -> std::tuple<viua::internals::types::byte*, viua::internals::types::registerset_type_marker>;
                 auto fetch_primitive_uint(viua::internals::types::byte*, viua::process::Process*) -> std::tuple<viua::internals::types::byte*, viua::internals::types::register_index>;
