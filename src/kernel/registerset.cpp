@@ -29,7 +29,11 @@ using namespace std;
 
 
 void viua::kernel::Register::reset(unique_ptr<viua::types::Type> o) {
-    value = std::move(o);
+    if (dynamic_cast<viua::types::Reference*>(value.get())) {
+        static_cast<viua::types::Reference*>(value.get())->rebind(o.release());
+    } else {
+        value = std::move(o);
+    }
 }
 
 bool viua::kernel::Register::empty() const {
@@ -62,12 +66,12 @@ viua::kernel::Register::operator bool() const {
 }
 
 auto viua::kernel::Register::operator =(Register&& that) -> Register& {
-    value = std::move(that.value);
+    reset(std::move(that.value));
     return *this;
 }
 
 auto viua::kernel::Register::operator =(decltype(value)&& o) -> Register& {
-    value = std::move(o);
+    reset(std::move(o));
     return *this;
 }
 
