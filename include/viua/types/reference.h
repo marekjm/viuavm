@@ -31,12 +31,12 @@ namespace viua {
     namespace types {
         class Reference: public Type {
             Type **pointer;
-            unsigned *counter;
+            uint64_t *counter;
 
             /*  This constructor is used internally by the Reference type to
              *  initialise copies of the reference.
              */
-            Reference(Type **ptr, unsigned *ctr): pointer(ptr), counter(ctr) {}
+            Reference(Type **ptr, uint64_t *ctr): pointer(ptr), counter(ctr) {}
 
             public:
                 virtual std::string type() const override;
