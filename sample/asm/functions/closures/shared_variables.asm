@@ -62,13 +62,13 @@
     call (.name: iota the_closures) returns_closures/0
 
     frame 0
-    fcall void *(vat (.name: iota getter_closure) the_closures 0)
+    fcall void *(vat (.name: iota printer_closure) the_closures 0)
 
     frame ^[(param 0 (istore iota 69))]
     fcall void *(vat (.name: iota setter_closure) the_closures 1)
 
     frame 0
-    fcall void *getter_closure
+    fcall void *printer_closure
 
     izero 0
     return
