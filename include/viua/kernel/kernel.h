@@ -69,20 +69,20 @@ namespace viua {
              *  Size and executable offset are metadata exported from bytecode dump.
              */
             std::unique_ptr<byte[]> bytecode;
-            uint64_t bytecode_size;
-            uint64_t executable_offset;
+            viua::internals::types::bytecode_size bytecode_size;
+            viua::internals::types::bytecode_size executable_offset;
 
             // Map of the typesystem currently existing inside the VM.
             std::map<std::string, std::unique_ptr<viua::types::Prototype>> typesystem;
 
             /*  Function and block names mapped to bytecode addresses.
              */
-            std::map<std::string, uint64_t> function_addresses;
-            std::map<std::string, uint64_t> block_addresses;
+            std::map<std::string, viua::internals::types::bytecode_size> function_addresses;
+            std::map<std::string, viua::internals::types::bytecode_size> block_addresses;
 
             std::map<std::string, std::pair<std::string, byte*>> linked_functions;
             std::map<std::string, std::pair<std::string, byte*>> linked_blocks;
-            std::map<std::string, std::pair<unsigned, std::unique_ptr<byte[]>>> linked_modules;
+            std::map<std::string, std::pair<viua::internals::types::bytecode_size, std::unique_ptr<byte[]>>> linked_modules;
 
             int return_code;
 
@@ -154,10 +154,10 @@ namespace viua {
                  *      * kick the Kernel so it starts running,
                  */
                 Kernel& load(std::unique_ptr<byte[]>);
-                Kernel& bytes(uint64_t);
+                Kernel& bytes(viua::internals::types::bytecode_size);
 
-                Kernel& mapfunction(const std::string&, uint64_t);
-                Kernel& mapblock(const std::string&, uint64_t);
+                Kernel& mapfunction(const std::string&, viua::internals::types::bytecode_size);
+                Kernel& mapblock(const std::string&, viua::internals::types::bytecode_size);
 
                 Kernel& registerExternalFunction(const std::string&, ForeignFunction*);
                 Kernel& removeExternalFunction(std::string);

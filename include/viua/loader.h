@@ -33,7 +33,7 @@
 #include <viua/machine.h>
 #include <viua/bytecode/bytetypedef.h>
 
-typedef std::tuple<std::vector<std::string>, std::map<std::string, uint64_t> > IdToAddressMapping;
+typedef std::tuple<std::vector<std::string>, std::map<std::string, viua::internals::types::bytecode_size> > IdToAddressMapping;
 
 template<class T> void readinto(std::ifstream& in, T* object) {
     in.read(reinterpret_cast<char*>(object), sizeof(T));
@@ -42,23 +42,23 @@ template<class T> void readinto(std::ifstream& in, T* object) {
 class Loader {
     std::string path;
 
-    uint64_t size;
+    viua::internals::types::bytecode_size size;
     std::unique_ptr<byte[]> bytecode;
 
-    std::vector<uint64_t> jumps;
+    std::vector<viua::internals::types::bytecode_size> jumps;
 
     std::map<std::string, std::string> meta_information;
 
     std::vector<std::string> external_signatures;
     std::vector<std::string> external_signatures_block;
 
-    std::map<std::string, uint64_t> function_addresses;
-    std::map<std::string, uint64_t> function_sizes;
+    std::map<std::string, viua::internals::types::bytecode_size> function_addresses;
+    std::map<std::string, viua::internals::types::bytecode_size> function_sizes;
     std::vector<std::string> functions;
-    std::map<std::string, uint64_t> block_addresses;
+    std::map<std::string, viua::internals::types::bytecode_size> block_addresses;
     std::vector<std::string> blocks;
 
-    IdToAddressMapping loadmap(char*, const uint64_t&);
+    IdToAddressMapping loadmap(char*, const viua::internals::types::bytecode_size&);
     void calculateFunctionSizes();
 
     void loadMagicNumber(std::ifstream&);
@@ -77,21 +77,21 @@ class Loader {
     Loader& load();
     Loader& executable();
 
-    uint64_t getBytecodeSize();
+    viua::internals::types::bytecode_size getBytecodeSize();
     std::unique_ptr<byte[]> getBytecode();
 
-    std::vector<uint64_t> getJumps();
+    std::vector<viua::internals::types::bytecode_size> getJumps();
 
     std::map<std::string, std::string> getMetaInformation();
 
     std::vector<std::string> getExternalSignatures();
     std::vector<std::string> getExternalBlockSignatures();
 
-    std::map<std::string, uint64_t> getFunctionAddresses();
-    std::map<std::string, uint64_t> getFunctionSizes();
+    std::map<std::string, viua::internals::types::bytecode_size> getFunctionAddresses();
+    std::map<std::string, viua::internals::types::bytecode_size> getFunctionSizes();
     std::vector<std::string> getFunctions();
 
-    std::map<std::string, uint64_t> getBlockAddresses();
+    std::map<std::string, viua::internals::types::bytecode_size> getBlockAddresses();
     std::vector<std::string> getBlocks();
 
     Loader(std::string pth): path(pth), size(0), bytecode(nullptr) {}

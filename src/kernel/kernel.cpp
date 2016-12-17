@@ -59,7 +59,7 @@ viua::kernel::Kernel& viua::kernel::Kernel::load(unique_ptr<byte[]> bc) {
     return (*this);
 }
 
-viua::kernel::Kernel& viua::kernel::Kernel::bytes(uint64_t sz) {
+viua::kernel::Kernel& viua::kernel::Kernel::bytes(viua::internals::types::bytecode_size sz) {
     /*  Set bytecode size, so the viua::kernel::Kernel can stop execution even if it doesn't reach HALT instruction but reaches
      *  bytecode address out of bounds.
      */
@@ -67,14 +67,14 @@ viua::kernel::Kernel& viua::kernel::Kernel::bytes(uint64_t sz) {
     return (*this);
 }
 
-viua::kernel::Kernel& viua::kernel::Kernel::mapfunction(const string& name, uint64_t address) {
+viua::kernel::Kernel& viua::kernel::Kernel::mapfunction(const string& name, viua::internals::types::bytecode_size address) {
     /** Maps function name to bytecode address.
      */
     function_addresses[name] = address;
     return (*this);
 }
 
-viua::kernel::Kernel& viua::kernel::Kernel::mapblock(const string& name, uint64_t address) {
+viua::kernel::Kernel& viua::kernel::Kernel::mapblock(const string& name, viua::internals::types::bytecode_size address) {
     /** Maps block name to bytecode address.
      */
     block_addresses[name] = address;
@@ -120,20 +120,20 @@ void viua::kernel::Kernel::loadNativeLibrary(const string& module) {
         unique_ptr<byte[]> lnk_btcd {loader.getBytecode()};
 
         vector<string> fn_names = loader.getFunctions();
-        map<string, uint64_t> fn_addrs = loader.getFunctionAddresses();
+        map<string, viua::internals::types::bytecode_size> fn_addrs = loader.getFunctionAddresses();
         for (unsigned i = 0; i < fn_names.size(); ++i) {
             string fn_linkname = fn_names[i];
             linked_functions[fn_linkname] = pair<string, byte*>(module, (lnk_btcd.get()+fn_addrs[fn_names[i]]));
         }
 
         vector<string> bl_names = loader.getBlocks();
-        map<string, uint64_t> bl_addrs = loader.getBlockAddresses();
+        map<string, viua::internals::types::bytecode_size> bl_addrs = loader.getBlockAddresses();
         for (unsigned i = 0; i < bl_names.size(); ++i) {
             string bl_linkname = bl_names[i];
             linked_blocks[bl_linkname] = pair<string, byte*>(module, (lnk_btcd.get()+bl_addrs[bl_linkname]));
         }
 
-        linked_modules[module] = pair<unsigned, unique_ptr<byte[]>>(static_cast<unsigned>(loader.getBytecodeSize()), std::move(lnk_btcd));
+        linked_modules[module] = pair<viua::internals::types::bytecode_size, unique_ptr<byte[]>>(loader.getBytecodeSize(), std::move(lnk_btcd));
     } else {
         throw new viua::types::Exception("failed to link: " + module);
     }
