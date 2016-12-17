@@ -36,7 +36,7 @@ using namespace std;
 static void printStackTrace(viua::process::Process *process) {
     auto trace = process->trace();
     cout << "stack trace: from entry point, most recent call last...\n";
-    for (unsigned i = (trace.size() and trace[0]->function_name == "__entry"); i < trace.size(); ++i) {
+    for (decltype(trace)::size_type i = (trace.size() and trace[0]->function_name == "__entry"); i < trace.size(); ++i) {
         cout << "  " << stringifyFunctionInvocation(trace[i]) << "\n";
     }
     cout << "\n";
@@ -56,12 +56,12 @@ static void printStackTrace(viua::process::Process *process) {
         Frame* last = trace.back();
         if (last->local_register_set->size()) {
             unsigned non_empty = 0;
-            for (unsigned r = 0; r < last->local_register_set->size(); ++r) {
+            for (decltype(last->local_register_set->size()) r = 0; r < last->local_register_set->size(); ++r) {
                 if (last->local_register_set->at(r) != nullptr) { ++non_empty; }
             }
             cout << "  non-empty registers: " << non_empty << '/' << last->local_register_set->size();
             cout << (non_empty ? ":\n" : "\n");
-            for (unsigned r = 0; r < last->local_register_set->size(); ++r) {
+            for (decltype(last->local_register_set->size()) r = 0; r < last->local_register_set->size(); ++r) {
                 if (last->local_register_set->at(r) == nullptr) { continue; }
                 cout << "    registers[" << r << "]: ";
                 cout << '<' << last->local_register_set->get(r)->type() << "> " << last->local_register_set->get(r)->str() << endl;
@@ -72,7 +72,7 @@ static void printStackTrace(viua::process::Process *process) {
 
         if (last->arguments->size()) {
             cout << "  non-empty arguments (out of " << last->arguments->size() << "):" << endl;
-            for (unsigned r = 0; r < last->arguments->size(); ++r) {
+            for (decltype(last->arguments->size()) r = 0; r < last->arguments->size(); ++r) {
                 if (last->arguments->at(r) == nullptr) { continue; }
                 cout << "    arguments[" << r << "]: ";
                 if (last->arguments->isflagged(r, MOVED)) {
@@ -409,7 +409,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                 unique_ptr<viua::types::Type> exc(th->transferActiveException());
                 unique_ptr<viua::types::Vector> parameters {new viua::types::Vector()};
                 viua::kernel::RegisterSet *top_args = th->trace().at(0)->arguments.get();
-                for (unsigned long j = 0; j < top_args->size(); ++j) {
+                for (decltype(top_args->size()) j = 0; j < top_args->size(); ++j) {
                     if (top_args->at(j)) {
                         parameters->push(top_args->pop(j));
                     }
