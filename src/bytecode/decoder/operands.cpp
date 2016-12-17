@@ -118,21 +118,21 @@ auto viua::bytecode::decoder::operands::fetch_primitive_int(byte *ip, viua::proc
     OperandType ot = viua::bytecode::decoder::operands::get_operand_type(ip);
     ++ip;
 
-    int value = 0;
+    viua::internals::types::plain_int value = 0;
     if (ot == OT_REGISTER_REFERENCE) {
         value = *reinterpret_cast<decltype(value)*>(ip);
         ip += sizeof(decltype(value));
         // FIXME once dynamic operand types are implemented the need for this cast will go away
         // because the operand *will* be encoded as a real uint
-        viua::types::Integer *i = static_cast<viua::types::Integer*>(p->obtain(static_cast<unsigned>(value)));
-        value = i->value();
+        viua::types::Integer *i = static_cast<viua::types::Integer*>(p->obtain(static_cast<viua::internals::types::register_index>(value)));
+        value = i->as_int32();
     } else if (ot == OT_INT) {
         value = *reinterpret_cast<decltype(value)*>(ip);
         ip += sizeof(decltype(value));
     } else {
         throw new viua::types::Exception("decoded invalid operand type");
     }
-    return tuple<byte*, int>(ip, value);
+    return tuple<byte*, viua::internals::types::plain_int>(ip, value);
 }
 
 auto viua::bytecode::decoder::operands::fetch_raw_int(byte *ip, viua::process::Process*) -> tuple<byte*, viua::internals::types::plain_int> {

@@ -28,12 +28,12 @@
 using namespace std;
 
 
-void viua::kernel::RegisterSet::put(registerset_size_type index, unique_ptr<viua::types::Type> object) {
+void viua::kernel::RegisterSet::put(viua::internals::types::register_index index, unique_ptr<viua::types::Type> object) {
     if (index >= registerset_size) { throw new viua::types::Exception("register access out of bounds: write"); }
     registers.at(index).reset(object.release());
 }
 
-unique_ptr<viua::types::Type> viua::kernel::RegisterSet::pop(registerset_size_type index) {
+unique_ptr<viua::types::Type> viua::kernel::RegisterSet::pop(viua::internals::types::register_index index) {
     /** Pop an object from the register.
      */
     unique_ptr<viua::types::Type> object {at(index)};
@@ -44,7 +44,7 @@ unique_ptr<viua::types::Type> viua::kernel::RegisterSet::pop(registerset_size_ty
     return object;
 }
 
-void viua::kernel::RegisterSet::set(registerset_size_type index, unique_ptr<viua::types::Type> object) {
+void viua::kernel::RegisterSet::set(viua::internals::types::register_index index, unique_ptr<viua::types::Type> object) {
     /** Put object inside register specified by given index.
      *
      *  Performs bounds checking.
@@ -58,7 +58,7 @@ void viua::kernel::RegisterSet::set(registerset_size_type index, unique_ptr<viua
     }
 }
 
-viua::types::Type* viua::kernel::RegisterSet::get(registerset_size_type index) {
+viua::types::Type* viua::kernel::RegisterSet::get(viua::internals::types::register_index index) {
     /** Fetch object from register specified by given index.
      *
      *  Performs bounds checking.
@@ -78,7 +78,7 @@ viua::types::Type* viua::kernel::RegisterSet::get(registerset_size_type index) {
     return optr;
 }
 
-viua::types::Type* viua::kernel::RegisterSet::at(registerset_size_type index) {
+viua::types::Type* viua::kernel::RegisterSet::at(viua::internals::types::register_index index) {
     /** Fetch object from register specified by given index.
      *
      *  Performs bounds checking.
@@ -93,7 +93,7 @@ viua::types::Type* viua::kernel::RegisterSet::at(registerset_size_type index) {
 }
 
 
-void viua::kernel::RegisterSet::move(registerset_size_type src, registerset_size_type dst) {
+void viua::kernel::RegisterSet::move(viua::internals::types::register_index src, viua::internals::types::register_index dst) {
     /** Move an object from src register to dst register.
      *
      *  Performs bound checking.
@@ -104,7 +104,7 @@ void viua::kernel::RegisterSet::move(registerset_size_type src, registerset_size
     set(dst, pop(src));
 }
 
-void viua::kernel::RegisterSet::swap(registerset_size_type src, registerset_size_type dst) {
+void viua::kernel::RegisterSet::swap(viua::internals::types::register_index src, viua::internals::types::register_index dst) {
     /** Swap objects in src and dst registers.
      *
      *  Performs bound checking.
@@ -121,7 +121,7 @@ void viua::kernel::RegisterSet::swap(registerset_size_type src, registerset_size
     masks[dst] = tmp_mask;
 }
 
-void viua::kernel::RegisterSet::empty(registerset_size_type here) {
+void viua::kernel::RegisterSet::empty(viua::internals::types::register_index here) {
     /** Empty a register.
      *
      *  Performs bound checking.
@@ -132,7 +132,7 @@ void viua::kernel::RegisterSet::empty(registerset_size_type here) {
     masks[here] = 0;
 }
 
-void viua::kernel::RegisterSet::free(registerset_size_type here) {
+void viua::kernel::RegisterSet::free(viua::internals::types::register_index here) {
     /** Free an object inside a register.
      *
      *  Performs bound checking.
@@ -145,7 +145,7 @@ void viua::kernel::RegisterSet::free(registerset_size_type here) {
 }
 
 
-void viua::kernel::RegisterSet::flag(registerset_size_type index, mask_t filter) {
+void viua::kernel::RegisterSet::flag(viua::internals::types::register_index index, mask_t filter) {
     /** Enable masks specified by filter for register at given index.
      *
      *  Performs bounds checking.
@@ -160,7 +160,7 @@ void viua::kernel::RegisterSet::flag(registerset_size_type index, mask_t filter)
     masks[index] = (masks[index] | filter);
 }
 
-void viua::kernel::RegisterSet::unflag(registerset_size_type index, mask_t filter) {
+void viua::kernel::RegisterSet::unflag(viua::internals::types::register_index index, mask_t filter) {
     /** Disable masks specified by filter for register at given index.
      *
      *  Performs bounds checking.
@@ -175,7 +175,7 @@ void viua::kernel::RegisterSet::unflag(registerset_size_type index, mask_t filte
     masks[index] = (masks[index] ^ filter);
 }
 
-void viua::kernel::RegisterSet::clear(registerset_size_type index) {
+void viua::kernel::RegisterSet::clear(viua::internals::types::register_index index) {
     /** Clear masks for given register.
      *
      *  Performs bounds checking.
@@ -184,7 +184,7 @@ void viua::kernel::RegisterSet::clear(registerset_size_type index) {
     masks[index] = 0;
 }
 
-bool viua::kernel::RegisterSet::isflagged(registerset_size_type index, mask_t filter) {
+bool viua::kernel::RegisterSet::isflagged(viua::internals::types::register_index index, mask_t filter) {
     /** Returns true if given filter is enabled for register specified by given index.
      *  Returns false otherwise.
      *
@@ -195,7 +195,7 @@ bool viua::kernel::RegisterSet::isflagged(registerset_size_type index, mask_t fi
     return (masks[index] & filter);
 }
 
-void viua::kernel::RegisterSet::setmask(registerset_size_type index, mask_t mask) {
+void viua::kernel::RegisterSet::setmask(viua::internals::types::register_index index, mask_t mask) {
     /** Set mask for a register.
      *
      *  Performs bounds checking.
@@ -210,7 +210,7 @@ void viua::kernel::RegisterSet::setmask(registerset_size_type index, mask_t mask
     masks[index] = mask;
 }
 
-mask_t viua::kernel::RegisterSet::getmask(registerset_size_type index) {
+mask_t viua::kernel::RegisterSet::getmask(viua::internals::types::register_index index) {
     /** Get mask of a register.
      *
      *  Performs bounds checking.
@@ -247,7 +247,7 @@ unique_ptr<viua::kernel::RegisterSet> viua::kernel::RegisterSet::copy() {
     return rscopy;
 }
 
-viua::kernel::RegisterSet::RegisterSet(registerset_size_type sz): registerset_size(sz) {
+viua::kernel::RegisterSet::RegisterSet(viua::internals::types::register_index sz): registerset_size(sz) {
     /** Create register set with specified size.
      */
     registers.reserve(sz);

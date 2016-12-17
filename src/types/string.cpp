@@ -177,13 +177,13 @@ void String::substr(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Regi
     if (frame->arguments->size() > 1) {
         assert_typeof(frame->arguments->at(1), "Integer");
         if (Integer* i = dynamic_cast<Integer*>(frame->arguments->at(1))) {
-            begin = i->value();
+            begin = i->as_int32();
         }
     }
     if (frame->arguments->size() > 2) {
         assert_typeof(frame->arguments->at(2), "Integer");
         if (Integer* i = dynamic_cast<Integer*>(frame->arguments->at(2))) {
-            end = i->value();
+            end = i->as_int32();
         }
     }
     frame->local_register_set->set(0, unique_ptr<viua::types::Type>{sub(begin, end)});

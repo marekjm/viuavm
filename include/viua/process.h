@@ -109,9 +109,9 @@ namespace viua {
 
             std::queue<std::unique_ptr<viua::types::Type>> message_queue;
 
-            viua::types::Type* fetch(registerset_size_type) const;
-            std::unique_ptr<viua::types::Type> pop(registerset_size_type);
-            void place(registerset_size_type, std::unique_ptr<viua::types::Type>);
+            viua::types::Type* fetch(viua::internals::types::register_index) const;
+            std::unique_ptr<viua::types::Type> pop(viua::internals::types::register_index);
+            void place(viua::internals::types::register_index, std::unique_ptr<viua::types::Type>);
             void ensureStaticRegisters(std::string);
 
             /*  Methods dealing with stack and frame manipulation, and
@@ -261,8 +261,8 @@ namespace viua {
                 byte* dispatch(byte*);
                 byte* tick();
 
-                viua::types::Type* obtain(registerset_size_type) const;
-                void put(registerset_size_type, std::unique_ptr<viua::types::Type>);
+                viua::types::Type* obtain(viua::internals::types::register_index) const;
+                void put(viua::internals::types::register_index, std::unique_ptr<viua::types::Type>);
 
                 bool joinable() const;
                 void join();

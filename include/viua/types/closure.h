@@ -49,7 +49,7 @@ namespace viua {
 
                 std::string name() const override;
                 viua::kernel::RegisterSet* rs() const;
-                void set(unsigned, std::unique_ptr<viua::types::Type>);
+                void set(viua::internals::types::register_index, std::unique_ptr<viua::types::Type>);
 
                 Closure(const std::string&, std::unique_ptr<viua::kernel::RegisterSet>);
                 virtual ~Closure();

@@ -31,7 +31,7 @@
 using namespace std;
 
 
-viua::types::Type* viua::process::Process::fetch(registerset_size_type index) const {
+viua::types::Type* viua::process::Process::fetch(viua::internals::types::register_index index) const {
     /*  Return pointer to object at given register.
      *  This method safeguards against reaching for out-of-bounds registers and
      *  reading from an empty register.
@@ -42,13 +42,13 @@ viua::types::Type* viua::process::Process::fetch(registerset_size_type index) co
     }
     return object;
 }
-viua::types::Type* viua::process::Process::obtain(registerset_size_type index) const {
+viua::types::Type* viua::process::Process::obtain(viua::internals::types::register_index index) const {
     return fetch(index);
 }
-unique_ptr<viua::types::Type> viua::process::Process::pop(registerset_size_type index) {
+unique_ptr<viua::types::Type> viua::process::Process::pop(viua::internals::types::register_index index) {
     return currently_used_register_set->pop(index);
 }
-void viua::process::Process::place(registerset_size_type index, unique_ptr<viua::types::Type> obj) {
+void viua::process::Process::place(viua::internals::types::register_index index, unique_ptr<viua::types::Type> obj) {
     /** Place an object in register with given index.
      *
      *  Before placing an object in register, a check is preformed if the register is empty.
@@ -57,7 +57,7 @@ void viua::process::Process::place(registerset_size_type index, unique_ptr<viua:
      */
     currently_used_register_set->set(index, std::move(obj));
 }
-void viua::process::Process::put(registerset_size_type index, unique_ptr<viua::types::Type> o) {
+void viua::process::Process::put(viua::internals::types::register_index index, unique_ptr<viua::types::Type> o) {
     place(index, std::move(o));
 }
 void viua::process::Process::ensureStaticRegisters(string function_name) {
@@ -105,7 +105,7 @@ void viua::process::Process::dropFrame() {
     unique_ptr<Frame> frame(std::move(frames.back()));
     frames.pop_back();
 
-    for (registerset_size_type i = 0; i < frame->arguments->size(); ++i) {
+    for (viua::internals::types::register_index i = 0; i < frame->arguments->size(); ++i) {
         if (frame->arguments->at(i) != nullptr and frame->arguments->isflagged(i, MOVED)) {
             throw new viua::types::Exception("unused pass-by-move parameter");
         }
