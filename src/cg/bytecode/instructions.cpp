@@ -322,7 +322,7 @@ namespace cg {
                 // after switching to token-based code generation
                 // it will not be necessary
             }
-            *(reinterpret_cast<viua::internals::types::registerset_type_marker*>(addr_ptr)) = register_set_marker;
+            *(addr_ptr) = register_set_marker;
             pointer::inc<viua::internals::types::registerset_type_marker, viua::internals::types::byte>(addr_ptr);
             return addr_ptr;
         }

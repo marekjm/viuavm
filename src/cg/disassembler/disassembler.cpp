@@ -305,7 +305,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
             break;
         case RESS:
             oss << " ";
-            switch(viua::internals::types::registerset_type_marker(*ptr)) {
+            switch (*ptr) {
                 case 0:
                     oss << "global";
                     break;

@@ -42,7 +42,7 @@ namespace viua {
 
             typedef uint32_t timeout;
 
-            typedef uint32_t registerset_type_marker;
+            typedef uint8_t registerset_type_marker;
         }
     }
 }
