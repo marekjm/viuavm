@@ -132,8 +132,8 @@ namespace cg {
         byte* opreceive(byte*, int_op, timeout_op);
         byte* opwatchdog(byte*, const std::string&);
 
-        byte* opjump(byte*, uint64_t);
-        byte* opif(byte*, int_op, uint64_t, uint64_t);
+        byte* opjump(byte*, viua::internals::types::bytecode_size);
+        byte* opif(byte*, int_op, viua::internals::types::bytecode_size, viua::internals::types::bytecode_size);
 
         byte* optry(byte*);
         byte* opcatch(byte*, const std::string&, const std::string&);

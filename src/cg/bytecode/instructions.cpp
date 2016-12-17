@@ -465,27 +465,27 @@ namespace cg {
             return insertString(addr_ptr, fn_name);
         }
 
-        byte* opjump(byte* addr_ptr, uint64_t addr) {
+        byte* opjump(byte* addr_ptr, viua::internals::types::bytecode_size addr) {
             *(addr_ptr++) = JUMP;
 
-            // we *know* that this location in the byte array points to uint64_t so
+            // we *know* that this location in the byte array points to viua::internals::types::bytecode_size so
             // the reinterpret_cast<> is justified
-            *(reinterpret_cast<uint64_t*>(addr_ptr)) = addr;
-            pointer::inc<uint64_t, byte>(addr_ptr);
+            *(reinterpret_cast<viua::internals::types::bytecode_size*>(addr_ptr)) = addr;
+            pointer::inc<viua::internals::types::bytecode_size, byte>(addr_ptr);
 
             return addr_ptr;
         }
 
-        byte* opif(byte* addr_ptr, int_op regc, uint64_t addr_truth, uint64_t addr_false) {
+        byte* opif(byte* addr_ptr, int_op regc, viua::internals::types::bytecode_size addr_truth, viua::internals::types::bytecode_size addr_false) {
             *(addr_ptr++) = IF;
             addr_ptr = insert_ri_operand(addr_ptr, regc);
 
-            // we *know* that following locations in the byte array point to uint64_t so
+            // we *know* that following locations in the byte array point to viua::internals::types::bytecode_size so
             // the reinterpret_cast<> is justified
-            *(reinterpret_cast<uint64_t*>(addr_ptr)) = addr_truth;
-            pointer::inc<uint64_t, byte>(addr_ptr);
-            *(reinterpret_cast<uint64_t*>(addr_ptr)) = addr_false;
-            pointer::inc<uint64_t, byte>(addr_ptr);
+            *(reinterpret_cast<viua::internals::types::bytecode_size*>(addr_ptr)) = addr_truth;
+            pointer::inc<viua::internals::types::bytecode_size, byte>(addr_ptr);
+            *(reinterpret_cast<viua::internals::types::bytecode_size*>(addr_ptr)) = addr_false;
+            pointer::inc<viua::internals::types::bytecode_size, byte>(addr_ptr);
 
             return addr_ptr;
         }
