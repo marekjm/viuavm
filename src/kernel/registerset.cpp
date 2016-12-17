@@ -28,9 +28,53 @@
 using namespace std;
 
 
+void viua::kernel::Register::reset(unique_ptr<viua::types::Type> o) {
+    value = std::move(o);
+}
+
+bool viua::kernel::Register::empty() const {
+    return value != nullptr;
+}
+
+viua::types::Type* viua::kernel::Register::get() {
+    return value.get();
+}
+
+viua::types::Type* viua::kernel::Register::release() {
+    return value.release();
+}
+
+void viua::kernel::Register::swap(Register& that) {
+    value.swap(that.value);
+}
+
+viua::kernel::Register::Register(): value(nullptr) {
+}
+
+viua::kernel::Register::Register(std::unique_ptr<viua::types::Type> o): value(std::move(o)) {
+}
+
+viua::kernel::Register::Register(Register&& that): value(std::move(that.value)) {
+}
+
+viua::kernel::Register::operator bool() const {
+    return value != nullptr;
+}
+
+auto viua::kernel::Register::operator =(Register&& that) -> Register& {
+    value = std::move(that.value);
+    return *this;
+}
+
+auto viua::kernel::Register::operator =(decltype(value)&& o) -> Register& {
+    value = std::move(o);
+    return *this;
+}
+
+
 void viua::kernel::RegisterSet::put(viua::internals::types::register_index index, unique_ptr<viua::types::Type> object) {
     if (index >= registerset_size) { throw new viua::types::Exception("register access out of bounds: write"); }
-    registers.at(index).reset(object.release());
+    registers.at(index).reset(std::move(object));
 }
 
 unique_ptr<viua::types::Type> viua::kernel::RegisterSet::pop(viua::internals::types::register_index index) {
@@ -54,7 +98,7 @@ void viua::kernel::RegisterSet::set(viua::internals::types::register_index index
     if (dynamic_cast<viua::types::Reference*>(registers.at(index).get())) {
         static_cast<viua::types::Reference*>(registers.at(index).get())->rebind(object.release());
     } else {
-        registers.at(index).reset(object.release());
+        registers.at(index).reset(std::move(object));
     }
 }
 

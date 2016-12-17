@@ -38,9 +38,30 @@ enum REGISTER_MASKS: mask_type {
 
 namespace viua {
     namespace kernel {
+        class Register {
+            std::unique_ptr<viua::types::Type> value;
+
+            public:
+            void reset(std::unique_ptr<viua::types::Type>);
+            bool empty() const;
+
+            viua::types::Type* get();
+            viua::types::Type* release();
+
+            void swap(Register&);
+
+            Register();
+            Register(std::unique_ptr<viua::types::Type>);
+            Register(Register&&);
+
+            operator bool() const;
+            auto operator =(Register&&) -> Register&;
+            auto operator =(decltype(value)&&) -> Register&;
+        };
+
         class RegisterSet {
             viua::internals::types::register_index registerset_size;
-            std::vector<std::unique_ptr<viua::types::Type>> registers;
+            std::vector<Register> registers;
             std::vector<mask_type>  masks;
 
             public:
