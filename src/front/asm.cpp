@@ -447,7 +447,7 @@ int main(int argc, char* argv[]) {
 
     int ret_code = 0;
     try {
-        ret_code = generate(cooked_tokens, functions, blocks, filename, compilename, commandline_given_links, flags);
+        generate(cooked_tokens, functions, blocks, filename, compilename, commandline_given_links, flags);
     } catch (const string& e) {
         ret_code = 1;
         cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET) << ": ";

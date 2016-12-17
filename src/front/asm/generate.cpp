@@ -702,10 +702,10 @@ static uint64_t generate_entry_function(uint64_t bytes, map<string, uint64_t> fu
     return bytes;
 }
 
-int generate(vector<Token>& tokens, invocables_t& functions, invocables_t& blocks, const string& filename, string& compilename, const vector<string>& commandline_given_links, const compilationflags_t& flags) {
+void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& blocks, const string& filename, string& compilename, const vector<string>& commandline_given_links, const compilationflags_t& flags) {
     //////////////////////////////
     // SETUP INITIAL BYTECODE SIZE
-    uint64_t bytes = 0;
+    viua::internals::types::bytecode_size bytes = 0;
 
 
     /////////////////////////
@@ -1335,6 +1335,4 @@ int generate(vector<Token>& tokens, invocables_t& functions, invocables_t& block
 
     out.write(reinterpret_cast<const char*>(program_bytecode.get()), static_cast<std::streamsize>(bytes));
     out.close();
-
-    return 0;
 }

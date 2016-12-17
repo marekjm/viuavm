@@ -64,7 +64,7 @@ invocables_t gatherFunctions(const std::vector<viua::cg::lex::Token>&);
 invocables_t gatherBlocks(const std::vector<viua::cg::lex::Token>&);
 std::map<std::string, std::string> gatherMetaInformation(const std::vector<viua::cg::lex::Token>&);
 
-int generate(std::vector<viua::cg::lex::Token>&, invocables_t&, invocables_t&, const std::string&, std::string&, const std::vector<std::string>&, const compilationflags_t&);
+void generate(std::vector<viua::cg::lex::Token>&, invocables_t&, invocables_t&, const std::string&, std::string&, const std::vector<std::string>&, const compilationflags_t&);
 
 
 #endif
