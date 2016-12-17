@@ -76,7 +76,7 @@ namespace viua {
                 tokens.push_back(std::move(token));
             }
 
-            InvalidSyntax::InvalidSyntax(long unsigned ln, long unsigned ch, string ct): line_number(ln), character_in_line(ch), content(ct) {
+            InvalidSyntax::InvalidSyntax(decltype(line_number) ln, decltype(character_in_line) ch, string ct): line_number(ln), character_in_line(ch), content(ct) {
             }
             InvalidSyntax::InvalidSyntax(Token t, string m): line_number(t.line()), character_in_line(t.character()), content(t.original()), message(m) {
                 add(t);

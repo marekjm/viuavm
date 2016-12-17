@@ -37,7 +37,7 @@ namespace viua {
             };
 
             struct InvalidSyntax {
-                long unsigned line_number, character_in_line;
+                std::vector<Token>::size_type line_number, character_in_line;
                 std::string content;
                 std::string message;
 
@@ -51,7 +51,7 @@ namespace viua {
 
                 auto add(Token) -> void;
 
-                InvalidSyntax(long unsigned, long unsigned, std::string);
+                InvalidSyntax(decltype(line_number), decltype(character_in_line), std::string);
                 InvalidSyntax(Token, std::string = "");
             };
 
