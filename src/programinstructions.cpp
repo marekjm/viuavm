@@ -453,7 +453,7 @@ Program& Program::opself(int_op target) {
     return (*this);
 }
 
-Program& Program::opjoin(int_op target, int_op source, int_op timeout) {
+Program& Program::opjoin(int_op target, int_op source, timeout_op timeout) {
     addr_ptr = cg::bytecode::opjoin(addr_ptr, target, source, timeout);
     return (*this);
 }
@@ -463,7 +463,7 @@ Program& Program::opsend(int_op target, int_op source) {
     return (*this);
 }
 
-Program& Program::opreceive(int_op ref, int_op timeout) {
+Program& Program::opreceive(int_op ref, timeout_op timeout) {
     addr_ptr = cg::bytecode::opreceive(addr_ptr, ref, timeout);
     return (*this);
 }

@@ -44,6 +44,14 @@ struct int_op {
     int_op(IntegerOperandType, viua::internals::types::plain_int = 0);
     int_op(viua::internals::types::plain_int);
 };
+struct timeout_op {
+    IntegerOperandType type;
+    viua::internals::types::timeout value;
+
+    timeout_op();
+    timeout_op(IntegerOperandType, viua::internals::types::timeout = 0);
+    timeout_op(viua::internals::types::timeout);
+};
 
 /** typedefs for various types of operands
  *  that Viua asm instructions may use.
@@ -119,9 +127,9 @@ namespace cg {
         byte* optailcall(byte*, const std::string&);
         byte* opprocess(byte*, int_op, const std::string&);
         byte* opself(byte*, int_op);
-        byte* opjoin(byte*, int_op, int_op, int_op);
+        byte* opjoin(byte*, int_op, int_op, timeout_op);
         byte* opsend(byte*, int_op, int_op);
-        byte* opreceive(byte*, int_op, int_op);
+        byte* opreceive(byte*, int_op, timeout_op);
         byte* opwatchdog(byte*, const std::string&);
 
         byte* opjump(byte*, uint64_t);

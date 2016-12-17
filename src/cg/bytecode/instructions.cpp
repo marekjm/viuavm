@@ -29,6 +29,13 @@ int_op::int_op(IntegerOperandType t, viua::internals::types::plain_int n): type(
 int_op::int_op(viua::internals::types::plain_int n): type(IntegerOperandType::PLAIN), value(n) {
 }
 
+timeout_op::timeout_op(): type(IntegerOperandType::PLAIN), value(0) {
+}
+timeout_op::timeout_op(IntegerOperandType t, viua::internals::types::timeout n): type(t), value(n) {
+}
+timeout_op::timeout_op(viua::internals::types::timeout n): type(IntegerOperandType::PLAIN), value(n) {
+}
+
 
 static byte* insert_ri_operand(byte* addr_ptr, int_op op) {
     /** Insert integer operand into bytecode.
@@ -420,7 +427,7 @@ namespace cg {
             return insert_ri_operand(addr_ptr, target);
         }
 
-        byte* opjoin(byte* addr_ptr, int_op target, int_op source, int_op timeout) {
+        byte* opjoin(byte* addr_ptr, int_op target, int_op source, timeout_op timeout) {
             *(addr_ptr++) = JOIN;
             addr_ptr = insert_ri_operand(addr_ptr, target);
             addr_ptr = insert_ri_operand(addr_ptr, source);
@@ -428,7 +435,7 @@ namespace cg {
             // FIXME change to OT_TIMEOUT?
             *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_INT;
             pointer::inc<OperandType, byte>(addr_ptr);
-            *(reinterpret_cast<viua::internals::types::timeout*>(addr_ptr))  = static_cast<viua::internals::types::timeout>(timeout.value);
+            *(reinterpret_cast<viua::internals::types::timeout*>(addr_ptr)) = timeout.value;
             pointer::inc<viua::internals::types::timeout, byte>(addr_ptr);
 
             return addr_ptr;
@@ -440,14 +447,14 @@ namespace cg {
             return insert_ri_operand(addr_ptr, source);
         }
 
-        byte* opreceive(byte* addr_ptr, int_op reg, int_op timeout) {
+        byte* opreceive(byte* addr_ptr, int_op reg, timeout_op timeout) {
             *(addr_ptr++) = RECEIVE;
             addr_ptr = insert_ri_operand(addr_ptr, reg);
 
             // FIXME change to OT_TIMEOUT?
             *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_INT;
             pointer::inc<OperandType, byte>(addr_ptr);
-            *(reinterpret_cast<viua::internals::types::timeout*>(addr_ptr))  = static_cast<viua::internals::types::timeout>(timeout.value);
+            *(reinterpret_cast<viua::internals::types::timeout*>(addr_ptr)) = timeout.value;
             pointer::inc<viua::internals::types::timeout, byte>(addr_ptr);
 
             return addr_ptr;
