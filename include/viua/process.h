@@ -142,7 +142,7 @@ namespace viua {
             bool finished;
             std::atomic_bool is_joinable;
             std::atomic_bool is_suspended;
-            uint16_t process_priority;
+            viua::internals::types::process_time_slice_type process_priority;
             std::mutex process_mtx;
 
             /*  viua::process::Process identifier.

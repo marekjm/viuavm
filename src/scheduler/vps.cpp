@@ -119,7 +119,7 @@ template<class ...Ts> static void viua_err(Ts&&... arguments) {
 }
 
 
-bool viua::scheduler::VirtualProcessScheduler::executeQuant(viua::process::Process *th, uint16_t priority) {
+bool viua::scheduler::VirtualProcessScheduler::executeQuant(viua::process::Process *th, viua::internals::types::process_time_slice_type priority) {
     if (th->stopped() and th->joinable()) {
         // stopped but still joinable
         // we don't have to deal with "stopped and unjoinable" case here

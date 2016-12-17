@@ -104,7 +104,7 @@ namespace viua {
             void send(const viua::process::PID, std::unique_ptr<viua::types::Type>);
             void receive(const viua::process::PID, std::queue<std::unique_ptr<viua::types::Type>>&);
 
-            bool executeQuant(viua::process::Process*, uint16_t);
+            bool executeQuant(viua::process::Process*, viua::internals::types::process_time_slice_type);
             bool burst();
 
             void operator()();
