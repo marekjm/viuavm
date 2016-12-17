@@ -469,7 +469,7 @@ byte* viua::process::Process::begin() {
     }
     return (instruction_pointer = adjustJumpBaseFor(frames[0]->function_name));
 }
-uint64_t viua::process::Process::counter() const {
+auto viua::process::Process::counter() const -> decltype(instruction_counter) {
     return instruction_counter;
 }
 auto viua::process::Process::executionAt() const -> decltype(instruction_pointer) {

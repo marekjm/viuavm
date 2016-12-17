@@ -104,7 +104,7 @@ namespace viua {
              */
             std::unique_ptr<viua::types::Type> return_value; // return value of top-most frame on the stack
 
-            uint64_t instruction_counter;
+            viua::internals::types::bytecode_size instruction_counter;
             byte* instruction_pointer;
 
             std::queue<std::unique_ptr<viua::types::Type>> message_queue;
@@ -298,7 +298,7 @@ namespace viua {
                 byte* become(const std::string&, std::unique_ptr<Frame>);
 
                 byte* begin();
-                uint64_t counter() const;
+                auto counter() const -> decltype(instruction_counter);
                 auto executionAt() const -> decltype(instruction_pointer);
 
                 std::vector<Frame*> trace() const;

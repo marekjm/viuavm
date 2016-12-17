@@ -473,7 +473,7 @@ Program& Program::opwatchdog(const string& fn_name) {
     return (*this);
 }
 
-Program& Program::opjump(uint64_t addr, enum JUMPTYPE is_absolute) {
+Program& Program::opjump(viua::internals::types::bytecode_size addr, enum JUMPTYPE is_absolute) {
     /*  Inserts jump instruction. Parameter is instruction index.
      *  Byte offset is calculated automatically.
      *
@@ -489,20 +489,20 @@ Program& Program::opjump(uint64_t addr, enum JUMPTYPE is_absolute) {
     return (*this);
 }
 
-Program& Program::opif(int_op regc, uint64_t addr_truth, enum JUMPTYPE absolute_truth, uint64_t addr_false, enum JUMPTYPE absolute_false) {
+Program& Program::opif(int_op regc, viua::internals::types::bytecode_size addr_truth, enum JUMPTYPE absolute_truth, viua::internals::types::bytecode_size addr_false, enum JUMPTYPE absolute_false) {
     /*  Inserts branch instruction.
      *  Byte offset is calculated automatically.
      */
     byte* jump_position_in_bytecode = addr_ptr;
 
     jump_position_in_bytecode += sizeof(byte); // for opcode
-    jump_position_in_bytecode += sizeof(bool); // for at-register flag
-    jump_position_in_bytecode += sizeof(int);  // for integer with register index
+    jump_position_in_bytecode += sizeof(byte); // for operand-type marker
+    jump_position_in_bytecode += sizeof(viua::internals::types::register_index);
 
     if (absolute_truth != JMP_TO_BYTE) {
         branches.push_back(jump_position_in_bytecode);
     }
-    jump_position_in_bytecode += sizeof(uint64_t);
+    jump_position_in_bytecode += sizeof(viua::internals::types::bytecode_size);
 
     if (absolute_false != JMP_TO_BYTE) {
         branches.push_back(jump_position_in_bytecode);

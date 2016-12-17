@@ -40,7 +40,7 @@ class Program {
     // byte array containing bytecode
     byte* program;
     // size of the bytecode
-    uint64_t bytes;
+    viua::internals::types::bytecode_size bytes;
 
     /** Current address inside bytecode array.
      *  Used during bytecode generation.
@@ -134,8 +134,8 @@ class Program {
     Program& opsend(int_op, int_op);
     Program& opreceive(int_op, timeout_op);
     Program& opwatchdog(const std::string&);
-    Program& opjump(uint64_t, enum JUMPTYPE);
-    Program& opif(int_op, uint64_t, enum JUMPTYPE, uint64_t, enum JUMPTYPE);
+    Program& opjump(viua::internals::types::bytecode_size, enum JUMPTYPE);
+    Program& opif(int_op, viua::internals::types::bytecode_size, enum JUMPTYPE, viua::internals::types::bytecode_size, enum JUMPTYPE);
 
     Program& optry();
     Program& opcatch(std::string, std::string);
@@ -165,8 +165,8 @@ class Program {
      *  These must be called after the bytecode is already generated as they must know
      *  size of the program.
      */
-    Program& calculateJumps(std::vector<std::tuple<uint64_t, uint64_t>>, std::vector<viua::cg::lex::Token>&);
-    std::vector<uint64_t> jumps();
+    Program& calculateJumps(std::vector<std::tuple<viua::internals::types::bytecode_size, viua::internals::types::bytecode_size>>, std::vector<viua::cg::lex::Token>&);
+    std::vector<viua::internals::types::bytecode_size> jumps();
 
     byte* bytecode();
     Program& fill(byte*);
@@ -174,9 +174,9 @@ class Program {
     Program& setdebug(bool d = true);
     Program& setscream(bool d = true);
 
-    uint64_t size();
+    viua::internals::types::bytecode_size size();
 
-    Program(uint64_t bts = 2);
+    Program(viua::internals::types::bytecode_size bts = 2);
     Program(const Program& that);
     ~Program();
     Program& operator=(const Program& that);
