@@ -37,7 +37,7 @@ template<typename K, typename V> bool in(std::map<K, V> m, K key) {
 
 namespace disassembler {
     std::string intop(byte*);
-    std::tuple<std::string, unsigned> instruction(byte*);
+    std::tuple<std::string, viua::internals::types::bytecode_size> instruction(byte*);
 }
 
 

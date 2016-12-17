@@ -38,6 +38,7 @@ typedef uint8_t byte;
 namespace viua {
     namespace internals {
         namespace types {
+            typedef uint64_t bytecode_size;
             // FIXME should be uint8_t
             typedef uint32_t register_index;
 

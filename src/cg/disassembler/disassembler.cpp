@@ -83,7 +83,7 @@ static byte* disassemble_target_register(ostream& oss, byte *ptr) {
     }
     return ptr;
 }
-tuple<string, unsigned> disassembler::instruction(byte* ptr) {
+tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(byte* ptr) {
     byte* saved_ptr = ptr;
 
     OPCODE op = OPCODE(*saved_ptr);
@@ -345,11 +345,11 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
             oss << "";
     }
 
-    long increase = (ptr-saved_ptr);
-    if (increase < 0) {
+    if (ptr < saved_ptr) {
         throw ("bytecode pointer increase less than zero: near " + OP_NAMES.at(op) + " instruction");
     }
+    viua::internals::types::bytecode_size increase = (ptr-saved_ptr);
 
     // cast increase to unsigned as at this point it is safe to assume that it is greater than zero
-    return tuple<string, unsigned>(oss.str(), static_cast<unsigned>(increase));
+    return tuple<string, viua::internals::types::bytecode_size>(oss.str(), increase);
 }
