@@ -112,9 +112,7 @@ void viua::kernel::RegisterSet::swap(viua::internals::types::register_index src,
      */
     if (src >= registerset_size) { throw new viua::types::Exception("register access out of bounds: swap source"); }
     if (dst >= registerset_size) { throw new viua::types::Exception("register access out of bounds: swap destination"); }
-    unique_ptr<viua::types::Type> tmp = std::move(registers.at(src));
-    registers[src] = std::move(registers.at(dst));
-    registers[dst] = std::move(tmp);
+    registers[src].swap(registers[dst]);
 
     mask_type tmp_mask = masks.at(src);
     masks[src] = masks.at(dst);
