@@ -373,9 +373,7 @@ int main(int argc, char* argv[]) {
 
     invocables_t functions;
     try {
-        if (gatherFunctions(&functions, cooked_tokens)) {
-            return 1;
-        }
+        functions = gatherFunctions(cooked_tokens);
     } catch (const viua::cg::lex::InvalidSyntax& e) {
         display_error_in_context(raw_tokens, e, filename);
         return 1;
@@ -386,9 +384,7 @@ int main(int argc, char* argv[]) {
 
     invocables_t blocks;
     try {
-        if (gatherBlocks(&blocks, cooked_tokens)) {
-            return 1;
-        }
+        blocks = gatherBlocks(cooked_tokens);
     } catch (const viua::cg::lex::InvalidSyntax& e) {
         display_error_in_context(raw_tokens, e, filename);
         return 1;

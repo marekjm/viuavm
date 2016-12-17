@@ -24,68 +24,52 @@
 using namespace std;
 
 
-int gatherFunctions(invocables_t* invocables, const vector<viua::cg::lex::Token>& tokens) {
-    ///////////////////////////////////////////
-    // GATHER FUNCTION NAMES AND SIGNATURES
-    //
-    // SIGNATURES ARE USED WITH DYNAMIC LINKING
-    // AS ASSEMBLER WOULD COMPLAIN ABOUT
-    // CALLS TO UNDEFINED FUNCTIONS
+invocables_t gatherFunctions(const vector<viua::cg::lex::Token>& tokens) {
+    invocables_t invocables;
     try {
-        invocables->names = assembler::ce::getFunctionNames(tokens);
+        invocables.names = assembler::ce::getFunctionNames(tokens);
     } catch (const string& e) {
-        cout << "fatal: " << e << endl;
-        return 1;
+        throw ("fatal: " + e);
     }
 
     try {
-        invocables->signatures = assembler::ce::getSignatures(tokens);
+        invocables.signatures = assembler::ce::getSignatures(tokens);
     } catch (const string& e) {
-        cout << "fatal: " << e << endl;
-        return 1;
+        throw ("fatal: " + e);
     }
 
-    ///////////////////////////////
-    // GATHER FUNCTIONS' CODE LINES
     try {
-         invocables->tokens = assembler::ce::getInvokablesTokenBodies("function", tokens);
+         invocables.tokens = assembler::ce::getInvokablesTokenBodies("function", tokens);
          for (const auto& each : assembler::ce::getInvokablesTokenBodies("closure", tokens)) {
-            invocables->tokens[each.first] = each.second;
+            invocables.tokens[each.first] = each.second;
          }
     } catch (const string& e) {
-        cout << "error: function gathering failed: " << e << endl;
-        return 1;
+        throw ("error: block gathering failed: " + e);
     }
 
-    return 0;
+    return invocables;
 }
 
-int gatherBlocks(invocables_t* invocables, const vector<viua::cg::lex::Token>& tokens) {
-    /////////////////////
-    // GATHER BLOCK NAMES
+invocables_t gatherBlocks(const vector<viua::cg::lex::Token>& tokens) {
+    invocables_t invocables;
     try {
-        invocables->names = assembler::ce::getBlockNames(tokens);
+        invocables.names = assembler::ce::getBlockNames(tokens);
     } catch (const string& e) {
-        cout << "fatal: " << e << endl;
-        return 1;
+        throw ("fatal: " + e);
     }
     try {
-        invocables->signatures = assembler::ce::getBlockSignatures(tokens);
+        invocables.signatures = assembler::ce::getBlockSignatures(tokens);
     } catch (const string& e) {
-        cout << "fatal: " << e << endl;
-        return 1;
+        throw ("fatal: " + e);
     }
 
-    ///////////////////////////////
-    // GATHER BLOCK CODE LINES
     try {
-         invocables->tokens = assembler::ce::getInvokablesTokenBodies("block", tokens);
+         invocables.tokens = assembler::ce::getInvokablesTokenBodies("block", tokens);
     } catch (const string& e) {
-        cout << "error: block gathering failed: " << e << endl;
-        return 1;
+        throw ("error: block gathering failed: " + e);
     }
 
-    return 0;
+    return invocables;
 }
 
 map<string, string> gatherMetaInformation(const vector<viua::cg::lex::Token>& tokens) {
