@@ -50,8 +50,8 @@ namespace viua {
                 bool& value() { return b; }
 
                 // Integer methods
-                int increment() { return (b = true); }
-                int decrement() { return (b = false); }
+                int64_t increment() { return (b = true); }
+                int64_t decrement() { return (b = false); }
 
                 virtual std::vector<std::string> bases() const override {
                     return std::vector<std::string>{"Number"};
