@@ -131,6 +131,10 @@ Answer to both of these questions is no.
 Whenever pointer dereference is used as the source either the typical *move* semantics change to *copy-pointed-to* semantics, or
 the code is invalid and will result in an exception being thrown.
 
+A user-code invisible improvement to VM's core is also included in this release: all core primitive types used by Viua have defined Viua-specific aliases, and
+are a fixed-size types.
+This is great for portability.
+
 
 ----
 
