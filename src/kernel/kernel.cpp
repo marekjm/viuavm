@@ -306,7 +306,7 @@ void viua::kernel::Kernel::postFreeProcess(unique_ptr<viua::process::Process> p)
     free_virtual_processes_cv.notify_one();
 }
 
-auto viua::kernel::Kernel::createMailbox(const viua::process::PID pid) -> decltype(running_processes) {
+auto viua::kernel::Kernel::createMailbox(const viua::process::PID pid) -> uint64_t {
     unique_lock<mutex> lck(mailbox_mutex);
 #if VIUA_VM_DEBUG_LOG
     cerr << "[kernel:mailbox:create] pid = " << pid.get() << endl;
@@ -314,7 +314,7 @@ auto viua::kernel::Kernel::createMailbox(const viua::process::PID pid) -> declty
     mailboxes.emplace(pid, vector<unique_ptr<viua::types::Type>>{});
     return ++running_processes;
 }
-auto viua::kernel::Kernel::deleteMailbox(const viua::process::PID pid) -> decltype(running_processes) {
+auto viua::kernel::Kernel::deleteMailbox(const viua::process::PID pid) -> viua::internals::types::processes_count {
     unique_lock<mutex> lck(mailbox_mutex);
 #if VIUA_VM_DEBUG_LOG
     cerr << "[kernel:mailbox:delete] pid = " << pid.get() << ", queued messages = " << mailboxes[pid].size() << endl;
@@ -360,7 +360,7 @@ int viua::kernel::Kernel::exit() const {
     return return_code;
 }
 
-static auto no_of_schedulers(const char *env_name, unsigned long default_limit) -> decltype(default_limit) {
+static auto no_of_schedulers(const char *env_name, viua::internals::types::schedulers_count default_limit) -> viua::internals::types::schedulers_count {
     decltype(default_limit) limit = default_limit;
     char *env_limit = getenv(env_name);
     if (env_limit != nullptr) {
@@ -371,10 +371,10 @@ static auto no_of_schedulers(const char *env_name, unsigned long default_limit) 
     }
     return limit;
 }
-auto viua::kernel::Kernel::no_of_vp_schedulers() -> decltype(default_vp_schedulers_limit) {
+auto viua::kernel::Kernel::no_of_vp_schedulers() -> viua::internals::types::schedulers_count {
     return no_of_schedulers("VIUA_VP_SCHEDULERS", default_vp_schedulers_limit);
 }
-auto viua::kernel::Kernel::no_of_ffi_schedulers() -> decltype(default_ffi_schedulers_limit) {
+auto viua::kernel::Kernel::no_of_ffi_schedulers() -> viua::internals::types::schedulers_count {
     return no_of_schedulers("VIUA_FFI_SCHEDULERS", default_ffi_schedulers_limit);
 }
 

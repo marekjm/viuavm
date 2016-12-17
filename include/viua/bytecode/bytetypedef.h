@@ -42,6 +42,9 @@ namespace viua {
             // FIXME should be uint8_t
             typedef uint32_t register_index;
 
+            typedef uint32_t schedulers_count;
+            typedef uint64_t processes_count;
+
             typedef int32_t plain_int;
             typedef double plain_float;
 
