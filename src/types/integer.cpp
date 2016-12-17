@@ -36,7 +36,7 @@ bool Integer::boolean() const {
     return (number != 0);
 }
 
-int64_t& Integer::value() { return number; }
+auto Integer::value() -> decltype(number) { return number; }
 
 int64_t Integer::increment() {
     return (++number);

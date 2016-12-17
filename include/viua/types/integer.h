@@ -44,7 +44,7 @@ namespace viua {
                 std::string str() const override;
                 bool boolean() const override;
 
-                int64_t& value();
+                auto value() -> decltype(number);
 
                 virtual int64_t increment();
                 virtual int64_t decrement();
