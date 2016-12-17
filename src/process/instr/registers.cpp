@@ -27,11 +27,11 @@ using namespace std;
 
 
 viua::internals::types::byte* viua::process::Process::opmove(viua::internals::types::byte* addr) {
-    viua::internals::types::register_index target = 0, source = 0;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    viua::kernel::Register *target = nullptr, *source = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    currently_used_register_set->move(source, target);
+    *target = std::move(*source);
 
     return addr;
 }
