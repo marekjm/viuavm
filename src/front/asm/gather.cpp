@@ -26,25 +26,12 @@ using namespace std;
 
 invocables_t gatherFunctions(const vector<viua::cg::lex::Token>& tokens) {
     invocables_t invocables;
-    try {
-        invocables.names = assembler::ce::getFunctionNames(tokens);
-    } catch (const string& e) {
-        throw ("fatal: " + e);
-    }
 
-    try {
-        invocables.signatures = assembler::ce::getSignatures(tokens);
-    } catch (const string& e) {
-        throw ("fatal: " + e);
-    }
-
-    try {
-         invocables.tokens = assembler::ce::getInvokablesTokenBodies("function", tokens);
-         for (const auto& each : assembler::ce::getInvokablesTokenBodies("closure", tokens)) {
-            invocables.tokens[each.first] = each.second;
-         }
-    } catch (const string& e) {
-        throw ("error: block gathering failed: " + e);
+    invocables.names = assembler::ce::getFunctionNames(tokens);
+    invocables.signatures = assembler::ce::getSignatures(tokens);
+    invocables.tokens = assembler::ce::getInvokablesTokenBodies("function", tokens);
+    for (const auto& each : assembler::ce::getInvokablesTokenBodies("closure", tokens)) {
+       invocables.tokens[each.first] = each.second;
     }
 
     return invocables;
@@ -52,22 +39,10 @@ invocables_t gatherFunctions(const vector<viua::cg::lex::Token>& tokens) {
 
 invocables_t gatherBlocks(const vector<viua::cg::lex::Token>& tokens) {
     invocables_t invocables;
-    try {
-        invocables.names = assembler::ce::getBlockNames(tokens);
-    } catch (const string& e) {
-        throw ("fatal: " + e);
-    }
-    try {
-        invocables.signatures = assembler::ce::getBlockSignatures(tokens);
-    } catch (const string& e) {
-        throw ("fatal: " + e);
-    }
 
-    try {
-         invocables.tokens = assembler::ce::getInvokablesTokenBodies("block", tokens);
-    } catch (const string& e) {
-        throw ("error: block gathering failed: " + e);
-    }
+    invocables.names = assembler::ce::getBlockNames(tokens);
+    invocables.signatures = assembler::ce::getBlockSignatures(tokens);
+    invocables.tokens = assembler::ce::getInvokablesTokenBodies("block", tokens);
 
     return invocables;
 }
