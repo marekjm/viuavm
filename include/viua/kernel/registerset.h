@@ -27,10 +27,10 @@
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/types/type.h>
 
-typedef unsigned char mask_t;
+typedef uint8_t mask_type;
 
 
-enum REGISTER_MASKS: mask_t {
+enum REGISTER_MASKS: mask_type {
     COPY_ON_WRITE   = (1 << 0),
     MOVED           = (1 << 1), // marks registers containing moved parameters
 };
@@ -41,7 +41,7 @@ namespace viua {
         class RegisterSet {
             viua::internals::types::register_index registerset_size;
             std::vector<std::unique_ptr<viua::types::Type>> registers;
-            std::vector<mask_t>  masks;
+            std::vector<mask_type>  masks;
 
             public:
                 // basic access to registers
@@ -58,12 +58,12 @@ namespace viua {
                 void free(viua::internals::types::register_index);
 
                 // mask inspection and manipulation
-                void flag(viua::internals::types::register_index, mask_t);
-                void unflag(viua::internals::types::register_index, mask_t);
+                void flag(viua::internals::types::register_index, mask_type);
+                void unflag(viua::internals::types::register_index, mask_type);
                 void clear(viua::internals::types::register_index);
-                bool isflagged(viua::internals::types::register_index, mask_t);
-                void setmask(viua::internals::types::register_index, mask_t);
-                mask_t getmask(viua::internals::types::register_index);
+                bool isflagged(viua::internals::types::register_index, mask_type);
+                void setmask(viua::internals::types::register_index, mask_type);
+                mask_type getmask(viua::internals::types::register_index);
 
                 void drop();
                 inline viua::internals::types::register_index size() { return registerset_size; }

@@ -116,7 +116,7 @@ void viua::kernel::RegisterSet::swap(viua::internals::types::register_index src,
     registers[src] = std::move(registers.at(dst));
     registers[dst] = std::move(tmp);
 
-    mask_t tmp_mask = masks.at(src);
+    mask_type tmp_mask = masks.at(src);
     masks[src] = masks.at(dst);
     masks[dst] = tmp_mask;
 }
@@ -145,7 +145,7 @@ void viua::kernel::RegisterSet::free(viua::internals::types::register_index here
 }
 
 
-void viua::kernel::RegisterSet::flag(viua::internals::types::register_index index, mask_t filter) {
+void viua::kernel::RegisterSet::flag(viua::internals::types::register_index index, mask_type filter) {
     /** Enable masks specified by filter for register at given index.
      *
      *  Performs bounds checking.
@@ -160,7 +160,7 @@ void viua::kernel::RegisterSet::flag(viua::internals::types::register_index inde
     masks[index] = (masks[index] | filter);
 }
 
-void viua::kernel::RegisterSet::unflag(viua::internals::types::register_index index, mask_t filter) {
+void viua::kernel::RegisterSet::unflag(viua::internals::types::register_index index, mask_type filter) {
     /** Disable masks specified by filter for register at given index.
      *
      *  Performs bounds checking.
@@ -184,7 +184,7 @@ void viua::kernel::RegisterSet::clear(viua::internals::types::register_index ind
     masks[index] = 0;
 }
 
-bool viua::kernel::RegisterSet::isflagged(viua::internals::types::register_index index, mask_t filter) {
+bool viua::kernel::RegisterSet::isflagged(viua::internals::types::register_index index, mask_type filter) {
     /** Returns true if given filter is enabled for register specified by given index.
      *  Returns false otherwise.
      *
@@ -195,7 +195,7 @@ bool viua::kernel::RegisterSet::isflagged(viua::internals::types::register_index
     return (masks[index] & filter);
 }
 
-void viua::kernel::RegisterSet::setmask(viua::internals::types::register_index index, mask_t mask) {
+void viua::kernel::RegisterSet::setmask(viua::internals::types::register_index index, mask_type mask) {
     /** Set mask for a register.
      *
      *  Performs bounds checking.
@@ -210,7 +210,7 @@ void viua::kernel::RegisterSet::setmask(viua::internals::types::register_index i
     masks[index] = mask;
 }
 
-mask_t viua::kernel::RegisterSet::getmask(viua::internals::types::register_index index) {
+mask_type viua::kernel::RegisterSet::getmask(viua::internals::types::register_index index) {
     /** Get mask of a register.
      *
      *  Performs bounds checking.
