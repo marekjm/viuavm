@@ -83,10 +83,8 @@ viua::internals::types::byte* viua::process::Process::opisnull(viua::internals::
 }
 
 viua::internals::types::byte* viua::process::Process::opress(viua::internals::types::byte* addr) {
-    /*  Run ress instruction.
-     */
-    viua::internals::types::plain_int to_register_set = 0;
-    tie(addr, to_register_set) = viua::bytecode::decoder::operands::fetch_raw_int(addr, this);
+    viua::internals::types::registerset_type_marker to_register_set = 0;
+    tie(addr, to_register_set) = viua::bytecode::decoder::operands::fetch_registerset_type(addr, this);
 
     switch (to_register_set) {
         case 0:

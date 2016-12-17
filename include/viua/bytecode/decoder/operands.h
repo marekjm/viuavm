@@ -58,6 +58,7 @@ namespace viua {
                 auto fetch_operand_type(viua::internals::types::byte*) -> std::tuple<viua::internals::types::byte*, OperandType>;
                 auto fetch_register_index(viua::internals::types::byte*, viua::process::Process*) -> std::tuple<viua::internals::types::byte*, viua::internals::types::register_index>;
                 auto fetch_timeout(viua::internals::types::byte*, viua::process::Process*) -> std::tuple<viua::internals::types::byte*, viua::internals::types::timeout>;
+                auto fetch_registerset_type(viua::internals::types::byte*, viua::process::Process*) -> std::tuple<viua::internals::types::byte*, viua::internals::types::registerset_type_marker>;
                 auto fetch_primitive_uint(viua::internals::types::byte*, viua::process::Process*) -> std::tuple<viua::internals::types::byte*, viua::internals::types::register_index>;
                 auto fetch_primitive_uint64(viua::internals::types::byte*, viua::process::Process*) -> std::tuple<viua::internals::types::byte*, uint64_t>;
                 auto fetch_primitive_int(viua::internals::types::byte*, viua::process::Process*) -> std::tuple<viua::internals::types::byte*, viua::internals::types::plain_int>;

@@ -41,6 +41,8 @@ namespace viua {
             typedef double plain_float;
 
             typedef uint32_t timeout;
+
+            typedef uint32_t registerset_type_marker;
         }
     }
 }

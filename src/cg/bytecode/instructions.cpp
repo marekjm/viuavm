@@ -308,7 +308,7 @@ namespace cg {
 
         viua::internals::types::byte* opress(viua::internals::types::byte* addr_ptr, const string& a) {
             *(addr_ptr++) = RESS;
-            viua::internals::types::plain_int register_set_marker = 0;
+            viua::internals::types::registerset_type_marker register_set_marker = 0;
             if (a == "global") {
                 register_set_marker = 0;
             } else if (a == "local") {
@@ -322,8 +322,8 @@ namespace cg {
                 // after switching to token-based code generation
                 // it will not be necessary
             }
-            *(reinterpret_cast<viua::internals::types::plain_int*>(addr_ptr)) = register_set_marker;
-            pointer::inc<viua::internals::types::plain_int, viua::internals::types::byte>(addr_ptr);
+            *(reinterpret_cast<viua::internals::types::registerset_type_marker*>(addr_ptr)) = register_set_marker;
+            pointer::inc<viua::internals::types::registerset_type_marker, viua::internals::types::byte>(addr_ptr);
             return addr_ptr;
         }
 

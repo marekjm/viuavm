@@ -107,6 +107,12 @@ auto viua::bytecode::decoder::operands::fetch_primitive_uint(viua::internals::ty
     return fetch_register_index(ip, process);
 }
 
+auto viua::bytecode::decoder::operands::fetch_registerset_type(viua::internals::types::byte *ip, viua::process::Process*) -> tuple<viua::internals::types::byte*, viua::internals::types::registerset_type_marker> {
+    viua::internals::types::registerset_type_marker rs_type = extract<decltype(rs_type)>(ip);
+    ip += sizeof(decltype(rs_type));
+    return tuple<viua::internals::types::byte*, decltype(rs_type)>(ip, rs_type);
+}
+
 auto viua::bytecode::decoder::operands::fetch_primitive_uint64(viua::internals::types::byte *ip, viua::process::Process*) -> tuple<viua::internals::types::byte*, uint64_t> {
     uint64_t integer = extract<decltype(integer)>(ip);
     ip += sizeof(decltype(integer));

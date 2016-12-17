@@ -305,7 +305,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
             break;
         case RESS:
             oss << " ";
-            switch(int(*ptr)) {
+            switch(viua::internals::types::registerset_type_marker(*ptr)) {
                 case 0:
                     oss << "global";
                     break;
@@ -323,7 +323,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
                     oss << "; WARNING: invalid register set type\n";
                     oss << int(*ptr);
             }
-            pointer::inc<int, viua::internals::types::byte>(ptr);
+            pointer::inc<viua::internals::types::registerset_type_marker, viua::internals::types::byte>(ptr);
             break;
         case JOIN:
             ptr = disassemble_target_register(oss, ptr);

@@ -256,7 +256,7 @@ namespace viua {
             }
             static auto size_of_ress(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 viua::internals::types::bytecode_size calculated_size = sizeof(viua::internals::types::byte);
-                calculated_size += sizeof(int);
+                calculated_size += sizeof(viua::internals::types::registerset_type_marker);
                 return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
             }
             static auto size_of_tmpri(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
