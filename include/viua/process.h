@@ -38,8 +38,8 @@
 #include <viua/pid.h>
 
 
-const unsigned DEFAULT_REGISTER_SIZE = 256;
-const unsigned MAX_STACK_SIZE = 8192;
+const viua::internals::types::register_index DEFAULT_REGISTER_SIZE = 255;
+const uint16_t MAX_STACK_SIZE = 8192;
 
 
 class HaltException : public std::runtime_error {
@@ -117,7 +117,7 @@ namespace viua {
             /*  Methods dealing with stack and frame manipulation, and
              *  function calls.
              */
-            Frame* requestNewFrame(unsigned arguments_size = 0, unsigned registers_size = 0);
+            Frame* requestNewFrame(viua::internals::types::register_index arguments_size = 0, viua::internals::types::register_index registers_size = 0);
             TryFrame* requestNewTryFrame();
             void pushFrame();
             void dropFrame();

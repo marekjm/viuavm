@@ -497,7 +497,7 @@ namespace viua {
 
                 // for target register
                 calculated_size += sizeof(byte);
-                calculated_size += sizeof(int);
+                calculated_size += sizeof(viua::internals::types::register_index);
                 ++i;
 
                 // for class name, +1 for null-terminator
@@ -511,7 +511,7 @@ namespace viua {
 
                 // for target register
                 calculated_size += sizeof(byte);
-                calculated_size += sizeof(int);
+                calculated_size += sizeof(viua::internals::types::register_index);
                 ++i;
 
                 // for real name of aliased function, +1 for null-terminator
@@ -532,7 +532,7 @@ namespace viua {
 
                 // for target register
                 calculated_size += sizeof(byte);
-                calculated_size += sizeof(int);
+                calculated_size += sizeof(viua::internals::types::register_index);
                 ++i;
 
                 // for class name, +1 for null-terminator

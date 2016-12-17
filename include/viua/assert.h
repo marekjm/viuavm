@@ -66,7 +66,7 @@ namespace viua {
             return ((to_compare == first) or any_equal(to_compare, rest...));
         }
 
-        using Arity = size_t;
+        using Arity = viua::internals::types::register_index;
 
         template<typename... A> void assert_arity(const Frame* frame, const A&... valid_arities) {
             Arity arity = frame->arguments->size();

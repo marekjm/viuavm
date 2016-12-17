@@ -306,7 +306,7 @@ void viua::kernel::Kernel::postFreeProcess(unique_ptr<viua::process::Process> p)
     free_virtual_processes_cv.notify_one();
 }
 
-auto viua::kernel::Kernel::createMailbox(const viua::process::PID pid) -> uint64_t {
+auto viua::kernel::Kernel::createMailbox(const viua::process::PID pid) -> viua::internals::types::processes_count {
     unique_lock<mutex> lck(mailbox_mutex);
 #if VIUA_VM_DEBUG_LOG
     cerr << "[kernel:mailbox:create] pid = " << pid.get() << endl;

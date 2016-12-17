@@ -104,7 +104,6 @@ auto viua::bytecode::decoder::operands::fetch_timeout(byte *ip, viua::process::P
 }
 
 auto viua::bytecode::decoder::operands::fetch_primitive_uint(byte *ip, viua::process::Process *process) -> tuple<byte*, viua::internals::types::register_index> {
-    // currently the logic is the same since RI's are encoded as unsigned integers
     return fetch_register_index(ip, process);
 }
 
@@ -160,7 +159,7 @@ auto viua::bytecode::decoder::operands::fetch_atom(byte *ip, viua::process::Proc
 }
 
 auto viua::bytecode::decoder::operands::fetch_object(byte *ip, viua::process::Process *p) -> tuple<byte*, viua::types::Type*> {
-    unsigned register_index = 0;
+    viua::internals::types::register_index register_index = 0;
 
     bool is_pointer = (get_operand_type(ip) == OT_POINTER);
 

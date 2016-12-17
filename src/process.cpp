@@ -71,7 +71,7 @@ void viua::process::Process::ensureStaticRegisters(string function_name) {
     }
 }
 
-Frame* viua::process::Process::requestNewFrame(unsigned arguments_size, unsigned registers_size) {
+Frame* viua::process::Process::requestNewFrame(viua::internals::types::register_index arguments_size, viua::internals::types::register_index registers_size) {
     /** Request new frame to be prepared.
      *
      *  Creates new frame if the new-frame hook is empty.
@@ -229,14 +229,14 @@ void viua::process::Process::adjustInstructionPointer(TryFrame* tframe, string h
     instruction_pointer = adjustJumpBaseForBlock(tframe->catchers.at(handler_found_for_type)->catcher_name);
 }
 void viua::process::Process::unwindCallStack(TryFrame* tframe) {
-    unsigned distance = 0;
-    for (long unsigned j = (frames.size()-1); j > 1; --j) {
+    decltype(frames)::size_type distance = 0;
+    for (decltype(frames)::size_type j = (frames.size()-1); j > 1; --j) {
         if (frames[j].get() == tframe->associated_frame) {
             break;
         }
         ++distance;
     }
-    for (unsigned j = 0; j < distance; ++j) {
+    for (decltype(distance) j = 0; j < distance; ++j) {
         dropFrame();
     }
 }
@@ -254,7 +254,7 @@ tuple<TryFrame*, string> viua::process::Process::findCatchFrame() {
     TryFrame* found_exception_frame = nullptr;
     string caught_with_type = "";
 
-    for (long unsigned i = tryframes.size(); i > 0; --i) {
+    for (decltype(tryframes)::size_type i = tryframes.size(); i > 0; --i) {
         TryFrame* tframe = tryframes[(i-1)].get();
         string handler_found_for_type = thrown->type();
         bool handler_found = tframe->catchers.count(handler_found_for_type);
@@ -262,7 +262,7 @@ tuple<TryFrame*, string> viua::process::Process::findCatchFrame() {
         // FIXME: mutex
         if ((not handler_found) and scheduler->isClass(handler_found_for_type)) {
             vector<string> types_to_check = scheduler->inheritanceChainOf(handler_found_for_type);
-            for (unsigned j = 0; j < types_to_check.size(); ++j) {
+            for (decltype(types_to_check)::size_type j = 0; j < types_to_check.size(); ++j) {
                 if (tframe->catchers.count(types_to_check[j])) {
                     handler_found = true;
                     handler_found_for_type = types_to_check[j];

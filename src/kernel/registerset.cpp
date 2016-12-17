@@ -233,13 +233,13 @@ void viua::kernel::RegisterSet::drop() {
      *  emptying all its available registers.
      *  No objects will be deleted, so use this function carefully.
      */
-    for (unsigned i = 0; i < size(); ++i) { empty(i); }
+    for (decltype(size()) i = 0; i < size(); ++i) { empty(i); }
 }
 
 
 unique_ptr<viua::kernel::RegisterSet> viua::kernel::RegisterSet::copy() {
     unique_ptr<viua::kernel::RegisterSet> rscopy {new viua::kernel::RegisterSet(size())};
-    for (unsigned i = 0; i < size(); ++i) {
+    for (decltype(size()) i = 0; i < size(); ++i) {
         if (at(i) == nullptr) { continue; }
         rscopy->set(i, at(i)->copy());
         rscopy->setmask(i, getmask(i));

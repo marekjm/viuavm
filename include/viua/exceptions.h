@@ -35,7 +35,7 @@ class OutOfRangeException: public viua::types::Exception {
 };
 
 class ArityException: public viua::types::Exception {
-        unsigned long got_arity;
+        viua::internals::types::register_index got_arity;
         std::vector<decltype(got_arity)> valid_arities;
     public:
         std::string type() const override {

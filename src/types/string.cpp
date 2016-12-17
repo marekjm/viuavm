@@ -172,7 +172,7 @@ void String::substr(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Regi
     int begin = 0;
     int end = -1;
 
-    assert_arity(frame, 1ul, 2ul, 3ul);
+    assert_arity(frame, 1u, 2u, 3u);
 
     if (frame->arguments->size() > 1) {
         assert_typeof(frame->arguments->at(1), "Integer");
