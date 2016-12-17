@@ -620,7 +620,7 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
     entry_function_tokens.emplace_back(0, 0, "ress");
     entry_function_tokens.emplace_back(0, 0, "local");
     entry_function_tokens.emplace_back(0, 0, "\n");
-    bytes += sizeof(byte) + sizeof(int);
+    bytes += sizeof(viua::internals::types::byte) + sizeof(int);
 
     // generate different instructions based on which main function variant
     // has been selected
@@ -629,13 +629,13 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
         entry_function_tokens.emplace_back(0, 0, "0");
         entry_function_tokens.emplace_back(0, 0, "16");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(byte);
+        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(viua::internals::types::byte);
     } else if (main_function == "main/2") {
         entry_function_tokens.emplace_back(0, 0, "frame");
         entry_function_tokens.emplace_back(0, 0, "2");
         entry_function_tokens.emplace_back(0, 0, "16");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(byte);
+        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(viua::internals::types::byte);
 
         // pop first element on the list of aruments
         entry_function_tokens.emplace_back(0, 0, "vpop");
@@ -643,14 +643,14 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
         entry_function_tokens.emplace_back(0, 0, "1");
         entry_function_tokens.emplace_back(0, 0, "0");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(byte) + 3*sizeof(viua::internals::types::register_index) + 3*sizeof(byte);
+        bytes += sizeof(viua::internals::types::byte) + 3*sizeof(viua::internals::types::register_index) + 3*sizeof(viua::internals::types::byte);
 
         // for parameter for main/2 is the name of the program
         entry_function_tokens.emplace_back(0, 0, "param");
         entry_function_tokens.emplace_back(0, 0, "0");
         entry_function_tokens.emplace_back(0, 0, "0");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(byte);
+        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(viua::internals::types::byte);
 
         // second parameter for main/2 is the vector with the rest
         // of the commandl ine parameters
@@ -658,7 +658,7 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
         entry_function_tokens.emplace_back(0, 0, "1");
         entry_function_tokens.emplace_back(0, 0, "1");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(byte);
+        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(viua::internals::types::byte);
     } else {
         // this is for default main function, i.e. `main/1` or
         // for custom main functions
@@ -667,13 +667,13 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
         entry_function_tokens.emplace_back(0, 0, "1");
         entry_function_tokens.emplace_back(0, 0, "16");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(byte);
+        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(viua::internals::types::byte);
 
         entry_function_tokens.emplace_back(0, 0, "param");
         entry_function_tokens.emplace_back(0, 0, "0");
         entry_function_tokens.emplace_back(0, 0, "1");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(byte);
+        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(viua::internals::types::byte);
     }
 
     // name of the main function must not be hardcoded because there is '.main:' assembler
@@ -683,7 +683,7 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
     entry_function_tokens.emplace_back(0, 0, "1");
     entry_function_tokens.emplace_back(0, 0, main_function);
     entry_function_tokens.emplace_back(0, 0, "\n");
-    bytes += sizeof(byte) + sizeof(viua::internals::types::register_index) + sizeof(byte);
+    bytes += sizeof(viua::internals::types::byte) + sizeof(viua::internals::types::register_index) + sizeof(viua::internals::types::byte);
     bytes += main_function.size()+1;
 
     // then, register 1 is moved to register 0 so it counts as a return code
@@ -691,11 +691,11 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
     entry_function_tokens.emplace_back(0, 0, "0");
     entry_function_tokens.emplace_back(0, 0, "1");
     entry_function_tokens.emplace_back(0, 0, "\n");
-    bytes += sizeof(byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(byte);
+    bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(viua::internals::types::byte);
 
     entry_function_tokens.emplace_back(0, 0, "halt");
     entry_function_tokens.emplace_back(0, 0, "\n");
-    bytes += sizeof(byte);
+    bytes += sizeof(viua::internals::types::byte);
 
     functions.tokens[ENTRY_FUNCTION_NAME] = entry_function_tokens;
 
@@ -760,7 +760,7 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
     /////////////////////////////////////////////////////////
     // GATHER LINKS, GET THEIR SIZES AND ADJUST BYTECODE SIZE
     vector<string> links = assembler::ce::getlinks(tokens);
-    vector<tuple<string, viua::internals::types::bytecode_size, std::unique_ptr<byte[]>> > linked_libs_bytecode;
+    vector<tuple<string, viua::internals::types::bytecode_size, std::unique_ptr<viua::internals::types::byte[]>> > linked_libs_bytecode;
     vector<string> linked_function_names;
     vector<string> linked_block_names;
     map<string, vector<viua::internals::types::bytecode_size> > linked_libs_jumptables;
@@ -950,8 +950,8 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
     //
     // BYTECODE IS GENERATED HERE BUT NOT YET WRITTEN TO FILE
     // THIS MUST BE GENERATED HERE TO OBTAIN FILL JUMP TABLE
-    map<string, tuple<viua::internals::types::bytecode_size, byte*> > functions_bytecode;
-    map<string, tuple<viua::internals::types::bytecode_size, byte*> > block_bodies_bytecode;
+    map<string, tuple<viua::internals::types::bytecode_size, viua::internals::types::byte*> > functions_bytecode;
+    map<string, tuple<viua::internals::types::bytecode_size, viua::internals::types::byte*> > block_bodies_bytecode;
     viua::internals::types::bytecode_size functions_section_size = 0;
     viua::internals::types::bytecode_size block_bodies_section_size = 0;
 
@@ -1011,10 +1011,10 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
         }
         func.calculateJumps(local_jumps, blocks.tokens.at(name));
 
-        byte* btcode = func.bytecode();
+        viua::internals::types::byte* btcode = func.bytecode();
 
         // store generated bytecode fragment for future use (we must not yet write it to the file to conform to bytecode format)
-        block_bodies_bytecode[name] = tuple<viua::internals::types::bytecode_size, byte*>(func.size(), btcode);
+        block_bodies_bytecode[name] = tuple<viua::internals::types::bytecode_size, viua::internals::types::byte*>(func.size(), btcode);
 
         // extend jump table with jumps from current block
         for (decltype(jumps)::size_type i = 0; i < jumps.size(); ++i) {
@@ -1105,10 +1105,10 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
         }
         func.calculateJumps(local_jumps, functions.tokens.at(name));
 
-        byte* btcode = func.bytecode();
+        viua::internals::types::byte* btcode = func.bytecode();
 
         // store generated bytecode fragment for future use (we must not yet write it to the file to conform to bytecode format)
-        functions_bytecode[name] = tuple<viua::internals::types::bytecode_size, byte*>{func.size(), btcode};
+        functions_bytecode[name] = tuple<viua::internals::types::bytecode_size, viua::internals::types::byte*>{func.size(), btcode};
 
         // extend jump table with jumps from current function
         for (decltype(jumps)::size_type i = 0; i < jumps.size(); ++i) {
@@ -1226,7 +1226,7 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
     // WRITE BYTECODE SIZE
     bwrite(out, bytes);
 
-    unique_ptr<byte[]> program_bytecode {new byte[bytes]};
+    unique_ptr<viua::internals::types::byte[]> program_bytecode {new viua::internals::types::byte[bytes]};
     viua::internals::types::bytecode_size program_bytecode_used = 0;
 
     ////////////////////////////////////////////////////
@@ -1245,7 +1245,7 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
             cout << "' to final byte array" << endl;
         }
         viua::internals::types::bytecode_size fun_size = 0;
-        byte* fun_bytecode = nullptr;
+        viua::internals::types::byte* fun_bytecode = nullptr;
         tie(fun_size, fun_bytecode) = block_bodies_bytecode[name];
 
         for (viua::internals::types::bytecode_size i = 0; i < fun_size; ++i) {
@@ -1271,7 +1271,7 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
             cout << "' to final byte array" << endl;
         }
         viua::internals::types::bytecode_size fun_size = 0;
-        byte* fun_bytecode = nullptr;
+        viua::internals::types::byte* fun_bytecode = nullptr;
         tie(fun_size, fun_bytecode) = functions_bytecode[name];
 
         for (viua::internals::types::bytecode_size i = 0; i < fun_size; ++i) {
@@ -1281,7 +1281,7 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
     }
 
     // free memory allocated for bytecode of local functions
-    for (pair<string, tuple<viua::internals::types::bytecode_size, byte*>> fun : functions_bytecode) {
+    for (pair<string, tuple<viua::internals::types::bytecode_size, viua::internals::types::byte*>> fun : functions_bytecode) {
         delete[] get<1>(fun.second);
     }
 
@@ -1290,7 +1290,7 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
     viua::internals::types::bytecode_size bytes_offset = current_link_offset;
     for (auto& lnk : linked_libs_bytecode) {
         string lib_name = get<0>(lnk);
-        byte* linked_bytecode = get<2>(lnk).get();
+        viua::internals::types::byte* linked_bytecode = get<2>(lnk).get();
         viua::internals::types::bytecode_size linked_size = get<1>(lnk);
 
         //tie(lib_name, linked_size, linked_bytecode) = lnk;

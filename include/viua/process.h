@@ -85,7 +85,7 @@ namespace viua {
 
 
             // Call stack
-            byte* jump_base;
+            viua::internals::types::byte* jump_base;
             std::vector<std::unique_ptr<Frame>> frames;
             std::unique_ptr<Frame> frame_new;
 
@@ -105,7 +105,7 @@ namespace viua {
             std::unique_ptr<viua::types::Type> return_value; // return value of top-most frame on the stack
 
             viua::internals::types::bytecode_size instruction_counter;
-            byte* instruction_pointer;
+            viua::internals::types::byte* instruction_pointer;
 
             std::queue<std::unique_ptr<viua::types::Type>> message_queue;
 
@@ -121,14 +121,14 @@ namespace viua {
             TryFrame* requestNewTryFrame();
             void pushFrame();
             void dropFrame();
-            byte* adjustJumpBaseForBlock(const std::string&);
-            byte* adjustJumpBaseFor(const std::string&);
+            viua::internals::types::byte* adjustJumpBaseForBlock(const std::string&);
+            viua::internals::types::byte* adjustJumpBaseFor(const std::string&);
             // call native (i.e. written in Viua) function
-            byte* callNative(byte*, const std::string&, const bool, const viua::internals::types::register_index, const std::string&);
+            viua::internals::types::byte* callNative(viua::internals::types::byte*, const std::string&, const bool, const viua::internals::types::register_index, const std::string&);
             // call foreign (i.e. from a C++ extension) function
-            byte* callForeign(byte*, const std::string&, const bool, const viua::internals::types::register_index, const std::string&);
+            viua::internals::types::byte* callForeign(viua::internals::types::byte*, const std::string&, const bool, const viua::internals::types::register_index, const std::string&);
             // call foreign method (i.e. method of a pure-C++ class loaded into machine's typesystem)
-            byte* callForeignMethod(byte*, viua::types::Type*, const std::string&, const bool, const viua::internals::types::register_index, const std::string&);
+            viua::internals::types::byte* callForeignMethod(viua::internals::types::byte*, viua::types::Type*, const std::string&, const bool, const viua::internals::types::register_index, const std::string&);
 
             /*  Stack unwinding methods.
              */
@@ -159,107 +159,107 @@ namespace viua {
 
             /*  Methods implementing individual instructions.
              */
-            byte* opizero(byte*);
-            byte* opistore(byte*);
-            byte* opiinc(byte*);
-            byte* opidec(byte*);
+            viua::internals::types::byte* opizero(viua::internals::types::byte*);
+            viua::internals::types::byte* opistore(viua::internals::types::byte*);
+            viua::internals::types::byte* opiinc(viua::internals::types::byte*);
+            viua::internals::types::byte* opidec(viua::internals::types::byte*);
 
-            byte* opfstore(byte*);
+            viua::internals::types::byte* opfstore(viua::internals::types::byte*);
 
-            byte* opitof(byte*);
-            byte* opftoi(byte*);
-            byte* opstoi(byte*);
-            byte* opstof(byte*);
+            viua::internals::types::byte* opitof(viua::internals::types::byte*);
+            viua::internals::types::byte* opftoi(viua::internals::types::byte*);
+            viua::internals::types::byte* opstoi(viua::internals::types::byte*);
+            viua::internals::types::byte* opstof(viua::internals::types::byte*);
 
-            byte* opadd(byte*);
-            byte* opsub(byte*);
-            byte* opmul(byte*);
-            byte* opdiv(byte*);
-            byte* oplt(byte*);
-            byte* oplte(byte*);
-            byte* opgt(byte*);
-            byte* opgte(byte*);
-            byte* opeq(byte*);
+            viua::internals::types::byte* opadd(viua::internals::types::byte*);
+            viua::internals::types::byte* opsub(viua::internals::types::byte*);
+            viua::internals::types::byte* opmul(viua::internals::types::byte*);
+            viua::internals::types::byte* opdiv(viua::internals::types::byte*);
+            viua::internals::types::byte* oplt(viua::internals::types::byte*);
+            viua::internals::types::byte* oplte(viua::internals::types::byte*);
+            viua::internals::types::byte* opgt(viua::internals::types::byte*);
+            viua::internals::types::byte* opgte(viua::internals::types::byte*);
+            viua::internals::types::byte* opeq(viua::internals::types::byte*);
 
-            byte* opstrstore(byte*);
+            viua::internals::types::byte* opstrstore(viua::internals::types::byte*);
 
-            byte* opvec(byte*);
-            byte* opvinsert(byte*);
-            byte* opvpush(byte*);
-            byte* opvpop(byte*);
-            byte* opvat(byte*);
-            byte* opvlen(byte*);
+            viua::internals::types::byte* opvec(viua::internals::types::byte*);
+            viua::internals::types::byte* opvinsert(viua::internals::types::byte*);
+            viua::internals::types::byte* opvpush(viua::internals::types::byte*);
+            viua::internals::types::byte* opvpop(viua::internals::types::byte*);
+            viua::internals::types::byte* opvat(viua::internals::types::byte*);
+            viua::internals::types::byte* opvlen(viua::internals::types::byte*);
 
-            byte* boolean(byte*);
-            byte* opnot(byte*);
-            byte* opand(byte*);
-            byte* opor(byte*);
+            viua::internals::types::byte* boolean(viua::internals::types::byte*);
+            viua::internals::types::byte* opnot(viua::internals::types::byte*);
+            viua::internals::types::byte* opand(viua::internals::types::byte*);
+            viua::internals::types::byte* opor(viua::internals::types::byte*);
 
-            byte* opmove(byte*);
-            byte* opcopy(byte*);
-            byte* opptr(byte*);
-            byte* opswap(byte*);
-            byte* opdelete(byte*);
-            byte* opisnull(byte*);
+            viua::internals::types::byte* opmove(viua::internals::types::byte*);
+            viua::internals::types::byte* opcopy(viua::internals::types::byte*);
+            viua::internals::types::byte* opptr(viua::internals::types::byte*);
+            viua::internals::types::byte* opswap(viua::internals::types::byte*);
+            viua::internals::types::byte* opdelete(viua::internals::types::byte*);
+            viua::internals::types::byte* opisnull(viua::internals::types::byte*);
 
-            byte* opress(byte*);
-            byte* optmpri(byte*);
-            byte* optmpro(byte*);
+            viua::internals::types::byte* opress(viua::internals::types::byte*);
+            viua::internals::types::byte* optmpri(viua::internals::types::byte*);
+            viua::internals::types::byte* optmpro(viua::internals::types::byte*);
 
-            byte* opprint(byte*);
-            byte* opecho(byte*);
+            viua::internals::types::byte* opprint(viua::internals::types::byte*);
+            viua::internals::types::byte* opecho(viua::internals::types::byte*);
 
-            byte* opcapture(byte*);
-            byte* opcapturecopy(byte*);
-            byte* opcapturemove(byte*);
-            byte* opclosure(byte*);
+            viua::internals::types::byte* opcapture(viua::internals::types::byte*);
+            viua::internals::types::byte* opcapturecopy(viua::internals::types::byte*);
+            viua::internals::types::byte* opcapturemove(viua::internals::types::byte*);
+            viua::internals::types::byte* opclosure(viua::internals::types::byte*);
 
-            byte* opfunction(byte*);
-            byte* opfcall(byte*);
+            viua::internals::types::byte* opfunction(viua::internals::types::byte*);
+            viua::internals::types::byte* opfcall(viua::internals::types::byte*);
 
-            byte* opframe(byte*);
-            byte* opparam(byte*);
-            byte* oppamv(byte*);
-            byte* oparg(byte*);
-            byte* opargc(byte*);
+            viua::internals::types::byte* opframe(viua::internals::types::byte*);
+            viua::internals::types::byte* opparam(viua::internals::types::byte*);
+            viua::internals::types::byte* oppamv(viua::internals::types::byte*);
+            viua::internals::types::byte* oparg(viua::internals::types::byte*);
+            viua::internals::types::byte* opargc(viua::internals::types::byte*);
 
-            byte* opcall(byte*);
-            byte* optailcall(byte*);
-            byte* opprocess(byte*);
-            byte* opself(byte*);
-            byte* opjoin(byte*);
-            byte* opsend(byte*);
-            byte* opreceive(byte*);
-            byte* opwatchdog(byte*);
-            byte* opreturn(byte*);
+            viua::internals::types::byte* opcall(viua::internals::types::byte*);
+            viua::internals::types::byte* optailcall(viua::internals::types::byte*);
+            viua::internals::types::byte* opprocess(viua::internals::types::byte*);
+            viua::internals::types::byte* opself(viua::internals::types::byte*);
+            viua::internals::types::byte* opjoin(viua::internals::types::byte*);
+            viua::internals::types::byte* opsend(viua::internals::types::byte*);
+            viua::internals::types::byte* opreceive(viua::internals::types::byte*);
+            viua::internals::types::byte* opwatchdog(viua::internals::types::byte*);
+            viua::internals::types::byte* opreturn(viua::internals::types::byte*);
 
-            byte* opjump(byte*);
-            byte* opif(byte*);
+            viua::internals::types::byte* opjump(viua::internals::types::byte*);
+            viua::internals::types::byte* opif(viua::internals::types::byte*);
 
-            byte* optry(byte*);
-            byte* opcatch(byte*);
-            byte* opdraw(byte*);
-            byte* openter(byte*);
-            byte* opthrow(byte*);
-            byte* opleave(byte*);
+            viua::internals::types::byte* optry(viua::internals::types::byte*);
+            viua::internals::types::byte* opcatch(viua::internals::types::byte*);
+            viua::internals::types::byte* opdraw(viua::internals::types::byte*);
+            viua::internals::types::byte* openter(viua::internals::types::byte*);
+            viua::internals::types::byte* opthrow(viua::internals::types::byte*);
+            viua::internals::types::byte* opleave(viua::internals::types::byte*);
 
-            byte* opclass(byte*);
-            byte* opprototype(byte*);
-            byte* opderive(byte*);
-            byte* opattach(byte*);
-            byte* opregister(byte*);
+            viua::internals::types::byte* opclass(viua::internals::types::byte*);
+            viua::internals::types::byte* opprototype(viua::internals::types::byte*);
+            viua::internals::types::byte* opderive(viua::internals::types::byte*);
+            viua::internals::types::byte* opattach(viua::internals::types::byte*);
+            viua::internals::types::byte* opregister(viua::internals::types::byte*);
 
-            byte* opnew(byte*);
-            byte* opmsg(byte*);
-            byte* opinsert(byte*);
-            byte* opremove(byte*);
+            viua::internals::types::byte* opnew(viua::internals::types::byte*);
+            viua::internals::types::byte* opmsg(viua::internals::types::byte*);
+            viua::internals::types::byte* opinsert(viua::internals::types::byte*);
+            viua::internals::types::byte* opremove(viua::internals::types::byte*);
 
-            byte* opimport(byte*);
-            byte* oplink(byte*);
+            viua::internals::types::byte* opimport(viua::internals::types::byte*);
+            viua::internals::types::byte* oplink(viua::internals::types::byte*);
 
             public:
-                byte* dispatch(byte*);
-                byte* tick();
+                viua::internals::types::byte* dispatch(viua::internals::types::byte*);
+                viua::internals::types::byte* tick();
 
                 viua::types::Type* obtain(viua::internals::types::register_index) const;
                 void put(viua::internals::types::register_index, std::unique_ptr<viua::types::Type>);
@@ -295,9 +295,9 @@ namespace viua {
 
                 bool watchdogged() const;
                 std::string watchdog() const;
-                byte* become(const std::string&, std::unique_ptr<Frame>);
+                viua::internals::types::byte* become(const std::string&, std::unique_ptr<Frame>);
 
-                byte* begin();
+                viua::internals::types::byte* begin();
                 auto counter() const -> decltype(instruction_counter);
                 auto executionAt() const -> decltype(instruction_pointer);
 

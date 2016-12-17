@@ -31,7 +31,7 @@
 using namespace std;
 
 
-byte* viua::process::Process::opcapture(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opcapture(viua::internals::types::byte* addr) {
     /** Capture object by reference.
      */
     viua::internals::types::register_index target_closure_register = 0, target_register = 0, source_register = 0;
@@ -59,7 +59,7 @@ byte* viua::process::Process::opcapture(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::opcapturecopy(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opcapturecopy(viua::internals::types::byte* addr) {
     /** Capture object by copy.
      */
     viua::internals::types::register_index target_closure_register = 0, target_register = 0;
@@ -79,7 +79,7 @@ byte* viua::process::Process::opcapturecopy(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::opcapturemove(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opcapturemove(viua::internals::types::byte* addr) {
     /** Capture object by move.
      */
     viua::internals::types::register_index target_closure_register = 0, target_register = 0, source_register = 0;
@@ -97,7 +97,7 @@ byte* viua::process::Process::opcapturemove(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::opclosure(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opclosure(viua::internals::types::byte* addr) {
     /** Create a closure from a function.
      */
     if (currently_used_register_set != frames.back()->local_register_set.get()) {
@@ -118,7 +118,7 @@ byte* viua::process::Process::opclosure(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::opfunction(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opfunction(viua::internals::types::byte* addr) {
     /** Create function object in a register.
      *
      *  Such objects can be used to call functions, and
@@ -136,7 +136,7 @@ byte* viua::process::Process::opfunction(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::opfcall(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opfcall(viua::internals::types::byte* addr) {
     /*  Call a function object.
      */
     bool return_void = viua::bytecode::decoder::operands::is_void(addr);
@@ -162,11 +162,11 @@ byte* viua::process::Process::opfcall(byte* addr) {
         throw new viua::types::Exception("fcall to undefined function: " + call_name);
     }
 
-    byte* call_address = nullptr;
+    viua::internals::types::byte* call_address = nullptr;
     call_address = adjustJumpBaseFor(call_name);
 
     // save return address for frame
-    byte* return_address = addr;
+    viua::internals::types::byte* return_address = addr;
 
     if (frame_new == nullptr) {
         throw new viua::types::Exception("fcall without a frame: use `frame 0' in source code if the function takes no parameters");

@@ -25,7 +25,7 @@
 using namespace std;
 
 
-byte* viua::process::Process::optry(byte* addr) {
+viua::internals::types::byte* viua::process::Process::optry(viua::internals::types::byte* addr) {
     /** Create new special frame for try blocks.
      */
     if (try_frame_new) {
@@ -35,7 +35,7 @@ byte* viua::process::Process::optry(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::opcatch(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opcatch(viua::internals::types::byte* addr) {
     /** Run catch instruction.
      */
     string type_name, catcher_block_name;
@@ -51,7 +51,7 @@ byte* viua::process::Process::opcatch(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::opdraw(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opdraw(viua::internals::types::byte* addr) {
     /** Run draw instruction.
      */
     viua::internals::types::register_index target = 0;
@@ -65,7 +65,7 @@ byte* viua::process::Process::opdraw(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::openter(byte* addr) {
+viua::internals::types::byte* viua::process::Process::openter(viua::internals::types::byte* addr) {
     /*  Run enter instruction.
      */
     string block_name;
@@ -75,7 +75,7 @@ byte* viua::process::Process::openter(byte* addr) {
         throw new viua::types::Exception("cannot enter undefined block: " + block_name);
     }
 
-    byte* block_address = adjustJumpBaseForBlock(block_name);
+    viua::internals::types::byte* block_address = adjustJumpBaseForBlock(block_name);
 
     try_frame_new->return_address = addr;
     try_frame_new->associated_frame = frames.back().get();
@@ -86,7 +86,7 @@ byte* viua::process::Process::openter(byte* addr) {
     return block_address;
 }
 
-byte* viua::process::Process::opthrow(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opthrow(viua::internals::types::byte* addr) {
     /** Run throw instruction.
      */
     viua::internals::types::register_index source = 0;
@@ -108,7 +108,7 @@ byte* viua::process::Process::opthrow(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::opleave(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opleave(viua::internals::types::byte* addr) {
     /*  Run leave instruction.
      */
     if (tryframes.size() == 0) {

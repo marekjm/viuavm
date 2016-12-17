@@ -24,22 +24,12 @@
 
 #include <stdint.h>
 
-/** This header contains only one typedef - for byte.
- *
- *  This is because this typedef is required by various files across Viua
- *  source code, and often they do not need the opcodes.h header.
- *  This header prevents redefinition of `byte` in every file and
- *  helps keeping the definition consistent.
- *
- */
-
-typedef uint8_t byte;
-
 namespace viua {
     namespace internals {
         namespace types {
+            typedef uint8_t byte;
+
             typedef uint64_t bytecode_size;
-            // FIXME should be uint8_t
             typedef uint32_t register_index;
 
             typedef uint32_t schedulers_count;

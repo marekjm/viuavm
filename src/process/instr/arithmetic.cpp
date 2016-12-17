@@ -64,7 +64,7 @@ template<template <typename T> class Operator> static void perform_arithmetic(Op
     }
 }
 
-template<template <typename T> class Operator> static byte* decode_operands_and_perform_arithmetic(byte* addr, viua::process::Process *process) {
+template<template <typename T> class Operator> static viua::internals::types::byte* decode_operands_and_perform_arithmetic(viua::internals::types::byte* addr, viua::process::Process *process) {
     OperandType result_type = OperandType::OT_VOID;
     tie(addr, result_type) = viua::bytecode::decoder::operands::fetch_operand_type(addr);
 
@@ -122,7 +122,7 @@ template<template <typename T> class Operator> static void perform_comparison(Op
     }
 }
 
-template<template <typename T> class Operator> static byte* decode_operands_and_perform_comparison(byte* addr, viua::process::Process *process) {
+template<template <typename T> class Operator> static viua::internals::types::byte* decode_operands_and_perform_comparison(viua::internals::types::byte* addr, viua::process::Process *process) {
     OperandType result_type = OperandType::OT_VOID;
     tie(addr, result_type) = viua::bytecode::decoder::operands::fetch_operand_type(addr);
 
@@ -147,38 +147,38 @@ template<template <typename T> class Operator> static byte* decode_operands_and_
     return addr;
 }
 
-byte* viua::process::Process::opadd(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opadd(viua::internals::types::byte* addr) {
     return decode_operands_and_perform_arithmetic<plus>(addr, this);
 }
 
-byte* viua::process::Process::opsub(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opsub(viua::internals::types::byte* addr) {
     return decode_operands_and_perform_arithmetic<minus>(addr, this);
 }
 
-byte* viua::process::Process::opmul(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opmul(viua::internals::types::byte* addr) {
     return decode_operands_and_perform_arithmetic<multiplies>(addr, this);
 }
 
-byte* viua::process::Process::opdiv(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opdiv(viua::internals::types::byte* addr) {
     return decode_operands_and_perform_arithmetic<divides>(addr, this);
 }
 
-byte* viua::process::Process::oplt(byte* addr) {
+viua::internals::types::byte* viua::process::Process::oplt(viua::internals::types::byte* addr) {
     return decode_operands_and_perform_comparison<less>(addr, this);
 }
 
-byte* viua::process::Process::oplte(byte* addr) {
+viua::internals::types::byte* viua::process::Process::oplte(viua::internals::types::byte* addr) {
     return decode_operands_and_perform_comparison<less_equal>(addr, this);
 }
 
-byte* viua::process::Process::opgt(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opgt(viua::internals::types::byte* addr) {
     return decode_operands_and_perform_comparison<greater>(addr, this);
 }
 
-byte* viua::process::Process::opgte(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opgte(viua::internals::types::byte* addr) {
     return decode_operands_and_perform_comparison<greater_equal>(addr, this);
 }
 
-byte* viua::process::Process::opeq(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opeq(viua::internals::types::byte* addr) {
     return decode_operands_and_perform_comparison<equal_to>(addr, this);
 }

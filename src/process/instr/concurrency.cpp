@@ -28,7 +28,7 @@
 using namespace std;
 
 
-byte* viua::process::Process::opprocess(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opprocess(viua::internals::types::byte* addr) {
     /*  Run process instruction.
      */
     viua::internals::types::register_index target = 0;
@@ -59,13 +59,13 @@ byte* viua::process::Process::opprocess(byte* addr) {
 
     return addr;
 }
-byte* viua::process::Process::opjoin(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opjoin(viua::internals::types::byte* addr) {
     /** Join a process.
      *
      *  This opcode blocks execution of current process until
      *  the process being joined finishes execution.
      */
-    byte* return_addr = (addr-1);
+    viua::internals::types::byte* return_addr = (addr-1);
 
     viua::internals::types::register_index target = 0;
     bool target_is_void = viua::bytecode::decoder::operands::is_void(addr);
@@ -112,7 +112,7 @@ byte* viua::process::Process::opjoin(byte* addr) {
 
     return return_addr;
 }
-byte* viua::process::Process::opsend(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opsend(viua::internals::types::byte* addr) {
     /** Send a message to a process.
      */
     viua::internals::types::register_index target = 0, source = 0;
@@ -128,13 +128,13 @@ byte* viua::process::Process::opsend(byte* addr) {
 
     return addr;
 }
-byte* viua::process::Process::opreceive(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opreceive(viua::internals::types::byte* addr) {
     /** Receive a message.
      *
      *  This opcode blocks execution of current process
      *  until a message arrives.
      */
-    byte* return_addr = (addr-1);
+    viua::internals::types::byte* return_addr = (addr-1);
 
     viua::internals::types::register_index target = 0;
     bool target_is_void = viua::bytecode::decoder::operands::is_void(addr);
@@ -182,7 +182,7 @@ byte* viua::process::Process::opreceive(byte* addr) {
 
     return return_addr;
 }
-byte* viua::process::Process::opwatchdog(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opwatchdog(viua::internals::types::byte* addr) {
     /*  Run watchdog instruction.
      */
     string call_name;
@@ -206,7 +206,7 @@ byte* viua::process::Process::opwatchdog(byte* addr) {
 
     return addr;
 }
-byte* viua::process::Process::opself(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opself(viua::internals::types::byte* addr) {
     /*  Run process instruction.
      */
     viua::internals::types::register_index target = 0;

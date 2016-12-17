@@ -493,10 +493,10 @@ Program& Program::opif(int_op regc, viua::internals::types::bytecode_size addr_t
     /*  Inserts branch instruction.
      *  Byte offset is calculated automatically.
      */
-    byte* jump_position_in_bytecode = addr_ptr;
+    viua::internals::types::byte* jump_position_in_bytecode = addr_ptr;
 
-    jump_position_in_bytecode += sizeof(byte); // for opcode
-    jump_position_in_bytecode += sizeof(byte); // for operand-type marker
+    jump_position_in_bytecode += sizeof(viua::internals::types::byte); // for opcode
+    jump_position_in_bytecode += sizeof(viua::internals::types::byte); // for operand-type marker
     jump_position_in_bytecode += sizeof(viua::internals::types::register_index);
 
     if (absolute_truth != JMP_TO_BYTE) {

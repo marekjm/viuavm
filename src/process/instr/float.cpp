@@ -29,7 +29,7 @@
 using namespace std;
 
 
-byte* viua::process::Process::opfstore(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opfstore(viua::internals::types::byte* addr) {
     /*  Run fstore instruction.
      */
     viua::internals::types::register_index target = 0;

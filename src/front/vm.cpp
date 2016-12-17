@@ -27,7 +27,7 @@ void viua::front::vm::initialise(viua::kernel::Kernel *kernel, const string& pro
     loader.executable();
 
     uint64_t bytes = loader.getBytecodeSize();
-    unique_ptr<byte[]> bytecode = loader.getBytecode();
+    unique_ptr<viua::internals::types::byte[]> bytecode = loader.getBytecode();
 
     map<string, uint64_t> function_address_mapping = loader.getFunctionAddresses();
     for (auto p : function_address_mapping) { kernel->mapfunction(p.first, p.second); }

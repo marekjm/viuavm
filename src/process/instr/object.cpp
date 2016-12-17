@@ -32,7 +32,7 @@
 using namespace std;
 
 
-byte* viua::process::Process::opnew(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opnew(viua::internals::types::byte* addr) {
     /** Create new instance of specified class.
      */
     viua::internals::types::register_index target = 0;
@@ -50,7 +50,7 @@ byte* viua::process::Process::opnew(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::opmsg(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opmsg(viua::internals::types::byte* addr) {
     /** Send a message to an object.
      *
      *  This instruction is used to perform a method call on an object using dynamic dispatch.
@@ -113,7 +113,7 @@ byte* viua::process::Process::opmsg(byte* addr) {
     return (this->*caller)(addr, function_name, return_void, return_register, method_name);
 }
 
-byte* viua::process::Process::opinsert(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opinsert(viua::internals::types::byte* addr) {
     /** Insert an object as an attribute of another object.
      */
     viua::types::Type *object_operand = nullptr, *key_operand = nullptr;
@@ -135,7 +135,7 @@ byte* viua::process::Process::opinsert(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::opremove(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opremove(viua::internals::types::byte* addr) {
     /** Remove an attribute of another object.
      */
     viua::internals::types::register_index target_index = 0;

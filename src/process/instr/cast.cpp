@@ -29,7 +29,7 @@
 using namespace std;
 
 
-byte* viua::process::Process::opitof(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opitof(viua::internals::types::byte* addr) {
     viua::internals::types::register_index target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
@@ -41,7 +41,7 @@ byte* viua::process::Process::opitof(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::opftoi(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opftoi(viua::internals::types::byte* addr) {
     viua::internals::types::register_index target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
@@ -53,7 +53,7 @@ byte* viua::process::Process::opftoi(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::opstoi(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opstoi(viua::internals::types::byte* addr) {
     viua::internals::types::register_index target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
@@ -75,7 +75,7 @@ byte* viua::process::Process::opstoi(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::opstof(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opstof(viua::internals::types::byte* addr) {
     viua::internals::types::register_index target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 

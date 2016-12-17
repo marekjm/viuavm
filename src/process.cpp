@@ -126,22 +126,22 @@ void viua::process::Process::popFrame() {
     dropFrame();
 }
 
-byte* viua::process::Process::adjustJumpBaseForBlock(const string& call_name) {
-    byte *entry_point = nullptr;
+viua::internals::types::byte* viua::process::Process::adjustJumpBaseForBlock(const string& call_name) {
+    viua::internals::types::byte *entry_point = nullptr;
     auto ep = scheduler->getEntryPointOfBlock(call_name);
     entry_point = ep.first;
     jump_base = ep.second;
     return entry_point;
 }
-byte* viua::process::Process::adjustJumpBaseFor(const string& call_name) {
-    byte *entry_point = nullptr;
+viua::internals::types::byte* viua::process::Process::adjustJumpBaseFor(const string& call_name) {
+    viua::internals::types::byte *entry_point = nullptr;
     auto ep = scheduler->getEntryPointOf(call_name);
     entry_point = ep.first;
     jump_base = ep.second;
     return entry_point;
 }
-byte* viua::process::Process::callNative(byte* return_address, const string& call_name, const bool return_void, const viua::internals::types::register_index return_index, const string&) {
-    byte* call_address = adjustJumpBaseFor(call_name);
+viua::internals::types::byte* viua::process::Process::callNative(viua::internals::types::byte* return_address, const string& call_name, const bool return_void, const viua::internals::types::register_index return_index, const string&) {
+    viua::internals::types::byte* call_address = adjustJumpBaseFor(call_name);
 
     if (not frame_new) {
         throw new viua::types::Exception("function call without a frame: use `frame 0' in source code if the function takes no parameters");
@@ -157,7 +157,7 @@ byte* viua::process::Process::callNative(byte* return_address, const string& cal
 
     return call_address;
 }
-byte* viua::process::Process::callForeign(byte* return_address, const string& call_name, const bool return_void, const viua::internals::types::register_index return_index, const string&) {
+viua::internals::types::byte* viua::process::Process::callForeign(viua::internals::types::byte* return_address, const string& call_name, const bool return_void, const viua::internals::types::register_index return_index, const string&) {
     if (not frame_new) {
         throw new viua::types::Exception("external function call without a frame: use `frame 0' in source code if the function takes no parameters");
     }
@@ -173,7 +173,7 @@ byte* viua::process::Process::callForeign(byte* return_address, const string& ca
 
     return return_address;
 }
-byte* viua::process::Process::callForeignMethod(byte* return_address, viua::types::Type* object, const string& call_name, const bool return_void, const viua::internals::types::register_index return_index, const string&) {
+viua::internals::types::byte* viua::process::Process::callForeignMethod(viua::internals::types::byte* return_address, viua::types::Type* object, const string& call_name, const bool return_void, const viua::internals::types::register_index return_index, const string&) {
     if (not frame_new) {
         throw new viua::types::Exception("foreign method call without a frame");
     }
@@ -290,10 +290,10 @@ void viua::process::Process::handleActiveException() {
         caught.reset(thrown.release());
     }
 }
-byte* viua::process::Process::tick() {
+viua::internals::types::byte* viua::process::Process::tick() {
     bool halt = false;
 
-    byte* previous_instruction_pointer = instruction_pointer;
+    viua::internals::types::byte* previous_instruction_pointer = instruction_pointer;
     ++instruction_counter;
 
     try {
@@ -445,7 +445,7 @@ bool viua::process::Process::watchdogged() const {
 string viua::process::Process::watchdog() const {
     return watchdog_function;
 }
-byte* viua::process::Process::become(const string& function_name, std::unique_ptr<Frame> frame_to_use) {
+viua::internals::types::byte* viua::process::Process::become(const string& function_name, std::unique_ptr<Frame> frame_to_use) {
     if (not scheduler->isNativeFunction(function_name)) {
         throw new viua::types::Exception("process from undefined function: " + function_name);
     }
@@ -463,7 +463,7 @@ byte* viua::process::Process::become(const string& function_name, std::unique_pt
     return (instruction_pointer = adjustJumpBaseFor(function_name));
 }
 
-byte* viua::process::Process::begin() {
+viua::internals::types::byte* viua::process::Process::begin() {
     if (not scheduler->isNativeFunction(frames[0]->function_name)) {
         throw new viua::types::Exception("process from undefined function: " + frames[0]->function_name);
     }

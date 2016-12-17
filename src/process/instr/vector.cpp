@@ -30,7 +30,7 @@
 using namespace std;
 
 
-byte* viua::process::Process::opvec(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opvec(viua::internals::types::byte* addr) {
     viua::internals::types::register_index register_index = 0, pack_start_index = 0, pack_length = 0;
     tie(addr, register_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, pack_start_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
@@ -60,7 +60,7 @@ byte* viua::process::Process::opvec(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::opvinsert(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opvinsert(viua::internals::types::byte* addr) {
     viua::types::Type* vector_operand = nullptr;
     tie(addr, vector_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
     viua::assertions::assert_implements<viua::types::Vector>(vector_operand, "viua::types::Vector");
@@ -87,7 +87,7 @@ byte* viua::process::Process::opvinsert(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::opvpush(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opvpush(viua::internals::types::byte* addr) {
     viua::types::Type* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_object(addr, this);
     viua::assertions::assert_implements<viua::types::Vector>(target, "viua::types::Vector");
@@ -105,7 +105,7 @@ byte* viua::process::Process::opvpush(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::opvpop(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opvpop(viua::internals::types::byte* addr) {
     viua::internals::types::register_index destination_register_index = 0;
     bool destination_is_void = false;
     if (viua::bytecode::decoder::operands::get_operand_type(addr) == OT_VOID) {
@@ -134,7 +134,7 @@ byte* viua::process::Process::opvpop(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::opvat(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opvat(viua::internals::types::byte* addr) {
     viua::internals::types::register_index destination_register_index = 0;
     viua::types::Type* vector_operand = nullptr;
     int position_operand_index = 0;
@@ -149,7 +149,7 @@ byte* viua::process::Process::opvat(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::opvlen(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opvlen(viua::internals::types::byte* addr) {
     viua::internals::types::register_index target = 0;
     viua::types::Type* source = nullptr;
 

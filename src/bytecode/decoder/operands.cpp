@@ -28,26 +28,26 @@
 using namespace std;
 
 
-template<class T> static auto extract(byte *ip) -> T {
+template<class T> static auto extract(viua::internals::types::byte *ip) -> T {
     return *reinterpret_cast<T*>(ip);
 }
-template<class T> static auto extract(const byte *ip) -> T {
+template<class T> static auto extract(const viua::internals::types::byte *ip) -> T {
     return *reinterpret_cast<T*>(ip);
 }
-template<class T> static auto extract_ptr(byte *ip) -> T* {
+template<class T> static auto extract_ptr(viua::internals::types::byte *ip) -> T* {
     return reinterpret_cast<T*>(ip);
 }
 
-auto viua::bytecode::decoder::operands::get_operand_type(const byte *ip) -> OperandType {
+auto viua::bytecode::decoder::operands::get_operand_type(const viua::internals::types::byte *ip) -> OperandType {
     return extract<const OperandType>(ip);
 }
 
-auto viua::bytecode::decoder::operands::is_void(const byte *ip) -> bool {
+auto viua::bytecode::decoder::operands::is_void(const viua::internals::types::byte *ip) -> bool {
     OperandType ot = get_operand_type(ip);
     return (ot == OT_VOID);
 }
 
-auto viua::bytecode::decoder::operands::fetch_void(byte *ip) -> byte* {
+auto viua::bytecode::decoder::operands::fetch_void(viua::internals::types::byte *ip) -> viua::internals::types::byte* {
     OperandType ot = get_operand_type(ip);
     ++ip;
 
@@ -58,13 +58,13 @@ auto viua::bytecode::decoder::operands::fetch_void(byte *ip) -> byte* {
     return ip;
 }
 
-auto viua::bytecode::decoder::operands::fetch_operand_type(byte *ip) -> tuple<byte*, OperandType> {
+auto viua::bytecode::decoder::operands::fetch_operand_type(viua::internals::types::byte *ip) -> tuple<viua::internals::types::byte*, OperandType> {
     OperandType ot = get_operand_type(ip);
     ++ip;
-    return tuple<byte*, OperandType>{ip, ot};
+    return tuple<viua::internals::types::byte*, OperandType>{ip, ot};
 }
 
-static auto extract_register_index(byte *ip, viua::process::Process *process, bool pointers_allowed = false) -> tuple<byte*, viua::internals::types::register_index> {
+static auto extract_register_index(viua::internals::types::byte *ip, viua::process::Process *process, bool pointers_allowed = false) -> tuple<viua::internals::types::byte*, viua::internals::types::register_index> {
     OperandType ot = viua::bytecode::decoder::operands::get_operand_type(ip);
     ++ip;
 
@@ -83,13 +83,13 @@ static auto extract_register_index(byte *ip, viua::process::Process *process, bo
         }
         register_index = i->as_uint32();
     }
-    return tuple<byte*, viua::internals::types::register_index>(ip, register_index);
+    return tuple<viua::internals::types::byte*, viua::internals::types::register_index>(ip, register_index);
 }
-auto viua::bytecode::decoder::operands::fetch_register_index(byte *ip, viua::process::Process *process) -> tuple<byte*, viua::internals::types::register_index> {
+auto viua::bytecode::decoder::operands::fetch_register_index(viua::internals::types::byte *ip, viua::process::Process *process) -> tuple<viua::internals::types::byte*, viua::internals::types::register_index> {
     return extract_register_index(ip, process);
 }
 
-auto viua::bytecode::decoder::operands::fetch_timeout(byte *ip, viua::process::Process*) -> tuple<byte*, viua::internals::types::timeout> {
+auto viua::bytecode::decoder::operands::fetch_timeout(viua::internals::types::byte *ip, viua::process::Process*) -> tuple<viua::internals::types::byte*, viua::internals::types::timeout> {
     OperandType ot = viua::bytecode::decoder::operands::get_operand_type(ip);
     ++ip;
 
@@ -100,20 +100,20 @@ auto viua::bytecode::decoder::operands::fetch_timeout(byte *ip, viua::process::P
     } else {
         throw new viua::types::Exception("decoded invalid operand type");
     }
-    return tuple<byte*, viua::internals::types::timeout>(ip, value);
+    return tuple<viua::internals::types::byte*, viua::internals::types::timeout>(ip, value);
 }
 
-auto viua::bytecode::decoder::operands::fetch_primitive_uint(byte *ip, viua::process::Process *process) -> tuple<byte*, viua::internals::types::register_index> {
+auto viua::bytecode::decoder::operands::fetch_primitive_uint(viua::internals::types::byte *ip, viua::process::Process *process) -> tuple<viua::internals::types::byte*, viua::internals::types::register_index> {
     return fetch_register_index(ip, process);
 }
 
-auto viua::bytecode::decoder::operands::fetch_primitive_uint64(byte *ip, viua::process::Process*) -> tuple<byte*, uint64_t> {
+auto viua::bytecode::decoder::operands::fetch_primitive_uint64(viua::internals::types::byte *ip, viua::process::Process*) -> tuple<viua::internals::types::byte*, uint64_t> {
     uint64_t integer = extract<decltype(integer)>(ip);
     ip += sizeof(decltype(integer));
-    return tuple<byte*, decltype(integer)>(ip, integer);
+    return tuple<viua::internals::types::byte*, decltype(integer)>(ip, integer);
 }
 
-auto viua::bytecode::decoder::operands::fetch_primitive_int(byte *ip, viua::process::Process* p) -> tuple<byte*, viua::internals::types::plain_int> {
+auto viua::bytecode::decoder::operands::fetch_primitive_int(viua::internals::types::byte *ip, viua::process::Process* p) -> tuple<viua::internals::types::byte*, viua::internals::types::plain_int> {
     OperandType ot = viua::bytecode::decoder::operands::get_operand_type(ip);
     ++ip;
 
@@ -131,34 +131,34 @@ auto viua::bytecode::decoder::operands::fetch_primitive_int(byte *ip, viua::proc
     } else {
         throw new viua::types::Exception("decoded invalid operand type");
     }
-    return tuple<byte*, viua::internals::types::plain_int>(ip, value);
+    return tuple<viua::internals::types::byte*, viua::internals::types::plain_int>(ip, value);
 }
 
-auto viua::bytecode::decoder::operands::fetch_raw_int(byte *ip, viua::process::Process*) -> tuple<byte*, viua::internals::types::plain_int> {
-    return tuple<byte*, viua::internals::types::plain_int>((ip+sizeof(viua::internals::types::plain_int)), extract<viua::internals::types::plain_int>(ip));
+auto viua::bytecode::decoder::operands::fetch_raw_int(viua::internals::types::byte *ip, viua::process::Process*) -> tuple<viua::internals::types::byte*, viua::internals::types::plain_int> {
+    return tuple<viua::internals::types::byte*, viua::internals::types::plain_int>((ip+sizeof(viua::internals::types::plain_int)), extract<viua::internals::types::plain_int>(ip));
 }
 
-auto viua::bytecode::decoder::operands::fetch_raw_float(byte *ip, viua::process::Process*) -> tuple<byte*, float> {
-    return tuple<byte*, float>((ip+sizeof(float)), extract<float>(ip));
+auto viua::bytecode::decoder::operands::fetch_raw_float(viua::internals::types::byte *ip, viua::process::Process*) -> tuple<viua::internals::types::byte*, float> {
+    return tuple<viua::internals::types::byte*, float>((ip+sizeof(float)), extract<float>(ip));
 }
 
-auto viua::bytecode::decoder::operands::extract_primitive_uint64(byte *ip, viua::process::Process*) -> uint64_t {
+auto viua::bytecode::decoder::operands::extract_primitive_uint64(viua::internals::types::byte *ip, viua::process::Process*) -> uint64_t {
     return extract<uint64_t>(ip);
 }
 
-auto viua::bytecode::decoder::operands::fetch_primitive_string(byte *ip, viua::process::Process*) -> tuple<byte*, string> {
+auto viua::bytecode::decoder::operands::fetch_primitive_string(viua::internals::types::byte *ip, viua::process::Process*) -> tuple<viua::internals::types::byte*, string> {
     string s(extract_ptr<const char>(ip));
     ip += (s.size() + 1);
-    return tuple<byte*, string>(ip, s);
+    return tuple<viua::internals::types::byte*, string>(ip, s);
 }
 
-auto viua::bytecode::decoder::operands::fetch_atom(byte *ip, viua::process::Process*) -> tuple<byte*, string> {
+auto viua::bytecode::decoder::operands::fetch_atom(viua::internals::types::byte *ip, viua::process::Process*) -> tuple<viua::internals::types::byte*, string> {
     string s(extract_ptr<const char>(ip));
     ip += (s.size() + 1);
-    return tuple<byte*, string>(ip, s);
+    return tuple<viua::internals::types::byte*, string>(ip, s);
 }
 
-auto viua::bytecode::decoder::operands::fetch_object(byte *ip, viua::process::Process *p) -> tuple<byte*, viua::types::Type*> {
+auto viua::bytecode::decoder::operands::fetch_object(viua::internals::types::byte *ip, viua::process::Process *p) -> tuple<viua::internals::types::byte*, viua::types::Type*> {
     viua::internals::types::register_index register_index = 0;
 
     bool is_pointer = (get_operand_type(ip) == OT_POINTER);
@@ -174,5 +174,5 @@ auto viua::bytecode::decoder::operands::fetch_object(byte *ip, viua::process::Pr
         object = pointer_object->to();
     }
 
-    return tuple<byte*, viua::types::Type*>(ip, object);
+    return tuple<viua::internals::types::byte*, viua::types::Type*>(ip, object);
 }

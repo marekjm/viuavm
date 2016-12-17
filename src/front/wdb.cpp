@@ -112,7 +112,7 @@ bool VERBOSE = false;
 
 
 OPCODE printInstruction(const viua::kernel::Kernel& kernel) {
-    byte* iptr = kernel.executionAt();
+    viua::internals::types::byte* iptr = kernel.executionAt();
 
     string instruction;
     unsigned size;
@@ -185,7 +185,7 @@ void printRegisters(const vector<string>& indexes, viua::kernel::RegisterSet* re
 
 struct State {
     // breakpoints
-    vector<byte*> breakpoints_byte;
+    vector<viua::internals::types::byte*> breakpoints_byte;
     vector<string> breakpoints_opcode;
     vector<string> breakpoints_function;
 
@@ -220,7 +220,7 @@ struct State {
 };
 
 
-tuple<bool, string> if_breakpoint_byte(viua::kernel::Kernel& kernel, vector<byte*>& breakpoints_byte) {
+tuple<bool, string> if_breakpoint_byte(viua::kernel::Kernel& kernel, vector<viua::internals::types::byte*>& breakpoints_byte) {
     bool pause = false;
     ostringstream reason;
     reason.str("");
@@ -286,7 +286,7 @@ tuple<bool, string> if_watchpoint_local_register_write(viua::kernel::Kernel& ker
     }
     int register_index[2] = {-1, -1};
     int writes_to = 0;
-    byte* register_index_ptr = (kernel.executionAt()+1);
+    viua::internals::types::byte* register_index_ptr = (kernel.executionAt()+1);
 
     if (opcode == IZERO or
         opcode == ISTORE or
@@ -395,7 +395,7 @@ tuple<bool, string> if_watchpoint_global_register_write(viua::kernel::Kernel& ke
     }
     int register_index[2] = {-1, -1};
     int writes_to = 0;
-    byte* register_index_ptr = (kernel.executionAt()+1);
+    viua::internals::types::byte* register_index_ptr = (kernel.executionAt()+1);
 
     if (opcode == IZERO or
         opcode == ISTORE or
@@ -931,7 +931,7 @@ void debuggerMainLoop(viua::kernel::Kernel& kernel, deque<string> init) {
                 state.exception_raised = true;
             }
 
-            byte* ticked = kernel.tick();
+            viua::internals::types::byte* ticked = kernel.tick();
             if (not state.exception_raised and not state.finished and ticked == nullptr) {
                 state.finished = (kernel.return_exception == "" ? true : false);
                 state.ticks_left = 0;

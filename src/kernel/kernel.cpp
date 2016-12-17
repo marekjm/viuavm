@@ -47,7 +47,7 @@
 using namespace std;
 
 
-viua::kernel::Kernel& viua::kernel::Kernel::load(unique_ptr<byte[]> bc) {
+viua::kernel::Kernel& viua::kernel::Kernel::load(unique_ptr<viua::internals::types::byte[]> bc) {
     /*  Load bytecode into the viua::kernel::Kernel.
      *  viua::kernel::Kernel becomes owner of loaded bytecode - meaning it will consider itself responsible for proper
      *  destruction of it, so make sure you have a copy of the bytecode.
@@ -117,23 +117,23 @@ void viua::kernel::Kernel::loadNativeLibrary(const string& module) {
         Loader loader(path);
         loader.load();
 
-        unique_ptr<byte[]> lnk_btcd {loader.getBytecode()};
+        unique_ptr<viua::internals::types::byte[]> lnk_btcd {loader.getBytecode()};
 
         vector<string> fn_names = loader.getFunctions();
         map<string, viua::internals::types::bytecode_size> fn_addrs = loader.getFunctionAddresses();
         for (unsigned i = 0; i < fn_names.size(); ++i) {
             string fn_linkname = fn_names[i];
-            linked_functions[fn_linkname] = pair<string, byte*>(module, (lnk_btcd.get()+fn_addrs[fn_names[i]]));
+            linked_functions[fn_linkname] = pair<string, viua::internals::types::byte*>(module, (lnk_btcd.get()+fn_addrs[fn_names[i]]));
         }
 
         vector<string> bl_names = loader.getBlocks();
         map<string, viua::internals::types::bytecode_size> bl_addrs = loader.getBlockAddresses();
         for (unsigned i = 0; i < bl_names.size(); ++i) {
             string bl_linkname = bl_names[i];
-            linked_blocks[bl_linkname] = pair<string, byte*>(module, (lnk_btcd.get()+bl_addrs[bl_linkname]));
+            linked_blocks[bl_linkname] = pair<string, viua::internals::types::byte*>(module, (lnk_btcd.get()+bl_addrs[bl_linkname]));
         }
 
-        linked_modules[module] = pair<viua::internals::types::bytecode_size, unique_ptr<byte[]>>(loader.getBytecodeSize(), std::move(lnk_btcd));
+        linked_modules[module] = pair<viua::internals::types::bytecode_size, unique_ptr<viua::internals::types::byte[]>>(loader.getBytecodeSize(), std::move(lnk_btcd));
     } else {
         throw new viua::types::Exception("failed to link: " + module);
     }
@@ -243,9 +243,9 @@ bool viua::kernel::Kernel::isLinkedBlock(const string& name) const {
     return linked_blocks.count(name);
 }
 
-pair<byte*, byte*> viua::kernel::Kernel::getEntryPointOfBlock(const std::string& name) const {
-    byte *entry_point = nullptr;
-    byte *module_base = nullptr;
+pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::kernel::Kernel::getEntryPointOfBlock(const std::string& name) const {
+    viua::internals::types::byte *entry_point = nullptr;
+    viua::internals::types::byte *module_base = nullptr;
     if (block_addresses.count(name)) {
         entry_point = (bytecode.get() + block_addresses.at(name));
         module_base = bytecode.get();
@@ -254,16 +254,16 @@ pair<byte*, byte*> viua::kernel::Kernel::getEntryPointOfBlock(const std::string&
         entry_point = lf.second;
         module_base = linked_modules.at(lf.first).second.get();
     }
-    return pair<byte*, byte*>(entry_point, module_base);
+    return pair<viua::internals::types::byte*, viua::internals::types::byte*>(entry_point, module_base);
 }
 
 string viua::kernel::Kernel::resolveMethodName(const string& klass, const string& method_name) const {
     return typesystem.at(klass)->resolvesTo(method_name);
 }
 
-pair<byte*, byte*> viua::kernel::Kernel::getEntryPointOf(const std::string& name) const {
-    byte *entry_point = nullptr;
-    byte *module_base = nullptr;
+pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::kernel::Kernel::getEntryPointOf(const std::string& name) const {
+    viua::internals::types::byte *entry_point = nullptr;
+    viua::internals::types::byte *module_base = nullptr;
     if (function_addresses.count(name)) {
         entry_point = (bytecode.get() + function_addresses.at(name));
         module_base = bytecode.get();
@@ -272,7 +272,7 @@ pair<byte*, byte*> viua::kernel::Kernel::getEntryPointOf(const std::string& name
         entry_point = lf.second;
         module_base = linked_modules.at(lf.first).second.get();
     }
-    return pair<byte*, byte*>(entry_point, module_base);
+    return pair<viua::internals::types::byte*, viua::internals::types::byte*>(entry_point, module_base);
 }
 
 void viua::kernel::Kernel::registerPrototype(const string& type_name, unique_ptr<viua::types::Prototype> proto) {

@@ -38,7 +38,7 @@ enum JUMPTYPE {
 
 class Program {
     // byte array containing bytecode
-    byte* program;
+    viua::internals::types::byte* program;
     // size of the bytecode
     viua::internals::types::bytecode_size bytes;
 
@@ -47,13 +47,13 @@ class Program {
      *  Methods implementing generation of specific bytecodes always
      *  append bytes to this pointer.
      */
-    byte* addr_ptr;
+    viua::internals::types::byte* addr_ptr;
 
     /** Branches inside bytecode must be stored for later recalculation.
      *  Jumps must be recalculated because each function is compiled separately with jump offset 0, but
      *  when they are assembled into a single binary the offsets change.
      */
-    std::vector<byte*> branches;
+    std::vector<viua::internals::types::byte*> branches;
 
     // simple, whether to print debugging information or not
     bool debug;
@@ -168,8 +168,8 @@ class Program {
     Program& calculateJumps(std::vector<std::tuple<viua::internals::types::bytecode_size, viua::internals::types::bytecode_size>>, std::vector<viua::cg::lex::Token>&);
     std::vector<viua::internals::types::bytecode_size> jumps();
 
-    byte* bytecode();
-    Program& fill(byte*);
+    viua::internals::types::byte* bytecode();
+    Program& fill(viua::internals::types::byte*);
 
     Program& setdebug(bool d = true);
     Program& setscream(bool d = true);

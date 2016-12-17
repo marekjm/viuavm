@@ -27,7 +27,7 @@
 using namespace std;
 
 
-byte* viua::process::Process::opframe(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opframe(viua::internals::types::byte* addr) {
     /** Create new frame for function calls.
      */
     viua::internals::types::register_index arguments = 0, local_registers = 0;
@@ -39,7 +39,7 @@ byte* viua::process::Process::opframe(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::opparam(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opparam(viua::internals::types::byte* addr) {
     /** Run param instruction.
      */
     viua::internals::types::register_index parameter_no_operand_index = 0;
@@ -57,7 +57,7 @@ byte* viua::process::Process::opparam(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::oppamv(byte* addr) {
+viua::internals::types::byte* viua::process::Process::oppamv(viua::internals::types::byte* addr) {
     /** Run pamv instruction.
      */
     viua::internals::types::register_index parameter_no_operand_index = 0, source = 0;
@@ -74,7 +74,7 @@ byte* viua::process::Process::oppamv(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::oparg(byte* addr) {
+viua::internals::types::byte* viua::process::Process::oparg(viua::internals::types::byte* addr) {
     /** Run arg instruction.
      */
     viua::internals::types::register_index destination_register_index = 0, parameter_no_operand_index = 0;
@@ -109,7 +109,7 @@ byte* viua::process::Process::oparg(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::opargc(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opargc(viua::internals::types::byte* addr) {
     viua::internals::types::register_index target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     currently_used_register_set->set(target, unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<int>(frames.back()->arguments->size()))});
@@ -117,7 +117,7 @@ byte* viua::process::Process::opargc(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::opcall(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opcall(viua::internals::types::byte* addr) {
     /*  Run call instruction.
      */
     bool return_void = viua::bytecode::decoder::operands::is_void(addr);
@@ -158,7 +158,7 @@ byte* viua::process::Process::opcall(byte* addr) {
     return (this->*caller)(addr, call_name, return_void, return_register, "");
 }
 
-byte* viua::process::Process::optailcall(byte* addr) {
+viua::internals::types::byte* viua::process::Process::optailcall(viua::internals::types::byte* addr) {
     /*  Run tailcall instruction.
      */
     string call_name;
@@ -187,7 +187,7 @@ byte* viua::process::Process::optailcall(byte* addr) {
     return adjustJumpBaseFor(call_name);
 }
 
-byte* viua::process::Process::opreturn(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opreturn(viua::internals::types::byte* addr) {
     if (frames.size() == 0) {
         throw new viua::types::Exception("no frame on stack: no call to return from");
     }

@@ -30,14 +30,14 @@
 using namespace std;
 
 
-byte* viua::process::Process::opizero(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opizero(viua::internals::types::byte* addr) {
     viua::internals::types::register_index target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     place(target, unique_ptr<viua::types::Type>{new viua::types::Integer(0)});
     return addr;
 }
 
-byte* viua::process::Process::opistore(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opistore(viua::internals::types::byte* addr) {
     viua::internals::types::register_index target = 0;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
@@ -49,7 +49,7 @@ byte* viua::process::Process::opistore(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::opiinc(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opiinc(viua::internals::types::byte* addr) {
     viua::types::Type* target { nullptr };
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
@@ -58,7 +58,7 @@ byte* viua::process::Process::opiinc(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::opidec(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opidec(viua::internals::types::byte* addr) {
     viua::types::Type* target { nullptr };
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 

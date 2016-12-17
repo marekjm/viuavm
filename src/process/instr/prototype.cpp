@@ -28,7 +28,7 @@
 using namespace std;
 
 
-byte* viua::process::Process::opclass(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opclass(viua::internals::types::byte* addr) {
     /** Create a class.
      */
     viua::internals::types::register_index target = 0;
@@ -42,7 +42,7 @@ byte* viua::process::Process::opclass(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::opderive(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opderive(viua::internals::types::byte* addr) {
     /** Push an ancestor class to prototype's inheritance chain.
      */
     viua::types::Type* target = nullptr;
@@ -60,7 +60,7 @@ byte* viua::process::Process::opderive(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::opattach(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opattach(viua::internals::types::byte* addr) {
     /** Attach a function to a prototype as a method.
      */
     viua::types::Type* target = nullptr;
@@ -81,7 +81,7 @@ byte* viua::process::Process::opattach(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::opregister(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opregister(viua::internals::types::byte* addr) {
     /** Register a prototype in the typesystem.
      */
     viua::internals::types::register_index source = 0;

@@ -200,7 +200,7 @@ bool viua::scheduler::VirtualProcessScheduler::isLinkedBlock(const string& name)
     return attached_kernel->isLinkedBlock(name);
 }
 
-pair<byte*, byte*> viua::scheduler::VirtualProcessScheduler::getEntryPointOfBlock(const std::string& name) const {
+pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::scheduler::VirtualProcessScheduler::getEntryPointOfBlock(const std::string& name) const {
     return attached_kernel->getEntryPointOfBlock(name);
 }
 
@@ -208,7 +208,7 @@ string viua::scheduler::VirtualProcessScheduler::resolveMethodName(const string&
     return attached_kernel->resolveMethodName(klass, method);
 }
 
-pair<byte*, byte*> viua::scheduler::VirtualProcessScheduler::getEntryPointOf(const std::string& name) const {
+pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::scheduler::VirtualProcessScheduler::getEntryPointOf(const std::string& name) const {
     return attached_kernel->getEntryPointOf(name);
 }
 

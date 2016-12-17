@@ -28,7 +28,7 @@
 using namespace std;
 
 
-byte* viua::process::Process::opimport(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opimport(viua::internals::types::byte* addr) {
     /** Run import instruction.
      */
     string module;
@@ -37,7 +37,7 @@ byte* viua::process::Process::opimport(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::oplink(byte* addr) {
+viua::internals::types::byte* viua::process::Process::oplink(viua::internals::types::byte* addr) {
     /** Run link instruction.
      */
     string module;

@@ -24,7 +24,7 @@
 
 #include <viua/bytecode/bytetypedef.h>
 
-enum OPCODE : byte {
+enum OPCODE : viua::internals::types::byte {
     NOP = 0,    // do nothing
 
     // integer instructions

@@ -68,7 +68,7 @@ namespace viua {
             /*  Bytecode pointer is a pointer to program's code.
              *  Size and executable offset are metadata exported from bytecode dump.
              */
-            std::unique_ptr<byte[]> bytecode;
+            std::unique_ptr<viua::internals::types::byte[]> bytecode;
             viua::internals::types::bytecode_size bytecode_size;
             viua::internals::types::bytecode_size executable_offset;
 
@@ -80,9 +80,9 @@ namespace viua {
             std::map<std::string, viua::internals::types::bytecode_size> function_addresses;
             std::map<std::string, viua::internals::types::bytecode_size> block_addresses;
 
-            std::map<std::string, std::pair<std::string, byte*>> linked_functions;
-            std::map<std::string, std::pair<std::string, byte*>> linked_blocks;
-            std::map<std::string, std::pair<viua::internals::types::bytecode_size, std::unique_ptr<byte[]>>> linked_modules;
+            std::map<std::string, std::pair<std::string, viua::internals::types::byte*>> linked_functions;
+            std::map<std::string, std::pair<std::string, viua::internals::types::byte*>> linked_blocks;
+            std::map<std::string, std::pair<viua::internals::types::bytecode_size, std::unique_ptr<viua::internals::types::byte[]>>> linked_modules;
 
             int return_code;
 
@@ -153,7 +153,7 @@ namespace viua {
                  *      * tell the Kernel where to start execution,
                  *      * kick the Kernel so it starts running,
                  */
-                Kernel& load(std::unique_ptr<byte[]>);
+                Kernel& load(std::unique_ptr<viua::internals::types::byte[]>);
                 Kernel& bytes(viua::internals::types::bytecode_size);
 
                 Kernel& mapfunction(const std::string&, viua::internals::types::bytecode_size);
@@ -176,10 +176,10 @@ namespace viua {
                 bool isBlock(const std::string&) const;
                 bool isLocalBlock(const std::string&) const;
                 bool isLinkedBlock(const std::string&) const;
-                std::pair<byte*, byte*> getEntryPointOfBlock(const std::string&) const;
+                std::pair<viua::internals::types::byte*, viua::internals::types::byte*> getEntryPointOfBlock(const std::string&) const;
 
                 std::string resolveMethodName(const std::string&, const std::string&) const;
-                std::pair<byte*, byte*> getEntryPointOf(const std::string&) const;
+                std::pair<viua::internals::types::byte*, viua::internals::types::byte*> getEntryPointOf(const std::string&) const;
 
                 void registerPrototype(const std::string&, std::unique_ptr<viua::types::Prototype>);
                 void registerPrototype(std::unique_ptr<viua::types::Prototype>);
