@@ -119,7 +119,7 @@ template<class ...Ts> static void viua_err(Ts&&... arguments) {
 }
 
 
-bool viua::scheduler::VirtualProcessScheduler::executeQuant(viua::process::Process *th, unsigned priority) {
+bool viua::scheduler::VirtualProcessScheduler::executeQuant(viua::process::Process *th, uint16_t priority) {
     if (th->stopped() and th->joinable()) {
         // stopped but still joinable
         // we don't have to deal with "stopped and unjoinable" case here
@@ -131,7 +131,7 @@ bool viua::scheduler::VirtualProcessScheduler::executeQuant(viua::process::Proce
         return true;
     }
 
-    for (unsigned j = 0; (priority == 0 or j < priority); ++j) {
+    for (decltype(priority) j = 0; (priority == 0 or j < priority); ++j) {
         if (th->stopped()) {
             // remember to break if the process stopped
             // otherwise the kernel will try to tick the process and
