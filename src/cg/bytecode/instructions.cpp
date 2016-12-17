@@ -308,21 +308,21 @@ namespace cg {
 
         viua::internals::types::byte* opress(viua::internals::types::byte* addr_ptr, const string& a) {
             *(addr_ptr++) = RESS;
-            viua::internals::types::registerset_type_marker register_set_marker = 0;
+            viua::internals::RegisterSets register_set_marker = viua::internals::RegisterSets::LOCAL;
             if (a == "global") {
-                register_set_marker = 0;
+                register_set_marker = viua::internals::RegisterSets::GLOBAL;
             } else if (a == "local") {
-                register_set_marker = 1;
+                register_set_marker = viua::internals::RegisterSets::LOCAL;
             } else if (a == "static") {
-                register_set_marker = 2;
+                register_set_marker = viua::internals::RegisterSets::STATIC;
             } else if (a == "temp") {
-                register_set_marker = 3;
+                register_set_marker = viua::internals::RegisterSets::TEMPORARY;
             } else {
                 // FIXME: detect invalid register set names
                 // after switching to token-based code generation
                 // it will not be necessary
             }
-            *(addr_ptr) = register_set_marker;
+            *(addr_ptr) = static_cast<viua::internals::types::registerset_type_marker>(register_set_marker);
             pointer::inc<viua::internals::types::registerset_type_marker, viua::internals::types::byte>(addr_ptr);
             return addr_ptr;
         }

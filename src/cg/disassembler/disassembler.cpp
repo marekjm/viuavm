@@ -305,17 +305,17 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
             break;
         case RESS:
             oss << " ";
-            switch (*ptr) {
-                case 0:
+            switch (static_cast<viua::internals::RegisterSets>(*ptr)) {
+                case viua::internals::RegisterSets::GLOBAL:
                     oss << "global";
                     break;
-                case 1:
+                case viua::internals::RegisterSets::LOCAL:
                     oss << "local";
                     break;
-                case 2:
+                case viua::internals::RegisterSets::STATIC:
                     oss << "static";
                     break;
-                case 3:
+                case viua::internals::RegisterSets::TEMPORARY:
                     oss << "temp";
                     break;
                 default:

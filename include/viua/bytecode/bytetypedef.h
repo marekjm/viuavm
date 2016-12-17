@@ -44,6 +44,13 @@ namespace viua {
 
             typedef uint8_t registerset_type_marker;
         }
+
+        enum class RegisterSets: types::registerset_type_marker {
+            GLOBAL = 0,
+            LOCAL,
+            STATIC,
+            TEMPORARY,
+        };
     }
 }
 

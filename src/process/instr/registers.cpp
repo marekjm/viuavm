@@ -86,18 +86,18 @@ viua::internals::types::byte* viua::process::Process::opress(viua::internals::ty
     viua::internals::types::registerset_type_marker to_register_set = 0;
     tie(addr, to_register_set) = viua::bytecode::decoder::operands::fetch_registerset_type(addr, this);
 
-    switch (to_register_set) {
-        case 0:
+    switch (static_cast<viua::internals::RegisterSets>(to_register_set)) {
+        case viua::internals::RegisterSets::GLOBAL:
             currently_used_register_set = global_register_set.get();
             break;
-        case 1:
+        case viua::internals::RegisterSets::LOCAL:
             currently_used_register_set = frames.back()->local_register_set.get();
             break;
-        case 2:
+        case viua::internals::RegisterSets::STATIC:
             ensureStaticRegisters(frames.back()->function_name);
             currently_used_register_set = static_registers.at(frames.back()->function_name).get();
             break;
-        case 3:
+        case viua::internals::RegisterSets::TEMPORARY:
             // TODO: switching to temporary registers
         default:
             throw new viua::types::Exception("illegal register set ID in ress instruction");
