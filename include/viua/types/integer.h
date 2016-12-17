@@ -33,7 +33,11 @@ namespace viua {
             /** Basic integer type.
              *  It is suitable for mathematical operations.
              */
-            int64_t number;
+            public:
+            using underlying_type = int64_t;
+
+            private:
+            underlying_type number;
 
             public:
                 std::string type() const override;

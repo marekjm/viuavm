@@ -40,7 +40,7 @@ using namespace viua::types;
 Integer* String::size() {
     /** Return size of the string.
      */
-    return new Integer(int(svalue.size()));
+    return new Integer(static_cast<Integer::underlying_type>(svalue.size()));
 }
 
 String* String::sub(int b, int e) {
