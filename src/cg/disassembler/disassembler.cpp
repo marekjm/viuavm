@@ -348,7 +348,8 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(b
     if (ptr < saved_ptr) {
         throw ("bytecode pointer increase less than zero: near " + OP_NAMES.at(op) + " instruction");
     }
-    viua::internals::types::bytecode_size increase = (ptr-saved_ptr);
+    // we already *know* that the result will not be negative
+    auto increase = static_cast<viua::internals::types::bytecode_size>(ptr-saved_ptr);
 
     // cast increase to unsigned as at this point it is safe to assume that it is greater than zero
     return tuple<string, viua::internals::types::bytecode_size>(oss.str(), increase);
