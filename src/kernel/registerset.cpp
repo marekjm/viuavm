@@ -37,7 +37,7 @@ void viua::kernel::Register::reset(unique_ptr<viua::types::Type> o) {
 }
 
 bool viua::kernel::Register::empty() const {
-    return value != nullptr;
+    return value == nullptr;
 }
 
 viua::types::Type* viua::kernel::Register::get() {
