@@ -48,6 +48,7 @@ namespace viua {
 
             viua::types::Type* get();
             viua::types::Type* release();
+            std::unique_ptr<viua::types::Type> give();
 
             void swap(Register&);
 

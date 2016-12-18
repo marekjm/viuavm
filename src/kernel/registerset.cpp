@@ -49,6 +49,11 @@ viua::types::Type* viua::kernel::Register::release() {
     return value.release();
 }
 
+std::unique_ptr<viua::types::Type> viua::kernel::Register::give() {
+    mask = 0;
+    return std::move(value);
+}
+
 void viua::kernel::Register::swap(Register& that) {
     value.swap(that.value);
     auto tmp = mask;
