@@ -36,12 +36,13 @@ viua::internals::types::byte* viua::process::Process::opmove(viua::internals::ty
     return addr;
 }
 viua::internals::types::byte* viua::process::Process::opcopy(viua::internals::types::byte* addr) {
-    viua::internals::types::register_index target = 0;
-    viua::types::Type *source = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    viua::kernel::Register *target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::types::Type* source = nullptr;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    place(target, source->copy());
+    *target = std::move(source->copy());
 
     return addr;
 }
