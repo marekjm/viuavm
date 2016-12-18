@@ -47,12 +47,13 @@ viua::internals::types::byte* viua::process::Process::opcopy(viua::internals::ty
     return addr;
 }
 viua::internals::types::byte* viua::process::Process::opptr(viua::internals::types::byte* addr) {
-    viua::internals::types::register_index target = 0;
-    viua::types::Type *source = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    viua::kernel::Register *target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::types::Type* source = nullptr;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    place(target, source->pointer());
+    *target = std::move(source->pointer());
 
     return addr;
 }
@@ -74,11 +75,11 @@ viua::internals::types::byte* viua::process::Process::opdelete(viua::internals::
     return addr;
 }
 viua::internals::types::byte* viua::process::Process::opisnull(viua::internals::types::byte* addr) {
-    viua::internals::types::register_index target = 0, source = 0;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    viua::kernel::Register *target = nullptr, *source = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    place(target, unique_ptr<viua::types::Type>{new viua::types::Boolean(currently_used_register_set->at(source) == nullptr)});
+    *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(source->empty())};
 
     return addr;
 }
