@@ -54,13 +54,13 @@ viua::internals::types::byte* viua::process::Process::opcatch(viua::internals::t
 viua::internals::types::byte* viua::process::Process::opdraw(viua::internals::types::byte* addr) {
     /** Run draw instruction.
      */
-    viua::internals::types::register_index target = 0;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     if (not caught) {
         throw new viua::types::Exception("no caught object to draw");
     }
-    currently_used_register_set->set(target, std::move(caught));
+    *target = std::move(caught);
 
     return addr;
 }
@@ -89,21 +89,16 @@ viua::internals::types::byte* viua::process::Process::openter(viua::internals::t
 viua::internals::types::byte* viua::process::Process::opthrow(viua::internals::types::byte* addr) {
     /** Run throw instruction.
      */
-    viua::internals::types::register_index source = 0;
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    viua::kernel::Register* source = nullptr;
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    if (source >= currently_used_register_set->size()) {
+    if (not source) {
         ostringstream oss;
-        oss << "invalid read: register out of bounds: " << source;
-        throw new viua::types::Exception(oss.str());
-    }
-    if (currently_used_register_set->at(source) == nullptr) {
-        ostringstream oss;
-        oss << "invalid throw: register " << source << " is empty";
+        oss << "invalid throw: register is empty";
         throw new viua::types::Exception(oss.str());
     }
 
-    thrown = currently_used_register_set->pop(source);
+    thrown = source->give();
 
     return addr;
 }
