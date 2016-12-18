@@ -35,17 +35,17 @@ using namespace std;
 viua::internals::types::byte* viua::process::Process::opnew(viua::internals::types::byte* addr) {
     /** Create new instance of specified class.
      */
-    viua::internals::types::register_index target = 0;
-    string class_name;
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    string class_name;
     tie(addr, class_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     if (not scheduler->isClass(class_name)) {
         throw new viua::types::Exception("cannot create new instance of unregistered type: " + class_name);
     }
 
-    place(target, unique_ptr<viua::types::Type>{new viua::types::Object(class_name)});
+    *target = unique_ptr<viua::types::Type>{new viua::types::Object(class_name)};
 
     return addr;
 }
@@ -123,9 +123,9 @@ viua::internals::types::byte* viua::process::Process::opinsert(viua::internals::
         tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
         static_cast<viua::types::Object*>(object_operand)->insert(static_cast<viua::types::String*>(key_operand)->str(), source->copy());
     } else {
-        viua::internals::types::register_index source_index = 0;
-        tie(addr, source_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-        static_cast<viua::types::Object*>(object_operand)->insert(static_cast<viua::types::String*>(key_operand)->str(), pop(source_index));
+        viua::kernel::Register* source = nullptr;
+        tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+        static_cast<viua::types::Object*>(object_operand)->insert(static_cast<viua::types::String*>(key_operand)->str(), source->give());
     }
 
     return addr;
@@ -134,13 +134,13 @@ viua::internals::types::byte* viua::process::Process::opinsert(viua::internals::
 viua::internals::types::byte* viua::process::Process::opremove(viua::internals::types::byte* addr) {
     /** Remove an attribute of another object.
      */
-    viua::internals::types::register_index target_index = 0;
-    bool void_target = false;
-    if (viua::bytecode::decoder::operands::get_operand_type(addr) == OT_VOID) {
-        void_target = true;
-        addr = viua::bytecode::decoder::operands::fetch_void(addr);
+    bool void_target = viua::bytecode::decoder::operands::is_void(addr);
+    viua::kernel::Register* target = nullptr;
+
+    if (not void_target) {
+        tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
     } else {
-        tie(addr, target_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+        addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 
     viua::types::Type *object_operand = nullptr, *key_operand = nullptr;
@@ -152,7 +152,7 @@ viua::internals::types::byte* viua::process::Process::opremove(viua::internals::
 
     unique_ptr<viua::types::Type> result { static_cast<viua::types::Object*>(object_operand)->remove(static_cast<viua::types::String*>(key_operand)->str()) };
     if (not void_target) {
-        place(target_index, std::move(result));
+        *target = std::move(result);
     }
 
     return addr;
