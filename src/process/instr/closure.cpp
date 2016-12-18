@@ -140,10 +140,10 @@ viua::internals::types::byte* viua::process::Process::opfcall(viua::internals::t
     /*  Call a function object.
      */
     bool return_void = viua::bytecode::decoder::operands::is_void(addr);
-    viua::internals::types::register_index return_register = 0;
+    viua::kernel::Register* return_register = nullptr;
 
     if (not return_void) {
-        tie(addr, return_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+        tie(addr, return_register) = viua::bytecode::decoder::operands::fetch_register(addr, this);
     } else {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
@@ -171,12 +171,10 @@ viua::internals::types::byte* viua::process::Process::opfcall(viua::internals::t
     if (frame_new == nullptr) {
         throw new viua::types::Exception("fcall without a frame: use `frame 0' in source code if the function takes no parameters");
     }
-    // set function name and return address
+
     frame_new->function_name = call_name;
     frame_new->return_address = return_address;
-
-    frame_new->return_void = return_void;
-    frame_new->place_return_value_in = return_register;
+    frame_new->return_register = return_register;
 
     if (fn->type() == "Closure") {
         frame_new->setLocalRegisterSet(static_cast<viua::types::Closure*>(fn)->rs(), false);

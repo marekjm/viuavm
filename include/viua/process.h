@@ -124,11 +124,11 @@ namespace viua {
             viua::internals::types::byte* adjustJumpBaseForBlock(const std::string&);
             viua::internals::types::byte* adjustJumpBaseFor(const std::string&);
             // call native (i.e. written in Viua) function
-            viua::internals::types::byte* callNative(viua::internals::types::byte*, const std::string&, const bool, const viua::internals::types::register_index, const std::string&);
+            viua::internals::types::byte* callNative(viua::internals::types::byte*, const std::string&, viua::kernel::Register*, const std::string&);
             // call foreign (i.e. from a C++ extension) function
-            viua::internals::types::byte* callForeign(viua::internals::types::byte*, const std::string&, const bool, const viua::internals::types::register_index, const std::string&);
+            viua::internals::types::byte* callForeign(viua::internals::types::byte*, const std::string&, viua::kernel::Register*, const std::string&);
             // call foreign method (i.e. method of a pure-C++ class loaded into machine's typesystem)
-            viua::internals::types::byte* callForeignMethod(viua::internals::types::byte*, viua::types::Type*, const std::string&, const bool, const viua::internals::types::register_index, const std::string&);
+            viua::internals::types::byte* callForeignMethod(viua::internals::types::byte*, viua::types::Type*, const std::string&, viua::kernel::Register*, const std::string&);
 
             /*  Stack unwinding methods.
              */

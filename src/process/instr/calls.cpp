@@ -120,13 +120,11 @@ viua::internals::types::byte* viua::process::Process::opargc(viua::internals::ty
 }
 
 viua::internals::types::byte* viua::process::Process::opcall(viua::internals::types::byte* addr) {
-    /*  Run call instruction.
-     */
     bool return_void = viua::bytecode::decoder::operands::is_void(addr);
-    viua::internals::types::register_index return_register = 0;
+    viua::kernel::Register* return_register = nullptr;
 
     if (not return_void) {
-        tie(addr, return_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+        tie(addr, return_register) = viua::bytecode::decoder::operands::fetch_register(addr, this);
     } else {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
@@ -153,11 +151,11 @@ viua::internals::types::byte* viua::process::Process::opcall(viua::internals::ty
             throw new viua::types::Exception("frame must have at least one argument when used to call a foreign method");
         }
         auto obj = frame_new->arguments->at(0);
-        return callForeignMethod(addr, obj, call_name, return_void, return_register, call_name);
+        return callForeignMethod(addr, obj, call_name, return_register, call_name);
     }
 
     auto caller = (is_native ? &viua::process::Process::callNative : &viua::process::Process::callForeign);
-    return (this->*caller)(addr, call_name, return_void, return_register, "");
+    return (this->*caller)(addr, call_name, return_register, "");
 }
 
 viua::internals::types::byte* viua::process::Process::optailcall(viua::internals::types::byte* addr) {
@@ -196,8 +194,8 @@ viua::internals::types::byte* viua::process::Process::opreturn(viua::internals::
     addr = frames.back()->ret_address();
 
     unique_ptr<viua::types::Type> returned;
-    viua::internals::types::register_index return_value_register = frames.back()->place_return_value_in;
-    if (return_value_register != 0 and not frames.back()->return_void) {
+    viua::kernel::Register* return_register = frames.back()->return_register;
+    if (return_register != nullptr) {
         // we check in 0. register because it's reserved for return values
         if (currently_used_register_set->at(0) == nullptr) {
             throw new viua::types::Exception("return value requested by frame but function did not set return register");
@@ -209,7 +207,7 @@ viua::internals::types::byte* viua::process::Process::opreturn(viua::internals::
 
     // place return value
     if (returned and frames.size() > 0) {
-        place(return_value_register, std::move(returned));
+        *return_register = std::move(returned);
     }
 
     if (frames.size() > 0) {

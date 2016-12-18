@@ -29,7 +29,7 @@
 
 .function: std::string::represent/1
     frame ^[(param 0 (ptr 2 (strstore 1 ""))) (param 1 (arg 3 0))]
-    msg 0 represent/2
+    msg void represent/2
     move 0 1
     return
 .end

@@ -28,8 +28,7 @@ Frame::Frame(viua::internals::types::byte* ra, viua::internals::types::register_
     return_address(ra),
     arguments(nullptr),
     local_register_set(nullptr),
-    return_void(false),
-    place_return_value_in(0)
+    return_register(nullptr)
 {
     arguments.reset(new viua::kernel::RegisterSet(argsize));
     local_register_set.reset(new viua::kernel::RegisterSet(regsize));

@@ -31,7 +31,7 @@ string viua::scheduler::ffi::ForeignFunctionCallRequest::functionName() const {
 }
 void viua::scheduler::ffi::ForeignFunctionCallRequest::call(ForeignFunction* callback) {
     /* FIXME: second parameter should be a pointer to static registers or
-     *        0 if function does not have static registers registered
+     *        nullptr if function does not have static registers registered
      * FIXME: should external functions always have static registers allocated?
      * FIXME: third parameter should be a pointer to global registers
      */
@@ -39,8 +39,8 @@ void viua::scheduler::ffi::ForeignFunctionCallRequest::call(ForeignFunction* cal
         (*callback)(frame.get(), nullptr, nullptr, caller_process, kernel);
 
         unique_ptr<viua::types::Type> returned;
-        viua::internals::types::register_index return_value_register = frame->place_return_value_in;
-        if (return_value_register != 0 and not frame->return_void) {
+        viua::kernel::Register* return_register = frame->return_register;
+        if (return_register != nullptr) {
             // we check in 0. register because it's reserved for return values
             if (frame->local_register_set->at(0) == nullptr) {
                 caller_process->raise(unique_ptr<viua::types::Type>{new viua::types::Exception("return value requested by frame but external function did not set return register")});
@@ -50,7 +50,7 @@ void viua::scheduler::ffi::ForeignFunctionCallRequest::call(ForeignFunction* cal
 
         // place return value
         if (returned and caller_process->trace().size() > 0) {
-            caller_process->put(return_value_register, std::move(returned));
+            *return_register = std::move(returned);
         }
     } catch (viua::types::Type *exception) {
         caller_process->raise(unique_ptr<viua::types::Type>{exception});

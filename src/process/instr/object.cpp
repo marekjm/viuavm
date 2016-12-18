@@ -57,11 +57,11 @@ viua::internals::types::byte* viua::process::Process::opmsg(viua::internals::typ
      *  To call a method using static dispatch (where a correct function is resolved during compilation) use
      *  "call" instruction.
      */
-    viua::internals::types::register_index return_register = 0;
     bool return_void = viua::bytecode::decoder::operands::is_void(addr);
+    viua::kernel::Register* return_register = nullptr;
 
     if (not return_void) {
-        tie(addr, return_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+        tie(addr, return_register) = viua::bytecode::decoder::operands::fetch_register(addr, this);
     } else {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
@@ -102,15 +102,11 @@ viua::internals::types::byte* viua::process::Process::opmsg(viua::internals::typ
     }
 
     if (is_foreign_method) {
-        // FIXME: remove the need for static_cast<>
-        // the cast is safe because register indexes cannot be negative, but it looks ugly
-        return callForeignMethod(addr, obj, function_name, return_void, return_register, method_name);
+        return callForeignMethod(addr, obj, function_name, return_register, method_name);
     }
 
     auto caller = (is_native ? &viua::process::Process::callNative : &viua::process::Process::callForeign);
-    // FIXME: remove the need for static_cast<>
-    // the cast is safe because register indexes cannot be negative, but it looks ugly
-    return (this->*caller)(addr, function_name, return_void, return_register, method_name);
+    return (this->*caller)(addr, function_name, return_register, method_name);
 }
 
 viua::internals::types::byte* viua::process::Process::opinsert(viua::internals::types::byte* addr) {
