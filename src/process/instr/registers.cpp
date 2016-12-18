@@ -67,10 +67,10 @@ viua::internals::types::byte* viua::process::Process::opswap(viua::internals::ty
     return addr;
 }
 viua::internals::types::byte* viua::process::Process::opdelete(viua::internals::types::byte* addr) {
-    viua::internals::types::register_index target = 0;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    viua::kernel::Register *target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    currently_used_register_set->free(target);
+    target->give();
 
     return addr;
 }

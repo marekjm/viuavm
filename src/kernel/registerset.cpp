@@ -229,8 +229,7 @@ void viua::kernel::RegisterSet::free(viua::internals::types::register_index here
      */
     if (here >= registerset_size) { throw new viua::types::Exception("register access out of bounds: free"); }
     if (not registers.at(here)) { throw new viua::types::Exception("invalid free: trying to free a null pointer"); }
-    registers.at(here).reset(nullptr);
-    empty(here);
+    registers.at(here).give();
 }
 
 
