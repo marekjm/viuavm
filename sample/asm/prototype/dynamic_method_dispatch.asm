@@ -54,7 +54,8 @@
     import "typesystem"
 
     ; setup the typesystem
-    call (frame 0) typesystem_setup/0
+    frame 0
+    call void typesystem_setup/0
 
     ; create a Derived object and
     ; call methods on it
@@ -62,11 +63,11 @@
 
     ; Good day from Derived
     frame ^[(param 0 1)]
-    msg 0 good_day/1
+    msg void good_day/1
 
     ; hello from Derived
     frame ^[(param 0 1)]
-    msg 0 hello/1
+    msg void hello/1
 
     ; print an empty line
     print (strstore 3 "")
@@ -77,15 +78,15 @@
 
     ; Good day from MoreDerived
     frame ^[(param 0 2)]
-    msg 0 good_day/1
+    msg void good_day/1
 
     ; Hello from MoreDerived
     frame ^[(param 0 2)]
-    msg 0 hello/1
+    msg void hello/1
 
     ; Hi from MoreDerived
     frame ^[(param 0 2)]
-    msg 0 hi/1
+    msg void hi/1
 
     izero 0
     return

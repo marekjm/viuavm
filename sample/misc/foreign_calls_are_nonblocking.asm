@@ -44,7 +44,7 @@
     process 1 run_in_a_process/0
 
     frame ^[(param 0 (ptr 2 1))]
-    msg 0 detach/1
+    msg void detach/1
     print (strstore 2 "main/1 detached worker process")
 
     echo (strstore 2 "message to pass: ")
@@ -52,7 +52,7 @@
     call 2 std::io::getline/0
 
     frame ^[(param 0 1) (param 1 2)]
-    msg 0 pass/2
+    msg void pass/2
 
     izero 0
     return

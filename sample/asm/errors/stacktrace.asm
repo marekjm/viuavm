@@ -37,7 +37,7 @@
 
 .function: main/1
     frame 0
-    call 0 baz
+    call void baz
     izero 0
     return
 .end

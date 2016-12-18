@@ -45,7 +45,7 @@
     nop
 
     frame ^[(param 0 (ptr 2 1))]
-    msg 0 detach/1
+    msg void detach/1
 
     nop
 

@@ -26,7 +26,8 @@
 .function: main/1
     istore 2 42
 
-    call (frame 0) set_69/0
+    frame 0
+    call void set_69/0
     print 2
 
     ress global

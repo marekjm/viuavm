@@ -24,7 +24,7 @@
 
     frame ^[(param iota format) (param iota format_params)]
     ;msg void format/
-    msg 0 format/
+    msg void format/
 
     izero 0
     return

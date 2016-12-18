@@ -50,7 +50,7 @@
     call 3 io::getline/0
 
     frame ^[(param 0 3) (param 1 2)]
-    call 0 io::write/2
+    call void io::write/2
 
     izero 0
     return

@@ -96,10 +96,10 @@
     process (.name: iota printer_pid) printer/1
 
     frame ^[(param 0 printer_pid)]
-    msg 0 detach/1
+    msg void detach/1
 
     frame ^[(param iota how_many_bottles) (param iota printer_pid)]
-    call 0 spawner/2
+    call void spawner/2
 
     izero 0
     return

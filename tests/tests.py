@@ -1191,7 +1191,7 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'isnull_fails_on_nonempty_registers.asm', "./sample/asm/static_analysis_errors/isnull_fails_on_nonempty_registers.asm:22:19: error: useless check, register will always be defined: 1")
 
     def testFcallFromEmptyRegister(self):
-        runTestFailsToAssemble(self, 'fcall_from_empty_register.asm', "./sample/asm/static_analysis_errors/fcall_from_empty_register.asm:22:13: error: fcall from empty register: 1")
+        runTestFailsToAssemble(self, 'fcall_from_empty_register.asm', "./sample/asm/static_analysis_errors/fcall_from_empty_register.asm:22:16: error: fcall from empty register: 1")
 
     def testJoinFromEmptyRegister(self):
         runTestFailsToAssemble(self, 'join_from_empty_register.asm', "./sample/asm/static_analysis_errors/join_from_empty_register.asm:21:12: error: join from empty register: 1")
@@ -1325,7 +1325,7 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'msg_requires_at_least_one_parameter.asm', "./sample/asm/errors/msg_requires_at_least_one_parameter.asm:22:5: error: invalid number of parameters in dynamic dispatch of foo: expected at least 1, got 0")
 
     def testNotAValidFunctionNameMsg(self):
-        runTestFailsToAssemble(self, 'not_a_valid_function_name_msg.asm', "./sample/asm/errors/not_a_valid_function_name_msg.asm:22:11: error: not a valid function name: foo/x")
+        runTestFailsToAssemble(self, 'not_a_valid_function_name_msg.asm', "./sample/asm/errors/not_a_valid_function_name_msg.asm:22:14: error: not a valid function name: foo/x")
 
     def testMsgArityMismatch(self):
         runTestFailsToAssemble(self, 'msg_arity_mismatch.asm', "./sample/asm/errors/msg_arity_mismatch.asm:22:5: error: invalid number of parameters in dynamic dispatch of add/2: expected 2 got 1")

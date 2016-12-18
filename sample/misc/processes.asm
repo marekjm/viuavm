@@ -65,7 +65,7 @@
     process 1 process_spawner/1
 
     frame ^[(param 0 1) (param 1 (istore 2 512))]
-    msg 0 setPriority/2
+    msg void setPriority/2
 
     join 0 1
 

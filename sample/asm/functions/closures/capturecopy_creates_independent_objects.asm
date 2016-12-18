@@ -32,14 +32,14 @@
     print 1
     ; call the closure
     frame 0
-    fcall 0 2
+    fcall void 2
 
     ; this should not affect the object captured a "a_closure"
     print (istore 1 42)
 
     ; call the closure
     frame 0
-    fcall 0 2
+    fcall void 2
 
     izero 0
     return

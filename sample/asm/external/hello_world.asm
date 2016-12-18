@@ -23,7 +23,7 @@
     import "build/test/World"
 
     frame 0
-    call 0 World::print_hello/0
+    call void World::print_hello/0
 
     izero 0
     return

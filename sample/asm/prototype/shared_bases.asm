@@ -48,7 +48,8 @@
 .end
 
 .function: main/1
-    call (frame 0) typesystem_setup/0
+    frame 0
+    call void typesystem_setup/0
 
     try
     catch "BaseA" handler

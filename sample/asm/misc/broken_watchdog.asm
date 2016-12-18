@@ -75,7 +75,7 @@
     ;process 1 will_be_killed_by_a_runaway_exception
     ;ptr 2 1
     ;frame ^[(param 0 2)]
-    ;msg 0 detach/1
+    ;msg void detach/1
 
     ;frame ^[(pamv 0 (istore 1 1024))]
     ;call std::util::cpu::cycle/1

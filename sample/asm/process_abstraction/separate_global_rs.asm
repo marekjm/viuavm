@@ -44,20 +44,20 @@
     frame 0
     process 1 global_printer/0
     frame ^[(param 0 1)]
-    msg 0 detach/1
+    msg void detach/1
 
     ; spawn two independent writer processes
     ; whichever triggers the printer process is not important
     frame ^[(param 0 1) (pamv 1 (strstore 2 "Hello World"))]
     process 2 global_writer/2
     frame ^[(param 0 2)]
-    msg 0 detach/1
+    msg void detach/1
 
     ; this is the second writer process
     frame ^[(param 0 1) (pamv 1 (strstore 2 "broken"))]
     process 2 global_writer/2
     frame ^[(param 0 2)]
-    msg 0 detach/1
+    msg void detach/1
 
     izero 0
     return

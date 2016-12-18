@@ -21,7 +21,7 @@
 
 .block: __try
     frame 0
-    call 0 throwing::oh_noes/0
+    call void throwing::oh_noes/0
     leave
 .end
 .block: __catch_Exception

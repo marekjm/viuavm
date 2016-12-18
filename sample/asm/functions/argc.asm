@@ -30,7 +30,8 @@
     frame ^[(param 0 2) (param 1 2)]
     call print_number_of_params/
 
-    call (frame 0) print_number_of_params/
+    frame 0
+    call void print_number_of_params/
 
     izero 0
     return

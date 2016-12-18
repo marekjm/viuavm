@@ -42,7 +42,7 @@
 
 .function: process_to_do_the_suspending
     frame ^[(param 0 (arg 1 0)]
-    msg 0 detach/1
+    msg void detach/1
 
     istore 4 10
     strstore 5 "iterations left (TDD): "
@@ -59,7 +59,7 @@
     .mark: loop_end_0
 
     frame ^[(param 0 1)]
-    msg 0 suspend
+    msg void suspend
 
     frame ^[(param 0 1]
     msg 2 suspended
@@ -80,7 +80,7 @@
     .mark: loop_end
 
     frame ^[(param 0 1)]
-    msg 0 wakeup
+    msg void wakeup
 
     frame ^[(param 0 1]
     msg 2 suspended

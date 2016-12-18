@@ -34,7 +34,7 @@
     print (strstore 1 "producer/1: exiting")
 
     frame ^[(param 0 (arg 3 0)) (param 1 2)]
-    msg 0 pass/2
+    msg void pass/2
 
     return
 .end
@@ -49,7 +49,7 @@
     ; ...and detach it, so main/1 exiting will not
     ; kill it
     frame ^[(param 0 (ptr 2 1))]
-    msg 0 detach/1
+    msg void detach/1
 
     ; spawn the producer process and pass consumer process handle to it
     ; producer needs to know what consumer it must pass a message to

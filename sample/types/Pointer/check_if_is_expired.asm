@@ -32,12 +32,12 @@
     ptr 2 1
 
     frame ^[(param 0 2)]
-    call 0 isExpired/1
+    call void isExpired/1
 
     delete 1
 
     frame ^[(param 0 2)]
-    call 0 isExpired/1
+    call void isExpired/1
 
     izero 0
     return

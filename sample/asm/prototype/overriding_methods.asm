@@ -39,20 +39,21 @@
 .end
 
 .function: main/1
-    call (frame 0) typesystem_setup/0
+    frame 0
+    call void typesystem_setup/0
 
     ; create a Base object and
     ; send a message to it
     frame ^[(param 0 (new 1 Base))]
-    msg 0 hello/1
+    msg void hello/1
 
     ; create a Derived object and
     ; send a message to it
     frame ^[(param 0 (new 2 Derived))]
-    msg 0 hello/1
+    msg void hello/1
 
     frame ^[(param 0 2)]
-    call 0 Base::saySomething/1
+    call void Base::saySomething/1
 
     izero 0
     return

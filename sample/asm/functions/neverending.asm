@@ -30,7 +30,8 @@
 .end
 
 .function: main/1
-    call (frame 0 2) one/0
+    frame 0 2
+    call void one/0
     izero 0
     return
 .end
