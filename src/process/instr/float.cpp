@@ -32,13 +32,13 @@ using namespace std;
 viua::internals::types::byte* viua::process::Process::opfstore(viua::internals::types::byte* addr) {
     /*  Run fstore instruction.
      */
-    viua::internals::types::register_index target = 0;
+    viua::kernel::Register* target = nullptr;
     float value = 0.0;
 
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
     tie(addr, value) = viua::bytecode::decoder::operands::fetch_raw_float(addr, this);
 
-    place(target, unique_ptr<viua::types::Type>{new viua::types::Float(value)});
+    *target = unique_ptr<viua::types::Type>{new viua::types::Float(value)};
 
     return addr;
 }
