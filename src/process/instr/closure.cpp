@@ -66,15 +66,15 @@ viua::internals::types::byte* viua::process::Process::opcapturecopy(viua::intern
     viua::internals::types::register_index target_register = 0;
     tie(addr, target_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    viua::kernel::Register* source = nullptr;
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+    viua::types::Type* source = nullptr;
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
     auto target_closure = static_cast<viua::types::Closure*>(target->get());
     if (target_register >= target_closure->rs()->size()) {
         throw new viua::types::Exception("cannot capture object: register index out exceeded size of closure register set");
     }
 
-    target_closure->rs()->register_at(target_register)->reset(source->get()->copy());
+    target_closure->rs()->register_at(target_register)->reset(source->copy());
 
     return addr;
 }
