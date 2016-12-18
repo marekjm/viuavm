@@ -31,20 +31,21 @@ using namespace std;
 
 
 viua::internals::types::byte* viua::process::Process::opizero(viua::internals::types::byte* addr) {
-    viua::internals::types::register_index target = 0;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    place(target, unique_ptr<viua::types::Type>{new viua::types::Integer(0)});
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    *target = unique_ptr<viua::types::Type>{new viua::types::Integer(0)};
     return addr;
 }
 
 viua::internals::types::byte* viua::process::Process::opistore(viua::internals::types::byte* addr) {
-    viua::internals::types::register_index target = 0;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     int integer = 0;
     tie(addr, integer) = viua::bytecode::decoder::operands::fetch_primitive_int(addr, this);
 
-    place(target, unique_ptr<viua::types::Type>{new viua::types::Integer(integer)});
+    *target = unique_ptr<viua::types::Type>{new viua::types::Integer(integer)};
 
     return addr;
 }
