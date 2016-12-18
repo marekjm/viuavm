@@ -62,7 +62,7 @@ viua::kernel::Register::Register(Register&& that): value(std::move(that.value)) 
 }
 
 viua::kernel::Register::operator bool() const {
-    return value != nullptr;
+    return not empty();
 }
 
 auto viua::kernel::Register::operator =(Register&& that) -> Register& {
