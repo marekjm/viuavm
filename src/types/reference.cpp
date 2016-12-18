@@ -33,6 +33,13 @@ void viua::types::Reference::rebind(viua::types::Type* ptr) {
     (*pointer) = ptr;
 }
 
+void viua::types::Reference::rebind(unique_ptr<viua::types::Type> ptr) {
+    if (*pointer) {
+        delete (*pointer);
+    }
+    (*pointer) = ptr.release();
+}
+
 
 string viua::types::Reference::type() const {
     return (*pointer)->type();

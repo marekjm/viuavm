@@ -53,7 +53,7 @@ viua::internals::types::byte* viua::process::Process::opcapture(viua::internals:
         // memory management scheme and put it under reference-counting scheme
         // this is needed to bind the captured object's life to lifetime of the closure
         rf = new viua::types::Reference(nullptr);
-        rf->rebind(source->release());
+        rf->rebind(source->give());
         *source = unique_ptr<viua::types::Type>{rf};  // set the register to contain the newly-created reference
     }
     target_closure->rs()->register_at(target_register)->reset(source->get()->copy());

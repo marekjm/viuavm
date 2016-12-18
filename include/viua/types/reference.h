@@ -23,6 +23,7 @@
 #pragma once
 
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 #include <viua/types/type.h>
@@ -50,6 +51,7 @@ namespace viua {
                 virtual std::unique_ptr<Type> copy() const override;
                 virtual Type* pointsTo() const;
                 virtual void rebind(Type*);
+                virtual void rebind(std::unique_ptr<Type>);
 
                 Reference(Type *ptr);
                 virtual ~Reference();
