@@ -40,6 +40,7 @@ namespace viua {
     namespace kernel {
         class Register {
             std::unique_ptr<viua::types::Type> value;
+            mask_type mask;
 
             public:
             void reset(std::unique_ptr<viua::types::Type>);
@@ -49,6 +50,12 @@ namespace viua {
             viua::types::Type* release();
 
             void swap(Register&);
+
+            mask_type set_mask(mask_type);
+            mask_type get_mask() const;
+            mask_type flag(mask_type);
+            mask_type unflag(mask_type);
+            bool is_flagged(mask_type) const;
 
             Register();
             Register(std::unique_ptr<viua::types::Type>);
@@ -62,7 +69,6 @@ namespace viua {
         class RegisterSet {
             viua::internals::types::register_index registerset_size;
             std::vector<Register> registers;
-            std::vector<mask_type>  masks;
 
             public:
                 // basic access to registers

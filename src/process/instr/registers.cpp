@@ -120,13 +120,10 @@ viua::internals::types::byte* viua::process::Process::optmpro(viua::internals::t
         throw new viua::types::Exception("temporary register set is empty");
     }
 
-    viua::internals::types::register_index target = 0;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    viua::kernel::Register *target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    if (currently_used_register_set->at(target) != nullptr) {
-        currently_used_register_set->free(target);
-    }
-    currently_used_register_set->set(target, std::move(tmp));
+    *target = std::move(tmp);
 
     return addr;
 }
