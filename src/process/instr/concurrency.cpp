@@ -29,13 +29,11 @@ using namespace std;
 
 
 viua::internals::types::byte* viua::process::Process::opprocess(viua::internals::types::byte* addr) {
-    /*  Run process instruction.
-     */
-    viua::internals::types::register_index target = 0;
+    viua::kernel::Register* target = nullptr;
     bool target_is_void = viua::bytecode::decoder::operands::is_void(addr);
 
     if (not target_is_void) {
-        tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+        tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
     } else {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
@@ -54,7 +52,7 @@ viua::internals::types::byte* viua::process::Process::opprocess(viua::internals:
 
     auto spawned_process = scheduler->spawn(std::move(frame_new), this, target_is_void);
     if (not target_is_void) {
-        place(target, unique_ptr<viua::types::Type>{new viua::types::Process(spawned_process)});
+        *target = unique_ptr<viua::types::Type>{new viua::types::Process(spawned_process)};
     }
 
     return addr;
@@ -67,11 +65,11 @@ viua::internals::types::byte* viua::process::Process::opjoin(viua::internals::ty
      */
     viua::internals::types::byte* return_addr = (addr-1);
 
-    viua::internals::types::register_index target = 0;
+    viua::kernel::Register* target = nullptr;
     bool target_is_void = viua::bytecode::decoder::operands::is_void(addr);
 
     if (not target_is_void) {
-        tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+        tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
     } else {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
@@ -98,7 +96,7 @@ viua::internals::types::byte* viua::process::Process::opjoin(viua::internals::ty
                 thrown = thrd->transferActiveException();
             }
             if (not target_is_void) {
-                place(target, thrd->getReturnValue());
+                *target = thrd->getReturnValue();
             }
         } else if (timeout_active and (not wait_until_infinity) and (waiting_until < std::chrono::steady_clock::now())) {
             timeout_active = false;
@@ -115,13 +113,12 @@ viua::internals::types::byte* viua::process::Process::opjoin(viua::internals::ty
 viua::internals::types::byte* viua::process::Process::opsend(viua::internals::types::byte* addr) {
     /** Send a message to a process.
      */
-    viua::internals::types::register_index target = 0, source = 0;
+    viua::kernel::Register *target = nullptr, *source = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-
-    if (auto thrd = dynamic_cast<viua::types::Process*>(fetch(target))) {
-        scheduler->send(thrd->pid(), pop(source));
+    if (auto thrd = dynamic_cast<viua::types::Process*>(target->get())) {
+        scheduler->send(thrd->pid(), source->give());
     } else {
         throw new viua::types::Exception("invalid type: expected viua::process::Process");
     }
@@ -136,11 +133,11 @@ viua::internals::types::byte* viua::process::Process::opreceive(viua::internals:
      */
     viua::internals::types::byte* return_addr = (addr-1);
 
-    viua::internals::types::register_index target = 0;
+    viua::kernel::Register *target = nullptr;
     bool target_is_void = viua::bytecode::decoder::operands::is_void(addr);
 
     if (not target_is_void) {
-        tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+        tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
     } else {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
@@ -161,8 +158,8 @@ viua::internals::types::byte* viua::process::Process::opreceive(viua::internals:
     }
 
     if (not message_queue.empty()) {
-        if (target) {
-            place(target, std::move(message_queue.front()));
+        if (not target_is_void) {
+            *target = std::move(message_queue.front());
         }
         message_queue.pop();
         timeout_active = false;
@@ -209,10 +206,10 @@ viua::internals::types::byte* viua::process::Process::opwatchdog(viua::internals
 viua::internals::types::byte* viua::process::Process::opself(viua::internals::types::byte* addr) {
     /*  Run process instruction.
      */
-    viua::internals::types::register_index target = 0;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    viua::kernel::Register *target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    place(target, unique_ptr<viua::types::Type>{new viua::types::Process(this)});
+    *target = unique_ptr<viua::types::Type>{new viua::types::Process(this)};
 
     return addr;
 }
