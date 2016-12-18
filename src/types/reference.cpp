@@ -27,7 +27,9 @@ viua::types::Type* viua::types::Reference::pointsTo() const {
 }
 
 void viua::types::Reference::rebind(viua::types::Type* ptr) {
-    delete (*pointer);
+    if (*pointer) {
+        delete (*pointer);
+    }
     (*pointer) = ptr;
 }
 

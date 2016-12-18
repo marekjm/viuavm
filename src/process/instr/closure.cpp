@@ -32,29 +32,31 @@ using namespace std;
 
 
 viua::internals::types::byte* viua::process::Process::opcapture(viua::internals::types::byte* addr) {
-    /** Capture object by reference.
-     */
-    viua::internals::types::register_index target_closure_register = 0, target_register = 0, source_register = 0;
-    tie(addr, target_closure_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    tie(addr, target_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    tie(addr, source_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    auto target_closure = static_cast<viua::types::Closure*>(fetch(target_closure_register));
+    viua::internals::types::register_index target_register = 0;
+    tie(addr, target_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+
+    viua::kernel::Register* source = nullptr;
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    auto target_closure = static_cast<viua::types::Closure*>(target->get());
     if (target_register >= target_closure->rs()->size()) {
         throw new viua::types::Exception("cannot capture object: register index out exceeded size of closure register set");
     }
 
-    auto captured_object = currently_used_register_set->at(source_register);
+    auto captured_object = source->get();
     auto rf = dynamic_cast<viua::types::Reference*>(captured_object);
     if (rf == nullptr) {
         // turn captured object into a reference to take it out of VM's default
         // memory management scheme and put it under reference-counting scheme
         // this is needed to bind the captured object's life to lifetime of the closure
-        rf = new viua::types::Reference(captured_object);
-        currently_used_register_set->empty(source_register);    // empty - do not delete the captured object or SEGFAULTS will follow
-        currently_used_register_set->set(source_register, unique_ptr<viua::types::Type>{rf});  // set the register to contain the newly-created reference
+        rf = new viua::types::Reference(nullptr);
+        rf->rebind(source->release());
+        *source = unique_ptr<viua::types::Type>{rf};  // set the register to contain the newly-created reference
     }
-    target_closure->set(target_register, rf->copy());
+    target_closure->rs()->register_at(target_register)->reset(source->get()->copy());
 
     return addr;
 }
