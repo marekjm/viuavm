@@ -77,15 +77,16 @@ viua::internals::types::byte* viua::process::Process::oppamv(viua::internals::ty
 viua::internals::types::byte* viua::process::Process::oparg(viua::internals::types::byte* addr) {
     /** Run arg instruction.
      */
-    viua::internals::types::register_index destination_register_index = 0, parameter_no_operand_index = 0;
+    viua::kernel::Register *target = nullptr;
     bool destination_is_void = viua::bytecode::decoder::operands::is_void(addr);
 
     if (not destination_is_void) {
-        tie(addr, destination_register_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+        tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
     } else {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 
+    viua::internals::types::register_index parameter_no_operand_index = 0;
     tie(addr, parameter_no_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     if (parameter_no_operand_index >= frames.back()->arguments->size()) {
@@ -103,16 +104,17 @@ viua::internals::types::byte* viua::process::Process::oparg(viua::internals::typ
     }
 
     if (not destination_is_void) {
-        currently_used_register_set->set(destination_register_index, std::move(argument));
+        *target = std::move(argument);
     }
 
     return addr;
 }
 
 viua::internals::types::byte* viua::process::Process::opargc(viua::internals::types::byte* addr) {
-    viua::internals::types::register_index target = 0;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    currently_used_register_set->set(target, unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<int>(frames.back()->arguments->size()))});
+    viua::kernel::Register *target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    *target = unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<int>(frames.back()->arguments->size()))};
 
     return addr;
 }
