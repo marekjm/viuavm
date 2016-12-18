@@ -31,13 +31,13 @@ using namespace std;
 viua::internals::types::byte* viua::process::Process::opclass(viua::internals::types::byte* addr) {
     /** Create a class.
      */
-    viua::internals::types::register_index target = 0;
-    string class_name;
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    string class_name;
     tie(addr, class_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
-    place(target, unique_ptr<viua::types::Type>{new viua::types::Prototype(class_name)});
+    *target = unique_ptr<viua::types::Type>{new viua::types::Prototype(class_name)};
 
     return addr;
 }
@@ -45,8 +45,8 @@ viua::internals::types::byte* viua::process::Process::opclass(viua::internals::t
 viua::internals::types::byte* viua::process::Process::opderive(viua::internals::types::byte* addr) {
     /** Push an ancestor class to prototype's inheritance chain.
      */
-    viua::types::Type* target = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     string class_name;
     tie(addr, class_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
@@ -55,7 +55,7 @@ viua::internals::types::byte* viua::process::Process::opderive(viua::internals::
         throw new viua::types::Exception("cannot derive from unregistered type: " + class_name);
     }
 
-    static_cast<viua::types::Prototype*>(target)->derive(class_name);
+    static_cast<viua::types::Prototype*>(target->get())->derive(class_name);
 
     return addr;
 }
@@ -63,14 +63,14 @@ viua::internals::types::byte* viua::process::Process::opderive(viua::internals::
 viua::internals::types::byte* viua::process::Process::opattach(viua::internals::types::byte* addr) {
     /** Attach a function to a prototype as a method.
      */
-    viua::types::Type* target = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     string function_name, method_name;
     tie(addr, function_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
     tie(addr, method_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
-    viua::types::Prototype* proto = static_cast<viua::types::Prototype*>(target);
+    viua::types::Prototype* proto = static_cast<viua::types::Prototype*>(target->get());
 
     if (not (scheduler->isNativeFunction(function_name) or scheduler->isForeignFunction(function_name))) {
         throw new viua::types::Exception("cannot attach undefined function '" + function_name + "' as a method '" + method_name + "' of prototype '" + proto->getTypeName() + "'");
@@ -84,10 +84,10 @@ viua::internals::types::byte* viua::process::Process::opattach(viua::internals::
 viua::internals::types::byte* viua::process::Process::opregister(viua::internals::types::byte* addr) {
     /** Register a prototype in the typesystem.
      */
-    viua::internals::types::register_index source = 0;
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    viua::kernel::Register* source = nullptr;
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    unique_ptr<viua::types::Prototype> prototype {static_cast<viua::types::Prototype*>(pop(source).release())};
+    unique_ptr<viua::types::Prototype> prototype {static_cast<viua::types::Prototype*>(source->release())};
     scheduler->registerPrototype(std::move(prototype));
 
     return addr;
