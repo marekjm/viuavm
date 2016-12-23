@@ -69,6 +69,9 @@ class ViuaCPUError(ViuaError):
     """
     pass
 
+class ValgrindException(Exception):
+    pass
+
 
 def getCPUArchitecture():
     p = subprocess.Popen(('uname', '-m'), stdout=subprocess.PIPE)
@@ -142,6 +145,12 @@ def valgrindBytesInBlocks(line, regex):
 def valgrindSummary(text):
     output_lines = text.splitlines()
     valprefix = output_lines[0].split(' ')[0]
+
+    invalid_read_preifx = '{} Invalid read'.format(valprefix)
+    if len(list(filter(lambda each: each.startswith(invalid_read_preifx), output_lines))):
+        print('\n'.join(output_lines))
+        raise ValgrindException()
+
     interesting_lines = [line[len(valprefix):].strip() for line in output_lines[output_lines.index('{0} HEAP SUMMARY:'.format(valprefix)):]]
 
     total_heap_usage_matched = valgrind_regex_heap_summary_total_heap_usage.search(interesting_lines[2])
