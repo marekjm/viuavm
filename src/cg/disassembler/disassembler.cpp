@@ -137,7 +137,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         ++ptr; // for null character terminating the C-style string not included in std::string
     } else if (op == ATTACH) {
         oss << " " << intop(ptr);
-        pointer::inc<bool, viua::internals::types::byte>(ptr);
+        pointer::inc<viua::internals::types::byte, viua::internals::types::byte>(ptr);
         pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
 
         oss << " ";
@@ -177,7 +177,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
             if (*ptr == OT_REGISTER_REFERENCE) {
                 oss << '@';
             }
-            pointer::inc<bool, viua::internals::types::byte>(ptr);
+            pointer::inc<viua::internals::types::byte, viua::internals::types::byte>(ptr);
             oss << decode_integer(ptr);
             pointer::inc<viua::internals::types::plain_int, viua::internals::types::byte>(ptr);
 
@@ -203,7 +203,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
             ptr = disassemble_target_register(oss, ptr);
 
             oss << " " << intop(ptr);
-            pointer::inc<bool, viua::internals::types::byte>(ptr);
+            pointer::inc<viua::internals::types::byte, viua::internals::types::byte>(ptr);
             pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
 
             break;
@@ -261,11 +261,11 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
             ptr = disassemble_target_register(oss, ptr);
 
             oss << " " << intop(ptr);
-            pointer::inc<bool, viua::internals::types::byte>(ptr);
+            pointer::inc<viua::internals::types::byte, viua::internals::types::byte>(ptr);
             pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
 
             oss << " " << intop(ptr);
-            pointer::inc<bool, viua::internals::types::byte>(ptr);
+            pointer::inc<viua::internals::types::byte, viua::internals::types::byte>(ptr);
             pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
 
             break;
@@ -280,7 +280,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
             break;
         case IF:
             oss << " " << intop(ptr);
-            pointer::inc<bool, viua::internals::types::byte>(ptr);
+            pointer::inc<viua::internals::types::byte, viua::internals::types::byte>(ptr);
             pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
 
             oss << " 0x";
@@ -330,7 +330,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         case RECEIVE:
             ptr = disassemble_target_register(oss, ptr);
 
-            pointer::inc<bool, viua::internals::types::byte>(ptr);
+            pointer::inc<viua::internals::types::byte, viua::internals::types::byte>(ptr);
             oss << ' ';
             if (decode_timeout(ptr)) {
                 oss << decode_timeout(ptr)-1 << "ms";
