@@ -171,7 +171,6 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
             break;
         case ISTORE:
             ptr = disassemble_ri_operand(oss, ptr);
-            oss << ' ';
             ptr = disassemble_ri_operand(oss, ptr);
 
             break;
@@ -194,7 +193,6 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         case VLEN:
         case FCALL:
             ptr = disassemble_ri_operand(oss, ptr);
-            oss << ' ';
             ptr = disassemble_ri_operand(oss, ptr);
             break;
         case ADD:
@@ -249,9 +247,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         case INSERT:
         case REMOVE:
             ptr = disassemble_ri_operand(oss, ptr);
-            oss << ' ';
             ptr = disassemble_ri_operand(oss, ptr);
-            oss << ' ';
             ptr = disassemble_ri_operand(oss, ptr);
 
             break;
@@ -265,7 +261,6 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
 
             break;
         case IF:
-            oss << ' ';
             ptr = disassemble_ri_operand(oss, ptr);
 
             oss << " 0x";
