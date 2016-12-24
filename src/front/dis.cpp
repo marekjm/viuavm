@@ -42,6 +42,7 @@ using namespace std;
 bool SHOW_HELP = false;
 bool SHOW_VERSION = false;
 bool VERBOSE = false;
+bool DEBUG = false;
 
 bool DISASSEMBLE_ENTRY = false;
 bool INCLUDE_INFO = false;
@@ -92,6 +93,8 @@ int main(int argc, char* argv[]) {
             SHOW_VERSION = true;
         } else if (option == "--verbose" or option == "-v") {
             VERBOSE = true;
+        } else if (option == "--debug") {
+            DEBUG = true;
         } else if ((option == "--with-entry") or (option == "-e")) {
             DISASSEMBLE_ENTRY = true;
         } else if ((option == "--info") or (option == "-i")) {
@@ -203,17 +206,19 @@ int main(int argc, char* argv[]) {
     }
 
     if (INCLUDE_INFO) {
-        oss << "; bytecode size: " << bytes << '\n';
-        oss << ";\n";
-        oss << "; functions:\n";
+        (DEBUG ? cout : oss) << "; bytecode size: " << bytes << '\n';
+        (DEBUG ? cout : oss) << ";\n";
+        (DEBUG ? cout : oss) << "; functions:\n";
         string function_name;
         for (unsigned i = 0; i < functions.size(); ++i) {
             function_name = functions[i];
-            oss << ";   " << function_name << " -> " << function_sizes[function_name] << " bytes at byte " << function_address_mapping[functions[i]] << '\n';
+            (DEBUG ? cout : oss) << ";   " << function_name << " -> " << function_sizes[function_name] << " bytes at byte " << function_address_mapping[functions[i]] << '\n';
         }
-        oss << "\n\n";
+        (DEBUG ? cout : oss) << "\n\n";
 
-        disassembled_lines.emplace_back(oss.str());
+        if (not DEBUG) {
+            disassembled_lines.emplace_back(oss.str());
+        }
     }
 
     auto meta_information = loader.getMetaInformation();
@@ -259,9 +264,9 @@ int main(int argc, char* argv[]) {
 
         oss.str("");
 
-        oss << '.' << element_types[name] << ": " << name << '\n';
+        (DEBUG ? cout : oss) << '.' << element_types[name] << ": " << name << '\n';
         if (LINE_BY_LINE) {
-            oss << '.' << element_types[name] << ": " << name;
+            (DEBUG ? cout : oss) << '.' << element_types[name] << ": " << name;
             getline(cin, dummy);
         }
 
@@ -272,18 +277,24 @@ int main(int argc, char* argv[]) {
             try {
                 unsigned size;
                 tie(instruction, size) = disassembler::instruction((bytecode.get()+element_address_mapping[name]+j));
-                oss << "    " << instruction << '\n';
+                (DEBUG ? cout : oss) << "    " << instruction << '\n';
                 j += size;
             } catch (const out_of_range& e) {
-                oss << "\n---- ERROR ----\n\n";
-                oss << "disassembly terminated after throwing an instance of std::out_of_range\n";
-                oss << "what(): " << e.what() << '\n';
+                (DEBUG ? cout : oss) << "\n---- ERROR ----\n\n";
+                (DEBUG ? cout : oss) << "disassembly terminated after throwing an instance of std::out_of_range\n";
+                (DEBUG ? cout : oss) << "what(): " << e.what() << '\n';
                 disasm_terminated = true;
                 break;
             } catch (const string& e) {
-                oss << "\n---- ERROR ----\n\n";
-                oss << "disassembly terminated after throwing an instance of std::out_of_range\n";
-                oss << "what(): " << e << '\n';
+                (DEBUG ? cout : oss) << "\n---- ERROR ----\n\n";
+                (DEBUG ? cout : oss) << "disassembly terminated after throwing an instance of std::out_of_range\n";
+                (DEBUG ? cout : oss) << "what(): " << e << '\n';
+                disasm_terminated = true;
+                break;
+            } catch (const char* e) {
+                (DEBUG ? cout : oss) << "\n---- ERROR ----\n\n";
+                (DEBUG ? cout : oss) << "disassembly terminated after throwing an instance of const char*\n";
+                (DEBUG ? cout : oss) << "what(): " << e << '\n';
                 disasm_terminated = true;
                 break;
             }
@@ -298,7 +309,7 @@ int main(int argc, char* argv[]) {
             break;
         }
 
-        oss << ".end" << '\n';
+        (DEBUG ? cout : oss) << ".end" << '\n';
 
         if (LINE_BY_LINE) {
             cout << ".end" << endl;
@@ -306,12 +317,16 @@ int main(int argc, char* argv[]) {
         }
 
         if (i < (elements.size()-1-(!DISASSEMBLE_ENTRY))) {
-            oss << '\n';
+            (DEBUG ? cout : oss) << '\n';
         }
 
         if ((not SELECTED_FUNCTION.size()) or (SELECTED_FUNCTION == name)) {
             disassembled_lines.emplace_back(oss.str());
         }
+    }
+
+    if (DEBUG) {
+        return 0;
     }
 
     ostringstream assembly_code;
