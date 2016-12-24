@@ -70,6 +70,9 @@ static auto extract_register_index(viua::internals::types::byte *ip, viua::proce
 
     viua::internals::types::register_index register_index = 0;
     if (ot == OT_REGISTER_INDEX or ot == OT_REGISTER_REFERENCE or (pointers_allowed and ot == OT_POINTER)) {
+        // FIXME extract RS type
+        ip += sizeof(viua::internals::RegisterSets);
+
         register_index = extract<viua::internals::types::register_index>(ip);
         ip += sizeof(viua::internals::types::register_index);
     } else {
@@ -131,6 +134,9 @@ auto viua::bytecode::decoder::operands::fetch_primitive_int(viua::internals::typ
 
     viua::internals::types::plain_int value = 0;
     if (ot == OT_REGISTER_REFERENCE) {
+        // FIXME decode rs type
+        ip += sizeof(viua::internals::RegisterSets);
+
         auto index = *reinterpret_cast<viua::internals::types::register_index*>(ip);
         ip += sizeof(viua::internals::types::register_index);
         // FIXME once dynamic operand types are implemented the need for this cast will go away

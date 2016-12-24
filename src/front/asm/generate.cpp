@@ -629,13 +629,13 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
         entry_function_tokens.emplace_back(0, 0, "0");
         entry_function_tokens.emplace_back(0, 0, "16");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(viua::internals::types::byte);
+        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
     } else if (main_function == "main/2") {
         entry_function_tokens.emplace_back(0, 0, "frame");
         entry_function_tokens.emplace_back(0, 0, "2");
         entry_function_tokens.emplace_back(0, 0, "16");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(viua::internals::types::byte);
+        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
 
         // pop first element on the list of aruments
         entry_function_tokens.emplace_back(0, 0, "vpop");
@@ -643,14 +643,14 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
         entry_function_tokens.emplace_back(0, 0, "1");
         entry_function_tokens.emplace_back(0, 0, "0");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) + 3*sizeof(viua::internals::types::register_index) + 3*sizeof(viua::internals::types::byte);
+        bytes += sizeof(viua::internals::types::byte) + 3*sizeof(viua::internals::types::byte) + 3*sizeof(viua::internals::RegisterSets) + 3*sizeof(viua::internals::types::register_index);
 
         // for parameter for main/2 is the name of the program
         entry_function_tokens.emplace_back(0, 0, "param");
         entry_function_tokens.emplace_back(0, 0, "0");
         entry_function_tokens.emplace_back(0, 0, "0");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(viua::internals::types::byte);
+        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
 
         // second parameter for main/2 is the vector with the rest
         // of the commandl ine parameters
@@ -658,7 +658,7 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
         entry_function_tokens.emplace_back(0, 0, "1");
         entry_function_tokens.emplace_back(0, 0, "1");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(viua::internals::types::byte);
+        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
     } else {
         // this is for default main function, i.e. `main/1` or
         // for custom main functions
@@ -667,13 +667,13 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
         entry_function_tokens.emplace_back(0, 0, "1");
         entry_function_tokens.emplace_back(0, 0, "16");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(viua::internals::types::byte);
+        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
 
         entry_function_tokens.emplace_back(0, 0, "param");
         entry_function_tokens.emplace_back(0, 0, "0");
         entry_function_tokens.emplace_back(0, 0, "1");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(viua::internals::types::byte);
+        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
     }
 
     // name of the main function must not be hardcoded because there is '.main:' assembler
@@ -683,7 +683,7 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
     entry_function_tokens.emplace_back(0, 0, "1");
     entry_function_tokens.emplace_back(0, 0, main_function);
     entry_function_tokens.emplace_back(0, 0, "\n");
-    bytes += sizeof(viua::internals::types::byte) + sizeof(viua::internals::types::register_index) + sizeof(viua::internals::types::byte);
+    bytes += sizeof(viua::internals::types::byte) + sizeof(viua::internals::types::byte) + sizeof(viua::internals::RegisterSets) + sizeof(viua::internals::types::register_index);
     bytes += main_function.size()+1;
 
     // then, register 1 is moved to register 0 so it counts as a return code
@@ -691,7 +691,7 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
     entry_function_tokens.emplace_back(0, 0, "0");
     entry_function_tokens.emplace_back(0, 0, "1");
     entry_function_tokens.emplace_back(0, 0, "\n");
-    bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(viua::internals::types::byte);
+    bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
 
     entry_function_tokens.emplace_back(0, 0, "halt");
     entry_function_tokens.emplace_back(0, 0, "\n");

@@ -18,6 +18,7 @@
  */
 
 #include <viua/cg/bytecode/instructions.h>
+#include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/operand_types.h>
 using namespace std;
 
@@ -63,6 +64,10 @@ static viua::internals::types::byte* insert_ri_operand(viua::internals::types::b
         *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_REGISTER_INDEX;
     }
     pointer::inc<OperandType, viua::internals::types::byte>(addr_ptr);
+
+    *(reinterpret_cast<viua::internals::RegisterSets*>(addr_ptr)) = viua::internals::RegisterSets::LOCAL;
+    pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(addr_ptr);
+
     *(reinterpret_cast<viua::internals::types::register_index*>(addr_ptr)) = static_cast<viua::internals::types::register_index>(op.value);
     pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(addr_ptr);
 
@@ -90,6 +95,9 @@ static viua::internals::types::byte* insert_two_ri_and_primitive_int_instruction
             if (c.type == IntegerOperandType::REGISTER_REFERENCE) {
                 *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_REGISTER_REFERENCE;
                 pointer::inc<OperandType, viua::internals::types::byte>(addr_ptr);
+
+                *(reinterpret_cast<viua::internals::RegisterSets*>(addr_ptr)) = viua::internals::RegisterSets::LOCAL;
+                pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(addr_ptr);
 
                 *(reinterpret_cast<viua::internals::types::register_index*>(addr_ptr))  = static_cast<viua::internals::types::register_index>(c.value);
                 pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(addr_ptr);
