@@ -231,7 +231,7 @@ build/bin/vm/dis: build/dis.o build/loader.o build/machine.o build/cg/disassembl
 
 ############################################################
 # OBJECTS COMMON FOR DEBUGGER AND KERNEL COMPILATION
-build/scheduler/vps.o: src/scheduler/vps.cpp
+build/scheduler/vps.o: src/scheduler/vps.cpp build/process.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
 build/kernel/kernel.o: src/kernel/kernel.cpp include/viua/kernel/kernel.h include/viua/bytecode/opcodes.h include/viua/kernel/frame.h build/scheduler/vps.o
