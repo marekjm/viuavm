@@ -137,9 +137,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         ptr += s.size();
         ++ptr; // for null character terminating the C-style string not included in std::string
     } else if (op == ATTACH) {
-        oss << ' ' << intop(ptr);
-        pointer::inc<viua::internals::types::byte, viua::internals::types::byte>(ptr);
-        pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
+        ptr = disassemble_ri_operand(oss, ptr);
 
         oss << ' ';
         string fn_name = string(reinterpret_cast<char*>(ptr));
