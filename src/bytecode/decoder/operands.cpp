@@ -150,8 +150,8 @@ auto viua::bytecode::decoder::operands::fetch_raw_int(viua::internals::types::by
     return tuple<viua::internals::types::byte*, viua::internals::types::plain_int>((ip+sizeof(viua::internals::types::plain_int)), extract<viua::internals::types::plain_int>(ip));
 }
 
-auto viua::bytecode::decoder::operands::fetch_raw_float(viua::internals::types::byte *ip, viua::process::Process*) -> tuple<viua::internals::types::byte*, float> {
-    return tuple<viua::internals::types::byte*, float>((ip+sizeof(float)), extract<float>(ip));
+auto viua::bytecode::decoder::operands::fetch_raw_float(viua::internals::types::byte *ip, viua::process::Process*) -> tuple<viua::internals::types::byte*, viua::internals::types::plain_float> {
+    return tuple<viua::internals::types::byte*, viua::internals::types::plain_float>((ip+sizeof(viua::internals::types::plain_float)), extract<viua::internals::types::plain_float>(ip));
 }
 
 auto viua::bytecode::decoder::operands::extract_primitive_uint64(viua::internals::types::byte *ip, viua::process::Process*) -> uint64_t {

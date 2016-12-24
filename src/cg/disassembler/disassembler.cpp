@@ -300,8 +300,8 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
             ptr = disassemble_target_register(oss, ptr);
 
             oss << " ";
-            oss << *reinterpret_cast<float*>(ptr);
-            pointer::inc<float, viua::internals::types::byte>(ptr);
+            oss << *reinterpret_cast<viua::internals::types::plain_float*>(ptr);
+            pointer::inc<viua::internals::types::plain_float, viua::internals::types::byte>(ptr);
             break;
         case RESS:
             oss << " ";

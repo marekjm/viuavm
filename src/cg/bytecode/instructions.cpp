@@ -144,8 +144,8 @@ namespace cg {
         viua::internals::types::byte* opfstore(viua::internals::types::byte* addr_ptr, int_op regno, float f) {
             *(addr_ptr++) = FSTORE;
             addr_ptr = insert_ri_operand(addr_ptr, regno);
-            *(reinterpret_cast<float*>(addr_ptr))  = f;
-            pointer::inc<float, viua::internals::types::byte>(addr_ptr);
+            *(reinterpret_cast<viua::internals::types::plain_float*>(addr_ptr))  = f;
+            pointer::inc<viua::internals::types::plain_float, viua::internals::types::byte>(addr_ptr);
 
             return addr_ptr;
         }

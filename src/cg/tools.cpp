@@ -147,8 +147,15 @@ namespace viua {
             }
             static auto size_of_fstore(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 viua::internals::types::bytecode_size calculated_size = sizeof(viua::internals::types::byte);
-                calculated_size += sizeof(viua::internals::types::byte);
+
+                decltype(calculated_size) size_increment = 0;
+
+                // for target register
+                tie(size_increment, i) = size_of_register_index_operand(tokens, i);
+                calculated_size += size_increment;
+
                 calculated_size += sizeof(viua::internals::types::plain_float);
+
                 return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
             }
             static auto size_of_itof(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {

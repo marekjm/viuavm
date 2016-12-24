@@ -75,7 +75,7 @@ namespace viua {
                  *  immediates.
                  */
                 auto fetch_raw_int(viua::internals::types::byte *ip, viua::process::Process* p) -> std::tuple<viua::internals::types::byte*, viua::internals::types::plain_int>;
-                auto fetch_raw_float(viua::internals::types::byte*, viua::process::Process*) -> std::tuple<viua::internals::types::byte*, float>;
+                auto fetch_raw_float(viua::internals::types::byte*, viua::process::Process*) -> std::tuple<viua::internals::types::byte*, viua::internals::types::plain_float>;
 
                 /*
                  *  Extract data decoding it from bytecode without advancing the bytecode
