@@ -42,7 +42,7 @@ viua::internals::types::byte* viua::process::Process::opcopy(viua::internals::ty
     viua::types::Type* source = nullptr;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    *target = std::move(source->copy());
+    *target = source->copy();
 
     return addr;
 }
@@ -53,7 +53,7 @@ viua::internals::types::byte* viua::process::Process::opptr(viua::internals::typ
     viua::types::Type* source = nullptr;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    *target = std::move(source->pointer());
+    *target = source->pointer();
 
     return addr;
 }
@@ -112,7 +112,7 @@ viua::internals::types::byte* viua::process::Process::optmpri(viua::internals::t
     viua::kernel::Register *target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    tmp = std::move(target->give());
+    tmp = target->give();
 
     return addr;
 }
