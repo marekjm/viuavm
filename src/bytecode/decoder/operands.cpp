@@ -131,11 +131,11 @@ auto viua::bytecode::decoder::operands::fetch_primitive_int(viua::internals::typ
 
     viua::internals::types::plain_int value = 0;
     if (ot == OT_REGISTER_REFERENCE) {
-        value = *reinterpret_cast<decltype(value)*>(ip);
-        ip += sizeof(decltype(value));
+        auto index = *reinterpret_cast<viua::internals::types::register_index*>(ip);
+        ip += sizeof(viua::internals::types::register_index);
         // FIXME once dynamic operand types are implemented the need for this cast will go away
         // because the operand *will* be encoded as a real uint
-        viua::types::Integer *i = static_cast<viua::types::Integer*>(p->obtain(static_cast<viua::internals::types::register_index>(value)));
+        viua::types::Integer *i = static_cast<viua::types::Integer*>(p->obtain(index));
         value = i->as_int32();
     } else if (ot == OT_INT) {
         value = *reinterpret_cast<decltype(value)*>(ip);
