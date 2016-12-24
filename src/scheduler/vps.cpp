@@ -20,6 +20,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <viua/support/env.h>
 #include <viua/machine.h>
 #include <viua/printutils.h>
 #include <viua/types/vector.h>
@@ -36,7 +37,11 @@ using namespace std;
 static void printStackTrace(viua::process::Process *process) {
     auto trace = process->trace();
     cout << "stack trace: from entry point, most recent call last...\n";
-    for (decltype(trace)::size_type i = (trace.size() and trace[0]->function_name == "__entry"); i < trace.size(); ++i) {
+    decltype(trace)::size_type i = 0;
+    if (support::env::getvar("VIUA_STACK_TRACES") != "full") {
+        i = (trace.size() and trace[0]->function_name == "__entry");
+    }
+    for (; i < trace.size(); ++i) {
         cout << "  " << stringifyFunctionInvocation(trace[i]) << "\n";
     }
     cout << "\n";

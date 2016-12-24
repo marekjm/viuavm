@@ -109,6 +109,7 @@ There are several categories of change:
   type-specific ALU instructions; the syntax is `mnemonic type target lhs rhs` eg. `add int32 result foo bar` will add `foo` to `bar` as 32 bit signed integers and
   store the result as 32 bit signed integer
 - bic: functions may return to 0 register, `void` must be used to drop return values
+- feature: `VIUA_STACK_TRACES` environment variable controlling how stack traces are printed (currently only `VIUA_STACK_TRACES=full` is recognised)
 
 One limitation of static analyser (SA) introduced in this release is its inability to handle backwards jumps.
 This, however, is not a problem if the code does not use loops and
