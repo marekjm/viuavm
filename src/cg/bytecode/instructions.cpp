@@ -91,7 +91,7 @@ static viua::internals::types::byte* insert_two_ri_and_primitive_int_instruction
                 *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_REGISTER_REFERENCE;
                 pointer::inc<OperandType, viua::internals::types::byte>(addr_ptr);
 
-                *(reinterpret_cast<viua::internals::types::register_index*>(addr_ptr))  = c.value;
+                *(reinterpret_cast<viua::internals::types::register_index*>(addr_ptr))  = static_cast<viua::internals::types::register_index>(c.value);
                 pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(addr_ptr);
             } else {
                 *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_INT;
