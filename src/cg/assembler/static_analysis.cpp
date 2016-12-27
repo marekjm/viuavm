@@ -265,7 +265,11 @@ static auto get_token_index_of_operand(const vector<viua::cg::lex::Token>& token
     while (i < limit and wanted_operand_index > 0) {
         //if (not (tokens.at(i) == "," or viua::cg::lex::is_reserved_keyword(tokens.at(i)))) {
         auto token = tokens.at(i);
-        if (token == "," or token == "static" or token == "local" or token == "global" or str::isnum(token, false) or str::isid(token) or ((token.str().at(0) == '@' or token.str().at(0) == '*') and (str::isnum(token.str().substr(1)) or str::isid(token.str().substr(1))))) {
+        bool is_valid_operand = (str::isnum(token, false) or str::isid(token) or ((token.str().at(0) == '@' or token.str().at(0) == '*') and (str::isnum(token.str().substr(1)) or str::isid(token.str().substr(1)))));
+        bool is_valid_operand_area_token = (token == "," or token == "static" or token == "local" or token == "global");
+        if (is_valid_operand_area_token) {
+            ++i;
+        } else if (is_valid_operand) {
             ++i;
             --wanted_operand_index;
         } else {
