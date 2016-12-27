@@ -167,6 +167,27 @@ static viua::internals::types::timeout timeout_to_int(const string& timeout) {
     }
 }
 
+static auto get_token_index_of_operand(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i, int wanted_operand_index) -> decltype(i) {
+    auto limit = tokens.size();
+    while (i < limit and wanted_operand_index > 0) {
+        //if (not (tokens.at(i) == "," or viua::cg::lex::is_reserved_keyword(tokens.at(i)))) {
+        auto token = tokens.at(i);
+        bool is_valid_operand = (str::isnum(token, false) or str::isid(token) or ((token.str().at(0) == '@' or token.str().at(0) == '*') and (str::isnum(token.str().substr(1)) or str::isid(token.str().substr(1)))));
+        bool is_valid_operand_area_token = (token == "," or token == "static" or token == "local" or token == "global");
+        if (is_valid_operand_area_token) {
+            ++i;
+        } else if (is_valid_operand) {
+            ++i;
+            --wanted_operand_index;
+        } else {
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i), "unexpected token");
+        }
+    }
+    return i;
+}
+static auto get_token_index_after_operand(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i, int wanted_operand_index) -> decltype(i) {
+    return get_token_index_of_operand(tokens, i, wanted_operand_index) + 1;
+}
 static viua::internals::types::bytecode_size assemble_instruction(Program& program, viua::internals::types::bytecode_size& instruction, viua::internals::types::bytecode_size i, const vector<Token>& tokens, map<string, std::remove_reference<decltype(tokens)>::type::size_type>& marks) {
     /*  This is main assembly loop.
      *  It iterates over lines with instructions and
@@ -186,264 +207,264 @@ static viua::internals::types::bytecode_size assemble_instruction(Program& progr
     if (tokens.at(i) == "nop") {
         program.opnop();
     } else if (tokens.at(i) == "izero") {
-        TokenIndex target = i+1;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 
         program.opizero(assembler::operands::getint(resolveregister(tokens.at(target))));
     } else if (tokens.at(i) == "istore") {
-        TokenIndex source = i+2;
-        TokenIndex target = i+1;
+        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 
         program.opistore(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "iinc") {
-        TokenIndex target = i+1;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 
         program.opiinc(assembler::operands::getint(resolveregister(tokens.at(target))));
     } else if (tokens.at(i) == "idec") {
-        TokenIndex target = i+1;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 
         program.opidec(assembler::operands::getint(resolveregister(tokens.at(target))));
     } else if (tokens.at(i) == "fstore") {
-        TokenIndex target = i+1;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 
         // FIXME use viua::internals::types::plain_float
         program.opfstore(assembler::operands::getint(resolveregister(tokens.at(target))), static_cast<float>(stod(tokens.at(i+2).str())));
     } else if (tokens.at(i) == "itof") {
-        TokenIndex source = i+2;
-        TokenIndex target = i+1;
+        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 
         program.opitof(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "ftoi") {
-        TokenIndex source = i+2;
-        TokenIndex target = i+1;
+        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 
         program.opftoi(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "stoi") {
-        TokenIndex source = i+2;
-        TokenIndex target = i+1;
+        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 
         program.opstoi(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "stof") {
-        TokenIndex source = i+2;
-        TokenIndex target = i+1;
+        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 
         program.opstof(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "add") {
-        TokenIndex rhs = i+4;
-        TokenIndex lhs = i+3;
-        TokenIndex target = i+2;
+        TokenIndex rhs = get_token_index_of_operand(tokens, i, 4);
+        TokenIndex lhs = get_token_index_of_operand(tokens, i, 3);
+        TokenIndex target = get_token_index_of_operand(tokens, i, 2);
 
         program.opadd(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(lhs))), assembler::operands::getint(resolveregister(tokens.at(rhs))));
     } else if (tokens.at(i) == "sub") {
-        TokenIndex rhs = i+4;
-        TokenIndex lhs = i+3;
-        TokenIndex target = i+2;
+        TokenIndex rhs = get_token_index_of_operand(tokens, i, 4);
+        TokenIndex lhs = get_token_index_of_operand(tokens, i, 3);
+        TokenIndex target = get_token_index_of_operand(tokens, i, 2);
 
         program.opsub(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(lhs))), assembler::operands::getint(resolveregister(tokens.at(rhs))));
     } else if (tokens.at(i) == "mul") {
-        TokenIndex rhs = i+4;
-        TokenIndex lhs = i+3;
-        TokenIndex target = i+2;
+        TokenIndex rhs = get_token_index_of_operand(tokens, i, 4);
+        TokenIndex lhs = get_token_index_of_operand(tokens, i, 3);
+        TokenIndex target = get_token_index_of_operand(tokens, i, 2);
 
         program.opmul(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(lhs))), assembler::operands::getint(resolveregister(tokens.at(rhs))));
     } else if (tokens.at(i) == "div") {
-        TokenIndex rhs = i+4;
-        TokenIndex lhs = i+3;
-        TokenIndex target = i+2;
+        TokenIndex rhs = get_token_index_of_operand(tokens, i, 4);
+        TokenIndex lhs = get_token_index_of_operand(tokens, i, 3);
+        TokenIndex target = get_token_index_of_operand(tokens, i, 2);
 
         program.opdiv(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(lhs))), assembler::operands::getint(resolveregister(tokens.at(rhs))));
     } else if (tokens.at(i) == "lt") {
-        TokenIndex rhs = i+4;
-        TokenIndex lhs = i+3;
-        TokenIndex target = i+2;
+        TokenIndex rhs = get_token_index_of_operand(tokens, i, 4);
+        TokenIndex lhs = get_token_index_of_operand(tokens, i, 3);
+        TokenIndex target = get_token_index_of_operand(tokens, i, 2);
 
         program.oplt(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(lhs))), assembler::operands::getint(resolveregister(tokens.at(rhs))));
     } else if (tokens.at(i) == "lte") {
-        TokenIndex rhs = i+4;
-        TokenIndex lhs = i+3;
-        TokenIndex target = i+2;
+        TokenIndex rhs = get_token_index_of_operand(tokens, i, 4);
+        TokenIndex lhs = get_token_index_of_operand(tokens, i, 3);
+        TokenIndex target = get_token_index_of_operand(tokens, i, 2);
 
         program.oplte(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(lhs))), assembler::operands::getint(resolveregister(tokens.at(rhs))));
     } else if (tokens.at(i) == "gt") {
-        TokenIndex rhs = i+4;
-        TokenIndex lhs = i+3;
-        TokenIndex target = i+2;
+        TokenIndex rhs = get_token_index_of_operand(tokens, i, 4);
+        TokenIndex lhs = get_token_index_of_operand(tokens, i, 3);
+        TokenIndex target = get_token_index_of_operand(tokens, i, 2);
 
         program.opgt(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(lhs))), assembler::operands::getint(resolveregister(tokens.at(rhs))));
     } else if (tokens.at(i) == "gte") {
-        TokenIndex rhs = i+4;
-        TokenIndex lhs = i+3;
-        TokenIndex target = i+2;
+        TokenIndex rhs = get_token_index_of_operand(tokens, i, 4);
+        TokenIndex lhs = get_token_index_of_operand(tokens, i, 3);
+        TokenIndex target = get_token_index_of_operand(tokens, i, 2);
 
         program.opgte(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(lhs))), assembler::operands::getint(resolveregister(tokens.at(rhs))));
     } else if (tokens.at(i) == "eq") {
-        TokenIndex rhs = i+4;
-        TokenIndex lhs = i+3;
-        TokenIndex target = i+2;
+        TokenIndex rhs = get_token_index_of_operand(tokens, i, 4);
+        TokenIndex lhs = get_token_index_of_operand(tokens, i, 3);
+        TokenIndex target = get_token_index_of_operand(tokens, i, 2);
 
         program.opeq(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(lhs))), assembler::operands::getint(resolveregister(tokens.at(rhs))));
     } else if (tokens.at(i) == "strstore") {
-        TokenIndex target = i+1;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 
         program.opstrstore(assembler::operands::getint(resolveregister(tokens.at(target))), tokens.at(i+2));
     } else if (tokens.at(i) == "vec") {
-        TokenIndex target = i+1;
-        TokenIndex pack_range_start = i+2;
-        TokenIndex pack_range_count = i+3;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex pack_range_start = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex pack_range_count = get_token_index_of_operand(tokens, i, 3);
 
         program.opvec(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(pack_range_start))), assembler::operands::getint(resolveregister(tokens.at(pack_range_count))));
     } else if (tokens.at(i) == "vinsert") {
-        TokenIndex target = i+1;
-        TokenIndex source = i+2;
-        TokenIndex position = i+3;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex position = get_token_index_of_operand(tokens, i, 3);
 
         Token vec = tokens.at(target), src = tokens.at(source), pos = tokens.at(position);
         program.opvinsert(assembler::operands::getint(resolveregister(vec)), assembler::operands::getint(resolveregister(src)), assembler::operands::getint(resolveregister(pos)));
     } else if (tokens.at(i) == "vpush") {
-        TokenIndex target = i+1;
-        TokenIndex source = i+2;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
 
         program.opvpush(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "vpop") {
-        TokenIndex target = i+1;
-        TokenIndex destination = i+2;
-        TokenIndex position = i+3;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex destination = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex position = get_token_index_of_operand(tokens, i, 3);
 
         Token vec = tokens.at(target), dst = tokens.at(destination), pos = tokens.at(position);
         program.opvpop(assembler::operands::getint(resolveregister(vec)), assembler::operands::getint(resolveregister(dst)), assembler::operands::getint(resolveregister(pos)));
     } else if (tokens.at(i) == "vat") {
-        TokenIndex target = i+1;
-        TokenIndex destination = i+2;
-        TokenIndex position = i+3;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex destination = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex position = get_token_index_of_operand(tokens, i, 3);
 
         Token vec = tokens.at(target), dst = tokens.at(destination), pos = tokens.at(position);
         if (pos == "\n") { pos = Token(dst.line(), dst.character(), "-1"); }
         program.opvat(assembler::operands::getint(resolveregister(vec)), assembler::operands::getint(resolveregister(dst)), assembler::operands::getint(resolveregister(pos)));
     } else if (tokens.at(i) == "vlen") {
-        TokenIndex target = i+1;
-        TokenIndex source = i+2;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
 
         program.opvlen(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "not") {
-        TokenIndex target = i+1;
-        TokenIndex source = i+2;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
 
         program.opnot(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "and") {
-        TokenIndex rhs = i+3;
-        TokenIndex lhs = i+2;
-        TokenIndex target = i+1;
+        TokenIndex rhs = get_token_index_of_operand(tokens, i, 3);
+        TokenIndex lhs = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 
         program.opand(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(lhs))), assembler::operands::getint(resolveregister(tokens.at(rhs))));
     } else if (tokens.at(i) == "or") {
-        TokenIndex rhs = i+3;
-        TokenIndex lhs = i+2;
-        TokenIndex target = i+1;
+        TokenIndex rhs = get_token_index_of_operand(tokens, i, 3);
+        TokenIndex lhs = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 
         program.opor(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(lhs))), assembler::operands::getint(resolveregister(tokens.at(rhs))));
     } else if (tokens.at(i) == "move") {
-        TokenIndex target = i+1;
-        TokenIndex source = i+2;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
 
         program.opmove(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "copy") {
-        TokenIndex target = i+1;
-        TokenIndex source = i+2;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
 
         program.opcopy(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "ptr") {
-        TokenIndex target = i+1;
-        TokenIndex source = i+2;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
 
         program.opptr(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "swap") {
-        TokenIndex target = i+1;
-        TokenIndex source = i+2;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
 
         program.opswap(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "delete") {
-        TokenIndex target = i+1;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 
         program.opdelete(assembler::operands::getint(resolveregister(tokens.at(target))));
     } else if (tokens.at(i) == "isnull") {
-        TokenIndex target = i+1;
-        TokenIndex source = i+2;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
 
         program.opisnull(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "ress") {
-        TokenIndex target = i+1;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 
         program.opress(tokens.at(target));
     } else if (tokens.at(i) == "tmpri") {
-        TokenIndex source = i+1;
+        TokenIndex source = get_token_index_of_operand(tokens, i, 1);
 
         program.optmpri(assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "tmpro") {
-        TokenIndex target = i+1;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 
         program.optmpro(assembler::operands::getint(resolveregister(tokens.at(target))));
     } else if (tokens.at(i) == "print") {
-        TokenIndex source = i+1;
+        TokenIndex source = get_token_index_of_operand(tokens, i, 1);
 
         program.opprint(assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "echo") {
-        TokenIndex source = i+1;
+        TokenIndex source = get_token_index_of_operand(tokens, i, 1);
 
         program.opecho(assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "capture") {
-        TokenIndex target = i+1;
-        TokenIndex inside_index = i+2;
-        TokenIndex source = i+3;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex inside_index = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex source = get_token_index_of_operand(tokens, i, 3);
 
         program.opcapture(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(inside_index))), assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "capturecopy") {
-        TokenIndex target = i+1;
-        TokenIndex inside_index = i+2;
-        TokenIndex source = i+3;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex inside_index = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex source = get_token_index_of_operand(tokens, i, 3);
 
         program.opcapturecopy(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(inside_index))), assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "capturemove") {
-        TokenIndex target = i+1;
-        TokenIndex inside_index = i+2;
-        TokenIndex source = i+3;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex inside_index = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex source = get_token_index_of_operand(tokens, i, 3);
 
         program.opcapturemove(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(inside_index))), assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "closure") {
-        TokenIndex target = i+1;
-        TokenIndex source = i+2;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
 
         program.opclosure(assembler::operands::getint(resolveregister(tokens.at(target))), tokens.at(source));
     } else if (tokens.at(i) == "function") {
-        TokenIndex target = i+1;
-        TokenIndex source = i+2;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
 
         program.opfunction(assembler::operands::getint(resolveregister(tokens.at(target))), tokens.at(source));
     } else if (tokens.at(i) == "fcall") {
-        TokenIndex target = i+1;
-        TokenIndex source = i+2;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
 
         program.opfcall(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "frame") {
-        TokenIndex target = i+1;
-        TokenIndex source = i+2;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
 
         program.opframe(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "param") {
-        TokenIndex target = i+1;
-        TokenIndex source = i+2;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
 
         program.opparam(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "pamv") {
-        TokenIndex target = i+1;
-        TokenIndex source = i+2;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
 
         program.oppamv(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "arg") {
-        TokenIndex target = i+1;
-        TokenIndex source = i+2;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
 
         program.oparg(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "argc") {
-        TokenIndex target = i+1;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 
         program.opargc(assembler::operands::getint(resolveregister(tokens.at(target))));
     } else if (tokens.at(i) == "call") {
@@ -468,8 +489,8 @@ static viua::internals::types::bytecode_size assemble_instruction(Program& progr
          *
          *  Good luck with debugging your code, then.
          */
-        TokenIndex target = i+1;
-        TokenIndex fn = i+2;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex fn = get_token_index_after_operand(tokens, i, 1);
 
         Token fn_name = tokens.at(fn), reg = tokens.at(target);
 
@@ -485,18 +506,18 @@ static viua::internals::types::bytecode_size assemble_instruction(Program& progr
     } else if (tokens.at(i) == "tailcall") {
         program.optailcall(tokens.at(i+1));
     } else if (tokens.at(i) == "process") {
-        TokenIndex target = i+1;
-        TokenIndex fn = i+2;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex fn = get_token_index_of_operand(tokens, i, 2);
 
         program.opprocess(assembler::operands::getint(resolveregister(tokens.at(target))), tokens.at(fn));
     } else if (tokens.at(i) == "self") {
-        TokenIndex target = i+1;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 
         program.opself(assembler::operands::getint(resolveregister(tokens.at(target))));
     } else if (tokens.at(i) == "join") {
-        TokenIndex target = i+1;
-        TokenIndex process = i+2;
-        TokenIndex timeout_index = i+3;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex process = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex timeout_index = get_token_index_of_operand(tokens, i, 3);
 
         Token a_chnk = tokens.at(target), b_chnk = tokens.at(process), timeout_chnk = tokens.at(timeout_index);
         viua::internals::types::timeout timeout_milliseconds = 0;
@@ -507,13 +528,13 @@ static viua::internals::types::bytecode_size assemble_instruction(Program& progr
         timeout_op timeout {timeout_milliseconds};
         program.opjoin(assembler::operands::getint(resolveregister(a_chnk)), assembler::operands::getint(resolveregister(b_chnk)), timeout);
     } else if (tokens.at(i) == "send") {
-        TokenIndex target = i+1;
-        TokenIndex source = i+2;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
 
         program.opsend(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "receive") {
-        TokenIndex target = i+1;
-        TokenIndex timeout_index = i+2;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex timeout_index = get_token_index_of_operand(tokens, i, 2);
 
         Token regno_chnk = tokens.at(target), timeout_chnk = tokens.at(timeout_index);
         viua::internals::types::timeout timeout_milliseconds = 0;
@@ -578,13 +599,13 @@ static viua::internals::types::bytecode_size assemble_instruction(Program& progr
         string type_chnk, catcher_chnk;
         program.opcatch(tokens.at(i+1), tokens.at(i+2));
     } else if (tokens.at(i) == "draw") {
-        TokenIndex target = i+1;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 
         program.opdraw(assembler::operands::getint(resolveregister(tokens.at(target))));
     } else if (tokens.at(i) == "enter") {
         program.openter(tokens.at(i+1));
     } else if (tokens.at(i) == "throw") {
-        TokenIndex source = i+1;
+        TokenIndex source = get_token_index_of_operand(tokens, i, 1);
 
         program.opthrow(assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "leave") {
@@ -594,45 +615,45 @@ static viua::internals::types::bytecode_size assemble_instruction(Program& progr
     } else if (tokens.at(i) == "link") {
         program.oplink(tokens.at(i+1));
     } else if (tokens.at(i) == "class") {
-        TokenIndex target = i+1;
-        TokenIndex class_name = i+2;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex class_name = get_token_index_of_operand(tokens, i, 2);
 
         program.opclass(assembler::operands::getint(resolveregister(tokens.at(target))), tokens.at(class_name));
     } else if (tokens.at(i) == "derive") {
-        TokenIndex target = i+1;
-        TokenIndex class_name = i+2;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex class_name = get_token_index_of_operand(tokens, i, 2);
 
         program.opderive(assembler::operands::getint(resolveregister(tokens.at(target))), tokens.at(class_name));
     } else if (tokens.at(i) == "attach") {
-        TokenIndex target = i+1;
-        TokenIndex fn_name = i+2;
-        TokenIndex attached_name = i+3;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex fn_name = get_token_index_after_operand(tokens, i, 1);
+        TokenIndex attached_name = fn_name+1;
 
         program.opattach(assembler::operands::getint(resolveregister(tokens.at(target))), tokens.at(fn_name), tokens.at(attached_name));
     } else if (tokens.at(i) == "register") {
-        TokenIndex target = i+1;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 
         program.opregister(assembler::operands::getint(resolveregister(tokens.at(target))));
     } else if (tokens.at(i) == "new") {
-        TokenIndex target = i+1;
-        TokenIndex class_name = i+2;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex class_name = get_token_index_of_operand(tokens, i, 2);
 
         program.opnew(assembler::operands::getint(resolveregister(tokens.at(target))), tokens.at(class_name));
     } else if (tokens.at(i) == "msg") {
-        TokenIndex target = i+1;
-        TokenIndex fn_name = i+2;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex fn_name = get_token_index_after_operand(tokens, i, 1);
 
         program.opmsg(assembler::operands::getint(resolveregister(tokens.at(target))), tokens.at(fn_name));
     } else if (tokens.at(i) == "insert") {
-        TokenIndex target = i+1;
-        TokenIndex source = i+2;
-        TokenIndex key = i+3;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex key = get_token_index_of_operand(tokens, i, 3);
 
         program.opinsert(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))), assembler::operands::getint(resolveregister(tokens.at(key))));
     } else if (tokens.at(i) == "remove") {
-        TokenIndex target = i+1;
-        TokenIndex source = i+2;
-        TokenIndex key = i+3;
+        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex key = get_token_index_of_operand(tokens, i, 3);
 
         program.opremove(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))), assembler::operands::getint(resolveregister(tokens.at(key))));
     } else if (tokens.at(i) == "return") {
