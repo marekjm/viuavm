@@ -587,10 +587,10 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
 
             check_timeout_operand(body_tokens.at(timeout));
             check_use_of_register(body_tokens, source, i, registers, named_registers, "join from empty register");
-            // FIXME joining into 0 register is allowed
-            if (body_tokens.at(target) != "void" and body_tokens.at(target) != "0") {
+            if (body_tokens.at(target) != "void") {
                 registers.insert(resolve_register_name(named_registers, body_tokens.at(target)), body_tokens.at(target));
             }
+
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "receive") {
@@ -598,8 +598,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             TokenIndex target = i+1;
 
             check_timeout_operand(body_tokens.at(timeout));
-            // FIXME receiving into 0 register is allowed
-            if (not (body_tokens.at(target) == "0" or body_tokens.at(target) == "void")) {
+            if (body_tokens.at(target) != "void") {
                 registers.insert(resolve_register_name(named_registers, body_tokens.at(target)), body_tokens.at(target));
             }
             check_timeout_operand(body_tokens.at(timeout));
@@ -619,8 +618,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
         } else if (token == "msg" or token == "call" or token == "process") {
             TokenIndex target = i+1;
 
-            // FIXME returning into 0 register is allowed
-            if (not (body_tokens.at(target) == "0" or body_tokens.at(target) == "void")) {
+            if (body_tokens.at(target) != "void") {
                 registers.insert(resolve_register_name(named_registers, body_tokens.at(target)), body_tokens.at(target));
             }
             i = skip_till_next_line(body_tokens, i);
