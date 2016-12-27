@@ -260,8 +260,19 @@ static void erase_register(Registers& registers, map<string, string>& named_regi
         registers.erase(resolve_register_name(named_registers, name), context);
     }
 }
-static auto get_token_index_of_operand(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i, unsigned wanted_operand_index) -> decltype(i) {
-    return i+wanted_operand_index;
+static auto get_token_index_of_operand(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i, int wanted_operand_index) -> decltype(i) {
+    auto limit = tokens.size();
+    while (i < limit and wanted_operand_index > 0) {
+        //if (not (tokens.at(i) == "," or viua::cg::lex::is_reserved_keyword(tokens.at(i)))) {
+        auto token = tokens.at(i);
+        if (token == "," or token == "static" or token == "local" or token == "global" or str::isnum(token, false) or str::isid(token) or ((token.str().at(0) == '@' or token.str().at(0) == '*') and (str::isnum(token.str().substr(1)) or str::isid(token.str().substr(1))))) {
+            ++i;
+            --wanted_operand_index;
+        } else {
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i), "unexpected token");
+        }
+    }
+    return i;
 }
 static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, decltype(body_tokens.size()) i, Registers& registers, map<string, string> named_registers, const map<string, vector<viua::cg::lex::Token>>& block_bodies, const bool debug) {
     using TokenIndex = std::remove_reference<decltype(body_tokens)>::type::size_type;
