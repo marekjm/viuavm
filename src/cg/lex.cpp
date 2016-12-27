@@ -102,7 +102,7 @@ namespace viua {
             }
 
 
-            static bool is_reserved_keyword(string s) {
+            bool is_reserved_keyword(const string& s) {
                 static const set<string> reserved_keywords {
                     /*
                      * Used for timeouts in 'join' and 'receive' instructions
@@ -188,7 +188,7 @@ namespace viua {
                 };
                 return (reserved_keywords.count(s) or OP_MNEMONICS.count(s));
             }
-            static void assert_is_not_reserved_keyword(Token token, const string& message) {
+            void assert_is_not_reserved_keyword(Token token, const string& message) {
                 string s = token.original();
                 if (is_reserved_keyword(s)) {
                     throw viua::cg::lex::InvalidSyntax(token, ("invalid " + message + ": '" + s + "' is a registered keyword"));

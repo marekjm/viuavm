@@ -70,6 +70,9 @@ namespace viua {
                 auto append(const InvalidSyntax&) -> TracedSyntaxError&;
             };
 
+            bool is_reserved_keyword(const std::string&);
+            void assert_is_not_reserved_keyword(Token, const std::string&);
+
             std::vector<Token> tokenise(const std::string&);
             std::vector<Token> standardise(std::vector<Token>);
 
