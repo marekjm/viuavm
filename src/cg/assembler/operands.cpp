@@ -19,11 +19,51 @@
 
 #include <string>
 #include <tuple>
+#include <vector>
 #include <viua/support/string.h>
+#include <viua/cg/lex.h>
 #include <viua/cg/assembler/assembler.h>
 #include <viua/program.h>
 using namespace std;
 
+
+static string resolveregister(viua::cg::lex::Token token) {
+    /*  This function is used to register numbers when a register is accessed, e.g.
+     *  in `istore` instruction or in `branch` in condition operand.
+     *
+     *  This function MUST return string as teh result is further passed to assembler::operands::getint() function which *expects* string.
+     */
+    ostringstream out;
+    string reg = token.str();
+    if (str::isnum(reg)) {
+        /*  Basic case - the register is accessed as real index, everything is nice and simple.
+         */
+        out.str(reg);
+    } else if (reg[0] == '@' and str::isnum(str::sub(reg, 1))) {
+        /*  Basic case - the register index is taken from another register, everything is still nice and simple.
+         */
+        if (stoi(reg.substr(1)) < 0) {
+            throw ("register indexes cannot be negative: " + reg);
+        }
+
+        // FIXME: analyse source and detect if the referenced register really holds an integer (the only value suitable to use
+        // as register reference)
+        out.str(reg);
+    } else if (reg[0] == '*' and str::isnum(str::sub(reg, 1))) {
+        /*  Basic case - the register index is taken from another register, everything is still nice and simple.
+         */
+        if (stoi(reg.substr(1)) < 0) {
+            throw ("register indexes cannot be negative: " + reg);
+        }
+
+        out.str(reg);
+    } else if (reg == "void") {
+        out << reg;
+    } else {
+        throw viua::cg::lex::InvalidSyntax(token, "not enough operands");
+    }
+    return out.str();
+}
 
 int_op assembler::operands::getint(const string& s) {
     if (s.size() == 0) {
@@ -41,6 +81,44 @@ int_op assembler::operands::getint(const string& s) {
     }
 
     return int_op(stoi(s));
+}
+
+int_op assembler::operands::getint(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) {
+    string s = resolveregister(tokens.at(i));
+
+    if (s.size() == 0) {
+        throw "empty string cannot be used as operand";
+    }
+
+    if (s == "void") {
+        return int_op(IntegerOperandType::VOID);
+    }
+
+    int_op iop;
+    if (s.at(0) == '@') {
+        iop = int_op(IntegerOperandType::REGISTER_REFERENCE, stoi(s.substr(1)));
+    } else if (s.at(0) == '*') {
+        iop = int_op(IntegerOperandType::POINTER_DEREFERENCE, stoi(s.substr(1)));
+    } else {
+        iop = int_op(stoi(s));
+    }
+
+    auto previous_token = tokens.at(i-1);
+    if (previous_token == "static") {
+        iop.rs_type = viua::internals::RegisterSets::STATIC;
+    } else if (previous_token == "local") {
+        iop.rs_type = viua::internals::RegisterSets::LOCAL;
+    } else if (previous_token == "global") {
+        iop.rs_type = viua::internals::RegisterSets::GLOBAL;
+    } else if (previous_token == "\n") {
+        // do nothing
+    } else if (str::isnum(previous_token) or str::isid(previous_token)) {
+        // do nothing
+    } else {
+        throw viua::cg::lex::InvalidSyntax(previous_token, "unexpected token");
+    }
+
+    return iop;
 }
 
 byte_op assembler::operands::getbyte(const string& s) {

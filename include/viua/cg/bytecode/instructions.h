@@ -38,6 +38,7 @@ enum class IntegerOperandType {
 
 struct int_op {
     IntegerOperandType type;
+    viua::internals::RegisterSets rs_type;
     viua::internals::types::plain_int value;
 
     int_op();

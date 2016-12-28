@@ -34,6 +34,7 @@
 namespace assembler {
     namespace operands {
         int_op getint(const std::string& s);
+        int_op getint(const std::vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()));
         byte_op getbyte(const std::string& s);
         float_op getfloat(const std::string& s);
 

@@ -183,6 +183,7 @@ static auto get_token_index_of_operand(const vector<viua::cg::lex::Token>& token
             throw viua::cg::lex::InvalidSyntax(tokens.at(i), "unexpected token");
         }
     }
+
     return i;
 }
 static auto get_token_index_after_operand(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i, int wanted_operand_index) -> decltype(i) {
@@ -365,7 +366,10 @@ static viua::internals::types::bytecode_size assemble_instruction(Program& progr
         TokenIndex target = get_token_index_of_operand(tokens, i, 1);
         TokenIndex source = get_token_index_of_operand(tokens, i, 2);
 
-        program.opmove(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
+        program.opmove(
+            assembler::operands::getint(tokens, target),
+            assembler::operands::getint(tokens, source)
+        );
     } else if (tokens.at(i) == "copy") {
         TokenIndex target = get_token_index_of_operand(tokens, i, 1);
         TokenIndex source = get_token_index_of_operand(tokens, i, 2);

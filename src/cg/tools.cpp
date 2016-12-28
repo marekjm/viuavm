@@ -49,6 +49,10 @@ namespace viua {
             static auto size_of_register_index_operand(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 viua::internals::types::bytecode_size calculated_size = 0;
 
+                if (tokens.at(i) == "static" or tokens.at(i) == "local" or tokens.at(i) == "global") {
+                    ++i;
+                }
+
                 if (tokens.at(i) == "void") {
                     calculated_size += sizeof(viua::internals::types::byte);
                     ++i;
