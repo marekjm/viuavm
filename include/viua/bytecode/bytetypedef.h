@@ -46,7 +46,8 @@ namespace viua {
         }
 
         enum class RegisterSets: types::registerset_type_marker {
-            GLOBAL = 0,
+            CURRENT = 0,
+            GLOBAL,
             LOCAL,
             STATIC,
             TEMPORARY,

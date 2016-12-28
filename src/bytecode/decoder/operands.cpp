@@ -88,14 +88,41 @@ static auto extract_register_index(viua::internals::types::byte *ip, viua::proce
     }
     return tuple<viua::internals::types::byte*, viua::internals::types::register_index>(ip, register_index);
 }
+static auto extract_register_type_and_index(viua::internals::types::byte *ip, viua::process::Process *process, bool pointers_allowed = false) -> tuple<viua::internals::types::byte*, viua::internals::RegisterSets, viua::internals::types::register_index> {
+    OperandType ot = viua::bytecode::decoder::operands::get_operand_type(ip);
+    ++ip;
+
+    viua::internals::RegisterSets register_type = viua::internals::RegisterSets::LOCAL;
+    viua::internals::types::register_index register_index = 0;
+    if (ot == OT_REGISTER_INDEX or ot == OT_REGISTER_REFERENCE or (pointers_allowed and ot == OT_POINTER)) {
+        register_type = extract<viua::internals::RegisterSets>(ip);
+        // FIXME extract RS type
+        ip += sizeof(viua::internals::RegisterSets);
+
+        register_index = extract<viua::internals::types::register_index>(ip);
+        ip += sizeof(viua::internals::types::register_index);
+    } else {
+        throw new viua::types::Exception("decoded invalid operand type");
+    }
+    if (ot == OT_REGISTER_REFERENCE) {
+        auto i = static_cast<viua::types::Integer*>(process->obtain(register_index));
+        // FIXME Number::negative() -> bool is needed
+        if (i->as_int32() < 0) {
+            throw new viua::types::Exception("register indexes cannot be negative");
+        }
+        register_index = i->as_uint32();
+    }
+    return tuple<viua::internals::types::byte*, viua::internals::RegisterSets, viua::internals::types::register_index>(ip, register_type, register_index);
+}
 auto viua::bytecode::decoder::operands::fetch_register_index(viua::internals::types::byte *ip, viua::process::Process *process) -> tuple<viua::internals::types::byte*, viua::internals::types::register_index> {
     return extract_register_index(ip, process);
 }
 
 auto viua::bytecode::decoder::operands::fetch_register(viua::internals::types::byte *ip, viua::process::Process *process) -> tuple<viua::internals::types::byte*, viua::kernel::Register*> {
+    viua::internals::RegisterSets register_type = viua::internals::RegisterSets::LOCAL;
     viua::internals::types::register_index target = 0;
-    tie(ip, target) = extract_register_index(ip, process);
-    return tuple<viua::internals::types::byte*, viua::kernel::Register*>(ip, process->register_at(target));
+    tie(ip, register_type, target) = extract_register_type_and_index(ip, process);
+    return tuple<viua::internals::types::byte*, viua::kernel::Register*>(ip, process->register_at(target, register_type));
 }
 
 auto viua::bytecode::decoder::operands::fetch_timeout(viua::internals::types::byte *ip, viua::process::Process*) -> tuple<viua::internals::types::byte*, viua::internals::types::timeout> {

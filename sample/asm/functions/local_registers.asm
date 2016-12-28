@@ -20,6 +20,8 @@
 .function: set_69/0
     ress global
     istore 2 69
+    move 0 2
+    move 2 0
     return
 .end
 

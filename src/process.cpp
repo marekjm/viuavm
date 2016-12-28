@@ -50,6 +50,19 @@ viua::kernel::Register* viua::process::Process::register_at(viua::internals::typ
     return currently_used_register_set->register_at(i);
 }
 
+viua::kernel::Register* viua::process::Process::register_at(viua::internals::types::register_index i, viua::internals::RegisterSets rs) {
+    if (rs == viua::internals::RegisterSets::CURRENT) {
+        return currently_used_register_set->register_at(i);
+    } else if (rs == viua::internals::RegisterSets::LOCAL) {
+        return frames.back()->local_register_set->register_at(i);
+    } else if (rs == viua::internals::RegisterSets::STATIC) {
+        ensureStaticRegisters(frames.back()->function_name);
+        return static_registers.at(frames.back()->function_name)->register_at(i);
+    } else {
+        throw new viua::types::Exception("unsupported register set type");
+    }
+}
+
 unique_ptr<viua::types::Type> viua::process::Process::pop(viua::internals::types::register_index index) {
     return currently_used_register_set->pop(index);
 }
