@@ -23,11 +23,11 @@
 using namespace std;
 
 
-int_op::int_op(): type(IntegerOperandType::PLAIN), value(0) {
+int_op::int_op(): type(IntegerOperandType::PLAIN), rs_type(viua::internals::RegisterSets::LOCAL), value(0) {
 }
-int_op::int_op(IntegerOperandType t, viua::internals::types::plain_int n): type(t), value(n) {
+int_op::int_op(IntegerOperandType t, viua::internals::types::plain_int n): type(t), rs_type(viua::internals::RegisterSets::LOCAL), value(n) {
 }
-int_op::int_op(viua::internals::types::plain_int n): type(IntegerOperandType::PLAIN), value(n) {
+int_op::int_op(viua::internals::types::plain_int n): type(IntegerOperandType::PLAIN), rs_type(viua::internals::RegisterSets::LOCAL), value(n) {
 }
 
 timeout_op::timeout_op(): type(IntegerOperandType::PLAIN), value(0) {
@@ -65,7 +65,7 @@ static viua::internals::types::byte* insert_ri_operand(viua::internals::types::b
     }
     pointer::inc<OperandType, viua::internals::types::byte>(addr_ptr);
 
-    *(reinterpret_cast<viua::internals::RegisterSets*>(addr_ptr)) = viua::internals::RegisterSets::LOCAL;
+    *(reinterpret_cast<viua::internals::RegisterSets*>(addr_ptr)) = op.rs_type;
     pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(addr_ptr);
 
     *(reinterpret_cast<viua::internals::types::register_index*>(addr_ptr)) = static_cast<viua::internals::types::register_index>(op.value);
