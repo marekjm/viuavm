@@ -99,11 +99,7 @@ static string resolveregister(Token token) {
      */
     ostringstream out;
     string reg = token.str();
-    if (str::isnum(reg)) {
-        /*  Basic case - the register is accessed as real index, everything is nice and simple.
-         */
-        out.str(reg);
-    } else if (reg[0] == '@' and str::isnum(str::sub(reg, 1))) {
+    if (reg[0] == '@' and str::isnum(str::sub(reg, 1))) {
         /*  Basic case - the register index is taken from another register, everything is still nice and simple.
          */
         if (stoi(reg.substr(1)) < 0) {
@@ -114,6 +110,14 @@ static string resolveregister(Token token) {
         // as register reference)
         out.str(reg);
     } else if (reg[0] == '*' and str::isnum(str::sub(reg, 1))) {
+        /*  Basic case - the register index is taken from another register, everything is still nice and simple.
+         */
+        if (stoi(reg.substr(1)) < 0) {
+            throw ("register indexes cannot be negative: " + reg);
+        }
+
+        out.str(reg);
+    } else if (reg[0] == '%' and str::isnum(str::sub(reg, 1))) {
         /*  Basic case - the register index is taken from another register, everything is still nice and simple.
          */
         if (stoi(reg.substr(1)) < 0) {
@@ -598,7 +602,7 @@ static void check_main_function(const string& main_function, const vector<Token>
         if (not (last_instruction == "copy" or last_instruction == "move" or last_instruction == "swap" or last_instruction == "izero" or last_instruction == "istore")) {
             throw viua::cg::lex::InvalidSyntax(last_instruction, ("main function does not return a value: " + main_function));
         }
-        if (main_function_tokens.at(i+1) != "0") {
+        if (main_function_tokens.at(i+1) != "%0") {
             throw viua::cg::lex::InvalidSyntax(last_instruction, ("main function does not return a value: " + main_function));
         }
 }
@@ -626,37 +630,37 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
     // has been selected
     if (main_function == "main/0") {
         entry_function_tokens.emplace_back(0, 0, "frame");
-        entry_function_tokens.emplace_back(0, 0, "0");
-        entry_function_tokens.emplace_back(0, 0, "16");
+        entry_function_tokens.emplace_back(0, 0, "%0");
+        entry_function_tokens.emplace_back(0, 0, "%16");
         entry_function_tokens.emplace_back(0, 0, "\n");
         bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(viua::internals::types::byte);
     } else if (main_function == "main/2") {
         entry_function_tokens.emplace_back(0, 0, "frame");
-        entry_function_tokens.emplace_back(0, 0, "2");
-        entry_function_tokens.emplace_back(0, 0, "16");
+        entry_function_tokens.emplace_back(0, 0, "%2");
+        entry_function_tokens.emplace_back(0, 0, "%16");
         entry_function_tokens.emplace_back(0, 0, "\n");
         bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(viua::internals::types::byte);
 
         // pop first element on the list of aruments
         entry_function_tokens.emplace_back(0, 0, "vpop");
-        entry_function_tokens.emplace_back(0, 0, "0");
-        entry_function_tokens.emplace_back(0, 0, "1");
-        entry_function_tokens.emplace_back(0, 0, "0");
+        entry_function_tokens.emplace_back(0, 0, "%0");
+        entry_function_tokens.emplace_back(0, 0, "%1");
+        entry_function_tokens.emplace_back(0, 0, "%0");
         entry_function_tokens.emplace_back(0, 0, "\n");
         bytes += sizeof(viua::internals::types::byte) + 3*sizeof(viua::internals::types::register_index) + 3*sizeof(viua::internals::types::byte);
 
         // for parameter for main/2 is the name of the program
         entry_function_tokens.emplace_back(0, 0, "param");
-        entry_function_tokens.emplace_back(0, 0, "0");
-        entry_function_tokens.emplace_back(0, 0, "0");
+        entry_function_tokens.emplace_back(0, 0, "%0");
+        entry_function_tokens.emplace_back(0, 0, "%0");
         entry_function_tokens.emplace_back(0, 0, "\n");
         bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(viua::internals::types::byte);
 
         // second parameter for main/2 is the vector with the rest
         // of the commandl ine parameters
         entry_function_tokens.emplace_back(0, 0, "param");
-        entry_function_tokens.emplace_back(0, 0, "1");
-        entry_function_tokens.emplace_back(0, 0, "1");
+        entry_function_tokens.emplace_back(0, 0, "%1");
+        entry_function_tokens.emplace_back(0, 0, "%1");
         entry_function_tokens.emplace_back(0, 0, "\n");
         bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(viua::internals::types::byte);
     } else {
@@ -664,14 +668,14 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
         // for custom main functions
         // FIXME: should custom main function be allowed?
         entry_function_tokens.emplace_back(0, 0, "frame");
-        entry_function_tokens.emplace_back(0, 0, "1");
-        entry_function_tokens.emplace_back(0, 0, "16");
+        entry_function_tokens.emplace_back(0, 0, "%1");
+        entry_function_tokens.emplace_back(0, 0, "%16");
         entry_function_tokens.emplace_back(0, 0, "\n");
         bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(viua::internals::types::byte);
 
         entry_function_tokens.emplace_back(0, 0, "param");
-        entry_function_tokens.emplace_back(0, 0, "0");
-        entry_function_tokens.emplace_back(0, 0, "1");
+        entry_function_tokens.emplace_back(0, 0, "%0");
+        entry_function_tokens.emplace_back(0, 0, "%1");
         entry_function_tokens.emplace_back(0, 0, "\n");
         bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(viua::internals::types::byte);
     }
@@ -680,7 +684,7 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
     // directive which can set an arbitrary function as main
     // we also save return value in 1 register since 0 means "drop return value"
     entry_function_tokens.emplace_back(0, 0, "call");
-    entry_function_tokens.emplace_back(0, 0, "1");
+    entry_function_tokens.emplace_back(0, 0, "%1");
     entry_function_tokens.emplace_back(0, 0, main_function);
     entry_function_tokens.emplace_back(0, 0, "\n");
     bytes += sizeof(viua::internals::types::byte) + sizeof(viua::internals::types::register_index) + sizeof(viua::internals::types::byte);
@@ -688,8 +692,8 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
 
     // then, register 1 is moved to register 0 so it counts as a return code
     entry_function_tokens.emplace_back(0, 0, "move");
-    entry_function_tokens.emplace_back(0, 0, "0");
-    entry_function_tokens.emplace_back(0, 0, "1");
+    entry_function_tokens.emplace_back(0, 0, "%0");
+    entry_function_tokens.emplace_back(0, 0, "%1");
     entry_function_tokens.emplace_back(0, 0, "\n");
     bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(viua::internals::types::byte);
 

@@ -114,7 +114,7 @@ static string resolve_register_name(const map<string, string>& named_registers, 
     if (name == "void") {
         return name;
     }
-    if (name.at(0) == '@' or name.at(0) == '*') {
+    if (name.at(0) == '@' or name.at(0) == '*' or name.at(0) == '%') {
         name = name.substr(1);
     }
     if (str::isnum(name, false)) {

@@ -774,7 +774,11 @@ namespace viua {
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
                     const auto t = input_tokens.at(i);
 
-                    if (i+1 < limit and t.str() == "@" and input_tokens.at(i+1).str() != "\n" and is_valid_register_id(input_tokens.at(i+1))) {
+                    if (i+1 < limit and t.str() == "%" and input_tokens.at(i+1).str() != "\n" and is_valid_register_id(input_tokens.at(i+1))) {
+                        tokens.emplace_back(t.line(), t.character(), (t.str() + input_tokens.at(i+1).str()));
+                        ++i;
+                        continue;
+                    } else if (i+1 < limit and t.str() == "@" and input_tokens.at(i+1).str() != "\n" and is_valid_register_id(input_tokens.at(i+1))) {
                         tokens.emplace_back(t.line(), t.character(), (t.str() + input_tokens.at(i+1).str()));
                         ++i;
                         continue;
@@ -1212,6 +1216,9 @@ namespace viua {
                         tokens.back().original(token.str().substr(1));
                     } else if (token.str().at(0) == '*' and names.count(token.str().substr(1))) {
                         tokens.emplace_back(token.line(), token.character(), ("*" + names.at(token.str().substr(1))));
+                        tokens.back().original(token.str().substr(1));
+                    } else if (token.str().at(0) == '%' and names.count(token.str().substr(1))) {
+                        tokens.emplace_back(token.line(), token.character(), ("%" + names.at(token.str().substr(1))));
                         tokens.back().original(token.str().substr(1));
                     } else {
                         tokens.push_back(token);
