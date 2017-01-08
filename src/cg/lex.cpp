@@ -1099,6 +1099,9 @@ namespace viua {
                     if (token == "iota") {
                         tokens.emplace_back(token.line(), token.character(), str::stringify(iotas.back()++, false));
                         tokens.back().original("iota");
+                    } else if ((token.str().at(0) == '%' or token.str().at(0) == '@' or token.str().at(0) == '*') and token.str().substr(1) == "iota") {
+                        tokens.emplace_back(token.line(), token.character(), (token.str().at(0) + str::stringify(iotas.back()++, false)));
+                        tokens.back().original(token);
                     } else {
                         tokens.push_back(token);
                     }
@@ -1195,9 +1198,13 @@ namespace viua {
 
                     if (token == ".name:") {
                         Token name = input_tokens.at(i+2);
-                        Token index = input_tokens.at(i+1);
+                        string index = input_tokens.at(i+1).str();
 
                         assert_is_not_reserved_keyword(name, "register name");
+
+                        if ((index.at(0) == '%' or index.at(0) == '@' or index.at(0) == '*') and str::isnum(index.substr(1), false)) {
+                            index = index.substr(1);
+                        }
 
                         if (not str::isnum(index)) {
                             throw viua::cg::lex::InvalidSyntax(input_tokens.at(i+1), ("invalid register index: " + str::strencode(name) + " := " + str::enquote(str::strencode(index))));
