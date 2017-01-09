@@ -307,30 +307,30 @@ namespace viua {
                         tokens.push_back(token);
 
                         if ((not str::isnum(input_tokens.at(i+1).str(), false)) and input_tokens.at(i+1).str() == "\n") {
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "0");
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "16");
+                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "%0");
+                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "%16");
                             continue;
                         }
 
                         tokens.push_back(input_tokens.at(++i));
                         if ((not str::isnum(input_tokens.at(i+1).str(), false)) and input_tokens.at(i+1).str() == "\n") {
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "16");
+                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "%16");
                         }
                     } else if (token == "vec") {
                         tokens.push_back(token);
                         tokens.push_back(input_tokens.at(++i));
 
                         if ((not str::isnum(input_tokens.at(i+1).str(), false)) and input_tokens.at(i+1).str() == "\n") {
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "0"); // starting register
+                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "%0"); // starting register
                             tokens.back().original("\n");
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "0"); // number of registers to pack
+                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "%0"); // number of registers to pack
                             tokens.back().original("\n");
                             continue;
                         }
 
                         tokens.push_back(input_tokens.at(++i)); // starting register
                         if ((not str::isnum(input_tokens.at(i+1).str(), false)) and input_tokens.at(i+1).str() == "\n") {
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "0"); // number of registers to pack
+                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "%0"); // number of registers to pack
                             tokens.back().original("\n");
                         }
                     } else if (token == "vpop") {
@@ -338,7 +338,7 @@ namespace viua {
                         tokens.push_back(input_tokens.at(++i));
 
                         if ((not str::isnum(input_tokens.at(i+1).str(), false)) and input_tokens.at(i+1).str() == "\n") {
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "0");
+                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "%0");
                             tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "-1");
                             continue;
                         }
@@ -353,7 +353,7 @@ namespace viua {
                         tokens.push_back(input_tokens.at(++i));
 
                         if (input_tokens.at(i+1).str() == "\n") {
-                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "0");
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "%0");
                         }
                     } else if (token == "join") {
                         tokens.push_back(token);
