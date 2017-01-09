@@ -91,7 +91,7 @@ static tuple<viua::internals::types::bytecode_size, enum JUMPTYPE> resolvejump(T
     return tuple<viua::internals::types::bytecode_size, enum JUMPTYPE>(addr, jump_type);
 }
 
-static string resolveregister(Token token) {
+static string resolveregister(Token token, const bool allow_bare_integers = false) {
     /*  This function is used to register numbers when a register is accessed, e.g.
      *  in `istore` instruction or in `branch` in condition operand.
      *
@@ -126,6 +126,8 @@ static string resolveregister(Token token) {
 
         out.str(reg);
     } else if (reg == "void") {
+        out << reg;
+    } else if (allow_bare_integers and str::isnum(reg)) {
         out << reg;
     } else {
         throw viua::cg::lex::InvalidSyntax(token, "not enough operands");
@@ -190,7 +192,7 @@ static viua::internals::types::bytecode_size assemble_instruction(Program& progr
     } else if (tokens.at(i) == "izero") {
         program.opizero(assembler::operands::getint(resolveregister(tokens.at(i+1))));
     } else if (tokens.at(i) == "istore") {
-        program.opistore(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
+        program.opistore(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2), true), true));
     } else if (tokens.at(i) == "iinc") {
         program.opiinc(assembler::operands::getint(resolveregister(tokens.at(i+1))));
     } else if (tokens.at(i) == "idec") {
