@@ -32,14 +32,11 @@ int_op assembler::operands::getint(const string& s) {
 
     if (s == "void") {
         return int_op(IntegerOperandType::VOID);
-    } else
-    if (s.at(0) == '@') {
+    } else if (s.at(0) == '@') {
         return int_op(IntegerOperandType::REGISTER_REFERENCE, stoi(s.substr(1)));
-    } else
-    if (s.at(0) == '*') {
+    } else if (s.at(0) == '*') {
         return int_op(IntegerOperandType::POINTER_DEREFERENCE, stoi(s.substr(1)));
-    } else
-    if (s.at(0) == '%') {
+    } else if (s.at(0) == '%') {
         return int_op(stoi(s.substr(1)));
     } else {
         throw ("cannot convert to int operand: " + s);
