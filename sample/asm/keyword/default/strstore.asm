@@ -18,9 +18,9 @@
 ;
 
 .function: main/0
-    echo (strstore iota "default: ")
-    print (strstore iota default)
+    echo (strstore %iota "default: ")
+    print (strstore %iota default)
 
-    izero 0
+    izero %0
     return
 .end

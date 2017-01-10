@@ -19,36 +19,36 @@
 
 .function: run_in_a_process/0
     ; will cause a memory leak on detached processes
-    throw (receive 1)
+    throw (receive %1)
     return
 .end
 
 .block: try_process_exception
-    join 0 1
+    join %0 %1
     leave
 .end
 
 .block: handle_process_exception
-    echo (strstore 3 "exception transferred from process ")
-    echo 1
-    echo (strstore 3 ": ")
-    print (draw 3)
+    echo (strstore %3 "exception transferred from process ")
+    echo %1
+    echo (strstore %3 ": ")
+    print (draw %3)
     leave
 .end
 
 .function: main/1
-    frame 0
-    process 1 run_in_a_process/0
+    frame %0
+    process %1 run_in_a_process/0
 
     ;frame ^[(param 0 1)]
     ;msg void detach/1
 
-    send 1 (strstore 2 "Hello exception transferring World!")
+    send %1 (strstore %2 "Hello exception transferring World!")
 
     try
     catch "String" handle_process_exception
     enter try_process_exception
 
-    izero 0
+    izero %0
     return
 .end

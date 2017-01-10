@@ -23,12 +23,12 @@
 ; true porpose of this script, though.
 
 .function: main/1
-    fstore 1 4.0
-    fstore 2 -3.5
-    add float32 3 1 2
-    fstore 4 0
-    add float32 3 3 4
-    print 3
-    izero 0
+    fstore %1 4.0
+    fstore %2 -3.5
+    add float32 %3 %1 %2
+    fstore %4 0
+    add float32 %3 %3 %4
+    print %3
+    izero %0
     return
 .end

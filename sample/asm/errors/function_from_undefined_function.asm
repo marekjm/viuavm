@@ -18,11 +18,11 @@
 ;
 
 .function: main/1
-    function 1 foo/0
+    function %1 foo/0
 
-    frame 0
-    fcall void 1
+    frame %0
+    fcall void %1
 
-    izero 0
+    izero %0
     return
 .end

@@ -18,8 +18,8 @@
 ;
 
 .function: main/0
-    tmpro 1
-    print 1
-    izero 0
+    tmpro %1
+    print %1
+    izero %0
     return
 .end

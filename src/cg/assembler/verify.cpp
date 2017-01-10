@@ -78,8 +78,8 @@ void assembler::verify::functionCallArities(const vector<Token>& tokens) {
         }
 
         if (tokens.at(i) == "frame") {
-            if (str::isnum(tokens.at(i+1))) {
-                frame_parameters_count = stoi(tokens.at(i+1));
+            if (str::isnum(tokens.at(i+1).str().substr(1))) {
+                frame_parameters_count = stoi(tokens.at(i+1).str().substr(1));
             } else {
                 frame_parameters_count = -1;
             }
@@ -131,8 +131,8 @@ void assembler::verify::msgArities(const vector<Token>& tokens) {
         }
 
         if (tokens.at(i) == "frame") {
-            if (str::isnum(tokens.at(i+1))) {
-                frame_parameters_count = stoi(tokens.at(i+1));
+            if (str::isnum(tokens.at(i+1).str().substr(1))) {
+                frame_parameters_count = stoi(tokens.at(i+1).str().substr(1));
             } else {
                 frame_parameters_count = -1;
             }
@@ -473,8 +473,8 @@ void assembler::verify::framesHaveNoGaps(const vector<Token>& tokens) {
         if (tokens.at(i) == "frame") {
             last_frame = tokens.at(i).line();
 
-            if (str::isnum(tokens.at(i+1))) {
-                frame_parameters_count = stoul(tokens.at(i+1));
+            if (str::isnum(tokens.at(i+1).str().substr(1))) {
+                frame_parameters_count = stoul(tokens.at(i+1).str().substr(1));
                 filled_slots.clear();
                 pass_lines.clear();
                 filled_slots.resize(frame_parameters_count, false);

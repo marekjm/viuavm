@@ -18,9 +18,9 @@
 ;
 
 .function: main/0
-    izero 1
+    izero %1
     .name: 1 named_register
 
-    izero 0
+    izero %0
     return
 .end

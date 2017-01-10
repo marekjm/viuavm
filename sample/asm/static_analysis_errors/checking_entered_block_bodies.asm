@@ -18,7 +18,7 @@
 ;
 
 .block: a_block
-    strstore 1 "Hello World!"
+    strstore %1 "Hello World!"
     leave
 .end
 
@@ -26,8 +26,8 @@
     try
     enter a_block
 
-    print 1
+    print %1
 
-    izero 0
+    izero %0
     return
 .end

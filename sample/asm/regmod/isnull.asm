@@ -18,8 +18,8 @@
 ;
 
 .function: main/1
-    print (isnull 2 1)
+    print (isnull %2 %1)
 
-    izero 0
+    izero %0
     return
 .end

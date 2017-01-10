@@ -22,39 +22,39 @@
 
 
 .function: typesystem_setup/0
-    register (attach (class 1 Base) Base::saySomething/1 hello/1)
-    register (attach (derive (class 1 Derived) Base) Derived::saySomethingMore/1 hello/1)
+    register (attach (class %1 Base) Base::saySomething/1 hello/1)
+    register (attach (derive (class %1 Derived) Base) Derived::saySomethingMore/1 hello/1)
 
     return
 .end
 
 .function: Base::saySomething/1
-    print (strstore 1 "Hello Base World!")
+    print (strstore %1 "Hello Base World!")
     return
 .end
 
 .function: Derived::saySomethingMore/1
-    print (strstore 1 "Hello Derived World!")
+    print (strstore %1 "Hello Derived World!")
     return
 .end
 
 .function: main/1
-    frame 0
+    frame %0
     call void typesystem_setup/0
 
     ; create a Base object and
     ; send a message to it
-    frame ^[(param 0 (new 1 Base))]
+    frame ^[(param %0 (new %1 Base))]
     msg void hello/1
 
     ; create a Derived object and
     ; send a message to it
-    frame ^[(param 0 (new 2 Derived))]
+    frame ^[(param %0 (new %2 Derived))]
     msg void hello/1
 
-    frame ^[(param 0 2)]
+    frame ^[(param %0 %2)]
     call void Base::saySomething/1
 
-    izero 0
+    izero %0
     return
 .end

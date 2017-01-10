@@ -18,14 +18,14 @@
 ;
 
 .function: main/0
-    istore (.name: iota value) 42
+    istore (.name: %iota value) 42
 
-    if value +1 go_here
-    delete value
+    if %value +1 go_here
+    delete %value
 
     .mark: go_here
-    print value
+    print %value
 
-    izero 0
+    izero %0
     return
 .end

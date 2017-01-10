@@ -18,21 +18,21 @@
 ;
 
 .function: print_number_of_params/
-    print (argc 1)
+    print (argc %1)
     return
 .end
 
 .function: main/1
-    print (argc 1)
+    print (argc %1)
 
-    izero 2
+    izero %2
 
-    frame ^[(param 0 2) (param 1 2)]
+    frame ^[(param %0 %2) (param %1 %2)]
     call print_number_of_params/
 
-    frame 0
+    frame %0
     call void print_number_of_params/
 
-    izero 0
+    izero %0
     return
 .end

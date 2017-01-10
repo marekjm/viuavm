@@ -18,9 +18,9 @@
 ;
 
 .function: main/0
-    ptr (.name: iota pointer) (strstore (.name: iota o) "3.14")
-    print (stof iota *pointer)
+    ptr (.name: %iota pointer) (strstore (.name: %iota o) "3.14")
+    print (stof %iota *pointer)
 
-    izero 0
+    izero %0
     return
 .end

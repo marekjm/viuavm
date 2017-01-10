@@ -127,7 +127,7 @@ static string resolve_register_name(const map<string, string>& named_registers, 
         throw viua::cg::lex::InvalidSyntax(token, ("register indexes cannot be negative: " + name));
     }
     if (named_registers.count(name) == 0) {
-        throw viua::cg::lex::InvalidSyntax(token, ("not a named register: " + str::strencode(name)));
+        throw viua::cg::lex::InvalidSyntax(token, ("not a named register: " + str::enquote(str::strencode(name))));
     }
     return named_registers.at(name);
 }
@@ -144,6 +144,10 @@ static void check_timeout_operand(Token token) {
         throw viua::cg::lex::InvalidSyntax(token, "invalid timeout operand");
     }
 }
+
+static auto strip_access_mode_sigil(string s) -> string {
+    return ((s.at(0) == '%' or s.at(0) == '@' or s.at(0) == '*') ? s.substr(1) : s);
+}
 static void check_use_of_register_index(const vector<viua::cg::lex::Token>& tokens, long unsigned i, long unsigned by, string register_index, Registers& registers, map<string, string>& named_registers, const string& message_prefix, const bool allow_direct_access_to_target = true) {
     string resolved_register_name = resolve_register_name(named_registers, tokens.at(i), register_index, allow_direct_access_to_target);
     if (resolved_register_name == "void") {
@@ -152,8 +156,8 @@ static void check_use_of_register_index(const vector<viua::cg::lex::Token>& toke
         throw base_error;
     }
     if (not registers.defined(resolved_register_name)) {
-        string message = (message_prefix + ": " + str::strencode(register_index));
-        if (resolved_register_name != register_index) {
+        string message = (message_prefix + ": " + str::strencode(strip_access_mode_sigil(register_index)));
+        if (resolved_register_name != strip_access_mode_sigil(register_index)) {
             message += (" := " + resolved_register_name);
         }
         auto base_error = viua::cg::lex::InvalidSyntax(tokens.at(i), message);
@@ -187,9 +191,6 @@ static void check_defined_but_unused(Registers& registers) {
     }
 }
 
-static auto strip_access_mode_sigil(string s) -> string {
-    return ((s.at(0) == '%' or s.at(0) == '@' or s.at(0) == '*') ? s.substr(1) : s);
-}
 static auto in_block_offset(const vector<viua::cg::lex::Token>& body_tokens, std::remove_reference<decltype(body_tokens)>::type::size_type i, Registers& registers, map<string, string>& named_registers) -> decltype(i) {
     const auto& checked_token = body_tokens.at(i);
 
@@ -380,7 +381,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             // instead, statically check for the "non-emptiness" and thrown an error is we can determine that the register access
             // will always be valid
             if (registers.defined(resolve_register_name(named_registers, body_tokens.at(i+2)))) {
-                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+1), ("useless check, register will always be defined: " + str::strencode(body_tokens.at(i+2))));
+                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+1), ("useless check, register will always be defined: " + str::strencode(strip_access_mode_sigil(body_tokens.at(i+2)))));
             }
             registers.insert(resolve_register_name(named_registers, body_tokens.at(i+1)), body_tokens.at(i+1));
             i = skip_till_next_line(body_tokens, i);
@@ -473,7 +474,9 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             int starting_register = stoi(resolve_register_name(named_registers, body_tokens.at(i+1)));
 
             if (body_tokens.at(i+2).str().at(0) != '%') {
-                throw viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), "expected register index operand");
+                auto error = viua::cg::lex::InvalidSyntax(body_tokens.at(i+2), "expected register index operand");
+                error.add(body_tokens.at(i-1));
+                throw error;
             }
             int registers_to_pack = stoi(body_tokens.at(i+2).str().substr(1));
             if (registers_to_pack) {

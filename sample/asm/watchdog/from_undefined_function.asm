@@ -51,16 +51,16 @@
     nop
     nop
     nop
-    throw (istore 1 42)
+    throw (istore %1 42)
     return
 .end
 
 .function: main/1
     watchdog undefined_function/0
 
-    frame 0
+    frame %0
     process void broken_process/0
 
-    izero 0
+    izero %0
     return
 .end

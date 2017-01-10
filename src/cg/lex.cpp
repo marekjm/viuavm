@@ -1037,7 +1037,13 @@ namespace viua {
                             unwrap_subtokens(unwrapped_tokens, subtokens, t);
                             push_unwrapped_lines(invert, inner_target_token, final_tokens, unwrapped_tokens, input_tokens, i);
                             if ((not invert) and full) {
-                                final_tokens.push_back(inner_target_token);
+                                if (final_tokens.back().str() == "*") {
+                                    final_tokens.pop_back();
+                                    final_tokens.emplace_back(inner_target_token.line(), inner_target_token.character(), ('*' + inner_target_token.str().substr(1)));
+                                    final_tokens.back().original(inner_target_token.str());
+                                } else {
+                                    final_tokens.push_back(inner_target_token);
+                                }
                             }
                         }
                         if (t == "[") {

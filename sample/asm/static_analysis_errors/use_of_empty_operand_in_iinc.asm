@@ -18,9 +18,9 @@
 ;
 
 .function: main/0
-    .name: iota value
-    iinc value
+    .name: %iota value
+    iinc %value
 
-    izero 0
+    izero %0
     return
 .end

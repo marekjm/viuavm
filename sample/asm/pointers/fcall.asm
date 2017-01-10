@@ -18,40 +18,40 @@
 ;
 
 .function: add/2
-    arg (.name: iota lhs) 0
-    arg (.name: iota rhs) 0
+    %arg (.name: %iota lhs) 0
+    arg (.name: %iota rhs) 0
 
-    add int64 0 lhs rhs
+    add int64 %0 %lhs %rhs
 
     return
 .end
 
 .function: multiply/2
-    arg (.name: iota lhs) 0
-    arg (.name: iota rhs) 0
+    arg (.name: %iota lhs) 0
+    arg (.name: %iota rhs) 0
 
-    mul int64 0 lhs rhs
+    mul int64 %0 %lhs %rhs
 
     return
 .end
 
 .function: main/0
-    function (.name: iota adder) add/2
-    function (.name: iota multipler) multiply/2
+    function (.name: %iota adder) add/2
+    %function (.name: %iota multipler) multiply/2
 
-    istore (.name: iota one) 1
+    istore (.name: %iota one) 1
 
-    .name: iota pointer
-    .name: iota result
+    .name: %iota pointer
+    .name: %iota result
 
-    ptr pointer adder
-    frame ^[(param iota one) (param iota one)]
-    print (fcall result *pointer)
+    ptr %pointer %adder
+    frame ^[(param %iota %one) (param %iota %one)]
+    print (fcall %result *pointer)
 
-    ptr pointer multipler
-    frame ^[(param iota one) (param iota one)]
-    print (fcall result *pointer)
+    ptr %pointer %multipler
+    frame ^[(param %iota %one) (param %iota %one)]
+    print (fcall %result *pointer)
 
-    izero 0
+    izero %0
     return
 .end

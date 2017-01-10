@@ -19,8 +19,8 @@
 
 .function: main/0
     frame
-    throw (istore 1)
+    throw (istore %1)
 
-    izero 0
+    izero %0
     return
 .end

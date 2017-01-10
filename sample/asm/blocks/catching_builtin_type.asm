@@ -19,14 +19,14 @@
 
 .block: handle_integer
     ; draw caught object into 2 register
-    draw 2
-    print 2
+    draw %2
+    print %2
     leave
 .end
 
 .block: main_block
-    istore 1 42
-    throw 1
+    istore %1 42
+    throw %1
     leave
 .end
 
@@ -36,7 +36,7 @@
     enter main_block
     ; leave instructions lead here
 
-    izero 0
+    izero %0
     return
 .end
 

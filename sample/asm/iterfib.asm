@@ -21,34 +21,34 @@
     .name: 1 vector
 
     ress static
-    if (not (isnull 2 vector)) logic
-    vpush (vpush (vec vector) (istore 2 1)) (istore 2 1)
+    if (not (isnull %2 %vector)) logic
+    vpush (vpush (vec %vector) (istore %2 1)) (istore %2 1)
 
     .mark: logic
 
     .name: 3 number
     .name: 4 length
-    arg number 0
+    arg %number %0
 
     .mark: loop
-    if (not (lt int64 5 (vlen length vector) number)) finished
-    add int64 8 *(vat 6 vector -1) *(vat 7 vector -2)
-    vpush vector 8
+    if (not (lt int64 %5 (vlen %length %vector) number)) finished
+    add int64 %8 *(vat %6 %vector -1) *(vat %7 %vector -2)
+    vpush %vector %8
     jump loop
 
     .mark: finished
-    copy 0 *(vat 9 vector -1)
+    copy %0 *(vat %9 %vector -1)
     return
 .end
 
 .function: main/1
     .name: 2 result
     .name: 3 expected
-    istore expected 1134903170
+    istore %expected 1134903170
 
-    frame ^[(param 0 (istore 1 45))]
-    print (call result iterfib/1)
+    frame ^[(param %0 (istore %1 45))]
+    print (call %result iterfib/1)
 
-    izero 0
+    izero %0
     return
 .end

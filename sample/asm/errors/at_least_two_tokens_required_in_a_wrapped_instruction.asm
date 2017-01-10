@@ -22,9 +22,9 @@
 .end
 
 .function: main/0
-    frame ^[(pamv 0 (iinc (istore)))]
+    frame ^[(pamv %0 (iinc (istore)))]
     call dummy/1
 
-    izero 0
+    izero %0
     return
 .end

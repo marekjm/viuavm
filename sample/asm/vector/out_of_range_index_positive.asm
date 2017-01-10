@@ -18,14 +18,14 @@
 ;
 
 .function: main/0
-    vec 1
-    vpush 1 (istore 0 0)
-    vpush 1 (istore 0 1)
-    vpush 1 (istore 0 2)
-    vpush 1 (istore 0 3)
+    vec %1
+    vpush %1 (istore %0 0)
+    vpush %1 (istore %0 1)
+    vpush %1 (istore %0 2)
+    vpush %1 (istore %0 3)
 
-    vinsert 1 (istore 0 4) 5
+    vinsert %1 (istore %0 4) 5
 
-    izero 0
+    izero %0
     return
 .end

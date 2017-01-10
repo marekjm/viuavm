@@ -20,50 +20,50 @@
 
 
 .function: tertiary/1
-    arg 3 0
+    arg %3 %0
     istore (.unused: 4) 300
-    throw 3
+    throw %3
     return
 .end
 
 .function: secondary/1
-    arg 2 0
+    arg %2 %0
     istore (.unused: 4) 200
 
-    frame ^[(param 0 2)] 5
-    istore 4 250
+    frame ^[(param %0 %2)] 5
+    istore %4 250
     call tertiary/1
 
-    istore 4 225
+    istore %4 225
     return
 .end
 
 .function: main/1
-    istore 4 50
+    istore %4 50
 
     try
     catch "Integer" .block: handle_integer
         ; draw caught object into 2 register
-        print (draw 2)
-        print 4
+        print (draw %2)
+        print %4
         leave
     .end
     enter .block: main_block
-        istore 4 100
+        istore %4 100
 
-        frame ^[(param 0 (istore 1 42))] 5
+        frame ^[(param %0 (istore %1 42))] 5
         call secondary/1
 
-        istore 2 41
-        istore 4 125
+        istore %2 41
+        istore %4 125
         leave
     .end
 
     ; leave instructions lead here
-    print 2
-    print 4
+    print %2
+    print %4
 
-    izero 0
+    izero %0
     return
 .end
 

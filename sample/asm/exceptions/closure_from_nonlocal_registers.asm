@@ -18,19 +18,19 @@
 ;
 
 .function: foo/0
-    print 1
+    print %1
     return
 .end
 
 .function: main/1
     ress global
-    istore 1 42
+    istore %1 42
 
     ; FIXME: static checking of capture* and closure combos to ensure that
     ; there is always a closure before any "closing" happens
-    closure 2 foo/0
-    capture 2 1
+    closure %2 foo/0
+    capture %2 1
 
-    izero 0
+    izero %0
     return
 .end

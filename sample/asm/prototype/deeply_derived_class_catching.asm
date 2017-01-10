@@ -18,32 +18,32 @@
 ;
 
 .block: handler
-    print (draw 2)
+    print (draw %2)
     leave
 .end
 
 .block: throws_derived
-    throw (new 1 DeeplyDerived)
+    throw (new %1 DeeplyDerived)
     leave
 .end
 
 .function: typesystem_setup/0
-    register (class 1 Base)
-    register (derive (class 1 Derived) Base)
-    register (derive (class 1 MoreDerived) Derived)
-    register (derive (class 1 EvenMoreDerived) MoreDerived)
-    register (derive (class 1 DeeplyDerived) EvenMoreDerived)
+    register (class %1 Base)
+    register (derive (class %1 Derived) Base)
+    register (derive (class %1 MoreDerived) Derived)
+    register (derive (class %1 EvenMoreDerived) MoreDerived)
+    register (derive (class %1 DeeplyDerived) EvenMoreDerived)
     return
 .end
 
 .function: main/1
-    frame 0
+    frame %0
     call void typesystem_setup/0
 
     try
     catch "Base" handler
     enter throws_derived
 
-    izero 0
+    izero %0
     return
 .end

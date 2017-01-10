@@ -20,15 +20,15 @@
 .function: main/1
     try
     catch "Exception" .block: exception_handler
-        echo (strstore 1 "exception encountered: ")
-        print (draw 2)
+        echo (strstore %1 "exception encountered: ")
+        print (draw %2)
         leave
     .end
     enter .block: print_block
-        print 1
+        print %1
         leave
     .end
 
-    izero 0
+    izero %0
     return
 .end

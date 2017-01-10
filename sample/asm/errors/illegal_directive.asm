@@ -18,6 +18,6 @@
 ;
 
 .fuction: main
-    izero 0
+    izero %0
     return
 .end

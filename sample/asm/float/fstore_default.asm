@@ -18,8 +18,8 @@
 ;
 
 .function: main/0
-    print (fstore 1)
+    print (fstore %1)
 
-    izero 0
+    izero %0
     return
 .end

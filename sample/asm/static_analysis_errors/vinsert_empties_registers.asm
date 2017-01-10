@@ -18,9 +18,9 @@
 ;
 
 .function: main/0
-    vinsert (vec 2) (izero 1) 0
-    print 1
+    vinsert (vec %2) (izero %1) 0
+    print %1
 
-    izero 0
+    izero %0
     return
 .end

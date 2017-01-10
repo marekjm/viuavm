@@ -18,14 +18,14 @@
 ;
 
 .function: foo/1
-    print (arg default 0)
+    print (arg %default %0)
     return
 .end
 
 .function: main/0
-    frame ^[(pamv 0 (strstore 1 "Hello default World!"))]
+    frame ^[(pamv %0 (strstore %1 "Hello default World!"))]
     call foo/1
 
-    izero 0
+    izero %0
     return
 .end

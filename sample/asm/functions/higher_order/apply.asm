@@ -20,7 +20,7 @@
 .function: square/1
     ; this function takes single integer as its argument,
     ; squares it and returns the result
-    mul int64 0 (arg 1 0) 1
+    mul int64 %0 (arg %1 %0) %1
     return
 .end
 
@@ -33,23 +33,23 @@
     .name: 2 parameter
 
     ; apply the function to the parameter...
-    frame ^[(pamv 0 (arg parameter 1))]
-    fcall 3 (arg func 0)
+    frame ^[(pamv %0 (arg %parameter %1))]
+    fcall %3 (arg %func %0)
 
     ; ...and return the result
-    move 0 3
+    move %0 %3
     return
 .end
 
 .function: main/1
     ; applies function square/1(int) to 5 and
     ; prints the result
-    istore 1 5
-    function 2 square/1
+    istore %1 5
+    function %2 square/1
 
-    frame ^[(param 0 2) (param 1 1)]
-    print (call 3 apply/2)
+    frame ^[(param %0 %2) (param %1 %1)]
+    print (call %3 apply/2)
 
-    izero 0
+    izero %0
     return
 .end

@@ -18,8 +18,8 @@
 ;
 
 .function: main/0
-    vpush 2 (izero 1)
+    vpush %2 (izero %1)
 
-    izero 0
+    izero %0
     return
 .end

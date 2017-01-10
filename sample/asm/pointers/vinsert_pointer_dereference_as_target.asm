@@ -18,12 +18,12 @@
 ;
 
 .function: main/0
-    ptr (.name: iota pointer) (vec (.name: iota container))
-    istore (.name: iota value) 0
+    ptr (.name: %iota pointer) (vec (.name: %iota container))
+    istore (.name: %iota value) 0
 
     vinsert *pointer value
-    print container
+    print %container
 
-    izero 0
+    izero %0
     return
 .end

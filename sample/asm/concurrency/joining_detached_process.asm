@@ -20,41 +20,41 @@
 .function: running_detached/0
 .name: 0 counter
 .name: 2 limit
-    izero counter
-    istore limit 4
-    strstore 1 "Hello World! (from long-running detached process) "
+    izero %counter
+    istore %limit 4
+    strstore %1 "Hello World! (from long-running detached process) "
 .mark: loop
-    if (gte int64 3 counter limit) after_loop
-    echo 1
-    print counter
-    iinc counter
+    if (gte int64 %3 %counter %limit) after_loop
+    echo %1
+    print %counter
+    iinc %counter
     jump loop
 .mark: after_loop
     return
 .end
 
 .function: main/1
-    frame 0
-    process 1 running_detached/0
+    frame %0
+    process %1 running_detached/0
 
     nop
     nop
 
-    frame ^[(param 0 (ptr 2 1))]
+    frame ^[(param %0 (ptr %2 %1))]
     msg void detach/1
 
     nop
 
     ; reuse pointer creater earlier
-    frame ^[(param 0 2)]
-    msg 3 joinable/1
-    print 3
+    frame ^[(param %0 %2)]
+    msg %3 joinable/1
+    print %3
 
     ; this throws, cannot join detached process
-    join 0 1
+    join %0 %1
 
-    print (strstore 3 "main/1 exited")
+    print (strstore %3 "main/1 exited")
 
-    izero 0
+    izero %0
     return
 .end

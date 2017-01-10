@@ -18,9 +18,9 @@
 ;
 
 .function: main/0
-    frame 0
+    frame %0
     process foo/0
 
-    izero 0
+    izero %0
     return
 .end

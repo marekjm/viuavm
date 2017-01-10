@@ -18,15 +18,15 @@
 ;
 
 .function: sample/2
-    print (arg 1 0)
-    print (arg 1 1)
+    print (arg %1 %0)
+    print (arg %1 %1)
     return
 .end
 
 .function: main/0
-    frame ^[(pamv iota (strstore 1 "Hello World!")) (pamv iota (istore 1 42))]
+    frame ^[(pamv %iota (strstore %1 "Hello World!")) (pamv %iota (istore %1 42))]
     call sample/2
 
-    izero 0
+    izero %0
     return
 .end

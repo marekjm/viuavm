@@ -22,9 +22,9 @@
 .end
 
 .function: main/0
-    frame 0
-    call default foo/0
+    frame %0
+    call %default foo/0
 
-    izero 0
+    izero %0
     return
 .end

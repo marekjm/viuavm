@@ -18,13 +18,13 @@
 ;
 
 .function: main/0
-    strstore (.name: iota value) "bar"
-    strstore (.name: iota key) "foo"
-    insert (new (.name: iota container) Object) key value
+    strstore (.name: %iota value) "bar"
+    strstore (.name: %iota key) "foo"
+    insert (new (.name: %iota container) Object) key value
 
-    remove void container key
-    print container
+    remove void %container %key
+    print %container
 
-    izero 0
+    izero %0
     return
 .end

@@ -18,9 +18,9 @@
 ;
 
 .function: main/0
-    send (self 1) (strstore 2 "Hello World (from self)!")
-    print (receive 2)
+    send (self %1) (strstore %2 "Hello World (from self)!")
+    print (receive %2)
 
-    izero 0
+    izero %0
     return
 .end

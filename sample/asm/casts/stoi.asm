@@ -18,12 +18,12 @@
 ;
 
 .function: main/1
-    strstore 1 "42"
-    istore 2 27
+    strstore %1 "42"
+    istore %2 27
 
-    stoi 3 1
-    print (add int8 3 2 3)
+    stoi %3 %1
+    print (add int8 %3 %2 %3)
 
-    izero 0
+    izero %0
     return
 .end
