@@ -223,7 +223,23 @@ namespace viua {
                 return size_of_instruction_with_two_ri_operands(tokens, i);
             }
             static auto size_of_vpop(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
-                return size_of_instruction_with_three_ri_operands(tokens, i);
+                viua::internals::types::bytecode_size calculated_size = sizeof(viua::internals::types::byte);    // start with the size of a single opcode
+
+                decltype(calculated_size) size_increment = 0;
+
+                // for target register
+                tie(size_increment, i) = size_of_register_index_operand(tokens, i);
+                calculated_size += size_increment;
+
+                // for source register
+                tie(size_increment, i) = size_of_register_index_operand(tokens, i);
+                calculated_size += size_increment;
+
+                calculated_size += sizeof(viua::internals::types::byte);
+                calculated_size += sizeof(viua::internals::types::plain_int);
+                ++i;
+
+                return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
             }
             static auto size_of_vat(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 viua::internals::types::bytecode_size calculated_size = 0;

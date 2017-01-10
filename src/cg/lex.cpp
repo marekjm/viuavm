@@ -1000,7 +1000,7 @@ namespace viua {
                 return inner_target_token;
             }
             static auto get_counter_token(const vector<Token>& subtokens, const unsigned toplevel_subexpressions) -> Token {
-                return Token{subtokens.at(0).line(), subtokens.at(0).character(), str::stringify(toplevel_subexpressions, false)};
+                return Token{subtokens.at(0).line(), subtokens.at(0).character(), ('%' + str::stringify(toplevel_subexpressions, false))};
             }
             vector<Token> unwrap_lines(vector<Token> input_tokens, bool full) {
                 decltype(input_tokens) unwrapped_tokens;

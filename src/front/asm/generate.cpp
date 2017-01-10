@@ -236,7 +236,7 @@ static viua::internals::types::bytecode_size assemble_instruction(Program& progr
         program.opvpush(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
     } else if (tokens.at(i) == "vpop") {
         Token vec = tokens.at(i+1), dst = tokens.at(i+2), pos = tokens.at(i+3);
-        program.opvpop(assembler::operands::getint(resolveregister(vec)), assembler::operands::getint(resolveregister(dst)), assembler::operands::getint(resolveregister(pos)));
+        program.opvpop(assembler::operands::getint(resolveregister(vec)), assembler::operands::getint(resolveregister(dst)), assembler::operands::getint(resolveregister(pos, true), true));
     } else if (tokens.at(i) == "vat") {
         Token vec = tokens.at(i+1), dst = tokens.at(i+2), pos = tokens.at(i+3);
         if (pos == "\n") { pos = Token(dst.line(), dst.character(), "-1"); }

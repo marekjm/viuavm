@@ -489,8 +489,8 @@ void assembler::verify::framesHaveNoGaps(const vector<Token>& tokens) {
         if (tokens.at(i) == "param" or tokens.at(i) == "pamv") {
             unsigned long slot_index;
             bool detected_slot_index = false;
-            if (str::isnum(tokens.at(i+1))) {
-                slot_index = stoul(tokens.at(i+1));
+            if (str::isnum(tokens.at(i+1).str().substr(1))) {
+                slot_index = stoul(tokens.at(i+1).str().substr(1));
                 detected_slot_index = true;
             }
             if (detected_slot_index and detected_frame_parameters_count and slot_index >= frame_parameters_count) {
