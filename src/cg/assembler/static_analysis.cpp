@@ -286,7 +286,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             continue;
         }
         if (token == ".unused:") {
-            registers.unused(body_tokens.at(i+1));
+            registers.unused(strip_access_mode_sigil(body_tokens.at(i+1)));
             i = skip_till_next_line(body_tokens, i);
             continue;
         }
