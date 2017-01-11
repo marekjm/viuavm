@@ -22,7 +22,7 @@
     ptr (.name: %iota pointer) (new (.name: %iota container) Object)
     strstore (.name: %iota key) "foo"
 
-    insert *pointer key value
+    insert *pointer %key %value
 
     print %container
 

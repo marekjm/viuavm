@@ -21,7 +21,7 @@
 ; integer related instructions.
 
 .function: foo/0
-    istore %1 16
+    istore %1 %16
     istore %16 1
 
     print %1
@@ -33,7 +33,7 @@
 .end
 
 .function: main/1
-    frame %0 17
+    frame %0 %17
     call foo/0
     izero %0
     return

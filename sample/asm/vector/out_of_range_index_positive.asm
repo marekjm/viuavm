@@ -24,7 +24,7 @@
     vpush %1 (istore %0 2)
     vpush %1 (istore %0 3)
 
-    vinsert %1 (istore %0 4) 5
+    vinsert %1 (istore %0 4) %5
 
     izero %0
     return

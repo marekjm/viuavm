@@ -20,7 +20,7 @@
 .function: main/0
     strstore (.name: %iota value) "bar"
     strstore (.name: %iota key) "foo"
-    insert (new (.name: %iota container) Object) key value
+    insert (new (.name: %iota container) Object) %key %value
 
     remove void %container %key
     print %container

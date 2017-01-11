@@ -29,7 +29,7 @@
     ; FIXME: static checking of capture* and closure combos to ensure that
     ; there is always a closure before any "closing" happens
     closure %2 foo/0
-    capture %2 1
+    capture %2 %1
 
     izero %0
     return

@@ -18,7 +18,7 @@
 ;
 
 .function: foo/1
-    print (arg %default %0)
+    print (arg default %0)
     return
 .end
 

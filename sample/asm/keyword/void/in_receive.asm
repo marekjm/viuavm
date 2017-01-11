@@ -18,7 +18,7 @@
 ;
 
 .function: sender/1
-    send (arg (.name: %iota pid) 0) (strstore %iota "Hello World!")
+    send (arg (.name: %iota pid) %0) (strstore %iota "Hello World!")
     return
 .end
 

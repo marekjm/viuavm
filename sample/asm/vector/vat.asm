@@ -19,12 +19,12 @@
 
 .function: main/1
     vec (.name: %iota a_vector)
-    print (vlen (.name: %iota length) a_vector)
+    print (vlen (.name: %iota length) %a_vector)
 
     vpush %a_vector (strstore %iota "Hello World!")
     print (vlen %length %a_vector)
 
-    vat (.name: %iota something) a_vector -1
+    vat (.name: %iota something) %a_vector -1
     print (vlen %length %a_vector)
 
     print *something

@@ -21,7 +21,7 @@
     ptr (.name: %iota pointer) (vec (.name: %iota container))
     istore (.name: %iota value) 0
 
-    vinsert *pointer value
+    vinsert *pointer %value
     print %container
 
     izero %0

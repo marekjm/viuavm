@@ -18,9 +18,9 @@
 ;
 
 .function: watchdog_process/1
-    arg (.name: %iota death_message) 0
-    remove (.name: %iota exception) 1 (strstore %exception "exception")
-    remove (.name: %iota aborted_function) 1 (strstore %aborted_function "function")
+    arg (.name: %iota death_message) %0
+    remove (.name: %iota exception) %1 (strstore %exception "exception")
+    remove (.name: %iota aborted_function) %1 (strstore %aborted_function "function")
 
     echo (strstore (.name: %iota message) "[WARNING] process '")
     echo %aborted_function

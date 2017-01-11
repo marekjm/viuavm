@@ -18,8 +18,8 @@
 ;
 
 .function: add/2
-    %arg (.name: %iota lhs) 0
-    arg (.name: %iota rhs) 0
+    arg (.name: %iota lhs) %0
+    arg (.name: %iota rhs) %0
 
     add int64 %0 %lhs %rhs
 
@@ -27,8 +27,8 @@
 .end
 
 .function: multiply/2
-    arg (.name: %iota lhs) 0
-    arg (.name: %iota rhs) 0
+    arg (.name: %iota lhs) %0
+    arg (.name: %iota rhs) %0
 
     mul int64 %0 %lhs %rhs
 
@@ -37,7 +37,7 @@
 
 .function: main/0
     function (.name: %iota adder) add/2
-    %function (.name: %iota multipler) multiply/2
+    function (.name: %iota multipler) multiply/2
 
     istore (.name: %iota one) 1
 

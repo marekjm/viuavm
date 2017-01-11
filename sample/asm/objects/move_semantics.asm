@@ -30,7 +30,7 @@
 
     ; insert and remove
     ; just to test move semantics
-    remove %4 (insert %1 %key %2) key
+    remove %4 (insert %1 %key %2) %key
 
     ; print object used as attribute value
     ; after it was removed 

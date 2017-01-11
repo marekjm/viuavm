@@ -18,10 +18,10 @@
 ;
 
 .function: watchdog_process/1
-    arg (.name: %iota death_message) 0
-    remove (.name: %iota exception) 1 (strstore %exception "exception")
-    remove (.name: %iota aborted_function) 1 (strstore %aborted_function "function")
-    remove (.name: %iota parameters) 1 (strstore %parameters "parameters")
+    arg (.name: %iota death_message) %0
+    remove (.name: %iota exception) %1 (strstore %exception "exception")
+    remove (.name: %iota aborted_function) %1 (strstore %aborted_function "function")
+    remove (.name: %iota parameters) %1 (strstore %parameters "parameters")
 
     .name: %iota message
     echo (strstore %message "[WARNING] process '")
@@ -61,8 +61,8 @@
 .end
 
 .function: formatting/2
-    arg (.name: %iota divide_what) 0
-    arg (.name: %iota divide_by) 1
+    arg (.name: %iota divide_what) %0
+    arg (.name: %iota divide_by) %1
 
     strstore (.name: %iota format_string) "#{0} / #{1}"
     frame ^[(param %0 %format_string) (param %1 %divide_what) (param %2 %divide_by)]

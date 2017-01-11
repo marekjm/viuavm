@@ -18,7 +18,7 @@
 ;
 
 .function: main/1
-    vinsert (vinsert (vinsert (vinsert (vec %1) (strstore %5 "sheep!")) (strstore %2 "Hurr")) (strstore %3 "durr") 1) (strstore %4 "Im'a") 2
+    vinsert (vinsert (vinsert (vinsert (vec %1) (strstore %5 "sheep!")) (strstore %2 "Hurr")) (strstore %3 "durr") %1) (strstore %4 "Im'a") %2
 
     ; this works OK
     ; this instruction is here for debugging - uncomment it to see the vector

@@ -26,7 +26,7 @@
     ptr (.name: %iota pointer) (strstore (.name: %iota o) "Hello World!")
 
     closure (.name: %iota cl) printer/0
-    capturecopy %cl 1 *pointer
+    capturecopy %cl %1 *pointer
 
     frame %0
     fcall void %cl

@@ -18,7 +18,7 @@
 ;
 
 .function: watchdog_process/1
-    arg (.name: %iota death_message) 0
+    arg (.name: %iota death_message) %0
 
     .name: %iota exception
     remove %exception %1 (strstore %exception "exception")
