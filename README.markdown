@@ -14,17 +14,31 @@
 #### Hello World in Viua VM
 
 ```
+; Main function of the program, automatically invoked by the VM.
+; It must be present in every executable file.
+; Valid main functions are main/0, main/1 and main/2.
+;
 .function: main/0
-    ; store string "Hello World!" in register 1
-    strstore 1 "Hello World!"
+    ; Store string in register with index 1.
+    ; The strstore instruction has two operands, and
+    ; shares operand order with majority of other instructions:
+    ;
+    ;   <mnemonic> <target> <source>...
+    ;
+    strstore %1 "Hello World!"
 
-    ; print contents of register 1
-    print 1
+    ; Print contents of a register to standard output.
+    ; This is the most primitive form of output the VM supports, and
+    ; should be used only in the simplest programs and
+    ; for quick-and-dirty debugging.
+    print %1
 
-    ; set exit code
-    ; return values are stored in zeroeth register
-    izero 0
-    ; and return from the main function
+    ; The finishing sequence of every program running on Viua.
+    ;
+    ; Register 0 is used to store return value of a function, and
+    ; the assembler will enforce that it is set to integer 0 for main
+    ; function.
+    izero %0
     return
 .end
 ```
