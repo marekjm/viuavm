@@ -18,19 +18,19 @@
 ;
 
 .function: watchdog_process/1
-    arg (.name: iota death_message) 0
+    arg (.name: %iota death_message) %0
 
-    .name: iota exception
-    remove exception 1 (strstore exception "exception")
+    .name: %iota exception
+    remove %exception %1 (strstore %exception "exception")
 
-    .name: iota aborted_function
-    remove aborted_function 1 (strstore aborted_function "function")
+    .name: %iota aborted_function
+    remove %aborted_function %1 (strstore %aborted_function "function")
 
-    echo (strstore (.name: iota message) "process spawned with <")
-    echo aborted_function
-    echo (strstore message "> killed by >>>")
-    echo exception
-    print (strstore message "<<<")
+    echo (strstore (.name: %iota message) "process spawned with <")
+    echo %aborted_function
+    echo (strstore %message "> killed by >>>")
+    echo %exception
+    print (strstore %message "<<<")
 
     return
 .end
@@ -69,7 +69,7 @@
     nop
     nop
     nop
-    throw (istore 1 42)
+    throw (istore %1 42)
     return
 .end
 
@@ -78,9 +78,9 @@
 
     watchdog watchdog_process/1
 
-    frame 0
+    frame %0
     process void broken_process/0
 
-    izero 0
+    izero %0
     return
 .end

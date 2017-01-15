@@ -19,13 +19,13 @@
 
 .function: is_divisible_by/1
     .name: 2 bound_variable
-    arg 1 0
+    arg %1 %0
 
     .mark: loop_begin
-    if (lt int64 3 1 bound_variable) loop_end loop_body
+    if (lt int64 %3 %1 %bound_variable) loop_end loop_body
 
     .mark: loop_body
-    sub int64 1 1 bound_variable
+    sub int64 %1 %1 %bound_variable
     jump loop_begin
 
     .mark: loop_end
@@ -33,14 +33,14 @@
     ; make zero "true" and
     ; non-zero values "false"
     ; FIXME: find out why `not (move 0 1)` causes memory leak
-    not (copy 0 1)
+    not (copy %0 %1)
     return
 .end
 
 .function: is_divisible_by_2/0
-    closure 1 is_divisible_by/1
-    capturemove 1 2 (istore 2 2)
-    move 0 1
+    closure %1 is_divisible_by/1
+    capturemove %1 %2 (istore %2 2)
+    move %0 %1
     return
 .end
 
@@ -49,63 +49,63 @@
     ; it takes two arguments:
     ;   * a filtering function,
     ;   * a vector with values to be filtered,
-    arg 1 0
-    arg 2 1
+    arg %1 %0
+    arg %2 %1
 
     ; vector for filtered values
-    vec 3
+    vec %3
 
     ; initial loop counter and
     ; loop termination variable
-    izero 4
-    vlen 5 2
+    izero %4
+    vlen %5 %2
 
     ; while (...) {
     .mark: loop_begin
-    if (gte int64 6 4 5) loop_end
+    if (gte int64 %6 %4 %5) loop_end
 
     ; call filtering function to determine whether current element
     ; is a valid value
-    frame ^[(param 0 *(vat 7 2 @4))] 0
-    fcall 8 1
+    frame ^[(param %0 *(vat %7 %2 @4))] %0
+    fcall %8 %1
 
     ; if the result from filtering function was "true" - the element should be pushed onto result vector
     ; it it was "false" - skip to next iteration
-    if 8 element_ok next_iter
+    if %8 element_ok next_iter
 
     .mark: element_ok
-    vpush 3 *7
+    vpush %3 *7
 
     .mark: next_iter
 
     ; increase the counter and go back to the beginning of the loop
     ;     ++i;
     ; }
-    iinc 4
+    iinc %4
     jump loop_begin
 
     .mark: loop_end
 
     ; move result vector into return register
-    move 0 3
+    move %0 %3
     return
 .end
 
 .function: main/1
-    vpush (vec 1) (istore 2 1)
-    vpush 1 (istore 2 2)
-    vpush 1 (istore 2 3)
-    vpush 1 (istore 2 4)
-    vpush 1 (istore 2 5)
+    vpush (vec %1) (istore %2 1)
+    vpush %1 (istore %2 2)
+    vpush %1 (istore %2 3)
+    vpush %1 (istore %2 4)
+    vpush %1 (istore %2 5)
 
-    print 1
+    print %1
 
-    frame 0
-    call 3 is_divisible_by_2/0
+    frame %0
+    call %3 is_divisible_by_2/0
 
-    frame ^[(param 0 3) (pamv 1 1)]
-    print (call 4 filter_closure/2)
+    frame ^[(param %0 %3) (pamv %1 %1)]
+    print (call %4 filter_closure/2)
 
-    izero 0
+    izero %0
     return
 .end

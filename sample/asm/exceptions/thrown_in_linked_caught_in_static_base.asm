@@ -20,21 +20,21 @@
 .signature: test_module::test_fun/0
 
 .block: try_calling
-    frame 0
+    frame %0
     call test_module::test_fun/0
     leave
 .end
 .block: handle_Integer
-    draw 1
-    echo (strstore 2 "looks ")
+    draw %1
+    echo (strstore %2 "looks ")
 
-    if 1 +2
-    strstore 2 "truthy"
-    strstore 2 "falsey"
+    if %1 +2
+    strstore %2 "truthy"
+    strstore %2 "falsey"
 
-    echo 2
-    echo (strstore 2 ": ")
-    print 1
+    echo %2
+    echo (strstore %2 ": ")
+    print %1
 
     leave
 .end
@@ -46,6 +46,6 @@
     catch "Integer" handle_Integer
     enter try_calling
 
-    izero 0
+    izero %0
     return
 .end

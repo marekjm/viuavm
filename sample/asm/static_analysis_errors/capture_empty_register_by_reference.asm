@@ -18,8 +18,8 @@
 ;
 
 .function: main/0
-    capture 2 1
+    capture %2 1
 
-    izero 0
+    izero %0
     return
 .end

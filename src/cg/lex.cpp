@@ -307,30 +307,30 @@ namespace viua {
                         tokens.push_back(token);
 
                         if ((not str::isnum(input_tokens.at(i+1).str(), false)) and input_tokens.at(i+1).str() == "\n") {
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "0");
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "16");
+                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "%0");
+                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "%16");
                             continue;
                         }
 
                         tokens.push_back(input_tokens.at(++i));
                         if ((not str::isnum(input_tokens.at(i+1).str(), false)) and input_tokens.at(i+1).str() == "\n") {
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "16");
+                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "%16");
                         }
                     } else if (token == "vec") {
                         tokens.push_back(token);
                         tokens.push_back(input_tokens.at(++i));
 
                         if ((not str::isnum(input_tokens.at(i+1).str(), false)) and input_tokens.at(i+1).str() == "\n") {
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "0"); // starting register
+                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "%0"); // starting register
                             tokens.back().original("\n");
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "0"); // number of registers to pack
+                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "%0"); // number of registers to pack
                             tokens.back().original("\n");
                             continue;
                         }
 
                         tokens.push_back(input_tokens.at(++i)); // starting register
                         if ((not str::isnum(input_tokens.at(i+1).str(), false)) and input_tokens.at(i+1).str() == "\n") {
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "0"); // number of registers to pack
+                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "%0"); // number of registers to pack
                             tokens.back().original("\n");
                         }
                     } else if (token == "vpop") {
@@ -338,7 +338,7 @@ namespace viua {
                         tokens.push_back(input_tokens.at(++i));
 
                         if ((not str::isnum(input_tokens.at(i+1).str(), false)) and input_tokens.at(i+1).str() == "\n") {
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "0");
+                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "%0");
                             tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "-1");
                             continue;
                         }
@@ -353,7 +353,7 @@ namespace viua {
                         tokens.push_back(input_tokens.at(++i));
 
                         if (input_tokens.at(i+1).str() == "\n") {
-                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "0");
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "%0");
                         }
                     } else if (token == "join") {
                         tokens.push_back(token);
@@ -774,7 +774,11 @@ namespace viua {
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
                     const auto t = input_tokens.at(i);
 
-                    if (i+1 < limit and t.str() == "@" and input_tokens.at(i+1).str() != "\n" and is_valid_register_id(input_tokens.at(i+1))) {
+                    if (i+1 < limit and t.str() == "%" and input_tokens.at(i+1).str() != "\n" and is_valid_register_id(input_tokens.at(i+1))) {
+                        tokens.emplace_back(t.line(), t.character(), (t.str() + input_tokens.at(i+1).str()));
+                        ++i;
+                        continue;
+                    } else if (i+1 < limit and t.str() == "@" and input_tokens.at(i+1).str() != "\n" and is_valid_register_id(input_tokens.at(i+1))) {
                         tokens.emplace_back(t.line(), t.character(), (t.str() + input_tokens.at(i+1).str()));
                         ++i;
                         continue;
@@ -996,7 +1000,7 @@ namespace viua {
                 return inner_target_token;
             }
             static auto get_counter_token(const vector<Token>& subtokens, const unsigned toplevel_subexpressions) -> Token {
-                return Token{subtokens.at(0).line(), subtokens.at(0).character(), str::stringify(toplevel_subexpressions, false)};
+                return Token{subtokens.at(0).line(), subtokens.at(0).character(), ('%' + str::stringify(toplevel_subexpressions, false))};
             }
             vector<Token> unwrap_lines(vector<Token> input_tokens, bool full) {
                 decltype(input_tokens) unwrapped_tokens;
@@ -1033,7 +1037,13 @@ namespace viua {
                             unwrap_subtokens(unwrapped_tokens, subtokens, t);
                             push_unwrapped_lines(invert, inner_target_token, final_tokens, unwrapped_tokens, input_tokens, i);
                             if ((not invert) and full) {
-                                final_tokens.push_back(inner_target_token);
+                                if (final_tokens.back().str() == "*") {
+                                    final_tokens.pop_back();
+                                    final_tokens.emplace_back(inner_target_token.line(), inner_target_token.character(), ('*' + inner_target_token.str().substr(1)));
+                                    final_tokens.back().original(inner_target_token.str());
+                                } else {
+                                    final_tokens.push_back(inner_target_token);
+                                }
                             }
                         }
                         if (t == "[") {
@@ -1095,6 +1105,9 @@ namespace viua {
                     if (token == "iota") {
                         tokens.emplace_back(token.line(), token.character(), str::stringify(iotas.back()++, false));
                         tokens.back().original("iota");
+                    } else if ((token.str().at(0) == '%' or token.str().at(0) == '@' or token.str().at(0) == '*') and token.str().substr(1) == "iota") {
+                        tokens.emplace_back(token.line(), token.character(), (token.str().at(0) + str::stringify(iotas.back()++, false)));
+                        tokens.back().original(token);
                     } else {
                         tokens.push_back(token);
                     }
@@ -1191,9 +1204,13 @@ namespace viua {
 
                     if (token == ".name:") {
                         Token name = input_tokens.at(i+2);
-                        Token index = input_tokens.at(i+1);
+                        string index = input_tokens.at(i+1).str();
 
                         assert_is_not_reserved_keyword(name, "register name");
+
+                        if ((index.at(0) == '%' or index.at(0) == '@' or index.at(0) == '*') and str::isnum(index.substr(1), false)) {
+                            index = index.substr(1);
+                        }
 
                         if (not str::isnum(index)) {
                             throw viua::cg::lex::InvalidSyntax(input_tokens.at(i+1), ("invalid register index: " + str::strencode(name) + " := " + str::enquote(str::strencode(index))));
@@ -1212,6 +1229,9 @@ namespace viua {
                         tokens.back().original(token.str().substr(1));
                     } else if (token.str().at(0) == '*' and names.count(token.str().substr(1))) {
                         tokens.emplace_back(token.line(), token.character(), ("*" + names.at(token.str().substr(1))));
+                        tokens.back().original(token.str().substr(1));
+                    } else if (token.str().at(0) == '%' and names.count(token.str().substr(1))) {
+                        tokens.emplace_back(token.line(), token.character(), ("%" + names.at(token.str().substr(1))));
                         tokens.back().original(token.str().substr(1));
                     } else {
                         tokens.push_back(token);

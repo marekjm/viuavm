@@ -18,8 +18,8 @@
 ;
 
 .function: main/0
-    stoi 2 1
+    stoi %2 %1
 
-    izero 0
+    izero %0
     return
 .end

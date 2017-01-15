@@ -18,10 +18,10 @@
 ;
 
 .function: main/0
-    ptr (.name: iota pointer_to_a) (istore (.name: iota a) 0)
+    ptr (.name: %iota pointer_to_a) (istore (.name: %iota a) 0)
 
-    print (not iota *pointer_to_a)
+    print (not %iota *pointer_to_a)
 
-    izero 0
+    izero %0
     return
 .end

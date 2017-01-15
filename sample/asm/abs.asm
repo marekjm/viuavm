@@ -24,22 +24,22 @@
 ; the purpose of this program is to find an absolute value of an integer
 
 .function: main/1
-    .name: iota number
-    .name: iota zero
-    .name: iota is_negative
+    .name: %iota number
+    .name: %iota zero
+    .name: %iota is_negative
 
     ; store the int, of which we want to get an absolute value
-    istore number -17
+    istore %number -17
 
     ; if the int is less than zero, multiply it by -1
     ; else, branch directly to print instruction
     ; the negation of boolean is just to use short form of branch
     ; instruction - this construction starts emerging as a pattern...
-    if (not (lt int64 is_negative number (istore zero 0))) final_print
-    mul int64 number (istore iota -1)
+    if (not (lt int64 %is_negative %number (istore %zero 0))) final_print
+    mul int64 %number (istore %iota -1)
 
     .mark: final_print
-    print number
-    izero 0
+    print %number
+    izero %0
     return
 .end

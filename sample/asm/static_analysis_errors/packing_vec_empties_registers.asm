@@ -18,14 +18,14 @@
 ;
 
 .function: main/0
-    strstore 1 "Hello World!"
-    istore 2 42
+    strstore %1 "Hello World!"
+    istore %2 42
 
-    vec 3 1 2
+    vec %3 %1 %2
 
-    print 1
-    print 2
+    print %1
+    print %2
 
-    izero 0
+    izero %0
     return
 .end

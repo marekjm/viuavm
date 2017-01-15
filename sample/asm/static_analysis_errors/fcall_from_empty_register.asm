@@ -18,9 +18,9 @@
 ;
 
 .function: main/0
-    frame 0
-    fcall void 1
+    frame %0
+    fcall void %1
 
-    izero 0
+    izero %0
     return
 .end

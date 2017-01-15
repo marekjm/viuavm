@@ -29,49 +29,49 @@
     ; it takes two arguments:
     ;   * a filtering function,
     ;   * a vector with values to be filtered,
-    arg 1 0
-    arg 2 1
+    arg %1 %0
+    arg %2 %1
 
     ; vector for filtered values
-    vec 3
+    vec %3
 
     ; initial loop counter and
     ; loop termination variable
-    izero 4
-    vlen 5 2
+    izero %4
+    vlen %5 %2
 
     ; while (...) {
     .mark: loop_begin
-    if (gte int64 6 4 5) loop_end loop_body
+    if (gte int64 %6 %4 %5) loop_end loop_body
 
     .mark: loop_body
 
     ; call filtering function to determine whether current element
     ; is a valid value
-    frame 1
-    vat 7 2 @4
-    param 0 7
-    fcall 8 1
+    frame %1
+    vat %7 %2 @4
+    param %0 %7
+    fcall %8 %1
 
     ; if the result from filtering function was "true" - the element should be pushed onto result vector
     ; it it was "false" - skip to next iteration
-    if 8 element_ok next_iter
+    if %8 element_ok next_iter
 
     .mark: element_ok
-    vpush 3 7
+    vpush %3 %7
 
     .mark: next_iter
 
     ; increase the counter and go back to the beginning of the loop
     ;     ++i;
     ; }
-    iinc 4
+    iinc %4
     jump loop_begin
 
     .mark: loop_end
 
     ; move result vector into return register
-    move 0 3
+    move %0 %3
     return
 .end
 
@@ -81,28 +81,28 @@
     ;       * a closure, or a function object to call,
     ;       * a vector of values that will be supplied as parameters to given callback,
     ;
-    arg (.name: iota callback) 0
-    arg (.name: iota list) 1
+    arg (.name: %iota callback) %0
+    arg (.name: %iota list) %1
 
     ; setup loop counter and
     ; loop termination variable
-    izero (.name: iota counter)
-    vlen (.name: iota list_length) list
+    izero (.name: %iota counter)
+    vlen (.name: %iota list_length) %list
 
     ; loop condition
     .mark: loop_begin
-    if (lt int64 iota counter list_length) loop_body loop_end
+    if (lt int64 %iota %counter %list_length) loop_body loop_end
 
     .mark: loop_body
 
     ; extract parameter value
-    vat (.name: iota element) list @counter
+    vat (.name: %iota element) %list @counter
 
     ; invoke given callback
-    frame ^[(param 0 element)]
-    fcall void callback
+    frame ^[(param %0 %element)]
+    fcall void %callback
 
-    iinc counter
+    iinc %counter
     jump loop_begin
 
     .mark: loop_end
@@ -117,56 +117,57 @@
     ; then, it maps (i.e. calls) the given function on every element of given vector
     ; and returns a vector containing modified values.
     ; returned vector is a newly created one - this function does not modify vectors in place.
-    arg 1 0
-    arg 2 1
+    arg %1 %0
+    arg %2 %1
 
     ; new vector to store mapped values
-    vec 3
+    vec %3
 
     ; set initial counter value and
     ; loop termination variable
-    izero 4
-    vlen 5 2
+    izero %4
+    vlen %5 %2
 
     ; while (...) {
     .mark: loop_begin
-    gte int64 6 4 5
-    if 6 loop_end loop_body
+    gte int64 %6 %4 %5
+    if %6 loop_end loop_body
 
     .mark: loop_body
 
     ; call supplied function on current element
-    frame 1
-    vat 7 2 @4
-    param 0 7
-    fcall 8 1
+    frame %1
+    vat %7 %2 @4
+    param %0 %7
+    fcall %8 %1
 
     ; push result to new vector
-    vpush 3 8
+    vpush %3 %8
 
     ; increase loop counter and go back to the beginning
     ;     ++i;
     ; }
-    iinc 4
+    iinc %4
     jump loop_begin
 
     .mark: loop_end
 
     ; move vector with mapped values to the return register
-    move 0 3
+    move %0 %3
     return
 .end
 
 .block: std::functional::apply::__try_calling
-    frame 1
-    param 0 2
-    fcall 3 1
-    move 0 3
+    ; FIXME refactor this to use ^[] syntax
+    frame %1
+    param %0 %2
+    fcall %3 %1
+    move %0 %3
     leave
 .end
 .block: std::functional::apply::__catch
     ; just ignore the error if the function didn't return a value
-    delete (draw 4)
+    delete (draw %4)
     leave
 .end
 .function: std::functional::apply/2
@@ -174,17 +175,17 @@
     ;
     ; this function is type agnostic
     ; it just passes the parameter without additional processing
-    .name: 1 func
-    .name: 2 parameter
+    .name: %1 func
+    .name: %2 parameter
 
     ; extract the parameters
-    arg func 0
-    arg parameter 1
+    arg %func %0
+    arg %parameter %1
 
     ; apply the function to the parameter...
-    ;frame 1
-    ;param 0 parameter
-    ;fcall 3 func
+    ;frame %1
+    ;param %0 parameter
+    ;fcall %3 func
     try
     catch "Exception" std::functional::apply::__catch
     enter std::functional::apply::__try_calling
@@ -200,37 +201,37 @@
     ; it then creates a frame with required number of parameter slots (as
     ; specified by length of the vector), and calls given function with this
     ; frame
-    arg 1 0
-    arg 2 1
+    arg %1 %0
+    arg %2 %1
 
     ; take length of the vector
-    .name: 4 vector_length
-    vlen vector_length 2
+    .name: %4 vector_length
+    vlen %vector_length %2
     frame @vector_length
 
     ; zero loop counter
-    .name: 3 loop_counter
-    izero loop_counter
+    .name: %3 loop_counter
+    izero %loop_counter
     .mark: while_begin
 
     ; simple condition:
     ; while (loop_counter < vector_length) {
-    .name: 5 loop_condition
-    gte int64 loop_condition loop_counter vector_length
-    if loop_condition while_end while_body
+    .name: %5 loop_condition
+    gte int64 %loop_condition %loop_counter %vector_length
+    if %loop_condition while_end while_body
 
     .mark: while_body
 
     ; store item located inside parameter vector at index denoted by loop_counter in
     ; a register
-    .name: 7 slot
-    vat slot 2 @loop_counter
+    .name: %7 slot
+    vat %slot %2 @loop_counter
 
     ; add parameter
-    param @loop_counter slot
+    param @loop_counter %slot
 
     ; loop_counter++
-    iinc loop_counter
+    iinc %loop_counter
 
     jump while_begin
 
@@ -238,7 +239,7 @@
 
     ; finally, after the frame is ready
     ; call the function
-    fcall 8 1
-    move 0 8
+    fcall %8 %1
+    move %0 %8
     return
 .end

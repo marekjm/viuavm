@@ -21,7 +21,7 @@
 
 .function: dummy/0
     ; this function is here to stress jump calculation
-    izero 0
+    izero %0
     return
 .end
 
@@ -32,40 +32,40 @@
     .name: 6 result
 
     ; store operands of the power-of operation
-    arg base 0
+    arg %base %0
 
     ; if the exponent is equal to zero, store 1 in first register and jump to print
     ; invert so short form of branch instruction can be used
-    if (not (eq int64 4 (arg exponent 1) (izero zero))) algorithm
-    istore result 1
+    if (not (eq int64 %4 (arg %exponent %1) (izero %zero))) algorithm
+    istore %result 1
     jump final
 
     ; now, we multiply in a loop
     .mark: algorithm
     .name: 5 counter
-    istore counter 1
+    istore %counter 1
     ; in register 6, store the base of power as
     ; we will need it for multiplication
-    copy result base
+    copy %result %base
 
     .mark: loop
-    if (lt int64 4 counter exponent) 12 final
-    mul int64 result result base
+    if (lt int64 %4 %counter %exponent) 12 final
+    mul int64 %result %result %base
     nop
-    iinc counter
+    iinc %counter
     jump loop
 
     ; final instructions
     .mark: final
     ; return result
-    move 0 result
+    move %0 %result
     return
 .end
 
 .function: main/1
-    frame ^[(param 0 (istore 1 4)) (param 1 (istore 2 3))]
-    print (call 1 power_of/2)
+    frame ^[(param %0 (istore %1 4)) (param %1 (istore %2 3))]
+    print (call %1 power_of/2)
 
-    izero 0
+    izero %0
     return
 .end

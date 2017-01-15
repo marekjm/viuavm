@@ -18,9 +18,9 @@
 ;
 
 .function: main/0
-    frame ^[(pamv 0 (new 1 Object))]
+    frame ^[(pamv %0 (new %1 Object))]
     msg void foo/x
 
-    izero 0
+    izero %0
     return
 .end

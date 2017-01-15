@@ -18,9 +18,9 @@
 ;
 
 .function: main/1
-    frame 0
+    frame %0
     msg void foo
 
-    izero 0
+    izero %0
     return
 .end

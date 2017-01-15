@@ -18,8 +18,8 @@
 ;
 
 .function: main/0
-    print (istore iota default)
+    print (istore %iota default)
 
-    izero 0
+    izero %0
     return
 .end

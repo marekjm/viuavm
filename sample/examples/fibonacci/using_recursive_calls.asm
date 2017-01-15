@@ -19,30 +19,30 @@
 
 .function: fibonacci/1
     .name: 1 current_value
-    arg current_value 0
+    arg %current_value %0
 
-    if current_value +1 fibonacci/1__finished
+    if %current_value +1 fibonacci/1__finished
 
-    frame ^[(pamv 0 (idec (copy 2 current_value)))]
-    call 2 fibonacci/1
+    frame ^[(pamv %0 (idec (copy %2 %current_value)))]
+    call %2 fibonacci/1
 
-    add int64 current_value 2
+    add int64 %current_value %2
 
     .mark: fibonacci/1__finished
-    move 0 current_value
+    move %0 %current_value
     return
 .end
 
 .function: main/0
     .name: 1 result
 
-    istore result 5
+    istore %result 5
 
-    frame ^[(pamv 0 result)]
-    call result fibonacci/1
+    frame ^[(pamv %0 %result)]
+    call %result fibonacci/1
 
-    print result
+    print %result
 
-    izero 0
+    izero %0
     return
 .end

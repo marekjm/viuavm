@@ -18,8 +18,8 @@
 ;
 
 .function: main/0
-    vat 2 1 0
+    vat %2 %1 0
 
-    izero 0
+    izero %0
     return
 .end

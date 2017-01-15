@@ -18,8 +18,8 @@
 ;
 
 .function: main/0
-    print (tmpri (izero 1))
+    print (tmpri (izero %1))
 
-    izero 0
+    izero %0
     return
 .end

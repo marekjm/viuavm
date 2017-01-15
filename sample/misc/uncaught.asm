@@ -18,8 +18,8 @@
 ;
 
 .block: this_throws
-    istore 1 42
-    throw 1
+    istore %1 42
+    throw %1
     leave
 .end
 
@@ -27,6 +27,6 @@
     try
     enter this_throws
 
-    izero 0
+    izero %0
     return
 .end

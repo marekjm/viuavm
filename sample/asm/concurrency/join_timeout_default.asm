@@ -19,23 +19,23 @@
 
 .function: child_process/1
     .name: 1 counter
-    if (idec (arg counter 0)) +1 end_this
-    frame ^[(pamv 0 counter)]
+    if (idec (arg %counter %0)) +1 end_this
+    frame ^[(pamv %0 %counter)]
     tailcall child_process/1
     .mark: end_this
-    strstore 0 "child process done"
+    strstore %0 "child process done"
     return
 .end
 .function: child_process/0
-    frame ^[(pamv 0 (istore 1 65536))]
+    frame ^[(pamv %0 (istore %1 65536))]
     tailcall child_process/1
     return
 .end
 
 .function: main/0
-    frame 0
-    process 1 child_process/0
-    print (join 2 1)
-    izero 0
+    frame %0
+    process %1 child_process/0
+    print (join %2 %1)
+    izero %0
     return
 .end

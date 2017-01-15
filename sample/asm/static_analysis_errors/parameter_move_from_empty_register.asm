@@ -22,10 +22,10 @@
 .end
 
 .function: main/0
-    frame 1
-    pamv 0 1
+    frame %1
+    pamv %0 %1
     call foo/1
 
-    izero 0
+    izero %0
     return
 .end

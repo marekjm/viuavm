@@ -19,57 +19,59 @@
 
 .function: closure_printer/0
     ; it has to be 2, because 2 register has been bound
-    print 2
+    print %2
     return
 .end
 
 .function: closure_setter/1
-    arg 1 0
+    arg %1 %0
 
     ; overwrite bound value with whatever we got
-    copy 2 1
+    copy %2 %1
     return
 .end
 
 .function: returns_closures/0
     ; create a vector to store closures
-    vec 1
+    vec %1
 
     ; create a value to be bound in both closures
-    istore 2 42
+    istore %2 42
 
     ; create two closures binding the same variable
     ; presto, we have two functions that are share some state
-    closure 3 closure_printer/0
-    capture 3 2 2
+    closure %3 closure_printer/0
+    capture %3 %2 %2
 
-    closure 4 closure_setter/1
-    capture 4 2 2
+    closure %4 closure_setter/1
+    capture %4 %2 %2
 
     ; push closures to vector...
-    vpush 1 3
-    vpush 1 4
+    vpush %1 %3
+    vpush %1 %4
 
     ; ...and return the vector
     ; vectors can be used to return multiple values as
     ; they can hold any Type-derived type
-    move 0 1
+    move %0 %1
     return
 .end
 
 .function: main/1
-    frame 0
-    call (.name: iota the_closures) returns_closures/0
+    frame %0
+    call (.name: %iota the_closures) returns_closures/0
 
-    frame 0
-    fcall void *(vat (.name: iota printer_closure) the_closures 0)
-
-    frame ^[(param 0 (istore iota 69))]
-    fcall void *(vat (.name: iota setter_closure) the_closures 1)
-
-    frame 0
+    frame %0
+    vat (.name: %iota printer_closure) %the_closures 0
     fcall void *printer_closure
 
-    izero 0
+    frame ^[(param %0 (istore %iota 69))]
+    vat (.name: %iota setter_closure) %the_closures 1
+    fcall void *setter_closure
+
+    frame %0
+    fcall void *printer_closure
+
+    izero %0
     return
 .end

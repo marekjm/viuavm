@@ -18,8 +18,8 @@
 ;
 
 .function: main/0
-    vinsert (vec 2) 1 0
+    vinsert (vec %2) 1 0
 
-    izero 0
+    izero %0
     return
 .end

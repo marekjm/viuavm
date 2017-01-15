@@ -18,15 +18,15 @@
 ;
 
 .function: main/0
-    .name: iota hello_world 
-    .name: iota forty_two
+    .name: %iota hello_world 
+    .name: %iota forty_two
 
-    strstore hello_world "Hello World!"
-    istore forty_two 42
+    strstore %hello_world "Hello World!"
+    istore %forty_two 42
 
-    print 1 ; should print "Hello World!"
-    print 2 ; should print 42
+    print %1 ; should print "Hello World!"
+    print %2 ; should print 42
 
-    izero 0
+    izero %0
     return
 .end

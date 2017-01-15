@@ -18,13 +18,13 @@
 ;
 
 .function: main/1
-    strstore 1 "Hello"
+    strstore %1 "Hello"
 
-    register (class 2 Foo)
-    new 2 Foo
-    lte int64 3 2 1
-    print 3
+    register (class %2 Foo)
+    new %2 Foo
+    lte int64 %3 %2 %1
+    print %3
 
-    izero 0
+    izero %0
     return
 .end

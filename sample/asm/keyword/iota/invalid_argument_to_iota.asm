@@ -20,6 +20,6 @@
 .function: main/0
     .iota: foo
 
-    izero 0
+    izero %0
     return
 .end

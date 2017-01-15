@@ -22,10 +22,10 @@
 .end
 
 .function: main/0
-    frame 0
-    process 1 child_process/0
-    send 1 2
+    frame %0
+    process %1 child_process/0
+    send %1 %2
 
-    izero 0
+    izero %0
     return
 .end

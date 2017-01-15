@@ -18,8 +18,8 @@
 ;
 
 .function: main/0
-    vinsert 2 (izero 1) 0
+    vinsert %2 (izero %1) 0
 
-    izero 0
+    izero %0
     return
 .end

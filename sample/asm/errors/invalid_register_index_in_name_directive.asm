@@ -20,6 +20,6 @@
 .function: main/0
     .name: bad named_register
 
-    izero 0
+    izero %0
     return
 .end

@@ -56,7 +56,7 @@ namespace viua {
                 if (tokens.at(i) == "void") {
                     calculated_size += sizeof(viua::internals::types::byte);
                     ++i;
-                } else if (str::isnum(tokens.at(i))) {
+                } else if (tokens.at(i).str().at(0) == '%' and str::isnum(tokens.at(i).str().substr(1))) {
                     calculated_size += sizeof(viua::internals::types::byte);
                     calculated_size += sizeof(viua::internals::RegisterSets);
                     calculated_size += sizeof(viua::internals::types::register_index);

@@ -20,6 +20,6 @@
 .function: main/0
     .name: a a_name
 
-    izero 0
+    izero %0
     return
 .end

@@ -18,14 +18,14 @@
 ;
 
 .function: main/0
-    ptr (.name: iota pointer) (istore (.name: iota number) 42)
+    ptr (.name: %iota pointer) (istore (.name: %iota number) 42)
 
     iinc *pointer
-    print number
+    print %number
 
     idec *pointer
-    print number
+    print %number
 
-    izero 0
+    izero %0
     return
 .end

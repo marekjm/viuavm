@@ -19,23 +19,23 @@
 
 .function: set_69/0
     ress global
-    istore 2 69
-    move 0 2
-    move 2 0
+    istore %2 69
+    move %0 %2
+    move %2 %0
     return
 .end
 
 .function: main/1
-    istore 2 42
+    istore %2 42
 
-    frame 0
+    frame %0
     call void set_69/0
-    print 2
+    print %2
 
     ress global
-    print 2
+    print %2
 
     ress local
-    izero 0
+    izero %0
     return
 .end

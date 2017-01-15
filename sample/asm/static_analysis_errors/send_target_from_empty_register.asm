@@ -19,8 +19,8 @@
 
 .function: main/0
     .name: 1 pid
-    send pid (izero 2)  ; note that 'pid' is empty
+    send %pid (izero %2)  ; note that 'pid' is empty
 
-    izero 0
+    izero %0
     return
 .end

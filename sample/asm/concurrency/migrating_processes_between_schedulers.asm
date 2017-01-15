@@ -20,44 +20,44 @@
 .signature: std::misc::cycle/1
 
 .function: print_hello/1
-    frame ^[(pamv 0 (istore 1 64))]
+    frame ^[(pamv %0 (istore %1 64))]
     call std::misc::cycle/1
 
     .name: 2 format_args
-    vec format_args (arg 1 0) 1
+    vec %format_args (arg %1 %0) %1
 
     .name: 1 format_string
-    strstore format_string "Hello #{0}!\n"
+    strstore %format_string "Hello #{0}!\n"
 
-    frame ^[(param 0 format_string) (param 1 format_args)]
-    msg 3 format/
+    frame ^[(param %0 %format_string) (param %1 %format_args)]
+    msg %3 format/
 
-    echo 3
+    echo %3
 
     return
 .end
 
 .function: process_spawner/1
-    frame ^[(pamv 0 (arg 1 0))]
+    frame ^[(pamv %0 (arg %1 %0))]
     process void print_hello/1
     return
 .end
 
 .function: spawn_processes/1
     .name: 1 limit
-    arg limit 0
+    arg %limit %0
 
     -- run until "limit" hits zero
-    if limit +1 spawn_processes/1__epilogue
+    if %limit +1 spawn_processes/1__epilogue
 
-    -- spawn a printer process with current limit value
+    -- spawn a printer process %with current limit value
     -- as its only parameter
-    frame ^[(param 0 limit)]
+    frame ^[(param %0 %limit)]
     call process_spawner/1
-    idec limit
+    idec %limit
 
-    -- tail-recursive call to spawn more printer processes
-    frame ^[(pamv 0 limit)]
+    -- tail-recursive call %to spawn more printer processes
+    frame ^[(pamv %0 %limit)]
     tailcall spawn_processes/1
 
     .mark: spawn_processes/1__epilogue
@@ -66,8 +66,8 @@
 
 .function: main/0
     -- spawn several processes, each printing a different "Hello {number}!"
-    -- the hellos do not have to appear in the order their functions are
-    -- called if there are multiple VP schedulers spawned
+    -- the hellos do not %have %to appear in the order their functions are
+    -- called if %there are multiple VP schedulers spawned
     --
     -- this program is embarrassingly simple - it's just prints, but there is
     -- so many of them that the first VP scheduler starts to feel overwhelmed and
@@ -79,10 +79,10 @@
     link std::misc
 
     .name: 1 limit
-    istore limit 64
-    frame ^[(pamv 0 limit)]
+    istore %limit 64
+    frame ^[(pamv %0 %limit)]
     call spawn_processes/1
 
-    izero 0
+    izero %0
     return
 .end

@@ -19,25 +19,25 @@
 
 .function: variable_changing_function/0
     ; expects register 1 to be an captured object
-    istore 1 42
+    istore %1 42
     return
 .end
 
 .function: main/1
     ; create a closure and capture object in register 1 with it
-    closure 2 variable_changing_function/0
-    capture 2 1 (strstore 1 "Hello World!")
+    closure %2 variable_changing_function/0
+    capture %2 %1 (strstore %1 "Hello World!")
 
     ; should print "Hello World!"
-    print 1
+    print %1
 
     ; call the closure
-    frame 0
-    fcall void 2
+    frame %0
+    fcall void %2
 
     ; should print "42"
-    print 1
+    print %1
 
-    izero 0
+    izero %0
     return
 .end

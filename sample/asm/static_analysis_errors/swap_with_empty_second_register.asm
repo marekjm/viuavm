@@ -18,9 +18,9 @@
 ;
 
 .function: main/0
-    izero 1
-    swap 1 2
+    izero %1
+    swap %1 %2
 
-    izero 0
+    izero %0
     return
 .end

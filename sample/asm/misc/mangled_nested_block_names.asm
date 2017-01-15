@@ -30,6 +30,6 @@
     enter .block: bar
         leave
     .end
-    izero 0
+    izero %0
     return
 .end

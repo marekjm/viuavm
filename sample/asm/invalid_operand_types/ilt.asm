@@ -18,11 +18,11 @@
 ;
 
 .function: main/1
-    strstore 1 "Hello"
-    strstore 2 "World!"
-    lt int64 3 2 1
-    print 3
+    strstore %1 "Hello"
+    strstore %2 "World!"
+    lt int64 %3 %2 %1
+    print %3
 
-    izero 0
+    izero %0
     return
 .end

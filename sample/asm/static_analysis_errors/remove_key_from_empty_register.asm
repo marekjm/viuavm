@@ -22,8 +22,8 @@
     .name: 1 target
     .name: 2 source
     .name: 3 key
-    remove target (new source Object) key
+    remove %target (new %source Object) key
 
-    izero 0
+    izero %0
     return
 .end
