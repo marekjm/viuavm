@@ -219,6 +219,35 @@ Patch submissions and issue reports are both welcome.
 
 Rememeber, though, to provide appropriate test cases with code patches you submit.
 It will be appreciated and will make the merge process faster.
+If you're fixing a bug:
+
+- write a test that will catch the bug should it resurface
+- put comments in the code sample your test uses
+
+If you're implementing a feature:
+
+- provide a positive test (i.e. feature working as intended and performing its function)
+- provide a negative test (i.e. feature generating an error)
+- put comments in the code samples the tests use
+
+In both cases your code must pass the tests on both x86_64 and 64 bit ARM (if you don't have an ARM CPU around
+mention it when submitting a pull request and I'll test on ARM myself).
+Your code must also run clean under Valgrind, which implies:
+
+- no memory leaks
+- no hangs due to multithreading
+- no unprotected reads/writes to memory
+
+Remember - if your code normally runs OK, but behaves strangely under Valgrind it's a sign that there's a problem with your code.
+
+When submitting a patch make sure that it is formatted according to the coding standard:
+
+- long, descriptive variable names are an accepted tradeoff for code clarity (it's better to give variables hilariously descriptive names than
+  to wonder "wtf does this code do" some time later)
+- opening braces on the same line as their `if`s, `while`s, class and function signatures, etc.
+- indent by four spaces
+
+When in doubt, look at surrounding code and infer what should be done.
 
 
 ----
