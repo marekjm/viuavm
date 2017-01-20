@@ -72,7 +72,7 @@ namespace viua {
                     calculated_size += sizeof(viua::internals::types::register_index);
                     ++i;
                 } else {
-                    throw viua::cg::lex::InvalidSyntax(tokens.at(i), "invalid operand token");
+                    throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("invalid operand token: " + tokens.at(i).str()));
                 }
 
                 return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
@@ -408,7 +408,7 @@ namespace viua {
                     calculated_size += sizeof(viua::internals::types::timeout);
                     ++i;
                 } else {
-                    throw viua::cg::lex::InvalidSyntax(tokens.at(i), "invalid operand token");
+                    throw viua::cg::lex::InvalidSyntax(tokens.at(i), "invalid timeout token in 'join'");
                 }
 
                 return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
@@ -425,7 +425,7 @@ namespace viua {
                     calculated_size += sizeof(viua::internals::types::timeout);
                     ++i;
                 } else {
-                    throw viua::cg::lex::InvalidSyntax(tokens.at(i), "invalid operand token");
+                    throw viua::cg::lex::InvalidSyntax(tokens.at(i), "invalid timeout token in 'receive'");
                 }
 
                 return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);

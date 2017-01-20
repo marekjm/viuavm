@@ -66,7 +66,7 @@ static string resolveregister(viua::cg::lex::Token token, const bool allow_bare_
     } else if (allow_bare_integers and str::isnum(reg)) {
         out << reg;
     } else {
-        throw viua::cg::lex::InvalidSyntax(token, "not enough operands");
+        throw viua::cg::lex::InvalidSyntax(token, ("illegal operand: " + token.str()));
     }
     return out.str();
 }

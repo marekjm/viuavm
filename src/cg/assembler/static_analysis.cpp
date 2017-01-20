@@ -149,7 +149,13 @@ static auto strip_access_mode_sigil(string s) -> string {
     return ((s.at(0) == '%' or s.at(0) == '@' or s.at(0) == '*') ? s.substr(1) : s);
 }
 static void check_use_of_register_index(const vector<viua::cg::lex::Token>& tokens, long unsigned i, long unsigned by, string register_index, Registers& registers, map<string, string>& named_registers, const string& message_prefix, const bool allow_direct_access_to_target = true) {
-    string resolved_register_name = resolve_register_name(named_registers, tokens.at(i), register_index, allow_direct_access_to_target);
+    string resolved_register_name;
+    try {
+        resolved_register_name = resolve_register_name(named_registers, tokens.at(i), register_index, allow_direct_access_to_target);
+    } catch (viua::cg::lex::InvalidSyntax& e) {
+        e.add(tokens.at(by));
+        throw e;
+    }
     if (resolved_register_name == "void") {
         auto base_error = viua::cg::lex::InvalidSyntax(tokens.at(i), "use of void as input register:");
         base_error.add(tokens.at(by));
@@ -280,7 +286,7 @@ static auto get_token_index_of_operand(const vector<viua::cg::lex::Token>& token
             ++i;
             --wanted_operand_index;
         } else {
-            throw viua::cg::lex::InvalidSyntax(tokens.at(i), "unexpected token");
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i), "invalid token where operand index was expected");
         }
     }
     return i;

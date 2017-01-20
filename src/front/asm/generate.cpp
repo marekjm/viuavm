@@ -83,7 +83,7 @@ static tuple<viua::internals::types::bytecode_size, enum JUMPTYPE> resolvejump(T
             // FIXME: markers map should use viua::internals::types::bytecode_size to avoid the need for casting
             addr = static_cast<viua::internals::types::bytecode_size>(marks.at(jmp));
         } catch (const std::out_of_range& e) {
-            throw viua::cg::lex::InvalidSyntax(token, ("jump to unrecognised marker: " + str::enquote(str::strencode(jmp))));
+            throw viua::cg::lex::InvalidSyntax(token, ("cannot resolve jump to unrecognised marker: " + str::enquote(str::strencode(jmp))));
         }
     }
 
@@ -130,7 +130,7 @@ static string resolveregister(Token token, const bool allow_bare_integers = fals
     } else if (allow_bare_integers and str::isnum(reg)) {
         out << reg;
     } else {
-        throw viua::cg::lex::InvalidSyntax(token, "not enough operands");
+        throw viua::cg::lex::InvalidSyntax(token, ("illegal operand: " + token.str()));
     }
     return out.str();
 }
