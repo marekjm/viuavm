@@ -38,17 +38,17 @@ string disassembler::intop(viua::internals::types::byte* ptr) {
             oss << "void";
             break;
         case OT_REGISTER_INDEX:
-            oss << '%' << *reinterpret_cast<viua::internals::types::register_index*>(ptr+sizeof(viua::internals::RegisterSets));
+            oss << '%' << *reinterpret_cast<viua::internals::types::register_index*>(ptr);
             pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
             pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
             break;
         case OT_REGISTER_REFERENCE:
-            oss << '@' << *reinterpret_cast<viua::internals::types::register_index*>(ptr+sizeof(viua::internals::RegisterSets));
+            oss << '@' << *reinterpret_cast<viua::internals::types::register_index*>(ptr);
             pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
             pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
             break;
         case OT_POINTER:
-            oss << '*' << *reinterpret_cast<viua::internals::types::register_index*>(ptr+sizeof(viua::internals::RegisterSets));
+            oss << '*' << *reinterpret_cast<viua::internals::types::register_index*>(ptr);
             pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
             pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
             break;

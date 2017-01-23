@@ -70,11 +70,11 @@ static auto extract_register_index(viua::internals::types::byte *ip, viua::proce
 
     viua::internals::types::register_index register_index = 0;
     if (ot == OT_REGISTER_INDEX or ot == OT_REGISTER_REFERENCE or (pointers_allowed and ot == OT_POINTER)) {
-        // FIXME extract RS type
-        ip += sizeof(viua::internals::RegisterSets);
-
         register_index = extract<viua::internals::types::register_index>(ip);
         ip += sizeof(viua::internals::types::register_index);
+
+        // FIXME extract RS type
+        ip += sizeof(viua::internals::RegisterSets);
     } else {
         throw new viua::types::Exception("decoded invalid operand type");
     }
@@ -95,12 +95,12 @@ static auto extract_register_type_and_index(viua::internals::types::byte *ip, vi
     viua::internals::RegisterSets register_type = viua::internals::RegisterSets::LOCAL;
     viua::internals::types::register_index register_index = 0;
     if (ot == OT_REGISTER_INDEX or ot == OT_REGISTER_REFERENCE or (pointers_allowed and ot == OT_POINTER)) {
+        register_index = extract<viua::internals::types::register_index>(ip);
+        ip += sizeof(viua::internals::types::register_index);
+
         register_type = extract<viua::internals::RegisterSets>(ip);
         // FIXME extract RS type
         ip += sizeof(viua::internals::RegisterSets);
-
-        register_index = extract<viua::internals::types::register_index>(ip);
-        ip += sizeof(viua::internals::types::register_index);
     } else {
         throw new viua::types::Exception("decoded invalid operand type");
     }
@@ -161,11 +161,12 @@ auto viua::bytecode::decoder::operands::fetch_primitive_int(viua::internals::typ
 
     viua::internals::types::plain_int value = 0;
     if (ot == OT_REGISTER_REFERENCE) {
+        auto index = *reinterpret_cast<viua::internals::types::register_index*>(ip);
+        ip += sizeof(viua::internals::types::register_index);
+
         // FIXME decode rs type
         ip += sizeof(viua::internals::RegisterSets);
 
-        auto index = *reinterpret_cast<viua::internals::types::register_index*>(ip);
-        ip += sizeof(viua::internals::types::register_index);
         // FIXME once dynamic operand types are implemented the need for this cast will go away
         // because the operand *will* be encoded as a real uint
         viua::types::Integer *i = static_cast<viua::types::Integer*>(p->obtain(index));
