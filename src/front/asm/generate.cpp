@@ -855,6 +855,12 @@ static void check_main_function(const string& main_function, const vector<Token>
         if (main_function_tokens.at(i+1) != "%0") {
             throw viua::cg::lex::InvalidSyntax(last_instruction, ("main function does not return a value: " + main_function));
         }
+        if (main_function_tokens.at(i+2).original() == "\n") {
+            throw viua::cg::lex::InvalidSyntax(last_instruction, "main function must explicitly return to local register set");
+        }
+        if (main_function_tokens.at(i+2) != "local") {
+            throw viua::cg::lex::InvalidSyntax(last_instruction, ("main function uses invalid register set to return a value: " + main_function_tokens.at(i+2).str())).add(main_function_tokens.at(i+2));
+        }
 }
 
 static viua::internals::types::bytecode_size generate_entry_function(viua::internals::types::bytecode_size bytes, map<string, viua::internals::types::bytecode_size> function_addresses, invocables_t& functions, const string& main_function, viua::internals::types::bytecode_size starting_instruction) {
