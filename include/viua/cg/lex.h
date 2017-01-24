@@ -49,7 +49,7 @@ namespace viua {
                 auto character() const -> decltype(character_in_line);
                 auto match(Token) const -> bool;
 
-                auto add(Token) -> void;
+                auto add(Token) -> InvalidSyntax&;
 
                 InvalidSyntax(decltype(line_number), decltype(character_in_line), std::string);
                 InvalidSyntax(Token, std::string = "");

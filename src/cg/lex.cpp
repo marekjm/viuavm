@@ -72,8 +72,9 @@ namespace viua {
                 return false;
             }
 
-            auto InvalidSyntax::add(Token token) -> void {
+            auto InvalidSyntax::add(Token token) -> InvalidSyntax& {
                 tokens.push_back(std::move(token));
+                return *this;
             }
 
             InvalidSyntax::InvalidSyntax(decltype(line_number) ln, decltype(character_in_line) ch, string ct): line_number(ln), character_in_line(ch), content(ct) {
