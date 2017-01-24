@@ -49,6 +49,6 @@
     frame ^[(param %0 (istore %1 45))]
     print (call %result iterfib/1)
 
-    izero %0
+    izero %0 local
     return
 .end

@@ -36,6 +36,6 @@
     frame %0
     process %1 child_process/0
     print (join %2 %1 500ms)
-    izero %0
+    izero %0 local
     return
 .end

@@ -28,6 +28,6 @@
     frame ^[(pamv %0 %1)]
     print (call %1 foo/1)
 
-    izero %0
+    izero %0 local
     return
 .end

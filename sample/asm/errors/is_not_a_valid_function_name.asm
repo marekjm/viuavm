@@ -24,6 +24,6 @@
 .function: main/0
     frame %0
     call foo/x
-    izero %0
+    izero %0 local
     return
 .end

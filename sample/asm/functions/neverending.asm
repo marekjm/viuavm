@@ -25,13 +25,13 @@
 
 .function: two/0
     print (istore %1 48)
-    izero %0
+    izero %0 local
     return
 .end
 
 .function: main/1
     frame %0 2
     call void one/0
-    izero %0
+    izero %0 local
     return
 .end

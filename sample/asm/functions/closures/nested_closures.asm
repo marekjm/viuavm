@@ -81,6 +81,6 @@
     frame ^[(param %0 (istore %1 4))]
     print (fcall %5 %4)
 
-    izero %0
+    izero %0 local
     return
 .end

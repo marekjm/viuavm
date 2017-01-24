@@ -56,6 +56,6 @@
     frame ^[(param %0 (istore %3 13))]
     print (fcall %4 %add_three)
 
-    izero %0
+    izero %0 local
     return
 .end

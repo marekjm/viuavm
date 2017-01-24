@@ -27,6 +27,6 @@
     try
     enter this_throws
 
-    izero %0
+    izero %0 local
     return
 .end

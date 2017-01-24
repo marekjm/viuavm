@@ -73,6 +73,6 @@
     frame ^[(param %0 %4)]
     call run_process_spawner/1
 
-    izero %0
+    izero %0 local
     return
 .end

@@ -22,6 +22,6 @@
     .name: 1 target
     insert %target (strstore %2 "key") (strstore %3 "value")
 
-    izero %0
+    izero %0 local
     return
 .end

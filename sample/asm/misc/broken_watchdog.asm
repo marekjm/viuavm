@@ -81,6 +81,6 @@
     ;call std::util::cpu::cycle/1
 
     print (strstore %3 "main/1 exiting")
-    izero %0
+    izero %0 local
     return
 .end

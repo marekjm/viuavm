@@ -25,6 +25,6 @@
     istore %2 1
     gte int64 %1 %1 %2
     print %1
-    izero %0
+    izero %0 local
     return
 .end

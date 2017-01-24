@@ -26,6 +26,6 @@
     print %1
     print %2
 
-    izero %0
+    izero %0 local
     return
 .end

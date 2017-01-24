@@ -118,6 +118,6 @@
 
     ; all the processes are detached
     ; so no joins are required
-    izero %0
+    izero %0 local
     return
 .end

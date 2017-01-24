@@ -66,6 +66,6 @@
 .function: main/1
     frame ^[(param %0 (istore %1 10))]
     call void counter/1
-    izero %0
+    izero %0 local
     return
 .end

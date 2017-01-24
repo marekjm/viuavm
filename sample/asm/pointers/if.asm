@@ -33,6 +33,6 @@
     .mark: done
     print %text
 
-    izero %0
+    izero %0 local
     return
 .end

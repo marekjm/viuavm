@@ -21,6 +21,6 @@
     echo (strstore %iota "default: ")
     print (strstore %iota default)
 
-    izero %0
+    izero %0 local
     return
 .end

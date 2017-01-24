@@ -36,6 +36,6 @@
     ; after it was removed 
     print %4
 
-    izero %0
+    izero %0 local
     return
 .end

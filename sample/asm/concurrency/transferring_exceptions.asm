@@ -49,6 +49,6 @@
     catch "String" handle_process_exception
     enter try_process_exception
 
-    izero %0
+    izero %0 local
     return
 .end

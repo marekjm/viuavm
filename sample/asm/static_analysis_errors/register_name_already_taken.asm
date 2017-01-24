@@ -21,6 +21,6 @@
     .name: 1 named_register
     .name: 1 named_register
 
-    izero %0
+    izero %0 local
     return
 .end

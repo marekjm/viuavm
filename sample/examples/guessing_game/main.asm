@@ -42,7 +42,7 @@
     call %1 std::random::randint
 
     ; enter zero to abort the game
-    izero %0
+    izero %0 local
 
     .mark: take_a_guess
     strstore %2 "guess the number: "
@@ -75,6 +75,6 @@
     print %1
 
     .mark: exit
-    izero %0
+    izero %0 local
     return
 .end

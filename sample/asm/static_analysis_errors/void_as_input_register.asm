@@ -25,6 +25,6 @@
     frame %0
     print (call void foo/0)
 
-    izero %0
+    izero %0 local
     return
 .end

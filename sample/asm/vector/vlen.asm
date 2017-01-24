@@ -23,6 +23,6 @@
     vpush (vpush (vpush (vpush (vpush (vpush (vpush (vpush (vec %2) (copy %3 %1)) (copy %3 %1)) (copy %3 %1)) (copy %3 %1)) (copy %3 %1)) (copy %3 %1)) (copy %3 %1)) %1
     print (vlen %3 %2)
 
-    izero %0
+    izero %0 local
     return
 .end

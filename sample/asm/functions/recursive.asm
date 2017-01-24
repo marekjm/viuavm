@@ -41,6 +41,6 @@
     frame ^[(param %0 (istore %1 10)) (pamv %1 (istore %2 0))]
     call recursive/2
 
-    izero %0
+    izero %0 local
     return
 .end

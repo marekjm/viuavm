@@ -27,6 +27,6 @@
     catch "Integer" main/0__catch
     enter main/0__try
 
-    izero %0
+    izero %0 local
     return
 .end

@@ -52,6 +52,6 @@
 
     ; print result
     print %result
-    izero %0
+    izero %0 local
     return
 .end

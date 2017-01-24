@@ -52,6 +52,6 @@
     frame ^[(param %iota %one) (param %iota %one)]
     print (fcall %result *pointer)
 
-    izero %0
+    izero %0 local
     return
 .end

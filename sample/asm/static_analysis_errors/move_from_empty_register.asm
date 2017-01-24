@@ -20,6 +20,6 @@
 .function: main/0
     move %1 %0
 
-    izero %0
+    izero %0 local
     return
 .end

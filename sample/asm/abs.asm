@@ -40,6 +40,6 @@
 
     .mark: final_print
     print %number
-    izero %0
+    izero %0 local
     return
 .end

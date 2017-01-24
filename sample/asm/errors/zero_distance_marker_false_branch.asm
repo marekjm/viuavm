@@ -24,6 +24,6 @@
     .mark: here
     if %2 3 here
 
-    izero %0
+    izero %0 local
     return
 .end

@@ -21,6 +21,6 @@
     ptr (.name: %iota pointer) (istore (.name: %iota o) 0)
     print (itof %iota *pointer)
 
-    izero %0
+    izero %0 local
     return
 .end

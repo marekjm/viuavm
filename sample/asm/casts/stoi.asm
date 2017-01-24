@@ -24,6 +24,6 @@
     stoi %3 %1
     print (add int8 %3 %2 %3)
 
-    izero %0
+    izero %0 local
     return
 .end

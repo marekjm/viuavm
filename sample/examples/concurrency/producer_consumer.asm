@@ -60,6 +60,6 @@
     process void producer/1
 
     ; main/1 may safely exit
-    izero %0
+    izero %0 local
     return
 .end

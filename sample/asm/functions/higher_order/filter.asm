@@ -93,6 +93,6 @@
     frame ^[(param %0 (function %3 is_divisible_by_2/1)) (param %1 %1)]
     print (call %4 filter/2)
 
-    izero %0
+    izero %0 local
     return
 .end

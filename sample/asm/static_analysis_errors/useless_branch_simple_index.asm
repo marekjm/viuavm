@@ -20,6 +20,6 @@
 .function: main/0
     if (izero %1) 3 3
 
-    izero %0
+    izero %0 local
     return
 .end

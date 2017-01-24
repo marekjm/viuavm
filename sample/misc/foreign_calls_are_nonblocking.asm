@@ -54,6 +54,6 @@
     frame ^[(param %0 %1) (param %1 %2)]
     msg void pass/2
 
-    izero %0
+    izero %0 local
     return
 .end

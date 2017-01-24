@@ -106,6 +106,6 @@
     frame ^[(param %0 %3) (param %1 %1)]
     print (call %4 filter_closure/2)
 
-    izero %0
+    izero %0 local
     return
 .end

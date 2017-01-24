@@ -25,6 +25,6 @@
     frame %0
     call void World::print_hello/0
 
-    izero %0
+    izero %0 local
     return
 .end

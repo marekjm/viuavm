@@ -88,6 +88,6 @@
     frame ^[(param %0 %2)]
     msg void hi/1
 
-    izero %0
+    izero %0 local
     return
 .end

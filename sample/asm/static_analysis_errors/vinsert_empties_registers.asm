@@ -21,6 +21,6 @@
     vinsert (vec %2) (izero %1) 0
     print %1
 
-    izero %0
+    izero %0 local
     return
 .end

@@ -23,6 +23,6 @@
     div int64 %3 %2 %1
     print %3
 
-    izero %0
+    izero %0 local
     return
 .end

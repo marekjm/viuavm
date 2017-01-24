@@ -40,6 +40,6 @@
     frame ^[(param %0 %1) (param %1 (strstore %2 "Mike"))]
     call std::functional::apply/2
 
-    izero %0
+    izero %0 local
     return
 .end

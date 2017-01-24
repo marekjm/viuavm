@@ -26,6 +26,6 @@
     param %3 (istore %1 1)
     call foo/3
 
-    izero %0
+    izero %0 local
     return
 .end

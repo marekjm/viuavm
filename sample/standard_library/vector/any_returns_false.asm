@@ -33,6 +33,6 @@
     call %5 std::vector::any/2
     print %5
 
-    izero %0
+    izero %0 local
     return
 .end

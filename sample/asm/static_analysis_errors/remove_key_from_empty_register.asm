@@ -24,6 +24,6 @@
     .name: 3 key
     remove %target (new %source Object) key
 
-    izero %0
+    izero %0 local
     return
 .end

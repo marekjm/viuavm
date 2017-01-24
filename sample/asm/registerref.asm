@@ -35,6 +35,6 @@
 .function: main/1
     frame %0 %17
     call foo/0
-    izero %0
+    izero %0 local
     return
 .end

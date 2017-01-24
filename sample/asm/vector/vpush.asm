@@ -25,6 +25,6 @@
     print (vlen %3 %2)
     print (vpop %4 %2)
 
-    izero %0
+    izero %0 local
     return
 .end

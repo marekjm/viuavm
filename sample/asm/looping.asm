@@ -36,6 +36,6 @@
     jump loop
     .mark: final_print
     print %1
-    izero %0
+    izero %0 local
     return
 .end

@@ -33,6 +33,6 @@
     catch "Exception" handler
     enter unregistered_type_instantation
 
-    izero %0
+    izero %0 local
     return
 .end

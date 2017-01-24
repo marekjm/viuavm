@@ -23,6 +23,6 @@
 
     print (and %iota *pointer_to_a *pointer_to_b)
 
-    izero %0
+    izero %0 local
     return
 .end

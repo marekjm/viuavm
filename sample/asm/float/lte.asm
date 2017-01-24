@@ -25,6 +25,6 @@
     fstore %2 1.099
     lte float32 %3 %1 %2
     print %3
-    izero %0
+    izero %0 local
     return
 .end

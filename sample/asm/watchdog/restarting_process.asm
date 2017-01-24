@@ -132,6 +132,6 @@
     frame %0
     call log_exiting_main/0
 
-    izero %0
+    izero %0 local
     return
 .end

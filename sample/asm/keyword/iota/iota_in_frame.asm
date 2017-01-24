@@ -27,6 +27,6 @@
     frame ^[(pamv %iota (strstore %1 "Hello World!")) (pamv %iota (istore %1 42))]
     call sample/2
 
-    izero %0
+    izero %0 local
     return
 .end

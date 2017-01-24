@@ -33,6 +33,6 @@
     frame %0
     call void print_number_of_params/
 
-    izero %0
+    izero %0 local
     return
 .end

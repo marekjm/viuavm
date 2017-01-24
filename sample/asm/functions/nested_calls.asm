@@ -48,6 +48,6 @@
     frame %0
     call void bay/0
 
-    izero %0
+    izero %0 local
     return
 .end

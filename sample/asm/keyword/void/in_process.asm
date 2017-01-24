@@ -26,6 +26,6 @@
     frame %0
     process void greeter/0
 
-    izero %0
+    izero %0 local
     return
 .end

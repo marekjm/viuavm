@@ -22,6 +22,6 @@
     echo (strstore %1 "received ")
     echo (argc %1)
     print (strstore %1 " arguments")
-    izero %0
+    izero %0 local
     return
 .end

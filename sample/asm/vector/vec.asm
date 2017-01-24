@@ -23,6 +23,6 @@
     vpush (vec %2) 1
     print (vpop %4 %2)
 
-    izero %0
+    izero %0 local
     return
 .end

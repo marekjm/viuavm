@@ -21,6 +21,6 @@
     function %1 main/1
     idec %1
 
-    izero %0
+    izero %0 local
     return
 .end

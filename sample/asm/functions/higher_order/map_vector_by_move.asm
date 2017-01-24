@@ -96,6 +96,6 @@
     frame ^[(param %0 (function %3 square/1)) (pamv %1 %1)]
     print (call %4 map/2)
 
-    izero %0
+    izero %0 local
     return
 .end

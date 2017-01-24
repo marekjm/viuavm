@@ -21,6 +21,6 @@
     .name: %iota value
     iinc %value
 
-    izero %0
+    izero %0 local
     return
 .end

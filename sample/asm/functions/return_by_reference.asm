@@ -40,6 +40,6 @@
     ; check if return-by-reference is working (should print 42)
     print %1
 
-    izero %0
+    izero %0 local
     return
 .end

@@ -21,6 +21,6 @@
     frame %0
     msg void foo
 
-    izero %0
+    izero %0 local
     return
 .end

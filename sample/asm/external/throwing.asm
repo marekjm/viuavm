@@ -48,6 +48,6 @@
     catch "ExceptionX" __catch_Exception
     enter __try
 
-    izero %0
+    izero %0 local
     return
 .end

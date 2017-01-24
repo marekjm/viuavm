@@ -29,6 +29,6 @@
 
     print %text_to_print
 
-    izero %0
+    izero %0 local
     return
 .end

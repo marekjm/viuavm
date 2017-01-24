@@ -29,6 +29,6 @@
     frame %0
     print (call %1 std::random::device::urandom)
 
-    izero %0
+    izero %0 local
     return
 .end

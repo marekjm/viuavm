@@ -35,6 +35,6 @@
     call %5 std::vector::every/2
     print %5
 
-    izero %0
+    izero %0 local
     return
 .end

@@ -34,6 +34,6 @@
     not %2
     .mark: fin
     print %2
-    izero %0
+    izero %0 local
     return
 .end

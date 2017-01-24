@@ -26,6 +26,6 @@
 
     vinsert %1 (istore %0 4) %5
 
-    izero %0
+    izero %0 local
     return
 .end

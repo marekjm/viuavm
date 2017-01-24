@@ -46,6 +46,6 @@
     catch "Integer" handle_Integer
     enter try_calling
 
-    izero %0
+    izero %0 local
     return
 .end

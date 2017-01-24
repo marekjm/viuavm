@@ -47,6 +47,6 @@
     ; this throws an exception
     join %0 %3
 
-    izero %0
+    izero %0 local
     return
 .end

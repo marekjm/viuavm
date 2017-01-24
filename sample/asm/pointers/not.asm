@@ -22,6 +22,6 @@
 
     print (not %iota *pointer_to_a)
 
-    izero %0
+    izero %0 local
     return
 .end

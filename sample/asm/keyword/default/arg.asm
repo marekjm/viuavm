@@ -26,6 +26,6 @@
     frame ^[(pamv %0 (strstore %1 "Hello default World!"))]
     call foo/1
 
-    izero %0
+    izero %0 local
     return
 .end

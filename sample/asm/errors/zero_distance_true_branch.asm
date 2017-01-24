@@ -23,6 +23,6 @@
 
     if %2 2 3
 
-    izero %0
+    izero %0 local
     return
 .end

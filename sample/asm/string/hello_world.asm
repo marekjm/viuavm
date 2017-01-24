@@ -19,6 +19,6 @@
 
 .function: main/1
     print (strstore %1 "Hello World!")
-    izero %0
+    izero %0 local
     return
 .end

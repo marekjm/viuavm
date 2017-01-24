@@ -97,6 +97,6 @@
     frame %0
     process void running_detached/0
 
-    izero %0
+    izero %0 local
     return
 .end

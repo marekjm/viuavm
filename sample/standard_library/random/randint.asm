@@ -86,6 +86,6 @@
     frame ^[(param %0 %3) (param %1 %4)]
     print (call %6 std::random::randint)
 
-    izero %0
+    izero %0 local
     return
 .end

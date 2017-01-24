@@ -61,6 +61,6 @@
     frame %0
     process void broken_process/0
 
-    izero %0
+    izero %0 local
     return
 .end

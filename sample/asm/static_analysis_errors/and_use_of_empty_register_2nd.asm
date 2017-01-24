@@ -21,6 +21,6 @@
     izero %1
     and %3 %1 %2
 
-    izero %0
+    izero %0 local
     return
 .end

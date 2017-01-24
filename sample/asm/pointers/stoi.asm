@@ -21,6 +21,6 @@
     ptr (.name: %iota pointer) (strstore (.name: %iota o) "42")
     print (stoi %iota *pointer)
 
-    izero %0
+    izero %0 local
     return
 .end

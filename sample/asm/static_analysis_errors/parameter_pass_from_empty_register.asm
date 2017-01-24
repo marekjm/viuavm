@@ -26,6 +26,6 @@
     param %0 %1
     call foo/1
 
-    izero %0
+    izero %0 local
     return
 .end

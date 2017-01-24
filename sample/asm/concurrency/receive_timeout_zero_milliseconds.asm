@@ -20,6 +20,6 @@
 .function: main/0
     receive void 0ms
 
-    izero %0
+    izero %0 local
     return
 .end

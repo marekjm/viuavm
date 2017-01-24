@@ -26,6 +26,6 @@
     call default foo/0
     ;call 1 foo/0
 
-    izero %0
+    izero %0 local
     return
 .end

@@ -22,6 +22,6 @@
 
     if %1 +1 16
 
-    izero %0
+    izero %0 local
     return
 .end

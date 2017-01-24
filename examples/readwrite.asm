@@ -52,6 +52,6 @@
     frame ^[(param %0 %3) (param %1 %2)]
     call void io::write/2
 
-    izero %0
+    izero %0 local
     return
 .end

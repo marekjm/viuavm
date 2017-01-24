@@ -29,6 +29,6 @@
     fstore %4 0
     add float32 %3 %3 %4
     print %3
-    izero %0
+    izero %0 local
     return
 .end

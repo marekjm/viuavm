@@ -21,6 +21,6 @@
     ptr (.name: %iota pointer) (strstore (.name: %iota text) "Hello World!")
     print *pointer
 
-    izero %0
+    izero %0 local
     return
 .end

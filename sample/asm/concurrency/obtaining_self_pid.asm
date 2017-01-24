@@ -21,6 +21,6 @@
     send (self %1) (strstore %2 "Hello World (from self)!")
     print (receive %2)
 
-    izero %0
+    izero %0 local
     return
 .end

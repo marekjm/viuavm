@@ -72,6 +72,6 @@
     frame %0
     fcall void *printer_closure
 
-    izero %0
+    izero %0 local
     return
 .end

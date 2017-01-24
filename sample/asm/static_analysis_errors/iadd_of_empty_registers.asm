@@ -20,6 +20,6 @@
 .function: main/0
     add int8 %2 %1 %3
 
-    izero %0
+    izero %0 local
     return
 .end

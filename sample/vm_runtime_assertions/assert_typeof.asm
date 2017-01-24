@@ -33,6 +33,6 @@
     catch "TypeException" catch_TypeException
     enter try_TypeException
 
-    izero %0
+    izero %0 local
     return
 .end

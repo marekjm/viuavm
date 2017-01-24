@@ -28,6 +28,6 @@
     frame %0
     print (call %1 std::random::device::random)
 
-    izero %0
+    izero %0 local
     return
 .end

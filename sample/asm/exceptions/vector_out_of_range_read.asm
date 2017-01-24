@@ -22,6 +22,6 @@
     vat %2 %1 4
     print *2
 
-    izero %0
+    izero %0 local
     return
 .end

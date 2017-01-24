@@ -83,6 +83,6 @@
     frame ^[(pamv %0 %limit)]
     call spawn_processes/1
 
-    izero %0
+    izero %0 local
     return
 .end

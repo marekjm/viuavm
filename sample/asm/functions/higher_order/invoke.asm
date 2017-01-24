@@ -90,6 +90,6 @@
     frame ^[(param %0 (function %7 sum/4)) (param %1 %1)]
     print (call %8 invoke/2)
 
-    izero %0
+    izero %0 local
     return
 .end

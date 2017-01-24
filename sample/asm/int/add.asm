@@ -29,6 +29,6 @@
     istore %4 0
     add int32 %3 %3 %4
     print %3
-    izero %0
+    izero %0 local
     return
 .end

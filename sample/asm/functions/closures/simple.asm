@@ -40,7 +40,7 @@
     frame %0 %0
     fcall void %bar
 
-    izero %0
+    izero %0 local
     return
 .end
 

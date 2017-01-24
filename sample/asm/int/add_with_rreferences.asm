@@ -24,6 +24,6 @@
 
     print (add int32 %4 %1 @3)
 
-    izero %0
+    izero %0 local
     return
 .end

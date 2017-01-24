@@ -55,6 +55,6 @@
     frame ^[(param %0 %2)]
     call void Base::saySomething/1
 
-    izero %0
+    izero %0 local
     return
 .end

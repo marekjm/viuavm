@@ -52,6 +52,6 @@
     catch "BaseA" handler
     enter throws_derived
 
-    izero %0
+    izero %0 local
     return
 .end

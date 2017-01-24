@@ -71,6 +71,6 @@
 
     print (strstore %2 "main/1 exited")
 
-    izero %0
+    izero %0 local
     return
 .end

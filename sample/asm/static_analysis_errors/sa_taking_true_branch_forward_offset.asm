@@ -26,6 +26,6 @@
     .mark: go_here
     print %value
 
-    izero %0
+    izero %0 local
     return
 .end

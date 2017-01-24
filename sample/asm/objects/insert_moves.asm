@@ -23,6 +23,6 @@
     insert %1 (strstore %2 "foo") (istore %3 42)
     print (isnull %4 %3)
 
-    izero %0
+    izero %0 local
     return
 .end

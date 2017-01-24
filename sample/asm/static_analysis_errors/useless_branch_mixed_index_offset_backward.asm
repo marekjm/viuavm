@@ -23,6 +23,6 @@
     .mark: after
     if (not (izero %1)) 1 -4
 
-    izero %0
+    izero %0 local
     return
 .end

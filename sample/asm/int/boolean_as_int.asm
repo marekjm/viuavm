@@ -25,6 +25,6 @@
 
     print (add int32 %iota %sixty_nine %compared)
 
-    izero %0
+    izero %0 local
     return
 .end

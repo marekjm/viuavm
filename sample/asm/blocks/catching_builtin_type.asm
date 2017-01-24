@@ -36,7 +36,7 @@
     enter main_block
     ; leave instructions lead here
 
-    izero %0
+    izero %0 local
     return
 .end
 

@@ -38,6 +38,6 @@
 .function: main/1
     frame %0
     call void baz
-    izero %0
+    izero %0 local
     return
 .end

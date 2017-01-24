@@ -27,6 +27,6 @@
     pamv %2 %1
     call foo/3
 
-    izero %0
+    izero %0 local
     return
 .end

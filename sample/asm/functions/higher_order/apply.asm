@@ -50,6 +50,6 @@
     frame ^[(param %0 %2) (param %1 %1)]
     print (call %3 apply/2)
 
-    izero %0
+    izero %0 local
     return
 .end
