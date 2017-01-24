@@ -92,6 +92,26 @@ int_op assembler::operands::getint(const string& s, const bool allow_bare_intege
     }
 }
 
+int_op assembler::operands::getint_with_rs_type(const string& s, const viua::internals::RegisterSets rs_type, const bool allow_bare_integers) {
+    if (s.size() == 0) {
+        throw "empty string cannot be used as operand";
+    }
+
+    if (s == "void") {
+        return int_op(IntegerOperandType::VOID);
+    } else if (s.at(0) == '@') {
+        return int_op(IntegerOperandType::REGISTER_REFERENCE, rs_type, stoi(s.substr(1)));
+    } else if (s.at(0) == '*') {
+        return int_op(IntegerOperandType::POINTER_DEREFERENCE, rs_type, stoi(s.substr(1)));
+    } else if (s.at(0) == '%') {
+        return int_op(IntegerOperandType::INDEX, rs_type, stoi(s.substr(1)));
+    } else if (allow_bare_integers and str::isnum(s)) {
+        return int_op(stoi(s));
+    } else {
+        throw ("cannot convert to int operand: " + s);
+    }
+}
+
 int_op assembler::operands::getint(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) {
     string s = resolveregister(tokens.at(i));
 

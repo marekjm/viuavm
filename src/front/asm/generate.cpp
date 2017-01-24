@@ -135,6 +135,20 @@ static string resolveregister(Token token, const bool allow_bare_integers = fals
     return out.str();
 }
 
+static viua::internals::RegisterSets resolve_rs_type(Token token) {
+    if (token == "current") {
+        return viua::internals::RegisterSets::CURRENT;
+    } else if (token == "local") {
+        return viua::internals::RegisterSets::LOCAL;
+    } else if (token == "static") {
+        return viua::internals::RegisterSets::STATIC;
+    } else if (token == "global") {
+        return viua::internals::RegisterSets::GLOBAL;
+    } else {
+        throw viua::cg::lex::InvalidSyntax(token, "invalid register set type name");
+    }
+}
+
 
 /*  This is a mapping of instructions to their assembly functions.
  *  Used in the assembly() function.
@@ -216,7 +230,7 @@ static viua::internals::types::bytecode_size assemble_instruction(Program& progr
     } else if (tokens.at(i) == "izero") {
         TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 
-        program.opizero(assembler::operands::getint(resolveregister(tokens.at(target))));
+        program.opizero(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1))));
     } else if (tokens.at(i) == "istore") {
         TokenIndex source = get_token_index_of_operand(tokens, i, 2);
         TokenIndex target = get_token_index_of_operand(tokens, i, 1);

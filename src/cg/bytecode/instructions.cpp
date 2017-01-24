@@ -27,6 +27,8 @@ int_op::int_op(): type(IntegerOperandType::PLAIN), rs_type(viua::internals::Regi
 }
 int_op::int_op(IntegerOperandType t, viua::internals::types::plain_int n): type(t), rs_type(viua::internals::RegisterSets::CURRENT), value(n) {
 }
+int_op::int_op(IntegerOperandType t, viua::internals::RegisterSets rst, viua::internals::types::plain_int n): type(t), rs_type(rst), value(n) {
+}
 int_op::int_op(viua::internals::types::plain_int n): type(IntegerOperandType::PLAIN), rs_type(viua::internals::RegisterSets::CURRENT), value(n) {
 }
 

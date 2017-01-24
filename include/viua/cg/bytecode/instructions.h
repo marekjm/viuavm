@@ -43,6 +43,7 @@ struct int_op {
 
     int_op();
     int_op(IntegerOperandType, viua::internals::types::plain_int = 0);
+    int_op(IntegerOperandType, viua::internals::RegisterSets, viua::internals::types::plain_int = 0);
     int_op(viua::internals::types::plain_int);
 };
 struct timeout_op {
