@@ -1659,7 +1659,7 @@ class MiscExceptionTests(unittest.TestCase):
 
     def testCatchingMachineThrownException(self):
         # pass --no-sa flag; we want to check runtime exception
-        runTest(self, 'nullregister_access.asm', "exception encountered: (get) read from null register: 1", assembly_opts=('--no-sa',))
+        runTest(self, 'nullregister_access.asm', "exception encountered: read from null register: 1", assembly_opts=('--no-sa',))
 
     def testCatcherState(self):
         runTestSplitlines(self, 'restore_catcher_state.asm', ['42','100','42','100'], test_disasm=False)
@@ -1777,7 +1777,7 @@ class ProcessAbstractionTests(unittest.TestCase):
 
     def testProcessesHaveSeparateGlobalRegisterSets(self):
         # FIXME global registers should not be statically checked
-        runTestReportsException(self, 'separate_global_rs.asm', ('Exception', '(get) read from null register: 1',), assembly_opts=('--no-sa',))
+        runTestReportsException(self, 'separate_global_rs.asm', ('Exception', 'read from null register: 1',), assembly_opts=('--no-sa',))
 
 
 class ConcurrencyTests(unittest.TestCase):

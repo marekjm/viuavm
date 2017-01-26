@@ -221,3 +221,28 @@ auto viua::bytecode::decoder::operands::fetch_object(viua::internals::types::byt
 
     return tuple<viua::internals::types::byte*, viua::types::Type*>(ip, object);
 }
+
+auto viua::bytecode::decoder::operands::fetch_object2(viua::internals::types::byte *ip, viua::process::Process *process) -> tuple<viua::internals::types::byte*, viua::types::Type*> {
+    bool is_pointer = (get_operand_type(ip) == OT_POINTER);
+
+    viua::internals::RegisterSets register_type = viua::internals::RegisterSets::LOCAL;
+    viua::internals::types::register_index target = 0;
+    tie(ip, register_type, target) = extract_register_type_and_index(ip, process, true);
+
+    auto object = process->register_at(target, register_type)->get();
+    if (object == nullptr) {
+        ostringstream oss;
+        oss << "read from null register: " << target;
+        throw new viua::types::Exception(oss.str());
+    }
+
+    if (is_pointer) {
+        auto pointer_object = dynamic_cast<viua::types::Pointer*>(object);
+        if (pointer_object == nullptr) {
+            throw new viua::types::Exception("dereferenced type is not a pointer: " + object->type());
+        }
+        object = pointer_object->to();
+    }
+
+    return tuple<viua::internals::types::byte*, viua::types::Type*>(ip, object);
+}

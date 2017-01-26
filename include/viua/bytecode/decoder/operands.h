@@ -67,6 +67,7 @@ namespace viua {
                 auto fetch_primitive_string(viua::internals::types::byte*, viua::process::Process*) -> std::tuple<viua::internals::types::byte*, std::string>;
                 auto fetch_atom(viua::internals::types::byte*, viua::process::Process*) -> std::tuple<viua::internals::types::byte*, std::string>;
                 auto fetch_object(viua::internals::types::byte*, viua::process::Process*) -> std::tuple<viua::internals::types::byte*, viua::types::Type*>;
+                auto fetch_object2(viua::internals::types::byte*, viua::process::Process*) -> std::tuple<viua::internals::types::byte*, viua::types::Type*>;
 
                 /*
                  *  Fetch raw data decoding it directly from bytecode.
