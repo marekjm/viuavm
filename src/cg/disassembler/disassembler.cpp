@@ -100,11 +100,51 @@ string disassembler::intop_with_rs_type(viua::internals::types::byte* ptr) {
         case OT_REGISTER_REFERENCE:
             oss << '@' << *reinterpret_cast<viua::internals::types::register_index*>(ptr);
             pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
+            oss << ' ';
+            switch (*reinterpret_cast<viua::internals::RegisterSets*>(ptr)) {
+                case viua::internals::RegisterSets::CURRENT:
+                    oss << "current";
+                    break;
+                case viua::internals::RegisterSets::GLOBAL:
+                    oss << "global";
+                    break;
+                case viua::internals::RegisterSets::LOCAL:
+                    oss << "local";
+                    break;
+                case viua::internals::RegisterSets::STATIC:
+                    oss << "static";
+                    break;
+                case viua::internals::RegisterSets::TEMPORARY:
+                    oss << "temporary";
+                    break;
+                default:
+                    throw "invalid register set detected";
+            }
             pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
             break;
         case OT_POINTER:
             oss << '*' << *reinterpret_cast<viua::internals::types::register_index*>(ptr);
             pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
+            oss << ' ';
+            switch (*reinterpret_cast<viua::internals::RegisterSets*>(ptr)) {
+                case viua::internals::RegisterSets::CURRENT:
+                    oss << "current";
+                    break;
+                case viua::internals::RegisterSets::GLOBAL:
+                    oss << "global";
+                    break;
+                case viua::internals::RegisterSets::LOCAL:
+                    oss << "local";
+                    break;
+                case viua::internals::RegisterSets::STATIC:
+                    oss << "static";
+                    break;
+                case viua::internals::RegisterSets::TEMPORARY:
+                    oss << "temporary";
+                    break;
+                default:
+                    throw "invalid register set detected";
+            }
             pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
             break;
         case OT_INT:
@@ -237,12 +277,12 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
 
     switch (op) {
         case IZERO:
+        case PRINT:
+        case ECHO:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             break;
         case IINC:
         case IDEC:
-        case PRINT:
-        case ECHO:
         case BOOL:
         case DELETE:
         case TMPRI:
