@@ -429,11 +429,11 @@ static viua::internals::types::bytecode_size assemble_instruction(Program& progr
     } else if (tokens.at(i) == "print") {
         TokenIndex source = get_token_index_of_operand(tokens, i, 1);
 
-        program.opprint(assembler::operands::getint(resolveregister(tokens.at(source))));
+        program.opprint(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1))));
     } else if (tokens.at(i) == "echo") {
         TokenIndex source = get_token_index_of_operand(tokens, i, 1);
 
-        program.opecho(assembler::operands::getint(resolveregister(tokens.at(source))));
+        program.opecho(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1))));
     } else if (tokens.at(i) == "capture") {
         TokenIndex target = get_token_index_of_operand(tokens, i, 1);
         TokenIndex inside_index = get_token_index_of_operand(tokens, i, 2);

@@ -478,7 +478,10 @@ namespace viua {
                             tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), input_tokens.at(i).str());
                         }
                         continue;
-                    } else if (token == "izero") {
+                    } else if (token == "izero"
+                        or token == "print"
+                        or token == "echo"
+                    ) {
                         tokens.push_back(token);                // mnemonic
                         tokens.push_back(input_tokens.at(++i)); // target register
                         if (input_tokens.at(i+1) == "\n") {
