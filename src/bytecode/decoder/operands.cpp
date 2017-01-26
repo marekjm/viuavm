@@ -99,7 +99,6 @@ static auto extract_register_type_and_index(viua::internals::types::byte *ip, vi
         ip += sizeof(viua::internals::types::register_index);
 
         register_type = extract<viua::internals::RegisterSets>(ip);
-        // FIXME extract RS type
         ip += sizeof(viua::internals::RegisterSets);
     } else {
         throw new viua::types::Exception("decoded invalid operand type");
