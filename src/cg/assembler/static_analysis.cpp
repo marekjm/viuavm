@@ -646,6 +646,8 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             // skip mnemonic
             ++i;
             check_use_of_register(body_tokens, i, i-1, registers, named_registers, "use of empty register");
+
+            i = skip_till_next_line(body_tokens, i);
         } else if (token == "register") {
             TokenIndex target = get_token_index_of_operand(body_tokens, i, 1);
 
