@@ -63,7 +63,7 @@ Program& Program::opidec(int_op regno) {
     return (*this);
 }
 
-Program& Program::opfstore(int_op regno, float f) {
+Program& Program::opfstore(int_op regno, viua::internals::types::plain_float f) {
     /*  Inserts fstore instruction to bytecode.
      *
      *  :params:

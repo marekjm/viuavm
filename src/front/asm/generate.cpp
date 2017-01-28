@@ -247,8 +247,7 @@ static viua::internals::types::bytecode_size assemble_instruction(Program& progr
     } else if (tokens.at(i) == "fstore") {
         TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 
-        // FIXME use viua::internals::types::plain_float
-        program.opfstore(assembler::operands::getint(resolveregister(tokens.at(target))), static_cast<float>(stod(tokens.at(i+2).str())));
+        program.opfstore(assembler::operands::getint(resolveregister(tokens.at(target))), stod(tokens.at(i+2).str()));
     } else if (tokens.at(i) == "itof") {
         TokenIndex source = get_token_index_of_operand(tokens, i, 2);
         TokenIndex target = get_token_index_of_operand(tokens, i, 1);
