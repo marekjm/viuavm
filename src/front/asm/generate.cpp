@@ -631,7 +631,7 @@ static viua::internals::types::bytecode_size assemble_instruction(Program& progr
     } else if (tokens.at(i) == "throw") {
         TokenIndex source = get_token_index_of_operand(tokens, i, 1);
 
-        program.opthrow(assembler::operands::getint(resolveregister(tokens.at(source))));
+        program.opthrow(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1))));
     } else if (tokens.at(i) == "leave") {
         program.opleave();
     } else if (tokens.at(i) == "import") {

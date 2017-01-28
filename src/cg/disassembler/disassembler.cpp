@@ -279,6 +279,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         case IZERO:
         case PRINT:
         case ECHO:
+        case THROW:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             break;
         case IINC:
@@ -289,7 +290,6 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         case TMPRO:
         case ARGC:
         case SELF:
-        case THROW:
         case DRAW:
         case REGISTER:
             ptr = disassemble_ri_operand(oss, ptr);

@@ -481,6 +481,8 @@ namespace viua {
                     } else if (token == "izero"
                         or token == "print"
                         or token == "echo"
+                        or token == "delete"
+                        or token == "throw"
                     ) {
                         tokens.push_back(token);                // mnemonic
                         tokens.push_back(input_tokens.at(++i)); // target register
