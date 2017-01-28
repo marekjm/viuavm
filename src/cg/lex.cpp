@@ -456,12 +456,31 @@ namespace viua {
                         continue;
                     } else if (token == "itof" or token == "ftoi" or token == "stoi" or token == "stof") {
                         tokens.push_back(token);                // mnemonic
-                        tokens.push_back(input_tokens.at(++i)); // target register
 
-                        if (input_tokens.at(i+1).str() == "\n") {
-                            tokens.push_back(tokens.back());
+                        tokens.push_back(input_tokens.at(++i)); // target register
+                        // save target register index because we may need to insert it later
+                        auto target_index = tokens.back();
+
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "current");
                         } else {
                             tokens.push_back(input_tokens.at(++i));
+                        }
+
+                        // save target register set because we may need to insert it later
+                        auto target_rs = tokens.back();
+
+                        // source register
+                        if (input_tokens.at(i+1).str() == "\n") {
+                            // copy target register index
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), target_index);
+                            // copy target register set
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), target_rs);
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                            if (not is_register_set_name(input_tokens.at(i+1))) {
+                                tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), target_rs);
+                            }
                         }
                         continue;
                     } else if (token == "if") {

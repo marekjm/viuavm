@@ -46,6 +46,45 @@ namespace viua {
                 }
                 return false;
             }
+            static auto size_of_register_index_operand_with_rs_type(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                viua::internals::types::bytecode_size calculated_size = 0;
+
+                if (tokens.at(i) == "void") {
+                    calculated_size += sizeof(viua::internals::types::byte);
+                    ++i;
+                } else if (tokens.at(i).str().at(0) == '%' and str::isnum(tokens.at(i).str().substr(1))) {
+                    calculated_size += sizeof(viua::internals::types::byte);
+                    calculated_size += sizeof(viua::internals::RegisterSets);
+                    calculated_size += sizeof(viua::internals::types::register_index);
+                    ++i;
+
+                    if (tokens.at(i) == "current" or tokens.at(i) == "local" or tokens.at(i) == "static" or tokens.at(i) == "global") {
+                        ++i;
+                    }
+                } else if (tokens.at(i).str().at(0) == '@') {
+                    calculated_size += sizeof(viua::internals::types::byte);
+                    calculated_size += sizeof(viua::internals::RegisterSets);
+                    calculated_size += sizeof(viua::internals::types::register_index);
+                    ++i;
+
+                    if (tokens.at(i) == "current" or tokens.at(i) == "local" or tokens.at(i) == "static" or tokens.at(i) == "global") {
+                        ++i;
+                    }
+                } else if (tokens.at(i).str().at(0) == '*') {
+                    calculated_size += sizeof(viua::internals::types::byte);
+                    calculated_size += sizeof(viua::internals::RegisterSets);
+                    calculated_size += sizeof(viua::internals::types::register_index);
+                    ++i;
+
+                    if (tokens.at(i) == "current" or tokens.at(i) == "local" or tokens.at(i) == "static" or tokens.at(i) == "global") {
+                        ++i;
+                    }
+                } else {
+                    throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("invalid operand token: " + tokens.at(i).str()));
+                }
+
+                return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
+            }
             static auto size_of_register_index_operand(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 viua::internals::types::bytecode_size calculated_size = 0;
 
@@ -85,6 +124,21 @@ namespace viua {
 
                 // for target register
                 tie(size_increment, i) = size_of_register_index_operand(tokens, i);
+                calculated_size += size_increment;
+
+                return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
+            }
+            static auto size_of_instruction_with_two_ri_operands_with_rs_types(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                viua::internals::types::bytecode_size calculated_size = sizeof(viua::internals::types::byte);    // start with the size of a single opcode
+
+                decltype(calculated_size) size_increment = 0;
+
+                // for target register
+                tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
+                calculated_size += size_increment;
+
+                // for source register
+                tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
                 calculated_size += size_increment;
 
                 return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
@@ -186,16 +240,16 @@ namespace viua {
                 return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
             }
             static auto size_of_itof(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
-                return size_of_instruction_with_two_ri_operands(tokens, i);
+                return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
             static auto size_of_ftoi(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
-                return size_of_instruction_with_two_ri_operands(tokens, i);
+                return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
             static auto size_of_stoi(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
-                return size_of_instruction_with_two_ri_operands(tokens, i);
+                return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
             static auto size_of_stof(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
-                return size_of_instruction_with_two_ri_operands(tokens, i);
+                return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
             static auto size_of_add(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 return size_of_instruction_alu(tokens, i);
