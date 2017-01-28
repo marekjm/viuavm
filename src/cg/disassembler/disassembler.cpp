@@ -295,7 +295,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
             ptr = disassemble_ri_operand(oss, ptr);
             break;
         case ISTORE:
-            ptr = disassemble_ri_operand(oss, ptr);
+            ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand(oss, ptr);
 
             break;
