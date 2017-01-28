@@ -293,6 +293,9 @@ namespace viua {
                 return tokens;
             }
 
+            static auto is_register_set_name(string s) -> bool {
+                return (s == "current" or s == "local" or s == "static" or s == "global");
+            }
             vector<Token> standardise(vector<Token> input_tokens) {
                 vector<Token> tokens;
 
@@ -427,6 +430,9 @@ namespace viua {
                     } else if (token == "istore") {
                         tokens.push_back(token);                // mnemonic
                         tokens.push_back(input_tokens.at(++i)); // target register
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "current");
+                        }
                         if (input_tokens.at(i+1) == "\n") {
                             tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "0");
                         }
