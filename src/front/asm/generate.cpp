@@ -239,11 +239,11 @@ static viua::internals::types::bytecode_size assemble_instruction(Program& progr
     } else if (tokens.at(i) == "iinc") {
         TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 
-        program.opiinc(assembler::operands::getint(resolveregister(tokens.at(target))));
+        program.opiinc(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1))));
     } else if (tokens.at(i) == "idec") {
         TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 
-        program.opidec(assembler::operands::getint(resolveregister(tokens.at(target))));
+        program.opidec(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1))));
     } else if (tokens.at(i) == "fstore") {
         TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 

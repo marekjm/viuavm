@@ -489,6 +489,8 @@ namespace viua {
                         or token == "echo"
                         or token == "delete"
                         or token == "throw"
+                        or token == "iinc"
+                        or token == "idec"
                     ) {
                         tokens.push_back(token);                // mnemonic
                         tokens.push_back(input_tokens.at(++i)); // target register

@@ -281,10 +281,10 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         case ECHO:
         case THROW:
         case DELETE:
-            ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
-            break;
         case IINC:
         case IDEC:
+            ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
+            break;
         case BOOL:
         case TMPRI:
         case TMPRO:
