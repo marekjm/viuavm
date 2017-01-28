@@ -336,9 +336,10 @@ static viua::internals::types::bytecode_size assemble_instruction(Program& progr
 
         program.opeq(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(lhs))), assembler::operands::getint(resolveregister(tokens.at(rhs))));
     } else if (tokens.at(i) == "strstore") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex target = i + 1;
+        TokenIndex source = target + 2;
 
-        program.opstrstore(assembler::operands::getint(resolveregister(tokens.at(target))), tokens.at(i+2));
+        program.opstrstore(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1))), tokens.at(source));
     } else if (tokens.at(i) == "vec") {
         TokenIndex target = get_token_index_of_operand(tokens, i, 1);
         TokenIndex pack_range_start = get_token_index_of_operand(tokens, i, 2);

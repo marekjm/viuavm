@@ -450,6 +450,9 @@ namespace viua {
                     } else if (token == "strstore") {
                         tokens.push_back(token);                // mnemonic
                         tokens.push_back(input_tokens.at(++i)); // target register
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "current");
+                        }
                         if (input_tokens.at(i+1) == "\n") {
                             tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "\"\"");
                         }

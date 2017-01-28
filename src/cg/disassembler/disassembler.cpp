@@ -225,7 +225,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
     oss << opname;
 
     if (op == STRSTORE) {
-        ptr = disassemble_ri_operand(oss, ptr);
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
         string s = string(reinterpret_cast<char*>(ptr));
         oss << ' ' << str::enquote(s);
