@@ -34,7 +34,7 @@ viua::internals::types::byte* viua::process::Process::opitof(viua::internals::ty
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     viua::types::Type* source = nullptr;
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object2(addr, this);
 
     *target = unique_ptr<viua::types::Type>{new viua::types::Float(static_cast<viua::types::Integer*>(source)->as_float64())};
 
@@ -46,7 +46,7 @@ viua::internals::types::byte* viua::process::Process::opftoi(viua::internals::ty
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     viua::types::Type* source = nullptr;
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object2(addr, this);
 
     *target = unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<viua::types::Float*>(source)->as_int32())};
 
@@ -58,7 +58,7 @@ viua::internals::types::byte* viua::process::Process::opstoi(viua::internals::ty
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     viua::types::Type* source = nullptr;
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object2(addr, this);
 
     int result_integer = 0;
     string supplied_string = static_cast<viua::types::String*>(source)->value();
@@ -80,7 +80,7 @@ viua::internals::types::byte* viua::process::Process::opstof(viua::internals::ty
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     viua::types::Type* source = nullptr;
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object2(addr, this);
 
     string supplied_string = static_cast<viua::types::String*>(source)->value();
     double convert_from = std::stod(supplied_string);
