@@ -92,12 +92,11 @@ viua::internals::types::byte* viua::process::Process::opthrow(viua::internals::t
     viua::kernel::Register* source = nullptr;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    if (not source) {
+    if (source->empty()) {
         ostringstream oss;
-        oss << "invalid throw: register is empty";
+        oss << "throw from null register";
         throw new viua::types::Exception(oss.str());
     }
-
     thrown = source->give();
 
     return addr;

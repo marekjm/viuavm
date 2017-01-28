@@ -1635,6 +1635,12 @@ class AssemblerErrorRejectingDuplicateSymbolsTests(unittest.TestCase):
         self.assertRaises(ViuaAssemblerError, assemble, os.path.join(self.PATH, 'exec.asm'), links=(lib_a_path, lib_a_path))
 
 
+class ExceptionMechanismTests(unittest.TestCase):
+    PATH = './sample/asm/exception_mechanism'
+
+    def testThrowFromEmptyRegister(self):
+        runTestThrowsException(self, 'throw_from_empty_register.asm', ('Exception', 'throw from null register',), assembly_opts=('--no-sa',))
+
 class MiscExceptionTests(unittest.TestCase):
     PATH = './sample/asm/exceptions'
 
