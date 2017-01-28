@@ -70,6 +70,9 @@ viua::internals::types::byte* viua::process::Process::opdelete(viua::internals::
     viua::kernel::Register *target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
+    if (target->empty()) {
+        throw new viua::types::Exception("delete of null register");
+    }
     target->give();
 
     return addr;

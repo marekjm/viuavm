@@ -1679,6 +1679,9 @@ class MiscExceptionTests(unittest.TestCase):
     def testVectorOutOfRangeRead(self):
         runTestThrowsException(self, 'vector_out_of_range_read.asm', ('OutOfRangeException', 'positive vector index out of range',))
 
+    def testDeleteOfEmptyRegister(self):
+        runTestThrowsException(self, 'delete_of_empty_register.asm', ('Exception', 'delete of null register',), assembly_opts=('--no-sa',))
+
 
 class MiscTests(unittest.TestCase):
     PATH = './sample/asm/misc'
