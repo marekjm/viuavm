@@ -402,7 +402,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
 
             break;
         case FSTORE:
-            ptr = disassemble_ri_operand(oss, ptr);
+            ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
             oss << ' ';
             oss << *reinterpret_cast<viua::internals::types::plain_float*>(ptr);

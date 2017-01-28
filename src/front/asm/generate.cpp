@@ -246,8 +246,9 @@ static viua::internals::types::bytecode_size assemble_instruction(Program& progr
         program.opidec(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1))));
     } else if (tokens.at(i) == "fstore") {
         TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex source = target + 2;
 
-        program.opfstore(assembler::operands::getint(resolveregister(tokens.at(target))), stod(tokens.at(i+2).str()));
+        program.opfstore(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1))), stod(tokens.at(source).str()));
     } else if (tokens.at(i) == "itof") {
         TokenIndex source = get_token_index_of_operand(tokens, i, 2);
         TokenIndex target = get_token_index_of_operand(tokens, i, 1);
