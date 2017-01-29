@@ -112,6 +112,7 @@ There are several categories of change:
 - feature: `VIUA_STACK_TRACES` environment variable controlling how stack traces are printed (currently only `VIUA_STACK_TRACES=full` is recognised)
 - bic: register index operands must be prefixed by `%` character
 - bic: the `izero` instruction setting return value of main function must explicitly state register set
+- bic, enhancement: `tmpri` and `tmpro` instructions are no longer part of the ISA, use `move`, `copy` or `swap` with explicit register set names
 
 One limitation of static analyser (SA) introduced in this release is its inability to handle backwards jumps.
 This, however, is not a problem if the code does not use loops and
