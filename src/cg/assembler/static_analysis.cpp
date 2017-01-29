@@ -571,8 +571,8 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             ++i; // the "vec" token
 
             TokenIndex target = i;
-            TokenIndex pack_range_start = get_token_index_of_operand(body_tokens, i, 1);
-            TokenIndex pack_range_count = get_token_index_of_operand(body_tokens, i, 2);
+            TokenIndex pack_range_start = target + 2;
+            TokenIndex pack_range_count = pack_range_start + 2;
 
             int starting_register = stoi(resolve_register_name(named_registers, body_tokens.at(pack_range_start)));
 

@@ -395,11 +395,15 @@ static viua::internals::types::bytecode_size assemble_instruction(Program& progr
 
         program.opstrstore(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1))), tokens.at(source));
     } else if (tokens.at(i) == "vec") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-        TokenIndex pack_range_start = get_token_index_of_operand(tokens, i, 2);
-        TokenIndex pack_range_count = get_token_index_of_operand(tokens, i, 3);
+        TokenIndex target = i + 1;
+        TokenIndex pack_range_start = target + 2;
+        TokenIndex pack_range_count = pack_range_start + 2;
 
-        program.opvec(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(pack_range_start))), assembler::operands::getint(resolveregister(tokens.at(pack_range_count))));
+        program.opvec(
+            assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(pack_range_start)), resolve_rs_type(tokens.at(pack_range_start+1)))
+            , assembler::operands::getint(resolveregister(tokens.at(pack_range_count)))
+        );
     } else if (tokens.at(i) == "vinsert") {
         TokenIndex target = get_token_index_of_operand(tokens, i, 1);
         TokenIndex source = get_token_index_of_operand(tokens, i, 2);

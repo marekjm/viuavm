@@ -324,15 +324,37 @@ namespace viua {
                         tokens.push_back(token);
                         tokens.push_back(input_tokens.at(++i));
 
-                        if ((not str::isnum(input_tokens.at(i+1).str(), false)) and input_tokens.at(i+1).str() == "\n") {
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "%0"); // starting register
+                        string target_register_index = tokens.back();
+                        string target_register_set = "current";
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                            tokens.back().original(target_register_index);
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                            target_register_set = tokens.back();
+                        }
+
+                        if (input_tokens.at(i+1) == "\n") {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "%0");
                             tokens.back().original("\n");
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "%0"); // number of registers to pack
+
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                            tokens.back().original("\n");
+
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "%0");
                             tokens.back().original("\n");
                             continue;
                         }
 
-                        tokens.push_back(input_tokens.at(++i)); // starting register
+                        // pack start register
+                        tokens.push_back(input_tokens.at(++i));
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                            tokens.back().original("\n");
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                        }
+
                         if ((not str::isnum(input_tokens.at(i+1).str(), false)) and input_tokens.at(i+1).str() == "\n") {
                             tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "%0"); // number of registers to pack
                             tokens.back().original("\n");
