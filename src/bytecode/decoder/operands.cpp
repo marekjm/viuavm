@@ -22,6 +22,7 @@
 #include <viua/types/type.h>
 #include <viua/types/integer.h>
 #include <viua/types/pointer.h>
+#include <viua/types/reference.h>
 #include <viua/process.h>
 #include <viua/exceptions.h>
 #include <viua/bytecode/decoder/operands.h>
@@ -234,6 +235,10 @@ auto viua::bytecode::decoder::operands::fetch_object2(viua::internals::types::by
         ostringstream oss;
         oss << "read from null register: " << target;
         throw new viua::types::Exception(oss.str());
+    }
+
+    if (auto ref = dynamic_cast<viua::types::Reference*>(object)) {
+        object = ref->pointsTo();
     }
 
     if (is_pointer) {
