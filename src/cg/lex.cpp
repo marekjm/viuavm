@@ -361,17 +361,63 @@ namespace viua {
                         }
                     } else if (token == "vpop") {
                         tokens.push_back(token);
-                        tokens.push_back(input_tokens.at(++i));
 
-                        if ((not str::isnum(input_tokens.at(i+1).str(), false)) and input_tokens.at(i+1).str() == "\n") {
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "%0");
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "-1");
-                            continue;
+                        tokens.push_back(input_tokens.at(++i));
+                        if (tokens.back().str() != "void") {
+                            if (not is_register_set_name(input_tokens.at(i+1))) {
+                                tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                            } else {
+                                tokens.push_back(input_tokens.at(++i));
+                            }
                         }
 
                         tokens.push_back(input_tokens.at(++i));
-                        if ((not str::isnum(input_tokens.at(i+1).str(), false)) and input_tokens.at(i+1).str() == "\n") {
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                        }
+
+                        if (input_tokens.at(i+1).str() == "\n") {
                             tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "-1");
+                        }
+                    } else if (token == "vat") {
+                        tokens.push_back(token);
+
+                        tokens.push_back(input_tokens.at(++i));
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                        }
+
+                        tokens.push_back(input_tokens.at(++i));
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                        }
+
+                        if (input_tokens.at(i+1).str() == "\n") {
+                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "-1");
+                        }
+                    } else if (token == "vlen") {
+                        tokens.push_back(token);
+
+                        tokens.push_back(input_tokens.at(++i));
+                        string target_register_set = "current";
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                            target_register_set = tokens.back();
+                        }
+
+                        tokens.push_back(input_tokens.at(++i));
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
                         }
                     } else if (token == "vinsert") {
                         tokens.push_back(token);

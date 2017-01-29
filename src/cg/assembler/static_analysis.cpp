@@ -373,9 +373,23 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "vpop" or token == "vat" or token == "vlen") {
-            TokenIndex source = get_token_index_of_operand(body_tokens, i, 2);
-            TokenIndex target = get_token_index_of_operand(body_tokens, i, 1);
+        } else if (token == "vpop") {
+            TokenIndex target = i + 1;
+            TokenIndex source = target + 2;
+
+            if (body_tokens.at(target) == "void") {
+                // source is one token earlier since void has no register set
+                --source;
+            }
+
+            check_use_of_register(body_tokens, source, i, registers, named_registers, (token.str() + " from empty register"));
+            registers.insert(resolve_register_name(named_registers, body_tokens.at(target)), body_tokens.at(target));
+
+            i = skip_till_next_line(body_tokens, i);
+            continue;
+        } else if (token == "vat" or token == "vlen") {
+            TokenIndex target = i + 1;
+            TokenIndex source = target + 2;
 
             check_use_of_register(body_tokens, source, i, registers, named_registers, (token.str() + " from empty register"));
             registers.insert(resolve_register_name(named_registers, body_tokens.at(target)), body_tokens.at(target));

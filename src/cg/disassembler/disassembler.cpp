@@ -317,12 +317,12 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         case PTR:
         case SWAP:
         case ISNULL:
-        case VLEN:
         case FCALL:
             ptr = disassemble_ri_operand(oss, ptr);
             ptr = disassemble_ri_operand(oss, ptr);
             break;
         case VPUSH:
+        case VLEN:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
@@ -373,6 +373,8 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
             break;
         case VEC:
         case VINSERT:
+        case VAT:
+        case VPOP:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand(oss, ptr);
@@ -384,8 +386,6 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         case CAPTURE:
         case CAPTURECOPY:
         case CAPTUREMOVE:
-        case VPOP:
-        case VAT:
         case INSERT:
         case REMOVE:
             ptr = disassemble_ri_operand(oss, ptr);

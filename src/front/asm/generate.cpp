@@ -130,7 +130,7 @@ static string resolveregister(Token token, const bool allow_bare_integers = fals
     } else if (allow_bare_integers and str::isnum(reg)) {
         out << reg;
     } else {
-        throw viua::cg::lex::InvalidSyntax(token, ("illegal operand: " + token.str()));
+        throw viua::cg::lex::InvalidSyntax(token, ("cannot resolve register operand: " + token.str()));
     }
     return out.str();
 }
@@ -423,25 +423,43 @@ static viua::internals::types::bytecode_size assemble_instruction(Program& progr
             , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
         );
     } else if (tokens.at(i) == "vpop") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-        TokenIndex destination = get_token_index_of_operand(tokens, i, 2);
-        TokenIndex position = get_token_index_of_operand(tokens, i, 3);
+        TokenIndex target = i + 1;
+        TokenIndex source = target + 2;
+        TokenIndex position = source + 2;
 
-        Token vec = tokens.at(target), dst = tokens.at(destination), pos = tokens.at(position);
-        program.opvpop(assembler::operands::getint(resolveregister(vec)), assembler::operands::getint(resolveregister(dst)), assembler::operands::getint(resolveregister(pos, true), true));
+        if (tokens.at(target) == "void") {
+            --source;
+            --position;
+            program.opvpop(
+                assembler::operands::getint(resolveregister(tokens.at(target)))
+                , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
+                , assembler::operands::getint(resolveregister(tokens.at(position), true), true)
+            );
+        } else {
+            program.opvpop(
+                assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+                , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
+                , assembler::operands::getint(resolveregister(tokens.at(position), true), true)
+            );
+        }
     } else if (tokens.at(i) == "vat") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-        TokenIndex destination = get_token_index_of_operand(tokens, i, 2);
-        TokenIndex position = get_token_index_of_operand(tokens, i, 3);
+        TokenIndex target = i + 1;
+        TokenIndex source = target + 2;
+        TokenIndex position = source + 2;
 
-        Token vec = tokens.at(target), dst = tokens.at(destination), pos = tokens.at(position);
-        if (pos == "\n") { pos = Token(dst.line(), dst.character(), "-1"); }
-        program.opvat(assembler::operands::getint(resolveregister(vec)), assembler::operands::getint(resolveregister(dst)), assembler::operands::getint(resolveregister(pos, true), true));
+        program.opvat(
+            assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
+            , assembler::operands::getint(resolveregister(tokens.at(position), true), true)
+        );
     } else if (tokens.at(i) == "vlen") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex target = i + 1;
+        TokenIndex source = target + 2;
 
-        program.opvlen(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
+        program.opvlen(
+            assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
+        );
     } else if (tokens.at(i) == "not") {
         TokenIndex target = get_token_index_of_operand(tokens, i, 1);
         TokenIndex source = get_token_index_of_operand(tokens, i, 2);
@@ -977,7 +995,9 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
         // pop first element on the list of aruments
         entry_function_tokens.emplace_back(0, 0, "vpop");
         entry_function_tokens.emplace_back(0, 0, "%0");
+        entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "%1");
+        entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "%0");
         entry_function_tokens.emplace_back(0, 0, "\n");
         bytes += sizeof(viua::internals::types::byte) + 3*sizeof(viua::internals::types::byte) + 3*sizeof(viua::internals::RegisterSets) + 3*sizeof(viua::internals::types::register_index);
