@@ -649,6 +649,24 @@ namespace viua {
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
+                    } else if (token == "move" or token == "copy" or token == "swap" or token == "ptr") {
+                        tokens.push_back(token);                // mnemonic
+
+                        tokens.push_back(input_tokens.at(++i)); // target register
+                        string target_register_set = "current";
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                            target_register_set = tokens.back();
+                        }
+
+                        tokens.push_back(input_tokens.at(++i));
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                        }
                     } else if (token == "izero"
                         or token == "print"
                         or token == "echo"

@@ -481,28 +481,37 @@ static viua::internals::types::bytecode_size assemble_instruction(Program& progr
 
         program.opor(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(lhs))), assembler::operands::getint(resolveregister(tokens.at(rhs))));
     } else if (tokens.at(i) == "move") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex target = i + 1;
+        TokenIndex source = target + 2;
 
         program.opmove(
-            assembler::operands::getint(tokens, target),
-            assembler::operands::getint(tokens, source)
+            assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
         );
     } else if (tokens.at(i) == "copy") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex target = i + 1;
+        TokenIndex source = target + 2;
 
-        program.opcopy(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
+        program.opcopy(
+            assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
+        );
     } else if (tokens.at(i) == "ptr") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex target = i + 1;
+        TokenIndex source = target + 2;
 
-        program.opptr(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
+        program.opptr(
+            assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
+        );
     } else if (tokens.at(i) == "swap") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex target = i + 1;
+        TokenIndex source = target + 2;
 
-        program.opswap(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
+        program.opswap(
+            assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
+        );
     } else if (tokens.at(i) == "delete") {
         TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 
@@ -1049,7 +1058,9 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
     // then, register 1 is moved to register 0 so it counts as a return code
     entry_function_tokens.emplace_back(0, 0, "move");
     entry_function_tokens.emplace_back(0, 0, "%0");
+    entry_function_tokens.emplace_back(0, 0, "local");
     entry_function_tokens.emplace_back(0, 0, "%1");
+    entry_function_tokens.emplace_back(0, 0, "local");
     entry_function_tokens.emplace_back(0, 0, "\n");
     bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
 

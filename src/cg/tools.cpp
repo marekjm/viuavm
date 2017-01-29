@@ -376,16 +376,16 @@ namespace viua {
                 return size_of_instruction_with_three_ri_operands(tokens, i);
             }
             static auto size_of_move(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
-                return size_of_instruction_with_two_ri_operands(tokens, i);
+                return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
             static auto size_of_copy(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
-                return size_of_instruction_with_two_ri_operands(tokens, i);
+                return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
             static auto size_of_ptr(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
-                return size_of_instruction_with_two_ri_operands(tokens, i);
+                return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
             static auto size_of_swap(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
-                return size_of_instruction_with_two_ri_operands(tokens, i);
+                return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
             static auto size_of_delete(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
