@@ -375,11 +375,39 @@ namespace viua {
                         }
                     } else if (token == "vinsert") {
                         tokens.push_back(token);
+
                         tokens.push_back(input_tokens.at(++i));
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                        }
+
                         tokens.push_back(input_tokens.at(++i));
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                        }
 
                         if (input_tokens.at(i+1).str() == "\n") {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "%0");
+                        }
+                    } else if (token == "vpush") {
+                        tokens.push_back(token);
+
+                        tokens.push_back(input_tokens.at(++i));
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                        }
+
+                        tokens.push_back(input_tokens.at(++i));
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
                         }
                     } else if (token == "join") {
                         tokens.push_back(token);

@@ -405,17 +405,23 @@ static viua::internals::types::bytecode_size assemble_instruction(Program& progr
             , assembler::operands::getint(resolveregister(tokens.at(pack_range_count)))
         );
     } else if (tokens.at(i) == "vinsert") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
-        TokenIndex position = get_token_index_of_operand(tokens, i, 3);
+        TokenIndex target = i + 1;
+        TokenIndex source = target + 2;
+        TokenIndex position = source + 2;
 
-        Token vec = tokens.at(target), src = tokens.at(source), pos = tokens.at(position);
-        program.opvinsert(assembler::operands::getint(resolveregister(vec)), assembler::operands::getint(resolveregister(src)), assembler::operands::getint(resolveregister(pos)));
+        program.opvinsert(
+            assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
+            , assembler::operands::getint(resolveregister(tokens.at(position)))
+        );
     } else if (tokens.at(i) == "vpush") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex target = i + 1;
+        TokenIndex source = target + 2;
 
-        program.opvpush(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
+        program.opvpush(
+            assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
+        );
     } else if (tokens.at(i) == "vpop") {
         TokenIndex target = get_token_index_of_operand(tokens, i, 1);
         TokenIndex destination = get_token_index_of_operand(tokens, i, 2);
