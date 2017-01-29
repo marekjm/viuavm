@@ -158,6 +158,25 @@ namespace viua {
 
                 return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
             }
+            static auto size_of_instruction_with_three_ri_operands_with_rs_types(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                viua::internals::types::bytecode_size calculated_size = sizeof(viua::internals::types::byte);    // start with the size of a single opcode
+
+                decltype(calculated_size) size_increment = 0;
+
+                // for target register
+                tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
+                calculated_size += size_increment;
+
+                // for 1st source register
+                tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
+                calculated_size += size_increment;
+
+                // for 2nd source register
+                tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
+                calculated_size += size_increment;
+
+                return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
+            }
             static auto size_of_instruction_with_three_ri_operands(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 viua::internals::types::bytecode_size calculated_size = sizeof(viua::internals::types::byte);    // start with the size of a single opcode
 
@@ -179,7 +198,7 @@ namespace viua {
             }
             static auto size_of_instruction_alu(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 ++i;
-                auto sz = size_of_instruction_with_three_ri_operands(tokens, i);
+                auto sz = size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
                 ++get<0>(sz);
                 return sz;
             }

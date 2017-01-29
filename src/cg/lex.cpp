@@ -379,20 +379,47 @@ namespace viua {
                     ) {
                         tokens.push_back(token);    // mnemonic
                         tokens.push_back(input_tokens.at(++i)); // result type specifier
+
                         tokens.push_back(input_tokens.at(++i)); // target register
-                        if (input_tokens.at(i+2).str() == "\n") {
-                            // if only two operands are given, double target register
-                            // this will expand the following instruction:
-                            //
-                            //      opcode T S
-                            // to:
-                            //
-                            //      opcode T T S
-                            //
-                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), tokens.back().str());
+
+                        string target_register_index = tokens.back();
+                        string target_register_set = "current";
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                            target_register_set = tokens.back();
+                        }
+
+                        // lhs register
+                        tokens.push_back(input_tokens.at(++i));
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                        }
+
+                        if (input_tokens.at(i+1) == "\n") {
+                            auto popped_target_rs = tokens.back();
+                            tokens.pop_back();
+                            auto popped_target_ri = tokens.back();
+                            tokens.pop_back();
+
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_index);
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+
+                            tokens.push_back(popped_target_ri);
+                            tokens.push_back(popped_target_rs);
                             continue;
                         }
-                        tokens.push_back(input_tokens.at(++i)); // second source register
+
+                        // rhs register
+                        tokens.push_back(input_tokens.at(++i));
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                        }
                     } else if (token == "and" or token == "or") {
                         tokens.push_back(token);    // mnemonic
                         tokens.push_back(input_tokens.at(++i)); // target register

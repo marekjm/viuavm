@@ -282,59 +282,113 @@ static viua::internals::types::bytecode_size assemble_instruction(Program& progr
             , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
         );
     } else if (tokens.at(i) == "add") {
-        TokenIndex rhs = get_token_index_of_operand(tokens, i, 4);
-        TokenIndex lhs = get_token_index_of_operand(tokens, i, 3);
-        TokenIndex target = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex result_type = i + 1;
+        TokenIndex target = result_type + 1;
+        TokenIndex lhs = target + 2;
+        TokenIndex rhs = lhs + 2;
 
-        program.opadd(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(lhs))), assembler::operands::getint(resolveregister(tokens.at(rhs))));
+        program.opadd(
+            tokens.at(result_type)
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)), resolve_rs_type(tokens.at(lhs+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)), resolve_rs_type(tokens.at(rhs+1)))
+        );
     } else if (tokens.at(i) == "sub") {
-        TokenIndex rhs = get_token_index_of_operand(tokens, i, 4);
-        TokenIndex lhs = get_token_index_of_operand(tokens, i, 3);
-        TokenIndex target = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex result_type = i + 1;
+        TokenIndex target = result_type + 1;
+        TokenIndex lhs = target + 2;
+        TokenIndex rhs = lhs + 2;
 
-        program.opsub(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(lhs))), assembler::operands::getint(resolveregister(tokens.at(rhs))));
+        program.opsub(
+            tokens.at(result_type)
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)), resolve_rs_type(tokens.at(lhs+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)), resolve_rs_type(tokens.at(rhs+1)))
+        );
     } else if (tokens.at(i) == "mul") {
-        TokenIndex rhs = get_token_index_of_operand(tokens, i, 4);
-        TokenIndex lhs = get_token_index_of_operand(tokens, i, 3);
-        TokenIndex target = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex result_type = i + 1;
+        TokenIndex target = result_type + 1;
+        TokenIndex lhs = target + 2;
+        TokenIndex rhs = lhs + 2;
 
-        program.opmul(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(lhs))), assembler::operands::getint(resolveregister(tokens.at(rhs))));
+        program.opmul(
+            tokens.at(result_type)
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)), resolve_rs_type(tokens.at(lhs+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)), resolve_rs_type(tokens.at(rhs+1)))
+        );
     } else if (tokens.at(i) == "div") {
-        TokenIndex rhs = get_token_index_of_operand(tokens, i, 4);
-        TokenIndex lhs = get_token_index_of_operand(tokens, i, 3);
-        TokenIndex target = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex result_type = i + 1;
+        TokenIndex target = result_type + 1;
+        TokenIndex lhs = target + 2;
+        TokenIndex rhs = lhs + 2;
 
-        program.opdiv(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(lhs))), assembler::operands::getint(resolveregister(tokens.at(rhs))));
+        program.opdiv(
+            tokens.at(result_type)
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)), resolve_rs_type(tokens.at(lhs+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)), resolve_rs_type(tokens.at(rhs+1)))
+        );
     } else if (tokens.at(i) == "lt") {
-        TokenIndex rhs = get_token_index_of_operand(tokens, i, 4);
-        TokenIndex lhs = get_token_index_of_operand(tokens, i, 3);
-        TokenIndex target = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex result_type = i + 1;
+        TokenIndex target = result_type + 1;
+        TokenIndex lhs = target + 2;
+        TokenIndex rhs = lhs + 2;
 
-        program.oplt(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(lhs))), assembler::operands::getint(resolveregister(tokens.at(rhs))));
+        program.oplt(
+            tokens.at(result_type)
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)), resolve_rs_type(tokens.at(lhs+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)), resolve_rs_type(tokens.at(rhs+1)))
+        );
     } else if (tokens.at(i) == "lte") {
-        TokenIndex rhs = get_token_index_of_operand(tokens, i, 4);
-        TokenIndex lhs = get_token_index_of_operand(tokens, i, 3);
-        TokenIndex target = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex result_type = i + 1;
+        TokenIndex target = result_type + 1;
+        TokenIndex lhs = target + 2;
+        TokenIndex rhs = lhs + 2;
 
-        program.oplte(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(lhs))), assembler::operands::getint(resolveregister(tokens.at(rhs))));
+        program.oplte(
+            tokens.at(result_type)
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)), resolve_rs_type(tokens.at(lhs+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)), resolve_rs_type(tokens.at(rhs+1)))
+        );
     } else if (tokens.at(i) == "gt") {
-        TokenIndex rhs = get_token_index_of_operand(tokens, i, 4);
-        TokenIndex lhs = get_token_index_of_operand(tokens, i, 3);
-        TokenIndex target = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex result_type = i + 1;
+        TokenIndex target = result_type + 1;
+        TokenIndex lhs = target + 2;
+        TokenIndex rhs = lhs + 2;
 
-        program.opgt(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(lhs))), assembler::operands::getint(resolveregister(tokens.at(rhs))));
+        program.opgt(
+            tokens.at(result_type)
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)), resolve_rs_type(tokens.at(lhs+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)), resolve_rs_type(tokens.at(rhs+1)))
+        );
     } else if (tokens.at(i) == "gte") {
-        TokenIndex rhs = get_token_index_of_operand(tokens, i, 4);
-        TokenIndex lhs = get_token_index_of_operand(tokens, i, 3);
-        TokenIndex target = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex result_type = i + 1;
+        TokenIndex target = result_type + 1;
+        TokenIndex lhs = target + 2;
+        TokenIndex rhs = lhs + 2;
 
-        program.opgte(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(lhs))), assembler::operands::getint(resolveregister(tokens.at(rhs))));
+        program.opgte(
+            tokens.at(result_type)
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)), resolve_rs_type(tokens.at(lhs+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)), resolve_rs_type(tokens.at(rhs+1)))
+        );
     } else if (tokens.at(i) == "eq") {
-        TokenIndex rhs = get_token_index_of_operand(tokens, i, 4);
-        TokenIndex lhs = get_token_index_of_operand(tokens, i, 3);
-        TokenIndex target = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex result_type = i + 1;
+        TokenIndex target = result_type + 1;
+        TokenIndex lhs = target + 2;
+        TokenIndex rhs = lhs + 2;
 
-        program.opeq(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(lhs))), assembler::operands::getint(resolveregister(tokens.at(rhs))));
+        program.opeq(
+            tokens.at(result_type)
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)), resolve_rs_type(tokens.at(lhs+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)), resolve_rs_type(tokens.at(rhs+1)))
+        );
     } else if (tokens.at(i) == "strstore") {
         TokenIndex target = i + 1;
         TokenIndex source = target + 2;
