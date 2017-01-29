@@ -517,10 +517,13 @@ static viua::internals::types::bytecode_size assemble_instruction(Program& progr
 
         program.opdelete(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1))));
     } else if (tokens.at(i) == "isnull") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex target = i + 1;
+        TokenIndex source = target + 2;
 
-        program.opisnull(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
+        program.opisnull(
+            assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
+        );
     } else if (tokens.at(i) == "ress") {
         TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 

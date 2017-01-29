@@ -451,8 +451,8 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             // it is not viable to statically check for register emptiness in the context of "isnull" instruction
             // instead, statically check for the "non-emptiness" and thrown an error is we can determine that the register access
             // will always be valid
-            TokenIndex source = get_token_index_of_operand(body_tokens, i, 2);
-            TokenIndex target = get_token_index_of_operand(body_tokens, i, 1);
+            TokenIndex target = i + 1;
+            TokenIndex source = target + 2;
 
             if (registers.defined(resolve_register_name(named_registers, body_tokens.at(source)))) {
                 throw viua::cg::lex::InvalidSyntax(body_tokens.at(target), ("useless check, register will always be defined: " + str::strencode(strip_access_mode_sigil(body_tokens.at(source)))));

@@ -649,7 +649,7 @@ namespace viua {
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
-                    } else if (token == "move" or token == "copy" or token == "swap" or token == "ptr") {
+                    } else if (token == "move" or token == "copy" or token == "swap" or token == "ptr" or token == "isnull") {
                         tokens.push_back(token);                // mnemonic
 
                         tokens.push_back(input_tokens.at(++i)); // target register
