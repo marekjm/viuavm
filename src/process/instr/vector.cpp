@@ -31,31 +31,37 @@ using namespace std;
 
 
 viua::internals::types::byte* viua::process::Process::opvec(viua::internals::types::byte* addr) {
-    viua::internals::types::register_index register_index = 0, pack_start_index = 0, pack_length = 0;
-    tie(addr, register_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    tie(addr, pack_start_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    tie(addr, pack_length) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    viua::internals::RegisterSets target_rs = viua::internals::RegisterSets::CURRENT;
+    viua::internals::types::register_index target_ri = 0;
+    tie(addr, target_rs, target_ri) = viua::bytecode::decoder::operands::fetch_register_type_and_index(addr, this);
 
-    if ((register_index > pack_start_index) and (register_index < (pack_start_index+pack_length))) {
+    viua::internals::RegisterSets pack_start_rs = viua::internals::RegisterSets::CURRENT;
+    viua::internals::types::register_index pack_start_ri = 0;
+    tie(addr, pack_start_rs, pack_start_ri) = viua::bytecode::decoder::operands::fetch_register_type_and_index(addr, this);
+
+    viua::internals::types::register_index pack_size = 0;
+    tie(addr, pack_size) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+
+    if ((target_ri > pack_start_ri) and (target_ri < (pack_start_ri+pack_size))) {
         // FIXME vector is inserted into a register after packing, so this exception is not entirely well thought-out
         // allow packing target register
         throw new viua::types::Exception("vec would pack itself");
     }
-    if ((pack_start_index+pack_length) >= currently_used_register_set->size()) {
+    if ((pack_start_ri+pack_size) >= currently_used_register_set->size()) {
         throw new viua::types::Exception("vec: packing outside of register set range");
     }
-    for (decltype(pack_length) i = 0; i < pack_length; ++i) {
-        if (currently_used_register_set->at(pack_start_index+i) == nullptr) {
+    for (decltype(pack_size) i = 0; i < pack_size; ++i) {
+        if (register_at(pack_start_ri+i, pack_start_rs)->empty()) {
             throw new viua::types::Exception("vec: cannot pack null register");
         }
     }
 
     unique_ptr<viua::types::Vector> v(new viua::types::Vector());
-    for (decltype(pack_length) i = 0; i < pack_length; ++i) {
-        v->push(pop(pack_start_index+i));
+    for (decltype(pack_size) i = 0; i < pack_size; ++i) {
+        v->push(register_at(pack_start_ri+i, pack_start_rs)->give());
     }
 
-    place(register_index, std::move(v));
+    *register_at(target_ri, target_rs) = std::move(v);
 
     return addr;
 }
