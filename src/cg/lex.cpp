@@ -627,11 +627,28 @@ namespace viua {
                         continue;
                     } else if (token == "not") {
                         tokens.push_back(token);                // mnemonic
+
                         tokens.push_back(input_tokens.at(++i)); // target register
+                        string target_register_set = "current";
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                            target_register_set = tokens.back();
+                        }
+
                         if (input_tokens.at(i+1) == "\n") {
                             tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), input_tokens.at(i).str());
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                            continue;
                         }
-                        continue;
+
+                        tokens.push_back(input_tokens.at(++i));
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                        }
                     } else if (token == "izero"
                         or token == "print"
                         or token == "echo"
