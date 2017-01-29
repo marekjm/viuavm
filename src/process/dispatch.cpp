@@ -134,12 +134,6 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case RESS:
             addr = opress(addr+1);
             break;
-        case TMPRI:
-            addr = optmpri(addr+1);
-            break;
-        case TMPRO:
-            addr = optmpro(addr+1);
-            break;
         case PRINT:
               addr = opprint(addr+1);
             break;

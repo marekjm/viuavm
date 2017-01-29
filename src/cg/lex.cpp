@@ -116,7 +116,6 @@ namespace viua {
                     "local",
                     "static",
                     "global",
-                    "temporary",
 
                     /*
                      * Reserved for future use.

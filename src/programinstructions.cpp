@@ -301,20 +301,6 @@ Program& Program::opress(string a) {
     return (*this);
 }
 
-Program& Program::optmpri(int_op reg) {
-    /*  Inserts tmpri instuction.
-     */
-    addr_ptr = cg::bytecode::optmpri(addr_ptr, reg);
-    return (*this);
-}
-
-Program& Program::optmpro(int_op reg) {
-    /*  Inserts tmpro instuction.
-     */
-    addr_ptr = cg::bytecode::optmpro(addr_ptr, reg);
-    return (*this);
-}
-
 Program& Program::opprint(int_op reg) {
     /*  Inserts print instuction.
      */

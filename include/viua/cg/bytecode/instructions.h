@@ -107,8 +107,6 @@ namespace cg {
         viua::internals::types::byte* opdelete(viua::internals::types::byte*, int_op);
         viua::internals::types::byte* opisnull(viua::internals::types::byte*, int_op, int_op);
         viua::internals::types::byte* opress(viua::internals::types::byte*, const std::string&);
-        viua::internals::types::byte* optmpri(viua::internals::types::byte*, int_op);
-        viua::internals::types::byte* optmpro(viua::internals::types::byte*, int_op);
 
         viua::internals::types::byte* opprint(viua::internals::types::byte*, int_op);
         viua::internals::types::byte* opecho(viua::internals::types::byte*, int_op);

@@ -50,7 +50,6 @@ namespace viua {
             GLOBAL,
             LOCAL,
             STATIC,
-            TEMPORARY,
         };
     }
 }

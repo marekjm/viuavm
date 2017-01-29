@@ -77,9 +77,6 @@ namespace viua {
              */
             viua::kernel::RegisterSet* currently_used_register_set;
 
-            // Temporary register
-            std::unique_ptr<viua::types::Type> tmp;
-
             // Static registers
             std::map<std::string, std::unique_ptr<viua::kernel::RegisterSet>> static_registers;
 
@@ -203,8 +200,6 @@ namespace viua {
             viua::internals::types::byte* opisnull(viua::internals::types::byte*);
 
             viua::internals::types::byte* opress(viua::internals::types::byte*);
-            viua::internals::types::byte* optmpri(viua::internals::types::byte*);
-            viua::internals::types::byte* optmpro(viua::internals::types::byte*);
 
             viua::internals::types::byte* opprint(viua::internals::types::byte*);
             viua::internals::types::byte* opecho(viua::internals::types::byte*);

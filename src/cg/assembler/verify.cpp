@@ -332,7 +332,6 @@ void assembler::verify::ressInstructions(const vector<Token>& tokens, bool as_li
         "global",   // global register set
         "local",    // local register set for function
         "static",   // static register set
-        "temporary",// temporary register set
     };
     string function;
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {

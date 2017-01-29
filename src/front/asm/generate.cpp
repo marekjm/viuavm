@@ -528,14 +528,6 @@ static viua::internals::types::bytecode_size assemble_instruction(Program& progr
         TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 
         program.opress(tokens.at(target));
-    } else if (tokens.at(i) == "tmpri") {
-        TokenIndex source = get_token_index_of_operand(tokens, i, 1);
-
-        program.optmpri(assembler::operands::getint(resolveregister(tokens.at(source))));
-    } else if (tokens.at(i) == "tmpro") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-
-        program.optmpro(assembler::operands::getint(resolveregister(tokens.at(target))));
     } else if (tokens.at(i) == "print") {
         TokenIndex source = get_token_index_of_operand(tokens, i, 1);
 

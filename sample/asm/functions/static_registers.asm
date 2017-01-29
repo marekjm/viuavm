@@ -43,12 +43,8 @@
     ; FIXME static analyser does not handle swicthes between registers sets well
     iinc %1
 
-    ; the copy is required because TMPRI moves objects instead
-    ; of copying
-    copy %4 %1
-    move (tmpri %1) %4
+    copy %1 local %1 current
     ress local
-    tmpro %1
 
     ; integer at 1 is *at least* N
     ; N is the parameter the function received

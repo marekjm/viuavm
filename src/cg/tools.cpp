@@ -398,12 +398,6 @@ namespace viua {
                 calculated_size += sizeof(viua::internals::types::registerset_type_marker);
                 return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_tmpri(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
-                return size_of_instruction_with_one_ri_operand(tokens, i);
-            }
-            static auto size_of_tmpro(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
-                return size_of_instruction_with_one_ri_operand(tokens, i);
-            }
             static auto size_of_print(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
@@ -850,12 +844,6 @@ namespace viua {
                     } else if (tokens.at(i) == "ress") {
                         ++i;
                         tie(increase, i) = size_of_ress(tokens, i);
-                    } else if (tokens.at(i) == "tmpri") {
-                        ++i;
-                        tie(increase, i) = size_of_tmpri(tokens, i);
-                    } else if (tokens.at(i) == "tmpro") {
-                        ++i;
-                        tie(increase, i) = size_of_tmpro(tokens, i);
                     } else if (tokens.at(i) == "print") {
                         ++i;
                         tie(increase, i) = size_of_print(tokens, i);
@@ -1131,12 +1119,6 @@ namespace viua {
                     } else if (tokens.at(i) == "ress") {
                         ++i;
                         tie(increase, i) = size_of_ress(tokens, i);
-                    } else if (tokens.at(i) == "tmpri") {
-                        ++i;
-                        tie(increase, i) = size_of_tmpri(tokens, i);
-                    } else if (tokens.at(i) == "tmpro") {
-                        ++i;
-                        tie(increase, i) = size_of_tmpro(tokens, i);
                     } else if (tokens.at(i) == "print") {
                         ++i;
                         tie(increase, i) = size_of_print(tokens, i);

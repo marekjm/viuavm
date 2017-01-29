@@ -330,8 +330,6 @@ namespace cg {
                 register_set_marker = viua::internals::RegisterSets::LOCAL;
             } else if (a == "static") {
                 register_set_marker = viua::internals::RegisterSets::STATIC;
-            } else if (a == "temp") {
-                register_set_marker = viua::internals::RegisterSets::TEMPORARY;
             } else {
                 // FIXME: detect invalid register set names
                 // after switching to token-based code generation
@@ -340,16 +338,6 @@ namespace cg {
             *(addr_ptr) = static_cast<viua::internals::types::registerset_type_marker>(register_set_marker);
             pointer::inc<viua::internals::types::registerset_type_marker, viua::internals::types::byte>(addr_ptr);
             return addr_ptr;
-        }
-
-        viua::internals::types::byte* optmpri(viua::internals::types::byte* addr_ptr, int_op reg) {
-            *(addr_ptr++) = TMPRI;
-            return insert_ri_operand(addr_ptr, reg);
-        }
-
-        viua::internals::types::byte* optmpro(viua::internals::types::byte* addr_ptr, int_op reg) {
-            *(addr_ptr++) = TMPRO;
-            return insert_ri_operand(addr_ptr, reg);
         }
 
         viua::internals::types::byte* opprint(viua::internals::types::byte* addr_ptr, int_op reg) {

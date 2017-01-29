@@ -89,9 +89,6 @@ string disassembler::intop_with_rs_type(viua::internals::types::byte* ptr) {
                 case viua::internals::RegisterSets::STATIC:
                     oss << "static";
                     break;
-                case viua::internals::RegisterSets::TEMPORARY:
-                    oss << "temporary";
-                    break;
                 default:
                     throw "invalid register set detected";
             }
@@ -114,9 +111,6 @@ string disassembler::intop_with_rs_type(viua::internals::types::byte* ptr) {
                 case viua::internals::RegisterSets::STATIC:
                     oss << "static";
                     break;
-                case viua::internals::RegisterSets::TEMPORARY:
-                    oss << "temporary";
-                    break;
                 default:
                     throw "invalid register set detected";
             }
@@ -138,9 +132,6 @@ string disassembler::intop_with_rs_type(viua::internals::types::byte* ptr) {
                     break;
                 case viua::internals::RegisterSets::STATIC:
                     oss << "static";
-                    break;
-                case viua::internals::RegisterSets::TEMPORARY:
-                    oss << "temporary";
                     break;
                 default:
                     throw "invalid register set detected";
@@ -286,8 +277,6 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             break;
         case BOOL:
-        case TMPRI:
-        case TMPRO:
         case ARGC:
         case SELF:
         case DRAW:
@@ -437,9 +426,6 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
                     break;
                 case viua::internals::RegisterSets::STATIC:
                     oss << "static";
-                    break;
-                case viua::internals::RegisterSets::TEMPORARY:
-                    oss << "temp";
                     break;
                 default:
                     // FIXME: should this only be a warning?

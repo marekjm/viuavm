@@ -515,7 +515,7 @@ void viua::process::Process::migrate_to(viua::scheduler::VirtualProcessScheduler
 }
 
 viua::process::Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualProcessScheduler *sch, viua::process::Process* pt): scheduler(sch), parent_process(pt), entry_function(frm->function_name),
-    global_register_set(nullptr), currently_used_register_set(nullptr), tmp(nullptr),
+    global_register_set(nullptr), currently_used_register_set(nullptr),
     jump_base(nullptr),
     frame_new(nullptr), try_frame_new(nullptr),
     thrown(nullptr), caught(nullptr),

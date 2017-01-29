@@ -619,9 +619,6 @@ class RegisterManipulationInstructionsTests(unittest.TestCase):
     def testDELETE(self):
         runTest(self, 'delete.asm', 'true')
 
-    def testFetchingFromEmptyTemporaryRegister(self):
-        runTestThrowsException(self, 'fetching_from_empty_tmp_register.asm', ('Exception', 'temporary register set is empty',))
-
 
 class PointersTests(unittest.TestCase):
     """Tests for register-manipulation instructions.
@@ -1186,15 +1183,6 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
 
     def testThrowFromEmptyRegister(self):
         runTestFailsToAssemble(self, 'throw_from_empty_register.asm', "./sample/asm/static_analysis_errors/throw_from_empty_register.asm:21:11: error: throw from empty register: 1")
-
-    def testTmpriEmptiesRegisters(self):
-        runTestFailsToAssemble(self, 'tmpri_empties_registers.asm', "./sample/asm/static_analysis_errors/tmpri_empties_registers.asm:21:25: error: print of empty register: 1")
-
-    def testTmpriFromEmptyRegister(self):
-        runTestFailsToAssemble(self, 'tmpri_from_empty_register.asm', "./sample/asm/static_analysis_errors/tmpri_from_empty_register.asm:21:11: error: move to tmp register from empty register: 1")
-
-    def testTmproMakesRegistersNonempty(self):
-        runTestThrowsException(self, 'tmpro_makes_registers_nonempty.asm', ('Exception', 'temporary register set is empty'))
 
     def testIsnullFailsOnNonemptyRegisters(self):
         runTestFailsToAssemble(self, 'isnull_fails_on_nonempty_registers.asm', "./sample/asm/static_analysis_errors/isnull_fails_on_nonempty_registers.asm:22:19: error: useless check, register will always be defined: 1")

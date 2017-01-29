@@ -104,8 +104,6 @@ class Program {
     Program& opptr(int_op, int_op);
     Program& opswap(int_op, int_op);
     Program& opress(std::string);
-    Program& optmpri(int_op);
-    Program& optmpro(int_op);
     Program& opdelete(int_op);
     Program& opisnull(int_op, int_op);
 

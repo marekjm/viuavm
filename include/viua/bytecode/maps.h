@@ -78,8 +78,6 @@ const std::set<std::string> OP_MNEMONICS = {
     "delete",
     "isnull",
     "ress",
-    "tmpri",
-    "tmpro",
 
     "print",
     "echo",
@@ -183,8 +181,6 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { DELETE,       "delete" },
     { ISNULL,       "isnull" },
     { RESS,         "ress", },
-    { TMPRI,        "tmpri", },
-    { TMPRO,        "tmpro", },
 
     { PRINT,        "print" },
     { ECHO,         "echo" },

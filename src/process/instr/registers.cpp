@@ -102,32 +102,9 @@ viua::internals::types::byte* viua::process::Process::opress(viua::internals::ty
             ensureStaticRegisters(frames.back()->function_name);
             currently_used_register_set = static_registers.at(frames.back()->function_name).get();
             break;
-        case viua::internals::RegisterSets::TEMPORARY:
-            // TODO: switching to temporary registers
         default:
             throw new viua::types::Exception("illegal register set ID in ress instruction");
     }
-
-    return addr;
-}
-
-viua::internals::types::byte* viua::process::Process::optmpri(viua::internals::types::byte* addr) {
-    viua::kernel::Register *target = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
-
-    tmp = target->give();
-
-    return addr;
-}
-viua::internals::types::byte* viua::process::Process::optmpro(viua::internals::types::byte* addr) {
-    if (not tmp) {
-        throw new viua::types::Exception("temporary register set is empty");
-    }
-
-    viua::kernel::Register *target = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
-
-    *target = std::move(tmp);
 
     return addr;
 }
