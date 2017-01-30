@@ -533,8 +533,16 @@ namespace viua {
                         tokens.push_back(input_tokens.at(++i)); // second source register
                     } else if (token == "capture" or token == "capturecopy" or token == "capturemove") {
                         tokens.push_back(token);    // mnemonic
+
                         tokens.push_back(input_tokens.at(++i)); // target register
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                        }
+
                         tokens.push_back(input_tokens.at(++i)); // source register
+
                         if (input_tokens.at(i+1).str() == "\n") {
                             // if only two operands are given, double source register
                             // this will expand the following instruction:
@@ -545,10 +553,16 @@ namespace viua {
                             //      opcode T S S
                             //
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), tokens.back().str());
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                            continue;
                         } else {
                             tokens.push_back(input_tokens.at(++i)); // source register
                         }
-                        continue;
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                        }
                     } else if (token == "istore") {
                         tokens.push_back(token);                // mnemonic
                         tokens.push_back(input_tokens.at(++i)); // target register

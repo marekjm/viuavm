@@ -537,23 +537,35 @@ static viua::internals::types::bytecode_size assemble_instruction(Program& progr
 
         program.opecho(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1))));
     } else if (tokens.at(i) == "capture") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-        TokenIndex inside_index = get_token_index_of_operand(tokens, i, 2);
-        TokenIndex source = get_token_index_of_operand(tokens, i, 3);
+        TokenIndex target = i + 1;
+        TokenIndex inside_index = target + 2;
+        TokenIndex source = inside_index + 1;
 
-        program.opcapture(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(inside_index))), assembler::operands::getint(resolveregister(tokens.at(source))));
+        program.opcapture(
+            assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , assembler::operands::getint(resolveregister(tokens.at(inside_index)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
+        );
     } else if (tokens.at(i) == "capturecopy") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-        TokenIndex inside_index = get_token_index_of_operand(tokens, i, 2);
-        TokenIndex source = get_token_index_of_operand(tokens, i, 3);
+        TokenIndex target = i + 1;
+        TokenIndex inside_index = target + 2;
+        TokenIndex source = inside_index + 1;
 
-        program.opcapturecopy(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(inside_index))), assembler::operands::getint(resolveregister(tokens.at(source))));
+        program.opcapturecopy(
+            assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , assembler::operands::getint(resolveregister(tokens.at(inside_index)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
+        );
     } else if (tokens.at(i) == "capturemove") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-        TokenIndex inside_index = get_token_index_of_operand(tokens, i, 2);
-        TokenIndex source = get_token_index_of_operand(tokens, i, 3);
+        TokenIndex target = i + 1;
+        TokenIndex inside_index = target + 2;
+        TokenIndex source = inside_index + 1;
 
-        program.opcapturemove(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(inside_index))), assembler::operands::getint(resolveregister(tokens.at(source))));
+        program.opcapturemove(
+            assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , assembler::operands::getint(resolveregister(tokens.at(inside_index)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
+        );
     } else if (tokens.at(i) == "closure") {
         TokenIndex target = get_token_index_of_operand(tokens, i, 1);
         TokenIndex source = get_token_index_of_operand(tokens, i, 2);
