@@ -310,7 +310,7 @@ void assembler::verify::callableCreations(const vector<Token>& tokens, const vec
             continue;
         }
 
-        string function = tokens.at(i+2);
+        string function = tokens.at(i+3);
         bool is_undefined = (find(function_names.begin(), function_names.end(), function) == function_names.end());
         // if function is undefined, check if we got a signature for it
         if (is_undefined) {

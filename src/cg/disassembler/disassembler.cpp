@@ -222,7 +222,15 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         oss << ' ' << str::enquote(s);
         ptr += s.size();
         ++ptr; // for null character terminating the C-style string not included in std::string
-    } else if ((op == CALL) or (op == PROCESS) or (op == CLOSURE) or (op == FUNCTION) or (op == CLASS) or (op == NEW) or (op == DERIVE) or (op == MSG)) {
+    } else if ((op == CLOSURE) or (op == FUNCTION)) {
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
+
+        oss << ' ';
+        string fn_name = string(reinterpret_cast<char*>(ptr));
+        oss << fn_name;
+        ptr += fn_name.size();
+        ++ptr; // for null character terminating the C-style string not included in std::string
+    } else if ((op == CALL) or (op == PROCESS) or (op == CLASS) or (op == NEW) or (op == DERIVE) or (op == MSG)) {
         ptr = disassemble_ri_operand(oss, ptr);
 
         oss << ' ';
