@@ -38,22 +38,22 @@ enum JUMPTYPE {
 
 class Program {
     // byte array containing bytecode
-    byte* program;
+    viua::internals::types::byte* program;
     // size of the bytecode
-    uint64_t bytes;
+    viua::internals::types::bytecode_size bytes;
 
     /** Current address inside bytecode array.
      *  Used during bytecode generation.
      *  Methods implementing generation of specific bytecodes always
      *  append bytes to this pointer.
      */
-    byte* addr_ptr;
+    viua::internals::types::byte* addr_ptr;
 
     /** Branches inside bytecode must be stored for later recalculation.
      *  Jumps must be recalculated because each function is compiled separately with jump offset 0, but
      *  when they are assembled into a single binary the offsets change.
      */
-    std::vector<byte*> branches;
+    std::vector<viua::internals::types::byte*> branches;
 
     // simple, whether to print debugging information or not
     bool debug;
@@ -65,36 +65,26 @@ class Program {
 
     Program& opizero(int_op);
     Program& opistore(int_op, int_op);
-    Program& opiadd(int_op, int_op, int_op);
-    Program& opisub(int_op, int_op, int_op);
-    Program& opimul(int_op, int_op, int_op);
-    Program& opidiv(int_op, int_op, int_op);
-
     Program& opiinc(int_op);
     Program& opidec(int_op);
 
-    Program& opilt(int_op, int_op, int_op);
-    Program& opilte(int_op, int_op, int_op);
-    Program& opigt(int_op, int_op, int_op);
-    Program& opigte(int_op, int_op, int_op);
-    Program& opieq(int_op, int_op, int_op);
-
     Program& opfstore(int_op, float);
-    Program& opfadd(int_op, int_op, int_op);
-    Program& opfsub(int_op, int_op, int_op);
-    Program& opfmul(int_op, int_op, int_op);
-    Program& opfdiv(int_op, int_op, int_op);
-
-    Program& opflt(int_op, int_op, int_op);
-    Program& opflte(int_op, int_op, int_op);
-    Program& opfgt(int_op, int_op, int_op);
-    Program& opfgte(int_op, int_op, int_op);
-    Program& opfeq(int_op, int_op, int_op);
 
     Program& opitof(int_op, int_op);
     Program& opftoi(int_op, int_op);
     Program& opstoi(int_op, int_op);
     Program& opstof(int_op, int_op);
+
+    Program& opadd(std::string, int_op, int_op, int_op);
+    Program& opsub(std::string, int_op, int_op, int_op);
+    Program& opmul(std::string, int_op, int_op, int_op);
+    Program& opdiv(std::string, int_op, int_op, int_op);
+
+    Program& oplt(std::string, int_op, int_op, int_op);
+    Program& oplte(std::string, int_op, int_op, int_op);
+    Program& opgt(std::string, int_op, int_op, int_op);
+    Program& opgte(std::string, int_op, int_op, int_op);
+    Program& opeq(std::string, int_op, int_op, int_op);
 
     Program& opstrstore(int_op, std::string);
 
@@ -140,12 +130,12 @@ class Program {
     Program& optailcall(const std::string&);
     Program& opprocess(int_op, const std::string&);
     Program& opself(int_op);
-    Program& opjoin(int_op, int_op, int_op);
+    Program& opjoin(int_op, int_op, timeout_op);
     Program& opsend(int_op, int_op);
-    Program& opreceive(int_op, int_op);
+    Program& opreceive(int_op, timeout_op);
     Program& opwatchdog(const std::string&);
-    Program& opjump(uint64_t, enum JUMPTYPE);
-    Program& opif(int_op, uint64_t, enum JUMPTYPE, uint64_t, enum JUMPTYPE);
+    Program& opjump(viua::internals::types::bytecode_size, enum JUMPTYPE);
+    Program& opif(int_op, viua::internals::types::bytecode_size, enum JUMPTYPE, viua::internals::types::bytecode_size, enum JUMPTYPE);
 
     Program& optry();
     Program& opcatch(std::string, std::string);
@@ -175,18 +165,18 @@ class Program {
      *  These must be called after the bytecode is already generated as they must know
      *  size of the program.
      */
-    Program& calculateJumps(std::vector<std::tuple<uint64_t, uint64_t>>, std::vector<viua::cg::lex::Token>&);
-    std::vector<uint64_t> jumps();
+    Program& calculateJumps(std::vector<std::tuple<viua::internals::types::bytecode_size, viua::internals::types::bytecode_size>>, std::vector<viua::cg::lex::Token>&);
+    std::vector<viua::internals::types::bytecode_size> jumps();
 
-    byte* bytecode();
-    Program& fill(byte*);
+    viua::internals::types::byte* bytecode();
+    Program& fill(viua::internals::types::byte*);
 
     Program& setdebug(bool d = true);
     Program& setscream(bool d = true);
 
-    uint64_t size();
+    viua::internals::types::bytecode_size size();
 
-    Program(uint64_t bts = 2);
+    Program(viua::internals::types::bytecode_size bts = 2);
     Program(const Program& that);
     ~Program();
     Program& operator=(const Program& that);

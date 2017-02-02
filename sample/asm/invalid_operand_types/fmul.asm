@@ -18,14 +18,14 @@
 ;
 
 .function: main/1
-    register (class 1 Foo)
-    new 1 Foo
+    register (class %1 Foo)
+    new %1 Foo
 
-    fstore 2 1.0
+    fstore %2 1.0
 
-    fmul 3 1 2
-    print 3
+    mul float32 %3 %1 %2
+    print %3
 
-    izero 0
+    izero %0
     return
 .end

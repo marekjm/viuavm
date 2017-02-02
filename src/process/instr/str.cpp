@@ -28,14 +28,14 @@
 using namespace std;
 
 
-byte* viua::process::Process::opstrstore(byte* addr) {
-    unsigned target = 0;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+viua::internals::types::byte* viua::process::Process::opstrstore(viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     string s;
     tie(addr, s) = viua::bytecode::decoder::operands::fetch_primitive_string(addr, this);
 
-    place(target, unique_ptr<viua::types::Type>{new viua::types::String(str::strdecode(s))});
+    *target = unique_ptr<viua::types::Type>{new viua::types::String(str::strdecode(s))};
 
     return addr;
 }

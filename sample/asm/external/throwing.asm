@@ -20,21 +20,21 @@
 .signature: throwing::oh_noes/0
 
 .block: __try
-    frame 0
-    call 0 throwing::oh_noes/0
+    frame %0
+    call void throwing::oh_noes/0
     leave
 .end
 .block: __catch_Exception
-    print (draw 1)
+    print (draw %1)
     leave
 .end
 
 .function: watchdog_process/0
-    arg (.name: iota death_message) 0
+    arg (.name: %iota death_message) %0
 
-    .name: iota exception
-    remove exception death_message (strstore exception "exception")
-    print exception
+    .name: %iota exception
+    remove %exception %death_message (strstore %exception "exception")
+    print %exception
 
     return
 .end
@@ -48,6 +48,6 @@
     catch "ExceptionX" __catch_Exception
     enter __try
 
-    izero 0
+    izero %0
     return
 .end

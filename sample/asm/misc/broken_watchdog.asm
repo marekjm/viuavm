@@ -21,27 +21,27 @@
     ; uncomment the `receive 1` and
     ; the program is no longer broken
     ;receive 1
-    -- this program tests if the machine can quit if
+    -- this program tests if %the machine can quit if
     -- watchdog is pathologically broken
     --
-    -- this test will fail if this watchdog function gets
+    -- this test will fail if %this watchdog function %gets
     -- at least one message
     return
 .end
 
 .function: will_be_killed_by_a_runaway_exception/0
-    istore 1 80
+    istore %1 80
 
-    strstore 3 "iterations left: "
+    strstore %3 "iterations left: "
 
     .mark: __will_be_killed_by_a_runaway_exception_begin_while_0
-    if 1 +1 __will_be_killed_by_a_runaway_exception_end_while_1
-    echo 3
-    print (idec 1)
+    if %1 +1 __will_be_killed_by_a_runaway_exception_end_while_1
+    echo %3
+    print (idec %1)
     jump __will_be_killed_by_a_runaway_exception_begin_while_0
     .mark: __will_be_killed_by_a_runaway_exception_end_while_1
 
-    throw (strstore 2 "Hello runaway World!")
+    throw (strstore %2 "Hello runaway World!")
 
     return
 .end
@@ -50,18 +50,18 @@
     ; executes at least N cycles
     ;
     .name: 1 counter
-    arg counter 0
+    arg %counter %0
 
     .name: 4 i
-    isub counter counter (istore i 9)
-    idiv counter counter (istore i 2)
+    sub int64 %counter %counter (istore %i 9)
+    div int64 %counter %counter (istore %i 2)
 
     .name: 2 zero
-    izero zero
+    izero %zero
 
     .mark: __loop_begin
-    if (ilte 3 counter zero) __loop_end +1
-    idec counter
+    if (lte int64 %3 %counter %zero) __loop_end +1
+    idec %counter
     jump __loop_begin
     .mark: __loop_end
 
@@ -71,16 +71,16 @@
 .function: main/1
     watchdog supervisor_function/0
 
-    ;frame 0
+    ;frame %0
     ;process 1 will_be_killed_by_a_runaway_exception
     ;ptr 2 1
     ;frame ^[(param 0 2)]
-    ;msg 0 detach/1
+    ;msg void detach/1
 
     ;frame ^[(pamv 0 (istore 1 1024))]
     ;call std::util::cpu::cycle/1
 
-    print (strstore 3 "main/1 exiting")
-    izero 0
+    print (strstore %3 "main/1 exiting")
+    izero %0
     return
 .end

@@ -51,10 +51,10 @@ namespace viua {
                  * For use by the VM and user code.
                  * Provides interface common to all values in Viua.
                  */
-                std::string type() const;
-                std::string str() const;
-                std::string repr() const;
-                bool boolean() const;
+                std::string type() const override;
+                std::string str() const override;
+                std::string repr() const override;
+                bool boolean() const override;
                 std::unique_ptr<Type> copy() const override;
 
                 /*

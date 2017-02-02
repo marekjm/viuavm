@@ -18,69 +18,69 @@
 ;
 
 .function: watchdog_process/1
-    arg (.name: iota death_message) 0
-    remove (.name: iota exception) 1 (strstore exception "exception")
-    remove (.name: iota aborted_function) 1 (strstore aborted_function "function")
+    arg (.name: %iota death_message) %0
+    remove (.name: %iota exception) %1 (strstore %exception "exception")
+    remove (.name: %iota aborted_function) %1 (strstore %aborted_function "function")
 
-    echo (strstore (.name: iota message) "[WARNING] process '")
-    echo aborted_function
-    echo (strstore message "' killed by >>>")
-    echo exception
-    print (strstore message "<<<")
+    echo (strstore (.name: %iota message) "[WARNING] process '")
+    echo %aborted_function
+    echo (strstore %message "' killed by >>>")
+    echo %exception
+    print (strstore %message "<<<")
 
     return
 .end
 
 .function: a_detached_concurrent_process/0
-    frame ^[(pamv 0 (istore 1 32))]
+    frame ^[(pamv %0 (istore %1 32))]
     call std::misc::cycle/1
 
-    print (strstore 1 "Hello World (from detached process)!")
+    print (strstore %1 "Hello World (from detached process)!")
 
-    frame ^[(pamv 0 (istore 1 512))]
+    frame ^[(pamv %0 (istore %1 512))]
     call std::misc::cycle/1
 
-    print (strstore 1 "Hello World (from detached process) after a runaway exception!")
+    print (strstore %1 "Hello World (from detached process) after a runaway exception!")
 
-    frame ^[(pamv 0 (istore 1 512))]
+    frame ^[(pamv %0 (istore %1 512))]
     call std::misc::cycle/1
 
-    frame ^[(pamv 0 (strstore 1 "a_detached_concurrent_process"))]
+    frame ^[(pamv %0 (strstore %1 "a_detached_concurrent_process"))]
     call log_exiting_detached/1
 
     return
 .end
 
 .function: a_joined_concurrent_process/0
-    frame ^[(pamv 0 (istore 1 128))]
+    frame ^[(pamv %0 (istore %1 128))]
     call std::misc::cycle/1
 
-    print (strstore 1 "Hello World (from joined process)!")
+    print (strstore %1 "Hello World (from joined process)!")
 
-    frame ^[(pamv 0 (strstore 1 "a_joined_concurrent_process"))]
+    frame ^[(pamv %0 (strstore %1 "a_joined_concurrent_process"))]
     call log_exiting_joined/1
 
-    throw (strstore 2 "OH NOES!")
+    throw (strstore %2 "OH NOES!")
 
     return
 .end
 
 .function: log_exiting_main/0
-    print (strstore 2 "process [  main  ]: 'main' exiting")
+    print (strstore %2 "process [  main  ]: 'main' exiting")
     return
 .end
 .function: log_exiting_detached/1
-    arg 1 0
-    echo (strstore 2 "process [detached]: '")
-    echo 1
-    print (strstore 2 "' exiting")
+    arg %1 %0
+    echo (strstore %2 "process [detached]: '")
+    echo %1
+    print (strstore %2 "' exiting")
     return
 .end
 .function: log_exiting_joined/1
-    arg 1 0
-    echo (strstore 2 "process [ joined ]: '")
-    echo 1
-    print (strstore 2 "' exiting")
+    arg %1 %0
+    echo (strstore %2 "process [ joined ]: '")
+    echo %1
+    print (strstore %2 "' exiting")
     return
 .end
 
@@ -91,16 +91,16 @@
 
     watchdog watchdog_process/1
 
-    frame 0
+    frame %0
     process void a_detached_concurrent_process/0
 
-    frame 0
-    process 2 a_joined_concurrent_process/0
-    join 0 2
+    frame %0
+    process %2 a_joined_concurrent_process/0
+    join %0 %2
 
-    frame 0
+    frame %0
     call log_exiting_main/0
 
-    izero 0
+    izero %0
     return
 .end

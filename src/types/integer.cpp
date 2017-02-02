@@ -36,12 +36,12 @@ bool Integer::boolean() const {
     return (number != 0);
 }
 
-int& Integer::value() { return number; }
+auto Integer::value() -> decltype(number) { return number; }
 
-int Integer::increment() {
+int64_t Integer::increment() {
     return (++number);
 }
-int Integer::decrement() {
+int64_t Integer::decrement() {
     return (--number);
 }
 

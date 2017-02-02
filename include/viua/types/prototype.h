@@ -60,10 +60,10 @@ namespace viua {
                 Prototype* derive(const std::string&);
 
 
-                virtual std::vector<std::string> bases() const {
+                virtual std::vector<std::string> bases() const override {
                     return std::vector<std::string>{"Type"};
                 }
-                virtual std::vector<std::string> inheritancechain() const {
+                virtual std::vector<std::string> inheritancechain() const override {
                     return std::vector<std::string>{"Type"};
                 }
 

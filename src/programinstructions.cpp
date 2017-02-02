@@ -49,58 +49,6 @@ Program& Program::opistore(int_op regno, int_op i) {
     return (*this);
 }
 
-Program& Program::opiadd(int_op rega, int_op regb, int_op regr) {
-    /*  Inserts iadd instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  rega    - register index of first operand
-     *  regb    - register index of second operand
-     *  regr    - register index in which to store the result
-     */
-    addr_ptr = cg::bytecode::opiadd(addr_ptr, rega, regb, regr);
-    return (*this);
-}
-
-Program& Program::opisub(int_op rega, int_op regb, int_op regr) {
-    /*  Inserts isub instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  rega    - register index of first operand
-     *  regb    - register index of second operand
-     *  regr    - register index in which to store the result
-     */
-    addr_ptr = cg::bytecode::opisub(addr_ptr, rega, regb, regr);
-    return (*this);
-}
-
-Program& Program::opimul(int_op rega, int_op regb, int_op regr) {
-    /*  Inserts imul instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  rega    - register index of first operand
-     *  regb    - register index of second operand
-     *  regr    - register index in which to store the result
-     */
-    addr_ptr = cg::bytecode::opimul(addr_ptr, rega, regb, regr);
-    return (*this);
-}
-
-Program& Program::opidiv(int_op rega, int_op regb, int_op regr) {
-    /*  Inserts idiv instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  rega    - register index of first operand
-     *  regb    - register index of second operand
-     *  regr    - register index in which to store the result
-     */
-    addr_ptr = cg::bytecode::opidiv(addr_ptr, rega, regb, regr);
-    return (*this);
-}
-
 Program& Program::opiinc(int_op regno) {
     /*  Inserts iinc instuction.
      */
@@ -115,71 +63,6 @@ Program& Program::opidec(int_op regno) {
     return (*this);
 }
 
-Program& Program::opilt(int_op rega, int_op regb, int_op regr) {
-    /*  Inserts ilt instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  rega    - register index of first operand
-     *  regb    - register index of second operand
-     *  regr    - register index in which to store the result
-     */
-    addr_ptr = cg::bytecode::opilt(addr_ptr, rega, regb, regr);
-    return (*this);
-}
-
-Program& Program::opilte(int_op rega, int_op regb, int_op regr) {
-    /*  Inserts ilte instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  rega    - register index of first operand
-     *  regb    - register index of second operand
-     *  regr    - register index in which to store the result
-     */
-    addr_ptr = cg::bytecode::opilte(addr_ptr, rega, regb, regr);
-    return (*this);
-}
-
-Program& Program::opigt(int_op rega, int_op regb, int_op regr) {
-    /*  Inserts igt instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  rega    - register index of first operand
-     *  regb    - register index of second operand
-     *  regr    - register index in which to store the result
-     */
-    addr_ptr = cg::bytecode::opigt(addr_ptr, rega, regb, regr);
-    return (*this);
-}
-
-Program& Program::opigte(int_op rega, int_op regb, int_op regr) {
-    /*  Inserts igte instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  rega    - register index of first operand
-     *  regb    - register index of second operand
-     *  regr    - register index in which to store the result
-     */
-    addr_ptr = cg::bytecode::opigte(addr_ptr, rega, regb, regr);
-    return (*this);
-}
-
-Program& Program::opieq(int_op rega, int_op regb, int_op regr) {
-    /*  Inserts ieq instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  rega    - register index of first operand
-     *  regb    - register index of second operand
-     *  regr    - register index in which to store the result
-     */
-    addr_ptr = cg::bytecode::opieq(addr_ptr, rega, regb, regr);
-    return (*this);
-}
-
 Program& Program::opfstore(int_op regno, float f) {
     /*  Inserts fstore instruction to bytecode.
      *
@@ -189,123 +72,6 @@ Program& Program::opfstore(int_op regno, float f) {
      *  f     - value to store
      */
     addr_ptr = cg::bytecode::opfstore(addr_ptr, regno, f);
-    return (*this);
-}
-
-Program& Program::opfadd(int_op rega, int_op regb, int_op regr) {
-    /*  Inserts fadd instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  rega    - register index of first operand
-     *  regb    - register index of second operand
-     *  regr    - register index in which to store the result
-     */
-    addr_ptr = cg::bytecode::opfadd(addr_ptr, rega, regb, regr);
-    return (*this);
-}
-
-Program& Program::opfsub(int_op rega, int_op regb, int_op regr) {
-    /*  Inserts fsub instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  rega    - register index of first operand
-     *  regb    - register index of second operand
-     *  regr    - register index in which to store the result
-     */
-    addr_ptr = cg::bytecode::opfsub(addr_ptr, rega, regb, regr);
-    return (*this);
-}
-
-Program& Program::opfmul(int_op rega, int_op regb, int_op regr) {
-    /*  Inserts fmul instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  rega    - register index of first operand
-     *  regb    - register index of second operand
-     *  regr    - register index in which to store the result
-     */
-    addr_ptr = cg::bytecode::opfmul(addr_ptr, rega, regb, regr);
-    return (*this);
-}
-
-Program& Program::opfdiv(int_op rega, int_op regb, int_op regr) {
-    /*  Inserts fdiv instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  rega    - register index of first operand
-     *  regb    - register index of second operand
-     *  regr    - register index in which to store the result
-     */
-    addr_ptr = cg::bytecode::opfdiv(addr_ptr, rega, regb, regr);
-    return (*this);
-}
-
-Program& Program::opflt(int_op rega, int_op regb, int_op regr) {
-    /*  Inserts flt instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  rega    - register index of first operand
-     *  regb    - register index of second operand
-     *  regr    - register index in which to store the result
-     */
-    addr_ptr = cg::bytecode::opflt(addr_ptr, rega, regb, regr);
-    return (*this);
-}
-
-Program& Program::opflte(int_op rega, int_op regb, int_op regr) {
-    /*  Inserts flte instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  rega    - register index of first operand
-     *  regb    - register index of second operand
-     *  regr    - register index in which to store the result
-     */
-    addr_ptr = cg::bytecode::opflte(addr_ptr, rega, regb, regr);
-    return (*this);
-}
-
-Program& Program::opfgt(int_op rega, int_op regb, int_op regr) {
-    /*  Inserts fgt instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  rega    - register index of first operand
-     *  regb    - register index of second operand
-     *  regr    - register index in which to store the resugt
-     */
-    addr_ptr = cg::bytecode::opfgt(addr_ptr, rega, regb, regr);
-    return (*this);
-}
-
-Program& Program::opfgte(int_op rega, int_op regb, int_op regr) {
-    /*  Inserts fgte instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  rega    - register index of first operand
-     *  regb    - register index of second operand
-     *  regr    - register index in which to store the resugt
-     */
-    addr_ptr = cg::bytecode::opfgte(addr_ptr, rega, regb, regr);
-    return (*this);
-}
-
-Program& Program::opfeq(int_op rega, int_op regb, int_op regr) {
-    /*  Inserts feq instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  rega    - register index of first operand
-     *  regb    - register index of second operand
-     *  regr    - register index in which to store the resugt
-     */
-    addr_ptr = cg::bytecode::opfeq(addr_ptr, rega, regb, regr);
     return (*this);
 }
 
@@ -334,6 +100,51 @@ Program& Program::opstof(int_op a, int_op b) {
     /*  Inserts stof instruction to bytecode.
      */
     addr_ptr = cg::bytecode::opstof(addr_ptr, a, b);
+    return (*this);
+}
+
+Program& Program::opadd(string result_type, int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opadd(addr_ptr, result_type, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opsub(string result_type, int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opsub(addr_ptr, result_type, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opmul(string result_type, int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opmul(addr_ptr, result_type, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opdiv(string result_type, int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opdiv(addr_ptr, result_type, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::oplt(string result_type, int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::oplt(addr_ptr, result_type, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::oplte(string result_type, int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::oplte(addr_ptr, result_type, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opgt(string result_type, int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opgt(addr_ptr, result_type, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opgte(string result_type, int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opgte(addr_ptr, result_type, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opeq(string result_type, int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opeq(addr_ptr, result_type, target, lhs, rhs);
     return (*this);
 }
 
@@ -642,7 +453,7 @@ Program& Program::opself(int_op target) {
     return (*this);
 }
 
-Program& Program::opjoin(int_op target, int_op source, int_op timeout) {
+Program& Program::opjoin(int_op target, int_op source, timeout_op timeout) {
     addr_ptr = cg::bytecode::opjoin(addr_ptr, target, source, timeout);
     return (*this);
 }
@@ -652,7 +463,7 @@ Program& Program::opsend(int_op target, int_op source) {
     return (*this);
 }
 
-Program& Program::opreceive(int_op ref, int_op timeout) {
+Program& Program::opreceive(int_op ref, timeout_op timeout) {
     addr_ptr = cg::bytecode::opreceive(addr_ptr, ref, timeout);
     return (*this);
 }
@@ -662,7 +473,7 @@ Program& Program::opwatchdog(const string& fn_name) {
     return (*this);
 }
 
-Program& Program::opjump(uint64_t addr, enum JUMPTYPE is_absolute) {
+Program& Program::opjump(viua::internals::types::bytecode_size addr, enum JUMPTYPE is_absolute) {
     /*  Inserts jump instruction. Parameter is instruction index.
      *  Byte offset is calculated automatically.
      *
@@ -678,20 +489,20 @@ Program& Program::opjump(uint64_t addr, enum JUMPTYPE is_absolute) {
     return (*this);
 }
 
-Program& Program::opif(int_op regc, uint64_t addr_truth, enum JUMPTYPE absolute_truth, uint64_t addr_false, enum JUMPTYPE absolute_false) {
+Program& Program::opif(int_op regc, viua::internals::types::bytecode_size addr_truth, enum JUMPTYPE absolute_truth, viua::internals::types::bytecode_size addr_false, enum JUMPTYPE absolute_false) {
     /*  Inserts branch instruction.
      *  Byte offset is calculated automatically.
      */
-    byte* jump_position_in_bytecode = addr_ptr;
+    viua::internals::types::byte* jump_position_in_bytecode = addr_ptr;
 
-    jump_position_in_bytecode += sizeof(byte); // for opcode
-    jump_position_in_bytecode += sizeof(bool); // for at-register flag
-    jump_position_in_bytecode += sizeof(int);  // for integer with register index
+    jump_position_in_bytecode += sizeof(viua::internals::types::byte); // for opcode
+    jump_position_in_bytecode += sizeof(viua::internals::types::byte); // for operand-type marker
+    jump_position_in_bytecode += sizeof(viua::internals::types::register_index);
 
     if (absolute_truth != JMP_TO_BYTE) {
         branches.push_back(jump_position_in_bytecode);
     }
-    jump_position_in_bytecode += sizeof(uint64_t);
+    jump_position_in_bytecode += sizeof(viua::internals::types::bytecode_size);
 
     if (absolute_false != JMP_TO_BYTE) {
         branches.push_back(jump_position_in_bytecode);

@@ -25,7 +25,7 @@
 using namespace std;
 
 
-byte* viua::process::Process::optry(byte* addr) {
+viua::internals::types::byte* viua::process::Process::optry(viua::internals::types::byte* addr) {
     /** Create new special frame for try blocks.
      */
     if (try_frame_new) {
@@ -35,7 +35,7 @@ byte* viua::process::Process::optry(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::opcatch(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opcatch(viua::internals::types::byte* addr) {
     /** Run catch instruction.
      */
     string type_name, catcher_block_name;
@@ -51,21 +51,21 @@ byte* viua::process::Process::opcatch(byte* addr) {
     return addr;
 }
 
-byte* viua::process::Process::opdraw(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opdraw(viua::internals::types::byte* addr) {
     /** Run draw instruction.
      */
-    unsigned target = 0;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     if (not caught) {
         throw new viua::types::Exception("no caught object to draw");
     }
-    uregset->set(target, std::move(caught));
+    *target = std::move(caught);
 
     return addr;
 }
 
-byte* viua::process::Process::openter(byte* addr) {
+viua::internals::types::byte* viua::process::Process::openter(viua::internals::types::byte* addr) {
     /*  Run enter instruction.
      */
     string block_name;
@@ -75,7 +75,7 @@ byte* viua::process::Process::openter(byte* addr) {
         throw new viua::types::Exception("cannot enter undefined block: " + block_name);
     }
 
-    byte* block_address = adjustJumpBaseForBlock(block_name);
+    viua::internals::types::byte* block_address = adjustJumpBaseForBlock(block_name);
 
     try_frame_new->return_address = addr;
     try_frame_new->associated_frame = frames.back().get();
@@ -86,29 +86,24 @@ byte* viua::process::Process::openter(byte* addr) {
     return block_address;
 }
 
-byte* viua::process::Process::opthrow(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opthrow(viua::internals::types::byte* addr) {
     /** Run throw instruction.
      */
-    unsigned source = 0;
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    viua::kernel::Register* source = nullptr;
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    if (source >= uregset->size()) {
+    if (not source) {
         ostringstream oss;
-        oss << "invalid read: register out of bounds: " << source;
-        throw new viua::types::Exception(oss.str());
-    }
-    if (uregset->at(source) == nullptr) {
-        ostringstream oss;
-        oss << "invalid throw: register " << source << " is empty";
+        oss << "invalid throw: register is empty";
         throw new viua::types::Exception(oss.str());
     }
 
-    thrown = std::move(uregset->pop(source));
+    thrown = source->give();
 
     return addr;
 }
 
-byte* viua::process::Process::opleave(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opleave(viua::internals::types::byte* addr) {
     /*  Run leave instruction.
      */
     if (tryframes.size() == 0) {

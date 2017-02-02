@@ -34,23 +34,24 @@ namespace viua {
         class Closure : public Function {
             /** Closure type.
              */
-            public:
-                std::unique_ptr<viua::kernel::RegisterSet> regset;
-
+                std::unique_ptr<viua::kernel::RegisterSet> local_register_set;
                 std::string function_name;
 
-                virtual std::string type() const;
-                virtual std::string str() const;
-                virtual std::string repr() const;
+            public:
 
-                virtual bool boolean() const;
+                virtual std::string type() const override;
+                virtual std::string str() const override;
+                virtual std::string repr() const override;
+
+                virtual bool boolean() const override;
 
                 virtual std::unique_ptr<Type> copy() const override;
 
-                virtual std::string name() const;
+                std::string name() const override;
+                viua::kernel::RegisterSet* rs() const;
+                void set(viua::internals::types::register_index, std::unique_ptr<viua::types::Type>);
 
-                // FIXME: implement real dtor
-                Closure(const std::string& = "", viua::kernel::RegisterSet* = nullptr);
+                Closure(const std::string&, std::unique_ptr<viua::kernel::RegisterSet>);
                 virtual ~Closure();
         };
     }

@@ -18,9 +18,9 @@
 ;
 
 .function: main/0
-    vpush (vec 2) (izero 1)
-    print 1
+    vpush (vec %2) (izero %1)
+    print %1
 
-    izero 0
+    izero %0
     return
 .end

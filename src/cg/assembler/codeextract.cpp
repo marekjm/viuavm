@@ -118,19 +118,19 @@ static void assert_is_not_reserved_keyword(Token token, const string& message) {
         "rol",  // rotate left
         "ror",  // rotate right
     };
-    if (reserved_keywords.count(s) or OP_SIZES.count(s)) {
+    if (reserved_keywords.count(s) or OP_MNEMONICS.count(s)) {
         throw viua::cg::lex::InvalidSyntax(token, ("invalid " + message + ": '" + s + "' is a registered keyword"));
     }
 }
 
 
-map<string, int> assembler::ce::getmarks(const vector<viua::cg::lex::Token>& tokens) {
+auto assembler::ce::getmarks(const vector<viua::cg::lex::Token>& tokens) -> map<string, std::remove_reference<decltype(tokens)>::type::size_type> {
     /** This function will pass over all instructions and
      * gather "marks", i.e. `.mark: <name>` directives which may be used by
      * `jump` and `branch` instructions.
      */
-    map<string, int> marks;
-    int instruction = 0;  // we need separate instruction counter because number of lines is not exactly number of instructions
+    std::remove_reference<decltype(tokens)>::type::size_type instruction = 0;  // we need separate instruction counter because number of lines is not exactly number of instructions
+    map<string, decltype(instruction)> marks;
 
     for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
         if (tokens.at(i) == ".name:" or tokens.at(i) == ".link:") {

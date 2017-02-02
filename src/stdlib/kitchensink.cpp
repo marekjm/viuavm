@@ -31,7 +31,7 @@ using namespace std;
 
 
 void kitchensink_sleep(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
-    sleep(dynamic_cast<viua::types::numeric::Number*>(frame->args->at(0))->as_int32());
+    sleep(dynamic_cast<viua::types::numeric::Number*>(frame->arguments->at(0))->as_int32());
 }
 
 const ForeignFunctionSpec functions[] = {

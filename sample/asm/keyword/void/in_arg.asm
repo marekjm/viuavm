@@ -18,14 +18,14 @@
 ;
 
 .function: foo/1
-    arg void 0
+    arg void %0
     return
 .end
 
 .function: main/0
-    frame ^[(pamv iota (izero iota))]
+    frame ^[(pamv %iota (izero %iota))]
     call void foo/1
 
-    izero 0
+    izero %0
     return
 .end

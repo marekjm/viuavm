@@ -18,8 +18,8 @@
 ;
 
 .function: main/0
-    or 3 1 2
+    or %3 %1 %2
 
-    izero 0
+    izero %0
     return
 .end

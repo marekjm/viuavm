@@ -33,7 +33,7 @@
 
 namespace assembler {
     namespace operands {
-        int_op getint(const std::string& s);
+        int_op getint(const std::string& s, const bool = false);
         byte_op getbyte(const std::string& s);
         float_op getfloat(const std::string& s);
 
@@ -42,7 +42,7 @@ namespace assembler {
     }
 
     namespace ce {
-        std::map<std::string, int> getmarks(const std::vector<viua::cg::lex::Token>&);
+        auto getmarks(const std::vector<viua::cg::lex::Token>& tokens) -> std::map<std::string, std::remove_reference<decltype(tokens)>::type::size_type>;
         std::vector<std::string> getlinks(const std::vector<viua::cg::lex::Token>&);
 
         std::vector<std::string> getFunctionNames(const std::vector<viua::cg::lex::Token>&);

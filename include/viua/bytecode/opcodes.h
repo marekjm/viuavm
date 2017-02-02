@@ -24,41 +24,33 @@
 
 #include <viua/bytecode/bytetypedef.h>
 
-enum OPCODE : byte {
+enum OPCODE : viua::internals::types::byte {
     NOP = 0,    // do nothing
 
     // integer instructions
     IZERO,
     ISTORE,
-    IADD,
-    ISUB,
-    IMUL,
-    IDIV,
     IINC,
     IDEC,
-    ILT,
-    ILTE,
-    IGT,
-    IGTE,
-    IEQ,
 
     // float instructions
     FSTORE,
-    FADD,
-    FSUB,
-    FMUL,
-    FDIV,
-    FLT,
-    FLTE,
-    FGT,
-    FGTE,
-    FEQ,
 
     // numeric conversion instructions
     ITOF,   // convert integer to float
     FTOI,   // convert float to integer
     STOI,   // convert string to integer
     STOF,   // convert string to float
+
+    ADD,
+    SUB,
+    MUL,
+    DIV,
+    LT,
+    LTE,
+    GT,
+    GTE,
+    EQ,
 
     // string instructions
     STRSTORE,

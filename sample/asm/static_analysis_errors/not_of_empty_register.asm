@@ -18,8 +18,8 @@
 ;
 
 .function: main/0
-    not 1
+    not %1
 
-    izero 0
+    izero %0
     return
 .end

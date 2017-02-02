@@ -23,6 +23,6 @@
 .function: bar/0
 
 .function: main/1
-    izero 0
+    izero %0
     return
 .end

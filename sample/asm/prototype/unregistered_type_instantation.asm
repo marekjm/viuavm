@@ -18,13 +18,13 @@
 ;
 
 .block: handler
-    print (draw 1)
+    print (draw %1)
     leave
 .end
 
 .block: unregistered_type_instantation
-    new 1 Nonexistent
-    print 1
+    new %1 Nonexistent
+    print %1
     leave
 .end
 
@@ -33,6 +33,6 @@
     catch "Exception" handler
     enter unregistered_type_instantation
 
-    izero 0
+    izero %0
     return
 .end

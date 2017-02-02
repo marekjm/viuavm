@@ -31,116 +31,123 @@
 using namespace std;
 
 
-byte* viua::process::Process::opcapture(byte* addr) {
-    /** Capture object by reference.
-     */
-    unsigned target_closure_register = 0, target_register = 0, source_register = 0;
-    tie(addr, target_closure_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    tie(addr, target_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    tie(addr, source_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+viua::internals::types::byte* viua::process::Process::opcapture(viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    auto target_closure = static_cast<viua::types::Closure*>(fetch(target_closure_register));
-    if (target_register >= target_closure->regset->size()) {
+    viua::internals::types::register_index target_register = 0;
+    tie(addr, target_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+
+    viua::kernel::Register* source = nullptr;
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    auto target_closure = static_cast<viua::types::Closure*>(target->get());
+    if (target_register >= target_closure->rs()->size()) {
         throw new viua::types::Exception("cannot capture object: register index out exceeded size of closure register set");
     }
 
-    auto captured_object = uregset->at(source_register);
+    auto captured_object = source->get();
     auto rf = dynamic_cast<viua::types::Reference*>(captured_object);
     if (rf == nullptr) {
         // turn captured object into a reference to take it out of VM's default
         // memory management scheme and put it under reference-counting scheme
         // this is needed to bind the captured object's life to lifetime of the closure
-        rf = new viua::types::Reference(captured_object);
-        uregset->empty(source_register);    // empty - do not delete the captured object or SEGFAULTS will follow
-        uregset->set(source_register, unique_ptr<viua::types::Type>{rf});  // set the register to contain the newly-created reference
+        rf = new viua::types::Reference(nullptr);
+        rf->rebind(source->give());
+        *source = unique_ptr<viua::types::Type>{rf};  // set the register to contain the newly-created reference
     }
-    target_closure->regset->set(target_register, std::move(rf->copy()));
+    target_closure->rs()->register_at(target_register)->reset(source->get()->copy());
 
     return addr;
 }
 
-byte* viua::process::Process::opcapturecopy(byte* addr) {
-    /** Capture object by copy.
-     */
-    unsigned target_closure_register = 0, target_register = 0;
-    tie(addr, target_closure_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+viua::internals::types::byte* viua::process::Process::opcapturecopy(viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::internals::types::register_index target_register = 0;
     tie(addr, target_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     viua::types::Type* source = nullptr;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    auto target_closure = static_cast<viua::types::Closure*>(fetch(target_closure_register));
-    if (target_register >= target_closure->regset->size()) {
+    auto target_closure = static_cast<viua::types::Closure*>(target->get());
+    if (target_register >= target_closure->rs()->size()) {
         throw new viua::types::Exception("cannot capture object: register index out exceeded size of closure register set");
     }
 
-    target_closure->regset->set(target_register, std::move(source->copy()));
+    target_closure->rs()->register_at(target_register)->reset(source->copy());
 
     return addr;
 }
 
-byte* viua::process::Process::opcapturemove(byte* addr) {
-    /** Capture object by move.
-     */
-    unsigned target_closure_register = 0, target_register = 0, source_register = 0;
-    tie(addr, target_closure_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+viua::internals::types::byte* viua::process::Process::opcapturemove(viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::internals::types::register_index target_register = 0;
     tie(addr, target_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    tie(addr, source_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    auto target_closure = static_cast<viua::types::Closure*>(fetch(target_closure_register));
-    if (target_register >= target_closure->regset->size()) {
+    viua::kernel::Register* source = nullptr;
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    auto target_closure = static_cast<viua::types::Closure*>(target->get());
+    if (target_register >= target_closure->rs()->size()) {
         throw new viua::types::Exception("cannot capture object: register index out exceeded size of closure register set");
     }
 
-    target_closure->regset->set(target_register, std::move(uregset->pop(source_register)));
+    target_closure->rs()->register_at(target_register)->reset(source->give());
 
     return addr;
 }
 
-byte* viua::process::Process::opclosure(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opclosure(viua::internals::types::byte* addr) {
     /** Create a closure from a function.
      */
-    if (uregset != frames.back()->regset.get()) {
+    if (currently_used_register_set != frames.back()->local_register_set.get()) {
         throw new viua::types::Exception("creating closures from nonlocal registers is forbidden");
     }
 
-    unsigned target = 0;
-    string function_name;
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    string function_name;
     tie(addr, function_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
-    place(target, unique_ptr<viua::types::Type>{new viua::types::Closure(function_name, new viua::kernel::RegisterSet(uregset->size()))});
+    unique_ptr<viua::kernel::RegisterSet> rs {new viua::kernel::RegisterSet(currently_used_register_set->size())};
+    unique_ptr<viua::types::Closure> closure {new viua::types::Closure(function_name, std::move(rs))};
+
+    *target = std::move(closure);
 
     return addr;
 }
 
-byte* viua::process::Process::opfunction(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opfunction(viua::internals::types::byte* addr) {
     /** Create function object in a register.
      *
      *  Such objects can be used to call functions, and
      *  are can be used to pass functions as parameters and
      *  return them from other functions.
      */
-    unsigned target = 0;
-    string function_name;
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    string function_name;
     tie(addr, function_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
-    place(target, unique_ptr<viua::types::Type>{new viua::types::Function(function_name)});
+    *target = unique_ptr<viua::types::Type>{new viua::types::Function(function_name)};
 
     return addr;
 }
 
-byte* viua::process::Process::opfcall(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opfcall(viua::internals::types::byte* addr) {
     /*  Call a function object.
      */
     bool return_void = viua::bytecode::decoder::operands::is_void(addr);
-    unsigned return_register = 0;
+    viua::kernel::Register* return_register = nullptr;
 
     if (not return_void) {
-        tie(addr, return_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+        tie(addr, return_register) = viua::bytecode::decoder::operands::fetch_register(addr, this);
     } else {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
@@ -159,24 +166,22 @@ byte* viua::process::Process::opfcall(byte* addr) {
         throw new viua::types::Exception("fcall to undefined function: " + call_name);
     }
 
-    byte* call_address = nullptr;
+    viua::internals::types::byte* call_address = nullptr;
     call_address = adjustJumpBaseFor(call_name);
 
     // save return address for frame
-    byte* return_address = addr;
+    viua::internals::types::byte* return_address = addr;
 
     if (frame_new == nullptr) {
         throw new viua::types::Exception("fcall without a frame: use `frame 0' in source code if the function takes no parameters");
     }
-    // set function name and return address
+
     frame_new->function_name = call_name;
     frame_new->return_address = return_address;
-
-    frame_new->return_void = return_void;
-    frame_new->place_return_value_in = return_register;
+    frame_new->return_register = return_register;
 
     if (fn->type() == "Closure") {
-        frame_new->setLocalRegisterSet(static_cast<viua::types::Closure*>(fn)->regset.get(), false);
+        frame_new->setLocalRegisterSet(static_cast<viua::types::Closure*>(fn)->rs(), false);
     }
 
     pushFrame();

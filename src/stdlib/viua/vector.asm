@@ -23,20 +23,20 @@
     ; N is received as first and only parameter
     ;
     .name: 1 limit
-    arg limit 0
+    arg %limit %0
 
     .name: 0 vector
-    vec vector
+    vec %vector %3
 
     .name: 3 counter
     .name: 4 to_push
-    izero counter
+    izero %counter
 
     .mark: begin_loop
-    vpush vector (copy to_push counter)
-    iinc counter
+    vpush %vector (copy %to_push %counter)
+    iinc %counter
     ; reuse 'to_push' register since it's empty
-    if (igte to_push counter limit) +1 begin_loop
+    if (gte int64 %to_push %counter %limit) +1 begin_loop
 
     return
 .end
@@ -49,22 +49,22 @@
     ;
     .name: 1 limit
     .name: 2 fn
-    arg limit 0
-    arg fn 1
+    arg %limit %0
+    arg %fn %1
 
     .name: 0 vector
-    vec vector
+    vec %vector
 
     .name: 3 counter
     .name: 4 to_push
-    izero counter
+    izero %counter
 
     .mark: begin_loop
-    frame ^[(pamv 0 (copy to_push counter))]
-    vpush vector (fcall to_push fn)
-    iinc counter
+    frame ^[(pamv %0 (copy %to_push %counter))]
+    vpush %vector (fcall %to_push %fn)
+    iinc %counter
     ; reuse 'to_push' register since it's empty
-    if (igte to_push counter limit) +1 begin_loop
+    if (gte int64 %to_push %counter %limit) +1 begin_loop
 
     return
 .end
@@ -78,16 +78,16 @@
     ;
     .name: 1 source
     .name: 0 result
-    arg source 0
-    vec result
+    arg %source %0
+    vec %result
 
     .name: 2 counter
-    vlen counter source
+    vlen %counter %source
 
     .mark: begin_loop
     .name: 3 tmp
-    vpush result (vpop tmp source)
-    if (idec counter) begin_loop
+    vpush %result (vpop %tmp %source)
+    if (idec %counter) begin_loop
     .mark: end_loop
 
     return
@@ -100,26 +100,26 @@
     ; copying).
     ;
     .name: 0 source
-    arg source 0
+    arg %source %0
 
     .name: 1 counter_down
-    vlen counter_down source
-    idec counter_down
+    vlen %counter_down %source
+    idec %counter_down
     .name: 2 counter_up
-    izero counter_up
+    izero %counter_up
     .name: 3 limit
-    copy limit counter_down
+    copy %limit %counter_down
 
     .mark: begin_loop
     .name: 4 tmp
-    vpop tmp source
-    vinsert source tmp @counter_up
+    vpop %tmp %source
+    vinsert %source %tmp @counter_up
 
-    idec limit
-    idec counter_down
-    iinc counter_up
+    idec %limit
+    idec %counter_down
+    iinc %counter_up
 
-    if limit begin_loop
+    if %limit begin_loop
     .mark: end_loop
 
     return
@@ -130,32 +130,32 @@
     ;
     .name: 1 vector
     .name: 2 fn
-    arg vector 0
-    arg fn 1
+    arg %vector %0
+    arg %fn %1
 
     .name: 0 result
-    not (izero result)
+    not (izero %result)
 
     .name: 3 limit
     .name: 4 index
     .name: 5 tmp
-    vlen limit vector
-    izero index
+    vlen %limit %vector
+    izero %index
 
     ; do not loop on zero-length vectors
-    if limit +1 end_loop
+    if %limit +1 end_loop
     .mark: begin_loop
-    vpop tmp vector @index
+    vpop %tmp %vector @index
     ; FIXME: there should be no copy operation - use pass-by-move instead
-    frame ^[(param 0 tmp)]
-    and result (fcall 6 fn) result
+    frame ^[(param %0 %tmp)]
+    and %result (fcall %6 %fn) %result
 
-    vinsert vector tmp @index
+    vinsert %vector %tmp @index
 
     ; break loop if there wasn't a match
-    if result +1 end_loop
+    if %result +1 end_loop
 
-    if (igte tmp (iinc index) limit) +1 begin_loop
+    if (gte int64 %tmp (iinc %index) %limit) +1 begin_loop
     .mark: end_loop
 
     return
@@ -166,33 +166,33 @@
     ;
     .name: 1 vector
     .name: 2 fn
-    arg vector 0
-    arg fn 1
+    arg %vector %0
+    arg %fn %1
 
     .name: 0 result
-    not (izero result)
+    not (izero %result)
 
     .name: 3 limit
     .name: 4 index
     .name: 5 tmp
-    vlen limit vector
-    izero index
+    vlen %limit %vector
+    izero %index
 
     ; do not loop on zero-length vectors
-    if limit +1 end_loop
+    if %limit +1 end_loop
     .mark: begin_loop
-    vpop tmp vector @index
+    vpop %tmp %vector @index
     ; FIXME: there should be no copy operation - use pass-by-move instead
-    frame ^[(param 0 tmp)]
-    move result (fcall 6 fn)
+    frame ^[(param %0 %tmp)]
+    move %result (fcall %6 %fn)
 
     ; put the value back into the vector
-    vinsert vector tmp @index
+    vinsert %vector %tmp @index
 
     ; break the loop if there was a match
-    if result end_loop
+    if %result end_loop
 
-    if (igte tmp (iinc index) limit) +1 begin_loop
+    if (gte int64 %tmp (iinc %index) %limit) +1 begin_loop
     .mark: end_loop
 
     return

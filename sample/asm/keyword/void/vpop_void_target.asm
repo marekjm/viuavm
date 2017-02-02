@@ -18,12 +18,12 @@
 ;
 
 .function: main/0
-    vec (.name: iota container)
+    vec (.name: %iota container)
 
-    vpush container (istore iota 0)
-    vpop void container 0
-    print container
+    vpush %container (istore %iota 0)
+    vpop void %container 0
+    print %container
 
-    izero 0
+    izero %0
     return
 .end

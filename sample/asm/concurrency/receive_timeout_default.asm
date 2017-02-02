@@ -18,43 +18,43 @@
 ;
 
 .block: pull_and_do_nothing
-    draw 3
+    draw %3
     leave
 .end
 
 .block: await_message
-    idec 1
-    receive 3 100ms
+    idec %1
+    receive %3 100ms
     leave
 .end
 
 .function: message_sender/2
-    .name: iota times
-    .name: iota pid
-    arg times .iota: 0 iota
-    arg pid 1
+    .name: %iota times
+    .name: %iota pid
+    arg %times .iota: 0  %iota
+    arg %pid %1
 
     try
     catch "Exception" pull_and_do_nothing
     enter await_message
 
-    if times next_iteration
-    send pid (strstore 3 "Hello World!")
+    if %times next_iteration
+    send %pid (strstore %3 "Hello World!")
     return
 
     .mark: next_iteration
-    frame ^[(pamv iota times) (pamv iota pid)]
+    frame ^[(pamv %iota %times) (pamv %iota %pid)]
     tailcall message_sender/2
 
     return
 .end
 
 .function: main/0
-    frame ^[(pamv iota (istore 1 5)) (pamv iota (self 1))]
+    frame ^[(pamv %iota (istore %1 5)) (pamv %iota (self %1))]
     process void message_sender/2
 
-    print (receive iota)
+    print (receive %iota)
 
-    izero 0
+    izero %0
     return
 .end

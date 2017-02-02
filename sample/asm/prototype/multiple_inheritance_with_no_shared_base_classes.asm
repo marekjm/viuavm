@@ -18,39 +18,40 @@
 ;
 
 .block: handler
-    print (draw 2)
+    print (draw %2)
     leave
 .end
 
 .block: throws_derived
-    throw (new 1 Combined)
+    throw (new %1 Combined)
     leave
 .end
 
 .function: typesystem_setup/0
-    register (class 1 BaseA)
-    register (derive (class 1 DerivedA) BaseA)
-    register (derive (class 1 MoreDerivedA) DerivedA)
+    register (class %1 BaseA)
+    register (derive (class %1 DerivedA) BaseA)
+    register (derive (class %1 MoreDerivedA) DerivedA)
 
-    register (class 1 BaseB)
-    register (derive (class 1 DerivedB) BaseB)
-    register (derive (class 1 MoreDerivedB) DerivedB)
+    register (class %1 BaseB)
+    register (derive (class %1 DerivedB) BaseB)
+    register (derive (class %1 MoreDerivedB) DerivedB)
 
-    class 1 Combined
-    derive 1 MoreDerivedA
-    derive 1 MoreDerivedB
-    register 1
+    class %1 Combined
+    derive %1 MoreDerivedA
+    derive %1 MoreDerivedB
+    register %1
 
     return
 .end
 
 .function: main/1
-    call (frame 0) typesystem_setup/0
+    frame %0
+    call void typesystem_setup/0
 
     try
     catch "BaseA" handler
     enter throws_derived
 
-    izero 0
+    izero %0
     return
 .end

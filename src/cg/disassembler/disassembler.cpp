@@ -26,27 +26,31 @@
 using namespace std;
 
 
-string disassembler::intop(byte* ptr) {
+string disassembler::intop(viua::internals::types::byte* ptr) {
     ostringstream oss;
 
     auto type = *reinterpret_cast<OperandType*>(ptr);
-    pointer::inc<OperandType, byte>(ptr);
+    pointer::inc<OperandType, viua::internals::types::byte>(ptr);
 
     switch (type) {
         case OT_VOID:
             oss << "void";
             break;
         case OT_REGISTER_INDEX:
-            oss << *reinterpret_cast<int*>(ptr);
-            pointer::inc<int, byte>(ptr);
+            oss << '%' << *reinterpret_cast<viua::internals::types::register_index*>(ptr);
+            pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
             break;
         case OT_REGISTER_REFERENCE:
-            oss << '@' << *reinterpret_cast<int*>(ptr);
-            pointer::inc<int, byte>(ptr);
+            oss << '@' << *reinterpret_cast<viua::internals::types::register_index*>(ptr);
+            pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
             break;
         case OT_POINTER:
-            oss << '*' << *reinterpret_cast<int*>(ptr);
-            pointer::inc<int, byte>(ptr);
+            oss << '*' << *reinterpret_cast<viua::internals::types::register_index*>(ptr);
+            pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
+            break;
+        case OT_INT:
+            oss << *reinterpret_cast<viua::internals::types::plain_int*>(ptr);
+            pointer::inc<viua::internals::types::plain_int, viua::internals::types::byte>(ptr);
             break;
         default:
             throw "invalid operand type detected";
@@ -55,29 +59,33 @@ string disassembler::intop(byte* ptr) {
     return oss.str();
 }
 
-static int decode_integer(byte *ptr) {
-    return *reinterpret_cast<int*>(ptr);
+static viua::internals::types::timeout decode_timeout(viua::internals::types::byte *ptr) {
+    return *reinterpret_cast<viua::internals::types::timeout*>(ptr);
 }
-static byte* disassemble_target_register(ostream& oss, byte *ptr) {
-    oss << " " << disassembler::intop(ptr);
+static viua::internals::types::byte* disassemble_ri_operand(ostream& oss, viua::internals::types::byte *ptr) {
+    oss << ' ' << disassembler::intop(ptr);
 
     switch (*ptr) {
         case OT_REGISTER_INDEX:
         case OT_REGISTER_REFERENCE:
         case OT_POINTER:
-            pointer::inc<OperandType, byte>(ptr);
-            pointer::inc<int, byte>(ptr);
+            pointer::inc<OperandType, viua::internals::types::byte>(ptr);
+            pointer::inc<viua::internals::types::plain_int, viua::internals::types::byte>(ptr);
             break;
         case OT_VOID:
-            pointer::inc<OperandType, byte>(ptr);
+            pointer::inc<OperandType, viua::internals::types::byte>(ptr);
+            break;
+        case OT_INT:
+            pointer::inc<OperandType, viua::internals::types::byte>(ptr);
+            pointer::inc<viua::internals::types::plain_int, viua::internals::types::byte>(ptr);
             break;
         default:
             throw "invalid operand type detected";
     }
     return ptr;
 }
-tuple<string, unsigned> disassembler::instruction(byte* ptr) {
-    byte* saved_ptr = ptr;
+tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(viua::internals::types::byte* ptr) {
+    viua::internals::types::byte* saved_ptr = ptr;
 
     OPCODE op = OPCODE(*saved_ptr);
     string opname;
@@ -94,22 +102,22 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
     oss << opname;
 
     if (op == STRSTORE) {
-        ptr = disassemble_target_register(oss, ptr);
+        ptr = disassemble_ri_operand(oss, ptr);
 
         string s = string(reinterpret_cast<char*>(ptr));
-        oss << " " << str::enquote(s);
+        oss << ' ' << str::enquote(s);
         ptr += s.size();
         ++ptr; // for null character terminating the C-style string not included in std::string
     } else if ((op == CALL) or (op == PROCESS) or (op == CLOSURE) or (op == FUNCTION) or (op == CLASS) or (op == NEW) or (op == DERIVE) or (op == MSG)) {
-        ptr = disassemble_target_register(oss, ptr);
+        ptr = disassemble_ri_operand(oss, ptr);
 
-        oss << " ";
+        oss << ' ';
         string fn_name = string(reinterpret_cast<char*>(ptr));
         oss << fn_name;
         ptr += fn_name.size();
         ++ptr; // for null character terminating the C-style string not included in std::string
     } else if ((op == IMPORT) or (op == ENTER) or (op == LINK) or (op == WATCHDOG) or (op == TAILCALL)) {
-        oss << " ";
+        oss << ' ';
         string s = string(reinterpret_cast<char*>(ptr));
         oss << (op == IMPORT ? str::enquote(s) : s);
         ptr += s.size();
@@ -117,29 +125,27 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
     } else if (op == CATCH) {
         string s;
 
-        oss << " ";
+        oss << ' ';
         s = string(reinterpret_cast<char*>(ptr));
         oss << str::enquote(s);
         ptr += s.size();
         ++ptr; // for null character terminating the C-style string not included in std::string
 
-        oss << " ";
+        oss << ' ';
         s = string(reinterpret_cast<char*>(ptr));
         oss << s;
         ptr += s.size();
         ++ptr; // for null character terminating the C-style string not included in std::string
     } else if (op == ATTACH) {
-        oss << " " << intop(ptr);
-        pointer::inc<bool, byte>(ptr);
-        pointer::inc<int, byte>(ptr);
+        ptr = disassemble_ri_operand(oss, ptr);
 
-        oss << " ";
+        oss << ' ';
         string fn_name = string(reinterpret_cast<char*>(ptr));
         oss << fn_name;
         ptr += fn_name.size();
         ++ptr; // for null character terminating the C-style string not included in std::string
 
-        oss << " ";
+        oss << ' ';
         string md_name = string(reinterpret_cast<char*>(ptr));
         oss << md_name;
         ptr += md_name.size();
@@ -161,9 +167,14 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case THROW:
         case DRAW:
         case REGISTER:
-            ptr = disassemble_target_register(oss, ptr);
+            ptr = disassemble_ri_operand(oss, ptr);
             break;
         case ISTORE:
+            ptr = disassemble_ri_operand(oss, ptr);
+            oss << ' ';
+            ptr = disassemble_ri_operand(oss, ptr);
+
+            break;
         case ITOF:
         case FTOI:
         case STOI:
@@ -182,31 +193,49 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case VPUSH:
         case VLEN:
         case FCALL:
-            ptr = disassemble_target_register(oss, ptr);
-
-            oss << " " << intop(ptr);
-            pointer::inc<bool, byte>(ptr);
-            pointer::inc<int, byte>(ptr);
-
+            ptr = disassemble_ri_operand(oss, ptr);
+            oss << ' ';
+            ptr = disassemble_ri_operand(oss, ptr);
             break;
-        case IADD:
-        case ISUB:
-        case IMUL:
-        case IDIV:
-        case ILT:
-        case ILTE:
-        case IGT:
-        case IGTE:
-        case IEQ:
-        case FADD:
-        case FSUB:
-        case FMUL:
-        case FDIV:
-        case FLT:
-        case FLTE:
-        case FGT:
-        case FGTE:
-        case FEQ:
+        case ADD:
+        case SUB:
+        case MUL:
+        case DIV:
+        case LT:
+        case LTE:
+        case GT:
+        case GTE:
+        case EQ:
+            if (*ptr == OperandType::OT_INT) {
+                oss << ' ' << "int";
+            } else if (*ptr == OperandType::OT_INT8) {
+                oss << ' ' << "int8";
+            } else if (*ptr == OperandType::OT_INT16) {
+                oss << ' ' << "int16";
+            } else if (*ptr == OperandType::OT_INT32) {
+                oss << ' ' << "int32";
+            } else if (*ptr == OperandType::OT_INT64) {
+                oss << ' ' << "int64";
+            } else if (*ptr == OperandType::OT_UINT) {
+                oss << ' ' << "uint";
+            } else if (*ptr == OperandType::OT_UINT8) {
+                oss << ' ' << "uint8";
+            } else if (*ptr == OperandType::OT_UINT16) {
+                oss << ' ' << "uint16";
+            } else if (*ptr == OperandType::OT_UINT32) {
+                oss << ' ' << "uint32";
+            } else if (*ptr == OperandType::OT_UINT64) {
+                oss << ' ' << "uint64";
+            } else if (*ptr == OperandType::OT_FLOAT) {
+                oss << ' ' << "float";
+            } else if (*ptr == OperandType::OT_FLOAT32) {
+                oss << ' ' << "float32";
+            } else if (*ptr == OperandType::OT_FLOAT64) {
+                oss << ' ' << "float64";
+            } else {
+                oss << ' ' << "void";
+            }
+            ++ptr;
         case STREQ:
         case AND:
         case OR:
@@ -219,64 +248,59 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
         case VAT:
         case INSERT:
         case REMOVE:
-            ptr = disassemble_target_register(oss, ptr);
-
-            oss << " " << intop(ptr);
-            pointer::inc<bool, byte>(ptr);
-            pointer::inc<int, byte>(ptr);
-
-            oss << " " << intop(ptr);
-            pointer::inc<bool, byte>(ptr);
-            pointer::inc<int, byte>(ptr);
+            ptr = disassemble_ri_operand(oss, ptr);
+            oss << ' ';
+            ptr = disassemble_ri_operand(oss, ptr);
+            oss << ' ';
+            ptr = disassemble_ri_operand(oss, ptr);
 
             break;
         case JUMP:
             oss << " 0x";
             oss << hex;
             oss << *reinterpret_cast<uint64_t*>(ptr);
-            pointer::inc<uint64_t, byte>(ptr);
+            pointer::inc<uint64_t, viua::internals::types::byte>(ptr);
 
             oss << dec;
 
             break;
         case IF:
-            oss << " " << intop(ptr);
-            pointer::inc<bool, byte>(ptr);
-            pointer::inc<int, byte>(ptr);
+            oss << ' ';
+            ptr = disassemble_ri_operand(oss, ptr);
 
             oss << " 0x";
             oss << hex;
             oss << *reinterpret_cast<uint64_t*>(ptr);
-            pointer::inc<uint64_t, byte>(ptr);
+            pointer::inc<uint64_t, viua::internals::types::byte>(ptr);
 
             oss << " 0x";
             oss << hex;
             oss << *reinterpret_cast<uint64_t*>(ptr);
-            pointer::inc<uint64_t, byte>(ptr);
+            pointer::inc<uint64_t, viua::internals::types::byte>(ptr);
 
             oss << dec;
 
             break;
         case FSTORE:
-            ptr = disassemble_target_register(oss, ptr);
+            ptr = disassemble_ri_operand(oss, ptr);
 
-            oss << " ";
-            oss << *reinterpret_cast<float*>(ptr);
-            pointer::inc<float, byte>(ptr);
+            oss << ' ';
+            oss << *reinterpret_cast<viua::internals::types::plain_float*>(ptr);
+            pointer::inc<viua::internals::types::plain_float, viua::internals::types::byte>(ptr);
             break;
         case RESS:
-            oss << " ";
-            switch(int(*ptr)) {
-                case 0:
+            oss << ' ';
+            switch (static_cast<viua::internals::RegisterSets>(*ptr)) {
+                case viua::internals::RegisterSets::GLOBAL:
                     oss << "global";
                     break;
-                case 1:
+                case viua::internals::RegisterSets::LOCAL:
                     oss << "local";
                     break;
-                case 2:
+                case viua::internals::RegisterSets::STATIC:
                     oss << "static";
                     break;
-                case 3:
+                case viua::internals::RegisterSets::TEMPORARY:
                     oss << "temp";
                     break;
                 default:
@@ -284,21 +308,21 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
                     oss << "; WARNING: invalid register set type\n";
                     oss << int(*ptr);
             }
-            pointer::inc<int, byte>(ptr);
+            pointer::inc<viua::internals::types::registerset_type_marker, viua::internals::types::byte>(ptr);
             break;
         case JOIN:
-            ptr = disassemble_target_register(oss, ptr);
+            ptr = disassemble_ri_operand(oss, ptr);
         case RECEIVE:
-            ptr = disassemble_target_register(oss, ptr);
+            ptr = disassemble_ri_operand(oss, ptr);
 
-            pointer::inc<bool, byte>(ptr);
+            pointer::inc<viua::internals::types::byte, viua::internals::types::byte>(ptr);
             oss << ' ';
-            if (decode_integer(ptr)) {
-                oss << decode_integer(ptr)-1 << "ms";
+            if (decode_timeout(ptr)) {
+                oss << decode_timeout(ptr)-1 << "ms";
             } else {
                 oss << "infinity";
             }
-            pointer::inc<int, byte>(ptr);
+            pointer::inc<viua::internals::types::timeout, viua::internals::types::byte>(ptr);
 
             break;
         default:
@@ -306,11 +330,11 @@ tuple<string, unsigned> disassembler::instruction(byte* ptr) {
             oss << "";
     }
 
-    long increase = (ptr-saved_ptr);
-    if (increase < 0) {
+    if (ptr < saved_ptr) {
         throw ("bytecode pointer increase less than zero: near " + OP_NAMES.at(op) + " instruction");
     }
+    // we already *know* that the result will not be negative
+    auto increase = static_cast<viua::internals::types::bytecode_size>(ptr-saved_ptr);
 
-    // cast increase to unsigned as at this point it is safe to assume that it is greater than zero
-    return tuple<string, unsigned>(oss.str(), static_cast<unsigned>(increase));
+    return tuple<string, viua::internals::types::bytecode_size>(oss.str(), increase);
 }

@@ -22,8 +22,8 @@
     nop
 
     .mark: here
-    if 2 here 3
+    if %2 here 3
 
-    izero 0
+    izero %0
     return
 .end

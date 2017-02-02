@@ -21,12 +21,12 @@
 ; Its expected output is "true".
 
 .function: main/1
-    fstore 1 0.69
-    fstore 2 0.69
-    feq 1 1 2
+    fstore %1 0.69
+    fstore %2 0.69
+    eq float32 %1 %1 %2
 
     ; should be true
-    print 1
-    izero 0
+    print %1
+    izero %0
     return
 .end

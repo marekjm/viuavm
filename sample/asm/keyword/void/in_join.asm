@@ -22,11 +22,11 @@
 .end
 
 .function: main/0
-    frame 0
-    process 1 foo/0
+    frame %0
+    process %1 foo/0
 
-    join void 1
+    join void %1
 
-    izero 0
+    izero %0
     return
 .end

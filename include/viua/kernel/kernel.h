@@ -68,21 +68,21 @@ namespace viua {
             /*  Bytecode pointer is a pointer to program's code.
              *  Size and executable offset are metadata exported from bytecode dump.
              */
-            std::unique_ptr<byte[]> bytecode;
-            uint64_t bytecode_size;
-            uint64_t executable_offset;
+            std::unique_ptr<viua::internals::types::byte[]> bytecode;
+            viua::internals::types::bytecode_size bytecode_size;
+            viua::internals::types::bytecode_size executable_offset;
 
             // Map of the typesystem currently existing inside the VM.
             std::map<std::string, std::unique_ptr<viua::types::Prototype>> typesystem;
 
             /*  Function and block names mapped to bytecode addresses.
              */
-            std::map<std::string, uint64_t> function_addresses;
-            std::map<std::string, uint64_t> block_addresses;
+            std::map<std::string, viua::internals::types::bytecode_size> function_addresses;
+            std::map<std::string, viua::internals::types::bytecode_size> block_addresses;
 
-            std::map<std::string, std::pair<std::string, byte*>> linked_functions;
-            std::map<std::string, std::pair<std::string, byte*>> linked_blocks;
-            std::map<std::string, std::pair<unsigned, std::unique_ptr<byte[]>>> linked_modules;
+            std::map<std::string, std::pair<std::string, viua::internals::types::byte*>> linked_functions;
+            std::map<std::string, std::pair<std::string, viua::internals::types::byte*>> linked_blocks;
+            std::map<std::string, std::pair<viua::internals::types::bytecode_size, std::unique_ptr<viua::internals::types::byte[]>>> linked_modules;
 
             int return_code;
 
@@ -107,10 +107,10 @@ namespace viua {
             // list of idle VP schedulers
             std::vector<viua::scheduler::VirtualProcessScheduler*> idle_virtual_process_schedulers;
 
-            std::atomic<uint64_t> running_processes { 0 };
+            std::atomic<viua::internals::types::processes_count> running_processes { 0 };
 
-            static const long unsigned default_vp_schedulers_limit = 2UL;
-            long unsigned vp_schedulers_limit;
+            static const viua::internals::types::schedulers_count default_vp_schedulers_limit = 2;
+            viua::internals::types::schedulers_count vp_schedulers_limit;
 
             /*  This is the interface between programs compiled to VM bytecode and
              *  extension libraries written in C++.
@@ -126,8 +126,8 @@ namespace viua {
             std::vector<std::unique_ptr<viua::scheduler::ffi::ForeignFunctionCallRequest>> foreign_call_queue;
             std::mutex foreign_call_queue_mutex;
             std::condition_variable foreign_call_queue_condition;
-            static const long unsigned default_ffi_schedulers_limit = 2UL;
-            long unsigned ffi_schedulers_limit;
+            static const viua::internals::types::schedulers_count default_ffi_schedulers_limit = 2;
+            viua::internals::types::schedulers_count ffi_schedulers_limit;
             std::vector<std::unique_ptr<std::thread>> foreign_call_workers;
 
             std::vector<void*> cxx_dynamic_lib_handles;
@@ -153,11 +153,11 @@ namespace viua {
                  *      * tell the Kernel where to start execution,
                  *      * kick the Kernel so it starts running,
                  */
-                Kernel& load(std::unique_ptr<byte[]>);
-                Kernel& bytes(uint64_t);
+                Kernel& load(std::unique_ptr<viua::internals::types::byte[]>);
+                Kernel& bytes(viua::internals::types::bytecode_size);
 
-                Kernel& mapfunction(const std::string&, uint64_t);
-                Kernel& mapblock(const std::string&, uint64_t);
+                Kernel& mapfunction(const std::string&, viua::internals::types::bytecode_size);
+                Kernel& mapblock(const std::string&, viua::internals::types::bytecode_size);
 
                 Kernel& registerExternalFunction(const std::string&, ForeignFunction*);
                 Kernel& removeExternalFunction(std::string);
@@ -176,10 +176,10 @@ namespace viua {
                 bool isBlock(const std::string&) const;
                 bool isLocalBlock(const std::string&) const;
                 bool isLinkedBlock(const std::string&) const;
-                std::pair<byte*, byte*> getEntryPointOfBlock(const std::string&) const;
+                std::pair<viua::internals::types::byte*, viua::internals::types::byte*> getEntryPointOfBlock(const std::string&) const;
 
                 std::string resolveMethodName(const std::string&, const std::string&) const;
-                std::pair<byte*, byte*> getEntryPointOf(const std::string&) const;
+                std::pair<viua::internals::types::byte*, viua::internals::types::byte*> getEntryPointOf(const std::string&) const;
 
                 void registerPrototype(const std::string&, std::unique_ptr<viua::types::Prototype>);
                 void registerPrototype(std::unique_ptr<viua::types::Prototype>);
@@ -193,14 +193,15 @@ namespace viua {
 
                 void postFreeProcess(std::unique_ptr<viua::process::Process>);
 
-                uint64_t createMailbox(const viua::process::PID);
-                uint64_t deleteMailbox(const viua::process::PID);
+                auto createMailbox(const viua::process::PID) -> viua::internals::types::processes_count;
+                auto deleteMailbox(const viua::process::PID) -> viua::internals::types::processes_count;
+
                 void send(const viua::process::PID, std::unique_ptr<viua::types::Type>);
                 void receive(const viua::process::PID, std::queue<std::unique_ptr<viua::types::Type>>&);
                 uint64_t pids() const;
 
-                auto static no_of_vp_schedulers() -> decltype(default_vp_schedulers_limit);
-                auto static no_of_ffi_schedulers() -> decltype(default_ffi_schedulers_limit);
+                auto static no_of_vp_schedulers() -> viua::internals::types::schedulers_count;
+                auto static no_of_ffi_schedulers() -> viua::internals::types::schedulers_count;
 
                 int run();
 

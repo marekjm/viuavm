@@ -63,7 +63,8 @@ static void encode_json(const string& filename, const vector<Token>& tokens) {
         cout << "{";
         cout << str::enquote("line") << ": " << t.second.line() << ", ";
         cout << str::enquote("character") << ": " << t.second.character() << ", ";
-        cout << str::enquote("content") << ": " << str::enquote(str::strencode(t.second.str()));
+        cout << str::enquote("content") << ": " << str::enquote(str::strencode(t.second.str())) << ", ";
+        cout << str::enquote("original") << ": " << str::enquote(str::strencode(t.second.original()));
         cout << '}';
         if (t.first+1 < limit) {
             cout << ", ";

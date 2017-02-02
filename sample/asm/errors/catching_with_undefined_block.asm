@@ -18,7 +18,7 @@
 ;
 
 .block: main/0__try
-    throw (istore 1 42)
+    throw (istore %1 42)
     leave
 .end
 
@@ -27,6 +27,6 @@
     catch "Integer" main/0__catch
     enter main/0__try
 
-    izero 0
+    izero %0
     return
 .end

@@ -18,8 +18,8 @@
 ;
 
 .function: main/0
-    ptr 2 1
+    ptr %2 %1
 
-    izero 0
+    izero %0
     return
 .end

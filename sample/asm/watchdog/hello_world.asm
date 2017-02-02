@@ -18,15 +18,15 @@
 ;
 
 .function: watchdog_process/1
-    arg 1 0
+    arg %1 %0
 
     ;print 1
 
-    remove 4 1 (strstore 3 "function")
+    remove %4 %1 (strstore %3 "function")
 
-    echo (strstore 5 "process spawned with <")
-    echo 4
-    print (strstore 5 "> died")
+    echo (strstore %5 "process spawned with <")
+    echo %4
+    print (strstore %5 "> died")
 
     return
 .end
@@ -67,17 +67,17 @@
     nop
     nop
     nop
-    throw (istore 1 42)
+    throw (istore %1 42)
     return
 .end
 
 .function: main/1
-    ;frame 0
+    ;frame %0
     ;watchdog watchdog_process/0
 
-    frame 0
+    frame %0
     process void broken_process/0
 
-    izero 0
+    izero %0
     return
 .end

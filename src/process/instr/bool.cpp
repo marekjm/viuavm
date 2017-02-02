@@ -27,40 +27,40 @@
 using namespace std;
 
 
-byte* viua::process::Process::opnot(byte* addr) {
-    unsigned target = 0;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+viua::internals::types::byte* viua::process::Process::opnot(viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     viua::types::Type *source = nullptr;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    place(target, unique_ptr<viua::types::Type>{new viua::types::Boolean(not source->boolean())});
+    *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(not source->boolean())};
 
     return addr;
 }
 
-byte* viua::process::Process::opand(byte* addr) {
-    unsigned target = 0;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+viua::internals::types::byte* viua::process::Process::opand(viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     viua::types::Type *first = nullptr, *second = nullptr;
     tie(addr, first) = viua::bytecode::decoder::operands::fetch_object(addr, this);
     tie(addr, second) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    place(target, unique_ptr<viua::types::Type>{new viua::types::Boolean(first->boolean() and second->boolean())});
+    *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(first->boolean() and second->boolean())};
 
     return addr;
 }
 
-byte* viua::process::Process::opor(byte* addr) {
-    unsigned target = 0;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+viua::internals::types::byte* viua::process::Process::opor(viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     viua::types::Type *first = nullptr, *second = nullptr;
     tie(addr, first) = viua::bytecode::decoder::operands::fetch_object(addr, this);
     tie(addr, second) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    place(target, unique_ptr<viua::types::Type>{new viua::types::Boolean(first->boolean() or second->boolean())});
+    *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(first->boolean() or second->boolean())};
 
     return addr;
 }

@@ -40,7 +40,7 @@ using namespace viua::types;
 Integer* String::size() {
     /** Return size of the string.
      */
-    return new Integer(int(svalue.size()));
+    return new Integer(static_cast<Integer::underlying_type>(svalue.size()));
 }
 
 String* String::sub(int b, int e) {
@@ -84,21 +84,21 @@ String* String::join(Vector* v) {
 
 // foreign methods
 void String::stringify(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
-    if (frame->args->size() < 2) {
+    if (frame->arguments->size() < 2) {
         throw new viua::types::Exception("expected 2 parameters");
     }
-    svalue = static_cast<Pointer*>(frame->args->at(1))->to()->str();
+    svalue = static_cast<Pointer*>(frame->arguments->at(1))->to()->str();
 }
 
 void String::represent(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
-    if (frame->args->size() < 2) {
+    if (frame->arguments->size() < 2) {
         throw new viua::types::Exception("expected 2 parameters");
     }
-    svalue = static_cast<Pointer*>(frame->args->at(1))->to()->repr();
+    svalue = static_cast<Pointer*>(frame->arguments->at(1))->to()->repr();
 }
 
 void String::startswith(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
-    string s = static_cast<String*>(frame->args->at(1))->value();
+    string s = static_cast<String*>(frame->arguments->at(1))->value();
     bool starts_with = false;
 
     if (s.size() <= svalue.size()) {
@@ -111,11 +111,11 @@ void String::startswith(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::
         }
     }
 
-    frame->regset->set(0, unique_ptr<viua::types::Type>{new viua::types::Boolean(starts_with)});
+    frame->local_register_set->set(0, unique_ptr<viua::types::Type>{new viua::types::Boolean(starts_with)});
 }
 
 void String::endswith(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
-    string s = static_cast<String*>(frame->args->at(1))->value();
+    string s = static_cast<String*>(frame->arguments->at(1))->value();
     bool ends_with = false;
 
     if (s.size() <= svalue.size()) {
@@ -130,7 +130,7 @@ void String::endswith(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Re
         }
     }
 
-    frame->regset->set(0, unique_ptr<viua::types::Type>{new viua::types::Boolean(ends_with)});
+    frame->local_register_set->set(0, unique_ptr<viua::types::Type>{new viua::types::Boolean(ends_with)});
 }
 
 void String::format(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
@@ -155,9 +155,9 @@ void String::format(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Regi
                 is_number = false;
             }
             if (is_number) {
-                replacement = static_cast<Vector*>(frame->args->at(1))->at(index)->str();
+                replacement = static_cast<Vector*>(frame->arguments->at(1))->at(index)->str();
             } else {
-                replacement = static_cast<Object*>(frame->args->at(2))->at(m)->str();
+                replacement = static_cast<Object*>(frame->arguments->at(2))->at(m)->str();
             }
             string pat("#\\{" + m + "\\}");
             regex subst(pat);
@@ -165,32 +165,32 @@ void String::format(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Regi
         }
     }
 
-    frame->regset->set(0, unique_ptr<viua::types::Type>{new String(result)});
+    frame->local_register_set->set(0, unique_ptr<viua::types::Type>{new String(result)});
 }
 
 void String::substr(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     int begin = 0;
     int end = -1;
 
-    assert_arity(frame, 1ul, 2ul, 3ul);
+    assert_arity(frame, 1u, 2u, 3u);
 
-    if (frame->args->size() > 1) {
-        assert_typeof(frame->args->at(1), "Integer");
-        if (Integer* i = dynamic_cast<Integer*>(frame->args->at(1))) {
-            begin = i->value();
+    if (frame->arguments->size() > 1) {
+        assert_typeof(frame->arguments->at(1), "Integer");
+        if (Integer* i = dynamic_cast<Integer*>(frame->arguments->at(1))) {
+            begin = i->as_int32();
         }
     }
-    if (frame->args->size() > 2) {
-        assert_typeof(frame->args->at(2), "Integer");
-        if (Integer* i = dynamic_cast<Integer*>(frame->args->at(2))) {
-            end = i->value();
+    if (frame->arguments->size() > 2) {
+        assert_typeof(frame->arguments->at(2), "Integer");
+        if (Integer* i = dynamic_cast<Integer*>(frame->arguments->at(2))) {
+            end = i->as_int32();
         }
     }
-    frame->regset->set(0, unique_ptr<viua::types::Type>{sub(begin, end)});
+    frame->local_register_set->set(0, unique_ptr<viua::types::Type>{sub(begin, end)});
 }
 
 void String::concatenate(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
-    frame->regset->set(0, unique_ptr<viua::types::Type>{new String(static_cast<String*>(frame->args->at(0))->value() + static_cast<String*>(frame->args->at(1))->value())});
+    frame->local_register_set->set(0, unique_ptr<viua::types::Type>{new String(static_cast<String*>(frame->arguments->at(0))->value() + static_cast<String*>(frame->arguments->at(1))->value())});
 }
 
 void String::join(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
@@ -198,5 +198,5 @@ void String::join(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*
 }
 
 void String::size(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
-    frame->regset->set(0, unique_ptr<viua::types::Type>{new Integer(static_cast<int>(svalue.size()))});
+    frame->local_register_set->set(0, unique_ptr<viua::types::Type>{new Integer(static_cast<int>(svalue.size()))});
 }

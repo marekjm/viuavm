@@ -105,6 +105,12 @@ There are several categories of change:
 - bic: rename `pull` instruction to `draw`
 - bic: `vat` returns not a copy, but a pointer to an object held inside a vector
 - fix: VM does not crash when source of `fcall` instruction is not callable, and throws an exception instead
+- feature: unified ALU (arithmetic-logic) instructions - `add`, `sub`, `mul`, `div`, `lt`, `lte`, `gt`, `gte`, and `eq` that should be used instead of the
+  type-specific ALU instructions; the syntax is `mnemonic type target lhs rhs` eg. `add int32 result foo bar` will add `foo` to `bar` as 32 bit signed integers and
+  store the result as 32 bit signed integer
+- bic: functions may return to 0 register, `void` must be used to drop return values
+- feature: `VIUA_STACK_TRACES` environment variable controlling how stack traces are printed (currently only `VIUA_STACK_TRACES=full` is recognised)
+- bic: register index operands must be prefixed by `%` character
 
 One limitation of static analyser (SA) introduced in this release is its inability to handle backwards jumps.
 This, however, is not a problem if the code does not use loops and
@@ -127,6 +133,10 @@ Should the object pointed-to be removed from its register?
 Answer to both of these questions is no.
 Whenever pointer dereference is used as the source either the typical *move* semantics change to *copy-pointed-to* semantics, or
 the code is invalid and will result in an exception being thrown.
+
+A user-code invisible improvement to VM's core is also included in this release: all core primitive types used by Viua have defined Viua-specific aliases, and
+are a fixed-size types.
+This is great for portability.
 
 
 ----

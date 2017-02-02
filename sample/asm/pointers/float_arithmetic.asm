@@ -18,12 +18,12 @@
 ;
 
 .function: main/0
-    ptr (.name: iota pointer_to_a) (fstore (.name: iota a) 2.14)
-    ptr (.name: iota pointer_to_b) (fstore (.name: iota b) 1.41)
+    ptr (.name: %iota pointer_to_a) (fstore (.name: %iota a) 2.14)
+    ptr (.name: %iota pointer_to_b) (fstore (.name: %iota b) 1.41)
 
-    fadd (.name: iota number) *pointer_to_a *pointer_to_b
-    print number
+    add float32 (.name: %iota number) *pointer_to_a *pointer_to_b
+    print %number
 
-    izero 0
+    izero %0
     return
 .end

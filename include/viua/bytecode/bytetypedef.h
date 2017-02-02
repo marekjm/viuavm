@@ -24,15 +24,34 @@
 
 #include <stdint.h>
 
-/** This header contains only one typedef - for byte.
- *
- *  This is because this typedef is required by various files across Viua
- *  source code, and often they do not need the opcodes.h header.
- *  This header prevents redefinition of `byte` in every file and
- *  helps keeping the definition consistent.
- *
- */
+namespace viua {
+    namespace internals {
+        namespace types {
+            typedef uint8_t byte;
 
-typedef uint8_t byte;
+            typedef uint64_t bytecode_size;
+            typedef uint32_t register_index;
+
+            typedef uint32_t schedulers_count;
+            typedef uint64_t processes_count;
+
+            typedef uint16_t process_time_slice_type;
+
+            typedef int32_t plain_int;
+            typedef double plain_float;
+
+            typedef uint32_t timeout;
+
+            typedef uint8_t registerset_type_marker;
+        }
+
+        enum class RegisterSets: types::registerset_type_marker {
+            GLOBAL = 0,
+            LOCAL,
+            STATIC,
+            TEMPORARY,
+        };
+    }
+}
 
 #endif

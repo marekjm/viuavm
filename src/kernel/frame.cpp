@@ -21,18 +21,17 @@
 
 
 void Frame::setLocalRegisterSet(viua::kernel::RegisterSet* rs, bool receives_ownership) {
-    regset.reset(rs, receives_ownership);
+    local_register_set.reset(rs, receives_ownership);
 }
 
-Frame::Frame(byte* ra, long unsigned argsize, long unsigned regsize):
+Frame::Frame(viua::internals::types::byte* ra, viua::internals::types::register_index argsize, viua::internals::types::register_index regsize):
     return_address(ra),
-    args(nullptr),
-    regset(nullptr),
-    return_void(false),
-    place_return_value_in(0)
+    arguments(nullptr),
+    local_register_set(nullptr),
+    return_register(nullptr)
 {
-    args.reset(new viua::kernel::RegisterSet(argsize));
-    regset.reset(new viua::kernel::RegisterSet(regsize));
+    arguments.reset(new viua::kernel::RegisterSet(argsize));
+    local_register_set.reset(new viua::kernel::RegisterSet(regsize));
 }
 Frame::Frame(const Frame& that) {
     return_address = that.return_address;

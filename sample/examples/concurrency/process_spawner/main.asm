@@ -18,28 +18,28 @@
 ;
 
 .function: worker_process/1
-    echo (strstore 1 "Hello from #")
-    echo (arg 2 0)
-    print (strstore 1 " worker process!")
+    echo (strstore %1 "Hello from #")
+    echo (arg %2 %0)
+    print (strstore %1 " worker process!")
     return
 .end
 
 .function: process_spawner/1
-    echo (strstore 1 "number of worker processes: ")
+    echo (strstore %1 "number of worker processes: ")
 
     .name: 1 limit
-    print (arg limit 0)
+    print (arg %limit %0)
 
     .name: 3 counter
-    izero counter
+    izero %counter
 
     .mark: begin_loop
-    if (igte 4 counter limit) end_loop +1
+    if (gte int64 %4 %counter %limit) end_loop +1
 
-    frame ^[(param 0 counter)]
+    frame ^[(param %0 %counter)]
     process void worker_process/1
 
-    iinc counter
+    iinc %counter
     jump begin_loop
     .mark: end_loop
 
@@ -51,14 +51,14 @@
 .signature: std::io::getline/0
 
 .function: get_number_of_processes_to_spawn/0
-    echo (strstore 4 "number of processes to spawn: ")
-    frame 0
-    stoi 0 (call 4 std::io::getline/0)
+    echo (strstore %4 "number of processes to spawn: ")
+    frame %0
+    stoi %0 (call %4 std::io::getline/0)
     return
 .end
 
 .function: run_process_spawner/1
-    frame ^[(param 0 (arg 1 0))]
+    frame ^[(param %0 (arg %1 %0))]
     process void process_spawner/1
     return
 .end
@@ -67,12 +67,12 @@
     ; the standard "io" library contains std::io::getline
     import "io"
 
-    frame 0
-    call 4 get_number_of_processes_to_spawn/0
+    frame %0
+    call %4 get_number_of_processes_to_spawn/0
 
-    frame ^[(param 0 4)]
+    frame ^[(param %0 %4)]
     call run_process_spawner/1
 
-    izero 0
+    izero %0
     return
 .end

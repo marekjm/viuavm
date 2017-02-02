@@ -18,8 +18,8 @@
 ;
 
 .function: main/0
-    if 2 +0 1
+    if %2 +0 1
 
-    izero 0
+    izero %0
     return
 .end

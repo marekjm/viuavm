@@ -18,14 +18,14 @@
 ;
 
 .function: greeter/0
-    print (strstore iota "Hello World!")
+    print (strstore %iota "Hello World!")
     return
 .end
 
 .function: main/0
-    frame 0
+    frame %0
     process void greeter/0
 
-    izero 0
+    izero %0
     return
 .end

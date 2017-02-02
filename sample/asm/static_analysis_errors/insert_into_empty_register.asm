@@ -20,8 +20,8 @@
 .function: main/0
     ; observe that 'target' register is undefined
     .name: 1 target
-    insert target (strstore 2 "key") (strstore 3 "value")
+    insert %target (strstore %2 "key") (strstore %3 "value")
 
-    izero 0
+    izero %0
     return
 .end

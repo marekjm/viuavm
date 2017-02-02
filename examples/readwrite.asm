@@ -38,20 +38,20 @@
 .function: main/0
     import "./io"
 
-    echo (strstore 1 "Path to read: ")
-    frame 0
-    print (call 1 io::getline/0)
+    echo (strstore %1 "Path to read: ")
+    frame %0
+    print (call %1 io::getline/0)
 
-    frame ^[(param 0 1)]
-    echo (call 2 io::read/1)
+    frame ^[(param %0 %1)]
+    echo (call %2 io::read/1)
 
-    echo (strstore 3 "Path to write: ")
-    frame 0
-    call 3 io::getline/0
+    echo (strstore %3 "Path to write: ")
+    frame %0
+    call %3 io::getline/0
 
-    frame ^[(param 0 3) (param 1 2)]
-    call 0 io::write/2
+    frame ^[(param %0 %3) (param %1 %2)]
+    call void io::write/2
 
-    izero 0
+    izero %0
     return
 .end

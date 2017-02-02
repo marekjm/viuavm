@@ -18,8 +18,8 @@
 ;
 
 .function: main/0
-    stof 2 1
+    stof %2 %1
 
-    izero 0
+    izero %0
     return
 .end

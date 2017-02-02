@@ -18,8 +18,8 @@
 ;
 
 .function: main/0
-    print (istore 1)
+    print (istore %1)
 
-    izero 0
+    izero %0
     return
 .end

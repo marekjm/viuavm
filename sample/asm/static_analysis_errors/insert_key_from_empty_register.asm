@@ -20,8 +20,8 @@
 .function: main/0
     ; observe that 'key' register is undefined
     .name: 2 key
-    insert (new 1 Object) key (strstore 3 "value")
+    insert (new %1 Object) key (strstore %3 "value")
 
-    izero 0
+    izero %0
     return
 .end

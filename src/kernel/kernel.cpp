@@ -47,7 +47,7 @@
 using namespace std;
 
 
-viua::kernel::Kernel& viua::kernel::Kernel::load(unique_ptr<byte[]> bc) {
+viua::kernel::Kernel& viua::kernel::Kernel::load(unique_ptr<viua::internals::types::byte[]> bc) {
     /*  Load bytecode into the viua::kernel::Kernel.
      *  viua::kernel::Kernel becomes owner of loaded bytecode - meaning it will consider itself responsible for proper
      *  destruction of it, so make sure you have a copy of the bytecode.
@@ -59,7 +59,7 @@ viua::kernel::Kernel& viua::kernel::Kernel::load(unique_ptr<byte[]> bc) {
     return (*this);
 }
 
-viua::kernel::Kernel& viua::kernel::Kernel::bytes(uint64_t sz) {
+viua::kernel::Kernel& viua::kernel::Kernel::bytes(viua::internals::types::bytecode_size sz) {
     /*  Set bytecode size, so the viua::kernel::Kernel can stop execution even if it doesn't reach HALT instruction but reaches
      *  bytecode address out of bounds.
      */
@@ -67,14 +67,14 @@ viua::kernel::Kernel& viua::kernel::Kernel::bytes(uint64_t sz) {
     return (*this);
 }
 
-viua::kernel::Kernel& viua::kernel::Kernel::mapfunction(const string& name, uint64_t address) {
+viua::kernel::Kernel& viua::kernel::Kernel::mapfunction(const string& name, viua::internals::types::bytecode_size address) {
     /** Maps function name to bytecode address.
      */
     function_addresses[name] = address;
     return (*this);
 }
 
-viua::kernel::Kernel& viua::kernel::Kernel::mapblock(const string& name, uint64_t address) {
+viua::kernel::Kernel& viua::kernel::Kernel::mapblock(const string& name, viua::internals::types::bytecode_size address) {
     /** Maps block name to bytecode address.
      */
     block_addresses[name] = address;
@@ -117,23 +117,23 @@ void viua::kernel::Kernel::loadNativeLibrary(const string& module) {
         Loader loader(path);
         loader.load();
 
-        unique_ptr<byte[]> lnk_btcd {loader.getBytecode()};
+        unique_ptr<viua::internals::types::byte[]> lnk_btcd {loader.getBytecode()};
 
         vector<string> fn_names = loader.getFunctions();
-        map<string, uint64_t> fn_addrs = loader.getFunctionAddresses();
+        map<string, viua::internals::types::bytecode_size> fn_addrs = loader.getFunctionAddresses();
         for (unsigned i = 0; i < fn_names.size(); ++i) {
             string fn_linkname = fn_names[i];
-            linked_functions[fn_linkname] = pair<string, byte*>(module, (lnk_btcd.get()+fn_addrs[fn_names[i]]));
+            linked_functions[fn_linkname] = pair<string, viua::internals::types::byte*>(module, (lnk_btcd.get()+fn_addrs[fn_names[i]]));
         }
 
         vector<string> bl_names = loader.getBlocks();
-        map<string, uint64_t> bl_addrs = loader.getBlockAddresses();
+        map<string, viua::internals::types::bytecode_size> bl_addrs = loader.getBlockAddresses();
         for (unsigned i = 0; i < bl_names.size(); ++i) {
             string bl_linkname = bl_names[i];
-            linked_blocks[bl_linkname] = pair<string, byte*>(module, (lnk_btcd.get()+bl_addrs[bl_linkname]));
+            linked_blocks[bl_linkname] = pair<string, viua::internals::types::byte*>(module, (lnk_btcd.get()+bl_addrs[bl_linkname]));
         }
 
-        linked_modules[module] = pair<unsigned, unique_ptr<byte[]>>(static_cast<unsigned>(loader.getBytecodeSize()), std::move(lnk_btcd));
+        linked_modules[module] = pair<viua::internals::types::bytecode_size, unique_ptr<viua::internals::types::byte[]>>(loader.getBytecodeSize(), std::move(lnk_btcd));
     } else {
         throw new viua::types::Exception("failed to link: " + module);
     }
@@ -243,9 +243,9 @@ bool viua::kernel::Kernel::isLinkedBlock(const string& name) const {
     return linked_blocks.count(name);
 }
 
-pair<byte*, byte*> viua::kernel::Kernel::getEntryPointOfBlock(const std::string& name) const {
-    byte *entry_point = nullptr;
-    byte *module_base = nullptr;
+pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::kernel::Kernel::getEntryPointOfBlock(const std::string& name) const {
+    viua::internals::types::byte *entry_point = nullptr;
+    viua::internals::types::byte *module_base = nullptr;
     if (block_addresses.count(name)) {
         entry_point = (bytecode.get() + block_addresses.at(name));
         module_base = bytecode.get();
@@ -254,16 +254,16 @@ pair<byte*, byte*> viua::kernel::Kernel::getEntryPointOfBlock(const std::string&
         entry_point = lf.second;
         module_base = linked_modules.at(lf.first).second.get();
     }
-    return pair<byte*, byte*>(entry_point, module_base);
+    return pair<viua::internals::types::byte*, viua::internals::types::byte*>(entry_point, module_base);
 }
 
 string viua::kernel::Kernel::resolveMethodName(const string& klass, const string& method_name) const {
     return typesystem.at(klass)->resolvesTo(method_name);
 }
 
-pair<byte*, byte*> viua::kernel::Kernel::getEntryPointOf(const std::string& name) const {
-    byte *entry_point = nullptr;
-    byte *module_base = nullptr;
+pair<viua::internals::types::byte*, viua::internals::types::byte*> viua::kernel::Kernel::getEntryPointOf(const std::string& name) const {
+    viua::internals::types::byte *entry_point = nullptr;
+    viua::internals::types::byte *module_base = nullptr;
     if (function_addresses.count(name)) {
         entry_point = (bytecode.get() + function_addresses.at(name));
         module_base = bytecode.get();
@@ -272,7 +272,7 @@ pair<byte*, byte*> viua::kernel::Kernel::getEntryPointOf(const std::string& name
         entry_point = lf.second;
         module_base = linked_modules.at(lf.first).second.get();
     }
-    return pair<byte*, byte*>(entry_point, module_base);
+    return pair<viua::internals::types::byte*, viua::internals::types::byte*>(entry_point, module_base);
 }
 
 void viua::kernel::Kernel::registerPrototype(const string& type_name, unique_ptr<viua::types::Prototype> proto) {
@@ -306,7 +306,7 @@ void viua::kernel::Kernel::postFreeProcess(unique_ptr<viua::process::Process> p)
     free_virtual_processes_cv.notify_one();
 }
 
-uint64_t viua::kernel::Kernel::createMailbox(const viua::process::PID pid) {
+auto viua::kernel::Kernel::createMailbox(const viua::process::PID pid) -> viua::internals::types::processes_count {
     unique_lock<mutex> lck(mailbox_mutex);
 #if VIUA_VM_DEBUG_LOG
     cerr << "[kernel:mailbox:create] pid = " << pid.get() << endl;
@@ -314,7 +314,7 @@ uint64_t viua::kernel::Kernel::createMailbox(const viua::process::PID pid) {
     mailboxes.emplace(pid, vector<unique_ptr<viua::types::Type>>{});
     return ++running_processes;
 }
-uint64_t viua::kernel::Kernel::deleteMailbox(const viua::process::PID pid) {
+auto viua::kernel::Kernel::deleteMailbox(const viua::process::PID pid) -> viua::internals::types::processes_count {
     unique_lock<mutex> lck(mailbox_mutex);
 #if VIUA_VM_DEBUG_LOG
     cerr << "[kernel:mailbox:delete] pid = " << pid.get() << ", queued messages = " << mailboxes[pid].size() << endl;
@@ -360,7 +360,7 @@ int viua::kernel::Kernel::exit() const {
     return return_code;
 }
 
-static auto no_of_schedulers(const char *env_name, unsigned long default_limit) -> decltype(default_limit) {
+static auto no_of_schedulers(const char *env_name, viua::internals::types::schedulers_count default_limit) -> viua::internals::types::schedulers_count {
     decltype(default_limit) limit = default_limit;
     char *env_limit = getenv(env_name);
     if (env_limit != nullptr) {
@@ -371,10 +371,10 @@ static auto no_of_schedulers(const char *env_name, unsigned long default_limit) 
     }
     return limit;
 }
-auto viua::kernel::Kernel::no_of_vp_schedulers() -> decltype(default_vp_schedulers_limit) {
+auto viua::kernel::Kernel::no_of_vp_schedulers() -> viua::internals::types::schedulers_count {
     return no_of_schedulers("VIUA_VP_SCHEDULERS", default_vp_schedulers_limit);
 }
-auto viua::kernel::Kernel::no_of_ffi_schedulers() -> decltype(default_ffi_schedulers_limit) {
+auto viua::kernel::Kernel::no_of_ffi_schedulers() -> viua::internals::types::schedulers_count {
     return no_of_schedulers("VIUA_FFI_SCHEDULERS", default_ffi_schedulers_limit);
 }
 

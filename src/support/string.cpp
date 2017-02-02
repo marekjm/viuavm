@@ -51,12 +51,12 @@ namespace str {
          *  Regex equivalent: `^[0-9]+$`
          */
         bool num = false;
-        unsigned start = 0;
+        std::string::size_type start = 0;
         if (s[0] == '-' and negatives) {
             // must handle negative numbers
             start = 1;
         }
-        for (unsigned i = start; i < s.size(); ++i) {
+        for (auto i = start; i < s.size(); ++i) {
             switch (s[i]) {
                 case '0':
                 case '1':
@@ -90,13 +90,13 @@ namespace str {
          *  Regex equivalent: `^[0-9]+\.[0-9]+$`
          */
         bool is = false;
-        unsigned start = 0;
+        std::string::size_type start = 0;
         if (s[0] == '-' and negatives) {
             // to handle negative numbers
             start = 1;
         }
         int dot = -1;
-        for (unsigned i = start; i < s.size(); ++i) {
+        for (auto i = start; i < s.size(); ++i) {
             if (s[i] == '.') {
                 dot = static_cast<int>(i);
                 break;
@@ -114,7 +114,7 @@ namespace str {
     }
 
 
-    string sub(const string& s, unsigned long b, long int e) {
+    string sub(const string& s, std::string::size_type b, long int e) {
         /*  Returns substring of s.
          *  If only s is passed, returns copy of s.
          */
@@ -123,11 +123,11 @@ namespace str {
         ostringstream part;
         part.str("");
 
-        unsigned long end;
-        if (e < 0) { end = (s.size() - static_cast<unsigned long>(-1 * e) + 1); }
-        else { end = static_cast<long unsigned>(e); }
+        std::string::size_type end = 0;
+        if (e < 0) { end = (s.size() - static_cast<std::string::size_type>(-1 * e) + 1); }
+        else { end = static_cast<std::string::size_type>(e); }
 
-        for (unsigned long i = b; i < s.size() and i < end; ++i) {
+        for (auto i = b; i < s.size() and i < end; ++i) {
             part << s[i];
         }
 
@@ -142,7 +142,7 @@ namespace str {
 
         string str = (ignore_leading_ws ? lstrip(s) : s);
 
-        for (unsigned i = 0; i < str.size(); ++i) {
+        for (std::string::size_type i = 0; i < str.size(); ++i) {
             if (str[i] == ' ' or str[i] == '\t' or str[i] == '\v' or str[i] == '\n') break;
             chnk << str[i];
         }
@@ -168,8 +168,8 @@ namespace str {
         /** Join elements of vector with given string.
          */
         ostringstream oss;
-        long unsigned limit = parts.size();
-        for (long unsigned i = 0; i < limit; ++i) {
+        auto limit = parts.size();
+        for (decltype(limit) i = 0; i < limit; ++i) {
             oss << parts[i];
             if (i < (limit-1)) {
                 oss << s;
@@ -201,8 +201,8 @@ namespace str {
         char quote;
         chnk << (quote = s[0]);
 
-        int backs = 0;
-        for (unsigned i = 1; i < s.size(); ++i) {
+        std::string::size_type backs = 0;
+        for (std::string::size_type i = 1; i < s.size(); ++i) {
             chnk << s[i];
             if (backs and s[i] != '\\' and s[i] != quote) {
                 backs = 0;
@@ -227,7 +227,7 @@ namespace str {
     string lstrip(const string& s) {
         /*  Removes whitespace from left side of the string.
          */
-        unsigned i = 0;
+        std::string::size_type i = 0;
         while (i < s.size()) {
             if (not (s[i] == ' ' or s[i] == '\t' or s[i] == '\v' or s[i] == '\n')) {
                 break;
@@ -238,9 +238,9 @@ namespace str {
     }
 
 
-    unsigned lshare(const string& s, const string& w) {
-        unsigned share = 0;
-        for (unsigned i = 0; i < s.size() and i < w.size(); ++i) {
+    std::string::size_type lshare(const string& s, const string& w) {
+        std::string::size_type share = 0;
+        for (std::string::size_type i = 0; i < s.size() and i < w.size(); ++i) {
             if (s[i] == w[i]) {
                 ++share;
             } else {
@@ -251,7 +251,7 @@ namespace str {
     }
     bool contains(const string&s, const char c) {
         bool it_does = false;
-        for (unsigned i = 0; i < s.size(); ++i) {
+        for (std::string::size_type i = 0; i < s.size(); ++i) {
             if (s[i] == c) {
                 it_does = true;
                 break;
@@ -268,7 +268,7 @@ namespace str {
         char closing = '"';
 
         encoded << closing;
-        for (unsigned i = 0; i < s.size(); ++i) {
+        for (std::string::size_type i = 0; i < s.size(); ++i) {
             if (s[i] == closing) { encoded << "\\"; }
             encoded << s[i];
         }
@@ -295,7 +295,7 @@ namespace str {
          */
         ostringstream decoded;
         char c;
-        for (unsigned i = 0; i < s.size(); ++i) {
+        for (std::string::size_type i = 0; i < s.size(); ++i) {
             c = s[i];
             if (c == '\\' and i < (s.size()-1)) {
                 ++i;
@@ -356,7 +356,7 @@ namespace str {
         ostringstream encoded;
         char c;
         bool escape = false;
-        for (unsigned i = 0; i < s.size(); ++i) {
+        for (std::string::size_type i = 0; i < s.size(); ++i) {
             c = s[i];
             switch (s[i]) {
                 case '\\':
@@ -407,8 +407,8 @@ namespace str {
     string stringify(const vector<string>& sv) {
         ostringstream oss;
         oss << '[';
-        long unsigned sz = sv.size();
-        for (long unsigned i = 0; i < sz; ++i) {
+        auto sz = sv.size();
+        for (decltype(sz) i = 0; i < sz; ++i) {
             oss << enquote(sv[i]);
             if (i < (sz-1)) {
                 oss << ", ";

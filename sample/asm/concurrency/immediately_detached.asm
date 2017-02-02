@@ -89,14 +89,14 @@
     nop
     nop
     nop
-    print (strstore 1 "Hello World (from detached)!")
+    print (strstore %1 "Hello World (from detached)!")
     return
 .end
 
 .function: main/0
-    frame 0
+    frame %0
     process void running_detached/0
 
-    izero 0
+    izero %0
     return
 .end

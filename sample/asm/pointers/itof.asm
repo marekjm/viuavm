@@ -18,9 +18,9 @@
 ;
 
 .function: main/0
-    ptr (.name: iota pointer) (istore (.name: iota o) 0)
-    print (itof iota *pointer)
+    ptr (.name: %iota pointer) (istore (.name: %iota o) 0)
+    print (itof %iota *pointer)
 
-    izero 0
+    izero %0
     return
 .end

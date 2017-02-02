@@ -27,68 +27,69 @@
 using namespace std;
 
 
-byte* viua::process::Process::opframe(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opframe(viua::internals::types::byte* addr) {
     /** Create new frame for function calls.
      */
-    unsigned arguments = 0, local_registers = 0;
-    tie(addr, arguments) = viua::bytecode::decoder::operands::fetch_primitive_uint(addr, this);
-    tie(addr, local_registers) = viua::bytecode::decoder::operands::fetch_primitive_uint(addr, this);
+    viua::internals::types::register_index arguments = 0, local_registers = 0;
+    tie(addr, arguments) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, local_registers) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     requestNewFrame(arguments, local_registers);
 
     return addr;
 }
 
-byte* viua::process::Process::opparam(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opparam(viua::internals::types::byte* addr) {
     /** Run param instruction.
      */
-    unsigned parameter_no_operand_index = 0;
+    viua::internals::types::register_index parameter_no_operand_index = 0;
     tie(addr, parameter_no_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     viua::types::Type *source = nullptr;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    if (parameter_no_operand_index >= frame_new->args->size()) {
+    if (parameter_no_operand_index >= frame_new->arguments->size()) {
         throw new viua::types::Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
     }
-    frame_new->args->set(parameter_no_operand_index, std::move(source->copy()));
-    frame_new->args->clear(parameter_no_operand_index);
+    frame_new->arguments->set(parameter_no_operand_index, source->copy());
+    frame_new->arguments->clear(parameter_no_operand_index);
 
     return addr;
 }
 
-byte* viua::process::Process::oppamv(byte* addr) {
+viua::internals::types::byte* viua::process::Process::oppamv(viua::internals::types::byte* addr) {
     /** Run pamv instruction.
      */
-    unsigned parameter_no_operand_index = 0, source = 0;
+    viua::internals::types::register_index parameter_no_operand_index = 0, source = 0;
     tie(addr, parameter_no_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    if (parameter_no_operand_index >= frame_new->args->size()) {
+    if (parameter_no_operand_index >= frame_new->arguments->size()) {
         throw new viua::types::Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
     }
-    frame_new->args->set(parameter_no_operand_index, std::move(uregset->pop(source)));
-    frame_new->args->clear(parameter_no_operand_index);
-    frame_new->args->flag(parameter_no_operand_index, MOVED);
+    frame_new->arguments->set(parameter_no_operand_index, currently_used_register_set->pop(source));
+    frame_new->arguments->clear(parameter_no_operand_index);
+    frame_new->arguments->flag(parameter_no_operand_index, MOVED);
 
     return addr;
 }
 
-byte* viua::process::Process::oparg(byte* addr) {
+viua::internals::types::byte* viua::process::Process::oparg(viua::internals::types::byte* addr) {
     /** Run arg instruction.
      */
-    unsigned destination_register_index = 0, parameter_no_operand_index = 0;
+    viua::kernel::Register *target = nullptr;
     bool destination_is_void = viua::bytecode::decoder::operands::is_void(addr);
 
     if (not destination_is_void) {
-        tie(addr, destination_register_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+        tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
     } else {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 
+    viua::internals::types::register_index parameter_no_operand_index = 0;
     tie(addr, parameter_no_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    if (parameter_no_operand_index >= frames.back()->args->size()) {
+    if (parameter_no_operand_index >= frames.back()->arguments->size()) {
         ostringstream oss;
         oss << "invalid read: read from argument register out of bounds: " << parameter_no_operand_index;
         throw new viua::types::Exception(oss.str());
@@ -96,35 +97,34 @@ byte* viua::process::Process::oparg(byte* addr) {
 
     unique_ptr<viua::types::Type> argument;
 
-    if (frames.back()->args->isflagged(parameter_no_operand_index, MOVED)) {
-        argument = std::move(frames.back()->args->pop(parameter_no_operand_index));
+    if (frames.back()->arguments->isflagged(parameter_no_operand_index, MOVED)) {
+        argument = frames.back()->arguments->pop(parameter_no_operand_index);
     } else {
-        argument = std::move(frames.back()->args->get(parameter_no_operand_index)->copy());
+        argument = frames.back()->arguments->get(parameter_no_operand_index)->copy();
     }
 
     if (not destination_is_void) {
-        uregset->set(destination_register_index, std::move(argument));
+        *target = std::move(argument);
     }
 
     return addr;
 }
 
-byte* viua::process::Process::opargc(byte* addr) {
-    unsigned target = 0;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
-    uregset->set(target, unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<int>(frames.back()->args->size()))});
+viua::internals::types::byte* viua::process::Process::opargc(viua::internals::types::byte* addr) {
+    viua::kernel::Register *target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    *target = unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<int>(frames.back()->arguments->size()))};
 
     return addr;
 }
 
-byte* viua::process::Process::opcall(byte* addr) {
-    /*  Run call instruction.
-     */
+viua::internals::types::byte* viua::process::Process::opcall(viua::internals::types::byte* addr) {
     bool return_void = viua::bytecode::decoder::operands::is_void(addr);
-    unsigned return_register = 0;
+    viua::kernel::Register* return_register = nullptr;
 
     if (not return_void) {
-        tie(addr, return_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+        tie(addr, return_register) = viua::bytecode::decoder::operands::fetch_register(addr, this);
     } else {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
@@ -144,21 +144,21 @@ byte* viua::process::Process::opcall(byte* addr) {
         if (frame_new == nullptr) {
             throw new viua::types::Exception("cannot call foreign method without a frame");
         }
-        if (frame_new->args->size() == 0) {
+        if (frame_new->arguments->size() == 0) {
             throw new viua::types::Exception("cannot call foreign method using empty frame");
         }
-        if (frame_new->args->at(0) == nullptr) {
+        if (frame_new->arguments->at(0) == nullptr) {
             throw new viua::types::Exception("frame must have at least one argument when used to call a foreign method");
         }
-        auto obj = frame_new->args->at(0);
-        return callForeignMethod(addr, obj, call_name, return_void, return_register, call_name);
+        auto obj = frame_new->arguments->at(0);
+        return callForeignMethod(addr, obj, call_name, return_register, call_name);
     }
 
     auto caller = (is_native ? &viua::process::Process::callNative : &viua::process::Process::callForeign);
-    return (this->*caller)(addr, call_name, return_void, return_register, "");
+    return (this->*caller)(addr, call_name, return_register, "");
 }
 
-byte* viua::process::Process::optailcall(byte* addr) {
+viua::internals::types::byte* viua::process::Process::optailcall(viua::internals::types::byte* addr) {
     /*  Run tailcall instruction.
      */
     string call_name;
@@ -178,7 +178,7 @@ byte* viua::process::Process::optailcall(byte* addr) {
 
     Frame *last_frame = frames.back().get();
 
-    last_frame->args = std::move(frame_new->args);
+    last_frame->arguments = std::move(frame_new->arguments);
 
     // new frame must be deleted to prevent future errors
     // it's a simulated "push-and-pop" from the stack
@@ -187,27 +187,27 @@ byte* viua::process::Process::optailcall(byte* addr) {
     return adjustJumpBaseFor(call_name);
 }
 
-byte* viua::process::Process::opreturn(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opreturn(viua::internals::types::byte* addr) {
     if (frames.size() == 0) {
         throw new viua::types::Exception("no frame on stack: no call to return from");
     }
     addr = frames.back()->ret_address();
 
     unique_ptr<viua::types::Type> returned;
-    unsigned return_value_register = frames.back()->place_return_value_in;
-    if (return_value_register != 0 and not frames.back()->return_void) {
+    viua::kernel::Register* return_register = frames.back()->return_register;
+    if (return_register != nullptr) {
         // we check in 0. register because it's reserved for return values
-        if (uregset->at(0) == nullptr) {
+        if (currently_used_register_set->at(0) == nullptr) {
             throw new viua::types::Exception("return value requested by frame but function did not set return register");
         }
-        returned = std::move(uregset->pop(0));
+        returned = currently_used_register_set->pop(0);
     }
 
     dropFrame();
 
     // place return value
     if (returned and frames.size() > 0) {
-        place(return_value_register, std::move(returned));
+        *return_register = std::move(returned);
     }
 
     if (frames.size() > 0) {

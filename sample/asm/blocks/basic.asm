@@ -18,7 +18,7 @@
 ;
 
 .block: main_block
-    istore 1 42
+    istore %1 42
     leave
 .end
 
@@ -26,8 +26,8 @@
     try
     enter main_block
     ; leave instructions lead here
-    print 1
+    print %1
 
-    izero 0
+    izero %0
     return
 .end

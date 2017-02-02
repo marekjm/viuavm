@@ -20,7 +20,7 @@
 .function: sum/4
     ; this function takes four integers as parameters and
     ; adds them, and returns the sum
-    iadd 0 (arg 4 3) (iadd 0 (arg 3 2) (iadd 0 (arg 1 0) (arg 2 1)))
+    add int64 %0 (arg %4 %3) (add int64 %0 (arg %3 %2) (add int64 %0 (arg %1 %0) (arg %2 %1)))
     return
 .end
 
@@ -32,33 +32,33 @@
     ; it then creates a frame with required number of parameter slots (as
     ; specified by length of the vector), and calls given function with this
     ; frame
-    arg (.name: iota fn_to_call) 0
-    arg (.name: iota parameters_list) 1
+    arg (.name: %iota fn_to_call) %0
+    arg (.name: %iota parameters_list) %1
 
     ; take length of the vector
-    .name: iota vector_length
-    vlen vector_length 2
+    .name: %iota vector_length
+    vlen %vector_length %2
     frame @vector_length
 
     ; zero loop counter
-    .name: iota loop_counter
-    izero loop_counter
+    .name: %iota loop_counter
+    izero %loop_counter
     .mark: while_begin
 
     ; simple condition:
     ; while (loop_counter < vector_length) {
-    if (igte iota loop_counter vector_length) while_end while_body
+    if (gte int64 %iota %loop_counter %vector_length) while_end while_body
 
     .mark: while_body
 
-    .name: iota slot
+    .name: %iota slot
     ; store item located inside parameter vector at index denoted by loop_counter in
     ; a register and
     ; pass it as a parameter
-    pamv @loop_counter (copy iota *(vat slot parameters_list @loop_counter))
+    pamv @loop_counter (copy %iota *(vat %slot %parameters_list @loop_counter))
 
     ; loop_counter++
-    iinc loop_counter
+    iinc %loop_counter
 
     jump while_begin
 
@@ -66,30 +66,30 @@
 
     ; finally, after the frame is ready
     ; call the function
-    move 0 (fcall iota fn_to_call)
+    move %0 (fcall %iota %fn_to_call)
     return
 .end
 
 .function: main/1
     ; create the vector
-    vpush (vec 1) (istore 2 20)
-    vpush 1 (istore 3 16)
-    vpush 1 (istore 4 8)
-    vpush 1 (istore 5 -2)
+    vpush (vec %1) (istore %2 20)
+    vpush %1 (istore %3 16)
+    vpush %1 (istore %4 8)
+    vpush %1 (istore %5 -2)
 
-    istore 2 20
-    istore 3 16
-    istore 4 8
-    istore 5 -2
+    istore %2 20
+    istore %3 16
+    istore %4 8
+    istore %5 -2
 
     ; call sum/4() function
-    frame ^[(param 0 2) (param 1 3) (param 2 4) (param 3 5)]
-    print (call 6 sum/4)
+    frame ^[(param %0 %2) (param %1 %3) (param %2 %4) (param %3 %5)]
+    print (call %6 sum/4)
 
     ; call sum/4 function via invoke/2 function
-    frame ^[(param 0 (function 7 sum/4)) (param 1 1)]
-    print (call 8 invoke/2)
+    frame ^[(param %0 (function %7 sum/4)) (param %1 %1)]
+    print (call %8 invoke/2)
 
-    izero 0
+    izero %0
     return
 .end

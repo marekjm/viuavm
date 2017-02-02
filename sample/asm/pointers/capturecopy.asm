@@ -18,19 +18,19 @@
 ;
 
 .closure: printer/0
-    print 1
+    print %1
     return
 .end
 
 .function: main/0
-    ptr (.name: iota pointer) (strstore (.name: iota o) "Hello World!")
+    ptr (.name: %iota pointer) (strstore (.name: %iota o) "Hello World!")
 
-    closure (.name: iota cl) printer/0
-    capturecopy cl 1 *pointer
+    closure (.name: %iota cl) printer/0
+    capturecopy %cl %1 *pointer
 
-    frame 0
-    fcall void cl
+    frame %0
+    fcall void %cl
 
-    izero 0
+    izero %0
     return
 .end

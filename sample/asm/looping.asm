@@ -21,21 +21,21 @@
 ; It displays numbers from 0 to 10.
 
 .function: main/1
-    istore 1 0
-    istore 2 10
+    istore %1 0
+    istore %2 10
 
     ; mark the beginning of the loop
     .mark: loop
-    ilt 3 1 2
+    lt int64 %3 %1 %2
     ; invert value to use short form of branch instruction, i.e.: branch <cond> <true>
     ; and expliot the fact that it will default false to "next instruction"
-    not 3
-    if 3 final_print
-    print 1
-    iinc 1
+    not %3
+    if %3 final_print
+    print %1
+    iinc %1
     jump loop
     .mark: final_print
-    print 1
-    izero 0
+    print %1
+    izero %0
     return
 .end

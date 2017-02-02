@@ -18,11 +18,11 @@
 ;
 
 .function: main/0
-    izero (.name: iota first)
-    .name: iota second
+    izero (.name: %iota first)
+    .name: %iota second
 
-    iadd (.name: iota value) first second
+    add int8 (.name: %iota value) first second
 
-    izero 0
+    izero %0
     return
 .end

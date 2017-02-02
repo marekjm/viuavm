@@ -18,9 +18,9 @@
 ;
 
 .function: main/0
-    if (izero 1) here here
+    if (izero %1) here here
 
     .mark: here
-    izero 0
+    izero %0
     return
 .end

@@ -18,8 +18,8 @@
 ;
 
 .function: main/0
-    throw 1
+    throw %1
 
-    izero 0
+    izero %0
     return
 .end

@@ -33,17 +33,21 @@ namespace viua {
             /** Basic integer type.
              *  It is suitable for mathematical operations.
              */
-            int number;
+            public:
+            using underlying_type = int64_t;
+
+            private:
+            underlying_type number;
 
             public:
                 std::string type() const override;
                 std::string str() const override;
                 bool boolean() const override;
 
-                int& value();
+                auto value() -> decltype(number);
 
-                virtual int increment();
-                virtual int decrement();
+                virtual int64_t increment();
+                virtual int64_t decrement();
 
                 std::unique_ptr<Type> copy() const override;
 
@@ -60,7 +64,7 @@ namespace viua {
                 viua::float32 as_float32() const override;
                 viua::float64 as_float64() const override;
 
-                Integer(int n = 0): number(n) {}
+                Integer(decltype(number) n = 0): number(n) {}
         };
     }
 }

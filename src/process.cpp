@@ -31,33 +31,38 @@
 using namespace std;
 
 
-viua::types::Type* viua::process::Process::fetch(unsigned index) const {
+viua::types::Type* viua::process::Process::fetch(viua::internals::types::register_index index) const {
     /*  Return pointer to object at given register.
      *  This method safeguards against reaching for out-of-bounds registers and
      *  reading from an empty register.
      */
-    viua::types::Type* object = uregset->get(index);
+    viua::types::Type* object = currently_used_register_set->get(index);
     if (dynamic_cast<viua::types::Reference*>(object)) {
         object = static_cast<viua::types::Reference*>(object)->pointsTo();
     }
     return object;
 }
-viua::types::Type* viua::process::Process::obtain(unsigned index) const {
+viua::types::Type* viua::process::Process::obtain(viua::internals::types::register_index index) const {
     return fetch(index);
 }
-unique_ptr<viua::types::Type> viua::process::Process::pop(unsigned index) {
-    return std::move(uregset->pop(index));
+
+viua::kernel::Register* viua::process::Process::register_at(viua::internals::types::register_index i) {
+    return currently_used_register_set->register_at(i);
 }
-void viua::process::Process::place(unsigned index, unique_ptr<viua::types::Type> obj) {
+
+unique_ptr<viua::types::Type> viua::process::Process::pop(viua::internals::types::register_index index) {
+    return currently_used_register_set->pop(index);
+}
+void viua::process::Process::place(viua::internals::types::register_index index, unique_ptr<viua::types::Type> obj) {
     /** Place an object in register with given index.
      *
      *  Before placing an object in register, a check is preformed if the register is empty.
      *  If not - the `viua::types::Type` previously stored in it is destroyed.
      *
      */
-    uregset->set(index, std::move(obj));
+    currently_used_register_set->set(index, std::move(obj));
 }
-void viua::process::Process::put(unsigned index, unique_ptr<viua::types::Type> o) {
+void viua::process::Process::put(viua::internals::types::register_index index, unique_ptr<viua::types::Type> o) {
     place(index, std::move(o));
 }
 void viua::process::Process::ensureStaticRegisters(string function_name) {
@@ -71,7 +76,7 @@ void viua::process::Process::ensureStaticRegisters(string function_name) {
     }
 }
 
-Frame* viua::process::Process::requestNewFrame(unsigned arguments_size, unsigned registers_size) {
+Frame* viua::process::Process::requestNewFrame(viua::internals::types::register_index arguments_size, viua::internals::types::register_index registers_size) {
     /** Request new frame to be prepared.
      *
      *  Creates new frame if the new-frame hook is empty.
@@ -91,10 +96,10 @@ void viua::process::Process::pushFrame() {
         throw new viua::types::Exception(oss.str());
     }
 
-    uregset = frame_new->regset.get();
+    currently_used_register_set = frame_new->local_register_set.get();
     if (find(frames.begin(), frames.end(), frame_new) != frames.end()) {
         ostringstream oss;
-        oss << "stack corruption: frame " << hex << frame_new.get() << dec << " for function " << frame_new->function_name << '/' << frame_new->args->size() << " pushed more than once";
+        oss << "stack corruption: frame " << hex << frame_new.get() << dec << " for function " << frame_new->function_name << '/' << frame_new->arguments->size() << " pushed more than once";
         throw oss.str();
     }
     frames.emplace_back(std::move(frame_new));
@@ -105,20 +110,20 @@ void viua::process::Process::dropFrame() {
     unique_ptr<Frame> frame(std::move(frames.back()));
     frames.pop_back();
 
-    for (registerset_size_type i = 0; i < frame->args->size(); ++i) {
-        if (frame->args->at(i) != nullptr and frame->args->isflagged(i, MOVED)) {
+    for (viua::internals::types::register_index i = 0; i < frame->arguments->size(); ++i) {
+        if (frame->arguments->at(i) != nullptr and frame->arguments->isflagged(i, MOVED)) {
             throw new viua::types::Exception("unused pass-by-move parameter");
         }
     }
 
     if (frames.size() == 0) {
-        return_value = std::move(frame->regset->pop(0));
+        return_value = frame->local_register_set->pop(0);
     }
 
     if (frames.size()) {
-        uregset = frames.back()->regset.get();
+        currently_used_register_set = frames.back()->local_register_set.get();
     } else {
-        uregset = regset.get();
+        currently_used_register_set = global_register_set.get();
     }
 }
 void viua::process::Process::popFrame() {
@@ -126,63 +131,57 @@ void viua::process::Process::popFrame() {
     dropFrame();
 }
 
-byte* viua::process::Process::adjustJumpBaseForBlock(const string& call_name) {
-    byte *entry_point = nullptr;
+viua::internals::types::byte* viua::process::Process::adjustJumpBaseForBlock(const string& call_name) {
+    viua::internals::types::byte *entry_point = nullptr;
     auto ep = scheduler->getEntryPointOfBlock(call_name);
     entry_point = ep.first;
     jump_base = ep.second;
     return entry_point;
 }
-byte* viua::process::Process::adjustJumpBaseFor(const string& call_name) {
-    byte *entry_point = nullptr;
+viua::internals::types::byte* viua::process::Process::adjustJumpBaseFor(const string& call_name) {
+    viua::internals::types::byte *entry_point = nullptr;
     auto ep = scheduler->getEntryPointOf(call_name);
     entry_point = ep.first;
     jump_base = ep.second;
     return entry_point;
 }
-byte* viua::process::Process::callNative(byte* return_address, const string& call_name, const bool return_void, const unsigned return_index, const string&) {
-    byte* call_address = adjustJumpBaseFor(call_name);
+viua::internals::types::byte* viua::process::Process::callNative(viua::internals::types::byte* return_address, const string& call_name, viua::kernel::Register* return_register, const string&) {
+    viua::internals::types::byte* call_address = adjustJumpBaseFor(call_name);
 
     if (not frame_new) {
         throw new viua::types::Exception("function call without a frame: use `frame 0' in source code if the function takes no parameters");
     }
-    // set function name and return address
+
     frame_new->function_name = call_name;
     frame_new->return_address = return_address;
-
-    frame_new->return_void = return_void;
-    frame_new->place_return_value_in = return_index;
+    frame_new->return_register = return_register;
 
     pushFrame();
 
     return call_address;
 }
-byte* viua::process::Process::callForeign(byte* return_address, const string& call_name, const bool return_void, const unsigned return_index, const string&) {
+viua::internals::types::byte* viua::process::Process::callForeign(viua::internals::types::byte* return_address, const string& call_name, viua::kernel::Register* return_register, const string&) {
     if (not frame_new) {
         throw new viua::types::Exception("external function call without a frame: use `frame 0' in source code if the function takes no parameters");
     }
-    // set function name and return address
+
     frame_new->function_name = call_name;
     frame_new->return_address = return_address;
-
-    frame_new->return_void = return_void;
-    frame_new->place_return_value_in = return_index;
+    frame_new->return_register = return_register;
 
     suspend();
     scheduler->requestForeignFunctionCall(frame_new.release(), this);
 
     return return_address;
 }
-byte* viua::process::Process::callForeignMethod(byte* return_address, viua::types::Type* object, const string& call_name, const bool return_void, const unsigned return_index, const string&) {
+viua::internals::types::byte* viua::process::Process::callForeignMethod(viua::internals::types::byte* return_address, viua::types::Type* object, const string& call_name, viua::kernel::Register* return_register, const string&) {
     if (not frame_new) {
         throw new viua::types::Exception("foreign method call without a frame");
     }
-    // set function name and return address
+
     frame_new->function_name = call_name;
     frame_new->return_address = return_address;
-
-    frame_new->return_void = return_void;
-    frame_new->place_return_value_in = return_index;
+    frame_new->return_register = return_register;
 
     Frame* frame = frame_new.get();
 
@@ -206,20 +205,19 @@ byte* viua::process::Process::callForeignMethod(byte* return_address, viua::type
 
     // FIXME: woohoo! segfault!
     unique_ptr<viua::types::Type> returned;
-    unsigned return_value_register = frames.back()->place_return_value_in;
-    if (return_value_register != 0 and not frames.back()->return_void) {
+    if (return_register != nullptr) {
         // we check in 0. register because it's reserved for return values
-        if (uregset->at(0) == nullptr) {
+        if (currently_used_register_set->at(0) == nullptr) {
             throw new viua::types::Exception("return value requested by frame but foreign method did not set return register");
         }
-        returned = std::move(uregset->pop(0));
+        returned = currently_used_register_set->pop(0);
     }
 
     dropFrame();
 
     // place return value
     if (returned and frames.size() > 0) {
-        place(return_value_register, std::move(returned));
+        *return_register = std::move(returned);
     }
 
     return return_address;
@@ -229,14 +227,14 @@ void viua::process::Process::adjustInstructionPointer(TryFrame* tframe, string h
     instruction_pointer = adjustJumpBaseForBlock(tframe->catchers.at(handler_found_for_type)->catcher_name);
 }
 void viua::process::Process::unwindCallStack(TryFrame* tframe) {
-    unsigned distance = 0;
-    for (long unsigned j = (frames.size()-1); j > 1; --j) {
+    decltype(frames)::size_type distance = 0;
+    for (decltype(frames)::size_type j = (frames.size()-1); j > 1; --j) {
         if (frames[j].get() == tframe->associated_frame) {
             break;
         }
         ++distance;
     }
-    for (unsigned j = 0; j < distance; ++j) {
+    for (decltype(distance) j = 0; j < distance; ++j) {
         dropFrame();
     }
 }
@@ -254,7 +252,7 @@ tuple<TryFrame*, string> viua::process::Process::findCatchFrame() {
     TryFrame* found_exception_frame = nullptr;
     string caught_with_type = "";
 
-    for (long unsigned i = tryframes.size(); i > 0; --i) {
+    for (decltype(tryframes)::size_type i = tryframes.size(); i > 0; --i) {
         TryFrame* tframe = tryframes[(i-1)].get();
         string handler_found_for_type = thrown->type();
         bool handler_found = tframe->catchers.count(handler_found_for_type);
@@ -262,7 +260,7 @@ tuple<TryFrame*, string> viua::process::Process::findCatchFrame() {
         // FIXME: mutex
         if ((not handler_found) and scheduler->isClass(handler_found_for_type)) {
             vector<string> types_to_check = scheduler->inheritanceChainOf(handler_found_for_type);
-            for (unsigned j = 0; j < types_to_check.size(); ++j) {
+            for (decltype(types_to_check)::size_type j = 0; j < types_to_check.size(); ++j) {
                 if (tframe->catchers.count(types_to_check[j])) {
                     handler_found = true;
                     handler_found_for_type = types_to_check[j];
@@ -290,10 +288,10 @@ void viua::process::Process::handleActiveException() {
         caught.reset(thrown.release());
     }
 }
-byte* viua::process::Process::tick() {
+viua::internals::types::byte* viua::process::Process::tick() {
     bool halt = false;
 
-    byte* previous_instruction_pointer = instruction_pointer;
+    viua::internals::types::byte* previous_instruction_pointer = instruction_pointer;
     ++instruction_counter;
 
     try {
@@ -374,7 +372,7 @@ void viua::process::Process::detach() {
      *
      *  Keep in mind that while detached processes cannot be joined,
      *  they can receive messages.
-     *  Also, they will run even after the main/1 function has exited.
+     *  Also, they will run even after the main/ function has exited.
      */
     is_joinable.store(false, std::memory_order_release);
     parent_process = nullptr;
@@ -445,7 +443,7 @@ bool viua::process::Process::watchdogged() const {
 string viua::process::Process::watchdog() const {
     return watchdog_function;
 }
-byte* viua::process::Process::become(const string& function_name, std::unique_ptr<Frame> frame_to_use) {
+viua::internals::types::byte* viua::process::Process::become(const string& function_name, std::unique_ptr<Frame> frame_to_use) {
     if (not scheduler->isNativeFunction(function_name)) {
         throw new viua::types::Exception("process from undefined function: " + function_name);
     }
@@ -463,13 +461,13 @@ byte* viua::process::Process::become(const string& function_name, std::unique_pt
     return (instruction_pointer = adjustJumpBaseFor(function_name));
 }
 
-byte* viua::process::Process::begin() {
+viua::internals::types::byte* viua::process::Process::begin() {
     if (not scheduler->isNativeFunction(frames[0]->function_name)) {
         throw new viua::types::Exception("process from undefined function: " + frames[0]->function_name);
     }
     return (instruction_pointer = adjustJumpBaseFor(frames[0]->function_name));
 }
-uint64_t viua::process::Process::counter() const {
+auto viua::process::Process::counter() const -> decltype(instruction_counter) {
     return instruction_counter;
 }
 auto viua::process::Process::executionAt() const -> decltype(instruction_pointer) {
@@ -504,7 +502,7 @@ void viua::process::Process::migrate_to(viua::scheduler::VirtualProcessScheduler
 }
 
 viua::process::Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualProcessScheduler *sch, viua::process::Process* pt): scheduler(sch), parent_process(pt), entry_function(frm->function_name),
-    regset(nullptr), uregset(nullptr), tmp(nullptr),
+    global_register_set(nullptr), currently_used_register_set(nullptr), tmp(nullptr),
     jump_base(nullptr),
     frame_new(nullptr), try_frame_new(nullptr),
     thrown(nullptr), caught(nullptr),
@@ -517,8 +515,8 @@ viua::process::Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualP
     process_id(this),
     is_hidden(false)
 {
-    regset.reset(new viua::kernel::RegisterSet(DEFAULT_REGISTER_SIZE));
-    uregset = frm->regset.get();
+    global_register_set.reset(new viua::kernel::RegisterSet(DEFAULT_REGISTER_SIZE));
+    currently_used_register_set = frm->local_register_set.get();
     frames.emplace_back(std::move(frm));
 }
 

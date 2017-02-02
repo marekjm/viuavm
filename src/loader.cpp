@@ -195,7 +195,7 @@ void Loader::loadBlocksMap(ifstream& in) {
 }
 void Loader::loadBytecode(ifstream& in) {
     in.read(reinterpret_cast<char*>(&size), sizeof(decltype(size)));
-    bytecode.reset(new byte[size]);
+    bytecode.reset(new viua::internals::types::byte[size]);
     in.read(reinterpret_cast<char*>(bytecode.get()), static_cast<std::streamsize>(size));
 }
 
@@ -247,12 +247,12 @@ Loader& Loader::executable() {
 uint64_t Loader::getBytecodeSize() {
     return size;
 }
-unique_ptr<byte[]> Loader::getBytecode() {
-    unique_ptr<byte[]> copy {new byte[size]};
+unique_ptr<viua::internals::types::byte[]> Loader::getBytecode() {
+    unique_ptr<viua::internals::types::byte[]> copy {new viua::internals::types::byte[size]};
     for (uint64_t i = 0; i < size; ++i) {
         copy[i] = bytecode[i];
     }
-    return std::move(copy);
+    return copy;
 }
 
 vector<uint64_t> Loader::getJumps() {

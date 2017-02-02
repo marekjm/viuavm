@@ -18,12 +18,12 @@
 ;
 
 .function: main/0
-    ptr (.name: iota pointer_to_a) (istore (.name: iota a) 23)
-    ptr (.name: iota pointer_to_b) (istore (.name: iota b) 19)
+    ptr (.name: %iota pointer_to_a) (istore (.name: %iota a) 23)
+    ptr (.name: %iota pointer_to_b) (istore (.name: %iota b) 19)
 
-    iadd (.name: iota number) *pointer_to_a *pointer_to_b
-    print number
+    add int64 (.name: %iota number) *pointer_to_a *pointer_to_b
+    print %number
 
-    izero 0
+    izero %0
     return
 .end

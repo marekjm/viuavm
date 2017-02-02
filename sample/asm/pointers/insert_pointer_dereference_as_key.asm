@@ -18,14 +18,14 @@
 ;
 
 .function: main/0
-    strstore (.name: iota value) "bar"
-    new (.name: iota container) Object
-    ptr (.name: iota pointer) (strstore (.name: iota key) "foo")
+    strstore (.name: %iota value) "bar"
+    new (.name: %iota container) Object
+    ptr (.name: %iota pointer) (strstore (.name: %iota key) "foo")
 
-    insert container *pointer value
+    insert %container *pointer %value
 
-    print container
+    print %container
 
-    izero 0
+    izero %0
     return
 .end

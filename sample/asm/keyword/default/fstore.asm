@@ -18,8 +18,8 @@
 ;
 
 .function: main/0
-    print (fstore iota default)
+    print (fstore %iota default)
 
-    izero 0
+    izero %0
     return
 .end

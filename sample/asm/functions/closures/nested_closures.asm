@@ -38,49 +38,49 @@
 .closure: closure_level_3/1
     ; expects 1, 2 and 3 to be captured integers
     .name: 5 accumulator
-    move 0 (iadd accumulator (arg 4 0) (iadd accumulator 3 (iadd accumulator 1 2)))
+    move %0 (add int64 %accumulator (arg %4 %0) (add int8 %accumulator %3 (add int8 %accumulator %1 %2)))
     return
 .end
 
 .closure: closure_level_2/1
-    closure 0 closure_level_3/1
+    closure %0 closure_level_3/1
     ; registers 1 and 2 are occupied by captured integers
     ; but they must be captured by the "closure_level_3"
-    capture 0 1 1
-    capture 0 2 2
-    capture 0 3 (arg 3 0)
+    capture %0 %1 %1
+    capture %0 %2 %2
+    capture %0 %3 (arg %3 %0)
     return
 .end
 
 .closure: closure_level_1/1
-    closure 0 closure_level_2/1
+    closure %0 closure_level_2/1
     ; register 1 is occupied by captured integer
     ; but it must be captured by the "closure_level_2"
-    capture 0 1 1
-    capture 0 2 (arg 2 0)
+    capture %0 %1 %1
+    capture %0 %2 (arg %2 %0)
     return
 .end
 
 .function: closure_maker/1
     ; create the outermost closure
-    closure 0 closure_level_1/1
-    capture 0 1 (arg 1 0)
+    closure %0 closure_level_1/1
+    capture %0 %1 (arg %1 %0)
     return
 .end
 
 .function: main/1
-    frame ^[(param 0 (istore 1 1))]
-    call 2 closure_maker/1
+    frame ^[(param %0 (istore %1 1))]
+    call %2 closure_maker/1
 
-    frame ^[(param 0 (istore 1 2))]
-    fcall 3 2
+    frame ^[(param %0 (istore %1 2))]
+    fcall %3 %2
 
-    frame ^[(param 0 (istore 1 3))]
-    fcall 4 3
+    frame ^[(param %0 (istore %1 3))]
+    fcall %4 %3
 
-    frame ^[(param 0 (istore 1 4))]
-    print (fcall 5 4)
+    frame ^[(param %0 (istore %1 4))]
+    print (fcall %5 %4)
 
-    izero 0
+    izero %0
     return
 .end

@@ -18,18 +18,18 @@
 ;
 
 .function: running_detached/0
-    izero (.name: iota counter)
-    istore (.name: iota limit) 4
-    strstore (.name: iota report_text_format) "Hello World! (from long-running detached process) #{0}"
+    izero (.name: %iota counter)
+    istore (.name: %iota limit) 4
+    strstore (.name: %iota report_text_format) "Hello World! (from long-running detached process) #{0}"
 
     .mark: loop
-    .name: iota format_parameters
-    if (igte iota counter limit) after_loop
+    .name: %iota format_parameters
+    if (gte int64 %iota %counter %limit) after_loop
 
-    frame ^[(param iota report_text_format) (param iota (vec format_parameters (copy format_parameters counter) 1))]
-    print (msg iota format/)
+    frame ^[(param %iota %report_text_format) (param %iota (vec %format_parameters (copy %format_parameters %counter) %1))]
+    print (msg %iota format/)
 
-    iinc counter
+    iinc %counter
 
     jump loop
     .mark: after_loop
@@ -38,24 +38,24 @@
 .end
 
 .function: main/1
-    frame 0
-    process 1 running_detached/0
+    frame %0
+    process %1 running_detached/0
 
     nop
     nop
 
-    frame ^[(param 0 (ptr 2 1))]
-    msg 0 detach/1
+    frame ^[(param %0 (ptr %2 %1))]
+    msg void detach/1
 
     nop
 
     ; reuse the pointer created earlier
-    frame ^[(param 0 2)]
-    msg 3 joinable/1
-    print 3
+    frame ^[(param %0 %2)]
+    msg %3 joinable/1
+    print %3
 
-    print (strstore 3 "main/1 exited")
+    print (strstore %3 "main/1 exited")
 
-    izero 0
+    izero %0
     return
 .end

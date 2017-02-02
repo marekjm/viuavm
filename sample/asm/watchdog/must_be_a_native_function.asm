@@ -24,6 +24,6 @@
 
     watchdog World::print_hello/0
 
-    izero 0
+    izero %0
     return
 .end

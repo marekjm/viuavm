@@ -18,11 +18,11 @@
 ;
 
 .function: main/0
-    if (izero 1) 2 +1
+    if (izero %1) 2 +1
 
     .mark: here
-    print (strstore 1 "Hello World!")
+    print (strstore %1 "Hello World!")
 
-    izero 0
+    izero %0
     return
 .end

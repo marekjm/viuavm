@@ -18,16 +18,16 @@
 ;
 
 .function: sender/1
-    send (arg (.name: iota pid) 0) (strstore iota "Hello World!")
+    send (arg (.name: %iota pid) %0) (strstore %iota "Hello World!")
     return
 .end
 
 .function: main/0
-    frame ^[(pamv iota (self iota))]
+    frame ^[(pamv %iota (self %iota))]
     process void sender/1
 
     receive void infinity
 
-    izero 0
+    izero %0
     return
 .end

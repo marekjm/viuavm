@@ -22,9 +22,9 @@
 .end
 
 .function: main/0
-    frame 0
+    frame %0
     print (call void foo/0)
 
-    izero 0
+    izero %0
     return
 .end

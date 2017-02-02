@@ -25,9 +25,9 @@
 
     ; returns random float
     ; probably the most often used function from std::random
-    frame 0
-    print (call 1 std::random::random)
+    frame %0
+    print (call %1 std::random::random)
 
-    izero 0
+    izero %0
     return
 .end

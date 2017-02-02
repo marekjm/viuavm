@@ -51,16 +51,16 @@ namespace viua {
             std::string svalue;
 
             public:
-                std::string type() const {
+                std::string type() const override {
                     return "String";
                 }
-                std::string str() const {
+                std::string str() const override {
                     return svalue;
                 }
-                std::string repr() const {
+                std::string repr() const override {
                     return str::enquote(svalue);
                 }
-                bool boolean() const {
+                bool boolean() const override {
                     return svalue.size() != 0;
                 }
 

@@ -26,14 +26,14 @@
 using namespace std;
 
 
-byte* viua::process::Process::opecho(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opecho(viua::internals::types::byte* addr) {
     viua::types::Type* source { nullptr };
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
     cout << source->str();
     return addr;
 }
 
-byte* viua::process::Process::opprint(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opprint(viua::internals::types::byte* addr) {
     viua::types::Type* source { nullptr };
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
     cout << source->str() + '\n';
@@ -41,19 +41,19 @@ byte* viua::process::Process::opprint(byte* addr) {
 }
 
 
-byte* viua::process::Process::opjump(byte* addr) {
-    byte* target = (jump_base + viua::bytecode::decoder::operands::extract_primitive_uint64(addr, this));
+viua::internals::types::byte* viua::process::Process::opjump(viua::internals::types::byte* addr) {
+    viua::internals::types::byte* target = (jump_base + viua::bytecode::decoder::operands::extract_primitive_uint64(addr, this));
     if (target == addr) {
         throw new viua::types::Exception("aborting: JUMP instruction pointing to itself");
     }
     return target;
 }
 
-byte* viua::process::Process::opif(byte* addr) {
+viua::internals::types::byte* viua::process::Process::opif(viua::internals::types::byte* addr) {
     viua::types::Type* source = nullptr;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    uint64_t addr_true = 0, addr_false = 0;
+    viua::internals::types::bytecode_size addr_true = 0, addr_false = 0;
     tie(addr, addr_true) = viua::bytecode::decoder::operands::fetch_primitive_uint64(addr, this);
     tie(addr, addr_false) = viua::bytecode::decoder::operands::fetch_primitive_uint64(addr, this);
 
