@@ -490,7 +490,7 @@ namespace viua {
                 return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
             }
             static auto size_of_fcall(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
-                return size_of_instruction_with_two_ri_operands(tokens, i);
+                return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
             static auto size_of_frame(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands(tokens, i);

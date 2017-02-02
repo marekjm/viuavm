@@ -541,8 +541,12 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "fcall") {
-            TokenIndex source = get_token_index_of_operand(body_tokens, i, 2);
-            TokenIndex target = get_token_index_of_operand(body_tokens, i, 1);
+            TokenIndex target = i + 1;
+            TokenIndex source = target + 2;
+
+            if (body_tokens.at(target) == "void") {
+                --source;
+            }
 
             string opcode_name = token;
             check_use_of_register(body_tokens, source, i, registers, named_registers, ((opcode_name == "ptr" ? "pointer" : opcode_name) + " from empty register"));

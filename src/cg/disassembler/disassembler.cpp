@@ -301,6 +301,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         case STOI:
         case STOF:
         case ISNULL:
+        case FCALL:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
@@ -310,7 +311,6 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         case ARG:
         case PARAM:
         case PAMV:
-        case FCALL:
             ptr = disassemble_ri_operand(oss, ptr);
             ptr = disassemble_ri_operand(oss, ptr);
             break;
