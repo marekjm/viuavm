@@ -305,7 +305,7 @@ namespace viua {
                 const auto limit = input_tokens.size();
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
                     Token token = input_tokens.at(i);
-                    if (token == "call") {
+                    if (token == "call" or token == "process") {
                         tokens.push_back(token);
                         if (is_register_index(input_tokens.at(i+1)) or (input_tokens.at(i+1) == "void")) {
                             tokens.push_back(input_tokens.at(++i));
@@ -320,11 +320,6 @@ namespace viua {
                             }
                         }
                         tokens.push_back(input_tokens.at(++i));
-                    } else if (token == "process") {
-                        tokens.push_back(token);
-                        if ((not str::isnum(input_tokens.at(i+1).str(), false)) and input_tokens.at(i+2).str() == "\n") {
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "void");
-                        }
                     } else if (token == "fcall") {
                         tokens.push_back(token);
 

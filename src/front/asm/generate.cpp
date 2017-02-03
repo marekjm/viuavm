@@ -670,10 +670,21 @@ static viua::internals::types::bytecode_size assemble_instruction(Program& progr
     } else if (tokens.at(i) == "tailcall") {
         program.optailcall(tokens.at(i+1));
     } else if (tokens.at(i) == "process") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-        TokenIndex fn = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex target = i + 1;
+        TokenIndex fn = target + 2;
 
-        program.opprocess(assembler::operands::getint(resolveregister(tokens.at(target))), tokens.at(fn));
+        int_op ret;
+        if (tokens.at(target) == "void") {
+            --fn;
+            ret = assembler::operands::getint(resolveregister(tokens.at(target)));
+        } else {
+            ret = assembler::operands::getint_with_rs_type(
+                resolveregister(tokens.at(target))
+                , resolve_rs_type(tokens.at(target+1))
+            );
+        }
+
+        program.opprocess(ret, tokens.at(fn));
     } else if (tokens.at(i) == "self") {
         TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 

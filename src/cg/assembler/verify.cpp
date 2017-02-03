@@ -62,7 +62,7 @@ void assembler::verify::functionCallsAreDefined(const vector<Token>& tokens, con
             }
         } else if (token == "call" or token == "process") {
             Token function_name = tokens.at(i+2);
-            if (token == "call" and tokens.at(i+1) != "void") {
+            if (tokens.at(i+1) != "void") {
                 function_name = tokens.at(i+3);
             }
             if (not is_defined(function_name, function_names, function_signatures)) {
@@ -92,11 +92,11 @@ void assembler::verify::functionCallArities(const vector<Token>& tokens) {
         Token function_name;
         if (tokens.at(i) == "call" or tokens.at(i) == "process") {
             function_name = tokens.at(i+2);
+            if (tokens.at(i+1) != "void") {
+                function_name = tokens.at(i+3);
+            }
         } else {
             function_name = tokens.at(i+1);
-        }
-        if (tokens.at(i) == "call" and tokens.at(i+1) != "void") {
-            function_name = tokens.at(i+3);
         }
 
         if (not assembler::utils::isValidFunctionName(function_name)) {
