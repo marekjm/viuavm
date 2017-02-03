@@ -623,41 +623,50 @@ static viua::internals::types::bytecode_size assemble_instruction(Program& progr
 
         program.opargc(assembler::operands::getint(resolveregister(tokens.at(target))));
     } else if (tokens.at(i) == "call") {
-        /** Full form of call instruction has two operands: function name and return value register index.
-         *  If call is given only one operand - it means it is the instruction index and returned value is discarded.
-         *  To explicitly state that return value should be discarderd 0 can be supplied as second operand.
+        /** Full form of call instruction has two operands: function name and
+         *  return value register index.
+         *  If call is given only one operand it means it is the function name and
+         *  returned value is discarded.
+         *  To explicitly state that return value should be discarderd put `void` as
+         *  return register index.
          */
-        /** Why is the function supplied as a *string* and not direct instruction pointer?
-         *  That would be faster - c'mon couldn't assembler just calculate offsets and insert them?
+        /** Why is the function supplied as a *string* and
+         *  not direct instruction pointer?
+         *  That would be faster - c'mon couldn't assembler just calculate offsets and
+         *  insert them?
          *
          *  Nope.
          *
          *  Yes, it *would* be faster if calls were just precalculated jumps.
-         *  However, by them being strings we get plenty of flexibility, good-quality stack traces, and
+         *  However, by them being strings we get plenty of flexibility, good-quality
+         *  stack traces, and
          *  a place to put plenty of debugging info.
-         *  All that at a cost of just one map lookup; the overhead is minimal and gains are big.
+         *  All that at a cost of just one map lookup; the overhead is minimal and
+         *  gains are big.
          *  What's not to love?
          *
-         *  Of course, you, my dear reader, are free to take this code (it's GPL after all!) and
-         *  modify it to suit your particular needs - in that case that would be calculating call jumps
-         *  at compile time and exchanging CALL instructions with JUMP instructions.
+         *  Of course, you, my dear reader, are free to take this code (it's GPL after
+         *  all!) and modify it to suit your particular needs - in that case that would
+         *  be calculating call jumps at compile time and exchanging CALL instructions
+         *  with JUMP instructions.
          *
          *  Good luck with debugging your code, then.
          */
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-        TokenIndex fn = get_token_index_after_operand(tokens, i, 1);
+        TokenIndex target = i + 1;
+        TokenIndex fn = target + 2;
 
-        Token fn_name = tokens.at(fn), reg = tokens.at(target);
-
-        // if second operand is a newline, fill it with zero
-        // which means that return value will be discarded
-        // FIXME this is not needed anymore
-        if (fn_name == "\n") {
-            fn_name = reg;
-            reg = Token(fn_name.line(), fn_name.character(), "0");
+        int_op ret;
+        if (tokens.at(target) == "void") {
+            --fn;
+            ret = assembler::operands::getint(resolveregister(tokens.at(target)));
+        } else {
+            ret = assembler::operands::getint_with_rs_type(
+                resolveregister(tokens.at(target))
+                , resolve_rs_type(tokens.at(target+1))
+            );
         }
 
-        program.opcall(assembler::operands::getint(resolveregister(reg)), fn_name.str());
+        program.opcall(ret, tokens.at(fn));
     } else if (tokens.at(i) == "tailcall") {
         program.optailcall(tokens.at(i+1));
     } else if (tokens.at(i) == "process") {
@@ -1074,6 +1083,7 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
     // we also save return value in 1 register since 0 means "drop return value"
     entry_function_tokens.emplace_back(0, 0, "call");
     entry_function_tokens.emplace_back(0, 0, "%1");
+    entry_function_tokens.emplace_back(0, 0, "local");
     entry_function_tokens.emplace_back(0, 0, main_function);
     entry_function_tokens.emplace_back(0, 0, "\n");
     bytes += sizeof(viua::internals::types::byte) + sizeof(viua::internals::types::byte) + sizeof(viua::internals::RegisterSets) + sizeof(viua::internals::types::register_index);

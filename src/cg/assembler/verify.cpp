@@ -61,9 +61,12 @@ void assembler::verify::functionCallsAreDefined(const vector<Token>& tokens, con
                 throw viua::cg::lex::InvalidSyntax(tokens.at(i+1), (string(token == "tailcall" ? "tail call to" : "watchdog from") + " undefined function " + function_name));
             }
         } else if (token == "call" or token == "process") {
-            string function_name = tokens.at(i+2);
+            Token function_name = tokens.at(i+2);
+            if (token == "call" and tokens.at(i+1) != "void") {
+                function_name = tokens.at(i+3);
+            }
             if (not is_defined(function_name, function_names, function_signatures)) {
-                throw viua::cg::lex::InvalidSyntax(tokens.at(i+2), (string(token == "call" ? "call to" : "process from") + " undefined function " + function_name));
+                throw viua::cg::lex::InvalidSyntax(function_name, (string(token == "call" ? "call to" : "process from") + " undefined function " + function_name.str()));
             }
         }
     }
@@ -91,6 +94,9 @@ void assembler::verify::functionCallArities(const vector<Token>& tokens) {
             function_name = tokens.at(i+2);
         } else {
             function_name = tokens.at(i+1);
+        }
+        if (tokens.at(i) == "call" and tokens.at(i+1) != "void") {
+            function_name = tokens.at(i+3);
         }
 
         if (not assembler::utils::isValidFunctionName(function_name)) {

@@ -507,7 +507,7 @@ namespace viua {
                 decltype(calculated_size) size_increment = 0;
 
                 // for target register
-                tie(size_increment, i) = size_of_register_index_operand(tokens, i);
+                tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
                 calculated_size += size_increment;
 
                 calculated_size += tokens.at(i).str().size() + 1;

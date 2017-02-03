@@ -295,13 +295,32 @@ namespace viua {
             static auto is_register_set_name(string s) -> bool {
                 return (s == "current" or s == "local" or s == "static" or s == "global");
             }
+            static auto is_register_index(string s) -> bool {
+                const auto p = s.at(0);
+                return (p == '%' or p == '*' or p == '@');
+            }
             vector<Token> standardise(vector<Token> input_tokens) {
                 vector<Token> tokens;
 
                 const auto limit = input_tokens.size();
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
                     Token token = input_tokens.at(i);
-                    if (token == "call" or token == "process") {
+                    if (token == "call") {
+                        tokens.push_back(token);
+                        if (is_register_index(input_tokens.at(i+1)) or (input_tokens.at(i+1) == "void")) {
+                            tokens.push_back(input_tokens.at(++i));
+                        } else {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "void");
+                        }
+                        if (is_register_index(tokens.back())) {
+                            if (is_register_set_name(input_tokens.at(i+1))) {
+                                tokens.push_back(input_tokens.at(++i));
+                            } else {
+                                tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                            }
+                        }
+                        tokens.push_back(input_tokens.at(++i));
+                    } else if (token == "process") {
                         tokens.push_back(token);
                         if ((not str::isnum(input_tokens.at(i+1).str(), false)) and input_tokens.at(i+2).str() == "\n") {
                             tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "void");
