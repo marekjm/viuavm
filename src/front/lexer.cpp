@@ -163,7 +163,7 @@ int main(int argc, char* argv[]) {
             MANUAL_REDUCING = true;
             continue;
         } else if (str::startswith(option, "-")) {
-            cout << "error: unknown option: " << option << endl;
+            cerr << "error: unknown option: " << option << endl;
             return 1;
         }
         args.emplace_back(argv[i]);

@@ -83,10 +83,10 @@ static bool usage(const string program, const vector<string>& args) {
         } else if (option == "--json") {
             show_json = true;
         } else if (str::startswith(option, "-")) {
-            cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
-            cout << ": unknown option: ";
-            cout << send_control_seq(COLOR_FG_WHITE) << option << send_control_seq(ATTR_RESET);
-            cout << endl;
+            cerr << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
+            cerr << ": unknown option: ";
+            cerr << send_control_seq(COLOR_FG_WHITE) << option << send_control_seq(ATTR_RESET);
+            cerr << endl;
             exit(1);
         }
     }
