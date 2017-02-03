@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <unistd.h>
 #include <cstdlib>
 #include <cstdint>
 #include <cstring>
@@ -35,6 +36,7 @@
 #include <viua/support/pointer.h>
 #include <viua/support/env.h>
 #include <viua/loader.h>
+#include <viua/front/asm.h>
 using namespace std;
 
 
@@ -48,6 +50,29 @@ bool DISASSEMBLE_ENTRY = false;
 bool INCLUDE_INFO = false;
 bool LINE_BY_LINE = false;
 string SELECTED_FUNCTION = "";
+
+
+string send_control_seq(const string& mode) {
+    static auto is_terminal = isatty(1);
+    static string env_color_flag { getenv("VIUAVM_ASM_COLOUR") ? getenv("VIUAVM_ASM_COLOUR") : "default" };
+
+    bool colorise = is_terminal;
+    if (env_color_flag == "default") {
+        // do nothing; the default is to colorise when printing to teminal and
+        // do not colorise otherwise
+    } else if (env_color_flag == "never") {
+        colorise = false;
+    } else if (env_color_flag == "always") {
+        colorise = true;
+    } else {
+        // unknown value, do nothing
+    }
+
+    if (colorise) {
+        return mode;
+    }
+    return "";
+}
 
 
 static bool usage(const char* program, bool show_help, bool show_version, bool verbose) {
@@ -118,7 +143,10 @@ int main(int argc, char* argv[]) {
             }
             continue;
         } else if (str::startswith(option, "-")) {
-            cout << "error: unknown option: " << option << endl;
+            cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
+            cout << ": unknown option: ";
+            cout << send_control_seq(COLOR_FG_WHITE) << option << send_control_seq(ATTR_RESET);
+            cout << endl;
             return 1;
         } else {
             args.emplace_back(argv[i]);

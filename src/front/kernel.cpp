@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <unistd.h>
 #include <cstdlib>
 #include <cstdint>
 #include <iostream>
@@ -29,10 +30,34 @@
 #include <viua/program.h>
 #include <viua/printutils.h>
 #include <viua/front/vm.h>
+#include <viua/front/asm.h>
 using namespace std;
 
 
 const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file which cannot be run without prior compilation";
+
+
+string send_control_seq(const string& mode) {
+    static auto is_terminal = isatty(1);
+    static string env_color_flag { getenv("VIUAVM_ASM_COLOUR") ? getenv("VIUAVM_ASM_COLOUR") : "default" };
+
+    bool colorise = is_terminal;
+    if (env_color_flag == "default") {
+        // do nothing; the default is to colorise when printing to teminal and
+        // do not colorise otherwise
+    } else if (env_color_flag == "never") {
+        colorise = false;
+    } else if (env_color_flag == "always") {
+        colorise = true;
+    } else {
+        // unknown value, do nothing
+    }
+
+    if (colorise) {
+        return mode;
+    }
+    return "";
+}
 
 
 static bool usage(const string program, const vector<string>& args) {
@@ -58,7 +83,10 @@ static bool usage(const string program, const vector<string>& args) {
         } else if (option == "--json") {
             show_json = true;
         } else if (str::startswith(option, "-")) {
-            cout << "error: unknown option: " << option << endl;
+            cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
+            cout << ": unknown option: ";
+            cout << send_control_seq(COLOR_FG_WHITE) << option << send_control_seq(ATTR_RESET);
+            cout << endl;
             exit(1);
         }
     }
