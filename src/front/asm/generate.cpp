@@ -1056,7 +1056,8 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
         entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "%0");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) + 3*sizeof(viua::internals::types::byte) + 3*sizeof(viua::internals::RegisterSets) + 3*sizeof(viua::internals::types::register_index);
+        bytes += sizeof(viua::internals::types::byte) + 3*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
+        bytes += sizeof(viua::internals::types::plain_int);
 
         // for parameter for main/2 is the name of the program
         entry_function_tokens.emplace_back(0, 0, "param");
