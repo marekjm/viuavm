@@ -36,6 +36,7 @@ Memory leak tests may be disabled for some runs as they are slow.
 
 import datetime
 import functools
+import hashlib
 import json
 import os
 import subprocess
@@ -320,6 +321,14 @@ def runTestBackend(self, name, expected_output=None, expected_exit_code = 0, out
         else:
             self.assertEqual(got_output, (dis_output.strip() if output_processing_function is None else output_processing_function(dis_output)))
             self.assertEqual(excode, dis_excode)
+
+    source_assembly_output = b''
+    disasm_assembly_output = b''
+    with open(compiled_path, 'rb') as ifstream:
+        source_assembly_output = ifstream.read()
+    with open(compiled_disasm_path, 'rb') as ifstream:
+        disasm_assembly_output = ifstream.read()
+    self.assertEqual(hashlib.sha512(source_assembly_output).hexdigest(), hashlib.sha512(disasm_assembly_output).hexdigest())
 
 measured_run_times = []
 def runTest(self, name, expected_output=None, expected_exit_code = 0, output_processing_function = None, check_memory_leaks = True, custom_assert=None, assembly_opts=None, valgrind_enable=True, test_disasm=True):
