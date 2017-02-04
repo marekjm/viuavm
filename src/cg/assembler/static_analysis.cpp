@@ -610,8 +610,9 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
         } else if (token == "and" or token == "or") {
             ++i; // skip mnemonic token
 
-            TokenIndex rhs = get_token_index_of_operand(body_tokens, i, 2);
-            TokenIndex lhs = get_token_index_of_operand(body_tokens, i, 1);
+            TokenIndex target = i;
+            TokenIndex lhs = target + 2;
+            TokenIndex rhs = lhs + 2;
 
             check_use_of_register(body_tokens, lhs, i, registers, named_registers);
             check_use_of_register(body_tokens, rhs, i, registers, named_registers);

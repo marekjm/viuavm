@@ -549,20 +549,30 @@ namespace viua {
                         }
                     } else if (token == "and" or token == "or") {
                         tokens.push_back(token);    // mnemonic
-                        tokens.push_back(input_tokens.at(++i)); // target register
-                        if (input_tokens.at(i+2).str() == "\n") {
-                            // if only two operands are given, double target register
-                            // this will expand the following instruction:
-                            //
-                            //      opcode T S
-                            // to:
-                            //
-                            //      opcode T T S
-                            //
-                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), tokens.back().str());
-                            continue;
+
+                        // target operand
+                        tokens.push_back(input_tokens.at(++i));
+                        if (is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.push_back(input_tokens.at(++i));
+                        } else {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
                         }
-                        tokens.push_back(input_tokens.at(++i)); // second source register
+
+                        // lhs operand
+                        tokens.push_back(input_tokens.at(++i));
+                        if (is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.push_back(input_tokens.at(++i));
+                        } else {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                        }
+
+                        // rhs operand
+                        tokens.push_back(input_tokens.at(++i));
+                        if (is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.push_back(input_tokens.at(++i));
+                        } else {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                        }
                     } else if (token == "capture" or token == "capturecopy" or token == "capturemove") {
                         tokens.push_back(token);    // mnemonic
 
