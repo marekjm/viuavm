@@ -635,6 +635,13 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
 
             i = skip_till_next_line(body_tokens, i);
             continue;
+        } else if (token == "self") {
+            TokenIndex target = i + 1;
+
+            registers.insert(resolve_register_name(named_registers, body_tokens.at(target)), body_tokens.at(target));
+
+            i = skip_till_next_line(body_tokens, i);
+            continue;
         } else if (token == "join") {
             TokenIndex timeout = get_token_index_of_operand(body_tokens, i, 3);
             TokenIndex source = get_token_index_of_operand(body_tokens, i, 2);

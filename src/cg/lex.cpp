@@ -735,6 +735,7 @@ namespace viua {
                         or token == "throw"
                         or token == "iinc"
                         or token == "idec"
+                        or token == "self"
                     ) {
                         tokens.push_back(token);                // mnemonic
                         tokens.push_back(input_tokens.at(++i)); // target register

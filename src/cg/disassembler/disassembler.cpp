@@ -290,11 +290,11 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         case DELETE:
         case IINC:
         case IDEC:
+        case SELF:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             break;
         case BOOL:
         case ARGC:
-        case SELF:
         case DRAW:
         case REGISTER:
             ptr = disassemble_ri_operand(oss, ptr);
