@@ -492,7 +492,7 @@ namespace viua {
                         tokens.push_back(input_tokens.at(++i));
 
                         if (input_tokens.at(i+1).str() == "\n") {
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "infinity"); // number of registers to pack
+                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "infinity");
                         }
                     } else if (token == "receive") {
                         tokens.push_back(token);
