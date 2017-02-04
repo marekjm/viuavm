@@ -548,7 +548,7 @@ namespace viua {
             }
             static auto size_of_join(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 viua::internals::types::bytecode_size calculated_size = 0;
-                tie(calculated_size, i) = size_of_instruction_with_two_ri_operands(tokens, i);
+                tie(calculated_size, i) = size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
 
                 if (looks_like_timeout(tokens.at(i))) {
                     calculated_size += sizeof(viua::internals::types::byte);

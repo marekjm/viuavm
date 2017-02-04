@@ -457,7 +457,19 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
             pointer::inc<viua::internals::types::registerset_type_marker, viua::internals::types::byte>(ptr);
             break;
         case JOIN:
-            ptr = disassemble_ri_operand(oss, ptr);
+            ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
+            ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
+
+            pointer::inc<viua::internals::types::byte, viua::internals::types::byte>(ptr);
+            oss << ' ';
+            if (decode_timeout(ptr)) {
+                oss << decode_timeout(ptr)-1 << "ms";
+            } else {
+                oss << "infinity";
+            }
+            pointer::inc<viua::internals::types::timeout, viua::internals::types::byte>(ptr);
+
+            break;
         case RECEIVE:
             ptr = disassemble_ri_operand(oss, ptr);
 

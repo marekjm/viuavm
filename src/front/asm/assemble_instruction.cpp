@@ -659,18 +659,33 @@ viua::internals::types::bytecode_size assemble_instruction(Program& program, viu
 
         program.opself(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1))));
     } else if (tokens.at(i) == "join") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-        TokenIndex process = get_token_index_of_operand(tokens, i, 2);
-        TokenIndex timeout_index = get_token_index_of_operand(tokens, i, 3);
+        TokenIndex target = i + 1;
+        TokenIndex process = target + 2;
+        TokenIndex timeout_index = process + 2;
 
-        Token a_chnk = tokens.at(target), b_chnk = tokens.at(process), timeout_chnk = tokens.at(timeout_index);
+        int_op target_operand;
+        if (tokens.at(target) == "void") {
+            --process;
+            --timeout_index;
+            target_operand = assembler::operands::getint(resolveregister(tokens.at(target)));
+        } else {
+            target_operand = assembler::operands::getint_with_rs_type(
+                resolveregister(tokens.at(target))
+                , resolve_rs_type(tokens.at(target+1))
+            );
+        }
+
         viua::internals::types::timeout timeout_milliseconds = 0;
-        if (timeout_chnk != "infinity") {
-            timeout_milliseconds = timeout_to_int(timeout_chnk);
+        if (tokens.at(timeout_index) != "infinity") {
+            timeout_milliseconds = timeout_to_int(tokens.at(timeout_index));
             ++timeout_milliseconds;
         }
         timeout_op timeout {timeout_milliseconds};
-        program.opjoin(assembler::operands::getint(resolveregister(a_chnk)), assembler::operands::getint(resolveregister(b_chnk)), timeout);
+        program.opjoin(
+            target_operand
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(process)), resolve_rs_type(tokens.at(process+1)))
+            , timeout
+        );
     } else if (tokens.at(i) == "send") {
         TokenIndex target = get_token_index_of_operand(tokens, i, 1);
         TokenIndex source = get_token_index_of_operand(tokens, i, 2);
