@@ -390,9 +390,14 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
             break;
-        case STREQ:
         case AND:
         case OR:
+            ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
+            ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
+            ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
+
+            break;
+        case STREQ:
         case INSERT:
         case REMOVE:
             ptr = disassemble_ri_operand(oss, ptr);
