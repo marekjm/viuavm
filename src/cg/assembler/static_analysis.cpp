@@ -437,7 +437,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
 
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "throw") {
-            TokenIndex source = get_token_index_of_operand(body_tokens, i, 1);
+            TokenIndex source = i + 1;
 
             check_use_of_register(body_tokens, source, i, registers, named_registers, "throw from empty register");
             erase_register(registers, named_registers, body_tokens.at(source), token);
@@ -635,7 +635,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "self") {
+        } else if (token == "self" or token == "draw") {
             TokenIndex target = i + 1;
 
             registers.insert(resolve_register_name(named_registers, body_tokens.at(target)), body_tokens.at(target));

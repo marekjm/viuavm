@@ -754,6 +754,7 @@ namespace viua {
                         or token == "print"
                         or token == "echo"
                         or token == "delete"
+                        or token == "draw"
                         or token == "throw"
                         or token == "iinc"
                         or token == "idec"

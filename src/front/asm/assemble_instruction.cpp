@@ -770,15 +770,19 @@ viua::internals::types::bytecode_size assemble_instruction(Program& program, viu
         string type_chnk, catcher_chnk;
         program.opcatch(tokens.at(i+1), tokens.at(i+2));
     } else if (tokens.at(i) == "draw") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex target = i + 1;
 
-        program.opdraw(assembler::operands::getint(resolveregister(tokens.at(target))));
+        program.opdraw(
+            assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+        );
     } else if (tokens.at(i) == "enter") {
         program.openter(tokens.at(i+1));
     } else if (tokens.at(i) == "throw") {
-        TokenIndex source = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex source = i + 1;
 
-        program.opthrow(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1))));
+        program.opthrow(
+            assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
+        );
     } else if (tokens.at(i) == "leave") {
         program.opleave();
     } else if (tokens.at(i) == "import") {
