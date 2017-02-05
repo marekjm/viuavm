@@ -170,6 +170,14 @@ static auto get_token_index_of_operand(const vector<viua::cg::lex::Token>& token
 static auto get_token_index_after_operand(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i, int wanted_operand_index) -> decltype(i) {
     return get_token_index_of_operand(tokens, i, wanted_operand_index) + 1;
 }
+static auto convert_token_to_timeout_operand(viua::cg::lex::Token token) -> timeout_op {
+    viua::internals::types::timeout timeout_milliseconds = 0;
+    if (token != "infinity") {
+        timeout_milliseconds = timeout_to_int(token);
+        ++timeout_milliseconds;
+    }
+    return timeout_op{timeout_milliseconds};
+}
 viua::internals::types::bytecode_size assemble_instruction(Program& program, viua::internals::types::bytecode_size& instruction, viua::internals::types::bytecode_size i, const vector<Token>& tokens, map<string, std::remove_reference<decltype(tokens)>::type::size_type>& marks) {
     /*  This is main assembly loop.
      *  It iterates over lines with instructions and
@@ -675,12 +683,7 @@ viua::internals::types::bytecode_size assemble_instruction(Program& program, viu
             );
         }
 
-        viua::internals::types::timeout timeout_milliseconds = 0;
-        if (tokens.at(timeout_index) != "infinity") {
-            timeout_milliseconds = timeout_to_int(tokens.at(timeout_index));
-            ++timeout_milliseconds;
-        }
-        timeout_op timeout {timeout_milliseconds};
+        timeout_op timeout = convert_token_to_timeout_operand(tokens.at(timeout_index));
         program.opjoin(
             target_operand
             , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(process)), resolve_rs_type(tokens.at(process+1)))
@@ -709,12 +712,7 @@ viua::internals::types::bytecode_size assemble_instruction(Program& program, viu
             );
         }
 
-        viua::internals::types::timeout timeout_milliseconds = 0;
-        if (tokens.at(timeout_index) != "infinity") {
-            timeout_milliseconds = timeout_to_int(tokens.at(timeout_index));
-            ++timeout_milliseconds;
-        }
-        timeout_op timeout {timeout_milliseconds};
+        timeout_op timeout = convert_token_to_timeout_operand(tokens.at(timeout_index));
 
         program.opreceive(target_operand, timeout);
     } else if (tokens.at(i) == "watchdog") {
