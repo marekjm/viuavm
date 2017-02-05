@@ -128,6 +128,17 @@ namespace viua {
 
                 return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
             }
+            static auto size_of_instruction_with_one_ri_operand_with_rs_type(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                viua::internals::types::bytecode_size calculated_size = sizeof(viua::internals::types::byte);    // start with the size of a single opcode
+
+                decltype(calculated_size) size_increment = 0;
+
+                // for target register
+                tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
+                calculated_size += size_increment;
+
+                return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
+            }
             static auto size_of_instruction_with_two_ri_operands_with_rs_types(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 viua::internals::types::bytecode_size calculated_size = sizeof(viua::internals::types::byte);    // start with the size of a single opcode
 
@@ -544,7 +555,7 @@ namespace viua {
                 return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
             }
             static auto size_of_self(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
-                return size_of_instruction_with_one_ri_operand(tokens, i);
+                return size_of_instruction_with_one_ri_operand_with_rs_type(tokens, i);
             }
             static auto size_of_join(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 viua::internals::types::bytecode_size calculated_size = 0;
@@ -561,11 +572,11 @@ namespace viua {
                 return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
             }
             static auto size_of_send(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
-                return size_of_instruction_with_two_ri_operands(tokens, i);
+                return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
             }
             static auto size_of_receive(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 viua::internals::types::bytecode_size calculated_size = 0;
-                tie(calculated_size, i) = size_of_instruction_with_one_ri_operand(tokens, i);
+                tie(calculated_size, i) = size_of_instruction_with_one_ri_operand_with_rs_type(tokens, i);
 
                 if (looks_like_timeout(tokens.at(i))) {
                     calculated_size += sizeof(viua::internals::types::byte);

@@ -512,6 +512,14 @@ namespace viua {
                         tokens.push_back(token);
                         tokens.push_back(input_tokens.at(++i));
 
+                        if (tokens.back() != "void") {
+                            if (is_register_set_name(input_tokens.at(i+1))) {
+                                tokens.push_back(input_tokens.at(++i));
+                            } else {
+                                tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                            }
+                        }
+
                         if (input_tokens.at(i+1).str() == "\n") {
                             tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "infinity"); // number of registers to pack
                         }
@@ -724,7 +732,7 @@ namespace viua {
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
-                    } else if (token == "move" or token == "copy" or token == "swap" or token == "ptr" or token == "isnull") {
+                    } else if (token == "move" or token == "copy" or token == "swap" or token == "ptr" or token == "isnull" or token == "send") {
                         tokens.push_back(token);                // mnemonic
 
                         tokens.push_back(input_tokens.at(++i)); // target register
