@@ -167,9 +167,6 @@ static auto get_token_index_of_operand(const vector<viua::cg::lex::Token>& token
     }
     return i;
 }
-static auto get_token_index_after_operand(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i, int wanted_operand_index) -> decltype(i) {
-    return get_token_index_of_operand(tokens, i, wanted_operand_index) + 1;
-}
 static auto convert_token_to_timeout_operand(viua::cg::lex::Token token) -> timeout_op {
     viua::internals::types::timeout timeout_milliseconds = 0;
     if (token != "infinity") {
@@ -790,35 +787,61 @@ viua::internals::types::bytecode_size assemble_instruction(Program& program, viu
     } else if (tokens.at(i) == "link") {
         program.oplink(tokens.at(i+1));
     } else if (tokens.at(i) == "class") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-        TokenIndex class_name = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex target = i + 1;
+        TokenIndex class_name = target + 2;
 
-        program.opclass(assembler::operands::getint(resolveregister(tokens.at(target))), tokens.at(class_name));
+        program.opclass(
+            assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , tokens.at(class_name)
+        );
     } else if (tokens.at(i) == "derive") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-        TokenIndex class_name = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex target = i + 1;
+        TokenIndex class_name = target + 2;
 
-        program.opderive(assembler::operands::getint(resolveregister(tokens.at(target))), tokens.at(class_name));
+        program.opderive(
+            assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , tokens.at(class_name)
+        );
     } else if (tokens.at(i) == "attach") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-        TokenIndex fn_name = get_token_index_after_operand(tokens, i, 1);
+        TokenIndex target = i + 1;
+        TokenIndex fn_name = target + 2;
         TokenIndex attached_name = fn_name+1;
 
-        program.opattach(assembler::operands::getint(resolveregister(tokens.at(target))), tokens.at(fn_name), tokens.at(attached_name));
+        program.opattach(
+            assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , tokens.at(fn_name)
+            , tokens.at(attached_name)
+        );
     } else if (tokens.at(i) == "register") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex target = i + 1;
 
-        program.opregister(assembler::operands::getint(resolveregister(tokens.at(target))));
+        program.opregister(
+            assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+        );
     } else if (tokens.at(i) == "new") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-        TokenIndex class_name = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex target = i + 1;
+        TokenIndex class_name = target + 2;
 
-        program.opnew(assembler::operands::getint(resolveregister(tokens.at(target))), tokens.at(class_name));
+        program.opnew(
+            assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , tokens.at(class_name)
+        );
     } else if (tokens.at(i) == "msg") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-        TokenIndex fn_name = get_token_index_after_operand(tokens, i, 1);
+        TokenIndex target = i + 1;
+        TokenIndex fn = target + 2;
 
-        program.opmsg(assembler::operands::getint(resolveregister(tokens.at(target))), tokens.at(fn_name));
+        int_op ret;
+        if (tokens.at(target) == "void") {
+            --fn;
+            ret = assembler::operands::getint(resolveregister(tokens.at(target)));
+        } else {
+            ret = assembler::operands::getint_with_rs_type(
+                resolveregister(tokens.at(target))
+                , resolve_rs_type(tokens.at(target+1))
+            );
+        }
+
+        program.opmsg(ret, tokens.at(fn));
     } else if (tokens.at(i) == "insert") {
         TokenIndex target = get_token_index_of_operand(tokens, i, 1);
         TokenIndex source = get_token_index_of_operand(tokens, i, 2);

@@ -145,7 +145,10 @@ void assembler::verify::msgArities(const vector<Token>& tokens) {
             continue;
         }
 
-        Token function_name = tokens.at(i+2);
+        Token function_name = tokens.at(i+3);
+        if (tokens.at(i+1) == "void") {
+            function_name = tokens.at(i+2);
+        }
 
         if (not assembler::utils::isValidFunctionName(function_name)) {
             throw viua::cg::lex::InvalidSyntax(function_name, ("not a valid function name: " + str::strencode(function_name)));

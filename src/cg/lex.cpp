@@ -305,7 +305,7 @@ namespace viua {
                 const auto limit = input_tokens.size();
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
                     Token token = input_tokens.at(i);
-                    if (token == "call" or token == "process") {
+                    if (token == "call" or token == "process" or token == "msg") {
                         tokens.push_back(token);
                         if (is_register_index(input_tokens.at(i+1)) or (input_tokens.at(i+1) == "void")) {
                             tokens.push_back(input_tokens.at(++i));
@@ -749,6 +749,18 @@ namespace viua {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
                         } else {
                             tokens.push_back(input_tokens.at(++i));
+                        }
+                    } else if (token == "class"
+                        or token == "derive"
+                        or token == "attach"
+                        or token == "register"
+                        or token == "new"
+                    ) {
+                        tokens.push_back(token);                // mnemonic
+                        tokens.push_back(input_tokens.at(++i)); // target register
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                            tokens.back().original(input_tokens.at(i));
                         }
                     } else if (token == "izero"
                         or token == "print"

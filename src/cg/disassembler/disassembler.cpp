@@ -239,7 +239,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         ptr += fn_name.size();
         ++ptr; // for null character terminating the C-style string not included in std::string
     } else if ((op == CLASS) or (op == NEW) or (op == DERIVE) or (op == MSG)) {
-        ptr = disassemble_ri_operand(oss, ptr);
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
         oss << ' ';
         string fn_name = string(reinterpret_cast<char*>(ptr));
@@ -267,7 +267,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         ptr += s.size();
         ++ptr; // for null character terminating the C-style string not included in std::string
     } else if (op == ATTACH) {
-        ptr = disassemble_ri_operand(oss, ptr);
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
         oss << ' ';
         string fn_name = string(reinterpret_cast<char*>(ptr));
