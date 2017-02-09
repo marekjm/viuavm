@@ -291,6 +291,7 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
         entry_function_tokens.emplace_back(0, 0, "param");
         entry_function_tokens.emplace_back(0, 0, "%0");
         entry_function_tokens.emplace_back(0, 0, "%0");
+        entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "\n");
         bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
 
@@ -299,6 +300,7 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
         entry_function_tokens.emplace_back(0, 0, "param");
         entry_function_tokens.emplace_back(0, 0, "%1");
         entry_function_tokens.emplace_back(0, 0, "%1");
+        entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "\n");
         bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
     } else {
@@ -314,6 +316,7 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
         entry_function_tokens.emplace_back(0, 0, "param");
         entry_function_tokens.emplace_back(0, 0, "%0");
         entry_function_tokens.emplace_back(0, 0, "%1");
+        entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "\n");
         bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
     }

@@ -120,7 +120,7 @@ static string resolveregister(Token token, const bool allow_bare_integers = fals
     } else if (allow_bare_integers and str::isnum(reg)) {
         out << reg;
     } else {
-        throw viua::cg::lex::InvalidSyntax(token, ("cannot resolve register operand: " + token.str()));
+        throw viua::cg::lex::InvalidSyntax(token, ("cannot resolve register operand: " + str::enquote(str::strencode(token.str()))));
     }
     return out.str();
 }
@@ -499,7 +499,7 @@ viua::internals::types::bytecode_size assemble_instruction(Program& program, viu
             , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
         );
     } else if (tokens.at(i) == "ress") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
+        TokenIndex target = i + 1;
 
         program.opress(tokens.at(target));
     } else if (tokens.at(i) == "print") {
@@ -578,20 +578,37 @@ viua::internals::types::bytecode_size assemble_instruction(Program& program, viu
 
         program.opframe(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "param") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex target = i + 1;
+        TokenIndex source = target + 1;
 
-        program.opparam(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
+        program.opparam(
+            assembler::operands::getint(resolveregister(tokens.at(target)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
+        );
     } else if (tokens.at(i) == "pamv") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex target = i + 1;
+        TokenIndex source = target + 1;
 
-        program.oppamv(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
+        program.oppamv(
+            assembler::operands::getint(resolveregister(tokens.at(target)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
+        );
     } else if (tokens.at(i) == "arg") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex target = i + 1;
+        TokenIndex source = target + 2;
 
-        program.oparg(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
+        if (tokens.at(target) == "void") {
+            --source;
+            program.oparg(
+                assembler::operands::getint(resolveregister(tokens.at(target)))
+                , assembler::operands::getint(resolveregister(tokens.at(source)))
+            );
+        } else {
+            program.oparg(
+                assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+                , assembler::operands::getint(resolveregister(tokens.at(source)))
+            );
+        }
     } else if (tokens.at(i) == "argc") {
         TokenIndex target = get_token_index_of_operand(tokens, i, 1);
 
