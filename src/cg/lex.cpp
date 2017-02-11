@@ -788,6 +788,7 @@ namespace viua {
                         }
                     } else if (token == "izero"
                         or token == "print"
+                        or token == "argc"
                         or token == "echo"
                         or token == "delete"
                         or token == "draw"
