@@ -148,25 +148,6 @@ static viua::internals::types::timeout timeout_to_int(const string& timeout) {
     }
 }
 
-// FIXME this function is duplicated
-static auto get_token_index_of_operand(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i, int wanted_operand_index) -> decltype(i) {
-    auto limit = tokens.size();
-    while (i < limit and wanted_operand_index > 0) {
-        //if (not (tokens.at(i) == "," or viua::cg::lex::is_reserved_keyword(tokens.at(i)))) {
-        auto token = tokens.at(i);
-        bool is_valid_operand = (str::isnum(token, false) or str::isid(token) or ((token.str().at(0) == '%' or token.str().at(0) == '@' or token.str().at(0) == '*') and (str::isnum(token.str().substr(1)) or str::isid(token.str().substr(1)))));
-        bool is_valid_operand_area_token = (token == "," or token == "static" or token == "local" or token == "global");
-        if (is_valid_operand_area_token) {
-            ++i;
-        } else if (is_valid_operand) {
-            ++i;
-            --wanted_operand_index;
-        } else {
-            throw viua::cg::lex::InvalidSyntax(tokens.at(i), "invalid token where operand index was expected");
-        }
-    }
-    return i;
-}
 static auto convert_token_to_timeout_operand(viua::cg::lex::Token token) -> timeout_op {
     viua::internals::types::timeout timeout_milliseconds = 0;
     if (token != "infinity") {
@@ -573,8 +554,8 @@ viua::internals::types::bytecode_size assemble_instruction(Program& program, viu
             );
         }
     } else if (tokens.at(i) == "frame") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
+        TokenIndex target = i + 1;
+        TokenIndex source = target + 1;
 
         program.opframe(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))));
     } else if (tokens.at(i) == "param") {
