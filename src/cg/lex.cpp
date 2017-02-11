@@ -510,6 +510,54 @@ namespace viua {
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
+                    } else if (token == "insert") {
+                        tokens.push_back(token);    // mnemonic
+
+                        tokens.push_back(input_tokens.at(++i)); // target register
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                        }
+
+                        tokens.push_back(input_tokens.at(++i)); // source register
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                        }
+
+                        tokens.push_back(input_tokens.at(++i)); // key register
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                        }
+                    } else if (token == "remove") {
+                        tokens.push_back(token);    // mnemonic
+
+                        tokens.push_back(input_tokens.at(++i)); // target register
+                        if (tokens.back() != "void") {
+                            if (not is_register_set_name(input_tokens.at(i+1))) {
+                                tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                            } else {
+                                tokens.push_back(input_tokens.at(++i));
+                            }
+                        }
+
+                        tokens.push_back(input_tokens.at(++i)); // source register
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                        }
+
+                        tokens.push_back(input_tokens.at(++i)); // key register
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                        }
                     } else if (token == "join") {
                         tokens.push_back(token);
 

@@ -860,17 +860,35 @@ viua::internals::types::bytecode_size assemble_instruction(Program& program, viu
 
         program.opmsg(ret, tokens.at(fn));
     } else if (tokens.at(i) == "insert") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
-        TokenIndex key = get_token_index_of_operand(tokens, i, 3);
+        TokenIndex target = i + 1;
+        TokenIndex key = target + 2;
+        TokenIndex source = key + 2;
 
-        program.opinsert(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))), assembler::operands::getint(resolveregister(tokens.at(key))));
+        program.opinsert(
+            assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(key)), resolve_rs_type(tokens.at(key+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
+        );
     } else if (tokens.at(i) == "remove") {
-        TokenIndex target = get_token_index_of_operand(tokens, i, 1);
-        TokenIndex source = get_token_index_of_operand(tokens, i, 2);
-        TokenIndex key = get_token_index_of_operand(tokens, i, 3);
+        TokenIndex target = i + 1;
+        TokenIndex source = target + 2;
+        TokenIndex key = source + 2;
 
-        program.opremove(assembler::operands::getint(resolveregister(tokens.at(target))), assembler::operands::getint(resolveregister(tokens.at(source))), assembler::operands::getint(resolveregister(tokens.at(key))));
+        if (tokens.at(target) == "void") {
+            --source;
+            --key;
+            program.opremove(
+                assembler::operands::getint(resolveregister(tokens.at(target)))
+                , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
+                , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(key)), resolve_rs_type(tokens.at(key+1)))
+            );
+        } else {
+            program.opremove(
+                assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+                , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
+                , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(key)), resolve_rs_type(tokens.at(key+1)))
+            );
+        }
     } else if (tokens.at(i) == "return") {
         program.opreturn();
     } else if (tokens.at(i) == "halt") {

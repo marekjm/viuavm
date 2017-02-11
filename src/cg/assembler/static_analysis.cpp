@@ -407,9 +407,9 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "insert") {
-            TokenIndex source = get_token_index_of_operand(body_tokens, i, 3);
-            TokenIndex key = get_token_index_of_operand(body_tokens, i, 2);
-            TokenIndex target = get_token_index_of_operand(body_tokens, i, 1);
+            TokenIndex target = i + 1;
+            TokenIndex key = target + 2;
+            TokenIndex source = key + 2;
 
             check_use_of_register(body_tokens, target, i, registers, named_registers, "insert into empty register");
             check_use_of_register(body_tokens, key, i, registers, named_registers, "insert key from empty register");
@@ -419,13 +419,21 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "remove") {
-            TokenIndex source = get_token_index_of_operand(body_tokens, i, 2);
-            TokenIndex key = get_token_index_of_operand(body_tokens, i, 3);
-            TokenIndex target = get_token_index_of_operand(body_tokens, i, 1);
+            TokenIndex target = i + 1;
+            TokenIndex source = target + 2;
+            TokenIndex key = source + 2;
+
+            if (body_tokens.at(target) == "void") {
+                --source;
+                --key;
+            }
 
             check_use_of_register(body_tokens, source, i, registers, named_registers, "remove from empty register");
             check_use_of_register(body_tokens, key, i, registers, named_registers, "remove key from empty register");
-            registers.insert(resolve_register_name(named_registers, body_tokens.at(target)), body_tokens.at(i+1));
+
+            if (body_tokens.at(target) != "void") {
+                registers.insert(resolve_register_name(named_registers, body_tokens.at(target)), body_tokens.at(i+1));
+            }
 
             i = skip_till_next_line(body_tokens, i);
             continue;
