@@ -2014,6 +2014,18 @@ class RuntimeAssertionsTests(unittest.TestCase):
         runTest(self, 'assert_typeof.asm', 'expected Integer, got String')
 
 
+class ExplicitRegisterSetsTests(unittest.TestCase):
+    PATH = './sample/asm/explicit_register_sets'
+
+    def testHelloWorld(self):
+        runTestSplitlines(self, 'hello_world.asm', [
+            'Hello local World!',
+            'Hello static World!',
+            'Hello global World!',
+        ])
+
+
+
 if __name__ == '__main__':
     if getCPUArchitecture() == 'aarch64':
         # we're running on ARM 64 and
