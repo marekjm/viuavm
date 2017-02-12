@@ -2024,6 +2024,13 @@ class ExplicitRegisterSetsTests(unittest.TestCase):
             'Hello global World!',
         ])
 
+    def testMoveBetween(self):
+        runTestSplitlines(self, 'move_between.asm', [
+            'Hello World!',
+            'Hello World!',
+            'Hello World!',
+        ])
+
 
 
 if __name__ == '__main__':
