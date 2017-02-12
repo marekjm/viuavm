@@ -58,6 +58,8 @@ viua::kernel::Register* viua::process::Process::register_at(viua::internals::typ
     } else if (rs == viua::internals::RegisterSets::STATIC) {
         ensureStaticRegisters(frames.back()->function_name);
         return static_registers.at(frames.back()->function_name)->register_at(i);
+    } else if (rs == viua::internals::RegisterSets::GLOBAL) {
+        return global_register_set->register_at(i);
     } else {
         throw new viua::types::Exception("unsupported register set type");
     }
