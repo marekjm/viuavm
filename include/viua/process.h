@@ -56,6 +56,36 @@ namespace viua {
 
 namespace viua {
     namespace process {
+        class Stack {
+            public:
+            const std::string entry_function;
+
+            viua::internals::types::byte* jump_base;
+            viua::internals::types::bytecode_size instruction_counter;
+            viua::internals::types::byte* instruction_pointer;
+
+            std::vector<std::unique_ptr<Frame>> frames;
+            std::unique_ptr<Frame> frame_new;
+
+            std::vector<std::unique_ptr<TryFrame>> tryframes;
+            std::unique_ptr<TryFrame> try_frame_new;
+
+            /*  Slot for thrown objects (typically exceptions).
+             *  Can be set either by user code, or the VM.
+             */
+            std::unique_ptr<viua::types::Type> thrown;
+            std::unique_ptr<viua::types::Type> caught;
+
+            /*  Variables set after the VM has executed bytecode.
+             *  They describe exit conditions of the bytecode that just stopped running.
+             */
+            std::unique_ptr<viua::types::Type> return_value; // return value of top-most frame on the stack
+
+            public:
+
+            Stack(std::string);
+        };
+
         class Process {
 #ifdef AS_DEBUG_HEADER
             public:
@@ -63,7 +93,6 @@ namespace viua {
             viua::scheduler::VirtualProcessScheduler *scheduler;
 
             viua::process::Process* parent_process;
-            const std::string entry_function;
 
             std::string watchdog_function { "" };
             bool watchdog_failed { false };
@@ -82,6 +111,8 @@ namespace viua {
 
 
             // Call stack
+            Stack stack;
+
             viua::internals::types::byte* jump_base;
             std::vector<std::unique_ptr<Frame>> frames;
             std::unique_ptr<Frame> frame_new;

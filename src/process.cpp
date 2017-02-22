@@ -31,6 +31,18 @@
 using namespace std;
 
 
+viua::process::Stack::Stack(string fn):
+    entry_function(fn),
+    jump_base(nullptr),
+    instruction_counter(0),
+    instruction_pointer(nullptr),
+    frame_new(nullptr), try_frame_new(nullptr),
+    thrown(nullptr), caught(nullptr),
+    return_value(nullptr)
+{
+}
+
+
 viua::types::Type* viua::process::Process::fetch(viua::internals::types::register_index index) const {
     /*  Return pointer to object at given register.
      *  This method safeguards against reaching for out-of-bounds registers and
@@ -411,7 +423,7 @@ viua::process::Process* viua::process::Process::parent() const {
 }
 
 string viua::process::Process::starting_function() const {
-    return entry_function;
+    return stack.entry_function;
 }
 
 auto viua::process::Process::priority() const -> decltype(process_priority) {
@@ -516,8 +528,9 @@ void viua::process::Process::migrate_to(viua::scheduler::VirtualProcessScheduler
     scheduler = sch;
 }
 
-viua::process::Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualProcessScheduler *sch, viua::process::Process* pt): scheduler(sch), parent_process(pt), entry_function(frm->function_name),
+viua::process::Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualProcessScheduler *sch, viua::process::Process* pt): scheduler(sch), parent_process(pt),
     global_register_set(nullptr), currently_used_register_set(nullptr),
+    stack(frm->function_name),
     jump_base(nullptr),
     frame_new(nullptr), try_frame_new(nullptr),
     thrown(nullptr), caught(nullptr),
