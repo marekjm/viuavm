@@ -28,10 +28,10 @@ using namespace std;
 viua::internals::types::byte* viua::process::Process::optry(viua::internals::types::byte* addr) {
     /** Create new special frame for try blocks.
      */
-    if (try_frame_new) {
+    if (stack.try_frame_new) {
         throw "new block frame requested while last one is unused";
     }
-    try_frame_new.reset(new TryFrame());
+    stack.try_frame_new.reset(new TryFrame());
     return addr;
 }
 
@@ -46,7 +46,7 @@ viua::internals::types::byte* viua::process::Process::opcatch(viua::internals::t
         throw new viua::types::Exception("registering undefined handler block '" + catcher_block_name + "' to handle " + type_name);
     }
 
-    try_frame_new->catchers[type_name] = new Catcher(type_name, catcher_block_name);
+    stack.try_frame_new->catchers[type_name] = new Catcher(type_name, catcher_block_name);
 
     return addr;
 }
@@ -77,11 +77,11 @@ viua::internals::types::byte* viua::process::Process::openter(viua::internals::t
 
     viua::internals::types::byte* block_address = adjustJumpBaseForBlock(block_name);
 
-    try_frame_new->return_address = addr;
-    try_frame_new->associated_frame = stack.frames.back().get();
-    try_frame_new->block_name = block_name;
+    stack.try_frame_new->return_address = addr;
+    stack.try_frame_new->associated_frame = stack.frames.back().get();
+    stack.try_frame_new->block_name = block_name;
 
-    tryframes.emplace_back(std::move(try_frame_new));
+    stack.tryframes.emplace_back(std::move(stack.try_frame_new));
 
     return block_address;
 }
@@ -105,11 +105,11 @@ viua::internals::types::byte* viua::process::Process::opthrow(viua::internals::t
 viua::internals::types::byte* viua::process::Process::opleave(viua::internals::types::byte* addr) {
     /*  Run leave instruction.
      */
-    if (tryframes.size() == 0) {
+    if (stack.tryframes.size() == 0) {
         throw new viua::types::Exception("bad leave: no block has been entered");
     }
-    addr = tryframes.back()->return_address;
-    tryframes.pop_back();
+    addr = stack.tryframes.back()->return_address;
+    stack.tryframes.pop_back();
 
     if (stack.frames.size() > 0) {
         adjustJumpBaseFor(stack.frames.back()->function_name);

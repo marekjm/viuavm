@@ -266,8 +266,8 @@ void viua::process::Process::unwindCallStack(TryFrame* tframe) {
     }
 }
 void viua::process::Process::unwindTryStack(TryFrame* tframe) {
-    while (tryframes.back().get() != tframe) {
-        tryframes.pop_back();
+    while (stack.tryframes.back().get() != tframe) {
+        stack.tryframes.pop_back();
     }
 }
 void viua::process::Process::unwindStack(TryFrame* tframe, string handler_found_for_type) {
@@ -279,8 +279,8 @@ tuple<TryFrame*, string> viua::process::Process::findCatchFrame() {
     TryFrame* found_exception_frame = nullptr;
     string caught_with_type = "";
 
-    for (decltype(tryframes)::size_type i = tryframes.size(); i > 0; --i) {
-        TryFrame* tframe = tryframes[(i-1)].get();
+    for (decltype(stack.tryframes)::size_type i = stack.tryframes.size(); i > 0; --i) {
+        TryFrame* tframe = stack.tryframes[(i-1)].get();
         string handler_found_for_type = stack.thrown->type();
         bool handler_found = tframe->catchers.count(handler_found_for_type);
 
@@ -532,7 +532,6 @@ viua::process::Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualP
     global_register_set(nullptr), currently_used_register_set(nullptr),
     stack(frm->function_name),
     jump_base(nullptr),
-    try_frame_new(nullptr),
     return_value(nullptr),
     instruction_counter(0),
     instruction_pointer(nullptr),

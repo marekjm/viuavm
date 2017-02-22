@@ -115,10 +115,6 @@ namespace viua {
 
             viua::internals::types::byte* jump_base;
 
-            // Block stack
-            std::vector<std::unique_ptr<TryFrame>> tryframes;
-            std::unique_ptr<TryFrame> try_frame_new;
-
             /*  Variables set after the VM has executed bytecode.
              *  They describe exit conditions of the bytecode that just stopped running.
              */
