@@ -69,7 +69,7 @@ viua::internals::types::byte* viua::process::Process::opmsg(viua::internals::typ
     string method_name;
     tie(addr, method_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
-    auto obj = frame_new->arguments->at(0);
+    auto obj = stack.frame_new->arguments->at(0);
     if (auto ptr = dynamic_cast<viua::types::Pointer*>(obj)) {
         obj = ptr->to();
     }

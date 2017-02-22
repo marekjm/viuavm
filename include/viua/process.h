@@ -114,8 +114,6 @@ namespace viua {
             Stack stack;
 
             viua::internals::types::byte* jump_base;
-            std::vector<std::unique_ptr<Frame>> frames;
-            std::unique_ptr<Frame> frame_new;
 
             // Block stack
             std::vector<std::unique_ptr<TryFrame>> tryframes;

@@ -48,9 +48,9 @@ viua::internals::types::byte* viua::process::Process::opprocess(viua::internals:
         throw new viua::types::Exception("call to undefined function: " + call_name);
     }
 
-    frame_new->function_name = call_name;
+    stack.frame_new->function_name = call_name;
 
-    auto spawned_process = scheduler->spawn(std::move(frame_new), this, target_is_void);
+    auto spawned_process = scheduler->spawn(std::move(stack.frame_new), this, target_is_void);
     if (not target_is_void) {
         *target = unique_ptr<viua::types::Type>{new viua::types::Process(spawned_process)};
     }
