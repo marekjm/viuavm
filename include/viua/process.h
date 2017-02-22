@@ -115,11 +115,6 @@ namespace viua {
 
             viua::internals::types::byte* jump_base;
 
-            /*  Variables set after the VM has executed bytecode.
-             *  They describe exit conditions of the bytecode that just stopped running.
-             */
-            std::unique_ptr<viua::types::Type> return_value; // return value of top-most frame on the stack
-
             viua::internals::types::bytecode_size instruction_counter;
             viua::internals::types::byte* instruction_pointer;
 

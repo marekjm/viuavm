@@ -144,7 +144,7 @@ void viua::process::Process::dropFrame() {
     }
 
     if (stack.frames.size() == 0) {
-        return_value = frame->local_register_set->pop(0);
+        stack.return_value = frame->local_register_set->pop(0);
     }
 
     if (stack.frames.size()) {
@@ -461,7 +461,7 @@ void viua::process::Process::raise(unique_ptr<viua::types::Type> exception) {
 
 
 unique_ptr<viua::types::Type> viua::process::Process::getReturnValue() {
-    return std::move(return_value);
+    return std::move(stack.return_value);
 }
 
 bool viua::process::Process::watchdogged() const {
@@ -532,7 +532,6 @@ viua::process::Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualP
     global_register_set(nullptr), currently_used_register_set(nullptr),
     stack(frm->function_name),
     jump_base(nullptr),
-    return_value(nullptr),
     instruction_counter(0),
     instruction_pointer(nullptr),
     finished(false), is_joinable(true),
