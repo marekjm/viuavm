@@ -82,6 +82,17 @@ namespace viua {
 
             public:
 
+            auto begin() const -> decltype(frames.begin());
+            auto end() const -> decltype(frames.end());
+
+            auto at(decltype(frames)::size_type i) const -> decltype(frames.at(i));
+            auto back() const -> decltype(frames.back());
+
+            auto pop() -> std::unique_ptr<Frame>;
+
+            auto size() const -> decltype(frames)::size_type;
+            auto clear() -> void;
+
             Stack(std::string);
         };
 

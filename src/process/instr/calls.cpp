@@ -89,7 +89,7 @@ viua::internals::types::byte* viua::process::Process::oparg(viua::internals::typ
     viua::internals::types::register_index parameter_no_operand_index = 0;
     tie(addr, parameter_no_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    if (parameter_no_operand_index >= stack.frames.back()->arguments->size()) {
+    if (parameter_no_operand_index >= stack.back()->arguments->size()) {
         ostringstream oss;
         oss << "invalid read: read from argument register out of bounds: " << parameter_no_operand_index;
         throw new viua::types::Exception(oss.str());
@@ -97,10 +97,10 @@ viua::internals::types::byte* viua::process::Process::oparg(viua::internals::typ
 
     unique_ptr<viua::types::Type> argument;
 
-    if (stack.frames.back()->arguments->isflagged(parameter_no_operand_index, MOVED)) {
-        argument = stack.frames.back()->arguments->pop(parameter_no_operand_index);
+    if (stack.back()->arguments->isflagged(parameter_no_operand_index, MOVED)) {
+        argument = stack.back()->arguments->pop(parameter_no_operand_index);
     } else {
-        argument = stack.frames.back()->arguments->get(parameter_no_operand_index)->copy();
+        argument = stack.back()->arguments->get(parameter_no_operand_index)->copy();
     }
 
     if (not destination_is_void) {
@@ -114,7 +114,7 @@ viua::internals::types::byte* viua::process::Process::opargc(viua::internals::ty
     viua::kernel::Register *target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    *target = unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<int>(stack.frames.back()->arguments->size()))};
+    *target = unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<int>(stack.back()->arguments->size()))};
 
     return addr;
 }
@@ -176,7 +176,7 @@ viua::internals::types::byte* viua::process::Process::optailcall(viua::internals
         throw new viua::types::Exception("tail call to non-native function: " + call_name);
     }
 
-    Frame *last_frame = stack.frames.back().get();
+    Frame *last_frame = stack.back().get();
 
     last_frame->arguments = std::move(stack.frame_new->arguments);
 
@@ -188,13 +188,13 @@ viua::internals::types::byte* viua::process::Process::optailcall(viua::internals
 }
 
 viua::internals::types::byte* viua::process::Process::opreturn(viua::internals::types::byte* addr) {
-    if (stack.frames.size() == 0) {
+    if (stack.size() == 0) {
         throw new viua::types::Exception("no frame on stack: no call to return from");
     }
-    addr = stack.frames.back()->ret_address();
+    addr = stack.back()->ret_address();
 
     unique_ptr<viua::types::Type> returned;
-    viua::kernel::Register* return_register = stack.frames.back()->return_register;
+    viua::kernel::Register* return_register = stack.back()->return_register;
     if (return_register != nullptr) {
         // we check in 0. register because it's reserved for return values
         if (currently_used_register_set->at(0) == nullptr) {
@@ -206,12 +206,12 @@ viua::internals::types::byte* viua::process::Process::opreturn(viua::internals::
     dropFrame();
 
     // place return value
-    if (returned and stack.frames.size() > 0) {
+    if (returned and stack.size() > 0) {
         *return_register = std::move(returned);
     }
 
-    if (stack.frames.size() > 0) {
-        adjustJumpBaseFor(stack.frames.back()->function_name);
+    if (stack.size() > 0) {
+        adjustJumpBaseFor(stack.back()->function_name);
     }
 
     return addr;

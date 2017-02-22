@@ -41,6 +41,36 @@ viua::process::Stack::Stack(string fn):
 {
 }
 
+auto viua::process::Stack::begin() const -> decltype(frames.begin()) {
+    return frames.begin();
+}
+
+auto viua::process::Stack::end() const -> decltype(frames.end()) {
+    return frames.end();
+}
+
+auto viua::process::Stack::at(decltype(frames)::size_type i) const -> decltype(frames.at(i)) {
+    return frames.at(i);
+}
+
+auto viua::process::Stack::back() const -> decltype(frames.back()) {
+    return frames.back();
+}
+
+auto viua::process::Stack::pop() -> unique_ptr<Frame> {
+    unique_ptr<Frame> last_frame { std::move(frames.back()) };
+    frames.pop_back();
+    return last_frame;
+}
+
+auto viua::process::Stack::size() const -> decltype(frames)::size_type {
+    return frames.size();
+}
+
+auto viua::process::Stack::clear() -> void {
+    frames.clear();
+}
+
 
 viua::types::Type* viua::process::Process::fetch(viua::internals::types::register_index index) const {
     /*  Return pointer to object at given register.
@@ -65,10 +95,10 @@ viua::kernel::Register* viua::process::Process::register_at(viua::internals::typ
     if (rs == viua::internals::RegisterSets::CURRENT) {
         return currently_used_register_set->register_at(i);
     } else if (rs == viua::internals::RegisterSets::LOCAL) {
-        return stack.frames.back()->local_register_set->register_at(i);
+        return stack.back()->local_register_set->register_at(i);
     } else if (rs == viua::internals::RegisterSets::STATIC) {
-        ensureStaticRegisters(stack.frames.back()->function_name);
-        return static_registers.at(stack.frames.back()->function_name)->register_at(i);
+        ensureStaticRegisters(stack.back()->function_name);
+        return static_registers.at(stack.back()->function_name)->register_at(i);
     } else if (rs == viua::internals::RegisterSets::GLOBAL) {
         return global_register_set->register_at(i);
     } else {
@@ -116,14 +146,14 @@ Frame* viua::process::Process::requestNewFrame(viua::internals::types::register_
 void viua::process::Process::pushFrame() {
     /** Pushes new frame to be the current (top-most) one.
      */
-    if (stack.frames.size() > MAX_STACK_SIZE) {
+    if (stack.size() > MAX_STACK_SIZE) {
         ostringstream oss;
         oss << "stack size (" << MAX_STACK_SIZE << ") exceeded with call to '" << stack.frame_new->function_name << '\'';
         throw new viua::types::Exception(oss.str());
     }
 
     currently_used_register_set = stack.frame_new->local_register_set.get();
-    if (find(stack.frames.begin(), stack.frames.end(), stack.frame_new) != stack.frames.end()) {
+    if (find(stack.begin(), stack.end(), stack.frame_new) != stack.end()) {
         ostringstream oss;
         oss << "stack corruption: frame " << hex << stack.frame_new.get() << dec << " for function " << stack.frame_new->function_name << '/' << stack.frame_new->arguments->size() << " pushed more than once";
         throw oss.str();
@@ -133,8 +163,7 @@ void viua::process::Process::pushFrame() {
 void viua::process::Process::dropFrame() {
     /** Drops top-most frame from call stack.
      */
-    unique_ptr<Frame> frame(std::move(stack.frames.back()));
-    stack.frames.pop_back();
+    unique_ptr<Frame> frame = stack.pop();
 
     for (viua::internals::types::register_index i = 0; i < frame->arguments->size(); ++i) {
         if (frame->arguments->at(i) != nullptr and frame->arguments->isflagged(i, MOVED)) {
@@ -142,12 +171,12 @@ void viua::process::Process::dropFrame() {
         }
     }
 
-    if (stack.frames.size() == 0) {
+    if (stack.size() == 0) {
         stack.return_value = frame->local_register_set->pop(0);
     }
 
-    if (stack.frames.size()) {
-        currently_used_register_set = stack.frames.back()->local_register_set.get();
+    if (stack.size()) {
+        currently_used_register_set = stack.back()->local_register_set.get();
     } else {
         currently_used_register_set = global_register_set.get();
     }
@@ -242,7 +271,7 @@ viua::internals::types::byte* viua::process::Process::callForeignMethod(viua::in
     dropFrame();
 
     // place return value
-    if (returned and stack.frames.size() > 0) {
+    if (returned and stack.size() > 0) {
         *return_register = std::move(returned);
     }
 
@@ -254,8 +283,8 @@ void viua::process::Process::adjustInstructionPointer(TryFrame* tframe, string h
 }
 void viua::process::Process::unwindCallStack(TryFrame* tframe) {
     decltype(stack.frames)::size_type distance = 0;
-    for (decltype(stack.frames)::size_type j = (stack.frames.size()-1); j > 1; --j) {
-        if (stack.frames[j].get() == tframe->associated_frame) {
+    for (decltype(stack.frames)::size_type j = (stack.size()-1); j > 1; --j) {
+        if (stack.at(j).get() == tframe->associated_frame) {
             break;
         }
         ++distance;
@@ -338,7 +367,7 @@ viua::internals::types::byte* viua::process::Process::tick() {
         stack.thrown.reset(new viua::types::Exception(e));
     }
 
-    if (halt or stack.frames.size() == 0) {
+    if (halt or stack.size() == 0) {
         finished = true;
         return nullptr;
     }
@@ -473,7 +502,7 @@ viua::internals::types::byte* viua::process::Process::become(const string& funct
         throw new viua::types::Exception("process from undefined function: " + function_name);
     }
 
-    stack.frames.clear();
+    stack.clear();
     stack.thrown.reset(nullptr);
     stack.caught.reset(nullptr);
     finished = false;
@@ -487,10 +516,10 @@ viua::internals::types::byte* viua::process::Process::become(const string& funct
 }
 
 viua::internals::types::byte* viua::process::Process::begin() {
-    if (not scheduler->isNativeFunction(stack.frames[0]->function_name)) {
-        throw new viua::types::Exception("process from undefined function: " + stack.frames[0]->function_name);
+    if (not scheduler->isNativeFunction(stack.at(0)->function_name)) {
+        throw new viua::types::Exception("process from undefined function: " + stack.at(0)->function_name);
     }
-    return (stack.instruction_pointer = adjustJumpBaseFor(stack.frames[0]->function_name));
+    return (stack.instruction_pointer = adjustJumpBaseFor(stack.at(0)->function_name));
 }
 auto viua::process::Process::executionAt() const -> decltype(stack.instruction_pointer) {
     return stack.instruction_pointer;
@@ -499,7 +528,7 @@ auto viua::process::Process::executionAt() const -> decltype(stack.instruction_p
 
 vector<Frame*> viua::process::Process::trace() const {
     vector<Frame*> tr;
-    for (auto& each : stack.frames) {
+    for (auto& each : stack) {
         tr.push_back(each.get());
     }
     return tr;

@@ -78,7 +78,7 @@ viua::internals::types::byte* viua::process::Process::openter(viua::internals::t
     viua::internals::types::byte* block_address = adjustJumpBaseForBlock(block_name);
 
     stack.try_frame_new->return_address = addr;
-    stack.try_frame_new->associated_frame = stack.frames.back().get();
+    stack.try_frame_new->associated_frame = stack.back().get();
     stack.try_frame_new->block_name = block_name;
 
     stack.tryframes.emplace_back(std::move(stack.try_frame_new));
@@ -111,8 +111,8 @@ viua::internals::types::byte* viua::process::Process::opleave(viua::internals::t
     addr = stack.tryframes.back()->return_address;
     stack.tryframes.pop_back();
 
-    if (stack.frames.size() > 0) {
-        adjustJumpBaseFor(stack.frames.back()->function_name);
+    if (stack.size() > 0) {
+        adjustJumpBaseFor(stack.back()->function_name);
     }
     return addr;
 }

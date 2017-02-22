@@ -104,7 +104,7 @@ viua::internals::types::byte* viua::process::Process::opcapturemove(viua::intern
 viua::internals::types::byte* viua::process::Process::opclosure(viua::internals::types::byte* addr) {
     /** Create a closure from a function.
      */
-    if (currently_used_register_set != stack.frames.back()->local_register_set.get()) {
+    if (currently_used_register_set != stack.back()->local_register_set.get()) {
         throw new viua::types::Exception("creating closures from nonlocal registers is forbidden");
     }
 

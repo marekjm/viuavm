@@ -96,11 +96,11 @@ viua::internals::types::byte* viua::process::Process::opress(viua::internals::ty
             currently_used_register_set = global_register_set.get();
             break;
         case viua::internals::RegisterSets::LOCAL:
-            currently_used_register_set = stack.frames.back()->local_register_set.get();
+            currently_used_register_set = stack.back()->local_register_set.get();
             break;
         case viua::internals::RegisterSets::STATIC:
-            ensureStaticRegisters(stack.frames.back()->function_name);
-            currently_used_register_set = static_registers.at(stack.frames.back()->function_name).get();
+            ensureStaticRegisters(stack.back()->function_name);
+            currently_used_register_set = static_registers.at(stack.back()->function_name).get();
             break;
         default:
             throw new viua::types::Exception("illegal register set ID in ress instruction");
