@@ -162,14 +162,14 @@ viua::internals::types::byte* viua::process::Process::adjustJumpBaseForBlock(con
     viua::internals::types::byte *entry_point = nullptr;
     auto ep = scheduler->getEntryPointOfBlock(call_name);
     entry_point = ep.first;
-    jump_base = ep.second;
+    stack.jump_base = ep.second;
     return entry_point;
 }
 viua::internals::types::byte* viua::process::Process::adjustJumpBaseFor(const string& call_name) {
     viua::internals::types::byte *entry_point = nullptr;
     auto ep = scheduler->getEntryPointOf(call_name);
     entry_point = ep.first;
-    jump_base = ep.second;
+    stack.jump_base = ep.second;
     return entry_point;
 }
 viua::internals::types::byte* viua::process::Process::callNative(viua::internals::types::byte* return_address, const string& call_name, viua::kernel::Register* return_register, const string&) {
@@ -251,7 +251,7 @@ viua::internals::types::byte* viua::process::Process::callForeignMethod(viua::in
 }
 
 void viua::process::Process::adjustInstructionPointer(TryFrame* tframe, string handler_found_for_type) {
-    instruction_pointer = adjustJumpBaseForBlock(tframe->catchers.at(handler_found_for_type)->catcher_name);
+    stack.instruction_pointer = adjustJumpBaseForBlock(tframe->catchers.at(handler_found_for_type)->catcher_name);
 }
 void viua::process::Process::unwindCallStack(TryFrame* tframe) {
     decltype(stack.frames)::size_type distance = 0;
@@ -318,11 +318,11 @@ void viua::process::Process::handleActiveException() {
 viua::internals::types::byte* viua::process::Process::tick() {
     bool halt = false;
 
-    viua::internals::types::byte* previous_instruction_pointer = instruction_pointer;
-    ++instruction_counter;
+    viua::internals::types::byte* previous_instruction_pointer = stack.instruction_pointer;
+    ++stack.instruction_counter;
 
     try {
-        instruction_pointer = dispatch(instruction_pointer);
+        stack.instruction_pointer = dispatch(stack.instruction_pointer);
     } catch (viua::types::Exception* e) {
         /* All machine-thrown exceptions are passed back to user code.
          * This is much easier than checking for erroneous conditions and
@@ -356,7 +356,7 @@ viua::internals::types::byte* viua::process::Process::tick() {
      *      - an object has been thrown, as the instruction pointer will be adjusted by
      *        catchers or execution will be halted on unhandled types,
      */
-    if (instruction_pointer == previous_instruction_pointer and (OPCODE(*instruction_pointer) != RETURN and OPCODE(*instruction_pointer) != JOIN and OPCODE(*instruction_pointer) != RECEIVE) and (not stack.thrown)) {
+    if (stack.instruction_pointer == previous_instruction_pointer and (OPCODE(*stack.instruction_pointer) != RETURN and OPCODE(*stack.instruction_pointer) != JOIN and OPCODE(*stack.instruction_pointer) != RECEIVE) and (not stack.thrown)) {
         stack.thrown.reset(new viua::types::Exception("InstructionUnchanged"));
     }
 
@@ -380,7 +380,7 @@ viua::internals::types::byte* viua::process::Process::tick() {
         return nullptr;
     }
 
-    return instruction_pointer;
+    return stack.instruction_pointer;
 }
 
 void viua::process::Process::join() {
@@ -485,20 +485,20 @@ viua::internals::types::byte* viua::process::Process::become(const string& funct
 
     pushFrame();
 
-    return (instruction_pointer = adjustJumpBaseFor(function_name));
+    return (stack.instruction_pointer = adjustJumpBaseFor(function_name));
 }
 
 viua::internals::types::byte* viua::process::Process::begin() {
     if (not scheduler->isNativeFunction(stack.frames[0]->function_name)) {
         throw new viua::types::Exception("process from undefined function: " + stack.frames[0]->function_name);
     }
-    return (instruction_pointer = adjustJumpBaseFor(stack.frames[0]->function_name));
+    return (stack.instruction_pointer = adjustJumpBaseFor(stack.frames[0]->function_name));
 }
-auto viua::process::Process::counter() const -> decltype(instruction_counter) {
-    return instruction_counter;
+auto viua::process::Process::counter() const -> decltype(stack.instruction_counter) {
+    return stack.instruction_counter;
 }
-auto viua::process::Process::executionAt() const -> decltype(instruction_pointer) {
-    return instruction_pointer;
+auto viua::process::Process::executionAt() const -> decltype(stack.instruction_pointer) {
+    return stack.instruction_pointer;
 }
 
 
@@ -531,9 +531,6 @@ void viua::process::Process::migrate_to(viua::scheduler::VirtualProcessScheduler
 viua::process::Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualProcessScheduler *sch, viua::process::Process* pt): scheduler(sch), parent_process(pt),
     global_register_set(nullptr), currently_used_register_set(nullptr),
     stack(frm->function_name),
-    jump_base(nullptr),
-    instruction_counter(0),
-    instruction_pointer(nullptr),
     finished(false), is_joinable(true),
     is_suspended(false),
     process_priority(1),

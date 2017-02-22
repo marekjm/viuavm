@@ -42,7 +42,7 @@ viua::internals::types::byte* viua::process::Process::opprint(viua::internals::t
 
 
 viua::internals::types::byte* viua::process::Process::opjump(viua::internals::types::byte* addr) {
-    viua::internals::types::byte* target = (jump_base + viua::bytecode::decoder::operands::extract_primitive_uint64(addr, this));
+    viua::internals::types::byte* target = (stack.jump_base + viua::bytecode::decoder::operands::extract_primitive_uint64(addr, this));
     if (target == addr) {
         throw new viua::types::Exception("aborting: JUMP instruction pointing to itself");
     }
@@ -57,5 +57,5 @@ viua::internals::types::byte* viua::process::Process::opif(viua::internals::type
     tie(addr, addr_true) = viua::bytecode::decoder::operands::fetch_primitive_uint64(addr, this);
     tie(addr, addr_false) = viua::bytecode::decoder::operands::fetch_primitive_uint64(addr, this);
 
-    return (jump_base + (source->boolean() ? addr_true : addr_false));
+    return (stack.jump_base + (source->boolean() ? addr_true : addr_false));
 }

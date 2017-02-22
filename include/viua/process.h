@@ -113,11 +113,6 @@ namespace viua {
             // Call stack
             Stack stack;
 
-            viua::internals::types::byte* jump_base;
-
-            viua::internals::types::bytecode_size instruction_counter;
-            viua::internals::types::byte* instruction_pointer;
-
             std::queue<std::unique_ptr<viua::types::Type>> message_queue;
 
             viua::types::Type* fetch(viua::internals::types::register_index) const;
@@ -310,8 +305,8 @@ namespace viua {
                 viua::internals::types::byte* become(const std::string&, std::unique_ptr<Frame>);
 
                 viua::internals::types::byte* begin();
-                auto counter() const -> decltype(instruction_counter);
-                auto executionAt() const -> decltype(instruction_pointer);
+                auto counter() const -> decltype(stack.instruction_counter);
+                auto executionAt() const -> decltype(stack.instruction_pointer);
 
                 std::vector<Frame*> trace() const;
 
