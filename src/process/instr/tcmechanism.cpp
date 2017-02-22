@@ -57,10 +57,10 @@ viua::internals::types::byte* viua::process::Process::opdraw(viua::internals::ty
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    if (not caught) {
+    if (not stack.caught) {
         throw new viua::types::Exception("no caught object to draw");
     }
-    *target = std::move(caught);
+    *target = std::move(stack.caught);
 
     return addr;
 }
@@ -97,7 +97,7 @@ viua::internals::types::byte* viua::process::Process::opthrow(viua::internals::t
         oss << "throw from null register";
         throw new viua::types::Exception(oss.str());
     }
-    thrown = source->give();
+    stack.thrown = source->give();
 
     return addr;
 }

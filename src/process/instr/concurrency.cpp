@@ -93,7 +93,7 @@ viua::internals::types::byte* viua::process::Process::opjoin(viua::internals::ty
             thrd->join();
             return_addr = addr;
             if (thrd->terminated()) {
-                thrown = thrd->transferActiveException();
+                stack.thrown = thrd->transferActiveException();
             }
             if (not target_is_void) {
                 *target = thrd->getReturnValue();
@@ -101,7 +101,7 @@ viua::internals::types::byte* viua::process::Process::opjoin(viua::internals::ty
         } else if (timeout_active and (not wait_until_infinity) and (waiting_until < std::chrono::steady_clock::now())) {
             timeout_active = false;
             wait_until_infinity = false;
-            thrown.reset(new viua::types::Exception("process did not join"));
+            stack.thrown.reset(new viua::types::Exception("process did not join"));
             return_addr = addr;
         }
     } else {
@@ -172,7 +172,7 @@ viua::internals::types::byte* viua::process::Process::opreceive(viua::internals:
         if (timeout_active and (not wait_until_infinity) and (waiting_until < std::chrono::steady_clock::now())) {
             timeout_active = false;
             wait_until_infinity = false;
-            thrown.reset(new viua::types::Exception("no message received"));
+            stack.thrown.reset(new viua::types::Exception("no message received"));
             return_addr = addr;
         }
     }

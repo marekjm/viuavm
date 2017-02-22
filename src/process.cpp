@@ -281,7 +281,7 @@ tuple<TryFrame*, string> viua::process::Process::findCatchFrame() {
 
     for (decltype(tryframes)::size_type i = tryframes.size(); i > 0; --i) {
         TryFrame* tframe = tryframes[(i-1)].get();
-        string handler_found_for_type = thrown->type();
+        string handler_found_for_type = stack.thrown->type();
         bool handler_found = tframe->catchers.count(handler_found_for_type);
 
         // FIXME: mutex
@@ -312,7 +312,7 @@ void viua::process::Process::handleActiveException() {
     tie(tframe, handler_found_for_type) = findCatchFrame();
     if (tframe != nullptr) {
         unwindStack(tframe, handler_found_for_type);
-        caught.reset(thrown.release());
+        stack.caught.reset(stack.thrown.release());
     }
 }
 viua::internals::types::byte* viua::process::Process::tick() {
@@ -331,13 +331,13 @@ viua::internals::types::byte* viua::process::Process::tick() {
          *
          * If user code cannot deal with them (i.e. did not register a catcher block) they will terminate execution later.
          */
-        thrown.reset(e);
+        stack.thrown.reset(e);
     } catch (const HaltException& e) {
         halt = true;
     } catch (viua::types::Type* e) {
-        thrown.reset(e);
+        stack.thrown.reset(e);
     } catch (const char* e) {
-        thrown.reset(new viua::types::Exception(e));
+        stack.thrown.reset(new viua::types::Exception(e));
     }
 
     if (halt or frames.size() == 0) {
@@ -356,11 +356,11 @@ viua::internals::types::byte* viua::process::Process::tick() {
      *      - an object has been thrown, as the instruction pointer will be adjusted by
      *        catchers or execution will be halted on unhandled types,
      */
-    if (instruction_pointer == previous_instruction_pointer and (OPCODE(*instruction_pointer) != RETURN and OPCODE(*instruction_pointer) != JOIN and OPCODE(*instruction_pointer) != RECEIVE) and (not thrown)) {
-        thrown.reset(new viua::types::Exception("InstructionUnchanged"));
+    if (instruction_pointer == previous_instruction_pointer and (OPCODE(*instruction_pointer) != RETURN and OPCODE(*instruction_pointer) != JOIN and OPCODE(*instruction_pointer) != RECEIVE) and (not stack.thrown)) {
+        stack.thrown.reset(new viua::types::Exception("InstructionUnchanged"));
     }
 
-    if (thrown and frame_new) {
+    if (stack.thrown and frame_new) {
         /*  Delete active frame after an exception is thrown.
          *  There're two reasons for such behaviour:
          *  - it prevents memory leaks if an exception escapes and
@@ -372,11 +372,11 @@ viua::internals::types::byte* viua::process::Process::tick() {
         frame_new.reset(nullptr);
     }
 
-    if (thrown) {
+    if (stack.thrown) {
         handleActiveException();
     }
 
-    if (thrown) {
+    if (stack.thrown) {
         return nullptr;
     }
 
@@ -438,7 +438,7 @@ bool viua::process::Process::stopped() const {
 }
 
 bool viua::process::Process::terminated() const {
-    return static_cast<bool>(thrown);
+    return static_cast<bool>(stack.thrown);
 }
 
 void viua::process::Process::pass(unique_ptr<viua::types::Type> message) {
@@ -448,15 +448,15 @@ void viua::process::Process::pass(unique_ptr<viua::types::Type> message) {
 
 
 viua::types::Type* viua::process::Process::getActiveException() {
-    return thrown.get();
+    return stack.thrown.get();
 }
 
 unique_ptr<viua::types::Type> viua::process::Process::transferActiveException() {
-    return std::move(thrown);
+    return std::move(stack.thrown);
 }
 
 void viua::process::Process::raise(unique_ptr<viua::types::Type> exception) {
-    thrown = std::move(exception);
+    stack.thrown = std::move(exception);
 }
 
 
@@ -476,8 +476,8 @@ viua::internals::types::byte* viua::process::Process::become(const string& funct
     }
 
     frames.clear();
-    thrown.reset(nullptr);
-    caught.reset(nullptr);
+    stack.thrown.reset(nullptr);
+    stack.caught.reset(nullptr);
     finished = false;
 
     frame_to_use->function_name = function_name;
@@ -533,7 +533,6 @@ viua::process::Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualP
     stack(frm->function_name),
     jump_base(nullptr),
     frame_new(nullptr), try_frame_new(nullptr),
-    thrown(nullptr), caught(nullptr),
     return_value(nullptr),
     instruction_counter(0),
     instruction_pointer(nullptr),

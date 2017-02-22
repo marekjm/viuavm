@@ -121,12 +121,6 @@ namespace viua {
             std::vector<std::unique_ptr<TryFrame>> tryframes;
             std::unique_ptr<TryFrame> try_frame_new;
 
-            /*  Slot for thrown objects (typically exceptions).
-             *  Can be set either by user code, or the VM.
-             */
-            std::unique_ptr<viua::types::Type> thrown;
-            std::unique_ptr<viua::types::Type> caught;
-
             /*  Variables set after the VM has executed bytecode.
              *  They describe exit conditions of the bytecode that just stopped running.
              */
