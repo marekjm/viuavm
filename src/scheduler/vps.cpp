@@ -50,7 +50,6 @@ static void printStackTrace(viua::process::Process *process) {
     auto ex = dynamic_cast<viua::types::Exception*>(thrown_object.get());
     string ex_type = thrown_object->type();
 
-    //cout << "exception after " << kernel.counter() << " ticks" << endl;
     //cout << "failed instruction: " << get<0>(disassembler::instruction(process->executionAt())) << endl;
     cout << "uncaught object: " << ex_type << " = " << (ex ? ex->what() : thrown_object->str()) << endl;
     cout << "\n";

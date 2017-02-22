@@ -34,7 +34,6 @@ using namespace std;
 viua::process::Stack::Stack(string fn):
     entry_function(fn),
     jump_base(nullptr),
-    instruction_counter(0),
     instruction_pointer(nullptr),
     frame_new(nullptr), try_frame_new(nullptr),
     thrown(nullptr), caught(nullptr),
@@ -319,7 +318,6 @@ viua::internals::types::byte* viua::process::Process::tick() {
     bool halt = false;
 
     viua::internals::types::byte* previous_instruction_pointer = stack.instruction_pointer;
-    ++stack.instruction_counter;
 
     try {
         stack.instruction_pointer = dispatch(stack.instruction_pointer);
@@ -493,9 +491,6 @@ viua::internals::types::byte* viua::process::Process::begin() {
         throw new viua::types::Exception("process from undefined function: " + stack.frames[0]->function_name);
     }
     return (stack.instruction_pointer = adjustJumpBaseFor(stack.frames[0]->function_name));
-}
-auto viua::process::Process::counter() const -> decltype(stack.instruction_counter) {
-    return stack.instruction_counter;
 }
 auto viua::process::Process::executionAt() const -> decltype(stack.instruction_pointer) {
     return stack.instruction_pointer;
