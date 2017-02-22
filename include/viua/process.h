@@ -65,6 +65,7 @@ namespace viua {
 
             std::vector<std::unique_ptr<Frame>> frames;
             std::unique_ptr<Frame> frame_new;
+            using size_type = decltype(frames)::size_type;
 
             std::vector<std::unique_ptr<TryFrame>> tryframes;
             std::unique_ptr<TryFrame> try_frame_new;

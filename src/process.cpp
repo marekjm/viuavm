@@ -282,8 +282,8 @@ void viua::process::Process::adjustInstructionPointer(TryFrame* tframe, string h
     stack.instruction_pointer = adjustJumpBaseForBlock(tframe->catchers.at(handler_found_for_type)->catcher_name);
 }
 void viua::process::Process::unwindCallStack(TryFrame* tframe) {
-    decltype(stack.frames)::size_type distance = 0;
-    for (decltype(stack.frames)::size_type j = (stack.size()-1); j > 1; --j) {
+    decltype(stack)::size_type distance = 0;
+    for (decltype(stack)::size_type j = (stack.size()-1); j > 1; --j) {
         if (stack.at(j).get() == tframe->associated_frame) {
             break;
         }
