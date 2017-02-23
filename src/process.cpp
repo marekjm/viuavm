@@ -61,9 +61,26 @@ auto viua::process::Stack::back() const -> decltype(frames.back()) {
 }
 
 auto viua::process::Stack::pop() -> unique_ptr<Frame> {
-    unique_ptr<Frame> last_frame { std::move(frames.back()) };
+    unique_ptr<Frame> frame { std::move(frames.back()) };
     frames.pop_back();
-    return last_frame;
+
+    for (viua::internals::types::register_index i = 0; i < frame->arguments->size(); ++i) {
+        if (frame->arguments->at(i) != nullptr and frame->arguments->isflagged(i, MOVED)) {
+            throw new viua::types::Exception("unused pass-by-move parameter");
+        }
+    }
+
+    if (size() == 0) {
+        return_value = frame->local_register_set->pop(0);
+    }
+
+    if (size()) {
+        *currently_used_register_set = back()->local_register_set.get();
+    } else {
+        *currently_used_register_set = global_register_set;
+    }
+
+    return frame;
 }
 
 auto viua::process::Stack::size() const -> decltype(frames)::size_type {
@@ -93,26 +110,6 @@ viua::internals::types::byte* viua::process::Stack::adjust_jump_base_for(const s
     return entry_point;
 }
 
-auto viua::process::Stack::drop_frame() -> void {
-    unique_ptr<Frame> frame = pop();
-
-    for (viua::internals::types::register_index i = 0; i < frame->arguments->size(); ++i) {
-        if (frame->arguments->at(i) != nullptr and frame->arguments->isflagged(i, MOVED)) {
-            throw new viua::types::Exception("unused pass-by-move parameter");
-        }
-    }
-
-    if (size() == 0) {
-        return_value = frame->local_register_set->pop(0);
-    }
-
-    if (size()) {
-        *currently_used_register_set = back()->local_register_set.get();
-    } else {
-        *currently_used_register_set = global_register_set;
-    }
-}
-
 auto viua::process::Stack::adjust_instruction_pointer(TryFrame* tframe, string handler_found_for_type) -> void {
     instruction_pointer = adjust_jump_base_for_block(tframe->catchers.at(handler_found_for_type)->catcher_name);
 }
@@ -125,7 +122,7 @@ auto viua::process::Stack::unwind_call_stack_to(TryFrame* tframe) -> void {
         ++distance;
     }
     for (size_type j = 0; j < distance; ++j) {
-        drop_frame();
+        pop();
     }
 }
 auto viua::process::Stack::unwind_try_stack_to(TryFrame* tframe) -> void {
@@ -271,31 +268,6 @@ void viua::process::Process::pushFrame() {
     }
     stack.emplace_back(std::move(stack.frame_new));
 }
-void viua::process::Process::dropFrame() {
-    /** Drops top-most frame from call stack.
-     */
-    unique_ptr<Frame> frame = stack.pop();
-
-    for (viua::internals::types::register_index i = 0; i < frame->arguments->size(); ++i) {
-        if (frame->arguments->at(i) != nullptr and frame->arguments->isflagged(i, MOVED)) {
-            throw new viua::types::Exception("unused pass-by-move parameter");
-        }
-    }
-
-    if (stack.size() == 0) {
-        stack.return_value = frame->local_register_set->pop(0);
-    }
-
-    if (stack.size()) {
-        currently_used_register_set = stack.back()->local_register_set.get();
-    } else {
-        currently_used_register_set = global_register_set.get();
-    }
-}
-void viua::process::Process::popFrame() {
-    // popFrame() is a public function for dropping frames
-    dropFrame();
-}
 
 viua::internals::types::byte* viua::process::Process::adjustJumpBaseForBlock(const string& call_name) {
     viua::internals::types::byte *entry_point = nullptr;
@@ -379,7 +351,7 @@ viua::internals::types::byte* viua::process::Process::callForeignMethod(viua::in
         returned = currently_used_register_set->pop(0);
     }
 
-    dropFrame();
+    stack.pop();
 
     // place return value
     if (returned and stack.size() > 0) {
@@ -389,61 +361,6 @@ viua::internals::types::byte* viua::process::Process::callForeignMethod(viua::in
     return return_address;
 }
 
-void viua::process::Process::adjustInstructionPointer(TryFrame* tframe, string handler_found_for_type) {
-    stack.instruction_pointer = adjustJumpBaseForBlock(tframe->catchers.at(handler_found_for_type)->catcher_name);
-}
-void viua::process::Process::unwindCallStack(TryFrame* tframe) {
-    decltype(stack)::size_type distance = 0;
-    for (decltype(stack)::size_type j = (stack.size()-1); j > 1; --j) {
-        if (stack.at(j).get() == tframe->associated_frame) {
-            break;
-        }
-        ++distance;
-    }
-    for (decltype(distance) j = 0; j < distance; ++j) {
-        dropFrame();
-    }
-}
-void viua::process::Process::unwindTryStack(TryFrame* tframe) {
-    while (stack.tryframes.back().get() != tframe) {
-        stack.tryframes.pop_back();
-    }
-}
-void viua::process::Process::unwindStack(TryFrame* tframe, string handler_found_for_type) {
-    adjustInstructionPointer(tframe, handler_found_for_type);
-    unwindCallStack(tframe);
-    unwindTryStack(tframe);
-}
-tuple<TryFrame*, string> viua::process::Process::findCatchFrame() {
-    TryFrame* found_exception_frame = nullptr;
-    string caught_with_type = "";
-
-    for (decltype(stack.tryframes)::size_type i = stack.tryframes.size(); i > 0; --i) {
-        TryFrame* tframe = stack.tryframes[(i-1)].get();
-        string handler_found_for_type = stack.thrown->type();
-        bool handler_found = tframe->catchers.count(handler_found_for_type);
-
-        // FIXME: mutex
-        if ((not handler_found) and scheduler->isClass(handler_found_for_type)) {
-            vector<string> types_to_check = scheduler->inheritanceChainOf(handler_found_for_type);
-            for (decltype(types_to_check)::size_type j = 0; j < types_to_check.size(); ++j) {
-                if (tframe->catchers.count(types_to_check[j])) {
-                    handler_found = true;
-                    handler_found_for_type = types_to_check[j];
-                    break;
-                }
-            }
-        }
-
-        if (handler_found) {
-            found_exception_frame = tframe;
-            caught_with_type = handler_found_for_type;
-            break;
-        }
-    }
-
-    return tuple<TryFrame*, string>(found_exception_frame, caught_with_type);
-}
 void viua::process::Process::handleActiveException() {
     stack.unwind();
 }

@@ -203,7 +203,7 @@ viua::internals::types::byte* viua::process::Process::opreturn(viua::internals::
         returned = currently_used_register_set->pop(0);
     }
 
-    dropFrame();
+    stack.pop();
 
     // place return value
     if (returned and stack.size() > 0) {

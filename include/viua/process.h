@@ -96,8 +96,6 @@ namespace viua {
             auto unwind_to(TryFrame*, std::string) -> void;
             auto find_catch_frame() -> std::tuple<TryFrame*, std::string>;
 
-            auto drop_frame() -> void;
-
             public:
 
             viua::kernel::RegisterSet* global_register_set;
@@ -161,7 +159,6 @@ namespace viua {
             Frame* requestNewFrame(viua::internals::types::register_index arguments_size = 0, viua::internals::types::register_index registers_size = 0);
             TryFrame* requestNewTryFrame();
             void pushFrame();
-            void dropFrame();
             viua::internals::types::byte* adjustJumpBaseForBlock(const std::string&);
             viua::internals::types::byte* adjustJumpBaseFor(const std::string&);
             // call native (i.e. written in Viua) function
@@ -170,15 +167,6 @@ namespace viua {
             viua::internals::types::byte* callForeign(viua::internals::types::byte*, const std::string&, viua::kernel::Register*, const std::string&);
             // call foreign method (i.e. method of a pure-C++ class loaded into machine's typesystem)
             viua::internals::types::byte* callForeignMethod(viua::internals::types::byte*, viua::types::Type*, const std::string&, viua::kernel::Register*, const std::string&);
-
-            /*  Stack unwinding methods.
-             */
-            void adjustInstructionPointer(TryFrame*, std::string);
-            void unwindCallStack(TryFrame*);
-            void unwindTryStack(TryFrame*);
-            void unwindStack(std::tuple<TryFrame*, std::string>);
-            void unwindStack(TryFrame*, std::string);
-            std::tuple<TryFrame*, std::string> findCatchFrame();
 
             bool finished;
             std::atomic_bool is_joinable;
@@ -332,7 +320,6 @@ namespace viua {
 
                 void migrate_to(viua::scheduler::VirtualProcessScheduler*);
 
-                void popFrame();
                 std::unique_ptr<viua::types::Type> getReturnValue();
 
                 bool watchdogged() const;
