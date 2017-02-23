@@ -71,6 +71,10 @@ auto viua::process::Stack::clear() -> void {
     frames.clear();
 }
 
+auto viua::process::Stack::emplace_back(unique_ptr<Frame> frame) -> decltype(frames.emplace_back(frame)) {
+    return frames.emplace_back(std::move(frame));
+}
+
 
 viua::types::Type* viua::process::Process::fetch(viua::internals::types::register_index index) const {
     /*  Return pointer to object at given register.
@@ -158,7 +162,7 @@ void viua::process::Process::pushFrame() {
         oss << "stack corruption: frame " << hex << stack.frame_new.get() << dec << " for function " << stack.frame_new->function_name << '/' << stack.frame_new->arguments->size() << " pushed more than once";
         throw oss.str();
     }
-    stack.frames.emplace_back(std::move(stack.frame_new));
+    stack.emplace_back(std::move(stack.frame_new));
 }
 void viua::process::Process::dropFrame() {
     /** Drops top-most frame from call stack.
@@ -563,7 +567,7 @@ viua::process::Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualP
 {
     global_register_set.reset(new viua::kernel::RegisterSet(DEFAULT_REGISTER_SIZE));
     currently_used_register_set = frm->local_register_set.get();
-    stack.frames.emplace_back(std::move(frm));
+    stack.emplace_back(std::move(frm));
 }
 
 viua::process::Process::~Process() {}

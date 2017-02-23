@@ -57,13 +57,14 @@ namespace viua {
 namespace viua {
     namespace process {
         class Stack {
+            std::vector<std::unique_ptr<Frame>> frames;
+
             public:
             const std::string entry_function;
 
             viua::internals::types::byte* jump_base;
             viua::internals::types::byte* instruction_pointer;
 
-            std::vector<std::unique_ptr<Frame>> frames;
             std::unique_ptr<Frame> frame_new;
             using size_type = decltype(frames)::size_type;
 
@@ -93,6 +94,8 @@ namespace viua {
 
             auto size() const -> decltype(frames)::size_type;
             auto clear() -> void;
+
+            auto emplace_back(std::unique_ptr<Frame> f) -> decltype(frames.emplace_back(f));
 
             Stack(std::string);
         };
