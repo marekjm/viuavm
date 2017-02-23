@@ -31,13 +31,16 @@
 using namespace std;
 
 
-viua::process::Stack::Stack(string fn):
+viua::process::Stack::Stack(string fn, viua::kernel::RegisterSet** curs, viua::kernel::RegisterSet* gs, viua::scheduler::VirtualProcessScheduler* sch):
     entry_function(fn),
     jump_base(nullptr),
     instruction_pointer(nullptr),
     frame_new(nullptr), try_frame_new(nullptr),
     thrown(nullptr), caught(nullptr),
-    return_value(nullptr)
+    currently_used_register_set(curs),
+    return_value(nullptr),
+    global_register_set(gs),
+    scheduler(sch)
 {
 }
 
@@ -73,6 +76,110 @@ auto viua::process::Stack::clear() -> void {
 
 auto viua::process::Stack::emplace_back(unique_ptr<Frame> frame) -> decltype(frames.emplace_back(frame)) {
     return frames.emplace_back(std::move(frame));
+}
+
+viua::internals::types::byte* viua::process::Stack::adjust_jump_base_for_block(const string& call_name) {
+    viua::internals::types::byte *entry_point = nullptr;
+    auto ep = scheduler->getEntryPointOfBlock(call_name);
+    entry_point = ep.first;
+    jump_base = ep.second;
+    return entry_point;
+}
+viua::internals::types::byte* viua::process::Stack::adjust_jump_base_for(const string& call_name) {
+    viua::internals::types::byte *entry_point = nullptr;
+    auto ep = scheduler->getEntryPointOf(call_name);
+    entry_point = ep.first;
+    jump_base = ep.second;
+    return entry_point;
+}
+
+auto viua::process::Stack::drop_frame() -> void {
+    unique_ptr<Frame> frame = pop();
+
+    for (viua::internals::types::register_index i = 0; i < frame->arguments->size(); ++i) {
+        if (frame->arguments->at(i) != nullptr and frame->arguments->isflagged(i, MOVED)) {
+            throw new viua::types::Exception("unused pass-by-move parameter");
+        }
+    }
+
+    if (size() == 0) {
+        return_value = frame->local_register_set->pop(0);
+    }
+
+    if (size()) {
+        *currently_used_register_set = back()->local_register_set.get();
+    } else {
+        *currently_used_register_set = global_register_set;
+    }
+}
+
+auto viua::process::Stack::adjust_instruction_pointer(TryFrame* tframe, string handler_found_for_type) -> void {
+    instruction_pointer = adjust_jump_base_for_block(tframe->catchers.at(handler_found_for_type)->catcher_name);
+}
+auto viua::process::Stack::unwind_call_stack_to(TryFrame* tframe) -> void {
+    size_type distance = 0;
+    for (size_type j = (size()-1); j > 1; --j) {
+        if (at(j).get() == tframe->associated_frame) {
+            break;
+        }
+        ++distance;
+    }
+    for (size_type j = 0; j < distance; ++j) {
+        drop_frame();
+    }
+}
+auto viua::process::Stack::unwind_try_stack_to(TryFrame* tframe) -> void {
+    while (tryframes.back().get() != tframe) {
+        tryframes.pop_back();
+    }
+}
+
+auto viua::process::Stack::unwind_to(TryFrame* tframe, string handler_found_for_type) -> void {
+    adjust_instruction_pointer(tframe, handler_found_for_type);
+    unwind_call_stack_to(tframe);
+    unwind_try_stack_to(tframe);
+}
+
+auto viua::process::Stack::find_catch_frame() -> tuple<TryFrame*, string> {
+    TryFrame* found_exception_frame = nullptr;
+    string caught_with_type = "";
+
+    for (decltype(tryframes)::size_type i = tryframes.size(); i > 0; --i) {
+        TryFrame* tframe = tryframes[(i-1)].get();
+        string handler_found_for_type = thrown->type();
+        bool handler_found = tframe->catchers.count(handler_found_for_type);
+
+        // FIXME: mutex
+        if ((not handler_found) and scheduler->isClass(handler_found_for_type)) {
+            vector<string> types_to_check = scheduler->inheritanceChainOf(handler_found_for_type);
+            for (decltype(types_to_check)::size_type j = 0; j < types_to_check.size(); ++j) {
+                if (tframe->catchers.count(types_to_check[j])) {
+                    handler_found = true;
+                    handler_found_for_type = types_to_check[j];
+                    break;
+                }
+            }
+        }
+
+        if (handler_found) {
+            found_exception_frame = tframe;
+            caught_with_type = handler_found_for_type;
+            break;
+        }
+    }
+
+    return tuple<TryFrame*, string>(found_exception_frame, caught_with_type);
+}
+
+auto viua::process::Stack::unwind() -> void {
+    TryFrame* tframe = nullptr;
+    string handler_found_for_type = "";
+
+    tie(tframe, handler_found_for_type) = find_catch_frame();
+    if (tframe != nullptr) {
+        unwind_to(tframe, handler_found_for_type);
+        caught = std::move(thrown);
+    }
 }
 
 
@@ -338,14 +445,7 @@ tuple<TryFrame*, string> viua::process::Process::findCatchFrame() {
     return tuple<TryFrame*, string>(found_exception_frame, caught_with_type);
 }
 void viua::process::Process::handleActiveException() {
-    TryFrame* tframe = nullptr;
-    string handler_found_for_type = "";
-
-    tie(tframe, handler_found_for_type) = findCatchFrame();
-    if (tframe != nullptr) {
-        unwindStack(tframe, handler_found_for_type);
-        stack.caught.reset(stack.thrown.release());
-    }
+    stack.unwind();
 }
 viua::internals::types::byte* viua::process::Process::tick() {
     bool halt = false;
@@ -558,7 +658,7 @@ void viua::process::Process::migrate_to(viua::scheduler::VirtualProcessScheduler
 
 viua::process::Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualProcessScheduler *sch, viua::process::Process* pt): scheduler(sch), parent_process(pt),
     global_register_set(nullptr), currently_used_register_set(nullptr),
-    stack(frm->function_name),
+    stack(frm->function_name, &currently_used_register_set, global_register_set.get(), scheduler),
     finished(false), is_joinable(true),
     is_suspended(false),
     process_priority(1),
@@ -568,6 +668,7 @@ viua::process::Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualP
     global_register_set.reset(new viua::kernel::RegisterSet(DEFAULT_REGISTER_SIZE));
     currently_used_register_set = frm->local_register_set.get();
     stack.emplace_back(std::move(frm));
+    stack.global_register_set = global_register_set.get();
 }
 
 viua::process::Process::~Process() {}

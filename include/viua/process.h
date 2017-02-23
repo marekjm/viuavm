@@ -77,12 +77,31 @@ namespace viua {
             std::unique_ptr<viua::types::Type> thrown;
             std::unique_ptr<viua::types::Type> caught;
 
+            /*
+             *  Currently used register set of parent process.
+             */
+            viua::kernel::RegisterSet** currently_used_register_set;
+
             /*  Variables set after the VM has executed bytecode.
              *  They describe exit conditions of the bytecode that just stopped running.
              */
             std::unique_ptr<viua::types::Type> return_value; // return value of top-most frame on the stack
 
+            viua::internals::types::byte* adjust_jump_base_for_block(const std::string&);
+            viua::internals::types::byte* adjust_jump_base_for(const std::string&);
+            void adjust_instruction_pointer(TryFrame*, std::string);
+            auto unwind_call_stack_to(TryFrame*) -> void;
+            auto unwind_try_stack_to(TryFrame*) -> void;
+            auto unwind_to(std::tuple<TryFrame*, std::string>) -> void;
+            auto unwind_to(TryFrame*, std::string) -> void;
+            auto find_catch_frame() -> std::tuple<TryFrame*, std::string>;
+
+            auto drop_frame() -> void;
+
             public:
+
+            viua::kernel::RegisterSet* global_register_set;
+            viua::scheduler::VirtualProcessScheduler* scheduler;
 
             auto begin() const -> decltype(frames.begin());
             auto end() const -> decltype(frames.end());
@@ -97,7 +116,9 @@ namespace viua {
 
             auto emplace_back(std::unique_ptr<Frame> f) -> decltype(frames.emplace_back(f));
 
-            Stack(std::string);
+            auto unwind() -> void;
+
+            Stack(std::string, viua::kernel::RegisterSet**, viua::kernel::RegisterSet*, viua::scheduler::VirtualProcessScheduler*);
         };
 
         class Process {
