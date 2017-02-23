@@ -78,9 +78,11 @@ namespace viua {
             std::unique_ptr<viua::types::Type> caught;
 
             /*
-             *  Currently used register set of parent process.
+             *  Currently used register, and
+             *  global register set of parent process.
              */
             viua::kernel::RegisterSet** currently_used_register_set;
+            viua::kernel::RegisterSet* global_register_set;
 
             /*  Variables set after the VM has executed bytecode.
              *  They describe exit conditions of the bytecode that just stopped running.
@@ -98,8 +100,9 @@ namespace viua {
 
             public:
 
-            viua::kernel::RegisterSet* global_register_set;
             viua::scheduler::VirtualProcessScheduler* scheduler;
+
+            auto bind(viua::kernel::RegisterSet**, viua::kernel::RegisterSet*) -> void;
 
             auto begin() const -> decltype(frames.begin());
             auto end() const -> decltype(frames.end());

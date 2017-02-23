@@ -38,10 +38,16 @@ viua::process::Stack::Stack(string fn, viua::kernel::RegisterSet** curs, viua::k
     frame_new(nullptr), try_frame_new(nullptr),
     thrown(nullptr), caught(nullptr),
     currently_used_register_set(curs),
-    return_value(nullptr),
     global_register_set(gs),
+    return_value(nullptr),
     scheduler(sch)
 {
+}
+
+
+auto viua::process::Stack::bind(viua::kernel::RegisterSet** curs, viua::kernel::RegisterSet* gs) -> void {
+    currently_used_register_set = curs;
+    global_register_set = gs;
 }
 
 auto viua::process::Stack::begin() const -> decltype(frames.begin()) {
@@ -585,7 +591,7 @@ viua::process::Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualP
     global_register_set.reset(new viua::kernel::RegisterSet(DEFAULT_REGISTER_SIZE));
     currently_used_register_set = frm->local_register_set.get();
     stack.emplace_back(std::move(frm));
-    stack.global_register_set = global_register_set.get();
+    stack.bind(&currently_used_register_set, global_register_set.get());
 }
 
 viua::process::Process::~Process() {}
