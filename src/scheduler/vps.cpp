@@ -486,7 +486,7 @@ void viua::scheduler::VirtualProcessScheduler::operator()() {
          *
          * The algorithm is simple: if current load is less than our fair share,
          * fetch a process.
-         * Repear until we're a good, hardworking scheduler.
+         * Repeat until we're a good, hardworking scheduler.
          */
         const auto total_processes = attached_kernel->pids();
         const auto running_schedulers = attached_kernel->no_of_vp_schedulers();
