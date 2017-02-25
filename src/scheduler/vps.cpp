@@ -315,6 +315,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
     }
 
     bool ticked = false;
+    bool any_active = false;
 
     vector<unique_ptr<viua::process::Process>> running_processes_list;
     decltype(running_processes_list) dead_processes_list;
@@ -328,6 +329,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
 #endif
         executeQuant(th, th->priority());
+        any_active = (any_active or ((not th->stopped()) and (not th->suspended())));
         ticked = (ticked or (not th->stopped()) or th->suspended());
 
         if (not (th->suspended() or th->terminated() or th->stopped())) {
@@ -456,6 +458,10 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
 
     processes.erase(processes.begin(), processes.end());
     processes.swap(running_processes_list);
+
+    if (not any_active) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
 
     return ticked;
 }
