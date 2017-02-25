@@ -115,6 +115,9 @@ namespace viua {
 
             auto emplace_back(std::unique_ptr<Frame> f) -> decltype(frames.emplace_back(f));
 
+            auto prepare_frame(viua::internals::types::register_index, viua::internals::types::register_index) -> Frame*;
+            auto push_prepared_frame() -> void;
+
             viua::internals::types::byte* adjust_jump_base_for_block(const std::string&);
             viua::internals::types::byte* adjust_jump_base_for(const std::string&);
             auto unwind() -> void;

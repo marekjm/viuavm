@@ -185,6 +185,31 @@ auto viua::process::Stack::unwind() -> void {
     }
 }
 
+auto viua::process::Stack::prepare_frame(viua::internals::types::register_index arguments_size, viua::internals::types::register_index registers_size) -> Frame* {
+    if (frame_new) { throw "requested new frame while last one is unused"; }
+    frame_new.reset(new Frame(nullptr, arguments_size, registers_size));
+    return frame_new.get();
+}
+
+auto viua::process::Stack::push_prepared_frame() -> void {
+    if (size() > MAX_STACK_SIZE) {
+        ostringstream oss;
+        oss << "stack size (" << MAX_STACK_SIZE << ") exceeded with call to '" << frame_new->function_name << '\'';
+        throw new viua::types::Exception(oss.str());
+    }
+
+    *currently_used_register_set = frame_new->local_register_set.get();
+    if (find(begin(), end(), frame_new) != end()) {
+        ostringstream oss;
+        oss << "stack corruption: frame ";
+        oss << hex << frame_new.get() << dec;
+        oss << " for function " << frame_new->function_name << '/' << frame_new->arguments->size();
+        oss << " pushed more than once";
+        throw oss.str();
+    }
+    emplace_back(std::move(frame_new));
+}
+
 
 viua::types::Type* viua::process::Process::fetch(viua::internals::types::register_index index) const {
     /*  Return pointer to object at given register.
@@ -247,15 +272,7 @@ void viua::process::Process::ensureStaticRegisters(string function_name) {
 }
 
 Frame* viua::process::Process::requestNewFrame(viua::internals::types::register_index arguments_size, viua::internals::types::register_index registers_size) {
-    /** Request new frame to be prepared.
-     *
-     *  Creates new frame if the new-frame hook is empty.
-     *  Throws an exception otherwise.
-     *  Returns pointer to the newly created frame.
-     */
-    if (stack.frame_new) { throw "requested new frame while last one is unused"; }
-    stack.frame_new.reset(new Frame(nullptr, arguments_size, registers_size));
-    return stack.frame_new.get();
+    return stack.prepare_frame(arguments_size, registers_size);
 }
 void viua::process::Process::pushFrame() {
     /** Pushes new frame to be the current (top-most) one.
