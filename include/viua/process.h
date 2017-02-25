@@ -89,8 +89,6 @@ namespace viua {
              */
             std::unique_ptr<viua::types::Type> return_value; // return value of top-most frame on the stack
 
-            viua::internals::types::byte* adjust_jump_base_for_block(const std::string&);
-            viua::internals::types::byte* adjust_jump_base_for(const std::string&);
             void adjust_instruction_pointer(TryFrame*, std::string);
             auto unwind_call_stack_to(TryFrame*) -> void;
             auto unwind_try_stack_to(TryFrame*) -> void;
@@ -117,6 +115,8 @@ namespace viua {
 
             auto emplace_back(std::unique_ptr<Frame> f) -> decltype(frames.emplace_back(f));
 
+            viua::internals::types::byte* adjust_jump_base_for_block(const std::string&);
+            viua::internals::types::byte* adjust_jump_base_for(const std::string&);
             auto unwind() -> void;
 
             Stack(std::string, viua::kernel::RegisterSet**, viua::kernel::RegisterSet*, viua::scheduler::VirtualProcessScheduler*);

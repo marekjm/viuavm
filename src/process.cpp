@@ -276,18 +276,10 @@ void viua::process::Process::pushFrame() {
 }
 
 viua::internals::types::byte* viua::process::Process::adjustJumpBaseForBlock(const string& call_name) {
-    viua::internals::types::byte *entry_point = nullptr;
-    auto ep = scheduler->getEntryPointOfBlock(call_name);
-    entry_point = ep.first;
-    stack.jump_base = ep.second;
-    return entry_point;
+    return stack.adjust_jump_base_for_block(call_name);
 }
 viua::internals::types::byte* viua::process::Process::adjustJumpBaseFor(const string& call_name) {
-    viua::internals::types::byte *entry_point = nullptr;
-    auto ep = scheduler->getEntryPointOf(call_name);
-    entry_point = ep.first;
-    stack.jump_base = ep.second;
-    return entry_point;
+    return stack.adjust_jump_base_for(call_name);
 }
 viua::internals::types::byte* viua::process::Process::callNative(viua::internals::types::byte* return_address, const string& call_name, viua::kernel::Register* return_register, const string&) {
     viua::internals::types::byte* call_address = adjustJumpBaseFor(call_name);
