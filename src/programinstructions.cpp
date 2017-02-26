@@ -419,6 +419,14 @@ Program& Program::opcall(int_op reg, const string& fn_name) {
     return (*this);
 }
 
+Program& Program::opcall(int_op reg, int_op fn) {
+    /*  Inserts call instruction.
+     *  Byte offset is calculated automatically.
+     */
+    addr_ptr = cg::bytecode::opcall(addr_ptr, reg, fn);
+    return (*this);
+}
+
 Program& Program::optailcall(const string& fn_name) {
     /*  Inserts tailcall instruction.
      *  Byte offset is calculated automatically.

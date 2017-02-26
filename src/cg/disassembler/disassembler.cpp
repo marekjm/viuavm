@@ -21,6 +21,7 @@
 #include <sstream>
 #include <viua/bytecode/opcodes.h>
 #include <viua/bytecode/maps.h>
+#include <viua/bytecode/operand_types.h>
 #include <viua/support/string.h>
 #include <viua/support/pointer.h>
 #include <viua/cg/disassembler/disassembler.h>
@@ -234,10 +235,15 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
         oss << ' ';
-        string fn_name = string(reinterpret_cast<char*>(ptr));
-        oss << fn_name;
-        ptr += fn_name.size();
-        ++ptr; // for null character terminating the C-style string not included in std::string
+
+        if (OperandType(*ptr) == OT_REGISTER_INDEX or OperandType(*ptr) == OT_POINTER) {
+            ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
+        } else {
+            string fn_name = string(reinterpret_cast<char*>(ptr));
+            oss << fn_name;
+            ptr += fn_name.size();
+            ++ptr; // for null character terminating the C-style string not included in std::string
+        }
     } else if ((op == CLASS) or (op == NEW) or (op == DERIVE) or (op == MSG)) {
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 

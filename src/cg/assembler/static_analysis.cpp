@@ -697,9 +697,15 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             i = skip_till_next_line(body_tokens, i);
         } else if (token == "msg" or token == "call" or token == "process") {
             TokenIndex target = get_token_index_of_operand(body_tokens, i, 1);
+            TokenIndex function = target + 2;
 
             if (body_tokens.at(target) != "void") {
                 registers.insert(resolve_register_name(named_registers, body_tokens.at(target)), body_tokens.at(target));
+            } else {
+                --function;
+            }
+            if (body_tokens.at(function).str().at(0) == '%' or body_tokens.at(function).str().at(0) == '*') {
+                check_use_of_register(body_tokens, function, function, registers, named_registers, "call from empty register");
             }
             i = skip_till_next_line(body_tokens, i);
             continue;

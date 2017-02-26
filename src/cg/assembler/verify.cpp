@@ -65,8 +65,10 @@ void assembler::verify::functionCallsAreDefined(const vector<Token>& tokens, con
             if (tokens.at(i+1) != "void") {
                 function_name = tokens.at(i+3);
             }
-            if (not is_defined(function_name, function_names, function_signatures)) {
-                throw viua::cg::lex::InvalidSyntax(function_name, (string(token == "call" ? "call to" : "process from") + " undefined function " + function_name.str()));
+            if (function_name.str().at(0) != '*' and function_name.str().at(0) != '%') {
+                if (not is_defined(function_name, function_names, function_signatures)) {
+                    throw viua::cg::lex::InvalidSyntax(function_name, (string(token == "call" ? "call to" : "process from") + " undefined function " + function_name.str()));
+                }
             }
         }
     }
@@ -99,11 +101,16 @@ void assembler::verify::functionCallArities(const vector<Token>& tokens) {
             function_name = tokens.at(i+1);
         }
 
-        if (not assembler::utils::isValidFunctionName(function_name)) {
+        if (not (function_name.str().at(0) == '*' or function_name.str().at(0) == '%' or assembler::utils::isValidFunctionName(function_name))) {
             throw viua::cg::lex::InvalidSyntax(function_name, ("not a valid function name: " + str::strencode(function_name)));
         }
 
         int arity = assembler::utils::getFunctionArity(function_name);
+
+        if (function_name.str().at(0) == '*' or function_name.str().at(0) == '%') {
+            // skip arity checks for functions called indirectly
+            continue;
+        }
 
         if (arity == -1) {
             ostringstream report;
@@ -150,7 +157,7 @@ void assembler::verify::msgArities(const vector<Token>& tokens) {
             function_name = tokens.at(i+2);
         }
 
-        if (not assembler::utils::isValidFunctionName(function_name)) {
+        if (not (function_name.str().at(0) == '*' or function_name.str().at(0) == '%' or assembler::utils::isValidFunctionName(function_name))) {
             throw viua::cg::lex::InvalidSyntax(function_name, ("not a valid function name: " + str::strencode(function_name)));
         }
 

@@ -125,6 +125,7 @@ class Program {
     Program& opargc(int_op);
 
     Program& opcall(int_op, const std::string&);
+    Program& opcall(int_op, int_op);
     Program& optailcall(const std::string&);
     Program& opprocess(int_op, const std::string&);
     Program& opself(int_op);
