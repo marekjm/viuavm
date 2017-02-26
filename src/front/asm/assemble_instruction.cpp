@@ -537,22 +537,6 @@ viua::internals::types::bytecode_size assemble_instruction(Program& program, viu
             assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
             , tokens.at(source)
         );
-    } else if (tokens.at(i) == "fcall") {
-        TokenIndex target = i + 1;
-        TokenIndex source = target + 2;
-
-        if (tokens.at(target) == "void") {
-            --source;
-            program.opfcall(
-                assembler::operands::getint(resolveregister(tokens.at(target)))
-                , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
-            );
-        } else {
-            program.opfcall(
-                assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
-                , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
-            );
-        }
     } else if (tokens.at(i) == "frame") {
         TokenIndex target = i + 1;
         TokenIndex source = target + 1;

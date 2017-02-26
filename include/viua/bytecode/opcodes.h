@@ -88,7 +88,6 @@ enum OPCODE : viua::internals::types::byte {
     CLOSURE,
 
     FUNCTION,
-    FCALL,
 
     // Opcodes related to functions.
     FRAME,  // create new frame (required before param and pamv) for future function call

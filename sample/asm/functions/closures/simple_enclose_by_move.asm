@@ -30,7 +30,7 @@
     print (isnull %3 %2)
 
     frame %0
-    fcall void %1
+    call void %1
 
     izero %0 local
     return

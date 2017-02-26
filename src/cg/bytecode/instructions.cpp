@@ -383,10 +383,6 @@ namespace cg {
             return insertString(addr_ptr, fn);
         }
 
-        viua::internals::types::byte* opfcall(viua::internals::types::byte* addr_ptr, int_op clsr, int_op ret) {
-            return insert_two_ri_instruction(addr_ptr, FCALL, clsr, ret);
-        }
-
         viua::internals::types::byte* opframe(viua::internals::types::byte* addr_ptr, int_op a, int_op b) {
             return insert_two_ri_instruction(addr_ptr, FRAME, a, b);
         }

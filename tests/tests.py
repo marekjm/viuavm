@@ -1197,7 +1197,7 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'isnull_fails_on_nonempty_registers.asm', "./sample/asm/static_analysis_errors/isnull_fails_on_nonempty_registers.asm:22:19: error: useless check, register will always be defined: 1")
 
     def testFcallFromEmptyRegister(self):
-        runTestFailsToAssemble(self, 'fcall_from_empty_register.asm', "./sample/asm/static_analysis_errors/fcall_from_empty_register.asm:22:16: error: fcall from empty register: 1")
+        runTestFailsToAssemble(self, 'fcall_from_empty_register.asm', "./sample/asm/static_analysis_errors/fcall_from_empty_register.asm:22:15: error: call from empty register: 1")
 
     def testJoinFromEmptyRegister(self):
         runTestFailsToAssemble(self, 'join_from_empty_register.asm', "./sample/asm/static_analysis_errors/join_from_empty_register.asm:21:13: error: join from empty register: 1")

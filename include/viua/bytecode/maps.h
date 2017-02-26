@@ -88,7 +88,6 @@ const std::set<std::string> OP_MNEMONICS = {
     "closure",
 
     "function",
-    "fcall",
 
     "frame",
     "param",
@@ -191,7 +190,6 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { CLOSURE,      "closure" },
 
     { FUNCTION,     "function" },
-    { FCALL,        "fcall" },
 
     { FRAME,        "frame" },
     { PARAM,        "param" },

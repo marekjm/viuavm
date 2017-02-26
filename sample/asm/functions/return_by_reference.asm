@@ -32,7 +32,7 @@
 
     frame %0
     ; store return value in another register (it is a reference!)
-    fcall %3 %2
+    call %3 %2
 
     ; assign different value to it
     istore %3 42

@@ -22,6 +22,7 @@
 #include <viua/types/integer.h>
 #include <viua/types/reference.h>
 #include <viua/types/function.h>
+#include <viua/types/closure.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/scheduler/vps.h>
@@ -141,6 +142,10 @@ viua::internals::types::byte* viua::process::Process::opcall(viua::internals::ty
             throw new viua::types::Exception("type is not callable: " + fn_source->type());
         }
         call_name = fn->name();
+
+        if (fn->type() == "Closure") {
+            stack.frame_new->setLocalRegisterSet(static_cast<viua::types::Closure*>(fn)->rs(), false);
+        }
     } else {
         tie(addr, call_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
     }

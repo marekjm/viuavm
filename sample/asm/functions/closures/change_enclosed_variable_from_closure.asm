@@ -33,7 +33,7 @@
 
     ; call the closure
     frame %0
-    fcall void %2
+    call void %2
 
     ; should print "42"
     print %1

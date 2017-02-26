@@ -46,11 +46,11 @@
 
     ptr %pointer %adder
     frame ^[(param %iota %one) (param %iota %one)]
-    print (fcall %result *pointer)
+    print (call %result *pointer)
 
     ptr %pointer %multipler
     frame ^[(param %iota %one) (param %iota %one)]
-    print (fcall %result *pointer)
+    print (call %result *pointer)
 
     izero %0 local
     return

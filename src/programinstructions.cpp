@@ -350,13 +350,6 @@ Program& Program::opfunction(int_op reg, const string& fn) {
     return (*this);
 }
 
-Program& Program::opfcall(int_op clsr, int_op ret) {
-    /*  Inserts fcall instruction to bytecode.
-     */
-    addr_ptr = cg::bytecode::opfcall(addr_ptr, clsr, ret);
-    return (*this);
-}
-
 Program& Program::opframe(int_op a, int_op b) {
     /*  Inserts frame instruction to bytecode.
      */

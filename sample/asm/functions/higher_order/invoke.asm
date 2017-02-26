@@ -66,7 +66,7 @@
 
     ; finally, after the frame is ready
     ; call the function
-    move %0 (fcall %iota %fn_to_call)
+    move %0 (call %iota %fn_to_call)
     return
 .end
 

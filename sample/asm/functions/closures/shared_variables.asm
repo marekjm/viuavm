@@ -63,14 +63,14 @@
 
     frame %0
     vat (.name: %iota printer_closure) %the_closures 0
-    fcall void *printer_closure
+    call void *printer_closure
 
     frame ^[(param %0 (istore %iota 69))]
     vat (.name: %iota setter_closure) %the_closures 1
-    fcall void *setter_closure
+    call void *setter_closure
 
     frame %0
-    fcall void *printer_closure
+    call void *printer_closure
 
     izero %0 local
     return

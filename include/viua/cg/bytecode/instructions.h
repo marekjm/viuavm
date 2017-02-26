@@ -116,7 +116,6 @@ namespace cg {
         viua::internals::types::byte* opcapturemove(viua::internals::types::byte*, int_op, int_op, int_op);
         viua::internals::types::byte* opclosure(viua::internals::types::byte*, int_op, const std::string&);
         viua::internals::types::byte* opfunction(viua::internals::types::byte*, int_op, const std::string&);
-        viua::internals::types::byte* opfcall(viua::internals::types::byte*, int_op, int_op);
 
         viua::internals::types::byte* opframe(viua::internals::types::byte*, int_op, int_op);
         viua::internals::types::byte* opparam(viua::internals::types::byte*, int_op, int_op);

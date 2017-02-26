@@ -38,7 +38,7 @@
     ; create frame for our closure and
     ; call it
     frame %0 %0
-    fcall void %bar
+    call void %bar
 
     izero %0 local
     return

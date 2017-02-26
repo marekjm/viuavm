@@ -155,9 +155,6 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case FUNCTION:
               addr = opfunction(addr+1);
             break;
-        case FCALL:
-              addr = opfcall(addr+1);
-            break;
         case FRAME:
               addr = opframe(addr+1);
             break;

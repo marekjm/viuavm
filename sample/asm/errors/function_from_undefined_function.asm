@@ -21,7 +21,7 @@
     function %1 foo/0
 
     frame %0
-    fcall void %1
+    call void %1
 
     izero %0 local
     return

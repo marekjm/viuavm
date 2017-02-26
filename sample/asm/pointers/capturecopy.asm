@@ -29,7 +29,7 @@
     capturecopy %cl %1 *pointer
 
     frame %0
-    fcall void %cl
+    call void %cl
 
     izero %0 local
     return

@@ -51,7 +51,7 @@
     frame %1
     vat %7 %2 @4
     param %0 %7
-    fcall %8 %1
+    call %8 %1
 
     ; if the result from filtering function was "true" - the element should be pushed onto result vector
     ; it it was "false" - skip to next iteration
@@ -100,7 +100,7 @@
 
     ; invoke given callback
     frame ^[(param %0 %element)]
-    fcall void %callback
+    call void %callback
 
     iinc %counter
     jump loop_begin
@@ -139,7 +139,7 @@
     frame %1
     vat %7 %2 @4
     param %0 %7
-    fcall %8 %1
+    call %8 %1
 
     ; push result to new vector
     vpush %3 %8
@@ -161,7 +161,7 @@
     ; FIXME refactor this to use ^[] syntax
     frame %1
     param %0 %2
-    fcall %3 %1
+    call %3 %1
     move %0 %3
     leave
 .end
@@ -185,7 +185,7 @@
     ; apply the function to the parameter...
     ;frame %1
     ;param %0 parameter
-    ;fcall %3 func
+    ;call %3 func
     try
     catch "Exception" std::functional::apply::__catch
     enter std::functional::apply::__try_calling
@@ -239,7 +239,7 @@
 
     ; finally, after the frame is ready
     ; call the function
-    fcall %8 %1
+    call %8 %1
     move %0 %8
     return
 .end

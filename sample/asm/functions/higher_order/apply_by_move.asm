@@ -34,7 +34,7 @@
 
     ; apply the function to the parameter...
     frame ^[(pamv %0 (arg %parameter %1))]
-    fcall %3 (arg %func %0)
+    call %3 (arg %func %0)
 
     ; ...and return the result
     move %0 %3

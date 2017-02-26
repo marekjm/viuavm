@@ -61,7 +61,7 @@
 
     ; ...and if the result from filtering function was "true" - the element should be pushed onto result vector
     ; it it was "false" - skip to next iteration
-    if (fcall %8 %1) element_ok next_iter
+    if (call %8 %1) element_ok next_iter
 
     .mark: element_ok
     vpush %3 *7

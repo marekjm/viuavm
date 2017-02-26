@@ -329,7 +329,6 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         case STOI:
         case STOF:
         case ISNULL:
-        case FCALL:
         case NOT:
         case MOVE:
         case COPY:

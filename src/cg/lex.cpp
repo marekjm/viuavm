@@ -349,24 +349,6 @@ namespace viua {
                         }
 
                         tokens.push_back(input_tokens.at(++i));
-                    } else if (token == "fcall") {
-                        tokens.push_back(token);
-
-                        tokens.push_back(input_tokens.at(++i));
-                        if (tokens.back().str() != "void") {
-                            if (not is_register_set_name(input_tokens.at(i+1))) {
-                                tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
-                            } else {
-                                tokens.push_back(input_tokens.at(++i));
-                            }
-                        }
-
-                        tokens.push_back(input_tokens.at(++i));
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
-                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
-                        } else {
-                            tokens.push_back(input_tokens.at(++i));
-                        }
                     } else if (token == "frame") {
                         tokens.push_back(token);
 

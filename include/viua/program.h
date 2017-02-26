@@ -116,7 +116,6 @@ class Program {
     Program& opclosure(int_op, const std::string&);
 
     Program& opfunction(int_op, const std::string&);
-    Program& opfcall(int_op, int_op);
 
     Program& opframe(int_op, int_op);
     Program& opparam(int_op, int_op);

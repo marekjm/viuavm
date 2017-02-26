@@ -248,7 +248,6 @@ namespace viua {
             viua::internals::types::byte* opclosure(viua::internals::types::byte*);
 
             viua::internals::types::byte* opfunction(viua::internals::types::byte*);
-            viua::internals::types::byte* opfcall(viua::internals::types::byte*);
 
             viua::internals::types::byte* opframe(viua::internals::types::byte*);
             viua::internals::types::byte* opparam(viua::internals::types::byte*);

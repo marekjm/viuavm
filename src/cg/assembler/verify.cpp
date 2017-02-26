@@ -241,12 +241,12 @@ void assembler::verify::frameBalance(const vector<Token>& tokens) {
     Token previous_frame_spawned;
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
         instruction = tokens.at(i);
-        if (not (instruction == "call" or instruction == "tailcall" or instruction == "process" or instruction == "fcall" or instruction == "frame" or instruction == "msg" or
+        if (not (instruction == "call" or instruction == "tailcall" or instruction == "process" or instruction == "frame" or instruction == "msg" or
                  instruction == "return" or instruction == "leave" or instruction == "throw" or instruction == ".end")) {
             continue;
         }
 
-        if (instruction == "call" or instruction == "tailcall" or instruction == "process" or instruction == "fcall" or instruction == "msg") {
+        if (instruction == "call" or instruction == "tailcall" or instruction == "process" or instruction == "msg") {
             --balance;
         }
         if (instruction == "frame") {
@@ -475,6 +475,7 @@ void assembler::verify::instructions(const vector<Token>& tokens) {
 void assembler::verify::framesHaveNoGaps(const vector<Token>& tokens) {
     unsigned long frame_parameters_count = 0;
     bool detected_frame_parameters_count = false;
+    bool slot_index_detection_is_reliable = true;
     unsigned long last_frame = 0;
 
     vector<bool> filled_slots;
@@ -498,12 +499,16 @@ void assembler::verify::framesHaveNoGaps(const vector<Token>& tokens) {
             } else {
                 detected_frame_parameters_count = false;
             }
+            slot_index_detection_is_reliable = true;
             continue;
         }
 
         if (tokens.at(i) == "param" or tokens.at(i) == "pamv") {
             unsigned long slot_index;
             bool detected_slot_index = false;
+            if (tokens.at(i+1).str().at(0) == '@') {
+                slot_index_detection_is_reliable = false;
+            }
             if (tokens.at(i+1).str().at(0) == '%' and str::isnum(tokens.at(i+1).str().substr(1))) {
                 slot_index = stoul(tokens.at(i+1).str().substr(1));
                 detected_slot_index = true;
@@ -526,7 +531,7 @@ void assembler::verify::framesHaveNoGaps(const vector<Token>& tokens) {
             continue;
         }
 
-        if (tokens.at(i) == "call" or tokens.at(i) == "process") {
+        if (slot_index_detection_is_reliable and (tokens.at(i) == "call" or tokens.at(i) == "process")) {
             for (decltype(frame_parameters_count) f = 0; f < frame_parameters_count; ++f) {
                 if (not filled_slots[f]) {
                     ostringstream report;
