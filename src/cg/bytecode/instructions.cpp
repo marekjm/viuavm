@@ -430,6 +430,10 @@ namespace cg {
             return insertString(addr_ptr, fn_name);
         }
 
+        viua::internals::types::byte* opprocess(viua::internals::types::byte* addr_ptr, int_op reg, int_op fn) {
+            return insert_two_ri_instruction(addr_ptr, PROCESS, reg, fn);
+        }
+
         viua::internals::types::byte* opself(viua::internals::types::byte* addr_ptr, int_op target) {
             *(addr_ptr++) = SELF;
             return insert_ri_operand(addr_ptr, target);

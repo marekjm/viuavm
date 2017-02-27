@@ -438,6 +438,11 @@ Program& Program::opprocess(int_op ref, const string& fn_name) {
     return (*this);
 }
 
+Program& Program::opprocess(int_op reg, int_op fn) {
+    addr_ptr = cg::bytecode::opprocess(addr_ptr, reg, fn);
+    return (*this);
+}
+
 Program& Program::opself(int_op target) {
     /*  Inserts self instuction.
      */

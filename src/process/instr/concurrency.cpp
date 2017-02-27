@@ -22,6 +22,8 @@
 #include <viua/types/boolean.h>
 #include <viua/types/reference.h>
 #include <viua/types/process.h>
+#include <viua/types/function.h>
+#include <viua/types/closure.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/scheduler/vps.h>
@@ -39,7 +41,23 @@ viua::internals::types::byte* viua::process::Process::opprocess(viua::internals:
     }
 
     string call_name;
-    tie(addr, call_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
+    auto ot = viua::bytecode::decoder::operands::get_operand_type(addr);
+    if (ot == OT_REGISTER_INDEX or ot == OT_POINTER) {
+        viua::types::Type* fn_source = nullptr;
+        tie(addr, fn_source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+
+        auto fn = dynamic_cast<viua::types::Function*>(fn_source);
+        if (not fn) {
+            throw new viua::types::Exception("type is not callable: " + fn_source->type());
+        }
+        call_name = fn->name();
+
+        if (fn->type() == "Closure") {
+            throw new viua::types::Exception("cannot spawn a process from closure");
+        }
+    } else {
+        tie(addr, call_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
+    }
 
     bool is_native = scheduler->isNativeFunction(call_name);
     bool is_foreign = scheduler->isForeignFunction(call_name);
