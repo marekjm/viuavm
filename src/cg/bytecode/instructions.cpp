@@ -419,6 +419,11 @@ namespace cg {
             return insertString(addr_ptr, fn_name);
         }
 
+        viua::internals::types::byte* optailcall(viua::internals::types::byte* addr_ptr, int_op fn) {
+            *(addr_ptr++) = TAILCALL;
+            return insert_ri_operand(addr_ptr, fn);
+        }
+
         viua::internals::types::byte* opprocess(viua::internals::types::byte* addr_ptr, int_op reg, const string& fn_name) {
             *(addr_ptr++) = PROCESS;
             addr_ptr = insert_ri_operand(addr_ptr, reg);

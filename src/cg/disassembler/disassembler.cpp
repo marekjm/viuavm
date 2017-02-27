@@ -252,7 +252,18 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         oss << fn_name;
         ptr += fn_name.size();
         ++ptr; // for null character terminating the C-style string not included in std::string
-    } else if ((op == IMPORT) or (op == ENTER) or (op == LINK) or (op == WATCHDOG) or (op == TAILCALL)) {
+    } else if (op == TAILCALL) {
+        oss << ' ';
+
+        if (OperandType(*ptr) == OT_REGISTER_INDEX or OperandType(*ptr) == OT_POINTER) {
+            ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
+        } else {
+            string fn_name = string(reinterpret_cast<char*>(ptr));
+            oss << fn_name;
+            ptr += fn_name.size();
+            ++ptr; // for null character terminating the C-style string not included in std::string
+        }
+    } else if ((op == IMPORT) or (op == ENTER) or (op == LINK) or (op == WATCHDOG)) {
         oss << ' ';
         string s = string(reinterpret_cast<char*>(ptr));
         oss << (op == IMPORT ? str::enquote(s) : s);

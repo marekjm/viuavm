@@ -428,6 +428,11 @@ Program& Program::optailcall(const string& fn_name) {
     return (*this);
 }
 
+Program& Program::optailcall(int_op fn) {
+    addr_ptr = cg::bytecode::optailcall(addr_ptr, fn);
+    return (*this);
+}
+
 Program& Program::opprocess(int_op ref, const string& fn_name) {
     addr_ptr = cg::bytecode::opprocess(addr_ptr, ref, fn_name);
     return (*this);

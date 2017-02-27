@@ -125,6 +125,7 @@ namespace cg {
         viua::internals::types::byte* opcall(viua::internals::types::byte*, int_op, const std::string&);
         viua::internals::types::byte* opcall(viua::internals::types::byte*, int_op, int_op);
         viua::internals::types::byte* optailcall(viua::internals::types::byte*, const std::string&);
+        viua::internals::types::byte* optailcall(viua::internals::types::byte*, int_op);
         viua::internals::types::byte* opprocess(viua::internals::types::byte*, int_op, const std::string&);
         viua::internals::types::byte* opself(viua::internals::types::byte*, int_op);
         viua::internals::types::byte* opjoin(viua::internals::types::byte*, int_op, int_op, timeout_op);
