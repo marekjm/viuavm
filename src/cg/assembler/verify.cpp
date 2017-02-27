@@ -55,10 +55,17 @@ void assembler::verify::functionCallsAreDefined(const vector<Token>& tokens, con
             continue;
         }
 
-        if (token == "tailcall" or token == "watchdog") {
-            string function_name = tokens.at(i+1);
+        if (token == "tailcall") {
+            auto function_name = tokens.at(i+1);
+            if (function_name.str().at(0) != '*' and function_name.str().at(0) != '%') {
+                if (not is_defined(function_name, function_names, function_signatures)) {
+                    throw viua::cg::lex::InvalidSyntax(function_name, (string(token == "tailcall" ? "tail call to" : "watchdog from") + " undefined function " + function_name.str()));
+                }
+            }
+        } else if (token == "watchdog") {
+            auto function_name = tokens.at(i+1);
             if (not is_defined(function_name, function_names, function_signatures)) {
-                throw viua::cg::lex::InvalidSyntax(tokens.at(i+1), (string(token == "tailcall" ? "tail call to" : "watchdog from") + " undefined function " + function_name));
+                throw viua::cg::lex::InvalidSyntax(function_name, (string(token == "tailcall" ? "tail call to" : "watchdog from") + " undefined function " + function_name.str()));
             }
         } else if (token == "call" or token == "process") {
             Token function_name = tokens.at(i+2);
@@ -222,8 +229,8 @@ void assembler::verify::functionsEndWithReturn(const std::vector<Token>& tokens)
             continue;
         }
 
-        bool last_token_returns = (tokens.at(i-1) == "return" or tokens.at(i-2) == "tailcall");
-        bool last_but_one_token_returns = (tokens.at(i-1) == "\n" and (tokens.at(i-2) == "return" or tokens.at(i-3) == "tailcall"));
+        bool last_token_returns = (tokens.at(i-1) == "return" or tokens.at(i-2) == "tailcall" or tokens.at(i-3) == "tailcall");
+        bool last_but_one_token_returns = (tokens.at(i-1) == "\n" and (tokens.at(i-2) == "return" or tokens.at(i-3) == "tailcall" or tokens.at(i-4) == "tailcall"));
         if (not (last_token_returns or last_but_one_token_returns)) {
             throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("function does not end with 'return' or 'tailcall': " + function));
         }

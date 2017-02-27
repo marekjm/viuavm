@@ -628,7 +628,11 @@ viua::internals::types::bytecode_size assemble_instruction(Program& program, viu
             program.opcall(ret, tokens.at(fn));
         }
     } else if (tokens.at(i) == "tailcall") {
-        program.optailcall(tokens.at(i+1));
+        if (tokens.at(i+1).str().at(0) == '*' or tokens.at(i+1).str().at(0) == '%') {
+            program.optailcall(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(i+1)), resolve_rs_type(tokens.at(i+2))));
+        } else {
+            program.optailcall(tokens.at(i+1));
+        }
     } else if (tokens.at(i) == "process") {
         TokenIndex target = i + 1;
         TokenIndex fn = target + 2;

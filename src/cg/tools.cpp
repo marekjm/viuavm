@@ -555,8 +555,14 @@ namespace viua {
             static auto size_of_tailcall(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 viua::internals::types::bytecode_size calculated_size = sizeof(viua::internals::types::byte);    // start with the size of a single opcode
 
-                calculated_size += tokens.at(i).str().size() + 1;
-                ++i;
+                if (tokens.at(i).str().at(0) == '*' or tokens.at(i).str().at(0) == '%') {
+                    decltype(calculated_size) size_increment = 0;
+                    tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
+                    calculated_size += size_increment;
+                } else {
+                    calculated_size += tokens.at(i).str().size() + 1;
+                    ++i;
+                }
 
                 return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
             }

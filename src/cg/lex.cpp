@@ -349,6 +349,19 @@ namespace viua {
                         }
 
                         tokens.push_back(input_tokens.at(++i));
+                    } else if (token == "tailcall") {
+                        tokens.push_back(token);
+
+                        tokens.push_back(input_tokens.at(++i));
+                        if (is_register_index(tokens.back())) {
+                            if (is_register_set_name(input_tokens.at(i+1))) {
+                                tokens.push_back(input_tokens.at(++i));
+                            } else {
+                                tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                            }
+                        }
+
+                        tokens.push_back(input_tokens.at(++i));
                     } else if (token == "frame") {
                         tokens.push_back(token);
 

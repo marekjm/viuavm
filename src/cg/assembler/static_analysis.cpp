@@ -335,7 +335,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             continue;
         }
         if (token == ".mark:" or token == ".link:" or token == "nop" or token == "tryframe" or token == "try" or token == "catch" or token == "frame" or
-            token == "tailcall" or token == "halt" or
+            token == "halt" or
             token == "watchdog" or
             token == "link" or token == "import") {
             i = skip_till_next_line(body_tokens, i);
@@ -690,6 +690,14 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             } else {
                 --function;
             }
+            if (body_tokens.at(function).str().at(0) == '%' or body_tokens.at(function).str().at(0) == '*') {
+                check_use_of_register(body_tokens, function, function, registers, named_registers, "call from empty register");
+            }
+            i = skip_till_next_line(body_tokens, i);
+            continue;
+        } else if (token == "tailcall") {
+            TokenIndex function = i + 1;
+
             if (body_tokens.at(function).str().at(0) == '%' or body_tokens.at(function).str().at(0) == '*') {
                 check_use_of_register(body_tokens, function, function, registers, named_registers, "call from empty register");
             }
