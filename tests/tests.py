@@ -373,6 +373,15 @@ def extractFirstException(output):
 def runTestThrowsException(self, name, expected_output, assembly_opts=None):
     runTest(self, name, expected_output, expected_exit_code=1, output_processing_function=extractFirstException, valgrind_enable=False, assembly_opts=assembly_opts)
 
+def runTestThrowsExceptionJSON(self, name, expected_output, output_processing_function, assembly_opts=None):
+    was = os.environ.get('VIUA_STACKTRACE_SERIALISATION', 'default')
+    was_to = os.environ.get('VIUA_STACKTRACE_PRINT_TO', 'stderr')
+    os.environ['VIUA_STACKTRACE_SERIALISATION'] = 'json'
+    os.environ['VIUA_STACKTRACE_PRINT_TO'] = 'stdout'
+    runTest(self, name, expected_output, expected_exit_code=1, output_processing_function=output_processing_function, valgrind_enable=False, assembly_opts=assembly_opts)
+    os.environ['VIUA_STACKTRACE_SERIALISATION'] = was
+    os.environ['VIUA_STACKTRACE_PRINT_TO'] = was_to
+
 def runTestReportsException(self, name, expected_output, assembly_opts=None):
     runTest(self, name, expected_output, expected_exit_code=0, output_processing_function=extractFirstException, assembly_opts=assembly_opts)
 
