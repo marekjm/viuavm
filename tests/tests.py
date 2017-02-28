@@ -828,6 +828,9 @@ class HigherOrderFunctionTests(unittest.TestCase):
         # FIXME --no-sa may be removed once closures are differentatied from functions
         runTest(self, 'filter_closure_vector_by_move.asm', [[1, 2, 3, 4, 5], [2, 4]], 0, lambda o: [json.loads(i) for i in o.splitlines()], assembly_opts=('--no-sa',))
 
+    def testTailcallOfObject(self):
+        runTestThrowsExceptionJSON(self, 'tailcall_of_object.asm', {'frame': {}, 'trace': ['main/0/0()', 'foo/0/0()',], 'uncaught': {'type': 'Integer', 'value': '42',}}, output_processing_function=lambda s: json.loads(s.strip()))
+
 
 class ClosureTests(unittest.TestCase):
     """Tests for closures.
