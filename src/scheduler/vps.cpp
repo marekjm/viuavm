@@ -21,6 +21,7 @@
 #include <string>
 #include <sstream>
 #include <viua/support/env.h>
+#include <viua/support/string.h>
 #include <viua/machine.h>
 #include <viua/printutils.h>
 #include <viua/types/vector.h>
@@ -34,7 +35,7 @@
 using namespace std;
 
 
-static void printStackTrace(viua::process::Process *process) {
+static auto print_stack_trace_default(viua::process::Process *process) -> void {
     auto trace = process->trace();
     cout << "stack trace: from entry point, most recent call last...\n";
     decltype(trace)::size_type i = 0;
@@ -97,6 +98,61 @@ static void printStackTrace(viua::process::Process *process) {
         }
     } else {
         cout << "no stack trace available" << endl;
+    }
+}
+static auto print_stack_trace_json(viua::process::Process *process) -> void {
+    ostringstream oss;
+    oss << '{';
+
+    oss << "\"trace\":[";
+    auto trace = process->trace();
+    decltype(trace)::size_type i = 0;
+    if (support::env::getvar("VIUA_STACK_TRACES") != "full") {
+        i = (trace.size() and trace[0]->function_name == "__entry");
+    }
+    for (; i < trace.size(); ++i) {
+        oss << str::enquote(stringifyFunctionInvocation(trace[i]));
+        if (i < trace.size()-1) {
+            oss << ',';
+        }
+    }
+    oss << "],";
+
+    unique_ptr<viua::types::Type> thrown_object(process->transferActiveException());
+    oss << "\"uncaught\":{";
+    oss << "\"type\":" << str::enquote(thrown_object->type()) << ',';
+    oss << "\"value\":" << str::enquote(thrown_object->str());
+    oss << "},";
+
+    oss << "\"frame\":{";
+    oss << "}";
+
+    oss << '}';
+
+    auto to = support::env::getvar("VIUA_STACKTRACE_PRINT_TO");
+    if (to == "") {
+        to = "stdout";
+    }
+    if (to == "stdout") {
+        cout << oss.str() << endl;
+    } else if (to == "stderr") {
+        cerr << oss.str() << endl;
+    } else {
+        cerr << oss.str() << endl;
+    }
+}
+static void printStackTrace(viua::process::Process *process) {
+    auto stack_trace_print_type = support::env::getvar("VIUA_STACKTRACE_SERIALISATION");
+    if (stack_trace_print_type == "") {
+        stack_trace_print_type = "default";
+    }
+
+    if (stack_trace_print_type == "default") {
+        print_stack_trace_default(process);
+    } else if (stack_trace_print_type == "json") {
+        print_stack_trace_json(process);
+    } else {
+        print_stack_trace_default(process);
     }
 }
 
