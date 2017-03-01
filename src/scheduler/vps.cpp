@@ -59,7 +59,7 @@ static auto print_stack_trace_default(viua::process::Process *process) -> void {
 
     if (trace.size()) {
         Frame* last = trace.back();
-        if (last->local_register_set->size()) {
+        if (last->local_register_set.owns() and last->local_register_set->size()) {
             unsigned non_empty = 0;
             for (decltype(last->local_register_set->size()) r = 0; r < last->local_register_set->size(); ++r) {
                 if (last->local_register_set->at(r) != nullptr) { ++non_empty; }
@@ -71,6 +71,8 @@ static auto print_stack_trace_default(viua::process::Process *process) -> void {
                 cout << "    registers[" << r << "]: ";
                 cout << '<' << last->local_register_set->get(r)->type() << "> " << last->local_register_set->get(r)->str() << endl;
             }
+        } else if (not last->local_register_set.owns()) {
+            cout << "  this frame did not own its registers" << endl;
         } else {
             cout << "  no registers were allocated for this frame" << endl;
         }
