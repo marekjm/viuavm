@@ -192,7 +192,7 @@ viua::internals::types::byte* viua::process::Process::optailcall(viua::internals
         call_name = fn->name();
 
         if (fn->type() == "Closure") {
-            stack.back().get()->setLocalRegisterSet(static_cast<viua::types::Closure*>(fn)->rs(), false);
+            stack.back()->setLocalRegisterSet(static_cast<viua::types::Closure*>(fn)->rs(), false);
         }
     } else {
         tie(addr, call_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
@@ -210,9 +210,7 @@ viua::internals::types::byte* viua::process::Process::optailcall(viua::internals
         throw new viua::types::Exception("tail call to non-native function: " + call_name);
     }
 
-    Frame *last_frame = stack.back().get();
-
-    last_frame->arguments = std::move(stack.frame_new->arguments);
+    stack.back()->arguments = std::move(stack.frame_new->arguments);
 
     // new frame must be deleted to prevent future errors
     // it's a simulated "push-and-pop" from the stack
