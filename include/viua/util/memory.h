@@ -53,6 +53,10 @@ namespace viua {
                     return pointer;
                 }
 
+                auto owns() const -> bool {
+                    return owns_pointer;
+                }
+
                 auto operator->() -> T* {
                     return pointer;
                 }
