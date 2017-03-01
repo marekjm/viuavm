@@ -33,6 +33,7 @@ namespace viua {
                 auto delete_if_owned() -> void {
                     if (owns_pointer and (pointer != nullptr)) {
                         delete pointer;
+                        pointer = nullptr;
                     }
                 }
 
