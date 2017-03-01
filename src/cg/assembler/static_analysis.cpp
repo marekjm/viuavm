@@ -532,7 +532,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             i = skip_till_next_line(body_tokens, i);
             continue;
         } else if (token == "capture" or token == "capturecopy" or token == "capturemove") {
-            TokenIndex source = get_token_index_of_operand(body_tokens, i, 3);
+            TokenIndex source = i + 4;
 
             // FIXME check if target is not empty
             check_use_of_register(body_tokens, source, i, registers, named_registers, "closure of empty register");
