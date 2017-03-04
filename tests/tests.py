@@ -831,6 +831,9 @@ class HigherOrderFunctionTests(unittest.TestCase):
     def testTailcallOfObject(self):
         runTestThrowsExceptionJSON(self, 'tailcall_of_object.asm', {'frame': {}, 'trace': ['main/0/0()', 'foo/0/0()',], 'uncaught': {'type': 'Integer', 'value': '42',}}, output_processing_function=lambda s: json.loads(s.strip()))
 
+    def testTailcallOfClosure(self):
+        runTestThrowsExceptionJSON(self, 'tailcall_of_closure.asm', {'frame': {}, 'trace': ['main/0/0()', 'test/0/0()',], 'uncaught': {'type': 'Integer', 'value': '42',}}, assembly_opts=('--no-sa',), output_processing_function=lambda s: json.loads(s.strip()))
+
 
 class ClosureTests(unittest.TestCase):
     """Tests for closures.

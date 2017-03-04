@@ -192,7 +192,8 @@ viua::internals::types::byte* viua::process::Process::optailcall(viua::internals
         call_name = fn->name();
 
         if (fn->type() == "Closure") {
-            stack.back()->setLocalRegisterSet(static_cast<viua::types::Closure*>(fn)->rs(), false);
+            stack.back()->local_register_set.reset(static_cast<viua::types::Closure*>(fn)->give());
+            currently_used_register_set = stack.back()->local_register_set.get();
         }
     } else {
         tie(addr, call_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
