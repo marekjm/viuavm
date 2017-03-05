@@ -831,7 +831,11 @@ viua::internals::types::bytecode_size assemble_instruction(Program& program, viu
             );
         }
 
-        program.opmsg(ret, tokens.at(fn));
+        if (tokens.at(fn).str().at(0) == '*' or tokens.at(fn).str().at(0) == '%') {
+            program.opmsg(ret, assembler::operands::getint_with_rs_type(resolveregister(tokens.at(fn)), resolve_rs_type(tokens.at(fn+1))));
+        } else {
+            program.opmsg(ret, tokens.at(fn));
+        }
     } else if (tokens.at(i) == "insert") {
         TokenIndex target = i + 1;
         TokenIndex key = target + 2;

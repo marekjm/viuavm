@@ -585,6 +585,10 @@ namespace cg {
             return insertString(addr_ptr, method_name);
         }
 
+        viua::internals::types::byte* opmsg(viua::internals::types::byte* addr_ptr, int_op reg, int_op method_name) {
+            return insert_two_ri_instruction(addr_ptr, MSG, reg, method_name);
+        }
+
         viua::internals::types::byte* opinsert(viua::internals::types::byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
             return insert_three_ri_instruction(addr_ptr, INSERT, rega, regb, regr);
         }

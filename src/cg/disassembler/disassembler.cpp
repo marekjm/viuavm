@@ -231,7 +231,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         oss << fn_name;
         ptr += fn_name.size();
         ++ptr; // for null character terminating the C-style string not included in std::string
-    } else if ((op == CALL) or (op == PROCESS)) {
+    } else if ((op == CALL) or (op == PROCESS) or (op == MSG)) {
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
         oss << ' ';
@@ -244,7 +244,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
             ptr += fn_name.size();
             ++ptr; // for null character terminating the C-style string not included in std::string
         }
-    } else if ((op == CLASS) or (op == NEW) or (op == DERIVE) or (op == MSG)) {
+    } else if ((op == CLASS) or (op == NEW) or (op == DERIVE)) {
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
         oss << ' ';

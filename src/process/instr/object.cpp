@@ -24,6 +24,8 @@
 #include <viua/types/pointer.h>
 #include <viua/types/object.h>
 #include <viua/types/string.h>
+#include <viua/types/function.h>
+#include <viua/types/closure.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/registerset.h>
 #include <viua/assert.h>
@@ -67,7 +69,23 @@ viua::internals::types::byte* viua::process::Process::opmsg(viua::internals::typ
     }
 
     string method_name;
-    tie(addr, method_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
+    auto ot = viua::bytecode::decoder::operands::get_operand_type(addr);
+    if (ot == OT_REGISTER_INDEX or ot == OT_POINTER) {
+        viua::types::Type* fn_source = nullptr;
+        tie(addr, fn_source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+
+        auto fn = dynamic_cast<viua::types::Function*>(fn_source);
+        if (not fn) {
+            throw new viua::types::Exception("type is not callable: " + fn_source->type());
+        }
+        method_name = fn->name();
+
+        if (fn->type() == "Closure") {
+            stack.frame_new->setLocalRegisterSet(static_cast<viua::types::Closure*>(fn)->rs(), false);
+        }
+    } else {
+        tie(addr, method_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
+    }
 
     auto obj = stack.frame_new->arguments->at(0);
     if (auto ptr = dynamic_cast<viua::types::Pointer*>(obj)) {

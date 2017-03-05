@@ -609,6 +609,13 @@ Program& Program::opmsg(int_op reg, const string& method_name) {
     return (*this);
 }
 
+Program& Program::opmsg(int_op reg, int_op method_name) {
+    /*  Inserts msg instuction.
+     */
+    addr_ptr = cg::bytecode::opmsg(addr_ptr, reg, method_name);
+    return (*this);
+}
+
 Program& Program::opinsert(int_op target, int_op key, int_op source) {
     addr_ptr = cg::bytecode::opinsert(addr_ptr, target, key, source);
     return (*this);

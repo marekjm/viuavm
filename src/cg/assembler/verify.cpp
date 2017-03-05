@@ -174,6 +174,11 @@ void assembler::verify::msgArities(const vector<Token>& tokens) {
 
         int arity = assembler::utils::getFunctionArity(function_name);
 
+        if (function_name.str().at(0) == '*' or function_name.str().at(0) == '%') {
+            // skip arity checks for functions called indirectly
+            continue;
+        }
+
         if (arity == -1) {
             ostringstream report;
             report << "dynamic dispatch call with undefined arity ";
