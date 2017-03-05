@@ -1078,6 +1078,9 @@ class PrototypeSystemTests(unittest.TestCase):
             ],
         )
 
+    def testMsgFromFunctionObject(self):
+        runTest(self, 'msg_from_function.asm', 'Hello World!')
+
 
 class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
     PATH = './sample/asm/static_analysis_errors'
