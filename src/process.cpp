@@ -593,7 +593,7 @@ viua::process::Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualP
     stack(frm->function_name, &currently_used_register_set, global_register_set.get(), scheduler),
     finished(false), is_joinable(true),
     is_suspended(false),
-    process_priority(1),
+    process_priority(512),
     process_id(this),
     is_hidden(false)
 {
