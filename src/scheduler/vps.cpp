@@ -517,6 +517,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
     processes.erase(processes.begin(), processes.end());
     processes.swap(running_processes_list);
 
+    // FIXME scheduler should sleep only after checking if there are no free processes to run and rebalancing
     if (not any_active) {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
@@ -525,17 +526,23 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
 }
 void viua::scheduler::VirtualProcessScheduler::operator()() {
     while (true) {
+        // FIXME perform a single burst at a time - if scheduler keeps bursting for a long time some free processes may wait "forever" before being migrated to a scheduler
         while (burst());
 
 #if VIUA_VM_DEBUG_LOG
         viua_err("[scheduler:vps:", this, "] burst finished");
 #endif
 
+        // FIXME MEMORY this is accessing kernel-specific variables by pointer
+        // rewrite this so it's the kernel that gives the scheduler a lock
         unique_lock<mutex> lock(*free_processes_mutex);
+        // FIXME don't wait forever after single-bursting is implemented, wait one time, then continue to rebalancing and just run again
         while (not free_processes_cv->wait_for(lock, chrono::milliseconds(10), [this]{
             return (not free_processes->empty() or shut_down.load(std::memory_order_acquire));
         }));
 
+        // FIXME XXX this exit condition is dubious - scheduler should exit when the shut_dow is true, not when there are no free processes
+        // FIXME SEGFAULT RACECONDITION what if a process has been suspended because it issued a FFI call, the scheduler exits (deleting the process), and then the FFI call returns - segfault
         if (free_processes->empty()) {
             // this means that shutdown() was received
 #if VIUA_VM_DEBUG_LOG
