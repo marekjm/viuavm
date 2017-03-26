@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -34,7 +34,7 @@
 
     ; apply the function to the parameter...
     frame ^[(pamv %0 (arg %parameter %1))]
-    fcall %3 (arg %func %0)
+    call %3 (arg %func %0)
 
     ; ...and return the result
     move %0 %3
@@ -50,6 +50,6 @@
     frame ^[(param %0 %2) (pamv %1 %1)]
     print (call %3 apply/2)
 
-    izero %0
+    izero %0 local
     return
 .end

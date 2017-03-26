@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -43,12 +43,8 @@
     ; FIXME static analyser does not handle swicthes between registers sets well
     iinc %1
 
-    ; the copy is required because TMPRI moves objects instead
-    ; of copying
-    copy %4 %1
-    move (tmpri %1) %4
+    copy %1 local %1 current
     ress local
-    tmpro %1
 
     ; integer at 1 is *at least* N
     ; N is the parameter the function received
@@ -66,6 +62,6 @@
 .function: main/1
     frame ^[(param %0 (istore %1 10))]
     call void counter/1
-    izero %0
+    izero %0 local
     return
 .end

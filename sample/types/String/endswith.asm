@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -24,6 +24,6 @@
     frame ^[(param %0 %1) (param %1 (strstore %2 "Fail"))]
     print (msg %3 endswith/2)
 
-    izero %0
+    izero %0 local
     return
 .end

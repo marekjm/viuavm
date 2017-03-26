@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -52,90 +52,6 @@ static void strwrite(ofstream& out, const string& s) {
 }
 
 
-static tuple<viua::internals::types::bytecode_size, enum JUMPTYPE> resolvejump(Token token, const map<string, vector<Token>::size_type>& marks, viua::internals::types::bytecode_size instruction_index) {
-    /*  This function is used to resolve jumps in `jump` and `branch` instructions.
-     */
-    string jmp = token.str();
-    viua::internals::types::bytecode_size addr = 0;
-    enum JUMPTYPE jump_type = JMP_RELATIVE;
-    if (str::isnum(jmp, false)) {
-        addr = stoul(jmp);
-    } else if (jmp.substr(0, 2) == "0x") {
-        stringstream ss;
-        ss << hex << jmp;
-        ss >> addr;
-        jump_type = JMP_TO_BYTE;
-    } else if (jmp[0] == '-') {
-        int jump_value = stoi(jmp);
-        if (instruction_index < static_cast<decltype(addr)>(-1 * jump_value)) {
-            // FIXME: move jump verification to assembler::verify namespace function
-            ostringstream oss;
-            oss << "use of relative jump results in a jump to negative index: ";
-            oss << "jump_value = " << jump_value << ", ";
-            oss << "instruction_index = " << instruction_index;
-            throw viua::cg::lex::InvalidSyntax(token, oss.str());
-        }
-        addr = (instruction_index - static_cast<viua::internals::types::bytecode_size>(-1 * jump_value));
-    } else if (jmp[0] == '+') {
-        addr = (instruction_index + stoul(jmp.substr(1)));
-    } else {
-        try {
-            // FIXME: markers map should use viua::internals::types::bytecode_size to avoid the need for casting
-            addr = static_cast<viua::internals::types::bytecode_size>(marks.at(jmp));
-        } catch (const std::out_of_range& e) {
-            throw viua::cg::lex::InvalidSyntax(token, ("jump to unrecognised marker: " + str::enquote(str::strencode(jmp))));
-        }
-    }
-
-    // FIXME: check if the jump is within the size of bytecode
-    return tuple<viua::internals::types::bytecode_size, enum JUMPTYPE>(addr, jump_type);
-}
-
-static string resolveregister(Token token, const bool allow_bare_integers = false) {
-    /*  This function is used to register numbers when a register is accessed, e.g.
-     *  in `istore` instruction or in `branch` in condition operand.
-     *
-     *  This function MUST return string as teh result is further passed to assembler::operands::getint() function which *expects* string.
-     */
-    ostringstream out;
-    string reg = token.str();
-    if (reg[0] == '@' and str::isnum(str::sub(reg, 1))) {
-        /*  Basic case - the register index is taken from another register, everything is still nice and simple.
-         */
-        if (stoi(reg.substr(1)) < 0) {
-            throw ("register indexes cannot be negative: " + reg);
-        }
-
-        // FIXME: analyse source and detect if the referenced register really holds an integer (the only value suitable to use
-        // as register reference)
-        out.str(reg);
-    } else if (reg[0] == '*' and str::isnum(str::sub(reg, 1))) {
-        /*  Basic case - the register index is taken from another register, everything is still nice and simple.
-         */
-        if (stoi(reg.substr(1)) < 0) {
-            throw ("register indexes cannot be negative: " + reg);
-        }
-
-        out.str(reg);
-    } else if (reg[0] == '%' and str::isnum(str::sub(reg, 1))) {
-        /*  Basic case - the register index is taken from another register, everything is still nice and simple.
-         */
-        if (stoi(reg.substr(1)) < 0) {
-            throw ("register indexes cannot be negative: " + reg);
-        }
-
-        out.str(reg);
-    } else if (reg == "void") {
-        out << reg;
-    } else if (allow_bare_integers and str::isnum(reg)) {
-        out << reg;
-    } else {
-        throw viua::cg::lex::InvalidSyntax(token, "not enough operands");
-    }
-    return out.str();
-}
-
-
 /*  This is a mapping of instructions to their assembly functions.
  *  Used in the assembly() function.
  *
@@ -164,295 +80,6 @@ const map<string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS = {
 };
 
 
-static viua::internals::types::timeout timeout_to_int(const string& timeout) {
-    const auto timeout_str_size = timeout.size();
-    if (timeout[timeout_str_size-2] == 'm') {
-        return static_cast<viua::internals::types::timeout>(stoi(timeout.substr(0, timeout_str_size-2)));
-    } else {
-        return static_cast<viua::internals::types::timeout>((stoi(timeout.substr(0, timeout_str_size-1)) * 1000));
-    }
-}
-
-static viua::internals::types::bytecode_size assemble_instruction(Program& program, viua::internals::types::bytecode_size& instruction, viua::internals::types::bytecode_size i, const vector<Token>& tokens, map<string, std::remove_reference<decltype(tokens)>::type::size_type>& marks) {
-    /*  This is main assembly loop.
-     *  It iterates over lines with instructions and
-     *  uses bytecode generation API to fill the program with instructions and
-     *  from them generate the bytecode.
-     */
-    if (DEBUG and SCREAM) {
-        cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << "message" << send_control_seq(ATTR_RESET);
-        cout << ": ";
-        cout << "assembling '";
-        cout << send_control_seq(COLOR_FG_WHITE) << tokens.at(i).str() << send_control_seq(ATTR_RESET);
-        cout << "' instruction\n";
-    }
-
-    if (tokens.at(i) == "nop") {
-        program.opnop();
-    } else if (tokens.at(i) == "izero") {
-        program.opizero(assembler::operands::getint(resolveregister(tokens.at(i+1))));
-    } else if (tokens.at(i) == "istore") {
-        program.opistore(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2), true), true));
-    } else if (tokens.at(i) == "iinc") {
-        program.opiinc(assembler::operands::getint(resolveregister(tokens.at(i+1))));
-    } else if (tokens.at(i) == "idec") {
-        program.opidec(assembler::operands::getint(resolveregister(tokens.at(i+1))));
-    } else if (tokens.at(i) == "fstore") {
-        program.opfstore(assembler::operands::getint(resolveregister(tokens.at(i+1))), static_cast<float>(stod(tokens.at(i+2).str())));
-    } else if (tokens.at(i) == "itof") {
-        program.opitof(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
-    } else if (tokens.at(i) == "ftoi") {
-        program.opftoi(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
-    } else if (tokens.at(i) == "stoi") {
-        program.opstoi(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
-    } else if (tokens.at(i) == "stof") {
-        program.opstof(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
-    } else if (tokens.at(i) == "add") {
-        program.opadd(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))), assembler::operands::getint(resolveregister(tokens.at(i+4))));
-    } else if (tokens.at(i) == "sub") {
-        program.opsub(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))), assembler::operands::getint(resolveregister(tokens.at(i+4))));
-    } else if (tokens.at(i) == "mul") {
-        program.opmul(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))), assembler::operands::getint(resolveregister(tokens.at(i+4))));
-    } else if (tokens.at(i) == "div") {
-        program.opdiv(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))), assembler::operands::getint(resolveregister(tokens.at(i+4))));
-    } else if (tokens.at(i) == "lt") {
-        program.oplt(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))), assembler::operands::getint(resolveregister(tokens.at(i+4))));
-    } else if (tokens.at(i) == "lte") {
-        program.oplte(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))), assembler::operands::getint(resolveregister(tokens.at(i+4))));
-    } else if (tokens.at(i) == "gt") {
-        program.opgt(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))), assembler::operands::getint(resolveregister(tokens.at(i+4))));
-    } else if (tokens.at(i) == "gte") {
-        program.opgte(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))), assembler::operands::getint(resolveregister(tokens.at(i+4))));
-    } else if (tokens.at(i) == "eq") {
-        program.opeq(tokens.at(i+1), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))), assembler::operands::getint(resolveregister(tokens.at(i+4))));
-    } else if (tokens.at(i) == "strstore") {
-        program.opstrstore(assembler::operands::getint(resolveregister(tokens.at(i+1))), tokens.at(i+2));
-    } else if (tokens.at(i) == "vec") {
-        program.opvec(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
-    } else if (tokens.at(i) == "vinsert") {
-        Token vec = tokens.at(i+1), src = tokens.at(i+2), pos = tokens.at(i+3);
-        program.opvinsert(assembler::operands::getint(resolveregister(vec)), assembler::operands::getint(resolveregister(src)), assembler::operands::getint(resolveregister(pos)));
-    } else if (tokens.at(i) == "vpush") {
-        program.opvpush(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
-    } else if (tokens.at(i) == "vpop") {
-        Token vec = tokens.at(i+1), dst = tokens.at(i+2), pos = tokens.at(i+3);
-        program.opvpop(assembler::operands::getint(resolveregister(vec)), assembler::operands::getint(resolveregister(dst)), assembler::operands::getint(resolveregister(pos, true), true));
-    } else if (tokens.at(i) == "vat") {
-        Token vec = tokens.at(i+1), dst = tokens.at(i+2), pos = tokens.at(i+3);
-        if (pos == "\n") { pos = Token(dst.line(), dst.character(), "-1"); }
-        program.opvat(assembler::operands::getint(resolveregister(vec)), assembler::operands::getint(resolveregister(dst)), assembler::operands::getint(resolveregister(pos, true), true));
-    } else if (tokens.at(i) == "vlen") {
-        program.opvlen(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
-    } else if (tokens.at(i) == "not") {
-        program.opnot(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
-    } else if (tokens.at(i) == "and") {
-        program.opand(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
-    } else if (tokens.at(i) == "or") {
-        program.opor(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
-    } else if (tokens.at(i) == "move") {
-        program.opmove(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
-    } else if (tokens.at(i) == "copy") {
-        program.opcopy(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
-    } else if (tokens.at(i) == "ptr") {
-        program.opptr(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
-    } else if (tokens.at(i) == "swap") {
-        program.opswap(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
-    } else if (tokens.at(i) == "delete") {
-        program.opdelete(assembler::operands::getint(resolveregister(tokens.at(i+1))));
-    } else if (tokens.at(i) == "isnull") {
-        program.opisnull(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
-    } else if (tokens.at(i) == "ress") {
-        program.opress(tokens.at(i+1));
-    } else if (tokens.at(i) == "tmpri") {
-        program.optmpri(assembler::operands::getint(resolveregister(tokens.at(i+1))));
-    } else if (tokens.at(i) == "tmpro") {
-        program.optmpro(assembler::operands::getint(resolveregister(tokens.at(i+1))));
-    } else if (tokens.at(i) == "print") {
-        program.opprint(assembler::operands::getint(resolveregister(tokens.at(i+1))));
-    } else if (tokens.at(i) == "echo") {
-        program.opecho(assembler::operands::getint(resolveregister(tokens.at(i+1))));
-    } else if (tokens.at(i) == "capture") {
-        program.opcapture(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
-    } else if (tokens.at(i) == "capturecopy") {
-        program.opcapturecopy(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
-    } else if (tokens.at(i) == "capturemove") {
-        program.opcapturemove(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
-    } else if (tokens.at(i) == "closure") {
-        program.opclosure(assembler::operands::getint(resolveregister(tokens.at(i+1))), tokens.at(i+2));
-    } else if (tokens.at(i) == "function") {
-        program.opfunction(assembler::operands::getint(resolveregister(tokens.at(i+1))), tokens.at(i+2));
-    } else if (tokens.at(i) == "fcall") {
-        program.opfcall(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
-    } else if (tokens.at(i) == "frame") {
-        program.opframe(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
-    } else if (tokens.at(i) == "param") {
-        program.opparam(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
-    } else if (tokens.at(i) == "pamv") {
-        program.oppamv(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
-    } else if (tokens.at(i) == "arg") {
-        program.oparg(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
-    } else if (tokens.at(i) == "argc") {
-        program.opargc(assembler::operands::getint(resolveregister(tokens.at(i+1))));
-    } else if (tokens.at(i) == "call") {
-        /** Full form of call instruction has two operands: function name and return value register index.
-         *  If call is given only one operand - it means it is the instruction index and returned value is discarded.
-         *  To explicitly state that return value should be discarderd 0 can be supplied as second operand.
-         */
-        /** Why is the function supplied as a *string* and not direct instruction pointer?
-         *  That would be faster - c'mon couldn't assembler just calculate offsets and insert them?
-         *
-         *  Nope.
-         *
-         *  Yes, it *would* be faster if calls were just precalculated jumps.
-         *  However, by them being strings we get plenty of flexibility, good-quality stack traces, and
-         *  a place to put plenty of debugging info.
-         *  All that at a cost of just one map lookup; the overhead is minimal and gains are big.
-         *  What's not to love?
-         *
-         *  Of course, you, my dear reader, are free to take this code (it's GPL after all!) and
-         *  modify it to suit your particular needs - in that case that would be calculating call jumps
-         *  at compile time and exchanging CALL instructions with JUMP instructions.
-         *
-         *  Good luck with debugging your code, then.
-         */
-        Token fn_name = tokens.at(i+2), reg = tokens.at(i+1);
-
-        // if second operand is a newline, fill it with zero
-        // which means that return value will be discarded
-        if (fn_name == "\n") {
-            fn_name = reg;
-            reg = Token(fn_name.line(), fn_name.character(), "0");
-        }
-
-        program.opcall(assembler::operands::getint(resolveregister(reg)), fn_name.str());
-    } else if (tokens.at(i) == "tailcall") {
-        program.optailcall(tokens.at(i+1));
-    } else if (tokens.at(i) == "process") {
-        program.opprocess(assembler::operands::getint(resolveregister(tokens.at(i+1))), tokens.at(i+2));
-    } else if (tokens.at(i) == "self") {
-        program.opself(assembler::operands::getint(resolveregister(tokens.at(i+1))));
-    } else if (tokens.at(i) == "join") {
-        Token a_chnk = tokens.at(i+1), b_chnk = tokens.at(i+2), timeout_chnk = tokens.at(i+3);
-        viua::internals::types::timeout timeout_milliseconds = 0;
-        if (timeout_chnk != "infinity") {
-            timeout_milliseconds = timeout_to_int(timeout_chnk);
-            ++timeout_milliseconds;
-        }
-        timeout_op timeout {timeout_milliseconds};
-        program.opjoin(assembler::operands::getint(resolveregister(a_chnk)), assembler::operands::getint(resolveregister(b_chnk)), timeout);
-    } else if (tokens.at(i) == "send") {
-        program.opsend(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))));
-    } else if (tokens.at(i) == "receive") {
-        Token regno_chnk = tokens.at(i+1), timeout_chnk = tokens.at(i+2);
-        viua::internals::types::timeout timeout_milliseconds = 0;
-        if (timeout_chnk != "infinity") {
-            timeout_milliseconds = timeout_to_int(timeout_chnk);
-            ++timeout_milliseconds;
-        }
-        timeout_op timeout {timeout_milliseconds};
-        program.opreceive(assembler::operands::getint(resolveregister(regno_chnk)), timeout);
-    } else if (tokens.at(i) == "watchdog") {
-        program.opwatchdog(tokens.at(i+1));
-    } else if (tokens.at(i) == "if") {
-        /*  If branch is given three operands, it means its full, three-operands form is being used.
-         *  Otherwise, it is short, two-operands form instruction and assembler should fill third operand accordingly.
-         *
-         *  In case of short-form `branch` instruction:
-         *
-         *      * first operand is index of the register to check,
-         *      * second operand is the address to which to jump if register is true,
-         *      * third operand is assumed to be the *next instruction*, i.e. instruction after the branch instruction,
-         *
-         *  In full (with three operands) form of `branch` instruction:
-         *
-         *      * third operands is the address to which to jump if register is false,
-         */
-        Token condition = tokens.at(i+1), if_true = tokens.at(i+2), if_false = tokens.at(i+3);
-
-        viua::internals::types::bytecode_size addrt_target, addrf_target;
-        enum JUMPTYPE addrt_jump_type, addrf_jump_type;
-        tie(addrt_target, addrt_jump_type) = resolvejump(tokens.at(i+2), marks, instruction);
-        if (if_false != "\n") {
-            tie(addrf_target, addrf_jump_type) = resolvejump(tokens.at(i+3), marks, instruction);
-        } else {
-            addrf_jump_type = JMP_RELATIVE;
-            addrf_target = instruction+1;
-        }
-
-        program.opif(assembler::operands::getint(resolveregister(condition)), addrt_target, addrt_jump_type, addrf_target, addrf_jump_type);
-    } else if (tokens.at(i) == "jump") {
-        /*  Jump instruction can be written in two forms:
-         *
-         *      * `jump <index>`
-         *      * `jump :<marker>`
-         *
-         *  Assembler must distinguish between these two forms, and so it does.
-         *  Here, we use a function from string support lib to determine
-         *  if the jump is numeric, and thus an index, or
-         *  a string - in which case we consider it a marker jump.
-         *
-         *  If it is a marker jump, assembler will look the marker up in a map and
-         *  if it is not found throw an exception about unrecognised marker being used.
-         */
-        viua::internals::types::bytecode_size jump_target;
-        enum JUMPTYPE jump_type;
-        tie(jump_target, jump_type) = resolvejump(tokens.at(i+1), marks, instruction);
-
-        program.opjump(jump_target, jump_type);
-    } else if (tokens.at(i) == "try") {
-        program.optry();
-    } else if (tokens.at(i) == "catch") {
-        string type_chnk, catcher_chnk;
-        program.opcatch(tokens.at(i+1), tokens.at(i+2));
-    } else if (tokens.at(i) == "draw") {
-        program.opdraw(assembler::operands::getint(resolveregister(tokens.at(i+1))));
-    } else if (tokens.at(i) == "enter") {
-        program.openter(tokens.at(i+1));
-    } else if (tokens.at(i) == "throw") {
-        program.opthrow(assembler::operands::getint(resolveregister(tokens.at(i+1))));
-    } else if (tokens.at(i) == "leave") {
-        program.opleave();
-    } else if (tokens.at(i) == "import") {
-        program.opimport(tokens.at(i+1));
-    } else if (tokens.at(i) == "link") {
-        program.oplink(tokens.at(i+1));
-    } else if (tokens.at(i) == "class") {
-        program.opclass(assembler::operands::getint(resolveregister(tokens.at(i+1))), tokens.at(i+2));
-    } else if (tokens.at(i) == "derive") {
-        program.opderive(assembler::operands::getint(resolveregister(tokens.at(i+1))), tokens.at(i+2));
-    } else if (tokens.at(i) == "attach") {
-        program.opattach(assembler::operands::getint(resolveregister(tokens.at(i+1))), tokens.at(i+2), tokens.at(i+3));
-    } else if (tokens.at(i) == "register") {
-        program.opregister(assembler::operands::getint(resolveregister(tokens.at(i+1))));
-    } else if (tokens.at(i) == "new") {
-        program.opnew(assembler::operands::getint(resolveregister(tokens.at(i+1))), tokens.at(i+2));
-    } else if (tokens.at(i) == "msg") {
-        program.opmsg(assembler::operands::getint(resolveregister(tokens.at(i+1))), tokens.at(i+2));
-    } else if (tokens.at(i) == "insert") {
-        program.opinsert(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
-    } else if (tokens.at(i) == "remove") {
-        program.opremove(assembler::operands::getint(resolveregister(tokens.at(i+1))), assembler::operands::getint(resolveregister(tokens.at(i+2))), assembler::operands::getint(resolveregister(tokens.at(i+3))));
-    } else if (tokens.at(i) == "return") {
-        program.opreturn();
-    } else if (tokens.at(i) == "halt") {
-        program.ophalt();
-    } else if (tokens.at(i).str().substr(0, 1) == ".") {
-        // do nothing, it's an assembler directive
-    } else {
-        throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("unimplemented instruction: " + str::enquote(str::strencode(tokens.at(i)))));
-    }
-
-    if (tokens.at(i).str().substr(0, 1) != ".") {
-        ++instruction;
-        /* cout << "increased instruction count to " << instruction << ": " << tokens.at(i).str() << endl; */
-    } else {
-        /* cout << "not increasing instruction count: " << tokens.at(i).str() << endl; */
-    }
-
-    while (tokens.at(++i) != "\n");
-    ++i;  // skip the newline
-    return i;
-}
 static Program& compile(Program& program, const vector<Token>& tokens, map<string, std::remove_reference<decltype(tokens)>::type::size_type>& marks) {
     /** Compile instructions into bytecode using bytecode generation API.
      *
@@ -607,6 +234,12 @@ static void check_main_function(const string& main_function, const vector<Token>
         if (main_function_tokens.at(i+1) != "%0") {
             throw viua::cg::lex::InvalidSyntax(last_instruction, ("main function does not return a value: " + main_function));
         }
+        if (main_function_tokens.at(i+2).original() == "\n") {
+            throw viua::cg::lex::InvalidSyntax(last_instruction, "main function must explicitly return to local register set");
+        }
+        if (main_function_tokens.at(i+2) != "local") {
+            throw viua::cg::lex::InvalidSyntax(last_instruction, ("main function uses invalid register set to return a value: " + main_function_tokens.at(i+2).str())).add(main_function_tokens.at(i+2));
+        }
 }
 
 static viua::internals::types::bytecode_size generate_entry_function(viua::internals::types::bytecode_size bytes, map<string, viua::internals::types::bytecode_size> function_addresses, invocables_t& functions, const string& main_function, viua::internals::types::bytecode_size starting_instruction) {
@@ -635,36 +268,41 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
         entry_function_tokens.emplace_back(0, 0, "%0");
         entry_function_tokens.emplace_back(0, 0, "%16");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(viua::internals::types::byte);
+        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
     } else if (main_function == "main/2") {
         entry_function_tokens.emplace_back(0, 0, "frame");
         entry_function_tokens.emplace_back(0, 0, "%2");
         entry_function_tokens.emplace_back(0, 0, "%16");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(viua::internals::types::byte);
+        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
 
         // pop first element on the list of aruments
         entry_function_tokens.emplace_back(0, 0, "vpop");
         entry_function_tokens.emplace_back(0, 0, "%0");
+        entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "%1");
+        entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "%0");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) + 3*sizeof(viua::internals::types::register_index) + 3*sizeof(viua::internals::types::byte);
+        bytes += sizeof(viua::internals::types::byte) + 3*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
+        bytes += sizeof(viua::internals::types::plain_int);
 
         // for parameter for main/2 is the name of the program
         entry_function_tokens.emplace_back(0, 0, "param");
         entry_function_tokens.emplace_back(0, 0, "%0");
         entry_function_tokens.emplace_back(0, 0, "%0");
+        entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(viua::internals::types::byte);
+        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
 
         // second parameter for main/2 is the vector with the rest
         // of the commandl ine parameters
         entry_function_tokens.emplace_back(0, 0, "param");
         entry_function_tokens.emplace_back(0, 0, "%1");
         entry_function_tokens.emplace_back(0, 0, "%1");
+        entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(viua::internals::types::byte);
+        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
     } else {
         // this is for default main function, i.e. `main/1` or
         // for custom main functions
@@ -673,13 +311,14 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
         entry_function_tokens.emplace_back(0, 0, "%1");
         entry_function_tokens.emplace_back(0, 0, "%16");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(viua::internals::types::byte);
+        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
 
         entry_function_tokens.emplace_back(0, 0, "param");
         entry_function_tokens.emplace_back(0, 0, "%0");
         entry_function_tokens.emplace_back(0, 0, "%1");
+        entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(viua::internals::types::byte);
+        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
     }
 
     // name of the main function must not be hardcoded because there is '.main:' assembler
@@ -687,17 +326,20 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
     // we also save return value in 1 register since 0 means "drop return value"
     entry_function_tokens.emplace_back(0, 0, "call");
     entry_function_tokens.emplace_back(0, 0, "%1");
+    entry_function_tokens.emplace_back(0, 0, "local");
     entry_function_tokens.emplace_back(0, 0, main_function);
     entry_function_tokens.emplace_back(0, 0, "\n");
-    bytes += sizeof(viua::internals::types::byte) + sizeof(viua::internals::types::register_index) + sizeof(viua::internals::types::byte);
+    bytes += sizeof(viua::internals::types::byte) + sizeof(viua::internals::types::byte) + sizeof(viua::internals::RegisterSets) + sizeof(viua::internals::types::register_index);
     bytes += main_function.size()+1;
 
     // then, register 1 is moved to register 0 so it counts as a return code
     entry_function_tokens.emplace_back(0, 0, "move");
     entry_function_tokens.emplace_back(0, 0, "%0");
+    entry_function_tokens.emplace_back(0, 0, "local");
     entry_function_tokens.emplace_back(0, 0, "%1");
+    entry_function_tokens.emplace_back(0, 0, "local");
     entry_function_tokens.emplace_back(0, 0, "\n");
-    bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::register_index) + 2*sizeof(viua::internals::types::byte);
+    bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
 
     entry_function_tokens.emplace_back(0, 0, "halt");
     entry_function_tokens.emplace_back(0, 0, "\n");

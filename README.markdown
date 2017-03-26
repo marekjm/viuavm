@@ -38,7 +38,7 @@
     ; Register 0 is used to store return value of a function, and
     ; the assembler will enforce that it is set to integer 0 for main
     ; function.
-    izero %0
+    izero %0 local
     return
 .end
 ```

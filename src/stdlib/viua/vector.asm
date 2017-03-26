@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -61,7 +61,7 @@
 
     .mark: begin_loop
     frame ^[(pamv %0 (copy %to_push %counter))]
-    vpush %vector (fcall %to_push %fn)
+    vpush %vector (call %to_push %fn)
     iinc %counter
     ; reuse 'to_push' register since it's empty
     if (gte int64 %to_push %counter %limit) +1 begin_loop
@@ -148,7 +148,7 @@
     vpop %tmp %vector @index
     ; FIXME: there should be no copy operation - use pass-by-move instead
     frame ^[(param %0 %tmp)]
-    and %result (fcall %6 %fn) %result
+    and %result (call %6 %fn) %result
 
     vinsert %vector %tmp @index
 
@@ -184,7 +184,7 @@
     vpop %tmp %vector @index
     ; FIXME: there should be no copy operation - use pass-by-move instead
     frame ^[(param %0 %tmp)]
-    move %result (fcall %6 %fn)
+    move %result (call %6 %fn)
 
     ; put the value back into the vector
     vinsert %vector %tmp @index

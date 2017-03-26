@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -26,6 +26,6 @@
     mul int32 %4 %1 %2
     add int32 %3 %4 %3
     print %3
-    izero %0
+    izero %0 local
     return
 .end

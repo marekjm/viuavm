@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -88,6 +88,6 @@
     frame ^[(param %0 %2)]
     msg void hi/1
 
-    izero %0
+    izero %0 local
     return
 .end

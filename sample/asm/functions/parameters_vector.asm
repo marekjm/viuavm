@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -32,6 +32,6 @@
 .function: main/1
     frame ^[(param %0 (istore %1 0)) (param %1 (istore %2 1)) (param %2 (istore %3 2)) (param %3 (istore %4 3))]
     call void foo/4
-    izero %0
+    izero %0 local
     return
 .end

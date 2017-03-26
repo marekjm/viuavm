@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -34,6 +34,8 @@
 namespace assembler {
     namespace operands {
         int_op getint(const std::string& s, const bool = false);
+        int_op getint_with_rs_type(const std::string&, const viua::internals::RegisterSets, const bool = false);
+        int_op getint(const std::vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()));
         byte_op getbyte(const std::string& s);
         float_op getfloat(const std::string& s);
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -78,10 +78,6 @@ enum OPCODE : viua::internals::types::byte {
     DELETE, // delete an object from a register, freeing the memory
     ISNULL, // checks if register is null (empty)
     RESS,   // REgister Set Switch - switches register set
-    TMPRI,  // temporary register in - move object from current
-            // register set into the temporary register
-    TMPRO,  // temporary register out - move object out of the temporary
-            // to current register set
 
     PRINT,
     ECHO,
@@ -92,7 +88,6 @@ enum OPCODE : viua::internals::types::byte {
     CLOSURE,
 
     FUNCTION,
-    FCALL,
 
     // Opcodes related to functions.
     FRAME,  // create new frame (required before param and pamv) for future function call

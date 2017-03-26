@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -46,16 +46,16 @@
 
     ; add_three(2)
     frame ^[(param %0 (istore %3 2))]
-    print (fcall %4 %add_three)
+    print (call %4 %add_three)
 
     ; add_three(5)
     frame ^[(param %0 (istore %3 5))]
-    print (fcall %4 %add_three)
+    print (call %4 %add_three)
 
     ; add_three(13)
     frame ^[(param %0 (istore %3 13))]
-    print (fcall %4 %add_three)
+    print (call %4 %add_three)
 
-    izero %0
+    izero %0 local
     return
 .end

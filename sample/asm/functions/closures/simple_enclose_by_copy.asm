@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -38,8 +38,8 @@
     ; create frame for our closure and
     ; call it
     frame %0 %0
-    fcall void %bar
+    call void %bar
 
-    izero %0
+    izero %0 local
     return
 .end

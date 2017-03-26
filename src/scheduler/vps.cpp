@@ -21,6 +21,7 @@
 #include <string>
 #include <sstream>
 #include <viua/support/env.h>
+#include <viua/support/string.h>
 #include <viua/machine.h>
 #include <viua/printutils.h>
 #include <viua/types/vector.h>
@@ -34,7 +35,7 @@
 using namespace std;
 
 
-static void printStackTrace(viua::process::Process *process) {
+static auto print_stack_trace_default(viua::process::Process *process) -> void {
     auto trace = process->trace();
     cout << "stack trace: from entry point, most recent call last...\n";
     decltype(trace)::size_type i = 0;
@@ -50,7 +51,6 @@ static void printStackTrace(viua::process::Process *process) {
     auto ex = dynamic_cast<viua::types::Exception*>(thrown_object.get());
     string ex_type = thrown_object->type();
 
-    //cout << "exception after " << kernel.counter() << " ticks" << endl;
     //cout << "failed instruction: " << get<0>(disassembler::instruction(process->executionAt())) << endl;
     cout << "uncaught object: " << ex_type << " = " << (ex ? ex->what() : thrown_object->str()) << endl;
     cout << "\n";
@@ -59,7 +59,7 @@ static void printStackTrace(viua::process::Process *process) {
 
     if (trace.size()) {
         Frame* last = trace.back();
-        if (last->local_register_set->size()) {
+        if (last->local_register_set.owns() and last->local_register_set->size()) {
             unsigned non_empty = 0;
             for (decltype(last->local_register_set->size()) r = 0; r < last->local_register_set->size(); ++r) {
                 if (last->local_register_set->at(r) != nullptr) { ++non_empty; }
@@ -71,6 +71,8 @@ static void printStackTrace(viua::process::Process *process) {
                 cout << "    registers[" << r << "]: ";
                 cout << '<' << last->local_register_set->get(r)->type() << "> " << last->local_register_set->get(r)->str() << endl;
             }
+        } else if (not last->local_register_set.owns()) {
+            cout << "  this frame did not own its registers" << endl;
         } else {
             cout << "  no registers were allocated for this frame" << endl;
         }
@@ -98,6 +100,61 @@ static void printStackTrace(viua::process::Process *process) {
         }
     } else {
         cout << "no stack trace available" << endl;
+    }
+}
+static auto print_stack_trace_json(viua::process::Process *process) -> void {
+    ostringstream oss;
+    oss << '{';
+
+    oss << "\"trace\":[";
+    auto trace = process->trace();
+    decltype(trace)::size_type i = 0;
+    if (support::env::getvar("VIUA_STACK_TRACES") != "full") {
+        i = (trace.size() and trace[0]->function_name == "__entry");
+    }
+    for (; i < trace.size(); ++i) {
+        oss << str::enquote(stringifyFunctionInvocation(trace[i]));
+        if (i < trace.size()-1) {
+            oss << ',';
+        }
+    }
+    oss << "],";
+
+    unique_ptr<viua::types::Type> thrown_object(process->transferActiveException());
+    oss << "\"uncaught\":{";
+    oss << "\"type\":" << str::enquote(thrown_object->type()) << ',';
+    oss << "\"value\":" << str::enquote(thrown_object->str());
+    oss << "},";
+
+    oss << "\"frame\":{";
+    oss << "}";
+
+    oss << '}';
+
+    auto to = support::env::getvar("VIUA_STACKTRACE_PRINT_TO");
+    if (to == "") {
+        to = "stdout";
+    }
+    if (to == "stdout") {
+        cout << oss.str() << endl;
+    } else if (to == "stderr") {
+        cerr << oss.str() << endl;
+    } else {
+        cerr << oss.str() << endl;
+    }
+}
+static void printStackTrace(viua::process::Process *process) {
+    auto stack_trace_print_type = support::env::getvar("VIUA_STACKTRACE_SERIALISATION");
+    if (stack_trace_print_type == "") {
+        stack_trace_print_type = "default";
+    }
+
+    if (stack_trace_print_type == "default") {
+        print_stack_trace_default(process);
+    } else if (stack_trace_print_type == "json") {
+        print_stack_trace_json(process);
+    } else {
+        print_stack_trace_default(process);
     }
 }
 
@@ -316,6 +373,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
     }
 
     bool ticked = false;
+    bool any_active = false;
 
     vector<unique_ptr<viua::process::Process>> running_processes_list;
     decltype(running_processes_list) dead_processes_list;
@@ -329,6 +387,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
 #endif
         executeQuant(th, th->priority());
+        any_active = (any_active or ((not th->stopped()) and (not th->suspended())));
         ticked = (ticked or (not th->stopped()) or th->suspended());
 
         if (not (th->suspended() or th->terminated() or th->stopped())) {
@@ -458,21 +517,32 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
     processes.erase(processes.begin(), processes.end());
     processes.swap(running_processes_list);
 
+    // FIXME scheduler should sleep only after checking if there are no free processes to run and rebalancing
+    if (not any_active) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+
     return ticked;
 }
 void viua::scheduler::VirtualProcessScheduler::operator()() {
     while (true) {
+        // FIXME perform a single burst at a time - if scheduler keeps bursting for a long time some free processes may wait "forever" before being migrated to a scheduler
         while (burst());
 
 #if VIUA_VM_DEBUG_LOG
         viua_err("[scheduler:vps:", this, "] burst finished");
 #endif
 
+        // FIXME MEMORY this is accessing kernel-specific variables by pointer
+        // rewrite this so it's the kernel that gives the scheduler a lock
         unique_lock<mutex> lock(*free_processes_mutex);
+        // FIXME don't wait forever after single-bursting is implemented, wait one time, then continue to rebalancing and just run again
         while (not free_processes_cv->wait_for(lock, chrono::milliseconds(10), [this]{
             return (not free_processes->empty() or shut_down.load(std::memory_order_acquire));
         }));
 
+        // FIXME XXX this exit condition is dubious - scheduler should exit when the shut_dow is true, not when there are no free processes
+        // FIXME SEGFAULT RACECONDITION what if a process has been suspended because it issued a FFI call, the scheduler exits (deleting the process), and then the FFI call returns - segfault
         if (free_processes->empty()) {
             // this means that shutdown() was received
 #if VIUA_VM_DEBUG_LOG
@@ -487,7 +557,7 @@ void viua::scheduler::VirtualProcessScheduler::operator()() {
          *
          * The algorithm is simple: if current load is less than our fair share,
          * fetch a process.
-         * Repear until we're a good, hardworking scheduler.
+         * Repeat until we're a good, hardworking scheduler.
          */
         const auto total_processes = attached_kernel->pids();
         const auto running_schedulers = attached_kernel->no_of_vp_schedulers();

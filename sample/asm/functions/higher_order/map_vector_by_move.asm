@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -34,7 +34,7 @@
 
     ; apply the function to the parameter...
     frame ^[(param %0 (arg %parameter %1))]
-    fcall %3 (arg %func %0)
+    call %3 (arg %func %0)
 
     ; ...and return the result
     move %0 %3
@@ -66,7 +66,7 @@
     ; call supplied function on current element...
     frame ^[(param %0 *(vat %7 %2 @4))]
     ; ...and push result to new vector
-    vpush %3 (fcall %8 %1)
+    vpush %3 (call %8 %1)
 
     ; increase loop counter and go back to the beginning
     ;     ++i;
@@ -96,6 +96,6 @@
     frame ^[(param %0 (function %3 square/1)) (pamv %1 %1)]
     print (call %4 map/2)
 
-    izero %0
+    izero %0 local
     return
 .end

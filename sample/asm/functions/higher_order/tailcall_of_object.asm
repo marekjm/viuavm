@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016 Marek Marecki
+;   Copyright (C) 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -17,14 +17,21 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: main/1
-    ress global
-    tmpri %1
-    ress local
-    tmpro %2
-    print %2
-    izero %0
+.function: foo/0
+    function %1 bar/0
+    frame %0
+    tailcall %1
+.end
+
+.function: bar/0
+    throw (istore %iota 42)
     return
 .end
 
-istore %1 42
+.function: main/0
+    frame %0
+    call void foo/0
+
+    izero %0 local
+    return
+.end

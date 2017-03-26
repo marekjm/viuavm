@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -19,10 +19,57 @@
 
 #include <string>
 #include <tuple>
+#include <vector>
 #include <viua/support/string.h>
+#include <viua/cg/lex.h>
 #include <viua/cg/assembler/assembler.h>
 #include <viua/program.h>
 using namespace std;
+
+
+static string resolveregister(viua::cg::lex::Token token, const bool allow_bare_integers = false) {
+    /*  This function is used to register numbers when a register is accessed, e.g.
+     *  in `istore` instruction or in `branch` in condition operand.
+     *
+     *  This function MUST return string as teh result is further passed to assembler::operands::getint() function which *expects* string.
+     */
+    ostringstream out;
+    string reg = token.str();
+    if (reg[0] == '@' and str::isnum(str::sub(reg, 1))) {
+        /*  Basic case - the register index is taken from another register, everything is still nice and simple.
+         */
+        if (stoi(reg.substr(1)) < 0) {
+            throw ("register indexes cannot be negative: " + reg);
+        }
+
+        // FIXME: analyse source and detect if the referenced register really holds an integer (the only value suitable to use
+        // as register reference)
+        out.str(reg);
+    } else if (reg[0] == '*' and str::isnum(str::sub(reg, 1))) {
+        /*  Basic case - the register index is taken from another register, everything is still nice and simple.
+         */
+        if (stoi(reg.substr(1)) < 0) {
+            throw ("register indexes cannot be negative: " + reg);
+        }
+
+        out.str(reg);
+    } else if (reg[0] == '%' and str::isnum(str::sub(reg, 1))) {
+        /*  Basic case - the register index is taken from another register, everything is still nice and simple.
+         */
+        if (stoi(reg.substr(1)) < 0) {
+            throw ("register indexes cannot be negative: " + reg);
+        }
+
+        out.str(reg);
+    } else if (reg == "void") {
+        out << reg;
+    } else if (allow_bare_integers and str::isnum(reg)) {
+        out << reg;
+    } else {
+        throw viua::cg::lex::InvalidSyntax(token, ("illegal operand: " + token.str()));
+    }
+    return out.str();
+}
 
 
 int_op assembler::operands::getint(const string& s, const bool allow_bare_integers) {
@@ -43,6 +90,53 @@ int_op assembler::operands::getint(const string& s, const bool allow_bare_intege
     } else {
         throw ("cannot convert to int operand: " + s);
     }
+}
+
+int_op assembler::operands::getint_with_rs_type(const string& s, const viua::internals::RegisterSets rs_type, const bool allow_bare_integers) {
+    if (s.size() == 0) {
+        throw "empty string cannot be used as operand";
+    }
+
+    if (s == "void") {
+        return int_op(IntegerOperandType::VOID);
+    } else if (s.at(0) == '@') {
+        return int_op(IntegerOperandType::REGISTER_REFERENCE, rs_type, stoi(s.substr(1)));
+    } else if (s.at(0) == '*') {
+        return int_op(IntegerOperandType::POINTER_DEREFERENCE, rs_type, stoi(s.substr(1)));
+    } else if (s.at(0) == '%') {
+        return int_op(IntegerOperandType::INDEX, rs_type, stoi(s.substr(1)));
+    } else if (allow_bare_integers and str::isnum(s)) {
+        return int_op(stoi(s));
+    } else {
+        throw ("cannot convert to int operand: " + s);
+    }
+}
+
+int_op assembler::operands::getint(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) {
+    string s = resolveregister(tokens.at(i));
+
+    if (s.size() == 0) {
+        throw "empty string cannot be used as operand";
+    }
+
+    if (s == "void") {
+        return int_op(IntegerOperandType::VOID);
+    }
+
+    int_op iop;
+    if (s.at(0) == '@') {
+        iop = int_op(IntegerOperandType::REGISTER_REFERENCE, stoi(s.substr(1)));
+    } else if (s.at(0) == '*') {
+        iop = int_op(IntegerOperandType::POINTER_DEREFERENCE, stoi(s.substr(1)));
+    } else if (s.at(0) == '%') {
+        iop = int_op(stoi(s.substr(1)));
+    } else {
+        throw viua::cg::lex::InvalidSyntax(tokens.at(i), "cannot convert to register index");
+    }
+
+    // FIXME set iop.rs_type according to rs specifier for given operand
+
+    return iop;
 }
 
 byte_op assembler::operands::getbyte(const string& s) {

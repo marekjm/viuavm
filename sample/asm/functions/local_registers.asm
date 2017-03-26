@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -20,6 +20,8 @@
 .function: set_69/0
     ress global
     istore %2 69
+    move %0 %2
+    move %2 %0
     return
 .end
 
@@ -34,6 +36,6 @@
     print %2
 
     ress local
-    izero %0
+    izero %0 local
     return
 .end

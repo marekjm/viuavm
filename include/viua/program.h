@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -68,7 +68,7 @@ class Program {
     Program& opiinc(int_op);
     Program& opidec(int_op);
 
-    Program& opfstore(int_op, float);
+    Program& opfstore(int_op, viua::internals::types::plain_float);
 
     Program& opitof(int_op, int_op);
     Program& opftoi(int_op, int_op);
@@ -104,8 +104,6 @@ class Program {
     Program& opptr(int_op, int_op);
     Program& opswap(int_op, int_op);
     Program& opress(std::string);
-    Program& optmpri(int_op);
-    Program& optmpro(int_op);
     Program& opdelete(int_op);
     Program& opisnull(int_op, int_op);
 
@@ -118,7 +116,6 @@ class Program {
     Program& opclosure(int_op, const std::string&);
 
     Program& opfunction(int_op, const std::string&);
-    Program& opfcall(int_op, int_op);
 
     Program& opframe(int_op, int_op);
     Program& opparam(int_op, int_op);
@@ -127,8 +124,11 @@ class Program {
     Program& opargc(int_op);
 
     Program& opcall(int_op, const std::string&);
+    Program& opcall(int_op, int_op);
     Program& optailcall(const std::string&);
+    Program& optailcall(int_op);
     Program& opprocess(int_op, const std::string&);
+    Program& opprocess(int_op, int_op);
     Program& opself(int_op);
     Program& opjoin(int_op, int_op, timeout_op);
     Program& opsend(int_op, int_op);
@@ -154,6 +154,7 @@ class Program {
 
     Program& opnew(int_op, const std::string&);
     Program& opmsg(int_op, const std::string&);
+    Program& opmsg(int_op, int_op);
     Program& opinsert(int_op, int_op, int_op);
     Program& opremove(int_op, int_op, int_op);
 

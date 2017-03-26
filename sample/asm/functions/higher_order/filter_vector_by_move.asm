@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -61,7 +61,7 @@
 
     ; ...and if the result from filtering function was "true" - the element should be pushed onto result vector
     ; it it was "false" - skip to next iteration
-    if (fcall %8 %1) element_ok next_iter
+    if (call %8 %1) element_ok next_iter
 
     .mark: element_ok
     vpush %3 *7
@@ -93,6 +93,6 @@
     frame ^[(param %0 (function %3 is_divisible_by_2/1)) (pamv %1 %1)]
     print (call %4 filter/2)
 
-    izero %0
+    izero %0 local
     return
 .end

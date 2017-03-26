@@ -22,6 +22,8 @@
 #include <viua/types/boolean.h>
 #include <viua/types/reference.h>
 #include <viua/types/process.h>
+#include <viua/types/function.h>
+#include <viua/types/closure.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/scheduler/vps.h>
@@ -39,7 +41,23 @@ viua::internals::types::byte* viua::process::Process::opprocess(viua::internals:
     }
 
     string call_name;
-    tie(addr, call_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
+    auto ot = viua::bytecode::decoder::operands::get_operand_type(addr);
+    if (ot == OT_REGISTER_INDEX or ot == OT_POINTER) {
+        viua::types::Type* fn_source = nullptr;
+        tie(addr, fn_source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+
+        auto fn = dynamic_cast<viua::types::Function*>(fn_source);
+        if (not fn) {
+            throw new viua::types::Exception("type is not callable: " + fn_source->type());
+        }
+        call_name = fn->name();
+
+        if (fn->type() == "Closure") {
+            throw new viua::types::Exception("cannot spawn a process from closure");
+        }
+    } else {
+        tie(addr, call_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
+    }
 
     bool is_native = scheduler->isNativeFunction(call_name);
     bool is_foreign = scheduler->isForeignFunction(call_name);
@@ -48,9 +66,9 @@ viua::internals::types::byte* viua::process::Process::opprocess(viua::internals:
         throw new viua::types::Exception("call to undefined function: " + call_name);
     }
 
-    frame_new->function_name = call_name;
+    stack.frame_new->function_name = call_name;
 
-    auto spawned_process = scheduler->spawn(std::move(frame_new), this, target_is_void);
+    auto spawned_process = scheduler->spawn(std::move(stack.frame_new), this, target_is_void);
     if (not target_is_void) {
         *target = unique_ptr<viua::types::Type>{new viua::types::Process(spawned_process)};
     }
@@ -93,7 +111,7 @@ viua::internals::types::byte* viua::process::Process::opjoin(viua::internals::ty
             thrd->join();
             return_addr = addr;
             if (thrd->terminated()) {
-                thrown = thrd->transferActiveException();
+                stack.thrown = thrd->transferActiveException();
             }
             if (not target_is_void) {
                 *target = thrd->getReturnValue();
@@ -101,7 +119,7 @@ viua::internals::types::byte* viua::process::Process::opjoin(viua::internals::ty
         } else if (timeout_active and (not wait_until_infinity) and (waiting_until < std::chrono::steady_clock::now())) {
             timeout_active = false;
             wait_until_infinity = false;
-            thrown.reset(new viua::types::Exception("process did not join"));
+            stack.thrown.reset(new viua::types::Exception("process did not join"));
             return_addr = addr;
         }
     } else {
@@ -172,7 +190,7 @@ viua::internals::types::byte* viua::process::Process::opreceive(viua::internals:
         if (timeout_active and (not wait_until_infinity) and (waiting_until < std::chrono::steady_clock::now())) {
             timeout_active = false;
             wait_until_infinity = false;
-            thrown.reset(new viua::types::Exception("no message received"));
+            stack.thrown.reset(new viua::types::Exception("no message received"));
             return_addr = addr;
         }
     }

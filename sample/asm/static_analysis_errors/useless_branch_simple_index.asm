@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2016 Marek Marecki
+;   Copyright (C) 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -20,6 +20,6 @@
 .function: main/0
     if (izero %1) 3 3
 
-    izero %0
+    izero %0 local
     return
 .end

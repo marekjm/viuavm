@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2016 Marek Marecki
+;   Copyright (C) 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,8 +18,14 @@
 ;
 
 .function: main/0
-    tmpri %1
+    strstore %1 local "Hello local World!"
+    strstore %1 static "Hello static World!"
+    strstore %1 global "Hello global World!"
 
-    izero %0
+    print %1 local
+    print %1 static
+    print %1 global
+
+    izero %0 local
     return
 .end

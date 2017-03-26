@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2016 Marek Marecki
+;   Copyright (C) 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -26,6 +26,6 @@
     call default foo/0
     ;call 1 foo/0
 
-    izero %0
+    izero %0 local
     return
 .end

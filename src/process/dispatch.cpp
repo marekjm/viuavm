@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -134,12 +134,6 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case RESS:
             addr = opress(addr+1);
             break;
-        case TMPRI:
-            addr = optmpri(addr+1);
-            break;
-        case TMPRO:
-            addr = optmpro(addr+1);
-            break;
         case PRINT:
               addr = opprint(addr+1);
             break;
@@ -160,9 +154,6 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
             break;
         case FUNCTION:
               addr = opfunction(addr+1);
-            break;
-        case FCALL:
-              addr = opfcall(addr+1);
             break;
         case FRAME:
               addr = opframe(addr+1);

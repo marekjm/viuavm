@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -46,10 +46,10 @@ namespace viua {
         }
 
         enum class RegisterSets: types::registerset_type_marker {
-            GLOBAL = 0,
+            CURRENT = 0,
+            GLOBAL,
             LOCAL,
             STATIC,
-            TEMPORARY,
         };
     }
 }

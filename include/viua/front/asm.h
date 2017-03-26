@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <viua/program.h>
 #include <viua/cg/lex.h>
 
 
@@ -64,6 +65,7 @@ invocables_t gatherFunctions(const std::vector<viua::cg::lex::Token>&);
 invocables_t gatherBlocks(const std::vector<viua::cg::lex::Token>&);
 std::map<std::string, std::string> gatherMetaInformation(const std::vector<viua::cg::lex::Token>&);
 
+viua::internals::types::bytecode_size assemble_instruction(Program& program, viua::internals::types::bytecode_size& instruction, viua::internals::types::bytecode_size i, const std::vector<viua::cg::lex::Token>& tokens, std::map<std::string, std::remove_reference<decltype(tokens)>::type::size_type>& marks);
 void generate(std::vector<viua::cg::lex::Token>&, invocables_t&, invocables_t&, const std::string&, std::string&, const std::vector<std::string>&, const compilationflags_t&);
 
 

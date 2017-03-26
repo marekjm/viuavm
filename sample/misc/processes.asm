@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -71,6 +71,6 @@
 
     print (strstore %2 "main/1 exited")
 
-    izero %0
+    izero %0 local
     return
 .end

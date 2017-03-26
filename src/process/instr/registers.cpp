@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -70,6 +70,9 @@ viua::internals::types::byte* viua::process::Process::opdelete(viua::internals::
     viua::kernel::Register *target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
+    if (target->empty()) {
+        throw new viua::types::Exception("delete of null register");
+    }
     target->give();
 
     return addr;
@@ -93,38 +96,15 @@ viua::internals::types::byte* viua::process::Process::opress(viua::internals::ty
             currently_used_register_set = global_register_set.get();
             break;
         case viua::internals::RegisterSets::LOCAL:
-            currently_used_register_set = frames.back()->local_register_set.get();
+            currently_used_register_set = stack.back()->local_register_set.get();
             break;
         case viua::internals::RegisterSets::STATIC:
-            ensureStaticRegisters(frames.back()->function_name);
-            currently_used_register_set = static_registers.at(frames.back()->function_name).get();
+            ensureStaticRegisters(stack.back()->function_name);
+            currently_used_register_set = static_registers.at(stack.back()->function_name).get();
             break;
-        case viua::internals::RegisterSets::TEMPORARY:
-            // TODO: switching to temporary registers
         default:
             throw new viua::types::Exception("illegal register set ID in ress instruction");
     }
-
-    return addr;
-}
-
-viua::internals::types::byte* viua::process::Process::optmpri(viua::internals::types::byte* addr) {
-    viua::kernel::Register *target = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
-
-    tmp = target->give();
-
-    return addr;
-}
-viua::internals::types::byte* viua::process::Process::optmpro(viua::internals::types::byte* addr) {
-    if (not tmp) {
-        throw new viua::types::Exception("temporary register set is empty");
-    }
-
-    viua::kernel::Register *target = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
-
-    *target = std::move(tmp);
 
     return addr;
 }

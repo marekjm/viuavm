@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -298,10 +298,10 @@ int main(int argc, char* argv[]) {
             PERFORM_STATIC_ANALYSIS = false;
             continue;
         } else if (str::startswith(option, "-")) {
-            cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
-            cout << ": unknown option: ";
-            cout << send_control_seq(COLOR_FG_WHITE) << option << send_control_seq(ATTR_RESET);
-            cout << endl;
+            cerr << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
+            cerr << ": unknown option: ";
+            cerr << send_control_seq(COLOR_FG_WHITE) << option << send_control_seq(ATTR_RESET);
+            cerr << endl;
             return 1;
         }
         args.emplace_back(argv[i]);

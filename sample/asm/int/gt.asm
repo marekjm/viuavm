@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -25,6 +25,6 @@
     istore %2 1
     gt int64 %1 %1 %2
     print %1
-    izero %0
+    izero %0 local
     return
 .end

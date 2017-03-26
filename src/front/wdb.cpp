@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -271,7 +271,6 @@ tuple<bool, string> if_watchpoint_local_register_write(viua::kernel::Kernel& ker
     OPCODE opcode = OPCODE(*kernel.executionAt());
     if (opcode == NOP or
         opcode == RESS or
-        opcode == TMPRI or
         opcode == PRINT or
         opcode == ECHO or
         opcode == FRAME or
@@ -301,8 +300,7 @@ tuple<bool, string> if_watchpoint_local_register_write(viua::kernel::Kernel& ker
         opcode == BOOL or
         opcode == NOT or
         opcode == DELETE or
-        opcode == EMPTY or
-        opcode == TMPRO
+        opcode == EMPTY
        ) {
         register_index[0] = *reinterpret_cast<int*>(register_index_ptr+1);
         writes_to = 1;
@@ -380,7 +378,6 @@ tuple<bool, string> if_watchpoint_global_register_write(viua::kernel::Kernel& ke
     OPCODE opcode = OPCODE(*kernel.executionAt());
     if (opcode == NOP or
         opcode == RESS or
-        opcode == TMPRI or
         opcode == PRINT or
         opcode == ECHO or
         opcode == FRAME or
@@ -410,8 +407,7 @@ tuple<bool, string> if_watchpoint_global_register_write(viua::kernel::Kernel& ke
         opcode == BOOL or
         opcode == NOT or
         opcode == DELETE or
-        opcode == EMPTY or
-        opcode == TMPRO
+        opcode == EMPTY
        ) {
         register_index[0] = *reinterpret_cast<int*>(register_index_ptr+1);
         writes_to = 1;

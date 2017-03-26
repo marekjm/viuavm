@@ -101,6 +101,6 @@
     frame ^[(param %iota %how_many_bottles) (param %iota %printer_pid)]
     call void spawner/2
 
-    izero %0
+    izero %0 local
     return
 .end

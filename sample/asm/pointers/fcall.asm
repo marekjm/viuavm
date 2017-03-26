@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2016 Marek Marecki
+;   Copyright (C) 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -46,12 +46,12 @@
 
     ptr %pointer %adder
     frame ^[(param %iota %one) (param %iota %one)]
-    print (fcall %result *pointer)
+    print (call %result *pointer)
 
     ptr %pointer %multipler
     frame ^[(param %iota %one) (param %iota %one)]
-    print (fcall %result *pointer)
+    print (call %result *pointer)
 
-    izero %0
+    izero %0 local
     return
 .end

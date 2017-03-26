@@ -20,6 +20,9 @@
 #ifndef VIUA_UTIL_MEMORY_H
 #define VIUA_UTIL_MEMORY_H
 
+#include <memory>
+
+
 #pragma once
 
 
@@ -33,6 +36,7 @@ namespace viua {
                 auto delete_if_owned() -> void {
                     if (owns_pointer and (pointer != nullptr)) {
                         delete pointer;
+                        pointer = nullptr;
                     }
                 }
 
@@ -48,9 +52,18 @@ namespace viua {
                     owns_pointer = own;
                     pointer = ptr;
                 }
+                auto reset(std::unique_ptr<T> ptr) -> void {
+                    delete_if_owned();
+                    owns_pointer = true;
+                    pointer = ptr.release();
+                }
 
                 auto get() -> T* {
                     return pointer;
+                }
+
+                auto owns() const -> bool {
+                    return owns_pointer;
                 }
 
                 auto operator->() -> T* {

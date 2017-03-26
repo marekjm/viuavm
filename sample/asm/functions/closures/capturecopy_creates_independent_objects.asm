@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -32,15 +32,15 @@
     print %1
     ; call the closure
     frame %0
-    fcall void %2
+    call void %2
 
     ; this should not affect the object captured a "a_closure"
     print (istore %1 42)
 
     ; call the closure
     frame %0
-    fcall void %2
+    call void %2
 
-    izero %0
+    izero %0 local
     return
 .end

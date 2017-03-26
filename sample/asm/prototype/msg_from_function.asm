@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2016 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -17,9 +17,22 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: main/0
-    print (tmpri (izero %1))
+.function: implementation/1
+    print (strstore %1 "Hello World!")
+    return
+.end
 
-    izero %0
+.signature: interface/1
+
+.function: main/1
+    register (attach (class %1 Class) implementation/1 interface/1)
+
+    new %2 Class
+    function %3 interface/1
+
+    frame ^[(param %0 %2)]
+    msg void %3
+
+    izero %0 local
     return
 .end

@@ -104,7 +104,7 @@ viua::internals::types::byte* viua::process::Process::opcapturemove(viua::intern
 viua::internals::types::byte* viua::process::Process::opclosure(viua::internals::types::byte* addr) {
     /** Create a closure from a function.
      */
-    if (currently_used_register_set != frames.back()->local_register_set.get()) {
+    if (currently_used_register_set != stack.back()->local_register_set.get()) {
         throw new viua::types::Exception("creating closures from nonlocal registers is forbidden");
     }
 
@@ -138,53 +138,4 @@ viua::internals::types::byte* viua::process::Process::opfunction(viua::internals
     *target = unique_ptr<viua::types::Type>{new viua::types::Function(function_name)};
 
     return addr;
-}
-
-viua::internals::types::byte* viua::process::Process::opfcall(viua::internals::types::byte* addr) {
-    /*  Call a function object.
-     */
-    bool return_void = viua::bytecode::decoder::operands::is_void(addr);
-    viua::kernel::Register* return_register = nullptr;
-
-    if (not return_void) {
-        tie(addr, return_register) = viua::bytecode::decoder::operands::fetch_register(addr, this);
-    } else {
-        addr = viua::bytecode::decoder::operands::fetch_void(addr);
-    }
-
-    viua::types::Type* fn_source = nullptr;
-    tie(addr, fn_source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
-
-    auto fn = dynamic_cast<viua::types::Function*>(fn_source);
-    if (not fn) {
-        throw new viua::types::Exception("type is not callable: " + fn_source->type());
-    }
-
-    string call_name = fn->name();
-
-    if (not scheduler->isNativeFunction(call_name)) {
-        throw new viua::types::Exception("fcall to undefined function: " + call_name);
-    }
-
-    viua::internals::types::byte* call_address = nullptr;
-    call_address = adjustJumpBaseFor(call_name);
-
-    // save return address for frame
-    viua::internals::types::byte* return_address = addr;
-
-    if (frame_new == nullptr) {
-        throw new viua::types::Exception("fcall without a frame: use `frame 0' in source code if the function takes no parameters");
-    }
-
-    frame_new->function_name = call_name;
-    frame_new->return_address = return_address;
-    frame_new->return_register = return_register;
-
-    if (fn->type() == "Closure") {
-        frame_new->setLocalRegisterSet(static_cast<viua::types::Closure*>(fn)->rs(), false);
-    }
-
-    pushFrame();
-
-    return call_address;
 }

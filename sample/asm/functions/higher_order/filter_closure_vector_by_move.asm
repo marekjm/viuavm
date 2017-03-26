@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -67,7 +67,7 @@
     ; call filtering function to determine whether current element
     ; is a valid value
     frame ^[(param %0 *(vat %7 %2 @4))] %0
-    fcall %8 %1
+    call %8 %1
 
     ; if the result from filtering function was "true" - the element should be pushed onto result vector
     ; it it was "false" - skip to next iteration
@@ -106,6 +106,6 @@
     frame ^[(param %0 %3) (pamv %1 %1)]
     print (call %4 filter_closure/2)
 
-    izero %0
+    izero %0 local
     return
 .end

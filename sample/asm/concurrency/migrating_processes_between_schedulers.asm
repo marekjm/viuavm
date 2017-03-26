@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2016 Marek Marecki
+;   Copyright (C) 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -83,6 +83,6 @@
     frame ^[(pamv %0 %limit)]
     call spawn_processes/1
 
-    izero %0
+    izero %0 local
     return
 .end

@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2016 Marek Marecki
+;   Copyright (C) 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -23,6 +23,6 @@
 
     add int8 (.name: %iota value) first second
 
-    izero %0
+    izero %0 local
     return
 .end

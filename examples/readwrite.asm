@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -52,6 +52,6 @@
     frame ^[(param %0 %3) (param %1 %2)]
     call void io::write/2
 
-    izero %0
+    izero %0 local
     return
 .end

@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016 Marek Marecki
+;   Copyright (C) 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -17,9 +17,28 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
+.closure: closure/0
+    throw %1
+    return
+.end
+
+.function: test/0
+    .name: %iota a_closure
+    .name: %iota an_int
+
+    istore %an_int 42
+
+    closure %a_closure closure/0
+    capturemove %a_closure %1 %an_int
+
+    frame %0
+    tailcall %a_closure
+.end
+
 .function: main/0
-    tmpro %1
-    print %1
-    izero %0
+    frame %0
+    call void test/0
+
+    izero %0 local
     return
 .end

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-#   Copyright (C) 2015, 2016 Marek Marecki
+#   Copyright (C) 2015, 2016, 2017 Marek Marecki
 #
 #   This file is part of Viua VM.
 #
@@ -36,6 +36,7 @@ Memory leak tests may be disabled for some runs as they are slow.
 
 import datetime
 import functools
+import hashlib
 import json
 import os
 import subprocess
@@ -321,6 +322,14 @@ def runTestBackend(self, name, expected_output=None, expected_exit_code = 0, out
             self.assertEqual(got_output, (dis_output.strip() if output_processing_function is None else output_processing_function(dis_output)))
             self.assertEqual(excode, dis_excode)
 
+    source_assembly_output = b''
+    disasm_assembly_output = b''
+    with open(compiled_path, 'rb') as ifstream:
+        source_assembly_output = ifstream.read()
+    with open(compiled_disasm_path, 'rb') as ifstream:
+        disasm_assembly_output = ifstream.read()
+    self.assertEqual(hashlib.sha512(source_assembly_output).hexdigest(), hashlib.sha512(disasm_assembly_output).hexdigest())
+
 measured_run_times = []
 def runTest(self, name, expected_output=None, expected_exit_code = 0, output_processing_function = None, check_memory_leaks = True, custom_assert=None, assembly_opts=None, valgrind_enable=True, test_disasm=True):
     begin = datetime.datetime.now()
@@ -363,6 +372,15 @@ def extractFirstException(output):
 
 def runTestThrowsException(self, name, expected_output, assembly_opts=None):
     runTest(self, name, expected_output, expected_exit_code=1, output_processing_function=extractFirstException, valgrind_enable=False, assembly_opts=assembly_opts)
+
+def runTestThrowsExceptionJSON(self, name, expected_output, output_processing_function, assembly_opts=None):
+    was = os.environ.get('VIUA_STACKTRACE_SERIALISATION', 'default')
+    was_to = os.environ.get('VIUA_STACKTRACE_PRINT_TO', 'stderr')
+    os.environ['VIUA_STACKTRACE_SERIALISATION'] = 'json'
+    os.environ['VIUA_STACKTRACE_PRINT_TO'] = 'stdout'
+    runTest(self, name, expected_output, expected_exit_code=1, output_processing_function=output_processing_function, valgrind_enable=False, assembly_opts=assembly_opts)
+    os.environ['VIUA_STACKTRACE_SERIALISATION'] = was
+    os.environ['VIUA_STACKTRACE_PRINT_TO'] = was_to
 
 def runTestReportsException(self, name, expected_output, assembly_opts=None):
     runTest(self, name, expected_output, expected_exit_code=0, output_processing_function=extractFirstException, assembly_opts=assembly_opts)
@@ -619,9 +637,6 @@ class RegisterManipulationInstructionsTests(unittest.TestCase):
     def testDELETE(self):
         runTest(self, 'delete.asm', 'true')
 
-    def testFetchingFromEmptyTemporaryRegister(self):
-        runTestThrowsException(self, 'fetching_from_empty_tmp_register.asm', ('Exception', 'temporary register set is empty',))
-
 
 class PointersTests(unittest.TestCase):
     """Tests for register-manipulation instructions.
@@ -812,6 +827,12 @@ class HigherOrderFunctionTests(unittest.TestCase):
     def testFilterByClosureVectorByMove(self):
         # FIXME --no-sa may be removed once closures are differentatied from functions
         runTest(self, 'filter_closure_vector_by_move.asm', [[1, 2, 3, 4, 5], [2, 4]], 0, lambda o: [json.loads(i) for i in o.splitlines()], assembly_opts=('--no-sa',))
+
+    def testTailcallOfObject(self):
+        runTestThrowsExceptionJSON(self, 'tailcall_of_object.asm', {'frame': {}, 'trace': ['main/0/0()', 'foo/0/0()',], 'uncaught': {'type': 'Integer', 'value': '42',}}, output_processing_function=lambda s: json.loads(s.strip()))
+
+    def testTailcallOfClosure(self):
+        runTestThrowsExceptionJSON(self, 'tailcall_of_closure.asm', {'frame': {}, 'trace': ['main/0/0()', 'test/0/0()',], 'uncaught': {'type': 'Integer', 'value': '42',}}, assembly_opts=('--no-sa',), output_processing_function=lambda s: json.loads(s.strip()))
 
 
 class ClosureTests(unittest.TestCase):
@@ -1057,6 +1078,9 @@ class PrototypeSystemTests(unittest.TestCase):
             ],
         )
 
+    def testMsgFromFunctionObject(self):
+        runTest(self, 'msg_from_function.asm', 'Hello World!')
+
 
 class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
     PATH = './sample/asm/static_analysis_errors'
@@ -1187,20 +1211,11 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
     def testThrowFromEmptyRegister(self):
         runTestFailsToAssemble(self, 'throw_from_empty_register.asm', "./sample/asm/static_analysis_errors/throw_from_empty_register.asm:21:11: error: throw from empty register: 1")
 
-    def testTmpriEmptiesRegisters(self):
-        runTestFailsToAssemble(self, 'tmpri_empties_registers.asm', "./sample/asm/static_analysis_errors/tmpri_empties_registers.asm:21:25: error: print of empty register: 1")
-
-    def testTmpriFromEmptyRegister(self):
-        runTestFailsToAssemble(self, 'tmpri_from_empty_register.asm', "./sample/asm/static_analysis_errors/tmpri_from_empty_register.asm:21:11: error: move to tmp register from empty register: 1")
-
-    def testTmproMakesRegistersNonempty(self):
-        runTestThrowsException(self, 'tmpro_makes_registers_nonempty.asm', ('Exception', 'temporary register set is empty'))
-
     def testIsnullFailsOnNonemptyRegisters(self):
         runTestFailsToAssemble(self, 'isnull_fails_on_nonempty_registers.asm', "./sample/asm/static_analysis_errors/isnull_fails_on_nonempty_registers.asm:22:19: error: useless check, register will always be defined: 1")
 
     def testFcallFromEmptyRegister(self):
-        runTestFailsToAssemble(self, 'fcall_from_empty_register.asm', "./sample/asm/static_analysis_errors/fcall_from_empty_register.asm:22:16: error: fcall from empty register: 1")
+        runTestFailsToAssemble(self, 'fcall_from_empty_register.asm', "./sample/asm/static_analysis_errors/fcall_from_empty_register.asm:22:15: error: call from empty register: 1")
 
     def testJoinFromEmptyRegister(self):
         runTestFailsToAssemble(self, 'join_from_empty_register.asm', "./sample/asm/static_analysis_errors/join_from_empty_register.asm:21:13: error: join from empty register: 1")
@@ -1635,6 +1650,12 @@ class AssemblerErrorRejectingDuplicateSymbolsTests(unittest.TestCase):
         self.assertRaises(ViuaAssemblerError, assemble, os.path.join(self.PATH, 'exec.asm'), links=(lib_a_path, lib_a_path))
 
 
+class ExceptionMechanismTests(unittest.TestCase):
+    PATH = './sample/asm/exception_mechanism'
+
+    def testThrowFromEmptyRegister(self):
+        runTestThrowsException(self, 'throw_from_empty_register.asm', ('Exception', 'throw from null register',), assembly_opts=('--no-sa',))
+
 class MiscExceptionTests(unittest.TestCase):
     PATH = './sample/asm/exceptions'
 
@@ -1659,7 +1680,7 @@ class MiscExceptionTests(unittest.TestCase):
 
     def testCatchingMachineThrownException(self):
         # pass --no-sa flag; we want to check runtime exception
-        runTest(self, 'nullregister_access.asm', "exception encountered: (get) read from null register: 1", assembly_opts=('--no-sa',))
+        runTest(self, 'nullregister_access.asm', "exception encountered: read from null register: 1", assembly_opts=('--no-sa',))
 
     def testCatcherState(self):
         runTestSplitlines(self, 'restore_catcher_state.asm', ['42','100','42','100'], test_disasm=False)
@@ -1672,6 +1693,9 @@ class MiscExceptionTests(unittest.TestCase):
 
     def testVectorOutOfRangeRead(self):
         runTestThrowsException(self, 'vector_out_of_range_read.asm', ('OutOfRangeException', 'positive vector index out of range',))
+
+    def testDeleteOfEmptyRegister(self):
+        runTestThrowsException(self, 'delete_of_empty_register.asm', ('Exception', 'delete of null register',), assembly_opts=('--no-sa',))
 
 
 class MiscTests(unittest.TestCase):
@@ -1777,7 +1801,7 @@ class ProcessAbstractionTests(unittest.TestCase):
 
     def testProcessesHaveSeparateGlobalRegisterSets(self):
         # FIXME global registers should not be statically checked
-        runTestReportsException(self, 'separate_global_rs.asm', ('Exception', '(get) read from null register: 1',), assembly_opts=('--no-sa',))
+        runTestReportsException(self, 'separate_global_rs.asm', ('Exception', 'read from null register: 1',), assembly_opts=('--no-sa',))
 
 
 class ConcurrencyTests(unittest.TestCase):
@@ -2006,6 +2030,25 @@ class RuntimeAssertionsTests(unittest.TestCase):
 
     def testAssertTypeof(self):
         runTest(self, 'assert_typeof.asm', 'expected Integer, got String')
+
+
+class ExplicitRegisterSetsTests(unittest.TestCase):
+    PATH = './sample/asm/explicit_register_sets'
+
+    def testHelloWorld(self):
+        runTestSplitlines(self, 'hello_world.asm', [
+            'Hello local World!',
+            'Hello static World!',
+            'Hello global World!',
+        ])
+
+    def testMoveBetween(self):
+        runTestSplitlines(self, 'move_between.asm', [
+            'Hello World!',
+            'Hello World!',
+            'Hello World!',
+        ])
+
 
 
 if __name__ == '__main__':

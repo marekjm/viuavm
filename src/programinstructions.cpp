@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -63,7 +63,7 @@ Program& Program::opidec(int_op regno) {
     return (*this);
 }
 
-Program& Program::opfstore(int_op regno, float f) {
+Program& Program::opfstore(int_op regno, viua::internals::types::plain_float f) {
     /*  Inserts fstore instruction to bytecode.
      *
      *  :params:
@@ -301,20 +301,6 @@ Program& Program::opress(string a) {
     return (*this);
 }
 
-Program& Program::optmpri(int_op reg) {
-    /*  Inserts tmpri instuction.
-     */
-    addr_ptr = cg::bytecode::optmpri(addr_ptr, reg);
-    return (*this);
-}
-
-Program& Program::optmpro(int_op reg) {
-    /*  Inserts tmpro instuction.
-     */
-    addr_ptr = cg::bytecode::optmpro(addr_ptr, reg);
-    return (*this);
-}
-
 Program& Program::opprint(int_op reg) {
     /*  Inserts print instuction.
      */
@@ -361,13 +347,6 @@ Program& Program::opfunction(int_op reg, const string& fn) {
     /*  Inserts function instuction.
      */
     addr_ptr = cg::bytecode::opfunction(addr_ptr, reg, fn);
-    return (*this);
-}
-
-Program& Program::opfcall(int_op clsr, int_op ret) {
-    /*  Inserts fcall instruction to bytecode.
-     */
-    addr_ptr = cg::bytecode::opfcall(addr_ptr, clsr, ret);
     return (*this);
 }
 
@@ -433,6 +412,14 @@ Program& Program::opcall(int_op reg, const string& fn_name) {
     return (*this);
 }
 
+Program& Program::opcall(int_op reg, int_op fn) {
+    /*  Inserts call instruction.
+     *  Byte offset is calculated automatically.
+     */
+    addr_ptr = cg::bytecode::opcall(addr_ptr, reg, fn);
+    return (*this);
+}
+
 Program& Program::optailcall(const string& fn_name) {
     /*  Inserts tailcall instruction.
      *  Byte offset is calculated automatically.
@@ -441,8 +428,18 @@ Program& Program::optailcall(const string& fn_name) {
     return (*this);
 }
 
+Program& Program::optailcall(int_op fn) {
+    addr_ptr = cg::bytecode::optailcall(addr_ptr, fn);
+    return (*this);
+}
+
 Program& Program::opprocess(int_op ref, const string& fn_name) {
     addr_ptr = cg::bytecode::opprocess(addr_ptr, ref, fn_name);
+    return (*this);
+}
+
+Program& Program::opprocess(int_op reg, int_op fn) {
+    addr_ptr = cg::bytecode::opprocess(addr_ptr, reg, fn);
     return (*this);
 }
 
@@ -497,6 +494,7 @@ Program& Program::opif(int_op regc, viua::internals::types::bytecode_size addr_t
 
     jump_position_in_bytecode += sizeof(viua::internals::types::byte); // for opcode
     jump_position_in_bytecode += sizeof(viua::internals::types::byte); // for operand-type marker
+    jump_position_in_bytecode += sizeof(viua::internals::RegisterSets); // for rs-type marker
     jump_position_in_bytecode += sizeof(viua::internals::types::register_index);
 
     if (absolute_truth != JMP_TO_BYTE) {
@@ -605,6 +603,13 @@ Program& Program::opnew(int_op reg, const string& class_name) {
 }
 
 Program& Program::opmsg(int_op reg, const string& method_name) {
+    /*  Inserts msg instuction.
+     */
+    addr_ptr = cg::bytecode::opmsg(addr_ptr, reg, method_name);
+    return (*this);
+}
+
+Program& Program::opmsg(int_op reg, int_op method_name) {
     /*  Inserts msg instuction.
      */
     addr_ptr = cg::bytecode::opmsg(addr_ptr, reg, method_name);

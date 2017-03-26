@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2016 Marek Marecki
+;   Copyright (C) 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,8 +18,8 @@
 ;
 
 .function: main/0
-    print (tmpro %1)
+    delete %1 static
 
-    izero %0
+    izero %0 local
     return
 .end

@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -66,7 +66,7 @@
 
     ; finally, after the frame is ready
     ; call the function
-    move %0 (fcall %iota %fn_to_call)
+    move %0 (call %iota %fn_to_call)
     return
 .end
 
@@ -90,6 +90,6 @@
     frame ^[(param %0 (function %7 sum/4)) (param %1 %1)]
     print (call %8 invoke/2)
 
-    izero %0
+    izero %0 local
     return
 .end

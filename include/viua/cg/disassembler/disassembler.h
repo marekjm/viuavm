@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -37,6 +37,7 @@ template<typename K, typename V> bool in(std::map<K, V> m, K key) {
 
 namespace disassembler {
     std::string intop(viua::internals::types::byte*);
+    std::string intop_with_rs_type(viua::internals::types::byte*);
     std::tuple<std::string, viua::internals::types::bytecode_size> instruction(viua::internals::types::byte*);
 }
 

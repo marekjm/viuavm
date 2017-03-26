@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -28,10 +28,10 @@ using namespace std;
 viua::internals::types::byte* viua::process::Process::optry(viua::internals::types::byte* addr) {
     /** Create new special frame for try blocks.
      */
-    if (try_frame_new) {
+    if (stack.try_frame_new) {
         throw "new block frame requested while last one is unused";
     }
-    try_frame_new.reset(new TryFrame());
+    stack.try_frame_new.reset(new TryFrame());
     return addr;
 }
 
@@ -46,7 +46,7 @@ viua::internals::types::byte* viua::process::Process::opcatch(viua::internals::t
         throw new viua::types::Exception("registering undefined handler block '" + catcher_block_name + "' to handle " + type_name);
     }
 
-    try_frame_new->catchers[type_name] = new Catcher(type_name, catcher_block_name);
+    stack.try_frame_new->catchers[type_name] = new Catcher(type_name, catcher_block_name);
 
     return addr;
 }
@@ -57,10 +57,10 @@ viua::internals::types::byte* viua::process::Process::opdraw(viua::internals::ty
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    if (not caught) {
+    if (not stack.caught) {
         throw new viua::types::Exception("no caught object to draw");
     }
-    *target = std::move(caught);
+    *target = std::move(stack.caught);
 
     return addr;
 }
@@ -77,11 +77,11 @@ viua::internals::types::byte* viua::process::Process::openter(viua::internals::t
 
     viua::internals::types::byte* block_address = adjustJumpBaseForBlock(block_name);
 
-    try_frame_new->return_address = addr;
-    try_frame_new->associated_frame = frames.back().get();
-    try_frame_new->block_name = block_name;
+    stack.try_frame_new->return_address = addr;
+    stack.try_frame_new->associated_frame = stack.back().get();
+    stack.try_frame_new->block_name = block_name;
 
-    tryframes.emplace_back(std::move(try_frame_new));
+    stack.tryframes.emplace_back(std::move(stack.try_frame_new));
 
     return block_address;
 }
@@ -92,13 +92,12 @@ viua::internals::types::byte* viua::process::Process::opthrow(viua::internals::t
     viua::kernel::Register* source = nullptr;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    if (not source) {
+    if (source->empty()) {
         ostringstream oss;
-        oss << "invalid throw: register is empty";
+        oss << "throw from null register";
         throw new viua::types::Exception(oss.str());
     }
-
-    thrown = source->give();
+    stack.thrown = source->give();
 
     return addr;
 }
@@ -106,14 +105,14 @@ viua::internals::types::byte* viua::process::Process::opthrow(viua::internals::t
 viua::internals::types::byte* viua::process::Process::opleave(viua::internals::types::byte* addr) {
     /*  Run leave instruction.
      */
-    if (tryframes.size() == 0) {
+    if (stack.tryframes.size() == 0) {
         throw new viua::types::Exception("bad leave: no block has been entered");
     }
-    addr = tryframes.back()->return_address;
-    tryframes.pop_back();
+    addr = stack.tryframes.back()->return_address;
+    stack.tryframes.pop_back();
 
-    if (frames.size() > 0) {
-        adjustJumpBaseFor(frames.back()->function_name);
+    if (stack.size() > 0) {
+        adjustJumpBaseFor(stack.back()->function_name);
     }
     return addr;
 }

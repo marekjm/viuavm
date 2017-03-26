@@ -1,3 +1,22 @@
+/*
+ *  Copyright (C) 2016, 2017 Marek Marecki
+ *
+ *  This file is part of Viua VM.
+ *
+ *  Viua VM is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Viua VM is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef VIUA_CG_LEX_H
 #define VIUA_CG_LEX_H
 
@@ -49,7 +68,7 @@ namespace viua {
                 auto character() const -> decltype(character_in_line);
                 auto match(Token) const -> bool;
 
-                auto add(Token) -> void;
+                auto add(Token) -> InvalidSyntax&;
 
                 InvalidSyntax(decltype(line_number), decltype(character_in_line), std::string);
                 InvalidSyntax(Token, std::string = "");
@@ -69,6 +88,9 @@ namespace viua {
 
                 auto append(const InvalidSyntax&) -> TracedSyntaxError&;
             };
+
+            bool is_reserved_keyword(const std::string&);
+            void assert_is_not_reserved_keyword(Token, const std::string&);
 
             std::vector<Token> tokenise(const std::string&);
             std::vector<Token> standardise(std::vector<Token>);

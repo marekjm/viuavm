@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016 Marek Marecki
+ *  Copyright (C) 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
 #include <memory>
 #include <functional>
 #include <viua/bytecode/bytetypedef.h>
@@ -72,15 +73,14 @@ template<template <typename T> class Operator> static viua::internals::types::by
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, process);
 
     viua::types::Type* lhs_raw = nullptr;
-    tie(addr, lhs_raw) = viua::bytecode::decoder::operands::fetch_object(addr, process);
+    tie(addr, lhs_raw) = viua::bytecode::decoder::operands::fetch_object2(addr, process);
 
     viua::types::Type* rhs_raw = nullptr;
-    tie(addr, rhs_raw) = viua::bytecode::decoder::operands::fetch_object(addr, process);
+    tie(addr, rhs_raw) = viua::bytecode::decoder::operands::fetch_object2(addr, process);
 
     using viua::types::numeric::Number;
 
     viua::assertions::expect_types<Number>("Number", lhs_raw, rhs_raw);
-
 
     auto lhs = static_cast<viua::types::numeric::Number*>(lhs_raw);
     auto rhs = static_cast<viua::types::numeric::Number*>(rhs_raw);
@@ -130,10 +130,10 @@ template<template <typename T> class Operator> static viua::internals::types::by
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, process);
 
     viua::types::Type* lhs_raw = nullptr;
-    tie(addr, lhs_raw) = viua::bytecode::decoder::operands::fetch_object(addr, process);
+    tie(addr, lhs_raw) = viua::bytecode::decoder::operands::fetch_object2(addr, process);
 
     viua::types::Type* rhs_raw = nullptr;
-    tie(addr, rhs_raw) = viua::bytecode::decoder::operands::fetch_object(addr, process);
+    tie(addr, rhs_raw) = viua::bytecode::decoder::operands::fetch_object2(addr, process);
 
     using viua::types::numeric::Number;
 

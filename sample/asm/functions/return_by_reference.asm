@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -32,7 +32,7 @@
 
     frame %0
     ; store return value in another register (it is a reference!)
-    fcall %3 %2
+    call %3 %2
 
     ; assign different value to it
     istore %3 42
@@ -40,6 +40,6 @@
     ; check if return-by-reference is working (should print 42)
     print %1
 
-    izero %0
+    izero %0 local
     return
 .end

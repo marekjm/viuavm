@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -55,15 +55,27 @@ void assembler::verify::functionCallsAreDefined(const vector<Token>& tokens, con
             continue;
         }
 
-        if (token == "tailcall" or token == "watchdog") {
-            string function_name = tokens.at(i+1);
+        if (token == "tailcall") {
+            auto function_name = tokens.at(i+1);
+            if (function_name.str().at(0) != '*' and function_name.str().at(0) != '%') {
+                if (not is_defined(function_name, function_names, function_signatures)) {
+                    throw viua::cg::lex::InvalidSyntax(function_name, (string(token == "tailcall" ? "tail call to" : "watchdog from") + " undefined function " + function_name.str()));
+                }
+            }
+        } else if (token == "watchdog") {
+            auto function_name = tokens.at(i+1);
             if (not is_defined(function_name, function_names, function_signatures)) {
-                throw viua::cg::lex::InvalidSyntax(tokens.at(i+1), (string(token == "tailcall" ? "tail call to" : "watchdog from") + " undefined function " + function_name));
+                throw viua::cg::lex::InvalidSyntax(function_name, (string(token == "tailcall" ? "tail call to" : "watchdog from") + " undefined function " + function_name.str()));
             }
         } else if (token == "call" or token == "process") {
-            string function_name = tokens.at(i+2);
-            if (not is_defined(function_name, function_names, function_signatures)) {
-                throw viua::cg::lex::InvalidSyntax(tokens.at(i+2), (string(token == "call" ? "call to" : "process from") + " undefined function " + function_name));
+            Token function_name = tokens.at(i+2);
+            if (tokens.at(i+1) != "void") {
+                function_name = tokens.at(i+3);
+            }
+            if (function_name.str().at(0) != '*' and function_name.str().at(0) != '%') {
+                if (not is_defined(function_name, function_names, function_signatures)) {
+                    throw viua::cg::lex::InvalidSyntax(function_name, (string(token == "call" ? "call to" : "process from") + " undefined function " + function_name.str()));
+                }
             }
         }
     }
@@ -89,15 +101,23 @@ void assembler::verify::functionCallArities(const vector<Token>& tokens) {
         Token function_name;
         if (tokens.at(i) == "call" or tokens.at(i) == "process") {
             function_name = tokens.at(i+2);
+            if (tokens.at(i+1) != "void") {
+                function_name = tokens.at(i+3);
+            }
         } else {
             function_name = tokens.at(i+1);
         }
 
-        if (not assembler::utils::isValidFunctionName(function_name)) {
+        if (not (function_name.str().at(0) == '*' or function_name.str().at(0) == '%' or assembler::utils::isValidFunctionName(function_name))) {
             throw viua::cg::lex::InvalidSyntax(function_name, ("not a valid function name: " + str::strencode(function_name)));
         }
 
         int arity = assembler::utils::getFunctionArity(function_name);
+
+        if (function_name.str().at(0) == '*' or function_name.str().at(0) == '%') {
+            // skip arity checks for functions called indirectly
+            continue;
+        }
 
         if (arity == -1) {
             ostringstream report;
@@ -139,9 +159,12 @@ void assembler::verify::msgArities(const vector<Token>& tokens) {
             continue;
         }
 
-        Token function_name = tokens.at(i+2);
+        Token function_name = tokens.at(i+3);
+        if (tokens.at(i+1) == "void") {
+            function_name = tokens.at(i+2);
+        }
 
-        if (not assembler::utils::isValidFunctionName(function_name)) {
+        if (not (function_name.str().at(0) == '*' or function_name.str().at(0) == '%' or assembler::utils::isValidFunctionName(function_name))) {
             throw viua::cg::lex::InvalidSyntax(function_name, ("not a valid function name: " + str::strencode(function_name)));
         }
 
@@ -150,6 +173,11 @@ void assembler::verify::msgArities(const vector<Token>& tokens) {
         }
 
         int arity = assembler::utils::getFunctionArity(function_name);
+
+        if (function_name.str().at(0) == '*' or function_name.str().at(0) == '%') {
+            // skip arity checks for functions called indirectly
+            continue;
+        }
 
         if (arity == -1) {
             ostringstream report;
@@ -206,8 +234,8 @@ void assembler::verify::functionsEndWithReturn(const std::vector<Token>& tokens)
             continue;
         }
 
-        bool last_token_returns = (tokens.at(i-1) == "return" or tokens.at(i-2) == "tailcall");
-        bool last_but_one_token_returns = (tokens.at(i-1) == "\n" and (tokens.at(i-2) == "return" or tokens.at(i-3) == "tailcall"));
+        bool last_token_returns = (tokens.at(i-1) == "return" or tokens.at(i-2) == "tailcall" or tokens.at(i-3) == "tailcall");
+        bool last_but_one_token_returns = (tokens.at(i-1) == "\n" and (tokens.at(i-2) == "return" or tokens.at(i-3) == "tailcall" or tokens.at(i-4) == "tailcall"));
         if (not (last_token_returns or last_but_one_token_returns)) {
             throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("function does not end with 'return' or 'tailcall': " + function));
         }
@@ -225,12 +253,12 @@ void assembler::verify::frameBalance(const vector<Token>& tokens) {
     Token previous_frame_spawned;
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
         instruction = tokens.at(i);
-        if (not (instruction == "call" or instruction == "tailcall" or instruction == "process" or instruction == "fcall" or instruction == "frame" or instruction == "msg" or
+        if (not (instruction == "call" or instruction == "tailcall" or instruction == "process" or instruction == "frame" or instruction == "msg" or
                  instruction == "return" or instruction == "leave" or instruction == "throw" or instruction == ".end")) {
             continue;
         }
 
-        if (instruction == "call" or instruction == "tailcall" or instruction == "process" or instruction == "fcall" or instruction == "msg") {
+        if (instruction == "call" or instruction == "tailcall" or instruction == "process" or instruction == "msg") {
             --balance;
         }
         if (instruction == "frame") {
@@ -310,7 +338,7 @@ void assembler::verify::callableCreations(const vector<Token>& tokens, const vec
             continue;
         }
 
-        string function = tokens.at(i+2);
+        string function = tokens.at(i+3);
         bool is_undefined = (find(function_names.begin(), function_names.end(), function) == function_names.end());
         // if function is undefined, check if we got a signature for it
         if (is_undefined) {
@@ -332,7 +360,6 @@ void assembler::verify::ressInstructions(const vector<Token>& tokens, bool as_li
         "global",   // global register set
         "local",    // local register set for function
         "static",   // static register set
-        "temporary",// temporary register set
     };
     string function;
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
@@ -460,6 +487,7 @@ void assembler::verify::instructions(const vector<Token>& tokens) {
 void assembler::verify::framesHaveNoGaps(const vector<Token>& tokens) {
     unsigned long frame_parameters_count = 0;
     bool detected_frame_parameters_count = false;
+    bool slot_index_detection_is_reliable = true;
     unsigned long last_frame = 0;
 
     vector<bool> filled_slots;
@@ -483,12 +511,16 @@ void assembler::verify::framesHaveNoGaps(const vector<Token>& tokens) {
             } else {
                 detected_frame_parameters_count = false;
             }
+            slot_index_detection_is_reliable = true;
             continue;
         }
 
         if (tokens.at(i) == "param" or tokens.at(i) == "pamv") {
             unsigned long slot_index;
             bool detected_slot_index = false;
+            if (tokens.at(i+1).str().at(0) == '@') {
+                slot_index_detection_is_reliable = false;
+            }
             if (tokens.at(i+1).str().at(0) == '%' and str::isnum(tokens.at(i+1).str().substr(1))) {
                 slot_index = stoul(tokens.at(i+1).str().substr(1));
                 detected_slot_index = true;
@@ -511,7 +543,7 @@ void assembler::verify::framesHaveNoGaps(const vector<Token>& tokens) {
             continue;
         }
 
-        if (tokens.at(i) == "call" or tokens.at(i) == "process") {
+        if (slot_index_detection_is_reliable and (tokens.at(i) == "call" or tokens.at(i) == "process")) {
             for (decltype(frame_parameters_count) f = 0; f < frame_parameters_count; ++f) {
                 if (not filled_slots[f]) {
                     ostringstream report;

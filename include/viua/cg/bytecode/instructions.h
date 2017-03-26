@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -38,10 +38,12 @@ enum class IntegerOperandType {
 
 struct int_op {
     IntegerOperandType type;
+    viua::internals::RegisterSets rs_type;
     viua::internals::types::plain_int value;
 
     int_op();
     int_op(IntegerOperandType, viua::internals::types::plain_int = 0);
+    int_op(IntegerOperandType, viua::internals::RegisterSets, viua::internals::types::plain_int = 0);
     int_op(viua::internals::types::plain_int);
 };
 struct timeout_op {
@@ -68,7 +70,7 @@ namespace cg {
         viua::internals::types::byte* opiinc(viua::internals::types::byte*, int_op);
         viua::internals::types::byte* opidec(viua::internals::types::byte*, int_op);
 
-        viua::internals::types::byte* opfstore(viua::internals::types::byte*, int_op, float);
+        viua::internals::types::byte* opfstore(viua::internals::types::byte*, int_op, viua::internals::types::plain_float);
 
         viua::internals::types::byte* opitof(viua::internals::types::byte*, int_op, int_op);
         viua::internals::types::byte* opftoi(viua::internals::types::byte*, int_op, int_op);
@@ -105,8 +107,6 @@ namespace cg {
         viua::internals::types::byte* opdelete(viua::internals::types::byte*, int_op);
         viua::internals::types::byte* opisnull(viua::internals::types::byte*, int_op, int_op);
         viua::internals::types::byte* opress(viua::internals::types::byte*, const std::string&);
-        viua::internals::types::byte* optmpri(viua::internals::types::byte*, int_op);
-        viua::internals::types::byte* optmpro(viua::internals::types::byte*, int_op);
 
         viua::internals::types::byte* opprint(viua::internals::types::byte*, int_op);
         viua::internals::types::byte* opecho(viua::internals::types::byte*, int_op);
@@ -116,7 +116,6 @@ namespace cg {
         viua::internals::types::byte* opcapturemove(viua::internals::types::byte*, int_op, int_op, int_op);
         viua::internals::types::byte* opclosure(viua::internals::types::byte*, int_op, const std::string&);
         viua::internals::types::byte* opfunction(viua::internals::types::byte*, int_op, const std::string&);
-        viua::internals::types::byte* opfcall(viua::internals::types::byte*, int_op, int_op);
 
         viua::internals::types::byte* opframe(viua::internals::types::byte*, int_op, int_op);
         viua::internals::types::byte* opparam(viua::internals::types::byte*, int_op, int_op);
@@ -124,8 +123,11 @@ namespace cg {
         viua::internals::types::byte* oparg(viua::internals::types::byte*, int_op, int_op);
         viua::internals::types::byte* opargc(viua::internals::types::byte*, int_op);
         viua::internals::types::byte* opcall(viua::internals::types::byte*, int_op, const std::string&);
+        viua::internals::types::byte* opcall(viua::internals::types::byte*, int_op, int_op);
         viua::internals::types::byte* optailcall(viua::internals::types::byte*, const std::string&);
+        viua::internals::types::byte* optailcall(viua::internals::types::byte*, int_op);
         viua::internals::types::byte* opprocess(viua::internals::types::byte*, int_op, const std::string&);
+        viua::internals::types::byte* opprocess(viua::internals::types::byte*, int_op, int_op);
         viua::internals::types::byte* opself(viua::internals::types::byte*, int_op);
         viua::internals::types::byte* opjoin(viua::internals::types::byte*, int_op, int_op, timeout_op);
         viua::internals::types::byte* opsend(viua::internals::types::byte*, int_op, int_op);
@@ -152,6 +154,7 @@ namespace cg {
 
         viua::internals::types::byte* opnew(viua::internals::types::byte*, int_op, const std::string&);
         viua::internals::types::byte* opmsg(viua::internals::types::byte*, int_op, const std::string&);
+        viua::internals::types::byte* opmsg(viua::internals::types::byte*, int_op, int_op);
         viua::internals::types::byte* opinsert(viua::internals::types::byte*, int_op, int_op, int_op);
         viua::internals::types::byte* opremove(viua::internals::types::byte*, int_op, int_op, int_op);
 

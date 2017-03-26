@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016 Marek Marecki
+;   Copyright (C) 2015, 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -47,6 +47,6 @@
     ; this throws an exception
     join %0 %3
 
-    izero %0
+    izero %0 local
     return
 .end

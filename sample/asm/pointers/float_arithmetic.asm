@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2016 Marek Marecki
+;   Copyright (C) 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -24,6 +24,6 @@
     add float32 (.name: %iota number) *pointer_to_a *pointer_to_b
     print %number
 
-    izero %0
+    izero %0 local
     return
 .end

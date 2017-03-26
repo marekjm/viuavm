@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2016 Marek Marecki
+;   Copyright (C) 2016, 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -21,6 +21,6 @@
     ptr (.name: %iota pointer) (fstore (.name: %iota o) 0.00)
     print (ftoi %iota *pointer)
 
-    izero %0
+    izero %0 local
     return
 .end
