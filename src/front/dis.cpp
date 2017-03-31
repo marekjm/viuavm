@@ -234,13 +234,13 @@ int main(int argc, char* argv[]) {
     }
 
     if (INCLUDE_INFO) {
-        (DEBUG ? cout : oss) << "; bytecode size: " << bytes << '\n';
-        (DEBUG ? cout : oss) << ";\n";
-        (DEBUG ? cout : oss) << "; functions:\n";
+        (DEBUG ? cout : oss) << "-- bytecode size: " << bytes << '\n';
+        (DEBUG ? cout : oss) << "--\n";
+        (DEBUG ? cout : oss) << "-- functions:\n";
         string function_name;
         for (unsigned i = 0; i < functions.size(); ++i) {
             function_name = functions[i];
-            (DEBUG ? cout : oss) << ";   " << function_name << " -> " << function_sizes[function_name] << " bytes at byte " << function_address_mapping[functions[i]] << '\n';
+            (DEBUG ? cout : oss) << "--   " << function_name << " -> " << function_sizes[function_name] << " bytes at byte " << function_address_mapping[functions[i]] << '\n';
         }
         (DEBUG ? cout : oss) << "\n\n";
 
