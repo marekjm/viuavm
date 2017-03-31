@@ -20,18 +20,18 @@
 .function: main/0
     ptr (.name: %iota pointer) (istore (.name: %iota o) 0)
 
-    .name: %iota text
+    .name: %iota message
     if *pointer yeah nope
 
     .mark: yeah
-    strstore %text "Yeah"
+    strstore %message "Yeah"
     jump done
 
     .mark: nope
-    strstore %text "Nope"
+    strstore %message "Nope"
 
     .mark: done
-    print %text
+    print %message
 
     izero %0 local
     return

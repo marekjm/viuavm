@@ -169,6 +169,8 @@ namespace viua {
                     "float32",
                     "float64",
                     "string",
+                    "text",
+                    "boolean",
                     "bits",
                     "coroutine",
                     "yield",
