@@ -133,7 +133,7 @@ enum OPCODE : viua::internals::types::byte {
     REGISTER,   // register a prototype in VM's typesystem
 
     NEW,        // construct new instance of a class in a register
-    MSG,        // send a message to an object (used for dynamic dispatch, for static use plan "CALL")
+    MSG,        // send a message to an object (used for dynamic dispatch, for static use plain "CALL")
     INSERT,     // insert an object as a value of an attribute of another object
     REMOVE,     // remove an attribute from an object
 
