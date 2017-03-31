@@ -128,7 +128,6 @@ enum OPCODE : viua::internals::types::byte {
     LINK,       // dynamically link native library
 
     CLASS,      // create a prototype for new class
-    PROTOTYPE,  // create a prototype from existing class
     DERIVE,     // derive a prototype from an existing class
     ATTACH,     // attach a method to the prototype
     REGISTER,   // register a prototype in VM's typesystem

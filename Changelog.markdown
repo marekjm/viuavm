@@ -114,6 +114,7 @@ There are several categories of change:
 - bic: the `izero` instruction setting return value of main function must explicitly state register set
 - bic, enhancement: `tmpri` and `tmpro` instructions are no longer part of the ISA, use `move`, `copy` or `swap` with explicit register set names
 - feature, bic: support for explicit register set access specifiers in register index operands
+- bic: removed `prototype` from bytecode definition
 
 One limitation of static analyser (SA) introduced in this release is its inability to handle backwards jumps.
 This, however, is not a problem if the code does not use loops and
