@@ -31,6 +31,7 @@
 namespace viua {
     namespace types {
         class Reference: public Type {
+            // FIXME maybe just use std::shared_ptr<> ?
             Type **pointer;
             uint64_t *counter;
 
