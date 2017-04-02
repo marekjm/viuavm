@@ -27,8 +27,8 @@
 using namespace std;
 
 
-unique_ptr<viua::types::Pointer> viua::types::Type::pointer() {
-    return unique_ptr<viua::types::Pointer>{new viua::types::Pointer(this)};
+unique_ptr<viua::types::Pointer> viua::types::Type::pointer(const viua::process::Process *process_of_origin) {
+    return unique_ptr<viua::types::Pointer>{new viua::types::Pointer(this, process_of_origin)};
 }
 
 viua::types::Type::~Type() {

@@ -224,7 +224,10 @@ auto viua::bytecode::decoder::operands::fetch_object(viua::internals::types::byt
         if (pointer_object == nullptr) {
             throw new viua::types::Exception("dereferenced type is not a pointer: " + object->type());
         }
-        object = pointer_object->to();
+        object = pointer_object->to(p);
+    }
+    if (auto pointer_object = dynamic_cast<viua::types::Pointer*>(object)) {
+        pointer_object->authenticate(p);
     }
 
     return tuple<viua::internals::types::byte*, viua::types::Type*>(ip, object);
@@ -253,7 +256,10 @@ auto viua::bytecode::decoder::operands::fetch_object2(viua::internals::types::by
         if (pointer_object == nullptr) {
             throw new viua::types::Exception("dereferenced type is not a pointer: " + object->type());
         }
-        object = pointer_object->to();
+        object = pointer_object->to(process);
+    }
+    if (auto pointer_object = dynamic_cast<viua::types::Pointer*>(object)) {
+        pointer_object->authenticate(process);
     }
 
     return tuple<viua::internals::types::byte*, viua::types::Type*>(ip, object);
