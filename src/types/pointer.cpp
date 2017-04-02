@@ -48,6 +48,12 @@ bool viua::types::Pointer::expired() {
     return !valid;
 }
 auto viua::types::Pointer::authenticate(const viua::process::Process* process) -> void {
+    /*
+     *  Pointers should automatically expire upon crossing process boundaries.
+     *  This method should be called before any other method every time the VM
+     *  code passes the pointer object to user-process to ensure that Pointer's state
+     *  is properly accounter for.
+     */
     valid = (process_of_origin == process);
 }
 void viua::types::Pointer::reset(viua::types::Type* t) {
@@ -57,6 +63,7 @@ void viua::types::Pointer::reset(viua::types::Type* t) {
 }
 viua::types::Type* viua::types::Pointer::to(const viua::process::Process* p) {
     if (process_of_origin != p) {
+        // Dereferencing pointers outside of their original process is illegal.
         throw new viua::types::Exception("InvalidDereference: outside of original process");
     }
     if (not valid) {
