@@ -118,7 +118,6 @@ const std::set<std::string> OP_MNEMONICS = {
     "link",
 
     "class",
-    "prototype",
     "derive",
     "attach",
     "register",
@@ -219,7 +218,6 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { LINK,         "link" },
 
     { CLASS,        "class" },
-    { PROTOTYPE,    "prototype" },
     { DERIVE,       "derive" },
     { ATTACH,       "attach" },
     { REGISTER,     "register" },
@@ -247,7 +245,6 @@ const std::vector<enum OPCODE> OP_VARIABLE_LENGTH = {
     IMPORT,
     LINK,
     CLASS,
-    PROTOTYPE,
     DERIVE,
     ATTACH,
     NEW,
