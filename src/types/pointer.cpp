@@ -54,7 +54,7 @@ auto viua::types::Pointer::authenticate(const viua::process::Process* process) -
      *  code passes the pointer object to user-process to ensure that Pointer's state
      *  is properly accounter for.
      */
-    valid = (process_of_origin == process);
+    valid = (valid and (process_of_origin == process));
 }
 void viua::types::Pointer::reset(viua::types::Type* t) {
     detach();
