@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <stdexcept>
 #include <string>
 #include <iostream>
 #include <vector>
@@ -95,7 +96,7 @@ auto Text::parse(string s) -> decltype(text) {
             ++i;
             ++i;
         } else {
-            cerr << "UTF-8 decoding error\n";
+            throw std::domain_error(s);
         }
 
         parsed_text.emplace_back(ss);
