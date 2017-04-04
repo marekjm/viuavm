@@ -89,7 +89,7 @@ viua::internals::types::byte* viua::process::Process::opmsg(viua::internals::typ
 
     auto obj = stack.frame_new->arguments->at(0);
     if (auto ptr = dynamic_cast<viua::types::Pointer*>(obj)) {
-        obj = ptr->to();
+        obj = ptr->to(this);
     }
     if (not scheduler->isClass(obj->type())) {
         throw new viua::types::Exception("unregistered type cannot be used for dynamic dispatch: " + obj->type());

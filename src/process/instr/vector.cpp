@@ -150,7 +150,7 @@ viua::internals::types::byte* viua::process::Process::opvat(viua::internals::typ
     tie(addr, position_operand_index) = viua::bytecode::decoder::operands::fetch_primitive_int(addr, this);
 
     viua::assertions::assert_implements<viua::types::Vector>(vector_operand, "viua::types::Vector");
-    *target = static_cast<viua::types::Vector*>(vector_operand)->at(position_operand_index)->pointer();
+    *target = static_cast<viua::types::Vector*>(vector_operand)->at(position_operand_index)->pointer(this);
 
     return addr;
 }

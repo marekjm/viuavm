@@ -28,28 +28,35 @@
 
 
 namespace viua {
-    namespace process {
-        class Process;
-    }
     namespace kernel {
         class Kernel;
     }
-}
 
-
-namespace viua {
     namespace types {
         class Pointer: public Type {
                 Type* points_to;
                 bool valid;
+                /*
+                 *  Pointer of origin is a parallelism-safety token.
+                 *  Viua asserts that pointers can be dereferenced only
+                 *  inside the process that spawned them -- otherwise
+                 *  there is no way to ensure that the pointer is still valid
+                 *  without sophisticated sycnhronisation schemes.
+                 *  Also, since the VM employs shared-nothing concurrency,
+                 *  pointer dereferences outside of the process that taken the
+                 *  pointer should be illegal by definition (even if the access
+                 *  could be made safe).
+                 */
+                const viua::process::Process *process_of_origin;
 
                 void attach();
                 void detach();
             public:
                 void invalidate(Type* t);
                 bool expired();
+                auto authenticate(const viua::process::Process*) -> void;
                 void reset(Type* t);
-                Type* to();
+                Type* to(const viua::process::Process*);
 
                 virtual void expired(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
 
@@ -68,7 +75,7 @@ namespace viua {
                 std::unique_ptr<Type> copy() const override;
 
                 Pointer();
-                Pointer(Type* t);
+                Pointer(Type* t, const viua::process::Process*);
                 virtual ~Pointer();
         };
     }

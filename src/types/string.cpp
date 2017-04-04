@@ -83,18 +83,18 @@ String* String::join(Vector* v) {
 }
 
 // foreign methods
-void String::stringify(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+void String::stringify(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process* process, viua::kernel::Kernel*) {
     if (frame->arguments->size() < 2) {
         throw new viua::types::Exception("expected 2 parameters");
     }
-    svalue = static_cast<Pointer*>(frame->arguments->at(1))->to()->str();
+    svalue = static_cast<Pointer*>(frame->arguments->at(1))->to(process)->str();
 }
 
-void String::represent(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+void String::represent(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process* process, viua::kernel::Kernel*) {
     if (frame->arguments->size() < 2) {
         throw new viua::types::Exception("expected 2 parameters");
     }
-    svalue = static_cast<Pointer*>(frame->arguments->at(1))->to()->repr();
+    svalue = static_cast<Pointer*>(frame->arguments->at(1))->to(process)->repr();
 }
 
 void String::startswith(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {

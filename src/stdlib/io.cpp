@@ -113,8 +113,8 @@ void io_ifstream_open(Frame *frame, viua::kernel::RegisterSet*, viua::kernel::Re
     frame->local_register_set->set(0, unique_ptr<viua::types::Type>{new Ifstream(frame->arguments->get(0)->str())});
 }
 
-void io_ifstream_getline(Frame *frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
-    Ifstream *in = dynamic_cast<Ifstream*>(static_cast<viua::types::Pointer*>(frame->arguments->get(0))->to());
+void io_ifstream_getline(Frame *frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process* p, viua::kernel::Kernel*) {
+    Ifstream *in = dynamic_cast<Ifstream*>(static_cast<viua::types::Pointer*>(frame->arguments->get(0))->to(p));
     frame->local_register_set->set(0, unique_ptr<viua::types::Type>{new viua::types::String(in->getline())});
 }
 
