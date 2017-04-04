@@ -1092,7 +1092,7 @@ namespace viua {
                         ++i;
                         tie(increase, i) = size_of_halt(tokens, i);
                     } else {
-                        // OH NOES!!!
+                        throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("instruction with unknown size: " + tokens.at(i).str()));
                     }
 
                     while (i < limit and tokens[i].str() != "\n") {
@@ -1367,7 +1367,7 @@ namespace viua {
                         ++i;
                         tie(increase, i) = size_of_halt(tokens, i);
                     } else {
-                        // OH NOES!!!
+                        throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("failed to calculate size of instruction: " + tokens.at(i).str()));
                     }
 
                     bytes += increase;
