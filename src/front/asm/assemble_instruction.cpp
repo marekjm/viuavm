@@ -341,6 +341,11 @@ viua::internals::types::bytecode_size assemble_instruction(Program& program, viu
         TokenIndex source = target + 2;
 
         program.opstrstore(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1))), tokens.at(source));
+    } else if (tokens.at(i) == "text") {
+        TokenIndex target = i + 1;
+        TokenIndex source = target + 2;
+
+        program.optext(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1))), tokens.at(source));
     } else if (tokens.at(i) == "vec") {
         TokenIndex target = i + 1;
         TokenIndex pack_range_start = target + 2;
