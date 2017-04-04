@@ -63,9 +63,7 @@ auto Text::parse(string s) -> decltype(text) {
     char ss[5];
     ss[4] = '\0';
 
-    ssize_t sz = 0;
-
-    for (decltype(s)::size_type i = 0; i < s.size(); ++i, ++sz) {
+    for (decltype(s)::size_type i = 0; i < s.size(); ++i) {
         const auto each { s.at(i) };
         ss[0] = each;
         ss[1] = '\0';
