@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <sstream>
 using namespace std;
 
 
@@ -21,9 +22,7 @@ const uint8_t UTF8_FILLING_NORMALISER = 0b11000000;
 using Character = string;
 
 class Text {
-    string text;
-
-    mutable decltype(text)::size_type current_size { 0 };
+    vector<Character> text;
 
     public:
 
@@ -36,6 +35,8 @@ class Text {
 
     auto operator [] (size_type) const -> Character;
 
+    static auto parse(string) -> decltype(text);
+
     Text(string);
 };
 
@@ -45,7 +46,7 @@ auto operator << (ostream& out, const Text& text) -> ostream& {
 }
 
 
-Text::Text(string s): text(std::move(s)) {
+Text::Text(string s): text(std::move(Text::parse(s))) {
 }
 
 static auto is_continuation_byte(uint8_t b) -> bool {
@@ -53,17 +54,19 @@ static auto is_continuation_byte(uint8_t b) -> bool {
 }
 
 auto Text::size() const -> size_type {
-    if (current_size) {
-        return current_size;
-    }
+    return text.size();
+}
+
+auto Text::parse(string s) -> decltype(text) {
+    vector<Character> parsed_text;
 
     char ss[5];
     ss[4] = '\0';
 
     ssize_t sz = 0;
 
-    for (std::remove_reference<decltype(text)>::type::size_type i = 0; i < text.size(); ++i, ++sz) {
-        const auto each { text.at(i) };
+    for (decltype(s)::size_type i = 0; i < s.size(); ++i, ++sz) {
+        const auto each { s.at(i) };
         ss[0] = each;
         ss[1] = '\0';
         ss[2] = '\0';
@@ -72,14 +75,14 @@ auto Text::size() const -> size_type {
         if ((UTF8_1ST_ROW_NORMALISER & each) == UTF8_1ST_ROW) {
             // do nothing
         } else if ((UTF8_2ND_ROW_NORMALISER & each) == UTF8_2ND_ROW) {
-            ss[1] = text.at(i+1);
+            ss[1] = s.at(i+1);
         } else if ((UTF8_3RD_ROW_NORMALISER & each) == UTF8_3RD_ROW) {
-            ss[1] = text.at(i+1);
-            ss[2] = text.at(i+2);
+            ss[1] = s.at(i+1);
+            ss[2] = s.at(i+2);
         } else if ((UTF8_4TH_ROW_NORMALISER & each) == UTF8_4TH_ROW) {
-            ss[1] = text.at(i+1);
-            ss[2] = text.at(i+2);
-            ss[3] = text.at(i+3);
+            ss[1] = s.at(i+1);
+            ss[2] = s.at(i+2);
+            ss[3] = s.at(i+3);
         }
 
         if ((UTF8_1ST_ROW_NORMALISER & ss[0]) == UTF8_1ST_ROW) {
@@ -96,60 +99,23 @@ auto Text::size() const -> size_type {
         } else {
             cerr << "UTF-8 decoding error\n";
         }
+
+        parsed_text.emplace_back(ss);
     }
 
-    current_size = sz;
-
-    return sz;
+    return parsed_text;
 }
 
 auto Text::at(size_type target) const -> Character {
-    char ss[5];
-    ss[4] = '\0';
-
-    size_t sz = 0;
-
-    for (std::remove_reference<decltype(text)>::type::size_type i = 0; sz <= target and i < text.size(); ++i, ++sz) {
-        const auto each { text.at(i) };
-        ss[0] = each;
-        ss[1] = '\0';
-        ss[2] = '\0';
-        ss[3] = '\0';
-
-        if ((UTF8_1ST_ROW_NORMALISER & each) == UTF8_1ST_ROW) {
-            // do nothing
-        } else if ((UTF8_2ND_ROW_NORMALISER & each) == UTF8_2ND_ROW) {
-            ss[1] = text.at(i+1);
-        } else if ((UTF8_3RD_ROW_NORMALISER & each) == UTF8_3RD_ROW) {
-            ss[1] = text.at(i+1);
-            ss[2] = text.at(i+2);
-        } else if ((UTF8_4TH_ROW_NORMALISER & each) == UTF8_4TH_ROW) {
-            ss[1] = text.at(i+1);
-            ss[2] = text.at(i+2);
-            ss[3] = text.at(i+3);
-        }
-
-        if ((UTF8_1ST_ROW_NORMALISER & ss[0]) == UTF8_1ST_ROW) {
-            // do nothing
-        } else if ((UTF8_2ND_ROW_NORMALISER & ss[0]) == UTF8_2ND_ROW and is_continuation_byte(ss[1])) {
-            ++i;
-        } else if ((UTF8_3RD_ROW_NORMALISER & ss[0]) == UTF8_3RD_ROW and is_continuation_byte(ss[1]) and is_continuation_byte(ss[2])) {
-            ++i;
-            ++i;
-        } else if ((UTF8_4TH_ROW_NORMALISER & ss[0]) == UTF8_4TH_ROW and is_continuation_byte(ss[1]) and is_continuation_byte(ss[2]) and is_continuation_byte(ss[3])) {
-            ++i;
-            ++i;
-            ++i;
-        } else {
-            cerr << "UTF-8 decoding error\n";
-        }
-    }
-
-    return string { ss };
+    return text.at(target);
 }
 
 auto Text::str() const -> string {
-    return text;
+    ostringstream oss;
+    for (const auto& each : text) {
+        oss << each;
+    }
+    return oss.str();
 }
 
 auto Text::operator [] (size_type i) const -> Character {
@@ -162,15 +128,12 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     const string s { argv[1] };
-    cout << s.size() << endl;
 
     Text text { s };
-    cout << text.size() << endl;
-    cout << text.size() << endl;
 
-    cout << text.at(6) << endl;
-    cout << text[6] << endl;
-    cout << text.at(7) << endl;
+    for (Text::size_type i = 0; i < text.size(); ++i) {
+        cout << text.at(i) << endl;
+    }
 
     cout << text << endl;
 
