@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <sstream>
 #include <viua/types/text.h>
 using namespace std;
 
@@ -94,7 +95,11 @@ string viua::types::Text::type() const {
 }
 
 string viua::types::Text::str() const {
-    return "";
+    ostringstream oss;
+    for (const auto& each : text) {
+        oss << each;
+    }
+    return oss.str();
 }
 
 string viua::types::Text::repr() const {
