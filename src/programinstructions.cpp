@@ -155,6 +155,11 @@ Program& Program::opstrstore(int_op reg, string s) {
     return (*this);
 }
 
+Program& Program::optext(int_op reg, string s) {
+    addr_ptr = cg::bytecode::optext(addr_ptr, reg, s);
+    return (*this);
+}
+
 Program& Program::opvec(int_op index, int_op pack_start_index, int_op pack_length) {
     /** Inserts vec instruction.
      */

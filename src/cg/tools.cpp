@@ -321,6 +321,19 @@ namespace viua {
 
                 return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
             }
+            static auto size_of_text(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                viua::internals::types::bytecode_size calculated_size = sizeof(viua::internals::types::byte);
+
+                decltype(calculated_size) size_increment = 0;
+
+                // for target register
+                tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
+                calculated_size += size_increment;
+
+                calculated_size += tokens.at(i++).str().size() + 1 - 2; // +1 for null terminator, -2 for quotes
+
+                return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
+            }
             static auto size_of_streq(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands(tokens, i);
             }
@@ -898,6 +911,9 @@ namespace viua {
                     } else if (tokens.at(i) == "strstore") {
                         ++i;
                         tie(increase, i) = size_of_strstore(tokens, i);
+                    } else if (tokens.at(i) == "text") {
+                        ++i;
+                        tie(increase, i) = size_of_text(tokens, i);
                     } else if (tokens.at(i) == "streq") {
                         ++i;
                         tie(increase, i) = size_of_streq(tokens, i);
@@ -1173,6 +1189,9 @@ namespace viua {
                     } else if (tokens.at(i) == "streq") {
                         ++i;
                         tie(increase, i) = size_of_streq(tokens, i);
+                    } else if (tokens.at(i) == "text") {
+                        ++i;
+                        tie(increase, i) = size_of_text(tokens, i);
                     } else if (tokens.at(i) == "vec") {
                         ++i;
                         tie(increase, i) = size_of_vec(tokens, i);

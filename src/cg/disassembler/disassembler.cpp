@@ -216,7 +216,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
     ostringstream oss;
     oss << opname;
 
-    if (op == STRSTORE) {
+    if ((op == STRSTORE) or (op == TEXT)) {
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
         string s = string(reinterpret_cast<char*>(ptr));
