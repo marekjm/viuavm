@@ -53,7 +53,7 @@ viua::internals::types::byte* viua::process::Process::opptr(viua::internals::typ
     viua::types::Type* source = nullptr;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    *target = source->pointer();
+    *target = source->pointer(this);
 
     return addr;
 }

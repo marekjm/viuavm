@@ -114,6 +114,10 @@ There are several categories of change:
 - bic: the `izero` instruction setting return value of main function must explicitly state register set
 - bic, enhancement: `tmpri` and `tmpro` instructions are no longer part of the ISA, use `move`, `copy` or `swap` with explicit register set names
 - feature, bic: support for explicit register set access specifiers in register index operands
+- bic: removed `prototype` from bytecode definition
+- bic: two new reserved words: `boolean` and `text`
+- fix: pointers now remember their process-of-origin and refuse to be dereferenced outside of it
+- fix: pointers are automatically expired upon crossing process boundaries, lazily - upon first access
 
 One limitation of static analyser (SA) introduced in this release is its inability to handle backwards jumps.
 This, however, is not a problem if the code does not use loops and

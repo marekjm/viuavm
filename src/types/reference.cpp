@@ -74,7 +74,6 @@ viua::types::Reference::~Reference() {
      *  the internal object *MUST* be preserved until its refcount reaches zero.
      */
     if ((--(*counter)) == 0) {
-        cout << hex;
         delete *pointer;
         delete pointer;
         delete counter;

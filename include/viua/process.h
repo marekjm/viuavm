@@ -276,7 +276,6 @@ namespace viua {
             viua::internals::types::byte* opleave(viua::internals::types::byte*);
 
             viua::internals::types::byte* opclass(viua::internals::types::byte*);
-            viua::internals::types::byte* opprototype(viua::internals::types::byte*);
             viua::internals::types::byte* opderive(viua::internals::types::byte*);
             viua::internals::types::byte* opattach(viua::internals::types::byte*);
             viua::internals::types::byte* opregister(viua::internals::types::byte*);

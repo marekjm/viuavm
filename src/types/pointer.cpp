@@ -47,12 +47,25 @@ void viua::types::Pointer::invalidate(viua::types::Type* t) {
 bool viua::types::Pointer::expired() {
     return !valid;
 }
+auto viua::types::Pointer::authenticate(const viua::process::Process* process) -> void {
+    /*
+     *  Pointers should automatically expire upon crossing process boundaries.
+     *  This method should be called before any other method every time the VM
+     *  code passes the pointer object to user-process to ensure that Pointer's state
+     *  is properly accounter for.
+     */
+    valid = (valid and (process_of_origin == process));
+}
 void viua::types::Pointer::reset(viua::types::Type* t) {
     detach();
     points_to = t;
     attach();
 }
-viua::types::Type* viua::types::Pointer::to() {
+viua::types::Type* viua::types::Pointer::to(const viua::process::Process* p) {
+    if (process_of_origin != p) {
+        // Dereferencing pointers outside of their original process is illegal.
+        throw new viua::types::Exception("InvalidDereference: outside of original process");
+    }
     if (not valid) {
         throw new viua::types::Exception("expired pointer exception");
     }
@@ -75,7 +88,7 @@ unique_ptr<viua::types::Type> viua::types::Pointer::copy() const {
     if (not valid) {
         return unique_ptr<viua::types::Type>{new viua::types::Pointer()};
     }
-    return unique_ptr<viua::types::Type>{new viua::types::Pointer(points_to)};
+    return unique_ptr<viua::types::Type>{new viua::types::Pointer(points_to, process_of_origin)};
 }
 
 
@@ -84,8 +97,8 @@ void viua::types::Pointer::expired(Frame* frm, viua::kernel::RegisterSet*, viua:
 }
 
 
-viua::types::Pointer::Pointer(): points_to(nullptr), valid(false) {}
-viua::types::Pointer::Pointer(viua::types::Type* t): points_to(t), valid(true) {
+viua::types::Pointer::Pointer(): points_to(nullptr), valid(false), process_of_origin(nullptr) {}
+viua::types::Pointer::Pointer(viua::types::Type* t, const viua::process::Process *poi): points_to(t), valid(true), process_of_origin(poi) {
     attach();
 }
 viua::types::Pointer::~Pointer() {

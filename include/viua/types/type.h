@@ -29,6 +29,10 @@
 
 
 namespace viua {
+    namespace process {
+        class Process;
+    }
+
     namespace types {
         class Pointer;
 
@@ -77,7 +81,7 @@ namespace viua {
                     return false;
                 }
 
-                virtual std::unique_ptr<Pointer> pointer();
+                virtual std::unique_ptr<Pointer> pointer(const viua::process::Process*);
 
                 virtual std::vector<std::string> bases() const {
                     return std::vector<std::string>{"Type"};
