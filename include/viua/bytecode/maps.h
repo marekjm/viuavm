@@ -60,6 +60,7 @@ const std::set<std::string> OP_MNEMONICS = {
     "streq",
 
     "text",
+    "texteq",
 
     "vec",
     "vinsert",
@@ -163,6 +164,7 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { STREQ,        "streq" },
 
     { TEXT,         "text" },
+    { TEXTEQ,       "texteq" },
 
     { VEC,          "vec" },
     { VINSERT,      "vinsert" },

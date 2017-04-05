@@ -57,6 +57,7 @@ enum OPCODE : viua::internals::types::byte {
     STREQ,
 
     TEXT,
+    TEXTEQ,
 
     VEC,
     VINSERT,
