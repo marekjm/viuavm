@@ -17,7 +17,7 @@ addons:
     apt:
         sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-4.0
+            - llvm-toolchain-precise-3.9
         packages:
             - openssl
             - python3
@@ -25,7 +25,7 @@ addons:
             - g++-6
             - valgrind
             - bc
-            - clang-4.0
+            - clang-3.9
     coverity_scan:
         project:
             name: "marekjm/viuavm"
@@ -37,7 +37,6 @@ addons:
 
 install:
     - if [ "$CXX" = "g++" ]; then export CXX="g++-6" CC="gcc-6"; fi
-    - if [ "$CXX" = "clang++" ]; then export CXX="clang++-4.0" CC="clang-4.0"; fi
 
 env:
   global:
