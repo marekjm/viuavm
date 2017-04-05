@@ -568,6 +568,12 @@ class TextInstructionsTests(unittest.TestCase):
     def testHelloWorld(self):
         runTest(self, 'hello_world.asm', 'Hello World!', 0)
 
+    def testTextEquals(self):
+        runTest(self, 'texteq.asm', 'true', 0)
+
+    def testTextEqualsNot(self):
+        runTest(self, 'texteq_not.asm', 'false', 0)
+
 
 class TextInstructionsEscapeSequencesTests(unittest.TestCase):
     """Tests for escape sequence decoding.
