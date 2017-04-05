@@ -836,8 +836,12 @@ namespace viua {
                 for (decltype(tokens.size()) i = 0; (i < limit) and (counted_instructions < instructions_counter); ++i) {
                     auto token = tokens.at(i);
 
-                    if (token == ".function:" or token == ".closure:" or token == ".block:" or token == ".mark:") {
+                    if (token == ".function:" or token == ".closure:" or token == ".block:" or token == ".mark:" or token == ".link:" or token == ".signature:" or token == ".bsignature:" or token == ".unused:" or token == ".main:") {
                         ++i;
+                        continue;
+                    }
+                    if (token == ".info:") {
+                        i += 2;
                         continue;
                     }
                     if (token == ".name:") {
@@ -1114,8 +1118,12 @@ namespace viua {
                 for (decltype(tokens.size()) i = 0; i < limit; ++i) {
                     auto token = tokens.at(i);
 
-                    if (token == ".function:" or token == ".closure:" or token == ".block:" or token == ".mark:") {
+                    if (token == ".function:" or token == ".closure:" or token == ".block:" or token == ".mark:" or token == ".link:" or token == ".signature:" or token == ".bsignature:" or token == ".unused:" or token == ".main:") {
                         ++i;
+                        continue;
+                    }
+                    if (token == ".info:") {
+                        i += 2;
                         continue;
                     }
                     if (token == ".name:") {
