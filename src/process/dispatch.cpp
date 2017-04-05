@@ -89,6 +89,9 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case TEXT:
             addr = optext(addr+1);
             break;
+        case TEXTEQ:
+            addr = optexteq(addr+1);
+            break;
         case VEC:
             addr = opvec(addr+1);
             break;

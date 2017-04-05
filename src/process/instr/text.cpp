@@ -20,6 +20,7 @@
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/types/text.h>
+#include <viua/types/boolean.h>
 #include <viua/process.h>
 #include <viua/support/string.h>
 using namespace std;
@@ -33,6 +34,20 @@ viua::internals::types::byte* viua::process::Process::optext(viua::internals::ty
     tie(addr, s) = viua::bytecode::decoder::operands::fetch_primitive_string(addr, this);
 
     *target = unique_ptr<viua::types::Type>{new viua::types::Text(str::strdecode(s))};
+
+    return addr;
+}
+
+
+viua::internals::types::byte* viua::process::Process::optexteq(viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::types::Type *first = nullptr, *second = nullptr;
+    tie(addr, first) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    tie(addr, second) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+
+    *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(*static_cast<viua::types::Text*>(first) == *static_cast<viua::types::Text*>(second))};
 
     return addr;
 }
