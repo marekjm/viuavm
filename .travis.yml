@@ -41,3 +41,16 @@ env:
    # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
    #   via the "travis encrypt" command using the project repo's public key
    - secure: "X+v3Omn3qdxcrzGzfSgraqWXlBcFMljv8PKDGcff62eFRdVD/nolr2MX9BQevTuNjr/LYPcqDT3bS80mxOuJl3X7byXm8u8o+9e4/shEhPsfuGw6DV2xHnivvSNg34Tf5c2/xYP+karfN+oObury37F3ddsWQwLLFf0ZjoI9lto=" 
+
+before_install:
+    - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+
+addons:
+    coverity_scan:
+        project:
+            name: "marekjm/viuavm"
+    description: "Build submitted via Travis CI"
+    notification_email: marekjm@ozro.pw
+    build_command_prepend: "./configure; make clean"
+    build_command:   "make"
+    branch_pattern: coverity_scan
