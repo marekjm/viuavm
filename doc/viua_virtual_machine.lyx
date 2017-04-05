@@ -243,10 +243,10 @@ Compilation and dependencies
 \end_layout
 
 \begin_layout Standard
-To compile Viua VM one needs a C++11 capable compiler.
+To compile Viua VM one needs a C++14 capable compiler.
  Development is done on Linux machine with GCC 5.1.0.
  From version 0.4.6 machine should also be compilable by clang++ 3.6.1 and above.
- C++11 standard library is the only dependency of the VM.
+ C++14 standard library is the only dependency of the VM.
  To compile the code, following command should be used:
 \end_layout
 
