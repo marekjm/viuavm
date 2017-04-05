@@ -38,6 +38,9 @@ namespace {
 static auto is_continuation_byte(uint8_t b) -> bool {
     return ((UTF8_FILLING_NORMALISER & b) == UTF8_FILLING);
 }
+static auto is_continuation_byte(char b) -> bool {
+    return is_continuation_byte(static_cast<uint8_t>(b));
+}
 auto viua::types::Text::parse(string s) -> decltype(text) {
     vector<Character> parsed_text;
 
