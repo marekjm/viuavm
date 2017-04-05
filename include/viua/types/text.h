@@ -65,6 +65,8 @@ namespace viua {
 
                 std::unique_ptr<Type> copy() const override;
 
+                auto operator == (const Text&) const -> bool;
+
                 Text(std::string);
                 ~Text() {}
 

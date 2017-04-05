@@ -113,3 +113,7 @@ bool viua::types::Text::boolean() const {
 std::unique_ptr<viua::types::Type> viua::types::Text::copy() const {
     return std::unique_ptr<Type> { new Text(text) };
 }
+
+auto viua::types::Text::operator == (const viua::types::Text& other) const -> bool {
+    return (text == other.text);
+}
