@@ -20,8 +20,8 @@ addons:
         packages:
             - openssl
             - python3
-            - gcc-5
-            - g++-5
+            - gcc-6
+            - g++-6
             - valgrind
             - bc
     coverity_scan:
@@ -30,11 +30,11 @@ addons:
         description: "Viua VM"
         notification_email: marekjm@ozro.pw
         build_command_prepend: "./configure"
-        build_command:   "make -j 4"
+        build_command:   "make"
         branch_pattern: coverity_scan
 
 install:
-    - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
+    - if [ "$CXX" = "g++" ]; then export CXX="g++-6" CC="gcc-6"; fi
 
 env:
   global:
