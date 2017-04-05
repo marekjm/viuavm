@@ -85,7 +85,7 @@ auto viua::types::Text::parse(string s) -> decltype(text) {
     return parsed_text;
 }
 
-viua::types::Text::Text(string s): text(std::move(parse(s))) {
+viua::types::Text::Text(string s): text(parse(s)) {
 }
 viua::types::Text::Text(vector<Character> s): text(std::move(s)) {
 }
