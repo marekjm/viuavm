@@ -160,6 +160,11 @@ Program& Program::optext(int_op reg, string s) {
     return (*this);
 }
 
+Program& Program::optexteq(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::optexteq(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
 Program& Program::opvec(int_op index, int_op pack_start_index, int_op pack_length) {
     /** Inserts vec instruction.
      */

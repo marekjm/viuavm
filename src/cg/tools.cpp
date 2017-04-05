@@ -335,6 +335,9 @@ namespace viua {
 
                 return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
             }
+            static auto size_of_texteq(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
             static auto size_of_streq(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands(tokens, i);
             }
@@ -919,6 +922,9 @@ namespace viua {
                     } else if (tokens.at(i) == "text") {
                         ++i;
                         tie(increase, i) = size_of_text(tokens, i);
+                    } else if (tokens.at(i) == "texteq") {
+                        ++i;
+                        tie(increase, i) = size_of_texteq(tokens, i);
                     } else if (tokens.at(i) == "streq") {
                         ++i;
                         tie(increase, i) = size_of_streq(tokens, i);

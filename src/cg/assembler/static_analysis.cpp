@@ -601,7 +601,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "and" or token == "or") {
+        } else if (token == "and" or token == "or" or token == "texteq") {
             ++i; // skip mnemonic token
 
             TokenIndex target = i;
