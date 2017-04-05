@@ -266,6 +266,7 @@ namespace viua {
                 calculated_size += size_increment;
 
                 calculated_size += sizeof(viua::internals::types::plain_float);
+                ++i;
 
                 return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
             }
