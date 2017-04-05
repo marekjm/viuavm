@@ -261,6 +261,10 @@ namespace cg {
             return insertString(addr_ptr, s.substr(1, s.size()-2));
         }
 
+        viua::internals::types::byte* optexteq(viua::internals::types::byte* addr_ptr, int_op target, int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, TEXTEQ, target, lhs, rhs);
+        }
+
         viua::internals::types::byte* opvec(viua::internals::types::byte* addr_ptr, int_op index, int_op pack_start_index, int_op pack_length) {
             *(addr_ptr++) = VEC;
             addr_ptr = insert_ri_operand(addr_ptr, index);

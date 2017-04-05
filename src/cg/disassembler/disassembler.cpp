@@ -414,6 +414,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
             break;
         case AND:
         case OR:
+        case TEXTEQ:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
