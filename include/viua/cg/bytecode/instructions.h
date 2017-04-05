@@ -88,7 +88,9 @@ namespace cg {
         viua::internals::types::byte* opeq(viua::internals::types::byte*, std::string, int_op, int_op, int_op);
 
         viua::internals::types::byte* opstrstore(viua::internals::types::byte*, int_op, std::string);
+
         viua::internals::types::byte* optext(viua::internals::types::byte*, int_op, std::string);
+        viua::internals::types::byte* optexteq(viua::internals::types::byte*, int_op, int_op, int_op);
 
         viua::internals::types::byte* opvec(viua::internals::types::byte*, int_op, int_op, int_op);
         viua::internals::types::byte* opvinsert(viua::internals::types::byte*, int_op, int_op, int_op);
