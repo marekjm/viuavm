@@ -56,11 +56,18 @@ enum OPCODE : viua::internals::types::byte {
     STRSTORE,
     STREQ,
 
-    TEXT,
-    TEXTEQ,
-    TEXTAT,
-    TEXTSUB,
-    TEXTLENGTH,
+    TEXT,           // store a text value in register
+    TEXTEQ,         // compare two text values for equality
+    TEXTAT,         // return character at given index
+    TEXTSUB,        // return a copy of subtext of given text value
+    TEXTLENGTH,     // return length of given text value
+    TEXTCOMMONPREFIX,   // return length of common prefix of two text values
+    TEXTCOMMONSUFFIX,   // return length of common suffix of two text values
+    TEXTVIEW,       // return a view of a text value between two indexes, a
+                    // non-copying TEXTSUB
+                    // values returned by TEXTVIEW are treated as regular text values
+                    // by TEXT* instructions
+    TEXTCONCAT,     // concatenate two text values
 
     VEC,
     VINSERT,
