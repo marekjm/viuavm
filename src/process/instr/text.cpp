@@ -21,6 +21,7 @@
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/types/text.h>
 #include <viua/types/boolean.h>
+#include <viua/types/exception.h>
 #include <viua/process.h>
 #include <viua/support/string.h>
 using namespace std;
@@ -50,4 +51,39 @@ viua::internals::types::byte* viua::process::Process::optexteq(viua::internals::
     *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(*static_cast<viua::types::Text*>(first) == *static_cast<viua::types::Text*>(second))};
 
     return addr;
+}
+
+
+viua::internals::types::byte* viua::process::Process::optextat(viua::internals::types::byte*) {
+    throw new viua::types::Exception("instruction not implemented");
+}
+
+
+viua::internals::types::byte* viua::process::Process::optextsub(viua::internals::types::byte*) {
+    throw new viua::types::Exception("instruction not implemented");
+}
+
+
+viua::internals::types::byte* viua::process::Process::optextlength(viua::internals::types::byte*) {
+    throw new viua::types::Exception("instruction not implemented");
+}
+
+
+viua::internals::types::byte* viua::process::Process::optextcommonprefix(viua::internals::types::byte*) {
+    throw new viua::types::Exception("instruction not implemented");
+}
+
+
+viua::internals::types::byte* viua::process::Process::optextcommonsuffix(viua::internals::types::byte*) {
+    throw new viua::types::Exception("instruction not implemented");
+}
+
+
+viua::internals::types::byte* viua::process::Process::optextview(viua::internals::types::byte*) {
+    throw new viua::types::Exception("instruction not implemented");
+}
+
+
+viua::internals::types::byte* viua::process::Process::optextconcat(viua::internals::types::byte*) {
+    throw new viua::types::Exception("instruction not implemented");
 }
