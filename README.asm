@@ -3,13 +3,13 @@
 ; Valid main functions are main/0, main/1 and main/2.
 ;
 .function: main/0
-    ; Store string in register with index 1.
-    ; The strstore instruction has two operands, and
-    ; shares operand order with majority of other instructions:
+    ; Store text value in register with index 1.
+    ; The text instruction shares operand order with majority of
+    ; other instructions:
     ;
-    ;   <mnemonic> <target> <source>...
+    ;   <mnemonic> <target> <sources>...
     ;
-    strstore %1 "Hello World!"
+    text %1 "Hello World!"
 
     ; Print contents of a register to standard output.
     ; This is the most primitive form of output the VM supports, and
