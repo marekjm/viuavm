@@ -1901,7 +1901,12 @@ class ConcurrencyTests(unittest.TestCase):
         runTest(self, 'message_passing.asm', 'Hello message passing World!')
 
     def testTransferringExceptionsOnJoin(self):
-        runTest(self, 'transferring_exceptions.asm', 'exception transferred from process Process: Hello exception transferring World!')
+        def match_output(self, excode, output):
+            pat = re.compile(r'^exception transferred from process Process: 0x[a-f0-9]+: Hello exception transferring World!$')
+            wat = re.match(pat, output)
+            self.assertTrue(wat is not None)
+            self.assertEqual(0, excode)
+        runTest(self, 'transferring_exceptions.asm', custom_assert = match_output)
 
     def testReturningValuesOnJoin(self):
         runTest(self, 'return_from_a_process.asm', '42')
