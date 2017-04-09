@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+#include <sstream>
 #include <algorithm>
 #include <viua/bytecode/opcodes.h>
 #include <viua/bytecode/maps.h>
@@ -56,4 +57,10 @@ bool viua::process::PID::operator>(const viua::process::PID& that) const {
 
 auto viua::process::PID::get() const -> decltype(associated_process) {
     return associated_process;
+}
+
+auto viua::process::PID::str() const -> string {
+    ostringstream oss;
+    oss << hex << associated_process;
+    return oss.str();
 }

@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <viua/types/boolean.h>
 #include <viua/types/process.h>
@@ -32,11 +33,13 @@ string viua::types::Process::type() const {
 }
 
 string viua::types::Process::str() const {
-    return "Process";
+    ostringstream oss;
+    oss << "Process: " << hex << pid().str() << dec;
+    return oss.str();
 }
 
 string viua::types::Process::repr() const {
-    return "Process";
+    return str();
 }
 
 bool viua::types::Process::boolean() const {
