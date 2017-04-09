@@ -55,6 +55,19 @@ viua::internals::types::byte* viua::process::Process::optexteq(viua::internals::
 }
 
 
+static auto convert_signed_integer_to_text_size_type(const viua::types::Text* text, const int64_t signed_index) -> viua::types::Text::size_type {
+    /*
+     *  Cast jugglery to satisfy Clang++ with -Wsign-conversion enabled.
+     */
+    viua::types::Text::size_type index = 0;
+    if (signed_index < 0) {
+        index = (text->size() - static_cast<viua::types::Text::size_type>(-signed_index));
+    } else {
+        index = static_cast<viua::types::Text::size_type>(signed_index);
+    }
+    return index;
+}
+
 viua::internals::types::byte* viua::process::Process::optextat(viua::internals::types::byte* addr) {
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -63,7 +76,9 @@ viua::internals::types::byte* viua::process::Process::optextat(viua::internals::
     tie(addr, source_text) = viua::bytecode::decoder::operands::fetch_object(addr, this);
     tie(addr, index) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    *target = unique_ptr<viua::types::Type>{new viua::types::Text(static_cast<viua::types::Text*>(source_text)->at(static_cast<viua::types::Integer*>(index)->as_int64()))};
+    auto working_index = convert_signed_integer_to_text_size_type(static_cast<viua::types::Text*>(source_text), static_cast<viua::types::Integer*>(index)->as_int64());
+
+    *target = unique_ptr<viua::types::Type>{new viua::types::Text(static_cast<viua::types::Text*>(source_text)->at(working_index))};
 
     return addr;
 }
@@ -80,10 +95,10 @@ viua::internals::types::byte* viua::process::Process::optextsub(viua::internals:
     tie(addr, first_index) = viua::bytecode::decoder::operands::fetch_object(addr, this);
     tie(addr, last_index) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    *target = unique_ptr<viua::types::Type>{new viua::types::Text(static_cast<viua::types::Text*>(source)->sub(
-        static_cast<viua::types::Integer*>(first_index)->as_int64(),
-        static_cast<viua::types::Integer*>(last_index)->as_int64()
-    ))};
+    auto working_first_index = convert_signed_integer_to_text_size_type(static_cast<viua::types::Text*>(source), static_cast<viua::types::Integer*>(first_index)->as_int64());
+    auto working_last_index = convert_signed_integer_to_text_size_type(static_cast<viua::types::Text*>(source), static_cast<viua::types::Integer*>(last_index)->as_int64());
+
+    *target = unique_ptr<viua::types::Type>{new viua::types::Text(static_cast<viua::types::Text*>(source)->sub(working_first_index, working_last_index))};
 
     return addr;
 }
@@ -96,7 +111,7 @@ viua::internals::types::byte* viua::process::Process::optextlength(viua::interna
     viua::types::Type *source = nullptr;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    *target = unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<viua::types::Text*>(source)->size())};
+    *target = unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<viua::types::Text*>(source)->signed_size())};
 
     return addr;
 }
@@ -112,7 +127,7 @@ viua::internals::types::byte* viua::process::Process::optextcommonprefix(viua::i
     viua::types::Type *rhs = nullptr;
     tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    *target = unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<viua::types::Text*>(lhs)->common_prefix(*static_cast<viua::types::Text*>(rhs)))};
+    *target = unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<int64_t>(static_cast<viua::types::Text*>(lhs)->common_prefix(*static_cast<viua::types::Text*>(rhs))))};
 
     return addr;
 }
@@ -128,7 +143,7 @@ viua::internals::types::byte* viua::process::Process::optextcommonsuffix(viua::i
     viua::types::Type *rhs = nullptr;
     tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    *target = unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<viua::types::Text*>(lhs)->common_suffix(*static_cast<viua::types::Text*>(rhs)))};
+    *target = unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<int64_t>(static_cast<viua::types::Text*>(lhs)->common_suffix(*static_cast<viua::types::Text*>(rhs))))};
 
     return addr;
 }

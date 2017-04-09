@@ -139,6 +139,10 @@ auto viua::types::Text::at(const size_type i) const -> Character {
     return text.at(i);
 }
 
+
+auto viua::types::Text::signed_size() const -> int64_t {
+    return static_cast<int64_t>(text.size());
+}
 auto viua::types::Text::size() const -> size_type {
     return text.size();
 }

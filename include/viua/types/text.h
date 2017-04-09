@@ -68,6 +68,7 @@ namespace viua {
 
                 using size_type = decltype(text)::size_type;
                 auto at(const size_type) const -> Character;
+                auto signed_size() const -> int64_t;
                 auto size() const -> size_type;
                 auto sub(size_type, size_type) const -> decltype(text);
                 auto sub(size_type) const -> decltype(text);
