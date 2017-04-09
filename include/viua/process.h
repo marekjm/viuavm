@@ -220,6 +220,7 @@ namespace viua {
             viua::internals::types::byte* optext(viua::internals::types::byte*);
             viua::internals::types::byte* optexteq(viua::internals::types::byte*);
             viua::internals::types::byte* optextat(viua::internals::types::byte*);
+            viua::internals::types::byte* optextlength(viua::internals::types::byte*);
 
             viua::internals::types::byte* opvec(viua::internals::types::byte*);
             viua::internals::types::byte* opvinsert(viua::internals::types::byte*);

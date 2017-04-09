@@ -66,3 +66,16 @@ viua::internals::types::byte* viua::process::Process::optextat(viua::internals::
 
     return addr;
 }
+
+
+viua::internals::types::byte* viua::process::Process::optextlength(viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::types::Type *source = nullptr;
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+
+    *target = unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<viua::types::Text*>(source)->size())};
+
+    return addr;
+}

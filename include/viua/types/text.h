@@ -69,6 +69,7 @@ namespace viua {
 
                 using size_type = decltype(text)::size_type;
                 auto at(const size_type) const -> Character;
+                auto size() const -> size_type;
 
                 Text(std::string);
                 ~Text() {}

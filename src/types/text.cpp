@@ -124,3 +124,7 @@ auto viua::types::Text::operator == (const viua::types::Text& other) const -> bo
 auto viua::types::Text::at(const size_type i) const -> Character {
     return text.at(i);
 }
+
+auto viua::types::Text::size() const -> size_type {
+    return text.size();
+}
