@@ -8,7 +8,7 @@
 ![License](https://img.shields.io/github/license/marekjm/viuavm.svg)
 
 
-> A register-based virtual machine programmable in custom assembly lookalike language with
+> A register-based, parallel virtual machine programmable in custom assembly lookalike language with
 > strong emphasis on reliability, predictability, and concurrency.
 
 #### Hello World in Viua VM
