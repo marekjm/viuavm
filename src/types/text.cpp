@@ -128,3 +128,15 @@ auto viua::types::Text::at(const size_type i) const -> Character {
 auto viua::types::Text::size() const -> size_type {
     return text.size();
 }
+
+auto viua::types::Text::sub(size_type first_index, size_type last_index) const -> decltype(text) {
+    decltype(text) copied;
+    for (size_type i = first_index; i < size() and i < last_index; ++i) {
+        copied.push_back(text.at(i));
+    }
+    return copied;
+}
+
+auto viua::types::Text::sub(size_type first_index) const -> decltype(text) {
+    return sub(first_index, text.size());
+}

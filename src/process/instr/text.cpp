@@ -69,8 +69,23 @@ viua::internals::types::byte* viua::process::Process::optextat(viua::internals::
 }
 
 
-viua::internals::types::byte* viua::process::Process::optextsub(viua::internals::types::byte*) {
-    throw new viua::types::Exception("instruction not implemented");
+viua::internals::types::byte* viua::process::Process::optextsub(viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::types::Type *source = nullptr;
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+
+    viua::types::Type *first_index = nullptr, *last_index = nullptr;
+    tie(addr, first_index) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    tie(addr, last_index) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+
+    *target = unique_ptr<viua::types::Type>{new viua::types::Text(static_cast<viua::types::Text*>(source)->sub(
+        static_cast<viua::types::Integer*>(first_index)->as_int64(),
+        static_cast<viua::types::Integer*>(last_index)->as_int64()
+    ))};
+
+    return addr;
 }
 
 

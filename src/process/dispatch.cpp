@@ -95,6 +95,9 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case TEXTAT:
             addr = optextat(addr+1);
             break;
+        case TEXTSUB:
+            addr = optextsub(addr+1);
+            break;
         case TEXTLENGTH:
             addr = optextlength(addr+1);
             break;

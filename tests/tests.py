@@ -577,6 +577,9 @@ class TextInstructionsTests(unittest.TestCase):
     def testTextat(self):
         runTest(self, 'textat.asm', 'W', 0)
 
+    def testTextsub(self):
+        runTestSplitlines(self, 'textsub.asm', ['Hello World!', 'Hello'], 0)
+
     def testTextlength(self):
         runTestReturnsIntegers(self, 'textlength.asm', [12, 14], 0)
 

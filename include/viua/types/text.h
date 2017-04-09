@@ -55,8 +55,6 @@ namespace viua {
 
             auto parse(std::string) -> decltype(text);
 
-            Text(std::vector<Character>);
-
             public:
                 std::string type() const override;
                 std::string str() const override;
@@ -70,7 +68,10 @@ namespace viua {
                 using size_type = decltype(text)::size_type;
                 auto at(const size_type) const -> Character;
                 auto size() const -> size_type;
+                auto sub(size_type, size_type) const -> decltype(text);
+                auto sub(size_type) const -> decltype(text);
 
+                Text(std::vector<Character>);
                 Text(std::string);
                 ~Text() {}
 
