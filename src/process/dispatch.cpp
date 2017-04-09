@@ -101,6 +101,9 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case TEXTLENGTH:
             addr = optextlength(addr+1);
             break;
+        case TEXTCONCAT:
+            addr = optextconcat(addr+1);
+            break;
         case VEC:
             addr = opvec(addr+1);
             break;

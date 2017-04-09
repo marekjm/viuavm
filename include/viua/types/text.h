@@ -64,6 +64,7 @@ namespace viua {
                 std::unique_ptr<Type> copy() const override;
 
                 auto operator == (const Text&) const -> bool;
+                auto operator + (const Text&) const -> Text;
 
                 using size_type = decltype(text)::size_type;
                 auto at(const size_type) const -> Character;
@@ -73,6 +74,7 @@ namespace viua {
 
                 Text(std::vector<Character>);
                 Text(std::string);
+                Text(Text&&);
                 ~Text() {}
 
                 /* Integer* size(); */

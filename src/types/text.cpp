@@ -92,6 +92,8 @@ viua::types::Text::Text(string s): text(parse(s)) {
 }
 viua::types::Text::Text(vector<Character> s): text(std::move(s)) {
 }
+viua::types::Text::Text(Text&& s): text(std::move(s.text)) {
+}
 
 string viua::types::Text::type() const {
     return "Text";
@@ -119,6 +121,17 @@ std::unique_ptr<viua::types::Type> viua::types::Text::copy() const {
 
 auto viua::types::Text::operator == (const viua::types::Text& other) const -> bool {
     return (text == other.text);
+}
+
+auto viua::types::Text::operator + (const viua::types::Text& other) const -> Text {
+    decltype(text) copied;
+    for (size_type i = 0; i < size(); ++i) {
+        copied.push_back(text.at(i));
+    }
+    for (size_type i = 0; i < other.size(); ++i) {
+        copied.push_back(other.at(i));
+    }
+    return copied;
 }
 
 auto viua::types::Text::at(const size_type i) const -> Character {
