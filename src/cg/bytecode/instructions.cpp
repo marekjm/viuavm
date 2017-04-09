@@ -288,9 +288,6 @@ namespace cg {
         viua::internals::types::byte* optextcommonsuffix(viua::internals::types::byte* addr_ptr, int_op target, int_op lhs, int_op rhs) {
             return insert_three_ri_instruction(addr_ptr, TEXTCOMMONSUFFIX, target, lhs, rhs);
         }
-        viua::internals::types::byte* optextview(viua::internals::types::byte* addr_ptr, int_op target, int_op source, int_op begin_index, int_op end_index) {
-            return insert_four_ri_instruction(addr_ptr, TEXTVIEW, target, source, begin_index, end_index);
-        }
         viua::internals::types::byte* optextconcat(viua::internals::types::byte* addr_ptr, int_op target, int_op lhs, int_op rhs) {
             return insert_three_ri_instruction(addr_ptr, TEXTCONCAT, target, lhs, rhs);
         }

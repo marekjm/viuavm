@@ -614,7 +614,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "textsub" or token == "textview") {
+        } else if (token == "textsub") {
             ++i; // skip mnemonic token
 
             TokenIndex target = i;

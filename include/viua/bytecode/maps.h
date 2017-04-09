@@ -66,7 +66,6 @@ const std::set<std::string> OP_MNEMONICS = {
     "textlength",
     "textcommonprefix",
     "textcommonsuffix",
-    "textview",
     "textconcat",
 
     "vec",
@@ -177,7 +176,6 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { TEXTLENGTH,   "textlength" },
     { TEXTCOMMONPREFIX, "textcommonprefix" },
     { TEXTCOMMONSUFFIX, "textcommonsuffix" },
-    { TEXTVIEW,     "textview" },
     { TEXTCONCAT,   "textconcat" },
 
     { VEC,          "vec" },

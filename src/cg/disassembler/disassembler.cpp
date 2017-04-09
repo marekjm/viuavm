@@ -426,7 +426,6 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
 
             break;
         case TEXTSUB:
-        case TEXTVIEW:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);

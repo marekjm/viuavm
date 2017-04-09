@@ -185,10 +185,6 @@ Program& Program::optextcommonsuffix(int_op target, int_op lhs, int_op rhs) {
     addr_ptr = cg::bytecode::optextcommonsuffix(addr_ptr, target, lhs, rhs);
     return (*this);
 }
-Program& Program::optextview(int_op target, int_op source, int_op begin_index, int_op end_index) {
-    addr_ptr = cg::bytecode::optextview(addr_ptr, target, source, begin_index, end_index);
-    return (*this);
-}
 Program& Program::optextconcat(int_op target, int_op lhs, int_op rhs) {
     addr_ptr = cg::bytecode::optextconcat(addr_ptr, target, lhs, rhs);
     return (*this);

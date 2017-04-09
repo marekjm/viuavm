@@ -147,6 +147,7 @@ auto viua::types::Text::size() const -> size_type {
     return text.size();
 }
 
+
 auto viua::types::Text::sub(size_type first_index, size_type last_index) const -> decltype(text) {
     decltype(text) copied;
     for (size_type i = first_index; i < size() and i < last_index; ++i) {
@@ -154,10 +155,10 @@ auto viua::types::Text::sub(size_type first_index, size_type last_index) const -
     }
     return copied;
 }
-
 auto viua::types::Text::sub(size_type first_index) const -> decltype(text) {
     return sub(first_index, text.size());
 }
+
 
 auto viua::types::Text::common_prefix(const Text& other) const -> size_type {
     size_type length_of_common_prefix = 0;
@@ -169,7 +170,6 @@ auto viua::types::Text::common_prefix(const Text& other) const -> size_type {
 
     return length_of_common_prefix;
 }
-
 auto viua::types::Text::common_suffix(const Text& other) const -> size_type {
     size_type length_of_common_suffix = 0;
 

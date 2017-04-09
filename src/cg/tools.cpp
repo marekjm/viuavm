@@ -380,9 +380,6 @@ namespace viua {
             static auto size_of_textcommonsuffix(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_textview(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
-                return size_of_instruction_with_four_ri_operands_with_rs_types(tokens, i);
-            }
             static auto size_of_textconcat(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
@@ -986,9 +983,6 @@ namespace viua {
                     } else if (tokens.at(i) == "textcommonsuffix") {
                         ++i;
                         tie(increase, i) = size_of_textcommonsuffix(tokens, i);
-                    } else if (tokens.at(i) == "textview") {
-                        ++i;
-                        tie(increase, i) = size_of_textview(tokens, i);
                     } else if (tokens.at(i) == "textconcat") {
                         ++i;
                         tie(increase, i) = size_of_textconcat(tokens, i);

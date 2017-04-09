@@ -95,7 +95,6 @@ class Program {
     Program& optextlength(int_op, int_op);
     Program& optextcommonprefix(int_op, int_op, int_op);
     Program& optextcommonsuffix(int_op, int_op, int_op);
-    Program& optextview(int_op, int_op, int_op, int_op);
     Program& optextconcat(int_op, int_op, int_op);
 
     Program& opvec(int_op, int_op, int_op);

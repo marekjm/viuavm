@@ -106,16 +106,6 @@ enum OPCODE : viua::internals::types::byte {
     TEXTCOMMONSUFFIX,
 
     /*
-     *  Return a view of a text value between two indexes.
-     *  It is a non-copying TEXTSUB.
-     *  Values returned by TEXTVIEW are treated as regular text values by TEXT* instructions, so
-     *  for example TEXTCONCAT of two views will result in a copy of viewed text.
-     *
-     *  textview {result-register} {string-register} {begin-index-register} {end-index:register|void}
-     */
-    TEXTVIEW,
-
-    /*
      *  Concatenate two text values. Creates a copy of each text value.
      *
      *  textconcat {result-register} {lhs-string-register} {rhs-string-register}

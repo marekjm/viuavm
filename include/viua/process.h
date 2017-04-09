@@ -225,7 +225,6 @@ namespace viua {
             viua::internals::types::byte* optextlength(viua::internals::types::byte*);
             viua::internals::types::byte* optextcommonprefix(viua::internals::types::byte*);
             viua::internals::types::byte* optextcommonsuffix(viua::internals::types::byte*);
-            viua::internals::types::byte* optextview(viua::internals::types::byte*);
             viua::internals::types::byte* optextconcat(viua::internals::types::byte*);
 
             viua::internals::types::byte* opvec(viua::internals::types::byte*);
