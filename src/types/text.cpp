@@ -120,3 +120,11 @@ std::unique_ptr<viua::types::Type> viua::types::Text::copy() const {
 auto viua::types::Text::operator == (const viua::types::Text& other) const -> bool {
     return (text == other.text);
 }
+
+auto viua::types::Text::at(const size_type i) const -> Character {
+    return text.at(i);
+}
+
+auto viua::types::Text::size() const -> size_type {
+    return text.size();
+}

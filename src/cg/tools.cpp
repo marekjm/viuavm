@@ -188,6 +188,29 @@ namespace viua {
 
                 return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
             }
+            static auto size_of_instruction_with_four_ri_operands_with_rs_types(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                viua::internals::types::bytecode_size calculated_size = sizeof(viua::internals::types::byte);    // start with the size of a single opcode
+
+                decltype(calculated_size) size_increment = 0;
+
+                // for target register
+                tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
+                calculated_size += size_increment;
+
+                // for 1st source register
+                tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
+                calculated_size += size_increment;
+
+                // for 2nd source register
+                tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
+                calculated_size += size_increment;
+
+                // for 3rd source register
+                tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
+                calculated_size += size_increment;
+
+                return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
+            }
             static auto size_of_instruction_with_three_ri_operands(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 viua::internals::types::bytecode_size calculated_size = sizeof(viua::internals::types::byte);    // start with the size of a single opcode
 
@@ -322,6 +345,10 @@ namespace viua {
 
                 return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
             }
+            static auto size_of_streq(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands(tokens, i);
+            }
+
             static auto size_of_text(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 viua::internals::types::bytecode_size calculated_size = sizeof(viua::internals::types::byte);
 
@@ -338,9 +365,28 @@ namespace viua {
             static auto size_of_texteq(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
-            static auto size_of_streq(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
-                return size_of_instruction_with_three_ri_operands(tokens, i);
+            static auto size_of_textat(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
+            static auto size_of_textsub(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_four_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_textlength(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_textcommonprefix(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_textcommonsuffix(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_textview(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_four_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_textconcat(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+
             static auto size_of_vec(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 viua::internals::types::bytecode_size calculated_size = sizeof(viua::internals::types::byte);    // start with the size of a single opcode
 
@@ -925,6 +971,27 @@ namespace viua {
                     } else if (tokens.at(i) == "texteq") {
                         ++i;
                         tie(increase, i) = size_of_texteq(tokens, i);
+                    } else if (tokens.at(i) == "textat") {
+                        ++i;
+                        tie(increase, i) = size_of_textat(tokens, i);
+                    } else if (tokens.at(i) == "textsub") {
+                        ++i;
+                        tie(increase, i) = size_of_textsub(tokens, i);
+                    } else if (tokens.at(i) == "textlength") {
+                        ++i;
+                        tie(increase, i) = size_of_textlength(tokens, i);
+                    } else if (tokens.at(i) == "textcommonprefix") {
+                        ++i;
+                        tie(increase, i) = size_of_textcommonprefix(tokens, i);
+                    } else if (tokens.at(i) == "textcommonsuffix") {
+                        ++i;
+                        tie(increase, i) = size_of_textcommonsuffix(tokens, i);
+                    } else if (tokens.at(i) == "textview") {
+                        ++i;
+                        tie(increase, i) = size_of_textview(tokens, i);
+                    } else if (tokens.at(i) == "textconcat") {
+                        ++i;
+                        tie(increase, i) = size_of_textconcat(tokens, i);
                     } else if (tokens.at(i) == "streq") {
                         ++i;
                         tie(increase, i) = size_of_streq(tokens, i);

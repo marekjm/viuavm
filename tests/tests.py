@@ -574,6 +574,12 @@ class TextInstructionsTests(unittest.TestCase):
     def testTextEqualsNot(self):
         runTest(self, 'texteq_not.asm', 'false', 0)
 
+    def testTextat(self):
+        runTest(self, 'textat.asm', 'W', 0)
+
+    def testTextlength(self):
+        runTestReturnsIntegers(self, 'textlength.asm', [12, 14], 0)
+
 
 class TextInstructionsEscapeSequencesTests(unittest.TestCase):
     """Tests for escape sequence decoding.
