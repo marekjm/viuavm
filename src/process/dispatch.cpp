@@ -101,6 +101,12 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case TEXTLENGTH:
             addr = optextlength(addr+1);
             break;
+        case TEXTCOMMONPREFIX:
+            addr = optextcommonprefix(addr+1);
+            break;
+        case TEXTCOMMONSUFFIX:
+            addr = optextcommonsuffix(addr+1);
+            break;
         case TEXTCONCAT:
             addr = optextconcat(addr+1);
             break;

@@ -583,6 +583,12 @@ class TextInstructionsTests(unittest.TestCase):
     def testTextlength(self):
         runTestReturnsIntegers(self, 'textlength.asm', [12, 14], 0)
 
+    def testTextCommonPrefix(self):
+        runTestReturnsIntegers(self, 'textcommonprefix.asm', [6], 0)
+
+    def testTextCommonSuffix(self):
+        runTestReturnsIntegers(self, 'textcommonsuffix.asm', [7], 0)
+
     def testTextconcat(self):
         runTest(self, 'textconcat.asm', 'Hello World!', 0)
 

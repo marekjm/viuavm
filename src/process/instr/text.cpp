@@ -102,13 +102,35 @@ viua::internals::types::byte* viua::process::Process::optextlength(viua::interna
 }
 
 
-viua::internals::types::byte* viua::process::Process::optextcommonprefix(viua::internals::types::byte*) {
-    throw new viua::types::Exception("instruction not implemented");
+viua::internals::types::byte* viua::process::Process::optextcommonprefix(viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::types::Type *lhs = nullptr;
+    tie(addr, lhs) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+
+    viua::types::Type *rhs = nullptr;
+    tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+
+    *target = unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<viua::types::Text*>(lhs)->common_prefix(*static_cast<viua::types::Text*>(rhs)))};
+
+    return addr;
 }
 
 
-viua::internals::types::byte* viua::process::Process::optextcommonsuffix(viua::internals::types::byte*) {
-    throw new viua::types::Exception("instruction not implemented");
+viua::internals::types::byte* viua::process::Process::optextcommonsuffix(viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::types::Type *lhs = nullptr;
+    tie(addr, lhs) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+
+    viua::types::Type *rhs = nullptr;
+    tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+
+    *target = unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<viua::types::Text*>(lhs)->common_suffix(*static_cast<viua::types::Text*>(rhs)))};
+
+    return addr;
 }
 
 

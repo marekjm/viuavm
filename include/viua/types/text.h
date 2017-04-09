@@ -71,6 +71,8 @@ namespace viua {
                 auto size() const -> size_type;
                 auto sub(size_type, size_type) const -> decltype(text);
                 auto sub(size_type) const -> decltype(text);
+                auto common_prefix(const Text&) const -> size_type;
+                auto common_suffix(const Text&) const -> size_type;
 
                 Text(std::vector<Character>);
                 Text(std::string);

@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
 #include <sstream>
 #include <viua/types/text.h>
 using namespace std;
@@ -152,4 +153,30 @@ auto viua::types::Text::sub(size_type first_index, size_type last_index) const -
 
 auto viua::types::Text::sub(size_type first_index) const -> decltype(text) {
     return sub(first_index, text.size());
+}
+
+auto viua::types::Text::common_prefix(const Text& other) const -> size_type {
+    size_type length_of_common_prefix = 0;
+    auto limit = max(size(), other.size());
+
+    while (length_of_common_prefix < limit and text.at(length_of_common_prefix) == other.at(length_of_common_prefix)) {
+        ++length_of_common_prefix;
+    }
+
+    return length_of_common_prefix;
+}
+
+auto viua::types::Text::common_suffix(const Text& other) const -> size_type {
+    size_type length_of_common_suffix = 0;
+
+    size_type this_index = size()-1;
+    size_type other_index = other.size()-1;
+
+    while ((this_index and other_index) and text.at(this_index) == other.at(other_index)) {
+        ++length_of_common_suffix;
+        --this_index;
+        --other_index;
+    }
+
+    return length_of_common_suffix;
 }
