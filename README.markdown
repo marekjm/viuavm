@@ -63,18 +63,18 @@ It ships with an assembler, and a static analyser, but does not provide any high
 #### Design goals
 
 - **predictable execution**: it is easier to reason about code when you know exactly how it will behave
-- **predictable memory behaviour**: in Viua you do not have to guess when the memory will be released, or
+- **predictable value lifetimes**: in Viua you do not have to guess when the memory will be released, when objects will be destroyed, or
   remember about the possibility of a gargabe collector kicking in and interrupting your program;
-  Viua manages memory without a GC in a strictly scope-based (where "scope" means "virtual stack frame") manner
-- **massive parallelism**: Viua architecture supports spawning massive amounts of independent, VM-based lightweight processes that can
+  Viua manages resources without a GC in a strictly scope-based (where "scope" means "virtual stack frame") manner
+- **massive concurrency**: Viua architecture supports spawning massive amounts of independent, VM-based lightweight processes that can
   run in parallel (Viua is capable of providing true parallelism given sufficient hardware resources, i.e. at least two CPU cores)
-- **concurrent I/O and FFI**: I/O operations and FFI calls cannot block the VM as they are executed on dedicated schedulers, so block only the
+- **parallel I/O and FFI schedulers**: I/O operations and FFI calls cannot block the VM as they are executed on dedicated schedulers, so block only the
   virtual process that called them without affecting other virtual processes
 - **easy scatter/gather processing**: processes communicate using messages but machine supports a *join* instruction - which synchronises virtual
-  processes execution, it blocks calling process until called process finishes and receives return value of called process (**WIP**)
+  processes execution, it blocks calling process until called process finishes and receives return value of called process
 - **safe inter-process communication** via message-passing (with queueing)
 - **soft-realtime capabilities**: join and receive operations with timeouts (throwing exceptions if nothing has been received) make Viua
-  a VM suitable to host soft-realtime programs (**WIP**)
+  a VM suitable to host soft-realtime programs
 - **fast debugging**: error handling is performed with exceptions (even across virtual processes), and unserviced exceptions cause the machine
   to generate precise and detailed stack traces; running programs are also debuggable with GDB
 - **reliability**: programs running on Viua should be able to run until they are told to stop, not until they crash;
@@ -94,7 +94,7 @@ Some features also supported by the VM:
 - passing function parameters by value and move (non-copying pass)
 - copy-free function returns
 - inter-function tail calls
-- support for pointer-aliases (with no arithmetic, and no assignment - pointers may be only used for reading and mutating objects)
+- support for pointers (with no arithmetic, and no reassignment - pointers may be only used for reading and mutating objects)
 
 For enhanced reliability, Viua assembler provides a built-in static analyser that is able to detect most common errors related to
 register manipulation at compile time.
