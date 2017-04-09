@@ -378,6 +378,14 @@ viua::internals::types::bytecode_size assemble_instruction(Program& program, viu
             assembler::operands::getint_with_rs_type(resolveregister(tokens.at(begin_index)), resolve_rs_type(tokens.at(begin_index+1))),
             assembler::operands::getint_with_rs_type(resolveregister(tokens.at(end_index)), resolve_rs_type(tokens.at(end_index+1)))
         );
+    } else if (tokens.at(i) == "textlength") {
+        TokenIndex target = i + 1;
+        TokenIndex source = target + 2;
+
+        program.optextlength(
+            assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1))),
+            assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
+        );
     } else if (tokens.at(i) == "textcommonprefix") {
         TokenIndex target = i + 1;
         TokenIndex lhs = target + 2;
