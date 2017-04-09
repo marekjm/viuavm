@@ -75,7 +75,7 @@ viua::types::Type* viua::types::Vector::at(long int index) {
     long offset = 0;
 
     // FIXME: REFACTORING: move bounds-checking to a separate function
-    if (index > 0 and static_cast<decltype(internal_object)::size_type>(index) >= internal_object.size()) {
+    if (static_cast<decltype(internal_object)::size_type>(index) >= internal_object.size()) {
         throw new OutOfRangeException("positive vector index out of range");
     } else if (index < 0 and static_cast<decltype(internal_object)::size_type>(-index) > internal_object.size()) {
         throw new OutOfRangeException("negative vector index out of range");

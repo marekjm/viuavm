@@ -118,6 +118,7 @@ There are several categories of change:
 - bic: two new reserved words: `boolean` and `text`
 - fix: pointers now remember their process-of-origin and refuse to be dereferenced outside of it
 - fix: pointers are automatically expired upon crossing process boundaries, lazily - upon first access
+- fix: accessing elements of empty vector does not crash the VM
 
 One limitation of static analyser (SA) introduced in this release is its inability to handle backwards jumps.
 This, however, is not a problem if the code does not use loops and
