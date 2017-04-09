@@ -560,6 +560,66 @@ class StringInstructionsEscapeSequencesTests(unittest.TestCase):
         runTest(self, 'carriage_return.asm', 'Hello \rWorld!', 0)
 
 
+class TextInstructionsTests(unittest.TestCase):
+    """Tests for string instructions.
+    """
+    PATH = './sample/asm/text'
+
+    def testHelloWorld(self):
+        runTest(self, 'hello_world.asm', 'Hello World!', 0)
+
+    def testTextEquals(self):
+        runTest(self, 'texteq.asm', 'true', 0)
+
+    def testTextEqualsNot(self):
+        runTest(self, 'texteq_not.asm', 'false', 0)
+
+    def testTextat(self):
+        runTest(self, 'textat.asm', 'W', 0)
+
+    def testTextsub(self):
+        runTestSplitlines(self, 'textsub.asm', ['Hello World!', 'Hello'], 0)
+
+    def testTextlength(self):
+        runTestReturnsIntegers(self, 'textlength.asm', [12, 14], 0)
+
+    def testTextCommonPrefix(self):
+        runTestReturnsIntegers(self, 'textcommonprefix.asm', [6], 0)
+
+    def testTextCommonSuffix(self):
+        runTestReturnsIntegers(self, 'textcommonsuffix.asm', [7], 0)
+
+    def testTextconcat(self):
+        runTest(self, 'textconcat.asm', 'Hello World!', 0)
+
+
+class TextInstructionsEscapeSequencesTests(unittest.TestCase):
+    """Tests for escape sequence decoding.
+    """
+    PATH = './sample/asm/text/escape_sequences'
+
+    def testNewline(self):
+        runTest(self, 'newline.asm', 'Hello\nWorld!', 0)
+
+    def testTab(self):
+        runTest(self, 'tab.asm', 'Hello\tWorld!', 0)
+
+    def testVerticalTab(self):
+        runTest(self, 'vertical_tab.asm', 'Hello\vWorld!', 0)
+
+    def testBell(self):
+        runTest(self, 'bell.asm', 'Hello \aWorld!', 0)
+
+    def testBackspace(self):
+        runTest(self, 'backspace.asm', 'Hello  \bWorld!', 0)
+
+    def testFormFeed(self):
+        runTest(self, 'form_feed.asm', 'Hello \fWorld!', 0)
+
+    def testCarriageReturn(self):
+        runTest(self, 'carriage_return.asm', 'Hello \rWorld!', 0)
+
+
 class VectorInstructionsTests(unittest.TestCase):
     """Tests for vector-related instructions.
 

@@ -188,6 +188,29 @@ namespace viua {
 
                 return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
             }
+            static auto size_of_instruction_with_four_ri_operands_with_rs_types(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                viua::internals::types::bytecode_size calculated_size = sizeof(viua::internals::types::byte);    // start with the size of a single opcode
+
+                decltype(calculated_size) size_increment = 0;
+
+                // for target register
+                tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
+                calculated_size += size_increment;
+
+                // for 1st source register
+                tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
+                calculated_size += size_increment;
+
+                // for 2nd source register
+                tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
+                calculated_size += size_increment;
+
+                // for 3rd source register
+                tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
+                calculated_size += size_increment;
+
+                return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
+            }
             static auto size_of_instruction_with_three_ri_operands(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 viua::internals::types::bytecode_size calculated_size = sizeof(viua::internals::types::byte);    // start with the size of a single opcode
 
@@ -266,6 +289,7 @@ namespace viua {
                 calculated_size += size_increment;
 
                 calculated_size += sizeof(viua::internals::types::plain_float);
+                ++i;
 
                 return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
             }
@@ -324,6 +348,42 @@ namespace viua {
             static auto size_of_streq(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands(tokens, i);
             }
+
+            static auto size_of_text(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                viua::internals::types::bytecode_size calculated_size = sizeof(viua::internals::types::byte);
+
+                decltype(calculated_size) size_increment = 0;
+
+                // for target register
+                tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
+                calculated_size += size_increment;
+
+                calculated_size += tokens.at(i++).str().size() + 1 - 2; // +1 for null terminator, -2 for quotes
+
+                return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
+            }
+            static auto size_of_texteq(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_textat(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_textsub(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_four_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_textlength(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_textcommonprefix(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_textcommonsuffix(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_textconcat(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+
             static auto size_of_vec(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 viua::internals::types::bytecode_size calculated_size = sizeof(viua::internals::types::byte);    // start with the size of a single opcode
 
@@ -822,8 +882,12 @@ namespace viua {
                 for (decltype(tokens.size()) i = 0; (i < limit) and (counted_instructions < instructions_counter); ++i) {
                     auto token = tokens.at(i);
 
-                    if (token == ".function:" or token == ".closure:" or token == ".block:" or token == ".mark:") {
+                    if (token == ".function:" or token == ".closure:" or token == ".block:" or token == ".mark:" or token == ".link:" or token == ".signature:" or token == ".bsignature:" or token == ".unused:" or token == ".main:") {
                         ++i;
+                        continue;
+                    }
+                    if (token == ".info:") {
+                        i += 2;
                         continue;
                     }
                     if (token == ".name:") {
@@ -898,6 +962,30 @@ namespace viua {
                     } else if (tokens.at(i) == "strstore") {
                         ++i;
                         tie(increase, i) = size_of_strstore(tokens, i);
+                    } else if (tokens.at(i) == "text") {
+                        ++i;
+                        tie(increase, i) = size_of_text(tokens, i);
+                    } else if (tokens.at(i) == "texteq") {
+                        ++i;
+                        tie(increase, i) = size_of_texteq(tokens, i);
+                    } else if (tokens.at(i) == "textat") {
+                        ++i;
+                        tie(increase, i) = size_of_textat(tokens, i);
+                    } else if (tokens.at(i) == "textsub") {
+                        ++i;
+                        tie(increase, i) = size_of_textsub(tokens, i);
+                    } else if (tokens.at(i) == "textlength") {
+                        ++i;
+                        tie(increase, i) = size_of_textlength(tokens, i);
+                    } else if (tokens.at(i) == "textcommonprefix") {
+                        ++i;
+                        tie(increase, i) = size_of_textcommonprefix(tokens, i);
+                    } else if (tokens.at(i) == "textcommonsuffix") {
+                        ++i;
+                        tie(increase, i) = size_of_textcommonsuffix(tokens, i);
+                    } else if (tokens.at(i) == "textconcat") {
+                        ++i;
+                        tie(increase, i) = size_of_textconcat(tokens, i);
                     } else if (tokens.at(i) == "streq") {
                         ++i;
                         tie(increase, i) = size_of_streq(tokens, i);
@@ -1076,7 +1164,7 @@ namespace viua {
                         ++i;
                         tie(increase, i) = size_of_halt(tokens, i);
                     } else {
-                        // OH NOES!!!
+                        throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("failed to calculate size of: " + tokens.at(i).str()));
                     }
 
                     while (i < limit and tokens[i].str() != "\n") {
@@ -1091,270 +1179,7 @@ namespace viua {
                 return bytes;
             }
             viua::internals::types::bytecode_size calculate_bytecode_size2(const vector<viua::cg::lex::Token>& tokens) {
-                viua::internals::types::bytecode_size bytes = 0;
-
-                const auto limit = tokens.size();
-                for (decltype(tokens.size()) i = 0; i < limit; ++i) {
-                    auto token = tokens.at(i);
-
-                    if (token == ".function:" or token == ".closure:" or token == ".block:" or token == ".mark:") {
-                        ++i;
-                        continue;
-                    }
-                    if (token == ".name:") {
-                        i += 2;
-                        continue;
-                    }
-                    if (token == "\n" or token == ".end") {
-                        continue;
-                    }
-
-                    viua::internals::types::bytecode_size increase = 0;
-                    if (tokens.at(i) == "nop") {
-                        ++i;
-                        tie(increase, i) = size_of_nop(tokens, i);
-                    } else if (tokens.at(i) == "izero") {
-                        ++i;
-                        tie(increase, i) = size_of_izero(tokens, i);
-                    } else if (tokens.at(i) == "istore") {
-                        ++i;
-                        tie(increase, i) = size_of_istore(tokens, i);
-                    } else if (tokens.at(i) == "iinc") {
-                        ++i;
-                        tie(increase, i) = size_of_iinc(tokens, i);
-                    } else if (tokens.at(i) == "idec") {
-                        ++i;
-                        tie(increase, i) = size_of_idec(tokens, i);
-                    } else if (tokens.at(i) == "fstore") {
-                        ++i;
-                        tie(increase, i) = size_of_fstore(tokens, i);
-                    } else if (tokens.at(i) == "itof") {
-                        ++i;
-                        tie(increase, i) = size_of_itof(tokens, i);
-                    } else if (tokens.at(i) == "ftoi") {
-                        ++i;
-                        tie(increase, i) = size_of_ftoi(tokens, i);
-                    } else if (tokens.at(i) == "stoi") {
-                        ++i;
-                        tie(increase, i) = size_of_stoi(tokens, i);
-                    } else if (tokens.at(i) == "stof") {
-                        ++i;
-                        tie(increase, i) = size_of_stof(tokens, i);
-                    } else if (tokens.at(i) == "add") {
-                        ++i;
-                        tie(increase, i) = size_of_add(tokens, i);
-                    } else if (tokens.at(i) == "sub") {
-                        ++i;
-                        tie(increase, i) = size_of_sub(tokens, i);
-                    } else if (tokens.at(i) == "mul") {
-                        ++i;
-                        tie(increase, i) = size_of_mul(tokens, i);
-                    } else if (tokens.at(i) == "div") {
-                        ++i;
-                        tie(increase, i) = size_of_div(tokens, i);
-                    } else if (tokens.at(i) == "lt") {
-                        ++i;
-                        tie(increase, i) = size_of_lt(tokens, i);
-                    } else if (tokens.at(i) == "lte") {
-                        ++i;
-                        tie(increase, i) = size_of_lte(tokens, i);
-                    } else if (tokens.at(i) == "gt") {
-                        ++i;
-                        tie(increase, i) = size_of_gt(tokens, i);
-                    } else if (tokens.at(i) == "gte") {
-                        ++i;
-                        tie(increase, i) = size_of_gte(tokens, i);
-                    } else if (tokens.at(i) == "eq") {
-                        ++i;
-                        tie(increase, i) = size_of_eq(tokens, i);
-                    } else if (tokens.at(i) == "strstore") {
-                        ++i;
-                        tie(increase, i) = size_of_strstore(tokens, i);
-                    } else if (tokens.at(i) == "streq") {
-                        ++i;
-                        tie(increase, i) = size_of_streq(tokens, i);
-                    } else if (tokens.at(i) == "vec") {
-                        ++i;
-                        tie(increase, i) = size_of_vec(tokens, i);
-                    } else if (tokens.at(i) == "vinsert") {
-                        ++i;
-                        tie(increase, i) = size_of_vinsert(tokens, i);
-                    } else if (tokens.at(i) == "vpush") {
-                        ++i;
-                        tie(increase, i) = size_of_vpush(tokens, i);
-                    } else if (tokens.at(i) == "vpop") {
-                        ++i;
-                        tie(increase, i) = size_of_vpop(tokens, i);
-                    } else if (tokens.at(i) == "vat") {
-                        ++i;
-                        tie(increase, i) = size_of_vat(tokens, i);
-                    } else if (tokens.at(i) == "vlen") {
-                        ++i;
-                        tie(increase, i) = size_of_vlen(tokens, i);
-                    } else if (tokens.at(i) == "bool") {
-                        ++i;
-                        tie(increase, i) = size_of_bool(tokens, i);
-                    } else if (tokens.at(i) == "not") {
-                        ++i;
-                        tie(increase, i) = size_of_not(tokens, i);
-                    } else if (tokens.at(i) == "and") {
-                        ++i;
-                        tie(increase, i) = size_of_and(tokens, i);
-                    } else if (tokens.at(i) == "or") {
-                        ++i;
-                        tie(increase, i) = size_of_or(tokens, i);
-                    } else if (tokens.at(i) == "move") {
-                        ++i;
-                        tie(increase, i) = size_of_move(tokens, i);
-                    } else if (tokens.at(i) == "copy") {
-                        ++i;
-                        tie(increase, i) = size_of_copy(tokens, i);
-                    } else if (tokens.at(i) == "ptr") {
-                        ++i;
-                        tie(increase, i) = size_of_ptr(tokens, i);
-                    } else if (tokens.at(i) == "swap") {
-                        ++i;
-                        tie(increase, i) = size_of_swap(tokens, i);
-                    } else if (tokens.at(i) == "delete") {
-                        ++i;
-                        tie(increase, i) = size_of_delete(tokens, i);
-                    } else if (tokens.at(i) == "isnull") {
-                        ++i;
-                        tie(increase, i) = size_of_isnull(tokens, i);
-                    } else if (tokens.at(i) == "ress") {
-                        ++i;
-                        tie(increase, i) = size_of_ress(tokens, i);
-                    } else if (tokens.at(i) == "print") {
-                        ++i;
-                        tie(increase, i) = size_of_print(tokens, i);
-                    } else if (tokens.at(i) == "echo") {
-                        ++i;
-                        tie(increase, i) = size_of_echo(tokens, i);
-                    } else if (tokens.at(i) == "capture") {
-                        ++i;
-                        tie(increase, i) = size_of_capture(tokens, i);
-                    } else if (tokens.at(i) == "capturecopy") {
-                        ++i;
-                        tie(increase, i) = size_of_capturecopy(tokens, i);
-                    } else if (tokens.at(i) == "capturemove") {
-                        ++i;
-                        tie(increase, i) = size_of_capturemove(tokens, i);
-                    } else if (tokens.at(i) == "closure") {
-                        ++i;
-                        tie(increase, i) = size_of_closure(tokens, i);
-                    } else if (tokens.at(i) == "function") {
-                        ++i;
-                        tie(increase, i) = size_of_function(tokens, i);
-                    } else if (tokens.at(i) == "frame") {
-                        ++i;
-                        tie(increase, i) = size_of_frame(tokens, i);
-                    } else if (tokens.at(i) == "param") {
-                        ++i;
-                        tie(increase, i) = size_of_param(tokens, i);
-                    } else if (tokens.at(i) == "pamv") {
-                        ++i;
-                        tie(increase, i) = size_of_pamv(tokens, i);
-                    } else if (tokens.at(i) == "call") {
-                        ++i;
-                        tie(increase, i) = size_of_call(tokens, i);
-                    } else if (tokens.at(i) == "tailcall") {
-                        ++i;
-                        tie(increase, i) = size_of_tailcall(tokens, i);
-                    } else if (tokens.at(i) == "arg") {
-                        ++i;
-                        tie(increase, i) = size_of_arg(tokens, i);
-                    } else if (tokens.at(i) == "argc") {
-                        ++i;
-                        tie(increase, i) = size_of_argc(tokens, i);
-                    } else if (tokens.at(i) == "process") {
-                        ++i;
-                        tie(increase, i) = size_of_process(tokens, i);
-                    } else if (tokens.at(i) == "self") {
-                        ++i;
-                        tie(increase, i) = size_of_self(tokens, i);
-                    } else if (tokens.at(i) == "join") {
-                        ++i;
-                        tie(increase, i) = size_of_join(tokens, i);
-                    } else if (tokens.at(i) == "send") {
-                        ++i;
-                        tie(increase, i) = size_of_send(tokens, i);
-                    } else if (tokens.at(i) == "receive") {
-                        ++i;
-                        tie(increase, i) = size_of_receive(tokens, i);
-                    } else if (tokens.at(i) == "watchdog") {
-                        ++i;
-                        tie(increase, i) = size_of_watchdog(tokens, i);
-                    } else if (tokens.at(i) == "jump") {
-                        ++i;
-                        tie(increase, i) = size_of_jump(tokens, i);
-                    } else if (tokens.at(i) == "if") {
-                        ++i;
-                        tie(increase, i) = size_of_if(tokens, i);
-                    } else if (tokens.at(i) == "throw") {
-                        ++i;
-                        tie(increase, i) = size_of_throw(tokens, i);
-                    } else if (tokens.at(i) == "catch") {
-                        ++i;
-                        tie(increase, i) = size_of_catch(tokens, i);
-                    } else if (tokens.at(i) == "draw") {
-                        ++i;
-                        tie(increase, i) = size_of_pull(tokens, i);
-                    } else if (tokens.at(i) == "try") {
-                        ++i;
-                        tie(increase, i) = size_of_try(tokens, i);
-                    } else if (tokens.at(i) == "enter") {
-                        ++i;
-                        tie(increase, i) = size_of_enter(tokens, i);
-                    } else if (tokens.at(i) == "leave") {
-                        ++i;
-                        tie(increase, i) = size_of_leave(tokens, i);
-                    } else if (tokens.at(i) == "import") {
-                        ++i;
-                        tie(increase, i) = size_of_import(tokens, i);
-                    } else if (tokens.at(i) == "link") {
-                        ++i;
-                        tie(increase, i) = size_of_link(tokens, i);
-                    } else if (tokens.at(i) == "class") {
-                        ++i;
-                        tie(increase, i) = size_of_class(tokens, i);
-                    } else if (tokens.at(i) == "prototype") {
-                        ++i;
-                        tie(increase, i) = size_of_prototype(tokens, i);
-                    } else if (tokens.at(i) == "derive") {
-                        ++i;
-                        tie(increase, i) = size_of_derive(tokens, i);
-                    } else if (tokens.at(i) == "attach") {
-                        ++i;
-                        tie(increase, i) = size_of_attach(tokens, i);
-                    } else if (tokens.at(i) == "register") {
-                        ++i;
-                        tie(increase, i) = size_of_register(tokens, i);
-                    } else if (tokens.at(i) == "new") {
-                        ++i;
-                        tie(increase, i) = size_of_new(tokens, i);
-                    } else if (tokens.at(i) == "msg") {
-                        ++i;
-                        tie(increase, i) = size_of_msg(tokens, i);
-                    } else if (tokens.at(i) == "insert") {
-                        ++i;
-                        tie(increase, i) = size_of_insert(tokens, i);
-                    } else if (tokens.at(i) == "remove") {
-                        ++i;
-                        tie(increase, i) = size_of_remove(tokens, i);
-                    } else if (tokens.at(i) == "return") {
-                        ++i;
-                        tie(increase, i) = size_of_return(tokens, i);
-                    } else if (tokens.at(i) == "halt") {
-                        ++i;
-                        tie(increase, i) = size_of_halt(tokens, i);
-                    } else {
-                        // OH NOES!!!
-                    }
-
-                    bytes += increase;
-                }
-
-                return bytes;
+                return calculate_bytecode_size_of_first_n_instructions2(tokens, tokens.size());
             }
         }
     }

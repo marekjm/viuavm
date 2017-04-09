@@ -88,6 +88,15 @@ class Program {
 
     Program& opstrstore(int_op, std::string);
 
+    Program& optext(int_op, std::string);
+    Program& optexteq(int_op, int_op, int_op);
+    Program& optextat(int_op, int_op, int_op);
+    Program& optextsub(int_op, int_op, int_op, int_op);
+    Program& optextlength(int_op, int_op);
+    Program& optextcommonprefix(int_op, int_op, int_op);
+    Program& optextcommonsuffix(int_op, int_op, int_op);
+    Program& optextconcat(int_op, int_op, int_op);
+
     Program& opvec(int_op, int_op, int_op);
     Program& opvinsert(int_op, int_op, int_op);
     Program& opvpush(int_op, int_op);

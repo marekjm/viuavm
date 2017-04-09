@@ -86,6 +86,30 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case STRSTORE:
             addr = opstrstore(addr+1);
             break;
+        case TEXT:
+            addr = optext(addr+1);
+            break;
+        case TEXTEQ:
+            addr = optexteq(addr+1);
+            break;
+        case TEXTAT:
+            addr = optextat(addr+1);
+            break;
+        case TEXTSUB:
+            addr = optextsub(addr+1);
+            break;
+        case TEXTLENGTH:
+            addr = optextlength(addr+1);
+            break;
+        case TEXTCOMMONPREFIX:
+            addr = optextcommonprefix(addr+1);
+            break;
+        case TEXTCOMMONSUFFIX:
+            addr = optextcommonsuffix(addr+1);
+            break;
+        case TEXTCONCAT:
+            addr = optextconcat(addr+1);
+            break;
         case VEC:
             addr = opvec(addr+1);
             break;

@@ -89,6 +89,15 @@ namespace cg {
 
         viua::internals::types::byte* opstrstore(viua::internals::types::byte*, int_op, std::string);
 
+        viua::internals::types::byte* optext(viua::internals::types::byte*, int_op, std::string);
+        viua::internals::types::byte* optexteq(viua::internals::types::byte*, int_op, int_op, int_op);
+        viua::internals::types::byte* optextat(viua::internals::types::byte*, int_op, int_op, int_op);
+        viua::internals::types::byte* optextsub(viua::internals::types::byte*, int_op, int_op, int_op, int_op);
+        viua::internals::types::byte* optextlength(viua::internals::types::byte*, int_op, int_op);
+        viua::internals::types::byte* optextcommonprefix(viua::internals::types::byte*, int_op, int_op, int_op);
+        viua::internals::types::byte* optextcommonsuffix(viua::internals::types::byte*, int_op, int_op, int_op);
+        viua::internals::types::byte* optextconcat(viua::internals::types::byte*, int_op, int_op, int_op);
+
         viua::internals::types::byte* opvec(viua::internals::types::byte*, int_op, int_op, int_op);
         viua::internals::types::byte* opvinsert(viua::internals::types::byte*, int_op, int_op, int_op);
         viua::internals::types::byte* opvpush(viua::internals::types::byte*, int_op, int_op);

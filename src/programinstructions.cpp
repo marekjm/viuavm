@@ -155,6 +155,41 @@ Program& Program::opstrstore(int_op reg, string s) {
     return (*this);
 }
 
+Program& Program::optext(int_op reg, string s) {
+    addr_ptr = cg::bytecode::optext(addr_ptr, reg, s);
+    return (*this);
+}
+
+Program& Program::optexteq(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::optexteq(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::optextat(int_op target, int_op source, int_op index) {
+    addr_ptr = cg::bytecode::optextat(addr_ptr, target, source, index);
+    return (*this);
+}
+Program& Program::optextsub(int_op target, int_op source, int_op begin_index, int_op end_index) {
+    addr_ptr = cg::bytecode::optextsub(addr_ptr, target, source, begin_index, end_index);
+    return (*this);
+}
+Program& Program::optextlength(int_op target, int_op source) {
+    addr_ptr = cg::bytecode::optextlength(addr_ptr, target, source);
+    return (*this);
+}
+Program& Program::optextcommonprefix(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::optextcommonprefix(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+Program& Program::optextcommonsuffix(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::optextcommonsuffix(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+Program& Program::optextconcat(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::optextconcat(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
 Program& Program::opvec(int_op index, int_op pack_start_index, int_op pack_length) {
     /** Inserts vec instruction.
      */

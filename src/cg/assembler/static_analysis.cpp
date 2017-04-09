@@ -538,7 +538,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             check_use_of_register(body_tokens, source, i, registers, named_registers, "closure of empty register");
 
             i = skip_till_next_line(body_tokens, i);
-        } else if (token == "copy" or token == "ptr") {
+        } else if (token == "copy" or token == "ptr" or token == "textlength") {
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
 
@@ -601,13 +601,28 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "and" or token == "or") {
+        } else if (token == "and" or token == "or" or token == "texteq" or token == "textat" or token == "textcommonprefix" or token == "textcommonsuffix" or token == "textconcat") {
             ++i; // skip mnemonic token
 
             TokenIndex target = i;
             TokenIndex lhs = target + 2;
             TokenIndex rhs = lhs + 2;
 
+            check_use_of_register(body_tokens, lhs, i, registers, named_registers);
+            check_use_of_register(body_tokens, rhs, i, registers, named_registers);
+            registers.insert(resolve_register_name(named_registers, body_tokens.at(i)), body_tokens.at(i));
+
+            i = skip_till_next_line(body_tokens, i);
+            continue;
+        } else if (token == "textsub") {
+            ++i; // skip mnemonic token
+
+            TokenIndex target = i;
+            TokenIndex source = target + 2;
+            TokenIndex lhs = source + 2;
+            TokenIndex rhs = lhs + 2;
+
+            check_use_of_register(body_tokens, source, i, registers, named_registers);
             check_use_of_register(body_tokens, lhs, i, registers, named_registers);
             check_use_of_register(body_tokens, rhs, i, registers, named_registers);
             registers.insert(resolve_register_name(named_registers, body_tokens.at(i)), body_tokens.at(i));

@@ -169,7 +169,6 @@ namespace viua {
                     "float32",
                     "float64",
                     "string",
-                    "text",
                     "boolean",
                     "bits",
                     "coroutine",
@@ -761,6 +760,39 @@ namespace viua {
                             tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "\"\"");
                         }
                         continue;
+                    } else if (token == "text") {
+                        tokens.push_back(token);                // mnemonic
+                        tokens.push_back(input_tokens.at(++i)); // target register
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "current");
+                        }
+                        if (input_tokens.at(i+1) == "\n") {
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "\"\"");
+                        }
+                        continue;
+                    } else if (token == "texteq") {
+                        tokens.push_back(token);    // mnemonic
+
+                        tokens.push_back(input_tokens.at(++i)); // target register
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                        }
+
+                        tokens.push_back(input_tokens.at(++i)); // lhs register
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                        }
+
+                        tokens.push_back(input_tokens.at(++i)); // rhs register
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                        }
                     } else if (token == "itof" or token == "ftoi" or token == "stoi" or token == "stof") {
                         tokens.push_back(token);                // mnemonic
 

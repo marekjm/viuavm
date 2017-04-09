@@ -89,6 +89,14 @@ static viua::internals::types::byte* insert_three_ri_instruction(viua::internals
     return insert_ri_operand(addr_ptr, c);
 }
 
+static viua::internals::types::byte* insert_four_ri_instruction(viua::internals::types::byte* addr_ptr, enum OPCODE instruction, int_op a, int_op b, int_op c, int_op d) {
+    *(addr_ptr++) = instruction;
+    addr_ptr = insert_ri_operand(addr_ptr, a);
+    addr_ptr = insert_ri_operand(addr_ptr, b);
+    addr_ptr = insert_ri_operand(addr_ptr, c);
+    return insert_ri_operand(addr_ptr, d);
+}
+
 static viua::internals::types::byte* insert_two_ri_and_primitive_int_instruction(viua::internals::types::byte* addr_ptr, enum OPCODE instruction, int_op a, int_op b, int_op c) {
             addr_ptr = insert_two_ri_instruction(addr_ptr, instruction, a, b);
 
@@ -253,6 +261,35 @@ namespace cg {
             *(addr_ptr++) = STRSTORE;
             addr_ptr = insert_ri_operand(addr_ptr, reg);
             return insertString(addr_ptr, s.substr(1, s.size()-2));
+        }
+
+        viua::internals::types::byte* optext(viua::internals::types::byte* addr_ptr, int_op reg, string s) {
+            *(addr_ptr++) = TEXT;
+            addr_ptr = insert_ri_operand(addr_ptr, reg);
+            return insertString(addr_ptr, s.substr(1, s.size()-2));
+        }
+
+        viua::internals::types::byte* optexteq(viua::internals::types::byte* addr_ptr, int_op target, int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, TEXTEQ, target, lhs, rhs);
+        }
+
+        viua::internals::types::byte* optextat(viua::internals::types::byte* addr_ptr, int_op target, int_op source, int_op index) {
+            return insert_three_ri_instruction(addr_ptr, TEXTAT, target, source, index);
+        }
+        viua::internals::types::byte* optextsub(viua::internals::types::byte* addr_ptr, int_op target, int_op source, int_op begin_index, int_op end_index) {
+            return insert_four_ri_instruction(addr_ptr, TEXTSUB, target, source, begin_index, end_index);
+        }
+        viua::internals::types::byte* optextlength(viua::internals::types::byte* addr_ptr, int_op target, int_op source) {
+            return insert_two_ri_instruction(addr_ptr, TEXTLENGTH, target, source);
+        }
+        viua::internals::types::byte* optextcommonprefix(viua::internals::types::byte* addr_ptr, int_op target, int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, TEXTCOMMONPREFIX, target, lhs, rhs);
+        }
+        viua::internals::types::byte* optextcommonsuffix(viua::internals::types::byte* addr_ptr, int_op target, int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, TEXTCOMMONSUFFIX, target, lhs, rhs);
+        }
+        viua::internals::types::byte* optextconcat(viua::internals::types::byte* addr_ptr, int_op target, int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, TEXTCONCAT, target, lhs, rhs);
         }
 
         viua::internals::types::byte* opvec(viua::internals::types::byte* addr_ptr, int_op index, int_op pack_start_index, int_op pack_length) {

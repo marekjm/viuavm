@@ -59,6 +59,15 @@ const std::set<std::string> OP_MNEMONICS = {
     "strstore",
     "streq",
 
+    "text",
+    "texteq",
+    "textat",
+    "textsub",
+    "textlength",
+    "textcommonprefix",
+    "textcommonsuffix",
+    "textconcat",
+
     "vec",
     "vinsert",
     "vpush",
@@ -160,6 +169,15 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { STRSTORE,     "strstore" },
     { STREQ,        "streq" },
 
+    { TEXT,         "text" },
+    { TEXTEQ,       "texteq" },
+    { TEXTAT,       "textat" },
+    { TEXTSUB,      "textsub" },
+    { TEXTLENGTH,   "textlength" },
+    { TEXTCOMMONPREFIX, "textcommonprefix" },
+    { TEXTCOMMONSUFFIX, "textcommonsuffix" },
+    { TEXTCONCAT,   "textconcat" },
+
     { VEC,          "vec" },
     { VINSERT,      "vinsert" },
     { VPUSH,        "vpush" },
@@ -229,26 +247,6 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
 
     { RETURN,       "return" },
     { HALT,         "halt" },
-};
-
-
-const std::vector<enum OPCODE> OP_VARIABLE_LENGTH = {
-    STRSTORE,
-    CLOSURE,
-    FUNCTION,
-    CALL,
-    TAILCALL,
-    PROCESS,
-    WATCHDOG,
-    CATCH,
-    ENTER,
-    IMPORT,
-    LINK,
-    CLASS,
-    DERIVE,
-    ATTACH,
-    NEW,
-    MSG,
 };
 
 

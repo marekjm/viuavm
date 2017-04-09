@@ -88,6 +88,9 @@ static bool usage(const string program, const vector<string>& args) {
             cerr << send_control_seq(COLOR_FG_WHITE) << option << send_control_seq(ATTR_RESET);
             cerr << endl;
             exit(1);
+        } else {
+            // first operand, options processing should stop
+            break;
         }
     }
 

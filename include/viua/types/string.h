@@ -46,7 +46,9 @@ namespace viua {
         class String : public Type {
             /** String type.
              *
-             *  Designed to hold text.
+             *  Designed to hold strings of bytes.
+             *  Strings of bytes do not neccessarily represent human-readable text.
+             *  They may represent just "strings of bytes".
              */
             std::string svalue;
 

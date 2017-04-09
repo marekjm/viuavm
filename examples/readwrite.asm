@@ -21,8 +21,8 @@
 ;
 ; Compilation:
 ;
-;   g++ -std=c++11 -Wall -pedantic -fPIC -c -I../include -o registerset.o ../src/cpu/registerset.cpp
-;   g++ -std=c++11 -Wall -pedantic -fPIC -shared -I../include -o io.so io.cpp registerset.o
+;   g++ -std=c++14 -Wall -pedantic -fPIC -c -I../include -o registerset.o ../src/cpu/registerset.cpp
+;   g++ -std=c++14 -Wall -pedantic -fPIC -shared -I../include -o io.so io.cpp registerset.o
 ;   ../build/bin/vm/asm readwrite.asm
 ;
 ; After libraries and the program are compiled result can be tested with following command
