@@ -67,6 +67,9 @@ namespace viua {
 
                 auto operator == (const Text&) const -> bool;
 
+                using size_type = decltype(text)::size_type;
+                auto at(const size_type) const -> Character;
+
                 Text(std::string);
                 ~Text() {}
 

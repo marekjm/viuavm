@@ -20,6 +20,7 @@
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/types/text.h>
+#include <viua/types/integer.h>
 #include <viua/types/boolean.h>
 #include <viua/process.h>
 #include <viua/support/string.h>
@@ -48,6 +49,20 @@ viua::internals::types::byte* viua::process::Process::optexteq(viua::internals::
     tie(addr, second) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
     *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(*static_cast<viua::types::Text*>(first) == *static_cast<viua::types::Text*>(second))};
+
+    return addr;
+}
+
+
+viua::internals::types::byte* viua::process::Process::optextat(viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::types::Type *source_text = nullptr, *index = nullptr;
+    tie(addr, source_text) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    tie(addr, index) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+
+    *target = unique_ptr<viua::types::Type>{new viua::types::Text(static_cast<viua::types::Text*>(source_text)->at(static_cast<viua::types::Integer*>(index)->as_int64()))};
 
     return addr;
 }
