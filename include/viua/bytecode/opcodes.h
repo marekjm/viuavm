@@ -56,18 +56,71 @@ enum OPCODE : viua::internals::types::byte {
     STRSTORE,
     STREQ,
 
-    TEXT,           // store a text value in register
-    TEXTEQ,         // compare two text values for equality
-    TEXTAT,         // return character at given index
-    TEXTSUB,        // return a copy of subtext of given text value
-    TEXTLENGTH,     // return length of given text value
-    TEXTCOMMONPREFIX,   // return length of common prefix of two text values
-    TEXTCOMMONSUFFIX,   // return length of common suffix of two text values
-    TEXTVIEW,       // return a view of a text value between two indexes, a
-                    // non-copying TEXTSUB
-                    // values returned by TEXTVIEW are treated as regular text values
-                    // by TEXT* instructions
-    TEXTCONCAT,     // concatenate two text values
+    /*
+     *  Store a text value in a register.
+     *
+     *  text {target-register} "<text>"
+     */
+    TEXT,
+
+    /*
+     *  Compare two text values for equality.
+     *
+     *  texteq {result-register} {lhs-register} {rhs-register}
+     */
+    TEXTEQ,
+
+    /*
+     *  Return copy of the character at a given index in text.
+     *
+     *  textat {result-register} {string-register} {index-register}
+     */
+    TEXTAT,
+
+    /*
+     *  Return a copy of a part of the given text between given indexes.
+     *
+     *  textsub {result-register} {string-register} {begin-index-register} {end-index:register|void}
+     */
+    TEXTSUB,
+
+    /*
+     *  Return length of a given text value (in characters).
+     *
+     *  textlength {result-register} {string-register}
+     */
+    TEXTLENGTH,
+
+    /*
+     *  Return length of common prefix of two text values.
+     *
+     *  textcommonprefix {result-register} {lhs-string-register} {rhs-string-register}
+     */
+    TEXTCOMMONPREFIX,
+
+    /*
+     *  Return length of common suffix of two text values.
+     *
+     *  textcommonsuffix {result-register} {lhs-string-register} {rhs-string-register}
+     */
+    TEXTCOMMONSUFFIX,
+
+    /*
+     *  Return a view of a text value between two indexes.
+     *  It is a non-copying TEXTSUB.
+     *  Values returned by TEXTVIEW are treated as regular text values by TEXT* instructions, so
+     *  for example TEXTCONCAT of two views will result in a copy of viewed text.
+     *
+     *  textview {result-register} {string-register} {begin-index-register} {end-index:register|void}
+     */
+    TEXTVIEW,
+
+    /*
+     *  Concatenate two text values. Creates a copy of each text value.
+     *
+     *  textconcat {result-register} {lhs-string-register} {rhs-string-register}
+     */
+    TEXTCONCAT,
 
     VEC,
     VINSERT,
