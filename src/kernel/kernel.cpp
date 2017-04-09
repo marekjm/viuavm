@@ -47,6 +47,23 @@
 using namespace std;
 
 
+viua::kernel::Mailbox::Mailbox(Mailbox&& that): messages(std::move(that.messages)) {
+}
+
+auto viua::kernel::Mailbox::send(unique_ptr<viua::types::Type> message) -> void {
+    unique_lock<mutex> lck { mailbox_mutex };
+    messages.push_back(std::move(message));
+}
+
+auto viua::kernel::Mailbox::receive(queue<unique_ptr<viua::types::Type>>& mq) -> void {
+    unique_lock<mutex> lck { mailbox_mutex };
+    for (auto& message : messages) {
+        mq.push(std::move(message));
+    }
+    messages.clear();
+}
+
+
 viua::kernel::Kernel& viua::kernel::Kernel::load(unique_ptr<viua::internals::types::byte[]> bc) {
     /*  Load bytecode into the viua::kernel::Kernel.
      *  viua::kernel::Kernel becomes owner of loaded bytecode - meaning it will consider itself responsible for proper
@@ -311,7 +328,7 @@ auto viua::kernel::Kernel::createMailbox(const viua::process::PID pid) -> viua::
 #if VIUA_VM_DEBUG_LOG
     cerr << "[kernel:mailbox:create] pid = " << pid.get() << endl;
 #endif
-    mailboxes.emplace(pid, vector<unique_ptr<viua::types::Type>>{});
+    mailboxes.emplace(pid, Mailbox{});
     return ++running_processes;
 }
 auto viua::kernel::Kernel::deleteMailbox(const viua::process::PID pid) -> viua::internals::types::processes_count {
@@ -332,7 +349,7 @@ void viua::kernel::Kernel::send(const viua::process::PID pid, unique_ptr<viua::t
 #if VIUA_VM_DEBUG_LOG
     cerr << "[kernel:receive:send] pid = " << pid.get() << ", queued messages = " << mailboxes[pid].size() << "+1" << endl;
 #endif
-    mailboxes[pid].emplace_back(std::move(message));
+    mailboxes[pid].send(std::move(message));
 }
 void viua::kernel::Kernel::receive(const viua::process::PID pid, queue<unique_ptr<viua::types::Type>>& message_queue) {
     unique_lock<mutex> lck(mailbox_mutex);
@@ -343,13 +360,10 @@ void viua::kernel::Kernel::receive(const viua::process::PID pid, queue<unique_pt
 #if VIUA_VM_DEBUG_LOG
     cerr << "[kernel:receive:pre] pid = " << pid.get() << ", queued messages = " << message_queue.size() << endl;
 #endif
-    for (auto& message : mailboxes[pid]) {
-        message_queue.push(std::move(message));
-    }
+    mailboxes[pid].receive(message_queue);
 #if VIUA_VM_DEBUG_LOG
     cerr << "[kernel:receive:post] pid = " << pid.get() << ", queued messages = " << message_queue.size() << endl;
 #endif
-    mailboxes[pid].clear();
 }
 
 uint64_t viua::kernel::Kernel::pids() const {

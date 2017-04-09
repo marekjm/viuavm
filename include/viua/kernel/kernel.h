@@ -61,6 +61,18 @@ namespace viua {
 
 namespace viua {
     namespace kernel {
+        class Mailbox {
+            std::mutex mailbox_mutex;
+            std::vector<std::unique_ptr<viua::types::Type>> messages;
+
+            public:
+
+            auto send(std::unique_ptr<viua::types::Type>) -> void;
+            auto receive(std::queue<std::unique_ptr<viua::types::Type>>&) -> void;
+
+            Mailbox() = default;
+            Mailbox(Mailbox&&);
+        };
         class Kernel {
 #ifdef AS_DEBUG_HEADER
             public:
@@ -132,7 +144,7 @@ namespace viua {
 
             std::vector<void*> cxx_dynamic_lib_handles;
 
-            std::map<viua::process::PID, std::vector<std::unique_ptr<viua::types::Type>>> mailboxes;
+            std::map<viua::process::PID, Mailbox> mailboxes;
             std::mutex mailbox_mutex;
 
             public:
