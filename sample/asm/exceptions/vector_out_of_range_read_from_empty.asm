@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2015, 2016, 2017 Marek Marecki
+;   Copyright (C) 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -17,10 +17,9 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: main/1
+.function: main/0
     vec %1
-    vpush %1 (istore %3 42)
-    vat %2 %1 4
+    vat %2 %1 0
     print *2
 
     izero %0 local
