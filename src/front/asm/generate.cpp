@@ -323,7 +323,6 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
 
     // name of the main function must not be hardcoded because there is '.main:' assembler
     // directive which can set an arbitrary function as main
-    // we also save return value in 1 register since 0 means "drop return value"
     entry_function_tokens.emplace_back(0, 0, "call");
     entry_function_tokens.emplace_back(0, 0, "%1");
     entry_function_tokens.emplace_back(0, 0, "local");
