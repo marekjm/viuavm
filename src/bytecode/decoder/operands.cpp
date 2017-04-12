@@ -53,7 +53,7 @@ auto viua::bytecode::decoder::operands::fetch_void(viua::internals::types::byte 
     ++ip;
 
     if (ot != OT_VOID) {
-        throw new viua::types::Exception("decoded invalid operand type");
+        throw new viua::types::Exception("decoded invalid operand type: expected OT_VOID");
     }
 
     return ip;
@@ -77,7 +77,7 @@ static auto extract_register_index(viua::internals::types::byte *ip, viua::proce
         // FIXME extract RS type
         ip += sizeof(viua::internals::RegisterSets);
     } else {
-        throw new viua::types::Exception("decoded invalid operand type");
+        throw new viua::types::Exception("decoded invalid operand type: expected OT_REGISTER_INDEX, OT_REGISTER_INDEX" + (pointers_allowed ? string(", OT_POINTER") : string("")));
     }
     if (ot == OT_REGISTER_REFERENCE) {
         auto i = static_cast<viua::types::Integer*>(process->obtain(register_index));
@@ -102,7 +102,7 @@ static auto extract_register_type_and_index(viua::internals::types::byte *ip, vi
         register_type = extract<viua::internals::RegisterSets>(ip);
         ip += sizeof(viua::internals::RegisterSets);
     } else {
-        throw new viua::types::Exception("decoded invalid operand type");
+        throw new viua::types::Exception("decoded invalid operand type: expected OT_REGISTER_INDEX, OT_REGISTER_INDEX" + (pointers_allowed ? string(", OT_POINTER") : string("")));
     }
     if (ot == OT_REGISTER_REFERENCE) {
         auto i = static_cast<viua::types::Integer*>(process->obtain(register_index));
@@ -141,7 +141,7 @@ auto viua::bytecode::decoder::operands::fetch_timeout(viua::internals::types::by
         value = *reinterpret_cast<decltype(value)*>(ip);
         ip += sizeof(decltype(value));
     } else {
-        throw new viua::types::Exception("decoded invalid operand type");
+        throw new viua::types::Exception("decoded invalid operand type: expected O_INT");
     }
     return tuple<viua::internals::types::byte*, viua::internals::types::timeout>(ip, value);
 }
@@ -182,7 +182,7 @@ auto viua::bytecode::decoder::operands::fetch_primitive_int(viua::internals::typ
         value = *reinterpret_cast<decltype(value)*>(ip);
         ip += sizeof(decltype(value));
     } else {
-        throw new viua::types::Exception("decoded invalid operand type");
+        throw new viua::types::Exception("decoded invalid operand type: expected OT_REGISTER_REFERENCE, OT_INT");
     }
     return tuple<viua::internals::types::byte*, viua::internals::types::plain_int>(ip, value);
 }
