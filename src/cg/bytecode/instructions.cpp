@@ -308,7 +308,7 @@ namespace cg {
         }
 
         viua::internals::types::byte* opvpop(viua::internals::types::byte* addr_ptr, int_op vec, int_op dst, int_op pos) {
-            return insert_two_ri_and_primitive_int_instruction(addr_ptr, VPOP, vec, dst, pos);
+            return insert_three_ri_instruction(addr_ptr, VPOP, vec, dst, pos);
         }
 
         viua::internals::types::byte* opvat(viua::internals::types::byte* addr_ptr, int_op vec, int_op dst, int_op at) {

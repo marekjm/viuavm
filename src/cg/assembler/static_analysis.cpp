@@ -376,13 +376,18 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
         } else if (token == "vpop") {
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
+            TokenIndex index = source + 2;
 
             if (body_tokens.at(target) == "void") {
                 // source is one token earlier since void has no register set
                 --source;
+                --index;
             }
 
             check_use_of_register(body_tokens, source, i, registers, named_registers, (token.str() + " from empty register"));
+            if (body_tokens.at(index) != "void") {
+                check_use_of_register(body_tokens, index, i, registers, named_registers, ("using empty register for indexing"));
+            }
             registers.insert(resolve_register_name(named_registers, body_tokens.at(target)), body_tokens.at(target));
 
             i = skip_till_next_line(body_tokens, i);

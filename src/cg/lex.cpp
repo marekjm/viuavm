@@ -443,11 +443,13 @@ namespace viua {
                         tokens.push_back(token);
 
                         tokens.push_back(input_tokens.at(++i));
+                        string target_register_set = "current";
                         if (tokens.back().str() != "void") {
                             if (not is_register_set_name(input_tokens.at(i+1))) {
-                                tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                                tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
                             } else {
                                 tokens.push_back(input_tokens.at(++i));
+                                target_register_set = tokens.back().str();
                             }
                         }
 
@@ -458,8 +460,15 @@ namespace viua {
                             tokens.push_back(input_tokens.at(++i));
                         }
 
-                        if (input_tokens.at(i+1).str() == "\n") {
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "-1");
+                        if (input_tokens.at(i+1) == "\n") {
+                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "void");
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                            if (not is_register_set_name(input_tokens.at(i+1))) {
+                                tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                            } else {
+                                tokens.push_back(input_tokens.at(++i));
+                            }
                         }
                     } else if (token == "vat") {
                         tokens.push_back(token);

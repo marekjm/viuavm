@@ -21,7 +21,7 @@
     vec (.name: %iota container)
 
     vpush %container (istore %iota 0)
-    vpop void %container 0
+    vpop void %container void
     print %container
 
     izero %0 local
