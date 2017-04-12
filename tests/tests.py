@@ -658,6 +658,12 @@ class VectorInstructionsTests(unittest.TestCase):
     def testVPOP(self):
         runTest(self, 'vpop.asm', ['0', '1', '0', 'Hello World!'], 0, lambda o: o.strip().splitlines())
 
+    def testVPOPWithVoidIndexPopsLast(self):
+        runTest(self, 'vpop_with_void_index_pops_last.asm', '[0]')
+
+    def testVPOPWithIndexPopsSpecified(self):
+        runTest(self, 'vpop_with_index_pops_specified.asm', '[1]')
+
     def testVAT(self):
         runTest(self, 'vat.asm', ['0', '1', '1', 'Hello World!'], 0, lambda o: o.strip().splitlines())
 
