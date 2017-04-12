@@ -167,20 +167,12 @@ static viua::internals::types::bytecode_size writeCodeBlocksSection(ofstream& ou
     return block_bodies_size_so_far;
 }
 
-static string get_main_function(const vector<Token>& tokens, const vector<string>& available_functions) {
+static string get_main_function(const vector<string>& available_functions) {
     string main_function = "";
-    for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
-        if (tokens.at(i) == ".main:") {
-            main_function = tokens.at(i+1);
+    for (auto f : available_functions) {
+        if (f == "main/0" or f == "main/1" or f == "main/2") {
+            main_function = f;
             break;
-        }
-    }
-    if (main_function == "") {
-        for (auto f : available_functions) {
-            if (f == "main/0" or f == "main/1" or f == "main/2") {
-                main_function = f;
-                break;
-            }
         }
     }
     return main_function;
@@ -321,9 +313,6 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
         bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
     }
 
-    // name of the main function must not be hardcoded because there is '.main:' assembler
-    // directive which can set an arbitrary function as main
-    // we also save return value in 1 register since 0 means "drop return value"
     entry_function_tokens.emplace_back(0, 0, "call");
     entry_function_tokens.emplace_back(0, 0, "%1");
     entry_function_tokens.emplace_back(0, 0, "local");
@@ -358,7 +347,7 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
 
     /////////////////////////
     // GET MAIN FUNCTION NAME
-    string main_function = get_main_function(tokens, functions.names);
+    string main_function = get_main_function(functions.names);
     if (((VERBOSE and main_function != "main/1" and main_function != "") or DEBUG) and not flags.as_lib) {
         cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
         cout << ": ";

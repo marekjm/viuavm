@@ -106,7 +106,6 @@ namespace assembler {
             bool is_mark(const std::string&);
             bool is_info(const std::string&);
             bool is_end(const std::string&);
-            bool is_main(const std::string&);
             bool is_link(const std::string&);
 
             std::string make_function_signature(const std::string&);

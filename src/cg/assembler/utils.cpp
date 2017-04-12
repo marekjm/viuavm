@@ -87,10 +87,6 @@ bool assembler::utils::lines::is_end(const string& line) {
     return str::chunk(line) == ".end";
 }
 
-bool assembler::utils::lines::is_main(const string& line) {
-    return str::chunk(line) == ".main:";
-}
-
 bool assembler::utils::lines::is_link(const string& line) {
     return str::chunk(line) == ".link:";
 }
@@ -105,7 +101,6 @@ bool assembler::utils::lines::is_directive(const string& line) {
         is_mark(line) or
         is_info(line) or
         is_end(line) or
-        is_main(line) or
         is_link(line) or
         is_closure(line) or
         line == ".unused:" or
