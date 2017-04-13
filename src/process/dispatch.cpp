@@ -28,6 +28,9 @@ using namespace std;
 viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::types::byte* addr) {
     /** Dispatches instruction at a pointer to its handler.
      */
+    if (tracing_enabled) {
+        emit_trace_line(addr);
+    }
     switch (static_cast<OPCODE>(*addr)) {
         case IZERO:
             addr = opizero(addr+1);

@@ -49,6 +49,13 @@ namespace viua {
              */
             viua::kernel::Kernel *attached_kernel;
 
+            /*
+             * Variables set below control whether the VM should gather and
+             * emit additional (debugging, profiling, tracing) information
+             * regarding executed code.
+             */
+            const bool tracing_enabled;
+
             std::vector<std::unique_ptr<viua::process::Process>> *free_processes;
             std::mutex *free_processes_mutex;
             std::condition_variable *free_processes_cv;
@@ -115,7 +122,7 @@ namespace viua {
             void join();
             int exit() const;
 
-            VirtualProcessScheduler(viua::kernel::Kernel*, std::vector<std::unique_ptr<viua::process::Process>>*, std::mutex*, std::condition_variable*);
+            VirtualProcessScheduler(viua::kernel::Kernel*, std::vector<std::unique_ptr<viua::process::Process>>*, std::mutex*, std::condition_variable*, const bool = false);
             VirtualProcessScheduler(VirtualProcessScheduler&&);
             ~VirtualProcessScheduler();
         };

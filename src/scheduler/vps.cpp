@@ -312,7 +312,7 @@ viua::process::Process* viua::scheduler::VirtualProcessScheduler::process() {
 }
 
 viua::process::Process* viua::scheduler::VirtualProcessScheduler::spawn(unique_ptr<Frame> frame, viua::process::Process *parent, bool disown) {
-    unique_ptr<viua::process::Process> p(new viua::process::Process(std::move(frame), this, parent));
+    unique_ptr<viua::process::Process> p(new viua::process::Process(std::move(frame), this, parent, tracing_enabled));
     p->begin();
     if (disown) {
         p->detach();
@@ -621,10 +621,15 @@ int viua::scheduler::VirtualProcessScheduler::exit() const {
     return exit_code;
 }
 
-viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(viua::kernel::Kernel *akernel, vector<unique_ptr<viua::process::Process>> *fp,
-                                                                  mutex *fp_mtx,
-                                                                  condition_variable *fp_cv):
+viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(
+        viua::kernel::Kernel *akernel,
+        vector<unique_ptr<viua::process::Process>> *fp,
+        mutex *fp_mtx,
+        condition_variable *fp_cv,
+        const bool enable_tracing
+    ):
     attached_kernel(akernel),
+    tracing_enabled(enable_tracing),
     free_processes(fp),
     free_processes_mutex(fp_mtx),
     free_processes_cv(fp_cv),
@@ -636,7 +641,9 @@ viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(viua::kernel::
 {
 }
 
-viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(VirtualProcessScheduler&& that) {
+viua::scheduler::VirtualProcessScheduler::VirtualProcessScheduler(VirtualProcessScheduler&& that):
+    tracing_enabled(that.tracing_enabled)
+{
     attached_kernel = that.attached_kernel;
 
     free_processes = that.free_processes;

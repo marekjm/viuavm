@@ -129,6 +129,14 @@ namespace viua {
 #ifdef AS_DEBUG_HEADER
             public:
 #endif
+            /*
+             * Variables set below control whether the VM should gather and
+             * emit additional (debugging, profiling, tracing) information
+             * regarding executed code.
+             */
+            const bool tracing_enabled;
+            auto get_trace_line(viua::internals::types::byte*) const -> std::string;
+            auto emit_trace_line(viua::internals::types::byte*) const -> void;
 
             /*
              * Pointer to scheduler the process is currently bound to.
@@ -360,7 +368,7 @@ namespace viua {
 
                 bool empty() const;
 
-                Process(std::unique_ptr<Frame>, viua::scheduler::VirtualProcessScheduler*, viua::process::Process*);
+                Process(std::unique_ptr<Frame>, viua::scheduler::VirtualProcessScheduler*, viua::process::Process*, const bool = false);
                 ~Process();
         };
     }

@@ -391,6 +391,14 @@ auto viua::kernel::Kernel::no_of_vp_schedulers() -> viua::internals::types::sche
 auto viua::kernel::Kernel::no_of_ffi_schedulers() -> viua::internals::types::schedulers_count {
     return no_of_schedulers("VIUA_FFI_SCHEDULERS", default_ffi_schedulers_limit);
 }
+auto viua::kernel::Kernel::is_tracing_enabled() -> bool {
+    string viua_enable_tracing;
+    char *env_text = getenv("VIUA_ENABLE_TRACING");
+    if (env_text) {
+        viua_enable_tracing = string(env_text);
+    }
+    return (viua_enable_tracing == "yes" or viua_enable_tracing == "true" or viua_enable_tracing == "1");
+}
 
 int viua::kernel::Kernel::run() {
     /*  VM viua::kernel::Kernel implementation.
@@ -400,13 +408,14 @@ int viua::kernel::Kernel::run() {
     }
 
     vp_schedulers_limit = no_of_vp_schedulers();
+    bool enable_tracing = is_tracing_enabled();
 
     vector<viua::scheduler::VirtualProcessScheduler> vp_schedulers;
 
     // reserver memory for all schedulers ahead of time
     vp_schedulers.reserve(vp_schedulers_limit);
 
-    vp_schedulers.emplace_back(this, &free_virtual_processes, &free_virtual_processes_mutex, &free_virtual_processes_cv);
+    vp_schedulers.emplace_back(this, &free_virtual_processes, &free_virtual_processes_mutex, &free_virtual_processes_cv, enable_tracing);
     vp_schedulers.front().bootstrap(commandline_arguments);
 
     for (auto i = (vp_schedulers_limit-1); i; --i) {

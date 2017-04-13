@@ -214,6 +214,7 @@ namespace viua {
 
                 auto static no_of_vp_schedulers() -> viua::internals::types::schedulers_count;
                 auto static no_of_ffi_schedulers() -> viua::internals::types::schedulers_count;
+                auto static is_tracing_enabled() -> bool;
 
                 int run();
 
