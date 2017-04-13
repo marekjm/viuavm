@@ -129,8 +129,18 @@ namespace viua {
 #ifdef AS_DEBUG_HEADER
             public:
 #endif
+
+            /*
+             * Pointer to scheduler the process is currently bound to.
+             * This is not constant because processes may migrate between
+             * schedulers during load balancing.
+             */
             viua::scheduler::VirtualProcessScheduler *scheduler;
 
+            /*
+             * Parent process of this process.
+             * May be null if this process has been detached.
+             */
             viua::process::Process* parent_process;
 
             std::string watchdog_function { "" };
