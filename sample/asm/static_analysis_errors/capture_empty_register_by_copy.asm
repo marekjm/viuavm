@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    capturecopy %2 1
+    capturecopy %2 %1
 
     izero %0 local
     return

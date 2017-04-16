@@ -116,6 +116,8 @@ static string resolve_register_name(const map<string, string>& named_registers, 
     }
     if (name.at(0) == '@' or name.at(0) == '*' or name.at(0) == '%') {
         name = name.substr(1);
+    } else {
+        throw viua::cg::lex::InvalidSyntax(token, ("not a valid register accessor: " + str::enquote(str::strencode(name))));
     }
     if (str::isnum(name, false)) {
         if ((not allow_direct_access) and is_named(named_registers, name) and not (token.original() == "iota" or ((token.original().at(0) == '%' or token.original().at(0) == '@' or token.original().at(0) == '*') and token.original().substr(1) == "iota") or token.original() == "\n")) {
@@ -598,7 +600,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             int registers_to_pack = stoi(body_tokens.at(pack_range_count).str().substr(1));
             if (registers_to_pack) {
                 for (int j = starting_register; j < (starting_register+registers_to_pack); ++j) {
-                    check_use_of_register_index(body_tokens, i-1, i-1, str::stringify(j, false), registers, named_registers, "packing empty register");
+                    check_use_of_register_index(body_tokens, i-1, i-1, ('%' + str::stringify(j, false)), registers, named_registers, "packing empty register");
                     registers.erase(str::stringify(j, false), token);
                 }
             }

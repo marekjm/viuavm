@@ -636,7 +636,6 @@ namespace viua {
                         tokens.push_back(input_tokens.at(++i)); // result type specifier
 
                         tokens.push_back(input_tokens.at(++i)); // target register
-
                         string target_register_index = tokens.back();
                         string target_register_set = "current";
                         if (not is_register_set_name(input_tokens.at(i+1))) {
