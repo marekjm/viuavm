@@ -31,7 +31,9 @@ void viua::types::Vector::insert(long int index, unique_ptr<viua::types::Type> o
 
     // FIXME: REFACTORING: move bounds-checking to a separate function
     if (index > 0 and static_cast<decltype(internal_object)::size_type>(index) > internal_object.size()) {
-        throw new OutOfRangeException("positive vector index out of range");
+        ostringstream oss;
+        oss << "positive vector index out of range: index = " << index << ", size = " << internal_object.size();
+        throw new OutOfRangeException(oss.str());
     } else if (index < 0 and static_cast<decltype(internal_object)::size_type>(-index) > internal_object.size()) {
         throw new OutOfRangeException("negative vector index out of range");
     }
