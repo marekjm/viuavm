@@ -145,12 +145,10 @@
     ; do not loop on zero-length vectors
     if %limit +1 end_loop
     .mark: begin_loop
-    vpop %tmp %vector @index
+    vat %tmp %vector %index
     ; FIXME: there should be no copy operation - use pass-by-move instead
-    frame ^[(param %0 %tmp)]
+    frame ^[(param %0 *tmp)]
     and %result (call %6 %fn) %result
-
-    vinsert %vector %tmp @index
 
     ; break loop if there wasn't a match
     if %result +1 end_loop
@@ -181,13 +179,10 @@
     ; do not loop on zero-length vectors
     if %limit +1 end_loop
     .mark: begin_loop
-    vpop %tmp %vector @index
+    vat %tmp %vector %index
     ; FIXME: there should be no copy operation - use pass-by-move instead
-    frame ^[(param %0 %tmp)]
+    frame ^[(param %0 *tmp)]
     move %result (call %6 %fn)
-
-    ; put the value back into the vector
-    vinsert %vector %tmp @index
 
     ; break the loop if there was a match
     if %result end_loop
