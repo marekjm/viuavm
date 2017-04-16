@@ -19,7 +19,7 @@
 
 .function: main/0
     vec %1
-    vat %2 %1 0
+    vat %2 %1 (izero %0 local)
     print *2
 
     izero %0 local

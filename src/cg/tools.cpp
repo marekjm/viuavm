@@ -236,25 +236,6 @@ namespace viua {
                 ++get<0>(sz);
                 return sz;
             }
-            static auto size_of_instruction_with_two_ri_with_rs_type_and_one_primitive_int_operand(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
-                viua::internals::types::bytecode_size calculated_size = 0;
-
-                decltype(calculated_size) size_increment = 0;
-
-                // for target register
-                tie(size_increment, i) = size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
-                calculated_size += size_increment;
-
-                if (tokens.at(i).str().at(0) == '@') {
-                    tie(size_increment, i) = size_of_register_index_operand(tokens, i);
-                    calculated_size += size_increment;
-                } else {
-                    calculated_size += sizeof(viua::internals::types::byte);
-                    calculated_size += sizeof(viua::internals::types::plain_int);
-                }
-
-                return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
-            }
 
             static auto size_of_nop(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 viua::internals::types::bytecode_size calculated_size = sizeof(viua::internals::types::byte);
@@ -429,7 +410,7 @@ namespace viua {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
             static auto size_of_vat(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
-                return size_of_instruction_with_two_ri_with_rs_type_and_one_primitive_int_operand(tokens, i);
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
             static auto size_of_vlen(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);

@@ -375,7 +375,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "vpop") {
+        } else if (token == "vat" or token == "vpop") {
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
             TokenIndex index = source + 2;
@@ -394,7 +394,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "vat" or token == "vlen") {
+        } else if (token == "vlen") {
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
 

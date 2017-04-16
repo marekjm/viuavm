@@ -31,8 +31,8 @@
     echo %exception
     print (strstore %message "<<<")
 
-    copy (.name: %iota i) *(vat %i %parameters 1)
-    frame ^[(param %0 *(vat %message %parameters 0)) (param %1 (iinc %i))]
+    copy (.name: %iota i) *(vat %i %parameters (istore %iota 1))
+    frame ^[(param %0 *(vat %message %parameters (istore %iota 0))) (param %1 (iinc %i))]
     process void a_division_executing_process/2
 
     return

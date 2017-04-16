@@ -476,7 +476,7 @@ viua::internals::types::bytecode_size assemble_instruction(Program& program, viu
         program.opvat(
             assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
             , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
-            , assembler::operands::getint(resolveregister(tokens.at(position), true), true)
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(position)), resolve_rs_type(tokens.at(position+1)))
         );
     } else if (tokens.at(i) == "vlen") {
         TokenIndex target = i + 1;
