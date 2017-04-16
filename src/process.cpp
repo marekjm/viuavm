@@ -237,8 +237,7 @@ auto viua::process::Process::get_trace_line(viua::internals::types::byte* for_ad
             working_address += sizeof(viua::internals::types::register_index);
             working_address += sizeof(viua::internals::types::registerset_type_marker);
         }
-        trace_line << ' ';
-        trace_line << string(reinterpret_cast<char*>(working_address));
+        trace_line << ' ' << string(reinterpret_cast<char*>(working_address));
     }
 
     return trace_line.str();
