@@ -1365,7 +1365,7 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
 
     def testUseOfEmptySecondOperandInIadd(self):
         runTestFailsToAssembleDetailed(self, 'use_of_empty_second_operand_in_iadd.asm', [
-            '24:41: error: use of empty register: second := 2',
+            '24:42: error: use of empty register: second := 2',
             '20:12: error: in function main/0',
         ])
 
