@@ -303,6 +303,7 @@ void viua::process::Process::ensureStaticRegisters(string function_name) {
         static_registers.at(function_name);
     } catch (const std::out_of_range& e) {
         // FIXME: amount of static registers should be customizable
+        // FIXME: amount of static registers shouldn't be a magic number
         static_registers[function_name] = unique_ptr<viua::kernel::RegisterSet>(new viua::kernel::RegisterSet(16));
     }
 }
