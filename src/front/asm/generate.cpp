@@ -268,6 +268,12 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
         entry_function_tokens.emplace_back(0, 0, "\n");
         bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
 
+        entry_function_tokens.emplace_back(0, 0, "izero");
+        entry_function_tokens.emplace_back(0, 0, "%0");
+        entry_function_tokens.emplace_back(0, 0, "local");
+        entry_function_tokens.emplace_back(0, 0, "\n");
+        bytes += sizeof(viua::internals::types::byte) + sizeof(viua::internals::types::byte) + sizeof(viua::internals::RegisterSets) + sizeof(viua::internals::types::register_index);
+
         // pop first element on the list of aruments
         entry_function_tokens.emplace_back(0, 0, "vpop");
         entry_function_tokens.emplace_back(0, 0, "%0");
@@ -275,9 +281,9 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
         entry_function_tokens.emplace_back(0, 0, "%1");
         entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "%0");
+        entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) + 3*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
-        bytes += sizeof(viua::internals::types::plain_int);
+        bytes += sizeof(viua::internals::types::byte) + 3*sizeof(viua::internals::types::byte) + 3*sizeof(viua::internals::RegisterSets) + 3*sizeof(viua::internals::types::register_index);
 
         // for parameter for main/2 is the name of the program
         entry_function_tokens.emplace_back(0, 0, "param");

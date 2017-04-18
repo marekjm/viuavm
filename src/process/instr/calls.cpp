@@ -211,6 +211,7 @@ viua::internals::types::byte* viua::process::Process::optailcall(viua::internals
         throw new viua::types::Exception("tail call to non-native function: " + call_name);
     }
 
+    // FIXME tailcalled functions should not inherit local register set of the frame they replace
     stack.back()->arguments = std::move(stack.frame_new->arguments);
 
     // new frame must be deleted to prevent future errors

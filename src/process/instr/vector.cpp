@@ -125,13 +125,17 @@ viua::internals::types::byte* viua::process::Process::opvpop(viua::internals::ty
     tie(addr, vector_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
     viua::assertions::assert_implements<viua::types::Vector>(vector_operand, "viua::types::Vector");
 
-    int position_operand_index = 0;
-    tie(addr, position_operand_index) = viua::bytecode::decoder::operands::fetch_primitive_int(addr, this);
+    viua::types::Type* index_operand = nullptr;
+    int64_t position_operand_index = -1;
 
-    /*  1) fetch vector,
-     *  2) pop value at given index,
-     *  3) put it in a register,
-     */
+    if (not viua::bytecode::decoder::operands::is_void(addr)) {
+        tie(addr, index_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+        viua::assertions::assert_implements<viua::types::Integer>(index_operand, "viua::types::Integer");
+        position_operand_index = static_cast<viua::types::Integer*>(index_operand)->as_int64();
+    } else {
+        addr = viua::bytecode::decoder::operands::fetch_void(addr);
+    }
+
     unique_ptr<viua::types::Type> ptr = static_cast<viua::types::Vector*>(vector_operand)->pop(position_operand_index);
     if (not void_target) {
         *target = std::move(ptr);
@@ -142,14 +146,18 @@ viua::internals::types::byte* viua::process::Process::opvpop(viua::internals::ty
 
 viua::internals::types::byte* viua::process::Process::opvat(viua::internals::types::byte* addr) {
     viua::kernel::Register* target = nullptr;
-    viua::types::Type* vector_operand = nullptr;
-    int position_operand_index = 0;
-
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
-    tie(addr, vector_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
-    tie(addr, position_operand_index) = viua::bytecode::decoder::operands::fetch_primitive_int(addr, this);
 
+    viua::types::Type* vector_operand = nullptr;
+    tie(addr, vector_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
     viua::assertions::assert_implements<viua::types::Vector>(vector_operand, "viua::types::Vector");
+
+    viua::types::Type* index_operand = nullptr;
+    int64_t position_operand_index = -1;
+    tie(addr, index_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    viua::assertions::assert_implements<viua::types::Integer>(index_operand, "viua::types::Integer");
+    position_operand_index = static_cast<viua::types::Integer*>(index_operand)->as_int64();
+
     *target = static_cast<viua::types::Vector*>(vector_operand)->at(position_operand_index)->pointer(this);
 
     return addr;

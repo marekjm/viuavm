@@ -1,5 +1,5 @@
 ;
-;   Copyright (C) 2016, 2017 Marek Marecki
+;   Copyright (C) 2017 Marek Marecki
 ;
 ;   This file is part of Viua VM.
 ;
@@ -18,9 +18,15 @@
 ;
 
 .function: main/0
-    ; observe that 'key' register is undefined
-    .name: 2 key
-    insert (new %1 Object) %key (strstore %3 "value")
+    vec (.name: %iota v) local
+
+    vpush %v (istore %iota local 0)
+    vpush %v (istore %iota local 1)
+
+    istore (.name: %iota index) local 0
+
+    vpop void %v local %index local
+    print %v local
 
     izero %0 local
     return

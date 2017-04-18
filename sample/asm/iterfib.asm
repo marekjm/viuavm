@@ -18,34 +18,41 @@
 ;
 
 .function: iterfib/1
-    .name: 1 vector
+    .name: %iota vector
 
     ress static
-    if (not (isnull %2 %vector)) logic
-    vpush (vpush (vec %vector) (istore %2 1)) (istore %2 1)
+
+    .name: %iota minus_one
+    .name: %iota minus_two
+    istore %minus_one -1
+    istore %minus_two -2
+
+    .name: %iota tmp
+    if (not (isnull %tmp %vector)) logic
+    vpush (vpush (vec %vector) (istore %tmp 1)) (istore %tmp 1)
 
     .mark: logic
 
-    .name: 3 number
-    .name: 4 length
+    .name: %iota number
+    .name: %iota length
     arg %number %0
 
     .mark: loop
-    if (not (lt int64 %5 (vlen %length %vector) %number)) finished
-    add int64 %8 *(vat %6 %vector -1) *(vat %7 %vector -2)
-    vpush %vector %8
+    .name: %iota result
+    if (not (lt int64 %iota (vlen %length %vector) %number)) finished
+    add int64 %result *(vat %iota %vector %minus_one) *(vat %iota %vector %minus_two)
+    vpush %vector %result
     jump loop
 
     .mark: finished
-    copy %0 *(vat %9 %vector -1)
+    copy %0 *(vat %iota %vector %minus_one)
     return
 .end
 
 .function: main/1
-    .name: 2 result
-    .name: 3 expected
-    istore %expected 1134903170
+    ; expected result is 1134903170
 
+    .name: 2 result
     frame ^[(param %0 (istore %1 45))]
     print (call %result iterfib/1)
 

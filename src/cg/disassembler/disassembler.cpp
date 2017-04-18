@@ -399,7 +399,6 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         case VEC:
         case VINSERT:
         case VAT:
-        case VPOP:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand(oss, ptr);
@@ -420,6 +419,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         case TEXTCOMMONPREFIX:
         case TEXTCOMMONSUFFIX:
         case TEXTCONCAT:
+        case VPOP:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);

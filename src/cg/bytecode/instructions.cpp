@@ -97,31 +97,6 @@ static viua::internals::types::byte* insert_four_ri_instruction(viua::internals:
     return insert_ri_operand(addr_ptr, d);
 }
 
-static viua::internals::types::byte* insert_two_ri_and_primitive_int_instruction(viua::internals::types::byte* addr_ptr, enum OPCODE instruction, int_op a, int_op b, int_op c) {
-            addr_ptr = insert_two_ri_instruction(addr_ptr, instruction, a, b);
-
-            // FIXME types different from OT_REGISTER_REFERENCE and OT_INT should
-            // throw an error
-            if (c.type == IntegerOperandType::REGISTER_REFERENCE) {
-                *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_REGISTER_REFERENCE;
-                pointer::inc<OperandType, viua::internals::types::byte>(addr_ptr);
-
-                *(reinterpret_cast<viua::internals::types::register_index*>(addr_ptr))  = static_cast<viua::internals::types::register_index>(c.value);
-                pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(addr_ptr);
-
-                *(reinterpret_cast<viua::internals::RegisterSets*>(addr_ptr)) = viua::internals::RegisterSets::LOCAL;
-                pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(addr_ptr);
-            } else {
-                *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_INT;
-                pointer::inc<OperandType, viua::internals::types::byte>(addr_ptr);
-
-                *(reinterpret_cast<viua::internals::types::plain_int*>(addr_ptr))  = c.value;
-                pointer::inc<viua::internals::types::plain_int, viua::internals::types::byte>(addr_ptr);
-            }
-
-            return addr_ptr;
-}
-
 static viua::internals::types::byte* insertString(viua::internals::types::byte* ptr, const string& s) {
     for (std::string::size_type i = 0; i < s.size(); ++i) {
         *(ptr++) = static_cast<viua::internals::types::byte>(s[i]);
@@ -308,11 +283,11 @@ namespace cg {
         }
 
         viua::internals::types::byte* opvpop(viua::internals::types::byte* addr_ptr, int_op vec, int_op dst, int_op pos) {
-            return insert_two_ri_and_primitive_int_instruction(addr_ptr, VPOP, vec, dst, pos);
+            return insert_three_ri_instruction(addr_ptr, VPOP, vec, dst, pos);
         }
 
         viua::internals::types::byte* opvat(viua::internals::types::byte* addr_ptr, int_op vec, int_op dst, int_op at) {
-            return insert_two_ri_and_primitive_int_instruction(addr_ptr, VAT, vec, dst, at);
+            return insert_three_ri_instruction(addr_ptr, VAT, vec, dst, at);
         }
 
         viua::internals::types::byte* opvlen(viua::internals::types::byte* addr_ptr, int_op vec, int_op reg) {

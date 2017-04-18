@@ -650,13 +650,19 @@ class VectorInstructionsTests(unittest.TestCase):
         runTest(self, 'vinsert.asm', ['Hurr', 'durr', 'Im\'a', 'sheep!'], 0, lambda o: o.strip().splitlines())
 
     def testInsertingOutOfRangeWithPositiveIndex(self):
-        runTestThrowsException(self, 'out_of_range_index_positive.asm', ('OutOfRangeException', 'positive vector index out of range',))
+        runTestThrowsException(self, 'out_of_range_index_positive.asm', ('OutOfRangeException', 'positive vector index out of range: index = 5, size = 4',))
 
     def testVPUSH(self):
         runTest(self, 'vpush.asm', ['0', '1', 'Hello World!'], 0, lambda o: o.strip().splitlines())
 
     def testVPOP(self):
         runTest(self, 'vpop.asm', ['0', '1', '0', 'Hello World!'], 0, lambda o: o.strip().splitlines())
+
+    def testVPOPWithVoidIndexPopsLast(self):
+        runTest(self, 'vpop_with_void_index_pops_last.asm', '[0]')
+
+    def testVPOPWithIndexPopsSpecified(self):
+        runTest(self, 'vpop_with_index_pops_specified.asm', '[1]')
 
     def testVAT(self):
         runTest(self, 'vat.asm', ['0', '1', '1', 'Hello World!'], 0, lambda o: o.strip().splitlines())
@@ -1359,7 +1365,7 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
 
     def testUseOfEmptySecondOperandInIadd(self):
         runTestFailsToAssembleDetailed(self, 'use_of_empty_second_operand_in_iadd.asm', [
-            '24:41: error: use of empty register: second := 2',
+            '24:42: error: use of empty register: second := 2',
             '20:12: error: in function main/0',
         ])
 

@@ -55,7 +55,7 @@
     ; store item located inside parameter vector at index denoted by loop_counter in
     ; a register and
     ; pass it as a parameter
-    pamv @loop_counter (copy %iota *(vat %slot %parameters_list @loop_counter))
+    pamv @loop_counter (copy %iota *(vat %slot %parameters_list %loop_counter))
 
     ; loop_counter++
     iinc %loop_counter

@@ -120,6 +120,7 @@ There are several categories of change:
 - fix: pointers are automatically expired upon crossing process boundaries, lazily - upon first access
 - fix: accessing elements of empty vector does not crash the VM
 - bic: `.main:` directive is no longer allowed
+- bic: `vat` and `vpop` do not take immediate values as operands but take indexes from registers
 
 One limitation of static analyser (SA) introduced in this release is its inability to handle backwards jumps.
 This, however, is not a problem if the code does not use loops and

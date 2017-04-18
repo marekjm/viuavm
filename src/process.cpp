@@ -237,8 +237,7 @@ auto viua::process::Process::get_trace_line(viua::internals::types::byte* for_ad
             working_address += sizeof(viua::internals::types::register_index);
             working_address += sizeof(viua::internals::types::registerset_type_marker);
         }
-        trace_line << ' ';
-        trace_line << string(reinterpret_cast<char*>(working_address));
+        trace_line << ' ' << string(reinterpret_cast<char*>(working_address));
     }
     if (static_cast<OPCODE>(*for_address) == TAILCALL) {
         trace_line << ' ';
@@ -308,6 +307,7 @@ void viua::process::Process::ensureStaticRegisters(string function_name) {
         static_registers.at(function_name);
     } catch (const std::out_of_range& e) {
         // FIXME: amount of static registers should be customizable
+        // FIXME: amount of static registers shouldn't be a magic number
         static_registers[function_name] = unique_ptr<viua::kernel::RegisterSet>(new viua::kernel::RegisterSet(16));
     }
 }

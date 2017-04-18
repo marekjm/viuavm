@@ -21,7 +21,7 @@
     izero (.name: %iota first)
     .name: %iota second
 
-    add int8 (.name: %iota value) first second
+    add int8 (.name: %iota value) %first %second
 
     izero %0 local
     return
