@@ -252,7 +252,7 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
             addr = opimport(addr+1);
             break;
         case LINK:
-            addr = oplink(addr+1);
+            addr = opimport(addr+1);
             break;
         case CLASS:
             addr = opclass(addr+1);

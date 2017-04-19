@@ -313,7 +313,6 @@ namespace viua {
             viua::internals::types::byte* opremove(viua::internals::types::byte*);
 
             viua::internals::types::byte* opimport(viua::internals::types::byte*);
-            viua::internals::types::byte* oplink(viua::internals::types::byte*);
 
             public:
                 viua::internals::types::byte* dispatch(viua::internals::types::byte*);

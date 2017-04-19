@@ -33,15 +33,6 @@ viua::internals::types::byte* viua::process::Process::opimport(viua::internals::
      */
     string module;
     tie(addr, module) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
-    scheduler->loadForeignLibrary(module);
-    return addr;
-}
-
-viua::internals::types::byte* viua::process::Process::oplink(viua::internals::types::byte* addr) {
-    /** Run link instruction.
-     */
-    string module;
-    tie(addr, module) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
-    scheduler->loadNativeLibrary(module);
+    scheduler->loadModule(module);
     return addr;
 }

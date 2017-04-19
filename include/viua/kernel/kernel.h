@@ -150,6 +150,7 @@ namespace viua {
             public:
                 /*  Methods dealing with dynamic library loading.
                  */
+                void loadModule(std::string);
                 void loadNativeLibrary(const std::string&);
                 void loadForeignLibrary(const std::string&);
 

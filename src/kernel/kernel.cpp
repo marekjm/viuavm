@@ -121,6 +121,32 @@ viua::kernel::Kernel& viua::kernel::Kernel::registerForeignMethod(const string& 
 }
 
 
+static auto is_native_module(string module) -> bool {
+    regex double_colon("::");
+    ostringstream oss;
+    oss << regex_replace(module, double_colon, "/");
+    string try_path = oss.str();
+    string path = support::env::viua::getmodpath(try_path, "vlib", support::env::getpaths("VIUAPATH"));
+    if (path.size() == 0) { path = support::env::viua::getmodpath(try_path, "vlib", VIUAPATH); }
+    if (path.size() == 0) { path = support::env::viua::getmodpath(try_path, "vlib", support::env::getpaths("VIUAAFTERPATH")); }
+    return (path.size() > 0);
+}
+static auto is_foreign_module(string module) -> bool {
+    string path = "";
+    path = support::env::viua::getmodpath(module, "so", support::env::getpaths("VIUAPATH"));
+    if (path.size() == 0) { path = support::env::viua::getmodpath(module, "so", VIUAPATH); }
+    if (path.size() == 0) { path = support::env::viua::getmodpath(module, "so", support::env::getpaths("VIUAAFTERPATH")); }
+    return (path.size() > 0);
+}
+void viua::kernel::Kernel::loadModule(string module) {
+    if (is_native_module(module)) {
+        loadNativeLibrary(module);
+    } else if (is_foreign_module(module)) {
+        loadForeignLibrary(module);
+    } else {
+        throw new viua::types::Exception("LinkException", ("failed to link library: " + module));
+    }
+}
 void viua::kernel::Kernel::loadNativeLibrary(const string& module) {
     regex double_colon("::");
     ostringstream oss;
