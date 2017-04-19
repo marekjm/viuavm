@@ -813,6 +813,9 @@ namespace viua {
             static auto size_of_structinsert(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
+            static auto size_of_structkeys(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
+            }
 
             static auto size_of_new(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 viua::internals::types::bytecode_size calculated_size = sizeof(viua::internals::types::byte);    // start with the size of a single opcode
@@ -1140,6 +1143,9 @@ namespace viua {
                     } else if (tokens.at(i) == "structinsert") {
                         ++i;
                         tie(increase, i) = size_of_structinsert(tokens, i);
+                    } else if (tokens.at(i) == "structkeys") {
+                        ++i;
+                        tie(increase, i) = size_of_structkeys(tokens, i);
                     } else if (tokens.at(i) == "new") {
                         ++i;
                         tie(increase, i) = size_of_new(tokens, i);

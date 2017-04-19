@@ -21,6 +21,8 @@
 #include <viua/process.h>
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/assert.h>
+#include <viua/types/vector.h>
+#include <viua/types/text.h>
 #include <viua/types/struct.h>
 using namespace std;
 
@@ -50,6 +52,25 @@ viua::internals::types::byte* viua::process::Process::opstructinsert(viua::inter
         tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
         static_cast<viua::types::Struct*>(struct_operand)->insert(key_operand->str(), source->give());
     }
+
+    return addr;
+}
+
+viua::internals::types::byte* viua::process::Process::opstructkeys(viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::types::Type *struct_operand = nullptr;
+    tie(addr, struct_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    viua::assertions::assert_implements<viua::types::Struct>(struct_operand, "viua::types::Struct");
+
+    auto struct_keys = static_cast<viua::types::Struct*>(struct_operand)->keys();
+    unique_ptr<viua::types::Vector> vec { new viua::types::Vector() };
+    for (const auto& each : struct_keys) {
+        vec->push(unique_ptr<viua::types::Text>{ new viua::types::Text(each) });
+    }
+
+    *target = std::move(vec);
 
     return addr;
 }

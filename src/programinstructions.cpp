@@ -640,6 +640,11 @@ Program& Program::opstructinsert(int_op target, int_op key, int_op source) {
     return (*this);
 }
 
+Program& Program::opstructkeys(int_op a, int_op b) {
+    addr_ptr = cg::bytecode::opstructkeys(addr_ptr, a, b);
+    return (*this);
+}
+
 Program& Program::opnew(int_op reg, const string& class_name) {
     /*  Inserts new instuction.
      */

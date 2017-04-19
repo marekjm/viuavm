@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <sstream>
+#include <viua/support/string.h>
 #include <viua/types/text.h>
 using namespace std;
 
@@ -109,7 +110,7 @@ string viua::types::Text::str() const {
 }
 
 string viua::types::Text::repr() const {
-    return "";
+    return str::enquote(str());
 }
 
 bool viua::types::Text::boolean() const {

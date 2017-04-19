@@ -901,6 +901,14 @@ viua::internals::types::bytecode_size assemble_instruction(Program& program, viu
             , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(key)), resolve_rs_type(tokens.at(key+1)))
             , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
         );
+    } else if (tokens.at(i) == "structkeys") {
+        TokenIndex target = i + 1;
+        TokenIndex source = target + 2;
+
+        program.opstructkeys(
+            assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
+        );
     } else if (tokens.at(i) == "new") {
         TokenIndex target = i + 1;
         TokenIndex class_name = target + 2;

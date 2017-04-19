@@ -349,6 +349,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         case VPUSH:
         case VLEN:
         case TEXTLENGTH:
+        case STRUCTKEYS:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
