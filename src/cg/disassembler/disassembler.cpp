@@ -310,6 +310,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         case IDEC:
         case SELF:
         case ARGC:
+        case STRUCT:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             break;
         case BOOL:

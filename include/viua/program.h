@@ -161,6 +161,8 @@ class Program {
     Program& opattach(int_op, const std::string&, const std::string&);
     Program& opregister(int_op);
 
+    Program& opstruct(int_op);
+
     Program& opnew(int_op, const std::string&);
     Program& opmsg(int_op, const std::string&);
     Program& opmsg(int_op, int_op);
