@@ -261,11 +261,10 @@ namespace str {
     }
 
 
-    string enquote(const string& s) {
+    string enquote(const string& s, const char closing) {
         /** Enquote the string.
          */
         ostringstream encoded;
-        char closing = '"';
 
         encoded << closing;
         for (std::string::size_type i = 0; i < s.size(); ++i) {
