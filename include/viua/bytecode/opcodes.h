@@ -188,6 +188,37 @@ enum OPCODE : viua::internals::types::byte {
     ATTACH,     // attach a method to the prototype
     REGISTER,   // register a prototype in VM's typesystem
 
+    /*
+     *  Create a struct.
+     *  Structs are anonymous key-value containers.
+     *
+     *  struct {target-register}
+     */
+    STRUCT,
+
+    /*
+     *  Insert a value into a struct at a given key.
+     *  Moves the value into the struct.
+     *
+     *  structinsert {target-struct-register} {key-register} {value-register}
+     */
+    STRUCTINSERT,
+
+    /*
+     *  Remove a value at a given key from a struct, and return removed value.
+     *  Throws an exception if the struct does not have requested key.
+     *
+     *  structremove {result-register} {source-struct-register} {key-register}
+     */
+    STRUCTREMOVE,
+
+    /*
+     *  Get a vector with keys of a struct.
+     *
+     *  structkeys {result} {source-struct-register}
+     */
+    STRUCTKEYS,
+
     NEW,        // construct new instance of a class in a register
     MSG,        // send a message to an object (used for dynamic dispatch, for static use plain "CALL")
     INSERT,     // insert an object as a value of an attribute of another object

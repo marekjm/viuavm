@@ -131,6 +131,11 @@ const std::set<std::string> OP_MNEMONICS = {
     "attach",
     "register",
 
+    "struct",
+    "structinsert",
+    "structremove",
+    "structkeys",
+
     "new",
     "msg",
     "insert",
@@ -239,6 +244,11 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { DERIVE,       "derive" },
     { ATTACH,       "attach" },
     { REGISTER,     "register" },
+
+    { STRUCT,       "struct" },
+    { STRUCTINSERT, "structinsert" },
+    { STRUCTREMOVE, "structremove" },
+    { STRUCTKEYS,   "structkeys" },
 
     { NEW,          "new" },
     { MSG,          "msg" },
