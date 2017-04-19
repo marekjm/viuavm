@@ -413,7 +413,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "insert") {
+        } else if (token == "insert" or token == "structinsert") {
             TokenIndex target = i + 1;
             TokenIndex key = target + 2;
             TokenIndex source = key + 2;

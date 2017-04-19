@@ -436,6 +436,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         case STREQ:
         case INSERT:
         case REMOVE:
+        case STRUCTINSERT:
             ptr = disassemble_ri_operand(oss, ptr);
             ptr = disassemble_ri_operand(oss, ptr);
             ptr = disassemble_ri_operand(oss, ptr);

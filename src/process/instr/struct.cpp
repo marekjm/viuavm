@@ -20,6 +20,7 @@
 #include <utility>
 #include <viua/process.h>
 #include <viua/bytecode/decoder/operands.h>
+#include <viua/assert.h>
 #include <viua/types/struct.h>
 using namespace std;
 
@@ -29,6 +30,26 @@ viua::internals::types::byte* viua::process::Process::opstruct(viua::internals::
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     *target = unique_ptr<viua::types::Type>{ new viua::types::Struct() };
+
+    return addr;
+}
+
+viua::internals::types::byte* viua::process::Process::opstructinsert(viua::internals::types::byte* addr) {
+    viua::types::Type *struct_operand = nullptr, *key_operand = nullptr;
+    tie(addr, struct_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+
+    tie(addr, key_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    viua::assertions::assert_implements<viua::types::Struct>(struct_operand, "viua::types::Struct");
+
+    if (viua::bytecode::decoder::operands::get_operand_type(addr) == OT_POINTER) {
+        viua::types::Type* source = nullptr;
+        tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+        static_cast<viua::types::Struct*>(struct_operand)->insert(key_operand->str(), source->copy());
+    } else {
+        viua::kernel::Register* source = nullptr;
+        tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+        static_cast<viua::types::Struct*>(struct_operand)->insert(key_operand->str(), source->give());
+    }
 
     return addr;
 }

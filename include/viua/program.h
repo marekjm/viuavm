@@ -162,6 +162,7 @@ class Program {
     Program& opregister(int_op);
 
     Program& opstruct(int_op);
+    Program& opstructinsert(int_op, int_op, int_op);
 
     Program& opnew(int_op, const std::string&);
     Program& opmsg(int_op, const std::string&);

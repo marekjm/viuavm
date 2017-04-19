@@ -162,6 +162,7 @@ namespace cg {
         viua::internals::types::byte* opregister(viua::internals::types::byte*, int_op);
 
         viua::internals::types::byte* opstruct(viua::internals::types::byte*, int_op);
+        viua::internals::types::byte* opstructinsert(viua::internals::types::byte*, int_op, int_op, int_op);
 
         viua::internals::types::byte* opnew(viua::internals::types::byte*, int_op, const std::string&);
         viua::internals::types::byte* opmsg(viua::internals::types::byte*, int_op, const std::string&);

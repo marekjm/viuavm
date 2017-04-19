@@ -549,7 +549,7 @@ namespace viua {
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
-                    } else if (token == "insert") {
+                    } else if (token == "insert" or token == "structinsert") {
                         tokens.push_back(token);    // mnemonic
 
                         tokens.push_back(input_tokens.at(++i)); // target register
