@@ -336,7 +336,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             i = skip_till_next_line(body_tokens, i);
             continue;
         }
-        if (token == ".mark:" or token == ".link:" or token == "nop" or token == "tryframe" or token == "try" or token == "catch" or token == "frame" or
+        if (token == ".mark:" or token == ".import:" or token == "nop" or token == "tryframe" or token == "try" or token == "catch" or token == "frame" or
             token == "halt" or
             token == "watchdog" or
             token == "import") {

@@ -222,7 +222,7 @@ int main(int argc, char* argv[]) {
                 tokens = reduce_block_directive(tokens);
                 tokens = reduce_info_directive(tokens);
                 tokens = reduce_name_directive(tokens);
-                tokens = reduce_link_directive(tokens);
+                tokens = reduce_import_directive(tokens);
                 tokens = reduce_mark_directive(tokens);
             }
         }

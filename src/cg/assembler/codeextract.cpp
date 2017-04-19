@@ -42,7 +42,7 @@ auto assembler::ce::getmarks(const vector<viua::cg::lex::Token>& tokens) -> map<
     map<string, decltype(instruction)> marks;
 
     for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
-        if (tokens.at(i) == ".name:" or tokens.at(i) == ".link:") {
+        if (tokens.at(i) == ".name:" or tokens.at(i) == ".import:") {
             do {
                 ++i;
             } while (i < tokens.size() and tokens.at(i) != "\n");
@@ -65,14 +65,14 @@ auto assembler::ce::getmarks(const vector<viua::cg::lex::Token>& tokens) -> map<
 
 vector<string> assembler::ce::getlinks(const vector<viua::cg::lex::Token>& tokens) {
     /** This function will pass over all instructions and
-     * gather .link: assembler instructions.
+     * gather .import: assembler instructions.
      */
     vector<string> links;
     for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
-        if (tokens.at(i) == ".link:") {
-            ++i;    // skip '.link:' token
+        if (tokens.at(i) == ".import:") {
+            ++i;    // skip '.import:' token
             if (tokens.at(i) == "\n") {
-                throw viua::cg::lex::InvalidSyntax(tokens.at(i), "missing module name in link directive");
+                throw viua::cg::lex::InvalidSyntax(tokens.at(i), "missing module name in import directive");
             }
             links.emplace_back(tokens.at(i));
             ++i;    // skip module name token

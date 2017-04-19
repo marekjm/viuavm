@@ -1599,7 +1599,7 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'invalid_register_index_in_name_directive.asm', "./sample/asm/errors/invalid_register_index_in_name_directive.asm: error: in function 'main/0': invalid register index in name directive: named_register := \"bad\"")
 
     def testInvalidRegisterIndexInNameDirective(self):
-        runTestFailsToAssemble(self, 'empty_link_directive.asm', "./sample/asm/errors/empty_link_directive.asm:21:11: error: missing module name in link directive")
+        runTestFailsToAssemble(self, 'empty_link_directive.asm', "./sample/asm/errors/empty_link_directive.asm:21:13: error: missing module name in import directive")
 
     def testReservedWordAsBlockName(self):
         runTestFailsToAssemble(self, 'reserved_word_as_block_name.asm', "./sample/asm/errors/reserved_word_as_block_name.asm:20:9: error: invalid block name: 'iota' is a registered keyword")

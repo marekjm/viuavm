@@ -1081,8 +1081,8 @@ namespace viua {
                 return reduce_directive(input_tokens, "info");
             }
 
-            vector<Token> reduce_link_directive(vector<Token> input_tokens) {
-                return reduce_directive(input_tokens, "link");
+            vector<Token> reduce_import_directive(vector<Token> input_tokens) {
+                return reduce_directive(input_tokens, "import");
             }
 
             vector<Token> reduce_function_directive(vector<Token> input_tokens) {
@@ -1717,7 +1717,7 @@ namespace viua {
                 tokens = reduce_block_directive(tokens);
                 tokens = reduce_info_directive(tokens);
                 tokens = reduce_name_directive(tokens);
-                tokens = reduce_link_directive(tokens);
+                tokens = reduce_import_directive(tokens);
                 tokens = reduce_mark_directive(tokens);
                 tokens = reduce_iota_directive(tokens);
 

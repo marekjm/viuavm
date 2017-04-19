@@ -856,7 +856,7 @@ namespace viua {
                 for (decltype(tokens.size()) i = 0; (i < limit) and (counted_instructions < instructions_counter); ++i) {
                     auto token = tokens.at(i);
 
-                    if (token == ".function:" or token == ".closure:" or token == ".block:" or token == ".mark:" or token == ".link:" or token == ".signature:" or token == ".bsignature:" or token == ".unused:") {
+                    if (token == ".function:" or token == ".closure:" or token == ".block:" or token == ".mark:" or token == ".import:" or token == ".signature:" or token == ".bsignature:" or token == ".unused:") {
                         ++i;
                         continue;
                     }
