@@ -107,7 +107,7 @@ int viua::types::Vector::len() {
 string viua::types::Vector::str() const {
     ostringstream oss;
     oss << "[";
-    for (unsigned i = 0; i < internal_object.size(); ++i) {
+    for (decltype(internal_object)::size_type i = 0; i < internal_object.size(); ++i) {
         oss << internal_object[i]->repr() << (i < internal_object.size()-1 ? ", " : "");
     }
     oss << "]";
