@@ -1,0 +1,67 @@
+/*
+ *  Copyright (C) 2017 Marek Marecki
+ *
+ *  This file is part of Viua VM.
+ *
+ *  Viua VM is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Viua VM is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef VIUA_TYPES_STRUCT_H
+#define VIUA_TYPES_STRUCT_H
+
+#pragma once
+
+#include <string>
+#include <map>
+#include <vector>
+#include <viua/types/type.h>
+
+
+namespace viua {
+    namespace types {
+        class Struct: public Type {
+            /** A generic object class.
+             *
+             *  This type is used internally inside the VM.
+             */
+            private:
+                std::map<std::string, std::unique_ptr<Type>> attributes;
+
+            public:
+                virtual std::string type() const override;
+                virtual bool boolean() const override;
+
+                virtual std::string str() const override;
+                virtual std::string repr() const override;
+
+                virtual std::vector<std::string> bases() const override {
+                    return std::vector<std::string>{"Type"};
+                }
+                virtual std::vector<std::string> inheritancechain() const override {
+                    return std::vector<std::string>{"Type"};
+                }
+
+                virtual void insert(const std::string& key, std::unique_ptr<Type> value);
+                virtual std::unique_ptr<Type> remove(const std::string& key);
+                virtual std::vector<std::string> keys() const;
+
+                virtual std::unique_ptr<Type> copy() const override;
+
+                ~Struct() override = default;
+        };
+    }
+}
+
+
+#endif
