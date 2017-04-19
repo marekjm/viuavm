@@ -121,6 +121,8 @@ There are several categories of change:
 - fix: accessing elements of empty vector does not crash the VM
 - bic: `.main:` directive is no longer allowed
 - bic: `vat` and `vpop` do not take immediate values as operands but take indexes from registers
+- bic: removed `link` instruction, `import` is now used to import both native and foreign modules
+- bic: renamed `.link:` directive to `.import:`
 
 One limitation of static analyser (SA) introduced in this release is its inability to handle backwards jumps.
 This, however, is not a problem if the code does not use loops and
