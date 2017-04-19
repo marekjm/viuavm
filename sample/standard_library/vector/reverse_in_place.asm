@@ -21,7 +21,7 @@
 .signature: std::vector::reverse_in_place/1
 
 .function: main/1
-    link std::vector
+    import "std::vector"
 
     frame ^[(pamv %0 (istore %1 8))]
     call %1 std::vector::of_ints/1

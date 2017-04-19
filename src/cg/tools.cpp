@@ -736,13 +736,6 @@ namespace viua {
 
                 return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
             }
-            static auto size_of_link(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
-                viua::internals::types::bytecode_size calculated_size = sizeof(viua::internals::types::byte);
-
-                calculated_size += tokens.at(i++).str().size() + 1; // +1 for null terminator
-
-                return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
-            }
             static auto size_of_class(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 viua::internals::types::bytecode_size calculated_size = sizeof(viua::internals::types::byte);
 
@@ -1108,9 +1101,6 @@ namespace viua {
                     } else if (tokens.at(i) == "import") {
                         ++i;
                         tie(increase, i) = size_of_import(tokens, i);
-                    } else if (tokens.at(i) == "link") {
-                        ++i;
-                        tie(increase, i) = size_of_link(tokens, i);
                     } else if (tokens.at(i) == "class") {
                         ++i;
                         tie(increase, i) = size_of_class(tokens, i);

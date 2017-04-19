@@ -25,7 +25,7 @@
 .end
 
 .function: main/1
-    link std::vector
+    import "std::vector"
 
     register (class %1 Foo)
 

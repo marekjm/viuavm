@@ -54,7 +54,7 @@
 .end
 
 .function: main/0
-    -- link foreign printer module
+    -- import "foreign printer module"
     import "build/test/printer"
     import "build/test/sleeper"
 

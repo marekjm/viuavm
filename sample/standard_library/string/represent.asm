@@ -21,7 +21,7 @@
 
 .function: main/1
     ; this instruction links "std::string" module into running machine
-    link std::string
+    import "std::string"
 
     ; create new object to test stringification
     new %1 Object

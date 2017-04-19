@@ -180,8 +180,7 @@ enum OPCODE : viua::internals::types::byte {
                 // ENTER instructions do not require any CATCH to precede them
     LEAVE,      // leave a block and resume execution after last enter instruction
 
-    IMPORT,     // dynamically link foreign library
-    LINK,       // dynamically link native library
+    IMPORT,     // dynamically link code modules
 
     CLASS,      // create a prototype for new class
     DERIVE,     // derive a prototype from an existing class

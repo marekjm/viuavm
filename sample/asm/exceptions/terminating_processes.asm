@@ -83,7 +83,7 @@
 
 .function: main/0
     ; required for std::misc::cycle/1
-    link std::misc
+    import "std::misc"
 
     ; spawn process that will crash
     frame %0

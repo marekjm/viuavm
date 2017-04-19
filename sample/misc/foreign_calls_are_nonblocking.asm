@@ -38,7 +38,7 @@
 
 .function: main/1
     import "io"
-    link std::misc
+    import "std::misc"
 
     frame %0
     process %1 run_in_a_process/0

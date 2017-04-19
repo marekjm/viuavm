@@ -154,7 +154,6 @@ namespace cg {
         viua::internals::types::byte* opleave(viua::internals::types::byte*);
 
         viua::internals::types::byte* opimport(viua::internals::types::byte*, const std::string&);
-        viua::internals::types::byte* oplink(viua::internals::types::byte*, const std::string&);
 
         viua::internals::types::byte* opclass(viua::internals::types::byte*, int_op, const std::string&);
         viua::internals::types::byte* opderive(viua::internals::types::byte*, int_op, const std::string&);

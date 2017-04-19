@@ -263,7 +263,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
             ptr += fn_name.size();
             ++ptr; // for null character terminating the C-style string not included in std::string
         }
-    } else if ((op == IMPORT) or (op == ENTER) or (op == LINK) or (op == WATCHDOG)) {
+    } else if ((op == IMPORT) or (op == ENTER) or (op == WATCHDOG)) {
         oss << ' ';
         string s = string(reinterpret_cast<char*>(ptr));
         oss << (op == IMPORT ? str::enquote(s) : s);

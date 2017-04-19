@@ -853,8 +853,6 @@ viua::internals::types::bytecode_size assemble_instruction(Program& program, viu
         program.opleave();
     } else if (tokens.at(i) == "import") {
         program.opimport(tokens.at(i+1));
-    } else if (tokens.at(i) == "link") {
-        program.oplink(tokens.at(i+1));
     } else if (tokens.at(i) == "class") {
         TokenIndex target = i + 1;
         TokenIndex class_name = target + 2;

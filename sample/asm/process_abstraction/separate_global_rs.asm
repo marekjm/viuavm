@@ -36,7 +36,7 @@
 .signature: std::misc::cycle/1
 
 .function: main/0
-    link std::misc
+    import "std::misc"
 
     ; spawn printer process
     ; it immediately waits for a message to arrive

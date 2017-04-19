@@ -124,7 +124,6 @@ const std::set<std::string> OP_MNEMONICS = {
     "leave",
 
     "import",
-    "link",
 
     "class",
     "derive",
@@ -233,7 +232,6 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { LEAVE,        "leave" },
 
     { IMPORT,       "import" },
-    { LINK,         "link" },
 
     { CLASS,        "class" },
     { DERIVE,       "derive" },

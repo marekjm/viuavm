@@ -595,13 +595,6 @@ Program& Program::opimport(string module_name) {
     return (*this);
 }
 
-Program& Program::oplink(string module_name) {
-    /*  Inserts link instruction.
-     */
-    addr_ptr = cg::bytecode::oplink(addr_ptr, module_name);
-    return (*this);
-}
-
 Program& Program::opclass(int_op reg, const string& class_name) {
     /*  Inserts class instuction.
      */

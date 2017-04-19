@@ -556,11 +556,6 @@ namespace cg {
             return insertString(addr_ptr, module_name.substr(1, module_name.size()-2));
         }
 
-        viua::internals::types::byte* oplink(viua::internals::types::byte* addr_ptr, const string& module_name) {
-            *(addr_ptr++) = LINK;
-            return insertString(addr_ptr, module_name);
-        }
-
         viua::internals::types::byte* opclass(viua::internals::types::byte* addr_ptr, int_op reg, const string& class_name) {
             *(addr_ptr++) = CLASS;
             addr_ptr = insert_ri_operand(addr_ptr, reg);

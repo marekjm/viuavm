@@ -154,7 +154,6 @@ class Program {
     Program& opleave();
 
     Program& opimport(std::string);
-    Program& oplink(std::string);
 
     Program& opclass(int_op, const std::string&);
     Program& opderive(int_op, const std::string&);

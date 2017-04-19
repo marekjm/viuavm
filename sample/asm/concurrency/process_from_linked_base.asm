@@ -20,7 +20,7 @@
 .signature: test_module::test_function/0
 
 .function: main/0
-    link test_module
+    import "test_module"
 
     frame %0
     process %1 test_module::test_function/0
