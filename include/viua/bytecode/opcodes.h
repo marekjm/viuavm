@@ -188,6 +188,21 @@ enum OPCODE : viua::internals::types::byte {
     REGISTER,   // register a prototype in VM's typesystem
 
     /*
+     *  Create an atom.
+     *  Atoms can be compared for equality, and encode symbols (function names, type names, etc.).
+     *
+     *  atom {target-register} '{atom-value}'
+     */
+    ATOM,
+
+    /*
+     *  Compare atoms for equality.
+     *
+     *  atomeq {result-register} {lhs-register} {rhs-register}
+     */
+    ATOMEQ,
+
+    /*
      *  Create a struct.
      *  Structs are anonymous key-value containers.
      *
