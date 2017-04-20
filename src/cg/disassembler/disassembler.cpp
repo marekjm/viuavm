@@ -223,6 +223,13 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         oss << ' ' << str::enquote(s);
         ptr += s.size();
         ++ptr; // for null character terminating the C-style string not included in std::string
+    } else if ((op == ATOM)) {
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
+
+        string s = string(reinterpret_cast<char*>(ptr));
+        oss << ' ' << str::enquote(s, '\'');
+        ptr += s.size();
+        ++ptr; // for null character terminating the C-style string not included in std::string
     } else if ((op == CLOSURE) or (op == FUNCTION)) {
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
@@ -422,6 +429,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         case TEXTCOMMONSUFFIX:
         case TEXTCONCAT:
         case VPOP:
+        case ATOMEQ:
         case STRUCTINSERT:
         case STRUCTREMOVE:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);

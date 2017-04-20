@@ -783,7 +783,7 @@ namespace viua {
                             tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "\"\"");
                         }
                         continue;
-                    } else if (token == "texteq") {
+                    } else if (token == "texteq" or token == "atomeq") {
                         tokens.push_back(token);    // mnemonic
 
                         tokens.push_back(input_tokens.at(++i)); // target register
@@ -806,6 +806,13 @@ namespace viua {
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
+                    } else if (token == "atom") {
+                        tokens.push_back(token);                // mnemonic
+                        tokens.push_back(input_tokens.at(++i)); // target register
+                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "current");
+                        }
+                        continue;
                     } else if (token == "itof" or token == "ftoi" or token == "stoi" or token == "stof") {
                         tokens.push_back(token);                // mnemonic
 

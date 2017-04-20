@@ -623,6 +623,16 @@ Program& Program::opregister(int_op reg) {
     return (*this);
 }
 
+Program& Program::opatom(int_op reg, string s) {
+    addr_ptr = cg::bytecode::opatom(addr_ptr, reg, s);
+    return (*this);
+}
+
+Program& Program::opatomeq(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opatomeq(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
 Program& Program::opstruct(int_op regno) {
     addr_ptr = cg::bytecode::opstruct(addr_ptr, regno);
     return (*this);

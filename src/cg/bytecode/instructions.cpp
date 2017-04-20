@@ -580,6 +580,16 @@ namespace cg {
             return insert_ri_operand(addr_ptr, regno);
         }
 
+        viua::internals::types::byte* opatom(viua::internals::types::byte* addr_ptr, int_op reg, string s) {
+            *(addr_ptr++) = ATOM;
+            addr_ptr = insert_ri_operand(addr_ptr, reg);
+            return insertString(addr_ptr, s.substr(1, s.size()-2));
+        }
+
+        viua::internals::types::byte* opatomeq(viua::internals::types::byte* addr_ptr, int_op target, int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, ATOMEQ, target, lhs, rhs);
+        }
+
         viua::internals::types::byte* opstruct(viua::internals::types::byte* addr_ptr, int_op regno) {
             *(addr_ptr++) = STRUCT;
             return insert_ri_operand(addr_ptr, regno);

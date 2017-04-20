@@ -800,6 +800,23 @@ namespace viua {
                 return size_of_instruction_with_one_ri_operand_with_rs_type(tokens, i);
             }
 
+            static auto size_of_atom(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                viua::internals::types::bytecode_size calculated_size = sizeof(viua::internals::types::byte);
+
+                decltype(calculated_size) size_increment = 0;
+
+                // for target register
+                tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
+                calculated_size += size_increment;
+
+                calculated_size += tokens.at(i++).str().size() + 1 - 2; // +1 for null terminator, -2 for quotes
+
+                return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
+            }
+            static auto size_of_atomeq(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+
             static auto size_of_struct(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
@@ -1130,6 +1147,12 @@ namespace viua {
                     } else if (tokens.at(i) == "register") {
                         ++i;
                         tie(increase, i) = size_of_register(tokens, i);
+                    } else if (tokens.at(i) == "atom") {
+                        ++i;
+                        tie(increase, i) = size_of_atom(tokens, i);
+                    } else if (tokens.at(i) == "atomeq") {
+                        ++i;
+                        tie(increase, i) = size_of_atomeq(tokens, i);
                     } else if (tokens.at(i) == "struct") {
                         ++i;
                         tie(increase, i) = size_of_struct(tokens, i);

@@ -307,6 +307,9 @@ namespace viua {
             viua::internals::types::byte* opattach(viua::internals::types::byte*);
             viua::internals::types::byte* opregister(viua::internals::types::byte*);
 
+            viua::internals::types::byte* opatom(viua::internals::types::byte*);
+            viua::internals::types::byte* opatomeq(viua::internals::types::byte*);
+
             viua::internals::types::byte* opstruct(viua::internals::types::byte*);
             viua::internals::types::byte* opstructinsert(viua::internals::types::byte*);
             viua::internals::types::byte* opstructremove(viua::internals::types::byte*);

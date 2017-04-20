@@ -15,7 +15,7 @@ CXXOPTIMIZATIONFLAGS=
 COPTIMIZATIONFLAGS=
 DYNAMIC_SYMS=-Wl,--dynamic-list-cpp-typeinfo
 
-VIUA_INSTR_FILES_O=build/process/instr/general.o build/process/instr/registers.o build/process/instr/calls.o build/process/instr/concurrency.o build/process/instr/linking.o build/process/instr/tcmechanism.o build/process/instr/closure.o build/process/instr/int.o build/process/instr/float.o build/process/instr/arithmetic.o build/process/instr/str.o build/process/instr/text.o build/process/instr/bool.o build/process/instr/cast.o build/process/instr/vector.o build/process/instr/prototype.o build/process/instr/object.o build/process/instr/struct.o
+VIUA_INSTR_FILES_O=build/process/instr/general.o build/process/instr/registers.o build/process/instr/calls.o build/process/instr/concurrency.o build/process/instr/linking.o build/process/instr/tcmechanism.o build/process/instr/closure.o build/process/instr/int.o build/process/instr/float.o build/process/instr/arithmetic.o build/process/instr/str.o build/process/instr/text.o build/process/instr/bool.o build/process/instr/cast.o build/process/instr/vector.o build/process/instr/prototype.o build/process/instr/object.o build/process/instr/struct.o build/process/instr/atom.o
 
 
 PREFIX=/usr/local
@@ -221,10 +221,10 @@ build/front/vm.o: src/front/vm.cpp
 build/machine.o: src/machine.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $^
 
-build/bin/vm/kernel: build/kernel.o build/kernel/kernel.o build/scheduler/vps.o build/front/vm.o build/assert.o build/process.o build/pid.o build/process/dispatch.o build/scheduler/ffi/request.o build/scheduler/ffi/scheduler.o build/kernel/registserset.o build/kernel/frame.o build/loader.o build/machine.o build/printutils.o build/support/pointer.o build/support/string.o build/support/env.o $(VIUA_INSTR_FILES_O) build/bytecode/decoder/operands.o build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/text.o build/types/struct.o build/types/integer.o build/types/float.o build/types/exception.o build/types/prototype.o build/types/object.o build/types/reference.o build/types/process.o build/types/type.o build/types/pointer.o build/cg/disassembler/disassembler.o
+build/bin/vm/kernel: build/kernel.o build/kernel/kernel.o build/scheduler/vps.o build/front/vm.o build/assert.o build/process.o build/pid.o build/process/dispatch.o build/scheduler/ffi/request.o build/scheduler/ffi/scheduler.o build/kernel/registserset.o build/kernel/frame.o build/loader.o build/machine.o build/printutils.o build/support/pointer.o build/support/string.o build/support/env.o $(VIUA_INSTR_FILES_O) build/bytecode/decoder/operands.o build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/text.o build/types/atom.o build/types/struct.o build/types/integer.o build/types/float.o build/types/exception.o build/types/prototype.o build/types/object.o build/types/reference.o build/types/process.o build/types/type.o build/types/pointer.o build/cg/disassembler/disassembler.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -lpthread -o $@ $^ $(LIBDL)
 
-build/bin/vm/vdb: build/wdb.o build/lib/linenoise.o build/kernel/kernel.o build/scheduler/vps.o build/front/vm.o build/assert.o build/process.o build/pid.o build/process/dispatch.o build/scheduler/ffi/request.o build/scheduler/ffi/scheduler.o build/kernel/registserset.o build/kernel/frame.o build/loader.o build/machine.o build/cg/disassembler/disassembler.o build/printutils.o build/support/pointer.o build/support/string.o build/support/env.o $(VIUA_INSTR_FILES_O) build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/text.o build/types/struct.o build/types/integer.o build/types/float.o build/types/exception.o build/types/prototype.o build/types/object.o build/types/reference.o build/types/process.o build/types/type.o build/types/pointer.o
+build/bin/vm/vdb: build/wdb.o build/lib/linenoise.o build/kernel/kernel.o build/scheduler/vps.o build/front/vm.o build/assert.o build/process.o build/pid.o build/process/dispatch.o build/scheduler/ffi/request.o build/scheduler/ffi/scheduler.o build/kernel/registserset.o build/kernel/frame.o build/loader.o build/machine.o build/cg/disassembler/disassembler.o build/printutils.o build/support/pointer.o build/support/string.o build/support/env.o $(VIUA_INSTR_FILES_O) build/types/vector.o build/types/function.o build/types/closure.o build/types/string.o build/types/text.o build/types/atom.o build/types/struct.o build/types/integer.o build/types/float.o build/types/exception.o build/types/prototype.o build/types/object.o build/types/reference.o build/types/process.o build/types/type.o build/types/pointer.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -lpthread -o $@ $^ $(LIBDL)
 
 build/bin/vm/asm: build/asm.o build/asm/generate.o build/asm/assemble_instruction.o build/asm/gather.o build/asm/decode.o build/program.o build/programinstructions.o build/cg/tokenizer/tokenize.o build/cg/assembler/operands.o build/cg/assembler/ce.o build/cg/lex.o build/cg/tools.o build/cg/assembler/verify.o build/cg/assembler/static_analysis.o build/cg/assembler/utils.o build/cg/bytecode/instructions.o build/loader.o build/machine.o build/support/string.o build/support/env.o
@@ -337,6 +337,9 @@ build/types/string.o: src/types/string.cpp include/viua/types/string.h
 build/types/text.o: src/types/text.cpp include/viua/types/text.h
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
+build/types/atom.o: src/types/atom.cpp include/viua/types/atom.h
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
+
 build/types/struct.o: src/types/struct.cpp include/viua/types/struct.h
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
@@ -431,6 +434,9 @@ build/process/instr/object.o: src/process/instr/object.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
 build/process/instr/struct.o: src/process/instr/struct.cpp
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
+
+build/process/instr/atom.o: src/process/instr/atom.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
 

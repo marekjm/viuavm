@@ -263,6 +263,12 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case REGISTER:
             addr = opregister(addr+1);
             break;
+        case ATOM:
+            addr = opatom(addr+1);
+            break;
+        case ATOMEQ:
+            addr = opatomeq(addr+1);
+            break;
         case STRUCT:
             addr = opstruct(addr+1);
             break;
