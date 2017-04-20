@@ -2028,7 +2028,7 @@ class StructTests(unittest.TestCase):
         runTestSplitlines(self, 'overwriting_a_value_in_a_struct.asm', ["{'answer': 666}", "{'answer': 42}"])
 
     def testObrainingListOfKeysInAStruct(self):
-        runTest(self, 'obtaining_list_of_keys_in_a_struct.asm', '["answer", "foo"]')
+        runTest(self, 'obtaining_list_of_keys_in_a_struct.asm', "['answer', 'foo']")
 
     def testStructOfStructs(self):
         runTest(self, 'struct_of_structs.asm', "{'bad': {'answer': 666}, 'good': {'answer': 42}}")

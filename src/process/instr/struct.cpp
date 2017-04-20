@@ -22,7 +22,7 @@
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/assert.h>
 #include <viua/types/vector.h>
-#include <viua/types/text.h>
+#include <viua/types/atom.h>
 #include <viua/types/struct.h>
 using namespace std;
 
@@ -42,15 +42,16 @@ viua::internals::types::byte* viua::process::Process::opstructinsert(viua::inter
 
     tie(addr, key_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
     viua::assertions::assert_implements<viua::types::Struct>(struct_operand, "viua::types::Struct");
+    viua::assertions::assert_implements<viua::types::Atom>(key_operand, "viua::types::Atom");
 
     if (viua::bytecode::decoder::operands::get_operand_type(addr) == OT_POINTER) {
         viua::types::Type* source = nullptr;
         tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
-        static_cast<viua::types::Struct*>(struct_operand)->insert(key_operand->str(), source->copy());
+        static_cast<viua::types::Struct*>(struct_operand)->insert(*static_cast<viua::types::Atom*>(key_operand), source->copy());
     } else {
         viua::kernel::Register* source = nullptr;
         tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
-        static_cast<viua::types::Struct*>(struct_operand)->insert(key_operand->str(), source->give());
+        static_cast<viua::types::Struct*>(struct_operand)->insert(*static_cast<viua::types::Atom*>(key_operand), source->give());
     }
 
     return addr;
@@ -71,9 +72,9 @@ viua::internals::types::byte* viua::process::Process::opstructremove(viua::inter
     tie(addr, key_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
     viua::assertions::assert_implements<viua::types::Struct>(struct_operand, "viua::types::Struct");
-    viua::assertions::assert_typeof(key_operand, "Text");
+    viua::assertions::assert_typeof(key_operand, "viua::types::Atom");
 
-    unique_ptr<viua::types::Type> result { static_cast<viua::types::Object*>(struct_operand)->remove(static_cast<viua::types::Text*>(key_operand)->str()) };
+    unique_ptr<viua::types::Type> result { static_cast<viua::types::Object*>(struct_operand)->remove(*static_cast<viua::types::Atom*>(key_operand)) };
     if (not void_target) {
         *target = std::move(result);
     }
@@ -92,7 +93,7 @@ viua::internals::types::byte* viua::process::Process::opstructkeys(viua::interna
     auto struct_keys = static_cast<viua::types::Struct*>(struct_operand)->keys();
     unique_ptr<viua::types::Vector> vec { new viua::types::Vector() };
     for (const auto& each : struct_keys) {
-        vec->push(unique_ptr<viua::types::Text>{ new viua::types::Text(each) });
+        vec->push(unique_ptr<viua::types::Atom>{ new viua::types::Atom(each) });
     }
 
     *target = std::move(vec);

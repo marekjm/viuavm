@@ -20,7 +20,7 @@
 .function: get_good_struct/0
     struct (.name: %iota container) local
 
-    text (.name: %iota key) local "answer"
+    atom (.name: %iota key) local 'answer'
     istore (.name: %iota value) local 42
     structinsert %container local %key local %value local
 
@@ -31,7 +31,7 @@
 .function: get_bad_struct/0
     struct (.name: %iota container) local
 
-    text (.name: %iota key) local "answer"
+    atom (.name: %iota key) local 'answer'
     istore (.name: %iota value) local 666
     structinsert %container local %key local %value local
 
@@ -48,10 +48,10 @@
 
     struct (.name: %iota container) local
 
-    text (.name: %iota key) "good"
+    atom (.name: %iota key) 'good'
     structinsert %container local %key local %good_struct local
 
-    text %key "bad"
+    atom %key 'bad'
     structinsert %container local %key local %bad_struct local
 
     print %container local

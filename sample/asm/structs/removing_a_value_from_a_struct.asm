@@ -20,7 +20,7 @@
 .function: main/0
     struct (.name: %iota container) local
 
-    text (.name: %iota key) local "answer"
+    atom (.name: %iota key) local 'answer'
     istore (.name: %iota value) local 42
 
     structinsert %container local %key local %value local
