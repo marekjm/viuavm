@@ -272,6 +272,9 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case STRUCTINSERT:
             addr = opstructinsert(addr+1);
             break;
+        case STRUCTREMOVE:
+            addr = opstructremove(addr+1);
+            break;
         case STRUCTKEYS:
             addr = opstructkeys(addr+1);
             break;

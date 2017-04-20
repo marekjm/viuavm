@@ -572,7 +572,7 @@ namespace viua {
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
-                    } else if (token == "remove") {
+                    } else if (token == "remove" or token == "structremove") {
                         tokens.push_back(token);    // mnemonic
 
                         tokens.push_back(input_tokens.at(++i)); // target register

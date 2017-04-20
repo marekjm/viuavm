@@ -640,6 +640,11 @@ Program& Program::opstructinsert(int_op target, int_op key, int_op source) {
     return (*this);
 }
 
+Program& Program::opstructremove(int_op target, int_op key, int_op source) {
+    addr_ptr = cg::bytecode::opstructremove(addr_ptr, target, key, source);
+    return (*this);
+}
+
 Program& Program::opstructkeys(int_op a, int_op b) {
     addr_ptr = cg::bytecode::opstructkeys(addr_ptr, a, b);
     return (*this);

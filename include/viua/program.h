@@ -163,6 +163,7 @@ class Program {
 
     Program& opstruct(int_op);
     Program& opstructinsert(int_op, int_op, int_op);
+    Program& opstructremove(int_op, int_op, int_op);
     Program& opstructkeys(int_op, int_op);
 
     Program& opnew(int_op, const std::string&);

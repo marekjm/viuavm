@@ -56,6 +56,31 @@ viua::internals::types::byte* viua::process::Process::opstructinsert(viua::inter
     return addr;
 }
 
+viua::internals::types::byte* viua::process::Process::opstructremove(viua::internals::types::byte* addr) {
+    bool void_target = viua::bytecode::decoder::operands::is_void(addr);
+    viua::kernel::Register* target = nullptr;
+
+    if (not void_target) {
+        tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+    } else {
+        addr = viua::bytecode::decoder::operands::fetch_void(addr);
+    }
+
+    viua::types::Type *struct_operand = nullptr, *key_operand = nullptr;
+    tie(addr, struct_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    tie(addr, key_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+
+    viua::assertions::assert_implements<viua::types::Struct>(struct_operand, "viua::types::Struct");
+    viua::assertions::assert_typeof(key_operand, "Text");
+
+    unique_ptr<viua::types::Type> result { static_cast<viua::types::Object*>(struct_operand)->remove(static_cast<viua::types::Text*>(key_operand)->str()) };
+    if (not void_target) {
+        *target = std::move(result);
+    }
+
+    return addr;
+}
+
 viua::internals::types::byte* viua::process::Process::opstructkeys(viua::internals::types::byte* addr) {
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);

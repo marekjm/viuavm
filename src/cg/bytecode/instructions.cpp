@@ -594,6 +594,10 @@ namespace cg {
             return insert_three_ri_instruction(addr_ptr, STRUCTINSERT, rega, regb, regr);
         }
 
+        viua::internals::types::byte* opstructremove(viua::internals::types::byte* addr_ptr, int_op rega, int_op regb, int_op regr) {
+            return insert_three_ri_instruction(addr_ptr, STRUCTREMOVE, rega, regb, regr);
+        }
+
         viua::internals::types::byte* opstructkeys(viua::internals::types::byte* addr_ptr, int_op target, int_op source) {
             return insert_two_ri_instruction(addr_ptr, STRUCTKEYS, target, source);
         }
