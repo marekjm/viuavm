@@ -885,6 +885,48 @@ viua::internals::types::bytecode_size assemble_instruction(Program& program, viu
         program.opregister(
             assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
         );
+    } else if (tokens.at(i) == "struct") {
+        TokenIndex target = i + 1;
+
+        program.opstruct(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1))));
+    } else if (tokens.at(i) == "structinsert") {
+        TokenIndex target = i + 1;
+        TokenIndex key = target + 2;
+        TokenIndex source = key + 2;
+
+        program.opstructinsert(
+            assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(key)), resolve_rs_type(tokens.at(key+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
+        );
+    } else if (tokens.at(i) == "structremove") {
+        TokenIndex target = i + 1;
+        TokenIndex source = target + 2;
+        TokenIndex key = source + 2;
+
+        if (tokens.at(target) == "void") {
+            --source;
+            --key;
+            program.opstructremove(
+                assembler::operands::getint(resolveregister(tokens.at(target)))
+                , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
+                , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(key)), resolve_rs_type(tokens.at(key+1)))
+            );
+        } else {
+            program.opstructremove(
+                assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+                , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
+                , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(key)), resolve_rs_type(tokens.at(key+1)))
+            );
+        }
+    } else if (tokens.at(i) == "structkeys") {
+        TokenIndex target = i + 1;
+        TokenIndex source = target + 2;
+
+        program.opstructkeys(
+            assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)))
+            , assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1)))
+        );
     } else if (tokens.at(i) == "new") {
         TokenIndex target = i + 1;
         TokenIndex class_name = target + 2;

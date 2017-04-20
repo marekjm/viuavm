@@ -307,6 +307,11 @@ namespace viua {
             viua::internals::types::byte* opattach(viua::internals::types::byte*);
             viua::internals::types::byte* opregister(viua::internals::types::byte*);
 
+            viua::internals::types::byte* opstruct(viua::internals::types::byte*);
+            viua::internals::types::byte* opstructinsert(viua::internals::types::byte*);
+            viua::internals::types::byte* opstructremove(viua::internals::types::byte*);
+            viua::internals::types::byte* opstructkeys(viua::internals::types::byte*);
+
             viua::internals::types::byte* opnew(viua::internals::types::byte*);
             viua::internals::types::byte* opmsg(viua::internals::types::byte*);
             viua::internals::types::byte* opinsert(viua::internals::types::byte*);

@@ -160,6 +160,11 @@ class Program {
     Program& opattach(int_op, const std::string&, const std::string&);
     Program& opregister(int_op);
 
+    Program& opstruct(int_op);
+    Program& opstructinsert(int_op, int_op, int_op);
+    Program& opstructremove(int_op, int_op, int_op);
+    Program& opstructkeys(int_op, int_op);
+
     Program& opnew(int_op, const std::string&);
     Program& opmsg(int_op, const std::string&);
     Program& opmsg(int_op, int_op);

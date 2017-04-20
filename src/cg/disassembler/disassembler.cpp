@@ -310,6 +310,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         case IDEC:
         case SELF:
         case ARGC:
+        case STRUCT:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             break;
         case BOOL:
@@ -348,6 +349,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         case VPUSH:
         case VLEN:
         case TEXTLENGTH:
+        case STRUCTKEYS:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
@@ -420,6 +422,8 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         case TEXTCOMMONSUFFIX:
         case TEXTCONCAT:
         case VPOP:
+        case STRUCTINSERT:
+        case STRUCTREMOVE:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);

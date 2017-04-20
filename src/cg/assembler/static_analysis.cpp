@@ -413,7 +413,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
 
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "insert") {
+        } else if (token == "insert" or token == "structinsert") {
             TokenIndex target = i + 1;
             TokenIndex key = target + 2;
             TokenIndex source = key + 2;
@@ -545,7 +545,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             check_use_of_register(body_tokens, source, i, registers, named_registers, "closure of empty register");
 
             i = skip_till_next_line(body_tokens, i);
-        } else if (token == "copy" or token == "ptr" or token == "textlength") {
+        } else if (token == "copy" or token == "ptr" or token == "textlength" or token == "structkeys") {
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
 

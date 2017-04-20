@@ -549,7 +549,7 @@ namespace viua {
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
-                    } else if (token == "insert") {
+                    } else if (token == "insert" or token == "structinsert") {
                         tokens.push_back(token);    // mnemonic
 
                         tokens.push_back(input_tokens.at(++i)); // target register
@@ -572,7 +572,7 @@ namespace viua {
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
-                    } else if (token == "remove") {
+                    } else if (token == "remove" or token == "structremove") {
                         tokens.push_back(token);    // mnemonic
 
                         tokens.push_back(input_tokens.at(++i)); // target register
@@ -875,7 +875,7 @@ namespace viua {
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
-                    } else if (token == "move" or token == "copy" or token == "swap" or token == "ptr" or token == "isnull" or token == "send") {
+                    } else if (token == "move" or token == "copy" or token == "swap" or token == "ptr" or token == "isnull" or token == "send" or token == "textlength" or token == "structkeys") {
                         tokens.push_back(token);                // mnemonic
 
                         tokens.push_back(input_tokens.at(++i)); // target register
@@ -915,6 +915,7 @@ namespace viua {
                         or token == "iinc"
                         or token == "idec"
                         or token == "self"
+                        or token == "struct"
                     ) {
                         tokens.push_back(token);                // mnemonic
                         tokens.push_back(input_tokens.at(++i)); // target register

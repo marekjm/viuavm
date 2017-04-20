@@ -263,6 +263,18 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case REGISTER:
             addr = opregister(addr+1);
             break;
+        case STRUCT:
+            addr = opstruct(addr+1);
+            break;
+        case STRUCTINSERT:
+            addr = opstructinsert(addr+1);
+            break;
+        case STRUCTREMOVE:
+            addr = opstructremove(addr+1);
+            break;
+        case STRUCTKEYS:
+            addr = opstructkeys(addr+1);
+            break;
         case NEW:
             addr = opnew(addr+1);
             break;

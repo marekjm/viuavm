@@ -69,7 +69,7 @@ namespace str {
     std::string::size_type lshare(const std::string& s, const std::string& w);
     bool contains(const std::string&s, const char c);
 
-    std::string enquote(const std::string&);
+    std::string enquote(const std::string&, const char = '"');
     std::string strdecode(const std::string&);
     std::string strencode(const std::string&);
 

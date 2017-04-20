@@ -623,6 +623,26 @@ Program& Program::opregister(int_op reg) {
     return (*this);
 }
 
+Program& Program::opstruct(int_op regno) {
+    addr_ptr = cg::bytecode::opstruct(addr_ptr, regno);
+    return (*this);
+}
+
+Program& Program::opstructinsert(int_op target, int_op key, int_op source) {
+    addr_ptr = cg::bytecode::opstructinsert(addr_ptr, target, key, source);
+    return (*this);
+}
+
+Program& Program::opstructremove(int_op target, int_op key, int_op source) {
+    addr_ptr = cg::bytecode::opstructremove(addr_ptr, target, key, source);
+    return (*this);
+}
+
+Program& Program::opstructkeys(int_op a, int_op b) {
+    addr_ptr = cg::bytecode::opstructkeys(addr_ptr, a, b);
+    return (*this);
+}
+
 Program& Program::opnew(int_op reg, const string& class_name) {
     /*  Inserts new instuction.
      */

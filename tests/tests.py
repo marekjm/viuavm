@@ -2012,6 +2012,28 @@ class WatchdogTests(unittest.TestCase):
         ])
 
 
+class StructTests(unittest.TestCase):
+    PATH = './sample/asm/structs'
+
+    def testCreatingEmptyStruct(self):
+        runTest(self, 'creating_empty_struct.asm', '{}')
+
+    def testInsertingAValueIntoAStruct(self):
+        runTest(self, 'inserting_a_value_into_a_struct.asm', "{'answer': 42}")
+
+    def testRemovingAValueFromAStruct(self):
+        runTestSplitlines(self, 'removing_a_value_from_a_struct.asm', ["{'answer': 42}", '{}'])
+
+    def testOverwritingAValueInAStruct(self):
+        runTestSplitlines(self, 'overwriting_a_value_in_a_struct.asm', ["{'answer': 666}", "{'answer': 42}"])
+
+    def testObrainingListOfKeysInAStruct(self):
+        runTest(self, 'obtaining_list_of_keys_in_a_struct.asm', '["answer", "foo"]')
+
+    def testStructOfStructs(self):
+        runTest(self, 'struct_of_structs.asm', "{'bad': {'answer': 666}, 'good': {'answer': 42}}")
+
+
 class StandardRuntimeLibraryModuleString(unittest.TestCase):
     PATH = './sample/standard_library/string'
 
