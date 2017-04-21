@@ -31,6 +31,8 @@ namespace viua {
                 const std::string value;
 
             public:
+                static const std::string type_name;
+
                 virtual std::string type() const override;
                 virtual bool boolean() const override;
 

@@ -21,6 +21,7 @@
 #include <viua/types/atom.h>
 using namespace std;
 
+const string viua::types::Atom::type_name = "viua::types::Atom";
 
 string viua::types::Atom::type() const {
     return "viua::types::Atom";
