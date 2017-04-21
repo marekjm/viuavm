@@ -43,11 +43,11 @@ viua::internals::types::byte* viua::process::Process::opatomeq(viua::internals::
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    viua::types::Type *first = nullptr, *second = nullptr;
-    tie(addr, first) = viua::bytecode::decoder::operands::fetch_object(addr, this);
-    tie(addr, second) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    viua::types::Atom *first = nullptr, *second = nullptr;
+    tie(addr, first) = viua::bytecode::decoder::operands::fetch_object_of<std::remove_pointer<decltype(first)>::type>(addr, this);
+    tie(addr, second) = viua::bytecode::decoder::operands::fetch_object_of<std::remove_pointer<decltype(second)>::type>(addr, this);
 
-    *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(*static_cast<viua::types::Atom*>(first) == *static_cast<viua::types::Atom*>(second))};
+    *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(*first == *second)};
 
     return addr;
 }
