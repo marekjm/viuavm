@@ -2034,6 +2034,16 @@ class StructTests(unittest.TestCase):
         runTest(self, 'struct_of_structs.asm', "{'bad': {'answer': 666}, 'good': {'answer': 42}}")
 
 
+class AtomTests(unittest.TestCase):
+    PATH = './sample/asm/atoms'
+
+    def testPrintingAnAtom(self):
+        runTest(self, 'printing_an_atom.asm', "'an_atom'")
+
+    def testComparingAtoms(self):
+        runTestSplitlines(self, 'comparing_atoms.asm', ['true', 'false'])
+
+
 class StandardRuntimeLibraryModuleString(unittest.TestCase):
     PATH = './sample/standard_library/string'
 
