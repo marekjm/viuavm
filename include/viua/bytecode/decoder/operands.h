@@ -27,6 +27,7 @@
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/operand_types.h>
 #include <viua/types/type.h>
+#include <viua/types/exception.h>
 #include <viua/kernel/registerset.h>
 
 
@@ -69,6 +70,25 @@ namespace viua {
                 auto fetch_atom(viua::internals::types::byte*, viua::process::Process*) -> std::tuple<viua::internals::types::byte*, std::string>;
                 auto fetch_object(viua::internals::types::byte*, viua::process::Process*) -> std::tuple<viua::internals::types::byte*, viua::types::Type*>;
                 auto fetch_object2(viua::internals::types::byte*, viua::process::Process*) -> std::tuple<viua::internals::types::byte*, viua::types::Type*>;
+
+                template < typename RequestedType > auto fetch_object_of(viua::internals::types::byte* ip, viua::process::Process* p) -> std::tuple<viua::internals::types::byte*, RequestedType*> {
+                    viua::internals::types::byte* addr = nullptr;
+                    viua::types::Type* fetched = nullptr;
+
+                    std::tie(addr, fetched) = fetch_object(ip, p);
+
+                    RequestedType* converted = dynamic_cast<RequestedType*>(fetched);
+                    if (not converted) {
+                        throw new viua::types::Exception(
+                            "fetched invalid type: expected '" +
+                            RequestedType::type_name +
+                            "' but got '" +
+                            fetched->type() +
+                            "'"
+                        );
+                    }
+                    return { addr, converted };
+                }
 
                 /*
                  *  Fetch raw data decoding it directly from bytecode.
