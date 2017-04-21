@@ -2043,6 +2043,9 @@ class AtomTests(unittest.TestCase):
     def testComparingAtoms(self):
         runTestSplitlines(self, 'comparing_atoms.asm', ['true', 'false'])
 
+    def testComparingWithDifferentType(self):
+        runTestThrowsException(self, 'comparing_with_different_type.asm', ('Exception', "fetched invalid type: expected 'viua::types::Atom' but got 'Integer'"))
+
 
 class StandardRuntimeLibraryModuleString(unittest.TestCase):
     PATH = './sample/standard_library/string'
