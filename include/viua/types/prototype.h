@@ -40,10 +40,10 @@ namespace viua {
             std::vector<std::string> attributes;
 
             public:
-                virtual std::string type() const override;
-                virtual bool boolean() const override;
+                std::string type() const override;
+                bool boolean() const override;
 
-                virtual std::string str() const override;
+                std::string str() const override;
 
                 std::string getTypeName() const;
                 std::vector<std::string> getAncestors() const;
@@ -60,14 +60,14 @@ namespace viua {
                 Prototype* derive(const std::string&);
 
 
-                virtual std::vector<std::string> bases() const override {
+                std::vector<std::string> bases() const override {
                     return std::vector<std::string>{"Type"};
                 }
-                virtual std::vector<std::string> inheritancechain() const override {
+                std::vector<std::string> inheritancechain() const override {
                     return std::vector<std::string>{"Type"};
                 }
 
-                virtual std::unique_ptr<Type> copy() const override;
+                std::unique_ptr<Type> copy() const override;
 
                 Prototype(const std::string& tn): type_name(tn) {}
                 virtual ~Prototype() {}

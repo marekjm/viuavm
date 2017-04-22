@@ -40,20 +40,20 @@ namespace viua {
                 std::map<std::string, std::unique_ptr<Type>> attributes;
 
             public:
-                virtual std::string type() const override;
-                virtual bool boolean() const override;
+                std::string type() const override;
+                bool boolean() const override;
 
-                virtual std::string str() const override;
+                std::string str() const override;
 
-                virtual std::vector<std::string> bases() const override {
+                std::vector<std::string> bases() const override {
                     return std::vector<std::string>{"Type"};
                 }
-                virtual std::vector<std::string> inheritancechain() const override {
+                std::vector<std::string> inheritancechain() const override {
                     return std::vector<std::string>{"Type"};
                 }
 
-                virtual void insert(const std::string& key, std::unique_ptr<Type> value);
-                virtual std::unique_ptr<Type> remove(const std::string& key);
+                void insert(const std::string& key, std::unique_ptr<Type> value);
+                std::unique_ptr<Type> remove(const std::string& key);
 
                 void set(const std::string&, std::unique_ptr<Type>);
                 inline Type* at(const std::string& s) { return attributes.at(s).get(); }

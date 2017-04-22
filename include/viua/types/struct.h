@@ -39,16 +39,16 @@ namespace viua {
                 std::map<std::string, std::unique_ptr<Type>> attributes;
 
             public:
-                virtual std::string type() const override;
-                virtual bool boolean() const override;
+                std::string type() const override;
+                bool boolean() const override;
 
-                virtual std::string str() const override;
-                virtual std::string repr() const override;
+                std::string str() const override;
+                std::string repr() const override;
 
-                virtual std::vector<std::string> bases() const override {
+                std::vector<std::string> bases() const override {
                     return std::vector<std::string>{"Type"};
                 }
-                virtual std::vector<std::string> inheritancechain() const override {
+                std::vector<std::string> inheritancechain() const override {
                     return std::vector<std::string>{"Type"};
                 }
 
@@ -56,7 +56,7 @@ namespace viua {
                 virtual std::unique_ptr<Type> remove(const std::string& key);
                 virtual std::vector<std::string> keys() const;
 
-                virtual std::unique_ptr<Type> copy() const override;
+                std::unique_ptr<Type> copy() const override;
 
                 ~Struct() override = default;
         };
