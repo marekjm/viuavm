@@ -27,6 +27,7 @@
 #include <viua/types/exception.h>
 using namespace std;
 
+const string viua::types::Pointer::type_name = "Pointer";
 
 void viua::types::Pointer::attach() {
     points_to->pointers.push_back(this);

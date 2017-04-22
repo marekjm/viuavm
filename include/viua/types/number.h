@@ -42,6 +42,8 @@ namespace viua {
                  *  Otherwise, they will not be usable by arithmetic instructions.
                  */
                 public:
+                    static const std::string type_name;
+
                     std::string type() const override {
                         return "Number";
                     }

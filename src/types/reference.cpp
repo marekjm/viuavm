@@ -21,6 +21,7 @@
 #include <viua/types/reference.h>
 using namespace std;
 
+const string viua::types::Reference::type_name = "Reference";
 
 viua::types::Type* viua::types::Reference::pointsTo() const {
     return *pointer;

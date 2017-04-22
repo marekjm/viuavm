@@ -27,6 +27,7 @@
 #include <viua/kernel/kernel.h>
 using namespace std;
 
+const string viua::types::Process::type_name = "Process";
 
 string viua::types::Process::type() const {
     return "Process";

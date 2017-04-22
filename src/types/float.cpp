@@ -23,6 +23,8 @@
 using namespace std;
 using namespace viua::types;
 
+const string viua::types::Float::type_name = "Float";
+
 
 string Float::type() const {
     return "Float";

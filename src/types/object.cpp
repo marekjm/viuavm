@@ -25,9 +25,10 @@
 #include <viua/kernel/frame.h>
 using namespace std;
 
+const string viua::types::Object::type_name = "Object";
 
 string viua::types::Object::type() const {
-    return type_name;
+    return object_type_name;
 }
 bool viua::types::Object::boolean() const {
     return true;
@@ -36,7 +37,7 @@ bool viua::types::Object::boolean() const {
 string viua::types::Object::str() const {
     ostringstream oss;
 
-    oss << type_name << '#';
+    oss << object_type_name << '#';
     oss << '{';
     const auto limit = attributes.size();
     std::remove_const<decltype(limit)>::type i = 0;
@@ -52,7 +53,7 @@ string viua::types::Object::str() const {
 }
 
 unique_ptr<viua::types::Type> viua::types::Object::copy() const {
-    unique_ptr<viua::types::Object> cp {new viua::types::Object(type_name)};
+    unique_ptr<viua::types::Object> cp {new viua::types::Object(object_type_name)};
     for (const auto& each : attributes) {
         cp->set(each.first, each.second->copy());
     }
@@ -78,6 +79,6 @@ unique_ptr<viua::types::Type> viua::types::Object::remove(const string& key) {
 }
 
 
-viua::types::Object::Object(const std::string& tn): type_name(tn) {}
+viua::types::Object::Object(const std::string& tn): object_type_name(tn) {}
 viua::types::Object::~Object() {
 }

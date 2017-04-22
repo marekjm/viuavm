@@ -34,6 +34,8 @@ namespace viua {
             /** Type representing a function.
              */
             public:
+                static const std::string type_name;
+
                 std::string function_name;
 
                 std::string type() const override;

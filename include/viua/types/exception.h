@@ -40,6 +40,8 @@ namespace viua {
                 std::string cause;
                 std::string detailed_type;
             public:
+                static const std::string type_name;
+
                 std::string type() const override {
                     return "Exception";
                 }

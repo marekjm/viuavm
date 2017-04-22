@@ -36,6 +36,8 @@ namespace viua {
                 std::string function_name;
 
             public:
+                static const std::string type_name;
+
                 std::string type() const override;
                 std::string str() const override;
                 std::string repr() const override;

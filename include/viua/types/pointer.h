@@ -52,6 +52,8 @@ namespace viua {
                 void attach();
                 void detach();
             public:
+                static const std::string type_name;
+
                 void invalidate(Type* t);
                 bool expired();
                 auto authenticate(const viua::process::Process*) -> void;

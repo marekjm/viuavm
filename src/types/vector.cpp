@@ -25,6 +25,7 @@
 #include <viua/exceptions.h>
 using namespace std;
 
+const string viua::types::Vector::type_name = "Vector";
 
 void viua::types::Vector::insert(long int index, unique_ptr<viua::types::Type> object) {
     long offset = 0;

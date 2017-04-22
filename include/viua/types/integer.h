@@ -40,6 +40,8 @@ namespace viua {
             underlying_type number;
 
             public:
+                static const std::string type_name;
+
                 std::string type() const override;
                 std::string str() const override;
                 bool boolean() const override;

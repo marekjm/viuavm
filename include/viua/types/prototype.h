@@ -34,12 +34,14 @@ namespace viua {
              *  This type is used internally inside the VM.
              */
 
-            std::string type_name;
+            std::string prototype_name;
             std::vector<std::string> ancestors;
             std::map<std::string, std::string> methods;
             std::vector<std::string> attributes;
 
             public:
+                static const std::string type_name;
+
                 std::string type() const override;
                 bool boolean() const override;
 
@@ -69,7 +71,7 @@ namespace viua {
 
                 std::unique_ptr<Type> copy() const override;
 
-                Prototype(const std::string& tn): type_name(tn) {}
+                Prototype(const std::string& tn): prototype_name(tn) {}
                 virtual ~Prototype() {}
         };
     }

@@ -22,6 +22,7 @@
 #include <viua/types/struct.h>
 using namespace std;
 
+const string viua::types::Struct::type_name = "Struct";
 
 string viua::types::Struct::type() const {
     return "Struct";

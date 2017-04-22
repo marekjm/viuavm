@@ -36,6 +36,7 @@ using namespace std;
 using namespace viua::assertions;
 using namespace viua::types;
 
+const string viua::types::String::type_name = "String";
 
 Integer* String::size() {
     /** Return size of the string.

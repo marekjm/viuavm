@@ -22,6 +22,7 @@
 #include <viua/types/prototype.h>
 using namespace std;
 
+const string viua::types::Prototype::type_name = "Prototype";
 
 string viua::types::Prototype::type() const {
     return "viua::types::Prototype";
@@ -31,16 +32,16 @@ bool viua::types::Prototype::boolean() const {
 }
 
 string viua::types::Prototype::str() const {
-    return ("Prototype for " + type_name);
+    return ("Prototype for " + prototype_name);
 }
 
 unique_ptr<viua::types::Type> viua::types::Prototype::copy() const {
-    return unique_ptr<viua::types::Type>{new viua::types::Prototype(type_name)};
+    return unique_ptr<viua::types::Type>{new viua::types::Prototype(prototype_name)};
 }
 
 
 string viua::types::Prototype::getTypeName() const {
-    return type_name;
+    return prototype_name;
 }
 vector<string> viua::types::Prototype::getAncestors() const {
     return ancestors;

@@ -53,6 +53,8 @@ namespace viua {
             std::string svalue;
 
             public:
+                static const std::string type_name;
+
                 std::string type() const override {
                     return "String";
                 }

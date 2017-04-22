@@ -39,6 +39,8 @@ namespace viua {
                 std::map<std::string, std::unique_ptr<Type>> attributes;
 
             public:
+                static const std::string type_name;
+
                 std::string type() const override;
                 bool boolean() const override;
 

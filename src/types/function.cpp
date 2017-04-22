@@ -23,6 +23,8 @@
 #include <viua/types/function.h>
 using namespace std;
 
+const string viua::types::Function::type_name = "Function";
+
 
 viua::types::Function::Function(const string& name): function_name(name) {
 }

@@ -41,6 +41,8 @@ namespace viua {
             Reference(Type **ptr, uint64_t *ctr): pointer(ptr), counter(ctr) {}
 
             public:
+                static const std::string type_name;
+
                 std::string type() const override;
                 std::string str() const override;
                 std::string repr() const override;

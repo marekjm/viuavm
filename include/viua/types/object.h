@@ -36,10 +36,12 @@ namespace viua {
              *  This type is used internally inside the VM.
              */
             private:
-                std::string type_name;
+                std::string object_type_name;
                 std::map<std::string, std::unique_ptr<Type>> attributes;
 
             public:
+                static const std::string type_name;
+
                 std::string type() const override;
                 bool boolean() const override;
 

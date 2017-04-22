@@ -21,6 +21,8 @@
 #include <viua/types/exception.h>
 using namespace std;
 
+const string viua::types::Exception::type_name = "Exception";
+
 
 string viua::types::Exception::what() const {
     /** Stay compatible with standatd exceptions and

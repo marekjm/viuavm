@@ -47,6 +47,8 @@ namespace viua {
             viua::process::Process* thrd;
 
             public:
+                static const std::string type_name;
+
                 /*
                  * For use by the VM and user code.
                  * Provides interface common to all values in Viua.
