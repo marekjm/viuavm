@@ -74,7 +74,7 @@ viua::internals::types::byte* viua::process::Process::opstructremove(viua::inter
     viua::assertions::assert_implements<viua::types::Struct>(struct_operand, "viua::types::Struct");
     viua::assertions::assert_typeof(key_operand, "viua::types::Atom");
 
-    unique_ptr<viua::types::Type> result { static_cast<viua::types::Object*>(struct_operand)->remove(*static_cast<viua::types::Atom*>(key_operand)) };
+    unique_ptr<viua::types::Type> result { static_cast<viua::types::Struct*>(struct_operand)->remove(*static_cast<viua::types::Atom*>(key_operand)) };
     if (not void_target) {
         *target = std::move(result);
     }
