@@ -43,13 +43,9 @@ viua::internals::types::byte* viua::process::Process::opprocess(viua::internals:
     string call_name;
     auto ot = viua::bytecode::decoder::operands::get_operand_type(addr);
     if (ot == OT_REGISTER_INDEX or ot == OT_POINTER) {
-        viua::types::Type* fn_source = nullptr;
-        tie(addr, fn_source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+        viua::types::Function* fn = nullptr;
+        tie(addr, fn) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Function>(addr, this);
 
-        auto fn = dynamic_cast<viua::types::Function*>(fn_source);
-        if (not fn) {
-            throw new viua::types::Exception("type is not callable: " + fn_source->type());
-        }
         call_name = fn->name();
 
         if (fn->type() == "Closure") {

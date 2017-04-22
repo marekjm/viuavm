@@ -51,19 +51,19 @@ viua::internals::types::byte* viua::process::Process::opistore(viua::internals::
 }
 
 viua::internals::types::byte* viua::process::Process::opiinc(viua::internals::types::byte* addr) {
-    viua::types::Type* target { nullptr };
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    viua::types::Integer* target { nullptr };
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
 
-    viua::assertions::expect_type<viua::types::Integer>("Integer", target)->increment();
+    target->increment();
 
     return addr;
 }
 
 viua::internals::types::byte* viua::process::Process::opidec(viua::internals::types::byte* addr) {
-    viua::types::Type* target { nullptr };
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    viua::types::Integer* target { nullptr };
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
 
-    viua::assertions::expect_type<viua::types::Integer>("Integer", target)->decrement();
+    target->decrement();
 
     return addr;
 }

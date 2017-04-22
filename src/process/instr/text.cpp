@@ -45,11 +45,11 @@ viua::internals::types::byte* viua::process::Process::optexteq(viua::internals::
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    viua::types::Type *first = nullptr, *second = nullptr;
-    tie(addr, first) = viua::bytecode::decoder::operands::fetch_object(addr, this);
-    tie(addr, second) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    viua::types::Text *first = nullptr, *second = nullptr;
+    tie(addr, first) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Text>(addr, this);
+    tie(addr, second) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Text>(addr, this);
 
-    *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(*static_cast<viua::types::Text*>(first) == *static_cast<viua::types::Text*>(second))};
+    *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(*first == *second)};
 
     return addr;
 }
@@ -72,13 +72,15 @@ viua::internals::types::byte* viua::process::Process::optextat(viua::internals::
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    viua::types::Type *source_text = nullptr, *index = nullptr;
-    tie(addr, source_text) = viua::bytecode::decoder::operands::fetch_object(addr, this);
-    tie(addr, index) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    viua::types::Text *source_text = nullptr;
+    tie(addr, source_text) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Text>(addr, this);
 
-    auto working_index = convert_signed_integer_to_text_size_type(static_cast<viua::types::Text*>(source_text), static_cast<viua::types::Integer*>(index)->as_int64());
+    viua::types::Integer *index = nullptr;
+    tie(addr, index) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
 
-    *target = unique_ptr<viua::types::Type>{new viua::types::Text(static_cast<viua::types::Text*>(source_text)->at(working_index))};
+    auto working_index = convert_signed_integer_to_text_size_type(source_text, index->as_int64());
+
+    *target = unique_ptr<viua::types::Type>{new viua::types::Text(source_text->at(working_index))};
 
     return addr;
 }
@@ -88,17 +90,17 @@ viua::internals::types::byte* viua::process::Process::optextsub(viua::internals:
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    viua::types::Type *source = nullptr;
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    viua::types::Text *source = nullptr;
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Text>(addr, this);
 
-    viua::types::Type *first_index = nullptr, *last_index = nullptr;
-    tie(addr, first_index) = viua::bytecode::decoder::operands::fetch_object(addr, this);
-    tie(addr, last_index) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    viua::types::Integer *first_index = nullptr, *last_index = nullptr;
+    tie(addr, first_index) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
+    tie(addr, last_index) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
 
-    auto working_first_index = convert_signed_integer_to_text_size_type(static_cast<viua::types::Text*>(source), static_cast<viua::types::Integer*>(first_index)->as_int64());
-    auto working_last_index = convert_signed_integer_to_text_size_type(static_cast<viua::types::Text*>(source), static_cast<viua::types::Integer*>(last_index)->as_int64());
+    auto working_first_index = convert_signed_integer_to_text_size_type(source, first_index->as_int64());
+    auto working_last_index = convert_signed_integer_to_text_size_type(source, last_index->as_int64());
 
-    *target = unique_ptr<viua::types::Type>{new viua::types::Text(static_cast<viua::types::Text*>(source)->sub(working_first_index, working_last_index))};
+    *target = unique_ptr<viua::types::Type>{new viua::types::Text(source->sub(working_first_index, working_last_index))};
 
     return addr;
 }
@@ -108,10 +110,10 @@ viua::internals::types::byte* viua::process::Process::optextlength(viua::interna
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    viua::types::Type *source = nullptr;
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    viua::types::Text *source = nullptr;
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Text>(addr, this);
 
-    *target = unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<viua::types::Text*>(source)->signed_size())};
+    *target = unique_ptr<viua::types::Type>{new viua::types::Integer(source->signed_size())};
 
     return addr;
 }
@@ -121,13 +123,13 @@ viua::internals::types::byte* viua::process::Process::optextcommonprefix(viua::i
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    viua::types::Type *lhs = nullptr;
-    tie(addr, lhs) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    viua::types::Text *lhs = nullptr;
+    tie(addr, lhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Text>(addr, this);
 
-    viua::types::Type *rhs = nullptr;
-    tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    viua::types::Text *rhs = nullptr;
+    tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Text>(addr, this);
 
-    *target = unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<int64_t>(static_cast<viua::types::Text*>(lhs)->common_prefix(*static_cast<viua::types::Text*>(rhs))))};
+    *target = unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<int64_t>(lhs->common_prefix(*rhs)))};
 
     return addr;
 }
@@ -137,13 +139,13 @@ viua::internals::types::byte* viua::process::Process::optextcommonsuffix(viua::i
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    viua::types::Type *lhs = nullptr;
-    tie(addr, lhs) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    viua::types::Text *lhs = nullptr;
+    tie(addr, lhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Text>(addr, this);
 
-    viua::types::Type *rhs = nullptr;
-    tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    viua::types::Text *rhs = nullptr;
+    tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Text>(addr, this);
 
-    *target = unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<int64_t>(static_cast<viua::types::Text*>(lhs)->common_suffix(*static_cast<viua::types::Text*>(rhs))))};
+    *target = unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<int64_t>(lhs->common_suffix(*rhs)))};
 
     return addr;
 }
@@ -153,13 +155,13 @@ viua::internals::types::byte* viua::process::Process::optextconcat(viua::interna
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    viua::types::Type *lhs = nullptr;
-    tie(addr, lhs) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    viua::types::Text *lhs = nullptr;
+    tie(addr, lhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Text>(addr, this);
 
-    viua::types::Type *rhs = nullptr;
-    tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    viua::types::Text *rhs = nullptr;
+    tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Text>(addr, this);
 
-    *target = unique_ptr<viua::types::Type>{new viua::types::Text((*static_cast<viua::types::Text*>(lhs)) + (*static_cast<viua::types::Text*>(rhs)))};
+    *target = unique_ptr<viua::types::Type>{new viua::types::Text((*lhs) + (*rhs))};
 
     return addr;
 }

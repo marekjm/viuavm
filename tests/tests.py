@@ -976,10 +976,10 @@ class InvalidInstructionOperandTypeTests(unittest.TestCase):
         runTestThrowsException(self, 'ieq.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Bar)',))
 
     def testIINC(self):
-        runTestThrowsException(self, 'iinc.asm', ('Exception', 'invalid operand types: expected (Integer), got (Foo)',))
+        runTestThrowsException(self, 'iinc.asm', ('Exception', "fetched invalid type: expected 'Integer' but got 'Foo'",))
 
     def testIDEC(self):
-        runTestThrowsException(self, 'idec.asm', ('Exception', 'invalid operand types: expected (Integer), got (Function)',))
+        runTestThrowsException(self, 'idec.asm', ('Exception', "fetched invalid type: expected 'Integer' but got 'Function'",))
 
     def testFADD(self):
         runTestThrowsException(self, 'fadd.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Float)',))

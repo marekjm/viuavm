@@ -71,13 +71,9 @@ viua::internals::types::byte* viua::process::Process::opmsg(viua::internals::typ
     string method_name;
     auto ot = viua::bytecode::decoder::operands::get_operand_type(addr);
     if (ot == OT_REGISTER_INDEX or ot == OT_POINTER) {
-        viua::types::Type* fn_source = nullptr;
-        tie(addr, fn_source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+        viua::types::Function* fn = nullptr;
+        tie(addr, fn) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Function>(addr, this);
 
-        auto fn = dynamic_cast<viua::types::Function*>(fn_source);
-        if (not fn) {
-            throw new viua::types::Exception("type is not callable: " + fn_source->type());
-        }
         method_name = fn->name();
 
         if (fn->type() == "Closure") {
@@ -130,20 +126,20 @@ viua::internals::types::byte* viua::process::Process::opmsg(viua::internals::typ
 viua::internals::types::byte* viua::process::Process::opinsert(viua::internals::types::byte* addr) {
     /** Insert an object as an attribute of another object.
      */
-    viua::types::Type *object_operand = nullptr, *key_operand = nullptr;
-    tie(addr, object_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
-    tie(addr, key_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
-    viua::assertions::assert_implements<viua::types::Object>(object_operand, "viua::types::Object");
-    viua::assertions::assert_typeof(key_operand, "String");
+    viua::types::Object *object = nullptr;
+    tie(addr, object) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Object>(addr, this);
+
+    viua::types::String *key = nullptr;
+    tie(addr, key) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::String>(addr, this);
 
     if (viua::bytecode::decoder::operands::get_operand_type(addr) == OT_POINTER) {
         viua::types::Type* source = nullptr;
         tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
-        static_cast<viua::types::Object*>(object_operand)->insert(static_cast<viua::types::String*>(key_operand)->str(), source->copy());
+        object->insert(key->str(), source->copy());
     } else {
         viua::kernel::Register* source = nullptr;
         tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
-        static_cast<viua::types::Object*>(object_operand)->insert(static_cast<viua::types::String*>(key_operand)->str(), source->give());
+        object->insert(key->str(), source->give());
     }
 
     return addr;
@@ -161,14 +157,13 @@ viua::internals::types::byte* viua::process::Process::opremove(viua::internals::
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 
-    viua::types::Type *object_operand = nullptr, *key_operand = nullptr;
-    tie(addr, object_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
-    tie(addr, key_operand) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+    viua::types::Object *object = nullptr;
+    tie(addr, object) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Object>(addr, this);
 
-    viua::assertions::assert_implements<viua::types::Object>(object_operand, "viua::types::Object");
-    viua::assertions::assert_typeof(key_operand, "String");
+    viua::types::String *key = nullptr;
+    tie(addr, key) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::String>(addr, this);
 
-    unique_ptr<viua::types::Type> result { static_cast<viua::types::Object*>(object_operand)->remove(static_cast<viua::types::String*>(key_operand)->str()) };
+    unique_ptr<viua::types::Type> result { object->remove(key->str()) };
     if (not void_target) {
         *target = std::move(result);
     }

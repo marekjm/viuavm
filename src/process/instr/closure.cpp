@@ -32,8 +32,8 @@ using namespace std;
 
 
 viua::internals::types::byte* viua::process::Process::opcapture(viua::internals::types::byte* addr) {
-    viua::kernel::Register* target = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+    viua::types::Closure* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Closure>(addr, this);
 
     viua::internals::types::register_index target_register = 0;
     tie(addr, target_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
@@ -41,8 +41,7 @@ viua::internals::types::byte* viua::process::Process::opcapture(viua::internals:
     viua::kernel::Register* source = nullptr;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    auto target_closure = static_cast<viua::types::Closure*>(target->get());
-    if (target_register >= target_closure->rs()->size()) {
+    if (target_register >= target->rs()->size()) {
         throw new viua::types::Exception("cannot capture object: register index out exceeded size of closure register set");
     }
 
@@ -56,14 +55,14 @@ viua::internals::types::byte* viua::process::Process::opcapture(viua::internals:
         rf->rebind(source->give());
         *source = unique_ptr<viua::types::Type>{rf};  // set the register to contain the newly-created reference
     }
-    target_closure->rs()->register_at(target_register)->reset(source->get()->copy());
+    target->rs()->register_at(target_register)->reset(source->get()->copy());
 
     return addr;
 }
 
 viua::internals::types::byte* viua::process::Process::opcapturecopy(viua::internals::types::byte* addr) {
-    viua::kernel::Register* target = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+    viua::types::Closure* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Closure>(addr, this);
 
     viua::internals::types::register_index target_register = 0;
     tie(addr, target_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
@@ -71,19 +70,18 @@ viua::internals::types::byte* viua::process::Process::opcapturecopy(viua::intern
     viua::types::Type* source = nullptr;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
-    auto target_closure = static_cast<viua::types::Closure*>(target->get());
-    if (target_register >= target_closure->rs()->size()) {
+    if (target_register >= target->rs()->size()) {
         throw new viua::types::Exception("cannot capture object: register index out exceeded size of closure register set");
     }
 
-    target_closure->rs()->register_at(target_register)->reset(source->copy());
+    target->rs()->register_at(target_register)->reset(source->copy());
 
     return addr;
 }
 
 viua::internals::types::byte* viua::process::Process::opcapturemove(viua::internals::types::byte* addr) {
-    viua::kernel::Register* target = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+    viua::types::Closure* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Closure>(addr, this);
 
     viua::internals::types::register_index target_register = 0;
     tie(addr, target_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
@@ -91,12 +89,11 @@ viua::internals::types::byte* viua::process::Process::opcapturemove(viua::intern
     viua::kernel::Register* source = nullptr;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    auto target_closure = static_cast<viua::types::Closure*>(target->get());
-    if (target_register >= target_closure->rs()->size()) {
+    if (target_register >= target->rs()->size()) {
         throw new viua::types::Exception("cannot capture object: register index out exceeded size of closure register set");
     }
 
-    target_closure->rs()->register_at(target_register)->reset(source->give());
+    target->rs()->register_at(target_register)->reset(source->give());
 
     return addr;
 }
