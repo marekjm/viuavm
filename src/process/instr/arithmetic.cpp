@@ -33,39 +33,10 @@
 #include <viua/assert.h>
 using namespace std;
 
-template<template <typename T> class Operator> static void perform_comparison(OperandType result_type, viua::kernel::Register* target, viua::types::numeric::Number* lhs, viua::types::numeric::Number* rhs) {
-    if (result_type == OperandType::OT_INT) {
-        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<viua::types::Integer::underlying_type>()(lhs->as_integer(), rhs->as_integer()))};
-    } else if (result_type == OperandType::OT_INT8) {
-        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<viua::types::Integer::underlying_type>()(lhs->as_integer(), rhs->as_integer()))};
-    } else if (result_type == OperandType::OT_INT16) {
-        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<viua::types::Integer::underlying_type>()(lhs->as_integer(), rhs->as_integer()))};
-    } else if (result_type == OperandType::OT_INT32) {
-        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<viua::types::Integer::underlying_type>()(lhs->as_integer(), rhs->as_integer()))};
-    } else if (result_type == OperandType::OT_INT64) {
-        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<viua::types::Integer::underlying_type>()(lhs->as_integer(), rhs->as_integer()))};
-    } else if (result_type == OperandType::OT_UINT) {
-        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<viua::types::Integer::underlying_type>()(lhs->as_integer(), rhs->as_integer()))};
-    } else if (result_type == OperandType::OT_UINT8) {
-        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<viua::types::Integer::underlying_type>()(lhs->as_integer(), rhs->as_integer()))};
-    } else if (result_type == OperandType::OT_UINT16) {
-        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<viua::types::Integer::underlying_type>()(lhs->as_integer(), rhs->as_integer()))};
-    } else if (result_type == OperandType::OT_UINT32) {
-        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<viua::types::Integer::underlying_type>()(lhs->as_integer(), rhs->as_integer()))};
-    } else if (result_type == OperandType::OT_UINT64) {
-        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<viua::types::Integer::underlying_type>()(lhs->as_integer(), rhs->as_integer()))};
-    } else if (result_type == OperandType::OT_FLOAT) {
-        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<viua::types::Float::underlying_type>()(lhs->as_float(), rhs->as_float()))};
-    } else if (result_type == OperandType::OT_FLOAT32) {
-        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<viua::types::Float::underlying_type>()(lhs->as_float(), rhs->as_float()))};
-    } else if (result_type == OperandType::OT_FLOAT64) {
-        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<viua::types::Float::underlying_type>()(lhs->as_float(), rhs->as_float()))};
-    } else {
-        throw new viua::types::Exception("invalid operand type: illegal result type");
-    }
-}
+using ArithmeticOp = unique_ptr<viua::types::numeric::Number>(viua::types::numeric::Number::*)(const viua::types::numeric::Number&) const;
+using LogicOp = unique_ptr<viua::types::Boolean>(viua::types::numeric::Number::*)(const viua::types::numeric::Number&) const;
 
-template<template <typename T> class Operator> static viua::internals::types::byte* decode_operands_and_perform_comparison(viua::internals::types::byte* addr, viua::process::Process *process) {
+template < ArithmeticOp action > static auto arithmetic_impl(viua::internals::types::byte* addr, viua::process::Process *process) -> viua::internals::types::byte* {
     OperandType result_type = OperandType::OT_VOID;
     tie(addr, result_type) = viua::bytecode::decoder::operands::fetch_operand_type(addr);
 
@@ -85,14 +56,12 @@ template<template <typename T> class Operator> static viua::internals::types::by
     auto lhs = static_cast<viua::types::numeric::Number*>(lhs_raw);
     auto rhs = static_cast<viua::types::numeric::Number*>(rhs_raw);
 
-    perform_comparison<Operator>(result_type, target, lhs, rhs);
+    *target = (lhs->*action)(*rhs);
 
     return addr;
 }
 
-using Op = unique_ptr<viua::types::numeric::Number>(viua::types::numeric::Number::*)(const viua::types::numeric::Number&) const;
-
-template < Op action > static auto arithmetic_impl(viua::internals::types::byte* addr, viua::process::Process *process) -> viua::internals::types::byte* {
+template < LogicOp action > static auto logic_impl(viua::internals::types::byte* addr, viua::process::Process *process) -> viua::internals::types::byte* {
     OperandType result_type = OperandType::OT_VOID;
     tie(addr, result_type) = viua::bytecode::decoder::operands::fetch_operand_type(addr);
 
@@ -134,21 +103,21 @@ viua::internals::types::byte* viua::process::Process::opdiv(viua::internals::typ
 }
 
 viua::internals::types::byte* viua::process::Process::oplt(viua::internals::types::byte* addr) {
-    return decode_operands_and_perform_comparison<less>(addr, this);
+    return logic_impl<&viua::types::numeric::Number::operator< >(addr, this);
 }
 
 viua::internals::types::byte* viua::process::Process::oplte(viua::internals::types::byte* addr) {
-    return decode_operands_and_perform_comparison<less_equal>(addr, this);
+    return logic_impl<&viua::types::numeric::Number::operator<= >(addr, this);
 }
 
 viua::internals::types::byte* viua::process::Process::opgt(viua::internals::types::byte* addr) {
-    return decode_operands_and_perform_comparison<greater>(addr, this);
+    return logic_impl<&viua::types::numeric::Number::operator> >(addr, this);
 }
 
 viua::internals::types::byte* viua::process::Process::opgte(viua::internals::types::byte* addr) {
-    return decode_operands_and_perform_comparison<greater_equal>(addr, this);
+    return logic_impl<&viua::types::numeric::Number::operator>= >(addr, this);
 }
 
 viua::internals::types::byte* viua::process::Process::opeq(viua::internals::types::byte* addr) {
-    return decode_operands_and_perform_comparison<equal_to>(addr, this);
+    return logic_impl<&viua::types::numeric::Number::operator== >(addr, this);
 }
