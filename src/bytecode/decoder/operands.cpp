@@ -231,6 +231,10 @@ auto viua::bytecode::decoder::operands::fetch_object(viua::internals::types::byt
         throw new viua::types::Exception(oss.str());
     }
 
+    if (auto ref = dynamic_cast<viua::types::Reference*>(object)) {
+        object = ref->pointsTo();
+    }
+
     if (is_pointer_dereference) {
         auto pointer_object = dynamic_cast<viua::types::Pointer*>(object);
         if (pointer_object == nullptr) {
