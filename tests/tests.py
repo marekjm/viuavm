@@ -950,31 +950,31 @@ class InvalidInstructionOperandTypeTests(unittest.TestCase):
     PATH = './sample/asm/invalid_operand_types'
 
     def testIADD(self):
-        runTestThrowsException(self, 'iadd.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Integer, String)',))
+        runTestThrowsException(self, 'iadd.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'String'",))
 
     def testISUB(self):
-        runTestThrowsException(self, 'isub.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Integer, String)',))
+        runTestThrowsException(self, 'isub.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'String'",))
 
     def testIMUL(self):
-        runTestThrowsException(self, 'imul.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Float, String)',))
+        runTestThrowsException(self, 'imul.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'String'",))
 
     def testIDIV(self):
-        runTestThrowsException(self, 'idiv.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, String, Float)',))
+        runTestThrowsException(self, 'idiv.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'String'",))
 
     def testILT(self):
-        runTestThrowsException(self, 'ilt.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, String, String)',))
+        runTestThrowsException(self, 'ilt.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'String'",))
 
     def testILTE(self):
-        runTestThrowsException(self, 'ilte.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, String)',))
+        runTestThrowsException(self, 'ilte.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
 
     def testIGT(self):
-        runTestThrowsException(self, 'igt.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Bar)',))
+        runTestThrowsException(self, 'igt.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
 
     def testIGTE(self):
-        runTestThrowsException(self, 'igte.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Bar)',))
+        runTestThrowsException(self, 'igte.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
 
     def testIEQ(self):
-        runTestThrowsException(self, 'ieq.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Bar)',))
+        runTestThrowsException(self, 'ieq.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
 
     def testIINC(self):
         runTestThrowsException(self, 'iinc.asm', ('Exception', "fetched invalid type: expected 'Integer' but got 'Foo'",))
@@ -983,31 +983,31 @@ class InvalidInstructionOperandTypeTests(unittest.TestCase):
         runTestThrowsException(self, 'idec.asm', ('Exception', "fetched invalid type: expected 'Integer' but got 'Function'",))
 
     def testFADD(self):
-        runTestThrowsException(self, 'fadd.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Float)',))
+        runTestThrowsException(self, 'fadd.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
 
     def testFSUB(self):
-        runTestThrowsException(self, 'fsub.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Float)',))
+        runTestThrowsException(self, 'fsub.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
 
     def testFMUL(self):
-        runTestThrowsException(self, 'fmul.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Float)',))
+        runTestThrowsException(self, 'fmul.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
 
     def testFDIV(self):
-        runTestThrowsException(self, 'fdiv.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Float)',))
+        runTestThrowsException(self, 'fdiv.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
 
     def testFLT(self):
-        runTestThrowsException(self, 'flt.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Float)',))
+        runTestThrowsException(self, 'flt.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
 
     def testFLTE(self):
-        runTestThrowsException(self, 'flte.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Float)',))
+        runTestThrowsException(self, 'flte.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
 
     def testFGT(self):
-        runTestThrowsException(self, 'fgt.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Float)',))
+        runTestThrowsException(self, 'fgt.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
 
     def testFGTE(self):
-        runTestThrowsException(self, 'fgte.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Float)',))
+        runTestThrowsException(self, 'fgte.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
 
     def testFEQ(self):
-        runTestThrowsException(self, 'feq.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Float)',))
+        runTestThrowsException(self, 'feq.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
 
 
 class ObjectInstructionsTests(unittest.TestCase):

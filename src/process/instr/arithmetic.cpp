@@ -40,18 +40,11 @@ template < typename OpType, OpType action > static auto alu_impl(viua::internals
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, process);
 
-    viua::types::Type* lhs_raw = nullptr;
-    tie(addr, lhs_raw) = viua::bytecode::decoder::operands::fetch_object2(addr, process);
+    viua::types::numeric::Number* lhs = nullptr;
+    tie(addr, lhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::numeric::Number>(addr, process);
 
-    viua::types::Type* rhs_raw = nullptr;
-    tie(addr, rhs_raw) = viua::bytecode::decoder::operands::fetch_object2(addr, process);
-
-    using viua::types::numeric::Number;
-
-    viua::assertions::expect_types<Number>("Number", lhs_raw, rhs_raw);
-
-    auto lhs = static_cast<viua::types::numeric::Number*>(lhs_raw);
-    auto rhs = static_cast<viua::types::numeric::Number*>(rhs_raw);
+    viua::types::numeric::Number* rhs = nullptr;
+    tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::numeric::Number>(addr, process);
 
     *target = (lhs->*action)(*rhs);
 
