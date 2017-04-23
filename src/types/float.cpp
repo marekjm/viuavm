@@ -88,4 +88,17 @@ auto Float::as_float() const -> viua::float64 {
     return number;
 }
 
+auto Float::operator + (const numeric::Number& that) const -> unique_ptr<numeric::Number> {
+    return unique_ptr<numeric::Number>{ new Float(number + that.as_float()) };
+}
+auto Float::operator - (const numeric::Number& that) const -> unique_ptr<numeric::Number> {
+    return unique_ptr<numeric::Number>{ new Float(number - that.as_float()) };
+}
+auto Float::operator * (const numeric::Number& that) const -> unique_ptr<numeric::Number> {
+    return unique_ptr<numeric::Number>{ new Float(number * that.as_float()) };
+}
+auto Float::operator / (const numeric::Number& that) const -> unique_ptr<numeric::Number> {
+    return unique_ptr<numeric::Number>{ new Float(number / that.as_float()) };
+}
+
 Float::Float(decltype(number) n): number(n) {}

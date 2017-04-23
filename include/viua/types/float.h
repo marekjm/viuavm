@@ -63,6 +63,11 @@ namespace viua {
                 auto as_integer() const -> int64_t override;
                 auto as_float() const -> float64 override;
 
+                auto operator + (const Number&) const -> std::unique_ptr<Number> override;
+                auto operator - (const Number&) const -> std::unique_ptr<Number> override;
+                auto operator * (const Number&) const -> std::unique_ptr<Number> override;
+                auto operator / (const Number&) const -> std::unique_ptr<Number> override;
+
                 Float(decltype(number) n = 0);
         };
     }
