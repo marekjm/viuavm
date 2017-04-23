@@ -124,6 +124,9 @@ There are several categories of change:
 - bic: removed `link` instruction, `import` is now used to import both native and foreign modules
 - bic: renamed `.link:` directive to `.import:`
 - feature: add `atom` and `atomeq` instructions
+- bic: return type specifiers in arithmetic and logic instructions are dropped; ALU instructions' results inherit the type of the left-hand side operand, and
+  right-hand side operand is converted to the type of the left-hand side operand before the operation is executed
+- bic: only `Integer` and `Float` types are numeric, `Boolean` is not
 
 One limitation of static analyser (SA) introduced in this release is its inability to handle backwards jumps.
 This, however, is not a problem if the code does not use loops and
