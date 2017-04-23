@@ -65,6 +65,10 @@ auto viua::bytecode::decoder::operands::fetch_operand_type(viua::internals::type
     return tuple<viua::internals::types::byte*, OperandType>{ip, ot};
 }
 
+static auto integer_to_register_index(const viua::types::Integer::underlying_type n) -> viua::internals::types::register_index {
+    // FIXME maximum integer is greater than maximum register index, add bouns checking
+    return static_cast<viua::internals::types::register_index>(n);
+}
 static auto extract_register_index(viua::internals::types::byte *ip, viua::process::Process *process, bool pointers_allowed = false) -> tuple<viua::internals::types::byte*, viua::internals::types::register_index> {
     OperandType ot = viua::bytecode::decoder::operands::get_operand_type(ip);
     ++ip;
@@ -77,15 +81,15 @@ static auto extract_register_index(viua::internals::types::byte *ip, viua::proce
         // FIXME extract RS type
         ip += sizeof(viua::internals::RegisterSets);
     } else {
-        throw new viua::types::Exception("decoded invalid operand type: expected OT_REGISTER_INDEX, OT_REGISTER_INDEX" + (pointers_allowed ? string(", OT_POINTER") : string("")));
+        throw new viua::types::Exception("decoded invalid operand type: expected OT_REGISTER_INDEX, OT_REGISTER_REFERENCE" + (pointers_allowed ? string(", OT_POINTER") : string("")));
     }
     if (ot == OT_REGISTER_REFERENCE) {
         auto i = static_cast<viua::types::Integer*>(process->obtain(register_index));
         // FIXME Number::negative() -> bool is needed
-        if (i->as_int32() < 0) {
+        if (i->as_integer() < 0) {
             throw new viua::types::Exception("register indexes cannot be negative");
         }
-        register_index = i->as_uint32();
+        register_index = integer_to_register_index(i->as_integer());
     }
     return tuple<viua::internals::types::byte*, viua::internals::types::register_index>(ip, register_index);
 }
@@ -102,15 +106,15 @@ static auto extract_register_type_and_index(viua::internals::types::byte *ip, vi
         register_type = extract<viua::internals::RegisterSets>(ip);
         ip += sizeof(viua::internals::RegisterSets);
     } else {
-        throw new viua::types::Exception("decoded invalid operand type: expected OT_REGISTER_INDEX, OT_REGISTER_INDEX" + (pointers_allowed ? string(", OT_POINTER") : string("")));
+        throw new viua::types::Exception("decoded invalid operand type: expected OT_REGISTER_INDEX, OT_REGISTER_REFERENCE" + (pointers_allowed ? string(", OT_POINTER") : string("")));
     }
     if (ot == OT_REGISTER_REFERENCE) {
         auto i = static_cast<viua::types::Integer*>(process->obtain(register_index));
         // FIXME Number::negative() -> bool is needed
-        if (i->as_int32() < 0) {
+        if (i->as_integer() < 0) {
             throw new viua::types::Exception("register indexes cannot be negative");
         }
-        register_index = i->as_uint32();
+        register_index = integer_to_register_index(i->as_integer());
     }
     return tuple<viua::internals::types::byte*, viua::internals::RegisterSets, viua::internals::types::register_index>(ip, register_type, register_index);
 }
@@ -177,7 +181,9 @@ auto viua::bytecode::decoder::operands::fetch_primitive_int(viua::internals::typ
         // FIXME once dynamic operand types are implemented the need for this cast will go away
         // because the operand *will* be encoded as a real uint
         viua::types::Integer *i = static_cast<viua::types::Integer*>(p->obtain(index));
-        value = i->as_int32();
+
+        // FIXME plain_int (as encoded in bytecode) is 32 bits, but in-program integer is 64 bits
+        value = static_cast<decltype(value)>(i->as_integer());
     } else if (ot == OT_INT) {
         value = *reinterpret_cast<decltype(value)*>(ip);
         ip += sizeof(decltype(value));

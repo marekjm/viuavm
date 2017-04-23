@@ -21,9 +21,9 @@
     istore (.name: %iota forty_two) 42
     istore (.name: %iota sixty_nine) 69
 
-    lt int64 (.name: %iota compared) %forty_two %sixty_nine
+    lt (.name: %iota compared) %forty_two %sixty_nine
 
-    print (add int32 %iota %sixty_nine %compared)
+    print (add %iota %sixty_nine %compared)
 
     izero %0 local
     return

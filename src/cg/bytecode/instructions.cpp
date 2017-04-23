@@ -164,72 +164,35 @@ namespace cg {
             return insert_two_ri_instruction(addr_ptr, STOF, a, b);
         }
 
-        static viua::internals::types::byte* encode_operand_type(viua::internals::types::byte* addr_ptr, string operand_type) {
-            if (operand_type == "int") {
-                *(addr_ptr++) = OperandType::OT_INT;
-            } else if (operand_type == "int8") {
-                *(addr_ptr++) = OperandType::OT_INT8;
-            } else if (operand_type == "int16") {
-                *(addr_ptr++) = OperandType::OT_INT16;
-            } else if (operand_type == "int32") {
-                *(addr_ptr++) = OperandType::OT_INT32;
-            } else if (operand_type == "int64") {
-                *(addr_ptr++) = OperandType::OT_INT64;
-            } else if (operand_type == "uint") {
-                *(addr_ptr++) = OperandType::OT_UINT;
-            } else if (operand_type == "uint8") {
-                *(addr_ptr++) = OperandType::OT_UINT8;
-            } else if (operand_type == "uint16") {
-                *(addr_ptr++) = OperandType::OT_UINT16;
-            } else if (operand_type == "uint32") {
-                *(addr_ptr++) = OperandType::OT_UINT32;
-            } else if (operand_type == "uint64") {
-                *(addr_ptr++) = OperandType::OT_UINT64;
-            } else if (operand_type == "float") {
-                *(addr_ptr++) = OperandType::OT_FLOAT;
-            } else if (operand_type == "float32") {
-                *(addr_ptr++) = OperandType::OT_FLOAT32;
-            } else if (operand_type == "float64") {
-                *(addr_ptr++) = OperandType::OT_FLOAT64;
-            } else {
-                *(addr_ptr++) = OperandType::OT_VOID;
-            }
-            return addr_ptr;
+        static viua::internals::types::byte* emit_instruction_alu(viua::internals::types::byte* addr_ptr, OPCODE instruction, int_op target, int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, instruction, target, lhs, rhs);
         }
-        static viua::internals::types::byte* emit_instruction_alu(viua::internals::types::byte* addr_ptr, OPCODE instruction, std::string result_type, int_op target, int_op lhs, int_op rhs) {
-            *(addr_ptr++) = instruction;
-
-            addr_ptr = encode_operand_type(addr_ptr, result_type);
-            addr_ptr = insert_ri_operand(addr_ptr, target);
-            addr_ptr = insert_ri_operand(addr_ptr, lhs);
-            return insert_ri_operand(addr_ptr, rhs);
+        viua::internals::types::byte* opadd(viua::internals::types::byte* addr_ptr, int_op target, int_op lhs, int_op rhs) {
+            return emit_instruction_alu(addr_ptr, ADD, target, lhs, rhs);
         }
-        viua::internals::types::byte* opadd(viua::internals::types::byte* addr_ptr, std::string result_type, int_op target, int_op lhs, int_op rhs) {
-            return emit_instruction_alu(addr_ptr, ADD, result_type, target, lhs, rhs);
+        viua::internals::types::byte* opsub(viua::internals::types::byte* addr_ptr, int_op target, int_op lhs, int_op rhs) {
+            return emit_instruction_alu(addr_ptr, SUB, target, lhs, rhs);
         }
-        viua::internals::types::byte* opsub(viua::internals::types::byte* addr_ptr, std::string result_type, int_op target, int_op lhs, int_op rhs) {
-            return emit_instruction_alu(addr_ptr, SUB, result_type, target, lhs, rhs);
+        viua::internals::types::byte* opmul(viua::internals::types::byte* addr_ptr, int_op target, int_op lhs, int_op rhs) {
+            return emit_instruction_alu(addr_ptr, MUL, target, lhs, rhs);
         }
-        viua::internals::types::byte* opmul(viua::internals::types::byte* addr_ptr, std::string result_type, int_op target, int_op lhs, int_op rhs) {
-            return emit_instruction_alu(addr_ptr, MUL, result_type, target, lhs, rhs);
+        viua::internals::types::byte* opdiv(viua::internals::types::byte* addr_ptr, int_op target, int_op lhs, int_op rhs) {
+            return emit_instruction_alu(addr_ptr, DIV, target, lhs, rhs);
         }
-        viua::internals::types::byte* opdiv(viua::internals::types::byte* addr_ptr, std::string result_type, int_op target, int_op lhs, int_op rhs) {
-            return emit_instruction_alu(addr_ptr, DIV, result_type, target, lhs, rhs);
+        viua::internals::types::byte* oplt(viua::internals::types::byte* addr_ptr, int_op target, int_op lhs, int_op rhs) {
+            return emit_instruction_alu(addr_ptr, LT, target, lhs, rhs);
         }
-        viua::internals::types::byte* oplt(viua::internals::types::byte* addr_ptr, std::string result_type, int_op target, int_op lhs, int_op rhs) {
-            return emit_instruction_alu(addr_ptr, LT, result_type, target, lhs, rhs);
+        viua::internals::types::byte* oplte(viua::internals::types::byte* addr_ptr, int_op target, int_op lhs, int_op rhs) {
+            return emit_instruction_alu(addr_ptr, LTE, target, lhs, rhs);
         }
-        viua::internals::types::byte* oplte(viua::internals::types::byte* addr_ptr, std::string result_type, int_op target, int_op lhs, int_op rhs) {
-            return emit_instruction_alu(addr_ptr, LTE, result_type, target, lhs, rhs);
+        viua::internals::types::byte* opgt(viua::internals::types::byte* addr_ptr, int_op target, int_op lhs, int_op rhs) {
+            return emit_instruction_alu(addr_ptr, GT, target, lhs, rhs);
         }
-        viua::internals::types::byte* opgt(viua::internals::types::byte* addr_ptr, std::string result_type, int_op target, int_op lhs, int_op rhs) {
-            return emit_instruction_alu(addr_ptr, GT, result_type, target, lhs, rhs);
+        viua::internals::types::byte* opgte(viua::internals::types::byte* addr_ptr, int_op target, int_op lhs, int_op rhs) {
+            return emit_instruction_alu(addr_ptr, GTE, target, lhs, rhs);
         }
-        viua::internals::types::byte* opgte(viua::internals::types::byte* addr_ptr, std::string result_type, int_op target, int_op lhs, int_op rhs) {
-            return emit_instruction_alu(addr_ptr, GTE, result_type, target, lhs, rhs);
-        }
-        viua::internals::types::byte* opeq(viua::internals::types::byte* addr_ptr, std::string result_type, int_op target, int_op lhs, int_op rhs) {
-            return emit_instruction_alu(addr_ptr, EQ, result_type, target, lhs, rhs);
+        viua::internals::types::byte* opeq(viua::internals::types::byte* addr_ptr, int_op target, int_op lhs, int_op rhs) {
+            return emit_instruction_alu(addr_ptr, EQ, target, lhs, rhs);
         }
 
         viua::internals::types::byte* opstrstore(viua::internals::types::byte* addr_ptr, int_op reg, string s) {

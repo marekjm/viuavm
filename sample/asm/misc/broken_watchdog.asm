@@ -53,14 +53,14 @@
     arg %counter %0
 
     .name: 4 i
-    sub int64 %counter %counter (istore %i 9)
-    div int64 %counter %counter (istore %i 2)
+    sub %counter %counter (istore %i 9)
+    div %counter %counter (istore %i 2)
 
     .name: 2 zero
     izero %zero
 
     .mark: __loop_begin
-    if (lte int64 %3 %counter %zero) __loop_end +1
+    if (lte %3 %counter %zero) __loop_end +1
     idec %counter
     jump __loop_begin
     .mark: __loop_end

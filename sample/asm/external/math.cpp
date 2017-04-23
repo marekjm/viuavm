@@ -39,7 +39,7 @@ static void math_sqrt(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Re
         throw new viua::types::Exception("invalid type of parameter 0: expected Float");
     }
 
-    auto square_root = sqrt(dynamic_cast<viua::types::numeric::Number*>(frame->arguments->at(0))->as_float64());
+    auto square_root = sqrt(dynamic_cast<viua::types::numeric::Number*>(frame->arguments->at(0))->as_float());
     frame->local_register_set->set(0, unique_ptr<viua::types::Type>{new viua::types::Float(square_root)});
 }
 

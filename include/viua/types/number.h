@@ -26,6 +26,7 @@
 #include <string>
 #include <sstream>
 #include <viua/types/type.h>
+#include <viua/types/boolean.h>
 
 
 namespace viua {
@@ -51,21 +52,22 @@ namespace viua {
                     bool boolean() const override = 0;
 
                     virtual bool negative() {
-                        return (as_int64() < 0);
+                        return (as_integer() < 0);
                     }
 
-                    virtual int8_t as_int8() const = 0;
-                    virtual int16_t as_int16() const = 0;
-                    virtual int32_t as_int32() const = 0;
-                    virtual int64_t as_int64() const = 0;
+                    virtual auto as_integer() const -> int64_t = 0;
+                    virtual auto as_float() const -> float64 = 0;
 
-                    virtual uint8_t as_uint8() const = 0;
-                    virtual uint16_t as_uint16() const = 0;
-                    virtual uint32_t as_uint32() const = 0;
-                    virtual uint64_t as_uint64() const = 0;
+                    virtual auto operator + (const Number&) const -> std::unique_ptr<Number> = 0;
+                    virtual auto operator - (const Number&) const -> std::unique_ptr<Number> = 0;
+                    virtual auto operator * (const Number&) const -> std::unique_ptr<Number> = 0;
+                    virtual auto operator / (const Number&) const -> std::unique_ptr<Number> = 0;
 
-                    virtual float32 as_float32() const = 0;
-                    virtual float64 as_float64() const = 0;
+                    virtual auto operator < (const Number&) const -> std::unique_ptr<Boolean> = 0;
+                    virtual auto operator <= (const Number&) const -> std::unique_ptr<Boolean> = 0;
+                    virtual auto operator > (const Number&) const -> std::unique_ptr<Boolean> = 0;
+                    virtual auto operator >= (const Number&) const -> std::unique_ptr<Boolean> = 0;
+                    virtual auto operator == (const Number&) const -> std::unique_ptr<Boolean> = 0;
 
                     Number() {}
                     virtual ~Number() {}

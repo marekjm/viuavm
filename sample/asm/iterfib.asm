@@ -39,8 +39,8 @@
 
     .mark: loop
     .name: %iota result
-    if (not (lt int64 %iota (vlen %length %vector) %number)) finished
-    add int64 %result *(vat %iota %vector %minus_one) *(vat %iota %vector %minus_two)
+    if (not (lt %iota (vlen %length %vector) %number)) finished
+    add %result *(vat %iota %vector %minus_one) *(vat %iota %vector %minus_two)
     vpush %vector %result
     jump loop
 

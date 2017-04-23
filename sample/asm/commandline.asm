@@ -25,7 +25,7 @@
     istore %counter 0
 
     .mark: loop
-    if (lt int64 %4 %counter %len) +1 break
+    if (lt %4 %counter %len) +1 break
 
     print *(vat %5 %1 @counter)
 

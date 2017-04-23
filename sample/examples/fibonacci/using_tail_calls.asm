@@ -25,7 +25,7 @@
 
     if %current_value +1 fibonacci/2__finished
 
-    add int64 %accumulator %current_value
+    add %accumulator %current_value
 
     frame ^[(pamv %0 (idec %current_value)) (pamv %1 %accumulator)]
     tailcall fibonacci/2

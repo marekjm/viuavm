@@ -22,7 +22,7 @@
     istore %1 1
     strstore %2 "Oh, look, a bug"
 
-    add int64 %3 %1 %2
+    add %3 %1 %2
     print %3
 
     izero %0 local

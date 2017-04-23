@@ -36,7 +36,7 @@
     vpush %vector (copy %to_push %counter)
     iinc %counter
     ; reuse 'to_push' register since it's empty
-    if (gte int64 %to_push %counter %limit) +1 begin_loop
+    if (gte %to_push %counter %limit) +1 begin_loop
 
     return
 .end
@@ -64,7 +64,7 @@
     vpush %vector (call %to_push %fn)
     iinc %counter
     ; reuse 'to_push' register since it's empty
-    if (gte int64 %to_push %counter %limit) +1 begin_loop
+    if (gte %to_push %counter %limit) +1 begin_loop
 
     return
 .end
@@ -153,7 +153,7 @@
     ; break loop if there wasn't a match
     if %result +1 end_loop
 
-    if (gte int64 %tmp (iinc %index) %limit) +1 begin_loop
+    if (gte %tmp (iinc %index) %limit) +1 begin_loop
     .mark: end_loop
 
     return
@@ -187,7 +187,7 @@
     ; break the loop if there was a match
     if %result end_loop
 
-    if (gte int64 %tmp (iinc %index) %limit) +1 begin_loop
+    if (gte %tmp (iinc %index) %limit) +1 begin_loop
     .mark: end_loop
 
     return

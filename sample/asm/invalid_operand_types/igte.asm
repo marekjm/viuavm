@@ -23,7 +23,7 @@
 
     register (class %2 Bar)
     new %2 Bar
-    gte int64 %3 %1 %2
+    gte %3 %1 %2
     print %3
 
     izero %0 local

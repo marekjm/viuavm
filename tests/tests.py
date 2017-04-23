@@ -463,6 +463,7 @@ class IntegerInstructionsTests(unittest.TestCase):
     def testIntegersInCondition(self):
         runTest(self, 'in_condition.asm', 'true', 0)
 
+    @unittest.skip('')
     def testBooleanAsInteger(self):
         runTest(self, 'boolean_as_int.asm', '70', 0)
 
@@ -1212,7 +1213,7 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'or_use_of_empty_register_2nd.asm', "./sample/asm/static_analysis_errors/or_use_of_empty_register_2nd.asm:22:14: error: use of empty register: 2")
 
     def testIaddOfEmptyRegisters(self):
-        runTestFailsToAssemble(self, 'iadd_of_empty_registers.asm', "./sample/asm/static_analysis_errors/iadd_of_empty_registers.asm:21:17: error: use of empty register: 1")
+        runTestFailsToAssemble(self, 'iadd_of_empty_registers.asm', "./sample/asm/static_analysis_errors/iadd_of_empty_registers.asm:21:12: error: use of empty register: 1")
 
     def testNotOfEmptyRegisters(self):
         runTestFailsToAssemble(self, 'not_of_empty_register.asm', "./sample/asm/static_analysis_errors/not_of_empty_register.asm:21:9: error: not of empty register: 1")
@@ -1359,13 +1360,13 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
 
     def testUseOfEmptyFirstOperandInIadd(self):
         runTestFailsToAssembleDetailed(self, 'use_of_empty_first_operand_in_iadd.asm', [
-            '24:35: error: use of empty register: first := 1',
+            '24:30: error: use of empty register: first := 1',
             '20:12: error: in function main/0',
         ])
 
     def testUseOfEmptySecondOperandInIadd(self):
         runTestFailsToAssembleDetailed(self, 'use_of_empty_second_operand_in_iadd.asm', [
-            '24:42: error: use of empty register: second := 2',
+            '24:37: error: use of empty register: second := 2',
             '20:12: error: in function main/0',
         ])
 

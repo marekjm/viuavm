@@ -20,7 +20,7 @@
 .function: main/1
     fstore %1 1.0
     strstore %2 "Hello World!"
-    mul int64 %3 %1 %2
+    mul %3 %1 %2
     print %3
 
     izero %0 local

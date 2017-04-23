@@ -26,7 +26,7 @@
     .mark: fibonacci/2__loop
     if %current_value +1 fibonacci/2__finished
 
-    add int64 %accumulator ^(idec %current_value)
+    add %accumulator ^(idec %current_value)
 
     jump fibonacci/2__loop
 
