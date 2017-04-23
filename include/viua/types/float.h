@@ -60,6 +60,9 @@ namespace viua {
                 viua::float32 as_float32() const override;
                 viua::float64 as_float64() const override;
 
+                auto as_integer() const -> int64_t override;
+                auto as_float() const -> float64 override;
+
                 Float(decltype(number) n = 0);
         };
     }

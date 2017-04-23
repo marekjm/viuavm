@@ -67,6 +67,9 @@ namespace viua {
                     virtual float32 as_float32() const = 0;
                     virtual float64 as_float64() const = 0;
 
+                    virtual auto as_integer() const -> int64_t = 0;
+                    virtual auto as_float() const -> float64 = 0;
+
                     Number() {}
                     virtual ~Number() {}
             };

@@ -82,3 +82,11 @@ viua::float32 Integer::as_float32() const {
 viua::float64 Integer::as_float64() const {
     return static_cast<viua::float64>(number);
 }
+
+auto Integer::as_integer() const -> int64_t {
+    return number;
+}
+
+auto Integer::as_float() const -> viua::float64 {
+    return static_cast<viua::float64>(number);
+}

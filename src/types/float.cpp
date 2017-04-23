@@ -80,4 +80,12 @@ viua::float64 Float::as_float64() const {
     return static_cast<viua::float64>(number);
 }
 
+auto Float::as_integer() const -> int64_t {
+    return static_cast<int64_t>(number);
+}
+
+auto Float::as_float() const -> viua::float64 {
+    return number;
+}
+
 Float::Float(decltype(number) n): number(n) {}
