@@ -35,31 +35,31 @@ using namespace std;
 
 template<template <typename T> class Operator> static void perform_comparison(OperandType result_type, viua::kernel::Register* target, viua::types::numeric::Number* lhs, viua::types::numeric::Number* rhs) {
     if (result_type == OperandType::OT_INT) {
-        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<int32_t>()(lhs->as_int32(), rhs->as_int32()))};
+        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<viua::types::Integer::underlying_type>()(lhs->as_integer(), rhs->as_integer()))};
     } else if (result_type == OperandType::OT_INT8) {
-        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<int32_t>()(lhs->as_int32(), rhs->as_int32()))};
+        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<viua::types::Integer::underlying_type>()(lhs->as_integer(), rhs->as_integer()))};
     } else if (result_type == OperandType::OT_INT16) {
-        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<int32_t>()(lhs->as_int32(), rhs->as_int32()))};
+        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<viua::types::Integer::underlying_type>()(lhs->as_integer(), rhs->as_integer()))};
     } else if (result_type == OperandType::OT_INT32) {
-        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<int32_t>()(lhs->as_int32(), rhs->as_int32()))};
+        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<viua::types::Integer::underlying_type>()(lhs->as_integer(), rhs->as_integer()))};
     } else if (result_type == OperandType::OT_INT64) {
-        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<int32_t>()(lhs->as_int32(), rhs->as_int32()))};
+        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<viua::types::Integer::underlying_type>()(lhs->as_integer(), rhs->as_integer()))};
     } else if (result_type == OperandType::OT_UINT) {
-        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<int32_t>()(lhs->as_int32(), rhs->as_int32()))};
+        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<viua::types::Integer::underlying_type>()(lhs->as_integer(), rhs->as_integer()))};
     } else if (result_type == OperandType::OT_UINT8) {
-        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<int32_t>()(lhs->as_int32(), rhs->as_int32()))};
+        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<viua::types::Integer::underlying_type>()(lhs->as_integer(), rhs->as_integer()))};
     } else if (result_type == OperandType::OT_UINT16) {
-        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<int32_t>()(lhs->as_int32(), rhs->as_int32()))};
+        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<viua::types::Integer::underlying_type>()(lhs->as_integer(), rhs->as_integer()))};
     } else if (result_type == OperandType::OT_UINT32) {
-        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<int32_t>()(lhs->as_int32(), rhs->as_int32()))};
+        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<viua::types::Integer::underlying_type>()(lhs->as_integer(), rhs->as_integer()))};
     } else if (result_type == OperandType::OT_UINT64) {
-        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<int32_t>()(lhs->as_int32(), rhs->as_int32()))};
+        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<viua::types::Integer::underlying_type>()(lhs->as_integer(), rhs->as_integer()))};
     } else if (result_type == OperandType::OT_FLOAT) {
-        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<double>()(lhs->as_float64(), rhs->as_float64()))};
+        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<viua::types::Float::underlying_type>()(lhs->as_float(), rhs->as_float()))};
     } else if (result_type == OperandType::OT_FLOAT32) {
-        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<double>()(lhs->as_float64(), rhs->as_float64()))};
+        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<viua::types::Float::underlying_type>()(lhs->as_float(), rhs->as_float()))};
     } else if (result_type == OperandType::OT_FLOAT64) {
-        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<double>()(lhs->as_float64(), rhs->as_float64()))};
+        *target = unique_ptr<viua::types::Type>{new viua::types::Boolean(Operator<viua::types::Float::underlying_type>()(lhs->as_float(), rhs->as_float()))};
     } else {
         throw new viua::types::Exception("invalid operand type: illegal result type");
     }
