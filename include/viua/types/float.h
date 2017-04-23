@@ -34,7 +34,11 @@ namespace viua {
             /** Basic integer type.
              *  It is suitable for mathematical operations.
              */
-            double number;
+            public:
+            using underlying_type = double;
+
+            private:
+            underlying_type number;
 
             public:
                 static const std::string type_name;
