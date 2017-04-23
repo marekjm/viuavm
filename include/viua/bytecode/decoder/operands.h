@@ -69,7 +69,6 @@ namespace viua {
                 auto fetch_primitive_string(viua::internals::types::byte*, viua::process::Process*) -> std::tuple<viua::internals::types::byte*, std::string>;
                 auto fetch_atom(viua::internals::types::byte*, viua::process::Process*) -> std::tuple<viua::internals::types::byte*, std::string>;
                 auto fetch_object(viua::internals::types::byte*, viua::process::Process*) -> std::tuple<viua::internals::types::byte*, viua::types::Type*>;
-                auto fetch_object2(viua::internals::types::byte*, viua::process::Process*) -> std::tuple<viua::internals::types::byte*, viua::types::Type*>;
 
                 template < typename RequestedType > auto fetch_object_of(viua::internals::types::byte* ip, viua::process::Process* p) -> std::tuple<viua::internals::types::byte*, RequestedType*> {
                     viua::internals::types::byte* addr = nullptr;
