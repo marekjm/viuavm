@@ -26,6 +26,7 @@
 #include <string>
 #include <sstream>
 #include <viua/types/type.h>
+#include <viua/types/boolean.h>
 
 
 namespace viua {
@@ -61,6 +62,12 @@ namespace viua {
                     virtual auto operator - (const Number&) const -> std::unique_ptr<Number> = 0;
                     virtual auto operator * (const Number&) const -> std::unique_ptr<Number> = 0;
                     virtual auto operator / (const Number&) const -> std::unique_ptr<Number> = 0;
+
+                    virtual auto operator < (const Number&) const -> std::unique_ptr<Boolean> = 0;
+                    virtual auto operator <= (const Number&) const -> std::unique_ptr<Boolean> = 0;
+                    virtual auto operator > (const Number&) const -> std::unique_ptr<Boolean> = 0;
+                    virtual auto operator >= (const Number&) const -> std::unique_ptr<Boolean> = 0;
+                    virtual auto operator == (const Number&) const -> std::unique_ptr<Boolean> = 0;
 
                     Number() {}
                     virtual ~Number() {}

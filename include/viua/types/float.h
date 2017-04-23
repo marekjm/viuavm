@@ -59,6 +59,12 @@ namespace viua {
                 auto operator * (const Number&) const -> std::unique_ptr<Number> override;
                 auto operator / (const Number&) const -> std::unique_ptr<Number> override;
 
+                auto operator < (const Number&) const -> std::unique_ptr<Boolean> override;
+                auto operator <= (const Number&) const -> std::unique_ptr<Boolean> override;
+                auto operator > (const Number&) const -> std::unique_ptr<Boolean> override;
+                auto operator >= (const Number&) const -> std::unique_ptr<Boolean> override;
+                auto operator == (const Number&) const -> std::unique_ptr<Boolean> override;
+
                 Float(decltype(number) n = 0);
         };
     }
