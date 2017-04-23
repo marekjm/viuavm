@@ -23,7 +23,7 @@
 
     fstore %2 1.0
 
-    gt float32 %3 %1 %2
+    gt %3 %1 %2
     print %3
 
     izero %0 local

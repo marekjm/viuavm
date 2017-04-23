@@ -60,7 +60,7 @@
 
     print %5
 
-    eq int64 %8 %7 %0
+    eq %8 %7 %0
     if %8 one_beer
     if %0 again
 

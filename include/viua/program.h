@@ -75,16 +75,16 @@ class Program {
     Program& opstoi(int_op, int_op);
     Program& opstof(int_op, int_op);
 
-    Program& opadd(std::string, int_op, int_op, int_op);
-    Program& opsub(std::string, int_op, int_op, int_op);
-    Program& opmul(std::string, int_op, int_op, int_op);
-    Program& opdiv(std::string, int_op, int_op, int_op);
+    Program& opadd(int_op, int_op, int_op);
+    Program& opsub(int_op, int_op, int_op);
+    Program& opmul(int_op, int_op, int_op);
+    Program& opdiv(int_op, int_op, int_op);
 
-    Program& oplt(std::string, int_op, int_op, int_op);
-    Program& oplte(std::string, int_op, int_op, int_op);
-    Program& opgt(std::string, int_op, int_op, int_op);
-    Program& opgte(std::string, int_op, int_op, int_op);
-    Program& opeq(std::string, int_op, int_op, int_op);
+    Program& oplt(int_op, int_op, int_op);
+    Program& oplte(int_op, int_op, int_op);
+    Program& opgt(int_op, int_op, int_op);
+    Program& opgte(int_op, int_op, int_op);
+    Program& opeq(int_op, int_op, int_op);
 
     Program& opstrstore(int_op, std::string);
 

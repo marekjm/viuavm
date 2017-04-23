@@ -22,7 +22,7 @@
     istore %2 27
 
     stoi %3 %1
-    print (add int8 %3 %2 %3)
+    print (add %3 %2 %3)
 
     izero %0 local
     return

@@ -22,7 +22,7 @@
 .function: main/1
     fstore %1 3.14
     fstore %2 2.0
-    div float32 %3 %1 %2
+    div %3 %1 %2
     print %3
     izero %0 local
     return

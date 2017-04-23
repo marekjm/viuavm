@@ -26,7 +26,7 @@
     frame ^[(pamv %0 (idec (copy %2 %current_value)))]
     call %2 fibonacci/1
 
-    add int64 %current_value %2
+    add %current_value %2
 
     .mark: fibonacci/1__finished
     move %0 %current_value

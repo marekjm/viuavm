@@ -639,7 +639,6 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
         } else if (token == "add" or token == "sub" or token == "mul" or token == "div" or
                    token == "lt" or token == "lte" or token == "gt" or token == "gte" or token == "eq") {
             ++i; // skip mnemonic token
-            ++i; // skip result type token
 
             TokenIndex target = i;
             TokenIndex lhs = target + 2;

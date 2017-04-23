@@ -103,48 +103,48 @@ Program& Program::opstof(int_op a, int_op b) {
     return (*this);
 }
 
-Program& Program::opadd(string result_type, int_op target, int_op lhs, int_op rhs) {
-    addr_ptr = cg::bytecode::opadd(addr_ptr, result_type, target, lhs, rhs);
+Program& Program::opadd(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opadd(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-Program& Program::opsub(string result_type, int_op target, int_op lhs, int_op rhs) {
-    addr_ptr = cg::bytecode::opsub(addr_ptr, result_type, target, lhs, rhs);
+Program& Program::opsub(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opsub(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-Program& Program::opmul(string result_type, int_op target, int_op lhs, int_op rhs) {
-    addr_ptr = cg::bytecode::opmul(addr_ptr, result_type, target, lhs, rhs);
+Program& Program::opmul(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opmul(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-Program& Program::opdiv(string result_type, int_op target, int_op lhs, int_op rhs) {
-    addr_ptr = cg::bytecode::opdiv(addr_ptr, result_type, target, lhs, rhs);
+Program& Program::opdiv(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opdiv(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-Program& Program::oplt(string result_type, int_op target, int_op lhs, int_op rhs) {
-    addr_ptr = cg::bytecode::oplt(addr_ptr, result_type, target, lhs, rhs);
+Program& Program::oplt(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::oplt(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-Program& Program::oplte(string result_type, int_op target, int_op lhs, int_op rhs) {
-    addr_ptr = cg::bytecode::oplte(addr_ptr, result_type, target, lhs, rhs);
+Program& Program::oplte(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::oplte(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-Program& Program::opgt(string result_type, int_op target, int_op lhs, int_op rhs) {
-    addr_ptr = cg::bytecode::opgt(addr_ptr, result_type, target, lhs, rhs);
+Program& Program::opgt(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opgt(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-Program& Program::opgte(string result_type, int_op target, int_op lhs, int_op rhs) {
-    addr_ptr = cg::bytecode::opgte(addr_ptr, result_type, target, lhs, rhs);
+Program& Program::opgte(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opgte(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-Program& Program::opeq(string result_type, int_op target, int_op lhs, int_op rhs) {
-    addr_ptr = cg::bytecode::opeq(addr_ptr, result_type, target, lhs, rhs);
+Program& Program::opeq(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opeq(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 

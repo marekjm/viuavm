@@ -55,10 +55,10 @@
     catch "Exception" failed_to_convert
     enter check_the_number
 
-    if (eq int64 %4 %3 %0) abort
-    if (eq int64 %4 %3 %1) correct
+    if (eq %4 %3 %0) abort
+    if (eq %4 %3 %1) correct
 
-    if (lt int64 %4 %3 %1) +1 +3
+    if (lt %4 %3 %1) +1 +3
     strstore %4 "guess: your number is less than the target"
     jump incorrect
     strstore %4 "guess: your number is greater than the target"

@@ -37,8 +37,9 @@ using ArithmeticOp = unique_ptr<viua::types::numeric::Number>(viua::types::numer
 using LogicOp = unique_ptr<viua::types::Boolean>(viua::types::numeric::Number::*)(const viua::types::numeric::Number&) const;
 
 template < typename OpType, OpType action > static auto alu_impl(viua::internals::types::byte* addr, viua::process::Process *process) -> viua::internals::types::byte* {
-    OperandType result_type = OperandType::OT_VOID;
-    tie(addr, result_type) = viua::bytecode::decoder::operands::fetch_operand_type(addr);
+    /* OperandType result_type = OperandType::OT_VOID; */
+    /* tie(addr, result_type) = viua::bytecode::decoder::operands::fetch_operand_type(addr); */
+    /* ++addr; */
 
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, process);

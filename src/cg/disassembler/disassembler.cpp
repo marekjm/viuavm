@@ -370,36 +370,6 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         case GT:
         case GTE:
         case EQ:
-            if (*ptr == OperandType::OT_INT) {
-                oss << ' ' << "int";
-            } else if (*ptr == OperandType::OT_INT8) {
-                oss << ' ' << "int8";
-            } else if (*ptr == OperandType::OT_INT16) {
-                oss << ' ' << "int16";
-            } else if (*ptr == OperandType::OT_INT32) {
-                oss << ' ' << "int32";
-            } else if (*ptr == OperandType::OT_INT64) {
-                oss << ' ' << "int64";
-            } else if (*ptr == OperandType::OT_UINT) {
-                oss << ' ' << "uint";
-            } else if (*ptr == OperandType::OT_UINT8) {
-                oss << ' ' << "uint8";
-            } else if (*ptr == OperandType::OT_UINT16) {
-                oss << ' ' << "uint16";
-            } else if (*ptr == OperandType::OT_UINT32) {
-                oss << ' ' << "uint32";
-            } else if (*ptr == OperandType::OT_UINT64) {
-                oss << ' ' << "uint64";
-            } else if (*ptr == OperandType::OT_FLOAT) {
-                oss << ' ' << "float";
-            } else if (*ptr == OperandType::OT_FLOAT32) {
-                oss << ' ' << "float32";
-            } else if (*ptr == OperandType::OT_FLOAT64) {
-                oss << ' ' << "float64";
-            } else {
-                oss << ' ' << "void";
-            }
-            ++ptr;
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);

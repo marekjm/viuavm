@@ -22,10 +22,10 @@
     arg %1 %0
 
     .mark: loop_begin
-    if (lt int64 %3 %1 %bound_variable) loop_end loop_body
+    if (lt %3 %1 %bound_variable) loop_end loop_body
 
     .mark: loop_body
-    sub int64 %1 %1 %bound_variable
+    sub %1 %1 %bound_variable
     jump loop_begin
 
     .mark: loop_end
@@ -62,7 +62,7 @@
 
     ; while (...) {
     .mark: loop_begin
-    if (gte int64 %6 %4 %5) loop_end
+    if (gte %6 %4 %5) loop_end
 
     ; call filtering function to determine whether current element
     ; is a valid value

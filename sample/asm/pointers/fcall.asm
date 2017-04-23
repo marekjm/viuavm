@@ -21,7 +21,7 @@
     arg (.name: %iota lhs) %0
     arg (.name: %iota rhs) %0
 
-    add int64 %0 %lhs %rhs
+    add %0 %lhs %rhs
 
     return
 .end
@@ -30,7 +30,7 @@
     arg (.name: %iota lhs) %0
     arg (.name: %iota rhs) %0
 
-    mul int64 %0 %lhs %rhs
+    mul %0 %lhs %rhs
 
     return
 .end

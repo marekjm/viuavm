@@ -81,7 +81,7 @@ static auto extract_register_index(viua::internals::types::byte *ip, viua::proce
         // FIXME extract RS type
         ip += sizeof(viua::internals::RegisterSets);
     } else {
-        throw new viua::types::Exception("decoded invalid operand type: expected OT_REGISTER_INDEX, OT_REGISTER_INDEX" + (pointers_allowed ? string(", OT_POINTER") : string("")));
+        throw new viua::types::Exception("decoded invalid operand type: expected OT_REGISTER_INDEX, OT_REGISTER_REFERENCE" + (pointers_allowed ? string(", OT_POINTER") : string("")));
     }
     if (ot == OT_REGISTER_REFERENCE) {
         auto i = static_cast<viua::types::Integer*>(process->obtain(register_index));
@@ -106,7 +106,7 @@ static auto extract_register_type_and_index(viua::internals::types::byte *ip, vi
         register_type = extract<viua::internals::RegisterSets>(ip);
         ip += sizeof(viua::internals::RegisterSets);
     } else {
-        throw new viua::types::Exception("decoded invalid operand type: expected OT_REGISTER_INDEX, OT_REGISTER_INDEX" + (pointers_allowed ? string(", OT_POINTER") : string("")));
+        throw new viua::types::Exception("decoded invalid operand type: expected OT_REGISTER_INDEX, OT_REGISTER_REFERENCE" + (pointers_allowed ? string(", OT_POINTER") : string("")));
     }
     if (ot == OT_REGISTER_REFERENCE) {
         auto i = static_cast<viua::types::Integer*>(process->obtain(register_index));

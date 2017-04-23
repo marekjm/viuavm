@@ -28,13 +28,13 @@
     copy %result %number
 
     ; if number is less than modulo, jump straight to result printing
-    lt int64 %4 %number %modulo
+    lt %4 %number %modulo
     if %4 final
 
     ; otherwise we must perform some calculations
-    div int64 %number %number %modulo
-    mul int64 %number %number %modulo
-    sub int64 %result %result %number
+    div %number %number %modulo
+    mul %number %number %modulo
+    sub %result %result %number
 
 
     .mark: final

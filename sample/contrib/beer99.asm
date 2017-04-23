@@ -22,13 +22,13 @@
     arg %0 %0
 
     istore %4 1
-    eq int64 %4 %4 %0
+    eq %4 %4 %0
 
     if %4 +1 +2
     strstore %1 " bottle"
 
     izero %4
-    eq int64 %4 %4 %0
+    eq %4 %4 %0
     if %4 zero_bottles
 
     echo %0
@@ -52,7 +52,7 @@
     arg %0 %0
 
     istore %4 1
-    eq int64 %4 %4 %0
+    eq %4 %4 %0
 
     if %4 +1 +2
     strstore %1 " bottle"

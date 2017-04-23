@@ -25,9 +25,9 @@
 .function: main/1
     istore %1 4
     istore %2 -3
-    add int32 %3 %1 %2
+    add %3 %1 %2
     istore %4 0
-    add int32 %3 %3 %4
+    add %3 %3 %4
     print %3
     izero %0 local
     return

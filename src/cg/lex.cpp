@@ -638,7 +638,6 @@ namespace viua {
                                token == "lt" or token == "lte" or token == "gt" or token == "gte" or token == "eq"
                     ) {
                         tokens.push_back(token);    // mnemonic
-                        tokens.push_back(input_tokens.at(++i)); // result type specifier
 
                         tokens.push_back(input_tokens.at(++i)); // target register
                         string target_register_index = tokens.back();
@@ -1427,23 +1426,6 @@ namespace viua {
                         inner_target_token = subtokens.at(check);
                         check += 2;
                     } while (inner_target_token.str() == "(");
-                    if (inner_target_token == "int"
-                        or inner_target_token == "int"
-                        or inner_target_token == "int8"
-                        or inner_target_token == "int16"
-                        or inner_target_token == "int32"
-                        or inner_target_token == "int64"
-                        or inner_target_token == "uint"
-                        or inner_target_token == "uint8"
-                        or inner_target_token == "uint16"
-                        or inner_target_token == "uint32"
-                        or inner_target_token == "uint64"
-                        or inner_target_token == "float"
-                        or inner_target_token == "float32"
-                        or inner_target_token == "float64"
-                    ) {
-                        inner_target_token = subtokens.at(check-1);
-                    }
                 } catch (const std::out_of_range& e) {
                     throw InvalidSyntax(t.line(), t.character(), t.str());
                 }

@@ -85,11 +85,11 @@
     .name: 3 zero
     izero %zero
 
-    if (eq int64 %4 %divide_by %zero) +1 __after_throw
+    if (eq %4 %divide_by %zero) +1 __after_throw
     throw (strstore %4 "cannot divide by zero")
     .mark: __after_throw
 
-    div int64 %0 %divide_what %divide_by
+    div %0 %divide_what %divide_by
     echo %divide_what
     echo (strstore %4 ' / ')
     echo %divide_by
