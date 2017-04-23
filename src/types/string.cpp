@@ -44,7 +44,7 @@ Integer* String::size() {
     return new Integer(static_cast<Integer::underlying_type>(svalue.size()));
 }
 
-String* String::sub(int b, int e) {
+String* String::sub(int64_t b, int64_t e) {
     /** Return substring extracted from this object.
      */
     string::size_type cut_from, cut_to;

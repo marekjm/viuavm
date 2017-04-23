@@ -75,7 +75,7 @@ namespace viua {
                 std::string& value() { return svalue; }
 
                 Integer* size();
-                String* sub(int b = 0, int e = -1);
+                String* sub(int64_t b = 0, int64_t e = -1);
                 String* add(String*);
                 String* join(Vector*);
 
