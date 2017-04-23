@@ -78,7 +78,7 @@ viua::internals::types::byte* viua::process::Process::optextat(viua::internals::
     viua::types::Integer *index = nullptr;
     tie(addr, index) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
 
-    auto working_index = convert_signed_integer_to_text_size_type(source_text, index->as_int64());
+    auto working_index = convert_signed_integer_to_text_size_type(source_text, index->as_integer());
 
     *target = unique_ptr<viua::types::Type>{new viua::types::Text(source_text->at(working_index))};
 
@@ -97,8 +97,8 @@ viua::internals::types::byte* viua::process::Process::optextsub(viua::internals:
     tie(addr, first_index) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
     tie(addr, last_index) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
 
-    auto working_first_index = convert_signed_integer_to_text_size_type(source, first_index->as_int64());
-    auto working_last_index = convert_signed_integer_to_text_size_type(source, last_index->as_int64());
+    auto working_first_index = convert_signed_integer_to_text_size_type(source, first_index->as_integer());
+    auto working_last_index = convert_signed_integer_to_text_size_type(source, last_index->as_integer());
 
     *target = unique_ptr<viua::types::Type>{new viua::types::Text(source->sub(working_first_index, working_last_index))};
 

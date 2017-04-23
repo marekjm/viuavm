@@ -127,7 +127,7 @@ viua::internals::types::byte* viua::process::Process::opvpop(viua::internals::ty
 
     if (not viua::bytecode::decoder::operands::is_void(addr)) {
         tie(addr, index_operand) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
-        position_operand_index = index_operand->as_int64();
+        position_operand_index = index_operand->as_integer();
     } else {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
@@ -150,7 +150,7 @@ viua::internals::types::byte* viua::process::Process::opvat(viua::internals::typ
     viua::types::Integer* index_operand = nullptr;
     tie(addr, index_operand) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
 
-    *target = vector_operand->at(index_operand->as_int64())->pointer(this);
+    *target = vector_operand->at(index_operand->as_integer())->pointer(this);
 
     return addr;
 }

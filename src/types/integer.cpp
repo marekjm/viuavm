@@ -50,39 +50,6 @@ unique_ptr<Type> Integer::copy() const {
     return unique_ptr<Type>{new Integer(number)};
 }
 
-int8_t Integer::as_int8() const {
-    return static_cast<int8_t>(number);
-}
-int16_t Integer::as_int16() const {
-    return static_cast<int16_t>(number);
-}
-int32_t Integer::as_int32() const {
-    return static_cast<int32_t>(number);
-}
-int64_t Integer::as_int64() const {
-    return static_cast<int64_t>(number);
-}
-
-uint8_t Integer::as_uint8() const {
-    return static_cast<uint8_t>(number);
-}
-uint16_t Integer::as_uint16() const {
-    return static_cast<uint16_t>(number);
-}
-uint32_t Integer::as_uint32() const {
-    return static_cast<uint32_t>(number);
-}
-uint64_t Integer::as_uint64() const {
-    return static_cast<uint64_t>(number);
-}
-
-viua::float32 Integer::as_float32() const {
-    return static_cast<viua::float32>(number);
-}
-viua::float64 Integer::as_float64() const {
-    return static_cast<viua::float64>(number);
-}
-
 auto Integer::as_integer() const -> int64_t {
     return number;
 }

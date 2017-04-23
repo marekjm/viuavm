@@ -36,7 +36,7 @@ viua::internals::types::byte* viua::process::Process::opitof(viua::internals::ty
     viua::types::Type* source = nullptr;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object2(addr, this);
 
-    *target = unique_ptr<viua::types::Type>{new viua::types::Float(static_cast<viua::types::Integer*>(source)->as_float64())};
+    *target = unique_ptr<viua::types::Type>{new viua::types::Float(static_cast<viua::types::Integer*>(source)->as_float())};
 
     return addr;
 }
@@ -48,7 +48,7 @@ viua::internals::types::byte* viua::process::Process::opftoi(viua::internals::ty
     viua::types::Type* source = nullptr;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object2(addr, this);
 
-    *target = unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<viua::types::Float*>(source)->as_int32())};
+    *target = unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<viua::types::Float*>(source)->as_integer())};
 
     return addr;
 }

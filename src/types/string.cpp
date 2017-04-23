@@ -170,21 +170,21 @@ void String::format(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Regi
 }
 
 void String::substr(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
-    int begin = 0;
-    int end = -1;
+    Integer::underlying_type begin = 0;
+    Integer::underlying_type end = -1;
 
     assert_arity(frame, 1u, 2u, 3u);
 
     if (frame->arguments->size() > 1) {
         assert_typeof(frame->arguments->at(1), "Integer");
         if (Integer* i = dynamic_cast<Integer*>(frame->arguments->at(1))) {
-            begin = i->as_int32();
+            begin = i->as_integer();
         }
     }
     if (frame->arguments->size() > 2) {
         assert_typeof(frame->arguments->at(2), "Integer");
         if (Integer* i = dynamic_cast<Integer*>(frame->arguments->at(2))) {
-            end = i->as_int32();
+            end = i->as_integer();
         }
     }
     frame->local_register_set->set(0, unique_ptr<viua::types::Type>{sub(begin, end)});

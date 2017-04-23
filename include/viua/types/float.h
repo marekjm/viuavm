@@ -51,19 +51,6 @@ namespace viua {
 
                 std::unique_ptr<Type> copy() const override;
 
-                int8_t as_int8() const override;
-                int16_t as_int16() const override;
-                int32_t as_int32() const override;
-                int64_t as_int64() const override;
-
-                uint8_t as_uint8() const override;
-                uint16_t as_uint16() const override;
-                uint32_t as_uint32() const override;
-                uint64_t as_uint64() const override;
-
-                viua::float32 as_float32() const override;
-                viua::float64 as_float64() const override;
-
                 auto as_integer() const -> int64_t override;
                 auto as_float() const -> float64 override;
 
