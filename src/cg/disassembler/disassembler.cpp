@@ -216,7 +216,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
     ostringstream oss;
     oss << opname;
 
-    if ((op == STRSTORE) or (op == TEXT)) {
+    if (op == STRSTORE) {
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
         ++ptr;  // for operand type
@@ -224,6 +224,18 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         oss << ' ' << str::enquote(s);
         ptr += s.size();
         ++ptr; // for null character terminating the C-style string not included in std::string
+    } else if (op == TEXT) {
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
+
+        if (OperandType(*ptr) == OT_REGISTER_INDEX or OperandType(*ptr) == OT_POINTER) {
+            ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
+        } else {
+            ++ptr;  // for operand type
+            string s = string(reinterpret_cast<char*>(ptr));
+            oss << ' ' << str::enquote(s);
+            ptr += s.size();
+            ++ptr; // for null character terminating the C-style string not included in std::string
+        }
     } else if (op == ATOM) {
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 

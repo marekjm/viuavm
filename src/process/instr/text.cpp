@@ -32,12 +32,19 @@ viua::internals::types::byte* viua::process::Process::optext(viua::internals::ty
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    ++addr; // for operand type
-
     string s;
-    tie(addr, s) = viua::bytecode::decoder::operands::fetch_primitive_string(addr, this);
+    auto ot = viua::bytecode::decoder::operands::get_operand_type(addr);
+    if (ot == OT_REGISTER_INDEX or ot == OT_POINTER) {
+        viua::types::Type* o = nullptr;
+        tie(addr, o) = viua::bytecode::decoder::operands::fetch_object(addr, this);
+        s = o->str();
+    } else {
+        ++addr; // for operand type
+        tie(addr, s) = viua::bytecode::decoder::operands::fetch_primitive_string(addr, this);
+        s = str::strdecode(s);
+    }
 
-    *target = unique_ptr<viua::types::Type>{new viua::types::Text(str::strdecode(s))};
+    *target = unique_ptr<viua::types::Type>{new viua::types::Text(s)};
 
     return addr;
 }

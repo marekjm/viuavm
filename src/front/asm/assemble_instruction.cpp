@@ -327,7 +327,12 @@ viua::internals::types::bytecode_size assemble_instruction(Program& program, viu
         TokenIndex target = i + 1;
         TokenIndex source = target + 2;
 
-        program.optext(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1))), tokens.at(source));
+        auto target_operand = assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target+1)));
+        if (tokens.at(source).str().at(0) == '*' or tokens.at(source).str().at(0) == '%') {
+            program.optext(target_operand, assembler::operands::getint_with_rs_type(resolveregister(tokens.at(source)), resolve_rs_type(tokens.at(source+1))));
+        } else {
+            program.optext(target_operand, tokens.at(source));
+        }
     } else if (tokens.at(i) == "texteq") {
         TokenIndex target = i + 1;
         TokenIndex lhs = target + 2;

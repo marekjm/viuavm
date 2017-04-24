@@ -217,6 +217,10 @@ namespace cg {
             return insert_type_prefixed_string(addr_ptr, s.substr(1, s.size()-2), OT_TEXT);
         }
 
+        viua::internals::types::byte* optext(viua::internals::types::byte* addr_ptr, int_op a, int_op b) {
+            return insert_two_ri_instruction(addr_ptr, TEXT, a, b);
+        }
+
         viua::internals::types::byte* optexteq(viua::internals::types::byte* addr_ptr, int_op target, int_op lhs, int_op rhs) {
             return insert_three_ri_instruction(addr_ptr, TEXTEQ, target, lhs, rhs);
         }

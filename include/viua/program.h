@@ -89,6 +89,7 @@ class Program {
     Program& opstrstore(int_op, std::string);
 
     Program& optext(int_op, std::string);
+    Program& optext(int_op, int_op);
     Program& optexteq(int_op, int_op, int_op);
     Program& optextat(int_op, int_op, int_op);
     Program& optextsub(int_op, int_op, int_op, int_op);

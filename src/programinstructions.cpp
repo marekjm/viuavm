@@ -160,6 +160,11 @@ Program& Program::optext(int_op reg, string s) {
     return (*this);
 }
 
+Program& Program::optext(int_op a, int_op b) {
+    addr_ptr = cg::bytecode::optext(addr_ptr, a, b);
+    return (*this);
+}
+
 Program& Program::optexteq(int_op target, int_op lhs, int_op rhs) {
     addr_ptr = cg::bytecode::optexteq(addr_ptr, target, lhs, rhs);
     return (*this);

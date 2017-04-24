@@ -780,8 +780,25 @@ namespace viua {
                         }
                         if (input_tokens.at(i+1) == "\n") {
                             tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "\"\"");
+                            continue;
                         }
-                        continue;
+                        if (is_register_index(input_tokens.at(i+1))) {
+                            /*
+                             *  This form of the "text" instruction is used to obtain text representations of Viua values.
+                             *  Its syntax is:
+                             *
+                             *          text {output:r-operand} {input:r-operand}
+                             *
+                             *  instead of:
+                             *
+                             *          text {output:r-operand} "{text literal}"
+                             */
+                            tokens.push_back(input_tokens.at(++i));
+                            if (not is_register_set_name(input_tokens.at(i+1))) {
+                                tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                            }
+                            continue;
+                        }
                     } else if (token == "texteq" or token == "atomeq") {
                         tokens.push_back(token);    // mnemonic
 
