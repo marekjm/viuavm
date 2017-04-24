@@ -319,6 +319,7 @@ namespace viua {
                 tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
                 calculated_size += size_increment;
 
+                ++calculated_size;  // for operand type
                 calculated_size += tokens.at(i++).str().size() + 1 - 2; // +1 for null terminator, -2 for quotes
 
                 return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
@@ -336,6 +337,7 @@ namespace viua {
                 tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
                 calculated_size += size_increment;
 
+                ++calculated_size;  // for operand type
                 calculated_size += tokens.at(i++).str().size() + 1 - 2; // +1 for null terminator, -2 for quotes
 
                 return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);

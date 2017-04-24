@@ -35,8 +35,8 @@ enum OperandType: uint8_t {
                             // dereferenced value)
 
     OT_ATOM,                // null-terminated ASCII string
-    OT_STRING,              // UTF-8 encoded Unicode string
-    OT_BYTES,               // size-prefixed byte string
+    OT_TEXT,                // UTF-8 encoded Unicode string, null-terminated
+    OT_STRING,              // size-prefixed byte string
 
     OT_INT,                 // unlimited size signed integer
     OT_INT8,                // 8bit signed integer

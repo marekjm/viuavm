@@ -97,6 +97,16 @@ static viua::internals::types::byte* insert_four_ri_instruction(viua::internals:
     return insert_ri_operand(addr_ptr, d);
 }
 
+static viua::internals::types::byte* insert_type_prefixed_string(viua::internals::types::byte* ptr, const string& s, const OperandType op_type) {
+    *(reinterpret_cast<OperandType*>(ptr)) = op_type;
+    pointer::inc<OperandType, viua::internals::types::byte>(ptr);
+    for (std::string::size_type i = 0; i < s.size(); ++i) {
+        *(ptr++) = static_cast<viua::internals::types::byte>(s[i]);
+    }
+    *(ptr++) = '\0';
+    return ptr;
+}
+
 static viua::internals::types::byte* insertString(viua::internals::types::byte* ptr, const string& s) {
     for (std::string::size_type i = 0; i < s.size(); ++i) {
         *(ptr++) = static_cast<viua::internals::types::byte>(s[i]);
@@ -198,13 +208,13 @@ namespace cg {
         viua::internals::types::byte* opstrstore(viua::internals::types::byte* addr_ptr, int_op reg, string s) {
             *(addr_ptr++) = STRSTORE;
             addr_ptr = insert_ri_operand(addr_ptr, reg);
-            return insertString(addr_ptr, s.substr(1, s.size()-2));
+            return insert_type_prefixed_string(addr_ptr, s.substr(1, s.size()-2), OT_STRING);
         }
 
         viua::internals::types::byte* optext(viua::internals::types::byte* addr_ptr, int_op reg, string s) {
             *(addr_ptr++) = TEXT;
             addr_ptr = insert_ri_operand(addr_ptr, reg);
-            return insertString(addr_ptr, s.substr(1, s.size()-2));
+            return insert_type_prefixed_string(addr_ptr, s.substr(1, s.size()-2), OT_TEXT);
         }
 
         viua::internals::types::byte* optexteq(viua::internals::types::byte* addr_ptr, int_op target, int_op lhs, int_op rhs) {

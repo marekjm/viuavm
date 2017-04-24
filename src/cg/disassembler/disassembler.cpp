@@ -219,6 +219,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
     if ((op == STRSTORE) or (op == TEXT)) {
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
+        ++ptr;  // for operand type
         string s = string(reinterpret_cast<char*>(ptr));
         oss << ' ' << str::enquote(s);
         ptr += s.size();

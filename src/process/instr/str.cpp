@@ -32,6 +32,8 @@ viua::internals::types::byte* viua::process::Process::opstrstore(viua::internals
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
+    ++addr; // for operand type
+
     string s;
     tie(addr, s) = viua::bytecode::decoder::operands::fetch_primitive_string(addr, this);
 
