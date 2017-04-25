@@ -265,7 +265,7 @@ viua::internals::types::byte* viua::process::Process::tick() {
     }
 
     if (halt or stack.size() == 0) {
-        finished = true;
+        finished.store(true, std::memory_order_release);
         return nullptr;
     }
 
@@ -358,7 +358,7 @@ void viua::process::Process::priority(decltype(process_priority) p) {
 }
 
 bool viua::process::Process::stopped() const {
-    return (finished or terminated());
+    return (finished.load(std::memory_order_acquire) or terminated());
 }
 
 bool viua::process::Process::terminated() const {
@@ -402,7 +402,7 @@ viua::internals::types::byte* viua::process::Process::become(const string& funct
     stack.clear();
     stack.thrown.reset(nullptr);
     stack.caught.reset(nullptr);
-    finished = false;
+    finished.store(false, std::memory_order_release);
 
     frame_to_use->function_name = function_name;
     stack.frame_new = std::move(frame_to_use);
