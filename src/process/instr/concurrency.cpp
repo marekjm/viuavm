@@ -103,7 +103,6 @@ viua::internals::types::byte* viua::process::Process::opjoin(viua::internals::ty
     }
 
     if (thrd->stopped()) {
-        thrd->join();
         return_addr = addr;
         if (thrd->terminated()) {
             stack.thrown = thrd->transferActiveException();
@@ -111,6 +110,7 @@ viua::internals::types::byte* viua::process::Process::opjoin(viua::internals::ty
         if (not target_is_void) {
             *target = thrd->getReturnValue();
         }
+        thrd->join();
     } else if (timeout_active and (not wait_until_infinity) and (waiting_until < std::chrono::steady_clock::now())) {
         timeout_active = false;
         wait_until_infinity = false;
