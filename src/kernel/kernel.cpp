@@ -63,6 +63,11 @@ auto viua::kernel::Mailbox::receive(queue<unique_ptr<viua::types::Type>>& mq) ->
     messages.clear();
 }
 
+auto viua::kernel::Mailbox::size() const -> decltype(messages)::size_type {
+    unique_lock<mutex> lck { mailbox_mutex };
+    return messages.size();
+}
+
 
 viua::kernel::Kernel& viua::kernel::Kernel::load(unique_ptr<viua::internals::types::byte[]> bc) {
     /*  Load bytecode into the viua::kernel::Kernel.

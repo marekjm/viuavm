@@ -62,13 +62,14 @@ namespace viua {
 namespace viua {
     namespace kernel {
         class Mailbox {
-            std::mutex mailbox_mutex;
+            mutable std::mutex mailbox_mutex;
             std::vector<std::unique_ptr<viua::types::Type>> messages;
 
             public:
 
             auto send(std::unique_ptr<viua::types::Type>) -> void;
             auto receive(std::queue<std::unique_ptr<viua::types::Type>>&) -> void;
+            auto size() const -> decltype(messages)::size_type;
 
             Mailbox() = default;
             Mailbox(Mailbox&&);
