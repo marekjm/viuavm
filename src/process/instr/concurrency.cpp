@@ -88,8 +88,8 @@ viua::internals::types::byte* viua::process::Process::opjoin(viua::internals::ty
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 
-    viua::internals::types::register_index source = 0;
-    tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    viua::types::Process* thrd;
+    tie(addr, thrd) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Process>(addr, this);
 
     viua::internals::types::timeout timeout = 0;
     tie(addr, timeout) = viua::bytecode::decoder::operands::fetch_timeout(addr, this);
@@ -102,24 +102,20 @@ viua::internals::types::byte* viua::process::Process::opjoin(viua::internals::ty
         timeout_active = true;
     }
 
-    if (auto thrd = dynamic_cast<viua::types::Process*>(fetch(source))) {
-        if (thrd->stopped()) {
-            thrd->join();
-            return_addr = addr;
-            if (thrd->terminated()) {
-                stack.thrown = thrd->transferActiveException();
-            }
-            if (not target_is_void) {
-                *target = thrd->getReturnValue();
-            }
-        } else if (timeout_active and (not wait_until_infinity) and (waiting_until < std::chrono::steady_clock::now())) {
-            timeout_active = false;
-            wait_until_infinity = false;
-            stack.thrown.reset(new viua::types::Exception("process did not join"));
-            return_addr = addr;
+    if (thrd->stopped()) {
+        thrd->join();
+        return_addr = addr;
+        if (thrd->terminated()) {
+            stack.thrown = thrd->transferActiveException();
         }
-    } else {
-        throw new viua::types::Exception("invalid type: expected viua::process::Process");
+        if (not target_is_void) {
+            *target = thrd->getReturnValue();
+        }
+    } else if (timeout_active and (not wait_until_infinity) and (waiting_until < std::chrono::steady_clock::now())) {
+        timeout_active = false;
+        wait_until_infinity = false;
+        stack.thrown.reset(new viua::types::Exception("process did not join"));
+        return_addr = addr;
     }
 
     return return_addr;
