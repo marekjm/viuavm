@@ -74,6 +74,51 @@ namespace viua {
             Mailbox() = default;
             Mailbox(Mailbox&&);
         };
+
+        class ProcessResult {
+                mutable std::mutex return_value_mutex;
+
+                /*
+                 * A process that has finished may either return a value, or
+                 * throw an exception.
+                 * Slots for both of these cases must be provided.
+                 */
+                std::unique_ptr<viua::types::Type> value_returned;
+                std::unique_ptr<viua::types::Type> exception_thrown;
+
+                /*
+                 * A flag set to 'true' once the process has finished execution.
+                 */
+                std::atomic_bool done;
+            public:
+                /*
+                 * Check if the process has stopped (for any reason).
+                 */
+                auto stopped() const -> bool;
+
+                /*
+                 * Check if the process has been terminated.
+                 */
+                auto terminated() const -> bool;
+
+                /*
+                 * Resolve a process to some return value.
+                 * This means that the execution succeeded.
+                 */
+                auto resolve(std::unique_ptr<viua::types::Type>) -> void;
+
+                /*
+                 * Raise an exception that killed the process.
+                 * This means that the execution failed.
+                 */
+                auto raise(std::unique_ptr<viua::types::Type>) -> void;
+
+                /*
+                 * Transfer return value and exception from process result.
+                 */
+                auto transfer() -> std::pair<std::unique_ptr<viua::types::Type>, std::unique_ptr<viua::types::Type>>;
+        };
+
         class Kernel {
 #ifdef AS_DEBUG_HEADER
             public:
@@ -147,6 +192,15 @@ namespace viua {
 
             std::map<viua::process::PID, Mailbox> mailboxes;
             std::mutex mailbox_mutex;
+
+            /*
+             * Only processes that were not disowned have an entry here.
+             * Result of a process may be fetched only once - it is then deleted.
+             * It must also be deleted when no process would be able to fetch it to
+             * prevent return value leaks.
+             */
+            std::map<viua::process::PID, ProcessResult> process_results;
+            std::mutex process_results_mutex;
 
             public:
                 /*  Methods dealing with dynamic library loading.
