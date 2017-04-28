@@ -94,6 +94,13 @@ viua::internals::types::byte* viua::process::Process::opjoin(viua::internals::ty
     viua::internals::types::timeout timeout = 0;
     tie(addr, timeout) = viua::bytecode::decoder::operands::fetch_timeout(addr, this);
 
+    // FIXME joinability should be checked by asking scheduler about it but
+    // currently 'detach/1' function on processes does not mark processes as no longer joinable in kernel
+    /* if (not scheduler->is_joinable(thrd->pid())) { */
+    if (not thrd->joinable()) {
+        throw new viua::types::Exception("process cannot be joined");
+    }
+
     if (timeout and not timeout_active) {
         waiting_until = (std::chrono::steady_clock::now() + std::chrono::milliseconds(timeout-1));
         timeout_active = true;
@@ -102,14 +109,17 @@ viua::internals::types::byte* viua::process::Process::opjoin(viua::internals::ty
         timeout_active = true;
     }
 
-    if (thrd->stopped()) {
+    if (scheduler->is_stopped(thrd->pid())) {
         return_addr = addr;
-        if (thrd->terminated()) {
-            stack.thrown = thrd->transferActiveException();
+        if (scheduler->is_terminated(thrd->pid())) {
+            stack.thrown = scheduler->transfer_exception_of(thrd->pid());
+        } else {
+            if (not target_is_void) {
+                *target = scheduler->transfer_result_of(thrd->pid());
+            }
         }
-        if (not target_is_void) {
-            *target = thrd->getReturnValue();
-        }
+
+        // FIXME requied until joinability is checked through the kernel
         thrd->join();
     } else if (timeout_active and (not wait_until_infinity) and (waiting_until < std::chrono::steady_clock::now())) {
         timeout_active = false;
