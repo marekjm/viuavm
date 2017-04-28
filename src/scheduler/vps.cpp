@@ -518,11 +518,8 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
         // if the process stopped and is not joinable declare it dead and
         // schedule for removal thus shortening the vector of running processes_list and
         // speeding up execution
-        if (th->stopped() and (not th->joinable())) {
-            attached_kernel->deleteMailbox(processes.at(i)->pid());
-#if VIUA_VM_DEBUG_LOG
-            viua_err( "[sched:vps:", this, "] process ", th, " marked as dead: ", th->starting_function());
-#endif
+        if (th->stopped()) {
+            attached_kernel->record_process_result(th);
             dead_processes_list.emplace_back(std::move(processes.at(i)));
         } else {
             running_processes_list.emplace_back(std::move(processes.at(i)));
