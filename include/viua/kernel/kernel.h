@@ -118,6 +118,9 @@ namespace viua {
                  */
                 auto transfer_exception() -> std::unique_ptr<viua::types::Type>;
                 auto transfer_result() -> std::unique_ptr<viua::types::Type>;
+
+                ProcessResult() = default;
+                ProcessResult(ProcessResult&&);
         };
 
         class Kernel {
@@ -265,6 +268,7 @@ namespace viua {
                 auto createMailbox(const viua::process::PID) -> viua::internals::types::processes_count;
                 auto deleteMailbox(const viua::process::PID) -> viua::internals::types::processes_count;
 
+                auto create_result_slot_for(viua::process::PID) -> void;
                 auto record_process_result(viua::process::Process*) -> void;
                 auto is_process_joinable(const viua::process::PID) const -> bool;
                 auto is_process_stopped(const viua::process::PID) const -> bool;

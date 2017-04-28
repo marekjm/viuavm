@@ -69,6 +69,11 @@ auto viua::kernel::Mailbox::size() const -> decltype(messages)::size_type {
 }
 
 
+viua::kernel::ProcessResult::ProcessResult(ProcessResult&& that) {
+    value_returned = std::move(that.value_returned);
+    exception_thrown = std::move(that.exception_thrown);
+    done.store(that.done.load(std::memory_order_acquire), std::memory_order_release);
+}
 auto viua::kernel::ProcessResult::resolve(unique_ptr<viua::types::Type> result) -> void {
     unique_lock<mutex> lck { result_mutex };
     value_returned = std::move(result);
@@ -399,6 +404,10 @@ auto viua::kernel::Kernel::deleteMailbox(const viua::process::PID pid) -> viua::
 #endif
     mailboxes.erase(pid);
     return --running_processes;
+}
+auto viua::kernel::Kernel::create_result_slot_for(viua::process::PID pid) -> void {
+    unique_lock<mutex> lck { process_results_mutex };
+    process_results.emplace(pid, ProcessResult{});
 }
 auto viua::kernel::Kernel::record_process_result(viua::process::Process* done_process) -> void {
     unique_lock<mutex> lck { process_results_mutex };
