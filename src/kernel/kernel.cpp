@@ -410,7 +410,7 @@ auto viua::kernel::Kernel::record_process_result(viua::process::Process* done_pr
     if (done_process->terminated()) {
         process_results.at(done_process->pid()).raise(done_process->transferActiveException());
     } else {
-        process_results.at(done_process->pid()).resolve(done_process->transferActiveException());
+        process_results.at(done_process->pid()).resolve(done_process->getReturnValue());
     }
 }
 auto viua::kernel::Kernel::is_process_joinable(const viua::process::PID pid) const -> bool {
