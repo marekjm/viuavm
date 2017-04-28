@@ -409,6 +409,10 @@ auto viua::kernel::Kernel::create_result_slot_for(viua::process::PID pid) -> voi
     unique_lock<mutex> lck { process_results_mutex };
     process_results.emplace(pid, ProcessResult{});
 }
+auto viua::kernel::Kernel::detach_process(const viua::process::PID pid) -> void {
+    unique_lock<mutex> lck { process_results_mutex };
+    process_results.erase(pid);
+}
 auto viua::kernel::Kernel::record_process_result(viua::process::Process* done_process) -> void {
     unique_lock<mutex> lck { process_results_mutex };
 

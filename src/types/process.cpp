@@ -92,8 +92,9 @@ void viua::types::Process::joinable(Frame* frame, viua::kernel::RegisterSet*, vi
     frame->local_register_set->set(0, unique_ptr<viua::types::Type>{new viua::types::Boolean(thrd->joinable())});
 }
 
-void viua::types::Process::detach(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+void viua::types::Process::detach(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel* kernel) {
     thrd->detach();
+    kernel->detach_process(thrd->pid());
 }
 
 
