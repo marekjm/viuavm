@@ -412,7 +412,11 @@ auto viua::kernel::Kernel::create_result_slot_for(viua::process::PID pid) -> voi
 auto viua::kernel::Kernel::record_process_result(viua::process::Process* done_process) -> void {
     unique_lock<mutex> lck { process_results_mutex };
 
-    if (process_results.count(done_process->pid())) {
+    if (process_results.count(done_process->pid()) == 0) {
+        return;
+    }
+
+    if (process_results.at(done_process->pid()).stopped()) {
         /*
          * FIXME a process cannot return twice
          */
