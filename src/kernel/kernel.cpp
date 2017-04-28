@@ -89,6 +89,14 @@ auto viua::kernel::ProcessResult::terminated() const -> bool {
     }
     return false;
 }
+auto viua::kernel::ProcessResult::transfer_exception() -> unique_ptr<viua::types::Type> {
+    unique_lock<mutex> lck { result_mutex };
+    return std::move(exception_thrown);
+}
+auto viua::kernel::ProcessResult::transfer_result() -> unique_ptr<viua::types::Type> {
+    unique_lock<mutex> lck { result_mutex };
+    return std::move(value_returned);
+}
 
 
 viua::kernel::Kernel& viua::kernel::Kernel::load(unique_ptr<viua::internals::types::byte[]> bc) {
@@ -416,6 +424,18 @@ auto viua::kernel::Kernel::is_process_stopped(const viua::process::PID pid) cons
 auto viua::kernel::Kernel::is_process_terminated(const viua::process::PID pid) const -> bool {
     unique_lock<mutex> lck { process_results_mutex };
     return process_results.at(pid).terminated();
+}
+auto viua::kernel::Kernel::transfer_exception_of(const viua::process::PID pid) -> unique_ptr<viua::types::Type> {
+    unique_lock<mutex> lck { process_results_mutex };
+    auto tmp = process_results.at(pid).transfer_exception();
+    process_results.erase(pid);
+    return tmp;
+}
+auto viua::kernel::Kernel::transfer_result_of(const viua::process::PID pid) -> unique_ptr<viua::types::Type> {
+    unique_lock<mutex> lck { process_results_mutex };
+    auto tmp = process_results.at(pid).transfer_result();
+    process_results.erase(pid);
+    return tmp;
 }
 
 void viua::kernel::Kernel::send(const viua::process::PID pid, unique_ptr<viua::types::Type> message) {

@@ -116,7 +116,8 @@ namespace viua {
                 /*
                  * Transfer return value and exception from process result.
                  */
-                auto transfer() -> std::pair<std::unique_ptr<viua::types::Type>, std::unique_ptr<viua::types::Type>>;
+                auto transfer_exception() -> std::unique_ptr<viua::types::Type>;
+                auto transfer_result() -> std::unique_ptr<viua::types::Type>;
         };
 
         class Kernel {
@@ -268,6 +269,8 @@ namespace viua {
                 auto is_process_joinable(const viua::process::PID) const -> bool;
                 auto is_process_stopped(const viua::process::PID) const -> bool;
                 auto is_process_terminated(const viua::process::PID) const -> bool;
+                auto transfer_exception_of(const viua::process::PID) -> std::unique_ptr<viua::types::Type>;
+                auto transfer_result_of(const viua::process::PID) -> std::unique_ptr<viua::types::Type>;
 
                 void send(const viua::process::PID, std::unique_ptr<viua::types::Type>);
                 void receive(const viua::process::PID, std::queue<std::unique_ptr<viua::types::Type>>&);

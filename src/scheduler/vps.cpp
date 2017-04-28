@@ -371,6 +371,12 @@ auto viua::scheduler::VirtualProcessScheduler::is_stopped(const viua::process::P
 auto viua::scheduler::VirtualProcessScheduler::is_terminated(const viua::process::PID pid) const -> bool {
     return attached_kernel->is_process_terminated(pid);
 }
+auto viua::scheduler::VirtualProcessScheduler::transfer_exception_of(const viua::process::PID pid) const -> unique_ptr<viua::types::Type> {
+    return attached_kernel->transfer_exception_of(pid);
+}
+auto viua::scheduler::VirtualProcessScheduler::transfer_result_of(const viua::process::PID pid) const -> unique_ptr<viua::types::Type> {
+    return attached_kernel->transfer_result_of(pid);
+}
 
 bool viua::scheduler::VirtualProcessScheduler::burst() {
     if (not processes.size()) {

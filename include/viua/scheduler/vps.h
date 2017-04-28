@@ -113,6 +113,8 @@ namespace viua {
             auto is_joinable(const viua::process::PID) const -> bool;
             auto is_stopped(const viua::process::PID) const -> bool;
             auto is_terminated(const viua::process::PID) const -> bool;
+            auto transfer_exception_of(const viua::process::PID) const -> std::unique_ptr<viua::types::Type>;
+            auto transfer_result_of(const viua::process::PID) const -> std::unique_ptr<viua::types::Type>;
 
             bool executeQuant(viua::process::Process*, viua::internals::types::process_time_slice_type);
             bool burst();
