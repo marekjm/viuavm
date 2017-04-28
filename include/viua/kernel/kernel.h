@@ -76,7 +76,7 @@ namespace viua {
         };
 
         class ProcessResult {
-                mutable std::mutex return_value_mutex;
+                mutable std::mutex result_mutex;
 
                 /*
                  * A process that has finished may either return a value, or
@@ -200,7 +200,7 @@ namespace viua {
              * prevent return value leaks.
              */
             std::map<viua::process::PID, ProcessResult> process_results;
-            std::mutex process_results_mutex;
+            mutable std::mutex process_results_mutex;
 
             public:
                 /*  Methods dealing with dynamic library loading.
@@ -263,6 +263,11 @@ namespace viua {
 
                 auto createMailbox(const viua::process::PID) -> viua::internals::types::processes_count;
                 auto deleteMailbox(const viua::process::PID) -> viua::internals::types::processes_count;
+
+                auto record_process_result(viua::process::Process*) -> void;
+                auto is_process_joinable(const viua::process::PID) const -> bool;
+                auto is_process_stopped(const viua::process::PID) const -> bool;
+                auto is_process_terminated(const viua::process::PID) const -> bool;
 
                 void send(const viua::process::PID, std::unique_ptr<viua::types::Type>);
                 void receive(const viua::process::PID, std::queue<std::unique_ptr<viua::types::Type>>&);

@@ -110,6 +110,10 @@ namespace viua {
             void send(const viua::process::PID, std::unique_ptr<viua::types::Type>);
             void receive(const viua::process::PID, std::queue<std::unique_ptr<viua::types::Type>>&);
 
+            auto is_joinable(const viua::process::PID) const -> bool;
+            auto is_stopped(const viua::process::PID) const -> bool;
+            auto is_terminated(const viua::process::PID) const -> bool;
+
             bool executeQuant(viua::process::Process*, viua::internals::types::process_time_slice_type);
             bool burst();
 

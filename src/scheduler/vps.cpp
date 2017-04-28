@@ -362,6 +362,16 @@ void viua::scheduler::VirtualProcessScheduler::receive(const viua::process::PID 
     attached_kernel->receive(pid, message_queue);
 }
 
+auto viua::scheduler::VirtualProcessScheduler::is_joinable(const viua::process::PID pid) const -> bool {
+    return attached_kernel->is_process_joinable(pid);
+}
+auto viua::scheduler::VirtualProcessScheduler::is_stopped(const viua::process::PID pid) const -> bool {
+    return attached_kernel->is_process_stopped(pid);
+}
+auto viua::scheduler::VirtualProcessScheduler::is_terminated(const viua::process::PID pid) const -> bool {
+    return attached_kernel->is_process_terminated(pid);
+}
+
 bool viua::scheduler::VirtualProcessScheduler::burst() {
     if (not processes.size()) {
         // make kernel stop if there are no processes_list to run

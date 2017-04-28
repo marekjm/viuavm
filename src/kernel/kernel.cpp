@@ -69,6 +69,28 @@ auto viua::kernel::Mailbox::size() const -> decltype(messages)::size_type {
 }
 
 
+auto viua::kernel::ProcessResult::resolve(unique_ptr<viua::types::Type> result) -> void {
+    unique_lock<mutex> lck { result_mutex };
+    value_returned = std::move(result);
+    done.store(true, std::memory_order_release);
+}
+auto viua::kernel::ProcessResult::raise(unique_ptr<viua::types::Type> failure) -> void {
+    unique_lock<mutex> lck { result_mutex };
+    exception_thrown = std::move(failure);
+    done.store(true, std::memory_order_release);
+}
+auto viua::kernel::ProcessResult::stopped() const -> bool {
+    return done.load(std::memory_order_acquire);
+}
+auto viua::kernel::ProcessResult::terminated() const -> bool {
+    if (done.load(std::memory_order_acquire)) {
+        unique_lock<mutex> lck { result_mutex };
+        return static_cast<bool>(exception_thrown);
+    }
+    return false;
+}
+
+
 viua::kernel::Kernel& viua::kernel::Kernel::load(unique_ptr<viua::internals::types::byte[]> bc) {
     /*  Load bytecode into the viua::kernel::Kernel.
      *  viua::kernel::Kernel becomes owner of loaded bytecode - meaning it will consider itself responsible for proper
@@ -370,6 +392,32 @@ auto viua::kernel::Kernel::deleteMailbox(const viua::process::PID pid) -> viua::
     mailboxes.erase(pid);
     return --running_processes;
 }
+auto viua::kernel::Kernel::record_process_result(viua::process::Process* done_process) -> void {
+    unique_lock<mutex> lck { process_results_mutex };
+
+    if (process_results.count(done_process->pid()) == 0) {
+        return;
+    }
+
+    if (done_process->terminated()) {
+        process_results.at(done_process->pid()).raise(done_process->transferActiveException());
+    } else {
+        process_results.at(done_process->pid()).resolve(done_process->transferActiveException());
+    }
+}
+auto viua::kernel::Kernel::is_process_joinable(const viua::process::PID pid) const -> bool {
+    unique_lock<mutex> lck { process_results_mutex };
+    return process_results.count(pid);
+}
+auto viua::kernel::Kernel::is_process_stopped(const viua::process::PID pid) const -> bool {
+    unique_lock<mutex> lck { process_results_mutex };
+    return process_results.at(pid).stopped();
+}
+auto viua::kernel::Kernel::is_process_terminated(const viua::process::PID pid) const -> bool {
+    unique_lock<mutex> lck { process_results_mutex };
+    return process_results.at(pid).terminated();
+}
+
 void viua::kernel::Kernel::send(const viua::process::PID pid, unique_ptr<viua::types::Type> message) {
     unique_lock<mutex> lck(mailbox_mutex);
     if (mailboxes.count(pid) == 0) {
