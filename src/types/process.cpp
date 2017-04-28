@@ -99,5 +99,5 @@ void viua::types::Process::detach(Frame*, viua::kernel::RegisterSet*, viua::kern
 
 
 viua::process::PID viua::types::Process::pid() const {
-    return thrd->pid();
+    return saved_pid;
 }
