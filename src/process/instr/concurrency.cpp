@@ -88,7 +88,7 @@ viua::internals::types::byte* viua::process::Process::opjoin(viua::internals::ty
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 
-    viua::types::Process* thrd;
+    viua::types::Process* thrd = nullptr;
     tie(addr, thrd) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Process>(addr, this);
 
     viua::internals::types::timeout timeout = 0;
