@@ -316,6 +316,9 @@ viua::process::Process* viua::scheduler::VirtualProcessScheduler::spawn(unique_p
 
     viua::process::Process *process_ptr = p.get();
     const auto total_processes = attached_kernel->createMailbox(process_ptr->pid());
+    if (not disown) {
+        attached_kernel->create_result_slot_for(process_ptr->pid());
+    }
     const auto running_schedulers = attached_kernel->no_of_vp_schedulers();
 
     /*
