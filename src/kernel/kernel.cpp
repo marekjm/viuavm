@@ -403,7 +403,10 @@ auto viua::kernel::Kernel::deleteMailbox(const viua::process::PID pid) -> viua::
 auto viua::kernel::Kernel::record_process_result(viua::process::Process* done_process) -> void {
     unique_lock<mutex> lck { process_results_mutex };
 
-    if (process_results.count(done_process->pid()) == 0) {
+    if (process_results.count(done_process->pid())) {
+        /*
+         * FIXME a process cannot return twice
+         */
         return;
     }
 
