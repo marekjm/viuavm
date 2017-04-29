@@ -550,7 +550,9 @@ void viua::scheduler::VirtualProcessScheduler::operator()() {
         unique_lock<mutex> lock(*free_processes_mutex);
         // FIXME don't wait forever after single-bursting is implemented, wait one time, then continue to rebalancing and just run again
         while (not free_processes_cv->wait_for(lock, chrono::milliseconds(10), [this]{
-            return (not free_processes->empty() or shut_down.load(std::memory_order_acquire));
+            auto scheduler_should_shut_down = shut_down.load(std::memory_order_acquire);
+            auto there_are_free_processes = (not free_processes->empty());
+            return (there_are_free_processes or scheduler_should_shut_down);
         }));
 
         // FIXME XXX this exit condition is dubious - scheduler should exit when the shut_dow is true, not when there are no free processes
