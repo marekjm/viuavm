@@ -30,9 +30,7 @@ string Integer::type() const {
     return "Integer";
 }
 string Integer::str() const {
-    ostringstream s;
-    s << number;
-    return s.str();
+    return to_string(number);
 }
 bool Integer::boolean() const {
     return (number != 0);

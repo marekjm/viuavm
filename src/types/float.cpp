@@ -31,10 +31,7 @@ string Float::type() const {
     return "Float";
 }
 string Float::str() const {
-    std::ostringstream s;
-    // std::fixed because 1.0 will yield '1' and not '1.0' when stringified
-    s << std::fixed << number;
-    return s.str();
+    return to_string(number);
 }
 bool Float::boolean() const {
     return (number != 0);
