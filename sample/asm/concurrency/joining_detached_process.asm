@@ -17,38 +17,50 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: running_detached/0
-.name: 0 counter
-.name: 2 limit
+.function: running_detached/1
+    .name: %iota counter
+    .name: %iota limit
     izero %counter
     istore %limit 4
-    strstore %1 "Hello World! (from long-running detached process) "
-.mark: loop
-    if (gte %3 %counter %limit) after_loop
-    echo %1
+
+    send (arg %iota %0) (self %iota)
+
+    .name: %iota message
+    strstore %message "Hello World! (from long-running detached process) "
+
+    .mark: loop
+    if (gte %iota %counter %limit) after_loop
+    echo %message
     print %counter
     iinc %counter
     jump loop
-.mark: after_loop
+    .mark: after_loop
+
     return
 .end
 
 .function: main/1
-    frame %0
-    process %1 running_detached/0
+    frame ^[(pamv %0 (self %1))]
+    process void running_detached/1
+
+    receive %1
 
     nop
     nop
-
-    frame ^[(param %0 (ptr %2 %1))]
-    msg void detach/1
-
     nop
-
-    ; reuse pointer creater earlier
-    frame ^[(param %0 %2)]
-    msg %3 joinable/1
-    print %3
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
 
     ; this throws, cannot join detached process
     join %0 %1
