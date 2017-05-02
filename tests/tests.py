@@ -1897,7 +1897,6 @@ class ConcurrencyTests(unittest.TestCase):
             self,
             'detaching_a_process.asm',
             [
-                'false',
                 'main/1 exited',
                 'Hello World! (from long-running detached process) 0',
                 'Hello World! (from long-running detached process) 1',
