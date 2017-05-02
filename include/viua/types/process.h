@@ -61,32 +61,10 @@ namespace viua {
                 std::unique_ptr<Type> copy() const override;
 
                 /*
-                 * For use by user code.
-                 * Users should be able to check if a process is joinable, and
-                 * to detach a process.
-                 */
-                virtual void joinable(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
-                virtual void detach(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
-
-                /*
                  * For use by the VM.
                  * User code has no way of discovering PIDs - it must receive them.
                  */
                 viua::process::PID pid() const;
-
-                /*
-                 * For use by the VM.
-                 * Use code *must not* touch these functions.
-                 * Well, technically, it can - e.g. via a FFI calls to libraries hooking into the VM but
-                 * then all bets are off.
-                 */
-                void join();
-                bool joinable();
-                void detach();
-                bool stopped();
-                bool terminated();
-                std::unique_ptr<Type> transferActiveException();
-                std::unique_ptr<Type> getReturnValue();
 
                 Process(viua::process::Process* t): thrd(t), saved_pid(thrd->pid()) {}
         };

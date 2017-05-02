@@ -53,52 +53,6 @@ unique_ptr<viua::types::Type> viua::types::Process::copy() const {
     return unique_ptr<viua::types::Type>{new viua::types::Process(thrd)};
 }
 
-bool viua::types::Process::joinable() {
-    return thrd->joinable();
-}
-
-void viua::types::Process::join() {
-    if (thrd->joinable()) {
-        thrd->join();
-    } else {
-        throw new viua::types::Exception("process cannot be joined");
-    }
-}
-
-void viua::types::Process::detach() {
-    if (thrd->joinable()) {
-        thrd->detach();
-    } else {
-        throw new viua::types::Exception("process cannot be detached");
-    }
-}
-
-bool viua::types::Process::stopped() {
-    return thrd->stopped();
-}
-
-bool viua::types::Process::terminated() {
-    return thrd->terminated();
-}
-
-unique_ptr<viua::types::Type> viua::types::Process::transferActiveException() {
-    return thrd->transferActiveException();
-}
-
-unique_ptr<viua::types::Type> viua::types::Process::getReturnValue() {
-    return thrd->getReturnValue();
-}
-
-
-void viua::types::Process::joinable(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
-    frame->local_register_set->set(0, unique_ptr<viua::types::Type>{new viua::types::Boolean(thrd->joinable())});
-}
-
-void viua::types::Process::detach(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel* kernel) {
-    thrd->detach();
-    kernel->detach_process(thrd->pid());
-}
-
 
 viua::process::PID viua::types::Process::pid() const {
     return saved_pid;
