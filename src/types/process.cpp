@@ -44,7 +44,9 @@ string viua::types::Process::repr() const {
 }
 
 bool viua::types::Process::boolean() const {
-    return thrd->joinable();
+    // There is no good reason why evaluating process as boolean should return either
+    // 'false' or 'true', as there is no meaning to this value.
+    return false;
 }
 
 unique_ptr<viua::types::Type> viua::types::Process::copy() const {
