@@ -127,6 +127,9 @@ There are several categories of change:
 - bic: return type specifiers in arithmetic and logic instructions are dropped; ALU instructions' results inherit the type of the left-hand side operand, and
   right-hand side operand is converted to the type of the left-hand side operand before the operation is executed
 - bic: only `Integer` and `Float` types are numeric, `Boolean` is not
+- bic: remove `detach/1` and `joinable/1` from `Process` type, they were problematic to secure from parallel point of view, and
+  were a pain point when it came to predictability
+- bic: `Process` values always evaluate to `false`
 
 One limitation of static analyser (SA) introduced in this release is its inability to handle backwards jumps.
 This, however, is not a problem if the code does not use loops and
