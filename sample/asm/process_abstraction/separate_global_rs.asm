@@ -17,12 +17,14 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: global_printer/0
+.function: global_printer/1
+    send (arg %1 %0) (self %2)
+
     ; switch to global register set
     ress global
 
     ; wait until a message arrives
-    receive %2
+    receive %2 10s
 
     ; print contents of first register
     ; this should throw an exception because this process
@@ -55,28 +57,24 @@
 .signature: std::misc::cycle/1
 
 .function: main/0
-    import "std::misc"
-
     ; spawn printer process
     ; it immediately waits for a message to arrive
     ; first message it receives should crash it
-    frame %0
-    process %1 global_printer/0
-    frame ^[(param %0 %1)]
-    msg void detach/1
+    frame ^[(pamv %0 (self %iota))]
+    process void global_printer/1
+
+    .name: %iota printer_pid
+    receive %printer_pid local 10s
+    print %printer_pid local
 
     ; spawn two independent writer processes
     ; whichever triggers the printer process is not important
-    frame ^[(param %0 %1) (pamv %1 (strstore %2 "Hello World"))]
-    process %2 global_writer/2
-    frame ^[(param %0 %2)]
-    msg void detach/1
+    frame ^[(param %0 %printer_pid) (pamv %1 (strstore %2 "Hello World"))]
+    process void global_writer/2
 
     ; this is the second writer process
-    frame ^[(param %0 %1) (pamv %1 (strstore %2 "broken"))]
-    process %2 global_writer/2
-    frame ^[(param %0 %2)]
-    msg void detach/1
+    frame ^[(param %0 %printer_pid) (pamv %1 (strstore %2 "broken"))]
+    process void global_writer/2
 
     izero %0 local
     return

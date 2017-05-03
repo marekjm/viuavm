@@ -17,19 +17,22 @@
 ;   along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
 ;
 
-.function: run_in_a_process/0
-    print (receive %1)
+.function: run_in_a_process/1
+    ; send our PID back to parent
+    send (arg %iota %0) (self %iota)
+
+    print (receive %iota 10s)
     return
 .end
 
 .function: main/1
-    frame %0
-    process %1 run_in_a_process/0
+    .name: %iota pid
+    frame ^[(pamv %0 (self %pid))]
+    process void run_in_a_process/1
 
-    frame ^[(param %0 %1)]
-    msg void detach/1
+    receive %pid 10s
 
-    send %1 (strstore %2 "Hello message passing World!")
+    send %pid (strstore %iota "Hello message passing World!")
 
     izero %0 local
     return

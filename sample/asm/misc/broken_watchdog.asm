@@ -71,15 +71,6 @@
 .function: main/1
     watchdog supervisor_function/0
 
-    ;frame %0
-    ;process 1 will_be_killed_by_a_runaway_exception
-    ;ptr 2 1
-    ;frame ^[(param 0 2)]
-    ;msg void detach/1
-
-    ;frame ^[(pamv 0 (istore 1 1024))]
-    ;call std::util::cpu::cycle/1
-
     print (strstore %3 "main/1 exiting")
     izero %0 local
     return

@@ -41,10 +41,7 @@
     import "std::misc"
 
     frame %0
-    process %1 run_in_a_process/0
-
-    frame ^[(param %0 (ptr %2 %1))]
-    msg void detach/1
+    process void run_in_a_process/0
     print (strstore %2 "main/1 detached worker process")
 
     echo (strstore %2 "message to pass: ")

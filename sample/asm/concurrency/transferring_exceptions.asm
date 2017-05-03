@@ -40,9 +40,6 @@
     frame %0
     process %1 run_in_a_process/0
 
-    ;frame ^[(param 0 1)]
-    ;msg void detach/1
-
     send %1 (strstore %2 "Hello exception transferring World!")
 
     try
