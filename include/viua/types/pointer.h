@@ -33,8 +33,8 @@ namespace viua {
     }
 
     namespace types {
-        class Pointer: public Type {
-                Type* points_to;
+        class Pointer: public Value {
+                Value* points_to;
                 bool valid;
                 /*
                  *  Pointer of origin is a parallelism-safety token.
@@ -54,11 +54,11 @@ namespace viua {
             public:
                 static const std::string type_name;
 
-                void invalidate(Type* t);
+                void invalidate(Value* t);
                 bool expired();
                 auto authenticate(const viua::process::Process*) -> void;
-                void reset(Type* t);
-                Type* to(const viua::process::Process*);
+                void reset(Value* t);
+                Value* to(const viua::process::Process*);
 
                 virtual void expired(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
 
@@ -68,16 +68,16 @@ namespace viua {
                 bool boolean() const override;
 
                 std::vector<std::string> bases() const override {
-                    return std::vector<std::string>{"Type"};
+                    return std::vector<std::string>{"Value"};
                 }
                 std::vector<std::string> inheritancechain() const override {
-                    return std::vector<std::string>{"Type"};
+                    return std::vector<std::string>{"Value"};
                 }
 
-                std::unique_ptr<Type> copy() const override;
+                std::unique_ptr<Value> copy() const override;
 
                 Pointer();
-                Pointer(Type* t, const viua::process::Process*);
+                Pointer(Value* t, const viua::process::Process*);
                 virtual ~Pointer();
         };
     }

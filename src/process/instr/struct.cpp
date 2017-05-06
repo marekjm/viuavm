@@ -31,7 +31,7 @@ viua::internals::types::byte* viua::process::Process::opstruct(viua::internals::
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    *target = unique_ptr<viua::types::Type>{ new viua::types::Struct() };
+    *target = unique_ptr<viua::types::Value>{ new viua::types::Struct() };
 
     return addr;
 }
@@ -44,7 +44,7 @@ viua::internals::types::byte* viua::process::Process::opstructinsert(viua::inter
     tie(addr, key) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Atom>(addr, this);
 
     if (viua::bytecode::decoder::operands::get_operand_type(addr) == OT_POINTER) {
-        viua::types::Type* source = nullptr;
+        viua::types::Value* source = nullptr;
         tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
         struct_operand->insert(*key, source->copy());
     } else {
@@ -72,7 +72,7 @@ viua::internals::types::byte* viua::process::Process::opstructremove(viua::inter
     viua::types::Atom *key = nullptr;
     tie(addr, key) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Atom>(addr, this);
 
-    unique_ptr<viua::types::Type> result { struct_operand->remove(*key) };
+    unique_ptr<viua::types::Value> result { struct_operand->remove(*key) };
     if (not void_target) {
         *target = std::move(result);
     }

@@ -44,14 +44,14 @@ namespace viua {
 
                 bool boolean() const override;
 
-                std::unique_ptr<Type> copy() const override;
+                std::unique_ptr<Value> copy() const override;
 
                 std::string name() const override;
                 viua::kernel::RegisterSet* rs() const;
                 auto release() -> viua::kernel::RegisterSet*;
                 auto give() -> std::unique_ptr<viua::kernel::RegisterSet>;
                 auto empty() const -> bool;
-                void set(viua::internals::types::register_index, std::unique_ptr<viua::types::Type>);
+                void set(viua::internals::types::register_index, std::unique_ptr<viua::types::Value>);
 
                 Closure(const std::string&, std::unique_ptr<viua::kernel::RegisterSet>);
                 virtual ~Closure();

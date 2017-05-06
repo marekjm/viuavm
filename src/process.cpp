@@ -71,18 +71,18 @@ auto viua::process::Process::emit_trace_line(viua::internals::types::byte* for_a
 }
 
 
-viua::types::Type* viua::process::Process::fetch(viua::internals::types::register_index index) const {
+viua::types::Value* viua::process::Process::fetch(viua::internals::types::register_index index) const {
     /*  Return pointer to object at given register.
      *  This method safeguards against reaching for out-of-bounds registers and
      *  reading from an empty register.
      */
-    viua::types::Type* object = currently_used_register_set->get(index);
+    viua::types::Value* object = currently_used_register_set->get(index);
     if (dynamic_cast<viua::types::Reference*>(object)) {
         object = static_cast<viua::types::Reference*>(object)->pointsTo();
     }
     return object;
 }
-viua::types::Type* viua::process::Process::obtain(viua::internals::types::register_index index) const {
+viua::types::Value* viua::process::Process::obtain(viua::internals::types::register_index index) const {
     return fetch(index);
 }
 
@@ -105,19 +105,19 @@ viua::kernel::Register* viua::process::Process::register_at(viua::internals::typ
     }
 }
 
-unique_ptr<viua::types::Type> viua::process::Process::pop(viua::internals::types::register_index index) {
+unique_ptr<viua::types::Value> viua::process::Process::pop(viua::internals::types::register_index index) {
     return currently_used_register_set->pop(index);
 }
-void viua::process::Process::place(viua::internals::types::register_index index, unique_ptr<viua::types::Type> obj) {
+void viua::process::Process::place(viua::internals::types::register_index index, unique_ptr<viua::types::Value> obj) {
     /** Place an object in register with given index.
      *
      *  Before placing an object in register, a check is preformed if the register is empty.
-     *  If not - the `viua::types::Type` previously stored in it is destroyed.
+     *  If not - the `viua::types::Value` previously stored in it is destroyed.
      *
      */
     currently_used_register_set->set(index, std::move(obj));
 }
-void viua::process::Process::put(viua::internals::types::register_index index, unique_ptr<viua::types::Type> o) {
+void viua::process::Process::put(viua::internals::types::register_index index, unique_ptr<viua::types::Value> o) {
     place(index, std::move(o));
 }
 void viua::process::Process::ensureStaticRegisters(string function_name) {
@@ -188,7 +188,7 @@ viua::internals::types::byte* viua::process::Process::callForeign(viua::internal
 
     return return_address;
 }
-viua::internals::types::byte* viua::process::Process::callForeignMethod(viua::internals::types::byte* return_address, viua::types::Type* object, const string& call_name, viua::kernel::Register* return_register, const string&) {
+viua::internals::types::byte* viua::process::Process::callForeignMethod(viua::internals::types::byte* return_address, viua::types::Value* object, const string& call_name, viua::kernel::Register* return_register, const string&) {
     if (not stack.frame_new) {
         throw new viua::types::Exception("foreign method call without a frame");
     }
@@ -218,7 +218,7 @@ viua::internals::types::byte* viua::process::Process::callForeignMethod(viua::in
     }
 
     // FIXME: woohoo! segfault!
-    unique_ptr<viua::types::Type> returned;
+    unique_ptr<viua::types::Value> returned;
     if (return_register != nullptr) {
         // we check in 0. register because it's reserved for return values
         if (currently_used_register_set->at(0) == nullptr) {
@@ -258,7 +258,7 @@ viua::internals::types::byte* viua::process::Process::tick() {
         stack.thrown.reset(e);
     } catch (const HaltException& e) {
         halt = true;
-    } catch (viua::types::Type* e) {
+    } catch (viua::types::Value* e) {
         stack.thrown.reset(e);
     } catch (const char* e) {
         stack.thrown.reset(new viua::types::Exception(e));
@@ -365,26 +365,26 @@ bool viua::process::Process::terminated() const {
     return static_cast<bool>(stack.thrown);
 }
 
-void viua::process::Process::pass(unique_ptr<viua::types::Type> message) {
+void viua::process::Process::pass(unique_ptr<viua::types::Value> message) {
     message_queue.push(std::move(message));
     wakeup();
 }
 
 
-viua::types::Type* viua::process::Process::getActiveException() {
+viua::types::Value* viua::process::Process::getActiveException() {
     return stack.thrown.get();
 }
 
-unique_ptr<viua::types::Type> viua::process::Process::transferActiveException() {
+unique_ptr<viua::types::Value> viua::process::Process::transferActiveException() {
     return std::move(stack.thrown);
 }
 
-void viua::process::Process::raise(unique_ptr<viua::types::Type> exception) {
+void viua::process::Process::raise(unique_ptr<viua::types::Value> exception) {
     stack.thrown = std::move(exception);
 }
 
 
-unique_ptr<viua::types::Type> viua::process::Process::getReturnValue() {
+unique_ptr<viua::types::Value> viua::process::Process::getReturnValue() {
     return std::move(stack.return_value);
 }
 

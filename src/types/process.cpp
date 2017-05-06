@@ -47,8 +47,8 @@ bool viua::types::Process::boolean() const {
     return thrd->joinable();
 }
 
-unique_ptr<viua::types::Type> viua::types::Process::copy() const {
-    return unique_ptr<viua::types::Type>{new viua::types::Process(thrd)};
+unique_ptr<viua::types::Value> viua::types::Process::copy() const {
+    return unique_ptr<viua::types::Value>{new viua::types::Process(thrd)};
 }
 
 bool viua::types::Process::joinable() {
@@ -79,17 +79,17 @@ bool viua::types::Process::terminated() {
     return thrd->terminated();
 }
 
-unique_ptr<viua::types::Type> viua::types::Process::transferActiveException() {
+unique_ptr<viua::types::Value> viua::types::Process::transferActiveException() {
     return thrd->transferActiveException();
 }
 
-unique_ptr<viua::types::Type> viua::types::Process::getReturnValue() {
+unique_ptr<viua::types::Value> viua::types::Process::getReturnValue() {
     return thrd->getReturnValue();
 }
 
 
 void viua::types::Process::joinable(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
-    frame->local_register_set->set(0, unique_ptr<viua::types::Type>{new viua::types::Boolean(thrd->joinable())});
+    frame->local_register_set->set(0, unique_ptr<viua::types::Value>{new viua::types::Boolean(thrd->joinable())});
 }
 
 void viua::types::Process::detach(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {

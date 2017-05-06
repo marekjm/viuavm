@@ -30,7 +30,7 @@
 
 namespace viua {
     namespace assertions {
-        void assert_typeof(viua::types::Type* object, const std::string& expected);
+        void assert_typeof(viua::types::Value* object, const std::string& expected);
 
         template<typename T, typename U> inline bool any_equal(const T& to_compare, const U& first) {
             return (to_compare == first);

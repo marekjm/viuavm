@@ -17,8 +17,8 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef VIUA_TYPES_TYPE_H
-#define VIUA_TYPES_TYPE_H
+#ifndef VIUA_TYPES_VALUE_H
+#define VIUA_TYPES_VALUE_H
 
 #pragma once
 
@@ -36,27 +36,24 @@ namespace viua {
     namespace types {
         class Pointer;
 
-        class Type {
+        class Value {
             /** Base class for all derived types.
              *  Viua uses an object-based hierarchy to allow easier storage in registers and
              *  to take advantage of C++ polymorphism.
-             *
-             *  Instead of void* Viua holds Type* so when registers are delete'ed proper destructor
-             *  is always called.
              */
             friend class Pointer;
             std::vector<Pointer*> pointers;
 
             public:
-                /** Basic interface of a Type.
+                /** Basic interface of a Value.
                  *
                  *  Derived objects are expected to override this methods, but in case they do not
-                 *  Type provides safe defaults.
+                 *  Value provides safe defaults.
                  */
                 virtual std::string type() const {
-                    /*  Basic type is just `Type`.
+                    /*  Basic type is just `Value`.
                      */
-                    return "Type";
+                    return "Value";
                 }
                 virtual std::string str() const {
                     /*  By default, Viua provides string output a la Python.
@@ -84,17 +81,17 @@ namespace viua {
                 virtual std::unique_ptr<Pointer> pointer(const viua::process::Process*);
 
                 virtual std::vector<std::string> bases() const {
-                    return std::vector<std::string>{"Type"};
+                    return std::vector<std::string>{"Value"};
                 }
                 virtual std::vector<std::string> inheritancechain() const {
-                    return std::vector<std::string>{"Type"};
+                    return std::vector<std::string>{"Value"};
                 }
 
-                virtual std::unique_ptr<Type> copy() const = 0;
+                virtual std::unique_ptr<Value> copy() const = 0;
 
                 // We need to construct and destroy our basic object.
-                Type() {}
-                virtual ~Type();
+                Value() {}
+                virtual ~Value();
         };
     }
 }

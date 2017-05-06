@@ -51,7 +51,7 @@ bool viua::types::Closure::boolean() const {
     return true;
 }
 
-unique_ptr<viua::types::Type> viua::types::Closure::copy() const {
+unique_ptr<viua::types::Value> viua::types::Closure::copy() const {
     return unique_ptr<viua::types::Closure>{new viua::types::Closure(function_name, local_register_set->copy())};
 }
 
@@ -76,6 +76,6 @@ auto viua::types::Closure::empty() const -> bool {
     return (local_register_set == nullptr);
 }
 
-void viua::types::Closure::set(viua::internals::types::register_index index, unique_ptr<viua::types::Type> object) {
+void viua::types::Closure::set(viua::internals::types::register_index index, unique_ptr<viua::types::Value> object) {
     local_register_set->set(index, std::move(object));
 }

@@ -30,13 +30,13 @@
 
 namespace viua {
     namespace types {
-        class Struct: public Type {
+        class Struct: public Value {
             /** A generic object class.
              *
              *  This type is used internally inside the VM.
              */
             private:
-                std::map<std::string, std::unique_ptr<Type>> attributes;
+                std::map<std::string, std::unique_ptr<Value>> attributes;
 
             public:
                 static const std::string type_name;
@@ -48,17 +48,17 @@ namespace viua {
                 std::string repr() const override;
 
                 std::vector<std::string> bases() const override {
-                    return std::vector<std::string>{"Type"};
+                    return std::vector<std::string>{"Value"};
                 }
                 std::vector<std::string> inheritancechain() const override {
-                    return std::vector<std::string>{"Type"};
+                    return std::vector<std::string>{"Value"};
                 }
 
-                virtual void insert(const std::string& key, std::unique_ptr<Type> value);
-                virtual std::unique_ptr<Type> remove(const std::string& key);
+                virtual void insert(const std::string& key, std::unique_ptr<Value> value);
+                virtual std::unique_ptr<Value> remove(const std::string& key);
                 virtual std::vector<std::string> keys() const;
 
-                std::unique_ptr<Type> copy() const override;
+                std::unique_ptr<Value> copy() const override;
 
                 ~Struct() override = default;
         };

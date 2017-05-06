@@ -27,7 +27,7 @@ using namespace std;
 
 const string viua::types::Vector::type_name = "Vector";
 
-void viua::types::Vector::insert(long int index, unique_ptr<viua::types::Type> object) {
+void viua::types::Vector::insert(long int index, unique_ptr<viua::types::Value> object) {
     long offset = 0;
 
     // FIXME: REFACTORING: move bounds-checking to a separate function
@@ -48,11 +48,11 @@ void viua::types::Vector::insert(long int index, unique_ptr<viua::types::Type> o
     internal_object.insert(it, std::move(object));
 }
 
-void viua::types::Vector::push(unique_ptr<viua::types::Type> object) {
+void viua::types::Vector::push(unique_ptr<viua::types::Value> object) {
     internal_object.emplace_back(std::move(object));
 }
 
-unique_ptr<viua::types::Type> viua::types::Vector::pop(long int index) {
+unique_ptr<viua::types::Value> viua::types::Vector::pop(long int index) {
     long offset = 0;
 
     // FIXME: REFACTORING: move bounds-checking to a separate function
@@ -71,12 +71,12 @@ unique_ptr<viua::types::Type> viua::types::Vector::pop(long int index) {
     }
 
     auto it = (internal_object.begin()+offset);
-    unique_ptr<viua::types::Type> object = std::move(*it);
+    unique_ptr<viua::types::Value> object = std::move(*it);
     internal_object.erase(it);
     return object;
 }
 
-viua::types::Type* viua::types::Vector::at(long int index) {
+viua::types::Value* viua::types::Vector::at(long int index) {
     long offset = 0;
 
     // FIXME: REFACTORING: move bounds-checking to a separate function
@@ -119,7 +119,7 @@ bool viua::types::Vector::boolean() const {
     return internal_object.size() != 0;
 }
 
-unique_ptr<viua::types::Type> viua::types::Vector::copy() const {
+unique_ptr<viua::types::Value> viua::types::Vector::copy() const {
     unique_ptr<viua::types::Vector> vec {new Vector()};
     for (unsigned i = 0; i < internal_object.size(); ++i) {
         vec->push(internal_object[i]->copy());
@@ -127,13 +127,13 @@ unique_ptr<viua::types::Type> viua::types::Vector::copy() const {
     return std::move(vec);
 }
 
-vector<unique_ptr<viua::types::Type>>& viua::types::Vector::value() {
+vector<unique_ptr<viua::types::Value>>& viua::types::Vector::value() {
     return internal_object;
 }
 
 viua::types::Vector::Vector() {
 }
-viua::types::Vector::Vector(const std::vector<viua::types::Type*>& v) {
+viua::types::Vector::Vector(const std::vector<viua::types::Value*>& v) {
     for (unsigned i = 0; i < v.size(); ++i) {
         internal_object.push_back(v[i]->copy());
     }

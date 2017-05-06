@@ -27,14 +27,14 @@ using namespace std;
 
 
 viua::internals::types::byte* viua::process::Process::opecho(viua::internals::types::byte* addr) {
-    viua::types::Type* source { nullptr };
+    viua::types::Value* source { nullptr };
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
     cout << source->str();
     return addr;
 }
 
 viua::internals::types::byte* viua::process::Process::opprint(viua::internals::types::byte* addr) {
-    viua::types::Type* source { nullptr };
+    viua::types::Value* source { nullptr };
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
     cout << source->str() + '\n';
     return addr;
@@ -50,7 +50,7 @@ viua::internals::types::byte* viua::process::Process::opjump(viua::internals::ty
 }
 
 viua::internals::types::byte* viua::process::Process::opif(viua::internals::types::byte* addr) {
-    viua::types::Type* source = nullptr;
+    viua::types::Value* source = nullptr;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
     viua::internals::types::bytecode_size addr_true = 0, addr_false = 0;

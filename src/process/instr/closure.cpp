@@ -53,7 +53,7 @@ viua::internals::types::byte* viua::process::Process::opcapture(viua::internals:
         // this is needed to bind the captured object's life to lifetime of the closure
         rf = new viua::types::Reference(nullptr);
         rf->rebind(source->give());
-        *source = unique_ptr<viua::types::Type>{rf};  // set the register to contain the newly-created reference
+        *source = unique_ptr<viua::types::Value>{rf};  // set the register to contain the newly-created reference
     }
     target->rs()->register_at(target_register)->reset(source->get()->copy());
 
@@ -67,7 +67,7 @@ viua::internals::types::byte* viua::process::Process::opcapturecopy(viua::intern
     viua::internals::types::register_index target_register = 0;
     tie(addr, target_register) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    viua::types::Type* source = nullptr;
+    viua::types::Value* source = nullptr;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
     if (target_register >= target->rs()->size()) {
@@ -132,7 +132,7 @@ viua::internals::types::byte* viua::process::Process::opfunction(viua::internals
     string function_name;
     tie(addr, function_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
-    *target = unique_ptr<viua::types::Type>{new viua::types::Function(function_name)};
+    *target = unique_ptr<viua::types::Value>{new viua::types::Function(function_name)};
 
     return addr;
 }

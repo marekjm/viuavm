@@ -28,7 +28,7 @@
 
 namespace viua {
     namespace types {
-        class Prototype: public Type {
+        class Prototype: public Value {
             /** A prototype of a type.
              *
              *  This type is used internally inside the VM.
@@ -63,13 +63,13 @@ namespace viua {
 
 
                 std::vector<std::string> bases() const override {
-                    return std::vector<std::string>{"Type"};
+                    return std::vector<std::string>{"Value"};
                 }
                 std::vector<std::string> inheritancechain() const override {
-                    return std::vector<std::string>{"Type"};
+                    return std::vector<std::string>{"Value"};
                 }
 
-                std::unique_ptr<Type> copy() const override;
+                std::unique_ptr<Value> copy() const override;
 
                 Prototype(const std::string& tn): prototype_name(tn) {}
                 virtual ~Prototype() {}

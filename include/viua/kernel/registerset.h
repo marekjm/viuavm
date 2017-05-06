@@ -39,16 +39,16 @@ enum REGISTER_MASKS: mask_type {
 namespace viua {
     namespace kernel {
         class Register {
-            std::unique_ptr<viua::types::Type> value;
+            std::unique_ptr<viua::types::Value> value;
             mask_type mask;
 
             public:
-            void reset(std::unique_ptr<viua::types::Type>);
+            void reset(std::unique_ptr<viua::types::Value>);
             bool empty() const;
 
-            viua::types::Type* get();
-            viua::types::Type* release();
-            std::unique_ptr<viua::types::Type> give();
+            viua::types::Value* get();
+            viua::types::Value* release();
+            std::unique_ptr<viua::types::Value> give();
 
             void swap(Register&);
 
@@ -59,7 +59,7 @@ namespace viua {
             bool is_flagged(mask_type) const;
 
             Register();
-            Register(std::unique_ptr<viua::types::Type>);
+            Register(std::unique_ptr<viua::types::Value>);
             Register(Register&&);
 
             operator bool() const;
@@ -73,11 +73,11 @@ namespace viua {
 
             public:
                 // basic access to registers
-                void put(viua::internals::types::register_index, std::unique_ptr<viua::types::Type>);
-                std::unique_ptr<viua::types::Type> pop(viua::internals::types::register_index);
-                void set(viua::internals::types::register_index, std::unique_ptr<viua::types::Type>);
-                viua::types::Type* get(viua::internals::types::register_index);
-                viua::types::Type* at(viua::internals::types::register_index);
+                void put(viua::internals::types::register_index, std::unique_ptr<viua::types::Value>);
+                std::unique_ptr<viua::types::Value> pop(viua::internals::types::register_index);
+                void set(viua::internals::types::register_index, std::unique_ptr<viua::types::Value>);
+                viua::types::Value* get(viua::internals::types::register_index);
+                viua::types::Value* at(viua::internals::types::register_index);
 
                 Register* register_at(viua::internals::types::register_index);
 

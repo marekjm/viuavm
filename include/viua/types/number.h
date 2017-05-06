@@ -35,7 +35,7 @@ namespace viua {
 
     namespace types {
         namespace numeric {
-            class Number : public Type {
+            class Number : public Value {
                 /** Base number type.
                  *
                  *  All types representing numbers *must* inherit from

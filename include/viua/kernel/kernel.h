@@ -63,12 +63,12 @@ namespace viua {
     namespace kernel {
         class Mailbox {
             std::mutex mailbox_mutex;
-            std::vector<std::unique_ptr<viua::types::Type>> messages;
+            std::vector<std::unique_ptr<viua::types::Value>> messages;
 
             public:
 
-            auto send(std::unique_ptr<viua::types::Type>) -> void;
-            auto receive(std::queue<std::unique_ptr<viua::types::Type>>&) -> void;
+            auto send(std::unique_ptr<viua::types::Value>) -> void;
+            auto receive(std::queue<std::unique_ptr<viua::types::Value>>&) -> void;
 
             Mailbox() = default;
             Mailbox(Mailbox&&);
@@ -202,15 +202,15 @@ namespace viua {
                 Kernel& registerForeignMethod(const std::string&, ForeignMethod);
 
                 void requestForeignFunctionCall(Frame*, viua::process::Process*);
-                void requestForeignMethodCall(const std::string&, viua::types::Type*, Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*);
+                void requestForeignMethodCall(const std::string&, viua::types::Value*, Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*);
 
                 void postFreeProcess(std::unique_ptr<viua::process::Process>);
 
                 auto createMailbox(const viua::process::PID) -> viua::internals::types::processes_count;
                 auto deleteMailbox(const viua::process::PID) -> viua::internals::types::processes_count;
 
-                void send(const viua::process::PID, std::unique_ptr<viua::types::Type>);
-                void receive(const viua::process::PID, std::queue<std::unique_ptr<viua::types::Type>>&);
+                void send(const viua::process::PID, std::unique_ptr<viua::types::Value>);
+                void receive(const viua::process::PID, std::queue<std::unique_ptr<viua::types::Value>>&);
                 uint64_t pids() const;
 
                 auto static no_of_vp_schedulers() -> viua::internals::types::schedulers_count;

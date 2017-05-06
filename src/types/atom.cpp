@@ -43,7 +43,7 @@ viua::types::Atom::operator string () const {
     return value;
 }
 
-unique_ptr<viua::types::Type> viua::types::Atom::copy() const {
+unique_ptr<viua::types::Value> viua::types::Atom::copy() const {
     return unique_ptr<viua::types::Atom>{ new Atom(value) };
 }
 

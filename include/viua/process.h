@@ -74,8 +74,8 @@ namespace viua {
             /*  Slot for thrown objects (typically exceptions).
              *  Can be set either by user code, or the VM.
              */
-            std::unique_ptr<viua::types::Type> thrown;
-            std::unique_ptr<viua::types::Type> caught;
+            std::unique_ptr<viua::types::Value> thrown;
+            std::unique_ptr<viua::types::Value> caught;
 
             /*
              *  Currently used register, and
@@ -87,7 +87,7 @@ namespace viua {
             /*  Variables set after the VM has executed bytecode.
              *  They describe exit conditions of the bytecode that just stopped running.
              */
-            std::unique_ptr<viua::types::Type> return_value; // return value of top-most frame on the stack
+            std::unique_ptr<viua::types::Value> return_value; // return value of top-most frame on the stack
 
             void adjust_instruction_pointer(TryFrame*, std::string);
             auto unwind_call_stack_to(TryFrame*) -> void;
@@ -170,11 +170,11 @@ namespace viua {
             // Call stack
             Stack stack;
 
-            std::queue<std::unique_ptr<viua::types::Type>> message_queue;
+            std::queue<std::unique_ptr<viua::types::Value>> message_queue;
 
-            viua::types::Type* fetch(viua::internals::types::register_index) const;
-            std::unique_ptr<viua::types::Type> pop(viua::internals::types::register_index);
-            void place(viua::internals::types::register_index, std::unique_ptr<viua::types::Type>);
+            viua::types::Value* fetch(viua::internals::types::register_index) const;
+            std::unique_ptr<viua::types::Value> pop(viua::internals::types::register_index);
+            void place(viua::internals::types::register_index, std::unique_ptr<viua::types::Value>);
             void ensureStaticRegisters(std::string);
 
             /*  Methods dealing with stack and frame manipulation, and
@@ -190,7 +190,7 @@ namespace viua {
             // call foreign (i.e. from a C++ extension) function
             viua::internals::types::byte* callForeign(viua::internals::types::byte*, const std::string&, viua::kernel::Register*, const std::string&);
             // call foreign method (i.e. method of a pure-C++ class loaded into machine's typesystem)
-            viua::internals::types::byte* callForeignMethod(viua::internals::types::byte*, viua::types::Type*, const std::string&, viua::kernel::Register*, const std::string&);
+            viua::internals::types::byte* callForeignMethod(viua::internals::types::byte*, viua::types::Value*, const std::string&, viua::kernel::Register*, const std::string&);
 
             bool finished;
             std::atomic_bool is_joinable;
@@ -326,8 +326,8 @@ namespace viua {
                 viua::internals::types::byte* dispatch(viua::internals::types::byte*);
                 viua::internals::types::byte* tick();
 
-                viua::types::Type* obtain(viua::internals::types::register_index) const;
-                void put(viua::internals::types::register_index, std::unique_ptr<viua::types::Type>);
+                viua::types::Value* obtain(viua::internals::types::register_index) const;
+                void put(viua::internals::types::register_index, std::unique_ptr<viua::types::Value>);
 
                 viua::kernel::Register* register_at(viua::internals::types::register_index);
                 viua::kernel::Register* register_at(viua::internals::types::register_index, viua::internals::RegisterSets);
@@ -343,7 +343,7 @@ namespace viua {
                 viua::process::Process* parent() const;
                 std::string starting_function() const;
 
-                void pass(std::unique_ptr<viua::types::Type>);
+                void pass(std::unique_ptr<viua::types::Value>);
 
                 auto priority() const -> decltype(process_priority);
                 void priority(decltype(process_priority) p);
@@ -351,14 +351,14 @@ namespace viua {
                 bool stopped() const;
 
                 bool terminated() const;
-                viua::types::Type* getActiveException();
-                std::unique_ptr<viua::types::Type> transferActiveException();
-                void raise(std::unique_ptr<viua::types::Type>);
+                viua::types::Value* getActiveException();
+                std::unique_ptr<viua::types::Value> transferActiveException();
+                void raise(std::unique_ptr<viua::types::Value>);
                 void handleActiveException();
 
                 void migrate_to(viua::scheduler::VirtualProcessScheduler*);
 
-                std::unique_ptr<viua::types::Type> getReturnValue();
+                std::unique_ptr<viua::types::Value> getReturnValue();
 
                 bool watchdogged() const;
                 std::string watchdog() const;

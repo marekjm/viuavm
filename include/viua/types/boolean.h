@@ -29,7 +29,7 @@
 
 namespace viua {
     namespace types {
-        class Boolean : public viua::types::Type {
+        class Boolean : public viua::types::Value {
             /** Boolean object.
              *
              *  This type is used to hold true and false values.
@@ -55,11 +55,11 @@ namespace viua {
                     return std::vector<std::string>{"Number"};
                 }
                 virtual std::vector<std::string> inheritancechain() const override {
-                    return std::vector<std::string>{"Number", "Type"};
+                    return std::vector<std::string>{"Number", "Value"};
                 }
 
-                std::unique_ptr<Type> copy() const override {
-                    return std::unique_ptr<viua::types::Type>{new Boolean(b)};
+                std::unique_ptr<Value> copy() const override {
+                    return std::unique_ptr<viua::types::Value>{new Boolean(b)};
                 }
 
                 Boolean(bool v = false): b(v) {}

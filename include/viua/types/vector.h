@@ -29,10 +29,10 @@
 
 namespace viua {
     namespace types {
-        class Vector : public Type {
+        class Vector : public Value {
             /** Vector type.
              */
-            std::vector<std::unique_ptr<Type>> internal_object;
+            std::vector<std::unique_ptr<Value>> internal_object;
 
             public:
                 static const std::string type_name;
@@ -42,18 +42,18 @@ namespace viua {
                 }
                 std::string str() const override;
                 bool boolean() const override;
-                std::unique_ptr<Type> copy() const override;
+                std::unique_ptr<Value> copy() const override;
 
-                std::vector<std::unique_ptr<Type>>& value();
+                std::vector<std::unique_ptr<Value>>& value();
 
-                void insert(long int, std::unique_ptr<Type>);
-                void push(std::unique_ptr<Type>);
-                std::unique_ptr<Type> pop(long int);
-                Type* at(long int);
+                void insert(long int, std::unique_ptr<Value>);
+                void push(std::unique_ptr<Value>);
+                std::unique_ptr<Value> pop(long int);
+                Value* at(long int);
                 int len();
 
                 Vector();
-                Vector(const std::vector<Type*>& v);
+                Vector(const std::vector<Value*>& v);
                 ~Vector();
         };
     }

@@ -50,12 +50,12 @@ using namespace std;
 viua::kernel::Mailbox::Mailbox(Mailbox&& that): messages(std::move(that.messages)) {
 }
 
-auto viua::kernel::Mailbox::send(unique_ptr<viua::types::Type> message) -> void {
+auto viua::kernel::Mailbox::send(unique_ptr<viua::types::Value> message) -> void {
     unique_lock<mutex> lck { mailbox_mutex };
     messages.push_back(std::move(message));
 }
 
-auto viua::kernel::Mailbox::receive(queue<unique_ptr<viua::types::Type>>& mq) -> void {
+auto viua::kernel::Mailbox::receive(queue<unique_ptr<viua::types::Value>>& mq) -> void {
     unique_lock<mutex> lck { mailbox_mutex };
     for (auto& message : messages) {
         mq.push(std::move(message));
@@ -338,7 +338,7 @@ void viua::kernel::Kernel::requestForeignFunctionCall(Frame *frame, viua::proces
     foreign_call_queue_condition.notify_one();
 }
 
-void viua::kernel::Kernel::requestForeignMethodCall(const string& name, viua::types::Type *object, Frame *frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process *p) {
+void viua::kernel::Kernel::requestForeignMethodCall(const string& name, viua::types::Value *object, Frame *frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process *p) {
     foreign_methods.at(name)(object, frame, nullptr, nullptr, p, this);
 }
 
@@ -365,7 +365,7 @@ auto viua::kernel::Kernel::deleteMailbox(const viua::process::PID pid) -> viua::
     mailboxes.erase(pid);
     return --running_processes;
 }
-void viua::kernel::Kernel::send(const viua::process::PID pid, unique_ptr<viua::types::Type> message) {
+void viua::kernel::Kernel::send(const viua::process::PID pid, unique_ptr<viua::types::Value> message) {
     unique_lock<mutex> lck(mailbox_mutex);
     if (mailboxes.count(pid) == 0) {
         // sending a message to an unknown address just drops the message
@@ -377,7 +377,7 @@ void viua::kernel::Kernel::send(const viua::process::PID pid, unique_ptr<viua::t
 #endif
     mailboxes[pid].send(std::move(message));
 }
-void viua::kernel::Kernel::receive(const viua::process::PID pid, queue<unique_ptr<viua::types::Type>>& message_queue) {
+void viua::kernel::Kernel::receive(const viua::process::PID pid, queue<unique_ptr<viua::types::Value>>& message_queue) {
     unique_lock<mutex> lck(mailbox_mutex);
     if (mailboxes.count(pid) == 0) {
         throw new viua::types::Exception("invalid PID");

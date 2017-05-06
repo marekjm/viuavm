@@ -43,7 +43,7 @@ namespace viua {
 
 namespace viua {
     namespace types {
-        class String : public Type {
+        class String : public Value {
             /** String type.
              *
              *  Designed to hold strings of bytes.
@@ -68,8 +68,8 @@ namespace viua {
                     return svalue.size() != 0;
                 }
 
-                std::unique_ptr<Type> copy() const override {
-                    return std::unique_ptr<viua::types::Type>{new String(svalue)};
+                std::unique_ptr<Value> copy() const override {
+                    return std::unique_ptr<viua::types::Value>{new String(svalue)};
                 }
 
                 std::string& value() { return svalue; }

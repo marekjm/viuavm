@@ -43,7 +43,7 @@ namespace viua {
 
 namespace viua {
     namespace types {
-        class Process : public Type {
+        class Process : public Value {
             viua::process::Process* thrd;
 
             public:
@@ -57,7 +57,7 @@ namespace viua {
                 std::string str() const override;
                 std::string repr() const override;
                 bool boolean() const override;
-                std::unique_ptr<Type> copy() const override;
+                std::unique_ptr<Value> copy() const override;
 
                 /*
                  * For use by user code.
@@ -84,8 +84,8 @@ namespace viua {
                 void detach();
                 bool stopped();
                 bool terminated();
-                std::unique_ptr<Type> transferActiveException();
-                std::unique_ptr<Type> getReturnValue();
+                std::unique_ptr<Value> transferActiveException();
+                std::unique_ptr<Value> getReturnValue();
 
                 Process(viua::process::Process* t): thrd(t) {}
         };

@@ -30,7 +30,7 @@
 
 namespace viua {
     namespace types {
-        class Exception : public Type {
+        class Exception : public Value {
             /** Exception type.
              *
              *  Thrown when irrecoverable conditions are encountered
@@ -55,8 +55,8 @@ namespace viua {
                     return true;
                 }
 
-                std::unique_ptr<Type> copy() const override {
-                    return std::unique_ptr<viua::types::Type>{new Exception(cause)};
+                std::unique_ptr<Value> copy() const override {
+                    return std::unique_ptr<viua::types::Value>{new Exception(cause)};
                 }
 
                 virtual std::string what() const;

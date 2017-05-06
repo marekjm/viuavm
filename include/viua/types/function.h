@@ -30,9 +30,7 @@
 
 namespace viua {
     namespace types {
-        class Function : public Type {
-            /** Type representing a function.
-             */
+        class Function : public Value {
             public:
                 static const std::string type_name;
 
@@ -44,7 +42,7 @@ namespace viua {
 
                 bool boolean() const override;
 
-                std::unique_ptr<Type> copy() const override;
+                std::unique_ptr<Value> copy() const override;
 
                 virtual std::string name() const;
 
