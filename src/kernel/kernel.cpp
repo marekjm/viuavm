@@ -28,7 +28,7 @@
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/opcodes.h>
 #include <viua/bytecode/maps.h>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/types/integer.h>
 #include <viua/types/string.h>
 #include <viua/types/vector.h>

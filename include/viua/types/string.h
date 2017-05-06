@@ -23,7 +23,7 @@
 #pragma once
 
 #include <string>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/types/vector.h>
 #include <viua/types/integer.h>
 #include <viua/support/string.h>

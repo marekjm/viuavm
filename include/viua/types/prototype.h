@@ -23,7 +23,7 @@
 #pragma once
 
 #include <map>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 
 
 namespace viua {

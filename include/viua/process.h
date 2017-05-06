@@ -29,7 +29,7 @@
 #include <memory>
 #include <chrono>
 #include <viua/bytecode/bytetypedef.h>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/types/prototype.h>
 #include <viua/kernel/registerset.h>
 #include <viua/kernel/frame.h>

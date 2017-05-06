@@ -24,7 +24,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include <viua/support/string.h>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/types/pointer.h>
 #include <viua/types/boolean.h>
 #include <viua/types/vector.h>

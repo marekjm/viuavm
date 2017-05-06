@@ -18,7 +18,7 @@
  */
 
 #include <iostream>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
 #include <viua/include/module.h>

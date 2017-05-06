@@ -21,7 +21,7 @@
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/assert.h>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/types/integer.h>
 #include <viua/types/vector.h>
 #include <viua/types/pointer.h>

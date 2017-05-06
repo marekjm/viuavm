@@ -26,7 +26,7 @@
 #include <utility>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/operand_types.h>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/types/exception.h>
 #include <viua/kernel/registerset.h>
 

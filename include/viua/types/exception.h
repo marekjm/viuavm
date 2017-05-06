@@ -24,7 +24,7 @@
 
 #include <string>
 #include <viua/bytecode/bytetypedef.h>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/support/string.h>
 
 

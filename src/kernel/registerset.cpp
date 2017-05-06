@@ -20,7 +20,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/types/integer.h>
 #include <viua/types/exception.h>
 #include <viua/types/reference.h>

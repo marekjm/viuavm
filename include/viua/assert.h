@@ -24,7 +24,7 @@
 
 #include <string>
 #include <viua/kernel/frame.h>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/exceptions.h>
 
 

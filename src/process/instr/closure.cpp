@@ -19,7 +19,7 @@
 
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/decoder/operands.h>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/types/integer.h>
 #include <viua/types/function.h>
 #include <viua/types/closure.h>

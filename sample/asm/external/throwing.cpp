@@ -19,7 +19,7 @@
 
 #include <cmath>
 #include <iostream>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/types/float.h>
 #include <viua/types/exception.h>
 #include <viua/kernel/frame.h>

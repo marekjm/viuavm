@@ -25,7 +25,7 @@
 #include <string>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/kernel/registerset.h>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 
 
 namespace viua {

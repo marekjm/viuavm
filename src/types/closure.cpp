@@ -20,7 +20,7 @@
 #include <string>
 #include <sstream>
 #include <viua/types/closure.h>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 using namespace std;
 
 const string viua::types::Closure::type_name = "Closure";

@@ -23,7 +23,7 @@
 #pragma once
 
 #include <vector>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/kernel/frame.h>
 
 

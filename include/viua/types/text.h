@@ -24,7 +24,7 @@
 
 #include <string>
 #include <vector>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/support/string.h>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>

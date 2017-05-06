@@ -19,7 +19,7 @@
 
 #include <utility>
 #include <viua/bytecode/operand_types.h>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/types/integer.h>
 #include <viua/types/pointer.h>
 #include <viua/types/reference.h>

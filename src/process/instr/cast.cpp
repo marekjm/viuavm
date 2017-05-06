@@ -20,7 +20,7 @@
 #include <string>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/decoder/operands.h>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/types/integer.h>
 #include <viua/types/float.h>
 #include <viua/types/string.h>

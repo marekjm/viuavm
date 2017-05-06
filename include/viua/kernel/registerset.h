@@ -25,7 +25,7 @@
 #include <memory>
 #include <vector>
 #include <viua/bytecode/bytetypedef.h>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 
 typedef uint8_t mask_type;
 

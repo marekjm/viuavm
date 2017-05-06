@@ -19,7 +19,7 @@
 
 #include <string>
 #include <sstream>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/types/function.h>
 using namespace std;
 
