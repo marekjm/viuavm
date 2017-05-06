@@ -38,6 +38,27 @@ using namespace viua::types;
 
 const string viua::types::String::type_name = "String";
 
+string String::type() const {
+    return "String";
+}
+string String::str() const {
+    return svalue;
+}
+string String::repr() const {
+    return str::enquote(svalue);
+}
+bool String::boolean() const {
+    return svalue.size() != 0;
+}
+
+unique_ptr<Value> String::copy() const {
+    return unique_ptr<viua::types::Value>{new String(svalue)};
+}
+
+string& String::value() {
+    return svalue;
+}
+
 Integer* String::size() {
     /** Return size of the string.
      */
@@ -200,4 +221,7 @@ void String::join(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*
 
 void String::size(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     frame->local_register_set->set(0, unique_ptr<viua::types::Value>{new Integer(static_cast<int>(svalue.size()))});
+}
+
+String::String(string s): svalue(s) {
 }

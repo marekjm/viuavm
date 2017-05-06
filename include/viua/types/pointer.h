@@ -67,12 +67,8 @@ namespace viua {
                 std::string type() const override;
                 bool boolean() const override;
 
-                std::vector<std::string> bases() const override {
-                    return std::vector<std::string>{"Value"};
-                }
-                std::vector<std::string> inheritancechain() const override {
-                    return std::vector<std::string>{"Value"};
-                }
+                std::vector<std::string> bases() const override;
+                std::vector<std::string> inheritancechain() const override;
 
                 std::unique_ptr<Value> copy() const override;
 

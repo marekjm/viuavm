@@ -78,6 +78,12 @@ unique_ptr<viua::types::Value> viua::types::Object::remove(const string& key) {
     return o;
 }
 
+vector<string> viua::types::Object::bases() const {
+    return vector<string>{"Value"};
+}
+vector<string> viua::types::Object::inheritancechain() const {
+    return vector<string>{"Value"};
+}
 
 viua::types::Object::Object(const std::string& tn): object_type_name(tn) {}
 viua::types::Object::~Object() {

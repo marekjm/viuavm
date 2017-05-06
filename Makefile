@@ -99,6 +99,9 @@ build/platform/value.o: src/types/value.cpp
 build/platform/pointer.o: src/types/pointer.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -o ./build/platform/pointer.o src/types/pointer.cpp
 
+build/platform/number.o: src/types/number.cpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ $^
+
 build/platform/integer.o: src/types/integer.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c -o ./build/platform/integer.o src/types/integer.cpp
 
@@ -147,13 +150,13 @@ build/test/sleeper.so: build/test/sleeper.o build/platform/registerset.o build/p
 build/test/math.o:  sample/asm/external/math.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o build/test/math.o ./sample/asm/external/math.cpp
 
-build/test/math.so: build/test/math.o build/platform/registerset.o build/platform/exception.o build/platform/value.o build/platform/pointer.o build/platform/integer.o build/platform/float.o
+build/test/math.so: build/test/math.o build/platform/registerset.o build/platform/exception.o build/platform/value.o build/platform/pointer.o build/platform/integer.o build/platform/float.o build/platform/number.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -fPIC -shared -o $@ $^
 
 build/test/throwing.o:  sample/asm/external/throwing.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -fPIC -o $@ $^
 
-build/test/throwing.so: build/test/throwing.o build/platform/registerset.o build/platform/exception.o build/platform/value.o build/platform/pointer.o build/platform/integer.o
+build/test/throwing.so: build/test/throwing.o build/platform/registerset.o build/platform/exception.o build/platform/value.o build/platform/pointer.o build/platform/integer.o build/platform/number.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -fPIC -shared -o $@ $^
 
 compile-test: build/test/math.so build/test/World.so build/test/throwing.so build/test/printer.so build/test/sleeper.so
@@ -286,7 +289,7 @@ build/stdlib/random.o: src/stdlib/random.cpp
 build/stdlib/kitchensink.o: src/stdlib/kitchensink.cpp
 	$(CXX) -std=$(CXX_STANDARD) -fPIC -c -I./include -o $@ $<
 
-build/stdlib/typesystem.so: build/stdlib/typesystem.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o build/platform/value.o build/platform/pointer.o build/platform/integer.o
+build/stdlib/typesystem.so: build/stdlib/typesystem.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o build/platform/value.o build/platform/pointer.o build/platform/integer.o build/platform/number.o
 	$(CXX) -std=$(CXX_STANDARD) -fPIC -shared -o $@ $^
 
 build/stdlib/io.so: build/stdlib/io.o build/platform/exception.o build/platform/vector.o build/platform/registerset.o build/platform/support_string.o build/platform/string.o build/platform/value.o build/platform/pointer.o build/platform/integer.o

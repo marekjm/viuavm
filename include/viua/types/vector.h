@@ -37,9 +37,7 @@ namespace viua {
             public:
                 static const std::string type_name;
 
-                std::string type() const override {
-                    return "Vector";
-                }
+                std::string type() const override;
                 std::string str() const override;
                 bool boolean() const override;
                 std::unique_ptr<Value> copy() const override;

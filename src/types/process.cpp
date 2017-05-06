@@ -100,3 +100,6 @@ void viua::types::Process::detach(Frame*, viua::kernel::RegisterSet*, viua::kern
 viua::process::PID viua::types::Process::pid() const {
     return thrd->pid();
 }
+
+viua::types::Process::Process(viua::process::Process* t): thrd(t) {
+}

@@ -38,7 +38,7 @@ namespace viua {
             /*  This constructor is used internally by the Reference type to
              *  initialise copies of the reference.
              */
-            Reference(Value **ptr, uint64_t *ctr): pointer(ptr), counter(ctr) {}
+            Reference(Value **ptr, uint64_t *ctr);
 
             public:
                 static const std::string type_name;

@@ -31,6 +31,13 @@ bool viua::types::Prototype::boolean() const {
     return true;
 }
 
+vector<string> viua::types::Prototype::bases() const {
+    return vector<string>{"Value"};
+}
+vector<string> viua::types::Prototype::inheritancechain() const {
+    return vector<string>{"Value"};
+}
+
 string viua::types::Prototype::str() const {
     return ("Prototype for " + prototype_name);
 }
@@ -63,4 +70,10 @@ bool viua::types::Prototype::accepts(const string& method_name) const {
 
 string viua::types::Prototype::resolvesTo(const string& method_name) const {
     return methods.at(method_name);
+}
+
+viua::types::Prototype::Prototype(const string& tn): prototype_name(tn) {
+}
+
+viua::types::Prototype::~Prototype() {
 }

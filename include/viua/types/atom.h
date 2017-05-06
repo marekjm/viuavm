@@ -39,12 +39,8 @@ namespace viua {
                 virtual std::string str() const override;
                 virtual std::string repr() const override;
 
-                virtual std::vector<std::string> bases() const override {
-                    return std::vector<std::string>{"Value"};
-                }
-                virtual std::vector<std::string> inheritancechain() const override {
-                    return std::vector<std::string>{"Value"};
-                }
+                virtual std::vector<std::string> bases() const override;
+                virtual std::vector<std::string> inheritancechain() const override;
 
                 operator std::string () const;
                 auto operator == (const Atom&) const -> bool;

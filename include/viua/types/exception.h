@@ -42,28 +42,18 @@ namespace viua {
             public:
                 static const std::string type_name;
 
-                std::string type() const override {
-                    return "Exception";
-                }
-                std::string str() const override {
-                    return cause;
-                }
-                std::string repr() const override {
-                    return (etype() + ": " + str::enquote(cause));
-                }
-                bool boolean() const override {
-                    return true;
-                }
+                std::string type() const override;
+                std::string str() const override;
+                std::string repr() const override;
+                bool boolean() const override;
 
-                std::unique_ptr<Value> copy() const override {
-                    return std::unique_ptr<viua::types::Value>{new Exception(cause)};
-                }
+                std::unique_ptr<Value> copy() const override;
 
                 virtual std::string what() const;
                 virtual std::string etype() const;
 
-                Exception(std::string s = ""): cause(s), detailed_type("Exception") {}
-                Exception(std::string ts, std::string cs): cause(cs), detailed_type(ts) {}
+                Exception(std::string s = "");
+                Exception(std::string ts, std::string cs);
         };
     }
 }

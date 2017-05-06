@@ -55,24 +55,14 @@ namespace viua {
             public:
                 static const std::string type_name;
 
-                std::string type() const override {
-                    return "String";
-                }
-                std::string str() const override {
-                    return svalue;
-                }
-                std::string repr() const override {
-                    return str::enquote(svalue);
-                }
-                bool boolean() const override {
-                    return svalue.size() != 0;
-                }
+                std::string type() const override;
+                std::string str() const override;
+                std::string repr() const override;
+                bool boolean() const override;
 
-                std::unique_ptr<Value> copy() const override {
-                    return std::unique_ptr<viua::types::Value>{new String(svalue)};
-                }
+                std::unique_ptr<Value> copy() const override;
 
-                std::string& value() { return svalue; }
+                std::string& value();
 
                 Integer* size();
                 String* sub(int64_t b = 0, int64_t e = -1);
@@ -92,7 +82,7 @@ namespace viua {
 
                 virtual void size(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
 
-                String(std::string s = ""): svalue(s) {}
+                String(std::string s = "");
         };
     }
 }

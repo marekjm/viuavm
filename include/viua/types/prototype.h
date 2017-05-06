@@ -62,17 +62,13 @@ namespace viua {
                 Prototype* derive(const std::string&);
 
 
-                std::vector<std::string> bases() const override {
-                    return std::vector<std::string>{"Value"};
-                }
-                std::vector<std::string> inheritancechain() const override {
-                    return std::vector<std::string>{"Value"};
-                }
+                std::vector<std::string> bases() const override;
+                std::vector<std::string> inheritancechain() const override;
 
                 std::unique_ptr<Value> copy() const override;
 
-                Prototype(const std::string& tn): prototype_name(tn) {}
-                virtual ~Prototype() {}
+                Prototype(const std::string& tn);
+                virtual ~Prototype();
         };
     }
 }

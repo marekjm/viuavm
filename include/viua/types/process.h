@@ -87,7 +87,7 @@ namespace viua {
                 std::unique_ptr<Value> transferActiveException();
                 std::unique_ptr<Value> getReturnValue();
 
-                Process(viua::process::Process* t): thrd(t) {}
+                Process(viua::process::Process* t);
         };
     }
 }
