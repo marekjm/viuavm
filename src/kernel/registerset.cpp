@@ -20,7 +20,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/types/integer.h>
 #include <viua/types/exception.h>
 #include <viua/types/reference.h>
@@ -28,7 +28,7 @@
 using namespace std;
 
 
-void viua::kernel::Register::reset(unique_ptr<viua::types::Type> o) {
+void viua::kernel::Register::reset(unique_ptr<viua::types::Value> o) {
     if (dynamic_cast<viua::types::Reference*>(value.get())) {
         static_cast<viua::types::Reference*>(value.get())->rebind(o.release());
     } else {
@@ -40,16 +40,16 @@ bool viua::kernel::Register::empty() const {
     return value == nullptr;
 }
 
-viua::types::Type* viua::kernel::Register::get() {
+viua::types::Value* viua::kernel::Register::get() {
     return value.get();
 }
 
-viua::types::Type* viua::kernel::Register::release() {
+viua::types::Value* viua::kernel::Register::release() {
     mask = 0;
     return value.release();
 }
 
-std::unique_ptr<viua::types::Type> viua::kernel::Register::give() {
+std::unique_ptr<viua::types::Value> viua::kernel::Register::give() {
     mask = 0;
     return std::move(value);
 }
@@ -90,7 +90,7 @@ bool viua::kernel::Register::is_flagged(mask_type filter) const {
 viua::kernel::Register::Register(): value(nullptr), mask(0) {
 }
 
-viua::kernel::Register::Register(std::unique_ptr<viua::types::Type> o): value(std::move(o)), mask(0) {
+viua::kernel::Register::Register(std::unique_ptr<viua::types::Value> o): value(std::move(o)), mask(0) {
 }
 
 viua::kernel::Register::Register(Register&& that): value(std::move(that.value)), mask(that.mask) {
@@ -115,15 +115,15 @@ auto viua::kernel::Register::operator =(decltype(value)&& o) -> Register& {
 }
 
 
-void viua::kernel::RegisterSet::put(viua::internals::types::register_index index, unique_ptr<viua::types::Type> object) {
+void viua::kernel::RegisterSet::put(viua::internals::types::register_index index, unique_ptr<viua::types::Value> object) {
     if (index >= registerset_size) { throw new viua::types::Exception("register access out of bounds: write"); }
     registers.at(index).reset(std::move(object));
 }
 
-unique_ptr<viua::types::Type> viua::kernel::RegisterSet::pop(viua::internals::types::register_index index) {
+unique_ptr<viua::types::Value> viua::kernel::RegisterSet::pop(viua::internals::types::register_index index) {
     /** Pop an object from the register.
      */
-    unique_ptr<viua::types::Type> object {at(index)};
+    unique_ptr<viua::types::Value> object {at(index)};
     if (not object) {
         // FIXME: throw an exception on read from empty register
     }
@@ -131,7 +131,7 @@ unique_ptr<viua::types::Type> viua::kernel::RegisterSet::pop(viua::internals::ty
     return object;
 }
 
-void viua::kernel::RegisterSet::set(viua::internals::types::register_index index, unique_ptr<viua::types::Type> object) {
+void viua::kernel::RegisterSet::set(viua::internals::types::register_index index, unique_ptr<viua::types::Value> object) {
     /** Put object inside register specified by given index.
      *
      *  Performs bounds checking.
@@ -145,7 +145,7 @@ void viua::kernel::RegisterSet::set(viua::internals::types::register_index index
     }
 }
 
-viua::types::Type* viua::kernel::RegisterSet::get(viua::internals::types::register_index index) {
+viua::types::Value* viua::kernel::RegisterSet::get(viua::internals::types::register_index index) {
     /** Fetch object from register specified by given index.
      *
      *  Performs bounds checking.
@@ -156,7 +156,7 @@ viua::types::Type* viua::kernel::RegisterSet::get(viua::internals::types::regist
         emsg << "register access out of bounds: read from " << index;
         throw new viua::types::Exception(emsg.str());
     }
-    viua::types::Type* optr = registers.at(index).get();
+    viua::types::Value* optr = registers.at(index).get();
     if (optr == nullptr) {
         ostringstream oss;
         oss << "(get) read from null register: " << index;
@@ -165,7 +165,7 @@ viua::types::Type* viua::kernel::RegisterSet::get(viua::internals::types::regist
     return optr;
 }
 
-viua::types::Type* viua::kernel::RegisterSet::at(viua::internals::types::register_index index) {
+viua::types::Value* viua::kernel::RegisterSet::at(viua::internals::types::register_index index) {
     /** Fetch object from register specified by given index.
      *
      *  Performs bounds checking.

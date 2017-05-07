@@ -25,19 +25,19 @@
 #include <map>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 
 
 namespace viua {
     namespace types {
-        class Object: public Type {
+        class Object: public Value {
             /** A generic object class.
              *
              *  This type is used internally inside the VM.
              */
             private:
                 std::string object_type_name;
-                std::map<std::string, std::unique_ptr<Type>> attributes;
+                std::map<std::string, std::unique_ptr<Value>> attributes;
 
             public:
                 static const std::string type_name;
@@ -47,20 +47,16 @@ namespace viua {
 
                 std::string str() const override;
 
-                std::vector<std::string> bases() const override {
-                    return std::vector<std::string>{"Type"};
-                }
-                std::vector<std::string> inheritancechain() const override {
-                    return std::vector<std::string>{"Type"};
-                }
+                std::vector<std::string> bases() const override;
+                std::vector<std::string> inheritancechain() const override;
 
-                void insert(const std::string& key, std::unique_ptr<Type> value);
-                std::unique_ptr<Type> remove(const std::string& key);
+                void insert(const std::string& key, std::unique_ptr<Value> value);
+                std::unique_ptr<Value> remove(const std::string& key);
 
-                void set(const std::string&, std::unique_ptr<Type>);
-                inline Type* at(const std::string& s) { return attributes.at(s).get(); }
+                void set(const std::string&, std::unique_ptr<Value>);
+                inline Value* at(const std::string& s) { return attributes.at(s).get(); }
 
-                virtual std::unique_ptr<Type> copy() const override;
+                virtual std::unique_ptr<Value> copy() const override;
 
                 Object(const std::string& tn);
                 virtual ~Object();

@@ -24,7 +24,7 @@
 
 #include <string>
 #include <memory>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/types/vector.h>
 #include <viua/types/integer.h>
 #include <viua/support/string.h>
@@ -43,7 +43,7 @@ namespace viua {
 
 namespace viua {
     namespace types {
-        class Process : public Type {
+        class Process : public Value {
             viua::process::Process* thrd;
             viua::process::PID saved_pid;
 
@@ -58,7 +58,7 @@ namespace viua {
                 std::string str() const override;
                 std::string repr() const override;
                 bool boolean() const override;
-                std::unique_ptr<Type> copy() const override;
+                std::unique_ptr<Value> copy() const override;
 
                 /*
                  * For use by the VM.
@@ -66,7 +66,7 @@ namespace viua {
                  */
                 viua::process::PID pid() const;
 
-                Process(viua::process::Process* t): thrd(t), saved_pid(thrd->pid()) {}
+                Process(viua::process::Process*);
         };
     }
 }

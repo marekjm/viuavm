@@ -28,7 +28,7 @@
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/opcodes.h>
 #include <viua/bytecode/maps.h>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/types/integer.h>
 #include <viua/types/string.h>
 #include <viua/types/vector.h>
@@ -50,12 +50,12 @@ using namespace std;
 viua::kernel::Mailbox::Mailbox(Mailbox&& that): messages(std::move(that.messages)) {
 }
 
-auto viua::kernel::Mailbox::send(unique_ptr<viua::types::Type> message) -> void {
+auto viua::kernel::Mailbox::send(unique_ptr<viua::types::Value> message) -> void {
     unique_lock<mutex> lck { mailbox_mutex };
     messages.push_back(std::move(message));
 }
 
-auto viua::kernel::Mailbox::receive(queue<unique_ptr<viua::types::Type>>& mq) -> void {
+auto viua::kernel::Mailbox::receive(queue<unique_ptr<viua::types::Value>>& mq) -> void {
     unique_lock<mutex> lck { mailbox_mutex };
     for (auto& message : messages) {
         mq.push(std::move(message));
@@ -74,12 +74,12 @@ viua::kernel::ProcessResult::ProcessResult(ProcessResult&& that) {
     exception_thrown = std::move(that.exception_thrown);
     done.store(that.done.load(std::memory_order_acquire), std::memory_order_release);
 }
-auto viua::kernel::ProcessResult::resolve(unique_ptr<viua::types::Type> result) -> void {
+auto viua::kernel::ProcessResult::resolve(unique_ptr<viua::types::Value> result) -> void {
     unique_lock<mutex> lck { result_mutex };
     value_returned = std::move(result);
     done.store(true, std::memory_order_release);
 }
-auto viua::kernel::ProcessResult::raise(unique_ptr<viua::types::Type> failure) -> void {
+auto viua::kernel::ProcessResult::raise(unique_ptr<viua::types::Value> failure) -> void {
     unique_lock<mutex> lck { result_mutex };
     exception_thrown = std::move(failure);
     done.store(true, std::memory_order_release);
@@ -94,11 +94,11 @@ auto viua::kernel::ProcessResult::terminated() const -> bool {
     }
     return false;
 }
-auto viua::kernel::ProcessResult::transfer_exception() -> unique_ptr<viua::types::Type> {
+auto viua::kernel::ProcessResult::transfer_exception() -> unique_ptr<viua::types::Value> {
     unique_lock<mutex> lck { result_mutex };
     return std::move(exception_thrown);
 }
-auto viua::kernel::ProcessResult::transfer_result() -> unique_ptr<viua::types::Type> {
+auto viua::kernel::ProcessResult::transfer_result() -> unique_ptr<viua::types::Value> {
     unique_lock<mutex> lck { result_mutex };
     return std::move(value_returned);
 }
@@ -378,7 +378,7 @@ void viua::kernel::Kernel::requestForeignFunctionCall(Frame *frame, viua::proces
     foreign_call_queue_condition.notify_one();
 }
 
-void viua::kernel::Kernel::requestForeignMethodCall(const string& name, viua::types::Type *object, Frame *frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process *p) {
+void viua::kernel::Kernel::requestForeignMethodCall(const string& name, viua::types::Value *object, Frame *frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process *p) {
     foreign_methods.at(name)(object, frame, nullptr, nullptr, p, this);
 }
 
@@ -445,20 +445,20 @@ auto viua::kernel::Kernel::is_process_terminated(const viua::process::PID pid) c
     unique_lock<mutex> lck { process_results_mutex };
     return process_results.at(pid).terminated();
 }
-auto viua::kernel::Kernel::transfer_exception_of(const viua::process::PID pid) -> unique_ptr<viua::types::Type> {
+auto viua::kernel::Kernel::transfer_exception_of(const viua::process::PID pid) -> unique_ptr<viua::types::Value> {
     unique_lock<mutex> lck { process_results_mutex };
     auto tmp = process_results.at(pid).transfer_exception();
     process_results.erase(pid);
     return tmp;
 }
-auto viua::kernel::Kernel::transfer_result_of(const viua::process::PID pid) -> unique_ptr<viua::types::Type> {
+auto viua::kernel::Kernel::transfer_result_of(const viua::process::PID pid) -> unique_ptr<viua::types::Value> {
     unique_lock<mutex> lck { process_results_mutex };
     auto tmp = process_results.at(pid).transfer_result();
     process_results.erase(pid);
     return tmp;
 }
 
-void viua::kernel::Kernel::send(const viua::process::PID pid, unique_ptr<viua::types::Type> message) {
+void viua::kernel::Kernel::send(const viua::process::PID pid, unique_ptr<viua::types::Value> message) {
     unique_lock<mutex> lck(mailbox_mutex);
     if (mailboxes.count(pid) == 0) {
         // sending a message to an unknown address just drops the message
@@ -470,7 +470,7 @@ void viua::kernel::Kernel::send(const viua::process::PID pid, unique_ptr<viua::t
 #endif
     mailboxes[pid].send(std::move(message));
 }
-void viua::kernel::Kernel::receive(const viua::process::PID pid, queue<unique_ptr<viua::types::Type>>& message_queue) {
+void viua::kernel::Kernel::receive(const viua::process::PID pid, queue<unique_ptr<viua::types::Value>>& message_queue) {
     unique_lock<mutex> lck(mailbox_mutex);
     if (mailboxes.count(pid) == 0) {
         throw new viua::types::Exception("invalid PID");

@@ -49,11 +49,13 @@ bool viua::types::Process::boolean() const {
     return false;
 }
 
-unique_ptr<viua::types::Type> viua::types::Process::copy() const {
-    return unique_ptr<viua::types::Type>{new viua::types::Process(thrd)};
+unique_ptr<viua::types::Value> viua::types::Process::copy() const {
+    return unique_ptr<viua::types::Value>{new viua::types::Process(thrd)};
 }
-
 
 viua::process::PID viua::types::Process::pid() const {
     return saved_pid;
+}
+
+viua::types::Process::Process(viua::process::Process* t): thrd(t), saved_pid(thrd->pid()) {
 }

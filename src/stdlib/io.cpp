@@ -20,7 +20,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/types/pointer.h>
 #include <viua/types/string.h>
 #include <viua/types/vector.h>
@@ -31,7 +31,7 @@
 using namespace std;
 
 
-class Ifstream: public viua::types::Type {
+class Ifstream: public viua::types::Value {
         ifstream in;
         const string filename;
 
@@ -50,10 +50,10 @@ class Ifstream: public viua::types::Type {
         }
 
         virtual std::vector<std::string> bases() const override {
-            return std::vector<std::string>{"viua::types::Type"};
+            return std::vector<std::string>{"viua::types::Value"};
         }
         virtual std::vector<std::string> inheritancechain() const override {
-            return std::vector<std::string>{"viua::types::Type"};
+            return std::vector<std::string>{"viua::types::Value"};
         }
 
         string getline() {
@@ -66,7 +66,7 @@ class Ifstream: public viua::types::Type {
             return line;
         }
 
-        unique_ptr<viua::types::Type> copy() const override {
+        unique_ptr<viua::types::Value> copy() const override {
             throw new viua::types::Exception("Ifstream is not copyable");
         }
 
@@ -84,7 +84,7 @@ class Ifstream: public viua::types::Type {
 void io_stdin_getline(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
     string line;
     getline(cin, line);
-    frame->local_register_set->set(0, unique_ptr<viua::types::Type>{new viua::types::String(line)});
+    frame->local_register_set->set(0, unique_ptr<viua::types::Value>{new viua::types::String(line)});
 }
 
 void io_stdout_write(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
@@ -106,16 +106,16 @@ void io_file_read(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Regist
         oss << line << '\n';
     }
 
-    frame->local_register_set->set(0, unique_ptr<viua::types::Type>{new viua::types::String(oss.str())});
+    frame->local_register_set->set(0, unique_ptr<viua::types::Value>{new viua::types::String(oss.str())});
 }
 
 void io_ifstream_open(Frame *frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
-    frame->local_register_set->set(0, unique_ptr<viua::types::Type>{new Ifstream(frame->arguments->get(0)->str())});
+    frame->local_register_set->set(0, unique_ptr<viua::types::Value>{new Ifstream(frame->arguments->get(0)->str())});
 }
 
 void io_ifstream_getline(Frame *frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process* p, viua::kernel::Kernel*) {
     Ifstream *in = dynamic_cast<Ifstream*>(static_cast<viua::types::Pointer*>(frame->arguments->get(0))->to(p));
-    frame->local_register_set->set(0, unique_ptr<viua::types::Type>{new viua::types::String(in->getline())});
+    frame->local_register_set->set(0, unique_ptr<viua::types::Value>{new viua::types::String(in->getline())});
 }
 
 const ForeignFunctionSpec functions[] = {

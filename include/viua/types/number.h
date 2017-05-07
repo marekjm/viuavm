@@ -25,7 +25,7 @@
 #include <cstdint>
 #include <string>
 #include <sstream>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/types/boolean.h>
 
 
@@ -35,7 +35,7 @@ namespace viua {
 
     namespace types {
         namespace numeric {
-            class Number : public Type {
+            class Number : public Value {
                 /** Base number type.
                  *
                  *  All types representing numbers *must* inherit from
@@ -45,15 +45,11 @@ namespace viua {
                 public:
                     static const std::string type_name;
 
-                    std::string type() const override {
-                        return "Number";
-                    }
+                    std::string type() const override;
                     std::string str() const override = 0;
                     bool boolean() const override = 0;
 
-                    virtual bool negative() {
-                        return (as_integer() < 0);
-                    }
+                    virtual bool negative() const;
 
                     virtual auto as_integer() const -> int64_t = 0;
                     virtual auto as_float() const -> float64 = 0;
@@ -69,8 +65,8 @@ namespace viua {
                     virtual auto operator >= (const Number&) const -> std::unique_ptr<Boolean> = 0;
                     virtual auto operator == (const Number&) const -> std::unique_ptr<Boolean> = 0;
 
-                    Number() {}
-                    virtual ~Number() {}
+                    Number();
+                    virtual ~Number();
             };
         }
     }

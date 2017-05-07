@@ -23,12 +23,12 @@
 #pragma once
 
 #include <map>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 
 
 namespace viua {
     namespace types {
-        class Prototype: public Type {
+        class Prototype: public Value {
             /** A prototype of a type.
              *
              *  This type is used internally inside the VM.
@@ -62,17 +62,13 @@ namespace viua {
                 Prototype* derive(const std::string&);
 
 
-                std::vector<std::string> bases() const override {
-                    return std::vector<std::string>{"Type"};
-                }
-                std::vector<std::string> inheritancechain() const override {
-                    return std::vector<std::string>{"Type"};
-                }
+                std::vector<std::string> bases() const override;
+                std::vector<std::string> inheritancechain() const override;
 
-                std::unique_ptr<Type> copy() const override;
+                std::unique_ptr<Value> copy() const override;
 
-                Prototype(const std::string& tn): prototype_name(tn) {}
-                virtual ~Prototype() {}
+                Prototype(const std::string& tn);
+                virtual ~Prototype();
         };
     }
 }

@@ -51,7 +51,7 @@ namespace viua {
                 virtual int64_t increment();
                 virtual int64_t decrement();
 
-                std::unique_ptr<Type> copy() const override;
+                std::unique_ptr<Value> copy() const override;
 
                 auto as_integer() const -> int64_t override;
                 auto as_float() const -> viua::float64 override;

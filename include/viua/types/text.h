@@ -24,7 +24,7 @@
 
 #include <string>
 #include <vector>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/support/string.h>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
@@ -42,7 +42,7 @@ namespace viua {
 
 namespace viua {
     namespace types {
-        class Text : public Type {
+        class Text : public Value {
             /**
              *  This type is designed to hold UTF-8 encoded text.
              *  Viua becomes tied to Unicode and the UTF-8 encoding.
@@ -63,7 +63,7 @@ namespace viua {
                 std::string repr() const override;
                 bool boolean() const override;
 
-                std::unique_ptr<Type> copy() const override;
+                std::unique_ptr<Value> copy() const override;
 
                 auto operator == (const Text&) const -> bool;
                 auto operator + (const Text&) const -> Text;

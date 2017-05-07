@@ -49,7 +49,7 @@ namespace viua {
 
                 auto value() -> decltype(number)&;
 
-                std::unique_ptr<Type> copy() const override;
+                std::unique_ptr<Value> copy() const override;
 
                 auto as_integer() const -> int64_t override;
                 auto as_float() const -> float64 override;

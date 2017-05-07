@@ -21,7 +21,7 @@
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/assert.h>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/types/integer.h>
 #include <viua/types/vector.h>
 #include <viua/types/pointer.h>
@@ -70,9 +70,9 @@ viua::internals::types::byte* viua::process::Process::opvinsert(viua::internals:
     viua::types::Vector* vector_operand = nullptr;
     tie(addr, vector_operand) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Vector>(addr, this);
 
-    unique_ptr<viua::types::Type> object;
+    unique_ptr<viua::types::Value> object;
     if (viua::bytecode::decoder::operands::get_operand_type(addr) == OT_POINTER) {
-        viua::types::Type* source = nullptr;
+        viua::types::Value* source = nullptr;
         tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
         object = source->copy();
     } else {
@@ -93,9 +93,9 @@ viua::internals::types::byte* viua::process::Process::opvpush(viua::internals::t
     viua::types::Vector* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Vector>(addr, this);
 
-    unique_ptr<viua::types::Type> object;
+    unique_ptr<viua::types::Value> object;
     if (viua::bytecode::decoder::operands::get_operand_type(addr) == OT_POINTER) {
-        viua::types::Type* source = nullptr;
+        viua::types::Value* source = nullptr;
         tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
         object = source->copy();
     } else {
@@ -132,7 +132,7 @@ viua::internals::types::byte* viua::process::Process::opvpop(viua::internals::ty
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 
-    unique_ptr<viua::types::Type> ptr = vector_operand->pop(position_operand_index);
+    unique_ptr<viua::types::Value> ptr = vector_operand->pop(position_operand_index);
     if (not void_target) {
         *target = std::move(ptr);
     }
@@ -162,7 +162,7 @@ viua::internals::types::byte* viua::process::Process::opvlen(viua::internals::ty
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Vector>(addr, this);
 
-    *target = unique_ptr<viua::types::Type>{new viua::types::Integer(source->len())};
+    *target = unique_ptr<viua::types::Value>{new viua::types::Integer(source->len())};
 
     return addr;
 }

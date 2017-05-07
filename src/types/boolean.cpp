@@ -21,3 +21,33 @@
 using namespace std;
 
 const string viua::types::Boolean::type_name = "Boolean";
+
+string viua::types::Boolean::type() const {
+    return "Boolean";
+}
+
+string viua::types::Boolean::str() const {
+    return (b ? "true" : "false");
+}
+
+bool viua::types::Boolean::boolean() const {
+    return b;
+}
+
+bool& viua::types::Boolean::value() {
+    return b;
+}
+
+vector<string> viua::types::Boolean::bases() const {
+    return vector<string>{"Number"};
+}
+vector<string> viua::types::Boolean::inheritancechain() const {
+    return vector<string>{"Number", "Value"};
+}
+
+unique_ptr<viua::types::Value> viua::types::Boolean::copy() const {
+    return unique_ptr<Boolean>{new Boolean(b)};
+}
+
+viua::types::Boolean::Boolean(bool v): b(v) {
+}

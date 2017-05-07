@@ -19,7 +19,7 @@
 
 #include <string>
 #include <sstream>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/types/function.h>
 using namespace std;
 
@@ -51,8 +51,8 @@ bool viua::types::Function::boolean() const {
     return true;
 }
 
-unique_ptr<viua::types::Type> viua::types::Function::copy() const {
-    return unique_ptr<viua::types::Type>{new viua::types::Function(function_name)};
+unique_ptr<viua::types::Value> viua::types::Function::copy() const {
+    return unique_ptr<viua::types::Value>{new viua::types::Function(function_name)};
 }
 
 

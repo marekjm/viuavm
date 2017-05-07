@@ -54,12 +54,19 @@ string viua::types::Struct::repr() const {
     return str();
 }
 
-void viua::types::Struct::insert(const string& key, unique_ptr<viua::types::Type> value) {
+vector<string> viua::types::Struct::bases() const {
+    return vector<string>{"Value"};
+}
+vector<string> viua::types::Struct::inheritancechain() const {
+    return vector<string>{"Value"};
+}
+
+void viua::types::Struct::insert(const string& key, unique_ptr<viua::types::Value> value) {
     attributes[key] = std::move(value);
 }
 
-unique_ptr<viua::types::Type> viua::types::Struct::remove(const string& key) {
-    unique_ptr<viua::types::Type> value = std::move(attributes.at(key));
+unique_ptr<viua::types::Value> viua::types::Struct::remove(const string& key) {
+    unique_ptr<viua::types::Value> value = std::move(attributes.at(key));
     attributes.erase(key);
     return value;
 }
@@ -72,7 +79,7 @@ vector<string> viua::types::Struct::keys() const {
     return ks;
 }
 
-unique_ptr<viua::types::Type> viua::types::Struct::copy() const {
+unique_ptr<viua::types::Value> viua::types::Struct::copy() const {
     unique_ptr<viua::types::Struct> copied { new Struct() };
     for (const auto& each : attributes) {
         copied->insert(each.first, each.second->copy());

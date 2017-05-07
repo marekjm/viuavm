@@ -41,8 +41,8 @@ auto Float::value() -> decltype(number)& {
     return number;
 }
 
-unique_ptr<viua::types::Type> Float::copy() const {
-    return unique_ptr<viua::types::Type>{new Float(number)};
+unique_ptr<viua::types::Value> Float::copy() const {
+    return unique_ptr<viua::types::Value>{new Float(number)};
 }
 
 auto Float::as_integer() const -> int64_t {

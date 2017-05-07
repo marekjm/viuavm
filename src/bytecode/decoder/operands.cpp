@@ -19,7 +19,7 @@
 
 #include <utility>
 #include <viua/bytecode/operand_types.h>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/types/integer.h>
 #include <viua/types/pointer.h>
 #include <viua/types/reference.h>
@@ -217,7 +217,7 @@ auto viua::bytecode::decoder::operands::fetch_atom(viua::internals::types::byte 
     return tuple<viua::internals::types::byte*, string>(ip, s);
 }
 
-auto viua::bytecode::decoder::operands::fetch_object(viua::internals::types::byte *ip, viua::process::Process *p) -> tuple<viua::internals::types::byte*, viua::types::Type*> {
+auto viua::bytecode::decoder::operands::fetch_object(viua::internals::types::byte *ip, viua::process::Process *p) -> tuple<viua::internals::types::byte*, viua::types::Value*> {
     bool is_pointer_dereference = (get_operand_type(ip) == OT_POINTER);
 
     viua::internals::RegisterSets register_type = viua::internals::RegisterSets::LOCAL;
@@ -246,5 +246,5 @@ auto viua::bytecode::decoder::operands::fetch_object(viua::internals::types::byt
         pointer_object->authenticate(p);
     }
 
-    return tuple<viua::internals::types::byte*, viua::types::Type*>(ip, object);
+    return tuple<viua::internals::types::byte*, viua::types::Value*>(ip, object);
 }

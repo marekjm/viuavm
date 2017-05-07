@@ -45,8 +45,8 @@ int64_t Integer::decrement() {
     return (--number);
 }
 
-unique_ptr<Type> Integer::copy() const {
-    return unique_ptr<Type>{new Integer(number)};
+unique_ptr<Value> Integer::copy() const {
+    return unique_ptr<Value>{new Integer(number)};
 }
 
 auto Integer::as_integer() const -> int64_t {

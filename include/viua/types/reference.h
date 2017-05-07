@@ -26,19 +26,19 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 
 namespace viua {
     namespace types {
-        class Reference: public Type {
+        class Reference: public Value {
             // FIXME maybe just use std::shared_ptr<> ?
-            Type **pointer;
+            Value **pointer;
             uint64_t *counter;
 
             /*  This constructor is used internally by the Reference type to
              *  initialise copies of the reference.
              */
-            Reference(Type **ptr, uint64_t *ctr): pointer(ptr), counter(ctr) {}
+            Reference(Value **ptr, uint64_t *ctr);
 
             public:
                 static const std::string type_name;
@@ -51,13 +51,13 @@ namespace viua {
                 std::vector<std::string> bases() const override;
                 std::vector<std::string> inheritancechain() const override;
 
-                std::unique_ptr<Type> copy() const override;
+                std::unique_ptr<Value> copy() const override;
 
-                virtual Type* pointsTo() const;
-                virtual void rebind(Type*);
-                virtual void rebind(std::unique_ptr<Type>);
+                virtual Value* pointsTo() const;
+                virtual void rebind(Value*);
+                virtual void rebind(std::unique_ptr<Value>);
 
-                Reference(Type *ptr);
+                Reference(Value *ptr);
                 virtual ~Reference();
         };
     }

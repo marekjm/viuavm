@@ -23,18 +23,18 @@ using namespace std;
 
 const string viua::types::Reference::type_name = "Reference";
 
-viua::types::Type* viua::types::Reference::pointsTo() const {
+viua::types::Value* viua::types::Reference::pointsTo() const {
     return *pointer;
 }
 
-void viua::types::Reference::rebind(viua::types::Type* ptr) {
+void viua::types::Reference::rebind(viua::types::Value* ptr) {
     if (*pointer) {
         delete (*pointer);
     }
     (*pointer) = ptr;
 }
 
-void viua::types::Reference::rebind(unique_ptr<viua::types::Type> ptr) {
+void viua::types::Reference::rebind(unique_ptr<viua::types::Value> ptr) {
     if (*pointer) {
         delete (*pointer);
     }
@@ -63,12 +63,14 @@ vector<string> viua::types::Reference::inheritancechain() const {
     return vector<string>({});
 }
 
-unique_ptr<viua::types::Type> viua::types::Reference::copy() const {
+unique_ptr<viua::types::Value> viua::types::Reference::copy() const {
     ++(*counter);
-    return unique_ptr<viua::types::Type>{new viua::types::Reference(pointer, counter)};
+    return unique_ptr<viua::types::Value>{new viua::types::Reference(pointer, counter)};
 }
 
-viua::types::Reference::Reference(viua::types::Type *ptr): pointer(new viua::types::Type*(ptr)), counter(new uint64_t(1)) {
+viua::types::Reference::Reference(viua::types::Value *ptr): pointer(new viua::types::Value*(ptr)), counter(new uint64_t(1)) {
+}
+viua::types::Reference::Reference(Value **ptr, uint64_t *ctr): pointer(ptr), counter(ctr) {
 }
 viua::types::Reference::~Reference() {
     /** Copies of the reference may be freely spawned and destroyed, but

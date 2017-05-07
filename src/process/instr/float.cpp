@@ -20,7 +20,7 @@
 #include <functional>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/decoder/operands.h>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/types/boolean.h>
 #include <viua/types/integer.h>
 #include <viua/types/float.h>
@@ -38,7 +38,7 @@ viua::internals::types::byte* viua::process::Process::opfstore(viua::internals::
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
     tie(addr, value) = viua::bytecode::decoder::operands::fetch_raw_float(addr, this);
 
-    *target = unique_ptr<viua::types::Type>{new viua::types::Float(value)};
+    *target = unique_ptr<viua::types::Value>{new viua::types::Float(value)};
 
     return addr;
 }

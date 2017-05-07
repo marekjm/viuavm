@@ -66,7 +66,7 @@ viua::internals::types::byte* viua::process::Process::opprocess(viua::internals:
 
     auto spawned_process = scheduler->spawn(std::move(stack.frame_new), this, target_is_void);
     if (not target_is_void) {
-        *target = unique_ptr<viua::types::Type>{new viua::types::Process(spawned_process)};
+        *target = unique_ptr<viua::types::Value>{new viua::types::Process(spawned_process)};
     }
 
     return addr;
@@ -223,7 +223,7 @@ viua::internals::types::byte* viua::process::Process::opself(viua::internals::ty
     viua::kernel::Register *target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    *target = unique_ptr<viua::types::Type>{new viua::types::Process(this)};
+    *target = unique_ptr<viua::types::Value>{new viua::types::Process(this)};
 
     return addr;
 }

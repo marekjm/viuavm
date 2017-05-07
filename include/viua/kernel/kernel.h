@@ -63,12 +63,12 @@ namespace viua {
     namespace kernel {
         class Mailbox {
             mutable std::mutex mailbox_mutex;
-            std::vector<std::unique_ptr<viua::types::Type>> messages;
+            std::vector<std::unique_ptr<viua::types::Value>> messages;
 
             public:
 
-            auto send(std::unique_ptr<viua::types::Type>) -> void;
-            auto receive(std::queue<std::unique_ptr<viua::types::Type>>&) -> void;
+            auto send(std::unique_ptr<viua::types::Value>) -> void;
+            auto receive(std::queue<std::unique_ptr<viua::types::Value>>&) -> void;
             auto size() const -> decltype(messages)::size_type;
 
             Mailbox() = default;
@@ -83,8 +83,8 @@ namespace viua {
                  * throw an exception.
                  * Slots for both of these cases must be provided.
                  */
-                std::unique_ptr<viua::types::Type> value_returned;
-                std::unique_ptr<viua::types::Type> exception_thrown;
+                std::unique_ptr<viua::types::Value> value_returned;
+                std::unique_ptr<viua::types::Value> exception_thrown;
 
                 /*
                  * A flag set to 'true' once the process has finished execution.
@@ -105,19 +105,19 @@ namespace viua {
                  * Resolve a process to some return value.
                  * This means that the execution succeeded.
                  */
-                auto resolve(std::unique_ptr<viua::types::Type>) -> void;
+                auto resolve(std::unique_ptr<viua::types::Value>) -> void;
 
                 /*
                  * Raise an exception that killed the process.
                  * This means that the execution failed.
                  */
-                auto raise(std::unique_ptr<viua::types::Type>) -> void;
+                auto raise(std::unique_ptr<viua::types::Value>) -> void;
 
                 /*
                  * Transfer return value and exception from process result.
                  */
-                auto transfer_exception() -> std::unique_ptr<viua::types::Type>;
-                auto transfer_result() -> std::unique_ptr<viua::types::Type>;
+                auto transfer_exception() -> std::unique_ptr<viua::types::Value>;
+                auto transfer_result() -> std::unique_ptr<viua::types::Value>;
 
                 ProcessResult() = default;
                 ProcessResult(ProcessResult&&);
@@ -261,7 +261,7 @@ namespace viua {
                 Kernel& registerForeignMethod(const std::string&, ForeignMethod);
 
                 void requestForeignFunctionCall(Frame*, viua::process::Process*);
-                void requestForeignMethodCall(const std::string&, viua::types::Type*, Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*);
+                void requestForeignMethodCall(const std::string&, viua::types::Value*, Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*);
 
                 void postFreeProcess(std::unique_ptr<viua::process::Process>);
 
@@ -274,11 +274,11 @@ namespace viua {
                 auto is_process_joinable(const viua::process::PID) const -> bool;
                 auto is_process_stopped(const viua::process::PID) const -> bool;
                 auto is_process_terminated(const viua::process::PID) const -> bool;
-                auto transfer_exception_of(const viua::process::PID) -> std::unique_ptr<viua::types::Type>;
-                auto transfer_result_of(const viua::process::PID) -> std::unique_ptr<viua::types::Type>;
+                auto transfer_exception_of(const viua::process::PID) -> std::unique_ptr<viua::types::Value>;
+                auto transfer_result_of(const viua::process::PID) -> std::unique_ptr<viua::types::Value>;
 
-                void send(const viua::process::PID, std::unique_ptr<viua::types::Type>);
-                void receive(const viua::process::PID, std::queue<std::unique_ptr<viua::types::Type>>&);
+                void send(const viua::process::PID, std::unique_ptr<viua::types::Value>);
+                void receive(const viua::process::PID, std::queue<std::unique_ptr<viua::types::Value>>&);
                 uint64_t pids() const;
 
                 auto static no_of_vp_schedulers() -> viua::internals::types::schedulers_count;

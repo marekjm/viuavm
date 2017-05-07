@@ -23,6 +23,14 @@ using namespace std;
 
 const string viua::types::Atom::type_name = "viua::types::Atom";
 
+vector<string> viua::types::Atom::bases() const {
+    return { "Value" };
+}
+
+vector<string> viua::types::Atom::inheritancechain() const {
+    return { "Value" };
+}
+
 string viua::types::Atom::type() const {
     return "viua::types::Atom";
 }
@@ -43,7 +51,7 @@ viua::types::Atom::operator string () const {
     return value;
 }
 
-unique_ptr<viua::types::Type> viua::types::Atom::copy() const {
+unique_ptr<viua::types::Value> viua::types::Atom::copy() const {
     return unique_ptr<viua::types::Atom>{ new Atom(value) };
 }
 

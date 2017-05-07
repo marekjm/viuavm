@@ -39,3 +39,25 @@ string viua::types::Exception::etype() const {
      */
     return detailed_type;
 }
+
+string viua::types::Exception::type() const {
+    return "Exception";
+}
+string viua::types::Exception::str() const {
+    return cause;
+}
+string viua::types::Exception::repr() const {
+    return (etype() + ": " + str::enquote(cause));
+}
+bool viua::types::Exception::boolean() const {
+    return true;
+}
+
+unique_ptr<viua::types::Value> viua::types::Exception::copy() const {
+    return unique_ptr<viua::types::Value>{new Exception(cause)};
+}
+
+viua::types::Exception::Exception(string s): cause(s), detailed_type("Exception") {
+}
+viua::types::Exception::Exception(string ts, string cs): cause(cs), detailed_type(ts) {
+}

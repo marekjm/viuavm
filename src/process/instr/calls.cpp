@@ -47,7 +47,7 @@ viua::internals::types::byte* viua::process::Process::opparam(viua::internals::t
     viua::internals::types::register_index parameter_no_operand_index = 0;
     tie(addr, parameter_no_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    viua::types::Type *source = nullptr;
+    viua::types::Value *source = nullptr;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
     if (parameter_no_operand_index >= stack.frame_new->arguments->size()) {
@@ -97,7 +97,7 @@ viua::internals::types::byte* viua::process::Process::oparg(viua::internals::typ
         throw new viua::types::Exception(oss.str());
     }
 
-    unique_ptr<viua::types::Type> argument;
+    unique_ptr<viua::types::Value> argument;
 
     if (stack.back()->arguments->isflagged(parameter_no_operand_index, MOVED)) {
         argument = stack.back()->arguments->pop(parameter_no_operand_index);
@@ -116,7 +116,7 @@ viua::internals::types::byte* viua::process::Process::opargc(viua::internals::ty
     viua::kernel::Register *target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    *target = unique_ptr<viua::types::Type>{new viua::types::Integer(static_cast<int>(stack.back()->arguments->size()))};
+    *target = unique_ptr<viua::types::Value>{new viua::types::Integer(static_cast<int>(stack.back()->arguments->size()))};
 
     return addr;
 }
@@ -217,7 +217,7 @@ viua::internals::types::byte* viua::process::Process::opreturn(viua::internals::
     }
     addr = stack.back()->ret_address();
 
-    unique_ptr<viua::types::Type> returned;
+    unique_ptr<viua::types::Value> returned;
     viua::kernel::Register* return_register = stack.back()->return_register;
     if (return_register != nullptr) {
         // we check in 0. register because it's reserved for return values
