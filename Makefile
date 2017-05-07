@@ -1,11 +1,14 @@
 CXX_STANDARD=c++14
 #CLANG_SANITIZE_FLAGS=-fsanitize=thread
 
+TRAVIS_CI_CLANG=clang++-3.9
+TRAVIS_CI_GCC=g++-6
+
 ifeq ($(CXX), g++)
 CXXFLAGS=-std=$(CXX_STANDARD) -Wall -Wextra -Wctor-dtor-privacy -Wnon-virtual-dtor -Wreorder -Woverloaded-virtual -Wundef -Wstrict-overflow=5 -Wdisabled-optimization -Winit-self -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wredundant-decls -Wlogical-op -Wmissing-include-dirs -Wmissing-declarations -Wcast-align -Wcast-qual -Wold-style-cast -Werror -Wfatal-errors -pedantic -g -I./include
-else ifeq ($(CXX), g++-6)
+else ifeq ($(CXX), $(TRAVIS_CI_GCC))
 CXXFLAGS=-std=$(CXX_STANDARD) -Wall -Wextra -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wredundant-decls -Wlogical-op -Wmissing-include-dirs -Wcast-align -Wold-style-cast -Werror -Wfatal-errors -pedantic -g -I./include
-else ifeq ($(CXX), clang++3.9)
+else ifeq ($(CXX), $(TRAVIS_CI_CLANG))
 CXXFLAGS=-std=$(CXX_STANDARD) -Wall -Wextra -Wint-to-void-pointer-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wmissing-include-dirs -Wcast-align -Wold-style-cast -Werror -Wfatal-errors -pedantic -g -I./include $(CLANG_SANITIZE_FLAGS)
 else ifeq ($(CXX), clang++)
 CXXFLAGS=-std=$(CXX_STANDARD) -Wall -Wextra -Wint-to-void-pointer-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wmissing-include-dirs -Wcast-align -Wold-style-cast -Werror -Wfatal-errors -pedantic -g -I./include $(CLANG_SANITIZE_FLAGS)
