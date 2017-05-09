@@ -2047,16 +2047,6 @@ class AtomTests(unittest.TestCase):
         runTestThrowsException(self, 'comparing_with_different_type.asm', ('Exception', "fetched invalid type: expected 'viua::types::Atom' but got 'Integer'"))
 
 
-class StandardRuntimeLibraryModuleString(unittest.TestCase):
-    PATH = './sample/standard_library/string'
-
-    def testStringifyFunction(self):
-        runTestCustomAsserts(self, 'stringify.asm', partiallyAppliedSameLines(2))
-
-    def testRepresentFunction(self):
-        runTestCustomAsserts(self, 'represent.asm', partiallyAppliedSameLines(2))
-
-
 class StandardRuntimeLibraryModuleVector(unittest.TestCase):
     PATH = './sample/standard_library/vector'
 
