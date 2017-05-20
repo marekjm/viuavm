@@ -285,6 +285,7 @@ namespace viua {
 
             viua::internals::types::byte* opcall(viua::internals::types::byte*);
             viua::internals::types::byte* optailcall(viua::internals::types::byte*);
+            viua::internals::types::byte* opdefer(viua::internals::types::byte*);
             viua::internals::types::byte* opprocess(viua::internals::types::byte*);
             viua::internals::types::byte* opself(viua::internals::types::byte*);
             viua::internals::types::byte* opjoin(viua::internals::types::byte*);

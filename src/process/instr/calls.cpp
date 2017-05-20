@@ -211,6 +211,38 @@ viua::internals::types::byte* viua::process::Process::optailcall(viua::internals
     return adjustJumpBaseFor(call_name);
 }
 
+viua::internals::types::byte* viua::process::Process::opdefer(viua::internals::types::byte* addr) {
+    string call_name;
+    auto ot = viua::bytecode::decoder::operands::get_operand_type(addr);
+    if (ot == OT_REGISTER_INDEX or ot == OT_POINTER) {
+        viua::types::Function* fn = nullptr;
+        tie(addr, fn) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Function>(addr, this);
+
+        call_name = fn->name();
+
+        if (fn->type() == "Closure") {
+            stack->back()->local_register_set.reset(static_cast<viua::types::Closure*>(fn)->give());
+            currently_used_register_set = stack->back()->local_register_set.get();
+        }
+    } else {
+        tie(addr, call_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
+    }
+
+    bool is_native = scheduler->isNativeFunction(call_name);
+    bool is_foreign = scheduler->isForeignFunction(call_name);
+    bool is_foreign_method = scheduler->isForeignMethod(call_name);
+
+    if (not (is_native or is_foreign or is_foreign_method)) {
+        throw new viua::types::Exception("tail call to undefined function: " + call_name);
+    }
+    // FIXME: make to possible to tail call foreign functions and methods
+    if (not is_native) {
+        throw new viua::types::Exception("tail call to non-native function: " + call_name);
+    }
+
+    return addr;
+}
+
 viua::internals::types::byte* viua::process::Process::opreturn(viua::internals::types::byte* addr) {
     if (stack->size() == 0) {
         throw new viua::types::Exception("no frame on stack: no call to return from");
