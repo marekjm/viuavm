@@ -168,7 +168,8 @@ namespace viua {
 
 
             // Call stack
-            Stack stack;
+            std::map<Stack*, std::unique_ptr<Stack>> stacks;
+            Stack* stack;
 
             std::queue<std::unique_ptr<viua::types::Value>> message_queue;
 
@@ -365,7 +366,7 @@ namespace viua {
                 viua::internals::types::byte* become(const std::string&, std::unique_ptr<Frame>);
 
                 viua::internals::types::byte* begin();
-                auto executionAt() const -> decltype(stack.instruction_pointer);
+                auto executionAt() const -> decltype(Stack::instruction_pointer);
 
                 std::vector<Frame*> trace() const;
 
