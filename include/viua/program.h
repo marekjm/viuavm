@@ -137,6 +137,8 @@ class Program {
     Program& opcall(int_op, int_op);
     Program& optailcall(const std::string&);
     Program& optailcall(int_op);
+    Program& opdefer(const std::string&);
+    Program& opdefer(int_op);
     Program& opprocess(int_op, const std::string&);
     Program& opprocess(int_op, int_op);
     Program& opself(int_op);
