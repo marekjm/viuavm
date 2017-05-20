@@ -611,6 +611,9 @@ namespace viua {
 
                 return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
             }
+            static auto size_of_defer(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_tailcall(tokens, i);
+            }
             static auto size_of_arg(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 viua::internals::types::bytecode_size calculated_size = sizeof(viua::internals::types::byte);    // start with the size of a single opcode
 
@@ -1085,6 +1088,9 @@ namespace viua {
                     } else if (tokens.at(i) == "tailcall") {
                         ++i;
                         tie(increase, i) = size_of_tailcall(tokens, i);
+                    } else if (tokens.at(i) == "defer") {
+                        ++i;
+                        tie(increase, i) = size_of_defer(tokens, i);
                     } else if (tokens.at(i) == "arg") {
                         ++i;
                         tie(increase, i) = size_of_arg(tokens, i);
