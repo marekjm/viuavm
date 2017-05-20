@@ -51,21 +51,21 @@ void assembler::verify::functionCallsAreDefined(const vector<Token>& tokens, con
     string line;
     for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
         auto token = tokens.at(i);
-        if (not (token == "call" or token == "process" or token == "watchdog" or token == "tailcall")) {
+        if (not (token == "call" or token == "process" or token == "watchdog" or token == "tailcall" or token == "defer")) {
             continue;
         }
 
-        if (token == "tailcall") {
+        if (token == "tailcall" or token == "defer") {
             auto function_name = tokens.at(i+1);
             if (function_name.str().at(0) != '*' and function_name.str().at(0) != '%') {
                 if (not is_defined(function_name, function_names, function_signatures)) {
-                    throw viua::cg::lex::InvalidSyntax(function_name, (string(token == "tailcall" ? "tail call to" : "watchdog from") + " undefined function " + function_name.str()));
+                    throw viua::cg::lex::InvalidSyntax(function_name, (string(token == "tailcall" ? "tail call to" : "deferred") + " undefined function " + function_name.str()));
                 }
             }
         } else if (token == "watchdog") {
             auto function_name = tokens.at(i+1);
             if (not is_defined(function_name, function_names, function_signatures)) {
-                throw viua::cg::lex::InvalidSyntax(function_name, (string(token == "tailcall" ? "tail call to" : "watchdog from") + " undefined function " + function_name.str()));
+                throw viua::cg::lex::InvalidSyntax(function_name, "watchdog from undefined function " + function_name.str());
             }
         } else if (token == "call" or token == "process") {
             Token function_name = tokens.at(i+2);
@@ -253,12 +253,12 @@ void assembler::verify::frameBalance(const vector<Token>& tokens) {
     Token previous_frame_spawned;
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
         instruction = tokens.at(i);
-        if (not (instruction == "call" or instruction == "tailcall" or instruction == "process" or instruction == "frame" or instruction == "msg" or
+        if (not (instruction == "call" or instruction == "tailcall" or instruction == "defer" or instruction == "process" or instruction == "frame" or instruction == "msg" or
                  instruction == "return" or instruction == "leave" or instruction == "throw" or instruction == ".end")) {
             continue;
         }
 
-        if (instruction == "call" or instruction == "tailcall" or instruction == "process" or instruction == "msg") {
+        if (instruction == "call" or instruction == "tailcall" or instruction == "defer" or instruction == "process" or instruction == "msg") {
             --balance;
         }
         if (instruction == "frame") {

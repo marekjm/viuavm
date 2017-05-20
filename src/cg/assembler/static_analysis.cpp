@@ -728,7 +728,7 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
             }
             i = skip_till_next_line(body_tokens, i);
             continue;
-        } else if (token == "tailcall") {
+        } else if (token == "tailcall" or token == "defer") {
             TokenIndex function = i + 1;
 
             if (body_tokens.at(function).str().at(0) == '%' or body_tokens.at(function).str().at(0) == '*') {
