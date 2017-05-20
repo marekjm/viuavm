@@ -203,6 +203,9 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case TAILCALL:
               addr = optailcall(addr+1);
             break;
+        case DEFER:
+              addr = opdefer(addr+1);
+            break;
         case PROCESS:
             addr = opprocess(addr+1);
             break;
