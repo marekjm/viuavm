@@ -350,7 +350,7 @@ namespace viua {
                         }
 
                         tokens.push_back(input_tokens.at(++i));
-                    } else if (token == "tailcall") {
+                    } else if (token == "tailcall" or token == "defer") {
                         tokens.push_back(token);
 
                         tokens.push_back(input_tokens.at(++i));
