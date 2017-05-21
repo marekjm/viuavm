@@ -24,6 +24,7 @@
 
 #include <string>
 #include <queue>
+#include <stack>
 #include <mutex>
 #include <atomic>
 #include <memory>
@@ -170,6 +171,7 @@ namespace viua {
             // Call stack
             std::map<Stack*, std::unique_ptr<Stack>> stacks;
             Stack* stack;
+            std::stack<Stack*> stacks_order;
 
             std::queue<std::unique_ptr<viua::types::Value>> message_queue;
 
