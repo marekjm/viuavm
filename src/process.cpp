@@ -259,7 +259,12 @@ viua::internals::types::byte* viua::process::Process::tick() {
     viua::internals::types::byte* previous_instruction_pointer = stack->instruction_pointer;
 
     try {
-        stack->instruction_pointer = dispatch(stack->instruction_pointer);
+        // It is necessary to use a "saved stack" because the stack variable may be changed during
+        // the call to dispatch(), and
+        // without the saved stack the VM could end up setting instruction pointer of one stack on
+        // a different one, thus currupting execution.
+        auto saved_stack = stack;
+        saved_stack->instruction_pointer = dispatch(stack->instruction_pointer);
     } catch (viua::types::Exception* e) {
         /* All machine-thrown exceptions are passed back to user code.
          * This is much easier than checking for erroneous conditions and

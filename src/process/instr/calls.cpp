@@ -267,9 +267,10 @@ viua::internals::types::byte* viua::process::Process::opreturn(viua::internals::
     for (auto& each : stack->back()->deferred_calls) {
         unique_ptr<Stack> s { new Stack { each->function_name, &currently_used_register_set, global_register_set.get(), scheduler } };
         s->emplace_back(std::move(each));
+        s->instruction_pointer = adjustJumpBaseFor(s->at(0)->function_name);
         s->bind(&currently_used_register_set, global_register_set.get());
-        stacks[s.get()] = std::move(s);
         stacks_order.push(s.get());
+        stacks[s.get()] = std::move(s);
     }
 
     stack->pop();
@@ -277,6 +278,12 @@ viua::internals::types::byte* viua::process::Process::opreturn(viua::internals::
     // place return value
     if (returned and stack->size() > 0) {
         *return_register = std::move(returned);
+    }
+
+    if (not stacks_order.empty()) {
+        stack = stacks_order.top();
+        stacks_order.pop();
+        currently_used_register_set = stack->back()->local_register_set.get();
     }
 
     if (stack->size() > 0) {
