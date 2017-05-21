@@ -195,6 +195,8 @@ namespace viua {
             // call foreign method (i.e. method of a pure-C++ class loaded into machine's typesystem)
             viua::internals::types::byte* callForeignMethod(viua::internals::types::byte*, viua::types::Value*, const std::string&, viua::kernel::Register*, const std::string&);
 
+            auto push_deferred(std::string) -> void;
+
             std::atomic_bool finished;
             std::atomic_bool is_joinable;
             std::atomic_bool is_suspended;

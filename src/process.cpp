@@ -237,6 +237,18 @@ viua::internals::types::byte* viua::process::Process::callForeignMethod(viua::in
     return return_address;
 }
 
+auto viua::process::Process::push_deferred(string call_name) -> void {
+    if (not stack->frame_new) {
+        throw new viua::types::Exception("function call without a frame: use `frame 0' in source code if the function takes no parameters");
+    }
+
+    stack->frame_new->function_name = call_name;
+    stack->frame_new->return_address = nullptr;
+    stack->frame_new->return_register = nullptr;
+
+    stack->back()->deferred_calls.push_back(std::move(stack->frame_new));
+}
+
 void viua::process::Process::handleActiveException() {
     stack->unwind();
 }

@@ -236,6 +236,8 @@ viua::internals::types::byte* viua::process::Process::opdefer(viua::internals::t
         throw new viua::types::Exception("tail call to undefined function: " + call_name);
     }
 
+    push_deferred(call_name);
+
     return addr;
 }
 
