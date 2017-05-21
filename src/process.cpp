@@ -60,7 +60,7 @@ auto viua::process::Process::get_trace_line(viua::internals::types::byte* for_ad
         }
         trace_line << ' ' << string(reinterpret_cast<char*>(working_address));
     }
-    if (static_cast<OPCODE>(*for_address) == TAILCALL) {
+    if (static_cast<OPCODE>(*for_address) == TAILCALL or static_cast<OPCODE>(*for_address) == DEFER) {
         trace_line << ' ';
         trace_line << string(reinterpret_cast<char*>(for_address+1));
     }
