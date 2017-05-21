@@ -23,6 +23,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <memory>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/util/memory.h>
@@ -35,6 +36,8 @@ class Frame {
         viua::util::memory::maybe_unique_ptr<viua::kernel::RegisterSet> local_register_set;
 
         viua::kernel::Register* return_register;
+
+        std::vector<std::unique_ptr<Frame>> deferred_calls;
 
         std::string function_name;
 
