@@ -235,10 +235,6 @@ viua::internals::types::byte* viua::process::Process::opdefer(viua::internals::t
     if (not (is_native or is_foreign or is_foreign_method)) {
         throw new viua::types::Exception("tail call to undefined function: " + call_name);
     }
-    // FIXME: make to possible to tail call foreign functions and methods
-    if (not is_native) {
-        throw new viua::types::Exception("tail call to non-native function: " + call_name);
-    }
 
     return addr;
 }
