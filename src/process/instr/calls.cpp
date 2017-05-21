@@ -257,6 +257,21 @@ viua::internals::types::byte* viua::process::Process::opreturn(viua::internals::
         returned = currently_used_register_set->pop(0);
     }
 
+    // Mark current stack as the one to return to after all
+    // the deferred calls complete, *but* only if the stack is not exhausted as
+    // there is no reason to return to such stacks.
+    if (stack->size() > 1) {
+        stacks_order.push(stack);
+    }
+
+    for (auto& each : stack->back()->deferred_calls) {
+        unique_ptr<Stack> s { new Stack { each->function_name, &currently_used_register_set, global_register_set.get(), scheduler } };
+        s->emplace_back(std::move(each));
+        s->bind(&currently_used_register_set, global_register_set.get());
+        stacks[s.get()] = std::move(s);
+        stacks_order.push(s.get());
+    }
+
     stack->pop();
 
     // place return value
