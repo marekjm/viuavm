@@ -2056,6 +2056,9 @@ class DeferredCallsTests(unittest.TestCase):
     def testDeferredCallsInvokedInReverseOrder(self):
         runTestSplitlines(self, 'reverse_order.asm', ['bar', 'foo'])
 
+    def testNestedDeferredCalls(self):
+        runTestSplitlines(self, 'nested.asm', ['bar', 'baz', 'bay', 'foo'])
+
 
 class StandardRuntimeLibraryModuleVector(unittest.TestCase):
     PATH = './sample/standard_library/vector'
