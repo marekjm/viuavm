@@ -43,7 +43,7 @@
 .end
 ```
 
-For more examples visit [documentation](http://docs.viuavm.org/).
+For more examples visit either [documentation](http://docs.viuavm.org/) or [Rosetta](http://rosettacode.org/wiki/Viua_VM_assembly) page for Viua VM.
 
 
 ### Use cases
