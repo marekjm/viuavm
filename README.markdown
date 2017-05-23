@@ -43,6 +43,8 @@
 .end
 ```
 
+For more examples visit [documentation](http://docs.viuavm.org/).
+
 
 ### Use cases
 
