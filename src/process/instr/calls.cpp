@@ -265,7 +265,7 @@ viua::internals::types::byte* viua::process::Process::opreturn(viua::internals::
     }
 
     for (auto& each : stack->back()->deferred_calls) {
-        unique_ptr<Stack> s { new Stack { each->function_name, &currently_used_register_set, global_register_set.get(), scheduler } };
+        unique_ptr<Stack> s { new Stack { each->function_name, this, &currently_used_register_set, global_register_set.get(), scheduler } };
         s->emplace_back(std::move(each));
         s->instruction_pointer = adjustJumpBaseFor(s->at(0)->function_name);
         s->bind(&currently_used_register_set, global_register_set.get());

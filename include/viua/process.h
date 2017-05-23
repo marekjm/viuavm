@@ -57,11 +57,14 @@ namespace viua {
 
 namespace viua {
     namespace process {
+        class Process;
+
         class Stack {
             std::vector<std::unique_ptr<Frame>> frames;
 
             public:
             const std::string entry_function;
+            const Process* parent_process;
 
             viua::internals::types::byte* jump_base;
             viua::internals::types::byte* instruction_pointer;
@@ -123,7 +126,7 @@ namespace viua {
             viua::internals::types::byte* adjust_jump_base_for(const std::string&);
             auto unwind() -> void;
 
-            Stack(std::string, viua::kernel::RegisterSet**, viua::kernel::RegisterSet*, viua::scheduler::VirtualProcessScheduler*);
+            Stack(std::string, Process*, viua::kernel::RegisterSet**, viua::kernel::RegisterSet*, viua::scheduler::VirtualProcessScheduler*);
         };
 
         class Process {

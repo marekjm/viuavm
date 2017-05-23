@@ -24,8 +24,9 @@
 using namespace std;
 
 
-viua::process::Stack::Stack(string fn, viua::kernel::RegisterSet** curs, viua::kernel::RegisterSet* gs, viua::scheduler::VirtualProcessScheduler* sch):
+viua::process::Stack::Stack(string fn, Process* pp, viua::kernel::RegisterSet** curs, viua::kernel::RegisterSet* gs, viua::scheduler::VirtualProcessScheduler* sch):
     entry_function(fn),
+    parent_process(pp),
     jump_base(nullptr),
     instruction_pointer(nullptr),
     frame_new(nullptr),

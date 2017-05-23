@@ -481,7 +481,7 @@ viua::process::Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualP
 {
     global_register_set.reset(new viua::kernel::RegisterSet(DEFAULT_REGISTER_SIZE));
     currently_used_register_set = frm->local_register_set.get();
-    unique_ptr<Stack> s {new Stack {frm->function_name, &currently_used_register_set, global_register_set.get(), scheduler}};
+    unique_ptr<Stack> s {new Stack {frm->function_name, this, &currently_used_register_set, global_register_set.get(), scheduler}};
     s->emplace_back(std::move(frm));
     s->bind(&currently_used_register_set, global_register_set.get());
     stack = s.get();
