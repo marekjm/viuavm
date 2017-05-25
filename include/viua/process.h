@@ -64,7 +64,7 @@ namespace viua {
 
             public:
             const std::string entry_function;
-            const Process* parent_process;
+            Process* parent_process;
 
             viua::internals::types::byte* jump_base;
             viua::internals::types::byte* instruction_pointer;
@@ -112,6 +112,7 @@ namespace viua {
             auto at(decltype(frames)::size_type i) const -> decltype(frames.at(i));
             auto back() const -> decltype(frames.back());
 
+            auto register_deferred_calls() -> void;
             auto pop() -> std::unique_ptr<Frame>;
 
             auto size() const -> decltype(frames)::size_type;
@@ -133,6 +134,7 @@ namespace viua {
 #ifdef AS_DEBUG_HEADER
             public:
 #endif
+            friend Stack;
             /*
              * Variables set below control whether the VM should gather and
              * emit additional (debugging, profiling, tracing) information

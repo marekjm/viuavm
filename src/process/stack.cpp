@@ -61,6 +61,24 @@ auto viua::process::Stack::back() const -> decltype(frames.back()) {
     return frames.back();
 }
 
+auto viua::process::Stack::register_deferred_calls() -> void {
+    // Mark current stack as the one to return to after all
+    // the deferred calls complete, *but* only if the stack is not exhausted as
+    // there is no reason to return to such stacks.
+    if (size() > 1) {
+        parent_process->stacks_order.push(this);
+    }
+
+    for (auto& each : back()->deferred_calls) {
+        unique_ptr<Stack> s { new Stack ( each->function_name, parent_process, currently_used_register_set, global_register_set, scheduler ) };
+        s->emplace_back(std::move(each));
+        s->instruction_pointer = adjust_jump_base_for(s->at(0)->function_name);
+        s->bind(currently_used_register_set, global_register_set);
+        parent_process->stacks_order.push(s.get());
+        parent_process->stacks[s.get()] = std::move(s);
+    }
+}
+
 auto viua::process::Stack::pop() -> unique_ptr<Frame> {
     unique_ptr<Frame> frame { std::move(frames.back()) };
     frames.pop_back();
