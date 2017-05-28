@@ -208,6 +208,13 @@ viua::internals::types::byte* viua::process::Process::optailcall(viua::internals
     // it's a simulated "push-and-pop" from the stack
     stack->frame_new.reset(nullptr);
 
+    stack->register_deferred_calls();
+    if (not stacks_order.empty()) {
+        stack = stacks_order.top();
+        stacks_order.pop();
+        currently_used_register_set = stack->back()->local_register_set.get();
+    }
+
     return adjustJumpBaseFor(call_name);
 }
 
