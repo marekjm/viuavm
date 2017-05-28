@@ -2059,6 +2059,9 @@ class DeferredCallsTests(unittest.TestCase):
     def testNestedDeferredCalls(self):
         runTestSplitlines(self, 'nested.asm', ['bar', 'baz', 'bay', 'foo'])
 
+    def testDeferredCallsActivatedOnTailCall(self):
+        runTestSplitlines(self, 'tailcall.asm', ['Hello from deferred!', '42'])
+
 
 class StandardRuntimeLibraryModuleVector(unittest.TestCase):
     PATH = './sample/standard_library/vector'
