@@ -272,7 +272,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         oss << fn_name;
         ptr += fn_name.size();
         ++ptr; // for null character terminating the C-style string not included in std::string
-    } else if (op == TAILCALL) {
+    } else if (op == TAILCALL or op == DEFER) {
         oss << ' ';
 
         if (OperandType(*ptr) == OT_REGISTER_INDEX or OperandType(*ptr) == OT_POINTER) {

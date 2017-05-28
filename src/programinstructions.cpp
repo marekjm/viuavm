@@ -473,6 +473,16 @@ Program& Program::optailcall(int_op fn) {
     return (*this);
 }
 
+Program& Program::opdefer(const string& fn_name) {
+    addr_ptr = cg::bytecode::opdefer(addr_ptr, fn_name);
+    return (*this);
+}
+
+Program& Program::opdefer(int_op fn) {
+    addr_ptr = cg::bytecode::opdefer(addr_ptr, fn);
+    return (*this);
+}
+
 Program& Program::opprocess(int_op ref, const string& fn_name) {
     addr_ptr = cg::bytecode::opprocess(addr_ptr, ref, fn_name);
     return (*this);

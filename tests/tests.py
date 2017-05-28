@@ -2047,6 +2047,19 @@ class AtomTests(unittest.TestCase):
         runTestThrowsException(self, 'comparing_with_different_type.asm', ('Exception', "fetched invalid type: expected 'viua::types::Atom' but got 'Integer'"))
 
 
+class DeferredCallsTests(unittest.TestCase):
+    PATH = './sample/asm/deferred'
+
+    def testDeferredHelloWorld(self):
+        runTest(self, 'hello_world.asm', "Hello World!")
+
+    def testDeferredCallsInvokedInReverseOrder(self):
+        runTestSplitlines(self, 'reverse_order.asm', ['bar', 'foo'])
+
+    def testNestedDeferredCalls(self):
+        runTestSplitlines(self, 'nested.asm', ['bar', 'baz', 'bay', 'foo'])
+
+
 class StandardRuntimeLibraryModuleVector(unittest.TestCase):
     PATH = './sample/standard_library/vector'
 

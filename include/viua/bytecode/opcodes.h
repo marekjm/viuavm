@@ -151,6 +151,7 @@ enum OPCODE : viua::internals::types::byte {
     PAMV,   // move object from a register to parameter register (pass-by-move),
     CALL,   // call given function with parameters set in parameter register,
     TAILCALL,   // perform a tail call to a function
+    DEFER,  // call a function just after the frame it was called in is popped off the stack
     ARG,    // move an object from argument register to a normal register (inside a function call),
     ARGC,   // store number of supplied parameters in a register
 

@@ -24,6 +24,7 @@
 
 #include <string>
 #include <queue>
+#include <stack>
 #include <mutex>
 #include <atomic>
 #include <memory>
@@ -56,11 +57,14 @@ namespace viua {
 
 namespace viua {
     namespace process {
+        class Process;
+
         class Stack {
             std::vector<std::unique_ptr<Frame>> frames;
 
             public:
             const std::string entry_function;
+            Process* parent_process;
 
             viua::internals::types::byte* jump_base;
             viua::internals::types::byte* instruction_pointer;
@@ -108,6 +112,7 @@ namespace viua {
             auto at(decltype(frames)::size_type i) const -> decltype(frames.at(i));
             auto back() const -> decltype(frames.back());
 
+            auto register_deferred_calls() -> void;
             auto pop() -> std::unique_ptr<Frame>;
 
             auto size() const -> decltype(frames)::size_type;
@@ -122,13 +127,14 @@ namespace viua {
             viua::internals::types::byte* adjust_jump_base_for(const std::string&);
             auto unwind() -> void;
 
-            Stack(std::string, viua::kernel::RegisterSet**, viua::kernel::RegisterSet*, viua::scheduler::VirtualProcessScheduler*);
+            Stack(std::string, Process*, viua::kernel::RegisterSet**, viua::kernel::RegisterSet*, viua::scheduler::VirtualProcessScheduler*);
         };
 
         class Process {
 #ifdef AS_DEBUG_HEADER
             public:
 #endif
+            friend Stack;
             /*
              * Variables set below control whether the VM should gather and
              * emit additional (debugging, profiling, tracing) information
@@ -168,7 +174,9 @@ namespace viua {
 
 
             // Call stack
-            Stack stack;
+            std::map<Stack*, std::unique_ptr<Stack>> stacks;
+            Stack* stack;
+            std::stack<Stack*> stacks_order;
 
             std::queue<std::unique_ptr<viua::types::Value>> message_queue;
 
@@ -191,6 +199,8 @@ namespace viua {
             viua::internals::types::byte* callForeign(viua::internals::types::byte*, const std::string&, viua::kernel::Register*, const std::string&);
             // call foreign method (i.e. method of a pure-C++ class loaded into machine's typesystem)
             viua::internals::types::byte* callForeignMethod(viua::internals::types::byte*, viua::types::Value*, const std::string&, viua::kernel::Register*, const std::string&);
+
+            auto push_deferred(std::string) -> void;
 
             std::atomic_bool finished;
             std::atomic_bool is_joinable;
@@ -284,6 +294,7 @@ namespace viua {
 
             viua::internals::types::byte* opcall(viua::internals::types::byte*);
             viua::internals::types::byte* optailcall(viua::internals::types::byte*);
+            viua::internals::types::byte* opdefer(viua::internals::types::byte*);
             viua::internals::types::byte* opprocess(viua::internals::types::byte*);
             viua::internals::types::byte* opself(viua::internals::types::byte*);
             viua::internals::types::byte* opjoin(viua::internals::types::byte*);
@@ -365,7 +376,7 @@ namespace viua {
                 viua::internals::types::byte* become(const std::string&, std::unique_ptr<Frame>);
 
                 viua::internals::types::byte* begin();
-                auto executionAt() const -> decltype(stack.instruction_pointer);
+                auto executionAt() const -> decltype(Stack::instruction_pointer);
 
                 std::vector<Frame*> trace() const;
 

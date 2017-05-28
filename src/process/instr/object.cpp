@@ -77,13 +77,13 @@ viua::internals::types::byte* viua::process::Process::opmsg(viua::internals::typ
         method_name = fn->name();
 
         if (fn->type() == "Closure") {
-            stack.frame_new->setLocalRegisterSet(static_cast<viua::types::Closure*>(fn)->rs(), false);
+            stack->frame_new->setLocalRegisterSet(static_cast<viua::types::Closure*>(fn)->rs(), false);
         }
     } else {
         tie(addr, method_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
     }
 
-    auto obj = stack.frame_new->arguments->at(0);
+    auto obj = stack->frame_new->arguments->at(0);
     if (auto ptr = dynamic_cast<viua::types::Pointer*>(obj)) {
         obj = ptr->to(this);
     }
