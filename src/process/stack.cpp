@@ -77,6 +77,10 @@ auto viua::process::Stack::register_deferred_calls() -> void {
         parent_process->stacks_order.push(s.get());
         parent_process->stacks[s.get()] = std::move(s);
     }
+
+    // remember to clear deferred calls vector to avoid
+    // accidentally deferring a frame twice!
+    back()->deferred_calls.clear();
 }
 
 auto viua::process::Stack::pop() -> unique_ptr<Frame> {
