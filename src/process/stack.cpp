@@ -61,11 +61,11 @@ auto viua::process::Stack::back() const -> decltype(frames.back()) {
     return frames.back();
 }
 
-auto viua::process::Stack::register_deferred_calls() -> void {
+auto viua::process::Stack::register_deferred_calls(const bool push_this_stack) -> void {
     // Mark current stack as the one to return to after all
     // the deferred calls complete, *but* only if the stack is not exhausted as
     // there is no reason to return to such stacks.
-    if (size() > 1) {
+    if (push_this_stack and size() > 1) {
         parent_process->stacks_order.push(this);
     }
 

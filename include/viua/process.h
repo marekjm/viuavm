@@ -112,7 +112,7 @@ namespace viua {
             auto at(decltype(frames)::size_type i) const -> decltype(frames.at(i));
             auto back() const -> decltype(frames.back());
 
-            auto register_deferred_calls() -> void;
+            auto register_deferred_calls(const bool = true) -> void;
             auto pop() -> std::unique_ptr<Frame>;
 
             auto size() const -> decltype(frames)::size_type;
