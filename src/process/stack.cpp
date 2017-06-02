@@ -199,6 +199,24 @@ auto viua::process::Stack::unwind() -> void {
     if (tframe != nullptr) {
         unwind_to(tframe, handler_found_for_type);
         caught = std::move(thrown);
+    } else {
+        parent_process->stacks_order.push(this);
+        for (auto i = (size()-1); i; --i) {
+            for (auto& each : at(i)->deferred_calls) {
+                unique_ptr<Stack> s { new Stack ( each->function_name, parent_process, currently_used_register_set, global_register_set, scheduler ) };
+                s->emplace_back(std::move(each));
+                s->instruction_pointer = adjust_jump_base_for(s->at(0)->function_name);
+                s->bind(currently_used_register_set, global_register_set);
+                parent_process->stacks_order.push(s.get());
+                parent_process->stacks[s.get()] = std::move(s);
+                at(i)->deferred_calls.clear();
+            }
+            if (not parent_process->stacks_order.empty()) {
+                parent_process->stack = parent_process->stacks_order.top();
+                parent_process->stacks_order.pop();
+                parent_process->currently_used_register_set = parent_process->stack->back()->local_register_set.get();
+            }
+        }
     }
 }
 
