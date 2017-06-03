@@ -211,11 +211,11 @@ auto viua::process::Stack::unwind() -> void {
                 parent_process->stacks[s.get()] = std::move(s);
                 at(i)->deferred_calls.clear();
             }
-            if (not parent_process->stacks_order.empty()) {
-                parent_process->stack = parent_process->stacks_order.top();
-                parent_process->stacks_order.pop();
-                parent_process->currently_used_register_set = parent_process->stack->back()->local_register_set.get();
-            }
+        }
+        if (not parent_process->stacks_order.empty()) {
+            parent_process->stack = parent_process->stacks_order.top();
+            parent_process->stacks_order.pop();
+            parent_process->currently_used_register_set = parent_process->stack->back()->local_register_set.get();
         }
     }
 }
