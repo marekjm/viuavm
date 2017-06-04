@@ -1398,6 +1398,9 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
             '20:12: error: in function main/0',
         ])
 
+    def testMainFunctionUsesInvalidRegisterSetToReturn(self):
+        runTestFailsToAssemble(self, 'main_returns_to_invalid_rs_type.asm', "./sample/asm/static_analysis_errors/main_returns_to_invalid_rs_type.asm:21:5: error: main function uses invalid register set to return a value: static")
+
 
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.

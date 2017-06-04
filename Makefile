@@ -1,4 +1,4 @@
-CXX_STANDARD=c++14
+CXX_STANDARD=c++17
 #CLANG_SANITIZE_FLAGS=-fsanitize=thread
 
 TRAVIS_CI_CLANG=clang++-3.9
@@ -14,7 +14,7 @@ else ifeq ($(CXX), clang++)
 CXXFLAGS=-std=$(CXX_STANDARD) -Wall -Wextra -Wint-to-void-pointer-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wmissing-include-dirs -Wcast-align -Wold-style-cast -Werror -Wfatal-errors -pedantic -g -I./include $(CLANG_SANITIZE_FLAGS)
 endif
 
-CXXOPTIMIZATIONFLAGS=
+CXXOPTIMIZATIONFLAGS=-O0
 COPTIMIZATIONFLAGS=
 DYNAMIC_SYMS=-Wl,--dynamic-list-cpp-typeinfo
 
@@ -25,7 +25,6 @@ PREFIX=/usr/local
 BIN_PATH=$(PREFIX)/bin
 LIB_PATH=$(PREFIX)/lib/viua
 H_PATH=$(PREFIX)/include/viua
-
 LIBDL ?= -ldl
 
 .SUFFIXES: .cpp .h .o
