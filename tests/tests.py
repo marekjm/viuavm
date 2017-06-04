@@ -366,8 +366,8 @@ def runTestCustomAsserts(self, name, assertions_callback, check_memory_leaks = T
         assertions_callback(self, excode, output)
         runMemoryLeakCheck(self, compiled_path, check_memory_leaks)
 
-def runTestSplitlines(self, name, expected_output, expected_exit_code = 0, assembly_opts=None, test_disasm=True):
-    runTest(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: o.strip().splitlines(), assembly_opts=assembly_opts, test_disasm=test_disasm)
+def runTestSplitlines(self, name, expected_output, expected_exit_code = 0, expected_error = None, error_processing_function = None, assembly_opts=None, test_disasm=True):
+    runTest(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: o.strip().splitlines(), assembly_opts=assembly_opts, test_disasm=test_disasm, expected_error=expected_error, error_processing_function=error_processing_function)
 
 def runTestReturnsUnorderedLines(self, name, expected_output, expected_exit_code = 0):
     runTest(self, name, sorted(expected_output), expected_exit_code, output_processing_function = lambda o: sorted(o.strip().splitlines()))
@@ -2077,6 +2077,16 @@ class DeferredCallsTests(unittest.TestCase):
 
     def testDeferredCallsActivatedOnTailCall(self):
         runTestSplitlines(self, 'tailcall.asm', ['Hello from deferred!', '42'])
+
+    def testDeferredCallsActivatedOnStackUnwindingWhenExceptionUncaught(self):
+        runTestSplitlines(
+            self,
+            'on_uncaught_exception.asm',
+            expected_output = ['Hello deferred Foo!', 'Hello deferred Bar!'],
+            expected_error = ('Integer', '42',),
+            error_processing_function = extractFirstException,
+            expected_exit_code = 1,
+        )
 
 
 class StandardRuntimeLibraryModuleVector(unittest.TestCase):
