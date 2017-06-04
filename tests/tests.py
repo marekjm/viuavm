@@ -119,7 +119,7 @@ def run(path, expected_exit_code=0):
     exit_code = p.wait()
     if exit_code not in (expected_exit_code if type(expected_exit_code) in [list, tuple] else (expected_exit_code,)):
         raise ViuaCPUError('{0} [{1}]: {2}'.format(path, exit_code, output.decode('utf-8').strip()))
-    return (exit_code, output.decode('utf-8'))
+    return (exit_code, output.decode('utf-8'), error.decode('utf-8'))
 
 FLAG_TEST_ONLY_ASSEMBLING = bool(int(os.environ.get('VIUA_TEST_ONLY_ASMING', 0)))
 MEMORY_LEAK_CHECKS_SKIPPED = 0
@@ -281,11 +281,11 @@ def runMemoryLeakCheck(self, compiled_path, check_memory_leaks):
         MEMORY_LEAK_CHECKS_RUN += 1
         valgrindCheck(self, compiled_path)
 
-def runTestBackend(self, name, expected_output=None, expected_exit_code = 0, output_processing_function = None, check_memory_leaks = True, custom_assert=None, assembly_opts=None, valgrind_enable=True, test_disasm=True):
+def runTestBackend(self, name, expected_output=None, expected_exit_code = 0, output_processing_function = None, expected_error=None, error_processing_function=None, check_memory_leaks = True, custom_assert=None, assembly_opts=None, valgrind_enable=True, test_disasm=True):
     if assembly_opts is None:
         assembly_opts = ()
-    if expected_output is None and custom_assert is None:
-        raise TypeError('`expected_output` and `custom_assert` cannot be both None')
+    if expected_output is None and expected_error is None and custom_assert is None:
+        raise TypeError('`expected_output`, `expected_error`, and `custom_assert` cannot all be None')
     assembly_path = os.path.join(self.PATH, name)
     compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
     if assembly_opts is None:
@@ -293,12 +293,14 @@ def runTestBackend(self, name, expected_output=None, expected_exit_code = 0, out
     else:
         assemble(assembly_path, compiled_path, opts=assembly_opts)
     if not FLAG_TEST_ONLY_ASSEMBLING:
-        excode, output = run(compiled_path, expected_exit_code)
+        excode, output, error = run(compiled_path, expected_exit_code)
         got_output = (output.strip() if output_processing_function is None else output_processing_function(output))
+        got_error = (error.strip() if error_processing_function is None else error_processing_function(error))
         if custom_assert is not None:
             custom_assert(self, excode, got_output)
         else:
-            self.assertEqual(expected_output, got_output)
+            if expected_output is not None: self.assertEqual(expected_output, got_output)
+            if expected_error is not None: self.assertEqual(expected_error, got_error)
             self.assertEqual(expected_exit_code, excode)
 
         if valgrind_enable:
@@ -315,11 +317,12 @@ def runTestBackend(self, name, expected_output=None, expected_exit_code = 0, out
     else:
         assemble(disasm_path, compiled_disasm_path, opts=assembly_opts)
     if not FLAG_TEST_ONLY_ASSEMBLING:
-        dis_excode, dis_output = run(compiled_disasm_path, expected_exit_code)
+        dis_excode, dis_output, dis_error = run(compiled_disasm_path, expected_exit_code)
         if custom_assert is not None:
             custom_assert(self, dis_excode, (dis_output.strip() if output_processing_function is None else output_processing_function(dis_output)))
         else:
-            self.assertEqual(got_output, (dis_output.strip() if output_processing_function is None else output_processing_function(dis_output)))
+            if expected_output is not None: self.assertEqual(got_output, (dis_output.strip() if output_processing_function is None else output_processing_function(dis_output)))
+            if expected_error is not None: self.assertEqual(got_error, (dis_error.strip() if error_processing_function is None else error_processing_function(dis_error)))
             self.assertEqual(excode, dis_excode)
 
     source_assembly_output = b''
@@ -331,10 +334,23 @@ def runTestBackend(self, name, expected_output=None, expected_exit_code = 0, out
     self.assertEqual(hashlib.sha512(source_assembly_output).hexdigest(), hashlib.sha512(disasm_assembly_output).hexdigest())
 
 measured_run_times = []
-def runTest(self, name, expected_output=None, expected_exit_code = 0, output_processing_function = None, check_memory_leaks = True, custom_assert=None, assembly_opts=None, valgrind_enable=True, test_disasm=True):
+def runTest(self, name, expected_output=None, expected_exit_code = 0, output_processing_function = None, expected_error=None, error_processing_function=None, check_memory_leaks = True, custom_assert=None, assembly_opts=None, valgrind_enable=True, test_disasm=True):
     begin = datetime.datetime.now()
     try:
-        runTestBackend(self, name, expected_output, expected_exit_code, output_processing_function, check_memory_leaks, custom_assert, assembly_opts, valgrind_enable, test_disasm)
+        runTestBackend(
+            self = self,
+            name = name,
+            expected_output = expected_output,
+            expected_exit_code = expected_exit_code,
+            expected_error = expected_error,
+            output_processing_function = output_processing_function,
+            error_processing_function = error_processing_function,
+            check_memory_leaks = check_memory_leaks,
+            custom_assert = custom_assert,
+            assembly_opts = assembly_opts,
+            valgrind_enable = valgrind_enable,
+            test_disasm = test_disasm,
+        )
     finally:
         end = datetime.datetime.now()
         delta = (end - begin)
@@ -346,7 +362,7 @@ def runTestCustomAsserts(self, name, assertions_callback, check_memory_leaks = T
     compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
     assemble(assembly_path, compiled_path)
     if not FLAG_TEST_ONLY_ASSEMBLING:
-        excode, output = run(compiled_path)
+        excode, output, error = run(compiled_path)
         assertions_callback(self, excode, output)
         runMemoryLeakCheck(self, compiled_path, check_memory_leaks)
 
@@ -371,7 +387,7 @@ def extractFirstException(output):
     return extractExceptionsThrown(output)[0]
 
 def runTestThrowsException(self, name, expected_output, assembly_opts=None):
-    runTest(self, name, expected_output, expected_exit_code=1, output_processing_function=extractFirstException, valgrind_enable=False, assembly_opts=assembly_opts)
+    runTest(self, name, expected_error=expected_output, expected_exit_code=1, error_processing_function=extractFirstException, valgrind_enable=False, assembly_opts=assembly_opts)
 
 def runTestThrowsExceptionJSON(self, name, expected_output, output_processing_function, assembly_opts=None):
     was = os.environ.get('VIUA_STACKTRACE_SERIALISATION', 'default')
@@ -383,7 +399,7 @@ def runTestThrowsExceptionJSON(self, name, expected_output, output_processing_fu
     os.environ['VIUA_STACKTRACE_PRINT_TO'] = was_to
 
 def runTestReportsException(self, name, expected_output, assembly_opts=None):
-    runTest(self, name, expected_output, expected_exit_code=0, output_processing_function=extractFirstException, assembly_opts=assembly_opts)
+    runTest(self, name, expected_error=expected_output, expected_exit_code=0, error_processing_function=extractFirstException, assembly_opts=assembly_opts)
 
 def runTestFailsToAssemble(self, name, expected_output, asm_opts=()):
     assembly_path = os.path.join(self.PATH, name)
@@ -1039,7 +1055,7 @@ class StaticLinkingTests(unittest.TestCase):
         assembly_bin_path = os.path.join(self.PATH, bin_name)
         compiled_bin_path = os.path.join(COMPILED_SAMPLES_PATH, (bin_name + '.bin'))
         assemble(assembly_bin_path, compiled_bin_path, links=(compiled_lib_path,))
-        excode, output = run(compiled_bin_path)
+        excode, output, error = run(compiled_bin_path)
         self.assertEqual('42', output.strip())
         self.assertEqual(0, excode)
 
@@ -1052,7 +1068,7 @@ class StaticLinkingTests(unittest.TestCase):
         assembly_bin_path = os.path.join(self.PATH, bin_name)
         compiled_bin_path = os.path.join(COMPILED_SAMPLES_PATH, (bin_name + '.bin'))
         assemble(assembly_bin_path, compiled_bin_path, links=(compiled_lib_path,))
-        excode, output = run(compiled_bin_path)
+        excode, output, error = run(compiled_bin_path)
         self.assertEqual('Hello World!', output.strip())
         self.assertEqual(0, excode)
 
@@ -1065,7 +1081,7 @@ class StaticLinkingTests(unittest.TestCase):
         assembly_bin_path = os.path.join(self.PATH, bin_name)
         compiled_bin_path = os.path.join(COMPILED_SAMPLES_PATH, (bin_name + '.bin'))
         assemble(assembly_bin_path, compiled_bin_path, links=(compiled_lib_path,))
-        excode, output = run(compiled_bin_path)
+        excode, output, error = run(compiled_bin_path)
         self.assertEqual(['42', ':-)'], output.strip().splitlines())
         self.assertEqual(0, excode)
 

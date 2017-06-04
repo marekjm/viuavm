@@ -37,25 +37,25 @@ using namespace std;
 
 static auto print_stack_trace_default(viua::process::Process *process) -> void {
     auto trace = process->trace();
-    cout << "stack trace: from entry point, most recent call last...\n";
+    cerr << "stack trace: from entry point, most recent call last...\n";
     decltype(trace)::size_type i = 0;
     if (support::env::getvar("VIUA_STACK_TRACES") != "full") {
         i = (trace.size() and trace[0]->function_name == "__entry");
     }
     for (; i < trace.size(); ++i) {
-        cout << "  " << stringifyFunctionInvocation(trace[i]) << "\n";
+        cerr << "  " << stringifyFunctionInvocation(trace[i]) << "\n";
     }
-    cout << "\n";
+    cerr << "\n";
 
     unique_ptr<viua::types::Value> thrown_object(process->transferActiveException());
     auto ex = dynamic_cast<viua::types::Exception*>(thrown_object.get());
     string ex_type = thrown_object->type();
 
-    //cout << "failed instruction: " << get<0>(disassembler::instruction(process->executionAt())) << endl;
-    cout << "uncaught object: " << ex_type << " = " << (ex ? ex->what() : thrown_object->str()) << endl;
-    cout << "\n";
+    //cerr << "failed instruction: " << get<0>(disassembler::instruction(process->executionAt())) << endl;
+    cerr << "uncaught object: " << ex_type << " = " << (ex ? ex->what() : thrown_object->str()) << endl;
+    cerr << "\n";
 
-    cout << "frame details:\n";
+    cerr << "frame details:\n";
 
     if (trace.size()) {
         Frame* last = trace.back();
@@ -64,42 +64,42 @@ static auto print_stack_trace_default(viua::process::Process *process) -> void {
             for (decltype(last->local_register_set->size()) r = 0; r < last->local_register_set->size(); ++r) {
                 if (last->local_register_set->at(r) != nullptr) { ++non_empty; }
             }
-            cout << "  non-empty registers: " << non_empty << '/' << last->local_register_set->size();
-            cout << (non_empty ? ":\n" : "\n");
+            cerr << "  non-empty registers: " << non_empty << '/' << last->local_register_set->size();
+            cerr << (non_empty ? ":\n" : "\n");
             for (decltype(last->local_register_set->size()) r = 0; r < last->local_register_set->size(); ++r) {
                 if (last->local_register_set->at(r) == nullptr) { continue; }
-                cout << "    registers[" << r << "]: ";
-                cout << '<' << last->local_register_set->get(r)->type() << "> " << last->local_register_set->get(r)->str() << endl;
+                cerr << "    registers[" << r << "]: ";
+                cerr << '<' << last->local_register_set->get(r)->type() << "> " << last->local_register_set->get(r)->str() << endl;
             }
         } else if (not last->local_register_set.owns()) {
-            cout << "  this frame did not own its registers" << endl;
+            cerr << "  this frame did not own its registers" << endl;
         } else {
-            cout << "  no registers were allocated for this frame" << endl;
+            cerr << "  no registers were allocated for this frame" << endl;
         }
 
         if (last->arguments->size()) {
-            cout << "  non-empty arguments (out of " << last->arguments->size() << "):" << endl;
+            cerr << "  non-empty arguments (out of " << last->arguments->size() << "):" << endl;
             for (decltype(last->arguments->size()) r = 0; r < last->arguments->size(); ++r) {
                 if (last->arguments->at(r) == nullptr) { continue; }
-                cout << "    arguments[" << r << "]: ";
+                cerr << "    arguments[" << r << "]: ";
                 if (last->arguments->isflagged(r, MOVED)) {
-                    cout << "[moved] ";
+                    cerr << "[moved] ";
                 }
                 if (auto ptr = dynamic_cast<viua::types::Pointer*>(last->arguments->get(r))) {
                     if (ptr->expired()) {
-                        cout << "<ExpiredPointer>" << endl;
+                        cerr << "<ExpiredPointer>" << endl;
                     } else {
-                        cout << '<' << ptr->type() << '>' << endl;
+                        cerr << '<' << ptr->type() << '>' << endl;
                     }
                 } else {
-                    cout << '<' << last->arguments->get(r)->type() << "> " << last->arguments->get(r)->str() << endl;
+                    cerr << '<' << last->arguments->get(r)->type() << "> " << last->arguments->get(r)->str() << endl;
                 }
             }
         } else {
-            cout << "  no arguments were passed to this frame" << endl;
+            cerr << "  no arguments were passed to this frame" << endl;
         }
     } else {
-        cout << "no stack trace available" << endl;
+        cerr << "no stack trace available" << endl;
     }
 }
 static auto print_stack_trace_json(viua::process::Process *process) -> void {
