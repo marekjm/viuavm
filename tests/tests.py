@@ -2093,7 +2093,7 @@ class DeferredCallsTests(unittest.TestCase):
     def testDeferredCallsActivatedOnStackUnwindingWhenExceptionUncaught(self):
         runTestSplitlines(
             self,
-            'on_uncaught_exception.asm',
+            name = 'on_uncaught_exception.asm',
             expected_output = ['Hello deferred Foo!', 'Hello deferred Bar!'],
             expected_error = ('Integer', '42',),
             error_processing_function = extractFirstException,
