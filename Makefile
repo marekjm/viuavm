@@ -1,4 +1,4 @@
-CXX_STANDARD=c++17
+CXX_STANDARD=c++14
 #CLANG_SANITIZE_FLAGS=-fsanitize=thread
 
 TRAVIS_CI_CLANG=clang++-3.9
