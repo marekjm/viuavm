@@ -2100,6 +2100,9 @@ class DeferredCallsTests(unittest.TestCase):
             expected_exit_code = 1,
         )
 
+    def testDeferredCallsActivatedOnStackUnwindingWhenExceptionCaught(self):
+        runTestSplitlines(self, 'on_caught_exception.asm', ['Hello bar World!', 'Hello foo World!', '42'])
+
 
 class StandardRuntimeLibraryModuleVector(unittest.TestCase):
     PATH = './sample/standard_library/vector'
