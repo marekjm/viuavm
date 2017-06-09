@@ -367,7 +367,16 @@ def runTestCustomAsserts(self, name, assertions_callback, check_memory_leaks = T
         runMemoryLeakCheck(self, compiled_path, check_memory_leaks)
 
 def runTestSplitlines(self, name, expected_output, expected_exit_code = 0, expected_error = None, error_processing_function = None, assembly_opts=None, test_disasm=True):
-    runTest(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: o.strip().splitlines(), assembly_opts=assembly_opts, test_disasm=test_disasm, expected_error=expected_error, error_processing_function=error_processing_function)
+    runTest(self,
+        name = name,
+        expected_output = expected_output,
+        expected_exit_code = expected_exit_code,
+        output_processing_function = lambda o: o.strip().splitlines(),
+        assembly_opts = assembly_opts,
+        test_disasm = test_disasm,
+        expected_error = expected_error,
+        error_processing_function = error_processing_function
+    )
 
 def runTestReturnsUnorderedLines(self, name, expected_output, expected_exit_code = 0):
     runTest(self, name, sorted(expected_output), expected_exit_code, output_processing_function = lambda o: sorted(o.strip().splitlines()))
