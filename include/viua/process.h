@@ -60,7 +60,30 @@ namespace viua {
         class Process;
 
         class Stack {
+            public:
+            enum class STATE {
+                /*
+                 * Before stack begins executing.
+                 */
+                UNINITIALISED,
+
+                /*
+                 * Normal state.
+                 * Stack is executing instructions normally.
+                 */
+                RUNNING,
+
+                /*
+                 * Stack is suspended because of deferred calls it triggered.
+                 * The VM should finish executing any stacks spawned by this stack's
+                 * deferred calls, and then return to continue executing this stack.
+                 */
+                SUSPENDED_BY_DEFERRED_ON_FRAME_POP,
+            };
+
+            private:
             std::vector<std::unique_ptr<Frame>> frames;
+            STATE current_state = STATE::UNINITIALISED;
 
             public:
             const std::string entry_function;
@@ -101,6 +124,9 @@ namespace viua {
             auto find_catch_frame() -> std::tuple<TryFrame*, std::string>;
 
             public:
+
+            auto state_of() const -> STATE;
+            auto state_of(const STATE) -> STATE;
 
             viua::scheduler::VirtualProcessScheduler* scheduler;
 

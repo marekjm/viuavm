@@ -25,6 +25,7 @@ using namespace std;
 
 
 viua::process::Stack::Stack(string fn, Process* pp, viua::kernel::RegisterSet** curs, viua::kernel::RegisterSet* gs, viua::scheduler::VirtualProcessScheduler* sch):
+    current_state(STATE::RUNNING),
     entry_function(fn),
     parent_process(pp),
     jump_base(nullptr),
@@ -38,6 +39,16 @@ viua::process::Stack::Stack(string fn, Process* pp, viua::kernel::RegisterSet** 
     return_value(nullptr),
     scheduler(sch)
 {
+}
+
+auto viua::process::Stack::state_of() const -> STATE {
+    return current_state;
+}
+
+auto viua::process::Stack::state_of(const STATE s) -> STATE {
+    auto previous_state = current_state;
+    current_state = s;
+    return previous_state;
 }
 
 auto viua::process::Stack::bind(viua::kernel::RegisterSet** curs, viua::kernel::RegisterSet* gs) -> void {

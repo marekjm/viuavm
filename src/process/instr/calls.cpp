@@ -252,6 +252,23 @@ viua::internals::types::byte* viua::process::Process::opreturn(viua::internals::
     if (stack->size() == 0) {
         throw new viua::types::Exception("no frame on stack: no call to return from");
     }
+
+    if (stack->state_of() == viua::process::Stack::STATE::RUNNING) {
+        stack->register_deferred_calls();
+        stack->state_of(viua::process::Stack::STATE::SUSPENDED_BY_DEFERRED_ON_FRAME_POP);
+
+        if (not stacks_order.empty()) {
+            stack = stacks_order.top();
+            stacks_order.pop();
+            currently_used_register_set = stack->back()->local_register_set.get();
+            return addr;
+        }
+    }
+
+    if (stack->state_of() != viua::process::Stack::STATE::SUSPENDED_BY_DEFERRED_ON_FRAME_POP) {
+        throw new viua::types::Exception("stack left in an invalid state");
+    }
+
     addr = stack->back()->ret_address();
 
     unique_ptr<viua::types::Value> returned;
@@ -264,18 +281,11 @@ viua::internals::types::byte* viua::process::Process::opreturn(viua::internals::
         returned = currently_used_register_set->pop(0);
     }
 
-    stack->register_deferred_calls();
     stack->pop();
 
     // place return value
     if (returned and stack->size() > 0) {
         *return_register = std::move(returned);
-    }
-
-    if (not stacks_order.empty()) {
-        stack = stacks_order.top();
-        stacks_order.pop();
-        currently_used_register_set = stack->back()->local_register_set.get();
     }
 
     if (stack->size() > 0) {
