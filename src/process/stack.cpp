@@ -41,6 +41,17 @@ viua::process::Stack::Stack(string fn, Process* pp, viua::kernel::RegisterSet** 
 {
 }
 
+auto viua::process::Stack::set_return_value() -> void {
+    // FIXME find better name for this function
+    if (back()->return_register != nullptr) {
+        // we check in 0. register because it's reserved for return values
+        if ((*currently_used_register_set)->at(0) == nullptr) {
+            throw new viua::types::Exception("return value requested by frame but function did not set return register");
+        }
+        return_value = (*currently_used_register_set)->pop(0);
+    }
+}
+
 auto viua::process::Stack::state_of() const -> STATE {
     return current_state;
 }

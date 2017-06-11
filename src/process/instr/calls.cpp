@@ -254,14 +254,7 @@ viua::internals::types::byte* viua::process::Process::opreturn(viua::internals::
     }
 
     if (stack->state_of() == viua::process::Stack::STATE::RUNNING) {
-        if (stack->back()->return_register != nullptr) {
-            // we check in 0. register because it's reserved for return values
-            if (currently_used_register_set->at(0) == nullptr) {
-                throw new viua::types::Exception("return value requested by frame but function did not set return register");
-            }
-            stack->return_value = currently_used_register_set->pop(0);
-        }
-
+        stack->set_return_value();
         stack->register_deferred_calls();
         stack->state_of(viua::process::Stack::STATE::SUSPENDED_BY_DEFERRED_ON_FRAME_POP);
 

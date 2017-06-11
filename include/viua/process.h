@@ -125,6 +125,8 @@ namespace viua {
 
             public:
 
+            auto set_return_value() -> void;
+
             auto state_of() const -> STATE;
             auto state_of(const STATE) -> STATE;
 
