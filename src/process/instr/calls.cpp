@@ -281,6 +281,8 @@ viua::internals::types::byte* viua::process::Process::opreturn(viua::internals::
         returned = currently_used_register_set->pop(0);
     }
 
+    stack->state_of(viua::process::Stack::STATE::RUNNING);
+
     stack->pop();
 
     // place return value
