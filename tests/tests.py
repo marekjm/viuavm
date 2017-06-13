@@ -2090,6 +2090,9 @@ class DeferredCallsTests(unittest.TestCase):
     def testDeferredCallsActivatedOnTailCall(self):
         runTestSplitlines(self, 'tailcall.asm', ['Hello from deferred!', '42'])
 
+    def testDeferredCallsInvokedBeforeTailCall(self):
+        runTestSplitlines(self, 'before_tailcall.asm', ['Hello World!'])
+
     def testDeferredCallsActivatedOnStackUnwindingWhenExceptionUncaught(self):
         runTestSplitlines(
             self,

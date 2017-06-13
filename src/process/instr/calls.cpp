@@ -173,6 +173,24 @@ viua::internals::types::byte* viua::process::Process::opcall(viua::internals::ty
 }
 
 viua::internals::types::byte* viua::process::Process::optailcall(viua::internals::types::byte* addr) {
+    if (stack->state_of() == viua::process::Stack::STATE::RUNNING) {
+        stack->register_deferred_calls();
+        stack->state_of(viua::process::Stack::STATE::SUSPENDED_BY_DEFERRED_ON_FRAME_POP);
+
+        if (not stacks_order.empty()) {
+            stack = stacks_order.top();
+            stacks_order.pop();
+            currently_used_register_set = stack->back()->local_register_set.get();
+            return (addr-1);
+        }
+    }
+
+    if (stack->state_of() != viua::process::Stack::STATE::SUSPENDED_BY_DEFERRED_ON_FRAME_POP) {
+        throw new viua::types::Exception("stack left in an invalid state");
+    }
+
+    stack->state_of(viua::process::Stack::STATE::RUNNING);
+
     string call_name;
     auto ot = viua::bytecode::decoder::operands::get_operand_type(addr);
     if (ot == OT_REGISTER_INDEX or ot == OT_POINTER) {
@@ -207,13 +225,6 @@ viua::internals::types::byte* viua::process::Process::optailcall(viua::internals
     // new frame must be deleted to prevent future errors
     // it's a simulated "push-and-pop" from the stack
     stack->frame_new.reset(nullptr);
-
-    stack->register_deferred_calls();
-    if (not stacks_order.empty()) {
-        stack = stacks_order.top();
-        stacks_order.pop();
-        currently_used_register_set = stack->back()->local_register_set.get();
-    }
 
     return adjustJumpBaseFor(call_name);
 }
