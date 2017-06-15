@@ -158,10 +158,10 @@ viua::internals::types::byte* viua::process::Stack::adjust_jump_base_for(const s
     return entry_point;
 }
 
-auto viua::process::Stack::adjust_instruction_pointer(TryFrame* tframe, string handler_found_for_type) -> void {
+auto viua::process::Stack::adjust_instruction_pointer(const TryFrame* tframe, const string handler_found_for_type) -> void {
     instruction_pointer = adjust_jump_base_for_block(tframe->catchers.at(handler_found_for_type)->catcher_name);
 }
-auto viua::process::Stack::unwind_call_stack_to(Frame* frame) -> void {
+auto viua::process::Stack::unwind_call_stack_to(const Frame* frame) -> void {
     size_type distance = 0;
     for (size_type j = (size()-1); j > 0; --j) {
         if (at(j).get() == frame) {
@@ -185,15 +185,15 @@ auto viua::process::Stack::unwind_call_stack_to(Frame* frame) -> void {
         parent_process->currently_used_register_set = parent_process->stack->back()->local_register_set.get();
     }
 }
-auto viua::process::Stack::unwind_try_stack_to(TryFrame* tframe) -> void {
+auto viua::process::Stack::unwind_try_stack_to(const TryFrame* tframe) -> void {
     while (tryframes.back().get() != tframe) {
         tryframes.pop_back();
     }
 }
 
-auto viua::process::Stack::unwind_to(TryFrame* tframe, string handler_found_for_type) -> void {
+auto viua::process::Stack::unwind_to(const TryFrame* tframe, const string handler_found_for_type) -> void {
     adjust_instruction_pointer(tframe, handler_found_for_type);
-    unwind_call_stack_to(tframe);
+    unwind_call_stack_to(tframe->associated_frame);
     unwind_try_stack_to(tframe);
 }
 

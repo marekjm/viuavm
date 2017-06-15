@@ -116,10 +116,10 @@ namespace viua {
              */
             std::unique_ptr<viua::types::Value> return_value; // return value of top-most frame on the stack
 
-            void adjust_instruction_pointer(TryFrame*, std::string);
-            auto unwind_call_stack_to(Frame*) -> void;
-            auto unwind_to(std::tuple<TryFrame*, std::string>) -> void;
-            auto unwind_to(TryFrame*, std::string) -> void;
+            void adjust_instruction_pointer(const TryFrame*, const std::string);
+            auto unwind_call_stack_to(const Frame*) -> void;
+            auto unwind_try_stack_to(const TryFrame*) -> void;
+            auto unwind_to(const TryFrame*, const std::string) -> void;
             auto find_catch_frame() -> std::tuple<TryFrame*, std::string>;
 
             public:
