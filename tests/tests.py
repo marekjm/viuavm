@@ -2116,6 +2116,40 @@ class DeferredCallsTests(unittest.TestCase):
     def testDeferredRunningBeforeFrameIsDropped(self):
         runTest(self, 'calls_running_before_frame_is_dropped.asm', 'Hello World!')
 
+    def testDeepUncaught(self):
+        runTestSplitlines(
+            self,
+            name = 'deep_uncaught.asm',
+            expected_output = [
+                'Hello from by_quux/0',
+                'Hello from by_bax/0',
+                'Hello from by_bay/0',
+                'Hello from by_baz/0',
+                'Hello from by_bar/0',
+                'Hello from by_foo/0',
+                'Hello from by_main/0',
+            ],
+            expected_error = ('Integer', '666',),
+            error_processing_function = extractFirstException,
+            expected_exit_code = 1,
+        )
+
+    def testDeepCaught(self):
+        runTestSplitlines(
+            self,
+            name = 'deep_caught.asm',
+            expected_output = [
+                'Hello from by_quux/0',
+                'Hello from by_bax/0',
+                'Hello from by_bay/0',
+                'Hello from by_baz/0',
+                'Hello from by_bar/0',
+                'Hello from by_foo/0',
+                '666',
+                'Hello from by_main/0',
+            ],
+        )
+
 
 class StandardRuntimeLibraryModuleVector(unittest.TestCase):
     PATH = './sample/standard_library/vector'
