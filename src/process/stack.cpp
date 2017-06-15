@@ -163,7 +163,7 @@ auto viua::process::Stack::adjust_instruction_pointer(TryFrame* tframe, string h
 }
 auto viua::process::Stack::unwind_call_stack_to(TryFrame* tframe) -> void {
     size_type distance = 0;
-    for (size_type j = (size()-1); j > 1; --j) {
+    for (size_type j = (size()-1); j > 0; --j) {
         if (at(j).get() == tframe->associated_frame) {
             break;
         }
