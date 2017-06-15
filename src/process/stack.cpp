@@ -172,16 +172,7 @@ auto viua::process::Stack::unwind_call_stack_to(TryFrame* tframe) -> void {
 
     parent_process->stacks_order.push(this);
     for (size_type i = (size() - distance); i < size(); ++i) {
-        const auto frame_index = i;
-        for (auto& each : at(frame_index)->deferred_calls) {
-            unique_ptr<Stack> s { new Stack ( each->function_name, parent_process, currently_used_register_set, global_register_set, scheduler ) };
-            s->emplace_back(std::move(each));
-            s->instruction_pointer = adjust_jump_base_for(s->at(0)->function_name);
-            s->bind(currently_used_register_set, global_register_set);
-            parent_process->stacks_order.push(s.get());
-            parent_process->stacks[s.get()] = std::move(s);
-        }
-        at(frame_index)->deferred_calls.clear();
+        register_deferred_calls_from(at(i).get());
     }
 
     for (size_type j = 0; j < distance; ++j) {
@@ -248,15 +239,7 @@ auto viua::process::Stack::unwind() -> void {
     } else {
         parent_process->stacks_order.push(this);
         for (size_type i = 0; i < size(); ++i) {
-            for (auto& each : at(i)->deferred_calls) {
-                unique_ptr<Stack> s { new Stack ( each->function_name, parent_process, currently_used_register_set, global_register_set, scheduler ) };
-                s->emplace_back(std::move(each));
-                s->instruction_pointer = adjust_jump_base_for(s->at(0)->function_name);
-                s->bind(currently_used_register_set, global_register_set);
-                parent_process->stacks_order.push(s.get());
-                parent_process->stacks[s.get()] = std::move(s);
-            }
-            at(i)->deferred_calls.clear();
+            register_deferred_calls_from(at(i).get());
         }
         if (not parent_process->stacks_order.empty()) {
             parent_process->stack = parent_process->stacks_order.top();
