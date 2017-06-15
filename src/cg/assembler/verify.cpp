@@ -479,7 +479,17 @@ void assembler::verify::instructions(const vector<Token>& tokens) {
             continue;
         }
         if (OP_MNEMONICS.count(tokens.at(i)) == 0) {
-            throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("unknown instruction: '" + tokens.at(i).str() + "'"));
+            string message;
+
+            if (tokens.at(i) == "(" or tokens.at(i) == ")") {
+                message = "unmatched parenthesis";
+            } else if (tokens.at(i) == "[" or tokens.at(i) == "]") {
+                message = "unmatched bracket";
+            } else {
+                message = ("unknown instruction: '" + tokens.at(i).str() + "'");
+            }
+
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i), message);
         }
     }
 }
