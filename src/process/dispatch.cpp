@@ -19,10 +19,57 @@
 
 #include <sstream>
 #include <viua/bytecode/maps.h>
+#include <viua/bytecode/decoder/operands.h>
 #include <viua/types/exception.h>
 #include <viua/process.h>
 #include <viua/kernel/kernel.h>
 using namespace std;
+
+
+auto viua::process::Process::get_trace_line(viua::internals::types::byte* for_address) const -> string {
+    ostringstream trace_line;
+
+    trace_line << "[ process = " << hex << this << dec;
+    trace_line << ", stack = " << hex << stack << dec;
+    trace_line << ", scheduler = " << hex << scheduler << dec;
+    trace_line << ", address = 0x" << hex << reinterpret_cast<unsigned long>(for_address) << dec;
+    trace_line << ", bytecode_base = 0x" << hex << reinterpret_cast<unsigned long>(stack->jump_base) << dec;
+    if (stack->thrown) {
+        trace_line << ", thrown = 0x" << hex << reinterpret_cast<unsigned long>(stack->thrown.get()) << dec;
+    }
+    if (stack->caught) {
+        trace_line << ", caught = 0x" << hex << reinterpret_cast<unsigned long>(stack->caught.get()) << dec;
+    }
+    trace_line << " ] ";
+
+    try {
+        trace_line << OP_NAMES.at(static_cast<OPCODE>(*for_address));
+    } catch (std::out_of_range& e) {
+        trace_line << "<unrecognised instruction byte = " << static_cast<unsigned>(*for_address) << '>';
+        return trace_line.str();
+    }
+
+    if (static_cast<OPCODE>(*for_address) == CALL or static_cast<OPCODE>(*for_address) == PROCESS or static_cast<OPCODE>(*for_address) == MSG) {
+        auto working_address = for_address+1;
+        if (viua::bytecode::decoder::operands::is_void(working_address)) {
+            ++working_address;
+        } else {
+            working_address += sizeof(viua::internals::types::byte);  // for opcode type
+            working_address += sizeof(viua::internals::types::register_index);
+            working_address += sizeof(viua::internals::types::registerset_type_marker);
+        }
+        trace_line << ' ' << string(reinterpret_cast<char*>(working_address));
+    }
+    if (static_cast<OPCODE>(*for_address) == TAILCALL or static_cast<OPCODE>(*for_address) == DEFER) {
+        trace_line << ' ';
+        trace_line << string(reinterpret_cast<char*>(for_address+1));
+    }
+
+    return trace_line.str();
+}
+auto viua::process::Process::emit_trace_line(viua::internals::types::byte* for_address) const -> void {
+    cerr << (get_trace_line(for_address) + "\n");
+}
 
 
 viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::types::byte* addr) {
