@@ -296,15 +296,19 @@ def runTestBackend(self, name, expected_output=None, expected_exit_code = 0, out
         excode, output, error = run(compiled_path, expected_exit_code)
         got_output = (output.strip() if output_processing_function is None else output_processing_function(output))
         got_error = (error.strip() if error_processing_function is None else error_processing_function(error))
-        if custom_assert is not None:
-            custom_assert(self, excode, got_output)
-        else:
-            if expected_output is not None: self.assertEqual(expected_output, got_output)
-            if expected_error is not None: self.assertEqual(expected_error, got_error)
-            self.assertEqual(expected_exit_code, excode)
+        try:
+            if custom_assert is not None:
+                custom_assert(self, excode, got_output)
+            else:
+                if expected_output is not None: self.assertEqual(expected_output, got_output)
+                if expected_error is not None: self.assertEqual(expected_error, got_error)
+                self.assertEqual(expected_exit_code, excode)
 
-        if valgrind_enable:
-            runMemoryLeakCheck(self, compiled_path, check_memory_leaks)
+            if valgrind_enable:
+                runMemoryLeakCheck(self, compiled_path, check_memory_leaks)
+        except Exception:
+            print('test failed: check file {}'.format(assembly_path))
+            raise
 
     if not test_disasm:
         return
