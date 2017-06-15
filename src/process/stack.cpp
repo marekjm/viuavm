@@ -161,10 +161,10 @@ viua::internals::types::byte* viua::process::Stack::adjust_jump_base_for(const s
 auto viua::process::Stack::adjust_instruction_pointer(TryFrame* tframe, string handler_found_for_type) -> void {
     instruction_pointer = adjust_jump_base_for_block(tframe->catchers.at(handler_found_for_type)->catcher_name);
 }
-auto viua::process::Stack::unwind_call_stack_to(TryFrame* tframe) -> void {
+auto viua::process::Stack::unwind_call_stack_to(Frame* frame) -> void {
     size_type distance = 0;
     for (size_type j = (size()-1); j > 0; --j) {
-        if (at(j).get() == tframe->associated_frame) {
+        if (at(j).get() == frame) {
             break;
         }
         ++distance;
