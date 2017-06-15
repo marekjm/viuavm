@@ -19,6 +19,7 @@
 
 #include <cstdint>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <viua/support/string.h>
 #include <viua/bytecode/opcodes.h>
@@ -28,13 +29,13 @@
 using namespace std;
 
 
-viua::internals::types::byte* Program::bytecode() {
+auto Program::bytecode() const -> unique_ptr<viua::internals::types::byte[]> {
     /*  Returns pointer to a copy of the bytecode.
      *  Each call produces new copy.
      *
      *  Calling code is responsible for proper destruction of the allocated memory.
      */
-    viua::internals::types::byte* tmp = new viua::internals::types::byte[bytes];
+    unique_ptr<viua::internals::types::byte[]> tmp { new viua::internals::types::byte[bytes] };
     for (decltype(bytes) i = 0; i < bytes; ++i) {
         tmp[i] = program[i];
     }
