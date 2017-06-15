@@ -1407,6 +1407,9 @@ class AssemblerErrorTests(unittest.TestCase):
     """
     PATH = './sample/asm/errors'
 
+    def testDotBeforeEnd(self):
+        runTestFailsToAssemble(self, 'no_dot_before_end.asm', "./sample/asm/errors/no_dot_before_end.asm:23:1: error: missing '.' character before 'end'")
+
     def testBranchWithoutOperands(self):
         runTestFailsToAssemble(self, 'branch_without_operands.asm', "./sample/asm/errors/branch_without_operands.asm:21:5: error: branch without operands")
 

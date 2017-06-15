@@ -1317,6 +1317,10 @@ namespace viua {
                         tokens.push_back(token);
                     }
 
+                    if (i > 0 and token == "end" and input_tokens.at(i-1) == "\n") {
+                        throw InvalidSyntax(token, "missing '.' character before 'end'");
+                    }
+
                     if (token == ".end") {
                         if (nested_block_opened) {
                             for (const auto& ntoken : nested_block_tokens) {
