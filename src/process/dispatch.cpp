@@ -33,8 +33,10 @@ auto viua::process::Process::get_trace_line(viua::internals::types::byte* for_ad
     trace_line << " scheduler = " << hex << scheduler << dec;
     trace_line << ", process = " << hex << this << dec;
     trace_line << ", stack = " << hex << stack << dec;
+    trace_line << ", frame = 0x" << hex << reinterpret_cast<unsigned long>(stack->back().get()) << dec;
     trace_line << ", jump_base = 0x" << hex << reinterpret_cast<unsigned long>(stack->jump_base) << dec;
     trace_line << ", address = 0x" << hex << reinterpret_cast<unsigned long>(for_address) << dec;
+    trace_line << ", depth = " << stack->size();
     if (stack->thrown) {
         trace_line << ", thrown = 0x" << hex << reinterpret_cast<unsigned long>(stack->thrown.get()) << dec;
     }
