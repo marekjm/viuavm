@@ -65,6 +65,9 @@ auto viua::process::Process::get_trace_line(viua::internals::types::byte* for_ad
         trace_line << ' ';
         trace_line << string(reinterpret_cast<char*>(for_address+1));
     }
+    if (static_cast<OPCODE>(*for_address) == RETURN) {
+        trace_line << " from " + stack->back()->function_name;
+    }
 
     return trace_line.str();
 }
