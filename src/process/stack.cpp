@@ -168,8 +168,8 @@ auto viua::process::Stack::unwind_call_stack_to(TryFrame* tframe) -> void {
     }
 
     parent_process->stacks_order.push(this);
-    for (size_type i = 0; i < distance; --i) {
-        const auto frame_index = (size() - i - 1);
+    for (size_type i = (size() - distance); i < size(); ++i) {
+        const auto frame_index = i;
         for (auto& each : at(frame_index)->deferred_calls) {
             unique_ptr<Stack> s { new Stack ( each->function_name, parent_process, currently_used_register_set, global_register_set, scheduler ) };
             s->emplace_back(std::move(each));
@@ -244,7 +244,7 @@ auto viua::process::Stack::unwind() -> void {
         caught = std::move(thrown);
     } else {
         parent_process->stacks_order.push(this);
-        for (auto i = (size()-1); i; --i) {
+        for (size_type i = 0; i < size(); ++i) {
             for (auto& each : at(i)->deferred_calls) {
                 unique_ptr<Stack> s { new Stack ( each->function_name, parent_process, currently_used_register_set, global_register_set, scheduler ) };
                 s->emplace_back(std::move(each));
