@@ -24,6 +24,7 @@
 #include <vector>
 #include <tuple>
 #include <map>
+#include <memory>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/cg/bytecode/instructions.h>
 #include <viua/cg/lex.h>
@@ -188,7 +189,7 @@ class Program {
     Program& calculateJumps(std::vector<std::tuple<viua::internals::types::bytecode_size, viua::internals::types::bytecode_size>>, std::vector<viua::cg::lex::Token>&);
     std::vector<viua::internals::types::bytecode_size> jumps();
 
-    viua::internals::types::byte* bytecode();
+    auto bytecode() const -> std::unique_ptr<viua::internals::types::byte[]>;
     Program& fill(viua::internals::types::byte*);
 
     Program& setdebug(bool d = true);
