@@ -70,7 +70,7 @@ auto viua::process::Process::get_trace_line(viua::internals::types::byte* for_ad
     if (static_cast<OPCODE>(*for_address) == RETURN) {
         trace_line << " from " + stack->back()->function_name;
         if (stack->state_of() == viua::process::Stack::STATE::RUNNING) {
-            trace_line << " before deferred";
+            trace_line << (stack->back()->deferred_calls.size() ? " before deferred" : " with no deferred");
         } else if (stack->state_of() == viua::process::Stack::STATE::SUSPENDED_BY_DEFERRED_ON_FRAME_POP) {
             trace_line << " after deferred";
         }
