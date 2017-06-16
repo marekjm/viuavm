@@ -53,7 +53,7 @@ auto viua::types::Pointer::authenticate(const viua::process::Process* process) -
      *  Pointers should automatically expire upon crossing process boundaries.
      *  This method should be called before any other method every time the VM
      *  code passes the pointer object to user-process to ensure that Pointer's state
-     *  is properly accounter for.
+     *  is properly accounted for.
      */
     valid = (valid and (process_of_origin == process));
 }
