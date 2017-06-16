@@ -72,7 +72,7 @@ namespace viua {
 
                 std::unique_ptr<Value> copy() const override;
 
-                Pointer();
+                Pointer(const viua::process::Process*);
                 Pointer(Value* t, const viua::process::Process*);
                 virtual ~Pointer();
         };

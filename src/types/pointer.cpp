@@ -94,7 +94,7 @@ string viua::types::Pointer::str() const {
 
 unique_ptr<viua::types::Value> viua::types::Pointer::copy() const {
     if (not valid) {
-        return unique_ptr<viua::types::Value>{new viua::types::Pointer()};
+        return unique_ptr<viua::types::Value>{new viua::types::Pointer(process_of_origin)};
     }
     return unique_ptr<viua::types::Value>{new viua::types::Pointer(points_to, process_of_origin)};
 }
@@ -105,7 +105,12 @@ void viua::types::Pointer::expired(Frame* frm, viua::kernel::RegisterSet*, viua:
 }
 
 
-viua::types::Pointer::Pointer(): points_to(nullptr), valid(false), process_of_origin(nullptr) {}
+viua::types::Pointer::Pointer(const viua::process::Process *poi):
+    points_to(nullptr),
+    valid(false),
+    process_of_origin(poi) {
+        cout << "created empty pointer (" << hex << this << dec << ")" << endl;
+}
 viua::types::Pointer::Pointer(viua::types::Value* t, const viua::process::Process *poi): points_to(t), valid(true), process_of_origin(poi) {
     attach();
 }
