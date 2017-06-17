@@ -2100,6 +2100,9 @@ class DeferredCallsTests(unittest.TestCase):
     def testDeferredCallsInvokedBeforeTailCall(self):
         runTestSplitlines(self, 'before_tailcall.asm', ['Hello World!'])
 
+    def testDeferredCallsInvokedBeforeFrameIsPopped(self):
+        runTestSplitlines(self, 'before_return.asm', ['Hello World!'])
+
     def testDeferredCallsActivatedOnStackUnwindingWhenExceptionUncaught(self):
         runTestSplitlines(
             self,
@@ -2112,6 +2115,21 @@ class DeferredCallsTests(unittest.TestCase):
 
     def testDeferredCallsActivatedOnStackUnwindingWhenExceptionCaught(self):
         runTestSplitlines(self, 'on_caught_exception.asm', ['Hello bar World!', 'Hello foo World!', '42'])
+
+    def testDeferredCallsAreInvokedBeforeStackIsUnwoundOnCaughtException(self):
+        runTestSplitlines(self,
+            name = 'before_unwind_on_caught.asm',
+            expected_output = [ 'Hello World before stack unwinding!', '666', ],
+        )
+
+    def testDeferredCallsAreInvokedBeforeStackIsUnwoundOnUncaughtException(self):
+        runTestSplitlines(self,
+            name = 'before_unwind_on_uncaught.asm',
+            expected_output = [ 'Hello World before stack unwinding!', ],
+            expected_error = ('Integer', '666',),
+            error_processing_function = extractFirstException,
+            expected_exit_code = 1,
+        )
 
     def testDeferredRunningBeforeFrameIsDropped(self):
         runTest(self, 'calls_running_before_frame_is_dropped.asm', 'Hello World!')
