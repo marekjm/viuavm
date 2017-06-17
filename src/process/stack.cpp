@@ -200,10 +200,10 @@ auto viua::process::Stack::unwind_to(const TryFrame* tframe, const string handle
 auto viua::process::Stack::find_catch_frame() -> tuple<TryFrame*, string> {
     TryFrame* found_exception_frame = nullptr;
     string caught_with_type = "";
+    string handler_found_for_type = (state_of() == STATE::RUNNING ? thrown : caught)->type();
 
     for (decltype(tryframes)::size_type i = tryframes.size(); i > 0; --i) {
         TryFrame* tframe = tryframes[(i-1)].get();
-        string handler_found_for_type = thrown->type();
         bool handler_found = tframe->catchers.count(handler_found_for_type);
 
         // FIXME: mutex
