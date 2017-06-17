@@ -170,19 +170,29 @@ auto viua::process::Stack::unwind_call_stack_to(const Frame* frame) -> void {
         ++distance;
     }
 
-    parent_process->stacks_order.push(this);
-    for (size_type i = (size() - distance); i < size(); ++i) {
-        register_deferred_calls_from(at(i).get());
+    if (state_of() == STATE::RUNNING) {
+        state_of(STATE::SUSPENDED_BY_DEFERRED_DURING_STACK_UNWINDING);
+        parent_process->stacks_order.push(this);
+        for (size_type i = (size() - distance); i < size(); ++i) {
+            register_deferred_calls_from(at(i).get());
+        }
+
+        if (not parent_process->stacks_order.empty()) {
+            parent_process->stack = parent_process->stacks_order.top();
+            parent_process->stacks_order.pop();
+            parent_process->currently_used_register_set = parent_process->stack->back()->local_register_set.get();
+            return;
+        }
     }
+
+    if (state_of() != STATE::SUSPENDED_BY_DEFERRED_DURING_STACK_UNWINDING) {
+        throw new viua::types::Exception("stack left in an invalid state during unwinding");
+    }
+
+    state_of(STATE::RUNNING);
 
     for (size_type j = 0; j < distance; ++j) {
         pop();
-    }
-
-    if (not parent_process->stacks_order.empty()) {
-        parent_process->stack = parent_process->stacks_order.top();
-        parent_process->stacks_order.pop();
-        parent_process->currently_used_register_set = parent_process->stack->back()->local_register_set.get();
     }
 }
 auto viua::process::Stack::unwind_try_stack_to(const TryFrame* tframe) -> void {

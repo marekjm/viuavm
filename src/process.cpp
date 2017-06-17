@@ -223,7 +223,20 @@ viua::internals::types::byte* viua::process::Process::tick() {
         // without the saved stack the VM could end up setting instruction pointer of one stack on
         // a different one, thus currupting execution.
         auto saved_stack = stack;
-        saved_stack->instruction_pointer = dispatch(stack->instruction_pointer);
+        switch (stack->state_of()) {
+            // When stack is in a RUNNING state it can be executed normally with
+            // no special conditions.
+            case Stack::STATE::RUNNING:
+            // When stack is in SUSPENDED_BY_DEFERRED_ON_FRAME_POP state a dispatch
+            // should be performed to run the opcode that put the process in this state
+            // the second time as such opcodes first suspend the stack, and
+            // then continue it when they are entered again.
+            case Stack::STATE::SUSPENDED_BY_DEFERRED_ON_FRAME_POP:
+                saved_stack->instruction_pointer = dispatch(stack->instruction_pointer);
+                break;
+            default:
+                break;
+        }
     } catch (viua::types::Exception* e) {
         /* All machine-thrown exceptions are passed back to user code.
          * This is much easier than checking for erroneous conditions and
@@ -273,7 +286,7 @@ viua::internals::types::byte* viua::process::Process::tick() {
         stack->frame_new.reset(nullptr);
     }
 
-    if (stack->thrown) {
+    if (stack->thrown or (stack->state_of() == Stack::STATE::SUSPENDED_BY_DEFERRED_DURING_STACK_UNWINDING)) {
         handleActiveException();
     }
 
