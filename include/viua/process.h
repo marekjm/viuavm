@@ -80,6 +80,12 @@ namespace viua {
                  * deferred calls, and then return to continue executing this stack.
                  */
                 SUSPENDED_BY_DEFERRED_ON_FRAME_POP,
+
+                /*
+                 * Stack is suspended until deferred calls triggered  by stack unwinding have
+                 * finished running.
+                 */
+                SUSPENDED_BY_DEFERRED_DURING_STACK_UNWINDING,
             };
 
             private:
