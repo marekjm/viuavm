@@ -79,7 +79,14 @@ auto viua::process::Process::get_trace_line(viua::internals::types::byte* for_ad
     return trace_line.str();
 }
 auto viua::process::Process::emit_trace_line(viua::internals::types::byte* for_address) const -> void {
-    cerr << (get_trace_line(for_address) + "\n");
+    // FIXME conditionally enable duplicate trace lines
+    static string previous_trace_line;
+    string line = get_trace_line(for_address);
+
+    if (line != previous_trace_line) {
+        cerr << (line + "\n");
+        previous_trace_line = line;
+    }
 }
 
 
