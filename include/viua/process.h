@@ -86,6 +86,13 @@ namespace viua {
                  * finished running.
                  */
                 SUSPENDED_BY_DEFERRED_DURING_STACK_UNWINDING,
+
+                /*
+                 * Entered after execution hits the `halt` opcode.
+                 * Execution is stopped *immediately* after entering this state meaning
+                 * that the stack is not unwound, deferred calls are not invoked, etc.
+                 */
+                HALTED,
             };
 
             private:

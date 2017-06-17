@@ -362,7 +362,7 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
             addr = opremove(addr+1);
             break;
         case HALT:
-            throw HaltException();
+            stack->state_of(Stack::STATE::HALTED);
             break;
         case NOP:
             ++addr;

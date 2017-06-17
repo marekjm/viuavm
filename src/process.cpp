@@ -213,8 +213,6 @@ void viua::process::Process::handleActiveException() {
     stack->unwind();
 }
 viua::internals::types::byte* viua::process::Process::tick() {
-    bool halt = false;
-
     viua::internals::types::byte* previous_instruction_pointer = stack->instruction_pointer;
 
     try {
@@ -223,6 +221,7 @@ viua::internals::types::byte* viua::process::Process::tick() {
         // without the saved stack the VM could end up setting instruction pointer of one stack on
         // a different one, thus currupting execution.
         auto saved_stack = stack;
+
         switch (stack->state_of()) {
             // When stack is in a RUNNING state it can be executed normally with
             // no special conditions.
@@ -246,15 +245,13 @@ viua::internals::types::byte* viua::process::Process::tick() {
          * If user code cannot deal with them (i.e. did not register a catcher block) they will terminate execution later.
          */
         stack->thrown.reset(e);
-    } catch (const HaltException& e) {
-        halt = true;
     } catch (viua::types::Value* e) {
         stack->thrown.reset(e);
     } catch (const char* e) {
         stack->thrown.reset(new viua::types::Exception(e));
     }
 
-    if (halt or stack->size() == 0) {
+    if (stack->state_of() == Stack::STATE::HALTED or stack->size() == 0) {
         finished.store(true, std::memory_order_release);
         return nullptr;
     }
