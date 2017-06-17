@@ -74,7 +74,8 @@ namespace viua {
                 RUNNING,
 
                 /*
-                 * Stack is suspended because of deferred calls it triggered.
+                 * Stack is suspended because of deferred calls it triggered when returning
+                 * from a call normally.
                  * The VM should finish executing any stacks spawned by this stack's
                  * deferred calls, and then return to continue executing this stack.
                  */
