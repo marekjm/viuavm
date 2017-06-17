@@ -237,11 +237,21 @@ auto viua::process::Stack::unwind() -> void {
     tie(tframe, handler_found_for_type) = find_catch_frame();
 
     if (tframe != nullptr) {
+        if (state_of() == STATE::RUNNING) {
+            // Move thrown value into "caught slot" *ONLY* if the stack is
+            // in running state.
+            // Why?
+            // To avoid moving the value twice.
+            // During the second call to unwind() after an exception has been
+            // thrown the stack is in a different state so the stack state is used as
+            // an indicator whether it is safe to move thrown value or not.
+            caught = std::move(thrown);
+        }
+
         // Catcher has been found, so unwind the stack "normally".
         // During the first call unwinding changes stack state to suspended to
         // let the VM run stacks of deferred calls.
         unwind_to(tframe, handler_found_for_type);
-        caught = std::move(thrown);
     } else {
         // No catcher has been found so we can just unwind the stack and
         // be done with the exception.
