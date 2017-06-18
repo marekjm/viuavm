@@ -17,16 +17,16 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <memory>
 #include <functional>
+#include <memory>
+#include <viua/assert.h>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/decoder/operands.h>
-#include <viua/types/value.h>
-#include <viua/types/integer.h>
-#include <viua/types/boolean.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
-#include <viua/assert.h>
+#include <viua/types/boolean.h>
+#include <viua/types/integer.h>
+#include <viua/types/value.h>
 using namespace std;
 
 
@@ -51,7 +51,7 @@ viua::internals::types::byte* viua::process::Process::opistore(viua::internals::
 }
 
 viua::internals::types::byte* viua::process::Process::opiinc(viua::internals::types::byte* addr) {
-    viua::types::Integer* target { nullptr };
+    viua::types::Integer* target{nullptr};
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
 
     target->increment();
@@ -60,7 +60,7 @@ viua::internals::types::byte* viua::process::Process::opiinc(viua::internals::ty
 }
 
 viua::internals::types::byte* viua::process::Process::opidec(viua::internals::types::byte* addr) {
-    viua::types::Integer* target { nullptr };
+    viua::types::Integer* target{nullptr};
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
 
     target->decrement();

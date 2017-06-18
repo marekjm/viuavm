@@ -20,18 +20,16 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <viua/exceptions.h>
+#include <viua/kernel/kernel.h>
+#include <viua/process.h>
 #include <viua/types/boolean.h>
 #include <viua/types/process.h>
-#include <viua/exceptions.h>
-#include <viua/process.h>
-#include <viua/kernel/kernel.h>
 using namespace std;
 
 const string viua::types::Process::type_name = "Process";
 
-string viua::types::Process::type() const {
-    return "Process";
-}
+string viua::types::Process::type() const { return "Process"; }
 
 string viua::types::Process::str() const {
     ostringstream oss;
@@ -39,9 +37,7 @@ string viua::types::Process::str() const {
     return oss.str();
 }
 
-string viua::types::Process::repr() const {
-    return str();
-}
+string viua::types::Process::repr() const { return str(); }
 
 bool viua::types::Process::boolean() const {
     // There is no good reason why evaluating process as boolean should return either
@@ -53,9 +49,6 @@ unique_ptr<viua::types::Value> viua::types::Process::copy() const {
     return unique_ptr<viua::types::Value>{new viua::types::Process(thrd)};
 }
 
-viua::process::PID viua::types::Process::pid() const {
-    return saved_pid;
-}
+viua::process::PID viua::types::Process::pid() const { return saved_pid; }
 
-viua::types::Process::Process(viua::process::Process* t): thrd(t), saved_pid(thrd->pid()) {
-}
+viua::types::Process::Process(viua::process::Process* t) : thrd(t), saved_pid(thrd->pid()) {}

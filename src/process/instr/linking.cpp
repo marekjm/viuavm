@@ -17,14 +17,14 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cstdlib>
 #include <dlfcn.h>
 #include <sys/stat.h>
-#include <cstdlib>
 #include <viua/bytecode/decoder/operands.h>
-#include <viua/types/integer.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/scheduler/vps.h>
+#include <viua/types/integer.h>
 using namespace std;
 
 

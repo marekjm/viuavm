@@ -17,44 +17,33 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <viua/types/exception.h>
 #include <viua/kernel/kernel.h>
-#include <viua/scheduler/vps.h>
 #include <viua/process.h>
+#include <viua/scheduler/vps.h>
+#include <viua/types/exception.h>
 using namespace std;
 
 
-viua::process::Stack::Stack(string fn, Process* pp, viua::kernel::RegisterSet** curs, viua::kernel::RegisterSet* gs, viua::scheduler::VirtualProcessScheduler* sch):
-    current_state(STATE::RUNNING),
-    entry_function(fn),
-    parent_process(pp),
-    jump_base(nullptr),
-    instruction_pointer(nullptr),
-    frame_new(nullptr),
-    try_frame_new(nullptr),
-    thrown(nullptr),
-    caught(nullptr),
-    currently_used_register_set(curs),
-    global_register_set(gs),
-    return_value(nullptr),
-    scheduler(sch)
-{
-}
+viua::process::Stack::Stack(string fn, Process* pp, viua::kernel::RegisterSet** curs,
+                            viua::kernel::RegisterSet* gs, viua::scheduler::VirtualProcessScheduler* sch)
+    : current_state(STATE::RUNNING), entry_function(fn), parent_process(pp), jump_base(nullptr),
+      instruction_pointer(nullptr), frame_new(nullptr), try_frame_new(nullptr), thrown(nullptr),
+      caught(nullptr), currently_used_register_set(curs), global_register_set(gs), return_value(nullptr),
+      scheduler(sch) {}
 
 auto viua::process::Stack::set_return_value() -> void {
     // FIXME find better name for this function
     if (back()->return_register != nullptr) {
         // we check in 0. register because it's reserved for return values
         if ((*currently_used_register_set)->at(0) == nullptr) {
-            throw new viua::types::Exception("return value requested by frame but function did not set return register");
+            throw new viua::types::Exception(
+                "return value requested by frame but function did not set return register");
         }
         return_value = (*currently_used_register_set)->pop(0);
     }
 }
 
-auto viua::process::Stack::state_of() const -> STATE {
-    return current_state;
-}
+auto viua::process::Stack::state_of() const -> STATE { return current_state; }
 
 auto viua::process::Stack::state_of(const STATE s) -> STATE {
     auto previous_state = current_state;
@@ -67,25 +56,20 @@ auto viua::process::Stack::bind(viua::kernel::RegisterSet** curs, viua::kernel::
     global_register_set = gs;
 }
 
-auto viua::process::Stack::begin() const -> decltype(frames.begin()) {
-    return frames.begin();
-}
+auto viua::process::Stack::begin() const -> decltype(frames.begin()) { return frames.begin(); }
 
-auto viua::process::Stack::end() const -> decltype(frames.end()) {
-    return frames.end();
-}
+auto viua::process::Stack::end() const -> decltype(frames.end()) { return frames.end(); }
 
 auto viua::process::Stack::at(decltype(frames)::size_type i) const -> decltype(frames.at(i)) {
     return frames.at(i);
 }
 
-auto viua::process::Stack::back() const -> decltype(frames.back()) {
-    return frames.back();
-}
+auto viua::process::Stack::back() const -> decltype(frames.back()) { return frames.back(); }
 
 auto viua::process::Stack::register_deferred_calls_from(Frame* frame) -> void {
     for (auto& each : frame->deferred_calls) {
-        unique_ptr<Stack> s { new Stack ( each->function_name, parent_process, currently_used_register_set, global_register_set, scheduler ) };
+        unique_ptr<Stack> s{new Stack(each->function_name, parent_process, currently_used_register_set,
+                                      global_register_set, scheduler)};
         s->emplace_back(std::move(each));
         s->instruction_pointer = adjust_jump_base_for(s->at(0)->function_name);
         s->bind(currently_used_register_set, global_register_set);
@@ -109,7 +93,7 @@ auto viua::process::Stack::register_deferred_calls(const bool push_this_stack) -
 }
 
 auto viua::process::Stack::pop() -> unique_ptr<Frame> {
-    unique_ptr<Frame> frame { std::move(frames.back()) };
+    unique_ptr<Frame> frame{std::move(frames.back())};
     frames.pop_back();
 
     for (viua::internals::types::register_index i = 0; i < frame->arguments->size(); ++i) {
@@ -131,39 +115,37 @@ auto viua::process::Stack::pop() -> unique_ptr<Frame> {
     return frame;
 }
 
-auto viua::process::Stack::size() const -> decltype(frames)::size_type {
-    return frames.size();
-}
+auto viua::process::Stack::size() const -> decltype(frames)::size_type { return frames.size(); }
 
-auto viua::process::Stack::clear() -> void {
-    frames.clear();
-}
+auto viua::process::Stack::clear() -> void { frames.clear(); }
 
 auto viua::process::Stack::emplace_back(unique_ptr<Frame> frame) -> decltype(frames.emplace_back(frame)) {
     return frames.emplace_back(std::move(frame));
 }
 
 viua::internals::types::byte* viua::process::Stack::adjust_jump_base_for_block(const string& call_name) {
-    viua::internals::types::byte *entry_point = nullptr;
+    viua::internals::types::byte* entry_point = nullptr;
     auto ep = scheduler->getEntryPointOfBlock(call_name);
     entry_point = ep.first;
     jump_base = ep.second;
     return entry_point;
 }
 viua::internals::types::byte* viua::process::Stack::adjust_jump_base_for(const string& call_name) {
-    viua::internals::types::byte *entry_point = nullptr;
+    viua::internals::types::byte* entry_point = nullptr;
     auto ep = scheduler->getEntryPointOf(call_name);
     entry_point = ep.first;
     jump_base = ep.second;
     return entry_point;
 }
 
-auto viua::process::Stack::adjust_instruction_pointer(const TryFrame* tframe, const string handler_found_for_type) -> void {
-    instruction_pointer = adjust_jump_base_for_block(tframe->catchers.at(handler_found_for_type)->catcher_name);
+auto viua::process::Stack::adjust_instruction_pointer(const TryFrame* tframe,
+                                                      const string handler_found_for_type) -> void {
+    instruction_pointer =
+        adjust_jump_base_for_block(tframe->catchers.at(handler_found_for_type)->catcher_name);
 }
 auto viua::process::Stack::unwind_call_stack_to(const Frame* frame) -> void {
     size_type distance = 0;
-    for (size_type j = (size()-1); j > 0; --j) {
+    for (size_type j = (size() - 1); j > 0; --j) {
         if (at(j).get() == frame) {
             break;
         }
@@ -180,7 +162,8 @@ auto viua::process::Stack::unwind_call_stack_to(const Frame* frame) -> void {
         if (not parent_process->stacks_order.empty()) {
             parent_process->stack = parent_process->stacks_order.top();
             parent_process->stacks_order.pop();
-            parent_process->currently_used_register_set = parent_process->stack->back()->local_register_set.get();
+            parent_process->currently_used_register_set =
+                parent_process->stack->back()->local_register_set.get();
             return;
         }
     }
@@ -213,7 +196,7 @@ auto viua::process::Stack::find_catch_frame() -> tuple<TryFrame*, string> {
     string handler_found_for_type = (state_of() == STATE::RUNNING ? thrown : caught)->type();
 
     for (decltype(tryframes)::size_type i = tryframes.size(); i > 0; --i) {
-        TryFrame* tframe = tryframes[(i-1)].get();
+        TryFrame* tframe = tryframes[(i - 1)].get();
         bool handler_found = tframe->catchers.count(handler_found_for_type);
 
         // FIXME: mutex
@@ -272,13 +255,17 @@ auto viua::process::Stack::unwind() -> void {
         if (not parent_process->stacks_order.empty()) {
             parent_process->stack = parent_process->stacks_order.top();
             parent_process->stacks_order.pop();
-            parent_process->currently_used_register_set = parent_process->stack->back()->local_register_set.get();
+            parent_process->currently_used_register_set =
+                parent_process->stack->back()->local_register_set.get();
         }
     }
 }
 
-auto viua::process::Stack::prepare_frame(viua::internals::types::register_index arguments_size, viua::internals::types::register_index registers_size) -> Frame* {
-    if (frame_new) { throw "requested new frame while last one is unused"; }
+auto viua::process::Stack::prepare_frame(viua::internals::types::register_index arguments_size,
+                                         viua::internals::types::register_index registers_size) -> Frame* {
+    if (frame_new) {
+        throw "requested new frame while last one is unused";
+    }
     frame_new.reset(new Frame(nullptr, arguments_size, registers_size));
     return frame_new.get();
 }
@@ -286,7 +273,8 @@ auto viua::process::Stack::prepare_frame(viua::internals::types::register_index 
 auto viua::process::Stack::push_prepared_frame() -> void {
     if (size() > MAX_STACK_SIZE) {
         ostringstream oss;
-        oss << "stack size (" << MAX_STACK_SIZE << ") exceeded with call to '" << frame_new->function_name << '\'';
+        oss << "stack size (" << MAX_STACK_SIZE << ") exceeded with call to '" << frame_new->function_name
+            << '\'';
         throw new viua::types::Exception(oss.str());
     }
 
@@ -301,4 +289,3 @@ auto viua::process::Stack::push_prepared_frame() -> void {
     }
     emplace_back(std::move(frame_new));
 }
-

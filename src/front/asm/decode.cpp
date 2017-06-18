@@ -18,9 +18,9 @@
  */
 
 #include <sstream>
-#include <viua/support/string.h>
 #include <viua/cg/tokenizer.h>
 #include <viua/front/asm.h>
+#include <viua/support/string.h>
 using namespace std;
 
 
@@ -41,9 +41,15 @@ vector<vector<string>> decode_line_tokens(const vector<string>& tokens) {
             ++i;
             int balance = 1;
             while (i < tokens.size()) {
-                if (tokens.at(i) == "(") { ++balance; }
-                if (tokens.at(i) == ")") { --balance; }
-                if (balance == 0) { break; }
+                if (tokens.at(i) == "(") {
+                    ++balance;
+                }
+                if (tokens.at(i) == ")") {
+                    --balance;
+                }
+                if (balance == 0) {
+                    break;
+                }
                 subtokens.emplace_back(tokens.at(i));
                 ++i;
             }
@@ -51,7 +57,7 @@ vector<vector<string>> decode_line_tokens(const vector<string>& tokens) {
             for (unsigned j = 0; j < sublines.size(); ++j) {
                 decoded_lines.emplace_back(sublines.at(j));
             }
-            main_line.emplace_back(sublines.at(sublines.size()-1).at(1));
+            main_line.emplace_back(sublines.at(sublines.size() - 1).at(1));
             ++i;
             continue;
         }
@@ -62,15 +68,23 @@ vector<vector<string>> decode_line_tokens(const vector<string>& tokens) {
             int toplevel_subexpr_balance = 0;
             unsigned len = 0;
             while (i < tokens.size()) {
-                if (tokens.at(i) == "[") { ++balance; }
-                if (tokens.at(i) == "]") { --balance; }
+                if (tokens.at(i) == "[") {
+                    ++balance;
+                }
+                if (tokens.at(i) == "]") {
+                    --balance;
+                }
                 if (tokens.at(i) == "(") {
-                    if ((++toplevel_subexpr_balance) == 1) { ++len; }
+                    if ((++toplevel_subexpr_balance) == 1) {
+                        ++len;
+                    }
                 }
                 if (tokens.at(i) == ")") {
                     --toplevel_subexpr_balance;
                 }
-                if (balance == 0) { break; }
+                if (balance == 0) {
+                    break;
+                }
                 subtokens.emplace_back(tokens.at(i));
                 ++i;
             }
@@ -95,6 +109,4 @@ vector<vector<string>> decode_line_tokens(const vector<string>& tokens) {
 
     return decoded_lines;
 }
-vector<vector<string>> decode_line(const string& s) {
-    return decode_line_tokens(tokenize(s));
-}
+vector<vector<string>> decode_line(const string& s) { return decode_line_tokens(tokenize(s)); }

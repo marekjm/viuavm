@@ -17,10 +17,10 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <string>
 #include <regex>
-#include <viua/support/string.h>
+#include <string>
 #include <viua/cg/assembler/assembler.h>
+#include <viua/support/string.h>
 using namespace std;
 
 
@@ -44,24 +44,18 @@ int assembler::utils::getFunctionArity(const string& function_name) {
     auto sz = parts[1].str().size();
     if (sz > 1) {
         ssub_match a = parts[1];
-        arity = stoi(a.str().substr(1)); // cut of the '/' before converting to integer
+        arity = stoi(a.str().substr(1));  // cut of the '/' before converting to integer
     } else if (sz == 1) {
         arity = -2;
     }
     return arity;
 }
 
-bool assembler::utils::lines::is_function(const string& line) {
-    return str::chunk(line) == ".function:";
-}
+bool assembler::utils::lines::is_function(const string& line) { return str::chunk(line) == ".function:"; }
 
-bool assembler::utils::lines::is_closure(const string& line) {
-    return str::chunk(line) == ".closure:";
-}
+bool assembler::utils::lines::is_closure(const string& line) { return str::chunk(line) == ".closure:"; }
 
-bool assembler::utils::lines::is_block(const string& line) {
-    return str::chunk(line) == ".block:";
-}
+bool assembler::utils::lines::is_block(const string& line) { return str::chunk(line) == ".block:"; }
 
 bool assembler::utils::lines::is_function_signature(const string& line) {
     return str::chunk(line) == ".signature:";
@@ -71,50 +65,27 @@ bool assembler::utils::lines::is_block_signature(const string& line) {
     return str::chunk(line) == ".bsignature:";
 }
 
-bool assembler::utils::lines::is_name(const string& line) {
-    return str::chunk(line) == ".name:";
-}
+bool assembler::utils::lines::is_name(const string& line) { return str::chunk(line) == ".name:"; }
 
-bool assembler::utils::lines::is_mark(const string& line) {
-    return str::chunk(line) == ".mark:";
-}
+bool assembler::utils::lines::is_mark(const string& line) { return str::chunk(line) == ".mark:"; }
 
-bool assembler::utils::lines::is_info(const string& line) {
-    return str::chunk(line) == ".info:";
-}
+bool assembler::utils::lines::is_info(const string& line) { return str::chunk(line) == ".info:"; }
 
-bool assembler::utils::lines::is_end(const string& line) {
-    return str::chunk(line) == ".end";
-}
+bool assembler::utils::lines::is_end(const string& line) { return str::chunk(line) == ".end"; }
 
-bool assembler::utils::lines::is_import(const string& line) {
-    return str::chunk(line) == ".import:";
-}
+bool assembler::utils::lines::is_import(const string& line) { return str::chunk(line) == ".import:"; }
 
 bool assembler::utils::lines::is_directive(const string& line) {
-    return (
-        is_function(line) or
-        is_block(line) or
-        is_function_signature(line) or
-        is_block_signature(line) or
-        is_name(line) or
-        is_mark(line) or
-        is_info(line) or
-        is_end(line) or
-        is_import(line) or
-        is_closure(line) or
-        line == ".unused:" or
-        false
-    );
+    return (is_function(line) or is_block(line) or is_function_signature(line) or is_block_signature(line) or
+            is_name(line) or is_mark(line) or is_info(line) or is_end(line) or is_import(line) or
+            is_closure(line) or line == ".unused:" or false);
 }
 
 string assembler::utils::lines::make_function_signature(const string& name) {
     return (".signature: " + name);
 }
 
-string assembler::utils::lines::make_block_signature(const string& name) {
-    return (".bsignature: " + name);
-}
+string assembler::utils::lines::make_block_signature(const string& name) { return (".bsignature: " + name); }
 
 string assembler::utils::lines::make_info(const string& key, const string& value) {
     return (".info: " + key + ' ' + str::enquote(str::strencode(value)));

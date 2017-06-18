@@ -20,21 +20,21 @@
 #include <cstdint>
 #include <iostream>
 #include <viua/bytecode/decoder/operands.h>
-#include <viua/types/boolean.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
+#include <viua/types/boolean.h>
 using namespace std;
 
 
 viua::internals::types::byte* viua::process::Process::opecho(viua::internals::types::byte* addr) {
-    viua::types::Value* source { nullptr };
+    viua::types::Value* source{nullptr};
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
     cout << source->str();
     return addr;
 }
 
 viua::internals::types::byte* viua::process::Process::opprint(viua::internals::types::byte* addr) {
-    viua::types::Value* source { nullptr };
+    viua::types::Value* source{nullptr};
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
     cout << source->str() + '\n';
     return addr;
@@ -42,7 +42,8 @@ viua::internals::types::byte* viua::process::Process::opprint(viua::internals::t
 
 
 viua::internals::types::byte* viua::process::Process::opjump(viua::internals::types::byte* addr) {
-    viua::internals::types::byte* target = (stack->jump_base + viua::bytecode::decoder::operands::extract_primitive_uint64(addr, this));
+    viua::internals::types::byte* target =
+        (stack->jump_base + viua::bytecode::decoder::operands::extract_primitive_uint64(addr, this));
     if (target == addr) {
         throw new viua::types::Exception("aborting: JUMP instruction pointing to itself");
     }

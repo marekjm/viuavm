@@ -17,74 +17,52 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <sstream>
 #include <map>
 #include <set>
+#include <sstream>
 #include <viua/bytecode/maps.h>
-#include <viua/support/string.h>
 #include <viua/cg/lex.h>
+#include <viua/support/string.h>
 using namespace std;
 
 namespace viua {
     namespace cg {
         namespace lex {
-            auto Token::line() const -> decltype(line_number) {
-                return line_number;
-            }
-            auto Token::character() const -> decltype(character_in_line) {
-                return character_in_line;
-            }
+            auto Token::line() const -> decltype(line_number) { return line_number; }
+            auto Token::character() const -> decltype(character_in_line) { return character_in_line; }
 
-            auto Token::str() const -> decltype(content) {
-                return content;
-            }
-            auto Token::str(string s) -> void {
-                content = s;
-            }
+            auto Token::str() const -> decltype(content) { return content; }
+            auto Token::str(string s) -> void { content = s; }
 
-            auto Token::original() const -> decltype(original_content) {
-                return original_content;
-            }
-            auto Token::original(string s) -> void {
-                original_content = s;
-            }
+            auto Token::original() const -> decltype(original_content) { return original_content; }
+            auto Token::original(string s) -> void { original_content = s; }
 
             auto Token::ends() const -> decltype(character_in_line) {
                 return (character_in_line + content.size());
             }
 
-            bool Token::operator==(const string& s) const {
-                return (content == s);
-            }
-            bool Token::operator!=(const string& s) const {
-                return (content != s);
-            }
+            bool Token::operator==(const string& s) const { return (content == s); }
+            bool Token::operator!=(const string& s) const { return (content != s); }
 
-            Token::operator string() const {
-                return str();
-            }
+            Token::operator string() const { return str(); }
 
-            Token::Token(decltype(line_number) line_, decltype(character_in_line) character_, string content_): content(content_), original_content(content), line_number(line_), character_in_line(character_) {
-            }
-            Token::Token(): Token(0, 0, "") {}
+            Token::Token(decltype(line_number) line_, decltype(character_in_line) character_, string content_)
+                : content(content_), original_content(content), line_number(line_),
+                  character_in_line(character_) {}
+            Token::Token() : Token(0, 0, "") {}
 
-            const char* InvalidSyntax::what() const {
-                return message.c_str();
-            }
+            const char* InvalidSyntax::what() const { return message.c_str(); }
 
-            auto InvalidSyntax::line() const -> decltype(line_number) {
-                return line_number;
-            }
-            auto InvalidSyntax::character() const -> decltype(character_in_line) {
-                return character_in_line;
-            }
+            auto InvalidSyntax::line() const -> decltype(line_number) { return line_number; }
+            auto InvalidSyntax::character() const -> decltype(character_in_line) { return character_in_line; }
 
             auto InvalidSyntax::match(Token token) const -> bool {
                 for (const auto& each : tokens) {
                     if (token.line() == each.line() and token.character() == each.character()) {
                         return true;
                     }
-                    if (token.line() == each.line() and token.character() >= each.character() and token.ends() <= each.ends()) {
+                    if (token.line() == each.line() and token.character() >= each.character() and
+                        token.ends() <= each.ends()) {
                         return true;
                     }
                 }
@@ -96,18 +74,17 @@ namespace viua {
                 return *this;
             }
 
-            InvalidSyntax::InvalidSyntax(decltype(line_number) ln, decltype(character_in_line) ch, string ct): line_number(ln), character_in_line(ch), content(ct) {
-            }
-            InvalidSyntax::InvalidSyntax(Token t, string m): line_number(t.line()), character_in_line(t.character()), content(t.original()), message(m) {
+            InvalidSyntax::InvalidSyntax(decltype(line_number) ln, decltype(character_in_line) ch, string ct)
+                : line_number(ln), character_in_line(ch), content(ct) {}
+            InvalidSyntax::InvalidSyntax(Token t, string m)
+                : line_number(t.line()), character_in_line(t.character()), content(t.original()), message(m) {
                 add(t);
             }
 
-            UnusedValue::UnusedValue(Token token): InvalidSyntax(token, ("unused value in register " + token.str())) {
-            }
+            UnusedValue::UnusedValue(Token token)
+                : InvalidSyntax(token, ("unused value in register " + token.str())) {}
 
-            const char* TracedSyntaxError::what() const {
-                return errors.front().what();
-            }
+            const char* TracedSyntaxError::what() const { return errors.front().what(); }
 
             auto TracedSyntaxError::line() const -> decltype(errors.front().line()) {
                 return errors.front().line();
@@ -123,7 +100,7 @@ namespace viua {
 
 
             bool is_reserved_keyword(const string& s) {
-                static const set<string> reserved_keywords {
+                static const set<string> reserved_keywords{
                     /*
                      * Used for timeouts in 'join' and 'receive' instructions
                      */
@@ -132,50 +109,24 @@ namespace viua {
                     /*
                      *  Reserved as register set names.
                      */
-                    "local",
-                    "static",
-                    "global",
+                    "local", "static", "global",
 
                     /*
                      * Reserved for future use.
                      */
-                    "auto",
-                    "default",
-                    "undefined",
-                    "null",
-                    "void",
-                    "iota",
-                    "const",
+                    "auto", "default", "undefined", "null", "void", "iota", "const",
 
                     /*
                      * Reserved for future use as boolean literals.
                      */
-                    "true",
-                    "false",
+                    "true", "false",
 
                     /*
                      * Reserved for future use as instruction names.
                      */
-                    "int",
-                    "int8",
-                    "int16",
-                    "int32",
-                    "int64",
-                    "uint",
-                    "uint8",
-                    "uint16",
-                    "uint32",
-                    "uint64",
-                    "float32",
-                    "float64",
-                    "string",
-                    "boolean",
-                    "bits",
-                    "coroutine",
-                    "yield",
-                    "channel",
-                    "publish",
-                    "subscribe",
+                    "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64",
+                    "float32", "float64", "string", "boolean", "bits", "coroutine", "yield", "channel",
+                    "publish", "subscribe",
 
                     /*
                      * Reserved  for future use as bit-operation instruction names.
@@ -198,10 +149,10 @@ namespace viua {
                      *          arithmetic bit shift left;
                      *          same as logical bit shift left, only the lowest bit is preserved
                      */
-                    "shl",  // logical shift left
-                    "shr",  // logical shift right
-                    "ashl", // arithmetic shift left
-                    "ashr", // arithmetic shift right
+                    "shl",   // logical shift left
+                    "shr",   // logical shift right
+                    "ashl",  // arithmetic shift left
+                    "ashr",  // arithmetic shift right
 
                     "rol",  // rotate left
                     "ror",  // rotate right
@@ -211,7 +162,8 @@ namespace viua {
             void assert_is_not_reserved_keyword(Token token, const string& message) {
                 string s = token.original();
                 if (is_reserved_keyword(s)) {
-                    throw viua::cg::lex::InvalidSyntax(token, ("invalid " + message + ": '" + s + "' is a registered keyword"));
+                    throw viua::cg::lex::InvalidSyntax(
+                        token, ("invalid " + message + ": '" + s + "' is a registered keyword"));
                 }
             }
 
@@ -327,25 +279,27 @@ namespace viua {
                     Token token = input_tokens.at(i);
                     if (token == "call" or token == "process" or token == "msg") {
                         tokens.push_back(token);
-                        if (is_register_index(input_tokens.at(i+1)) or (input_tokens.at(i+1) == "void")) {
+                        if (is_register_index(input_tokens.at(i + 1)) or (input_tokens.at(i + 1) == "void")) {
                             tokens.push_back(input_tokens.at(++i));
                         } else {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "void");
                         }
                         if (is_register_index(tokens.back())) {
-                            if (is_register_set_name(input_tokens.at(i+1))) {
+                            if (is_register_set_name(input_tokens.at(i + 1))) {
                                 tokens.push_back(input_tokens.at(++i));
                             } else {
-                                tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                                tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                    "current");
                             }
                         }
 
                         tokens.push_back(input_tokens.at(++i));
                         if (is_register_index(tokens.back())) {
-                            if (is_register_set_name(input_tokens.at(i+1))) {
+                            if (is_register_set_name(input_tokens.at(i + 1))) {
                                 tokens.push_back(input_tokens.at(++i));
                             } else {
-                                tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                                tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                    "current");
                             }
                         }
 
@@ -355,10 +309,11 @@ namespace viua {
 
                         tokens.push_back(input_tokens.at(++i));
                         if (is_register_index(tokens.back())) {
-                            if (is_register_set_name(input_tokens.at(i+1))) {
+                            if (is_register_set_name(input_tokens.at(i + 1))) {
                                 tokens.push_back(input_tokens.at(++i));
                             } else {
-                                tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                                tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                    "current");
                             }
                         }
 
@@ -366,34 +321,40 @@ namespace viua {
                     } else if (token == "frame") {
                         tokens.push_back(token);
 
-                        if ((not str::isnum(input_tokens.at(i+1).str(), false)) and input_tokens.at(i+1).str() == "\n") {
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "%0");
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "%16");
+                        if ((not str::isnum(input_tokens.at(i + 1).str(), false)) and
+                            input_tokens.at(i + 1).str() == "\n") {
+                            tokens.emplace_back(input_tokens.at(i + 1).line(),
+                                                input_tokens.at(i + 1).character(), "%0");
+                            tokens.emplace_back(input_tokens.at(i + 1).line(),
+                                                input_tokens.at(i + 1).character(), "%16");
                             continue;
                         }
 
                         tokens.push_back(input_tokens.at(++i));
-                        if ((not str::isnum(input_tokens.at(i+1).str(), false)) and input_tokens.at(i+1).str() == "\n") {
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "%16");
+                        if ((not str::isnum(input_tokens.at(i + 1).str(), false)) and
+                            input_tokens.at(i + 1).str() == "\n") {
+                            tokens.emplace_back(input_tokens.at(i + 1).line(),
+                                                input_tokens.at(i + 1).character(), "%16");
                         }
                     } else if (token == "param" or token == "pamv") {
-                        tokens.push_back(token);                // mnemonic
+                        tokens.push_back(token);  // mnemonic
 
-                        tokens.push_back(input_tokens.at(++i)); // target register
+                        tokens.push_back(input_tokens.at(++i));  // target register
 
-                        tokens.push_back(input_tokens.at(++i)); // source register
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                        tokens.push_back(input_tokens.at(++i));  // source register
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
                     } else if (token == "arg") {
-                        tokens.push_back(token);                // mnemonic
+                        tokens.push_back(token);  // mnemonic
 
-                        tokens.push_back(input_tokens.at(++i)); // target register
+                        tokens.push_back(input_tokens.at(++i));  // target register
                         if (tokens.back() != "void") {
-                            if (not is_register_set_name(input_tokens.at(i+1))) {
-                                tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                            if (not is_register_set_name(input_tokens.at(i + 1))) {
+                                tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                    "current");
                             } else {
                                 tokens.push_back(input_tokens.at(++i));
                             }
@@ -406,19 +367,21 @@ namespace viua {
 
                         string target_register_index = tokens.back();
                         string target_register_set = "current";
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
-                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                target_register_set);
                             tokens.back().original(target_register_index);
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                             target_register_set = tokens.back();
                         }
 
-                        if (input_tokens.at(i+1) == "\n") {
+                        if (input_tokens.at(i + 1) == "\n") {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "%0");
                             tokens.back().original("\n");
 
-                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                target_register_set);
                             tokens.back().original("\n");
 
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "%0");
@@ -428,15 +391,19 @@ namespace viua {
 
                         // pack start register
                         tokens.push_back(input_tokens.at(++i));
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
-                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                target_register_set);
                             tokens.back().original("\n");
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
 
-                        if ((not str::isnum(input_tokens.at(i+1).str(), false)) and input_tokens.at(i+1).str() == "\n") {
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "%0"); // number of registers to pack
+                        if ((not str::isnum(input_tokens.at(i + 1).str(), false)) and
+                            input_tokens.at(i + 1).str() == "\n") {
+                            tokens.emplace_back(input_tokens.at(i + 1).line(),
+                                                input_tokens.at(i + 1).character(),
+                                                "%0");  // number of registers to pack
                             tokens.back().original("\n");
                         }
                     } else if (token == "vpop") {
@@ -445,8 +412,9 @@ namespace viua {
                         tokens.push_back(input_tokens.at(++i));
                         string target_register_set = "current";
                         if (tokens.back().str() != "void") {
-                            if (not is_register_set_name(input_tokens.at(i+1))) {
-                                tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                            if (not is_register_set_name(input_tokens.at(i + 1))) {
+                                tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                    target_register_set);
                             } else {
                                 tokens.push_back(input_tokens.at(++i));
                                 target_register_set = tokens.back().str();
@@ -454,18 +422,20 @@ namespace viua {
                         }
 
                         tokens.push_back(input_tokens.at(++i));
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
 
-                        if (input_tokens.at(i+1) == "\n") {
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "void");
+                        if (input_tokens.at(i + 1) == "\n") {
+                            tokens.emplace_back(input_tokens.at(i + 1).line(),
+                                                input_tokens.at(i + 1).character(), "void");
                         } else {
                             tokens.push_back(input_tokens.at(++i));
-                            if (not is_register_set_name(input_tokens.at(i+1))) {
-                                tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                            if (not is_register_set_name(input_tokens.at(i + 1))) {
+                                tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                    target_register_set);
                             } else {
                                 tokens.push_back(input_tokens.at(++i));
                             }
@@ -475,7 +445,7 @@ namespace viua {
 
                         tokens.push_back(input_tokens.at(++i));
                         string target_register_set = "current";
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
                         } else {
                             tokens.push_back(input_tokens.at(++i));
@@ -483,15 +453,16 @@ namespace viua {
                         }
 
                         tokens.push_back(input_tokens.at(++i));
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
 
                         tokens.push_back(input_tokens.at(++i));
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
-                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                target_register_set);
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
@@ -500,16 +471,18 @@ namespace viua {
 
                         tokens.push_back(input_tokens.at(++i));
                         string target_register_set = "current";
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
-                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                target_register_set);
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                             target_register_set = tokens.back();
                         }
 
                         tokens.push_back(input_tokens.at(++i));
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
-                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                target_register_set);
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
@@ -517,82 +490,83 @@ namespace viua {
                         tokens.push_back(token);
 
                         tokens.push_back(input_tokens.at(++i));
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
 
                         tokens.push_back(input_tokens.at(++i));
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
 
-                        if (input_tokens.at(i+1).str() == "\n") {
+                        if (input_tokens.at(i + 1).str() == "\n") {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "%0");
                         }
                     } else if (token == "vpush") {
                         tokens.push_back(token);
 
                         tokens.push_back(input_tokens.at(++i));
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
 
                         tokens.push_back(input_tokens.at(++i));
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
                     } else if (token == "insert" or token == "structinsert") {
-                        tokens.push_back(token);    // mnemonic
+                        tokens.push_back(token);  // mnemonic
 
-                        tokens.push_back(input_tokens.at(++i)); // target register
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                        tokens.push_back(input_tokens.at(++i));  // target register
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
 
-                        tokens.push_back(input_tokens.at(++i)); // source register
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                        tokens.push_back(input_tokens.at(++i));  // source register
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
 
-                        tokens.push_back(input_tokens.at(++i)); // key register
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                        tokens.push_back(input_tokens.at(++i));  // key register
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
                     } else if (token == "remove" or token == "structremove") {
-                        tokens.push_back(token);    // mnemonic
+                        tokens.push_back(token);  // mnemonic
 
-                        tokens.push_back(input_tokens.at(++i)); // target register
+                        tokens.push_back(input_tokens.at(++i));  // target register
                         if (tokens.back() != "void") {
-                            if (not is_register_set_name(input_tokens.at(i+1))) {
-                                tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                            if (not is_register_set_name(input_tokens.at(i + 1))) {
+                                tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                    "current");
                             } else {
                                 tokens.push_back(input_tokens.at(++i));
                             }
                         }
 
-                        tokens.push_back(input_tokens.at(++i)); // source register
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                        tokens.push_back(input_tokens.at(++i));  // source register
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
 
-                        tokens.push_back(input_tokens.at(++i)); // key register
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                        tokens.push_back(input_tokens.at(++i));  // key register
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
                         } else {
                             tokens.push_back(input_tokens.at(++i));
@@ -602,48 +576,54 @@ namespace viua {
 
                         tokens.push_back(input_tokens.at(++i));
                         if (tokens.back() != "void") {
-                            if (is_register_set_name(input_tokens.at(i+1))) {
+                            if (is_register_set_name(input_tokens.at(i + 1))) {
                                 tokens.push_back(input_tokens.at(++i));
                             } else {
-                                tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                                tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                    "current");
                             }
                         }
 
                         tokens.push_back(input_tokens.at(++i));
-                        if (is_register_set_name(input_tokens.at(i+1))) {
+                        if (is_register_set_name(input_tokens.at(i + 1))) {
                             tokens.push_back(input_tokens.at(++i));
                         } else {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
                         }
 
-                        if (input_tokens.at(i+1).str() == "\n") {
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "infinity");
+                        if (input_tokens.at(i + 1).str() == "\n") {
+                            tokens.emplace_back(input_tokens.at(i + 1).line(),
+                                                input_tokens.at(i + 1).character(), "infinity");
                         }
                     } else if (token == "receive") {
                         tokens.push_back(token);
                         tokens.push_back(input_tokens.at(++i));
 
                         if (tokens.back() != "void") {
-                            if (is_register_set_name(input_tokens.at(i+1))) {
+                            if (is_register_set_name(input_tokens.at(i + 1))) {
                                 tokens.push_back(input_tokens.at(++i));
                             } else {
-                                tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                                tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                    "current");
                             }
                         }
 
-                        if (input_tokens.at(i+1).str() == "\n") {
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "infinity"); // number of registers to pack
+                        if (input_tokens.at(i + 1).str() == "\n") {
+                            tokens.emplace_back(input_tokens.at(i + 1).line(),
+                                                input_tokens.at(i + 1).character(),
+                                                "infinity");  // number of registers to pack
                         }
                     } else if (token == "add" or token == "sub" or token == "mul" or token == "div" or
-                               token == "lt" or token == "lte" or token == "gt" or token == "gte" or token == "eq"
-                    ) {
-                        tokens.push_back(token);    // mnemonic
+                               token == "lt" or token == "lte" or token == "gt" or token == "gte" or
+                               token == "eq") {
+                        tokens.push_back(token);  // mnemonic
 
-                        tokens.push_back(input_tokens.at(++i)); // target register
+                        tokens.push_back(input_tokens.at(++i));  // target register
                         string target_register_index = tokens.back();
                         string target_register_set = "current";
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
-                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                target_register_set);
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                             target_register_set = tokens.back();
@@ -651,20 +631,23 @@ namespace viua {
 
                         // lhs register
                         tokens.push_back(input_tokens.at(++i));
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
-                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                target_register_set);
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
 
-                        if (input_tokens.at(i+1) == "\n") {
+                        if (input_tokens.at(i + 1) == "\n") {
                             auto popped_target_rs = tokens.back();
                             tokens.pop_back();
                             auto popped_target_ri = tokens.back();
                             tokens.pop_back();
 
-                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_index);
-                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                target_register_index);
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                target_register_set);
 
                             tokens.push_back(popped_target_ri);
                             tokens.push_back(popped_target_rs);
@@ -673,17 +656,18 @@ namespace viua {
 
                         // rhs register
                         tokens.push_back(input_tokens.at(++i));
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
-                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                target_register_set);
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
                     } else if (token == "and" or token == "or") {
-                        tokens.push_back(token);    // mnemonic
+                        tokens.push_back(token);  // mnemonic
 
                         // target operand
                         tokens.push_back(input_tokens.at(++i));
-                        if (is_register_set_name(input_tokens.at(i+1))) {
+                        if (is_register_set_name(input_tokens.at(i + 1))) {
                             tokens.push_back(input_tokens.at(++i));
                         } else {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
@@ -691,7 +675,7 @@ namespace viua {
 
                         // lhs operand
                         tokens.push_back(input_tokens.at(++i));
-                        if (is_register_set_name(input_tokens.at(i+1))) {
+                        if (is_register_set_name(input_tokens.at(i + 1))) {
                             tokens.push_back(input_tokens.at(++i));
                         } else {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
@@ -699,24 +683,24 @@ namespace viua {
 
                         // rhs operand
                         tokens.push_back(input_tokens.at(++i));
-                        if (is_register_set_name(input_tokens.at(i+1))) {
+                        if (is_register_set_name(input_tokens.at(i + 1))) {
                             tokens.push_back(input_tokens.at(++i));
                         } else {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
                         }
                     } else if (token == "capture" or token == "capturecopy" or token == "capturemove") {
-                        tokens.push_back(token);    // mnemonic
+                        tokens.push_back(token);  // mnemonic
 
-                        tokens.push_back(input_tokens.at(++i)); // target register
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                        tokens.push_back(input_tokens.at(++i));  // target register
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
 
-                        tokens.push_back(input_tokens.at(++i)); // source register
+                        tokens.push_back(input_tokens.at(++i));  // source register
 
-                        if (input_tokens.at(i+1).str() == "\n") {
+                        if (input_tokens.at(i + 1).str() == "\n") {
                             // if only two operands are given, double source register
                             // this will expand the following instruction:
                             //
@@ -725,66 +709,77 @@ namespace viua {
                             //
                             //      opcode T S S
                             //
-                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), tokens.back().str());
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                tokens.back().str());
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
                             continue;
                         } else {
-                            tokens.push_back(input_tokens.at(++i)); // source register
+                            tokens.push_back(input_tokens.at(++i));  // source register
                         }
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
                     } else if (token == "closure" or token == "function") {
-                        tokens.push_back(token);                // mnemonic
-                        tokens.push_back(input_tokens.at(++i)); // target register
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
-                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "current");
+                        tokens.push_back(token);                 // mnemonic
+                        tokens.push_back(input_tokens.at(++i));  // target register
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(),
+                                                "current");
                         }
                     } else if (token == "istore") {
-                        tokens.push_back(token);                // mnemonic
-                        tokens.push_back(input_tokens.at(++i)); // target register
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
-                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "current");
+                        tokens.push_back(token);                 // mnemonic
+                        tokens.push_back(input_tokens.at(++i));  // target register
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(),
+                                                "current");
                         }
-                        if (input_tokens.at(i+1) == "\n") {
-                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "0");
+                        if (input_tokens.at(i + 1) == "\n") {
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(),
+                                                "0");
                         }
                         continue;
                     } else if (token == "fstore") {
-                        tokens.push_back(token);                // mnemonic
-                        tokens.push_back(input_tokens.at(++i)); // target register
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
-                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "current");
+                        tokens.push_back(token);                 // mnemonic
+                        tokens.push_back(input_tokens.at(++i));  // target register
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(),
+                                                "current");
                         }
-                        if (input_tokens.at(i+1) == "\n") {
-                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "0.0");
+                        if (input_tokens.at(i + 1) == "\n") {
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(),
+                                                "0.0");
                         }
                         continue;
                     } else if (token == "strstore") {
-                        tokens.push_back(token);                // mnemonic
-                        tokens.push_back(input_tokens.at(++i)); // target register
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
-                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "current");
+                        tokens.push_back(token);                 // mnemonic
+                        tokens.push_back(input_tokens.at(++i));  // target register
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(),
+                                                "current");
                         }
-                        if (input_tokens.at(i+1) == "\n") {
-                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "\"\"");
+                        if (input_tokens.at(i + 1) == "\n") {
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(),
+                                                "\"\"");
                         }
                         continue;
                     } else if (token == "text") {
-                        tokens.push_back(token);                // mnemonic
-                        tokens.push_back(input_tokens.at(++i)); // target register
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
-                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "current");
+                        tokens.push_back(token);                 // mnemonic
+                        tokens.push_back(input_tokens.at(++i));  // target register
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(),
+                                                "current");
                         }
-                        if (input_tokens.at(i+1) == "\n") {
-                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "\"\"");
+                        if (input_tokens.at(i + 1) == "\n") {
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(),
+                                                "\"\"");
                             continue;
                         }
-                        if (is_register_index(input_tokens.at(i+1))) {
+                        if (is_register_index(input_tokens.at(i + 1))) {
                             /*
-                             *  This form of the "text" instruction is used to obtain text representations of Viua values.
+                             *  This form of the "text" instruction is used to obtain text representations of
+                             * Viua values.
                              *  Its syntax is:
                              *
                              *          text {output:r-operand} {input:r-operand}
@@ -794,50 +789,53 @@ namespace viua {
                              *          text {output:r-operand} "{text literal}"
                              */
                             tokens.push_back(input_tokens.at(++i));
-                            if (not is_register_set_name(input_tokens.at(i+1))) {
-                                tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                            if (not is_register_set_name(input_tokens.at(i + 1))) {
+                                tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                    "current");
                             }
                             continue;
                         }
                     } else if (token == "texteq" or token == "atomeq") {
-                        tokens.push_back(token);    // mnemonic
+                        tokens.push_back(token);  // mnemonic
 
-                        tokens.push_back(input_tokens.at(++i)); // target register
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                        tokens.push_back(input_tokens.at(++i));  // target register
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
 
-                        tokens.push_back(input_tokens.at(++i)); // lhs register
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                        tokens.push_back(input_tokens.at(++i));  // lhs register
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
 
-                        tokens.push_back(input_tokens.at(++i)); // rhs register
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                        tokens.push_back(input_tokens.at(++i));  // rhs register
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
                     } else if (token == "atom") {
-                        tokens.push_back(token);                // mnemonic
-                        tokens.push_back(input_tokens.at(++i)); // target register
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
-                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "current");
+                        tokens.push_back(token);                 // mnemonic
+                        tokens.push_back(input_tokens.at(++i));  // target register
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(),
+                                                "current");
                         }
                         continue;
                     } else if (token == "itof" or token == "ftoi" or token == "stoi" or token == "stof") {
-                        tokens.push_back(token);                // mnemonic
+                        tokens.push_back(token);  // mnemonic
 
-                        tokens.push_back(input_tokens.at(++i)); // target register
+                        tokens.push_back(input_tokens.at(++i));  // target register
                         // save target register index because we may need to insert it later
                         auto target_index = tokens.back();
 
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
-                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "current");
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(),
+                                                "current");
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
@@ -846,105 +844,105 @@ namespace viua {
                         auto target_rs = tokens.back();
 
                         // source register
-                        if (input_tokens.at(i+1).str() == "\n") {
+                        if (input_tokens.at(i + 1).str() == "\n") {
                             // copy target register index
-                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), target_index);
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(),
+                                                target_index);
                             // copy target register set
-                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), target_rs);
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(),
+                                                target_rs);
                         } else {
                             tokens.push_back(input_tokens.at(++i));
-                            if (not is_register_set_name(input_tokens.at(i+1))) {
-                                tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), target_rs);
+                            if (not is_register_set_name(input_tokens.at(i + 1))) {
+                                tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(),
+                                                    target_rs);
                             }
                         }
                         continue;
                     } else if (token == "if") {
-                        tokens.push_back(token);                // mnemonic
-                        if (input_tokens.at(i+1) == "\n") {
+                        tokens.push_back(token);  // mnemonic
+                        if (input_tokens.at(i + 1) == "\n") {
                             throw viua::cg::lex::InvalidSyntax(token, "branch without operands");
                         }
 
-                        tokens.push_back(input_tokens.at(++i)); // checked register
-                        if (input_tokens.at(i+1) == "\n") {
+                        tokens.push_back(input_tokens.at(++i));  // checked register
+                        if (input_tokens.at(i + 1) == "\n") {
                             throw viua::cg::lex::InvalidSyntax(token, "branch without a target");
                         }
 
-                        tokens.push_back(input_tokens.at(++i)); // target if true branch
-                        if (input_tokens.at(i+1) == "\n") {
-                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "+1");
+                        tokens.push_back(input_tokens.at(++i));  // target if true branch
+                        if (input_tokens.at(i + 1) == "\n") {
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(),
+                                                "+1");
                         }
                         continue;
                     } else if (token == "not") {
-                        tokens.push_back(token);                // mnemonic
+                        tokens.push_back(token);  // mnemonic
 
-                        tokens.push_back(input_tokens.at(++i)); // target register
+                        tokens.push_back(input_tokens.at(++i));  // target register
                         string target_register_set = "current";
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
-                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                target_register_set);
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                             target_register_set = tokens.back();
                         }
 
-                        if (input_tokens.at(i+1) == "\n") {
-                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), input_tokens.at(i).str());
-                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                        if (input_tokens.at(i + 1) == "\n") {
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(),
+                                                input_tokens.at(i).str());
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                target_register_set);
                             continue;
                         }
 
                         tokens.push_back(input_tokens.at(++i));
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
-                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                target_register_set);
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
-                    } else if (token == "move" or token == "copy" or token == "swap" or token == "ptr" or token == "isnull" or token == "send" or token == "textlength" or token == "structkeys") {
-                        tokens.push_back(token);                // mnemonic
+                    } else if (token == "move" or token == "copy" or token == "swap" or token == "ptr" or
+                               token == "isnull" or token == "send" or token == "textlength" or
+                               token == "structkeys") {
+                        tokens.push_back(token);  // mnemonic
 
-                        tokens.push_back(input_tokens.at(++i)); // target register
+                        tokens.push_back(input_tokens.at(++i));  // target register
                         string target_register_set = "current";
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
-                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                target_register_set);
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                             target_register_set = tokens.back();
                         }
 
                         tokens.push_back(input_tokens.at(++i));
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
-                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), target_register_set);
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                target_register_set);
                         } else {
                             tokens.push_back(input_tokens.at(++i));
                         }
-                    } else if (token == "class"
-                        or token == "derive"
-                        or token == "attach"
-                        or token == "register"
-                        or token == "new"
-                    ) {
-                        tokens.push_back(token);                // mnemonic
-                        tokens.push_back(input_tokens.at(++i)); // target register
-                        if (not is_register_set_name(input_tokens.at(i+1))) {
+                    } else if (token == "class" or token == "derive" or token == "attach" or
+                               token == "register" or token == "new") {
+                        tokens.push_back(token);                 // mnemonic
+                        tokens.push_back(input_tokens.at(++i));  // target register
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
                             tokens.back().original(input_tokens.at(i));
                         }
-                    } else if (token == "izero"
-                        or token == "print"
-                        or token == "argc"
-                        or token == "echo"
-                        or token == "delete"
-                        or token == "draw"
-                        or token == "throw"
-                        or token == "iinc"
-                        or token == "idec"
-                        or token == "self"
-                        or token == "struct"
-                    ) {
-                        tokens.push_back(token);                // mnemonic
-                        tokens.push_back(input_tokens.at(++i)); // target register
-                        if (input_tokens.at(i+1) == "\n") {
-                            tokens.emplace_back(input_tokens.at(i+1).line(), input_tokens.at(i+1).character(), "current");
-                            tokens.back().original(input_tokens.at(i+1));
+                    } else if (token == "izero" or token == "print" or token == "argc" or token == "echo" or
+                               token == "delete" or token == "draw" or token == "throw" or token == "iinc" or
+                               token == "idec" or token == "self" or token == "struct") {
+                        tokens.push_back(token);                 // mnemonic
+                        tokens.push_back(input_tokens.at(++i));  // target register
+                        if (input_tokens.at(i + 1) == "\n") {
+                            tokens.emplace_back(input_tokens.at(i + 1).line(),
+                                                input_tokens.at(i + 1).character(), "current");
+                            tokens.back().original(input_tokens.at(i + 1));
                         }
                         continue;
                     } else {
@@ -955,7 +953,8 @@ namespace viua {
                 return tokens;
             }
 
-            string join_tokens(const vector<Token> tokens, const decltype(tokens)::size_type from, const decltype(from) to) {
+            string join_tokens(const vector<Token> tokens, const decltype(tokens)::size_type from,
+                               const decltype(from) to) {
                 ostringstream joined;
 
                 for (auto i = from; i < tokens.size() and i < to; ++i) {
@@ -992,7 +991,8 @@ namespace viua {
                         if (i < limit) {
                             tokens.push_back(input_tokens.at(i));
                         }
-                    } else if (i+2 < limit and adjacent(token, input_tokens.at(i+1)) and token.str() == "-" and input_tokens.at(i+1).str() == "-") {
+                    } else if (i + 2 < limit and adjacent(token, input_tokens.at(i + 1)) and
+                               token.str() == "-" and input_tokens.at(i + 1).str() == "-") {
                         // FIXME this is ugly as hell
                         do {
                             ++i;
@@ -1032,18 +1032,18 @@ namespace viua {
                 return tokens;
             }
 
-            static auto is_valid_register_id(string s) -> bool {
-                return (str::isnum(s) or str::isid(s));
-            }
-            static bool match(const vector<Token>& tokens, std::remove_reference<decltype(tokens)>::type::size_type i, const vector<string>& sequence) {
-                if (i+sequence.size() >= tokens.size()) {
+            static auto is_valid_register_id(string s) -> bool { return (str::isnum(s) or str::isid(s)); }
+            static bool match(const vector<Token>& tokens,
+                              std::remove_reference<decltype(tokens)>::type::size_type i,
+                              const vector<string>& sequence) {
+                if (i + sequence.size() >= tokens.size()) {
                     return false;
                 }
 
                 decltype(i) n = 0;
                 while (n < sequence.size()) {
                     // empty string in the sequence means "any token"
-                    if ((not sequence.at(n).empty()) and tokens.at(i+n) != sequence.at(n)) {
+                    if ((not sequence.at(n).empty()) and tokens.at(i + n) != sequence.at(n)) {
                         return false;
                     }
                     ++n;
@@ -1052,18 +1052,20 @@ namespace viua {
                 return true;
             }
 
-            static bool match_adjacent(const vector<Token>& tokens, std::remove_reference<decltype(tokens)>::type::size_type i, const vector<string>& sequence) {
-                if (i+sequence.size() >= tokens.size()) {
+            static bool match_adjacent(const vector<Token>& tokens,
+                                       std::remove_reference<decltype(tokens)>::type::size_type i,
+                                       const vector<string>& sequence) {
+                if (i + sequence.size() >= tokens.size()) {
                     return false;
                 }
 
                 decltype(i) n = 0;
                 while (n < sequence.size()) {
                     // empty string in the sequence means "any token"
-                    if ((not sequence.at(n).empty()) and tokens.at(i+n) != sequence.at(n)) {
+                    if ((not sequence.at(n).empty()) and tokens.at(i + n) != sequence.at(n)) {
                         return false;
                     }
-                    if (n and not adjacent(tokens.at(i+n-1), tokens.at(i+n))) {
+                    if (n and not adjacent(tokens.at(i + n - 1), tokens.at(i + n))) {
                         return false;
                     }
                     ++n;
@@ -1079,8 +1081,9 @@ namespace viua {
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
                     const auto t = input_tokens.at(i);
                     if (match_adjacent(input_tokens, i, sequence)) {
-                        tokens.emplace_back(t.line(), t.character(), join_tokens(input_tokens, i, (i+sequence.size())));
-                        i += (sequence.size()-1);
+                        tokens.emplace_back(t.line(), t.character(),
+                                            join_tokens(input_tokens, i, (i + sequence.size())));
+                        i += (sequence.size() - 1);
                         continue;
                     }
                     tokens.push_back(t);
@@ -1149,26 +1152,29 @@ namespace viua {
                     const auto t = input_tokens.at(i);
                     if (str::isid(t)) {
                         auto j = i;
-                        while (j+2 < limit and input_tokens.at(j+1).str() == "::" and str::isid(input_tokens.at(j+2)) and adjacent(input_tokens.at(j), input_tokens.at(j+1), input_tokens.at(j+2))) {
-                            ++j; // swallow "::" token
-                            ++j; // swallow identifier token
+                        while (j + 2 < limit and input_tokens.at(j + 1).str() == "::" and
+                               str::isid(input_tokens.at(j + 2)) and
+                               adjacent(input_tokens.at(j), input_tokens.at(j + 1), input_tokens.at(j + 2))) {
+                            ++j;  // swallow "::" token
+                            ++j;  // swallow identifier token
                         }
-                        if (j+1 < limit and input_tokens.at(j+1).str() == "/") {
-                            if (j+2 < limit and str::isnum(input_tokens.at(j+2).str(), false)) {
-                                if (adjacent(input_tokens.at(j), input_tokens.at(j+1), input_tokens.at(j+2))) {
-                                    ++j; // skip "/" token
-                                    ++j; // skip integer encoding arity
+                        if (j + 1 < limit and input_tokens.at(j + 1).str() == "/") {
+                            if (j + 2 < limit and str::isnum(input_tokens.at(j + 2).str(), false)) {
+                                if (adjacent(input_tokens.at(j), input_tokens.at(j + 1),
+                                             input_tokens.at(j + 2))) {
+                                    ++j;  // skip "/" token
+                                    ++j;  // skip integer encoding arity
                                 }
-                            } else if (j+2 < limit and input_tokens.at(j+2).str() == "\n") {
-                                if (adjacent(input_tokens.at(j), input_tokens.at(j+1))) {
-                                    ++j; // skip "/" token
+                            } else if (j + 2 < limit and input_tokens.at(j + 2).str() == "\n") {
+                                if (adjacent(input_tokens.at(j), input_tokens.at(j + 1))) {
+                                    ++j;  // skip "/" token
                                 }
                             }
-                            if (j < limit and str::isid(input_tokens.at(j)) and adjacent(input_tokens.at(j-1), input_tokens.at(j))) {
+                            if (j < limit and str::isid(input_tokens.at(j)) and
+                                adjacent(input_tokens.at(j - 1), input_tokens.at(j))) {
                                 ++j;
-
                             }
-                            tokens.emplace_back(t.line(), t.character(), join_tokens(input_tokens, i, j+1));
+                            tokens.emplace_back(t.line(), t.character(), join_tokens(input_tokens, i, j + 1));
                             i = j;
                             continue;
                         }
@@ -1187,23 +1193,27 @@ namespace viua {
                     const auto t = input_tokens.at(i);
                     if (str::isid(t)) {
                         auto j = i;
-                        while (j+2 < limit and input_tokens.at(j+1).str() == "::" and str::isid(input_tokens.at(j+2)) and adjacent(input_tokens.at(j), input_tokens.at(j+1), input_tokens.at(j+2))) {
-                            ++j; // swallow "::" token
-                            ++j; // swallow identifier token
+                        while (j + 2 < limit and input_tokens.at(j + 1).str() == "::" and
+                               str::isid(input_tokens.at(j + 2)) and
+                               adjacent(input_tokens.at(j), input_tokens.at(j + 1), input_tokens.at(j + 2))) {
+                            ++j;  // swallow "::" token
+                            ++j;  // swallow identifier token
                         }
-                        if (j+1 < limit and input_tokens.at(j+1).str() == "/") {
-                            ++j; // skip "/" token
-                            auto next_token = input_tokens.at(j+1).str();
-                            if (j+1 < limit and (next_token != "\n" and next_token != "^" and next_token != "(" and next_token != ")" and next_token != "[" and next_token != "]")) {
-                                if (adjacent(input_tokens.at(j), input_tokens.at(j+1))) {
-                                    ++j; // skip next token, append it to name
+                        if (j + 1 < limit and input_tokens.at(j + 1).str() == "/") {
+                            ++j;  // skip "/" token
+                            auto next_token = input_tokens.at(j + 1).str();
+                            if (j + 1 < limit and
+                                (next_token != "\n" and next_token != "^" and next_token != "(" and
+                                 next_token != ")" and next_token != "[" and next_token != "]")) {
+                                if (adjacent(input_tokens.at(j), input_tokens.at(j + 1))) {
+                                    ++j;  // skip next token, append it to name
                                 }
                             }
-                            tokens.emplace_back(t.line(), t.character(), join_tokens(input_tokens, i, j+1));
+                            tokens.emplace_back(t.line(), t.character(), join_tokens(input_tokens, i, j + 1));
                             i = j;
                             continue;
                         }
-                        tokens.emplace_back(t.line(), t.character(), join_tokens(input_tokens, i, j+1));
+                        tokens.emplace_back(t.line(), t.character(), join_tokens(input_tokens, i, j + 1));
                         i = j;
                         continue;
                     }
@@ -1220,9 +1230,11 @@ namespace viua {
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
                     const auto t = input_tokens.at(i);
 
-                    if (i+1 < limit and (t.str() == "+" or t.str() == "-") and str::isnum(input_tokens.at(i+1))) {
-                        if (adjacent(t, input_tokens.at(i+1))) {
-                            tokens.emplace_back(t.line(), t.character(), (t.str() + input_tokens.at(i+1).str()));
+                    if (i + 1 < limit and (t.str() == "+" or t.str() == "-") and
+                        str::isnum(input_tokens.at(i + 1))) {
+                        if (adjacent(t, input_tokens.at(i + 1))) {
+                            tokens.emplace_back(t.line(), t.character(),
+                                                (t.str() + input_tokens.at(i + 1).str()));
                             ++i;
                             continue;
                         }
@@ -1240,16 +1252,22 @@ namespace viua {
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
                     const auto t = input_tokens.at(i);
 
-                    if (i+1 < limit and t.str() == "%" and input_tokens.at(i+1).str() != "\n" and is_valid_register_id(input_tokens.at(i+1))) {
-                        tokens.emplace_back(t.line(), t.character(), (t.str() + input_tokens.at(i+1).str()));
+                    if (i + 1 < limit and t.str() == "%" and input_tokens.at(i + 1).str() != "\n" and
+                        is_valid_register_id(input_tokens.at(i + 1))) {
+                        tokens.emplace_back(t.line(), t.character(),
+                                            (t.str() + input_tokens.at(i + 1).str()));
                         ++i;
                         continue;
-                    } else if (i+1 < limit and t.str() == "@" and input_tokens.at(i+1).str() != "\n" and is_valid_register_id(input_tokens.at(i+1))) {
-                        tokens.emplace_back(t.line(), t.character(), (t.str() + input_tokens.at(i+1).str()));
+                    } else if (i + 1 < limit and t.str() == "@" and input_tokens.at(i + 1).str() != "\n" and
+                               is_valid_register_id(input_tokens.at(i + 1))) {
+                        tokens.emplace_back(t.line(), t.character(),
+                                            (t.str() + input_tokens.at(i + 1).str()));
                         ++i;
                         continue;
-                    } else if (i+1 < limit and t.str() == "*" and input_tokens.at(i+1).str() != "\n" and is_valid_register_id(input_tokens.at(i+1))) {
-                        tokens.emplace_back(t.line(), t.character(), (t.str() + input_tokens.at(i+1).str()));
+                    } else if (i + 1 < limit and t.str() == "*" and input_tokens.at(i + 1).str() != "\n" and
+                               is_valid_register_id(input_tokens.at(i + 1))) {
+                        tokens.emplace_back(t.line(), t.character(),
+                                            (t.str() + input_tokens.at(i + 1).str()));
                         ++i;
                         continue;
                     }
@@ -1265,11 +1283,12 @@ namespace viua {
                 const auto limit = input_tokens.size();
                 for (decltype(input_tokens)::size_type i = 0; i < limit; ++i) {
                     const auto t = input_tokens.at(i);
-                    if (str::isnum(t) and i < limit-2 and input_tokens.at(i+1) == "." and str::isnum(input_tokens.at(i+2))) {
-                        if (adjacent(t, input_tokens.at(i+1), input_tokens.at(i+2))) {
-                            tokens.emplace_back(t.line(), t.character(), join_tokens(input_tokens, i, i+3));
-                            ++i; // skip "." token
-                            ++i; // skip second numeric part
+                    if (str::isnum(t) and i < limit - 2 and input_tokens.at(i + 1) == "." and
+                        str::isnum(input_tokens.at(i + 2))) {
+                        if (adjacent(t, input_tokens.at(i + 1), input_tokens.at(i + 2))) {
+                            tokens.emplace_back(t.line(), t.character(), join_tokens(input_tokens, i, i + 3));
+                            ++i;  // skip "." token
+                            ++i;  // skip second numeric part
                             continue;
                         }
                     }
@@ -1295,7 +1314,7 @@ namespace viua {
                             nested_block_opened = true;
                         }
                         if (not nested_block_opened) {
-                            opened_inside = input_tokens.at(i+1);
+                            opened_inside = input_tokens.at(i + 1);
                         }
                         block_opened = true;
                     }
@@ -1304,8 +1323,11 @@ namespace viua {
                         if (nested_block_opened) {
                             if (nested_block_tokens.size() == 1) {
                                 // name is pushed here
-                                // must be mangled because we want to allow many functions to have a nested 'foo' block
-                                nested_block_tokens.emplace_back(token.line(), token.character(), (opened_inside + "__nested__" + token.str()));
+                                // must be mangled because we want to allow many functions to have a nested
+                                // 'foo' block
+                                nested_block_tokens.emplace_back(
+                                    token.line(), token.character(),
+                                    (opened_inside + "__nested__" + token.str()));
                                 nested_block_tokens.back().original(token);
                             } else {
                                 nested_block_tokens.push_back(token);
@@ -1317,7 +1339,7 @@ namespace viua {
                         tokens.push_back(token);
                     }
 
-                    if (i > 0 and token == "end" and input_tokens.at(i-1) == "\n") {
+                    if (i > 0 and token == "end" and input_tokens.at(i - 1) == "\n") {
                         throw InvalidSyntax(token, "missing '.' character before 'end'");
                     }
 
@@ -1326,7 +1348,8 @@ namespace viua {
                             for (const auto& ntoken : nested_block_tokens) {
                                 tokens.push_back(ntoken);
                             }
-                            tokens.emplace_back(nested_block_tokens.front().line(), nested_block_tokens.front().character(), "\n");
+                            tokens.emplace_back(nested_block_tokens.front().line(),
+                                                nested_block_tokens.front().character(), "\n");
                             nested_block_opened = false;
 
                             // Push nested block name.
@@ -1351,7 +1374,10 @@ namespace viua {
                 return tokens;
             }
 
-            static void push_unwrapped_lines(const bool invert, const Token& inner_target_token, vector<Token>& final_tokens, const vector<Token>& unwrapped_tokens, const vector<Token>& input_tokens, std::remove_reference<decltype(input_tokens)>::type::size_type& i) {
+            static void push_unwrapped_lines(
+                const bool invert, const Token& inner_target_token, vector<Token>& final_tokens,
+                const vector<Token>& unwrapped_tokens, const vector<Token>& input_tokens,
+                std::remove_reference<decltype(input_tokens)>::type::size_type& i) {
                 const auto limit = input_tokens.size();
                 if (invert) {
                     final_tokens.push_back(inner_target_token);
@@ -1368,7 +1394,7 @@ namespace viua {
                     }
                 } else {
                     vector<Token> last_line;
-                    while (final_tokens.size() and final_tokens.at(final_tokens.size()-1) != "\n") {
+                    while (final_tokens.size() and final_tokens.at(final_tokens.size() - 1) != "\n") {
                         last_line.insert(last_line.begin(), final_tokens.back());
                         final_tokens.pop_back();
                     }
@@ -1382,13 +1408,16 @@ namespace viua {
                     }
                 }
             }
-            static void unwrap_subtokens(vector<Token>& unwrapped_tokens, const vector<Token>& subtokens, const Token& token) {
+            static void unwrap_subtokens(vector<Token>& unwrapped_tokens, const vector<Token>& subtokens,
+                                         const Token& token) {
                 for (auto subt : unwrap_lines(subtokens)) {
                     unwrapped_tokens.push_back(subt);
                 }
                 unwrapped_tokens.emplace_back(token.line(), token.character(), "\n");
             }
-            static auto get_subtokens(const vector<Token>& input_tokens, std::remove_reference<decltype(input_tokens)>::type::size_type i) -> std::tuple<decltype(i), vector<Token>, unsigned, unsigned, unsigned> {
+            static auto get_subtokens(const vector<Token>& input_tokens,
+                                      std::remove_reference<decltype(input_tokens)>::type::size_type i)
+                -> std::tuple<decltype(i), vector<Token>, unsigned, unsigned, unsigned> {
                 string paren_type = input_tokens.at(i);
                 string closing_paren_type = ((paren_type == "(") ? ")" : "]");
                 ++i;
@@ -1406,7 +1435,9 @@ namespace viua {
                         --balance;
                     }
                     if (input_tokens.at(i) == "(") {
-                        if ((++toplevel_subexpressions_balance) == 1) { ++toplevel_subexpressions; }
+                        if ((++toplevel_subexpressions_balance) == 1) {
+                            ++toplevel_subexpressions;
+                        }
                     }
                     if (input_tokens.at(i) == ")") {
                         --toplevel_subexpressions_balance;
@@ -1419,7 +1450,9 @@ namespace viua {
                     ++i;
                 }
 
-                return std::tuple<decltype(i), vector<Token>, unsigned, unsigned, unsigned>{i, std::move(subtokens), balance, toplevel_subexpressions_balance, toplevel_subexpressions};
+                return std::tuple<decltype(i), vector<Token>, unsigned, unsigned, unsigned>{
+                    i, std::move(subtokens), balance, toplevel_subexpressions_balance,
+                    toplevel_subexpressions};
             }
             static auto get_innermost_target_token(const vector<Token>& subtokens, const Token& t) -> Token {
                 Token inner_target_token;
@@ -1452,8 +1485,10 @@ namespace viua {
                 }
                 return inner_target_token;
             }
-            static auto get_counter_token(const vector<Token>& subtokens, const unsigned toplevel_subexpressions) -> Token {
-                return Token{subtokens.at(0).line(), subtokens.at(0).character(), ('%' + str::stringify(toplevel_subexpressions, false))};
+            static auto get_counter_token(const vector<Token>& subtokens,
+                                          const unsigned toplevel_subexpressions) -> Token {
+                return Token{subtokens.at(0).line(), subtokens.at(0).character(),
+                             ('%' + str::stringify(toplevel_subexpressions, false))};
             }
             vector<Token> unwrap_lines(vector<Token> input_tokens, bool full) {
                 decltype(input_tokens) unwrapped_tokens;
@@ -1476,23 +1511,28 @@ namespace viua {
                         unsigned toplevel_subexpressions_balance = 0;
                         unsigned toplevel_subexpressions = 0;
 
-                        tie(i, subtokens, balance, toplevel_subexpressions_balance, toplevel_subexpressions) = get_subtokens(input_tokens, i);
+                        tie(i, subtokens, balance, toplevel_subexpressions_balance, toplevel_subexpressions) =
+                            get_subtokens(input_tokens, i);
 
                         if (t == "(") {
                             if (i >= limit and balance != 0) {
                                 throw InvalidSyntax(t, "unbalanced parenthesis in wrapped instruction");
                             }
                             if (subtokens.size() < 2) {
-                                throw InvalidSyntax(t, "at least two tokens are required in a wrapped instruction");
+                                throw InvalidSyntax(
+                                    t, "at least two tokens are required in a wrapped instruction");
                             }
 
                             Token inner_target_token = get_innermost_target_token(subtokens, t);
                             unwrap_subtokens(unwrapped_tokens, subtokens, t);
-                            push_unwrapped_lines(invert, inner_target_token, final_tokens, unwrapped_tokens, input_tokens, i);
+                            push_unwrapped_lines(invert, inner_target_token, final_tokens, unwrapped_tokens,
+                                                 input_tokens, i);
                             if ((not invert) and full) {
                                 if (final_tokens.back().str() == "*") {
                                     final_tokens.pop_back();
-                                    final_tokens.emplace_back(inner_target_token.line(), inner_target_token.character(), ('*' + inner_target_token.str().substr(1)));
+                                    final_tokens.emplace_back(inner_target_token.line(),
+                                                              inner_target_token.character(),
+                                                              ('*' + inner_target_token.str().substr(1)));
                                     final_tokens.back().original(inner_target_token.str());
                                 } else {
                                     final_tokens.push_back(inner_target_token);
@@ -1505,7 +1545,8 @@ namespace viua {
                             subtokens = unwrap_lines(subtokens, false);
 
                             unwrap_subtokens(unwrapped_tokens, subtokens, t);
-                            push_unwrapped_lines(invert, counter_token, final_tokens, unwrapped_tokens, input_tokens, i);
+                            push_unwrapped_lines(invert, counter_token, final_tokens, unwrapped_tokens,
+                                                 input_tokens, i);
                             if (not invert) {
                                 final_tokens.push_back(counter_token);
                             }
@@ -1533,13 +1574,16 @@ namespace viua {
 
                     if (token == ".iota:") {
                         if (iotas.empty()) {
-                            throw viua::cg::lex::InvalidSyntax(token, "'.iota:' directive used outside of iota scope");
+                            throw viua::cg::lex::InvalidSyntax(
+                                token, "'.iota:' directive used outside of iota scope");
                         }
-                        if (not str::isnum(input_tokens.at(i+1))) {
-                            throw viua::cg::lex::InvalidSyntax(input_tokens.at(i+1), ("invalid argument to '.iota:' directive: " + str::strencode(input_tokens.at(i+1))));
+                        if (not str::isnum(input_tokens.at(i + 1))) {
+                            throw viua::cg::lex::InvalidSyntax(input_tokens.at(i + 1),
+                                                               ("invalid argument to '.iota:' directive: " +
+                                                                str::strencode(input_tokens.at(i + 1))));
                         }
 
-                        iotas.back() = stoul(input_tokens.at(i+1));
+                        iotas.back() = stoul(input_tokens.at(i + 1));
 
                         ++i;
                         continue;
@@ -1556,10 +1600,14 @@ namespace viua {
                     }
 
                     if (token == "iota") {
-                        tokens.emplace_back(token.line(), token.character(), str::stringify(iotas.back()++, false));
+                        tokens.emplace_back(token.line(), token.character(),
+                                            str::stringify(iotas.back()++, false));
                         tokens.back().original("iota");
-                    } else if ((token.str().at(0) == '%' or token.str().at(0) == '@' or token.str().at(0) == '*') and token.str().substr(1) == "iota") {
-                        tokens.emplace_back(token.line(), token.character(), (token.str().at(0) + str::stringify(iotas.back()++, false)));
+                    } else if ((token.str().at(0) == '%' or token.str().at(0) == '@' or
+                                token.str().at(0) == '*') and
+                               token.str().substr(1) == "iota") {
+                        tokens.emplace_back(token.line(), token.character(),
+                                            (token.str().at(0) + str::stringify(iotas.back()++, false)));
                         tokens.back().original(token);
                     } else {
                         tokens.push_back(token);
@@ -1576,9 +1624,13 @@ namespace viua {
                     const auto& token = input_tokens.at(i);
                     tokens.push_back(token);
 
-                    if (match(input_tokens, i, {"arg", "default"}) or match(input_tokens, i, {"call", "default"}) or match(input_tokens, i, {"msg", "default"}) or match(input_tokens, i, {"process", "default"})) {
+                    if (match(input_tokens, i, {"arg", "default"}) or
+                        match(input_tokens, i, {"call", "default"}) or
+                        match(input_tokens, i, {"msg", "default"}) or
+                        match(input_tokens, i, {"process", "default"})) {
                         ++i;
-                        tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "void");
+                        tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(),
+                                            "void");
                         tokens.back().original("default");
                         continue;
                     }
@@ -1599,34 +1651,39 @@ namespace viua {
                     if (match(input_tokens, i, {"strstore", "", "default"})) {
                         tokens.push_back(input_tokens.at(++i));  // push target register token
                         ++i;
-                        tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "\"\"");
+                        tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(),
+                                            "\"\"");
                         tokens.back().original("default");
                         continue;
                     }
                     if (match(input_tokens, i, {"receive", "", "default"})) {
                         ++i;
                         if (input_tokens.at(i) == "default") {
-                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "void");
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(),
+                                                "void");
                             tokens.back().original("default");
                         } else {
                             tokens.push_back(input_tokens.at(i));  // push target register token
                         }
                         ++i;
-                        tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "infinity");
+                        tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(),
+                                            "infinity");
                         tokens.back().original("default");
                         continue;
                     }
                     if (match(input_tokens, i, {"join", "", "", "default"})) {
                         ++i;
                         if (input_tokens.at(i) == "default") {
-                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "void");
+                            tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(),
+                                                "void");
                             tokens.back().original("default");
                         } else {
                             tokens.push_back(input_tokens.at(i));  // push target register token
                         }
                         tokens.push_back(input_tokens.at(++i));  // push source register token
                         ++i;
-                        tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(), "infinity");
+                        tokens.emplace_back(input_tokens.at(i).line(), input_tokens.at(i).character(),
+                                            "infinity");
                         tokens.back().original("default");
                         continue;
                     }
@@ -1656,17 +1713,20 @@ namespace viua {
                     }
 
                     if (token == ".name:") {
-                        Token name = input_tokens.at(i+2);
-                        string index = input_tokens.at(i+1).str();
+                        Token name = input_tokens.at(i + 2);
+                        string index = input_tokens.at(i + 1).str();
 
                         assert_is_not_reserved_keyword(name, "register name");
 
-                        if ((index.at(0) == '%' or index.at(0) == '@' or index.at(0) == '*') and str::isnum(index.substr(1), false)) {
+                        if ((index.at(0) == '%' or index.at(0) == '@' or index.at(0) == '*') and
+                            str::isnum(index.substr(1), false)) {
                             index = index.substr(1);
                         }
 
                         if (not str::isnum(index)) {
-                            throw viua::cg::lex::InvalidSyntax(input_tokens.at(i+1), ("invalid register index: " + str::strencode(name) + " := " + str::enquote(str::strencode(index))));
+                            throw viua::cg::lex::InvalidSyntax(
+                                input_tokens.at(i + 1), ("invalid register index: " + str::strencode(name) +
+                                                         " := " + str::enquote(str::strencode(index))));
                         }
 
                         names[name] = index;
@@ -1678,13 +1738,16 @@ namespace viua {
                         tokens.emplace_back(token.line(), token.character(), names.at(token));
                         tokens.back().original(token.str());
                     } else if (token.str().at(0) == '@' and names.count(token.str().substr(1))) {
-                        tokens.emplace_back(token.line(), token.character(), ("@" + names.at(token.str().substr(1))));
+                        tokens.emplace_back(token.line(), token.character(),
+                                            ("@" + names.at(token.str().substr(1))));
                         tokens.back().original(token.str().substr(1));
                     } else if (token.str().at(0) == '*' and names.count(token.str().substr(1))) {
-                        tokens.emplace_back(token.line(), token.character(), ("*" + names.at(token.str().substr(1))));
+                        tokens.emplace_back(token.line(), token.character(),
+                                            ("*" + names.at(token.str().substr(1))));
                         tokens.back().original(token.str().substr(1));
                     } else if (token.str().at(0) == '%' and names.count(token.str().substr(1))) {
-                        tokens.emplace_back(token.line(), token.character(), ("%" + names.at(token.str().substr(1))));
+                        tokens.emplace_back(token.line(), token.character(),
+                                            ("%" + names.at(token.str().substr(1))));
                         tokens.back().original(token.str().substr(1));
                     } else {
                         tokens.push_back(token);
@@ -1756,7 +1819,8 @@ namespace viua {
                  *
                  * The order should not be changed as the functions make assumptions about input list, and
                  * parsing may break if the assumptions are false.
-                 * Order may be changed if the externally visible outputs from assembler (i.e. compiled bytecode)
+                 * Order may be changed if the externally visible outputs from assembler (i.e. compiled
+                 * bytecode)
                  * do not change.
                  */
                 tokens = reduce_offset_jumps(tokens);
@@ -1773,7 +1837,8 @@ namespace viua {
                 /*
                  * Replace 'default' keywords with their values.
                  * This **MUST** be run before unwrapping instructions because unwrapping copies and
-                 * rearranges tokens in a list so "default" may be copied somewhere where the expansion would be
+                 * rearranges tokens in a list so "default" may be copied somewhere where the expansion would
+                 * be
                  * incorrect, or illegal.
                  */
                 tokens = replace_defaults(tokens);
@@ -1806,18 +1871,22 @@ namespace viua {
 
                 /*
                  * Move inlined blocks out of their functions.
-                 * This makes life easier for functions at later processing stages as they do not have to deal with
+                 * This makes life easier for functions at later processing stages as they do not have to deal
+                 * with
                  * nested blocks.
                  *
-                 * Still, this must be run after iota expansion because nested blocks should share iotas with their
+                 * Still, this must be run after iota expansion because nested blocks should share iotas with
+                 * their
                  * functions.
                  */
                 tokens = move_inline_blocks_out(tokens);
 
                 /*
-                 * Reduce newlines once more, since unwrap_lines() may sometimes insert a spurious newline into the
+                 * Reduce newlines once more, since unwrap_lines() may sometimes insert a spurious newline
+                 * into the
                  * token stream.
-                 * It's easier to just clean the newlines up after unwrap_lines() than to add extra ifs to it, and
+                 * It's easier to just clean the newlines up after unwrap_lines() than to add extra ifs to it,
+                 * and
                  * it also helps readability (unwrap_lines() may be less convulted).
                  */
                 tokens = reduce_newlines(tokens);

@@ -19,13 +19,13 @@
 
 #include <memory>
 #include <viua/bytecode/decoder/operands.h>
-#include <viua/types/integer.h>
-#include <viua/types/reference.h>
-#include <viua/types/function.h>
-#include <viua/types/closure.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/scheduler/vps.h>
+#include <viua/types/closure.h>
+#include <viua/types/function.h>
+#include <viua/types/integer.h>
+#include <viua/types/reference.h>
 using namespace std;
 
 
@@ -45,13 +45,15 @@ viua::internals::types::byte* viua::process::Process::opparam(viua::internals::t
     /** Run param instruction.
      */
     viua::internals::types::register_index parameter_no_operand_index = 0;
-    tie(addr, parameter_no_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, parameter_no_operand_index) =
+        viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    viua::types::Value *source = nullptr;
+    viua::types::Value* source = nullptr;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object(addr, this);
 
     if (parameter_no_operand_index >= stack->frame_new->arguments->size()) {
-        throw new viua::types::Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
+        throw new viua::types::Exception("parameter register index out of bounds (greater than arguments set "
+                                         "size) while adding parameter");
     }
     stack->frame_new->arguments->set(parameter_no_operand_index, source->copy());
     stack->frame_new->arguments->clear(parameter_no_operand_index);
@@ -63,11 +65,13 @@ viua::internals::types::byte* viua::process::Process::oppamv(viua::internals::ty
     /** Run pamv instruction.
      */
     viua::internals::types::register_index parameter_no_operand_index = 0, source = 0;
-    tie(addr, parameter_no_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, parameter_no_operand_index) =
+        viua::bytecode::decoder::operands::fetch_register_index(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     if (parameter_no_operand_index >= stack->frame_new->arguments->size()) {
-        throw new viua::types::Exception("parameter register index out of bounds (greater than arguments set size) while adding parameter");
+        throw new viua::types::Exception("parameter register index out of bounds (greater than arguments set "
+                                         "size) while adding parameter");
     }
     stack->frame_new->arguments->set(parameter_no_operand_index, currently_used_register_set->pop(source));
     stack->frame_new->arguments->clear(parameter_no_operand_index);
@@ -79,7 +83,7 @@ viua::internals::types::byte* viua::process::Process::oppamv(viua::internals::ty
 viua::internals::types::byte* viua::process::Process::oparg(viua::internals::types::byte* addr) {
     /** Run arg instruction.
      */
-    viua::kernel::Register *target = nullptr;
+    viua::kernel::Register* target = nullptr;
     bool destination_is_void = viua::bytecode::decoder::operands::is_void(addr);
 
     if (not destination_is_void) {
@@ -89,7 +93,8 @@ viua::internals::types::byte* viua::process::Process::oparg(viua::internals::typ
     }
 
     viua::internals::types::register_index parameter_no_operand_index = 0;
-    tie(addr, parameter_no_operand_index) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
+    tie(addr, parameter_no_operand_index) =
+        viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
     if (parameter_no_operand_index >= stack->back()->arguments->size()) {
         ostringstream oss;
@@ -113,10 +118,11 @@ viua::internals::types::byte* viua::process::Process::oparg(viua::internals::typ
 }
 
 viua::internals::types::byte* viua::process::Process::opargc(viua::internals::types::byte* addr) {
-    viua::kernel::Register *target = nullptr;
+    viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    *target = unique_ptr<viua::types::Value>{new viua::types::Integer(static_cast<int>(stack->back()->arguments->size()))};
+    *target = unique_ptr<viua::types::Value>{
+        new viua::types::Integer(static_cast<int>(stack->back()->arguments->size()))};
 
     return addr;
 }
@@ -150,7 +156,7 @@ viua::internals::types::byte* viua::process::Process::opcall(viua::internals::ty
     bool is_foreign = scheduler->isForeignFunction(call_name);
     bool is_foreign_method = scheduler->isForeignMethod(call_name);
 
-    if (not (is_native or is_foreign or is_foreign_method)) {
+    if (not(is_native or is_foreign or is_foreign_method)) {
         throw new viua::types::Exception("call to undefined function: " + call_name);
     }
 
@@ -162,7 +168,8 @@ viua::internals::types::byte* viua::process::Process::opcall(viua::internals::ty
             throw new viua::types::Exception("cannot call foreign method using empty frame");
         }
         if (stack->frame_new->arguments->at(0) == nullptr) {
-            throw new viua::types::Exception("frame must have at least one argument when used to call a foreign method");
+            throw new viua::types::Exception(
+                "frame must have at least one argument when used to call a foreign method");
         }
         auto obj = stack->frame_new->arguments->at(0);
         return callForeignMethod(addr, obj, call_name, return_register, call_name);
@@ -181,7 +188,7 @@ viua::internals::types::byte* viua::process::Process::optailcall(viua::internals
             stack = stacks_order.top();
             stacks_order.pop();
             currently_used_register_set = stack->back()->local_register_set.get();
-            return (addr-1);
+            return (addr - 1);
         }
     }
 
@@ -211,7 +218,7 @@ viua::internals::types::byte* viua::process::Process::optailcall(viua::internals
     bool is_foreign = scheduler->isForeignFunction(call_name);
     bool is_foreign_method = scheduler->isForeignMethod(call_name);
 
-    if (not (is_native or is_foreign or is_foreign_method)) {
+    if (not(is_native or is_foreign or is_foreign_method)) {
         throw new viua::types::Exception("tail call to undefined function: " + call_name);
     }
     // FIXME: make to possible to tail call foreign functions and methods
@@ -250,7 +257,7 @@ viua::internals::types::byte* viua::process::Process::opdefer(viua::internals::t
     bool is_foreign = scheduler->isForeignFunction(call_name);
     bool is_foreign_method = scheduler->isForeignMethod(call_name);
 
-    if (not (is_native or is_foreign or is_foreign_method)) {
+    if (not(is_native or is_foreign or is_foreign_method)) {
         throw new viua::types::Exception("tail call to undefined function: " + call_name);
     }
 

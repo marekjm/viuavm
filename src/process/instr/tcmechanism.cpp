@@ -18,10 +18,10 @@
  */
 
 #include <viua/bytecode/decoder/operands.h>
-#include <viua/types/integer.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/scheduler/vps.h>
+#include <viua/types/integer.h>
 using namespace std;
 
 
@@ -43,7 +43,8 @@ viua::internals::types::byte* viua::process::Process::opcatch(viua::internals::t
     tie(addr, catcher_block_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
     if (not scheduler->isBlock(catcher_block_name)) {
-        throw new viua::types::Exception("registering undefined handler block '" + catcher_block_name + "' to handle " + type_name);
+        throw new viua::types::Exception("registering undefined handler block '" + catcher_block_name +
+                                         "' to handle " + type_name);
     }
 
     stack->try_frame_new->catchers[type_name] = new Catcher(type_name, catcher_block_name);

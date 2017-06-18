@@ -18,9 +18,9 @@
  */
 
 #include <iostream>
-#include <viua/support/string.h>
 #include <viua/cg/assembler/assembler.h>
 #include <viua/front/asm.h>
+#include <viua/support/string.h>
 using namespace std;
 
 
@@ -31,7 +31,7 @@ invocables_t gatherFunctions(const vector<viua::cg::lex::Token>& tokens) {
     invocables.signatures = assembler::ce::getSignatures(tokens);
     invocables.tokens = assembler::ce::getInvokablesTokenBodies("function", tokens);
     for (const auto& each : assembler::ce::getInvokablesTokenBodies("closure", tokens)) {
-       invocables.tokens[each.first] = each.second;
+        invocables.tokens[each.first] = each.second;
     }
 
     return invocables;
@@ -52,14 +52,14 @@ map<string, string> gatherMetaInformation(const vector<viua::cg::lex::Token>& to
 
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
         if (tokens.at(i) == ".info:") {
-            viua::cg::lex::Token key = tokens.at(i+1), value = tokens.at(i+2);
+            viua::cg::lex::Token key = tokens.at(i + 1), value = tokens.at(i + 2);
             if (key == "\n") {
                 throw viua::cg::lex::InvalidSyntax(tokens.at(i), "missing key and value in .info: directive");
             }
             if (value == "\n") {
                 throw viua::cg::lex::InvalidSyntax(tokens.at(i), "missing value in .info: directive");
             }
-            meta_information.emplace(key, str::strdecode(value.str().substr(1, value.str().size()-2)));
+            meta_information.emplace(key, str::strdecode(value.str().substr(1, value.str().size() - 2)));
         }
     }
 

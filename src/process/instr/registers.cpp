@@ -18,11 +18,11 @@
  */
 
 #include <viua/bytecode/decoder/operands.h>
-#include <viua/types/pointer.h>
-#include <viua/types/boolean.h>
-#include <viua/types/reference.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
+#include <viua/types/boolean.h>
+#include <viua/types/pointer.h>
+#include <viua/types/reference.h>
 using namespace std;
 
 
@@ -36,7 +36,7 @@ viua::internals::types::byte* viua::process::Process::opmove(viua::internals::ty
     return addr;
 }
 viua::internals::types::byte* viua::process::Process::opcopy(viua::internals::types::byte* addr) {
-    viua::kernel::Register *target = nullptr;
+    viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     viua::types::Value* source = nullptr;
@@ -47,7 +47,7 @@ viua::internals::types::byte* viua::process::Process::opcopy(viua::internals::ty
     return addr;
 }
 viua::internals::types::byte* viua::process::Process::opptr(viua::internals::types::byte* addr) {
-    viua::kernel::Register *target = nullptr;
+    viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     viua::types::Value* source = nullptr;
@@ -67,7 +67,7 @@ viua::internals::types::byte* viua::process::Process::opswap(viua::internals::ty
     return addr;
 }
 viua::internals::types::byte* viua::process::Process::opdelete(viua::internals::types::byte* addr) {
-    viua::kernel::Register *target = nullptr;
+    viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     if (target->empty()) {

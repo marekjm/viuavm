@@ -17,25 +17,21 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <string>
 #include <sstream>
-#include <viua/types/value.h>
+#include <string>
 #include <viua/types/function.h>
+#include <viua/types/value.h>
 using namespace std;
 
 const string viua::types::Function::type_name = "Function";
 
 
-viua::types::Function::Function(const string& name): function_name(name) {
-}
+viua::types::Function::Function(const string& name) : function_name(name) {}
 
-viua::types::Function::~Function() {
-}
+viua::types::Function::~Function() {}
 
 
-string viua::types::Function::type() const {
-    return "Function";
-}
+string viua::types::Function::type() const { return "Function"; }
 
 string viua::types::Function::str() const {
     ostringstream oss;
@@ -43,19 +39,13 @@ string viua::types::Function::str() const {
     return oss.str();
 }
 
-string viua::types::Function::repr() const {
-    return str();
-}
+string viua::types::Function::repr() const { return str(); }
 
-bool viua::types::Function::boolean() const {
-    return true;
-}
+bool viua::types::Function::boolean() const { return true; }
 
 unique_ptr<viua::types::Value> viua::types::Function::copy() const {
     return unique_ptr<viua::types::Value>{new viua::types::Function(function_name)};
 }
 
 
-string viua::types::Function::name() const {
-    return function_name;
-}
+string viua::types::Function::name() const { return function_name; }

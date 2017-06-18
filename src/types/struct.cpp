@@ -24,13 +24,9 @@ using namespace std;
 
 const string viua::types::Struct::type_name = "Struct";
 
-string viua::types::Struct::type() const {
-    return "Struct";
-}
+string viua::types::Struct::type() const { return "Struct"; }
 
-bool viua::types::Struct::boolean() const {
-    return (not attributes.empty());
-}
+bool viua::types::Struct::boolean() const { return (not attributes.empty()); }
 
 string viua::types::Struct::str() const {
     ostringstream oss;
@@ -50,16 +46,10 @@ string viua::types::Struct::str() const {
     return oss.str();
 }
 
-string viua::types::Struct::repr() const {
-    return str();
-}
+string viua::types::Struct::repr() const { return str(); }
 
-vector<string> viua::types::Struct::bases() const {
-    return vector<string>{"Value"};
-}
-vector<string> viua::types::Struct::inheritancechain() const {
-    return vector<string>{"Value"};
-}
+vector<string> viua::types::Struct::bases() const { return vector<string>{"Value"}; }
+vector<string> viua::types::Struct::inheritancechain() const { return vector<string>{"Value"}; }
 
 void viua::types::Struct::insert(const string& key, unique_ptr<viua::types::Value> value) {
     attributes[key] = std::move(value);
@@ -80,7 +70,7 @@ vector<string> viua::types::Struct::keys() const {
 }
 
 unique_ptr<viua::types::Value> viua::types::Struct::copy() const {
-    unique_ptr<viua::types::Struct> copied { new Struct() };
+    unique_ptr<viua::types::Struct> copied{new Struct()};
     for (const auto& each : attributes) {
         copied->insert(each.first, each.second->copy());
     }

@@ -17,14 +17,14 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-#include <string>
-#include <sstream>
 #include <algorithm>
-#include <viua/types/value.h>
+#include <iostream>
+#include <sstream>
+#include <string>
 #include <viua/types/boolean.h>
-#include <viua/types/pointer.h>
 #include <viua/types/exception.h>
+#include <viua/types/pointer.h>
+#include <viua/types/value.h>
 using namespace std;
 
 const string viua::types::Pointer::type_name = "Pointer";
@@ -45,9 +45,7 @@ void viua::types::Pointer::invalidate(viua::types::Value* t) {
         valid = false;
     }
 }
-bool viua::types::Pointer::expired() {
-    return !valid;
-}
+bool viua::types::Pointer::expired() { return !valid; }
 auto viua::types::Pointer::authenticate(const viua::process::Process* process) -> void {
     /*
      *  Pointers should automatically expire upon crossing process boundaries.
@@ -73,24 +71,14 @@ viua::types::Value* viua::types::Pointer::to(const viua::process::Process* p) {
     return points_to;
 }
 
-string viua::types::Pointer::type() const {
-    return ((valid ? points_to->type() : "Expired") + "Pointer");
-}
+string viua::types::Pointer::type() const { return ((valid ? points_to->type() : "Expired") + "Pointer"); }
 
-bool viua::types::Pointer::boolean() const {
-    return valid;
-}
+bool viua::types::Pointer::boolean() const { return valid; }
 
-vector<string> viua::types::Pointer::bases() const {
-    return vector<string>{"Value"};
-}
-vector<string> viua::types::Pointer::inheritancechain() const {
-    return vector<string>{"Value"};
-}
+vector<string> viua::types::Pointer::bases() const { return vector<string>{"Value"}; }
+vector<string> viua::types::Pointer::inheritancechain() const { return vector<string>{"Value"}; }
 
-string viua::types::Pointer::str() const {
-    return type();
-}
+string viua::types::Pointer::str() const { return type(); }
 
 unique_ptr<viua::types::Value> viua::types::Pointer::copy() const {
     if (not valid) {
@@ -100,16 +88,16 @@ unique_ptr<viua::types::Value> viua::types::Pointer::copy() const {
 }
 
 
-void viua::types::Pointer::expired(Frame* frm, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+void viua::types::Pointer::expired(Frame* frm, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                                   viua::process::Process*, viua::kernel::Kernel*) {
     frm->local_register_set->set(0, unique_ptr<viua::types::Value>{new viua::types::Boolean(expired())});
 }
 
 
-viua::types::Pointer::Pointer(const viua::process::Process *poi): points_to(nullptr), valid(false), process_of_origin(poi) {
-}
-viua::types::Pointer::Pointer(viua::types::Value* t, const viua::process::Process *poi): points_to(t), valid(true), process_of_origin(poi) {
+viua::types::Pointer::Pointer(const viua::process::Process* poi)
+    : points_to(nullptr), valid(false), process_of_origin(poi) {}
+viua::types::Pointer::Pointer(viua::types::Value* t, const viua::process::Process* poi)
+    : points_to(t), valid(true), process_of_origin(poi) {
     attach();
 }
-viua::types::Pointer::~Pointer() {
-    detach();
-}
+viua::types::Pointer::~Pointer() { detach(); }

@@ -18,8 +18,8 @@
  */
 
 #include <viua/bytecode/opcodes.h>
-#include <viua/support/pointer.h>
 #include <viua/program.h>
+#include <viua/support/pointer.h>
 using namespace std;
 
 
@@ -529,22 +529,24 @@ Program& Program::opjump(viua::internals::types::bytecode_size addr, enum JUMPTY
      *  addr:int    - index of the instruction to which to branch
      */
     if (is_absolute != JMP_TO_BYTE) {
-        branches.push_back((addr_ptr+1));
+        branches.push_back((addr_ptr + 1));
     }
 
     addr_ptr = cg::bytecode::opjump(addr_ptr, addr);
     return (*this);
 }
 
-Program& Program::opif(int_op regc, viua::internals::types::bytecode_size addr_truth, enum JUMPTYPE absolute_truth, viua::internals::types::bytecode_size addr_false, enum JUMPTYPE absolute_false) {
+Program& Program::opif(int_op regc, viua::internals::types::bytecode_size addr_truth,
+                       enum JUMPTYPE absolute_truth, viua::internals::types::bytecode_size addr_false,
+                       enum JUMPTYPE absolute_false) {
     /*  Inserts branch instruction.
      *  Byte offset is calculated automatically.
      */
     viua::internals::types::byte* jump_position_in_bytecode = addr_ptr;
 
-    jump_position_in_bytecode += sizeof(viua::internals::types::byte); // for opcode
-    jump_position_in_bytecode += sizeof(viua::internals::types::byte); // for operand-type marker
-    jump_position_in_bytecode += sizeof(viua::internals::RegisterSets); // for rs-type marker
+    jump_position_in_bytecode += sizeof(viua::internals::types::byte);   // for opcode
+    jump_position_in_bytecode += sizeof(viua::internals::types::byte);   // for operand-type marker
+    jump_position_in_bytecode += sizeof(viua::internals::RegisterSets);  // for rs-type marker
     jump_position_in_bytecode += sizeof(viua::internals::types::register_index);
 
     if (absolute_truth != JMP_TO_BYTE) {

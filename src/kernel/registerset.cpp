@@ -18,13 +18,13 @@
  */
 
 #include <iostream>
-#include <string>
 #include <sstream>
-#include <viua/types/value.h>
-#include <viua/types/integer.h>
-#include <viua/types/exception.h>
-#include <viua/types/reference.h>
+#include <string>
 #include <viua/kernel/registerset.h>
+#include <viua/types/exception.h>
+#include <viua/types/integer.h>
+#include <viua/types/reference.h>
+#include <viua/types/value.h>
 using namespace std;
 
 
@@ -36,13 +36,9 @@ void viua::kernel::Register::reset(unique_ptr<viua::types::Value> o) {
     }
 }
 
-bool viua::kernel::Register::empty() const {
-    return value == nullptr;
-}
+bool viua::kernel::Register::empty() const { return value == nullptr; }
 
-viua::types::Value* viua::kernel::Register::get() {
-    return value.get();
-}
+viua::types::Value* viua::kernel::Register::get() { return value.get(); }
 
 viua::types::Value* viua::kernel::Register::release() {
     mask = 0;
@@ -79,51 +75,46 @@ mask_type viua::kernel::Register::unflag(mask_type new_mask) {
     return tmp;
 }
 
-mask_type viua::kernel::Register::get_mask() const {
-    return mask;
-}
+mask_type viua::kernel::Register::get_mask() const { return mask; }
 
-bool viua::kernel::Register::is_flagged(mask_type filter) const {
-    return (mask & filter);
-}
+bool viua::kernel::Register::is_flagged(mask_type filter) const { return (mask & filter); }
 
-viua::kernel::Register::Register(): value(nullptr), mask(0) {
-}
+viua::kernel::Register::Register() : value(nullptr), mask(0) {}
 
-viua::kernel::Register::Register(std::unique_ptr<viua::types::Value> o): value(std::move(o)), mask(0) {
-}
+viua::kernel::Register::Register(std::unique_ptr<viua::types::Value> o) : value(std::move(o)), mask(0) {}
 
-viua::kernel::Register::Register(Register&& that): value(std::move(that.value)), mask(that.mask) {
+viua::kernel::Register::Register(Register&& that) : value(std::move(that.value)), mask(that.mask) {
     that.mask = 0;
 }
 
-viua::kernel::Register::operator bool() const {
-    return not empty();
-}
+viua::kernel::Register::operator bool() const { return not empty(); }
 
-auto viua::kernel::Register::operator =(Register&& that) -> Register& {
+auto viua::kernel::Register::operator=(Register&& that) -> Register& {
     reset(std::move(that.value));
     mask = that.mask;
     that.mask = 0;
     return *this;
 }
 
-auto viua::kernel::Register::operator =(decltype(value)&& o) -> Register& {
+auto viua::kernel::Register::operator=(decltype(value) && o) -> Register& {
     reset(std::move(o));
     mask = 0;
     return *this;
 }
 
 
-void viua::kernel::RegisterSet::put(viua::internals::types::register_index index, unique_ptr<viua::types::Value> object) {
-    if (index >= registerset_size) { throw new viua::types::Exception("register access out of bounds: write"); }
+void viua::kernel::RegisterSet::put(viua::internals::types::register_index index,
+                                    unique_ptr<viua::types::Value> object) {
+    if (index >= registerset_size) {
+        throw new viua::types::Exception("register access out of bounds: write");
+    }
     registers.at(index).reset(std::move(object));
 }
 
 unique_ptr<viua::types::Value> viua::kernel::RegisterSet::pop(viua::internals::types::register_index index) {
     /** Pop an object from the register.
      */
-    unique_ptr<viua::types::Value> object {at(index)};
+    unique_ptr<viua::types::Value> object{at(index)};
     if (not object) {
         // FIXME: throw an exception on read from empty register
     }
@@ -131,12 +122,15 @@ unique_ptr<viua::types::Value> viua::kernel::RegisterSet::pop(viua::internals::t
     return object;
 }
 
-void viua::kernel::RegisterSet::set(viua::internals::types::register_index index, unique_ptr<viua::types::Value> object) {
+void viua::kernel::RegisterSet::set(viua::internals::types::register_index index,
+                                    unique_ptr<viua::types::Value> object) {
     /** Put object inside register specified by given index.
      *
      *  Performs bounds checking.
      */
-    if (index >= registers.size()) { throw new viua::types::Exception("register access out of bounds: write"); }
+    if (index >= registers.size()) {
+        throw new viua::types::Exception("register access out of bounds: write");
+    }
 
     if (dynamic_cast<viua::types::Reference*>(registers.at(index).get())) {
         static_cast<viua::types::Reference*>(registers.at(index).get())->rebind(object.release());
@@ -189,25 +183,35 @@ viua::kernel::Register* viua::kernel::RegisterSet::register_at(viua::internals::
 }
 
 
-void viua::kernel::RegisterSet::move(viua::internals::types::register_index src, viua::internals::types::register_index dst) {
+void viua::kernel::RegisterSet::move(viua::internals::types::register_index src,
+                                     viua::internals::types::register_index dst) {
     /** Move an object from src register to dst register.
      *
      *  Performs bound checking.
      *  Both source and destination can be empty.
      */
-    if (src >= registerset_size) { throw new viua::types::Exception("register access out of bounds: move source"); }
-    if (dst >= registerset_size) { throw new viua::types::Exception("register access out of bounds: move destination"); }
+    if (src >= registerset_size) {
+        throw new viua::types::Exception("register access out of bounds: move source");
+    }
+    if (dst >= registerset_size) {
+        throw new viua::types::Exception("register access out of bounds: move destination");
+    }
     set(dst, pop(src));
 }
 
-void viua::kernel::RegisterSet::swap(viua::internals::types::register_index src, viua::internals::types::register_index dst) {
+void viua::kernel::RegisterSet::swap(viua::internals::types::register_index src,
+                                     viua::internals::types::register_index dst) {
     /** Swap objects in src and dst registers.
      *
      *  Performs bound checking.
      *  Both source and destination can be empty.
      */
-    if (src >= registerset_size) { throw new viua::types::Exception("register access out of bounds: swap source"); }
-    if (dst >= registerset_size) { throw new viua::types::Exception("register access out of bounds: swap destination"); }
+    if (src >= registerset_size) {
+        throw new viua::types::Exception("register access out of bounds: swap source");
+    }
+    if (dst >= registerset_size) {
+        throw new viua::types::Exception("register access out of bounds: swap destination");
+    }
     registers[src].swap(registers[dst]);
 }
 
@@ -217,7 +221,9 @@ void viua::kernel::RegisterSet::empty(viua::internals::types::register_index her
      *  Performs bound checking.
      *  Does not throw if the register is empty.
      */
-    if (here >= registerset_size) { throw new viua::types::Exception("register access out of bounds: empty"); }
+    if (here >= registerset_size) {
+        throw new viua::types::Exception("register access out of bounds: empty");
+    }
     registers.at(here).release();
 }
 
@@ -227,8 +233,12 @@ void viua::kernel::RegisterSet::free(viua::internals::types::register_index here
      *  Performs bound checking.
      *  Throws if the register is empty.
      */
-    if (here >= registerset_size) { throw new viua::types::Exception("register access out of bounds: free"); }
-    if (not registers.at(here)) { throw new viua::types::Exception("invalid free: trying to free a null pointer"); }
+    if (here >= registerset_size) {
+        throw new viua::types::Exception("register access out of bounds: free");
+    }
+    if (not registers.at(here)) {
+        throw new viua::types::Exception("invalid free: trying to free a null pointer");
+    }
     registers.at(here).give();
 }
 
@@ -239,7 +249,9 @@ void viua::kernel::RegisterSet::flag(viua::internals::types::register_index inde
      *  Performs bounds checking.
      *  Throws exception when accessing empty register.
      */
-    if (index >= registerset_size) { throw new viua::types::Exception("register access out of bounds: mask_enable"); }
+    if (index >= registerset_size) {
+        throw new viua::types::Exception("register access out of bounds: mask_enable");
+    }
     if (not registers.at(index)) {
         ostringstream oss;
         oss << "(flag) flagging null register: " << index;
@@ -254,7 +266,9 @@ void viua::kernel::RegisterSet::unflag(viua::internals::types::register_index in
      *  Performs bounds checking.
      *  Throws exception when accessing empty register.
      */
-    if (index >= registerset_size) { throw new viua::types::Exception("register access out of bounds: mask_disable"); }
+    if (index >= registerset_size) {
+        throw new viua::types::Exception("register access out of bounds: mask_disable");
+    }
     if (not registers.at(index)) {
         ostringstream oss;
         oss << "(unflag) unflagging null register: " << index;
@@ -268,7 +282,9 @@ void viua::kernel::RegisterSet::clear(viua::internals::types::register_index ind
      *
      *  Performs bounds checking.
      */
-    if (index >= registerset_size) { throw new viua::types::Exception("register access out of bounds: mask_clear"); }
+    if (index >= registerset_size) {
+        throw new viua::types::Exception("register access out of bounds: mask_clear");
+    }
     registers.at(index).set_mask(0);
 }
 
@@ -278,7 +294,9 @@ bool viua::kernel::RegisterSet::isflagged(viua::internals::types::register_index
      *
      *  Performs bounds checking.
      */
-    if (index >= registerset_size) { throw new viua::types::Exception("register access out of bounds: mask_isenabled"); }
+    if (index >= registerset_size) {
+        throw new viua::types::Exception("register access out of bounds: mask_isenabled");
+    }
     // FIXME: should throw when accessing empty register, but that breaks set()
     if (index >= registers.size()) {
         return registers.at(index).is_flagged(filter);
@@ -293,7 +311,9 @@ void viua::kernel::RegisterSet::setmask(viua::internals::types::register_index i
      *  Performs bounds checking.
      *  Throws exception when accessing empty register.
      */
-    if (index >= registerset_size) { throw new viua::types::Exception("register access out of bounds: mask_disable"); }
+    if (index >= registerset_size) {
+        throw new viua::types::Exception("register access out of bounds: mask_disable");
+    }
     if (not registers.at(index)) {
         ostringstream oss;
         oss << "(setmask) setting mask for null register: " << index;
@@ -308,7 +328,9 @@ mask_type viua::kernel::RegisterSet::getmask(viua::internals::types::register_in
      *  Performs bounds checking.
      *  Throws exception when accessing empty register.
      */
-    if (index >= registerset_size) { throw new viua::types::Exception("register access out of bounds: mask_disable"); }
+    if (index >= registerset_size) {
+        throw new viua::types::Exception("register access out of bounds: mask_disable");
+    }
     if (not registers.at(index)) {
         ostringstream oss;
         oss << "(getmask) getting mask of null register: " << index;
@@ -325,21 +347,25 @@ void viua::kernel::RegisterSet::drop() {
      *  emptying all its available registers.
      *  No objects will be deleted, so use this function carefully.
      */
-    for (decltype(size()) i = 0; i < size(); ++i) { empty(i); }
+    for (decltype(size()) i = 0; i < size(); ++i) {
+        empty(i);
+    }
 }
 
 
 unique_ptr<viua::kernel::RegisterSet> viua::kernel::RegisterSet::copy() {
-    unique_ptr<viua::kernel::RegisterSet> rscopy {new viua::kernel::RegisterSet(size())};
+    unique_ptr<viua::kernel::RegisterSet> rscopy{new viua::kernel::RegisterSet(size())};
     for (decltype(size()) i = 0; i < size(); ++i) {
-        if (at(i) == nullptr) { continue; }
+        if (at(i) == nullptr) {
+            continue;
+        }
         rscopy->set(i, at(i)->copy());
         rscopy->setmask(i, getmask(i));
     }
     return rscopy;
 }
 
-viua::kernel::RegisterSet::RegisterSet(viua::internals::types::register_index sz): registerset_size(sz) {
+viua::kernel::RegisterSet::RegisterSet(viua::internals::types::register_index sz) : registerset_size(sz) {
     /** Create register set with specified size.
      */
     registers.reserve(sz);
@@ -348,5 +374,4 @@ viua::kernel::RegisterSet::RegisterSet(viua::internals::types::register_index sz
         registers.emplace_back(nullptr);
     }
 }
-viua::kernel::RegisterSet::~RegisterSet() {
-}
+viua::kernel::RegisterSet::~RegisterSet() {}

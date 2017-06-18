@@ -18,19 +18,19 @@
  */
 
 #include <memory>
+#include <viua/assert.h>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/decoder/operands.h>
-#include <viua/types/integer.h>
-#include <viua/types/pointer.h>
-#include <viua/types/object.h>
-#include <viua/types/string.h>
-#include <viua/types/function.h>
-#include <viua/types/closure.h>
 #include <viua/exceptions.h>
-#include <viua/kernel/registerset.h>
-#include <viua/assert.h>
 #include <viua/kernel/kernel.h>
+#include <viua/kernel/registerset.h>
 #include <viua/scheduler/vps.h>
+#include <viua/types/closure.h>
+#include <viua/types/function.h>
+#include <viua/types/integer.h>
+#include <viua/types/object.h>
+#include <viua/types/pointer.h>
+#include <viua/types/string.h>
 using namespace std;
 
 
@@ -88,7 +88,8 @@ viua::internals::types::byte* viua::process::Process::opmsg(viua::internals::typ
         obj = ptr->to(this);
     }
     if (not scheduler->isClass(obj->type())) {
-        throw new viua::types::Exception("unregistered type cannot be used for dynamic dispatch: " + obj->type());
+        throw new viua::types::Exception("unregistered type cannot be used for dynamic dispatch: " +
+                                         obj->type());
     }
     vector<string> mro = scheduler->inheritanceChainOf(obj->type());
     mro.insert(mro.begin(), obj->type());
@@ -96,7 +97,8 @@ viua::internals::types::byte* viua::process::Process::opmsg(viua::internals::typ
     string function_name = "";
     for (decltype(mro.size()) i = 0; i < mro.size(); ++i) {
         if (not scheduler->isClass(mro[i])) {
-            throw new viua::types::Exception("unavailable base type in inheritance hierarchy of " + mro[0] + ": " + mro[i]);
+            throw new viua::types::Exception("unavailable base type in inheritance hierarchy of " + mro[0] +
+                                             ": " + mro[i]);
         }
         if (scheduler->classAccepts(mro[i], method_name)) {
             function_name = scheduler->resolveMethodName(mro[i], method_name);
@@ -104,15 +106,17 @@ viua::internals::types::byte* viua::process::Process::opmsg(viua::internals::typ
         }
     }
     if (function_name.size() == 0) {
-        throw new viua::types::Exception("class '" + obj->type() + "' does not accept method '" + method_name + "'");
+        throw new viua::types::Exception("class '" + obj->type() + "' does not accept method '" +
+                                         method_name + "'");
     }
 
     bool is_native = scheduler->isNativeFunction(function_name);
     bool is_foreign = scheduler->isForeignFunction(function_name);
     bool is_foreign_method = scheduler->isForeignMethod(function_name);
 
-    if (not (is_native or is_foreign or is_foreign_method)) {
-        throw new viua::types::Exception("method '" + method_name + "' resolves to undefined function '" + function_name + "' on class '" + obj->type() + "'");
+    if (not(is_native or is_foreign or is_foreign_method)) {
+        throw new viua::types::Exception("method '" + method_name + "' resolves to undefined function '" +
+                                         function_name + "' on class '" + obj->type() + "'");
     }
 
     if (is_foreign_method) {
@@ -126,10 +130,10 @@ viua::internals::types::byte* viua::process::Process::opmsg(viua::internals::typ
 viua::internals::types::byte* viua::process::Process::opinsert(viua::internals::types::byte* addr) {
     /** Insert an object as an attribute of another object.
      */
-    viua::types::Object *object = nullptr;
+    viua::types::Object* object = nullptr;
     tie(addr, object) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Object>(addr, this);
 
-    viua::types::String *key = nullptr;
+    viua::types::String* key = nullptr;
     tie(addr, key) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::String>(addr, this);
 
     if (viua::bytecode::decoder::operands::get_operand_type(addr) == OT_POINTER) {
@@ -157,13 +161,13 @@ viua::internals::types::byte* viua::process::Process::opremove(viua::internals::
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
     }
 
-    viua::types::Object *object = nullptr;
+    viua::types::Object* object = nullptr;
     tie(addr, object) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Object>(addr, this);
 
-    viua::types::String *key = nullptr;
+    viua::types::String* key = nullptr;
     tie(addr, key) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::String>(addr, this);
 
-    unique_ptr<viua::types::Value> result { object->remove(key->str()) };
+    unique_ptr<viua::types::Value> result{object->remove(key->str())};
     if (not void_target) {
         *target = std::move(result);
     }

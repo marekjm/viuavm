@@ -24,16 +24,10 @@ using namespace std;
 
 const string viua::types::numeric::Number::type_name = "Number";
 
-string viua::types::numeric::Number::type() const {
-    return "Number";
-}
+string viua::types::numeric::Number::type() const { return "Number"; }
 
-bool viua::types::numeric::Number::negative() const {
-    return (as_integer() < 0);
-}
+bool viua::types::numeric::Number::negative() const { return (as_integer() < 0); }
 
-viua::types::numeric::Number::Number() {
-}
+viua::types::numeric::Number::Number() {}
 
-viua::types::numeric::Number::~Number() {
-}
+viua::types::numeric::Number::~Number() {}

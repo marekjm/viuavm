@@ -55,9 +55,11 @@ namespace support {
             struct stat sf;
 
             // not a file if stat returned error
-            if (stat(path.c_str(), &sf) == -1) return false;
+            if (stat(path.c_str(), &sf) == -1)
+                return false;
             // not a file if S_ISREG() macro returned false
-            if (not S_ISREG(sf.st_mode)) return false;
+            if (not S_ISREG(sf.st_mode))
+                return false;
 
             // file otherwise
             return true;
@@ -79,7 +81,8 @@ namespace support {
                         path = oss.str();
                     }
 
-                    if ((found = support::env::isfile(path))) break;
+                    if ((found = support::env::isfile(path)))
+                        break;
                 }
 
                 return (found ? path : "");

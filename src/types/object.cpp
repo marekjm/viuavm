@@ -18,21 +18,17 @@
  */
 
 #include <iostream>
-#include <string>
 #include <sstream>
-#include <viua/types/object.h>
-#include <viua/types/exception.h>
+#include <string>
 #include <viua/kernel/frame.h>
+#include <viua/types/exception.h>
+#include <viua/types/object.h>
 using namespace std;
 
 const string viua::types::Object::type_name = "Object";
 
-string viua::types::Object::type() const {
-    return object_type_name;
-}
-bool viua::types::Object::boolean() const {
-    return true;
-}
+string viua::types::Object::type() const { return object_type_name; }
+bool viua::types::Object::boolean() const { return true; }
 
 string viua::types::Object::str() const {
     ostringstream oss;
@@ -53,7 +49,7 @@ string viua::types::Object::str() const {
 }
 
 unique_ptr<viua::types::Value> viua::types::Object::copy() const {
-    unique_ptr<viua::types::Object> cp {new viua::types::Object(object_type_name)};
+    unique_ptr<viua::types::Object> cp{new viua::types::Object(object_type_name)};
     for (const auto& each : attributes) {
         cp->set(each.first, each.second->copy());
     }
@@ -78,13 +74,8 @@ unique_ptr<viua::types::Value> viua::types::Object::remove(const string& key) {
     return o;
 }
 
-vector<string> viua::types::Object::bases() const {
-    return vector<string>{"Value"};
-}
-vector<string> viua::types::Object::inheritancechain() const {
-    return vector<string>{"Value"};
-}
+vector<string> viua::types::Object::bases() const { return vector<string>{"Value"}; }
+vector<string> viua::types::Object::inheritancechain() const { return vector<string>{"Value"}; }
 
-viua::types::Object::Object(const std::string& tn): object_type_name(tn) {}
-viua::types::Object::~Object() {
-}
+viua::types::Object::Object(const std::string& tn) : object_type_name(tn) {}
+viua::types::Object::~Object() {}

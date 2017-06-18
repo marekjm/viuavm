@@ -18,8 +18,8 @@
  */
 
 #include <sstream>
-#include <viua/support/string.h>
 #include <viua/cg/tokenizer.h>
+#include <viua/support/string.h>
 using namespace std;
 
 vector<string> tokenize(const string& s) {
@@ -68,7 +68,7 @@ vector<string> tokenize(const string& s) {
         }
         if (s[i] == '"' or s[i] == '\'') {
             string ss = str::extract(s.substr(i));
-            i += (ss.size()-1);
+            i += (ss.size() - 1);
             tokens.emplace_back(ss);
             continue;
         }

@@ -18,14 +18,14 @@
  */
 
 #include <functional>
+#include <viua/assert.h>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/decoder/operands.h>
-#include <viua/types/value.h>
-#include <viua/types/boolean.h>
-#include <viua/types/integer.h>
-#include <viua/types/float.h>
 #include <viua/kernel/kernel.h>
-#include <viua/assert.h>
+#include <viua/types/boolean.h>
+#include <viua/types/float.h>
+#include <viua/types/integer.h>
+#include <viua/types/value.h>
 using namespace std;
 
 

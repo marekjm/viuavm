@@ -18,17 +18,15 @@
  */
 
 #include <string>
-#include <viua/types/integer.h>
-#include <viua/types/exception.h>
 #include <viua/include/module.h>
-#include <viua/scheduler/ffi.h>
 #include <viua/process.h>
+#include <viua/scheduler/ffi.h>
+#include <viua/types/exception.h>
+#include <viua/types/integer.h>
 using namespace std;
 
 
-string viua::scheduler::ffi::ForeignFunctionCallRequest::functionName() const {
-    return frame->function_name;
-}
+string viua::scheduler::ffi::ForeignFunctionCallRequest::functionName() const { return frame->function_name; }
 void viua::scheduler::ffi::ForeignFunctionCallRequest::call(ForeignFunction* callback) {
     /* FIXME: second parameter should be a pointer to static registers or
      *        nullptr if function does not have static registers registered
@@ -43,7 +41,8 @@ void viua::scheduler::ffi::ForeignFunctionCallRequest::call(ForeignFunction* cal
         if (return_register != nullptr) {
             // we check in 0. register because it's reserved for return values
             if (frame->local_register_set->at(0) == nullptr) {
-                caller_process->raise(unique_ptr<viua::types::Value>{new viua::types::Exception("return value requested by frame but external function did not set return register")});
+                caller_process->raise(unique_ptr<viua::types::Value>{new viua::types::Exception(
+                    "return value requested by frame but external function did not set return register")});
             }
             returned = frame->local_register_set->pop(0);
         }
@@ -52,7 +51,7 @@ void viua::scheduler::ffi::ForeignFunctionCallRequest::call(ForeignFunction* cal
         if (returned and caller_process->trace().size() > 0) {
             *return_register = std::move(returned);
         }
-    } catch (viua::types::Value *exception) {
+    } catch (viua::types::Value* exception) {
         caller_process->raise(unique_ptr<viua::types::Value>{exception});
         caller_process->handleActiveException();
     }
@@ -60,6 +59,4 @@ void viua::scheduler::ffi::ForeignFunctionCallRequest::call(ForeignFunction* cal
 void viua::scheduler::ffi::ForeignFunctionCallRequest::raise(unique_ptr<viua::types::Value> object) {
     caller_process->raise(std::move(object));
 }
-void viua::scheduler::ffi::ForeignFunctionCallRequest::wakeup() {
-    caller_process->wakeup();
-}
+void viua::scheduler::ffi::ForeignFunctionCallRequest::wakeup() { caller_process->wakeup(); }

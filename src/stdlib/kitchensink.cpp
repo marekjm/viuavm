@@ -17,28 +17,26 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <unistd.h>
 #include <iostream>
-#include <viua/types/value.h>
-#include <viua/types/string.h>
-#include <viua/types/vector.h>
-#include <viua/types/number.h>
-#include <viua/types/exception.h>
+#include <unistd.h>
+#include <viua/include/module.h>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
-#include <viua/include/module.h>
+#include <viua/types/exception.h>
+#include <viua/types/number.h>
+#include <viua/types/string.h>
+#include <viua/types/value.h>
+#include <viua/types/vector.h>
 using namespace std;
 
 
-void kitchensink_sleep(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+void kitchensink_sleep(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                       viua::process::Process*, viua::kernel::Kernel*) {
     sleep(dynamic_cast<viua::types::numeric::Number*>(frame->arguments->at(0))->as_integer());
 }
 
 const ForeignFunctionSpec functions[] = {
-    { "std::kitchensink::sleep/1", &kitchensink_sleep },
-    { NULL, NULL },
+    {"std::kitchensink::sleep/1", &kitchensink_sleep}, {NULL, NULL},
 };
 
-extern "C" const ForeignFunctionSpec* exports() {
-    return functions;
-}
+extern "C" const ForeignFunctionSpec* exports() { return functions; }

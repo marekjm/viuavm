@@ -17,36 +17,37 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cstdlib>
+#include "../../lib/linenoise/linenoise.h"
 #include <cstdint>
+#include <cstdlib>
 #include <cstring>
-#include <iostream>
+#include <deque>
 #include <fstream>
+#include <iostream>
 #include <string>
 #include <vector>
-#include <deque>
-#include "../../lib/linenoise/linenoise.h"
-#include <viua/version.h>
 #include <viua/bytecode/maps.h>
-#include <viua/support/string.h>
-#include <viua/support/pointer.h>
-#include <viua/support/env.h>
-#include <viua/types/integer.h>
-#include <viua/types/closure.h>
-#include <viua/types/string.h>
-#include <viua/types/reference.h>
 #include <viua/loader.h>
+#include <viua/support/env.h>
+#include <viua/support/pointer.h>
+#include <viua/support/string.h>
+#include <viua/types/closure.h>
+#include <viua/types/integer.h>
+#include <viua/types/reference.h>
+#include <viua/types/string.h>
+#include <viua/version.h>
 #define AS_DEBUG_HEADER 1
-#include <viua/kernel/kernel.h>
-#include <viua/program.h>
 #include <viua/cg/disassembler/disassembler.h>
-#include <viua/printutils.h>
-#include <viua/include/module.h>
 #include <viua/front/vm.h>
+#include <viua/include/module.h>
+#include <viua/kernel/kernel.h>
+#include <viua/printutils.h>
+#include <viua/program.h>
 using namespace std;
 
 
-const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file which cannot be run without prior compilation";
+const char* NOTE_LOADED_ASM =
+    "note: seems like you have loaded an .asm file which cannot be run without prior compilation";
 const char* RC_FILENAME = "/.viuavm.db.rc";
 const char* DEBUGGER_COMMAND_HISTORY = "/.viuavmdb_history";
 
@@ -118,7 +119,7 @@ OPCODE printInstruction(const viua::kernel::Kernel& kernel) {
     unsigned size;
     tie(instruction, size) = disassembler::instruction(iptr);
 
-    cout << "byte " << (iptr-kernel.bytecode) << hex << " (0x" << (iptr-kernel.bytecode) << ") ";
+    cout << "byte " << (iptr - kernel.bytecode) << hex << " (0x" << (iptr - kernel.bytecode) << ") ";
     cout << "at 0x" << long(iptr) << dec << ": ";
     cout << instruction << endl;
 
@@ -156,11 +157,12 @@ void printRegisters(const vector<string>& indexes, viua::kernel::RegisterSet* re
         Type* object = regset->at(index);
         if (object) {
             cout << '\n';
-            Reference *rf = nullptr;
+            Reference* rf = nullptr;
             if ((rf = dynamic_cast<Reference*>(object))) {
                 cout << "  pointer:       " << hex << rf << " -> " << rf->pointsTo() << dec << endl;
                 cout << "  reference:     true" << endl;
-                cout << "  copy-on-write: " << (regset->isflagged(index, COPY_ON_WRITE) ? "true" : "false") << '\n';
+                cout << "  copy-on-write: " << (regset->isflagged(index, COPY_ON_WRITE) ? "true" : "false")
+                     << '\n';
                 cout << "  keep:          " << (regset->isflagged(index, KEEP) ? "true" : "false") << '\n';
                 cout << "  to-be bound:   " << (regset->isflagged(index, BIND) ? "true" : "false") << '\n';
                 cout << "  bound:         " << (regset->isflagged(index, BOUND) ? "true" : "false") << '\n';
@@ -169,7 +171,8 @@ void printRegisters(const vector<string>& indexes, viua::kernel::RegisterSet* re
             } else {
                 cout << "  pointer:       " << hex << object << dec << endl;
                 cout << "  reference:     false" << endl;
-                cout << "  copy-on-write: " << (regset->isflagged(index, COPY_ON_WRITE) ? "true" : "false") << '\n';
+                cout << "  copy-on-write: " << (regset->isflagged(index, COPY_ON_WRITE) ? "true" : "false")
+                     << '\n';
                 cout << "  keep:          " << (regset->isflagged(index, KEEP) ? "true" : "false") << '\n';
                 cout << "  to-be bound:   " << (regset->isflagged(index, BIND) ? "true" : "false") << '\n';
                 cout << "  bound:         " << (regset->isflagged(index, BOUND) ? "true" : "false") << '\n';
@@ -190,10 +193,10 @@ struct State {
     vector<string> breakpoints_function;
 
     // watchpoints (FIXME)
-    map<string, vector<int> > watch_register_local_write;
-    map<string, vector<int> > watch_register_local_read;
-    map<string, vector<int> > watch_register_static_write;
-    map<string, vector<int> > watch_register_static_read;
+    map<string, vector<int>> watch_register_local_write;
+    map<string, vector<int>> watch_register_local_read;
+    map<string, vector<int>> watch_register_static_write;
+    map<string, vector<int>> watch_register_static_read;
     vector<int> watch_register_global_write;
     vector<int> watch_register_global_read;
 
@@ -211,21 +214,21 @@ struct State {
     int ticks_left = 0;
     int autoresumes = 0;
 
-    State():
-        breakpoints_byte({}), breakpoints_opcode({}), breakpoints_function({}),
-        initialised(false), paused(false), finished(false), quit(false),
-        exception_raised(false), exception_type(""), exception_message(""),
-        ticks_left(0), autoresumes(0)
-    {}
+    State()
+        : breakpoints_byte({}), breakpoints_opcode({}), breakpoints_function({}), initialised(false),
+          paused(false), finished(false), quit(false), exception_raised(false), exception_type(""),
+          exception_message(""), ticks_left(0), autoresumes(0) {}
 };
 
 
-tuple<bool, string> if_breakpoint_byte(viua::kernel::Kernel& kernel, vector<viua::internals::types::byte*>& breakpoints_byte) {
+tuple<bool, string> if_breakpoint_byte(viua::kernel::Kernel& kernel,
+                                       vector<viua::internals::types::byte*>& breakpoints_byte) {
     bool pause = false;
     ostringstream reason;
     reason.str("");
 
-    if (find(breakpoints_byte.begin(), breakpoints_byte.end(), kernel.executionAt()) != breakpoints_byte.end()) {
+    if (find(breakpoints_byte.begin(), breakpoints_byte.end(), kernel.executionAt()) !=
+        breakpoints_byte.end()) {
         reason << "info: execution paused by byte breakpoint: " << kernel.executionAt();
         pause = true;
     }
@@ -246,7 +249,8 @@ tuple<bool, string> if_breakpoint_opcode(viua::kernel::Kernel& kernel, vector<st
 
     return tuple<bool, string>(pause, reason.str());
 }
-tuple<bool, string> if_breakpoint_function(viua::kernel::Kernel& kernel, vector<string>& breakpoints_function) {
+tuple<bool, string> if_breakpoint_function(viua::kernel::Kernel& kernel,
+                                           vector<string>& breakpoints_function) {
     bool pause = false;
     ostringstream reason;
     reason.str("");
@@ -254,8 +258,10 @@ tuple<bool, string> if_breakpoint_function(viua::kernel::Kernel& kernel, vector<
     string op_name = OP_NAMES.at(OPCODE(*kernel.executionAt()));
 
     if (op_name == "call") {
-        string function_name = string(reinterpret_cast<char*>(kernel.executionAt()+1+sizeof(bool)+sizeof(int)));
-        if (find(breakpoints_function.begin(), breakpoints_function.end(), function_name) != breakpoints_function.end()) {
+        string function_name =
+            string(reinterpret_cast<char*>(kernel.executionAt() + 1 + sizeof(bool) + sizeof(int)));
+        if (find(breakpoints_function.begin(), breakpoints_function.end(), function_name) !=
+            breakpoints_function.end()) {
             reason << "info: execution halted by function breakpoint: " << function_name;
             pause = true;
         }
@@ -269,87 +275,35 @@ tuple<bool, string> if_watchpoint_local_register_write(viua::kernel::Kernel& ker
      */
     bool writing_instruction = true;
     OPCODE opcode = OPCODE(*kernel.executionAt());
-    if (opcode == NOP or
-        opcode == RESS or
-        opcode == PRINT or
-        opcode == ECHO or
-        opcode == FRAME or
-        opcode == PARAM or
-        opcode == CALL or
-        opcode == JUMP or
-        opcode == IF or
-        opcode == RETURN or
-        opcode == HALT
-       ) {
+    if (opcode == NOP or opcode == RESS or opcode == PRINT or opcode == ECHO or opcode == FRAME or
+        opcode == PARAM or opcode == CALL or opcode == JUMP or opcode == IF or opcode == RETURN or
+        opcode == HALT) {
         writing_instruction = false;
     }
     int register_index[2] = {-1, -1};
     int writes_to = 0;
-    viua::internals::types::byte* register_index_ptr = (kernel.executionAt()+1);
+    viua::internals::types::byte* register_index_ptr = (kernel.executionAt() + 1);
 
-    if (opcode == IZERO or
-        opcode == ISTORE or
-        opcode == IINC or
-        opcode == IDEC or
-        opcode == FSTORE or
-        opcode == BSTORE or
-        opcode == STRSTORE or
-        opcode == VEC or
-        opcode == VINSERT or
-        opcode == VPUSH or
-        opcode == BOOL or
-        opcode == NOT or
-        opcode == DELETE or
-        opcode == EMPTY
-       ) {
-        register_index[0] = *reinterpret_cast<int*>(register_index_ptr+1);
+    if (opcode == IZERO or opcode == ISTORE or opcode == IINC or opcode == IDEC or opcode == FSTORE or
+        opcode == BSTORE or opcode == STRSTORE or opcode == VEC or opcode == VINSERT or opcode == VPUSH or
+        opcode == BOOL or opcode == NOT or opcode == DELETE or opcode == EMPTY) {
+        register_index[0] = *reinterpret_cast<int*>(register_index_ptr + 1);
         writes_to = 1;
-    } else if (opcode == ITOF or
-               opcode == FTOI or
-               opcode == STOI or
-               opcode == STOF or
-               opcode == VLEN or
-               opcode == MOVE or
-               opcode == COPY or
-               opcode == ISNULL or
-               opcode == ARG
-            ) {
-        register_index[0] = *(reinterpret_cast<int*>(register_index_ptr+2)+1);
+    } else if (opcode == ITOF or opcode == FTOI or opcode == STOI or opcode == STOF or opcode == VLEN or
+               opcode == MOVE or opcode == COPY or opcode == ISNULL or opcode == ARG) {
+        register_index[0] = *(reinterpret_cast<int*>(register_index_ptr + 2) + 1);
         writes_to = 1;
-    } else if (opcode == IADD or
-               opcode == ISUB or
-               opcode == IMUL or
-               opcode == IDIV or
-               opcode == ILT or
-               opcode == ILTE or
-               opcode == IGT or
-               opcode == IGTE or
-               opcode == IEQ or
-               opcode == FADD or
-               opcode == FSUB or
-               opcode == FMUL or
-               opcode == FDIV or
-               opcode == FLT or
-               opcode == FLTE or
-               opcode == FGT or
-               opcode == FGTE or
-               opcode == FEQ or
-               opcode == BADD or
-               opcode == BSUB or
-               opcode == BLT or
-               opcode == BLTE or
-               opcode == BGT or
-               opcode == BGTE or
-               opcode == BEQ or
-               opcode == VAT or
-               opcode == AND or
-               opcode == OR
-               ) {
-        register_index[0] = *(reinterpret_cast<int*>(register_index_ptr+3)+2);
+    } else if (opcode == IADD or opcode == ISUB or opcode == IMUL or opcode == IDIV or opcode == ILT or
+               opcode == ILTE or opcode == IGT or opcode == IGTE or opcode == IEQ or opcode == FADD or
+               opcode == FSUB or opcode == FMUL or opcode == FDIV or opcode == FLT or opcode == FLTE or
+               opcode == FGT or opcode == FGTE or opcode == FEQ or opcode == BADD or opcode == BSUB or
+               opcode == BLT or opcode == BLTE or opcode == BGT or opcode == BGTE or opcode == BEQ or
+               opcode == VAT or opcode == AND or opcode == OR) {
+        register_index[0] = *(reinterpret_cast<int*>(register_index_ptr + 3) + 2);
         writes_to = 1;
     } else if (opcode == VPOP or opcode == SWAP) {
         register_index[0] = *(reinterpret_cast<int*>(++register_index_ptr));
-        register_index[1] = *(reinterpret_cast<int*>(++register_index_ptr)+1);
+        register_index[1] = *(reinterpret_cast<int*>(++register_index_ptr) + 1);
         writes_to = 2;
     }
 
@@ -361,9 +315,11 @@ tuple<bool, string> if_watchpoint_local_register_write(viua::kernel::Kernel& ker
         auto search = state.watch_register_local_write.find(kernel.trace().back()->function_name);
         if (search != state.watch_register_local_write.end()) {
             for (int i = 0; i < writes_to; ++i) {
-                if (find(search->second.begin(), search->second.end(), register_index[i]) != search->second.end()) {
+                if (find(search->second.begin(), search->second.end(), register_index[i]) !=
+                    search->second.end()) {
                     pause = true;
-                    reason << "info: execution halted by local register write watchpoint: " << register_index[i];
+                    reason << "info: execution halted by local register write watchpoint: "
+                           << register_index[i];
                 }
             }
         }
@@ -376,87 +332,35 @@ tuple<bool, string> if_watchpoint_global_register_write(viua::kernel::Kernel& ke
      */
     bool writing_instruction = true;
     OPCODE opcode = OPCODE(*kernel.executionAt());
-    if (opcode == NOP or
-        opcode == RESS or
-        opcode == PRINT or
-        opcode == ECHO or
-        opcode == FRAME or
-        opcode == PARAM or
-        opcode == CALL or
-        opcode == JUMP or
-        opcode == IF or
-        opcode == RETURN or
-        opcode == HALT
-       ) {
+    if (opcode == NOP or opcode == RESS or opcode == PRINT or opcode == ECHO or opcode == FRAME or
+        opcode == PARAM or opcode == CALL or opcode == JUMP or opcode == IF or opcode == RETURN or
+        opcode == HALT) {
         writing_instruction = false;
     }
     int register_index[2] = {-1, -1};
     int writes_to = 0;
-    viua::internals::types::byte* register_index_ptr = (kernel.executionAt()+1);
+    viua::internals::types::byte* register_index_ptr = (kernel.executionAt() + 1);
 
-    if (opcode == IZERO or
-        opcode == ISTORE or
-        opcode == IINC or
-        opcode == IDEC or
-        opcode == FSTORE or
-        opcode == BSTORE or
-        opcode == STRSTORE or
-        opcode == VEC or
-        opcode == VINSERT or
-        opcode == VPUSH or
-        opcode == BOOL or
-        opcode == NOT or
-        opcode == DELETE or
-        opcode == EMPTY
-       ) {
-        register_index[0] = *reinterpret_cast<int*>(register_index_ptr+1);
+    if (opcode == IZERO or opcode == ISTORE or opcode == IINC or opcode == IDEC or opcode == FSTORE or
+        opcode == BSTORE or opcode == STRSTORE or opcode == VEC or opcode == VINSERT or opcode == VPUSH or
+        opcode == BOOL or opcode == NOT or opcode == DELETE or opcode == EMPTY) {
+        register_index[0] = *reinterpret_cast<int*>(register_index_ptr + 1);
         writes_to = 1;
-    } else if (opcode == ITOF or
-               opcode == FTOI or
-               opcode == STOI or
-               opcode == STOF or
-               opcode == VLEN or
-               opcode == MOVE or
-               opcode == COPY or
-               opcode == ISNULL or
-               opcode == ARG
-            ) {
-        register_index[0] = *(reinterpret_cast<int*>(register_index_ptr+2)+1);
+    } else if (opcode == ITOF or opcode == FTOI or opcode == STOI or opcode == STOF or opcode == VLEN or
+               opcode == MOVE or opcode == COPY or opcode == ISNULL or opcode == ARG) {
+        register_index[0] = *(reinterpret_cast<int*>(register_index_ptr + 2) + 1);
         writes_to = 1;
-    } else if (opcode == IADD or
-               opcode == ISUB or
-               opcode == IMUL or
-               opcode == IDIV or
-               opcode == ILT or
-               opcode == ILTE or
-               opcode == IGT or
-               opcode == IGTE or
-               opcode == IEQ or
-               opcode == FADD or
-               opcode == FSUB or
-               opcode == FMUL or
-               opcode == FDIV or
-               opcode == FLT or
-               opcode == FLTE or
-               opcode == FGT or
-               opcode == FGTE or
-               opcode == FEQ or
-               opcode == BADD or
-               opcode == BSUB or
-               opcode == BLT or
-               opcode == BLTE or
-               opcode == BGT or
-               opcode == BGTE or
-               opcode == BEQ or
-               opcode == VAT or
-               opcode == AND or
-               opcode == OR
-               ) {
-        register_index[0] = *(reinterpret_cast<int*>(register_index_ptr+3)+2);
+    } else if (opcode == IADD or opcode == ISUB or opcode == IMUL or opcode == IDIV or opcode == ILT or
+               opcode == ILTE or opcode == IGT or opcode == IGTE or opcode == IEQ or opcode == FADD or
+               opcode == FSUB or opcode == FMUL or opcode == FDIV or opcode == FLT or opcode == FLTE or
+               opcode == FGT or opcode == FGTE or opcode == FEQ or opcode == BADD or opcode == BSUB or
+               opcode == BLT or opcode == BLTE or opcode == BGT or opcode == BGTE or opcode == BEQ or
+               opcode == VAT or opcode == AND or opcode == OR) {
+        register_index[0] = *(reinterpret_cast<int*>(register_index_ptr + 3) + 2);
         writes_to = 1;
     } else if (opcode == VPOP or opcode == SWAP) {
         register_index[0] = *(reinterpret_cast<int*>(++register_index_ptr));
-        register_index[1] = *(reinterpret_cast<int*>(++register_index_ptr)+1);
+        register_index[1] = *(reinterpret_cast<int*>(++register_index_ptr) + 1);
         writes_to = 2;
     }
 
@@ -466,7 +370,8 @@ tuple<bool, string> if_watchpoint_global_register_write(viua::kernel::Kernel& ke
 
     if (writing_instruction) {
         for (int i = 0; i < writes_to; ++i) {
-            if (find(state.watch_register_global_write.begin(), state.watch_register_global_write.end(), register_index[i]) != state.watch_register_global_write.end()) {
+            if (find(state.watch_register_global_write.begin(), state.watch_register_global_write.end(),
+                     register_index[i]) != state.watch_register_global_write.end()) {
                 pause = true;
                 reason << "info: execution halted by global register write watchpoint: " << register_index[i];
             }
@@ -477,7 +382,8 @@ tuple<bool, string> if_watchpoint_global_register_write(viua::kernel::Kernel& ke
 }
 
 
-bool command_verify(string& command, vector<string>& operands, const viua::kernel::Kernel& kernel, const State& state) {
+bool command_verify(string& command, vector<string>& operands, const viua::kernel::Kernel& kernel,
+                    const State& state) {
     /** Basic command verification.
      *
      *  This function check only for the most obvious errors and
@@ -492,7 +398,8 @@ bool command_verify(string& command, vector<string>& operands, const viua::kerne
             cout << "error: missing operands: <key> [value]" << endl;
             verified = false;
         } else if (operands[0] == "kernel.debug") {
-            if (operands.size() != 1 and (operands.size() > 1 and not (operands[1] == "true" or operands[1] == "false"))) {
+            if (operands.size() != 1 and
+                (operands.size() > 1 and not(operands[1] == "true" or operands[1] == "false"))) {
                 cout << "error: invalid operand, expected 'true' of 'false'" << endl;
                 verified = false;
             }
@@ -541,10 +448,12 @@ bool command_verify(string& command, vector<string>& operands, const viua::kerne
     } else if (command == "kernel.init") {
     } else if (command == "kernel.run") {
         if (not state.initialised) {
-            cout << "error: viua::kernel::Kernel is not initialised, use `kernel.init` command before `" << command << "`" << endl;
+            cout << "error: viua::kernel::Kernel is not initialised, use `kernel.init` command before `"
+                 << command << "`" << endl;
             verified = false;
         } else if (state.paused) {
-            cout << "warn: viua::kernel::Kernel is paused, use `kernel.resume` command instead of `" << command << "`" << endl;
+            cout << "warn: viua::kernel::Kernel is paused, use `kernel.resume` command instead of `"
+                 << command << "`" << endl;
             verified = false;
         }
     } else if (command == "kernel.resume") {
@@ -562,16 +471,19 @@ bool command_verify(string& command, vector<string>& operands, const viua::kerne
         }
     } else if (command == "kernel.tick") {
         if (not state.initialised) {
-            cout << "error: viua::kernel::Kernel is not initialised, use `kernel.init` command before `" << command << "`" << endl;
+            cout << "error: viua::kernel::Kernel is not initialised, use `kernel.init` command before `"
+                 << command << "`" << endl;
             verified = false;
         } else if (state.finished) {
             cout << "error: viua::kernel::Kernel has finished execution of loaded program" << endl;
             verified = false;
         } else if (state.paused) {
-            cout << "warn: viua::kernel::Kernel is paused, use `kernel.resume` command instead of `" << command << "`" << endl;
+            cout << "warn: viua::kernel::Kernel is paused, use `kernel.resume` command instead of `"
+                 << command << "`" << endl;
             verified = false;
         } else if (operands.size() > 1) {
-            cout << "error: invalid operand size, expected 0 or 1 operand but got " << operands.size() << endl;
+            cout << "error: invalid operand size, expected 0 or 1 operand but got " << operands.size()
+                 << endl;
             verified = false;
         } else if (operands.size() == 1 and not str::isnum(operands[0])) {
             cout << "error: invalid operand, expected integer" << endl;
@@ -579,7 +491,7 @@ bool command_verify(string& command, vector<string>& operands, const viua::kerne
         }
     } else if (command == "kernel.jump") {
         if (operands.size() == 1) {
-            if (not (str::isnum(operands[0]) or str::startswith(operands[0], "0x") or operands[0][0] == '+')) {
+            if (not(str::isnum(operands[0]) or str::startswith(operands[0], "0x") or operands[0][0] == '+')) {
                 cout << "error: invalid operand, expected:" << endl;
                 cout << "  * decimal integer (optionally preceded by plus), or" << endl;
                 cout << "  * hexadecimal integer" << endl;
@@ -599,7 +511,8 @@ bool command_verify(string& command, vector<string>& operands, const viua::kerne
         }
     } else if (command == "kernel.unpause") {
         if (state.finished) {
-            cout << "error: viua::kernel::Kernel has finished execution, use `kernel.unfinish` instead" << endl;
+            cout << "error: viua::kernel::Kernel has finished execution, use `kernel.unfinish` instead"
+                 << endl;
             verified = false;
         } else if (not state.paused) {
             cout << "warning: viua::kernel::Kernel has not been paused" << endl;
@@ -660,7 +573,9 @@ bool command_dispatch(string& command, vector<string>& operands, viua::kernel::K
      *  Returns true on success, false otherwise.
      *  If false is returned, current iteration of debuggers's REPL should be skipped.
      */
-    if (not command_verify(command, operands, kernel, state)) { return false; }
+    if (not command_verify(command, operands, kernel, state)) {
+        return false;
+    }
 
     if (command == "") {
         // do nothing...
@@ -678,7 +593,7 @@ bool command_dispatch(string& command, vector<string>& operands, viua::kernel::K
     } else if (command == "breakpoint.set.at") {
         for (unsigned j = 0; j < operands.size(); ++j) {
             if (str::isnum(operands[j])) {
-                state.breakpoints_byte.emplace_back(kernel.bytecode+stoi(operands[j]));
+                state.breakpoints_byte.emplace_back(kernel.bytecode + stoi(operands[j]));
             } else {
                 cout << "warn: invalid operand, expected integer: " << operands[j] << endl;
             }
@@ -730,9 +645,11 @@ bool command_dispatch(string& command, vector<string>& operands, viua::kernel::K
                 --j;
             }
         } else if (str::startswith(operands[0], "0x")) {
-            kernel.processes[kernel.current_process_index]->instruction_pointer = (kernel.bytecode+stoul(operands[0], nullptr, 16));
+            kernel.processes[kernel.current_process_index]->instruction_pointer =
+                (kernel.bytecode + stoul(operands[0], nullptr, 16));
         } else {
-            kernel.processes[kernel.current_process_index]->instruction_pointer = (kernel.bytecode+stoul(operands[0]));
+            kernel.processes[kernel.current_process_index]->instruction_pointer =
+                (kernel.bytecode + stoul(operands[0]));
         }
     } else if (command == "kernel.unpause") {
         state.paused = false;
@@ -751,7 +668,8 @@ bool command_dispatch(string& command, vector<string>& operands, viua::kernel::K
         string fun_name = kernel.trace().back()->function_name;
 
         try {
-            printRegisters(operands, kernel.processes[kernel.current_process_index]->static_registers.at(fun_name));
+            printRegisters(operands,
+                           kernel.processes[kernel.current_process_index]->static_registers.at(fun_name));
         } catch (const std::out_of_range& e) {
             // OK, now we know that our function does not have static registers
             cout << "error: current function does not have static registers allocated" << endl;
@@ -783,9 +701,7 @@ bool command_dispatch(string& command, vector<string>& operands, viua::kernel::K
             try {
                 addr = kernel.function_addresses.at(fun);
                 exists = true;
-            } catch (const std::out_of_range& e) {
-                exists = false;
-            }
+            } catch (const std::out_of_range& e) { exists = false; }
             cout << "  '" << fun << "': ";
             if (not exists) {
                 cout << "not found" << endl;
@@ -800,9 +716,7 @@ bool command_dispatch(string& command, vector<string>& operands, viua::kernel::K
             try {
                 addr = kernel.block_addresses.at(fun);
                 exists = true;
-            } catch (const std::out_of_range& e) {
-                exists = false;
-            }
+            } catch (const std::out_of_range& e) { exists = false; }
             cout << "  '" << fun << "': ";
             if (not exists) {
                 cout << "not found" << endl;
@@ -816,9 +730,7 @@ bool command_dispatch(string& command, vector<string>& operands, viua::kernel::K
             try {
                 kernel.foreign_functions.at(fun);
                 exists = true;
-            } catch (const std::out_of_range& e) {
-                exists = false;
-            }
+            } catch (const std::out_of_range& e) { exists = false; }
             cout << "  '" << fun << "'";
             if (not exists) {
                 cout << " (not found)" << endl;
@@ -826,7 +738,9 @@ bool command_dispatch(string& command, vector<string>& operands, viua::kernel::K
         }
     } else if (command == "help") {
         for (string c : DEBUGGER_COMMANDS) {
-            if (c[c.size()-1] == '.') { continue; }
+            if (c[c.size() - 1] == '.') {
+                continue;
+            }
             cout << c << endl;
         }
     } else if (command == "quit") {
@@ -894,8 +808,12 @@ void debuggerMainLoop(viua::kernel::Kernel& kernel, deque<string> init) {
         linenoiseHistoryAdd(cline);
         free(cline);
 
-        if (line == "") { continue; }
-        if (line[0] == '#') { continue; }
+        if (line == "") {
+            continue;
+        }
+        if (line[0] == '#') {
+            continue;
+        }
 
         if (line == ".") {
             line = lastline;
@@ -911,12 +829,19 @@ void debuggerMainLoop(viua::kernel::Kernel& kernel, deque<string> init) {
             continue;
         }
 
-        if (state.quit) { break; }
-        if (not state.initialised) { continue; }
+        if (state.quit) {
+            break;
+        }
+        if (not state.initialised) {
+            continue;
+        }
 
         string op_name;
-        while (not state.paused and not state.finished and not state.exception_raised and (state.ticks_left == -1 or (state.ticks_left > 0))) {
-            if (state.ticks_left > 0) { --state.ticks_left; }
+        while (not state.paused and not state.finished and not state.exception_raised and
+               (state.ticks_left == -1 or (state.ticks_left > 0))) {
+            if (state.ticks_left > 0) {
+                --state.ticks_left;
+            }
 
             OPCODE printed = NOP;
             try {
@@ -931,7 +856,8 @@ void debuggerMainLoop(viua::kernel::Kernel& kernel, deque<string> init) {
             if (not state.exception_raised and not state.finished and ticked == nullptr) {
                 state.finished = (kernel.return_exception == "" ? true : false);
                 state.ticks_left = 0;
-                cout << "\nmessage: execution " << (kernel.return_exception == "" ? "finished" : "broken") << ": " << kernel.counter() << " instructions executed" << endl;
+                cout << "\nmessage: execution " << (kernel.return_exception == "" ? "finished" : "broken")
+                     << ": " << kernel.counter() << " instructions executed" << endl;
             }
 
             if (state.finished) {
@@ -983,7 +909,7 @@ void debuggerMainLoop(viua::kernel::Kernel& kernel, deque<string> init) {
             if (state.paused) {
                 // if there are no autoresumes, keep paused status
                 // otherwise, set paused status to false
-                state.paused = (not (state.autoresumes-- > 0));
+                state.paused = (not(state.autoresumes-- > 0));
             }
         }
 
@@ -1006,12 +932,15 @@ bool usage(const char* program, bool show_help, bool show_version, bool verbose)
         cout << "\nUSAGE:\n";
         cout << "    " << program << " [option...] <executable> [<operands>...]\n" << endl;
         cout << "OPTIONS:\n";
-        cout << "    " << "-V, --version            - show version\n"
-             << "    " << "-h, --help               - display this message\n"
-             << "    " << "-v, --verbose            - show verbose output\n"
-             ;
+        cout << "    "
+             << "-V, --version            - show version\n"
+             << "    "
+             << "-h, --help               - display this message\n"
+             << "    "
+             << "-v, --verbose            - show verbose output\n";
         cout << "\n";
-        cout << "When inside debugger, use 'help' to list debugger statements (you can also discover them by pressing Tab repeatedly).";
+        cout << "When inside debugger, use 'help' to list debugger statements (you can also discover them by "
+                "pressing Tab repeatedly).";
         cout << "\n";
         cout << "Use ^C to abort entering a statement. Use ^D or 'quit' to quit the debugger.";
         cout << endl;
@@ -1041,7 +970,9 @@ int main(int argc, char* argv[]) {
         args.emplace_back(argv[i]);
     }
 
-    if (usage(argv[0], SHOW_HELP, SHOW_VERSION, VERBOSE)) { return 0; }
+    if (usage(argv[0], SHOW_HELP, SHOW_VERSION, VERBOSE)) {
+        return 0;
+    }
 
     if (args.size() == 0) {
         cout << "fatal: no input file" << endl;
@@ -1075,10 +1006,14 @@ int main(int argc, char* argv[]) {
     deque<string> init_commands;
     string line;
     if (global_rc_file) {
-        while (getline(global_rc_file, line)) { init_commands.push_back(line); }
+        while (getline(global_rc_file, line)) {
+            init_commands.push_back(line);
+        }
     }
     if (local_rc_file) {
-        while (getline(local_rc_file, line)) { init_commands.push_back(line); }
+        while (getline(local_rc_file, line)) {
+            init_commands.push_back(line);
+        }
     }
 
     debuggerMainLoop(kernel, init_commands);

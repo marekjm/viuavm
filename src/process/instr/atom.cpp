@@ -17,10 +17,10 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <viua/support/string.h>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/decoder/operands.h>
 #include <viua/process.h>
+#include <viua/support/string.h>
 #include <viua/types/atom.h>
 #include <viua/types/boolean.h>
 using namespace std;
@@ -44,8 +44,12 @@ viua::internals::types::byte* viua::process::Process::opatomeq(viua::internals::
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     viua::types::Atom *first = nullptr, *second = nullptr;
-    tie(addr, first) = viua::bytecode::decoder::operands::fetch_object_of<std::remove_pointer<decltype(first)>::type>(addr, this);
-    tie(addr, second) = viua::bytecode::decoder::operands::fetch_object_of<std::remove_pointer<decltype(second)>::type>(addr, this);
+    tie(addr, first) =
+        viua::bytecode::decoder::operands::fetch_object_of<std::remove_pointer<decltype(first)>::type>(addr,
+                                                                                                       this);
+    tie(addr, second) =
+        viua::bytecode::decoder::operands::fetch_object_of<std::remove_pointer<decltype(second)>::type>(addr,
+                                                                                                        this);
 
     *target = unique_ptr<viua::types::Value>{new viua::types::Boolean(*first == *second)};
 

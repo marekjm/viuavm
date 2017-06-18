@@ -17,21 +17,21 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cstdint>
-#include <iostream>
 #include <algorithm>
+#include <cstdint>
 #include <fstream>
+#include <iostream>
 #include <sstream>
-#include <viua/machine.h>
 #include <viua/bytecode/maps.h>
-#include <viua/support/string.h>
-#include <viua/support/env.h>
-#include <viua/loader.h>
-#include <viua/program.h>
-#include <viua/cg/tools.h>
-#include <viua/cg/tokenizer.h>
 #include <viua/cg/assembler/assembler.h>
+#include <viua/cg/tokenizer.h>
+#include <viua/cg/tools.h>
 #include <viua/front/asm.h>
+#include <viua/loader.h>
+#include <viua/machine.h>
+#include <viua/program.h>
+#include <viua/support/env.h>
+#include <viua/support/string.h>
 using namespace std;
 
 
@@ -58,29 +58,32 @@ static void strwrite(ofstream& out, const string& s) {
  *  It is suitable for all instructions which use three, simple register-index operands.
  *
  *  BE WARNED!
- *  This mapping (and the assemble_three_intop_instruction() function) *greatly* reduce the amount of code repetition
+ *  This mapping (and the assemble_three_intop_instruction() function) *greatly* reduce the amount of code
+ * repetition
  *  in the assembler but is kinda black voodoo magic...
  *
  *  NOTE TO FUTURE SELF:
  *  If you feel comfortable with taking pointers of member functions and calling such things - go on.
  *  Otherwise, it may be better to leave this alone until your have refreshed your memory.
- *  Here is isocpp.org's FAQ about pointers to members (2015-01-17): https://isocpp.org/wiki/faq/pointers-to-members
+ *  Here is isocpp.org's FAQ about pointers to members (2015-01-17):
+ * https://isocpp.org/wiki/faq/pointers-to-members
  */
 typedef Program& (Program::*ThreeIntopAssemblerFunction)(int_op, int_op, int_op);
 const map<string, ThreeIntopAssemblerFunction> THREE_INTOP_ASM_FUNCTIONS = {
-    { "and",  &Program::opand },
-    { "or",   &Program::opor },
+    {"and", &Program::opand},
+    {"or", &Program::opor},
 
-    { "capture", &Program::opcapture },
-    { "capturecopy", &Program::opcapturecopy },
-    { "capturemove", &Program::opcapturemove },
+    {"capture", &Program::opcapture},
+    {"capturecopy", &Program::opcapturecopy},
+    {"capturemove", &Program::opcapturemove},
 
-    { "insert", &Program::opinsert },
-    { "remove", &Program::opremove },
+    {"insert", &Program::opinsert},
+    {"remove", &Program::opremove},
 };
 
 
-static Program& compile(Program& program, const vector<Token>& tokens, map<string, std::remove_reference<decltype(tokens)>::type::size_type>& marks) {
+static Program& compile(Program& program, const vector<Token>& tokens,
+                        map<string, std::remove_reference<decltype(tokens)>::type::size_type>& marks) {
     /** Compile instructions into bytecode using bytecode generation API.
      *
      */
@@ -108,22 +111,25 @@ static void assemble(Program& program, const vector<Token>& tokens) {
 }
 
 
-static map<string, viua::internals::types::bytecode_size> mapInvocableAddresses(viua::internals::types::bytecode_size& starting_instruction, const invocables_t& blocks) {
+static map<string, viua::internals::types::bytecode_size> mapInvocableAddresses(
+    viua::internals::types::bytecode_size& starting_instruction, const invocables_t& blocks) {
     map<string, viua::internals::types::bytecode_size> addresses;
     for (string name : blocks.names) {
         addresses[name] = starting_instruction;
         try {
             starting_instruction += viua::cg::tools::calculate_bytecode_size2(blocks.tokens.at(name));
-        } catch (const std::out_of_range& e) {
-            throw ("could not find block '" + name + "'");
-        }
+        } catch (const std::out_of_range& e) { throw("could not find block '" + name + "'"); }
     }
     return addresses;
 }
 
-static viua::internals::types::bytecode_size writeCodeBlocksSection(ofstream& out, const invocables_t& blocks, const vector<string>& linked_block_names, viua::internals::types::bytecode_size block_bodies_size_so_far = 0) {
+static viua::internals::types::bytecode_size writeCodeBlocksSection(
+    ofstream& out, const invocables_t& blocks, const vector<string>& linked_block_names,
+    viua::internals::types::bytecode_size block_bodies_size_so_far = 0) {
     viua::internals::types::bytecode_size block_ids_section_size = 0;
-    for (string name : blocks.names) { block_ids_section_size += name.size(); }
+    for (string name : blocks.names) {
+        block_ids_section_size += name.size();
+    }
     // we need to insert address after every block
     block_ids_section_size += sizeof(viua::internals::types::bytecode_size) * blocks.names.size();
     // for null characters after block names
@@ -160,7 +166,7 @@ static viua::internals::types::bytecode_size writeCodeBlocksSection(ofstream& ou
         try {
             block_bodies_size_so_far += viua::cg::tools::calculate_bytecode_size2(blocks.tokens.at(name));
         } catch (const std::out_of_range& e) {
-            throw ("could not find block '" + name + "' during address table write");
+            throw("could not find block '" + name + "' during address table write");
         }
     }
 
@@ -179,62 +185,72 @@ static string get_main_function(const vector<string>& available_functions) {
 }
 
 static void check_main_function(const string& main_function, const vector<Token>& main_function_tokens) {
-        // Why three newlines?
-        //
-        // Here's why:
-        //
-        // - first newline is after the final 'return' instruction
-        // - second newline is after the last-but-one instruction which should set the return register
-        // - third newline is the marker after which we look for the instruction that will set the return register
-        //
-        // Example:
-        //
-        //   1st newline
-        //         |
-        //         |  2nd newline
-        //         |   |
-        //      nop    |
-        //      izero 0
-        //      return
-        //            |
-        //          3rd newline
-        //
-        // If these three newlines are found then the main function is considered "full".
-        // Anything less, and things get suspicious.
-        // If there are two newlines - maybe the function just returns something.
-        // If there is only one newline - the main function is invalid, because there is no way
-        // to correctly set the return register, and return from the function with one instruction.
-        //
-        const int expected_newlines = 3;
+    // Why three newlines?
+    //
+    // Here's why:
+    //
+    // - first newline is after the final 'return' instruction
+    // - second newline is after the last-but-one instruction which should set the return register
+    // - third newline is the marker after which we look for the instruction that will set the return register
+    //
+    // Example:
+    //
+    //   1st newline
+    //         |
+    //         |  2nd newline
+    //         |   |
+    //      nop    |
+    //      izero 0
+    //      return
+    //            |
+    //          3rd newline
+    //
+    // If these three newlines are found then the main function is considered "full".
+    // Anything less, and things get suspicious.
+    // If there are two newlines - maybe the function just returns something.
+    // If there is only one newline - the main function is invalid, because there is no way
+    // to correctly set the return register, and return from the function with one instruction.
+    //
+    const int expected_newlines = 3;
 
-        int found_newlines = 0;
-        auto i = main_function_tokens.size()-1;
-        while (i and found_newlines < expected_newlines) {
-            if (main_function_tokens.at(i--) == "\n") {
-                ++found_newlines;
-            }
+    int found_newlines = 0;
+    auto i = main_function_tokens.size() - 1;
+    while (i and found_newlines < expected_newlines) {
+        if (main_function_tokens.at(i--) == "\n") {
+            ++found_newlines;
         }
-        if (found_newlines >= expected_newlines) {
-            // if found newlines number at least equals the expected number we
-            // have to adjust token counter to skip past last required newline and the token before it
-            i += 2;
-        }
-        auto last_instruction = main_function_tokens.at(i);
-        if (not (last_instruction == "copy" or last_instruction == "move" or last_instruction == "swap" or last_instruction == "izero" or last_instruction == "istore")) {
-            throw viua::cg::lex::InvalidSyntax(last_instruction, ("main function does not return a value: " + main_function));
-        }
-        if (main_function_tokens.at(i+1) != "%0") {
-            throw viua::cg::lex::InvalidSyntax(last_instruction, ("main function does not return a value: " + main_function));
-        }
-        if (main_function_tokens.at(i+2).original() == "\n") {
-            throw viua::cg::lex::InvalidSyntax(last_instruction, "main function must explicitly return to local register set");
-        }
-        if (main_function_tokens.at(i+2) != "local") {
-            throw viua::cg::lex::InvalidSyntax(last_instruction, ("main function uses invalid register set to return a value: " + main_function_tokens.at(i+2).str())).add(main_function_tokens.at(i+2));
-        }
+    }
+    if (found_newlines >= expected_newlines) {
+        // if found newlines number at least equals the expected number we
+        // have to adjust token counter to skip past last required newline and the token before it
+        i += 2;
+    }
+    auto last_instruction = main_function_tokens.at(i);
+    if (not(last_instruction == "copy" or last_instruction == "move" or last_instruction == "swap" or
+            last_instruction == "izero" or last_instruction == "istore")) {
+        throw viua::cg::lex::InvalidSyntax(last_instruction,
+                                           ("main function does not return a value: " + main_function));
+    }
+    if (main_function_tokens.at(i + 1) != "%0") {
+        throw viua::cg::lex::InvalidSyntax(last_instruction,
+                                           ("main function does not return a value: " + main_function));
+    }
+    if (main_function_tokens.at(i + 2).original() == "\n") {
+        throw viua::cg::lex::InvalidSyntax(last_instruction,
+                                           "main function must explicitly return to local register set");
+    }
+    if (main_function_tokens.at(i + 2) != "local") {
+        throw viua::cg::lex::InvalidSyntax(last_instruction,
+                                           ("main function uses invalid register set to return a value: " +
+                                            main_function_tokens.at(i + 2).str()))
+            .add(main_function_tokens.at(i + 2));
+    }
 }
 
-static viua::internals::types::bytecode_size generate_entry_function(viua::internals::types::bytecode_size bytes, map<string, viua::internals::types::bytecode_size> function_addresses, invocables_t& functions, const string& main_function, viua::internals::types::bytecode_size starting_instruction) {
+static viua::internals::types::bytecode_size generate_entry_function(
+    viua::internals::types::bytecode_size bytes,
+    map<string, viua::internals::types::bytecode_size> function_addresses, invocables_t& functions,
+    const string& main_function, viua::internals::types::bytecode_size starting_instruction) {
     if (DEBUG) {
         cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << "message" << send_control_seq(ATTR_RESET);
         cout << ": ";
@@ -260,19 +276,24 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
         entry_function_tokens.emplace_back(0, 0, "%0");
         entry_function_tokens.emplace_back(0, 0, "%16");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
+        bytes += sizeof(viua::internals::types::byte) + 2 * sizeof(viua::internals::types::byte) +
+                 2 * sizeof(viua::internals::RegisterSets) +
+                 2 * sizeof(viua::internals::types::register_index);
     } else if (main_function == "main/2") {
         entry_function_tokens.emplace_back(0, 0, "frame");
         entry_function_tokens.emplace_back(0, 0, "%2");
         entry_function_tokens.emplace_back(0, 0, "%16");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
+        bytes += sizeof(viua::internals::types::byte) + 2 * sizeof(viua::internals::types::byte) +
+                 2 * sizeof(viua::internals::RegisterSets) +
+                 2 * sizeof(viua::internals::types::register_index);
 
         entry_function_tokens.emplace_back(0, 0, "izero");
         entry_function_tokens.emplace_back(0, 0, "%0");
         entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) + sizeof(viua::internals::types::byte) + sizeof(viua::internals::RegisterSets) + sizeof(viua::internals::types::register_index);
+        bytes += sizeof(viua::internals::types::byte) + sizeof(viua::internals::types::byte) +
+                 sizeof(viua::internals::RegisterSets) + sizeof(viua::internals::types::register_index);
 
         // pop first element on the list of aruments
         entry_function_tokens.emplace_back(0, 0, "vpop");
@@ -283,7 +304,9 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
         entry_function_tokens.emplace_back(0, 0, "%0");
         entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) + 3*sizeof(viua::internals::types::byte) + 3*sizeof(viua::internals::RegisterSets) + 3*sizeof(viua::internals::types::register_index);
+        bytes += sizeof(viua::internals::types::byte) + 3 * sizeof(viua::internals::types::byte) +
+                 3 * sizeof(viua::internals::RegisterSets) +
+                 3 * sizeof(viua::internals::types::register_index);
 
         // for parameter for main/2 is the name of the program
         entry_function_tokens.emplace_back(0, 0, "param");
@@ -291,7 +314,9 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
         entry_function_tokens.emplace_back(0, 0, "%0");
         entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
+        bytes += sizeof(viua::internals::types::byte) + 2 * sizeof(viua::internals::types::byte) +
+                 2 * sizeof(viua::internals::RegisterSets) +
+                 2 * sizeof(viua::internals::types::register_index);
 
         // second parameter for main/2 is the vector with the rest
         // of the commandl ine parameters
@@ -300,7 +325,9 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
         entry_function_tokens.emplace_back(0, 0, "%1");
         entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
+        bytes += sizeof(viua::internals::types::byte) + 2 * sizeof(viua::internals::types::byte) +
+                 2 * sizeof(viua::internals::RegisterSets) +
+                 2 * sizeof(viua::internals::types::register_index);
     } else {
         // this is for default main function, i.e. `main/1` or
         // for custom main functions
@@ -309,14 +336,18 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
         entry_function_tokens.emplace_back(0, 0, "%1");
         entry_function_tokens.emplace_back(0, 0, "%16");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
+        bytes += sizeof(viua::internals::types::byte) + 2 * sizeof(viua::internals::types::byte) +
+                 2 * sizeof(viua::internals::RegisterSets) +
+                 2 * sizeof(viua::internals::types::register_index);
 
         entry_function_tokens.emplace_back(0, 0, "param");
         entry_function_tokens.emplace_back(0, 0, "%0");
         entry_function_tokens.emplace_back(0, 0, "%1");
         entry_function_tokens.emplace_back(0, 0, "local");
         entry_function_tokens.emplace_back(0, 0, "\n");
-        bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
+        bytes += sizeof(viua::internals::types::byte) + 2 * sizeof(viua::internals::types::byte) +
+                 2 * sizeof(viua::internals::RegisterSets) +
+                 2 * sizeof(viua::internals::types::register_index);
     }
 
     entry_function_tokens.emplace_back(0, 0, "call");
@@ -324,8 +355,9 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
     entry_function_tokens.emplace_back(0, 0, "local");
     entry_function_tokens.emplace_back(0, 0, main_function);
     entry_function_tokens.emplace_back(0, 0, "\n");
-    bytes += sizeof(viua::internals::types::byte) + sizeof(viua::internals::types::byte) + sizeof(viua::internals::RegisterSets) + sizeof(viua::internals::types::register_index);
-    bytes += main_function.size()+1;
+    bytes += sizeof(viua::internals::types::byte) + sizeof(viua::internals::types::byte) +
+             sizeof(viua::internals::RegisterSets) + sizeof(viua::internals::types::register_index);
+    bytes += main_function.size() + 1;
 
     // then, register 1 is moved to register 0 so it counts as a return code
     entry_function_tokens.emplace_back(0, 0, "move");
@@ -334,7 +366,8 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
     entry_function_tokens.emplace_back(0, 0, "%1");
     entry_function_tokens.emplace_back(0, 0, "local");
     entry_function_tokens.emplace_back(0, 0, "\n");
-    bytes += sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::types::byte) + 2*sizeof(viua::internals::RegisterSets) + 2*sizeof(viua::internals::types::register_index);
+    bytes += sizeof(viua::internals::types::byte) + 2 * sizeof(viua::internals::types::byte) +
+             2 * sizeof(viua::internals::RegisterSets) + 2 * sizeof(viua::internals::types::register_index);
 
     entry_function_tokens.emplace_back(0, 0, "halt");
     entry_function_tokens.emplace_back(0, 0, "\n");
@@ -345,7 +378,9 @@ static viua::internals::types::bytecode_size generate_entry_function(viua::inter
     return bytes;
 }
 
-void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& blocks, const string& filename, string& compilename, const vector<string>& commandline_given_links, const compilationflags_t& flags) {
+void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& blocks, const string& filename,
+              string& compilename, const vector<string>& commandline_given_links,
+              const compilationflags_t& flags) {
     //////////////////////////////
     // SETUP INITIAL BYTECODE SIZE
     viua::internals::types::bytecode_size bytes = 0;
@@ -368,8 +403,10 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
     /////////////////////////////////////////
     // CHECK IF MAIN FUNCTION RETURNS A VALUE
     // FIXME: this is just a crude check - it does not acctually checks if these instructions set 0 register
-    // this must be better implemented or we will receive "function did not set return register" exceptions at runtime
-    bool main_is_defined = (find(functions.names.begin(), functions.names.end(), main_function) != functions.names.end());
+    // this must be better implemented or we will receive "function did not set return register" exceptions at
+    // runtime
+    bool main_is_defined =
+        (find(functions.names.begin(), functions.names.end(), main_function) != functions.names.end());
     if (not flags.as_lib and main_is_defined) {
         check_main_function(main_function, functions.tokens.at(main_function));
     }
@@ -388,25 +425,26 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
     // MAP FUNCTIONS TO ADDRESSES AND
     // MAP BLOCKS TO ADDRESSES AND
     // SET STARTING INSTRUCTION
-    viua::internals::types::bytecode_size starting_instruction = 0;  // the bytecode offset to first executable instruction
+    viua::internals::types::bytecode_size starting_instruction =
+        0;  // the bytecode offset to first executable instruction
     map<string, viua::internals::types::bytecode_size> function_addresses;
     map<string, viua::internals::types::bytecode_size> block_addresses;
     try {
         block_addresses = mapInvocableAddresses(starting_instruction, blocks);
         function_addresses = mapInvocableAddresses(starting_instruction, functions);
         bytes = viua::cg::tools::calculate_bytecode_size2(tokens);
-    } catch (const string& e) {
-        throw ("bytecode size calculation failed: " + e);
-    }
+    } catch (const string& e) { throw("bytecode size calculation failed: " + e); }
 
 
     /////////////////////////////////////////////////////////
     // GATHER LINKS, GET THEIR SIZES AND ADJUST BYTECODE SIZE
     vector<string> links = assembler::ce::getlinks(tokens);
-    vector<tuple<string, viua::internals::types::bytecode_size, std::unique_ptr<viua::internals::types::byte[]>> > linked_libs_bytecode;
+    vector<
+        tuple<string, viua::internals::types::bytecode_size, std::unique_ptr<viua::internals::types::byte[]>>>
+        linked_libs_bytecode;
     vector<string> linked_function_names;
     vector<string> linked_block_names;
-    map<string, vector<viua::internals::types::bytecode_size> > linked_libs_jumptables;
+    map<string, vector<viua::internals::types::bytecode_size>> linked_libs_jumptables;
 
     // map of symbol names to name of the module the symbol came from
     map<string, string> symbol_sources;
@@ -418,7 +456,7 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
         if (find(links.begin(), links.end(), lnk) == links.end()) {
             links.emplace_back(lnk);
         } else {
-            throw ("requested to link module '" + lnk + "' more than once");
+            throw("requested to link module '" + lnk + "' more than once");
         }
     }
 
@@ -430,13 +468,14 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
         vector<string> fn_names = loader.getFunctions();
         for (string fn : fn_names) {
             if (function_addresses.count(fn)) {
-                throw ("duplicate symbol '" + fn + "' found when linking '" + lnk + "' (previously found in '" + symbol_sources.at(fn) + "')");
+                throw("duplicate symbol '" + fn + "' found when linking '" + lnk +
+                      "' (previously found in '" + symbol_sources.at(fn) + "')");
             }
         }
 
         map<string, viua::internals::types::bytecode_size> fn_addresses = loader.getFunctionAddresses();
         for (string fn : fn_names) {
-            function_addresses[fn] = 0; // for now we just build a list of all available functions
+            function_addresses[fn] = 0;  // for now we just build a list of all available functions
             symbol_sources[fn] = lnk;
             linked_function_names.emplace_back(fn);
             if (DEBUG) {
@@ -457,7 +496,9 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
     //////////////////////////////////////////////////////////////
     // EXTEND FUNCTION NAMES VECTOR WITH NAMES OF LINKED FUNCTIONS
     auto local_function_names = functions.names;
-    for (string name : linked_function_names) { functions.names.emplace_back(name); }
+    for (string name : linked_function_names) {
+        functions.names.emplace_back(name);
+    }
 
 
     if (not flags.as_lib) {
@@ -477,7 +518,8 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
                 cout << ": ";
                 cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << f << send_control_seq(ATTR_RESET);
                 cout << " function found in module ";
-                cout << send_control_seq(COLOR_FG_WHITE) << symbol_sources.at(f) << send_control_seq(ATTR_RESET);
+                cout << send_control_seq(COLOR_FG_WHITE) << symbol_sources.at(f)
+                     << send_control_seq(ATTR_RESET);
                 cout << endl;
             }
             throw "more than one candidate for main function";
@@ -491,7 +533,8 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
     //////////////////////////
     // GENERATE ENTRY FUNCTION
     if (not flags.as_lib) {
-        bytes = generate_entry_function(bytes, function_addresses, functions, main_function, starting_instruction);
+        bytes = generate_entry_function(bytes, function_addresses, functions, main_function,
+                                        starting_instruction);
     }
 
 
@@ -534,7 +577,8 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
                 cout << ": ";
                 cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
                 cout << ": ";
-                cout << "\"" << send_control_seq(COLOR_FG_LIGHT_GREEN) << fn << send_control_seq(ATTR_RESET) << "\": ";
+                cout << "\"" << send_control_seq(COLOR_FG_LIGHT_GREEN) << fn << send_control_seq(ATTR_RESET)
+                     << "\": ";
                 cout << "entry point at byte: " << current_link_offset << '+' << fn_addresses.at(fn);
                 cout << endl;
             }
@@ -566,8 +610,8 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
         cout << ": ";
         cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
         cout << ": ";
-        cout << "required bytes: " << (bytes-(bytes-current_link_offset)) << " local, ";
-        cout << (bytes-current_link_offset) << " linked";
+        cout << "required bytes: " << (bytes - (bytes - current_link_offset)) << " local, ";
+        cout << (bytes - current_link_offset) << " linked";
         cout << endl;
     }
 
@@ -593,16 +637,21 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
     //
     // BYTECODE IS GENERATED HERE BUT NOT YET WRITTEN TO FILE
     // THIS MUST BE GENERATED HERE TO OBTAIN FILL JUMP TABLE
-    map<string, tuple<viua::internals::types::bytecode_size, unique_ptr<viua::internals::types::byte[]>>> functions_bytecode;
-    map<string, tuple<viua::internals::types::bytecode_size, unique_ptr<viua::internals::types::byte[]>>> block_bodies_bytecode;
+    map<string, tuple<viua::internals::types::bytecode_size, unique_ptr<viua::internals::types::byte[]>>>
+        functions_bytecode;
+    map<string, tuple<viua::internals::types::bytecode_size, unique_ptr<viua::internals::types::byte[]>>>
+        block_bodies_bytecode;
     viua::internals::types::bytecode_size functions_section_size = 0;
     viua::internals::types::bytecode_size block_bodies_section_size = 0;
 
-    vector<tuple<viua::internals::types::bytecode_size, viua::internals::types::bytecode_size> > jump_positions;
+    vector<tuple<viua::internals::types::bytecode_size, viua::internals::types::bytecode_size>>
+        jump_positions;
 
     for (string name : blocks.names) {
         // do not generate bytecode for blocks that were linked
-        if (find(linked_block_names.begin(), linked_block_names.end(), name) != linked_block_names.end()) { continue; }
+        if (find(linked_block_names.begin(), linked_block_names.end(), name) != linked_block_names.end()) {
+            continue;
+        }
 
         if (VERBOSE or DEBUG) {
             cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
@@ -620,10 +669,8 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
                 cout << " (" << fun_bytes << " bytes at byte " << block_bodies_section_size << ')' << endl;
             }
         } catch (const string& e) {
-            throw ("failed block size count (during pre-assembling): " + e);
-        } catch (const std::out_of_range& e) {
-            throw ("in block '" + name + "': " + e.what());
-        }
+            throw("failed block size count (during pre-assembling): " + e);
+        } catch (const std::out_of_range& e) { throw("in block '" + name + "': " + e.what()); }
 
         Program func(fun_bytes);
         func.setdebug(DEBUG).setscream(SCREAM);
@@ -638,17 +685,14 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
                 cout << "'\n";
             }
             assemble(func, blocks.tokens.at(name));
-        } catch (const string& e) {
-            throw ("in block '" + name + "': " + e);
-        } catch (const char*& e) {
-            throw ("in block '" + name + "': " + e);
-        } catch (const std::out_of_range& e) {
-            throw ("in block '" + name + "': " + e.what());
-        }
+        } catch (const string& e) { throw("in block '" + name + "': " + e); } catch (const char*& e) {
+            throw("in block '" + name + "': " + e);
+        } catch (const std::out_of_range& e) { throw("in block '" + name + "': " + e.what()); }
 
         vector<viua::internals::types::bytecode_size> jumps = func.jumps();
 
-        vector<tuple<viua::internals::types::bytecode_size, viua::internals::types::bytecode_size> > local_jumps;
+        vector<tuple<viua::internals::types::bytecode_size, viua::internals::types::bytecode_size>>
+            local_jumps;
         for (auto jmp : jumps) {
             local_jumps.emplace_back(jmp, block_bodies_section_size);
         }
@@ -656,8 +700,10 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
 
         auto btcode = func.bytecode();
 
-        // store generated bytecode fragment for future use (we must not yet write it to the file to conform to bytecode format)
-        block_bodies_bytecode[name] = tuple<viua::internals::types::bytecode_size, decltype(btcode)>(func.size(), std::move(btcode));
+        // store generated bytecode fragment for future use (we must not yet write it to the file to conform
+        // to bytecode format)
+        block_bodies_bytecode[name] =
+            tuple<viua::internals::types::bytecode_size, decltype(btcode)>(func.size(), std::move(btcode));
 
         // extend jump table with jumps from current block
         for (decltype(jumps)::size_type i = 0; i < jumps.size(); ++i) {
@@ -667,9 +713,10 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
                 cout << ": ";
                 cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
                 cout << ": ";
-                cout << "pushed relative jump to jump table: " << jmp << '+' << block_bodies_section_size << endl;
+                cout << "pushed relative jump to jump table: " << jmp << '+' << block_bodies_section_size
+                     << endl;
             }
-            jump_table.emplace_back(jmp+block_bodies_section_size);
+            jump_table.emplace_back(jmp + block_bodies_section_size);
         }
 
         block_bodies_section_size += func.size();
@@ -680,7 +727,10 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
 
     for (string name : functions.names) {
         // do not generate bytecode for functions that were linked
-        if (find(linked_function_names.begin(), linked_function_names.end(), name) != linked_function_names.end()) { continue; }
+        if (find(linked_function_names.begin(), linked_function_names.end(), name) !=
+            linked_function_names.end()) {
+            continue;
+        }
 
         if (VERBOSE or DEBUG) {
             cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
@@ -698,10 +748,8 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
                 cout << " (" << fun_bytes << " bytes at byte " << functions_section_size << ')' << endl;
             }
         } catch (const string& e) {
-            throw ("failed function size count (during pre-assembling): " + e);
-        } catch (const std::out_of_range& e) {
-            throw e.what();
-        }
+            throw("failed function size count (during pre-assembling): " + e);
+        } catch (const std::out_of_range& e) { throw e.what(); }
 
         Program func(fun_bytes);
         func.setdebug(DEBUG).setscream(SCREAM);
@@ -717,31 +765,23 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
             }
             assemble(func, functions.tokens.at(name));
         } catch (const string& e) {
-            string msg = ("in function '"
-                          + send_control_seq(COLOR_FG_LIGHT_GREEN) + name
-                          + send_control_seq(ATTR_RESET)
-                          + "': " + e
-                          );
+            string msg = ("in function '" + send_control_seq(COLOR_FG_LIGHT_GREEN) + name +
+                          send_control_seq(ATTR_RESET) + "': " + e);
             throw msg;
         } catch (const char*& e) {
-            string msg = ("in function '"
-                          + send_control_seq(COLOR_FG_LIGHT_GREEN) + name
-                          + send_control_seq(ATTR_RESET)
-                          + "': " + e
-                          );
+            string msg = ("in function '" + send_control_seq(COLOR_FG_LIGHT_GREEN) + name +
+                          send_control_seq(ATTR_RESET) + "': " + e);
             throw msg;
         } catch (const std::out_of_range& e) {
-            string msg = ("in function '"
-                          + send_control_seq(COLOR_FG_LIGHT_GREEN) + name
-                          + send_control_seq(ATTR_RESET)
-                          + "': " + e.what()
-                          );
+            string msg = ("in function '" + send_control_seq(COLOR_FG_LIGHT_GREEN) + name +
+                          send_control_seq(ATTR_RESET) + "': " + e.what());
             throw msg;
         }
 
         vector<viua::internals::types::bytecode_size> jumps = func.jumps();
 
-        vector<tuple<viua::internals::types::bytecode_size, viua::internals::types::bytecode_size> > local_jumps;
+        vector<tuple<viua::internals::types::bytecode_size, viua::internals::types::bytecode_size>>
+            local_jumps;
         for (decltype(jumps)::size_type i = 0; i < jumps.size(); ++i) {
             viua::internals::types::bytecode_size jmp = jumps[i];
             local_jumps.emplace_back(jmp, functions_section_size);
@@ -750,8 +790,10 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
 
         auto btcode = func.bytecode();
 
-        // store generated bytecode fragment for future use (we must not yet write it to the file to conform to bytecode format)
-        functions_bytecode[name] = tuple<viua::internals::types::bytecode_size, decltype(btcode)>{func.size(), std::move(btcode)};
+        // store generated bytecode fragment for future use (we must not yet write it to the file to conform
+        // to bytecode format)
+        functions_bytecode[name] =
+            tuple<viua::internals::types::bytecode_size, decltype(btcode)>{func.size(), std::move(btcode)};
 
         // extend jump table with jumps from current function
         for (decltype(jumps)::size_type i = 0; i < jumps.size(); ++i) {
@@ -761,9 +803,10 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
                 cout << ": ";
                 cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
                 cout << ": ";
-                cout << "pushed relative jump to jump table: " << jmp << '+' << functions_section_size << endl;
+                cout << "pushed relative jump to jump table: " << jmp << '+' << functions_section_size
+                     << endl;
             }
-            jump_table.emplace_back(jmp+functions_section_size);
+            jump_table.emplace_back(jmp + functions_section_size);
         }
 
         functions_section_size += func.size();
@@ -774,7 +817,7 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
     // CREATE OFSTREAM TO WRITE BYTECODE OUT
     ofstream out(compilename, ios::out | ios::binary);
 
-    out.write(VIUA_MAGIC_NUMBER, sizeof(char)*5);
+    out.write(VIUA_MAGIC_NUMBER, sizeof(char) * 5);
     if (flags.as_lib) {
         out.write(&VIUA_LINKABLE, sizeof(ViuaBinaryType));
     } else {
@@ -833,7 +876,7 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
     // WRITE EXTERNAL FUNCTION SIGNATURES
     viua::internals::types::bytecode_size signatures_section_size = 0;
     for (const auto each : functions.signatures) {
-        signatures_section_size += (each.size() + 1); // +1 for null byte after each signature
+        signatures_section_size += (each.size() + 1);  // +1 for null byte after each signature
     }
     bwrite(out, signatures_section_size);
     for (const auto each : functions.signatures) {
@@ -845,7 +888,7 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
     // WRITE EXTERNAL BLOCK SIGNATURES
     signatures_section_size = 0;
     for (const auto each : blocks.signatures) {
-        signatures_section_size += (each.size() + 1); // +1 for null byte after each signature
+        signatures_section_size += (each.size() + 1);  // +1 for null byte after each signature
     }
     bwrite(out, signatures_section_size);
     for (const auto each : blocks.signatures) {
@@ -855,8 +898,10 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
 
     /////////////////////////////////////////////////////////////
     // WRITE BLOCK AND FUNCTION ENTRY POINT ADDRESSES TO BYTECODE
-    viua::internals::types::bytecode_size functions_size_so_far = writeCodeBlocksSection(out, blocks, linked_block_names);
-    functions_size_so_far = writeCodeBlocksSection(out, functions, linked_function_names, functions_size_so_far);
+    viua::internals::types::bytecode_size functions_size_so_far =
+        writeCodeBlocksSection(out, blocks, linked_block_names);
+    functions_size_so_far =
+        writeCodeBlocksSection(out, functions, linked_function_names, functions_size_so_far);
     for (string name : linked_function_names) {
         strwrite(out, name);
         // mapped address must come after name
@@ -869,14 +914,16 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
     // WRITE BYTECODE SIZE
     bwrite(out, bytes);
 
-    unique_ptr<viua::internals::types::byte[]> program_bytecode {new viua::internals::types::byte[bytes]};
+    unique_ptr<viua::internals::types::byte[]> program_bytecode{new viua::internals::types::byte[bytes]};
     viua::internals::types::bytecode_size program_bytecode_used = 0;
 
     ////////////////////////////////////////////////////
     // WRITE BYTECODE OF LOCAL BLOCKS TO BYTECODE BUFFER
     for (string name : blocks.names) {
         // linked blocks are to be inserted later
-        if (find(linked_block_names.begin(), linked_block_names.end(), name) != linked_block_names.end()) { continue; }
+        if (find(linked_block_names.begin(), linked_block_names.end(), name) != linked_block_names.end()) {
+            continue;
+        }
 
         if (DEBUG) {
             cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
@@ -891,7 +938,7 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
         viua::internals::types::byte* fun_bytecode = get<1>(block_bodies_bytecode[name]).get();
 
         for (viua::internals::types::bytecode_size i = 0; i < fun_size; ++i) {
-            program_bytecode[program_bytecode_used+i] = fun_bytecode[i];
+            program_bytecode[program_bytecode_used + i] = fun_bytecode[i];
         }
         program_bytecode_used += fun_size;
     }
@@ -901,7 +948,10 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
     // WRITE BYTECODE OF LOCAL FUNCTIONS TO BYTECODE BUFFER
     for (string name : functions.names) {
         // linked functions are to be inserted later
-        if (find(linked_function_names.begin(), linked_function_names.end(), name) != linked_function_names.end()) { continue; }
+        if (find(linked_function_names.begin(), linked_function_names.end(), name) !=
+            linked_function_names.end()) {
+            continue;
+        }
 
         if (DEBUG) {
             cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
@@ -916,7 +966,7 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
         viua::internals::types::byte* fun_bytecode = get<1>(functions_bytecode[name]).get();
 
         for (viua::internals::types::bytecode_size i = 0; i < fun_size; ++i) {
-            program_bytecode[program_bytecode_used+i] = fun_bytecode[i];
+            program_bytecode[program_bytecode_used + i] = fun_bytecode[i];
         }
         program_bytecode_used += fun_size;
     }
@@ -929,7 +979,7 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
         viua::internals::types::byte* linked_bytecode = get<2>(lnk).get();
         viua::internals::types::bytecode_size linked_size = get<1>(lnk);
 
-        //tie(lib_name, linked_size, linked_bytecode) = lnk;
+        // tie(lib_name, linked_size, linked_bytecode) = lnk;
 
         if (VERBOSE or DEBUG) {
             cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
@@ -945,26 +995,27 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
         try {
             linked_jumptable = linked_libs_jumptables[lib_name];
         } catch (const std::out_of_range& e) {
-            throw ("[linker] could not find jumptable for '" + lib_name + "' (maybe not loaded?)");
+            throw("[linker] could not find jumptable for '" + lib_name + "' (maybe not loaded?)");
         }
 
         viua::internals::types::bytecode_size jmp, jmp_target;
         for (decltype(linked_jumptable)::size_type i = 0; i < linked_jumptable.size(); ++i) {
             jmp = linked_jumptable[i];
             // we know what we're doing here
-            jmp_target = *reinterpret_cast<viua::internals::types::bytecode_size*>(linked_bytecode+jmp);
+            jmp_target = *reinterpret_cast<viua::internals::types::bytecode_size*>(linked_bytecode + jmp);
             if (DEBUG) {
                 cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
                 cout << ": ";
                 cout << send_control_seq(COLOR_FG_YELLOW) << "debug" << send_control_seq(ATTR_RESET);
                 cout << ": ";
-                cout << "adjusting jump: at position " << jmp << ", " << jmp_target << '+' << bytes_offset << " -> " << (jmp_target+bytes_offset) << endl;
+                cout << "adjusting jump: at position " << jmp << ", " << jmp_target << '+' << bytes_offset
+                     << " -> " << (jmp_target + bytes_offset) << endl;
             }
-            *reinterpret_cast<viua::internals::types::bytecode_size*>(linked_bytecode+jmp) += bytes_offset;
+            *reinterpret_cast<viua::internals::types::bytecode_size*>(linked_bytecode + jmp) += bytes_offset;
         }
 
         for (decltype(linked_size) i = 0; i < linked_size; ++i) {
-            program_bytecode[program_bytecode_used+i] = linked_bytecode[i];
+            program_bytecode[program_bytecode_used + i] = linked_bytecode[i];
         }
         program_bytecode_used += linked_size;
     }

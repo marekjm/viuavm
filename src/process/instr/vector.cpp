@@ -18,47 +18,50 @@
  */
 
 #include <memory>
+#include <viua/assert.h>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/decoder/operands.h>
-#include <viua/assert.h>
-#include <viua/types/value.h>
-#include <viua/types/integer.h>
-#include <viua/types/vector.h>
-#include <viua/types/pointer.h>
-#include <viua/kernel/registerset.h>
 #include <viua/kernel/kernel.h>
+#include <viua/kernel/registerset.h>
+#include <viua/types/integer.h>
+#include <viua/types/pointer.h>
+#include <viua/types/value.h>
+#include <viua/types/vector.h>
 using namespace std;
 
 
 viua::internals::types::byte* viua::process::Process::opvec(viua::internals::types::byte* addr) {
     viua::internals::RegisterSets target_rs = viua::internals::RegisterSets::CURRENT;
     viua::internals::types::register_index target_ri = 0;
-    tie(addr, target_rs, target_ri) = viua::bytecode::decoder::operands::fetch_register_type_and_index(addr, this);
+    tie(addr, target_rs, target_ri) =
+        viua::bytecode::decoder::operands::fetch_register_type_and_index(addr, this);
 
     viua::internals::RegisterSets pack_start_rs = viua::internals::RegisterSets::CURRENT;
     viua::internals::types::register_index pack_start_ri = 0;
-    tie(addr, pack_start_rs, pack_start_ri) = viua::bytecode::decoder::operands::fetch_register_type_and_index(addr, this);
+    tie(addr, pack_start_rs, pack_start_ri) =
+        viua::bytecode::decoder::operands::fetch_register_type_and_index(addr, this);
 
     viua::internals::types::register_index pack_size = 0;
     tie(addr, pack_size) = viua::bytecode::decoder::operands::fetch_register_index(addr, this);
 
-    if ((target_ri > pack_start_ri) and (target_ri < (pack_start_ri+pack_size))) {
-        // FIXME vector is inserted into a register after packing, so this exception is not entirely well thought-out
+    if ((target_ri > pack_start_ri) and (target_ri < (pack_start_ri + pack_size))) {
+        // FIXME vector is inserted into a register after packing, so this exception is not entirely well
+        // thought-out
         // allow packing target register
         throw new viua::types::Exception("vec would pack itself");
     }
-    if ((pack_start_ri+pack_size) >= currently_used_register_set->size()) {
+    if ((pack_start_ri + pack_size) >= currently_used_register_set->size()) {
         throw new viua::types::Exception("vec: packing outside of register set range");
     }
     for (decltype(pack_size) i = 0; i < pack_size; ++i) {
-        if (register_at(pack_start_ri+i, pack_start_rs)->empty()) {
+        if (register_at(pack_start_ri + i, pack_start_rs)->empty()) {
             throw new viua::types::Exception("vec: cannot pack null register");
         }
     }
 
     unique_ptr<viua::types::Vector> v(new viua::types::Vector());
     for (decltype(pack_size) i = 0; i < pack_size; ++i) {
-        v->push(register_at(pack_start_ri+i, pack_start_rs)->give());
+        v->push(register_at(pack_start_ri + i, pack_start_rs)->give());
     }
 
     *register_at(target_ri, target_rs) = std::move(v);
@@ -68,7 +71,8 @@ viua::internals::types::byte* viua::process::Process::opvec(viua::internals::typ
 
 viua::internals::types::byte* viua::process::Process::opvinsert(viua::internals::types::byte* addr) {
     viua::types::Vector* vector_operand = nullptr;
-    tie(addr, vector_operand) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Vector>(addr, this);
+    tie(addr, vector_operand) =
+        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Vector>(addr, this);
 
     unique_ptr<viua::types::Value> object;
     if (viua::bytecode::decoder::operands::get_operand_type(addr) == OT_POINTER) {
@@ -120,13 +124,15 @@ viua::internals::types::byte* viua::process::Process::opvpop(viua::internals::ty
     }
 
     viua::types::Vector* vector_operand = nullptr;
-    tie(addr, vector_operand) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Vector>(addr, this);
+    tie(addr, vector_operand) =
+        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Vector>(addr, this);
 
     viua::types::Integer* index_operand = nullptr;
     int64_t position_operand_index = -1;
 
     if (not viua::bytecode::decoder::operands::is_void(addr)) {
-        tie(addr, index_operand) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
+        tie(addr, index_operand) =
+            viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
         position_operand_index = index_operand->as_integer();
     } else {
         addr = viua::bytecode::decoder::operands::fetch_void(addr);
@@ -145,10 +151,12 @@ viua::internals::types::byte* viua::process::Process::opvat(viua::internals::typ
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
     viua::types::Vector* vector_operand = nullptr;
-    tie(addr, vector_operand) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Vector>(addr, this);
+    tie(addr, vector_operand) =
+        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Vector>(addr, this);
 
     viua::types::Integer* index_operand = nullptr;
-    tie(addr, index_operand) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
+    tie(addr, index_operand) =
+        viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
 
     *target = vector_operand->at(index_operand->as_integer())->pointer(this);
 

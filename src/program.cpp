@@ -21,11 +21,11 @@
 #include <iostream>
 #include <memory>
 #include <sstream>
-#include <viua/support/string.h>
-#include <viua/bytecode/opcodes.h>
 #include <viua/bytecode/maps.h>
+#include <viua/bytecode/opcodes.h>
 #include <viua/cg/tools.h>
 #include <viua/program.h>
+#include <viua/support/string.h>
 using namespace std;
 
 
@@ -35,7 +35,7 @@ auto Program::bytecode() const -> unique_ptr<viua::internals::types::byte[]> {
      *
      *  Calling code is responsible for proper destruction of the allocated memory.
      */
-    unique_ptr<viua::internals::types::byte[]> tmp { new viua::internals::types::byte[bytes] };
+    unique_ptr<viua::internals::types::byte[]> tmp{new viua::internals::types::byte[bytes]};
     for (decltype(bytes) i = 0; i < bytes; ++i) {
         tmp[i] = program[i];
     }
@@ -77,7 +77,7 @@ uint64_t Program::size() {
 }
 
 using Token = viua::cg::lex::Token;
-Program& Program::calculateJumps(vector<tuple<uint64_t, uint64_t> > jump_positions, vector<Token>& tokens) {
+Program& Program::calculateJumps(vector<tuple<uint64_t, uint64_t>> jump_positions, vector<Token>& tokens) {
     /** Calculate jump targets in given bytecode.
      */
     uint64_t* ptr = nullptr;
@@ -88,15 +88,18 @@ Program& Program::calculateJumps(vector<tuple<uint64_t, uint64_t> > jump_positio
         tie(position, offset) = jmp;
 
         // usually beware of the reinterpret_cast<>'s but here we *know* what we're doing
-        // we *know* that this location points to uint64_t even if it is stored inside the viua::internals::types::byte array
-        ptr = reinterpret_cast<uint64_t*>(program+position);
+        // we *know* that this location points to uint64_t even if it is stored inside the
+        // viua::internals::types::byte array
+        ptr = reinterpret_cast<uint64_t*>(program + position);
         if (debug) {
-            cout << "[bcgen:jump] calculating jump at " << position << " (target: " << *ptr << ") with offset " << offset << endl;
+            cout << "[bcgen:jump] calculating jump at " << position << " (target: " << *ptr
+                 << ") with offset " << offset << endl;
         }
         adjustment = viua::cg::tools::calculate_bytecode_size_of_first_n_instructions2(tokens, *ptr);
         (*ptr) = (offset + adjustment);
         if (debug) {
-            cout << "[bcgen:jump] calculated jump at " << position << " (total: " << adjustment << ") with offset " << offset << " = ";
+            cout << "[bcgen:jump] calculated jump at " << position << " (total: " << adjustment
+                 << ") with offset " << offset << " = ";
             cout << *ptr << endl;
         }
     }
@@ -108,31 +111,33 @@ vector<uint64_t> Program::jumps() {
     /** Returns vector if bytecode points which contain jumps.
      */
     vector<uint64_t> jmps;
-    for (viua::internals::types::byte* jmp : branches) { jmps.push_back( static_cast<uint64_t>(jmp-program) ); }
+    for (viua::internals::types::byte* jmp : branches) {
+        jmps.push_back(static_cast<uint64_t>(jmp - program));
+    }
     return jmps;
 }
 
-Program::Program(uint64_t bts): bytes(bts), debug(false), scream(false) {
+Program::Program(uint64_t bts) : bytes(bts), debug(false), scream(false) {
     program = new viua::internals::types::byte[bytes];
     /* Filling bytecode with zeroes (which are interpreted by kernel as NOP instructions) is a safe way
      * to prevent many hiccups.
      */
-    for (decltype(bytes) i = 0; i < bytes; ++i) { program[i] = viua::internals::types::byte(0); }
+    for (decltype(bytes) i = 0; i < bytes; ++i) {
+        program[i] = viua::internals::types::byte(0);
+    }
     addr_ptr = program;
 }
-Program::Program(const Program& that): program(nullptr), bytes(that.bytes), addr_ptr(nullptr), branches({}) {
+Program::Program(const Program& that) : program(nullptr), bytes(that.bytes), addr_ptr(nullptr), branches({}) {
     program = new viua::internals::types::byte[bytes];
     for (decltype(bytes) i = 0; i < bytes; ++i) {
         program[i] = that.program[i];
     }
-    addr_ptr = program+(that.addr_ptr - that.program);
+    addr_ptr = program + (that.addr_ptr - that.program);
     for (unsigned i = 0; i < that.branches.size(); ++i) {
-        branches.push_back(program+(that.branches[i]-that.program));
+        branches.push_back(program + (that.branches[i] - that.program));
     }
 }
-Program::~Program() {
-    delete[] program;
-}
+Program::~Program() { delete[] program; }
 Program& Program::operator=(const Program& that) {
     if (this != &that) {
         delete[] program;
@@ -141,10 +146,12 @@ Program& Program::operator=(const Program& that) {
         for (decltype(bytes) i = 0; i < bytes; ++i) {
             program[i] = that.program[i];
         }
-        addr_ptr = program+(that.addr_ptr - that.program);
-        while (branches.size()) { branches.pop_back(); }
+        addr_ptr = program + (that.addr_ptr - that.program);
+        while (branches.size()) {
+            branches.pop_back();
+        }
         for (unsigned i = 0; i < that.branches.size(); ++i) {
-            branches.push_back(program+(that.branches[i]-that.program));
+            branches.push_back(program + (that.branches[i] - that.program));
         }
     }
     return (*this);

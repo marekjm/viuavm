@@ -19,12 +19,12 @@
 
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/decoder/operands.h>
+#include <viua/exceptions.h>
+#include <viua/kernel/kernel.h>
+#include <viua/kernel/registerset.h>
+#include <viua/scheduler/vps.h>
 #include <viua/types/integer.h>
 #include <viua/types/prototype.h>
-#include <viua/exceptions.h>
-#include <viua/kernel/registerset.h>
-#include <viua/kernel/kernel.h>
-#include <viua/scheduler/vps.h>
 using namespace std;
 
 
@@ -72,8 +72,10 @@ viua::internals::types::byte* viua::process::Process::opattach(viua::internals::
 
     viua::types::Prototype* proto = static_cast<viua::types::Prototype*>(target->get());
 
-    if (not (scheduler->isNativeFunction(function_name) or scheduler->isForeignFunction(function_name))) {
-        throw new viua::types::Exception("cannot attach undefined function '" + function_name + "' as a method '" + method_name + "' of prototype '" + proto->getTypeName() + "'");
+    if (not(scheduler->isNativeFunction(function_name) or scheduler->isForeignFunction(function_name))) {
+        throw new viua::types::Exception("cannot attach undefined function '" + function_name +
+                                         "' as a method '" + method_name + "' of prototype '" +
+                                         proto->getTypeName() + "'");
     }
 
     proto->attach(function_name, method_name);
@@ -87,7 +89,7 @@ viua::internals::types::byte* viua::process::Process::opregister(viua::internals
     viua::kernel::Register* source = nullptr;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    unique_ptr<viua::types::Prototype> prototype {static_cast<viua::types::Prototype*>(source->release())};
+    unique_ptr<viua::types::Prototype> prototype{static_cast<viua::types::Prototype*>(source->release())};
     scheduler->registerPrototype(std::move(prototype));
 
     return addr;

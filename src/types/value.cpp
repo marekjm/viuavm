@@ -17,27 +17,23 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
 #include <algorithm>
-#include <string>
+#include <iostream>
 #include <sstream>
-#include <viua/types/value.h>
-#include <viua/types/pointer.h>
+#include <string>
 #include <viua/types/exception.h>
+#include <viua/types/pointer.h>
+#include <viua/types/value.h>
 using namespace std;
 
 
-string viua::types::Value::type() const {
-    return "Value";
-}
+string viua::types::Value::type() const { return "Value"; }
 string viua::types::Value::str() const {
     ostringstream s;
     s << "<'" << type() << "' object at " << this << ">";
     return s.str();
 }
-string viua::types::Value::repr() const {
-    return str();
-}
+string viua::types::Value::repr() const { return str(); }
 bool viua::types::Value::boolean() const {
     /*  Boolean defaults to false.
      *  This is because in if, loops etc. we will NOT execute code depending on unknown state.
@@ -48,17 +44,14 @@ bool viua::types::Value::boolean() const {
 }
 
 
-unique_ptr<viua::types::Pointer> viua::types::Value::pointer(const viua::process::Process *process_of_origin) {
+unique_ptr<viua::types::Pointer> viua::types::Value::pointer(
+    const viua::process::Process* process_of_origin) {
     return unique_ptr<viua::types::Pointer>{new viua::types::Pointer(this, process_of_origin)};
 }
 
 
-vector<string> viua::types::Value::bases() const {
-    return vector<string>{"Value"};
-}
-vector<string> viua::types::Value::inheritancechain() const {
-    return vector<string>{"Value"};
-}
+vector<string> viua::types::Value::bases() const { return vector<string>{"Value"}; }
+vector<string> viua::types::Value::inheritancechain() const { return vector<string>{"Value"}; }
 
 
 viua::types::Value::~Value() {
