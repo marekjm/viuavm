@@ -58,37 +58,37 @@ static auto alu_impl(viua::internals::types::byte* addr, viua::process::Process*
 }
 
 viua::internals::types::byte* viua::process::Process::opadd(viua::internals::types::byte* addr) {
-    return alu_impl < ArithmeticOp, &viua::types::numeric::Number::operator+>(addr, this);
+    return alu_impl<ArithmeticOp, (&viua::types::numeric::Number::operator+)>(addr, this);
 }
 
 viua::internals::types::byte* viua::process::Process::opsub(viua::internals::types::byte* addr) {
-    return alu_impl < ArithmeticOp, &viua::types::numeric::Number::operator->(addr, this);
+    return alu_impl<ArithmeticOp, (&viua::types::numeric::Number::operator-)>(addr, this);
 }
 
 viua::internals::types::byte* viua::process::Process::opmul(viua::internals::types::byte* addr) {
-    return alu_impl < ArithmeticOp, &viua::types::numeric::Number::operator*>(addr, this);
+    return alu_impl<ArithmeticOp, (&viua::types::numeric::Number::operator*)>(addr, this);
 }
 
 viua::internals::types::byte* viua::process::Process::opdiv(viua::internals::types::byte* addr) {
-    return alu_impl < ArithmeticOp, &viua::types::numeric::Number::operator/>(addr, this);
+    return alu_impl<ArithmeticOp, (&viua::types::numeric::Number::operator/)>(addr, this);
 }
 
 viua::internals::types::byte* viua::process::Process::oplt(viua::internals::types::byte* addr) {
-    return alu_impl < LogicOp, &viua::types::numeric::Number::operator<>(addr, this);
+    return alu_impl<LogicOp, (&viua::types::numeric::Number::operator<)>(addr, this);
 }
 
 viua::internals::types::byte* viua::process::Process::oplte(viua::internals::types::byte* addr) {
-    return alu_impl < LogicOp, &viua::types::numeric::Number::operator<=>(addr, this);
+    return alu_impl<LogicOp, (&viua::types::numeric::Number::operator<=)>(addr, this);
 }
 
 viua::internals::types::byte* viua::process::Process::opgt(viua::internals::types::byte* addr) {
-    return alu_impl < LogicOp, &viua::types::numeric::Number::operator>>(addr, this);
+    return alu_impl<LogicOp, ((&viua::types::numeric::Number::operator>))>(addr, this);
 }
 
 viua::internals::types::byte* viua::process::Process::opgte(viua::internals::types::byte* addr) {
-    return alu_impl < LogicOp, &viua::types::numeric::Number::operator>=>(addr, this);
+    return alu_impl<LogicOp, (&viua::types::numeric::Number::operator>=)>(addr, this);
 }
 
 viua::internals::types::byte* viua::process::Process::opeq(viua::internals::types::byte* addr) {
-    return alu_impl < LogicOp, &viua::types::numeric::Number::operator==>(addr, this);
+    return alu_impl<LogicOp, (&viua::types::numeric::Number::operator==)>(addr, this);
 }
