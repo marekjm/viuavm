@@ -14,6 +14,21 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+;
+;   EDIT #1, 2017, by Marek Marecki
+;
+;   Compile this with --no-sa option.
+;   It is not a bug in Harald's code, but rather a limitation of
+;   Viua's static analyser (it can't go "back" so it sees some registers as
+;   unused while they would be in fact used at a later moment after
+;   taking a jump).
+;
+;   EDIT #2, 2017, by Marek Marecki
+;
+;   Added 'local' after 'izero' at the end of main function to conform
+;   to Viua spec.
+;
+
 .function: main/1
     istore %0 99
 
@@ -64,6 +79,6 @@
     if %8 one_beer
     if %0 again
 
-    izero %0
+    izero %0 local
     return
 .end
