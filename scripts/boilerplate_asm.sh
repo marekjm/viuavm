@@ -6,7 +6,7 @@ set -e
 # stub for main/0 function to the standard output.
 
 echo ";
-;   Copyright (C) `date '+%Y'` `git config --get user.name`
+;   Copyright (C) `date '+%Y'` `git config --get user.name` <`git config --get user.email`>
 ;
 ;   This file is part of Viua VM.
 ;
