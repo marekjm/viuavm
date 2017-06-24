@@ -161,6 +161,14 @@ A typical session is shown below (assuming current working directory is the loca
 
 ----
 
+## Contributing
+
+Please read [CONTRIBUTING.markdown](./CONTRIBUTING.markdown) for details on development setup, and
+the process for submitting pull requests, bug reports, and feature suggestions.
+
+
+----
+
 ## License
 
 The code is licensed under GNU GPL v3.
