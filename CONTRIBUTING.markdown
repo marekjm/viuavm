@@ -108,3 +108,58 @@ When submitting a patch make sure that it is formatted according to the coding s
 An appropriate `.clang-format` file is included in the repository.
 Use it to format your code before commiting.
 Documentation for `clang-format`: https://clang.llvm.org/docs/ClangFormat.html
+
+
+----
+
+## Suggested contributions
+
+
+**Documentation**
+
+As always, the documentation is lacking.
+If you're interested in writing documentation have a go at [docs repository](https://github.com/marekjm/docs.viuavm.org).
+
+
+**Code samples**
+
+> Talk is cheap, show me the code.
+
+The VM will be no good, if no code runs on it.
+If you have written something that runs on the VM (a short program solving your problem, or
+a Rosetta Code task) submit a pull request.
+Your sample should contain appropriate copyright notice pointing to you, and
+be published under GNU GPL v3 or any later version of the GPL.
+
+
+**Data structures**
+
+Viua uses only the C++ standard library data structures.
+However, if you are capable of writing efficient, reliable, concurrent data structures feel welcome
+to share your knowlegde and experience and enhance the VM.
+
+Most sought-after would be:
+
+- multiple-producer single-consumer queue (for message queues),
+- data structure for mapping types to their ancestors (e.g. map from string to vector of strings),
+- multi-version map (for storing multiple versions of loaded bytecode modules for code hot-swapping)
+
+If you have other ideas, feel free to suggest them.
+
+Note that *all* data structures used by the VM kernel *must* support parallel access so either use locks, or
+atomic operations but ensure that your data structure is safe to use in parallel environment.
+
+
+**Bytecode format**
+
+Currently, debugging information embedded in bytecode is limited.
+If you have an idea how to embed debugging symbols in bytecode, and
+want to have a go at implementing such a functionality feel free to.
+
+
+**Overall hardening**
+
+If you can set-up Coverity (I seem unable to), it would be a great help.
+Otherwise, if you can spot memory access bugs, multithreading bugs, use ASan, TSan, or
+other sanitisers - don't hesitate and attack the VM as hard as you can.
+After all, the more bugs you find - the more bugs will be fixed.
