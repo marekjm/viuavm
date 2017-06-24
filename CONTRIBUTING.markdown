@@ -72,6 +72,7 @@ This is also true for small features.
 ## Patch submissions
 
 Patch submissions and issue reports are both welcome.
+Appropriate interface for reporting is the Github issues page.
 
 Rememeber, though, to provide appropriate test cases with code patches you submit.
 It will be appreciated and will make the merge process faster.
