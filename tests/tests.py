@@ -391,10 +391,11 @@ def runTestReturnsIntegers(self, name, expected_output, expected_exit_code = 0, 
 def extractExceptionsThrown(output):
     uncaught_object_prefix = 'uncaught object: '
     return list(map(lambda _: (_[0].strip(), _[1].strip(),),
-                    map(lambda _: _.split(' = ', 1),
-                        map(lambda _: _[len(uncaught_object_prefix):],
-                            filter(lambda _: _.startswith(uncaught_object_prefix),
-                                output.strip().splitlines())))))
+                    filter(lambda _: len(_) == 2,
+                           map(lambda _: _.split(' = ', 1),
+                               map(lambda _: _[len(uncaught_object_prefix):],
+                                   filter(lambda _: _.startswith(uncaught_object_prefix),
+                                       output.strip().splitlines()))))))
 
 def extractFirstException(output):
     return extractExceptionsThrown(output)[0]
