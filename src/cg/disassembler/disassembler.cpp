@@ -25,7 +25,10 @@
 #include <viua/cg/disassembler/disassembler.h>
 #include <viua/support/pointer.h>
 #include <viua/support/string.h>
+#include <viua/util/memory.h>
 using namespace std;
+
+using viua::util::memory::load_aligned;
 
 
 string disassembler::intop(viua::internals::types::byte* ptr) {
@@ -39,22 +42,22 @@ string disassembler::intop(viua::internals::types::byte* ptr) {
             oss << "void";
             break;
         case OT_REGISTER_INDEX:
-            oss << '%' << *reinterpret_cast<viua::internals::types::register_index*>(ptr);
+            oss << '%' << load_aligned<viua::internals::types::register_index>(ptr);
             pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
             pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
             break;
         case OT_REGISTER_REFERENCE:
-            oss << '@' << *reinterpret_cast<viua::internals::types::register_index*>(ptr);
+            oss << '@' << load_aligned<viua::internals::types::register_index>(ptr);
             pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
             pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
             break;
         case OT_POINTER:
-            oss << '*' << *reinterpret_cast<viua::internals::types::register_index*>(ptr);
+            oss << '*' << load_aligned<viua::internals::types::register_index>(ptr);
             pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
             pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
             break;
         case OT_INT:
-            oss << *reinterpret_cast<viua::internals::types::plain_int*>(ptr);
+            oss << load_aligned<viua::internals::types::plain_int>(ptr);
             pointer::inc<viua::internals::types::plain_int, viua::internals::types::byte>(ptr);
             break;
         default:
@@ -74,7 +77,7 @@ string disassembler::intop_with_rs_type(viua::internals::types::byte* ptr) {
             oss << "void";
             break;
         case OT_REGISTER_INDEX:
-            oss << '%' << *reinterpret_cast<viua::internals::types::register_index*>(ptr);
+            oss << '%' << load_aligned<viua::internals::types::register_index>(ptr);
             pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
             oss << ' ';
             switch (*reinterpret_cast<viua::internals::RegisterSets*>(ptr)) {
@@ -96,7 +99,7 @@ string disassembler::intop_with_rs_type(viua::internals::types::byte* ptr) {
             pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
             break;
         case OT_REGISTER_REFERENCE:
-            oss << '@' << *reinterpret_cast<viua::internals::types::register_index*>(ptr);
+            oss << '@' << load_aligned<viua::internals::types::register_index>(ptr);
             pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
             oss << ' ';
             switch (*reinterpret_cast<viua::internals::RegisterSets*>(ptr)) {
@@ -118,7 +121,7 @@ string disassembler::intop_with_rs_type(viua::internals::types::byte* ptr) {
             pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
             break;
         case OT_POINTER:
-            oss << '*' << *reinterpret_cast<viua::internals::types::register_index*>(ptr);
+            oss << '*' << load_aligned<viua::internals::types::register_index>(ptr);
             pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
             oss << ' ';
             switch (*reinterpret_cast<viua::internals::RegisterSets*>(ptr)) {
@@ -140,7 +143,7 @@ string disassembler::intop_with_rs_type(viua::internals::types::byte* ptr) {
             pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
             break;
         case OT_INT:
-            oss << *reinterpret_cast<viua::internals::types::plain_int*>(ptr);
+            oss << load_aligned<viua::internals::types::plain_int>(ptr);
             pointer::inc<viua::internals::types::plain_int, viua::internals::types::byte>(ptr);
             break;
         default:
@@ -151,7 +154,7 @@ string disassembler::intop_with_rs_type(viua::internals::types::byte* ptr) {
 }
 
 static viua::internals::types::timeout decode_timeout(viua::internals::types::byte* ptr) {
-    return *reinterpret_cast<viua::internals::types::timeout*>(ptr);
+    return load_aligned<viua::internals::types::timeout>(ptr);
 }
 static viua::internals::types::byte* disassemble_ri_operand(ostream& oss, viua::internals::types::byte* ptr) {
     oss << ' ' << disassembler::intop(ptr);
@@ -440,7 +443,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(
         case JUMP:
             oss << " 0x";
             oss << hex;
-            oss << *reinterpret_cast<uint64_t*>(ptr);
+            oss << load_aligned<uint64_t>(ptr);  // FIXME use Viua-defined type
             pointer::inc<uint64_t, viua::internals::types::byte>(ptr);
 
             oss << dec;
@@ -451,12 +454,12 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(
 
             oss << " 0x";
             oss << hex;
-            oss << *reinterpret_cast<uint64_t*>(ptr);
+            oss << load_aligned<uint64_t>(ptr);  // FIXME use Viua-defined type
             pointer::inc<uint64_t, viua::internals::types::byte>(ptr);
 
             oss << " 0x";
             oss << hex;
-            oss << *reinterpret_cast<uint64_t*>(ptr);
+            oss << load_aligned<uint64_t>(ptr);  // FIXME use Viua-defined type
             pointer::inc<uint64_t, viua::internals::types::byte>(ptr);
 
             oss << dec;
@@ -466,7 +469,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
             oss << ' ';
-            oss << *reinterpret_cast<viua::internals::types::plain_float*>(ptr);
+            oss << load_aligned<viua::internals::types::plain_float>(ptr);
             pointer::inc<viua::internals::types::plain_float, viua::internals::types::byte>(ptr);
             break;
         case RESS:
