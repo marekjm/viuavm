@@ -40,7 +40,7 @@ namespace viua {
                     }
                 }
 
-                public:
+              public:
                 auto release() -> T* {
                     auto tmp = pointer;
                     pointer = nullptr;
@@ -58,23 +58,14 @@ namespace viua {
                     pointer = ptr.release();
                 }
 
-                auto get() -> T* {
-                    return pointer;
-                }
+                auto get() -> T* { return pointer; }
 
-                auto owns() const -> bool {
-                    return owns_pointer;
-                }
+                auto owns() const -> bool { return owns_pointer; }
 
-                auto operator->() -> T* {
-                    return pointer;
-                }
+                auto operator-> () -> T* { return pointer; }
 
-                maybe_unique_ptr(T* ptr = nullptr, bool own = true): owns_pointer(own), pointer(ptr) {
-                }
-                ~maybe_unique_ptr() {
-                    delete_if_owned();
-                }
+                maybe_unique_ptr(T* ptr = nullptr, bool own = true) : owns_pointer(own), pointer(ptr) {}
+                ~maybe_unique_ptr() { delete_if_owned(); }
             };
         }
     }
