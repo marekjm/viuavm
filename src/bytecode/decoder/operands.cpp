@@ -26,11 +26,17 @@
 #include <viua/types/pointer.h>
 #include <viua/types/reference.h>
 #include <viua/types/value.h>
+#include <viua/util/memory.h>
 using namespace std;
+
+using viua::util::memory::load_aligned;
+using viua::util::memory::aligned_read;
 
 
 template<class T> static auto extract(viua::internals::types::byte* ip) -> T {
-    return *reinterpret_cast<T*>(ip);
+    T data{};
+    std::memcpy(&data, ip, sizeof(T));
+    return data;
 }
 template<class T> static auto extract(const viua::internals::types::byte* ip) -> T {
     return *reinterpret_cast<T*>(ip);
@@ -167,7 +173,7 @@ auto viua::bytecode::decoder::operands::fetch_timeout(viua::internals::types::by
 
     viua::internals::types::timeout value = 0;
     if (ot == OT_INT) {
-        value = *reinterpret_cast<decltype(value)*>(ip);
+        aligned_read(value) = ip;
         ip += sizeof(decltype(value));
     } else {
         throw new viua::types::Exception("decoded invalid operand type: expected O_INT");
@@ -218,7 +224,7 @@ auto viua::bytecode::decoder::operands::fetch_primitive_int(viua::internals::typ
         // FIXME plain_int (as encoded in bytecode) is 32 bits, but in-program integer is 64 bits
         value = static_cast<decltype(value)>(i->as_integer());
     } else if (ot == OT_INT) {
-        value = *reinterpret_cast<decltype(value)*>(ip);
+        aligned_read(value) = ip;
         ip += sizeof(decltype(value));
     } else {
         throw new viua::types::Exception(
