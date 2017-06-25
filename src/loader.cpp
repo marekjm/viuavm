@@ -29,7 +29,10 @@
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/loader.h>
 #include <viua/machine.h>
+#include <viua/util/memory.h>
 using namespace std;
+
+using viua::util::memory::aligned_read;
 
 
 IdToAddressMapping Loader::loadmap(char* bytedump, const uint64_t& bytedump_size) {
@@ -44,7 +47,7 @@ IdToAddressMapping Loader::loadmap(char* bytedump, const uint64_t& bytedump_size
     while (i < bytedump_size) {
         lib_fn_name = string(lib_function_ids_map);
         i += lib_fn_name.size() + 1;  // one for null character
-        lib_fn_address = *reinterpret_cast<decltype(lib_fn_address)*>(bytedump + i);
+        aligned_read(lib_fn_address) = (bytedump + i);
         i += sizeof(decltype(lib_fn_address));
         lib_function_ids_map = bytedump + i;
         mapping[lib_fn_name] = lib_fn_address;
