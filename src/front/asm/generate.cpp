@@ -32,7 +32,11 @@
 #include <viua/program.h>
 #include <viua/support/env.h>
 #include <viua/support/string.h>
+#include <viua/util/memory.h>
 using namespace std;
+
+using viua::util::memory::aligned_write;
+using viua::util::memory::aligned_read;
 
 
 extern bool VERBOSE;
@@ -1001,8 +1005,7 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
         viua::internals::types::bytecode_size jmp, jmp_target;
         for (decltype(linked_jumptable)::size_type i = 0; i < linked_jumptable.size(); ++i) {
             jmp = linked_jumptable[i];
-            // we know what we're doing here
-            jmp_target = *reinterpret_cast<viua::internals::types::bytecode_size*>(linked_bytecode + jmp);
+            aligned_read(jmp_target) = (linked_bytecode + jmp);
             if (DEBUG) {
                 cout << send_control_seq(COLOR_FG_WHITE) << filename << send_control_seq(ATTR_RESET);
                 cout << ": ";
@@ -1011,7 +1014,7 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
                 cout << "adjusting jump: at position " << jmp << ", " << jmp_target << '+' << bytes_offset
                      << " -> " << (jmp_target + bytes_offset) << endl;
             }
-            *reinterpret_cast<viua::internals::types::bytecode_size*>(linked_bytecode + jmp) += bytes_offset;
+            aligned_write(linked_bytecode + jmp) += bytes_offset;
         }
 
         for (decltype(linked_size) i = 0; i < linked_size; ++i) {
