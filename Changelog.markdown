@@ -27,6 +27,11 @@ There are several categories of change:
 
 ----
 
+# From 0.9.0 to 0.9.1
+
+
+----
+
 # From 0.8.4 to 0.9.0
 
 - enhancement: assembler is able to catch most zero-distance jumps preventing infinite loops at compile time
