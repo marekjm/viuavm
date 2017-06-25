@@ -20,7 +20,10 @@
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/operand_types.h>
 #include <viua/cg/bytecode/instructions.h>
+#include <viua/util/memory.h>
 using namespace std;
+
+using viua::util::memory::aligned_write;
 
 
 int_op::int_op()
@@ -65,8 +68,7 @@ static viua::internals::types::byte* insert_ri_operand(viua::internals::types::b
     }
     pointer::inc<OperandType, viua::internals::types::byte>(addr_ptr);
 
-    *(reinterpret_cast<viua::internals::types::register_index*>(addr_ptr)) =
-        static_cast<viua::internals::types::register_index>(op.value);
+    aligned_write(addr_ptr) = op.value;
     pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(addr_ptr);
 
     *(reinterpret_cast<viua::internals::RegisterSets*>(addr_ptr)) = op.rs_type;
@@ -139,7 +141,7 @@ namespace cg {
 
             *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_INT;
             pointer::inc<OperandType, viua::internals::types::byte>(addr_ptr);
-            *(reinterpret_cast<viua::internals::types::plain_int*>(addr_ptr)) = i.value;
+            aligned_write(addr_ptr) = i.value;
             pointer::inc<viua::internals::types::plain_int, viua::internals::types::byte>(addr_ptr);
 
             return addr_ptr;
@@ -159,7 +161,7 @@ namespace cg {
                                                viua::internals::types::plain_float f) {
             *(addr_ptr++) = FSTORE;
             addr_ptr = insert_ri_operand(addr_ptr, regno);
-            *(reinterpret_cast<viua::internals::types::plain_float*>(addr_ptr)) = f;
+            aligned_write(addr_ptr) = f;
             pointer::inc<viua::internals::types::plain_float, viua::internals::types::byte>(addr_ptr);
 
             return addr_ptr;
@@ -493,7 +495,7 @@ namespace cg {
             // FIXME change to OT_TIMEOUT?
             *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_INT;
             pointer::inc<OperandType, viua::internals::types::byte>(addr_ptr);
-            *(reinterpret_cast<viua::internals::types::timeout*>(addr_ptr)) = timeout.value;
+            aligned_write(addr_ptr) = timeout.value;
             pointer::inc<viua::internals::types::timeout, viua::internals::types::byte>(addr_ptr);
 
             return addr_ptr;
@@ -514,7 +516,8 @@ namespace cg {
             // FIXME change to OT_TIMEOUT?
             *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_INT;
             pointer::inc<OperandType, viua::internals::types::byte>(addr_ptr);
-            *(reinterpret_cast<viua::internals::types::timeout*>(addr_ptr)) = timeout.value;
+
+            aligned_write(addr_ptr) = timeout.value;
             pointer::inc<viua::internals::types::timeout, viua::internals::types::byte>(addr_ptr);
 
             return addr_ptr;
@@ -533,7 +536,7 @@ namespace cg {
             // we *know* that this location in the viua::internals::types::byte array points to
             // viua::internals::types::bytecode_size so
             // the reinterpret_cast<> is justified
-            *(reinterpret_cast<viua::internals::types::bytecode_size*>(addr_ptr)) = addr;
+            aligned_write(addr_ptr) = addr;
             pointer::inc<viua::internals::types::bytecode_size, viua::internals::types::byte>(addr_ptr);
 
             return addr_ptr;
@@ -548,9 +551,9 @@ namespace cg {
             // we *know* that following locations in the viua::internals::types::byte array point to
             // viua::internals::types::bytecode_size so
             // the reinterpret_cast<> is justified
-            *(reinterpret_cast<viua::internals::types::bytecode_size*>(addr_ptr)) = addr_truth;
+            aligned_write(addr_ptr) = addr_truth;
             pointer::inc<viua::internals::types::bytecode_size, viua::internals::types::byte>(addr_ptr);
-            *(reinterpret_cast<viua::internals::types::bytecode_size*>(addr_ptr)) = addr_false;
+            aligned_write(addr_ptr) = addr_false;
             pointer::inc<viua::internals::types::bytecode_size, viua::internals::types::byte>(addr_ptr);
 
             return addr_ptr;
