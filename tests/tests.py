@@ -111,15 +111,15 @@ def disassemble(path, out=None):
         raise ViuaDisassemblerError('{0}: {1}'.format(' '.join(asmargs), output.strip()))
     return (output, error, exit_code)
 
-def run(path, expected_exit_code=0):
+def run(path, expected_exit_code=0, pipe_error=False):
     """Run given file with Viua CPU and return its output.
     """
-    p = subprocess.Popen((VIUA_KERNEL_PATH, path), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen((VIUA_KERNEL_PATH, path), stdout=subprocess.PIPE, stderr=(subprocess.PIPE if pipe_error else None))
     output, error = p.communicate()
     exit_code = p.wait()
     if exit_code not in (expected_exit_code if type(expected_exit_code) in [list, tuple] else (expected_exit_code,)):
         raise ViuaCPUError('{0} [{1}]: {2}'.format(path, exit_code, output.decode('utf-8').strip()))
-    return (exit_code, output.decode('utf-8'), error.decode('utf-8'))
+    return (exit_code, output.decode('utf-8'), (error if error is not None else b'').decode('utf-8'))
 
 FLAG_TEST_ONLY_ASSEMBLING = bool(int(os.environ.get('VIUA_TEST_ONLY_ASMING', 0)))
 MEMORY_LEAK_CHECKS_SKIPPED = 0
@@ -293,7 +293,7 @@ def runTestBackend(self, name, expected_output=None, expected_exit_code = 0, out
     else:
         assemble(assembly_path, compiled_path, opts=assembly_opts)
     if not FLAG_TEST_ONLY_ASSEMBLING:
-        excode, output, error = run(compiled_path, expected_exit_code)
+        excode, output, error = run(compiled_path, expected_exit_code, pipe_error = (expected_error is not None))
         got_output = (output.strip() if output_processing_function is None else output_processing_function(output))
         got_error = (error.strip() if error_processing_function is None else error_processing_function(error))
         try:
@@ -321,7 +321,7 @@ def runTestBackend(self, name, expected_output=None, expected_exit_code = 0, out
     else:
         assemble(disasm_path, compiled_disasm_path, opts=assembly_opts)
     if not FLAG_TEST_ONLY_ASSEMBLING:
-        dis_excode, dis_output, dis_error = run(compiled_disasm_path, expected_exit_code)
+        dis_excode, dis_output, dis_error = run(compiled_disasm_path, expected_exit_code, pipe_error = (expected_error is not None))
         if custom_assert is not None:
             custom_assert(self, dis_excode, (dis_output.strip() if output_processing_function is None else output_processing_function(dis_output)))
         else:
