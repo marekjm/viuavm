@@ -261,12 +261,13 @@ void viua::kernel::Kernel::loadForeignLibrary(const string& module) {
                                          ("failed to open handle: " + module + ": " + dlerror()));
     }
 
-    ForeignFunctionSpec* (*exports)() = nullptr;
-    if ((exports = reinterpret_cast<ForeignFunctionSpec* (*)()>(dlsym(handle, "exports"))) == nullptr) {
+    using ExporterFunction = const ForeignFunctionSpec* (*)();
+    ExporterFunction exports = nullptr;
+    if ((exports = reinterpret_cast<ExporterFunction>(dlsym(handle, "exports"))) == nullptr) {
         throw new viua::types::Exception("failed to extract interface from module: " + module);
     }
 
-    ForeignFunctionSpec* exported = (*exports)();
+    const ForeignFunctionSpec* exported = (*exports)();
 
     unsigned i = 0;
     while (exported[i].name != nullptr) {
