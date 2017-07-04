@@ -103,6 +103,13 @@ void io_file_read(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Regist
     frame->local_register_set->set(0, unique_ptr<viua::types::Value>{new viua::types::String(oss.str())});
 }
 
+void io_file_write(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                   viua::process::Process*, viua::kernel::Kernel*) {
+    ofstream out(frame->arguments->get(0)->str());
+    out << frame->arguments->get(1)->str();
+    out.close();
+}
+
 void io_ifstream_open(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
                       viua::process::Process*, viua::kernel::Kernel*) {
     frame->local_register_set->set(
@@ -121,6 +128,7 @@ const ForeignFunctionSpec functions[] = {
     {"std::io::stdout::write/1", &io_stdout_write},
     {"std::io::stderr::write/1", &io_stderr_write},
     {"std::io::file::read/1", &io_file_read},
+    {"std::io::file::write/1", &io_file_write},
     {"std::io::ifstream::open/1", &io_ifstream_open},
     {"std::io::ifstream::getline/1", &io_ifstream_getline},
     {NULL, NULL},
