@@ -22,21 +22,21 @@
 
 #pragma once
 
-#include <string>
+#include <atomic>
+#include <chrono>
+#include <memory>
+#include <mutex>
 #include <queue>
 #include <stack>
-#include <mutex>
-#include <atomic>
-#include <memory>
-#include <chrono>
+#include <string>
 #include <viua/bytecode/bytetypedef.h>
-#include <viua/types/value.h>
-#include <viua/types/prototype.h>
-#include <viua/kernel/registerset.h>
-#include <viua/kernel/frame.h>
-#include <viua/kernel/tryframe.h>
 #include <viua/include/module.h>
+#include <viua/kernel/frame.h>
+#include <viua/kernel/registerset.h>
+#include <viua/kernel/tryframe.h>
 #include <viua/pid.h>
+#include <viua/types/prototype.h>
+#include <viua/types/value.h>
 
 
 const viua::internals::types::register_index DEFAULT_REGISTER_SIZE = 255;
@@ -44,8 +44,8 @@ const uint16_t MAX_STACK_SIZE = 8192;
 
 
 class HaltException : public std::runtime_error {
-    public:
-        HaltException(): std::runtime_error("execution halted") {}
+  public:
+    HaltException() : std::runtime_error("execution halted") {}
 };
 
 
@@ -60,7 +60,7 @@ namespace viua {
         class Process;
 
         class Stack {
-            public:
+          public:
             enum class STATE {
                 /*
                  * Before stack begins executing.
@@ -95,11 +95,11 @@ namespace viua {
                 HALTED,
             };
 
-            private:
+          private:
             std::vector<std::unique_ptr<Frame>> frames;
             STATE current_state = STATE::UNINITIALISED;
 
-            public:
+          public:
             const std::string entry_function;
             Process* parent_process;
 
@@ -128,7 +128,7 @@ namespace viua {
             /*  Variables set after the VM has executed bytecode.
              *  They describe exit conditions of the bytecode that just stopped running.
              */
-            std::unique_ptr<viua::types::Value> return_value; // return value of top-most frame on the stack
+            std::unique_ptr<viua::types::Value> return_value;  // return value of top-most frame on the stack
 
             void adjust_instruction_pointer(const TryFrame*, const std::string);
             auto unwind_call_stack_to(const Frame*) -> void;
@@ -136,8 +136,7 @@ namespace viua {
             auto unwind_to(const TryFrame*, const std::string) -> void;
             auto find_catch_frame() -> std::tuple<TryFrame*, std::string>;
 
-            public:
-
+          public:
             auto set_return_value() -> void;
 
             auto state_of() const -> STATE;
@@ -162,19 +161,21 @@ namespace viua {
 
             auto emplace_back(std::unique_ptr<Frame> f) -> decltype(frames.emplace_back(f));
 
-            auto prepare_frame(viua::internals::types::register_index, viua::internals::types::register_index) -> Frame*;
+            auto prepare_frame(viua::internals::types::register_index, viua::internals::types::register_index)
+                -> Frame*;
             auto push_prepared_frame() -> void;
 
             viua::internals::types::byte* adjust_jump_base_for_block(const std::string&);
             viua::internals::types::byte* adjust_jump_base_for(const std::string&);
             auto unwind() -> void;
 
-            Stack(std::string, Process*, viua::kernel::RegisterSet**, viua::kernel::RegisterSet*, viua::scheduler::VirtualProcessScheduler*);
+            Stack(std::string, Process*, viua::kernel::RegisterSet**, viua::kernel::RegisterSet*,
+                  viua::scheduler::VirtualProcessScheduler*);
         };
 
         class Process {
 #ifdef AS_DEBUG_HEADER
-            public:
+          public:
 #endif
             friend Stack;
             /*
@@ -191,7 +192,7 @@ namespace viua {
              * This is not constant because processes may migrate between
              * schedulers during load balancing.
              */
-            viua::scheduler::VirtualProcessScheduler *scheduler;
+            viua::scheduler::VirtualProcessScheduler* scheduler;
 
             /*
              * Parent process of this process.
@@ -199,8 +200,8 @@ namespace viua {
              */
             viua::process::Process* parent_process;
 
-            std::string watchdog_function { "" };
-            bool watchdog_failed { false };
+            std::string watchdog_function{""};
+            bool watchdog_failed{false};
 
             std::unique_ptr<viua::kernel::RegisterSet> global_register_set;
 
@@ -230,17 +231,22 @@ namespace viua {
             /*  Methods dealing with stack and frame manipulation, and
              *  function calls.
              */
-            Frame* requestNewFrame(viua::internals::types::register_index arguments_size = 0, viua::internals::types::register_index registers_size = 0);
+            Frame* requestNewFrame(viua::internals::types::register_index arguments_size = 0,
+                                   viua::internals::types::register_index registers_size = 0);
             TryFrame* requestNewTryFrame();
             void pushFrame();
             viua::internals::types::byte* adjustJumpBaseForBlock(const std::string&);
             viua::internals::types::byte* adjustJumpBaseFor(const std::string&);
             // call native (i.e. written in Viua) function
-            viua::internals::types::byte* callNative(viua::internals::types::byte*, const std::string&, viua::kernel::Register*, const std::string&);
+            viua::internals::types::byte* callNative(viua::internals::types::byte*, const std::string&,
+                                                     viua::kernel::Register*, const std::string&);
             // call foreign (i.e. from a C++ extension) function
-            viua::internals::types::byte* callForeign(viua::internals::types::byte*, const std::string&, viua::kernel::Register*, const std::string&);
+            viua::internals::types::byte* callForeign(viua::internals::types::byte*, const std::string&,
+                                                      viua::kernel::Register*, const std::string&);
             // call foreign method (i.e. method of a pure-C++ class loaded into machine's typesystem)
-            viua::internals::types::byte* callForeignMethod(viua::internals::types::byte*, viua::types::Value*, const std::string&, viua::kernel::Register*, const std::string&);
+            viua::internals::types::byte* callForeignMethod(viua::internals::types::byte*,
+                                                            viua::types::Value*, const std::string&,
+                                                            viua::kernel::Register*, const std::string&);
 
             auto push_deferred(std::string) -> void;
 
@@ -375,61 +381,63 @@ namespace viua {
 
             viua::internals::types::byte* opimport(viua::internals::types::byte*);
 
-            public:
-                viua::internals::types::byte* dispatch(viua::internals::types::byte*);
-                viua::internals::types::byte* tick();
+          public:
+            viua::internals::types::byte* dispatch(viua::internals::types::byte*);
+            viua::internals::types::byte* tick();
 
-                viua::types::Value* obtain(viua::internals::types::register_index) const;
-                void put(viua::internals::types::register_index, std::unique_ptr<viua::types::Value>);
+            viua::types::Value* obtain(viua::internals::types::register_index) const;
+            void put(viua::internals::types::register_index, std::unique_ptr<viua::types::Value>);
 
-                viua::kernel::Register* register_at(viua::internals::types::register_index);
-                viua::kernel::Register* register_at(viua::internals::types::register_index, viua::internals::RegisterSets);
+            viua::kernel::Register* register_at(viua::internals::types::register_index);
+            viua::kernel::Register* register_at(viua::internals::types::register_index,
+                                                viua::internals::RegisterSets);
 
-                bool joinable() const;
-                void join();
-                void detach();
+            bool joinable() const;
+            void join();
+            void detach();
 
-                void suspend();
-                void wakeup();
-                bool suspended() const;
+            void suspend();
+            void wakeup();
+            bool suspended() const;
 
-                viua::process::Process* parent() const;
-                std::string starting_function() const;
+            viua::process::Process* parent() const;
+            std::string starting_function() const;
 
-                void pass(std::unique_ptr<viua::types::Value>);
+            void pass(std::unique_ptr<viua::types::Value>);
 
-                auto priority() const -> decltype(process_priority);
-                void priority(decltype(process_priority) p);
+            auto priority() const -> decltype(process_priority);
+            void priority(decltype(process_priority) p);
 
-                bool stopped() const;
+            bool stopped() const;
 
-                bool terminated() const;
-                viua::types::Value* getActiveException();
-                std::unique_ptr<viua::types::Value> transferActiveException();
-                void raise(std::unique_ptr<viua::types::Value>);
-                void handleActiveException();
+            bool terminated() const;
+            viua::types::Value* getActiveException();
+            std::unique_ptr<viua::types::Value> transferActiveException();
+            void raise(std::unique_ptr<viua::types::Value>);
+            void handleActiveException();
 
-                void migrate_to(viua::scheduler::VirtualProcessScheduler*);
+            void migrate_to(viua::scheduler::VirtualProcessScheduler*);
 
-                std::unique_ptr<viua::types::Value> getReturnValue();
+            std::unique_ptr<viua::types::Value> getReturnValue();
 
-                bool watchdogged() const;
-                std::string watchdog() const;
-                viua::internals::types::byte* become(const std::string&, std::unique_ptr<Frame>);
+            bool watchdogged() const;
+            std::string watchdog() const;
+            viua::internals::types::byte* become(const std::string&, std::unique_ptr<Frame>);
 
-                viua::internals::types::byte* begin();
-                auto executionAt() const -> decltype(Stack::instruction_pointer);
+            viua::internals::types::byte* begin();
+            auto executionAt() const -> decltype(Stack::instruction_pointer);
 
-                std::vector<Frame*> trace() const;
+            std::vector<Frame*> trace() const;
 
-                viua::process::PID pid() const;
-                bool hidden() const;
-                void hidden(bool);
+            viua::process::PID pid() const;
+            bool hidden() const;
+            void hidden(bool);
 
-                bool empty() const;
+            bool empty() const;
 
-                Process(std::unique_ptr<Frame>, viua::scheduler::VirtualProcessScheduler*, viua::process::Process*, const bool = false);
-                ~Process();
+            Process(std::unique_ptr<Frame>, viua::scheduler::VirtualProcessScheduler*,
+                    viua::process::Process*, const bool = false);
+            ~Process();
         };
     }
 }
