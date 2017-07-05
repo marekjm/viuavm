@@ -315,6 +315,20 @@ namespace viua {
             viua::internals::types::byte* opand(viua::internals::types::byte*);
             viua::internals::types::byte* opor(viua::internals::types::byte*);
 
+            viua::internals::types::byte* opbits(viua::internals::types::byte*);
+            viua::internals::types::byte* opbitand(viua::internals::types::byte*);
+            viua::internals::types::byte* opbitor(viua::internals::types::byte*);
+            viua::internals::types::byte* opbitnot(viua::internals::types::byte*);
+            viua::internals::types::byte* opbitxor(viua::internals::types::byte*);
+            viua::internals::types::byte* opbitat(viua::internals::types::byte*);
+            viua::internals::types::byte* opbitset(viua::internals::types::byte*);
+            viua::internals::types::byte* opshl(viua::internals::types::byte*);
+            viua::internals::types::byte* opshr(viua::internals::types::byte*);
+            viua::internals::types::byte* opashl(viua::internals::types::byte*);
+            viua::internals::types::byte* opashr(viua::internals::types::byte*);
+            viua::internals::types::byte* oprol(viua::internals::types::byte*);
+            viua::internals::types::byte* opror(viua::internals::types::byte*);
+
             viua::internals::types::byte* opmove(viua::internals::types::byte*);
             viua::internals::types::byte* opcopy(viua::internals::types::byte*);
             viua::internals::types::byte* opptr(viua::internals::types::byte*);
