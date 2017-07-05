@@ -126,6 +126,20 @@ enum OPCODE : viua::internals::types::byte {
     AND,
     OR,
 
+    BITS,
+    BITAND,
+    BITOR,
+    BITNOT,
+    BITXOR,
+    BITAT,
+    BITSET,
+    SHL,
+    SHR,
+    ASHL,
+    ASHR,
+    ROL,
+    ROR,
+
     // register manipulation
     MOVE,   // move an object from one register to another
     COPY,   // copy an object from one register to another
