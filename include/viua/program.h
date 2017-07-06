@@ -20,11 +20,11 @@
 #ifndef VIUA_PROGRAM_H
 #define VIUA_PROGRAM_H
 
-#include <string>
-#include <vector>
-#include <tuple>
 #include <map>
 #include <memory>
+#include <string>
+#include <tuple>
+#include <vector>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/cg/bytecode/instructions.h>
 #include <viua/cg/lex.h>
@@ -60,7 +60,7 @@ class Program {
     bool debug;
     bool scream;
 
-    public:
+  public:
     // instruction insertion interface
     Program& opnop();
 
@@ -148,7 +148,8 @@ class Program {
     Program& opreceive(int_op, timeout_op);
     Program& opwatchdog(const std::string&);
     Program& opjump(viua::internals::types::bytecode_size, enum JUMPTYPE);
-    Program& opif(int_op, viua::internals::types::bytecode_size, enum JUMPTYPE, viua::internals::types::bytecode_size, enum JUMPTYPE);
+    Program& opif(int_op, viua::internals::types::bytecode_size, enum JUMPTYPE,
+                  viua::internals::types::bytecode_size, enum JUMPTYPE);
 
     Program& optry();
     Program& opcatch(std::string, std::string);
@@ -186,7 +187,9 @@ class Program {
      *  These must be called after the bytecode is already generated as they must know
      *  size of the program.
      */
-    Program& calculateJumps(std::vector<std::tuple<viua::internals::types::bytecode_size, viua::internals::types::bytecode_size>>, std::vector<viua::cg::lex::Token>&);
+    Program& calculateJumps(
+        std::vector<std::tuple<viua::internals::types::bytecode_size, viua::internals::types::bytecode_size>>,
+        std::vector<viua::cg::lex::Token>&);
     std::vector<viua::internals::types::bytecode_size> jumps();
 
     auto bytecode() const -> std::unique_ptr<viua::internals::types::byte[]>;
