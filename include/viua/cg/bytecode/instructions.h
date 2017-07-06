@@ -70,7 +70,8 @@ namespace cg {
         viua::internals::types::byte* opiinc(viua::internals::types::byte*, int_op);
         viua::internals::types::byte* opidec(viua::internals::types::byte*, int_op);
 
-        viua::internals::types::byte* opfstore(viua::internals::types::byte*, int_op, viua::internals::types::plain_float);
+        viua::internals::types::byte* opfstore(viua::internals::types::byte*, int_op,
+                                               viua::internals::types::plain_float);
 
         viua::internals::types::byte* opitof(viua::internals::types::byte*, int_op, int_op);
         viua::internals::types::byte* opftoi(viua::internals::types::byte*, int_op, int_op);
@@ -93,10 +94,13 @@ namespace cg {
         viua::internals::types::byte* optext(viua::internals::types::byte*, int_op, int_op);
         viua::internals::types::byte* optexteq(viua::internals::types::byte*, int_op, int_op, int_op);
         viua::internals::types::byte* optextat(viua::internals::types::byte*, int_op, int_op, int_op);
-        viua::internals::types::byte* optextsub(viua::internals::types::byte*, int_op, int_op, int_op, int_op);
+        viua::internals::types::byte* optextsub(viua::internals::types::byte*, int_op, int_op, int_op,
+                                                int_op);
         viua::internals::types::byte* optextlength(viua::internals::types::byte*, int_op, int_op);
-        viua::internals::types::byte* optextcommonprefix(viua::internals::types::byte*, int_op, int_op, int_op);
-        viua::internals::types::byte* optextcommonsuffix(viua::internals::types::byte*, int_op, int_op, int_op);
+        viua::internals::types::byte* optextcommonprefix(viua::internals::types::byte*, int_op, int_op,
+                                                         int_op);
+        viua::internals::types::byte* optextcommonsuffix(viua::internals::types::byte*, int_op, int_op,
+                                                         int_op);
         viua::internals::types::byte* optextconcat(viua::internals::types::byte*, int_op, int_op, int_op);
 
         viua::internals::types::byte* opvec(viua::internals::types::byte*, int_op, int_op, int_op);
@@ -146,11 +150,15 @@ namespace cg {
         viua::internals::types::byte* opreceive(viua::internals::types::byte*, int_op, timeout_op);
         viua::internals::types::byte* opwatchdog(viua::internals::types::byte*, const std::string&);
 
-        viua::internals::types::byte* opjump(viua::internals::types::byte*, viua::internals::types::bytecode_size);
-        viua::internals::types::byte* opif(viua::internals::types::byte*, int_op, viua::internals::types::bytecode_size, viua::internals::types::bytecode_size);
+        viua::internals::types::byte* opjump(viua::internals::types::byte*,
+                                             viua::internals::types::bytecode_size);
+        viua::internals::types::byte* opif(viua::internals::types::byte*, int_op,
+                                           viua::internals::types::bytecode_size,
+                                           viua::internals::types::bytecode_size);
 
         viua::internals::types::byte* optry(viua::internals::types::byte*);
-        viua::internals::types::byte* opcatch(viua::internals::types::byte*, const std::string&, const std::string&);
+        viua::internals::types::byte* opcatch(viua::internals::types::byte*, const std::string&,
+                                              const std::string&);
         viua::internals::types::byte* opdraw(viua::internals::types::byte*, int_op);
         viua::internals::types::byte* openter(viua::internals::types::byte*, const std::string&);
         viua::internals::types::byte* opthrow(viua::internals::types::byte*, int_op);
@@ -160,7 +168,8 @@ namespace cg {
 
         viua::internals::types::byte* opclass(viua::internals::types::byte*, int_op, const std::string&);
         viua::internals::types::byte* opderive(viua::internals::types::byte*, int_op, const std::string&);
-        viua::internals::types::byte* opattach(viua::internals::types::byte*, int_op, const std::string&, const std::string&);
+        viua::internals::types::byte* opattach(viua::internals::types::byte*, int_op, const std::string&,
+                                               const std::string&);
         viua::internals::types::byte* opregister(viua::internals::types::byte*, int_op);
 
         viua::internals::types::byte* opatom(viua::internals::types::byte*, int_op, std::string);
