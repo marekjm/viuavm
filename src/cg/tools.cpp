@@ -511,6 +511,58 @@ namespace viua {
                 -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
+            static auto size_of_bits(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i)
+                -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_bitand(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i)
+                -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_bitor(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i)
+                -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_bitnot(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i)
+                -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_bitxor(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i)
+                -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_bitat(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i)
+                -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_bitset(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i)
+                -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_shl(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i)
+                -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_shr(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i)
+                -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_ashl(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i)
+                -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_ashr(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i)
+                -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_rol(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i)
+                -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
+            }
+            static auto size_of_ror(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i)
+                -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
+                return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
+            }
             static auto size_of_move(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i)
                 -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
@@ -1200,6 +1252,45 @@ namespace viua {
                     } else if (tokens.at(i) == "or") {
                         ++i;
                         tie(increase, i) = size_of_or(tokens, i);
+                    } else if (tokens.at(i) == "bits") {
+                        ++i;
+                        tie(increase, i) = size_of_bits(tokens, i);
+                    } else if (tokens.at(i) == "bitand") {
+                        ++i;
+                        tie(increase, i) = size_of_bitand(tokens, i);
+                    } else if (tokens.at(i) == "bitor") {
+                        ++i;
+                        tie(increase, i) = size_of_bitor(tokens, i);
+                    } else if (tokens.at(i) == "bitnot") {
+                        ++i;
+                        tie(increase, i) = size_of_bitnot(tokens, i);
+                    } else if (tokens.at(i) == "bitxor") {
+                        ++i;
+                        tie(increase, i) = size_of_bitxor(tokens, i);
+                    } else if (tokens.at(i) == "bitat") {
+                        ++i;
+                        tie(increase, i) = size_of_bitat(tokens, i);
+                    } else if (tokens.at(i) == "bitset") {
+                        ++i;
+                        tie(increase, i) = size_of_bitset(tokens, i);
+                    } else if (tokens.at(i) == "shl") {
+                        ++i;
+                        tie(increase, i) = size_of_shl(tokens, i);
+                    } else if (tokens.at(i) == "shr") {
+                        ++i;
+                        tie(increase, i) = size_of_shr(tokens, i);
+                    } else if (tokens.at(i) == "ashl") {
+                        ++i;
+                        tie(increase, i) = size_of_ashl(tokens, i);
+                    } else if (tokens.at(i) == "ashr") {
+                        ++i;
+                        tie(increase, i) = size_of_ashr(tokens, i);
+                    } else if (tokens.at(i) == "rol") {
+                        ++i;
+                        tie(increase, i) = size_of_rol(tokens, i);
+                    } else if (tokens.at(i) == "ror") {
+                        ++i;
+                        tie(increase, i) = size_of_ror(tokens, i);
                     } else if (tokens.at(i) == "move") {
                         ++i;
                         tie(increase, i) = size_of_move(tokens, i);
