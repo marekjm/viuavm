@@ -270,6 +270,71 @@ Program& Program::opor(int_op regr, int_op rega, int_op regb) {
     return (*this);
 }
 
+Program& Program::opbits(int_op target, int_op count) {
+    addr_ptr = cg::bytecode::opbits(addr_ptr, target, count);
+    return (*this);
+}
+
+Program& Program::opbitand(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opbitand(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opbitor(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opbitor(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opbitnot(int_op target, int_op lhs) {
+    addr_ptr = cg::bytecode::opbitnot(addr_ptr, target, lhs);
+    return (*this);
+}
+
+Program& Program::opbitxor(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opbitxor(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opbitat(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opbitat(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opbitset(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opbitset(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opshl(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opshl(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opshr(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opshr(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opashl(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opashl(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opashr(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opashr(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::oprol(int_op target, int_op count) {
+    addr_ptr = cg::bytecode::oprol(addr_ptr, target, count);
+    return (*this);
+}
+
+Program& Program::opror(int_op target, int_op count) {
+    addr_ptr = cg::bytecode::opror(addr_ptr, target, count);
+    return (*this);
+}
+
 Program& Program::opmove(int_op a, int_op b) {
     /*  Inserts move instruction to bytecode.
      *

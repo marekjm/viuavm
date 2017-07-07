@@ -321,6 +321,72 @@ namespace cg {
             return insert_three_ri_instruction(addr_ptr, OR, regr, rega, regb);
         }
 
+        viua::internals::types::byte* opbits(viua::internals::types::byte* addr_ptr, int_op target,
+                                             int_op lhs) {
+            return insert_two_ri_instruction(addr_ptr, BITS, target, lhs);
+        }
+
+        viua::internals::types::byte* opbitand(viua::internals::types::byte* addr_ptr, int_op target,
+                                               int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, BITAND, target, lhs, rhs);
+        }
+
+        viua::internals::types::byte* opbitor(viua::internals::types::byte* addr_ptr, int_op target,
+                                              int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, BITOR, target, lhs, rhs);
+        }
+
+        viua::internals::types::byte* opbitnot(viua::internals::types::byte* addr_ptr, int_op target,
+                                               int_op lhs) {
+            return insert_two_ri_instruction(addr_ptr, BITNOT, target, lhs);
+        }
+
+        viua::internals::types::byte* opbitxor(viua::internals::types::byte* addr_ptr, int_op target,
+                                               int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, BITXOR, target, lhs, rhs);
+        }
+
+        viua::internals::types::byte* opbitat(viua::internals::types::byte* addr_ptr, int_op target,
+                                              int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, BITAT, target, lhs, rhs);
+        }
+
+        viua::internals::types::byte* opbitset(viua::internals::types::byte* addr_ptr, int_op target,
+                                               int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, BITSET, target, lhs, rhs);
+        }
+
+        viua::internals::types::byte* opshl(viua::internals::types::byte* addr_ptr, int_op target, int_op lhs,
+                                            int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, SHL, target, lhs, rhs);
+        }
+
+        viua::internals::types::byte* opshr(viua::internals::types::byte* addr_ptr, int_op target, int_op lhs,
+                                            int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, SHR, target, lhs, rhs);
+        }
+
+        viua::internals::types::byte* opashl(viua::internals::types::byte* addr_ptr, int_op target,
+                                             int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, ASHL, target, lhs, rhs);
+        }
+
+        viua::internals::types::byte* opashr(viua::internals::types::byte* addr_ptr, int_op target,
+                                             int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, ASHR, target, lhs, rhs);
+        }
+
+        viua::internals::types::byte* oprol(viua::internals::types::byte* addr_ptr, int_op target,
+                                            int_op lhs) {
+            return insert_two_ri_instruction(addr_ptr, ROL, target, lhs);
+        }
+
+        viua::internals::types::byte* opror(viua::internals::types::byte* addr_ptr, int_op target,
+                                            int_op lhs) {
+            return insert_two_ri_instruction(addr_ptr, ROR, target, lhs);
+        }
+
+
         viua::internals::types::byte* opmove(viua::internals::types::byte* addr_ptr, int_op a, int_op b) {
             return insert_two_ri_instruction(addr_ptr, MOVE, a, b);
         }

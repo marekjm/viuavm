@@ -553,6 +553,129 @@ viua::internals::types::bytecode_size assemble_instruction(
                                                               resolve_rs_type(tokens.at(lhs + 1))),
                      assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)),
                                                               resolve_rs_type(tokens.at(rhs + 1))));
+    } else if (tokens.at(i) == "bitand") {
+        TokenIndex target = i + 1;
+        TokenIndex lhs = target + 2;
+        TokenIndex rhs = lhs + 2;
+
+        program.opbitand(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
+                                                                  resolve_rs_type(tokens.at(target + 1))),
+                         assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
+                                                                  resolve_rs_type(tokens.at(lhs + 1))),
+                         assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)),
+                                                                  resolve_rs_type(tokens.at(rhs + 1))));
+    } else if (tokens.at(i) == "bitor") {
+        TokenIndex target = i + 1;
+        TokenIndex lhs = target + 2;
+        TokenIndex rhs = lhs + 2;
+
+        program.opbitor(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
+                                                                 resolve_rs_type(tokens.at(target + 1))),
+                        assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
+                                                                 resolve_rs_type(tokens.at(lhs + 1))),
+                        assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)),
+                                                                 resolve_rs_type(tokens.at(rhs + 1))));
+    } else if (tokens.at(i) == "bitnot") {
+        TokenIndex target = i + 1;
+        TokenIndex lhs = target + 2;
+
+        program.opbitnot(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
+                                                                  resolve_rs_type(tokens.at(target + 1))),
+                         assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
+                                                                  resolve_rs_type(tokens.at(lhs + 1))));
+    } else if (tokens.at(i) == "bitxor") {
+        TokenIndex target = i + 1;
+        TokenIndex lhs = target + 2;
+        TokenIndex rhs = lhs + 2;
+
+        program.opbitxor(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
+                                                                  resolve_rs_type(tokens.at(target + 1))),
+                         assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
+                                                                  resolve_rs_type(tokens.at(lhs + 1))),
+                         assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)),
+                                                                  resolve_rs_type(tokens.at(rhs + 1))));
+    } else if (tokens.at(i) == "bitat") {
+        TokenIndex target = i + 1;
+        TokenIndex lhs = target + 2;
+        TokenIndex rhs = lhs + 2;
+
+        program.opbitat(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
+                                                                 resolve_rs_type(tokens.at(target + 1))),
+                        assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
+                                                                 resolve_rs_type(tokens.at(lhs + 1))),
+                        assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)),
+                                                                 resolve_rs_type(tokens.at(rhs + 1))));
+    } else if (tokens.at(i) == "bitset") {
+        TokenIndex target = i + 1;
+        TokenIndex lhs = target + 2;
+        TokenIndex rhs = lhs + 2;
+
+        program.opbitset(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
+                                                                  resolve_rs_type(tokens.at(target + 1))),
+                         assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
+                                                                  resolve_rs_type(tokens.at(lhs + 1))),
+                         assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)),
+                                                                  resolve_rs_type(tokens.at(rhs + 1))));
+    } else if (tokens.at(i) == "shl") {
+        TokenIndex target = i + 1;
+        TokenIndex lhs = target + 2;
+        TokenIndex rhs = lhs + 2;
+
+        program.opshl(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
+                                                               resolve_rs_type(tokens.at(target + 1))),
+                      assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
+                                                               resolve_rs_type(tokens.at(lhs + 1))),
+                      assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)),
+                                                               resolve_rs_type(tokens.at(rhs + 1))));
+    } else if (tokens.at(i) == "ashl") {
+        TokenIndex target = i + 1;
+        TokenIndex lhs = target + 2;
+        TokenIndex rhs = lhs + 2;
+
+        program.opashl(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
+                                                                resolve_rs_type(tokens.at(target + 1))),
+                       assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
+                                                                resolve_rs_type(tokens.at(lhs + 1))),
+                       assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)),
+                                                                resolve_rs_type(tokens.at(rhs + 1))));
+    } else if (tokens.at(i) == "shr") {
+        TokenIndex target = i + 1;
+        TokenIndex lhs = target + 2;
+        TokenIndex rhs = lhs + 2;
+
+        program.opshr(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
+                                                               resolve_rs_type(tokens.at(target + 1))),
+                      assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
+                                                               resolve_rs_type(tokens.at(lhs + 1))),
+                      assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)),
+                                                               resolve_rs_type(tokens.at(rhs + 1))));
+    } else if (tokens.at(i) == "ashr") {
+        TokenIndex target = i + 1;
+        TokenIndex lhs = target + 2;
+        TokenIndex rhs = lhs + 2;
+
+        program.opashr(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
+                                                                resolve_rs_type(tokens.at(target + 1))),
+                       assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
+                                                                resolve_rs_type(tokens.at(lhs + 1))),
+                       assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)),
+                                                                resolve_rs_type(tokens.at(rhs + 1))));
+    } else if (tokens.at(i) == "rol") {
+        TokenIndex target = i + 1;
+        TokenIndex lhs = target + 2;
+
+        program.oprol(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
+                                                               resolve_rs_type(tokens.at(target + 1))),
+                      assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
+                                                               resolve_rs_type(tokens.at(lhs + 1))));
+    } else if (tokens.at(i) == "ror") {
+        TokenIndex target = i + 1;
+        TokenIndex lhs = target + 2;
+
+        program.opror(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
+                                                               resolve_rs_type(tokens.at(target + 1))),
+                      assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
+                                                               resolve_rs_type(tokens.at(lhs + 1))));
     } else if (tokens.at(i) == "move") {
         TokenIndex target = i + 1;
         TokenIndex source = target + 2;
