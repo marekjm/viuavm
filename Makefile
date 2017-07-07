@@ -21,7 +21,7 @@ CXXOPTIMIZATIONFLAGS=-O0
 COPTIMIZATIONFLAGS=
 DYNAMIC_SYMS=-Wl,--dynamic-list-cpp-typeinfo
 
-VIUA_INSTR_FILES_O=build/process/instr/general.o build/process/instr/registers.o build/process/instr/calls.o build/process/instr/concurrency.o build/process/instr/linking.o build/process/instr/tcmechanism.o build/process/instr/closure.o build/process/instr/int.o build/process/instr/float.o build/process/instr/arithmetic.o build/process/instr/str.o build/process/instr/text.o build/process/instr/bool.o build/process/instr/cast.o build/process/instr/vector.o build/process/instr/prototype.o build/process/instr/object.o build/process/instr/struct.o build/process/instr/atom.o
+VIUA_INSTR_FILES_O=build/process/instr/general.o build/process/instr/registers.o build/process/instr/calls.o build/process/instr/concurrency.o build/process/instr/linking.o build/process/instr/tcmechanism.o build/process/instr/closure.o build/process/instr/int.o build/process/instr/float.o build/process/instr/arithmetic.o build/process/instr/str.o build/process/instr/text.o build/process/instr/bool.o build/process/instr/bits.o build/process/instr/cast.o build/process/instr/vector.o build/process/instr/prototype.o build/process/instr/object.o build/process/instr/struct.o build/process/instr/atom.o
 
 
 PREFIX=/usr/local
@@ -439,6 +439,9 @@ build/process/instr/text.o: src/process/instr/text.cpp
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
 build/process/instr/bool.o: src/process/instr/bool.cpp
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
+
+build/process/instr/bits.o: src/process/instr/bits.cpp build/process.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) -c -o $@ $<
 
 build/process/instr/cast.o: src/process/instr/cast.cpp
