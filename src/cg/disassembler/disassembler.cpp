@@ -375,6 +375,10 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(
         case VLEN:
         case TEXTLENGTH:
         case STRUCTKEYS:
+        case BITS:
+        case BITNOT:
+        case ROL:
+        case ROR:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
@@ -388,6 +392,15 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(
         case GT:
         case GTE:
         case EQ:
+        case BITAND:
+        case BITOR:
+        case BITXOR:
+        case BITAT:
+        case BITSET:
+        case SHL:
+        case SHR:
+        case ASHL:
+        case ASHR:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
