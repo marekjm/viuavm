@@ -110,6 +110,20 @@ class Program {
     Program& opand(int_op, int_op, int_op);
     Program& opor(int_op, int_op, int_op);
 
+    Program& opbits(int_op, int_op);
+    Program& opbitand(int_op, int_op, int_op);
+    Program& opbitor(int_op, int_op, int_op);
+    Program& opbitnot(int_op, int_op);
+    Program& opbitxor(int_op, int_op, int_op);
+    Program& opbitat(int_op, int_op, int_op);
+    Program& opbitset(int_op, int_op, int_op);
+    Program& opshl(int_op, int_op, int_op);
+    Program& opshr(int_op, int_op, int_op);
+    Program& opashl(int_op, int_op, int_op);
+    Program& opashr(int_op, int_op, int_op);
+    Program& oprol(int_op, int_op);
+    Program& opror(int_op, int_op);
+
     Program& opmove(int_op, int_op);
     Program& opcopy(int_op, int_op);
     Program& opptr(int_op, int_op);
