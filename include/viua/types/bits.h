@@ -17,8 +17,8 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef VIUA_TYPES_INTEGER_H
-#define VIUA_TYPES_INTEGER_H
+#ifndef VIUA_TYPES_BITS_H
+#define VIUA_TYPES_BITS_H
 
 #pragma once
 
