@@ -206,6 +206,9 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case OR:
             addr = opor(addr + 1);
             break;
+        case BITS:
+            addr = opbits(addr + 1);
+            break;
         case MOVE:
             addr = opmove(addr + 1);
             break;
