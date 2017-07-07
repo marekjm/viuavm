@@ -553,6 +553,14 @@ viua::internals::types::bytecode_size assemble_instruction(
                                                               resolve_rs_type(tokens.at(lhs + 1))),
                      assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)),
                                                               resolve_rs_type(tokens.at(rhs + 1))));
+    } else if (tokens.at(i) == "bits") {
+        TokenIndex target = i + 1;
+        TokenIndex lhs = target + 2;
+
+        program.opbits(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
+                                                                resolve_rs_type(tokens.at(target + 1))),
+                       assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
+                                                                resolve_rs_type(tokens.at(lhs + 1))));
     } else if (tokens.at(i) == "bitand") {
         TokenIndex target = i + 1;
         TokenIndex lhs = target + 2;
