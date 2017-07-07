@@ -599,6 +599,16 @@ static void check_block_body(const TokenVector& body_tokens, TokenVector::size_t
                              body_tokens.at(target));
 
             i = skip_till_next_line(body_tokens, i);
+        } else if (token == "bits") {
+            TokenIndex target = i + 1;
+            TokenIndex source = target + 2;
+
+            check_use_of_register(body_tokens, source, i, registers, named_registers,
+                                  ("use of empty register in " + token.str()));
+            registers.insert(resolve_register_name(named_registers, body_tokens.at(target)),
+                             body_tokens.at(target));
+
+            i = skip_till_next_line(body_tokens, i);
         } else if (token == "pamv" or token == "param") {
             TokenIndex source = get_token_index_of_operand(body_tokens, i, 2);
 
