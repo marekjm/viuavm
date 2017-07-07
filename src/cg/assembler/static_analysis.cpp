@@ -35,6 +35,7 @@ using namespace std;
 
 
 using Token = viua::cg::lex::Token;
+using TokenVector = vector<Token>;
 
 class Registers {
     map<string, Token> defined_registers;
@@ -67,8 +68,7 @@ class Registers {
 };
 
 
-static auto skip_till_next_line(const std::vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i)
-    -> decltype(i) {
+static auto skip_till_next_line(const TokenVector& tokens, TokenVector::size_type i) -> decltype(i) {
     do {
         ++i;
     } while (i < tokens.size() and tokens.at(i) != "\n");
@@ -90,8 +90,8 @@ static auto get_name(const map<string, string>& named_registers, string name, To
     }
     return it->first;
 }
-static string resolve_register_name(const map<string, string>& named_registers, viua::cg::lex::Token token,
-                                    string name, const bool allow_direct_access = false) {
+static string resolve_register_name(const map<string, string>& named_registers, Token token, string name,
+                                    const bool allow_direct_access = false) {
     if (name == "\n") {
         throw viua::cg::lex::InvalidSyntax(token, "expected operand, found newline");
     }
@@ -126,7 +126,7 @@ static string resolve_register_name(const map<string, string>& named_registers, 
     }
     return named_registers.at(name);
 }
-static string resolve_register_name(const map<string, string>& named_registers, viua::cg::lex::Token token) {
+static string resolve_register_name(const map<string, string>& named_registers, Token token) {
     return resolve_register_name(named_registers, token, token.str());
 }
 
@@ -143,8 +143,8 @@ static void check_timeout_operand(Token token) {
 static auto strip_access_mode_sigil(string s) -> string {
     return ((s.at(0) == '%' or s.at(0) == '@' or s.at(0) == '*') ? s.substr(1) : s);
 }
-static void check_use_of_register_index(const vector<viua::cg::lex::Token>& tokens, long unsigned i,
-                                        long unsigned by, string register_index, Registers& registers,
+static void check_use_of_register_index(const TokenVector& tokens, long unsigned i, long unsigned by,
+                                        string register_index, Registers& registers,
                                         map<string, string>& named_registers, const string& message_prefix,
                                         const bool allow_direct_access_to_target = true) {
     string resolved_register_name;
@@ -178,16 +178,15 @@ static void check_use_of_register_index(const vector<viua::cg::lex::Token>& toke
     }
     registers.use(resolved_register_name, tokens.at(i));
 }
-static void check_use_of_register(const vector<viua::cg::lex::Token>& tokens, long unsigned i,
-                                  long unsigned by, Registers& registers,
-                                  map<string, string>& named_registers, const string& message_prefix,
+static void check_use_of_register(const TokenVector& tokens, long unsigned i, long unsigned by,
+                                  Registers& registers, map<string, string>& named_registers,
+                                  const string& message_prefix,
                                   const bool allow_direct_access_to_target = true) {
     check_use_of_register_index(tokens, i, by, tokens.at(i), registers, named_registers, message_prefix,
                                 allow_direct_access_to_target);
 }
-static void check_use_of_register(const vector<viua::cg::lex::Token>& tokens, long unsigned i,
-                                  long unsigned by, Registers& registers,
-                                  map<string, string>& named_registers) {
+static void check_use_of_register(const TokenVector& tokens, long unsigned i, long unsigned by,
+                                  Registers& registers, map<string, string>& named_registers) {
     check_use_of_register_index(tokens, i, by, tokens.at(i), registers, named_registers,
                                 "use of empty register");
 }
@@ -205,9 +204,8 @@ static void check_defined_but_unused(Registers& registers) {
     }
 }
 
-static auto in_block_offset(const vector<viua::cg::lex::Token>& body_tokens,
-                            std::remove_reference<decltype(body_tokens)>::type::size_type i,
-                            Registers& registers, map<string, string>& named_registers) -> decltype(i) {
+static auto in_block_offset(const TokenVector& body_tokens, TokenVector::size_type i, Registers& registers,
+                            map<string, string>& named_registers) -> decltype(i) {
     const auto& checked_token = body_tokens.at(i);
 
     if (checked_token.str().at(0) == '+') {
@@ -280,10 +278,9 @@ static auto in_block_offset(const vector<viua::cg::lex::Token>& body_tokens,
     return i;
 }
 
-static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, decltype(body_tokens.size()),
-                             Registers&, const map<string, vector<viua::cg::lex::Token>>&, const bool);
-static void check_block_body(const vector<viua::cg::lex::Token>&, Registers&,
-                             const map<string, vector<viua::cg::lex::Token>>&, const bool);
+static void check_block_body(const TokenVector& body_tokens, TokenVector::size_type, Registers&,
+                             const map<string, TokenVector>&, const bool);
+static void check_block_body(const TokenVector&, Registers&, const map<string, TokenVector>&, const bool);
 
 static void erase_register(Registers& registers, map<string, string>& named_registers, const Token& name,
                            const Token& context) {
@@ -298,7 +295,7 @@ static void erase_register(Registers& registers, map<string, string>& named_regi
 }
 
 // FIXME this function is duplicated
-static auto get_token_index_of_operand(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i,
+static auto get_token_index_of_operand(const TokenVector& tokens, TokenVector::size_type i,
                                        int wanted_operand_index) -> decltype(i) {
     auto limit = tokens.size();
     while (i < limit and wanted_operand_index > 0) {
@@ -323,11 +320,10 @@ static auto get_token_index_of_operand(const vector<viua::cg::lex::Token>& token
     return i;
 }
 
-static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, decltype(body_tokens.size()) i,
-                             Registers& registers, map<string, string> named_registers,
-                             const map<string, vector<viua::cg::lex::Token>>& block_bodies,
-                             const bool debug) {
-    using TokenIndex = std::remove_reference<decltype(body_tokens)>::type::size_type;
+static void check_block_body(const TokenVector& body_tokens, TokenVector::size_type i, Registers& registers,
+                             map<string, string> named_registers,
+                             const map<string, TokenVector>& block_bodies, const bool debug) {
+    using TokenIndex = TokenVector::size_type;
 
     for (; i < body_tokens.size(); ++i) {
         auto token = body_tokens.at(i);
@@ -873,26 +869,23 @@ static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, de
     }
     check_defined_but_unused(registers);
 }
-static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, decltype(body_tokens.size()) i,
-                             Registers& registers,
-                             const map<string, vector<viua::cg::lex::Token>>& block_bodies,
-                             const bool debug) {
+static void check_block_body(const TokenVector& body_tokens, TokenVector::size_type i, Registers& registers,
+                             const map<string, TokenVector>& block_bodies, const bool debug) {
     map<string, string> named_registers;
     check_block_body(body_tokens, i, registers, named_registers, block_bodies, debug);
 }
-static void check_block_body(const vector<viua::cg::lex::Token>& body_tokens, Registers& registers,
-                             const map<string, vector<viua::cg::lex::Token>>& block_bodies,
-                             const bool debug) {
+static void check_block_body(const TokenVector& body_tokens, Registers& registers,
+                             const map<string, TokenVector>& block_bodies, const bool debug) {
     check_block_body(body_tokens, 0, registers, block_bodies, debug);
 }
 
-void assembler::verify::manipulationOfDefinedRegisters(
-    const std::vector<viua::cg::lex::Token>& tokens,
-    const map<string, vector<viua::cg::lex::Token>>& block_bodies, const bool debug) {
+void assembler::verify::manipulationOfDefinedRegisters(const TokenVector& tokens,
+                                                       const map<string, TokenVector>& block_bodies,
+                                                       const bool debug) {
     string opened_function;
 
-    vector<viua::cg::lex::Token> body;
-    for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
+    TokenVector body;
+    for (TokenVector::size_type i = 0; i < tokens.size(); ++i) {
         auto token = tokens.at(i);
         if (token == ".function:") {
             opened_function = tokens.at(i + 1);
