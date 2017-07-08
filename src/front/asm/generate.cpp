@@ -131,7 +131,12 @@ static viua::internals::types::bytecode_size writeCodeBlocksSection(
     ofstream& out, const invocables_t& blocks, const vector<string>& linked_block_names,
     viua::internals::types::bytecode_size block_bodies_size_so_far = 0) {
     viua::internals::types::bytecode_size block_ids_section_size = 0;
+
     for (string name : blocks.names) {
+        /*
+         * Increase size of the block IDs section by
+         * size of the block's name.
+         */
         block_ids_section_size += name.size();
     }
     // we need to insert address after every block
@@ -142,7 +147,14 @@ static viua::internals::types::bytecode_size writeCodeBlocksSection(
     /////////////////////////////////////////////
     // WRITE OUT BLOCK IDS SECTION
     // THIS ALSO INCLUDES IDS OF LINKED BLOCKS
+
+    /*
+     * Write out block IDs section's size.
+     * Note that block IDs section may also include IDs and
+     * addresses of statically linked blocks.
+     */
     bwrite(out, block_ids_section_size);
+
     for (string name : blocks.names) {
         if (DEBUG) {
             cout << send_control_seq(COLOR_FG_LIGHT_GREEN) << "message" << send_control_seq(ATTR_RESET);
@@ -161,12 +173,25 @@ static viua::internals::types::bytecode_size writeCodeBlocksSection(
             cout << endl;
         }
 
+        /*
+         * Write name of the block.
+         * This name is used at runtime to find address of the block.
+         */
         strwrite(out, name);
-        // mapped address must come after name
+
+        /*
+         * Mapped address must come after name.
+         * This address is used at runtime to resolve offset from the beginning of
+         * the loaded module at which the block's instructions begin.
+         */
         // FIXME: use uncasted viua::internals::types::bytecode_size
         bwrite(out, block_bodies_size_so_far);
-        // block_bodies_size_so_far size must be incremented by the actual size of block's bytecode size
-        // to give correct offset for next block
+
+        /*
+         * The 'block_bodies_size_so_far' variable must be incremented by
+         * the actual size of block's bytecode size to give correct offset
+         * for the next block.
+         */
         try {
             block_bodies_size_so_far += viua::cg::tools::calculate_bytecode_size2(blocks.tokens.at(name));
         } catch (const std::out_of_range& e) {
