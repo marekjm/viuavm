@@ -24,12 +24,9 @@ void Frame::setLocalRegisterSet(viua::kernel::RegisterSet* rs, bool receives_own
     local_register_set.reset(rs, receives_ownership);
 }
 
-Frame::Frame(viua::internals::types::byte* ra, viua::internals::types::register_index argsize, viua::internals::types::register_index regsize):
-    return_address(ra),
-    arguments(nullptr),
-    local_register_set(nullptr),
-    return_register(nullptr)
-{
+Frame::Frame(viua::internals::types::byte* ra, viua::internals::types::register_index argsize,
+             viua::internals::types::register_index regsize)
+    : return_address(ra), arguments(nullptr), local_register_set(nullptr), return_register(nullptr) {
     arguments.reset(new viua::kernel::RegisterSet(argsize));
     local_register_set.reset(new viua::kernel::RegisterSet(regsize));
 }

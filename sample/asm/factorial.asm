@@ -20,12 +20,12 @@
 .function: factorial/2
     .name: 1 number
     .name: 2 result
-    mul int64 %result (arg %result %1) (arg %number %0)
+    mul %result (arg %result %1) (arg %number %0)
     idec %number
 
     ; if counter is equal to zero
     ; finish "factorial" calls
-    if (eq int64 %4 %number (istore %3 0)) finish
+    if (eq %4 %number (istore %3 0)) finish
 
     frame ^[(param %0 %number) (param %1 %result)]
     call %result factorial/2

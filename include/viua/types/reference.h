@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -26,35 +26,38 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 
 namespace viua {
     namespace types {
-        class Reference: public Type {
+        class Reference: public Value {
             // FIXME maybe just use std::shared_ptr<> ?
-            Type **pointer;
+            Value **pointer;
             uint64_t *counter;
 
             /*  This constructor is used internally by the Reference type to
              *  initialise copies of the reference.
              */
-            Reference(Type **ptr, uint64_t *ctr): pointer(ptr), counter(ctr) {}
+            Reference(Value **ptr, uint64_t *ctr);
 
             public:
-                virtual std::string type() const override;
-                virtual std::string str() const override;
-                virtual std::string repr() const override;
-                virtual bool boolean() const override;
+                static const std::string type_name;
 
-                virtual std::vector<std::string> bases() const override;
-                virtual std::vector<std::string> inheritancechain() const override;
+                std::string type() const override;
+                std::string str() const override;
+                std::string repr() const override;
+                bool boolean() const override;
 
-                virtual std::unique_ptr<Type> copy() const override;
-                virtual Type* pointsTo() const;
-                virtual void rebind(Type*);
-                virtual void rebind(std::unique_ptr<Type>);
+                std::vector<std::string> bases() const override;
+                std::vector<std::string> inheritancechain() const override;
 
-                Reference(Type *ptr);
+                std::unique_ptr<Value> copy() const override;
+
+                virtual Value* pointsTo() const;
+                virtual void rebind(Value*);
+                virtual void rebind(std::unique_ptr<Value>);
+
+                Reference(Value *ptr);
                 virtual ~Reference();
         };
     }

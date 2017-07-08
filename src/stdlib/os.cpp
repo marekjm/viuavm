@@ -19,11 +19,11 @@
 
 #include <cstdlib>
 #include <string>
-#include <viua/types/integer.h>
-#include <viua/types/exception.h>
+#include <viua/include/module.h>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
-#include <viua/include/module.h>
+#include <viua/types/exception.h>
+#include <viua/types/integer.h>
 using namespace std;
 
 
@@ -38,10 +38,7 @@ void os_system(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterS
 
 
 const ForeignFunctionSpec functions[] = {
-    { "os::system", &os_system },
-    { NULL, NULL },
+    {"os::system", &os_system}, {NULL, NULL},
 };
 
-extern "C" const ForeignFunctionSpec* exports() {
-    return functions;
-}
+extern "C" const ForeignFunctionSpec* exports() { return functions; }

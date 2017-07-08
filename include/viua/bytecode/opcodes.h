@@ -56,6 +56,62 @@ enum OPCODE : viua::internals::types::byte {
     STRSTORE,
     STREQ,
 
+    /*
+     *  Store a text value in a register.
+     *
+     *  text {target-register} "<text>"
+     */
+    TEXT,
+
+    /*
+     *  Compare two text values for equality.
+     *
+     *  texteq {result-register} {lhs-register} {rhs-register}
+     */
+    TEXTEQ,
+
+    /*
+     *  Return copy of the character at a given index in text.
+     *
+     *  textat {result-register} {string-register} {index-register}
+     */
+    TEXTAT,
+
+    /*
+     *  Return a copy of a part of the given text between given indexes.
+     *
+     *  textsub {result-register} {string-register} {begin-index-register} {end-index:register|void}
+     */
+    TEXTSUB,
+
+    /*
+     *  Return length of a given text value (in characters).
+     *
+     *  textlength {result-register} {string-register}
+     */
+    TEXTLENGTH,
+
+    /*
+     *  Return length of common prefix of two text values.
+     *
+     *  textcommonprefix {result-register} {lhs-string-register} {rhs-string-register}
+     */
+    TEXTCOMMONPREFIX,
+
+    /*
+     *  Return length of common suffix of two text values.
+     *
+     *  textcommonsuffix {result-register} {lhs-string-register} {rhs-string-register}
+     */
+    TEXTCOMMONSUFFIX,
+
+    /*
+     *  Concatenate two text values. Creates a copy of each text value.
+     *
+     *  textconcat {result-register} {lhs-string-register} {rhs-string-register}
+     */
+    TEXTCONCAT,
+
     VEC,
     VINSERT,
     VPUSH,
@@ -95,6 +151,7 @@ enum OPCODE : viua::internals::types::byte {
     PAMV,   // move object from a register to parameter register (pass-by-move),
     CALL,   // call given function with parameters set in parameter register,
     TAILCALL,   // perform a tail call to a function
+    DEFER,  // call a function just after the frame it was called in is popped off the stack
     ARG,    // move an object from argument register to a normal register (inside a function call),
     ARGC,   // store number of supplied parameters in a register
 
@@ -124,13 +181,58 @@ enum OPCODE : viua::internals::types::byte {
                 // ENTER instructions do not require any CATCH to precede them
     LEAVE,      // leave a block and resume execution after last enter instruction
 
-    IMPORT,     // dynamically link foreign library
-    LINK,       // dynamically link native library
+    IMPORT,     // dynamically link code modules
 
     CLASS,      // create a prototype for new class
     DERIVE,     // derive a prototype from an existing class
     ATTACH,     // attach a method to the prototype
     REGISTER,   // register a prototype in VM's typesystem
+
+    /*
+     *  Create an atom.
+     *  Atoms can be compared for equality, and encode symbols (function names, type names, etc.).
+     *
+     *  atom {target-register} '{atom-value}'
+     */
+    ATOM,
+
+    /*
+     *  Compare atoms for equality.
+     *
+     *  atomeq {result-register} {lhs-register} {rhs-register}
+     */
+    ATOMEQ,
+
+    /*
+     *  Create a struct.
+     *  Structs are anonymous key-value containers.
+     *
+     *  struct {target-register}
+     */
+    STRUCT,
+
+    /*
+     *  Insert a value into a struct at a given key.
+     *  Moves the value into the struct.
+     *
+     *  structinsert {target-struct-register} {key-register} {value-register}
+     */
+    STRUCTINSERT,
+
+    /*
+     *  Remove a value at a given key from a struct, and return removed value.
+     *  Throws an exception if the struct does not have requested key.
+     *
+     *  structremove {result-register} {source-struct-register} {key-register}
+     */
+    STRUCTREMOVE,
+
+    /*
+     *  Get a vector with keys of a struct.
+     *
+     *  structkeys {result} {source-struct-register}
+     */
+    STRUCTKEYS,
 
     NEW,        // construct new instance of a class in a register
     MSG,        // send a message to an object (used for dynamic dispatch, for static use plain "CALL")

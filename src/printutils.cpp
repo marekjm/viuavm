@@ -19,8 +19,8 @@
 
 #include <sstream>
 #include <string>
-#include <viua/types/type.h>
 #include <viua/printutils.h>
+#include <viua/types/value.h>
 using namespace std;
 
 string stringifyFunctionInvocation(const Frame* frame) {
@@ -34,7 +34,7 @@ string stringifyFunctionInvocation(const Frame* frame) {
         } else {
             oss << optr->repr();
         }
-        if (i < (frame->arguments->size()-1)) {
+        if (i < (frame->arguments->size() - 1)) {
             oss << ", ";
         }
     }

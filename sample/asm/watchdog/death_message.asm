@@ -87,7 +87,7 @@
 .signature: std::misc::cycle/1
 
 .function: main/1
-    link std::misc
+    import "std::misc"
 
     watchdog watchdog_process/1
 

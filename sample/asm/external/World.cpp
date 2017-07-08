@@ -18,26 +18,24 @@
  */
 
 #include <iostream>
-#include <viua/types/type.h>
+#include <viua/include/module.h>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
-#include <viua/include/module.h>
+#include <viua/types/value.h>
 using namespace std;
 
 
 extern "C" const ForeignFunctionSpec* exports();
 
 
-static void hello(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+static void hello(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*,
+                  viua::kernel::Kernel*) {
     cout << "Hello World!" << endl;
 }
 
 
 const ForeignFunctionSpec functions[] = {
-    { "World::print_hello/0", &hello },
-    { nullptr, nullptr },
+    {"World::print_hello/0", &hello}, {nullptr, nullptr},
 };
 
-extern "C" const ForeignFunctionSpec* exports() {
-    return functions;
-}
+extern "C" const ForeignFunctionSpec* exports() { return functions; }

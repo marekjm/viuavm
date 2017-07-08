@@ -8,7 +8,7 @@
 ![License](https://img.shields.io/github/license/marekjm/viuavm.svg)
 
 
-> A register-based virtual machine programmable in custom assembly lookalike language with
+> A register-based, parallel virtual machine programmable in custom assembly lookalike language with
 > strong emphasis on reliability, predictability, and concurrency.
 
 #### Hello World in Viua VM
@@ -19,13 +19,13 @@
 ; Valid main functions are main/0, main/1 and main/2.
 ;
 .function: main/0
-    ; Store string in register with index 1.
-    ; The strstore instruction has two operands, and
-    ; shares operand order with majority of other instructions:
+    ; Store text value in register with index 1.
+    ; The text instruction shares operand order with majority of
+    ; other instructions:
     ;
-    ;   <mnemonic> <target> <source>...
+    ;   <mnemonic> <target> <sources>...
     ;
-    strstore %1 "Hello World!"
+    text %1 "Hello World!"
 
     ; Print contents of a register to standard output.
     ; This is the most primitive form of output the VM supports, and
@@ -43,6 +43,9 @@
 .end
 ```
 
+For more examples visit either [documentation](http://docs.viuavm.org/) or [Rosetta](http://rosettacode.org/wiki/Viua_VM_assembly) page for Viua VM.
+Check [Weekly](http://weekly.viuavm.org/) blog for news and developments in Viua VM.
+
 
 ### Use cases
 
@@ -53,8 +56,8 @@ The VM is able to fully utilise all cores of the CPU it's running on (tested on 
 generate high CPU loads, but is relatively light on RAM and should not contain any memory leaks (all runtime tests are
 run under Valgrind to ensure this).
 
-The virtual machine is covered by ~380 tests to provide safety, and guard against possible regressions.
-It ships with an assembler, and a static analyser, but does not provide any higher-level language compiler.
+The virtual machine is covered by more than 400 tests to provide safety, and guard against possible regressions.
+It ships with an assembler and a static analyser, but does not provide any higher-level language compiler.
 
 
 ----
@@ -63,18 +66,18 @@ It ships with an assembler, and a static analyser, but does not provide any high
 #### Design goals
 
 - **predictable execution**: it is easier to reason about code when you know exactly how it will behave
-- **predictable memory behaviour**: in Viua you do not have to guess when the memory will be released, or
+- **predictable value lifetimes**: in Viua you do not have to guess when the memory will be released, when objects will be destroyed, or
   remember about the possibility of a gargabe collector kicking in and interrupting your program;
-  Viua manages memory without a GC in a strictly scope-based (where "scope" means "virtual stack frame") manner
-- **massive parallelism**: Viua architecture supports spawning massive amounts of independent, VM-based lightweight processes that can
+  Viua manages resources without a GC in a strictly scope-based (where "scope" means "virtual stack frame") manner
+- **massive concurrency**: Viua architecture supports spawning massive amounts of independent, VM-based lightweight processes that can
   run in parallel (Viua is capable of providing true parallelism given sufficient hardware resources, i.e. at least two CPU cores)
-- **concurrent I/O and FFI**: I/O operations and FFI calls cannot block the VM as they are executed on dedicated schedulers, so block only the
+- **parallel I/O and FFI schedulers**: I/O operations and FFI calls cannot block the VM as they are executed on dedicated schedulers, so block only the
   virtual process that called them without affecting other virtual processes
 - **easy scatter/gather processing**: processes communicate using messages but machine supports a *join* instruction - which synchronises virtual
-  processes execution, it blocks calling process until called process finishes and receives return value of called process (**WIP**)
+  processes execution, it blocks calling process until called process finishes and receives return value of called process
 - **safe inter-process communication** via message-passing (with queueing)
 - **soft-realtime capabilities**: join and receive operations with timeouts (throwing exceptions if nothing has been received) make Viua
-  a VM suitable to host soft-realtime programs (**WIP**)
+  a VM suitable to host soft-realtime programs
 - **fast debugging**: error handling is performed with exceptions (even across virtual processes), and unserviced exceptions cause the machine
   to generate precise and detailed stack traces; running programs are also debuggable with GDB
 - **reliability**: programs running on Viua should be able to run until they are told to stop, not until they crash;
@@ -94,7 +97,7 @@ Some features also supported by the VM:
 - passing function parameters by value and move (non-copying pass)
 - copy-free function returns
 - inter-function tail calls
-- support for pointer-aliases (with no arithmetic, and no assignment - pointers may be only used for reading and mutating objects)
+- support for pointers (with no arithmetic, and no reassignment - pointers may be only used for reading and mutating objects)
 
 For enhanced reliability, Viua assembler provides a built-in static analyser that is able to detect most common errors related to
 register manipulation at compile time.
@@ -156,113 +159,12 @@ A typical session is shown below (assuming current working directory is the loca
  ]$ ./build/bin/vm/kernel some_file.out
 ```
 
-
 ----
 
+## Contributing
 
-# Development
-
-Some development-related information.
-Required tools:
-
-* `g++`: GNU Compiler Collection's C++ compiler version 5.0 or later
-* `clang++`: clang C++ compiler version 3.6.1 or later,
-* `python`: Python programming language 3.x for test suite (optional),
-* `valgrind`: for memory leak testing (optional; by default enabled, disabling required setting `MEMORY_LEAK_CHECKS_ENABLE` variable in `tests/tests.py` to `False`),
-
-Other C++11 capable compilers may work but testing is only performed for G++ and Clang++.
-
-Testing is only performed on Linux.
-Compilation on on various BSD distributions should also work (but it may be problematic when compiling with Clang++).
-Compilation on other operating systems is not tested.
-
-
-## Cloning the repository
-
-Best way to clone a repository (ensuring that the most recent code, and all submodules are fetched) is:
-
-```
-git clone --recursive --branch devel https://github.com/marekjm/viuavm
-```
-
-
-## Compilation
-
-> Before compiling, Git submodule for `linenoise` library must be initialised.
-
-Compilation is simple and can be executed by typing `make` in the shell.
-Full, clean compilation can also be performed by the `./scripts/recompile` script.
-The script will run `make clean` production, detect number of cores the machine compilation is done on has, and
-run `make` with `-j` option adjusted to take advantage of multithreaded `make`-ing.
-
-Incremental recompilation can be performed with either `make` or `./scripts/compile` (the latter will detect the number of
-cores available and adjust `-j` option in Make).
-
-
-## Testing
-
-There is a simple test suite located in `tests/` directory.
-It can be invoked by `make test` command.
-Python 3 must be installed on the machine to run the tests.
-
-Code used for unit tests can be found in `sample/` directory.
-
-
-### Viua development scripts
-
-In the `scripts/` directory, you can find scripts that are used during development of Viua.
-The shell installed in dev environment is ZSH but the scripts should be compatible with BASH as well.
-
-
-## Git workflow
-
-Each feature and fix is developed in a separate branch.
-Bugs which are discovered during development of a certain feature,
-may be fixed in the same branch as their parent issue.
-This is also true for small features.
-
-**Branch structure:**
-
-- `master`: master branch - contains stable, working version of VM code,
-- `devel`: development branch - all fixes and features are first merged here,
-- `issue/<number>/<slug>` or `issue/<slug>`: for issues (both enhancement and bug fixes),
-
-
-## Patch submissions
-
-Patch submissions and issue reports are both welcome.
-
-Rememeber, though, to provide appropriate test cases with code patches you submit.
-It will be appreciated and will make the merge process faster.
-If you're fixing a bug:
-
-- write a test that will catch the bug should it resurface
-- put comments in the code sample your test uses
-
-If you're implementing a feature:
-
-- provide a positive test (i.e. feature working as intended and performing its function)
-- provide a negative test (i.e. feature generating an error)
-- put comments in the code samples the tests use
-
-In both cases your code must pass the tests on both x86_64 and 64 bit ARM (if you don't have an ARM CPU around
-mention it when submitting a pull request and I'll test on ARM myself).
-Your code must also run clean under Valgrind, which implies:
-
-- no memory leaks
-- no hangs due to multithreading
-- no unprotected reads/writes to memory
-
-Remember - if your code normally runs OK, but behaves strangely under Valgrind it's a sign that there's a problem with your code.
-
-When submitting a patch make sure that it is formatted according to the coding standard:
-
-- long, descriptive variable names are an accepted tradeoff for code clarity (it's better to give variables hilariously descriptive names than
-  to wonder "wtf does this code do" some time later)
-- opening braces on the same line as their `if`s, `while`s, class and function signatures, etc.
-- indent by four spaces
-
-When in doubt, look at surrounding code and infer what should be done.
+Please read [CONTRIBUTING.markdown](./CONTRIBUTING.markdown) for details on development setup, and
+the process for submitting pull requests, bug reports, and feature suggestions.
 
 
 ----

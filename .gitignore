@@ -29,3 +29,4 @@ tmp/*
 !.gitkeep
 !.gitignore
 !.travis.yml
+!.clang-format

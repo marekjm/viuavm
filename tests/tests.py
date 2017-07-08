@@ -111,15 +111,15 @@ def disassemble(path, out=None):
         raise ViuaDisassemblerError('{0}: {1}'.format(' '.join(asmargs), output.strip()))
     return (output, error, exit_code)
 
-def run(path, expected_exit_code=0):
+def run(path, expected_exit_code=0, pipe_error=False):
     """Run given file with Viua CPU and return its output.
     """
-    p = subprocess.Popen((VIUA_KERNEL_PATH, path), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen((VIUA_KERNEL_PATH, path), stdout=subprocess.PIPE, stderr=(subprocess.PIPE if pipe_error else None))
     output, error = p.communicate()
     exit_code = p.wait()
     if exit_code not in (expected_exit_code if type(expected_exit_code) in [list, tuple] else (expected_exit_code,)):
         raise ViuaCPUError('{0} [{1}]: {2}'.format(path, exit_code, output.decode('utf-8').strip()))
-    return (exit_code, output.decode('utf-8'))
+    return (exit_code, output.decode('utf-8'), (error if error is not None else b'').decode('utf-8'))
 
 FLAG_TEST_ONLY_ASSEMBLING = bool(int(os.environ.get('VIUA_TEST_ONLY_ASMING', 0)))
 MEMORY_LEAK_CHECKS_SKIPPED = 0
@@ -281,11 +281,11 @@ def runMemoryLeakCheck(self, compiled_path, check_memory_leaks):
         MEMORY_LEAK_CHECKS_RUN += 1
         valgrindCheck(self, compiled_path)
 
-def runTestBackend(self, name, expected_output=None, expected_exit_code = 0, output_processing_function = None, check_memory_leaks = True, custom_assert=None, assembly_opts=None, valgrind_enable=True, test_disasm=True):
+def runTestBackend(self, name, expected_output=None, expected_exit_code = 0, output_processing_function = None, expected_error=None, error_processing_function=None, check_memory_leaks = True, custom_assert=None, assembly_opts=None, valgrind_enable=True, test_disasm=True):
     if assembly_opts is None:
         assembly_opts = ()
-    if expected_output is None and custom_assert is None:
-        raise TypeError('`expected_output` and `custom_assert` cannot be both None')
+    if expected_output is None and expected_error is None and custom_assert is None:
+        raise TypeError('`expected_output`, `expected_error`, and `custom_assert` cannot all be None')
     assembly_path = os.path.join(self.PATH, name)
     compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
     if assembly_opts is None:
@@ -293,16 +293,22 @@ def runTestBackend(self, name, expected_output=None, expected_exit_code = 0, out
     else:
         assemble(assembly_path, compiled_path, opts=assembly_opts)
     if not FLAG_TEST_ONLY_ASSEMBLING:
-        excode, output = run(compiled_path, expected_exit_code)
+        excode, output, error = run(compiled_path, expected_exit_code, pipe_error = (expected_error is not None))
         got_output = (output.strip() if output_processing_function is None else output_processing_function(output))
-        if custom_assert is not None:
-            custom_assert(self, excode, got_output)
-        else:
-            self.assertEqual(expected_output, got_output)
-            self.assertEqual(expected_exit_code, excode)
+        got_error = (error.strip() if error_processing_function is None else error_processing_function(error))
+        try:
+            if custom_assert is not None:
+                custom_assert(self, excode, got_output)
+            else:
+                if expected_output is not None: self.assertEqual(expected_output, got_output)
+                if expected_error is not None: self.assertEqual(expected_error, got_error)
+                self.assertEqual(expected_exit_code, excode)
 
-        if valgrind_enable:
-            runMemoryLeakCheck(self, compiled_path, check_memory_leaks)
+            if valgrind_enable:
+                runMemoryLeakCheck(self, compiled_path, check_memory_leaks)
+        except Exception:
+            print('test failed: check file {}'.format(assembly_path))
+            raise
 
     if not test_disasm:
         return
@@ -315,11 +321,12 @@ def runTestBackend(self, name, expected_output=None, expected_exit_code = 0, out
     else:
         assemble(disasm_path, compiled_disasm_path, opts=assembly_opts)
     if not FLAG_TEST_ONLY_ASSEMBLING:
-        dis_excode, dis_output = run(compiled_disasm_path, expected_exit_code)
+        dis_excode, dis_output, dis_error = run(compiled_disasm_path, expected_exit_code, pipe_error = (expected_error is not None))
         if custom_assert is not None:
             custom_assert(self, dis_excode, (dis_output.strip() if output_processing_function is None else output_processing_function(dis_output)))
         else:
-            self.assertEqual(got_output, (dis_output.strip() if output_processing_function is None else output_processing_function(dis_output)))
+            if expected_output is not None: self.assertEqual(got_output, (dis_output.strip() if output_processing_function is None else output_processing_function(dis_output)))
+            if expected_error is not None: self.assertEqual(got_error, (dis_error.strip() if error_processing_function is None else error_processing_function(dis_error)))
             self.assertEqual(excode, dis_excode)
 
     source_assembly_output = b''
@@ -331,10 +338,23 @@ def runTestBackend(self, name, expected_output=None, expected_exit_code = 0, out
     self.assertEqual(hashlib.sha512(source_assembly_output).hexdigest(), hashlib.sha512(disasm_assembly_output).hexdigest())
 
 measured_run_times = []
-def runTest(self, name, expected_output=None, expected_exit_code = 0, output_processing_function = None, check_memory_leaks = True, custom_assert=None, assembly_opts=None, valgrind_enable=True, test_disasm=True):
+def runTest(self, name, expected_output=None, expected_exit_code = 0, output_processing_function = None, expected_error=None, error_processing_function=None, check_memory_leaks = True, custom_assert=None, assembly_opts=None, valgrind_enable=True, test_disasm=True):
     begin = datetime.datetime.now()
     try:
-        runTestBackend(self, name, expected_output, expected_exit_code, output_processing_function, check_memory_leaks, custom_assert, assembly_opts, valgrind_enable, test_disasm)
+        runTestBackend(
+            self = self,
+            name = name,
+            expected_output = expected_output,
+            expected_exit_code = expected_exit_code,
+            expected_error = expected_error,
+            output_processing_function = output_processing_function,
+            error_processing_function = error_processing_function,
+            check_memory_leaks = check_memory_leaks,
+            custom_assert = custom_assert,
+            assembly_opts = assembly_opts,
+            valgrind_enable = valgrind_enable,
+            test_disasm = test_disasm,
+        )
     finally:
         end = datetime.datetime.now()
         delta = (end - begin)
@@ -346,12 +366,21 @@ def runTestCustomAsserts(self, name, assertions_callback, check_memory_leaks = T
     compiled_path = os.path.join(COMPILED_SAMPLES_PATH, '{0}_{1}.bin'.format(self.PATH[2:].replace('/', '_'), name))
     assemble(assembly_path, compiled_path)
     if not FLAG_TEST_ONLY_ASSEMBLING:
-        excode, output = run(compiled_path)
+        excode, output, error = run(compiled_path)
         assertions_callback(self, excode, output)
         runMemoryLeakCheck(self, compiled_path, check_memory_leaks)
 
-def runTestSplitlines(self, name, expected_output, expected_exit_code = 0, assembly_opts=None, test_disasm=True):
-    runTest(self, name, expected_output, expected_exit_code, output_processing_function = lambda o: o.strip().splitlines(), assembly_opts=assembly_opts, test_disasm=test_disasm)
+def runTestSplitlines(self, name, expected_output, expected_exit_code = 0, expected_error = None, error_processing_function = None, assembly_opts=None, test_disasm=True):
+    runTest(self,
+        name = name,
+        expected_output = expected_output,
+        expected_exit_code = expected_exit_code,
+        output_processing_function = lambda o: o.strip().splitlines(),
+        assembly_opts = assembly_opts,
+        test_disasm = test_disasm,
+        expected_error = expected_error,
+        error_processing_function = error_processing_function
+    )
 
 def runTestReturnsUnorderedLines(self, name, expected_output, expected_exit_code = 0):
     runTest(self, name, sorted(expected_output), expected_exit_code, output_processing_function = lambda o: sorted(o.strip().splitlines()))
@@ -362,16 +391,17 @@ def runTestReturnsIntegers(self, name, expected_output, expected_exit_code = 0, 
 def extractExceptionsThrown(output):
     uncaught_object_prefix = 'uncaught object: '
     return list(map(lambda _: (_[0].strip(), _[1].strip(),),
-                    map(lambda _: _.split(' = ', 1),
-                        map(lambda _: _[len(uncaught_object_prefix):],
-                            filter(lambda _: _.startswith(uncaught_object_prefix),
-                                output.strip().splitlines())))))
+                    filter(lambda _: len(_) == 2,
+                           map(lambda _: _.split(' = ', 1),
+                               map(lambda _: _[len(uncaught_object_prefix):],
+                                   filter(lambda _: _.startswith(uncaught_object_prefix),
+                                       output.strip().splitlines()))))))
 
 def extractFirstException(output):
     return extractExceptionsThrown(output)[0]
 
 def runTestThrowsException(self, name, expected_output, assembly_opts=None):
-    runTest(self, name, expected_output, expected_exit_code=1, output_processing_function=extractFirstException, valgrind_enable=False, assembly_opts=assembly_opts)
+    runTest(self, name, expected_error=expected_output, expected_exit_code=1, error_processing_function=extractFirstException, valgrind_enable=False, assembly_opts=assembly_opts)
 
 def runTestThrowsExceptionJSON(self, name, expected_output, output_processing_function, assembly_opts=None):
     was = os.environ.get('VIUA_STACKTRACE_SERIALISATION', 'default')
@@ -383,7 +413,7 @@ def runTestThrowsExceptionJSON(self, name, expected_output, output_processing_fu
     os.environ['VIUA_STACKTRACE_PRINT_TO'] = was_to
 
 def runTestReportsException(self, name, expected_output, assembly_opts=None):
-    runTest(self, name, expected_output, expected_exit_code=0, output_processing_function=extractFirstException, assembly_opts=assembly_opts)
+    runTest(self, name, expected_error=expected_output, expected_exit_code=0, error_processing_function=extractFirstException, assembly_opts=assembly_opts)
 
 def runTestFailsToAssemble(self, name, expected_output, asm_opts=()):
     assembly_path = os.path.join(self.PATH, name)
@@ -463,6 +493,7 @@ class IntegerInstructionsTests(unittest.TestCase):
     def testIntegersInCondition(self):
         runTest(self, 'in_condition.asm', 'true', 0)
 
+    @unittest.skip('')
     def testBooleanAsInteger(self):
         runTest(self, 'boolean_as_int.asm', '70', 0)
 
@@ -560,6 +591,66 @@ class StringInstructionsEscapeSequencesTests(unittest.TestCase):
         runTest(self, 'carriage_return.asm', 'Hello \rWorld!', 0)
 
 
+class TextInstructionsTests(unittest.TestCase):
+    """Tests for string instructions.
+    """
+    PATH = './sample/asm/text'
+
+    def testHelloWorld(self):
+        runTest(self, 'hello_world.asm', 'Hello World!', 0)
+
+    def testTextEquals(self):
+        runTest(self, 'texteq.asm', 'true', 0)
+
+    def testTextEqualsNot(self):
+        runTest(self, 'texteq_not.asm', 'false', 0)
+
+    def testTextat(self):
+        runTest(self, 'textat.asm', 'W', 0)
+
+    def testTextsub(self):
+        runTestSplitlines(self, 'textsub.asm', ['Hello World!', 'Hello'], 0)
+
+    def testTextlength(self):
+        runTestReturnsIntegers(self, 'textlength.asm', [12, 14], 0)
+
+    def testTextCommonPrefix(self):
+        runTestReturnsIntegers(self, 'textcommonprefix.asm', [6], 0)
+
+    def testTextCommonSuffix(self):
+        runTestReturnsIntegers(self, 'textcommonsuffix.asm', [7], 0)
+
+    def testTextconcat(self):
+        runTest(self, 'textconcat.asm', 'Hello World!', 0)
+
+
+class TextInstructionsEscapeSequencesTests(unittest.TestCase):
+    """Tests for escape sequence decoding.
+    """
+    PATH = './sample/asm/text/escape_sequences'
+
+    def testNewline(self):
+        runTest(self, 'newline.asm', 'Hello\nWorld!', 0)
+
+    def testTab(self):
+        runTest(self, 'tab.asm', 'Hello\tWorld!', 0)
+
+    def testVerticalTab(self):
+        runTest(self, 'vertical_tab.asm', 'Hello\vWorld!', 0)
+
+    def testBell(self):
+        runTest(self, 'bell.asm', 'Hello \aWorld!', 0)
+
+    def testBackspace(self):
+        runTest(self, 'backspace.asm', 'Hello  \bWorld!', 0)
+
+    def testFormFeed(self):
+        runTest(self, 'form_feed.asm', 'Hello \fWorld!', 0)
+
+    def testCarriageReturn(self):
+        runTest(self, 'carriage_return.asm', 'Hello \rWorld!', 0)
+
+
 class VectorInstructionsTests(unittest.TestCase):
     """Tests for vector-related instructions.
 
@@ -590,13 +681,19 @@ class VectorInstructionsTests(unittest.TestCase):
         runTest(self, 'vinsert.asm', ['Hurr', 'durr', 'Im\'a', 'sheep!'], 0, lambda o: o.strip().splitlines())
 
     def testInsertingOutOfRangeWithPositiveIndex(self):
-        runTestThrowsException(self, 'out_of_range_index_positive.asm', ('OutOfRangeException', 'positive vector index out of range',))
+        runTestThrowsException(self, 'out_of_range_index_positive.asm', ('OutOfRangeException', 'positive vector index out of range: index = 5, size = 4',))
 
     def testVPUSH(self):
         runTest(self, 'vpush.asm', ['0', '1', 'Hello World!'], 0, lambda o: o.strip().splitlines())
 
     def testVPOP(self):
         runTest(self, 'vpop.asm', ['0', '1', '0', 'Hello World!'], 0, lambda o: o.strip().splitlines())
+
+    def testVPOPWithVoidIndexPopsLast(self):
+        runTest(self, 'vpop_with_void_index_pops_last.asm', '[0]')
+
+    def testVPOPWithIndexPopsSpecified(self):
+        runTest(self, 'vpop_with_index_pops_specified.asm', '[1]')
 
     def testVAT(self):
         runTest(self, 'vat.asm', ['0', '1', '1', 'Hello World!'], 0, lambda o: o.strip().splitlines())
@@ -883,64 +980,64 @@ class InvalidInstructionOperandTypeTests(unittest.TestCase):
     PATH = './sample/asm/invalid_operand_types'
 
     def testIADD(self):
-        runTestThrowsException(self, 'iadd.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Integer, String)',))
+        runTestThrowsException(self, 'iadd.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'String'",))
 
     def testISUB(self):
-        runTestThrowsException(self, 'isub.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Integer, String)',))
+        runTestThrowsException(self, 'isub.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'String'",))
 
     def testIMUL(self):
-        runTestThrowsException(self, 'imul.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Float, String)',))
+        runTestThrowsException(self, 'imul.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'String'",))
 
     def testIDIV(self):
-        runTestThrowsException(self, 'idiv.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, String, Float)',))
+        runTestThrowsException(self, 'idiv.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'String'",))
 
     def testILT(self):
-        runTestThrowsException(self, 'ilt.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, String, String)',))
+        runTestThrowsException(self, 'ilt.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'String'",))
 
     def testILTE(self):
-        runTestThrowsException(self, 'ilte.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, String)',))
+        runTestThrowsException(self, 'ilte.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
 
     def testIGT(self):
-        runTestThrowsException(self, 'igt.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Bar)',))
+        runTestThrowsException(self, 'igt.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
 
     def testIGTE(self):
-        runTestThrowsException(self, 'igte.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Bar)',))
+        runTestThrowsException(self, 'igte.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
 
     def testIEQ(self):
-        runTestThrowsException(self, 'ieq.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Bar)',))
+        runTestThrowsException(self, 'ieq.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
 
     def testIINC(self):
-        runTestThrowsException(self, 'iinc.asm', ('Exception', 'invalid operand types: expected (Integer), got (Foo)',))
+        runTestThrowsException(self, 'iinc.asm', ('Exception', "fetched invalid type: expected 'Integer' but got 'Foo'",))
 
     def testIDEC(self):
-        runTestThrowsException(self, 'idec.asm', ('Exception', 'invalid operand types: expected (Integer), got (Function)',))
+        runTestThrowsException(self, 'idec.asm', ('Exception', "fetched invalid type: expected 'Integer' but got 'Function'",))
 
     def testFADD(self):
-        runTestThrowsException(self, 'fadd.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Float)',))
+        runTestThrowsException(self, 'fadd.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
 
     def testFSUB(self):
-        runTestThrowsException(self, 'fsub.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Float)',))
+        runTestThrowsException(self, 'fsub.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
 
     def testFMUL(self):
-        runTestThrowsException(self, 'fmul.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Float)',))
+        runTestThrowsException(self, 'fmul.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
 
     def testFDIV(self):
-        runTestThrowsException(self, 'fdiv.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Float)',))
+        runTestThrowsException(self, 'fdiv.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
 
     def testFLT(self):
-        runTestThrowsException(self, 'flt.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Float)',))
+        runTestThrowsException(self, 'flt.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
 
     def testFLTE(self):
-        runTestThrowsException(self, 'flte.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Float)',))
+        runTestThrowsException(self, 'flte.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
 
     def testFGT(self):
-        runTestThrowsException(self, 'fgt.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Float)',))
+        runTestThrowsException(self, 'fgt.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
 
     def testFGTE(self):
-        runTestThrowsException(self, 'fgte.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Float)',))
+        runTestThrowsException(self, 'fgte.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
 
     def testFEQ(self):
-        runTestThrowsException(self, 'feq.asm', ('Exception', 'invalid operand types: expected (_, Number, Number), got (_, Foo, Float)',))
+        runTestThrowsException(self, 'feq.asm', ('Exception', "fetched invalid type: expected 'Number' but got 'Foo'",))
 
 
 class ObjectInstructionsTests(unittest.TestCase):
@@ -972,7 +1069,7 @@ class StaticLinkingTests(unittest.TestCase):
         assembly_bin_path = os.path.join(self.PATH, bin_name)
         compiled_bin_path = os.path.join(COMPILED_SAMPLES_PATH, (bin_name + '.bin'))
         assemble(assembly_bin_path, compiled_bin_path, links=(compiled_lib_path,))
-        excode, output = run(compiled_bin_path)
+        excode, output, error = run(compiled_bin_path)
         self.assertEqual('42', output.strip())
         self.assertEqual(0, excode)
 
@@ -985,7 +1082,7 @@ class StaticLinkingTests(unittest.TestCase):
         assembly_bin_path = os.path.join(self.PATH, bin_name)
         compiled_bin_path = os.path.join(COMPILED_SAMPLES_PATH, (bin_name + '.bin'))
         assemble(assembly_bin_path, compiled_bin_path, links=(compiled_lib_path,))
-        excode, output = run(compiled_bin_path)
+        excode, output, error = run(compiled_bin_path)
         self.assertEqual('Hello World!', output.strip())
         self.assertEqual(0, excode)
 
@@ -998,7 +1095,7 @@ class StaticLinkingTests(unittest.TestCase):
         assembly_bin_path = os.path.join(self.PATH, bin_name)
         compiled_bin_path = os.path.join(COMPILED_SAMPLES_PATH, (bin_name + '.bin'))
         assemble(assembly_bin_path, compiled_bin_path, links=(compiled_lib_path,))
-        excode, output = run(compiled_bin_path)
+        excode, output, error = run(compiled_bin_path)
         self.assertEqual(['42', ':-)'], output.strip().splitlines())
         self.assertEqual(0, excode)
 
@@ -1146,7 +1243,7 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'or_use_of_empty_register_2nd.asm', "./sample/asm/static_analysis_errors/or_use_of_empty_register_2nd.asm:22:14: error: use of empty register: 2")
 
     def testIaddOfEmptyRegisters(self):
-        runTestFailsToAssemble(self, 'iadd_of_empty_registers.asm', "./sample/asm/static_analysis_errors/iadd_of_empty_registers.asm:21:17: error: use of empty register: 1")
+        runTestFailsToAssemble(self, 'iadd_of_empty_registers.asm', "./sample/asm/static_analysis_errors/iadd_of_empty_registers.asm:21:12: error: use of empty register: 1")
 
     def testNotOfEmptyRegisters(self):
         runTestFailsToAssemble(self, 'not_of_empty_register.asm', "./sample/asm/static_analysis_errors/not_of_empty_register.asm:21:9: error: not of empty register: 1")
@@ -1293,13 +1390,13 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
 
     def testUseOfEmptyFirstOperandInIadd(self):
         runTestFailsToAssembleDetailed(self, 'use_of_empty_first_operand_in_iadd.asm', [
-            '24:35: error: use of empty register: first := 1',
+            '24:30: error: use of empty register: first := 1',
             '20:12: error: in function main/0',
         ])
 
     def testUseOfEmptySecondOperandInIadd(self):
         runTestFailsToAssembleDetailed(self, 'use_of_empty_second_operand_in_iadd.asm', [
-            '24:41: error: use of empty register: second := 2',
+            '24:37: error: use of empty register: second := 2',
             '20:12: error: in function main/0',
         ])
 
@@ -1315,11 +1412,17 @@ class AssemblerStaticAnalysisErrorTests(unittest.TestCase):
             '20:12: error: in function main/0',
         ])
 
+    def testMainFunctionUsesInvalidRegisterSetToReturn(self):
+        runTestFailsToAssemble(self, 'main_returns_to_invalid_rs_type.asm', "./sample/asm/static_analysis_errors/main_returns_to_invalid_rs_type.asm:21:5: error: main function uses invalid register set to return a value: static")
+
 
 class AssemblerErrorTests(unittest.TestCase):
     """Tests for error-checking and reporting functionality.
     """
     PATH = './sample/asm/errors'
+
+    def testDotBeforeEnd(self):
+        runTestFailsToAssemble(self, 'no_dot_before_end.asm', "./sample/asm/errors/no_dot_before_end.asm:23:1: error: missing '.' character before 'end'")
 
     def testBranchWithoutOperands(self):
         runTestFailsToAssemble(self, 'branch_without_operands.asm', "./sample/asm/errors/branch_without_operands.asm:21:5: error: branch without operands")
@@ -1533,7 +1636,7 @@ class AssemblerErrorTests(unittest.TestCase):
         runTestFailsToAssemble(self, 'invalid_register_index_in_name_directive.asm', "./sample/asm/errors/invalid_register_index_in_name_directive.asm: error: in function 'main/0': invalid register index in name directive: named_register := \"bad\"")
 
     def testInvalidRegisterIndexInNameDirective(self):
-        runTestFailsToAssemble(self, 'empty_link_directive.asm', "./sample/asm/errors/empty_link_directive.asm:21:11: error: missing module name in link directive")
+        runTestFailsToAssemble(self, 'empty_link_directive.asm', "./sample/asm/errors/empty_link_directive.asm:21:13: error: missing module name in import directive")
 
     def testReservedWordAsBlockName(self):
         runTestFailsToAssemble(self, 'reserved_word_as_block_name.asm', "./sample/asm/errors/reserved_word_as_block_name.asm:20:9: error: invalid block name: 'iota' is a registered keyword")
@@ -1694,6 +1797,9 @@ class MiscExceptionTests(unittest.TestCase):
     def testVectorOutOfRangeRead(self):
         runTestThrowsException(self, 'vector_out_of_range_read.asm', ('OutOfRangeException', 'positive vector index out of range',))
 
+    def testVectorOutOfRangeReadFromEmpty(self):
+        runTestThrowsException(self, 'vector_out_of_range_read_from_empty.asm', ('OutOfRangeException', 'empty vector index out of range',))
+
     def testDeleteOfEmptyRegister(self):
         runTestThrowsException(self, 'delete_of_empty_register.asm', ('Exception', 'delete of null register',), assembly_opts=('--no-sa',))
 
@@ -1827,7 +1933,6 @@ class ConcurrencyTests(unittest.TestCase):
             self,
             'detaching_a_process.asm',
             [
-                'false',
                 'main/1 exited',
                 'Hello World! (from long-running detached process) 0',
                 'Hello World! (from long-running detached process) 1',
@@ -1841,7 +1946,12 @@ class ConcurrencyTests(unittest.TestCase):
         runTest(self, 'message_passing.asm', 'Hello message passing World!')
 
     def testTransferringExceptionsOnJoin(self):
-        runTest(self, 'transferring_exceptions.asm', 'exception transferred from process Process: Hello exception transferring World!')
+        def match_output(self, excode, output):
+            pat = re.compile(r'^exception transferred from process Process: 0x[a-f0-9]+: Hello exception transferring World!$')
+            wat = re.match(pat, output)
+            self.assertTrue(wat is not None)
+            self.assertEqual(0, excode)
+        runTest(self, 'transferring_exceptions.asm', custom_assert = match_output)
 
     def testReturningValuesOnJoin(self):
         runTest(self, 'return_from_a_process.asm', '42')
@@ -1938,14 +2048,126 @@ class WatchdogTests(unittest.TestCase):
         ])
 
 
-class StandardRuntimeLibraryModuleString(unittest.TestCase):
-    PATH = './sample/standard_library/string'
+class StructTests(unittest.TestCase):
+    PATH = './sample/asm/structs'
 
-    def testStringifyFunction(self):
-        runTestCustomAsserts(self, 'stringify.asm', partiallyAppliedSameLines(2))
+    def testCreatingEmptyStruct(self):
+        runTest(self, 'creating_empty_struct.asm', '{}')
 
-    def testRepresentFunction(self):
-        runTestCustomAsserts(self, 'represent.asm', partiallyAppliedSameLines(2))
+    def testInsertingAValueIntoAStruct(self):
+        runTest(self, 'inserting_a_value_into_a_struct.asm', "{'answer': 42}")
+
+    def testRemovingAValueFromAStruct(self):
+        runTestSplitlines(self, 'removing_a_value_from_a_struct.asm', ["{'answer': 42}", '{}'])
+
+    def testOverwritingAValueInAStruct(self):
+        runTestSplitlines(self, 'overwriting_a_value_in_a_struct.asm', ["{'answer': 666}", "{'answer': 42}"])
+
+    def testObrainingListOfKeysInAStruct(self):
+        runTest(self, 'obtaining_list_of_keys_in_a_struct.asm', "['answer', 'foo']")
+
+    def testStructOfStructs(self):
+        runTest(self, 'struct_of_structs.asm', "{'bad': {'answer': 666}, 'good': {'answer': 42}}")
+
+
+class AtomTests(unittest.TestCase):
+    PATH = './sample/asm/atoms'
+
+    def testPrintingAnAtom(self):
+        runTest(self, 'printing_an_atom.asm', "'an_atom'")
+
+    def testComparingAtoms(self):
+        runTestSplitlines(self, 'comparing_atoms.asm', ['true', 'false'])
+
+    def testComparingWithDifferentType(self):
+        runTestThrowsException(self, 'comparing_with_different_type.asm', ('Exception', "fetched invalid type: expected 'viua::types::Atom' but got 'Integer'"))
+
+
+class DeferredCallsTests(unittest.TestCase):
+    PATH = './sample/asm/deferred'
+
+    def testDeferredHelloWorld(self):
+        runTest(self, 'hello_world.asm', "Hello World!")
+
+    def testDeferredCallsInvokedInReverseOrder(self):
+        runTestSplitlines(self, 'reverse_order.asm', ['bar', 'foo'])
+
+    def testNestedDeferredCalls(self):
+        runTestSplitlines(self, 'nested.asm', ['bar', 'baz', 'bay', 'foo'])
+
+    def testDeferredCallsActivatedOnTailCall(self):
+        runTestSplitlines(self, 'tailcall.asm', ['Hello from deferred!', '42'])
+
+    def testDeferredCallsInvokedBeforeTailCall(self):
+        runTestSplitlines(self, 'before_tailcall.asm', ['Hello World!'])
+
+    def testDeferredCallsInvokedBeforeFrameIsPopped(self):
+        runTestSplitlines(self, 'before_return.asm', ['Hello World!'])
+
+    def testDeferredCallsActivatedOnStackUnwindingWhenExceptionUncaught(self):
+        runTestSplitlines(
+            self,
+            name = 'on_uncaught_exception.asm',
+            expected_output = ['Hello deferred Foo!', 'Hello deferred Bar!'],
+            expected_error = ('Integer', '42',),
+            error_processing_function = extractFirstException,
+            expected_exit_code = 1,
+        )
+
+    def testDeferredCallsActivatedOnStackUnwindingWhenExceptionCaught(self):
+        runTestSplitlines(self, 'on_caught_exception.asm', ['Hello bar World!', 'Hello foo World!', '42'])
+
+    def testDeferredCallsAreInvokedBeforeStackIsUnwoundOnCaughtException(self):
+        runTestSplitlines(self,
+            name = 'before_unwind_on_caught.asm',
+            expected_output = [ 'Hello World before stack unwinding!', '666', ],
+        )
+
+    def testDeferredCallsAreInvokedBeforeStackIsUnwoundOnUncaughtException(self):
+        runTestSplitlines(self,
+            name = 'before_unwind_on_uncaught.asm',
+            expected_output = [ 'Hello World before stack unwinding!', ],
+            expected_error = ('Integer', '666',),
+            error_processing_function = extractFirstException,
+            expected_exit_code = 1,
+        )
+
+    def testDeferredRunningBeforeFrameIsDropped(self):
+        runTest(self, 'calls_running_before_frame_is_dropped.asm', 'Hello World!')
+
+    def testDeepUncaught(self):
+        runTestSplitlines(
+            self,
+            name = 'deep_uncaught.asm',
+            expected_output = [
+                'Hello from by_quux/0',
+                'Hello from by_bax/0',
+                'Hello from by_bay/0',
+                'Hello from by_baz/0',
+                'Hello from by_bar/0',
+                'Hello from by_foo/0',
+                'Hello from by_main/0',
+            ],
+            expected_error = ('Integer', '666',),
+            error_processing_function = extractFirstException,
+            expected_exit_code = 1,
+        )
+
+    def testDeepCaught(self):
+        runTestSplitlines(
+            self,
+            name = 'deep_caught.asm',
+            expected_output = [
+                'Hello from by_quux/0',
+                'Hello from by_bax/0',
+                'Hello from by_bay/0',
+                'Hello from by_baz/0',
+                'Hello from by_bar/0',
+                'Hello from by_foo/0',
+                '666',
+                'Hello from by_main/0',
+            ],
+        )
 
 
 class StandardRuntimeLibraryModuleVector(unittest.TestCase):

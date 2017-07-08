@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016 Marek Marecki
+ *  Copyright (C) 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -17,65 +17,57 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <string>
 #include <sstream>
+#include <string>
+#include <viua/types/boolean.h>
 #include <viua/types/float.h>
 using namespace std;
 using namespace viua::types;
 
+const string viua::types::Float::type_name = "Float";
 
-string Float::type() const {
-    return "Float";
-}
-string Float::str() const {
-    std::ostringstream s;
-    // std::fixed because 1.0 will yield '1' and not '1.0' when stringified
-    s << std::fixed << number;
-    return s.str();
-}
-bool Float::boolean() const {
-    return (number != 0);
-}
 
-auto Float::value() -> decltype(number)& {
-    return number;
+string Float::type() const { return "Float"; }
+string Float::str() const { return to_string(number); }
+bool Float::boolean() const { return (number != 0); }
+
+auto Float::value() -> decltype(number) & { return number; }
+
+unique_ptr<viua::types::Value> Float::copy() const {
+    return unique_ptr<viua::types::Value>{new Float(number)};
 }
 
-unique_ptr<viua::types::Type> Float::copy() const {
-    return unique_ptr<viua::types::Type>{new Float(number)};
+auto Float::as_integer() const -> int64_t { return static_cast<int64_t>(number); }
+
+auto Float::as_float() const -> viua::float64 { return number; }
+
+auto Float::operator+(const numeric::Number& that) const -> unique_ptr<numeric::Number> {
+    return unique_ptr<numeric::Number>{new Float(number + that.as_float())};
+}
+auto Float::operator-(const numeric::Number& that) const -> unique_ptr<numeric::Number> {
+    return unique_ptr<numeric::Number>{new Float(number - that.as_float())};
+}
+auto Float::operator*(const numeric::Number& that) const -> unique_ptr<numeric::Number> {
+    return unique_ptr<numeric::Number>{new Float(number * that.as_float())};
+}
+auto Float::operator/(const numeric::Number& that) const -> unique_ptr<numeric::Number> {
+    return unique_ptr<numeric::Number>{new Float(number / that.as_float())};
 }
 
-int8_t Float::as_int8() const {
-    return static_cast<int8_t>(number);
+auto Float::operator<(const numeric::Number& that) const -> unique_ptr<Boolean> {
+    return unique_ptr<Boolean>{new Boolean(number < that.as_float())};
 }
-int16_t Float::as_int16() const {
-    return static_cast<int16_t>(number);
+auto Float::operator<=(const numeric::Number& that) const -> unique_ptr<Boolean> {
+    return unique_ptr<Boolean>{new Boolean(number <= that.as_float())};
 }
-int32_t Float::as_int32() const {
-    return static_cast<int32_t>(number);
+auto Float::operator>(const numeric::Number& that) const -> unique_ptr<Boolean> {
+    return unique_ptr<Boolean>{new Boolean(number > that.as_float())};
 }
-int64_t Float::as_int64() const {
-    return static_cast<int64_t>(number);
+auto Float::operator>=(const numeric::Number& that) const -> unique_ptr<Boolean> {
+    return unique_ptr<Boolean>{new Boolean(number >= that.as_float())};
 }
-
-uint8_t Float::as_uint8() const {
-    return static_cast<uint8_t>(number);
-}
-uint16_t Float::as_uint16() const {
-    return static_cast<uint16_t>(number);
-}
-uint32_t Float::as_uint32() const {
-    return static_cast<uint32_t>(number);
-}
-uint64_t Float::as_uint64() const {
-    return static_cast<uint64_t>(number);
+auto Float::operator==(const numeric::Number& that) const -> unique_ptr<Boolean> {
+    return unique_ptr<Boolean>{new Boolean(number == that.as_float())};
 }
 
-viua::float32 Float::as_float32() const {
-    return static_cast<viua::float32>(number);
-}
-viua::float64 Float::as_float64() const {
-    return static_cast<viua::float64>(number);
-}
-
-Float::Float(decltype(number) n): number(n) {}
+Float::Float(decltype(number) n) : number(n) {}

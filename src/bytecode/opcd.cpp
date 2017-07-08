@@ -17,20 +17,21 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
 #include <algorithm>
+#include <iostream>
 #include <map>
 #include <string>
 #include <viua/bytecode/bytetypedef.h>
-#include <viua/bytecode/opcodes.h>
 #include <viua/bytecode/maps.h>
+#include <viua/bytecode/opcodes.h>
 using namespace std;
 
 
 int main() {
     std::string::size_type max_mnemonic_length = 0;
     for (pair<const OPCODE, string> i : OP_NAMES) {
-        max_mnemonic_length = ((max_mnemonic_length >= i.second.size()) ? max_mnemonic_length : i.second.size());
+        max_mnemonic_length =
+            ((max_mnemonic_length >= i.second.size()) ? max_mnemonic_length : i.second.size());
     }
 
     // separate mnemonic from the rest of data
@@ -39,7 +40,8 @@ int main() {
     const string initial_column = "MNEMONIC        ";
     cout << initial_column << "| OPCODE | HEX OPCODE\n" << endl;
 
-    max_mnemonic_length = (max_mnemonic_length < initial_column.size() ? initial_column.size() : max_mnemonic_length);
+    max_mnemonic_length =
+        (max_mnemonic_length < initial_column.size() ? initial_column.size() : max_mnemonic_length);
 
     for (pair<const OPCODE, string> i : OP_NAMES) {
         cout << i.second;

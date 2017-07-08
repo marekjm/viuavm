@@ -18,7 +18,7 @@
 ;
 
 .function: main/0
-    .link:
+    .import:
     izero %0 local
     return
 .end

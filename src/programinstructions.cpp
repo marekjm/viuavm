@@ -18,8 +18,8 @@
  */
 
 #include <viua/bytecode/opcodes.h>
-#include <viua/support/pointer.h>
 #include <viua/program.h>
+#include <viua/support/pointer.h>
 using namespace std;
 
 
@@ -103,48 +103,48 @@ Program& Program::opstof(int_op a, int_op b) {
     return (*this);
 }
 
-Program& Program::opadd(string result_type, int_op target, int_op lhs, int_op rhs) {
-    addr_ptr = cg::bytecode::opadd(addr_ptr, result_type, target, lhs, rhs);
+Program& Program::opadd(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opadd(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-Program& Program::opsub(string result_type, int_op target, int_op lhs, int_op rhs) {
-    addr_ptr = cg::bytecode::opsub(addr_ptr, result_type, target, lhs, rhs);
+Program& Program::opsub(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opsub(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-Program& Program::opmul(string result_type, int_op target, int_op lhs, int_op rhs) {
-    addr_ptr = cg::bytecode::opmul(addr_ptr, result_type, target, lhs, rhs);
+Program& Program::opmul(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opmul(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-Program& Program::opdiv(string result_type, int_op target, int_op lhs, int_op rhs) {
-    addr_ptr = cg::bytecode::opdiv(addr_ptr, result_type, target, lhs, rhs);
+Program& Program::opdiv(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opdiv(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-Program& Program::oplt(string result_type, int_op target, int_op lhs, int_op rhs) {
-    addr_ptr = cg::bytecode::oplt(addr_ptr, result_type, target, lhs, rhs);
+Program& Program::oplt(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::oplt(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-Program& Program::oplte(string result_type, int_op target, int_op lhs, int_op rhs) {
-    addr_ptr = cg::bytecode::oplte(addr_ptr, result_type, target, lhs, rhs);
+Program& Program::oplte(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::oplte(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-Program& Program::opgt(string result_type, int_op target, int_op lhs, int_op rhs) {
-    addr_ptr = cg::bytecode::opgt(addr_ptr, result_type, target, lhs, rhs);
+Program& Program::opgt(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opgt(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-Program& Program::opgte(string result_type, int_op target, int_op lhs, int_op rhs) {
-    addr_ptr = cg::bytecode::opgte(addr_ptr, result_type, target, lhs, rhs);
+Program& Program::opgte(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opgte(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-Program& Program::opeq(string result_type, int_op target, int_op lhs, int_op rhs) {
-    addr_ptr = cg::bytecode::opeq(addr_ptr, result_type, target, lhs, rhs);
+Program& Program::opeq(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opeq(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
@@ -152,6 +152,46 @@ Program& Program::opstrstore(int_op reg, string s) {
     /*  Inserts strstore instruction.
      */
     addr_ptr = cg::bytecode::opstrstore(addr_ptr, reg, s);
+    return (*this);
+}
+
+Program& Program::optext(int_op reg, string s) {
+    addr_ptr = cg::bytecode::optext(addr_ptr, reg, s);
+    return (*this);
+}
+
+Program& Program::optext(int_op a, int_op b) {
+    addr_ptr = cg::bytecode::optext(addr_ptr, a, b);
+    return (*this);
+}
+
+Program& Program::optexteq(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::optexteq(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::optextat(int_op target, int_op source, int_op index) {
+    addr_ptr = cg::bytecode::optextat(addr_ptr, target, source, index);
+    return (*this);
+}
+Program& Program::optextsub(int_op target, int_op source, int_op begin_index, int_op end_index) {
+    addr_ptr = cg::bytecode::optextsub(addr_ptr, target, source, begin_index, end_index);
+    return (*this);
+}
+Program& Program::optextlength(int_op target, int_op source) {
+    addr_ptr = cg::bytecode::optextlength(addr_ptr, target, source);
+    return (*this);
+}
+Program& Program::optextcommonprefix(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::optextcommonprefix(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+Program& Program::optextcommonsuffix(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::optextcommonsuffix(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+Program& Program::optextconcat(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::optextconcat(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
@@ -433,6 +473,16 @@ Program& Program::optailcall(int_op fn) {
     return (*this);
 }
 
+Program& Program::opdefer(const string& fn_name) {
+    addr_ptr = cg::bytecode::opdefer(addr_ptr, fn_name);
+    return (*this);
+}
+
+Program& Program::opdefer(int_op fn) {
+    addr_ptr = cg::bytecode::opdefer(addr_ptr, fn);
+    return (*this);
+}
+
 Program& Program::opprocess(int_op ref, const string& fn_name) {
     addr_ptr = cg::bytecode::opprocess(addr_ptr, ref, fn_name);
     return (*this);
@@ -479,22 +529,24 @@ Program& Program::opjump(viua::internals::types::bytecode_size addr, enum JUMPTY
      *  addr:int    - index of the instruction to which to branch
      */
     if (is_absolute != JMP_TO_BYTE) {
-        branches.push_back((addr_ptr+1));
+        branches.push_back((addr_ptr + 1));
     }
 
     addr_ptr = cg::bytecode::opjump(addr_ptr, addr);
     return (*this);
 }
 
-Program& Program::opif(int_op regc, viua::internals::types::bytecode_size addr_truth, enum JUMPTYPE absolute_truth, viua::internals::types::bytecode_size addr_false, enum JUMPTYPE absolute_false) {
+Program& Program::opif(int_op regc, viua::internals::types::bytecode_size addr_truth,
+                       enum JUMPTYPE absolute_truth, viua::internals::types::bytecode_size addr_false,
+                       enum JUMPTYPE absolute_false) {
     /*  Inserts branch instruction.
      *  Byte offset is calculated automatically.
      */
     viua::internals::types::byte* jump_position_in_bytecode = addr_ptr;
 
-    jump_position_in_bytecode += sizeof(viua::internals::types::byte); // for opcode
-    jump_position_in_bytecode += sizeof(viua::internals::types::byte); // for operand-type marker
-    jump_position_in_bytecode += sizeof(viua::internals::RegisterSets); // for rs-type marker
+    jump_position_in_bytecode += sizeof(viua::internals::types::byte);   // for opcode
+    jump_position_in_bytecode += sizeof(viua::internals::types::byte);   // for operand-type marker
+    jump_position_in_bytecode += sizeof(viua::internals::RegisterSets);  // for rs-type marker
     jump_position_in_bytecode += sizeof(viua::internals::types::register_index);
 
     if (absolute_truth != JMP_TO_BYTE) {
@@ -560,13 +612,6 @@ Program& Program::opimport(string module_name) {
     return (*this);
 }
 
-Program& Program::oplink(string module_name) {
-    /*  Inserts link instruction.
-     */
-    addr_ptr = cg::bytecode::oplink(addr_ptr, module_name);
-    return (*this);
-}
-
 Program& Program::opclass(int_op reg, const string& class_name) {
     /*  Inserts class instuction.
      */
@@ -592,6 +637,36 @@ Program& Program::opregister(int_op reg) {
     /*  Inserts register instuction.
      */
     addr_ptr = cg::bytecode::opregister(addr_ptr, reg);
+    return (*this);
+}
+
+Program& Program::opatom(int_op reg, string s) {
+    addr_ptr = cg::bytecode::opatom(addr_ptr, reg, s);
+    return (*this);
+}
+
+Program& Program::opatomeq(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opatomeq(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
+Program& Program::opstruct(int_op regno) {
+    addr_ptr = cg::bytecode::opstruct(addr_ptr, regno);
+    return (*this);
+}
+
+Program& Program::opstructinsert(int_op target, int_op key, int_op source) {
+    addr_ptr = cg::bytecode::opstructinsert(addr_ptr, target, key, source);
+    return (*this);
+}
+
+Program& Program::opstructremove(int_op target, int_op key, int_op source) {
+    addr_ptr = cg::bytecode::opstructremove(addr_ptr, target, key, source);
+    return (*this);
+}
+
+Program& Program::opstructkeys(int_op a, int_op b) {
+    addr_ptr = cg::bytecode::opstructkeys(addr_ptr, a, b);
     return (*this);
 }
 

@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-./scripts/regenerate_cxxflags.sh
-
 VALGRIND_VERSION=$(valgrind --version | grep -Po '\d+\.\d+\.\d+' | cat)
 echo "using Valgrind: $VALGRIND_VERSION"
 

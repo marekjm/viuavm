@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -24,34 +24,34 @@
 
 #include <string>
 #include <vector>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 
 
 namespace viua {
     namespace types {
-        class Vector : public Type {
+        class Vector : public Value {
             /** Vector type.
              */
-            std::vector<std::unique_ptr<Type>> internal_object;
+            std::vector<std::unique_ptr<Value>> internal_object;
 
             public:
-                std::string type() const override {
-                    return "Vector";
-                }
+                static const std::string type_name;
+
+                std::string type() const override;
                 std::string str() const override;
                 bool boolean() const override;
-                std::unique_ptr<Type> copy() const override;
+                std::unique_ptr<Value> copy() const override;
 
-                std::vector<std::unique_ptr<Type>>& value();
+                std::vector<std::unique_ptr<Value>>& value();
 
-                void insert(long int, std::unique_ptr<Type>);
-                void push(std::unique_ptr<Type>);
-                std::unique_ptr<Type> pop(long int);
-                Type* at(long int);
+                void insert(long int, std::unique_ptr<Value>);
+                void push(std::unique_ptr<Value>);
+                std::unique_ptr<Value> pop(long int);
+                Value* at(long int);
                 int len();
 
                 Vector();
-                Vector(const std::vector<Type*>& v);
+                Vector(const std::vector<Value*>& v);
                 ~Vector();
         };
     }

@@ -20,7 +20,7 @@
 .bsignature: misc::argsvector
 
 .function: foo/4
-    link misc
+    import "misc"
 
     try
     enter misc::argsvector

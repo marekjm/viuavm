@@ -62,11 +62,11 @@
     call (.name: %iota the_closures) returns_closures/0
 
     frame %0
-    vat (.name: %iota printer_closure) %the_closures 0
+    vat (.name: %iota printer_closure) %the_closures (izero %iota)
     call void *printer_closure
 
     frame ^[(param %0 (istore %iota 69))]
-    vat (.name: %iota setter_closure) %the_closures 1
+    vat (.name: %iota setter_closure) %the_closures (istore %iota 1)
     call void *setter_closure
 
     frame %0

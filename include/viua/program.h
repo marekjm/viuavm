@@ -24,6 +24,7 @@
 #include <vector>
 #include <tuple>
 #include <map>
+#include <memory>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/cg/bytecode/instructions.h>
 #include <viua/cg/lex.h>
@@ -75,18 +76,28 @@ class Program {
     Program& opstoi(int_op, int_op);
     Program& opstof(int_op, int_op);
 
-    Program& opadd(std::string, int_op, int_op, int_op);
-    Program& opsub(std::string, int_op, int_op, int_op);
-    Program& opmul(std::string, int_op, int_op, int_op);
-    Program& opdiv(std::string, int_op, int_op, int_op);
+    Program& opadd(int_op, int_op, int_op);
+    Program& opsub(int_op, int_op, int_op);
+    Program& opmul(int_op, int_op, int_op);
+    Program& opdiv(int_op, int_op, int_op);
 
-    Program& oplt(std::string, int_op, int_op, int_op);
-    Program& oplte(std::string, int_op, int_op, int_op);
-    Program& opgt(std::string, int_op, int_op, int_op);
-    Program& opgte(std::string, int_op, int_op, int_op);
-    Program& opeq(std::string, int_op, int_op, int_op);
+    Program& oplt(int_op, int_op, int_op);
+    Program& oplte(int_op, int_op, int_op);
+    Program& opgt(int_op, int_op, int_op);
+    Program& opgte(int_op, int_op, int_op);
+    Program& opeq(int_op, int_op, int_op);
 
     Program& opstrstore(int_op, std::string);
+
+    Program& optext(int_op, std::string);
+    Program& optext(int_op, int_op);
+    Program& optexteq(int_op, int_op, int_op);
+    Program& optextat(int_op, int_op, int_op);
+    Program& optextsub(int_op, int_op, int_op, int_op);
+    Program& optextlength(int_op, int_op);
+    Program& optextcommonprefix(int_op, int_op, int_op);
+    Program& optextcommonsuffix(int_op, int_op, int_op);
+    Program& optextconcat(int_op, int_op, int_op);
 
     Program& opvec(int_op, int_op, int_op);
     Program& opvinsert(int_op, int_op, int_op);
@@ -127,6 +138,8 @@ class Program {
     Program& opcall(int_op, int_op);
     Program& optailcall(const std::string&);
     Program& optailcall(int_op);
+    Program& opdefer(const std::string&);
+    Program& opdefer(int_op);
     Program& opprocess(int_op, const std::string&);
     Program& opprocess(int_op, int_op);
     Program& opself(int_op);
@@ -145,12 +158,19 @@ class Program {
     Program& opleave();
 
     Program& opimport(std::string);
-    Program& oplink(std::string);
 
     Program& opclass(int_op, const std::string&);
     Program& opderive(int_op, const std::string&);
     Program& opattach(int_op, const std::string&, const std::string&);
     Program& opregister(int_op);
+
+    Program& opatom(int_op, std::string);
+    Program& opatomeq(int_op, int_op, int_op);
+
+    Program& opstruct(int_op);
+    Program& opstructinsert(int_op, int_op, int_op);
+    Program& opstructremove(int_op, int_op, int_op);
+    Program& opstructkeys(int_op, int_op);
 
     Program& opnew(int_op, const std::string&);
     Program& opmsg(int_op, const std::string&);
@@ -169,7 +189,7 @@ class Program {
     Program& calculateJumps(std::vector<std::tuple<viua::internals::types::bytecode_size, viua::internals::types::bytecode_size>>, std::vector<viua::cg::lex::Token>&);
     std::vector<viua::internals::types::bytecode_size> jumps();
 
-    viua::internals::types::byte* bytecode();
+    auto bytecode() const -> std::unique_ptr<viua::internals::types::byte[]>;
     Program& fill(viua::internals::types::byte*);
 
     Program& setdebug(bool d = true);

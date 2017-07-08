@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -21,6 +21,8 @@
 #include <viua/types/exception.h>
 using namespace std;
 
+const string viua::types::Exception::type_name = "Exception";
+
 
 string viua::types::Exception::what() const {
     /** Stay compatible with standatd exceptions and
@@ -37,3 +39,15 @@ string viua::types::Exception::etype() const {
      */
     return detailed_type;
 }
+
+string viua::types::Exception::type() const { return "Exception"; }
+string viua::types::Exception::str() const { return cause; }
+string viua::types::Exception::repr() const { return (etype() + ": " + str::enquote(cause)); }
+bool viua::types::Exception::boolean() const { return true; }
+
+unique_ptr<viua::types::Value> viua::types::Exception::copy() const {
+    return unique_ptr<viua::types::Value>{new Exception(cause)};
+}
+
+viua::types::Exception::Exception(string s) : cause(s), detailed_type("Exception") {}
+viua::types::Exception::Exception(string ts, string cs) : cause(cs), detailed_type(ts) {}

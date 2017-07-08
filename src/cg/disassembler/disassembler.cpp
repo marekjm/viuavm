@@ -19,13 +19,16 @@
 
 #include <iostream>
 #include <sstream>
-#include <viua/bytecode/opcodes.h>
 #include <viua/bytecode/maps.h>
+#include <viua/bytecode/opcodes.h>
 #include <viua/bytecode/operand_types.h>
-#include <viua/support/string.h>
-#include <viua/support/pointer.h>
 #include <viua/cg/disassembler/disassembler.h>
+#include <viua/support/pointer.h>
+#include <viua/support/string.h>
+#include <viua/util/memory.h>
 using namespace std;
+
+using viua::util::memory::load_aligned;
 
 
 string disassembler::intop(viua::internals::types::byte* ptr) {
@@ -39,22 +42,22 @@ string disassembler::intop(viua::internals::types::byte* ptr) {
             oss << "void";
             break;
         case OT_REGISTER_INDEX:
-            oss << '%' << *reinterpret_cast<viua::internals::types::register_index*>(ptr);
+            oss << '%' << load_aligned<viua::internals::types::register_index>(ptr);
             pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
             pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
             break;
         case OT_REGISTER_REFERENCE:
-            oss << '@' << *reinterpret_cast<viua::internals::types::register_index*>(ptr);
+            oss << '@' << load_aligned<viua::internals::types::register_index>(ptr);
             pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
             pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
             break;
         case OT_POINTER:
-            oss << '*' << *reinterpret_cast<viua::internals::types::register_index*>(ptr);
+            oss << '*' << load_aligned<viua::internals::types::register_index>(ptr);
             pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
             pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
             break;
         case OT_INT:
-            oss << *reinterpret_cast<viua::internals::types::plain_int*>(ptr);
+            oss << load_aligned<viua::internals::types::plain_int>(ptr);
             pointer::inc<viua::internals::types::plain_int, viua::internals::types::byte>(ptr);
             break;
         default:
@@ -74,7 +77,7 @@ string disassembler::intop_with_rs_type(viua::internals::types::byte* ptr) {
             oss << "void";
             break;
         case OT_REGISTER_INDEX:
-            oss << '%' << *reinterpret_cast<viua::internals::types::register_index*>(ptr);
+            oss << '%' << load_aligned<viua::internals::types::register_index>(ptr);
             pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
             oss << ' ';
             switch (*reinterpret_cast<viua::internals::RegisterSets*>(ptr)) {
@@ -96,7 +99,7 @@ string disassembler::intop_with_rs_type(viua::internals::types::byte* ptr) {
             pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
             break;
         case OT_REGISTER_REFERENCE:
-            oss << '@' << *reinterpret_cast<viua::internals::types::register_index*>(ptr);
+            oss << '@' << load_aligned<viua::internals::types::register_index>(ptr);
             pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
             oss << ' ';
             switch (*reinterpret_cast<viua::internals::RegisterSets*>(ptr)) {
@@ -118,7 +121,7 @@ string disassembler::intop_with_rs_type(viua::internals::types::byte* ptr) {
             pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
             break;
         case OT_POINTER:
-            oss << '*' << *reinterpret_cast<viua::internals::types::register_index*>(ptr);
+            oss << '*' << load_aligned<viua::internals::types::register_index>(ptr);
             pointer::inc<viua::internals::types::register_index, viua::internals::types::byte>(ptr);
             oss << ' ';
             switch (*reinterpret_cast<viua::internals::RegisterSets*>(ptr)) {
@@ -140,7 +143,7 @@ string disassembler::intop_with_rs_type(viua::internals::types::byte* ptr) {
             pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
             break;
         case OT_INT:
-            oss << *reinterpret_cast<viua::internals::types::plain_int*>(ptr);
+            oss << load_aligned<viua::internals::types::plain_int>(ptr);
             pointer::inc<viua::internals::types::plain_int, viua::internals::types::byte>(ptr);
             break;
         default:
@@ -150,10 +153,10 @@ string disassembler::intop_with_rs_type(viua::internals::types::byte* ptr) {
     return oss.str();
 }
 
-static viua::internals::types::timeout decode_timeout(viua::internals::types::byte *ptr) {
-    return *reinterpret_cast<viua::internals::types::timeout*>(ptr);
+static viua::internals::types::timeout decode_timeout(viua::internals::types::byte* ptr) {
+    return load_aligned<viua::internals::types::timeout>(ptr);
 }
-static viua::internals::types::byte* disassemble_ri_operand(ostream& oss, viua::internals::types::byte *ptr) {
+static viua::internals::types::byte* disassemble_ri_operand(ostream& oss, viua::internals::types::byte* ptr) {
     oss << ' ' << disassembler::intop(ptr);
 
     switch (*ptr) {
@@ -176,7 +179,8 @@ static viua::internals::types::byte* disassemble_ri_operand(ostream& oss, viua::
     }
     return ptr;
 }
-static viua::internals::types::byte* disassemble_ri_operand_with_rs_type(ostream& oss, viua::internals::types::byte *ptr) {
+static viua::internals::types::byte* disassemble_ri_operand_with_rs_type(ostream& oss,
+                                                                         viua::internals::types::byte* ptr) {
     oss << ' ' << disassembler::intop_with_rs_type(ptr);
 
     switch (*ptr) {
@@ -199,7 +203,8 @@ static viua::internals::types::byte* disassemble_ri_operand_with_rs_type(ostream
     }
     return ptr;
 }
-tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(viua::internals::types::byte* ptr) {
+tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(
+    viua::internals::types::byte* ptr) {
     viua::internals::types::byte* saved_ptr = ptr;
 
     OPCODE op = OPCODE(*saved_ptr);
@@ -219,10 +224,30 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
     if (op == STRSTORE) {
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
+        ++ptr;  // for operand type
         string s = string(reinterpret_cast<char*>(ptr));
         oss << ' ' << str::enquote(s);
         ptr += s.size();
-        ++ptr; // for null character terminating the C-style string not included in std::string
+        ++ptr;  // for null character terminating the C-style string not included in std::string
+    } else if (op == TEXT) {
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
+
+        if (OperandType(*ptr) == OT_REGISTER_INDEX or OperandType(*ptr) == OT_POINTER) {
+            ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
+        } else {
+            ++ptr;  // for operand type
+            string s = string(reinterpret_cast<char*>(ptr));
+            oss << ' ' << str::enquote(s);
+            ptr += s.size();
+            ++ptr;  // for null character terminating the C-style string not included in std::string
+        }
+    } else if (op == ATOM) {
+        ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
+
+        string s = string(reinterpret_cast<char*>(ptr));
+        oss << ' ' << str::enquote(s, '\'');
+        ptr += s.size();
+        ++ptr;  // for null character terminating the C-style string not included in std::string
     } else if ((op == CLOSURE) or (op == FUNCTION)) {
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
@@ -230,7 +255,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         string fn_name = string(reinterpret_cast<char*>(ptr));
         oss << fn_name;
         ptr += fn_name.size();
-        ++ptr; // for null character terminating the C-style string not included in std::string
+        ++ptr;  // for null character terminating the C-style string not included in std::string
     } else if ((op == CALL) or (op == PROCESS) or (op == MSG)) {
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
@@ -242,7 +267,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
             string fn_name = string(reinterpret_cast<char*>(ptr));
             oss << fn_name;
             ptr += fn_name.size();
-            ++ptr; // for null character terminating the C-style string not included in std::string
+            ++ptr;  // for null character terminating the C-style string not included in std::string
         }
     } else if ((op == CLASS) or (op == NEW) or (op == DERIVE)) {
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
@@ -251,8 +276,8 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         string fn_name = string(reinterpret_cast<char*>(ptr));
         oss << fn_name;
         ptr += fn_name.size();
-        ++ptr; // for null character terminating the C-style string not included in std::string
-    } else if (op == TAILCALL) {
+        ++ptr;  // for null character terminating the C-style string not included in std::string
+    } else if (op == TAILCALL or op == DEFER) {
         oss << ' ';
 
         if (OperandType(*ptr) == OT_REGISTER_INDEX or OperandType(*ptr) == OT_POINTER) {
@@ -261,14 +286,14 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
             string fn_name = string(reinterpret_cast<char*>(ptr));
             oss << fn_name;
             ptr += fn_name.size();
-            ++ptr; // for null character terminating the C-style string not included in std::string
+            ++ptr;  // for null character terminating the C-style string not included in std::string
         }
-    } else if ((op == IMPORT) or (op == ENTER) or (op == LINK) or (op == WATCHDOG)) {
+    } else if ((op == IMPORT) or (op == ENTER) or (op == WATCHDOG)) {
         oss << ' ';
         string s = string(reinterpret_cast<char*>(ptr));
         oss << (op == IMPORT ? str::enquote(s) : s);
         ptr += s.size();
-        ++ptr; // for null character terminating the C-style string not included in std::string
+        ++ptr;  // for null character terminating the C-style string not included in std::string
     } else if (op == CATCH) {
         string s;
 
@@ -276,13 +301,13 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         s = string(reinterpret_cast<char*>(ptr));
         oss << str::enquote(s);
         ptr += s.size();
-        ++ptr; // for null character terminating the C-style string not included in std::string
+        ++ptr;  // for null character terminating the C-style string not included in std::string
 
         oss << ' ';
         s = string(reinterpret_cast<char*>(ptr));
         oss << s;
         ptr += s.size();
-        ++ptr; // for null character terminating the C-style string not included in std::string
+        ++ptr;  // for null character terminating the C-style string not included in std::string
     } else if (op == ATTACH) {
         ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
@@ -290,13 +315,13 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         string fn_name = string(reinterpret_cast<char*>(ptr));
         oss << fn_name;
         ptr += fn_name.size();
-        ++ptr; // for null character terminating the C-style string not included in std::string
+        ++ptr;  // for null character terminating the C-style string not included in std::string
 
         oss << ' ';
         string md_name = string(reinterpret_cast<char*>(ptr));
         oss << md_name;
         ptr += md_name.size();
-        ++ptr; // for null character terminating the C-style string not included in std::string
+        ++ptr;  // for null character terminating the C-style string not included in std::string
     }
 
     switch (op) {
@@ -310,6 +335,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         case IDEC:
         case SELF:
         case ARGC:
+        case STRUCT:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             break;
         case BOOL:
@@ -347,6 +373,8 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         case SWAP:
         case VPUSH:
         case VLEN:
+        case TEXTLENGTH:
+        case STRUCTKEYS:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
@@ -360,36 +388,6 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         case GT:
         case GTE:
         case EQ:
-            if (*ptr == OperandType::OT_INT) {
-                oss << ' ' << "int";
-            } else if (*ptr == OperandType::OT_INT8) {
-                oss << ' ' << "int8";
-            } else if (*ptr == OperandType::OT_INT16) {
-                oss << ' ' << "int16";
-            } else if (*ptr == OperandType::OT_INT32) {
-                oss << ' ' << "int32";
-            } else if (*ptr == OperandType::OT_INT64) {
-                oss << ' ' << "int64";
-            } else if (*ptr == OperandType::OT_UINT) {
-                oss << ' ' << "uint";
-            } else if (*ptr == OperandType::OT_UINT8) {
-                oss << ' ' << "uint8";
-            } else if (*ptr == OperandType::OT_UINT16) {
-                oss << ' ' << "uint16";
-            } else if (*ptr == OperandType::OT_UINT32) {
-                oss << ' ' << "uint32";
-            } else if (*ptr == OperandType::OT_UINT64) {
-                oss << ' ' << "uint64";
-            } else if (*ptr == OperandType::OT_FLOAT) {
-                oss << ' ' << "float";
-            } else if (*ptr == OperandType::OT_FLOAT32) {
-                oss << ' ' << "float32";
-            } else if (*ptr == OperandType::OT_FLOAT64) {
-                oss << ' ' << "float64";
-            } else {
-                oss << ' ' << "void";
-            }
-            ++ptr;
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
@@ -398,7 +396,6 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         case VEC:
         case VINSERT:
         case VAT:
-        case VPOP:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand(oss, ptr);
@@ -414,6 +411,22 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
             break;
         case AND:
         case OR:
+        case TEXTEQ:
+        case TEXTAT:
+        case TEXTCOMMONPREFIX:
+        case TEXTCOMMONSUFFIX:
+        case TEXTCONCAT:
+        case VPOP:
+        case ATOMEQ:
+        case STRUCTINSERT:
+        case STRUCTREMOVE:
+            ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
+            ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
+            ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
+
+            break;
+        case TEXTSUB:
+            ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
@@ -430,7 +443,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
         case JUMP:
             oss << " 0x";
             oss << hex;
-            oss << *reinterpret_cast<uint64_t*>(ptr);
+            oss << load_aligned<uint64_t>(ptr);  // FIXME use Viua-defined type
             pointer::inc<uint64_t, viua::internals::types::byte>(ptr);
 
             oss << dec;
@@ -441,12 +454,12 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
 
             oss << " 0x";
             oss << hex;
-            oss << *reinterpret_cast<uint64_t*>(ptr);
+            oss << load_aligned<uint64_t>(ptr);  // FIXME use Viua-defined type
             pointer::inc<uint64_t, viua::internals::types::byte>(ptr);
 
             oss << " 0x";
             oss << hex;
-            oss << *reinterpret_cast<uint64_t*>(ptr);
+            oss << load_aligned<uint64_t>(ptr);  // FIXME use Viua-defined type
             pointer::inc<uint64_t, viua::internals::types::byte>(ptr);
 
             oss << dec;
@@ -456,7 +469,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
 
             oss << ' ';
-            oss << *reinterpret_cast<viua::internals::types::plain_float*>(ptr);
+            oss << load_aligned<viua::internals::types::plain_float>(ptr);
             pointer::inc<viua::internals::types::plain_float, viua::internals::types::byte>(ptr);
             break;
         case RESS:
@@ -485,7 +498,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
             pointer::inc<viua::internals::types::byte, viua::internals::types::byte>(ptr);
             oss << ' ';
             if (decode_timeout(ptr)) {
-                oss << decode_timeout(ptr)-1 << "ms";
+                oss << decode_timeout(ptr) - 1 << "ms";
             } else {
                 oss << "infinity";
             }
@@ -498,7 +511,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
             pointer::inc<viua::internals::types::byte, viua::internals::types::byte>(ptr);
             oss << ' ';
             if (decode_timeout(ptr)) {
-                oss << decode_timeout(ptr)-1 << "ms";
+                oss << decode_timeout(ptr) - 1 << "ms";
             } else {
                 oss << "infinity";
             }
@@ -511,10 +524,10 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(v
     }
 
     if (ptr < saved_ptr) {
-        throw ("bytecode pointer increase less than zero: near " + OP_NAMES.at(op) + " instruction");
+        throw("bytecode pointer increase less than zero: near " + OP_NAMES.at(op) + " instruction");
     }
     // we already *know* that the result will not be negative
-    auto increase = static_cast<viua::internals::types::bytecode_size>(ptr-saved_ptr);
+    auto increase = static_cast<viua::internals::types::bytecode_size>(ptr - saved_ptr);
 
     return tuple<string, viua::internals::types::bytecode_size>(oss.str(), increase);
 }

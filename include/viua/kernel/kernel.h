@@ -61,6 +61,68 @@ namespace viua {
 
 namespace viua {
     namespace kernel {
+        class Mailbox {
+            mutable std::mutex mailbox_mutex;
+            std::vector<std::unique_ptr<viua::types::Value>> messages;
+
+            public:
+
+            auto send(std::unique_ptr<viua::types::Value>) -> void;
+            auto receive(std::queue<std::unique_ptr<viua::types::Value>>&) -> void;
+            auto size() const -> decltype(messages)::size_type;
+
+            Mailbox() = default;
+            Mailbox(Mailbox&&);
+        };
+
+        class ProcessResult {
+                mutable std::mutex result_mutex;
+
+                /*
+                 * A process that has finished may either return a value, or
+                 * throw an exception.
+                 * Slots for both of these cases must be provided.
+                 */
+                std::unique_ptr<viua::types::Value> value_returned;
+                std::unique_ptr<viua::types::Value> exception_thrown;
+
+                /*
+                 * A flag set to 'true' once the process has finished execution.
+                 */
+                std::atomic_bool done;
+            public:
+                /*
+                 * Check if the process has stopped (for any reason).
+                 */
+                auto stopped() const -> bool;
+
+                /*
+                 * Check if the process has been terminated.
+                 */
+                auto terminated() const -> bool;
+
+                /*
+                 * Resolve a process to some return value.
+                 * This means that the execution succeeded.
+                 */
+                auto resolve(std::unique_ptr<viua::types::Value>) -> void;
+
+                /*
+                 * Raise an exception that killed the process.
+                 * This means that the execution failed.
+                 */
+                auto raise(std::unique_ptr<viua::types::Value>) -> void;
+
+                /*
+                 * Transfer return value and exception from process result.
+                 */
+                auto transfer_exception() -> std::unique_ptr<viua::types::Value>;
+                auto transfer_result() -> std::unique_ptr<viua::types::Value>;
+
+                ProcessResult() = default;
+                ProcessResult(ProcessResult&&);
+        };
+
         class Kernel {
 #ifdef AS_DEBUG_HEADER
             public:
@@ -132,12 +194,22 @@ namespace viua {
 
             std::vector<void*> cxx_dynamic_lib_handles;
 
-            std::map<viua::process::PID, std::vector<std::unique_ptr<viua::types::Type>>> mailboxes;
+            std::map<viua::process::PID, Mailbox> mailboxes;
             std::mutex mailbox_mutex;
+
+            /*
+             * Only processes that were not disowned have an entry here.
+             * Result of a process may be fetched only once - it is then deleted.
+             * It must also be deleted when no process would be able to fetch it to
+             * prevent return value leaks.
+             */
+            std::map<viua::process::PID, ProcessResult> process_results;
+            mutable std::mutex process_results_mutex;
 
             public:
                 /*  Methods dealing with dynamic library loading.
                  */
+                void loadModule(std::string);
                 void loadNativeLibrary(const std::string&);
                 void loadForeignLibrary(const std::string&);
 
@@ -189,19 +261,29 @@ namespace viua {
                 Kernel& registerForeignMethod(const std::string&, ForeignMethod);
 
                 void requestForeignFunctionCall(Frame*, viua::process::Process*);
-                void requestForeignMethodCall(const std::string&, viua::types::Type*, Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*);
+                void requestForeignMethodCall(const std::string&, viua::types::Value*, Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*);
 
                 void postFreeProcess(std::unique_ptr<viua::process::Process>);
 
                 auto createMailbox(const viua::process::PID) -> viua::internals::types::processes_count;
                 auto deleteMailbox(const viua::process::PID) -> viua::internals::types::processes_count;
 
-                void send(const viua::process::PID, std::unique_ptr<viua::types::Type>);
-                void receive(const viua::process::PID, std::queue<std::unique_ptr<viua::types::Type>>&);
+                auto create_result_slot_for(viua::process::PID) -> void;
+                auto detach_process(const viua::process::PID) -> void;
+                auto record_process_result(viua::process::Process*) -> void;
+                auto is_process_joinable(const viua::process::PID) const -> bool;
+                auto is_process_stopped(const viua::process::PID) const -> bool;
+                auto is_process_terminated(const viua::process::PID) const -> bool;
+                auto transfer_exception_of(const viua::process::PID) -> std::unique_ptr<viua::types::Value>;
+                auto transfer_result_of(const viua::process::PID) -> std::unique_ptr<viua::types::Value>;
+
+                void send(const viua::process::PID, std::unique_ptr<viua::types::Value>);
+                void receive(const viua::process::PID, std::queue<std::unique_ptr<viua::types::Value>>&);
                 uint64_t pids() const;
 
                 auto static no_of_vp_schedulers() -> viua::internals::types::schedulers_count;
                 auto static no_of_ffi_schedulers() -> viua::internals::types::schedulers_count;
+                auto static is_tracing_enabled() -> bool;
 
                 int run();
 

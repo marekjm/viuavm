@@ -20,7 +20,7 @@
 .function: main/1
     fstore %1 1.0
     strstore %2 "Hello World!"
-    div int64 %3 %2 %1
+    div %3 %2 %1
     print %3
 
     izero %0 local

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -18,81 +18,37 @@
  */
 
 #include <iostream>
+#include <sstream>
 #include <string>
+#include <viua/exceptions.h>
+#include <viua/kernel/kernel.h>
+#include <viua/process.h>
 #include <viua/types/boolean.h>
 #include <viua/types/process.h>
-#include <viua/exceptions.h>
-#include <viua/process.h>
-#include <viua/kernel/kernel.h>
 using namespace std;
 
+const string viua::types::Process::type_name = "Process";
 
-string viua::types::Process::type() const {
-    return "Process";
-}
+string viua::types::Process::type() const { return "Process"; }
 
 string viua::types::Process::str() const {
-    return "Process";
+    ostringstream oss;
+    oss << "Process: " << hex << pid().str() << dec;
+    return oss.str();
 }
 
-string viua::types::Process::repr() const {
-    return "Process";
-}
+string viua::types::Process::repr() const { return str(); }
 
 bool viua::types::Process::boolean() const {
-    return thrd->joinable();
+    // There is no good reason why evaluating process as boolean should return either
+    // 'false' or 'true', as there is no meaning to this value.
+    return false;
 }
 
-unique_ptr<viua::types::Type> viua::types::Process::copy() const {
-    return unique_ptr<viua::types::Type>{new viua::types::Process(thrd)};
+unique_ptr<viua::types::Value> viua::types::Process::copy() const {
+    return unique_ptr<viua::types::Value>{new viua::types::Process(thrd)};
 }
 
-bool viua::types::Process::joinable() {
-    return thrd->joinable();
-}
+viua::process::PID viua::types::Process::pid() const { return saved_pid; }
 
-void viua::types::Process::join() {
-    if (thrd->joinable()) {
-        thrd->join();
-    } else {
-        throw new viua::types::Exception("process cannot be joined");
-    }
-}
-
-void viua::types::Process::detach() {
-    if (thrd->joinable()) {
-        thrd->detach();
-    } else {
-        throw new viua::types::Exception("process cannot be detached");
-    }
-}
-
-bool viua::types::Process::stopped() {
-    return thrd->stopped();
-}
-
-bool viua::types::Process::terminated() {
-    return thrd->terminated();
-}
-
-unique_ptr<viua::types::Type> viua::types::Process::transferActiveException() {
-    return thrd->transferActiveException();
-}
-
-unique_ptr<viua::types::Type> viua::types::Process::getReturnValue() {
-    return thrd->getReturnValue();
-}
-
-
-void viua::types::Process::joinable(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
-    frame->local_register_set->set(0, unique_ptr<viua::types::Type>{new viua::types::Boolean(thrd->joinable())});
-}
-
-void viua::types::Process::detach(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
-    thrd->detach();
-}
-
-
-viua::process::PID viua::types::Process::pid() const {
-    return thrd->pid();
-}
+viua::types::Process::Process(viua::process::Process* t) : thrd(t), saved_pid(thrd->pid()) {}

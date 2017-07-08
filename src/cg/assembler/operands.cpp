@@ -20,10 +20,10 @@
 #include <string>
 #include <tuple>
 #include <vector>
-#include <viua/support/string.h>
-#include <viua/cg/lex.h>
 #include <viua/cg/assembler/assembler.h>
+#include <viua/cg/lex.h>
 #include <viua/program.h>
+#include <viua/support/string.h>
 using namespace std;
 
 
@@ -31,33 +31,38 @@ static string resolveregister(viua::cg::lex::Token token, const bool allow_bare_
     /*  This function is used to register numbers when a register is accessed, e.g.
      *  in `istore` instruction or in `branch` in condition operand.
      *
-     *  This function MUST return string as teh result is further passed to assembler::operands::getint() function which *expects* string.
+     *  This function MUST return string as teh result is further passed to assembler::operands::getint()
+     * function which *expects* string.
      */
     ostringstream out;
     string reg = token.str();
     if (reg[0] == '@' and str::isnum(str::sub(reg, 1))) {
-        /*  Basic case - the register index is taken from another register, everything is still nice and simple.
+        /*  Basic case - the register index is taken from another register, everything is still nice and
+         * simple.
          */
         if (stoi(reg.substr(1)) < 0) {
-            throw ("register indexes cannot be negative: " + reg);
+            throw("register indexes cannot be negative: " + reg);
         }
 
-        // FIXME: analyse source and detect if the referenced register really holds an integer (the only value suitable to use
+        // FIXME: analyse source and detect if the referenced register really holds an integer (the only value
+        // suitable to use
         // as register reference)
         out.str(reg);
     } else if (reg[0] == '*' and str::isnum(str::sub(reg, 1))) {
-        /*  Basic case - the register index is taken from another register, everything is still nice and simple.
+        /*  Basic case - the register index is taken from another register, everything is still nice and
+         * simple.
          */
         if (stoi(reg.substr(1)) < 0) {
-            throw ("register indexes cannot be negative: " + reg);
+            throw("register indexes cannot be negative: " + reg);
         }
 
         out.str(reg);
     } else if (reg[0] == '%' and str::isnum(str::sub(reg, 1))) {
-        /*  Basic case - the register index is taken from another register, everything is still nice and simple.
+        /*  Basic case - the register index is taken from another register, everything is still nice and
+         * simple.
          */
         if (stoi(reg.substr(1)) < 0) {
-            throw ("register indexes cannot be negative: " + reg);
+            throw("register indexes cannot be negative: " + reg);
         }
 
         out.str(reg);
@@ -88,11 +93,12 @@ int_op assembler::operands::getint(const string& s, const bool allow_bare_intege
     } else if (allow_bare_integers and str::isnum(s)) {
         return int_op(stoi(s));
     } else {
-        throw ("cannot convert to int operand: " + s);
+        throw("cannot convert to int operand: " + s);
     }
 }
 
-int_op assembler::operands::getint_with_rs_type(const string& s, const viua::internals::RegisterSets rs_type, const bool allow_bare_integers) {
+int_op assembler::operands::getint_with_rs_type(const string& s, const viua::internals::RegisterSets rs_type,
+                                                const bool allow_bare_integers) {
     if (s.size() == 0) {
         throw "empty string cannot be used as operand";
     }
@@ -108,7 +114,7 @@ int_op assembler::operands::getint_with_rs_type(const string& s, const viua::int
     } else if (allow_bare_integers and str::isnum(s)) {
         return int_op(stoi(s));
     } else {
-        throw ("cannot convert to int operand: " + s);
+        throw("cannot convert to int operand: " + s);
     }
 }
 

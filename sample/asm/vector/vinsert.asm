@@ -31,8 +31,8 @@
     vlen %len %1
 
     .mark: loop
-    if (lt int64 %8 %counter %len) +1 break
-    print *(vat %9 %1 @counter)
+    if (lt %8 %counter %len) +1 break
+    print *(vat %9 %1 %counter)
     iinc %counter
     jump loop
 

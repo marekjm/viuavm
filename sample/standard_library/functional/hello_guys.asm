@@ -27,7 +27,7 @@
 .signature: std::functional::apply/2
 
 .function: main/1
-    link std::functional
+    import "std::functional"
 
     function %1 greetings/1
 

@@ -22,7 +22,7 @@
     istore %2 1
     istore %3 2
 
-    print (add int32 %4 %1 @3)
+    print (add %4 %1 @3)
 
     izero %0 local
     return

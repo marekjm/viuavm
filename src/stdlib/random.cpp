@@ -17,17 +17,17 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cstdlib>
 #include <climits>
-#include <iostream>
+#include <cstdlib>
 #include <fstream>
+#include <iostream>
 #include <string>
-#include <viua/types/integer.h>
-#include <viua/types/float.h>
-#include <viua/types/exception.h>
+#include <viua/include/module.h>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
-#include <viua/include/module.h>
+#include <viua/types/exception.h>
+#include <viua/types/float.h>
+#include <viua/types/integer.h>
 using namespace std;
 
 
@@ -46,7 +46,8 @@ float getrandom() {
     return rfloat;
 }
 
-void random_drandom(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+void random_drandom(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                    viua::process::Process*, viua::kernel::Kernel*) {
     /** Return random integer.
      *
      *  Bytes are read from /dev/random random number device.
@@ -58,10 +59,11 @@ void random_drandom(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Regi
     }
     int rint = 0;
     in.read((char*)&rint, sizeof(int));
-    frame->local_register_set->set(0, unique_ptr<viua::types::Type>{new viua::types::Integer(rint)});
+    frame->local_register_set->set(0, unique_ptr<viua::types::Value>{new viua::types::Integer(rint)});
 }
 
-void random_durandom(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+void random_durandom(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                     viua::process::Process*, viua::kernel::Kernel*) {
     /** Return random integer.
      *
      *  Bytes are read from /dev/urandom random number device.
@@ -75,16 +77,18 @@ void random_durandom(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Reg
     }
     int rint = 0;
     in.read((char*)&rint, sizeof(int));
-    frame->local_register_set->set(0, unique_ptr<viua::types::Type>{new viua::types::Integer(rint)});
+    frame->local_register_set->set(0, unique_ptr<viua::types::Value>{new viua::types::Integer(rint)});
 }
 
-void random_random(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+void random_random(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                   viua::process::Process*, viua::kernel::Kernel*) {
     /** Return random float from range between 0.0 and 1.0.
      */
-    frame->local_register_set->set(0, unique_ptr<viua::types::Type>{new viua::types::Float(getrandom())});
+    frame->local_register_set->set(0, unique_ptr<viua::types::Value>{new viua::types::Float(getrandom())});
 }
 
-void random_randint(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+void random_randint(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                    viua::process::Process*, viua::kernel::Kernel*) {
     /** Return random integer from selected range.
      *
      *  Requires two parameters: lower and upper bound.
@@ -93,17 +97,16 @@ void random_randint(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Regi
     int lower_bound = static_cast<viua::types::Integer*>(frame->arguments->at(0))->value();
     int upper_bound = static_cast<viua::types::Integer*>(frame->arguments->at(1))->value();
     int modifer = ((upper_bound - lower_bound) * getrandom());
-    frame->local_register_set->set(0, unique_ptr<viua::types::Type>{new viua::types::Integer(lower_bound + modifer)});
+    frame->local_register_set->set(
+        0, unique_ptr<viua::types::Value>{new viua::types::Integer(lower_bound + modifer)});
 }
 
 const ForeignFunctionSpec functions[] = {
-    { "std::random::device::random", &random_drandom },
-    { "std::random::device::urandom", &random_durandom },
-    { "std::random::random", &random_random },
-    { "std::random::randint", &random_randint },
-    { NULL, NULL },
+    {"std::random::device::random", &random_drandom},
+    {"std::random::device::urandom", &random_durandom},
+    {"std::random::random", &random_random},
+    {"std::random::randint", &random_randint},
+    {NULL, NULL},
 };
 
-extern "C" const ForeignFunctionSpec* exports() {
-    return functions;
-}
+extern "C" const ForeignFunctionSpec* exports() { return functions; }

@@ -22,9 +22,9 @@
     istore %2 2
 
     .mark: loop_begin
-    if (lt int64 %3 %1 %2) loop_end +1
+    if (lt %3 %1 %2) loop_end +1
 
-    sub int64 %1 %1 %2
+    sub %1 %1 %2
     jump loop_begin
 
     ; make zero "true" and
@@ -53,11 +53,11 @@
 
     ; while (...) {
     .mark: loop_begin
-    if (gte int64 %6 %4 %5) loop_end +1
+    if (gte %6 %4 %5) loop_end +1
 
     ; call filtering function to determine whether current element
     ; is a valid value...
-    frame ^[(param %0 *(vat %7 %2 @4))]
+    frame ^[(param %0 *(vat %7 %2 %4))]
 
     ; ...and if the result from filtering function was "true" - the element should be pushed onto result vector
     ; it it was "false" - skip to next iteration

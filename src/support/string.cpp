@@ -18,10 +18,10 @@
  */
 
 #include <iostream>
-#include <vector>
-#include <string>
-#include <sstream>
 #include <regex>
+#include <sstream>
+#include <string>
+#include <vector>
 #include <viua/types/string.h>
 using namespace std;
 
@@ -42,7 +42,7 @@ namespace str {
     bool endswith(const std::string& s, const std::string& w) {
         /*  Returns true if s ends with w.
          */
-        return (s.compare(s.length()-w.length(), s.length(), w) == 0);
+        return (s.compare(s.length() - w.length(), s.length(), w) == 0);
     }
 
 
@@ -73,7 +73,8 @@ namespace str {
                 default:
                     num = false;
             }
-            if (!num) break;
+            if (!num)
+                break;
         }
         return num;
     }
@@ -102,7 +103,7 @@ namespace str {
                 break;
             }
         }
-        is = isnum(sub(s, 0, dot), negatives) and isnum(sub(s, (static_cast<unsigned>(dot)+1)));
+        is = isnum(sub(s, 0, dot), negatives) and isnum(sub(s, (static_cast<unsigned>(dot) + 1)));
         return is;
     }
 
@@ -118,14 +119,18 @@ namespace str {
         /*  Returns substring of s.
          *  If only s is passed, returns copy of s.
          */
-        if (b == 0 and e == -1) return string(s);
+        if (b == 0 and e == -1)
+            return string(s);
 
         ostringstream part;
         part.str("");
 
         std::string::size_type end = 0;
-        if (e < 0) { end = (s.size() - static_cast<std::string::size_type>(-1 * e) + 1); }
-        else { end = static_cast<std::string::size_type>(e); }
+        if (e < 0) {
+            end = (s.size() - static_cast<std::string::size_type>(-1 * e) + 1);
+        } else {
+            end = static_cast<std::string::size_type>(e);
+        }
 
         for (auto i = b; i < s.size() and i < end; ++i) {
             part << s[i];
@@ -143,7 +148,8 @@ namespace str {
         string str = (ignore_leading_ws ? lstrip(s) : s);
 
         for (std::string::size_type i = 0; i < str.size(); ++i) {
-            if (str[i] == ' ' or str[i] == '\t' or str[i] == '\v' or str[i] == '\n') break;
+            if (str[i] == ' ' or str[i] == '\t' or str[i] == '\v' or str[i] == '\n')
+                break;
             chnk << str[i];
         }
         return chnk.str();
@@ -171,7 +177,7 @@ namespace str {
         auto limit = parts.size();
         for (decltype(limit) i = 0; i < limit; ++i) {
             oss << parts[i];
-            if (i < (limit-1)) {
+            if (i < (limit - 1)) {
                 oss << s;
             }
         }
@@ -184,13 +190,16 @@ namespace str {
          *
          *  It is particularly useful if you have a string encoded in another string.
          *
-         *  This function will return `"Hello 'Beautiful' World!"` when fed `"Hello 'Beautiful' World!" some other (42) things;`, and
-         *  will return `'Hello "Beautiful" World!'` when fed `'Hello "Beautiful" World!' some other (42) things;`.
+         *  This function will return `"Hello 'Beautiful' World!"` when fed `"Hello 'Beautiful' World!" some
+         * other (42) things;`, and
+         *  will return `'Hello "Beautiful" World!'` when fed `'Hello "Beautiful" World!' some other (42)
+         * things;`.
          *  Starting quote character is irrelevant.
          *
          *  In fact, this function will treat *the first character* of the string it is fed as a delimiter for
          *  string extraction - whatever that may be (e.g. the backtick character) so you can get creative.
-         *  One character that is not recommended for use as a delimiter is the backslash as it is treated specially (as
+         *  One character that is not recommended for use as a delimiter is the backslash as it is treated
+         * specially (as
          *  the escape character) by this function.
          */
         if (s.size() == 0) {
@@ -216,7 +225,7 @@ namespace str {
             }
             if (s[i] == '\\') {
                 ++backs;
-                //cout << "backs = " << backs << endl;
+                // cout << "backs = " << backs << endl;
             }
         }
 
@@ -229,7 +238,7 @@ namespace str {
          */
         std::string::size_type i = 0;
         while (i < s.size()) {
-            if (not (s[i] == ' ' or s[i] == '\t' or s[i] == '\v' or s[i] == '\n')) {
+            if (not(s[i] == ' ' or s[i] == '\t' or s[i] == '\v' or s[i] == '\n')) {
                 break;
             };
             ++i;
@@ -249,7 +258,7 @@ namespace str {
         }
         return share;
     }
-    bool contains(const string&s, const char c) {
+    bool contains(const string& s, const char c) {
         bool it_does = false;
         for (std::string::size_type i = 0; i < s.size(); ++i) {
             if (s[i] == c) {
@@ -261,15 +270,16 @@ namespace str {
     }
 
 
-    string enquote(const string& s) {
+    string enquote(const string& s, const char closing) {
         /** Enquote the string.
          */
         ostringstream encoded;
-        char closing = '"';
 
         encoded << closing;
         for (std::string::size_type i = 0; i < s.size(); ++i) {
-            if (s[i] == closing) { encoded << "\\"; }
+            if (s[i] == closing) {
+                encoded << "\\";
+            }
             encoded << s[i];
         }
         encoded << closing;
@@ -297,7 +307,7 @@ namespace str {
         char c;
         for (std::string::size_type i = 0; i < s.size(); ++i) {
             c = s[i];
-            if (c == '\\' and i < (s.size()-1)) {
+            if (c == '\\' and i < (s.size() - 1)) {
                 ++i;
                 switch (s[i]) {
                     case '\'':
@@ -357,7 +367,6 @@ namespace str {
         char c;
         bool escape = false;
         for (std::string::size_type i = 0; i < s.size(); ++i) {
-            c = s[i];
             switch (s[i]) {
                 case '\\':
                     escape = true;
@@ -410,7 +419,7 @@ namespace str {
         auto sz = sv.size();
         for (decltype(sz) i = 0; i < sz; ++i) {
             oss << enquote(sv[i]);
-            if (i < (sz-1)) {
+            if (i < (sz - 1)) {
                 oss << ", ";
             }
         }

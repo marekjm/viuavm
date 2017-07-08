@@ -38,7 +38,7 @@
 .end
 
 .function: main/0
-    -- link foreign printer module
+    -- import "foreign printer module"
     import "build/test/printer"
 
     -- spawn several processes, each printing a different "Hello {who}!"

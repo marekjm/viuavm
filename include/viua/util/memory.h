@@ -20,6 +20,7 @@
 #ifndef VIUA_UTIL_MEMORY_H
 #define VIUA_UTIL_MEMORY_H
 
+#include <cstring>
 #include <memory>
 
 
@@ -40,7 +41,7 @@ namespace viua {
                     }
                 }
 
-                public:
+              public:
                 auto release() -> T* {
                     auto tmp = pointer;
                     pointer = nullptr;
@@ -58,24 +59,60 @@ namespace viua {
                     pointer = ptr.release();
                 }
 
-                auto get() -> T* {
-                    return pointer;
+                auto get() -> T* { return pointer; }
+
+                auto owns() const -> bool { return owns_pointer; }
+
+                auto operator-> () -> T* { return pointer; }
+
+                maybe_unique_ptr(T* ptr = nullptr, bool own = true) : owns_pointer(own), pointer(ptr) {}
+                ~maybe_unique_ptr() { delete_if_owned(); }
+            };
+
+            template<class To, class From> auto load_aligned(const From* source) -> To {
+                To data{};
+                std::memcpy(&data, source, sizeof(To));
+                return data;
+            }
+
+            template<class To> class aligned_write_impl {
+                To* target;
+
+              public:
+                aligned_write_impl(To* t) : target(t) {}
+
+                template<class From> auto operator=(const From source) -> aligned_write_impl& {
+                    std::memcpy(target, &source, sizeof(From));
+                    return *this;
                 }
 
-                auto owns() const -> bool {
-                    return owns_pointer;
-                }
-
-                auto operator->() -> T* {
-                    return pointer;
-                }
-
-                maybe_unique_ptr(T* ptr = nullptr, bool own = true): owns_pointer(own), pointer(ptr) {
-                }
-                ~maybe_unique_ptr() {
-                    delete_if_owned();
+                template<class From> auto operator+=(const From source) -> aligned_write_impl& {
+                    From data = load_aligned<From>(target);
+                    data += source;
+                    std::memcpy(target, &data, sizeof(From));
+                    return *this;
                 }
             };
+
+            template<class To> auto aligned_write(To* target) -> aligned_write_impl<To> {
+                return aligned_write_impl<To>(target);
+            }
+
+            template<class To> class aligned_read_impl {
+                To& target;
+
+              public:
+                aligned_read_impl(To& t) : target(t) {}
+
+                template<class From> auto operator=(const From* source) -> aligned_read_impl& {
+                    std::memcpy(&target, source, sizeof(target));
+                    return *this;
+                }
+            };
+
+            template<class To> auto aligned_read(To& target) -> aligned_read_impl<To> {
+                return aligned_read_impl<To>(target);
+            }
         }
     }
 }

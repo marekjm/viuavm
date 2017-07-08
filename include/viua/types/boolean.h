@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -24,12 +24,12 @@
 
 #include <string>
 #include <sstream>
-#include <viua/types/number.h>
+#include <viua/types/value.h>
 
 
 namespace viua {
     namespace types {
-        class Boolean : public viua::types::numeric::Number {
+        class Boolean : public viua::types::Value {
             /** Boolean object.
              *
              *  This type is used to hold true and false values.
@@ -37,47 +37,20 @@ namespace viua {
             bool b;
 
             public:
-                std::string type() const override {
-                    return "Boolean";
-                }
-                std::string str() const override {
-                    return ( b ? "true" : "false" );
-                }
-                bool boolean() const override {
-                    return b;
-                }
+                static const std::string type_name;
 
-                bool& value() { return b; }
+                std::string type() const override;
+                std::string str() const override;
+                bool boolean() const override;
 
-                // Integer methods
-                int64_t increment() { return (b = true); }
-                int64_t decrement() { return (b = false); }
+                bool& value();
 
-                virtual std::vector<std::string> bases() const override {
-                    return std::vector<std::string>{"Number"};
-                }
-                virtual std::vector<std::string> inheritancechain() const override {
-                    return std::vector<std::string>{"Number", "Type"};
-                }
+                virtual std::vector<std::string> bases() const override;
+                virtual std::vector<std::string> inheritancechain() const override;
 
-                std::unique_ptr<Type> copy() const override {
-                    return std::unique_ptr<viua::types::Type>{new Boolean(b)};
-                }
+                std::unique_ptr<Value> copy() const override;
 
-                int8_t as_int8() const override { return b; }
-                int16_t as_int16() const override { return b; }
-                int32_t as_int32() const override { return b; }
-                int64_t as_int64() const override { return b; }
-
-                uint8_t as_uint8() const override { return b; }
-                uint16_t as_uint16() const override { return b; }
-                uint32_t as_uint32() const override { return b; }
-                uint64_t as_uint64() const override { return b; }
-
-                viua::float32 as_float32() const override { return b; }
-                viua::float64 as_float64() const override { return b; }
-
-                Boolean(bool v = false): b(v) {}
+                Boolean(bool v = false);
         };
     }
 }

@@ -17,17 +17,17 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <fstream>
+#include <iostream>
 #include <stdlib.h>
 #include <unistd.h>
-#include <iostream>
-#include <fstream>
-#include <viua/support/string.h>
-#include <viua/support/env.h>
-#include <viua/version.h>
 #include <viua/cg/assembler/assembler.h>
 #include <viua/cg/lex.h>
 #include <viua/cg/tools.h>
 #include <viua/front/asm.h>
+#include <viua/support/env.h>
+#include <viua/support/string.h>
+#include <viua/version.h>
 using namespace std;
 
 
@@ -52,7 +52,7 @@ bool SCREAM = false;
 
 string send_control_seq(const string& mode) {
     static auto is_terminal = isatty(1);
-    static string env_color_flag { getenv("VIUAVM_ASM_COLOUR") ? getenv("VIUAVM_ASM_COLOUR") : "default" };
+    static string env_color_flag{getenv("VIUAVM_ASM_COLOUR") ? getenv("VIUAVM_ASM_COLOUR") : "default"};
 
     bool colorise = is_terminal;
     if (env_color_flag == "default") {
@@ -86,34 +86,56 @@ static bool usage(const char* program, bool show_help, bool show_version, bool v
         cout << "OPTIONS:\n";
 
         // generic options
-        cout << "    " << "-V, --version            - show version\n"
-             << "    " << "-h, --help               - display this message\n"
+        cout << "    "
+             << "-V, --version            - show version\n"
+             << "    "
+             << "-h, --help               - display this message\n"
 
-        // logging options
-             << "    " << "-v, --verbose            - show verbose output\n"
-             << "    " << "-d, --debug              - show debugging output\n"
-             << "    " << "    --scream             - show so much debugging output it becomes noisy\n"
+             // logging options
+             << "    "
+             << "-v, --verbose            - show verbose output\n"
+             << "    "
+             << "-d, --debug              - show debugging output\n"
+             << "    "
+             << "    --scream             - show so much debugging output it becomes noisy\n"
 
-        // warning reporting level control
-             << "    " << "-W, --Wall               - warn about everything\n"
-             << "    " << "    --Wmissing-return    - warn about missing 'return' instruction at the end of functions\n"
-             << "    " << "    --Wundefined-arity   - warn about functions declared with undefined arity\n"
+             // warning reporting level control
+             << "    "
+             << "-W, --Wall               - warn about everything\n"
+             << "    "
+             << "    --Wmissing-return    - warn about missing 'return' instruction at the end of functions\n"
+             << "    "
+             << "    --Wundefined-arity   - warn about functions declared with undefined arity\n"
 
-        // error reporting level control
-             << "    " << "-E, --Eall               - treat all warnings as errors\n"
-             << "    " << "    --Emissing-return    - treat missing 'return' instruction at the end of function as error\n"
-             << "    " << "    --Eundefined-arity   - treat functions declared with undefined arity as errors\n"
-             << "    " << "    --Ehalt-is-last      - treat 'halt' being used as last instruction of 'main' function as error\n"
+             // error reporting level control
+             << "    "
+             << "-E, --Eall               - treat all warnings as errors\n"
+             << "    "
+             << "    --Emissing-return    - treat missing 'return' instruction at the end of function as "
+                "error\n"
+             << "    "
+             << "    --Eundefined-arity   - treat functions declared with undefined arity as errors\n"
+             << "    "
+             << "    --Ehalt-is-last      - treat 'halt' being used as last instruction of 'main' function "
+                "as error\n"
 
-        // compilation options
-             << "    " << "-o, --out <file>         - specify output file\n"
-             << "    " << "-c, --lib                - assemble as a library\n"
-             << "    " << "-C, --verify             - verify source code correctness without actually compiling it\n"
-             << "    " << "                           this option turns assembler into source level debugger and static code analyzer hybrid\n"
-             << "    " << "    --size               - calculate and report final bytecode size\n"
-             << "    " << "    --meta               - display information embedded in source code and exit\n"
-             << "    " << "    --no-sa              - disable static checking of register accesses (use in case of false positives)\n"
-             ;
+             // compilation options
+             << "    "
+             << "-o, --out <file>         - specify output file\n"
+             << "    "
+             << "-c, --lib                - assemble as a library\n"
+             << "    "
+             << "-C, --verify             - verify source code correctness without actually compiling it\n"
+             << "    "
+             << "                           this option turns assembler into source level debugger and "
+                "static code analyzer hybrid\n"
+             << "    "
+             << "    --size               - calculate and report final bytecode size\n"
+             << "    "
+             << "    --meta               - display information embedded in source code and exit\n"
+             << "    "
+             << "    --no-sa              - disable static checking of register accesses (use in case of "
+                "false positives)\n";
     }
 
     return (show_help or show_version);
@@ -124,54 +146,59 @@ static string read_file(const string& path) {
 
     ostringstream source_in;
     string line;
-    while (getline(in, line)) { source_in << line << '\n'; }
+    while (getline(in, line)) {
+        source_in << line << '\n';
+    }
 
     return source_in.str();
 }
 
-static void underline_error_token(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i, const viua::cg::lex::InvalidSyntax& error) {
-        cout << "     ";
+static void underline_error_token(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i,
+                                  const viua::cg::lex::InvalidSyntax& error) {
+    cout << "     ";
 
-        auto len = str::stringify((error.line()+1), false).size();
-        while (len--) {
-            cout << ' ';
-        }
+    auto len = str::stringify((error.line() + 1), false).size();
+    while (len--) {
         cout << ' ';
+    }
+    cout << ' ';
 
-        while (i < tokens.size()) {
-            const auto& each = tokens.at(i++);
-            bool match = error.match(each);
+    while (i < tokens.size()) {
+        const auto& each = tokens.at(i++);
+        bool match = error.match(each);
 
-            if (match) {
-                cout << send_control_seq(COLOR_FG_RED_1);
-            }
-
-            char c = (match ? '^' : ' ');
-            len = each.str().size();
-            while (len--) {
-                cout << c;
-            }
-
-            if (match) {
-                cout << send_control_seq(ATTR_RESET);
-            }
-
-            if (each == "\n") {
-                break;
-            }
+        if (match) {
+            cout << send_control_seq(COLOR_FG_RED_1);
         }
 
-        cout << '\n';
+        char c = (match ? '^' : ' ');
+        len = each.str().size();
+        while (len--) {
+            cout << c;
+        }
+
+        if (match) {
+            cout << send_control_seq(ATTR_RESET);
+        }
+
+        if (each == "\n") {
+            break;
+        }
+    }
+
+    cout << '\n';
 }
-static auto display_error_line(const vector<viua::cg::lex::Token>& tokens, const viua::cg::lex::InvalidSyntax& error, decltype(tokens.size()) i) -> decltype(i) {
+static auto display_error_line(const vector<viua::cg::lex::Token>& tokens,
+                               const viua::cg::lex::InvalidSyntax& error, decltype(tokens.size()) i)
+    -> decltype(i) {
     const auto token_line = tokens.at(i).line();
 
     cout << send_control_seq(COLOR_FG_RED);
-    cout << ">>>>"; // message indent, ">>>>" on error line
+    cout << ">>>>";  // message indent, ">>>>" on error line
     cout << ' ';
 
     cout << send_control_seq(COLOR_FG_YELLOW);
-    cout << token_line+1;
+    cout << token_line + 1;
     cout << ' ';
 
     auto original_i = i;
@@ -195,12 +222,14 @@ static auto display_error_line(const vector<viua::cg::lex::Token>& tokens, const
 
     return i;
 }
-static auto display_context_line(const vector<viua::cg::lex::Token>& tokens, const viua::cg::lex::InvalidSyntax&, decltype(tokens.size()) i) -> decltype(i) {
+static auto display_context_line(const vector<viua::cg::lex::Token>& tokens,
+                                 const viua::cg::lex::InvalidSyntax&, decltype(tokens.size()) i)
+    -> decltype(i) {
     const auto token_line = tokens.at(i).line();
 
-    cout << "    "; // message indent, ">>>>" on error line
+    cout << "    ";  // message indent, ">>>>" on error line
     cout << ' ';
-    cout << token_line+1;
+    cout << token_line + 1;
     cout << ' ';
 
     while (i < tokens.size() and tokens.at(i).line() == token_line) {
@@ -210,14 +239,17 @@ static auto display_context_line(const vector<viua::cg::lex::Token>& tokens, con
     return i;
 }
 static void display_error_header(const viua::cg::lex::InvalidSyntax& error, const string& filename) {
-    cout << send_control_seq(COLOR_FG_WHITE) << filename << ':' << error.line()+1 << ':' << error.character()+1 << ':' << send_control_seq(ATTR_RESET) << ' ';
-    cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET) << ": " << error.what() << endl;
+    cout << send_control_seq(COLOR_FG_WHITE) << filename << ':' << error.line() + 1 << ':'
+         << error.character() + 1 << ':' << send_control_seq(ATTR_RESET) << ' ';
+    cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET) << ": " << error.what()
+         << endl;
 }
-static void display_error_location(const vector<viua::cg::lex::Token>& tokens, const viua::cg::lex::InvalidSyntax error) {
+static void display_error_location(const vector<viua::cg::lex::Token>& tokens,
+                                   const viua::cg::lex::InvalidSyntax error) {
     const unsigned context_lines = 2;
-    decltype(error.line()) context_before = 0, context_after = (error.line()+context_lines);
+    decltype(error.line()) context_before = 0, context_after = (error.line() + context_lines);
     if (error.line() >= context_lines) {
-        context_before = (error.line()-context_lines);
+        context_before = (error.line() - context_lines);
     }
 
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size();) {
@@ -235,12 +267,14 @@ static void display_error_location(const vector<viua::cg::lex::Token>& tokens, c
         ++i;
     }
 }
-static void display_error_in_context(const vector<viua::cg::lex::Token>& tokens, const viua::cg::lex::InvalidSyntax error, const string& filename) {
+static void display_error_in_context(const vector<viua::cg::lex::Token>& tokens,
+                                     const viua::cg::lex::InvalidSyntax error, const string& filename) {
     display_error_header(error, filename);
     cout << "\n";
     display_error_location(tokens, error);
 }
-static void display_error_in_context(const vector<viua::cg::lex::Token>& tokens, const viua::cg::lex::TracedSyntaxError error, const string& filename) {
+static void display_error_in_context(const vector<viua::cg::lex::Token>& tokens,
+                                     const viua::cg::lex::TracedSyntaxError error, const string& filename) {
     for (auto const& e : error.errors) {
         display_error_in_context(tokens, e, filename);
         cout << "\n";
@@ -273,11 +307,12 @@ int main(int argc, char* argv[]) {
             SCREAM = true;
             continue;
         } else if (option == "--out" or option == "-o") {
-            if (i < argc-1) {
+            if (i < argc - 1) {
                 compilename = string(argv[++i]);
             } else {
                 cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
-                cout << ": option '" << send_control_seq(COLOR_FG_WHITE) << argv[i] << send_control_seq(ATTR_RESET) << "' requires an argument: filename";
+                cout << ": option '" << send_control_seq(COLOR_FG_WHITE) << argv[i]
+                     << send_control_seq(ATTR_RESET) << "' requires an argument: filename";
                 cout << endl;
                 exit(1);
             }
@@ -307,7 +342,9 @@ int main(int argc, char* argv[]) {
         args.emplace_back(argv[i]);
     }
 
-    if (usage(argv[0], SHOW_HELP, SHOW_VERSION, VERBOSE)) { return 0; }
+    if (usage(argv[0], SHOW_HELP, SHOW_VERSION, VERBOSE)) {
+        return 0;
+    }
 
     if (args.size() == 0) {
         cout << send_control_seq(COLOR_FG_RED) << "error" << send_control_seq(ATTR_RESET);
@@ -362,7 +399,8 @@ int main(int argc, char* argv[]) {
     decltype(raw_tokens) cooked_tokens, cooked_tokens_without_names_replaced;
     try {
         cooked_tokens = viua::cg::lex::standardise(viua::cg::lex::cook(raw_tokens));
-        cooked_tokens_without_names_replaced = viua::cg::lex::standardise(viua::cg::lex::cook(raw_tokens, false));
+        cooked_tokens_without_names_replaced =
+            viua::cg::lex::standardise(viua::cg::lex::cook(raw_tokens, false));
     } catch (const viua::cg::lex::InvalidSyntax& e) {
         display_error_in_context(raw_tokens, e, filename);
         return 1;
@@ -402,7 +440,8 @@ int main(int argc, char* argv[]) {
         assembler::verify::functionNames(cooked_tokens_without_names_replaced);
         assembler::verify::functionBodiesAreNonempty(cooked_tokens_without_names_replaced);
         assembler::verify::blockTries(cooked_tokens_without_names_replaced, blocks.names, blocks.signatures);
-        assembler::verify::blockCatches(cooked_tokens_without_names_replaced, blocks.names, blocks.signatures);
+        assembler::verify::blockCatches(cooked_tokens_without_names_replaced, blocks.names,
+                                        blocks.signatures);
         assembler::verify::frameBalance(cooked_tokens_without_names_replaced);
         assembler::verify::functionCallArities(cooked_tokens_without_names_replaced);
         assembler::verify::msgArities(cooked_tokens_without_names_replaced);
@@ -412,7 +451,8 @@ int main(int argc, char* argv[]) {
         assembler::verify::framesHaveNoGaps(cooked_tokens_without_names_replaced);
         assembler::verify::blocksEndWithFinishingInstruction(cooked_tokens_without_names_replaced);
         if (PERFORM_STATIC_ANALYSIS) {
-            assembler::verify::manipulationOfDefinedRegisters(cooked_tokens_without_names_replaced, blocks.tokens, DEBUG);
+            assembler::verify::manipulationOfDefinedRegisters(cooked_tokens_without_names_replaced,
+                                                              blocks.tokens, DEBUG);
         }
     } catch (const viua::cg::lex::InvalidSyntax& e) {
         display_error_in_context(raw_tokens, e, filename);

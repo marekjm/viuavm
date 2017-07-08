@@ -76,7 +76,7 @@
     --
     -- so what this program does is saturate the schedulers
 
-    link std::misc
+    import "std::misc"
 
     .name: 1 limit
     istore %limit 64

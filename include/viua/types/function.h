@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -25,24 +25,24 @@
 #include <string>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/kernel/registerset.h>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 
 
 namespace viua {
     namespace types {
-        class Function : public Type {
-            /** Type representing a function.
-             */
+        class Function : public Value {
             public:
+                static const std::string type_name;
+
                 std::string function_name;
 
-                virtual std::string type() const override;
-                virtual std::string str() const override;
-                virtual std::string repr() const override;
+                std::string type() const override;
+                std::string str() const override;
+                std::string repr() const override;
 
-                virtual bool boolean() const override;
+                bool boolean() const override;
 
-                virtual std::unique_ptr<Type> copy() const override;
+                std::unique_ptr<Value> copy() const override;
 
                 virtual std::string name() const;
 

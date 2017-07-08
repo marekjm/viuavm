@@ -19,7 +19,7 @@
 
 ; This script implements basic functions used in functional programming style
 ;
-; It can be dynamically linked to programs running on Viua VM by putting "link std::functional" instruction in
+; It can be dynamically linked to programs running on Viua VM by putting 'import "std::functional"' instruction in
 ; source code of the script.
 ; Alternatively, it can be statically linked if that would be more suitable.
 ;
@@ -42,7 +42,7 @@
 
     ; while (...) {
     .mark: loop_begin
-    if (gte int64 %6 %4 %5) loop_end loop_body
+    if (gte %6 %4 %5) loop_end loop_body
 
     .mark: loop_body
 
@@ -91,7 +91,7 @@
 
     ; loop condition
     .mark: loop_begin
-    if (lt int64 %iota %counter %list_length) loop_body loop_end
+    if (lt %iota %counter %list_length) loop_body loop_end
 
     .mark: loop_body
 
@@ -130,7 +130,7 @@
 
     ; while (...) {
     .mark: loop_begin
-    gte int64 %6 %4 %5
+    gte %6 %4 %5
     if %6 loop_end loop_body
 
     .mark: loop_body
@@ -217,7 +217,7 @@
     ; simple condition:
     ; while (loop_counter < vector_length) {
     .name: %5 loop_condition
-    gte int64 %loop_condition %loop_counter %vector_length
+    gte %loop_condition %loop_counter %vector_length
     if %loop_condition while_end while_body
 
     .mark: while_body

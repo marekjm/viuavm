@@ -24,7 +24,7 @@
 
     .mark: loop
     .name: %iota format_parameters
-    if (gte int64 %iota %counter %limit) after_loop
+    if (gte %iota %counter %limit) after_loop
 
     frame ^[(param %iota %report_text_format) (param %iota (vec %format_parameters (copy %format_parameters %counter) %1))]
     print (msg %iota format/)
@@ -39,20 +39,24 @@
 
 .function: main/1
     frame %0
-    process %1 running_detached/0
+    process void running_detached/0
 
     nop
     nop
-
-    frame ^[(param %0 (ptr %2 %1))]
-    msg void detach/1
-
     nop
-
-    ; reuse the pointer created earlier
-    frame ^[(param %0 %2)]
-    msg %3 joinable/1
-    print %3
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
 
     print (strstore %3 "main/1 exited")
 

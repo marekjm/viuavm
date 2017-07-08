@@ -17,29 +17,30 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <unistd.h>
-#include <cstdlib>
 #include <cstdint>
-#include <iostream>
+#include <cstdlib>
 #include <fstream>
+#include <iostream>
 #include <string>
+#include <unistd.h>
 #include <vector>
-#include <viua/version.h>
 #include <viua/bytecode/maps.h>
 #include <viua/cg/disassembler/disassembler.h>
-#include <viua/program.h>
-#include <viua/printutils.h>
-#include <viua/front/vm.h>
 #include <viua/front/asm.h>
+#include <viua/front/vm.h>
+#include <viua/printutils.h>
+#include <viua/program.h>
+#include <viua/version.h>
 using namespace std;
 
 
-const char* NOTE_LOADED_ASM = "note: seems like you have loaded an .asm file which cannot be run without prior compilation";
+const char* NOTE_LOADED_ASM =
+    "note: seems like you have loaded an .asm file which cannot be run without prior compilation";
 
 
 string send_control_seq(const string& mode) {
     static auto is_terminal = isatty(1);
-    static string env_color_flag { getenv("VIUAVM_ASM_COLOUR") ? getenv("VIUAVM_ASM_COLOUR") : "default" };
+    static string env_color_flag{getenv("VIUAVM_ASM_COLOUR") ? getenv("VIUAVM_ASM_COLOUR") : "default"};
 
     bool colorise = is_terminal;
     if (env_color_flag == "default") {
@@ -88,11 +89,15 @@ static bool usage(const string program, const vector<string>& args) {
             cerr << send_control_seq(COLOR_FG_WHITE) << option << send_control_seq(ATTR_RESET);
             cerr << endl;
             exit(1);
+        } else {
+            // first operand, options processing should stop
+            break;
         }
     }
 
     if (show_json) {
-        cout << "{\"version\": \"" << VERSION << '.' << MICRO << "\", \"sched\": {\"ffi\": " << viua::kernel::Kernel::no_of_ffi_schedulers() << ", ";
+        cout << "{\"version\": \"" << VERSION << '.' << MICRO
+             << "\", \"sched\": {\"ffi\": " << viua::kernel::Kernel::no_of_ffi_schedulers() << ", ";
         cout << "\"vp\": " << viua::kernel::Kernel::no_of_vp_schedulers() << "}}\n";
         return true;
     }
@@ -116,12 +121,17 @@ static bool usage(const string program, const vector<string>& args) {
         cout << "\nUSAGE:\n";
         cout << "    " << program << " [option...] <executable>\n" << endl;
         cout << "OPTIONS:\n";
-        cout << "    " << "-V, --version            - show version\n"
-             << "    " << "-h, --help               - display this message\n"
-             << "    " << "-v, --verbose            - show verbose output\n"
-             << "    " << "-i, --info               - show information about VM configuration (number of schedulers, version etc.)\n"
-             << "    " << "    --json               - same as --info but in JSON format\n"
-             ;
+        cout << "    "
+             << "-V, --version            - show version\n"
+             << "    "
+             << "-h, --help               - display this message\n"
+             << "    "
+             << "-v, --verbose            - show verbose output\n"
+             << "    "
+             << "-i, --info               - show information about VM configuration (number of schedulers, "
+                "version etc.)\n"
+             << "    "
+             << "    --json               - same as --info but in JSON format\n";
     }
 
     return (show_help or show_version or show_info);
@@ -134,7 +144,9 @@ int main(int argc, char* argv[]) {
         args.emplace_back(argv[i]);
     }
 
-    if (usage(argv[0], args)) { return 0; }
+    if (usage(argv[0], args)) {
+        return 0;
+    }
 
     if (args.size() == 0) {
         cout << "fatal: no input file" << endl;
@@ -157,7 +169,7 @@ int main(int argc, char* argv[]) {
 
     try {
         viua::front::vm::initialise(&kernel, filename, args);
-    } catch (const char *e) {
+    } catch (const char* e) {
         cout << "error: " << e << endl;
         return 1;
     } catch (const string& e) {

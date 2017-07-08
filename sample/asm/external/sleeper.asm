@@ -45,16 +45,12 @@
 .end
 .function: lazy_print_spawner/0
     frame %0
-    process %1 lazy_print_process/0
-
-    frame ^[(param %0 %1)]
-    msg void detach/1
-
+    process void lazy_print_process/0
     return
 .end
 
 .function: main/0
-    -- link foreign printer module
+    -- import "foreign printer module"
     import "build/test/printer"
     import "build/test/sleeper"
 

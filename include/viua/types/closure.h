@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -32,27 +32,26 @@
 namespace viua {
     namespace types {
         class Closure : public Function {
-            /** Closure type.
-             */
                 std::unique_ptr<viua::kernel::RegisterSet> local_register_set;
                 std::string function_name;
 
             public:
+                static const std::string type_name;
 
-                virtual std::string type() const override;
-                virtual std::string str() const override;
-                virtual std::string repr() const override;
+                std::string type() const override;
+                std::string str() const override;
+                std::string repr() const override;
 
-                virtual bool boolean() const override;
+                bool boolean() const override;
 
-                virtual std::unique_ptr<Type> copy() const override;
+                std::unique_ptr<Value> copy() const override;
 
                 std::string name() const override;
                 viua::kernel::RegisterSet* rs() const;
                 auto release() -> viua::kernel::RegisterSet*;
                 auto give() -> std::unique_ptr<viua::kernel::RegisterSet>;
                 auto empty() const -> bool;
-                void set(viua::internals::types::register_index, std::unique_ptr<viua::types::Type>);
+                void set(viua::internals::types::register_index, std::unique_ptr<viua::types::Value>);
 
                 Closure(const std::string&, std::unique_ptr<viua::kernel::RegisterSet>);
                 virtual ~Closure();

@@ -20,7 +20,7 @@
 #include <iostream>
 #include <sstream>
 #include <memory>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
 #include <viua/include/module.h>
@@ -31,7 +31,7 @@ extern "C" const ForeignFunctionSpec* exports();
 
 
 static void printer_print(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
-    unique_ptr<viua::types::Type> arg(frame->arguments->pop(0));
+    unique_ptr<viua::types::Value> arg(frame->arguments->pop(0));
     // concatenate before printing to avoid mangled output
     cout << ("Hello " + arg->str() + "!\n");
 }

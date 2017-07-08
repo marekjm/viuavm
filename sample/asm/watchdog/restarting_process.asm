@@ -31,8 +31,8 @@
     echo %exception
     print (strstore %message "<<<")
 
-    copy (.name: %iota i) *(vat %i %parameters 1)
-    frame ^[(param %0 *(vat %message %parameters 0)) (param %1 (iinc %i))]
+    copy (.name: %iota i) *(vat %i %parameters (istore %iota 1))
+    frame ^[(param %0 *(vat %message %parameters (istore %iota 0))) (param %1 (iinc %i))]
     process void a_division_executing_process/2
 
     return
@@ -85,11 +85,11 @@
     .name: 3 zero
     izero %zero
 
-    if (eq int64 %4 %divide_by %zero) +1 __after_throw
+    if (eq %4 %divide_by %zero) +1 __after_throw
     throw (strstore %4 "cannot divide by zero")
     .mark: __after_throw
 
-    div int64 %0 %divide_what %divide_by
+    div %0 %divide_what %divide_by
     echo %divide_what
     echo (strstore %4 ' / ')
     echo %divide_by
@@ -121,7 +121,7 @@
 .signature: std::misc::cycle/1
 
 .function: main/1
-    link std::misc
+    import "std::misc"
 
     frame %0
     process void a_detached_concurrent_process/0

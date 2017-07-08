@@ -40,7 +40,7 @@
 .end
 
 .function: main/0
-    link test_module
+    import "test_module"
 
     try
     catch "Integer" handle_Integer

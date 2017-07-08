@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -23,27 +23,29 @@
 #pragma once
 
 #include <map>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 
 
 namespace viua {
     namespace types {
-        class Prototype: public Type {
+        class Prototype: public Value {
             /** A prototype of a type.
              *
              *  This type is used internally inside the VM.
              */
 
-            std::string type_name;
+            std::string prototype_name;
             std::vector<std::string> ancestors;
             std::map<std::string, std::string> methods;
             std::vector<std::string> attributes;
 
             public:
-                virtual std::string type() const override;
-                virtual bool boolean() const override;
+                static const std::string type_name;
 
-                virtual std::string str() const override;
+                std::string type() const override;
+                bool boolean() const override;
+
+                std::string str() const override;
 
                 std::string getTypeName() const;
                 std::vector<std::string> getAncestors() const;
@@ -60,17 +62,13 @@ namespace viua {
                 Prototype* derive(const std::string&);
 
 
-                virtual std::vector<std::string> bases() const override {
-                    return std::vector<std::string>{"Type"};
-                }
-                virtual std::vector<std::string> inheritancechain() const override {
-                    return std::vector<std::string>{"Type"};
-                }
+                std::vector<std::string> bases() const override;
+                std::vector<std::string> inheritancechain() const override;
 
-                virtual std::unique_ptr<Type> copy() const override;
+                std::unique_ptr<Value> copy() const override;
 
-                Prototype(const std::string& tn): type_name(tn) {}
-                virtual ~Prototype() {}
+                Prototype(const std::string& tn);
+                virtual ~Prototype();
         };
     }
 }

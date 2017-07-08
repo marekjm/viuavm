@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -21,19 +21,18 @@
 #include <viua/types/reference.h>
 using namespace std;
 
+const string viua::types::Reference::type_name = "Reference";
 
-viua::types::Type* viua::types::Reference::pointsTo() const {
-    return *pointer;
-}
+viua::types::Value* viua::types::Reference::pointsTo() const { return *pointer; }
 
-void viua::types::Reference::rebind(viua::types::Type* ptr) {
+void viua::types::Reference::rebind(viua::types::Value* ptr) {
     if (*pointer) {
         delete (*pointer);
     }
     (*pointer) = ptr;
 }
 
-void viua::types::Reference::rebind(unique_ptr<viua::types::Type> ptr) {
+void viua::types::Reference::rebind(unique_ptr<viua::types::Value> ptr) {
     if (*pointer) {
         delete (*pointer);
     }
@@ -41,34 +40,23 @@ void viua::types::Reference::rebind(unique_ptr<viua::types::Type> ptr) {
 }
 
 
-string viua::types::Reference::type() const {
-    return (*pointer)->type();
-}
+string viua::types::Reference::type() const { return (*pointer)->type(); }
 
-string viua::types::Reference::str() const {
-    return (*pointer)->str();
-}
-string viua::types::Reference::repr() const {
-    return (*pointer)->repr();
-}
-bool viua::types::Reference::boolean() const {
-    return (*pointer)->boolean();
-}
+string viua::types::Reference::str() const { return (*pointer)->str(); }
+string viua::types::Reference::repr() const { return (*pointer)->repr(); }
+bool viua::types::Reference::boolean() const { return (*pointer)->boolean(); }
 
-vector<string> viua::types::Reference::bases() const {
-    return vector<string>({});
-}
-vector<string> viua::types::Reference::inheritancechain() const {
-    return vector<string>({});
-}
+vector<string> viua::types::Reference::bases() const { return vector<string>({}); }
+vector<string> viua::types::Reference::inheritancechain() const { return vector<string>({}); }
 
-unique_ptr<viua::types::Type> viua::types::Reference::copy() const {
+unique_ptr<viua::types::Value> viua::types::Reference::copy() const {
     ++(*counter);
-    return unique_ptr<viua::types::Type>{new viua::types::Reference(pointer, counter)};
+    return unique_ptr<viua::types::Value>{new viua::types::Reference(pointer, counter)};
 }
 
-viua::types::Reference::Reference(viua::types::Type *ptr): pointer(new viua::types::Type*(ptr)), counter(new uint64_t(1)) {
-}
+viua::types::Reference::Reference(viua::types::Value* ptr)
+    : pointer(new viua::types::Value*(ptr)), counter(new uint64_t(1)) {}
+viua::types::Reference::Reference(Value** ptr, uint64_t* ctr) : pointer(ptr), counter(ctr) {}
 viua::types::Reference::~Reference() {
     /** Copies of the reference may be freely spawned and destroyed, but
      *  the internal object *MUST* be preserved until its refcount reaches zero.

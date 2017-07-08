@@ -27,7 +27,12 @@ There are several categories of change:
 
 ----
 
-# From 0.8.4 to 0.8.5
+# From 0.9.0 to 0.9.1
+
+
+----
+
+# From 0.8.4 to 0.9.0
 
 - enhancement: assembler is able to catch most zero-distance jumps preventing infinite loops at compile time
 - bic: remove all warning and error options from assembler frontend (all enabled by default)
@@ -38,8 +43,8 @@ There are several categories of change:
 - enhancement: token-based return value checking of main function (the assembler actually checks if the return register
   is being correctly set)
 - feature: add `.closure:` directive marking blocks as closures; closures are almost the same as functions, but they are
-  not directly callable, i.e. `call closure/0` is illegal, but `fcall <closure>` is OK - this distinction was introduced
-  because closures are currently not statically checkable
+  not directly callable, i.e. `call some_closure/0` is illegal, but `call %some_closure` is OK (i.e. calling uninstantiated closures is illegal);
+  this distinction was introduced because closures are currently not statically checkable
 - feature: assembler is able to perform basic static analysis of register accesses, and detect some places where a register is
   accessed but would be empty at runtime; this can be disable using `--no-sa` (*no static analysis*) flag if the static analyser
   throws a false positive
@@ -57,7 +62,7 @@ There are several categories of change:
   value values are: `default` - colorise only when stdout is a terminal, `never`, and `always`)
 - enhancement: assembler checks `.name:` directives and detects when a name is reused in a single block
 - enhancement: `istore` instruction has `0` as a default second operand (i.e. `istore 1` is assembled as `istore 1 0`)
-- enhancement: `fstore` instruction has `0.0` as a default second operand (i.e. `fstore 1` is assembled as `fstore 1 0`)
+- enhancement: `fstore` instruction has `0.0` as a default second operand (i.e. `fstore 1` is assembled as `fstore 1 0.0`)
 - enhancement: `strstore` instruction has `""` as a default second operand (i.e. `strstore 1` is assembled as `strstore 1 ""`)
 - enhancement: assembler detects missing module names in `.link:` directive
 - feature: `--meta` option in assembler displays meta information embedded in source code
@@ -72,7 +77,7 @@ There are several categories of change:
   to provide full-fledged nesting support, and should be used when a block is not reused acros functions and is relatively simple;
   nested blocks can access register names from their enclosing function, but do not export names to it (i.e. names have lexical scope);
   nested blocks names **are mangled** when unwrapped
-- bic: removed byte instructions, they will be superseded with fixed-size 8-bit integer instructions
+- bic: removed byte instructions, they will be superseded with fixed-size bitstring instructions
 - bic: dropping joinable processes in frames is no longer an error; this was a common situation - spawn process A, obtain its PID, pass
   the PID to some other process and forget about process A;
   now it is not required to detach the process before dropping its PID
@@ -92,11 +97,10 @@ There are several categories of change:
 - fix: duplicated names are not allowed in a single source file
 - bic: processes cannot be suspended, and their priority cannot be adjusted, from user code; VM is the sole ruler of processes
 - bic: rename `enclose` family of instructions (`enclose`, `enclosecopy`, and `enclosemove`) as `capture` family
-- bic, enhancement: `receive` instruction drops messages if its target register index is 0
 - enhancement: `void` can be used as target register index to denote that result of the instruction should be dropped (implemented for `call`, `msg`,
   `process`, `join`, `receive`, and `arg`)
 - bic: remove support for `.`-prefixed absolute jumps; this makes reasoning about machine easier since only jumps inside single block of code are valid
-- bic, feature: `void` operands are now only one byte long
+- bic, feature: `void` operands are now only one byte long (only the operand type is encoded in bytecode)
 - fix: `std::io::ifstream::getline/1` throws an exception when EOF is reached
 - bic, enhancement: `not` has two operands: target and source registers
 - feature: pointer dereference using `*<register-index>` (e.g. `*pointer`) syntax; exception is thrown when expired pointer is dereferenced, or
@@ -105,9 +109,6 @@ There are several categories of change:
 - bic: rename `pull` instruction to `draw`
 - bic: `vat` returns not a copy, but a pointer to an object held inside a vector
 - fix: VM does not crash when source of `fcall` instruction is not callable, and throws an exception instead
-- feature: unified ALU (arithmetic-logic) instructions - `add`, `sub`, `mul`, `div`, `lt`, `lte`, `gt`, `gte`, and `eq` that should be used instead of the
-  type-specific ALU instructions; the syntax is `mnemonic type target lhs rhs` eg. `add int32 result foo bar` will add `foo` to `bar` as 32 bit signed integers and
-  store the result as 32 bit signed integer
 - bic: functions may return to 0 register, `void` must be used to drop return values
 - feature: `VIUA_STACK_TRACES` environment variable controlling how stack traces are printed (currently only `VIUA_STACK_TRACES=full` is recognised)
 - bic: register index operands must be prefixed by `%` character
@@ -115,13 +116,33 @@ There are several categories of change:
 - bic, enhancement: `tmpri` and `tmpro` instructions are no longer part of the ISA, use `move`, `copy` or `swap` with explicit register set names
 - feature, bic: support for explicit register set access specifiers in register index operands
 - bic: removed `prototype` from bytecode definition
-- bic: two new reserved words: `boolean` and `text`
+- bic: new reserved word: `boolean`
 - fix: pointers now remember their process-of-origin and refuse to be dereferenced outside of it
 - fix: pointers are automatically expired upon crossing process boundaries, lazily - upon first access
+- fix: accessing elements of empty vector does not crash the VM
+- bic: `.main:` directive is no longer allowed
+- bic: `vat` and `vpop` do not take immediate values as operands but take indexes from registers
+- bic: removed `link` instruction, `import` is now used to import both native and foreign modules
+- bic: renamed `.link:` directive to `.import:`
+- feature: add `atom` and `atomeq` instructions
+- enhancement: ALU instructions' results inherit the type of the left-hand side operand, and
+  right-hand side operand is converted to the type of the left-hand side operand before the operation is executed
+- bic: only `Integer` and `Float` types are numeric, `Boolean` is not
+- bic: remove `detach/1` and `joinable/1` from `Process` type, they were problematic to secure from parallel point of view, and
+  were a pain point when it came to predictability
+- bic: `Process` values always evaluate to `false`
+- feature: `defer` instruction for executing function calls on function return,
+- feature: `text` family of instructions for **basic** text manipulation
+- feature: values can be stringified by passing them as source operands for `text` instruction
+- feature: `VIUAVM_ASM_COLOUR` environment variable controlling colourisation of output from VM internals (e.g. error messages)
+- feature: `VIUAVM_ENABLE_TRACING` environment variable, if set to `yes`, makes the VM kernel print execution traces which may prove valuable for debugging
+  the overhead introduced by enabling traces is about 10x to 13x (pretty substantial)
+- enhancement, feature: Viua VM now uses UTF-8 to represent text internally
+- bic: source code of Viua VM assembly must be either ASCII or UTF-8 encoded Unicode, other encodings are not supported
 
 One limitation of static analyser (SA) introduced in this release is its inability to handle backwards jumps.
 This, however, is not a problem if the code does not use loops and
-instead employ recursion using `tailcall` instruction - SA is able to verify forward jumps without problems, and
+instead employs recursion using `tailcall` instruction - SA is able to verify forward jumps without problems, and
 using recursion as a method for "looping" would eliminate the need for backward jumps.
 If the SA throws false positives `--no-sa` flag can be used.
 Problematic code sections should be moved to a separate compilation unit so code that is consumable by SA can still
@@ -130,6 +151,7 @@ be checked.
 Static analyser displays *traces* for some errors, e.g. frame balance errors, and errors caused by branching and jumps.
 These traces are displayed as step-by-step explanations of how the SA reached the error, complete with line and character numbers, and
 context lines.
+These traces may be a bit longish at times, but they are mostly accurate.
 When the SA is not able to provide a trace (e.g. reaching an error takes only one step, or SA does not have enough information) a
 single-step message is provided.
 
@@ -144,6 +166,9 @@ the code is invalid and will result in an exception being thrown.
 A user-code invisible improvement to VM's core is also included in this release: all core primitive types used by Viua have defined Viua-specific aliases, and
 are a fixed-size types.
 This is great for portability.
+
+As a feature for contributors, a `.clang-format` has been added to the repository allowing automatic code formatting and
+ensuring a uniform coding style accross Viua VM source base.
 
 
 ----

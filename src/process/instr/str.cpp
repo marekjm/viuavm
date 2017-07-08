@@ -19,12 +19,12 @@
 
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/bytecode/decoder/operands.h>
-#include <viua/types/type.h>
-#include <viua/types/integer.h>
-#include <viua/types/boolean.h>
-#include <viua/types/string.h>
-#include <viua/support/string.h>
 #include <viua/kernel/kernel.h>
+#include <viua/support/string.h>
+#include <viua/types/boolean.h>
+#include <viua/types/integer.h>
+#include <viua/types/string.h>
+#include <viua/types/value.h>
 using namespace std;
 
 
@@ -32,10 +32,12 @@ viua::internals::types::byte* viua::process::Process::opstrstore(viua::internals
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
+    ++addr;  // for operand type
+
     string s;
     tie(addr, s) = viua::bytecode::decoder::operands::fetch_primitive_string(addr, this);
 
-    *target = unique_ptr<viua::types::Type>{new viua::types::String(str::strdecode(s))};
+    *target = unique_ptr<viua::types::Value>{new viua::types::String(str::strdecode(s))};
 
     return addr;
 }

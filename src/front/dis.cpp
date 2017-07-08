@@ -17,26 +17,26 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <unistd.h>
-#include <cstdlib>
 #include <cstdint>
+#include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <sstream>
-#include <vector>
-#include <tuple>
 #include <string>
-#include <viua/version.h>
-#include <viua/machine.h>
-#include <viua/bytecode/opcodes.h>
+#include <tuple>
+#include <unistd.h>
+#include <vector>
 #include <viua/bytecode/maps.h>
+#include <viua/bytecode/opcodes.h>
 #include <viua/cg/assembler/assembler.h>
 #include <viua/cg/disassembler/disassembler.h>
-#include <viua/support/string.h>
-#include <viua/support/pointer.h>
-#include <viua/support/env.h>
-#include <viua/loader.h>
 #include <viua/front/asm.h>
+#include <viua/loader.h>
+#include <viua/machine.h>
+#include <viua/support/env.h>
+#include <viua/support/pointer.h>
+#include <viua/support/string.h>
+#include <viua/version.h>
 using namespace std;
 
 
@@ -54,7 +54,7 @@ string SELECTED_FUNCTION = "";
 
 string send_control_seq(const string& mode) {
     static auto is_terminal = isatty(1);
-    static string env_color_flag { getenv("VIUAVM_ASM_COLOUR") ? getenv("VIUAVM_ASM_COLOUR") : "default" };
+    static string env_color_flag{getenv("VIUAVM_ASM_COLOUR") ? getenv("VIUAVM_ASM_COLOUR") : "default"};
 
     bool colorise = is_terminal;
     if (env_color_flag == "default") {
@@ -86,15 +86,22 @@ static bool usage(const char* program, bool show_help, bool show_version, bool v
         cout << "\nUSAGE:\n";
         cout << "    " << program << " [option...] [-o <outfile>] <infile>\n" << endl;
         cout << "OPTIONS:\n";
-        cout << "    " << "-V, --version            - show version\n"
-             << "    " << "-h, --help               - display this message\n"
-             << "    " << "-v, --verbose            - show verbose output\n"
-             << "    " << "-o, --out                - output to given path (by default prints to cout)\n"
-             << "    " << "-i, --info               - include information about executable in output\n"
-             << "    " << "-e, --with-entry         - include " << ENTRY_FUNCTION_NAME << " function in disassembly\n"
-             << "    " << "-L, --line-by-line       - display output line by line\n"
-             << "    " << "-F, --function <name>    - disassemble only selected function\n"
-             ;
+        cout << "    "
+             << "-V, --version            - show version\n"
+             << "    "
+             << "-h, --help               - display this message\n"
+             << "    "
+             << "-v, --verbose            - show verbose output\n"
+             << "    "
+             << "-o, --out                - output to given path (by default prints to cout)\n"
+             << "    "
+             << "-i, --info               - include information about executable in output\n"
+             << "    "
+             << "-e, --with-entry         - include " << ENTRY_FUNCTION_NAME << " function in disassembly\n"
+             << "    "
+             << "-L, --line-by-line       - display output line by line\n"
+             << "    "
+             << "-F, --function <name>    - disassemble only selected function\n";
     }
 
     return (show_help or show_version);
@@ -127,7 +134,7 @@ int main(int argc, char* argv[]) {
         } else if ((option == "--line-by-line") or (option == "-L")) {
             LINE_BY_LINE = true;
         } else if (option == "--function" or option == "-F") {
-            if (i < argc-1) {
+            if (i < argc - 1) {
                 SELECTED_FUNCTION = string(argv[++i]);
             } else {
                 cout << "error: option '" << argv[i] << "' requires an argument: function name" << endl;
@@ -135,7 +142,7 @@ int main(int argc, char* argv[]) {
             }
             continue;
         } else if (option == "--out" or option == "-o") {
-            if (i < argc-1) {
+            if (i < argc - 1) {
                 disasmname = string(argv[++i]);
             } else {
                 cout << "error: option '" << argv[i] << "' requires an argument: filename" << endl;
@@ -153,7 +160,9 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if (usage(argv[0], SHOW_HELP, SHOW_VERSION, VERBOSE)) { return 0; }
+    if (usage(argv[0], SHOW_HELP, SHOW_VERSION, VERBOSE)) {
+        return 0;
+    }
 
     if (args.size() == 0) {
         cout << "fatal: no input file" << endl;
@@ -200,21 +209,18 @@ int main(int argc, char* argv[]) {
     ostringstream oss;
 
 
-    string name;
-    uint64_t el_size;
-
     for (unsigned i = 0; i < blocks.size(); ++i) {
-        name = blocks[i];
-        el_size = 0;
+        const string name = blocks[i];
 
-        if (i < (blocks.size()-1)) {
+        uint64_t el_size = 0;
+        if (i < (blocks.size() - 1)) {
             long unsigned a = block_address_mapping[name];
-            long unsigned b = block_address_mapping[blocks[i+1]];
-            el_size = (b-a);
+            long unsigned b = block_address_mapping[blocks[i + 1]];
+            el_size = (b - a);
         } else {
             long unsigned a = block_address_mapping[name];
             long unsigned b = function_address_mapping[functions[0]];
-            el_size = (b-a);
+            el_size = (b - a);
         }
 
         block_sizes[name] = el_size;
@@ -226,7 +232,7 @@ int main(int argc, char* argv[]) {
     }
 
     for (unsigned i = 0; i < functions.size(); ++i) {
-        name = functions[i];
+        const string name = functions[i];
         element_sizes[name] = function_sizes[name];
         element_types[name] = "function";
         element_address_mapping[name] = function_address_mapping[name];
@@ -237,10 +243,10 @@ int main(int argc, char* argv[]) {
         (DEBUG ? cout : oss) << "-- bytecode size: " << bytes << '\n';
         (DEBUG ? cout : oss) << "--\n";
         (DEBUG ? cout : oss) << "-- functions:\n";
-        string function_name;
         for (unsigned i = 0; i < functions.size(); ++i) {
-            function_name = functions[i];
-            (DEBUG ? cout : oss) << "--   " << function_name << " -> " << function_sizes[function_name] << " bytes at byte " << function_address_mapping[functions[i]] << '\n';
+            const auto function_name = functions[i];
+            (DEBUG ? cout : oss) << "--   " << function_name << " -> " << function_sizes[function_name]
+                                 << " bytes at byte " << function_address_mapping[functions[i]] << '\n';
         }
         (DEBUG ? cout : oss) << "\n\n";
 
@@ -283,8 +289,8 @@ int main(int argc, char* argv[]) {
     }
 
     for (unsigned i = 0; i < elements.size(); ++i) {
-        name = elements[i];
-        el_size = element_sizes[name];
+        const string name = elements[i];
+        const auto el_size = element_sizes[name];
 
         if ((name == ENTRY_FUNCTION_NAME) and not DISASSEMBLE_ENTRY) {
             continue;
@@ -304,18 +310,21 @@ int main(int argc, char* argv[]) {
             string instruction;
             try {
                 unsigned size;
-                tie(instruction, size) = disassembler::instruction((bytecode.get()+element_address_mapping[name]+j));
+                tie(instruction, size) =
+                    disassembler::instruction((bytecode.get() + element_address_mapping[name] + j));
                 (DEBUG ? cout : oss) << "    " << instruction << '\n';
                 j += size;
             } catch (const out_of_range& e) {
                 (DEBUG ? cout : oss) << "\n---- ERROR ----\n\n";
-                (DEBUG ? cout : oss) << "disassembly terminated after throwing an instance of std::out_of_range\n";
+                (DEBUG ? cout : oss)
+                    << "disassembly terminated after throwing an instance of std::out_of_range\n";
                 (DEBUG ? cout : oss) << "what(): " << e.what() << '\n';
                 disasm_terminated = true;
                 break;
             } catch (const string& e) {
                 (DEBUG ? cout : oss) << "\n---- ERROR ----\n\n";
-                (DEBUG ? cout : oss) << "disassembly terminated after throwing an instance of std::out_of_range\n";
+                (DEBUG ? cout : oss)
+                    << "disassembly terminated after throwing an instance of std::out_of_range\n";
                 (DEBUG ? cout : oss) << "what(): " << e << '\n';
                 disasm_terminated = true;
                 break;
@@ -344,7 +353,7 @@ int main(int argc, char* argv[]) {
             getline(cin, dummy);
         }
 
-        if (i < (elements.size()-1-(!DISASSEMBLE_ENTRY))) {
+        if (i < (elements.size() - 1 - (!DISASSEMBLE_ENTRY))) {
             (DEBUG ? cout : oss) << '\n';
         }
 

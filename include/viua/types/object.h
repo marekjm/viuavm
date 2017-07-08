@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -25,40 +25,38 @@
 #include <map>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 
 
 namespace viua {
     namespace types {
-        class Object: public Type {
+        class Object: public Value {
             /** A generic object class.
              *
              *  This type is used internally inside the VM.
              */
             private:
-                std::string type_name;
-                std::map<std::string, std::unique_ptr<Type>> attributes;
+                std::string object_type_name;
+                std::map<std::string, std::unique_ptr<Value>> attributes;
 
             public:
-                virtual std::string type() const override;
-                virtual bool boolean() const override;
+                static const std::string type_name;
 
-                virtual std::string str() const override;
+                std::string type() const override;
+                bool boolean() const override;
 
-                virtual std::vector<std::string> bases() const override {
-                    return std::vector<std::string>{"Type"};
-                }
-                virtual std::vector<std::string> inheritancechain() const override {
-                    return std::vector<std::string>{"Type"};
-                }
+                std::string str() const override;
 
-                virtual void insert(const std::string& key, std::unique_ptr<Type> value);
-                virtual std::unique_ptr<Type> remove(const std::string& key);
+                std::vector<std::string> bases() const override;
+                std::vector<std::string> inheritancechain() const override;
 
-                void set(const std::string&, std::unique_ptr<Type>);
-                inline Type* at(const std::string& s) { return attributes.at(s).get(); }
+                void insert(const std::string& key, std::unique_ptr<Value> value);
+                std::unique_ptr<Value> remove(const std::string& key);
 
-                virtual std::unique_ptr<Type> copy() const override;
+                void set(const std::string&, std::unique_ptr<Value>);
+                inline Value* at(const std::string& s) { return attributes.at(s).get(); }
+
+                virtual std::unique_ptr<Value> copy() const override;
 
                 Object(const std::string& tn);
                 virtual ~Object();

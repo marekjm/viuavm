@@ -18,14 +18,14 @@
 ;
 
 .function: is_not_negative/1
-    gte int64 %0 (arg %1 %0) (izero %2)
+    gte %0 (arg %1 %0) (izero %2)
     return
 .end
 
 .signature: std::vector::any/2
 
 .function: main/1
-    link std::vector
+    import "std::vector"
 
     vpush (vpush (vpush (vec %2) (istore %1 -1)) (istore %1 -2)) (istore %1 -3)
 

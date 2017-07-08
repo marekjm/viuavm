@@ -17,22 +17,22 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
 #include <algorithm>
-#include <viua/bytecode/opcodes.h>
+#include <iostream>
+#include <sstream>
 #include <viua/bytecode/maps.h>
-#include <viua/types/integer.h>
-#include <viua/types/exception.h>
-#include <viua/types/reference.h>
-#include <viua/types/process.h>
-#include <viua/process.h>
+#include <viua/bytecode/opcodes.h>
 #include <viua/kernel/kernel.h>
+#include <viua/process.h>
 #include <viua/scheduler/vps.h>
+#include <viua/types/exception.h>
+#include <viua/types/integer.h>
+#include <viua/types/process.h>
+#include <viua/types/reference.h>
 using namespace std;
 
 
-viua::process::PID::PID(const viua::process::Process* p): associated_process(p) {
-}
+viua::process::PID::PID(const viua::process::Process* p) : associated_process(p) {}
 bool viua::process::PID::operator==(const viua::process::PID& that) const {
     return (associated_process == that.associated_process);
 }
@@ -44,16 +44,22 @@ bool viua::process::PID::operator<(const viua::process::PID& that) const {
     // they are either equal or not, and that's it
     // less-than relation is implemented only so that viua::process::PID objects may be used as
     // keys in std::map<>
-    return (reinterpret_cast<uint64_t>(associated_process) < reinterpret_cast<uint64_t>(that.associated_process));
+    return (reinterpret_cast<uint64_t>(associated_process) <
+            reinterpret_cast<uint64_t>(that.associated_process));
 }
 bool viua::process::PID::operator>(const viua::process::PID& that) const {
     // PIDs can't really have a greater-than relation
     // they are either equal or not, and that's it
     // greater-than relation is implemented only so that viua::process::PID objects may be used as
     // keys in std::map<>
-    return (reinterpret_cast<uint64_t>(associated_process) > reinterpret_cast<uint64_t>(that.associated_process));
+    return (reinterpret_cast<uint64_t>(associated_process) >
+            reinterpret_cast<uint64_t>(that.associated_process));
 }
 
-auto viua::process::PID::get() const -> decltype(associated_process) {
-    return associated_process;
+auto viua::process::PID::get() const -> decltype(associated_process) { return associated_process; }
+
+auto viua::process::PID::str() const -> string {
+    ostringstream oss;
+    oss << hex << associated_process;
+    return oss.str();
 }

@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include <string>
+
 
 namespace viua {
     namespace process {
@@ -37,6 +39,7 @@ namespace viua {
             bool operator>(const viua::process::PID&) const;
 
             auto get() const -> decltype(associated_process);
+            auto str() const -> std::string;
 
             PID(const viua::process::Process*);
         };

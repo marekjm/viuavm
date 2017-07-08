@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -34,29 +34,36 @@ namespace viua {
             /** Basic integer type.
              *  It is suitable for mathematical operations.
              */
-            double number;
+            public:
+            using underlying_type = double;
+
+            private:
+            underlying_type number;
 
             public:
+                static const std::string type_name;
+
                 std::string type() const override;
                 std::string str() const override;
                 bool boolean() const override;
 
                 auto value() -> decltype(number)&;
 
-                std::unique_ptr<Type> copy() const override;
+                std::unique_ptr<Value> copy() const override;
 
-                int8_t as_int8() const override;
-                int16_t as_int16() const override;
-                int32_t as_int32() const override;
-                int64_t as_int64() const override;
+                auto as_integer() const -> int64_t override;
+                auto as_float() const -> float64 override;
 
-                uint8_t as_uint8() const override;
-                uint16_t as_uint16() const override;
-                uint32_t as_uint32() const override;
-                uint64_t as_uint64() const override;
+                auto operator + (const Number&) const -> std::unique_ptr<Number> override;
+                auto operator - (const Number&) const -> std::unique_ptr<Number> override;
+                auto operator * (const Number&) const -> std::unique_ptr<Number> override;
+                auto operator / (const Number&) const -> std::unique_ptr<Number> override;
 
-                viua::float32 as_float32() const override;
-                viua::float64 as_float64() const override;
+                auto operator < (const Number&) const -> std::unique_ptr<Boolean> override;
+                auto operator <= (const Number&) const -> std::unique_ptr<Boolean> override;
+                auto operator > (const Number&) const -> std::unique_ptr<Boolean> override;
+                auto operator >= (const Number&) const -> std::unique_ptr<Boolean> override;
+                auto operator == (const Number&) const -> std::unique_ptr<Boolean> override;
 
                 Float(decltype(number) n = 0);
         };

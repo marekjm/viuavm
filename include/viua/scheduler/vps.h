@@ -49,6 +49,13 @@ namespace viua {
              */
             viua::kernel::Kernel *attached_kernel;
 
+            /*
+             * Variables set below control whether the VM should gather and
+             * emit additional (debugging, profiling, tracing) information
+             * regarding executed code.
+             */
+            const bool tracing_enabled;
+
             std::vector<std::unique_ptr<viua::process::Process>> *free_processes;
             std::mutex *free_processes_mutex;
             std::condition_variable *free_processes_cv;
@@ -89,10 +96,9 @@ namespace viua {
             void registerPrototype(std::unique_ptr<viua::types::Prototype>);
 
             void requestForeignFunctionCall(Frame*, viua::process::Process*) const;
-            void requestForeignMethodCall(const std::string&, viua::types::Type*, Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*);
+            void requestForeignMethodCall(const std::string&, viua::types::Value*, Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*);
 
-            void loadNativeLibrary(const std::string&);
-            void loadForeignLibrary(const std::string&);
+            void loadModule(std::string);
 
             auto cpi() const -> decltype(processes)::size_type;
             auto size() const -> decltype(processes)::size_type;
@@ -101,8 +107,14 @@ namespace viua {
             viua::process::Process* process();
             viua::process::Process* spawn(std::unique_ptr<Frame>, viua::process::Process*, bool);
 
-            void send(const viua::process::PID, std::unique_ptr<viua::types::Type>);
-            void receive(const viua::process::PID, std::queue<std::unique_ptr<viua::types::Type>>&);
+            void send(const viua::process::PID, std::unique_ptr<viua::types::Value>);
+            void receive(const viua::process::PID, std::queue<std::unique_ptr<viua::types::Value>>&);
+
+            auto is_joinable(const viua::process::PID) const -> bool;
+            auto is_stopped(const viua::process::PID) const -> bool;
+            auto is_terminated(const viua::process::PID) const -> bool;
+            auto transfer_exception_of(const viua::process::PID) const -> std::unique_ptr<viua::types::Value>;
+            auto transfer_result_of(const viua::process::PID) const -> std::unique_ptr<viua::types::Value>;
 
             bool executeQuant(viua::process::Process*, viua::internals::types::process_time_slice_type);
             bool burst();
@@ -115,7 +127,7 @@ namespace viua {
             void join();
             int exit() const;
 
-            VirtualProcessScheduler(viua::kernel::Kernel*, std::vector<std::unique_ptr<viua::process::Process>>*, std::mutex*, std::condition_variable*);
+            VirtualProcessScheduler(viua::kernel::Kernel*, std::vector<std::unique_ptr<viua::process::Process>>*, std::mutex*, std::condition_variable*, const bool = false);
             VirtualProcessScheduler(VirtualProcessScheduler&&);
             ~VirtualProcessScheduler();
         };

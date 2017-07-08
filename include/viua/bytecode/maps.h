@@ -59,6 +59,15 @@ const std::set<std::string> OP_MNEMONICS = {
     "strstore",
     "streq",
 
+    "text",
+    "texteq",
+    "textat",
+    "textsub",
+    "textlength",
+    "textcommonprefix",
+    "textcommonsuffix",
+    "textconcat",
+
     "vec",
     "vinsert",
     "vpush",
@@ -94,6 +103,7 @@ const std::set<std::string> OP_MNEMONICS = {
     "pamv",
     "call",
     "tailcall",
+    "defer",
     "arg",
     "argc",
     "process",
@@ -115,12 +125,19 @@ const std::set<std::string> OP_MNEMONICS = {
     "leave",
 
     "import",
-    "link",
 
     "class",
     "derive",
     "attach",
     "register",
+
+    "atom",
+    "atomeq",
+
+    "struct",
+    "structinsert",
+    "structremove",
+    "structkeys",
 
     "new",
     "msg",
@@ -160,6 +177,15 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { STRSTORE,     "strstore" },
     { STREQ,        "streq" },
 
+    { TEXT,         "text" },
+    { TEXTEQ,       "texteq" },
+    { TEXTAT,       "textat" },
+    { TEXTSUB,      "textsub" },
+    { TEXTLENGTH,   "textlength" },
+    { TEXTCOMMONPREFIX, "textcommonprefix" },
+    { TEXTCOMMONSUFFIX, "textcommonsuffix" },
+    { TEXTCONCAT,   "textconcat" },
+
     { VEC,          "vec" },
     { VINSERT,      "vinsert" },
     { VPUSH,        "vpush" },
@@ -195,6 +221,7 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { PAMV,         "pamv" },
     { CALL,         "call" },
     { TAILCALL,     "tailcall" },
+    { DEFER,        "defer" },
     { ARG,          "arg" },
     { ARGC,         "argc" },
     { PROCESS,      "process" },
@@ -215,12 +242,19 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     { LEAVE,        "leave" },
 
     { IMPORT,       "import" },
-    { LINK,         "link" },
 
     { CLASS,        "class" },
     { DERIVE,       "derive" },
     { ATTACH,       "attach" },
     { REGISTER,     "register" },
+
+    { ATOM,         "atom" },
+    { ATOMEQ,       "atomeq" },
+
+    { STRUCT,       "struct" },
+    { STRUCTINSERT, "structinsert" },
+    { STRUCTREMOVE, "structremove" },
+    { STRUCTKEYS,   "structkeys" },
 
     { NEW,          "new" },
     { MSG,          "msg" },
@@ -229,26 +263,6 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
 
     { RETURN,       "return" },
     { HALT,         "halt" },
-};
-
-
-const std::vector<enum OPCODE> OP_VARIABLE_LENGTH = {
-    STRSTORE,
-    CLOSURE,
-    FUNCTION,
-    CALL,
-    TAILCALL,
-    PROCESS,
-    WATCHDOG,
-    CATCH,
-    ENTER,
-    IMPORT,
-    LINK,
-    CLASS,
-    DERIVE,
-    ATTACH,
-    NEW,
-    MSG,
 };
 
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016 Marek Marecki
+ *  Copyright (C) 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -17,67 +17,55 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <string>
 #include <sstream>
+#include <string>
+#include <viua/types/boolean.h>
 #include <viua/types/integer.h>
 using namespace std;
 using namespace viua::types;
 
+const string viua::types::Integer::type_name = "Integer";
 
-string Integer::type() const {
-    return "Integer";
-}
-string Integer::str() const {
-    ostringstream s;
-    s << number;
-    return s.str();
-}
-bool Integer::boolean() const {
-    return (number != 0);
-}
+string Integer::type() const { return "Integer"; }
+string Integer::str() const { return to_string(number); }
+bool Integer::boolean() const { return (number != 0); }
 
 auto Integer::value() -> decltype(number) { return number; }
 
-int64_t Integer::increment() {
-    return (++number);
+int64_t Integer::increment() { return (++number); }
+int64_t Integer::decrement() { return (--number); }
+
+unique_ptr<Value> Integer::copy() const { return unique_ptr<Value>{new Integer(number)}; }
+
+auto Integer::as_integer() const -> int64_t { return number; }
+
+auto Integer::as_float() const -> viua::float64 { return static_cast<viua::float64>(number); }
+
+auto Integer::operator+(const numeric::Number& that) const -> unique_ptr<numeric::Number> {
+    return unique_ptr<numeric::Number>{new Integer(number + that.as_integer())};
 }
-int64_t Integer::decrement() {
-    return (--number);
+auto Integer::operator-(const numeric::Number& that) const -> unique_ptr<numeric::Number> {
+    return unique_ptr<numeric::Number>{new Integer(number - that.as_integer())};
+}
+auto Integer::operator*(const numeric::Number& that) const -> unique_ptr<numeric::Number> {
+    return unique_ptr<numeric::Number>{new Integer(number * that.as_integer())};
+}
+auto Integer::operator/(const numeric::Number& that) const -> unique_ptr<numeric::Number> {
+    return unique_ptr<numeric::Number>{new Integer(number / that.as_integer())};
 }
 
-unique_ptr<Type> Integer::copy() const {
-    return unique_ptr<Type>{new Integer(number)};
+auto Integer::operator<(const numeric::Number& that) const -> unique_ptr<Boolean> {
+    return unique_ptr<Boolean>{new Boolean(number < that.as_integer())};
 }
-
-int8_t Integer::as_int8() const {
-    return static_cast<int8_t>(number);
+auto Integer::operator<=(const numeric::Number& that) const -> unique_ptr<Boolean> {
+    return unique_ptr<Boolean>{new Boolean(number <= that.as_integer())};
 }
-int16_t Integer::as_int16() const {
-    return static_cast<int16_t>(number);
+auto Integer::operator>(const numeric::Number& that) const -> unique_ptr<Boolean> {
+    return unique_ptr<Boolean>{new Boolean(number > that.as_integer())};
 }
-int32_t Integer::as_int32() const {
-    return static_cast<int32_t>(number);
+auto Integer::operator>=(const numeric::Number& that) const -> unique_ptr<Boolean> {
+    return unique_ptr<Boolean>{new Boolean(number >= that.as_integer())};
 }
-int64_t Integer::as_int64() const {
-    return static_cast<int64_t>(number);
-}
-
-uint8_t Integer::as_uint8() const {
-    return static_cast<uint8_t>(number);
-}
-uint16_t Integer::as_uint16() const {
-    return static_cast<uint16_t>(number);
-}
-uint32_t Integer::as_uint32() const {
-    return static_cast<uint32_t>(number);
-}
-uint64_t Integer::as_uint64() const {
-    return static_cast<uint64_t>(number);
-}
-
-viua::float32 Integer::as_float32() const {
-    return static_cast<viua::float32>(number);
-}
-viua::float64 Integer::as_float64() const {
-    return static_cast<viua::float64>(number);
+auto Integer::operator==(const numeric::Number& that) const -> unique_ptr<Boolean> {
+    return unique_ptr<Boolean>{new Boolean(number == that.as_integer())};
 }

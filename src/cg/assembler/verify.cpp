@@ -17,20 +17,20 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <vector>
-#include <tuple>
-#include <map>
-#include <set>
 #include <algorithm>
+#include <iostream>
+#include <map>
 #include <regex>
-#include <viua/support/string.h>
+#include <set>
+#include <sstream>
+#include <string>
+#include <tuple>
+#include <vector>
 #include <viua/bytecode/maps.h>
-#include <viua/cg/lex.h>
 #include <viua/cg/assembler/assembler.h>
+#include <viua/cg/lex.h>
 #include <viua/program.h>
+#include <viua/support/string.h>
 using namespace std;
 
 
@@ -38,43 +38,54 @@ using ErrorReport = pair<unsigned, string>;
 using Token = viua::cg::lex::Token;
 
 
-static bool is_defined(string function_name, const vector<string>& function_names, const vector<string>& function_signatures) {
-    bool is_undefined = (find(function_names.begin(), function_names.end(), function_name) == function_names.end());
+static bool is_defined(string function_name, const vector<string>& function_names,
+                       const vector<string>& function_signatures) {
+    bool is_undefined =
+        (find(function_names.begin(), function_names.end(), function_name) == function_names.end());
     // if function is undefined, check if we got a signature for it
     if (is_undefined) {
-        is_undefined = (find(function_signatures.begin(), function_signatures.end(), function_name) == function_signatures.end());
+        is_undefined = (find(function_signatures.begin(), function_signatures.end(), function_name) ==
+                        function_signatures.end());
     }
     return (not is_undefined);
 }
-void assembler::verify::functionCallsAreDefined(const vector<Token>& tokens, const vector<string>& function_names, const vector<string>& function_signatures) {
+void assembler::verify::functionCallsAreDefined(const vector<Token>& tokens,
+                                                const vector<string>& function_names,
+                                                const vector<string>& function_signatures) {
     ostringstream report("");
     string line;
     for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
         auto token = tokens.at(i);
-        if (not (token == "call" or token == "process" or token == "watchdog" or token == "tailcall")) {
+        if (not(token == "call" or token == "process" or token == "watchdog" or token == "tailcall" or
+                token == "defer")) {
             continue;
         }
 
-        if (token == "tailcall") {
-            auto function_name = tokens.at(i+1);
+        if (token == "tailcall" or token == "defer") {
+            auto function_name = tokens.at(i + 1);
             if (function_name.str().at(0) != '*' and function_name.str().at(0) != '%') {
                 if (not is_defined(function_name, function_names, function_signatures)) {
-                    throw viua::cg::lex::InvalidSyntax(function_name, (string(token == "tailcall" ? "tail call to" : "watchdog from") + " undefined function " + function_name.str()));
+                    throw viua::cg::lex::InvalidSyntax(
+                        function_name, (string(token == "tailcall" ? "tail call to" : "deferred") +
+                                        " undefined function " + function_name.str()));
                 }
             }
         } else if (token == "watchdog") {
-            auto function_name = tokens.at(i+1);
+            auto function_name = tokens.at(i + 1);
             if (not is_defined(function_name, function_names, function_signatures)) {
-                throw viua::cg::lex::InvalidSyntax(function_name, (string(token == "tailcall" ? "tail call to" : "watchdog from") + " undefined function " + function_name.str()));
+                throw viua::cg::lex::InvalidSyntax(function_name,
+                                                   "watchdog from undefined function " + function_name.str());
             }
         } else if (token == "call" or token == "process") {
-            Token function_name = tokens.at(i+2);
-            if (tokens.at(i+1) != "void") {
-                function_name = tokens.at(i+3);
+            Token function_name = tokens.at(i + 2);
+            if (tokens.at(i + 1) != "void") {
+                function_name = tokens.at(i + 3);
             }
             if (function_name.str().at(0) != '*' and function_name.str().at(0) != '%') {
                 if (not is_defined(function_name, function_names, function_signatures)) {
-                    throw viua::cg::lex::InvalidSyntax(function_name, (string(token == "call" ? "call to" : "process from") + " undefined function " + function_name.str()));
+                    throw viua::cg::lex::InvalidSyntax(function_name,
+                                                       (string(token == "call" ? "call to" : "process from") +
+                                                        " undefined function " + function_name.str()));
                 }
             }
         }
@@ -85,13 +96,14 @@ void assembler::verify::functionCallArities(const vector<Token>& tokens) {
     int frame_parameters_count = 0;
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
         // watchdog function should be unary
-        if (not (tokens.at(i) == "call" or tokens.at(i) == "process" /*or tokens.at(i) == "watchdog"*/ or tokens.at(i) == "frame")) {
+        if (not(tokens.at(i) == "call" or tokens.at(i) == "process" /*or tokens.at(i) == "watchdog"*/ or
+                tokens.at(i) == "frame")) {
             continue;
         }
 
         if (tokens.at(i) == "frame") {
-            if (str::isnum(tokens.at(i+1).str().substr(1))) {
-                frame_parameters_count = stoi(tokens.at(i+1).str().substr(1));
+            if (str::isnum(tokens.at(i + 1).str().substr(1))) {
+                frame_parameters_count = stoi(tokens.at(i + 1).str().substr(1));
             } else {
                 frame_parameters_count = -1;
             }
@@ -100,16 +112,18 @@ void assembler::verify::functionCallArities(const vector<Token>& tokens) {
 
         Token function_name;
         if (tokens.at(i) == "call" or tokens.at(i) == "process") {
-            function_name = tokens.at(i+2);
-            if (tokens.at(i+1) != "void") {
-                function_name = tokens.at(i+3);
+            function_name = tokens.at(i + 2);
+            if (tokens.at(i + 1) != "void") {
+                function_name = tokens.at(i + 3);
             }
         } else {
-            function_name = tokens.at(i+1);
+            function_name = tokens.at(i + 1);
         }
 
-        if (not (function_name.str().at(0) == '*' or function_name.str().at(0) == '%' or assembler::utils::isValidFunctionName(function_name))) {
-            throw viua::cg::lex::InvalidSyntax(function_name, ("not a valid function name: " + str::strencode(function_name)));
+        if (not(function_name.str().at(0) == '*' or function_name.str().at(0) == '%' or
+                assembler::utils::isValidFunctionName(function_name))) {
+            throw viua::cg::lex::InvalidSyntax(
+                function_name, ("not a valid function name: " + str::strencode(function_name)));
         }
 
         int arity = assembler::utils::getFunctionArity(function_name);
@@ -136,7 +150,8 @@ void assembler::verify::functionCallArities(const vector<Token>& tokens) {
 
         if (arity > 0 and arity != frame_parameters_count) {
             ostringstream report;
-            report << "invalid number of parameters in call to function " << function_name.str() << ": expected " << arity << " got " << frame_parameters_count;
+            report << "invalid number of parameters in call to function " << function_name.str()
+                   << ": expected " << arity << " got " << frame_parameters_count;
             throw viua::cg::lex::InvalidSyntax(tokens.at(i), report.str());
         }
     }
@@ -146,30 +161,34 @@ void assembler::verify::msgArities(const vector<Token>& tokens) {
     int frame_parameters_count = 0;
 
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
-        if (not (tokens.at(i) == "msg" or tokens.at(i) == "frame")) {
+        if (not(tokens.at(i) == "msg" or tokens.at(i) == "frame")) {
             continue;
         }
 
         if (tokens.at(i) == "frame") {
-            if (str::isnum(tokens.at(i+1).str().substr(1))) {
-                frame_parameters_count = stoi(tokens.at(i+1).str().substr(1));
+            if (str::isnum(tokens.at(i + 1).str().substr(1))) {
+                frame_parameters_count = stoi(tokens.at(i + 1).str().substr(1));
             } else {
                 frame_parameters_count = -1;
             }
             continue;
         }
 
-        Token function_name = tokens.at(i+3);
-        if (tokens.at(i+1) == "void") {
-            function_name = tokens.at(i+2);
+        Token function_name = tokens.at(i + 3);
+        if (tokens.at(i + 1) == "void") {
+            function_name = tokens.at(i + 2);
         }
 
-        if (not (function_name.str().at(0) == '*' or function_name.str().at(0) == '%' or assembler::utils::isValidFunctionName(function_name))) {
-            throw viua::cg::lex::InvalidSyntax(function_name, ("not a valid function name: " + str::strencode(function_name)));
+        if (not(function_name.str().at(0) == '*' or function_name.str().at(0) == '%' or
+                assembler::utils::isValidFunctionName(function_name))) {
+            throw viua::cg::lex::InvalidSyntax(
+                function_name, ("not a valid function name: " + str::strencode(function_name)));
         }
 
         if (frame_parameters_count == 0) {
-            throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("invalid number of parameters in dynamic dispatch of " + function_name.str() + ": expected at least 1, got 0"));
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i),
+                                               ("invalid number of parameters in dynamic dispatch of " +
+                                                function_name.str() + ": expected at least 1, got 0"));
         }
 
         int arity = assembler::utils::getFunctionArity(function_name);
@@ -196,7 +215,8 @@ void assembler::verify::msgArities(const vector<Token>& tokens) {
 
         if (arity > 0 and arity != frame_parameters_count) {
             ostringstream report;
-            report << "invalid number of parameters in dynamic dispatch of " << function_name.str() << ": expected " << arity << " got " << frame_parameters_count;
+            report << "invalid number of parameters in dynamic dispatch of " << function_name.str()
+                   << ": expected " << arity << " got " << frame_parameters_count;
             throw viua::cg::lex::InvalidSyntax(tokens.at(i), report.str());
         }
     }
@@ -225,7 +245,7 @@ void assembler::verify::functionsEndWithReturn(const std::vector<Token>& tokens)
 
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
         if (tokens.at(i) == ".function:") {
-            function = tokens.at(i+1);
+            function = tokens.at(i + 1);
             continue;
         } else if (tokens.at(i) == ".end" and function.size()) {
             // .end may have been reached while not in a function because blocks also end with .end
@@ -234,10 +254,14 @@ void assembler::verify::functionsEndWithReturn(const std::vector<Token>& tokens)
             continue;
         }
 
-        bool last_token_returns = (tokens.at(i-1) == "return" or tokens.at(i-2) == "tailcall" or tokens.at(i-3) == "tailcall");
-        bool last_but_one_token_returns = (tokens.at(i-1) == "\n" and (tokens.at(i-2) == "return" or tokens.at(i-3) == "tailcall" or tokens.at(i-4) == "tailcall"));
-        if (not (last_token_returns or last_but_one_token_returns)) {
-            throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("function does not end with 'return' or 'tailcall': " + function));
+        bool last_token_returns = (tokens.at(i - 1) == "return" or tokens.at(i - 2) == "tailcall" or
+                                   tokens.at(i - 3) == "tailcall");
+        bool last_but_one_token_returns =
+            (tokens.at(i - 1) == "\n" and (tokens.at(i - 2) == "return" or tokens.at(i - 3) == "tailcall" or
+                                           tokens.at(i - 4) == "tailcall"));
+        if (not(last_token_returns or last_but_one_token_returns)) {
+            throw viua::cg::lex::InvalidSyntax(
+                tokens.at(i), ("function does not end with 'return' or 'tailcall': " + function));
         }
 
         // if we're here, then the .end at the end of function has been reached and
@@ -253,12 +277,15 @@ void assembler::verify::frameBalance(const vector<Token>& tokens) {
     Token previous_frame_spawned;
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
         instruction = tokens.at(i);
-        if (not (instruction == "call" or instruction == "tailcall" or instruction == "process" or instruction == "frame" or instruction == "msg" or
-                 instruction == "return" or instruction == "leave" or instruction == "throw" or instruction == ".end")) {
+        if (not(instruction == "call" or instruction == "tailcall" or instruction == "defer" or
+                instruction == "process" or instruction == "frame" or instruction == "msg" or
+                instruction == "return" or instruction == "leave" or instruction == "throw" or
+                instruction == ".end")) {
             continue;
         }
 
-        if (instruction == "call" or instruction == "tailcall" or instruction == "process" or instruction == "msg") {
+        if (instruction == "call" or instruction == "tailcall" or instruction == "defer" or
+            instruction == "process" or instruction == "msg") {
             --balance;
         }
         if (instruction == "frame") {
@@ -266,19 +293,20 @@ void assembler::verify::frameBalance(const vector<Token>& tokens) {
         }
 
         if (balance < 0) {
-            throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("call with '" + instruction + "' without a frame"));
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i),
+                                               ("call with '" + instruction + "' without a frame"));
         }
         if (balance > 1) {
             throw viua::cg::lex::TracedSyntaxError()
                 .append(viua::cg::lex::InvalidSyntax(tokens.at(i), "excess frame spawned"))
-                .append(viua::cg::lex::InvalidSyntax(previous_frame_spawned, "unused frame:"))
-                ;
+                .append(viua::cg::lex::InvalidSyntax(previous_frame_spawned, "unused frame:"));
         }
-        if ((instruction == "return"  or instruction == "leave" or instruction == "throw" or instruction == ".end") and balance > 0) {
+        if ((instruction == "return" or instruction == "leave" or instruction == "throw" or
+             instruction == ".end") and
+            balance > 0) {
             throw viua::cg::lex::TracedSyntaxError()
                 .append(viua::cg::lex::InvalidSyntax(tokens.at(i), "leftover frame:"))
-                .append(viua::cg::lex::InvalidSyntax(previous_frame_spawned, "spawned here:"))
-                ;
+                .append(viua::cg::lex::InvalidSyntax(previous_frame_spawned, "spawned here:"));
         }
 
         if (instruction == "frame") {
@@ -287,7 +315,8 @@ void assembler::verify::frameBalance(const vector<Token>& tokens) {
     }
 }
 
-void assembler::verify::blockTries(const vector<Token>& tokens, const vector<string>& block_names, const vector<string>& block_signatures) {
+void assembler::verify::blockTries(const vector<Token>& tokens, const vector<string>& block_names,
+                                   const vector<string>& block_signatures) {
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
         if (tokens.at(i) != "enter") {
             continue;
@@ -297,7 +326,8 @@ void assembler::verify::blockTries(const vector<Token>& tokens, const vector<str
         bool is_undefined = (find(block_names.begin(), block_names.end(), block) == block_names.end());
         // if block is undefined, check if we got a signature for it
         if (is_undefined) {
-            is_undefined = (find(block_signatures.begin(), block_signatures.end(), block) == block_signatures.end());
+            is_undefined =
+                (find(block_signatures.begin(), block_signatures.end(), block) == block_signatures.end());
         }
 
         if (is_undefined) {
@@ -306,7 +336,8 @@ void assembler::verify::blockTries(const vector<Token>& tokens, const vector<str
     }
 }
 
-void assembler::verify::blockCatches(const vector<Token>& tokens, const vector<string>& block_names, const vector<string>& block_signatures) {
+void assembler::verify::blockCatches(const vector<Token>& tokens, const vector<string>& block_names,
+                                     const vector<string>& block_signatures) {
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
         if (tokens.at(i) != "catch") {
             continue;
@@ -319,18 +350,21 @@ void assembler::verify::blockCatches(const vector<Token>& tokens, const vector<s
         bool is_undefined = (find(block_names.begin(), block_names.end(), block) == block_names.end());
         // if block is undefined, check if we got a signature for it
         if (is_undefined) {
-            is_undefined = (find(block_signatures.begin(), block_signatures.end(), block) == block_signatures.end());
+            is_undefined =
+                (find(block_signatures.begin(), block_signatures.end(), block) == block_signatures.end());
         }
 
         if (is_undefined) {
-            throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("cannot catch using undefined block: " + block));
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i),
+                                               ("cannot catch using undefined block: " + block));
         }
     }
 }
 
-void assembler::verify::callableCreations(const vector<Token>& tokens, const vector<string>& function_names, const vector<string>& function_signatures) {
+void assembler::verify::callableCreations(const vector<Token>& tokens, const vector<string>& function_names,
+                                          const vector<string>& function_signatures) {
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
-        if (not (tokens.at(i) == "closure" or tokens.at(i) == "function")) {
+        if (not(tokens.at(i) == "closure" or tokens.at(i) == "function")) {
             // skip while lines to avoid triggering the check by registers named 'function' or 'closure'
             while (i < tokens.size() and tokens.at(i) != "\n") {
                 ++i;
@@ -338,16 +372,19 @@ void assembler::verify::callableCreations(const vector<Token>& tokens, const vec
             continue;
         }
 
-        string function = tokens.at(i+3);
-        bool is_undefined = (find(function_names.begin(), function_names.end(), function) == function_names.end());
+        string function = tokens.at(i + 3);
+        bool is_undefined =
+            (find(function_names.begin(), function_names.end(), function) == function_names.end());
         // if function is undefined, check if we got a signature for it
         if (is_undefined) {
-            is_undefined = (find(function_signatures.begin(), function_signatures.end(), function) == function_signatures.end());
+            is_undefined = (find(function_signatures.begin(), function_signatures.end(), function) ==
+                            function_signatures.end());
         }
 
         if (is_undefined) {
-            viua::cg::lex::InvalidSyntax e(tokens.at(i), (tokens.at(i).str() + " from undefined function: " + function));
-            e.add(tokens.at(i+2));
+            viua::cg::lex::InvalidSyntax e(tokens.at(i),
+                                           (tokens.at(i).str() + " from undefined function: " + function));
+            e.add(tokens.at(i + 2));
             throw e;
         }
         i += 2;
@@ -357,14 +394,14 @@ void assembler::verify::callableCreations(const vector<Token>& tokens, const vec
 void assembler::verify::ressInstructions(const vector<Token>& tokens, bool as_lib) {
     ostringstream report("");
     vector<string> legal_register_sets = {
-        "global",   // global register set
-        "local",    // local register set for function
-        "static",   // static register set
+        "global",  // global register set
+        "local",   // local register set for function
+        "static",  // static register set
     };
     string function;
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
         if (tokens.at(i) == ".function:") {
-            function = tokens.at(i+1);
+            function = tokens.at(i + 1);
             continue;
         }
         if (tokens.at(i) != "ress") {
@@ -373,11 +410,15 @@ void assembler::verify::ressInstructions(const vector<Token>& tokens, bool as_li
 
         string registerset_name = tokens.at(++i);
 
-        if (find(legal_register_sets.begin(), legal_register_sets.end(), registerset_name) == legal_register_sets.end()) {
-            throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("illegal register set name in ress instruction '" + registerset_name + "' in function " + function));
+        if (find(legal_register_sets.begin(), legal_register_sets.end(), registerset_name) ==
+            legal_register_sets.end()) {
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i),
+                                               ("illegal register set name in ress instruction '" +
+                                                registerset_name + "' in function " + function));
         }
         if (registerset_name == "global" and as_lib and function != "main/1") {
-            throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("global registers used in library function " + function));
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i),
+                                               ("global registers used in library function " + function));
         }
     }
 }
@@ -414,26 +455,25 @@ static void bodiesAreNonempty(const vector<Token>& tokens) {
         // this 'if' is reached only if '.end' was matched - so we just check if it is preceded by
         // the interesting prefix, and
         // if it is - report an error
-        if (i and (tokens.at(i-3) == ".function:" or tokens.at(i-3) == ".block:" or tokens.at(i-3) == ".closure:")) {
-            throw viua::cg::lex::InvalidSyntax(tokens.at(i-2), (string(function ? "function" : "block") + " with empty body: " + tokens.at(i-2).str()));
+        if (i and (tokens.at(i - 3) == ".function:" or tokens.at(i - 3) == ".block:" or
+                   tokens.at(i - 3) == ".closure:")) {
+            throw viua::cg::lex::InvalidSyntax(
+                tokens.at(i - 2),
+                (string(function ? "function" : "block") + " with empty body: " + tokens.at(i - 2).str()));
         }
         function = false;
         block.str("");
     }
 }
-void assembler::verify::functionBodiesAreNonempty(const vector<Token>& tokens) {
-    bodiesAreNonempty(tokens);
-}
-void assembler::verify::blockBodiesAreNonempty(const vector<Token>& tokens) {
-    bodiesAreNonempty(tokens);
-}
+void assembler::verify::functionBodiesAreNonempty(const vector<Token>& tokens) { bodiesAreNonempty(tokens); }
+void assembler::verify::blockBodiesAreNonempty(const vector<Token>& tokens) { bodiesAreNonempty(tokens); }
 
 void assembler::verify::blocksEndWithFinishingInstruction(const vector<Token>& tokens) {
     string block;
 
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
         if (tokens.at(i) == ".block:") {
-            block = tokens.at(i+1);
+            block = tokens.at(i + 1);
             continue;
         } else if (tokens.at(i) == ".end" and block.size()) {
             // .end may have been reached while not in a block because functions also end with .end
@@ -442,10 +482,16 @@ void assembler::verify::blocksEndWithFinishingInstruction(const vector<Token>& t
             continue;
         }
 
-        bool last_token_returns = (tokens.at(i-1) == "leave" or tokens.at(i-1) == "return" or tokens.at(i-1) == "tailcall" or tokens.at(i-1) == "halt");
-        bool last_but_one_token_returns = (tokens.at(i-1) == "\n" and (tokens.at(i-2) == "leave" or tokens.at(i-2) == "return" or tokens.at(i-2) == "tailcall" or tokens.at(i-2) == "halt"));
-        if (not (last_token_returns or last_but_one_token_returns)) {
-            throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("missing returning instruction (leave, return, tailcall or halt) at the end of block: " + block));
+        bool last_token_returns = (tokens.at(i - 1) == "leave" or tokens.at(i - 1) == "return" or
+                                   tokens.at(i - 1) == "tailcall" or tokens.at(i - 1) == "halt");
+        bool last_but_one_token_returns =
+            (tokens.at(i - 1) == "\n" and (tokens.at(i - 2) == "leave" or tokens.at(i - 2) == "return" or
+                                           tokens.at(i - 2) == "tailcall" or tokens.at(i - 2) == "halt"));
+        if (not(last_token_returns or last_but_one_token_returns)) {
+            throw viua::cg::lex::InvalidSyntax(
+                tokens.at(i),
+                ("missing returning instruction (leave, return, tailcall or halt) at the end of block: " +
+                 block));
         }
 
         // if we're here, then the .end at the end of function has been reached and
@@ -456,7 +502,7 @@ void assembler::verify::blocksEndWithFinishingInstruction(const vector<Token>& t
 
 void assembler::verify::directives(const vector<Token>& tokens) {
     for (decltype(tokens.size()) i = 0; i < tokens.size(); ++i) {
-        if (not (i == 0 or tokens.at(i-1) == "\n")) {
+        if (not(i == 0 or tokens.at(i - 1) == "\n")) {
             continue;
         }
         if (tokens.at(i).str().at(0) != '.') {
@@ -471,7 +517,7 @@ void assembler::verify::directives(const vector<Token>& tokens) {
 void assembler::verify::instructions(const vector<Token>& tokens) {
     for (decltype(tokens.size()) i = 1; i < tokens.size(); ++i) {
         // instructions can only appear after newline
-        if (tokens.at(i-1) != "\n") {
+        if (tokens.at(i - 1) != "\n") {
             continue;
         }
         // directives and newlines can *also* apear after newline so filter them out
@@ -479,7 +525,17 @@ void assembler::verify::instructions(const vector<Token>& tokens) {
             continue;
         }
         if (OP_MNEMONICS.count(tokens.at(i)) == 0) {
-            throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("unknown instruction: '" + tokens.at(i).str() + "'"));
+            string message;
+
+            if (tokens.at(i) == "(" or tokens.at(i) == ")") {
+                message = "unmatched parenthesis";
+            } else if (tokens.at(i) == "[" or tokens.at(i) == "]") {
+                message = "unmatched bracket";
+            } else {
+                message = ("unknown instruction: '" + tokens.at(i).str() + "'");
+            }
+
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i), message);
         }
     }
 }
@@ -494,15 +550,16 @@ void assembler::verify::framesHaveNoGaps(const vector<Token>& tokens) {
     vector<unsigned long> pass_lines;
 
     for (std::remove_reference<decltype(tokens)>::type::size_type i = 0; i < tokens.size(); ++i) {
-        if (not (tokens.at(i) == "call" or tokens.at(i) == "process" or tokens.at(i) == "frame" or tokens.at(i) == "param" or tokens.at(i) == "pamv")) {
+        if (not(tokens.at(i) == "call" or tokens.at(i) == "process" or tokens.at(i) == "frame" or
+                tokens.at(i) == "param" or tokens.at(i) == "pamv")) {
             continue;
         }
 
         if (tokens.at(i) == "frame") {
             last_frame = tokens.at(i).line();
 
-            if (str::isnum(tokens.at(i+1).str().substr(1))) {
-                frame_parameters_count = stoul(tokens.at(i+1).str().substr(1));
+            if (str::isnum(tokens.at(i + 1).str().substr(1))) {
+                frame_parameters_count = stoul(tokens.at(i + 1).str().substr(1));
                 filled_slots.clear();
                 pass_lines.clear();
                 filled_slots.resize(frame_parameters_count, false);
@@ -518,23 +575,26 @@ void assembler::verify::framesHaveNoGaps(const vector<Token>& tokens) {
         if (tokens.at(i) == "param" or tokens.at(i) == "pamv") {
             unsigned long slot_index;
             bool detected_slot_index = false;
-            if (tokens.at(i+1).str().at(0) == '@') {
+            if (tokens.at(i + 1).str().at(0) == '@') {
                 slot_index_detection_is_reliable = false;
             }
-            if (tokens.at(i+1).str().at(0) == '%' and str::isnum(tokens.at(i+1).str().substr(1))) {
-                slot_index = stoul(tokens.at(i+1).str().substr(1));
+            if (tokens.at(i + 1).str().at(0) == '%' and str::isnum(tokens.at(i + 1).str().substr(1))) {
+                slot_index = stoul(tokens.at(i + 1).str().substr(1));
                 detected_slot_index = true;
             }
-            if (detected_slot_index and detected_frame_parameters_count and slot_index >= frame_parameters_count) {
+            if (detected_slot_index and detected_frame_parameters_count and
+                slot_index >= frame_parameters_count) {
                 ostringstream report;
-                report << "pass to parameter slot " << slot_index << " in frame with only " << frame_parameters_count << " slots available";
+                report << "pass to parameter slot " << slot_index << " in frame with only "
+                       << frame_parameters_count << " slots available";
                 throw viua::cg::lex::InvalidSyntax(tokens.at(i), report.str());
             }
             if (detected_slot_index and detected_frame_parameters_count) {
                 if (filled_slots[slot_index]) {
                     ostringstream report;
-                    report << "double pass to parameter slot " << slot_index << " in frame defined at line " << last_frame+1;
-                    report << ", first pass at line " << pass_lines[slot_index]+1;
+                    report << "double pass to parameter slot " << slot_index << " in frame defined at line "
+                           << last_frame + 1;
+                    report << ", first pass at line " << pass_lines[slot_index] + 1;
                     throw viua::cg::lex::InvalidSyntax(tokens.at(i), report.str());
                 }
                 filled_slots[slot_index] = true;
@@ -547,7 +607,8 @@ void assembler::verify::framesHaveNoGaps(const vector<Token>& tokens) {
             for (decltype(frame_parameters_count) f = 0; f < frame_parameters_count; ++f) {
                 if (not filled_slots[f]) {
                     ostringstream report;
-                    report << "gap in frame defined at line " << last_frame+1 << ", slot " << f << " left empty";
+                    report << "gap in frame defined at line " << last_frame + 1 << ", slot " << f
+                           << " left empty";
                     throw viua::cg::lex::InvalidSyntax(tokens.at(i), report.str());
                 }
             }
@@ -555,7 +616,10 @@ void assembler::verify::framesHaveNoGaps(const vector<Token>& tokens) {
     }
 }
 
-static void validate_jump(const Token token, const string& extracted_jump, const int function_instruction_counter, vector<pair<Token, int>>& forward_jumps, vector<pair<Token, string>>& deferred_marker_jumps, const map<string, int>& jump_targets) {
+static void validate_jump(const Token token, const string& extracted_jump,
+                          const int function_instruction_counter, vector<pair<Token, int>>& forward_jumps,
+                          vector<pair<Token, string>>& deferred_marker_jumps,
+                          const map<string, int>& jump_targets) {
     int target = -1;
     if (str::isnum(extracted_jump, false)) {
         target = stoi(extracted_jump);
@@ -593,7 +657,7 @@ static void validate_jump(const Token token, const string& extracted_jump, const
         } else {
             // FIXME: jump targets are saved with an off-by-one error, that surfaces when
             // a .mark: directive immediately follows .function: declaration
-            target = jump_targets.at(extracted_jump)+1;
+            target = jump_targets.at(extracted_jump) + 1;
         }
     }
 
@@ -608,16 +672,13 @@ static void validate_jump(const Token token, const string& extracted_jump, const
     }
 }
 
-static void validate_jump_pair(
-    const Token& branch_token,
-    const Token& when_true,
-    const Token& when_false,
-    int function_instruction_counter,
-    vector<tuple<Token, Token, Token, int>>& deferred_jump_pair_checks,
-    const map<string, int>& jump_targets
-) {
+static void validate_jump_pair(const Token& branch_token, const Token& when_true, const Token& when_false,
+                               int function_instruction_counter,
+                               vector<tuple<Token, Token, Token, int>>& deferred_jump_pair_checks,
+                               const map<string, int>& jump_targets) {
     if (when_true.str() == when_false.str()) {
-        throw viua::cg::lex::InvalidSyntax(branch_token, "useless branch: both targets point to the same instruction");
+        throw viua::cg::lex::InvalidSyntax(branch_token,
+                                           "useless branch: both targets point to the same instruction");
     }
 
     int true_target = 0, false_target = 0;
@@ -635,12 +696,13 @@ static void validate_jump_pair(
         return;
     } else {
         if (jump_targets.count(when_true) == 0) {
-            deferred_jump_pair_checks.emplace_back(branch_token, when_true, when_false, function_instruction_counter);
+            deferred_jump_pair_checks.emplace_back(branch_token, when_true, when_false,
+                                                   function_instruction_counter);
             return;
         } else {
             // FIXME: jump targets are saved with an off-by-one error, that surfaces when
             // a .mark: directive immediately follows .function: declaration
-            true_target = jump_targets.at(when_true)+1;
+            true_target = jump_targets.at(when_true) + 1;
         }
     }
 
@@ -658,21 +720,24 @@ static void validate_jump_pair(
         return;
     } else {
         if (jump_targets.count(when_false) == 0) {
-            deferred_jump_pair_checks.emplace_back(branch_token, when_true, when_false, function_instruction_counter);
+            deferred_jump_pair_checks.emplace_back(branch_token, when_true, when_false,
+                                                   function_instruction_counter);
             return;
         } else {
             // FIXME: jump targets are saved with an off-by-one error, that surfaces when
             // a .mark: directive immediately follows .function: declaration
-            false_target = jump_targets.at(when_false)+1;
+            false_target = jump_targets.at(when_false) + 1;
         }
     }
 
     if (true_target == false_target) {
-        throw viua::cg::lex::InvalidSyntax(branch_token, "useless branch: both targets point to the same instruction");
+        throw viua::cg::lex::InvalidSyntax(branch_token,
+                                           "useless branch: both targets point to the same instruction");
     }
 }
 
-static void verify_forward_jumps(const int function_instruction_counter, const vector<pair<Token, int>>& forward_jumps) {
+static void verify_forward_jumps(const int function_instruction_counter,
+                                 const vector<pair<Token, int>>& forward_jumps) {
     for (auto jmp : forward_jumps) {
         if (jmp.second > function_instruction_counter) {
             throw viua::cg::lex::InvalidSyntax(jmp.first, "forward out-of-range jump");
@@ -680,7 +745,9 @@ static void verify_forward_jumps(const int function_instruction_counter, const v
     }
 }
 
-static void verify_marker_jumps(const int function_instruction_counter, const vector<pair<Token, string>>& deferred_marker_jumps, const map<string, int>& jump_targets) {
+static void verify_marker_jumps(const int function_instruction_counter,
+                                const vector<pair<Token, string>>& deferred_marker_jumps,
+                                const map<string, int>& jump_targets) {
     for (auto jmp : deferred_marker_jumps) {
         if (jump_targets.count(jmp.second) == 0) {
             throw viua::cg::lex::InvalidSyntax(jmp.first, ("jump to unrecognised marker: " + jmp.second));
@@ -691,7 +758,9 @@ static void verify_marker_jumps(const int function_instruction_counter, const ve
     }
 }
 
-static void verify_deferred_jump_pairs(const vector<tuple<Token, Token, Token, int>>& deferred_jump_pair_checks, const map<string, int>& jump_targets) {
+static void verify_deferred_jump_pairs(
+    const vector<tuple<Token, Token, Token, int>>& deferred_jump_pair_checks,
+    const map<string, int>& jump_targets) {
     for (const auto& each : deferred_jump_pair_checks) {
         int function_instruction_counter = 0;
         Token branch_token, when_true, when_false;
@@ -709,7 +778,7 @@ static void verify_deferred_jump_pairs(const vector<tuple<Token, Token, Token, i
         } else {
             // FIXME: jump targets are saved with an off-by-one error, that surfaces when
             // a .mark: directive immediately follows .function: declaration
-            true_target = jump_targets.at(when_true)+1;
+            true_target = jump_targets.at(when_true) + 1;
         }
 
         if (str::isnum(when_false, false)) {
@@ -723,16 +792,18 @@ static void verify_deferred_jump_pairs(const vector<tuple<Token, Token, Token, i
         } else {
             // FIXME: jump targets are saved with an off-by-one error, that surfaces when
             // a .mark: directive immediately follows .function: declaration
-            false_target = jump_targets.at(when_false)+1;
+            false_target = jump_targets.at(when_false) + 1;
         }
 
         if (true_target == false_target) {
-            throw viua::cg::lex::InvalidSyntax(branch_token, "useless branch: both targets point to the same instruction");
+            throw viua::cg::lex::InvalidSyntax(branch_token,
+                                               "useless branch: both targets point to the same instruction");
         }
     }
 }
 
-static auto skip_till_next_line(const std::vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i) -> decltype(i) {
+static auto skip_till_next_line(const std::vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i)
+    -> decltype(i) {
     do {
         ++i;
     } while (i < tokens.size() and tokens.at(i) != "\n");
@@ -752,29 +823,34 @@ void assembler::verify::jumpsAreInRange(const vector<viua::cg::lex::Token>& toke
         }
 
         string mnemonic = tokens.at(i);
-        if (not (mnemonic == ".function:" or mnemonic == ".closure:" or mnemonic == ".block:" or mnemonic == "jump" or mnemonic == "if" or mnemonic == ".mark:" or mnemonic == ".end")) {
+        if (not(mnemonic == ".function:" or mnemonic == ".closure:" or mnemonic == ".block:" or
+                mnemonic == "jump" or mnemonic == "if" or mnemonic == ".mark:" or mnemonic == ".end")) {
             i = skip_till_next_line(tokens, i);
             continue;
         }
 
-        if (mnemonic == ".function:" or mnemonic ==".closure:" or mnemonic == ".block:") {
+        if (mnemonic == ".function:" or mnemonic == ".closure:" or mnemonic == ".block:") {
             function_instruction_counter = -1;
             jump_targets.clear();
             forward_jumps.clear();
             deferred_marker_jumps.clear();
             deferred_jump_pair_checks.clear();
-            function_name = tokens.at(i+1);
+            function_name = tokens.at(i + 1);
         } else if (mnemonic == "jump") {
-            validate_jump(tokens.at(i+1), tokens.at(i+1), function_instruction_counter, forward_jumps, deferred_marker_jumps, jump_targets);
+            validate_jump(tokens.at(i + 1), tokens.at(i + 1), function_instruction_counter, forward_jumps,
+                          deferred_marker_jumps, jump_targets);
         } else if (mnemonic == "if") {
-            Token when_true = tokens.at(i+2);
-            Token when_false = tokens.at(i+3);
+            Token when_true = tokens.at(i + 2);
+            Token when_false = tokens.at(i + 3);
 
-            validate_jump(when_true, when_true, function_instruction_counter, forward_jumps, deferred_marker_jumps, jump_targets);
-            validate_jump(when_false, when_false, function_instruction_counter, forward_jumps, deferred_marker_jumps, jump_targets);
-            validate_jump_pair(tokens.at(i), when_true, when_false, function_instruction_counter, deferred_jump_pair_checks, jump_targets);
+            validate_jump(when_true, when_true, function_instruction_counter, forward_jumps,
+                          deferred_marker_jumps, jump_targets);
+            validate_jump(when_false, when_false, function_instruction_counter, forward_jumps,
+                          deferred_marker_jumps, jump_targets);
+            validate_jump_pair(tokens.at(i), when_true, when_false, function_instruction_counter,
+                               deferred_jump_pair_checks, jump_targets);
         } else if (mnemonic == ".mark:") {
-            jump_targets[tokens.at(i+1)] = function_instruction_counter;
+            jump_targets[tokens.at(i + 1)] = function_instruction_counter;
         } else if (mnemonic == ".end") {
             function_name = "";
             verify_forward_jumps(function_instruction_counter, forward_jumps);

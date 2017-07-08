@@ -27,7 +27,9 @@
     return
 .end
 .function: child_process/0
-    frame ^[(pamv %0 (istore %1 65536))]
+    ; 1024 to force the scheduler to preempt the process at least one time
+    ; while the parent process waits.
+    frame ^[(pamv %0 (istore %1 1024))]
     tailcall child_process/1
     return
 .end

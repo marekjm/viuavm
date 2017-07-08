@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -24,7 +24,7 @@
 
 #include <string>
 #include <memory>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/types/vector.h>
 #include <viua/types/integer.h>
 #include <viua/support/string.h>
@@ -43,10 +43,13 @@ namespace viua {
 
 namespace viua {
     namespace types {
-        class Process : public Type {
+        class Process : public Value {
             viua::process::Process* thrd;
+            viua::process::PID saved_pid;
 
             public:
+                static const std::string type_name;
+
                 /*
                  * For use by the VM and user code.
                  * Provides interface common to all values in Viua.
@@ -55,15 +58,7 @@ namespace viua {
                 std::string str() const override;
                 std::string repr() const override;
                 bool boolean() const override;
-                std::unique_ptr<Type> copy() const override;
-
-                /*
-                 * For use by user code.
-                 * Users should be able to check if a process is joinable, and
-                 * to detach a process.
-                 */
-                virtual void joinable(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
-                virtual void detach(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
+                std::unique_ptr<Value> copy() const override;
 
                 /*
                  * For use by the VM.
@@ -71,21 +66,7 @@ namespace viua {
                  */
                 viua::process::PID pid() const;
 
-                /*
-                 * For use by the VM.
-                 * Use code *must not* touch these functions.
-                 * Well, technically, it can - e.g. via a FFI calls to libraries hooking into the VM but
-                 * then all bets are off.
-                 */
-                void join();
-                bool joinable();
-                void detach();
-                bool stopped();
-                bool terminated();
-                std::unique_ptr<Type> transferActiveException();
-                std::unique_ptr<Type> getReturnValue();
-
-                Process(viua::process::Process* t): thrd(t) {}
+                Process(viua::process::Process*);
         };
     }
 }

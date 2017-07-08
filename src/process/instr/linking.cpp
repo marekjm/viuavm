@@ -17,14 +17,14 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cstdlib>
 #include <dlfcn.h>
 #include <sys/stat.h>
-#include <cstdlib>
 #include <viua/bytecode/decoder/operands.h>
-#include <viua/types/integer.h>
 #include <viua/exceptions.h>
 #include <viua/kernel/kernel.h>
 #include <viua/scheduler/vps.h>
+#include <viua/types/integer.h>
 using namespace std;
 
 
@@ -33,15 +33,6 @@ viua::internals::types::byte* viua::process::Process::opimport(viua::internals::
      */
     string module;
     tie(addr, module) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
-    scheduler->loadForeignLibrary(module);
-    return addr;
-}
-
-viua::internals::types::byte* viua::process::Process::oplink(viua::internals::types::byte* addr) {
-    /** Run link instruction.
-     */
-    string module;
-    tie(addr, module) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
-    scheduler->loadNativeLibrary(module);
+    scheduler->loadModule(module);
     return addr;
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -24,13 +24,13 @@
 
 #include <string>
 #include <viua/bytecode/bytetypedef.h>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/support/string.h>
 
 
 namespace viua {
     namespace types {
-        class Exception : public Type {
+        class Exception : public Value {
             /** Exception type.
              *
              *  Thrown when irrecoverable conditions are encountered
@@ -40,28 +40,20 @@ namespace viua {
                 std::string cause;
                 std::string detailed_type;
             public:
-                std::string type() const override {
-                    return "Exception";
-                }
-                std::string str() const override {
-                    return cause;
-                }
-                std::string repr() const override {
-                    return (etype() + ": " + str::enquote(cause));
-                }
-                bool boolean() const override {
-                    return true;
-                }
+                static const std::string type_name;
 
-                std::unique_ptr<Type> copy() const override {
-                    return std::unique_ptr<viua::types::Type>{new Exception(cause)};
-                }
+                std::string type() const override;
+                std::string str() const override;
+                std::string repr() const override;
+                bool boolean() const override;
+
+                std::unique_ptr<Value> copy() const override;
 
                 virtual std::string what() const;
                 virtual std::string etype() const;
 
-                Exception(std::string s = ""): cause(s), detailed_type("Exception") {}
-                Exception(std::string ts, std::string cs): cause(cs), detailed_type(ts) {}
+                Exception(std::string s = "");
+                Exception(std::string ts, std::string cs);
         };
     }
 }

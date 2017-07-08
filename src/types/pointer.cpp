@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -17,16 +17,17 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-#include <string>
-#include <sstream>
 #include <algorithm>
-#include <viua/types/type.h>
+#include <iostream>
+#include <sstream>
+#include <string>
 #include <viua/types/boolean.h>
-#include <viua/types/pointer.h>
 #include <viua/types/exception.h>
+#include <viua/types/pointer.h>
+#include <viua/types/value.h>
 using namespace std;
 
+const string viua::types::Pointer::type_name = "Pointer";
 
 void viua::types::Pointer::attach() {
     points_to->pointers.push_back(this);
@@ -39,29 +40,27 @@ void viua::types::Pointer::detach() {
     valid = false;
 }
 
-void viua::types::Pointer::invalidate(viua::types::Type* t) {
+void viua::types::Pointer::invalidate(viua::types::Value* t) {
     if (t == points_to) {
         valid = false;
     }
 }
-bool viua::types::Pointer::expired() {
-    return !valid;
-}
+bool viua::types::Pointer::expired() { return !valid; }
 auto viua::types::Pointer::authenticate(const viua::process::Process* process) -> void {
     /*
      *  Pointers should automatically expire upon crossing process boundaries.
      *  This method should be called before any other method every time the VM
      *  code passes the pointer object to user-process to ensure that Pointer's state
-     *  is properly accounter for.
+     *  is properly accounted for.
      */
     valid = (valid and (process_of_origin == process));
 }
-void viua::types::Pointer::reset(viua::types::Type* t) {
+void viua::types::Pointer::reset(viua::types::Value* t) {
     detach();
     points_to = t;
     attach();
 }
-viua::types::Type* viua::types::Pointer::to(const viua::process::Process* p) {
+viua::types::Value* viua::types::Pointer::to(const viua::process::Process* p) {
     if (process_of_origin != p) {
         // Dereferencing pointers outside of their original process is illegal.
         throw new viua::types::Exception("InvalidDereference: outside of original process");
@@ -72,35 +71,33 @@ viua::types::Type* viua::types::Pointer::to(const viua::process::Process* p) {
     return points_to;
 }
 
-string viua::types::Pointer::type() const {
-    return ((valid ? points_to->type() : "Expired") + "Pointer");
-}
+string viua::types::Pointer::type() const { return ((valid ? points_to->type() : "Expired") + "Pointer"); }
 
-bool viua::types::Pointer::boolean() const {
-    return valid;
-}
+bool viua::types::Pointer::boolean() const { return valid; }
 
-string viua::types::Pointer::str() const {
-    return type();
-}
+vector<string> viua::types::Pointer::bases() const { return vector<string>{"Value"}; }
+vector<string> viua::types::Pointer::inheritancechain() const { return vector<string>{"Value"}; }
 
-unique_ptr<viua::types::Type> viua::types::Pointer::copy() const {
+string viua::types::Pointer::str() const { return type(); }
+
+unique_ptr<viua::types::Value> viua::types::Pointer::copy() const {
     if (not valid) {
-        return unique_ptr<viua::types::Type>{new viua::types::Pointer()};
+        return unique_ptr<viua::types::Value>{new viua::types::Pointer(process_of_origin)};
     }
-    return unique_ptr<viua::types::Type>{new viua::types::Pointer(points_to, process_of_origin)};
+    return unique_ptr<viua::types::Value>{new viua::types::Pointer(points_to, process_of_origin)};
 }
 
 
-void viua::types::Pointer::expired(Frame* frm, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
-    frm->local_register_set->set(0, unique_ptr<viua::types::Type>{new viua::types::Boolean(expired())});
+void viua::types::Pointer::expired(Frame* frm, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                                   viua::process::Process*, viua::kernel::Kernel*) {
+    frm->local_register_set->set(0, unique_ptr<viua::types::Value>{new viua::types::Boolean(expired())});
 }
 
 
-viua::types::Pointer::Pointer(): points_to(nullptr), valid(false), process_of_origin(nullptr) {}
-viua::types::Pointer::Pointer(viua::types::Type* t, const viua::process::Process *poi): points_to(t), valid(true), process_of_origin(poi) {
+viua::types::Pointer::Pointer(const viua::process::Process* poi)
+    : points_to(nullptr), valid(false), process_of_origin(poi) {}
+viua::types::Pointer::Pointer(viua::types::Value* t, const viua::process::Process* poi)
+    : points_to(t), valid(true), process_of_origin(poi) {
     attach();
 }
-viua::types::Pointer::~Pointer() {
-    detach();
-}
+viua::types::Pointer::~Pointer() { detach(); }

@@ -42,14 +42,9 @@
 .function: main/1
     import "io"
 
-    ; spawn the consumer process...
+    ; spawn the consumer process
     frame %0
-    process %1 consumer/0
-
-    ; ...and detach it, so main/1 exiting will not
-    ; kill it
-    frame ^[(param %0 (ptr %2 %1))]
-    msg void detach/1
+    process void consumer/0
 
     ; spawn the producer process and pass consumer process handle to it
     ; producer needs to know what consumer it must pass a message to

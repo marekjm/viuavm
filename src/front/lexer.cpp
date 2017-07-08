@@ -18,15 +18,15 @@
  */
 
 #include <cstdint>
-#include <iostream>
 #include <fstream>
-#include <utility>
 #include <functional>
+#include <iostream>
+#include <utility>
 #include <viua/bytecode/maps.h>
-#include <viua/support/string.h>
-#include <viua/support/env.h>
 #include <viua/cg/lex.h>
 #include <viua/cg/tools.h>
+#include <viua/support/env.h>
+#include <viua/support/string.h>
 #include <viua/version.h>
 using namespace std;
 
@@ -41,7 +41,8 @@ using Token = viua::cg::lex::Token;
 using InvalidSyntax = viua::cg::lex::InvalidSyntax;
 
 
-template<class T> static auto enumerate(const vector<T>& v) -> vector<pair<typename vector<T>::size_type, T>> {
+template<class T>
+static auto enumerate(const vector<T>& v) -> vector<pair<typename vector<T>::size_type, T>> {
     vector<pair<typename vector<T>::size_type, T>> enumerated_vector;
 
     typename vector<T>::size_type i = 0;
@@ -66,7 +67,7 @@ static void encode_json(const string& filename, const vector<Token>& tokens) {
         cout << str::enquote("content") << ": " << str::enquote(str::strencode(t.second.str())) << ", ";
         cout << str::enquote("original") << ": " << str::enquote(str::strencode(t.second.original()));
         cout << '}';
-        if (t.first+1 < limit) {
+        if (t.first + 1 < limit) {
             cout << ", ";
         }
     }
@@ -87,14 +88,19 @@ static bool usage(const char* program, bool show_help, bool show_version, bool v
         cout << "OPTIONS:\n";
 
         // generic options
-        cout << "    " << "-V, --version            - show version\n"
-             << "    " << "-h, --help               - display this message\n"
-        // misc options
-             << "    " << "    --size               - calculate and display compiled bytecode size\n"
-             << "    " << "    --raw                - dump raw token list\n"
-             << "    " << "    --ws                 - reduce whitespace and remove comments\n"
-             << "    " << "    --dirs               - reduce directives\n"
-        ;
+        cout << "    "
+             << "-V, --version            - show version\n"
+             << "    "
+             << "-h, --help               - display this message\n"
+             // misc options
+             << "    "
+             << "    --size               - calculate and display compiled bytecode size\n"
+             << "    "
+             << "    --raw                - dump raw token list\n"
+             << "    "
+             << "    --ws                 - reduce whitespace and remove comments\n"
+             << "    "
+             << "    --dirs               - reduce directives\n";
     }
 
     return (show_help or show_version);
@@ -103,7 +109,9 @@ static bool usage(const char* program, bool show_help, bool show_version, bool v
 static string read_file(ifstream& in) {
     ostringstream source_in;
     string line;
-    while (getline(in, line)) { source_in << line << '\n'; }
+    while (getline(in, line)) {
+        source_in << line << '\n';
+    }
 
     return source_in.str();
 }
@@ -169,7 +177,9 @@ int main(int argc, char* argv[]) {
         args.emplace_back(argv[i]);
     }
 
-    if (usage(argv[0], SHOW_HELP, SHOW_VERSION, VERBOSE)) { return 0; }
+    if (usage(argv[0], SHOW_HELP, SHOW_VERSION, VERBOSE)) {
+        return 0;
+    }
 
     if (args.size() == 0) {
         cout << "fatal: no input file" << endl;
@@ -222,14 +232,14 @@ int main(int argc, char* argv[]) {
                 tokens = reduce_block_directive(tokens);
                 tokens = reduce_info_directive(tokens);
                 tokens = reduce_name_directive(tokens);
-                tokens = reduce_main_directive(tokens);
-                tokens = reduce_link_directive(tokens);
+                tokens = reduce_import_directive(tokens);
                 tokens = reduce_mark_directive(tokens);
             }
         }
     } catch (const InvalidSyntax& e) {
         string message = e.what();
-        cerr << filename << ':' << e.line_number+1 << ':' << e.character_in_line+1 << ": error: " << (message.size() ? message : "invalid syntax") << endl;
+        cerr << filename << ':' << e.line_number + 1 << ':' << e.character_in_line + 1
+             << ": error: " << (message.size() ? message : "invalid syntax") << endl;
         return 1;
     }
 

@@ -35,7 +35,7 @@
 
 #pragma once
 
-const char* VERSION = "0.8.4";
-const char* MICRO = "918";
+const char* VERSION = "0.9.0";
+const char* MICRO = "0";
 
 #endif

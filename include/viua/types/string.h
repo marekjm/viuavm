@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -23,7 +23,7 @@
 #pragma once
 
 #include <string>
-#include <viua/types/type.h>
+#include <viua/types/value.h>
 #include <viua/types/vector.h>
 #include <viua/types/integer.h>
 #include <viua/support/string.h>
@@ -43,35 +43,29 @@ namespace viua {
 
 namespace viua {
     namespace types {
-        class String : public Type {
+        class String : public Value {
             /** String type.
              *
-             *  Designed to hold text.
+             *  Designed to hold strings of bytes.
+             *  Strings of bytes do not neccessarily represent human-readable text.
+             *  They may represent just "strings of bytes".
              */
             std::string svalue;
 
             public:
-                std::string type() const override {
-                    return "String";
-                }
-                std::string str() const override {
-                    return svalue;
-                }
-                std::string repr() const override {
-                    return str::enquote(svalue);
-                }
-                bool boolean() const override {
-                    return svalue.size() != 0;
-                }
+                static const std::string type_name;
 
-                std::unique_ptr<Type> copy() const override {
-                    return std::unique_ptr<viua::types::Type>{new String(svalue)};
-                }
+                std::string type() const override;
+                std::string str() const override;
+                std::string repr() const override;
+                bool boolean() const override;
 
-                std::string& value() { return svalue; }
+                std::unique_ptr<Value> copy() const override;
+
+                std::string& value();
 
                 Integer* size();
-                String* sub(int b = 0, int e = -1);
+                String* sub(int64_t b = 0, int64_t e = -1);
                 String* add(String*);
                 String* join(Vector*);
 
@@ -88,7 +82,7 @@ namespace viua {
 
                 virtual void size(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
 
-                String(std::string s = ""): svalue(s) {}
+                String(std::string s = "");
         };
     }
 }
