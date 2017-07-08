@@ -138,15 +138,21 @@ static viua::internals::types::bytecode_size writeCodeBlocksSection(
          * size of the block's name.
          */
         block_ids_section_size += name.size();
-    }
-    // we need to insert address after every block
-    block_ids_section_size += sizeof(viua::internals::types::bytecode_size) * blocks.names.size();
-    // for null characters after block names
-    block_ids_section_size += blocks.names.size();
 
-    /////////////////////////////////////////////
-    // WRITE OUT BLOCK IDS SECTION
-    // THIS ALSO INCLUDES IDS OF LINKED BLOCKS
+        /*
+         * In bytecode, block names are stored as null-terminated ASCII strings.
+         * std::string::size() does not include this terminating null byte, so
+         * the size should be increased by 1.
+         */
+        // FIXME should be increased by size of byte as defined by Viua headers
+        block_ids_section_size += 1;
+
+        /*
+         * Increase size of the block IDs section by size of address of
+         * the block.
+         */
+        block_ids_section_size += sizeof(viua::internals::types::bytecode_size);
+    }
 
     /*
      * Write out block IDs section's size.
@@ -929,8 +935,7 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
     // WRITE BLOCK AND FUNCTION ENTRY POINT ADDRESSES TO BYTECODE
     viua::internals::types::bytecode_size functions_size_so_far =
         writeCodeBlocksSection(out, blocks, linked_block_names);
-    functions_size_so_far =
-        writeCodeBlocksSection(out, functions, linked_function_names, functions_size_so_far);
+    writeCodeBlocksSection(out, functions, linked_function_names, functions_size_so_far);
     for (string name : linked_function_names) {
         strwrite(out, name);
         // mapped address must come after name

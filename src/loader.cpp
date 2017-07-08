@@ -57,12 +57,9 @@ IdToAddressMapping Loader::loadmap(char* bytedump, const uint64_t& bytedump_size
     return IdToAddressMapping(order, mapping);
 }
 void Loader::calculateFunctionSizes() {
-    string name;
-    uint64_t el_size;
-
     for (unsigned i = 0; i < functions.size(); ++i) {
-        name = functions[i];
-        el_size = 0;
+        string name = functions[i];
+        uint64_t el_size = 0;
 
         if (i < (functions.size() - 1)) {
             uint64_t a = function_addresses[name];

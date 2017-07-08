@@ -367,7 +367,6 @@ namespace str {
         char c;
         bool escape = false;
         for (std::string::size_type i = 0; i < s.size(); ++i) {
-            c = s[i];
             switch (s[i]) {
                 case '\\':
                     escape = true;
