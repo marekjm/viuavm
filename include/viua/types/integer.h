@@ -53,6 +53,7 @@ namespace viua {
 
             std::unique_ptr<Value> copy() const override;
 
+            auto as_unsigned() const -> uint64_t;
             auto as_integer() const -> int64_t override;
             auto as_float() const -> viua::float64 override;
 

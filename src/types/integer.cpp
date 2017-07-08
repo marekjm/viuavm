@@ -20,6 +20,7 @@
 #include <sstream>
 #include <string>
 #include <viua/types/boolean.h>
+#include <viua/types/exception.h>
 #include <viua/types/integer.h>
 using namespace std;
 using namespace viua::types;
@@ -36,6 +37,13 @@ int64_t Integer::increment() { return (++number); }
 int64_t Integer::decrement() { return (--number); }
 
 unique_ptr<Value> Integer::copy() const { return unique_ptr<Value>{new Integer(number)}; }
+
+auto Integer::as_unsigned() const -> uint64_t {
+    if (number < 0) {
+        throw new viua::types::Exception("number is negative");
+    }
+    return static_cast<uint64_t>(number);
+}
 
 auto Integer::as_integer() const -> int64_t { return number; }
 
