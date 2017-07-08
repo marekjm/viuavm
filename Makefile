@@ -4,9 +4,15 @@ CXX_STANDARD=c++14
 TRAVIS_CI_CLANG=clang++-3.9
 TRAVIS_CI_GCC=g++-6
 
+GENERIC_SANITISER_FLAGS=-fsanitize=undefined -fstack-protector-strong -fsanitize=address -fsanitize=leak
 CLANG_SANITISER_FLAGS=-fsanitize=undefined -fstack-protector-strong -fsanitize=address -fsanitize=leak
 GCC_SANITISER_FLAGS=-fsanitize=undefined -fstack-protector-strong -fsanitize=leak
 
+# These are generic flags that should be used for compiling Viua VM.
+CXXFLAGS=-std=$(CXX_STANDARD) -Wall -Wextra -Wctor-dtor-privacy -Wnon-virtual-dtor -Wreorder -Woverloaded-virtual -Wundef -Wstrict-overflow=5 -Wdisabled-optimization -Winit-self -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wredundant-decls -Wlogical-op -Wmissing-include-dirs -Wmissing-declarations -Wcast-align -Wcast-qual -Wold-style-cast -Werror -Wfatal-errors -pedantic -g -I./include $(GENERIC_SANITISER_FLAGS)
+
+# For different compilers (and for TravisCI) compiler flags should be overridden, because
+# of throwing too many false positives or being unsupported.
 ifeq ($(CXX), g++)
 CXXFLAGS=-std=$(CXX_STANDARD) -Wall -Wextra -Wctor-dtor-privacy -Wnon-virtual-dtor -Wreorder -Woverloaded-virtual -Wundef -Wstrict-overflow=5 -Wdisabled-optimization -Winit-self -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wredundant-decls -Wlogical-op -Wmissing-include-dirs -Wmissing-declarations -Wcast-align -Wcast-qual -Wold-style-cast -Werror -Wfatal-errors -pedantic -g -I./include $(GCC_SANITISER_FLAGS)
 else ifeq ($(CXX), $(TRAVIS_CI_GCC))

@@ -74,7 +74,7 @@ This is also true for small features.
 Patch submissions and issue reports are both welcome.
 Appropriate interface for reporting is the Github issues page.
 
-Rememeber, though, to provide appropriate test cases with code patches you submit.
+Rememeber to provide appropriate test cases with code patches you submit.
 It will be appreciated and will make the merge process faster.
 If you're fixing a bug:
 
@@ -97,6 +97,16 @@ Your code must also run clean under Valgrind, which implies:
 
 Remember - if your code normally runs OK, but behaves strangely under Valgrind it's most
 probably a sign that there's a problem with your code.
+
+
+### Vulnerabilities
+
+Vulnerabilities are considered bugs, and the standard way of submission applies.
+A GitHub issue should be opened with a description of how to exploit the VM, and
+a possible fix preventing the exploit.
+
+
+### Coding standard
 
 When submitting a patch make sure that it is formatted according to the coding standard:
 

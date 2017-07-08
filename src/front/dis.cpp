@@ -209,13 +209,10 @@ int main(int argc, char* argv[]) {
     ostringstream oss;
 
 
-    string name;
-    uint64_t el_size;
-
     for (unsigned i = 0; i < blocks.size(); ++i) {
-        name = blocks[i];
-        el_size = 0;
+        const string name = blocks[i];
 
+        uint64_t el_size = 0;
         if (i < (blocks.size() - 1)) {
             long unsigned a = block_address_mapping[name];
             long unsigned b = block_address_mapping[blocks[i + 1]];
@@ -235,7 +232,7 @@ int main(int argc, char* argv[]) {
     }
 
     for (unsigned i = 0; i < functions.size(); ++i) {
-        name = functions[i];
+        const string name = functions[i];
         element_sizes[name] = function_sizes[name];
         element_types[name] = "function";
         element_address_mapping[name] = function_address_mapping[name];
@@ -246,9 +243,8 @@ int main(int argc, char* argv[]) {
         (DEBUG ? cout : oss) << "-- bytecode size: " << bytes << '\n';
         (DEBUG ? cout : oss) << "--\n";
         (DEBUG ? cout : oss) << "-- functions:\n";
-        string function_name;
         for (unsigned i = 0; i < functions.size(); ++i) {
-            function_name = functions[i];
+            const auto function_name = functions[i];
             (DEBUG ? cout : oss) << "--   " << function_name << " -> " << function_sizes[function_name]
                                  << " bytes at byte " << function_address_mapping[functions[i]] << '\n';
         }
@@ -293,8 +289,8 @@ int main(int argc, char* argv[]) {
     }
 
     for (unsigned i = 0; i < elements.size(); ++i) {
-        name = elements[i];
-        el_size = element_sizes[name];
+        const string name = elements[i];
+        const auto el_size = element_sizes[name];
 
         if ((name == ENTRY_FUNCTION_NAME) and not DISASSEMBLE_ENTRY) {
             continue;
