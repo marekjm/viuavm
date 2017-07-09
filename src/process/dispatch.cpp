@@ -209,11 +209,41 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case BITS:
             addr = opbits(addr + 1);
             break;
+        case BITAND:
+            addr = opbitand(addr + 1);
+            break;
+        case BITOR:
+            addr = opbitor(addr + 1);
+            break;
+        case BITNOT:
+            addr = opbitnot(addr + 1);
+            break;
+        case BITXOR:
+            addr = opbitxor(addr + 1);
+            break;
         case BITAT:
             addr = opbitat(addr + 1);
             break;
         case BITSET:
             addr = opbitset(addr + 1);
+            break;
+        case SHL:
+            addr = opshl(addr + 1);
+            break;
+        case SHR:
+            addr = opshr(addr + 1);
+            break;
+        case ASHL:
+            addr = opashl(addr + 1);
+            break;
+        case ASHR:
+            addr = opashr(addr + 1);
+            break;
+        case ROL:
+            addr = oprol(addr + 1);
+            break;
+        case ROR:
+            addr = opror(addr + 1);
             break;
         case MOVE:
             addr = opmove(addr + 1);
