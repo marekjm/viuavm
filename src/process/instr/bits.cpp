@@ -42,6 +42,67 @@ viua::internals::types::byte* viua::process::Process::opbits(viua::internals::ty
 }
 
 
+viua::internals::types::byte* viua::process::Process::opbitand(viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::types::Bits* lhs = nullptr;
+    tie(addr, lhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
+
+    viua::types::Bits* rhs = nullptr;
+    tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
+
+    *target = (*lhs) & (*rhs);
+
+    return addr;
+}
+
+
+viua::internals::types::byte* viua::process::Process::opbitor(viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::types::Bits* lhs = nullptr;
+    tie(addr, lhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
+
+    viua::types::Bits* rhs = nullptr;
+    tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
+
+    *target = (*lhs) | (*rhs);
+
+    return addr;
+}
+
+
+viua::internals::types::byte* viua::process::Process::opbitnot(viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::types::Bits* source = nullptr;
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
+
+    *target = source->inverted();
+
+    return addr;
+}
+
+
+viua::internals::types::byte* viua::process::Process::opbitxor(viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::types::Bits* lhs = nullptr;
+    tie(addr, lhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
+
+    viua::types::Bits* rhs = nullptr;
+    tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
+
+    *target = (*lhs) ^ (*rhs);
+
+    return addr;
+}
+
+
 viua::internals::types::byte* viua::process::Process::opbitat(viua::internals::types::byte* addr) {
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
@@ -69,6 +130,96 @@ viua::internals::types::byte* viua::process::Process::opbitset(viua::internals::
     tie(addr, x) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Boolean>(addr, this);
 
     target->set(index->as_unsigned(), x->boolean());
+
+    return addr;
+}
+
+
+viua::internals::types::byte* viua::process::Process::opshl(viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::types::Bits* source = nullptr;
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
+
+    viua::types::Integer* offset = nullptr;
+    tie(addr, offset) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
+
+    *target = source->shl(offset->as_unsigned());
+
+    return addr;
+}
+
+
+viua::internals::types::byte* viua::process::Process::opshr(viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::types::Bits* source = nullptr;
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
+
+    viua::types::Integer* offset = nullptr;
+    tie(addr, offset) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
+
+    *target = source->shr(offset->as_unsigned());
+
+    return addr;
+}
+
+
+viua::internals::types::byte* viua::process::Process::opashl(viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::types::Bits* source = nullptr;
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
+
+    viua::types::Integer* offset = nullptr;
+    tie(addr, offset) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
+
+    *target = source->ashl(offset->as_unsigned());
+
+    return addr;
+}
+
+
+viua::internals::types::byte* viua::process::Process::opashr(viua::internals::types::byte* addr) {
+    viua::kernel::Register* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+
+    viua::types::Bits* source = nullptr;
+    tie(addr, source) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
+
+    viua::types::Integer* offset = nullptr;
+    tie(addr, offset) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
+
+    *target = source->ashr(offset->as_unsigned());
+
+    return addr;
+}
+
+
+viua::internals::types::byte* viua::process::Process::oprol(viua::internals::types::byte* addr) {
+    viua::types::Bits* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
+
+    viua::types::Integer* offset = nullptr;
+    tie(addr, offset) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
+
+    target->rol(offset->as_unsigned());
+
+    return addr;
+}
+
+
+viua::internals::types::byte* viua::process::Process::opror(viua::internals::types::byte* addr) {
+    viua::types::Bits* target = nullptr;
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
+
+    viua::types::Integer* offset = nullptr;
+    tie(addr, offset) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
+
+    target->ror(offset->as_unsigned());
 
     return addr;
 }
