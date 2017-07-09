@@ -589,7 +589,7 @@ static void check_block_body(const TokenVector& body_tokens, TokenVector::size_t
                                   (token.str() + " of empty register"), false);
 
             i = skip_till_next_line(body_tokens, i);
-        } else if (token == "not") {
+        } else if (token == "not" or token == "bitnot") {
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
 
@@ -641,6 +641,17 @@ static void check_block_body(const TokenVector& body_tokens, TokenVector::size_t
             check_use_of_register(
                 body_tokens, source, i, registers, named_registers,
                 ((opcode_name == "ptr" ? "pointer" : opcode_name) + " from empty register"));
+            registers.insert(resolve_register_name(named_registers, body_tokens.at(target)),
+                             body_tokens.at(target));
+
+            i = skip_till_next_line(body_tokens, i);
+            continue;
+        } else if (token == "rol" or token == "ror") {
+            TokenIndex target = i + 1;
+            TokenIndex source = target + 2;
+
+            check_use_of_register(body_tokens, source, i, registers, named_registers);
+            check_use_of_register(body_tokens, target, i, registers, named_registers);
             registers.insert(resolve_register_name(named_registers, body_tokens.at(target)),
                              body_tokens.at(target));
 
@@ -725,7 +736,9 @@ static void check_block_body(const TokenVector& body_tokens, TokenVector::size_t
             continue;
         } else if (token == "and" or token == "or" or token == "texteq" or token == "textat" or
                    token == "textcommonprefix" or token == "textcommonsuffix" or token == "textconcat" or
-                   token == "atomeq" or token == "bitset") {
+                   token == "atomeq" or token == "bitand" or token == "bitor" or token == "bitxor" or
+                   token == "bitat" or token == "bitset" or token == "shl" or token == "shr" or
+                   token == "ashl" or token == "ashr") {
             ++i;  // skip mnemonic token
 
             TokenIndex target = i;
