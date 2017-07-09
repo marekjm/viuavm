@@ -52,7 +52,7 @@ viua::internals::types::byte* viua::process::Process::opbitat(viua::internals::t
     viua::types::Integer* n = nullptr;
     tie(addr, n) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
 
-    *target = unique_ptr<viua::types::Value>{new viua::types::Boolean(bits->at(n->as_integer()))};
+    *target = unique_ptr<viua::types::Value>{new viua::types::Boolean(bits->at(n->as_unsigned()))};
 
     return addr;
 }
