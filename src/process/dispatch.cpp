@@ -209,6 +209,12 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case BITS:
             addr = opbits(addr + 1);
             break;
+        case BITAT:
+            addr = opbitat(addr + 1);
+            break;
+        case BITSET:
+            addr = opbitset(addr + 1);
+            break;
         case MOVE:
             addr = opmove(addr + 1);
             break;
