@@ -20,6 +20,7 @@
 #include <sstream>
 #include <string>
 #include <viua/types/bits.h>
+#include <viua/types/exception.h>
 using namespace std;
 using namespace viua::types;
 
@@ -46,13 +47,148 @@ unique_ptr<viua::types::Value> viua::types::Bits::copy() const {
     return unique_ptr<viua::types::Value>{new Bits(underlying_array)};
 }
 
-
 auto viua::types::Bits::at(size_type i) const -> bool { return underlying_array.at(i); }
 
 auto viua::types::Bits::set(size_type i, const bool value) -> bool {
     bool was = at(i);
     underlying_array.at(i) = value;
     return was;
+}
+
+auto viua::types::Bits::clear() -> void {
+    for (auto i = underlying_array.size() - 1; i; --i) {
+        set(i, false);
+    }
+}
+
+auto viua::types::Bits::shl(size_type n) -> unique_ptr<Bits> {
+    auto shifted = unique_ptr<Bits>{new Bits{n}};
+
+    if (n >= underlying_array.size()) {
+        clear();
+        return shifted;
+    }
+
+    for (size_type i = 0; i < underlying_array.size(); ++i) {
+        auto index_to_set = underlying_array.size() - 1 - i;
+        auto index_of_value = underlying_array.size() - 1 - i - n;
+        auto index_to_set_in_shifted = (n - 1 - i);
+
+        if (index_of_value < underlying_array.size()) {
+            if (index_to_set_in_shifted < n) {
+                shifted->set(index_to_set_in_shifted, at(index_to_set));
+            }
+            set(index_to_set, at(index_of_value));
+            set(index_of_value, false);
+        } else {
+            if (index_to_set_in_shifted < n) {
+                shifted->set(index_to_set_in_shifted, at(index_to_set));
+            }
+            set(index_to_set, false);
+        }
+    }
+
+    return shifted;
+}
+
+auto viua::types::Bits::shr(size_type n) -> unique_ptr<Bits> {
+    auto shifted = unique_ptr<Bits>{new Bits{n}};
+
+    if (n >= underlying_array.size()) {
+        clear();
+        return shifted;
+    }
+
+    for (size_type i = 0; i < underlying_array.size(); ++i) {
+        auto index_to_set = i;
+        auto index_of_value = i + n;
+        auto index_to_set_in_shifted = i;
+
+        if (index_of_value < underlying_array.size()) {
+            if (index_to_set_in_shifted < n) {
+                shifted->set(index_to_set_in_shifted, at(index_to_set));
+            }
+            set(index_to_set, at(index_of_value));
+            set(index_of_value, false);
+        } else {
+            if (index_to_set_in_shifted < n) {
+                shifted->set(index_to_set_in_shifted, at(index_to_set));
+            }
+            set(index_to_set, false);
+        }
+    }
+
+    return shifted;
+}
+
+auto viua::types::Bits::ashl(size_type n) -> unique_ptr<Bits> {
+    auto sign = at(underlying_array.size() - 1);
+    auto shifted = shl(n);
+    set(underlying_array.size() - 1, sign);
+    return shifted;
+}
+
+auto viua::types::Bits::ashr(size_type n) -> unique_ptr<Bits> {
+    auto sign = at(underlying_array.size() - 1);
+    auto shifted = shr(n);
+    set(underlying_array.size() - 1, sign);
+    return shifted;
+}
+
+auto viua::types::Bits::rol(size_type n) -> void {
+    auto shifted = shl(n);
+    const auto offset = shifted->underlying_array.size();
+    for (size_type i = 0; i < offset; ++i) {
+        set(i, shifted->at(i));
+    }
+}
+
+auto viua::types::Bits::ror(size_type n) -> void {
+    auto shifted = shr(n);
+    const auto offset = shifted->underlying_array.size();
+    for (size_type i = 0; i < offset; ++i) {
+        set(underlying_array.size() - offset + i, shifted->at(offset - 1 - i));
+    }
+}
+
+auto viua::types::Bits::inverted() const -> unique_ptr<Bits> {
+    auto result = unique_ptr<Bits>{new Bits{underlying_array.size()}};
+
+    for (size_type i = 0; i < underlying_array.size(); ++i) {
+        result->set(i, not at(i));
+    }
+
+    return result;
+}
+
+auto viua::types::Bits::operator|(const Bits& that) const -> unique_ptr<Bits> {
+    unique_ptr<Bits> result = unique_ptr<Bits>{new Bits{underlying_array.size()}};
+
+    for (size_type i = 0; i < underlying_array.size(); ++i) {
+        result->set(i, (at(i) or that.at(i)));
+    }
+
+    return result;
+}
+
+auto viua::types::Bits::operator&(const Bits& that) const -> unique_ptr<Bits> {
+    unique_ptr<Bits> result = unique_ptr<Bits>{new Bits{underlying_array.size()}};
+
+    for (size_type i = 0; i < underlying_array.size(); ++i) {
+        result->set(i, (at(i) and that.at(i)));
+    }
+
+    return result;
+}
+
+auto viua::types::Bits::operator^(const Bits& that) const -> unique_ptr<Bits> {
+    unique_ptr<Bits> result = unique_ptr<Bits>{new Bits{underlying_array.size()}};
+
+    for (size_type i = 0; i < underlying_array.size(); ++i) {
+        result->set(i, (at(i) xor that.at(i)));
+    }
+
+    return result;
 }
 
 viua::types::Bits::Bits(const vector<bool>& bs) {

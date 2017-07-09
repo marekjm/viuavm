@@ -44,12 +44,19 @@ namespace viua {
 
             auto clear() -> void;
 
-            auto shl(size_type) -> Bits;
-            auto shr(size_type) -> Bits;
-            auto ashl(size_type) -> Bits;
-            auto ashr(size_type) -> Bits;
+            auto shl(size_type) -> std::unique_ptr<Bits>;
+            auto shr(size_type) -> std::unique_ptr<Bits>;
+            auto ashl(size_type) -> std::unique_ptr<Bits>;
+            auto ashr(size_type) -> std::unique_ptr<Bits>;
 
-            auto operator|(const Bits&) const -> Bits;
+            auto rol(size_type) -> void;
+            auto ror(size_type) -> void;
+
+            auto inverted() const -> std::unique_ptr<Bits>;
+
+            auto operator&(const Bits&)const -> std::unique_ptr<Bits>;
+            auto operator|(const Bits&) const -> std::unique_ptr<Bits>;
+            auto operator^(const Bits&) const -> std::unique_ptr<Bits>;
 
             static const std::string type_name;
 
