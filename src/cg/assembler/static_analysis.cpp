@@ -732,8 +732,8 @@ static void check_block_body(const TokenVector& body_tokens, TokenVector::size_t
             TokenIndex lhs = target + 2;
             TokenIndex rhs = lhs + 2;
 
-            check_use_of_register(body_tokens, lhs, i, registers, named_registers);
-            check_use_of_register(body_tokens, rhs, i, registers, named_registers);
+            check_use_of_register(body_tokens, lhs, i - 1, registers, named_registers);
+            check_use_of_register(body_tokens, rhs, i - 1, registers, named_registers);
             registers.insert(resolve_register_name(named_registers, body_tokens.at(i)), body_tokens.at(i));
 
             i = skip_till_next_line(body_tokens, i);
