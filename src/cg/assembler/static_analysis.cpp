@@ -725,7 +725,7 @@ static void check_block_body(const TokenVector& body_tokens, TokenVector::size_t
             continue;
         } else if (token == "and" or token == "or" or token == "texteq" or token == "textat" or
                    token == "textcommonprefix" or token == "textcommonsuffix" or token == "textconcat" or
-                   token == "atomeq") {
+                   token == "atomeq" or token == "bitset") {
             ++i;  // skip mnemonic token
 
             TokenIndex target = i;

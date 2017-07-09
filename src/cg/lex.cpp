@@ -906,7 +906,8 @@ namespace viua {
                         }
                     } else if (token == "move" or token == "copy" or token == "swap" or token == "ptr" or
                                token == "isnull" or token == "send" or token == "textlength" or
-                               token == "structkeys") {
+                               token == "structkeys" or token == "bits" or token == "bitset" or
+                               token == "bitat") {
                         tokens.push_back(token);  // mnemonic
 
                         tokens.push_back(input_tokens.at(++i));  // target register
