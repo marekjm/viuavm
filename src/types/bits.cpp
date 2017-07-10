@@ -33,9 +33,6 @@ string viua::types::Bits::str() const {
 
     for (size_type i = underlying_array.size(); i; --i) {
         oss << underlying_array.at(i - 1);
-        if (((i - 1) % 4 == 0) and i != 1) {
-            oss << ':';
-        }
     }
 
     return oss.str();
