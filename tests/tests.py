@@ -657,6 +657,9 @@ class BitsManipulationTests(unittest.TestCase):
     def testHelloWorld(self):
         runTest(self, 'hello_world.asm', '00000000')
 
+    def testHelloWorld(self):
+        runTestSplitlines(self, 'bitnot.asm', ['00000000', '11111111'])
+
 
 class VectorInstructionsTests(unittest.TestCase):
     """Tests for vector-related instructions.
