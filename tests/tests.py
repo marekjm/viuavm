@@ -651,6 +651,13 @@ class TextInstructionsEscapeSequencesTests(unittest.TestCase):
         runTest(self, 'carriage_return.asm', 'Hello \rWorld!', 0)
 
 
+class BitsManipulationTests(unittest.TestCase):
+    PATH = './sample/asm/bits/manipulation'
+
+    def testHelloWorld(self):
+        runTest(self, 'hello_world.asm', '00000000')
+
+
 class VectorInstructionsTests(unittest.TestCase):
     """Tests for vector-related instructions.
 
