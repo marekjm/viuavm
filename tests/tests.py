@@ -660,6 +660,9 @@ class BitsManipulationTests(unittest.TestCase):
     def testBitnot(self):
         runTestSplitlines(self, 'bitnot.asm', ['00000000', '11111111'])
 
+    def testBitand(self):
+        runTestSplitlines(self, 'bitand.asm', ['11110101', '10111001', '10110001',])
+
 
 class VectorInstructionsTests(unittest.TestCase):
     """Tests for vector-related instructions.
