@@ -47,7 +47,7 @@ namespace viua {
             typedef uint64_t bits_size;
         }
 
-        enum class RegisterSets: types::registerset_type_marker {
+        enum class RegisterSets : types::registerset_type_marker {
             CURRENT = 0,
             GLOBAL,
             LOCAL,
