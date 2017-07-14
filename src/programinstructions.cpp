@@ -305,6 +305,11 @@ Program& Program::opbitset(int_op target, int_op lhs, int_op rhs) {
     return (*this);
 }
 
+Program& Program::opbitset(int_op target, int_op lhs, bool rhs) {
+    addr_ptr = cg::bytecode::opbitset(addr_ptr, target, lhs, rhs);
+    return (*this);
+}
+
 Program& Program::opshl(int_op target, int_op lhs, int_op rhs) {
     addr_ptr = cg::bytecode::opshl(addr_ptr, target, lhs, rhs);
     return (*this);

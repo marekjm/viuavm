@@ -51,7 +51,7 @@ namespace viua {
                 -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
                 viua::internals::types::bytecode_size calculated_size = 0;
 
-                if (tokens.at(i) == "void") {
+                if (tokens.at(i) == "void" or tokens.at(i) == "true" or tokens.at(i) == "false") {
                     calculated_size += sizeof(viua::internals::types::byte);
                     ++i;
                 } else if (tokens.at(i).str().at(0) == '%' and str::isnum(tokens.at(i).str().substr(1))) {
@@ -100,7 +100,7 @@ namespace viua {
                     ++i;
                 }
 
-                if (tokens.at(i) == "void") {
+                if (tokens.at(i) == "void" or tokens.at(i) == "true" or tokens.at(i) == "false") {
                     calculated_size += sizeof(viua::internals::types::byte);
                     ++i;
                 } else if (tokens.at(i).str().at(0) == '%' and str::isnum(tokens.at(i).str().substr(1))) {

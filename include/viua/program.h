@@ -117,6 +117,7 @@ class Program {
     Program& opbitxor(int_op, int_op, int_op);
     Program& opbitat(int_op, int_op, int_op);
     Program& opbitset(int_op, int_op, int_op);
+    Program& opbitset(int_op, int_op, bool);
     Program& opshl(int_op, int_op, int_op);
     Program& opshr(int_op, int_op, int_op);
     Program& opashl(int_op, int_op, int_op);

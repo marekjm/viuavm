@@ -95,7 +95,7 @@ static string resolve_register_name(const map<string, string>& named_registers, 
     if (name == "\n") {
         throw viua::cg::lex::InvalidSyntax(token, "expected operand, found newline");
     }
-    if (name == "void") {
+    if (name == "void" or name == "true" or name == "false") {
         return name;
     }
     if (name.at(0) == '@' or name.at(0) == '*' or name.at(0) == '%') {
@@ -737,8 +737,8 @@ static void check_block_body(const TokenVector& body_tokens, TokenVector::size_t
         } else if (token == "and" or token == "or" or token == "texteq" or token == "textat" or
                    token == "textcommonprefix" or token == "textcommonsuffix" or token == "textconcat" or
                    token == "atomeq" or token == "bitand" or token == "bitor" or token == "bitxor" or
-                   token == "bitat" or token == "bitset" or token == "shl" or token == "shr" or
-                   token == "ashl" or token == "ashr") {
+                   token == "bitat" or token == "shl" or token == "shr" or token == "ashl" or
+                   token == "ashr") {
             ++i;  // skip mnemonic token
 
             TokenIndex target = i;
@@ -747,6 +747,23 @@ static void check_block_body(const TokenVector& body_tokens, TokenVector::size_t
 
             check_use_of_register(body_tokens, lhs, i - 1, registers, named_registers);
             check_use_of_register(body_tokens, rhs, i - 1, registers, named_registers);
+            registers.insert(resolve_register_name(named_registers, body_tokens.at(i)), body_tokens.at(i));
+
+            i = skip_till_next_line(body_tokens, i);
+            continue;
+        } else if (token == "bitset") {
+            ++i;  // skip mnemonic token
+
+            TokenIndex target = i;
+            TokenIndex lhs = target + 2;
+            TokenIndex rhs = lhs + 2;
+
+            check_use_of_register(body_tokens, lhs, i - 1, registers, named_registers);
+
+            if (not(body_tokens.at(rhs) == "true" or body_tokens.at(rhs) == "false")) {
+                check_use_of_register(body_tokens, rhs, i - 1, registers, named_registers);
+            }
+
             registers.insert(resolve_register_name(named_registers, body_tokens.at(i)), body_tokens.at(i));
 
             i = skip_till_next_line(body_tokens, i);

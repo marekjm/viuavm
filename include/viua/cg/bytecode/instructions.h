@@ -121,6 +121,7 @@ namespace cg {
         viua::internals::types::byte* opbitxor(viua::internals::types::byte*, int_op, int_op, int_op);
         viua::internals::types::byte* opbitat(viua::internals::types::byte*, int_op, int_op, int_op);
         viua::internals::types::byte* opbitset(viua::internals::types::byte*, int_op, int_op, int_op);
+        viua::internals::types::byte* opbitset(viua::internals::types::byte*, int_op, int_op, bool);
         viua::internals::types::byte* opshl(viua::internals::types::byte*, int_op, int_op, int_op);
         viua::internals::types::byte* opshr(viua::internals::types::byte*, int_op, int_op, int_op);
         viua::internals::types::byte* opashl(viua::internals::types::byte*, int_op, int_op, int_op);

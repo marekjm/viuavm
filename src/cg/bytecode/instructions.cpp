@@ -77,6 +77,17 @@ static viua::internals::types::byte* insert_ri_operand(viua::internals::types::b
     return addr_ptr;
 }
 
+static viua::internals::types::byte* insert_bool_operand(viua::internals::types::byte* addr_ptr, bool op) {
+    if (op) {
+        *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_TRUE;
+    } else {
+        *(reinterpret_cast<OperandType*>(addr_ptr)) = OT_FALSE;
+    }
+    pointer::inc<OperandType, viua::internals::types::byte>(addr_ptr);
+
+    return addr_ptr;
+}
+
 static viua::internals::types::byte* insert_two_ri_instruction(viua::internals::types::byte* addr_ptr,
                                                                enum OPCODE instruction, int_op a, int_op b) {
     *(addr_ptr++) = instruction;
@@ -354,6 +365,13 @@ namespace cg {
         viua::internals::types::byte* opbitset(viua::internals::types::byte* addr_ptr, int_op target,
                                                int_op lhs, int_op rhs) {
             return insert_three_ri_instruction(addr_ptr, BITSET, target, lhs, rhs);
+        }
+
+        viua::internals::types::byte* opbitset(viua::internals::types::byte* addr_ptr, int_op target,
+                                               int_op lhs, bool rhs) {
+            addr_ptr = insert_two_ri_instruction(addr_ptr, BITSET, target, lhs);
+            addr_ptr = insert_bool_operand(addr_ptr, rhs);
+            return addr_ptr;
         }
 
         viua::internals::types::byte* opshl(viua::internals::types::byte* addr_ptr, int_op target, int_op lhs,

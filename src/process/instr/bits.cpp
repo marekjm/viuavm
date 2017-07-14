@@ -126,10 +126,21 @@ viua::internals::types::byte* viua::process::Process::opbitset(viua::internals::
     viua::types::Integer* index = nullptr;
     tie(addr, index) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
 
-    viua::types::Boolean* x = nullptr;
-    tie(addr, x) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Boolean>(addr, this);
+    bool value = false;
+    auto ot = viua::bytecode::decoder::operands::get_operand_type(addr);
+    if (ot == OT_TRUE) {
+        ++addr;  // for operand type
+        value = true;
+    } else if (ot == OT_FALSE) {
+        ++addr;  // for operand type
+        value = false;
+    } else {
+        viua::types::Boolean* x = nullptr;
+        tie(addr, x) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Boolean>(addr, this);
+        value = x->boolean();
+    }
 
-    target->set(index->as_unsigned(), x->boolean());
+    target->set(index->as_unsigned(), value);
 
     return addr;
 }

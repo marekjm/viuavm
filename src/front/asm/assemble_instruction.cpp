@@ -618,12 +618,20 @@ viua::internals::types::bytecode_size assemble_instruction(
         TokenIndex lhs = target + 2;
         TokenIndex rhs = lhs + 2;
 
-        program.opbitset(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
-                                                                  resolve_rs_type(tokens.at(target + 1))),
-                         assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
-                                                                  resolve_rs_type(tokens.at(lhs + 1))),
-                         assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)),
-                                                                  resolve_rs_type(tokens.at(rhs + 1))));
+        if (tokens.at(rhs) == "true" or tokens.at(rhs) == "false") {
+            program.opbitset(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
+                                                                      resolve_rs_type(tokens.at(target + 1))),
+                             assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
+                                                                      resolve_rs_type(tokens.at(lhs + 1))),
+                             (tokens.at(rhs) == "true"));
+        } else {
+            program.opbitset(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
+                                                                      resolve_rs_type(tokens.at(target + 1))),
+                             assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
+                                                                      resolve_rs_type(tokens.at(lhs + 1))),
+                             assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)),
+                                                                      resolve_rs_type(tokens.at(rhs + 1))));
+        }
     } else if (tokens.at(i) == "shl") {
         TokenIndex target = i + 1;
         TokenIndex lhs = target + 2;

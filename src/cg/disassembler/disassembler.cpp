@@ -396,7 +396,6 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(
         case BITOR:
         case BITXOR:
         case BITAT:
-        case BITSET:
         case SHL:
         case SHR:
         case ASHL:
@@ -404,6 +403,20 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
+
+            break;
+        case BITSET:
+            ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
+            ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
+            if (OperandType(*ptr) == OT_TRUE) {
+                oss << ' ' << "true";
+                ++ptr;
+            } else if (OperandType(*ptr) == OT_FALSE) {
+                oss << ' ' << "false";
+                ++ptr;
+            } else {
+                ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
+            }
 
             break;
         case VEC:
