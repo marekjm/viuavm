@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+#include <math.h>
 #include <tuple>
 #include <viua/bytecode/bytetypedef.h>
 #include <viua/cg/tools.h>
@@ -269,10 +270,62 @@ namespace viua {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
             }
 
-            static auto size_of_nop(const vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()) i)
-                -> tuple<viua::internals::types::bytecode_size, decltype(i)> {
-                viua::internals::types::bytecode_size calculated_size = sizeof(viua::internals::types::byte);
-                return tuple<viua::internals::types::bytecode_size, decltype(i)>(calculated_size, i);
+            static auto size_of_binary_literal_operand(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
+                calculated_size += sizeof(viua::internals::types::bits_size);
+
+                auto literal = tokens.at(i).str().substr(2);
+                ++i;
+
+                /*
+                 * Size is first multiplied by 1, because every character of the
+                 * string may be encoded on one bit.
+                 * Then the result is divided by 8.0 because a byte has 8 bits, and
+                 * the bytecode is encoded using bytes.
+                 */
+                calculated_size = llroundl((literal.size() * 1) / 8.0l);
+
+                return tuple<bytecode_size_type, decltype(i)>{calculated_size, i};
+            }
+
+            static auto size_of_octal_literal_operand(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
+                calculated_size += sizeof(viua::internals::types::bits_size);
+
+                auto literal = tokens.at(i).str().substr(2);
+                ++i;
+
+                /*
+                 * Size is first multiplied by 3, because every character of the
+                 * string must be encoded on three bits.
+                 * Then the result is divided by 8.0 because a byte has 8 bits, and
+                 * the bytecode is encoded using bytes.
+                 */
+                calculated_size = llroundl((literal.size() * 3) / 8.0l);
+
+                return tuple<bytecode_size_type, decltype(i)>{calculated_size, i};
+            }
+
+            static auto size_of_hexadecimal_literal_operand(const TokenVector& tokens,
+                                                            TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
+                calculated_size += sizeof(viua::internals::types::bits_size);
+
+                auto literal = tokens.at(i).str().substr(2);
+                ++i;
+
+                /*
+                 * Size is first multiplied by 4, because every character of the
+                 * string must be encoded on four bits.
+                 * Then the result is divided by 8.0 because a byte has 8 bits, and
+                 * the bytecode is encoded using bytes.
+                 */
+                calculated_size = llroundl((literal.size() * 4) / 8.0l);
+
+                return tuple<bytecode_size_type, decltype(i)>{calculated_size, i};
             }
 
             static auto size_of_nop(const TokenVector&, TokenVector::size_type i)

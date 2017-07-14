@@ -43,6 +43,8 @@ namespace viua {
             typedef uint32_t timeout;
 
             typedef uint8_t registerset_type_marker;
+
+            typedef uint64_t bits_size;
         }
 
         enum class RegisterSets: types::registerset_type_marker {
