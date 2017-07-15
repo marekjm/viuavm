@@ -196,76 +196,46 @@ Program& Program::optextconcat(int_op target, int_op lhs, int_op rhs) {
 }
 
 Program& Program::opvec(int_op index, int_op pack_start_index, int_op pack_length) {
-    /** Inserts vec instruction.
-     */
     addr_ptr = cg::bytecode::opvec(addr_ptr, index, pack_start_index, pack_length);
     return (*this);
 }
 
 Program& Program::opvinsert(int_op vec, int_op src, int_op dst) {
-    /** Inserts vinsert instruction.
-     */
     addr_ptr = cg::bytecode::opvinsert(addr_ptr, vec, src, dst);
     return (*this);
 }
 
 Program& Program::opvpush(int_op vec, int_op src) {
-    /** Inserts vpush instruction.
-     */
     addr_ptr = cg::bytecode::opvpush(addr_ptr, vec, src);
     return (*this);
 }
 
 Program& Program::opvpop(int_op vec, int_op dst, int_op pos) {
-    /** Inserts vpop instruction.
-     */
     addr_ptr = cg::bytecode::opvpop(addr_ptr, vec, dst, pos);
     return (*this);
 }
 
 Program& Program::opvat(int_op vec, int_op dst, int_op at) {
-    /** Inserts vat instruction.
-     */
     addr_ptr = cg::bytecode::opvat(addr_ptr, vec, dst, at);
     return (*this);
 }
 
 Program& Program::opvlen(int_op vec, int_op reg) {
-    /** Inserts vlen instruction.
-     */
     addr_ptr = cg::bytecode::opvlen(addr_ptr, vec, reg);
     return (*this);
 }
 
 Program& Program::opnot(int_op target, int_op source) {
-    /*  Inserts not instuction.
-     */
     addr_ptr = cg::bytecode::opnot(addr_ptr, target, source);
     return (*this);
 }
 
 Program& Program::opand(int_op regr, int_op rega, int_op regb) {
-    /*  Inserts and instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  regr   - register index in which to store the result
-     *  rega   - register index of first operand
-     *  regb   - register index of second operand
-     */
     addr_ptr = cg::bytecode::opand(addr_ptr, regr, rega, regb);
     return (*this);
 }
 
 Program& Program::opor(int_op regr, int_op rega, int_op regb) {
-    /*  Inserts or instruction to bytecode.
-     *
-     *  :params:
-     *
-     *  regr   - register index in which to store the result
-     *  rega   - register index of first operand
-     *  regb   - register index of second operand
-     */
     addr_ptr = cg::bytecode::opor(addr_ptr, regr, rega, regb);
     return (*this);
 }
