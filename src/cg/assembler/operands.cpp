@@ -295,17 +295,18 @@ auto assembler::operands::hexadecimal_to_binary_literal(const string s) -> strin
 auto assembler::operands::convert_token_to_bitstring_operand(const viua::cg::lex::Token token)
     -> vector<uint8_t> {
     auto s = token.str();
-    string workable_version;
+    string normalised_version;
     if (s.at(1) == 'b') {
-        workable_version = normalise_binary_literal(s);
+        normalised_version = normalise_binary_literal(s.substr(2));
     } else if (s.at(1) == 'o') {
-        workable_version = normalise_binary_literal(octal_to_binary_literal(s));
+        normalised_version = normalise_binary_literal(octal_to_binary_literal(s));
     } else if (s.at(1) == 'x') {
-        workable_version = normalise_binary_literal(hexadecimal_to_binary_literal(s));
+        normalised_version = normalise_binary_literal(hexadecimal_to_binary_literal(s));
     } else {
         throw viua::cg::lex::InvalidSyntax(token);
     }
 
+    string workable_version = normalised_version;
     reverse(workable_version.begin(), workable_version.end());
 
     vector<uint8_t> converted;
