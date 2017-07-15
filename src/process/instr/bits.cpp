@@ -26,17 +26,28 @@
 #include <viua/types/bits.h>
 #include <viua/types/boolean.h>
 #include <viua/types/integer.h>
+#include <viua/util/memory.h>
 using namespace std;
+
+using viua::util::memory::load_aligned;
 
 
 viua::internals::types::byte* viua::process::Process::opbits(viua::internals::types::byte* addr) {
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    viua::types::Integer* n = nullptr;
-    tie(addr, n) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
-
-    *target = unique_ptr<viua::types::Value>{new viua::types::Bits(n->as_unsigned())};
+    auto ot = viua::bytecode::decoder::operands::get_operand_type(addr);
+    if (ot == OT_BITS) {
+        ++addr;  // for operand type
+        auto bits_size = load_aligned<viua::internals::types::bits_size>(addr);
+        addr += sizeof(bits_size);
+        *target = make_unique<viua::types::Bits>(bits_size, addr);
+        addr += bits_size;
+    } else {
+        viua::types::Integer* n = nullptr;
+        tie(addr, n) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
+        *target = unique_ptr<viua::types::Value>{new viua::types::Bits(n->as_unsigned())};
+    }
 
     return addr;
 }
