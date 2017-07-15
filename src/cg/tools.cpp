@@ -595,8 +595,6 @@ namespace viua {
                     calculated_size += size_increment;
                 }
 
-                cout << "bits: " << calculated_size << endl;
-
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
             static auto size_of_bitand(const TokenVector& tokens, TokenVector::size_type i)
