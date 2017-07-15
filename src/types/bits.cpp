@@ -202,9 +202,18 @@ viua::types::Bits::Bits(size_type i) {
     }
 }
 
-viua::types::Bits::Bits(const size_type size, const uint8_t*) {
+viua::types::Bits::Bits(const size_type size, const uint8_t* source) {
     underlying_array.reserve(size * 8);
     for (auto i = size * 8; i; --i) {
         underlying_array.push_back(false);
+    }
+    const uint8_t one = 1;
+    for (size_type byte_index = 0; byte_index < size; ++byte_index) {
+        viua::internals::types::byte a_byte = *(source + byte_index);
+
+        for (auto i = 0; i < 8; ++i) {
+            auto mask = static_cast<decltype(one)>(one << i);
+            underlying_array.at((size * 8) - 1 - ((byte_index * 8) + (7 - i))) = (a_byte & mask);
+        }
     }
 }
