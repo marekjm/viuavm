@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -300,21 +301,21 @@ auto assembler::operands::convert_token_to_bitstring_operand(const viua::cg::lex
         throw viua::cg::lex::InvalidSyntax(token);
     }
 
+    reverse(workable_version.begin(), workable_version.end());
+
     vector<uint8_t> converted;
     uint8_t part = 0;
-    for (auto i = workable_version.size() - 1; i; --i) {
+    for (decltype(workable_version)::size_type i = 0; i < workable_version.size(); ++i) {
         uint8_t one = 1;
         if (workable_version.at(i) == '1') {
             one = static_cast<uint8_t>(one << (i % 8));
             part = (part | one);
         }
-        if (i % 8 == 0) {
+        if ((i + 1) % 8 == 0) {
             converted.push_back(part);
             part = 0;
         }
     }
-
-    converted.push_back(part);
 
     return converted;
 }

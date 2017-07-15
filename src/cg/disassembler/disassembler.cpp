@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <viua/bytecode/maps.h>
 #include <viua/bytecode/opcodes.h>
@@ -148,6 +149,77 @@ string disassembler::intop_with_rs_type(viua::internals::types::byte* ptr) {
             break;
         default:
             throw "invalid operand type detected";
+    }
+
+    return oss.str();
+}
+static auto disassemble_bit_string(viua::internals::types::byte* ptr,
+                                   const viua::internals::types::bits_size size) -> string {
+    const static map<uint8_t, char> decodings = {
+        {
+            0b0000, '0',
+        },
+        {
+            0b0001, '1',
+        },
+        {
+            0b0010, '2',
+        },
+        {
+            0b0011, '3',
+        },
+        {
+            0b0100, '4',
+        },
+        {
+            0b0101, '5',
+        },
+        {
+            0b0110, '6',
+        },
+        {
+            0b0111, '7',
+        },
+        {
+            0b1000, '8',
+        },
+        {
+            0b1001, '9',
+        },
+        {
+            0b1010, 'a',
+        },
+        {
+            0b1011, 'b',
+        },
+        {
+            0b1100, 'c',
+        },
+        {
+            0b1101, 'd',
+        },
+        {
+            0b1110, 'e',
+        },
+        {
+            0b1111, 'f',
+        },
+    };
+
+    ostringstream oss;
+    oss << "0x";
+
+    const static uint8_t mask_high = 0b00001111;
+    const static uint8_t mask_low = 0b11110000;
+
+    for (std::remove_const_t<decltype(size)> i = 0; i < size; ++i) {
+        auto two_digits = *(ptr + i);
+
+        auto high_digit = ((two_digits & mask_low) >> 4);
+        auto low_digit = (two_digits & mask_high);
+
+        oss << decodings.at(static_cast<uint8_t>(high_digit));
+        oss << decodings.at(static_cast<uint8_t>(low_digit));
     }
 
     return oss.str();
@@ -389,9 +461,9 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(
                 ++ptr;  // for operand type
                 auto bsz = load_aligned<viua::internals::types::bits_size>(ptr);
                 pointer::inc<viua::internals::types::bits_size, viua::internals::types::byte>(ptr);
-                ptr += bsz;
                 oss << ' ';
-                oss << "0b0";  // FIXME implement disassembling of binaries
+                oss << disassemble_bit_string(ptr, bsz);
+                ptr += bsz;
             } else {
                 ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             }
