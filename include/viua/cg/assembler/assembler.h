@@ -40,6 +40,11 @@ namespace assembler {
         byte_op getbyte(const std::string& s);
         float_op getfloat(const std::string& s);
 
+        auto normalise_binary_literal(const std::string s) -> std::string;
+        auto octal_to_binary_literal(const std::string s) -> std::string;
+        auto hexadecimal_to_binary_literal(const std::string s) -> std::string;
+        auto convert_token_to_bitstring_operand(const viua::cg::lex::Token) -> std::vector<uint8_t>;
+
         std::tuple<std::string, std::string> get2(std::string s);
         std::tuple<std::string, std::string, std::string> get3(std::string s, bool fill_third = true);
     }

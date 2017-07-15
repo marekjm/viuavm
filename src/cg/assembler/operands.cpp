@@ -183,3 +183,138 @@ tuple<string, string, string> assembler::operands::get3(string s, bool fill_thir
 
     return tuple<string, string, string>(op_a, op_b, op_c);
 }
+
+auto assembler::operands::normalise_binary_literal(const string s) -> string {
+    ostringstream oss;
+
+    auto n = 0;
+    while (((s.size() - 2) + n) % 8 != 0) {
+        oss << '0';
+        ++n;
+    }
+    oss << s.substr(2);
+
+    return oss.str();
+}
+auto assembler::operands::octal_to_binary_literal(const string s) -> string {
+    ostringstream oss;
+    const static map<const char, const string> lookup = {
+        {
+            '0', "000",
+        },
+        {
+            '1', "001",
+        },
+        {
+            '2', "010",
+        },
+        {
+            '3', "011",
+        },
+        {
+            '4', "100",
+        },
+        {
+            '5', "101",
+        },
+        {
+            '6', "110",
+        },
+        {
+            '7', "111",
+        },
+    };
+    for (const auto c : s.substr(2)) {
+        oss << lookup.at(c);
+    }
+    return oss.str();
+}
+auto assembler::operands::hexadecimal_to_binary_literal(const string s) -> string {
+    ostringstream oss;
+    const static map<const char, const string> lookup = {
+        {
+            '0', "0000",
+        },
+        {
+            '1', "0001",
+        },
+        {
+            '2', "0010",
+        },
+        {
+            '3', "0011",
+        },
+        {
+            '4', "0100",
+        },
+        {
+            '5', "0101",
+        },
+        {
+            '6', "0110",
+        },
+        {
+            '7', "0111",
+        },
+        {
+            '8', "1000",
+        },
+        {
+            '9', "1001",
+        },
+        {
+            'a', "1010",
+        },
+        {
+            'b', "1011",
+        },
+        {
+            'c', "1100",
+        },
+        {
+            'd', "1101",
+        },
+        {
+            'e', "1110",
+        },
+        {
+            'f', "1111",
+        },
+    };
+    for (const auto c : s.substr(2)) {
+        oss << lookup.at(c);
+    }
+    return oss.str();
+}
+auto assembler::operands::convert_token_to_bitstring_operand(const viua::cg::lex::Token token)
+    -> vector<uint8_t> {
+    auto s = token.str();
+    string workable_version;
+    if (s.at(1) == 'b') {
+        workable_version = normalise_binary_literal(s);
+    } else if (s.at(1) == 'o') {
+        workable_version = normalise_binary_literal(octal_to_binary_literal(s));
+    } else if (s.at(1) == 'x') {
+        workable_version = normalise_binary_literal(hexadecimal_to_binary_literal(s));
+    } else {
+        throw viua::cg::lex::InvalidSyntax(token);
+    }
+
+    vector<uint8_t> converted;
+    uint8_t part = 0;
+    for (auto i = workable_version.size() - 1; i; --i) {
+        uint8_t one = 1;
+        if (workable_version.at(i) == '1') {
+            one = static_cast<uint8_t>(one << (i % 8));
+            part = (part | one);
+        }
+        if (i % 8 == 0) {
+            converted.push_back(part);
+            part = 0;
+        }
+    }
+
+    converted.push_back(part);
+
+    return converted;
+}
