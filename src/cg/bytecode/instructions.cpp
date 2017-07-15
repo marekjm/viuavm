@@ -133,8 +133,12 @@ static auto insert_size_and_type_prefixed_bitstring(viua::internals::types::byte
     aligned_write(ptr) = bit_string.size();
     pointer::inc<viua::internals::types::bits_size, viua::internals::types::byte>(ptr);
 
-    for (const auto c : bit_string) {
-        *ptr = c;
+    /*
+     * Binaries (and other multibyte values) are stored in the Big Endian encoding.
+     * Remember about this!
+     */
+    for (auto i = bit_string.size(); i; --i) {
+        *ptr = bit_string.at(i - 1);
         ++ptr;
     }
 
