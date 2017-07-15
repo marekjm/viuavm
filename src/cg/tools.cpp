@@ -573,7 +573,31 @@ namespace viua {
             }
             static auto size_of_bits(const TokenVector& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                return size_of_instruction_with_two_ri_operands_with_rs_types(tokens, i);
+                bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
+
+                decltype(calculated_size) size_increment = 0;
+
+                // for target register
+                tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
+                calculated_size += size_increment;
+
+                if (tokens.at(i).str().at(0) == '*' or tokens.at(i).str().at(0) == '%') {
+                    tie(size_increment, i) = size_of_register_index_operand_with_rs_type(tokens, i);
+                    calculated_size += size_increment;
+                } else if (tokens.at(i).str().at(1) == 'b') {
+                    tie(size_increment, i) = size_of_binary_literal_operand(tokens, i);
+                    calculated_size += size_increment;
+                } else if (tokens.at(i).str().at(1) == 'o') {
+                    tie(size_increment, i) = size_of_octal_literal_operand(tokens, i);
+                    calculated_size += size_increment;
+                } else if (tokens.at(i).str().at(1) == 'x') {
+                    tie(size_increment, i) = size_of_hexadecimal_literal_operand(tokens, i);
+                    calculated_size += size_increment;
+                }
+
+                cout << "bits: " << calculated_size << endl;
+
+                return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
             static auto size_of_bitand(const TokenVector& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
