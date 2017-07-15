@@ -284,8 +284,8 @@ namespace viua {
                  * Then the result is divided by 8.0 because a byte has 8 bits, and
                  * the bytecode is encoded using bytes.
                  */
-                auto size = ceill((literal.size() * 1) / 8.0l);
-                calculated_size += static_cast<decltype(calculated_size)>(size);
+                auto size = (literal.size() / 8);
+                calculated_size += size;
 
                 return tuple<bytecode_size_type, decltype(i)>{calculated_size, i};
             }
