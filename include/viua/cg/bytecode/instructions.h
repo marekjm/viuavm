@@ -24,6 +24,7 @@
 
 #include <string>
 #include <tuple>
+#include <vector>
 #include <viua/bytecode/opcodes.h>
 #include <viua/support/pointer.h>
 
@@ -115,6 +116,7 @@ namespace cg {
         viua::internals::types::byte* opor(viua::internals::types::byte*, int_op, int_op, int_op);
 
         viua::internals::types::byte* opbits(viua::internals::types::byte*, int_op, int_op);
+        viua::internals::types::byte* opbits(viua::internals::types::byte*, int_op, std::vector<uint8_t>);
         viua::internals::types::byte* opbitand(viua::internals::types::byte*, int_op, int_op, int_op);
         viua::internals::types::byte* opbitor(viua::internals::types::byte*, int_op, int_op, int_op);
         viua::internals::types::byte* opbitnot(viua::internals::types::byte*, int_op, int_op);
