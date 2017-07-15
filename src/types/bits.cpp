@@ -201,3 +201,10 @@ viua::types::Bits::Bits(size_type i) {
         underlying_array.push_back(false);
     }
 }
+
+viua::types::Bits::Bits(const size_type size, const uint8_t*) {
+    underlying_array.reserve(size * 8);
+    for (auto i = size * 8; i; --i) {
+        underlying_array.push_back(false);
+    }
+}
