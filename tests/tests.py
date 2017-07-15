@@ -663,6 +663,13 @@ class BitsManipulationTests(unittest.TestCase):
     def testBitand(self):
         runTestSplitlines(self, 'bitand.asm', ['11110101', '10111001', '10110001',])
 
+    def testLiterals(self):
+        runTestSplitlines(self, 'literals.asm', [
+            '11011110101011011011111011101111',
+            '11011110101011011011111011101111',
+            '11011110101011011011111011101111',
+        ])
+
 
 class VectorInstructionsTests(unittest.TestCase):
     """Tests for vector-related instructions.
