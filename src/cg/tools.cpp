@@ -21,6 +21,7 @@
 #include <math.h>
 #include <tuple>
 #include <viua/bytecode/bytetypedef.h>
+#include <viua/cg/assembler/assembler.h>
 #include <viua/cg/tools.h>
 #include <viua/support/string.h>
 using namespace std;
@@ -295,17 +296,13 @@ namespace viua {
                 bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
                 calculated_size += sizeof(viua::internals::types::bits_size);
 
-                auto literal = tokens.at(i).str().substr(2);
+                auto literal = tokens.at(i).str();
                 ++i;
 
-                /*
-                 * Size is first multiplied by 3, because every character of the
-                 * string must be encoded on three bits.
-                 * Then the result is divided by 8.0 because a byte has 8 bits, and
-                 * the bytecode is encoded using bytes.
-                 */
-                auto size = ceill((literal.size() * 3) / 8.0l);
-                calculated_size += static_cast<decltype(calculated_size)>(size);
+                calculated_size += (assembler::operands::normalise_binary_literal(
+                                        assembler::operands::octal_to_binary_literal(literal))
+                                        .size() /
+                                    8);
 
                 return tuple<bytecode_size_type, decltype(i)>{calculated_size, i};
             }
@@ -316,17 +313,13 @@ namespace viua {
                 bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
                 calculated_size += sizeof(viua::internals::types::bits_size);
 
-                auto literal = tokens.at(i).str().substr(2);
+                auto literal = tokens.at(i).str();
                 ++i;
 
-                /*
-                 * Size is first multiplied by 4, because every character of the
-                 * string must be encoded on four bits.
-                 * Then the result is divided by 8.0 because a byte has 8 bits, and
-                 * the bytecode is encoded using bytes.
-                 */
-                auto size = ceill((literal.size() * 4) / 8.0l);
-                calculated_size += static_cast<decltype(calculated_size)>(size);
+                calculated_size += (assembler::operands::normalise_binary_literal(
+                                        assembler::operands::hexadecimal_to_binary_literal(literal))
+                                        .size() /
+                                    8);
 
                 return tuple<bytecode_size_type, decltype(i)>{calculated_size, i};
             }
