@@ -188,11 +188,11 @@ auto assembler::operands::normalise_binary_literal(const string s) -> string {
     ostringstream oss;
 
     auto n = 0;
-    while (((s.size() - 2) + n) % 8 != 0) {
+    while ((s.size() + n) % 8 != 0) {
         oss << '0';
         ++n;
     }
-    oss << s.substr(2);
+    oss << s;
 
     return oss.str();
 }
