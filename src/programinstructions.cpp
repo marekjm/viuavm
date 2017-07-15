@@ -245,6 +245,11 @@ Program& Program::opbits(int_op target, int_op count) {
     return (*this);
 }
 
+Program& Program::opbits(int_op target, const vector<uint8_t> bit_string) {
+    addr_ptr = cg::bytecode::opbits(addr_ptr, target, bit_string);
+    return (*this);
+}
+
 Program& Program::opbitand(int_op target, int_op lhs, int_op rhs) {
     addr_ptr = cg::bytecode::opbitand(addr_ptr, target, lhs, rhs);
     return (*this);

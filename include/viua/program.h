@@ -111,6 +111,7 @@ class Program {
     Program& opor(int_op, int_op, int_op);
 
     Program& opbits(int_op, int_op);
+    Program& opbits(int_op, const std::vector<uint8_t>);
     Program& opbitand(int_op, int_op, int_op);
     Program& opbitor(int_op, int_op, int_op);
     Program& opbitnot(int_op, int_op);
