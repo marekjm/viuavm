@@ -375,12 +375,26 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(
         case VLEN:
         case TEXTLENGTH:
         case STRUCTKEYS:
-        case BITS:
         case BITNOT:
         case ROL:
         case ROR:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
+
+            break;
+        case BITS:
+            ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
+
+            if (OperandType(*ptr) == OT_BITS) {
+                ++ptr;  // for operand type
+                auto bsz = load_aligned<viua::internals::types::bits_size>(ptr);
+                pointer::inc<viua::internals::types::bits_size, viua::internals::types::byte>(ptr);
+                ptr += bsz;
+                oss << ' ';
+                oss << "0b0";  // FIXME implement disassembling of binaries
+            } else {
+                ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
+            }
 
             break;
         case ADD:
