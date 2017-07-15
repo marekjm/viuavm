@@ -188,6 +188,11 @@ tuple<string, string, string> assembler::operands::get3(string s, bool fill_thir
 auto assembler::operands::normalise_binary_literal(const string s) -> string {
     ostringstream oss;
 
+    if (s.size() > 2 and s.at(1) == 'b') {
+        // FIXME create InternalError class
+        throw("internal error: invalid binary literal: cannot normalise literals with '0b' prefix: " + s);
+    }
+
     auto n = 0;
     while ((s.size() + n) % 8 != 0) {
         oss << '0';
