@@ -312,7 +312,11 @@ int main(int argc, char* argv[]) {
                 unsigned size;
                 tie(instruction, size) =
                     disassembler::instruction((bytecode.get() + element_address_mapping[name] + j));
-                (DEBUG ? cout : oss) << "    " << instruction << '\n';
+                (DEBUG ? cout : oss) << "    " << instruction;
+                if (DEBUG) {
+                    (DEBUG ? cout : oss) << " ; size: " << size << " bytes";
+                }
+                (DEBUG ? cout : oss) << '\n';
                 j += size;
             } catch (const out_of_range& e) {
                 (DEBUG ? cout : oss) << "\n---- ERROR ----\n\n";
