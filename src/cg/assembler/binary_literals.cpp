@@ -29,7 +29,7 @@ auto assembler::operands::normalise_binary_literal(const string s) -> string {
         throw("internal error: invalid binary literal: cannot normalise literals with '0b' prefix: " + s);
     }
 
-    auto n = 0;
+    auto n = decltype(s)::size_type{0};
     while ((s.size() + n) % 8 != 0) {
         oss << '0';
         ++n;
