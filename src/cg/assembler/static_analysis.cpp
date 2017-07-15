@@ -603,8 +603,14 @@ static void check_block_body(const TokenVector& body_tokens, TokenVector::size_t
             TokenIndex target = i + 1;
             TokenIndex source = target + 2;
 
-            check_use_of_register(body_tokens, source, i, registers, named_registers,
-                                  ("use of empty register in " + token.str()));
+            auto src = body_tokens.at(source).str();
+            if (src.at(0) == '0' and (src.at(1) == 'b' or src.at(1) == 'o' or src.at(1) == 'x')) {
+                // literal bit string, FIXME add validation
+            } else {
+                check_use_of_register(body_tokens, source, i, registers, named_registers,
+                                      ("use of empty register in " + token.str()));
+            }
+
             registers.insert(resolve_register_name(named_registers, body_tokens.at(target)),
                              body_tokens.at(target));
 
