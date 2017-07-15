@@ -23,18 +23,19 @@
 #pragma once
 
 
-#include <string>
-#include <vector>
-#include <tuple>
 #include <map>
 #include <regex>
+#include <string>
+#include <tuple>
+#include <vector>
 #include <viua/cg/lex.h>
 #include <viua/program.h>
 
 namespace assembler {
     namespace operands {
         int_op getint(const std::string& s, const bool = false);
-        int_op getint_with_rs_type(const std::string&, const viua::internals::RegisterSets, const bool = false);
+        int_op getint_with_rs_type(const std::string&, const viua::internals::RegisterSets,
+                                   const bool = false);
         int_op getint(const std::vector<viua::cg::lex::Token>& tokens, decltype(tokens.size()));
         byte_op getbyte(const std::string& s);
         float_op getfloat(const std::string& s);
@@ -44,19 +45,23 @@ namespace assembler {
     }
 
     namespace ce {
-        auto getmarks(const std::vector<viua::cg::lex::Token>& tokens) -> std::map<std::string, std::remove_reference<decltype(tokens)>::type::size_type>;
+        auto getmarks(const std::vector<viua::cg::lex::Token>& tokens)
+            -> std::map<std::string, std::remove_reference<decltype(tokens)>::type::size_type>;
         std::vector<std::string> getlinks(const std::vector<viua::cg::lex::Token>&);
 
         std::vector<std::string> getFunctionNames(const std::vector<viua::cg::lex::Token>&);
         std::vector<std::string> getSignatures(const std::vector<viua::cg::lex::Token>&);
         std::vector<std::string> getBlockNames(const std::vector<viua::cg::lex::Token>&);
         std::vector<std::string> getBlockSignatures(const std::vector<viua::cg::lex::Token>&);
-        std::map<std::string, std::vector<std::string> > getInvokables(const std::string& type, const std::vector<viua::cg::lex::Token>&);
-        std::map<std::string, std::vector<viua::cg::lex::Token>> getInvokablesTokenBodies(const std::string&, const std::vector<viua::cg::lex::Token>&);
+        std::map<std::string, std::vector<std::string>> getInvokables(
+            const std::string& type, const std::vector<viua::cg::lex::Token>&);
+        std::map<std::string, std::vector<viua::cg::lex::Token>> getInvokablesTokenBodies(
+            const std::string&, const std::vector<viua::cg::lex::Token>&);
     }
 
     namespace verify {
-        void functionCallsAreDefined(const std::vector<viua::cg::lex::Token>&, const std::vector<std::string>&, const std::vector<std::string>&);
+        void functionCallsAreDefined(const std::vector<viua::cg::lex::Token>&,
+                                     const std::vector<std::string>&, const std::vector<std::string>&);
 
         void functionCallArities(const std::vector<viua::cg::lex::Token>&);
         void msgArities(const std::vector<viua::cg::lex::Token>& lines);
@@ -66,10 +71,13 @@ namespace assembler {
 
         void frameBalance(const std::vector<viua::cg::lex::Token>&);
 
-        void blockTries(const std::vector<viua::cg::lex::Token>&, const std::vector<std::string>&, const std::vector<std::string>&);
-        void blockCatches(const std::vector<viua::cg::lex::Token>&, const std::vector<std::string>&, const std::vector<std::string>&);
+        void blockTries(const std::vector<viua::cg::lex::Token>&, const std::vector<std::string>&,
+                        const std::vector<std::string>&);
+        void blockCatches(const std::vector<viua::cg::lex::Token>&, const std::vector<std::string>&,
+                          const std::vector<std::string>&);
 
-        void callableCreations(const std::vector<viua::cg::lex::Token>&, const std::vector<std::string>&, const std::vector<std::string>&);
+        void callableCreations(const std::vector<viua::cg::lex::Token>&, const std::vector<std::string>&,
+                               const std::vector<std::string>&);
 
         void ressInstructions(const std::vector<viua::cg::lex::Token>&, bool);
 
@@ -85,7 +93,9 @@ namespace assembler {
 
         void jumpsAreInRange(const std::vector<viua::cg::lex::Token>&);
 
-        void manipulationOfDefinedRegisters(const std::vector<viua::cg::lex::Token>&, const std::map<std::string, std::vector<viua::cg::lex::Token>>&, const bool);
+        void manipulationOfDefinedRegisters(const std::vector<viua::cg::lex::Token>&,
+                                            const std::map<std::string, std::vector<viua::cg::lex::Token>>&,
+                                            const bool);
     }
 
     namespace utils {
