@@ -159,7 +159,11 @@ viua::internals::types::byte* viua::process::Process::opbitset(viua::internals::
 
 viua::internals::types::byte* viua::process::Process::opshl(viua::internals::types::byte* addr) {
     viua::kernel::Register* target = nullptr;
-    tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+    if (viua::bytecode::decoder::operands::is_void(addr)) {
+        addr = viua::bytecode::decoder::operands::fetch_void(addr);
+    } else {
+        tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
+    }
 
     viua::types::Bits* source = nullptr;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
@@ -167,7 +171,10 @@ viua::internals::types::byte* viua::process::Process::opshl(viua::internals::typ
     viua::types::Integer* offset = nullptr;
     tie(addr, offset) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
 
-    *target = source->shl(offset->as_unsigned());
+    auto result = source->shl(offset->as_unsigned());
+    if (target) {
+        *target = std::move(result);
+    }
 
     return addr;
 }

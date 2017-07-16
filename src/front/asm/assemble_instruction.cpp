@@ -644,10 +644,18 @@ viua::internals::types::bytecode_size assemble_instruction(
         TokenIndex lhs = target + 2;
         TokenIndex rhs = lhs + 2;
 
-        program.opshl(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
-                                                               resolve_rs_type(tokens.at(target + 1))),
-                      assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
-                                                               resolve_rs_type(tokens.at(lhs + 1))),
+        int_op ret;
+        if (tokens.at(target) == "void") {
+            --lhs;
+            --rhs;
+            ret = assembler::operands::getint(resolveregister(tokens.at(target)));
+        } else {
+            ret = assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
+                                                           resolve_rs_type(tokens.at(target + 1)));
+        }
+
+        program.opshl(ret, assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
+                                                                    resolve_rs_type(tokens.at(lhs + 1))),
                       assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)),
                                                                resolve_rs_type(tokens.at(rhs + 1))));
     } else if (tokens.at(i) == "ashl") {
