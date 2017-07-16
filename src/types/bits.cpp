@@ -118,6 +118,8 @@ auto viua::types::Bits::shr(size_type n, const bool padding) -> unique_ptr<Bits>
     return shifted;
 }
 
+auto viua::types::Bits::shr(size_type n) -> unique_ptr<Bits> { return shr(n, false); }
+
 auto viua::types::Bits::ashl(size_type n) -> unique_ptr<Bits> {
     auto sign = at(underlying_array.size() - 1);
     auto shifted = shl(n);
