@@ -681,6 +681,18 @@ class BitsManipulationTests(unittest.TestCase):
     def testRor(self):
         runTestSplitlines(self, 'ror.asm', ['10011101', '01100111',])
 
+    def testBitAt(self):
+        runTestSplitlines(self, 'bitat.asm', ['10011101', 'true', 'false',])
+
+    def testBitSet(self):
+        runTestSplitlines(self, 'bitset.asm', ['10000000', '00000001',])
+
+    def testLogicalShiftLeft(self):
+        runTestSplitlines(self, 'shl.asm', ['00100000', '10000000',])
+
+    def testLogicalShiftRight(self):
+        runTestSplitlines(self, 'shr.asm', ['10000000', '00100000',])
+
     def testLiterals(self):
         runTestSplitlines(self, 'literals.asm', [
             '11011110101011011011111011101111',
