@@ -143,7 +143,9 @@ auto viua::types::Bits::ror(size_type n) -> void {
     auto shifted = shr(n);
     const auto offset = shifted->underlying_array.size();
     for (size_type i = 0; i < offset; ++i) {
-        set(underlying_array.size() - offset + i, shifted->at(offset - 1 - i));
+        auto target_index = (underlying_array.size() - 1 - i);
+        auto source_index = (offset - 1 - i);
+        set(target_index, shifted->at(source_index));
     }
 }
 
