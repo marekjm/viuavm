@@ -40,6 +40,7 @@ extern bool SCREAM;
 
 
 using Token = viua::cg::lex::Token;
+using TokenIndex = vector<Token>::size_type;
 
 
 static tuple<viua::internals::types::bytecode_size, enum JUMPTYPE> resolvejump(
@@ -159,6 +160,30 @@ static viua::internals::types::timeout timeout_to_int(const string& timeout) {
     }
 }
 
+using ShiftOp = Program& (Program::*)(int_op, int_op, int_op);
+template<const ShiftOp op>
+static auto assemble_bit_shift_instruction(Program& program, const vector<Token>& tokens, const TokenIndex i)
+    -> void {
+    TokenIndex target = i + 1;
+    TokenIndex lhs = target + 2;
+    TokenIndex rhs = lhs + 2;
+
+    int_op ret;
+    if (tokens.at(target) == "void") {
+        --lhs;
+        --rhs;
+        ret = assembler::operands::getint(resolveregister(tokens.at(target)));
+    } else {
+        ret = assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
+                                                       resolve_rs_type(tokens.at(target + 1)));
+    }
+
+    (program.*op)(ret, assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
+                                                                resolve_rs_type(tokens.at(lhs + 1))),
+                  assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)),
+                                                           resolve_rs_type(tokens.at(rhs + 1))));
+}
+
 static auto convert_token_to_timeout_operand(viua::cg::lex::Token token) -> timeout_op {
     viua::internals::types::timeout timeout_milliseconds = 0;
     if (token != "infinity") {
@@ -183,8 +208,6 @@ viua::internals::types::bytecode_size assemble_instruction(
         cout << send_control_seq(COLOR_FG_WHITE) << tokens.at(i).str() << send_control_seq(ATTR_RESET);
         cout << "' instruction\n";
     }
-
-    using TokenIndex = std::remove_reference<decltype(tokens)>::type::size_type;
 
     if (tokens.at(i) == "nop") {
         program.opnop();
@@ -640,57 +663,13 @@ viua::internals::types::bytecode_size assemble_instruction(
                                                                       resolve_rs_type(tokens.at(rhs + 1))));
         }
     } else if (tokens.at(i) == "shl") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs = target + 2;
-        TokenIndex rhs = lhs + 2;
-
-        int_op ret;
-        if (tokens.at(target) == "void") {
-            --lhs;
-            --rhs;
-            ret = assembler::operands::getint(resolveregister(tokens.at(target)));
-        } else {
-            ret = assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
-                                                           resolve_rs_type(tokens.at(target + 1)));
-        }
-
-        program.opshl(ret, assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
-                                                                    resolve_rs_type(tokens.at(lhs + 1))),
-                      assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)),
-                                                               resolve_rs_type(tokens.at(rhs + 1))));
+        assemble_bit_shift_instruction<&Program::opshl>(program, tokens, i);
     } else if (tokens.at(i) == "ashl") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs = target + 2;
-        TokenIndex rhs = lhs + 2;
-
-        program.opashl(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
-                                                                resolve_rs_type(tokens.at(target + 1))),
-                       assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
-                                                                resolve_rs_type(tokens.at(lhs + 1))),
-                       assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)),
-                                                                resolve_rs_type(tokens.at(rhs + 1))));
+        assemble_bit_shift_instruction<&Program::opashl>(program, tokens, i);
     } else if (tokens.at(i) == "shr") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs = target + 2;
-        TokenIndex rhs = lhs + 2;
-
-        program.opshr(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
-                                                               resolve_rs_type(tokens.at(target + 1))),
-                      assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
-                                                               resolve_rs_type(tokens.at(lhs + 1))),
-                      assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)),
-                                                               resolve_rs_type(tokens.at(rhs + 1))));
+        assemble_bit_shift_instruction<&Program::opshr>(program, tokens, i);
     } else if (tokens.at(i) == "ashr") {
-        TokenIndex target = i + 1;
-        TokenIndex lhs = target + 2;
-        TokenIndex rhs = lhs + 2;
-
-        program.opashr(assembler::operands::getint_with_rs_type(resolveregister(tokens.at(target)),
-                                                                resolve_rs_type(tokens.at(target + 1))),
-                       assembler::operands::getint_with_rs_type(resolveregister(tokens.at(lhs)),
-                                                                resolve_rs_type(tokens.at(lhs + 1))),
-                       assembler::operands::getint_with_rs_type(resolveregister(tokens.at(rhs)),
-                                                                resolve_rs_type(tokens.at(rhs + 1))));
+        assemble_bit_shift_instruction<&Program::opashr>(program, tokens, i);
     } else if (tokens.at(i) == "rol") {
         TokenIndex target = i + 1;
         TokenIndex lhs = target + 2;
