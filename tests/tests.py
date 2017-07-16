@@ -690,6 +690,9 @@ class BitsManipulationTests(unittest.TestCase):
     def testLogicalShiftLeft(self):
         runTestSplitlines(self, 'shl.asm', ['10100000', '10000000', '10'])
 
+    def testLogicalShiftLeftToVoid(self):
+        runTestSplitlines(self, 'shl_to_void.asm', ['00100000', '10000000',])
+
     def testLogicalShiftRight(self):
         runTestSplitlines(self, 'shr.asm', ['10000000', '00100000',])
 
