@@ -743,13 +743,30 @@ static void check_block_body(const TokenVector& body_tokens, TokenVector::size_t
         } else if (token == "and" or token == "or" or token == "texteq" or token == "textat" or
                    token == "textcommonprefix" or token == "textcommonsuffix" or token == "textconcat" or
                    token == "atomeq" or token == "bitand" or token == "bitor" or token == "bitxor" or
-                   token == "bitat" or token == "shl" or token == "shr" or token == "ashl" or
-                   token == "ashr") {
+                   token == "bitat") {
             ++i;  // skip mnemonic token
 
             TokenIndex target = i;
             TokenIndex lhs = target + 2;
             TokenIndex rhs = lhs + 2;
+
+            check_use_of_register(body_tokens, lhs, i - 1, registers, named_registers);
+            check_use_of_register(body_tokens, rhs, i - 1, registers, named_registers);
+            registers.insert(resolve_register_name(named_registers, body_tokens.at(i)), body_tokens.at(i));
+
+            i = skip_till_next_line(body_tokens, i);
+            continue;
+        } else if (token == "shl" or token == "shr" or token == "ashl" or token == "ashr") {
+            ++i;  // skip mnemonic token
+
+            TokenIndex target = i;
+            TokenIndex lhs = target + 2;
+            TokenIndex rhs = lhs + 2;
+
+            if (body_tokens.at(target) == "void") {
+                --lhs;
+                --rhs;
+            }
 
             check_use_of_register(body_tokens, lhs, i - 1, registers, named_registers);
             check_use_of_register(body_tokens, rhs, i - 1, registers, named_registers);
