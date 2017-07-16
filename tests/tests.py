@@ -660,7 +660,7 @@ class BitsManipulationTests(unittest.TestCase):
     def testBitnot(self):
         runTestSplitlines(self, 'bitnot.asm', ['00000000', '11111111'])
 
-    def testBitand(self):
+    def testBitAnd(self):
         runTestSplitlines(self, 'bitand.asm', ['11110101', '10111001', '10110001',])
 
     def testArithmeticShiftRight(self):
