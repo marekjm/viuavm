@@ -45,7 +45,7 @@ namespace viua {
             auto clear() -> void;
 
             auto shl(size_type) -> std::unique_ptr<Bits>;
-            auto shr(size_type) -> std::unique_ptr<Bits>;
+            auto shr(size_type, const bool = false) -> std::unique_ptr<Bits>;
             auto ashl(size_type) -> std::unique_ptr<Bits>;
             auto ashr(size_type) -> std::unique_ptr<Bits>;
 

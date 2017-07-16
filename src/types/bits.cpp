@@ -88,7 +88,7 @@ auto viua::types::Bits::shl(size_type n) -> unique_ptr<Bits> {
     return shifted;
 }
 
-auto viua::types::Bits::shr(size_type n) -> unique_ptr<Bits> {
+auto viua::types::Bits::shr(size_type n, const bool padding) -> unique_ptr<Bits> {
     auto shifted = unique_ptr<Bits>{new Bits{n}};
 
     if (n >= underlying_array.size()) {
@@ -106,12 +106,12 @@ auto viua::types::Bits::shr(size_type n) -> unique_ptr<Bits> {
                 shifted->set(index_to_set_in_shifted, at(index_to_set));
             }
             set(index_to_set, at(index_of_value));
-            set(index_of_value, false);
+            set(index_of_value, padding);
         } else {
             if (index_to_set_in_shifted < n) {
                 shifted->set(index_to_set_in_shifted, at(index_to_set));
             }
-            set(index_to_set, false);
+            set(index_to_set, padding);
         }
     }
 
@@ -127,8 +127,7 @@ auto viua::types::Bits::ashl(size_type n) -> unique_ptr<Bits> {
 
 auto viua::types::Bits::ashr(size_type n) -> unique_ptr<Bits> {
     auto sign = at(underlying_array.size() - 1);
-    auto shifted = shr(n);
-    set(underlying_array.size() - 1, sign);
+    auto shifted = shr(n, sign);
     return shifted;
 }
 
