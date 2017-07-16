@@ -675,6 +675,12 @@ class BitsManipulationTests(unittest.TestCase):
     def testArithmeticShiftRight(self):
         runTestSplitlines(self, 'arithmetic_shift_right.asm', ['10000000000000000000000001100000', '11111000000000000000000000000110',])
 
+    def testRol(self):
+        runTestSplitlines(self, 'rol.asm', ['10011101', '01110110',])
+
+    def testRor(self):
+        runTestSplitlines(self, 'ror.asm', ['10011101', '01100111',])
+
     def testLiterals(self):
         runTestSplitlines(self, 'literals.asm', [
             '11011110101011011011111011101111',
