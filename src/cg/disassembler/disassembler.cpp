@@ -24,6 +24,7 @@
 #include <viua/bytecode/opcodes.h>
 #include <viua/bytecode/operand_types.h>
 #include <viua/cg/disassembler/disassembler.h>
+#include <viua/support/env.h>
 #include <viua/support/pointer.h>
 #include <viua/support/string.h>
 #include <viua/util/memory.h>
@@ -95,7 +96,11 @@ string disassembler::intop_with_rs_type(viua::internals::types::byte* ptr) {
                     oss << "static";
                     break;
                 default:
-                    throw "invalid register set detected";
+                    if (support::env::getvar("VIUA_DISASM_INVALID_RS_TYPES") == "yes") {
+                        oss << "<invalid=" << int(*ptr) << '>';
+                    } else {
+                        throw "invalid register set detected";
+                    }
             }
             pointer::inc<viua::internals::RegisterSets, viua::internals::types::byte>(ptr);
             break;
