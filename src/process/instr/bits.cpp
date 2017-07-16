@@ -174,6 +174,10 @@ static auto execute_bit_shift_instruction(viua::process::Process* process, viua:
     tie(addr, offset) =
         viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, process);
 
+    /*
+     * Let's hope the compiler sees that the 'op' can be resolved at compile time, and
+     * optimise the extra pointer dereference away.
+     */
     auto result = (source->*op)(offset->as_unsigned());
     if (target) {
         *target = std::move(result);
