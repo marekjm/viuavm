@@ -670,10 +670,16 @@ class BitsManipulationTests(unittest.TestCase):
         runTestSplitlines(self, 'bitxor.asm', ['00001100', '00001010', '00000110',])
 
     def testArithmeticShiftLeft(self):
-        runTestSplitlines(self, 'arithmetic_shift_left.asm', ['10000000000000000000000001100000', '10000000000000000000011000000000',])
+        runTestSplitlines(self, 'arithmetic_shift_left.asm', ['10000000000000000000000001100000', '10000000000000000000011000000000', '1000',])
+
+    def testArithmeticShiftLeftToVoid(self):
+        runTestSplitlines(self, 'ashl_to_void.asm', ['10000000000000000000000001100000', '10000000000000000000011000000000',])
 
     def testArithmeticShiftRight(self):
-        runTestSplitlines(self, 'arithmetic_shift_right.asm', ['10000000000000000000000001100000', '11111000000000000000000000000110',])
+        runTestSplitlines(self, 'arithmetic_shift_right.asm', ['10000000000000000000000001100001', '11111000000000000000000000000110', '0001'])
+
+    def testArithmeticShiftRightToVoid(self):
+        runTestSplitlines(self, 'ashr_to_void.asm', ['10000000000000000000000001100000', '11111000000000000000000000000110',])
 
     def testRol(self):
         runTestSplitlines(self, 'rol.asm', ['10011101', '01110110',])
@@ -694,7 +700,10 @@ class BitsManipulationTests(unittest.TestCase):
         runTestSplitlines(self, 'shl_to_void.asm', ['00100000', '10000000',])
 
     def testLogicalShiftRight(self):
-        runTestSplitlines(self, 'shr.asm', ['10000000', '00100000',])
+        runTestSplitlines(self, 'shr.asm', ['10000001', '00100000', '01',])
+
+    def testLogicalShiftRightToVoid(self):
+        runTestSplitlines(self, 'shr_to_void.asm', ['10000001', '00100000',])
 
     def testLiterals(self):
         runTestSplitlines(self, 'literals.asm', [

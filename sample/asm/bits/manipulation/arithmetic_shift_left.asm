@@ -25,6 +25,7 @@
 
     ashl %0 local %bitstring local %offset local
     print %bitstring local
+    print %0 local
 
     izero %0 local
     return

@@ -18,13 +18,14 @@
 ;
 
 .function: main/0
-    bits (.name: %iota bitstring) local 0b10000000000000000000000001100000
+    bits (.name: %iota bitstring) local 0b10000000000000000000000001100001
     istore (.name: %iota offset) local 4
 
     print %bitstring local
 
     ashr %0 local %bitstring local %offset local
     print %bitstring local
+    print %0 local
 
     izero %0 local
     return

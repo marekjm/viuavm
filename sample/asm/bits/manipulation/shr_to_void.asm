@@ -22,9 +22,8 @@
     istore (.name: %iota offset) local 2
 
     print %bitstring local
-    shr %0 local %bitstring local %offset local
+    shr void %bitstring local %offset local
     print %bitstring local
-    print %0 local
 
     izero %0 local
     return
