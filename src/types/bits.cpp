@@ -17,6 +17,7 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
 #include <sstream>
 #include <string>
 #include <viua/types/bits.h>
@@ -164,7 +165,7 @@ auto viua::types::Bits::inverted() const -> unique_ptr<Bits> {
 auto viua::types::Bits::operator|(const Bits& that) const -> unique_ptr<Bits> {
     unique_ptr<Bits> result = unique_ptr<Bits>{new Bits{underlying_array.size()}};
 
-    for (size_type i = 0; i < underlying_array.size(); ++i) {
+    for (size_type i = 0; i < min(underlying_array.size(), that.underlying_array.size()); ++i) {
         result->set(i, (at(i) or that.at(i)));
     }
 
@@ -174,7 +175,7 @@ auto viua::types::Bits::operator|(const Bits& that) const -> unique_ptr<Bits> {
 auto viua::types::Bits::operator&(const Bits& that) const -> unique_ptr<Bits> {
     unique_ptr<Bits> result = unique_ptr<Bits>{new Bits{underlying_array.size()}};
 
-    for (size_type i = 0; i < underlying_array.size(); ++i) {
+    for (size_type i = 0; i < min(underlying_array.size(), that.underlying_array.size()); ++i) {
         result->set(i, (at(i) and that.at(i)));
     }
 
@@ -184,7 +185,7 @@ auto viua::types::Bits::operator&(const Bits& that) const -> unique_ptr<Bits> {
 auto viua::types::Bits::operator^(const Bits& that) const -> unique_ptr<Bits> {
     unique_ptr<Bits> result = unique_ptr<Bits>{new Bits{underlying_array.size()}};
 
-    for (size_type i = 0; i < underlying_array.size(); ++i) {
+    for (size_type i = 0; i < min(underlying_array.size(), that.underlying_array.size()); ++i) {
         result->set(i, (at(i) xor that.at(i)));
     }
 
