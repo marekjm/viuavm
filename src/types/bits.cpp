@@ -18,6 +18,7 @@
  */
 
 #include <algorithm>
+#include <functional>
 #include <sstream>
 #include <string>
 #include <viua/types/bits.h>
@@ -164,34 +165,27 @@ auto viua::types::Bits::inverted() const -> unique_ptr<Bits> {
     return result;
 }
 
-auto viua::types::Bits::operator|(const Bits& that) const -> unique_ptr<Bits> {
-    unique_ptr<Bits> result = unique_ptr<Bits>{new Bits{underlying_array.size()}};
+template<typename T>
+static auto perform_bitwise_logic(const viua::types::Bits& lhs, const viua::types::Bits& rhs)
+    -> unique_ptr<viua::types::Bits> {
+    unique_ptr<viua::types::Bits> result = unique_ptr<viua::types::Bits>{new viua::types::Bits{lhs.size()}};
 
-    for (size_type i = 0; i < min(underlying_array.size(), that.underlying_array.size()); ++i) {
-        result->set(i, (at(i) or that.at(i)));
+    for (viua::types::Bits::size_type i = 0; i < min(lhs.size(), rhs.size()); ++i) {
+        result->set(i, T()(lhs.at(i), rhs.at(i)));
     }
 
     return result;
+}
+auto viua::types::Bits::operator|(const Bits& that) const -> unique_ptr<Bits> {
+    return perform_bitwise_logic<bit_or<bool>>(*this, that);
 }
 
 auto viua::types::Bits::operator&(const Bits& that) const -> unique_ptr<Bits> {
-    unique_ptr<Bits> result = unique_ptr<Bits>{new Bits{underlying_array.size()}};
-
-    for (size_type i = 0; i < min(underlying_array.size(), that.underlying_array.size()); ++i) {
-        result->set(i, (at(i) and that.at(i)));
-    }
-
-    return result;
+    return perform_bitwise_logic<bit_and<bool>>(*this, that);
 }
 
 auto viua::types::Bits::operator^(const Bits& that) const -> unique_ptr<Bits> {
-    unique_ptr<Bits> result = unique_ptr<Bits>{new Bits{underlying_array.size()}};
-
-    for (size_type i = 0; i < min(underlying_array.size(), that.underlying_array.size()); ++i) {
-        result->set(i, (at(i) xor that.at(i)));
-    }
-
-    return result;
+    return perform_bitwise_logic<bit_xor<bool>>(*this, that);
 }
 
 viua::types::Bits::Bits(const vector<bool>& bs) {
