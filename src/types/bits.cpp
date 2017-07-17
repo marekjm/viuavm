@@ -168,7 +168,7 @@ auto viua::types::Bits::inverted() const -> unique_ptr<Bits> {
 template<typename T>
 static auto perform_bitwise_logic(const viua::types::Bits& lhs, const viua::types::Bits& rhs)
     -> unique_ptr<viua::types::Bits> {
-    unique_ptr<viua::types::Bits> result = unique_ptr<viua::types::Bits>{new viua::types::Bits{lhs.size()}};
+    auto result = make_unique<viua::types::Bits>(lhs.size());
 
     for (viua::types::Bits::size_type i = 0; i < min(lhs.size(), rhs.size()); ++i) {
         result->set(i, T()(lhs.at(i), rhs.at(i)));
