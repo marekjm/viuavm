@@ -37,6 +37,7 @@ namespace viua {
 
           public:
             using size_type = decltype(underlying_array)::size_type;
+            auto size() const -> size_type;
 
             auto at(size_type) const -> bool;
             auto set(size_type, const bool = true) -> bool;

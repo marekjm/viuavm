@@ -45,6 +45,8 @@ unique_ptr<viua::types::Value> viua::types::Bits::copy() const {
     return unique_ptr<viua::types::Value>{new Bits(underlying_array)};
 }
 
+auto viua::types::Bits::size() const -> size_type { return underlying_array.size(); }
+
 auto viua::types::Bits::at(size_type i) const -> bool { return underlying_array.at(i); }
 
 auto viua::types::Bits::set(size_type i, const bool value) -> bool {
