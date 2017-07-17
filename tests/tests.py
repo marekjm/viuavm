@@ -669,6 +669,15 @@ class BitsManipulationTests(unittest.TestCase):
     def testBitXor(self):
         runTestSplitlines(self, 'bitxor.asm', ['00001100', '00001010', '00000110',])
 
+    def testBitAndWithDifferentWidths(self):
+        runTestSplitlines(self, 'bitand_with_different_widths.asm', ['1101000100100111', '00001101', '0000000000000101', '00000101',])
+
+    def testBitOrWithDifferentWidths(self):
+        runTestSplitlines(self, 'bitor_with_different_widths.asm', ['1101000100100111', '00001101', '0000000000101111', '00101111',])
+
+    def testBitXorWithDifferentWidths(self):
+        runTestSplitlines(self, 'bitxor_with_different_widths.asm', ['1101000100100111', '00001101', '0000000000101010', '00101010',])
+
     def testArithmeticShiftLeft(self):
         runTestSplitlines(self, 'arithmetic_shift_left.asm', ['10000000000000000000000001100000', '10000000000000000000011000000000', '1000',])
 
