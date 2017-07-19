@@ -72,7 +72,7 @@ viua::internals::types::byte* viua::process::Process::opstoi(viua::internals::ty
         throw new viua::types::Exception("invalid argument: " + supplied_string);
     }
 
-    *target = unique_ptr<viua::types::Value>{new viua::types::Integer(result_integer)};
+    *target = make_unique<viua::types::Integer>(result_integer);
 
     return addr;
 }
@@ -86,7 +86,7 @@ viua::internals::types::byte* viua::process::Process::opstof(viua::internals::ty
 
     string supplied_string = static_cast<viua::types::String*>(source)->value();
     double convert_from = std::stod(supplied_string);
-    *target = unique_ptr<viua::types::Value>{new viua::types::Float(convert_from)};
+    *target = make_unique<viua::types::Float>(convert_from);
 
     return addr;
 }

@@ -46,7 +46,7 @@ viua::internals::types::byte* viua::process::Process::opbits(viua::internals::ty
     } else {
         viua::types::Integer* n = nullptr;
         tie(addr, n) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
-        *target = unique_ptr<viua::types::Value>{new viua::types::Bits(n->as_unsigned())};
+        *target = make_unique<viua::types::Bits>(n->as_unsigned());
     }
 
     return addr;
@@ -124,7 +124,7 @@ viua::internals::types::byte* viua::process::Process::opbitat(viua::internals::t
     viua::types::Integer* n = nullptr;
     tie(addr, n) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Integer>(addr, this);
 
-    *target = unique_ptr<viua::types::Value>{new viua::types::Boolean(bits->at(n->as_unsigned()))};
+    *target = make_unique<viua::types::Boolean>(bits->at(n->as_unsigned()));
 
     return addr;
 }

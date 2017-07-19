@@ -47,7 +47,7 @@ viua::internals::types::byte* viua::process::Process::opnew(viua::internals::typ
         throw new viua::types::Exception("cannot create new instance of unregistered type: " + class_name);
     }
 
-    *target = unique_ptr<viua::types::Value>{new viua::types::Object(class_name)};
+    *target = make_unique<viua::types::Object>(class_name);
 
     return addr;
 }

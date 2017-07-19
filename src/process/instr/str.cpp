@@ -37,7 +37,7 @@ viua::internals::types::byte* viua::process::Process::opstrstore(viua::internals
     string s;
     tie(addr, s) = viua::bytecode::decoder::operands::fetch_primitive_string(addr, this);
 
-    *target = unique_ptr<viua::types::Value>{new viua::types::String(str::strdecode(s))};
+    *target = make_unique<viua::types::String>(str::strdecode(s));
 
     return addr;
 }

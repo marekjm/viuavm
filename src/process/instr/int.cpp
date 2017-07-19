@@ -34,7 +34,7 @@ viua::internals::types::byte* viua::process::Process::opizero(viua::internals::t
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    *target = unique_ptr<viua::types::Value>{new viua::types::Integer(0)};
+    *target = make_unique<viua::types::Integer>(0);
     return addr;
 }
 
@@ -45,7 +45,7 @@ viua::internals::types::byte* viua::process::Process::opistore(viua::internals::
     int integer = 0;
     tie(addr, integer) = viua::bytecode::decoder::operands::fetch_primitive_int(addr, this);
 
-    *target = unique_ptr<viua::types::Value>{new viua::types::Integer(integer)};
+    *target = make_unique<viua::types::Integer>(integer);
 
     return addr;
 }

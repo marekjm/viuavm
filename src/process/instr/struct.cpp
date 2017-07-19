@@ -31,7 +31,7 @@ viua::internals::types::byte* viua::process::Process::opstruct(viua::internals::
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    *target = unique_ptr<viua::types::Value>{new viua::types::Struct()};
+    *target = make_unique<viua::types::Struct>();
 
     return addr;
 }

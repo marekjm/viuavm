@@ -33,7 +33,7 @@ viua::internals::types::byte* viua::process::Process::opatom(viua::internals::ty
     string s;
     tie(addr, s) = viua::bytecode::decoder::operands::fetch_primitive_string(addr, this);
 
-    *target = unique_ptr<viua::types::Value>{new viua::types::Atom(str::strdecode(s))};
+    *target = make_unique<viua::types::Atom>(str::strdecode(s));
 
     return addr;
 }
@@ -51,7 +51,7 @@ viua::internals::types::byte* viua::process::Process::opatomeq(viua::internals::
         viua::bytecode::decoder::operands::fetch_object_of<std::remove_pointer<decltype(second)>::type>(addr,
                                                                                                         this);
 
-    *target = unique_ptr<viua::types::Value>{new viua::types::Boolean(*first == *second)};
+    *target = make_unique<viua::types::Boolean>(*first == *second);
 
     return addr;
 }

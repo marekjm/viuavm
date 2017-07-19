@@ -44,7 +44,7 @@ viua::internals::types::byte* viua::process::Process::optext(viua::internals::ty
         s = str::strdecode(s);
     }
 
-    *target = unique_ptr<viua::types::Value>{new viua::types::Text(s)};
+    *target = make_unique<viua::types::Text>(s);
 
     return addr;
 }
@@ -58,7 +58,7 @@ viua::internals::types::byte* viua::process::Process::optexteq(viua::internals::
     tie(addr, first) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Text>(addr, this);
     tie(addr, second) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Text>(addr, this);
 
-    *target = unique_ptr<viua::types::Value>{new viua::types::Boolean(*first == *second)};
+    *target = make_unique<viua::types::Boolean>(*first == *second);
 
     return addr;
 }
@@ -92,7 +92,7 @@ viua::internals::types::byte* viua::process::Process::optextat(viua::internals::
 
     auto working_index = convert_signed_integer_to_text_size_type(source_text, index->as_integer());
 
-    *target = unique_ptr<viua::types::Value>{new viua::types::Text(source_text->at(working_index))};
+    *target = make_unique<viua::types::Text>(source_text->at(working_index));
 
     return addr;
 }
@@ -128,7 +128,7 @@ viua::internals::types::byte* viua::process::Process::optextlength(viua::interna
     viua::types::Text* source = nullptr;
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Text>(addr, this);
 
-    *target = unique_ptr<viua::types::Value>{new viua::types::Integer(source->signed_size())};
+    *target = make_unique<viua::types::Integer>(source->signed_size());
 
     return addr;
 }
@@ -178,7 +178,7 @@ viua::internals::types::byte* viua::process::Process::optextconcat(viua::interna
     viua::types::Text* rhs = nullptr;
     tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Text>(addr, this);
 
-    *target = unique_ptr<viua::types::Value>{new viua::types::Text((*lhs) + (*rhs))};
+    *target = make_unique<viua::types::Text>((*lhs) + (*rhs));
 
     return addr;
 }

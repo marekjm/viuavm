@@ -137,7 +137,7 @@ viua::internals::types::byte* viua::process::Process::opfunction(viua::internals
     string function_name;
     tie(addr, function_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
-    *target = unique_ptr<viua::types::Value>{new viua::types::Function(function_name)};
+    *target = make_unique<viua::types::Function>(function_name);
 
     return addr;
 }

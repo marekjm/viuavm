@@ -82,7 +82,7 @@ viua::internals::types::byte* viua::process::Process::opisnull(viua::internals::
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
     tie(addr, source) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    *target = unique_ptr<viua::types::Value>{new viua::types::Boolean(source->empty())};
+    *target = make_unique<viua::types::Boolean>(source->empty());
 
     return addr;
 }

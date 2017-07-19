@@ -38,7 +38,7 @@ viua::internals::types::byte* viua::process::Process::opfstore(viua::internals::
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
     tie(addr, value) = viua::bytecode::decoder::operands::fetch_raw_float(addr, this);
 
-    *target = unique_ptr<viua::types::Value>{new viua::types::Float(value)};
+    *target = make_unique<viua::types::Float>(value);
 
     return addr;
 }

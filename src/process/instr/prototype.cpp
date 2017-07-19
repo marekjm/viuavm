@@ -37,7 +37,7 @@ viua::internals::types::byte* viua::process::Process::opclass(viua::internals::t
     string class_name;
     tie(addr, class_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
-    *target = unique_ptr<viua::types::Value>{new viua::types::Prototype(class_name)};
+    *target = make_unique<viua::types::Prototype>(class_name);
 
     return addr;
 }
