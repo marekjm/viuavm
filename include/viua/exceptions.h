@@ -77,9 +77,7 @@ class TypeException : public viua::types::Exception {
         return oss.str();
     }
 
-    std::unique_ptr<Value> copy() const override {
-        return std::unique_ptr<Value>{new TypeException(expected, got)};
-    }
+    std::unique_ptr<Value> copy() const override { return std::make_unique<TypeException>(expected, got); }
 
     std::string what() const override { return str(); }
 
@@ -95,9 +93,7 @@ class UnresolvedAtomException : public viua::types::Exception {
 
     std::string str() const override { return ("atom '" + atom + "' could not be resolved"); }
 
-    std::unique_ptr<Value> copy() const override {
-        return std::unique_ptr<Value>{new UnresolvedAtomException(atom)};
-    }
+    std::unique_ptr<Value> copy() const override { return std::make_unique<UnresolvedAtomException>(atom); }
 
     std::string what() const override { return str(); }
 
@@ -111,9 +107,7 @@ class OperandTypeException : public viua::types::Exception {
 
     std::string str() const override { return "invalid operand type"; }
 
-    std::unique_ptr<Value> copy() const override {
-        return std::unique_ptr<Value>{new OperandTypeException()};
-    }
+    std::unique_ptr<Value> copy() const override { return std::make_unique<OperandTypeException>(); }
 
     std::string what() const override { return str(); }
 };
