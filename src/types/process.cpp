@@ -45,9 +45,7 @@ bool viua::types::Process::boolean() const {
     return false;
 }
 
-unique_ptr<viua::types::Value> viua::types::Process::copy() const {
-    return unique_ptr<viua::types::Value>{new viua::types::Process(thrd)};
-}
+unique_ptr<viua::types::Value> viua::types::Process::copy() const { return make_unique<Process>(thrd); }
 
 viua::process::PID viua::types::Process::pid() const { return saved_pid; }
 

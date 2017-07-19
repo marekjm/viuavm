@@ -33,8 +33,6 @@ bool& viua::types::Boolean::value() { return b; }
 vector<string> viua::types::Boolean::bases() const { return vector<string>{"Number"}; }
 vector<string> viua::types::Boolean::inheritancechain() const { return vector<string>{"Number", "Value"}; }
 
-unique_ptr<viua::types::Value> viua::types::Boolean::copy() const {
-    return unique_ptr<Boolean>{new Boolean(b)};
-}
+unique_ptr<viua::types::Value> viua::types::Boolean::copy() const { return make_unique<Boolean>(b); }
 
 viua::types::Boolean::Boolean(bool v) : b(v) {}

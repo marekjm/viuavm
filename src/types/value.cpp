@@ -46,7 +46,7 @@ bool viua::types::Value::boolean() const {
 
 unique_ptr<viua::types::Pointer> viua::types::Value::pointer(
     const viua::process::Process* process_of_origin) {
-    return unique_ptr<viua::types::Pointer>{new viua::types::Pointer(this, process_of_origin)};
+    return make_unique<viua::types::Pointer>(this, process_of_origin);
 }
 
 

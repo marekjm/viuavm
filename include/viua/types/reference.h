@@ -35,11 +35,6 @@ namespace viua {
             Value** pointer;
             uint64_t* counter;
 
-            /*  This constructor is used internally by the Reference type to
-             *  initialise copies of the reference.
-             */
-            Reference(Value** ptr, uint64_t* ctr);
-
           public:
             static const std::string type_name;
 
@@ -57,6 +52,10 @@ namespace viua {
             virtual void rebind(Value*);
             virtual void rebind(std::unique_ptr<Value>);
 
+            /*  This constructor is used internally by the Reference type to
+             *  initialise copies of the reference.
+             */
+            Reference(Value** ptr, uint64_t* ctr);
             Reference(Value* ptr);
             virtual ~Reference();
         };

@@ -33,8 +33,6 @@ namespace viua {
         class Bits : public viua::types::Value {
             std::vector<bool> underlying_array;
 
-            Bits(const std::vector<bool>&);
-
           public:
             using size_type = decltype(underlying_array)::size_type;
             auto size() const -> size_type;
@@ -68,6 +66,7 @@ namespace viua {
 
             std::unique_ptr<Value> copy() const override;
 
+            Bits(const std::vector<bool>&);
             Bits(const size_type);
             Bits(const size_type, const uint8_t*);
         };

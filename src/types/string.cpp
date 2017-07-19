@@ -43,7 +43,7 @@ string String::str() const { return svalue; }
 string String::repr() const { return str::enquote(svalue); }
 bool String::boolean() const { return svalue.size() != 0; }
 
-unique_ptr<Value> String::copy() const { return unique_ptr<viua::types::Value>{new String(svalue)}; }
+unique_ptr<Value> String::copy() const { return make_unique<String>(svalue); }
 
 string& String::value() { return svalue; }
 

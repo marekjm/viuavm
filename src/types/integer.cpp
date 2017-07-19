@@ -36,7 +36,7 @@ auto Integer::value() -> decltype(number) { return number; }
 int64_t Integer::increment() { return (++number); }
 int64_t Integer::decrement() { return (--number); }
 
-unique_ptr<Value> Integer::copy() const { return unique_ptr<Value>{new Integer(number)}; }
+unique_ptr<Value> Integer::copy() const { return make_unique<Integer>(number); }
 
 auto Integer::as_unsigned() const -> uint64_t {
     if (number < 0) {
@@ -50,30 +50,30 @@ auto Integer::as_integer() const -> int64_t { return number; }
 auto Integer::as_float() const -> viua::float64 { return static_cast<viua::float64>(number); }
 
 auto Integer::operator+(const numeric::Number& that) const -> unique_ptr<numeric::Number> {
-    return unique_ptr<numeric::Number>{new Integer(number + that.as_integer())};
+    return make_unique<Integer>(number + that.as_integer());
 }
 auto Integer::operator-(const numeric::Number& that) const -> unique_ptr<numeric::Number> {
-    return unique_ptr<numeric::Number>{new Integer(number - that.as_integer())};
+    return make_unique<Integer>(number - that.as_integer());
 }
 auto Integer::operator*(const numeric::Number& that) const -> unique_ptr<numeric::Number> {
-    return unique_ptr<numeric::Number>{new Integer(number * that.as_integer())};
+    return make_unique<Integer>(number * that.as_integer());
 }
 auto Integer::operator/(const numeric::Number& that) const -> unique_ptr<numeric::Number> {
-    return unique_ptr<numeric::Number>{new Integer(number / that.as_integer())};
+    return make_unique<Integer>(number / that.as_integer());
 }
 
 auto Integer::operator<(const numeric::Number& that) const -> unique_ptr<Boolean> {
-    return unique_ptr<Boolean>{new Boolean(number < that.as_integer())};
+    return make_unique<Boolean>(number < that.as_integer());
 }
 auto Integer::operator<=(const numeric::Number& that) const -> unique_ptr<Boolean> {
-    return unique_ptr<Boolean>{new Boolean(number <= that.as_integer())};
+    return make_unique<Boolean>(number <= that.as_integer());
 }
 auto Integer::operator>(const numeric::Number& that) const -> unique_ptr<Boolean> {
-    return unique_ptr<Boolean>{new Boolean(number > that.as_integer())};
+    return make_unique<Boolean>(number > that.as_integer());
 }
 auto Integer::operator>=(const numeric::Number& that) const -> unique_ptr<Boolean> {
-    return unique_ptr<Boolean>{new Boolean(number >= that.as_integer())};
+    return make_unique<Boolean>(number >= that.as_integer());
 }
 auto Integer::operator==(const numeric::Number& that) const -> unique_ptr<Boolean> {
-    return unique_ptr<Boolean>{new Boolean(number == that.as_integer())};
+    return make_unique<Boolean>(number == that.as_integer());
 }

@@ -44,7 +44,7 @@ string viua::types::Function::repr() const { return str(); }
 bool viua::types::Function::boolean() const { return true; }
 
 unique_ptr<viua::types::Value> viua::types::Function::copy() const {
-    return unique_ptr<viua::types::Value>{new viua::types::Function(function_name)};
+    return make_unique<viua::types::Function>(function_name);
 }
 
 

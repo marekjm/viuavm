@@ -33,7 +33,7 @@ vector<string> viua::types::Prototype::inheritancechain() const { return vector<
 string viua::types::Prototype::str() const { return ("Prototype for " + prototype_name); }
 
 unique_ptr<viua::types::Value> viua::types::Prototype::copy() const {
-    return unique_ptr<viua::types::Value>{new viua::types::Prototype(prototype_name)};
+    return make_unique<Prototype>(prototype_name);
 }
 
 

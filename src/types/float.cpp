@@ -33,41 +33,39 @@ bool Float::boolean() const { return (number != 0); }
 
 auto Float::value() -> decltype(number) & { return number; }
 
-unique_ptr<viua::types::Value> Float::copy() const {
-    return unique_ptr<viua::types::Value>{new Float(number)};
-}
+unique_ptr<viua::types::Value> Float::copy() const { return make_unique<Float>(number); }
 
 auto Float::as_integer() const -> int64_t { return static_cast<int64_t>(number); }
 
 auto Float::as_float() const -> viua::float64 { return number; }
 
 auto Float::operator+(const numeric::Number& that) const -> unique_ptr<numeric::Number> {
-    return unique_ptr<numeric::Number>{new Float(number + that.as_float())};
+    return make_unique<Float>(number + that.as_float());
 }
 auto Float::operator-(const numeric::Number& that) const -> unique_ptr<numeric::Number> {
-    return unique_ptr<numeric::Number>{new Float(number - that.as_float())};
+    return make_unique<Float>(number - that.as_float());
 }
 auto Float::operator*(const numeric::Number& that) const -> unique_ptr<numeric::Number> {
-    return unique_ptr<numeric::Number>{new Float(number * that.as_float())};
+    return make_unique<Float>(number * that.as_float());
 }
 auto Float::operator/(const numeric::Number& that) const -> unique_ptr<numeric::Number> {
-    return unique_ptr<numeric::Number>{new Float(number / that.as_float())};
+    return make_unique<Float>(number / that.as_float());
 }
 
 auto Float::operator<(const numeric::Number& that) const -> unique_ptr<Boolean> {
-    return unique_ptr<Boolean>{new Boolean(number < that.as_float())};
+    return make_unique<Boolean>(number < that.as_float());
 }
 auto Float::operator<=(const numeric::Number& that) const -> unique_ptr<Boolean> {
-    return unique_ptr<Boolean>{new Boolean(number <= that.as_float())};
+    return make_unique<Boolean>(number <= that.as_float());
 }
 auto Float::operator>(const numeric::Number& that) const -> unique_ptr<Boolean> {
-    return unique_ptr<Boolean>{new Boolean(number > that.as_float())};
+    return make_unique<Boolean>(number > that.as_float());
 }
 auto Float::operator>=(const numeric::Number& that) const -> unique_ptr<Boolean> {
-    return unique_ptr<Boolean>{new Boolean(number >= that.as_float())};
+    return make_unique<Boolean>(number >= that.as_float());
 }
 auto Float::operator==(const numeric::Number& that) const -> unique_ptr<Boolean> {
-    return unique_ptr<Boolean>{new Boolean(number == that.as_float())};
+    return make_unique<Boolean>(number == that.as_float());
 }
 
 Float::Float(decltype(number) n) : number(n) {}

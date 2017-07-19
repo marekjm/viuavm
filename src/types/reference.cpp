@@ -51,7 +51,7 @@ vector<string> viua::types::Reference::inheritancechain() const { return vector<
 
 unique_ptr<viua::types::Value> viua::types::Reference::copy() const {
     ++(*counter);
-    return unique_ptr<viua::types::Value>{new viua::types::Reference(pointer, counter)};
+    return make_unique<viua::types::Reference>(pointer, counter);
 }
 
 viua::types::Reference::Reference(viua::types::Value* ptr)

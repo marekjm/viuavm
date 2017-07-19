@@ -42,9 +42,7 @@ string viua::types::Bits::str() const {
 
 bool viua::types::Bits::boolean() const { return false; }
 
-unique_ptr<viua::types::Value> viua::types::Bits::copy() const {
-    return unique_ptr<viua::types::Value>{new Bits(underlying_array)};
-}
+unique_ptr<viua::types::Value> viua::types::Bits::copy() const { return make_unique<Bits>(underlying_array); }
 
 auto viua::types::Bits::size() const -> size_type { return underlying_array.size(); }
 

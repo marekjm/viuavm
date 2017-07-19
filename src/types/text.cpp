@@ -110,9 +110,7 @@ string viua::types::Text::repr() const { return str::enquote(str()); }
 
 bool viua::types::Text::boolean() const { return false; }
 
-std::unique_ptr<viua::types::Value> viua::types::Text::copy() const {
-    return std::unique_ptr<Value>{new Text(text)};
-}
+std::unique_ptr<viua::types::Value> viua::types::Text::copy() const { return std::make_unique<Text>(text); }
 
 auto viua::types::Text::operator==(const viua::types::Text& other) const -> bool {
     return (text == other.text);

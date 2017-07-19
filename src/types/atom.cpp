@@ -37,9 +37,7 @@ string viua::types::Atom::repr() const { return str(); }
 
 viua::types::Atom::operator string() const { return value; }
 
-unique_ptr<viua::types::Value> viua::types::Atom::copy() const {
-    return unique_ptr<viua::types::Atom>{new Atom(value)};
-}
+unique_ptr<viua::types::Value> viua::types::Atom::copy() const { return make_unique<Atom>(value); }
 
 auto viua::types::Atom::operator==(const Atom& that) const -> bool { return (value == that.value); }
 
