@@ -22,117 +22,100 @@
 
 #pragma once
 
-#include <string>
 #include <sstream>
+#include <string>
 #include <vector>
 #include <viua/types/exception.h>
 
 
-class OutOfRangeException: public viua::types::Exception {
-    public:
-        std::string type() const { return "OutOfRangeException"; }
-        OutOfRangeException(const std::string& s): viua::types::Exception(s) {}
+class OutOfRangeException : public viua::types::Exception {
+  public:
+    std::string type() const { return "OutOfRangeException"; }
+    OutOfRangeException(const std::string& s) : viua::types::Exception(s) {}
 };
 
-class ArityException: public viua::types::Exception {
-        viua::internals::types::register_index got_arity;
-        std::vector<decltype(got_arity)> valid_arities;
-    public:
-        std::string type() const override {
-            return "ArityException";
-        }
+class ArityException : public viua::types::Exception {
+    viua::internals::types::register_index got_arity;
+    std::vector<decltype(got_arity)> valid_arities;
 
-        std::string str() const override {
-            std::ostringstream oss;
-            oss << "got arity " << got_arity << ", expected one of {";
-            for (decltype(valid_arities)::size_type i = 0; i < valid_arities.size(); ++i) {
-                oss << valid_arities[i];
-                if (i < (valid_arities.size()-1)) {
-                    oss << ", ";
-                }
+  public:
+    std::string type() const override { return "ArityException"; }
+
+    std::string str() const override {
+        std::ostringstream oss;
+        oss << "got arity " << got_arity << ", expected one of {";
+        for (decltype(valid_arities)::size_type i = 0; i < valid_arities.size(); ++i) {
+            oss << valid_arities[i];
+            if (i < (valid_arities.size() - 1)) {
+                oss << ", ";
             }
-            oss << '}';
-            return oss.str();
         }
+        oss << '}';
+        return oss.str();
+    }
 
-        std::unique_ptr<Value> copy() const override {
-            return std::unique_ptr<Value>{new ArityException(got_arity, valid_arities)};
-        }
+    std::unique_ptr<Value> copy() const override {
+        return std::unique_ptr<Value>{new ArityException(got_arity, valid_arities)};
+    }
 
-        std::string what() const override {
-            return str();
-        }
+    std::string what() const override { return str(); }
 
-        ArityException(decltype(got_arity) a, decltype(valid_arities) v): got_arity(a), valid_arities(v) {}
-        ~ArityException() {}
+    ArityException(decltype(got_arity) a, decltype(valid_arities) v) : got_arity(a), valid_arities(v) {}
+    ~ArityException() {}
 };
 
-class TypeException: public viua::types::Exception {
-        std::string expected;
-        std::string got;
-    public:
-        std::string type() const override {
-            return "TypeException";
-        }
+class TypeException : public viua::types::Exception {
+    std::string expected;
+    std::string got;
 
-        std::string str() const override {
-            std::ostringstream oss;
-            oss << "expected " << expected << ", got " << got;
-            return oss.str();
-        }
+  public:
+    std::string type() const override { return "TypeException"; }
 
-        std::unique_ptr<Value> copy() const override {
-            return std::unique_ptr<Value>{new TypeException(expected, got)};
-        }
+    std::string str() const override {
+        std::ostringstream oss;
+        oss << "expected " << expected << ", got " << got;
+        return oss.str();
+    }
 
-        std::string what() const override {
-            return str();
-        }
+    std::unique_ptr<Value> copy() const override {
+        return std::unique_ptr<Value>{new TypeException(expected, got)};
+    }
 
-        TypeException(decltype(expected) e, decltype(got) g): expected(e), got(g) {}
-        ~TypeException() {}
+    std::string what() const override { return str(); }
+
+    TypeException(decltype(expected) e, decltype(got) g) : expected(e), got(g) {}
+    ~TypeException() {}
 };
 
-class UnresolvedAtomException: public viua::types::Exception {
-        std::string atom;
-    public:
-        std::string type() const override {
-            return "UnresolvedAtomException";
-        }
+class UnresolvedAtomException : public viua::types::Exception {
+    std::string atom;
 
-        std::string str() const override {
-            return ("atom '" + atom + "' could not be resolved");
-        }
+  public:
+    std::string type() const override { return "UnresolvedAtomException"; }
 
-        std::unique_ptr<Value> copy() const override {
-            return std::unique_ptr<Value>{new UnresolvedAtomException(atom)};
-        }
+    std::string str() const override { return ("atom '" + atom + "' could not be resolved"); }
 
-        std::string what() const override {
-            return str();
-        }
+    std::unique_ptr<Value> copy() const override {
+        return std::unique_ptr<Value>{new UnresolvedAtomException(atom)};
+    }
 
-        UnresolvedAtomException(decltype(atom) a): atom(a) {}
-        ~UnresolvedAtomException() {}
+    std::string what() const override { return str(); }
+
+    UnresolvedAtomException(decltype(atom) a) : atom(a) {}
+    ~UnresolvedAtomException() {}
 };
 
-class OperandTypeException: public viua::types::Exception {
-    public:
-        std::string type() const override {
-            return "OperandTypeException";
-        }
+class OperandTypeException : public viua::types::Exception {
+  public:
+    std::string type() const override { return "OperandTypeException"; }
 
-        std::string str() const override {
-            return "invalid operand type";
-        }
+    std::string str() const override { return "invalid operand type"; }
 
-        std::unique_ptr<Value> copy() const override {
-            return std::unique_ptr<Value>{new OperandTypeException()};
-        }
+    std::unique_ptr<Value> copy() const override {
+        return std::unique_ptr<Value>{new OperandTypeException()};
+    }
 
-        std::string what() const override {
-            return str();
-        }
+    std::string what() const override { return str(); }
 };
 
 #endif
