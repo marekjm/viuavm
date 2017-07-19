@@ -45,7 +45,7 @@ void inheritanceChain(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Re
     }
 
     vector<string> ic = frame->arguments->at(0)->inheritancechain();
-    unique_ptr<viua::types::Vector> icv{new viua::types::Vector()};
+    auto icv = make_unique<viua::types::Vector>();
 
     for (unsigned i = 0; i < ic.size(); ++i) {
         icv->push(unique_ptr<viua::types::Value>{new viua::types::String(ic[i])});
@@ -62,7 +62,7 @@ void bases(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
 
     viua::types::Value* object = frame->arguments->at(0);
     vector<string> ic = object->bases();
-    unique_ptr<viua::types::Vector> icv{new viua::types::Vector()};
+    auto icv = make_unique<viua::types::Vector>();
 
     for (unsigned i = 0; i < ic.size(); ++i) {
         icv->push(unique_ptr<viua::types::Value>{new viua::types::String(ic[i])});

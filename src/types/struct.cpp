@@ -70,7 +70,7 @@ vector<string> viua::types::Struct::keys() const {
 }
 
 unique_ptr<viua::types::Value> viua::types::Struct::copy() const {
-    unique_ptr<viua::types::Struct> copied{new Struct()};
+    auto copied = make_unique<Struct>();
     for (const auto& each : attributes) {
         copied->insert(each.first, each.second->copy());
     }

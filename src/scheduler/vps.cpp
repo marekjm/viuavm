@@ -502,7 +502,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
             } else {
                 unique_ptr<viua::types::Object> death_message(new viua::types::Object("Object"));
                 unique_ptr<viua::types::Value> exc(th->transferActiveException());
-                unique_ptr<viua::types::Vector> parameters{new viua::types::Vector()};
+                auto parameters = make_unique<viua::types::Vector>();
                 viua::kernel::RegisterSet* top_args = th->trace().at(0)->arguments.get();
                 for (decltype(top_args->size()) j = 0; j < top_args->size(); ++j) {
                     if (top_args->at(j)) {
@@ -634,7 +634,7 @@ void viua::scheduler::VirtualProcessScheduler::bootstrap(const vector<string>& c
     unique_ptr<Frame> initial_frame(new Frame(nullptr, 0, 2));
     initial_frame->function_name = ENTRY_FUNCTION_NAME;
 
-    unique_ptr<viua::types::Vector> cmdline{new viua::types::Vector()};
+    auto cmdline = make_unique<viua::types::Vector>();
     auto limit = commandline_arguments.size();
     for (decltype(limit) i = 0; i < limit; ++i) {
         cmdline->push(unique_ptr<viua::types::Value>{new viua::types::String(commandline_arguments[i])});

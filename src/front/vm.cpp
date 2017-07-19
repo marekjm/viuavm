@@ -43,10 +43,10 @@ void viua::front::vm::initialise(viua::kernel::Kernel* kernel, const string& pro
 }
 
 void viua::front::vm::load_standard_prototypes(viua::kernel::Kernel* kernel) {
-    unique_ptr<viua::types::Prototype> proto_object{new viua::types::Prototype("Object")};
+    auto proto_object = make_unique<viua::types::Prototype>("Object");
     kernel->registerForeignPrototype("Object", std::move(proto_object));
 
-    unique_ptr<viua::types::Prototype> proto_string{new viua::types::Prototype("String")};
+    auto proto_string = make_unique<viua::types::Prototype>("String");
     proto_string->attach("String::stringify/2", "stringify/2");
     proto_string->attach("String::represent/2", "represent/2");
     proto_string->attach("String::startswith/2", "startswith/2");
@@ -78,10 +78,10 @@ void viua::front::vm::load_standard_prototypes(viua::kernel::Kernel* kernel) {
     kernel->registerForeignMethod("String::size/1",
                                   static_cast<ForeignMethodMemberPointer>(&viua::types::String::size));
 
-    unique_ptr<viua::types::Prototype> proto_process{new viua::types::Prototype("Process")};
+    auto proto_process = make_unique<viua::types::Prototype>("Process");
     kernel->registerForeignPrototype("Process", std::move(proto_process));
 
-    unique_ptr<viua::types::Prototype> proto_pointer{new viua::types::Prototype("Pointer")};
+    auto proto_pointer = make_unique<viua::types::Prototype>("Pointer");
     proto_pointer->attach("Pointer::expired/1", "expired/1");
     kernel->registerForeignPrototype("Pointer", std::move(proto_pointer));
     kernel->registerForeignMethod("Pointer::expired/1",

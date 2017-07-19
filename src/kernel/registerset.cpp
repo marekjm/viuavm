@@ -354,7 +354,7 @@ void viua::kernel::RegisterSet::drop() {
 
 
 unique_ptr<viua::kernel::RegisterSet> viua::kernel::RegisterSet::copy() {
-    unique_ptr<viua::kernel::RegisterSet> rscopy{new viua::kernel::RegisterSet(size())};
+    auto rscopy = make_unique<viua::kernel::RegisterSet>(size());
     for (decltype(size()) i = 0; i < size(); ++i) {
         if (at(i) == nullptr) {
             continue;

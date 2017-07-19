@@ -91,7 +91,7 @@ viua::internals::types::byte* viua::process::Process::opstructkeys(viua::interna
         viua::bytecode::decoder::operands::fetch_object_of<viua::types::Struct>(addr, this);
 
     auto struct_keys = struct_operand->keys();
-    unique_ptr<viua::types::Vector> vec{new viua::types::Vector()};
+    auto vec = make_unique<viua::types::Vector>();
     for (const auto& each : struct_keys) {
         vec->push(unique_ptr<viua::types::Atom>{new viua::types::Atom(each)});
     }

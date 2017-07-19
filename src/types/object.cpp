@@ -49,7 +49,7 @@ string viua::types::Object::str() const {
 }
 
 unique_ptr<viua::types::Value> viua::types::Object::copy() const {
-    unique_ptr<viua::types::Object> cp{new viua::types::Object(object_type_name)};
+    auto cp = make_unique<viua::types::Object>(object_type_name);
     for (const auto& each : attributes) {
         cp->set(each.first, each.second->copy());
     }

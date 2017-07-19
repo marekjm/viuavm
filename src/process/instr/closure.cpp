@@ -117,7 +117,7 @@ viua::internals::types::byte* viua::process::Process::opclosure(viua::internals:
 
     unique_ptr<viua::kernel::RegisterSet> rs{
         new viua::kernel::RegisterSet(currently_used_register_set->size())};
-    unique_ptr<viua::types::Closure> closure{new viua::types::Closure(function_name, std::move(rs))};
+    auto closure = make_unique<viua::types::Closure>(function_name, std::move(rs));
 
     *target = std::move(closure);
 
