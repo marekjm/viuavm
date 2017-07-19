@@ -90,7 +90,7 @@ unique_ptr<viua::types::Value> viua::types::Pointer::copy() const {
 
 void viua::types::Pointer::expired(Frame* frm, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
                                    viua::process::Process*, viua::kernel::Kernel*) {
-    frm->local_register_set->set(0, unique_ptr<viua::types::Value>{new viua::types::Boolean(expired())});
+    frm->local_register_set->set(0, make_unique<viua::types::Boolean>(expired()));
 }
 
 

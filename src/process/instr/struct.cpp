@@ -93,7 +93,7 @@ viua::internals::types::byte* viua::process::Process::opstructkeys(viua::interna
     auto struct_keys = struct_operand->keys();
     auto vec = make_unique<viua::types::Vector>();
     for (const auto& each : struct_keys) {
-        vec->push(unique_ptr<viua::types::Atom>{new viua::types::Atom(each)});
+        vec->push(make_unique<viua::types::Atom>(each));
     }
 
     *target = std::move(vec);

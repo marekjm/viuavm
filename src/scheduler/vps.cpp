@@ -637,7 +637,7 @@ void viua::scheduler::VirtualProcessScheduler::bootstrap(const vector<string>& c
     auto cmdline = make_unique<viua::types::Vector>();
     auto limit = commandline_arguments.size();
     for (decltype(limit) i = 0; i < limit; ++i) {
-        cmdline->push(unique_ptr<viua::types::Value>{new viua::types::String(commandline_arguments[i])});
+        cmdline->push(make_unique<viua::types::String>(commandline_arguments[i]));
     }
     initial_frame->local_register_set->set(1, std::move(cmdline));
 

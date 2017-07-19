@@ -154,7 +154,7 @@ auto viua::types::Bits::ror(size_type n) -> void {
 }
 
 auto viua::types::Bits::inverted() const -> unique_ptr<Bits> {
-    auto result = unique_ptr<Bits>{new Bits{underlying_array.size()}};
+    auto result = make_unique<Bits>(underlying_array.size());
 
     for (size_type i = 0; i < underlying_array.size(); ++i) {
         result->set(i, not at(i));
