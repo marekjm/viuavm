@@ -55,7 +55,7 @@ class ArityException : public viua::types::Exception {
     }
 
     std::unique_ptr<Value> copy() const override {
-        return std::unique_ptr<Value>{new ArityException(got_arity, valid_arities)};
+        return std::make_unique<ArityException>(got_arity, valid_arities);
     }
 
     std::string what() const override { return str(); }
