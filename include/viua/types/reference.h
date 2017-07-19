@@ -30,35 +30,35 @@
 
 namespace viua {
     namespace types {
-        class Reference: public Value {
+        class Reference : public Value {
             // FIXME maybe just use std::shared_ptr<> ?
-            Value **pointer;
-            uint64_t *counter;
+            Value** pointer;
+            uint64_t* counter;
 
             /*  This constructor is used internally by the Reference type to
              *  initialise copies of the reference.
              */
-            Reference(Value **ptr, uint64_t *ctr);
+            Reference(Value** ptr, uint64_t* ctr);
 
-            public:
-                static const std::string type_name;
+          public:
+            static const std::string type_name;
 
-                std::string type() const override;
-                std::string str() const override;
-                std::string repr() const override;
-                bool boolean() const override;
+            std::string type() const override;
+            std::string str() const override;
+            std::string repr() const override;
+            bool boolean() const override;
 
-                std::vector<std::string> bases() const override;
-                std::vector<std::string> inheritancechain() const override;
+            std::vector<std::string> bases() const override;
+            std::vector<std::string> inheritancechain() const override;
 
-                std::unique_ptr<Value> copy() const override;
+            std::unique_ptr<Value> copy() const override;
 
-                virtual Value* pointsTo() const;
-                virtual void rebind(Value*);
-                virtual void rebind(std::unique_ptr<Value>);
+            virtual Value* pointsTo() const;
+            virtual void rebind(Value*);
+            virtual void rebind(std::unique_ptr<Value>);
 
-                Reference(Value *ptr);
-                virtual ~Reference();
+            Reference(Value* ptr);
+            virtual ~Reference();
         };
     }
 }
