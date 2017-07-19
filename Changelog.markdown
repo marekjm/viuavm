@@ -31,6 +31,9 @@ There are several categories of change:
 
 - feature: bit manipulation instructions (and, or, xor; arithmetic and logical shifts; rotates), and
   bit literals (binary, octal, and hexadecimal)
+- feature: setting `VIUA_DISASM_INVALID_RS_TYPES` environment variable to `yes` will make the disassembler
+  output unknown register set types instead of aborting; this may be useful if the binary that needs to
+  be disassembled is somewhat damaged, but the disassembler will not try too hard anyway
 
 
 ----
