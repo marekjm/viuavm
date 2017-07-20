@@ -39,7 +39,7 @@ enum JUMPTYPE {
 
 class Program {
     // byte array containing bytecode
-    viua::internals::types::byte* program;
+    std::unique_ptr<viua::internals::types::byte[]> program;
     // size of the bytecode
     viua::internals::types::bytecode_size bytes;
 
@@ -209,7 +209,7 @@ class Program {
     std::vector<viua::internals::types::bytecode_size> jumps();
 
     auto bytecode() const -> std::unique_ptr<viua::internals::types::byte[]>;
-    Program& fill(viua::internals::types::byte*);
+    Program& fill(std::unique_ptr<viua::internals::types::byte[]>);
 
     Program& setdebug(bool d = true);
     Program& setscream(bool d = true);
@@ -218,7 +218,6 @@ class Program {
 
     Program(viua::internals::types::bytecode_size bts = 2);
     Program(const Program& that);
-    ~Program();
     Program& operator=(const Program& that);
 };
 
