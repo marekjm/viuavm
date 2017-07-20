@@ -91,8 +91,7 @@ void viua::process::Process::ensureStaticRegisters(string function_name) {
     } catch (const std::out_of_range& e) {
         // FIXME: amount of static registers should be customizable
         // FIXME: amount of static registers shouldn't be a magic number
-        static_registers[function_name] =
-            unique_ptr<viua::kernel::RegisterSet>(new viua::kernel::RegisterSet(16));
+        static_registers[function_name] = make_unique<viua::kernel::RegisterSet>(16);
     }
 }
 
@@ -101,8 +100,6 @@ Frame* viua::process::Process::requestNewFrame(viua::internals::types::register_
     return stack->prepare_frame(arguments_size, registers_size);
 }
 void viua::process::Process::pushFrame() {
-    /** Pushes new frame to be the current (top-most) one.
-     */
     if (stack->size() > MAX_STACK_SIZE) {
         ostringstream oss;
         oss << "stack size (" << MAX_STACK_SIZE << ") exceeded with call to '"
@@ -263,7 +260,7 @@ viua::internals::types::byte* viua::process::Process::tick() {
          */
         stack->thrown.reset(e);
     } catch (viua::types::Value* e) { stack->thrown.reset(e); } catch (const char* e) {
-        stack->thrown.reset(new viua::types::Exception(e));
+        stack->thrown = make_unique<viua::types::Exception>(e);
     }
 
     if (stack->state_of() == Stack::STATE::HALTED or stack->size() == 0) {
@@ -288,7 +285,7 @@ viua::internals::types::byte* viua::process::Process::tick() {
         (OPCODE(*stack->instruction_pointer) != RETURN and OPCODE(*stack->instruction_pointer) != JOIN and
          OPCODE(*stack->instruction_pointer) != RECEIVE) and
         (not stack->thrown)) {
-        stack->thrown.reset(new viua::types::Exception("InstructionUnchanged"));
+        stack->thrown = make_unique<viua::types::Exception>("InstructionUnchanged");
     }
 
     if (stack->thrown and stack->frame_new) {
@@ -428,10 +425,10 @@ viua::process::Process::Process(unique_ptr<Frame> frm, viua::scheduler::VirtualP
     : tracing_enabled(enable_tracing), scheduler(sch), parent_process(pt), global_register_set(nullptr),
       currently_used_register_set(nullptr), stack(nullptr), finished(false), is_joinable(true),
       is_suspended(false), process_priority(512), process_id(this), is_hidden(false) {
-    global_register_set.reset(new viua::kernel::RegisterSet(DEFAULT_REGISTER_SIZE));
+    global_register_set = make_unique<viua::kernel::RegisterSet>(DEFAULT_REGISTER_SIZE);
     currently_used_register_set = frm->local_register_set.get();
-    unique_ptr<Stack> s{new Stack{frm->function_name, this, &currently_used_register_set,
-                                  global_register_set.get(), scheduler}};
+    auto s = make_unique<Stack>(frm->function_name, this, &currently_used_register_set,
+                                global_register_set.get(), scheduler);
     s->emplace_back(std::move(frm));
     s->bind(&currently_used_register_set, global_register_set.get());
     stack = s.get();
