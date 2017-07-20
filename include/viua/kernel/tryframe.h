@@ -22,29 +22,30 @@
 
 #pragma once
 
-#include <string>
 #include <map>
+#include <memory>
+#include <string>
 #include <viua/bytecode/bytetypedef.h>
-#include <viua/kernel/frame.h>
 #include <viua/kernel/catcher.h>
+#include <viua/kernel/frame.h>
 
 class TryFrame {
-    public:
-        viua::internals::types::byte* return_address;
-        Frame* associated_frame;
+  public:
+    viua::internals::types::byte* return_address;
+    Frame* associated_frame;
 
-        std::string block_name;
+    std::string block_name;
 
-        std::map<std::string, Catcher*> catchers;
+    std::map<std::string, Catcher*> catchers;
 
-        inline viua::internals::types::byte* ret_address() { return return_address; }
+    inline viua::internals::types::byte* ret_address() { return return_address; }
 
-        TryFrame(): return_address(nullptr), associated_frame(nullptr) {}
-        ~TryFrame() {
-            for (auto p : catchers) {
-                delete p.second;
-            }
+    TryFrame() : return_address(nullptr), associated_frame(nullptr) {}
+    ~TryFrame() {
+        for (auto p : catchers) {
+            delete p.second;
         }
+    }
 };
 
 
