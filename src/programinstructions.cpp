@@ -716,8 +716,6 @@ Program& Program::opstructkeys(int_op a, int_op b) {
 }
 
 Program& Program::opnew(int_op reg, const string& class_name) {
-    /*  Inserts new instuction.
-     */
     addr_ptr = cg::bytecode::opnew(addr_ptr, reg, class_name);
     return (*this);
 }
