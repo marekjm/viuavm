@@ -18,6 +18,7 @@
  */
 
 #include <cstdlib>
+#include <memory>
 #include <string>
 #include <viua/include/module.h>
 #include <viua/kernel/frame.h>
@@ -33,7 +34,7 @@ void os_system(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterS
     }
     string command = frame->args->get(0)->str();
     int ret = system(command.c_str());
-    frame->regset->set(0, new Integer(ret));
+    frame->regset->set(0, make_unique<Integer>(ret));
 }
 
 
