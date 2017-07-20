@@ -49,9 +49,12 @@ viua::internals::types::byte* viua::process::Process::opcapture(viua::internals:
     auto captured_object = source->get();
     auto rf = dynamic_cast<viua::types::Reference*>(captured_object);
     if (rf == nullptr) {
-        // turn captured object into a reference to take it out of VM's default
-        // memory management scheme and put it under reference-counting scheme
-        // this is needed to bind the captured object's life to lifetime of the closure
+        /*
+         * Turn captured object into a reference to take it out of VM's default
+         * memory management scheme, and put it under reference-counting scheme.
+         * This is needed to bind the captured object's life to lifetime of the
+         * closure, instead of to lifetime of the frame.
+         */
         rf = new viua::types::Reference(nullptr);
         rf->rebind(source->give());
         *source =
