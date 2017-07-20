@@ -31,7 +31,7 @@ viua::internals::types::byte* viua::process::Process::optry(viua::internals::typ
     if (stack->try_frame_new) {
         throw "new block frame requested while last one is unused";
     }
-    stack->try_frame_new.reset(new TryFrame());
+    stack->try_frame_new = make_unique<TryFrame>();
     return addr;
 }
 
@@ -47,7 +47,7 @@ viua::internals::types::byte* viua::process::Process::opcatch(viua::internals::t
                                          "' to handle " + type_name);
     }
 
-    stack->try_frame_new->catchers[type_name] = new Catcher(type_name, catcher_block_name);
+    stack->try_frame_new->catchers[type_name] = make_unique<Catcher>(type_name, catcher_block_name);
 
     return addr;
 }

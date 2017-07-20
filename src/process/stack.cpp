@@ -68,8 +68,8 @@ auto viua::process::Stack::back() const -> decltype(frames.back()) { return fram
 
 auto viua::process::Stack::register_deferred_calls_from(Frame* frame) -> void {
     for (auto& each : frame->deferred_calls) {
-        unique_ptr<Stack> s{new Stack(each->function_name, parent_process, currently_used_register_set,
-                                      global_register_set, scheduler)};
+        auto s = make_unique<Stack>(each->function_name, parent_process, currently_used_register_set,
+                                    global_register_set, scheduler);
         s->emplace_back(std::move(each));
         s->instruction_pointer = adjust_jump_base_for(s->at(0)->function_name);
         s->bind(currently_used_register_set, global_register_set);
@@ -266,7 +266,7 @@ auto viua::process::Stack::prepare_frame(viua::internals::types::register_index 
     if (frame_new) {
         throw "requested new frame while last one is unused";
     }
-    frame_new.reset(new Frame(nullptr, arguments_size, registers_size));
+    frame_new = make_unique<Frame>(nullptr, arguments_size, registers_size);
     return frame_new.get();
 }
 

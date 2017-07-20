@@ -55,10 +55,10 @@ viua::internals::types::byte* viua::process::Process::opcapture(viua::internals:
          * This is needed to bind the captured object's life to lifetime of the
          * closure, instead of to lifetime of the frame.
          */
-        rf = new viua::types::Reference(nullptr);
-        rf->rebind(source->give());
-        *source =
-            unique_ptr<viua::types::Value>{rf};  // set the register to contain the newly-created reference
+        auto ref = make_unique<viua::types::Reference>(nullptr);
+        ref->rebind(source->give());
+
+        *source = std::move(ref);  // set the register to contain the newly-created reference
     }
     target->rs()->register_at(target_register)->reset(source->get()->copy());
 
@@ -118,8 +118,7 @@ viua::internals::types::byte* viua::process::Process::opclosure(viua::internals:
     string function_name;
     tie(addr, function_name) = viua::bytecode::decoder::operands::fetch_atom(addr, this);
 
-    unique_ptr<viua::kernel::RegisterSet> rs{
-        new viua::kernel::RegisterSet(currently_used_register_set->size())};
+    auto rs = make_unique<viua::kernel::RegisterSet>(currently_used_register_set->size());
     auto closure = make_unique<viua::types::Closure>(function_name, std::move(rs));
 
     *target = std::move(closure);

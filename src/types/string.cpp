@@ -206,9 +206,9 @@ void String::substr(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Regi
 
 void String::concatenate(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
                          viua::process::Process*, viua::kernel::Kernel*) {
-    frame->local_register_set->set(0, unique_ptr<viua::types::Value>{new String(
-                                          static_cast<String*>(frame->arguments->at(0))->value() +
-                                          static_cast<String*>(frame->arguments->at(1))->value())});
+    frame->local_register_set->set(
+        0, make_unique<String>(static_cast<String*>(frame->arguments->at(0))->value() +
+                               static_cast<String*>(frame->arguments->at(1))->value()));
 }
 
 void String::join(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*,

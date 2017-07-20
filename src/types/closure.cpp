@@ -45,8 +45,7 @@ string viua::types::Closure::repr() const { return str(); }
 bool viua::types::Closure::boolean() const { return true; }
 
 unique_ptr<viua::types::Value> viua::types::Closure::copy() const {
-    return unique_ptr<viua::types::Closure>{
-        new viua::types::Closure(function_name, local_register_set->copy())};
+    return make_unique<Closure>(function_name, local_register_set->copy());
 }
 
 

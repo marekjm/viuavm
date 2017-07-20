@@ -52,8 +52,8 @@ void viua::scheduler::ffi::ff_call_processor(
         string call_name = request->functionName();
         unique_lock<mutex> ff_map_lock(*ff_map_mtx);
         if (foreign_functions->count(call_name) == 0) {
-            request->raise(unique_ptr<viua::types::Value>{
-                new viua::types::Exception("call to unregistered foreign function: " + call_name)});
+            request->raise(
+                make_unique<viua::types::Exception>("call to unregistered foreign function: " + call_name));
         } else {
             auto function = foreign_functions->at(call_name);
             ff_map_lock.unlock();  // unlock the mutex - foreign call can block for unspecified period of time

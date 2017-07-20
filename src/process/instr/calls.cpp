@@ -121,8 +121,7 @@ viua::internals::types::byte* viua::process::Process::opargc(viua::internals::ty
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
 
-    *target = unique_ptr<viua::types::Value>{
-        new viua::types::Integer(static_cast<int>(stack->back()->arguments->size()))};
+    *target = make_unique<viua::types::Integer>(static_cast<int>(stack->back()->arguments->size()));
 
     return addr;
 }

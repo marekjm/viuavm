@@ -318,8 +318,7 @@ viua::process::Process* viua::scheduler::VirtualProcessScheduler::process() {
 viua::process::Process* viua::scheduler::VirtualProcessScheduler::spawn(unique_ptr<Frame> frame,
                                                                         viua::process::Process* parent,
                                                                         bool disown) {
-    unique_ptr<viua::process::Process> p(
-        new viua::process::Process(std::move(frame), this, parent, tracing_enabled));
+    auto p = make_unique<viua::process::Process>(std::move(frame), this, parent, tracing_enabled);
     p->begin();
     if (disown) {
         p->detach();
@@ -500,7 +499,7 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
 #endif
                 dead_processes_list.emplace_back(std::move(processes.at(i)));
             } else {
-                unique_ptr<viua::types::Object> death_message(new viua::types::Object("Object"));
+                auto death_message = make_unique<viua::types::Object>("Object");
                 unique_ptr<viua::types::Value> exc(th->transferActiveException());
                 auto parameters = make_unique<viua::types::Vector>();
                 viua::kernel::RegisterSet* top_args = th->trace().at(0)->arguments.get();
@@ -515,12 +514,12 @@ bool viua::scheduler::VirtualProcessScheduler::burst() {
                          ", death cause: ", exc->str());
 #endif
 
-                death_message->set("function", unique_ptr<viua::types::Value>{new viua::types::Function(
-                                                   th->trace().at(0)->function_name)});
+                death_message->set("function",
+                                   make_unique<viua::types::Function>(th->trace().at(0)->function_name));
                 death_message->set("exception", std::move(exc));
                 death_message->set("parameters", std::move(parameters));
 
-                unique_ptr<Frame> death_frame(new Frame(nullptr, 1));
+                auto death_frame = make_unique<Frame>(nullptr, 1);
                 death_frame->arguments->set(0, std::move(death_message));
 #if VIUA_VM_DEBUG_LOG
                 viua_err("[scheduler:vps:", this, ":watchdogging] process ", th, ':', th->starting_function(),
@@ -631,7 +630,7 @@ void viua::scheduler::VirtualProcessScheduler::operator()() {
 }
 
 void viua::scheduler::VirtualProcessScheduler::bootstrap(const vector<string>& commandline_arguments) {
-    unique_ptr<Frame> initial_frame(new Frame(nullptr, 0, 2));
+    auto initial_frame = make_unique<Frame>(nullptr, 0, 2);
     initial_frame->function_name = ENTRY_FUNCTION_NAME;
 
     auto cmdline = make_unique<viua::types::Vector>();

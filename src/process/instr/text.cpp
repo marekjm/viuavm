@@ -114,8 +114,7 @@ viua::internals::types::byte* viua::process::Process::optextsub(viua::internals:
     auto working_first_index = convert_signed_integer_to_text_size_type(source, first_index->as_integer());
     auto working_last_index = convert_signed_integer_to_text_size_type(source, last_index->as_integer());
 
-    *target = unique_ptr<viua::types::Value>{
-        new viua::types::Text(source->sub(working_first_index, working_last_index))};
+    *target = make_unique<viua::types::Text>(source->sub(working_first_index, working_last_index));
 
     return addr;
 }
@@ -144,8 +143,7 @@ viua::internals::types::byte* viua::process::Process::optextcommonprefix(viua::i
     viua::types::Text* rhs = nullptr;
     tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Text>(addr, this);
 
-    *target = unique_ptr<viua::types::Value>{
-        new viua::types::Integer(static_cast<int64_t>(lhs->common_prefix(*rhs)))};
+    *target = make_unique<viua::types::Integer>(static_cast<int64_t>(lhs->common_prefix(*rhs)));
 
     return addr;
 }
@@ -161,8 +159,7 @@ viua::internals::types::byte* viua::process::Process::optextcommonsuffix(viua::i
     viua::types::Text* rhs = nullptr;
     tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Text>(addr, this);
 
-    *target = unique_ptr<viua::types::Value>{
-        new viua::types::Integer(static_cast<int64_t>(lhs->common_suffix(*rhs)))};
+    *target = make_unique<viua::types::Integer>(static_cast<int64_t>(lhs->common_suffix(*rhs)));
 
     return addr;
 }
