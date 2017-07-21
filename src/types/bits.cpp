@@ -61,7 +61,7 @@ auto viua::types::Bits::clear() -> void {
 }
 
 auto viua::types::Bits::shl(size_type n) -> unique_ptr<Bits> {
-    auto shifted = unique_ptr<Bits>{new Bits{n}};
+    auto shifted = make_unique<Bits>(n);
 
     if (n >= underlying_array.size()) {
         clear();
