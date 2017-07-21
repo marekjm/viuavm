@@ -129,11 +129,7 @@ auto viua::types::Bits::ashl(size_type n) -> unique_ptr<Bits> {
     return shifted;
 }
 
-auto viua::types::Bits::ashr(size_type n) -> unique_ptr<Bits> {
-    auto sign = at(underlying_array.size() - 1);
-    auto shifted = shr(n, sign);
-    return shifted;
-}
+auto viua::types::Bits::ashr(size_type n) -> unique_ptr<Bits> { return shr(n, at(size() - 1)); }
 
 auto viua::types::Bits::rol(size_type n) -> void {
     auto shifted = shl(n);
@@ -168,7 +164,7 @@ static auto perform_bitwise_logic(const viua::types::Bits& lhs, const viua::type
     -> unique_ptr<viua::types::Bits> {
     auto result = make_unique<viua::types::Bits>(lhs.size());
 
-    for (viua::types::Bits::size_type i = 0; i < min(lhs.size(), rhs.size()); ++i) {
+    for (auto i = viua::types::Bits::size_type{0}; i < min(lhs.size(), rhs.size()); ++i) {
         result->set(i, T()(lhs.at(i), rhs.at(i)));
     }
 
