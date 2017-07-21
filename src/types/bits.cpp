@@ -55,7 +55,7 @@ auto viua::types::Bits::set(size_type i, const bool value) -> bool {
 }
 
 auto viua::types::Bits::clear() -> void {
-    for (auto i = underlying_array.size() - 1; i; --i) {
+    for (auto i = size_type{0}; i < underlying_array.size(); ++i) {
         set(i, false);
     }
 }
