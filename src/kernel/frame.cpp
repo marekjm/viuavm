@@ -17,7 +17,9 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <memory>
 #include <viua/kernel/frame.h>
+using std::make_unique;
 
 
 void Frame::setLocalRegisterSet(viua::kernel::RegisterSet* rs, bool receives_ownership) {
@@ -27,8 +29,8 @@ void Frame::setLocalRegisterSet(viua::kernel::RegisterSet* rs, bool receives_own
 Frame::Frame(viua::internals::types::byte* ra, viua::internals::types::register_index argsize,
              viua::internals::types::register_index regsize)
     : return_address(ra), arguments(nullptr), local_register_set(nullptr), return_register(nullptr) {
-    arguments.reset(new viua::kernel::RegisterSet(argsize));
-    local_register_set.reset(new viua::kernel::RegisterSet(regsize));
+    arguments = make_unique<viua::kernel::RegisterSet>(argsize);
+    local_register_set = make_unique<viua::kernel::RegisterSet>(regsize);
 }
 Frame::Frame(const Frame& that) {
     return_address = that.return_address;

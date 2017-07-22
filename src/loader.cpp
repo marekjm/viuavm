@@ -101,7 +101,7 @@ static map<string, string> load_meta_information_map(ifstream& in) {
     uint64_t meta_information_map_size = 0;
     readinto(in, &meta_information_map_size);
 
-    unique_ptr<char[]> meta_information_map_buffer(new char[meta_information_map_size]);
+    auto meta_information_map_buffer = make_unique<char[]>(meta_information_map_size);
     in.read(meta_information_map_buffer.get(), static_cast<std::streamsize>(meta_information_map_size));
 
     map<string, string> meta_information_map;
@@ -125,7 +125,7 @@ static vector<string> load_string_list(ifstream& in) {
     uint64_t signatures_section_size = 0;
     readinto(in, &signatures_section_size);
 
-    unique_ptr<char[]> signatures_section_buffer(new char[signatures_section_size]);
+    auto signatures_section_buffer = make_unique<char[]>(signatures_section_size);
     in.read(signatures_section_buffer.get(), static_cast<std::streamsize>(signatures_section_size));
 
     uint64_t i = 0;
@@ -158,7 +158,7 @@ void Loader::loadFunctionsMap(ifstream& in) {
     uint64_t lib_function_ids_section_size = 0;
     readinto(in, &lib_function_ids_section_size);
 
-    unique_ptr<char[]> lib_buffer_function_ids{new char[lib_function_ids_section_size]};
+    auto lib_buffer_function_ids = make_unique<char[]>(lib_function_ids_section_size);
     in.read(lib_buffer_function_ids.get(), static_cast<std::streamsize>(lib_function_ids_section_size));
 
     vector<string> order;
@@ -175,7 +175,7 @@ void Loader::loadBlocksMap(ifstream& in) {
     uint64_t lib_block_ids_section_size = 0;
     readinto(in, &lib_block_ids_section_size);
 
-    unique_ptr<char[]> lib_buffer_block_ids{new char[lib_block_ids_section_size]};
+    auto lib_buffer_block_ids = make_unique<char[]>(lib_block_ids_section_size);
     in.read(lib_buffer_block_ids.get(), static_cast<std::streamsize>(lib_block_ids_section_size));
 
     vector<string> order;
@@ -190,7 +190,7 @@ void Loader::loadBlocksMap(ifstream& in) {
 }
 void Loader::loadBytecode(ifstream& in) {
     in.read(reinterpret_cast<char*>(&size), sizeof(decltype(size)));
-    bytecode.reset(new viua::internals::types::byte[size]);
+    bytecode = make_unique<viua::internals::types::byte[]>(size);
     in.read(reinterpret_cast<char*>(bytecode.get()), static_cast<std::streamsize>(size));
 }
 
@@ -241,7 +241,7 @@ Loader& Loader::executable() {
 
 uint64_t Loader::getBytecodeSize() { return size; }
 unique_ptr<viua::internals::types::byte[]> Loader::getBytecode() {
-    unique_ptr<viua::internals::types::byte[]> copy{new viua::internals::types::byte[size]};
+    auto copy = make_unique<viua::internals::types::byte[]>(size);
     for (uint64_t i = 0; i < size; ++i) {
         copy[i] = bytecode[i];
     }

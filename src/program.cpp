@@ -39,7 +39,7 @@ auto Program::bytecode() const -> unique_ptr<viua::internals::types::byte[]> {
      *
      *  Calling code is responsible for proper destruction of the allocated memory.
      */
-    unique_ptr<viua::internals::types::byte[]> tmp{new viua::internals::types::byte[bytes]};
+    auto tmp = make_unique<viua::internals::types::byte[]>(bytes);
     for (decltype(bytes) i = 0; i < bytes; ++i) {
         tmp[i] = program[i];
     }
@@ -122,7 +122,7 @@ vector<uint64_t> Program::jumps() {
 }
 
 Program::Program(uint64_t bts) : bytes(bts), debug(false), scream(false) {
-    program = unique_ptr<viua::internals::types::byte[]>{new viua::internals::types::byte[bytes]};
+    program = make_unique<viua::internals::types::byte[]>(bytes);
     /* Filling bytecode with zeroes (which are interpreted by kernel as NOP instructions) is a safe way
      * to prevent many hiccups.
      */
@@ -132,7 +132,7 @@ Program::Program(uint64_t bts) : bytes(bts), debug(false), scream(false) {
     addr_ptr = program.get();
 }
 Program::Program(const Program& that) : program(nullptr), bytes(that.bytes), addr_ptr(nullptr), branches({}) {
-    program.reset(new viua::internals::types::byte[bytes]);
+    program = make_unique<viua::internals::types::byte[]>(bytes);
     for (decltype(bytes) i = 0; i < bytes; ++i) {
         program[i] = that.program[i];
     }
@@ -144,7 +144,7 @@ Program::Program(const Program& that) : program(nullptr), bytes(that.bytes), add
 Program& Program::operator=(const Program& that) {
     if (this != &that) {
         bytes = that.bytes;
-        program.reset(new viua::internals::types::byte[bytes]);
+        program = make_unique<viua::internals::types::byte[]>(bytes);
         for (decltype(bytes) i = 0; i < bytes; ++i) {
             program[i] = that.program[i];
         }

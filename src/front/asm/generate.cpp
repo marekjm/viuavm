@@ -948,7 +948,7 @@ void generate(vector<Token>& tokens, invocables_t& functions, invocables_t& bloc
     // WRITE BYTECODE SIZE
     bwrite(out, bytes);
 
-    unique_ptr<viua::internals::types::byte[]> program_bytecode{new viua::internals::types::byte[bytes]};
+    auto program_bytecode = make_unique<viua::internals::types::byte[]>(bytes);
     viua::internals::types::bytecode_size program_bytecode_used = 0;
 
     ////////////////////////////////////////////////////
