@@ -94,7 +94,7 @@ auto viua::types::Bits::shl(size_type n) -> unique_ptr<Bits> {
 }
 
 auto viua::types::Bits::shr(size_type n, const bool padding) -> unique_ptr<Bits> {
-    auto shifted = unique_ptr<Bits>{new Bits{n}};
+    auto shifted = make_unique<Bits>(n);
 
     if (n >= underlying_array.size()) {
         for (auto i = size_type{0}; i < size(); ++i) {
