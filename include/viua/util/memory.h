@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016 Marek Marecki
+ *  Copyright (C) 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -57,6 +57,11 @@ namespace viua {
                     delete_if_owned();
                     owns_pointer = true;
                     pointer = ptr.release();
+                }
+
+                auto operator=(std::unique_ptr<T> ptr) -> maybe_unique_ptr& {
+                    reset(std::move(ptr));
+                    return *this;
                 }
 
                 auto get() -> T* { return pointer; }
