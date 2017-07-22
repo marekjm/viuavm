@@ -55,7 +55,7 @@ unique_ptr<viua::types::Value> viua::types::Reference::copy() const {
 }
 
 viua::types::Reference::Reference(viua::types::Value* ptr)
-    : pointer(new viua::types::Value*(ptr)), counter(new uint64_t(1)) {}
+    : pointer(new viua::types::Value*(ptr)), counter(new uint64_t{1}) {}
 viua::types::Reference::Reference(Value** ptr, uint64_t* ctr) : pointer(ptr), counter(ctr) {}
 viua::types::Reference::~Reference() {
     /** Copies of the reference may be freely spawned and destroyed, but
