@@ -119,7 +119,7 @@ viua::internals::types::byte* viua::process::Process::opjoin(viua::internals::ty
                (waiting_until < std::chrono::steady_clock::now())) {
         timeout_active = false;
         wait_until_infinity = false;
-        stack->thrown.reset(new viua::types::Exception("process did not join"));
+        stack->thrown = make_unique<viua::types::Exception>("process did not join");
         return_addr = addr;
     }
 
@@ -188,7 +188,7 @@ viua::internals::types::byte* viua::process::Process::opreceive(viua::internals:
             (waiting_until < std::chrono::steady_clock::now())) {
             timeout_active = false;
             wait_until_infinity = false;
-            stack->thrown.reset(new viua::types::Exception("no message received"));
+            stack->thrown = make_unique<viua::types::Exception>("no message received");
             return_addr = addr;
         }
     }

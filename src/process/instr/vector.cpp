@@ -59,7 +59,7 @@ viua::internals::types::byte* viua::process::Process::opvec(viua::internals::typ
         }
     }
 
-    unique_ptr<viua::types::Vector> v(new viua::types::Vector());
+    auto v = make_unique<viua::types::Vector>();
     for (decltype(pack_size) i = 0; i < pack_size; ++i) {
         v->push(register_at(pack_start_ri + i, pack_start_rs)->give());
     }
