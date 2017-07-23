@@ -34,6 +34,13 @@ There are several categories of change:
 - feature: setting `VIUA_DISASM_INVALID_RS_TYPES` environment variable to `yes` will make the disassembler
   output unknown register set types instead of aborting; this may be useful if the binary that needs to
   be disassembled is somewhat damaged, but the disassembler will not try too hard anyway
+- fix: fixed unalidnes stores and loads in bytecode module loader (important at runtime), program and
+  bytecode generators, and assembler frontend
+- fix: the `if` instruction supports specifying register set specifiers for its source operand
+- enhancement: moved to C++14's `make_unique`, making the VM core less likely to contain leaks
+- fix: disassembler correctly outputs register set specifiers for `if`, `streq`, `insert`, and
+  `remove` instructions
+- feature: disassemler outputs per-instruction offsets when `--debug` flag is in effect
 
 
 ----
