@@ -320,14 +320,6 @@ def runTestBackend(self, name, expected_output=None, expected_exit_code = 0, out
         assemble(disasm_path, compiled_disasm_path)
     else:
         assemble(disasm_path, compiled_disasm_path, opts=assembly_opts)
-    if not FLAG_TEST_ONLY_ASSEMBLING:
-        dis_excode, dis_output, dis_error = run(compiled_disasm_path, expected_exit_code, pipe_error = (expected_error is not None))
-        if custom_assert is not None:
-            custom_assert(self, dis_excode, (dis_output.strip() if output_processing_function is None else output_processing_function(dis_output)))
-        else:
-            if expected_output is not None: self.assertEqual(got_output, (dis_output.strip() if output_processing_function is None else output_processing_function(dis_output)))
-            if expected_error is not None: self.assertEqual(got_error, (dis_error.strip() if error_processing_function is None else error_processing_function(dis_error)))
-            self.assertEqual(excode, dis_excode)
 
     source_assembly_output = b''
     disasm_assembly_output = b''
@@ -336,6 +328,15 @@ def runTestBackend(self, name, expected_output=None, expected_exit_code = 0, out
     with open(compiled_disasm_path, 'rb') as ifstream:
         disasm_assembly_output = ifstream.read()
     self.assertEqual(hashlib.sha512(source_assembly_output).hexdigest(), hashlib.sha512(disasm_assembly_output).hexdigest())
+
+    if not FLAG_TEST_ONLY_ASSEMBLING:
+        dis_excode, dis_output, dis_error = run(compiled_disasm_path, expected_exit_code, pipe_error = (expected_error is not None))
+        if custom_assert is not None:
+            custom_assert(self, dis_excode, (dis_output.strip() if output_processing_function is None else output_processing_function(dis_output)))
+        else:
+            if expected_output is not None: self.assertEqual(got_output, (dis_output.strip() if output_processing_function is None else output_processing_function(dis_output)))
+            if expected_error is not None: self.assertEqual(got_error, (dis_error.strip() if error_processing_function is None else error_processing_function(dis_error)))
+            self.assertEqual(excode, dis_excode)
 
 measured_run_times = []
 def runTest(self, name, expected_output=None, expected_exit_code = 0, output_processing_function = None, expected_error=None, error_processing_function=None, check_memory_leaks = True, custom_assert=None, assembly_opts=None, valgrind_enable=True, test_disasm=True):
