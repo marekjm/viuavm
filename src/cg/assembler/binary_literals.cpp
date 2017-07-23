@@ -24,6 +24,11 @@ using namespace std;
 auto assembler::operands::normalise_binary_literal(const string s) -> string {
     ostringstream oss;
 
+    if (s.size() == 0) {
+        // FIXME create InternalError class
+        throw("internal error: invalid binary literal: cannot normalise empty string");
+    }
+
     if (s.size() > 2 and s.at(1) == 'b') {
         // FIXME create InternalError class
         throw("internal error: invalid binary literal: cannot normalise literals with '0b' prefix: " + s);
@@ -43,7 +48,7 @@ static auto strip_leading_zeroes(const string s) -> string {
     while (leading_zeroes < s.size() and s.at(leading_zeroes) == '0') {
         ++leading_zeroes;
     }
-    return s.substr(leading_zeroes);
+    return (leading_zeroes < s.size() ? s.substr(leading_zeroes) : "0");
 }
 auto assembler::operands::octal_to_binary_literal(const string s) -> string {
     ostringstream oss;
