@@ -40,7 +40,14 @@ string viua::types::Bits::str() const {
     return oss.str();
 }
 
-bool viua::types::Bits::boolean() const { return false; }
+bool viua::types::Bits::boolean() const {
+    for (const auto i : underlying_array) {
+        if (i) {
+            return true;
+        }
+    }
+    return false;
+}
 
 unique_ptr<viua::types::Value> viua::types::Bits::copy() const { return make_unique<Bits>(underlying_array); }
 

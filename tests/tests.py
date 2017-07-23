@@ -657,6 +657,9 @@ class BitsManipulationTests(unittest.TestCase):
     def testHelloWorld(self):
         runTest(self, 'hello_world.asm', '00000000')
 
+    def testBitsInBooleanContext(self):
+        runTest(self, 'bits_in_boolean_context.asm', 'OH YEAH')
+
     def testBitnot(self):
         runTestSplitlines(self, 'bitnot.asm', ['00000000', '11111111'])
 
