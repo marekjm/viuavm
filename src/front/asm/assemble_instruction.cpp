@@ -972,21 +972,23 @@ viua::internals::types::bytecode_size assemble_instruction(
          *
          *      * third operands is the address to which to jump if register is false,
          */
-        // FIXME jump indexes
-        Token condition = tokens.at(i + 1), if_true = tokens.at(i + 2), if_false = tokens.at(i + 3);
+        Token condition = tokens.at(i + 1);
+        Token if_true = tokens.at(i + 3);
+        Token if_false = tokens.at(i + 4);
 
         viua::internals::types::bytecode_size addrt_target, addrf_target;
         enum JUMPTYPE addrt_jump_type, addrf_jump_type;
-        tie(addrt_target, addrt_jump_type) = resolvejump(tokens.at(i + 2), marks, instruction);
+        tie(addrt_target, addrt_jump_type) = resolvejump(tokens.at(i + 3), marks, instruction);
         if (if_false != "\n") {
-            tie(addrf_target, addrf_jump_type) = resolvejump(tokens.at(i + 3), marks, instruction);
+            tie(addrf_target, addrf_jump_type) = resolvejump(tokens.at(i + 4), marks, instruction);
         } else {
             addrf_jump_type = JMP_RELATIVE;
             addrf_target = instruction + 1;
         }
 
-        program.opif(assembler::operands::getint(resolveregister(condition)), addrt_target, addrt_jump_type,
-                     addrf_target, addrf_jump_type);
+        program.opif(assembler::operands::getint_with_rs_type(resolveregister(condition),
+                                                              resolve_rs_type(tokens.at(i + 2))),
+                     addrt_target, addrt_jump_type, addrf_target, addrf_jump_type);
     } else if (tokens.at(i) == "jump") {
         /*  Jump instruction can be written in two forms:
          *

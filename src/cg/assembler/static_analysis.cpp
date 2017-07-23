@@ -540,6 +540,8 @@ static void check_block_body(const TokenVector& body_tokens, TokenVector::size_t
         } else if (token == "if") {
             ++i;
             TokenIndex source = i;
+            ++i;  // for register set type specifier
+
             check_use_of_register(body_tokens, source, i - 1, registers, named_registers,
                                   "branch depends on empty register");
 

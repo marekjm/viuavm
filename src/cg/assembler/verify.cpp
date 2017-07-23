@@ -840,8 +840,8 @@ void assembler::verify::jumpsAreInRange(const vector<viua::cg::lex::Token>& toke
             validate_jump(tokens.at(i + 1), tokens.at(i + 1), function_instruction_counter, forward_jumps,
                           deferred_marker_jumps, jump_targets);
         } else if (mnemonic == "if") {
-            Token when_true = tokens.at(i + 2);
-            Token when_false = tokens.at(i + 3);
+            Token when_true = tokens.at(i + 3);
+            Token when_false = tokens.at(i + 4);
 
             validate_jump(when_true, when_true, function_instruction_counter, forward_jumps,
                           deferred_marker_jumps, jump_targets);

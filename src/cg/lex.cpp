@@ -866,6 +866,12 @@ namespace viua {
                         }
 
                         tokens.push_back(input_tokens.at(++i));  // checked register
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(), "current");
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                        }
+
                         if (input_tokens.at(i + 1) == "\n") {
                             throw viua::cg::lex::InvalidSyntax(token, "branch without a target");
                         }
