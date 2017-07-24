@@ -413,6 +413,7 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(
         case SELF:
         case ARGC:
         case STRUCT:
+        case FIXEDINCREMENT:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             break;
         case BOOL:
