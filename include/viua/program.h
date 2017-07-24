@@ -126,6 +126,8 @@ class Program {
     Program& oprol(int_op, int_op);
     Program& opror(int_op, int_op);
 
+    Program& opfixedincrement(int_op);
+
     Program& opmove(int_op, int_op);
     Program& opcopy(int_op, int_op);
     Program& opptr(int_op, int_op);

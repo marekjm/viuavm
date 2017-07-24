@@ -315,6 +315,11 @@ Program& Program::opror(int_op target, int_op count) {
     return (*this);
 }
 
+Program& Program::opfixedincrement(int_op target) {
+    addr_ptr = cg::bytecode::opfixedincrement(addr_ptr, target);
+    return (*this);
+}
+
 Program& Program::opmove(int_op a, int_op b) {
     /*  Inserts move instruction to bytecode.
      *
