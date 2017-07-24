@@ -140,6 +140,11 @@ enum OPCODE : viua::internals::types::byte {
     ROL,
     ROR,
 
+    /*
+     * Math on bits.
+     */
+    FIXEDINCREMENT,
+
     // register manipulation
     MOVE,    // move an object from one register to another
     COPY,    // copy an object from one register to another
