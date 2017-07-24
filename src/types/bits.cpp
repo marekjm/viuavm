@@ -172,6 +172,24 @@ auto viua::types::Bits::inverted() const -> unique_ptr<Bits> {
     return result;
 }
 
+auto viua::types::Bits::increment() -> bool {
+    bool carry = true;
+
+    for (auto i = size_type{0}; carry and i < size(); ++i) {
+        if (at(i)) {
+            set(i, false);
+            continue;
+        }
+        if (not at(i)) {
+            set(i, true);
+            carry = false;
+            continue;
+        }
+    }
+
+    return carry;
+}
+
 template<typename T>
 static auto perform_bitwise_logic(const viua::types::Bits& lhs, const viua::types::Bits& rhs)
     -> unique_ptr<viua::types::Bits> {
