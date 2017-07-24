@@ -245,6 +245,9 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case ROR:
             addr = opror(addr + 1);
             break;
+        case FIXEDINCREMENT:
+            addr = opfixedincrement(addr + 1);
+            break;
         case MOVE:
             addr = opmove(addr + 1);
             break;

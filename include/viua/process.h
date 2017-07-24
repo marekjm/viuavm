@@ -329,6 +329,8 @@ namespace viua {
             viua::internals::types::byte* oprol(viua::internals::types::byte*);
             viua::internals::types::byte* opror(viua::internals::types::byte*);
 
+            viua::internals::types::byte* opfixedincrement(viua::internals::types::byte*);
+
             viua::internals::types::byte* opmove(viua::internals::types::byte*);
             viua::internals::types::byte* opcopy(viua::internals::types::byte*);
             viua::internals::types::byte* opptr(viua::internals::types::byte*);
