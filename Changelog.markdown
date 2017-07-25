@@ -41,6 +41,7 @@ There are several categories of change:
 - fix: disassembler correctly outputs register set specifiers for `if`, `streq`, `insert`, and
   `remove` instructions
 - feature: disassemler outputs per-instruction offsets when `--debug` flag is in effect
+- feature: `fixedincrement`, `fixedadd` instructions for arithmetic on fixed-width integers
 
 
 ----
