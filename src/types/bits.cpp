@@ -190,6 +190,9 @@ auto viua::types::Bits::increment() -> bool {
     return carry;
 }
 
+/*
+ * Here's a cool resource of binary arithemtic: https://www.cs.cornell.edu/~tomf/notes/cps104/twoscomp.html
+ */
 auto viua::types::Bits::fixedadd(const Bits& that) const -> unique_ptr<Bits> {
     auto result = make_unique<Bits>(size());
     bool carry = false;
