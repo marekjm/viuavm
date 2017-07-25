@@ -56,6 +56,8 @@ namespace viua {
 
             auto increment() -> bool;
 
+            auto fixedadd(const Bits&) const -> std::unique_ptr<Bits>;
+
             auto operator&(const Bits&)const -> std::unique_ptr<Bits>;
             auto operator|(const Bits&) const -> std::unique_ptr<Bits>;
             auto operator^(const Bits&) const -> std::unique_ptr<Bits>;

@@ -190,6 +190,68 @@ auto viua::types::Bits::increment() -> bool {
     return carry;
 }
 
+auto viua::types::Bits::fixedadd(const Bits& that) const -> unique_ptr<Bits> {
+    auto result = make_unique<Bits>(size());
+    bool carry = false;
+
+    for (auto i = size_type{0}; i < size(); ++i) {
+        const auto from_that = (i < that.size() ? that.at(i) : false);
+
+        /*
+         * lhs + rhs -> 0 + 0 -> 0
+         *
+         * This is the easy case.
+         * Everything is zero, so we just carry the carry into the result at
+         * the current position, and reset the carry flag to zero (it was consumed).
+         */
+        if ((not from_that) and (not at(i))) {
+            result->set(i, carry);
+            carry = false;
+            continue;
+        }
+
+        /*
+         * lhs + rhs -> 1 + 1 -> 10
+         *
+         * This gives us a zero on current position, and
+         * carry flag in the enabled state.
+         *
+         * If carry was enabled before we have 0 + 1 = 1, so we should
+         * enable bit on current position in the result.
+         * If carry was not enabled we have 0 + 0, so we should
+         * obviously leave the bit disabled in the result.
+         * This means that we can just copy state of the carry flag into
+         * the result bit string on current position.
+         */
+        if (from_that and at(i)) {
+            result->set(i, carry);
+            carry = true;
+            continue;
+        }
+
+        /*
+         * At this point either the lhs or rhs is enabled, but not both.
+         * So if the carry bit is enabled this gives us 1 + 1 = 10, so
+         * zero should be put in result on the current position, and
+         * carry flag should be enabled.
+         */
+        if (carry) {
+            continue;
+        }
+
+        /*
+         * All other cases.
+         * Either lhs or rhs is enabled, and carry is not.
+         * So this is the 0 + 1 = 1 case.
+         * Easy.
+         * Just enable the bit in the result.
+         */
+        result->set(i, true);
+    }
+
+    return result;
+}
+
 template<typename T>
 static auto perform_bitwise_logic(const viua::types::Bits& lhs, const viua::types::Bits& rhs)
     -> unique_ptr<viua::types::Bits> {
