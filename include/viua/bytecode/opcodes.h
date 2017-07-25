@@ -144,6 +144,7 @@ enum OPCODE : viua::internals::types::byte {
      * Math on bits.
      */
     FIXEDINCREMENT,
+    FIXEDADD,
 
     // register manipulation
     MOVE,    // move an object from one register to another
