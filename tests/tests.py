@@ -732,6 +732,13 @@ class BitsManipulationTests(unittest.TestCase):
         ])
 
 
+class BitsArithmeticTests(unittest.TestCase):
+    PATH = './sample/asm/bits/arithmetic'
+
+    def testAddition(self):
+        runTest(self, 'addition.asm', '00001010')
+
+
 class VectorInstructionsTests(unittest.TestCase):
     """Tests for vector-related instructions.
 
