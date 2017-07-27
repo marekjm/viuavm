@@ -437,6 +437,12 @@ namespace cg {
             return insert_ri_operand(addr_ptr, target);
         }
 
+        viua::internals::types::byte* opfixeddecrement(viua::internals::types::byte* addr_ptr,
+                                                       int_op target) {
+            *(addr_ptr++) = FIXEDDECREMENT;
+            return insert_ri_operand(addr_ptr, target);
+        }
+
         viua::internals::types::byte* opfixedadd(viua::internals::types::byte* addr_ptr, int_op target,
                                                  int_op lhs, int_op rhs) {
             return insert_three_ri_instruction(addr_ptr, FIXEDADD, target, lhs, rhs);

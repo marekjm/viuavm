@@ -642,6 +642,10 @@ namespace viua {
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_one_ri_operand(tokens, i);
             }
+            static auto size_of_fixeddecrement(const TokenVector& tokens, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                return size_of_instruction_with_one_ri_operand(tokens, i);
+            }
             static auto size_of_fixedadd(const TokenVector& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
                 return size_of_instruction_with_three_ri_operands_with_rs_types(tokens, i);
@@ -1367,6 +1371,9 @@ namespace viua {
                     } else if (tokens.at(i) == "fixedincrement") {
                         ++i;
                         tie(increase, i) = size_of_fixedincrement(tokens, i);
+                    } else if (tokens.at(i) == "fixeddecrement") {
+                        ++i;
+                        tie(increase, i) = size_of_fixeddecrement(tokens, i);
                     } else if (tokens.at(i) == "fixedadd") {
                         ++i;
                         tie(increase, i) = size_of_fixedadd(tokens, i);

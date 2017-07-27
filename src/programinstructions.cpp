@@ -320,6 +320,11 @@ Program& Program::opfixedincrement(int_op target) {
     return (*this);
 }
 
+Program& Program::opfixeddecrement(int_op target) {
+    addr_ptr = cg::bytecode::opfixeddecrement(addr_ptr, target);
+    return (*this);
+}
+
 Program& Program::opfixedadd(int_op target, int_op lhs, int_op rhs) {
     addr_ptr = cg::bytecode::opfixedadd(addr_ptr, target, lhs, rhs);
     return (*this);
