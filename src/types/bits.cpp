@@ -212,16 +212,18 @@ auto viua::types::Bits::decrement() -> bool {
  * Here's a cool resource of binary arithemtic: https://www.cs.cornell.edu/~tomf/notes/cps104/twoscomp.html
  */
 static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs) -> vector<bool> {
+    auto size_of_result{std::max(lhs.size(), rhs.size())};
     vector<bool> result;
-    result.reserve(lhs.size());
-    for (auto i = decltype(result)::size_type{0}; i < lhs.size(); ++i) {
+    result.reserve(size_of_result);
+    for (auto i = decltype(size_of_result){0}; i < size_of_result; ++i) {
         result.push_back(false);
     }
 
     bool carry = false;
 
-    for (auto i = decltype(result)::size_type{0}; i < lhs.size(); ++i) {
-        const auto from_that = (i < rhs.size() ? rhs.at(i) : false);
+    for (auto i = decltype(size_of_result){0}; i < size_of_result; ++i) {
+        const auto from_lhs = (i < lhs.size() ? lhs.at(i) : false);
+        const auto from_rhs = (i < rhs.size() ? rhs.at(i) : false);
 
         /*
          * lhs + rhs -> 0 + 0 -> 0
@@ -230,7 +232,7 @@ static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs) ->
          * Everything is zero, so we just carry the carry into the result at
          * the current position, and reset the carry flag to zero (it was consumed).
          */
-        if ((not from_that) and (not lhs.at(i))) {
+        if ((not from_rhs) and (not from_lhs)) {
             result.at(i) = carry;
             carry = false;
             continue;
@@ -249,7 +251,7 @@ static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs) ->
          * This means that we can just copy state of the carry flag into
          * the result bit string on current position.
          */
-        if (from_that and lhs.at(i)) {
+        if (from_rhs and from_lhs) {
             result.at(i) = carry;
             carry = true;
             continue;
