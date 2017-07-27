@@ -738,6 +738,12 @@ class BitsArithmeticTests(unittest.TestCase):
     def testAddition(self):
         runTest(self, 'addition.asm', '00001010')
 
+    def testAdditionCuts(self):
+        runTest(self, 'addition_cuts_to_width_of_lhs.asm', '00001010')
+
+    def testAdditionExtends(self):
+        runTest(self, 'addition_extends_to_width_of_lhs.asm', '1111111100001010')
+
     def testIncrement(self):
         runTest(self, 'increment.asm', '10001100')
 

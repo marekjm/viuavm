@@ -211,8 +211,10 @@ auto viua::types::Bits::decrement() -> bool {
 /*
  * Here's a cool resource of binary arithemtic: https://www.cs.cornell.edu/~tomf/notes/cps104/twoscomp.html
  */
-static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs) -> vector<bool> {
-    auto size_of_result{std::max(lhs.size(), rhs.size())};
+static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs,
+                            const std::remove_reference_t<decltype(lhs)>::size_type size_of_result)
+    -> vector<bool> {
+    /* auto size_of_result{std::max(lhs.size(), rhs.size())}; */
     vector<bool> result;
     result.reserve(size_of_result);
     for (auto i = decltype(size_of_result){0}; i < size_of_result; ++i) {
@@ -279,8 +281,12 @@ static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs) ->
 
     return result;
 }
+[[maybe_unused]] static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs)
+    -> vector<bool> {
+    return binary_addition(lhs, rhs, std::max(lhs.size(), rhs.size()));
+}
 auto viua::types::Bits::fixedadd(const Bits& that) const -> unique_ptr<Bits> {
-    return make_unique<Bits>(binary_addition(underlying_array, that.underlying_array));
+    return make_unique<Bits>(binary_addition(underlying_array, that.underlying_array, size()));
 }
 
 template<typename T>
