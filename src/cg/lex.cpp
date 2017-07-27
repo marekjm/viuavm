@@ -944,7 +944,7 @@ namespace viua {
                     } else if (token == "izero" or token == "print" or token == "argc" or token == "echo" or
                                token == "delete" or token == "draw" or token == "throw" or token == "iinc" or
                                token == "idec" or token == "self" or token == "struct" or
-                               token == "fixedincrement") {
+                               token == "fixedincrement" or token == "fixeddecrement") {
                         tokens.push_back(token);                 // mnemonic
                         tokens.push_back(input_tokens.at(++i));  // target register
                         if (input_tokens.at(i + 1) == "\n") {
