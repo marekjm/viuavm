@@ -41,7 +41,13 @@ There are several categories of change:
 - fix: disassembler correctly outputs register set specifiers for `if`, `streq`, `insert`, and
   `remove` instructions
 - feature: disassemler outputs per-instruction offsets when `--debug` flag is in effect
-- feature: `fixedincrement`, `fixedadd` instructions for arithmetic on fixed-width integers
+- feature: `fixedincrement` and`fixeddecrement` instructions for fixed-width integers/bit strings
+- feature: `fixedadd` instructions for arithmetic on fixed-width integers
+
+Fixed-width arithmetic instructions interpret bit strings as two's complement fixed-width integers when
+signed arithmetic is requested.
+Arithmetic *always* wraps when the result is out-of-range.
+Increment and decrement have no concept of signedness and treat all values as unsigned.
 
 
 ----
