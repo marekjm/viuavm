@@ -95,6 +95,7 @@ const std::set<std::string> OP_MNEMONICS = {
     "ror",
 
     "fixedincrement",
+    "fixeddecrement",
     "fixedadd",
 
     "move",
@@ -230,6 +231,7 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     {ROR, "ror"},
 
     {FIXEDINCREMENT, "fixedincrement"},
+    {FIXEDDECREMENT, "fixeddecrement"},
     {FIXEDADD, "fixedadd"},
 
     {MOVE, "move"},
