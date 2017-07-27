@@ -738,6 +738,18 @@ class BitsArithmeticTests(unittest.TestCase):
     def testAddition(self):
         runTest(self, 'addition.asm', '00001010')
 
+    def testIncrement(self):
+        runTest(self, 'increment.asm', '10001100')
+
+    def testIncrementWrapsToAllZeroes(self):
+        runTest(self, 'increment_wraps_to_all_zeroes.asm', '00000000')
+
+    def testDecrement(self):
+        runTestSplitlines(self, 'decrement.asm', ['10001010', '10000011'])
+
+    def testDecrementWrapsToAllOnes(self):
+        runTest(self, 'decrement_wraps_to_all_ones.asm', '11111111')
+
 
 class VectorInstructionsTests(unittest.TestCase):
     """Tests for vector-related instructions.
