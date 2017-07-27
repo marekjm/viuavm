@@ -248,6 +248,9 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
         case FIXEDINCREMENT:
             addr = opfixedincrement(addr + 1);
             break;
+        case FIXEDDECREMENT:
+            addr = opfixeddecrement(addr + 1);
+            break;
         case FIXEDADD:
             addr = opfixedadd(addr + 1);
             break;

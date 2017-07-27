@@ -330,6 +330,7 @@ namespace viua {
             viua::internals::types::byte* opror(viua::internals::types::byte*);
 
             viua::internals::types::byte* opfixedincrement(viua::internals::types::byte*);
+            viua::internals::types::byte* opfixeddecrement(viua::internals::types::byte*);
             viua::internals::types::byte* opfixedadd(viua::internals::types::byte*);
 
             viua::internals::types::byte* opmove(viua::internals::types::byte*);

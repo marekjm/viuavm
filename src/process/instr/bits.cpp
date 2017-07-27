@@ -242,6 +242,16 @@ viua::internals::types::byte* viua::process::Process::opfixedincrement(viua::int
 }
 
 
+viua::internals::types::byte* viua::process::Process::opfixeddecrement(viua::internals::types::byte* addr) {
+    viua::types::Bits* target{nullptr};
+    tie(addr, target) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
+
+    target->decrement();
+
+    return addr;
+}
+
+
 viua::internals::types::byte* viua::process::Process::opfixedadd(viua::internals::types::byte* addr) {
     viua::kernel::Register* target = nullptr;
     tie(addr, target) = viua::bytecode::decoder::operands::fetch_register(addr, this);
