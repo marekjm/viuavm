@@ -55,6 +55,7 @@ namespace viua {
             auto inverted() const -> std::unique_ptr<Bits>;
 
             auto increment() -> bool;
+            auto decrement() -> bool;
 
             auto fixedadd(const Bits&) const -> std::unique_ptr<Bits>;
 

@@ -190,6 +190,24 @@ auto viua::types::Bits::increment() -> bool {
     return carry;
 }
 
+auto viua::types::Bits::decrement() -> bool {
+    bool borrow = false;
+
+    for (auto i = size_type{0}; i < size(); ++i) {
+        if (at(i)) {
+            set(i, false);
+            borrow = false;
+            break;
+        }
+        if (not at(i)) {
+            set(i, true);
+            borrow = true;
+        }
+    }
+
+    return borrow;
+}
+
 /*
  * Here's a cool resource of binary arithemtic: https://www.cs.cornell.edu/~tomf/notes/cps104/twoscomp.html
  */
