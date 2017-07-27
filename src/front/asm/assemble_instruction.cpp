@@ -691,6 +691,11 @@ viua::internals::types::bytecode_size assemble_instruction(
 
         program.opfixedincrement(assembler::operands::getint_with_rs_type(
             resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target + 1))));
+    } else if (tokens.at(i) == "fixeddecrement") {
+        TokenIndex target = i + 1;
+
+        program.opfixeddecrement(assembler::operands::getint_with_rs_type(
+            resolveregister(tokens.at(target)), resolve_rs_type(tokens.at(target + 1))));
     } else if (tokens.at(i) == "fixedadd") {
         TokenIndex target = i + 1;
         TokenIndex lhs = target + 2;
