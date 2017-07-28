@@ -129,6 +129,7 @@ class Program {
     Program& opfixedincrement(int_op);
     Program& opfixeddecrement(int_op);
     Program& opfixedadd(int_op, int_op, int_op);
+    Program& opfixedmul(int_op, int_op, int_op);
 
     Program& opmove(int_op, int_op);
     Program& opcopy(int_op, int_op);

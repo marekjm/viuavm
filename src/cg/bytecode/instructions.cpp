@@ -448,6 +448,11 @@ namespace cg {
             return insert_three_ri_instruction(addr_ptr, FIXEDADD, target, lhs, rhs);
         }
 
+        viua::internals::types::byte* opfixedmul(viua::internals::types::byte* addr_ptr, int_op target,
+                                                 int_op lhs, int_op rhs) {
+            return insert_three_ri_instruction(addr_ptr, FIXEDMUL, target, lhs, rhs);
+        }
+
 
         viua::internals::types::byte* opmove(viua::internals::types::byte* addr_ptr, int_op a, int_op b) {
             return insert_two_ri_instruction(addr_ptr, MOVE, a, b);

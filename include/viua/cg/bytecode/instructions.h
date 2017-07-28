@@ -134,6 +134,7 @@ namespace cg {
         viua::internals::types::byte* opfixedincrement(viua::internals::types::byte*, int_op);
         viua::internals::types::byte* opfixeddecrement(viua::internals::types::byte*, int_op);
         viua::internals::types::byte* opfixedadd(viua::internals::types::byte*, int_op, int_op, int_op);
+        viua::internals::types::byte* opfixedmul(viua::internals::types::byte*, int_op, int_op, int_op);
 
         viua::internals::types::byte* opmove(viua::internals::types::byte*, int_op, int_op);
         viua::internals::types::byte* opcopy(viua::internals::types::byte*, int_op, int_op);
