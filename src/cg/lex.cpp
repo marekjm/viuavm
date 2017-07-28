@@ -615,7 +615,7 @@ namespace viua {
                         }
                     } else if (token == "add" or token == "sub" or token == "mul" or token == "div" or
                                token == "lt" or token == "lte" or token == "gt" or token == "gte" or
-                               token == "eq" or token == "fixedadd") {
+                               token == "eq" or token == "fixedadd" or token == "fixedmul") {
                         tokens.push_back(token);  // mnemonic
 
                         tokens.push_back(input_tokens.at(++i));  // target register
