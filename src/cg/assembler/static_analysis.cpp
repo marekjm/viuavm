@@ -810,7 +810,7 @@ static void check_block_body(const TokenVector& body_tokens, TokenVector::size_t
             continue;
         } else if (token == "add" or token == "sub" or token == "mul" or token == "div" or token == "lt" or
                    token == "lte" or token == "gt" or token == "gte" or token == "eq" or
-                   token == "fixedadd") {
+                   token == "fixedadd" or token == "fixedmul") {
             ++i;  // skip mnemonic token
 
             TokenIndex target = i;
