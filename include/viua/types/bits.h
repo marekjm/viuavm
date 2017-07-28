@@ -58,6 +58,7 @@ namespace viua {
             auto decrement() -> bool;
 
             auto fixedadd(const Bits&) const -> std::unique_ptr<Bits>;
+            auto fixedmul(const Bits&) const -> std::unique_ptr<Bits>;
 
             auto operator&(const Bits&)const -> std::unique_ptr<Bits>;
             auto operator|(const Bits&) const -> std::unique_ptr<Bits>;
