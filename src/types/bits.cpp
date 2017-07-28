@@ -281,10 +281,6 @@ static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs,
 
     return result;
 }
-[[maybe_unused]] static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs)
-    -> vector<bool> {
-    return binary_addition(lhs, rhs, std::max(lhs.size(), rhs.size()));
-}
 auto viua::types::Bits::fixedadd(const Bits& that) const -> unique_ptr<Bits> {
     return make_unique<Bits>(binary_addition(underlying_array, that.underlying_array, size()));
 }
