@@ -280,9 +280,7 @@ static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs,
 
     return result;
 }
-static auto binary_multiplication(const vector<bool>& lhs, const vector<bool>& rhs,
-                                  const std::remove_reference_t<decltype(lhs)>::size_type size_of_result)
-    -> vector<bool> {
+static auto binary_multiplication(const vector<bool>& lhs, const vector<bool>& rhs) -> vector<bool> {
     vector<vector<bool>> intermediates;
     intermediates.reserve(rhs.size());
 
@@ -292,7 +290,7 @@ static auto binary_multiplication(const vector<bool>& lhs, const vector<bool>& r
      */
     intermediates.emplace_back(lhs.size() + rhs.size());
 
-    for (auto i = decltype(size_of_result){0}; i < rhs.size(); ++i) {
+    for (auto i = std::remove_reference_t<decltype(lhs)>::size_type{0}; i < rhs.size(); ++i) {
         if (not rhs.at(i)) {
             /*
              * Multiplication by 0 just gives a long string of zeroes.
@@ -322,7 +320,7 @@ auto viua::types::Bits::fixedadd(const Bits& that) const -> unique_ptr<Bits> {
     return make_unique<Bits>(binary_addition(underlying_array, that.underlying_array, size()));
 }
 auto viua::types::Bits::fixedmul(const Bits& that) const -> unique_ptr<Bits> {
-    return make_unique<Bits>(binary_multiplication(underlying_array, that.underlying_array, size()));
+    return make_unique<Bits>(binary_multiplication(underlying_array, that.underlying_array));
 }
 
 template<typename T>
