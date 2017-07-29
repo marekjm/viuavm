@@ -218,9 +218,7 @@ static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs,
     -> vector<bool> {
     vector<bool> result;
     result.reserve(size_of_result);
-    for (auto i = decltype(size_of_result){0}; i < size_of_result; ++i) {
-        result.push_back(false);
-    }
+    std::fill_n(std::back_inserter(result), size_of_result, false);
 
     bool carry = false;
 
