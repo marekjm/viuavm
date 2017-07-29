@@ -209,7 +209,7 @@ auto viua::types::Bits::decrement() -> bool {
 }
 
 /*
- * Here's a cool resource of binary arithemtic: https://www.cs.cornell.edu/~tomf/notes/cps104/twoscomp.html
+ * Here's a cool resource for binary arithemtic: https://www.cs.cornell.edu/~tomf/notes/cps104/twoscomp.html
  */
 static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs,
                             const std::remove_reference_t<decltype(lhs)>::size_type size_of_result)
