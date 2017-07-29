@@ -19,6 +19,8 @@
 
 #include <algorithm>
 #include <functional>
+#include <iterator>
+#include <numeric>
 #include <sstream>
 #include <string>
 #include <viua/types/bits.h>
@@ -280,11 +282,49 @@ static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs,
 
     return result;
 }
+static auto binary_multiplication(const vector<bool>& lhs, const vector<bool>& rhs,
+                                  const std::remove_reference_t<decltype(lhs)>::size_type size_of_result)
+    -> vector<bool> {
+    vector<vector<bool>> intermediates;
+    intermediates.reserve(rhs.size());
+
+    /*
+     * Make sure the result is *always* has at least one entry (in case the rhs is all zero bits), and
+     * that the results width is *always* the sum of operands' widths.
+     */
+    intermediates.emplace_back(lhs.size() + rhs.size());
+
+    for (auto i = decltype(size_of_result){0}; i < rhs.size(); ++i) {
+        if (not rhs.at(i)) {
+            /*
+             * Multiplication by 0 just gives a long string of zeroes.
+             * There is no reason to build all these zero-filled bit strings as
+             * they will only slow things down the road when all the intermediate
+             * bit strings are accumulated.
+             */
+            continue;
+        }
+
+        vector<bool> interm;
+
+        interm.reserve(interm.size() + lhs.size());
+        std::fill_n(std::back_inserter(interm), i, false);
+
+        std::copy(lhs.begin(), lhs.end(), std::back_inserter(interm));
+
+        intermediates.emplace_back(std::move(interm));
+    }
+
+    return std::accumulate(intermediates.begin(), intermediates.end(), vector<bool>{},
+                           [](const vector<bool>& l, const vector<bool>& r) -> vector<bool> {
+                               return binary_addition(l, r, std::max(l.size(), r.size()));
+                           });
+}
 auto viua::types::Bits::fixedadd(const Bits& that) const -> unique_ptr<Bits> {
     return make_unique<Bits>(binary_addition(underlying_array, that.underlying_array, size()));
 }
 auto viua::types::Bits::fixedmul(const Bits& that) const -> unique_ptr<Bits> {
-    return make_unique<Bits>(binary_addition(underlying_array, that.underlying_array, size()));
+    return make_unique<Bits>(binary_multiplication(underlying_array, that.underlying_array, size()));
 }
 
 template<typename T>
