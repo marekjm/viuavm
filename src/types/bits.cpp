@@ -214,7 +214,6 @@ auto viua::types::Bits::decrement() -> bool {
 static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs,
                             const std::remove_reference_t<decltype(lhs)>::size_type size_of_result)
     -> vector<bool> {
-    /* auto size_of_result{std::max(lhs.size(), rhs.size())}; */
     vector<bool> result;
     result.reserve(size_of_result);
     for (auto i = decltype(size_of_result){0}; i < size_of_result; ++i) {
