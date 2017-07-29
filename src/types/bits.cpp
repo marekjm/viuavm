@@ -316,11 +316,22 @@ static auto binary_multiplication(const vector<bool>& lhs, const vector<bool>& r
                                return binary_addition(l, r, std::max(l.size(), r.size()));
                            });
 }
+static auto binary_clip(const vector<bool>& bits, std::remove_reference_t<decltype(bits)>::size_type width)
+    -> vector<bool> {
+    vector<bool> result;
+    result.reserve(width);
+    std::fill_n(std::back_inserter(result), width, false);
+
+    std::copy_n(bits.begin(), std::min(bits.size(), width), result.begin());
+
+    return result;
+}
 auto viua::types::Bits::fixedadd(const Bits& that) const -> unique_ptr<Bits> {
     return make_unique<Bits>(binary_addition(underlying_array, that.underlying_array, size()));
 }
 auto viua::types::Bits::fixedmul(const Bits& that) const -> unique_ptr<Bits> {
-    return make_unique<Bits>(binary_multiplication(underlying_array, that.underlying_array));
+    return make_unique<Bits>(
+        binary_clip(binary_multiplication(underlying_array, that.underlying_array), size()));
 }
 
 template<typename T>
