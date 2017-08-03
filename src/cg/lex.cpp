@@ -99,6 +99,16 @@ namespace viua {
             }
 
 
+            bool is_mnemonic(const string& s) {
+                auto is_it = false;
+                for (const auto& each : OP_NAMES) {
+                    if (each.second == s) {
+                        is_it = true;
+                        break;
+                    }
+                }
+                return is_it;
+            }
             bool is_reserved_keyword(const string& s) {
                 static const set<string> reserved_keywords{
                     /*
@@ -157,7 +167,7 @@ namespace viua {
                     "rol",  // rotate left
                     "ror",  // rotate right
                 };
-                return (reserved_keywords.count(s) or OP_MNEMONICS.count(s));
+                return (reserved_keywords.count(s) or is_mnemonic(s));
             }
             void assert_is_not_reserved_keyword(Token token, const string& message) {
                 string s = token.original();

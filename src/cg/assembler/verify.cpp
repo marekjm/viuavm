@@ -524,7 +524,7 @@ void assembler::verify::instructions(const vector<Token>& tokens) {
         if (tokens.at(i).str().at(0) == '.' or tokens.at(i) == "\n") {
             continue;
         }
-        if (OP_MNEMONICS.count(tokens.at(i)) == 0) {
+        if (not viua::cg::lex::is_mnemonic(tokens.at(i))) {
             string message;
 
             if (tokens.at(i) == "(" or tokens.at(i) == ")") {

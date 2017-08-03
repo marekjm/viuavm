@@ -89,6 +89,7 @@ namespace viua {
             };
 
             bool is_reserved_keyword(const std::string&);
+            auto is_mnemonic(const std::string&) -> bool;
             void assert_is_not_reserved_keyword(Token, const std::string&);
 
             std::vector<Token> tokenise(const std::string&);
