@@ -141,6 +141,17 @@ enum OPCODE : viua::internals::types::byte {
     ROR,
 
     /*
+     * Bit string comparison operations.
+     *
+     * The operands do not have to be the same width to be correctly compared.
+     */
+    BITEQ,
+    BITLT,
+    BITLTE,
+    BITGT,
+    BITGTE,
+
+    /*
      * Math on bits.
      */
     FIXEDINCREMENT,
