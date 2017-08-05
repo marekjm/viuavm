@@ -152,7 +152,28 @@ enum OPCODE : viua::internals::types::byte {
     BITGTE,
 
     /*
-     * Math on bits.
+     * Fixed-width, clipping arithmetic operations on bit strings.
+     *
+     * These operations produce results that have the same width
+     * as the left-hand side operand.
+     * For example:
+     *
+     *      fixedmul %result %lhs %rhs
+     *
+     * produces 8 bit wide value in 'result' register if
+     * register 'lhs' contains 8 bit wide value.
+     *
+     * Result values that are outside of range of left-hand side
+     * operand are "clipped", i.e. only N least significant bits
+     * are preserved.
+     * For example, if the left-hand side operand is an 8 bit wide value, and
+     * the result would be 12 bits wide, only the 8 least significat bits
+     * will be put in the result register:
+     *
+     *      101111010010    (full result)
+     *      ----11010010    (removing four most-significant bits)
+     *
+     *          11010010    (final result)
      */
     FIXEDINCREMENT,
     FIXEDDECREMENT,
