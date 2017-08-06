@@ -152,7 +152,7 @@ enum OPCODE : viua::internals::types::byte {
     BITGTE,
 
     /*
-     * Fixed-width, clipping arithmetic operations on bit strings.
+     * Fixed-width, wrap-aroud arithmetic operations on bit strings.
      *
      * These operations produce results that have the same width
      * as the left-hand side operand.
@@ -163,9 +163,12 @@ enum OPCODE : viua::internals::types::byte {
      * produces 8 bit wide value in 'result' register if
      * register 'lhs' contains 8 bit wide value.
      *
-     * Result values that are outside of range of left-hand side
+     * Result values that are out of range of left-hand side
      * operand are "clipped", i.e. only N least significant bits
      * are preserved.
+     * This produces the wrap-around effect; values out of range available
+     * for given bit width are reduced by modulo 2 to n, where 'n' is the
+     * bit width of the left-hand side operand.
      * For example, if the left-hand side operand is an 8 bit wide value, and
      * the result would be 12 bits wide, only the 8 least significat bits
      * will be put in the result register:
