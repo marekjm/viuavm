@@ -28,18 +28,19 @@
 using namespace std;
 
 
-void os_system(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*) {
-    if (frame->args->at(0) == 0) {
+static void os_system(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                      viua::process::Process*, viua::kernel::Kernel*) {
+    if (frame->arguments->at(0) == nullptr) {
         throw new viua::types::Exception("expected command to launch (string) as parameter 0");
     }
-    string command = frame->args->get(0)->str();
+    string command = frame->arguments->get(0)->str();
     int ret = system(command.c_str());
-    frame->regset->set(0, make_unique<Integer>(ret));
+    frame->local_register_set->set(0, make_unique<viua::types::Integer>(ret));
 }
 
 
 const ForeignFunctionSpec functions[] = {
-    {"os::system", &os_system}, {NULL, NULL},
+    {"os::system", &os_system}, {nullptr, nullptr},
 };
 
 extern "C" const ForeignFunctionSpec* exports() { return functions; }

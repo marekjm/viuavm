@@ -22,9 +22,9 @@
 
 #pragma once
 
+#include <functional>
 #include <string>
 #include <vector>
-#include <functional>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
 #include <viua/types/object.h>
@@ -55,24 +55,32 @@ namespace viua {
 
 
 // External functions must have this signature
-typedef void (ForeignFunction)(
-    Frame*,         // call frame; contains parameters, local registers, name of the function etc.
-    viua::kernel::RegisterSet*,   // static register set (may be nullptr)
-    viua::kernel::RegisterSet*,   // global register set (may be nullptr)
-    viua::process::Process*,       // calling process
-    viua::kernel::Kernel*            // VM viua::kernel::Kernel the calling process is running on
-);
+typedef void(ForeignFunction)(
+    Frame*,  // call frame; contains parameters, local registers, name of the function etc.
+    viua::kernel::RegisterSet*,  // static register set (may be nullptr)
+    viua::kernel::RegisterSet*,  // global register set (may be nullptr)
+    viua::process::Process*,     // calling process
+    viua::kernel::Kernel*        // VM viua::kernel::Kernel the calling process is running on
+    );
 
-/** Custom types for Viua VM can be written in C++ and loaded into the typesystem with minimal amount of bookkeeping.
+/** Custom types for Viua VM can be written in C++ and loaded into the typesystem with minimal amount of
+ * bookkeeping.
  *  The only thing Viua needs to use a pure-C++ class is a string-name-to-member-function-pointer mapping as
  *  the machine must be able to somehow dispatch the methods.
- *  One downside this approach has is that all method calls are performed via the vtable which may not be the most
+ *  One downside this approach has is that all method calls are performed via the vtable which may not be the
+ * most
  *  efficient way.
- *  Of course, you can also use the struct-and-a-bunch-of-free-functions strategy, in which case you are more interested
+ *  Of course, you can also use the struct-and-a-bunch-of-free-functions strategy, in which case you are more
+ * interested
  *  in the ForeignFunction typedef defined above.
  */
-typedef void (viua::types::Value::*ForeignMethodMemberPointer)(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*);
-typedef std::function<void(viua::types::Value*, Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*)> ForeignMethod;
+typedef void (viua::types::Value::*ForeignMethodMemberPointer)(Frame*, viua::kernel::RegisterSet*,
+                                                               viua::kernel::RegisterSet*,
+                                                               viua::process::Process*,
+                                                               viua::kernel::Kernel*);
+typedef std::function<void(viua::types::Value*, Frame*, viua::kernel::RegisterSet*,
+                           viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*)>
+    ForeignMethod;
 
 
 /** External modules must export the "exports()" function.
@@ -84,6 +92,9 @@ struct ForeignFunctionSpec {
     const char* name;
     ForeignFunction* fpointer;
 };
+
+
+extern "C" const ForeignFunctionSpec* exports();
 
 
 #endif
