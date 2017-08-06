@@ -30,13 +30,14 @@
 using namespace std;
 
 
-void kitchensink_sleep(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                       viua::process::Process*, viua::kernel::Kernel*) {
-    sleep(dynamic_cast<viua::types::numeric::Number*>(frame->arguments->at(0))->as_integer());
+static void kitchensink_sleep(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                              viua::process::Process*, viua::kernel::Kernel*) {
+    sleep(static_cast<unsigned int>(
+        dynamic_cast<viua::types::numeric::Number*>(frame->arguments->at(0))->as_integer()));
 }
 
 const ForeignFunctionSpec functions[] = {
-    {"std::kitchensink::sleep/1", &kitchensink_sleep}, {NULL, NULL},
+    {"std::kitchensink::sleep/1", &kitchensink_sleep}, {nullptr, nullptr},
 };
 
 extern "C" const ForeignFunctionSpec* exports() { return functions; }

@@ -71,26 +71,26 @@ class Ifstream : public viua::types::Value {
 };
 
 
-void io_stdin_getline(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                      viua::process::Process*, viua::kernel::Kernel*) {
+static void io_stdin_getline(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                             viua::process::Process*, viua::kernel::Kernel*) {
     string line;
     getline(cin, line);
     frame->local_register_set->set(0, make_unique<viua::types::String>(line));
 }
 
-void io_stdout_write(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                     viua::process::Process*, viua::kernel::Kernel*) {
+static void io_stdout_write(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                            viua::process::Process*, viua::kernel::Kernel*) {
     cout << frame->arguments->at(0)->str();
 }
 
-void io_stderr_write(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                     viua::process::Process*, viua::kernel::Kernel*) {
+static void io_stderr_write(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                            viua::process::Process*, viua::kernel::Kernel*) {
     cerr << frame->arguments->at(0)->str();
 }
 
 
-void io_file_read(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                  viua::process::Process*, viua::kernel::Kernel*) {
+static void io_file_read(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                         viua::process::Process*, viua::kernel::Kernel*) {
     string path = frame->arguments->get(0)->str();
     ifstream in(path);
 
@@ -103,20 +103,20 @@ void io_file_read(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Regist
     frame->local_register_set->set(0, make_unique<viua::types::String>(oss.str()));
 }
 
-void io_file_write(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                   viua::process::Process*, viua::kernel::Kernel*) {
+static void io_file_write(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                          viua::process::Process*, viua::kernel::Kernel*) {
     ofstream out(frame->arguments->get(0)->str());
     out << frame->arguments->get(1)->str();
     out.close();
 }
 
-void io_ifstream_open(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                      viua::process::Process*, viua::kernel::Kernel*) {
+static void io_ifstream_open(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                             viua::process::Process*, viua::kernel::Kernel*) {
     frame->local_register_set->set(0, make_unique<Ifstream>(frame->arguments->get(0)->str()));
 }
 
-void io_ifstream_getline(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                         viua::process::Process* p, viua::kernel::Kernel*) {
+static void io_ifstream_getline(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                                viua::process::Process* p, viua::kernel::Kernel*) {
     Ifstream* in =
         dynamic_cast<Ifstream*>(static_cast<viua::types::Pointer*>(frame->arguments->get(0))->to(p));
     frame->local_register_set->set(0, make_unique<viua::types::String>(in->getline()));
