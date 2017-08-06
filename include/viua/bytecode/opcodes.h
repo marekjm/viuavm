@@ -184,6 +184,28 @@ enum OPCODE : viua::internals::types::byte {
     WRAPMUL,
     WRAPDIV,
 
+    /*
+     * Fixed-width, checked arithmetic operations on bit strings.
+     *
+     * These operations produce results that have the same width
+     * as the left-hand-dise operand.
+     * For example:
+     *
+     *      checkedmul %result %lhs %rhs
+     *
+     * produces 8 bit wide value in 'result' register if
+     * register 'lhs' contains 8 bit wide value.
+     *
+     * If any checked operation produces a value that is out of range
+     * for the bit width specified by the left-hand side operand an
+     * exception is thrown.
+     */
+    CHECKEDINCREMENT,
+    CHECKEDDECREMENT,
+    CHECKEDADD,
+    CHECKEDMUL,
+    CHECKEDDIV,
+
     // register manipulation
     MOVE,    // move an object from one register to another
     COPY,    // copy an object from one register to another
