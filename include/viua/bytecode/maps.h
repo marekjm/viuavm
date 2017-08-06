@@ -106,6 +106,12 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     {CHECKEDMUL, "checkedmul"},
     {CHECKEDDIV, "checkeddiv"},
 
+    {SATURATINGINCREMENT, "saturatingincrement"},
+    {SATURATINGDECREMENT, "saturatingdecrement"},
+    {SATURATINGADD, "saturatingadd"},
+    {SATURATINGMUL, "saturatingmul"},
+    {SATURATINGDIV, "saturatingdiv"},
+
     {MOVE, "move"},
     {COPY, "copy"},
     {PTR, "ptr"},

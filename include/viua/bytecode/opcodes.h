@@ -206,6 +206,34 @@ enum OPCODE : viua::internals::types::byte {
     CHECKEDMUL,
     CHECKEDDIV,
 
+    /*
+     * Fixed-width, sarurating arithmetic operations on bit strings.
+     *
+     * These operations produce results that have the same width
+     * as the left-hand-dise operand.
+     * For example:
+     *
+     *      checkedmul %result %lhs %rhs
+     *
+     * produces 8 bit wide value in 'result' register if
+     * register 'lhs' contains 8 bit wide value.
+     *
+     * If any checked operation results in an overflow or underflow
+     * for the bit width specified by the left-hand side operand the value
+     * becomes "saturated".
+     *
+     * For example, using 8 bit wide numbers for simplicity, when 16 is
+     * added to 255 the result is 255 as the value already is at the maximum;
+     * it is already "saturated" and cannot hold any "more" digits.
+     * If 16 is subtracted from 0 (assuming unsigned values) the result is zero
+     * because the value is already at the minimum.
+     */
+    SATURATINGINCREMENT,
+    SATURATINGDECREMENT,
+    SATURATINGADD,
+    SATURATINGMUL,
+    SATURATINGDIV,
+
     // register manipulation
     MOVE,    // move an object from one register to another
     COPY,    // copy an object from one register to another
