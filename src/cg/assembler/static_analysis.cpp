@@ -810,7 +810,7 @@ static void check_block_body(const TokenVector& body_tokens, TokenVector::size_t
             continue;
         } else if (token == "add" or token == "sub" or token == "mul" or token == "div" or token == "lt" or
                    token == "lte" or token == "gt" or token == "gte" or token == "eq" or
-                   token == "fixedadd" or token == "fixedmul") {
+                   token == "wrapadd" or token == "wrapmul") {
             ++i;  // skip mnemonic token
 
             TokenIndex target = i;
@@ -866,8 +866,8 @@ static void check_block_body(const TokenVector& body_tokens, TokenVector::size_t
             }
 
             i = skip_till_next_line(body_tokens, i);
-        } else if (token == "iinc" or token == "idec" or token == "fixedincrement" or
-                   token == "fixeddecrement") {
+        } else if (token == "iinc" or token == "idec" or token == "wrapincrement" or
+                   token == "wrapdecrement") {
             // skip mnemonic
             ++i;
             check_use_of_register(body_tokens, i, i - 1, registers, named_registers, "use of empty register");

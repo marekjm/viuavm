@@ -262,7 +262,7 @@ viua::internals::types::byte* viua::process::Process::opfixedadd(viua::internals
     viua::types::Bits* rhs = nullptr;
     tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
 
-    *target = lhs->fixedadd(*rhs);
+    *target = lhs->wrapadd(*rhs);
 
     return addr;
 }
@@ -278,7 +278,7 @@ viua::internals::types::byte* viua::process::Process::opfixedmul(viua::internals
     viua::types::Bits* rhs = nullptr;
     tie(addr, rhs) = viua::bytecode::decoder::operands::fetch_object_of<viua::types::Bits>(addr, this);
 
-    *target = lhs->fixedmul(*rhs);
+    *target = lhs->wrapmul(*rhs);
 
     return addr;
 }

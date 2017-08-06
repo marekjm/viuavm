@@ -51,9 +51,9 @@ void viua::front::vm::load_standard_prototypes(viua::kernel::Kernel* kernel) {
     proto_string->attach("String::represent/2", "represent/2");
     proto_string->attach("String::startswith/2", "startswith/2");
     proto_string->attach("String::endswith/2", "endswith/2");
-    proto_string->attach("String::format/", "format/");  // FIXME: fixed-arity, two- and three-parameter
+    proto_string->attach("String::format/", "format/");  // FIXME: wrap-arity, two- and three-parameter
                                                          // versions
-    proto_string->attach("String::substr/", "substr/");  // FIXME: fixed-arity versions (2, 3 and 4
+    proto_string->attach("String::substr/", "substr/");  // FIXME: wrap-arity versions (2, 3 and 4
                                                          // parameters)
     proto_string->attach("String::concatenate/2", "concatenate/2");
     proto_string->attach("String::join/1", "join/1");

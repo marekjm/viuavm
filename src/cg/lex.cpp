@@ -625,7 +625,7 @@ namespace viua {
                         }
                     } else if (token == "add" or token == "sub" or token == "mul" or token == "div" or
                                token == "lt" or token == "lte" or token == "gt" or token == "gte" or
-                               token == "eq" or token == "fixedadd" or token == "fixedmul") {
+                               token == "eq" or token == "wrapadd" or token == "wrapmul") {
                         tokens.push_back(token);  // mnemonic
 
                         tokens.push_back(input_tokens.at(++i));  // target register
@@ -954,7 +954,7 @@ namespace viua {
                     } else if (token == "izero" or token == "print" or token == "argc" or token == "echo" or
                                token == "delete" or token == "draw" or token == "throw" or token == "iinc" or
                                token == "idec" or token == "self" or token == "struct" or
-                               token == "fixedincrement" or token == "fixeddecrement") {
+                               token == "wrapincrement" or token == "wrapdecrement") {
                         tokens.push_back(token);                 // mnemonic
                         tokens.push_back(input_tokens.at(++i));  // target register
                         if (input_tokens.at(i + 1) == "\n") {

@@ -21,7 +21,7 @@
     bits (.name: %iota lhs) local 0x51
     bits (.name: %iota rhs) local 0x6
 
-    fixedmul (.name: %iota result) local %lhs local %rhs local
+    wrapmul (.name: %iota result) local %lhs local %rhs local
     print %result local
 
     izero %0 local

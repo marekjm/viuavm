@@ -158,7 +158,7 @@ enum OPCODE : viua::internals::types::byte {
      * as the left-hand side operand.
      * For example:
      *
-     *      fixedmul %result %lhs %rhs
+     *      wrapmul %result %lhs %rhs
      *
      * produces 8 bit wide value in 'result' register if
      * register 'lhs' contains 8 bit wide value.
@@ -178,11 +178,11 @@ enum OPCODE : viua::internals::types::byte {
      *
      *          11010010    (final result)
      */
-    FIXEDINCREMENT,
-    FIXEDDECREMENT,
-    FIXEDADD,
-    FIXEDMUL,
-    FIXEDDIV,
+    WRAPINCREMENT,
+    WRAPDECREMENT,
+    WRAPADD,
+    WRAPMUL,
+    WRAPDIV,
 
     // register manipulation
     MOVE,    // move an object from one register to another

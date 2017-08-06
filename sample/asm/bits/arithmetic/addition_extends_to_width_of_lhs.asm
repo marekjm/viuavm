@@ -21,7 +21,7 @@
     bits (.name: %iota lhs) local 0xff04
     bits (.name: %iota rhs) local 0x06
 
-    fixedadd (.name: %iota result) local %lhs local %rhs local
+    wrapadd (.name: %iota result) local %lhs local %rhs local
     print %result local
 
     izero %0 local

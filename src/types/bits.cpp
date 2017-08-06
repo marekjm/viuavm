@@ -326,10 +326,10 @@ static auto binary_clip(const vector<bool>& bits, std::remove_reference_t<declty
 
     return result;
 }
-auto viua::types::Bits::fixedadd(const Bits& that) const -> unique_ptr<Bits> {
+auto viua::types::Bits::wrapadd(const Bits& that) const -> unique_ptr<Bits> {
     return make_unique<Bits>(binary_addition(underlying_array, that.underlying_array, size()));
 }
-auto viua::types::Bits::fixedmul(const Bits& that) const -> unique_ptr<Bits> {
+auto viua::types::Bits::wrapmul(const Bits& that) const -> unique_ptr<Bits> {
     return make_unique<Bits>(
         binary_clip(binary_multiplication(underlying_array, that.underlying_array), size()));
 }

@@ -413,8 +413,8 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(
         case SELF:
         case ARGC:
         case STRUCT:
-        case FIXEDINCREMENT:
-        case FIXEDDECREMENT:
+        case WRAPINCREMENT:
+        case WRAPDECREMENT:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             break;
         case BOOL:
@@ -493,8 +493,8 @@ tuple<string, viua::internals::types::bytecode_size> disassembler::instruction(
         case SHR:
         case ASHL:
         case ASHR:
-        case FIXEDADD:
-        case FIXEDMUL:
+        case WRAPADD:
+        case WRAPMUL:
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);
             ptr = disassemble_ri_operand_with_rs_type(oss, ptr);

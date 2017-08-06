@@ -433,24 +433,24 @@ namespace cg {
 
         viua::internals::types::byte* opfixedincrement(viua::internals::types::byte* addr_ptr,
                                                        int_op target) {
-            *(addr_ptr++) = FIXEDINCREMENT;
+            *(addr_ptr++) = WRAPINCREMENT;
             return insert_ri_operand(addr_ptr, target);
         }
 
         viua::internals::types::byte* opfixeddecrement(viua::internals::types::byte* addr_ptr,
                                                        int_op target) {
-            *(addr_ptr++) = FIXEDDECREMENT;
+            *(addr_ptr++) = WRAPDECREMENT;
             return insert_ri_operand(addr_ptr, target);
         }
 
         viua::internals::types::byte* opfixedadd(viua::internals::types::byte* addr_ptr, int_op target,
                                                  int_op lhs, int_op rhs) {
-            return insert_three_ri_instruction(addr_ptr, FIXEDADD, target, lhs, rhs);
+            return insert_three_ri_instruction(addr_ptr, WRAPADD, target, lhs, rhs);
         }
 
         viua::internals::types::byte* opfixedmul(viua::internals::types::byte* addr_ptr, int_op target,
                                                  int_op lhs, int_op rhs) {
-            return insert_three_ri_instruction(addr_ptr, FIXEDMUL, target, lhs, rhs);
+            return insert_three_ri_instruction(addr_ptr, WRAPMUL, target, lhs, rhs);
         }
 
 

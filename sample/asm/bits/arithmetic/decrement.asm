@@ -19,11 +19,11 @@
 
 .function: main/0
     bits (.name: %iota bitstring) local 0b10001011
-    fixeddecrement %bitstring local
+    wrapdecrement %bitstring local
     print %bitstring local
 
     bits %bitstring local 0b10000100
-    fixeddecrement %bitstring local
+    wrapdecrement %bitstring local
     print %bitstring local
 
     izero %0 local

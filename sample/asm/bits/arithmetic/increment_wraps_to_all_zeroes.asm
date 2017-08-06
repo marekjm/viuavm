@@ -19,7 +19,7 @@
 
 .function: main/0
     bits (.name: %iota bitstring) local 0xff
-    fixedincrement %bitstring local
+    wrapincrement %bitstring local
     print %bitstring local
 
     izero %0 local

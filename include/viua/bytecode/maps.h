@@ -94,10 +94,10 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     {ROL, "rol"},
     {ROR, "ror"},
 
-    {FIXEDINCREMENT, "fixedincrement"},
-    {FIXEDDECREMENT, "fixeddecrement"},
-    {FIXEDADD, "fixedadd"},
-    {FIXEDMUL, "fixedmul"},
+    {WRAPINCREMENT, "wrapincrement"},
+    {WRAPDECREMENT, "wrapdecrement"},
+    {WRAPADD, "wrapadd"},
+    {WRAPMUL, "wrapmul"},
 
     {MOVE, "move"},
     {COPY, "copy"},

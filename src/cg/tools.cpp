@@ -1372,16 +1372,16 @@ namespace viua {
                     } else if (tokens.at(i) == "ror") {
                         ++i;
                         tie(increase, i) = size_of_ror(tokens, i);
-                    } else if (tokens.at(i) == "fixedincrement") {
+                    } else if (tokens.at(i) == "wrapincrement") {
                         ++i;
                         tie(increase, i) = size_of_fixedincrement(tokens, i);
-                    } else if (tokens.at(i) == "fixeddecrement") {
+                    } else if (tokens.at(i) == "wrapdecrement") {
                         ++i;
                         tie(increase, i) = size_of_fixeddecrement(tokens, i);
-                    } else if (tokens.at(i) == "fixedadd") {
+                    } else if (tokens.at(i) == "wrapadd") {
                         ++i;
                         tie(increase, i) = size_of_fixedadd(tokens, i);
-                    } else if (tokens.at(i) == "fixedmul") {
+                    } else if (tokens.at(i) == "wrapmul") {
                         ++i;
                         tie(increase, i) = size_of_fixedmul(tokens, i);
                     } else if (tokens.at(i) == "move") {
