@@ -41,7 +41,7 @@ static auto getrandom() -> long double {
         throw new viua::types::Exception("failed to open random device: /dev/urandom");
     }
     unsigned long long int rullint = 0;
-    in.read((char*)&rullint, sizeof(unsigned long long int));
+    in.read((char*)&rullint, sizeof(rullint));
     float rfloat = ((long double)rullint / (long double)ULLONG_MAX);
     return rfloat;
 }
@@ -58,7 +58,7 @@ static void random_drandom(Frame* frame, viua::kernel::RegisterSet*, viua::kerne
         throw new viua::types::Exception("failed to open random device: /dev/random");
     }
     int rint = 0;
-    in.read((char*)&rint, sizeof(int));
+    in.read((char*)&rint, sizeof(rint));
     frame->local_register_set->set(0, make_unique<viua::types::Integer>(rint));
 }
 
@@ -76,7 +76,7 @@ static void random_durandom(Frame* frame, viua::kernel::RegisterSet*, viua::kern
         throw new viua::types::Exception("failed to open random device: /dev/urandom");
     }
     int rint = 0;
-    in.read((char*)&rint, sizeof(int));
+    in.read((char*)&rint, sizeof(rint));
     frame->local_register_set->set(0, make_unique<viua::types::Integer>(rint));
 }
 
