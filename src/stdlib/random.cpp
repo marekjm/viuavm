@@ -31,7 +31,7 @@
 using namespace std;
 
 
-static auto getrandom() -> float {
+static auto getrandom() -> long double {
     /** Return random float between 0.0 and 1.0.
      *
      *  This is a utility function exposed to Viua.
