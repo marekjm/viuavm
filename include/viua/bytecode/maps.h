@@ -98,6 +98,7 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     {WRAPDECREMENT, "wrapdecrement"},
     {WRAPADD, "wrapadd"},
     {WRAPMUL, "wrapmul"},
+    {WRAPDIV, "wrapdiv"},
 
     {MOVE, "move"},
     {COPY, "copy"},
