@@ -42,7 +42,7 @@ static auto getrandom() -> long double {
     }
     unsigned long long int rullint = 0;
     in.read(reinterpret_cast<char*>(&rullint), sizeof(rullint));
-    float rfloat = ((long double)rullint / (long double)ULLONG_MAX);
+    auto rfloat = (static_cast<long double>(rullint) / static_cast<long double>(ULLONG_MAX));
     return rfloat;
 }
 
@@ -94,9 +94,9 @@ static void random_randint(Frame* frame, viua::kernel::RegisterSet*, viua::kerne
      *  Requires two parameters: lower and upper bound.
      *  Returned integer is in range [lower, upper).
      */
-    int lower_bound = static_cast<viua::types::Integer*>(frame->arguments->at(0))->value();
-    int upper_bound = static_cast<viua::types::Integer*>(frame->arguments->at(1))->value();
-    int modifer = ((upper_bound - lower_bound) * getrandom());
+    auto lower_bound = static_cast<viua::types::Integer*>(frame->arguments->at(0))->value();
+    auto upper_bound = static_cast<viua::types::Integer*>(frame->arguments->at(1))->value();
+    auto modifer = ((upper_bound - lower_bound) * getrandom());
     frame->local_register_set->set(0, make_unique<viua::types::Integer>(lower_bound + modifer));
 }
 
