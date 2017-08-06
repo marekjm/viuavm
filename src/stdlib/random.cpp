@@ -31,7 +31,7 @@
 using namespace std;
 
 
-float getrandom() {
+static float getrandom() {
     /** Return random float between 0.0 and 1.0.
      *
      *  This is a utility function exposed to Viua.
@@ -80,15 +80,15 @@ static void random_durandom(Frame* frame, viua::kernel::RegisterSet*, viua::kern
     frame->local_register_set->set(0, make_unique<viua::types::Integer>(rint));
 }
 
-void random_random(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+static void random_random(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
                           viua::process::Process*, viua::kernel::Kernel*) {
     /** Return random float from range between 0.0 and 1.0.
      */
     frame->local_register_set->set(0, make_unique<viua::types::Float>(getrandom()));
 }
 
-void random_randint(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                    viua::process::Process*, viua::kernel::Kernel*) {
+static void random_randint(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                           viua::process::Process*, viua::kernel::Kernel*) {
     /** Return random integer from selected range.
      *
      *  Requires two parameters: lower and upper bound.
