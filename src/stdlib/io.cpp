@@ -130,7 +130,7 @@ const ForeignFunctionSpec functions[] = {
     {"std::io::file::write/1", &io_file_write},
     {"std::io::ifstream::open/1", &io_ifstream_open},
     {"std::io::ifstream::getline/1", &io_ifstream_getline},
-    {NULL, NULL},
+    {nullptr, nullptr},
 };
 
 extern "C" const ForeignFunctionSpec* exports() { return functions; }

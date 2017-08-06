@@ -31,7 +31,7 @@ using namespace std;
 
 void typeof(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*,
             viua::kernel::Kernel*) {
-    if (frame->arguments->at(0) == 0) {
+    if (frame->arguments->at(0) == nullptr) {
         throw new viua::types::Exception("expected object as parameter 0");
     }
     frame->local_register_set->set(0, make_unique<viua::types::String>(frame->arguments->get(0)->type()));
@@ -39,7 +39,7 @@ void typeof(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*
 
 void inheritanceChain(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
                       viua::process::Process*, viua::kernel::Kernel*) {
-    if (frame->arguments->at(0) == 0) {
+    if (frame->arguments->at(0) == nullptr) {
         throw new viua::types::Exception("expected object as parameter 0");
     }
 
@@ -55,7 +55,7 @@ void inheritanceChain(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Re
 
 void bases(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*,
            viua::kernel::Kernel*) {
-    if (frame->arguments->at(0) == 0) {
+    if (frame->arguments->at(0) == nullptr) {
         throw new viua::types::Exception("expected object as parameter 0");
     }
 
@@ -75,7 +75,7 @@ const ForeignFunctionSpec functions[] = {
     {"typesystem::typeof/1", &typeof},
     {"typesystem::inheritanceChain/1", &inheritanceChain},
     {"typesystem::bases/1", &bases},
-    {NULL, NULL},
+    {nullptr, nullptr},
 };
 
 extern "C" const ForeignFunctionSpec* exports() { return functions; }
