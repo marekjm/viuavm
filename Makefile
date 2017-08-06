@@ -51,10 +51,12 @@ remake: clean all
 ############################################################
 # CLEANING
 clean: clean-test-compiles
-	find . -name '*.o' | xargs -n 1 rm -fv
-	find . -name '*.so' | xargs -n 1 rm -fv
-	find . -name '*.bin' | xargs -n 1 rm -fv
-	find . -name '*.vlib' | xargs -n 1 rm -fv
+	find ./build -type f | grep -Pv '.gitkeep' | xargs -n 1 $(RM)
+	find ./src -name '*.d' | xargs -n 1 $(RM)
+	find . -name '*.o' | xargs -n 1 $(RM)
+	find . -name '*.so' | xargs -n 1 $(RM)
+	find . -name '*.bin' | xargs -n 1 $(RM)
+	find . -name '*.vlib' | xargs -n 1 $(RM)
 
 clean-test-compiles:
 	find ./tests/compiled -name '*.asm' | xargs rm -fv
