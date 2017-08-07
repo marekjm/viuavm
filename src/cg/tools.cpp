@@ -132,6 +132,11 @@ namespace viua {
                 return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
             }
 
+            static auto size_of_instruction_with_no_operands(const TokenVector&, TokenVector::size_type i)
+                -> tuple<bytecode_size_type, decltype(i)> {
+                bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
+                return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
+            }
             static auto size_of_instruction_with_one_ri_operand(const TokenVector& tokens,
                                                                 TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
@@ -324,10 +329,9 @@ namespace viua {
                 return tuple<bytecode_size_type, decltype(i)>{calculated_size, i};
             }
 
-            static auto size_of_nop(const TokenVector&, TokenVector::size_type i)
+            static auto size_of_nop(const TokenVector& v, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
-                bytecode_size_type calculated_size = sizeof(viua::internals::types::byte);
-                return tuple<bytecode_size_type, decltype(i)>(calculated_size, i);
+                return size_of_instruction_with_no_operands(v, i);
             }
             static auto size_of_izero(const TokenVector& tokens, TokenVector::size_type i)
                 -> tuple<bytecode_size_type, decltype(i)> {
