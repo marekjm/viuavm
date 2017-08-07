@@ -144,6 +144,7 @@ enum OPCODE : viua::internals::types::byte {
      * Bit string comparison operations.
      *
      * The operands do not have to be the same width to be correctly compared.
+     * These instructions treat bit strings as unsigned values.
      */
     BITEQ,
     BITLT,
