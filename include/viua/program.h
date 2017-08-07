@@ -126,10 +126,10 @@ class Program {
     Program& oprol(int_op, int_op);
     Program& opror(int_op, int_op);
 
-    Program& opfixedincrement(int_op);
-    Program& opfixeddecrement(int_op);
-    Program& opfixedadd(int_op, int_op, int_op);
-    Program& opfixedmul(int_op, int_op, int_op);
+    Program& opwrapincrement(int_op);
+    Program& opwrapdecrement(int_op);
+    Program& opwrapadd(int_op, int_op, int_op);
+    Program& opwrapmul(int_op, int_op, int_op);
 
     Program& opmove(int_op, int_op);
     Program& opcopy(int_op, int_op);

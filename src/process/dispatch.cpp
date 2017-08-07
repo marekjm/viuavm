@@ -246,16 +246,16 @@ viua::internals::types::byte* viua::process::Process::dispatch(viua::internals::
             addr = opror(addr + 1);
             break;
         case WRAPINCREMENT:
-            addr = opfixedincrement(addr + 1);
+            addr = opwrapincrement(addr + 1);
             break;
         case WRAPDECREMENT:
-            addr = opfixeddecrement(addr + 1);
+            addr = opwrapdecrement(addr + 1);
             break;
         case WRAPADD:
-            addr = opfixedadd(addr + 1);
+            addr = opwrapadd(addr + 1);
             break;
         case WRAPMUL:
-            addr = opfixedmul(addr + 1);
+            addr = opwrapmul(addr + 1);
             break;
         case MOVE:
             addr = opmove(addr + 1);

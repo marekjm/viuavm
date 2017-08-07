@@ -315,23 +315,23 @@ Program& Program::opror(int_op target, int_op count) {
     return (*this);
 }
 
-Program& Program::opfixedincrement(int_op target) {
-    addr_ptr = cg::bytecode::opfixedincrement(addr_ptr, target);
+Program& Program::opwrapincrement(int_op target) {
+    addr_ptr = cg::bytecode::opwrapincrement(addr_ptr, target);
     return (*this);
 }
 
-Program& Program::opfixeddecrement(int_op target) {
-    addr_ptr = cg::bytecode::opfixeddecrement(addr_ptr, target);
+Program& Program::opwrapdecrement(int_op target) {
+    addr_ptr = cg::bytecode::opwrapdecrement(addr_ptr, target);
     return (*this);
 }
 
-Program& Program::opfixedadd(int_op target, int_op lhs, int_op rhs) {
-    addr_ptr = cg::bytecode::opfixedadd(addr_ptr, target, lhs, rhs);
+Program& Program::opwrapadd(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opwrapadd(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
-Program& Program::opfixedmul(int_op target, int_op lhs, int_op rhs) {
-    addr_ptr = cg::bytecode::opfixedmul(addr_ptr, target, lhs, rhs);
+Program& Program::opwrapmul(int_op target, int_op lhs, int_op rhs) {
+    addr_ptr = cg::bytecode::opwrapmul(addr_ptr, target, lhs, rhs);
     return (*this);
 }
 
