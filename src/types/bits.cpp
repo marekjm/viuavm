@@ -213,8 +213,8 @@ auto viua::types::Bits::decrement() -> bool {
 /*
  * Here's a cool resource for binary arithemtic: https://www.cs.cornell.edu/~tomf/notes/cps104/twoscomp.html
  */
-static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs,
-                            const std::remove_reference_t<decltype(lhs)>::size_type size_of_result)
+static auto binary_wrapping_addition(const vector<bool>& lhs, const vector<bool>& rhs,
+                                     const std::remove_reference_t<decltype(lhs)>::size_type size_of_result)
     -> vector<bool> {
     vector<bool> result;
     result.reserve(size_of_result);
@@ -280,7 +280,7 @@ static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs,
 
     return result;
 }
-static auto binary_multiplication(const vector<bool>& lhs, const vector<bool>& rhs) -> vector<bool> {
+static auto binary_wrapping_multiplication(const vector<bool>& lhs, const vector<bool>& rhs) -> vector<bool> {
     vector<vector<bool>> intermediates;
     intermediates.reserve(rhs.size());
 
@@ -313,7 +313,7 @@ static auto binary_multiplication(const vector<bool>& lhs, const vector<bool>& r
 
     return std::accumulate(intermediates.begin(), intermediates.end(), vector<bool>{},
                            [](const vector<bool>& l, const vector<bool>& r) -> vector<bool> {
-                               return binary_addition(l, r, std::max(l.size(), r.size()));
+                               return binary_wrapping_addition(l, r, std::max(l.size(), r.size()));
                            });
 }
 static auto binary_clip(const vector<bool>& bits, std::remove_reference_t<decltype(bits)>::size_type width)
@@ -326,12 +326,13 @@ static auto binary_clip(const vector<bool>& bits, std::remove_reference_t<declty
 
     return result;
 }
+
 auto viua::types::Bits::wrapadd(const Bits& that) const -> unique_ptr<Bits> {
-    return make_unique<Bits>(binary_addition(underlying_array, that.underlying_array, size()));
+    return make_unique<Bits>(binary_wrapping_addition(underlying_array, that.underlying_array, size()));
 }
 auto viua::types::Bits::wrapmul(const Bits& that) const -> unique_ptr<Bits> {
     return make_unique<Bits>(
-        binary_clip(binary_multiplication(underlying_array, that.underlying_array), size()));
+        binary_clip(binary_wrapping_multiplication(underlying_array, that.underlying_array), size()));
 }
 
 template<typename T>
