@@ -948,6 +948,7 @@ void assembler::verify::manipulationOfDefinedRegisters(const TokenVector& tokens
                                                        const map<string, TokenVector>& block_bodies,
                                                        const bool debug) {
     string opened_function;
+    set<string> attributes;
 
     TokenVector body;
     for (TokenVector::size_type i = 0; i < tokens.size(); ++i) {
@@ -957,7 +958,10 @@ void assembler::verify::manipulationOfDefinedRegisters(const TokenVector& tokens
             if (tokens.at(i) == "[[") {
                 ++i;  // skip the opening '[['
                 while (tokens.at(i) != "]]") {
-                    ++i;
+                    attributes.insert(tokens.at(i++));
+                    if (tokens.at(i) == ",") {
+                        ++i;
+                    }
                 }
                 ++i;  // skip the closing ']]'
             }
@@ -974,7 +978,9 @@ void assembler::verify::manipulationOfDefinedRegisters(const TokenVector& tokens
             }
             Registers registers;
             try {
-                check_block_body(body, registers, block_bodies, debug);
+                if (not attributes.count("no_sa")) {
+                    check_block_body(body, registers, block_bodies, debug);
+                }
             } catch (const viua::cg::lex::InvalidSyntax& e) {
                 throw viua::cg::lex::TracedSyntaxError().append(e).append(viua::cg::lex::InvalidSyntax(
                     tokens.at(i - body.size() - 2), ("in function " + opened_function)));
@@ -984,6 +990,7 @@ void assembler::verify::manipulationOfDefinedRegisters(const TokenVector& tokens
             }
             body.clear();
             opened_function = "";
+            attributes.clear();
             i = skip_till_next_line(tokens, i);
             continue;
         }
