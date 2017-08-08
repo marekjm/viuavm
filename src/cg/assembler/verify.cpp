@@ -228,6 +228,12 @@ void assembler::verify::functionNames(const vector<Token>& tokens) {
             continue;
         }
 
+        if (tokens.at(i + 1) == "[[") {
+            do {
+                ++i;
+            } while (tokens.at(i) != "]]" and tokens.at(i) != "\n");
+        }
+
         string function = tokens.at(++i);
 
         if (not assembler::utils::isValidFunctionName(function)) {

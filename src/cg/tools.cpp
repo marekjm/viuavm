@@ -1182,6 +1182,14 @@ namespace viua {
                         token == ".mark:" or token == ".import:" or token == ".signature:" or
                         token == ".bsignature:" or token == ".unused:") {
                         ++i;
+
+                        if (tokens.at(i) == "[[") {
+                            do {
+                                ++i;
+                            } while (tokens.at(i) != "]]");
+                            ++i;
+                        }
+
                         continue;
                     }
                     if (token == ".info:") {

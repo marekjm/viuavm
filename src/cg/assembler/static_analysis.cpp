@@ -953,7 +953,15 @@ void assembler::verify::manipulationOfDefinedRegisters(const TokenVector& tokens
     for (TokenVector::size_type i = 0; i < tokens.size(); ++i) {
         auto token = tokens.at(i);
         if (token == ".function:") {
-            opened_function = tokens.at(i + 1);
+            ++i;
+            if (tokens.at(i) == "[[") {
+                ++i;  // skip the opening '[['
+                while (tokens.at(i) != "]]") {
+                    ++i;
+                }
+                ++i;  // skip the closing ']]'
+            }
+            opened_function = tokens.at(i);
             if (debug) {
                 cout << "analysing '" << opened_function << "'\n";
             }

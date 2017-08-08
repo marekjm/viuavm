@@ -916,6 +916,12 @@ namespace viua {
                                token == "bitat") {
                         tokens.push_back(token);  // mnemonic
 
+                        if (input_tokens.at(i + 1) == "[[") {
+                            do {
+                                tokens.push_back(input_tokens.at(++i));
+                            } while (input_tokens.at(i) != "]]");
+                        }
+
                         tokens.push_back(input_tokens.at(++i));  // target register
                         string target_register_set = "current";
                         if (not is_register_set_name(input_tokens.at(i + 1))) {
@@ -1149,6 +1155,14 @@ namespace viua {
 
             vector<Token> reduce_double_colon(vector<Token> input_tokens) {
                 return reduce_token_sequence(input_tokens, {":", ":"});
+            }
+
+            vector<Token> reduce_left_attribute_bracket(vector<Token> input_tokens) {
+                return reduce_token_sequence(input_tokens, {"[", "["});
+            }
+
+            vector<Token> reduce_right_attribute_bracket(vector<Token> input_tokens) {
+                return reduce_token_sequence(input_tokens, {"]", "]"});
             }
 
             vector<Token> reduce_function_signatures(vector<Token> input_tokens) {
@@ -1811,6 +1825,9 @@ namespace viua {
                  * Reduce double-colon token to make life easier for name reductions.
                  */
                 tokens = reduce_double_colon(tokens);
+
+                tokens = reduce_left_attribute_bracket(tokens);
+                tokens = reduce_right_attribute_bracket(tokens);
 
                 /*
                  * Then, reduce function signatues and names.

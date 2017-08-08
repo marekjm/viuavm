@@ -131,6 +131,8 @@ namespace viua {
             std::vector<Token> reduce_block_directive(std::vector<Token>);
             std::vector<Token> reduce_iota_directive(std::vector<Token>);
             std::vector<Token> reduce_double_colon(std::vector<Token>);
+            std::vector<Token> reduce_left_attribute_bracket(std::vector<Token>);
+            std::vector<Token> reduce_right_attribute_bracket(std::vector<Token>);
             std::vector<Token> reduce_function_signatures(std::vector<Token>);
             std::vector<Token> reduce_names(std::vector<Token>);
             std::vector<Token> reduce_offset_jumps(std::vector<Token>);

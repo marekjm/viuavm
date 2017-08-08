@@ -103,6 +103,13 @@ static vector<string> get_instruction_block_names(const vector<Token>& tokens, s
                 throw tokens[i - 1];
             }
 
+            if (tokens.at(i) == "[[") {
+                do {
+                    ++i;
+                } while (tokens.at(i) != "]]");
+                ++i;
+            }
+
             if (defined_where.count(tokens.at(i)) > 0) {
                 throw viua::cg::lex::TracedSyntaxError()
                     .append(viua::cg::lex::InvalidSyntax(tokens.at(i),
