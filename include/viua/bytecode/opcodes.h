@@ -214,7 +214,7 @@ enum OPCODE : viua::internals::types::byte {
      * as the left-hand-dise operand.
      * For example:
      *
-     *      checkedmul %result %lhs %rhs
+     *      saturatingmul %result %lhs %rhs
      *
      * produces 8 bit wide value in 'result' register if
      * register 'lhs' contains 8 bit wide value.
