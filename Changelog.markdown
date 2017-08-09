@@ -41,6 +41,9 @@ There are several categories of change:
 - fix: disassembler correctly outputs register set specifiers for `if`, `streq`, `insert`, and
   `remove` instructions
 - feature: disassemler outputs per-instruction offsets when `--debug` flag is in effect
+- feature: attributes for functions (`.function: [[attr0, attr1]] fun/0`) providing additional details about
+  functions the assembler can use
+- feature: `no_sa` function attribute disabling static analysis for function marked with this attribute
 
 
 ----
