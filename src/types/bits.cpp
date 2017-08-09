@@ -280,7 +280,7 @@ static auto binary_wrapping_addition(const vector<bool>& lhs, const vector<bool>
 
     return result;
 }
-static auto binary_wrapping_multiplication(const vector<bool>& lhs, const vector<bool>& rhs) -> vector<bool> {
+static auto binary_multiplication(const vector<bool>& lhs, const vector<bool>& rhs) -> vector<bool> {
     vector<vector<bool>> intermediates;
     intermediates.reserve(rhs.size());
 
@@ -332,7 +332,7 @@ auto viua::types::Bits::wrapadd(const Bits& that) const -> unique_ptr<Bits> {
 }
 auto viua::types::Bits::wrapmul(const Bits& that) const -> unique_ptr<Bits> {
     return make_unique<Bits>(
-        binary_clip(binary_wrapping_multiplication(underlying_array, that.underlying_array), size()));
+        binary_clip(binary_multiplication(underlying_array, that.underlying_array), size()));
 }
 
 template<typename T>
