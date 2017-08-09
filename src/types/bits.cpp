@@ -213,11 +213,10 @@ auto viua::types::Bits::decrement() -> bool {
 /*
  * Here's a cool resource for binary arithemtic: https://www.cs.cornell.edu/~tomf/notes/cps104/twoscomp.html
  */
-static auto binary_wrapping_addition(const vector<bool>& lhs, const vector<bool>& rhs,
-                                     const std::remove_reference_t<decltype(lhs)>::size_type size_of_result)
-    -> vector<bool> {
+static auto binary_addition(const vector<bool>& lhs, const vector<bool>& rhs) -> vector<bool> {
     vector<bool> result;
-    result.reserve(size_of_result);
+    auto size_of_result = std::max(lhs.size(), rhs.size());
+    result.reserve(size_of_result + 1);
     std::fill_n(std::back_inserter(result), size_of_result, false);
 
     bool carry = false;
@@ -278,6 +277,15 @@ static auto binary_wrapping_addition(const vector<bool>& lhs, const vector<bool>
         result.at(i) = true;
     }
 
+    /*
+     * If there was a carry during the last operation append it to the result.
+     * Basic binary addition is expanding.
+     * It can be made wrapping, checked, or saturating by "post-processing".
+     */
+    if (carry) {
+        result.push_back(carry);
+    }
+
     return result;
 }
 static auto binary_multiplication(const vector<bool>& lhs, const vector<bool>& rhs) -> vector<bool> {
@@ -311,10 +319,9 @@ static auto binary_multiplication(const vector<bool>& lhs, const vector<bool>& r
         intermediates.emplace_back(std::move(interm));
     }
 
-    return std::accumulate(intermediates.begin(), intermediates.end(), vector<bool>{},
-                           [](const vector<bool>& l, const vector<bool>& r) -> vector<bool> {
-                               return binary_wrapping_addition(l, r, std::max(l.size(), r.size()));
-                           });
+    return std::accumulate(
+        intermediates.begin(), intermediates.end(), vector<bool>{},
+        [](const vector<bool>& l, const vector<bool>& r) -> vector<bool> { return binary_addition(l, r); });
 }
 static auto binary_clip(const vector<bool>& bits, std::remove_reference_t<decltype(bits)>::size_type width)
     -> vector<bool> {
@@ -328,7 +335,7 @@ static auto binary_clip(const vector<bool>& bits, std::remove_reference_t<declty
 }
 
 auto viua::types::Bits::wrapadd(const Bits& that) const -> unique_ptr<Bits> {
-    return make_unique<Bits>(binary_wrapping_addition(underlying_array, that.underlying_array, size()));
+    return make_unique<Bits>(binary_clip(binary_addition(underlying_array, that.underlying_array), size()));
 }
 auto viua::types::Bits::wrapmul(const Bits& that) const -> unique_ptr<Bits> {
     return make_unique<Bits>(
