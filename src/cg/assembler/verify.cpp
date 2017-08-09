@@ -228,7 +228,16 @@ void assembler::verify::functionNames(const vector<Token>& tokens) {
             continue;
         }
 
+        if (tokens.at(i + 1) == "[[") {
+            do {
+                ++i;
+            } while (tokens.at(i) != "]]" and tokens.at(i) != "\n");
+        }
+
         string function = tokens.at(++i);
+        if (tokens.at(i) == "\n") {
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i), "missing function name");
+        }
 
         if (not assembler::utils::isValidFunctionName(function)) {
             throw viua::cg::lex::InvalidSyntax(tokens.at(i), ("invalid function name: " + function));
