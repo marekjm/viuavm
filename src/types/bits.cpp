@@ -342,6 +342,10 @@ auto viua::types::Bits::wrapmul(const Bits& that) const -> unique_ptr<Bits> {
         binary_clip(binary_multiplication(underlying_array, that.underlying_array), size()));
 }
 
+auto viua::types::Bits::operator==(const Bits& that) const -> bool {
+    return (size() == that.size() and underlying_array == that.underlying_array);
+}
+
 template<typename T>
 static auto perform_bitwise_logic(const viua::types::Bits& lhs, const viua::types::Bits& rhs)
     -> unique_ptr<viua::types::Bits> {
