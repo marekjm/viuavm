@@ -119,12 +119,11 @@ enum OPCODE : viua::internals::types::byte {
     VAT,
     VLEN,
 
-    // booleans
+    /*
+     * Any Viua VM value may be converted to a boolean value.
+     */
     BOOL,  // store Boolean false object in given register (empty) or
            // convert an object to Boolean value
-    NOT,
-    AND,
-    OR,
 
     BITS,
     BITAND,
