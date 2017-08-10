@@ -94,11 +94,11 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     {ROL, "rol"},
     {ROR, "ror"},
 
-    {BITEQ, "biteq"},
-    {BITLT, "bitlt"},
-    {BITLTE, "bitlte"},
-    {BITGT, "bitgt"},
-    {BITGTE, "bitgte"},
+    {BITSEQ, "bitseq"},
+    {BITSLT, "bitslt"},
+    {BITSLTE, "bitslte"},
+    {BITSGT, "bitsgt"},
+    {BITSGTE, "bitsgte"},
 
     {WRAPINCREMENT, "wrapincrement"},
     {WRAPDECREMENT, "wrapdecrement"},
