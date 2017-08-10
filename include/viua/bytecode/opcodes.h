@@ -143,14 +143,54 @@ enum OPCODE : viua::internals::types::byte {
     /*
      * Bit string comparison operations.
      *
-     * The operands do not have to be the same width to be correctly compared.
-     * These instructions treat bit strings as unsigned values.
+     * These instructions treat bit strings as strings.
+     * Comparison starts with most significant bit, and
+     * ends with the least significant bit.
+     *
+     * Longer string is *always* greater; '00' is greater than '0'.
+     * This is because the strings are compared as if they were equal in width, and
+     * the shorter one is padded on the left with a magic "very small value" that
+     * is actually lesser than '0' bit.
+     *
+     * Some example comparisons evaluating to truth:
+     *
+     *      bitseq   0   0
+     *      bitseq   1   1
+     *
+     *      bitslt   0   1
+     *      bitslt   1  10
+     *
+     *      bitslte  0   0
+     *      bitslte 10  11
+     *
+     *      bitsgt   00   0
+     *      bitsgt    1   0
+     *      bitsgt  000  11
+     *
+     *      bitsgte  00   0
+     *      bitsgte 101 100
+     *      bitsgte 011 010
+     *
+     * For meaningful comparison it is best that compared bit strings are
+     * the same width.
      */
-    BITEQ,
-    BITLT,
-    BITLTE,
-    BITGT,
-    BITGTE,
+    BITSEQ,
+    BITSLT,
+    BITSLTE,
+    BITSGT,
+    BITSGTE,
+
+    /*
+     * Bit string arithmetic comparison operations.
+     *
+     * These instructions treat bit strings as signed values.
+     * The operands do not have to be the same width to be correctly compared.
+     */
+    BITAEQ,
+    BITALT,
+    BITALTE,
+    BITAGT,
+    BITAGTE,
 
     /*
      * Fixed-width, wrap-aroud arithmetic operations on bit strings.
