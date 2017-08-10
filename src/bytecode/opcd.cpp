@@ -34,26 +34,48 @@ int main() {
             ((max_mnemonic_length >= i.second.size()) ? max_mnemonic_length : i.second.size());
     }
 
-    // separate mnemonic from the rest of data
-    max_mnemonic_length += 4;
+    max_mnemonic_length += 1;
 
-    const string initial_column = "MNEMONIC        ";
-    cout << initial_column << "| OPCODE | HEX OPCODE\n" << endl;
+    const string initial_column = "MNEMONIC";
+    cout << initial_column;
+    for (auto j = initial_column.size(); j < (max_mnemonic_length); ++j) {
+        cout << ' ';
+    }
+    cout << "| OPCODE | HEX OPCODE" << endl;
 
     max_mnemonic_length =
         (max_mnemonic_length < initial_column.size() ? initial_column.size() : max_mnemonic_length);
 
-    for (pair<const OPCODE, string> i : OP_NAMES) {
-        cout << i.second;
-        for (auto j = i.second.size(); j < (max_mnemonic_length); ++j) {
+    for (auto i = viua::internals::types::byte{0}; i < static_cast<viua::internals::types::byte>(0xff); ++i) {
+        auto opcode = static_cast<OPCODE>(i);
+        auto mnemonic = string{"??"};
+        if (OP_NAMES.count(opcode)) {
+            mnemonic = OP_NAMES.at(opcode);
+        }
+
+        cout << mnemonic;
+        cout << ' ';
+        for (auto j = mnemonic.size() + 1; j < (max_mnemonic_length); ++j) {
+            cout << '.';
+        }
+        cout << "| ";
+
+        if (i < 100) {
             cout << ' ';
         }
-        cout << "  ";
-        cout << i.first << (i.first < 10 ? " " : "");
-        cout << "       ";
-        cout << "0x" << hex << i.first << (i.first < 0x10 ? " " : "") << dec;
+        if (i < 10) {
+            cout << ' ';
+        }
+        cout << static_cast<int>(i);
+
+        cout << "    | ";
+        cout << "0x";
+        if (i < 0x10) {
+            cout << '0';
+        }
+        cout << hex << static_cast<int>(i) << dec;
+
         cout << '\n';
     }
-    cout << flush;
     return 0;
 }
