@@ -134,6 +134,7 @@ enum OPCODE : viua::internals::types::byte {
     BITNOT,  // negation of a bits value
     BITXOR,  // binary xor of two bits values
 
+    BITSWIDTH,  // fetch width of a bits value
     BITAT,      // fetch the bit at the requested offset
     BITSET,     // set the bit at the requested offset to a specified value
 
