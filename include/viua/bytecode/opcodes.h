@@ -124,20 +124,26 @@ enum OPCODE : viua::internals::types::byte {
      */
     BOOL,  // store Boolean false object in given register (empty) or
            // convert an object to Boolean value
+    NOT,   // logical negation of any value
+    AND,   // logical and of any two values
+    OR,    // logical or of any two values
 
-    BITS,
-    BITAND,
-    BITOR,
-    BITNOT,
-    BITXOR,
-    BITAT,
-    BITSET,
-    SHL,
-    SHR,
-    ASHL,
-    ASHR,
-    ROL,
-    ROR,
+    BITS,    // create a bits value from a literal, or a zero-filled value of a specified width
+    BITAND,  // binary and of two bits values
+    BITOR,   // binary or of two bits values
+    BITNOT,  // negation of a bits value
+    BITXOR,  // binary xor of two bits values
+
+    BITAT,      // fetch the bit at the requested offset
+    BITSET,     // set the bit at the requested offset to a specified value
+
+    SHL,   // logical shift left
+    SHR,   // logical shift right
+    ASHL,  // arithmetic shift left
+    ASHR,  // arithmetic shift right
+    ROL,   // rotate left
+    ROR,   // rotate right
+
 
     /*
      * Bit string comparison operations.
