@@ -85,6 +85,7 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     {BITOR, "bitor"},
     {BITNOT, "bitnot"},
     {BITXOR, "bitxor"},
+    {BITSWIDTH, "bitswidth"},
     {BITAT, "bitat"},
     {BITSET, "bitset"},
     {SHL, "shl"},
@@ -99,6 +100,12 @@ const std::map<enum OPCODE, std::string> OP_NAMES = {
     {BITSLTE, "bitslte"},
     {BITSGT, "bitsgt"},
     {BITSGTE, "bitsgte"},
+
+    {BITAEQ, "bitaeq"},
+    {BITALT, "bitalt"},
+    {BITALTE, "bitalte"},
+    {BITAGT, "bitagt"},
+    {BITAGTE, "bitagte"},
 
     {WRAPINCREMENT, "wrapincrement"},
     {WRAPDECREMENT, "wrapdecrement"},
