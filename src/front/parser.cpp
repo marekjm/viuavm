@@ -274,6 +274,7 @@ enum class AccessSpecifier {
 };
 
 enum class RegisterSetSpecifier {
+    CURRENT,
     LOCAL,
     STATIC,
     GLOBAL,
@@ -281,7 +282,7 @@ enum class RegisterSetSpecifier {
 
 struct RegisterIndex : public Operand {
     AccessSpecifier as;
-    unsigned index;
+    viua::internals::types::register_index index;
     RegisterSetSpecifier rss;
 };
 struct InstructionBlockName : public Operand {};
@@ -357,6 +358,44 @@ static auto parse_attributes(const vector_view<Token> tokens,
     return i;
 }
 
+static auto parse_operand(const vector_view<Token> tokens, Operand& operand) -> const
+    decltype(tokens)::size_type {
+    auto i = std::remove_reference_t<decltype(tokens)>::size_type{0};
+
+    if (tokens.at(i).str().at(0) == '%' or tokens.at(i).str().at(0) == '*' or
+        tokens.at(i).str().at(0) == '@') {
+        RegisterIndex ri;
+
+        if (tokens.at(i).str().at(0) == '%') {
+            ri.as = AccessSpecifier::DIRECT;
+        } else if (tokens.at(i).str().at(0) == '*') {
+            ri.as = AccessSpecifier::POINTER_DEREFERENCE;
+        } else if (tokens.at(i).str().at(0) == '@') {
+            ri.as = AccessSpecifier::REGISTER_INDIRECT;
+        }
+
+        ri.index = static_cast<decltype(ri.index)>(stoul(tokens.at(i).str().substr(1)));
+        ++i;
+
+        if (tokens.at(i) == "current") {
+            ri.rss = RegisterSetSpecifier::CURRENT;
+        } else if (tokens.at(i) == "local") {
+            ri.rss = RegisterSetSpecifier::LOCAL;
+        } else if (tokens.at(i) == "static") {
+            ri.rss = RegisterSetSpecifier::STATIC;
+        } else if (tokens.at(i) == "global") {
+            ri.rss = RegisterSetSpecifier::GLOBAL;
+        }
+        ++i;
+
+        operand = ri;
+    } else {
+        throw viua::cg::lex::InvalidSyntax(tokens.at(i), "invalid operand");
+    }
+
+    return i;
+}
+
 static auto mnemonic_to_opcode(const string mnemonic) -> OPCODE {
     OPCODE opcode = NOP;
     for (const auto each : OP_NAMES) {
@@ -375,11 +414,12 @@ static auto parse_instruction(const vector_view<Token> tokens, Instruction& inst
         throw viua::cg::lex::InvalidSyntax(tokens.at(i), "expected mnemonic");
     }
 
+    cerr << "  mnemonic: " << tokens.at(i).str() << endl;
     instruction.opcode = mnemonic_to_opcode(tokens.at(i++).str());
 
     while (tokens.at(i) != "\n") {
-        // TODO
-        ++i;
+        Operand operand;
+        i += parse_operand(vector_view<Token>(tokens, i), operand);
     }
     ++i;  // skip newline
 
