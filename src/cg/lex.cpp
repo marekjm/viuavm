@@ -125,37 +125,8 @@ namespace viua {
                      * Reserved for future use as instruction names.
                      */
                     "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64",
-                    "float32", "float64", "string", "boolean", "bits", "coroutine", "yield", "channel",
-                    "publish", "subscribe",
-
-                    /*
-                     * Reserved  for future use as bit-operation instruction names.
-                     * Shifts:
-                     *
-                     *      shl <target> <source> <width>
-                     *
-                     *          logical bit shift left;
-                     *          <source> is shifted left by <width> bits
-                     *          bits shifted out of <source> are put in <target>
-                     *          <target> has the same bitsize as <source>
-                     *
-                     *      ashr <target> <source> <width>
-                     *
-                     *          arithmetic bit shift right;
-                     *          same as logical bit shift right, only the highest bit is preserved
-                     *
-                     *      ashl <target> <source> <width>
-                     *
-                     *          arithmetic bit shift left;
-                     *          same as logical bit shift left, only the lowest bit is preserved
-                     */
-                    "shl",   // logical shift left
-                    "shr",   // logical shift right
-                    "ashl",  // arithmetic shift left
-                    "ashr",  // arithmetic shift right
-
-                    "rol",  // rotate left
-                    "ror",  // rotate right
+                    "float32", "float64", "string", "boolean", "coroutine", "yield", "channel", "publish",
+                    "subscribe",
                 };
                 return (reserved_keywords.count(s) or OP_MNEMONICS.count(s));
             }
