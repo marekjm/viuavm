@@ -98,6 +98,7 @@ static vector<string> get_instruction_block_names(const vector<Token>& tokens, s
     string looking_for = ("." + directive + ":");
     for (decltype(tokens.size()) i = 0; i < limit; ++i) {
         if (looks_like_name_definition(tokens.at(i))) {
+            const auto first_token_of_block_header_at = i;
             ++i;
             if (i >= limit) {
                 throw tokens[i - 1];
@@ -118,10 +119,12 @@ static vector<string> get_instruction_block_names(const vector<Token>& tokens, s
                                                          "already defined here:"));
             }
 
-            if (tokens.at(i - 1) == looking_for) {
-                predicate(tokens.at(i));
-                names.emplace_back(tokens.at(i).str());
+            if (tokens.at(first_token_of_block_header_at) != looking_for) {
+                continue;
             }
+
+            predicate(tokens.at(i));
+            names.emplace_back(tokens.at(i).str());
             defined_where.emplace(tokens.at(i), tokens.at(i));
         }
     }
