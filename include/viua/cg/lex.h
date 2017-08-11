@@ -93,6 +93,7 @@ namespace viua {
 
             std::vector<Token> tokenise(const std::string&);
             std::vector<Token> standardise(std::vector<Token>);
+            auto normalise(std::vector<Token>) -> std::vector<Token>;
 
             template<class T, typename... R> bool adjacent(T first, T second) {
                 if (first.line() != second.line()) {

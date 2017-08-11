@@ -43,7 +43,7 @@ LIBDL ?= -ldl
 
 ############################################################
 # BASICS
-all: build/bin/vm/asm build/bin/vm/kernel build/bin/vm/dis build/bin/vm/lex build/bin/opcodes.bin platform stdlib
+all: build/bin/vm/asm build/bin/vm/kernel build/bin/vm/dis build/bin/vm/lex build/bin/vm/parser build/bin/opcodes.bin platform stdlib
 
 remake: clean all
 
@@ -248,6 +248,9 @@ build/bin/vm/asm: build/asm.o build/asm/generate.o build/asm/assemble_instructio
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^
 
 build/bin/vm/lex: src/front/lexer.cpp build/cg/lex.o build/cg/tools.o build/support/string.o build/support/env.o build/cg/assembler/binary_literals.o
+	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^
+
+build/bin/vm/parser: src/front/parser.cpp build/cg/lex.o build/cg/tools.o build/support/string.o build/support/env.o build/cg/assembler/binary_literals.o
 	$(CXX) $(CXXFLAGS) $(CXXOPTIMIZATIONFLAGS) $(DYNAMIC_SYMS) -o $@ $^
 
 build/bin/vm/dis: build/dis.o build/loader.o build/machine.o build/cg/disassembler/disassembler.o build/support/pointer.o build/support/string.o build/support/env.o build/cg/assembler/utils.o
