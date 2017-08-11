@@ -33,8 +33,7 @@ namespace viua {
                 std::string content, original_content;
                 decltype(content.size()) line_number, character_in_line;
 
-                public:
-
+              public:
                 auto line() const -> decltype(line_number);
                 auto character() const -> decltype(character_in_line);
 
@@ -74,7 +73,7 @@ namespace viua {
                 InvalidSyntax(Token, std::string = "");
             };
 
-            struct UnusedValue: public InvalidSyntax {
+            struct UnusedValue : public InvalidSyntax {
                 UnusedValue(Token);
             };
 
@@ -114,7 +113,8 @@ namespace viua {
                 return adjacent(second, rest...);
             }
 
-            std::string join_tokens(const std::vector<Token> tokens, const decltype(tokens)::size_type from, const decltype(from) to);
+            std::string join_tokens(const std::vector<Token> tokens, const decltype(tokens)::size_type from,
+                                    const decltype(from) to);
 
             std::vector<Token> remove_spaces(std::vector<Token>);
             std::vector<Token> remove_comments(std::vector<Token>);
