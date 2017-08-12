@@ -362,19 +362,20 @@ static auto parse_operand(const vector_view<Token> tokens, Operand& operand) -> 
     decltype(tokens)::size_type {
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{0};
 
-    if (tokens.at(i).str().at(0) == '%' or tokens.at(i).str().at(0) == '*' or
-        tokens.at(i).str().at(0) == '@') {
+    auto tok = tokens.at(i).str();
+
+    if (tok.at(0) == '%' or tok.at(0) == '*' or tok.at(0) == '@') {
         RegisterIndex ri;
 
-        if (tokens.at(i).str().at(0) == '%') {
+        if (tok.at(0) == '%') {
             ri.as = AccessSpecifier::DIRECT;
-        } else if (tokens.at(i).str().at(0) == '*') {
+        } else if (tok.at(0) == '*') {
             ri.as = AccessSpecifier::POINTER_DEREFERENCE;
-        } else if (tokens.at(i).str().at(0) == '@') {
+        } else if (tok.at(0) == '@') {
             ri.as = AccessSpecifier::REGISTER_INDIRECT;
         }
 
-        ri.index = static_cast<decltype(ri.index)>(stoul(tokens.at(i).str().substr(1)));
+        ri.index = static_cast<decltype(ri.index)>(stoul(tok.substr(1)));
         ++i;
 
         if (tokens.at(i) == "current") {
