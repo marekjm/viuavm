@@ -1577,7 +1577,7 @@ namespace viua {
                         }
                     } else if (token == "move" or token == "copy" or token == "swap" or token == "ptr" or
                                token == "isnull" or token == "send" or token == "textlength" or
-                               token == "structkeys" or token == "bits" or token == "bitset" or
+                               token == "structkeys" or token == "bitset" or
                                token == "bitat") {
                         tokens.push_back(token);  // mnemonic
 
@@ -1598,6 +1598,29 @@ namespace viua {
                         }
 
                         tokens.push_back(input_tokens.at(++i));
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                target_register_set);
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                        }
+                    } else if (token == "bits") {
+                        tokens.push_back(token);  // mnemonic
+
+                        tokens.push_back(input_tokens.at(++i));  // target register
+                        string target_register_set = "current";
+                        if (not is_register_set_name(input_tokens.at(i + 1))) {
+                            tokens.emplace_back(tokens.back().line(), tokens.back().character(),
+                                                target_register_set);
+                        } else {
+                            tokens.push_back(input_tokens.at(++i));
+                            target_register_set = tokens.back();
+                        }
+
+                        tokens.push_back(input_tokens.at(++i));
+                        if (str::is_binary_literal(tokens.back())) {
+                            continue;
+                        }
                         if (not is_register_set_name(input_tokens.at(i + 1))) {
                             tokens.emplace_back(tokens.back().line(), tokens.back().character(),
                                                 target_register_set);
