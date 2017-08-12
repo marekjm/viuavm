@@ -286,7 +286,9 @@ struct RegisterIndex : public Operand {
     RegisterSetSpecifier rss;
 };
 struct InstructionBlockName : public Operand {};
-struct BitsLiteral : public Operand {};
+struct BitsLiteral : public Operand {
+    string content;
+};
 
 struct Instruction {
     OPCODE opcode;
@@ -390,6 +392,12 @@ static auto parse_operand(const vector_view<Token> tokens, Operand& operand) -> 
         ++i;
 
         operand = ri;
+    } else if (str::is_binary_literal(tok)) {
+        BitsLiteral bits_literal;
+        bits_literal.content = tokens.at(i);
+        ++i;
+
+        operand = bits_literal;
     } else {
         throw viua::cg::lex::InvalidSyntax(tokens.at(i), "invalid operand");
     }
