@@ -86,6 +86,11 @@ namespace str {
         return regex_match(s, hexadecimal_number);
     }
 
+    auto is_binary_literal(const string s) -> bool {
+        static regex binary_literal{"^0(?:b[01]+|o[0-7]+|x[0-9a-f]+)$"};
+        return regex_match(s, binary_literal);
+    }
+
     bool isfloat(const std::string& s, bool negatives) {
         /*  Returns true if s contains only numerical characters.
          *  Regex equivalent: `^[0-9]+\.[0-9]+$`

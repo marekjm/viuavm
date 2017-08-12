@@ -37,6 +37,8 @@ namespace str {
     bool isfloat(const std::string& s, bool negatives = true);
     bool isid(const std::string& s);
 
+    auto is_binary_literal(const std::string) -> bool;
+
     std::string sub(const std::string& s, std::string::size_type b = 0, long int e = -1);
 
     std::string extract(const std::string& s);
