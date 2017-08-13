@@ -289,6 +289,9 @@ struct InstructionBlockName : public Operand {};
 struct BitsLiteral : public Operand {
     string content;
 };
+struct IntegerLiteral : public Operand {
+    string content;
+};
 
 struct Instruction {
     OPCODE opcode;
@@ -398,6 +401,12 @@ static auto parse_operand(const vector_view<Token> tokens, Operand& operand) -> 
         ++i;
 
         operand = bits_literal;
+    } else if (str::isnum(tok, true)) {
+        IntegerLiteral integer_literal;
+        integer_literal.content = tokens.at(i);
+        ++i;
+
+        operand = integer_literal;
     } else {
         throw viua::cg::lex::InvalidSyntax(tokens.at(i), "invalid operand");
     }
