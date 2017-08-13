@@ -293,6 +293,9 @@ struct BitsLiteral : public Operand {
 struct IntegerLiteral : public Operand {
     string content;
 };
+struct BooleanLiteral : public Operand {
+    string content;
+};
 
 struct Instruction {
     OPCODE opcode;
@@ -408,6 +411,12 @@ static auto parse_operand(const vector_view<Token> tokens, unique_ptr<Operand>& 
         ++i;
 
         operand = std::move(integer_literal);
+    } else if (str::is_boolean_literal(tok)) {
+        auto boolean_literal = make_unique<BooleanLiteral>();
+        boolean_literal->content = tokens.at(i);
+        ++i;
+
+        operand = std::move(boolean_literal);
     } else {
         throw viua::cg::lex::InvalidSyntax(tokens.at(i), "invalid operand");
     }
