@@ -296,6 +296,9 @@ struct IntegerLiteral : public Operand {
 struct BooleanLiteral : public Operand {
     string content;
 };
+struct VoidLiteral : public Operand {
+    const string content = "void";
+};
 
 struct Instruction {
     OPCODE opcode;
@@ -417,6 +420,11 @@ static auto parse_operand(const vector_view<Token> tokens, unique_ptr<Operand>& 
         ++i;
 
         operand = std::move(boolean_literal);
+    } else if (str::is_void(tok)) {
+        auto void_literal = make_unique<VoidLiteral>();
+        ++i;
+
+        operand = std::move(void_literal);
     } else {
         throw viua::cg::lex::InvalidSyntax(tokens.at(i), "invalid operand");
     }
