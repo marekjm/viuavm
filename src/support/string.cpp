@@ -95,6 +95,23 @@ namespace str {
 
     auto is_void(const string s) -> bool { return (s == "void"); }
 
+    auto is_atom_literal(const string s) -> bool {
+        /*
+         * This seemingly naive check is sufficient, as this function should only
+         * be called after the source code already lexed (and the lexer ensures that
+         * strings are properly closed and escaped so it is sufficient to check
+         * for opening and closing quotes here).
+         */
+        return (s.at(0) == '\'' and s.at(s.size() - 1) == '\'');
+    }
+
+    auto is_text_literal(const string s) -> bool {
+        /*
+         * Same as with with is_atom_literal().
+         */
+        return (s.at(0) == '"' and s.at(s.size() - 1) == '"');
+    }
+
     bool isfloat(const std::string& s, bool negatives) {
         /*  Returns true if s contains only numerical characters.
          *  Regex equivalent: `^[0-9]+\.[0-9]+$`
