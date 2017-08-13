@@ -91,6 +91,10 @@ namespace str {
         return regex_match(s, binary_literal);
     }
 
+    auto is_boolean_literal(const string s) -> bool { return (s == "true" or s == "false"); }
+
+    auto is_void(const string s) -> bool { return (s == "void"); }
+
     bool isfloat(const std::string& s, bool negatives) {
         /*  Returns true if s contains only numerical characters.
          *  Regex equivalent: `^[0-9]+\.[0-9]+$`

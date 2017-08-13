@@ -38,6 +38,8 @@ namespace str {
     bool isid(const std::string& s);
 
     auto is_binary_literal(const std::string) -> bool;
+    auto is_boolean_literal(const std::string) -> bool;
+    auto is_void(const std::string) -> bool;
 
     std::string sub(const std::string& s, std::string::size_type b = 0, long int e = -1);
 
