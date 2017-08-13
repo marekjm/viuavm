@@ -22,6 +22,7 @@
 #include <functional>
 #include <iostream>
 #include <map>
+#include <memory>
 #include <string>
 #include <unistd.h>
 #include <utility>
@@ -295,7 +296,7 @@ struct IntegerLiteral : public Operand {
 
 struct Instruction {
     OPCODE opcode;
-    vector<Operand> operands;
+    vector<unique_ptr<Operand>> operands;
 };
 
 struct InstructionsBlock {
@@ -363,50 +364,50 @@ static auto parse_attributes(const vector_view<Token> tokens,
     return i;
 }
 
-static auto parse_operand(const vector_view<Token> tokens, Operand& operand) -> const
+static auto parse_operand(const vector_view<Token> tokens, unique_ptr<Operand>& operand) -> const
     decltype(tokens)::size_type {
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{0};
 
     auto tok = tokens.at(i).str();
 
     if (tok.at(0) == '%' or tok.at(0) == '*' or tok.at(0) == '@') {
-        RegisterIndex ri;
+        auto ri = make_unique<RegisterIndex>();
 
         if (tok.at(0) == '%') {
-            ri.as = AccessSpecifier::DIRECT;
+            ri->as = AccessSpecifier::DIRECT;
         } else if (tok.at(0) == '*') {
-            ri.as = AccessSpecifier::POINTER_DEREFERENCE;
+            ri->as = AccessSpecifier::POINTER_DEREFERENCE;
         } else if (tok.at(0) == '@') {
-            ri.as = AccessSpecifier::REGISTER_INDIRECT;
+            ri->as = AccessSpecifier::REGISTER_INDIRECT;
         }
 
-        ri.index = static_cast<decltype(ri.index)>(stoul(tok.substr(1)));
+        ri->index = static_cast<decltype(ri->index)>(stoul(tok.substr(1)));
         ++i;
 
         if (tokens.at(i) == "current") {
-            ri.rss = RegisterSetSpecifier::CURRENT;
+            ri->rss = RegisterSetSpecifier::CURRENT;
         } else if (tokens.at(i) == "local") {
-            ri.rss = RegisterSetSpecifier::LOCAL;
+            ri->rss = RegisterSetSpecifier::LOCAL;
         } else if (tokens.at(i) == "static") {
-            ri.rss = RegisterSetSpecifier::STATIC;
+            ri->rss = RegisterSetSpecifier::STATIC;
         } else if (tokens.at(i) == "global") {
-            ri.rss = RegisterSetSpecifier::GLOBAL;
+            ri->rss = RegisterSetSpecifier::GLOBAL;
         }
         ++i;
 
-        operand = ri;
+        operand = std::move(ri);
     } else if (str::is_binary_literal(tok)) {
-        BitsLiteral bits_literal;
-        bits_literal.content = tokens.at(i);
+        auto bits_literal = make_unique<BitsLiteral>();
+        bits_literal->content = tokens.at(i);
         ++i;
 
-        operand = bits_literal;
+        operand = std::move(bits_literal);
     } else if (str::isnum(tok, true)) {
-        IntegerLiteral integer_literal;
-        integer_literal.content = tokens.at(i);
+        auto integer_literal = make_unique<IntegerLiteral>();
+        integer_literal->content = tokens.at(i);
         ++i;
 
-        operand = integer_literal;
+        operand = std::move(integer_literal);
     } else {
         throw viua::cg::lex::InvalidSyntax(tokens.at(i), "invalid operand");
     }
@@ -436,7 +437,7 @@ static auto parse_instruction(const vector_view<Token> tokens, Instruction& inst
     instruction.opcode = mnemonic_to_opcode(tokens.at(i++).str());
 
     while (tokens.at(i) != "\n") {
-        Operand operand;
+        unique_ptr<Operand> operand;
         i += parse_operand(vector_view<Token>(tokens, i), operand);
     }
     ++i;  // skip newline
@@ -451,7 +452,7 @@ static auto parse_block_body(const vector_view<Token> tokens, decltype(Instructi
     while (tokens.at(i) != ".end") {
         Instruction instruction;
         i += parse_instruction(vector_view<Token>(tokens, i), instruction);
-        body.push_back(instruction);
+        body.push_back(std::move(instruction));
     }
 
     return i;
