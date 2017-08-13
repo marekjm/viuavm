@@ -22,9 +22,9 @@
 
 #pragma once
 
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
 
 
 namespace str {
@@ -51,7 +51,7 @@ namespace str {
         std::ostringstream oss;
         for (decltype(sz) i = 0; i < sz; ++i) {
             oss << seq[i];
-            if (i < (sz-1)) {
+            if (i < (sz - 1)) {
                 oss << delim;
             }
         }
@@ -69,7 +69,7 @@ namespace str {
     std::string lstrip(const std::string& s);
 
     std::string::size_type lshare(const std::string& s, const std::string& w);
-    bool contains(const std::string&s, const char c);
+    bool contains(const std::string& s, const char c);
 
     std::string enquote(const std::string&, const char = '"');
     std::string strdecode(const std::string&);
