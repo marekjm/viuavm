@@ -306,6 +306,9 @@ struct FunctionNameLiteral : public Operand {
 struct AtomLiteral : public Operand {
     string content;
 };
+struct TextLiteral : public Operand {
+    string content;
+};
 
 struct Instruction {
     OPCODE opcode;
@@ -444,6 +447,12 @@ static auto parse_operand(const vector_view<Token> tokens, unique_ptr<Operand>& 
         ++i;
 
         operand = std::move(atom_literal);
+    } else if (str::is_text_literal(tok)) {
+        auto text_literal = make_unique<TextLiteral>();
+        text_literal->content = tokens.at(i);
+        ++i;
+
+        operand = std::move(text_literal);
     } else {
         throw viua::cg::lex::InvalidSyntax(tokens.at(i), "invalid operand");
     }
