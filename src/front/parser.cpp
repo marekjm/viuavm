@@ -28,6 +28,7 @@
 #include <utility>
 #include <vector>
 #include <viua/bytecode/maps.h>
+#include <viua/cg/assembler/assembler.h>
 #include <viua/cg/lex.h>
 #include <viua/cg/tools.h>
 #include <viua/front/asm.h>
@@ -299,6 +300,9 @@ struct BooleanLiteral : public Operand {
 struct VoidLiteral : public Operand {
     const string content = "void";
 };
+struct FunctionNameLiteral : public Operand {
+    string content;
+};
 
 struct Instruction {
     OPCODE opcode;
@@ -425,6 +429,12 @@ static auto parse_operand(const vector_view<Token> tokens, unique_ptr<Operand>& 
         ++i;
 
         operand = std::move(void_literal);
+    } else if (assembler::utils::isValidFunctionName(tok)) {
+        auto fn_name_literal = make_unique<FunctionNameLiteral>();
+        fn_name_literal->content = tokens.at(i);
+        ++i;
+
+        operand = std::move(fn_name_literal);
     } else {
         throw viua::cg::lex::InvalidSyntax(tokens.at(i), "invalid operand");
     }
