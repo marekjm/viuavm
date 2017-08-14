@@ -481,6 +481,8 @@ static auto mnemonic_to_opcode(const string mnemonic) -> OPCODE {
 }
 static auto parse_instruction(const vector_view<Token> tokens, Instruction& instruction)
     -> decltype(tokens)::size_type {
+    // FIXME this function should be renamed to something like 'parse_line()' because it should
+    // also parse directives
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{0};
 
     if (not OP_MNEMONICS.count(tokens.at(i).str())) {
