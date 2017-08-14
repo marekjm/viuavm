@@ -1647,7 +1647,7 @@ namespace viua {
                             tokens.back().original(input_tokens.at(i + 1));
                         }
                         continue;
-                    } else if (token == ".function:" or token == ".closure:") {
+                    } else if (token == ".function:" or token == ".closure:" or token == ".block:") {
                         tokens.push_back(token);
 
                         if (input_tokens.at(i + 1) != "[[") {
