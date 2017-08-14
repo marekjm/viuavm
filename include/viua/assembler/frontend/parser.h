@@ -49,6 +49,8 @@ namespace viua {
                     std::vector<viua::cg::lex::Token> tokens;
 
                     auto add(viua::cg::lex::Token) -> void;
+
+                    virtual ~Operand() = default;
                 };
 
                 struct RegisterIndex : public Operand {
@@ -92,7 +94,7 @@ namespace viua {
                 };
 
                 struct Line {
-                    virtual ~Line() {}
+                    virtual ~Line() = default;
                 };
                 struct Directive : public Line {
                     std::string directive;
