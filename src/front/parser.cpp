@@ -27,6 +27,7 @@
 #include <unistd.h>
 #include <utility>
 #include <vector>
+#include <viua/assembler/frontend/parser.h>
 #include <viua/bytecode/maps.h>
 #include <viua/cg/assembler/assembler.h>
 #include <viua/cg/lex.h>
@@ -44,6 +45,7 @@ bool SHOW_VERSION = false;
 bool VERBOSE = false;
 
 
+using namespace viua::assembler::frontend::parser;
 using Token = viua::cg::lex::Token;
 using InvalidSyntax = viua::cg::lex::InvalidSyntax;
 
@@ -265,88 +267,6 @@ template<typename T> class vector_view {
 
     vector_view(const decltype(vec) v, const decltype(offset) o) : vec(v), offset(o) {}
     vector_view(const vector_view<T>& v, const decltype(offset) o) : vec(v.vec), offset(v.offset + o) {}
-};
-
-enum class AccessSpecifier {
-    DIRECT,
-    REGISTER_INDIRECT,
-    POINTER_DEREFERENCE,
-};
-
-enum class RegisterSetSpecifier {
-    CURRENT,
-    LOCAL,
-    STATIC,
-    GLOBAL,
-};
-
-struct Operand {
-    vector<Token> tokens;
-
-    auto add(Token t) -> void { tokens.push_back(t); }
-};
-
-struct RegisterIndex : public Operand {
-    AccessSpecifier as;
-    viua::internals::types::register_index index;
-    RegisterSetSpecifier rss;
-};
-struct InstructionBlockName : public Operand {};
-struct BitsLiteral : public Operand {
-    string content;
-};
-struct IntegerLiteral : public Operand {
-    string content;
-};
-struct FloatLiteral : public Operand {
-    string content;
-};
-struct BooleanLiteral : public Operand {
-    string content;
-};
-struct VoidLiteral : public Operand {
-    const string content = "void";
-};
-struct FunctionNameLiteral : public Operand {
-    string content;
-};
-struct AtomLiteral : public Operand {
-    string content;
-};
-struct TextLiteral : public Operand {
-    string content;
-};
-struct DurationLiteral : public Operand {
-    string content;
-};
-struct Label : public Operand {
-    string content;
-};
-struct Offset : public Operand {
-    string content;
-};
-
-struct Line {
-    virtual ~Line() {}
-};
-struct Directive : public Line {
-    string directive;
-    vector<string> operands;
-};
-struct Instruction : public Line {
-    OPCODE opcode;
-    vector<unique_ptr<Operand>> operands;
-};
-
-struct InstructionsBlock {
-    Token name;
-    map<string, string> attributes;
-    vector<unique_ptr<Line>> body;
-};
-
-struct ParsedSource {
-    vector<InstructionsBlock> functions;
-    vector<InstructionsBlock> blocks;
 };
 
 
