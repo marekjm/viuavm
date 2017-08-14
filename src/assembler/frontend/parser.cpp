@@ -55,7 +55,7 @@ auto viua::assembler::frontend::parser::parse_attributes(const vector_view<Token
     auto i = decltype(tokens)::size_type{0};
 
     if (tokens.at(i) != "[[") {
-        throw InvalidSyntax(tokens.at(i));
+        throw InvalidSyntax(tokens.at(i), "expected '[['");
     }
     ++i;  // skip '[['
 
