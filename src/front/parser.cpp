@@ -510,11 +510,13 @@ static auto parse_instruction(const vector_view<Token> tokens, Instruction& inst
     cerr << "  mnemonic: " << tokens.at(i).str() << endl;
     instruction.opcode = mnemonic_to_opcode(tokens.at(i++).str());
 
-    while (tokens.at(i) != "\n") {
-        unique_ptr<Operand> operand;
-        i += parse_operand(vector_view<Token>(tokens, i), operand);
-    }
-    ++i;  // skip newline
+    try {
+        while (tokens.at(i) != "\n") {
+            unique_ptr<Operand> operand;
+            i += parse_operand(vector_view<Token>(tokens, i), operand);
+        }
+        ++i;  // skip newline
+    } catch (viua::cg::lex::InvalidSyntax& e) { throw e.add(tokens.at(0)); }
 
     return i;
 }
