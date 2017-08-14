@@ -527,15 +527,58 @@ static auto parse_instruction(const vector_view<Token> tokens, unique_ptr<Instru
 
     return i;
 }
+static auto parse_directive(const vector_view<Token> tokens, unique_ptr<Directive>& directive)
+    -> decltype(tokens)::size_type {
+    auto i = decltype(tokens)::size_type{0};
+
+    if (not assembler::utils::lines::is_directive(tokens.at(0))) {
+        throw viua::cg::lex::InvalidSyntax(tokens.at(0), "unknown directive");
+    }
+
+    cerr << "  directive: " << tokens.at(i).str() << endl;
+    directive->directive = tokens.at(i++);
+
+    if (tokens.at(0) == ".iota:") {
+        if (not str::isnum(tokens.at(i), false)) {
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i), "expected a positive integer");
+        }
+        directive->operands.push_back(tokens.at(i++));
+    } else if (tokens.at(0) == ".mark:") {
+        if (not str::isid(tokens.at(i))) {
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i), "invalid marker");
+        }
+        directive->operands.push_back(tokens.at(i++));
+    }
+    if (tokens.at(i) != "\n") {
+        throw viua::cg::lex::InvalidSyntax(tokens.at(i), "extra parameters to a directive").add(tokens.at(0));
+    }
+    ++i;  // skip newline
+
+    return i;
+}
+static auto parse_line(const vector_view<Token> tokens, unique_ptr<Line>& line)
+    -> decltype(tokens)::size_type {
+    auto i = decltype(tokens)::size_type{0};
+    if (tokens.at(0).str().at(0) == '.') {
+        auto directive = make_unique<Directive>();
+        i = parse_directive(vector_view<Token>(tokens, 0), directive);
+        line = std::move(directive);
+    } else {
+        auto instruction = make_unique<Instruction>();
+        i = parse_instruction(vector_view<Token>(tokens, 0), instruction);
+        line = std::move(instruction);
+    }
+    return i;
+}
 
 static auto parse_block_body(const vector_view<Token> tokens, InstructionsBlock& instructions_block)
     -> decltype(tokens)::size_type {
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{0};
 
     while (tokens.at(i) != ".end") {
-        auto instruction = make_unique<Instruction>();
-        i += parse_instruction(vector_view<Token>(tokens, i), instruction);
-        instructions_block.body.push_back(std::move(instruction));
+        auto line = make_unique<Line>();
+        i += parse_line(vector_view<Token>(tokens, i), line);
+        instructions_block.body.push_back(std::move(line));
     }
 
     return i;
