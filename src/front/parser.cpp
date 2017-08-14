@@ -267,8 +267,6 @@ template<typename T> class vector_view {
     vector_view(const vector_view<T>& v, const decltype(offset) o) : vec(v.vec), offset(v.offset + o) {}
 };
 
-struct Operand {};
-
 enum class AccessSpecifier {
     DIRECT,
     REGISTER_INDIRECT,
@@ -280,6 +278,12 @@ enum class RegisterSetSpecifier {
     LOCAL,
     STATIC,
     GLOBAL,
+};
+
+struct Operand {
+    vector<Token> tokens;
+
+    auto add(Token t) -> void { tokens.push_back(t); }
 };
 
 struct RegisterIndex : public Operand {
@@ -417,6 +421,7 @@ static auto parse_operand(const vector_view<Token> tokens, unique_ptr<Operand>& 
         } else if (tok.at(0) == '@') {
             ri->as = AccessSpecifier::REGISTER_INDIRECT;
         }
+        ri->add(tokens.at(i));  // add index token
 
         ri->index = static_cast<decltype(ri->index)>(stoul(tok.substr(1)));
         ++i;
@@ -430,71 +435,84 @@ static auto parse_operand(const vector_view<Token> tokens, unique_ptr<Operand>& 
         } else if (tokens.at(i) == "global") {
             ri->rss = RegisterSetSpecifier::GLOBAL;
         }
+        ri->add(tokens.at(i));  // add register set specifier token
+
         ++i;
 
         operand = std::move(ri);
     } else if (str::is_binary_literal(tok)) {
         auto bits_literal = make_unique<BitsLiteral>();
         bits_literal->content = tokens.at(i);
+        bits_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(bits_literal);
     } else if (str::isnum(tok, true)) {
         auto integer_literal = make_unique<IntegerLiteral>();
         integer_literal->content = tokens.at(i);
+        integer_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(integer_literal);
     } else if (str::isfloat(tok, true)) {
         auto float_literal = make_unique<FloatLiteral>();
         float_literal->content = tokens.at(i);
+        float_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(float_literal);
     } else if (str::is_boolean_literal(tok)) {
         auto boolean_literal = make_unique<BooleanLiteral>();
         boolean_literal->content = tokens.at(i);
+        boolean_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(boolean_literal);
     } else if (str::is_void(tok)) {
         auto void_literal = make_unique<VoidLiteral>();
+        void_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(void_literal);
     } else if (assembler::utils::isValidFunctionName(tok)) {
         auto fn_name_literal = make_unique<FunctionNameLiteral>();
         fn_name_literal->content = tokens.at(i);
+        fn_name_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(fn_name_literal);
     } else if (str::is_atom_literal(tok)) {
         auto atom_literal = make_unique<AtomLiteral>();
         atom_literal->content = tokens.at(i);
+        atom_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(atom_literal);
     } else if (str::is_text_literal(tok)) {
         auto text_literal = make_unique<TextLiteral>();
         text_literal->content = tokens.at(i);
+        text_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(text_literal);
     } else if (str::is_timeout_literal(tok)) {
         auto duration_literal = make_unique<DurationLiteral>();
         duration_literal->content = tokens.at(i);
+        duration_literal->add(tokens.at(i));
         ++i;
 
         operand = std::move(duration_literal);
     } else if (str::isid(tok) and not OP_MNEMONICS.count(tok)) {
         auto label = make_unique<Label>();
         label->content = tokens.at(i);
+        label->add(tokens.at(i));
         ++i;
 
         operand = std::move(label);
     } else if (tok.at(0) == '+' and str::isnum(tok.substr(1))) {
         auto offset = make_unique<Offset>();
         offset->content = tokens.at(i);
+        offset->add(tokens.at(i));
         ++i;
 
         operand = std::move(offset);
