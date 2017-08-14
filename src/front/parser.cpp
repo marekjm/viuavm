@@ -399,6 +399,7 @@ static auto parse_operand(const vector_view<Token> tokens, unique_ptr<Operand>& 
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{0};
 
     auto tok = tokens.at(i).str();
+    cerr << "    operand: " << tok << endl;
 
     if (tok.at(0) == '%' or tok.at(0) == '*' or tok.at(0) == '@') {
         auto ri = make_unique<RegisterIndex>();
