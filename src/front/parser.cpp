@@ -315,6 +315,9 @@ struct TextLiteral : public Operand {
 struct Label : public Operand {
     string content;
 };
+struct Offset : public Operand {
+    string content;
+};
 
 struct Instruction {
     OPCODE opcode;
@@ -471,6 +474,12 @@ static auto parse_operand(const vector_view<Token> tokens, unique_ptr<Operand>& 
         ++i;
 
         operand = std::move(label);
+    } else if (tok.at(0) == '+' and str::isnum(tok.substr(1))) {
+        auto offset = make_unique<Offset>();
+        offset->content = tokens.at(i);
+        ++i;
+
+        operand = std::move(offset);
     } else {
         throw viua::cg::lex::InvalidSyntax(tokens.at(i), "invalid operand");
     }
