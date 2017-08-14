@@ -698,9 +698,19 @@ int main(int argc, char* argv[]) {
     string source = read_file(in);
 
     auto raw_tokens = viua::cg::lex::tokenise(source);
-    auto tokens = viua::cg::lex::cook(raw_tokens);
+    vector<Token> tokens;
+    vector<Token> normalised_tokens;
 
-    vector<Token> normalised_tokens = normalise(tokens);
+    try {
+        tokens = viua::cg::lex::cook(raw_tokens);
+        normalised_tokens = normalise(tokens);
+    } catch (const viua::cg::lex::InvalidSyntax& e) {
+        display_error_in_context(raw_tokens, e, filename);
+        return 1;
+    } catch (const viua::cg::lex::TracedSyntaxError& e) {
+        display_error_in_context(raw_tokens, e, filename);
+        return 1;
+    }
 
     try {
         ParsedSource parsed_source = parse(normalised_tokens);
