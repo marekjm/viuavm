@@ -503,7 +503,7 @@ static auto mnemonic_to_opcode(const string mnemonic) -> OPCODE {
     }
     return opcode;
 }
-static auto parse_instruction(const vector_view<Token> tokens, Instruction& instruction)
+static auto parse_instruction(const vector_view<Token> tokens, unique_ptr<Instruction>& instruction)
     -> decltype(tokens)::size_type {
     auto i = decltype(tokens)::size_type{0};
 
@@ -512,12 +512,13 @@ static auto parse_instruction(const vector_view<Token> tokens, Instruction& inst
     }
 
     cerr << "  mnemonic: " << tokens.at(i).str() << endl;
-    instruction.opcode = mnemonic_to_opcode(tokens.at(i++).str());
+    instruction->opcode = mnemonic_to_opcode(tokens.at(i++).str());
 
     try {
         while (tokens.at(i) != "\n") {
             unique_ptr<Operand> operand;
             i += parse_operand(vector_view<Token>(tokens, i), operand);
+            instruction->operands.push_back(std::move(operand));
         }
         ++i;  // skip newline
     } catch (viua::cg::lex::InvalidSyntax& e) { throw e.add(tokens.at(0)); }
@@ -530,7 +531,7 @@ static auto parse_block_body(const vector_view<Token> tokens, InstructionsBlock&
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{0};
 
     while (tokens.at(i) != ".end") {
-        Instruction instruction;
+        auto instruction = make_unique<Instruction>();
         i += parse_instruction(vector_view<Token>(tokens, i), instruction);
         instructions_block.body.push_back(std::move(instruction));
     }
