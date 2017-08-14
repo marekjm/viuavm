@@ -335,7 +335,7 @@ struct Instruction : public Line {
 };
 
 struct InstructionsBlock {
-    string name;
+    Token name;
     map<string, string> attributes;
     vector<unique_ptr<Line>> body;
 };
@@ -603,7 +603,7 @@ static auto parse_function(const vector_view<Token> tokens, InstructionsBlock& i
     i += parse_attributes(vector_view<Token>(tokens, i), ib.attributes);
 
     cerr << "  name: " << tokens.at(i).str() << endl;
-    ib.name = tokens.at(i).str();
+    ib.name = tokens.at(i);
     ++i;  // skip name
     ++i;  // skip newline
 
