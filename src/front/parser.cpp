@@ -294,6 +294,9 @@ struct BitsLiteral : public Operand {
 struct IntegerLiteral : public Operand {
     string content;
 };
+struct FloatLiteral : public Operand {
+    string content;
+};
 struct BooleanLiteral : public Operand {
     string content;
 };
@@ -424,6 +427,12 @@ static auto parse_operand(const vector_view<Token> tokens, unique_ptr<Operand>& 
         ++i;
 
         operand = std::move(integer_literal);
+    } else if (str::isfloat(tok, true)) {
+        auto float_literal = make_unique<FloatLiteral>();
+        float_literal->content = tokens.at(i);
+        ++i;
+
+        operand = std::move(float_literal);
     } else if (str::is_boolean_literal(tok)) {
         auto boolean_literal = make_unique<BooleanLiteral>();
         boolean_literal->content = tokens.at(i);
