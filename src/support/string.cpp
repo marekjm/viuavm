@@ -112,6 +112,24 @@ namespace str {
         return (s.at(0) == '"' and s.at(s.size() - 1) == '"');
     }
 
+    auto is_timeout_literal(const string s) -> bool {
+        if (s == "infinity") {
+            return true;
+        }
+
+        const auto size = s.size();
+        if (size < 2) {
+            return false;
+        }
+        if (s.at(size - 2) == 'm' and s.at(size - 1) == 's' and str::isnum(s.substr(0, size - 2))) {
+            return true;
+        }
+        if (s.at(size - 1) == 's' and str::isnum(s.substr(0, size - 1))) {
+            return true;
+        }
+        return false;
+    }
+
     bool isfloat(const std::string& s, bool negatives) {
         /*  Returns true if s contains only numerical characters.
          *  Regex equivalent: `^[0-9]+\.[0-9]+$`
