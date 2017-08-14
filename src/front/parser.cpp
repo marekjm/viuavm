@@ -601,6 +601,10 @@ static auto parse_function(const vector_view<Token> tokens, InstructionsBlock& i
 
     return i;
 }
+static auto parse_block(const vector_view<Token> tokens, InstructionsBlock& ib) -> const
+    decltype(tokens)::size_type {
+    return parse_function(tokens, ib);
+}
 
 static auto parse(const vector<Token>& tokens) -> ParsedSource {
     ParsedSource parsed;
@@ -612,6 +616,9 @@ static auto parse(const vector<Token>& tokens) -> ParsedSource {
         if (tokens.at(i) == ".function:") {
             InstructionsBlock ib;
             i += parse_function(vector_view<Token>(tokens, i), ib);
+        } else if (tokens.at(i) == ".block:") {
+            InstructionsBlock ib;
+            i += parse_block(vector_view<Token>(tokens, i), ib);
         } else {
             throw viua::cg::lex::InvalidSyntax(tokens.at(i), "expected '.function:' or newline");
         }
