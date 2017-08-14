@@ -355,7 +355,8 @@ auto viua::assembler::frontend::parser::parse(const vector<Token>& tokens) -> Pa
             }
             parsed.block_signatures.push_back(tokens.at(i++));
         } else {
-            throw viua::cg::lex::InvalidSyntax(tokens.at(i), "expected '.function:' or newline");
+            throw viua::cg::lex::InvalidSyntax(
+                tokens.at(i), "expected a function or a block definition (or signature), or a newline");
         }
     }
 
