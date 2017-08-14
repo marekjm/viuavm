@@ -332,6 +332,21 @@ auto viua::assembler::frontend::parser::parse(const vector<Token>& tokens) -> Pa
         } else if (tokens.at(i) == ".block:") {
             InstructionsBlock ib;
             i += parse_block(vector_view<Token>(tokens, i), ib);
+        } else if (tokens.at(i) == ".signature:") {
+            ++i;
+            if (tokens.at(i) == "\n") {
+                throw InvalidSyntax(tokens.at(i - 1), "missing function name");
+            }
+            if (not::assembler::utils::isValidFunctionName(tokens.at(i))) {
+                throw InvalidSyntax(tokens.at(i), "not a valid function name");
+            }
+            parsed.function_signatures.push_back(tokens.at(i++));
+        } else if (tokens.at(i) == ".bsignature:") {
+            ++i;
+            if (tokens.at(i) == "\n") {
+                throw InvalidSyntax(tokens.at(i - 1), "missing block name");
+            }
+            parsed.block_signatures.push_back(tokens.at(i++));
         } else {
             throw viua::cg::lex::InvalidSyntax(tokens.at(i), "expected '.function:' or newline");
         }

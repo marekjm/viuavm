@@ -113,7 +113,10 @@ namespace viua {
 
                 struct ParsedSource {
                     std::vector<InstructionsBlock> functions;
+                    std::vector<viua::cg::lex::Token> function_signatures;
+
                     std::vector<InstructionsBlock> blocks;
+                    std::vector<viua::cg::lex::Token> block_signatures;
                 };
 
 
