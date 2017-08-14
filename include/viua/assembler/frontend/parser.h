@@ -154,6 +154,8 @@ namespace viua {
                     -> decltype(tokens)::size_type;
                 auto parse_function(const vector_view<viua::cg::lex::Token> tokens, InstructionsBlock&)
                     -> const decltype(tokens)::size_type;
+                auto parse_closure(const vector_view<viua::cg::lex::Token> tokens, InstructionsBlock&)
+                    -> const decltype(tokens)::size_type;
                 auto parse_block(const vector_view<viua::cg::lex::Token> tokens, InstructionsBlock&) -> const
                     decltype(tokens)::size_type;
                 auto parse(const std::vector<viua::cg::lex::Token>&) -> ParsedSource;

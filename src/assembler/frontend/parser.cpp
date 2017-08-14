@@ -314,6 +314,10 @@ auto viua::assembler::frontend::parser::parse_function(const vector_view<Token> 
 
     return i;
 }
+auto viua::assembler::frontend::parser::parse_closure(const vector_view<Token> tokens, InstructionsBlock& ib)
+    -> const decltype(tokens)::size_type {
+    return parse_function(tokens, ib);
+}
 auto viua::assembler::frontend::parser::parse_block(const vector_view<Token> tokens, InstructionsBlock& ib)
     -> const decltype(tokens)::size_type {
     return parse_function(tokens, ib);
@@ -332,6 +336,9 @@ auto viua::assembler::frontend::parser::parse(const vector<Token>& tokens) -> Pa
         } else if (tokens.at(i) == ".block:") {
             InstructionsBlock ib;
             i += parse_block(vector_view<Token>(tokens, i), ib);
+        } else if (tokens.at(i) == ".closure:") {
+            InstructionsBlock ib;
+            i += parse_closure(vector_view<Token>(tokens, i), ib);
         } else if (tokens.at(i) == ".signature:") {
             ++i;
             if (tokens.at(i) == "\n") {
