@@ -260,6 +260,10 @@ auto viua::assembler::frontend::parser::parse_directive(const vector_view<Token>
         throw viua::cg::lex::InvalidSyntax(tokens.at(0), "unknown directive");
     }
 
+    if (tokens.at(0) == ".block:" or tokens.at(0) == ".function:" or tokens.at(0) == ".closure:") {
+        throw viua::cg::lex::InvalidSyntax(tokens.at(0), "no '.end' between definitions");
+    }
+
     cerr << "  directive: " << tokens.at(i).str() << endl;
     directive->directive = tokens.at(i++);
 
@@ -276,6 +280,7 @@ auto viua::assembler::frontend::parser::parse_directive(const vector_view<Token>
     } else if (tokens.at(0) == ".unused:") {
         directive->operands.push_back(tokens.at(i++));
     }
+
     if (tokens.at(i) != "\n") {
         throw viua::cg::lex::InvalidSyntax(tokens.at(i), "extra parameters to a directive").add(tokens.at(0));
     }
