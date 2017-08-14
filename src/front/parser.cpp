@@ -519,14 +519,14 @@ static auto parse_instruction(const vector_view<Token> tokens, Instruction& inst
     return i;
 }
 
-static auto parse_block_body(const vector_view<Token> tokens, decltype(InstructionsBlock::body) & body)
+static auto parse_block_body(const vector_view<Token> tokens, InstructionsBlock& instructions_block)
     -> decltype(tokens)::size_type {
     auto i = std::remove_reference_t<decltype(tokens)>::size_type{0};
 
     while (tokens.at(i) != ".end") {
         Instruction instruction;
         i += parse_instruction(vector_view<Token>(tokens, i), instruction);
-        body.push_back(std::move(instruction));
+        instructions_block.body.push_back(std::move(instruction));
     }
 
     return i;
@@ -545,7 +545,7 @@ static auto parse_function(const vector_view<Token> tokens, InstructionsBlock& i
     ++i;  // skip name
     ++i;  // skip newline
 
-    i += parse_block_body(vector_view<Token>(tokens, i), ib.body);
+    i += parse_block_body(vector_view<Token>(tokens, i), ib);
 
     return i;
 }
