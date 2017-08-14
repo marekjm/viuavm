@@ -154,7 +154,7 @@ namespace str {
     bool isid(const std::string& s) {
         /*  Returns true if s is a valid identifier.
          */
-        static regex identifier("^[a-zA-Z_][a-zA-Z0-9_]*$");
+        static regex identifier("^[a-zA-Z_][:/a-zA-Z0-9_]*$");
         return regex_match(s, identifier);
     }
 
