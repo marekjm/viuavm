@@ -319,7 +319,12 @@ struct Offset : public Operand {
     string content;
 };
 
-struct Instruction {
+struct Line {};
+struct Directive : public Line {
+    string directive;
+    vector<string> operands;
+};
+struct Instruction : public Line {
     OPCODE opcode;
     vector<unique_ptr<Operand>> operands;
 };
@@ -327,7 +332,7 @@ struct Instruction {
 struct InstructionsBlock {
     string name;
     map<string, string> attributes;
-    vector<Instruction> body;
+    vector<unique_ptr<Line>> body;
 };
 
 struct ParsedSource {
