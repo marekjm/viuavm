@@ -312,6 +312,9 @@ struct AtomLiteral : public Operand {
 struct TextLiteral : public Operand {
     string content;
 };
+struct Label : public Operand {
+    string content;
+};
 
 struct Instruction {
     OPCODE opcode;
@@ -462,6 +465,12 @@ static auto parse_operand(const vector_view<Token> tokens, unique_ptr<Operand>& 
         ++i;
 
         operand = std::move(text_literal);
+    } else if (str::isid(tok) and not OP_MNEMONICS.count(tok)) {
+        auto label = make_unique<Label>();
+        label->content = tokens.at(i);
+        ++i;
+
+        operand = std::move(label);
     } else {
         throw viua::cg::lex::InvalidSyntax(tokens.at(i), "invalid operand");
     }
