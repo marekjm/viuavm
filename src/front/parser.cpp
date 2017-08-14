@@ -312,6 +312,9 @@ struct AtomLiteral : public Operand {
 struct TextLiteral : public Operand {
     string content;
 };
+struct DurationLiteral : public Operand {
+    string content;
+};
 struct Label : public Operand {
     string content;
 };
@@ -476,6 +479,12 @@ static auto parse_operand(const vector_view<Token> tokens, unique_ptr<Operand>& 
         ++i;
 
         operand = std::move(text_literal);
+    } else if (str::is_timeout_literal(tok)) {
+        auto duration_literal = make_unique<DurationLiteral>();
+        duration_literal->content = tokens.at(i);
+        ++i;
+
+        operand = std::move(duration_literal);
     } else if (str::isid(tok) and not OP_MNEMONICS.count(tok)) {
         auto label = make_unique<Label>();
         label->content = tokens.at(i);
