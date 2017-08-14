@@ -350,16 +350,17 @@ static auto parse_attribute_value(const vector_view<Token> tokens, string& value
     decltype(tokens)::size_type {
     auto i = decltype(tokens)::size_type{1};
 
-    if (tokens.at(i) == ")") {
+    if (tokens.at(i) == "}") {
         // do nothing
     } else {
         value = tokens.at(i).str();
         ++i;
     }
 
-    if (tokens.at(i) != ")") {
-        throw viua::cg::lex::InvalidSyntax(tokens.at(i), "expected ')'");
+    if (tokens.at(i) != "}") {
+        throw viua::cg::lex::InvalidSyntax(tokens.at(i), "expected '}'");
     }
+    ++i;
 
     return i;
 }
@@ -379,15 +380,15 @@ static auto parse_attributes(const vector_view<Token> tokens,
 
         if (tokens.at(i) == ",") {
             ++i;
-        } else if (tokens.at(i) == "(") {
+        } else if (tokens.at(i) == "{") {
             i += parse_attribute_value(vector_view<Token>(tokens, i), value);
         } else if (tokens.at(i) == "]]") {
             // do nothing
         } else {
-            throw viua::cg::lex::InvalidSyntax(tokens.at(i), "expected ',' or '(' or ']]'");
+            throw viua::cg::lex::InvalidSyntax(tokens.at(i), "expected ',' or '{' or ']]'");
         }
 
-        cerr << "  attribute: " << key << '(' << value << ')' << endl;
+        cerr << "  attribute: " << key << '{' << value << '}' << endl;
         attributes[key] = value;
     }
     ++i;  // skip ']]'
