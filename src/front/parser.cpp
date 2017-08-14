@@ -319,7 +319,9 @@ struct Offset : public Operand {
     string content;
 };
 
-struct Line {};
+struct Line {
+    virtual ~Line() {}
+};
 struct Directive : public Line {
     string directive;
     vector<string> operands;
