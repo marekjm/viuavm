@@ -1579,8 +1579,7 @@ namespace viua {
                         }
                     } else if (token == "move" or token == "copy" or token == "swap" or token == "ptr" or
                                token == "isnull" or token == "send" or token == "textlength" or
-                               token == "structkeys" or token == "bitset" or
-                               token == "bitat") {
+                               token == "structkeys" or token == "bitset" or token == "bitat") {
                         tokens.push_back(token);  // mnemonic
 
                         if (input_tokens.at(i + 1) == "[[") {
