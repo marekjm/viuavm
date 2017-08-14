@@ -108,6 +108,7 @@ auto viua::assembler::frontend::parser::parse_operand(const vector_view<Token> t
         ri->index = static_cast<decltype(ri->index)>(stoul(tok.substr(1)));
         ++i;
 
+        auto has_rss = true;
         if (tokens.at(i) == "current") {
             ri->rss = RegisterSetSpecifier::CURRENT;
         } else if (tokens.at(i) == "local") {
@@ -116,10 +117,22 @@ auto viua::assembler::frontend::parser::parse_operand(const vector_view<Token> t
             ri->rss = RegisterSetSpecifier::STATIC;
         } else if (tokens.at(i) == "global") {
             ri->rss = RegisterSetSpecifier::GLOBAL;
+        } else {
+            /*
+             * This is just for 'arg' instruction's special-case, where
+             * the second operand *is* preceded by a '%' character, but
+             * *is not* followed by a register set specifier.
+             *
+             * FIXME Add 'arguments' register set specifier (read only) to
+             * un-special-case the 'arg' instruction.
+             */
+            has_rss = false;
         }
-        ri->add(tokens.at(i));  // add register set specifier token
 
-        ++i;
+        if (has_rss) {
+            ri->add(tokens.at(i));  // add register set specifier token
+            ++i;
+        }
 
         operand = std::move(ri);
     } else if (str::is_binary_literal(tok)) {
