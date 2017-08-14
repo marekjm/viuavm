@@ -113,6 +113,45 @@ namespace viua {
                     std::vector<InstructionsBlock> functions;
                     std::vector<InstructionsBlock> blocks;
                 };
+
+
+                template<typename T> class vector_view {
+                    const std::vector<T>& vec;
+                    const typename std::remove_reference_t<decltype(vec)>::size_type offset;
+
+                  public:
+                    using size_type = decltype(offset);
+
+                    auto at(const decltype(offset) i) const -> const T& { return vec.at(offset + i); }
+                    auto size() const -> size_type { return vec.size(); }
+
+                    vector_view(const decltype(vec) v, const decltype(offset) o) : vec(v), offset(o) {}
+                    vector_view(const vector_view<T>& v, const decltype(offset) o)
+                        : vec(v.vec), offset(v.offset + o) {}
+                };
+
+
+                auto parse_attribute_value(const vector_view<viua::cg::lex::Token> tokens, std::string&)
+                    -> const decltype(tokens)::size_type;
+                auto parse_attributes(const vector_view<viua::cg::lex::Token> tokens,
+                                      std::map<std::string, std::string>&) -> const
+                    decltype(tokens)::size_type;
+                auto parse_operand(const vector_view<viua::cg::lex::Token> tokens, std::unique_ptr<Operand>&)
+                    -> const decltype(tokens)::size_type;
+                auto mnemonic_to_opcode(const std::string mnemonic) -> OPCODE;
+                auto parse_instruction(const vector_view<viua::cg::lex::Token> tokens,
+                                       std::unique_ptr<Instruction>&) -> decltype(tokens)::size_type;
+                auto parse_directive(const vector_view<viua::cg::lex::Token> tokens,
+                                     std::unique_ptr<Directive>&) -> decltype(tokens)::size_type;
+                auto parse_line(const vector_view<viua::cg::lex::Token> tokens, std::unique_ptr<Line>&)
+                    -> decltype(tokens)::size_type;
+                auto parse_block_body(const vector_view<viua::cg::lex::Token> tokens, InstructionsBlock&)
+                    -> decltype(tokens)::size_type;
+                auto parse_function(const vector_view<viua::cg::lex::Token> tokens, InstructionsBlock&)
+                    -> const decltype(tokens)::size_type;
+                auto parse_block(const vector_view<viua::cg::lex::Token> tokens, InstructionsBlock&) -> const
+                    decltype(tokens)::size_type;
+                auto parse(const std::vector<viua::cg::lex::Token>&) -> ParsedSource;
             }
         }
     }
