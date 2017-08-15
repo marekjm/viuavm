@@ -1,4 +1,4 @@
-CXX_STANDARD=c++14
+CXX_STANDARD=c++17
 #CLANG_SANITIZE_FLAGS=-fsanitize=thread
 
 TRAVIS_CI_CLANG=clang++-3.9
@@ -18,9 +18,15 @@ CXXFLAGS=-std=$(CXX_STANDARD) -Wall -Wextra -Wctor-dtor-privacy -Wnon-virtual-dt
 else ifeq ($(CXX), $(TRAVIS_CI_GCC))
 CXXFLAGS=-std=$(CXX_STANDARD) -Wall -Wextra -Wzero-as-null-pointer-constant -Wuseless-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wredundant-decls -Wlogical-op -Wmissing-include-dirs -Wcast-align -Wold-style-cast -Werror -Wfatal-errors -pedantic -g -I./include -fsanitize=undefined
 else ifeq ($(CXX), $(TRAVIS_CI_CLANG))
-CXXFLAGS=-std=c++14 -Wall -Wextra -Wint-to-void-pointer-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wmissing-include-dirs -Wcast-align -Wold-style-cast -Werror -Wfatal-errors -pedantic -g -I./include $(CLANG_SANITIZER_FLAGS)
+# Clang does not yet recognise -std=c++17 option, and
+# needs -std=c++1z.
+# See http://clang.llvm.org/cxx_status.html for details.
+CXXFLAGS=-std=c++1z -Wall -Wextra -Wint-to-void-pointer-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wmissing-include-dirs -Wcast-align -Wold-style-cast -Werror -Wfatal-errors -pedantic -g -I./include $(CLANG_SANITIZER_FLAGS)
 else ifeq ($(CXX), clang++)
-CXXFLAGS=-std=$(CXX_STANDARD) -Wall -Wextra -Wint-to-void-pointer-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wmissing-include-dirs -Wcast-align -Wold-style-cast -Werror -Wfatal-errors -pedantic -g -I./include $(CLANG_SANITIZER_FLAGS)
+# Clang does not yet recognise -std=c++17 option, and
+# needs -std=c++1z.
+# See http://clang.llvm.org/cxx_status.html for details.
+CXXFLAGS=-std=c++1z -Wall -Wextra -Wint-to-void-pointer-cast -Wconversion -Winline -Wshadow -Wswitch-default -Wmissing-include-dirs -Wcast-align -Wold-style-cast -Werror -Wfatal-errors -pedantic -g -I./include $(CLANG_SANITIZER_FLAGS)
 endif
 
 CXXOPTIMIZATIONFLAGS=-O0
