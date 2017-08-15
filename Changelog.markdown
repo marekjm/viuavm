@@ -46,6 +46,7 @@ There are several categories of change:
 - feature: `no_sa` function attribute disabling static analysis for function marked with this attribute
 - feature: `fixedincrement` and`fixeddecrement` instructions for fixed-width integers/bit strings
 - feature: `fixedadd` instructions for arithmetic on fixed-width integers
+- enhancement: C++ standard used for Viua VM development was updated to C++17
 
 Fixed-width arithmetic instructions interpret bit strings as two's complement fixed-width integers when
 signed arithmetic is requested.
