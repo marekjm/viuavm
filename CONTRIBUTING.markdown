@@ -19,7 +19,7 @@ develop the VM.
 * `python`: Python programming language 3.x for test suite (optional),
 * `valgrind`: for memory leak testing (optional; by default enabled, disabling required setting `MEMORY_LEAK_CHECKS_ENABLE` variable in `tests/tests.py` to `False`),
 
-Other C++14 capable compilers may work but testing is only performed for G++ and Clang++.
+Other C++17 capable compilers may work but testing is only performed for G++ and Clang++.
 
 The development environment is also assumed to have the usual \*NIX tools (awk, sed, xargs, etc.) available.
 
