@@ -44,6 +44,7 @@ There are several categories of change:
 - feature: attributes for functions (`.function: [[attr0, attr1]] fun/0`) providing additional details about
   functions the assembler can use
 - feature: `no_sa` function attribute disabling static analysis for function marked with this attribute
+- enhancement: C++ standard used for Viua VM development was updated to C++17
 
 
 ----
