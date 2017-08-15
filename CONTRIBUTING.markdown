@@ -44,11 +44,12 @@ $ make test     # this assumes that you have Python 3.x and Valgrind installed
 If the above sequence of commands can be run without problems on your system then
 you're all set.
 
+*Note:* the last command - `make test` - may run for several minutes, depending on the speed of your hardware.
+
 
 ### Development scripts
 
 In the `scripts/` directory, you can find scripts that are used during development of Viua.
-The shell installed in dev environment is ZSH but the scripts should be compatible with BASH as well.
 
 ----
 
@@ -146,7 +147,7 @@ be published under GNU GPL v3 or any later version of the GPL.
 
 Viua uses only the C++ standard library data structures.
 However, if you are capable of writing efficient, reliable, concurrent data structures feel welcome
-to share your knowlegde and experience and enhance the VM.
+to share your knowlegde and experience, and improve the VM.
 
 Most sought-after would be:
 
