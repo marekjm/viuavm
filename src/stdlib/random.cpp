@@ -31,7 +31,7 @@
 using namespace std;
 
 
-float getrandom() {
+static auto getrandom() -> long double {
     /** Return random float between 0.0 and 1.0.
      *
      *  This is a utility function exposed to Viua.
@@ -42,8 +42,7 @@ float getrandom() {
     }
     unsigned long long int rullint = 0;
     in.read(reinterpret_cast<char*>(&rullint), sizeof(rullint));
-    float rfloat = ((long double)rullint / (long double)ULLONG_MAX);
-    return rfloat;
+    return (static_cast<long double>(rullint) / static_cast<long double>(ULLONG_MAX));
 }
 
 static auto random_drandom(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
