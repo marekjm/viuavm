@@ -46,7 +46,7 @@ static auto inheritanceChain(Frame* frame, viua::kernel::RegisterSet*, viua::ker
     auto ic = frame->arguments->at(0)->inheritancechain();
     auto icv = make_unique<viua::types::Vector>();
 
-    for (unsigned i = 0; i < ic.size(); ++i) {
+    for (decltype(ic)::size_type i = 0; i < ic.size(); ++i) {
         icv->push(make_unique<viua::types::String>(ic[i]));
     }
 
@@ -63,7 +63,7 @@ static auto bases(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Regist
     auto ic = object->bases();
     auto icv = make_unique<viua::types::Vector>();
 
-    for (unsigned i = 0; i < ic.size(); ++i) {
+    for (decltype(ic)::size_type i = 0; i < ic.size(); ++i) {
         icv->push(make_unique<viua::types::String>(ic[i]));
     }
 
