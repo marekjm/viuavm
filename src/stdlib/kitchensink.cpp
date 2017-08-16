@@ -36,7 +36,7 @@ void kitchensink_sleep(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::R
 }
 
 const ForeignFunctionSpec functions[] = {
-    {"std::kitchensink::sleep/1", &kitchensink_sleep}, {NULL, NULL},
+    {"std::kitchensink::sleep/1", &kitchensink_sleep}, {nullptr, nullptr},
 };
 
 extern "C" const ForeignFunctionSpec* exports() { return functions; }

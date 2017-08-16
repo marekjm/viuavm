@@ -75,7 +75,7 @@ const ForeignFunctionSpec functions[] = {
     {"typesystem::typeof/1", &typeof},
     {"typesystem::inheritanceChain/1", &inheritanceChain},
     {"typesystem::bases/1", &bases},
-    {NULL, NULL},
+    {nullptr, nullptr},
 };
 
 extern "C" const ForeignFunctionSpec* exports() { return functions; }

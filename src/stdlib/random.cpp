@@ -105,7 +105,7 @@ const ForeignFunctionSpec functions[] = {
     {"std::random::device::urandom", &random_durandom},
     {"std::random::random", &random_random},
     {"std::random::randint", &random_randint},
-    {NULL, NULL},
+    {nullptr, nullptr},
 };
 
 extern "C" const ForeignFunctionSpec* exports() { return functions; }
