@@ -93,5 +93,6 @@ struct ForeignFunctionSpec {
     ForeignFunction* fpointer;
 };
 
+extern "C" const ForeignFunctionSpec* exports();
 
 #endif

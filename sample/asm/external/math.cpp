@@ -28,9 +28,6 @@
 using namespace std;
 
 
-extern "C" const ForeignFunctionSpec* exports();
-
-
 static auto math_sqrt(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
                       viua::process::Process*, viua::kernel::Kernel*) -> void {
     if (not frame->arguments->at(0)) {

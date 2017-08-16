@@ -27,9 +27,6 @@
 using namespace std;
 
 
-extern "C" const ForeignFunctionSpec* exports();
-
-
 static auto printer_print(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
                           viua::process::Process*, viua::kernel::Kernel*) -> void {
     unique_ptr<viua::types::Value> arg(frame->arguments->pop(0));
