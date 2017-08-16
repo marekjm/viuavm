@@ -31,7 +31,7 @@ using namespace std;
 
 static auto typeof(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
                    viua::process::Process*, viua::kernel::Kernel*) -> void {
-    if (frame->arguments->at(0) == 0) {
+    if (not frame->arguments->at(0)) {
         throw new viua::types::Exception("expected object as parameter 0");
     }
     frame->local_register_set->set(0, make_unique<viua::types::String>(frame->arguments->get(0)->type()));
@@ -39,7 +39,7 @@ static auto typeof(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Regis
 
 static auto inheritanceChain(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
                              viua::process::Process*, viua::kernel::Kernel*) -> void {
-    if (frame->arguments->at(0) == 0) {
+    if (not frame->arguments->at(0)) {
         throw new viua::types::Exception("expected object as parameter 0");
     }
 
@@ -55,7 +55,7 @@ static auto inheritanceChain(Frame* frame, viua::kernel::RegisterSet*, viua::ker
 
 static auto bases(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
                   viua::process::Process*, viua::kernel::Kernel*) -> void {
-    if (frame->arguments->at(0) == 0) {
+    if (not frame->arguments->at(0)) {
         throw new viua::types::Exception("expected object as parameter 0");
     }
 
