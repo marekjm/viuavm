@@ -42,12 +42,8 @@ class Ifstream : public viua::types::Value {
     string repr() const override { return str(); }
     bool boolean() const override { return in.is_open(); }
 
-    virtual std::vector<std::string> bases() const override {
-        return std::vector<std::string>{"viua::types::Value"};
-    }
-    virtual std::vector<std::string> inheritancechain() const override {
-        return std::vector<std::string>{"viua::types::Value"};
-    }
+    virtual vector<string> bases() const override { return vector<string>{"viua::types::Value"}; }
+    virtual vector<string> inheritancechain() const override { return vector<string>{"viua::types::Value"}; }
 
     string getline() {
         if (in.eof()) {
@@ -55,7 +51,7 @@ class Ifstream : public viua::types::Value {
         }
 
         string line;
-        std::getline(in, line);
+        ::std::getline(in, line);
         return line;
     }
 
