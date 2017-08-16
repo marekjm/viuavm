@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016 Marek Marecki
+ *  Copyright (C) 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -18,19 +18,17 @@
  */
 
 #include <iostream>
-#include <sstream>
 #include <memory>
-#include <viua/types/value.h>
+#include <sstream>
+#include <viua/include/module.h>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
-#include <viua/include/module.h>
+#include <viua/types/value.h>
 using namespace std;
 
 
-extern "C" const ForeignFunctionSpec* exports();
-
-
-static void printer_print(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+static auto printer_print(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                          viua::process::Process*, viua::kernel::Kernel*) -> void {
     unique_ptr<viua::types::Value> arg(frame->arguments->pop(0));
     // concatenate before printing to avoid mangled output
     cout << ("Hello " + arg->str() + "!\n");
@@ -38,10 +36,7 @@ static void printer_print(Frame* frame, viua::kernel::RegisterSet*, viua::kernel
 
 
 const ForeignFunctionSpec functions[] = {
-    { "printer::print/1", &printer_print },
-    { nullptr, nullptr },
+    {"printer::print/1", &printer_print}, {nullptr, nullptr},
 };
 
-extern "C" const ForeignFunctionSpec* exports() {
-    return functions;
-}
+extern "C" const ForeignFunctionSpec* exports() { return functions; }

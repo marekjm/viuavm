@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -31,7 +31,7 @@
 using namespace std;
 
 
-float getrandom() {
+static auto getrandom() -> long double {
     /** Return random float between 0.0 and 1.0.
      *
      *  This is a utility function exposed to Viua.
@@ -41,13 +41,12 @@ float getrandom() {
         throw new viua::types::Exception("failed to open random device: /dev/urandom");
     }
     unsigned long long int rullint = 0;
-    in.read((char*)&rullint, sizeof(unsigned long long int));
-    float rfloat = ((long double)rullint / (long double)ULLONG_MAX);
-    return rfloat;
+    in.read(reinterpret_cast<char*>(&rullint), sizeof(rullint));
+    return (static_cast<long double>(rullint) / static_cast<long double>(ULLONG_MAX));
 }
 
-void random_drandom(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                    viua::process::Process*, viua::kernel::Kernel*) {
+static auto random_drandom(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                           viua::process::Process*, viua::kernel::Kernel*) -> void {
     /** Return random integer.
      *
      *  Bytes are read from /dev/random random number device.
@@ -58,12 +57,12 @@ void random_drandom(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Regi
         throw new viua::types::Exception("failed to open random device: /dev/random");
     }
     int rint = 0;
-    in.read((char*)&rint, sizeof(int));
+    in.read(reinterpret_cast<char*>(&rint), sizeof(rint));
     frame->local_register_set->set(0, make_unique<viua::types::Integer>(rint));
 }
 
-void random_durandom(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                     viua::process::Process*, viua::kernel::Kernel*) {
+static auto random_durandom(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                            viua::process::Process*, viua::kernel::Kernel*) -> void {
     /** Return random integer.
      *
      *  Bytes are read from /dev/urandom random number device.
@@ -76,27 +75,27 @@ void random_durandom(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Reg
         throw new viua::types::Exception("failed to open random device: /dev/urandom");
     }
     int rint = 0;
-    in.read((char*)&rint, sizeof(int));
+    in.read(reinterpret_cast<char*>(&rint), sizeof(rint));
     frame->local_register_set->set(0, make_unique<viua::types::Integer>(rint));
 }
 
-void random_random(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                   viua::process::Process*, viua::kernel::Kernel*) {
+static auto random_random(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                          viua::process::Process*, viua::kernel::Kernel*) -> void {
     /** Return random float from range between 0.0 and 1.0.
      */
     frame->local_register_set->set(0, make_unique<viua::types::Float>(getrandom()));
 }
 
-void random_randint(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                    viua::process::Process*, viua::kernel::Kernel*) {
+static auto random_randint(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                           viua::process::Process*, viua::kernel::Kernel*) -> void {
     /** Return random integer from selected range.
      *
      *  Requires two parameters: lower and upper bound.
      *  Returned integer is in range [lower, upper).
      */
-    int lower_bound = static_cast<viua::types::Integer*>(frame->arguments->at(0))->value();
-    int upper_bound = static_cast<viua::types::Integer*>(frame->arguments->at(1))->value();
-    int modifer = ((upper_bound - lower_bound) * getrandom());
+    auto lower_bound = static_cast<viua::types::Integer*>(frame->arguments->at(0))->value();
+    auto upper_bound = static_cast<viua::types::Integer*>(frame->arguments->at(1))->value();
+    auto modifer = ((upper_bound - lower_bound) * getrandom());
     frame->local_register_set->set(0, make_unique<viua::types::Integer>(lower_bound + modifer));
 }
 
@@ -105,7 +104,7 @@ const ForeignFunctionSpec functions[] = {
     {"std::random::device::urandom", &random_durandom},
     {"std::random::random", &random_random},
     {"std::random::randint", &random_randint},
-    {NULL, NULL},
+    {nullptr, nullptr},
 };
 
 extern "C" const ForeignFunctionSpec* exports() { return functions; }

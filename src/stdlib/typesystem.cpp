@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -29,41 +29,41 @@
 using namespace std;
 
 
-void typeof(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*,
-            viua::kernel::Kernel*) {
-    if (frame->arguments->at(0) == 0) {
+static auto typeof(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                   viua::process::Process*, viua::kernel::Kernel*) -> void {
+    if (not frame->arguments->at(0)) {
         throw new viua::types::Exception("expected object as parameter 0");
     }
     frame->local_register_set->set(0, make_unique<viua::types::String>(frame->arguments->get(0)->type()));
 }
 
-void inheritanceChain(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                      viua::process::Process*, viua::kernel::Kernel*) {
-    if (frame->arguments->at(0) == 0) {
+static auto inheritanceChain(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                             viua::process::Process*, viua::kernel::Kernel*) -> void {
+    if (not frame->arguments->at(0)) {
         throw new viua::types::Exception("expected object as parameter 0");
     }
 
-    vector<string> ic = frame->arguments->at(0)->inheritancechain();
+    auto ic = frame->arguments->at(0)->inheritancechain();
     auto icv = make_unique<viua::types::Vector>();
 
-    for (unsigned i = 0; i < ic.size(); ++i) {
+    for (decltype(ic)::size_type i = 0; i < ic.size(); ++i) {
         icv->push(make_unique<viua::types::String>(ic[i]));
     }
 
     frame->local_register_set->set(0, std::move(icv));
 }
 
-void bases(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*,
-           viua::kernel::Kernel*) {
-    if (frame->arguments->at(0) == 0) {
+static auto bases(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                  viua::process::Process*, viua::kernel::Kernel*) -> void {
+    if (not frame->arguments->at(0)) {
         throw new viua::types::Exception("expected object as parameter 0");
     }
 
     viua::types::Value* object = frame->arguments->at(0);
-    vector<string> ic = object->bases();
+    auto ic = object->bases();
     auto icv = make_unique<viua::types::Vector>();
 
-    for (unsigned i = 0; i < ic.size(); ++i) {
+    for (decltype(ic)::size_type i = 0; i < ic.size(); ++i) {
         icv->push(make_unique<viua::types::String>(ic[i]));
     }
 
@@ -75,7 +75,7 @@ const ForeignFunctionSpec functions[] = {
     {"typesystem::typeof/1", &typeof},
     {"typesystem::inheritanceChain/1", &inheritanceChain},
     {"typesystem::bases/1", &bases},
-    {NULL, NULL},
+    {nullptr, nullptr},
 };
 
 extern "C" const ForeignFunctionSpec* exports() { return functions; }

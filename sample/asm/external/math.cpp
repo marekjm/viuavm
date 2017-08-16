@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -19,20 +19,18 @@
 
 #include <cmath>
 #include <iostream>
-#include <viua/types/value.h>
-#include <viua/types/float.h>
-#include <viua/types/exception.h>
+#include <viua/include/module.h>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
-#include <viua/include/module.h>
+#include <viua/types/exception.h>
+#include <viua/types/float.h>
+#include <viua/types/value.h>
 using namespace std;
 
 
-extern "C" const ForeignFunctionSpec* exports();
-
-
-static void math_sqrt(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
-    if (frame->arguments->at(0) == nullptr) {
+static auto math_sqrt(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                      viua::process::Process*, viua::kernel::Kernel*) -> void {
+    if (not frame->arguments->at(0)) {
         throw new viua::types::Exception("expected float as first argument");
     }
     if (frame->arguments->at(0)->type() != "Float") {
@@ -45,10 +43,7 @@ static void math_sqrt(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Re
 
 
 const ForeignFunctionSpec functions[] = {
-    { "math::sqrt/1", &math_sqrt },
-    { nullptr, nullptr },
+    {"math::sqrt/1", &math_sqrt}, {nullptr, nullptr},
 };
 
-extern "C" const ForeignFunctionSpec* exports() {
-    return functions;
-}
+extern "C" const ForeignFunctionSpec* exports() { return functions; }
