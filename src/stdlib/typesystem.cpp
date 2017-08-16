@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -29,16 +29,16 @@
 using namespace std;
 
 
-void typeof(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*,
-            viua::kernel::Kernel*) {
+static auto typeof(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                   viua::process::Process*, viua::kernel::Kernel*) -> void {
     if (frame->arguments->at(0) == 0) {
         throw new viua::types::Exception("expected object as parameter 0");
     }
     frame->local_register_set->set(0, make_unique<viua::types::String>(frame->arguments->get(0)->type()));
 }
 
-void inheritanceChain(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                      viua::process::Process*, viua::kernel::Kernel*) {
+static auto inheritanceChain(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                             viua::process::Process*, viua::kernel::Kernel*) -> void {
     if (frame->arguments->at(0) == 0) {
         throw new viua::types::Exception("expected object as parameter 0");
     }
@@ -53,8 +53,8 @@ void inheritanceChain(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Re
     frame->local_register_set->set(0, std::move(icv));
 }
 
-void bases(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*,
-           viua::kernel::Kernel*) {
+static auto bases(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                  viua::process::Process*, viua::kernel::Kernel*) -> void {
     if (frame->arguments->at(0) == 0) {
         throw new viua::types::Exception("expected object as parameter 0");
     }

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -46,8 +46,8 @@ float getrandom() {
     return rfloat;
 }
 
-void random_drandom(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                    viua::process::Process*, viua::kernel::Kernel*) {
+static auto random_drandom(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                           viua::process::Process*, viua::kernel::Kernel*) -> void {
     /** Return random integer.
      *
      *  Bytes are read from /dev/random random number device.
@@ -62,8 +62,8 @@ void random_drandom(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Regi
     frame->local_register_set->set(0, make_unique<viua::types::Integer>(rint));
 }
 
-void random_durandom(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                     viua::process::Process*, viua::kernel::Kernel*) {
+static auto random_durandom(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                            viua::process::Process*, viua::kernel::Kernel*) -> void {
     /** Return random integer.
      *
      *  Bytes are read from /dev/urandom random number device.
@@ -80,15 +80,15 @@ void random_durandom(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::Reg
     frame->local_register_set->set(0, make_unique<viua::types::Integer>(rint));
 }
 
-void random_random(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                   viua::process::Process*, viua::kernel::Kernel*) {
+static auto random_random(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                          viua::process::Process*, viua::kernel::Kernel*) -> void {
     /** Return random float from range between 0.0 and 1.0.
      */
     frame->local_register_set->set(0, make_unique<viua::types::Float>(getrandom()));
 }
 
-void random_randint(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
-                    viua::process::Process*, viua::kernel::Kernel*) {
+static auto random_randint(Frame* frame, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                           viua::process::Process*, viua::kernel::Kernel*) -> void {
     /** Return random integer from selected range.
      *
      *  Requires two parameters: lower and upper bound.

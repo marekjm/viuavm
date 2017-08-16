@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015, 2016 Marek Marecki
+ *  Copyright (C) 2015, 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -28,8 +28,8 @@ using namespace std;
 extern "C" const ForeignFunctionSpec* exports();
 
 
-static void hello(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*,
-                  viua::kernel::Kernel*) {
+static auto hello(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*,
+                  viua::kernel::Kernel*) -> void {
     cout << "Hello World!" << endl;
 }
 

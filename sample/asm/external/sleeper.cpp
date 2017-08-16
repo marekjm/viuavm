@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016 Marek Marecki
+ *  Copyright (C) 2016, 2017 Marek Marecki
  *
  *  This file is part of Viua VM.
  *
@@ -17,22 +17,23 @@
  *  along with Viua VM.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-#include <sstream>
-#include <memory>
-#include <thread>
 #include <chrono>
-#include <viua/types/value.h>
+#include <iostream>
+#include <memory>
+#include <sstream>
+#include <thread>
+#include <viua/include/module.h>
 #include <viua/kernel/frame.h>
 #include <viua/kernel/registerset.h>
-#include <viua/include/module.h>
+#include <viua/types/value.h>
 using namespace std;
 
 
 extern "C" const ForeignFunctionSpec* exports();
 
 
-static void sleeper_lazy_print(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*, viua::process::Process*, viua::kernel::Kernel*) {
+static auto sleeper_lazy_print(Frame*, viua::kernel::RegisterSet*, viua::kernel::RegisterSet*,
+                               viua::process::Process*, viua::kernel::Kernel*) -> void {
     cout << "sleeper::lazy_print/0: sleep for 5ms" << endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
@@ -53,10 +54,7 @@ static void sleeper_lazy_print(Frame*, viua::kernel::RegisterSet*, viua::kernel:
 
 
 const ForeignFunctionSpec functions[] = {
-    { "sleeper::lazy_print/0", &sleeper_lazy_print },
-    { nullptr, nullptr },
+    {"sleeper::lazy_print/0", &sleeper_lazy_print}, {nullptr, nullptr},
 };
 
-extern "C" const ForeignFunctionSpec* exports() {
-    return functions;
-}
+extern "C" const ForeignFunctionSpec* exports() { return functions; }
